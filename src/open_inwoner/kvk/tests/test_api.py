@@ -11,23 +11,18 @@ from . import mocks
 from .factories import CLIENT_CERT, CLIENT_CERT_PAIR, SERVER_CERT
 
 
+@patch("open_inwoner.kvk.client.requests.get")
 class KvKAPITest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.config = KvKConfig(
+    def setUp(self):
+        self.config = KvKConfig(
             api_root="https://api.kvk.nl/test/api/",
             api_key="12345",
             client_certificate=CLIENT_CERT,
             server_certificate=SERVER_CERT,
         )
-        cls.kvk_client = KvKClient(cls.config)
+        self.kvk_client = KvKClient(self.config)
 
-    def setUp(self):
-        patched_requests = patch("open_inwoner.kvk.client.requests.get")
-        self.mocked_requests = patched_requests.start()
-        self.addCleanup(patch.stopall)
-
-    def test_search_endpoint(self):
+    def test_search_endpoint(self, m):
         """
         Assert that the "Zoeken" API url is constructed properly from the API root:
             - trailing slashes are ignored
@@ -45,7 +40,7 @@ class KvKAPITest(TestCase):
         self.assertEqual(endpoint1, "https://api.kvk.nl/test/api/v2/zoeken")
         self.assertEqual(endpoint1, endpoint2)
 
-    def test_basisprofielen_endpoint(self):
+    def test_basisprofielen_endpoint(self, m):
         """
         Assert that the "Basisprofielen" API url is constructed properly from the API root:
             - trailing slashes are ignored
@@ -63,8 +58,8 @@ class KvKAPITest(TestCase):
         self.assertEqual(endpoint1, "https://api.kvk.nl/test/api/v1/basisprofielen")
         self.assertEqual(endpoint1, endpoint2)
 
-    def test_generic_search_by_kvk(self):
-        self.mocked_requests.return_value.json.return_value = mocks.simple
+    def test_generic_search_by_kvk(self, m):
+        m.return_value.json.return_value = mocks.simple
 
         company = self.kvk_client.search(kvk="68750110")
 
@@ -90,8 +85,8 @@ class KvKAPITest(TestCase):
             },
         )
 
-    def test_search_headquarters(self):
-        self.mocked_requests.return_value.json.return_value = mocks.multiple
+    def test_search_headquarters(self, m):
+        m.return_value.json.return_value = mocks.hoofdvestiging
 
         headquarters = self.kvk_client.get_company_headquarters(kvk="68750110")
         self.assertEqual(
@@ -99,26 +94,28 @@ class KvKAPITest(TestCase):
             {
                 "kvkNummer": "68750110",
                 "vestigingsnummer": "000037178598",
-                "handelsnaam": "Test BV Donald",
-                "adresType": "bezoekadres",
-                "straatnaam": "Hizzaarderlaan",
-                "plaats": "Lollum",
+                "naam": "Test BV Donald",
+                "adres": {
+                    "binnenlandsAdres": {
+                        "type": "bezoekadres",
+                        "straatnaam": "Hizzaarderlaan",
+                        "plaats": "Lollum",
+                    }
+                },
                 "type": "hoofdvestiging",
-                "links": [
-                    {
-                        "rel": "basisprofiel",
-                        "href": "https://api.kvk.nl/test/api/v1/basisprofielen/68750110",
+                "_links": {
+                    "basisprofiel": {
+                        "href": "https://api.kvk.nl/test/api/v1/basisprofielen/68750110"
                     },
-                    {
-                        "rel": "vestigingsprofiel",
-                        "href": "https://api.kvk.nl/test/api/v1/vestigingsprofielen/000037178598",
+                    "vestigingsprofiel": {
+                        "href": "https://api.kvk.nl/test/api/v1/vestigingsprofielen/000037178598"
                     },
-                ],
+                },
             },
         )
 
-    def test_search_all_branches(self):
-        self.mocked_requests.return_value.json.return_value = mocks.multiple
+    def test_search_all_branches(self, m):
+        m.return_value.json.return_value = mocks.multiple_branches
 
         branches = self.kvk_client.get_all_company_branches(kvk="68750110")
 
@@ -128,45 +125,51 @@ class KvKAPITest(TestCase):
                 {
                     "kvkNummer": "68750110",
                     "vestigingsnummer": "000037178598",
-                    "handelsnaam": "Test BV Donald",
-                    "adresType": "bezoekadres",
-                    "straatnaam": "Hizzaarderlaan",
-                    "plaats": "Lollum",
+                    "naam": "Test BV Donald",
+                    "adres": {
+                        "binnenlandsAdres": {
+                            "type": "bezoekadres",
+                            "straatnaam": "Hizzaarderlaan",
+                            "plaats": "Lollum",
+                        }
+                    },
                     "type": "hoofdvestiging",
-                    "links": [
-                        {
-                            "rel": "basisprofiel",
-                            "href": "https://api.kvk.nl/test/api/v1/basisprofielen/68750110",
+                    "_links": {
+                        "basisprofiel": {
+                            "href": "https://api.kvk.nl/test/api/v1/basisprofielen/68750110"
                         },
-                        {
-                            "rel": "vestigingsprofiel",
-                            "href": "https://api.kvk.nl/test/api/v1/vestigingsprofielen/000037178598",
+                        "vestigingsprofiel": {
+                            "href": "https://api.kvk.nl/test/api/v1/vestigingsprofielen/000037178598"
                         },
-                    ],
+                    },
                 },
                 {
                     "kvkNummer": "68750110",
                     "vestigingsnummer": "000037178601",
-                    "handelsnaam": "Test BV Donald Nevenvestiging",
-                    "adresType": "bezoekadres",
-                    "straatnaam": "Brinkerinckbaan",
-                    "plaats": "Diepenveen",
+                    "naam": "Test BV Donald Nevenvestiging",
+                    "adres": {
+                        "binnenlandsAdres": {
+                            "type": "bezoekadres",
+                            "straatnaam": "Brinkerinckbaan",
+                            "plaats": "Diepenveen",
+                        }
+                    },
                     "type": "nevenvestiging",
-                    "links": [
-                        {
-                            "rel": "basisprofiel",
-                            "href": "https://api.kvk.nl/test/api/v1/basisprofielen/68750110",
+                    "_links": {
+                        "basisprofiel": {
+                            "href": "https://api.kvk.nl/test/api/v1/basisprofielen/68750110"
                         },
-                        {
-                            "rel": "vestigingsprofiel",
-                            "href": "https://api.kvk.nl/test/api/v1/vestigingsprofielen/000037178601",
+                        "vestigingsprofiel": {
+                            "href": "https://api.kvk.nl/test/api/v1/vestigingsprofielen/000037178601"
                         },
-                    ],
+                    },
                 },
             ],
         )
 
-    def test_no_search_without_config(self):
+    def test_no_search_without_config(self, m):
+        m.return_value.json.return_value = mocks.multiple_branches
+
         config = None
         kvk_client = KvKClient(config)
 
@@ -174,8 +177,10 @@ class KvKAPITest(TestCase):
 
         self.assertEqual(company, {})
 
-    def test_no_search_with_empty_api_root(self):
+    def test_no_search_with_empty_api_root(self, m):
         """Sentry 343407"""
+
+        m.return_value.json.return_value = mocks.multiple_branches
 
         config = KvKConfig(
             api_root="",
@@ -191,20 +196,18 @@ class KvKAPITest(TestCase):
 
 
 class KvKRequestsInterfaceTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        config = KvKConfig(
-            api_root="https://api.kvk.nl/test/api/v1",
-            api_key="12345",
-            client_certificate=CLIENT_CERT,
-            server_certificate=SERVER_CERT,
-        )
-        cls.kvk_client = KvKClient(config)
-
     def setUp(self):
         patched_requests = patch("open_inwoner.kvk.client.requests.get")
         self.mocked_requests = patched_requests.start()
         self.addCleanup(patch.stopall)
+
+        config = KvKConfig(
+            api_root="https://api.kvk.nl/test/api/v2",
+            api_key="12345",
+            client_certificate=CLIENT_CERT,
+            server_certificate=SERVER_CERT,
+        )
+        self.kvk_client = KvKClient(config)
 
     def test_kvk_client_with_certs(self):
         self.kvk_client.get_company_headquarters(kvk="69599084")
@@ -218,7 +221,7 @@ class KvKRequestsInterfaceTest(TestCase):
 
     def test_kvk_client_with_key_pair(self):
         config = KvKConfig(
-            api_root="https://api.kvk.nl/test/api/v1",
+            api_root="https://api.kvk.nl/test/api/v2",
             api_key="12345",
             client_certificate=CLIENT_CERT_PAIR,
             server_certificate=SERVER_CERT,
@@ -239,7 +242,7 @@ class KvKRequestsInterfaceTest(TestCase):
 
     def test_kvk_client_no_certs(self):
         config = KvKConfig(
-            api_root="https://api.kvk.nl/test/api/v1",
+            api_root="https://api.kvk.nl/test/api/v2",
             api_key="12345",
         )
         kvk_client = KvKClient(config)
