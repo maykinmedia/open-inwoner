@@ -1020,7 +1020,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.assertEqual(documents[1].name, self.informatie_object["titel"])
         self.assertEqual(documents[2].name, self.informatie_object_no_date["titel"])
 
-    @patch("open_inwoner.cms.cases.views.status.fetch_status_history")
+    @patch("open_inwoner.openzaak.clients.ZakenClient.fetch_status_history")
     def test_e_suite_missing_current_status_fetch_status(
         self, m, mock_fetch_status_history
     ):
@@ -1065,7 +1065,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             ],
         )
 
-    @patch("open_inwoner.cms.cases.views.status.fetch_status_history")
+    @patch("open_inwoner.openzaak.clients.ZakenClient.fetch_status_history")
     def test_e_suite_missing_current_status_upload_button_displayed(
         self, m, mock_fetch_status_history
     ):

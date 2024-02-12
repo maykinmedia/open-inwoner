@@ -6,15 +6,10 @@ from django.views.generic import FormView
 from mail_editor.helpers import find_template
 from view_breadcrumbs import BaseBreadcrumbMixin
 
+from open_inwoner.openklant.clients import build_client
 from open_inwoner.openklant.forms import ContactForm
 from open_inwoner.openklant.models import OpenKlantConfig
-from open_inwoner.openklant.wrap import (
-    create_contactmoment,
-    create_klant,
-    fetch_klant,
-    get_fetch_parameters,
-    patch_klant,
-)
+from open_inwoner.openklant.wrap import get_fetch_parameters
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 
@@ -116,56 +111,61 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
         assert config.has_api_configuration()
 
         # fetch/update/create klant
-        if self.request.user.is_authenticated and (
-            self.request.user.bsn or self.request.user.kvk
-        ):
-            klant = fetch_klant(**get_fetch_parameters(self.request))
-
-            if klant:
-                self.log_system_action(
-                    "retrieved klant for BSN or KVK user", user=self.request.user
+        klant = None
+        if klanten_client := build_client("klanten"):
+            if self.request.user.is_authenticated and (
+                self.request.user.bsn or self.request.user.kvk
+            ):
+                klant = klanten_client.retrieve_klant(
+                    **get_fetch_parameters(self.request)
                 )
 
-                # check if we have some data missing from the Klant
-                update_data = {}
-                if not klant.emailadres and form.cleaned_data["email"]:
-                    update_data["emailadres"] = form.cleaned_data["email"]
-                if not klant.telefoonnummer and form.cleaned_data["phonenumber"]:
-                    update_data["telefoonnummer"] = form.cleaned_data["phonenumber"]
-                if update_data:
-                    patch_klant(klant, update_data)
+                if klant:
                     self.log_system_action(
-                        "patched klant from user with missing fields: {patched}".format(
-                            patched=", ".join(sorted(update_data.keys()))
-                        ),
-                        user=self.request.user,
+                        "retrieved klant for BSN or KVK user", user=self.request.user
                     )
-            else:
-                self.log_system_action(
-                    "could not retrieve klant for BSN or KVK user",
-                    user=self.request.user,
-                )
 
-        else:
-            data = {
-                "bronorganisatie": config.register_bronorganisatie_rsin,
-                "voornaam": form.cleaned_data["first_name"],
-                "voorvoegselAchternaam": form.cleaned_data["infix"],
-                "achternaam": form.cleaned_data["last_name"],
-                "emailadres": form.cleaned_data["email"],
-                "telefoonnummer": form.cleaned_data["phonenumber"],
-            }
-            # registering klanten won't work in e-Suite as it always pulls from BRP
-            # (but try anyway and fallback to appending details to tekst if fails)
-            klant = create_klant(data)
-            if klant:
-                if self.request.user.is_authenticated:
-                    self.log_system_action(
-                        "created klant for basic authenticated user",
-                        user=self.request.user,
-                    )
+                    # check if we have some data missing from the Klant
+                    update_data = {}
+                    if not klant.emailadres and form.cleaned_data["email"]:
+                        update_data["emailadres"] = form.cleaned_data["email"]
+                    if not klant.telefoonnummer and form.cleaned_data["phonenumber"]:
+                        update_data["telefoonnummer"] = form.cleaned_data["phonenumber"]
+                    if update_data:
+                        klanten_client.partial_update_klant(klant, update_data)
+                        self.log_system_action(
+                            "patched klant from user with missing fields: {patched}".format(
+                                patched=", ".join(sorted(update_data.keys()))
+                            ),
+                            user=self.request.user,
+                        )
                 else:
-                    self.log_system_action("created klant for anonymous user")
+                    self.log_system_action(
+                        "could not retrieve klant for BSN or KVK user",
+                        user=self.request.user,
+                    )
+
+            else:
+                data = {
+                    "bronorganisatie": config.register_bronorganisatie_rsin,
+                    "voornaam": form.cleaned_data["first_name"],
+                    "voorvoegselAchternaam": form.cleaned_data["infix"],
+                    "achternaam": form.cleaned_data["last_name"],
+                    "emailadres": form.cleaned_data["email"],
+                    "telefoonnummer": form.cleaned_data["phonenumber"],
+                }
+                # registering klanten won't work in e-Suite as it always pulls from BRP
+                # (but try anyway and fallback to appending details to tekst if fails)
+                klant = klanten_client.create_klant(data)
+
+                if klant:
+                    if self.request.user.is_authenticated:
+                        self.log_system_action(
+                            "created klant for basic authenticated user",
+                            user=self.request.user,
+                        )
+                    else:
+                        self.log_system_action("created klant for anonymous user")
 
         # create contact moment
         subject = form.cleaned_data["subject"].subject
@@ -208,7 +208,12 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
                 "identificatie": config.register_employee_id,
             },
         }
-        contactmoment = create_contactmoment(data, klant=klant)
+
+        contactmoment = None
+        if contactmomenten_client := build_client("contactmomenten"):
+            contactmoment = contactmomenten_client.create_contactmoment(
+                data, klant=klant
+            )
 
         if contactmoment:
             self.log_system_action(

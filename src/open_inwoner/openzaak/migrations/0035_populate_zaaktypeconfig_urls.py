@@ -4,6 +4,10 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import migrations, transaction
 
 from open_inwoner.openzaak.zgw_imports import get_configurable_zaaktypes
+from open_inwoner.openzaak.clients import build_client
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def populate_zaaktype_config_urls(apps, schema_editor):
@@ -14,7 +18,14 @@ def populate_zaaktype_config_urls(apps, schema_editor):
     CatalogusConfig = apps.get_model("openzaak", "CatalogusConfig")
     catalog_lookup = {c.url: c for c in CatalogusConfig.objects.all()}
 
-    zaaktypes = get_configurable_zaaktypes()
+    client = build_client("catalogi")
+    if not client:
+        logger.warning(
+            "Not populating zaaktype config urls: could not build Catalogi API client"
+        )
+        return []
+
+    zaaktypes = get_configurable_zaaktypes(client)
     if not zaaktypes:
         return []
 
