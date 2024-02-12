@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n l10n button_tags faq_tags file_tags grid_tags icon_tags link_tags map_tags notification_tags tag_tags utils condition_tags render_tags anchor_menu_tags product_tags string_tags %}
+{% load i18n l10n button_tags faq_tags file_tags grid_tags icon_tags link_tags map_tags notification_tags tag_tags utils render_tags anchor_menu_tags product_tags string_tags %}
 
 {% block header_image %}
 {% if object.image %}
@@ -74,12 +74,12 @@
             {% render_grid %}
                 {% render_column span=6 compact=True %}
                     <h3 class="h3">{% trans "U komt in aanmerking" %}</h3>
-                    {% condition_list conditions=object.conditions.all %}
+                    {% include "components/conditions/ConditionList.html" with conditions=object.conditions.all only}
                 {% endrender_column %}
 
                 {% render_column start=7 span=6 compact=True %}
                     <h3 class="h3">{% trans "U komt niet in aanmerking" %}</h3>
-                    {% condition_list conditions=object.conditions.all negative=True %}
+                    {% include "components/conditions/ConditionList.html" with conditions=object.conditions.all negative=True only}
                 {% endrender_column %}
             {% endrender_grid %}
         {% endif %}
