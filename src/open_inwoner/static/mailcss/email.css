@@ -28,14 +28,14 @@ table, .table-mail {
     background-color: #ffffff;
     border-spacing: 0;
     color: #4B4B4B;
-    font-family: Lato, Helvetica, sans-serif;
+    font-family: "Lato", "Helvetica", sans-serif;
     line-height: 24px;
 }
 
-td, .td-mail {
+td, .td-mail  {
     /* --color-gray-dark */
     color: #4B4B4B;
-    font-family: Lato, Helvetica, Arial, sans-serif;
+    font-family: "Lato", "Helvetica", Arial, sans-serif;
     line-height: 24px;
 }
 
