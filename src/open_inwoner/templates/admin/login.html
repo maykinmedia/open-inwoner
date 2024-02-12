@@ -1,0 +1,17 @@
+{% extends "admin/login.html" %}
+{% load solo_tags i18n %}
+
+
+{% block content %}
+{{ block.super }}
+
+{% get_solo 'mozilla_django_oidc_db.OpenIDConnectConfig' as oidc_config %}
+{% get_solo 'configurations.SiteConfiguration' as site_config %}
+{% if oidc_config.enabled and site_config.openid_enabled_for_admin %}
+<div class="admin-login-option">{% trans "or" %}</div>
+<div class="admin-login-option">
+    <a href="{% url 'oidc_authentication_init' %}">{% trans "Login with organization account" %}</a>
+</div>
+{% endif %}
+
+{% endblock %}
