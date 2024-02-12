@@ -185,6 +185,9 @@ class NecessaryUserForm(forms.ModelForm):
             "last_name",
             "email",
             "invite",
+            "cases_notifications",
+            "messages_notifications",
+            "plans_notifications",
         )
 
     def __init__(self, user, *args, **kwargs):
@@ -193,6 +196,14 @@ class NecessaryUserForm(forms.ModelForm):
         self.fields["first_name"].required = True
         self.fields["infix"].required = False
         self.fields["last_name"].required = True
+
+        # notifications
+        if not (user.login_type == LoginTypeChoices.digid and case_page_is_published()):
+            del self.fields["cases_notifications"]
+        if not inbox_page_is_published():
+            del self.fields["messages_notifications"]
+        if not collaborate_page_is_published():
+            del self.fields["plans_notifications"]
 
         if user.is_digid_user_with_brp:
             self.fields["first_name"].disabled = True
