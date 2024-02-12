@@ -8,6 +8,8 @@ table, th, td, img {
 
 th {
     font-weight: bold;
+    padding: 18px 20px 18px 20px;
+    text-align: left;
 }
 
 p {
@@ -27,15 +29,16 @@ table, .table-mail {
     /* --color-gray-dark */
     background-color: #ffffff;
     border-spacing: 0;
+    border-collapse: collapse;
     color: #4B4B4B;
-    font-family: "Lato", "Helvetica", sans-serif;
+    font-family: Lato, Helvetica, sans-serif;
     line-height: 24px;
 }
 
 td, .td-mail  {
     /* --color-gray-dark */
     color: #4B4B4B;
-    font-family: "Lato", "Helvetica", Arial, sans-serif;
+    font-family: Lato, Helvetica, Arial, sans-serif;
     line-height: 24px;
 }
 
@@ -83,7 +86,7 @@ td.align-center {
     border-radius: 6px;
     color: #704000;
     display: inline-block;
-    font-family: 'Lato', 'Helvetica', Arial, sans-serif;
+    font-family: Lato, Helvetica, Arial, sans-serif;
     font-size: 16px;
     line-height: 24px;
     text-decoration: none;
