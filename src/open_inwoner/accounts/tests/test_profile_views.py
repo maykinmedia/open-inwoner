@@ -276,7 +276,7 @@ class ProfileViewTests(WebTest):
 
         response = self.app.get(self.url, user=self.user)
 
-        message_link = response.pyquery("[title='Stuur een bericht']")
+        message_link = response.pyquery("[text='Stuur een bericht']")
         link_text = message_link.find(".link__text").text
 
         self.assertEqual(link_text(), _("Stuur een bericht"))
