@@ -27,6 +27,10 @@
                 "user"
             ],
             [
+                "mozilla_django_oidc_db",
+                "openidconnectconfig"
+            ],
+            [
                 "userfeed",
                 "feeditemdata"
             ]
