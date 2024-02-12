@@ -25,4 +25,10 @@
       padding: var(--spacing-small) 0;
     }
   }
+
+  .button {
+    &--error {
+      font-weight: bold;
+    }
+  }
 }
