@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n button_tags string_tags pagination_tags helpers card_tags form_tags link_tags cms_tags %}
+{% load i18n button_tags string_tags pagination_tags helpers form_tags link_tags cms_tags %}
 
 {% block header_image %}
     {% placeholder 'banner' %}
@@ -65,7 +65,7 @@
             </tbody>
         </table>
     {% else %}
-        {% card_container plans=plans.plan_list columns=2 %}
+        {% include "components/Card/CardContainer.html" with plans=plans.plan_list columns=2 only %}
     {% endif %}
 
     {% pagination page_obj=page_obj paginator=paginator request=request %}
