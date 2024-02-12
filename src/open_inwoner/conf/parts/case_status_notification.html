@@ -32,7 +32,7 @@
                             <img src="/static/img/mail/info_info-blue.jpg" alt="">
                         </td>
                         <td class="td__padding-top td__padding-right td__padding-bottom">
-                            <p class="text-color__info">De status is gewijzigd naar {{ case_status }}.</p>
+                            <p class="text-color__info">De status is gewijzigd naar <span class="status_current"><strong><a href="{{ case_link }}" class="color--primary">{{ case_status }}</a></strong></span>.</p>
                         </td>
                     </tr>
                 </table>
@@ -44,7 +44,7 @@
     <tr>
         <td class="td-mail td-mail__bg-info td__padding-all" colspan="6">
             <p>U hoeft niets te doen. Zodra er weer een update beschikbaar is ontvangt u hier een melding over. U kunt wel inloggen om uw aanvraag te bekijken.</p>
-            <p><strong><a href="https://example.com/accounts/login/" class="color--primary">Log in &rarr;</a></strong></p>
+            <p><strong><a href="https://example.com/accounts/login/" class="color--primary">Log in</a><span class="color--primary"> &rarr;</span></strong></p>
         </td>
     </tr>
     <tr>
