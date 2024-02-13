@@ -1,4 +1,5 @@
 import logging
+from unittest.mock import patch
 
 from django.test import TestCase, override_settings
 from django.utils.translation import gettext as _
@@ -275,23 +276,9 @@ class TestLogging(HaalCentraalMixin, TestCase):
             first_name="", last_name="", login_type=LoginTypeChoices.digid
         )
         user.bsn = "999993847"
-        user.save()
 
-        log_entry = TimelineLog.objects.filter(object_id=user.id)[1]
-
-        self.assertEquals(
-            log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
-        )
-        self.assertEquals(log_entry.object_id, str(user.id))
-        self.assertEquals(
-            log_entry.extra_data,
-            {
-                "message": _("data was retrieved from haal centraal"),
-                "log_level": logging.INFO,
-                "action_flag": list(LOG_ACTIONS[5]),
-                "content_object_repr": str(user),
-            },
-        )
+        with self.assertLogs("open_inwoner.haalcentraal.signals"):
+            user.save()
 
     @requests_mock.Mocker()
     def test_single_entry_is_logged_when_there_is_an_error(self, m):
@@ -317,8 +304,6 @@ class TestLogging(HaalCentraalMixin, TestCase):
             first_name="", last_name="", login_type=LoginTypeChoices.digid
         )
         user.bsn = "999993847"
-        user.save()
 
-        log_entries = TimelineLog.objects.count()
-
-        self.assertEqual(log_entries, 1)
+        with self.assertLogs("open_inwoner.haalcentraal.signals"):
+            user.save()

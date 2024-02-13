@@ -2,11 +2,9 @@ import logging
 from typing import Optional
 
 from django.conf import settings
-from django.utils.translation import gettext as _
 
 from open_inwoner.haalcentraal.api import BRP_1_3, BRP_2_1, BRPAPI
 from open_inwoner.haalcentraal.api_models import BRPData
-from open_inwoner.utils.logentry import system_action
 
 logger = logging.getLogger(__name__)
 
@@ -41,4 +39,4 @@ def update_brp_data_in_db(user, initial=True):
     if initial is False:
         user.save()
 
-    system_action(_("data was retrieved from haal centraal"), content_object=user)
+    logger.info("Retrieving data for %s from haal centraal based on BSN", user)
