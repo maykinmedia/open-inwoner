@@ -254,7 +254,7 @@ django-treebeard==4.4
     #   djangocms-attributes-field
 django-two-factor-auth[phonenumberslite,webauthn]==1.16.0
     # via maykin-2fa
-django-view-breadcrumbs==2.2.4
+django-view-breadcrumbs==2.5.1
     # via -r requirements/base.in
 django-yubin==1.7.1
     # via -r requirements/base.in
