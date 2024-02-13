@@ -10,7 +10,7 @@ amqp==5.1.1
     # via kombu
 ape-pie==0.1.0
     # via zgw-consumers
-asgiref==3.4.1
+asgiref==3.7.2
     # via django
 asn1crypto==1.5.1
     # via webauthn
@@ -79,7 +79,7 @@ defusedxml==0.7.1
     #   odfpy
 diff-match-patch==20200713
     # via django-import-export
-django==3.2.24
+django==4.2.10
     # via
     #   -r requirements/base.in
     #   django-admin-index
@@ -439,7 +439,6 @@ pytz==2021.3
     # via
     #   -r requirements/base.in
     #   celery
-    #   django
     #   django-yubin
 pyyaml==6.0
     # via

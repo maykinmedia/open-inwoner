@@ -12,7 +12,7 @@ tinycss2
 css_inline
 
 # Framework libraries
-Django>=3.2.11<4.0
+Django>=4.2<5.0
 django-admin-index
 django-axes
 django-filer

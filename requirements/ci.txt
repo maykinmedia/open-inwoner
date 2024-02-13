@@ -18,7 +18,7 @@ ape-pie==0.1.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   zgw-consumers
-asgiref==3.4.1
+asgiref==3.7.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -155,7 +155,7 @@ diff-match-patch==20200713
     #   django-import-export
 dill==0.3.7
     # via pylint
-django==3.2.24
+django==4.2.10
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -812,7 +812,6 @@ pytz==2021.3
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   celery
-    #   django
     #   django-yubin
 pyyaml==6.0
     # via
