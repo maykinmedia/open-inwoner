@@ -17,7 +17,7 @@
                 <!-- submission cases -->
                 {% if case.case_type == "OpenSubmission" %}
                     <a href="{{ case.vervolg_link }}" class="cases__link">
-                    <h2 class="card__heading">{{ case.naam }}</h2>
+                    <h2 class="card__heading-2">{{ case.naam }}</h2>
                     {% render_list %}
                     <span class="case-list">
                         <li class="list-item list-item--compact">
@@ -36,7 +36,7 @@
                 <!-- other cases -->
                 {% else %}
                     <a href="{% url 'cases:case_detail' object_id=case.uuid %}" class="cases__link">
-                    <h2 class="card__heading">{{ case.description }}</h2>
+                    <h2 class="card__heading-2">{{ case.description }}</h2>
                     {% render_list %}
                         <span class="case-list">
                         <li class="list-item list-item--compact">

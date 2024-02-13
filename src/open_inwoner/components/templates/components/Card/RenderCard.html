@@ -12,9 +12,15 @@
 
     <div class="card__body{% if compact %}--compact{% endif %} {% if direction %} card__body--direction-{{ direction }}{% endif %}{% if grid %} card__body--grid{% endif %}">
         {% if title %}
-            <p class="{% if compact %}h4{% else %}h3{% endif %}">
+            {% if compact %}
+            <h3 class="card__heading-3">
                 <span class="link link__text">{{ title }}</span>
-            </p>
+            </h3>
+            {% else %}
+            <h4 class="card__heading-4">
+                <span class="link link__text">{{ title }}</span>
+            </h4>
+            {% endif %}
         {% endif %}
         {{ contents }}
     </div>

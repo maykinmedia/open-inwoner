@@ -1,7 +1,7 @@
 {% load icon_tags link_tags i18n grid_tags thumbnail %}
 
 {# template for product cards with images #}
-<a href="{{ url }}" class="card">
+<a href="{{ url }}" class="card card__product-card">
 
     {% if image %}
     <div class="card__body card__body--grid">
@@ -9,11 +9,11 @@
             <img class="card__image" src="{{ image|thumbnail_url:'card-image' }}" alt="{{ image.default_alt_text }}"/>
         </div>
         <div class="card__content">
-                <h2 class="h2"><span class="link link__text">{{ title }}</span></h2>
+                <h2 class="card__heading-2"><span class="link link__text">{{ title }}</span></h2>
     {% else %}
         <div class="card__body">
             <div class="card__content">
-            <h2 class="h2"><span class="link link__text">{{ title }}</span></h2>
+            <h2 class="card__heading-2"><span class="link link__text">{{ title }}</span></h2>
     {% endif %}
             <p class="p">{{ description }}</p>
             {% if object.end_date %}
