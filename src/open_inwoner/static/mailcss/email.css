@@ -17,7 +17,7 @@ p {
     margin: 0;
 }
 
-.heading-font, h1 {
+.heading-font, h1, h2, h3, h4 {
     color: #000000;
     font-family: Ubuntu, Helvetica, Arial, sans-serif;
     font-weight: bold;
@@ -44,11 +44,35 @@ td, .td-mail {
 
 /* Class styles for differing elements */
 
-.logo-mail {
+.td-mail__bg-danger .td-mail__bg-white a {
+    color: #704000;
+}
+
+.td-mail__bg-info .td-mail__bg-white a, .td-mail__bg-info a, .td__info-link a {
+    color: #2566A7;
+}
+
+.td__logo-mail {
     text-align: center;
+    padding-top: 16px;
+}
+
+.img__logo-mail {
     width: auto;
     max-height: 55px;
     max-width: 600px;
+}
+
+.mail__icon {
+    border-right: 5px solid #FFFFFF;
+}
+
+.td-mail h1 {
+    font-size: 20px;
+}
+
+.td-mail h2 {
+    font-size: 18px;
 }
 
 .td-mail.align-top {
@@ -65,7 +89,7 @@ td.align-center {
 
 .td-mail.spacer-bottom {
     border-bottom: 1px solid #d2d2d2;
-    padding-top: 80px;
+    padding-top: 60px;
 }
 
 .td-mail--accent {
@@ -116,6 +140,10 @@ td.align-center {
 
 .td__padding-zero {
     padding: 0;
+}
+
+.spacing__extra {
+    height: 20px;
 }
 
 /* Theme-colors and other mail-template colors */
