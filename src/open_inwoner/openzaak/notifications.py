@@ -1,5 +1,5 @@
 import logging
-from datetime import timedelta
+from datetime import date, timedelta
 from typing import List
 
 from django.conf import settings
@@ -572,12 +572,14 @@ def send_case_update_email(
         reverse("cases:case_detail", kwargs={"object_id": str(case.uuid)})
     )
 
+    config = OpenZaakConfig.get_solo()
+
     template = find_template(template_name)
     context = {
         "identification": case.identification,
         "type_description": case.zaaktype.omschrijving,
         "start_date": case.startdatum,
-        "end_date": case.einddatum_gepland,
+        "end_date": date.today() + timedelta(days=config.action_required_deadline_days),
         "case_link": case_detail_url,
     }
     if extra_context:

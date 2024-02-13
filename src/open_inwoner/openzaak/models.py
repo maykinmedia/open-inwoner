@@ -163,6 +163,12 @@ class OpenZaakConfig(SingletonModel):
         ),
     )
 
+    action_required_deadline_days = models.IntegerField(
+        verbose_name=_("Standaard actie deadline termijn in dagen"),
+        default=15,
+        help_text=_("Aantal dagen voor gebruiker om actie te ondernemen."),
+    )
+
     class Meta:
         verbose_name = _("Open Zaak configuration")
 
