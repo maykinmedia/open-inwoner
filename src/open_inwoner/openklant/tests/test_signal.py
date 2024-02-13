@@ -1,5 +1,5 @@
 from django.contrib.auth import user_logged_in
-from django.test import RequestFactory, override_settings
+from django.test import RequestFactory
 
 import requests_mock
 from django_webtest import WebTest

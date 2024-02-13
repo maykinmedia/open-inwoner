@@ -2,13 +2,10 @@ import logging
 
 from django.conf import settings
 from django.contrib import auth, messages
-from django.core.exceptions import ValidationError
-from django.db import IntegrityError, transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import resolve_url
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django.views import View
 from django.views.generic import View
 
 import requests
@@ -19,7 +16,6 @@ from mozilla_django_oidc.views import (
 from mozilla_django_oidc_db.views import (
     OIDC_ERROR_SESSION_KEY,
     OIDCCallbackView as _OIDCCallbackView,
-    get_exception_message,
 )
 
 from digid_eherkenning_oidc_generics.mixins import (

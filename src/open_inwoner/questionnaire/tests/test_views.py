@@ -6,7 +6,6 @@ from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse
 from django.views.generic import FormView
 
-from cms import api
 from django_webtest import WebTest
 
 from ...accounts.tests.factories import UserFactory

@@ -1,8 +1,4 @@
-from datetime import date
-
 from django.test import TestCase
-
-from freezegun import freeze_time
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.utils.hash import generate_email_from_string

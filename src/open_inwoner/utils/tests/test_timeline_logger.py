@@ -72,7 +72,7 @@ class TestAdminTimelineLogging(WebTest):
             {
                 "message": "Titel, Doel and Einddatum gewijzigd.",
                 "action_flag": list(LOG_ACTIONS[CHANGE]),
-                "content_object_repr": f"Updated",
+                "content_object_repr": "Updated",
             },
         )
 

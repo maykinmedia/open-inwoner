@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.utils import timezone
 from django.utils.html import strip_tags
-from django.utils.translation import ngettext, ugettext as _
+from django.utils.translation import ngettext
 
 from freezegun import freeze_time
 

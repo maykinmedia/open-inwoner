@@ -7,7 +7,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from colorfield.fields import ColorField
 from django_better_admin_arrayfield.models.fields import ArrayField
-from filer.fields.file import FilerFileField
 from filer.fields.image import FilerImageField
 from ordered_model.models import OrderedModel, OrderedModelManager
 from solo.models import SingletonModel

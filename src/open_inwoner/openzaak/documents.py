@@ -3,8 +3,6 @@ from typing import Optional
 
 from django.conf import settings
 
-from zgw_consumers.client import build_client
-
 from open_inwoner.openzaak.api_models import InformatieObject
 from open_inwoner.openzaak.clients import build_client
 

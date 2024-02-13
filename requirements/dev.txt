@@ -53,7 +53,9 @@ billiard==3.6.4.0
     #   -r requirements/ci.txt
     #   celery
 black==22.12.0
-    # via -r requirements/dev.in
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 blinker==1.7.0
     # via flask
 boltons==21.0.0
@@ -555,7 +557,9 @@ faker==9.9.0
     #   -r requirements/ci.txt
     #   factory-boy
 flake8==3.9.2
-    # via -r requirements/dev.in
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 flask==3.0.0
     # via
     #   flask-basicauth
@@ -654,7 +658,6 @@ isort==5.9.3
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-    #   -r requirements/dev.in
     #   pylint
 itsdangerous==2.1.2
     # via flask
@@ -750,8 +753,11 @@ mozilla-django-oidc-db==0.12.0
     #   -r requirements/ci.txt
 msgpack==1.0.7
     # via locust
-mypy-extensions==0.4.3
-    # via black
+mypy-extensions==1.0.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   black
 notifications-api-common==0.2.2
     # via
     #   -c requirements/ci.txt
@@ -782,8 +788,11 @@ packaging==23.0
     #   build
     #   djangocms-text-ckeditor
     #   sphinx
-pathspec==0.9.0
-    # via black
+pathspec==0.12.1
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   black
 pbr==5.9.0
     # via stevedore
 pep517==0.11.0
@@ -834,6 +843,8 @@ psycopg2==2.9.9
     #   -r requirements/ci.txt
 pycodestyle==2.7.0
     # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
     #   autopep8
     #   flake8
 pycparser==2.20
@@ -852,7 +863,10 @@ pyee==11.0.1
     #   -r requirements/ci.txt
     #   playwright
 pyflakes==2.3.1
-    # via flake8
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   flake8
 pygments==2.12.0
     # via sphinx
 pyjwt==2.8.0

@@ -1,4 +1,4 @@
-from django.test import TestCase, modify_settings
+from django.test import TestCase
 
 from pyquery import PyQuery
 

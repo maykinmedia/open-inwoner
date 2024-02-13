@@ -1,10 +1,9 @@
-from datetime import date
 from unittest.mock import patch
 from urllib.parse import urlencode
 
 from django.contrib.sites.models import Site
 from django.core import mail
-from django.test import modify_settings, override_settings
+from django.test import override_settings
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
 
@@ -20,7 +19,6 @@ from digid_eherkenning_oidc_generics.models import (
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.kvk.branches import get_kvk_branch_number
-from open_inwoner.kvk.models import KvKConfig
 from open_inwoner.kvk.tests.factories import CertificateFactory
 
 from ...cms.tests import cms_tools

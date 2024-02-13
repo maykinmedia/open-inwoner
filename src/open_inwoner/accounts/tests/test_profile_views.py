@@ -12,7 +12,6 @@ import requests_mock
 from cms import api
 from django_webtest import WebTest
 from pyquery import PyQuery as PQ
-from timeline_logger.models import TimelineLog
 from webtest import Upload
 
 from open_inwoner.accounts.choices import StatusChoices
@@ -35,7 +34,6 @@ from ..models import User
 from .factories import (
     ActionFactory,
     DigidUserFactory,
-    DocumentFactory,
     UserFactory,
     eHerkenningUserFactory,
 )

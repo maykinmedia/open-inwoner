@@ -1,8 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from open_inwoner.accounts.tests.factories import UserFactory
-
 
 class APIMockTest(TestCase):
     def test_basic_response(self):

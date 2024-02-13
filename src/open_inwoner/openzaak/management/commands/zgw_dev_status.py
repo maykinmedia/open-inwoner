@@ -172,7 +172,7 @@ class Command(BaseCommand):
                     {
                         "zaak": case.url,
                         "resultaattype": next_result_type.url,
-                        "toelichting": f"set from management command",
+                        "toelichting": "set from management command",
                     },
                 )
 
@@ -182,7 +182,7 @@ class Command(BaseCommand):
                     "zaak": case.url,
                     "statustype": next_status_type.url,
                     "datumStatusGezet": timezone.now().isoformat(),
-                    "statustoelichting": f"set from management command",
+                    "statustoelichting": "set from management command",
                 },
             )
 

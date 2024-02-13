@@ -1,5 +1,10 @@
-from django.db.models import Case, F, Max, OuterRef, Q, Subquery, Value, When
+from typing import TYPE_CHECKING
+
+from django.db.models import Case, F, Max, OuterRef, Q, Subquery, When
 from django.db.models.query import QuerySet
+
+if TYPE_CHECKING:
+    from open_inwoner.accounts.models import User
 
 
 class MessageQuerySet(QuerySet):

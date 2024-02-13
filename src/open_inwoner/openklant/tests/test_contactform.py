@@ -268,7 +268,7 @@ class ContactFormTestCase(
             {
                 "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
                 "bronorganisatie": "123456789",
-                "tekst": f"Onderwerp: Aanvraag document\n\nhey!\n\nwaddup?",
+                "tekst": "Onderwerp: Aanvraag document\n\nhey!\n\nwaddup?",
                 "type": "Melding",
                 "kanaal": "Internet",
                 "onderwerp": "afdeling-xyz",
@@ -413,7 +413,7 @@ class ContactFormTestCase(
             {
                 "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
                 "bronorganisatie": "123456789",
-                "tekst": f"Onderwerp: Aanvraag document\n\nhey!\n\nwaddup?",
+                "tekst": "Onderwerp: Aanvraag document\n\nhey!\n\nwaddup?",
                 "type": "Melding",
                 "kanaal": "Internet",
                 "onderwerp": "afdeling-xyz",
@@ -503,7 +503,7 @@ class ContactFormTestCase(
                         {
                             "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
                             "bronorganisatie": "123456789",
-                            "tekst": f"Onderwerp: Aanvraag document\n\nhey!\n\nwaddup?",
+                            "tekst": "Onderwerp: Aanvraag document\n\nhey!\n\nwaddup?",
                             "type": "Melding",
                             "kanaal": "Internet",
                             "onderwerp": "afdeling-xyz",
@@ -579,7 +579,7 @@ class ContactFormTestCase(
             {
                 "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
                 "bronorganisatie": "123456789",
-                "tekst": f"Onderwerp: Aanvraag document\n\nhey!\n\nwaddup?",
+                "tekst": "Onderwerp: Aanvraag document\n\nhey!\n\nwaddup?",
                 "type": "Melding",
                 "kanaal": "Internet",
                 "onderwerp": "afdeling-xyz",
@@ -675,7 +675,7 @@ class ContactFormTestCase(
                         {
                             "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
                             "bronorganisatie": "123456789",
-                            "tekst": f"Onderwerp: Aanvraag document\n\nhey!\n\nwaddup?",
+                            "tekst": "Onderwerp: Aanvraag document\n\nhey!\n\nwaddup?",
                             "type": "Melding",
                             "kanaal": "Internet",
                             "onderwerp": "afdeling-xyz",

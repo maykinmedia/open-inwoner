@@ -1,4 +1,4 @@
-from django.test import TestCase, modify_settings, override_settings
+from django.test import TestCase
 
 from eherkenning.mock.idp.forms import eHerkenningPasswordLoginForm
 

@@ -1,6 +1,5 @@
 from django import template
 from django.db.models import QuerySet
-from django.utils.translation import gettext as _
 
 register = template.Library()
 

@@ -7,7 +7,6 @@ from filer.fields.image import FilerImageField
 from treebeard.exceptions import InvalidMoveToDescendant
 from treebeard.mp_tree import MP_MoveHandler, MP_Node
 
-from ...utils.ckeditor import get_rendered_content
 from ..managers import CategoryPublishedQueryset
 
 

@@ -2,7 +2,6 @@ from collections import defaultdict
 
 from django import forms
 from django.contrib import admin
-from django.core.exceptions import ValidationError
 from django.forms import BaseModelFormSet
 from django.utils.translation import gettext as _
 
