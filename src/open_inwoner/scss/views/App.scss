@@ -255,39 +255,36 @@
 
 @font-face {
   font-family: 'Heading';
-  font-weight: bold;
-  src: url('/static/fonts/ubuntu/Ubuntu-M.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'Heading';
-  font-weight: bold;
-  font-style: italic;
-  src: url('/static/fonts/ubuntu/Ubuntu-MI.ttf') format('truetype');
+  src: url('/media/custom_fonts/heading_font.ttf') format('truetype'),
+    url('/static/fonts/ubuntu/Ubuntu-M.ttf') format('truetype');
 }
 
 @font-face {
   font-family: 'Body';
-  src: url('/static/fonts/lato/Lato-Regular.ttf') format('truetype');
+  src: url('/media/custom_fonts/body_font_regular.ttf') format('truetype'),
+    url('/static/fonts/lato/Lato-Regular.ttf') format('truetype');
 }
 
 @font-face {
   font-family: 'Body';
   font-weight: bold;
-  src: url('/static/fonts/lato/Lato-Bold.ttf') format('truetype');
+  src: url('/media/custom_fonts/body_font_bold.ttf') format('truetype'),
+    url('/static/fonts/lato/Lato-Bold.ttf') format('truetype');
 }
 
 @font-face {
   font-family: 'Body';
   font-style: italic;
-  src: url('/static/fonts/lato/Lato-Italic.ttf') format('truetype');
+  src: url('/media/custom_fonts/body_font_italic.ttf') format('truetype'),
+    url('/static/fonts/lato/Lato-Italic.ttf') format('truetype');
 }
 
 @font-face {
   font-family: 'Body';
   font-weight: bold;
   font-style: italic;
-  src: url('/static/fonts/lato/Lato-BoldItalic.ttf') format('truetype');
+  src: url('/media/custom_fonts/body_font_bold_italic.ttf') format('truetype'),
+    url('/static/fonts/lato/Lato-BoldItalic.ttf') format('truetype');
 }
 
 @font-face {
