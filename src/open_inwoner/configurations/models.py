@@ -7,7 +7,7 @@ from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from colorfield.fields import ColorField
 from django_better_admin_arrayfield.models.fields import ArrayField

@@ -5,7 +5,7 @@ from django.core import mail
 from django.core.files.images import ImageFile
 from django.test import override_settings
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from cms import api
 from django_webtest import WebTest

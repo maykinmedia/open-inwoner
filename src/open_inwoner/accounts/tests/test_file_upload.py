@@ -2,7 +2,7 @@ from django.conf import settings
 from django.template.defaultfilters import filesizeformat
 from django.test import override_settings
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from django_webtest import WebTest
 from privates.test import temp_private_root

@@ -5,7 +5,7 @@ from typing import Union
 from django.contrib.gis.db.models import PointField
 from django.core.exceptions import ValidationError
 from django.db import connection, models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from geopy.exc import GeopyError
 from localflavor.nl.models import NLZipCodeField

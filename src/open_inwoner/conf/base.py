@@ -1,6 +1,6 @@
 import os
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 import sentry_sdk
 from easy_thumbnails.conf import Settings as thumbnail_settings
