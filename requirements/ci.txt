@@ -473,7 +473,7 @@ djangorestframework==3.12.4
     #   django-extra-fields
     #   drf-spectacular
     #   notifications-api-common
-djangorestframework-camel-case==1.2.0
+djangorestframework-camel-case==1.4.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
