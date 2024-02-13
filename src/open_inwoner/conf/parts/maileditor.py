@@ -220,10 +220,6 @@ MAIL_EDITOR_CONF = {
                 "name": "case_link",
                 "description": _("The link to the case details."),
             },
-            # {
-            #     "name": "start_date",
-            #     "description": _("The start date of the case"),
-            # },
             {
                 "name": "end_date",
                 "description": _("The planned final date of the case"),
@@ -233,12 +229,26 @@ MAIL_EDITOR_CONF = {
                 "description": _("The link to the case details."),
             },
             {
-                "name": "case_status",
-                "description": _("The current status of the case."),
-            },
-            {
                 "name": "site_name",
                 "description": _("Name of the site"),
+            },
+            {
+                "name": "contactpage",
+                "description": _("The link to an existing contactpage"),
+            },
+            {
+                "name": "profile_notifications",
+                "description": _(
+                    "The link to the notifications and unsubscribe settings"
+                ),
+            },
+            {
+                "name": "profile_page",
+                "description": _("The link to the user's profile page"),
+            },
+            {
+                "name": "login_page",
+                "description": _("The link to the login page"),
             },
         ],
     },
@@ -310,20 +320,8 @@ MAIL_EDITOR_CONF = {
                 "description": _("The planned final date of the case"),
             },
             {
-                "name": "case_link",
-                "description": _("The link to the case details."),
-            },
-            {
-                "name": "case_status",
-                "description": _("The current status of the case."),
-            },
-            {
                 "name": "site_name",
                 "description": _("Name of the site"),
-            },
-            {
-                "name": "site_logo",
-                "description": _("URL of the site logo."),
             },
         ],
     },

@@ -8,6 +8,7 @@
 </head>
 
 <style data-css-inline="keep">
+    /* Font-styles for mail-clients that support custom fonts */
     /* cyrillic-ext */
     @font-face {
         font-family: Ubuntu;
@@ -89,6 +90,19 @@
     }
 </style>
 
+<style data-css-inline="keep">
+    /* Responsiveness mail-clients that support media-queries */
+    @media only screen and (max-width: 610px) {
+        .tr--responsive {
+            display: block;
+            width: 100%;
+        }
+        .td--responsive {
+            display: block;
+        }
+    }
+</style>
+
 <style>
     /* Use <style data-css-inline="extra_css"> for additional styling */
     a {
@@ -139,29 +153,29 @@
 <body>
 
 <center>
-    <table border="0" cellspacing="0" width="100%" class="table-mail">
+    <table border="0" cellspacing="0" cellpadding="0" width="100%" class="table-mail">
         <tbody>
         <tr>
             <!-- Do not remove empty TD's !!! -->
-            <td>&nbsp;</td>
+            <td></td>
             <td width="600">
-                <table>
+                <table border="0" cellspacing="0" cellpadding="0" width="100%" class="table-mail">
                     <tr>
                         <td class="td-mail--accent td-mail__bg-accent" colspan="6" style="background-color: {{ theming.accent_color }};">&nbsp;</td>
                     </tr>
                     <tr>
                         <td class="td-mail logo-mail td__padding-top" colspan="6">
-                            <img height="50" src="{{ logo.url }}" alt="" class="logo-mail">
+                            <img height="55" src="{{ logo.url }}" alt="" class="logo-mail">
                         </td>
                     </tr>
                     <tr>
-                        <td class="td-mail td__padding-all" valign="top" colspan="6">
+                        <td class="td-mail" valign="top" colspan="6">
                             {{ content }}
                         </td>
                     </tr>
                 </table>
             </td>
-            <td>&nbsp;</td>
+            <td></td>
         </tr>
         </tbody>
     </table>

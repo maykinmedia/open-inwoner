@@ -11,12 +11,12 @@
             <h1>Nieuw:</h1>
         </td>
     </tr>
-    <tr>
-        <td class="td-mail td-mail__bg-info td__padding-all" colspan="3">
+    <tr class="tr--responsive">
+        <td class="td--responsive td-mail td-mail__bg-info td__padding-all" colspan="3">
             <p><span class="text-color__small-gray-900">Aanvraag: </span></p>
             <h2 class="heading-font">{{ type_description }}</h2>
         </td>
-        <td class="td-mail td-mail__bg-info td__padding-all" colspan="3">
+        <td class="td--responsive td-mail td-mail__bg-info td__padding-all" colspan="3">
             <p><span class="text-color__small-gray-900">Zaaknummer: </span><br/>{{ identification }}</p>
         </td>
     </tr>
@@ -32,7 +32,7 @@
                             <img src="/static/img/mail/info_info-blue.jpg" alt="">
                         </td>
                         <td class="td__padding-top td__padding-right td__padding-bottom">
-                            <p class="text-color__info">De status is gewijzigd naar <span class="status_current"><strong><a href="{{ case_link }}" class="color--primary">{{ case_status }}</a></strong></span>.</p>
+                            <p class="text-color__info">De status is gewijzigd naar <span class="status_current"><strong><a href="{{ case_link }}" class="text-color__info">{{ type_description }}</a></strong></span>.</p>
                         </td>
                     </tr>
                 </table>
@@ -44,7 +44,7 @@
     <tr>
         <td class="td-mail td-mail__bg-info td__padding-all" colspan="6">
             <p>U hoeft niets te doen. Zodra er weer een update beschikbaar is ontvangt u hier een melding over. U kunt wel inloggen om uw aanvraag te bekijken.</p>
-            <p><strong><a href="https://example.com/accounts/login/" class="color--primary">Log in</a><span class="color--primary"> &rarr;</span></strong></p>
+            <p><strong><a href="{{ login_page }}" class="color--primary">Log in</a><span class="color--primary"> &rarr;</span></strong></p>
         </td>
     </tr>
     <tr>
@@ -67,9 +67,9 @@
         </td>
     </tr>
     <tr>
-        <td class="td-mail td__padding-right td__padding-bottom td__padding-left" colspan="3"><a href="https://example.com/contactformulier/" class="color--secondary">Ga naar onze contactpagina</a>
+        <td class="td--responsive td-mail td__padding-right td__padding-bottom td__padding-left" colspan="3"><a href="{{ contactpage }}" class="color--secondary">Ga naar onze contactpagina</a>
         </td>
-        <td class="td-mail td__padding-right td__padding-bottom td__padding-left" colspan="3"><a href="tel:+14050" class="color--secondary">Bel 14050</a></td>
+        <td class="td--responsive td-mail td__padding-right td__padding-bottom td__padding-left" colspan="3"><a href="tel:+14050" class="color--secondary">Bel 14050</a></td>
     </tr>
     <tr class="tr-mail border-top">
         <td class="td-mail border-top td__padding-zero" colspan="6">
@@ -78,7 +78,7 @@
     </tr>
     <tr>
         <td class="td-mail td__padding-all" colspan="6">
-            <p>Pas hier uw <a href="https://example.com/mijn-profiel/notificaties/" class="color--secondary">voorkeuren</a> aan voor de notificaties. </p>
+            <p>Pas hier uw <a href="{{ profile_notifications }}" class="color--secondary">voorkeuren</a> aan voor de notificaties. </p>
         </td>
     </tr>
     </tbody>
