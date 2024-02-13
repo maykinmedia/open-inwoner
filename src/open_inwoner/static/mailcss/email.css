@@ -35,7 +35,7 @@ table, .table-mail {
     line-height: 24px;
 }
 
-td, .td-mail  {
+td, .td-mail {
     /* --color-gray-dark */
     color: #4B4B4B;
     font-family: Lato, Helvetica, Arial, sans-serif;
@@ -47,7 +47,7 @@ td, .td-mail  {
 .logo-mail {
     text-align: center;
     width: auto;
-    max-height: 53px;
+    max-height: 55px;
     max-width: 600px;
 }
 

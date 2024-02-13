@@ -11,12 +11,12 @@
             <h1>Nieuw:</h1>
         </td>
     </tr>
-    <tr>
-        <td class="td-mail td-mail__bg-danger td__padding-all" colspan="3">
+    <tr class="tr--responsive">
+        <td class="td--responsive td-mail td-mail__bg-danger td__padding-all" colspan="3">
             <p><span class="text-color__small-gray-900">Aanvraag: </span></p>
-            <h2 class="heading-font">{{ type_description }}</h2>
+            <h2 class="td--responsive heading-font">{{ type_description }}</h2>
         </td>
-        <td class="td-mail td-mail__bg-danger td__padding-all" colspan="3">
+        <td class="td--responsive td-mail td-mail__bg-danger td__padding-all" colspan="3">
             <p><span class="text-color__small-gray-900">Zaaknummer: </span><br/>{{ identification }}</p>
         </td>
     </tr>
@@ -68,10 +68,10 @@
             <p><strong>Contact opnemen</strong></p>
         </td>
     </tr>
-    <tr>
-        <td class="td-mail td__padding-right td__padding-bottom td__padding-left" colspan="3"><a href="https://example.com/contactformulier/" class="color--secondary">Ga naar onze contactpagina</a>
+    <tr class="tr--responsive">
+        <td class="td--responsive td-mail td__padding-right td__padding-bottom td__padding-left" colspan="3"><a href="{{ contactpage }}" class="color--secondary">Ga naar onze contactpagina</a>
         </td>
-        <td class="td-mail td__padding-right td__padding-bottom td__padding-left" colspan="3"><a href="tel:+14050" class="color--secondary">Bel 14050</a></td>
+        <td class="td--responsive td-mail td__padding-right td__padding-bottom td__padding-left" colspan="3"><a href="tel:+14050" class="color--secondary">Bel 14050</a></td>
     </tr>
     <tr class="tr-mail border-top">
         <td class="td-mail border-top td__padding-zero" colspan="6">
@@ -80,7 +80,7 @@
     </tr>
     <tr>
         <td class="td-mail td__padding-all" colspan="6">
-            <p>U ontvangt deze e-mail notificatie zodat wij u op de hoogte kunnen houden van lorem ipsum dolor sit amet consectetur...</p>
+            <p>U ontvangt deze e-mail notificatie zodat wij u op de hoogte kunnen houden.</p>
         </td>
     </tr>
     </tbody>
