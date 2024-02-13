@@ -6,7 +6,7 @@
 #
 alabaster==0.7.12
     # via sphinx
-aldryn-apphooks-config==0.6.0
+aldryn-apphooks-config==0.7.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
