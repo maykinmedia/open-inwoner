@@ -1,6 +1,8 @@
 from unittest.mock import patch
 
-from django.contrib.sessions.middleware import SessionMiddleware
+from django.contrib.sessions.middleware import (
+    SessionMiddleware as DefaultSessionMiddleWare,
+)
 from django.http import Http404
 from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse
@@ -18,6 +20,15 @@ from ..forms import QuestionnaireStepForm
 from ..models import QuestionnaireStep
 from ..views import QUESTIONNAIRE_SESSION_KEY, QuestionnaireStepView
 from .factories import QuestionnaireStepFactory, QuestionnaireStepFileFactory
+
+
+class SessionMiddleware(DefaultSessionMiddleWare):
+    """
+    The `SessionMiddleware` __init__ expects a `get_response` argument in Django 4.2
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(get_response=lambda x: "dummy")
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
