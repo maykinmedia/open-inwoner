@@ -457,7 +457,7 @@ django-solo==2.2.0
     #   mozilla-django-oidc-db
     #   notifications-api-common
     #   zgw-consumers
-django-timeline-logger==2.0.0
+django-timeline-logger==3.0.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -513,7 +513,7 @@ djangocms-text-ckeditor==5.1.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-djangorestframework==3.12.4
+djangorestframework==3.14.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -946,6 +946,11 @@ pytz==2021.3
     #   babel
     #   celery
     #   django-yubin
+    #   djangorestframework
+pywatchman==1.4.1
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 pyyaml==6.0
     # via
     #   -c requirements/ci.txt

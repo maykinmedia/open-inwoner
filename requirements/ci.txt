@@ -412,7 +412,7 @@ django-solo==2.2.0
     #   mozilla-django-oidc-db
     #   notifications-api-common
     #   zgw-consumers
-django-timeline-logger==2.0.0
+django-timeline-logger==3.0.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -466,7 +466,7 @@ djangocms-text-ckeditor==5.1.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-djangorestframework==3.12.4
+djangorestframework==3.14.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -810,6 +810,11 @@ pytz==2021.3
     #   -r requirements/base.txt
     #   celery
     #   django-yubin
+    #   djangorestframework
+pywatchman==1.4.1
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
 pyyaml==6.0
     # via
     #   -c requirements/base.txt
