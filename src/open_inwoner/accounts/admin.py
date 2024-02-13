@@ -5,7 +5,7 @@ from django.contrib.auth.models import Group
 from django.forms import ValidationError
 from django.urls import reverse
 from django.utils.html import format_html
-from django.utils.translation import ngettext, ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _, ngettext
 
 from image_cropping import ImageCroppingMixin
 from privates.admin import PrivateMediaMixin

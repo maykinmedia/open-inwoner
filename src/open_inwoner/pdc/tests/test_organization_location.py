@@ -1,7 +1,7 @@
 from unittest.mock import patch
 
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from django_webtest import WebTest
 from maykin_2fa.test import disable_admin_mfa

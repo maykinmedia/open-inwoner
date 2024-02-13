@@ -1,5 +1,5 @@
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from aldryn_apphooks_config.utils import get_app_instance
 from cms.extensions.toolbar import ExtensionToolbar

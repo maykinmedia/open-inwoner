@@ -4,7 +4,7 @@ from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import escape, format_html
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from open_inwoner.accounts.models import User
 from open_inwoner.openzaak.api_models import Status, Zaak
