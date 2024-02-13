@@ -18,7 +18,7 @@
 		{% if settings.DIGID_ENABLED %}
             {% get_solo 'digid_eherkenning_oidc_generics.OpenIDConnectDigiDConfig' as digid_oidc_config %}
             {% if digid_oidc_config.enabled %}
-                {% render_card direction='horizontal' tinted=True %}
+                {% render_card direction='horizontal' tinted=True compact=True %}
                     <a href="{% url 'digid_oidc:init' %}" class="link digid-logo">
                         <img class="digid-logo__image" src="{% static 'accounts/digid_logo.svg' %}" alt="DigiD inlogpagina">
                     </a>
@@ -26,7 +26,7 @@
                     {% link href=href text=_('Inloggen met DigiD') secondary=True icon='arrow_forward' extra_classes="link--digid" %}
                 {% endrender_card %}
             {% else %}
-                {% render_card direction='horizontal' tinted=True %}
+                {% render_card direction='horizontal' tinted=True compact=True %}
                     <a href="{% url 'digid:login' %}" class="link digid-logo">
                         <img class="digid-logo__image" src="{% static 'accounts/digid_logo.svg' %}" alt="DigiD inlogpagina">
                     </a>
@@ -41,7 +41,7 @@
         {% if eherkenning_enabled %}
             {% get_solo 'digid_eherkenning_oidc_generics.OpenIDConnectEHerkenningConfig' as eherkenning_oidc_config %}
             {% if eherkenning_oidc_config.enabled %}
-                {% render_card direction='horizontal' tinted=True %}
+                {% render_card direction='horizontal' tinted=True compact=True %}
                     <a href="{% url 'eherkenning_oidc:init' %}" class="link eherkenning-logo">
                         <img class="eherkenning-logo__image" src="{% static 'accounts/eherkenning.png' %}" height=30 alt="eHerkenning inlogpagina">
                     </a>
@@ -49,7 +49,7 @@
                     {% link href=href text=_('Inloggen met eHerkenning') secondary=True icon='arrow_forward' extra_classes="link--eherkenning" %}
                 {% endrender_card %}
             {% else %}
-                {% render_card direction='horizontal' tinted=True %}
+                {% render_card direction='horizontal' tinted=True compact=True %}
                     <a href="{% url 'eherkenning:login' %}" class="link eherkenning-logo">
                         <img class="eherkenning-logo__image" src="{% static 'accounts/eherkenning.png' %}" height=30 alt="eHerkenning inlogpagina">
                     </a>
@@ -64,7 +64,7 @@
                 {% get_solo 'mozilla_django_oidc_db.OpenIDConnectConfig' as oidc_config %}
                 {% get_solo 'configurations.SiteConfiguration' as site_config %}
                 {% if oidc_config.enabled and site_config.openid_enabled_for_regular_users %}
-                    {% render_card tinted=True direction='horizontal' %}
+                    {% render_card tinted=True compact=True direction='horizontal' %}
                     {% if site_config.openid_connect_logo %}
                         <a href="{% url 'oidc_authentication_init' %}" class="link digid-logo">
                             <img class="digid-logo__image" src="{{ site_config.openid_connect_logo.url }}" alt="{{ site_config.openid_connect_logo.default_alt_text }}">
@@ -80,7 +80,7 @@
                 {% endif %}
 
                 {% if login_allow_registration %}
-                    {% render_card tinted=True %}
+                    {% render_card tinted=True compact=True %}
                         {% render_form id="login-form" method="POST" form=form show_required=True %}
                             {% csrf_token %}
                             <input type="hidden" name="next" value="{{next}}" />
