@@ -174,8 +174,6 @@ cssselect2==0.4.1
     #   -r requirements/ci.txt
     #   svglib
     #   weasyprint
-ddt-api-calls==0.3.2
-    # via -r requirements/dev.in
 defusedxml==0.7.1
     # via
     #   -c requirements/ci.txt
@@ -197,7 +195,6 @@ django==4.2.10
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-    #   ddt-api-calls
     #   django-admin-index
     #   django-appconf
     #   django-appdata
@@ -232,6 +229,7 @@ django==4.2.10
     #   django-silk
     #   django-simple-certmanager
     #   django-sniplates
+    #   django-solo
     #   django-timeline-logger
     #   django-treebeard
     #   django-two-factor-auth
@@ -448,7 +446,7 @@ django-sniplates==0.7.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-django-solo==1.2.0
+django-solo==2.2.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -983,7 +981,6 @@ requests==2.31.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   ape-pie
-    #   ddt-api-calls
     #   django-log-outgoing-requests
     #   django-open-forms-client
     #   gemma-zds-client
@@ -999,7 +996,6 @@ requests-mock==1.9.3
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-    #   ddt-api-calls
 roundrobin==0.0.4
     # via locust
 sentry-sdk==1.38.0
