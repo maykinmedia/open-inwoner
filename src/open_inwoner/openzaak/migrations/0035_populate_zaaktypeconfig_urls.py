@@ -19,22 +19,22 @@ def populate_zaaktype_config_urls(apps, schema_editor):
     CatalogusConfig = apps.get_model("openzaak", "CatalogusConfig")
     catalog_lookup = {c.url: c for c in CatalogusConfig.objects.all()}
 
-    try:
-        client = build_client("catalogi")
-        if not client:
-            logger.warning(
-                "Not populating zaaktype config urls: could not build Catalogi API client"
-            )
-            return []
-
-        zaaktypes = get_configurable_zaaktypes(client)
-        if not zaaktypes:
-            return []
-
-    except ProgrammingError:
-        return []
-
     with transaction.atomic():
+        try:
+            client = build_client("catalogi")
+            if not client:
+                logger.warning(
+                    "Not populating zaaktype config urls: could not build Catalogi API client"
+                )
+                return []
+
+            zaaktypes = get_configurable_zaaktypes(client)
+            if not zaaktypes:
+                return []
+
+        except ProgrammingError:
+            return []
+
         for zaaktype in zaaktypes:
             catalog = catalog_lookup.get(zaaktype.catalogus)
             if not catalog:
