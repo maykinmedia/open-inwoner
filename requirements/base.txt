@@ -113,6 +113,7 @@ django==4.2.10
     #   django-sendfile2
     #   django-simple-certmanager
     #   django-sniplates
+    #   django-solo
     #   django-timeline-logger
     #   django-treebeard
     #   django-two-factor-auth
@@ -236,7 +237,7 @@ django-simple-certmanager==1.4.1
     #   zgw-consumers
 django-sniplates==0.7.0
     # via -r requirements/base.in
-django-solo==1.2.0
+django-solo==2.2.0
     # via
     #   -r requirements/base.in
     #   django-digid-eherkenning

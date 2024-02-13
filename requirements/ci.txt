@@ -190,6 +190,7 @@ django==4.2.10
     #   django-sendfile2
     #   django-simple-certmanager
     #   django-sniplates
+    #   django-solo
     #   django-timeline-logger
     #   django-treebeard
     #   django-two-factor-auth
@@ -400,7 +401,7 @@ django-sniplates==0.7.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-django-solo==1.2.0
+django-solo==2.2.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
