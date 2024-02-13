@@ -100,7 +100,7 @@ if "test" in sys.argv:
     ES_INDEX_PRODUCTS = "products_test"
 
 # Django debug toolbar
-INSTALLED_APPS += ["ddt_api_calls", "django_extensions"]
+INSTALLED_APPS += ["django_extensions"]
 # MIDDLEWARE += [
 #     "debug_toolbar.middleware.DebugToolbarMiddleware",
 # ]
@@ -120,7 +120,6 @@ DEBUG_TOOLBAR_PANELS = [
     "debug_toolbar.panels.logging.LoggingPanel",
     "debug_toolbar.panels.redirects.RedirectsPanel",
     "debug_toolbar.panels.profiling.ProfilingPanel",
-    "ddt_api_calls.panels.APICallsPanel",
 ]
 
 # THOU SHALT NOT USE NAIVE DATETIMES
