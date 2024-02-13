@@ -426,7 +426,7 @@ django-two-factor-auth[phonenumberslite,webauthn]==1.16.0
     #   -r requirements/base.txt
     #   django-two-factor-auth
     #   maykin-2fa
-django-view-breadcrumbs==2.2.4
+django-view-breadcrumbs==2.5.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
