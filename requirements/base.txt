@@ -4,7 +4,7 @@
 #
 #    ./bin/compile_dependencies.sh
 #
-aldryn-apphooks-config==0.6.0
+aldryn-apphooks-config==0.7.0
     # via -r requirements/base.in
 amqp==5.1.1
     # via kombu
