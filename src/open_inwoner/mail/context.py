@@ -7,8 +7,7 @@ def mail_context():
     """
     context = {}
     config = SiteConfiguration.get_solo()
-    context["logo"] = config.logo
-    context["footer_logo"] = config.footer_logo
+    context["logo"] = config.email_logo
     context["theming"] = {
         "primary_color": config.primary_color,
         "secondary_color": config.secondary_color,
