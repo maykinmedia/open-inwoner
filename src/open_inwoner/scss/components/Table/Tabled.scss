@@ -98,11 +98,25 @@
         display: flex;
         justify-content: end;
       }
+
+      .button {
+        &--transparent,
+        &--textless {
+          font-weight: bold;
+        }
+      }
     }
 
     &--force-right {
       display: flex;
       justify-content: end;
+
+      .button {
+        &--transparent,
+        &--textless {
+          font-weight: bold;
+        }
+      }
     }
 
     &--mobile-big {
