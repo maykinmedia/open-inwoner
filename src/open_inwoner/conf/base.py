@@ -774,17 +774,6 @@ ES_SUGGEST_SIZE = 5
 # django import-export
 IMPORT_EXPORT_USE_TRANSACTIONS = True
 
-# mail-editor
-from .parts.maileditor import MAIL_EDITOR_BASE_CONTEXT, MAIL_EDITOR_CONF  # noqa
-
-CKEDITOR_CONFIGS = {
-    "mail_editor": {
-        "allowedContent": True,
-        "height": 600,  # This is optional
-        "entities": False,  # This is added because CKEDITOR escapes the ' when you do an if statement
-    }
-}
-
 # invite expires in X days after sending
 INVITE_EXPIRY_DAYS = config("INVITE_EXPIRY_DAYS", default=30)
 
@@ -896,6 +885,27 @@ ACCOUNTS_SMS_GATEWAY = {
 from .app.csp import *  # noqa
 
 SECURE_REFERRER_POLICY = "same-origin"
+
+
+# mail-editor
+from .parts.maileditor import (  # noqa
+    MAIL_EDITOR_BASE_CONTEXT,
+    MAIL_EDITOR_CONF,
+    MAIL_EDITOR_DYNAMIC_CONTEXT,
+)
+
+MAIL_EDITOR_BASE_HOST = BASE_URL
+
+CKEDITOR_CONFIGS = {
+    "mail_editor": {
+        "allowedContent": True,
+        "contentsCss": [
+            "/static/mailcss/email.css"
+        ],  # Enter the css file used to style the email.
+        "height": 600,  # This is optional
+        "entities": False,  # This is added because CKEDITOR escapes the ' when you do an if statement
+    }
+}
 
 
 #

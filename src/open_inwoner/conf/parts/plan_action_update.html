@@ -1,0 +1,24 @@
+<p>Dear</p>
+<p>You are receiving this email because the action in your <a href="{{ plan_url }}">plan</a> was updated.</p>
+
+<table>
+    <tr>
+        <th>Action name</th>
+        <td>{{ action.name }}</td>
+    </tr>
+    <tr>
+        <th>Plan</th>
+        <td><a href="{{ plan_url }}">{{ plan.title }}</a></td>
+    </tr>
+    <tr>
+        <th>Updated at</th>
+        <td>{{ action.updated_on }}</td>
+    </tr>
+    <tr>
+        <th>Details</th>
+        <td>{{ message }}</td>
+    </tr>
+</table>
+
+<p>Met vriendelijke groet,
+    {{ site_name }} </p>

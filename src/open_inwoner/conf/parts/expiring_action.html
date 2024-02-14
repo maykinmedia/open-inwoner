@@ -1,0 +1,19 @@
+<p>Dear</p>
+<p>You are receiving this email because you have some actions that are expiring.</p>
+
+<table width="600">
+    <tr>
+        <td>Action name</td>
+        <td>End date</td>
+    </tr>
+    {% for action in actions %}
+        <tr>
+            <td>{{ action.name }}</td>
+            <td>{{ action.end_date|date:"j F Y" }}</td>
+        </tr>
+    {% endfor %}
+</table>
+
+<p><a href="{{ actions_link }}">Go to your actions</a></p>
+<p>Met vriendelijke groet,
+    {{ site_name }} </p>

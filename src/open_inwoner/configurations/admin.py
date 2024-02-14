@@ -155,6 +155,7 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
             {
                 "fields": (
                     "logo",
+                    "email_logo",
                     "footer_logo",
                     "footer_logo_title",
                     "footer_logo_url",

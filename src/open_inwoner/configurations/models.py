@@ -257,6 +257,14 @@ class SiteConfiguration(SingletonModel):
         default="",
         help_text=_("The external link for the footer logo."),
     )
+    email_logo = FilerImageField(
+        verbose_name=_("Email logo (.png or .jpg)"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="email_logo",
+        help_text=_("Image to use as logo in email."),
+    )
     favicon = FilerImageField(
         verbose_name=_("Favicon image (32x32, .png)"),
         null=True,
