@@ -1,4 +1,9 @@
+import concurrent.futures
 import logging
+
+from django.conf import settings
+
+from zgw_consumers.concurrent import parallel
 
 from .api_models import Zaak
 from .clients import build_client
@@ -82,19 +87,26 @@ def preprocess_data(cases: list[Zaak]) -> list[Zaak]:
     zaken_client = build_client("zaak")
     catalogi_client = build_client("catalogi")
 
+    def preprocess_case(case: Zaak) -> None:
+        resolve_status(case, client=zaken_client)
+        resolve_status_type(case, client=catalogi_client)
+        add_zaak_type_config(case)
+        add_status_type_config(case)
+
     # TODO error handling if these are none?
     # use contextmanager to ensure the `requests.Session` is reused
     with zaken_client, catalogi_client:
-        for case in cases:
-            resolve_zaak_type(case, client=catalogi_client)
+        with parallel(max_workers=settings.CASE_LIST_NUM_THREADS) as executor:
+            futures = [
+                executor.submit(resolve_zaak_type, case, client=catalogi_client)
+                for case in cases
+            ]
+            concurrent.futures.wait(futures)
 
-        cases = [case for case in cases if case.status and is_zaak_visible(case)]
+            cases = [case for case in cases if case.status and is_zaak_visible(case)]
 
-        for case in cases:
-            resolve_status(case, client=zaken_client)
-            resolve_status_type(case, client=catalogi_client)
-            add_zaak_type_config(case)
-            add_status_type_config(case)
+            futures = [executor.submit(preprocess_case, case) for case in cases]
+            concurrent.futures.wait(futures)
 
     cases.sort(key=lambda case: case.startdatum, reverse=True)
 

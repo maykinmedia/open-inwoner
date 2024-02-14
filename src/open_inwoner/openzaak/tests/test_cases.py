@@ -3,6 +3,7 @@ from unittest.mock import patch
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
+from django.test import TransactionTestCase
 from django.test.utils import override_settings
 from django.urls import reverse_lazy
 
@@ -139,9 +140,10 @@ class CaseListAccessTests(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
 @requests_mock.Mocker()
 @override_settings(
-    ROOT_URLCONF="open_inwoner.cms.tests.urls", MIDDLEWARE=PATCHED_MIDDLEWARE
+    ROOT_URLCONF="open_inwoner.cms.tests.urls",
+    MIDDLEWARE=PATCHED_MIDDLEWARE,
 )
-class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
+class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTestCase):
     inner_url = reverse_lazy("cases:cases_content")
     maxDiff = None
 
@@ -420,9 +422,8 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
             call_to_action_text="duplicate",
         )
 
-        response = self.app.get(
-            self.inner_url, user=self.user, headers={"HX-Request": "true"}
-        )
+        self.client.force_login(user=self.user)
+        response = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
 
         self.assertListEqual(
             response.context["cases"],
@@ -500,11 +501,8 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
 
                 m.reset_mock()
 
-                response = self.app.get(
-                    self.inner_url,
-                    user=self.eherkenning_user,
-                    headers={"HX-Request": "true"},
-                )
+                self.client.force_login(user=self.eherkenning_user)
+                response = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
 
                 self.assertListEqual(
                     response.context["cases"],
@@ -648,11 +646,8 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
 
         m.reset_mock()
 
-        response = self.app.get(
-            self.inner_url,
-            user=self.eherkenning_user,
-            headers={"HX-Request": "true"},
-        )
+        self.client.force_login(user=self.eherkenning_user)
+        response = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
 
         self.assertListEqual(response.context["cases"], [])
         # don't show internal cases
@@ -670,14 +665,13 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
     def test_format_zaak_identificatie(self, m):
         config = OpenZaakConfig.get_solo()
         self._setUpMocks(m)
+        self.client.force_login(user=self.user)
 
         with self.subTest("formatting enabled"):
             config.reformat_esuite_zaak_identificatie = True
             config.save()
 
-            response = self.app.get(
-                self.inner_url, user=self.user, headers={"HX-Request": "true"}
-            )
+            response = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
 
             e_suite_case = next(
                 (
@@ -693,9 +687,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
             config.reformat_esuite_zaak_identificatie = False
             config.save()
 
-            response = self.app.get(
-                self.inner_url, user=self.user, headers={"HX-Request": "true"}
-            )
+            response = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
 
             e_suite_case = next(
                 (
@@ -727,16 +719,17 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
             translation="Translated Status Type",
         )
         self._setUpMocks(m)
-        response = self.app.get(
-            self.inner_url, user=self.user, headers={"HX-Request": "true"}
-        )
+        self.client.force_login(user=self.user)
+        response = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
+
         self.assertNotContains(response, st1.status)
         self.assertContains(response, st1.translation)
 
     def test_list_cases_logs_displayed_case_ids(self, m):
         self._setUpMocks(m)
 
-        self.app.get(self.inner_url, user=self.user, headers={"HX-Request": "true"})
+        self.client.force_login(user=self.user)
+        self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
 
         # check access logs for displayed cases
         logs = list(TimelineLog.objects.all())
@@ -769,9 +762,8 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
         self._setUpMocks(m)
 
         # 1. test first page
-        response_1 = self.app.get(
-            self.inner_url, user=self.user, headers={"HX-Request": "true"}
-        )
+        self.client.force_login(user=self.user)
+        response_1 = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
 
         self.assertListEqual(
             response_1.context.get("cases"),
@@ -794,9 +786,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
 
         # 2. test next page
         next_page = f"{self.inner_url}?page=2"
-        response_2 = self.app.get(
-            next_page, user=self.user, headers={"HX-Request": "true"}
-        )
+        response_2 = self.client.get(next_page, HTTP_HX_REQUEST="true")
 
         self.assertListEqual(
             response_2.context.get("cases"),
@@ -820,11 +810,10 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
     @patch.object(InnerCaseListView, "paginate_by", 1)
     def test_list_cases_paginated_logs_displayed_case_ids(self, m):
         self._setUpMocks(m)
+        self.client.force_login(user=self.user)
 
         with self.subTest("first page"):
-            response = self.app.get(
-                self.inner_url, user=self.user, headers={"HX-Request": "true"}
-            )
+            response = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
             self.assertEqual(
                 response.context.get("cases")[0]["uuid"], self.zaak2["uuid"]
             )
@@ -843,9 +832,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
 
         with self.subTest("next page"):
             next_page = f"{self.inner_url}?page=2"
-            response = self.app.get(
-                next_page, user=self.user, headers={"HX-Request": "true"}
-            )
+            response = self.client.get(next_page, HTTP_HX_REQUEST="true")
             self.assertEqual(
                 response.context.get("cases")[0]["uuid"], self.zaak1["uuid"]
             )
