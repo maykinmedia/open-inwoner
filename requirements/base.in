@@ -10,7 +10,7 @@ furl # processing urls
 weasyprint # export to pdf
 pywatchman
 tinycss2
-
+css_inline
 
 # Framework libraries
 Django>=3.2.11<4.0

@@ -11,7 +11,7 @@ from zgw_consumers.client import build_client
 
 from open_inwoner.haalcentraal.api_models import BRPData
 from open_inwoner.haalcentraal.models import HaalCentraalConfig
-from open_inwoner.utils.api import ClientError, JSONParserClient
+from open_inwoner.utils.api import ClientError, get_json_response
 
 logger = logging.getLogger(__name__)
 
@@ -25,9 +25,7 @@ class BRPAPI(ABC):
         if not self.config.service:
             logger.warning("no service defined for Haal Centraal")
         else:
-            self.client = build_client(
-                self.config.service, client_factory=JSONParserClient
-            )
+            self.client = build_client(self.config.service)
             self._is_ready = True
 
     @abc.abstractmethod
@@ -74,7 +72,7 @@ class BRP_1_3(BRPAPI):
             headers["x-doelbinding"] = self.config.api_doelbinding
 
         try:
-            data = self.client.get(
+            response = self.client.get(
                 url=url,
                 headers=headers,
                 params={
@@ -87,7 +85,7 @@ class BRP_1_3(BRPAPI):
                 },
                 verify=False,
             )
-            return data
+            return get_json_response(response)
         except (RequestException, ClientError) as e:
             logger.exception("exception while making request", exc_info=e)
             return None
@@ -121,7 +119,7 @@ class BRP_2_1(BRPAPI):
     def fetch_data(self, user_bsn: str) -> Optional[dict]:
         url = urljoin(self.client.base_url, "personen")
         try:
-            data = self.client.post(
+            response = self.client.post(
                 url=url,
                 data={
                     "fields": [
@@ -145,7 +143,7 @@ class BRP_2_1(BRPAPI):
                 headers={"Accept": "application/json"},
                 verify=False,
             )
-            return data
+            return get_json_response(response)
         except (RequestException, ClientError) as e:
             logger.exception("exception while making request", exc_info=e)
             return None

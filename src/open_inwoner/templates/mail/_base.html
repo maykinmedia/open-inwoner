@@ -1,69 +1,173 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http: //www.w3.org/1999/xhtml">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta name="viewport" content="width=device-width" />
-
-    <!-- Fallback styling only, use inline -->
-    <style>
-        #outlook a{
-			padding:0;
-		}
-        body{
-			width:100% !important;
-		}
-		body{
-			-webkit-text-size-adjust:none;
-		}
-		body{
-			margin:0;
-			padding:0;
-		}
-		img{
-			border:none;
-			font-size:14px;
-			font-weight:bold;
-			height:auto;
-			line-height:100%;
-			outline:none;
-			text-decoration:none;
-			text-transform:capitalize;
-		}
-        a {
-            color: #059EC2;
-        }
-
-        @media (max-width: 580px) {
-            h1, h2, h3, h4, h5, h6,
-            a, p,
-            img {
-                width: 100%!important;
-                height: auto!important;
-                margin-left: 0!important;
-            }
-        }
-    </style>
-    <!-- End fallback styling -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width"/>
+    <!-- Needs correct path -->
+    <link rel="stylesheet" href="/static/mailcss/email.css">
 </head>
 
-<body style="
-    -ms-text-size-adjust: 100%;
-    -webkit-text-size-adjust: 100%;
-    background-color: #fff;
-    color: #000;
-    font-family: Arial, sans-serif;
-    font-size: 17px;
-    font-weight: normal;
-    min-width: 100%;
-    margin: 0;
-    line-height: 1.2;
-    padding: 0;
-    text-align: left;
-    width: 100% !important;
-">
+<style data-css-inline="keep">
+    /* Font-styles for mail-clients that support custom fonts */
+    /* cyrillic-ext */
+    @font-face {
+        font-family: Ubuntu;
+        font-style: normal;
+        font-weight: 500;
+        font-display: swap;
+        src: url(https://fonts.gstatic.com/s/ubuntu/v20/4iCv6KVjbNBYlgoCjC3jvWyNPYZvg7UI.woff2) format('woff2');
+        unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+    }
+
+    /* cyrillic */
+    @font-face {
+        font-family: Ubuntu;
+        font-style: normal;
+        font-weight: 500;
+        font-display: swap;
+        src: url(https://fonts.gstatic.com/s/ubuntu/v20/4iCv6KVjbNBYlgoCjC3jtGyNPYZvg7UI.woff2) format('woff2');
+        unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+    }
+
+    /* greek-ext */
+    @font-face {
+        font-family: Ubuntu;
+        font-style: normal;
+        font-weight: 500;
+        font-display: swap;
+        src: url(https://fonts.gstatic.com/s/ubuntu/v20/4iCv6KVjbNBYlgoCjC3jvGyNPYZvg7UI.woff2) format('woff2');
+        unicode-range: U+1F00-1FFF;
+    }
+
+    /* greek */
+    @font-face {
+        font-family: Ubuntu;
+        font-style: normal;
+        font-weight: 500;
+        font-display: swap;
+        src: url(https://fonts.gstatic.com/s/ubuntu/v20/4iCv6KVjbNBYlgoCjC3js2yNPYZvg7UI.woff2) format('woff2');
+        unicode-range: U+0370-03FF;
+    }
+
+    /* latin-ext */
+    @font-face {
+        font-family: Ubuntu;
+        font-style: normal;
+        font-weight: 500;
+        font-display: swap;
+        src: url(https://fonts.gstatic.com/s/ubuntu/v20/4iCv6KVjbNBYlgoCjC3jvmyNPYZvg7UI.woff2) format('woff2');
+        unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+    }
+
+    /* latin */
+    @font-face {
+        font-family: Ubuntu;
+        font-style: normal;
+        font-weight: 500;
+        font-display: swap;
+        src: url(https://fonts.gstatic.com/s/ubuntu/v20/4iCv6KVjbNBYlgoCjC3jsGyNPYZvgw.woff2) format('woff2');
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    }
+
+    /* latin-ext */
+    @font-face {
+        font-family: Lato;
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url(https://fonts.gstatic.com/s/lato/v24/S6uyw4BMUTPHjxAwXiWtFCfQ7A.woff2) format('woff2');
+        unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+    }
+
+    /* latin */
+    @font-face {
+        font-family: Lato;
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url(https://fonts.gstatic.com/s/lato/v24/S6uyw4BMUTPHjx4wXiWtFCc.woff2) format('woff2');
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    }
+</style>
+
+<style data-css-inline="keep">
+    /* Responsiveness mail-clients that support media-queries */
+    @media only screen and (max-width: 610px) {
+        .tr--responsive {
+            display: block;
+            width: 100%;
+        }
+        .td--responsive {
+            display: block;
+        }
+    }
+</style>
+
+<style>
+    /* Use <style data-css-inline="extra_css"> for additional styling */
+    a {
+        color: {{ theming.secondary_color }};
+    }
+
+    body {
+        --color-accent: {{ theming.accent_color }};
+        --color-primary: {{ theming.primary_color }};
+        --color-secondary: {{ theming.secondary_color }};
+    }
+
+    /* Dynamic theme CSS variables */
+
+    .color--primary {
+        color: {{ theming.primary_color }};
+    }
+
+    .color--secondary {
+        color: {{ theming.secondary_color }};
+    }
+
+    .color--accent {
+        color: {{ theming.accent_color }};
+    }
+
+    .button--primary {
+        background-color: {{ theming.primary_color }};
+    }
+
+    .td-mail__bg-accent {
+        background-color: {{ theming.accent_color }};
+    }
+
+</style>
+
+<body>
 
 <center>
-{{ content }}
+    <table role="presentation" border="0" cellspacing="0" cellpadding="0" width="100%" class="table-mail">
+        <tbody>
+        <tr>
+            <!-- Do not remove empty TD's !!! -->
+            <td></td>
+            <td width="600">
+                <table role="presentation" border="0" cellspacing="0" cellpadding="0" width="100%" class="table-mail">
+                    <tr>
+                        <td class="td-mail--accent td-mail__bg-accent" colspan="6" style="background-color: {{ theming.accent_color }};">&nbsp;</td>
+                    </tr>
+                    <tr align="center">
+                        <td class="td-mail td__logo-mail" colspan="6" align="center" >
+                            <img height="55" src="{{ logo.url }}" alt="" class="img__logo-mail">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td-mail" valign="top" colspan="6">
+                            {{ content }}
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td></td>
+        </tr>
+        </tbody>
+    </table>
 </center>
 </body>
 </html>

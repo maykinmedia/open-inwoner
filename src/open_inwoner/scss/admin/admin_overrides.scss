@@ -6,3 +6,8 @@
 @import './app_overrides';
 @import './ck_editor';
 @import '../components/Map/Map.scss';
+
+// hide title from admin.StackedInline
+.inline-related > h3 {
+  display: none;
+}

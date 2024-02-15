@@ -29,3 +29,10 @@
     color: var(--color-gray-lighter);
   }
 }
+
+.label__label--required {
+  font-size: var(--font-size-body-large);
+  color: var(--color-red);
+  padding-left: var(--spacing-tiny);
+  vertical-align: sub;
+}

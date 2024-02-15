@@ -18,6 +18,10 @@
   position: relative;
   text-decoration: none;
 
+  &__product-card {
+    min-height: 150px;
+  }
+
   &--inline {
     display: inline-flex;
   }
@@ -64,16 +68,6 @@
     right: calc(-1 * var(--card-size-border));
     top: calc(-1 * var(--card-size-border));
     width: var(--card-size-dog-ear);
-  }
-
-  &--type-info .h1,
-  &--type-info .h2,
-  &--type-info .h3,
-  &--type-info .h4,
-  &--type-info .h5,
-  &--type-info .h5,
-  &--type-info .p {
-    color: var(--color-info-darker);
   }
 
   &--tinted {
@@ -211,43 +205,22 @@
     margin-top: var(--spacing-extra-large);
   }
 
-  .h2,
-  .h4 {
-    margin: 0 0 var(--card-spacing);
-  }
-
-  &--compact .h3 {
-    padding: 0 0 var(--card-spacing);
-    margin: 0 0 var(--card-spacing);
-    position: relative;
-
-    &::before {
-      bottom: 0;
-      content: '';
-      border-bottom: var(--card-size-border) solid var(--card-color-border);
-      width: calc(100% + 2 * var(--card-spacing));
-      position: absolute;
-      left: calc(-1 * var(--card-spacing));
-    }
+  .link .link__text {
+    font-weight: bold;
   }
 
   /// Headings in cards
 
-  .h2,
-  .h3,
-  .h4,
-  .h2 .link,
-  .h3 .link,
-  .h4 .link {
-    color: var(--font-color-body);
-    font-size: var(--font-size-heading-card);
-  }
-
-  &__heading {
+  &__heading-2,
+  &__heading-3,
+  &__heading-4,
+  &__heading-2 .link,
+  &__heading-3 .link,
+  &__heading-4 .link {
     color: var(--color-black);
     font-family: var(--font-family-heading);
     font-size: var(--font-size-heading-card);
-    line-height: var(--font-line-height-body);
+    line-height: var(--font-line-height-heading-4);
     margin: 0;
   }
 
@@ -255,7 +228,7 @@
     padding: 20px;
     align-items: end;
 
-    .h3 {
+    .card__heading-3 {
       width: 100%;
     }
 

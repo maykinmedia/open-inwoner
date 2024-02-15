@@ -1,5 +1,5 @@
 import logging
-from datetime import timedelta
+from datetime import date, timedelta
 from typing import List
 
 from django.conf import settings
@@ -17,20 +17,9 @@ from open_inwoner.openzaak.api_models import (
     ZaakInformatieObject,
     ZaakType,
 )
-from open_inwoner.openzaak.cases import (
-    fetch_case_by_url_no_cache,
-    fetch_case_roles,
-    fetch_single_case_information_object,
-    fetch_single_status,
-    fetch_status_history_no_cache,
-    resolve_status,
-)
-from open_inwoner.openzaak.catalog import (
-    fetch_single_case_type,
-    fetch_single_status_type,
-)
+from open_inwoner.openzaak.cases import resolve_status
+from open_inwoner.openzaak.clients import CatalogiClient, ZakenClient, build_client
 from open_inwoner.openzaak.documents import fetch_single_information_object_url
-from open_inwoner.openzaak.managers import UserCaseInfoObjectNotificationManager
 from open_inwoner.openzaak.models import (
     OpenZaakConfig,
     UserCaseInfoObjectNotification,
@@ -79,6 +68,14 @@ def handle_zaken_notification(notification: Notification):
     resources = ("status", "zaakinformatieobject")
     r = notification.resource  # short alias for logging
 
+    client = build_client("zaak")
+    if not client:
+        log_system_action(
+            f"ignored {r} notification: cannot build Zaken API client for case {case_url}",
+            log_level=logging.ERROR,
+        )
+        return
+
     if notification.resource not in resources:
         log_system_action(
             f"ignored {r} notification: resource is not {wrap_join(resources, 'or')} but '{notification.resource}' for case {case_url}",
@@ -87,7 +84,7 @@ def handle_zaken_notification(notification: Notification):
         return
 
     # check if we have users that need to be informed about this case
-    roles = fetch_case_roles(case_url)
+    roles = client.fetch_case_roles(case_url)
     if not roles:
         log_system_action(
             f"ignored {r} notification: cannot retrieve rollen for case {case_url}",
@@ -105,7 +102,7 @@ def handle_zaken_notification(notification: Notification):
         return
 
     # check if this case is visible
-    case = fetch_case_by_url_no_cache(case_url)
+    case = client.fetch_case_by_url_no_cache(case_url)
     if not case:
         log_system_action(
             f"ignored {r} notification: cannot retrieve case {case_url}",
@@ -113,7 +110,10 @@ def handle_zaken_notification(notification: Notification):
         )
         return
 
-    case_type = fetch_single_case_type(case.zaaktype)
+    case_type = None
+    if catalogi_client := build_client("catalogi"):
+        case_type = catalogi_client.fetch_single_case_type(case.zaaktype)
+
     if not case_type:
         log_system_action(
             f"ignored {r} notification: cannot retrieve case_type {case.zaaktype} for case {case_url}",
@@ -144,6 +144,14 @@ def _handle_zaakinformatieobject_notification(
     oz_config = OpenZaakConfig.get_solo()
     r = notification.resource  # short alias for logging
 
+    client = build_client("zaak")
+    if not client:
+        log_system_action(
+            f"ignored {r} notification: cannot build Zaken API client for case {case.url}",
+            log_level=logging.ERROR,
+        )
+        return
+
     """
     {
     "kanaal": "zaken",
@@ -162,7 +170,7 @@ def _handle_zaakinformatieobject_notification(
     # check if this is a zaakinformatieobject we want to inform on
     ziobj_url = notification.resource_url
 
-    ziobj = fetch_single_case_information_object(ziobj_url)
+    ziobj = client.fetch_single_case_information_object(ziobj_url)
 
     if not ziobj:
         log_system_action(
@@ -261,12 +269,14 @@ def handle_zaakinformatieobject_update(
 #
 # Helper functions for handling status update notifications
 #
-def check_status_history(notification: Notification, case: Zaak) -> List[Status] | None:
+def check_status_history(
+    notification: Notification, case: Zaak, client: ZakenClient
+) -> List[Status] | None:
     """
     Check if more than one status exists for `case` (else notifications are skipped)
     """
     resource = notification.resource
-    status_history = fetch_status_history_no_cache(case.url)
+    status_history = client.fetch_status_history_no_cache(case.url)
 
     if not status_history:
         log_system_action(
@@ -289,6 +299,7 @@ def check_status(
     notification: Notification,
     case: Zaak,
     status_history: List[Status],
+    client: ZakenClient,
 ) -> Status | None:
     """
     Check if this is a status we want to inform on
@@ -301,7 +312,9 @@ def check_status(
             status = s
             break
     else:
-        status = fetch_single_status(status_url)
+        # TODO currently not covered in tests?
+        if client:
+            status = client.fetch_single_status(status_url)
 
     if not status:
         log_system_action(
@@ -318,11 +331,12 @@ def check_status_type(
     case: Zaak,
     status: Status,
     oz_config: OpenZaakConfig,
+    catalogi_client: CatalogiClient,
 ) -> ZaakType | None:
     """
     Check if a status_type exists for `status` and if notifications are enabled
     """
-    status_type = fetch_single_status_type(status.statustype)
+    status_type = catalogi_client.fetch_single_status_type(status.statustype)
     resource = notification.resource
 
     if not status_type:
@@ -449,19 +463,39 @@ def handle_status_notification(
     """
     oz_config = OpenZaakConfig.get_solo()
 
-    if not (status_history := check_status_history(notification, case)):
+    catalogi_client = build_client("catalogi")
+    if not catalogi_client:
+        log_system_action(
+            f"ignored {notification.resource} notification for {case.url}: cannot create Catalogi API client",
+            log_level=logging.ERROR,
+        )
+        return None
+
+    zaken_client = build_client("zaak")
+    if not zaken_client:
+        log_system_action(
+            f"ignored {notification.resource} notification for {case.url}: cannot create Zaken API client",
+            log_level=logging.ERROR,
+        )
         return
 
-    if not (status := check_status(notification, case, status_history)):
+    if not (status_history := check_status_history(notification, case, zaken_client)):
         return
 
-    if not (status_type := check_status_type(notification, case, status, oz_config)):
+    if not (status := check_status(notification, case, status_history, zaken_client)):
+        return
+
+    if not (
+        status_type := check_status_type(
+            notification, case, status, oz_config, catalogi_client
+        )
+    ):
         return
 
     if not (ztc := check_zaaktype_config(notification, case, oz_config)):
         return
 
-    resolve_status(case)
+    resolve_status(case, client=zaken_client)
     if not (status_type_config := check_statustype_config(notification, case, ztc)):
         return
 
@@ -538,11 +572,14 @@ def send_case_update_email(
         reverse("cases:case_detail", kwargs={"object_id": str(case.uuid)})
     )
 
+    config = OpenZaakConfig.get_solo()
+
     template = find_template(template_name)
     context = {
         "identification": case.identification,
         "type_description": case.zaaktype.omschrijving,
         "start_date": case.startdatum,
+        "end_date": date.today() + timedelta(days=config.action_required_deadline_days),
         "case_link": case_detail_url,
     }
     if extra_context:

@@ -5,19 +5,6 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from open_inwoner.accounts.models import User
-from open_inwoner.openzaak.cases import (
-    fetch_case_by_url_no_cache,
-    fetch_cases,
-    fetch_single_case,
-    fetch_single_result,
-    fetch_single_status,
-)
-from open_inwoner.openzaak.catalog import (
-    fetch_result_types_no_cache,
-    fetch_single_case_type,
-    fetch_single_status_type,
-    fetch_status_types_no_cache,
-)
 from open_inwoner.openzaak.clients import build_client
 from open_inwoner.openzaak.utils import get_zaak_type_config, is_zaak_visible
 
@@ -54,6 +41,14 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.silence()
 
+        zaken_client = build_client("zaak")
+        if zaken_client is None:
+            self.die(self.style.ERROR("Could not build Zaken API client"))
+
+        catalogi_client = build_client("catalogi")
+        if catalogi_client is None:
+            self.die(self.style.ERROR("Could not build Catalogi API client"))
+
         user_ref: str = options.get("user")
         if not user_ref:
             self.die("pass 'user'")
@@ -74,9 +69,9 @@ class Command(BaseCommand):
         if not case_uuid:
             # if no case_ref is supplied display list of cases and some information about each
 
-            cases = fetch_cases(user.bsn)
+            cases = zaken_client.fetch_cases(user.bsn)
             for case in cases:
-                case_type = fetch_single_case_type(case.zaaktype)
+                case_type = catalogi_client.fetch_single_case_type(case.zaaktype)
                 case.zaaktype = case_type
 
                 self.stdout.write(
@@ -86,8 +81,10 @@ class Command(BaseCommand):
                     f'  {case_type.identificatie} {case_type.uuid} {case_type.indicatie_intern_of_extern} "{case_type.omschrijving}" '
                 )
 
-                status = fetch_single_status(case.status)
-                status_type = fetch_single_status_type(status.statustype)
+                status = zaken_client.fetch_single_status(case.status)
+                status_type = catalogi_client.fetch_single_status_type(
+                    status.statustype
+                )
                 self.stdout.write(
                     f"  {status_type.omschrijving} (end {status_type.is_eindstatus}, inform {status_type.informeren}) {status_type.uuid}"
                 )
@@ -95,8 +92,8 @@ class Command(BaseCommand):
         else:
             # dump a bunch of information about the case
 
-            case = fetch_single_case(case_uuid)
-            case_type = fetch_single_case_type(case.zaaktype)
+            case = zaken_client.fetch_single_case(case_uuid)
+            case_type = catalogi_client.fetch_single_case_type(case.zaaktype)
             case.zaaktype = case_type
 
             self.stdout.write(
@@ -112,17 +109,17 @@ class Command(BaseCommand):
             else:
                 self.stdout.write("no ZaakTypeConfig found")
 
-            status_types = fetch_status_types_no_cache(case_type.url)
+            status_types = catalogi_client.fetch_status_types_no_cache(case_type.url)
             status_type_map = {r.url: r for r in status_types}
-            result_types = fetch_result_types_no_cache(case_type.url)
+            result_types = catalogi_client.fetch_result_types_no_cache(case_type.url)
             result_types_map = {r.url: r for r in result_types}
 
-            status = fetch_single_status(case.status)
+            status = zaken_client.fetch_single_status(case.status)
             status_type = status_type_map[status.statustype]
             self.stdout.write(f"  status: {status_type.omschrijving}")
 
             if case.resultaat:
-                result = fetch_single_result(case.resultaat)
+                result = zaken_client.fetch_single_result(case.resultaat)
                 result_type = result_types_map[result.resultaattype]
 
                 self.stdout.write(f"  result: {result_type.omschrijving}")
@@ -166,13 +163,11 @@ class Command(BaseCommand):
 
             self.stdout.write("...")
 
-            client = build_client("zaak")
-
             # if next status is end-status we need to result, so random select one
             if next_status_type.is_eindstatus and not case.resultaat:
                 next_result_type = random.choice(result_types)  # nosec
                 self.stdout.write(f"setting new result {next_result_type.omschrijving}")
-                client.create(
+                zaken_client.create(
                     "resultaat",
                     {
                         "zaak": case.url,
@@ -181,7 +176,7 @@ class Command(BaseCommand):
                     },
                 )
 
-            client.create(
+            zaken_client.create(
                 "status",
                 {
                     "zaak": case.url,
@@ -192,7 +187,7 @@ class Command(BaseCommand):
             )
 
             # check if status was applied
-            case = fetch_case_by_url_no_cache(case.url)
-            status = fetch_single_status(case.status)
-            status_type = fetch_single_status_type(status.statustype)
+            case = zaken_client.fetch_case_by_url_no_cache(case.url)
+            status = zaken_client.fetch_single_status(case.status)
+            status_type = catalogi_client.fetch_single_status_type(status.statustype)
             self.stdout.write(f"  {status_type.omschrijving}")

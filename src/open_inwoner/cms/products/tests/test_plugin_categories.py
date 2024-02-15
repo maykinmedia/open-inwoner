@@ -666,7 +666,7 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
                 self.assertEqual(context["categories"][3], self.category7)
 
     @patch(
-        "open_inwoner.openzaak.cases.get_paginated_results",
+        "zgw_consumers.service.pagination_helper",
         side_effect=RequestException,
     )
     def test_categories_fail_to_fetch_cases(self, m):

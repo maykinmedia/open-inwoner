@@ -1,13 +1,16 @@
+import os
 from typing import Optional
 
+from django.conf import settings
 from django.contrib.flatpages.models import FlatPage
 from django.core.validators import FileExtensionValidator
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
 
 from colorfield.fields import ColorField
 from django_better_admin_arrayfield.models.fields import ArrayField
-from filer.fields.file import FilerFileField
 from filer.fields.image import FilerImageField
 from ordered_model.models import OrderedModel, OrderedModelManager
 from solo.models import SingletonModel
@@ -15,8 +18,9 @@ from solo.models import SingletonModel
 from ..utils.colors import hex_to_hsl
 from ..utils.css import clean_stylesheet
 from ..utils.fields import CSSField
+from ..utils.files import OverwriteStorage
 from ..utils.validators import FilerExactImageSizeValidator
-from .choices import ColorTypeChoices, OpenIDDisplayChoices
+from .choices import ColorTypeChoices, CustomFontName, OpenIDDisplayChoices
 from .validators import validate_oidc_config
 
 
@@ -252,6 +256,14 @@ class SiteConfiguration(SingletonModel):
         blank=True,
         default="",
         help_text=_("The external link for the footer logo."),
+    )
+    email_logo = FilerImageField(
+        verbose_name=_("Email logo (.png or .jpg)"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="email_logo",
+        help_text=_("Image to use as logo in email."),
     )
     favicon = FilerImageField(
         verbose_name=_("Favicon image (32x32, .png)"),
@@ -592,6 +604,131 @@ class SiteConfiguration(SingletonModel):
             return self.home_help_text
         else:
             return ""
+
+
+class CustomFontField(models.FileField):
+    def __init__(self, file_name: str = "", **kwargs):
+        self.file_name = file_name
+        super().__init__(**kwargs)
+
+
+class CustomFontSet(models.Model):
+    def update_filename(self, filename: str, new_name: str, path: str) -> str:
+        ext = filename.split(".")[1]
+        filename = f"{new_name}.{ext}"
+        return "{path}/{filename}".format(path=path, filename=filename)
+
+    def update_filename_body(self, filename: str) -> str:
+        return CustomFontSet.update_filename(
+            self,
+            filename,
+            new_name=CustomFontName.body,
+            path="custom_fonts/",
+        )
+
+    def update_filename_body_italic(self, filename: str) -> str:
+        return CustomFontSet.update_filename(
+            self,
+            filename,
+            new_name=CustomFontName.body_italic,
+            path="custom_fonts/",
+        )
+
+    def update_filename_body_bold(self, filename: str) -> str:
+        return CustomFontSet.update_filename(
+            self,
+            filename,
+            new_name=CustomFontName.body_bold,
+            path="custom_fonts/",
+        )
+
+    def update_filename_body_bold_italic(self, filename: str) -> str:
+        return CustomFontSet.update_filename(
+            self,
+            filename,
+            new_name=CustomFontName.body_bold_italic,
+            path="custom_fonts/",
+        )
+
+    def update_filename_heading(self, filename: str) -> str:
+        return CustomFontSet.update_filename(
+            self,
+            filename,
+            new_name=CustomFontName.heading,
+            path="custom_fonts/",
+        )
+
+    heading_font = CustomFontField(
+        verbose_name=_("Heading font"),
+        upload_to=update_filename_heading,
+        file_name=CustomFontName.heading,
+        storage=OverwriteStorage(),
+        validators=[FileExtensionValidator(["ttf"])],
+        blank=True,
+        null=True,
+        help_text=_("Upload heading font. TTF font types only."),
+    )
+    site_configuration = models.OneToOneField(
+        SiteConfiguration,
+        verbose_name=_("Configuration"),
+        related_name="custom_fonts",
+        on_delete=models.CASCADE,
+    )
+    body_font_regular = CustomFontField(
+        verbose_name=_("Body font regular"),
+        upload_to=update_filename_body,
+        file_name=CustomFontName.body,
+        storage=OverwriteStorage(),
+        validators=[FileExtensionValidator(["ttf"])],
+        blank=True,
+        null=True,
+        help_text=_("Upload regular text body font. TTF font types only."),
+    )
+    body_font_italic = CustomFontField(
+        verbose_name=_("Body font italic"),
+        upload_to=update_filename_body_italic,
+        file_name=CustomFontName.body_italic,
+        storage=OverwriteStorage(),
+        validators=[FileExtensionValidator(["ttf"])],
+        blank=True,
+        null=True,
+        help_text=_("Upload italic text body font. TTF font types only."),
+    )
+    body_font_bold = CustomFontField(
+        verbose_name=_("Body font bold"),
+        upload_to=update_filename_body_bold,
+        file_name=CustomFontName.body_bold,
+        storage=OverwriteStorage(),
+        validators=[FileExtensionValidator(["ttf"])],
+        blank=True,
+        null=True,
+        help_text=_("Upload bold text body font. TTF font types only."),
+    )
+    body_font_bold_italic = CustomFontField(
+        verbose_name=_("Body font bold italic"),
+        upload_to=update_filename_body_bold_italic,
+        file_name=CustomFontName.body_bold_italic,
+        storage=OverwriteStorage(),
+        validators=[FileExtensionValidator(["ttf"])],
+        blank=True,
+        null=True,
+        help_text=_("Upload bold italic text body font. TTF font types only."),
+    )
+
+
+@receiver(post_save, sender=CustomFontSet)
+def remove_orphan_files(sender, instance, *args, **kwargs):
+    """
+    Remove font files corresponding to `CustomFont` fields that have been cleared
+    """
+    custom_fonts_dir = os.path.join(settings.MEDIA_ROOT, "custom_fonts")
+    font_names = os.listdir(custom_fonts_dir)
+
+    for field in sender._meta.concrete_fields:
+        if isinstance(field, models.FileField) and not getattr(instance, field.name):
+            for font_name in font_names:
+                if font_name.startswith(field.file_name):
+                    os.remove(os.path.join(custom_fonts_dir, font_name))
 
 
 class SiteConfigurationPage(OrderedModel):

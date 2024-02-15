@@ -21,10 +21,9 @@ from zgw_consumers.constants import APITypes, AuthTypes
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.cms.cases.views.status import SimpleFile
+from open_inwoner.openzaak.clients import build_client
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
-from ..cases import connect_case_with_document
-from ..documents import download_document, upload_document
 from ..models import OpenZaakConfig
 from .factories import (
     CertificateFactory,
@@ -57,6 +56,10 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
         )
         self.config = OpenZaakConfig.get_solo()
         self.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
+        self.config.zaak_service = self.zaak_service
+        self.config.save()
+        self.zaken_client = build_client("zaak")
+
         self.config.zaak_service = self.zaak_service
         self.catalogi_service = ServiceFactory(
             api_root=CATALOGI_ROOT, api_type=APITypes.ztc
@@ -384,7 +387,8 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
 
         m.get(self.informatie_object["inhoud"], content=self.informatie_object_content)
 
-        download_document(self.informatie_object["inhoud"])
+        document_client = build_client("document")
+        document_client.download_document(self.informatie_object["inhoud"])
 
         req = m.request_history[0]
         self.assertEqual(req.verify, server.public_certificate.path)
@@ -407,7 +411,8 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
         file = get_temporary_text_file()
         title = "my_document"
 
-        created_document = upload_document(
+        documenten_client = build_client("document")
+        created_document = documenten_client.upload_document(
             self.user, file, title, zaak_type_iotc.id, self.zaak["bronorganisatie"]
         )
 
@@ -429,7 +434,8 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
         title = "my_document"
 
         m.post(f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten", status_code=404)
-        created_document = upload_document(
+        documenten_client = build_client("document")
+        created_document = documenten_client.upload_document(
             self.user, file, title, zaak_type_iotc.id, self.zaak["bronorganisatie"]
         )
 
@@ -451,31 +457,8 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
         title = "my_document"
 
         m.post(f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten", status_code=500)
-        created_document = upload_document(
-            self.user, file, title, zaak_type_iotc.id, self.zaak["bronorganisatie"]
-        )
-
-        self.assertIsNone(created_document)
-
-    def test_document_response_is_none_when_no_client_is_configured(self, m):
-        self._setUpMocks(m)
-
-        zaak_type_config = ZaakTypeConfigFactory(
-            identificatie=self.zaaktype["identificatie"]
-        )
-        zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory(
-            zaaktype_config=zaak_type_config,
-            informatieobjecttype_url=self.informatie_object["url"],
-            zaaktype_uuids=[self.zaaktype["uuid"]],
-            document_upload_enabled=True,
-        )
-        self.config.document_service = None
-        self.config.save()
-
-        file = get_temporary_text_file()
-        title = "my_document"
-
-        created_document = upload_document(
+        documenten_client = build_client("document")
+        created_document = documenten_client.upload_document(
             self.user, file, title, zaak_type_iotc.id, self.zaak["bronorganisatie"]
         )
 
@@ -484,7 +467,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
     def test_document_case_relationship_is_created(self, m):
         self._setUpMocks(m)
 
-        created_relationship = connect_case_with_document(
+        created_relationship = self.zaken_client.connect_case_with_document(
             self.zaak["url"], self.informatie_object["url"]
         )
 
@@ -497,7 +480,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
             f"{ZAKEN_ROOT}zaakinformatieobjecten",
             status_code=400,
         )
-        created_relationship = connect_case_with_document(
+        created_relationship = self.zaken_client.connect_case_with_document(
             self.zaak["url"], self.informatie_object["url"]
         )
 
@@ -510,21 +493,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
             f"{ZAKEN_ROOT}zaakinformatieobjecten",
             status_code=500,
         )
-        created_relationship = connect_case_with_document(
-            self.zaak["url"], self.informatie_object["url"]
-        )
-
-        self.assertIsNone(created_relationship)
-
-    def test_document_case_relationship_is_not_created_when_no_client_is_configured(
-        self, m
-    ):
-        self._setUpMocks(m)
-
-        self.config.zaak_service = None
-        self.config.save()
-
-        created_relationship = connect_case_with_document(
+        created_relationship = self.zaken_client.connect_case_with_document(
             self.zaak["url"], self.informatie_object["url"]
         )
 

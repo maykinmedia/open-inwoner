@@ -115,7 +115,7 @@
                     <a href="#" class="card card--compact card--stretch" id="profile-section-mentors">
                 {% endif %}
                         <div class="card__body">
-                            <p class="h4"><span class="link link__text">{% trans "Mijn begeleider" %}</span></p>
+                            <h4 class="card__heading-4"><span class="link link__text">{% trans "Mijn begeleider" %}</span></h4>
                             {% render_list %}
                                 <span class="profile-list ellipsis">
                                     {% for name in mentor_contact_names %}
@@ -141,7 +141,7 @@
                     <a href="{% url 'profile:contact_list' %}" class="card card--compact card--stretch" id="profile-section-contacts">
                         <div class="card__body">
                             <div class="profile__link">
-                                <p class="h4"><span class="link link__text">{% trans "Mijn contacten" %}</span></p>
+                                <h4 class="card__heading-4"><span class="link link__text">{% trans "Mijn contacten" %}</span></h4>
                                 {% render_list %}
                                     <span class="profile-list ellipsis">
                                     {% for name in contact_names %}
@@ -169,7 +169,7 @@
                     <a href="{% url 'profile:action_list' %}" class="card card--compact card--stretch" id="profile-section-actions">
                         <div class="card__body">
                             <div class="profile__link">
-                                <p class="h4"><span class="link link__text">{% trans "Acties" %}</span></p>
+                                <h4 class="card__heading-4"><span class="link link__text">{% trans "Acties" %}</span></h4>
                                 {% render_list %}
                                     <span class="profile-list">
                                         {% list_item text=action_text compact=True strong=False %}
@@ -188,8 +188,8 @@
             {% if view.config.ssd %}
                 <a href="{% url 'ssd:uitkeringen' %}" class="card card--compact card--stretch" id="profile-section-ssd">
                     <div class="card__body">
-                        <p class="h4"><span class="link link__text">{% trans "Mijn uitkeringen" %}</span>
-                        </p>
+                        <h4 class="card__heading-4"><span class="link link__text">{% trans "Mijn uitkeringen" %}</span>
+                        </h4>
                         {% render_list %}
                             <span class="profile-list">
                                 {% list_item text="Jaaropgaven" compact=True strong=False active=False %}
@@ -209,7 +209,7 @@
             {% if view.config.questions %}
                 <a href="{% url 'cases:contactmoment_list' %}" class="card card--compact card--stretch" id="profile-section-questions">
                     <div class="card__body">
-                    <p class="h4"><span class="link link__text">{% trans "Mijn vragen" %}</span></p>
+                    <h4 class="card__heading-4"><span class="link link__text">{% trans "Mijn vragen" %}</span></h4>
                     <span class="link link--icon link--secondary profile-card__button" aria-label="{% trans "Bekijken" %}" title="{% trans "Bekijken" %}">
                         <span class="link__text">{% trans "Bekijken" %}</span>
                         {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
@@ -221,7 +221,7 @@
             {% if questionnaire_exists and view.config.selfdiagnose %}
                 <a href="{% url 'products:questionnaire_list' %}" class="card card--compact card--stretch" id="profile-section-questions">
                     <div class="card__body">
-                        <p class="h4"><span class="link link__text">{% trans "Zelftest" %}</span></p>
+                        <h4 class="card__heading-4"><span class="link link__text">{% trans "Zelftest" %}</span></h4>
                         <span class="link link--icon link--secondary profile-card__button" aria-label="{% trans "Start zelfdiagnose" %}" title="{% trans "Start zelfdiagnose" %}">
                             <span class="link__text">{% trans "Start zelfdiagnose" %}</span>
                             {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}

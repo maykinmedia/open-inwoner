@@ -20,32 +20,17 @@ from mail_editor.helpers import find_template
 from view_breadcrumbs import BaseBreadcrumbMixin
 from zgw_consumers.api_models.constants import RolOmschrijving
 
+from open_inwoner.openklant.clients import build_client as build_client_openklant
 from open_inwoner.openklant.models import OpenKlantConfig
-from open_inwoner.openklant.wrap import (
-    create_contactmoment,
-    create_klant,
-    fetch_klant,
-    get_fetch_parameters,
-)
+from open_inwoner.openklant.wrap import get_fetch_parameters
 from open_inwoner.openzaak.api_models import Status, StatusType, Zaak
-from open_inwoner.openzaak.cases import (
-    connect_case_with_document,
-    fetch_case_information_objects,
-    fetch_case_information_objects_for_case_and_info,
-    fetch_case_roles,
-    fetch_single_result,
-    fetch_single_status,
-    fetch_status_history,
-)
-from open_inwoner.openzaak.catalog import (
-    fetch_single_status_type,
-    fetch_status_types_no_cache,
+from open_inwoner.openzaak.clients import (
+    ZakenClient,
+    build_client as build_client_openzaak,
 )
 from open_inwoner.openzaak.documents import (
-    download_document,
     fetch_single_information_object_url,
     fetch_single_information_object_uuid,
-    upload_document,
 )
 from open_inwoner.openzaak.models import (
     OpenZaakConfig,
@@ -148,12 +133,19 @@ class InnerCaseDetailView(
             config = OpenZaakConfig.get_solo()
             status_translate = StatusTranslation.objects.get_lookup()
 
+            zaken_client = build_client_openzaak("zaak")
+
             # fetch data associated with `self.case`
-            documents = self.get_case_document_files(self.case)
-            statuses = fetch_status_history(self.case.url)
+            documents = self.get_case_document_files(self.case, zaken_client)
+            statuses = zaken_client.fetch_status_history(self.case.url)
             self.store_statustype_mapping(self.case.zaaktype.identificatie)
             self.store_resulttype_mapping(self.case.zaaktype.identificatie)
-            statustypen = fetch_status_types_no_cache(self.case.zaaktype.url)
+
+            statustypen = []
+            if catalogi_client := build_client_openzaak("catalogi"):
+                statustypen = catalogi_client.fetch_status_types_no_cache(
+                    self.case.zaaktype.url
+                )
 
             # NOTE we cannot sort on the Status.datum_status_gezet (datetime) because eSuite
             # returns zeros as the time component of the datetime, so we're going with the
@@ -168,14 +160,16 @@ class InnerCaseDetailView(
                 second_status_preview = None
 
             # handle/transform data associated with `self.case`
-            status_types_mapping = self.sync_statuses_with_status_types(statuses)
+            status_types_mapping = self.sync_statuses_with_status_types(
+                statuses, zaken_client
+            )
             end_statustype_data = self.handle_end_statustype_data(
                 status_types_mapping=status_types_mapping,
                 end_statustype=self.handle_end_statustype(statuses, statustypen),
                 status_translate=status_translate,
             )
             result_data = self.get_result_data(
-                self.case, self.resulttype_config_mapping
+                self.case, self.resulttype_config_mapping, zaken_client
             )
 
             hooks.case_status_seen(self.request.user, self.case)
@@ -253,7 +247,7 @@ class InnerCaseDetailView(
         )
 
     def sync_statuses_with_status_types(
-        self, statuses: list[Status]
+        self, statuses: list[Status], zaken_client: ZakenClient
     ) -> dict[str, StatusType]:
         """
         Update `statuses` (including the status on this view) and sync with `status_types`:
@@ -283,13 +277,17 @@ class InnerCaseDetailView(
             logger.info(
                 "Issue #2037 -- Retrieving status individually because of eSuite"
             )
-            self.case.status = fetch_single_status(self.case.status)
+            self.case.status = zaken_client.fetch_single_status(self.case.status)
             status_types_mapping[self.case.status.statustype].append(self.case.status)
             statuses.append(self.case.status)
 
+        catalogi_client = build_client_openzaak("catalogi")
+        if catalogi_client is None:
+            return status_types_mapping
+
         # final mapping {status_type url: status_type}
         for status_type_url, _statuses in list(status_types_mapping.items()):
-            status_type = fetch_single_status_type(status_type_url)
+            status_type = catalogi_client.fetch_single_status_type(status_type_url)
             status_types_mapping[status_type_url] = status_type
             # resolve statustype url to `StatusType`
             for status in _statuses:
@@ -471,11 +469,13 @@ class InnerCaseDetailView(
         }
 
     @staticmethod
-    def get_result_data(case: Zaak, result_type_config_mapping: dict) -> dict:
+    def get_result_data(
+        case: Zaak, result_type_config_mapping: dict, client: ZakenClient
+    ) -> dict:
         if not case.resultaat:
             return {}
 
-        result = fetch_single_result(case.resultaat)
+        result = client.fetch_single_result(case.resultaat)
 
         display = result.toelichting
         description = getattr(
@@ -489,10 +489,10 @@ class InnerCaseDetailView(
 
     @staticmethod
     def get_initiator_display(case: Zaak) -> str:
-        roles = fetch_case_roles(case.url, RolOmschrijving.initiator)
-        if not roles:
-            return ""
-        return ", ".join([get_role_name_display(r) for r in roles])
+        if client := build_client_openzaak("zaak"):
+            roles = client.fetch_case_roles(case.url, RolOmschrijving.initiator)
+            return ", ".join([get_role_name_display(r) for r in roles])
+        return ""
 
     @staticmethod
     def get_statuses_data(
@@ -539,8 +539,11 @@ class InnerCaseDetailView(
         ]
 
     @staticmethod
-    def get_case_document_files(case: Zaak) -> List[SimpleFile]:
-        case_info_objects = fetch_case_information_objects(case.url)
+    def get_case_document_files(case: Zaak, client: ZakenClient) -> List[SimpleFile]:
+        if not client:
+            return []
+
+        case_info_objects = client.fetch_case_information_objects(case.url)
 
         # get the information objects for the case objects
 
@@ -613,13 +616,17 @@ class CaseDocumentDownloadView(LogMixin, CaseAccessMixin, View):
         if not self.case:
             raise Http404
 
+        zaken_client = build_client_openzaak("zaak")
+        if not zaken_client:
+            raise Http404
+
         info_object_uuid = kwargs["info_id"]
         info_object = fetch_single_information_object_uuid(info_object_uuid)
         if not info_object:
             raise Http404
 
         # check if this info_object belongs to this case
-        if not fetch_case_information_objects_for_case_and_info(
+        if not zaken_client.fetch_case_information_objects_for_case_and_info(
             self.case.url, info_object.url
         ):
             raise PermissionDenied()
@@ -630,7 +637,10 @@ class CaseDocumentDownloadView(LogMixin, CaseAccessMixin, View):
             raise PermissionDenied()
 
         # retrieve and stream content
-        content_stream = download_document(info_object.inhoud)
+        content_stream = None
+        if client := build_client_openzaak("document"):
+            content_stream = client.download_document(info_object.inhoud)
+
         if not content_stream:
             raise Http404
 
@@ -691,7 +701,11 @@ class CaseDocumentUploadFormView(CaseAccessMixin, LogMixin, FormView):
             document_type = cleaned_data["type"]
             source_organization = self.case.bronorganisatie
 
-            created_document = upload_document(
+            client = build_client_openzaak("document")
+            if client is None:
+                return self.handle_document_error(request, file)
+
+            created_document = client.upload_document(
                 request.user,
                 file,
                 title,
@@ -701,9 +715,11 @@ class CaseDocumentUploadFormView(CaseAccessMixin, LogMixin, FormView):
             if not created_document:
                 return self.handle_document_error(request, file)
 
-            created_relationship = connect_case_with_document(
-                self.case.url, created_document.get("url")
-            )
+            created_relationship = None
+            if zaken_client := build_client_openzaak("zaak"):
+                created_relationship = zaken_client.connect_case_with_document(
+                    self.case.url, created_document.get("url")
+                )
             if not created_relationship:
                 return self.handle_document_error(request, file)
 
@@ -836,32 +852,39 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
         except ObjectDoesNotExist:
             ztc = None
 
-        klant = fetch_klant(**get_fetch_parameters(self.request))
-        if klant:
-            self.log_system_action("retrieved klant for user", user=self.request.user)
-        else:
-            self.log_system_action(
-                "could not retrieve klant for user", user=self.request.user
-            )
-            data = {
-                "bronorganisatie": config.register_bronorganisatie_rsin,
-                "voornaam": self.request.user.first_name,
-                "voorvoegselAchternaam": self.request.user.infix,
-                "achternaam": self.request.user.last_name,
-                "emailadres": self.request.user.email,
-                "telefoonnummer": self.request.user.phonenumber,
-            }
-            # registering klanten won't work in e-Suite as it always pulls from BRP (but try anyway and fallback to appending details to tekst if fails)
-            klant = create_klant(data)
+        if klanten_client := build_client_openklant("klanten"):
+            klant = klanten_client.retrieve_klant(**get_fetch_parameters(self.request))
+
             if klant:
                 self.log_system_action(
-                    "created klant for basic authenticated user",
-                    user=self.request.user,
+                    "retrieved klant for user", user=self.request.user
                 )
             else:
                 self.log_system_action(
-                    "could not create klant for user", user=self.request.user
+                    "could not retrieve klant for user", user=self.request.user
                 )
+                data = {
+                    "bronorganisatie": config.register_bronorganisatie_rsin,
+                    "voornaam": self.request.user.first_name,
+                    "voorvoegselAchternaam": self.request.user.infix,
+                    "achternaam": self.request.user.last_name,
+                    "emailadres": self.request.user.email,
+                    "telefoonnummer": self.request.user.phonenumber,
+                }
+                # registering klanten won't work in e-Suite as it always pulls from BRP (but try anyway and fallback to appending details to tekst if fails)
+                klant = klanten_client.create_klant(data)
+
+                if klant:
+                    self.log_system_action(
+                        "created klant for basic authenticated user",
+                        user=self.request.user,
+                    )
+                else:
+                    self.log_system_action(
+                        "could not create klant for user", user=self.request.user
+                    )
+        else:
+            self.log_system_action("could not build client for klanten API")
 
         # create contact moment
         question = form.cleaned_data["question"]
@@ -877,13 +900,15 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
         if ztc and ztc.contact_subject_code:
             data["onderwerp"] = ztc.contact_subject_code
 
-        contactmoment = create_contactmoment(data, klant=klant)
-
-        if contactmoment:
-            self.log_system_action(
-                "registered contactmoment by API", user=self.request.user
+        if contactmomenten_client := build_client_openklant("contactmomenten"):
+            contactmoment = contactmomenten_client.create_contactmoment(
+                data, klant=klant
             )
-            return True
+            if contactmoment:
+                self.log_system_action(
+                    "registered contactmoment by API", user=self.request.user
+                )
+                return True
         else:
             self.log_system_action(
                 "error while registering contactmoment by API", user=self.request.user

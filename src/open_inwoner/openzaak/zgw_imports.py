@@ -1,3 +1,4 @@
+import logging
 from collections import defaultdict
 from typing import List, Tuple
 
@@ -10,14 +11,7 @@ from zgw_consumers.api_models.catalogi import (
 )
 
 from open_inwoner.openzaak.api_models import ZaakType
-from open_inwoner.openzaak.catalog import (
-    fetch_case_types_by_identification_no_cache,
-    fetch_catalogs_no_cache,
-    fetch_single_information_object_type,
-    fetch_single_resultaat_type,
-    fetch_single_status_type,
-    fetch_zaaktypes_no_cache,
-)
+from open_inwoner.openzaak.clients import CatalogiClient, build_client
 from open_inwoner.openzaak.models import (
     CatalogusConfig,
     ZaakTypeConfig,
@@ -26,21 +20,23 @@ from open_inwoner.openzaak.models import (
     ZaakTypeStatusTypeConfig,
 )
 
+logger = logging.getLogger(__name__)
+
 
 def filter_zaaktypes(case_types: List[ZaakType]) -> List[ZaakType]:
     return [c for c in case_types if c.indicatie_intern_of_extern == "extern"]
 
 
-def get_configurable_zaaktypes() -> List[ZaakType]:
-    case_types = fetch_zaaktypes_no_cache()
+def get_configurable_zaaktypes(client: CatalogiClient) -> List[ZaakType]:
+    case_types = client.fetch_zaaktypes_no_cache()
     case_types = filter_zaaktypes(case_types)
     return case_types
 
 
 def get_configurable_zaaktypes_by_identification(
-    identificatie, catalogus_url
+    client: CatalogiClient, identificatie, catalogus_url
 ) -> List[ZaakType]:
-    case_types = fetch_case_types_by_identification_no_cache(
+    case_types = client.fetch_case_types_by_identification_no_cache(
         identificatie, catalogus_url
     )
     case_types = filter_zaaktypes(case_types)
@@ -53,7 +49,14 @@ def import_catalog_configs() -> List[CatalogusConfig]:
 
     note this doesn't generate anything on eSuite
     """
-    catalogs = fetch_catalogs_no_cache()
+    client = build_client("catalogi")
+    if not client:
+        logger.warning(
+            "Not importing catalogus configs: could not build Catalogi API client"
+        )
+        return []
+
+    catalogs = client.fetch_catalogs_no_cache()
     if not catalogs:
         return []
 
@@ -84,7 +87,14 @@ def import_zaaktype_configs() -> List[ZaakTypeConfig]:
 
     this collapses individual ZaakType versions on their identificatie and catalog
     """
-    zaak_types = get_configurable_zaaktypes()
+    client = build_client("catalogi")
+    if not client:
+        logger.warning(
+            "Not importing zaaktype configs: could not build Catalogi API client"
+        )
+        return []
+
+    zaak_types = get_configurable_zaaktypes(client)
     if not zaak_types:
         return []
 
@@ -177,10 +187,16 @@ def import_zaaktype_informatieobjecttype_configs_for_type(
 
     this is a bit complicated because one ZaakTypeConfig can represent multiple ZaakTypes
     """
+    client = build_client("catalogi")
+    if not client:
+        logger.warning(
+            "Not importing zaaktype-informatieobjecttype configs: could not build Catalogi API client"
+        )
+        return []
 
     # grab actual ZaakTypes for this identificatie
     zaak_types: List[ZaakType] = get_configurable_zaaktypes_by_identification(
-        ztc.identificatie, ztc.catalogus_url
+        client, ztc.identificatie, ztc.catalogus_url
     )
     if not zaak_types:
         return []
@@ -204,7 +220,7 @@ def import_zaaktype_informatieobjecttype_configs_for_type(
         if info_queue:
             # load urls and update/create records
             for iot_url, using_zaak_types in info_queue.items():
-                info_type = fetch_single_information_object_type(iot_url)
+                info_type = client.fetch_single_information_object_type(iot_url)
 
                 ztiotc = info_map.get(info_type.url)
                 if ztiotc:
@@ -245,10 +261,16 @@ def import_statustype_configs_for_type(
 
     this is a bit complicated because one ZaakTypeConfig can represent multiple ZaakTypes
     """
+    client = build_client("catalogi")
+    if not client:
+        logger.warning(
+            "Not importing statustype configs: could not build Catalogi API client"
+        )
+        return []
 
     # grab actual ZaakTypes for this identificatie
     zaak_types: List[ZaakType] = get_configurable_zaaktypes_by_identification(
-        ztc.identificatie, ztc.catalogus_url
+        client, ztc.identificatie, ztc.catalogus_url
     )
     if not zaak_types:
         return []
@@ -273,7 +295,7 @@ def import_statustype_configs_for_type(
         if info_queue:
             # load urls and update/create records
             for statustype_url, using_zaak_types in info_queue.items():
-                status_type = fetch_single_status_type(statustype_url)
+                status_type = client.fetch_single_status_type(statustype_url)
                 if not status_type:  # Statustype isn't available anymore?
                     continue
 
@@ -315,10 +337,16 @@ def import_resultaattype_configs_for_type(
 
     this is a bit complicated because one ZaakTypeConfig can represent multiple ZaakTypes
     """
+    client = build_client("catalogi")
+    if not client:
+        logger.warning(
+            "Not importing resultaattype configs: could not build Catalogi API client"
+        )
+        return []
 
     # grab actual ZaakTypes for this identificatie
     zaak_types: List[ZaakType] = get_configurable_zaaktypes_by_identification(
-        ztc.identificatie, ztc.catalogus_url
+        client, ztc.identificatie, ztc.catalogus_url
     )
     if not zaak_types:
         return []
@@ -343,7 +371,7 @@ def import_resultaattype_configs_for_type(
         if info_queue:
             # load urls and update/create records
             for resultaattype_url, using_zaak_types in info_queue.items():
-                resultaat_type = fetch_single_resultaat_type(resultaattype_url)
+                resultaat_type = client.fetch_single_resultaat_type(resultaattype_url)
 
                 zaaktype_resultaattype = info_map.get(resultaat_type.url)
                 if zaaktype_resultaattype:

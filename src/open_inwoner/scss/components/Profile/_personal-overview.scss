@@ -25,4 +25,14 @@
       padding: var(--spacing-small) 0;
     }
   }
+
+  .button {
+    &--error {
+      font-weight: bold;
+    }
+  }
+
+  .profile-cards .card {
+    min-height: 190px;
+  }
 }

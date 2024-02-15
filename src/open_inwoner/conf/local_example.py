@@ -21,3 +21,6 @@ from .dev import INSTALLED_APPS, MIDDLEWARE
 
 INSTALLED_APPS += ["debug_toolbar"]
 MIDDLEWARE += ["debug_toolbar.middleware.DebugToolbarMiddleware"]
+
+
+MAIL_EDITOR_BASE_HOST = "http://localhost:8000"

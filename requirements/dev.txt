@@ -141,6 +141,10 @@ cryptography==41.0.7
     #   josepy
     #   mozilla-django-oidc
     #   pyopenssl
+css-inline==0.13.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 cssselect==1.1.0
     # via
     #   -c requirements/ci.txt
@@ -352,7 +356,7 @@ django-localflavor==3.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-django-log-outgoing-requests==0.6.0
+django-log-outgoing-requests==0.6.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -515,7 +519,6 @@ easy-thumbnails[svg]==2.8.5
     #   -r requirements/ci.txt
     #   django-filer
     #   djangocms-picture
-    #   easy-thumbnails
 ecs-logging==2.1.0
     # via
     #   -c requirements/ci.txt
@@ -573,7 +576,6 @@ fonttools[woff]==4.29.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-    #   fonttools
     #   weasyprint
 freezegun==1.1.0
     # via
@@ -1043,7 +1045,6 @@ tablib[html,ods,xls,xlsx,yaml]==3.1.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-import-export
-    #   tablib
 tblib==1.7.0
     # via
     #   -c requirements/ci.txt
@@ -1161,7 +1162,7 @@ xsdata==23.8
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-zgw-consumers==0.28.0
+zgw-consumers==0.29.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt

@@ -23,6 +23,7 @@ from open_inwoner.kvk.branches import get_kvk_branch_number
 from open_inwoner.kvk.models import KvKConfig
 from open_inwoner.kvk.tests.factories import CertificateFactory
 
+from ...cms.collaborate.cms_apps import CollaborateApphook
 from ...cms.tests import cms_tools
 from ...utils.test import ClearCachesMixin
 from ...utils.tests.helpers import AssertRedirectsMixin
@@ -45,7 +46,7 @@ class DigiDRegistrationTest(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
 
     @classmethod
     def setUpTestData(cls):
-        cms_tools.create_homepage()
+        cls.homepage = cms_tools.create_homepage()
 
     @patch("digid_eherkenning_oidc_generics.models.OpenIDConnectDigiDConfig.get_solo")
     def test_registration_page_only_digid(self, mock_solo):
@@ -229,6 +230,48 @@ class DigiDRegistrationTest(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
         self.assertEqual(user.email, "updated@example.com")
         self.assertEqual(user.first_name, "Merel")
         self.assertEqual(user.last_name, "Kooyman")
+
+    def test_notification_settings_with_cms_page_published(self):
+        """
+        Assert that notification settings can be changed via the necessary-fields form
+        if the corresponding CMS pages are published. Fields corresponding to unpublished
+        pages should not be present.
+        """
+        cms_tools.create_apphook_page(
+            CollaborateApphook,
+            parent_page=self.homepage,
+        )
+
+        invite = InviteFactory()
+
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": f"{reverse('profile:registration_necessary')}?invite={invite.key}",
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "533458225",
+            "auth_pass": "bar",
+        }
+
+        # post our password to the IDP
+        response = self.app.post(url, data).follow().follow()
+
+        necessary_form = response.forms["necessary-form"]
+
+        self.assertNotIn("cases_notifications", necessary_form.fields)
+        self.assertNotIn("messages_notifications", necessary_form.fields)
+
+        necessary_form["plans_notifications"] = False
+        necessary_form.submit()
+
+        user = User.objects.get(bsn=data["auth_name"])
+
+        self.assertEqual(user.cases_notifications, True)
+        self.assertEqual(user.messages_notifications, True)
+        self.assertEqual(user.plans_notifications, False)
 
     @requests_mock.Mocker()
     def test_partial_response_from_haalcentraal_when_digid_and_brp(self, m):

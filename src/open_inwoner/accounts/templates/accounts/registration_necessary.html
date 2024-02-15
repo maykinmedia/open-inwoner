@@ -2,7 +2,6 @@
 {% load i18n static form_tags card_tags grid_tags solo_tags %}
 
 {% block content %}
-
 <div class="registration-grid">
 {% render_grid %}
     {% render_column span=9 %}
@@ -10,10 +9,24 @@
             {% get_solo 'configurations.SiteConfiguration' as config %}
             <h1 class="h1">{% trans "Registratie voltooien" %}</h1><br>
             {% if config.registration_text %}<p class="p">{{ config.registration_text|urlize|linebreaksbr }}</p><br>{% endif %}
-            {% form form_object=form method="POST" id="necessary-form" %}
+            <form method="POST" id="necessary-form" action="{% url 'profile:registration_necessary' %}" class="form" novalidate>
+                {% csrf_token %}
+
+                {% for field in form.fields %}
+                    {% autorender_field form field %}
+                {% endfor %}
+
+                {# pseudo checkbox for notifications that cannot be disabled #}
+                <div class="checkbox">
+                    <input type="checkbox" name="cases_notifications_action_required" disabled="" class="checkbox__input checkbox__input--disabled" checked="">
+                    <label class="checkbox__label" for="id_cases_notifications_action_required">{% trans "Zaaknotificaties - action required" %}</label>
+                    <p class="p">{% trans "E-mail notifications for case updates that require action (cannot be disabled)" %}</p>
+                </div>
+
+                {% form_actions primary_icon='arrow_forward' primary_text="Verzenden" %}
+            </form>
         {% endrender_card %}
     {% endrender_column %}
 {% endrender_grid %}
 </div>
-
 {% endblock content %}
