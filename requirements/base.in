@@ -37,7 +37,7 @@ django-view-breadcrumbs
 markdown
 django_better_admin_arrayfield
 humanfriendly
-git+https://github.com/maykinmedia/mail-editor.git@0.3.0#egg=mail-editor
+git+https://github.com/maykinmedia/mail-editor.git@0.3.5#egg=mail-editor
 fontawesomefree
 django-timeline-logger
 django-csp
