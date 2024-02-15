@@ -426,7 +426,6 @@ django-two-factor-auth[phonenumberslite,webauthn]==1.16.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-    #   django-two-factor-auth
     #   maykin-2fa
 django-view-breadcrumbs==2.5.1
     # via
@@ -488,7 +487,6 @@ easy-thumbnails[svg]==2.8.5
     #   -r requirements/base.txt
     #   django-filer
     #   djangocms-picture
-    #   easy-thumbnails
 ecs-logging==2.1.0
     # via
     #   -c requirements/base.txt
@@ -528,7 +526,6 @@ fonttools[woff]==4.43.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-    #   fonttools
     #   weasyprint
 freezegun==1.1.0
     # via -r requirements/test-tools.in
@@ -895,7 +892,6 @@ tablib[html,ods,xls,xlsx,yaml]==3.1.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-import-export
-    #   tablib
 tblib==1.7.0
     # via -r requirements/test-tools.in
 text-unidecode==1.3
