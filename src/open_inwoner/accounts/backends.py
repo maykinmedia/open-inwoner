@@ -4,7 +4,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.hashers import check_password
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 
 from axes.backends import AxesBackend
 from mozilla_django_oidc_db.backends import OIDCAuthenticationBackend
@@ -79,6 +79,10 @@ class CustomOIDCBackend(OIDCAuthenticationBackend):
         if request and request.path != self.callback_path:
             return
 
+        config = SiteConfiguration.get_solo()
+        if request and config.openid_enabled_for_admin:
+            request.session["oidc_login_next"] = reverse("admin:index")
+
         return super().authenticate(request, *args, **kwargs)
 
     def create_user(self, claims):
@@ -106,6 +110,8 @@ class CustomOIDCBackend(OIDCAuthenticationBackend):
             # TODO verify we want unusable_password
             existing_user.set_unusable_password()
             existing_user.save()
+            # Ensure `make_user_staff` is used
+            self.update_user(existing_user, claims)
             return existing_user
         else:
             logger.debug("Creating OIDC user: %s", unique_id)
@@ -116,6 +122,7 @@ class CustomOIDCBackend(OIDCAuthenticationBackend):
                 "login_type": LoginTypeChoices.oidc,
             }
             user = self.UserModel.objects.create_user(**kwargs)
+            # Ensure `make_user_staff` is used
             self.update_user(user, claims)
             # TODO verify we want unusable_password
             user.set_unusable_password()
