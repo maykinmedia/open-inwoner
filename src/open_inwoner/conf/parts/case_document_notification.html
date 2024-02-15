@@ -1,22 +1,95 @@
-<p>Beste</p>
-<p>U ontvangt deze email, omdat er bij een van uw zaken een document als bijlage is toegevoegd.</p>
+<table role="presentation" border="0" cellspacing="0" cellpadding="0" width="100%" class="table-mail">
+    <tbody>
+    <tr>
+        <td class="td-mail td__padding-all" colspan="6">
+            <p>Beste inwoner,</p>
+            <p>Er is iets veranderd in &eacute;&eacute;n van uw aanvragen.</p>
+        </td>
+    </tr>
+    <tr>
+        <td class="spacing__extra" colspan="6">
+            &nbsp;
+        </td>
+    </tr>
+    <tr>
+        <td class="td-mail td-mail__bg-info td__padding-all" colspan="6">
+            <h1>Nieuw:</h1>
+        </td>
+    </tr>
+    <tr class="tr--responsive">
+        <td class="td--responsive td-mail td-mail__bg-info td__padding-all" colspan="3">
+            <p><span class="text-color__small-gray-900">Aanvraag: </span></p>
+            <h2>{{ type_description }}</h2>
+        </td>
+        <td class="td--responsive td-mail td-mail__bg-info td__padding-all" colspan="3">
+            <p><span class="text-color__small-gray-900">Zaaknummer: </span><br/>{{ identification }}</p>
+        </td>
+    </tr>
 
-<table>
+    <!-- Table with different column-widths -->
     <tr>
-        <th>Zaakidentificatie</th>
-        <td>{{ identification }}</td>
+        <td class="td-mail td-mail__bg-info td__padding-all" colspan="6">
+            <div class="td-mail__bg-white">
+                <p>
+                <table role="presentation" border="0" cellspacing="0" cellpadding="0" width="100%">
+                    <tr>
+                        <td width="35" class="td-mail td__padding-left align-center">
+                            <img src="/static/img/mail/info_info-blue.jpg" width="20" height="20" alt="" class="mail__icon">
+                        </td>
+                        <td class="td__padding-top td__padding-right td__padding-bottom">
+                            <p class="text-color__info">Een of meer documenten zijn aan uw aanvraag toegevoegd.</p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </td>
+    </tr>
+    <!-- end of Table with differing column-widths -->
+
+    <tr>
+        <td class="td-mail td-mail__bg-info td__padding-all td__info-link" colspan="6">
+            <p>U hoeft niets te doen. Zodra er weer een update beschikbaar is ontvangt u hier een melding over. U kunt wel inloggen om uw aanvraag te bekijken.</p>
+            <p><strong><a href="{{ case_link }}" class="color--primary">Log in</a><span class="color--primary"> &rarr;</span></strong></p>
+        </td>
     </tr>
     <tr>
-        <th>Zaaktype</th>
-        <td>{{ type_description }}</td>
+        <td class="spacing__extra" colspan="6">
+            &nbsp;
+        </td>
     </tr>
     <tr>
-        <th>Startdatum</th>
-        <td>{{ start_date }}</td>
+        <td class="td-mail td__padding-all" colspan="6">
+            <p>Met vriendelijke groet,</p>
+            <p>&nbsp;</p>
+            <p>{{ site_name }}</p>
+        </td>
     </tr>
+    <tr class="tr-mail">
+        <td class="td-mail spacer-bottom td__padding-zero" colspan="6">
+            <!-- <hr> styling --> &nbsp;
+        </td>
+    </tr>
+    <tr>
+        <td class="td-mail td__padding-top td__padding-right td__padding-left" colspan="6">
+            <p>Dit bericht is automatisch verzonden. U kunt <strong>niet reageren</strong> op deze e-mail. </p>
+            <p>&nbsp;</p>
+            <p><strong>Contact opnemen</strong></p>
+        </td>
+    </tr>
+    <tr>
+        <td class="td--responsive td-mail td__padding-right td__padding-bottom td__padding-left" colspan="3"><p><a href="#">Ga naar onze contactpagina</a></p>
+        </td>
+        <td class="td--responsive td-mail td__padding-right td__padding-bottom td__padding-left" colspan="3"><p><a href="tel:+12345" data-rel="external">Bel 12345</a></p></td>
+    </tr>
+    <tr class="tr-mail border-top">
+        <td class="td-mail border-top td__padding-zero" colspan="6">
+            <!-- <hr> styling --> &nbsp;
+        </td>
+    </tr>
+    <tr>
+        <td class="td-mail td__padding-right td__padding-bottom td__padding-left" colspan="6">
+            <p>Pas hier uw <a href="{{ profile_notifications }}">voorkeuren</a> aan voor de notificaties. </p>
+        </td>
+    </tr>
+    </tbody>
 </table>
-
-<p><a href="{{ case_link }}">Ga naar uw zaak</a><span class="color--secondary"> &rarr;</span></p>
-<p>Met vriendelijke groet,
-    {{ site_name }}
-</p>
