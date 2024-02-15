@@ -644,7 +644,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 # SENTRY - error monitoring
 #
 SENTRY_DSN = config("SENTRY_DSN", None)
-RELEASE = "v1.13"  # get_current_version()
+RELEASE = "v1.14"  # get_current_version()
 
 PRIVATE_MEDIA_ROOT = os.path.join(BASE_DIR, "private_media")
 FILER_ROOT = os.path.join(BASE_DIR, "media", "filer")
