@@ -119,6 +119,9 @@ class CustomOIDCBackend(OIDCAuthenticationBackend):
             self.update_user(user, claims)
             # TODO verify we want unusable_password
             user.set_unusable_password()
+            # Saving after using `set_unusable_password` is required, otherwise the user
+            # will not actually be authenticated, see: https://taiga.maykinmedia.nl/project/open-inwoner/issue/2101
+            user.save()
 
             return user
 
