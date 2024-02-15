@@ -19,6 +19,8 @@ from digid_eherkenning_oidc_generics.views import (
     GENERIC_DIGID_ERROR_MSG,
     GENERIC_EHERKENNING_ERROR_MSG,
 )
+from open_inwoner.configurations.choices import OpenIDDisplayChoices
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.kvk.branches import KVK_BRANCH_SESSION_VARIABLE
 
 from ..choices import LoginTypeChoices
@@ -34,10 +36,15 @@ class OIDCFlowTests(TestCase):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
         "mozilla_django_oidc_db.mixins.OpenIDConnectConfig.get_solo",
-        return_value=OpenIDConnectConfig(id=1, enabled=True),
+        return_value=OpenIDConnectConfig(id=1, enabled=True, make_users_staff=True),
     )
-    def test_existing_email_updates_user(
+    @patch(
+        "open_inwoner.configurations.models.SiteConfiguration.get_solo",
+        return_value=SiteConfiguration(id=1, openid_display=OpenIDDisplayChoices.admin),
+    )
+    def test_existing_email_updates_admin_user(
         self,
+        mock_config_get_solo,
         mock_get_solo,
         mock_get_token,
         mock_verify_token,
@@ -62,11 +69,12 @@ class OIDCFlowTests(TestCase):
             callback_url, {"code": "mock", "state": "mock"}
         )
 
+        self.assertRedirects(
+            callback_response, reverse("admin:index"), fetch_redirect_response=True
+        )
+
         user.refresh_from_db()
 
-        self.assertRedirects(
-            callback_response, reverse("pages-root"), fetch_redirect_response=False
-        )
         self.assertTrue(User.objects.filter(oidc_id="some_username").exists())
         self.assertEqual(user.oidc_id, "some_username")
 
@@ -74,6 +82,121 @@ class OIDCFlowTests(TestCase):
 
         self.assertEqual(db_user.id, user.id)
         self.assertEqual(db_user.login_type, LoginTypeChoices.oidc)
+        self.assertEqual(db_user.is_staff, True)
+
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
+    @patch(
+        "mozilla_django_oidc_db.mixins.OpenIDConnectConfig.get_solo",
+        return_value=OpenIDConnectConfig(id=1, enabled=True, make_users_staff=False),
+    )
+    @patch(
+        "open_inwoner.configurations.models.SiteConfiguration.get_solo",
+        return_value=SiteConfiguration(
+            id=1, openid_display=OpenIDDisplayChoices.regular
+        ),
+    )
+    def test_existing_email_updates_regular_user(
+        self,
+        mock_config_get_solo,
+        mock_get_solo,
+        mock_get_token,
+        mock_verify_token,
+        mock_store_tokens,
+        mock_get_userinfo,
+    ):
+        # set up a user with a colliding email address
+        # sub is the oidc_id field in our db
+        mock_get_userinfo.return_value = {
+            "email": "existing_user@example.com",
+            "sub": "some_username",
+        }
+        user = UserFactory.create(email="existing_user@example.com")
+        self.assertEqual(user.oidc_id, "")
+        session = self.client.session
+        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session.save()
+        callback_url = reverse("oidc_authentication_callback")
+
+        # enter the login flow
+        callback_response = self.client.get(
+            callback_url, {"code": "mock", "state": "mock"}
+        )
+
+        self.assertRedirects(
+            callback_response, reverse("pages-root"), fetch_redirect_response=True
+        )
+
+        user.refresh_from_db()
+
+        self.assertTrue(User.objects.filter(oidc_id="some_username").exists())
+        self.assertEqual(user.oidc_id, "some_username")
+
+        db_user = User.objects.filter(oidc_id="some_username").first()
+
+        self.assertEqual(db_user.id, user.id)
+        self.assertEqual(db_user.login_type, LoginTypeChoices.oidc)
+        self.assertEqual(db_user.is_staff, False)
+
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
+    @patch(
+        "mozilla_django_oidc_db.mixins.OpenIDConnectConfig.get_solo",
+        return_value=OpenIDConnectConfig(id=1, enabled=True, make_users_staff=False),
+    )
+    @patch(
+        "open_inwoner.configurations.models.SiteConfiguration.get_solo",
+        return_value=SiteConfiguration(
+            id=1, openid_display=OpenIDDisplayChoices.regular
+        ),
+    )
+    def test_existing_oidc_id_updates_regular_user(
+        self,
+        mock_config_get_solo,
+        mock_get_solo,
+        mock_get_token,
+        mock_verify_token,
+        mock_store_tokens,
+        mock_get_userinfo,
+    ):
+        # set up a user with a colliding email address
+        # sub is the oidc_id field in our db
+        mock_get_userinfo.return_value = {
+            "email": "existing_user@example.com",
+            "sub": "some_username",
+            "first_name": "bar",
+        }
+        user = UserFactory.create(
+            oidc_id="some_username", first_name="Foo", login_type=LoginTypeChoices.oidc
+        )
+        session = self.client.session
+        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session.save()
+        callback_url = reverse("oidc_authentication_callback")
+
+        # enter the login flow
+        callback_response = self.client.get(
+            callback_url, {"code": "mock", "state": "mock"}
+        )
+
+        self.assertRedirects(
+            callback_response, reverse("pages-root"), fetch_redirect_response=True
+        )
+
+        user.refresh_from_db()
+
+        self.assertTrue(User.objects.filter(oidc_id="some_username").exists())
+        self.assertEqual(user.oidc_id, "some_username")
+
+        db_user = User.objects.filter(oidc_id="some_username").first()
+
+        self.assertEqual(db_user.id, user.id)
+        self.assertEqual(db_user.login_type, LoginTypeChoices.oidc)
+        self.assertEqual(db_user.is_staff, False)
 
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
@@ -83,8 +206,15 @@ class OIDCFlowTests(TestCase):
         "mozilla_django_oidc_db.mixins.OpenIDConnectConfig.get_solo",
         return_value=OpenIDConnectConfig(id=1, enabled=True),
     )
+    @patch(
+        "open_inwoner.configurations.models.SiteConfiguration.get_solo",
+        return_value=SiteConfiguration(
+            id=1, openid_display=OpenIDDisplayChoices.regular
+        ),
+    )
     def test_existing_case_sensitive_email_updates_user(
         self,
+        mock_config_get_solo,
         mock_get_solo,
         mock_get_token,
         mock_verify_token,
@@ -123,6 +253,7 @@ class OIDCFlowTests(TestCase):
 
         self.assertEqual(db_user.id, user.id)
         self.assertEqual(db_user.login_type, LoginTypeChoices.oidc)
+        self.assertEqual(db_user.is_staff, False)
 
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
@@ -130,10 +261,15 @@ class OIDCFlowTests(TestCase):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
         "mozilla_django_oidc_db.mixins.OpenIDConnectConfig.get_solo",
-        return_value=OpenIDConnectConfig(id=1, enabled=True),
+        return_value=OpenIDConnectConfig(id=1, enabled=True, make_users_staff=True),
     )
-    def test_new_user_is_created_when_new_email(
+    @patch(
+        "open_inwoner.configurations.models.SiteConfiguration.get_solo",
+        return_value=SiteConfiguration(id=1, openid_display=OpenIDDisplayChoices.admin),
+    )
+    def test_new_admin_user_is_created_when_new_email(
         self,
+        mock_config_get_solo,
         mock_get_solo,
         mock_get_token,
         mock_verify_token,
@@ -159,13 +295,67 @@ class OIDCFlowTests(TestCase):
         )
 
         self.assertRedirects(
-            callback_response, reverse("pages-root"), fetch_redirect_response=False
+            callback_response, reverse("admin:index"), fetch_redirect_response=True
         )
-        new_user = User.objects.filter(email="new_user@example.com")
 
-        self.assertTrue(new_user.exists())
-        self.assertEqual(new_user.get().oidc_id, "some_username")
-        self.assertEqual(new_user.get().login_type, LoginTypeChoices.oidc)
+        new_user = User.objects.filter(email="new_user@example.com").first()
+
+        self.assertIsNotNone(new_user)
+        self.assertEqual(new_user.oidc_id, "some_username")
+        self.assertEqual(new_user.login_type, LoginTypeChoices.oidc)
+        self.assertEqual(new_user.is_staff, True)
+
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
+    @patch(
+        "mozilla_django_oidc_db.mixins.OpenIDConnectConfig.get_solo",
+        return_value=OpenIDConnectConfig(id=1, enabled=True, make_users_staff=False),
+    )
+    @patch(
+        "open_inwoner.configurations.models.SiteConfiguration.get_solo",
+        return_value=SiteConfiguration(
+            id=1, openid_display=OpenIDDisplayChoices.regular
+        ),
+    )
+    def test_new_regular_user_is_created_when_new_email(
+        self,
+        mock_config_get_solo,
+        mock_get_solo,
+        mock_get_token,
+        mock_verify_token,
+        mock_store_tokens,
+        mock_get_userinfo,
+    ):
+        # set up a user with a non existing email address
+        mock_get_userinfo.return_value = {
+            "email": "new_user@example.com",
+            "sub": "some_username",
+        }
+        UserFactory.create(email="existing_user@example.com")
+        session = self.client.session
+        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session.save()
+        callback_url = reverse("oidc_authentication_callback")
+
+        self.assertFalse(User.objects.filter(email="new_user@example.com").exists())
+
+        # enter the login flow
+        callback_response = self.client.get(
+            callback_url, {"code": "mock", "state": "mock"}
+        )
+
+        self.assertRedirects(
+            callback_response, reverse("pages-root"), fetch_redirect_response=True
+        )
+
+        new_user = User.objects.filter(email="new_user@example.com").first()
+
+        self.assertIsNotNone(new_user)
+        self.assertEqual(new_user.oidc_id, "some_username")
+        self.assertEqual(new_user.login_type, LoginTypeChoices.oidc)
+        self.assertEqual(new_user.is_staff, False)
 
     def test_error_page_direct_access_forbidden(self):
         error_url = reverse("admin-oidc-error")
@@ -182,8 +372,15 @@ class OIDCFlowTests(TestCase):
         "mozilla_django_oidc_db.mixins.OpenIDConnectConfig.get_solo",
         return_value=OpenIDConnectConfig(id=1, enabled=True),
     )
+    @patch(
+        "open_inwoner.configurations.models.SiteConfiguration.get_solo",
+        return_value=SiteConfiguration(
+            id=1, openid_display=OpenIDDisplayChoices.regular
+        ),
+    )
     def test_error_first_cleared_after_succesful_login(
         self,
+        mock_config_get_solo,
         mock_get_solo,
         mock_get_token,
         mock_verify_token,
