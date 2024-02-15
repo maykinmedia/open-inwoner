@@ -3,12 +3,12 @@
 {# template for subcategory cards with or without product-links #}
 {# create tag for anchor around card - never use anchors within anchors for valid HTML. #}
 {% if category.products.published %}
-<div class="card">
+<div class="card card__category-card">
     <div class="card__body">
         {% if category %}
-            <p class="h3">
+            <h3 class="card__heading-3">
                 <a href="{{ category.slug }}" class="link link__text">{{ category }}</a>
-            </p>
+            </h3>
         {% endif %}
         {% for product in category.products.published %}
             {% with category as parent %}
@@ -25,9 +25,9 @@
     <a href="{{ category.slug }}" class="card">
         <div class="card__body">
             {% if category %}
-                <p class="h3">
+                <h3 class="card__heading-3">
                     <span class="link link__text">{{ category }}</span>
-                </p>
+                </h3>
             {% endif %}
         </div>
     </a>

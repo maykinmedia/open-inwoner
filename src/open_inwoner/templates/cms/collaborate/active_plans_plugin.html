@@ -9,7 +9,7 @@
     {% for plan in plans %}
         {% render_card image_object_fit="cover" href=plan.get_absolute_url %}
             <div class="card__content">
-                <h3 class="h3 plan-list">{{ plan.title }}</h3>
+                <h3 class="card__heading-3 plan-list">{{ plan.title }}</h3>
                 <p class="p">{{ plan.goal|truncatewords:20 }}</p>
                 <p class="p">{{ plan.description|truncatewords:20 }}</p>
                 <span class="spacer"></span>

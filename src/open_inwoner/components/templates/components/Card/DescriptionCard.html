@@ -1,10 +1,10 @@
 {% load icon_tags link_tags i18n grid_tags thumbnail %}
 
 {# template for plans cards and product cards without any images #}
-<a href="{{ url }}" class="card">
+<a href="{{ url }}" class="card card__description-card">
     <div class="card__body card__body--tabled">
         {% if title %}
-            <h2 class="h2">
+            <h2 class="card__heading-2">
                 <span class="link link__text">{{ title }}</span>
             </h2>
         {% endif %}
