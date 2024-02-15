@@ -9,10 +9,10 @@ from treebeard.mp_tree import MP_NodeQuerySet
 
 from open_inwoner.accounts.models import User
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.kvk.branches import get_kvk_branch_number
 from open_inwoner.openzaak.api_models import Zaak
 from open_inwoner.openzaak.clients import build_client
-from open_inwoner.openzaak.models import OpenZaakConfig, ZaakTypeConfig
+from open_inwoner.openzaak.models import ZaakTypeConfig
+from open_inwoner.openzaak.utils import get_fetch_parameters
 
 
 class ProductQueryset(models.QuerySet):
@@ -56,20 +56,7 @@ class CategoryPublishedQueryset(MP_NodeQuerySet):
         if client is None:
             return self.none()
 
-        if request.user.bsn:
-            cases = client.fetch_cases_by_bsn(request.user.bsn)
-        elif request.user.kvk:
-            kvk_or_rsin = request.user.kvk
-            config = OpenZaakConfig.get_solo()
-            if config.fetch_eherkenning_zaken_with_rsin:
-                kvk_or_rsin = request.user.rsin
-            vestigingsnummer = get_kvk_branch_number(request.session)
-            if vestigingsnummer:
-                cases = client.fetch_cases_by_kvk_or_rsin(
-                    kvk_or_rsin=kvk_or_rsin, vestigingsnummer=vestigingsnummer
-                )
-            else:
-                cases = client.fetch_cases_by_kvk_or_rsin(kvk_or_rsin=kvk_or_rsin)
+        cases = client.fetch_cases(**get_fetch_parameters(request))
 
         return self.filter_by_zaken(cases)
 
