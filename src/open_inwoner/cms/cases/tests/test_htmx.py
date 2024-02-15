@@ -412,7 +412,7 @@ class CasesPlaywrightTests(
     def test_cases(self, m):
         self._setUpMocks(m)
 
-        context = self.browser.new_context(storage_state=self.user_login_state)
+        context = self.new_browser_context(storage_state=self.user_login_state)
 
         page = context.new_page()
         page.goto(self.live_reverse("cases:index"))
@@ -572,16 +572,20 @@ class CasesPlaywrightTests(
         ),
 
         # Setup.
-        context = self.browser.new_context(storage_state=self.user_login_state)
+        context = self.new_browser_context(storage_state=self.user_login_state)
         page = context.new_page()
         page.goto(
             self.live_reverse(
                 "cases:case_detail", kwargs={"object_id": self.zaak["uuid"]}
             )
         )
+        page.wait_for_load_state("load")
+        page.wait_for_load_state("networkidle")
 
         upload_form = page.locator("#document-upload")
-        file_input = upload_form.get_by_label("Sleep of selecteer bestanden")
+        expect(upload_form).to_be_visible()
+
+        file_input = upload_form.get_by_label(_("Sleep of selecteer bestanden"))
         submit_button = upload_form.get_by_role("button", name=_("Upload documenten"))
         notification_list = page.get_by_role("alert").get_by_role("list")
         notification_list_items = notification_list.get_by_role("listitem")
@@ -591,6 +595,7 @@ class CasesPlaywrightTests(
         # Check that the initial state does not have any uploaded documents.
         expect(notification_list_items).to_have_count(0)
         expect(file_list_items).to_have_count(0)
+        expect(file_input).to_be_visible()
 
         # Upload some files.
         file_input.set_input_files(

@@ -221,7 +221,7 @@ class SearchPagePlaywrightTests(
         config.save()
 
     def test_basic_search(self):
-        context = self.browser.new_context()
+        context = self.new_browser_context()
         page = context.new_page()
 
         # search to find both products
@@ -230,7 +230,7 @@ class SearchPagePlaywrightTests(
         expect(page.locator(".search-results__item")).to_have_count(2)
 
     def test_search_form_delegates_copy_query_value(self):
-        context = self.browser.new_context()
+        context = self.new_browser_context()
         page = context.new_page()
         page.goto(self.live_reverse("search:search", params={"query": "summary"}))
 
@@ -259,7 +259,7 @@ class SearchPagePlaywrightTests(
 
         for form_id, view_size, open_menu in self.form_delegates:
             with self.subTest(form_id):
-                context = self.browser.new_context(
+                context = self.new_browser_context(
                     viewport={"width": view_size, "height": 1024},
                 )
                 page = context.new_page()
@@ -277,7 +277,7 @@ class SearchPagePlaywrightTests(
                 context.close()
 
     def test_search_with_filters(self):
-        context = self.browser.new_context()
+        context = self.new_browser_context()
         page = context.new_page()
 
         # search to find both products
@@ -320,7 +320,7 @@ class SearchPagePlaywrightTests(
 
     def test_search_with_filter_combinations(self):
         # NOTE it isn't great to generate query-strings outside the form but we test the form above
-        context = self.browser.new_context()
+        context = self.new_browser_context()
         page = context.new_page()
 
         tests = [

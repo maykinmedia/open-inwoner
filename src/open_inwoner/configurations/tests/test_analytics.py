@@ -133,10 +133,11 @@ class CookieBannerPlaywrightTests(ClearCachesMixin, PlaywrightSyncLiveServerTest
     def test_cookie_accept(self):
         config = SiteConfiguration.get_solo()
 
-        context = self.browser.new_context(storage_state=self.user_login_state)
+        context = self.new_browser_context(storage_state=self.user_login_state)
 
         page = context.new_page()
         page.goto(self.live_reverse("profile:action_list"))
+        page.wait_for_load_state("load")
 
         cookie_banner = page.locator("#cookie-banner")
 
@@ -157,10 +158,11 @@ class CookieBannerPlaywrightTests(ClearCachesMixin, PlaywrightSyncLiveServerTest
     def test_cookie_reject(self):
         config = SiteConfiguration.get_solo()
 
-        context = self.browser.new_context(storage_state=self.user_login_state)
+        context = self.new_browser_context(storage_state=self.user_login_state)
 
         page = context.new_page()
         page.goto(self.live_reverse("profile:action_list"))
+        page.wait_for_load_state("load")
 
         cookie_banner = page.locator("#cookie-banner")
 

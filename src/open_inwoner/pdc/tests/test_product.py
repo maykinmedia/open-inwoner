@@ -381,7 +381,7 @@ class ProductPagePlaywrightTests(ClearCachesMixin, PlaywrightSyncLiveServerTestC
             content="Some content [CTABUTTON]", link="http://www.example.com"
         )
 
-        context = self.browser.new_context()
+        context = self.new_browser_context()
         page = context.new_page()
 
         page.goto(

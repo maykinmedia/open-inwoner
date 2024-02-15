@@ -272,7 +272,7 @@ class InboxPagePlaywrightTests(PlaywrightSyncLiveServerTestCase):
         """
 
     def test_polling(self):
-        context = self.browser.new_context(storage_state=self.user_login_state)
+        context = self.new_browser_context(storage_state=self.user_login_state)
 
         page = context.new_page()
         page.goto(self.contact_1_conversation_url)

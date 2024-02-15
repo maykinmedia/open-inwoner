@@ -5,7 +5,8 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.urls import reverse
 
 from furl import furl
-from playwright.sync_api import Browser, Playwright, sync_playwright
+from playwright._impl._browser_context import BrowserContext
+from playwright.sync_api import Browser, Playwright, expect, sync_playwright
 
 from open_inwoner.accounts.models import User
 
@@ -24,6 +25,9 @@ def get_driver_name() -> str:
     return os.environ.get("E2E_DRIVER", BROWSER_DEFAULT)
 
 
+expect.set_options(timeout=15000)
+
+
 class PlaywrightSyncLiveServerTestCase(StaticLiveServerTestCase):
     """
     base class for convenient synchronous Playwright in Django
@@ -39,7 +43,7 @@ class PlaywrightSyncLiveServerTestCase(StaticLiveServerTestCase):
     class MyPageTest(PlaywrightSyncLiveServerTestCase):
         def test_my_page():
             # get a new context for test isolation
-            context = self.browser.new_context()
+            context = self.new_browser_context()
 
             # open a page
             page = context.new_page()
@@ -61,7 +65,7 @@ class PlaywrightSyncLiveServerTestCase(StaticLiveServerTestCase):
             user_state = self.get_user_bsn_login_state(user)
 
             # user_state now has the cookies (etc) for the logged-in user and can be (re)used to get new context's
-            context = self.browser.new_context(storage_state=user_state)
+            context = self.new_browser_context(storage_state=user_state)
             ...
     """
 
@@ -93,6 +97,16 @@ class PlaywrightSyncLiveServerTestCase(StaticLiveServerTestCase):
 
         cls.playwright = sync_playwright().start()
         cls.browser = cls.launch_browser(cls.playwright)
+
+    @classmethod
+    def new_browser_context(cls, *args, **kwargs) -> BrowserContext:
+        """
+        opportunity to set some default options
+        """
+        # TODO ideally we'd copy the type signature from Browser.new_context
+        ctx = cls.browser.new_context(*args, **kwargs)
+        ctx.set_default_timeout(30000)
+        return ctx
 
     @classmethod
     def tearDownClass(cls):
@@ -145,7 +159,7 @@ class PlaywrightSyncLiveServerTestCase(StaticLiveServerTestCase):
 
             user_logged_in = self.get_user_bsn_login_state(user)
 
-            context = self.browser.new_context(storage_state=user_logged_in)
+            context = self.new_browser_context(storage_state=user_logged_in)
         """
         assert user.bsn, "user requires a BSN"
         assert user.pk, "user instance must be saved"

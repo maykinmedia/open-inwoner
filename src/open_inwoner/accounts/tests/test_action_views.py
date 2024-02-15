@@ -344,7 +344,7 @@ class ActionsPlaywrightTests(PlaywrightSyncLiveServerTestCase):
 
         mock_solo.return_value.cookiebanner_enabled = False
 
-        context = self.browser.new_context(storage_state=self.user_login_state)
+        context = self.new_browser_context(storage_state=self.user_login_state)
 
         page = context.new_page()
         page.goto(self.live_reverse("profile:action_list"))
