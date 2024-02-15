@@ -11,7 +11,7 @@ from open_inwoner.openzaak.clients import build_client
 from open_inwoner.openzaak.formapi import fetch_open_submissions
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.types import UniformCase
-from open_inwoner.openzaak.utils import get_fetch_parameters
+from open_inwoner.openzaak.utils import get_user_fetch_parameters
 from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import CommonPageMixin
 
@@ -61,7 +61,7 @@ class InnerCaseListView(
         if client is None:
             return []
 
-        raw_cases = client.fetch_cases(**get_fetch_parameters(self.request))
+        raw_cases = client.fetch_cases(**get_user_fetch_parameters(self.request))
 
         preprocessed_cases = preprocess_data(raw_cases)
         return preprocessed_cases

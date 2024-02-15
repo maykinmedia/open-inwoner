@@ -12,7 +12,7 @@ from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openzaak.api_models import Zaak
 from open_inwoner.openzaak.clients import build_client
 from open_inwoner.openzaak.models import ZaakTypeConfig
-from open_inwoner.openzaak.utils import get_fetch_parameters
+from open_inwoner.openzaak.utils import get_user_fetch_parameters
 
 
 class ProductQueryset(models.QuerySet):
@@ -56,7 +56,7 @@ class CategoryPublishedQueryset(MP_NodeQuerySet):
         if client is None:
             return self.none()
 
-        cases = client.fetch_cases(**get_fetch_parameters(request))
+        cases = client.fetch_cases(**get_user_fetch_parameters(request))
 
         return self.filter_by_zaken(cases)
 

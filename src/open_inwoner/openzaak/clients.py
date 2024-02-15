@@ -41,12 +41,17 @@ logger = logging.getLogger(__name__)
 class ZakenClient(APIClient):
     def fetch_cases(
         self,
-        user_bsn=None,
-        user_kvk_or_rsin=None,
-        max_requests=4,
-        identificatie=None,
-        vestigingsnummer=None,
+        user_bsn: Optional[str] = None,
+        user_kvk_or_rsin: Optional[str] = None,
+        max_requests: int = 4,
+        identificatie: Optional[str] = None,
+        vestigingsnummer: Optional[str] = None,
     ):
+        if user_bsn and (user_kvk_or_rsin or vestigingsnummer):
+            raise ValueError(
+                "either `user_bsn` or `user_kvk_or_rsin`/`vestigingsnummer` should be supplied, not both"
+            )
+
         if user_bsn:
             return self.fetch_cases_by_bsn(
                 user_bsn, max_requests=max_requests, identificatie=identificatie

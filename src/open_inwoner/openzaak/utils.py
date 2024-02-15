@@ -145,11 +145,14 @@ def translate_single_status(status_text: str) -> str:
         return ""
 
 
-def get_fetch_parameters(request) -> dict:
+def get_user_fetch_parameters(request) -> dict:
     """
     Determine the parameters used to perform ZGW resource fetches
     """
     user = request.user
+
+    if not user.is_authenticated:
+        return {}
 
     if user.bsn:
         return {"user_bsn": user.bsn}
