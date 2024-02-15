@@ -57,7 +57,7 @@ class CategoryPublishedQueryset(MP_NodeQuerySet):
             return self.none()
 
         if request.user.bsn:
-            cases = client.fetch_cases(request.user.bsn)
+            cases = client.fetch_cases_by_bsn(request.user.bsn)
         elif request.user.kvk:
             kvk_or_rsin = request.user.kvk
             config = OpenZaakConfig.get_solo()

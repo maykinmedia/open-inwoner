@@ -3,6 +3,7 @@ from typing import Optional
 
 from zgw_consumers.api_models.constants import RolTypes, VertrouwelijkheidsAanduidingen
 
+from open_inwoner.kvk.branches import get_kvk_branch_number
 from open_inwoner.openzaak.api_models import InformatieObject, Rol, Zaak, ZaakType
 
 from .models import (
@@ -142,3 +143,25 @@ def translate_single_status(status_text: str) -> str:
         )
     except StatusTranslation.DoesNotExist:
         return ""
+
+
+def get_fetch_parameters(request) -> dict:
+    """
+    Determine the parameters used to perform ZGW resource fetches
+    """
+    user = request.user
+
+    if user.bsn:
+        return {"user_bsn": user.bsn}
+    elif user.kvk:
+        kvk_or_rsin = user.kvk
+        config = OpenZaakConfig.get_solo()
+        if config.fetch_eherkenning_zaken_with_rsin:
+            kvk_or_rsin = user.rsin
+
+        parameters = {"user_kvk_or_rsin": kvk_or_rsin}
+        vestigingsnummer = get_kvk_branch_number(request.session)
+        if vestigingsnummer:
+            parameters.update({"vestigingsnummer": vestigingsnummer})
+        return parameters
+    return {}

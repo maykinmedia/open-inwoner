@@ -69,7 +69,7 @@ class Command(BaseCommand):
         if not case_uuid:
             # if no case_ref is supplied display list of cases and some information about each
 
-            cases = zaken_client.fetch_cases(user.bsn)
+            cases = zaken_client.fetch_cases_by_bsn(user.bsn)
             for case in cases:
                 case_type = catalogi_client.fetch_single_case_type(case.zaaktype)
                 case.zaaktype = case_type

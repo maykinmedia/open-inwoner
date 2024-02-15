@@ -74,7 +74,7 @@ class InnerCaseListView(
             else:
                 raw_cases = client.fetch_cases_by_kvk_or_rsin(kvk_or_rsin=kvk_or_rsin)
         else:
-            raw_cases = client.fetch_cases(self.request.user.bsn)
+            raw_cases = client.fetch_cases_by_bsn(self.request.user.bsn)
         preprocessed_cases = preprocess_data(raw_cases)
         return preprocessed_cases
 

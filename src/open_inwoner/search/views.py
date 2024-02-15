@@ -10,6 +10,8 @@ from furl import furl
 
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openzaak.clients import build_client
+from open_inwoner.openzaak.models import OpenZaakConfig
+from open_inwoner.openzaak.utils import get_fetch_parameters
 from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import CommonPageMixin, LoginMaybeRequiredMixin, LogMixin
 
@@ -62,10 +64,9 @@ class SearchView(
             self.log_user_action(user, _("search query: {query}").format(query=query))
 
         # Check if the query exactly matches with a case that belongs to the user
-        # TODO should be implemented for KVK as well
-        if hasattr(self.request.user, "bsn"):
+        if search_params := get_fetch_parameters(self.request):
             if client := build_client("zaak"):
-                cases = client.fetch_cases(self.request.user.bsn, identificatie=query)
+                cases = client.fetch_cases(**search_params, identificatie=query)
                 if cases and len(cases) == 1:
                     return HttpResponseRedirect(
                         reverse(
