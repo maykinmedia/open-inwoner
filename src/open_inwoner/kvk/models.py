@@ -10,7 +10,7 @@ from .validators import validate_api_root
 
 
 class KvKConfig(SingletonModel):
-    api_root = models.CharField(
+    api_root = models.URLField(
         verbose_name=_("API root"),
         max_length=128,
         validators=[validate_api_root],
@@ -29,7 +29,7 @@ class KvKConfig(SingletonModel):
         Certificate,
         blank=True,
         null=True,
-        help_text=_("The SSL certificate file used for client identification."),
+        help_text=_("The SSL certificate file used for client identification. "),
         on_delete=models.PROTECT,
         related_name="kvk_service_client",
     )

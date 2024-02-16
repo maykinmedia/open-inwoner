@@ -1079,12 +1079,12 @@ class DuplicateEmailRegistrationTest(WebTest):
             {
                 "kvkNummer": "12345678",
                 "vestigingsnummer": "1234",
-                "handelsnaam": "Mijn bedrijf",
+                "naam": "Mijn bedrijf",
             },
             {
                 "kvkNummer": "12345678",
                 "vestigingsnummer": "5678",
-                "handelsnaam": "Mijn bedrijf",
+                "naam": "Mijn bedrijf",
             },
         ]
 

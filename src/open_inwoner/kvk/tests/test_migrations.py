@@ -2,8 +2,8 @@ from open_inwoner.utils.tests.test_migrations import TestMigrations
 
 
 class APIRootMigrationTest(TestMigrations):
-    migrate_from = "0003_auto_20240209_1259"
-    migrate_to = "0004_api_root"
+    migrate_from = "0002_alter_kvkconfig_api_root"
+    migrate_to = "0003_api_root"
     app = "kvk"
 
     def setUpBeforeMigration(self, apps):

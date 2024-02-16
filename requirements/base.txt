@@ -62,7 +62,9 @@ cryptography==41.0.7
     #   mozilla-django-oidc
     #   pyopenssl
 css-inline==0.13.0
-    # via -r requirements/base.in
+    # via
+    #   -r requirements/base.in
+    #   mail-editor
 cssselect2==0.4.1
     # via
     #   svglib
@@ -341,6 +343,7 @@ lockfile==0.12.2
 lxml==4.9.1
     # via
     #   django-digid-eherkenning
+    #   mail-editor
     #   maykin-python3-saml
     #   svglib
     #   xmlsec
@@ -453,6 +456,7 @@ requests==2.31.0
     #   django-open-forms-client
     #   django-rosetta
     #   gemma-zds-client
+    #   mail-editor
     #   maykin-python3-saml
     #   messagebird
     #   mozilla-django-oidc

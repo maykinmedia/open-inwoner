@@ -67,21 +67,33 @@ class KvKAPITest(TestCase):
             company,
             {
                 "pagina": 1,
-                "aantal": 1,
+                "resultatenPerPagina": 10,
                 "totaal": 1,
                 "resultaten": [
                     {
-                        "kvkNummer": "68750110",
-                        "handelsnaam": "Test BV Donald",
-                        "type": "rechtspersoon",
-                        "links": [
-                            {
-                                "rel": "basisprofiel",
-                                "href": "https://api.kvk.nl/test/api/v1/basisprofielen/68750110",
+                        "kvkNummer": "55505201",
+                        "naam": "Company Newtex",
+                        "adres": {
+                            "binnenlandsAdres": {
+                                "type": "bezoekadres",
+                                "straatnaam": "Japiksestraat",
+                                "plaats": "Eindhoven",
                             }
-                        ],
+                        },
+                        "type": "rechtspersoon",
+                        "_links": {
+                            "basisprofiel": {
+                                "href": "https://api.kvk.nl/test/api/v1/basisprofielen/55505201"
+                            }
+                        },
                     }
                 ],
+                "_links": {
+                    "self": {
+                        "href": "https://api.kvk.nl/test/api/v2/zoeken?kvknummer="
+                        "55505201&pagina=1&resultatenperpagina=10"
+                    }
+                },
             },
         )
 

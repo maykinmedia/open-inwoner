@@ -147,6 +147,7 @@ css-inline==0.13.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   mail-editor
 cssselect==1.1.0
     # via
     #   -c requirements/ci.txt
@@ -699,6 +700,7 @@ lxml==4.9.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-digid-eherkenning
+    #   mail-editor
     #   maykin-python3-saml
     #   pyquery
     #   svglib
@@ -974,6 +976,7 @@ requests==2.31.0
     #   django-rosetta
     #   gemma-zds-client
     #   locust
+    #   mail-editor
     #   maykin-python3-saml
     #   messagebird
     #   mozilla-django-oidc
