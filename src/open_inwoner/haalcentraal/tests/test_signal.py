@@ -1,16 +1,10 @@
-import logging
-from unittest.mock import patch
-
 from django.test import TestCase, override_settings
-from django.utils.translation import gettext as _
 
 import requests_mock
 from freezegun import freeze_time
-from timeline_logger.models import TimelineLog
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
-from open_inwoner.utils.logentry import LOG_ACTIONS
 
 from ...utils.test import ClearCachesMixin
 from ..models import HaalCentraalConfig
