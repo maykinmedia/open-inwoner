@@ -74,12 +74,12 @@
             {% render_grid %}
                 {% render_column span=6 compact=True %}
                     <h3 class="h3">{% trans "U komt in aanmerking" %}</h3>
-                    {% include "components/conditions/ConditionList.html" with conditions=object.conditions.all only}
+                    {% include "components/Condition/ConditionList.html" with conditions=object.conditions.all only %}
                 {% endrender_column %}
 
                 {% render_column start=7 span=6 compact=True %}
                     <h3 class="h3">{% trans "U komt niet in aanmerking" %}</h3>
-                    {% include "components/conditions/ConditionList.html" with conditions=object.conditions.all negative=True only}
+                    {% include "components/Condition/ConditionList.html" with conditions=object.conditions.all negative=True only %}
                 {% endrender_column %}
             {% endrender_grid %}
         {% endif %}
