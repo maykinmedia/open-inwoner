@@ -471,6 +471,7 @@ django-two-factor-auth[phonenumberslite,webauthn]==1.16.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   django-two-factor-auth
     #   maykin-2fa
 django-view-breadcrumbs==2.5.1
     # via
@@ -538,6 +539,7 @@ easy-thumbnails[svg]==2.8.5
     #   -r requirements/ci.txt
     #   django-filer
     #   djangocms-picture
+    #   easy-thumbnails
 ecs-logging==2.1.0
     # via
     #   -c requirements/ci.txt
@@ -593,6 +595,7 @@ fonttools[woff]==4.43.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   fonttools
     #   weasyprint
 freezegun==1.1.0
     # via
@@ -712,11 +715,7 @@ lxml==4.9.1
     #   pyquery
     #   svglib
     #   xmlsec
-<<<<<<< HEAD
 mail-editor @ git+https://github.com/maykinmedia/mail-editor.git@0.3.5
-=======
-mail-editor @ git+https://github.com/maykinmedia/mail-editor.git@66293245ca4b4ea9f05e396a144d6f9a7aedf3b1
->>>>>>> 83677aa4 ([#939] Update mail-editor)
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -1071,6 +1070,7 @@ tablib[html,ods,xls,xlsx,yaml]==3.1.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-import-export
+    #   tablib
 tblib==1.7.0
     # via
     #   -c requirements/ci.txt

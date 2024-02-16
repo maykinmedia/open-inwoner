@@ -17,13 +17,13 @@ class DeleteContactInvitationsTest(TestCase):
             last_name="Eenzaameiland",
         )
 
-        invite1 = InviteFactory.create(inviter=user)
-        invite2 = InviteFactory.create(inviter=user)
-        invite3 = InviteFactory.create()
+        invite1 = InviteFactory.create(inviter=user, invitee_first_name="Harry")
+        invite2 = InviteFactory.create(inviter=user, invitee_first_name="Sally")
+        invite3 = InviteFactory.create(invitee_first_name="Joe")
 
         frozen_time.move_to("2023-10-01")
 
-        invite4 = InviteFactory.create()
+        invite4 = InviteFactory.create(invitee_first_name="Jane")
 
         frozen_time.move_to("2023-10-27")
 
