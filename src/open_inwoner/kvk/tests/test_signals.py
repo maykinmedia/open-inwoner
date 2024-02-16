@@ -12,6 +12,7 @@ from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.utils.logentry import LOG_ACTIONS
 from open_inwoner.utils.test import ClearCachesMixin
+from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin
 
 from ..client import KvKClient
 from ..models import KvKConfig
@@ -104,7 +105,7 @@ class TestPreSaveSignal(ClearCachesMixin, TestCase):
         self.assertFalse(user.is_prepopulated)
 
 
-class TestLogging(TestCase):
+class TestLogging(AssertTimelineLogMixin, TestCase):
     @classmethod
     def setUpTestData(cls):
         config = KvKConfig(
@@ -132,20 +133,11 @@ class TestLogging(TestCase):
 
         self.client.force_login(user=user)
 
-        log_entry = TimelineLog.objects.filter(object_id=user.id)[2]
-
-        self.assertEquals(
-            log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
-        )
-        self.assertEquals(log_entry.object_id, str(user.id))
-        self.assertEquals(
-            log_entry.extra_data,
-            {
-                "message": _("data was retrieved from KvK API"),
-                "log_level": logging.INFO,
-                "action_flag": list(LOG_ACTIONS[5]),
-                "content_object_repr": str(user),
-            },
+        self.assertTimelineLog(
+            _("data was retrieved from KvK API"),
+            level=logging.INFO,
+            action_flag=list(LOG_ACTIONS[5]),
+            content_object_repr=str(user),
         )
 
     @requests_mock.Mocker()
