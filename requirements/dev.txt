@@ -147,6 +147,7 @@ css-inline==0.13.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   mail-editor
 cssselect==1.1.0
     # via
     #   -c requirements/ci.txt
@@ -362,7 +363,7 @@ django-log-outgoing-requests==0.6.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-django-open-forms-client==0.2.3
+django-open-forms-client==0.3.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -521,6 +522,7 @@ easy-thumbnails[svg]==2.8.5
     #   -r requirements/ci.txt
     #   django-filer
     #   djangocms-picture
+    #   easy-thumbnails
 ecs-logging==2.1.0
     # via
     #   -c requirements/ci.txt
@@ -580,6 +582,7 @@ fonttools[woff]==4.29.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   fonttools
     #   weasyprint
 freezegun==1.1.0
     # via
@@ -699,6 +702,7 @@ lxml==4.9.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-digid-eherkenning
+    #   mail-editor
     #   maykin-python3-saml
     #   pyquery
     #   svglib
@@ -974,6 +978,7 @@ requests==2.31.0
     #   django-rosetta
     #   gemma-zds-client
     #   locust
+    #   mail-editor
     #   maykin-python3-saml
     #   messagebird
     #   mozilla-django-oidc
@@ -1059,6 +1064,7 @@ tablib[html,ods,xls,xlsx,yaml]==3.1.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-import-export
+    #   tablib
 tblib==1.7.0
     # via
     #   -c requirements/ci.txt
