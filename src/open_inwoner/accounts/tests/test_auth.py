@@ -755,7 +755,7 @@ class EmailPasswordRegistrationTest(WebTest):
 
     def setUp(self):
         # Create a User instance that's not saved
-        self.user = UserFactory.build()
+        self.user = UserFactory.build(first_name="John", last_name="Doe")
 
         self.config = SiteConfiguration.get_solo()
         self.config.login_allow_registration = True
@@ -846,41 +846,14 @@ class EmailPasswordRegistrationTest(WebTest):
                 }
                 self.assertEqual(response.context["form"].errors, expected_errors)
 
-    def test_registration_fails_uniform_password(self):
+    def test_registration_fails_with_non_diverse_password(self):
         passwords = [
-            "lowercase123",
-            "UPPERCASE123",
             "NODIGITS",
             "nodigits",
             "NoDigits",
             "1238327879",
-        ]
-        register_page = self.app.get(reverse("django_registration_register"))
-        form = register_page.forms["registration-form"]
-
-        for password in passwords:
-            with self.subTest(password=password):
-                form["email"] = self.user.email
-                form["first_name"] = self.user.first_name
-                form["last_name"] = self.user.last_name
-                form["password1"] = password
-                form["password2"] = password
-                response = form.submit()
-                expected_errors = {
-                    "password2": [
-                        _(
-                            "Your password must contain at least 1 upper-case letter, "
-                            "1 lower-case letter, 1 digit."
-                        ),
-                    ]
-                }
-                self.assertEqual(response.context["form"].errors, expected_errors)
-
-    def test_registration_fails_with_non_diverse_password(self):
-        passwords = [
             "pass_word-123",
             "PASS_WORD-123",
-            "NoDigits",
             "UPPERCASE123",
             "lowercase123",
         ]
