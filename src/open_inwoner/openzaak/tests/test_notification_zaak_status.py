@@ -142,7 +142,7 @@ class StatusNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored status notification: cannot retrieve case https://",
+            "ignored status notification: cannot retrieve case https://",
             lookup=Lookups.startswith,
             level=logging.ERROR,
         )
@@ -155,7 +155,7 @@ class StatusNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored status notification: cannot retrieve case_type https://",
+            "ignored status notification: cannot retrieve case_type https://",
             lookup=Lookups.startswith,
             level=logging.ERROR,
         )
@@ -171,7 +171,7 @@ class StatusNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored status notification: case not visible after applying website visibility filter for case https://",
+            "ignored status notification: case not visible after applying website visibility filter for case https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -187,7 +187,7 @@ class StatusNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored status notification: case not visible after applying website visibility filter for case https://",
+            "ignored status notification: case not visible after applying website visibility filter for case https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -204,7 +204,7 @@ class StatusNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored status notification: cannot retrieve status_history for case https://",
+            "ignored status notification: cannot retrieve status_history for case https://",
             lookup=Lookups.startswith,
             level=logging.ERROR,
         )
@@ -220,7 +220,7 @@ class StatusNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored status notification: skip initial status notification for case https://",
+            "ignored status notification: skip initial status notification for case https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )

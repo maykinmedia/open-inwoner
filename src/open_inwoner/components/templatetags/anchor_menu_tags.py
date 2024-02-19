@@ -1,5 +1,4 @@
 from django import template
-from django.urls import reverse
 
 from open_inwoner.components.utils import ComponentNode
 

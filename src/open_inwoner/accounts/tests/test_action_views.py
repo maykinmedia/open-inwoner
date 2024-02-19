@@ -207,7 +207,7 @@ class ActionViewTests(WebTest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content_type, "application/pdf")
         self.assertEqual(
-            response["Content-Disposition"], f'attachment; filename="actions.pdf"'
+            response["Content-Disposition"], 'attachment; filename="actions.pdf"'
         )
         self.assertEqual(list(response.context["actions"]), [self.action])
 

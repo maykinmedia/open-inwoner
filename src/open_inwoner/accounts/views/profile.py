@@ -1,20 +1,17 @@
-from datetime import date, datetime
+from datetime import date
 from typing import Generator, Union
 
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Q
 from django.forms.forms import Form
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
-from django.views.generic import DetailView, FormView, TemplateView, UpdateView
+from django.views.generic import FormView, TemplateView, UpdateView
 
 from aldryn_apphooks_config.mixins import AppConfigMixin
-from glom import glom
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.choices import (
@@ -31,7 +28,6 @@ from open_inwoner.openklant.clients import build_client
 from open_inwoner.openklant.wrap import get_fetch_parameters
 from open_inwoner.plans.models import Plan
 from open_inwoner.questionnaire.models import QuestionnaireStep
-from open_inwoner.utils.mixins import ExportMixin
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from ..forms import BrpUserForm, UserForm, UserNotificationsForm

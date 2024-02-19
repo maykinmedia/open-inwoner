@@ -11,12 +11,7 @@ from open_inwoner.accounts.tests.factories import (
     DigidUserFactory,
     eHerkenningUserFactory,
 )
-from open_inwoner.openzaak.tests.factories import (
-    NotificationFactory,
-    ServiceFactory,
-    ZaakTypeConfigFactory,
-    ZaakTypeInformatieObjectTypeConfigFactory,
-)
+from open_inwoner.openzaak.tests.factories import NotificationFactory, ServiceFactory
 from open_inwoner.utils.test import paginated_response
 
 from ..models import OpenZaakConfig

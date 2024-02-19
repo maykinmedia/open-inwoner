@@ -16,7 +16,6 @@ from zgw_consumers.client import build_client as _build_client
 from zgw_consumers.service import pagination_helper
 
 from open_inwoner.openzaak.api_models import InformatieObject
-from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.utils.api import ClientError, get_json_response
 
 from ..utils.decorators import cache as cache_result

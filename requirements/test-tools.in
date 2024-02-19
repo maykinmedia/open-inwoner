@@ -11,5 +11,10 @@ pyquery  # integrates with webtest
 requests-mock
 tblib
 
+# Code formatting
+black
+isort
+flake8
+
 # DigidLocal
 pyopenssl

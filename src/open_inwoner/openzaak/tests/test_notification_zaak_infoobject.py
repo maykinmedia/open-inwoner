@@ -22,11 +22,7 @@ from open_inwoner.utils.test import ClearCachesMixin
 from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin, Lookups
 
 from ..api_models import InformatieObject, Zaak, ZaakInformatieObject, ZaakType
-from ..models import (
-    OpenZaakConfig,
-    UserCaseInfoObjectNotification,
-    ZaakTypeInformatieObjectTypeConfig,
-)
+from ..models import OpenZaakConfig, UserCaseInfoObjectNotification
 from .helpers import copy_with_new_uuid
 from .test_notification_data import MockAPIData
 
@@ -173,7 +169,7 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored zaakinformatieobject notification: cannot retrieve case https://",
+            "ignored zaakinformatieobject notification: cannot retrieve case https://",
             lookup=Lookups.startswith,
             level=logging.ERROR,
         )
@@ -186,7 +182,7 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored zaakinformatieobject notification: cannot retrieve case_type https://",
+            "ignored zaakinformatieobject notification: cannot retrieve case_type https://",
             lookup=Lookups.startswith,
             level=logging.ERROR,
         )
@@ -202,7 +198,7 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored zaakinformatieobject notification: case not visible after applying website visibility filter for case https://",
+            "ignored zaakinformatieobject notification: case not visible after applying website visibility filter for case https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -218,7 +214,7 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored zaakinformatieobject notification: case not visible after applying website visibility filter for case https://",
+            "ignored zaakinformatieobject notification: case not visible after applying website visibility filter for case https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -267,7 +263,7 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored zaakinformatieobject notification: informatieobject not visible after applying website visibility filter for case https://",
+            "ignored zaakinformatieobject notification: informatieobject not visible after applying website visibility filter for case https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -283,7 +279,7 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored zaakinformatieobject notification: informatieobject not visible after applying website visibility filter for case https://",
+            "ignored zaakinformatieobject notification: informatieobject not visible after applying website visibility filter for case https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )

@@ -1,6 +1,5 @@
 import logging
-from typing import Optional, Union
-from uuid import UUID
+from typing import Optional
 
 from zgw_consumers.api_models.constants import RolTypes, VertrouwelijkheidsAanduidingen
 

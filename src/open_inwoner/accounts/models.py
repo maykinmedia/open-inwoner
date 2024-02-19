@@ -1,9 +1,9 @@
 import os
-from datetime import date, timedelta
+from datetime import timedelta
 from uuid import uuid4
 
 from django.conf import settings
-from django.contrib.auth.models import AbstractBaseUser, Group, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import ValidationError
 from django.db import models

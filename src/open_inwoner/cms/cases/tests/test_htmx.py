@@ -18,11 +18,7 @@ from open_inwoner.cms.tests import cms_tools
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openklant.constants import Status
 from open_inwoner.openklant.models import OpenKlantConfig
-from open_inwoner.openklant.tests.data import (
-    CONTACTMOMENTEN_ROOT,
-    KLANTEN_ROOT,
-    MockAPIData,
-)
+from open_inwoner.openklant.tests.data import CONTACTMOMENTEN_ROOT, KLANTEN_ROOT
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.tests.factories import (
     ServiceFactory,

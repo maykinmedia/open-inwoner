@@ -41,6 +41,8 @@ billiard==3.6.4.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   celery
+black==22.12.0
+    # via -r requirements/test-tools.in
 boltons==21.0.0
     # via
     #   -c requirements/base.txt
@@ -81,6 +83,7 @@ click==8.1.3
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   black
     #   celery
     #   click-didyoumean
     #   click-plugins
@@ -502,6 +505,8 @@ factory-boy==3.2.0
     # via -r requirements/test-tools.in
 faker==9.9.0
     # via factory-boy
+flake8==3.9.2
+    # via -r requirements/test-tools.in
 fontawesomefree==6.4.2
     # via
     #   -c requirements/base.txt
@@ -570,7 +575,9 @@ isodate==0.6.1
     #   -r requirements/base.txt
     #   maykin-python3-saml
 isort==5.9.3
-    # via pylint
+    # via
+    #   -r requirements/test-tools.in
+    #   pylint
 josepy==1.13.0
     # via
     #   -c requirements/base.txt
@@ -630,7 +637,9 @@ maykin-python3-saml==1.14.0.post0
     #   -r requirements/base.txt
     #   django-digid-eherkenning
 mccabe==0.6.1
-    # via pylint
+    # via
+    #   flake8
+    #   pylint
 messagebird==2.1.0
     # via
     #   -c requirements/base.txt
@@ -644,6 +653,8 @@ mozilla-django-oidc-db==0.12.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+mypy-extensions==1.0.0
+    # via black
 notifications-api-common==0.2.2
     # via
     #   -c requirements/base.txt
@@ -672,6 +683,8 @@ packaging==23.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   djangocms-text-ckeditor
+pathspec==0.12.1
+    # via black
 pep8==1.7.1
     # via -r requirements/test-tools.in
 phonenumbers==8.12.33
@@ -687,7 +700,9 @@ pillow==10.1.0
     #   reportlab
     #   weasyprint
 platformdirs==2.4.0
-    # via pylint
+    # via
+    #   black
+    #   pylint
 playwright==1.41.0
     # via
     #   -c requirements/base.txt
@@ -706,6 +721,8 @@ psycopg2==2.9.9
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+pycodestyle==2.7.0
+    # via flake8
 pycparser==2.20
     # via
     #   -c requirements/base.txt
@@ -721,6 +738,8 @@ pyee==11.0.1
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   playwright
+pyflakes==2.3.1
+    # via flake8
 pyjwt==2.8.0
     # via
     #   -c requirements/base.txt

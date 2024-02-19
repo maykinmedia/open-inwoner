@@ -295,7 +295,7 @@ class ZaakTypeConfig(models.Model):
             self.identificatie,
             self.omschrijving,
         )
-        return f" - ".join(b for b in bits if b)
+        return " - ".join(b for b in bits if b)
 
 
 class ZaakTypeInformatieObjectTypeConfig(models.Model):

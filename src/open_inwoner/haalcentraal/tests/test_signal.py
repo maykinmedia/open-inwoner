@@ -1,5 +1,4 @@
 import logging
-from datetime import date
 
 from django.test import TestCase, override_settings
 from django.utils.translation import gettext as _

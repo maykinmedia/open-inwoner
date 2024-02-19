@@ -1,9 +1,9 @@
 import os
 
-from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
 import sentry_sdk
+from easy_thumbnails.conf import Settings as thumbnail_settings
 from log_outgoing_requests.formatters import HttpFormatter
 
 from .utils import config, get_sentry_integrations
@@ -671,7 +671,6 @@ FILER_STORAGES = {
     },
 }
 
-from easy_thumbnails.conf import Settings as thumbnail_settings
 
 THUMBNAIL_PROCESSORS = (
     "filer.thumbnail_processors.scale_and_crop_with_subject_location",

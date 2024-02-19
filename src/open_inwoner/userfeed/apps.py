@@ -1,7 +1,3 @@
-import os
-from importlib import import_module
-from pathlib import Path
-
 from django.apps import AppConfig
 
 

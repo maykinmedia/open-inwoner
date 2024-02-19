@@ -25,7 +25,7 @@ def update_admin_index(sender, **kwargs):
 
     try:
         call_command("loaddata", "django-admin-index", verbosity=0, stdout=StringIO())
-    except:
+    except:  # noqa
         print("Error: Unable to load django-admin-index fixture!")
     print("Loaded django-admin-index fixture")
 
@@ -34,6 +34,9 @@ class AccountsConfig(AppConfig):
     name = "open_inwoner.accounts"
 
     def ready(self):
-        from .signals import log_user_login, log_user_logout  # register the signals
+        from .signals import (  # noqa:register the signals
+            log_user_login,
+            log_user_logout,
+        )
 
         post_migrate.connect(update_admin_index, sender=self)
