@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n l10n button_tags faq_tags file_tags grid_tags icon_tags link_tags map_tags notification_tags tag_tags utils render_tags anchor_menu_tags product_tags string_tags %}
+{% load i18n l10n button_tags faq_tags file_tags grid_tags icon_tags link_tags map_tags notification_tags utils render_tags anchor_menu_tags product_tags string_tags %}
 
 {% block header_image %}
 {% if object.image %}
@@ -32,7 +32,7 @@
             {% button icon="edit" text=_("Bewerken in de Admin") hide_text=True href="admin:pdc_product_change" object_id=object.pk %}
         {% endif %}
     </h1>
-    {% tag tags=object.tags.all %}
+    {% include "components/Tag/Tag.html" with tags=object.tags.all only %}
     <p class="p p-summary">{{ object.summary }}</p>
 
     {# Collapsable content #}
