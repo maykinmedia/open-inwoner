@@ -129,7 +129,7 @@ class ZaakInformatieObject(ZGWModel):
     # aard_relatie_weergave: str
     titel: str
     # beschrijving: str
-    registratiedatum: datetime
+    registratiedatum: Optional[datetime]
 
 
 @dataclass

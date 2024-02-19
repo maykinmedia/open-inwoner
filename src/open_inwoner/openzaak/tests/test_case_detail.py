@@ -348,6 +348,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             aardRelatieWeergave="some content",
             titel="info object 3",
             beschrijving="",
+            registratiedatum=None,
         )
         self.informatie_object_type = generate_oas_component_cached(
             "ztc",
