@@ -227,7 +227,7 @@ class MockAPIReadData(MockAPIData):
             "schemas/Zaak",
             uuid="410bb717-ff3d-4fd8-8357-801e5daf9775",
             url=f"{ZAKEN_ROOT}zaken/410bb717-ff3d-4fd8-8357-801e5daf9775",
-            identificatie="Test Zaak",
+            identificatie="053ESUITE5422021",
         )
 
     def install_mocks(self, m, link_objectcontactmomenten=False) -> "MockAPIReadData":

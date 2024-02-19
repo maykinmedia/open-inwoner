@@ -11,6 +11,7 @@ from django_webtest import WebTest
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.openklant.models import ContactFormSubject, OpenKlantConfig
 from open_inwoner.openklant.tests.data import MockAPIReadData
+from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.utils.test import (
     ClearCachesMixin,
     DisableRequestLogMixin,
@@ -196,7 +197,56 @@ class FetchKlantDataTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
 
         self.assertIsNotNone(response.context["zaak"])
         self.assertEqual(response.context["zaak"].url, data.zaak["url"])
-        self.assertEqual(response.context["zaak"].identificatie, "Test Zaak")
+        self.assertEqual(response.context["zaak"].identificatie, "053ESUITE5422021")
+        self.assertEqual(
+            kcm,
+            {
+                "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),
+                "channel": cm_data["kanaal"].title(),
+                "text": cm_data["tekst"],
+                "onderwerp": self.contactformsubject.subject,
+                "antwoord": cm_data["antwoord"],
+                "identificatie": cm_data["identificatie"],
+                "type": cm_data["type"],
+                "status": _("Afgehandeld"),
+                "url": detail_url,
+            },
+        )
+
+        zaak_link = response.pyquery(".case-detail__link")
+
+        self.assertEqual(zaak_link.text(), _("Ga naar zaak"))
+        self.assertEqual(
+            zaak_link.attr("href"),
+            reverse(
+                "cases:case_detail",
+                kwargs={"object_id": "410bb717-ff3d-4fd8-8357-801e5daf9775"},
+            ),
+        )
+
+    def test_show_detail_for_bsn_with_zaak_reformat_esuite_id(self, m):
+        data = MockAPIReadData().install_mocks(m, link_objectcontactmomenten=True)
+
+        oz_config = OpenZaakConfig.get_solo()
+        oz_config.reformat_esuite_zaak_identificatie = True
+        oz_config.save()
+
+        detail_url = reverse(
+            "cases:contactmoment_detail",
+            kwargs={"kcm_uuid": data.klant_contactmoment["uuid"]},
+        )
+        response = self.app.get(detail_url, user=data.user)
+
+        kcm = response.context["contactmoment"]
+        cm_data = data.contactmoment
+
+        zaak_id = (
+            response.pyquery.find(".case-detail__link").parent().text().split(" ")[0]
+        )
+
+        self.assertIsNotNone(response.context["zaak"])
+        self.assertEqual(response.context["zaak"].url, data.zaak["url"])
+        self.assertEqual(zaak_id, "542-2021")
         self.assertEqual(
             kcm,
             {
