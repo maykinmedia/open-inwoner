@@ -2,6 +2,8 @@ from django import template
 from django.urls import reverse
 from django.utils.html import format_html_join
 
+from open_inwoner.components.utils import ContentsNode, parse_component_with_args
+
 register = template.Library()
 
 
@@ -67,3 +69,14 @@ def as_attributes(attribute_dict):
         return format_html_join(" ", '{}="{}"', attribute_dict.items())
     except AttributeError:
         return attribute_dict
+
+
+def create_content_wrapper(name, template_name):
+    def inner(parser, token):
+        bits = token.split_contents()
+        context_kwargs = parse_component_with_args(parser, bits, name)
+        nodelist = parser.parse((f"end{name}",))
+        parser.delete_first_token()
+        return ContentsNode(nodelist, template_name, **context_kwargs)
+
+    return inner
