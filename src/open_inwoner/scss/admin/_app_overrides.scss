@@ -8,71 +8,51 @@
 /**
  * DJANGO ADMIN INDEX
  */
-
-.dropdown-menu,
-div#container .dropdown-menu {
-  /* Override for Environment banner */
-  top: 48px;
-  /* Added to attach body */
-  border-bottom: 8px solid $color_secondary;
+body {
+  --djai-tab-bg: #{$color-primary}; // no fallback to default admin vars
+  --djai-tab-bg--active: #{$color-secondary};
+  --djai-tab-bg--hover: #{$color-primary-dark};
+  --djai-tab-fg--active: #{$color-primary};
+  --djai-dropdown-bg--active: var(--color-primary);
+  --djai-dropdown-bg--hover: #{$color-primary};
 }
 
-.breadcrumbs {
-  top: 48px !important;
-}
+$djai-padding: 40px;
+$djai-padding--mobile: 15px;
+$djai-padding--tablet: 30px;
+$djai-border-width: 8px;
 
-/* Integration into color scheme */
-.dropdown-menu {
-  background-color: $color_primary;
+.djai-dropdown-menu {
+  // use full width on mobile & tablet
+  width: 100%;
 
-  .dropdown-menu__item,
-  .dropdown-menu__item:link,
-  .dropdown-menu__item:visited {
-    color: $color_lightest;
+  & &__drop {
+    min-width: 250px !important;
+  }
 
-    &.dropdown-menu__item--active {
-      background-color: $color_secondary;
-      text-decoration: none;
-      color: $color_primary;
+  // remove the header padding on mobile and tablet
+  @at-root #header {
+    padding-bottom: 0 !important;
+
+    // overwrite admin '#header a:link' rule which is otherwise more specific
+    .djai-dropdown-menu .djai-dropdown-menu__item--active:link,
+    .djai-dropdown-menu .djai-dropdown-menu__item--active:visited {
+      color: var(--djai-tab-fg--active);
 
       &:hover {
-        color: $color_lightest;
+        color: var(--djai-tab-fg--hover);
       }
     }
-
-    &:hover {
-      background-color: $color_primary_dark;
-    }
   }
 
-  .dropdown-menu__drop {
-    background-color: $color_primary;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.2);
+  /* Override for wider filer dropzone Taiga #359 */
+  .js-filer-dropzone {
+    min-width: 600px !important;
   }
 
-  .dropdown-menu__link,
-  .dropdown-menu__link:link,
-  .dropdown-menu__link:visited {
-    color: $color_lightest;
-
-    &:hover {
-      background-color: $color_primary_dark;
-    }
-
-    &.dropdown-menu__link--active {
-      background-color: $color_primary_dark;
-      text-decoration: none;
-    }
+  @at-root body.login #header {
+    padding-bottom: 15px !important;
   }
-}
-/* Override for wider dropdown */
-.dropdown-menu .dropdown-menu__drop {
-  min-width: 250px;
-}
-
-/* Override for wider filer dropzone Taiga #359 */
-.js-filer-dropzone {
-  min-width: 600px !important;
 }
 
 /**

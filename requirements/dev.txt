@@ -147,6 +147,7 @@ css-inline==0.13.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   mail-editor
 cssselect==1.1.0
     # via
     #   -c requirements/ci.txt
@@ -182,6 +183,7 @@ django==3.2.23
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   ddt-api-calls
+    #   django-admin-index
     #   django-appconf
     #   django-appdata
     #   django-axes
@@ -228,7 +230,7 @@ django==3.2.23
     #   mozilla-django-oidc-db
     #   notifications-api-common
     #   zgw-consumers
-django-admin-index==1.5.0
+django-admin-index==3.1.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -366,7 +368,7 @@ django-open-forms-client==0.2.3
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-django-ordered-model==3.4.3
+django-ordered-model==3.7.4
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -521,6 +523,7 @@ easy-thumbnails[svg]==2.8.5
     #   -r requirements/ci.txt
     #   django-filer
     #   djangocms-picture
+    #   easy-thumbnails
 ecs-logging==2.1.0
     # via
     #   -c requirements/ci.txt
@@ -580,6 +583,7 @@ fonttools[woff]==4.29.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   fonttools
     #   weasyprint
 freezegun==1.1.0
     # via
@@ -699,6 +703,7 @@ lxml==4.9.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-digid-eherkenning
+    #   mail-editor
     #   maykin-python3-saml
     #   pyquery
     #   svglib
@@ -974,6 +979,7 @@ requests==2.31.0
     #   django-rosetta
     #   gemma-zds-client
     #   locust
+    #   mail-editor
     #   maykin-python3-saml
     #   messagebird
     #   mozilla-django-oidc
@@ -1059,6 +1065,7 @@ tablib[html,ods,xls,xlsx,yaml]==3.1.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-import-export
+    #   tablib
 tblib==1.7.0
     # via
     #   -c requirements/ci.txt

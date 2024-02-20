@@ -5,7 +5,9 @@ const mybutton = document.getElementById('scroll-anchor')
 document.addEventListener(
   'scroll',
   (e) => {
-    if (
+    if (!mybutton) {
+      return
+    } else if (
       document.body.scrollTop > 80 ||
       document.documentElement.scrollTop > 80
     ) {
