@@ -1,10 +1,33 @@
 {% extends 'master.html' %}
-{% load i18n anchor_menu_tags card_tags grid_tags icon_tags link_tags list_tags pagination_tags utils %}
+{% load i18n anchor_menu_tags button_tags card_tags form_tags grid_tags icon_tags link_tags list_tags pagination_tags utils %}
 
 {% block content %}
     <h1 class="utrecht-heading-1" id="contactmomenten">{{ page_title }} ({{ contactmomenten|length }})</h1>
 
+    {# title + scroll down button #}
+    <section class="contactmomenten__scrolldown">
+        <div class="form-container">
+            <div class="form-heading">
+                <h2 class="h2">{% trans "Stel een vraag" %}</h2>
+                <p class="p">
+                {% blocktrans trimmed %}
+                    Heeft u een vraag? Dan kunt u deze hier stellen.
+                    Een van onze medewerkers beantwoord uw vraag z.s.m.
+                {% endblocktrans %}
+                </p>
+            </div>
+            {% button href="#question-form" text=_("Stel een vraag") title=_("Stel een vraag") primary=True icon="arrow_downward" icon_position="after" %}
+        </div>
+    </section>
+
+    {# grid with questions #}
     <div class="contactmomenten">
+        {% if contactmomenten %}
+            <h2 class="contactmomenten__title">{% trans "Eerder gestelde vragen" %}</h2>
+        {% else %}
+            <h2>{% trans "U heeft op dit moment nog geen vragen." %}</h2>
+        {% endif %}
+
         {% render_grid %}
             {% for contactmoment in page_obj.object_list %}
                 {% render_column start=forloop.counter_0|multiply:4 span=4 %}
@@ -13,14 +36,15 @@
                         <a href="{{ contactmoment.url }}" class="contactmomenten__link">
                             {% render_list %}
                                 <span class="contactmomenten-list">
-                                {% list_item contactmoment.registered_date caption=_("Ontvangstdatum") compact=True strong=False %}
-                                {% list_item contactmoment.channel caption=_("Contactwijze") compact=True strong=False %}
+                                <h2 class="card__heading-2">{{ contactmoment.onderwerp }}</h2>
+                                <li class="list-item list-item--compact">
+                                    {% with register_date=contactmoment.registered_date|default:"" %}
+                                    <p class="card__caption card__text--small"><span>{% trans "Vraag ingediend op:" %}</span><span class="card__text--dark">{{ register_date|date }}</span></p>
+                                    {% endwith %}
+                                </li>
+                                {% list_item contactmoment.text compact=True strong=False %}
                                 {% list_item contactmoment.status caption=_("Status") compact=True strong=False %}
-                                {% if contactmoment.onderwerp %}
-                                    {% list_item contactmoment.onderwerp|truncatechars:25 caption=_("Onderwerp") compact=True strong=False %}
-                                {% else %}
-                                    {% list_item contactmoment.text|truncatechars:25 caption=_("Bericht") compact=True strong=False %}
-                                {% endif %}
+                                {% list_item contactmoment.identificatie caption=_("Vraag nummer") compact=True strong=False %}
                                 </span>
                             {% endrender_list %}
 
@@ -39,4 +63,31 @@
     {% if contactmomenten %}
         {% pagination page_obj=page_obj paginator=paginator request=request %}
     {% endif %}
+
+    <section class="contactmomenten contactmomenten__contact-form">
+        <div class="form-container">
+            <div class="form-heading">
+                <h2 class="h2">{% trans "Stel een vraag" %}</h2>
+                <p class="p">
+                {% blocktrans trimmed %}
+                    Heeft u een vraag? Dan kunt u deze hier stellen.
+                    Een van onze medewerkers beantwoord uw vraag z.s.m.
+                {% endblocktrans %}
+                </p>
+            </div>
+            <div>
+                <form action="#" method="POST" id="question-form">
+                    {% csrf_token %}
+                    {% for field in question_form.fields %}
+                        {% autorender_field question_form field %}
+                    {% endfor %}
+
+                    <button class="button button--textless button--icon button--icon-after button--primary" type="submit">
+                        <span aria-hidden="true" class="material-icons">arrow_forward</span>
+                        {% trans "Verstuur vraag" %}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
 {% endblock content %}
