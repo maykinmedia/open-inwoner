@@ -223,5 +223,5 @@ class KvKViewsTestCase(TestCase):
         self.assertEqual(branch_inputs[2], doc.find("[id='branch-5678']")[0])
 
         # chack that company name is displayed for every branch
-        company_name_displays = doc("p:Contains('Makers and Shakers')")
+        company_name_displays = doc("h2:Contains('Makers and Shakers')")
         self.assertEqual(len(company_name_displays), 3)

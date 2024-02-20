@@ -2,36 +2,106 @@
 {% load i18n static form_tags grid_tags button_tags card_tags button_tags %}
 
 {% block content %}
-<p> {% trans "Selecteer de vestiging waarmee u wilt inloggen" %}:</p>
-{% render_grid %}
-    {% render_column start=0 span=6 %}
-        <form method="POST" id="eherkenning-branch-form">
-            {% csrf_token %}
-            {% if form.branch_number.errors %}
-                {% errors errors=form.branch_number.errors %}
-            {% endif %}
-            {% for branch in company_branches %}
-                {% render_card direction='horizontal' %}
+    <h1 class="h1" id="title">{% trans "Log in" %}</h1>
+    {% render_grid %}
+        {% render_column start=4 span=6 %}
+            <form method="POST" id="eherkenning-branch-form" class="form">
+                {% csrf_token %}
+                {% if form.branch_number.errors %}
+                    {% errors errors=form.branch_number.errors %}
+                {% endif %}
+
+                <ul class="choice-list choice-list--single">
+
+                {# if COMPANY shows NEVENVESTIGING and HOOFDVESTIGING in one list #}
+                <p><strong>{% trans "Selecteer de vestiging waarmee u wilt inloggen" %}</strong></p>
+                {% for branch in company_branches %}
                     {% with company_id=branch.vestigingsnummer %}
-                        <label class="left" for="branch-{{ company_id }}">
-                            <p>{{ branch.naam }}</p>
-                            {% if branch.straatnaam and branch.plaats %}
-                                <p>{{ branch.straatnaam }}, {{ branch.plaats}}</p>
-                            {% endif %}
-                            {% if branch.vestigingsnummer %}
-                                <p>{% trans "Vestiging" %}: {{ company_id }}</p>
-                            {% endif %}
-                        </label>
-                        <input type="radio" id="branch-{{ company_id }}" name="branch_number" value="{{ company_id }}">
+
+                        <li class="choice-list__item">
+                            <label class="choice-list__label">
+                                <input type="radio" id="branch-{{ company_id }}" name="branch_number" value="{{ company_id }}" class="choice-list__radio">
+                                <div class="choice-list__content">
+                                    <h2 class="choice-list__heading">{{ branch.naam }}</h2>
+                                    {% if branch.straatnaam %}
+                                    <p class="choice-list__p">{{ branch.straatnaam }}</p>
+                                    {% endif %}
+                                    {% if branch.plaats %}
+                                    <p class="choice-list__p">{{ branch.plaats}}</p>
+                                    {% endif %}
+                                    {% if branch.vestigingsnummer %}
+                                    <p class="choice-list__p">{% trans "Vestiging" %}: {{ company_id }}</p>
+                                    {% endif %}
+                                </div>
+                            </label>
+                        </li>
+
                     {% endwith %}
-                {% endrender_card %}
-            {% endfor %}
-            {% button_row %}
-                {% button primary=True name="submit" text=_('Log in') %}
-                {% url 'logout' as logout_url %}
-                {% button danger=True href=logout_url text=_('Cancel') %}
-            {% endbutton_row %}
-        </form>
-    {% endrender_column %}
-{% endrender_grid %}
+                {% endfor %}
+
+
+                {# first only show HOOFDVESTIGING #}
+{#                {% for branch in company_branches %}#}
+{#                {% if not branch.vestigingsnummer %}#}
+{#                <p><strong>{% trans "Log in namens alle vestigingen" %}</strong></p>#}
+{##}
+{#                <li class="choice-list__item">#}
+{#                    <label class="choice-list__label">#}
+{#                        <input type="radio" id="hoofdvestiging-{{ company_id }}" name="branch_number" value="{{ company_id }}" class="choice-list__radio">#}
+{#                        <div class="choice-list__content">#}
+{#                            <h2 class="choice-list__heading">{{ branch.naam }}</h2>#}
+{#                            {% if branch.straatnaam %}#}
+{#                            <p class="choice-list__p">{{ branch.straatnaam }}</p>#}
+{#                            {% endif %}#}
+{#                            {% if branch.plaats %}#}
+{#                            <p class="choice-list__p">{{ branch.plaats}}</p>#}
+{#                            {% endif %}#}
+{#                            {% if branch.vestigingsnummer %}#}
+{#                            <p class="choice-list__p">{% trans "Vestiging" %}: {{ company_id }}</p>#}
+{#                            {% endif %}#}
+{#                        </div>#}
+{#                    </label>#}
+{#                </li>#}
+{#                {% endif %}#}
+{#                {% endfor %}#}
+{##}
+                {# only show multiple NEVENVESTIGINGEN without the HOOFDVESTIGING #}
+{#                <p><strong>{% trans "Of selecteer de vestiging waarmee u wilt inloggen" %}</strong></p>#}
+{#                {% for branch in company_branches %}#}
+{#                    {% if branch.vestigingsnummer %}#}
+{#                    {% with company_id=branch.vestigingsnummer %}#}
+{##}
+{#                        <li class="choice-list__item">#}
+{#                            <label class="choice-list__label">#}
+{#                                <input type="radio" id="branch-{{ company_id }}" name="branch_number" value="{{ company_id }}" class="choice-list__radio">#}
+{#                                <div class="choice-list__content">#}
+{#                                    <h2 class="choice-list__heading">{{ branch.naam }}</h2>#}
+{#                                    {% if branch.straatnaam %}#}
+{#                                    <p class="choice-list__p">{{ branch.straatnaam }}</p>#}
+{#                                    {% endif %}#}
+{#                                    {% if branch.plaats %}#}
+{#                                    <p class="choice-list__p">{{ branch.plaats}}</p>#}
+{#                                    {% endif %}#}
+{#                                    {% if branch.vestigingsnummer %}#}
+{#                                    <p class="choice-list__p">{% trans "Vestiging" %}: {{ company_id }}</p>#}
+{#                                    {% endif %}#}
+{#                                </div>#}
+{#                            </label>#}
+{#                        </li>#}
+{##}
+{#                    {% endwith %}#}
+{#                    {% endif %}#}
+{#                {% endfor %}#}
+
+                </ul>
+
+                <div class="form__actions form__actions--fullwidth">
+                    {% button_row %}
+                        {% button primary=True name="submit" text=_('Ga door') icon="east" icon_position="after" icon_outlined=True %}
+                    {% endbutton_row %}
+                </div>
+            </form>
+
+        {% endrender_column %}
+    {% endrender_grid %}
 {% endblock content %}
