@@ -6,12 +6,18 @@ from django.utils.translation import gettext_lazy as _
 from simple_certmanager.models import Certificate
 from solo.models import SingletonModel
 
+from .validators import validate_api_root
+
 
 class KvKConfig(SingletonModel):
     api_root = models.URLField(
         verbose_name=_("API root"),
         max_length=128,
-        help_text=_("The root of the API (e.g. https://api.kvk.nl/api/v1)"),
+        validators=[validate_api_root],
+        help_text=_(
+            "The root of the API without version number and endpoint "
+            "(e.g. https://api.kvk.nl/api/ or https://api.kvk.nl/test/api)."
+        ),
     )
     api_key = models.CharField(
         verbose_name=_("API key"),

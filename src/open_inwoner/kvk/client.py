@@ -68,15 +68,15 @@ class KvKClient:
         return data
 
     #
-    # Interface: search
+    # Interface
     #
     @cached_property
     def search_endpoint(self):
-        return self._urljoin(self.config.api_root, "zoeken")
+        return self._urljoin(self.config.api_root, "v2", "zoeken")
 
     @cached_property
     def basisprofielen_endpoint(self):
-        return self._urljoin(self.config.api_root, "basisprofielen")
+        return self._urljoin(self.config.api_root, "v1", "basisprofielen")
 
     def search(self, **kwargs) -> dict:
         """
