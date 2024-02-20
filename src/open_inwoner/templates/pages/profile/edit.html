@@ -2,10 +2,7 @@
 {% load i18n l10n grid_tags form_tags anchor_menu_tags icon_tags button_tags %}
 
 {% block sidebar_content %}
-    <div class="profile-nav">
-        {% icon icon="west" icon_position="before" outlined=True %}
-        <p class="profile-nav__content">Terug naar {% button href="profile:detail" text=_("mijn gegevens") transparent=True %}</p>
-    </div>
+    {% anchor_menu anchors=anchors desktop=True %}
 {% endblock sidebar_content %}
 
 {% block extra_head %}
@@ -53,7 +50,7 @@
                     {% endwith %}
                     <div class="form__actions form__actions--fullwidth">
                         {% button text="Sla wijzigingen op" primary=True type="submit" form_id="profile-edit" %}
-                        {% button href="profile:detail" icon="west" text=_("Terug naar Mijn gegevens") icon_outlined=True transparent=True %}
+                        {% button href="profile:detail" icon="west" text=_("Terug naar Mijn profiel") icon_outlined=True transparent=True %}
                     </div>
                 {% endrender_form %}
 

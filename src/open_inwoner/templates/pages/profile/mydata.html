@@ -1,11 +1,8 @@
 {% extends 'master.html' %}
-{% load i18n l10n link_tags dropdown_tags icon_tags button_tags %}
+{% load i18n l10n link_tags anchor_menu_tags dropdown_tags icon_tags button_tags %}
 
 {% block sidebar_content %}
-    <div class="profile-nav">
-        {% icon icon="west" icon_position="before" outlined=True %}
-        <p class="profile-nav__content">Terug naar {% button href="profile:detail" text=_("mijn gegevens") transparent=True %}</p>
-    </div>
+    {% anchor_menu anchors=anchors desktop=True %}
 {% endblock sidebar_content %}
 
 {% block content %}
