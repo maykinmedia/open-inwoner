@@ -1,5 +1,5 @@
 {% extends "pages/product/detail.html" %}
-{% load openforms button_tags tag_tags %}
+{% load openforms button_tags %}
 
 {% block extra_css %}
 
@@ -19,7 +19,7 @@
             {% button icon="edit" text=_("Bewerken in de Admin") hide_text=True href="admin:pdc_product_change" object_id=object.pk %}
         {% endif %}
     </h1>
-    {% tag tags=object.tags.all %}
+    {% include "components/Tag/Tag.html" with tags=object.tags.all only %}
 
     {% if object.form %}
         {% openforms_form object.form  csp_nonce=request.csp_nonce %}

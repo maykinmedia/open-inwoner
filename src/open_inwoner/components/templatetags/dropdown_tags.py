@@ -1,6 +1,6 @@
 from django import template
 
-from open_inwoner.components.utils import ContentsNode, parse_component_with_args
+from .helpers import create_content_wrapper
 
 register = template.Library()
 
@@ -30,8 +30,6 @@ def dropdown(parser, token):
     Extra context:
         - contents: string (HTML) | this is the context between the dropdown and enddropdown tags
     """
-    bits = token.split_contents()
-    context_kwargs = parse_component_with_args(parser, bits, "dropdown")
-    nodelist = parser.parse(("enddropdown",))
-    parser.delete_first_token()
-    return ContentsNode(nodelist, "components/Dropdown/Dropdown.html", **context_kwargs)
+    return create_content_wrapper("dropdown", "components/Dropdown/Dropdown.html")(
+        parser, token
+    )
