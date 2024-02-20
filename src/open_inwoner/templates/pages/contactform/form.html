@@ -1,9 +1,9 @@
 {% extends 'master.html' %}
-{% load i18n contact_tags %}
+{% load i18n %}
 
 {% block content %}
     <h1 class="h1">
         {% trans "Contactformulier" %}
     </h1>
-{% contact_form form_object=form %}
+    {% include "components/Contact/ContactForm.html" with form_object=form has_form_configuration=has_form_configuration csrf_token=csrf_token only %}
 {% endblock content %}

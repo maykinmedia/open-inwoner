@@ -175,6 +175,7 @@ class ContactFormTestCase(
     def test_submit_and_register_via_email(self, m):
         config = OpenKlantConfig.get_solo()
         config.register_email = "example@example.com"
+        config.has_form_configuration = True
         config.save()
         subject = ContactFormSubjectFactory(config=config)
 

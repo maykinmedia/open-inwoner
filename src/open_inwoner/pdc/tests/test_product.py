@@ -14,7 +14,12 @@ from open_inwoner.utils.tests.playwright import PlaywrightSyncLiveServerTestCase
 
 from ...media.tests.factories import VideoFactory
 from ..models import CategoryProduct
-from .factories import CategoryFactory, ProductFactory, QuestionFactory
+from .factories import (
+    CategoryFactory,
+    ProductConditionFactory,
+    ProductFactory,
+    QuestionFactory,
+)
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
@@ -307,6 +312,51 @@ class TestProductContent(WebTest):
         self.assertNotContains(response, escape("<b>world"))
         self.assertContains(response, "hello <b>world</b>")
         self.assertContains(response, "<strong>test</strong>")
+
+
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+class ProductConditionTest(WebTest):
+    def test_product_with_conditions(self):
+        condition1 = ProductConditionFactory(
+            positive_text="when the stars align",
+            negative_text="when you're out of luck",
+        )
+        condition2 = ProductConditionFactory(
+            positive_text="when it's bright and sunny",
+            negative_text="when it's dark and gloomy",
+        )
+        product = ProductFactory(
+            content="Some content",
+            link="http://www.example.com",
+        )
+        product.conditions.set((condition1, condition2))
+
+        response = self.app.get(
+            reverse("products:product_detail", kwargs={"slug": product.slug})
+        )
+
+        conditions_positive = response.pyquery(".condition__mark--positive")
+        self.assertEqual(conditions_positive[0].tail.lstrip(), condition1.positive_text)
+        self.assertEqual(conditions_positive[1].tail.lstrip(), condition2.positive_text)
+
+        conditions_negative = response.pyquery(".condition__mark--negative")
+        self.assertEqual(conditions_negative[0].tail.lstrip(), condition1.negative_text)
+        self.assertEqual(conditions_negative[1].tail.lstrip(), condition2.negative_text)
+
+    def test_product_no_conditions(self):
+        product = ProductFactory(
+            content="Some content",
+            link="http://www.example.com",
+        )
+
+        response = self.app.get(
+            reverse("products:product_detail", kwargs={"slug": product.slug})
+        )
+
+        conditions_positive = response.pyquery(".condition__mark--positive")
+        conditions_negative = response.pyquery(".condition__mark--negative")
+        self.assertEqual(conditions_positive, [])
+        self.assertEqual(conditions_negative, [])
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
