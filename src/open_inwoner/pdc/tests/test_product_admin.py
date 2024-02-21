@@ -3,12 +3,14 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from django_webtest import WebTest
+from maykin_2fa.test import disable_admin_mfa
 
 from open_inwoner.accounts.tests.factories import GroupFactory, UserFactory
 
 from .factories import CategoryFactory, ProductFactory
 
 
+@disable_admin_mfa()
 class TestAdminProductForm(WebTest):
     def test_access_limited_to_linked_auth_groups(self):
         super_user = UserFactory(is_superuser=True, is_staff=True)

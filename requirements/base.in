@@ -22,7 +22,7 @@ django-redis
 django-rosetta
 django-sniplates
 django-treebeard
-maykin-django-two-factor-auth
+maykin-2fa
 phonenumbers
 django-localflavor
 django-privates

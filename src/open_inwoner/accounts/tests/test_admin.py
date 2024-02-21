@@ -2,6 +2,7 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from django_webtest import WebTest
+from maykin_2fa.test import disable_admin_mfa
 from webtest import Upload
 
 from open_inwoner.utils.tests.helpers import create_image_bytes
@@ -11,6 +12,7 @@ from ..models import User
 from .factories import UserFactory
 
 
+@disable_admin_mfa()
 class TestAdminUser(WebTest):
     def setUp(self):
         self.user = UserFactory(

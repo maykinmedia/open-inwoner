@@ -2,12 +2,14 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from django_webtest import WebTest
+from maykin_2fa.test import disable_admin_mfa
 
 from open_inwoner.accounts.tests.factories import UserFactory
 
 from .factories import ZaakTypeConfigFactory, ZaakTypeInformatieObjectTypeConfigFactory
 
 
+@disable_admin_mfa()
 class TestZaakTypeConfigAdmin(WebTest):
     def setUp(self):
         self.user = UserFactory(is_superuser=True, is_staff=True)
