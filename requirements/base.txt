@@ -387,7 +387,7 @@ phonenumbers==8.13.29
     # via -r requirements/base.in
 phonenumberslite==8.13.29
     # via django-two-factor-auth
-pillow==10.1.0
+pillow==10.2.0
     # via
     #   -r requirements/base.in
     #   djangocms-text-ckeditor
