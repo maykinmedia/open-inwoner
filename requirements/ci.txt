@@ -153,7 +153,7 @@ diff-match-patch==20200713
     #   django-import-export
 dill==0.3.7
     # via pylint
-django==3.2.23
+django==3.2.24
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
