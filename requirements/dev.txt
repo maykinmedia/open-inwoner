@@ -223,7 +223,6 @@ django==3.2.23
     #   django-redis
     #   django-registration
     #   django-relativedelta
-    #   django-rosetta
     #   django-sekizai
     #   django-sendfile2
     #   django-silk
@@ -418,10 +417,6 @@ django-relativedelta==2.0.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   zgw-consumers
-django-rosetta==0.9.7
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
 django-sekizai==4.0.0
     # via
     #   -c requirements/ci.txt
@@ -593,10 +588,6 @@ flask-basicauth==0.2.0
     # via locust
 flask-cors==4.0.0
     # via locust
-fontawesomefree==6.4.2
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
 fonttools[woff]==4.29.1
     # via
     #   -c requirements/ci.txt
@@ -855,11 +846,6 @@ playwright==1.41.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-polib==1.1.1
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   django-rosetta
 prompt-toolkit==3.0.36
     # via
     #   -c requirements/ci.txt
@@ -962,10 +948,6 @@ pytz==2021.3
     #   celery
     #   django
     #   django-yubin
-pywatchman==1.4.1
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
 pyyaml==6.0
     # via
     #   -c requirements/ci.txt
@@ -1000,7 +982,6 @@ requests==2.31.0
     #   ddt-api-calls
     #   django-log-outgoing-requests
     #   django-open-forms-client
-    #   django-rosetta
     #   gemma-zds-client
     #   locust
     #   mail-editor

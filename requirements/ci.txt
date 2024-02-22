@@ -37,10 +37,7 @@ attrs==21.2.0
     #   glom
     #   jsonschema
 beautifulsoup4==4.10.0
-    # via
-    #   -c requirements/base.txt
-    #   -r requirements/base.txt
-    #   webtest
+    # via webtest
 billiard==3.6.4.0
     # via
     #   -c requirements/base.txt
@@ -187,7 +184,6 @@ django==3.2.23
     #   django-redis
     #   django-registration
     #   django-relativedelta
-    #   django-rosetta
     #   django-sekizai
     #   django-sendfile2
     #   django-simple-certmanager
@@ -377,10 +373,6 @@ django-relativedelta==2.0.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   zgw-consumers
-django-rosetta==0.9.7
-    # via
-    #   -c requirements/base.txt
-    #   -r requirements/base.txt
 django-sekizai==4.0.0
     # via
     #   -c requirements/base.txt
@@ -528,10 +520,6 @@ faker==9.9.0
     # via factory-boy
 flake8==3.9.2
     # via -r requirements/test-tools.in
-fontawesomefree==6.4.2
-    # via
-    #   -c requirements/base.txt
-    #   -r requirements/base.txt
 fonttools[woff]==4.29.1
     # via
     #   -c requirements/base.txt
@@ -735,11 +723,6 @@ playwright==1.41.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-polib==1.1.1
-    # via
-    #   -c requirements/base.txt
-    #   -r requirements/base.txt
-    #   django-rosetta
 prompt-toolkit==3.0.36
     # via
     #   -c requirements/base.txt
@@ -827,10 +810,6 @@ pytz==2021.3
     #   celery
     #   django
     #   django-yubin
-pywatchman==1.4.1
-    # via
-    #   -c requirements/base.txt
-    #   -r requirements/base.txt
 pyyaml==6.0
     # via
     #   -c requirements/base.txt
@@ -861,7 +840,6 @@ requests==2.31.0
     #   ape-pie
     #   django-log-outgoing-requests
     #   django-open-forms-client
-    #   django-rosetta
     #   gemma-zds-client
     #   mail-editor
     #   maykin-python3-saml
@@ -897,10 +875,7 @@ six==1.16.0
     #   qrcode
     #   requests-mock
 soupsieve==2.3.1
-    # via
-    #   -c requirements/base.txt
-    #   -r requirements/base.txt
-    #   beautifulsoup4
+    # via beautifulsoup4
 sqlparse==0.4.4
     # via
     #   -c requirements/base.txt

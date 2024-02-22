@@ -185,7 +185,6 @@ INSTALLED_APPS = [
     "mail_editor",
     "ckeditor",
     "privates",
-    "fontawesomefree",
     "timeline_logger",
     "csp",
     "cspreports",
