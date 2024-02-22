@@ -131,6 +131,20 @@ class CategoryListViewTest(TestCase):
             list(response.context["object_list"]), [self.category2, self.category4]
         )
 
+    def test_category_list_view_visibility_for_staff_user(self):
+        url = reverse("products:category_list")
+
+        user = UserFactory(is_staff=True)
+        self.client.force_login(user)
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            list(response.context["object_list"]),
+            [self.category1, self.category2, self.category3, self.category4],
+        )
+
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class CategoryDetailViewTest(TestCase):
