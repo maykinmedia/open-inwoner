@@ -40,7 +40,7 @@ class OIDCFlowTests(TestCase):
     )
     @patch(
         "open_inwoner.configurations.models.SiteConfiguration.get_solo",
-        return_value=SiteConfiguration(id=1, openid_display=OpenIDDisplayChoices.admin),
+        return_value=SiteConfiguration(openid_display=OpenIDDisplayChoices.admin),
     )
     def test_existing_email_updates_admin_user(
         self,
@@ -73,16 +73,13 @@ class OIDCFlowTests(TestCase):
             callback_response, reverse("admin:index"), fetch_redirect_response=True
         )
 
+        self.assertEqual(User.objects.count(), 1)
+
         user.refresh_from_db()
 
-        self.assertTrue(User.objects.filter(oidc_id="some_username").exists())
         self.assertEqual(user.oidc_id, "some_username")
-
-        db_user = User.objects.filter(oidc_id="some_username").first()
-
-        self.assertEqual(db_user.id, user.id)
-        self.assertEqual(db_user.login_type, LoginTypeChoices.oidc)
-        self.assertEqual(db_user.is_staff, True)
+        self.assertEqual(user.login_type, LoginTypeChoices.oidc)
+        self.assertEqual(user.is_staff, True)
 
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
@@ -94,9 +91,7 @@ class OIDCFlowTests(TestCase):
     )
     @patch(
         "open_inwoner.configurations.models.SiteConfiguration.get_solo",
-        return_value=SiteConfiguration(
-            id=1, openid_display=OpenIDDisplayChoices.regular
-        ),
+        return_value=SiteConfiguration(openid_display=OpenIDDisplayChoices.regular),
     )
     def test_existing_email_updates_regular_user(
         self,
@@ -129,16 +124,13 @@ class OIDCFlowTests(TestCase):
             callback_response, reverse("pages-root"), fetch_redirect_response=True
         )
 
+        self.assertEqual(User.objects.count(), 1)
+
         user.refresh_from_db()
 
-        self.assertTrue(User.objects.filter(oidc_id="some_username").exists())
         self.assertEqual(user.oidc_id, "some_username")
-
-        db_user = User.objects.filter(oidc_id="some_username").first()
-
-        self.assertEqual(db_user.id, user.id)
-        self.assertEqual(db_user.login_type, LoginTypeChoices.oidc)
-        self.assertEqual(db_user.is_staff, False)
+        self.assertEqual(user.login_type, LoginTypeChoices.oidc)
+        self.assertEqual(user.is_staff, False)
 
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
@@ -146,13 +138,16 @@ class OIDCFlowTests(TestCase):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
         "mozilla_django_oidc_db.mixins.OpenIDConnectConfig.get_solo",
-        return_value=OpenIDConnectConfig(id=1, enabled=True, make_users_staff=False),
+        return_value=OpenIDConnectConfig(
+            id=1,
+            enabled=True,
+            make_users_staff=False,
+            claim_mapping={"first_name": "first_name"},
+        ),
     )
     @patch(
         "open_inwoner.configurations.models.SiteConfiguration.get_solo",
-        return_value=SiteConfiguration(
-            id=1, openid_display=OpenIDDisplayChoices.regular
-        ),
+        return_value=SiteConfiguration(openid_display=OpenIDDisplayChoices.regular),
     )
     def test_existing_oidc_id_updates_regular_user(
         self,
@@ -187,16 +182,13 @@ class OIDCFlowTests(TestCase):
             callback_response, reverse("pages-root"), fetch_redirect_response=True
         )
 
+        self.assertEqual(User.objects.count(), 1)
+
         user.refresh_from_db()
 
-        self.assertTrue(User.objects.filter(oidc_id="some_username").exists())
         self.assertEqual(user.oidc_id, "some_username")
-
-        db_user = User.objects.filter(oidc_id="some_username").first()
-
-        self.assertEqual(db_user.id, user.id)
-        self.assertEqual(db_user.login_type, LoginTypeChoices.oidc)
-        self.assertEqual(db_user.is_staff, False)
+        self.assertEqual(user.first_name, "bar")
+        self.assertEqual(user.is_staff, False)
 
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
@@ -208,9 +200,7 @@ class OIDCFlowTests(TestCase):
     )
     @patch(
         "open_inwoner.configurations.models.SiteConfiguration.get_solo",
-        return_value=SiteConfiguration(
-            id=1, openid_display=OpenIDDisplayChoices.regular
-        ),
+        return_value=SiteConfiguration(openid_display=OpenIDDisplayChoices.regular),
     )
     def test_existing_case_sensitive_email_updates_user(
         self,
@@ -265,7 +255,7 @@ class OIDCFlowTests(TestCase):
     )
     @patch(
         "open_inwoner.configurations.models.SiteConfiguration.get_solo",
-        return_value=SiteConfiguration(id=1, openid_display=OpenIDDisplayChoices.admin),
+        return_value=SiteConfiguration(openid_display=OpenIDDisplayChoices.admin),
     )
     def test_new_admin_user_is_created_when_new_email(
         self,
@@ -298,9 +288,8 @@ class OIDCFlowTests(TestCase):
             callback_response, reverse("admin:index"), fetch_redirect_response=True
         )
 
-        new_user = User.objects.filter(email="new_user@example.com").first()
+        new_user = User.objects.get(email="new_user@example.com")
 
-        self.assertIsNotNone(new_user)
         self.assertEqual(new_user.oidc_id, "some_username")
         self.assertEqual(new_user.login_type, LoginTypeChoices.oidc)
         self.assertEqual(new_user.is_staff, True)
@@ -315,9 +304,7 @@ class OIDCFlowTests(TestCase):
     )
     @patch(
         "open_inwoner.configurations.models.SiteConfiguration.get_solo",
-        return_value=SiteConfiguration(
-            id=1, openid_display=OpenIDDisplayChoices.regular
-        ),
+        return_value=SiteConfiguration(openid_display=OpenIDDisplayChoices.regular),
     )
     def test_new_regular_user_is_created_when_new_email(
         self,
@@ -339,8 +326,6 @@ class OIDCFlowTests(TestCase):
         session.save()
         callback_url = reverse("oidc_authentication_callback")
 
-        self.assertFalse(User.objects.filter(email="new_user@example.com").exists())
-
         # enter the login flow
         callback_response = self.client.get(
             callback_url, {"code": "mock", "state": "mock"}
@@ -350,9 +335,8 @@ class OIDCFlowTests(TestCase):
             callback_response, reverse("pages-root"), fetch_redirect_response=True
         )
 
-        new_user = User.objects.filter(email="new_user@example.com").first()
+        new_user = User.objects.get(email="new_user@example.com")
 
-        self.assertIsNotNone(new_user)
         self.assertEqual(new_user.oidc_id, "some_username")
         self.assertEqual(new_user.login_type, LoginTypeChoices.oidc)
         self.assertEqual(new_user.is_staff, False)
@@ -374,9 +358,7 @@ class OIDCFlowTests(TestCase):
     )
     @patch(
         "open_inwoner.configurations.models.SiteConfiguration.get_solo",
-        return_value=SiteConfiguration(
-            id=1, openid_display=OpenIDDisplayChoices.regular
-        ),
+        return_value=SiteConfiguration(openid_display=OpenIDDisplayChoices.regular),
     )
     def test_error_first_cleared_after_succesful_login(
         self,
