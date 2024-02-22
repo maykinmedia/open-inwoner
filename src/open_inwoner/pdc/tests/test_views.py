@@ -24,32 +24,28 @@ PATCHED_MIDDLEWARE = [
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class CategoryListViewTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.user = UserFactory()
-        cls.user.set_password("12345")
-        cls.user.email = "test@email.com"
-        cls.user.save()
+    def setUp(self):
+        super().setUp()
 
-        cls.category1 = CategoryFactory(
+        self.category_anonymous = CategoryFactory(
             name="0001",
             visible_for_anonymous=True,
             visible_for_citizens=False,
             visible_for_companies=False,
         )
-        cls.category2 = CategoryFactory(
+        self.category_all = CategoryFactory(
             name="0002",
             visible_for_anonymous=True,
             visible_for_citizens=True,
             visible_for_companies=True,
         )
-        cls.category3 = CategoryFactory(
+        self.category_citizens = CategoryFactory(
             name="0003",
             visible_for_anonymous=False,
             visible_for_citizens=True,
             visible_for_companies=False,
         )
-        cls.category4 = CategoryFactory(
+        self.category_companies = CategoryFactory(
             name="0004",
             visible_for_anonymous=False,
             visible_for_citizens=False,
@@ -63,6 +59,8 @@ class CategoryListViewTest(TestCase):
 
         url = reverse("products:category_list")
 
+        user = UserFactory()
+
         # request with anonymous user
         response = self.client.get(url)
 
@@ -70,7 +68,7 @@ class CategoryListViewTest(TestCase):
         self.assertEqual(response.url, "/accounts/login/?next=/products/")
 
         # request with user logged in
-        self.client.login(email=self.user.email, password="12345")
+        self.client.force_login(user=user)
 
         response = self.client.get(url)
 
@@ -100,7 +98,8 @@ class CategoryListViewTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            list(response.context["object_list"]), [self.category1, self.category2]
+            list(response.context["object_list"]),
+            [self.category_anonymous, self.category_all],
         )
 
     def test_category_list_view_visibility_for_digid_user(self):
@@ -114,7 +113,8 @@ class CategoryListViewTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            list(response.context["object_list"]), [self.category2, self.category3]
+            list(response.context["object_list"]),
+            [self.category_all, self.category_citizens],
         )
 
     @override_settings(MIDDLEWARE=PATCHED_MIDDLEWARE)
@@ -128,7 +128,8 @@ class CategoryListViewTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            list(response.context["object_list"]), [self.category2, self.category4]
+            list(response.context["object_list"]),
+            [self.category_all, self.category_companies],
         )
 
     def test_category_list_view_visibility_for_staff_user(self):
@@ -142,20 +143,23 @@ class CategoryListViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             list(response.context["object_list"]),
-            [self.category1, self.category2, self.category3, self.category4],
+            [
+                self.category_anonymous,
+                self.category_all,
+                self.category_citizens,
+                self.category_companies,
+            ],
         )
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class CategoryDetailViewTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.user = DigidUserFactory()
-        cls.user.set_password("12345")
-        cls.user.email = "test@email.com"
-        cls.user.save()
+    def setUp(self):
+        super().setUp()
 
-        cls.category = CategoryFactory.create(
+        self.user = DigidUserFactory()
+
+        self.category = CategoryFactory.create(
             name="test cat",
             description="A <em>descriptive</em> description",
             visible_for_anonymous=False,
@@ -175,7 +179,7 @@ class CategoryDetailViewTest(TestCase):
         self.assertEqual(response.url, "/accounts/login/?next=/products/test-cat/")
 
         # request with user logged in
-        self.client.login(email=self.user.email, password="12345")
+        self.client.force_login(user=self.user)
 
         response = self.client.get(url)
 
