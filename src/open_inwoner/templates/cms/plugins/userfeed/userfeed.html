@@ -1,7 +1,7 @@
 {% load i18n icon_tags %}
 
 {% if userfeed %}
-<section class="userfeed">
+<section class="plugin userfeed">
     <h2 class="h2 {% if userfeed.action_required %}indicator{% endif %}">
         {{ instance.title }}
     </h2>
@@ -10,7 +10,7 @@
             {% for line in userfeed.summary %}
             <li class="userfeed__list-item">
                 <p class="userfeed__list-paragraph">{{ line }}</p>
-            </li>            
+            </li>
             {% endfor %}
         </ul>
     </div>
@@ -29,19 +29,6 @@
             </div>
         </a>
         {% endfor %}
-        
-        {# Example of card without action status #}
-{#        <a href="{{ userfeedbackend }}" class="card">#}
-{#            <div class="card__body card__body--tabled">#}
-{#                <p class="p tabled__value">Bijzondere bijstand aanvragen</p>#}
-{#                <h2 class="userfeed__heading">#}
-{#                    <span class="">Status gewijzigd naar &lsquo;<span class="status">in behandeling</span>&rsquo;</span>#}
-{#                </h2>#}
-{#                <span class="button button--icon-before button--transparent button--secondary">#}
-{#                {% icon icon="east" icon_position="after" primary=True outlined=True %}#}
-{#                </span>#}
-{#            </div>#}
-{#        </a>#}
     </div>
 </section>
 {% endif %}

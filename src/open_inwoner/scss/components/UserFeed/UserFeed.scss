@@ -1,6 +1,5 @@
 .userfeed {
   position: relative;
-  margin-top: var(--row-height);
 
   &__summary {
     background-color: var(--color-white);
@@ -64,6 +63,10 @@
     margin: 0;
   }
 
+  .card-container {
+    grid-row-gap: var(--spacing-medium);
+  }
+
   .card--status {
     padding-top: 5px;
     background-color: var(--color-danger-lightest);
@@ -85,9 +88,4 @@
       bottom: var(--spacing-medium);
     }
   }
-}
-
-/// Contextual
-.userfeed + h2 {
-  margin-top: var(--row-height);
 }
