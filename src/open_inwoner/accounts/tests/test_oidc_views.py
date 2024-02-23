@@ -1,4 +1,5 @@
 from hashlib import md5
+from typing import Literal
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
@@ -6,7 +7,9 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase, modify_settings, override_settings
 from django.urls import reverse
 
+import requests
 import requests_mock
+from django_webtest import DjangoTestApp, DjangoWebtestResponse, WebTest
 from furl import furl
 from mozilla_django_oidc_db.models import OpenIDConnectConfig
 from pyquery import PyQuery as PQ
@@ -27,6 +30,52 @@ from ..choices import LoginTypeChoices
 from .factories import DigidUserFactory, UserFactory, eHerkenningUserFactory
 
 User = get_user_model()
+
+
+def perform_oidc_login(
+    app: DjangoTestApp,
+    login_type: Literal["digid", "eherkenning"],
+    redirect_url: str = None,
+) -> DjangoWebtestResponse:
+    """
+    Perform the full OIDC login flow for DigiD or eHerkenning
+    """
+    login_url = furl(reverse("login"))
+    if redirect_url:
+        login_url.set({"next": redirect_url})
+
+    login_response = app.get(login_url)
+
+    doc = PQ(login_response.content)
+    login_link = doc.find(f".link--{login_type}")
+    init_url = login_link.attr("href")
+
+    init_response = app.get(init_url)
+
+    # Should redirect to identity provider
+    assert init_response.status_code == 302
+
+    callback_url = reverse(f"{login_type}_oidc:callback")
+
+    with requests_mock.Mocker() as m:
+        callback_url = (
+            furl(f"http://testserver{callback_url}")
+            .set(
+                {
+                    "state": list(app.session["oidc_states"].keys())[0],
+                    "code": "mock",
+                }
+            )
+            .url
+        )
+        # Posting to the identity provider endpoint should redirect us to the callback
+        m.post(init_response.url, status_code=302, headers={"Location": callback_url})
+
+        auth_response_redirect = requests.post(init_response.url, allow_redirects=False)
+
+    callback_response = app.get(auth_response_redirect.headers["location"])
+
+    return callback_response
 
 
 class OIDCFlowTests(TestCase):
@@ -403,7 +452,8 @@ class OIDCFlowTests(TestCase):
                 self.assertEqual(response.status_code, 403)
 
 
-class DigiDOIDCFlowTests(TestCase):
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+class DigiDOIDCFlowTests(WebTest):
     @patch("open_inwoner.haalcentraal.signals.update_brp_data_in_db")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
@@ -578,6 +628,7 @@ class DigiDOIDCFlowTests(TestCase):
         mock_store_tokens,
         mock_get_userinfo,
     ):
+        user = DigidUserFactory.create(bsn="123456782")
         mock_get_userinfo.return_value = {
             "sub": "some_username",
             "bsn": "123456782",
@@ -767,9 +818,128 @@ class DigiDOIDCFlowTests(TestCase):
 
         self.assertEqual(error_msg, str(GENERIC_DIGID_ERROR_MSG))
 
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
+    @patch(
+        "digid_eherkenning_oidc_generics.models.OpenIDConnectDigiDConfig.get_solo",
+        return_value=OpenIDConnectDigiDConfig(
+            id=1, enabled=True, oidc_op_authorization_endpoint="http://idp.local/auth"
+        ),
+    )
+    def test_redirect_after_login_with_registration(
+        self,
+        mock_get_solo,
+        mock_get_token,
+        mock_verify_token,
+        mock_store_tokens,
+        mock_get_userinfo,
+    ):
+        """
+        Full authentication flow with redirect after successful login and registration
+        """
+        mock_get_userinfo.return_value = {
+            "sub": "some_username",
+            "bsn": "123456782",
+        }
+
+        redirect_url = reverse("profile:detail")
+
+        callback_response = perform_oidc_login(
+            self.app, "digid", redirect_url=redirect_url
+        )
+
+        user = User.objects.get()
+
+        self.assertEqual(user.pk, int(self.app.session.get("_auth_user_id")))
+        self.assertEqual(user.bsn, "123456782")
+
+        self.assertRedirects(
+            callback_response, reverse("profile:detail"), fetch_redirect_response=False
+        )
+
+        response = self.app.get(callback_response.url)
+
+        self.assertRedirects(
+            response,
+            furl(reverse("profile:registration_necessary"))
+            .set({"next": reverse("profile:detail")})
+            .url,
+            fetch_redirect_response=False,
+        )
+
+        necessary_fields_response = self.app.get(response.url)
+        form = necessary_fields_response.forms["necessary-form"]
+
+        form["first_name"] = "a"
+        form["last_name"] = "a"
+        form["email"] = "foo@bar.org"
+
+        necessary_fields_response = form.submit()
+
+        self.assertRedirects(
+            necessary_fields_response,
+            reverse("profile:detail"),
+            fetch_redirect_response=False,
+        )
+
+        profile_response = self.app.get(necessary_fields_response.url)
+
+        self.assertEqual(profile_response.status_code, 200)
+
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
+    @patch(
+        "digid_eherkenning_oidc_generics.models.OpenIDConnectDigiDConfig.get_solo",
+        return_value=OpenIDConnectDigiDConfig(
+            id=1, enabled=True, oidc_op_authorization_endpoint="http://idp.local/auth"
+        ),
+    )
+    def test_redirect_after_login_no_registration(
+        self,
+        mock_get_solo,
+        mock_get_token,
+        mock_verify_token,
+        mock_store_tokens,
+        mock_get_userinfo,
+    ):
+        """
+        Full authentication flow with redirect after successful login
+        """
+        # Create a user that already has a proper email adress, to avoid necessary field
+        # registration
+        DigidUserFactory.create(bsn="123456782", email="foo@bar.com")
+
+        mock_get_userinfo.return_value = {
+            "sub": "some_username",
+            "bsn": "123456782",
+        }
+
+        redirect_url = reverse("profile:detail")
+
+        callback_response = perform_oidc_login(
+            self.app, "digid", redirect_url=redirect_url
+        )
+
+        user = User.objects.get()
+
+        self.assertEqual(user.pk, int(self.app.session.get("_auth_user_id")))
+        self.assertEqual(user.bsn, "123456782")
+
+        self.assertRedirects(
+            callback_response, reverse("profile:detail"), fetch_redirect_response=False
+        )
+
+        profile_response = self.app.get(callback_response.url)
+
+        self.assertEqual(profile_response.status_code, 200)
+
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class eHerkenningOIDCFlowTests(TestCase):
+class eHerkenningOIDCFlowTests(WebTest):
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     @patch("open_inwoner.kvk.signals.KvKClient.retrieve_rsin_with_kvk")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
@@ -1014,7 +1184,7 @@ class eHerkenningOIDCFlowTests(TestCase):
     ):
         mock_get_userinfo.return_value = {
             "sub": "some_username",
-            "bsn": "123456782",
+            "kvk": "12345678",
         }
 
         session = self.client.session
@@ -1066,7 +1236,7 @@ class eHerkenningOIDCFlowTests(TestCase):
     ):
         mock_get_userinfo.return_value = {
             "sub": "some_username",
-            "bsn": "123456782",
+            "kvk": "12345678",
         }
 
         session = self.client.session
@@ -1119,7 +1289,7 @@ class eHerkenningOIDCFlowTests(TestCase):
         mock_verify_token.side_effect = ValidationError("Something went wrong")
         mock_get_userinfo.return_value = {
             "sub": "some_username",
-            "bsn": "123456782",
+            "kvk": "12345678",
         }
 
         session = self.client.session
@@ -1147,3 +1317,248 @@ class eHerkenningOIDCFlowTests(TestCase):
         error_msg = doc.find(".notification__content").text()
 
         self.assertEqual(error_msg, str(GENERIC_EHERKENNING_ERROR_MSG))
+
+    @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
+    @patch("open_inwoner.utils.context_processors.SiteConfiguration")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
+    @patch(
+        "digid_eherkenning_oidc_generics.models.OpenIDConnectEHerkenningConfig.get_solo",
+        return_value=OpenIDConnectEHerkenningConfig(
+            id=1, enabled=True, oidc_op_authorization_endpoint="http://idp.local/auth"
+        ),
+    )
+    def test_redirect_after_login_with_registration_and_branch_selection(
+        self,
+        mock_get_solo,
+        mock_get_token,
+        mock_verify_token,
+        mock_store_tokens,
+        mock_get_userinfo,
+        mock_siteconfig,
+        mock_kvk,
+    ):
+        """
+        Full authentication flow with redirect after successful login
+        """
+        mock_get_userinfo.return_value = {
+            "sub": "some_username",
+            "kvk": "12345678",
+        }
+        mock_siteconfig.return_value = SiteConfiguration(id=1, eherkenning_enabled=True)
+        mock_kvk.return_value = [
+            {"kvkNummer": "12345678"},
+            {"kvkNummer": "12345678", "vestigingsnummer": "1234"},
+        ]
+
+        self.assertEqual(User.objects.count(), 0)
+
+        redirect_url = reverse("profile:detail")
+
+        callback_response = perform_oidc_login(
+            self.app, "eherkenning", redirect_url=redirect_url
+        )
+
+        user = User.objects.get()
+
+        self.assertEqual(user.pk, int(self.app.session.get("_auth_user_id")))
+        self.assertEqual(user.kvk, "12345678")
+
+        self.assertRedirects(
+            callback_response, reverse("profile:detail"), fetch_redirect_response=False
+        )
+
+        response = self.app.get(callback_response.url)
+
+        self.assertRedirects(
+            response,
+            furl(reverse("kvk:branches")).set({"next": reverse("profile:detail")}).url,
+            fetch_redirect_response=False,
+        )
+
+        branches_response = self.app.get(response.url)
+        form = branches_response.forms["eherkenning-branch-form"]
+        form["branch_number"] = "1234"
+        branches_response = form.submit()
+
+        self.assertRedirects(
+            branches_response,
+            furl(reverse("profile:detail"))
+            .set({"next": reverse("profile:detail")})
+            .url,
+            fetch_redirect_response=False,
+        )
+
+        necessary_fields_response = self.app.get(branches_response.url).follow()
+
+        form = necessary_fields_response.forms["necessary-form"]
+
+        form["email"] = "foo@bar.org"
+
+        necessary_fields_response = form.submit()
+
+        self.assertRedirects(
+            necessary_fields_response,
+            reverse("profile:detail"),
+            fetch_redirect_response=False,
+        )
+
+        profile_response = self.app.get(necessary_fields_response.url)
+
+        self.assertEqual(profile_response.status_code, 200)
+
+    @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
+    @patch("open_inwoner.utils.context_processors.SiteConfiguration")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
+    @patch(
+        "digid_eherkenning_oidc_generics.models.OpenIDConnectEHerkenningConfig.get_solo",
+        return_value=OpenIDConnectEHerkenningConfig(
+            id=1, enabled=True, oidc_op_authorization_endpoint="http://idp.local/auth"
+        ),
+    )
+    def test_redirect_after_login_no_registration_with_branch_selection(
+        self,
+        mock_get_solo,
+        mock_get_token,
+        mock_verify_token,
+        mock_store_tokens,
+        mock_get_userinfo,
+        mock_siteconfig,
+        mock_kvk,
+    ):
+        """
+        Full authentication flow with redirect after successful login
+        """
+        user = eHerkenningUserFactory.create(kvk="12345678")
+        mock_get_userinfo.return_value = {
+            "sub": "some_username",
+            "kvk": "12345678",
+        }
+        mock_siteconfig.return_value = SiteConfiguration(id=1, eherkenning_enabled=True)
+        mock_kvk.return_value = [
+            {"kvkNummer": "12345678"},
+            {"kvkNummer": "12345678", "vestigingsnummer": "1234"},
+        ]
+
+        self.assertEqual(User.objects.count(), 1)
+
+        redirect_url = reverse("profile:detail")
+
+        callback_response = perform_oidc_login(
+            self.app, "eherkenning", redirect_url=redirect_url
+        )
+
+        user = User.objects.get()
+
+        self.assertEqual(user.pk, int(self.app.session.get("_auth_user_id")))
+        self.assertEqual(user.kvk, "12345678")
+
+        self.assertRedirects(
+            callback_response, reverse("profile:detail"), fetch_redirect_response=False
+        )
+
+        response = self.app.get(callback_response.url)
+
+        self.assertRedirects(
+            response,
+            furl(reverse("kvk:branches")).set({"next": reverse("profile:detail")}).url,
+            fetch_redirect_response=False,
+        )
+
+        branches_response = self.app.get(response.url)
+        form = branches_response.forms["eherkenning-branch-form"]
+        form["branch_number"] = "1234"
+        branches_response = form.submit()
+
+        self.assertRedirects(
+            branches_response,
+            furl(reverse("profile:detail"))
+            .set({"next": reverse("profile:detail")})
+            .url,
+            fetch_redirect_response=False,
+        )
+
+        profile_response = self.app.get(branches_response.url)
+
+        self.assertEqual(profile_response.status_code, 200)
+
+    @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
+    @patch("open_inwoner.utils.context_processors.SiteConfiguration")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
+    @patch(
+        "digid_eherkenning_oidc_generics.models.OpenIDConnectEHerkenningConfig.get_solo",
+        return_value=OpenIDConnectEHerkenningConfig(
+            id=1, enabled=True, oidc_op_authorization_endpoint="http://idp.local/auth"
+        ),
+    )
+    def test_redirect_after_login_no_registration_and_no_branch_selection(
+        self,
+        mock_get_solo,
+        mock_get_token,
+        mock_verify_token,
+        mock_store_tokens,
+        mock_get_userinfo,
+        mock_siteconfig,
+        mock_kvk,
+    ):
+        """
+        Full authentication flow with redirect after successful login
+        """
+        user = eHerkenningUserFactory.create(kvk="12345678")
+        mock_get_userinfo.return_value = {
+            "sub": "some_username",
+            "kvk": "12345678",
+        }
+        mock_siteconfig.return_value = SiteConfiguration(id=1, eherkenning_enabled=True)
+        mock_kvk.return_value = [
+            {"kvkNummer": "12345678"},
+        ]
+
+        self.assertEqual(User.objects.count(), 1)
+
+        redirect_url = reverse("profile:detail")
+
+        callback_response = perform_oidc_login(
+            self.app, "eherkenning", redirect_url=redirect_url
+        )
+
+        user = User.objects.get()
+
+        self.assertEqual(user.pk, int(self.app.session.get("_auth_user_id")))
+        self.assertEqual(user.kvk, "12345678")
+
+        self.assertRedirects(
+            callback_response, reverse("profile:detail"), fetch_redirect_response=False
+        )
+
+        response = self.app.get(callback_response.url)
+
+        # User is redirect to branch selection, but immediately redirected because there
+        # is only one branch
+        self.assertRedirects(
+            response,
+            furl(reverse("kvk:branches")).set({"next": reverse("profile:detail")}).url,
+            fetch_redirect_response=False,
+        )
+
+        profile_response = self.app.get(response.url)
+
+        self.assertRedirects(
+            profile_response,
+            furl(reverse("profile:detail"))
+            .set({"next": reverse("profile:detail")})
+            .url,
+            fetch_redirect_response=False,
+        )
+
+        profile_response = self.app.get(profile_response.url)
+
+        self.assertEqual(profile_response.status_code, 200)
