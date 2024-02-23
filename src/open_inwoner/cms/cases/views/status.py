@@ -19,6 +19,7 @@ from django_htmx.http import HttpResponseClientRedirect
 from mail_editor.helpers import find_template
 from view_breadcrumbs import BaseBreadcrumbMixin
 from zgw_consumers.api_models.constants import RolOmschrijving
+from zgw_consumers.concurrent import parallel
 
 from open_inwoner.openklant.clients import build_client as build_client_openklant
 from open_inwoner.openklant.models import OpenKlantConfig
@@ -547,16 +548,11 @@ class InnerCaseDetailView(
 
         # get the information objects for the case objects
 
-        # TODO we'd like to use parallel() but it is borked in tests
-        # with parallel() as executor:
-        #     info_objects = executor.map(
-        #         fetch_single_information_object,
-        #         [case_info.informatieobject for case_info in case_info_objects],
-        #     )
-        info_objects = [
-            fetch_single_information_object_url(case_info.informatieobject)
-            for case_info in case_info_objects
-        ]
+        with parallel() as executor:
+            info_objects = executor.map(
+                fetch_single_information_object_url,
+                [case_info.informatieobject for case_info in case_info_objects],
+            )
 
         config = OpenZaakConfig.get_solo()
         documents = []

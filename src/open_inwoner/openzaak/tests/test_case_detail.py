@@ -3,7 +3,7 @@ from unittest.mock import Mock, patch
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.test import RequestFactory
+from django.test import RequestFactory, TransactionTestCase
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -58,7 +58,7 @@ PATCHED_MIDDLEWARE = [
     ROOT_URLCONF="open_inwoner.cms.tests.urls",
     MIDDLEWARE=PATCHED_MIDDLEWARE,
 )
-class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
+class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, TransactionTestCase):
     def setUp(self):
         super().setUp()
 
@@ -620,7 +620,9 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         status_new_obj.statustype = factory(StatusType, self.status_type_new)
         status_finish_obj.statustype = factory(StatusType, self.status_type_finish)
 
-        response = self.app.get(self.case_detail_url, user=self.user)
+        self.client.force_login(user=self.user)
+
+        response = self.client.get(self.case_detail_url)
 
         self.assertEqual(
             response.context.get("case"),
@@ -713,7 +715,9 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         status_new_obj.statustype = factory(StatusType, self.status_type_new)
         status_finish_obj.statustype = factory(StatusType, self.status_type_finish)
 
-        response = self.app.get(self.case_detail_url, user=self.user)
+        self.client.force_login(user=self.user)
+
+        response = self.client.get(self.case_detail_url)
 
         self.assertEqual(
             response.context.get("case"),
@@ -856,7 +860,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         self._setUpMocks(m)
 
-        response = self.app.get(self.case_detail_url, user=self.user)
+        response = self.client.get(self.case_detail_url)
 
         case = response.context.get("case")
         first_status = case["statuses"][0]
@@ -953,7 +957,9 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         status_new_obj.statustype = factory(StatusType, self.status_type_new)
         status_finish_obj.statustype = factory(StatusType, self.status_type_finish)
 
-        response = self.app.get(self.case_detail_url, user=self.user)
+        self.client.force_login(user=self.user)
+
+        response = self.client.get(self.case_detail_url)
 
         documents = response.context.get("case")["documents"]
 
@@ -1012,7 +1018,9 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         status_new_obj.statustype = factory(StatusType, self.status_type_new)
         status_finish_obj.statustype = factory(StatusType, self.status_type_finish)
 
-        response = self.app.get(self.case_detail_url, user=self.user)
+        self.client.force_login(user=self.user)
+
+        response = self.client.get(self.case_detail_url)
 
         documents = response.context.get("case")["documents"]
 
@@ -1048,7 +1056,9 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         status_new_obj.statustype = factory(StatusType, self.status_type_new)
         status_finish_obj.statustype = factory(StatusType, self.status_type_finish)
 
-        response = self.app.get(self.case_detail_url, user=self.user)
+        self.client.force_login(user=self.user)
+
+        response = self.client.get(self.case_detail_url)
 
         self.assertEqual(
             response.context.get("case")["statuses"],
@@ -1103,12 +1113,14 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             zaaktype_uuids=[self.zaaktype["uuid"]],
             document_upload_description="- Foo\n- bar",
         )
-        response = self.app.get(
+
+        self.client.force_login(user=self.user)
+
+        response = self.client.get(
             reverse(
                 "cases:case_detail_content",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
-            user=self.user,
         )
 
         doc = PyQuery(response.content)
@@ -1121,14 +1133,18 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
     def test_new_docs(self, m):
         self._setUpMocks(m)
 
-        response = self.app.get(self.case_detail_url, user=self.user)
+        self.client.force_login(user=self.user)
+
+        response = self.client.get(self.case_detail_url)
 
         self.assertEqual(response.context.get("case")["new_docs"], True)
 
     def test_page_displays_expected_data(self, m):
         self._setUpMocks(m)
 
-        response = self.app.get(self.case_detail_url, user=self.user)
+        self.client.force_login(user=self.user)
+
+        response = self.client.get(self.case_detail_url)
 
         self.assertContains(response, "ZAAK-2022-0000000024")
         self.assertContains(response, "Coffee zaaktype")
@@ -1136,6 +1152,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
     def test_page_displays_expected_data_for_eherkenning_user(self, m):
         self._setUpMocks(m)
+
+        self.client.force_login(user=self.eherkenning_user)
 
         for fetch_eherkenning_zaken_with_rsin in [True, False]:
             with self.subTest(
@@ -1146,9 +1164,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 )
                 self.config.save()
 
-                response = self.app.get(
+                response = self.client.get(
                     self.eherkenning_case_detail_url,
-                    user=self.eherkenning_user,
                 )
 
                 self.assertContains(response, "ZAAK-2022-0000000025")
@@ -1195,10 +1212,12 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
     def test_page_reformats_zaak_identificatie(self, m):
         self._setUpMocks(m)
 
+        self.client.force_login(user=self.user)
+
         with patch(
             "open_inwoner.openzaak.api_models.Zaak._format_zaak_identificatie",
         ) as spy_format:
-            self.app.get(self.case_detail_url, user=self.user)
+            self.client.get(self.case_detail_url)
 
         # _format_zaak_identificatie is called twice on requesting DetailVew:
         # once for the log, once for adding case to context
@@ -1214,8 +1233,11 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             translation="Translated Second Status Type",
         )
         self._setUpMocks(m)
-        response = self.app.get(
-            self.case_detail_url, user=self.user, headers={"HX-Request": "true"}
+
+        self.client.force_login(user=self.user)
+
+        response = self.client.get(
+            self.case_detail_url, headers={"HX-Request": "true"}
         )
         self.assertNotContains(response, st1.status)
         self.assertNotContains(response, st2.status)
@@ -1225,7 +1247,9 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
     def test_when_accessing_case_detail_a_timelinelog_is_created(self, m):
         self._setUpMocks(m)
 
-        self.app.get(self.case_detail_url, user=self.user)
+        self.client.force_login(user=self.user)
+
+        self.client.get(self.case_detail_url)
 
         log = TimelineLog.objects.last()
         self.assertIn(self.zaak["identificatie"], log.extra_data["message"])
@@ -1235,7 +1259,9 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
     def test_case_io_objects_are_retrieved_when_user_logged_in_via_digid(self, m):
         self._setUpMocks(m)
 
-        response = self.app.get(self.case_detail_url, user=self.user)
+        self.client.force_login(user=self.user)
+
+        response = self.client.get(self.case_detail_url)
         documents = response.context.get("case", {}).get("documents")
         self.assertEquals(len(documents), 2)
         self.assertEquals(
@@ -1252,7 +1278,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             last_name="",
             login_type=LoginTypeChoices.default,
         )
-        response = self.app.get(self.case_detail_url, user=user)
+
+        self.client.force_login(user=user)
+
+        response = self.client.get(self.case_detail_url)
 
         self.assertTemplateUsed("pages/cases/403.html")
         self.assertContains(
@@ -1262,7 +1291,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
     def test_anonymous_user_has_no_access_to_status_page(self, m):
         self._setUpMocks(m)
         user = AnonymousUser()
-        response = self.app.get(self.case_detail_url, user=user)
+
+        self.client.force_login(user=user)
+
+        response = self.client.get(self.case_detail_url)
 
         self.assertRedirects(
             response,
@@ -1285,7 +1317,9 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         #     f"{ZAKEN_ROOT}statussen?zaak={self.zaak['url']}",
         #     json=paginated_response([self.status_finish, self.status_new]),
         # )
-        response = self.app.get(self.case_detail_url, user=self.user)
+        self.client.force_login(user=self.user)
+
+        response = self.client.get(self.case_detail_url)
 
         self.assertTemplateUsed("pages/cases/403.html")
         self.assertContains(
@@ -1314,6 +1348,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             json=paginated_response([not_initiator_role]),
         )
 
+        self.client.force_login(user=self.eherkenning_user)
+
         for fetch_eherkenning_zaken_with_rsin in [True, False]:
             with self.subTest(
                 fetch_eherkenning_zaken_with_rsin=fetch_eherkenning_zaken_with_rsin
@@ -1323,9 +1359,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 )
                 self.config.save()
 
-                response = self.app.get(
-                    self.case_detail_url, user=self.eherkenning_user
-                )
+                response = self.client.get(self.case_detail_url)
 
                 self.assertTemplateUsed("pages/cases/403.html")
                 self.assertContains(
@@ -1432,7 +1466,9 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.eherkenning_user.rsin = ""
         self.eherkenning_user.save()
 
-        response = self.app.get(self.case_detail_url, user=self.eherkenning_user)
+        self.client.force_login(user=self.user)
+
+        response = self.client.get(self.case_detail_url)
 
         self.assertTemplateUsed("pages/cases/403.html")
         self.assertContains(
@@ -1453,12 +1489,17 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             indicatieInternOfExtern="intern",
         )
         m.get(self.zaaktype["url"], json=zaaktype_intern)
-        self.app.get(self.informatie_object_file.url, user=self.user, status=403)
+
+        self.client.force_login(user=self.user)
+
+        self.client.get(self.informatie_object_file.url)
 
     def test_no_data_is_retrieved_when_http_404(self, m):
         m.get(self.zaak["url"], status_code=404)
 
-        response = self.app.get(self.case_detail_url, user=self.user)
+        self.client.force_login(user=self.user)
+
+        response = self.client.get(self.case_detail_url)
 
         self.assertIsNone(response.context.get("case"))
         self.assertContains(response, _("There is no available data at the moment."))
@@ -1466,7 +1507,9 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
     def test_no_data_is_retrieved_when_http_500(self, m):
         m.get(self.zaak["url"], status_code=500)
 
-        response = self.app.get(self.case_detail_url, user=self.user)
+        self.client.force_login(user=self.user)
+
+        response = self.client.get(self.case_detail_url)
 
         self.assertIsNone(response.context.get("case"))
         self.assertContains(response, _("There is no available data at the moment."))
@@ -1479,12 +1522,13 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             json=paginated_response([self.user_role, self.not_initiator_role]),
         )
 
-        response = self.app.get(
+        self.client.force_login(user=self.user)
+
+        response = self.client.get(
             reverse(
                 "cases:case_detail_content",
                 kwargs={"object_id": self.zaak_invisible["uuid"]},
             ),
-            user=self.user,
         )
 
         self.assertTemplateUsed("pages/cases/403.html")
@@ -1514,12 +1558,13 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             document_upload_description="- Foo\n- bar",
         )
 
-        response = self.app.get(
+        self.client.force_login(user=self.user)
+
+        response = self.client.get(
             reverse(
                 "cases:case_detail_content",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
-            user=self.user,
         )
         form = response.forms["document-upload"]
         type_field = form["type"]
@@ -1559,12 +1604,13 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             document_upload_enabled=True,
         )
 
-        response = self.app.get(
+        self.client.force_login(user=self.user)
+
+        response = self.client.get(
             reverse(
                 "cases:case_detail_content",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
-            user=self.user,
         )
         form = response.forms["document-upload"]
         type_field = form["type"]
@@ -1593,12 +1639,14 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             document_upload_enabled=False,
             description="some description content",
         )
-        response = self.app.get(
+
+        self.client.force_login(user=self.user)
+
+        response = self.client.get(
             reverse(
                 "cases:case_detail_content",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
-            user=self.user,
         )
 
         self.assertContains(response, _("some description content"))
@@ -1627,12 +1675,13 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         )
         status_new_obj.statustype = factory(StatusType, self.status_type_new)
 
-        response = self.app.get(
+        self.client.force_login(user=self.user)
+
+        response = self.client.get(
             reverse(
                 "cases:case_detail_content",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
-            user=self.user,
         )
 
         self.assertContains(
@@ -1643,12 +1692,14 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self._setUpMocks(m)
 
         m.get(self.zaak["url"], status_code=500)
-        response = self.app.get(
+
+        self.client.force_login(user=self.user)
+
+        response = self.client.get(
             reverse(
                 "cases:case_detail_content",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
-            user=self.user,
         )
 
         self.assertNotIn("document-upload", response.forms)
@@ -1659,12 +1710,13 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
     ):
         self._setUpMocks(m)
 
-        response = self.app.get(
+        self.client.force_login(user=self.user)
+
+        response = self.client.get(
             reverse(
                 "cases:case_detail_content",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
-            user=self.user,
         )
 
         self.assertNotIn("document-upload", response.forms)
@@ -1687,7 +1739,9 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             document_upload_enabled=True,
         )
 
-        response = self.app.get(self.case_detail_url, user=self.user)
+        self.client.force_login(user=self.user)
+
+        response = self.client.get(self.case_detail_url)
         form = response.forms["document-upload"]
         form.action = reverse(
             "cases:case_detail_document_form", kwargs={"object_id": self.zaak["uuid"]}
@@ -1703,7 +1757,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             reverse("cases:case_detail", kwargs={"object_id": str(self.zaak["uuid"])}),
         )
 
-        redirect = self.app.get(form_response.headers["HX-Redirect"])
+        redirect = self.client.get(form_response.headers["HX-Redirect"])
         redirect_messages = list(redirect.context["messages"])
 
         self.assertEqual(
@@ -1731,7 +1785,9 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             document_upload_enabled=True,
         )
 
-        response = self.app.get(self.case_detail_url, user=self.user)
+        self.client.force_login(user=self.user)
+
+        response = self.client.get(self.case_detail_url)
         form = response.forms["document-upload"]
         form.action = reverse(
             "cases:case_detail_document_form", kwargs={"object_id": self.zaak["uuid"]}
@@ -1746,7 +1802,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             reverse("cases:case_detail", kwargs={"object_id": str(self.zaak["uuid"])}),
         )
 
-        redirect = self.app.get(form_response.headers["HX-Redirect"])
+        redirect = self.client.get(form_response.headers["HX-Redirect"])
         redirect_messages = list(redirect.context["messages"])
         upload_request = next(
             request
@@ -1780,12 +1836,13 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             document_upload_enabled=True,
         )
 
-        response = self.app.get(
+        self.client.force_login(user=self.user)
+
+        response = self.client.get(
             reverse(
                 "cases:case_detail_content",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
-            user=self.user,
         )
         form = response.forms["document-upload"]
         form["type"] = zaak_type_iotc.id
@@ -1823,12 +1880,13 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.config.max_upload_size = 10 / (1024**2)
         self.config.save()
 
-        response = self.app.get(
+        self.client.force_login(user=self.user)
+
+        response = self.client.get(
             reverse(
                 "cases:case_detail_content",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
-            user=self.user,
         )
         form = response.forms["document-upload"]
 
@@ -1857,12 +1915,13 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             document_upload_enabled=True,
         )
 
-        response = self.app.get(
+        self.client.force_login(user=self.user)
+
+        response = self.client.get(
             reverse(
                 "cases:case_detail_content",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
-            user=self.user,
         )
 
         self.assertContains(
@@ -1882,12 +1941,13 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             description="some description content",
         )
 
-        response = self.app.get(
+        self.client.force_login(user=self.user)
+
+        response = self.client.get(
             reverse(
                 "cases:case_detail_content",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
-            user=self.user,
         )
 
         self.assertContains(response, _("some description content"))
@@ -1903,12 +1963,13 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             description="",
         )
 
-        response = self.app.get(
+        self.client.force_login(user=self.user)
+
+        response = self.client.get(
             reverse(
                 "cases:case_detail_content",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
-            user=self.user,
         )
 
         self.assertContains(
@@ -1927,12 +1988,13 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             external_document_upload_url="https://test.example.com",
         )
 
-        response = self.app.get(
+        self.client.force_login(user=self.user)
+
+        response = self.client.get(
             reverse(
                 "cases:case_detail_content",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
-            user=self.user,
         )
 
         self.assertNotContains(
@@ -1950,12 +2012,13 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             document_upload_enabled=True,
         )
 
-        response = self.app.get(
+        self.client.force_login(user=self.user)
+
+        response = self.client.get(
             reverse(
                 "cases:case_detail_content",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
-            user=self.user,
         )
 
         self.assertNotContains(
@@ -1973,12 +2036,13 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             external_document_upload_url="",
         )
 
-        response = self.app.get(
+        self.client.force_login(user=self.user)
+
+        response = self.client.get(
             reverse(
                 "cases:case_detail_content",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
-            user=self.user,
         )
 
         self.assertNotContains(
@@ -2003,9 +2067,11 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             document_upload_enabled=True,
         )
 
+        self.client.force_login(user=self.user)
+
         m.post(f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten", status_code=500)
 
-        response = self.app.get(self.case_detail_url, user=self.user)
+        response = self.client.get(self.case_detail_url)
         form = response.forms["document-upload"]
         form.action = reverse(
             "cases:case_detail_document_form", kwargs={"object_id": self.zaak["uuid"]}
@@ -2019,7 +2085,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             reverse("cases:case_detail", kwargs={"object_id": str(self.zaak["uuid"])}),
         )
 
-        redirect = self.app.get(form_response.headers["HX-Redirect"])
+        redirect = self.client.get(form_response.headers["HX-Redirect"])
         form_response_messages = list(redirect.context["messages"])
 
         self.assertEqual(
@@ -2051,7 +2117,9 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         m.post(f"{ZAKEN_ROOT}zaakinformatieobjecten", status_code=500)
 
-        response = self.app.get(self.case_detail_url, user=self.user)
+        self.client.force_login(user=self.user)
+
+        response = self.client.get(self.case_detail_url)
         form = response.forms["document-upload"]
         form.action = reverse(
             "cases:case_detail_document_form", kwargs={"object_id": self.zaak["uuid"]}
@@ -2059,7 +2127,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         form["file"] = Upload("upload.txt", b"data", "text/plain")
         form_response = form.submit()
 
-        redirect = self.app.get(form_response.headers["HX-Redirect"])
+        redirect = self.client.get(form_response.headers["HX-Redirect"])
         form_response_messages = list(redirect.context["messages"])
 
         self.assertEqual(
