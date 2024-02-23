@@ -41,7 +41,10 @@ class OIDCConfigTest(ClearCachesMixin, WebTest):
 
         oidc_login_option = response.pyquery.find(".admin-login-option")
 
-        self.assertEqual(oidc_login_option.text(), _("Login with organization account"))
+        self.assertEqual(
+            oidc_login_option.text(),
+            "{} {}".format(_("or"), _("Login with organization account")),
+        )
 
     def test_admin_only_disabled(self):
         """Assert that the OIDC login option is only displayed for regular users"""
