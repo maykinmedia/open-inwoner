@@ -5,6 +5,7 @@ from django.dispatch import receiver
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.models import User
+from open_inwoner.utils.logentry import system_action
 
 from .utils import update_brp_data_in_db
 
@@ -18,6 +19,14 @@ def on_bsn_change(instance, **kwargs):
         and instance.is_prepopulated is False
         and instance.login_type == LoginTypeChoices.digid
     ):
-        logger.info("Retrieving data for %s from haal centraal based on BSN", instance)
+        try:
+            system_action(
+                "Retrieving data for %s from haal centraal based on BSN",
+                content_object=instance,
+            )
+        except ValueError:
+            logger.info(
+                "Retrieving data for %s from haal centraal based on BSN", instance
+            )
 
         update_brp_data_in_db(instance)

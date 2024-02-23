@@ -105,7 +105,7 @@ class InboxView(
 
         return get_object_or_404(User, uuid=other_user_uuid)
 
-    def get_messages(self, other_user: User) -> List[MessageQuerySet]:
+    def get_messages(self, other_user: User) -> List[Message]:
         """
         Returns the messages (MessageType) of the current conversation.
         """
