@@ -146,6 +146,8 @@ class NecessaryFieldsUserView(LogMixin, LoginRequiredMixin, InviteMixin, UpdateV
 
     def get_success_url(self):
         messages.add_message(self.request, messages.SUCCESS, "Registratie is voltooid")
+        if "next" in self.request.GET:
+            return self.request.GET["next"]
         return reverse("pages-root")
 
     def get_form_kwargs(self):
