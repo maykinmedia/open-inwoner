@@ -376,7 +376,7 @@ django-log-outgoing-requests==0.6.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-django-open-forms-client==0.2.3
+django-open-forms-client==0.3.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
