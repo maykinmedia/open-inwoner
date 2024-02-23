@@ -14,6 +14,7 @@
   /// cards on case detail
   .card {
     margin-bottom: var(--spacing-extra-large);
+
     &__body {
       &.document-upload-description {
         display: flex;
@@ -61,7 +62,7 @@
     }
 
     .file-list,
-    .form__actions {
+    .form__actions--fullwidth {
       display: block;
       margin: 0;
 

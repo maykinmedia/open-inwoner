@@ -1,5 +1,5 @@
 {% load button_tags %}
-<div class="form__actions {% if single %}form__actions--single{% endif %}">
+<div class="form__actions {% if single %}form__actions--single{% endif %} {% if fullwidth %}form__actions--fullwidth{% endif %}">
     {% if secondary_text %}{% button href=secondary_href secondary=secondary text=secondary_text icon=secondary_icon icon_position=secondary_icon_position form_id=form_id %}{% endif %}
     {% if secondary_name %}{% button name=secondary_name type="submit" secondary=secondary text=secondary_text icon=secondary_icon icon_position=secondary_icon_position form_id=form_id %}{% endif %}
     {% if secondary_value %}{% button name=secondary_name value=secondary_value type="submit" secondary=secondary text=secondary_text icon=secondary_icon icon_position=secondary_icon_position form_id=form_id %}{% endif %}
