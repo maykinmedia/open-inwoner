@@ -1,6 +1,7 @@
 from requests.exceptions import RequestException
 from zgw_consumers.constants import APITypes
 
+from open_inwoner.accounts.models import User
 from open_inwoner.accounts.tests.factories import (
     DigidUserFactory,
     eHerkenningUserFactory,
@@ -38,10 +39,13 @@ class MockAPIData:
 
 class MockAPIReadPatchData(MockAPIData):
     def __init__(self):
+        User.objects.filter(email="old@example.com").delete()
         self.user = DigidUserFactory(
             email="old@example.com",
             phonenumber="0100000000",
         )
+
+        User.objects.filter(kvk="12345678").delete()
         self.eherkenning_user = eHerkenningUserFactory(
             email="old2@example.com",
             kvk="12345678",
@@ -130,9 +134,11 @@ class MockAPIReadPatchData(MockAPIData):
 
 class MockAPIReadData(MockAPIData):
     def __init__(self):
+        User.objects.filter(bsn="100000001").delete()
         self.user = DigidUserFactory(
             bsn="100000001",
         )
+        User.objects.filter(kvk="12345678").delete()
         self.eherkenning_user = eHerkenningUserFactory(
             kvk="12345678",
             rsin="000000000",
@@ -347,9 +353,11 @@ class MockAPIReadData(MockAPIData):
 
 class MockAPICreateData(MockAPIData):
     def __init__(self):
+        User.objects.filter(bsn="100000001").delete()
         self.user = DigidUserFactory(
             bsn="100000001",
         )
+        User.objects.filter(kvk="12345678").delete()
         self.eherkenning_user = eHerkenningUserFactory(
             kvk="12345678",
             rsin="000000000",

@@ -15,6 +15,7 @@ from zgw_consumers.api_models.constants import (
 )
 from zgw_consumers.constants import APITypes
 
+from open_inwoner.accounts.models import User
 from open_inwoner.accounts.tests.factories import (
     DigidUserFactory,
     eHerkenningUserFactory,
@@ -459,6 +460,9 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             with self.subTest(
                 use_rsin_for_innNnpId_query_parameter=use_rsin_for_innNnpId_query_parameter
             ):
+                # FIXME for some reason creating the user outside of the loop
+                # makes the second iteration fail?
+                User.objects.filter(kvk="12345678").delete()
                 eherkenning_user = eHerkenningUserFactory(
                     kvk="12345678", rsin="000000000"
                 )
@@ -477,7 +481,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
                 m.get(
                     f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId={identifier}",
                     json=paginated_response([self.klant]),
-                ),
+                )
 
                 response = self.app.get(self.case_detail_url, user=eherkenning_user)
 

@@ -173,7 +173,7 @@ class ContactViewTests(WebTest):
         self.assertEqual(existing_user, pending_invitation)
 
     def test_existing_user_contact_with_case_sensitive_email(self):
-        existing_user = UserFactory(email="user@example.com", bsn="111111111")
+        existing_user = DigidUserFactory(email="user@example.com", bsn="111111111")
         response = self.app.get(self.create_url, user=self.user)
         form = response.forms["contact-form"]
 

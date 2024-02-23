@@ -213,6 +213,7 @@ class ProfileViewTests(WebTest):
             housenumber="42",
             postcode="1234 XY",
             city="The good place",
+            kvk="87654321",
         )
         response = self.app.get(self.url, user=user)
 
