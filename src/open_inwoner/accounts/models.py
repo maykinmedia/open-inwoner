@@ -7,7 +7,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Q, UniqueConstraint
+from django.db.models import CheckConstraint, Q, UniqueConstraint
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.crypto import get_random_string
@@ -287,11 +287,11 @@ class User(AbstractBaseUser, PermissionsMixin):
                 | Q(login_type=LoginTypeChoices.eherkenning),
                 name="check_kvk_or_rsin_only_set_when_login_eherkenning",
             ),
-            CheckConstraint(
-                check=((Q(kvk="") & ~Q(rsin="")) | (~Q(kvk="") & Q(rsin="")))
-                | ~Q(login_type=LoginTypeChoices.eherkenning),
-                name="check_kvk_or_rsin_exclusive_when_login_eherkenning",
-            ),
+            # CheckConstraint(
+            #     check=((Q(kvk="") & ~Q(rsin="")) | (~Q(kvk="") & Q(rsin="")))
+            #     | ~Q(login_type=LoginTypeChoices.eherkenning),
+            #     name="check_kvk_or_rsin_exclusive_when_login_eherkenning",
+            # ),
         ]
 
     def __init__(self, *args, **kwargs):
