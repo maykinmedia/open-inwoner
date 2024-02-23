@@ -1,3 +1,5 @@
+import logging
+
 from django.test import TestCase, override_settings
 
 import requests_mock
@@ -5,6 +7,7 @@ from freezegun import freeze_time
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin
 
 from ...utils.test import ClearCachesMixin
 from ..models import HaalCentraalConfig
@@ -14,7 +17,7 @@ from .mixins import HaalCentraalMixin
 
 @requests_mock.Mocker()
 class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
-    def test_signal_updates_users_data_when_logged_in_via_digid_v_2(self, m):
+    def test_signal_updates_users_data_when_logged_in_via_digid_v_3(self, m):
         self._setUpMocks_v_2(m)
         self._setUpService()
 
@@ -243,7 +246,7 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
         self.assertFalse(user.is_prepopulated)
 
 
-class TestLogging(HaalCentraalMixin, TestCase):
+class TestLogging(HaalCentraalMixin, AssertTimelineLogMixin, TestCase):
     @freeze_time("2021-10-18 13:00:00")
     @requests_mock.Mocker()
     def test_signal_updates_logging(self, m):
@@ -270,9 +273,12 @@ class TestLogging(HaalCentraalMixin, TestCase):
             first_name="", last_name="", login_type=LoginTypeChoices.digid
         )
         user.bsn = "999993847"
+        user.save()
 
-        with self.assertLogs("open_inwoner.haalcentraal.signals"):
-            user.save()
+        self.assertTimelineLog(
+            "Retrieving data for %s from haal centraal based on BSN",
+            level=logging.INFO,
+        )
 
     @requests_mock.Mocker()
     def test_single_entry_is_logged_when_there_is_an_error(self, m):
@@ -295,9 +301,14 @@ class TestLogging(HaalCentraalMixin, TestCase):
         config.save()
 
         user = UserFactory(
-            first_name="", last_name="", login_type=LoginTypeChoices.digid
+            first_name="",
+            last_name="",
+            login_type=LoginTypeChoices.digid,
         )
         user.bsn = "999993847"
+        user.save()
 
-        with self.assertLogs("open_inwoner.haalcentraal.signals"):
-            user.save()
+        self.assertTimelineLog(
+            "Retrieving data for %s from haal centraal based on BSN",
+            level=logging.INFO,
+        )

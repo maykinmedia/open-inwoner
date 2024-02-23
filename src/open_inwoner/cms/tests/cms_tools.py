@@ -2,9 +2,6 @@ from typing import Tuple
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.contrib.sessions.middleware import (
-    SessionMiddleware as DefaultSessionMiddleWare,
-)
 from django.test import RequestFactory
 from django.utils.module_loading import import_string
 
@@ -15,15 +12,7 @@ from cms.models import Placeholder
 from cms.plugin_rendering import ContentRenderer
 
 from open_inwoner.cms.extensions.models import CommonExtension
-
-
-class SessionMiddleware(DefaultSessionMiddleWare):
-    """
-    The `SessionMiddleware` __init__ expects a `get_response` argument in Django 4.2
-    """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(get_response=lambda x: "dummy")
+from open_inwoner.utils.test import SessionMiddleware
 
 
 def create_homepage():
