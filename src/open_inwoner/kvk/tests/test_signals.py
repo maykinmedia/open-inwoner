@@ -1,7 +1,7 @@
 import logging
 
-from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.contrib.auth import get_user_model, user_logged_in
+from django.test import RequestFactory, TestCase
 from django.utils.translation import gettext as _
 
 import requests_mock
@@ -9,6 +9,7 @@ from freezegun import freeze_time
 from timeline_logger.models import TimelineLog
 
 from open_inwoner.accounts.choices import LoginTypeChoices
+from open_inwoner.accounts.models import User
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.utils.logentry import LOG_ACTIONS
 from open_inwoner.utils.test import ClearCachesMixin
@@ -53,8 +54,10 @@ class TestPreSaveSignal(ClearCachesMixin, TestCase):
         user = UserFactory(
             first_name="", infix="", last_name="", login_type=LoginTypeChoices.default
         )
-        user.bsn = "69599084"
-        user.save()
+
+        request = RequestFactory().get("/dummy")
+        request.user = user
+        user_logged_in.send(User, user=user, request=request)
 
         user.refresh_from_db()
 
