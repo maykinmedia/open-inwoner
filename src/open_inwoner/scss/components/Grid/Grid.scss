@@ -9,6 +9,30 @@
     gap: 0;
   }
 
+  &__main {
+    display: grid;
+
+    /// Home grid
+
+    .plugin {
+      padding-top: var(--row-height);
+
+      .utrecht-heading-1 {
+        margin-bottom: var(--spacing-large);
+      }
+
+      .h2 {
+        margin-bottom: var(--spacing-medium);
+      }
+
+      &.userfeed {
+        .h2 {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+
   &--limit &__sidebar,
   &--limit &__main {
     max-height: 75vh;
@@ -56,7 +80,6 @@
   }
 
   &__welcome {
-    margin-bottom: var(--row-height);
     margin-top: -80px;
     background-color: var(--color-white);
     box-shadow: 0 0 var(--row-height) 0 var(--color-gray);
@@ -73,11 +96,4 @@
   .form__grid-box {
     grid-template-columns: 1fr;
   }
-}
-
-.grid + .grid,
-.h1 + .grid,
-.h2 + .grid,
-.h4 + .grid {
-  margin-top: var(--spacing-large);
 }
