@@ -1,7 +1,10 @@
 {% load i18n link_tags render_tags %}
 
-<aside class="faq" aria-label="{% trans "Veelgestelde vragen" %}">
-    {% if title %}<h2 id="faq" class="h2">{{ title }}</h2>{% endif %}
+{% trans "Veelgestelde vragen" as default_title %}
+<aside class="faq" aria-label="{{ default_title }}">
+    {% if not hide_title %}
+        <h2 id="faq" class="h2">{{ title|default:default_title }}</h2>
+    {% endif %}
 
     <ul class="faq__list">
         {% for question in questions %}

@@ -25,7 +25,7 @@ from ..utils.colors import ACCESSIBLE_CONTRAST_RATIO, get_contrast_ratio
 from ..utils.css import ALLOWED_PROPERTIES
 from ..utils.fields import CSSEditorWidget
 from ..utils.iteration import split
-from .models import SiteConfiguration, SiteConfigurationPage
+from .models import CustomFontSet, SiteConfiguration, SiteConfigurationPage
 
 
 @admin.action(description=_("Delete selected websites"))
@@ -60,6 +60,9 @@ class CustomSiteAdmin(SiteAdmin):
         else:
             super().delete_model(request, obj)
 
+    class Media:
+        css = {"all": ("css/admin/admin_overrides.css",)}
+
 
 # re-register `Site` with our CustomSiteAdmin
 admin.site.unregister(Site)
@@ -82,12 +85,20 @@ class SiteConfigurationPageInline(OrderedTabularInline):
     autocomplete_fields = ("flatpage",)
 
 
-class SiteConfigurarionAdminForm(forms.ModelForm):
+class FontConfigurationInline(admin.StackedInline):
+    model = CustomFontSet
+    verbose_name = "Fonts"
+    min_num = 1
+    can_delete = False
+
+
+class SiteConfigurationAdminForm(forms.ModelForm):
     class Meta:
         model = SiteConfiguration
         fields = "__all__"
         widgets = {
             "extra_css": CSSEditorWidget,
+            "login_text": CKEditorWidget,
         }
 
     def clean_redirect_to(self):
@@ -110,7 +121,7 @@ class SiteConfigurarionAdminForm(forms.ModelForm):
 
 
 @admin.register(SiteConfiguration)
-class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
+class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
     save_on_top = True
     fieldsets = (
         (
@@ -144,6 +155,7 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
             {
                 "fields": (
                     "logo",
+                    "email_logo",
                     "footer_logo",
                     "footer_logo_title",
                     "footer_logo_url",
@@ -216,7 +228,15 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                 )
             },
         ),
-        (_("Emails"), {"fields": ("email_new_message",)}),
+        (
+            _("Emails"),
+            {
+                "fields": (
+                    "email_new_message",
+                    "recipients_email_digest",
+                )
+            },
+        ),
         (
             _("Openid Connect"),
             {
@@ -275,8 +295,8 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
         ),
         (_("Social media"), {"fields": ("display_social",)}),
     )
-    inlines = [SiteConfigurationPageInline]
-    form = SiteConfigurarionAdminForm
+    inlines = [SiteConfigurationPageInline, FontConfigurationInline]
+    form = SiteConfigurationAdminForm
 
     readonly_fields = [
         "extra_css_allowed",

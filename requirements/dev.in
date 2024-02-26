@@ -4,9 +4,6 @@
 pip-tools
 
 # Code formatting
-black
-isort
-flake8
 bandit
 
 # Debug tooling
@@ -18,5 +15,6 @@ django-extensions
 sphinx
 sphinx_rtd_theme
 
-# performance testing
+# performance testing / profiling
 locust
+django-silk

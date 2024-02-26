@@ -140,3 +140,14 @@ class KlantContactMoment(ZGWModel):
 
     # open-klant non-standard *AFWIJKING*
     gelezen: bool = False
+
+
+@dataclass
+class ObjectContactMoment(ZGWModel):
+    """
+    Contactmomenten API
+    """
+
+    contactmoment: Union[str, ContactMoment]
+    object: Union[str, Klant]
+    object_type: str

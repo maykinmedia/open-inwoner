@@ -1,0 +1,30 @@
+.wysiwyg {
+  font-family: var(--font-family-body);
+
+  a {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    font-size: var(--font-size-body);
+    line-height: var(--font-line-height-body);
+    text-decoration: none;
+    gap: var(--spacing-small);
+    color: var(--color-secondary);
+
+    word-wrap: break-word;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-family-heading);
+  }
+
+  ul {
+    margin: 0;
+    padding: 0 0 0 var(--font-size-body);
+  }
+}

@@ -87,7 +87,7 @@ class TestMonthlyBenefitsFormView(TestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
         self.assertContains(
-            response, "Geen uitkeringsspecificatie gevonden voor Dec 1985"
+            response, "Geen uitkeringsspecificatie gevonden voor december 1985"
         )
 
     @patch(

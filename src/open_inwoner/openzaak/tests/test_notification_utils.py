@@ -4,7 +4,6 @@ from django.core import mail
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
-from django.utils.formats import date_format
 
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
@@ -42,7 +41,7 @@ class NotificationHandlerUtilsTestCase(TestCase):
             Zaak, "_format_zaak_identificatie"
         ) as format_identificatie:
             format_identificatie.return_value = ret_val
-            send_case_update_email(user, case)
+            send_case_update_email(user, case, "case_status_notification")
 
         format_identificatie.assert_called_once()
 
@@ -54,7 +53,6 @@ class NotificationHandlerUtilsTestCase(TestCase):
         body_html = email.alternatives[0][0]
         self.assertIn(case.identificatie, body_html)
         self.assertIn(case.zaaktype.omschrijving, body_html)
-        self.assertIn(date_format(case.startdatum), body_html)
         self.assertIn(case_url, body_html)
         self.assertIn(config.name, body_html)
 

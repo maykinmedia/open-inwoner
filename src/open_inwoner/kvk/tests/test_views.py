@@ -190,12 +190,12 @@ class KvKViewsTestCase(TestCase):
     def test_get_branches_page(self, mock_solo, mock_kvk):
         mock_kvk.return_value = [
             {
-                "handelsnaam": "Makers and Shakers",
+                "naam": "Makers and Shakers",
                 "kvkNummer": "12345678",
                 "vestigingsnummer": "1234",
             },
             {
-                "handelsnaam": "Makers and Shakers",
+                "naam": "Makers and Shakers",
                 "kvkNummer": "12345678",
                 "vestigingsnummer": "5678",
             },
@@ -221,3 +221,7 @@ class KvKViewsTestCase(TestCase):
         self.assertEqual(branch_inputs[0], doc.find("[id='branch-']")[0])
         self.assertEqual(branch_inputs[1], doc.find("[id='branch-1234']")[0])
         self.assertEqual(branch_inputs[2], doc.find("[id='branch-5678']")[0])
+
+        # chack that company name is displayed for every branch
+        company_name_displays = doc("p:Contains('Makers and Shakers')")
+        self.assertEqual(len(company_name_displays), 3)

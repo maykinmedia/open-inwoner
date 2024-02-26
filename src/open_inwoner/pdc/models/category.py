@@ -7,7 +7,6 @@ from filer.fields.image import FilerImageField
 from treebeard.exceptions import InvalidMoveToDescendant
 from treebeard.mp_tree import MP_MoveHandler, MP_Node
 
-from ...utils.ckeditor import get_rendered_content
 from ..managers import CategoryPublishedQueryset
 
 
@@ -102,6 +101,16 @@ class Category(MP_Node):
             "If configured, the user will be automatically redirected to this link "
             "when accessing the category detail page."
         ),
+    )
+
+    access_groups = models.ManyToManyField(
+        "auth.Group",
+        verbose_name=_("Restrict to admin groups"),
+        blank=True,
+        help_text=_(
+            "If set, only users belonging to this group can edit this category and its products"
+        ),
+        related_name="managed_categories",
     )
 
     objects = CategoryPublishedQueryset.as_manager()

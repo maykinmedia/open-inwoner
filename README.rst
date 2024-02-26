@@ -3,10 +3,10 @@ Open Inwoner
 ==================
 
 
-:Version: 1.13
+:Version: 1.14
 :Source: https://github.com/maykinmedia/open-inwoner
 :Keywords: inwoner
-:PythonVersion: 3.9
+:PythonVersion: 3.11
 
 |build-status| |docker| |black| |python-versions|
 

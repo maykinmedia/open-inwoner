@@ -2,26 +2,27 @@ from django.test import TestCase
 
 import requests_mock
 from zgw_consumers.constants import APITypes
-from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
-from open_inwoner.openzaak.cases import fetch_single_case
+from open_inwoner.openzaak.clients import build_client
 
 from ...utils.test import ClearCachesMixin
 from ..models import OpenZaakConfig
 from .factories import ServiceFactory
+from .helpers import generate_oas_component_cached
 from .shared import ZAKEN_ROOT
 
 
 @requests_mock.Mocker()
 class TestFetchSpecificCase(ClearCachesMixin, TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
-        cls.config = OpenZaakConfig.get_solo()
-        cls.config.zaak_service = cls.zaak_service
-        cls.config.save()
+    def setUp(self):
+        super().setUp()
 
-        cls.zaak = generate_oas_component(
+        self.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
+        self.config = OpenZaakConfig.get_solo()
+        self.config.zaak_service = self.zaak_service
+        self.config.save()
+
+        self.zaak = generate_oas_component_cached(
             "zrc",
             "schemas/Zaak",
             url=f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
@@ -31,11 +32,12 @@ class TestFetchSpecificCase(ClearCachesMixin, TestCase):
             einddatum=None,
         )
 
+        self.client = build_client("zaak")
+
     def test_case_is_retrieved(self, m):
-        mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
         m.get(self.zaak["url"], json=self.zaak)
 
-        case = fetch_single_case("d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d")
+        case = self.client.fetch_single_case("d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d")
 
         self.assertEquals(
             case.url,
@@ -43,20 +45,18 @@ class TestFetchSpecificCase(ClearCachesMixin, TestCase):
         )
 
     def test_no_case_is_retrieved_when_http_404(self, m):
-        mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
         m.get(self.zaak["url"], status_code=404)
 
-        case = fetch_single_case("d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d")
+        case = self.client.fetch_single_case("d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d")
 
         self.assertIsNone(case)
 
     def test_no_case_is_retrieved_when_http_500(self, m):
-        mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
         m.get(
             self.zaak["url"],
             status_code=500,
         )
 
-        case = fetch_single_case("d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d")
+        case = self.client.fetch_single_case("d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d")
 
         self.assertIsNone(case)

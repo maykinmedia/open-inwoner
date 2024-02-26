@@ -2,12 +2,16 @@ import os
 from typing import Callable
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from django.core.files.base import ContentFile
 from django.urls import reverse
 
 from furl import furl
 from playwright.sync_api import Browser, Playwright, sync_playwright
 
 from open_inwoner.accounts.models import User
+from open_inwoner.configurations.choices import CustomFontName
+from open_inwoner.utils.files import OverwriteStorage
+from open_inwoner.utils.test import temp_media_root
 
 BROWSER_DRIVERS = {
     # keys for the E2E_DRIVER environment variable (likely from test matrix)
@@ -24,6 +28,7 @@ def get_driver_name() -> str:
     return os.environ.get("E2E_DRIVER", BROWSER_DEFAULT)
 
 
+@temp_media_root()
 class PlaywrightSyncLiveServerTestCase(StaticLiveServerTestCase):
     """
     base class for convenient synchronous Playwright in Django
@@ -93,6 +98,14 @@ class PlaywrightSyncLiveServerTestCase(StaticLiveServerTestCase):
 
         cls.playwright = sync_playwright().start()
         cls.browser = cls.launch_browser(cls.playwright)
+
+        # Add custom fonts to media folder to avoid test failures
+        storage = OverwriteStorage()
+        for font_name, _ in CustomFontName.choices:
+            storage.save(
+                f"custom_fonts/{font_name}.ttf",
+                ContentFile(b"", name=f"{font_name}.ttf"),
+            )
 
     @classmethod
     def tearDownClass(cls):

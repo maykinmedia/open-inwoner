@@ -14,6 +14,7 @@
   /// cards on case detail
   .card {
     margin-bottom: var(--spacing-extra-large);
+
     &__body {
       &.document-upload-description {
         display: flex;
@@ -39,7 +40,7 @@
         @extend .button--disabled;
         background-color: var(--color-gray);
         border-color: var(--color-gray);
-        color: var(--color-gray-90);
+        color: var(--color-gray-dark-900);
         cursor: default;
         font-weight: bold;
         justify-content: center;
@@ -52,7 +53,7 @@
       @extend .button--disabled;
       background-color: var(--color-gray);
       border-color: var(--color-gray);
-      color: var(--color-gray-90);
+      color: var(--color-gray-dark-900);
       cursor: default;
       font-weight: bold;
       justify-content: center;
@@ -61,7 +62,7 @@
     }
 
     .file-list,
-    .form__actions {
+    .form__actions--fullwidth {
       display: block;
       margin: 0;
 

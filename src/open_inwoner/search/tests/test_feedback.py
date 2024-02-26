@@ -44,7 +44,7 @@ class TestFeedbackFunctionality(ESMixin, WebTest):
 
         feedback = Feedback.objects.get()
 
-        self.assertEqual(feedback.search_query, f"query: keyword1")
+        self.assertEqual(feedback.search_query, "query: keyword1")
         self.assertEqual(feedback.search_url, url)
         self.assertTrue(feedback.positive)
         self.assertEqual(feedback.remark, "Some remark")
@@ -65,7 +65,7 @@ class TestFeedbackFunctionality(ESMixin, WebTest):
 
         feedback = Feedback.objects.get()
 
-        self.assertEqual(feedback.search_query, f"query: keyword1")
+        self.assertEqual(feedback.search_query, "query: keyword1")
         self.assertEqual(feedback.search_url, url)
         self.assertFalse(feedback.positive)
         self.assertEqual(feedback.remark, "Some remark")
@@ -85,7 +85,7 @@ class TestFeedbackFunctionality(ESMixin, WebTest):
 
         feedback = Feedback.objects.get()
 
-        self.assertEqual(feedback.search_query, f"query: keyword1")
+        self.assertEqual(feedback.search_query, "query: keyword1")
         self.assertEqual(feedback.search_url, url)
         self.assertTrue(feedback.positive)
         self.assertEqual(feedback.remark, "Some remark")
@@ -105,7 +105,7 @@ class TestFeedbackFunctionality(ESMixin, WebTest):
 
         feedback = Feedback.objects.get()
 
-        self.assertEqual(feedback.search_query, f"query: keyword1")
+        self.assertEqual(feedback.search_query, "query: keyword1")
         self.assertEqual(feedback.search_url, url)
         self.assertFalse(feedback.positive)
         self.assertEqual(feedback.remark, "Some remark")
@@ -160,7 +160,7 @@ class TestFeedbackFunctionality(ESMixin, WebTest):
 
         feedback = Feedback.objects.get()
 
-        self.assertEqual(feedback.search_query, f"query: keyword1")
+        self.assertEqual(feedback.search_query, "query: keyword1")
         self.assertEqual(feedback.search_url, url)
         self.assertTrue(feedback.positive)
         self.assertEqual(feedback.remark, "Some remark")

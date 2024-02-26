@@ -4,12 +4,14 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from django_webtest import WebTest
+from maykin_2fa.test import disable_admin_mfa
 
 from open_inwoner.accounts.tests.factories import UserFactory
 
 from .factories import OrganizationFactory
 
 
+@disable_admin_mfa()
 class TestLocationFormInput(WebTest):
     @patch("open_inwoner.pdc.models.mixins.geocode_address", side_effect=IndexError)
     def test_exception_is_handled_when_city_and_postcode_are_not_provided(

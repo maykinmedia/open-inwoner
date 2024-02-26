@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n l10n button_tags card_tags faq_tags file_tags grid_tags icon_tags link_tags map_tags notification_tags tag_tags utils condition_tags render_tags anchor_menu_tags product_tags string_tags %}
+{% load i18n l10n button_tags file_tags grid_tags icon_tags link_tags map_tags notification_tags utils render_tags anchor_menu_tags product_tags string_tags %}
 
 {% block header_image %}
 {% if object.image %}
@@ -32,7 +32,7 @@
             {% button icon="edit" text=_("Bewerken in de Admin") hide_text=True href="admin:pdc_product_change" object_id=object.pk %}
         {% endif %}
     </h1>
-    {% tag tags=object.tags.all %}
+    {% include "components/Tag/Tag.html" with tags=object.tags.all only %}
     <p class="p p-summary">{{ object.summary }}</p>
 
     {# Collapsable content #}
@@ -62,7 +62,7 @@
 
     <div class="product-info">
         {% if object.question_set.exists %}
-            {% faq object.question_set.all %}
+            {% include "components/Faq/Faq.html" with questions=object.question_set.all only %}
         {% endif %}
 
         {% if object.files.exists %}
@@ -74,12 +74,12 @@
             {% render_grid %}
                 {% render_column span=6 compact=True %}
                     <h3 class="h3">{% trans "U komt in aanmerking" %}</h3>
-                    {% condition_list conditions=object.conditions.all %}
+                    {% include "components/Condition/ConditionList.html" with conditions=object.conditions.all only %}
                 {% endrender_column %}
 
                 {% render_column start=7 span=6 compact=True %}
                     <h3 class="h3">{% trans "U komt niet in aanmerking" %}</h3>
-                    {% condition_list conditions=object.conditions.all negative=True %}
+                    {% include "components/Condition/ConditionList.html" with conditions=object.conditions.all negative=True only %}
                 {% endrender_column %}
             {% endrender_grid %}
         {% endif %}
@@ -90,27 +90,7 @@
                 {% map centroid.lat centroid.lng id="locations" title=_('Locaties') geojson_feature_collection=object.locations.get_geojson_feature_collection %}
             {% endwith %}
 
-            {% render_card_container columns=3 %}
-                {% for location in object.locations.all %}
-                    {% with location_name=location.name phonenumber=location.phonenumber email=location.email %}
-                        <div class="card card__body">
-                            {% if location_name %}
-                                {% link href=location.get_absolute_url primary=True text=location_name extra_classes="h3" %}
-                            {% endif %}
-                            <div class="card__body--flex p--no-margin">
-                                <p class="p">{{ location.address_line_1 }}</p>
-                                <p class="p">{{ location.address_line_2 }}</p>
-                                {% if phonenumber %}
-                                    {% link href='tel:'|addstr:phonenumber secondary=True text=phonenumber %}
-                                {% endif %}
-                                {% if email %}
-                                    {% link href='mailto:'|addstr:email secondary=True text=email %}
-                                {% endif %}
-                            </div>
-                        </div>
-                    {% endwith %}
-                {% endfor %}
-            {% endrender_card_container %}
+            {% include "components/Card/CardContainer.html" with locations=object.locations.all columns=3 only %}
         {% endif %}
 
         {% render_grid %}

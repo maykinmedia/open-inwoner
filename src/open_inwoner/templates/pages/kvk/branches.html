@@ -14,7 +14,7 @@
                 {% render_card direction='horizontal' %}
                     {% with company_id=branch.vestigingsnummer %}
                         <label class="left" for="branch-{{ company_id }}">
-                            <p>{{ branch.handelsnaam }}</p>
+                            <p>{{ branch.naam }}</p>
                             {% if branch.straatnaam and branch.plaats %}
                                 <p>{{ branch.straatnaam }}, {{ branch.plaats}}</p>
                             {% endif %}

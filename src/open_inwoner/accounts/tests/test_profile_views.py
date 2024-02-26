@@ -12,7 +12,6 @@ import requests_mock
 from cms import api
 from django_webtest import WebTest
 from pyquery import PyQuery as PQ
-from timeline_logger.models import TimelineLog
 from webtest import Upload
 
 from open_inwoner.accounts.choices import StatusChoices
@@ -35,7 +34,6 @@ from ..models import User
 from .factories import (
     ActionFactory,
     DigidUserFactory,
-    DocumentFactory,
     UserFactory,
     eHerkenningUserFactory,
 )
@@ -179,7 +177,7 @@ class ProfileViewTests(WebTest):
             login_type=LoginTypeChoices.digid,
         )
         response = self.app.get(self.url, user=user)
-        self.assertContains(response, _("My details"))
+        self.assertContains(response, _("Bekijk alle gegevens"))
 
         # check business profile section not displayed
         self.assertNotContains(response, "Bedrijfsgegevens")
@@ -320,7 +318,6 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         form["display_name"] = ""
         form["email"] = ""
         form["phonenumber"] = ""
-        form["birthday"] = ""
         form["street"] = ""
         form["housenumber"] = ""
         form["postcode"] = ""
@@ -337,7 +334,6 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         form["display_name"] = "a nickname"
         form["email"] = "user@example.com"
         form["phonenumber"] = "0612345678"
-        form["birthday"] = "21-01-1992"
         form["street"] = "Keizersgracht"
         form["housenumber"] = "17 d"
         form["postcode"] = "1013 RM"
@@ -351,7 +347,6 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         self.assertEquals(self.user.last_name, "Last name")
         self.assertEquals(self.user.display_name, "a nickname")
         self.assertEquals(self.user.email, "user@example.com")
-        self.assertEquals(self.user.birthday.strftime("%d-%m-%Y"), "21-01-1992")
         self.assertEquals(self.user.street, "Keizersgracht")
         self.assertEquals(self.user.housenumber, "17 d")
         self.assertEquals(self.user.postcode, "1013 RM")
@@ -1027,24 +1022,3 @@ class NotificationsDisplayTests(WebTest):
         form = response.forms["change-notifications"]
 
         self.assertIn("plans_notifications", form.fields)
-
-
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class ExportProfileTests(WebTest):
-    def setUp(self):
-        self.url = reverse("profile:export")
-        self.user = UserFactory()
-
-    def test_login_required(self):
-        login_url = reverse("login")
-        response = self.app.get(self.url)
-        self.assertRedirects(response, f"{login_url}?next={self.url}")
-
-    def test_export_profile(self):
-        response = self.app.get(self.url, user=self.user)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content_type, "application/pdf")
-        self.assertEqual(
-            response["Content-Disposition"],
-            f'attachment; filename="profile.pdf"',
-        )

@@ -1,10 +1,9 @@
-from datetime import date
 from unittest.mock import patch
 from urllib.parse import urlencode
 
 from django.contrib.sites.models import Site
 from django.core import mail
-from django.test import modify_settings, override_settings
+from django.test import override_settings
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
 
@@ -20,9 +19,9 @@ from digid_eherkenning_oidc_generics.models import (
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.kvk.branches import get_kvk_branch_number
-from open_inwoner.kvk.models import KvKConfig
 from open_inwoner.kvk.tests.factories import CertificateFactory
 
+from ...cms.collaborate.cms_apps import CollaborateApphook
 from ...cms.tests import cms_tools
 from ...utils.test import ClearCachesMixin
 from ...utils.tests.helpers import AssertRedirectsMixin
@@ -45,7 +44,7 @@ class DigiDRegistrationTest(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
 
     @classmethod
     def setUpTestData(cls):
-        cms_tools.create_homepage()
+        cls.homepage = cms_tools.create_homepage()
 
     @patch("digid_eherkenning_oidc_generics.models.OpenIDConnectDigiDConfig.get_solo")
     def test_registration_page_only_digid(self, mock_solo):
@@ -230,6 +229,48 @@ class DigiDRegistrationTest(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
         self.assertEqual(user.first_name, "Merel")
         self.assertEqual(user.last_name, "Kooyman")
 
+    def test_notification_settings_with_cms_page_published(self):
+        """
+        Assert that notification settings can be changed via the necessary-fields form
+        if the corresponding CMS pages are published. Fields corresponding to unpublished
+        pages should not be present.
+        """
+        cms_tools.create_apphook_page(
+            CollaborateApphook,
+            parent_page=self.homepage,
+        )
+
+        invite = InviteFactory()
+
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": f"{reverse('profile:registration_necessary')}?invite={invite.key}",
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "533458225",
+            "auth_pass": "bar",
+        }
+
+        # post our password to the IDP
+        response = self.app.post(url, data).follow().follow()
+
+        necessary_form = response.forms["necessary-form"]
+
+        self.assertNotIn("cases_notifications", necessary_form.fields)
+        self.assertNotIn("messages_notifications", necessary_form.fields)
+
+        necessary_form["plans_notifications"] = False
+        necessary_form.submit()
+
+        user = User.objects.get(bsn=data["auth_name"])
+
+        self.assertEqual(user.cases_notifications, True)
+        self.assertEqual(user.messages_notifications, True)
+        self.assertEqual(user.plans_notifications, False)
+
     @requests_mock.Mocker()
     def test_partial_response_from_haalcentraal_when_digid_and_brp(self, m):
         self._setUpService()
@@ -306,7 +347,6 @@ class DigiDRegistrationTest(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
 
         self.assertEqual(user.first_name, "Merel")
         self.assertEqual(user.last_name, "Kooyman")
-        self.assertEqual(user.birthday, date(1982, 4, 10))
         self.assertEqual(user.street, "King Olivereiland")
         self.assertEqual(user.housenumber, "64")
         self.assertEqual(user.city, "'s-Gravenhage")
@@ -715,7 +755,7 @@ class EmailPasswordRegistrationTest(WebTest):
 
     def setUp(self):
         # Create a User instance that's not saved
-        self.user = UserFactory.build()
+        self.user = UserFactory.build(first_name="John", last_name="Doe")
 
         self.config = SiteConfiguration.get_solo()
         self.config.login_allow_registration = True
@@ -806,41 +846,14 @@ class EmailPasswordRegistrationTest(WebTest):
                 }
                 self.assertEqual(response.context["form"].errors, expected_errors)
 
-    def test_registration_fails_uniform_password(self):
+    def test_registration_fails_with_non_diverse_password(self):
         passwords = [
-            "lowercase123",
-            "UPPERCASE123",
             "NODIGITS",
             "nodigits",
             "NoDigits",
             "1238327879",
-        ]
-        register_page = self.app.get(reverse("django_registration_register"))
-        form = register_page.forms["registration-form"]
-
-        for password in passwords:
-            with self.subTest(password=password):
-                form["email"] = self.user.email
-                form["first_name"] = self.user.first_name
-                form["last_name"] = self.user.last_name
-                form["password1"] = password
-                form["password2"] = password
-                response = form.submit()
-                expected_errors = {
-                    "password2": [
-                        _(
-                            "Your password must contain at least 1 upper-case letter, "
-                            "1 lower-case letter, 1 digit."
-                        ),
-                    ]
-                }
-                self.assertEqual(response.context["form"].errors, expected_errors)
-
-    def test_registration_fails_with_non_diverse_password(self):
-        passwords = [
             "pass_word-123",
             "PASS_WORD-123",
-            "NoDigits",
             "UPPERCASE123",
             "lowercase123",
         ]
@@ -1039,12 +1052,12 @@ class DuplicateEmailRegistrationTest(WebTest):
             {
                 "kvkNummer": "12345678",
                 "vestigingsnummer": "1234",
-                "handelsnaam": "Mijn bedrijf",
+                "naam": "Mijn bedrijf",
             },
             {
                 "kvkNummer": "12345678",
                 "vestigingsnummer": "5678",
-                "handelsnaam": "Mijn bedrijf",
+                "naam": "Mijn bedrijf",
             },
         ]
 

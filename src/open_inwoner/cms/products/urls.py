@@ -41,23 +41,23 @@ urlpatterns = [
         name="location_detail",
     ),
     path(
-        f"producten/<str:slug>/formulier/",
+        "producten/<str:slug>/formulier/",
         ProductFormView.as_view(),
         name="product_form",
     ),
     path(
         # Required to handle dynamic URL-paths appended by Open Forms.
-        f"producten/<str:slug>/formulier/<path:rest>",
+        "producten/<str:slug>/formulier/<path:rest>",
         ProductFormView.as_view(),
         name="product_form",
     ),
     path(
-        f"producten/<str:slug>/",
+        "producten/<str:slug>/",
         ProductDetailView.as_view(),
         name="product_detail",
     ),
     path(
-        f"producten/",
+        "producten/",
         RedirectView.as_view(pattern_name="products:category_list"),
         name="product_detail",
     ),

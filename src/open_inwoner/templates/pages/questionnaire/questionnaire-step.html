@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n button_tags card_tags form_tags file_tags grid_tags render_tags step_tags string_tags %}
+{% load i18n button_tags form_tags file_tags grid_tags render_tags step_tags string_tags %}
 
 {% block content %}
     {% render_grid %}
@@ -51,7 +51,7 @@
 
                 {% if form.instance.related_products.published.exists %}
                     <hr class="divider">
-                    {% card_container products=form.instance.related_products.published small=True %}
+                    {% include "components/Card/CardContainer.html" with products=form.instance.related_products.published small=True only %}
                 {% endif %}
             {% endrender_form %}
             </fieldset>

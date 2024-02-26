@@ -52,7 +52,7 @@ class Facet:
                     )
                 )
             else:
-                raise NotImplemented("Bucket shape is unknown")
+                raise NotImplementedError("Bucket shape is unknown")
 
         return buckets
 

@@ -24,13 +24,11 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
         user = UserFactory(login_type=LoginTypeChoices.digid)
         user.bsn = "999993847"
 
-        with self.assertLogs() as captured:
-            user.save()
+        user.save()
 
-        logs_messages = [record.getMessage() for record in captured.records]
         saved_logs = OutgoingRequestsLog.objects.filter(
             url="https://personen/api/brp/personen"
         )
 
-        self.assertIn("Outgoing request", logs_messages)
-        self.assertTrue(saved_logs.exists())
+        self.assertTrue(saved_logs.count(), 1)
+        self.assertEqual(saved_logs[0].method, "POST")

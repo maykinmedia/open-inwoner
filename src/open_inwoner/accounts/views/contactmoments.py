@@ -1,26 +1,28 @@
 import logging
 from datetime import datetime
-from typing import List, TypedDict
+from typing import TypedDict
 
 from django.contrib.auth.mixins import AccessMixin
 from django.http import Http404
 from django.shortcuts import redirect
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
 
-from open_inwoner.kvk.branches import get_kvk_branch_number
 from open_inwoner.openklant.api_models import KlantContactMoment
+from open_inwoner.openklant.clients import build_client
 from open_inwoner.openklant.constants import Status
-from open_inwoner.openklant.models import ContactFormSubject, OpenKlantConfig
+from open_inwoner.openklant.models import ContactFormSubject
 from open_inwoner.openklant.wrap import (
     fetch_klantcontactmoment,
     fetch_klantcontactmomenten,
     get_fetch_parameters,
 )
+from open_inwoner.openzaak.clients import build_client as build_client_openzaak
+from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import CommonPageMixin
 
 logger = logging.getLogger(__name__)
@@ -116,8 +118,9 @@ class KlantContactMomentBaseView(
         return ctx
 
 
-class KlantContactMomentListView(KlantContactMomentBaseView):
+class KlantContactMomentListView(PaginationMixin, KlantContactMomentBaseView):
     template_name = "pages/contactmoment/list.html"
+    paginate_by = 9
 
     @cached_property
     def crumbs(self):
@@ -137,6 +140,8 @@ class KlantContactMomentListView(KlantContactMomentBaseView):
             **get_fetch_parameters(self.request, use_vestigingsnummer=True)
         )
         ctx["contactmomenten"] = [self.get_kcm_data(kcm) for kcm in kcms]
+        paginator_dict = self.paginate_with_context(ctx["contactmomenten"])
+        ctx.update(paginator_dict)
         return ctx
 
 
@@ -167,5 +172,27 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
         if not kcm:
             raise Http404()
 
-        ctx["contactmoment"] = self.get_kcm_data(kcm)
+        if client := build_client("contactmomenten"):
+            zaken_client = build_client_openzaak("zaak")
+            ocm = client.retrieve_objectcontactmoment(
+                kcm.contactmoment, "zaak", zaken_client
+            )
+            ctx["zaak"] = getattr(ocm, "object", None)
+
+        contactmoment: KCMDict = self.get_kcm_data(kcm)
+        ctx["contactmoment"] = contactmoment
+        ctx["metrics"] = [
+            {
+                "label": _("Ontvangstdatum: "),
+                "value": contactmoment["registered_date"],
+            },
+            {
+                "label": _("Contactwijze: "),
+                "value": contactmoment["channel"],
+            },
+            {
+                "label": _("Status: "),
+                "value": contactmoment["status"],
+            },
+        ]
         return ctx

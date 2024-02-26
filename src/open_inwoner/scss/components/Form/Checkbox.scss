@@ -43,4 +43,12 @@
     font-family: 'Material Icons';
     content: '\e876';
   }
+
+  .checkbox__input--disabled:checked ~ .checkbox__label:before {
+    border-color: var(--color-gray) !important;
+    background-color: var(--color-gray);
+    color: var(--color-white);
+    font-family: 'Material Icons';
+    content: '\e876';
+  }
 }

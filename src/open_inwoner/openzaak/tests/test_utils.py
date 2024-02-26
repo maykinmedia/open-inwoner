@@ -80,7 +80,7 @@ class TestUtils(ClearCachesMixin, TestCase):
                 )
 
         # test we don't leak on bad input
-        with self.subTest(f"bad vertrouwelijkheidaanduiding in info object"):
+        with self.subTest("bad vertrouwelijkheidaanduiding in info object"):
             info_object = factory(
                 InformatieObject,
                 generate_oas_component(
@@ -92,7 +92,7 @@ class TestUtils(ClearCachesMixin, TestCase):
             )
             self.assertFalse(is_info_object_visible(info_object, max_level))
 
-        with self.subTest(f"bad vertrouwelijkheidaanduiding as parameter"):
+        with self.subTest("bad vertrouwelijkheidaanduiding as parameter"):
             info_object = factory(
                 InformatieObject,
                 generate_oas_component(

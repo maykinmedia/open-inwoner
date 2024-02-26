@@ -1,6 +1,7 @@
 from urllib.parse import urlencode
 
 from locust import HttpUser, events, task
+from pyquery import PyQuery as pq
 
 
 class OpenInwonerUser(HttpUser):
@@ -9,6 +10,10 @@ class OpenInwonerUser(HttpUser):
     @task
     def mijn_aanvragen_list_cached(self):
         self.client.get("/mijn-aanvragen/content", headers={"HX-Request": "true"})
+
+    @task
+    def mijn_aanvragen_detail_cached(self):
+        self.client.get(f"{self.case_link}content", headers={"HX-Request": "true"})
 
     def on_start(self):
         params = urlencode(
@@ -34,8 +39,17 @@ class OpenInwonerUser(HttpUser):
         )
 
         # Ensure uncached call is logged separately
-        self.client.get(
+        response = self.client.get(
             "/mijn-aanvragen/content?_uncached=true", headers={"HX-Request": "true"}
+        )
+        doc = pq(response.content)
+
+        self.case_link = pq(
+            doc.find(".cases__link:not([href^='https://www.maykinmedia'])")[0]
+        ).attr("href")
+
+        self.client.get(
+            f"{self.case_link}content?uncached=true", headers={"HX-Request": "true"}
         )
 
 

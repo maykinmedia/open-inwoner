@@ -2,6 +2,8 @@ from django import template
 
 from open_inwoner.components.utils import ContentsNode, parse_component_with_args
 
+from .helpers import create_content_wrapper
+
 register = template.Library()
 
 
@@ -22,11 +24,9 @@ def render_grid(parser, token):
     Extra context:
         - contents: string (HTML) | this is the context between the render_grid and endrender_grid tags
     """
-    bits = token.split_contents()
-    context_kwargs = parse_component_with_args(parser, bits, "render_grid")
-    nodelist = parser.parse(("endrender_grid",))
-    parser.delete_first_token()
-    return ContentsNode(nodelist, "components/Grid/Grid.html", **context_kwargs)
+    return create_content_wrapper("render_grid", "components/Grid/Grid.html")(
+        parser, token
+    )
 
 
 @register.tag

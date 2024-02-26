@@ -58,7 +58,7 @@ class InviteMixin(CommonPageMixin):
         #  update inviter - invitee relationship
         inviter_contacts = invite.inviter.user_contacts.all()
         invitee = invite.invitee
-        if not invitee in inviter_contacts:
+        if invitee not in inviter_contacts:
             invite.inviter.user_contacts.add(invitee)
 
 

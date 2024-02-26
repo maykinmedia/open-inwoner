@@ -7,13 +7,7 @@ from django.utils.translation import gettext_lazy as _
 
 from open_inwoner.kvk.branches import get_kvk_branch_number
 from open_inwoner.openzaak.api_models import Zaak
-from open_inwoner.openzaak.cases import (
-    fetch_roles_for_case_and_bsn,
-    fetch_roles_for_case_and_kvk_or_rsin,
-    fetch_roles_for_case_and_vestigingsnummer,
-    fetch_single_case,
-)
-from open_inwoner.openzaak.catalog import fetch_single_case_type
+from open_inwoner.openzaak.clients import build_client
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.types import UniformCase
 from open_inwoner.openzaak.utils import is_zaak_visible
@@ -67,11 +61,17 @@ class CaseAccessMixin(AccessMixin):
             )
             return self.handle_no_permission()
 
-        self.case = self.get_case(kwargs)
+        client = build_client("zaak")
+        if client is None:
+            return super().dispatch(request, *args, **kwargs)
+
+        self.case = self.get_case(client, kwargs)
         if self.case:
             # check if we have a role in this case
             if request.user.bsn:
-                if not fetch_roles_for_case_and_bsn(self.case.url, request.user.bsn):
+                if not client.fetch_roles_for_case_and_bsn(
+                    self.case.url, request.user.bsn
+                ):
                     logger.debug(
                         f"CaseAccessMixin - permission denied: no role for the case {self.case.url}"
                     )
@@ -83,22 +83,33 @@ class CaseAccessMixin(AccessMixin):
                     identifier = self.request.user.rsin
 
                 vestigingsnummer = get_kvk_branch_number(self.request.session)
-                if vestigingsnummer and not fetch_roles_for_case_and_vestigingsnummer(
-                    self.case.url, vestigingsnummer
+                if (
+                    vestigingsnummer
+                    and not client.fetch_roles_for_case_and_vestigingsnummer(
+                        self.case.url, vestigingsnummer
+                    )
                 ):
                     logger.debug(
                         f"CaseAccessMixin - permission denied: no role for the case {self.case.url}"
                     )
                     return self.handle_no_permission()
 
-                if not fetch_roles_for_case_and_kvk_or_rsin(self.case.url, identifier):
+                if not client.fetch_roles_for_case_and_kvk_or_rsin(
+                    self.case.url, identifier
+                ):
                     logger.debug(
                         f"CaseAccessMixin - permission denied: no role for the case {self.case.url}"
                     )
                     return self.handle_no_permission()
 
             # resolve case-type
-            self.case.zaaktype = fetch_single_case_type(self.case.zaaktype)
+            if catalogi_client := build_client("catalogi"):
+                self.case.zaaktype = catalogi_client.fetch_single_case_type(
+                    self.case.zaaktype
+                )
+            else:
+                self.case.zaaktype = None
+
             if not self.case.zaaktype:
                 logger.debug(
                     "CaseAccessMixin - permission denied: no case type for case {self.case.url}"
@@ -120,12 +131,12 @@ class CaseAccessMixin(AccessMixin):
 
         return super().handle_no_permission()
 
-    def get_case(self, kwargs) -> Optional[Zaak]:
+    def get_case(self, client, kwargs) -> Optional[Zaak]:
         case_uuid = kwargs.get("object_id")
         if not case_uuid:
             return None
 
-        return fetch_single_case(case_uuid)
+        return client.fetch_single_case(case_uuid)
 
 
 class OuterCaseAccessMixin(LoginRequiredMixin):

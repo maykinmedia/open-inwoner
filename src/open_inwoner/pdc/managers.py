@@ -9,10 +9,10 @@ from treebeard.mp_tree import MP_NodeQuerySet
 
 from open_inwoner.accounts.models import User
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.kvk.branches import get_kvk_branch_number
 from open_inwoner.openzaak.api_models import Zaak
-from open_inwoner.openzaak.cases import fetch_cases, fetch_cases_by_kvk_or_rsin
-from open_inwoner.openzaak.models import OpenZaakConfig, ZaakTypeConfig
+from open_inwoner.openzaak.clients import build_client
+from open_inwoner.openzaak.models import ZaakTypeConfig
+from open_inwoner.openzaak.utils import get_user_fetch_parameters
 
 
 class ProductQueryset(models.QuerySet):
@@ -35,7 +35,10 @@ class CategoryPublishedQueryset(MP_NodeQuerySet):
 
     def visible_for_user(self, user: User):
         if user.is_authenticated:
-            if user.bsn:
+            # Show all categories to staff users
+            if user.is_staff:
+                return self
+            elif user.bsn:
                 return self.filter(visible_for_citizens=True)
             elif user.kvk:
                 return self.filter(visible_for_companies=True)
@@ -52,20 +55,11 @@ class CategoryPublishedQueryset(MP_NodeQuerySet):
         if not request.user.bsn and not request.user.kvk:
             return self
 
-        if request.user.bsn:
-            cases = fetch_cases(request.user.bsn)
-        elif request.user.kvk:
-            kvk_or_rsin = request.user.kvk
-            config = OpenZaakConfig.get_solo()
-            if config.fetch_eherkenning_zaken_with_rsin:
-                kvk_or_rsin = request.user.rsin
-            vestigingsnummer = get_kvk_branch_number(request.session)
-            if vestigingsnummer:
-                cases = fetch_cases_by_kvk_or_rsin(
-                    kvk_or_rsin=kvk_or_rsin, vestigingsnummer=vestigingsnummer
-                )
-            else:
-                cases = fetch_cases_by_kvk_or_rsin(kvk_or_rsin=kvk_or_rsin)
+        client = build_client("zaak")
+        if client is None:
+            return self.none()
+
+        cases = client.fetch_cases(**get_user_fetch_parameters(request))
 
         return self.filter_by_zaken(cases)
 
@@ -110,7 +104,7 @@ class CategoryPublishedQueryset(MP_NodeQuerySet):
         pks = []
         for category in qs:
             for identificatie in category.zaaktypen:
-                if not identificatie in months_since_last_zaak_per_zaaktype:
+                if identificatie not in months_since_last_zaak_per_zaaktype:
                     continue
                 relevante_zaakperiode = zaakperiode_mapping.get(identificatie)
                 if not relevante_zaakperiode:

@@ -1,16 +1,15 @@
 import datetime
 
 from django.core.cache import cache
+from django.test import TransactionTestCase
 from django.test.utils import override_settings
 from django.urls import reverse_lazy
 
 import requests_mock
-from django_webtest import WebTest
 from freezegun import freeze_time
 from furl import furl
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 from zgw_consumers.constants import APITypes
-from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
@@ -18,36 +17,36 @@ from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
 from ..models import OpenZaakConfig
 from .factories import ServiceFactory
+from .helpers import generate_oas_component_cached
 from .shared import CATALOGI_ROOT, ZAKEN_ROOT
 
 
 @requests_mock.Mocker()
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
+class OpenCaseListCacheTests(ClearCachesMixin, TransactionTestCase):
     inner_url = reverse_lazy("cases:cases_content")
 
-    @classmethod
-    def setUpTestData(cls):
-        super().setUpTestData()
+    def setUp(self):
+        super().setUp()
 
-        cls.user = UserFactory(
+        self.user = UserFactory(
             login_type=LoginTypeChoices.digid, bsn="900222086", email="johm@smith.nl"
         )
         # services
-        cls.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
-        cls.catalogi_service = ServiceFactory(
+        self.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
+        self.catalogi_service = ServiceFactory(
             api_root=CATALOGI_ROOT, api_type=APITypes.ztc
         )
         # openzaak config
-        cls.config = OpenZaakConfig.get_solo()
-        cls.config.zaak_service = cls.zaak_service
-        cls.config.catalogi_service = cls.catalogi_service
-        cls.config.zaak_max_confidentiality = (
+        self.config = OpenZaakConfig.get_solo()
+        self.config.zaak_service = self.zaak_service
+        self.config.catalogi_service = self.catalogi_service
+        self.config.zaak_max_confidentiality = (
             VertrouwelijkheidsAanduidingen.beperkt_openbaar
         )
-        cls.config.save()
+        self.config.save()
 
-        cls.zaaktype = generate_oas_component(
+        self.zaaktype = generate_oas_component_cached(
             "ztc",
             "schemas/ZaakType",
             url=f"{CATALOGI_ROOT}zaaktypen/53340e34-7581-4b04-884f",
@@ -56,29 +55,29 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
             indicatieInternOfExtern="extern",
         )
-        cls.status_type1 = generate_oas_component(
+        self.status_type1 = generate_oas_component_cached(
             "ztc",
             "schemas/StatusType",
             url=f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-777yu878km09",
-            zaaktype=cls.zaaktype["url"],
+            zaaktype=self.zaaktype["url"],
             omschrijving="Initial request",
             volgnummer=1,
             isEindstatus=False,
         )
-        cls.status_type2 = generate_oas_component(
+        self.status_type2 = generate_oas_component_cached(
             "ztc",
             "schemas/StatusType",
             url=f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-744516671fe4",
-            zaaktype=cls.zaaktype["url"],
+            zaaktype=self.zaaktype["url"],
             omschrijving="Finish",
             volgnummer=2,
             isEindstatus=True,
         )
-        cls.zaak1 = generate_oas_component(
+        self.zaak1 = generate_oas_component_cached(
             "zrc",
             "schemas/Zaak",
             url=f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
-            zaaktype=cls.zaaktype["url"],
+            zaaktype=self.zaaktype["url"],
             identificatie="ZAAK-2022-0000000001",
             omschrijving="Coffee zaak1",
             startdatum="2022-01-02",
@@ -86,20 +85,20 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
             status=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
         )
-        cls.status1 = generate_oas_component(
+        self.status1 = generate_oas_component_cached(
             "zrc",
             "schemas/Zaak",
             url=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-beu760sle929",
-            zaak=cls.zaak1["url"],
-            statustype=cls.status_type1["url"],
+            zaak=self.zaak1["url"],
+            statustype=self.status_type1["url"],
             datumStatusGezet="2021-01-12",
             statustoelichting="",
         )
-        cls.zaak2 = generate_oas_component(
+        self.zaak2 = generate_oas_component_cached(
             "zrc",
             "schemas/Zaak",
             url=f"{ZAKEN_ROOT}zaken/e4d469b9-6666-4bdd-bf42-b53445298102",
-            zaaktype=cls.zaaktype["url"],
+            zaaktype=self.zaaktype["url"],
             identificatie="ZAAK-2022-0008800002",
             omschrijving="Coffee zaak2",
             startdatum="2022-01-12",
@@ -107,18 +106,18 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
             status=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-beu760sle929",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
         )
-        cls.status2 = generate_oas_component(
+        self.status2 = generate_oas_component_cached(
             "zrc",
             "schemas/Zaak",
             url=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
-            zaak=cls.zaak2["url"],
-            statustype=cls.status_type2["url"],
+            zaak=self.zaak2["url"],
+            statustype=self.status_type2["url"],
             datumStatusGezet="2021-03-12",
             statustoelichting="",
         )
 
         # objects needed to test how the cache is updated
-        cls.new_zaaktype = generate_oas_component(
+        self.new_zaaktype = generate_oas_component_cached(
             "ztc",
             "schemas/ZaakType",
             url=f"{CATALOGI_ROOT}zaaktypen/53340e34-7581-4b04-884f-98ui7y87i876",
@@ -127,20 +126,20 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
             indicatieInternOfExtern="extern",
         )
-        cls.new_status_type = generate_oas_component(
+        self.new_status_type = generate_oas_component_cached(
             "ztc",
             "schemas/StatusType",
             url=f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-984yr8887rhe",
-            zaaktype=cls.new_zaaktype["url"],
+            zaaktype=self.new_zaaktype["url"],
             omschrijving="Process",
             volgnummer=1,
             isEindstatus=False,
         )
-        cls.new_zaak = generate_oas_component(
+        self.new_zaak = generate_oas_component_cached(
             "zrc",
             "schemas/Zaak",
             url=f"{ZAKEN_ROOT}zaken/a25b2dce-1cae-4fc9-b9e9-141b0ad5189f",
-            zaaktype=cls.new_zaaktype["url"],
+            zaaktype=self.new_zaaktype["url"],
             identificatie="ZAAK-2022-0000000003",
             omschrijving="Tea zaak",
             startdatum="2022-01-02",
@@ -148,19 +147,17 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
             status=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-oie8u899923g",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
         )
-        cls.new_status = generate_oas_component(
+        self.new_status = generate_oas_component_cached(
             "zrc",
             "schemas/Zaak",
             url=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-oie8u899923g",
-            zaak=cls.new_zaak["url"],
-            statustype=cls.new_status_type["url"],
+            zaak=self.new_zaak["url"],
+            statustype=self.new_status_type["url"],
             datumStatusGezet="2021-01-12",
             statustoelichting="",
         )
 
     def _setUpMocks(self, m):
-        mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
-        mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
         m.get(
             furl(f"{ZAKEN_ROOT}zaken")
             .add(
@@ -201,7 +198,8 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
         # Cache is empty before the request
         self.assertIsNone(cache.get(f"case_type:{self.zaaktype['url']}"))
 
-        self.app.get(self.inner_url, user=self.user, headers={"HX-Request": "true"})
+        self.client.force_login(user=self.user)
+        self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
 
         # Case type is cached after the request
         self.assertIsNotNone(cache.get(f"case_type:{self.zaaktype['url']}"))
@@ -210,7 +208,8 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
         self._setUpMocks(m)
 
         with freeze_time("2022-01-01 12:00") as frozen_time:
-            self.app.get(self.inner_url, user=self.user, headers={"HX-Request": "true"})
+            self.client.force_login(user=self.user)
+            self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
 
             # After one day the results should be deleted
             frozen_time.tick(delta=datetime.timedelta(days=1))
@@ -223,7 +222,8 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
             # First attempt
             self.assertIsNone(cache.get(f"case_type:{self.zaaktype['url']}"))
 
-            self.app.get(self.inner_url, user=self.user, headers={"HX-Request": "true"})
+            self.client.force_login(user=self.user)
+            self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
 
             self.assertIsNotNone(cache.get(f"case_type:{self.zaaktype['url']}"))
 
@@ -233,7 +233,7 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
             frozen_time.tick(delta=datetime.timedelta(minutes=3))
             self.assertIsNone(cache.get(f"case_type:{self.new_zaaktype['url']}"))
 
-            self.app.get(self.inner_url, user=self.user, headers={"HX-Request": "true"})
+            self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
 
             self.assertIsNotNone(cache.get(f"case_type:{self.zaaktype['url']}"))
             self.assertIsNotNone(cache.get(f"case_type:{self.new_zaaktype['url']}"))
@@ -242,7 +242,8 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
         self._setUpMocks(m)
 
         with freeze_time("2022-01-01 12:00") as frozen_time:
-            self.app.get(self.inner_url, user=self.user, headers={"HX-Request": "true"})
+            self.client.force_login(user=self.user)
+            self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
 
             # After one day the results should be deleted
             frozen_time.tick(delta=datetime.timedelta(hours=24))
@@ -260,7 +261,8 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
         self.assertIsNone(cache.get(f"status:{self.status1['url']}"))
         self.assertIsNone(cache.get(f"status:{self.status2['url']}"))
 
-        self.app.get(self.inner_url, user=self.user, headers={"HX-Request": "true"})
+        self.client.force_login(user=self.user)
+        self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
 
         # Status is cached after the request
         self.assertIsNotNone(cache.get(f"status:{self.status1['url']}"))
@@ -270,7 +272,8 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
         self._setUpMocks(m)
 
         with freeze_time("2022-01-01 12:00") as frozen_time:
-            self.app.get(self.inner_url, user=self.user, headers={"HX-Request": "true"})
+            self.client.force_login(user=self.user)
+            self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
 
             # After one hour the results should be deleted
             frozen_time.tick(delta=datetime.timedelta(hours=1))
@@ -285,7 +288,8 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
             self.assertIsNone(cache.get(f"status:{self.status1['url']}"))
             self.assertIsNone(cache.get(f"status:{self.status2['url']}"))
 
-            self.app.get(self.inner_url, user=self.user, headers={"HX-Request": "true"})
+            self.client.force_login(user=self.user)
+            self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
 
             self.assertIsNotNone(cache.get(f"status:{self.status1['url']}"))
             self.assertIsNotNone(cache.get(f"status:{self.status2['url']}"))
@@ -296,7 +300,7 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
             frozen_time.tick(delta=datetime.timedelta(minutes=3))
             self.assertIsNone(cache.get(f"status:{self.new_status['url']}"))
 
-            self.app.get(self.inner_url, user=self.user, headers={"HX-Request": "true"})
+            self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
 
             self.assertIsNotNone(cache.get(f"status:{self.new_status['url']}"))
             self.assertIsNotNone(cache.get(f"status:{self.status1['url']}"))

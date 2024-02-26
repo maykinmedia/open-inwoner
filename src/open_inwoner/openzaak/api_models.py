@@ -129,7 +129,7 @@ class ZaakInformatieObject(ZGWModel):
     # aard_relatie_weergave: str
     titel: str
     # beschrijving: str
-    registratiedatum: datetime
+    registratiedatum: Optional[datetime]
 
 
 @dataclass
@@ -273,3 +273,32 @@ class Notification(Model):
     actie: str
     aanmaakdatum: datetime
     kenmerken: Dict = field(default_factory=dict)
+
+
+@dataclass
+class OpenSubmission(Model):
+    url: str
+    uuid: str
+    naam: str
+    datum_laatste_wijziging: datetime
+    vervolg_link: Optional[str] = None
+    eind_datum_geldigheid: Optional[datetime] = None
+
+    @property
+    def identification(self) -> str:
+        return f"{self.naam}: {self.uuid}"
+
+    def process_data(self) -> dict:
+        """
+        Prepare data for template
+        """
+        return {
+            "identification": self.identification,
+            "url": self.url,
+            "uuid": self.uuid,
+            "naam": self.naam,
+            "vervolg_link": self.vervolg_link,
+            "datum_laatste_wijziging": self.datum_laatste_wijziging,
+            "eind_datum_geldigheid": self.eind_datum_geldigheid or "Geen",
+            "case_type": "OpenSubmission",
+        }

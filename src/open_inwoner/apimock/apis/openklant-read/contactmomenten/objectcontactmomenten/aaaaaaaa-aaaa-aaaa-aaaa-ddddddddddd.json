@@ -1,0 +1,5 @@
+{
+    "contactmoment": "https://contactmomenten.nl/api/v1/contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+    "object": "https://example.com/foo",
+    "objectType": "zaak"
+}

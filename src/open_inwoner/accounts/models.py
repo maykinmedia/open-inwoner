@@ -1,5 +1,5 @@
 import os
-from datetime import date, timedelta
+from datetime import timedelta
 from uuid import uuid4
 
 from django.conf import settings
@@ -7,7 +7,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import CheckConstraint, Q, UniqueConstraint
+from django.db.models import Q, UniqueConstraint
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.crypto import get_random_string
@@ -145,7 +145,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         default=LoginTypeChoices.default,
         max_length=250,
     )
-    birthday = models.DateField(verbose_name=_("Birthday"), null=True, blank=True)
     street = models.CharField(
         verbose_name=_("Street"),
         default="",
@@ -340,18 +339,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_short_name(self):
         return self.first_name
 
-    def get_age(self):
-        if self.birthday:
-            today = date.today()
-            age = (
-                today.year
-                - self.birthday.year
-                - ((today.month, today.day) < (self.birthday.month, self.birthday.day))
-            )
-
-            return age
-        return None
-
     def get_address(self):
         if self.street:
             return f"{self.street} {self.housenumber}, {self.postcode} {self.city}"
@@ -482,6 +469,16 @@ class User(AbstractBaseUser, PermissionsMixin):
     def is_eherkenning_user(self) -> bool:
         return self.login_type == LoginTypeChoices.eherkenning
 
+    def has_group_managed_categories(self) -> bool:
+        from ..pdc.models import Category
+
+        return Category.objects.filter(access_groups__user=self).exists()
+
+    def get_group_managed_categories(self):
+        from ..pdc.models import Category
+
+        return Category.objects.filter(access_groups__user=self)
+
 
 class Document(models.Model):
     uuid = models.UUIDField(
@@ -530,49 +527,6 @@ class Document(models.Model):
     class Meta:
         verbose_name = _("Document")
         verbose_name_plural = _("Documents")
-
-    def __str__(self):
-        return self.name
-
-
-class Appointment(models.Model):
-    uuid = models.UUIDField(
-        verbose_name=_("UUID"),
-        unique=True,
-        default=uuid4,
-        help_text=_("Used as a reference in the appointments api."),
-    )
-    name = models.CharField(
-        verbose_name=_("Name"),
-        default="",
-        max_length=250,
-        help_text=_("The name of the appointment."),
-    )
-    datetime = models.DateTimeField(
-        verbose_name=_("Appointment time"),
-        help_text=_("This is the time that the appointment is at."),
-    )
-    created_on = models.DateTimeField(
-        verbose_name=_("Created on"),
-        auto_now_add=True,
-        help_text=_("This is the date the appointment was created"),
-    )
-    updated_on = models.DateTimeField(
-        verbose_name=_("Updated on"),
-        auto_now=True,
-        help_text=_("This is the date when the appointment was last changed"),
-    )
-    created_by = models.ForeignKey(
-        "accounts.User",
-        verbose_name=_("Created by"),
-        on_delete=models.CASCADE,
-        related_name="appointments",
-        help_text=_("The person that created the appointment."),
-    )
-
-    class Meta:
-        verbose_name = _("Appointment")
-        verbose_name_plural = _("Appointments")
 
     def __str__(self):
         return self.name

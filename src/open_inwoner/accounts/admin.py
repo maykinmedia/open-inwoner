@@ -1,9 +1,9 @@
 from django.contrib import admin, messages
-from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.admin import GroupAdmin, UserAdmin
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
+from django.contrib.auth.models import Group
 from django.forms import ValidationError
-from django.http.request import HttpRequest
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import ngettext, ugettext_lazy as _
 
@@ -13,7 +13,8 @@ from privates.admin import PrivateMediaMixin
 from open_inwoner.utils.mixins import UUIDAdminFirstInOrder
 
 from .choices import ContactTypeChoices
-from .models import Action, Appointment, Document, Invite, Message, User
+from .forms import GroupAdminForm
+from .models import Action, Document, Invite, Message, User
 
 
 class ReadOnlyFileMixin:
@@ -167,6 +168,36 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
     )
 
 
+admin.site.unregister(Group)
+
+
+@admin.register(Group)
+class _GroupAdmin(GroupAdmin):
+    form = GroupAdminForm
+
+    list_display = [
+        "name",
+        "get_categories",
+    ]
+    filter_horizontal = [
+        "permissions",
+    ]
+    list_filter = ["managed_categories", "permissions"]
+
+    fieldsets = (
+        (None, {"fields": ("name", "permissions")}),
+        (
+            _("Additional permissions"),
+            {"fields": ("managed_categories",)},
+        ),
+    )
+
+    def get_categories(self, obj):
+        return ", ".join(g.name for g in obj.managed_categories.all())
+
+    get_categories.short_description = _("Admin categories")
+
+
 @admin.register(Action)
 class ActionAdmin(
     ReadOnlyFileMixin, UUIDAdminFirstInOrder, PrivateMediaMixin, admin.ModelAdmin
@@ -233,13 +264,6 @@ class DocumentAdmin(
 
     def has_change_permission(self, request, obj=None):
         return False
-
-
-@admin.register(Appointment)
-class AppointmentAdmin(UUIDAdminFirstInOrder, admin.ModelAdmin):
-    readonly_fields = ("uuid",)
-    list_display = ("name", "datetime", "created_on", "created_by")
-    list_filter = ("created_by",)
 
 
 @admin.register(Message)

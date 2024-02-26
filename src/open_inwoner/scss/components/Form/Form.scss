@@ -81,6 +81,7 @@
       }
     }
   }
+
   &__control
     .label
     .notifications__errors
@@ -164,6 +165,7 @@
     font-family: var(--font-family-body);
     font-size: var(--font-size-body);
     font-style: italic;
+
     .label__label--required {
       vertical-align: sub;
     }
@@ -189,6 +191,17 @@
     &--single {
       gap: 0;
       margin-top: 0;
+    }
+
+    &--fullwidth {
+      display: block;
+      margin: 0;
+
+      .button {
+        width: 100%;
+        font-weight: bold;
+        justify-content: center;
+      }
     }
   }
 

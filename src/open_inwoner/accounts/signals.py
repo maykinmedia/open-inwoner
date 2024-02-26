@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.dispatch import receiver
 from django.urls import reverse
@@ -27,7 +26,7 @@ def log_user_login(sender, user, request, *args, **kwargs):
 
     try:
         digid_path = reverse("digid:acs")
-    except:
+    except:  # noqa
         digid_path = ""
 
     if current_path == reverse("admin:login"):

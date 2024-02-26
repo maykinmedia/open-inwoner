@@ -367,6 +367,7 @@ def form_actions(
         {% form_actions primary_text="Submit" %}
 
     Variables:
+        - fullwidth: bool | if submit-buttons should be in a block instead of grid.
         - primary: bool | if false, hide the primary button.
         - primary_text: string | The text for the primary button.
         - primary_icon: string | The icon for the primary button.

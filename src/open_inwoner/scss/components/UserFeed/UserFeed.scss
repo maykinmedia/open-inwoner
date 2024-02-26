@@ -71,7 +71,8 @@
 
   .card__body {
     background-color: #fff;
-    padding-right: var(--row-height);
+    border-radius: var(--border-radius);
+    padding: var(--card-spacing);
 
     .tabled__value {
       color: var(--color-gray-dark);
@@ -81,7 +82,7 @@
     }
 
     span.button:last-child {
-      bottom: 20px;
+      bottom: var(--spacing-medium);
     }
   }
 }

@@ -163,6 +163,12 @@ class OpenZaakConfig(SingletonModel):
         ),
     )
 
+    action_required_deadline_days = models.IntegerField(
+        verbose_name=_("Standaard actie deadline termijn in dagen"),
+        default=15,
+        help_text=_("Aantal dagen voor gebruiker om actie te ondernemen."),
+    )
+
     class Meta:
         verbose_name = _("Open Zaak configuration")
 
@@ -289,7 +295,7 @@ class ZaakTypeConfig(models.Model):
             self.identificatie,
             self.omschrijving,
         )
-        return f" - ".join(b for b in bits if b)
+        return " - ".join(b for b in bits if b)
 
 
 class ZaakTypeInformatieObjectTypeConfig(models.Model):
@@ -418,6 +424,13 @@ class ZaakTypeStatusTypeConfig(models.Model):
         default=True,
         help_text=_(
             "Whether the user should be notfied if a case is set to this type of status"
+        ),
+    )
+    action_required = models.BooleanField(
+        verbose_name=_("Action required"),
+        default=False,
+        help_text=_(
+            "Whether the status change notification should indicate that an action is required"
         ),
     )
     document_upload_enabled = models.BooleanField(

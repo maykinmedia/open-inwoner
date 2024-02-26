@@ -1,9 +1,5 @@
 from django import forms
-from django.forms import widgets
-from django.forms.widgets import Textarea
 from django.utils.translation import ugettext_lazy as _
-
-from open_inwoner.components.templatetags.form_tags import form
 
 from .models import Feedback
 

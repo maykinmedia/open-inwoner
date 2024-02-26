@@ -9,12 +9,14 @@ from open_inwoner.cms.benefits.cms_apps import SSDApphook
 from open_inwoner.cms.cases.cms_apps import CasesApphook
 from open_inwoner.cms.collaborate.cms_apps import CollaborateApphook
 from open_inwoner.cms.inbox.cms_apps import InboxApphook
+from open_inwoner.cms.profile.cms_apps import ProfileApphook
 
 cms_apps = {
     "inbox": InboxApphook,
     "collaborate": CollaborateApphook,
     "cases": CasesApphook,
     "ssd": SSDApphook,
+    "profile": ProfileApphook,
 }
 
 
@@ -54,6 +56,13 @@ def benefits_page_is_published() -> bool:
     :returns: True if the social benefits page published, False otherwise
     """
     return _is_published("ssd")
+
+
+def profile_page_is_published() -> bool:
+    """
+    :returns: True if the profile page published, False otherwise
+    """
+    return _is_published("profile")
 
 
 def get_active_app_names() -> list[str]:

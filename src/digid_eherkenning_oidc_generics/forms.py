@@ -1,7 +1,5 @@
 from copy import deepcopy
 
-from django.utils.translation import gettext_lazy as _
-
 from mozilla_django_oidc_db.constants import OIDC_MAPPING as _OIDC_MAPPING
 from mozilla_django_oidc_db.forms import OpenIDConnectConfigForm
 

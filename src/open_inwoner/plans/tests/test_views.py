@@ -480,7 +480,7 @@ class PlanViewTests(WebTest):
         self.assertEqual(elem.attrib.get("checked"), "checked")
 
         # NOTE: custom widget ID hardcoded on index of choice
-        elem = response.pyquery(f"#id_plan_contacts_1")[0]
+        elem = response.pyquery("#id_plan_contacts_1")[0]
         self.assertEqual(elem.attrib.get("checked"), "checked")
 
     def test_plan_create_contains_contact_create_link_when_no_contacts_exist(self):

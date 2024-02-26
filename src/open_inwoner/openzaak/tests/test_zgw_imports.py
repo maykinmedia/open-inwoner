@@ -2,10 +2,10 @@ from django.test import TestCase
 
 import requests_mock
 from zgw_consumers.constants import APITypes
-from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
 from open_inwoner.openzaak.models import CatalogusConfig, OpenZaakConfig, ZaakTypeConfig
 from open_inwoner.openzaak.tests.factories import CatalogusConfigFactory, ServiceFactory
+from open_inwoner.openzaak.tests.helpers import generate_oas_component_cached
 from open_inwoner.openzaak.tests.shared import CATALOGI_ROOT
 from open_inwoner.openzaak.zgw_imports import (
     import_catalog_configs,
@@ -17,14 +17,14 @@ from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 class CatalogMockData:
     def __init__(self):
         self.catalogs = [
-            generate_oas_component(
+            generate_oas_component_cached(
                 "ztc",
                 "schemas/Catalogus",
                 url=f"{CATALOGI_ROOT}catalogussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
                 domein="aaaaa",
                 rsin="123456789",
             ),
-            generate_oas_component(
+            generate_oas_component_cached(
                 "ztc",
                 "schemas/Catalogus",
                 url=f"{CATALOGI_ROOT}catalogussen/bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
@@ -32,7 +32,7 @@ class CatalogMockData:
                 rsin="123456789",
             ),
         ]
-        self.extra_catalog = generate_oas_component(
+        self.extra_catalog = generate_oas_component_cached(
             "ztc",
             "schemas/Catalogus",
             url=f"{CATALOGI_ROOT}catalogussen/cccccccc-cccc-cccc-cccc-cccccccccccc",
@@ -40,11 +40,7 @@ class CatalogMockData:
             rsin="123456789",
         )
 
-    def setUpOASMocks(self, m):
-        mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
-
     def install_mocks(self, m) -> "CatalogMockData":
-        self.setUpOASMocks(m)
         m.get(
             f"{CATALOGI_ROOT}catalogussen",
             json=paginated_response(self.catalogs),
@@ -55,7 +51,7 @@ class CatalogMockData:
 class ZaakTypeMockData:
     def __init__(self):
 
-        self.zaaktype_aaa_1 = generate_oas_component(
+        self.zaaktype_aaa_1 = generate_oas_component_cached(
             "ztc",
             "schemas/ZaakType",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-111111111111",
@@ -65,7 +61,7 @@ class ZaakTypeMockData:
             omschrijving="zaaktype-aaa",
             indicatieInternOfExtern="extern",
         )
-        self.zaaktype_bbb = generate_oas_component(
+        self.zaaktype_bbb = generate_oas_component_cached(
             "ztc",
             "schemas/ZaakType",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-222222222222",
@@ -76,7 +72,7 @@ class ZaakTypeMockData:
             omschrijving="zaaktype-bbb",
             indicatieInternOfExtern="extern",
         )
-        self.zaaktype_aaa_2 = generate_oas_component(
+        self.zaaktype_aaa_2 = generate_oas_component_cached(
             "ztc",
             "schemas/ZaakType",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-333333333333",
@@ -87,7 +83,7 @@ class ZaakTypeMockData:
             omschrijving="zaaktype-aaa",
             indicatieInternOfExtern="extern",
         )
-        self.zaaktype_intern = generate_oas_component(
+        self.zaaktype_intern = generate_oas_component_cached(
             "ztc",
             "schemas/ZaakType",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-444444444444",
@@ -104,7 +100,7 @@ class ZaakTypeMockData:
             self.zaaktype_aaa_2,
             self.zaaktype_intern,
         ]
-        self.extra_zaaktype = generate_oas_component(
+        self.extra_zaaktype = generate_oas_component_cached(
             "ztc",
             "schemas/ZaakType",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-555555555555",
@@ -122,12 +118,7 @@ class ZaakTypeMockData:
             self.extra_zaaktype,
         ]
 
-    def setUpOASMocks(self, m):
-        mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
-
     def install_mocks(self, m, *, with_catalog=True) -> "ZaakTypeMockData":
-        self.setUpOASMocks(m)
-
         if not with_catalog:
             for zt in self.all_zaak_types:
                 zt["catalogus"] = None

@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n button_tags card_tags faq_tags grid_tags questionnaire_tags string_tags %}
+{% load i18n button_tags grid_tags questionnaire_tags string_tags %}
 
 {% block header_image %}
 {% if object.image %}
@@ -20,19 +20,19 @@
             {{ category_rendered_description|safe }}
 
         {% if subcategories %}
-            {% card_container subcategories=subcategories parent_category=object %}
+            {% include "components/Card/CardContainer.html" with subcategories=subcategories parent_category=object only %}
         {% endif %}
 
         {% if products %}
             <div class="categories__products">
-            {% card_container products=products small=True parent=object %}
+            {% include "components/Card/CardContainer.html" with products=products small=True parent=object only %}
             </div>
         {% endif %}
 
         {% if category.question_set.all %}
             {% render_grid %}
                 {% render_column span=6 %}
-                    {% faq category.question_set.all %}
+                    {% include "components/Faq/Faq.html" with questions=category.question_set.all only %}
                 {% endrender_column %}
             {% endrender_grid %}
         {% endif %}

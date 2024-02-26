@@ -46,6 +46,7 @@ class OpenZaakConfigAdmin(SingletonModelAdmin):
                 "fields": [
                     "zaak_max_confidentiality",
                     "document_max_confidentiality",
+                    "action_required_deadline_days",
                     "max_upload_size",
                     "allowed_file_extensions",
                     "title_text",
@@ -193,6 +194,7 @@ class ZaakTypeStatusTypeConfigInline(admin.StackedInline):
         "status_indicator",
         "status_indicator_text",
         "notify_status_change",
+        "action_required",
         "document_upload_enabled",
         "document_upload_description",
         "description",

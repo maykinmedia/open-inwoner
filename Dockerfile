@@ -5,7 +5,7 @@
 
 # Stage 1 - Backend build environment
 # includes compilers and build tooling to create the environment
-FROM python:3.9-slim-buster AS backend-build
+FROM python:3.11-slim-buster AS backend-build
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         pkg-config \
@@ -61,7 +61,7 @@ RUN npm run build
 
 # Stage 3 - Build docker image suitable for production
 
-FROM python:3.9-slim-buster
+FROM python:3.11-slim-buster
 
 # Stage 3.1 - Set up the needed production dependencies
 # Note: mime-support becomes media-types in Debian Bullseye (required for correctly serving mime-types for images)
@@ -93,7 +93,7 @@ RUN mkdir /app/log
 RUN mkdir /app/media
 
 # copy backend build deps
-COPY --from=backend-build /usr/local/lib/python3.9 /usr/local/lib/python3.9
+COPY --from=backend-build /usr/local/lib/python3.11 /usr/local/lib/python3.11
 COPY --from=backend-build /usr/local/bin/uwsgi /usr/local/bin/uwsgi
 COPY --from=backend-build /app/src/ /app/src/
 

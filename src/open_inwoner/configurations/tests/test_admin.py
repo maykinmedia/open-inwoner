@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from django_webtest import WebTest
+from maykin_2fa.test import disable_admin_mfa
 from pyquery import PyQuery
 
 from open_inwoner.accounts.tests.factories import UserFactory
@@ -10,6 +11,7 @@ from open_inwoner.accounts.tests.factories import UserFactory
 from ..models import SiteConfiguration
 
 
+@disable_admin_mfa()
 class TestAdminSite(WebTest):
     csrf_checks = False
 
@@ -102,6 +104,7 @@ class TestAdminSite(WebTest):
         )
 
 
+@disable_admin_mfa()
 class TestAdminForm(WebTest):
     def setUp(self):
         self.user = UserFactory(is_superuser=True, is_staff=True)

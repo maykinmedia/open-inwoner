@@ -1,5 +1,4 @@
 import logging
-from datetime import date
 
 from django.test import TestCase, override_settings
 from django.utils.translation import gettext as _
@@ -35,7 +34,6 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
         self.assertEqual(user.first_name, "Merel")
         self.assertEqual(user.infix, "de")
         self.assertEqual(user.last_name, "Kooyman")
-        self.assertEqual(user.birthday, date(1982, 4, 10))
         self.assertEqual(user.street, "King Olivereiland")
         self.assertEqual(user.housenumber, "64")
         self.assertEqual(user.city, "'s-Gravenhage")
@@ -57,7 +55,6 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
         self.assertEqual(user.first_name, "Merel")
         self.assertEqual(user.infix, "de")
         self.assertEqual(user.last_name, "Kooyman")
-        self.assertEqual(user.birthday, date(1982, 4, 10))
         self.assertEqual(user.street, "King Olivereiland")
         self.assertEqual(user.housenumber, "64")
         self.assertEqual(user.city, "'s-Gravenhage")
@@ -98,7 +95,6 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
         self.assertEqual(user.first_name, "")
         self.assertEqual(user.infix, "")
         self.assertEqual(user.last_name, "")
-        self.assertEqual(user.birthday, None)
         self.assertEqual(user.street, "")
         self.assertEqual(user.housenumber, "")
         self.assertEqual(user.city, "")
@@ -118,7 +114,6 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
         self.assertEqual(user.first_name, "")
         self.assertEqual(user.infix, "")
         self.assertEqual(user.last_name, "")
-        self.assertEqual(user.birthday, None)
         self.assertEqual(user.street, "")
         self.assertEqual(user.housenumber, "")
         self.assertEqual(user.city, "")
@@ -148,7 +143,6 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
         self.assertEqual(user.first_name, "")
         self.assertEqual(user.infix, "")
         self.assertEqual(user.last_name, "")
-        self.assertEqual(user.birthday, None)
         self.assertEqual(user.street, "")
         self.assertEqual(user.housenumber, "")
         self.assertEqual(user.city, "")
@@ -190,7 +184,6 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
         self.assertEqual(user.first_name, "")
         self.assertEqual(user.infix, "")
         self.assertEqual(user.last_name, "")
-        self.assertEqual(user.birthday, None)
         self.assertEqual(user.street, "")
         self.assertEqual(user.housenumber, "")
         self.assertEqual(user.city, "")
@@ -220,7 +213,6 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
         self.assertEqual(user.first_name, "")
         self.assertEqual(user.infix, "")
         self.assertEqual(user.last_name, "")
-        self.assertEqual(user.birthday, None)
         self.assertEqual(user.street, "")
         self.assertEqual(user.housenumber, "")
         self.assertEqual(user.city, "")
@@ -250,7 +242,6 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
         self.assertEqual(user.first_name, "")
         self.assertEqual(user.infix, "")
         self.assertEqual(user.last_name, "")
-        self.assertEqual(user.birthday, None)
         self.assertEqual(user.street, "")
         self.assertEqual(user.housenumber, "")
         self.assertEqual(user.city, "")

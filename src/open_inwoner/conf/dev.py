@@ -144,8 +144,18 @@ SOLO_CACHE = None
 
 TWO_FACTOR_PATCH_ADMIN = False
 
+# Disable two-factor authentication by default for development
+if config("DISABLE_2FA", default=True):
+    MAYKIN_2FA_ALLOW_MFA_BYPASS_BACKENDS = AUTHENTICATION_BACKENDS
+
 # playwright multi browser
 PLAYWRIGHT_MULTI_ONLY_DEFAULT = True
+
+if config("PROFILE", default=False):
+    INSTALLED_APPS += ["silk"]
+    MIDDLEWARE = ["silk.middleware.SilkyMiddleware"] + MIDDLEWARE
+    SILKY_PYTHON_PROFILER = True
+    SILKY_PYTHON_PROFILER_BINARY = True
 
 # Override settings with local settings.
 try:

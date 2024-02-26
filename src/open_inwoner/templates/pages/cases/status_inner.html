@@ -1,4 +1,4 @@
-{% load i18n ssd_tags anchor_menu_tags card_tags dashboard_tags file_tags grid_tags table_tags solo_tags link_tags button_tags icon_tags notification_tags %}
+{% load i18n utils anchor_menu_tags card_tags file_tags grid_tags table_tags solo_tags link_tags button_tags icon_tags notification_tags %}
 
 {# Messages #}
 <div class="container container--no-margin" id="cases-status-messages-oob" hx-swap-oob="true">
@@ -13,7 +13,7 @@
         {% render_column span=12 %}
             {# Title/dashboard. #}
             <h1 class="utrecht-heading-1" id="title">{{ case.description }}</h1>
-            {% case_dashboard case %}
+            {% include "components/Dashboard/Dashboard.html" with metrics=metrics only %}
         {% endrender_column %}
 
         {% render_column start=4 span=6 %}

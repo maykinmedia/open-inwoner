@@ -5,8 +5,10 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, path, re_path
-from django.views.generic import RedirectView
+from django.views.generic import RedirectView, TemplateView
 
+from maykin_2fa import monkeypatch_admin
+from maykin_2fa.urls import urlpatterns, webauthn_urlpatterns
 from mozilla_django_oidc_db.views import AdminLoginFailure
 
 from digid_eherkenning_oidc_generics.views import OIDCFailureView
@@ -30,10 +32,12 @@ from open_inwoner.openklant.views.contactform import ContactFormView
 from open_inwoner.pdc.views import FAQView
 
 handler500 = "open_inwoner.utils.views.server_error"
+admin.site.enable_nav_sidebar = False
 admin.site.site_header = "Open Inwoner beheeromgeving"
 admin.site.site_title = "Open Inwoner beheeromgeving"
 admin.site.index_title = "Welkom op de OpenInwoner beheeromgeving"
 
+monkeypatch_admin()
 
 urlpatterns = [
     path(
@@ -56,7 +60,8 @@ urlpatterns = [
         auth_views.PasswordResetCompleteView.as_view(),
         name="password_reset_complete",
     ),
-    path("admin/hijack/", include("hijack.urls")),
+    path("admin/", include((urlpatterns, "maykin_2fa"))),
+    path("admin/", include((webauthn_urlpatterns, "two_factor"))),
     path("admin/login/failure/", AdminLoginFailure.as_view(), name="admin-oidc-error"),
     path("admin/", admin.site.urls),
     path("csp/", include("cspreports.urls")),
@@ -182,6 +187,11 @@ elif settings.EHERKENNING_MOCK:
 
 if settings.DEBUG:
     urlpatterns = [
+        # provide default styling template
+        path(
+            "style-demo/",
+            TemplateView.as_view(template_name="components/Typography/StyleDemo.html"),
+        ),
         # fix annoying favicon http error
         path("favicon.ico", RedirectView.as_view(url="/static/ico/favicon.png")),
     ] + urlpatterns
@@ -192,3 +202,6 @@ if settings.DEBUG:
         urlpatterns = [
             path("__debug__/", include(debug_toolbar.urls)),
         ] + urlpatterns
+
+if apps.is_installed("silk"):
+    urlpatterns.insert(0, path(r"silk/", include("silk.urls", namespace="silk")))

@@ -1,6 +1,6 @@
 from django import template
 
-from open_inwoner.components.utils import ContentsNode, parse_component_with_args
+from .helpers import create_content_wrapper
 
 register = template.Library()
 
@@ -18,11 +18,9 @@ def render_list(parser, token):
     Extra context:
         - contents: string (HTML) | this is the context between the render_list and endrender_list tags
     """
-    bits = token.split_contents()
-    context_kwargs = parse_component_with_args(parser, bits, "render_list")
-    nodelist = parser.parse(("endrender_list",))
-    parser.delete_first_token()
-    return ContentsNode(nodelist, "components/List/List.html", **context_kwargs)
+    return create_content_wrapper("render_list", "components/List/List.html")(
+        parser, token
+    )
 
 
 @register.inclusion_tag("components/List/ListItem.html")

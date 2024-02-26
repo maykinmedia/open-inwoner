@@ -3,10 +3,21 @@
   flex-direction: column;
 
   &__key {
-    color: var(--color-gray-90);
+    color: var(--color-gray-dark-900);
+    @media (max-width: 500px) {
+      min-width: 150px;
+    }
   }
   &__value {
     color: var(--color-gray-dark);
+    overflow-wrap: break-word;
+    word-break: normal;
+  }
+
+  &__break {
+    color: var(--color-gray-dark);
+    overflow-wrap: break-word;
+    word-break: break-all;
   }
 
   &__title {
@@ -25,9 +36,7 @@
   &.tabled--flexible {
     .tabled__header,
     .tabled__row {
-      @media (min-width: 768px) {
-        grid-template-columns: 1fr 1fr 1fr;
-      }
+      grid-template-columns: 1fr 2fr;
     }
   }
 
@@ -89,11 +98,25 @@
         display: flex;
         justify-content: end;
       }
+
+      .button {
+        &--transparent,
+        &--textless {
+          font-weight: bold;
+        }
+      }
     }
 
     &--force-right {
       display: flex;
       justify-content: end;
+
+      .button {
+        &--transparent,
+        &--textless {
+          font-weight: bold;
+        }
+      }
     }
 
     &--mobile-big {

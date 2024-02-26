@@ -1,6 +1,6 @@
-from .category import *
-from .faq import *
-from .neighbourhood import *
-from .organization import *
-from .product import *
-from .tag import *
+from .category import *  # noqa
+from .faq import *  # noqa
+from .neighbourhood import *  # noqa
+from .organization import *  # noqa
+from .product import *  # noqa
+from .tag import *  # noqa

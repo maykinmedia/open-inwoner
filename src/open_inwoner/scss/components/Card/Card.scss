@@ -4,6 +4,8 @@
   --card-size-border: var(--border-width-thin);
   --card-size-dog-ear: var(--gutter-width);
   --card-spacing: var(--spacing-large);
+  --card-spacing-vertical: var(--spacing-giant);
+  --card-spacing-horizontal: var(--spacing-extra-large);
 
   background-color: var(--card-color-background);
   border: var(--card-size-border) solid var(--card-color-border);
@@ -15,6 +17,10 @@
   min-width: var(--header-height);
   position: relative;
   text-decoration: none;
+
+  &__product-card {
+    min-height: 150px;
+  }
 
   &--inline {
     display: inline-flex;
@@ -64,16 +70,6 @@
     width: var(--card-size-dog-ear);
   }
 
-  &--type-info .h1,
-  &--type-info .h2,
-  &--type-info .h3,
-  &--type-info .h4,
-  &--type-info .h5,
-  &--type-info .h5,
-  &--type-info .p {
-    color: var(--color-info-darker);
-  }
-
   &--tinted {
     --card-color-background: var(--color-gray-lightest);
 
@@ -98,8 +94,26 @@
     object-fit: contain;
   }
 
+  &__caption {
+    color: var(--color-gray-dark-900);
+    margin: 0;
+  }
+
+  &__text--small {
+    font-size: var(--font-size-body-small);
+  }
+
+  &__text--dark {
+    color: var(--font-color-body);
+    padding-left: var(--spacing-medium);
+  }
+
   &__body {
-    padding: var(--card-spacing);
+    padding: var(--card-spacing-vertical) var(--card-spacing-horizontal);
+
+    &--compact {
+      padding: var(--card-spacing);
+    }
 
     &--tabled {
       display: flex;
@@ -191,43 +205,30 @@
     margin-top: var(--spacing-extra-large);
   }
 
-  .h2,
-  .h4 {
-    margin: 0 0 var(--card-spacing);
-  }
-
-  &--compact .h3 {
-    padding: 0 0 var(--card-spacing);
-    margin: 0 0 var(--card-spacing);
-    position: relative;
-
-    &::before {
-      bottom: 0;
-      content: '';
-      border-bottom: var(--card-size-border) solid var(--card-color-border);
-      width: calc(100% + 2 * var(--card-spacing));
-      position: absolute;
-      left: calc(-1 * var(--card-spacing));
-    }
+  .link .link__text {
+    font-weight: bold;
   }
 
   /// Headings in cards
 
-  .h2,
-  .h3,
-  .h4,
-  .h2 .link,
-  .h3 .link,
-  .h4 .link {
-    color: var(--font-color-body);
+  &__heading-2,
+  &__heading-3,
+  &__heading-4,
+  &__heading-2 .link,
+  &__heading-3 .link,
+  &__heading-4 .link {
+    color: var(--color-black);
+    font-family: var(--font-family-heading);
     font-size: var(--font-size-heading-card);
+    line-height: var(--font-line-height-heading-4);
+    margin: 0;
   }
 
   &--product {
     padding: 20px;
     align-items: end;
 
-    .h3 {
+    .card__heading-3 {
       width: 100%;
     }
 
@@ -255,7 +256,7 @@
   span.button:last-child {
     bottom: 0;
     right: 0;
-    padding-bottom: var(--card-spacing);
+    padding-bottom: var(--card-spacing-vertical);
     position: absolute;
   }
 
@@ -283,7 +284,7 @@
 
   &--stretch .list + .link:first-of-type:last-of-type,
   &--stretch .profile-card__button {
-    bottom: var(--card-spacing);
+    bottom: var(--card-spacing-vertical);
     position: static;
 
     @media (min-width: 768px) {

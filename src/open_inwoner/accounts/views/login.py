@@ -17,10 +17,6 @@ from formtools.wizard.views import SessionWizardView
 from furl import furl
 from oath import totp
 
-from digid_eherkenning_oidc_generics.models import (
-    OpenIDConnectDigiDConfig,
-    OpenIDConnectEHerkenningConfig,
-)
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.utils.mixins import ThrottleMixin
 from open_inwoner.utils.views import LogMixin

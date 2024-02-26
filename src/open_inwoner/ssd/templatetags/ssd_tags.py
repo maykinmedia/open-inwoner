@@ -2,9 +2,7 @@ from datetime import datetime
 from typing import Optional, Union
 
 from django import template
-from django.template.defaultfilters import date as django_date, stringfilter
-
-import markdown as md
+from django.template.defaultfilters import date as django_date
 
 from ..service.jaaropgave.fwi_include_resolved import CdPositiefNegatief
 
@@ -108,9 +106,3 @@ def get_detail_value_for_column(detail, column: str) -> str:
 
 def get_sign(sign: CdPositiefNegatief) -> Union[CdPositiefNegatief, str]:
     return sign if sign == "-" else ""
-
-
-@register.filter()
-@stringfilter
-def markdown(value):
-    return md.markdown(value, extensions=["markdown.extensions.fenced_code"])

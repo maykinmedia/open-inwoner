@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib import admin
+from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.utils.translation import gettext as _
 
 from import_export.admin import ImportExportMixin
@@ -11,6 +12,7 @@ from open_inwoner.utils.logentry import system_action
 from open_inwoner.utils.mixins import UUIDAdminFirstInOrder
 
 from ..models import (
+    Category,
     Product,
     ProductCondition,
     ProductContact,
@@ -40,6 +42,47 @@ class ProductAdminForm(forms.ModelForm):
         fields = "__all__"
         widgets = {"content": CKEditorWidget}
 
+    categories = forms.ModelMultipleChoiceField(
+        label=_("Allowed admin categories"),
+        queryset=Category.objects.all(),
+        required=False,
+        widget=FilteredSelectMultiple(verbose_name=_("Category"), is_stacked=False),
+    )
+
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request")
+        super().__init__(*args, **kwargs)
+
+        # we only want to add/remove Categories we have access to and keep te rest
+        user_categories = self.request.user.get_group_managed_categories()
+        if user_categories:
+            self.fields["categories"].queryset = user_categories
+            if self.instance and self.instance.pk:
+                self.fields[
+                    "categories"
+                ].initial = self.instance.categories.intersection(user_categories)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if len(cleaned_data["categories"]) == 0:
+            self.add_error("categories", _("At least one category is required"))
+        return cleaned_data
+
+    def _save_m2m(self):
+        # remember this before we run regular _save_m2m()
+        current = set(self.instance.categories.all())
+
+        super()._save_m2m()
+
+        # we only want to add/remove Categories we have access to and keep the ones we don't,
+        # so do some set operations to figure it out
+        managed = set(self.request.user.get_group_managed_categories())
+        if managed:
+            want_managed = managed & set(self.cleaned_data["categories"])
+            keep_not_ours = current - managed
+            combined = keep_not_ours | want_managed
+            self.instance.categories.set(combined)
+
 
 @admin.register(Product)
 class ProductAdmin(ImportExportMixin, admin.ModelAdmin):
@@ -48,7 +91,6 @@ class ProductAdmin(ImportExportMixin, admin.ModelAdmin):
     list_editable = ("published",)
     date_hierarchy = "created_on"
     autocomplete_fields = (
-        "categories",
         "related_products",
         "tags",
         "organizations",
@@ -72,6 +114,17 @@ class ProductAdmin(ImportExportMixin, admin.ModelAdmin):
     import_template_name = "admin/product_import.html"
     formats = [base_formats.XLSX, base_formats.CSV]
 
+    def get_form(self, request, obj=None, change=False, **kwargs):
+        # workaround to get the request in the Modelform
+        Form = super().get_form(request, obj=obj, change=change, **kwargs)
+
+        class RequestForm(Form):
+            def __new__(cls, *args, **kwargs):
+                kwargs["request"] = request
+                return Form(*args, **kwargs)
+
+        return RequestForm
+
     def get_export_resource_class(self):
         return ProductExportResource
 
@@ -86,6 +139,9 @@ class ProductAdmin(ImportExportMixin, admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
+        categories = request.user.get_group_managed_categories()
+        if categories:
+            qs = qs.filter(categories__in=categories)
         return qs.prefetch_related("links", "locations", "contacts")
 
     def display_categories(self, obj):

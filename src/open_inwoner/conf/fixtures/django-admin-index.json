@@ -12,10 +12,6 @@
             ],
             [
                 "accounts",
-                "appointment"
-            ],
-            [
-                "accounts",
                 "document"
             ],
             [
@@ -29,6 +25,10 @@
             [
                 "accounts",
                 "user"
+            ],
+            [
+                "mozilla_django_oidc_db",
+                "openidconnectconfig"
             ],
             [
                 "userfeed",

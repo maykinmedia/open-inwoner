@@ -1,5 +1,4 @@
 import random
-from datetime import datetime, timezone
 from uuid import uuid4
 
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -8,6 +7,13 @@ from django.db.models.signals import post_save, pre_save
 import factory.fuzzy
 
 from open_inwoner.accounts.choices import LoginTypeChoices
+
+
+class GroupFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "auth.Group"
+
+    name = factory.Faker("word")
 
 
 @factory.django.mute_signals(pre_save, post_save)
@@ -48,15 +54,6 @@ class TokenFactory(factory.django.DjangoModelFactory):
     created_for = factory.SubFactory(UserFactory)
     key = factory.LazyAttribute(lambda o: uuid4())
     user_id = factory.LazyAttribute(lambda o: o.created_for.id)
-
-
-class AppointmentFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = "accounts.Appointment"
-
-    name = factory.Faker("first_name")
-    datetime = factory.fuzzy.FuzzyDateTime(datetime.now(timezone.utc))
-    created_by = factory.SubFactory(UserFactory)
 
 
 class ActionFactory(factory.django.DjangoModelFactory):

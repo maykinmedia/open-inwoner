@@ -1,10 +1,9 @@
 import logging
-from typing import Optional, Union
-from uuid import UUID
+from typing import Optional
 
-from zds_client import get_operation_url
 from zgw_consumers.api_models.constants import RolTypes, VertrouwelijkheidsAanduidingen
 
+from open_inwoner.kvk.branches import get_kvk_branch_number
 from open_inwoner.openzaak.api_models import InformatieObject, Rol, Zaak, ZaakType
 
 from .models import (
@@ -133,20 +132,6 @@ def get_zaak_type_info_object_type_config(
         return None
 
 
-def get_retrieve_resource_by_uuid_url(
-    client, resource: str, uuid: Union[str, UUID]
-) -> str:
-    op_suffix = client.operation_suffix_mapping["retrieve"]
-    operation_id = f"{resource}{op_suffix}"
-    path_kwargs = {
-        "uuid": uuid,
-    }
-    url = get_operation_url(
-        client.schema, operation_id, base_url=client.base_url, **path_kwargs
-    )
-    return url
-
-
 def translate_single_status(status_text: str) -> str:
     if not status_text:
         return ""
@@ -158,3 +143,28 @@ def translate_single_status(status_text: str) -> str:
         )
     except StatusTranslation.DoesNotExist:
         return ""
+
+
+def get_user_fetch_parameters(request) -> dict:
+    """
+    Determine the parameters used to perform ZGW resource fetches
+    """
+    user = request.user
+
+    if not user.is_authenticated:
+        return {}
+
+    if user.bsn:
+        return {"user_bsn": user.bsn}
+    elif user.kvk:
+        kvk_or_rsin = user.kvk
+        config = OpenZaakConfig.get_solo()
+        if config.fetch_eherkenning_zaken_with_rsin:
+            kvk_or_rsin = user.rsin
+
+        parameters = {"user_kvk_or_rsin": kvk_or_rsin}
+        vestigingsnummer = get_kvk_branch_number(request.session)
+        if vestigingsnummer:
+            parameters.update({"vestigingsnummer": vestigingsnummer})
+        return parameters
+    return {}

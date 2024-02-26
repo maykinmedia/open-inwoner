@@ -19,7 +19,6 @@ from open_inwoner.accounts.views import (
     InviteAcceptView,
     MyDataView,
     MyNotificationsView,
-    MyProfileExportView,
     MyProfileView,
     NecessaryFieldsUserView,
 )
@@ -95,7 +94,6 @@ urlpatterns = [
     path("mydata/", MyDataView.as_view(), name="data"),
     path("edit/", EditProfileView.as_view(), name="edit"),
     path("invite/<str:key>/accept/", InviteAcceptView.as_view(), name="invite_accept"),
-    path("export/", MyProfileExportView.as_view(), name="export"),
     path(
         "register/necessary/",
         NecessaryFieldsUserView.as_view(),

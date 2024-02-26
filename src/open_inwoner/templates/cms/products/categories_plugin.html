@@ -1,4 +1,4 @@
-{% load i18n button_tags card_tags %}
+{% load i18n button_tags %}
 {% if categories %}
     <h2 class="h2">
         {{configurable_text.home_page.home_theme_title}}
@@ -8,5 +8,5 @@
     </h2>
     <p class="p">{{configurable_text.home_page.home_theme_intro|linebreaksbr}}</p>
 
-    {% card_container categories=categories columns=4 image_object_fit="cover" %}
+    {% include "components/Card/CardContainer.html" with categories=categories columns=4 image_object_fit="cover" only %}
 {% endif %}

@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n l10n card_tags grid_tags %}
+{% load i18n l10n grid_tags %}
 
 
 {% block content %}
@@ -23,9 +23,9 @@
             </div>
         </div>
     </div>
-        
+
     {% if products %}
-        {% card_container products=products small=True %}
+        {% include "components/Card/CardContainer.html" with products=products small=True only %}
     {% else %}
         {% trans "There are no products available at this location." %}
     {% endif %}

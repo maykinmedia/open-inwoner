@@ -50,13 +50,16 @@
     border-top-left-radius: var(--border-radius);
     border-top-right-radius: var(--border-radius);
     color: var(--color-info-darker);
+    font-size: var(--font-size-body);
 
     .card__status_indicator_text {
-      padding: var(--spacing-medium);
+      // Fix for optical illusion
+      padding: 8px var(--spacing-large) 10px 0;
     }
 
     [class*='icons'] {
-      margin: var(--spacing-small) var(--spacing-medium) 0 var(--spacing-medium);
+      // Fix for optical illusion
+      margin: 6px 10px 6px 10px;
     }
 
     &.success {

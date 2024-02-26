@@ -12,7 +12,6 @@ from zgw_consumers.api_models.constants import (
     VertrouwelijkheidsAanduidingen,
 )
 from zgw_consumers.constants import APITypes
-from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
 from open_inwoner.accounts.tests.factories import (
     DigidUserFactory,
@@ -20,13 +19,10 @@ from open_inwoner.accounts.tests.factories import (
 )
 from open_inwoner.openklant.constants import Status
 from open_inwoner.openklant.models import OpenKlantConfig
-from open_inwoner.openklant.tests.data import (
-    CONTACTMOMENTEN_ROOT,
-    KLANTEN_ROOT,
-    MockAPIData,
-)
+from open_inwoner.openklant.tests.data import CONTACTMOMENTEN_ROOT, KLANTEN_ROOT
 from open_inwoner.openzaak.models import CatalogusConfig, OpenZaakConfig
 from open_inwoner.openzaak.tests.factories import ServiceFactory, ZaakTypeConfigFactory
+from open_inwoner.openzaak.tests.helpers import generate_oas_component_cached
 from open_inwoner.openzaak.tests.shared import (
     CATALOGI_ROOT,
     DOCUMENTEN_ROOT,
@@ -87,7 +83,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         )
         self.ok_config.save()
 
-        self.zaak = generate_oas_component(
+        self.zaak = generate_oas_component_cached(
             "zrc",
             "schemas/Zaak",
             uuid="d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
@@ -101,7 +97,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             resultaat=f"{ZAKEN_ROOT}resultaten/a44153aa-ad2c-6a07-be75-15add5113",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
         )
-        self.user_role = generate_oas_component(
+        self.user_role = generate_oas_component_cached(
             "zrc",
             "schemas/Rol",
             url=f"{ZAKEN_ROOT}rollen/f33153aa-ad2c-4a07-ae75-15add5891",
@@ -114,7 +110,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
                 "geslachtsnaam": "Bazz",
             },
         )
-        self.eherkenning_user_role = generate_oas_component(
+        self.eherkenning_user_role = generate_oas_component_cached(
             "zrc",
             "schemas/Rol",
             url=f"{ZAKEN_ROOT}rollen/3ff7686f-db35-4181-8e48-57521220f887",
@@ -127,7 +123,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
                 "geslachtsnaam": "Bazz",
             },
         )
-        self.eherkenning_user_role_kvk = generate_oas_component(
+        self.eherkenning_user_role_kvk = generate_oas_component_cached(
             "zrc",
             "schemas/Rol",
             url=f"{ZAKEN_ROOT}rollen/5885531e-9b7f-46af-947e-f2278a2e72a8",
@@ -140,7 +136,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
                 "geslachtsnaam": "Bazz",
             },
         )
-        self.zaaktype = generate_oas_component(
+        self.zaaktype = generate_oas_component_cached(
             "ztc",
             "schemas/ZaakType",
             uuid="0caa29cb-0167-426f-8dc1-88bebd7c8804",
@@ -154,7 +150,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         #
         # statuses
         #
-        self.status_new = generate_oas_component(
+        self.status_new = generate_oas_component_cached(
             "zrc",
             "schemas/Status",
             url=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-beu760sle929",
@@ -163,7 +159,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             datumStatusGezet="2021-01-12",
             statustoelichting="",
         )
-        self.status_finish = generate_oas_component(
+        self.status_finish = generate_oas_component_cached(
             "zrc",
             "schemas/Status",
             url=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
@@ -175,7 +171,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         #
         # status types
         #
-        self.status_type_new = generate_oas_component(
+        self.status_type_new = generate_oas_component_cached(
             "ztc",
             "schemas/StatusType",
             url=self.status_new["statustype"],
@@ -188,7 +184,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             isEindstatus=False,
         )
         # no associated status (for testing `add_second_status_preview`)
-        self.status_type_in_behandeling = generate_oas_component(
+        self.status_type_in_behandeling = generate_oas_component_cached(
             "ztc",
             "schemas/StatusType",
             url=f"{CATALOGI_ROOT}statustypen/167cb935-ac8a-428e-8cca-5abda0da47c7",
@@ -200,7 +196,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             volgnummer=3,
             isEindstatus=False,
         )
-        self.status_type_finish = generate_oas_component(
+        self.status_type_finish = generate_oas_component_cached(
             "ztc",
             "schemas/StatusType",
             url=self.status_finish["statustype"],
@@ -212,7 +208,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             volgnummer=1,
             isEindstatus=True,
         )
-        self.result = generate_oas_component(
+        self.result = generate_oas_component_cached(
             "zrc",
             "schemas/Resultaat",
             uuid="a44153aa-ad2c-6a07-be75-15add5113",
@@ -221,7 +217,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             zaak=self.zaak["url"],
             toelichting="resultaat toelichting",
         )
-        self.klant = generate_oas_component(
+        self.klant = generate_oas_component_cached(
             "kc",
             "schemas/Klant",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
@@ -246,11 +242,6 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         )
 
     def _setUpMocks(self, m):
-        mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
-        mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
-        mock_service_oas_get(m, DOCUMENTEN_ROOT, "drc")
-        MockAPIData.setUpOASMocks(m)
-
         self.matchers = []
 
         for resource in [
@@ -296,7 +287,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         ]
 
     def _setUpExtraMocks(self, m):
-        self.contactmoment = generate_oas_component(
+        self.contactmoment = generate_oas_component_cached(
             "cmc",
             "schemas/ContactMoment",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
@@ -305,7 +296,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             antwoord="",
             text="hey!\n\nwaddup?",
         )
-        self.klant_contactmoment = generate_oas_component(
+        self.klant_contactmoment = generate_oas_component_cached(
             "cmc",
             "schemas/KlantContactMoment",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
