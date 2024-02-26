@@ -20,7 +20,11 @@ from mail_editor.helpers import find_template
 from view_breadcrumbs import BaseBreadcrumbMixin
 from zgw_consumers.api_models.constants import RolOmschrijving
 
-from open_inwoner.openklant.clients import build_client as build_client_openklant
+from open_inwoner.openklant.api_models import ObjectContactMoment
+from open_inwoner.openklant.clients import (
+    ContactmomentenClient,
+    build_client as build_client_openklant,
+)
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.openklant.wrap import get_fetch_parameters
 from open_inwoner.openzaak.api_models import Status, StatusType, Zaak
@@ -134,10 +138,14 @@ class InnerCaseDetailView(
             status_translate = StatusTranslation.objects.get_lookup()
 
             zaken_client = build_client_openzaak("zaak")
+            contactmoment_client = build_client_openklant("contactmomenten")
 
             # fetch data associated with `self.case`
             documents = self.get_case_document_files(self.case, zaken_client)
             statuses = zaken_client.fetch_status_history(self.case.url)
+            objectcontactmomenten = self.get_objectcontactmomenten(
+                client=contactmoment_client
+            )
             self.store_statustype_mapping(self.case.zaaktype.identificatie)
             self.store_resulttype_mapping(self.case.zaaktype.identificatie)
 
@@ -175,6 +183,9 @@ class InnerCaseDetailView(
             hooks.case_status_seen(self.request.user, self.case)
             hooks.case_documents_seen(self.request.user, self.case)
 
+            # TODO: remove
+            from .. import dev_snippets
+
             context["case"] = {
                 "id": str(self.case.uuid),
                 "identification": self.case.identification,
@@ -201,6 +212,8 @@ class InnerCaseDetailView(
                     "created",
                     dt.timedelta(days=settings.DOCUMENT_RECENT_DAYS),
                 ),
+                # "questions": [ocm.contactmoment for ocm in objectcontactmomenten],
+                "questions": dev_snippets.questions,
             }
             context["case"].update(self.get_upload_info_context(self.case))
             context["anchors"] = self.get_anchors(statuses, documents)
@@ -607,6 +620,14 @@ class InnerCaseDetailView(
                 )  # order ascending b/c alphabetical
             except TypeError:
                 return documents
+
+    def get_objectcontactmomenten(
+        self,
+        client: Optional[ContactmomentenClient],
+    ) -> list[ObjectContactMoment]:
+        if not client:
+            return []
+        return client.retrieve_objectcontactmomenten_for_zaak(self.case)
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

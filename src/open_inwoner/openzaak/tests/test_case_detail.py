@@ -26,6 +26,9 @@ from zgw_consumers.constants import APITypes
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory, eHerkenningUserFactory
 from open_inwoner.cms.cases.views.status import InnerCaseDetailView, SimpleFile
+from open_inwoner.openklant.constants import Status as ContactMomentStatus
+from open_inwoner.openklant.models import OpenKlantConfig
+from open_inwoner.openklant.tests.factories import make_contactmoment
 from open_inwoner.openzaak.constants import StatusIndicators
 from open_inwoner.openzaak.tests.factories import (
     StatusTranslationFactory,
@@ -53,6 +56,9 @@ PATCHED_MIDDLEWARE = [
 ]
 
 
+CONTACTMOMENTEN_ROOT = "https://contactmomenten.nl/api/v1/"
+
+
 @requests_mock.Mocker()
 @override_settings(
     ROOT_URLCONF="open_inwoner.cms.tests.urls",
@@ -78,6 +84,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.document_service = ServiceFactory(
             api_root=DOCUMENTEN_ROOT, api_type=APITypes.drc
         )
+        self.contactmoment_service = ServiceFactory(
+            api_root=CONTACTMOMENTEN_ROOT, api_type=APITypes.cmc
+        )
+
         # openzaak config
         self.config = OpenZaakConfig.get_solo()
         self.config.zaak_service = self.zaak_service
@@ -90,6 +100,11 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             VertrouwelijkheidsAanduidingen.beperkt_openbaar
         )
         self.config.save()
+
+        # openklant config
+        self.openklant_config = OpenKlantConfig.get_solo()
+        self.openklant_config.contactmomenten_service = self.contactmoment_service
+        self.openklant_config.save()
 
         self.case_detail_url = reverse(
             "cases:case_detail_content",
@@ -445,7 +460,63 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             bestandsnaam="geheim-document.txt",
             bestandsomvang=123,
         )
-
+        #
+        # (object-) contactmomenten
+        #
+        self.contactmoment = generate_oas_component_cached(
+            "cmc",
+            "schemas/ContactMoment",
+            uuid="aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+            url=f"{CONTACTMOMENTEN_ROOT}contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+            identificatie="AB123",
+            type="SomeType",
+            kanaal="Contactformulier",
+            status=ContactMomentStatus.afgehandeld,
+            antwoord="yes",
+            onderwerp="e_suite_subject_code",
+        )
+        self.contactmoment2 = generate_oas_component_cached(
+            "cmc",
+            "schemas/ContactMoment",
+            uuid="aaaaaaaa-aaaa-aaaa-aaaa-dddddddddddd",
+            url=f"{CONTACTMOMENTEN_ROOT}contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-dddddddddddd",
+            identificatie="AB123",
+            type="SomeType",
+            kanaal="MAIL",
+            status=ContactMomentStatus.afgehandeld,
+            antwoord="no",
+            onderwerp="e_suite_subject_code",
+        )
+        self.objectcontactmoment = generate_oas_component_cached(
+            "cmc",
+            "schemas/ObjectContactMoment",
+            uuid="77880671-b88a-44ed-ba24-dc2ae688c2ec",
+            url=f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten/77880671-b88a-44ed-ba24-dc2ae688c2ec",
+            object=self.zaak["url"],
+            object_type="zaak",
+            contactmoment=self.contactmoment["url"],
+        )
+        self.objectcontactmoment2 = generate_oas_component_cached(
+            "cmc",
+            "schemas/ObjectContactMoment",
+            uuid="bb51784c-fa2c-4f65-b24e-7179b615efac",
+            url=f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten/bb51784c-fa2c-4f65-b24e-7179b615efac",
+            object=self.zaak["url"],
+            object_type="zaak",
+            contactmoment=self.contactmoment2["url"],
+        )
+        self.objectcontactmoment_eherkenning = generate_oas_component_cached(
+            "cmc",
+            "schemas/ObjectContactMoment",
+            uuid="bb51784c-fa2c-4f65-b24e-7179b615efac",
+            url=f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten/bb51784c-fa2c-4f65-b24e-7179b615efac",
+            object=self.zaak_eherkenning["url"],
+            object_type="zaak",
+            contactmoment=self.contactmoment["url"],
+        )
+        #
+        # documents
+        #
         self.informatie_object_file = SimpleFile(
             name="uploaded_document_title.txt",
             size=123,
@@ -505,6 +576,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             self.status_type_new,
             self.status_type_in_behandeling,
             self.status_type_finish,
+            self.contactmoment,
+            self.contactmoment2,
+            self.objectcontactmoment,
+            self.objectcontactmoment2,
         ]:
             m.get(resource["url"], json=resource)
 
@@ -580,6 +655,12 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                     self.status_type_in_behandeling,
                     self.status_type_finish,
                 ]
+            ),
+        )
+        m.get(
+            f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten?object={self.zaak['url']}",
+            json=paginated_response(
+                [self.objectcontactmoment, self.objectcontactmoment2]
             ),
         )
 
@@ -673,6 +754,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 "allowed_file_extensions": sorted(self.config.allowed_file_extensions),
                 "contact_form_enabled": False,
                 "new_docs": False,
+                "questions": [
+                    make_contactmoment(self.contactmoment),
+                    make_contactmoment(self.contactmoment2),
+                ],
             },
         )
         # check userfeed hooks
@@ -763,6 +848,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 "allowed_file_extensions": sorted(self.config.allowed_file_extensions),
                 "contact_form_enabled": False,
                 "new_docs": False,
+                "questions": [
+                    make_contactmoment(self.contactmoment),
+                    make_contactmoment(self.contactmoment2),
+                ],
             },
         )
 
@@ -1138,8 +1227,13 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.assertContains(response, "Coffee zaaktype")
         self.assertContains(response, "uploaded_document_title")
 
-    def test_page_displays_expected_data_for_eherkenning_user(self, m):
+    @patch(
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.get_objectcontactmomenten"
+    )
+    def test_page_displays_expected_data_for_eherkenning_user(self, m, ocm_mock):
         self._setUpMocks(m)
+
+        ocm_mock.return_value = []
 
         for fetch_eherkenning_zaken_with_rsin in [True, False]:
             with self.subTest(
@@ -1159,8 +1253,11 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 self.assertContains(response, "Coffee zaaktype")
 
     @set_kvk_branch_number_in_session("1234")
+    @patch(
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.get_objectcontactmomenten"
+    )
     def test_page_displays_expected_data_for_eherkenning_user_with_vestigingsnummer(
-        self, m
+        self, m, ocm_mock
     ):
         """
         In order to have access to a case detail page when logged in as a specific
@@ -1181,6 +1278,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 ]
             ),
         )
+
+        ocm_mock.return_value = []
 
         for fetch_eherkenning_zaken_with_rsin in [True, False]:
             with self.subTest(
@@ -1236,8 +1335,15 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.assertEqual(self.user, log.user)
         self.assertEqual(self.user, log.content_object)
 
-    def test_case_io_objects_are_retrieved_when_user_logged_in_via_digid(self, m):
+    @patch(
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.get_objectcontactmomenten"
+    )
+    def test_case_io_objects_are_retrieved_when_user_logged_in_via_digid(
+        self, m, ocm_mock
+    ):
         self._setUpMocks(m)
+
+        ocm_mock.return_value = []
 
         response = self.app.get(self.case_detail_url, user=self.user)
         documents = response.context.get("case", {}).get("documents")

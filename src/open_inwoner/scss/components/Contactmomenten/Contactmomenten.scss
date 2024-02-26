@@ -70,6 +70,10 @@
       text-decoration: none;
     }
   }
+
+  &__title {
+    padding-bottom: var(--spacing-large);
+  }
 }
 
 .contactmoment {

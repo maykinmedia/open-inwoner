@@ -56,6 +56,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         self.document_service = ServiceFactory(
             api_root=DOCUMENTEN_ROOT, api_type=APITypes.drc
         )
+
         # openzaak config
         self.oz_config = OpenZaakConfig.get_solo()
         self.oz_config.zaak_service = self.zaak_service
@@ -92,7 +93,6 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             identificatie="ZAAK-2022-0000000024",
             omschrijving="Zaak naar aanleiding van ingezonden formulier",
             startdatum="2022-01-02",
-            einddatum=None,
             status=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
             resultaat=f"{ZAKEN_ROOT}resultaten/a44153aa-ad2c-6a07-be75-15add5113",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
@@ -296,6 +296,15 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             antwoord="",
             text="hey!\n\nwaddup?",
         )
+        self.objectcontactmoment = generate_oas_component_cached(
+            "cmc",
+            "schemas/ObjectContactMoment",
+            uuid="77880671-b88a-44ed-ba24-dc2ae688c2ec",
+            url=f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten/77880671-b88a-44ed-ba24-dc2ae688c2ec",
+            object=self.zaak["url"],
+            object_type="zaak",
+            contactmoment=self.contactmoment["url"],
+        )
         self.klant_contactmoment = generate_oas_component_cached(
             "cmc",
             "schemas/KlantContactMoment",
@@ -319,8 +328,18 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             self.matcher_create_klantcontactmoment,
         ]
 
+        m.get(
+            self.contactmoment["url"],
+            json=self.contactmoment,
+        )
+        m.get(
+            f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten?object={self.zaak['url']}",
+            json=paginated_response([self.objectcontactmoment]),
+        )
+
     def test_form_is_shown_if_open_klant_api_configured(self, m):
         self._setUpMocks(m)
+        self._setUpExtraMocks(m)
 
         self.assertTrue(self.ok_config.has_api_configuration())
 
@@ -332,6 +351,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
 
     def test_form_is_shown_if_open_klant_email_configured(self, m):
         self._setUpMocks(m)
+        self._setUpExtraMocks(m)
 
         self.ok_config.register_email = "example@example.com"
         self.ok_config.register_contact_moment = False
@@ -348,6 +368,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
 
     def test_form_is_shown_if_open_klant_email_and_api_configured(self, m):
         self._setUpMocks(m)
+        self._setUpExtraMocks(m)
 
         self.ok_config.register_email = "example@example.com"
         self.ok_config.save()
@@ -383,6 +404,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
 
     def test_no_form_shown_if_contact_form_disabled(self, m):
         self._setUpMocks(m)
+        self._setUpExtraMocks(m)
 
         CatalogusConfig.objects.all().delete()
         self.zaak_type_config.delete()
@@ -502,6 +524,11 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
     def test_form_success_with_email(self, m):
         self._setUpMocks(m)
         self._setUpExtraMocks(m)
+
+        m.get(
+            f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten?object={self.zaak['url']}",
+            json=paginated_response([self.objectcontactmoment]),
+        )
 
         self.ok_config.register_email = "example@example.com"
         self.ok_config.register_contact_moment = False
