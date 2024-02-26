@@ -35,7 +35,10 @@ class CategoryPublishedQueryset(MP_NodeQuerySet):
 
     def visible_for_user(self, user: User):
         if user.is_authenticated:
-            if user.bsn:
+            # Show all categories to staff users
+            if user.is_staff:
+                return self
+            elif user.bsn:
                 return self.filter(visible_for_citizens=True)
             elif user.kvk:
                 return self.filter(visible_for_companies=True)
