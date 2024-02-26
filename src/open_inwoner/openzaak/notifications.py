@@ -553,7 +553,7 @@ def handle_status_update(
     else:
         template_name = "case_status_notification"
 
-    send_case_update_email(user, case, template_name)
+    send_case_update_email(user, case, status, template_name)
     note.mark_sent()
 
     log_system_action(
@@ -563,7 +563,11 @@ def handle_status_update(
 
 
 def send_case_update_email(
-    user: User, case: Zaak, template_name: str, extra_context: dict = None
+    user: User,
+    case: Zaak,
+    status: Status,
+    template_name: str,
+    extra_context: dict = None,
 ):
     """
     send the actual mail
@@ -578,6 +582,7 @@ def send_case_update_email(
     context = {
         "identification": case.identification,
         "type_description": case.zaaktype.omschrijving,
+        "status_description": status.statustype.omschrijving,
         "start_date": case.startdatum,
         "end_date": date.today() + timedelta(days=config.action_required_deadline_days),
         "case_link": case_detail_url,
