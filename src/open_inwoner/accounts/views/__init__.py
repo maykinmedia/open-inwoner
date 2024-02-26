@@ -34,7 +34,13 @@ from .login import (
     VerifyTokenView,
 )
 from .password_reset import PasswordResetView
-from .profile import EditProfileView, MyDataView, MyNotificationsView, MyProfileView
+from .profile import (
+    EditProfileView,
+    MyCategoriesView,
+    MyDataView,
+    MyNotificationsView,
+    MyProfileView,
+)
 from .registration import CustomRegistrationView, NecessaryFieldsUserView
 
 __all__ = [
@@ -67,6 +73,7 @@ __all__ = [
     "VerifyTokenView",
     "PasswordResetView",
     "EditProfileView",
+    "MyCategoriesView",
     "MyDataView",
     "MyNotificationsView",
     "MyProfileView",

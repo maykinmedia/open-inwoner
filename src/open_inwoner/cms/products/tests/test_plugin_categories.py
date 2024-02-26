@@ -589,6 +589,22 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
         self.assertEqual(context["categories"].last(), self.category7)
 
     @requests_mock.Mocker()
+    def test_categories_based_on_selected_categories(self, m):
+        """
+        If the user has selected categories, only these categories should show up on
+        the homepage
+        """
+        self._setUpMocks(m)
+
+        self.user.selected_categories.set([self.category1, self.category2])
+
+        html, context = cms_tools.render_plugin(CategoriesPlugin, user=self.user)
+
+        self.assertEqual(context["categories"].count(), 2)
+        self.assertEqual(context["categories"].first(), self.category1)
+        self.assertEqual(context["categories"].last(), self.category2)
+
+    @requests_mock.Mocker()
     def test_categories_based_on_cases_for_eherkenning_user(self, m):
         self._setUpMocks(m)
 

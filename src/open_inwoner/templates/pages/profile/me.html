@@ -106,6 +106,33 @@
     <section class="profile-section profile-section__overview">
         <h2 class="h2 title" id="overview">{% trans "Overzicht" %}</h2>
         <div class="profile-cards card-container card-container--columns-3">
+            {# Selected categories #}
+            {% if view.config.selected_categories %}
+                <a href="{% url 'profile:categories' %}" class="card card--compact card--stretch" id="profile-selected-categories">
+                    <div class="card__body">
+                        <div class="profile__link">
+                            <h4 class="card__heading-4"><span class="link link__text">{% trans "Mijn Interessegebieden" %}</span></h4>
+
+                            {% render_list %}
+                                <span class="profile-list ellipsis">
+                                    {% for name in selected_categories %}
+                                        {% list_item text=name compact=True strong=False %}
+                                    {% empty %}
+                                        <p class="p list_paragraph">{% trans "U heeft geen interesses gekozen." %}</p>
+                                    {% endfor %}
+                                </span>
+                            {% endrender_list %}
+
+                            <span class="link link--icon link--secondary"
+                                aria-label="{% trans "Aanpassen" %}"
+                                title="{% trans "Aanpassen" %}">
+                            <span class="link__text">{% trans "Aanpassen" %}</span>
+                                {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            {% endif %}
 
             {# Mentors #}
             {% if view.config.mentors %}
