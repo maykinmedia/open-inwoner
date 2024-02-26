@@ -597,7 +597,8 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         args = mock_send.call_args.args
         self.assertEqual(args[0], user)
         self.assertEqual(args[1].url, case.url)
-        self.assertEqual(args[2], "case_status_notification")
+        self.assertEqual(args[2], status)
+        self.assertEqual(args[3], "case_status_notification")
 
         mock_send.reset_mock()
 
@@ -694,4 +695,5 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         args = mock_send.call_args.args
         self.assertEqual(args[0], user)
         self.assertEqual(args[1].url, case.url)
-        self.assertEqual(args[2], "case_status_notification_action_required")
+        self.assertEqual(args[2], status)
+        self.assertEqual(args[3], "case_status_notification_action_required")

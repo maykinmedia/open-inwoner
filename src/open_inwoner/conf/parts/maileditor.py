@@ -217,8 +217,8 @@ MAIL_EDITOR_CONF = {
                 "description": _("The description of the type of the case"),
             },
             {
-                "name": "case_link",
-                "description": _("The link to the case details."),
+                "name": "status_description",
+                "description": _("The description of the status of the case"),
             },
             {
                 "name": "end_date",
@@ -310,6 +310,10 @@ MAIL_EDITOR_CONF = {
             {
                 "name": "type_description",
                 "description": _("The description of the type of the case"),
+            },
+            {
+                "name": "status_description",
+                "description": _("The description of the status of the case"),
             },
             {
                 "name": "case_link",
