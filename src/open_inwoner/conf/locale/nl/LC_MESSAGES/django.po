@@ -810,7 +810,7 @@ msgstr "Registratie voltooien"
 
 #: accounts/templates/accounts/registration_necessary.html:22
 msgid "Zaaknotificaties - action required"
-msgstr "Zaaknotificaties - actie benodigd"
+msgstr "Zaaknotificaties - actie is nodig"
 
 #: accounts/templates/accounts/registration_necessary.html:23
 msgid ""
@@ -2660,43 +2660,43 @@ msgstr "Standaardgebruiker"
 
 #: configurations/choices.py:16
 msgid "body_font_regular"
-msgstr ""
+msgstr "body_font_regular"
 
 #: configurations/choices.py:16
 msgid "Text body font"
-msgstr ""
+msgstr "Text body font"
 
 #: configurations/choices.py:17
 msgid "body_font_italic"
-msgstr ""
+msgstr "body_font_italic"
 
 #: configurations/choices.py:17
 msgid "Text body font italic"
-msgstr ""
+msgstr "Text body font italic"
 
 #: configurations/choices.py:18
 msgid "body_font_bold"
-msgstr ""
+msgstr "body_font_bold"
 
 #: configurations/choices.py:18
 msgid "Text body font bold"
-msgstr ""
+msgstr "Text body font bold"
 
 #: configurations/choices.py:19
 msgid "body_font_bold_italic"
-msgstr ""
+msgstr "body_font_bold_italic"
 
 #: configurations/choices.py:19
 msgid "Text body font bold italic"
-msgstr ""
+msgstr "Text body font bold italic"
 
 #: configurations/choices.py:20
 msgid "heading_font"
-msgstr ""
+msgstr "heading_font"
 
 #: configurations/choices.py:20 configurations/models.py:662
 msgid "Heading font"
-msgstr ""
+msgstr "Heading font"
 
 #: configurations/models.py:31
 msgid "The name of the municipality"
@@ -3451,7 +3451,7 @@ msgstr "Configuratie"
 
 #: configurations/models.py:678
 msgid "Body font regular"
-msgstr ""
+msgstr "Body font regular"
 
 #: configurations/models.py:685
 msgid "Upload regular text body font. TTF font types only."
@@ -3459,7 +3459,7 @@ msgstr "Upload reguliere tekst lettertype. Alleen TTF lettertypes toegestaan."
 
 #: configurations/models.py:688
 msgid "Body font italic"
-msgstr ""
+msgstr "Body font italic"
 
 #: configurations/models.py:695
 msgid "Upload italic text body font. TTF font types only."
@@ -3467,7 +3467,7 @@ msgstr "Upload schuingedrukte tekst lettertype. Alleen TTF lettertypes toegestaa
 
 #: configurations/models.py:698
 msgid "Body font bold"
-msgstr ""
+msgstr "Body font bold"
 
 #: configurations/models.py:705
 msgid "Upload bold text body font. TTF font types only."
@@ -3475,7 +3475,7 @@ msgstr "Upload dikgedrukte tekst lettertype. Alleen TTF lettertypes toegestaan."
 
 #: configurations/models.py:708
 msgid "Body font bold italic"
-msgstr ""
+msgstr "Body font bold italic"
 
 #: configurations/models.py:715
 msgid "Upload bold italic text body font. TTF font types only."
@@ -6805,13 +6805,6 @@ msgstr "Het KVK nummer moet numeriek zijn."
 
 #~ msgid "Netwerkcontacten"
 #~ msgstr "Contacten"
-
-#~ msgid "hijack"
-#~ msgstr "overnemen"
-
-#, python-format
-#~ msgid "Hijack %(username)s"
-#~ msgstr "Overname %(username)s"
 
 #~ msgid "Laatste wijziging"
 #~ msgstr "Laatste wijziging"
