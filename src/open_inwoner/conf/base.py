@@ -630,6 +630,9 @@ AXES_LOCKOUT_TEMPLATE = "account_blocked.html"
 AXES_USE_USER_AGENT = True  # Default: False
 AXES_LOCK_OUT_BY_COMBINATION_USER_AND_IP = True  # Default: False
 AXES_BEHIND_REVERSE_PROXY = IS_HTTPS
+# By default, Axes obfuscates values for formfields named "password", but the admin
+# interface login formfield name is "auth-password", so we obfuscate that as well
+AXES_SENSITIVE_PARAMETERS = ["password", "auth-password"]  # nosec
 
 # The default meta precedence order
 IPWARE_META_PRECEDENCE_ORDER = (
