@@ -18,8 +18,6 @@ attrs==21.2.0
     # via
     #   glom
     #   jsonschema
-beautifulsoup4==4.10.0
-    # via -r requirements/base.in
 billiard==3.6.4.0
     # via celery
 boltons==21.0.0
@@ -28,7 +26,7 @@ boltons==21.0.0
     #   glom
 brotli==1.0.9
     # via fonttools
-cbor2==5.6.0
+cbor2==5.6.2
     # via webauthn
 celery==5.2.7
     # via notifications-api-common
@@ -81,7 +79,7 @@ defusedxml==0.7.1
     #   odfpy
 diff-match-patch==20200713
     # via django-import-export
-django==3.2.23
+django==3.2.24
     # via
     #   -r requirements/base.in
     #   django-admin-index
@@ -111,7 +109,6 @@ django==3.2.23
     #   django-redis
     #   django-registration
     #   django-relativedelta
-    #   django-rosetta
     #   django-sekizai
     #   django-sendfile2
     #   django-simple-certmanager
@@ -225,8 +222,6 @@ django-registration==3.2
     # via -r requirements/base.in
 django-relativedelta==2.0.0
     # via zgw-consumers
-django-rosetta==0.9.7
-    # via -r requirements/base.in
 django-sekizai==4.0.0
     # via django-cms
 django-sendfile2==0.7.0
@@ -306,9 +301,7 @@ et-xmlfile==1.1.0
     # via openpyxl
 face==20.1.1
     # via glom
-fontawesomefree==6.4.2
-    # via -r requirements/base.in
-fonttools[woff]==4.29.1
+fonttools[woff]==4.43.0
     # via
     #   fonttools
     #   weasyprint
@@ -394,7 +387,7 @@ phonenumbers==8.13.29
     # via -r requirements/base.in
 phonenumberslite==8.13.29
     # via django-two-factor-auth
-pillow==10.1.0
+pillow==10.2.0
     # via
     #   -r requirements/base.in
     #   djangocms-text-ckeditor
@@ -403,8 +396,6 @@ pillow==10.1.0
     #   weasyprint
 playwright==1.41.0
     # via -r requirements/base.in
-polib==1.1.1
-    # via django-rosetta
 prompt-toolkit==3.0.36
     # via click-repl
 psycopg2==2.9.9
@@ -448,8 +439,6 @@ pytz==2021.3
     #   celery
     #   django
     #   django-yubin
-pywatchman==1.4.1
-    # via -r requirements/base.in
 pyyaml==6.0
     # via
     #   drf-spectacular
@@ -468,7 +457,6 @@ requests==2.31.0
     #   ape-pie
     #   django-log-outgoing-requests
     #   django-open-forms-client
-    #   django-rosetta
     #   gemma-zds-client
     #   mail-editor
     #   maykin-python3-saml
@@ -492,8 +480,6 @@ six==1.16.0
     #   orderedmultidict
     #   python-dateutil
     #   qrcode
-soupsieve==2.3.1
-    # via beautifulsoup4
 sqlparse==0.4.4
     # via django
 svglib==1.5.1
