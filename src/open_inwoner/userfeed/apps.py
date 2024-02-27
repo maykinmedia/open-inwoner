@@ -9,6 +9,8 @@ class UserFeedConfig(AppConfig):
     def ready(self):
         auto_import_adapters()
 
+        from .hooks.external_task import fetch_open_tasks  # noqa
+
 
 def auto_import_adapters():
     """
