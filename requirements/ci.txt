@@ -36,6 +36,8 @@ attrs==21.2.0
     #   -r requirements/base.txt
     #   glom
     #   jsonschema
+autoflake==2.3.0
+    # via -r requirements/test-tools.in
 beautifulsoup4==4.10.0
     # via webtest
 billiard==3.6.4.0
@@ -518,7 +520,7 @@ factory-boy==3.2.0
     # via -r requirements/test-tools.in
 faker==9.9.0
     # via factory-boy
-flake8==3.9.2
+flake8==7.0.0
     # via -r requirements/test-tools.in
 fonttools[woff]==4.43.0
     # via
@@ -647,7 +649,7 @@ maykin-python3-saml==1.14.0.post0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-digid-eherkenning
-mccabe==0.6.1
+mccabe==0.7.0
     # via
     #   flake8
     #   pylint
@@ -732,7 +734,7 @@ psycopg2==2.9.9
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-pycodestyle==2.7.0
+pycodestyle==2.11.1
     # via flake8
 pycparser==2.20
     # via
@@ -749,8 +751,10 @@ pyee==11.0.1
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   playwright
-pyflakes==2.3.1
-    # via flake8
+pyflakes==3.2.0
+    # via
+    #   autoflake
+    #   flake8
 pyjwt==2.8.0
     # via
     #   -c requirements/base.txt

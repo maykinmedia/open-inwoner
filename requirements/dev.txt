@@ -41,6 +41,10 @@ attrs==21.2.0
     #   -r requirements/ci.txt
     #   glom
     #   jsonschema
+autoflake==2.3.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 autopep8==1.5.7
     # via django-silk
 babel==2.9.1
@@ -575,7 +579,7 @@ faker==9.9.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   factory-boy
-flake8==3.9.2
+flake8==7.0.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -748,7 +752,7 @@ maykin-python3-saml==1.14.0.post0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-digid-eherkenning
-mccabe==0.6.1
+mccabe==0.7.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -857,7 +861,7 @@ psycopg2==2.9.9
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-pycodestyle==2.7.0
+pycodestyle==2.11.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -878,10 +882,11 @@ pyee==11.0.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   playwright
-pyflakes==2.3.1
+pyflakes==3.2.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   autoflake
     #   flake8
 pygments==2.12.0
     # via sphinx

@@ -167,18 +167,18 @@ def autorender_field(form_object, field_name, **kwargs):
     fn = input
     tmplt = WIDGET_TEMPLATES["INPUT"]
 
-    if type(field) == forms.fields.DateField:
+    if type(field) is forms.fields.DateField:
         tmplt = WIDGET_TEMPLATES["DATE"]
-    elif type(field) == forms.models.ModelMultipleChoiceField:
+    elif type(field) is forms.models.ModelMultipleChoiceField:
         tmplt = WIDGET_TEMPLATES["MULTIPLECHECKBOX"]
-    elif type(field) == forms.fields.BooleanField:
+    elif type(field) is forms.fields.BooleanField:
         fn = checkbox
         tmplt = WIDGET_TEMPLATES["CHECKBOX"]
-    elif type(field.widget) == forms.fields.HiddenInput:
+    elif type(field.widget) is forms.fields.HiddenInput:
         tmplt = WIDGET_TEMPLATES["HIDDEN"]
-    elif type(field.widget) == forms.widgets.RadioSelect:
+    elif type(field.widget) is forms.widgets.RadioSelect:
         tmplt = WIDGET_TEMPLATES["RADIO"]
-    elif type(field.widget) == forms.fields.Textarea:
+    elif type(field.widget) is forms.fields.Textarea:
         tmplt = WIDGET_TEMPLATES["TEXTAREA"]
 
     context = fn(bound_field, **kwargs)
