@@ -28,9 +28,30 @@ class ESuiteData:
             ],
         }
 
+        self.task1 = {
+            "url": "https://maykinmedia.nl",
+            "uuid": "fb72d8db-c3ee-4aa0-96c1-260b202cb208",
+            "identificatie": "1234-2023",
+            "naam": "Aanvullende informatie gewenst",
+            "startdatum": "2023-11-14",
+            "formulierLink": "https://maykinmedia.nl",
+        }
+        self.task2 = {
+            "url": "https://maykinmedia.nl",
+            "uuid": "d74f6a5c-297d-43a3-a923-1774164d852d",
+            "identificatie": "4321-2023",
+            "naam": "Aanvullende informatie gewenst",
+            "startdatum": "2023-10-11",
+            "formulierLink": "https://maykinmedia.nl",
+        }
+
     def install_mocks(self, m):
         m.get(
             f"{FORMS_ROOT}openstaande-inzendingen",
             json=self.response,
+        )
+        m.get(
+            f"{FORMS_ROOT}openstaande-taken",
+            json=[self.task1, self.task2],
         )
         return self
