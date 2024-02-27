@@ -15,6 +15,7 @@ tblib
 black
 isort
 flake8
+autoflake
 
 # DigidLocal
 pyopenssl
