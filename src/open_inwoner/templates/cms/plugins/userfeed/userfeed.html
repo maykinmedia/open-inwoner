@@ -19,6 +19,11 @@
         <a href="{{ item.action_url }}" class="card {% if item.action_required %}card--status{% endif %} {% if item.is_completed %}card--completed{% endif %}">
             <div class="card__body card__body--tabled">
                 <p class="p tabled__value">{{ item.title }}</p>
+                                
+                <p class="p" style="color: rebeccapurple; font-size: 300%;">
+                    {{ item.status_indicator }}
+                </p>
+                
                 <h2 class="userfeed__heading">
                     <span class="">{{ item.message }}</span>
 {#                    Status gewijzigd naar &lsquo;<span class="status">Documenten nodig</span>&rsquo;</span>#}

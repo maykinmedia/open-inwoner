@@ -17,6 +17,7 @@ from open_inwoner.openzaak.managers import (
     UserCaseStatusNotificationManager,
     ZaakTypeConfigQueryset,
     ZaakTypeInformatieObjectTypeConfigQueryset,
+    ZaakTypeStatusTypeConfigQuerySet,
 )
 
 from .constants import StatusIndicators
@@ -464,6 +465,8 @@ class ZaakTypeStatusTypeConfig(models.Model):
             "The text that will be shown in the button that links to a case's detail page"
         ),
     )
+
+    objects = ZaakTypeStatusTypeConfigQuerySet.as_manager()
 
     class Meta:
         verbose_name = _("Zaaktype Statustype Configuration")
