@@ -9,6 +9,23 @@
     {% trans "Kies voor welk onderwerp je meldingen wilt ontvangen" %}
 </p>
 
-{% form form_object=form method="POST" id="change-notifications" submit_text=_("Opslaan") secondary_href='profile:detail' secondary_text=_('Terug') secondary_icon='arrow_backward' secondary_icon_position="before" %}
+<form method="POST" id="change-notifications" action="{% url 'profile:notifications' %}" class="form" novalidate>
+    {% csrf_token %}
+
+    {% for field in form.fields %}
+        {% autorender_field form field %}
+    {% endfor %}
+
+    <div class="form__control">
+        {# pseudo checkbox for notifications that cannot be disabled #}
+        <div class="checkbox">
+            <span role="checkbox" aria-disabled="true" aria-checked="true" class="checkbox__input checkbox__pseudo checkbox__input--disabled" aria-labelledby="id_cases_notifications_action_required" tabindex="0"></span>
+            <span class="checkbox__label checkbox__pseudo-label" id="id_cases_notifications_action_required">{% trans "Zaaknotificaties - actie is nodig" %}</span>
+            <p class="p">{% trans "E-mailnotificaties wanneer er actie nodig is voor een zaak (kan niet uitgeschakeld worden)" %}</p>
+        </div>
+    </div>
+
+    {% form_actions primary_text=_("Opslaan") primary_icon="arrow_forward" secondary_href='profile:detail' secondary_text=_('Terug') secondary_icon_position="before" secondary_icon='arrow_backward' %}
+</form>
 
 {% endblock content %}

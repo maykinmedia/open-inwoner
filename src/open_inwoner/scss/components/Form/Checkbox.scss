@@ -35,6 +35,10 @@
       border-radius: 1px; // intended-var-change.
       background-color: var(--color-white);
     }
+
+    &.checkbox__pseudo-label {
+      padding-left: calc(var(--gutter-width) + 4px);
+    }
   }
 
   .checkbox__input:checked ~ .checkbox__label:before {
@@ -49,6 +53,25 @@
     background-color: var(--color-gray);
     color: var(--color-white);
     font-family: 'Material Icons';
+    content: '\e876';
+  }
+
+  /// Mimic checked-styles for pseudo checkboxes
+
+  &__pseudo ~ .checkbox__label:before {
+    background-color: var(--color-secondary);
+    color: var(--color-font-secondary);
+    font-family: 'Material Icons';
+    left: 4px;
+    content: '\e876';
+  }
+
+  &__pseudo.checkbox__input--disabled ~ .checkbox__label:before {
+    border-color: var(--color-gray) !important;
+    background-color: var(--color-gray);
+    color: var(--color-white);
+    font-family: 'Material Icons';
+    left: 3px;
     content: '\e876';
   }
 }
