@@ -15,8 +15,8 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 from open_inwoner.openklant.api_models import KlantContactMoment
 from open_inwoner.openklant.clients import build_client
 from open_inwoner.openklant.constants import Status
-from open_inwoner.openklant.forms import ContactForm
 from open_inwoner.openklant.models import ContactFormSubject
+from open_inwoner.openklant.views.contactform import ContactFormView
 from open_inwoner.openklant.wrap import (
     fetch_klantcontactmoment,
     fetch_klantcontactmomenten,
@@ -127,9 +127,14 @@ class KlantContactMomentBaseView(
         return subject.subject
 
 
-class KlantContactMomentListView(PaginationMixin, KlantContactMomentBaseView):
+class KlantContactMomentListView(
+    PaginationMixin, ContactFormView, KlantContactMomentBaseView
+):
+    """
+    Display "contactmomenten" (questions), and a form (via ContactFormView) to send a new question
+    """
+
     template_name = "pages/contactmoment/list.html"
-    form_class = ContactForm
     paginate_by = 9
 
     @cached_property
@@ -150,7 +155,6 @@ class KlantContactMomentListView(PaginationMixin, KlantContactMomentBaseView):
             **get_fetch_parameters(self.request, use_vestigingsnummer=True)
         )
         ctx["contactmomenten"] = [self.get_kcm_data(kcm) for kcm in kcms]
-        ctx["question_form"] = ContactForm(user=self.request.user)
         paginator_dict = self.paginate_with_context(ctx["contactmomenten"])
         ctx.update(paginator_dict)
         return ctx

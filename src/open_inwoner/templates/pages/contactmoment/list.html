@@ -16,7 +16,9 @@
                 {% endblocktrans %}
                 </p>
             </div>
-            {% button href="#question-form" text=_("Stel een vraag") title=_("Stel een vraag") primary=True icon="arrow_downward" icon_position="after" %}
+            <div class="button-row">
+                {% button href="#question-form" text=_("Stel een vraag") title=_("Stel een vraag") primary=True icon="arrow_downward" icon_position="after" %}
+            </div>
         </div>
     </section>
 
@@ -76,16 +78,20 @@
                 </p>
             </div>
             <div>
-                <form action="#" method="POST" id="question-form">
+                <form action="{% url 'cases:contactmoment_list' %}" method="POST" id="question-form" class="form contact-form">
                     {% csrf_token %}
-                    {% for field in question_form.fields %}
-                        {% autorender_field question_form field %}
-                    {% endfor %}
 
-                    <button class="button button--textless button--icon button--icon-after button--primary" type="submit">
-                        <span aria-hidden="true" class="material-icons">arrow_forward</span>
-                        {% trans "Verstuur vraag" %}
-                    </button>
+                    {% input form.subject no_help=True icon="expand_more" %}
+                    {% if form.phonenumber %}
+                        {% input form.phonenumber no_help=True %}
+                    {% endif %}
+                    {% input form.question no_help=True %}
+
+                    <div class="form__submit">
+                        {% button_row %}
+                            {% button text=_("Vraag versturen") icon="east" icon_position="after" icon_outlined=True id="submit_question" type="submit" disabled=True primary=True name="question_form_submit" %}
+                        {% endbutton_row %}
+                    </div>
                 </form>
             </div>
         </div>

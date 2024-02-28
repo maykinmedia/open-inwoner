@@ -87,15 +87,4 @@
   #cases-contact-form-content > h2 {
     margin-top: var(--spacing-large);
   }
-
-  .case-contact-form {
-    .button[type='submit']:disabled,
-    .button--primary.button--disabled {
-      background-color: var(--color-gray) !important;
-      border-color: var(--color-gray) !important;
-      color: var(--color-white);
-      cursor: default;
-      pointer-events: none;
-    }
-  }
 }
