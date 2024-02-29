@@ -52,13 +52,14 @@
   }
 
   input[type='radio'] {
-    display: none;
+    /// Display for accessibility
+    opacity: 0;
   }
 
   &__label:before {
     content: '';
     display: inline-block;
-    margin-right: 10px;
+    margin-right: 2px;
     align-items: center;
     box-sizing: border-box;
     width: var(--font-line-height-body-small);
@@ -78,5 +79,6 @@
     color: var(--color-accent);
     font-family: 'Material Icons';
     content: '\e876';
+    line-height: var(--font-size-body);
   }
 }

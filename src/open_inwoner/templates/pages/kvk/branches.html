@@ -2,9 +2,9 @@
 {% load i18n static form_tags grid_tags button_tags card_tags button_tags %}
 
 {% block content %}
-    <h1 class="h1" id="title">{% trans "Log in" %}</h1>
     {% render_grid %}
         {% render_column start=4 span=6 %}
+            <h1 class="h1" id="title">{% trans "Log in" %}</h1>
             <form method="POST" id="eherkenning-branch-form" class="form">
                 {% csrf_token %}
                 {% if form.branch_number.errors %}
@@ -13,7 +13,7 @@
 
                 <ul class="choice-list choice-list--single">
 
-                {# if COMPANY shows NEVENVESTIGING and HOOFDVESTIGING in one list #}
+                {# Show NEVENVESTIGINGEN and HOOFDVESTIGING in one list #}
                 <p><strong>{% trans "Selecteer de vestiging waarmee u wilt inloggen" %}</strong></p>
                 {% for branch in company_branches %}
                     {% with company_id=branch.vestigingsnummer %}
@@ -24,7 +24,7 @@
                                 <div class="choice-list__content">
                                     <h2 class="choice-list__heading">{{ branch.naam }}</h2>
                                     {% if branch.straatnaam %}
-                                    <p class="choice-list__p">{{ branch.straatnaam }}</p>
+                                    <p class="choice-list__p">{{ branch.adres.binnenlandsAdres.straatnaam }}</p>
                                     {% endif %}
                                     {% if branch.plaats %}
                                     <p class="choice-list__p">{{ branch.plaats}}</p>
@@ -40,7 +40,7 @@
                 {% endfor %}
 
 
-                {# first only show HOOFDVESTIGING #}
+                {# first only show HOOFDVESTIGING in separate list-item #}
 {#                {% for branch in company_branches %}#}
 {#                {% if not branch.vestigingsnummer %}#}
 {#                <p><strong>{% trans "Log in namens alle vestigingen" %}</strong></p>#}
@@ -65,10 +65,10 @@
 {#                {% endif %}#}
 {#                {% endfor %}#}
 {##}
+{#          {% if branch.vestigingsnummer %}#}
                 {# only show multiple NEVENVESTIGINGEN without the HOOFDVESTIGING #}
 {#                <p><strong>{% trans "Of selecteer de vestiging waarmee u wilt inloggen" %}</strong></p>#}
 {#                {% for branch in company_branches %}#}
-{#                    {% if branch.vestigingsnummer %}#}
 {#                    {% with company_id=branch.vestigingsnummer %}#}
 {##}
 {#                        <li class="choice-list__item">#}
@@ -90,8 +90,8 @@
 {#                        </li>#}
 {##}
 {#                    {% endwith %}#}
-{#                    {% endif %}#}
 {#                {% endfor %}#}
+{#          {% endif %}#}
 
                 </ul>
 
