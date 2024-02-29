@@ -6,7 +6,7 @@ from django.db import IntegrityError, models, transaction
 from django.utils import timezone
 
 from open_inwoner.accounts.models import User
-from open_inwoner.openzaak.api_models import ZaakType
+from open_inwoner.openzaak.api_models import Status, StatusType, Zaak, ZaakType
 from open_inwoner.utils.translate import TranslationLookup
 
 if TYPE_CHECKING:
@@ -139,6 +139,20 @@ class ZaakTypeConfigQueryset(models.QuerySet):
             identificatie=case_type.identificatie,
         )
 
+    def filter_from_str(self, catalogus_url: str, case_type_identificatie: str):
+        qs = self
+        if catalogus_url:
+            qs = qs.filter(
+                catalogus__url=catalogus_url,
+            )
+        else:
+            qs = qs.filter(
+                catalogus__isnull=True,
+            )
+        return qs.filter(
+            identificatie=case_type_identificatie,
+        )
+
     def filter_enabled_for_case_type(self, case_type: ZaakType):
         """
         Returns all ZaakTypeConfig instances which allow external documents
@@ -163,6 +177,31 @@ class ZaakTypeConfigQueryset(models.QuerySet):
             return self.none()
 
         return self.filter_case_type(case_type).filter(questions_enabled=True)
+
+
+class ZaakTypeStatusTypeConfigQuerySet(models.QuerySet):
+    def find_for(self, case: Zaak, status: Status):
+        return self.find_for_types(case.zaaktype, status.statustype)
+
+    def find_for_types(self, case_type: ZaakType, status_type: StatusType):
+        from .models import ZaakTypeConfig
+
+        ztc = ZaakTypeConfig.objects.filter_case_type(case_type)
+        return self.filter(
+            zaaktype_config__in=ztc, statustype_url=status_type.url
+        ).first()
+
+    def find_for_types_from_str(
+        self, catalogus_url: str, case_type_identificatie: str, status_type_url: str
+    ):
+        from .models import ZaakTypeConfig
+
+        ztc = ZaakTypeConfig.objects.filter_from_str(
+            catalogus_url, case_type_identificatie
+        )
+        return self.filter(
+            zaaktype_config__in=ztc, statustype_url=status_type_url
+        ).first()
 
 
 class StatusTranslationQuerySet(models.QuerySet):

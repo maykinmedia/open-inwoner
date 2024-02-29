@@ -1,3 +1,4 @@
+from open_inwoner.openzaak.constants import StatusIndicators
 from open_inwoner.userfeed.models import FeedItemData
 
 
@@ -12,6 +13,8 @@ class FeedItem:
     base_message = ""
     base_action_text = ""
     base_action_url = ""
+    base_status_indicator = StatusIndicators.info
+    base_status_indicator_action = StatusIndicators.warning
 
     cms_apps: list[str] = []
 
@@ -40,6 +43,12 @@ class FeedItem:
     @property
     def message(self) -> str:
         return self.get_data("message") or self.base_message
+
+    @property
+    def status_indicator(self) -> str:
+        if self.action_required:
+            return self.base_status_indicator_action
+        return self.base_status_indicator
 
     @property
     def action_text(self) -> str:
