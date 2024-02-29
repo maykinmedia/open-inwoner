@@ -16,14 +16,21 @@
     </div>
     <div class="card-container card-container--columns-2">
         {% for item in userfeed.items %}
-        <a href="{{ item.action_url }}" class="card {% if item.action_required %}card--status{% endif %} {% if item.is_completed %}card--completed{% endif %}">
+        <a href="{{ item.action_url }}" class="card card--status card--status-{{ item.status_indicator }} {% if item.is_completed %}card--completed{% endif %}">
+        {% if item.action_required %}
+            <div class="userfeed-marker userfeed-marker--warning">
+                {% icon icon="warning_amber" icon_position="after" extra_classes="icon--warning" outlined=True %}
+                <span class="userfeed__status_text">{{ item.status_text }}</span>
+            </div>
+        {% else %}
+            <div class="userfeed-marker userfeed-marker--info">
+                {% icon icon="info" icon_position="after" extra_classes="icon--default" outlined=True %}
+                <span class="userfeed__status_text">{{ item.status_text }}</span>
+            </div>
+        {% endif %}
             <div class="card__body card__body--tabled">
                 <p class="p tabled__value">{{ item.title }}</p>
-                                
-                <p class="p" style="color: rebeccapurple; font-size: 300%;">
-                    {{ item.status_indicator }}
-                </p>
-                
+
                 <h2 class="userfeed__heading">
                     <span class="">{{ item.message }}</span>
 {#                    Status gewijzigd naar &lsquo;<span class="status">Documenten nodig</span>&rsquo;</span>#}

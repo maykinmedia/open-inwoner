@@ -63,13 +63,51 @@
     margin: 0;
   }
 
+  .card {
+    justify-content: flex-end;
+  }
+
   .card-container {
     grid-row-gap: var(--spacing-medium);
   }
 
   .card--status {
-    padding-top: 5px;
-    background-color: var(--color-danger-lightest);
+    padding: 0;
+
+    &-warning {
+      background-color: var(--color-danger-lightest);
+    }
+
+    &-info {
+      background-color: var(--color-info-lighter);
+    }
+  }
+
+  &-marker {
+    display: flex;
+    align-items: center;
+    border-top-left-radius: var(--border-radius);
+    border-top-right-radius: var(--border-radius);
+    color: var(--color-info-darker);
+    font-size: var(--font-size-body);
+
+    &--warning {
+      background-color: var(--color-danger-lightest);
+      color: var(--color-danger-darker);
+    }
+
+    &--info {
+      background-color: var(--color-info-lighter);
+      color: var(--color-info-darker);
+    }
+
+    [class*='icons'] {
+      margin: 6px 10px;
+    }
+
+    .userfeed__status_text {
+      padding: 8px var(--spacing-large) 10px 0;
+    }
   }
 
   .card__body {
