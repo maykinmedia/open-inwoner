@@ -22,6 +22,7 @@ from ..utils.decorators import cache as cache_result
 from .api_models import (
     InformatieObjectType,
     OpenSubmission,
+    OpenTask,
     Resultaat,
     ResultaatType,
     Rol,
@@ -651,6 +652,24 @@ class FormClient(APIClient):
             return []
 
         results = factory(OpenSubmission, all_data)
+
+        return results
+
+    def fetch_open_tasks(self, bsn: str) -> List[OpenTask]:
+        if not bsn:
+            return []
+
+        try:
+            response = self.get(
+                "openstaande-taken",
+                params={"bsn": bsn},
+            )
+            data = get_json_response(response)
+        except (RequestException, ClientError) as e:
+            logger.exception("exception while making request", exc_info=e)
+            return []
+
+        results = factory(OpenTask, data)
 
         return results
 

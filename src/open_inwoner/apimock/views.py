@@ -50,7 +50,7 @@ class APIMockView(View):
         with open(file_path, "r") as f:
             data = json.load(f)
             process_urls(data, prefix, self.url_replacers)
-            return JsonResponse(data)
+            return JsonResponse(data, safe=False)
 
 
 def process_urls(data, prefix, url_replacers):

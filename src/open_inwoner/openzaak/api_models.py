@@ -302,3 +302,13 @@ class OpenSubmission(Model):
             "eind_datum_geldigheid": self.eind_datum_geldigheid or "Geen",
             "case_type": "OpenSubmission",
         }
+
+
+@dataclass
+class OpenTask(Model):
+    url: str
+    uuid: str
+    identificatie: str
+    naam: str
+    startdatum: date
+    formulier_link: str

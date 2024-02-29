@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import admin
 
 from .models import FeedItemData
@@ -27,7 +28,10 @@ class FeedItemDataAdmin(admin.ModelAdmin):
     ]
 
     def has_change_permission(self, request, obj=None):
+        if settings.DEBUG:
+            return super().has_change_permission(request, obj=obj)
         return False
 
     def has_add_permission(self, request):
-        pass
+        if settings.DEBUG:
+            return super().has_add_permission(request)
