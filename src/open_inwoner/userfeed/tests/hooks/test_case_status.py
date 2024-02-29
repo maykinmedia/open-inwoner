@@ -154,11 +154,12 @@ class FeedHookTest(TestCase):
         self.assertEqual(item.action_required, True)
         self.assertEqual(item.is_completed, False)
         self.assertEqual(item.status_indicator, StatusIndicators.warning)
+        self.assertEqual(item.status_text, "my_status_text")
         self.assertEqual(
             strip_tags(item.message),
             escape(_("Case status has been changed to 'initial'")),
         )
-        self.assertEqual(item.title, "my_status_text")
+        self.assertEqual(item.title, case.omschrijving)
         self.assertEqual(
             item.action_url,
             reverse("cases:case_detail", kwargs={"object_id": case.uuid}),
