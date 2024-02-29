@@ -13,6 +13,7 @@ class FeedItem:
     base_message = ""
     base_action_text = ""
     base_action_url = ""
+    base_status_text = ""
     base_status_indicator = StatusIndicators.info
     base_status_indicator_action = StatusIndicators.warning
 
@@ -43,6 +44,10 @@ class FeedItem:
     @property
     def message(self) -> str:
         return self.get_data("message") or self.base_message
+
+    @property
+    def status_text(self) -> str:
+        return self.base_status_text
 
     @property
     def status_indicator(self) -> str:

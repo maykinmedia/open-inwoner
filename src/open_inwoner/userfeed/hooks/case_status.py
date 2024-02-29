@@ -85,10 +85,7 @@ class CaseStatusUpdateFeedItem(FeedItem):
 
     @property
     def title(self) -> str:
-        if self.status_config and self.status_config.status_indicator_text:
-            return self.status_config.status_indicator_text
-        else:
-            return self.get_data("case_omschrijving", super().title)
+        return self.get_data("case_omschrijving", super().title)
 
     @property
     def message(self) -> str:
@@ -106,6 +103,13 @@ class CaseStatusUpdateFeedItem(FeedItem):
     def action_url(self) -> str:
         uuid = self.get_data("case_uuid")
         return reverse("cases:case_detail", kwargs={"object_id": uuid})
+
+    @property
+    def status_text(self) -> str:
+        if self.status_config and self.status_config.status_indicator_text:
+            return self.status_config.status_indicator_text
+        else:
+            return super().status_text
 
     @property
     def status_indicator(self) -> str:

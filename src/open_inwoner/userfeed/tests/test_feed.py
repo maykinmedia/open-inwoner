@@ -40,6 +40,7 @@ class FeedTests(TestCase):
         self.assertEqual(item.message, "Hello")
         self.assertEqual(item.title, "Test message")
         self.assertEqual(item.action_url, "http://foo.bar")
+        self.assertEqual(item.status_text, "")
         self.assertEqual(item.status_indicator, StatusIndicators.info)
 
         # check summary
