@@ -118,6 +118,8 @@ class MockAPIReadData(MockAPIData):
             url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             emailadres="foo@example.com",
             telefoonnummer="0612345678",
+            subjectType="natuurlijk_persoon",
+            subjectIdentificatie={"inp_bsn": self.user.bsn},
         )
         self.klant2 = generate_oas_component_cached(
             "kc",
@@ -126,6 +128,8 @@ class MockAPIReadData(MockAPIData):
             url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-ffffffffffff",
             emailadres="foo@bar.com",
             telefoonnummer="0687654321",
+            subjectType="niet_natuurlijk_persoon",
+            subjectIdentificatie={"inn_nnp_id": self.eherkenning_user.kvk},
         )
         self.klant_vestiging = generate_oas_component_cached(
             "kc",
@@ -272,7 +276,15 @@ class MockAPIReadData(MockAPIData):
             json=paginated_response([self.klant_contactmoment]),
         )
         m.get(
+            f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten?contactmoment={self.contactmoment['url']}",
+            json=paginated_response([self.klant_contactmoment]),
+        )
+        m.get(
             f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten?klant={self.klant2['url']}",
+            json=paginated_response([self.klant_contactmoment2]),
+        )
+        m.get(
+            f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten?contactmoment={self.contactmoment2['url']}",
             json=paginated_response([self.klant_contactmoment2]),
         )
         m.get(

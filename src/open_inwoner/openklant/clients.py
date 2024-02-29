@@ -36,6 +36,18 @@ class KlantenClient(APIClient):
 
         return klant
 
+    def retrieve_klant_by_url(self, klant_url: str) -> Optional[Klant]:
+        try:
+            response = self.get(url=klant_url)
+            data = get_json_response(response)
+        except (RequestException, ClientError) as e:
+            logger.exception("exception while making request", exc_info=e)
+            return
+
+        klant = factory(Klant, data)
+
+        return klant
+
     def retrieve_klant(
         self, user_bsn: Optional[str] = None, user_kvk_or_rsin: Optional[str] = None
     ) -> Optional[Klant]:
@@ -210,6 +222,29 @@ class ContactmomentenClient(APIClient):
 
         return klanten_contact_moments
 
+    def retrieve_klantcontactmomenten_for_contactmoment(
+        self, contactmoment: ContactMoment
+    ) -> List[KlantContactMoment]:
+        try:
+            response = self.get(
+                "klantcontactmomenten",
+                params={"contactmoment": contactmoment.url},
+            )
+            data = get_json_response(response)
+            all_data = list(pagination_helper(self, data))
+        except (RequestException, ClientError) as e:
+            logger.exception("exception while making request", exc_info=e)
+            return []
+
+        klanten_contact_moments = factory(KlantContactMoment, all_data)
+
+        # resolve linked resources
+        for kcm in klanten_contact_moments:
+            assert kcm.contactmoment == contactmoment.url
+            kcm.contactmoment = contactmoment
+
+        return klanten_contact_moments
+
     def retrieve_objectcontactmomenten_for_object_type(
         self, contactmoment: ContactMoment, object_type: str, zaken_client
     ) -> List[ObjectContactMoment]:
@@ -233,7 +268,7 @@ class ContactmomentenClient(APIClient):
             return ocms[0]
 
 
-def build_client(type_) -> Optional[APIClient]:
+def build_client(type_) -> KlantenClient | ContactmomentenClient | None:
     config = OpenKlantConfig.get_solo()
     services_to_client_mapping = {
         "klanten": KlantenClient,
