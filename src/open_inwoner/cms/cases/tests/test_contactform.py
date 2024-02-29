@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.conf import settings
 from django.core import mail
 from django.test import override_settings
@@ -296,15 +298,6 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             antwoord="",
             text="hey!\n\nwaddup?",
         )
-        self.objectcontactmoment = generate_oas_component_cached(
-            "cmc",
-            "schemas/ObjectContactMoment",
-            uuid="77880671-b88a-44ed-ba24-dc2ae688c2ec",
-            url=f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten/77880671-b88a-44ed-ba24-dc2ae688c2ec",
-            object=self.zaak["url"],
-            object_type="zaak",
-            contactmoment=self.contactmoment["url"],
-        )
         self.klant_contactmoment = generate_oas_component_cached(
             "cmc",
             "schemas/KlantContactMoment",
@@ -332,14 +325,15 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             self.contactmoment["url"],
             json=self.contactmoment,
         )
-        m.get(
-            f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten?object={self.zaak['url']}",
-            json=paginated_response([self.objectcontactmoment]),
-        )
 
-    def test_form_is_shown_if_open_klant_api_configured(self, m):
+    @patch(
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.get_objectcontactmomenten"
+    )
+    def test_form_is_shown_if_open_klant_api_configured(self, m, ocm_mock):
         self._setUpMocks(m)
         self._setUpExtraMocks(m)
+
+        ocm_mock.return_value = []
 
         self.assertTrue(self.ok_config.has_api_configuration())
 
@@ -349,9 +343,14 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         self.assertTrue(response.context["case"]["contact_form_enabled"])
         self.assertTrue(contact_form)
 
-    def test_form_is_shown_if_open_klant_email_configured(self, m):
+    @patch(
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.get_objectcontactmomenten"
+    )
+    def test_form_is_shown_if_open_klant_email_configured(self, m, ocm_mock):
         self._setUpMocks(m)
         self._setUpExtraMocks(m)
+
+        ocm_mock.return_value = []
 
         self.ok_config.register_email = "example@example.com"
         self.ok_config.register_contact_moment = False
@@ -366,9 +365,14 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         self.assertTrue(response.context["case"]["contact_form_enabled"])
         self.assertTrue(contact_form)
 
-    def test_form_is_shown_if_open_klant_email_and_api_configured(self, m):
+    @patch(
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.get_objectcontactmomenten"
+    )
+    def test_form_is_shown_if_open_klant_email_and_api_configured(self, m, ocm_mock):
         self._setUpMocks(m)
         self._setUpExtraMocks(m)
+
+        ocm_mock.return_value = []
 
         self.ok_config.register_email = "example@example.com"
         self.ok_config.save()
@@ -402,9 +406,14 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         self.assertFalse(response.context["case"]["contact_form_enabled"])
         self.assertFalse(contact_form)
 
-    def test_no_form_shown_if_contact_form_disabled(self, m):
+    @patch(
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.get_objectcontactmomenten"
+    )
+    def test_no_form_shown_if_contact_form_disabled(self, m, ocm_mock):
         self._setUpMocks(m)
         self._setUpExtraMocks(m)
+
+        ocm_mock.return_value = []
 
         CatalogusConfig.objects.all().delete()
         self.zaak_type_config.delete()
@@ -420,9 +429,14 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         self.assertFalse(response.context["case"]["contact_form_enabled"])
         self.assertFalse(contact_form)
 
-    def test_form_success_with_api(self, m):
+    @patch(
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.get_objectcontactmomenten"
+    )
+    def test_form_success_with_api(self, m, ocm_mock):
         self._setUpMocks(m)
         self._setUpExtraMocks(m)
+
+        ocm_mock.return_value = []
 
         response = self.app.get(self.case_detail_url, user=self.user)
         form = response.forms["contact-form"]
@@ -456,9 +470,14 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             },
         )
 
-    def test_form_success_with_api_eherkenning_user(self, m):
+    @patch(
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.get_objectcontactmomenten"
+    )
+    def test_form_success_with_api_eherkenning_user(self, m, ocm_mock):
         self._setUpMocks(m)
         self._setUpExtraMocks(m)
+
+        ocm_mock.return_value = []
 
         for use_rsin_for_innNnpId_query_parameter in [True, False]:
             with self.subTest(
@@ -521,14 +540,14 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
                     },
                 )
 
-    def test_form_success_with_email(self, m):
+    @patch(
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.get_objectcontactmomenten"
+    )
+    def test_form_success_with_email(self, m, ocm_mock):
         self._setUpMocks(m)
         self._setUpExtraMocks(m)
 
-        m.get(
-            f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten?object={self.zaak['url']}",
-            json=paginated_response([self.objectcontactmoment]),
-        )
+        ocm_mock.return_value = []
 
         self.ok_config.register_email = "example@example.com"
         self.ok_config.register_contact_moment = False
@@ -559,9 +578,14 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             _("Contact formulier inzending vanaf Open Inwoner Platform"),
         )
 
-    def test_form_success_with_both_email_and_api(self, m):
+    @patch(
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.get_objectcontactmomenten"
+    )
+    def test_form_success_with_bearth_email_and_api(self, m, ocm_mock):
         self._setUpMocks(m)
         self._setUpExtraMocks(m)
+
+        ocm_mock.return_value = []
 
         self.ok_config.register_email = "example@example.com"
         self.ok_config.save()

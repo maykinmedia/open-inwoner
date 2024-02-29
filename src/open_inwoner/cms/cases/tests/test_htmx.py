@@ -277,15 +277,6 @@ class CasesPlaywrightTests(
             antwoord="",
             text="hey!\n\nwaddup?",
         )
-        self.objectcontactmoment = generate_oas_component_cached(
-            "cmc",
-            "schemas/ObjectContactMoment",
-            uuid="77880671-b88a-44ed-ba24-dc2ae688c2ec",
-            url=f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten/77880671-b88a-44ed-ba24-dc2ae688c2ec",
-            object=self.zaak["url"],
-            object_type="zaak",
-            contactmoment=self.contactmoment["url"],
-        )
         self.klant_contactmoment = generate_oas_component_cached(
             "cmc",
             "schemas/KlantContactMoment",
@@ -329,7 +320,6 @@ class CasesPlaywrightTests(
             self.status_type_new,
             self.status_type_finish,
             self.contactmoment,
-            self.objectcontactmoment,
         ]:
             m.get(resource["url"], json=resource)
 
@@ -417,13 +407,13 @@ class CasesPlaywrightTests(
             ),
         ]
 
-    def test_cases(self, m):
+    @patch(
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.get_objectcontactmomenten"
+    )
+    def test_cases(self, m, ocm_mock):
         self._setUpMocks(m)
 
-        m.get(
-            f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten?object={self.zaak['url']}",
-            json=paginated_response([self.objectcontactmoment]),
-        )
+        ocm_mock.return_value = []
 
         context = self.browser.new_context(storage_state=self.user_login_state)
 

@@ -8,7 +8,7 @@ from typing import List, Optional
 from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
-from django.http import Http404, StreamingHttpResponse
+from django.http import Http404, HttpResponseRedirect, StreamingHttpResponse
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -20,6 +20,7 @@ from mail_editor.helpers import find_template
 from view_breadcrumbs import BaseBreadcrumbMixin
 from zgw_consumers.api_models.constants import RolOmschrijving
 
+from open_inwoner.accounts.views.contactmoments import KlantContactMomentAccessMixin
 from open_inwoner.openklant.api_models import ObjectContactMoment
 from open_inwoner.openklant.clients import (
     ContactmomentenClient,
@@ -183,9 +184,6 @@ class InnerCaseDetailView(
             hooks.case_status_seen(self.request.user, self.case)
             hooks.case_documents_seen(self.request.user, self.case)
 
-            # TODO: remove
-            from .. import dev_snippets
-
             context["case"] = {
                 "id": str(self.case.uuid),
                 "identification": self.case.identification,
@@ -212,8 +210,7 @@ class InnerCaseDetailView(
                     "created",
                     dt.timedelta(days=settings.DOCUMENT_RECENT_DAYS),
                 ),
-                # "questions": [ocm.contactmoment for ocm in objectcontactmomenten],
-                "questions": dev_snippets.questions,
+                "questions": [ocm.contactmoment for ocm in objectcontactmomenten],
             }
             context["case"].update(self.get_upload_info_context(self.case))
             context["anchors"] = self.get_anchors(statuses, documents)
@@ -644,6 +641,36 @@ class InnerCaseDetailView(
             anchors.append(["#documents", _("Documenten")])
 
         return anchors
+
+
+class KCM_RedirectView(KlantContactMomentAccessMixin, View):
+    """
+    Redirect to `KlantContactMomentDetailView` on the basis of contactmoment uuid
+
+    Case-related questions ("objectcontactmomenten") in the template contain links
+    to the contactmoment detail under "mijn-aanvragen/contactmomenten". For this,
+    we need to fetch the klantcontactomment uuid and pass it to the relevant view.
+    """
+
+    def get(self, request, *args, **kwargs):
+        klanten_client = build_client_openklant("klanten")
+        contactmoment_client = build_client_openklant("contactmomenten")
+
+        klant = klanten_client.retrieve_klant(**get_fetch_parameters(self.request))
+        kcms = contactmoment_client.retrieve_klantcontactmomenten_for_klant(klant)
+
+        if not kcms:
+            raise Http404
+
+        contactmoment_uuid = kwargs["uuid"]
+        kcm = next((kcm for kcm in kcms if kcm.uuid == contactmoment_uuid))
+
+        if not kcm:
+            raise Http404
+
+        return HttpResponseRedirect(
+            reverse("cases:contactmoment_detail", kwargs={"kcm_uuid": kcm.uuid})
+        )
 
 
 class CaseDocumentDownloadView(LogMixin, CaseAccessMixin, View):

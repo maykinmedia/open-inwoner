@@ -11,6 +11,7 @@ from .views import (
     CaseDocumentUploadFormView,
     InnerCaseDetailView,
     InnerCaseListView,
+    KCM_RedirectView,
     OuterCaseDetailView,
     OuterCaseListView,
 )
@@ -27,6 +28,11 @@ urlpatterns = [
         "contactmomenten/<str:kcm_uuid>/",
         KlantContactMomentDetailView.as_view(),
         name="contactmoment_detail",
+    ),
+    path(
+        "contactmoment/<str:uuid>/",
+        KCM_RedirectView.as_view(),
+        name="kcm_redirect",
     ),
     path(
         "<str:object_id>/document/<str:info_id>/",

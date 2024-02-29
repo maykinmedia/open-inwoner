@@ -1,4 +1,4 @@
-{% load i18n utils anchor_menu_tags card_tags file_tags grid_tags list_tags table_tags solo_tags link_tags button_tags icon_tags notification_tags %}
+{% load i18n utils anchor_menu_tags card_tags file_tags grid_tags list_tags table_tags solo_tags link_tags button_tags icon_tags notification_tags pagination_tags %}
 
 {# Messages #}
 <div class="container container--no-margin" id="cases-status-messages-oob" hx-swap-oob="true">
@@ -77,21 +77,24 @@
             {% if case.questions %}
                 <div class="contactmomenten">
                 <h2 class="h3 contactmomenten__title">{% trans "Vragen" %}</h2>
-                    {% for question in case.questions %}
+                    {% for contactmoment in case.questions %}
                         <div class="card card--compact card--stretch">
                             <div class="card__body">
-                                <a href="{{ question.url }}" class="contactmomenten__link">
+                                {# redirect to fetch klantcontactmoment from contactmoment #}
+                                <a href="{% url 'cases:kcm_redirect' contactmoment.uuid %}" class="contactmomenten__link">
                                     {% render_list %}
                                         <span class="contactmomenten-list">
-                                        {% list_item question.tekst compact=True strong=False %}
+                                        {% list_item contactmoment.tekst compact=True strong=False %}
                                         <li class="list-item list-item--compact">
-                                            {% with register_date=question.registratiedatum|default:"" %}
+                                            {% with register_date=contactmoment.registratiedatum|default:"" %}
                                                 <p class="card__caption card__text--small"><span>{% trans "Vraag ingediend op:" %}</span><span class="card__text--dark">{{ register_date|date }}</span></p>
                                             {% endwith %}
                                         </li>
-                                        {% list_item question.identificatie caption=_("Vraag nummer") compact=True strong=False %}
+                                        {% if contactmoment.identificatie %}
+                                            {% list_item contactmoment.identificatie caption=_("Vraag nummer") compact=True strong=False %}
+                                        {% endif %}
                                         <li class="list-item list-item--compact">
-                                            {% with channel=question.kanaal|default:"" %}
+                                            {% with channel=contactmoment.kanaal|default:"" %}
                                                 <p class="card__caption card__text--small"><span>{% trans "Ingediend via" %}:</span><span class="card__text--dark">{{ channel }}</span></p>
                                             {% endwith %}
                                         </li>
@@ -107,6 +110,10 @@
                         </div>
                     {% endfor %}
                 </div>
+            {% endif %}
+
+            {% if case.questions.paginator %}
+                {% pagination page_obj=case.questions paginator=case.questions.paginator request=request %}
             {% endif %}
 
         {% endrender_column %}

@@ -669,11 +669,20 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
             json=self.status_new,
         )
+        m.get(
+            f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten?object={self.zaak['url']}",
+            json=paginated_response(
+                [self.objectcontactmoment, self.objectcontactmoment2]
+            ),
+        )
 
     @patch("open_inwoner.userfeed.hooks.case_status_seen", autospec=True)
     @patch("open_inwoner.userfeed.hooks.case_documents_seen", autospec=True)
     def test_status_is_retrieved_when_user_logged_in_via_digid(
-        self, m, mock_hook_status: Mock, mock_hook_documents: Mock
+        self,
+        m,
+        mock_hook_status: Mock,
+        mock_hook_documents: Mock,
     ):
         self.maxDiff = None
 
@@ -703,8 +712,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         response = self.app.get(self.case_detail_url, user=self.user)
 
+        case = response.context.get("case")
+
         self.assertEqual(
-            response.context.get("case"),
+            case,
             {
                 "id": self.zaak["uuid"],
                 "identification": "ZAAK-2022-0000000024",
@@ -763,6 +774,20 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         # check userfeed hooks
         mock_hook_status.assert_called_once()
         mock_hook_documents.assert_called_once()
+
+        # check question links
+        doc = PyQuery(response.text)
+        links = doc.find(".contactmomenten__link")
+
+        self.assertEqual(len(links), 2)
+        self.assertEqual(
+            links[0].attrib["href"],
+            reverse("cases:kcm_redirect", kwargs={"uuid": self.contactmoment["uuid"]}),
+        )
+        self.assertEqual(
+            links[1].attrib["href"],
+            reverse("cases:kcm_redirect", kwargs={"uuid": self.contactmoment2["uuid"]}),
+        )
 
     def test_pass_endstatus_type_data_if_endstatus_not_reached(self, m):
         self.maxDiff = None
@@ -853,6 +878,20 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                     make_contactmoment(self.contactmoment2),
                 ],
             },
+        )
+
+        # check question links
+        doc = PyQuery(response.text)
+        links = doc.find(".contactmomenten__link")
+
+        self.assertEqual(len(links), 2)
+        self.assertEqual(
+            links[0].attrib["href"],
+            reverse("cases:kcm_redirect", kwargs={"uuid": self.contactmoment["uuid"]}),
+        )
+        self.assertEqual(
+            links[1].attrib["href"],
+            reverse("cases:kcm_redirect", kwargs={"uuid": self.contactmoment2["uuid"]}),
         )
 
     def test_second_status_preview(self, m):
