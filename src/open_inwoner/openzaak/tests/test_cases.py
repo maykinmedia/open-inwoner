@@ -37,7 +37,7 @@ from .factories import (
     ZaakTypeStatusTypeConfigFactory,
 )
 from .helpers import generate_oas_component_cached
-from .mocks import ESuiteData
+from .mocks import ESuiteSubmissionData
 from .shared import CATALOGI_ROOT, ZAKEN_ROOT
 
 # Avoid redirects through `KvKLoginMiddleware`
@@ -868,7 +868,7 @@ class CaseSubmissionTest(WebTest):
             login_type=LoginTypeChoices.digid, bsn="900222086", email="john@smith.nl"
         )
 
-        data = ESuiteData().install_mocks(m)
+        data = ESuiteSubmissionData().install_mocks(m)
 
         response = self.app.get(
             self.inner_url, user=user, headers={"HX-Request": "true"}

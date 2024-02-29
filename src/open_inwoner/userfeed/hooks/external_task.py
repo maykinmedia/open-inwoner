@@ -1,8 +1,5 @@
-import dataclasses
 from typing import List
 
-from django.contrib.auth.signals import user_logged_in
-from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 
 from open_inwoner.accounts.choices import LoginTypeChoices
@@ -21,34 +18,55 @@ class OpenTaskFeedItem(FeedItem):
     base_message = _("Open task that is yet to be completed")
 
     @property
-    def message(self) -> str:
-        return self.get_data("naam", super().title)
+    def title(self) -> str:
+        return f"{self.base_title} ({self.get_data('task_identificatie')})"
 
     @property
-    def action_url(self) -> str:
-        return self.get_data("formulier_link")
+    def message(self) -> str:
+        return self.get_data("task_name", super().message)
 
 
-def create_external_task_items(user: User, openstaande_taken: List[OpenTask]):
-    existing_uuids = FeedItemData.objects.filter(
-        type=FeedItemType.external_task,
-        user=user,
-    ).values_list("ref_uuid", flat=True)
-    existing_uuids = set(str(uuid) for uuid in existing_uuids)
+def update_external_task_items(user: User, openstaande_taken: List[OpenTask]):
+    """
+    Creates items for OpenTasks if they do not exist yet, updates existing items if the
+    data changed and marks existing items as complete if no OpenTask exists for that
+    uuid anymore
+    """
+    existing_uuid_mapping = {
+        str(item.ref_uuid): item
+        for item in FeedItemData.objects.filter(
+            type=FeedItemType.external_task,
+            user=user,
+        )
+    }
+    existing_uuids = set(existing_uuid_mapping.keys())
 
+    update_data = []
     create_data = []
     for task in openstaande_taken:
-        if task.uuid in existing_uuids:
+        type_data = {
+            "action_url": task.formulier_link,
+            "task_name": task.naam,
+            "task_identificatie": task.identificatie,
+        }
+        if existing_item := existing_uuid_mapping.get(task.uuid):
+            if existing_item.type_data != type_data:
+                existing_item.type_data = type_data
+                update_data.append(existing_item)
             continue
 
-        data = {
-            "user": user,
-            "type": FeedItemType.external_task,
-            "ref_uuid": task.uuid,
-            "action_required": True,
-            "type_data": dataclasses.asdict(task),
-        }
-        create_data.append(FeedItemData(**data))
+        create_data.append(
+            FeedItemData(
+                user=user,
+                type=FeedItemType.external_task,
+                ref_uuid=task.uuid,
+                action_required=True,
+                type_data=type_data,
+            )
+        )
+
+    # TODO we could maybe use `bulk_create` once we upgraded to Django 4.x
+    FeedItemData.objects.bulk_update(update_data, ["type_data"], batch_size=100)
     FeedItemData.objects.bulk_create(create_data)
 
     # Mark all tasks with UUIDs not occurring in the fetched results as completed
@@ -58,12 +76,11 @@ def create_external_task_items(user: User, openstaande_taken: List[OpenTask]):
     ).mark_completed()
 
 
-@receiver(user_logged_in)
-def fetch_open_tasks(sender, user, request, *args, **kwargs):
+def update_user_tasks(user: User):
     if user.login_type == LoginTypeChoices.digid:
         if client := build_client("form"):
             tasks = client.fetch_open_tasks(user.bsn)
-            create_external_task_items(user, tasks)
+            update_external_task_items(user, tasks)
 
 
 register_item_adapter(OpenTaskFeedItem, FeedItemType.external_task)
