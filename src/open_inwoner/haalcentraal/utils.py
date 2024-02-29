@@ -2,9 +2,11 @@ import logging
 from typing import Optional
 
 from django.conf import settings
+from django.utils.translation import gettext as _
 
 from open_inwoner.haalcentraal.api import BRP_1_3, BRP_2_1, BRPAPI
 from open_inwoner.haalcentraal.api_models import BRPData
+from open_inwoner.utils.logentry import system_action
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +30,11 @@ def fetch_brp(user_bsn: str) -> Optional[BRPData]:
 
 
 def update_brp_data_in_db(user, initial=True):
+    system_action(
+        "Retrieving data for %s from haal centraal based on BSN",
+        content_object=user,
+    )
+
     brp = fetch_brp(user.bsn)
     if not brp:
         logger.warning("no data retrieved from Haal Centraal")
@@ -35,8 +42,6 @@ def update_brp_data_in_db(user, initial=True):
 
     brp.copy_to_user(user)
     user.is_prepopulated = True
+    user.save()
 
-    if initial is False:
-        user.save()
-
-    logger.info("Retrieving data for %s from haal centraal based on BSN", user)
+    system_action(_("data was retrieved from haal centraal"), content_object=user)

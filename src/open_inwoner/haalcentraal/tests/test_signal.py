@@ -1,9 +1,11 @@
 import logging
 
 from django.test import TestCase, override_settings
+from django.utils.translation import gettext as _
 
 import requests_mock
 from freezegun import freeze_time
+from timeline_logger.models import TimelineLog
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
@@ -279,6 +281,10 @@ class TestLogging(HaalCentraalMixin, AssertTimelineLogMixin, TestCase):
             "Retrieving data for %s from haal centraal based on BSN",
             level=logging.INFO,
         )
+        self.assertTimelineLog(
+            _("data was retrieved from haal centraal"),
+            level=logging.INFO,
+        )
 
     @requests_mock.Mocker()
     def test_single_entry_is_logged_when_there_is_an_error(self, m):
@@ -312,3 +318,4 @@ class TestLogging(HaalCentraalMixin, AssertTimelineLogMixin, TestCase):
             "Retrieving data for %s from haal centraal based on BSN",
             level=logging.INFO,
         )
+        self.assertEqual(TimelineLog.objects.count(), 1)
