@@ -1,5 +1,6 @@
 import logging
 
+from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.urls import NoReverseMatch, reverse
 
@@ -21,6 +22,11 @@ class NecessaryFieldsMiddleware:
             logger.warning(
                 "cannot reverse 'profile:registration_necessary' URL: apphook not active"
             )
+            return self.get_response(request)
+
+        if request.path.startswith(settings.MEDIA_URL) or request.path.startswith(
+            settings.PRIVATE_MEDIA_URL
+        ):
             return self.get_response(request)
 
         user = request.user
