@@ -59,8 +59,12 @@
     font-family: var(--font-family-heading);
     font-size: var(--font-size-body);
     line-height: var(--font-line-height-body);
-    padding: var(--spacing-large) 0 0 0;
+    padding: var(--spacing-large) var(--spacing-giant) 0 0;
     margin: 0;
+
+    @media (min-width: 768px) {
+      padding: var(--spacing-large) 0 0 0;
+    }
   }
 
   .card {
@@ -69,18 +73,19 @@
 
   .card-container {
     grid-row-gap: var(--spacing-medium);
+
+    @media (max-width: 380px) {
+      grid-template-columns: repeat(
+        auto-fit,
+        calc(320px - var(--spacing-small))
+      );
+    }
   }
 
   .card--status {
+    // Default color
     padding: 0;
-
-    &-warning {
-      background-color: var(--color-danger-lightest);
-    }
-
-    &-info {
-      background-color: var(--color-info-lighter);
-    }
+    background-color: var(--color-info-lighter);
   }
 
   &-marker {
@@ -101,6 +106,16 @@
       color: var(--color-info-darker);
     }
 
+    &--success {
+      background-color: var(--color-success-lighter);
+      color: var(--color-success);
+    }
+
+    &--failure {
+      background-color: var(--color-error-lightest);
+      color: var(--color-error-darker);
+    }
+
     [class*='icons'] {
       margin: 6px 10px;
     }
@@ -112,8 +127,14 @@
 
   .card__body {
     background-color: #fff;
-    border-radius: var(--border-radius);
-    padding: var(--card-spacing);
+    border-bottom-left-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+    padding: var(--card-spacing) var(--spacing-giant) var(--card-spacing)
+      var(--card-spacing);
+
+    @media (min-width: 768px) {
+      padding: var(--card-spacing);
+    }
 
     .tabled__value {
       color: var(--color-gray-dark);

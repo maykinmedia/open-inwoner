@@ -17,17 +17,22 @@
     <div class="card-container card-container--columns-2">
         {% for item in userfeed.items %}
         <a href="{{ item.action_url }}" class="card card--status card--status-{{ item.status_indicator }} {% if item.is_completed %}card--completed{% endif %}">
-        {% if item.action_required %}
-            <div class="userfeed-marker userfeed-marker--warning">
-                {% icon icon="warning_amber" icon_position="after" extra_classes="icon--warning" outlined=True %}
+
+            <div class="userfeed-marker userfeed-marker--{{ item.status_indicator }}">
+                {% if item.status_indicator == "info" %}
+                    {% icon icon="info" outlined=True %}
+                {% elif item.status_indicator == "success" %}
+                    {% icon icon="check_circle" outlined=True %}
+                {% elif item.status_indicator == "failure" %}
+                    {% icon icon="cancel" outlined=True %}
+                {% elif item.status_indicator == "warning" %}
+                    {% icon icon="warning_amber" outlined=True %}
+                {% else %}
+                    {% icon icon="info" outlined=True %}
+                {% endif %}
                 <span class="userfeed__status_text">{{ item.status_text }}</span>
             </div>
-        {% else %}
-            <div class="userfeed-marker userfeed-marker--info">
-                {% icon icon="info" icon_position="after" extra_classes="icon--default" outlined=True %}
-                <span class="userfeed__status_text">{{ item.status_text }}</span>
-            </div>
-        {% endif %}
+
             <div class="card__body card__body--tabled">
                 <p class="p tabled__value">{{ item.title }}</p>
 
@@ -35,7 +40,7 @@
                     <span class="">{{ item.message }}</span>
 {#                    Status gewijzigd naar &lsquo;<span class="status">Documenten nodig</span>&rsquo;</span>#}
                 </h2>
-                <span class="button button--icon-before button--transparent button--secondary">
+                <span class="button button--icon-before button--transparent">
                 {% icon icon="east" icon_position="after" primary=True outlined=True %}
                 </span>
             </div>
