@@ -3,9 +3,10 @@
 <div class="form__control">
     <div class="checkbox">
         {{ field|addclass:"checkbox__input" }}
-        {% if not no_label %}<label class="checkbox__label" for="id_{{ field.name }}">{{ field.label }}</label>{% endif %}
-        {% if field.help_text %}
-            <p class="p{{ help_extra_cls }}">{{ field.help_text }}</p>
+        {% if not no_label %}<label class="checkbox__label" for="id_{{ field.name }}">{{ field.label }}
+            {% if field.help_text %}
+                <p class="choice-list__p">{{ field.help_text }}</p>
+            {% endif %}</label>
         {% endif %}
 
         {% if field.errors %}
