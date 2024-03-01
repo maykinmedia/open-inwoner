@@ -23,7 +23,7 @@ jobs:
 
     services:
       postgres:
-        image: postgis/postgis:10-2.5
+        image: postgis/postgis:15-3.4
         env:
           POSTGRES_HOST_AUTH_METHOD: trust
         ports:
@@ -92,7 +92,7 @@ jobs:
 
     services:
       postgres:
-        image: postgis/postgis:10-2.5
+        image: postgis/postgis:15-3.4
         env:
           POSTGRES_HOST_AUTH_METHOD: trust
         ports:

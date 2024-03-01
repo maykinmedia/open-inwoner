@@ -3,7 +3,6 @@ from datetime import timedelta
 from django.db.models import F
 from django.utils import timezone
 
-from django_yubin.constants import RESULT_FAILED
 from django_yubin.models import Log
 from mail_editor.helpers import find_template
 
@@ -21,7 +20,7 @@ def inform_admins_about_failing_emails():
     period_start = now - timedelta(days=1)
 
     failed_email_logs = (
-        Log.objects.filter(date__gt=period_start, result=RESULT_FAILED)
+        Log.objects.filter(date__gt=period_start)
         .annotate(subject=F("message__subject"), recipient=F("message__to_address"))
         .values("subject", "recipient", "date")
     )

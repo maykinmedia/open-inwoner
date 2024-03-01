@@ -6,7 +6,7 @@
 #
 alabaster==0.7.12
     # via sphinx
-aldryn-apphooks-config==0.6.0
+aldryn-apphooks-config==0.7.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -20,7 +20,7 @@ ape-pie==0.1.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   zgw-consumers
-asgiref==3.4.1
+asgiref==3.7.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -90,6 +90,7 @@ celery==5.2.7
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   django-yubin
     #   notifications-api-common
 certifi==2023.11.17
     # via
@@ -174,8 +175,6 @@ cssselect2==0.4.1
     #   -r requirements/ci.txt
     #   svglib
     #   weasyprint
-ddt-api-calls==0.3.2
-    # via -r requirements/dev.in
 defusedxml==0.7.1
     # via
     #   -c requirements/ci.txt
@@ -193,11 +192,10 @@ dill==0.3.7
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   pylint
-django==3.2.24
+django==4.2.10
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-    #   ddt-api-calls
     #   django-admin-index
     #   django-appconf
     #   django-appdata
@@ -232,6 +230,7 @@ django==3.2.24
     #   django-silk
     #   django-simple-certmanager
     #   django-sniplates
+    #   django-solo
     #   django-timeline-logger
     #   django-treebeard
     #   django-two-factor-auth
@@ -256,7 +255,7 @@ django-appconf==1.0.5
     #   django-image-cropping
     #   django-log-outgoing-requests
     #   django-timeline-logger
-django-appdata==0.3.2
+django-appdata==0.4.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -322,7 +321,7 @@ django-digid-eherkenning==0.9.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-django-elasticsearch-dsl==7.2.1
+django-elasticsearch-dsl==7.4
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -444,11 +443,11 @@ django-simple-certmanager==1.4.1
     #   -r requirements/ci.txt
     #   django-digid-eherkenning
     #   zgw-consumers
-django-sniplates==0.7.0
+django-sniplates==0.7.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-django-solo==1.2.0
+django-solo==2.2.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -458,7 +457,7 @@ django-solo==1.2.0
     #   mozilla-django-oidc-db
     #   notifications-api-common
     #   zgw-consumers
-django-timeline-logger==2.0.0
+django-timeline-logger==3.0.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -474,15 +473,15 @@ django-two-factor-auth[phonenumberslite,webauthn]==1.16.0
     #   -r requirements/ci.txt
     #   django-two-factor-auth
     #   maykin-2fa
-django-view-breadcrumbs==2.2.4
+django-view-breadcrumbs==2.5.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-django-webtest==1.9.7
+django-webtest==1.9.11
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-django-yubin==1.7.1
+django-yubin==2.0.3
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -498,7 +497,7 @@ djangocms-attributes-field==2.1.0
     #   djangocms-file
     #   djangocms-link
     #   djangocms-picture
-djangocms-file==3.0.0
+djangocms-file==3.0.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -506,7 +505,7 @@ djangocms-link==3.1.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-djangocms-picture==4.0.0
+djangocms-picture==4.1.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -514,14 +513,14 @@ djangocms-text-ckeditor==5.1.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-djangorestframework==3.12.4
+djangorestframework==3.14.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-extra-fields
     #   drf-spectacular
     #   notifications-api-common
-djangorestframework-camel-case==1.2.0
+djangorestframework-camel-case==1.4.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -704,11 +703,6 @@ lazy-object-proxy==1.6.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   astroid
-lockfile==0.12.2
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   django-yubin
 locust==2.20.0
     # via -r requirements/dev.in
 lxml==4.9.1
@@ -951,8 +945,12 @@ pytz==2021.3
     #   -r requirements/ci.txt
     #   babel
     #   celery
-    #   django
     #   django-yubin
+    #   djangorestframework
+pywatchman==1.4.1
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 pyyaml==6.0
     # via
     #   -c requirements/ci.txt
@@ -984,7 +982,6 @@ requests==2.31.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   ape-pie
-    #   ddt-api-calls
     #   django-log-outgoing-requests
     #   django-open-forms-client
     #   gemma-zds-client
@@ -1000,7 +997,6 @@ requests-mock==1.9.3
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-    #   ddt-api-calls
 roundrobin==0.0.4
     # via locust
 sentry-sdk==1.38.0
@@ -1017,7 +1013,6 @@ six==1.16.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   click-repl
-    #   django-appdata
     #   django-elasticsearch-dsl
     #   elasticsearch-dsl
     #   furl

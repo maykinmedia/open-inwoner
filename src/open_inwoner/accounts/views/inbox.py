@@ -1,5 +1,5 @@
 import logging
-from typing import Optional
+from typing import List, Optional
 from urllib.parse import unquote
 
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -105,7 +105,7 @@ class InboxView(
 
         return get_object_or_404(User, uuid=other_user_uuid)
 
-    def get_messages(self, other_user: User) -> MessageQuerySet:
+    def get_messages(self, other_user: User) -> List[Message]:
         """
         Returns the messages (MessageType) of the current conversation.
         """
@@ -122,12 +122,10 @@ class InboxView(
         """
         Returns the status string of the conversation.
         """
-        try:
-            return f"{_('Laatste bericht ontvangen op')} {formats.date_format(messages[-1].created_on)}"
-        except IndexError:
+        messages = list(messages)
+        if not messages:
             return ""
-        except AssertionError:
-            return ""
+        return f"{_('Laatste bericht ontvangen op')} {formats.date_format(messages[-1].created_on)}"
 
     def mark_messages_seen(self, other_user: Optional[User]):
         if not other_user:

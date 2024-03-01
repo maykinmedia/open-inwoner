@@ -30,6 +30,11 @@ def fetch_brp(user_bsn: str) -> Optional[BRPData]:
 
 
 def update_brp_data_in_db(user, initial=True):
+    system_action(
+        "Retrieving data for %s from haal centraal based on BSN",
+        content_object=user,
+    )
+
     brp = fetch_brp(user.bsn)
     if not brp:
         logger.warning("no data retrieved from Haal Centraal")
@@ -37,8 +42,6 @@ def update_brp_data_in_db(user, initial=True):
 
     brp.copy_to_user(user)
     user.is_prepopulated = True
-
-    if initial is False:
-        user.save()
+    user.save()
 
     system_action(_("data was retrieved from haal centraal"), content_object=user)

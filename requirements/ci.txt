@@ -4,7 +4,7 @@
 #
 #    ./bin/compile_dependencies.sh
 #
-aldryn-apphooks-config==0.6.0
+aldryn-apphooks-config==0.7.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -18,7 +18,7 @@ ape-pie==0.1.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   zgw-consumers
-asgiref==3.4.1
+asgiref==3.7.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -67,6 +67,7 @@ celery==5.2.7
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   django-yubin
     #   notifications-api-common
 certifi==2023.11.17
     # via
@@ -155,7 +156,7 @@ diff-match-patch==20200713
     #   django-import-export
 dill==0.3.7
     # via pylint
-django==3.2.24
+django==4.2.10
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -190,6 +191,7 @@ django==3.2.24
     #   django-sendfile2
     #   django-simple-certmanager
     #   django-sniplates
+    #   django-solo
     #   django-timeline-logger
     #   django-treebeard
     #   django-two-factor-auth
@@ -214,7 +216,7 @@ django-appconf==1.0.5
     #   django-image-cropping
     #   django-log-outgoing-requests
     #   django-timeline-logger
-django-appdata==0.3.2
+django-appdata==0.4.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -278,7 +280,7 @@ django-digid-eherkenning==0.9.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-django-elasticsearch-dsl==7.2.1
+django-elasticsearch-dsl==7.4
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -396,11 +398,11 @@ django-simple-certmanager==1.4.1
     #   -r requirements/base.txt
     #   django-digid-eherkenning
     #   zgw-consumers
-django-sniplates==0.7.0
+django-sniplates==0.7.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-django-solo==1.2.0
+django-solo==2.2.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -410,7 +412,7 @@ django-solo==1.2.0
     #   mozilla-django-oidc-db
     #   notifications-api-common
     #   zgw-consumers
-django-timeline-logger==2.0.0
+django-timeline-logger==3.0.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -426,13 +428,13 @@ django-two-factor-auth[phonenumberslite,webauthn]==1.16.0
     #   -r requirements/base.txt
     #   django-two-factor-auth
     #   maykin-2fa
-django-view-breadcrumbs==2.2.4
+django-view-breadcrumbs==2.5.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-django-webtest==1.9.7
+django-webtest==1.9.11
     # via -r requirements/test-tools.in
-django-yubin==1.7.1
+django-yubin==2.0.3
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -448,7 +450,7 @@ djangocms-attributes-field==2.1.0
     #   djangocms-file
     #   djangocms-link
     #   djangocms-picture
-djangocms-file==3.0.0
+djangocms-file==3.0.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -456,7 +458,7 @@ djangocms-link==3.1.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-djangocms-picture==4.0.0
+djangocms-picture==4.1.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -464,14 +466,14 @@ djangocms-text-ckeditor==5.1.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-djangorestframework==3.12.4
+djangorestframework==3.14.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-extra-fields
     #   drf-spectacular
     #   notifications-api-common
-djangorestframework-camel-case==1.2.0
+djangorestframework-camel-case==1.4.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -607,11 +609,6 @@ kombu==5.2.4
     #   celery
 lazy-object-proxy==1.6.0
     # via astroid
-lockfile==0.12.2
-    # via
-    #   -c requirements/base.txt
-    #   -r requirements/base.txt
-    #   django-yubin
 lxml==4.9.1
     # via
     #   -c requirements/base.txt
@@ -812,8 +809,12 @@ pytz==2021.3
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   celery
-    #   django
     #   django-yubin
+    #   djangorestframework
+pywatchman==1.4.1
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
 pyyaml==6.0
     # via
     #   -c requirements/base.txt
@@ -867,7 +868,6 @@ six==1.16.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   click-repl
-    #   django-appdata
     #   django-elasticsearch-dsl
     #   elasticsearch-dsl
     #   furl

@@ -9,7 +9,7 @@ from timeline_logger.models import TimelineLog
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
-from open_inwoner.utils.logentry import LOG_ACTIONS
+from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin
 
 from ...utils.test import ClearCachesMixin
 from ..models import HaalCentraalConfig
@@ -19,7 +19,7 @@ from .mixins import HaalCentraalMixin
 
 @requests_mock.Mocker()
 class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
-    def test_signal_updates_users_data_when_logged_in_via_digid_v_2(self, m):
+    def test_signal_updates_users_data_when_logged_in_via_digid_v_3(self, m):
         self._setUpMocks_v_2(m)
         self._setUpService()
 
@@ -248,7 +248,7 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
         self.assertFalse(user.is_prepopulated)
 
 
-class TestLogging(HaalCentraalMixin, TestCase):
+class TestLogging(HaalCentraalMixin, AssertTimelineLogMixin, TestCase):
     @freeze_time("2021-10-18 13:00:00")
     @requests_mock.Mocker()
     def test_signal_updates_logging(self, m):
@@ -277,20 +277,13 @@ class TestLogging(HaalCentraalMixin, TestCase):
         user.bsn = "999993847"
         user.save()
 
-        log_entry = TimelineLog.objects.filter(object_id=user.id)[1]
-
-        self.assertEquals(
-            log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
+        self.assertTimelineLog(
+            "Retrieving data for %s from haal centraal based on BSN",
+            level=logging.INFO,
         )
-        self.assertEquals(log_entry.object_id, str(user.id))
-        self.assertEquals(
-            log_entry.extra_data,
-            {
-                "message": _("data was retrieved from haal centraal"),
-                "log_level": logging.INFO,
-                "action_flag": list(LOG_ACTIONS[5]),
-                "content_object_repr": str(user),
-            },
+        self.assertTimelineLog(
+            _("data was retrieved from haal centraal"),
+            level=logging.INFO,
         )
 
     @requests_mock.Mocker()
@@ -314,11 +307,15 @@ class TestLogging(HaalCentraalMixin, TestCase):
         config.save()
 
         user = UserFactory(
-            first_name="", last_name="", login_type=LoginTypeChoices.digid
+            first_name="",
+            last_name="",
+            login_type=LoginTypeChoices.digid,
         )
         user.bsn = "999993847"
         user.save()
 
-        log_entries = TimelineLog.objects.count()
-
-        self.assertEqual(log_entries, 1)
+        self.assertTimelineLog(
+            "Retrieving data for %s from haal centraal based on BSN",
+            level=logging.INFO,
+        )
+        self.assertEqual(TimelineLog.objects.count(), 1)
