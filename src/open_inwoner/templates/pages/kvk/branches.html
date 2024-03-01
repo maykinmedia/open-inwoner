@@ -12,87 +12,44 @@
                 {% endif %}
 
                 <ul class="choice-list choice-list--single">
-
-                {# Show NEVENVESTIGINGEN and HOOFDVESTIGING in one list #}
-                <p><strong>{% trans "Selecteer de vestiging waarmee u wilt inloggen" %}</strong></p>
-                {% for branch in company_branches %}
-                    {% with company_id=branch.vestigingsnummer %}
-
+                    {# first only show option to select entire company in separate list-item #}
+                    <p><strong>{% trans "Log in namens alle vestigingen" %}</strong></p>
+                    {% with entire_company=company_branches.0 %}
                         <li class="choice-list__item">
                             <label class="choice-list__label">
-                                <input type="radio" id="branch-{{ company_id }}" name="branch_number" value="{{ company_id }}" class="choice-list__radio">
+                                <input type="radio" id="entire-company" name="branch_number" value="" class="choice-list__radio">
                                 <div class="choice-list__content">
-                                    <h2 class="choice-list__heading">{{ branch.naam }}</h2>
-                                    {% if branch.straatnaam %}
-                                    <p class="choice-list__p">{{ branch.adres.binnenlandsAdres.straatnaam }}</p>
-                                    {% endif %}
-                                    {% if branch.plaats %}
-                                    <p class="choice-list__p">{{ branch.plaats}}</p>
-                                    {% endif %}
-                                    {% if branch.vestigingsnummer %}
-                                    <p class="choice-list__p">{% trans "Vestiging" %}: {{ company_id }}</p>
-                                    {% endif %}
+                                    <h2 class="choice-list__heading">{{ entire_company.naam }}</h2>
                                 </div>
                             </label>
                         </li>
-
                     {% endwith %}
-                {% endfor %}
 
-
-                {# first only show HOOFDVESTIGING in separate list-item #}
-{#                {% for branch in company_branches %}#}
-{#                {% if not branch.vestigingsnummer %}#}
-{#                <p><strong>{% trans "Log in namens alle vestigingen" %}</strong></p>#}
-{##}
-{#                <li class="choice-list__item">#}
-{#                    <label class="choice-list__label">#}
-{#                        <input type="radio" id="hoofdvestiging-{{ company_id }}" name="branch_number" value="{{ company_id }}" class="choice-list__radio">#}
-{#                        <div class="choice-list__content">#}
-{#                            <h2 class="choice-list__heading">{{ branch.naam }}</h2>#}
-{#                            {% if branch.straatnaam %}#}
-{#                            <p class="choice-list__p">{{ branch.straatnaam }}</p>#}
-{#                            {% endif %}#}
-{#                            {% if branch.plaats %}#}
-{#                            <p class="choice-list__p">{{ branch.plaats}}</p>#}
-{#                            {% endif %}#}
-{#                            {% if branch.vestigingsnummer %}#}
-{#                            <p class="choice-list__p">{% trans "Vestiging" %}: {{ company_id }}</p>#}
-{#                            {% endif %}#}
-{#                        </div>#}
-{#                    </label>#}
-{#                </li>#}
-{#                {% endif %}#}
-{#                {% endfor %}#}
-{##}
-{#          {% if branch.vestigingsnummer %}#}
-                {# only show multiple NEVENVESTIGINGEN without the HOOFDVESTIGING #}
-{#                <p><strong>{% trans "Of selecteer de vestiging waarmee u wilt inloggen" %}</strong></p>#}
-{#                {% for branch in company_branches %}#}
-{#                    {% with company_id=branch.vestigingsnummer %}#}
-{##}
-{#                        <li class="choice-list__item">#}
-{#                            <label class="choice-list__label">#}
-{#                                <input type="radio" id="branch-{{ company_id }}" name="branch_number" value="{{ company_id }}" class="choice-list__radio">#}
-{#                                <div class="choice-list__content">#}
-{#                                    <h2 class="choice-list__heading">{{ branch.naam }}</h2>#}
-{#                                    {% if branch.straatnaam %}#}
-{#                                    <p class="choice-list__p">{{ branch.straatnaam }}</p>#}
-{#                                    {% endif %}#}
-{#                                    {% if branch.plaats %}#}
-{#                                    <p class="choice-list__p">{{ branch.plaats}}</p>#}
-{#                                    {% endif %}#}
-{#                                    {% if branch.vestigingsnummer %}#}
-{#                                    <p class="choice-list__p">{% trans "Vestiging" %}: {{ company_id }}</p>#}
-{#                                    {% endif %}#}
-{#                                </div>#}
-{#                            </label>#}
-{#                        </li>#}
-{##}
-{#                    {% endwith %}#}
-{#                {% endfor %}#}
-{#          {% endif %}#}
-
+                    {% if company_branches|slice:"1:" %}
+                        {# only show multiple VESTIGINGEN #}
+                        <p><strong>{% trans "Of selecteer de vestiging waarmee u wilt inloggen" %}</strong></p>
+                        {% for branch in company_branches|slice:"1:" %}
+                            {% with company_id=branch.vestigingsnummer %}
+                                <li class="choice-list__item">
+                                    <label class="choice-list__label">
+                                        <input type="radio" id="branch-{{ company_id }}" name="branch_number" value="{{ company_id }}" class="choice-list__radio">
+                                        <div class="choice-list__content">
+                                            <h2 class="choice-list__heading">{{ branch.naam }}</h2>
+                                            {% if company_id %}
+                                                <p class="choice-list__p">{% trans "Vestiging" %}: {{ company_id }}{% if branch.type == "hoofdvestiging" %} ({% trans "Hoofdvestiging" %}){% endif %}</p>
+                                            {% endif %}
+                                            {% if branch.adres.binnenlandsAdres.straatnaam %}
+                                                <p class="choice-list__p">{{ branch.adres.binnenlandsAdres.straatnaam }}</p>
+                                            {% endif %}
+                                            {% if branch.adres.binnenlandsAdres.plaats %}
+                                                <p class="choice-list__p">{{ branch.adres.binnenlandsAdres.plaats}}</p>
+                                            {% endif %}
+                                        </div>
+                                    </label>
+                                </li>
+                            {% endwith %}
+                        {% endfor %}
+                    {% endif %}
                 </ul>
 
                 <div class="form__actions form__actions--fullwidth">
