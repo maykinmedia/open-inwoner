@@ -19,7 +19,7 @@ from ..utils.colors import hex_to_hsl
 from ..utils.css import clean_stylesheet
 from ..utils.fields import CSSField
 from ..utils.files import OverwriteStorage
-from ..utils.validators import FilerExactImageSizeValidator
+from ..utils.validators import DutchPhoneNumberValidator, FilerExactImageSizeValidator
 from .choices import ColorTypeChoices, CustomFontName, OpenIDDisplayChoices
 from .validators import validate_oidc_config
 
@@ -372,6 +372,15 @@ class SiteConfiguration(SingletonModel):
         ),
         blank=True,
         default=list,
+    )
+
+    # contact info
+    contact_phonenumber = models.CharField(
+        verbose_name=_("Phonenumber"),
+        blank=True,
+        max_length=15,
+        validators=[DutchPhoneNumberValidator()],
+        help_text=_("The public contact phone number of the organization"),
     )
 
     # analytics
