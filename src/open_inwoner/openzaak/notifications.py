@@ -1,6 +1,6 @@
 import logging
 from datetime import date, timedelta
-from typing import List
+from typing import List, Optional
 
 from django.conf import settings
 from django.urls import reverse
@@ -553,7 +553,7 @@ def handle_status_update(
     else:
         template_name = "case_status_notification"
 
-    send_case_update_email(user, case, status, template_name)
+    send_case_update_email(user, case, template_name, status=status)
     note.mark_sent()
 
     log_system_action(
@@ -565,8 +565,8 @@ def handle_status_update(
 def send_case_update_email(
     user: User,
     case: Zaak,
-    status: Status,
     template_name: str,
+    status: Optional[Status] = None,
     extra_context: dict = None,
 ):
     """
