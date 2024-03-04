@@ -665,11 +665,12 @@ class FormClient(APIClient):
                 params={"bsn": bsn},
             )
             data = get_json_response(response)
+            all_data = list(pagination_helper(self, data))
         except (RequestException, ClientError) as e:
             logger.exception("exception while making request", exc_info=e)
             return []
 
-        results = factory(OpenTask, data)
+        results = factory(OpenTask, all_data)
 
         return results
 
