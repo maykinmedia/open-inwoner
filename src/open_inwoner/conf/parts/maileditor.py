@@ -1,4 +1,5 @@
 import os
+from datetime import date
 
 from django.utils.translation import gettext_lazy as _
 
@@ -211,18 +212,22 @@ MAIL_EDITOR_CONF = {
             {
                 "name": "identification",
                 "description": _("The identification of the case"),
+                "example": "ZAAK-1234",
             },
             {
                 "name": "type_description",
                 "description": _("The description of the type of the case"),
+                "example": _("Casetype placeholder"),
             },
             {
                 "name": "status_description",
                 "description": _("The description of the status of the case"),
+                "example": _("status placeholder"),
             },
             {
                 "name": "end_date",
                 "description": _("The planned final date of the case"),
+                "example": date(2024, 5, 1),
             },
             {
                 "name": "case_link",
@@ -269,14 +274,17 @@ MAIL_EDITOR_CONF = {
             {
                 "name": "identification",
                 "description": _("The identification of the case"),
+                "example": "ZAAK-1234",
             },
             {
                 "name": "type_description",
                 "description": _("The description of the type of the case"),
+                "example": _("Casetype placeholder"),
             },
             {
                 "name": "start_date",
                 "description": _("The start date of the case"),
+                "example": date(2024, 5, 1),
             },
             {
                 "name": "case_link",
@@ -312,14 +320,22 @@ MAIL_EDITOR_CONF = {
             {
                 "name": "identification",
                 "description": _("The identification of the case"),
+                "example": "ZAAK-1234",
             },
             {
                 "name": "type_description",
                 "description": _("The description of the type of the case"),
+                "example": _("Casetype placeholder"),
             },
             {
                 "name": "status_description",
                 "description": _("The description of the status of the case"),
+                "example": _("status placeholder"),
+            },
+            {
+                "name": "status_description",
+                "description": _("The description of the status of the case"),
+                "example": _("status placeholder"),
             },
             {
                 "name": "case_link",
@@ -328,6 +344,7 @@ MAIL_EDITOR_CONF = {
             {
                 "name": "end_date",
                 "description": _("The planned final date of the case"),
+                "example": date(2024, 5, 1),
             },
             {
                 "name": "site_name",

@@ -97,8 +97,13 @@
             display: block;
             width: 100%;
         }
+
         .td--responsive {
             display: block;
+        }
+
+        .td__alignright {
+            text-align: left;
         }
     }
 </style>
@@ -113,6 +118,7 @@
         --color-accent: {{ theming.accent_color }};
         --color-primary: {{ theming.primary_color }};
         --color-secondary: {{ theming.secondary_color }};
+        margin: 0;
     }
 
     /* Dynamic theme CSS variables */
@@ -131,6 +137,7 @@
 
     .button--primary {
         background-color: {{ theming.primary_color }};
+        border: 1px solid{{ theming.primary_color }};
     }
 
     .td-mail__bg-accent {
@@ -153,7 +160,7 @@
                         <td class="td-mail--accent td-mail__bg-accent" colspan="6" style="background-color: {{ theming.accent_color }};">&nbsp;</td>
                     </tr>
                     <tr align="center">
-                        <td class="td-mail td__logo-mail" colspan="6" align="center" >
+                        <td class="td-mail td__logo-mail" colspan="6" align="center">
                             <img height="55" src="{{ logo.url }}" alt="" class="img__logo-mail">
                         </td>
                     </tr>
