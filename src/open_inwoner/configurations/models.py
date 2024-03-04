@@ -382,6 +382,11 @@ class SiteConfiguration(SingletonModel):
         validators=[DutchPhoneNumberValidator()],
         help_text=_("The public contact phone number of the organization"),
     )
+    contact_page = models.URLField(
+        verbose_name=_("URL"),
+        blank=True,
+        help_text=_("URL of the public contact page of the organization"),
+    )
 
     # analytics
     gtm_code = models.CharField(
