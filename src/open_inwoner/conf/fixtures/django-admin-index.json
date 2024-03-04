@@ -183,6 +183,10 @@
             [
                 "filer",
                 "folderpermission"
+            ],
+            [
+                "openklant",
+                "klantcontactmomentlocal"
             ]
         ]
     }

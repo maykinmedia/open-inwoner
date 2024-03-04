@@ -127,3 +127,27 @@ class ContactFormSubject(OrderedModel):
 
     def __str__(self):
         return self.subject
+
+
+class KlantContactMomentLocal(models.Model):
+    user = models.ForeignKey(
+        "accounts.User",
+        verbose_name=_("User"),
+        on_delete=models.CASCADE,
+        related_name="contactmoment_answers",
+        help_text=_(
+            "This is the user that asked the question to which this is an answer."
+        ),
+    )
+    kcm_url = models.URLField(
+        verbose_name=_("KlantContactMoment URL"), unique=True, max_length=1000
+    )
+    is_seen = models.BooleanField(
+        verbose_name=_("Is seen"),
+        help_text=_("Whether or not the user has seen the answer"),
+        default=False,
+    )
+
+    class Meta:
+        verbose_name = _("KlantContactMoment")
+        verbose_name_plural = _("KlantContactMomenten")

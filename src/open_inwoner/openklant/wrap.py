@@ -1,10 +1,11 @@
 import logging
 from typing import List, Optional
 
+from open_inwoner.accounts.models import User
 from open_inwoner.kvk.branches import get_kvk_branch_number
 from open_inwoner.openklant.api_models import KlantContactMoment
 from open_inwoner.openklant.clients import build_client
-from open_inwoner.openklant.models import OpenKlantConfig
+from open_inwoner.openklant.models import KlantContactMomentLocal, OpenKlantConfig
 
 logger = logging.getLogger(__name__)
 
@@ -95,3 +96,27 @@ def get_fetch_parameters(request, use_vestigingsnummer: bool = False) -> dict:
                 parameters.update({"vestigingsnummer": vestigingsnummer})
         return parameters
     return {}
+
+
+def get_local_kcm_mapping(
+    kcms: list[KlantContactMoment], user: User
+) -> dict[str, KlantContactMomentLocal]:
+    existing_kcms = KlantContactMomentLocal.objects.filter(user=user).values_list(
+        "kcm_url", flat=True
+    )
+
+    to_create = []
+    for kcm in kcms:
+        if kcm.url in existing_kcms:
+            continue
+
+        to_create.append(KlantContactMomentLocal(user=user, kcm_url=kcm.url))
+
+    KlantContactMomentLocal.objects.bulk_create(to_create)
+
+    kcm_answer_mapping = {
+        kcm_answer.kcm_url: kcm_answer
+        for kcm_answer in KlantContactMomentLocal.objects.filter(user=user)
+    }
+
+    return kcm_answer_mapping
