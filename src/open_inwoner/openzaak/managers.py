@@ -18,13 +18,19 @@ if TYPE_CHECKING:
 
 class UserCaseNotificationBaseManager(models.Manager):
     def has_received_similar_notes_within(
-        self, user: User, case_uuid, delta: timedelta, not_record_id: int = None
+        self,
+        user: User,
+        case_uuid,
+        delta: timedelta,
+        collision_key: str,
+        not_record_id: Optional[int] = None,
     ) -> bool:
         qs = self.filter(
             user=user,
             case_uuid=case_uuid,
             created_on__gte=timezone.now() - delta,
             is_sent=True,
+            collision_key=collision_key,
         )
         if not_record_id:
             qs = qs.exclude(id=not_record_id)
@@ -44,6 +50,7 @@ class UserCaseStatusNotificationManager(UserCaseNotificationBaseManager):
         user: User,
         case_uuid: UUID,
         status_uuid: UUID,
+        collision_key: str,
     ) -> Optional["UserCaseStatusNotification"]:
         """
         assume this is the first delivery but depend on the unique constraint
@@ -52,6 +59,7 @@ class UserCaseStatusNotificationManager(UserCaseNotificationBaseManager):
             "user": user,
             "case_uuid": case_uuid,
             "status_uuid": status_uuid,
+            "collision_key": collision_key,
         }
         return self.attempt_create(**kwargs)
 
@@ -62,6 +70,7 @@ class UserCaseInfoObjectNotificationManager(UserCaseNotificationBaseManager):
         user: User,
         case_uuid: UUID,
         zaak_info_object_uuid: UUID,
+        collision_key: str,
     ) -> Optional["UserCaseInfoObjectNotification"]:
         """
         assume this is the first delivery but depend on the unique constraint
@@ -70,6 +79,7 @@ class UserCaseInfoObjectNotificationManager(UserCaseNotificationBaseManager):
             "user": user,
             "case_uuid": case_uuid,
             "zaak_info_object_uuid": zaak_info_object_uuid,
+            "collision_key": collision_key,
         }
         return self.attempt_create(**kwargs)
 

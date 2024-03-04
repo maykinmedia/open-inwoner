@@ -538,6 +538,7 @@ class UserCaseStatusNotificationBase(models.Model):
         verbose_name=_("Created on"), default=timezone.now
     )
     is_sent = models.BooleanField(_("Is sent"), default=False)
+    collision_key = models.CharField(_("Collision key"), blank=True, max_length=255)
 
     def mark_sent(self):
         self.is_sent = True
@@ -563,11 +564,11 @@ class UserCaseStatusNotification(UserCaseStatusNotificationBase):
             )
         ]
 
-    def has_received_similar_notes_within(self, period: timedelta) -> bool:
+    def has_received_similar_notes_within(
+        self, period: timedelta, collision_key: str
+    ) -> bool:
         return UserCaseStatusNotification.objects.has_received_similar_notes_within(
-            self.user, self.case_uuid, period, not_record_id=self.id
-        ) or UserCaseInfoObjectNotification.objects.has_received_similar_notes_within(
-            self.user, self.case_uuid, period
+            self.user, self.case_uuid, period, collision_key, not_record_id=self.id
         )
 
 
@@ -587,11 +588,11 @@ class UserCaseInfoObjectNotification(UserCaseStatusNotificationBase):
             )
         ]
 
-    def has_received_similar_notes_within(self, period: timedelta) -> bool:
+    def has_received_similar_notes_within(
+        self, period: timedelta, collision_key: str
+    ) -> bool:
         return UserCaseInfoObjectNotification.objects.has_received_similar_notes_within(
-            self.user, self.case_uuid, period, not_record_id=self.id
-        ) or UserCaseStatusNotification.objects.has_received_similar_notes_within(
-            self.user, self.case_uuid, period
+            self.user, self.case_uuid, period, collision_key, not_record_id=self.id
         )
 
 

@@ -227,6 +227,8 @@ def _handle_zaakinformatieobject_notification(
 def handle_zaakinformatieobject_update(
     user: User, case: Zaak, zaak_info_object: ZaakInformatieObject
 ):
+    template_name = "case_document_notification"
+
     # hook into userfeed
     hooks.case_document_added_notification_received(user, case, zaak_info_object)
 
@@ -241,6 +243,7 @@ def handle_zaakinformatieobject_update(
         user,
         case.uuid,
         zaak_info_object.uuid,
+        template_name,
     )
     if not note:
         log_system_action(
@@ -251,14 +254,14 @@ def handle_zaakinformatieobject_update(
 
     # let's not spam the users
     period = timedelta(seconds=settings.ZGW_LIMIT_NOTIFICATIONS_FREQUENCY)
-    if note.has_received_similar_notes_within(period):
+    if note.has_received_similar_notes_within(period, template_name):
         log_system_action(
             f"blocked over-frequent zaakinformatieobject notification email for user '{user}' zaakinformatieobject {zaak_info_object.url} case {case.url}",
             log_level=logging.INFO,
         )
         return
 
-    send_case_update_email(user, case, "case_document_notification")
+    send_case_update_email(user, case, template_name)
     note.mark_sent()
 
     log_system_action(
@@ -521,6 +524,12 @@ def handle_status_update(
     status: Status,
     status_type_config: ZaakTypeStatusTypeConfig,
 ):
+    # choose template
+    if status_type_config.action_required:
+        template_name = "case_status_notification_action_required"
+    else:
+        template_name = "case_status_notification"
+
     # hook into userfeed
     hooks.case_status_notification_received(user, case, status)
 
@@ -529,6 +538,7 @@ def handle_status_update(
         user,
         case.uuid,
         status.uuid,
+        template_name,
     )
     if not note:
         log_system_action(
@@ -540,19 +550,13 @@ def handle_status_update(
 
     # let's not spam the users
     period = timedelta(seconds=settings.ZGW_LIMIT_NOTIFICATIONS_FREQUENCY)
-    if note.has_received_similar_notes_within(period):
+    if note.has_received_similar_notes_within(period, template_name):
         log_system_action(
             f"blocked over-frequent status notification email for user '{user}' status "
             f"{status.url} case {case.url}",
             log_level=logging.INFO,
         )
         return
-
-    # choose template
-    if status_type_config.action_required:
-        template_name = "case_status_notification_action_required"
-    else:
-        template_name = "case_status_notification"
 
     send_case_update_email(user, case, template_name, status=status)
     note.mark_sent()

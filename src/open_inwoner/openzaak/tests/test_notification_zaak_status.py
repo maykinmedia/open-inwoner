@@ -571,8 +571,11 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         case = factory(Zaak, data.zaak)
         case.zaaktype = factory(ZaakType, data.zaak_type)
 
-        status = factory(Status, data.status_final)
-        status.statustype = factory(StatusType, data.status_type_final)
+        status_initial = factory(Status, data.status_initial)
+        status_initial.statustype = factory(StatusType, data.status_type_initial)
+
+        status_final = factory(Status, data.status_final)
+        status_final.statustype = factory(StatusType, data.status_type_final)
 
         ztc = ZaakTypeConfigFactory.create(
             catalogus=None,
@@ -580,15 +583,22 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
             # set this to notify
             notify_status_changes=True,
         )
-        status_type_config = ZaakTypeStatusTypeConfigFactory.create(
+        status_type_config_initial = ZaakTypeStatusTypeConfigFactory.create(
+            zaaktype_config=ztc,
+            omschrijving=data.status_type_initial["omschrijving"],
+            statustype_url=data.status_type_initial["url"],
+            notify_status_change=True,
+        )
+        status_type_config_final = ZaakTypeStatusTypeConfigFactory.create(
             zaaktype_config=ztc,
             omschrijving=data.status_type_final["omschrijving"],
             statustype_url=data.status_type_final["url"],
             notify_status_change=True,
+            action_required=True,
         )
 
         # first call
-        handle_status_update(user, case, status, status_type_config)
+        handle_status_update(user, case, status_initial, status_type_config_initial)
 
         mock_send.assert_called_once()
 
@@ -602,7 +612,7 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         self.assertEqual(args[0], user)
         self.assertEqual(args[1].url, case.url)
         self.assertEqual(args[2], "case_status_notification")
-        self.assertEqual(kwargs["status"], status)
+        self.assertEqual(kwargs["status"], status_initial)
 
         mock_send.reset_mock()
 
@@ -616,10 +626,27 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         )
 
         # second call with same case/status
-        handle_status_update(user, case, status, status_type_config)
+        handle_status_update(user, case, status_initial, status_type_config_initial)
 
         # no duplicate mail for this user/case/status
         mock_send.assert_not_called()
+
+        with self.subTest("mails are throttled based on template_name"):
+            # call with different status and different configuration with action_required=True
+            handle_status_update(user, case, status_final, status_type_config_final)
+
+            mock_send.assert_called_once()
+
+            # check call arguments
+            args = mock_send.call_args.args
+            kwargs = mock_send.call_args.kwargs
+
+            self.assertEqual(args[0], user)
+            self.assertEqual(args[1].url, case.url)
+            self.assertEqual(args[2], "case_status_notification_action_required")
+            self.assertEqual(kwargs["status"], status_final)
+
+            mock_send.reset_mock()
 
         self.assertTimelineLog(
             "ignored duplicate status notification delivery for user ",
@@ -628,7 +655,9 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         )
         # other user is fine
         other_user = UserFactory.create()
-        handle_status_update(other_user, case, status, status_type_config)
+        handle_status_update(
+            other_user, case, status_initial, status_type_config_initial
+        )
 
         mock_send.assert_called_once()
 
@@ -644,7 +673,7 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         status.statustype = factory(
             StatusType, copy_with_new_uuid(data.status_type_final)
         )
-        handle_status_update(user, case, status, status_type_config)
+        handle_status_update(user, case, status, status_type_config_initial)
 
         # not sent because we already send to this user within the frequency
         mock_send.assert_not_called()
@@ -661,7 +690,7 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
             status.statustype = factory(
                 StatusType, copy_with_new_uuid(data.status_type_final)
             )
-            handle_status_update(user, case, status, status_type_config)
+            handle_status_update(user, case, status, status_type_config_initial)
 
             # this one succeeds
             mock_send.assert_called_once()
