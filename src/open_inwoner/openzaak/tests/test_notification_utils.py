@@ -46,7 +46,9 @@ class NotificationHandlerUtilsTestCase(TestCase):
             Zaak, "_format_zaak_identificatie"
         ) as format_identificatie:
             format_identificatie.return_value = ret_val
-            send_case_update_email(user, case, status, "case_status_notification")
+            send_case_update_email(
+                user, case, "case_status_notification", status=status
+            )
 
         format_identificatie.assert_called_once()
 
