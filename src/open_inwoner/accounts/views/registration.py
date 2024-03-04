@@ -6,6 +6,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import NoReverseMatch, reverse
+from django.utils.encoding import iri_to_uri
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext as _
 from django.views.generic import UpdateView
 
@@ -146,6 +148,13 @@ class NecessaryFieldsUserView(LogMixin, LoginRequiredMixin, InviteMixin, UpdateV
 
     def get_success_url(self):
         messages.add_message(self.request, messages.SUCCESS, "Registratie is voltooid")
+        if "next" in self.request.GET and url_has_allowed_host_and_scheme(
+            url=self.request.GET["next"],
+            allowed_hosts=[
+                self.request.get_host(),
+            ],
+        ):
+            return iri_to_uri(self.request.GET["next"])
         return reverse("pages-root")
 
     def get_form_kwargs(self):

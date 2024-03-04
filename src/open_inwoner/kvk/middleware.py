@@ -45,6 +45,8 @@ class KvKLoginMiddleware:
 
         # redirect to company branch choice
         redirect = furl(reverse("kvk:branches"))
+        if request.path != settings.LOGIN_REDIRECT_URL:
+            redirect.set({"next": request.path})
         redirect.args.update(request.GET)
 
         return HttpResponseRedirect(redirect.url)

@@ -656,11 +656,11 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
 
         # follow redirect flow
         res = self.client.get(response["Location"])
-        res = self.client.get(res["Location"])
-        res = self.client.get(res["Location"])
 
         self.assertRedirects(
-            res, f"{reverse('profile:registration_necessary')}?invite={invite.key}"
+            res,
+            f"{reverse('profile:registration_necessary')}?invite={invite.key}",
+            fetch_redirect_response=False,
         )
         self.assertNotIn("invite_url", self.client.session.keys())
 
@@ -708,7 +708,7 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
         response = self.client.post(url, data, user=user, follow=True)
         self.assertRedirects(
             response,
-            f"{reverse('profile:registration_necessary')}",
+            reverse("profile:registration_necessary"),
         )
 
         # check company branch number in session
@@ -739,6 +739,10 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
         response = self.app.get(reverse("pages-root"), user=user)
 
         # redirect to /kvk/branches/
+        self.assertRedirects(
+            response, reverse("kvk:branches"), fetch_redirect_response=False
+        )
+
         res = self.app.post(response["Location"], {"branch_number": "1234"})
 
         # redirect to /register/necessary/
@@ -1387,9 +1391,11 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
             with self.subTest(url=url):
                 response = self.app.get(url, user=user)
 
-                self.assertRedirects(
-                    response, reverse("profile:registration_necessary")
-                )
+                redirect = furl(reverse("profile:registration_necessary"))
+                if url != reverse("pages-root"):
+                    redirect.set({"next": url})
+
+                self.assertRedirects(response, redirect.url)
 
     def test_submit_without_invite(self):
         user = UserFactory(
@@ -1606,7 +1612,7 @@ class TestLoginLogoutFunctionality(AssertRedirectsMixin, WebTest):
                 config.save()
 
                 login_url = (
-                    reverse("digid_oidc:init")
+                    f"{reverse('digid_oidc:init')}?next="
                     if oidc_enabled
                     else f"{reverse('digid:login')}?next="
                 )
@@ -1631,7 +1637,7 @@ class TestLoginLogoutFunctionality(AssertRedirectsMixin, WebTest):
                 config.save()
 
                 login_url = (
-                    reverse("eherkenning_oidc:init")
+                    f"{reverse('eherkenning_oidc:init')}?next="
                     if oidc_enabled
                     else f"{reverse('eherkenning:login')}?next="
                 )
