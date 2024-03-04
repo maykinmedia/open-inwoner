@@ -193,11 +193,13 @@ class KvKViewsTestCase(TestCase):
                 "naam": "Makers and Shakers",
                 "kvkNummer": "12345678",
                 "vestigingsnummer": "1234",
+                "type": "hoofdvestiging",
             },
             {
                 "naam": "Makers and Shakers",
                 "kvkNummer": "12345678",
                 "vestigingsnummer": "5678",
+                "type": "nevenvestiging",
             },
         ]
 
@@ -218,10 +220,13 @@ class KvKViewsTestCase(TestCase):
         # check that pseudo-branch representing company as a whole has been added
         self.assertEqual(len(branch_inputs), 3)
 
-        self.assertEqual(branch_inputs[0], doc.find("[id='branch-']")[0])
+        self.assertEqual(branch_inputs[0], doc.find("[id='entire-company']")[0])
         self.assertEqual(branch_inputs[1], doc.find("[id='branch-1234']")[0])
         self.assertEqual(branch_inputs[2], doc.find("[id='branch-5678']")[0])
 
         # chack that company name is displayed for every branch
-        company_name_displays = doc("p:Contains('Makers and Shakers')")
+        company_name_displays = doc("h2:Contains('Makers and Shakers')")
         self.assertEqual(len(company_name_displays), 3)
+
+        main_branch_display = doc("p:Contains('Hoofdvestiging')")
+        self.assertEqual(len(main_branch_display), 1)
