@@ -28,7 +28,10 @@ from .test_notification_data import MockAPIData
 
 
 @requests_mock.Mocker()
-@patch("open_inwoner.openzaak.notifications.handle_zaakinformatieobject_update")
+@patch(
+    "open_inwoner.openzaak.notifications.handle_zaakinformatieobject_update",
+    autospec=True,
+)
 class ZaakInformatieObjectNotificationHandlerTestCase(
     AssertTimelineLogMixin, ClearCachesMixin, TestCase
 ):
@@ -329,8 +332,11 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
     note these tests match with a similar test from `test_notification_zaak_status.py`
     """
 
-    @patch("open_inwoner.userfeed.hooks.case_document_added_notification_received")
-    @patch("open_inwoner.openzaak.notifications.send_case_update_email")
+    @patch(
+        "open_inwoner.userfeed.hooks.case_document_added_notification_received",
+        autospec=True,
+    )
+    @patch("open_inwoner.openzaak.notifications.send_case_update_email", autospec=True)
     def test_handle_zaak_info_object_update_filters_disabled_notifications(
         self, mock_send: Mock, mock_feed_hook: Mock
     ):
@@ -359,8 +365,11 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
             level=logging.INFO,
         )
 
-    @patch("open_inwoner.userfeed.hooks.case_document_added_notification_received")
-    @patch("open_inwoner.openzaak.notifications.send_case_update_email")
+    @patch(
+        "open_inwoner.userfeed.hooks.case_document_added_notification_received",
+        autospec=True,
+    )
+    @patch("open_inwoner.openzaak.notifications.send_case_update_email", autospec=True)
     def test_handle_zaak_info_object_update_filters_bad_email(
         self, mock_send: Mock, mock_feed_hook: Mock
     ):
@@ -389,8 +398,11 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
             level=logging.INFO,
         )
 
-    @patch("open_inwoner.userfeed.hooks.case_document_added_notification_received")
-    @patch("open_inwoner.openzaak.notifications.send_case_update_email")
+    @patch(
+        "open_inwoner.userfeed.hooks.case_document_added_notification_received",
+        autospec=True,
+    )
+    @patch("open_inwoner.openzaak.notifications.send_case_update_email", autospec=True)
     def test_handle_zaak_info_object_update(
         self, mock_send: Mock, mock_feed_hook: Mock
     ):
