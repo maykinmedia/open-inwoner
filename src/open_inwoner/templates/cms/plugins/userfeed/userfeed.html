@@ -16,19 +16,31 @@
     </div>
     <div class="card-container card-container--columns-2">
         {% for item in userfeed.items %}
-        <a href="{{ item.action_url }}" class="card {% if item.action_required %}card--status{% endif %} {% if item.is_completed %}card--completed{% endif %}">
+        <a href="{{ item.action_url }}" class="card card--status card--status-{{ item.status_indicator }} {% if item.is_completed %}card--completed{% endif %}">
+
+            <div class="userfeed-marker userfeed-marker--{{ item.status_indicator }}">
+                {% if item.status_indicator == "info" %}
+                    {% icon icon="info" outlined=True %}
+                {% elif item.status_indicator == "success" %}
+                    {% icon icon="check_circle" outlined=True %}
+                {% elif item.status_indicator == "failure" %}
+                    {% icon icon="cancel" outlined=True %}
+                {% elif item.status_indicator == "warning" %}
+                    {% icon icon="warning_amber" outlined=True %}
+                {% else %}
+                    {% icon icon="info" outlined=True %}
+                {% endif %}
+                <span class="userfeed__status_text">{{ item.status_text }}</span>
+            </div>
+
             <div class="card__body card__body--tabled">
                 <p class="p tabled__value">{{ item.title }}</p>
-                                
-                <p class="p" style="color: rebeccapurple; font-size: 300%;">
-                    {{ item.status_indicator }}
-                </p>
-                
+
                 <h2 class="userfeed__heading">
                     <span class="">{{ item.message }}</span>
 {#                    Status gewijzigd naar &lsquo;<span class="status">Documenten nodig</span>&rsquo;</span>#}
                 </h2>
-                <span class="button button--icon-before button--transparent button--secondary">
+                <span class="button button--icon-before button--transparent">
                 {% icon icon="east" icon_position="after" primary=True outlined=True %}
                 </span>
             </div>
