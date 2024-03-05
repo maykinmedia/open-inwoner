@@ -242,6 +242,10 @@ MAIL_EDITOR_CONF = {
                 "description": _("The link to an existing contactpage"),
             },
             {
+                "name": "contact_phonenumber",
+                "description": _("The callable link to the configured phonenumber"),
+            },
+            {
                 "name": "profile_notifications",
                 "description": _(
                     "The link to the notifications and unsubscribe settings"
@@ -293,6 +297,14 @@ MAIL_EDITOR_CONF = {
             {
                 "name": "site_name",
                 "description": _("Name of the site"),
+            },
+            {
+                "name": "contact_page",
+                "description": _("The link to an existing contactpage"),
+            },
+            {
+                "name": "contact_phonenumber",
+                "description": _("The callable link to the configured phonenumber"),
             },
             {
                 "name": "profile_notifications",
@@ -349,6 +361,14 @@ MAIL_EDITOR_CONF = {
             {
                 "name": "site_name",
                 "description": _("Name of the site"),
+            },
+            {
+                "name": "contact_page",
+                "description": _("The link to an existing contactpage"),
+            },
+            {
+                "name": "contact_phonenumber",
+                "description": _("The callable link to the configured phonenumber"),
             },
             {
                 "name": "profile_notifications",
