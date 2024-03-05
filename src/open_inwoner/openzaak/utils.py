@@ -142,7 +142,7 @@ def translate_single_status(status_text: str) -> str:
             status=status_text
         )
     except StatusTranslation.DoesNotExist:
-        return ""
+        return status_text
 
 
 def get_user_fetch_parameters(request) -> dict:
