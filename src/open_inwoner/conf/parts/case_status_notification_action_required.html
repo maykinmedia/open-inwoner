@@ -25,15 +25,17 @@
             <p><span class="text-color__small-gray-900">Zaaknummer: </span><br/>{{ identification }}</p>
         </td>
     </tr>
+
+    <!-- Contains Table with different column-widths -->
     <tr>
-        <td class="td-mail td-mail__bg-danger td__padding-all" colspan="6">
-            <div class="td-mail__bg-white">
-                <table role="presentation" border="0" cellspacing="0" cellpadding="0" width="100%">
+        <td class="td-mail td-mail__bg-danger cell--rounded-padding" colspan="6">
+            <div class="td-mail__bg-white mail-cell--rounded">
+                <table role="presentation" border="0" cellspacing="0" cellpadding="0" width="100%" class="mail--transparent">
                     <tr>
-                        <td width="35" class="td-mail td__padding-left align-center">
+                        <td width="35" class="td-mail mail--transparent td__padding-left align-center">
                             <img src="/static/img/mail/alarm_danger-orange.png" width="20" height="18" alt="" class="mail__icon">
                         </td>
-                        <td class="td__padding-top td__padding-right td__padding-bottom align-center">
+                        <td class="td-mail mail--transparent td__padding-top td__padding-right td__padding-bottom align-center">
                             <p class="text-color__danger"><strong>Wij hebben documenten van u nodig</strong><br>
                                 Upload de documenten tot {{ end_date }}</p>
                         </td>
@@ -42,6 +44,8 @@
             </div>
         </td>
     </tr>
+    <!-- end of Table with differing column-widths -->
+
     <tr>
         <td class="td-mail td-mail__bg-danger td__padding-all" colspan="6">
             <p>Log in om de documenten te uploaden.</p>
