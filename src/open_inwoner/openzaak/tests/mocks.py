@@ -58,6 +58,6 @@ class ESuiteTaskData:
     def install_mocks(self, m):
         m.get(
             f"{FORMS_ROOT}openstaande-taken",
-            json=[self.task1, self.task2],
+            json={"count": 2, "results": [self.task1, self.task2]},
         )
         return self
