@@ -201,6 +201,7 @@ django==4.2.10
     #   django-appdata
     #   django-axes
     #   django-choices
+    #   django-ckeditor
     #   django-classy-tags
     #   django-cms
     #   django-cors-headers
@@ -215,6 +216,7 @@ django==4.2.10
     #   django-formtools
     #   django-htmx
     #   django-import-export
+    #   django-js-asset
     #   django-localflavor
     #   django-log-outgoing-requests
     #   django-open-forms-client
@@ -278,7 +280,7 @@ django-choices==2.0.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   mail-editor
-django-ckeditor==6.2.0
+django-ckeditor==6.7.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -365,7 +367,7 @@ django-ipware==4.0.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-axes
-django-js-asset==1.2.2
+django-js-asset==2.2.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -591,6 +593,10 @@ flask-basicauth==0.2.0
     # via locust
 flask-cors==4.0.0
     # via locust
+fontawesomefree==6.4.2
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 fonttools[woff]==4.43.0
     # via
     #   -c requirements/ci.txt
@@ -715,7 +721,7 @@ lxml==4.9.1
     #   pyquery
     #   svglib
     #   xmlsec
-mail-editor @ git+https://github.com/maykinmedia/mail-editor.git@0.3.5
+mail-editor @ git+https://github.com/maykinmedia/mail-editor.git@0.3.6
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -947,10 +953,6 @@ pytz==2021.3
     #   celery
     #   django-yubin
     #   djangorestframework
-pywatchman==1.4.1
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
 pyyaml==6.0
     # via
     #   -c requirements/ci.txt

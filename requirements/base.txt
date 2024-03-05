@@ -89,6 +89,7 @@ django==4.2.10
     #   django-appdata
     #   django-axes
     #   django-choices
+    #   django-ckeditor
     #   django-classy-tags
     #   django-cms
     #   django-cors-headers
@@ -101,6 +102,7 @@ django==4.2.10
     #   django-formtools
     #   django-htmx
     #   django-import-export
+    #   django-js-asset
     #   django-localflavor
     #   django-log-outgoing-requests
     #   django-open-forms-client
@@ -148,7 +150,7 @@ django-better-admin-arrayfield==1.4.2
     #   mozilla-django-oidc-db
 django-choices==2.0.0
     # via mail-editor
-django-ckeditor==6.2.0
+django-ckeditor==6.7.0
     # via mail-editor
 django-classy-tags==4.0.0
     # via
@@ -197,7 +199,7 @@ django-import-export==2.6.1
     # via -r requirements/base.in
 django-ipware==4.0.0
     # via django-axes
-django-js-asset==1.2.2
+django-js-asset==2.2.0
     # via django-ckeditor
 django-localflavor==3.1
     # via -r requirements/base.in
@@ -304,12 +306,12 @@ et-xmlfile==1.1.0
     # via openpyxl
 face==20.1.1
     # via glom
+fontawesomefree==6.4.2
+    # via -r requirements/base.in
 fonttools[woff]==4.43.0
     # via
     #   fonttools
     #   weasyprint
-fontawesomefree==6.4.2
-    # via -r requirements/base.in
 furl==2.1.3
     # via
     #   -r requirements/base.in
@@ -354,7 +356,7 @@ lxml==4.9.1
     #   maykin-python3-saml
     #   svglib
     #   xmlsec
-mail-editor @ git+https://github.com/maykinmedia/mail-editor.git@0.3.5
+mail-editor @ git+https://github.com/maykinmedia/mail-editor.git@0.3.6
     # via -r requirements/base.in
 mail-parser==3.15.0
     # via django-yubin
@@ -442,8 +444,6 @@ pytz==2021.3
     #   celery
     #   django-yubin
     #   djangorestframework
-pywatchman==1.4.1
-    # via -r requirements/base.in
 pyyaml==6.0
     # via
     #   drf-spectacular
