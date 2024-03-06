@@ -2,6 +2,7 @@ from django.test import TestCase
 
 from open_inwoner.openzaak.models import StatusTranslation
 from open_inwoner.openzaak.tests.factories import StatusTranslationFactory
+from open_inwoner.openzaak.utils import translate_single_status
 
 
 class StatusTranslationModelTest(TestCase):
@@ -24,3 +25,9 @@ class StatusTranslationModelTest(TestCase):
                 self.assertEqual(expected, actual)
 
         # NOTE the TranslationLookup helper is further tested in its own file
+        #    src/open_inwoner/utils/tests/test_translate.py
+
+    def test_helper(self):
+        StatusTranslationFactory(status="foo", translation="FOO")
+        self.assertEqual("FOO", translate_single_status("foo"))
+        self.assertEqual("not_translated", translate_single_status("not_translated"))

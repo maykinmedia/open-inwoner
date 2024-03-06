@@ -142,4 +142,4 @@ def translate_single_status(status_text: str) -> str:
             status=status_text
         )
     except StatusTranslation.DoesNotExist:
-        return ""
+        return status_text

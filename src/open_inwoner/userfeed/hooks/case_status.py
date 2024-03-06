@@ -66,9 +66,7 @@ class CaseStatusUpdateFeedItem(FeedItem):
     @property
     def message(self) -> str:
         status_text = self.get_data("status_omschrijving")
-        status_text = (
-            translate_single_status(status_text) or status_text or _("onbekend")
-        )
+        status_text = translate_single_status(status_text) or _("onbekend")
         html = escape(self.base_message)
         status = format_html('<span class="status">{}</span>', status_text)
         html = format_html(html, status=status)

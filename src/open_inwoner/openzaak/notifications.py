@@ -31,6 +31,7 @@ from open_inwoner.openzaak.utils import (
     get_zaak_type_info_object_type_config,
     is_info_object_visible,
     is_zaak_visible,
+    translate_single_status,
 )
 from open_inwoner.userfeed import hooks
 from open_inwoner.utils.logentry import system_action as log_system_action
@@ -582,7 +583,7 @@ def send_case_update_email(
     context = {
         "identification": case.identification,
         "type_description": case.zaaktype.omschrijving,
-        "status_description": status.statustype.omschrijving,
+        "status_description": translate_single_status(status.statustype.omschrijving),
         "start_date": case.startdatum,
         "end_date": date.today() + timedelta(days=config.action_required_deadline_days),
         "case_link": case_detail_url,
