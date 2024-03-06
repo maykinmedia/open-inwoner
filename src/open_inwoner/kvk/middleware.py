@@ -1,5 +1,6 @@
 import logging
 
+from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.urls import NoReverseMatch, reverse
 
@@ -24,6 +25,8 @@ class KvKLoginMiddleware:
             not user.is_authenticated
             or not user.is_eherkenning_user
             or kvk_branch_selected_done(request.session)
+            or request.path.startswith(settings.MEDIA_URL)
+            or request.path.startswith(settings.PRIVATE_MEDIA_URL)
         ):
             return self.get_response(request)
 
@@ -42,6 +45,8 @@ class KvKLoginMiddleware:
 
         # redirect to company branch choice
         redirect = furl(reverse("kvk:branches"))
+        if request.path != settings.LOGIN_REDIRECT_URL:
+            redirect.set({"next": request.path})
         redirect.args.update(request.GET)
 
         return HttpResponseRedirect(redirect.url)

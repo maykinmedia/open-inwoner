@@ -1,20 +1,17 @@
-from datetime import date, datetime
+from datetime import date
 from typing import Generator, Union
 
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Q
 from django.forms.forms import Form
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
-from django.views.generic import DetailView, FormView, TemplateView, UpdateView
+from django.views.generic import FormView, TemplateView, UpdateView
 
 from aldryn_apphooks_config.mixins import AppConfigMixin
-from glom import glom
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.choices import (
@@ -31,10 +28,9 @@ from open_inwoner.openklant.clients import build_client
 from open_inwoner.openklant.wrap import get_fetch_parameters
 from open_inwoner.plans.models import Plan
 from open_inwoner.questionnaire.models import QuestionnaireStep
-from open_inwoner.utils.mixins import ExportMixin
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
-from ..forms import BrpUserForm, UserForm, UserNotificationsForm
+from ..forms import BrpUserForm, CategoriesForm, UserForm, UserNotificationsForm
 from ..models import Action, User
 
 
@@ -79,6 +75,7 @@ class MyProfileView(
             ("#personal-info", _("Persoonlijke gegevens")),
             ("#notifications", _("Voorkeuren voor meldingen")),
             ("#overview", _("Overzicht")),
+            ("#profile-remove", _("Profiel verwijderen")),
         ]
 
         user_files = user.get_all_files()
@@ -121,6 +118,8 @@ class MyProfileView(
         )
 
         context["files"] = user_files
+
+        context["selected_categories"] = user.get_interests()
 
         context["questionnaire_exists"] = QuestionnaireStep.objects.filter(
             published=True
@@ -226,6 +225,31 @@ class EditProfileView(
         kwargs = super().get_form_kwargs()
         kwargs["user"] = self.request.user
         return kwargs
+
+
+class MyCategoriesView(
+    LogMixin, LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, UpdateView
+):
+    template_name = "pages/profile/categories.html"
+    model = User
+    form_class = CategoriesForm
+    success_url = reverse_lazy("profile:detail")
+
+    @cached_property
+    def crumbs(self):
+        return [
+            (_("Mijn profiel"), reverse("profile:detail")),
+            (_("Mijn interessegebieden"), reverse("profile:categories")),
+        ]
+
+    def get_object(self):
+        return self.request.user
+
+    def form_valid(self, form):
+        form.save()
+        messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
+        self.log_change(self.object, _("categories were modified"))
+        return HttpResponseRedirect(self.get_success_url())
 
 
 class MyDataView(

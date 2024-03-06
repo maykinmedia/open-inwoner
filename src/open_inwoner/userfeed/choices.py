@@ -1,5 +1,5 @@
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 class FeedItemType(models.TextChoices):
@@ -7,3 +7,4 @@ class FeedItemType(models.TextChoices):
     case_status_changed = "case_status_change", _("Case status changed")
     case_document_added = "case_document_added", _("Case document added")
     plan_expiring = "plan_expiring", _("Plan nears deadline")
+    external_task = "external_task", _("External task")

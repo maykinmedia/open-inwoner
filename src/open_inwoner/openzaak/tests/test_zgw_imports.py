@@ -2,7 +2,6 @@ from django.test import TestCase
 
 import requests_mock
 from zgw_consumers.constants import APITypes
-from zgw_consumers.test import generate_oas_component
 
 from open_inwoner.openzaak.models import CatalogusConfig, OpenZaakConfig, ZaakTypeConfig
 from open_inwoner.openzaak.tests.factories import CatalogusConfigFactory, ServiceFactory

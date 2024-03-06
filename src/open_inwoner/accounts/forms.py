@@ -7,7 +7,7 @@ from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
 from django.template import loader
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from django_registration.forms import RegistrationForm
 
@@ -288,6 +288,18 @@ class CustomPasswordResetForm(PasswordResetForm):
             email_message.attach_alternative(html_email, "text/html")
 
         email_message.send()
+
+
+class CategoriesForm(forms.ModelForm):
+    selected_categories = forms.ModelMultipleChoiceField(
+        queryset=Category.objects.published(),
+        widget=forms.widgets.CheckboxSelectMultiple,
+        required=False,
+    )
+
+    class Meta:
+        model = User
+        fields = ("selected_categories",)
 
 
 class UserNotificationsForm(forms.ModelForm):

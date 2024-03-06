@@ -1,9 +1,9 @@
 import os
 
-from django.urls import reverse_lazy
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 import sentry_sdk
+from easy_thumbnails.conf import Settings as thumbnail_settings
 from log_outgoing_requests.formatters import HttpFormatter
 
 from .utils import config, get_sentry_integrations
@@ -150,6 +150,8 @@ INSTALLED_APPS = [
     "django_otp.plugins.otp_static",
     "django_otp.plugins.otp_totp",
     "two_factor",
+    "two_factor.plugins.webauthn",
+    "maykin_2fa",
     # Optional applications.
     "ordered_model",
     "django_admin_index",
@@ -183,7 +185,6 @@ INSTALLED_APPS = [
     "mail_editor",
     "ckeditor",
     "privates",
-    "fontawesomefree",
     "timeline_logger",
     "csp",
     "cspreports",
@@ -245,7 +246,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "axes.middleware.AxesMiddleware",
-    "django_otp.middleware.OTPMiddleware",
+    "maykin_2fa.middleware.OTPMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "cms.middleware.utils.ApphookReloadMiddleware",
     "cms.middleware.user.CurrentUserMiddleware",
@@ -478,6 +479,7 @@ AUTHENTICATION_BACKENDS = [
     "open_inwoner.accounts.backends.CustomOIDCBackend",
 ]
 
+
 SESSION_COOKIE_NAME = "open_inwoner_sessionid"
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
@@ -601,6 +603,11 @@ DJANGOCMS_LINK_TEMPLATES = [
 ADMIN_INDEX_SHOW_REMAINING_APPS = False
 ADMIN_INDEX_AUTO_CREATE_APP_GROUP = False
 ADMIN_INDEX_SHOW_REMAINING_APPS_TO_SUPERUSERS = False
+ADMIN_INDEX_SHOW_MENU = True
+ADMIN_INDEX_DISPLAY_DROP_DOWN_MENU_CONDITION_FUNCTION = (
+    "open_inwoner.utils.django_two_factor_auth.should_display_dropdown_menu"
+)
+
 
 #
 # DJANGO-AXES (4.0+)
@@ -623,6 +630,9 @@ AXES_LOCKOUT_TEMPLATE = "account_blocked.html"
 AXES_USE_USER_AGENT = True  # Default: False
 AXES_LOCK_OUT_BY_COMBINATION_USER_AND_IP = True  # Default: False
 AXES_BEHIND_REVERSE_PROXY = IS_HTTPS
+# By default, Axes obfuscates values for formfields named "password", but the admin
+# interface login formfield name is "auth-password", so we obfuscate that as well
+AXES_SENSITIVE_PARAMETERS = ["password", "auth-password"]  # nosec
 
 # The default meta precedence order
 IPWARE_META_PRECEDENCE_ORDER = (
@@ -671,7 +681,6 @@ FILER_STORAGES = {
     },
 }
 
-from easy_thumbnails.conf import Settings as thumbnail_settings
 
 THUMBNAIL_PROCESSORS = (
     "filer.thumbnail_processors.scale_and_crop_with_subject_location",
@@ -792,13 +801,15 @@ ZGW_LIMIT_NOTIFICATIONS_FREQUENCY = config(
 DOCUMENT_RECENT_DAYS = config("DOCUMENT_RECENT_DAYS", default=1)
 
 #
-# Maykin fork of DJANGO-TWO-FACTOR-AUTH
+# Maykin 2FA
 #
-TWO_FACTOR_FORCE_OTP_ADMIN = config("TWO_FACTOR_FORCE_OTP_ADMIN", default=not DEBUG)
-TWO_FACTOR_PATCH_ADMIN = config("TWO_FACTOR_PATCH_ADMIN", default=True)
-ADMIN_INDEX_DISPLAY_DROP_DOWN_MENU_CONDITION_FUNCTION = (
-    "open_inwoner.utils.django_two_factor_auth.should_display_dropdown_menu"
-)
+TWO_FACTOR_PATCH_ADMIN = False
+TWO_FACTOR_WEBAUTHN_RP_NAME = f"OpenInwoner {ENVIRONMENT}"
+TWO_FACTOR_WEBAUTHN_AUTHENTICATOR_ATTACHMENT = "cross-platform"
+# Allow OIDC admins to bypass 2FA
+MAYKIN_2FA_ALLOW_MFA_BYPASS_BACKENDS = [
+    "open_inwoner.accounts.backends.CustomOIDCBackend",
+]
 
 # file upload limits
 MIN_UPLOAD_SIZE = 1  # in bytes

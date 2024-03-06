@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n anchor_menu_tags card_tags dashboard_tags file_tags grid_tags table_tags solo_tags form_tags button_tags %}
+{% load i18n anchor_menu_tags card_tags file_tags grid_tags table_tags solo_tags form_tags button_tags %}
 
 {% block content %}
     {% if contactmoment %}
@@ -7,7 +7,7 @@
             {% render_column span=12 %}
                 {# Contactmoment/dashboard. #}
                 <h1 class="h1" id="title">{{ page_title }}</h1>
-                {% contactmoment_dashboard contactmoment %}
+                {% include "components/Dashboard/Dashboard.html" with metrics=metrics only %}
             {% endrender_column %}
             {% render_column start=4 span=6 %}
 

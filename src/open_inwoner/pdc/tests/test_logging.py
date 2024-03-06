@@ -6,6 +6,7 @@ from django.utils.translation import gettext as _
 import tablib
 from django_webtest import WebTest
 from freezegun import freeze_time
+from maykin_2fa.test import disable_admin_mfa
 from timeline_logger.models import TimelineLog
 from webtest import Upload
 
@@ -17,6 +18,7 @@ from ..models.product import Product
 from .factories import CategoryFactory, ProductFactory
 
 
+@disable_admin_mfa()
 @freeze_time("2021-10-18 13:00:00")
 class TestProductLogging(WebTest):
     def setUp(self):
@@ -162,6 +164,7 @@ class TestProductLogging(WebTest):
         )
 
 
+@disable_admin_mfa()
 @freeze_time("2021-10-18 13:00:00")
 class TestCategoryLogging(WebTest):
     def setUp(self):

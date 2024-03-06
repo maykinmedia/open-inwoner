@@ -2,6 +2,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from django_webtest import WebTest
+from maykin_2fa.test import disable_admin_mfa
 from mozilla_django_oidc_db.models import OpenIDConnectConfig
 
 from open_inwoner.accounts.tests.factories import UserFactory
@@ -11,6 +12,7 @@ from open_inwoner.utils.test import ClearCachesMixin
 from ..choices import OpenIDDisplayChoices
 
 
+@disable_admin_mfa()
 class OIDCConfigTest(ClearCachesMixin, WebTest):
     csrf_checks = False
 
@@ -39,7 +41,10 @@ class OIDCConfigTest(ClearCachesMixin, WebTest):
 
         oidc_login_option = response.pyquery.find(".admin-login-option")
 
-        self.assertEqual(oidc_login_option.text(), _("Login with organization account"))
+        self.assertEqual(
+            oidc_login_option.text(),
+            "{} {}".format(_("or"), _("Login with organization account")),
+        )
 
     def test_admin_only_disabled(self):
         """Assert that the OIDC login option is only displayed for regular users"""

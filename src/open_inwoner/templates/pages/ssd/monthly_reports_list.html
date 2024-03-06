@@ -33,7 +33,7 @@
                                 {% endrender_form %}
                                 <div>
                                     {% if report_not_found %}
-                                        {% blocktrans with time_period=report_not_found|date:"M Y" %}
+                                        {% blocktrans with time_period=report_not_found|date:"F Y" %}
                                             Geen uitkeringsspecificatie gevonden voor {{ time_period }}.
                                         {% endblocktrans %}
                                     {% endif %}

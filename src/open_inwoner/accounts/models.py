@@ -1,9 +1,9 @@
 import os
-from datetime import date, timedelta
+from datetime import timedelta
 from uuid import uuid4
 
 from django.conf import settings
-from django.contrib.auth.models import AbstractBaseUser, Group, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -11,7 +11,7 @@ from django.db.models import Q, UniqueConstraint
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.crypto import get_random_string
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from image_cropping import ImageCropField, ImageRatioField
 from localflavor.nl.models import NLBSNField, NLZipCodeField
@@ -177,6 +177,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name=_("Prepopulated"),
         default=False,
         help_text=_("Indicates if fields have been prepopulated by Haal Central API."),
+    )
+    selected_categories = models.ManyToManyField(
+        "pdc.Category",
+        verbose_name=_("Selected categories"),
+        related_name="selected_by",
+        blank=True,
     )
     oidc_id = models.CharField(
         verbose_name=_("OpenId Connect id"),
@@ -349,6 +355,12 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_all_files(self):
         return self.documents.order_by("-created_on")
+
+    def get_interests(self) -> list:
+        if not self.selected_categories.exists():
+            return []
+
+        return list(self.selected_categories.values_list("name", flat=True))
 
     def get_active_notifications(self) -> str:
         from open_inwoner.cms.utils.page_display import (

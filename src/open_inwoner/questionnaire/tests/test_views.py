@@ -1,13 +1,13 @@
 from unittest.mock import patch
 
-from django.contrib.sessions.middleware import SessionMiddleware
 from django.http import Http404
 from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse
 from django.views.generic import FormView
 
-from cms import api
 from django_webtest import WebTest
+
+from open_inwoner.utils.test import SessionMiddleware
 
 from ...accounts.tests.factories import UserFactory
 from ...cms.profile.cms_appconfig import ProfileConfig

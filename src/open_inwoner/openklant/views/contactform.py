@@ -49,7 +49,7 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         config = OpenKlantConfig.get_solo()
-        context["has_configuration"] = config.has_form_configuration()
+        context["has_form_configuration"] = config.has_form_configuration()
         return context
 
     def get_result_message(self, success=False):

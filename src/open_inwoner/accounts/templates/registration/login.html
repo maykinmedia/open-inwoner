@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n static utils logo_tags grid_tags card_tags form_tags link_tags button_tags solo_tags cms_tags %}
+{% load i18n static utils grid_tags card_tags form_tags link_tags button_tags solo_tags cms_tags %}
 
 
 {% block header_image %}
@@ -23,8 +23,10 @@
                         <img class="digid-logo__image" src="{% static 'accounts/digid_logo.svg' %}" alt="DigiD inlogpagina">
                     </a>
                     {% url 'digid_oidc:init' as href %}
-                    {% link href=href text=_('Inloggen met DigiD') secondary=True icon='arrow_forward' extra_classes="link--digid" %}
-                {% endrender_card %}
+                    {% with href|addnexturl:next as href_with_next %}
+                        {% link href=href_with_next text=_('Inloggen met DigiD') secondary=True icon='arrow_forward' extra_classes="link--digid" %}
+                    {% endwith %}
+                    {% endrender_card %}
             {% else %}
                 {% render_card direction='horizontal' tinted=True compact=True %}
                     <a href="{% url 'digid:login' %}" class="link digid-logo">
@@ -46,7 +48,9 @@
                         <img class="eherkenning-logo__image" src="{% static 'accounts/eherkenning.png' %}" height=30 alt="eHerkenning inlogpagina">
                     </a>
                     {% url 'eherkenning_oidc:init' as href %}
-                    {% link href=href text=_('Inloggen met eHerkenning') secondary=True icon='arrow_forward' extra_classes="link--eherkenning" %}
+                    {% with href|addnexturl:next as href_with_next %}
+                    {% link href=href_with_next text=_('Inloggen met eHerkenning') secondary=True icon='arrow_forward' extra_classes="link--eherkenning" %}
+                    {% endwith %}
                 {% endrender_card %}
             {% else %}
                 {% render_card direction='horizontal' tinted=True compact=True %}

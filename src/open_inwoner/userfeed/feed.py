@@ -13,6 +13,7 @@ from open_inwoner.userfeed.adapters import (
     get_item_adapter_class,
     get_types_for_unpublished_cms_apps,
 )
+from open_inwoner.userfeed.hooks.external_task import update_user_tasks
 from open_inwoner.userfeed.models import FeedItemData
 from open_inwoner.userfeed.summarize import SUMMARIES
 
@@ -47,6 +48,8 @@ def get_feed(user: User, with_history: bool = False) -> Feed:
     if not user or user.is_anonymous:
         # empty feed
         return Feed()
+
+    update_user_tasks(user)
 
     # core filters
     display_filter = Q(completed_at__isnull=True)

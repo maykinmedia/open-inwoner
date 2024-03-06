@@ -1,5 +1,4 @@
 import random
-from datetime import datetime, timezone
 from uuid import uuid4
 
 from django.core.files.uploadedfile import SimpleUploadedFile

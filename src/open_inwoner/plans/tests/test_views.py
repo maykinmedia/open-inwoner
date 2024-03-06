@@ -5,7 +5,7 @@ from django.contrib.messages import get_messages
 from django.core import mail
 from django.test import override_settings, tag
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from django_webtest import WebTest
 from freezegun import freeze_time
@@ -148,7 +148,7 @@ class PlanViewTests(WebTest):
         self.assertContains(response, self.contact.get_full_name())
         self.assertNotContains(response, new_contact.get_full_name())
 
-    @patch("open_inwoner.userfeed.hooks.plan_completed")
+    @patch("open_inwoner.userfeed.hooks.plan_completed", autospec=True)
     def test_plan_detail_userfeed_hook(self, mock_plan_completed: Mock):
         self.plan.end_date = date.today()
         self.plan.save()
@@ -480,7 +480,7 @@ class PlanViewTests(WebTest):
         self.assertEqual(elem.attrib.get("checked"), "checked")
 
         # NOTE: custom widget ID hardcoded on index of choice
-        elem = response.pyquery(f"#id_plan_contacts_1")[0]
+        elem = response.pyquery("#id_plan_contacts_1")[0]
         self.assertEqual(elem.attrib.get("checked"), "checked")
 
     def test_plan_create_contains_contact_create_link_when_no_contacts_exist(self):

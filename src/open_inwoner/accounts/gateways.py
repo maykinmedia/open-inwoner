@@ -15,8 +15,6 @@ class GatewayError(Exception):
     text message.
     """
 
-    pass
-
 
 class Gateway(object):
     def get_message(self, token):

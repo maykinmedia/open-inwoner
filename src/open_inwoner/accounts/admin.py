@@ -3,10 +3,9 @@ from django.contrib.auth.admin import GroupAdmin, UserAdmin
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.contrib.auth.models import Group
 from django.forms import ValidationError
-from django.http.request import HttpRequest
-from django.urls import reverse, reverse_lazy
-from django.utils.html import format_html, format_html_join
-from django.utils.translation import ngettext, ugettext_lazy as _
+from django.urls import reverse
+from django.utils.html import format_html
+from django.utils.translation import gettext_lazy as _, ngettext
 
 from image_cropping import ImageCroppingMixin
 from privates.admin import PrivateMediaMixin
@@ -104,6 +103,7 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
                     "image",
                     "cropping",
                     "phonenumber",
+                    "selected_categories",
                 )
             },
         ),

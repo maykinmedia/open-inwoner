@@ -1,4 +1,4 @@
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
@@ -22,19 +22,25 @@ class CategoriesPlugin(CMSActiveAppMixin, CMSPluginBase):
     def render(self, context, instance, placeholder):
         config = OpenZaakConfig.get_solo()
         request = context["request"]
-        # Show the all the highlighted categories the user has access to, as well as
-        # categories that are linked to ZaakTypen for which the user has Zaken within
-        # the specified period
-        visible_categories = Category.objects.published().visible_for_user(request.user)
-        categories = visible_categories.filter(highlighted=True)
-        if (
-            config.enable_categories_filtering_with_zaken
-            and request.user.is_authenticated
-            and (request.user.bsn or request.user.kvk)
-        ):
-            categories |= visible_categories.filter_by_zaken_for_request(request)
 
-        context["categories"] = categories.order_by("path")
+        if request.user.is_authenticated and request.user.selected_categories.exists():
+            context["categories"] = request.user.selected_categories.all()
+        else:
+            # Show the all the highlighted categories the user has access to, as well as
+            # categories that are linked to ZaakTypen for which the user has Zaken within
+            # the specified period
+            visible_categories = Category.objects.published().visible_for_user(
+                request.user
+            )
+            categories = visible_categories.filter(highlighted=True)
+            if (
+                config.enable_categories_filtering_with_zaken
+                and request.user.is_authenticated
+                and (request.user.bsn or request.user.kvk)
+            ):
+                categories |= visible_categories.filter_by_zaken_for_request(request)
+
+            context["categories"] = categories.order_by("path")
 
         return context
 

@@ -1,10 +1,11 @@
 from django.contrib.admin.models import ADDITION, CHANGE, DELETION
 from django.test import override_settings
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from django_webtest import WebTest
 from freezegun import freeze_time
+from maykin_2fa.test import disable_admin_mfa
 from timeline_logger.models import TimelineLog
 
 from open_inwoner.accounts.tests.factories import UserFactory
@@ -15,6 +16,7 @@ from ..admin import CustomTimelineLogAdmin
 from ..logentry import LOG_ACTIONS
 
 
+@disable_admin_mfa()
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestAdminTimelineLogging(WebTest):
     csrf_checks = False
@@ -72,7 +74,7 @@ class TestAdminTimelineLogging(WebTest):
             {
                 "message": "Titel, Doel and Einddatum gewijzigd.",
                 "action_flag": list(LOG_ACTIONS[CHANGE]),
-                "content_object_repr": f"Updated",
+                "content_object_repr": "Updated",
             },
         )
 
@@ -200,6 +202,7 @@ class TestAdminTimelineLogging(WebTest):
         self.assertContains(response, obj_link)
 
 
+@disable_admin_mfa()
 class TestTimelineLogExport(WebTest):
     @freeze_time("2021-10-18 13:00:00")
     def test_proper_data_is_exported(self):

@@ -29,7 +29,7 @@ from .test_notification_data import MockAPIData
 
 
 @requests_mock.Mocker()
-@patch("open_inwoner.openzaak.notifications.handle_status_update")
+@patch("open_inwoner.openzaak.notifications.handle_status_update", autospec=True)
 class StatusNotificationHandlerTestCase(
     AssertTimelineLogMixin, ClearCachesMixin, TestCase
 ):
@@ -142,7 +142,7 @@ class StatusNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored status notification: cannot retrieve case https://",
+            "ignored status notification: cannot retrieve case https://",
             lookup=Lookups.startswith,
             level=logging.ERROR,
         )
@@ -155,7 +155,7 @@ class StatusNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored status notification: cannot retrieve case_type https://",
+            "ignored status notification: cannot retrieve case_type https://",
             lookup=Lookups.startswith,
             level=logging.ERROR,
         )
@@ -171,7 +171,7 @@ class StatusNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored status notification: case not visible after applying website visibility filter for case https://",
+            "ignored status notification: case not visible after applying website visibility filter for case https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -187,7 +187,7 @@ class StatusNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored status notification: case not visible after applying website visibility filter for case https://",
+            "ignored status notification: case not visible after applying website visibility filter for case https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -204,7 +204,7 @@ class StatusNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored status notification: cannot retrieve status_history for case https://",
+            "ignored status notification: cannot retrieve status_history for case https://",
             lookup=Lookups.startswith,
             level=logging.ERROR,
         )
@@ -220,7 +220,7 @@ class StatusNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored status notification: skip initial status notification for case https://",
+            "ignored status notification: skip initial status notification for case https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -560,8 +560,10 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
     note these tests match with a similar test from `test_notification_zaak_infoobject.py`
     """
 
-    @patch("open_inwoner.userfeed.hooks.case_status_notification_received")
-    @patch("open_inwoner.openzaak.notifications.send_case_update_email")
+    @patch(
+        "open_inwoner.userfeed.hooks.case_status_notification_received", autospec=True
+    )
+    @patch("open_inwoner.openzaak.notifications.send_case_update_email", autospec=True)
     def test_handle_status_update(self, mock_send: Mock, mock_feed_hook: Mock):
         data = MockAPIData()
         user = data.user_initiator
@@ -664,8 +666,10 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
             # this one succeeds
             mock_send.assert_called_once()
 
-    @patch("open_inwoner.userfeed.hooks.case_status_notification_received")
-    @patch("open_inwoner.openzaak.notifications.send_case_update_email")
+    @patch(
+        "open_inwoner.userfeed.hooks.case_status_notification_received", autospec=True
+    )
+    @patch("open_inwoner.openzaak.notifications.send_case_update_email", autospec=True)
     def test_action_required_template(self, mock_send: Mock, mock_feed_hook: Mock):
         data = MockAPIData()
         user = data.user_initiator

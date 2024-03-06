@@ -7,7 +7,7 @@ from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from colorfield.fields import ColorField
 from django_better_admin_arrayfield.models.fields import ArrayField
@@ -19,7 +19,7 @@ from ..utils.colors import hex_to_hsl
 from ..utils.css import clean_stylesheet
 from ..utils.fields import CSSField
 from ..utils.files import OverwriteStorage
-from ..utils.validators import FilerExactImageSizeValidator
+from ..utils.validators import DutchPhoneNumberValidator, FilerExactImageSizeValidator
 from .choices import ColorTypeChoices, CustomFontName, OpenIDDisplayChoices
 from .validators import validate_oidc_config
 
@@ -372,6 +372,20 @@ class SiteConfiguration(SingletonModel):
         ),
         blank=True,
         default=list,
+    )
+
+    # contact info
+    contact_phonenumber = models.CharField(
+        verbose_name=_("Phonenumber"),
+        blank=True,
+        max_length=15,
+        validators=[DutchPhoneNumberValidator()],
+        help_text=_("The public contact phone number of the organization"),
+    )
+    contact_page = models.URLField(
+        verbose_name=_("URL"),
+        blank=True,
+        help_text=_("URL of the public contact page of the organization"),
     )
 
     # analytics
@@ -748,7 +762,7 @@ class SiteConfigurationPage(OrderedModel):
 
     objects = OrderedModelManager()
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         verbose_name = _("Flatpage in the footer")
         verbose_name_plural = _("Flatpages in the footer")
 

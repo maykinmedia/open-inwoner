@@ -12,7 +12,6 @@ from zgw_consumers.api_models.constants import (
     VertrouwelijkheidsAanduidingen,
 )
 from zgw_consumers.constants import APITypes
-from zgw_consumers.test import generate_oas_component
 
 from open_inwoner.accounts.tests.factories import (
     DigidUserFactory,
@@ -20,11 +19,7 @@ from open_inwoner.accounts.tests.factories import (
 )
 from open_inwoner.openklant.constants import Status
 from open_inwoner.openklant.models import OpenKlantConfig
-from open_inwoner.openklant.tests.data import (
-    CONTACTMOMENTEN_ROOT,
-    KLANTEN_ROOT,
-    MockAPIData,
-)
+from open_inwoner.openklant.tests.data import CONTACTMOMENTEN_ROOT, KLANTEN_ROOT
 from open_inwoner.openzaak.models import CatalogusConfig, OpenZaakConfig
 from open_inwoner.openzaak.tests.factories import ServiceFactory, ZaakTypeConfigFactory
 from open_inwoner.openzaak.tests.helpers import generate_oas_component_cached

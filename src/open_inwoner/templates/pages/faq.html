@@ -1,10 +1,10 @@
 {% extends 'master.html' %}
-{% load i18n faq_tags %}
+{% load i18n %}
 
 {% block content %}
-    <h1 class="h1">
+    <h1 class="utrecht-heading-1">
         {% trans "Veelgestelde vragen" %}
     </h1>
 
-    {% faq questions=faqs title=None %}
+    {% include "components/Faq/Faq.html" with questions=faqs hide_title=True only %}
 {% endblock %}

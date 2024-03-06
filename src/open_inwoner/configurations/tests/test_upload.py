@@ -1,6 +1,7 @@
 from django.urls import reverse
 
 from django_webtest import WebTest
+from maykin_2fa.test import disable_admin_mfa
 from webtest import Upload
 
 from open_inwoner.accounts.tests.factories import UserFactory
@@ -9,6 +10,7 @@ from ...utils.test import ClearCachesMixin
 from ..models import CustomFontSet, SiteConfiguration
 
 
+@disable_admin_mfa()
 class CustomFontsTest(ClearCachesMixin, WebTest):
     def setUp(self):
         self.user = UserFactory(is_superuser=True, is_staff=True)

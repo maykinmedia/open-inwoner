@@ -6,13 +6,12 @@ from django.conf import settings
 from django.template.defaultfilters import date as django_date
 from django.test import override_settings
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 import requests_mock
 from cms import api
 from django_webtest import WebTest
 from pyquery import PyQuery as PQ
-from timeline_logger.models import TimelineLog
 from webtest import Upload
 
 from open_inwoner.accounts.choices import StatusChoices
@@ -35,7 +34,6 @@ from ..models import User
 from .factories import (
     ActionFactory,
     DigidUserFactory,
-    DocumentFactory,
     UserFactory,
     eHerkenningUserFactory,
 )
@@ -145,6 +143,7 @@ class ProfileViewTests(WebTest):
         response = self.app.get(self.url, user=self.user)
 
         self.assertEquals(response.status_code, 200)
+        self.assertContains(response, _("U heeft geen interesses gekozen."))
         self.assertContains(response, _("U heeft nog geen contacten"))
         self.assertContains(response, "0 acties staan open")
         self.assertNotContains(response, reverse("products:questionnaire_list"))
@@ -153,11 +152,13 @@ class ProfileViewTests(WebTest):
         ActionFactory(created_by=self.user)
         contact = UserFactory()
         self.user.user_contacts.add(contact)
-        CategoryFactory()
+        category = CategoryFactory()
+        self.user.selected_categories.add(category)
         QuestionnaireStepFactory(published=True)
 
         response = self.app.get(self.url, user=self.user)
         self.assertEquals(response.status_code, 200)
+        self.assertContains(response, category.name)
         self.assertContains(
             response,
             f"{contact.first_name} ({contact.get_contact_type_display()})",
@@ -179,7 +180,7 @@ class ProfileViewTests(WebTest):
             login_type=LoginTypeChoices.digid,
         )
         response = self.app.get(self.url, user=user)
-        self.assertContains(response, _("My details"))
+        self.assertContains(response, _("Bekijk alle gegevens"))
 
         # check business profile section not displayed
         self.assertNotContains(response, "Bedrijfsgegevens")
@@ -881,6 +882,29 @@ class MyDataTests(AssertTimelineLogMixin, HaalCentraalMixin, WebTest):
             content_object_repr=str(self.user),
             action_flag=list(LOG_ACTIONS[4]),
         )
+
+
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+class EditIntrestsTests(WebTest):
+    def setUp(self):
+        self.url = reverse("profile:categories")
+        self.user = UserFactory()
+
+    def test_login_required(self):
+        login_url = reverse("login")
+        response = self.app.get(self.url)
+        self.assertRedirects(response, f"{login_url}?next={self.url}")
+
+    def test_preselected_values(self):
+        category = CategoryFactory(name="a")
+        CategoryFactory(name="b")
+        CategoryFactory(name="c")
+        self.user.selected_categories.add(category)
+        response = self.app.get(self.url, user=self.user)
+        form = response.forms["change-categories"]
+        self.assertTrue(form.get("selected_categories", index=0).checked)
+        self.assertFalse(form.get("selected_categories", index=1).checked)
+        self.assertFalse(form.get("selected_categories", index=2).checked)
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")

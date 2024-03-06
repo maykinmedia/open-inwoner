@@ -277,6 +277,8 @@ class ZaakTypeConfigAdmin(admin.ModelAdmin):
         "identificatie",
         "omschrijving",
         "num_infotypes",
+        "num_statustypes",
+        "num_resulttypes",
     ]
     list_display = [
         "identificatie",
@@ -288,6 +290,8 @@ class ZaakTypeConfigAdmin(admin.ModelAdmin):
         "contact_subject_code",
         "document_upload_enabled",
         "num_infotypes",
+        "num_statustypes",
+        "num_resulttypes",
     ]
     list_display_links = [
         "identificatie",
@@ -316,6 +320,8 @@ class ZaakTypeConfigAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         qs = qs.annotate(num_infotypes=Count("zaaktypeinformatieobjecttypeconfig"))
+        qs = qs.annotate(num_statustypes=Count("zaaktypestatustypeconfig"))
+        qs = qs.annotate(num_resulttypes=Count("zaaktyperesultaattypeconfig"))
         qs = qs.annotate(
             num_doc_notify=Count(
                 "zaaktypeinformatieobjecttypeconfig",
@@ -338,6 +344,22 @@ class ZaakTypeConfigAdmin(admin.ModelAdmin):
             return getattr(obj, "num_infotypes", 0)
 
     num_infotypes.admin_order_field = "num_infotypes"
+
+    def num_statustypes(self, obj=None):
+        if not obj or not obj.pk:
+            return "-"
+        else:
+            return getattr(obj, "num_statustypes", 0)
+
+    num_statustypes.admin_order_field = "num_statustypes"
+
+    def num_resulttypes(self, obj=None):
+        if not obj or not obj.pk:
+            return "-"
+        else:
+            return getattr(obj, "num_resulttypes", 0)
+
+    num_resulttypes.admin_order_field = "num_resulttypes"
 
     def has_doc_notify(self, obj=None):
         if not obj or not obj.pk:

@@ -8,7 +8,7 @@ from django.core.signing import BadSignature, SignatureExpired, TimestampSigner
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.utils.http import is_safe_url
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext as _
 from django.views.decorators.cache import never_cache
 from django.views.generic import FormView, View
@@ -17,10 +17,6 @@ from formtools.wizard.views import SessionWizardView
 from furl import furl
 from oath import totp
 
-from digid_eherkenning_oidc_generics.models import (
-    OpenIDConnectDigiDConfig,
-    OpenIDConnectEHerkenningConfig,
-)
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.utils.mixins import ThrottleMixin
 from open_inwoner.utils.views import LogMixin
@@ -148,7 +144,7 @@ class VerifyTokenView(ThrottleMixin, FormView):
         )
 
         # Ensure the user-originating redirection url is safe.
-        if not redirect_to or not is_safe_url(
+        if not redirect_to or not url_has_allowed_host_and_scheme(
             url=redirect_to,
             allowed_hosts=[
                 self.request.get_host(),

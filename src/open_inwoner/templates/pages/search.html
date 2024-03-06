@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n form_tags utils icon_tags filter_tags pagination_tags %}
+{% load i18n form_tags utils icon_tags pagination_tags %}
 
 {% block main_inner %}
     {#  search term section #}
@@ -16,13 +16,13 @@
         {% if search_filter_categories or search_filter_tags or search_filter_organizations %}
             <h2 class="h2">{% trans "Zoekfilters" %}</h2>
                 {% if search_filter_categories %}
-                    {% filters field=search_form.categories form_id="search-form" %}
+                    {% include "components/Filter/Filter.html" with field=search_form.categories form_id="search-form" only %}
                 {% endif %}
                 {% if search_filter_tags %}
-                     {% filters field=search_form.tags form_id="search-form" %}
+                    {% include "components/Filter/Filter.html" with field=search_form.tags form_id="search-form" only %}
                 {% endif %}
                 {% if search_filter_organizations %}
-                    {% filters field=search_form.organizations form_id="search-form" %}
+                    {% include "components/Filter/Filter.html" with field=search_form.organizations form_id="search-form" only %}
                 {% endif %}
         {%  endif %}
         {#  end search filters #}

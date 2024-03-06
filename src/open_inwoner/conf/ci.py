@@ -60,10 +60,6 @@ AXES_BEHIND_REVERSE_PROXY = False
 # Django privates
 SENDFILE_BACKEND = "django_sendfile.backends.development"
 
-# Two factor auth
-TWO_FACTOR_FORCE_OTP_ADMIN = False
-TWO_FACTOR_PATCH_ADMIN = False
-
 # THOU SHALT NOT USE NAIVE DATETIMES
 warnings.filterwarnings(
     "error",

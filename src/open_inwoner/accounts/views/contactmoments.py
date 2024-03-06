@@ -179,5 +179,20 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
             )
             ctx["zaak"] = getattr(ocm, "object", None)
 
-        ctx["contactmoment"] = self.get_kcm_data(kcm)
+        contactmoment: KCMDict = self.get_kcm_data(kcm)
+        ctx["contactmoment"] = contactmoment
+        ctx["metrics"] = [
+            {
+                "label": _("Ontvangstdatum: "),
+                "value": contactmoment["registered_date"],
+            },
+            {
+                "label": _("Contactwijze: "),
+                "value": contactmoment["channel"],
+            },
+            {
+                "label": _("Status: "),
+                "value": contactmoment["status"],
+            },
+        ]
         return ctx

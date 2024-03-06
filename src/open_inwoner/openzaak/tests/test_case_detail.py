@@ -348,6 +348,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             aardRelatieWeergave="some content",
             titel="info object 3",
             beschrijving="",
+            registratiedatum=None,
         )
         self.informatie_object_type = generate_oas_component_cached(
             "ztc",
@@ -588,8 +589,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             json=self.status_new,
         )
 
-    @patch("open_inwoner.userfeed.hooks.case_status_seen")
-    @patch("open_inwoner.userfeed.hooks.case_documents_seen")
+    @patch("open_inwoner.userfeed.hooks.case_status_seen", autospec=True)
+    @patch("open_inwoner.userfeed.hooks.case_documents_seen", autospec=True)
     def test_status_is_retrieved_when_user_logged_in_via_digid(
         self, m, mock_hook_status: Mock, mock_hook_documents: Mock
     ):
@@ -1020,7 +1021,9 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.assertEqual(documents[1].name, self.informatie_object["titel"])
         self.assertEqual(documents[2].name, self.informatie_object_no_date["titel"])
 
-    @patch("open_inwoner.openzaak.clients.ZakenClient.fetch_status_history")
+    @patch(
+        "open_inwoner.openzaak.clients.ZakenClient.fetch_status_history", autospec=True
+    )
     def test_e_suite_missing_current_status_fetch_status(
         self, m, mock_fetch_status_history
     ):
@@ -1065,7 +1068,9 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             ],
         )
 
-    @patch("open_inwoner.openzaak.clients.ZakenClient.fetch_status_history")
+    @patch(
+        "open_inwoner.openzaak.clients.ZakenClient.fetch_status_history", autospec=True
+    )
     def test_e_suite_missing_current_status_upload_button_displayed(
         self, m, mock_fetch_status_history
     ):
@@ -1533,7 +1538,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.assertEqual(info_card.text.strip(), "info\n\nFoo\nbar")
 
     @patch(
-        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype"
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
+        autospec=True,
     )
     def test_expected_information_object_types_are_available_in_upload_form(
         self, m, upload
@@ -1575,7 +1581,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.assertEqual(sorted(type_field.options), sorted(expected_choices))
 
     @patch(
-        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_internal_file_upload_enabled"
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_internal_file_upload_enabled",
+        autospec=True,
     )
     def test_case_type_config_description_is_rendered_when_internal_upload(
         self, m, upload
@@ -1603,7 +1610,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.assertContains(response, _("some description content"))
 
     @patch(
-        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_internal_file_upload_enabled"
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_internal_file_upload_enabled",
+        autospec=True,
     )
     def test_fixed_text_is_rendered_when_no_description_in_internal_upload(
         self, m, upload
@@ -1669,7 +1677,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.assertNotIn("document-upload", response.forms)
 
     @patch(
-        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype"
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
+        autospec=True,
     )
     def test_successful_document_upload_flow(self, m, upload):
         self._setUpMocks(m)
@@ -1713,7 +1722,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         )
 
     @patch(
-        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype"
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
+        autospec=True,
     )
     def test_successful_document_upload_flow_with_uppercase_extension(self, m, upload):
         self._setUpMocks(m)
@@ -1762,7 +1772,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         )
 
     @patch(
-        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype"
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
+        autospec=True,
     )
     def test_upload_file_flow_fails_with_invalid_file_extension(self, m, upload):
         self._setUpMocks(m)
@@ -1801,7 +1812,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         )
 
     @patch(
-        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype"
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
+        autospec=True,
     )
     def test_upload_with_larger_file_size_fails(self, m, upload):
         self._setUpMocks(m)
@@ -1985,7 +1997,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         )
 
     @patch(
-        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype"
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
+        autospec=True,
     )
     def test_request_error_in_uploading_document_shows_proper_message(self, m, upload):
         self._setUpMocks(m)
@@ -2029,7 +2042,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         )
 
     @patch(
-        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype"
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
+        autospec=True,
     )
     def test_request_error_in_connecting_doc_with_zaak_shows_proper_message(
         self, m, upload

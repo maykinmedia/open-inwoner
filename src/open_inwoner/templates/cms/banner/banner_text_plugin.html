@@ -1,5 +1,9 @@
-<h1 class="utrecht-heading-1">{{ instance.title }} {{ request.user.get_full_name }}</h1>
+<section class="plugin banner__text">
+    <div class="grid__welcome">
+        <h1 class="utrecht-heading-1">{{ instance.title }} {{ request.user.get_full_name }}</h1>
 
-{% if instance.description %}
-    <p class="p">{{ instance.description|linebreaksbr }}</p>
-{% endif %}
+        {% if instance.description %}
+            <p class="p">{{ instance.description|linebreaksbr }}</p>
+        {% endif %}
+    </div>
+</section>

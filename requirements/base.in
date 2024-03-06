@@ -8,21 +8,19 @@ geopy # geo decoder
 glom # processing nested data
 furl # processing urls
 weasyprint # export to pdf
-pywatchman
 tinycss2
 css_inline
 
 # Framework libraries
-Django>=3.2.11<4.0
+Django>=4.2<5.0
 django-admin-index
 django-axes
 django-filer
 django-ordered-model
 django-redis
-django-rosetta
 django-sniplates
 django-treebeard
-maykin-django-two-factor-auth
+maykin-2fa
 phonenumbers
 django-localflavor
 django-privates
@@ -37,7 +35,7 @@ django-view-breadcrumbs
 markdown
 django_better_admin_arrayfield
 humanfriendly
-git+https://github.com/maykinmedia/mail-editor.git@0.3.5#egg=mail-editor
+git+https://github.com/maykinmedia/mail-editor.git@0.3.6#egg=mail-editor
 fontawesomefree
 django-timeline-logger
 django-csp
@@ -74,8 +72,6 @@ djangorestframework-camel-case
 uwsgi
 sentry-sdk  # error monitoring
 elastic-apm  # Elastic APM integration
-
-beautifulsoup4
 
 # DigidLocal
 django-digid-eherkenning

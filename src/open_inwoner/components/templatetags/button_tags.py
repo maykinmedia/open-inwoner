@@ -1,7 +1,7 @@
 from django import template
 from django.urls import NoReverseMatch, reverse
 
-from open_inwoner.components.utils import ContentsNode, parse_component_with_args
+from .helpers import create_content_wrapper
 
 register = template.Library()
 
@@ -25,11 +25,9 @@ def button_row(parser, token):
     Extra context:
         - contents: string (HTML) | this is the context between the button_row and endbutton_row tags
     """
-    bits = token.split_contents()
-    context_kwargs = parse_component_with_args(parser, bits, "button_row")
-    nodelist = parser.parse(("endbutton_row",))
-    parser.delete_first_token()
-    return ContentsNode(nodelist, "components/Button/ButtonRow.html", **context_kwargs)
+    return create_content_wrapper("button_row", "components/Button/ButtonRow.html")(
+        parser, token
+    )
 
 
 @register.inclusion_tag("components/Button/Button.html")

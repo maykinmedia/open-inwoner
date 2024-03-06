@@ -106,7 +106,7 @@ def contactmoment_table(kcm: KCMDict, zaak: Optional[Zaak] = None, **kwargs) -> 
                 "headers": [{"text": _("Zaakidentificatie")}],
                 "cells": [
                     {
-                        "text": zaak.identificatie,
+                        "text": zaak.identification,
                         "url": reverse(
                             "cases:case_detail", kwargs={"object_id": str(zaak.uuid)}
                         ),

@@ -1,4 +1,4 @@
-{% load i18n logo_tags header_tags form_tags button_tags link_tags solo_tags icon_tags thumbnail string_tags menu_tags %}
+{% load i18n header_tags form_tags button_tags link_tags solo_tags icon_tags thumbnail string_tags menu_tags %}
 
 {% get_solo "configurations.SiteConfiguration" as config %}
 
@@ -16,7 +16,7 @@
             </button>
         {% endif %}
         {% firstof config.logo.default_alt_text config.name as logo_alt_text %}
-        {% logo src=config.logo.file.url alt="Homepage "|add:logo_alt_text svg_height=75 %}
+        {% include "components/Logo/Logo.html" with src=config.logo.file.url alt="Homepage "|add:logo_alt_text svg_height=75 only %}
 
         {% if request.user.is_authenticated %}
             <span class="nav-login--icon">{% icon icon="how_to_reg" icon_position="before" outlined=True %}</span>
@@ -104,7 +104,7 @@
             {# end of submenu items #}
 
     {% firstof config.logo.default_alt_text config.name as logo_alt_text %}
-        <div class="logo__desktop">{% logo src=config.logo.file.url alt="Homepage "|add:logo_alt_text svg_height=75 %}</div>
+        <div class="logo__desktop">{% include "components/Logo/Logo.html" with src=config.logo.file.url alt="Homepage "|add:logo_alt_text svg_height=75 only %}</div>
 
         {% include "components/Header/PrimaryNavigation.html" %}
 

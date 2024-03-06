@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.images import get_image_dimensions
 from django.core.validators import RegexValidator
 from django.utils.deconstruct import deconstructible
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
 
 import phonenumbers
@@ -129,8 +129,8 @@ class CustomRegexValidator(RegexValidator):
         """
         Validates that the input matches the regular expression.
         """
-        if not self.regex.search(force_text(value)):
-            message = "{0}: {1}".format(self.message, force_text(value))
+        if not self.regex.search(force_str(value)):
+            message = "{0}: {1}".format(self.message, force_str(value))
             raise ValidationError(message, code=self.code)
 
 

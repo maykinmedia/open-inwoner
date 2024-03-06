@@ -213,7 +213,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
         self.assertIn("Content-Disposition", response.headers)
         self.assertEqual(
             response.headers["Content-Disposition"],
-            f'attachment; filename="my_document.txt"',
+            'attachment; filename="my_document.txt"',
         )
         self.assertIn("Content-Type", response.headers)
         self.assertEqual(response.headers["Content-Type"], "text/plain")

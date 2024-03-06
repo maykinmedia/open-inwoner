@@ -1,7 +1,10 @@
 import logging
 
+from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.urls import NoReverseMatch, reverse
+
+from furl import furl
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +24,11 @@ class NecessaryFieldsMiddleware:
             logger.warning(
                 "cannot reverse 'profile:registration_necessary' URL: apphook not active"
             )
+            return self.get_response(request)
+
+        if request.path.startswith(settings.MEDIA_URL) or request.path.startswith(
+            settings.PRIVATE_MEDIA_URL
+        ):
             return self.get_response(request)
 
         user = request.user
@@ -48,6 +56,9 @@ class NecessaryFieldsMiddleware:
                 )
                 and request.user.require_necessary_fields()
             ):
-                return HttpResponseRedirect(necessary_fields_url)
+                redirect = furl(reverse("profile:registration_necessary"))
+                if request.path != settings.LOGIN_REDIRECT_URL:
+                    redirect.set({"next": request.path})
+                return HttpResponseRedirect(redirect.url)
 
         return self.get_response(request)

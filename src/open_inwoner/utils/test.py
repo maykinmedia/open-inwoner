@@ -2,6 +2,9 @@ import logging
 import tempfile
 from typing import Any, Dict, List
 
+from django.contrib.sessions.middleware import (
+    SessionMiddleware as DefaultSessionMiddleWare,
+)
 from django.core.cache import caches
 from django.test import override_settings
 
@@ -72,3 +75,12 @@ def set_kvk_branch_number_in_session(value="1234"):
         return wrapper
 
     return decorator
+
+
+class SessionMiddleware(DefaultSessionMiddleWare):
+    """
+    `SessionMiddleware` __init__ expects a `get_response` argument in Django 4.2
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(get_response=lambda x: "dummy")

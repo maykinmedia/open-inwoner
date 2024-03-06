@@ -2,7 +2,6 @@ from django.core import mail
 from django.core.management import call_command
 from django.test import TestCase
 
-from django_yubin.constants import RESULT_FAILED
 from django_yubin.models import Log, Message
 from freezegun import freeze_time
 
@@ -20,11 +19,8 @@ class DailyFailingEmailDigestTestCase(TestCase):
                 subject="Some subject",
                 from_address="from@example.com",
                 to_address="to@example.com",
-                encoded_message="foo",
             )
-            Log.objects.create(
-                message=message, result=RESULT_FAILED, log_message="Some "
-            )
+            Log.objects.create(message=message, log_message="Some ")
 
         with freeze_time("2024-01-02T00:00:00"):
             call_command("send_failed_mail_digest")
@@ -41,11 +37,8 @@ class DailyFailingEmailDigestTestCase(TestCase):
                 subject="Some subject",
                 from_address="from@example.com",
                 to_address="to@example.com",
-                encoded_message="foo",
             )
-            Log.objects.create(
-                message=message, result=RESULT_FAILED, log_message="Some msg"
-            )
+            Log.objects.create(message=message, log_message="Some msg")
 
         with freeze_time("2024-01-02T00:00:00"):
             call_command("send_failed_mail_digest")
@@ -62,22 +55,16 @@ class DailyFailingEmailDigestTestCase(TestCase):
                 subject="Should not show up in email",
                 from_address="from@example.com",
                 to_address="to@example.com",
-                encoded_message="foo",
             )
-            Log.objects.create(
-                message=message, result=RESULT_FAILED, log_message="Some msg"
-            )
+            Log.objects.create(message=message, log_message="Some msg")
 
         with freeze_time("2024-01-01T12:00:00"):
             message = Message.objects.create(
                 subject="Should show up in email",
                 from_address="from@example.com",
                 to_address="to@example.com",
-                encoded_message="bar",
             )
-            Log.objects.create(
-                message=message, result=RESULT_FAILED, log_message="Some msg"
-            )
+            Log.objects.create(message=message, log_message="Some msg")
 
         with freeze_time("2024-01-02T00:00:00"):
             call_command("send_failed_mail_digest")

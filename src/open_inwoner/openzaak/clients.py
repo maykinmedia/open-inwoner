@@ -16,13 +16,13 @@ from zgw_consumers.client import build_client as _build_client
 from zgw_consumers.service import pagination_helper
 
 from open_inwoner.openzaak.api_models import InformatieObject
-from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.utils.api import ClientError, get_json_response
 
 from ..utils.decorators import cache as cache_result
 from .api_models import (
     InformatieObjectType,
     OpenSubmission,
+    OpenTask,
     Resultaat,
     ResultaatType,
     Rol,
@@ -40,11 +40,37 @@ logger = logging.getLogger(__name__)
 
 
 class ZakenClient(APIClient):
+    def fetch_cases(
+        self,
+        user_bsn: Optional[str] = None,
+        user_kvk_or_rsin: Optional[str] = None,
+        max_requests: int = 4,
+        identificatie: Optional[str] = None,
+        vestigingsnummer: Optional[str] = None,
+    ):
+        if user_bsn and (user_kvk_or_rsin or vestigingsnummer):
+            raise ValueError(
+                "either `user_bsn` or `user_kvk_or_rsin`/`vestigingsnummer` should be supplied, not both"
+            )
+
+        if user_bsn:
+            return self.fetch_cases_by_bsn(
+                user_bsn, max_requests=max_requests, identificatie=identificatie
+            )
+        elif user_kvk_or_rsin:
+            return self.fetch_cases_by_kvk_or_rsin(
+                user_kvk_or_rsin,
+                max_requests=max_requests,
+                zaak_identificatie=identificatie,
+                vestigingsnummer=vestigingsnummer,
+            )
+        return []
+
     @cache_result(
         "cases:{user_bsn}:{max_requests}:{identificatie}",
         timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
     )
-    def fetch_cases(
+    def fetch_cases_by_bsn(
         self,
         user_bsn: str,
         max_requests: Optional[int] = 4,
@@ -626,6 +652,25 @@ class FormClient(APIClient):
             return []
 
         results = factory(OpenSubmission, all_data)
+
+        return results
+
+    def fetch_open_tasks(self, bsn: str) -> List[OpenTask]:
+        if not bsn:
+            return []
+
+        try:
+            response = self.get(
+                "openstaande-taken",
+                params={"bsn": bsn},
+            )
+            data = get_json_response(response)
+            all_data = list(pagination_helper(self, data))
+        except (RequestException, ClientError) as e:
+            logger.exception("exception while making request", exc_info=e)
+            return []
+
+        results = factory(OpenTask, all_data)
 
         return results
 

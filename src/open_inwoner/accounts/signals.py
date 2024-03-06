@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.dispatch import receiver
 from django.urls import reverse
@@ -27,7 +26,7 @@ def log_user_login(sender, user, request, *args, **kwargs):
 
     try:
         digid_path = reverse("digid:acs")
-    except:
+    except:  # noqa
         digid_path = ""
 
     if current_path == reverse("admin:login"):
@@ -45,7 +44,7 @@ def log_user_login(sender, user, request, *args, **kwargs):
 
     if user.login_type == LoginTypeChoices.digid:
         if brp_config.service:
-            update_brp_data_in_db(user, initial=False)
+            update_brp_data_in_db(user)
 
     if user.login_type in [LoginTypeChoices.digid, LoginTypeChoices.eherkenning]:
         if oc_config.klanten_service:

@@ -1,11 +1,12 @@
 from django.test import TestCase
 from django.utils import timezone
 from django.utils.html import strip_tags
-from django.utils.translation import ngettext, ugettext as _
+from django.utils.translation import ngettext
 
 from freezegun import freeze_time
 
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.openzaak.constants import StatusIndicators
 from open_inwoner.userfeed.choices import FeedItemType
 from open_inwoner.userfeed.feed import ACTION_COMPLETED_HISTORY_RANGE, get_feed
 from open_inwoner.userfeed.hooks.common import simple_message
@@ -39,6 +40,8 @@ class FeedTests(TestCase):
         self.assertEqual(item.message, "Hello")
         self.assertEqual(item.title, "Test message")
         self.assertEqual(item.action_url, "http://foo.bar")
+        self.assertEqual(item.status_text, "")
+        self.assertEqual(item.status_indicator, StatusIndicators.info)
 
         # check summary
         summary = feed.summary[0]

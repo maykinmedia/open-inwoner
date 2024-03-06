@@ -40,9 +40,7 @@ class CompanyBranchChoiceView(FormView):
         # create pseudo-branch representing the company as a whole
         master_branch = {
             "vestigingsnummer": "",
-            "handelsnaam": company_branches[0].get("handelsnaam", "")
-            if company_branches
-            else "",
+            "naam": company_branches[0].get("naam", "") if company_branches else "",
         }
         company_branches.insert(0, master_branch)
 

@@ -1,5 +1,4 @@
 from cms.models import Page
-from cms.plugin_base import CMSPluginBase
 
 
 class CMSActiveAppMixin:

@@ -2,7 +2,7 @@
 
 <aside class="dashboard" aria-label="{% trans "Dashboard" %}">
     <ul class="dashboard__list">
-        {% for metric in config.metrics %}
+        {% for metric in metrics %}
             <li class="dashboard__list-item">
                 <p class="p p--compact"><span class="dashboard__item-label">{{ metric.label }}</span> {{ metric.value|default:'-' }}</p>
             </li>

@@ -22,17 +22,16 @@ from open_inwoner.utils.test import ClearCachesMixin
 from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin, Lookups
 
 from ..api_models import InformatieObject, Zaak, ZaakInformatieObject, ZaakType
-from ..models import (
-    OpenZaakConfig,
-    UserCaseInfoObjectNotification,
-    ZaakTypeInformatieObjectTypeConfig,
-)
+from ..models import OpenZaakConfig, UserCaseInfoObjectNotification
 from .helpers import copy_with_new_uuid
 from .test_notification_data import MockAPIData
 
 
 @requests_mock.Mocker()
-@patch("open_inwoner.openzaak.notifications.handle_zaakinformatieobject_update")
+@patch(
+    "open_inwoner.openzaak.notifications.handle_zaakinformatieobject_update",
+    autospec=True,
+)
 class ZaakInformatieObjectNotificationHandlerTestCase(
     AssertTimelineLogMixin, ClearCachesMixin, TestCase
 ):
@@ -173,7 +172,7 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored zaakinformatieobject notification: cannot retrieve case https://",
+            "ignored zaakinformatieobject notification: cannot retrieve case https://",
             lookup=Lookups.startswith,
             level=logging.ERROR,
         )
@@ -186,7 +185,7 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored zaakinformatieobject notification: cannot retrieve case_type https://",
+            "ignored zaakinformatieobject notification: cannot retrieve case_type https://",
             lookup=Lookups.startswith,
             level=logging.ERROR,
         )
@@ -202,7 +201,7 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored zaakinformatieobject notification: case not visible after applying website visibility filter for case https://",
+            "ignored zaakinformatieobject notification: case not visible after applying website visibility filter for case https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -218,7 +217,7 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored zaakinformatieobject notification: case not visible after applying website visibility filter for case https://",
+            "ignored zaakinformatieobject notification: case not visible after applying website visibility filter for case https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -267,7 +266,7 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored zaakinformatieobject notification: informatieobject not visible after applying website visibility filter for case https://",
+            "ignored zaakinformatieobject notification: informatieobject not visible after applying website visibility filter for case https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -283,7 +282,7 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored zaakinformatieobject notification: informatieobject not visible after applying website visibility filter for case https://",
+            "ignored zaakinformatieobject notification: informatieobject not visible after applying website visibility filter for case https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -333,8 +332,11 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
     note these tests match with a similar test from `test_notification_zaak_status.py`
     """
 
-    @patch("open_inwoner.userfeed.hooks.case_document_added_notification_received")
-    @patch("open_inwoner.openzaak.notifications.send_case_update_email")
+    @patch(
+        "open_inwoner.userfeed.hooks.case_document_added_notification_received",
+        autospec=True,
+    )
+    @patch("open_inwoner.openzaak.notifications.send_case_update_email", autospec=True)
     def test_handle_zaak_info_object_update_filters_disabled_notifications(
         self, mock_send: Mock, mock_feed_hook: Mock
     ):
@@ -363,8 +365,11 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
             level=logging.INFO,
         )
 
-    @patch("open_inwoner.userfeed.hooks.case_document_added_notification_received")
-    @patch("open_inwoner.openzaak.notifications.send_case_update_email")
+    @patch(
+        "open_inwoner.userfeed.hooks.case_document_added_notification_received",
+        autospec=True,
+    )
+    @patch("open_inwoner.openzaak.notifications.send_case_update_email", autospec=True)
     def test_handle_zaak_info_object_update_filters_bad_email(
         self, mock_send: Mock, mock_feed_hook: Mock
     ):
@@ -393,8 +398,11 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
             level=logging.INFO,
         )
 
-    @patch("open_inwoner.userfeed.hooks.case_document_added_notification_received")
-    @patch("open_inwoner.openzaak.notifications.send_case_update_email")
+    @patch(
+        "open_inwoner.userfeed.hooks.case_document_added_notification_received",
+        autospec=True,
+    )
+    @patch("open_inwoner.openzaak.notifications.send_case_update_email", autospec=True)
     def test_handle_zaak_info_object_update(
         self, mock_send: Mock, mock_feed_hook: Mock
     ):

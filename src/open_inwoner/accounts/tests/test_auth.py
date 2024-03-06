@@ -1,10 +1,9 @@
-from datetime import date
 from unittest.mock import patch
 from urllib.parse import urlencode
 
 from django.contrib.sites.models import Site
 from django.core import mail
-from django.test import modify_settings, override_settings
+from django.test import override_settings
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
 
@@ -20,7 +19,6 @@ from digid_eherkenning_oidc_generics.models import (
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.kvk.branches import get_kvk_branch_number
-from open_inwoner.kvk.models import KvKConfig
 from open_inwoner.kvk.tests.factories import CertificateFactory
 
 from ...cms.collaborate.cms_apps import CollaborateApphook
@@ -658,11 +656,11 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
 
         # follow redirect flow
         res = self.client.get(response["Location"])
-        res = self.client.get(res["Location"])
-        res = self.client.get(res["Location"])
 
         self.assertRedirects(
-            res, f"{reverse('profile:registration_necessary')}?invite={invite.key}"
+            res,
+            f"{reverse('profile:registration_necessary')}?invite={invite.key}",
+            fetch_redirect_response=False,
         )
         self.assertNotIn("invite_url", self.client.session.keys())
 
@@ -710,7 +708,7 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
         response = self.client.post(url, data, user=user, follow=True)
         self.assertRedirects(
             response,
-            f"{reverse('profile:registration_necessary')}",
+            reverse("profile:registration_necessary"),
         )
 
         # check company branch number in session
@@ -741,6 +739,10 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
         response = self.app.get(reverse("pages-root"), user=user)
 
         # redirect to /kvk/branches/
+        self.assertRedirects(
+            response, reverse("kvk:branches"), fetch_redirect_response=False
+        )
+
         res = self.app.post(response["Location"], {"branch_number": "1234"})
 
         # redirect to /register/necessary/
@@ -757,7 +759,7 @@ class EmailPasswordRegistrationTest(WebTest):
 
     def setUp(self):
         # Create a User instance that's not saved
-        self.user = UserFactory.build()
+        self.user = UserFactory.build(first_name="John", last_name="Doe")
 
         self.config = SiteConfiguration.get_solo()
         self.config.login_allow_registration = True
@@ -848,41 +850,14 @@ class EmailPasswordRegistrationTest(WebTest):
                 }
                 self.assertEqual(response.context["form"].errors, expected_errors)
 
-    def test_registration_fails_uniform_password(self):
+    def test_registration_fails_with_non_diverse_password(self):
         passwords = [
-            "lowercase123",
-            "UPPERCASE123",
             "NODIGITS",
             "nodigits",
             "NoDigits",
             "1238327879",
-        ]
-        register_page = self.app.get(reverse("django_registration_register"))
-        form = register_page.forms["registration-form"]
-
-        for password in passwords:
-            with self.subTest(password=password):
-                form["email"] = self.user.email
-                form["first_name"] = self.user.first_name
-                form["last_name"] = self.user.last_name
-                form["password1"] = password
-                form["password2"] = password
-                response = form.submit()
-                expected_errors = {
-                    "password2": [
-                        _(
-                            "Your password must contain at least 1 upper-case letter, "
-                            "1 lower-case letter, 1 digit."
-                        ),
-                    ]
-                }
-                self.assertEqual(response.context["form"].errors, expected_errors)
-
-    def test_registration_fails_with_non_diverse_password(self):
-        passwords = [
             "pass_word-123",
             "PASS_WORD-123",
-            "NoDigits",
             "UPPERCASE123",
             "lowercase123",
         ]
@@ -1081,12 +1056,12 @@ class DuplicateEmailRegistrationTest(WebTest):
             {
                 "kvkNummer": "12345678",
                 "vestigingsnummer": "1234",
-                "handelsnaam": "Mijn bedrijf",
+                "naam": "Mijn bedrijf",
             },
             {
                 "kvkNummer": "12345678",
                 "vestigingsnummer": "5678",
-                "handelsnaam": "Mijn bedrijf",
+                "naam": "Mijn bedrijf",
             },
         ]
 
@@ -1416,9 +1391,11 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
             with self.subTest(url=url):
                 response = self.app.get(url, user=user)
 
-                self.assertRedirects(
-                    response, reverse("profile:registration_necessary")
-                )
+                redirect = furl(reverse("profile:registration_necessary"))
+                if url != reverse("pages-root"):
+                    redirect.set({"next": url})
+
+                self.assertRedirects(response, redirect.url)
 
     def test_submit_without_invite(self):
         user = UserFactory(
@@ -1635,7 +1612,7 @@ class TestLoginLogoutFunctionality(AssertRedirectsMixin, WebTest):
                 config.save()
 
                 login_url = (
-                    reverse("digid_oidc:init")
+                    f"{reverse('digid_oidc:init')}?next="
                     if oidc_enabled
                     else f"{reverse('digid:login')}?next="
                 )
@@ -1660,7 +1637,7 @@ class TestLoginLogoutFunctionality(AssertRedirectsMixin, WebTest):
                 config.save()
 
                 login_url = (
-                    reverse("eherkenning_oidc:init")
+                    f"{reverse('eherkenning_oidc:init')}?next="
                     if oidc_enabled
                     else f"{reverse('eherkenning:login')}?next="
                 )

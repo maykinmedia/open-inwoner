@@ -211,6 +211,20 @@ class InnerCaseDetailView(
             context["hxpost_document_action"] = reverse(
                 "cases:case_detail_document_form", kwargs=self.kwargs
             )
+            context["metrics"] = [
+                {
+                    "label": _("Zaaknummer:"),
+                    "value": context["case"].get("identification"),
+                },
+                {
+                    "label": _("Aanvraag ingediend op:"),
+                    "value": context["case"].get("start_date"),
+                },
+                {
+                    "label": _("Beslissing op zijn laatst:"),
+                    "value": context["case"].get("end_date_legal"),
+                },
+            ]
         else:
             context["case"] = None
 

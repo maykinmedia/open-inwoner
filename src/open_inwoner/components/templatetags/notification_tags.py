@@ -1,7 +1,5 @@
 from django import template
 
-from open_inwoner.components.utils import ContentsNode, parse_component_with_args
-
 register = template.Library()
 
 

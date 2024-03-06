@@ -6,4 +6,4 @@ class UtilsConfig(AppConfig):
 
     def ready(self):
         from . import checks  # noqa
-        from .signals import copy_log_entry_to_timeline_logger
+        from .signals import copy_log_entry_to_timeline_logger  # noqa

@@ -29,7 +29,7 @@ def mail_context():
         context["profile_notifications"] = ""
         context["profile_page"] = ""
 
-    # if a contact page exists it is a FlatPage
-    context["contactpage"] = "????"
+    context["contact_page"] = config.contact_page
+    context["contact_phonenumber"] = config.contact_phonenumber
 
     return context

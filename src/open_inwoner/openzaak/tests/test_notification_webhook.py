@@ -76,7 +76,7 @@ class NotificationSubscriptionAuthTest(TestCase):
             get_valid_subscriptions_from_bearer(auth_value)
 
 
-@patch("open_inwoner.openzaak.api.views.handle_zaken_notification")
+@patch("open_inwoner.openzaak.api.views.handle_zaken_notification", autospec=True)
 class NotificationWebhookAPITestCase(AssertTimelineLogMixin, APITestCase):
     """
     NOTE these tests run against the mounted zaken webhook (eg: ZakenNotificationsWebhookView),
