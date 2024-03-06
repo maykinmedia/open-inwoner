@@ -643,7 +643,7 @@ class InnerCaseDetailView(
         return anchors
 
 
-class KCM_RedirectView(KlantContactMomentAccessMixin, View):
+class KCMRedirectView(KlantContactMomentAccessMixin, View):
     """
     Redirect to `KlantContactMomentDetailView` on the basis of contactmoment uuid
 
@@ -663,7 +663,9 @@ class KCM_RedirectView(KlantContactMomentAccessMixin, View):
             raise Http404
 
         contactmoment_uuid = kwargs["uuid"]
-        kcm = next((kcm for kcm in kcms if kcm.uuid == contactmoment_uuid))
+        kcm = next(
+            (kcm for kcm in kcms if str(kcm.contactmoment.uuid) == contactmoment_uuid)
+        )
 
         if not kcm:
             raise Http404

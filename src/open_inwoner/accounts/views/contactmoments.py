@@ -195,7 +195,6 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
             ctx["zaak"] = getattr(ocm, "object", None)
 
         contactmoment: KCMDict = self.get_kcm_data(kcm)
-
         ctx["contactmoment"] = contactmoment
         ctx["metrics"] = [
             {

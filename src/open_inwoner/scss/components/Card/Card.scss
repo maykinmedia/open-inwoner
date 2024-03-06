@@ -1,3 +1,7 @@
+.hide-me {
+  display: none;
+}
+
 .card {
   --card-color-background: white;
   --card-color-border: var(--color-gray);
@@ -11,7 +15,7 @@
   border: var(--card-size-border) solid var(--card-color-border);
   border-radius: var(--border-radius);
   box-sizing: border-box;
-  display: flex;
+  // display: flex;
   flex-direction: column;
   min-height: 70px;
   min-width: var(--header-height);

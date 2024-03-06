@@ -57,6 +57,7 @@ PATCHED_MIDDLEWARE = [
 
 
 CONTACTMOMENTEN_ROOT = "https://contactmomenten.nl/api/v1/"
+KLANTEN_ROOT = "https://klanten.nl/api/v1/"
 
 
 @requests_mock.Mocker()
@@ -461,7 +462,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             bestandsomvang=123,
         )
         #
-        # (object-) contactmomenten
+        # contactmomenten
         #
         self.contactmoment = generate_oas_component_cached(
             "cmc",
@@ -472,7 +473,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             type="SomeType",
             kanaal="Contactformulier",
             status=ContactMomentStatus.afgehandeld,
-            antwoord="yes",
+            tekst="Garage verbouwen?",
+            antwoord="Nee",
             onderwerp="e_suite_subject_code",
         )
         self.contactmoment2 = generate_oas_component_cached(
@@ -2225,4 +2227,69 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             _(
                 f"Een fout is opgetreden bij het uploaden van {self.uploaded_informatie_object['bestandsnaam']}"
             ),
+        )
+
+    def test_kcm_redirect(self, m):
+        """Check redirect from question embedded in case detail to klant_contactmoment detail"""
+
+        self._setUpMocks(m)
+
+        #
+        # extra configs + mocks
+        #
+        self.klanten_service = ServiceFactory(
+            api_root=KLANTEN_ROOT, api_type=APITypes.kc
+        )
+        self.openklant_config.klanten_service = self.klanten_service
+        self.openklant_config.save()
+
+        klant = generate_oas_component_cached(
+            "kc",
+            "schemas/Klant",
+            uuid="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            emailadres="new@example.com",
+            telefoonnummer="0612345678",
+        )
+        klant_contactmoment = generate_oas_component_cached(
+            "cmc",
+            "schemas/KlantContactMoment",
+            uuid="aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
+            url=f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten/aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
+            klant=klant["url"],
+            contactmoment=self.contactmoment["url"],
+        )
+
+        m.get(
+            f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn={self.user.bsn}",
+            json=paginated_response([klant]),
+        )
+        m.get(
+            f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId={self.eherkenning_user.rsin}",
+            json=paginated_response([klant]),
+        )
+        m.get(
+            f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten?klant={klant['url']}",
+            json=paginated_response([klant_contactmoment]),
+        )
+        m.get(
+            f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten?contactmoment={self.contactmoment['url']}",
+            json=paginated_response([self.objectcontactmoment]),
+        )
+
+        #
+        # asserts
+        #
+        response = self.app.get(
+            reverse("cases:kcm_redirect", kwargs={"uuid": self.contactmoment["uuid"]}),
+            user=self.user,
+        )
+        self.assertRedirects(
+            response,
+            reverse(
+                "cases:contactmoment_detail",
+                kwargs={"kcm_uuid": klant_contactmoment["uuid"]},
+            ),
+            status_code=302,
+            target_status_code=200,
         )

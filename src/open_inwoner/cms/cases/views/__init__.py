@@ -4,7 +4,7 @@ from .status import (
     CaseDocumentDownloadView,
     CaseDocumentUploadFormView,
     InnerCaseDetailView,
-    KCM_RedirectView,
+    KCMRedirectView,
     OuterCaseDetailView,
 )
 
@@ -16,5 +16,5 @@ __all__ = [
     "CaseDocumentUploadFormView",
     "InnerCaseDetailView",
     "OuterCaseDetailView",
-    "KCM_RedirectView",
+    "KCMRedirectView",
 ]

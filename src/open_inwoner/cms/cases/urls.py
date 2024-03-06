@@ -11,7 +11,7 @@ from .views import (
     CaseDocumentUploadFormView,
     InnerCaseDetailView,
     InnerCaseListView,
-    KCM_RedirectView,
+    KCMRedirectView,
     OuterCaseDetailView,
     OuterCaseListView,
 )
@@ -31,7 +31,7 @@ urlpatterns = [
     ),
     path(
         "contactmoment/<str:uuid>/",
-        KCM_RedirectView.as_view(),
+        KCMRedirectView.as_view(),
         name="kcm_redirect",
     ),
     path(
