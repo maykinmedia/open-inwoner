@@ -234,6 +234,7 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                 "fields": (
                     "email_new_message",
                     "recipients_email_digest",
+                    "contact_phonenumber",
                 )
             },
         ),

@@ -233,7 +233,7 @@ MAIL_EDITOR_CONF = {
                 "description": _("Name of the site"),
             },
             {
-                "name": "contactpage",
+                "name": "contact_page",
                 "description": _("The link to an existing contactpage"),
             },
             {
