@@ -32,7 +32,7 @@ class NotifyComandTests(TestCase):
         self.assertIn(plan.goal, html_body)
         self.assertIn(reverse("collaborate:plan_list"), html_body)
 
-    @patch("open_inwoner.userfeed.hooks.plan_expiring")
+    @patch("open_inwoner.userfeed.hooks.plan_expiring", autospec=True)
     def test_notify_about_expiring_plan_userfeed_hook(self, mock_plan_expiring: Mock):
         user = UserFactory()
         plan = PlanFactory(end_date=date.today(), created_by=user)
