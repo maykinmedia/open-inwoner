@@ -81,7 +81,7 @@ def get_role_name_display(rol: Rol) -> str:
             (value("voornamen") or value("voorletters")),
             value("voorvoegsel_geslachtsnaam"),
             value("geslachtsnaam"),
-        )https://github.com/maykinmedia/open-inwoner/pull/new/release/v1.14.3
+        )
 
     elif rol.betrokkene_type == RolTypes.niet_natuurlijk_persoon:
         display = value("statutaire_naam")
