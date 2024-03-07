@@ -8,7 +8,7 @@ from typing import List, Optional
 from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
-from django.http import Http404, HttpResponseRedirect, StreamingHttpResponse
+from django.http import Http404, StreamingHttpResponse
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -20,12 +20,7 @@ from mail_editor.helpers import find_template
 from view_breadcrumbs import BaseBreadcrumbMixin
 from zgw_consumers.api_models.constants import RolOmschrijving
 
-from open_inwoner.accounts.views.contactmoments import KlantContactMomentAccessMixin
-from open_inwoner.openklant.api_models import ObjectContactMoment
-from open_inwoner.openklant.clients import (
-    ContactmomentenClient,
-    build_client as build_client_openklant,
-)
+from open_inwoner.openklant.clients import build_client as build_client_openklant
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.openklant.wrap import get_fetch_parameters
 from open_inwoner.openzaak.api_models import Status, StatusType, Zaak
@@ -88,7 +83,11 @@ class OuterCaseDetailView(
 
 
 class InnerCaseDetailView(
-    CaseLogMixin, CommonPageMixin, BaseBreadcrumbMixin, CaseAccessMixin, FormView
+    CaseLogMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    CaseAccessMixin,
+    FormView,
 ):
     template_name = "pages/cases/status_inner.html"
     form_class = CaseUploadForm
@@ -139,16 +138,22 @@ class InnerCaseDetailView(
             status_translate = StatusTranslation.objects.get_lookup()
 
             zaken_client = build_client_openzaak("zaak")
-            contactmoment_client = build_client_openklant("contactmomenten")
 
             # fetch data associated with `self.case`
             documents = self.get_case_document_files(self.case, zaken_client)
             statuses = zaken_client.fetch_status_history(self.case.url)
-            objectcontactmomenten = self.get_objectcontactmomenten(
-                client=contactmoment_client
-            )
             self.store_statustype_mapping(self.case.zaaktype.identificatie)
             self.store_resulttype_mapping(self.case.zaaktype.identificatie)
+
+            objectcontactmomenten = []
+            if contactmoment_client := build_client_openklant("contactmomenten"):
+                objectcontactmomenten = (
+                    contactmoment_client.retrieve_objectcontactmomenten_for_zaak(
+                        self.case
+                    )
+                )
+            questions = [ocm.contactmoment for ocm in objectcontactmomenten]
+            questions.sort(key=lambda q: q.registratiedatum, reverse=True)
 
             statustypen = []
             if catalogi_client := build_client_openzaak("catalogi"):
@@ -210,7 +215,7 @@ class InnerCaseDetailView(
                     "created",
                     dt.timedelta(days=settings.DOCUMENT_RECENT_DAYS),
                 ),
-                "questions": [ocm.contactmoment for ocm in objectcontactmomenten],
+                "questions": questions,
             }
             context["case"].update(self.get_upload_info_context(self.case))
             context["anchors"] = self.get_anchors(statuses, documents)
@@ -618,14 +623,6 @@ class InnerCaseDetailView(
             except TypeError:
                 return documents
 
-    def get_objectcontactmomenten(
-        self,
-        client: Optional[ContactmomentenClient],
-    ) -> list[ObjectContactMoment]:
-        if not client:
-            return []
-        return client.retrieve_objectcontactmomenten_for_zaak(self.case)
-
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["case"] = self.case
@@ -641,38 +638,6 @@ class InnerCaseDetailView(
             anchors.append(["#documents", _("Documenten")])
 
         return anchors
-
-
-class KCMRedirectView(KlantContactMomentAccessMixin, View):
-    """
-    Redirect to `KlantContactMomentDetailView` on the basis of contactmoment uuid
-
-    Case-related questions ("objectcontactmomenten") in the template contain links
-    to the contactmoment detail under "mijn-aanvragen/contactmomenten". For this,
-    we need to fetch the klantcontactomment uuid and pass it to the relevant view.
-    """
-
-    def get(self, request, *args, **kwargs):
-        klanten_client = build_client_openklant("klanten")
-        contactmoment_client = build_client_openklant("contactmomenten")
-
-        klant = klanten_client.retrieve_klant(**get_fetch_parameters(self.request))
-        kcms = contactmoment_client.retrieve_klantcontactmomenten_for_klant(klant)
-
-        if not kcms:
-            raise Http404
-
-        contactmoment_uuid = kwargs["uuid"]
-        kcm = next(
-            (kcm for kcm in kcms if str(kcm.contactmoment.uuid) == contactmoment_uuid)
-        )
-
-        if not kcm:
-            raise Http404
-
-        return HttpResponseRedirect(
-            reverse("cases:contactmoment_detail", kwargs={"kcm_uuid": kcm.uuid})
-        )
 
 
 class CaseDocumentDownloadView(LogMixin, CaseAccessMixin, View):

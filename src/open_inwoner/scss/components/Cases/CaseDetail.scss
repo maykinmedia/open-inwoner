@@ -84,7 +84,11 @@
     }
   }
 
+  #toggle-hide-elements {
+    padding-left: 0;
+  }
+
   #cases-contact-form-content > h2 {
-    margin-top: var(--spacing-large);
+    margin-top: var(--spacing-extra-large);
   }
 }

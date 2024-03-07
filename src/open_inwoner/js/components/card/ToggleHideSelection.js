@@ -1,43 +1,46 @@
 export class ToggleHideSelection {
-  static selector = '.card'
+  static selector = '.card--toggle-hide'
 
-  constructor(node) {
-    this.node = node
-    this.button = document.querySelector('#toggle-hide-elements')
-    this.button?.addEventListener('click', this.toggleHide.bind(this))
-    this.icon = document.querySelector('.readmore__icon')
-    this.node.showMoreText = document.querySelector(
-      '.showmore__button-text'
-    ).textContent
+  constructor() {
+    this.icon = document.querySelector('.expand-icon')
+    this.button = document.getElementById('toggle-hide-elements')
+    this.button.addEventListener('click', this.toggleHide.bind(this))
+    this.button.innerHTML = `${this.icon.outerHTML} ${this.button.dataset.labelReveal} (${this.button.dataset.labelNumElems})`
 
-    // hide all but the first 3 cards by default
-    var allCards = document.querySelectorAll('.card')
-    var cardsTail = Array.from(allCards).slice(3)
-    cardsTail.forEach((element) => {
-      element.classList.add('hide-me')
-    })
+    // Hide all but the first three cards by default
+    const allCards = document.querySelectorAll(ToggleHideSelection.selector)
+    const cardsTail = Array.from(allCards).slice(3)
+
+    if (cardsTail.length === 0) {
+      this.button.classList.add('hidden')
+    } else {
+      cardsTail.forEach((element) => {
+        element.classList.add('hidden')
+      })
+    }
   }
 
-  toggleHide() {
-    var allCards = document.querySelectorAll('.card')
-    var cardsTail = Array.from(allCards).slice(3)
+  toggleHide(event) {
+    event.preventDefault()
 
-    cardsTail.forEach((e) => {
-      this.node.classList.toggle('hide-me')
+    // Toggle the expand/collapse state of the button
+    const isExpanded = this.button.getAttribute('aria-expanded') === 'false'
+    this.button.setAttribute('aria-expanded', isExpanded ? 'true' : 'false')
+    this.icon.textContent = isExpanded ? 'expand_more' : 'expand_less'
+
+    this.button.innerHTML =
+      this.icon.outerHTML +
+      (isExpanded
+        ? this.button.dataset.labelCollapse
+        : `${this.button.dataset.labelReveal} (${this.button.dataset.labelNumElems})`)
+
+    // Toggle 'hidden' class on cards beyond the first three
+    const allCards = document.querySelectorAll(ToggleHideSelection.selector)
+    const cardsTail = Array.from(allCards).slice(3)
+
+    cardsTail.forEach((element) => {
+      element.classList.toggle('hidden', !isExpanded)
     })
-
-    // toggle button text + icon
-    for (var i = 0; i < cardsTail.length; i++) {
-      if (cardsTail[i].classList.contains('hide-me')) {
-        this.icon.textContent = 'expand_more'
-        this.button.innerHTML = this.icon.outerHTML + this.node.showMoreText
-        break
-      } else {
-        this.icon.textContent = 'expand_less'
-        this.button.innerHTML = this.icon.outerHTML + 'Minder toon'
-        break
-      }
-    }
   }
 }
 

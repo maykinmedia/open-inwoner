@@ -8,6 +8,7 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
+import dateutil
 import requests_mock
 from django_webtest import WebTest
 from freezegun import freeze_time
@@ -26,6 +27,7 @@ from zgw_consumers.constants import APITypes
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory, eHerkenningUserFactory
 from open_inwoner.cms.cases.views.status import InnerCaseDetailView, SimpleFile
+from open_inwoner.openklant.clients import ContactmomentenClient
 from open_inwoner.openklant.constants import Status as ContactMomentStatus
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.openklant.tests.factories import make_contactmoment
@@ -332,7 +334,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             zaak=self.zaak["url"],
             toelichting="resultaat toelichting",
         )
-        self.zaak_informatie_object = generate_oas_component_cached(
+        self.zaak_informatie_object_old = generate_oas_component_cached(
             "zrc",
             "schemas/ZaakInformatieObject",
             url=f"{ZAKEN_ROOT}zaakinformatieobjecten/e55153aa-ad2c-4a07-ae75-15add57d6",
@@ -343,7 +345,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             beschrijving="",
             registratiedatum="2021-01-12T00:00:00+01:00",
         )
-        self.zaak_informatie_object_2 = generate_oas_component_cached(
+        self.zaak_informatie_object_new = generate_oas_component_cached(
             "zrc",
             "schemas/ZaakInformatieObject",
             url=f"{ZAKEN_ROOT}zaakinformatieobjecten/e55153aa-ad2c-4a07-ae75-15add57d7",
@@ -389,7 +391,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             "drc",
             "schemas/EnkelvoudigInformatieObject",
             uuid="014c38fe-b010-4412-881c-3000032fb812",
-            url=self.zaak_informatie_object["informatieobject"],
+            url=self.zaak_informatie_object_old["informatieobject"],
             inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812/download",
             informatieobjecttype=self.informatie_object_type["url"],
             status="definitief",
@@ -402,7 +404,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             "drc",
             "schemas/EnkelvoudigInformatieObject",
             uuid="015c38fe-b010-4412-881c-3000032fb812",
-            url=self.zaak_informatie_object_2["informatieobject"],
+            url=self.zaak_informatie_object_new["informatieobject"],
             inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/015c38fe-b010-4412-881c-3000032fb812/download",
             informatieobjecttype=self.informatie_object_type["url"],
             status="definitief",
@@ -428,7 +430,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             "drc",
             "schemas/EnkelvoudigInformatieObject",
             uuid="85079ba3-554a-450f-b963-2ce20b176c90",
-            url=self.zaak_informatie_object["informatieobject"],
+            url=self.zaak_informatie_object_old["informatieobject"],
             inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/85079ba3-554a-450f-b963-2ce20b176c90/download",
             informatieobjecttype=self.informatie_object_type["url"],
             status="definitief",
@@ -464,12 +466,13 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         #
         # contactmomenten
         #
-        self.contactmoment = generate_oas_component_cached(
+        self.contactmoment_old = generate_oas_component_cached(
             "cmc",
             "schemas/ContactMoment",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
             url=f"{CONTACTMOMENTEN_ROOT}contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
             identificatie="AB123",
+            registratiedatum="1971-07-17T20:15:07+00:00",
             type="SomeType",
             kanaal="Contactformulier",
             status=ContactMomentStatus.afgehandeld,
@@ -477,35 +480,36 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             antwoord="Nee",
             onderwerp="e_suite_subject_code",
         )
-        self.contactmoment2 = generate_oas_component_cached(
+        self.contactmoment_new = generate_oas_component_cached(
             "cmc",
             "schemas/ContactMoment",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-dddddddddddd",
             url=f"{CONTACTMOMENTEN_ROOT}contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-dddddddddddd",
             identificatie="AB123",
+            registratiedatum="1972-09-27T03:39:28+00:00",
             type="SomeType",
             kanaal="MAIL",
             status=ContactMomentStatus.afgehandeld,
             antwoord="no",
             onderwerp="e_suite_subject_code",
         )
-        self.objectcontactmoment = generate_oas_component_cached(
+        self.objectcontactmoment_old = generate_oas_component_cached(
             "cmc",
             "schemas/ObjectContactMoment",
             uuid="77880671-b88a-44ed-ba24-dc2ae688c2ec",
             url=f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten/77880671-b88a-44ed-ba24-dc2ae688c2ec",
             object=self.zaak["url"],
             object_type="zaak",
-            contactmoment=self.contactmoment["url"],
+            contactmoment=self.contactmoment_old["url"],
         )
-        self.objectcontactmoment2 = generate_oas_component_cached(
+        self.objectcontactmoment_new = generate_oas_component_cached(
             "cmc",
             "schemas/ObjectContactMoment",
             uuid="bb51784c-fa2c-4f65-b24e-7179b615efac",
             url=f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten/bb51784c-fa2c-4f65-b24e-7179b615efac",
             object=self.zaak["url"],
             object_type="zaak",
-            contactmoment=self.contactmoment2["url"],
+            contactmoment=self.contactmoment_new["url"],
         )
         self.objectcontactmoment_eherkenning = generate_oas_component_cached(
             "cmc",
@@ -514,7 +518,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             url=f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten/bb51784c-fa2c-4f65-b24e-7179b615efac",
             object=self.zaak_eherkenning["url"],
             object_type="zaak",
-            contactmoment=self.contactmoment["url"],
+            contactmoment=self.contactmoment_old["url"],
         )
         #
         # documents
@@ -529,8 +533,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                     "info_id": self.informatie_object["uuid"],
                 },
             ),
-            created=datetime.datetime.fromisoformat(
-                self.zaak_informatie_object["registratiedatum"]
+            created=dateutil.parser.parse(
+                self.zaak_informatie_object_old["registratiedatum"]
             ),
         )
         self.informatie_object_file_2 = SimpleFile(
@@ -543,8 +547,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                     "info_id": self.informatie_object_2["uuid"],
                 },
             ),
-            created=datetime.datetime.fromisoformat(
-                self.zaak_informatie_object_2["registratiedatum"]
+            created=dateutil.parser.parse(
+                self.zaak_informatie_object_new["registratiedatum"]
             ),
         )
         self.informatie_object_file_no_date = SimpleFile(
@@ -578,10 +582,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             self.status_type_new,
             self.status_type_in_behandeling,
             self.status_type_finish,
-            self.contactmoment,
-            self.contactmoment2,
-            self.objectcontactmoment,
-            self.objectcontactmoment2,
+            self.contactmoment_old,
+            self.contactmoment_new,
+            self.objectcontactmoment_old,
+            self.objectcontactmoment_new,
         ]:
             m.get(resource["url"], json=resource)
 
@@ -589,15 +593,15 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             f"{ZAKEN_ROOT}zaakinformatieobjecten",
             status_code=201,
             json=[
-                self.zaak_informatie_object,
-                self.zaak_informatie_object_2,
+                self.zaak_informatie_object_old,
+                self.zaak_informatie_object_new,
             ],
         )
         m.get(
             f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak['url']}",
             json=[
-                self.zaak_informatie_object,
-                self.zaak_informatie_object_2,
+                self.zaak_informatie_object_old,
+                self.zaak_informatie_object_new,
                 self.zaak_informatie_object_invisible,
             ],
         )
@@ -662,7 +666,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         m.get(
             f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten?object={self.zaak['url']}",
             json=paginated_response(
-                [self.objectcontactmoment, self.objectcontactmoment2]
+                [self.objectcontactmoment_old, self.objectcontactmoment_new]
             ),
         )
 
@@ -674,7 +678,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         m.get(
             f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten?object={self.zaak['url']}",
             json=paginated_response(
-                [self.objectcontactmoment, self.objectcontactmoment2]
+                [self.objectcontactmoment_old, self.objectcontactmoment_new]
             ),
         )
 
@@ -768,8 +772,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 "contact_form_enabled": False,
                 "new_docs": False,
                 "questions": [
-                    make_contactmoment(self.contactmoment),
-                    make_contactmoment(self.contactmoment2),
+                    make_contactmoment(self.contactmoment_new),
+                    make_contactmoment(self.contactmoment_old),
                 ],
             },
         )
@@ -777,18 +781,22 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         mock_hook_status.assert_called_once()
         mock_hook_documents.assert_called_once()
 
-        # check question links
+        # check question links (should be ordered by contactmoment: recent first)
         doc = PyQuery(response.text)
         links = doc.find(".contactmomenten__link")
 
         self.assertEqual(len(links), 2)
         self.assertEqual(
             links[0].attrib["href"],
-            reverse("cases:kcm_redirect", kwargs={"uuid": self.contactmoment["uuid"]}),
+            reverse(
+                "cases:kcm_redirect", kwargs={"uuid": self.contactmoment_new["uuid"]}
+            ),
         )
         self.assertEqual(
             links[1].attrib["href"],
-            reverse("cases:kcm_redirect", kwargs={"uuid": self.contactmoment2["uuid"]}),
+            reverse(
+                "cases:kcm_redirect", kwargs={"uuid": self.contactmoment_old["uuid"]}
+            ),
         )
 
     def test_pass_endstatus_type_data_if_endstatus_not_reached(self, m):
@@ -876,24 +884,28 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 "contact_form_enabled": False,
                 "new_docs": False,
                 "questions": [
-                    make_contactmoment(self.contactmoment),
-                    make_contactmoment(self.contactmoment2),
+                    make_contactmoment(self.contactmoment_new),
+                    make_contactmoment(self.contactmoment_old),
                 ],
             },
         )
 
-        # check question links
+        # check question links (should be ordered by contactmoment: recent first)
         doc = PyQuery(response.text)
         links = doc.find(".contactmomenten__link")
 
         self.assertEqual(len(links), 2)
         self.assertEqual(
             links[0].attrib["href"],
-            reverse("cases:kcm_redirect", kwargs={"uuid": self.contactmoment["uuid"]}),
+            reverse(
+                "cases:kcm_redirect", kwargs={"uuid": self.contactmoment_new["uuid"]}
+            ),
         )
         self.assertEqual(
             links[1].attrib["href"],
-            reverse("cases:kcm_redirect", kwargs={"uuid": self.contactmoment2["uuid"]}),
+            reverse(
+                "cases:kcm_redirect", kwargs={"uuid": self.contactmoment_old["uuid"]}
+            ),
         )
 
     def test_second_status_preview(self, m):
@@ -1065,15 +1077,15 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             f"{ZAKEN_ROOT}zaakinformatieobjecten",
             status_code=201,
             json=[
-                self.zaak_informatie_object,
-                self.zaak_informatie_object_2,
+                self.zaak_informatie_object_old,
+                self.zaak_informatie_object_new,
             ],
         )
         m.get(
             f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak['url']}",
             json=[
-                self.zaak_informatie_object,
-                self.zaak_informatie_object_2,
+                self.zaak_informatie_object_old,
+                self.zaak_informatie_object_new,
             ],
         )
 
@@ -1122,16 +1134,16 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             f"{ZAKEN_ROOT}zaakinformatieobjecten",
             status_code=201,
             json=[
-                self.zaak_informatie_object,
-                self.zaak_informatie_object_2,
+                self.zaak_informatie_object_old,
+                self.zaak_informatie_object_new,
                 self.zaak_informatie_object_no_date,
             ],
         )
         m.get(
             f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak['url']}",
             json=[
-                self.zaak_informatie_object,
-                self.zaak_informatie_object_2,
+                self.zaak_informatie_object_old,
+                self.zaak_informatie_object_new,
                 self.zaak_informatie_object_no_date,
             ],
         )
@@ -1268,13 +1280,14 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.assertContains(response, "Coffee zaaktype")
         self.assertContains(response, "uploaded_document_title")
 
-    @patch(
-        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.get_objectcontactmomenten"
+    @patch.object(
+        ContactmomentenClient,
+        "retrieve_objectcontactmomenten_for_zaak",
+        autospec=True,
+        return_value=[],
     )
-    def test_page_displays_expected_data_for_eherkenning_user(self, m, ocm_mock):
+    def test_page_displays_expected_data_for_eherkenning_user(self, m, cm_client_mock):
         self._setUpMocks(m)
-
-        ocm_mock.return_value = []
 
         for fetch_eherkenning_zaken_with_rsin in [True, False]:
             with self.subTest(
@@ -1294,11 +1307,14 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 self.assertContains(response, "Coffee zaaktype")
 
     @set_kvk_branch_number_in_session("1234")
-    @patch(
-        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.get_objectcontactmomenten"
+    @patch.object(
+        ContactmomentenClient,
+        "retrieve_objectcontactmomenten_for_zaak",
+        autospec=True,
+        return_value=[],
     )
     def test_page_displays_expected_data_for_eherkenning_user_with_vestigingsnummer(
-        self, m, ocm_mock
+        self, m, cm_client_mock
     ):
         """
         In order to have access to a case detail page when logged in as a specific
@@ -1319,8 +1335,6 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 ]
             ),
         )
-
-        ocm_mock.return_value = []
 
         for fetch_eherkenning_zaken_with_rsin in [True, False]:
             with self.subTest(
@@ -1376,15 +1390,16 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.assertEqual(self.user, log.user)
         self.assertEqual(self.user, log.content_object)
 
-    @patch(
-        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.get_objectcontactmomenten"
+    @patch.object(
+        ContactmomentenClient,
+        "retrieve_objectcontactmomenten_for_zaak",
+        autospec=True,
+        return_value=[],
     )
     def test_case_io_objects_are_retrieved_when_user_logged_in_via_digid(
-        self, m, ocm_mock
+        self, m, cm_client_mock
     ):
         self._setUpMocks(m)
-
-        ocm_mock.return_value = []
 
         response = self.app.get(self.case_detail_url, user=self.user)
         documents = response.context.get("case", {}).get("documents")
@@ -1430,7 +1445,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         )
         # m.get(
         #     f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak['url']}",
-        #     json=[self.zaak_informatie_object, self.zaak_informatie_object_invisible],
+        #     json=[self.zaak_informatie_object_old, self.zaak_informatie_object_invisible],
         # )
         # m.get(
         #     f"{ZAKEN_ROOT}statussen?zaak={self.zaak['url']}",
@@ -2257,7 +2272,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
             url=f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten/aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
             klant=klant["url"],
-            contactmoment=self.contactmoment["url"],
+            contactmoment=self.contactmoment_old["url"],
         )
 
         m.get(
@@ -2273,15 +2288,17 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             json=paginated_response([klant_contactmoment]),
         )
         m.get(
-            f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten?contactmoment={self.contactmoment['url']}",
-            json=paginated_response([self.objectcontactmoment]),
+            f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten?contactmoment={self.contactmoment_old['url']}",
+            json=paginated_response([self.objectcontactmoment_old]),
         )
 
         #
         # asserts
         #
         response = self.app.get(
-            reverse("cases:kcm_redirect", kwargs={"uuid": self.contactmoment["uuid"]}),
+            reverse(
+                "cases:kcm_redirect", kwargs={"uuid": self.contactmoment_old["uuid"]}
+            ),
             user=self.user,
         )
         self.assertRedirects(

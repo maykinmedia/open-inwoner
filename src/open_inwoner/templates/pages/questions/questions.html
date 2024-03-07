@@ -1,37 +1,31 @@
 {% load i18n icon_tags list_tags %}
 
-<div class="contactmomenten">
 <h2 class="h3 contactmomenten__title">{% trans "Vragen" %}</h2>
+<div class="contactmomenten">
     {% for contactmoment in questions %}
-        <div class="card card--compact card--stretch">
-            <div class="card__body ">
-                {# redirect to fetch klantcontactmoment from contactmoment #}
-                <a href="{% url 'cases:kcm_redirect' contactmoment.uuid %}" class="contactmomenten__link">
-                    {% render_list %}
-                        <span class="contactmomenten-list">
-                        {% list_item contactmoment.tekst compact=True strong=False %}
-                        <li class="list-item list-item--compact">
-                            {% with register_date=contactmoment.registratiedatum|default:"" %}
-                                <p class="card__caption card__text--small"><span>{% trans "Vraag ingediend op:" %}</span><span class="card__text--dark">{{ register_date|date }}</span></p>
-                            {% endwith %}
-                        </li>
-                        {% if contactmoment.identificatie %}
-                            {% list_item contactmoment.identificatie caption=_("Vraag nummer") compact=True strong=False %}
-                        {% endif %}
-                        <li class="list-item list-item--compact">
-                            {% with channel=contactmoment.kanaal|default:"" %}
-                                <p class="card__caption card__text--small"><span>{% trans "Ingediend via" %}:</span><span class="card__text--dark">{{ channel }}</span></p>
-                            {% endwith %}
-                        </li>
-                        </span>
-                    {% endrender_list %}
-
-                    <span class="link link--icon link--secondary" aria-label="{% trans "Bekijk vraag" %}" title="{% trans "Bekijk vraag" %}">
-                        <span class="link__text">{% trans "Bekijk vraag" %}</span>
-                        {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
-                    </span>
-                </a>
+        {# redirect to fetch klantcontactmoment from contactmoment #}
+        <a href="{% url 'cases:kcm_redirect' contactmoment.uuid %}" class="card card--compact card--stretch card--toggle-hide contactmomenten__link">
+            <div class="card__body">
+                {% render_list %}
+                <span class="contactmomenten-list">
+                    <li class="list-item list-item--compact">
+                        {% with register_date=contactmoment.registratiedatum|default:"" %}
+                        <p class="card__caption card__text--small"><span>{% trans "Vraag ingediend op" %}:</span><span class="card__text--dark">{{ register_date|date }}</span></p>
+                        {% endwith %}
+                    </li>
+                    {% list_item contactmoment.tekst compact=True strong=False %}
+                    <li class="list-item list-item--compact">
+                        {% with channel=contactmoment.kanaal|default:"" %}
+                        <p class="card__caption card__text--small"><span>{% trans "Ingediend via" %}:</span><span class="card__text--dark">{{ channel }}</span></p>
+                        {% endwith %}
+                    </li>
+                </span>
+                {% endrender_list %}
+                <span class="link link--icon link--primary" aria-label="{% trans "Bekijk vraag" %}" title="{% trans "Bekijk vraag" %}">
+                    <span class="link__text">{% trans "Bekijk vraag" %}</span>
+                    {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+                </span>
             </div>
-        </div>
+        </a>
     {% endfor %}
 </div>

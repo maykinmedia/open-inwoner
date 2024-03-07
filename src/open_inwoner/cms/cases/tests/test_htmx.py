@@ -17,6 +17,7 @@ from zgw_consumers.constants import APITypes
 from open_inwoner.accounts.tests.factories import DigidUserFactory
 from open_inwoner.cms.tests import cms_tools
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.openklant.clients import ContactmomentenClient
 from open_inwoner.openklant.constants import Status
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.openklant.tests.data import CONTACTMOMENTEN_ROOT, KLANTEN_ROOT
@@ -44,6 +45,12 @@ from open_inwoner.utils.tests.playwright import PlaywrightSyncLiveServerTestCase
 
 @tag("e2e")
 @requests_mock.Mocker()
+@patch.object(
+    ContactmomentenClient,
+    "retrieve_objectcontactmomenten_for_zaak",
+    autospec=True,
+    return_value=[],
+)
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class CasesPlaywrightTests(
     AssertMockMatchersMixin,
@@ -407,13 +414,8 @@ class CasesPlaywrightTests(
             ),
         ]
 
-    @patch(
-        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.get_objectcontactmomenten"
-    )
-    def test_cases(self, m, ocm_mock):
+    def test_cases(self, m, contactmoment_mock):
         self._setUpMocks(m)
-
-        ocm_mock.return_value = []
 
         context = self.browser.new_context(storage_state=self.user_login_state)
 
@@ -505,13 +507,8 @@ class CasesPlaywrightTests(
         # finally check if our mock matchers are accurate
         self.assertMockMatchersCalled(self.matchers)
 
-    @patch(
-        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.get_objectcontactmomenten"
-    )
-    def test_multiple_file_upload(self, m, ocm_mock):
+    def test_multiple_file_upload(self, m, contactmoment_mock):
         self._setUpMocks(m)
-
-        ocm_mock.return_value = []
 
         # Keep track of uploaded files (schemas/EnkelvoudigInformatieObject array)
         # This list is updated by mocks after uploading the files.

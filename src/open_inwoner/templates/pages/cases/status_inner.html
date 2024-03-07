@@ -1,4 +1,4 @@
-{% load i18n utils anchor_menu_tags card_tags file_tags grid_tags list_tags table_tags solo_tags link_tags button_tags icon_tags notification_tags pagination_tags %}
+{% load i18n utils anchor_menu_tags card_tags file_tags form_tags grid_tags table_tags solo_tags link_tags button_tags icon_tags notification_tags %}
 
 {# Messages #}
 <div class="container container--no-margin" id="cases-status-messages-oob" hx-swap-oob="true">
@@ -64,26 +64,24 @@
                 {% case_document_list case.documents %}
             {% endif %}
 
-            {#  Contact moment form #}
-            {% if case.contact_form_enabled %}
-                <section id="cases-contact-form" class="form_contact">
-                    <div id="cases-contact-form-content">
-                        {% include 'pages/cases/contact_form.html' %}
-                    </div>
-                </section>
-            {% endif %}
-
             {# Questions/contactmomenten #}
             {% if case.questions %}
                 {% include "pages/questions/questions.html" with questions=case.questions only %}
-                <div class="dropdown">
-
-                <a id="toggle-hide-elements"  class="readmore__toggle button button--textless button--icon button--icon-after button--secondary button--transparent" aria-expanded="false">
-                    {% icon extra_classes="readmore__icon" icon="expand_more" icon_position="after" icon_outlined=True %}
-                    <span class="showmore__button-text">{% trans "Toon alle vragen" %}</span>
-                </a>
-
+                <div class="expand">
+                    <a id="toggle-hide-elements" class="button button--textless button--icon button--icon-after button--secondary button--transparent" data-label-reveal="{% trans 'Toon alle vragen' %}" data-label-collapse="{% trans 'Toon minder' %}" data-label-num-elems={{ case.questions|length }} aria-expanded=false>
+                        {% icon extra_classes="expand-icon" icon="expand_more" icon_position="after" icon_outlined=True %}
+                    </a>
                 </div>
+
+            {% endif %}
+
+            {#  Contact form #}
+            {% if case.contact_form_enabled %}
+            <section id="cases-contact-form" class="form_contact">
+                <div id="cases-contact-form-content" class="spaced">
+                    {% include 'pages/cases/contact_form.html' %}
+                </div>
+            </section>
             {% endif %}
 
         {% endrender_column %}
