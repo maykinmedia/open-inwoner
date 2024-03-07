@@ -84,17 +84,12 @@
 
   .card--status {
     // Default color
-    padding: 0;
+    padding: var(--spacing-medium) 0 0 0;
     background-color: var(--color-info-lighter);
-  }
 
-  &-marker {
-    display: flex;
-    align-items: center;
-    border-top-left-radius: var(--border-radius);
-    border-top-right-radius: var(--border-radius);
-    color: var(--color-info-darker);
-    font-size: var(--font-size-body);
+    .card__header {
+      display: flex;
+    }
 
     &--warning {
       background-color: var(--color-danger-lightest);
@@ -117,11 +112,14 @@
     }
 
     [class*='icons'] {
-      margin: 6px 10px;
+      display: inline-block;
+      margin: 0 10px 6px 10px;
     }
 
-    .userfeed__status_text {
-      padding: 8px var(--spacing-large) 10px 0;
+    .card__status_indicator_text {
+      display: inline-block;
+      margin: var(--spacing-tiny) var(--spacing-large) var(--spacing-medium) 0;
+      padding: 0;
     }
   }
 
