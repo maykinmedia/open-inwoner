@@ -83,6 +83,10 @@
   & .file-list {
     margin-bottom: var(--spacing-large) !important;
 
+    &__list-item {
+    }
+    margin-bottom: var(--spacing-large);
+
     // upload-error styles
     .file__file.error {
       border-color: var(--color-red-notification);
@@ -120,6 +124,7 @@
         [class*='icon'] {
           color: var(--color-red-notification);
           font-size: var(--font-size-body);
+          height: 20px;
           margin-top: 2px;
         }
       }

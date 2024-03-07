@@ -310,7 +310,7 @@ export class FileInput extends Component {
               ? `
               <p class="p p--small error">
                 <span aria-hidden="true" class="material-icons-outlined">warning_amber</span>
-                <span class="file-error__content">Dit bestand is te groot - en van een ongeldig type ("${ext}"). <br />Toegestaan zijn: ${uploadFileTypes}.</span>
+                <span class="file-error__content">Dit type bestand (${ext}) is ongeldig en te groot. Geldige bestandstypen zijn: ${uploadFileTypes}</span>
               </p>`
               : typeError || sizeError
               ? `
@@ -318,12 +318,12 @@ export class FileInput extends Component {
                 <span aria-hidden="true" class="material-icons-outlined">warning_amber</span>
                 ${
                   typeError
-                    ? `<span class="file-error__content">Dit type bestand ("${ext}") is ongeldig. Geldige bestandstypen zijn: ${uploadFileTypes}.</span>`
+                    ? `<span class="file-error__content">Dit type bestand (${ext}) is ongeldig. Geldige bestandstypen zijn: ${uploadFileTypes}</span>`
                     : ''
                 }
                 ${
                   sizeError
-                    ? '<span class="file-error__content">Dit bestand is te groot.</span>'
+                    ? '<span class="file-error__content">Dit bestand is te groot</span>'
                     : ''
                 }
               </p>`
