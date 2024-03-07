@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n button_tags grid_tags questionnaire_tags string_tags %}
+{% load i18n button_tags grid_tags string_tags %}
 
 {% block header_image %}
 {% if object.image %}
@@ -43,7 +43,7 @@
                     <aside class="questionnaire">
                         <h2 class="h2">{{configurable_text.questionnaire_page.select_questionnaire_title}}</h2>
                         {% optional_paragraph configurable_text.questionnaire_page.select_questionnaire_intro %}
-                        {% questionnaire root_nodes=questionnaire_roots %}
+                        {% include "components/Questionnaire/Questionnaire.html" with root_nodes=questionnaire_roots only %}
                     </aside>
                 </div>
             </div>
