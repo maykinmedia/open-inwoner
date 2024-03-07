@@ -17,9 +17,11 @@
     <div class="card-container card-container--columns-2">
         {% for item in userfeed.items %}
             <a href="{{ item.action_url }}" class="card card--status card--status--{{ item.status_indicator }} {% if item.is_completed %}card--completed{% endif %}">
-                {% if item.status_text %}
-                    {% include "components/StatusIndicator/StatusIndicator.html" with status_indicator=item.status_indicator status_indicator_text=item.status_text %}
-                {% endif %}
+                <div class="userfeed__marker userfeed__marker--{{ item.status_indicator }}">
+                    {% if item.status_text %}
+                        {% include "components/StatusIndicator/StatusIndicator.html" with status_indicator=item.status_indicator status_indicator_text=item.status_text %}
+                    {% endif %}
+                </div>
 
                 <div class="card__body card__body--tabled">
                     <p class="p tabled__value">{{ item.title }}</p>

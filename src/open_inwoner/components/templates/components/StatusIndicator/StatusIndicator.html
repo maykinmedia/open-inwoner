@@ -1,5 +1,5 @@
 {% load icon_tags %}
-{%  if status_indicator_text %}
+{% if status_indicator_text %}
 <div class="card__header {{ status_indicator }}">
     {% if status_indicator == "info" %}
         {% icon icon="info" icon_position="after" extra_classes="icon--"|add:status_indicator outlined=True %}

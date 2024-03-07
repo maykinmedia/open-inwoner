@@ -68,7 +68,7 @@
   }
 
   .card {
-    justify-content: flex-end;
+    justify-content: space-between;
   }
 
   .card-container {
@@ -84,42 +84,68 @@
 
   .card--status {
     // Default color
-    padding: var(--spacing-medium) 0 0 0;
-    background-color: var(--color-info-lighter);
+    padding: 0;
+    background-color: var(--color-white);
 
     .card__header {
       display: flex;
+
+      &.warning {
+        background-color: var(--color-danger-lightest);
+        color: var(--color-danger-darker);
+      }
+
+      &.info {
+        background-color: var(--color-info-lighter);
+        color: var(--color-info-darker);
+      }
+
+      &.success {
+        background-color: var(--color-success-lighter);
+        color: var(--color-success);
+      }
+
+      &.failure {
+        background-color: var(--color-error-lightest);
+        color: var(--color-error-darker);
+      }
+
+      [class*='icons'] {
+        display: inline-block;
+        margin: 0 10px 6px 10px;
+      }
+
+      .card__status_indicator_text {
+        display: inline-block;
+        margin: var(--spacing-tiny) var(--spacing-large) var(--spacing-medium) 0;
+        padding: 0;
+      }
     }
 
-    &--warning {
-      background-color: var(--color-danger-lightest);
-      color: var(--color-danger-darker);
-    }
+    .userfeed__marker {
+      // Default color
+      padding: var(--spacing-medium) 0 0 0;
+      background-color: var(--color-white);
 
-    &--info {
-      background-color: var(--color-info-lighter);
-      color: var(--color-info-darker);
-    }
+      &--warning {
+        background-color: var(--color-danger-lightest);
+        color: var(--color-danger-darker);
+      }
 
-    &--success {
-      background-color: var(--color-success-lighter);
-      color: var(--color-success);
-    }
+      &--info {
+        background-color: var(--color-info-lighter);
+        color: var(--color-info-darker);
+      }
 
-    &--failure {
-      background-color: var(--color-error-lightest);
-      color: var(--color-error-darker);
-    }
+      &--success {
+        background-color: var(--color-success-lighter);
+        color: var(--color-success);
+      }
 
-    [class*='icons'] {
-      display: inline-block;
-      margin: 0 10px 6px 10px;
-    }
-
-    .card__status_indicator_text {
-      display: inline-block;
-      margin: var(--spacing-tiny) var(--spacing-large) var(--spacing-medium) 0;
-      padding: 0;
+      &--failure {
+        background-color: var(--color-error-lightest);
+        color: var(--color-error-darker);
+      }
     }
   }
 
