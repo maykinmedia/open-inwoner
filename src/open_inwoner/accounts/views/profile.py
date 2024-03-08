@@ -132,8 +132,7 @@ class MyProfileView(
         context["inbox_page_is_published"] = inbox_page_is_published()
         context["benefits_page_is_published"] = benefits_page_is_published()
 
-        # TODO what if no choices
-        context["newsletter_form"] = NewsletterSubscriptionForm()
+        context["newsletter_form"] = NewsletterSubscriptionForm(user=user)
 
         return context
 
@@ -316,7 +315,8 @@ class NewsletterSubscribeView(LogMixin, LoginRequiredMixin, FormView):
         return reverse("profile:detail")
 
     def form_valid(self, form):
-        form.save()
+        form.save(self.request)
+
         messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
         self.log_user_action(
             self.request.user, _("users newsletter subscriptions were modified")

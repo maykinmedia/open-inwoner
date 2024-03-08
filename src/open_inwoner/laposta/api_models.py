@@ -30,3 +30,14 @@ class UserData(BaseModel):
     source_url: HttpUrl | None
     custom_fields: dict | None
     options: dict | None
+
+
+class Member(BaseModel):
+    member_id: str
+    list_id: str
+    email: EmailStr
+    state: str
+    signup_date: datetime
+    ip: IPvAnyAddress
+    source_url: HttpUrl | Literal[""] | None
+    custom_fields: dict | None

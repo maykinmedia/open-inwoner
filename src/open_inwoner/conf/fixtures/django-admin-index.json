@@ -33,6 +33,10 @@
             [
                 "userfeed",
                 "feeditemdata"
+            ],
+            [
+                "laposta",
+                "subscription"
             ]
         ]
     }

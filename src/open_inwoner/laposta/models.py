@@ -40,3 +40,22 @@ class LapostaConfig(SingletonModel):
         return {
             "auth": HTTPBasicAuth(self.basic_auth_username, self.basic_auth_password)
         }
+
+
+class Subscription(models.Model):
+    list_id = models.CharField(
+        verbose_name=_("List ID"),
+        help_text=_("Unique ID of the list in the API"),
+        max_length=50,
+    )
+    member_id = models.CharField(
+        verbose_name=_("Member ID"),
+        help_text=_("Unique ID of the member for this list in the API"),
+        max_length=50,
+    )
+    user = models.ForeignKey(
+        "accounts.User", verbose_name=_("User"), on_delete=models.CASCADE
+    )
+
+    class Meta:
+        unique_together = [["list_id", "member_id"]]

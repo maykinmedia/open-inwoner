@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 from solo.admin import SingletonModelAdmin
 
-from .models import LapostaConfig
+from .models import LapostaConfig, Subscription
 
 
 @admin.register(LapostaConfig)
@@ -25,3 +25,9 @@ class LapostaConfigAdmin(SingletonModelAdmin):
             },
         ),
     )
+
+
+@admin.register(Subscription)
+class SubscriptionAdmin(admin.ModelAdmin):
+    list_display = ["list_id", "user", "member_id"]
+    list_filter = ["list_id", "user"]
