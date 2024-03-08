@@ -533,7 +533,9 @@ face==20.1.1
 factory-boy==3.2.0
     # via -r requirements/test-tools.in
 faker==9.9.0
-    # via factory-boy
+    # via
+    #   factory-boy
+    #   polyfactory
 flake8==7.0.0
     # via -r requirements/test-tools.in
 fontawesomefree==6.4.2
@@ -739,6 +741,8 @@ playwright==1.41.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+polyfactory==2.13.0
+    # via -r requirements/test-tools.in
 prompt-toolkit==3.0.36
     # via
     #   -c requirements/base.txt
@@ -927,10 +931,11 @@ tinycss2==1.1.1
     #   weasyprint
 tomlkit==0.12.3
     # via pylint
-typing-extensions==4.4.0
+typing-extensions==4.10.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   polyfactory
     #   pydantic
     #   pyee
     #   xsdata

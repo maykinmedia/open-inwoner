@@ -506,8 +506,9 @@ tinycss2==1.1.1
     #   cssselect2
     #   svglib
     #   weasyprint
-typing-extensions==4.4.0
+typing-extensions==4.10.0
     # via
+    #   -r requirements/base.in
     #   pydantic
     #   pyee
     #   xsdata

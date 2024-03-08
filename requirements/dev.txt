@@ -590,6 +590,7 @@ faker==9.9.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   factory-boy
+    #   polyfactory
 flake8==7.0.0
     # via
     #   -c requirements/ci.txt
@@ -861,6 +862,10 @@ playwright==1.41.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+polyfactory==2.13.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 prompt-toolkit==3.0.36
     # via
     #   -c requirements/ci.txt
@@ -1114,10 +1119,11 @@ tomlkit==0.12.3
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   pylint
-typing-extensions==4.4.0
+typing-extensions==4.10.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   polyfactory
     #   pydantic
     #   pyee
     #   xsdata
