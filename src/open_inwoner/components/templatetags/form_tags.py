@@ -171,6 +171,8 @@ def autorender_field(form_object, field_name, **kwargs):
         tmplt = WIDGET_TEMPLATES["DATE"]
     elif type(field) is forms.models.ModelMultipleChoiceField:
         tmplt = WIDGET_TEMPLATES["MULTIPLECHECKBOX"]
+    elif type(field) is forms.MultipleChoiceField:
+        tmplt = WIDGET_TEMPLATES["MULTIPLECHECKBOX"]
     elif type(field) is forms.fields.BooleanField:
         fn = checkbox
         tmplt = WIDGET_TEMPLATES["CHECKBOX"]

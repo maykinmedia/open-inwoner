@@ -24,6 +24,7 @@ from open_inwoner.cms.utils.page_display import (
     inbox_page_is_published,
 )
 from open_inwoner.haalcentraal.utils import fetch_brp
+from open_inwoner.laposta.forms import NewsletterSubscriptionForm
 from open_inwoner.openklant.clients import build_client
 from open_inwoner.openklant.wrap import get_fetch_parameters
 from open_inwoner.plans.models import Plan
@@ -130,6 +131,9 @@ class MyProfileView(
         )
         context["inbox_page_is_published"] = inbox_page_is_published()
         context["benefits_page_is_published"] = benefits_page_is_published()
+
+        # TODO what if no choices
+        context["newsletter_form"] = NewsletterSubscriptionForm()
 
         return context
 
@@ -302,4 +306,19 @@ class MyNotificationsView(
         form.save()
         messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
         self.log_change(self.object, _("users notifications were modified"))
+        return HttpResponseRedirect(self.get_success_url())
+
+
+class NewsletterSubscribeView(LogMixin, LoginRequiredMixin, FormView):
+    form_class = NewsletterSubscriptionForm
+
+    def get_success_url(self) -> str:
+        return reverse("profile:detail")
+
+    def form_valid(self, form):
+        form.save()
+        messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
+        self.log_user_action(
+            self.request.user, _("users newsletter subscriptions were modified")
+        )
         return HttpResponseRedirect(self.get_success_url())

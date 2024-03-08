@@ -22,6 +22,7 @@ from open_inwoner.accounts.views import (
     MyNotificationsView,
     MyProfileView,
     NecessaryFieldsUserView,
+    NewsletterSubscribeView,
 )
 from open_inwoner.accounts.views.actions import ActionDeleteView
 
@@ -100,6 +101,11 @@ urlpatterns = [
         "register/necessary/",
         NecessaryFieldsUserView.as_view(),
         name="registration_necessary",
+    ),
+    path(
+        "newsletter-subscribe",
+        NewsletterSubscribeView.as_view(),
+        name="newsletter_subscribe",
     ),
     path("", MyProfileView.as_view(), name="detail"),
 ]
