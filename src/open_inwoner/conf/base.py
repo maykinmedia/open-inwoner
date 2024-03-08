@@ -113,6 +113,10 @@ SOLO_CACHE = "local"  # Avoid Redis overhead
 CACHE_ZGW_CATALOGI_TIMEOUT = config("CACHE_ZGW_CATALOGI_TIMEOUT", default=60 * 60 * 24)
 CACHE_ZGW_ZAKEN_TIMEOUT = config("CACHE_ZGW_ZAKEN_TIMEOUT", default=60 * 1)
 
+# Laposta API caching
+CACHE_LAPOSTA_API_TIMEOUT = config("CACHE_LAPOSTA_API_TIMEOUT", default=60 * 60 * 24)
+
+
 #
 # APPLICATIONS enabled for this project
 #
@@ -200,6 +204,7 @@ INSTALLED_APPS = [
     # Project applications.
     "open_inwoner.components",
     "open_inwoner.kvk",
+    "open_inwoner.laposta",
     "open_inwoner.ckeditor5",
     "open_inwoner.pdc",
     "open_inwoner.plans",

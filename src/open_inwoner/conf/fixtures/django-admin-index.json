@@ -335,6 +335,10 @@
                 "zaaktypeinformatieobjecttypeconfig"
             ],
             [
+                "laposta",
+                "lapostaconfig"
+            ],
+            [
                 "soap",
                 "soapservice"
             ],
