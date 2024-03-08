@@ -68,7 +68,7 @@
   }
 
   .card {
-    justify-content: flex-end;
+    justify-content: space-between;
   }
 
   .card-container {
@@ -85,43 +85,67 @@
   .card--status {
     // Default color
     padding: 0;
-    background-color: var(--color-info-lighter);
-  }
+    background-color: var(--color-white);
 
-  &-marker {
-    display: flex;
-    align-items: center;
-    border-top-left-radius: var(--border-radius);
-    border-top-right-radius: var(--border-radius);
-    color: var(--color-info-darker);
-    font-size: var(--font-size-body);
+    .card__header {
+      display: flex;
 
-    &--warning {
-      background-color: var(--color-danger-lightest);
-      color: var(--color-danger-darker);
+      &.warning {
+        background-color: var(--color-danger-lightest);
+        color: var(--color-danger-darker);
+      }
+
+      &.info {
+        background-color: var(--color-info-lighter);
+        color: var(--color-info-darker);
+      }
+
+      &.success {
+        background-color: var(--color-success-lighter);
+        color: var(--color-success);
+      }
+
+      &.failure {
+        background-color: var(--color-error-lightest);
+        color: var(--color-error-darker);
+      }
+
+      [class*='icons'] {
+        display: inline-block;
+        margin: 0 10px 6px 10px;
+      }
+
+      .card__status_indicator_text {
+        display: inline-block;
+        margin: var(--spacing-tiny) var(--spacing-large) var(--spacing-medium) 0;
+        padding: 0;
+      }
     }
 
-    &--info {
-      background-color: var(--color-info-lighter);
-      color: var(--color-info-darker);
-    }
+    .userfeed__marker {
+      // Default color
+      padding: var(--spacing-medium) 0 0 0;
+      background-color: var(--color-white);
 
-    &--success {
-      background-color: var(--color-success-lighter);
-      color: var(--color-success);
-    }
+      &--warning {
+        background-color: var(--color-danger-lightest);
+        color: var(--color-danger-darker);
+      }
 
-    &--failure {
-      background-color: var(--color-error-lightest);
-      color: var(--color-error-darker);
-    }
+      &--info {
+        background-color: var(--color-info-lighter);
+        color: var(--color-info-darker);
+      }
 
-    [class*='icons'] {
-      margin: 6px 10px;
-    }
+      &--success {
+        background-color: var(--color-success-lighter);
+        color: var(--color-success);
+      }
 
-    .userfeed__status_text {
-      padding: 8px var(--spacing-large) 10px 0;
+      &--failure {
+        background-color: var(--color-error-lightest);
+        color: var(--color-error-darker);
+      }
     }
   }
 
