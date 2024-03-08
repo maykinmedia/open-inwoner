@@ -70,6 +70,30 @@ class NotificationHandlerUtilsTestCase(TestCase):
         self.assertIn(case_url, body_html)
         self.assertIn(config.name, body_html)
 
+    def test_send_case_update_email__no_status(self):
+        config = SiteConfiguration.get_solo()
+        data = MockAPIData()
+
+        user = data.user_initiator
+
+        case = factory(Zaak, data.zaak)
+        case.zaaktype = factory(ZaakType, data.zaak_type)
+
+        case_url = reverse("cases:case_detail", kwargs={"object_id": str(case.uuid)})
+
+        send_case_update_email(user, case, "case_document_notification")
+
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertEqual(email.to, [user.email])
+        self.assertIn(config.name, email.subject)
+
+        body_html = email.alternatives[0][0]
+        self.assertIn(case.identificatie, body_html)
+        self.assertIn(case.zaaktype.omschrijving, body_html)
+        self.assertIn(case_url, body_html)
+        self.assertIn(config.name, body_html)
+
     # TODO we're missing a similar test for get_nnp_initiator_nnp_id_from_roles()
     def test_get_np_initiator_bsns_from_roles(self):
         # roles we're interested in

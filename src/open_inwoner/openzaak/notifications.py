@@ -583,11 +583,14 @@ def send_case_update_email(
     context = {
         "identification": case.identification,
         "type_description": case.zaaktype.omschrijving,
-        "status_description": translate_single_status(status.statustype.omschrijving),
         "start_date": case.startdatum,
         "end_date": date.today() + timedelta(days=config.action_required_deadline_days),
         "case_link": case_detail_url,
     }
+    if status:
+        context["status_description"] = (
+            translate_single_status(status.statustype.omschrijving),
+        )
     if extra_context:
         context.update(extra_context)
     template.send_email([user.email], context)
