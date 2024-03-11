@@ -17,7 +17,7 @@
                 {% icon icon="west" %}
             </a>
         {% else %}
-            <span class="pagination__item">{% icon icon="west" %}</span>
+            <span class="pagination__previous pagination__item">{% icon icon="west" %}</span>
         {% endif %}
 
         {% for i in paginator.page_range %}
@@ -81,7 +81,7 @@
                 {% icon icon="east" %}
             </a>
         {% else %}
-            <span class="pagination__item">{% icon icon="east" %}</span>
+            <span class="pagination__next pagination__item">{% icon icon="east" %}</span>
         {% endif %}
     </div>
     {% endif %}

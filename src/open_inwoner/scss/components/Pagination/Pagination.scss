@@ -79,6 +79,12 @@
         color: var(--color-body);
       }
     }
+
+    &.pagination__item [class*='icon'] {
+      margin-right: var(--gutter-width);
+      margin-left: 0;
+      color: var(--color-body);
+    }
   }
 
   &__next {
@@ -89,6 +95,12 @@
       &:hover {
         color: var(--color-body);
       }
+    }
+
+    &.pagination__item [class*='icon'] {
+      margin-right: 0;
+      margin-left: var(--gutter-width);
+      color: var(--color-body);
     }
   }
 }
