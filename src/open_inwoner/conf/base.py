@@ -179,6 +179,7 @@ INSTALLED_APPS = [
     "colorfield",
     "view_breadcrumbs",
     "django_better_admin_arrayfield",
+    "django_jsonform",
     "simple_certmanager",
     "zgw_consumers",
     "notifications_api_common",
