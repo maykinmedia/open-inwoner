@@ -1,3 +1,4 @@
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -24,6 +25,16 @@ class LapostaConfig(SingletonModel):
         max_length=255,
         blank=True,
         help_text=_("The password used to authenticate with the Laposta API"),
+    )
+    limit_list_selection_to = ArrayField(
+        models.CharField(max_length=255),
+        verbose_name=_("Limit list selection to"),
+        default=list,
+        blank=True,
+        help_text=_(
+            "If configured, users will only be able to choose from this selection of "
+            "lists to subscribe to"
+        ),
     )
 
     class Meta:

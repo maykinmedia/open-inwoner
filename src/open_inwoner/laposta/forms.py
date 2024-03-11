@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from ipware import get_client_ip
 
 from open_inwoner.laposta.api_models import UserData
-from open_inwoner.laposta.models import Subscription
+from open_inwoner.laposta.models import LapostaConfig, Subscription
 
 from .client import create_laposta_client
 
@@ -26,6 +26,12 @@ class NewsletterSubscriptionForm(forms.Form):
                 for laposta_list in lists
                 if laposta_list.name
             ]
+            if limited_to := LapostaConfig.get_solo().limit_list_selection_to:
+                self.fields["newsletters"].choices = [
+                    choice
+                    for choice in self.fields["newsletters"].choices
+                    if choice[0] in limited_to
+                ]
 
             self.fields["newsletters"].initial = [
                 subscription.list_id
