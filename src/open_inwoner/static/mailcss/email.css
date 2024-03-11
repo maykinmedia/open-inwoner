@@ -64,7 +64,10 @@ td, .td-mail {
 }
 
 .mail__icon {
-    border-right: 5px solid #FFFFFF;
+    padding-right: 8px;
+    margin-right: 0;
+    width: 20px;
+    height: 20px;
 }
 
 .td-mail h1 {
@@ -97,7 +100,7 @@ td.align-center {
 }
 
 .td-mail__bg-info {
-    background-color: #B3D9EB;
+    background-color: #D5E6F6;
 }
 
 .td-mail__bg-danger {
@@ -142,12 +145,24 @@ td.align-center {
     padding: 0;
 }
 
+.td__nowrap {
+    white-space: nowrap;
+}
+
+.td__alignright {
+    text-align: right;
+}
+
+.td__rightcell.td__nowrap {
+    min-width: 200px;
+}
+
 .spacing__extra {
     height: 20px;
 }
 
 .button--primary {
-    border: 1px solid #0065BD;
+    border: 1px solid;
     border-radius: 6px;
     color: #ffffff;
     display: inline-block;
@@ -181,3 +196,18 @@ td.align-center {
     font-size: 14px;
 }
 
+strong .color--primary, strong .color--secondary {
+    line-height: 42px;
+    text-decoration: none;
+}
+
+/* CKEditor only */
+
+.cke_editable a {
+    color: #248641;
+}
+
+.cke_editable .button--primary {
+    background-color: #0065BD;
+    color: #FFFFFF;
+}

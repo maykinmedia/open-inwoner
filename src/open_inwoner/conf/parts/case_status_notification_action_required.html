@@ -12,29 +12,28 @@
         </td>
     </tr>
     <tr>
-        <td class="td-mail td-mail__bg-danger td__padding-all" colspan="6">
+        <td class="td-mail td-mail__bg-danger td__padding-top td__padding-right td__padding-left" colspan="6">
             <h1>Nieuw:</h1>
         </td>
     </tr>
     <tr class="tr--responsive">
-        <td class="td--responsive td-mail td-mail__bg-danger td__padding-all" colspan="3">
+        <td class="td--responsive td-mail td-mail__bg-danger td__padding-all td__leftcell" colspan="3">
             <p><span class="text-color__small-gray-900">Aanvraag: </span></p>
             <h2>{{ type_description }}</h2>
         </td>
-        <td class="td--responsive td-mail td-mail__bg-danger td__padding-all" colspan="3">
+        <td class="td--responsive td-mail td-mail__bg-danger td__padding-all td__rightcell td__alignright" colspan="3">
             <p><span class="text-color__small-gray-900">Zaaknummer: </span><br/>{{ identification }}</p>
         </td>
     </tr>
     <tr>
         <td class="td-mail td-mail__bg-danger td__padding-all" colspan="6">
             <div class="td-mail__bg-white">
-                <p>
                 <table role="presentation" border="0" cellspacing="0" cellpadding="0" width="100%">
                     <tr>
                         <td width="35" class="td-mail td__padding-left align-center">
-                            <img src="/static/img/mail/alarm_danger-orange.jpg" width="20" height="18" alt="" class="mail__icon">
+                            <img src="/static/img/mail/alarm_danger-orange.png" width="20" height="18" alt="" class="mail__icon">
                         </td>
-                        <td class="td__padding-top td__padding-right td__padding-bottom">
+                        <td class="td__padding-top td__padding-right td__padding-bottom align-center">
                             <p class="text-color__danger"><strong>Wij hebben documenten van u nodig</strong><br>
                                 Upload de documenten tot {{ end_date }}</p>
                         </td>
@@ -63,7 +62,7 @@
     </tr>
     <tr class="tr-mail">
         <td class="td-mail spacer-bottom td__padding-zero" colspan="6">
-            <!-- <hr> styling --> &nbsp;
+            <!-- <hr> styling -->
         </td>
     </tr>
     <tr>
@@ -74,11 +73,9 @@
         </td>
     </tr>
     <tr class="tr--responsive">
-        <td class="td--responsive td-mail td__padding-right td__padding-bottom td__padding-left" colspan="3"><p><a href="{{ contact_page }}">Ga naar onze contactpagina</a></p>
+        <td class="td--responsive td-mail td__padding-right td__padding-bottom td__padding-left td__leftcell" colspan="2"><p><a href="{{ contact_page }}">Ga naar onze contactpagina</a></p>
         </td>
-        <td class="td--responsive td-mail td__padding-right td__padding-bottom td__padding-left" colspan="3"><p>
-            <a href="tel:{{contact_phonenumber}}" data-rel="external">{{contact_phonenumber}}</a>
-        </p></td>
+        <td class="td--responsive td-mail td__padding-right td__padding-bottom td__padding-left td__rightcell td__nowrap" colspan="4"><p><a href="tel:{{ contact_phonenumber }}" data-rel="external">Bel {{ contact_phonenumber }}</a></p></td>
     </tr>
     <tr class="tr-mail border-top">
         <td class="td-mail border-top td__padding-zero" colspan="6">
