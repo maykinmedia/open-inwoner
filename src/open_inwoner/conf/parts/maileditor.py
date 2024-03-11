@@ -286,6 +286,12 @@ MAIL_EDITOR_CONF = {
                 "name": "site_name",
                 "description": _("Name of the site"),
             },
+            {
+                "name": "profile_notifications",
+                "description": _(
+                    "The link to the notifications and unsubscribe settings"
+                ),
+            },
         ],
     },
     "case_status_notification_action_required": {
@@ -326,6 +332,12 @@ MAIL_EDITOR_CONF = {
             {
                 "name": "site_name",
                 "description": _("Name of the site"),
+            },
+            {
+                "name": "profile_notifications",
+                "description": _(
+                    "The link to the notifications and unsubscribe settings"
+                ),
             },
         ],
     },
