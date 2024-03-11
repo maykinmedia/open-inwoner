@@ -1,5 +1,5 @@
-export class DisableCaseContactButton {
-  static selector = '.case-contact-form'
+export class DisableContactFormButton {
+  static selector = '.contact-form'
 
   constructor(form) {
     this.form = form
@@ -21,5 +21,5 @@ export class DisableCaseContactButton {
 }
 
 document
-  .querySelectorAll(DisableCaseContactButton.selector)
-  .forEach((caseContactForm) => new DisableCaseContactButton(caseContactForm))
+  .querySelectorAll(DisableContactFormButton.selector)
+  .forEach((ContactForm) => new DisableContactFormButton(ContactForm))

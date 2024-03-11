@@ -9,7 +9,7 @@ import './autocomplete-search'
 import './autocomplete'
 import './autosumbit'
 import './cases'
-import { DisableCaseContactButton } from './cases/case_contact_form'
+import { DisableContactFormButton } from './form/DisableContactFormButton'
 import { DisableSubmitButton } from './cases/document_upload'
 import './confirmation'
 import './contacts'
@@ -48,8 +48,8 @@ const elementWrappers = [
   [CreateGumshoe.selector, (elt) => new CreateGumshoe(elt)],
   [DisableSubmitButton.selector, (elt) => new DisableSubmitButton(elt)],
   [
-    DisableCaseContactButton.selector,
-    (elt) => new DisableCaseContactButton(elt),
+    DisableContactFormButton.selector,
+    (elt) => new DisableContactFormButton(elt),
   ],
   [Notification.selector, (elt) => new Notification(elt)],
   [AnchorMobile.selector, (elt) => new AnchorMobile(elt)],

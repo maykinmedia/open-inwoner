@@ -273,6 +273,17 @@
       grid-template-columns: 1fr 1fr 1fr 1fr;
     }
   }
+
+  /// buttons
+
+  .button[type='submit']:disabled,
+  .button--primary.button--disabled {
+    background-color: var(--color-gray) !important;
+    border-color: var(--color-gray) !important;
+    color: var(--color-white);
+    cursor: default;
+    pointer-events: none;
+  }
 }
 
 /// Specific forms

@@ -1,6 +1,48 @@
 .contactmomenten {
   margin-top: var(--spacing-giant);
 
+  &__scrolldown {
+    padding-top: 3em;
+
+    .form-container {
+      width: 50%;
+    }
+
+    .button {
+      margin-top: var(--spacing-giant);
+    }
+  }
+
+  &__contact-form {
+    text-align: center;
+
+    .form-container {
+      margin: auto;
+      width: 50%;
+    }
+
+    .form-heading {
+      padding-bottom: var(--spacing-giant);
+      text-align: left;
+    }
+
+    form {
+      textarea {
+        width: 100%;
+      }
+
+      .form__control {
+        label {
+          padding-bottom: var(--spacing-extra-large);
+        }
+
+        .input {
+          max-width: 100% !important;
+        }
+      }
+    }
+  }
+
   & .grid {
     grid-row-gap: var(--spacing-medium);
     grid-column-gap: var(--spacing-extra-large);
@@ -72,4 +114,16 @@
       }
     }
   }
+}
+
+// overrides of elements outside of components
+section {
+  display: block;
+  padding-bottom: 2em;
+}
+
+.pagination {
+  display: table !important;
+  margin: 0 auto !important;
+  padding-top: 1em !important;
 }

@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from typing import TypedDict
+from typing import Optional, TypedDict
 
 from django.contrib.auth.mixins import AccessMixin
 from django.http import Http404
@@ -16,6 +16,7 @@ from open_inwoner.openklant.api_models import KlantContactMoment
 from open_inwoner.openklant.clients import build_client
 from open_inwoner.openklant.constants import Status
 from open_inwoner.openklant.models import ContactFormSubject
+from open_inwoner.openklant.views.contactform import ContactFormView
 from open_inwoner.openklant.wrap import (
     fetch_klantcontactmoment,
     fetch_klantcontactmomenten,
@@ -90,25 +91,7 @@ class KlantContactMomentBaseView(
         # replace e_suite_subject_code with OIP configured subject, if applicable
         e_suite_subject_code = getattr(kcm.contactmoment, "onderwerp", None)
 
-        if not e_suite_subject_code:
-            data["onderwerp"] = None
-        else:
-            try:
-                subject = ContactFormSubject.objects.get(
-                    subject_code=e_suite_subject_code
-                )
-            except (
-                ContactFormSubject.DoesNotExist,
-                ContactFormSubject.MultipleObjectsReturned,
-            ) as e:
-                logger.warning(
-                    "Could not determine subject ('onderwerp') for contactmoment %s (%s)",
-                    kcm.contactmoment.url,
-                    e,
-                )
-                data["onderwerp"] = None
-            else:
-                data["onderwerp"] = subject.subject
+        data["onderwerp"] = self.get_kcm_subject(kcm, e_suite_subject_code)
 
         return data
 
@@ -117,8 +100,40 @@ class KlantContactMomentBaseView(
         ctx["anchors"] = self.get_anchors()
         return ctx
 
+    def get_kcm_subject(
+        self,
+        kcm: KlantContactMoment,
+        e_suite_subject_code: str,
+    ) -> Optional[str]:
+        """
+        Try to determine the subject ('onderwerp') of a contactmoment
+        """
+        if not e_suite_subject_code:
+            return None
 
-class KlantContactMomentListView(PaginationMixin, KlantContactMomentBaseView):
+        try:
+            subject = ContactFormSubject.objects.get(subject_code=e_suite_subject_code)
+        except (
+            ContactFormSubject.DoesNotExist,
+            ContactFormSubject.MultipleObjectsReturned,
+        ) as exc:
+            logger.warning(
+                "Could not determine subject ('onderwerp') for contactmoment %s",
+                kcm.contactmoment.url,
+                exc_info=exc,
+            )
+            return None
+
+        return subject.subject
+
+
+class KlantContactMomentListView(
+    PaginationMixin, ContactFormView, KlantContactMomentBaseView
+):
+    """
+    Display "contactmomenten" (questions), and a form (via ContactFormView) to send a new question
+    """
+
     template_name = "pages/contactmoment/list.html"
     paginate_by = 9
 
