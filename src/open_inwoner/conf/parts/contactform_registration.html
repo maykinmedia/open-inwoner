@@ -1,29 +1,89 @@
-<p>Beste</p>
+<table role="presentation" border="0" cellspacing="0" cellpadding="0" width="100%" class="table-mail">
+    <tbody>
+    <tr>
+        <td class="td-mail td__padding-all" colspan="6">
+            <p>Beste inwoner,</p>
+            <p>Wij hebben uw vraag ontvangen.</p>
+        </td>
+    </tr>
+    <tr>
+        <td class="spacing__extra" colspan="6">
+            &nbsp;
+        </td>
+    </tr>
+    <tr class="tr--responsive">
+        <td class="td--responsive td-mail td-mail__bg-success td__padding-all td__leftcell" colspan="3">
+            <p><span class="text-color__small-gray-900">Vraag: </span></p>
+            <h2>{{ subject }} / {{ question }}</h2>
+        </td>
+        <td class="td--responsive td-mail td-mail__bg-success td__padding-all td__rightcell td__alignright" colspan="3">
+            <p><!-- <span class="text-color__small-gray-900">Vraagnummer: </span><br/>{{ identification }} --></p>
+        </td>
+    </tr>
 
-<table>
+    <!-- Table with different column-widths -->
     <tr>
-        <th>Onderwerp:</th>
-        <td>{{ subject }}</td>
+        <td class="td-mail td-mail__bg-success td__padding-all" colspan="6">
+            <div class="td-mail__bg-white">
+                <table role="presentation" border="0" cellspacing="0" cellpadding="0" width="100%">
+                    <tr>
+                        <td width="35" class="td-mail td__padding-left align-center">
+                            <img src="/static/img/mail/check_success-green.png" width="20" height="20" alt="" class="mail__icon">
+                        </td>
+                        <td class="td__padding-top td__padding-right td__padding-bottom align-center">
+                            <p class="text-color__success">Wij hebben uw <strong>vraag ontvangen</strong>. Eén van onze medewerkers beantwoordt deze zo snel mogelijk.</p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </td>
+    </tr>
+    <!-- end of Table with differing column-widths -->
+
+    <tr>
+        <td class="td-mail td-mail__bg-success td__padding-all td__success-link" colspan="6">
+            <p>U hoeft niets te doen. Zodra uw vraag beantwoord is, ontvangt u hier een melding over. U kunt wel inloggen om uw vraag te bekijken.</p>
+            <p><strong><a href="{{ login_page }}" class="color--primary">Log in</a><span class="color--primary"> &rarr;</span></strong></p>
+        </td>
     </tr>
     <tr>
-        <th>Naam:</th>
-        <td>{{ name }}</td>
+        <td class="spacing__extra" colspan="6">
+            &nbsp;
+        </td>
     </tr>
     <tr>
-        <th>Email:</th>
-        <td>{{ email }}</td>
+        <td class="td-mail td__padding-all" colspan="6">
+            <p>Met vriendelijke groet,</p>
+            <p>&nbsp;</p>
+            <p>{{ site_name }}</p>
+        </td>
+    </tr>
+    <tr class="tr-mail">
+        <td class="td-mail spacer-bottom td__padding-zero" colspan="6">
+            <!-- <hr> styling -->
+        </td>
     </tr>
     <tr>
-        <th>Telefoonnummer:</th>
-        <td>{{ phonenumber }}</td>
+        <td class="td-mail td__padding-top td__padding-right td__padding-left" colspan="6">
+            <p>Dit bericht is automatisch verzonden. U kunt <strong>niet reageren</strong> op deze e-mail. </p>
+            <p>&nbsp;</p>
+            <p><strong>Contact opnemen</strong></p>
+        </td>
     </tr>
     <tr>
-        <th colspan="2">Vraag:</th>
+        <td class="td--responsive td-mail td__padding-right td__padding-bottom td__padding-left td__leftcell" colspan="2"><p><a href="{{ contact_page }}">Ga naar onze contactpagina</a></p>
+        </td>
+        <td class="td--responsive td-mail td__padding-right td__padding-bottom td__padding-left td__rightcell td__nowrap" colspan="4"><p><a href="tel:{{ contact_phonenumber }}" data-rel="external">Bel {{ contact_phonenumber }}</a></p></td>
+    </tr>
+    <tr class="tr-mail border-top">
+        <td class="td-mail border-top td__padding-zero" colspan="6">
+            <!-- <hr> styling --> &nbsp;
+        </td>
     </tr>
     <tr>
-        <td colspan="2">{{ question }}</td>
+        <td class="td-mail td__padding-right td__padding-bottom td__padding-left" colspan="6">
+            <p>Pas hier uw <a href="{{ profile_notifications }}">voorkeuren</a> aan voor de notificaties. </p>
+        </td>
     </tr>
+    </tbody>
 </table>
-
-<p>Met vriendelijke groet,</p>
-<p>{{ site_name }}</p>

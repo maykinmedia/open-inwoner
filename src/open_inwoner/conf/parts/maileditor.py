@@ -393,6 +393,7 @@ MAIL_EDITOR_CONF = {
             {
                 "name": "subject",
                 "description": _("Onderwerp"),
+                "example": "Placeholder onderwerp",
             },
             {
                 "name": "name",
@@ -409,6 +410,28 @@ MAIL_EDITOR_CONF = {
             {
                 "name": "question",
                 "description": _("Vraag"),
+            },
+            {
+                "name": "site_name",
+                "description": _("Name of the site"),
+            },
+            {
+                "name": "login_page",
+                "description": _("The link to the login page"),
+            },
+            {
+                "name": "contact_page",
+                "description": _("The link to an existing contactpage"),
+            },
+            {
+                "name": "contact_phonenumber",
+                "description": _("The callable link to the configured phonenumber"),
+            },
+            {
+                "name": "profile_notifications",
+                "description": _(
+                    "The link to the notifications and unsubscribe settings"
+                ),
             },
         ],
     },
