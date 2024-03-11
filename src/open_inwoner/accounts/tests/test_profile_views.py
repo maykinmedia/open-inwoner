@@ -1061,7 +1061,7 @@ class NewsletterSubscriptionTests(ClearCachesMixin, WebTest):
     def setUp(self):
         super().setUp()
 
-        self.profile_url = reverse("profile:detail")
+        self.profile_url = reverse("profile:newsletters")
         self.user = DigidUserFactory()
 
         self.config = LapostaConfig.get_solo()
@@ -1089,7 +1089,7 @@ class NewsletterSubscriptionTests(ClearCachesMixin, WebTest):
 
         response = self.app.get(self.profile_url, user=self.user)
 
-        self.assertNotIn(_("Nieuwsbrieven"), response.text)
+        self.assertIn(_("Geen nieuwsbrieven beschikbaar"), response.text)
         self.assertNotIn("newsletter-form", response.forms)
 
     def test_do_not_render_form_if_no_newsletters_are_found(self, m):
@@ -1097,7 +1097,7 @@ class NewsletterSubscriptionTests(ClearCachesMixin, WebTest):
 
         response = self.app.get(self.profile_url, user=self.user)
 
-        self.assertNotIn(_("Nieuwsbrieven"), response.text)
+        self.assertIn(_("Geen nieuwsbrieven beschikbaar"), response.text)
         self.assertNotIn("newsletter-form", response.forms)
 
     def test_render_form_if_newsletters_are_found(self, m):

@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Generator, Union
+from typing import Any, Generator, Union
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -131,8 +131,6 @@ class MyProfileView(
         )
         context["inbox_page_is_published"] = inbox_page_is_published()
         context["benefits_page_is_published"] = benefits_page_is_published()
-
-        context["newsletter_form"] = NewsletterSubscriptionForm(user=user)
 
         return context
 
@@ -308,11 +306,26 @@ class MyNotificationsView(
         return HttpResponseRedirect(self.get_success_url())
 
 
-class NewsletterSubscribeView(LogMixin, LoginRequiredMixin, FormView):
+class NewsletterSubscribeView(
+    LogMixin, LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, FormView
+):
     form_class = NewsletterSubscriptionForm
+    template_name = "pages/profile/newsletters.html"
 
     def get_success_url(self) -> str:
-        return reverse("profile:detail")
+        return reverse("profile:newsletters")
+
+    @cached_property
+    def crumbs(self):
+        return [
+            (_("Mijn profiel"), reverse("profile:detail")),
+            (_("Nieuwsbrieven"), reverse("profile:newsletters")),
+        ]
+
+    def get_form_kwargs(self) -> dict[str, Any]:
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
 
     def form_valid(self, form):
         form.save(self.request)

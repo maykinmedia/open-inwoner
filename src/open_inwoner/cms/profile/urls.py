@@ -103,9 +103,9 @@ urlpatterns = [
         name="registration_necessary",
     ),
     path(
-        "newsletter-subscribe",
+        "newsletters",
         NewsletterSubscribeView.as_view(),
-        name="newsletter_subscribe",
+        name="newsletters",
     ),
     path("", MyProfileView.as_view(), name="detail"),
 ]
