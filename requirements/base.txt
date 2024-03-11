@@ -145,8 +145,6 @@ django-autoslug==1.9.8
     # via -r requirements/base.in
 django-axes==5.25.0
     # via -r requirements/base.in
-django-better-admin-arrayfield==1.4.2
-    # via -r requirements/base.in
 django-choices==2.0.0
     # via mail-editor
 django-ckeditor==6.7.0
@@ -201,7 +199,9 @@ django-ipware==4.0.0
 django-js-asset==2.2.0
     # via django-ckeditor
 django-jsonform==2.22.0
-    # via mozilla-django-oidc-db
+    # via
+    #   -r requirements/base.in
+    #   mozilla-django-oidc-db
 django-localflavor==3.1
     # via -r requirements/base.in
 django-log-outgoing-requests==0.6.1

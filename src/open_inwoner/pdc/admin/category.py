@@ -5,8 +5,7 @@ from django.contrib import admin
 from django.forms import BaseModelFormSet
 from django.utils.translation import gettext as _
 
-from django_better_admin_arrayfield.admin.mixins import DynamicArrayMixin
-from django_better_admin_arrayfield.forms.widgets import DynamicArrayWidget
+from django_jsonform.widgets import JSONFormWidget
 from import_export.admin import ImportExportMixin
 from import_export.formats import base_formats
 from ordered_model.admin import OrderedInlineModelAdminMixin, OrderedTabularInline
@@ -49,7 +48,7 @@ class ZaakTypenSelectWidget(forms.Select):
         self.choices = choices_dict.items()
 
 
-class DynamicArraySelectWidget(DynamicArrayWidget):
+class DynamicArraySelectWidget(JSONFormWidget):
     def __init__(self, *args, **kwargs):
         kwargs["subwidget_form"] = ZaakTypenSelectWidget
 

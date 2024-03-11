@@ -3,7 +3,6 @@ from django.contrib import admin, messages
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
-from django_better_admin_arrayfield.admin.mixins import DynamicArrayMixin
 from import_export.admin import ImportExportMixin
 from import_export.formats import base_formats
 
@@ -12,7 +11,7 @@ from .resources import SynonymResource
 
 
 @admin.register(Synonym)
-class SynonymAdmin(ImportExportMixin, admin.ModelAdmin, DynamicArrayMixin):
+class SynonymAdmin(ImportExportMixin, admin.ModelAdmin):
     list_display = ("term", "synonyms")
     resource_class = SynonymResource
     formats = [base_formats.CSV]
