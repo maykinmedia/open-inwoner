@@ -1070,6 +1070,19 @@ class NewsletterSubscriptionTests(ClearCachesMixin, WebTest):
         self.config.basic_auth_password = "password"
         self.config.save()
 
+        self.list1 = LapostaListFactory.build(
+            list_id="list1", name="Nieuwsbrief1", remarks="foo"
+        )
+        self.list2 = LapostaListFactory.build(
+            list_id="list2", name="Nieuwsbrief2", remarks="bar"
+        )
+
+    def setUpMocks(self, m):
+        m.get(
+            "https://laposta.local/api/v2/list",
+            json={"data": [{"list": self.list1.dict()}, {"list": self.list2.dict()}]},
+        )
+
     def test_do_not_render_form_if_config_is_missing(self, m):
         self.config.api_root = ""
         self.config.save()
@@ -1088,16 +1101,9 @@ class NewsletterSubscriptionTests(ClearCachesMixin, WebTest):
         self.assertNotIn("newsletter-form", response.forms)
 
     def test_render_form_if_newsletters_are_found(self, m):
-        list1, list2 = LapostaListFactory.build(
-            name="Nieuwsbrief1", remarks="foo"
-        ), LapostaListFactory.build(name="Nieuwsbrief2", remarks="bar")
+        self.setUpMocks(m)
 
-        SubscriptionFactory.create(list_id=list1.list_id, user=self.user)
-
-        m.get(
-            "https://laposta.local/api/v2/list",
-            json={"data": [{"list": list1.dict()}, {"list": list2.dict()}]},
-        )
+        SubscriptionFactory.create(list_id=self.list1.list_id, user=self.user)
 
         response = self.app.get(self.profile_url, user=self.user)
 
@@ -1111,3 +1117,25 @@ class NewsletterSubscriptionTests(ClearCachesMixin, WebTest):
         self.assertFalse(form.fields["newsletters"][1].checked)
         self.assertIn("Nieuwsbrief1: foo", response.text)
         self.assertIn("Nieuwsbrief2: bar", response.text)
+
+    def test_render_form_limit_newsletters_to_admin_selection(self, m):
+        self.setUpMocks(m)
+
+        self.config.limit_list_selection_to = ["list1"]
+        self.config.save()
+
+        SubscriptionFactory.create(list_id=self.list1.list_id, user=self.user)
+
+        response = self.app.get(self.profile_url, user=self.user)
+
+        self.assertIn(_("Nieuwsbrieven"), response.text)
+        self.assertIn("newsletter-form", response.forms)
+
+        form = response.forms["newsletter-form"]
+
+        # First checkbox should be checked, because the user is already subscribed
+        self.assertTrue(form.fields["newsletters"][0].checked)
+        self.assertIn("Nieuwsbrief1: foo", response.text)
+
+        # Second field was excluded by `LapostaConfig.limit_list_selection_to`
+        self.assertNotIn("Nieuwsbrief2: bar", response.text)
