@@ -35,14 +35,19 @@ def zaaktypen_select_schema() -> dict:
 
     choices = []
     for zaaktype in zaaktypen:
+        title = zaaktype.omschrijving
+        # eSuite doesn't have the Catalogus resource
+        if zaaktype.catalogus:
+            title = f"{zaaktype.catalogus.domein} - {zaaktype.catalogus.rsin}: {title}"
+
         choices.append(
             {
                 "value": zaaktype.identificatie,
-                "title": f"{zaaktype.catalogus.domein} - {zaaktype.catalogus.rsin}: {zaaktype.omschrijving}",
+                "title": title,
             }
         )
 
-    choices = sorted(choices, key=lambda item: item["title"])
+    choices.sort(key=lambda item: item["title"])
 
     schema = {
         "type": "array",
