@@ -4,7 +4,24 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, EmailStr, HttpUrl, IPvAnyAddress, NonNegativeInt
 
-from open_inwoner.utils.time import convert_datetime_to_iso_8601_with_z_suffix
+
+class JSONEncoderMixin:
+    # To make `BaseModel.dict()` produce JSON serialized data, i.e. for usage in tests
+    # in tandem with `requests_mock`, we cast the data using the configured JSON encoders
+    # Source: https://github.com/pydantic/pydantic/issues/1409#issuecomment-1381655025
+    def _iter(self, **kwargs):
+        for key, value in super()._iter(**kwargs):
+            yield key, self.__config__.json_encoders.get(type(value), lambda v: v)(
+                value
+            )
+
+    class Config:
+        json_encoders = {
+            # We need to specify a serializable format for datetimes and IPv4Addresses, otherwise
+            # `BaseModel.dict()` will complain about certain types not being JSON serializable
+            datetime: lambda dt: dt.isoformat(sep=" "),
+            IPv4Address: str,
+        }
 
 
 class Members(BaseModel):
@@ -13,7 +30,7 @@ class Members(BaseModel):
     cleaned: NonNegativeInt
 
 
-class LapostaList(BaseModel):
+class LapostaList(JSONEncoderMixin, BaseModel):
     account_id: str
     list_id: str
     created: datetime
@@ -26,19 +43,8 @@ class LapostaList(BaseModel):
     account_id: str
     members: Members
 
-    # Let `.dict()` handle JSON encoding
-    # Source: https://github.com/pydantic/pydantic/issues/1409#issuecomment-1381655025
-    def _iter(self, **kwargs):
-        for key, value in super()._iter(**kwargs):
-            yield key, self.__config__.json_encoders.get(type(value), lambda v: v)(
-                value
-            )
-
-    class Config:
-        json_encoders = {
-            # custom output conversion for datetime
-            datetime: convert_datetime_to_iso_8601_with_z_suffix
-        }
+    class Config(JSONEncoderMixin.Config):
+        pass
 
 
 class UserData(BaseModel):
@@ -49,7 +55,7 @@ class UserData(BaseModel):
     options: dict | None
 
 
-class Member(BaseModel):
+class Member(JSONEncoderMixin, BaseModel):
     member_id: str
     list_id: str
     email: EmailStr
@@ -59,17 +65,5 @@ class Member(BaseModel):
     source_url: HttpUrl | Literal[""] | None = None
     custom_fields: dict | None = None
 
-    # Let `.dict()` handle JSON encoding
-    # Source: https://github.com/pydantic/pydantic/issues/1409#issuecomment-1381655025
-    def _iter(self, **kwargs):
-        for key, value in super()._iter(**kwargs):
-            yield key, self.__config__.json_encoders.get(type(value), lambda v: v)(
-                value
-            )
-
-    class Config:
-        json_encoders = {
-            # custom output conversion for datetime
-            datetime: convert_datetime_to_iso_8601_with_z_suffix,
-            IPv4Address: str,
-        }
+    class Config(JSONEncoderMixin.Config):
+        pass

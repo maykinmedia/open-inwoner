@@ -38,7 +38,3 @@ def has_new_elements(
     otherwise
     """
     return any(is_new(elem, attribute_name, delta) for elem in collection)
-
-
-def convert_datetime_to_iso_8601_with_z_suffix(dt: dt.datetime) -> str:
-    return dt.strftime("%Y-%m-%dT%H:%M:%SZ")

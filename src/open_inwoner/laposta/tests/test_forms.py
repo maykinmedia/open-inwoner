@@ -148,11 +148,7 @@ class NewsletterSubscriptionFormTestCase(ClearCachesMixin, TestCase):
 
         self.assertEqual(len(post_matcher.request_history), 1)
 
-        subscriptions = Subscription.objects.filter(user=self.user)
-
-        self.assertEqual(subscriptions.count(), 1)
-
-        subscription = subscriptions.get()
+        subscription = Subscription.objects.filter(user=self.user).get()
 
         # Subscription should be created locally, based on data returned by API
         self.assertEqual(subscription.list_id, "789")

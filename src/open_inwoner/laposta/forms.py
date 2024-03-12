@@ -6,6 +6,7 @@ from ipware import get_client_ip
 from open_inwoner.laposta.api_models import UserData
 from open_inwoner.laposta.models import LapostaConfig, Subscription
 
+from .choices import get_list_choices
 from .client import create_laposta_client
 
 
@@ -21,11 +22,7 @@ class NewsletterSubscriptionForm(forms.Form):
 
         if laposta_client := create_laposta_client():
             lists = laposta_client.get_lists()
-            self.fields["newsletters"].choices = [
-                (laposta_list.list_id, f"{laposta_list.name}: {laposta_list.remarks}")
-                for laposta_list in lists
-                if laposta_list.name
-            ]
+            self.fields["newsletters"].choices = get_list_choices(lists)
             if limited_to := LapostaConfig.get_solo().limit_list_selection_to:
                 self.fields["newsletters"].choices = [
                     choice

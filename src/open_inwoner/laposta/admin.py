@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 from solo.admin import SingletonModelAdmin
 
+from .choices import get_list_choices
 from .client import create_laposta_client
 from .models import LapostaConfig, Subscription
 
@@ -26,11 +27,7 @@ class LapostaConfigForm(forms.ModelForm):
 
         if client := create_laposta_client():
             lists = client.get_lists()
-            self.fields["limit_list_selection_to"].choices = [
-                (laposta_list.list_id, f"{laposta_list.name}: {laposta_list.remarks}")
-                for laposta_list in lists
-                if laposta_list.name
-            ]
+            self.fields["limit_list_selection_to"].choices = get_list_choices(lists)
 
 
 @admin.register(LapostaConfig)
@@ -58,3 +55,4 @@ class LapostaConfigAdmin(SingletonModelAdmin):
 class SubscriptionAdmin(admin.ModelAdmin):
     list_display = ["list_id", "user", "member_id"]
     list_filter = ["list_id", "user"]
+    search_fields = ("user__first_name", "user__last_name", "user__email")
