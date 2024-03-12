@@ -172,15 +172,23 @@ class UserCaseStatusNotificationTests(TestCase):
             )
             # create a related note we didn't send
             UserCaseStatusNotificationFactory(
-                user=user, case_uuid=case_uuid, is_sent=False
+                user=user,
+                case_uuid=case_uuid,
+                is_sent=False,
+                collision_key="case_status_notification",
             )
             # create our note
             note = UserCaseStatusNotificationFactory(
-                user=user, case_uuid=case_uuid, is_sent=True
+                user=user,
+                case_uuid=case_uuid,
+                is_sent=True,
+                collision_key="case_status_notification",
             )
             # it doesn't see any of the above
             self.assertFalse(
-                note.has_received_similar_notes_within(timedelta(minutes=10))
+                note.has_received_similar_notes_within(
+                    timedelta(minutes=10), "case_status_notification"
+                )
             )
 
         # advance half hour
@@ -190,11 +198,15 @@ class UserCaseStatusNotificationTests(TestCase):
             )
             # nothing is past 10 minutes
             self.assertFalse(
-                note.has_received_similar_notes_within(timedelta(minutes=10))
+                note.has_received_similar_notes_within(
+                    timedelta(minutes=10), "case_status_notification"
+                )
             )
             # looking back an hour we see the earlier note
             self.assertTrue(
-                note.has_received_similar_notes_within(timedelta(minutes=60))
+                note.has_received_similar_notes_within(
+                    timedelta(minutes=60), "case_status_notification"
+                )
             )
 
     def test_case_info_has_received_similar_notes_within(self):
@@ -205,50 +217,49 @@ class UserCaseStatusNotificationTests(TestCase):
         with freeze_time("2023-01-01 01:00:00"):
             # create unrelated sent note for different case
             UserCaseInfoObjectNotificationFactory(
-                user=user, case_uuid=other_case_uuid, is_sent=True
+                user=user,
+                case_uuid=other_case_uuid,
+                is_sent=True,
+                collision_key="case_document_notification",
             )
             # create a related note we didn't send
             UserCaseInfoObjectNotificationFactory(
-                user=user, case_uuid=case_uuid, is_sent=False
+                user=user,
+                case_uuid=case_uuid,
+                is_sent=False,
+                collision_key="case_document_notification",
             )
             # create our note
             note = UserCaseInfoObjectNotificationFactory(
-                user=user, case_uuid=case_uuid, is_sent=True
+                user=user,
+                case_uuid=case_uuid,
+                is_sent=True,
+                collision_key="case_document_notification",
             )
             # it doesn't see any of the above
             self.assertFalse(
-                note.has_received_similar_notes_within(timedelta(minutes=10))
+                note.has_received_similar_notes_within(
+                    timedelta(minutes=10), "case_document_notification"
+                )
             )
 
         # advance half hour
         with freeze_time("2023-01-01 01:30:00"):
             note = UserCaseInfoObjectNotificationFactory(
-                user=user, case_uuid=case_uuid, is_sent=True
+                user=user,
+                case_uuid=case_uuid,
+                is_sent=True,
+                collision_key="case_document_notification",
             )
             # nothing is past 10 minutes
             self.assertFalse(
-                note.has_received_similar_notes_within(timedelta(minutes=10))
+                note.has_received_similar_notes_within(
+                    timedelta(minutes=10), "case_document_notification"
+                )
             )
             # looking back an hour we see the earlier note
             self.assertTrue(
-                note.has_received_similar_notes_within(timedelta(minutes=60))
-            )
-
-    def test_mixed_notes_has_received_similar_notes_within(self):
-        user = UserFactory()
-        case_uuid = uuid4()
-
-        with freeze_time("2023-01-01 01:00:00"):
-            note_info = UserCaseInfoObjectNotificationFactory(
-                user=user, case_uuid=case_uuid, is_sent=True
-            )
-            note_status = UserCaseStatusNotificationFactory(
-                user=user, case_uuid=case_uuid, is_sent=True
-            )
-            # check each type also sees the other
-            self.assertTrue(
-                note_info.has_received_similar_notes_within(timedelta(minutes=60))
-            )
-            self.assertTrue(
-                note_status.has_received_similar_notes_within(timedelta(minutes=60))
+                note.has_received_similar_notes_within(
+                    timedelta(minutes=60), "case_document_notification"
+                )
             )
