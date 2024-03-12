@@ -103,6 +103,7 @@ django==4.2.10
     #   django-htmx
     #   django-import-export
     #   django-js-asset
+    #   django-jsonform
     #   django-localflavor
     #   django-log-outgoing-requests
     #   django-open-forms-client
@@ -144,10 +145,6 @@ django-autoslug==1.9.8
     # via -r requirements/base.in
 django-axes==5.25.0
     # via -r requirements/base.in
-django-better-admin-arrayfield==1.4.2
-    # via
-    #   -r requirements/base.in
-    #   mozilla-django-oidc-db
 django-choices==2.0.0
     # via mail-editor
 django-ckeditor==6.7.0
@@ -201,6 +198,10 @@ django-ipware==4.0.0
     # via django-axes
 django-js-asset==2.2.0
     # via django-ckeditor
+django-jsonform==2.22.0
+    # via
+    #   -r requirements/base.in
+    #   mozilla-django-oidc-db
 django-localflavor==3.1
     # via -r requirements/base.in
 django-log-outgoing-requests==0.6.1
@@ -374,7 +375,7 @@ messagebird==2.1.0
     # via -r requirements/base.in
 mozilla-django-oidc==2.0.0
     # via mozilla-django-oidc-db
-mozilla-django-oidc-db==0.12.0
+mozilla-django-oidc-db==0.14.1
     # via -r requirements/base.in
 notifications-api-common==0.2.2
     # via -r requirements/base.in

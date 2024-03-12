@@ -10,7 +10,7 @@ from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 
 from colorfield.fields import ColorField
-from django_better_admin_arrayfield.models.fields import ArrayField
+from django_jsonform.models.fields import ArrayField
 from filer.fields.image import FilerImageField
 from ordered_model.models import OrderedModel, OrderedModelManager
 from solo.models import SingletonModel

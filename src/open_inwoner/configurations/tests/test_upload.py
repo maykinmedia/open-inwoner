@@ -23,6 +23,11 @@ class CustomFontsTest(ClearCachesMixin, WebTest):
             reverse("admin:configurations_siteconfiguration_change"), user=self.user
         ).forms["siteconfiguration_form"]
 
+        # django-jsonform requires JS to work properly and with Webtest the default
+        # value for ArrayFields is an empty string, causing it crash to when trying to parse
+        # that value as JSON
+        self.form["recipients_email_digest"] = "[]"
+
     def test_upload_font_correct_filetype(self):
         font_file = Upload("valid.ttf", b"content", content_type="font/ttf")
         self.form["name"] = "Test"

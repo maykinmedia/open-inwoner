@@ -1,12 +1,9 @@
-from collections import defaultdict
-
 from django import forms
 from django.contrib import admin
 from django.forms import BaseModelFormSet
 from django.utils.translation import gettext as _
 
-from django_better_admin_arrayfield.admin.mixins import DynamicArrayMixin
-from django_better_admin_arrayfield.forms.widgets import DynamicArrayWidget
+from django_jsonform.forms.fields import JSONFormField
 from import_export.admin import ImportExportMixin
 from import_export.formats import base_formats
 from ordered_model.admin import OrderedInlineModelAdminMixin, OrderedTabularInline
@@ -22,40 +19,6 @@ from ..resources import CategoryExportResource, CategoryImportResource
 from .faq import QuestionInline
 
 
-class ZaakTypenSelectWidget(forms.Select):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        zaaktypen = ZaakTypeConfig.objects.order_by("catalogus__domein", "omschrijving")
-
-        # Create an optgroup for each Catalogus and its ZaakTypen
-        choices_dict = defaultdict(list)
-        choices_dict[""] = [
-            (
-                "",
-                "-------",
-            )
-        ]
-        for zaaktype in zaaktypen:
-            choices_dict[
-                f"{zaaktype.catalogus.domein} - {zaaktype.catalogus.rsin}"
-            ].append(
-                (
-                    zaaktype.identificatie,
-                    zaaktype.omschrijving,
-                )
-            )
-
-        self.choices = choices_dict.items()
-
-
-class DynamicArraySelectWidget(DynamicArrayWidget):
-    def __init__(self, *args, **kwargs):
-        kwargs["subwidget_form"] = ZaakTypenSelectWidget
-
-        super().__init__(*args, **kwargs)
-
-
 class CategoryProductInline(OrderedTabularInline):
     model = CategoryProduct
     fields = (
@@ -67,11 +30,44 @@ class CategoryProductInline(OrderedTabularInline):
     extra = 1
 
 
+def zaaktypen_select_schema() -> dict:
+    zaaktypen = ZaakTypeConfig.objects.order_by("catalogus__domein", "omschrijving")
+
+    choices = []
+    for zaaktype in zaaktypen:
+        title = zaaktype.omschrijving
+        # eSuite doesn't have the Catalogus resource
+        if zaaktype.catalogus:
+            title = f"{zaaktype.catalogus.domein} - {zaaktype.catalogus.rsin}: {title}"
+
+        choices.append(
+            {
+                "value": zaaktype.identificatie,
+                "title": title,
+            }
+        )
+
+    choices.sort(key=lambda item: item["title"])
+
+    schema = {
+        "type": "array",
+        "items": {"type": "string", "choices": choices, "widget": "multiselect"},
+    }
+    return schema
+
+
 class CategoryAdminForm(movenodeform_factory(Category)):
+    zaaktypen = JSONFormField(schema=zaaktypen_select_schema, required=False)
+
     class Meta:
         model = Category
         fields = "__all__"
-        widgets = {"description": CKEditorWidget, "zaaktypen": DynamicArraySelectWidget}
+        widgets = {"description": CKEditorWidget}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["zaaktypen"].help_text = self.Meta.model.zaaktypen.field.help_text
 
     def clean(self, *args, **kwargs):
         cleaned_data = super().clean(*args, **kwargs)
@@ -123,9 +119,7 @@ class CategoryAdminFormSet(BaseModelFormSet):
 
 
 @admin.register(Category)
-class CategoryAdmin(
-    OrderedInlineModelAdminMixin, ImportExportMixin, TreeAdmin, DynamicArrayMixin
-):
+class CategoryAdmin(OrderedInlineModelAdminMixin, ImportExportMixin, TreeAdmin):
     change_list_template = "admin/category_change_list.html"
     form = CategoryAdminForm
     inlines = (

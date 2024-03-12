@@ -3,7 +3,7 @@
 import django.db.models.deletion
 from django.db import migrations, models
 
-import django_better_admin_arrayfield.models.fields
+import django_jsonform.models.fields
 
 
 class Migration(migrations.Migration):
@@ -49,7 +49,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "zaaktype_uuids",
-                    django_better_admin_arrayfield.models.fields.ArrayField(
+                    django_jsonform.models.fields.ArrayField(
                         base_field=models.UUIDField(verbose_name="Zaaktype UUID"),
                         default=list,
                         size=None,
