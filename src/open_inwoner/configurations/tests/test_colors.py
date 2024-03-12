@@ -27,6 +27,10 @@ class TestConfigurationColors(WebTest):
         form["secondary_font_color"] = "#FFFFFF"
         form["accent_color"] = "#FFFFFF"
         form["accent_font_color"] = "#FFFFFF"
+        # django-jsonform requires JS to work properly and with Webtest the default
+        # value for ArrayFields is an empty string, causing it crash to when trying to parse
+        # that value as JSON
+        form["recipients_email_digest"] = "[]"
         response = form.submit("_continue").follow()
 
         messages = list(response.context["messages"])

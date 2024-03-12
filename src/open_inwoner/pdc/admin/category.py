@@ -52,7 +52,7 @@ def zaaktypen_select_schema() -> dict:
 
 
 class CategoryAdminForm(movenodeform_factory(Category)):
-    zaaktypen = JSONFormField(schema=zaaktypen_select_schema)
+    zaaktypen = JSONFormField(schema=zaaktypen_select_schema, required=False)
 
     class Meta:
         model = Category

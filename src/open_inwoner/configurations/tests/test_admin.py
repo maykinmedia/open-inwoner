@@ -118,6 +118,10 @@ class TestAdminForm(WebTest):
         self.form["secondary_font_color"] = "#FFFFFF"
         self.form["accent_color"] = "#FFFFFF"
         self.form["accent_font_color"] = "#FFFFFF"
+        # django-jsonform requires JS to work properly and with Webtest the default
+        # value for ArrayFields is an empty string, causing it crash to when trying to parse
+        # that value as JSON
+        self.form["recipients_email_digest"] = "[]"
 
     def test_valid_path_is_saved(self):
         config = SiteConfiguration.get_solo()
