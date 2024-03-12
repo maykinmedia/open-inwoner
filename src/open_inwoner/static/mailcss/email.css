@@ -109,16 +109,25 @@ td.align-center {
 
 .td-mail__bg-white {
     background-color: #ffffff;
-    border: 1px solid #ffffff;
-    border-radius: 6px;
-    color: #704000;
-    display: inline-block;
+    color: #4B4B4B;
     font-family: Lato, Helvetica, Arial, sans-serif;
     font-size: 16px;
     line-height: 24px;
     text-decoration: none;
     width: 100%;
     -webkit-text-size-adjust: none;
+}
+
+.mail-cell--rounded {
+    border: 1px solid #ffffff;
+    border-radius: 3px;
+    display: inline-block;
+    margin: 3px;
+    padding: 3px;
+}
+
+.mail--transparent {
+    background-color: transparent;
 }
 
 .td__padding-top {
@@ -139,6 +148,10 @@ td.align-center {
 
 .td__padding-all {
     padding: 20px 24px 20px 24px;
+}
+
+.cell--rounded-padding {
+    padding: 20px 30px 20px 20px;
 }
 
 .td__padding-zero {
@@ -163,7 +176,7 @@ td.align-center {
 
 .button--primary {
     border: 1px solid;
-    border-radius: 6px;
+    border-radius: 3px;
     color: #ffffff;
     display: inline-block;
     font-family: sans-serif;
