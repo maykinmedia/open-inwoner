@@ -29,9 +29,7 @@ brotli==1.0.9
 cbor2==5.6.2
     # via webauthn
 celery==5.2.7
-    # via
-    #   django-yubin
-    #   notifications-api-common
+    # via notifications-api-common
 certifi==2023.11.17
     # via
     #   django-simple-certmanager
@@ -106,6 +104,7 @@ django==4.2.10
     #   django-jsonform
     #   django-localflavor
     #   django-log-outgoing-requests
+    #   django-mailer
     #   django-open-forms-client
     #   django-otp
     #   django-phonenumber-field
@@ -206,6 +205,8 @@ django-localflavor==3.1
     # via -r requirements/base.in
 django-log-outgoing-requests==0.6.1
     # via -r requirements/base.in
+django-mailer==2.3.1
+    # via -r requirements/base.in
 django-open-forms-client==0.3.0
     # via -r requirements/base.in
 django-ordered-model==3.7.4
@@ -261,8 +262,6 @@ django-treebeard==4.4
 django-two-factor-auth[phonenumberslite,webauthn]==1.16.0
     # via maykin-2fa
 django-view-breadcrumbs==2.5.1
-    # via -r requirements/base.in
-django-yubin==2.0.3
     # via -r requirements/base.in
 djangocms-admin-style==3.2.3
     # via django-cms
@@ -350,6 +349,8 @@ jsonschema==4.1.0
     # via drf-spectacular
 kombu==5.2.4
     # via celery
+lockfile==0.12.2
+    # via django-mailer
 lxml==4.9.1
     # via
     #   django-digid-eherkenning
@@ -359,8 +360,6 @@ lxml==4.9.1
     #   xmlsec
 mail-editor @ git+https://github.com/maykinmedia/mail-editor.git@0.3.6
     # via -r requirements/base.in
-mail-parser==3.15.0
-    # via django-yubin
 markdown==3.3.6
     # via -r requirements/base.in
 markuppy==1.14
@@ -443,7 +442,6 @@ pytz==2021.3
     # via
     #   -r requirements/base.in
     #   celery
-    #   django-yubin
     #   djangorestframework
 pyyaml==6.0
     # via
@@ -471,8 +469,6 @@ requests==2.31.0
     #   zgw-consumers
 sentry-sdk==1.38.0
     # via -r requirements/base.in
-simplejson==3.18.0
-    # via mail-parser
 six==1.16.0
     # via
     #   click-repl
@@ -481,7 +477,6 @@ six==1.16.0
     #   furl
     #   html5lib
     #   isodate
-    #   mail-parser
     #   orderedmultidict
     #   python-dateutil
     #   qrcode

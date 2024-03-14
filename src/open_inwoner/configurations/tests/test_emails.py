@@ -1,11 +1,39 @@
+import uuid
+
 from django.core import mail
+from django.core.mail import EmailMessage
 from django.core.management import call_command
 from django.test import TestCase
+from django.utils import timezone
 
-from django_yubin.models import Log, Message
 from freezegun import freeze_time
+from mailer.models import (
+    PRIORITY_MEDIUM,
+    RESULT_FAILURE,
+    RESULT_SUCCESS,
+    MessageLog,
+    email_to_db,
+)
 
 from ..models import SiteConfiguration
+
+
+def make_message_log(to, subject, result):
+    """
+    hand-craft a minimal version of what django-mailer stores as log
+    """
+    assert isinstance(to, list)
+    data = EmailMessage(subject=subject, to=to, from_email="from@example.com")
+
+    log = MessageLog.objects.create(
+        message_id=f"message_id-{uuid.uuid4()}",
+        # it wraps pickle and base64
+        message_data=email_to_db(data),
+        result=result,
+        when_added=timezone.now(),
+        priority=PRIORITY_MEDIUM,
+    )
+    return log
 
 
 class DailyFailingEmailDigestTestCase(TestCase):
@@ -15,12 +43,7 @@ class DailyFailingEmailDigestTestCase(TestCase):
         config.save()
 
         with freeze_time("2024-01-01T12:00:00"):
-            message = Message.objects.create(
-                subject="Some subject",
-                from_address="from@example.com",
-                to_address="to@example.com",
-            )
-            Log.objects.create(message=message, log_message="Some ")
+            make_message_log(["to@example.com"], "failed message", RESULT_FAILURE)
 
         with freeze_time("2024-01-02T00:00:00"):
             call_command("send_failed_mail_digest")
@@ -33,12 +56,7 @@ class DailyFailingEmailDigestTestCase(TestCase):
         config.save()
 
         with freeze_time("2023-12-31T12:00:00"):
-            message = Message.objects.create(
-                subject="Some subject",
-                from_address="from@example.com",
-                to_address="to@example.com",
-            )
-            Log.objects.create(message=message, log_message="Some msg")
+            make_message_log(["to@example.com"], "failed message", RESULT_FAILURE)
 
         with freeze_time("2024-01-02T00:00:00"):
             call_command("send_failed_mail_digest")
@@ -51,20 +69,19 @@ class DailyFailingEmailDigestTestCase(TestCase):
         config.save()
 
         with freeze_time("2023-12-31T12:00:00"):
-            message = Message.objects.create(
-                subject="Should not show up in email",
-                from_address="from@example.com",
-                to_address="to@example.com",
+            # out of date range
+            make_message_log(
+                ["to@example.com"], "Should not show up in email", RESULT_SUCCESS
             )
-            Log.objects.create(message=message, log_message="Some msg")
 
         with freeze_time("2024-01-01T12:00:00"):
-            message = Message.objects.create(
-                subject="Should show up in email",
-                from_address="from@example.com",
-                to_address="to@example.com",
+            make_message_log(
+                ["to@example.com"], "Should show up in email", RESULT_FAILURE
             )
-            Log.objects.create(message=message, log_message="Some msg")
+            # in range but success
+            make_message_log(
+                ["to@example.com"], "Should not show up in email", RESULT_SUCCESS
+            )
 
         with freeze_time("2024-01-02T00:00:00"):
             call_command("send_failed_mail_digest")

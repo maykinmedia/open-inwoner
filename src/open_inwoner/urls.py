@@ -127,7 +127,6 @@ urlpatterns = [
     ),
     path("login/failure/", OIDCFailureView.as_view(), name="oidc-error"),
     path("faq/", FAQView.as_view(), name="general_faq"),
-    path("yubin/", include("django_yubin.urls")),
     path("apimock/", include("open_inwoner.apimock.urls")),
     path("kvk/", include("open_inwoner.kvk.urls")),
     # TODO move search to products cms app?
