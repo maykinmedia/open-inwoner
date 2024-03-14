@@ -52,6 +52,10 @@ td, .td-mail {
     color: #2566A7;
 }
 
+.td-mail__bg-success .td-mail__bg-white a {
+    color: #4A7746;
+}
+
 .td__logo-mail {
     text-align: center;
     padding-top: 16px;
@@ -101,6 +105,10 @@ td.align-center {
 
 .td-mail__bg-info {
     background-color: #D5E6F6;
+}
+
+.td-mail__bg-success {
+    background-color: #ECF4EC;
 }
 
 .td-mail__bg-danger {
@@ -193,6 +201,10 @@ td.align-center {
 
 .text-color__info {
     color: #2566A7;
+}
+
+.text-color__success {
+    color: #4A7746;
 }
 
 .text-color__danger {

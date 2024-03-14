@@ -1,0 +1,85 @@
+<table role="presentation" border="0" cellspacing="0" cellpadding="0" width="100%" class="table-mail">
+    <tbody>
+    <tr>
+        <td class="td-mail td__padding-all" colspan="6">
+            <p>Beste inwoner,</p>
+            <p>Wij hebben uw vraag ontvangen.</p>
+        </td>
+    </tr>
+    <tr>
+        <td class="spacing__extra" colspan="6">
+            &nbsp;
+        </td>
+    </tr>
+    <tr class="tr--responsive">
+        <td class="td--responsive td-mail td-mail__bg-success td__padding-all td__leftcell" colspan="3">
+            <p><span class="text-color__small-gray-900">Vraag: </span></p>
+            <h2>{{ subject }}</h2>
+        </td>
+    </tr>
+
+    <!-- Contains Table with different column-widths -->
+    <tr class="mail--transparent">
+        <td class="td-mail td-mail__bg-success cell--rounded-padding" colspan="6">
+            <div class="td-mail__bg-white mail-cell--rounded">
+                <table role="presentation" border="0" cellspacing="0" cellpadding="0" width="100%" class="mail--transparent">
+                    <tr>
+                        <td width="35" class="td-mail mail--transparent td__padding-left align-center">
+                            <img src="/static/img/mail/check_success-green.png" width="20" height="20" alt="" class="mail__icon">
+                        </td>
+                        <td class="td-mail mail--transparent td__padding-top td__padding-right td__padding-bottom align-center">
+                            <p class="text-color__success">Wij hebben uw <strong>vraag ontvangen</strong> op {{ site_name }}. Eén van onze medewerkers beantwoordt deze zo snel mogelijk.</p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </td>
+    </tr>
+    <!-- end of Table with differing column-widths -->
+
+    <tr>
+        <td class="td-mail td-mail__bg-success td__padding-all td__success-link" colspan="6">
+            <p></p>
+        </td>
+    </tr>
+    <tr>
+        <td class="spacing__extra" colspan="6">
+            &nbsp;
+        </td>
+    </tr>
+    <tr>
+        <td class="td-mail td__padding-all" colspan="6">
+            <p>Met vriendelijke groet,</p>
+            <p>&nbsp;</p>
+            <p>{{ site_name }}</p>
+        </td>
+    </tr>
+    <tr class="tr-mail">
+        <td class="td-mail spacer-bottom td__padding-zero" colspan="6">
+            <!-- <hr> styling -->
+        </td>
+    </tr>
+    <tr>
+        <td class="td-mail td__padding-top td__padding-right td__padding-left" colspan="6">
+            <p>Dit bericht is automatisch verzonden. U kunt <strong>niet reageren</strong> op deze e-mail. </p>
+            <p>&nbsp;</p>
+            <p><strong>Contact opnemen</strong></p>
+        </td>
+    </tr>
+    <tr>
+        <td class="td--responsive td-mail td__padding-right td__padding-bottom td__padding-left td__leftcell" colspan="2"><p><a href="{{ contact_page }}">Ga naar onze contactpagina</a></p>
+        </td>
+        <td class="td--responsive td-mail td__padding-right td__padding-bottom td__padding-left td__rightcell td__nowrap" colspan="4"><p><a href="tel:{{ contact_phonenumber }}" data-rel="external">Bel {{ contact_phonenumber }}</a></p></td>
+    </tr>
+    <tr class="tr-mail border-top">
+        <td class="td-mail border-top td__padding-zero" colspan="6">
+            <!-- <hr> styling --> &nbsp;
+        </td>
+    </tr>
+    <tr>
+        <td class="td-mail td__padding-right td__padding-bottom td__padding-left" colspan="6">
+            <p>Pas hier uw <a href="{{ profile_notifications }}">voorkeuren</a> aan voor de notificaties. </p>
+        </td>
+    </tr>
+    </tbody>
+</table>
