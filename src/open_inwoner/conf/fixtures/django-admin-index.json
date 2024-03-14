@@ -3,6 +3,7 @@
     "model": "admin_index.appgroup",
     "fields": {
         "order": 0,
+        "translations": {},
         "name": "Gebruikersprofielen",
         "slug": "accounts",
         "models": [
@@ -41,6 +42,7 @@
     "model": "admin_index.appgroup",
     "fields": {
         "order": 2,
+        "translations": {},
         "name": "PDC",
         "slug": "pdc",
         "models": [
@@ -99,6 +101,7 @@
     "model": "admin_index.appgroup",
     "fields": {
         "order": 4,
+        "translations": {},
         "name": "Permissies, 2FA en logging",
         "slug": "permissies-2fa-en-logging",
         "models": [
@@ -141,6 +144,7 @@
     "model": "admin_index.appgroup",
     "fields": {
         "order": 10,
+        "translations": {},
         "name": "Overige / Diverse",
         "slug": "overige-diverse",
         "models": [
@@ -183,6 +187,7 @@
     "model": "admin_index.appgroup",
     "fields": {
         "order": 8,
+        "translations": {},
         "name": "Configuratie",
         "slug": "configuratie",
         "models": [
@@ -217,6 +222,7 @@
     "model": "admin_index.appgroup",
     "fields": {
         "order": 3,
+        "translations": {},
         "name": "Zoeken",
         "slug": "zoeken",
         "models": [
@@ -239,6 +245,7 @@
     "model": "admin_index.appgroup",
     "fields": {
         "order": 1,
+        "translations": {},
         "name": "Plannen",
         "slug": "plannen",
         "models": [
@@ -261,24 +268,23 @@
     "model": "admin_index.appgroup",
     "fields": {
         "order": 9,
+        "translations": {
+            "nl": "Emails"
+        },
         "name": "Emails",
         "slug": "emails",
         "models": [
             [
-                "django_yubin",
-                "blacklist"
+                "mailer",
+                "dontsendentry"
             ],
             [
-                "django_yubin",
-                "log"
-            ],
-            [
-                "django_yubin",
+                "mailer",
                 "message"
             ],
             [
-                "django_yubin",
-                "queuedmessage"
+                "mailer",
+                "messagelog"
             ]
         ]
     }
@@ -287,6 +293,7 @@
     "model": "admin_index.appgroup",
     "fields": {
         "order": 5,
+        "translations": {},
         "name": "Data koppelingen",
         "slug": "koppelingen",
         "models": [
@@ -357,6 +364,7 @@
     "model": "admin_index.appgroup",
     "fields": {
         "order": 7,
+        "translations": {},
         "name": "CMS",
         "slug": "cms",
         "models": [
@@ -407,6 +415,7 @@
     "model": "admin_index.appgroup",
     "fields": {
         "order": 6,
+        "translations": {},
         "name": "Inlog koppelingen",
         "slug": "auth-koppelingen",
         "models": [
@@ -441,6 +450,7 @@
     "model": "admin_index.applink",
     "fields": {
         "order": 0,
+        "translations": {},
         "app_group": [
             "overige-diverse"
         ],
@@ -452,6 +462,7 @@
     "model": "admin_index.applink",
     "fields": {
         "order": 1,
+        "translations": {},
         "app_group": [
             "overige-diverse"
         ],
@@ -463,6 +474,7 @@
     "model": "admin_index.applink",
     "fields": {
         "order": 2,
+        "translations": {},
         "app_group": [
             "overige-diverse"
         ],

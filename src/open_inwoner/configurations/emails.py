@@ -1,15 +1,23 @@
+import logging
 from datetime import timedelta
 
 from django.db.models import F
 from django.utils import timezone
 
-from django_yubin.models import Log
 from mail_editor.helpers import find_template
 
 from open_inwoner.configurations.models import SiteConfiguration
 
 
 def inform_admins_about_failing_emails():
+    # TODO update this to use django-mailer instead of django-yubin
+    logging.getLogger(__name__).warning(
+        "daily_email_digest not sent: update from django-yubin"
+    )
+    return
+
+    from django_yubin.models import Log
+
     config = SiteConfiguration.get_solo()
     inform_users = config.recipients_email_digest
 

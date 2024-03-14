@@ -90,7 +90,6 @@ celery==5.2.7
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-    #   django-yubin
     #   notifications-api-common
 certifi==2023.11.17
     # via
@@ -220,6 +219,7 @@ django==4.2.10
     #   django-jsonform
     #   django-localflavor
     #   django-log-outgoing-requests
+    #   django-mailer
     #   django-open-forms-client
     #   django-otp
     #   django-phonenumber-field
@@ -381,6 +381,10 @@ django-log-outgoing-requests==0.6.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+django-mailer==2.3.1
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 django-open-forms-client==0.3.0
     # via
     #   -c requirements/ci.txt
@@ -481,10 +485,6 @@ django-view-breadcrumbs==2.5.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
 django-webtest==1.9.11
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-django-yubin==2.0.3
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -710,6 +710,11 @@ lazy-object-proxy==1.6.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   astroid
+lockfile==0.12.2
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   django-mailer
 locust==2.20.0
     # via -r requirements/dev.in
 lxml==4.9.1
@@ -726,11 +731,6 @@ mail-editor @ git+https://github.com/maykinmedia/mail-editor.git@0.3.6
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-mail-parser==3.15.0
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   django-yubin
 markdown==3.3.6
     # via
     #   -c requirements/ci.txt
@@ -952,7 +952,6 @@ pytz==2021.3
     #   -r requirements/ci.txt
     #   babel
     #   celery
-    #   django-yubin
     #   djangorestframework
 pyyaml==6.0
     # via
@@ -1006,11 +1005,6 @@ sentry-sdk==1.38.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-simplejson==3.18.0
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   mail-parser
 six==1.16.0
     # via
     #   -c requirements/ci.txt
@@ -1022,7 +1016,6 @@ six==1.16.0
     #   geventhttpclient
     #   html5lib
     #   isodate
-    #   mail-parser
     #   orderedmultidict
     #   python-dateutil
     #   qrcode
