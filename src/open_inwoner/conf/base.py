@@ -340,7 +340,8 @@ EMAIL_TIMEOUT = 10
 
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="openinwoner@maykinmedia.nl")
 
-EMAIL_BACKEND = "django_yubin.smtp_queue.EmailBackend"
+EMAIL_BACKEND = "django_yubin.backends.QueuedEmailBackend"
+MAILER_USE_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
 #
 # LOGGING
