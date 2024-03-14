@@ -39,7 +39,7 @@ class TestSMSVerificationLogin(WebTest):
         self.config.login_2fa_sms = False
         self.config.save()
 
-        response = self.app.get(reverse("login"))
+        response = self.app.get(reverse("login_email"))
         mock_gateway_send.assert_not_called()
 
         login_form = response.forms["login-form"]
@@ -54,7 +54,7 @@ class TestSMSVerificationLogin(WebTest):
 
     @patch("open_inwoner.accounts.gateways.gateway.send")
     def test_login_with_valid_token_succeeds(self, mock_gateway_send):
-        response = self.app.get(reverse("login"))
+        response = self.app.get(reverse("login_email"))
         mock_gateway_send.assert_not_called()
 
         login_form = response.forms["login-form"]
@@ -76,7 +76,7 @@ class TestSMSVerificationLogin(WebTest):
 
     @patch("open_inwoner.accounts.gateways.gateway.send")
     def test_login_with_invalid_token_fails(self, mock_gateway_send):
-        response = self.app.get(reverse("login"))
+        response = self.app.get(reverse("login_email"))
         mock_gateway_send.assert_not_called()
 
         login_form = response.forms["login-form"]
@@ -101,7 +101,7 @@ class TestSMSVerificationLogin(WebTest):
     def test_login_fails_with_sms_failure(self, mock_gateway_send):
         mock_gateway_send.side_effect = GatewayError
 
-        response = self.app.get(reverse("login"))
+        response = self.app.get(reverse("login_email"))
         mock_gateway_send.assert_not_called()
 
         login_form = response.forms["login-form"]
@@ -138,7 +138,7 @@ class TestSMSVerificationLogin(WebTest):
     @override_settings(ACCOUNTS_USER_TOKEN_EXPIRE_TIME=300)
     def test_login_fails_with_token_timeout(self, mock_gateway_send):
         with freeze_time("2023-05-22 11:00:00"):
-            response = self.app.get(reverse("login"))
+            response = self.app.get(reverse("login_email"))
             mock_gateway_send.assert_not_called()
 
             login_form = response.forms["login-form"]
@@ -160,11 +160,12 @@ class TestSMSVerificationLogin(WebTest):
             response = verify_token_form.submit()
 
             self.assertRedirects(response, reverse("login"))
+            # Or to view reverse("login") ?
 
     @patch("open_inwoner.accounts.gateways.gateway.send")
     def test_login_token_with_max_attempts(self, mock_gateway_send):
         with freeze_time("2023-05-22 12:00:00") as frozen_time:
-            response = self.app.get(reverse("login"))
+            response = self.app.get(reverse("login_email"))
             mock_gateway_send.assert_not_called()
 
             # login form
@@ -204,7 +205,7 @@ class TestSMSVerificationLogin(WebTest):
             frozen_time.tick(delta=datetime.timedelta(minutes=-1))
             other_user = UserFactory(email="ex2@example.com", password="secret2")
 
-            response = self.app.get(reverse("login"))
+            response = self.app.get(reverse("login_email"))
             login_form = response.forms["login-form"]
             login_form["username"] = other_user.email
             login_form["password"] = "secret2"
@@ -229,7 +230,7 @@ class TestSMSVerificationLogin(WebTest):
     @patch("open_inwoner.accounts.gateways.gateway.send")
     @freeze_time("2023-05-22 12:00:00")
     def test_login_when_resending_sms(self, mock_gateway_send):
-        response = self.app.get(reverse("login"))
+        response = self.app.get(reverse("login_email"))
         mock_gateway_send.assert_not_called()
 
         login_form = response.forms["login-form"]
@@ -275,7 +276,7 @@ class TestSMSVerificationLogin(WebTest):
         self, mock_gateway_send, mock_login_throttle_visits
     ):
         with freeze_time("2023-05-22 12:00:00"):
-            response = self.app.get(reverse("login"))
+            response = self.app.get(reverse("login_email"))
             mock_gateway_send.assert_not_called()
 
             login_form = response.forms["login-form"]
@@ -325,7 +326,7 @@ class TestSMSVerificationLogin(WebTest):
 
         # new attempt 5 minutes later
         with freeze_time("2023-05-22 12:05:01"):
-            response = self.app.get(reverse("login"))
+            response = self.app.get(reverse("login_email"))
             login_form = response.forms["login-form"]
             login_form["username"] = self.user.email
             login_form["password"] = "secret"
@@ -386,7 +387,7 @@ class TestSMSVerificationLogin(WebTest):
         self.user.phonenumber = ""
         self.user.save()
 
-        response = self.app.get(reverse("login"))
+        response = self.app.get(reverse("login_email"))
         mock_gateway_send.assert_not_called()
 
         form = response.forms["login-form"]
@@ -424,7 +425,7 @@ class TestSMSVerificationLogin(WebTest):
         self.user.phonenumber = ""
         self.user.save()
 
-        response = self.app.get(reverse("login"))
+        response = self.app.get(reverse("login_email"))
         mock_gateway_send.assert_not_called()
 
         form = response.forms["login-form"]
