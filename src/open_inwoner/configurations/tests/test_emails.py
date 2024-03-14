@@ -11,6 +11,10 @@ from ..models import SiteConfiguration
 # TODO update to django-mailer
 # from django_yubin.models import Log, Message
 
+# silence flake8 before refactor
+Message = object
+Log = object
+
 
 @skip("update this to use django-mailer instead of django-yubin")
 class DailyFailingEmailDigestTestCase(TestCase):

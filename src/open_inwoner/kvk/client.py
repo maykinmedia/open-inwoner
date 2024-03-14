@@ -4,7 +4,7 @@ from typing import Optional
 from urllib.parse import urlencode
 
 import requests
-from simplejson.errors import JSONDecodeError
+from requests.exceptions import JSONDecodeError
 
 from .constants import CompanyType
 from .models import KvKConfig
