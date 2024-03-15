@@ -149,6 +149,8 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
         self.assertIn(_("Nieuw antwoord beschikbaar"), response.text)
 
     def test_list_for_kvk_or_rsin(self, m, mock_get_kcm_answer_mapping):
+        data = MockAPIReadData().install_mocks(m)
+
         for use_rsin_for_innNnpId_query_parameter in [True, False]:
             with self.subTest(
                 use_rsin_for_innNnpId_query_parameter=use_rsin_for_innNnpId_query_parameter
@@ -158,8 +160,6 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
                     use_rsin_for_innNnpId_query_parameter
                 )
                 config.save()
-
-                data = MockAPIReadData().install_mocks(m)
 
                 detail_url = reverse(
                     "cases:contactmoment_detail",
@@ -364,6 +364,8 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
         )
 
     def test_show_detail_for_kvk_or_rsin(self, m, mock_get_kcm_answer_mapping):
+        data = MockAPIReadData().install_mocks(m)
+
         for use_rsin_for_innNnpId_query_parameter in [True, False]:
             with self.subTest(
                 use_rsin_for_innNnpId_query_parameter=use_rsin_for_innNnpId_query_parameter
@@ -376,8 +378,6 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
                     use_rsin_for_innNnpId_query_parameter
                 )
                 config.save()
-
-                data = MockAPIReadData().install_mocks(m)
 
                 detail_url = reverse(
                     "cases:contactmoment_detail",

@@ -1,5 +1,3 @@
-from unittest import skip
-
 from django.db import IntegrityError, transaction
 from django.test import TestCase
 
@@ -50,12 +48,10 @@ class UserIdentifierConstraintTests(TestCase):
         with self.assertRaises(IntegrityError):
             UserFactory(rsin="12345678", login_type=LoginTypeChoices.eherkenning)
 
-    @skip("Not yet implemented")
-    def test_not_both_kvk_and_rsin_when_login_eherkenning(self):
-        with self.assertRaises(IntegrityError):
-            UserFactory(
-                kvk="12345678", rsin="12345678", login_type=LoginTypeChoices.eherkenning
-            )
+    def test_both_kvk_and_rsin_when_login_eherkenning(self):
+        UserFactory(
+            kvk="12345678", rsin="12345678", login_type=LoginTypeChoices.eherkenning
+        )
 
     def test_not_bsn_when_login_not_digid(self):
         for login_type in [
