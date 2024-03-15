@@ -318,6 +318,10 @@
                 "openklantconfig"
             ],
             [
+                "openklant",
+                "klantcontactmomentanswer"
+            ],
+            [
                 "openzaak",
                 "catalogusconfig"
             ],

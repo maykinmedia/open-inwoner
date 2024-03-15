@@ -5,6 +5,10 @@
     {% for contactmoment in questions %}
         {# redirect to fetch klantcontactmoment from contactmoment #}
         <a href="{% url 'cases:kcm_redirect' contactmoment.uuid %}" class="card card--compact card--stretch card--toggle-hide contactmomenten__link">
+            {% if contactmoment.new_answer_available %}
+                {% translate "Nieuw antwoord beschikbaar" as new_answer_text %}
+                {% include "components/StatusIndicator/StatusIndicator.html" with status_indicator="info" status_indicator_text=new_answer_text only %}
+            {% endif %}
             <div class="card__body">
                 {% render_list %}
                 <span class="contactmomenten-list">

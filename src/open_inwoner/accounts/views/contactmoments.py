@@ -16,12 +16,14 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 from open_inwoner.openklant.api_models import KlantContactMoment
 from open_inwoner.openklant.clients import build_client
 from open_inwoner.openklant.constants import Status
-from open_inwoner.openklant.models import ContactFormSubject
+from open_inwoner.openklant.models import ContactFormSubject, KlantContactMomentAnswer
 from open_inwoner.openklant.views.contactform import ContactFormView
 from open_inwoner.openklant.wrap import (
+    contactmoment_has_new_answer,
     fetch_klantcontactmoment,
     fetch_klantcontactmomenten,
     get_fetch_parameters,
+    get_kcm_answer_mapping,
 )
 from open_inwoner.openzaak.clients import build_client as build_client_openzaak
 from open_inwoner.utils.mixins import PaginationMixin
@@ -71,12 +73,17 @@ class KCMDict(TypedDict):
     onderwerp: str
     status: str
     antwoord: str
+    new_answer_available: bool
 
 
 class KlantContactMomentBaseView(
     CommonPageMixin, BaseBreadcrumbMixin, KlantContactMomentAccessMixin, TemplateView
 ):
-    def get_kcm_data(self, kcm: KlantContactMoment) -> KCMDict:
+    def get_kcm_data(
+        self,
+        kcm: KlantContactMoment,
+        local_kcm_mapping: Optional[dict[str, KlantContactMomentAnswer]] = None,
+    ) -> KCMDict:
         data = {
             "registered_date": kcm.contactmoment.registratiedatum,
             "channel": kcm.contactmoment.kanaal.title(),
@@ -87,6 +94,9 @@ class KlantContactMomentBaseView(
             "type": kcm.contactmoment.type,
             "status": Status.safe_label(kcm.contactmoment.status, _("Onbekend")),
             "antwoord": kcm.contactmoment.antwoord,
+            "new_answer_available": contactmoment_has_new_answer(
+                kcm.contactmoment, local_kcm_mapping=local_kcm_mapping
+            ),
         }
 
         # replace e_suite_subject_code with OIP configured subject, if applicable
@@ -155,7 +165,15 @@ class KlantContactMomentListView(
         kcms = fetch_klantcontactmomenten(
             **get_fetch_parameters(self.request, use_vestigingsnummer=True)
         )
-        ctx["contactmomenten"] = [self.get_kcm_data(kcm) for kcm in kcms]
+        ctx["contactmomenten"] = [
+            self.get_kcm_data(
+                kcm,
+                local_kcm_mapping=get_kcm_answer_mapping(
+                    [kcm.contactmoment for kcm in kcms], self.request.user
+                ),
+            )
+            for kcm in kcms
+        ]
         paginator_dict = self.paginate_with_context(ctx["contactmomenten"])
         ctx.update(paginator_dict)
         return ctx
@@ -187,6 +205,13 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
 
         if not kcm:
             raise Http404()
+
+        local_kcm, is_created = KlantContactMomentAnswer.objects.get_or_create(  # noqa
+            user=self.request.user, contactmoment_url=kcm.contactmoment.url
+        )
+        if not local_kcm.is_seen:
+            local_kcm.is_seen = True
+            local_kcm.save()
 
         if client := build_client("contactmomenten"):
             zaken_client = build_client_openzaak("zaak")

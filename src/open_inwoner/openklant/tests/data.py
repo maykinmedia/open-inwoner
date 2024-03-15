@@ -144,8 +144,9 @@ class MockAPIReadData(MockAPIData):
             type="SomeType",
             kanaal="MAIL",
             status=Status.afgehandeld,
-            antwoord="",
+            antwoord="foo",
             onderwerp="e_suite_subject_code",
+            registratiedatum="2022-01-01T12:00:00Z",
         )
         self.contactmoment2 = generate_oas_component_cached(
             "cmc",

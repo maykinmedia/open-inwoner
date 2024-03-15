@@ -34,6 +34,10 @@
             {% for contactmoment in page_obj.object_list %}
                 {% render_column start=forloop.counter_0|multiply:4 span=4 %}
                 <div class="card card--compact card--stretch">
+                    {% if contactmoment.new_answer_available %}
+                        {% translate "Nieuw antwoord beschikbaar" as new_answer_text %}
+                        {% include "components/StatusIndicator/StatusIndicator.html" with status_indicator="info" status_indicator_text=new_answer_text only %}
+                    {% endif %}
                     <div class="card__body">
                         <a href="{{ contactmoment.url }}" class="contactmomenten__link">
                             {% render_list %}

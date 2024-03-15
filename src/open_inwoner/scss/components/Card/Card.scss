@@ -18,6 +18,49 @@
   position: relative;
   text-decoration: none;
 
+  .card__header {
+    display: flex;
+    background-color: var(--color-info-lighter);
+    border-top-left-radius: var(--border-radius);
+    border-top-right-radius: var(--border-radius);
+    color: var(--color-info-darker);
+    font-size: var(--font-size-body);
+
+    .card__status_indicator_text {
+      // Fix for optical illusion
+      padding: 8px var(--spacing-large) 10px 0;
+    }
+
+    [class*='icons'] {
+      // Fix for optical illusion
+      margin: 6px 10px 6px 10px;
+    }
+
+    &.success {
+      display: flex;
+      background-color: var(--color-success-lighter);
+      color: var(--color-success);
+    }
+
+    &.info {
+      display: flex;
+      background-color: var(--color-info-lighter);
+      color: var(--color-info-darker);
+    }
+
+    &.warning {
+      display: flex;
+      background-color: var(--color-danger-lightest);
+      color: var(--color-danger-darker);
+    }
+
+    &.failure {
+      display: flex;
+      background-color: var(--color-error-lighter);
+      color: var(--color-error-darker);
+    }
+  }
+
   &__product-card {
     min-height: 150px;
   }

@@ -807,6 +807,9 @@ ZGW_LIMIT_NOTIFICATIONS_FREQUENCY = config(
 # recent documents: created/added no longer than n days in the past
 DOCUMENT_RECENT_DAYS = config("DOCUMENT_RECENT_DAYS", default=1)
 
+# recent answers to contactmomenten: no longer than n days in the past
+CONTACTMOMENT_NEW_DAYS = config("CONTACTMOMENT_NEW_DAYS", default=7)
+
 #
 # Maykin 2FA
 #

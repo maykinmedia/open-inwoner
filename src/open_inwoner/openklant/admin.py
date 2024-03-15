@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from ordered_model.admin import OrderedInlineModelAdminMixin, OrderedTabularInline
 from solo.admin import SingletonModelAdmin
 
-from .models import ContactFormSubject, OpenKlantConfig
+from .models import ContactFormSubject, KlantContactMomentAnswer, OpenKlantConfig
 
 
 class ContactFormSubjectInlineAdmin(OrderedTabularInline):
@@ -70,3 +70,15 @@ class OpenKlantConfigAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
             },
         ),
     ]
+
+
+@admin.register(KlantContactMomentAnswer)
+class KlantContactMomentAnswerAdmin(admin.ModelAdmin):
+    search_fields = [
+        "user__first_name",
+        "user__last_name",
+        "user__email",
+        "contactmoment_url",
+    ]
+    list_filter = ["is_seen"]
+    list_display = ["user", "contactmoment_url", "is_seen"]
