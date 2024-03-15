@@ -1008,7 +1008,7 @@ msgid ""
 "Your password must contain at least 1 upper-case letter, 1 lower-case "
 "letter, 1 digit."
 msgstr ""
-"Het wachtwoord dient in ieder geval 1 hoofdletter, 1 kleine letter en een "
+"Het wachtwoord moet in ieder geval 1 hoofdletter, 1 kleine letter en een "
 "nummer te bevatten."
 
 #: accounts/tests/test_auth.py:1021 accounts/tests/test_profile_views.py:328
@@ -1785,7 +1785,7 @@ msgid ""
 "Designates whether 'actions' section is rendered or not.If this is disabled, "
 "plans (page and menu) should be disabled as well."
 msgstr ""
-"Bepaalt of de 'acties' sectie getoond wordt. Dient ingeschakeld te worden "
+"Bepaalt of de 'acties' sectie getoond wordt. Moet ingeschakeld te worden "
 "bij het gebruik van Samenwerken."
 
 #: cms/profile/cms_appconfig.py:39
@@ -4844,7 +4844,7 @@ msgstr "Condities"
 
 #: pdc/models/product.py:208
 msgid "Conditions applicable for the product"
-msgstr "Voorwaarden waar de aanvrager van het product dient te voldoen"
+msgstr "Voorwaarden waar de aanvrager van het product aan moet voldoen"
 
 #: pdc/models/product.py:244 pdc/models/product.py:333
 msgid "Related product"
@@ -6451,8 +6451,7 @@ msgid ""
 "For security reasons, please enter your old password and your new password "
 "twice so we can make sure you have not made any typo."
 msgstr ""
-"Voor beveiligingsredenen dient u uw oude wachtwoord en (om tikfouten te "
-"voorkomen) tweemaal uw nieuwe wachtwoord in te vullen."
+"Voor beveiligingsredenen vult u eerst uw oude wachtwoord in. Daarna vult u tweemaal uw nieuwe wachtwoord in om tikfouten te voorkomen."
 
 #: templates/registration/password_reset_complete.html:5
 msgid "Password reset complete"
