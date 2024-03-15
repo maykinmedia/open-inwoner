@@ -1098,8 +1098,7 @@ msgid ""
 "Er zijn geen contacten gevonden met deze filter, of u heeft nog geen "
 "contacten."
 msgstr ""
-"er zijn geen contacten gevonden met deze filter, of u heeft nog geen "
-"contacten."
+"Er zijn geen contacten gevonden."
 
 #: accounts/tests/test_contact_views.py:98
 #: accounts/tests/test_contact_views.py:112
@@ -1899,7 +1898,7 @@ msgstr "Uitvoeren voor"
 msgid ""
 "er zijn geen acties gevonden met de huidige filters of er zijn geen acties"
 msgstr ""
-"er zijn geen acties gevonden met de huidige filters of er zijn geen acties"
+"Er zijn geen acties gevonden."
 
 #: components/templates/components/AnchorMenu/AnchorMenu.html:3
 msgid "Secundaire paginanavigatie"
