@@ -1,0 +1,21 @@
+{% extends 'master.html' %}
+{% load i18n form_tags anchor_menu_tags %}
+
+{% block content %}
+
+<h1 class="utrecht-heading-1" id="title">{% trans "Nieuwsbrieven" %}</h2>
+{% if form.fields.newsletters.choices %}
+    <p class="tabled__key">{% trans "Vink nieuwsbrieven aan en druk om opslaan om je erop te abonneren" %}</p>
+    <form method="POST" id="newsletter-form" class="form" novalidate>
+        {% csrf_token %}
+
+        {% for field in form.fields %}
+            {% autorender_field form field %}
+        {% endfor %}
+        {% form_actions primary_text=_("Opslaan") primary_icon="arrow_forward" %}
+    </form>
+{% else %}
+    <p class="tabled__key">{% trans "Geen nieuwsbrieven beschikbaar" %}</p>
+{% endif %}
+
+{% endblock %}

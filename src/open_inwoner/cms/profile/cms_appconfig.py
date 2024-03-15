@@ -61,3 +61,8 @@ class ProfileConfig(AppHookConfig):
             "CMS page has been published."
         ),
     )
+    newsletters = models.BooleanField(
+        verbose_name=_("Nieuwsbrieven"),
+        default=False,
+        help_text=_("Designates whether 'Nieuwsbrieven' section is rendered or not."),
+    )

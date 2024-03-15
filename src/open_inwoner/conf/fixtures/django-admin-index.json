@@ -34,6 +34,10 @@
             [
                 "userfeed",
                 "feeditemdata"
+            ],
+            [
+                "laposta",
+                "subscription"
             ]
         ]
     }
@@ -340,6 +344,10 @@
             [
                 "openzaak",
                 "zaaktypeinformatieobjecttypeconfig"
+            ],
+            [
+                "laposta",
+                "lapostaconfig"
             ],
             [
                 "soap",

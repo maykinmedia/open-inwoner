@@ -481,6 +481,11 @@ djangorestframework-camel-case==1.4.2
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   notifications-api-common
+dnspython==2.6.1
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   email-validator
 drf-spectacular==0.20.1
     # via
     #   -c requirements/base.txt
@@ -511,6 +516,11 @@ elasticsearch-dsl==7.4.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-elasticsearch-dsl
+email-validator==2.1.1
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   pydantic
 et-xmlfile==1.1.0
     # via
     #   -c requirements/base.txt
@@ -524,7 +534,9 @@ face==20.1.1
 factory-boy==3.2.0
     # via -r requirements/test-tools.in
 faker==9.9.0
-    # via factory-boy
+    # via
+    #   factory-boy
+    #   polyfactory
 flake8==7.0.0
     # via -r requirements/test-tools.in
 fontawesomefree==6.4.2
@@ -584,6 +596,7 @@ idna==3.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   email-validator
     #   requests
 inflection==0.5.1
     # via
@@ -729,6 +742,8 @@ playwright==1.41.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+polyfactory==2.13.0
+    # via -r requirements/test-tools.in
 prompt-toolkit==3.0.36
     # via
     #   -c requirements/base.txt
@@ -745,6 +760,11 @@ pycparser==2.20
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   cffi
+pydantic[email]==1.10.14
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   pydantic
 pydyf==0.1.2
     # via
     #   -c requirements/base.txt
@@ -905,10 +925,12 @@ tinycss2==1.1.1
     #   weasyprint
 tomlkit==0.12.3
     # via pylint
-typing-extensions==4.4.0
+typing-extensions==4.10.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   polyfactory
+    #   pydantic
     #   pyee
     #   xsdata
 uritemplate==4.1.1

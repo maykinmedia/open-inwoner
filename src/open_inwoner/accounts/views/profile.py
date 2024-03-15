@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Generator, Union
+from typing import Any, Generator, Union
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -24,6 +24,7 @@ from open_inwoner.cms.utils.page_display import (
     inbox_page_is_published,
 )
 from open_inwoner.haalcentraal.utils import fetch_brp
+from open_inwoner.laposta.forms import NewsletterSubscriptionForm
 from open_inwoner.openklant.clients import build_client
 from open_inwoner.openklant.wrap import get_fetch_parameters
 from open_inwoner.plans.models import Plan
@@ -302,4 +303,35 @@ class MyNotificationsView(
         form.save()
         messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
         self.log_change(self.object, _("users notifications were modified"))
+        return HttpResponseRedirect(self.get_success_url())
+
+
+class NewsletterSubscribeView(
+    LogMixin, LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, FormView
+):
+    form_class = NewsletterSubscriptionForm
+    template_name = "pages/profile/newsletters.html"
+
+    def get_success_url(self) -> str:
+        return reverse("profile:newsletters")
+
+    @cached_property
+    def crumbs(self):
+        return [
+            (_("Mijn profiel"), reverse("profile:detail")),
+            (_("Nieuwsbrieven"), reverse("profile:newsletters")),
+        ]
+
+    def get_form_kwargs(self) -> dict[str, Any]:
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
+
+    def form_valid(self, form):
+        form.save(self.request)
+
+        messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
+        self.log_user_action(
+            self.request.user, _("users newsletter subscriptions were modified")
+        )
         return HttpResponseRedirect(self.get_success_url())

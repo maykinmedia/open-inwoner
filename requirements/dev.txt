@@ -528,6 +528,11 @@ djangorestframework-camel-case==1.4.2
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   notifications-api-common
+dnspython==2.6.1
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   email-validator
 docutils==0.17.1
     # via
     #   sphinx
@@ -562,6 +567,11 @@ elasticsearch-dsl==7.4.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-elasticsearch-dsl
+email-validator==2.1.1
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   pydantic
 et-xmlfile==1.1.0
     # via
     #   -c requirements/ci.txt
@@ -581,6 +591,7 @@ faker==9.9.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   factory-boy
+    #   polyfactory
 flake8==7.0.0
     # via
     #   -c requirements/ci.txt
@@ -666,6 +677,7 @@ idna==3.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   email-validator
     #   requests
 imagesize==1.2.0
     # via sphinx
@@ -851,6 +863,10 @@ playwright==1.41.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+polyfactory==2.13.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 prompt-toolkit==3.0.36
     # via
     #   -c requirements/ci.txt
@@ -873,6 +889,11 @@ pycparser==2.20
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   cffi
+pydantic[email]==1.10.14
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   pydantic
 pydyf==0.1.2
     # via
     #   -c requirements/ci.txt
@@ -1092,10 +1113,12 @@ tomlkit==0.12.3
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   pylint
-typing-extensions==4.4.0
+typing-extensions==4.10.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   polyfactory
+    #   pydantic
     #   pyee
     #   xsdata
 uritemplate==4.1.1

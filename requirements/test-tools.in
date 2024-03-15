@@ -4,6 +4,7 @@
 coverage < 5.0
 django-webtest
 factory-boy
+polyfactory
 freezegun
 pep8
 pylint>=2.17.7

@@ -10,6 +10,8 @@ furl # processing urls
 weasyprint # export to pdf
 tinycss2
 css_inline
+pydantic[email]
+typing-extensions
 
 # Framework libraries
 Django>=4.2<5.0
