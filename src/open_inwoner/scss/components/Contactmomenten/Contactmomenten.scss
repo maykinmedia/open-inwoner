@@ -64,11 +64,12 @@
     }
   }
 
-  /// cards on cases page
-  .card {
-    .contactmomenten__link {
-      text-decoration: none;
-    }
+  .contactmomenten__link {
+    text-decoration: none;
+  }
+
+  &__title {
+    padding-bottom: var(--spacing-large);
   }
 }
 

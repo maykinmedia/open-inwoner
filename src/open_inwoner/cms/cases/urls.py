@@ -3,6 +3,7 @@ from django.urls import path
 from open_inwoner.accounts.views.contactmoments import (
     KlantContactMomentDetailView,
     KlantContactMomentListView,
+    KlantContactMomentRedirectView,
 )
 
 from .views import (
@@ -27,6 +28,11 @@ urlpatterns = [
         "contactmomenten/<str:kcm_uuid>/",
         KlantContactMomentDetailView.as_view(),
         name="contactmoment_detail",
+    ),
+    path(
+        "contactmoment/<str:uuid>/",
+        KlantContactMomentRedirectView.as_view(),
+        name="kcm_redirect",
     ),
     path(
         "<str:object_id>/document/<str:info_id>/",

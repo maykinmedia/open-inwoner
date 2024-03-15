@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.conf import settings
 from django.core import mail
 from django.test import override_settings
@@ -17,6 +19,7 @@ from open_inwoner.accounts.tests.factories import (
     DigidUserFactory,
     eHerkenningUserFactory,
 )
+from open_inwoner.openklant.clients import ContactmomentenClient
 from open_inwoner.openklant.constants import Status
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.openklant.tests.data import CONTACTMOMENTEN_ROOT, KLANTEN_ROOT
@@ -39,6 +42,12 @@ PATCHED_MIDDLEWARE = [
 
 
 @requests_mock.Mocker()
+@patch.object(
+    ContactmomentenClient,
+    "retrieve_objectcontactmomenten_for_zaak",
+    autospec=True,
+    return_value=[],
+)
 @override_settings(
     ROOT_URLCONF="open_inwoner.cms.tests.urls", MIDDLEWARE=PATCHED_MIDDLEWARE
 )
@@ -56,6 +65,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         self.document_service = ServiceFactory(
             api_root=DOCUMENTEN_ROOT, api_type=APITypes.drc
         )
+
         # openzaak config
         self.oz_config = OpenZaakConfig.get_solo()
         self.oz_config.zaak_service = self.zaak_service
@@ -92,7 +102,6 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             identificatie="ZAAK-2022-0000000024",
             omschrijving="Zaak naar aanleiding van ingezonden formulier",
             startdatum="2022-01-02",
-            einddatum=None,
             status=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
             resultaat=f"{ZAKEN_ROOT}resultaten/a44153aa-ad2c-6a07-be75-15add5113",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
@@ -319,8 +328,14 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             self.matcher_create_klantcontactmoment,
         ]
 
-    def test_form_is_shown_if_open_klant_api_configured(self, m):
+        m.get(
+            self.contactmoment["url"],
+            json=self.contactmoment,
+        )
+
+    def test_form_is_shown_if_open_klant_api_configured(self, m, contactmoment_mock):
         self._setUpMocks(m)
+        self._setUpExtraMocks(m)
 
         self.assertTrue(self.ok_config.has_api_configuration())
 
@@ -330,8 +345,9 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         self.assertTrue(response.context["case"]["contact_form_enabled"])
         self.assertTrue(contact_form)
 
-    def test_form_is_shown_if_open_klant_email_configured(self, m):
+    def test_form_is_shown_if_open_klant_email_configured(self, m, contactmoment_mock):
         self._setUpMocks(m)
+        self._setUpExtraMocks(m)
 
         self.ok_config.register_email = "example@example.com"
         self.ok_config.register_contact_moment = False
@@ -346,8 +362,11 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         self.assertTrue(response.context["case"]["contact_form_enabled"])
         self.assertTrue(contact_form)
 
-    def test_form_is_shown_if_open_klant_email_and_api_configured(self, m):
+    def test_form_is_shown_if_open_klant_email_and_api_configured(
+        self, m, contactmoment_mock
+    ):
         self._setUpMocks(m)
+        self._setUpExtraMocks(m)
 
         self.ok_config.register_email = "example@example.com"
         self.ok_config.save()
@@ -361,7 +380,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         self.assertTrue(response.context["case"]["contact_form_enabled"])
         self.assertTrue(contact_form)
 
-    def test_no_form_shown_if_open_klant_not_configured(self, m):
+    def test_no_form_shown_if_open_klant_not_configured(self, m, contactmoment_mock):
         self._setUpMocks(m)
 
         # reset
@@ -381,8 +400,9 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         self.assertFalse(response.context["case"]["contact_form_enabled"])
         self.assertFalse(contact_form)
 
-    def test_no_form_shown_if_contact_form_disabled(self, m):
+    def test_no_form_shown_if_contact_form_disabled(self, m, contactmoment_mock):
         self._setUpMocks(m)
+        self._setUpExtraMocks(m)
 
         CatalogusConfig.objects.all().delete()
         self.zaak_type_config.delete()
@@ -398,7 +418,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         self.assertFalse(response.context["case"]["contact_form_enabled"])
         self.assertFalse(contact_form)
 
-    def test_form_success_with_api(self, m):
+    def test_form_success_with_api(self, m, contactmoment_mock):
         self._setUpMocks(m)
         self._setUpExtraMocks(m)
 
@@ -434,7 +454,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             },
         )
 
-    def test_form_success_with_api_eherkenning_user(self, m):
+    def test_form_success_with_api_eherkenning_user(self, m, contactmoment_mock):
         self._setUpMocks(m)
         self._setUpExtraMocks(m)
 
@@ -499,7 +519,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
                     },
                 )
 
-    def test_form_success_with_email(self, m):
+    def test_form_success_with_email(self, m, contactmoment_mock):
         self._setUpMocks(m)
         self._setUpExtraMocks(m)
 
@@ -532,7 +552,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             _("Contact formulier inzending vanaf Open Inwoner Platform"),
         )
 
-    def test_form_success_with_both_email_and_api(self, m):
+    def test_form_success_with_both_email_and_api(self, m, contactmoment_mock):
         self._setUpMocks(m)
         self._setUpExtraMocks(m)
 

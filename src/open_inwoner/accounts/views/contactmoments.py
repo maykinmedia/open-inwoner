@@ -3,11 +3,12 @@ from datetime import datetime
 from typing import Optional, TypedDict
 
 from django.contrib.auth.mixins import AccessMixin
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
+from django.views import View
 from django.views.generic import TemplateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
@@ -211,3 +212,31 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
             },
         ]
         return ctx
+
+
+class KlantContactMomentRedirectView(KlantContactMomentAccessMixin, View):
+    """
+    Redirect to `KlantContactMomentDetailView` on the basis of contactmoment uuid
+    """
+
+    def get(self, request, *args, **kwargs):
+        klanten_client = build_client("klanten")
+        contactmoment_client = build_client("contactmomenten")
+
+        klant = klanten_client.retrieve_klant(**get_fetch_parameters(self.request))
+        kcms = contactmoment_client.retrieve_klantcontactmomenten_for_klant(klant)
+
+        if not kcms:
+            raise Http404
+
+        contactmoment_uuid = kwargs["uuid"]
+        kcm = next(
+            (kcm for kcm in kcms if str(kcm.contactmoment.uuid) == contactmoment_uuid)
+        )
+
+        if not kcm:
+            raise Http404
+
+        return HttpResponseRedirect(
+            reverse("cases:contactmoment_detail", kwargs={"kcm_uuid": kcm.uuid})
+        )

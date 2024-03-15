@@ -7,6 +7,7 @@ from zgw_consumers.api_models.base import factory
 from zgw_consumers.client import build_client as _build_client
 from zgw_consumers.utils import pagination_helper
 
+from open_inwoner.openzaak.api_models import Zaak
 from open_inwoner.utils.api import ClientError, get_json_response
 
 from .api_models import (
@@ -153,6 +154,34 @@ class ContactmomentenClient(APIClient):
         contact_moment = factory(ContactMoment, data)
 
         return contact_moment
+
+    def retrieve_objectcontactmomenten_for_zaak(
+        self, zaak: Zaak
+    ) -> List[ObjectContactMoment]:
+        try:
+            response = self.get("objectcontactmomenten", params={"object": zaak.url})
+            data = get_json_response(response)
+            all_data = list(pagination_helper(self, data))
+        except (RequestException, ClientError) as exc:
+            logger.exception("exception while making request", exc_info=exc)
+            return []
+
+        object_contact_momenten = factory(ObjectContactMoment, all_data)
+
+        # resolve linked resources
+        contactmoment_mapping = {}
+        for ocm in object_contact_momenten:
+            assert ocm.object == zaak.url
+            ocm.object = zaak
+
+            contactmoment_url = ocm.contactmoment
+            if contactmoment_url in contactmoment_mapping:
+                ocm.contactmoment = contactmoment_mapping[contactmoment_url]
+            else:
+                ocm.contactmoment = self.retrieve_contactmoment(contactmoment_url)
+                contactmoment_mapping[contactmoment_url] = ocm.contactmoment
+
+        return object_contact_momenten
 
     def retrieve_objectcontactmomenten_for_contactmoment(
         self, contactmoment: ContactMoment, zaken_client

@@ -1,4 +1,5 @@
 import json
+from unittest.mock import patch
 from uuid import UUID
 
 from django.test import override_settings, tag
@@ -16,6 +17,7 @@ from zgw_consumers.constants import APITypes
 from open_inwoner.accounts.tests.factories import DigidUserFactory
 from open_inwoner.cms.tests import cms_tools
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.openklant.clients import ContactmomentenClient
 from open_inwoner.openklant.constants import Status
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.openklant.tests.data import CONTACTMOMENTEN_ROOT, KLANTEN_ROOT
@@ -43,6 +45,12 @@ from open_inwoner.utils.tests.playwright import PlaywrightSyncLiveServerTestCase
 
 @tag("e2e")
 @requests_mock.Mocker()
+@patch.object(
+    ContactmomentenClient,
+    "retrieve_objectcontactmomenten_for_zaak",
+    autospec=True,
+    return_value=[],
+)
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class CasesPlaywrightTests(
     AssertMockMatchersMixin,
@@ -318,6 +326,7 @@ class CasesPlaywrightTests(
             self.zaaktype,
             self.status_type_new,
             self.status_type_finish,
+            self.contactmoment,
         ]:
             m.get(resource["url"], json=resource)
 
@@ -405,7 +414,7 @@ class CasesPlaywrightTests(
             ),
         ]
 
-    def test_cases(self, m):
+    def test_cases(self, m, contactmoment_mock):
         self._setUpMocks(m)
 
         context = self.browser.new_context(storage_state=self.user_login_state)
@@ -498,7 +507,7 @@ class CasesPlaywrightTests(
         # finally check if our mock matchers are accurate
         self.assertMockMatchersCalled(self.matchers)
 
-    def test_multiple_file_upload(self, m):
+    def test_multiple_file_upload(self, m, contactmoment_mock):
         self._setUpMocks(m)
 
         # Keep track of uploaded files (schemas/EnkelvoudigInformatieObject array)

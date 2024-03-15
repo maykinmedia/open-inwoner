@@ -1,4 +1,7 @@
 import factory
+from zgw_consumers.api_models.base import factory as zgw_factory
+
+from open_inwoner.openklant.api_models import ContactMoment
 
 
 class ContactFormSubjectFactory(factory.django.DjangoModelFactory):
@@ -7,3 +10,7 @@ class ContactFormSubjectFactory(factory.django.DjangoModelFactory):
 
     subject = factory.Faker("sentence")
     subject_code = factory.Faker("word")
+
+
+def make_contactmoment(contact_moment_data: dict):
+    return zgw_factory(ContactMoment, contact_moment_data)

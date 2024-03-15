@@ -83,7 +83,11 @@ class OuterCaseDetailView(
 
 
 class InnerCaseDetailView(
-    CaseLogMixin, CommonPageMixin, BaseBreadcrumbMixin, CaseAccessMixin, FormView
+    CaseLogMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    CaseAccessMixin,
+    FormView,
 ):
     template_name = "pages/cases/status_inner.html"
     form_class = CaseUploadForm
@@ -140,6 +144,16 @@ class InnerCaseDetailView(
             statuses = zaken_client.fetch_status_history(self.case.url)
             self.store_statustype_mapping(self.case.zaaktype.identificatie)
             self.store_resulttype_mapping(self.case.zaaktype.identificatie)
+
+            objectcontactmomenten = []
+            if contactmoment_client := build_client_openklant("contactmomenten"):
+                objectcontactmomenten = (
+                    contactmoment_client.retrieve_objectcontactmomenten_for_zaak(
+                        self.case
+                    )
+                )
+            questions = [ocm.contactmoment for ocm in objectcontactmomenten]
+            questions.sort(key=lambda q: q.registratiedatum, reverse=True)
 
             statustypen = []
             if catalogi_client := build_client_openzaak("catalogi"):
@@ -201,6 +215,7 @@ class InnerCaseDetailView(
                     "created",
                     dt.timedelta(days=settings.DOCUMENT_RECENT_DAYS),
                 ),
+                "questions": questions,
             }
             context["case"].update(self.get_upload_info_context(self.case))
             context["anchors"] = self.get_anchors(statuses, documents)
