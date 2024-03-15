@@ -102,6 +102,10 @@ urlpatterns = [
         "api/openzaak/",
         include("open_inwoner.openzaak.api.urls", namespace="openzaak_api"),
     ),
+    path(
+        "api/openklant/",
+        include("open_inwoner.openklant.api.urls", namespace="openklant_api"),
+    ),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     # Views
     path("accounts/", include("open_inwoner.accounts.urls", namespace="accounts")),
