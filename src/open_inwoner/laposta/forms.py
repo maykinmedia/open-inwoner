@@ -107,7 +107,7 @@ class NewsletterSubscriptionForm(forms.Form):
                 client.remove_subscription(subscription.list_id, subscription.member_id)
             except (RequestException, ClientError):
                 logger.exception(
-                    "Something went wrong while trying to create subscription"
+                    "Something went wrong while trying to delete subscription"
                 )
                 self.add_error(
                     "newsletters",

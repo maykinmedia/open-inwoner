@@ -63,6 +63,7 @@ class LapostaClient(APIClient):
             # Handle scenario where a subscription does not exists in the API,
             # but it does exist locally
             if error.get("code") == 203 and error.get("parameter") == "member_id":
+                logger.info("Subscription does not exist for user")
                 return None
 
         data = get_json_response(response)
