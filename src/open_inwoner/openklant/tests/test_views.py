@@ -52,7 +52,6 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
             config=OpenKlantConfig.get_solo(),
         )
 
-    # @patch("open_inwoner.accounts.views.contactmoments.get_local_kcm_mapping", autospec=True)
     def test_list_for_bsn(self, m, mock_get_local_kcm_mapping):
         data = MockAPIReadData().install_mocks(m)
 
@@ -100,7 +99,9 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
 
         mock_get_local_kcm_mapping.return_value = {
             data.klant_contactmoment["url"]: KlantContactMomentLocalFactory.create(
-                user=data.user, kcm_url=data.klant_contactmoment["url"], is_seen=False
+                user=data.user,
+                klantcontactmoment_url=data.klant_contactmoment["url"],
+                is_seen=False,
             )
         }
 
@@ -299,7 +300,7 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
         )
 
         kcm_local = KlantContactMomentLocal.objects.get(
-            kcm_url=data.klant_contactmoment["url"]
+            klantcontactmoment_url=data.klant_contactmoment["url"]
         )
 
         self.assertEqual(kcm_local.user, data.user)
@@ -362,8 +363,7 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
             with self.subTest(
                 use_rsin_for_innNnpId_query_parameter=use_rsin_for_innNnpId_query_parameter
             ):
-                # Avoid having a `KlantContactMomentLocal` with the same URL for
-                # different users
+                # Avoid having a `KlantContactMomentLocal` with the same URL for different users
                 KlantContactMomentLocal.objects.all().delete()
 
                 config = OpenKlantConfig.get_solo()

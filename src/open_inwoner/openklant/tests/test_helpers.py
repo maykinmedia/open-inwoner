@@ -32,7 +32,7 @@ class HelpersTestCase(ClearCachesMixin, DisableRequestLogMixin, TestCase):
 
             self.assertEqual(mapping, {kcms[0].url: kcm_local})
             self.assertEqual(kcm_local.user, data.user)
-            self.assertEqual(kcm_local.kcm_url, kcms[0].url)
+            self.assertEqual(kcm_local.klantcontactmoment_url, kcms[0].url)
             self.assertEqual(kcm_local.is_seen, False)
 
         with self.subTest("running function again will ignore existing entries"):

@@ -139,7 +139,7 @@ class KlantContactMomentLocal(models.Model):
             "This is the user that asked the question to which this is an answer."
         ),
     )
-    kcm_url = models.URLField(
+    klantcontactmoment_url = models.URLField(
         verbose_name=_("KlantContactMoment URL"), unique=True, max_length=1000
     )
     is_seen = models.BooleanField(

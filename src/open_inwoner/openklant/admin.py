@@ -74,6 +74,11 @@ class OpenKlantConfigAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
 
 @admin.register(KlantContactMomentLocal)
 class KlantContactMomentLocalAdmin(admin.ModelAdmin):
-    search_fields = ["user", "kcm_uuid"]
+    search_fields = [
+        "user__first_name",
+        "user__last_name",
+        "user__email",
+        "klantcontactmoment_url",
+    ]
     list_filter = ["is_seen"]
-    list_display = ["user", "kcm_url", "is_seen"]
+    list_display = ["user", "klantcontactmoment_url", "is_seen"]

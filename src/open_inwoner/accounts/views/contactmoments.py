@@ -27,7 +27,7 @@ from open_inwoner.openklant.wrap import (
 )
 from open_inwoner.openzaak.clients import build_client as build_client_openzaak
 from open_inwoner.utils.mixins import PaginationMixin
-from open_inwoner.utils.time import is_new
+from open_inwoner.utils.time import instance_is_new
 from open_inwoner.utils.views import CommonPageMixin
 
 logger = logging.getLogger(__name__)
@@ -85,7 +85,7 @@ class KlantContactMomentBaseView(
         kcm: KlantContactMoment,
         local_kcm_mapping: Optional[dict[str, KlantContactMomentLocal]] = None,
     ) -> KCMDict:
-        _is_new = is_new(
+        is_new = instance_is_new(
             kcm.contactmoment,
             "registratiedatum",
             timedelta(days=settings.CONTACTMOMENT_NEW_DAYS),
@@ -105,9 +105,9 @@ class KlantContactMomentBaseView(
             "type": kcm.contactmoment.type,
             "status": Status.safe_label(kcm.contactmoment.status, _("Onbekend")),
             "antwoord": kcm.contactmoment.antwoord,
-            "new_answer_available": bool(kcm.contactmoment.antwoord)
-            and _is_new
-            and not is_seen,
+            "new_answer_available": (
+                bool(kcm.contactmoment.antwoord) and is_new and not is_seen
+            ),
         }
 
         # replace e_suite_subject_code with OIP configured subject, if applicable
@@ -215,7 +215,7 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
             raise Http404()
 
         local_kcm, is_created = KlantContactMomentLocal.objects.get_or_create(  # noqa
-            user=self.request.user, kcm_url=kcm.url
+            user=self.request.user, klantcontactmoment_url=kcm.url
         )
         if not local_kcm.is_seen:
             local_kcm.is_seen = True

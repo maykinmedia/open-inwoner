@@ -101,8 +101,10 @@ def get_fetch_parameters(request, use_vestigingsnummer: bool = False) -> dict:
 def get_local_kcm_mapping(
     kcms: list[KlantContactMoment], user: User
 ) -> dict[str, KlantContactMomentLocal]:
-    existing_kcms = KlantContactMomentLocal.objects.filter(user=user).values_list(
-        "kcm_url", flat=True
+    existing_kcms = set(
+        KlantContactMomentLocal.objects.filter(user=user).values_list(
+            "klantcontactmoment_url", flat=True
+        )
     )
 
     to_create = []
@@ -110,12 +112,14 @@ def get_local_kcm_mapping(
         if kcm.url in existing_kcms:
             continue
 
-        to_create.append(KlantContactMomentLocal(user=user, kcm_url=kcm.url))
+        to_create.append(
+            KlantContactMomentLocal(user=user, klantcontactmoment_url=kcm.url)
+        )
 
     KlantContactMomentLocal.objects.bulk_create(to_create)
 
     kcm_answer_mapping = {
-        kcm_answer.kcm_url: kcm_answer
+        kcm_answer.klantcontactmoment_url: kcm_answer
         for kcm_answer in KlantContactMomentLocal.objects.filter(user=user)
     }
 

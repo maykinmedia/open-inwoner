@@ -7,7 +7,7 @@ from django.conf import settings
 from filer.models.filemodels import File
 
 from open_inwoner.cms.cases.views.status import SimpleFile
-from open_inwoner.utils.time import is_new
+from open_inwoner.utils.time import instance_is_new
 
 register = template.Library()
 
@@ -147,7 +147,9 @@ def file(file, **kwargs):
     created = getattr(file, "created", None)
     kwargs["created"] = created
 
-    if is_new(file, "created", datetime.timedelta(days=settings.DOCUMENT_RECENT_DAYS)):
+    if instance_is_new(
+        file, "created", datetime.timedelta(days=settings.DOCUMENT_RECENT_DAYS)
+    ):
         kwargs["recently_added"] = True
 
     if "show_download" not in kwargs:
