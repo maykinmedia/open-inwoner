@@ -287,11 +287,9 @@ class User(AbstractBaseUser, PermissionsMixin):
                 | Q(login_type=LoginTypeChoices.eherkenning),
                 name="check_kvk_or_rsin_only_set_when_login_eherkenning",
             ),
-            # CheckConstraint(
-            #     check=((Q(kvk="") & ~Q(rsin="")) | (~Q(kvk="") & Q(rsin="")))
-            #     | ~Q(login_type=LoginTypeChoices.eherkenning),
-            #     name="check_kvk_or_rsin_exclusive_when_login_eherkenning",
-            # ),
+            # NOTE: we do not need a constraint that enforces exclusivity between
+            # `KVK` and `RSIN`, because companies have both of these attributes and we
+            # need both of them to fetch cases for these companies
         ]
 
     def __init__(self, *args, **kwargs):

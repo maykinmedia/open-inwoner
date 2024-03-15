@@ -15,7 +15,6 @@ from zgw_consumers.api_models.constants import (
 )
 from zgw_consumers.constants import APITypes
 
-from open_inwoner.accounts.models import User
 from open_inwoner.accounts.tests.factories import (
     DigidUserFactory,
     eHerkenningUserFactory,
@@ -455,18 +454,15 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
     def test_form_success_with_api_eherkenning_user(self, m, contactmoment_mock):
         self._setUpMocks(m)
         self._setUpExtraMocks(m)
-
+        eherkenning_user = eHerkenningUserFactory.create(
+            kvk="12345678",
+            rsin="000000000",
+            email=self.klant["emailadres"],
+        )
         for use_rsin_for_innNnpId_query_parameter in [True, False]:
             with self.subTest(
                 use_rsin_for_innNnpId_query_parameter=use_rsin_for_innNnpId_query_parameter
             ):
-                # FIXME for some reason creating the user outside of the loop
-                # makes the second iteration fail?
-                User.objects.filter(kvk="12345678").delete()
-                eherkenning_user = eHerkenningUserFactory(
-                    kvk="12345678", rsin="000000000"
-                )
-
                 config = OpenKlantConfig.get_solo()
                 config.use_rsin_for_innNnpId_query_parameter = (
                     use_rsin_for_innNnpId_query_parameter

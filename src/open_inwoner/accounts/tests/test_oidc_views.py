@@ -1055,7 +1055,7 @@ class eHerkenningOIDCFlowTests(WebTest):
         # set up a user with a non existing email address
         mock_get_userinfo.return_value = {"sub": "00000000"}
         eHerkenningUserFactory.create(
-            kvk="12345678", rsin="123456789", email="existing_user@example.com"
+            kvk="12345678", rsin="123456782", email="existing_user@example.com"
         )
         session = self.client.session
         session["oidc_states"] = {"mock": {"nonce": "nonce"}}
