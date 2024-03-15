@@ -17,9 +17,9 @@ def make_contactmoment(contact_moment_data: dict):
     return zgw_factory(ContactMoment, contact_moment_data)
 
 
-class KlantContactMomentLocalFactory(factory.django.DjangoModelFactory):
+class KlantContactMomentAnswerFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = "openklant.KlantContactMomentLocal"
+        model = "openklant.KlantContactMomentAnswer"
 
     contactmoment_url = factory.Faker("url")
     user = factory.SubFactory(UserFactory)

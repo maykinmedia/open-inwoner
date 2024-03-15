@@ -16,14 +16,14 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 from open_inwoner.openklant.api_models import KlantContactMoment
 from open_inwoner.openklant.clients import build_client
 from open_inwoner.openklant.constants import Status
-from open_inwoner.openklant.models import ContactFormSubject, KlantContactMomentLocal
+from open_inwoner.openklant.models import ContactFormSubject, KlantContactMomentAnswer
 from open_inwoner.openklant.views.contactform import ContactFormView
 from open_inwoner.openklant.wrap import (
     contactmoment_has_new_answer,
     fetch_klantcontactmoment,
     fetch_klantcontactmomenten,
     get_fetch_parameters,
-    get_local_kcm_mapping,
+    get_kcm_answer_mapping,
 )
 from open_inwoner.openzaak.clients import build_client as build_client_openzaak
 from open_inwoner.utils.mixins import PaginationMixin
@@ -82,7 +82,7 @@ class KlantContactMomentBaseView(
     def get_kcm_data(
         self,
         kcm: KlantContactMoment,
-        local_kcm_mapping: Optional[dict[str, KlantContactMomentLocal]] = None,
+        local_kcm_mapping: Optional[dict[str, KlantContactMomentAnswer]] = None,
     ) -> KCMDict:
         data = {
             "registered_date": kcm.contactmoment.registratiedatum,
@@ -168,7 +168,7 @@ class KlantContactMomentListView(
         ctx["contactmomenten"] = [
             self.get_kcm_data(
                 kcm,
-                local_kcm_mapping=get_local_kcm_mapping(
+                local_kcm_mapping=get_kcm_answer_mapping(
                     [kcm.contactmoment for kcm in kcms], self.request.user
                 ),
             )
@@ -206,7 +206,7 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
         if not kcm:
             raise Http404()
 
-        local_kcm, is_created = KlantContactMomentLocal.objects.get_or_create(  # noqa
+        local_kcm, is_created = KlantContactMomentAnswer.objects.get_or_create(  # noqa
             user=self.request.user, contactmoment_url=kcm.contactmoment.url
         )
         if not local_kcm.is_seen:

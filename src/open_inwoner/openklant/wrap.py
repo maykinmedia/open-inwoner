@@ -8,7 +8,7 @@ from open_inwoner.accounts.models import User
 from open_inwoner.kvk.branches import get_kvk_branch_number
 from open_inwoner.openklant.api_models import ContactMoment, KlantContactMoment
 from open_inwoner.openklant.clients import build_client
-from open_inwoner.openklant.models import KlantContactMomentLocal, OpenKlantConfig
+from open_inwoner.openklant.models import KlantContactMomentAnswer, OpenKlantConfig
 from open_inwoner.utils.time import instance_is_new
 
 logger = logging.getLogger(__name__)
@@ -102,13 +102,13 @@ def get_fetch_parameters(request, use_vestigingsnummer: bool = False) -> dict:
     return {}
 
 
-def get_local_kcm_mapping(
+def get_kcm_answer_mapping(
     contactmomenten: list[ContactMoment],
     user: User,
-) -> dict[str, KlantContactMomentLocal]:
+) -> dict[str, KlantContactMomentAnswer]:
     to_create = []
     existing_kcms = set(
-        KlantContactMomentLocal.objects.filter(user=user).values_list(
+        KlantContactMomentAnswer.objects.filter(user=user).values_list(
             "contactmoment_url", flat=True
         )
     )
@@ -117,14 +117,14 @@ def get_local_kcm_mapping(
             continue
 
         to_create.append(
-            KlantContactMomentLocal(user=user, contactmoment_url=contactmoment.url)
+            KlantContactMomentAnswer(user=user, contactmoment_url=contactmoment.url)
         )
 
-    KlantContactMomentLocal.objects.bulk_create(to_create)
+    KlantContactMomentAnswer.objects.bulk_create(to_create)
 
     kcm_answer_mapping = {
         kcm_answer.contactmoment_url: kcm_answer
-        for kcm_answer in KlantContactMomentLocal.objects.filter(user=user)
+        for kcm_answer in KlantContactMomentAnswer.objects.filter(user=user)
     }
 
     return kcm_answer_mapping
@@ -132,7 +132,7 @@ def get_local_kcm_mapping(
 
 def contactmoment_has_new_answer(
     contactmoment: ContactMoment,
-    local_kcm_mapping: Optional[dict[str, KlantContactMomentLocal]] = None,
+    local_kcm_mapping: Optional[dict[str, KlantContactMomentAnswer]] = None,
 ) -> bool:
     is_new = instance_is_new(
         contactmoment,

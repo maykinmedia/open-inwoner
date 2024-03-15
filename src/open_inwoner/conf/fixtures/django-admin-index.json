@@ -183,10 +183,6 @@
             [
                 "filer",
                 "folderpermission"
-            ],
-            [
-                "openklant",
-                "klantcontactmomentlocal"
             ]
         ]
     }
@@ -320,6 +316,10 @@
             [
                 "openklant",
                 "openklantconfig"
+            ],
+            [
+                "openklant",
+                "klantcontactmomentanswer"
             ],
             [
                 "openzaak",

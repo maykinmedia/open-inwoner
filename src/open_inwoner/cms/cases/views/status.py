@@ -25,7 +25,7 @@ from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.openklant.wrap import (
     contactmoment_has_new_answer,
     get_fetch_parameters,
-    get_local_kcm_mapping,
+    get_kcm_answer_mapping,
 )
 from open_inwoner.openzaak.api_models import Status, StatusType, Zaak
 from open_inwoner.openzaak.clients import (
@@ -159,10 +159,10 @@ class InnerCaseDetailView(
             questions = [ocm.contactmoment for ocm in objectcontactmomenten]
             questions.sort(key=lambda q: q.registratiedatum, reverse=True)
 
-            local_mapping = get_local_kcm_mapping(questions, self.request.user)
+            kcm_answer_mapping = get_kcm_answer_mapping(questions, self.request.user)
             for question in questions:
                 question.new_answer_available = contactmoment_has_new_answer(
-                    question, local_mapping
+                    question, kcm_answer_mapping
                 )
 
             statustypen = []

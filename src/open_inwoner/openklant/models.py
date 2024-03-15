@@ -129,7 +129,7 @@ class ContactFormSubject(OrderedModel):
         return self.subject
 
 
-class KlantContactMomentLocal(models.Model):
+class KlantContactMomentAnswer(models.Model):
     user = models.ForeignKey(
         "accounts.User",
         verbose_name=_("User"),
