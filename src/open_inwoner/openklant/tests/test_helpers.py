@@ -24,19 +24,23 @@ class HelpersTestCase(ClearCachesMixin, DisableRequestLogMixin, TestCase):
         kcms = fetch_klantcontactmomenten(user_bsn=data.user.bsn)
 
         with self.subTest("running the first time will create KlantContactMomentLocal"):
-            mapping = get_local_kcm_mapping(kcms, data.user)
+            mapping = get_local_kcm_mapping(
+                [kcm.contactmoment for kcm in kcms], data.user
+            )
 
             self.assertEqual(KlantContactMomentLocal.objects.count(), 1)
 
             kcm_local = KlantContactMomentLocal.objects.get()
 
-            self.assertEqual(mapping, {kcms[0].url: kcm_local})
+            self.assertEqual(mapping, {kcms[0].contactmoment.url: kcm_local})
             self.assertEqual(kcm_local.user, data.user)
-            self.assertEqual(kcm_local.klantcontactmoment_url, kcms[0].url)
+            self.assertEqual(kcm_local.contactmoment_url, kcms[0].contactmoment.url)
             self.assertEqual(kcm_local.is_seen, False)
 
         with self.subTest("running function again will ignore existing entries"):
-            mapping = get_local_kcm_mapping(kcms, data.user)
+            mapping = get_local_kcm_mapping(
+                [kcm.contactmoment for kcm in kcms], data.user
+            )
 
             self.assertEqual(KlantContactMomentLocal.objects.count(), 1)
-            self.assertEqual(mapping, {kcms[0].url: kcm_local})
+            self.assertEqual(mapping, {kcms[0].contactmoment.url: kcm_local})

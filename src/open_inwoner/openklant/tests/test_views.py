@@ -86,7 +86,9 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
         kcm.contactmoment = factory(ContactMoment, data.contactmoment)
         kcm.klant = factory(Klant, data.klant)
 
-        mock_get_local_kcm_mapping.assert_called_once_with([kcm], data.user)
+        mock_get_local_kcm_mapping.assert_called_once_with(
+            [kcm.contactmoment], data.user
+        )
 
         status_item = response.pyquery.find(f"p:contains('{_('Status')}')").parent()
 
@@ -100,7 +102,7 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
         mock_get_local_kcm_mapping.return_value = {
             data.klant_contactmoment["url"]: KlantContactMomentLocalFactory.create(
                 user=data.user,
-                klantcontactmoment_url=data.klant_contactmoment["url"],
+                contactmoment_url=data.klant_contactmoment["contactmoment"],
                 is_seen=False,
             )
         }
@@ -136,7 +138,9 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
         kcm.contactmoment = factory(ContactMoment, data.contactmoment)
         kcm.klant = factory(Klant, data.klant)
 
-        mock_get_local_kcm_mapping.assert_called_once_with([kcm], data.user)
+        mock_get_local_kcm_mapping.assert_called_once_with(
+            [kcm.contactmoment], data.user
+        )
 
         status_item = response.pyquery.find(f"p:contains('{_('Status')}')").parent()
 
@@ -300,7 +304,7 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
         )
 
         kcm_local = KlantContactMomentLocal.objects.get(
-            klantcontactmoment_url=data.klant_contactmoment["url"]
+            contactmoment_url=data.klant_contactmoment["contactmoment"]
         )
 
         self.assertEqual(kcm_local.user, data.user)

@@ -1,11 +1,15 @@
 import logging
+from datetime import timedelta
 from typing import List, Optional
+
+from django.conf import settings
 
 from open_inwoner.accounts.models import User
 from open_inwoner.kvk.branches import get_kvk_branch_number
-from open_inwoner.openklant.api_models import KlantContactMoment
+from open_inwoner.openklant.api_models import ContactMoment, KlantContactMoment
 from open_inwoner.openklant.clients import build_client
 from open_inwoner.openklant.models import KlantContactMomentLocal, OpenKlantConfig
+from open_inwoner.utils.time import instance_is_new
 
 logger = logging.getLogger(__name__)
 
@@ -99,28 +103,45 @@ def get_fetch_parameters(request, use_vestigingsnummer: bool = False) -> dict:
 
 
 def get_local_kcm_mapping(
-    kcms: list[KlantContactMoment], user: User
+    contactmomenten: list[ContactMoment],
+    user: User,
 ) -> dict[str, KlantContactMomentLocal]:
+    to_create = []
     existing_kcms = set(
         KlantContactMomentLocal.objects.filter(user=user).values_list(
-            "klantcontactmoment_url", flat=True
+            "contactmoment_url", flat=True
         )
     )
-
-    to_create = []
-    for kcm in kcms:
-        if kcm.url in existing_kcms:
+    for contactmoment in contactmomenten:
+        if contactmoment.url in existing_kcms:
             continue
 
         to_create.append(
-            KlantContactMomentLocal(user=user, klantcontactmoment_url=kcm.url)
+            KlantContactMomentLocal(user=user, contactmoment_url=contactmoment.url)
         )
 
     KlantContactMomentLocal.objects.bulk_create(to_create)
 
     kcm_answer_mapping = {
-        kcm_answer.klantcontactmoment_url: kcm_answer
+        kcm_answer.contactmoment_url: kcm_answer
         for kcm_answer in KlantContactMomentLocal.objects.filter(user=user)
     }
 
     return kcm_answer_mapping
+
+
+def contactmoment_has_new_answer(
+    contactmoment: ContactMoment,
+    local_kcm_mapping: Optional[dict[str, KlantContactMomentLocal]] = None,
+) -> bool:
+    is_new = instance_is_new(
+        contactmoment,
+        "registratiedatum",
+        timedelta(days=settings.CONTACTMOMENT_NEW_DAYS),
+    )
+    if local_kcm_mapping:
+        is_seen = getattr(local_kcm_mapping.get(contactmoment.url), "is_seen", False)
+    else:
+        # In the detail view, this is automatically true
+        is_seen = True
+    return bool(contactmoment.antwoord) and is_new and not is_seen

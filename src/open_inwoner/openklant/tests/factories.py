@@ -21,5 +21,5 @@ class KlantContactMomentLocalFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "openklant.KlantContactMomentLocal"
 
-    klantcontactmoment_url = factory.Faker("url")
+    contactmoment_url = factory.Faker("url")
     user = factory.SubFactory(UserFactory)

@@ -1,8 +1,7 @@
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Optional, TypedDict
 
-from django.conf import settings
 from django.contrib.auth.mixins import AccessMixin
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import redirect
@@ -20,6 +19,7 @@ from open_inwoner.openklant.constants import Status
 from open_inwoner.openklant.models import ContactFormSubject, KlantContactMomentLocal
 from open_inwoner.openklant.views.contactform import ContactFormView
 from open_inwoner.openklant.wrap import (
+    contactmoment_has_new_answer,
     fetch_klantcontactmoment,
     fetch_klantcontactmomenten,
     get_fetch_parameters,
@@ -27,7 +27,6 @@ from open_inwoner.openklant.wrap import (
 )
 from open_inwoner.openzaak.clients import build_client as build_client_openzaak
 from open_inwoner.utils.mixins import PaginationMixin
-from open_inwoner.utils.time import instance_is_new
 from open_inwoner.utils.views import CommonPageMixin
 
 logger = logging.getLogger(__name__)
@@ -85,16 +84,6 @@ class KlantContactMomentBaseView(
         kcm: KlantContactMoment,
         local_kcm_mapping: Optional[dict[str, KlantContactMomentLocal]] = None,
     ) -> KCMDict:
-        is_new = instance_is_new(
-            kcm.contactmoment,
-            "registratiedatum",
-            timedelta(days=settings.CONTACTMOMENT_NEW_DAYS),
-        )
-        if local_kcm_mapping:
-            is_seen = getattr(local_kcm_mapping.get(kcm.url), "is_seen", False)
-        else:
-            # In the detail view, this is automatically true
-            is_seen = True
         data = {
             "registered_date": kcm.contactmoment.registratiedatum,
             "channel": kcm.contactmoment.kanaal.title(),
@@ -105,8 +94,8 @@ class KlantContactMomentBaseView(
             "type": kcm.contactmoment.type,
             "status": Status.safe_label(kcm.contactmoment.status, _("Onbekend")),
             "antwoord": kcm.contactmoment.antwoord,
-            "new_answer_available": (
-                bool(kcm.contactmoment.antwoord) and is_new and not is_seen
+            "new_answer_available": contactmoment_has_new_answer(
+                kcm.contactmoment, local_kcm_mapping=local_kcm_mapping
             ),
         }
 
@@ -178,7 +167,10 @@ class KlantContactMomentListView(
         )
         ctx["contactmomenten"] = [
             self.get_kcm_data(
-                kcm, local_kcm_mapping=get_local_kcm_mapping(kcms, self.request.user)
+                kcm,
+                local_kcm_mapping=get_local_kcm_mapping(
+                    [kcm.contactmoment for kcm in kcms], self.request.user
+                ),
             )
             for kcm in kcms
         ]
@@ -215,7 +207,7 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
             raise Http404()
 
         local_kcm, is_created = KlantContactMomentLocal.objects.get_or_create(  # noqa
-            user=self.request.user, klantcontactmoment_url=kcm.url
+            user=self.request.user, contactmoment_url=kcm.contactmoment.url
         )
         if not local_kcm.is_seen:
             local_kcm.is_seen = True

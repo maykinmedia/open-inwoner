@@ -139,8 +139,8 @@ class KlantContactMomentLocal(models.Model):
             "This is the user that asked the question to which this is an answer."
         ),
     )
-    klantcontactmoment_url = models.URLField(
-        verbose_name=_("KlantContactMoment URL"), unique=True, max_length=1000
+    contactmoment_url = models.URLField(
+        verbose_name=_("ContactMoment URL"), max_length=1000
     )
     is_seen = models.BooleanField(
         verbose_name=_("Is seen"),
@@ -151,3 +151,4 @@ class KlantContactMomentLocal(models.Model):
     class Meta:
         verbose_name = _("KlantContactMoment")
         verbose_name_plural = _("KlantContactMomenten")
+        unique_together = [["user", "contactmoment_url"]]

@@ -486,7 +486,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-dddddddddddd",
             url=f"{CONTACTMOMENTEN_ROOT}contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-dddddddddddd",
             identificatie="AB123",
-            registratiedatum="1972-09-27T03:39:28+00:00",
+            registratiedatum="2024-09-27T03:39:28+00:00",
             type="SomeType",
             kanaal="MAIL",
             status=ContactMomentStatus.afgehandeld,
@@ -682,6 +682,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             ),
         )
 
+    @freeze_time("2021-01-12 17:00:00")
     @patch("open_inwoner.userfeed.hooks.case_status_seen", autospec=True)
     @patch("open_inwoner.userfeed.hooks.case_documents_seen", autospec=True)
     def test_status_is_retrieved_when_user_logged_in_via_digid(
@@ -770,13 +771,16 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 "external_upload_url": "",
                 "allowed_file_extensions": sorted(self.config.allowed_file_extensions),
                 "contact_form_enabled": False,
-                "new_docs": False,
+                "new_docs": True,
                 "questions": [
                     make_contactmoment(self.contactmoment_new),
                     make_contactmoment(self.contactmoment_old),
                 ],
             },
         )
+        self.assertTrue(case["questions"][0].new_answer_available)
+        self.assertFalse(case["questions"][1].new_answer_available)
+
         # check userfeed hooks
         mock_hook_status.assert_called_once()
         mock_hook_documents.assert_called_once()
@@ -792,6 +796,11 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 "cases:kcm_redirect", kwargs={"uuid": self.contactmoment_new["uuid"]}
             ),
         )
+
+        new_answer_headers = links.find(".card__status_indicator_text")
+
+        self.assertEqual(len(new_answer_headers), 1)
+        self.assertEqual(new_answer_headers[0].text, _("Nieuw antwoord beschikbaar"))
         self.assertEqual(
             links[1].attrib["href"],
             reverse(

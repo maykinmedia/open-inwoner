@@ -78,7 +78,7 @@ class KlantContactMomentLocalAdmin(admin.ModelAdmin):
         "user__first_name",
         "user__last_name",
         "user__email",
-        "klantcontactmoment_url",
+        "contactmoment_url",
     ]
     list_filter = ["is_seen"]
-    list_display = ["user", "klantcontactmoment_url", "is_seen"]
+    list_display = ["user", "contactmoment_url", "is_seen"]
