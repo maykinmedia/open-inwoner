@@ -191,21 +191,23 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
             indicatieInternOfExtern="intern",
         )
-        self.status_type1 = generate_oas_component_cached(
+        self.status_type_initial = generate_oas_component_cached(
             "ztc",
             "schemas/StatusType",
             url=f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-777yu878km09",
             zaaktype=self.zaaktype["url"],
             omschrijving="Initial request",
+            statustekst="",
             volgnummer=1,
             isEindstatus=False,
         )
-        self.status_type2 = generate_oas_component_cached(
+        self.status_type_finish = generate_oas_component_cached(
             "ztc",
             "schemas/StatusType",
             url=f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-744516671fe4",
             zaaktype=self.zaaktype["url"],
             omschrijving="Finish",
+            statustekst="Statustekst finish",
             volgnummer=2,
             isEindstatus=True,
         )
@@ -220,7 +222,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
         )
         self.zt_statustype_config1 = ZaakTypeStatusTypeConfigFactory.create(
             zaaktype_config=self.zaaktype_config1,
-            statustype_url=self.status_type1["url"],
+            statustype_url=self.status_type_initial["url"],
             status_indicator=StatusIndicators.warning,
             status_indicator_text="U moet documenten toevoegen",
             description="Lorem ipsum dolor sit amet",
@@ -246,7 +248,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
             "schemas/Status",
             url=self.zaak1["status"],
             zaak=self.zaak1["url"],
-            statustype=self.status_type1["url"],
+            statustype=self.status_type_initial["url"],
             datumStatusGezet="2021-01-12",
             statustoelichting="",
         )
@@ -268,7 +270,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
             "schemas/Status",
             url=self.zaak2["status"],
             zaak=self.zaak2["url"],
-            statustype=self.status_type1["url"],
+            statustype=self.status_type_initial["url"],
             datumStatusGezet="2021-03-12",
             statustoelichting="",
         )
@@ -317,7 +319,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
             "schemas/Status",
             url=self.zaak3["status"],
             zaak=self.zaak3["url"],
-            statustype=self.status_type2["url"],
+            statustype=self.status_type_finish["url"],
             datumStatusGezet="2021-03-15",
             statustoelichting="",
         )
@@ -340,7 +342,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
             "schemas/Status",
             url=self.zaak_intern["status"],
             zaak=self.zaak_intern["url"],
-            statustype=self.status_type1["url"],
+            statustype=self.status_type_initial["url"],
             datumStatusGezet="2021-01-12",
             statustoelichting="",
         )
@@ -395,8 +397,8 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
             )
         for resource in [
             self.zaaktype,
-            self.status_type1,
-            self.status_type2,
+            self.status_type_initial,
+            self.status_type_finish,
             self.status1,
             self.status2,
             self.status3,
@@ -414,7 +416,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
         # led to errors when retrieving the ZaakTypeStatusTypeConfig. This duplicate
         # config is added to verify that that issue was solved
         ZaakTypeStatusTypeConfigFactory.create(
-            statustype_url=self.status_type1["url"],
+            statustype_url=self.status_type_initial["url"],
             status_indicator=StatusIndicators.warning,
             status_indicator_text="U moet documenten toevoegen",
             description="Lorem ipsum dolor sit amet",
@@ -434,7 +436,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                     "end_date": None,
                     "identification": self.zaak2["identificatie"],
                     "description": self.zaaktype["omschrijving"],
-                    "current_status": self.status_type1["omschrijving"],
+                    "current_status": self.status_type_initial["omschrijving"],
                     "zaaktype_config": self.zaaktype_config1,
                     "statustype_config": self.zt_statustype_config1,
                     "case_type": "Zaak",
@@ -445,7 +447,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                     "end_date": None,
                     "identification": self.zaak1["identificatie"],
                     "description": self.zaaktype["omschrijving"],
-                    "current_status": self.status_type1["omschrijving"],
+                    "current_status": self.status_type_initial["omschrijving"],
                     "zaaktype_config": self.zaaktype_config1,
                     "statustype_config": self.zt_statustype_config1,
                     "case_type": "Zaak",
@@ -456,7 +458,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                     "end_date": datetime.date.fromisoformat(self.zaak3["einddatum"]),
                     "identification": self.zaak3["identificatie"],
                     "description": self.zaaktype["omschrijving"],
-                    "current_status": self.status_type2["omschrijving"],
+                    "current_status": self.status_type_finish["statustekst"],
                     "zaaktype_config": self.zaaktype_config1,
                     "statustype_config": None,
                     "case_type": "Zaak",
@@ -515,7 +517,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                             "end_date": None,
                             "identification": self.zaak_eherkenning2["identificatie"],
                             "description": self.zaaktype["omschrijving"],
-                            "current_status": self.status_type1["omschrijving"],
+                            "current_status": self.status_type_initial["omschrijving"],
                             "zaaktype_config": self.zaaktype_config1,
                             "statustype_config": self.zt_statustype_config1,
                             "case_type": "Zaak",
@@ -528,7 +530,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                             "end_date": None,
                             "identification": self.zaak_eherkenning1["identificatie"],
                             "description": self.zaaktype["omschrijving"],
-                            "current_status": self.status_type1["omschrijving"],
+                            "current_status": self.status_type_initial["omschrijving"],
                             "zaaktype_config": self.zaaktype_config1,
                             "statustype_config": self.zt_statustype_config1,
                             "case_type": "Zaak",
@@ -596,7 +598,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                             "end_date": None,
                             "identification": self.zaak_eherkenning1["identificatie"],
                             "description": self.zaaktype["omschrijving"],
-                            "current_status": self.status_type1["omschrijving"],
+                            "current_status": self.status_type_initial["omschrijving"],
                             "zaaktype_config": self.zaaktype_config1,
                             "statustype_config": self.zt_statustype_config1,
                             "case_type": "Zaak",
@@ -715,7 +717,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
 
     def test_list_cases_translates_status(self, m):
         st1 = StatusTranslationFactory(
-            status=self.status_type1["omschrijving"],
+            status=self.status_type_initial["omschrijving"],
             translation="Translated Status Type",
         )
         self._setUpMocks(m)
@@ -774,7 +776,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                     "end_date": None,
                     "identification": self.zaak2["identificatie"],
                     "description": self.zaaktype["omschrijving"],
-                    "current_status": self.status_type1["omschrijving"],
+                    "current_status": self.status_type_initial["omschrijving"],
                     "zaaktype_config": self.zaaktype_config1,
                     "statustype_config": self.zt_statustype_config1,
                     "case_type": "Zaak",
@@ -797,7 +799,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                     "end_date": None,
                     "identification": self.zaak1["identificatie"],
                     "description": self.zaaktype["omschrijving"],
-                    "current_status": self.status_type1["omschrijving"],
+                    "current_status": self.status_type_initial["omschrijving"],
                     "zaaktype_config": self.zaaktype_config1,
                     "statustype_config": self.zt_statustype_config1,
                     "case_type": "Zaak",

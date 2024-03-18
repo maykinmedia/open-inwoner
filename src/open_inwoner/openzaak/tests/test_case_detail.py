@@ -219,7 +219,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             omschrijving="Initial request",
             omschrijvingGeneriek="some content",
-            statustekst="",
+            statustekst="Registered",
             volgnummer=1,
             isEindstatus=False,
         )
@@ -735,7 +735,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 "statuses": [
                     {
                         "date": datetime.datetime(2021, 1, 12),
-                        "label": "Initial request",
+                        "label": "Registered",
                         "status_indicator": "warning",
                         "status_indicator_text": "foo",
                         "call_to_action_url": "",
@@ -858,7 +858,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 "statuses": [
                     {
                         "date": datetime.datetime(2021, 1, 12),
-                        "label": "Initial request",
+                        "label": "Registered",
                         "status_indicator": "warning",
                         "status_indicator_text": "foo",
                         "call_to_action_url": "",
@@ -1384,9 +1384,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(
             self.case_detail_url, user=self.user, headers={"HX-Request": "true"}
         )
-        self.assertNotContains(response, st1.status)
+        self.assertNotContains(response, st1.translation)
         self.assertNotContains(response, st2.status)
-        self.assertContains(response, st1.translation)
         self.assertContains(response, st2.translation)
 
     def test_when_accessing_case_detail_a_timelinelog_is_created(self, m):

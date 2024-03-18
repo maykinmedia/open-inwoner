@@ -591,10 +591,11 @@ def send_case_update_email(
         "case_link": case_detail_url,
     }
     if status:
-        context["status_description"] = translate_single_status(
+        context[
+            "status_description"
+        ] = status.statustype.statustekst or translate_single_status(
             status.statustype.omschrijving
         )
-
     if extra_context:
         context.update(extra_context)
     template.send_email([user.email], context)

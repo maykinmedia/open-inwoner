@@ -369,8 +369,11 @@ class InnerCaseDetailView(
         end_statustype_data = None
         if not status_types_mapping.get(end_statustype.url):
             end_statustype_data = {
-                "label": status_translate(
-                    end_statustype.omschrijving, default=_("No data available")
+                "label": (
+                    end_statustype.statustekst
+                    or status_translate(
+                        end_statustype.omschrijving, default=_("No data available")
+                    )
                 ),
                 "status_indicator": getattr(
                     self.statustype_config_mapping.get(end_statustype.url),
@@ -541,8 +544,11 @@ class InnerCaseDetailView(
         return [
             {
                 "date": s.datum_status_gezet,
-                "label": lookup.from_glom(
-                    s, "statustype.omschrijving", default=_("No data available")
+                "label": (
+                    s.statustype.statustekst
+                    or lookup.from_glom(
+                        s, "statustype.omschrijving", default=_("No data available")
+                    )
                 ),
                 "status_indicator": getattr(
                     statustype_config_mapping.get(s.statustype.url),

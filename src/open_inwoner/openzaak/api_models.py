@@ -5,6 +5,7 @@ from datetime import date, datetime
 from typing import Optional, Union
 
 from dateutil.relativedelta import relativedelta
+from glom import glom
 from zgw_consumers.api_models.base import Model, ZGWModel
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 
@@ -79,8 +80,11 @@ class Zaak(ZGWModel):
             "start_date": self.startdatum,
             "end_date": getattr(self, "einddatum", None),
             "description": self.zaaktype.omschrijving,
-            "current_status": status_translate.from_glom(
-                self, "status.statustype.omschrijving", default=""
+            "current_status": (
+                glom(self, "status.statustype.statustekst")
+                or status_translate.from_glom(
+                    self, "status.statustype.omschrijving", default=""
+                )
             ),
             "zaaktype_config": getattr(self, "zaaktype_config", None),
             "statustype_config": getattr(self, "statustype_config", None),

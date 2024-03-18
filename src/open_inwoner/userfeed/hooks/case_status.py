@@ -23,7 +23,8 @@ def case_status_notification_received(user: User, case: Zaak, status: Status):
         "case_uuid": case.uuid,
         "case_identificatie": case.identificatie,
         "case_omschrijving": case.omschrijving,
-        "status_omschrijving": status.statustype.omschrijving,
+        "status_omschrijving": status.statustype.statustekst
+        or status.statustype.omschrijving,
         # new for actionable
         "catalogus_url": case.zaaktype.catalogus,
         "case_type_identificatie": case.zaaktype.identificatie,
