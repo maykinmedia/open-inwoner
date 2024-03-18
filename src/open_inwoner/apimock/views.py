@@ -2,8 +2,24 @@ import json
 from pathlib import Path
 
 from django.core.exceptions import PermissionDenied
-from django.http import Http404, JsonResponse
+from django.http import Http404, HttpRequest, JsonResponse
 from django.views import View
+
+
+def inject_filter_parameter_values(request: HttpRequest, data: dict) -> dict:
+    """
+    To avoid returning data with hardcoded values that do not match the expected response
+    when calling a mock API endpoint with query parameters, inject the value of these
+    parameters into the response
+    """
+    for parameter_key, parameter_value in request.GET.items():
+        if "results" in data:
+            for entry in data["results"]:
+                if parameter_key in entry:
+                    entry[parameter_key] = parameter_value
+        elif parameter_key in data:
+            data[parameter_key] = parameter_value
+    return data
 
 
 class APIMockView(View):
@@ -48,7 +64,7 @@ class APIMockView(View):
         prefix = request.build_absolute_uri(f"/apimock/{set_name}/")
 
         with open(file_path, "r") as f:
-            data = json.load(f)
+            data = inject_filter_parameter_values(request, json.load(f))
             process_urls(data, prefix, self.url_replacers)
             return JsonResponse(data, safe=False)
 
