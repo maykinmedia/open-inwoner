@@ -1,18 +1,18 @@
 import logging
-from typing import Any, Dict, Optional
+from typing import Any
 
 import requests
 
 logger = logging.getLogger(__name__)
 
-Object = Dict[str, Any]
+Object = dict[str, Any]
 
 
 class ClientError(Exception):
     pass
 
 
-def get_json_response(response: requests.Response) -> Optional[dict]:
+def get_json_response(response: requests.Response) -> dict | None:
     try:
         response_json = response.json()
     except Exception:

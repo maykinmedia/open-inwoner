@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 
 from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry, Point
@@ -71,7 +70,7 @@ class PdocLocatieserver(Geocoder):
         callback = self._parse_json
         return self._call_geocoder(url, callback, timeout=timeout)
 
-    def _parse_json(self, result) -> Optional[Location]:
+    def _parse_json(self, result) -> Location | None:
         if not result:
             return None
 
@@ -84,7 +83,7 @@ class PdocLocatieserver(Geocoder):
         return Location(placename, (point.y, point.x), place)
 
 
-def geocode_address(address: str) -> Optional[Point]:
+def geocode_address(address: str) -> Point | None:
     geocoder_class = import_string(settings.GEOCODER)
     geocoder = geocoder_class(
         user_agent=settings.GEOPY_APP, timeout=settings.GEOPY_TIMEOUT

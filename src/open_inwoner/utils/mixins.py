@@ -1,5 +1,5 @@
+from collections.abc import Iterable
 from time import time
-from typing import Iterable, Tuple
 
 from django.core.cache import caches
 from django.core.exceptions import PermissionDenied
@@ -104,7 +104,7 @@ class PaginationMixin:
 
     def paginate_object_list(
         self, object_list: Iterable, page_size: int = None
-    ) -> Tuple[Paginator, Page, Iterable, bool]:
+    ) -> tuple[Paginator, Page, Iterable, bool]:
         """copy MultipleObjectMixin.paginate_queryset method"""
         page_size = page_size or self.paginate_by
         paginator = self.paginator_class(

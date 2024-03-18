@@ -1,4 +1,4 @@
-from typing import List, Optional, TypedDict
+from typing import TypedDict
 
 from django import template
 from django.urls import reverse
@@ -19,12 +19,12 @@ class TableHeaderConfig(TypedDict):
 
 
 class TableRowConfig(TypedDict):
-    headers: List[TableHeaderConfig]
-    cells: List[TableCellConfig]
+    headers: list[TableHeaderConfig]
+    cells: list[TableCellConfig]
 
 
 class TableConfig(TypedDict):
-    body: List[TableRowConfig]
+    body: list[TableRowConfig]
 
 
 @register.inclusion_tag("components/table/table.html")
@@ -48,14 +48,14 @@ def case_table(case: dict, **kwargs) -> dict:
     """
 
     # build rows for data we actually have
-    rows: List[TableRowConfig] = []
+    rows: list[TableRowConfig] = []
 
     def add_row_if_not_empty(key, label):
         value = case.get(key)
         if not value:
             return
 
-        row = {"headers": [{"text": label}], "cells": [{"text": value}]}
+        row: TableRowConfig = {"headers": [{"text": label}], "cells": [{"text": value}]}
 
         rows.append(row)
 
@@ -74,7 +74,7 @@ def case_table(case: dict, **kwargs) -> dict:
 
 
 @register.inclusion_tag("components/table/table.html")
-def contactmoment_table(kcm: KCMDict, zaak: Optional[Zaak] = None, **kwargs) -> dict:
+def contactmoment_table(kcm: KCMDict, zaak: Zaak | None = None, **kwargs) -> dict:
     """
     Renders a table below the dashboard for additional values related to a Zaak (case).
 
@@ -89,14 +89,14 @@ def contactmoment_table(kcm: KCMDict, zaak: Optional[Zaak] = None, **kwargs) -> 
     """
 
     # build rows for data we actually have
-    rows: List[TableRowConfig] = []
+    rows: list[TableRowConfig] = []
 
     def add_row_if_not_empty(key, label):
         value = kcm.get(key)
         if not value:
             return
 
-        row = {"headers": [{"text": label}], "cells": [{"text": value}]}
+        row: TableRowConfig = {"headers": [{"text": label}], "cells": [{"text": value}]}
 
         rows.append(row)
 

@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from typing import Optional
 
 from open_inwoner.ssd.service.uitkering.body_action_resolved import (
     UitkeringsSpecificatieInfo,
@@ -19,18 +18,14 @@ class UitkeringsSpecificatieClientPortTypeSendUitkeringsSpecificatieClientInput:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
-    header: Optional[
-        "UitkeringsSpecificatieClientPortTypeSendUitkeringsSpecificatieClientInput.Header"
-    ] = field(
+    header: "UitkeringsSpecificatieClientPortTypeSendUitkeringsSpecificatieClientInput.Header | None" = field(
         default=None,
         metadata={
             "name": "Header",
             "type": "Element",
         },
     )
-    body: Optional[
-        "UitkeringsSpecificatieClientPortTypeSendUitkeringsSpecificatieClientInput.Body"
-    ] = field(
+    body: "UitkeringsSpecificatieClientPortTypeSendUitkeringsSpecificatieClientInput.Body | None" = field(
         default=None,
         metadata={
             "name": "Body",
@@ -40,7 +35,7 @@ class UitkeringsSpecificatieClientPortTypeSendUitkeringsSpecificatieClientInput:
 
     @dataclass
     class Header:
-        header: Optional[Header] = field(
+        header: Header | None = field(
             default=None,
             metadata={
                 "name": "Header",
@@ -51,7 +46,7 @@ class UitkeringsSpecificatieClientPortTypeSendUitkeringsSpecificatieClientInput:
 
     @dataclass
     class Body:
-        uitkerings_specificatie_info: Optional[UitkeringsSpecificatieInfo] = field(
+        uitkerings_specificatie_info: UitkeringsSpecificatieInfo | None = field(
             default=None,
             metadata={
                 "name": "UitkeringsSpecificatieInfo",
@@ -67,18 +62,14 @@ class UitkeringsSpecificatieClientPortTypeSendUitkeringsSpecificatieClientOutput
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
-    header: Optional[
-        "UitkeringsSpecificatieClientPortTypeSendUitkeringsSpecificatieClientOutput.Header"
-    ] = field(
+    header: "UitkeringsSpecificatieClientPortTypeSendUitkeringsSpecificatieClientOutput.Header | None" = field(
         default=None,
         metadata={
             "name": "Header",
             "type": "Element",
         },
     )
-    body: Optional[
-        "UitkeringsSpecificatieClientPortTypeSendUitkeringsSpecificatieClientOutput.Body"
-    ] = field(
+    body: "UitkeringsSpecificatieClientPortTypeSendUitkeringsSpecificatieClientOutput.Body | None" = field(
         default=None,
         metadata={
             "name": "Body",
@@ -88,7 +79,7 @@ class UitkeringsSpecificatieClientPortTypeSendUitkeringsSpecificatieClientOutput
 
     @dataclass
     class Header:
-        header: Optional[Header] = field(
+        header: Header | None = field(
             default=None,
             metadata={
                 "name": "Header",
@@ -99,9 +90,7 @@ class UitkeringsSpecificatieClientPortTypeSendUitkeringsSpecificatieClientOutput
 
     @dataclass
     class Body:
-        uitkerings_specificatie_info_response: Optional[
-            UitkeringsSpecificatieInfoResponse
-        ] = field(
+        uitkerings_specificatie_info_response: UitkeringsSpecificatieInfoResponse | None = field(
             default=None,
             metadata={
                 "name": "UitkeringsSpecificatieInfoResponse",
@@ -109,9 +98,7 @@ class UitkeringsSpecificatieClientPortTypeSendUitkeringsSpecificatieClientOutput
                 "namespace": "http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient/v0600",
             },
         )
-        fault: Optional[
-            "UitkeringsSpecificatieClientPortTypeSendUitkeringsSpecificatieClientOutput.Body.Fault"
-        ] = field(
+        fault: "UitkeringsSpecificatieClientPortTypeSendUitkeringsSpecificatieClientOutput.Body.Fault | None" = field(
             default=None,
             metadata={
                 "name": "Fault",
@@ -121,30 +108,28 @@ class UitkeringsSpecificatieClientPortTypeSendUitkeringsSpecificatieClientOutput
 
         @dataclass
         class Fault:
-            faultcode: Optional[str] = field(
+            faultcode: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultstring: Optional[str] = field(
+            faultstring: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultactor: Optional[str] = field(
+            faultactor: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            detail: Optional[
-                "UitkeringsSpecificatieClientPortTypeSendUitkeringsSpecificatieClientOutput.Body.Fault.Detail"
-            ] = field(
+            detail: "UitkeringsSpecificatieClientPortTypeSendUitkeringsSpecificatieClientOutput.Body.Fault.Detail | None" = field(
                 default=None,
                 metadata={
                     "type": "Element",
@@ -154,7 +139,7 @@ class UitkeringsSpecificatieClientPortTypeSendUitkeringsSpecificatieClientOutput
 
             @dataclass
             class Detail:
-                fwi: Optional[Fwi] = field(
+                fwi: Fwi | None = field(
                     default=None,
                     metadata={
                         "name": "FWI",

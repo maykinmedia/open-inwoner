@@ -3,7 +3,6 @@ import datetime as dt
 import logging
 from collections import defaultdict
 from datetime import datetime
-from typing import List, Optional
 
 from django.conf import settings
 from django.contrib import messages
@@ -61,7 +60,7 @@ class SimpleFile:
     name: str
     size: int
     url: str
-    created: Optional[datetime] = None
+    created: datetime | None = None
 
 
 class OuterCaseDetailView(
@@ -96,7 +95,7 @@ class InnerCaseDetailView(
     template_name = "pages/cases/status_inner.html"
     form_class = CaseUploadForm
     contact_form_class = CaseContactForm
-    case: Optional[Zaak] = None
+    case: Zaak | None = None
 
     def store_statustype_mapping(self, zaaktype_identificatie):
         # Filter on ZaakType identificatie to avoid eSuite situation where one statustype
@@ -255,7 +254,7 @@ class InnerCaseDetailView(
 
         return context
 
-    def get_second_status_preview(self, statustypen: list) -> Optional[StatusType]:
+    def get_second_status_preview(self, statustypen: list) -> StatusType | None:
         """
         Get the relevant status type to display preview of second case status
 
@@ -535,10 +534,10 @@ class InnerCaseDetailView(
 
     @staticmethod
     def get_statuses_data(
-        statuses: List[Status],
+        statuses: list[Status],
         lookup: TranslationLookup,
-        statustype_config_mapping: Optional[dict] = None,
-    ) -> List[dict]:
+        statustype_config_mapping: dict | None = None,
+    ) -> list[dict]:
         return [
             {
                 "date": s.datum_status_gezet,
@@ -578,7 +577,7 @@ class InnerCaseDetailView(
         ]
 
     @staticmethod
-    def get_case_document_files(case: Zaak, client: ZakenClient) -> List[SimpleFile]:
+    def get_case_document_files(case: Zaak, client: ZakenClient) -> list[SimpleFile]:
         if not client:
             return []
 

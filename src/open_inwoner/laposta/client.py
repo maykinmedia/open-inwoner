@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 
 from django.conf import settings
 
@@ -72,7 +71,7 @@ class LapostaClient(APIClient):
         return Member(**data["member"])
 
 
-def create_laposta_client() -> Optional[LapostaClient]:
+def create_laposta_client() -> LapostaClient | None:
     config = LapostaConfig.get_solo()
     if config.api_root:
         return LapostaClient.configure_from(config)

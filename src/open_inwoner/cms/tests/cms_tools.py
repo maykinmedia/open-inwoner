@@ -1,5 +1,3 @@
-from typing import Tuple
-
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.test import RequestFactory
@@ -30,7 +28,7 @@ def create_homepage():
     return p
 
 
-def _init_plugin(plugin_class, plugin_data=None) -> Tuple[dict, str]:
+def _init_plugin(plugin_class, plugin_data=None) -> tuple[dict, str]:
     if plugin_data is None:
         plugin_data = dict()
 
@@ -60,7 +58,7 @@ def get_request(*, user=None, session_vars=None):
 
 def render_plugin(
     plugin_class, plugin_data=None, *, user=None, session_vars=None
-) -> Tuple[str, dict]:
+) -> tuple[str, dict]:
     model_instance = _init_plugin(plugin_class, plugin_data)
     request = get_request(user=user, session_vars=session_vars)
 

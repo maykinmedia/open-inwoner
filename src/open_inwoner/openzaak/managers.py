@@ -1,5 +1,5 @@
 from datetime import timedelta
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 from uuid import UUID
 
 from django.db import IntegrityError, models, transaction
@@ -23,7 +23,7 @@ class UserCaseNotificationBaseManager(models.Manager):
         case_uuid,
         delta: timedelta,
         collision_key: str,
-        not_record_id: Optional[int] = None,
+        not_record_id: int | None = None,
     ) -> bool:
         qs = self.filter(
             user=user,
@@ -51,7 +51,7 @@ class UserCaseStatusNotificationManager(UserCaseNotificationBaseManager):
         case_uuid: UUID,
         status_uuid: UUID,
         collision_key: str,
-    ) -> Optional["UserCaseStatusNotification"]:
+    ) -> "UserCaseStatusNotification | None":
         """
         assume this is the first delivery but depend on the unique constraint
         """
@@ -71,7 +71,7 @@ class UserCaseInfoObjectNotificationManager(UserCaseNotificationBaseManager):
         case_uuid: UUID,
         zaak_info_object_uuid: UUID,
         collision_key: str,
-    ) -> Optional["UserCaseInfoObjectNotification"]:
+    ) -> "UserCaseInfoObjectNotification | None":
         """
         assume this is the first delivery but depend on the unique constraint
         """

@@ -1,6 +1,5 @@
 import logging
 from datetime import timedelta
-from typing import List, Optional
 
 from django.conf import settings
 
@@ -15,10 +14,10 @@ logger = logging.getLogger(__name__)
 
 
 def fetch_klantcontactmomenten(
-    user_bsn: Optional[str] = None,
-    user_kvk_or_rsin: Optional[str] = None,
-    vestigingsnummer: Optional[str] = None,
-) -> List[KlantContactMoment]:
+    user_bsn: str | None = None,
+    user_kvk_or_rsin: str | None = None,
+    vestigingsnummer: str | None = None,
+) -> list[KlantContactMoment]:
     if not user_bsn and not user_kvk_or_rsin:
         return []
 
@@ -53,10 +52,10 @@ def fetch_klantcontactmomenten(
 
 def fetch_klantcontactmoment(
     kcm_uuid: str,
-    user_bsn: Optional[str] = None,
-    user_kvk_or_rsin: Optional[str] = None,
-    vestigingsnummer: Optional[str] = None,
-) -> Optional[KlantContactMoment]:
+    user_bsn: str | None = None,
+    user_kvk_or_rsin: str | None = None,
+    vestigingsnummer: str | None = None,
+) -> KlantContactMoment | None:
     if not user_bsn and not user_kvk_or_rsin:
         return
 
@@ -132,7 +131,7 @@ def get_kcm_answer_mapping(
 
 def contactmoment_has_new_answer(
     contactmoment: ContactMoment,
-    local_kcm_mapping: Optional[dict[str, KlantContactMomentAnswer]] = None,
+    local_kcm_mapping: dict[str, KlantContactMomentAnswer] | None = None,
 ) -> bool:
     is_new = instance_is_new(
         contactmoment,

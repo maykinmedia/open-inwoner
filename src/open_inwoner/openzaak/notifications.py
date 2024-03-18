@@ -1,6 +1,5 @@
 import logging
 from datetime import date, timedelta
-from typing import List, Optional
 
 from django.conf import settings
 from django.urls import reverse
@@ -275,7 +274,7 @@ def handle_zaakinformatieobject_update(
 #
 def check_status_history(
     notification: Notification, case: Zaak, client: ZakenClient
-) -> List[Status] | None:
+) -> list[Status] | None:
     """
     Check if more than one status exists for `case` (else notifications are skipped)
     """
@@ -302,7 +301,7 @@ def check_status_history(
 def check_status(
     notification: Notification,
     case: Zaak,
-    status_history: List[Status],
+    status_history: list[Status],
     client: ZakenClient,
 ) -> Status | None:
     """
@@ -571,7 +570,7 @@ def send_case_update_email(
     user: User,
     case: Zaak,
     template_name: str,
-    status: Optional[Status] = None,
+    status: Status | None = None,
     extra_context: dict = None,
 ):
     """
@@ -604,7 +603,7 @@ def send_case_update_email(
 # - - - - -
 
 
-def get_np_initiator_bsns_from_roles(roles: List[Rol]) -> List[str]:
+def get_np_initiator_bsns_from_roles(roles: list[Rol]) -> list[str]:
     """
     iterate over Rollen and for all natural-person initiators return their BSN
     """
@@ -628,7 +627,7 @@ def get_np_initiator_bsns_from_roles(roles: List[Rol]) -> List[str]:
     return list(ret)
 
 
-def get_nnp_initiator_nnp_id_from_roles(roles: List[Rol]) -> List[str]:
+def get_nnp_initiator_nnp_id_from_roles(roles: list[Rol]) -> list[str]:
     """
     iterate over Rollen and for all non-natural-person initiators return their nnpId
     """
@@ -652,7 +651,7 @@ def get_nnp_initiator_nnp_id_from_roles(roles: List[Rol]) -> List[str]:
     return list(ret)
 
 
-def get_initiator_users_from_roles(roles: List[Rol]) -> List[User]:
+def get_initiator_users_from_roles(roles: list[Rol]) -> list[User]:
     """
     iterate over Rollen and return User objects for initiators
     """

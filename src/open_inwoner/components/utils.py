@@ -1,5 +1,3 @@
-from typing import Optional
-
 from django import template
 from django.template import Context, Template
 from django.template.library import InclusionNode, parse_bits
@@ -163,7 +161,7 @@ class RenderableTag:
         """
         return self.render(kwargs)
 
-    def render(self, tag_args: Optional[dict] = None) -> str:
+    def render(self, tag_args: dict | None = None) -> str:
         """
         Renders the template tag with arguments.
 
@@ -178,7 +176,7 @@ class RenderableTag:
         template = self.get_template(tag_args)
         return template.render(context)
 
-    def get_template(self, tag_args: Optional[dict] = None):
+    def get_template(self, tag_args: dict | None = None):
         """
         Returns the (Django) Template instance (in order to render the tag).
         A templates str is constructed and then passed to a django.template.Template, the resulting instance is

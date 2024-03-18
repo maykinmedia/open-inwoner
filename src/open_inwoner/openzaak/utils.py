@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 
 from zgw_consumers.api_models.constants import RolTypes, VertrouwelijkheidsAanduidingen
 
@@ -112,7 +111,7 @@ def get_role_name_display(rol: Rol) -> str:
         return display
 
 
-def get_zaak_type_config(case_type: ZaakType) -> Optional[ZaakTypeConfig]:
+def get_zaak_type_config(case_type: ZaakType) -> ZaakTypeConfig | None:
     try:
         return ZaakTypeConfig.objects.filter_case_type(case_type).get()
     except ZaakTypeConfig.DoesNotExist:
@@ -122,7 +121,7 @@ def get_zaak_type_config(case_type: ZaakType) -> Optional[ZaakTypeConfig]:
 def get_zaak_type_info_object_type_config(
     case_type: ZaakType,
     info_object_type_url: str,
-) -> Optional[ZaakTypeInformatieObjectTypeConfig]:
+) -> ZaakTypeInformatieObjectTypeConfig | None:
     assert isinstance(info_object_type_url, str)
     try:
         return ZaakTypeInformatieObjectTypeConfig.objects.get_for_case_and_info_type(

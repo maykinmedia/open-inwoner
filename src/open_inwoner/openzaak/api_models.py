@@ -2,7 +2,7 @@ import logging
 import re
 from dataclasses import dataclass, field
 from datetime import date, datetime
-from typing import Dict, Optional, Union
+from typing import Optional, Union
 
 from dateutil.relativedelta import relativedelta
 from zgw_consumers.api_models.base import Model, ZGWModel
@@ -272,7 +272,7 @@ class Notification(Model):
     hoofd_object: str
     actie: str
     aanmaakdatum: datetime
-    kenmerken: Dict = field(default_factory=dict)
+    kenmerken: dict = field(default_factory=dict)
 
 
 @dataclass

@@ -1,5 +1,3 @@
-from typing import Union
-
 from django.template import Context, Template
 from django.test import RequestFactory
 
@@ -335,7 +333,7 @@ class ContentsTagWebTest(InclusionTagWebTest):
         self.assertIn(contents_html, html)
         return contents_html
 
-    def get_contents(self, context: Union[Context, dict] = {}) -> str:
+    def get_contents(self, context: Context | dict = {}) -> str:
         """
         Renders contents HTML.
 

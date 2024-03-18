@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import HttpResponseRedirect
@@ -31,7 +31,7 @@ class QuestionnaireResetView(RedirectView):
         request.session[QUESTIONNAIRE_SESSION_KEY] = None
         return super().get(request, *args, **kwargs)
 
-    def get_redirect_url(self, *args, **kwargs) -> Optional[str]:
+    def get_redirect_url(self, *args, **kwargs) -> str | None:
         if not self.request.user.is_authenticated:
             return reverse("pages-root")
         return super().get_redirect_url(*args, **kwargs)
@@ -108,7 +108,7 @@ class QuestionnaireExportView(LogMixin, ExportMixin, TemplateView):
             self.save_pdf_file(context["file"], self.get_filename())
         return response
 
-    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         questionnaire = QuestionnaireStep.objects.filter(
             slug=self.request.session.get(QUESTIONNAIRE_SESSION_KEY)

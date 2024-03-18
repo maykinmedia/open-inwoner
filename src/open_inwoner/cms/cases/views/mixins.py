@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 
 from django.contrib.auth.mixins import AccessMixin, LoginRequiredMixin
 from django.template.response import TemplateResponse
@@ -131,7 +130,7 @@ class CaseAccessMixin(AccessMixin):
 
         return super().handle_no_permission()
 
-    def get_case(self, client, kwargs) -> Optional[Zaak]:
+    def get_case(self, client, kwargs) -> Zaak | None:
         case_uuid = kwargs.get("object_id")
         if not case_uuid:
             return None

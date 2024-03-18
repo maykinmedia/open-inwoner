@@ -1,5 +1,3 @@
-from typing import List
-
 from django.utils.translation import gettext_lazy as _
 
 from open_inwoner.accounts.choices import LoginTypeChoices
@@ -26,7 +24,7 @@ class OpenTaskFeedItem(FeedItem):
         return self.get_data("task_name", super().message)
 
 
-def update_external_task_items(user: User, openstaande_taken: List[OpenTask]):
+def update_external_task_items(user: User, openstaande_taken: list[OpenTask]):
     """
     Creates items for OpenTasks if they do not exist yet, updates existing items if the
     data changed and marks existing items as complete if no OpenTask exists for that

@@ -1,6 +1,6 @@
 import logging
 import tempfile
-from typing import Any, Dict, List
+from typing import Any
 
 from django.contrib.sessions.middleware import (
     SessionMiddleware as DefaultSessionMiddleWare,
@@ -18,7 +18,7 @@ def temp_media_root():
     return override_settings(MEDIA_ROOT=tmpdir)
 
 
-def paginated_response(results: List[dict]) -> Dict[str, Any]:
+def paginated_response(results: list[dict]) -> dict[str, Any]:
     body = {
         "count": len(results),
         "previous": None,
