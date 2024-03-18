@@ -40,7 +40,7 @@ def perform_oidc_login(
     """
     Perform the full OIDC login flow for DigiD or eHerkenning
     """
-    login_url = furl(reverse("login"))
+    login_url = furl(reverse("login_business"))
     if redirect_url:
         login_url.set({"next": redirect_url})
 

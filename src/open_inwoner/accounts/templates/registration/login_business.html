@@ -37,7 +37,9 @@
                                             <img class="eherkenning-logo__image" src="{% static 'accounts/eherkenning.png' %}" height=30 alt="eHerkenning inlogpagina">
                                         </a>
                                         {% url 'eherkenning_oidc:init' as href %}
-                                        {% link href=href text=_('Inloggen met eHerkenning') primary=True icon='east' extra_classes="link--next link--eherkenning" %}
+                                        {% with href|addnexturl:next as href_with_next %}
+                                            {% link href=href_with_next text=_('Inloggen met eHerkenning') primary=True icon='east' extra_classes="link--next link--eherkenning" %}
+                                        {% endwith %}
                                     {% endrender_card %}
                                 {% else %}
                                     {% render_card direction='horizontal' tinted=True %}
