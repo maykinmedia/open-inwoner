@@ -5,6 +5,8 @@ from pydantic import BaseModel
 from zgw_consumers.client import build_client
 from zgw_consumers.models import Service
 
+from open_inwoner.utils.api import JSONEncoderMixin
+
 from .exceptions import QmaticException
 from .models import QmaticConfig
 
@@ -60,7 +62,7 @@ class BranchDetailDict(BaseModel):
     updated: int
 
 
-class Appointment(BaseModel):
+class Appointment(JSONEncoderMixin, BaseModel):
     services: list[ServiceDict]
     title: str
     start: datetime
@@ -70,6 +72,9 @@ class Appointment(BaseModel):
     publicId: str
     branch: BranchDetailDict
     notes: str | None
+
+    class Config(JSONEncoderMixin.Config):
+        pass
 
 
 class NoServiceConfigured(RuntimeError):
