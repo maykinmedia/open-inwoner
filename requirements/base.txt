@@ -364,7 +364,7 @@ lxml==4.9.1
     #   maykin-python3-saml
     #   svglib
     #   xmlsec
-mail-editor @ git+https://github.com/maykinmedia/mail-editor.git@0.3.6
+mail-editor==0.3.7
     # via -r requirements/base.in
 markdown==3.3.6
     # via -r requirements/base.in

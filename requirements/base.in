@@ -37,7 +37,7 @@ django-view-breadcrumbs
 markdown
 django-jsonform
 humanfriendly
-git+https://github.com/maykinmedia/mail-editor.git@0.3.6#egg=mail-editor
+mail-editor
 fontawesomefree
 django-timeline-logger
 django-csp
