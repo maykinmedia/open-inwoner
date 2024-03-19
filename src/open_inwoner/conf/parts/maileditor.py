@@ -345,11 +345,6 @@ MAIL_EDITOR_CONF = {
                 "example": _("status placeholder"),
             },
             {
-                "name": "status_description",
-                "description": _("The description of the status of the case"),
-                "example": _("status placeholder"),
-            },
-            {
                 "name": "case_link",
                 "description": _("The link to the case details."),
             },
