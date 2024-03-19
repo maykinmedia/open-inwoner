@@ -1,12 +1,11 @@
 from dataclasses import dataclass, field
-from typing import Optional
 
 __NAMESPACE__ = "http://www.centric.nl/GWS/Diensten/JaarOpgaveClient/v0400"
 
 
 @dataclass
 class Request:
-    burger_service_nr: Optional[str] = field(
+    burger_service_nr: str | None = field(
         default=None,
         metadata={
             "name": "BurgerServiceNr",
@@ -17,7 +16,7 @@ class Request:
             "pattern": r"\d*",
         },
     )
-    dienstjaar: Optional[int] = field(
+    dienstjaar: int | None = field(
         default=None,
         metadata={
             "name": "Dienstjaar",

@@ -1,8 +1,8 @@
 import logging
 from datetime import date
-from typing import List
 
 from django.core.management.base import BaseCommand
+from django.db.models.query import QuerySet
 from django.urls import reverse
 
 from mail_editor.helpers import find_template
@@ -37,7 +37,7 @@ class Command(BaseCommand):
                 f"The email was sent to the user {receiver} about {actions.count()} expiring actions"
             )
 
-    def send_email(self, receiver: User, actions: List[Action]):
+    def send_email(self, receiver: User, actions: QuerySet[Action]):
         actions_link = build_absolute_url(reverse("profile:action_list"))
         template = find_template("expiring_action")
         context = {

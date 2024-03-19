@@ -2,7 +2,6 @@ import abc
 import logging
 from abc import ABC
 from datetime import datetime
-from typing import Optional
 from urllib.parse import urljoin
 
 from glom import GlomError, glom
@@ -29,14 +28,14 @@ class BRPAPI(ABC):
             self._is_ready = True
 
     @abc.abstractmethod
-    def fetch_data(self, user_bsn: str) -> Optional[dict]:
+    def fetch_data(self, user_bsn: str) -> dict | None:
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def parse_data(self, data: dict) -> Optional[BRPData]:
+    def parse_data(self, data: dict) -> BRPData | None:
         raise NotImplementedError()
 
-    def fetch_brp(self, user_bsn: str) -> Optional[BRPData]:
+    def fetch_brp(self, user_bsn: str) -> BRPData | None:
         if not self._is_ready:
             return None
 
@@ -61,7 +60,7 @@ class BRPAPI(ABC):
 class BRP_1_3(BRPAPI):
     version = "1.3"
 
-    def fetch_data(self, user_bsn: str) -> Optional[dict]:
+    def fetch_data(self, user_bsn: str) -> dict | None:
         url = urljoin(self.client.base_url, f"ingeschrevenpersonen/{user_bsn}")
         headers = {
             "Accept": "application/hal+json",
@@ -90,7 +89,7 @@ class BRP_1_3(BRPAPI):
             logger.exception("exception while making request", exc_info=e)
             return None
 
-    def parse_data(self, data: dict) -> Optional[BRPData]:
+    def parse_data(self, data: dict) -> BRPData | None:
         brp = BRPData(
             first_name=glom(data, "naam.voornamen", default=""),
             infix=glom(data, "naam.voorvoegsel", default=""),
@@ -116,7 +115,7 @@ class BRP_1_3(BRPAPI):
 class BRP_2_1(BRPAPI):
     version = "2.1"
 
-    def fetch_data(self, user_bsn: str) -> Optional[dict]:
+    def fetch_data(self, user_bsn: str) -> dict | None:
         url = urljoin(self.client.base_url, "personen")
         try:
             response = self.client.post(
@@ -148,7 +147,7 @@ class BRP_2_1(BRPAPI):
             logger.exception("exception while making request", exc_info=e)
             return None
 
-    def parse_data(self, data: dict) -> Optional[BRPData]:
+    def parse_data(self, data: dict) -> BRPData | None:
         # use first record
         if not data["personen"]:
             return None

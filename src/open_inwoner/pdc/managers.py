@@ -1,5 +1,4 @@
 from datetime import date
-from typing import List
 
 from django.db import models
 
@@ -63,7 +62,7 @@ class CategoryPublishedQueryset(MP_NodeQuerySet):
 
         return self.filter_by_zaken(cases)
 
-    def filter_by_zaken(self, cases: List[Zaak]):
+    def filter_by_zaken(self, cases: list[Zaak]):
         """
         Returns the categories linked to ZaakTypen matching with the specified Zaken.
         """

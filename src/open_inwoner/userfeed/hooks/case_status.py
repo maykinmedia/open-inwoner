@@ -1,5 +1,4 @@
 from datetime import timedelta
-from typing import Optional
 
 from django.db.models import Q
 from django.urls import reverse
@@ -72,7 +71,7 @@ class CaseStatusUpdateFeedItem(FeedItem):
 
     cms_apps = ["cases"]
 
-    status_config: Optional[ZaakTypeStatusTypeConfig] = None
+    status_config: ZaakTypeStatusTypeConfig | None = None
 
     def __init__(self, data: FeedItemData):
         super().__init__(data)

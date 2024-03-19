@@ -1,6 +1,6 @@
 # fmt: off
 
-from typing import Any, Optional, Union
+from typing import Any
 
 import requests
 from lxml import etree  # nosec
@@ -30,7 +30,7 @@ def _get_report_info(
     response: requests.Response,
     info_response_node: str,
     info_type: Any,
-) -> Optional[Union[JaarOpgaveInfoResponse, UitkeringInfoResponse]]:
+) -> JaarOpgaveInfoResponse | UitkeringInfoResponse | None:
     """
     Return the `info_type` (e.g. JaarOpgaveInfoResponse) from the request
     response, or `None` if a parsing error occurs
@@ -58,7 +58,7 @@ def _get_report_info(
     return info
 
 
-def get_jaaropgaven(response: requests.Response) -> Optional[list[dict]]:
+def get_jaaropgaven(response: requests.Response) -> list[dict] | None:
     """
     Wrapper function: guard against `AttributeError` while fetching Jaaropgave data
     """
@@ -92,7 +92,7 @@ def get_jaaropgaven(response: requests.Response) -> Optional[list[dict]]:
     return jaaropgaven
 
 
-def get_uitkeringen(response: requests.Response) -> Optional[list[dict]]:
+def get_uitkeringen(response: requests.Response) -> list[dict] | None:
     """
     Wrapper function: guard against `AttributeError` while fetching uitkering data
     """

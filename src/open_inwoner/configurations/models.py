@@ -1,5 +1,4 @@
 import os
-from typing import Optional
 
 from django.conf import settings
 from django.contrib.flatpages.models import FlatPage
@@ -591,7 +590,7 @@ class SiteConfiguration(SingletonModel):
     def openid_enabled_for_regular_users(self):
         return self.openid_display == OpenIDDisplayChoices.regular
 
-    def get_help_text(self, request) -> Optional[str]:
+    def get_help_text(self, request) -> str | None:
         match = request.resolver_match
         path = request.get_full_path()
         if not match:

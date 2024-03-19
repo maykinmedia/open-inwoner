@@ -1,5 +1,6 @@
+from collections.abc import Generator
 from datetime import date
-from typing import Any, Generator, Union
+from typing import Any
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -53,7 +54,7 @@ class MyProfileView(
     @staticmethod
     def stringify(
         items: list, string_func: callable, lump: bool = False
-    ) -> Union[Generator, str]:
+    ) -> Generator | str:
         """
         Create string representation(s) of `items` for display
 

@@ -1,5 +1,4 @@
 import json
-from typing import Union
 from uuid import uuid4
 
 from django.contrib.postgres.fields import ArrayField
@@ -373,7 +372,7 @@ class ProductLocation(GeoModel):
     def __str__(self) -> str:
         return f"{self.name}: {self.address_str}" if self.name else self.address_str
 
-    def get_geojson_feature(self, stringify: bool = True) -> Union[str, dict]:
+    def get_geojson_feature(self, stringify: bool = True) -> str | dict:
         feature = super().get_geojson_feature(False)
 
         if feature.get("properties"):

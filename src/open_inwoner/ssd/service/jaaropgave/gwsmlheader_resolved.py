@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from typing import Optional
 
 from xsdata.models.datatype import XmlDateTime
 
@@ -10,7 +9,7 @@ __NAMESPACE__ = "http://www.centric.nl/GWS/Header/v0300"
 
 @dataclass
 class BerichtIdentificatie:
-    dat_tijd_aanmaak_request: Optional[XmlDateTime] = field(
+    dat_tijd_aanmaak_request: XmlDateTime | None = field(
         default=None,
         metadata={
             "name": "DatTijdAanmaakRequest",
@@ -18,7 +17,7 @@ class BerichtIdentificatie:
             "namespace": "",
         },
     )
-    dat_tijd_ontvangst_request: Optional[XmlDateTime] = field(
+    dat_tijd_ontvangst_request: XmlDateTime | None = field(
         default=None,
         metadata={
             "name": "DatTijdOntvangstRequest",
@@ -26,7 +25,7 @@ class BerichtIdentificatie:
             "namespace": "",
         },
     )
-    dat_tijd_aanmaak_response: Optional[XmlDateTime] = field(
+    dat_tijd_aanmaak_response: XmlDateTime | None = field(
         default=None,
         metadata={
             "name": "DatTijdAanmaakResponse",
@@ -34,7 +33,7 @@ class BerichtIdentificatie:
             "namespace": "",
         },
     )
-    dat_tijd_ontvangst_response: Optional[XmlDateTime] = field(
+    dat_tijd_ontvangst_response: XmlDateTime | None = field(
         default=None,
         metadata={
             "name": "DatTijdOntvangstResponse",
@@ -42,7 +41,7 @@ class BerichtIdentificatie:
             "namespace": "",
         },
     )
-    applicatie_informatie: Optional[str] = field(
+    applicatie_informatie: str | None = field(
         default=None,
         metadata={
             "name": "ApplicatieInformatie",
@@ -54,7 +53,7 @@ class BerichtIdentificatie:
 
 @dataclass
 class RouteInformatie:
-    bron: Optional[Actor] = field(
+    bron: Actor | None = field(
         default=None,
         metadata={
             "name": "Bron",
@@ -63,7 +62,7 @@ class RouteInformatie:
             "required": True,
         },
     )
-    bestemming: Optional[Actor] = field(
+    bestemming: Actor | None = field(
         default=None,
         metadata={
             "name": "Bestemming",
@@ -79,7 +78,7 @@ class Header:
     class Meta:
         namespace = "http://www.centric.nl/GWS/Header/v0300"
 
-    route_informatie: Optional[RouteInformatie] = field(
+    route_informatie: RouteInformatie | None = field(
         default=None,
         metadata={
             "name": "RouteInformatie",
@@ -88,7 +87,7 @@ class Header:
             "required": True,
         },
     )
-    bericht_identificatie: Optional[BerichtIdentificatie] = field(
+    bericht_identificatie: BerichtIdentificatie | None = field(
         default=None,
         metadata={
             "name": "BerichtIdentificatie",

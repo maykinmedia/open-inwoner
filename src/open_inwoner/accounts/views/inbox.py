@@ -1,5 +1,4 @@
 import logging
-from typing import List, Optional
 from urllib.parse import unquote
 
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -91,7 +90,7 @@ class InboxView(
             c.other_user_full_name = " ".join(p for p in parts if p)
         return conversations
 
-    def get_other_user(self, conversations: dict) -> Optional[User]:
+    def get_other_user(self, conversations: dict) -> User | None:
         """
         Return the User instance of the "other user" in the conversation (if any).
         """
@@ -105,7 +104,7 @@ class InboxView(
 
         return get_object_or_404(User, uuid=other_user_uuid)
 
-    def get_messages(self, other_user: User) -> List[Message]:
+    def get_messages(self, other_user: User) -> list[Message]:
         """
         Returns the messages (MessageType) of the current conversation.
         """
@@ -127,7 +126,7 @@ class InboxView(
             return ""
         return f"{_('Laatste bericht ontvangen op')} {formats.date_format(messages[-1].created_on)}"
 
-    def mark_messages_seen(self, other_user: Optional[User]):
+    def mark_messages_seen(self, other_user: User | None):
         if not other_user:
             return
 

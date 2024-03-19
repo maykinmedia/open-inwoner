@@ -1,5 +1,4 @@
 import logging
-from typing import List, Optional
 
 from ape_pie.client import APIClient
 from requests.exceptions import RequestException
@@ -25,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 class KlantenClient(APIClient):
-    def create_klant(self, data: KlantCreateData) -> Optional[Klant]:
+    def create_klant(self, data: KlantCreateData) -> Klant | None:
         try:
             response = self.post("klanten", json=data)
             data = get_json_response(response)
@@ -38,8 +37,8 @@ class KlantenClient(APIClient):
         return klant
 
     def retrieve_klant(
-        self, user_bsn: Optional[str] = None, user_kvk_or_rsin: Optional[str] = None
-    ) -> Optional[Klant]:
+        self, user_bsn: str | None = None, user_kvk_or_rsin: str | None = None
+    ) -> Klant | None:
         if not user_bsn and not user_kvk_or_rsin:
             return
 
@@ -55,7 +54,7 @@ class KlantenClient(APIClient):
         else:
             return
 
-    def retrieve_klanten_for_bsn(self, user_bsn: str) -> List[Klant]:
+    def retrieve_klanten_for_bsn(self, user_bsn: str) -> list[Klant]:
         try:
             response = self.get(
                 "klanten",
@@ -73,7 +72,7 @@ class KlantenClient(APIClient):
 
     def retrieve_klanten_for_kvk_or_rsin(
         self, user_kvk_or_rsin: str, *, vestigingsnummer=None
-    ) -> List[Klant]:
+    ) -> list[Klant]:
         params = {"subjectNietNatuurlijkPersoon__innNnpId": user_kvk_or_rsin}
 
         if vestigingsnummer:
@@ -96,7 +95,7 @@ class KlantenClient(APIClient):
 
         return klanten
 
-    def partial_update_klant(self, klant: Klant, update_data) -> Optional[Klant]:
+    def partial_update_klant(self, klant: Klant, update_data) -> Klant | None:
         try:
             response = self.patch(url=klant.url, json=update_data)
             data = get_json_response(response)
@@ -114,9 +113,9 @@ class ContactmomentenClient(APIClient):
         self,
         data: ContactMomentCreateData,
         *,
-        klant: Optional[Klant] = None,
-        rol: Optional[str] = KlantContactRol.BELANGHEBBENDE,
-    ) -> Optional[ContactMoment]:
+        klant: Klant | None = None,
+        rol: str | None = KlantContactRol.BELANGHEBBENDE,
+    ) -> ContactMoment | None:
         try:
             response = self.post("contactmomenten", json=data)
             data = get_json_response(response)
@@ -143,7 +142,7 @@ class ContactmomentenClient(APIClient):
 
         return contactmoment
 
-    def retrieve_contactmoment(self, url) -> Optional[ContactMoment]:
+    def retrieve_contactmoment(self, url) -> ContactMoment | None:
         try:
             response = self.get(url)
             data = get_json_response(response)
@@ -157,7 +156,7 @@ class ContactmomentenClient(APIClient):
 
     def retrieve_objectcontactmomenten_for_zaak(
         self, zaak: Zaak
-    ) -> List[ObjectContactMoment]:
+    ) -> list[ObjectContactMoment]:
         try:
             response = self.get("objectcontactmomenten", params={"object": zaak.url})
             data = get_json_response(response)
@@ -185,7 +184,7 @@ class ContactmomentenClient(APIClient):
 
     def retrieve_objectcontactmomenten_for_contactmoment(
         self, contactmoment: ContactMoment, zaken_client
-    ) -> List[ObjectContactMoment]:
+    ) -> list[ObjectContactMoment]:
         try:
             response = self.get(
                 "objectcontactmomenten", params={"contactmoment": contactmoment.url}
@@ -217,7 +216,7 @@ class ContactmomentenClient(APIClient):
 
     def retrieve_klantcontactmomenten_for_klant(
         self, klant: Klant
-    ) -> List[KlantContactMoment]:
+    ) -> list[KlantContactMoment]:
         try:
             response = self.get(
                 "klantcontactmomenten",
@@ -241,7 +240,7 @@ class ContactmomentenClient(APIClient):
 
     def retrieve_objectcontactmomenten_for_object_type(
         self, contactmoment: ContactMoment, object_type: str, zaken_client
-    ) -> List[ObjectContactMoment]:
+    ) -> list[ObjectContactMoment]:
 
         moments = self.retrieve_objectcontactmomenten_for_contactmoment(
             contactmoment, zaken_client
@@ -254,7 +253,7 @@ class ContactmomentenClient(APIClient):
 
     def retrieve_objectcontactmoment(
         self, contactmoment: ContactMoment, object_type: str, zaken_client
-    ) -> Optional[ObjectContactMoment]:
+    ) -> ObjectContactMoment | None:
         ocms = self.retrieve_objectcontactmomenten_for_object_type(
             contactmoment, object_type, zaken_client
         )
@@ -262,7 +261,7 @@ class ContactmomentenClient(APIClient):
             return ocms[0]
 
 
-def build_client(type_) -> Optional[APIClient]:
+def build_client(type_) -> APIClient | None:
     config = OpenKlantConfig.get_solo()
     services_to_client_mapping = {
         "klanten": KlantenClient,

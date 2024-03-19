@@ -1,4 +1,5 @@
-from typing import Iterable, NamedTuple, Optional
+from collections.abc import Iterable
+from typing import NamedTuple
 
 from django.utils.translation import ngettext
 
@@ -13,7 +14,7 @@ class SummaryLine(NamedTuple):
 
 def summarize_case_status_changed(
     items: Iterable[FeedItem],
-) -> Optional[SummaryLine]:
+) -> SummaryLine | None:
     num_items = sum(
         1 for item in items if item.type == FeedItemType.case_status_changed
     )
@@ -28,7 +29,7 @@ def summarize_case_status_changed(
         )
 
 
-def summarize_action_required(items: Iterable[FeedItem]) -> Optional[SummaryLine]:
+def summarize_action_required(items: Iterable[FeedItem]) -> SummaryLine | None:
     num_items = sum(1 for item in items if item.action_required)
     if num_items:
         return SummaryLine(
@@ -41,7 +42,7 @@ def summarize_action_required(items: Iterable[FeedItem]) -> Optional[SummaryLine
         )
 
 
-def summarize_simple_message(items: Iterable[FeedItem]) -> Optional[SummaryLine]:
+def summarize_simple_message(items: Iterable[FeedItem]) -> SummaryLine | None:
     num_items = sum(1 for item in items if item.type == FeedItemType.message_simple)
     if num_items:
         return SummaryLine(

@@ -1,5 +1,3 @@
-from typing import List, Tuple
-
 from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
 from django.test import TestCase
@@ -15,7 +13,7 @@ class TestMigrations(TestCase):
     migrate_from = None
     migrate_to = None
 
-    extra_migrate_from: List[Tuple[str, str]] = None
+    extra_migrate_from: list[tuple[str, str]] = None
 
     def setUp(self):
         assert self.migrate_from and self.migrate_to and self.app, (

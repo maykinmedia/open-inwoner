@@ -1,7 +1,7 @@
 from collections import OrderedDict
 from dataclasses import dataclass
 from operator import attrgetter
-from typing import List, Type
+from typing import Type
 
 from django.db import models
 
@@ -28,7 +28,7 @@ class FacetBucket:
 @dataclass(init=False)
 class Facet:
     name: str
-    buckets: List[FacetBucket]
+    buckets: list[FacetBucket]
     model: Type[models.Model]
 
     def __init__(self, name: str, buckets: list, model: models.Model):
@@ -63,7 +63,7 @@ class Facet:
         return self._mapping
 
     @property
-    def empty_buckets(self) -> List[FacetBucket]:
+    def empty_buckets(self) -> list[FacetBucket]:
         if not hasattr(self, "_empty_buckets"):
             bucket_slugs = [b.slug for b in self.buckets]
             empty_queryset = self.model.objects.exclude(slug__in=bucket_slugs).order_by(
@@ -75,7 +75,7 @@ class Facet:
         return self._empty_buckets
 
     @property
-    def total_buckets(self) -> List[FacetBucket]:
+    def total_buckets(self) -> list[FacetBucket]:
         return self.buckets + self.empty_buckets
 
     def choices(self) -> list:
@@ -90,8 +90,8 @@ class Facet:
 
 @dataclass()
 class ProductSearchResult:
-    results: List[ProductDocument]
-    facets: List[Facet]
+    results: list[ProductDocument]
+    facets: list[Facet]
     _r: FacetedResponse = None
 
     @classmethod
@@ -108,16 +108,16 @@ class ProductSearchResult:
 @dataclass(frozen=True)
 class Suggester:
     name: str
-    options: List[str]
+    options: list[str]
 
 
 @dataclass()
 class AutocompleteResult:
-    suggesters: List[Suggester]
+    suggesters: list[Suggester]
     _r: Response = None
 
     @classmethod
-    def build_from_response(cls, response: Response, order: List[str]):
+    def build_from_response(cls, response: Response, order: list[str]):
         suggesters = []
         for suggest_name, suggest_value in response.suggest.to_dict().items():
             options = [o["text"] for o in suggest_value[0]["options"]]
@@ -128,7 +128,7 @@ class AutocompleteResult:
         return cls(suggesters=suggesters, _r=response)
 
     @property
-    def options(self) -> List[str]:
+    def options(self) -> list[str]:
         """return deduplicated list of all available options"""
         all_options = sum([s.options for s in self.suggesters], [])
         deduplicated_options = list(OrderedDict.fromkeys(all_options))

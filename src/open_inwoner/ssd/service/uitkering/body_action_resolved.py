@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from typing import Optional
 
 from open_inwoner.ssd.service.uitkering.fwi_include_resolved import TypePeriode
 
@@ -8,7 +7,7 @@ __NAMESPACE__ = "http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient
 
 @dataclass
 class Request:
-    burger_service_nr: Optional[str] = field(
+    burger_service_nr: str | None = field(
         default=None,
         metadata={
             "name": "BurgerServiceNr",
@@ -19,7 +18,7 @@ class Request:
             "pattern": r"\d*",
         },
     )
-    periodenummer: Optional[str] = field(
+    periodenummer: str | None = field(
         default=None,
         metadata={
             "name": "Periodenummer",
@@ -30,7 +29,7 @@ class Request:
             "pattern": r"[1-2][0-9]{3}(0[1-9]|1[0-2])",
         },
     )
-    type_periode: Optional[TypePeriode] = field(
+    type_periode: TypePeriode | None = field(
         default=None,
         metadata={
             "name": "TypePeriode",

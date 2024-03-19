@@ -1,5 +1,3 @@
-from typing import List, Optional
-
 from zgw_consumers.api_models.constants import (
     RolOmschrijving,
     RolTypes,
@@ -216,7 +214,7 @@ class MockAPIData:
             hoofd_object=self.zaak2["url"],
         )
 
-    def install_mocks(self, m, *, res404: Optional[List[str]] = None) -> "MockAPIData":
+    def install_mocks(self, m, *, res404: list[str] | None = None) -> "MockAPIData":
         if res404 is None:
             res404 = []
         for attr in res404:

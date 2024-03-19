@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from typing import Optional, TypedDict
+from typing import TypedDict
 
 from django.contrib.auth.mixins import AccessMixin
 from django.http import Http404, HttpResponseRedirect
@@ -82,7 +82,7 @@ class KlantContactMomentBaseView(
     def get_kcm_data(
         self,
         kcm: KlantContactMoment,
-        local_kcm_mapping: Optional[dict[str, KlantContactMomentAnswer]] = None,
+        local_kcm_mapping: dict[str, KlantContactMomentAnswer] | None = None,
     ) -> KCMDict:
         data = {
             "registered_date": kcm.contactmoment.registratiedatum,
@@ -114,8 +114,8 @@ class KlantContactMomentBaseView(
     def get_kcm_subject(
         self,
         kcm: KlantContactMoment,
-        e_suite_subject_code: str,
-    ) -> Optional[str]:
+        e_suite_subject_code: str | None,
+    ) -> str | None:
         """
         Try to determine the subject ('onderwerp') of a contactmoment
         """

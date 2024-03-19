@@ -1,11 +1,12 @@
+from collections.abc import Iterable, Iterator
 from itertools import islice
 from math import ceil
-from typing import Iterable, Iterator, Tuple, TypeVar
+from typing import TypeVar
 
 T = TypeVar("T")
 
 
-def batched(iterable: Iterable[T], chunk_size: int) -> Iterator[Tuple[T, ...]]:
+def batched(iterable: Iterable[T], chunk_size: int) -> Iterator[tuple[T, ...]]:
     """
     split `iterable `in parts of `chunk_size` length
 
@@ -16,7 +17,7 @@ def batched(iterable: Iterable[T], chunk_size: int) -> Iterator[Tuple[T, ...]]:
         yield chunk
 
 
-def split(iterable: Iterable[T], num_parts: int = 2) -> Iterator[Tuple[T, ...]]:
+def split(iterable: Iterable[T], num_parts: int = 2) -> Iterator[tuple[T, ...]]:
     """
     split `iterable` in `num_parts` amount of parts
     """

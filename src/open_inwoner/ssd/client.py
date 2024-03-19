@@ -2,7 +2,6 @@ import logging
 from abc import ABC, abstractmethod
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 from uuid import uuid4
 
 from django.template import loader
@@ -98,7 +97,7 @@ class SSDBaseClient(ABC):
         """
 
     @abstractmethod
-    def get_reports(self, bsn: str, report_date: str, base_url: str) -> Optional[bytes]:
+    def get_reports(self, bsn: str, report_date: str, base_url: str) -> bytes | None:
         """
         :param bsn: the BSN number of the client making the request
         :param report_date: the date of the requested report
@@ -138,7 +137,7 @@ class JaaropgaveClient(SSDBaseClient):
 
     def get_reports(
         self, bsn: str, report_date: str, request_base_url: str
-    ) -> Optional[bytes]:
+    ) -> bytes | None:
 
         response = self.templated_request(bsn=bsn, dienstjaar=report_date)
 
@@ -194,7 +193,7 @@ class UitkeringClient(SSDBaseClient):
 
     def get_reports(
         self, bsn: str, report_date: str, request_base_url: str
-    ) -> Optional[bytes]:
+    ) -> bytes | None:
 
         response = self.templated_request(bsn=bsn, period=report_date)
 

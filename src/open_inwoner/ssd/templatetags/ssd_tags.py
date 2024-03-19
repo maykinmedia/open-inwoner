@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Optional, Union
 
 from django import template
 from django.template.defaultfilters import date as django_date
@@ -10,7 +9,7 @@ register = template.Library()
 
 
 @register.simple_tag
-def calculate_loon_zvw(specificatie) -> int:
+def calculate_loon_zvw(specificatie) -> int | str:
     if not specificatie:
         return ""
 
@@ -50,7 +49,7 @@ def format_currency(value: str) -> str:
 
 
 @register.simple_tag
-def format_period(date_str: Optional[str]) -> str:
+def format_period(date_str: str | None) -> str:
     """
     20480501 -> 01-05-2048
     """
@@ -73,7 +72,7 @@ def format_sign_value(item) -> str:
 
 
 @register.simple_tag
-def format_string(*args: Optional[Union[str, int]]) -> str:
+def format_string(*args: str | None) -> str:
     """
     Return a formatted string, filtering out `None` elements from `args`,
     normalizing datatypes by casting `int` to `str`, and cleaning up whitespace
@@ -104,5 +103,5 @@ def get_detail_value_for_column(detail, column: str) -> str:
     return ""
 
 
-def get_sign(sign: CdPositiefNegatief) -> Union[CdPositiefNegatief, str]:
+def get_sign(sign: CdPositiefNegatief) -> CdPositiefNegatief | str:
     return sign if sign == "-" else ""

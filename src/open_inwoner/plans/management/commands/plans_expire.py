@@ -1,6 +1,5 @@
 import logging
 from datetime import date
-from typing import List
 
 from django.core.management.base import BaseCommand
 from django.db.models import Q
@@ -52,7 +51,7 @@ class Command(BaseCommand):
             for p in plans:
                 hooks.plan_expiring(receiver, p)
 
-    def send_email(self, receiver: User, plans: List[Plan]):
+    def send_email(self, receiver: User, plans: list[Plan]):
         plan_list_link = build_absolute_url(reverse("collaborate:plan_list"))
         template = find_template("expiring_plan")
         context = {

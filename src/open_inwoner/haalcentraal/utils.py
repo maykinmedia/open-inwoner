@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 
 from django.conf import settings
 from django.utils.translation import gettext as _
@@ -22,7 +21,7 @@ def get_brp_api() -> BRPAPI:
         raise NotImplementedError(f"no implementation for BRP API '{brp_version}'")
 
 
-def fetch_brp(user_bsn: str) -> Optional[BRPData]:
+def fetch_brp(user_bsn: str) -> BRPData | None:
     if not user_bsn:
         return
     api = get_brp_api()

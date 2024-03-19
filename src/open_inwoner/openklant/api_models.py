@@ -1,7 +1,7 @@
 import dataclasses
 from dataclasses import dataclass
 from datetime import datetime
-from typing import List, Optional, TypedDict, Union
+from typing import Optional, TypedDict, Union
 
 from zgw_consumers.api_models.base import ZGWModel
 
@@ -35,10 +35,10 @@ class Klant(ZGWModel):
     # open-klant OAS
     bedrijfsnaam: str = ""
     functie: str = ""
-    adres: Optional[dict] = None
+    adres: dict | None = None
     subject: str = ""
     subject_type: str = ""
-    subject_identificatie: Optional[dict] = None
+    subject_identificatie: dict | None = None
 
     # open-klant non-standard *AFWIJKING*
     aanmaakkanaal: str = ""
@@ -91,7 +91,7 @@ class ContactMoment(ZGWModel):
     voorkeurstaal: str = ""
     vorig_contactmoment: Optional[str] = None
     volgend_contactmoment: Optional[str] = None
-    onderwerp_links: List[str] = dataclasses.field(default_factory=list)
+    onderwerp_links: list[str] = dataclasses.field(default_factory=list)
 
     initiatiefnemer: str = ""
     medewerker: str = ""

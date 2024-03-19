@@ -1,4 +1,3 @@
-from typing import Optional
 from urllib.parse import unquote
 
 from django.contrib import messages
@@ -42,7 +41,7 @@ class InviteMixin(CommonPageMixin):
 
         return initial
 
-    def get_invite(self) -> Optional[Invite]:
+    def get_invite(self) -> Invite | None:
         """return Invite model instance if the user registers after accepting invite"""
         invite_key = unquote(self.request.GET.get("invite", ""))
         if not invite_key:

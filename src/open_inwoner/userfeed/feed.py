@@ -1,6 +1,6 @@
 import dataclasses
+from collections.abc import Iterable
 from datetime import timedelta
-from typing import Iterable
 
 from django.db.models import Q
 from django.utils import timezone

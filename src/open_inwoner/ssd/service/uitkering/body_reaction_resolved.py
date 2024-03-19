@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from typing import List, Optional
 
 from open_inwoner.ssd.service.uitkering.fwi_include_resolved import (
     Adres,
@@ -15,7 +14,7 @@ __NAMESPACE__ = "http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient
 
 @dataclass
 class Uitkeringsinstantie:
-    gemeentecode: Optional[str] = field(
+    gemeentecode: str | None = field(
         default=None,
         metadata={
             "name": "Gemeentecode",
@@ -26,7 +25,7 @@ class Uitkeringsinstantie:
             "pattern": r"\d*",
         },
     )
-    gemeentenaam: Optional[str] = field(
+    gemeentenaam: str | None = field(
         default=None,
         metadata={
             "name": "Gemeentenaam",
@@ -35,7 +34,7 @@ class Uitkeringsinstantie:
             "max_length": 40,
         },
     )
-    bezoekadres: Optional[str] = field(
+    bezoekadres: str | None = field(
         default=None,
         metadata={
             "name": "Bezoekadres",
@@ -44,7 +43,7 @@ class Uitkeringsinstantie:
             "max_length": 30,
         },
     )
-    postcode: Optional[str] = field(
+    postcode: str | None = field(
         default=None,
         metadata={
             "name": "Postcode",
@@ -54,7 +53,7 @@ class Uitkeringsinstantie:
             "pattern": r"[1-9][0-9]{3}[A-Z]{2}",
         },
     )
-    woonplaatsnaam: Optional[str] = field(
+    woonplaatsnaam: str | None = field(
         default=None,
         metadata={
             "name": "Woonplaatsnaam",
@@ -67,7 +66,7 @@ class Uitkeringsinstantie:
 
 @dataclass
 class Client(Persoon):
-    clientnummer: Optional[str] = field(
+    clientnummer: str | None = field(
         default=None,
         metadata={
             "name": "Clientnummer",
@@ -81,7 +80,7 @@ class Client(Persoon):
 
 @dataclass
 class Componenthistorie:
-    omschrijving: Optional[str] = field(
+    omschrijving: str | None = field(
         default=None,
         metadata={
             "name": "Omschrijving",
@@ -90,7 +89,7 @@ class Componenthistorie:
             "required": True,
         },
     )
-    bedrag: Optional[StandaardBedrag] = field(
+    bedrag: StandaardBedrag | None = field(
         default=None,
         metadata={
             "name": "Bedrag",
@@ -99,7 +98,7 @@ class Componenthistorie:
             "required": True,
         },
     )
-    indicatie_kolom: Optional[IndicatieKolom] = field(
+    indicatie_kolom: IndicatieKolom | None = field(
         default=None,
         metadata={
             "name": "IndicatieKolom",
@@ -108,7 +107,7 @@ class Componenthistorie:
             "required": True,
         },
     )
-    toelichting: Optional[str] = field(
+    toelichting: str | None = field(
         default=None,
         metadata={
             "name": "Toelichting",
@@ -117,7 +116,7 @@ class Componenthistorie:
             "max_length": 40,
         },
     )
-    crediteur: Optional[str] = field(
+    crediteur: str | None = field(
         default=None,
         metadata={
             "name": "Crediteur",
@@ -130,7 +129,7 @@ class Componenthistorie:
 
 @dataclass
 class ClientType(Client):
-    adres: Optional[Adres] = field(
+    adres: Adres | None = field(
         default=None,
         metadata={
             "name": "Adres",
@@ -142,7 +141,7 @@ class ClientType(Client):
 
 @dataclass
 class OverigeBijstandspartij(Client):
-    uitbetaald_bedrag: Optional[StandaardBedrag] = field(
+    uitbetaald_bedrag: StandaardBedrag | None = field(
         default=None,
         metadata={
             "name": "UitbetaaldBedrag",
@@ -150,7 +149,7 @@ class OverigeBijstandspartij(Client):
             "namespace": "",
         },
     )
-    iban: Optional[str] = field(
+    iban: str | None = field(
         default=None,
         metadata={
             "name": "Iban",
@@ -159,7 +158,7 @@ class OverigeBijstandspartij(Client):
             "pattern": r"[A-Z]{2,2}[0-9]{2,2}[a-zA-Z0-9]{1,30}",
         },
     )
-    bic: Optional[str] = field(
+    bic: str | None = field(
         default=None,
         metadata={
             "name": "Bic",
@@ -172,7 +171,7 @@ class OverigeBijstandspartij(Client):
 
 @dataclass
 class Dossierhistorie:
-    regeling: Optional[str] = field(
+    regeling: str | None = field(
         default=None,
         metadata={
             "name": "Regeling",
@@ -182,7 +181,7 @@ class Dossierhistorie:
             "max_length": 30,
         },
     )
-    dossiernummer: Optional[str] = field(
+    dossiernummer: str | None = field(
         default=None,
         metadata={
             "name": "Dossiernummer",
@@ -193,7 +192,7 @@ class Dossierhistorie:
             "pattern": r"\d*",
         },
     )
-    periodenummer: Optional[str] = field(
+    periodenummer: str | None = field(
         default=None,
         metadata={
             "name": "Periodenummer",
@@ -204,7 +203,7 @@ class Dossierhistorie:
             "pattern": r"[1-2][0-9]{3}(0[1-9]|1[0-2])",
         },
     )
-    betrekkingsperiode: Optional[str] = field(
+    betrekkingsperiode: str | None = field(
         default=None,
         metadata={
             "name": "Betrekkingsperiode",
@@ -215,7 +214,7 @@ class Dossierhistorie:
             "pattern": r"[1-2][0-9]{3}(0[1-9]|1[0-2])",
         },
     )
-    uitbetaald_bedrag_client: Optional[StandaardBedrag] = field(
+    uitbetaald_bedrag_client: StandaardBedrag | None = field(
         default=None,
         metadata={
             "name": "UitbetaaldBedragClient",
@@ -223,7 +222,7 @@ class Dossierhistorie:
             "namespace": "",
         },
     )
-    iban: Optional[str] = field(
+    iban: str | None = field(
         default=None,
         metadata={
             "name": "Iban",
@@ -232,7 +231,7 @@ class Dossierhistorie:
             "pattern": r"[A-Z]{2,2}[0-9]{2,2}[a-zA-Z0-9]{1,30}",
         },
     )
-    bic: Optional[str] = field(
+    bic: str | None = field(
         default=None,
         metadata={
             "name": "Bic",
@@ -241,7 +240,7 @@ class Dossierhistorie:
             "pattern": r"[A-Z]{6,6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3,3}){0,1}",
         },
     )
-    overige_bijstandspartij: List[OverigeBijstandspartij] = field(
+    overige_bijstandspartij: list[OverigeBijstandspartij] = field(
         default_factory=list,
         metadata={
             "name": "OverigeBijstandspartij",
@@ -249,7 +248,7 @@ class Dossierhistorie:
             "namespace": "",
         },
     )
-    opgegeven_inkomsten: Optional[StandaardBedrag] = field(
+    opgegeven_inkomsten: StandaardBedrag | None = field(
         default=None,
         metadata={
             "name": "OpgegevenInkomsten",
@@ -257,7 +256,7 @@ class Dossierhistorie:
             "namespace": "",
         },
     )
-    te_verrekenen_inkomsten: Optional[StandaardBedrag] = field(
+    te_verrekenen_inkomsten: StandaardBedrag | None = field(
         default=None,
         metadata={
             "name": "TeVerrekenenInkomsten",
@@ -265,7 +264,7 @@ class Dossierhistorie:
             "namespace": "",
         },
     )
-    inkomsten_vrijlating: Optional[StandaardBedrag] = field(
+    inkomsten_vrijlating: StandaardBedrag | None = field(
         default=None,
         metadata={
             "name": "InkomstenVrijlating",
@@ -273,7 +272,7 @@ class Dossierhistorie:
             "namespace": "",
         },
     )
-    inkomsten_na_vrijlating: Optional[StandaardBedrag] = field(
+    inkomsten_na_vrijlating: StandaardBedrag | None = field(
         default=None,
         metadata={
             "name": "InkomstenNaVrijlating",
@@ -281,7 +280,7 @@ class Dossierhistorie:
             "namespace": "",
         },
     )
-    vakantiegeld_over_inkomsten: Optional[StandaardBedrag] = field(
+    vakantiegeld_over_inkomsten: StandaardBedrag | None = field(
         default=None,
         metadata={
             "name": "VakantiegeldOverInkomsten",
@@ -289,7 +288,7 @@ class Dossierhistorie:
             "namespace": "",
         },
     )
-    gekorte_inkomsten: Optional[StandaardBedrag] = field(
+    gekorte_inkomsten: StandaardBedrag | None = field(
         default=None,
         metadata={
             "name": "GekorteInkomsten",
@@ -297,7 +296,7 @@ class Dossierhistorie:
             "namespace": "",
         },
     )
-    uitbetaald_bedrag_dossier: Optional[StandaardBedrag] = field(
+    uitbetaald_bedrag_dossier: StandaardBedrag | None = field(
         default=None,
         metadata={
             "name": "UitbetaaldBedragDossier",
@@ -305,7 +304,7 @@ class Dossierhistorie:
             "namespace": "",
         },
     )
-    datum_betaald: Optional[str] = field(
+    datum_betaald: str | None = field(
         default=None,
         metadata={
             "name": "DatumBetaald",
@@ -315,7 +314,7 @@ class Dossierhistorie:
             "pattern": r"[1-2][0-9]{3}(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])",
         },
     )
-    componenthistorie: List[Componenthistorie] = field(
+    componenthistorie: list[Componenthistorie] = field(
         default_factory=list,
         metadata={
             "name": "Componenthistorie",
@@ -327,7 +326,7 @@ class Dossierhistorie:
 
 @dataclass
 class Uitkeringsspecificatie:
-    uitkeringsinstantie: Optional[Uitkeringsinstantie] = field(
+    uitkeringsinstantie: Uitkeringsinstantie | None = field(
         default=None,
         metadata={
             "name": "Uitkeringsinstantie",
@@ -336,7 +335,7 @@ class Uitkeringsspecificatie:
             "required": True,
         },
     )
-    dossierhistorie: List[Dossierhistorie] = field(
+    dossierhistorie: list[Dossierhistorie] = field(
         default_factory=list,
         metadata={
             "name": "Dossierhistorie",
@@ -349,7 +348,7 @@ class Uitkeringsspecificatie:
 
 @dataclass
 class UitkeringsSpecificatieClient:
-    client: Optional[ClientType] = field(
+    client: ClientType | None = field(
         default=None,
         metadata={
             "name": "Client",
@@ -357,7 +356,7 @@ class UitkeringsSpecificatieClient:
             "namespace": "",
         },
     )
-    type_periode: Optional[TypePeriode] = field(
+    type_periode: TypePeriode | None = field(
         default=None,
         metadata={
             "name": "TypePeriode",
@@ -366,7 +365,7 @@ class UitkeringsSpecificatieClient:
             "required": True,
         },
     )
-    uitkeringsspecificatie: List[Uitkeringsspecificatie] = field(
+    uitkeringsspecificatie: list[Uitkeringsspecificatie] = field(
         default_factory=list,
         metadata={
             "name": "Uitkeringsspecificatie",
@@ -378,7 +377,7 @@ class UitkeringsSpecificatieClient:
 
 @dataclass
 class Response:
-    uitkerings_specificatie_client: Optional[UitkeringsSpecificatieClient] = field(
+    uitkerings_specificatie_client: UitkeringsSpecificatieClient | None = field(
         default=None,
         metadata={
             "name": "UitkeringsSpecificatieClient",
@@ -386,7 +385,7 @@ class Response:
             "namespace": "",
         },
     )
-    fwi: Optional[Fwi] = field(
+    fwi: Fwi | None = field(
         default=None,
         metadata={
             "name": "FWI",
@@ -394,7 +393,7 @@ class Response:
             "namespace": "http://www.centric.nl/GWS/FWI/v0200",
         },
     )
-    niets_gevonden: Optional[NietsGevonden] = field(
+    niets_gevonden: NietsGevonden | None = field(
         default=None,
         metadata={
             "name": "NietsGevonden",

@@ -3,7 +3,7 @@ Utility functions/classes related to (date-)times
 """
 
 import datetime as dt
-from typing import Sequence
+from collections.abc import Sequence
 
 from django.utils import timezone
 
