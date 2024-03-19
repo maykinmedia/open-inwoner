@@ -739,7 +739,7 @@ lxml==4.9.1
     #   pyquery
     #   svglib
     #   xmlsec
-mail-editor @ git+https://github.com/maykinmedia/mail-editor.git@0.3.6
+mail-editor==0.3.7
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
