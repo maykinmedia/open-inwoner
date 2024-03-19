@@ -25,8 +25,9 @@ def update_admin_index(sender, **kwargs):
 
     try:
         call_command("loaddata", "django-admin-index", verbosity=0, stdout=StringIO())
-    except:  # noqa
-        print("Error: Unable to load django-admin-index fixture!")
+    except Exception as exc:
+        print(f"Error: Unable to load django-admin-index fixture ({exc})")
+        return
     print("Loaded django-admin-index fixture")
 
 
