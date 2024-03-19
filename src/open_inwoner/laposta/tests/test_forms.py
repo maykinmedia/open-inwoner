@@ -1,6 +1,7 @@
 from urllib.parse import parse_qs
 
 from django.test import RequestFactory, TestCase
+from django.utils.translation import gettext as _
 
 import requests_mock
 
@@ -186,3 +187,61 @@ class NewsletterSubscriptionFormTestCase(ClearCachesMixin, TestCase):
         self.assertEqual(len(delete_matcher.request_history), 1)
 
         self.assertFalse(Subscription.objects.filter(user=self.user).exists())
+
+    def test_save_form_raises_errors(self, m):
+        """
+        Form should return errors if unexpected errors occur when performing API calls
+        """
+        self.setUpMocks(m)
+
+        SubscriptionFactory.create(list_id="456", member_id="member456", user=self.user)
+
+        form = NewsletterSubscriptionForm(data={"newsletters": ["789"]}, user=self.user)
+
+        self.assertTrue(form.is_valid())
+
+        post_matcher = m.post(
+            f"{LAPOSTA_API_ROOT}member",
+            json={
+                "error": {
+                    "type": "internal",
+                    "message": "Internal server error",
+                }
+            },
+            status_code=500,
+        )
+        delete_matcher = m.delete(
+            f"{LAPOSTA_API_ROOT}member/member456?list_id=456",
+            json={
+                "error": {
+                    "type": "internal",
+                    "message": "Internal server error",
+                }
+            },
+            status_code=500,
+        )
+
+        form.save(self.request)
+
+        self.assertEqual(len(post_matcher.request_history), 1)
+        self.assertEqual(len(delete_matcher.request_history), 1)
+        self.assertEqual(
+            form.errors,
+            {
+                "newsletters": [
+                    _(
+                        "Something went wrong while trying to subscribe to "
+                        "'{list_name}', please try again later"
+                    ).format(list_name="Nieuwsbrief3: baz"),
+                    _(
+                        "Something went wrong while trying to unsubscribe from "
+                        "'{list_name}', please try again later"
+                    ).format(list_name="Nieuwsbrief2: bar"),
+                ]
+            },
+        )
+
+        # Local subscription should not be deleted
+        subscription = Subscription.objects.get(user=self.user)
+
+        self.assertEqual(subscription.list_id, "456")

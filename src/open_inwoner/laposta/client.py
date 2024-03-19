@@ -32,39 +32,40 @@ class LapostaClient(APIClient):
         return lists
 
     def create_subscription(self, list_id: str, user_data: UserData) -> Member | None:
-        try:
-            response = self.post(
-                "member", data={"list_id": list_id, **user_data.dict()}
-            )
-            if response.status_code == 400:
-                data = response.json()
-                # Handle scenario where a subscription exists in the API, but not locally
-                if data.get("error", {}).get("message") == "Email address exists":
-                    logger.info("Subscription already exists for user")
-                    return Member(
-                        member_id=data["error"]["member_id"],
-                        list_id=list_id,
-                        email=user_data.email,
-                        ip=user_data.ip,
-                    )
-            data = get_json_response(response)
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
-            return None
+        response = self.post("member", data={"list_id": list_id, **user_data.dict()})
 
+        if response.status_code == 400:
+            data = response.json()
+            error = data.get("error", {})
+            # Handle scenario where a subscription exists in the API, but not locally
+            if error.get("code") == 204 and error.get("parameter") == "email":
+                logger.info("Subscription already exists for user")
+                return Member(
+                    member_id=data["error"]["member_id"],
+                    list_id=list_id,
+                    email=user_data.email,
+                    ip=user_data.ip,
+                )
+
+        data = get_json_response(response)
         if not data:
             return None
 
         return Member(**data["member"])
 
     def remove_subscription(self, list_id: str, member_id: str) -> Member | None:
-        try:
-            response = self.delete(f"member/{member_id}", params={"list_id": list_id})
-            data = get_json_response(response)
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
-            return None
+        response = self.delete(f"member/{member_id}", params={"list_id": list_id})
 
+        if response.status_code == 400:
+            data = response.json()
+            error = data.get("error", {})
+            # Handle scenario where a subscription does not exists in the API,
+            # but it does exist locally
+            if error.get("code") == 203 and error.get("parameter") == "member_id":
+                logger.info("Subscription does not exist for user")
+                return None
+
+        data = get_json_response(response)
         if not data:
             return None
 

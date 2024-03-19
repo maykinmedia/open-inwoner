@@ -331,6 +331,13 @@ class NewsletterSubscribeView(
     def form_valid(self, form):
         form.save(self.request)
 
+        # Display errors raised by Laposta API
+        if form.errors:
+            self.log_user_action(
+                self.request.user, _("failed to modify user newsletter subscription")
+            )
+            return self.form_invalid(form)
+
         messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
         self.log_user_action(
             self.request.user, _("users newsletter subscriptions were modified")
