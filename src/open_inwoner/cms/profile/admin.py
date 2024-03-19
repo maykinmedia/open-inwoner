@@ -19,4 +19,5 @@ class ProfileConfigAdmin(BaseAppHookConfig, admin.ModelAdmin):
             "questions",
             "ssd",
             "newsletters",
+            "appointments",
         )

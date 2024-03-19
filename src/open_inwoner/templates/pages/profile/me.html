@@ -101,7 +101,7 @@
         </div>
     </section>
 
-    {% if view.config.mentors or view.config.my_contacts or view.config.actions or view.config.ssd or view.config.selfdiagnose or view.config.newsletters %}
+    {% if view.config.mentors or view.config.my_contacts or view.config.actions or view.config.ssd or view.config.selfdiagnose or view.config.newsletters or view.config.appointments %}
     {# Overview #}
     <section class="profile-section profile-section__overview">
         <h2 class="h2 title" id="overview">{% trans "Overzicht" %}</h2>
@@ -262,8 +262,21 @@
                         <h4 class="card__heading-4"><span class="link link__text">{% trans "Nieuwsbrieven" %}</span>
                         </h4>
 
-                        <span class="link link--icon link--secondary profile-card__button" aria-label="{% trans "Beijk nieuwsbrieven" %}" title="{% trans "Beijk nieuwsbrieven" %}">
-                            <span class="link__text">{% trans "Beijk nieuwsbrieven" %}</span>
+                        <span class="link link--icon link--secondary profile-card__button" aria-label="{% trans "Bekijk nieuwsbrieven" %}" title="{% trans "Bekijk nieuwsbrieven" %}">
+                            <span class="link__text">{% trans "Bekijk nieuwsbrieven" %}</span>
+                            {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+                        </span>
+                    </div>
+                </a>
+            {% endif %}
+            {% if view.config.appointments %}
+                <a href="{% url 'profile:appointments' %}" class="card card--compact card--stretch" id="profile-section-appointments">
+                    <div class="card__body">
+                        <h4 class="card__heading-4"><span class="link link__text">{% trans "Mijn afspraken" %}</span>
+                        </h4>
+
+                        <span class="link link--icon link--secondary profile-card__button" aria-label="{% trans "Bekijk afspraken" %}" title="{% trans "Bekijk afspraken" %}">
+                            <span class="link__text">{% trans "Bekijk afspraken" %}</span>
                             {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
                         </span>
                     </div>

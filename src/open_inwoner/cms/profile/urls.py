@@ -17,6 +17,7 @@ from open_inwoner.accounts.views import (
     DocumentPrivateMediaView,
     EditProfileView,
     InviteAcceptView,
+    MyAppointmentsView,
     MyCategoriesView,
     MyDataView,
     MyNotificationsView,
@@ -107,5 +108,6 @@ urlpatterns = [
         NewsletterSubscribeView.as_view(),
         name="newsletters",
     ),
+    path("appointments", MyAppointmentsView.as_view(), name="appointments"),
     path("", MyProfileView.as_view(), name="detail"),
 ]

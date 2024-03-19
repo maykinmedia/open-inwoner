@@ -1,0 +1,49 @@
+{% extends 'master.html' %}
+{% load i18n tz form_tags anchor_menu_tags list_tags icon_tags grid_tags utils %}
+
+{% block content %}
+
+<h1 class="utrecht-heading-1" id="title">{% trans "Mijn afspraken" %}</h2>
+
+{% if appointments %}
+    <p class="tabled__key">{% trans "Een overzicht van uw afspraken" %}</p>
+
+    {% render_grid %}
+        {% for appointment in appointments %}
+            {% render_column start=forloop.counter_0|multiply:4 span=4 %}
+                <div class="card card--compact card--stretch appointment-info">
+                    <div class="card__body">
+                        {% render_list %}
+                            <h2 class="card__heading-2">{{ appointment.title }}</h2>
+                            {% timezone appointment.branch.timeZone %}
+                                {% list_item text=appointment.start|date:"l j F Y H:i" compact=True strong=False %}
+                            {% endtimezone %}
+                            {% list_item text=appointment.notes compact=True strong=False %}
+                            {% list_item text=appointment.branch.name caption=_("Locatie") compact=True strong=False %}
+                            {% list_item text=appointment.branch.addressCity compact=True strong=False %}
+                            {% list_item text=appointment.branch.addressLine2 compact=True strong=False %}
+                        {% endrender_list %}
+
+                        <span class="link link--icon link--secondary"
+                            aria-label="{% trans "Wijzig afspraak" %}"
+                            title="{% trans "Wijzig afspraak" %}">
+                            <span class="link__text">{% trans "Wijzig afspraak" %}</span>
+                            {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+                        </span>
+                        <span class="link link--icon link--secondary"
+                            aria-label="{% trans "Annuleer afspraak" %}"
+                            title="{% trans "Annuleer afspraak" %}">
+                            <span class="link__text">{% trans "Annuleer afspraak" %}</span>
+                            {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+                        </span>
+                    </div>
+                </div>
+            {% endrender_column %}
+        {% endfor %}
+    {% endrender_grid %}
+    </section>
+{% else %}
+    <p class="tabled__key">{% trans "Geen afspraken beschikbaar" %}</p>
+{% endif %}
+
+{% endblock %}
