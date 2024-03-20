@@ -32,7 +32,7 @@ import { StatusAccordion } from './cases/status_accordion'
 import './session'
 import './twofactor-sms'
 import { FileInput } from './form/FileInput'
-import { ToggleHideSelection } from './card/ToggleHideSelection'
+import { ToggleHide } from './card/ToggleHide'
 
 const htmx = (window.htmx = require('htmx.org'))
 
@@ -56,7 +56,7 @@ const elementWrappers = [
   [AnchorMobile.selector, (elt) => new AnchorMobile(elt)],
   [StatusAccordion.selector, (elt) => new StatusAccordion(elt)],
   [FileInput.selector, (elt) => new FileInput(elt)],
-  [ToggleHideSelection.selector, (elt) => new ToggleHideSelection(elt)],
+  [ToggleHide.selector, (elt) => new ToggleHide(elt)],
 ]
 
 // harden against multiple events

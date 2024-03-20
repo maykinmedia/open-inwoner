@@ -1,20 +1,21 @@
-export class ToggleHideSelection {
-  static selector = '.card--toggle-hide'
+export class ToggleHide {
+  static selector = '.expand'
+  static selectorCard = '.card--toggle-hide'
 
-  constructor() {
+  constructor(node) {
+    this.node = node
     this.icon = document.querySelector('.expand-icon')
     this.button = document.getElementById('toggle-hide-elements')
     this.button.addEventListener('click', this.toggleHide.bind(this))
     this.button.innerHTML = `${this.icon.outerHTML} ${this.button.dataset.labelReveal} (${this.button.dataset.labelNumElems})`
 
-    // Hide all but the first three cards by default
-    const allCards = document.querySelectorAll(ToggleHideSelection.selector)
-    const cardsTail = Array.from(allCards).slice(3)
+    const toggleCards = document.querySelectorAll(ToggleHide.selectorCard)
 
-    if (cardsTail.length === 0) {
+    // Hide cards or the toggle button/link (if there are no cards to be hidden)
+    if (toggleCards.length === 0) {
       this.button.classList.add('hidden')
     } else {
-      cardsTail.forEach((element) => {
+      toggleCards.forEach((element) => {
         element.classList.add('hidden')
       })
     }
@@ -28,22 +29,20 @@ export class ToggleHideSelection {
     this.button.setAttribute('aria-expanded', isExpanded ? 'true' : 'false')
     this.icon.textContent = isExpanded ? 'expand_more' : 'expand_less'
 
+    // Toggle hide/show on cards
+    const toggleCards = document.querySelectorAll(ToggleHide.selectorCard)
+    toggleCards.forEach((card) => {
+      card.classList.toggle('hidden')
+    })
+
     this.button.innerHTML =
       this.icon.outerHTML +
       (isExpanded
         ? this.button.dataset.labelCollapse
         : `${this.button.dataset.labelReveal} (${this.button.dataset.labelNumElems})`)
-
-    // Toggle 'hidden' class on cards beyond the first three
-    const allCards = document.querySelectorAll(ToggleHideSelection.selector)
-    const cardsTail = Array.from(allCards).slice(3)
-
-    cardsTail.forEach((element) => {
-      element.classList.toggle('hidden', !isExpanded)
-    })
   }
 }
 
 document
-  .querySelectorAll(ToggleHideSelection.selector)
-  .forEach((toggleHide) => new ToggleHideSelection(toggleHide))
+  .querySelectorAll(ToggleHide.selector)
+  .forEach((toggleHide) => new ToggleHide(toggleHide))
