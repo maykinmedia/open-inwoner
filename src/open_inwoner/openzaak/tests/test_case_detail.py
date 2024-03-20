@@ -1372,11 +1372,15 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         spy_format.assert_called
 
     def test_page_translates_statuses(self, m):
-        st1 = StatusTranslationFactory(
+        trans_status_new_omschrijving = StatusTranslationFactory(
             status=self.status_type_new["omschrijving"],
-            translation="Translated First Status Type",
+            translation="Translated First Status Type Omschrijving",
         )
-        st2 = StatusTranslationFactory(
+        trans_status_new_statustekst = StatusTranslationFactory(
+            status=self.status_type_new["statustekst"],
+            translation="Translated First Status Type Statustekst",
+        )
+        trans_status_finish_omschrijving = StatusTranslationFactory(
             status=self.status_type_finish["omschrijving"],
             translation="Translated Second Status Type",
         )
@@ -1384,9 +1388,14 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(
             self.case_detail_url, user=self.user, headers={"HX-Request": "true"}
         )
-        self.assertNotContains(response, st1.translation)
-        self.assertNotContains(response, st2.status)
-        self.assertContains(response, st2.translation)
+        self.assertNotContains(response, trans_status_new_omschrijving.translation)
+        self.assertNotContains(response, trans_status_new_omschrijving.status)
+
+        self.assertNotContains(response, trans_status_new_statustekst.status)
+        self.assertContains(response, trans_status_new_statustekst.translation)
+
+        self.assertNotContains(response, trans_status_finish_omschrijving.status)
+        self.assertContains(response, trans_status_finish_omschrijving.translation)
 
     def test_when_accessing_case_detail_a_timelinelog_is_created(self, m):
         self._setUpMocks(m)

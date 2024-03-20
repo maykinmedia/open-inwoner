@@ -1,5 +1,7 @@
 import logging
 
+from django.utils.translation import gettext as _
+
 from zgw_consumers.api_models.constants import RolTypes, VertrouwelijkheidsAanduidingen
 
 from open_inwoner.kvk.branches import get_kvk_branch_number
@@ -133,7 +135,7 @@ def get_zaak_type_info_object_type_config(
 
 def translate_single_status(status_text: str) -> str:
     if not status_text:
-        return ""
+        return _("No data available")
 
     # in most cases try to cache with StatusTranslation.objects.get_lookup()
     try:

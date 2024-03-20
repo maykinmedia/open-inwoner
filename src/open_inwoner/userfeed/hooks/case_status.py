@@ -23,8 +23,9 @@ def case_status_notification_received(user: User, case: Zaak, status: Status):
         "case_uuid": case.uuid,
         "case_identificatie": case.identificatie,
         "case_omschrijving": case.omschrijving,
-        "status_omschrijving": status.statustype.statustekst
-        or status.statustype.omschrijving,
+        "status_omschrijving": translate_single_status(
+            status.statustype.statustekst or status.statustype.omschrijving
+        ),
         # new for actionable
         "catalogus_url": case.zaaktype.catalogus,
         "case_type_identificatie": case.zaaktype.identificatie,
@@ -90,7 +91,7 @@ class CaseStatusUpdateFeedItem(FeedItem):
     @property
     def message(self) -> str:
         status_text = self.get_data("status_omschrijving")
-        status_text = translate_single_status(status_text) or _("onbekend")
+        status_text = translate_single_status(status_text)
         html = escape(self.base_message)
         status = format_html('<span class="status">{}</span>', status_text)
         html = format_html(html, status=status)
