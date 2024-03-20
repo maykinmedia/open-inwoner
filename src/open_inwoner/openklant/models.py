@@ -50,6 +50,13 @@ class OpenKlantConfig(SingletonModel):
         default="",
         blank=True,
     )
+    register_channel = models.CharField(
+        verbose_name=_("Contactmoment kanaal"),
+        max_length=50,
+        default="contactformulier",
+        blank=True,
+        help_text=_("The channel through which contactmomenten are created"),
+    )
     register_type = models.CharField(
         verbose_name=_("Contactmoment type"),
         max_length=50,

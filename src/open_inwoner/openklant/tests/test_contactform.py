@@ -271,7 +271,7 @@ class ContactFormTestCase(
                 "bronorganisatie": "123456789",
                 "tekst": "Onderwerp: Aanvraag document\n\nhey!\n\nwaddup?",
                 "type": "Melding",
-                "kanaal": "Internet",
+                "kanaal": "contactformulier",
                 "onderwerp": "afdeling-xyz",
             },
         )
@@ -294,6 +294,7 @@ class ContactFormTestCase(
         config.register_contact_moment = True
         config.register_bronorganisatie_rsin = "123456789"
         config.register_type = "Melding"
+        config.register_channel = "contactformulier"
         config.register_employee_id = "FooVonBar"
         config.save()
 
@@ -351,7 +352,7 @@ class ContactFormTestCase(
                 "bronorganisatie": "123456789",
                 "tekst": text,
                 "type": "Melding",
-                "kanaal": "Internet",
+                "kanaal": "contactformulier",
                 "onderwerp": "afdeling-xyz",
             },
         )
@@ -416,7 +417,7 @@ class ContactFormTestCase(
                 "bronorganisatie": "123456789",
                 "tekst": "Onderwerp: Aanvraag document\n\nhey!\n\nwaddup?",
                 "type": "Melding",
-                "kanaal": "Internet",
+                "kanaal": "contactformulier",
                 "onderwerp": "afdeling-xyz",
             },
         )
@@ -506,7 +507,7 @@ class ContactFormTestCase(
                             "bronorganisatie": "123456789",
                             "tekst": "Onderwerp: Aanvraag document\n\nhey!\n\nwaddup?",
                             "type": "Melding",
-                            "kanaal": "Internet",
+                            "kanaal": "contactformulier",
                             "onderwerp": "afdeling-xyz",
                         },
                     )
@@ -582,7 +583,7 @@ class ContactFormTestCase(
                 "bronorganisatie": "123456789",
                 "tekst": "Onderwerp: Aanvraag document\n\nhey!\n\nwaddup?",
                 "type": "Melding",
-                "kanaal": "Internet",
+                "kanaal": "contactformulier",
                 "onderwerp": "afdeling-xyz",
             },
         )
@@ -678,7 +679,7 @@ class ContactFormTestCase(
                             "bronorganisatie": "123456789",
                             "tekst": "Onderwerp: Aanvraag document\n\nhey!\n\nwaddup?",
                             "type": "Melding",
-                            "kanaal": "Internet",
+                            "kanaal": "contactformulier",
                             "onderwerp": "afdeling-xyz",
                         },
                     )

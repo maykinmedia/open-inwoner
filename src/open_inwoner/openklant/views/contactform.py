@@ -202,7 +202,7 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
             "bronorganisatie": config.register_bronorganisatie_rsin,
             "tekst": text,
             "type": config.register_type,
-            "kanaal": "Internet",
+            "kanaal": config.register_channel,
             "onderwerp": subject_code or subject,
             "medewerkerIdentificatie": {
                 "identificatie": config.register_employee_id,
