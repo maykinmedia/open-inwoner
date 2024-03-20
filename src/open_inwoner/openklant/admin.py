@@ -8,8 +8,24 @@ from solo.admin import SingletonModelAdmin
 from .models import ContactFormSubject, KlantContactMomentAnswer, OpenKlantConfig
 
 
+class ContactFormSubjectForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["subject_code"].widget.attrs["placeholder"] = _(
+            "Must be configured if E-suite is used"
+        )
+
+    class Meta:
+        model = ContactFormSubject
+        fields = (
+            "subject",
+            "subject_code",
+        )
+
+
 class ContactFormSubjectInlineAdmin(OrderedTabularInline):
     model = ContactFormSubject
+    form = ContactFormSubjectForm
     fields = ("subject", "subject_code", "order", "move_up_down_links")
     readonly_fields = ("order", "move_up_down_links")
     ordering = ("order",)
@@ -55,6 +71,7 @@ class OpenKlantConfigAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "register_contact_moment",
                     "register_bronorganisatie_rsin",
                     "register_type",
+                    "register_channel",
                     "register_employee_id",
                     "use_rsin_for_innNnpId_query_parameter",
                 ],
