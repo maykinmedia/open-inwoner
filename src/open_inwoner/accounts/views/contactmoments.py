@@ -99,10 +99,7 @@ class KlantContactMomentBaseView(
             ),
         }
 
-        # replace e_suite_subject_code with OIP configured subject, if applicable
-        e_suite_subject_code = getattr(kcm.contactmoment, "onderwerp", None)
-
-        data["onderwerp"] = self.get_kcm_subject(kcm, e_suite_subject_code)
+        data["onderwerp"] = self.get_kcm_subject(kcm)
 
         return data
 
@@ -114,13 +111,14 @@ class KlantContactMomentBaseView(
     def get_kcm_subject(
         self,
         kcm: KlantContactMoment,
-        e_suite_subject_code: str | None,
     ) -> str | None:
         """
-        Try to determine the subject ('onderwerp') of a contactmoment
+        Determine the subject (`onderwerp`) of a `KlantContactMoment.contactmoment`:
+            1. replace e-suite subject code with OIP configured subject or
+            2. return e-suite subject code or
+            3. return an empty string as fallback
         """
-        if not e_suite_subject_code:
-            return None
+        e_suite_subject_code = getattr(kcm.contactmoment, "onderwerp", "")
 
         try:
             subject = ContactFormSubject.objects.get(subject_code=e_suite_subject_code)
@@ -133,7 +131,7 @@ class KlantContactMomentBaseView(
                 kcm.contactmoment.url,
                 exc_info=exc,
             )
-            return None
+            return e_suite_subject_code
 
         return subject.subject
 

@@ -41,13 +41,12 @@ from .factories import KlantContactMomentAnswerFactory
 class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
     maxDiff = None
 
-    @classmethod
-    def setUpTestData(cls):
-        super().setUpTestData()
+    def setUp(self):
+        super().setUp()
         MockAPIReadData.setUpServices()
 
         # for testing replacement of e-suite "onderwerp" code with OIP configured subject
-        cls.contactformsubject = ContactFormSubject.objects.create(
+        self.contactformsubject = ContactFormSubject.objects.create(
             subject="oip_subject",
             subject_code="e_suite_subject_code",
             config=OpenKlantConfig.get_solo(),
@@ -361,6 +360,38 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
                 "cases:case_detail",
                 kwargs={"object_id": "410bb717-ff3d-4fd8-8357-801e5daf9775"},
             ),
+        )
+
+    def test_display_esuite_subject_code(self, m, mock_get_kcm_answer_mapping):
+        data = MockAPIReadData().install_mocks(m)
+
+        ContactFormSubject.objects.first().delete()
+
+        detail_url = reverse(
+            "cases:contactmoment_detail",
+            kwargs={"kcm_uuid": data.klant_contactmoment["uuid"]},
+        )
+        list_url = reverse("cases:contactmoment_list")
+        response = self.app.get(list_url, user=data.user)
+
+        kcms = response.context["contactmomenten"]
+        cm_data = data.contactmoment
+
+        self.assertEqual(len(kcms), 1)
+        self.assertEqual(
+            kcms[0],
+            {
+                "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),
+                "channel": cm_data["kanaal"].title(),
+                "text": cm_data["tekst"],
+                "onderwerp": "e_suite_subject_code",
+                "antwoord": cm_data["antwoord"],
+                "identificatie": cm_data["identificatie"],
+                "type": cm_data["type"],
+                "status": Status.afgehandeld.label,
+                "url": detail_url,
+                "new_answer_available": False,
+            },
         )
 
     def test_show_detail_for_kvk_or_rsin(self, m, mock_get_kcm_answer_mapping):
