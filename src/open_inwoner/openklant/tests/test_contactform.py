@@ -269,7 +269,7 @@ class ContactFormTestCase(
             {
                 "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
                 "bronorganisatie": "123456789",
-                "tekst": "Onderwerp: Aanvraag document\n\nhey!\n\nwaddup?",
+                "tekst": "hey!\n\nwaddup?",
                 "type": "Melding",
                 "kanaal": "contactformulier",
                 "onderwerp": "afdeling-xyz",
@@ -333,8 +333,6 @@ class ContactFormTestCase(
 
         text = inspect.cleandoc(
             """
-        Onderwerp: Aanvraag document
-
         hey!
 
         waddup?
@@ -415,7 +413,7 @@ class ContactFormTestCase(
             {
                 "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
                 "bronorganisatie": "123456789",
-                "tekst": "Onderwerp: Aanvraag document\n\nhey!\n\nwaddup?",
+                "tekst": "hey!\n\nwaddup?",
                 "type": "Melding",
                 "kanaal": "contactformulier",
                 "onderwerp": "afdeling-xyz",
@@ -505,7 +503,7 @@ class ContactFormTestCase(
                         {
                             "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
                             "bronorganisatie": "123456789",
-                            "tekst": "Onderwerp: Aanvraag document\n\nhey!\n\nwaddup?",
+                            "tekst": "hey!\n\nwaddup?",
                             "type": "Melding",
                             "kanaal": "contactformulier",
                             "onderwerp": "afdeling-xyz",
@@ -581,7 +579,7 @@ class ContactFormTestCase(
             {
                 "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
                 "bronorganisatie": "123456789",
-                "tekst": "Onderwerp: Aanvraag document\n\nhey!\n\nwaddup?",
+                "tekst": "hey!\n\nwaddup?",
                 "type": "Melding",
                 "kanaal": "contactformulier",
                 "onderwerp": "afdeling-xyz",
@@ -677,7 +675,7 @@ class ContactFormTestCase(
                         {
                             "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
                             "bronorganisatie": "123456789",
-                            "tekst": "Onderwerp: Aanvraag document\n\nhey!\n\nwaddup?",
+                            "tekst": "hey!\n\nwaddup?",
                             "type": "Melding",
                             "kanaal": "contactformulier",
                             "onderwerp": "afdeling-xyz",
