@@ -1227,6 +1227,16 @@ class MyAppointmentsTests(ClearCachesMixin, WebTest):
 
         self.assertIn(_("Geen afspraken beschikbaar"), response.text)
 
+    def test_do_not_render_list_if_validation_error(self, m):
+        m.get(
+            f"{self.api_root}v1/customers/externalId/{self.user.email}/appointments",
+            json={"appointmentList": [{"invalid": "data"}]},
+        )
+
+        response = self.app.get(self.appointments_url, user=self.user)
+
+        self.assertIn(_("Geen afspraken beschikbaar"), response.text)
+
     def test_render_list_if_appointments_are_found(self, m):
         self.setUpMocks(m)
 

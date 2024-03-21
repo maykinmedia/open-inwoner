@@ -1,19 +1,22 @@
+import logging
 from datetime import datetime
+from urllib.parse import quote
 
 from ape_pie.client import APIClient
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 from zgw_consumers.client import build_client
-from zgw_consumers.models import Service
 
 from open_inwoner.utils.api import JSONEncoderMixin
 
 from .exceptions import QmaticException
 from .models import QmaticConfig
 
+logger = logging.getLogger(__name__)
+
 # API DATA DEFINITIONS
 
 
-class ServiceDict(BaseModel):
+class QmaticService(BaseModel):
     publicId: str
     name: str
     # could be float too in theory, documentation is not specific (it gives an int example)
@@ -22,24 +25,24 @@ class ServiceDict(BaseModel):
     custom: str | None
 
 
-class FullServiceDict(ServiceDict):
+class FullService(QmaticService):
     active: bool
     publicEnabled: bool
     created: int
     updated: int
 
 
-class ServiceGroupDict(BaseModel):
-    services: list[ServiceDict]
+class ServiceGroup(BaseModel):
+    services: list[QmaticService]
 
 
-class BranchDict(BaseModel):
+class Branch(BaseModel):
     branchPublicId: str
     branchName: str
-    serviceGroups: list[ServiceGroupDict]
+    serviceGroups: list[ServiceGroup]
 
 
-class BranchDetailDict(BaseModel):
+class BranchDetail(BaseModel):
     name: str
     publicId: str
     phone: str | None
@@ -63,14 +66,14 @@ class BranchDetailDict(BaseModel):
 
 
 class Appointment(JSONEncoderMixin, BaseModel):
-    services: list[ServiceDict]
+    services: list[QmaticService]
     title: str
     start: datetime
     end: datetime
     created: int
     updated: int
     publicId: str
-    branch: BranchDetailDict
+    branch: BranchDetail
     notes: str | None
 
     class Config(JSONEncoderMixin.Config):
@@ -89,19 +92,13 @@ def QmaticClient() -> "Client":
     Create a Qmatic client instance from the database configuration.
     """
     config = QmaticConfig.get_solo()
-    assert isinstance(config, QmaticConfig)
-    if (service := config.service) is None:
-        raise NoServiceConfigured("No Qmatic service defined, aborting!")
-    assert isinstance(service, Service)
-    return build_client(service, client_factory=Client)
+    if service := config.service:
+        return build_client(service, client_factory=Client)
+    raise NoServiceConfigured("No Qmatic service defined, aborting!")
 
 
 def startswith_version(url: str) -> bool:
-    if url.startswith("v1/"):
-        return True
-    if url.startswith("v2/"):
-        return True
-    return False
+    return url.startswith(("v1/", "v2/"))
 
 
 class Client(APIClient):
@@ -133,9 +130,17 @@ class Client(APIClient):
     def list_appointments_for_customer(
         self, customer_externalid: str
     ) -> list[Appointment]:
-        endpoint = f"customers/externalId/{customer_externalid}/appointments"
+        endpoint = f"customers/externalId/{quote(customer_externalid)}/appointments"
         response = self.get(endpoint)
         if response.status_code == 404:
             return []
         response.raise_for_status()
-        return [Appointment(**entry) for entry in response.json()["appointmentList"]]
+        try:
+            return [
+                Appointment(**entry) for entry in response.json()["appointmentList"]
+            ]
+        except ValidationError:
+            logger.exception(
+                "Something went wrong while deserializing appointment data"
+            )
+            return []

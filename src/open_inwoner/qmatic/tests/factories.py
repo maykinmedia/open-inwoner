@@ -1,10 +1,10 @@
 from polyfactory.factories.pydantic_factory import ModelFactory
 
-from ..client import Appointment, BranchDetailDict
+from ..client import Appointment, BranchDetail
 
 
-class BranchDetailFactory(ModelFactory[BranchDetailDict]):
-    __model__ = BranchDetailDict
+class BranchDetailFactory(ModelFactory[BranchDetail]):
+    __model__ = BranchDetail
 
 
 class AppointmentFactory(ModelFactory[Appointment]):

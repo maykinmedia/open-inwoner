@@ -2,7 +2,6 @@ import logging
 from collections.abc import Generator
 from datetime import date
 from typing import Any
-from urllib.parse import quote
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -365,7 +364,7 @@ class MyAppointmentsView(
             context["appointments"] = []
         else:
             context["appointments"] = client.list_appointments_for_customer(
-                quote(self.request.user.email)
+                self.request.user.email
             )
         return context
 
