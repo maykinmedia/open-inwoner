@@ -834,24 +834,31 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
 
             email_success = False
             api_success = False
+            send_confirmation = False
 
             if config.register_email:
                 form.cleaned_data[
                     "question"
                 ] += f"\n\nCase number: {self.case.identificatie}"
                 email_success = self.register_by_email(form, config.register_email)
+                send_confirmation = email_success
 
             if config.register_contact_moment:
                 api_success = self.register_by_api(form, config)
+                if api_success:
+                    if config.api_sends_email_confirmation:
+                        send_confirmation = False
+                    else:
+                        send_confirmation = True
+                # else keep the send_confirmation if email set it
 
-            success = email_success or api_success
-            if success:
+            if send_confirmation:
                 subject = _("Case: {case_identification}").format(
                     case_identification=self.case.identificatie
                 )
                 send_contact_confirmation_mail(self.request.user.email, subject)
 
-            self.set_result_message(success)
+            self.set_result_message(email_success or api_success)
 
             return HttpResponseClientRedirect(
                 reverse("cases:case_detail", kwargs={"object_id": str(self.case.uuid)})

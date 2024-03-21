@@ -608,3 +608,41 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         self.assertEqual(len(mail.outbox), 1)
 
         mock_send_confirm.assert_called_once_with("foo@example.com", ANY)
+
+    def test_api_sends_email_confirmation_is_configurable__api_does_not_send(
+        self, m, mock_contactmoment, mock_send_confirm
+    ):
+        self._setUpMocks(m)
+        self._setUpExtraMocks(m)
+
+        config = OpenKlantConfig.get_solo()
+        config.api_sends_email_confirmation = False
+        config.save()
+
+        response = self.app.get(self.case_detail_url, user=self.user)
+        form = response.forms["contact-form"]
+        form.action = reverse(
+            "cases:case_detail_contact_form", kwargs={"object_id": self.zaak["uuid"]}
+        )
+        form["question"] = "Sample text"
+        response = form.submit()
+        mock_send_confirm.assert_called_once()
+
+    def test_api_sends_email_confirmation_is_configurable__api_sends(
+        self, m, mock_contactmoment, mock_send_confirm
+    ):
+        self._setUpMocks(m)
+        self._setUpExtraMocks(m)
+
+        config = OpenKlantConfig.get_solo()
+        config.api_sends_email_confirmation = True
+        config.save()
+
+        response = self.app.get(self.case_detail_url, user=self.user)
+        form = response.forms["contact-form"]
+        form.action = reverse(
+            "cases:case_detail_contact_form", kwargs={"object_id": self.zaak["uuid"]}
+        )
+        form["question"] = "Sample text"
+        response = form.submit()
+        mock_send_confirm.assert_not_called()

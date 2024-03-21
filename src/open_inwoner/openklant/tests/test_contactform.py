@@ -729,3 +729,44 @@ class ContactFormTestCase(
                         data.eherkenning_user.email, subject.subject
                     )
                     mock_send_confirm.reset_mock()
+
+    def test_api_sends_email_confirmation_is_configurable(self, m, mock_send_confirm):
+        MockAPICreateData.setUpServices()
+
+        config = OpenKlantConfig.get_solo()
+        config.register_contact_moment = True
+        config.register_bronorganisatie_rsin = "123456789"
+        config.register_type = "Melding"
+        config.register_employee_id = "FooVonBar"
+        config.save()
+
+        data = MockAPICreateData()
+        data.install_mocks_anon_with_klant(m)
+
+        subject = ContactFormSubjectFactory(
+            config=config,
+            subject="Aanvraag document",
+            subject_code="afdeling-xyz",
+        )
+        for api_sends in [True, False]:
+            with self.subTest(api_sends=api_sends):
+                config.api_sends_email_confirmation = api_sends
+                config.save()
+
+                response = self.app.get(self.url)
+                form = response.forms["contactmoment-form"]
+                form["subject"].select(text=subject.subject)
+                form["first_name"] = "Foo"
+                form["infix"] = "de"
+                form["last_name"] = "Bar"
+                form["email"] = "foo@example.com"
+                form["phonenumber"] = "+31612345678"
+                form["question"] = "hey!\n\nwaddup?"
+
+                response = form.submit().follow()
+
+                if api_sends:
+                    mock_send_confirm.assert_not_called()
+                else:
+                    mock_send_confirm.assert_called_once()
+                mock_send_confirm.reset_mock()

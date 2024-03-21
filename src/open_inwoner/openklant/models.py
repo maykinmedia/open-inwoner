@@ -83,6 +83,14 @@ class OpenKlantConfig(SingletonModel):
         ),
         default=False,
     )
+    api_sends_email_confirmation = models.BooleanField(
+        verbose_name=_("API stuurt bevestiging"),
+        help_text=_(
+            "If enabled the external API will send a confirmation email."
+            "If not enabled the 'contactform_confirmation' email template will be sent"
+        ),
+        default=False,
+    )
 
     register_api_required_fields = (
         "register_contact_moment",

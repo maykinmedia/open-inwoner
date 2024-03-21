@@ -68,30 +68,38 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
 
         # this logic is very gnarly as there are multiple destinations, and sources of user-email
 
+        user = self.request.user
         user_email = None
         api_user_email = None
-        user = self.request.user
         email_success = False
         api_success = False
+        send_confirmation = False
 
-        if user.is_authenticated and self.request.user.email:
-            user_email = self.request.user.email
+        if user.is_authenticated and user.email:
+            user_email = user.email
 
         if config.register_email:
             email_success = self.register_by_email(form, config.register_email)
+            send_confirmation = email_success
 
         if config.register_contact_moment:
             api_success, api_user_email = self.register_by_api(form, config)
+            if api_success:
+                if config.api_sends_email_confirmation:
+                    send_confirmation = False
+                else:
+                    send_confirmation = True
+            # else keep the send_confirmation if email set it
 
         # it is possible we don't have an email, user didn't enter it but we got it from the Klant
         user_email = api_user_email or user_email or form.cleaned_data.get("email")
-        success = email_success or api_success
-        if user_email and success:
+
+        if send_confirmation:
             send_contact_confirmation_mail(
                 user_email, form.cleaned_data["subject"].subject
             )
 
-        self.set_result_message(success)
+        self.set_result_message(email_success or api_success)
 
         return super().form_valid(form)
 
