@@ -1018,7 +1018,7 @@ msgid ""
 "letter, 1 digit."
 msgstr ""
 "Het wachtwoord moet in ieder geval 1 hoofdletter, 1 kleine letter en een "
-"nummer te bevatten."
+"nummer bevatten."
 
 #: accounts/tests/test_auth.py:996 accounts/tests/test_profile_views.py:332
 #: pdc/tests/test_organization_location.py:33
@@ -6748,7 +6748,7 @@ msgid ""
 "For security reasons, please enter your old password and your new password "
 "twice so we can make sure you have not made any typo."
 msgstr ""
-"Voor beveiligingsredenen vult u eerst uw oude wachtwoord in. Daarna vult u "
+"Om beveiligingsredenen vult u eerst uw oude wachtwoord in. Daarna vult u "
 "tweemaal uw nieuwe wachtwoord in om tikfouten te voorkomen."
 
 #: templates/registration/password_reset_complete.html:5
