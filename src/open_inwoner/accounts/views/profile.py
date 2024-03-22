@@ -31,7 +31,6 @@ from open_inwoner.openklant.clients import build_client
 from open_inwoner.openklant.wrap import get_fetch_parameters
 from open_inwoner.plans.models import Plan
 from open_inwoner.qmatic.client import NoServiceConfigured, QmaticClient
-from open_inwoner.qmatic.models import QmaticConfig
 from open_inwoner.questionnaire.models import QuestionnaireStep
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
@@ -367,8 +366,6 @@ class MyAppointmentsView(
             context["appointments"] = client.list_appointments_for_customer(
                 self.request.user.email
             )
-            config = QmaticConfig.get_solo()
-            context["booking_base_url"] = config.booking_base_url
         return context
 
     @cached_property

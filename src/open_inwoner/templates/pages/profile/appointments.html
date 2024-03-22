@@ -24,8 +24,7 @@
                             {% list_item text=appointment.branch.addressLine2 compact=True strong=False %}
                         {% endrender_list %}
 
-                        <a href="{{ booking_base_url }}{{ appointment.publicId }}" class="link link--icon link--secondary"
-                            aria-label="{% trans "Wijzig of annuleer afspraak" %}"
+                        <a href="{{ appointment.url }}" class="link link--icon link--secondary"
                             title="{% trans "Wijzig of annuleer afspraak" %}">
                             <span class="link__text">{% trans "Wijzig of annuleer afspraak" %}</span>
                             {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}

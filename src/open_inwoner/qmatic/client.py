@@ -66,6 +66,7 @@ class BranchDetail(BaseModel):
 
 
 class Appointment(JSONEncoderMixin, BaseModel):
+    url: str | None
     services: list[QmaticService]
     title: str
     start: datetime
@@ -135,10 +136,16 @@ class Client(APIClient):
         if response.status_code == 404:
             return []
         response.raise_for_status()
+        config = QmaticConfig.get_solo()
         try:
-            return [
+            appointments = [
                 Appointment(**entry) for entry in response.json()["appointmentList"]
             ]
+            for appointment in appointments:
+                appointment.url = (
+                    f"{config.booking_base_url}{quote(appointment.publicId)}"
+                )
+            return appointments
         except ValidationError:
             logger.exception(
                 "Something went wrong while deserializing appointment data"
