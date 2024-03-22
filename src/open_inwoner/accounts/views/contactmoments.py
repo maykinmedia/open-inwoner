@@ -223,24 +223,55 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
             ocm = client.retrieve_objectcontactmoment(
                 kcm.contactmoment, "zaak", zaken_client
             )
-            ctx["zaak"] = getattr(ocm, "object", None)
+            zaak = getattr(ocm, "object", None)
+            if zaak:
+                zaak_url = reverse(
+                    "cases:case_detail", kwargs={"object_id": str(zaak.uuid)}
+                )
+            else:
+                zaak_url = None
+            ctx["zaak"] = zaak
 
         contactmoment: KCMDict = self.get_kcm_data(kcm)
         ctx["contactmoment"] = contactmoment
         ctx["metrics"] = [
             {
-                "label": _("Ontvangstdatum: "),
-                "value": contactmoment["registered_date"],
-            },
-            {
-                "label": _("Contactwijze: "),
-                "value": contactmoment["channel"],
-            },
-            {
                 "label": _("Status: "),
                 "value": contactmoment["status"],
             },
+            {
+                "label": _("Ingediend op: "),
+                "value": contactmoment["registered_date"],
+            },
+            {
+                "label": _("Vraag nummer: "),
+                "value": contactmoment["identificatie"],
+            },
+            {
+                "label": _("Contact gehad via: "),
+                "value": contactmoment["channel"],
+            },
         ]
+        origin = self.request.headers.get("Referer")
+        if origin == reverse("cases:contactmoment_list"):
+            ctx["origin"] = {
+                "label": _("Terug naar overzicht"),
+                "url": origin,
+            }
+            if zaak:
+                ctx["destination"] = {
+                    "label": _("Naar aanvrag"),
+                    "url": zaak_url,
+                }
+        else:
+            ctx["origin"] = {
+                "label": _("Terug naar aanvrag"),
+                "url": zaak_url,
+            }
+            ctx["destination"] = {
+                "label": _("Bekijk alle vragen"),
+                "url": reverse("cases:contactmoment_list"),
+            }
         return ctx
 
 

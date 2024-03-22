@@ -1,21 +1,42 @@
 {% extends 'master.html' %}
-{% load i18n anchor_menu_tags card_tags file_tags grid_tags table_tags solo_tags form_tags button_tags %}
+{% load i18n grid_tags table_tags button_tags icon_tags %}
 
 {% block content %}
     {% if contactmoment %}
         {% render_grid %}
             {% render_column span=12 %}
-                {# Contactmoment/dashboard. #}
-                <h1 class="h1" id="title">{{ page_title }}</h1>
+                <h1 class="h1" id="title">{{ contactmoment.onderwerp }}</h1>
                 {% include "components/Dashboard/Dashboard.html" with metrics=metrics only %}
             {% endrender_column %}
-            {% render_column start=4 span=6 %}
-
-                <div class="contactmoment__details">
-                {% contactmoment_table contactmoment zaak=zaak %}
-                </div>
-            {% endrender_column %}
         {% endrender_grid %}
+
+        <div class="container--no-margin">
+            <div class="contactmoment">
+                <h3>{% trans "Uw vraag" %}</h3>
+                <p>{{ contactmoment.text }}</p>
+            </div>
+            <div class="contactmoment">
+                <h3>{% trans "Antwoord" %}</h3>
+                {% if contactmoment.antwoord %}
+                    <p>{{ contactmoment.antwoord }}</p>
+                {% else %}
+                    <p>{% trans "Nog geen antwoord beschijkbaar" %}</p>
+                {% endif %}
+            </div>
+            <div class="contactmoment">
+                <a href="{{ origin.url }}" id="origin_link" class="button button--secondary">
+                    {% icon "arrow_backward" %}{{ origin.label }}
+                </a>
+            </div>
+            {% if destination %}
+                <div class="contactmoment">
+                    <a href="{{ destination.url }}" id="destination_link" class="button button--transparent">
+                        {{ destination.label }}{% icon "arrow_forward" %}
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
     {% else %}
         <h2 class="h2">{% trans 'There is no available data at the moment.' %}</h2>
     {% endif %}
