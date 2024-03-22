@@ -108,8 +108,15 @@ class PasswordLoginViewTests(eHerkenningMockTestCase):
         self.assertContains(response, reverse("login"))
         self.assertNoEHerkenningURLS(response)
 
-    @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
-    def test_post_redirects_and_authenticates(self, mock_kvk):
+    @patch(
+        "open_inwoner.kvk.signals.KvKClient.retrieve_rsin_with_kvk",
+        return_value="123456789",
+        autospec=True,
+    )
+    @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches", autospec=True)
+    def test_post_redirects_and_authenticates(
+        self, mock_kvk, mock_retrieve_rsin_with_kvk
+    ):
         mock_kvk.return_value = [
             {"kvkNummer": "29664887", "vestigingsnummer": "1234"},
             {"kvkNummer": "29664887", "vestigingsnummer": "5678"},

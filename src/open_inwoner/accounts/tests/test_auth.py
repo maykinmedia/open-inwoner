@@ -20,6 +20,7 @@ from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.kvk.branches import get_kvk_branch_number
 from open_inwoner.kvk.tests.factories import CertificateFactory
+from open_inwoner.openzaak.models import OpenZaakConfig
 
 from ...cms.collaborate.cms_apps import CollaborateApphook
 from ...cms.tests import cms_tools
@@ -33,6 +34,9 @@ from .factories import (
     UserFactory,
     eHerkenningUserFactory,
 )
+
+RETURN_URL = "/"
+CANCEL_URL = reverse("login")
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
@@ -559,6 +563,46 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
 
         self.assertRedirectsLogin(response, with_host=True)
 
+    @patch(
+        "open_inwoner.kvk.signals.KvKClient.retrieve_rsin_with_kvk",
+        return_value="",
+        autospec=True,
+    )
+    @patch(
+        "open_inwoner.accounts.views.auth.OpenZaakConfig.get_solo",
+        return_value=OpenZaakConfig(fetch_eherkenning_zaken_with_rsin=True),
+        autospec=True,
+    )
+    def test_login_as_eenmanszaak_blocked(
+        self, mock_oz_config, mock_retrieve_rsin_with_kvk
+    ):
+        url = reverse("eherkenning-mock:password")
+        params = {
+            "acs": f"http://testserver{reverse('eherkenning:acs')}",
+            "next": RETURN_URL,
+            "cancel": CANCEL_URL,
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "29664887",
+            "auth_pass": "company@localhost",
+        }
+
+        # post our password to the IDP
+        response = self.client.post(url, data, follow=False)
+
+        # it will redirect to our ACS
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("eherkenning:acs"), response["Location"])
+
+        # follow the ACS redirect and get/create the user
+        response = self.client.get(response["Location"])
+
+        # User is logged out and redirected to login view
+        self.assertNotIn("_auth_user_id", self.app.session)
+        self.assertRedirectsLogin(response, with_host=True)
+
     @patch("eherkenning.validators.KVKValidator.__call__")
     def test_eherkenning_fail_without_invite_and_next_url_redirects_to_login_page(
         self, m
@@ -614,12 +658,24 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
             f"http://testserver{reverse('django_registration_register')}?invite={invite.key}",
         )
 
-    @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
+    @patch(
+        "open_inwoner.kvk.signals.KvKClient.retrieve_rsin_with_kvk",
+        return_value="123456789",
+        autospec=True,
+    )
+    @patch(
+        "open_inwoner.kvk.client.KvKClient.get_all_company_branches",
+        autospec=True,
+    )
     @patch(
         "open_inwoner.kvk.models.KvKConfig.get_solo",
+        autospec=True,
     )
     def test_invite_url_not_in_session_after_successful_login(
-        self, mock_solo, mock_kvk
+        self,
+        mock_solo,
+        mock_kvk,
+        mock_retrieve_rsin_with_kvk,
     ):
         mock_kvk.return_value = [
             {"kvkNummer": "12345678", "vestigingsnummer": "1234"},
@@ -687,7 +743,7 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
         mock_solo.return_value.server_certificate = CertificateFactory()
 
         user = eHerkenningUserFactory.create(
-            kvk="12345678", email="user-12345678@localhost"
+            kvk="12345678", rsin="123456789", email="user-12345678@localhost"
         )
 
         url = reverse("eherkenning-mock:password")
@@ -1048,8 +1104,16 @@ class DuplicateEmailRegistrationTest(WebTest):
         self.assertEqual(users.first().email, "test@example.com")
         self.assertEqual(users.last().email, "test@example.com")
 
-    @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
-    def test_eherkenning_user_success(self, mock_kvk):
+    @patch(
+        "open_inwoner.kvk.signals.KvKClient.retrieve_rsin_with_kvk",
+        return_value="123456789",
+        autospec=True,
+    )
+    @patch(
+        "open_inwoner.kvk.client.KvKClient.get_all_company_branches",
+        autospec=True,
+    )
+    def test_eherkenning_user_success(self, mock_kvk, mock_retrieve_rsin_with_kvk):
         """Assert that eHerkenning users can register with duplicate emails"""
 
         mock_kvk.return_value = [
@@ -1068,6 +1132,7 @@ class DuplicateEmailRegistrationTest(WebTest):
         test_user = eHerkenningUserFactory.create(
             email="test@localhost",
             kvk="64819772",
+            rsin="123456789",
         )
 
         url = reverse("eherkenning-mock:password")
