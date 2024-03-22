@@ -3,7 +3,7 @@ Open Inwoner
 ==================
 
 
-:Version: 1.14
+:Version: 1.15
 :Source: https://github.com/maykinmedia/open-inwoner
 :Keywords: inwoner
 :PythonVersion: 3.11
@@ -41,7 +41,7 @@ commands.
 License
 =======
 
-Copyright © Maykin Media, 2021 - 2023
+Copyright © Maykin Media, 2024
 
 Licensed under the EUPL_.
 
