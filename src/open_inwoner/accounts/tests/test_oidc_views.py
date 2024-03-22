@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test import TestCase, modify_settings, override_settings
 from django.urls import reverse
+from django.utils.translation import gettext as _
 
 import requests
 import requests_mock
@@ -25,6 +26,7 @@ from digid_eherkenning_oidc_generics.views import (
 from open_inwoner.configurations.choices import OpenIDDisplayChoices
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.kvk.branches import KVK_BRANCH_SESSION_VARIABLE
+from open_inwoner.openzaak.models import OpenZaakConfig
 
 from ..choices import LoginTypeChoices
 from .factories import DigidUserFactory, UserFactory, eHerkenningUserFactory
@@ -977,6 +979,7 @@ class eHerkenningOIDCFlowTests(WebTest):
             first_name="John",
             last_name="Doe",
             kvk="12345678",
+            rsin="123456789",
             email="user-12345678@localhost",
             is_prepopulated=True,
         )
@@ -1031,7 +1034,9 @@ class eHerkenningOIDCFlowTests(WebTest):
         mock_retrieve_rsin_with_kvk.return_value = "123456789"
         # set up a user with a non existing email address
         mock_get_userinfo.return_value = {"sub": "00000000"}
-        eHerkenningUserFactory.create(kvk="12345678", email="existing_user@example.com")
+        eHerkenningUserFactory.create(
+            kvk="12345678", rsin="123456789", email="existing_user@example.com"
+        )
         session = self.client.session
         session["oidc_states"] = {"mock": {"nonce": "nonce"}}
         session.save()
@@ -1109,14 +1114,32 @@ class eHerkenningOIDCFlowTests(WebTest):
             ]
         }
     )
-    @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
-    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
-    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
-    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
-    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
+    @patch(
+        "open_inwoner.kvk.signals.KvKClient.retrieve_rsin_with_kvk",
+        return_value="123456789",
+        autospec=True,
+    )
+    @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches", autospec=True)
+    @patch(
+        "mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo",
+        autospec=True,
+    )
+    @patch(
+        "mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens",
+        autospec=True,
+    )
+    @patch(
+        "mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token",
+        autospec=True,
+    )
+    @patch(
+        "mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token",
+        autospec=True,
+    )
     @patch(
         "digid_eherkenning_oidc_generics.models.OpenIDConnectEHerkenningConfig.get_solo",
         return_value=OpenIDConnectEHerkenningConfig(id=1, enabled=True),
+        autospec=True,
     )
     def test_error_first_cleared_after_succesful_login(
         self,
@@ -1126,6 +1149,7 @@ class eHerkenningOIDCFlowTests(WebTest):
         mock_store_tokens,
         mock_get_userinfo,
         mock_kvk,
+        mock_retrieve_rsin_with_kvk,
     ):
         mock_get_userinfo.return_value = {
             "sub": "some_username",
@@ -1318,17 +1342,111 @@ class eHerkenningOIDCFlowTests(WebTest):
 
         self.assertEqual(error_msg, str(GENERIC_EHERKENNING_ERROR_MSG))
 
-    @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
-    @patch("open_inwoner.utils.context_processors.SiteConfiguration")
-    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
-    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
-    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
-    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
+    @patch(
+        "open_inwoner.accounts.views.auth.OpenZaakConfig.get_solo",
+        return_value=OpenZaakConfig(fetch_eherkenning_zaken_with_rsin=True),
+        autospec=True,
+    )
+    @patch("open_inwoner.kvk.signals.KvKClient.retrieve_rsin_with_kvk", autospec=True)
+    @patch(
+        "mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo",
+        autospec=True,
+    )
+    @patch(
+        "mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens",
+        autospec=True,
+    )
+    @patch(
+        "mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token",
+        autospec=True,
+    )
+    @patch(
+        "mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token",
+        autospec=True,
+    )
+    @patch(
+        "digid_eherkenning_oidc_generics.models.OpenIDConnectEHerkenningConfig.get_solo",
+        return_value=OpenIDConnectEHerkenningConfig(
+            id=1, enabled=True, identifier_claim_name="sub"
+        ),
+        autospec=True,
+    )
+    def test_login_as_eenmanszaak_blocked(
+        self,
+        mock_get_solo,
+        mock_get_token,
+        mock_verify_token,
+        mock_store_tokens,
+        mock_get_userinfo,
+        mock_retrieve_rsin_with_kvk,
+        mock_oz_config,
+    ):
+        """
+        Eenmanszaken do not have an RSIN, which means that if we have a feature flag
+        to fetch resources using RSIN (from Open Zaak or Open Klant) enabled, we cannot
+        let eenmanszaken log in using eHerkenning
+        """
+        mock_retrieve_rsin_with_kvk.return_value = ""
+        # set up a user with a non existing email address
+        mock_get_userinfo.return_value = {"sub": "00000000"}
+        eHerkenningUserFactory.create(kvk="12345678", email="existing_user@example.com")
+        session = self.client.session
+        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session.save()
+        callback_url = reverse("eherkenning_oidc:callback")
+
+        self.assertFalse(User.objects.filter(email="new_user@example.com").exists())
+
+        # enter the login flow
+        callback_response = self.client.get(
+            callback_url, {"code": "mock", "state": "mock"}
+        )
+
+        # User is logged out and redirected to login view
+        self.assertNotIn("_auth_user_id", self.app.session)
+        self.assertRedirects(
+            callback_response, reverse("login"), fetch_redirect_response=False
+        )
+
+        response = self.client.get(callback_response.url)
+
+        self.assertContains(response, _("Use DigiD to log in as a sole proprietor."))
+
+    @patch(
+        "open_inwoner.kvk.signals.KvKClient.retrieve_rsin_with_kvk",
+        return_value="123456789",
+        autospec=True,
+    )
+    @patch(
+        "open_inwoner.kvk.client.KvKClient.get_all_company_branches",
+        autospec=True,
+    )
+    @patch(
+        "open_inwoner.utils.context_processors.SiteConfiguration",
+        autospec=True,
+    )
+    @patch(
+        "mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo",
+        autospec=True,
+    )
+    @patch(
+        "mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens",
+        autospec=True,
+    )
+    @patch(
+        "mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token",
+        autospec=True,
+    )
+    @patch(
+        "mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token",
+        autospec=True,
+    )
     @patch(
         "digid_eherkenning_oidc_generics.models.OpenIDConnectEHerkenningConfig.get_solo",
         return_value=OpenIDConnectEHerkenningConfig(
             id=1, enabled=True, oidc_op_authorization_endpoint="http://idp.local/auth"
         ),
+        autospec=True,
     )
     def test_redirect_after_login_with_registration_and_branch_selection(
         self,
@@ -1339,6 +1457,7 @@ class eHerkenningOIDCFlowTests(WebTest):
         mock_get_userinfo,
         mock_siteconfig,
         mock_kvk,
+        mock_retrieve_rsin_with_kvk,
     ):
         """
         Full authentication flow with redirect after successful login
@@ -1409,17 +1528,40 @@ class eHerkenningOIDCFlowTests(WebTest):
 
         self.assertEqual(profile_response.status_code, 200)
 
-    @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
-    @patch("open_inwoner.utils.context_processors.SiteConfiguration")
-    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
-    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
-    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
-    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
+    @patch(
+        "open_inwoner.kvk.signals.KvKClient.retrieve_rsin_with_kvk",
+        autospec=True,
+    )
+    @patch(
+        "open_inwoner.kvk.client.KvKClient.get_all_company_branches",
+        autospec=True,
+    )
+    @patch(
+        "open_inwoner.utils.context_processors.SiteConfiguration",
+        autospec=True,
+    )
+    @patch(
+        "mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo",
+        autospec=True,
+    )
+    @patch(
+        "mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens",
+        autospec=True,
+    )
+    @patch(
+        "mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token",
+        autospec=True,
+    )
+    @patch(
+        "mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token",
+        autospec=True,
+    )
     @patch(
         "digid_eherkenning_oidc_generics.models.OpenIDConnectEHerkenningConfig.get_solo",
         return_value=OpenIDConnectEHerkenningConfig(
             id=1, enabled=True, oidc_op_authorization_endpoint="http://idp.local/auth"
         ),
+        autospec=True,
     )
     def test_redirect_after_login_no_registration_with_branch_selection(
         self,
@@ -1430,11 +1572,12 @@ class eHerkenningOIDCFlowTests(WebTest):
         mock_get_userinfo,
         mock_siteconfig,
         mock_kvk,
+        mock_retrieve_rsin_with_kvk,
     ):
         """
         Full authentication flow with redirect after successful login
         """
-        user = eHerkenningUserFactory.create(kvk="12345678")
+        user = eHerkenningUserFactory.create(kvk="12345678", rsin="123456789")
         mock_get_userinfo.return_value = {
             "sub": "some_username",
             "kvk": "12345678",
@@ -1512,7 +1655,7 @@ class eHerkenningOIDCFlowTests(WebTest):
         """
         Full authentication flow with redirect after successful login
         """
-        user = eHerkenningUserFactory.create(kvk="12345678")
+        user = eHerkenningUserFactory.create(kvk="12345678", rsin="123456789")
         mock_get_userinfo.return_value = {
             "sub": "some_username",
             "kvk": "12345678",
