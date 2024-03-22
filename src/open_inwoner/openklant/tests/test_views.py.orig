@@ -364,19 +364,23 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
             ),
         )
 
-	contactmoment_link = response.pyquery("#destination_link")
-        self.assertIn(_("Bekijk alle vragen"), contactmoment_link.text())
-        self.assertEqual(
-            contactmoment_link.attr("href"),
-            reverse("cases:contactmoment_list"),
-        )
-
+<<<<<<< HEAD
     def test_display_contactmoment_subject_duplicate_esuite_codes(
         self, m, mock_get_kcm_answer_mapping
     ):
         """
         Assert that the first OIP subject is used if several are mapped to the same e-suite code
         """
+=======
+        contactmoment_link = response.pyquery("#destination_link")
+        self.assertIn(_("Bekijk alle vragen"), contactmoment_link.text())
+        self.assertEqual(
+            contactmoment_link.attr("href"),
+            reverse("cases:contactmoment_list"),
+        )
+
+    def test_display_esuite_subject_code(self, m, mock_get_kcm_answer_mapping):
+>>>>>>> 8e9ad8fe (Make vragen detail conform to design)
         data = MockAPIReadData().install_mocks(m)
 
         ContactFormSubject.objects.create(
