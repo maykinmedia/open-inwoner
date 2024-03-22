@@ -13,6 +13,7 @@ from .auth import (
     CustomDigiDAssertionConsumerServiceView,
     CustomeHerkenningAssertionConsumerServiceMockView,
     CustomeHerkenningAssertionConsumerServiceView,
+    CustomEHerkenningOIDCAuthenticationCallbackView,
     LogPasswordChangeView,
     LogPasswordResetConfirmView,
     LogPasswordResetView,
@@ -81,4 +82,5 @@ __all__ = [
     "NewsletterSubscribeView",
     "CustomRegistrationView",
     "NecessaryFieldsUserView",
+    "CustomEHerkenningOIDCAuthenticationCallbackView",
 ]
