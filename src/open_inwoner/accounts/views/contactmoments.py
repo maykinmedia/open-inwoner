@@ -260,12 +260,12 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
             }
             if zaak:
                 ctx["destination"] = {
-                    "label": _("Naar aanvrag"),
+                    "label": _("Naar aanvraag"),
                     "url": zaak_url,
                 }
         else:
             ctx["origin"] = {
-                "label": _("Terug naar aanvrag"),
+                "label": _("Terug naar aanvraag"),
                 "url": zaak_url,
             }
             ctx["destination"] = {
