@@ -6,7 +6,11 @@ from django_setup_configuration.exceptions import SelfTestFailed
 
 from open_inwoner.openklant.models import OpenKlantConfig
 
-from ...bootstrap.kic import KICAPIConfigurationStep
+from ...bootstrap.kic import (
+    ContactmomentenAPIConfigurationStep,
+    KICAPIsConfigurationStep,
+    KlantenAPIConfigurationStep,
+)
 
 KLANTEN_API_ROOT = "https://openklant.local/klanten/api/v1/"
 CONTACTMOMENTEN_API_ROOT = "https://openklant.local/contactmomenten/api/v1/"
@@ -30,7 +34,9 @@ CONTACTMOMENTEN_API_ROOT = "https://openklant.local/contactmomenten/api/v1/"
 )
 class KICConfigurationTests(TestCase):
     def test_configure(self):
-        configuration = KICAPIConfigurationStep()
+        KlantenAPIConfigurationStep().configure()
+        ContactmomentenAPIConfigurationStep().configure()
+        configuration = KICAPIsConfigurationStep()
 
         configuration.configure()
 
@@ -64,7 +70,9 @@ class KICConfigurationTests(TestCase):
         KIC_USE_RSIN_FOR_INNNNPID_QUERY_PARAMETER=None,
     )
     def test_configure_use_defaults(self):
-        configuration = KICAPIConfigurationStep()
+        KlantenAPIConfigurationStep().configure()
+        ContactmomentenAPIConfigurationStep().configure()
+        configuration = KICAPIsConfigurationStep()
 
         configuration.configure()
 
@@ -89,7 +97,10 @@ class KICConfigurationTests(TestCase):
 
     @requests_mock.Mocker()
     def test_configuration_check_ok(self, m):
-        configuration = KICAPIConfigurationStep()
+        KlantenAPIConfigurationStep().configure()
+        ContactmomentenAPIConfigurationStep().configure()
+        configuration = KICAPIsConfigurationStep()
+
         configuration.configure()
 
         m.get(f"{KLANTEN_API_ROOT}klanten", json=[])
@@ -110,7 +121,9 @@ class KICConfigurationTests(TestCase):
 
     @requests_mock.Mocker()
     def test_configuration_check_failures(self, m):
-        configuration = KICAPIConfigurationStep()
+        KlantenAPIConfigurationStep().configure()
+        ContactmomentenAPIConfigurationStep().configure()
+        configuration = KICAPIsConfigurationStep()
         configuration.configure()
 
         mock_kwargs = (
@@ -128,10 +141,15 @@ class KICConfigurationTests(TestCase):
                     configuration.test_configuration()
 
     def test_is_configured(self):
-        configuration = KICAPIConfigurationStep()
+        configs = [
+            KlantenAPIConfigurationStep(),
+            ContactmomentenAPIConfigurationStep(),
+            KICAPIsConfigurationStep(),
+        ]
+        for config in configs:
+            with self.subTest(config=config.verbose_name):
+                self.assertFalse(config.is_configured())
 
-        self.assertFalse(configuration.is_configured())
+                config.configure()
 
-        configuration.configure()
-
-        self.assertTrue(configuration.is_configured())
+                self.assertTrue(config.is_configured())

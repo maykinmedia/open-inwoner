@@ -934,8 +934,14 @@ CKEDITOR_CONFIGS = {
 # django-setup-configuration
 #
 SETUP_CONFIGURATION_STEPS = [
-    "open_inwoner.configurations.bootstrap.zgw.ZGWAPIConfigurationStep",
-    "open_inwoner.configurations.bootstrap.kic.KICAPIConfigurationStep",
+    "open_inwoner.configurations.bootstrap.zgw.ZakenAPIConfigurationStep",
+    "open_inwoner.configurations.bootstrap.zgw.CatalogiAPIConfigurationStep",
+    "open_inwoner.configurations.bootstrap.zgw.DocumentenAPIConfigurationStep",
+    "open_inwoner.configurations.bootstrap.zgw.FormulierenAPIConfigurationStep",
+    "open_inwoner.configurations.bootstrap.zgw.ZGWAPIsConfigurationStep",
+    "open_inwoner.configurations.bootstrap.kic.KlantenAPIConfigurationStep",
+    "open_inwoner.configurations.bootstrap.kic.ContactmomentenAPIConfigurationStep",
+    "open_inwoner.configurations.bootstrap.kic.KICAPIsConfigurationStep",
 ]
 OIP_ORGANIZATION = config("OIP_ORGANIZATION", "")
 

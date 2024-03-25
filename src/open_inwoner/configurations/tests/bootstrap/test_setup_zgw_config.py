@@ -11,7 +11,13 @@ from open_inwoner.openzaak.models import (
     generate_default_file_extensions,
 )
 
-from ...bootstrap.zgw import ZGWAPIConfigurationStep
+from ...bootstrap.zgw import (
+    CatalogiAPIConfigurationStep,
+    DocumentenAPIConfigurationStep,
+    FormulierenAPIConfigurationStep,
+    ZakenAPIConfigurationStep,
+    ZGWAPIsConfigurationStep,
+)
 
 ZAKEN_API_ROOT = "https://openzaak.local/zaken/api/v1/"
 CATALOGI_API_ROOT = "https://openzaak.local/catalogi/api/v1/"
@@ -45,7 +51,11 @@ FORMULIEREN_API_ROOT = "https://esuite.local.net/formulieren-provider/api/v1/"
 )
 class ZGWConfigurationTests(TestCase):
     def test_configure(self):
-        configuration = ZGWAPIConfigurationStep()
+        ZakenAPIConfigurationStep().configure()
+        CatalogiAPIConfigurationStep().configure()
+        DocumentenAPIConfigurationStep().configure()
+        FormulierenAPIConfigurationStep().configure()
+        configuration = ZGWAPIsConfigurationStep()
 
         configuration.configure()
 
@@ -97,7 +107,11 @@ class ZGWConfigurationTests(TestCase):
         FETCH_EHERKENNING_ZAKEN_WITH_RSIN=None,
     )
     def test_configure_use_defaults(self):
-        configuration = ZGWAPIConfigurationStep()
+        ZakenAPIConfigurationStep().configure()
+        CatalogiAPIConfigurationStep().configure()
+        DocumentenAPIConfigurationStep().configure()
+        FormulierenAPIConfigurationStep().configure()
+        configuration = ZGWAPIsConfigurationStep()
 
         configuration.configure()
 
@@ -142,7 +156,12 @@ class ZGWConfigurationTests(TestCase):
 
     @requests_mock.Mocker()
     def test_configuration_check_ok(self, m):
-        configuration = ZGWAPIConfigurationStep()
+        ZakenAPIConfigurationStep().configure()
+        CatalogiAPIConfigurationStep().configure()
+        DocumentenAPIConfigurationStep().configure()
+        FormulierenAPIConfigurationStep().configure()
+        configuration = ZGWAPIsConfigurationStep()
+
         configuration.configure()
 
         m.get(f"{ZAKEN_API_ROOT}statussen", json=[])
@@ -174,7 +193,12 @@ class ZGWConfigurationTests(TestCase):
 
     @requests_mock.Mocker()
     def test_configuration_check_failures(self, m):
-        configuration = ZGWAPIConfigurationStep()
+        ZakenAPIConfigurationStep().configure()
+        CatalogiAPIConfigurationStep().configure()
+        DocumentenAPIConfigurationStep().configure()
+        FormulierenAPIConfigurationStep().configure()
+        configuration = ZGWAPIsConfigurationStep()
+
         configuration.configure()
 
         mock_kwargs = (
@@ -192,10 +216,17 @@ class ZGWConfigurationTests(TestCase):
                     configuration.test_configuration()
 
     def test_is_configured(self):
-        configuration = ZGWAPIConfigurationStep()
+        configs = [
+            ZakenAPIConfigurationStep(),
+            CatalogiAPIConfigurationStep(),
+            DocumentenAPIConfigurationStep(),
+            FormulierenAPIConfigurationStep(),
+            ZGWAPIsConfigurationStep(),
+        ]
+        for config in configs:
+            with self.subTest(config=config.verbose_name):
+                self.assertFalse(config.is_configured())
 
-        self.assertFalse(configuration.is_configured())
+                config.configure()
 
-        configuration.configure()
-
-        self.assertTrue(configuration.is_configured())
+                self.assertTrue(config.is_configured())

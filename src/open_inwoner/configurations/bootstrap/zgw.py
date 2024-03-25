@@ -11,50 +11,26 @@ from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.utils.api import ClientError
 
 
-# TODO split into two steps? or split per service?
-class ZGWAPIConfigurationStep(BaseConfigurationStep):
+class ZakenAPIConfigurationStep(BaseConfigurationStep):
     """
-    Configure the required services to establish a connection with ZGW APIs and set
-    any feature flags or other options if specified
-
-    1. Create service for Zaken API
-    2. Create service for Catalogi API
-    3. Create service for Documenten API
-    4. Create service for Formulieren API (eSuite)
-    5. Set up configuration for ZGW APIs
+    Configure the required Service to establish a connection with the Zaken API
     """
 
-    verbose_name = "ZGW APIs configuration"
+    verbose_name = "Zaken API configuration"
     required_settings = [
         "ZAKEN_API_ROOT",
         "ZAKEN_API_CLIENT_ID",
         "ZAKEN_API_SECRET",
-        "CATALOGI_API_ROOT",
-        "CATALOGI_API_CLIENT_ID",
-        "CATALOGI_API_SECRET",
-        "DOCUMENTEN_API_ROOT",
-        "DOCUMENTEN_API_CLIENT_ID",
-        "DOCUMENTEN_API_SECRET",
-        "FORMULIEREN_API_ROOT",
-        "FORMULIEREN_API_CLIENT_ID",
-        "FORMULIEREN_API_SECRET",
     ]
     enable_setting = "ZGW_API_CONFIG_ENABLE"
 
     def is_configured(self) -> bool:
-        zgw_config = OpenZaakConfig.get_solo()
-        return (
-            bool(zgw_config.zaak_service)
-            and bool(zgw_config.catalogi_service)
-            and bool(zgw_config.document_service)
-            and bool(zgw_config.form_service)
-        )
+        return bool(Service.objects.filter(api_root=settings.ZAKEN_API_ROOT))
 
     def configure(self):
         organization = settings.OIP_ORGANIZATION or settings.ENVIRONMENT
         org_label = f"Open Inwoner {organization}".strip()
 
-        # 1. Create Zaken API service
         zaak_service, created = Service.objects.update_or_create(
             api_root=settings.ZAKEN_API_ROOT,
             defaults={
@@ -76,7 +52,32 @@ class ZGWAPIConfigurationStep(BaseConfigurationStep):
             zaak_service.user_representation = org_label
             zaak_service.save()
 
-        # 2. Create Catalogi API service
+    def test_configuration(self):
+        """
+        actual testing is done in final step
+        """
+
+
+class CatalogiAPIConfigurationStep(BaseConfigurationStep):
+    """
+    Configure the required Service to establish a connection with the Catalogi API
+    """
+
+    verbose_name = "Catalogi API configuration"
+    required_settings = [
+        "CATALOGI_API_ROOT",
+        "CATALOGI_API_CLIENT_ID",
+        "CATALOGI_API_SECRET",
+    ]
+    enable_setting = "ZGW_API_CONFIG_ENABLE"
+
+    def is_configured(self) -> bool:
+        return bool(Service.objects.filter(api_root=settings.CATALOGI_API_ROOT))
+
+    def configure(self):
+        organization = settings.OIP_ORGANIZATION or settings.ENVIRONMENT
+        org_label = f"Open Inwoner {organization}".strip()
+
         catalogi_service, created = Service.objects.update_or_create(
             api_root=settings.CATALOGI_API_ROOT,
             defaults={
@@ -98,7 +99,32 @@ class ZGWAPIConfigurationStep(BaseConfigurationStep):
             catalogi_service.user_representation = org_label
             catalogi_service.save()
 
-        # 3. Create Documenten API service
+    def test_configuration(self):
+        """
+        actual testing is done in final step
+        """
+
+
+class DocumentenAPIConfigurationStep(BaseConfigurationStep):
+    """
+    Configure the required Service to establish a connection with the Documenten API
+    """
+
+    verbose_name = "Documenten API configuration"
+    required_settings = [
+        "DOCUMENTEN_API_ROOT",
+        "DOCUMENTEN_API_CLIENT_ID",
+        "DOCUMENTEN_API_SECRET",
+    ]
+    enable_setting = "ZGW_API_CONFIG_ENABLE"
+
+    def is_configured(self) -> bool:
+        return bool(Service.objects.filter(api_root=settings.DOCUMENTEN_API_ROOT))
+
+    def configure(self):
+        organization = settings.OIP_ORGANIZATION or settings.ENVIRONMENT
+        org_label = f"Open Inwoner {organization}".strip()
+
         document_service, created = Service.objects.update_or_create(
             api_root=settings.DOCUMENTEN_API_ROOT,
             defaults={
@@ -120,7 +146,32 @@ class ZGWAPIConfigurationStep(BaseConfigurationStep):
             document_service.user_representation = org_label
             document_service.save()
 
-        # 4. Create Formulieren API service
+    def test_configuration(self):
+        """
+        actual testing is done in final step
+        """
+
+
+class FormulierenAPIConfigurationStep(BaseConfigurationStep):
+    """
+    Configure the required Service to establish a connection with the Formulieren API
+    """
+
+    verbose_name = "Formulieren APIs configuration"
+    required_settings = [
+        "FORMULIEREN_API_ROOT",
+        "FORMULIEREN_API_CLIENT_ID",
+        "FORMULIEREN_API_SECRET",
+    ]
+    enable_setting = "ZGW_API_CONFIG_ENABLE"
+
+    def is_configured(self) -> bool:
+        return bool(Service.objects.filter(api_root=settings.FORMULIEREN_API_ROOT))
+
+    def configure(self):
+        organization = settings.OIP_ORGANIZATION or settings.ENVIRONMENT
+        org_label = f"Open Inwoner {organization}".strip()
+
         form_service, created = Service.objects.update_or_create(
             api_root=settings.FORMULIEREN_API_ROOT,
             defaults={
@@ -142,12 +193,41 @@ class ZGWAPIConfigurationStep(BaseConfigurationStep):
             form_service.user_representation = org_label
             form_service.save()
 
-        # 5. Set up configuration
+    def test_configuration(self):
+        """
+        actual testing is done in final step
+        """
+
+
+class ZGWAPIsConfigurationStep(BaseConfigurationStep):
+    """
+    Configure the ZGW settings and set any feature flags or other options if specified
+    """
+
+    verbose_name = "ZGW APIs configuration"
+    enable_setting = "ZGW_API_CONFIG_ENABLE"
+
+    def is_configured(self) -> bool:
+        zgw_config = OpenZaakConfig.get_solo()
+        return (
+            bool(zgw_config.zaak_service)
+            and bool(zgw_config.catalogi_service)
+            and bool(zgw_config.document_service)
+            and bool(zgw_config.form_service)
+        )
+
+    def configure(self):
         config = OpenZaakConfig.get_solo()
-        config.zaak_service = zaak_service
-        config.catalogi_service = catalogi_service
-        config.document_service = document_service
-        config.form_service = form_service
+        config.zaak_service = Service.objects.get(api_root=settings.ZAKEN_API_ROOT)
+        config.catalogi_service = Service.objects.get(
+            api_root=settings.CATALOGI_API_ROOT
+        )
+        config.document_service = Service.objects.get(
+            api_root=settings.DOCUMENTEN_API_ROOT
+        )
+        config.form_service = Service.objects.get(
+            api_root=settings.FORMULIEREN_API_ROOT
+        )
 
         # General config options
         if settings.ZAAK_MAX_CONFIDENTIALITY:

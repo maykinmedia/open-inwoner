@@ -11,33 +11,21 @@ from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.utils.api import ClientError
 
 
-# TODO split into two steps? or split per service?
-class KICAPIConfigurationStep(BaseConfigurationStep):
+class KlantenAPIConfigurationStep(BaseConfigurationStep):
     """
-    Configure the required services to establish a connection with KIC APIs and set
-    any feature flags or other options if specified
-
-    1. Create service for Klanten API
-    2. Create service for Contactmomenten API
-    3. Set up configuration for KIC APIs
+    Configure the required Service to establish a connection with the Klanten API
     """
 
-    verbose_name = "Klantinteractie APIs configuration"
+    verbose_name = "Klanten API configuration"
     required_settings = [
         "KLANTEN_API_ROOT",
         "KLANTEN_API_CLIENT_ID",
         "KLANTEN_API_SECRET",
-        "CONTACTMOMENTEN_API_ROOT",
-        "CONTACTMOMENTEN_API_CLIENT_ID",
-        "CONTACTMOMENTEN_API_SECRET",
     ]
     enable_setting = "KIC_API_CONFIG_ENABLE"
 
     def is_configured(self) -> bool:
-        kic_config = OpenKlantConfig.get_solo()
-        return bool(kic_config.klanten_service) and bool(
-            kic_config.contactmomenten_service
-        )
+        return bool(Service.objects.filter(api_root=settings.KLANTEN_API_ROOT))
 
     def configure(self):
         organization = settings.OIP_ORGANIZATION or settings.ENVIRONMENT
@@ -65,7 +53,32 @@ class KICAPIConfigurationStep(BaseConfigurationStep):
             klanten_service.user_representation = org_label
             klanten_service.save()
 
-        # 2. Create Contactmomenten API service
+    def test_configuration(self):
+        """
+        actual testing is done in final step
+        """
+
+
+class ContactmomentenAPIConfigurationStep(BaseConfigurationStep):
+    """
+    Configure the required Service to establish a connection with the Contactmomenten API
+    """
+
+    verbose_name = "Contactmomenten API configuration"
+    required_settings = [
+        "CONTACTMOMENTEN_API_ROOT",
+        "CONTACTMOMENTEN_API_CLIENT_ID",
+        "CONTACTMOMENTEN_API_SECRET",
+    ]
+    enable_setting = "KIC_API_CONFIG_ENABLE"
+
+    def is_configured(self) -> bool:
+        return bool(Service.objects.filter(api_root=settings.CONTACTMOMENTEN_API_ROOT))
+
+    def configure(self):
+        organization = settings.OIP_ORGANIZATION or settings.ENVIRONMENT
+        org_label = f"Open Inwoner {organization}".strip()
+
         contactmomenten_service, created = Service.objects.update_or_create(
             api_root=settings.CONTACTMOMENTEN_API_ROOT,
             defaults={
@@ -87,10 +100,32 @@ class KICAPIConfigurationStep(BaseConfigurationStep):
             contactmomenten_service.user_representation = org_label
             contactmomenten_service.save()
 
-        # 3. Set up configuration
+    def test_configuration(self):
+        """
+        actual testing is done in final step
+        """
+
+
+class KICAPIsConfigurationStep(BaseConfigurationStep):
+    """
+    Configure the KIC settings and set any feature flags or other options if specified
+    """
+
+    verbose_name = "Klantinteractie APIs configuration"
+    enable_setting = "KIC_API_CONFIG_ENABLE"
+
+    def is_configured(self) -> bool:
+        kic_config = OpenKlantConfig.get_solo()
+        return bool(kic_config.klanten_service) and bool(
+            kic_config.contactmomenten_service
+        )
+
+    def configure(self):
         config = OpenKlantConfig.get_solo()
-        config.klanten_service = klanten_service
-        config.contactmomenten_service = contactmomenten_service
+        config.klanten_service = Service.objects.get(api_root=settings.KLANTEN_API_ROOT)
+        config.contactmomenten_service = Service.objects.get(
+            api_root=settings.CONTACTMOMENTEN_API_ROOT
+        )
 
         if settings.KIC_REGISTER_EMAIL:
             config.register_email = settings.KIC_REGISTER_EMAIL
@@ -115,7 +150,7 @@ class KICAPIConfigurationStep(BaseConfigurationStep):
 
     def test_configuration(self):
         """
-        make requests to each API and verify that a connection can be made
+        make requests to the APIs and verify that a connection can be made
         """
         klanten_client = build_client("klanten")
         contactmomenten_client = build_client("contactmomenten")
