@@ -301,7 +301,7 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
 
         zaak_link = response.pyquery("#origin_link")
 
-        self.assertIn(_("Terug naar aanvrag"), zaak_link.text())
+        self.assertIn(_("Terug naar aanvraag"), zaak_link.text())
         self.assertEqual(
             zaak_link.attr("href"),
             reverse(
@@ -361,8 +361,7 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
         )
 
         zaak_link = response.pyquery("#origin_link")
-
-        self.assertIn(_("Terug naar aanvrag"), zaak_link.text())
+        self.assertIn(_("Terug naar aanvraag"), zaak_link.text())
         self.assertEqual(
             zaak_link.attr("href"),
             reverse(
@@ -371,7 +370,7 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
             ),
         )
 
-	contactmoment_link = response.pyquery("#destination_link")
+        contactmoment_link = response.pyquery("#destination_link")
         self.assertIn(_("Bekijk alle vragen"), contactmoment_link.text())
         self.assertEqual(
             contactmoment_link.attr("href"),

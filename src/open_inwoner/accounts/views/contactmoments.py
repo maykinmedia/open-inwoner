@@ -253,19 +253,19 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
             },
         ]
         origin = self.request.headers.get("Referer")
-        if origin == reverse("cases:contactmoment_list"):
+        if origin and reverse("cases:contactmoment_list") in origin:
             ctx["origin"] = {
                 "label": _("Terug naar overzicht"),
                 "url": origin,
             }
             if zaak:
                 ctx["destination"] = {
-                    "label": _("Naar aanvrag"),
+                    "label": _("Naar aanvraag"),
                     "url": zaak_url,
                 }
         else:
             ctx["origin"] = {
-                "label": _("Terug naar aanvrag"),
+                "label": _("Terug naar aanvraag"),
                 "url": zaak_url,
             }
             ctx["destination"] = {
