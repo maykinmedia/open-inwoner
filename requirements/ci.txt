@@ -192,6 +192,7 @@ django==4.2.10
     #   django-relativedelta
     #   django-sekizai
     #   django-sendfile2
+    #   django-setup-configuration
     #   django-simple-certmanager
     #   django-sniplates
     #   django-solo
@@ -399,6 +400,10 @@ django-sessionprofile==1.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-digid-eherkenning
+django-setup-configuration==0.1.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
 django-simple-certmanager==1.4.1
     # via
     #   -c requirements/base.txt
