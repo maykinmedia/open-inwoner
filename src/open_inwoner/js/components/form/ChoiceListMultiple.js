@@ -9,11 +9,11 @@ export class ChoiceListMultiple {
     this.label = listitem.querySelector(
       '.choice-list-multiple .choice-list-multiple__item .checkbox__label'
     )
-    // Add 'selected' parentclass if checkbox is already checked onLoad
+
     if (this.checkbox.checked) {
       this.listitem.classList.add('selected')
     }
-    // If selector exists
+
     this.listitem.addEventListener(
       'click',
       this.toggleChoiceItemBorder.bind(this)
@@ -29,7 +29,6 @@ export class ChoiceListMultiple {
   }
 }
 
-// Apply toggleChoiceItemBorder to each element matching the selector
 document
   .querySelectorAll(ChoiceListMultiple.selector)
   .forEach((listitem) => new ChoiceListMultiple(listitem))

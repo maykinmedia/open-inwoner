@@ -26,7 +26,7 @@
     margin: 0;
     padding: 0;
     background-color: var(--card-color-background);
-    border: var(--border-width) solid var(--color-gray);
+    border: var(--border-width-thin) solid var(--color-gray);
     border-radius: var(--border-radius);
     box-sizing: border-box;
     display: flex;
@@ -38,7 +38,7 @@
   }
 
   &__content {
-    max-width: 95%;
+    max-width: calc(100% - var(--spacing-giant));
   }
 
   &__label {
@@ -116,14 +116,11 @@
         vertical-align: text-top;
       }
     }
-
-    .form__control {
-      width: 100%;
-    }
   }
 
   &-multiple__item {
     border: var(--border-width-thin) solid var(--color-white);
+    max-width: var(--form-width);
   }
 
   &-multiple__item label {
@@ -135,7 +132,10 @@
     display: flex;
     padding: 0;
     width: 100%;
-    max-width: var(--form-width);
+
+    .form__control {
+      width: 100%;
+    }
 
     & .checkbox {
       // reversing the order
