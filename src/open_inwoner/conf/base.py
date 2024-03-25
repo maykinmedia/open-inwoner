@@ -201,6 +201,7 @@ INSTALLED_APPS = [
     "mailer",
     "log_outgoing_requests",
     "formtools",
+    "django_setup_configuration",
     # Project applications.
     "open_inwoner.components",
     "open_inwoner.kvk",
@@ -929,6 +930,61 @@ CKEDITOR_CONFIGS = {
     }
 }
 
+#
+# django-setup-configuration
+#
+SETUP_CONFIGURATION_STEPS = [
+    "open_inwoner.configurations.bootstrap.zgw.ZGWAPIConfigurationStep"
+]
+
+ZGW_API_CONFIG_ENABLE = config("ZGW_API_CONFIG_ENABLE", default=True)
+OIP_ORGANIZATION = config("OIP_ORGANIZATION", "")
+ZAKEN_API_ROOT = config("ZAKEN_API_ROOT", "")
+if ZAKEN_API_ROOT and not ZAKEN_API_ROOT.endswith("/"):
+    ZAKEN_API_ROOT = f"{ZAKEN_API_ROOT.strip()}/"
+ZAKEN_OAS_URL = (
+    ZAKEN_API_ROOT  # this is still required by the form, but not actually used
+)
+ZAKEN_API_CLIENT_ID = config("ZAKEN_API_CLIENT_ID", "")
+ZAKEN_API_SECRET = config("ZAKEN_API_SECRET", "")
+CATALOGI_API_ROOT = config("CATALOGI_API_ROOT", "")
+if CATALOGI_API_ROOT and not CATALOGI_API_ROOT.endswith("/"):
+    CATALOGI_API_ROOT = f"{CATALOGI_API_ROOT.strip()}/"
+CATALOGI_OAS_URL = (
+    CATALOGI_API_ROOT  # this is still required by the form, but not actually used
+)
+CATALOGI_API_CLIENT_ID = config("CATALOGI_API_CLIENT_ID", "")
+CATALOGI_API_SECRET = config("CATALOGI_API_SECRET", "")
+DOCUMENTEN_API_ROOT = config("DOCUMENTEN_API_ROOT", "")
+if DOCUMENTEN_API_ROOT and not DOCUMENTEN_API_ROOT.endswith("/"):
+    DOCUMENTEN_API_ROOT = f"{DOCUMENTEN_API_ROOT.strip()}/"
+DOCUMENTEN_OAS_URL = (
+    DOCUMENTEN_API_ROOT  # this is still required by the form, but not actually used
+)
+DOCUMENTEN_API_CLIENT_ID = config("DOCUMENTEN_API_CLIENT_ID", "")
+DOCUMENTEN_API_SECRET = config("DOCUMENTEN_API_SECRET", "")
+FORMULIEREN_API_ROOT = config("FORMULIEREN_API_ROOT", "")
+if FORMULIEREN_API_ROOT and not FORMULIEREN_API_ROOT.endswith("/"):
+    FORMULIEREN_API_ROOT = f"{FORMULIEREN_API_ROOT.strip()}/"
+FORMULIEREN_OAS_URL = (
+    FORMULIEREN_API_ROOT  # this is still required by the form, but not actually used
+)
+FORMULIEREN_API_CLIENT_ID = config("FORMULIEREN_API_CLIENT_ID", "")
+FORMULIEREN_API_SECRET = config("FORMULIEREN_API_SECRET", "")
+# ZGW config options
+ZAAK_MAX_CONFIDENTIALITY = config("ZAAK_MAX_CONFIDENTIALITY", None)
+DOCUMENT_MAX_CONFIDENTIALITY = config("DOCUMENT_MAX_CONFIDENTIALITY", None)
+ACTION_REQUIRED_DEADLINE_DAYS = config("ACTION_REQUIRED_DEADLINE_DAYS", None)
+ALLOWED_FILE_EXTENSIONS = config("ALLOWED_FILE_EXTENSIONS", None)
+MIJN_AANVRAGEN_TITLE_TEXT = config("MIJN_AANVRAGEN_TITLE_TEXT", None)
+ENABLE_CATEGORIES_FILTERING_WITH_ZAKEN = config(
+    "ENABLE_CATEGORIES_FILTERING_WITH_ZAKEN", None
+)
+SKIP_NOTIFICATION_STATUSTYPE_INFORMEREN = config(
+    "SKIP_NOTIFICATION_STATUSTYPE_INFORMEREN", None
+)
+REFORMAT_ESUITE_ZAAK_IDENTIFICATIE = config("REFORMAT_ESUITE_ZAAK_IDENTIFICATIE", None)
+FETCH_EHERKENNING_ZAKEN_WITH_RSIN = config("FETCH_EHERKENNING_ZAKEN_WITH_RSIN", None)
 
 #
 # Project specific settings
