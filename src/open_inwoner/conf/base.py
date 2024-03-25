@@ -934,11 +934,13 @@ CKEDITOR_CONFIGS = {
 # django-setup-configuration
 #
 SETUP_CONFIGURATION_STEPS = [
-    "open_inwoner.configurations.bootstrap.zgw.ZGWAPIConfigurationStep"
+    "open_inwoner.configurations.bootstrap.zgw.ZGWAPIConfigurationStep",
+    "open_inwoner.configurations.bootstrap.kic.KICAPIConfigurationStep",
 ]
-
-ZGW_API_CONFIG_ENABLE = config("ZGW_API_CONFIG_ENABLE", default=True)
 OIP_ORGANIZATION = config("OIP_ORGANIZATION", "")
+
+# ZGW configuration variables
+ZGW_API_CONFIG_ENABLE = config("ZGW_API_CONFIG_ENABLE", default=True)
 ZAKEN_API_ROOT = config("ZAKEN_API_ROOT", "")
 if ZAKEN_API_ROOT and not ZAKEN_API_ROOT.endswith("/"):
     ZAKEN_API_ROOT = f"{ZAKEN_API_ROOT.strip()}/"
@@ -985,6 +987,32 @@ SKIP_NOTIFICATION_STATUSTYPE_INFORMEREN = config(
 )
 REFORMAT_ESUITE_ZAAK_IDENTIFICATIE = config("REFORMAT_ESUITE_ZAAK_IDENTIFICATIE", None)
 FETCH_EHERKENNING_ZAKEN_WITH_RSIN = config("FETCH_EHERKENNING_ZAKEN_WITH_RSIN", None)
+
+# KIC configuration variables
+KIC_API_CONFIG_ENABLE = config("KIC_API_CONFIG_ENABLE", default=True)
+KLANTEN_API_ROOT = config("KLANTEN_API_ROOT", "")
+if KLANTEN_API_ROOT and not KLANTEN_API_ROOT.endswith("/"):
+    KLANTEN_API_ROOT = f"{KLANTEN_API_ROOT.strip()}/"
+KLANTEN_OAS_URL = (
+    KLANTEN_API_ROOT  # this is still required by the form, but not actually used
+)
+KLANTEN_API_CLIENT_ID = config("KLANTEN_API_CLIENT_ID", "")
+KLANTEN_API_SECRET = config("KLANTEN_API_SECRET", "")
+CONTACTMOMENTEN_API_ROOT = config("CONTACTMOMENTEN_API_ROOT", "")
+if CONTACTMOMENTEN_API_ROOT and not CONTACTMOMENTEN_API_ROOT.endswith("/"):
+    CONTACTMOMENTEN_API_ROOT = f"{CONTACTMOMENTEN_API_ROOT.strip()}/"
+CONTACTMOMENTEN_OAS_URL = CONTACTMOMENTEN_API_ROOT  # this is still required by the form, but not actually used
+CONTACTMOMENTEN_API_CLIENT_ID = config("CONTACTMOMENTEN_API_CLIENT_ID", "")
+CONTACTMOMENTEN_API_SECRET = config("CONTACTMOMENTEN_API_SECRET", "")
+KIC_REGISTER_EMAIL = config("KIC_REGISTER_EMAIL", None)
+KIC_REGISTER_CONTACT_MOMENT = config("KIC_REGISTER_CONTACT_MOMENT", None)
+KIC_REGISTER_BRONORGANISATIE_RSIN = config("KIC_REGISTER_BRONORGANISATIE_RSIN", None)
+KIC_REGISTER_CHANNEL = config("KIC_REGISTER_CHANNEL", None)
+KIC_REGISTER_TYPE = config("KIC_REGISTER_TYPE", None)
+KIC_REGISTER_EMPLOYEE_ID = config("KIC_REGISTER_EMPLOYEE_ID", None)
+KIC_USE_RSIN_FOR_INNNNPID_QUERY_PARAMETER = config(
+    "KIC_USE_RSIN_FOR_INNNNPID_QUERY_PARAMETER", None
+)
 
 #
 # Project specific settings
