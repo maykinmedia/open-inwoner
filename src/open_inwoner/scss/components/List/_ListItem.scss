@@ -16,6 +16,12 @@
     padding: 0.5em 0;
   }
 
+  &--extra-compact {
+    border-top: none;
+    border-bottom: none;
+    padding: 0;
+  }
+
   &--compact:first-child {
     padding-top: 0;
   }

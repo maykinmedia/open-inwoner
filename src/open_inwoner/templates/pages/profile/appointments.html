@@ -1,9 +1,9 @@
 {% extends 'master.html' %}
-{% load i18n tz form_tags anchor_menu_tags list_tags icon_tags grid_tags utils %}
+{% load i18n tz list_tags icon_tags grid_tags utils %}
 
 {% block content %}
 
-<h1 class="utrecht-heading-1" id="title">{% trans "Mijn afspraken" %}</h2>
+<h1 class="utrecht-heading-1" id="title">{% trans "Mijn balie-afspraken" %}</h1>
 
 {% if appointments %}
     <p class="tabled__key">{% trans "Een overzicht van uw afspraken" %}</p>
@@ -14,14 +14,16 @@
                 <div class="card card--compact card--stretch appointment-info">
                     <div class="card__body">
                         {% render_list %}
+                            {% with branch=appointment.branch %}
                             <h2 class="card__heading-2">{{ appointment.title }}</h2>
-                            {% timezone appointment.branch.timeZone %}
-                                {% list_item text=appointment.start|date:"l j F Y H:i" compact=True strong=False %}
+                            {% timezone branch.timeZone %}
+                                {% list_item text=appointment.start|date:"j F Y" caption=_("Datum") compact=True strong=False %}
+                                {% list_item text=appointment.start|date:"H:i"|add:" "|add:_("uur") caption=_("Tijd") compact=True strong=False %}
                             {% endtimezone %}
-                            {% list_item text=appointment.notes compact=True strong=False %}
-                            {% list_item text=appointment.branch.name caption=_("Locatie") compact=True strong=False %}
-                            {% list_item text=appointment.branch.addressCity compact=True strong=False %}
-                            {% list_item text=appointment.branch.addressLine2 compact=True strong=False %}
+                            {% list_item text=branch.addressLine1 caption=_("Locatie") extra_compact=True strong=False %}
+                            {% list_item text=branch.addressLine2 extra_compact=True strong=False %}
+                            {% list_item text=branch.addressZip|add:" "|add:branch.addressCity extra_compact=True strong=False %}
+                            {% endwith %}
                         {% endrender_list %}
 
                         <a href="{{ appointment.url }}" class="link link--icon link--secondary"
@@ -34,7 +36,6 @@
             {% endrender_column %}
         {% endfor %}
     {% endrender_grid %}
-    </section>
 {% else %}
     <p class="tabled__key">{% trans "Geen afspraken beschikbaar" %}</p>
 {% endif %}
