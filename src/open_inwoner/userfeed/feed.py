@@ -1,9 +1,7 @@
 import dataclasses
 from collections.abc import Iterable
-from datetime import timedelta
 
 from django.db.models import Q
-from django.utils import timezone
 from django.utils.html import escape, format_html
 
 from open_inwoner.accounts.models import User
@@ -16,8 +14,6 @@ from open_inwoner.userfeed.adapters import (
 from open_inwoner.userfeed.hooks.external_task import update_user_tasks
 from open_inwoner.userfeed.models import FeedItemData
 from open_inwoner.userfeed.summarize import SUMMARIES
-
-ACTION_COMPLETED_HISTORY_RANGE = timedelta(minutes=10)
 
 
 @dataclasses.dataclass()
@@ -44,7 +40,7 @@ def wrap_items(items: Iterable[FeedItemData]) -> Iterable[FeedItem]:
         yield get_item_adapter_class(item.type)(item)
 
 
-def get_feed(user: User, with_history: bool = False) -> Feed:
+def get_feed(user: User) -> Feed:
     if not user or user.is_anonymous:
         # empty feed
         return Feed()
@@ -53,10 +49,6 @@ def get_feed(user: User, with_history: bool = False) -> Feed:
 
     # core filters
     display_filter = Q(completed_at__isnull=True)
-    if with_history:
-        display_filter |= Q(
-            completed_at__gt=timezone.now() - ACTION_COMPLETED_HISTORY_RANGE
-        )
 
     data_items = FeedItemData.objects.filter(
         display_filter,

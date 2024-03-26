@@ -1,4 +1,8 @@
+import logging
+
 from django.utils.translation import gettext_lazy as _
+
+from requests import RequestException
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.models import User
@@ -7,8 +11,11 @@ from open_inwoner.openzaak.clients import build_client
 from open_inwoner.userfeed.adapter import FeedItem
 from open_inwoner.userfeed.choices import FeedItemType
 from open_inwoner.userfeed.models import FeedItemData
+from open_inwoner.utils.api import ClientError
 
 from ..adapters import register_item_adapter
+
+logger = logging.getLogger(__name__)
 
 
 class OpenTaskFeedItem(FeedItem):
@@ -77,8 +84,12 @@ def update_external_task_items(user: User, openstaande_taken: list[OpenTask]):
 def update_user_tasks(user: User):
     if user.login_type == LoginTypeChoices.digid:
         if client := build_client("form"):
-            tasks = client.fetch_open_tasks(user.bsn)
-            update_external_task_items(user, tasks)
+            try:
+                tasks = client.fetch_open_tasks(user.bsn)
+            except (RequestException, ClientError):
+                logger.exception("Something went wrong while fetching open tasks")
+            else:
+                update_external_task_items(user, tasks)
 
 
 register_item_adapter(OpenTaskFeedItem, FeedItemType.external_task)
