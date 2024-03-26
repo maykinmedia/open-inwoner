@@ -411,8 +411,7 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
         """
         data = MockAPIReadData().install_mocks(m)
 
-        self.contactformsubject.subject = ""
-        self.contactformsubject.save()
+        self.contactformsubject.delete()
 
         detail_url = reverse(
             "cases:contactmoment_detail",
