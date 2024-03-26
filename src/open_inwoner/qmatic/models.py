@@ -27,6 +27,14 @@ class QmaticConfig(SingletonModel):
             "Example: https://example.com:8443/calendar-backend/public/api/v1/"
         ),
     )
+    booking_base_url = models.URLField(
+        verbose_name=_("Booking base URL"),
+        max_length=1000,
+        help_text=_(
+            "The base URL where the user can reschedule or delete their appointment"
+        ),
+        blank=True,
+    )
 
     objects = QmaticConfigManager()
 

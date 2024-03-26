@@ -1157,6 +1157,7 @@ class MyAppointmentsTests(ClearCachesMixin, WebTest):
         self.user = DigidUserFactory()
 
         self.config = QmaticConfig.get_solo()
+        self.config.booking_base_url = "https://qmatic.local/"
         self.api_root = "https://qmatic.local/api/"
         self.service = ServiceFactory.create(
             api_root=self.api_root, api_type=APITypes.orc
@@ -1258,6 +1259,10 @@ class MyAppointmentsTests(ClearCachesMixin, WebTest):
         self.assertEqual(PQ(passport_appointment[3]).text(), "Locatie\nHoofdkantoor")
         self.assertEqual(PQ(passport_appointment[4]).text(), "Amsterdam")
         self.assertEqual(PQ(passport_appointment[5]).text(), "Dam 1")
+        self.assertEqual(
+            PQ(cards[0]).find("a").attr("href"),
+            f"{self.config.booking_base_url}{self.appointment_passport.publicId}",
+        )
 
         id_card_appointment = PQ(cards[1]).find("ul").children()
 
@@ -1269,3 +1274,7 @@ class MyAppointmentsTests(ClearCachesMixin, WebTest):
         self.assertEqual(PQ(id_card_appointment[3]).text(), "Locatie\nHoofdkantoor")
         self.assertEqual(PQ(id_card_appointment[4]).text(), "New York")
         self.assertEqual(PQ(id_card_appointment[5]).text(), "Wall Street 1")
+        self.assertEqual(
+            PQ(cards[1]).find("a").attr("href"),
+            f"{self.config.booking_base_url}{self.appointment_idcard.publicId}",
+        )

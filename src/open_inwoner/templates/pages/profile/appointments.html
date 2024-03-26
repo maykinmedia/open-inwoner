@@ -24,18 +24,11 @@
                             {% list_item text=appointment.branch.addressLine2 compact=True strong=False %}
                         {% endrender_list %}
 
-                        <span class="link link--icon link--secondary"
-                            aria-label="{% trans "Wijzig afspraak" %}"
-                            title="{% trans "Wijzig afspraak" %}">
-                            <span class="link__text">{% trans "Wijzig afspraak" %}</span>
+                        <a href="{{ appointment.url }}" class="link link--icon link--secondary"
+                            title="{% trans "Wijzig of annuleer afspraak" %}">
+                            <span class="link__text">{% trans "Wijzig of annuleer afspraak" %}</span>
                             {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
-                        </span>
-                        <span class="link link--icon link--secondary"
-                            aria-label="{% trans "Annuleer afspraak" %}"
-                            title="{% trans "Annuleer afspraak" %}">
-                            <span class="link__text">{% trans "Annuleer afspraak" %}</span>
-                            {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
-                        </span>
+                        </a>
                     </div>
                 </div>
             {% endrender_column %}
