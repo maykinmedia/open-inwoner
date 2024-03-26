@@ -658,16 +658,12 @@ class FormClient(APIClient):
         if not bsn:
             return []
 
-        try:
-            response = self.get(
-                "openstaande-taken",
-                params={"bsn": bsn},
-            )
-            data = get_json_response(response)
-            all_data = list(pagination_helper(self, data))
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
-            return []
+        response = self.get(
+            "openstaande-taken",
+            params={"bsn": bsn},
+        )
+        data = get_json_response(response)
+        all_data = list(pagination_helper(self, data))
 
         results = factory(OpenTask, all_data)
 
