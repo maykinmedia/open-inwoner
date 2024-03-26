@@ -1,3 +1,4 @@
+import logging
 from collections.abc import Generator
 from datetime import date
 from typing import Any
@@ -29,11 +30,14 @@ from open_inwoner.laposta.forms import NewsletterSubscriptionForm
 from open_inwoner.openklant.clients import build_client
 from open_inwoner.openklant.wrap import get_fetch_parameters
 from open_inwoner.plans.models import Plan
+from open_inwoner.qmatic.client import NoServiceConfigured, QmaticClient
 from open_inwoner.questionnaire.models import QuestionnaireStep
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from ..forms import BrpUserForm, CategoriesForm, UserForm, UserNotificationsForm
 from ..models import Action, User
+
+logger = logging.getLogger(__name__)
 
 
 class MyProfileView(
@@ -343,3 +347,30 @@ class NewsletterSubscribeView(
             self.request.user, _("users newsletter subscriptions were modified")
         )
         return HttpResponseRedirect(self.get_success_url())
+
+
+class MyAppointmentsView(
+    LogMixin, LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, TemplateView
+):
+    template_name = "pages/profile/appointments.html"
+
+    def get_context_data(self, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        # TODO email should be verified
+        try:
+            client = QmaticClient()
+        except NoServiceConfigured:
+            logger.exception("Error occurred while creating Qmatic client")
+            context["appointments"] = []
+        else:
+            context["appointments"] = client.list_appointments_for_customer(
+                self.request.user.email
+            )
+        return context
+
+    @cached_property
+    def crumbs(self):
+        return [
+            (_("Mijn profiel"), reverse("profile:detail")),
+            (_("Mijn afspraken"), reverse("profile:appointments")),
+        ]

@@ -37,6 +37,7 @@ from .login import (
 from .password_reset import PasswordResetView
 from .profile import (
     EditProfileView,
+    MyAppointmentsView,
     MyCategoriesView,
     MyDataView,
     MyNotificationsView,
@@ -80,6 +81,7 @@ __all__ = [
     "MyNotificationsView",
     "MyProfileView",
     "NewsletterSubscribeView",
+    "MyAppointmentsView",
     "CustomRegistrationView",
     "NecessaryFieldsUserView",
     "CustomEHerkenningOIDCAuthenticationCallbackView",

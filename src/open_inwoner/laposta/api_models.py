@@ -1,27 +1,9 @@
 from datetime import datetime
-from ipaddress import IPv4Address
 from typing import Any, Literal
 
 from pydantic import BaseModel, EmailStr, HttpUrl, IPvAnyAddress, NonNegativeInt
 
-
-class JSONEncoderMixin:
-    # To make `BaseModel.dict()` produce JSON serialized data, i.e. for usage in tests
-    # in tandem with `requests_mock`, we cast the data using the configured JSON encoders
-    # Source: https://github.com/pydantic/pydantic/issues/1409#issuecomment-1381655025
-    def _iter(self, **kwargs):
-        for key, value in super()._iter(**kwargs):
-            yield key, self.__config__.json_encoders.get(type(value), lambda v: v)(
-                value
-            )
-
-    class Config:
-        json_encoders = {
-            # We need to specify a serializable format for datetimes and IPv4Addresses, otherwise
-            # `BaseModel.dict()` will complain about certain types not being JSON serializable
-            datetime: lambda dt: dt.isoformat(sep=" "),
-            IPv4Address: str,
-        }
+from open_inwoner.utils.api import JSONEncoderMixin
 
 
 class Members(BaseModel):

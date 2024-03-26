@@ -326,6 +326,10 @@
                 "catalogusconfig"
             ],
             [
+                "qmatic",
+                "qmaticconfig"
+            ],
+            [
                 "openzaak",
                 "openzaakconfig"
             ],
