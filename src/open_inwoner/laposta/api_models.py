@@ -25,11 +25,8 @@ class LapostaList(JSONEncoderMixin, BaseModel):
     account_id: str
     members: Members
 
-    class Config(JSONEncoderMixin.Config):
-        pass
 
-
-class UserData(BaseModel):
+class UserData(JSONEncoderMixin, BaseModel):
     ip: IPvAnyAddress
     email: EmailStr
     source_url: HttpUrl | None
@@ -46,6 +43,3 @@ class Member(JSONEncoderMixin, BaseModel):
     ip: IPvAnyAddress
     source_url: HttpUrl | Literal[""] | None = None
     custom_fields: dict | None = None
-
-    class Config(JSONEncoderMixin.Config):
-        pass
