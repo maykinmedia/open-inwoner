@@ -191,7 +191,7 @@ dill==0.3.7
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   pylint
-django==4.2.10
+django==4.2.11
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -648,7 +648,7 @@ geventhttpclient==2.0.11
     # via locust
 gitdb==4.0.9
     # via gitpython
-gitpython==3.1.27
+gitpython==3.1.41
     # via bandit
 glom==20.11.0
     # via
