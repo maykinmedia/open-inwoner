@@ -140,14 +140,6 @@ class KlantContactMomentBaseView(
             )
             return e_suite_subject_code
 
-        if not subject.subject:
-            logger.warning(
-                "Could not determine OIP subject for contactmoment %s; "
-                "falling back on e-suite subject code ('onderwerp')",
-                kcm.contactmoment.url,
-            )
-            return e_suite_subject_code
-
         return subject.subject
 
 
