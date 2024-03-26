@@ -53,7 +53,9 @@ class EventTracker {
   }
 
   extractEventData(target) {
-    if (typeof target === 'undefined') return
+    if (typeof target === 'undefined') {
+      return
+    }
 
     if (typeof target.getAttribute === 'function') {
       return (
@@ -69,20 +71,80 @@ class EventTracker {
 
 // Add new elements for tracking here
 const selectorMap = {
-  'input[type="submit"]': [
+  '.form#profile-edit input[name="display_name"]': [
     'event',
-    'Button Click',
-    'Input Submit Button Click',
-    [],
+    'Contactgegevens',
+    'ACTION',
+    'LABEL',
   ],
-  '.button--primary': ['event', 'Button Click', 'Normal Button Click', []],
-  a: ['event', 'Link Click', 'Anchor Link Click', []],
-  '.dropdown-button': ['event', 'Dropdown Toggle', 'Dropdown Button Click', []],
-  'input[type="text"]': [
+  '.form#profile-edit input[name="email"]': [
     'event',
-    'Text Field Change',
-    'Input Text Field Change',
-    [],
+    'Contactgegevens',
+    'ACTION',
+    'LABEL',
+  ],
+  '.form#profile-edit input[name="phonenumber"]': [
+    'event',
+    'Contactgegevens',
+    'ACTION',
+    'LABEL',
+  ],
+  '.form#profile-edit button[type="submit"]': [
+    'event',
+    'Contactgegevens',
+    'Submit',
+    'Profiel bewerkt',
+  ],
+  '.form#profile-edit a.button--textless': [
+    'event',
+    'Contactgegevens',
+    'Click',
+    'No save',
+  ],
+  '.plugin__categories .card': ['event', 'CATEGORY', 'ACTION', 'LABEL'],
+  'nav.primary-navigation__main .primary-navigation__list-item .link  ': [
+    'event',
+    'Homepage',
+    'ACTION',
+    'Onderwerpen',
+  ],
+  // '.dropdown-nav__toggle .nav__list--open .subpage-list .link': [
+  //   'event',
+  //   'Dropdown navigatie',
+  //   'ACTION',
+  //   'Onderwerpen',
+  // ],
+  'body > header > div > nav.primary-navigation.primary-navigation__main > ul > li > ul > li > a':
+    ['event', 'Dropdown navigatie', 'ACTION', 'Onderwerpen'],
+  '.footer__logo': ['event', 'CATEGORY', 'ACTION', 'LABEL'],
+  '.search-form input[name="query"] ': ['event', 'CATEGORY', 'ACTION', 'LABEL'],
+  '.search-form button[type=submit]': ['event', 'CATEGORY', 'ACTION', 'LABEL'],
+  '.form#change-notifications a.button': [
+    'event',
+    'Communicatievoorkeuren',
+    'ACTION',
+    'LABEL',
+  ],
+  '.form#change-notifications button.button--primary': [
+    'event',
+    'Communicatievoorkeuren',
+    'ACTION',
+    'LABEL',
+  ],
+  '.primary-navigation__authenticated .header__list-item .link': [
+    'event',
+    'CATEGORY',
+    'ACTION',
+    'LABEL',
+  ],
+  // perhaps not needed:
+  'body > header > div > nav.primary-navigation.primary-navigation__authenticated > ul > li > ul > li:nth-child(1) > a':
+    ['event', 'CATEGORY', 'ACTION', 'LABEL'],
+  '.form#change-notifications input[type=checkbox]': [
+    'event',
+    'CATEGORY',
+    'ACTION',
+    'LABEL',
   ],
 }
 
