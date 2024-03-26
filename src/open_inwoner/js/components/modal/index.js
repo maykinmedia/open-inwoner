@@ -67,6 +67,9 @@ export default class Modal {
     // Whether the modal-buttons should have icons or not
     if (modalIcons) {
       this.node.classList.add('show-modal-icons')
+    } else {
+      // Remove lingering elements if user did not close other modals
+      this.node.classList.remove('show-modal-icons')
     }
   }
 
@@ -74,6 +77,9 @@ export default class Modal {
     // Accessibility: whether the modal should have a confirm button or not
     if (confirmVisibility) {
       this.node.classList.add('show-confirm-button')
+    } else {
+      // Remove lingering elements if user did not close other modals
+      this.node.classList.remove('show-confirm-button')
     }
   }
 
@@ -81,6 +87,9 @@ export default class Modal {
     // Accessibility: whether the modal should have a cancel button or not
     if (cancelVisibility) {
       this.node.classList.add('show-cancel-button')
+    } else {
+      // Remove lingering elements if user did not close other modals
+      this.node.classList.remove('show-cancel-button')
     }
   }
 
@@ -88,6 +97,9 @@ export default class Modal {
     // Whether the modal should have a top-right close button or not
     if (buttonIconCloseVisibility) {
       this.node.classList.add('show-button-icon-close')
+    } else {
+      // Remove lingering elements if user did not close other modals
+      this.node.classList.remove('show-button-icon-close')
     }
   }
 

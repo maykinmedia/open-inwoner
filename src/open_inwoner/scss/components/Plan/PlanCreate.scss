@@ -11,8 +11,6 @@
   }
 
   .modal--open {
-    background: rgba(0, 0, 0, 0.25);
-
     .modal__container {
       padding: var(--spacing-giant);
 
@@ -23,6 +21,16 @@
       .button-icon--primary {
         color: var(--color-white);
         font-size: var(--font-size-body);
+        transform: none;
+      }
+
+      .modal__actions {
+        .modal__button {
+          &:focus-visible {
+            box-shadow: none;
+            outline: none;
+          }
+        }
       }
 
       .modal__title .modal__button {
