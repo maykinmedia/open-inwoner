@@ -141,3 +141,59 @@ class UpdateUserFromLoginSignalAPITestCase(
 
         self.assertTimelineLog("retrieved klant for user")
         self.assertTimelineLog("updated user from klant API with fields: phonenumber")
+
+    def test_create_klant_for_digid_user(self, m):
+        digid_klant = {
+            "bronorganisatie": "123456789",
+            "klantnummer": "87654321",
+            "subjectIdentificatie": {
+                "inpBsn": "123456789",
+            },
+            "subjectType": "natuurlijk_persoon",
+            "url": f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+        }
+        m.get(
+            f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn=123456789",
+            json={"count": 0, "results": []},
+        )
+        m.post(f"{KLANTEN_ROOT}klanten", json=digid_klant)
+
+        user = UserFactory(
+            login_type=LoginTypeChoices.digid,
+            bsn="123456789",
+        )
+
+        request = RequestFactory().get("/dummy")
+        request.user = user
+        user_logged_in.send(User, user=user, request=request)
+
+        self.assertTimelineLog(f"created klant ({digid_klant['klantnummer']}) for user")
+
+    def test_create_klant_for_eherkenning_user(self, m):
+        eherkenning_klant = {
+            "bronorganisatie": "123456789",
+            "klantnummer": "87654321",
+            "subjectIdentificatie": {
+                "innNnpId": "87654321",
+            },
+            "subjectType": "natuurlijk_persoon",
+            "url": f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+        }
+        m.get(
+            f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId=87654321",
+            json={"count": 0, "results": []},
+        )
+        m.post(f"{KLANTEN_ROOT}klanten", json=eherkenning_klant)
+
+        user = UserFactory(
+            login_type=LoginTypeChoices.eherkenning,
+            kvk="87654321",
+        )
+
+        request = RequestFactory().get("/dummy")
+        request.user = user
+        user_logged_in.send(User, user=user, request=request)
+
+        self.assertTimelineLog(
+            f"created klant ({eherkenning_klant['klantnummer']}) for user"
+        )
