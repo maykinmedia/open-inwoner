@@ -1,4 +1,4 @@
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 from typing import Any
 
 from glom import glom
@@ -37,3 +37,12 @@ class TranslationLookup:
             ),
             default=default,
         )
+
+    def from_glom_multiple(
+        self, obj: Any, paths: Sequence, *, default: str = ""
+    ) -> str:
+        for p in paths:
+            value = self.from_glom(obj, p, default=None)
+            if value:
+                return self(value)
+        return default

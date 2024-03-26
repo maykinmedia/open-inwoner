@@ -73,6 +73,7 @@ class MockAPIData:
             informeren=True,
             volgnummer=1,
             omschrijving="initial",
+            statustekst="",
             isEindStatus=False,
         )
         self.status_type_final = generate_oas_component_cached(
@@ -83,6 +84,7 @@ class MockAPIData:
             informeren=True,
             volgnummer=2,
             omschrijving="final",
+            statustekst="",
             isEindStatus=True,
         )
         self.zaak = generate_oas_component_cached(
