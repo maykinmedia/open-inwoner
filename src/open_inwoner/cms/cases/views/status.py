@@ -938,10 +938,8 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
         if ztc and ztc.contact_subject_code:
             data["onderwerp"] = ztc.contact_subject_code
 
-        if contactmomenten_client := build_client_openklant("contactmomenten"):
-            contactmoment = contactmomenten_client.create_contactmoment(
-                data, klant=klant
-            )
+        if contactmoment_client := build_client_openklant("contactmomenten"):
+            contactmoment = contactmoment_client.create_contactmoment(data, klant=klant)
             if contactmoment:
                 self.log_system_action(
                     "registered contactmoment by API", user=self.request.user

@@ -208,10 +208,8 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
         }
 
         contactmoment = None
-        if contactmomenten_client := build_client("contactmomenten"):
-            contactmoment = contactmomenten_client.create_contactmoment(
-                data, klant=klant
-            )
+        if contactmoment_client := build_client("contactmomenten"):
+            contactmoment = contactmoment_client.create_contactmoment(data, klant=klant)
 
         if contactmoment:
             self.log_system_action(

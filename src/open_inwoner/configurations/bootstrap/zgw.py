@@ -18,39 +18,34 @@ class ZakenAPIConfigurationStep(BaseConfigurationStep):
 
     verbose_name = "Zaken API configuration"
     required_settings = [
-        "ZAKEN_API_ROOT",
-        "ZAKEN_API_CLIENT_ID",
-        "ZAKEN_API_SECRET",
+        "ZGW_CONFIG_ZAKEN_API_ROOT",
+        "ZGW_CONFIG_ZAKEN_API_CLIENT_ID",
+        "ZGW_CONFIG_ZAKEN_API_SECRET",
     ]
-    enable_setting = "ZGW_API_CONFIG_ENABLE"
+    enable_setting = "ZGW_CONFIG_ENABLE"
 
     def is_configured(self) -> bool:
-        return bool(Service.objects.filter(api_root=settings.ZAKEN_API_ROOT))
+        return Service.objects.filter(
+            api_root=settings.ZGW_CONFIG_ZAKEN_API_ROOT
+        ).exists()
 
     def configure(self):
         organization = settings.OIP_ORGANIZATION or settings.ENVIRONMENT
         org_label = f"Open Inwoner {organization}".strip()
 
-        zaak_service, created = Service.objects.update_or_create(
-            api_root=settings.ZAKEN_API_ROOT,
+        Service.objects.update_or_create(
+            api_root=settings.ZGW_CONFIG_ZAKEN_API_ROOT,
             defaults={
                 "label": "Zaken API",
                 "api_type": APITypes.zrc,
-                "oas": settings.ZAKEN_API_ROOT,
+                "oas": settings.ZGW_CONFIG_ZAKEN_API_ROOT,
                 "auth_type": AuthTypes.zgw,
-                "client_id": settings.ZAKEN_API_CLIENT_ID,
-                "secret": settings.ZAKEN_API_SECRET,
-                "user_id": settings.ZAKEN_API_CLIENT_ID,
+                "client_id": settings.ZGW_CONFIG_ZAKEN_API_CLIENT_ID,
+                "secret": settings.ZGW_CONFIG_ZAKEN_API_SECRET,
+                "user_id": settings.ZGW_CONFIG_ZAKEN_API_CLIENT_ID,
                 "user_representation": org_label,
             },
         )
-        if not created:
-            zaak_service.oas = settings.ZAKEN_API_ROOT
-            zaak_service.client_id = settings.ZAKEN_API_CLIENT_ID
-            zaak_service.secret = settings.ZAKEN_API_SECRET
-            zaak_service.user_id = settings.ZAKEN_API_CLIENT_ID
-            zaak_service.user_representation = org_label
-            zaak_service.save()
 
     def test_configuration(self):
         """
@@ -65,39 +60,34 @@ class CatalogiAPIConfigurationStep(BaseConfigurationStep):
 
     verbose_name = "Catalogi API configuration"
     required_settings = [
-        "CATALOGI_API_ROOT",
-        "CATALOGI_API_CLIENT_ID",
-        "CATALOGI_API_SECRET",
+        "ZGW_CONFIG_CATALOGI_API_ROOT",
+        "ZGW_CONFIG_CATALOGI_API_CLIENT_ID",
+        "ZGW_CONFIG_CATALOGI_API_SECRET",
     ]
-    enable_setting = "ZGW_API_CONFIG_ENABLE"
+    enable_setting = "ZGW_CONFIG_ENABLE"
 
     def is_configured(self) -> bool:
-        return bool(Service.objects.filter(api_root=settings.CATALOGI_API_ROOT))
+        return Service.objects.filter(
+            api_root=settings.ZGW_CONFIG_CATALOGI_API_ROOT
+        ).exists()
 
     def configure(self):
         organization = settings.OIP_ORGANIZATION or settings.ENVIRONMENT
         org_label = f"Open Inwoner {organization}".strip()
 
-        catalogi_service, created = Service.objects.update_or_create(
-            api_root=settings.CATALOGI_API_ROOT,
+        Service.objects.update_or_create(
+            api_root=settings.ZGW_CONFIG_CATALOGI_API_ROOT,
             defaults={
                 "label": "Catalogi API",
                 "api_type": APITypes.ztc,
-                "oas": settings.CATALOGI_API_ROOT,
+                "oas": settings.ZGW_CONFIG_CATALOGI_API_ROOT,
                 "auth_type": AuthTypes.zgw,
-                "client_id": settings.CATALOGI_API_CLIENT_ID,
-                "secret": settings.CATALOGI_API_SECRET,
-                "user_id": settings.CATALOGI_API_CLIENT_ID,
+                "client_id": settings.ZGW_CONFIG_CATALOGI_API_CLIENT_ID,
+                "secret": settings.ZGW_CONFIG_CATALOGI_API_SECRET,
+                "user_id": settings.ZGW_CONFIG_CATALOGI_API_CLIENT_ID,
                 "user_representation": org_label,
             },
         )
-        if not created:
-            catalogi_service.oas = settings.CATALOGI_API_ROOT
-            catalogi_service.client_id = settings.CATALOGI_API_CLIENT_ID
-            catalogi_service.secret = settings.CATALOGI_API_SECRET
-            catalogi_service.user_id = settings.CATALOGI_API_CLIENT_ID
-            catalogi_service.user_representation = org_label
-            catalogi_service.save()
 
     def test_configuration(self):
         """
@@ -112,39 +102,34 @@ class DocumentenAPIConfigurationStep(BaseConfigurationStep):
 
     verbose_name = "Documenten API configuration"
     required_settings = [
-        "DOCUMENTEN_API_ROOT",
-        "DOCUMENTEN_API_CLIENT_ID",
-        "DOCUMENTEN_API_SECRET",
+        "ZGW_CONFIG_DOCUMENTEN_API_ROOT",
+        "ZGW_CONFIG_DOCUMENTEN_API_CLIENT_ID",
+        "ZGW_CONFIG_DOCUMENTEN_API_SECRET",
     ]
-    enable_setting = "ZGW_API_CONFIG_ENABLE"
+    enable_setting = "ZGW_CONFIG_ENABLE"
 
     def is_configured(self) -> bool:
-        return bool(Service.objects.filter(api_root=settings.DOCUMENTEN_API_ROOT))
+        return Service.objects.filter(
+            api_root=settings.ZGW_CONFIG_DOCUMENTEN_API_ROOT
+        ).exists()
 
     def configure(self):
         organization = settings.OIP_ORGANIZATION or settings.ENVIRONMENT
         org_label = f"Open Inwoner {organization}".strip()
 
-        document_service, created = Service.objects.update_or_create(
-            api_root=settings.DOCUMENTEN_API_ROOT,
+        Service.objects.update_or_create(
+            api_root=settings.ZGW_CONFIG_DOCUMENTEN_API_ROOT,
             defaults={
                 "label": "Documenten API",
                 "api_type": APITypes.drc,
-                "oas": settings.DOCUMENTEN_API_ROOT,
+                "oas": settings.ZGW_CONFIG_DOCUMENTEN_API_ROOT,
                 "auth_type": AuthTypes.zgw,
-                "client_id": settings.DOCUMENTEN_API_CLIENT_ID,
-                "secret": settings.DOCUMENTEN_API_SECRET,
-                "user_id": settings.DOCUMENTEN_API_CLIENT_ID,
+                "client_id": settings.ZGW_CONFIG_DOCUMENTEN_API_CLIENT_ID,
+                "secret": settings.ZGW_CONFIG_DOCUMENTEN_API_SECRET,
+                "user_id": settings.ZGW_CONFIG_DOCUMENTEN_API_CLIENT_ID,
                 "user_representation": org_label,
             },
         )
-        if not created:
-            document_service.oas = settings.DOCUMENTEN_API_ROOT
-            document_service.client_id = settings.DOCUMENTEN_API_CLIENT_ID
-            document_service.secret = settings.DOCUMENTEN_API_SECRET
-            document_service.user_id = settings.DOCUMENTEN_API_CLIENT_ID
-            document_service.user_representation = org_label
-            document_service.save()
 
     def test_configuration(self):
         """
@@ -159,39 +144,34 @@ class FormulierenAPIConfigurationStep(BaseConfigurationStep):
 
     verbose_name = "Formulieren APIs configuration"
     required_settings = [
-        "FORMULIEREN_API_ROOT",
-        "FORMULIEREN_API_CLIENT_ID",
-        "FORMULIEREN_API_SECRET",
+        "ZGW_CONFIG_FORMULIEREN_API_ROOT",
+        "ZGW_CONFIG_FORMULIEREN_API_CLIENT_ID",
+        "ZGW_CONFIG_FORMULIEREN_API_SECRET",
     ]
-    enable_setting = "ZGW_API_CONFIG_ENABLE"
+    enable_setting = "ZGW_CONFIG_ENABLE"
 
     def is_configured(self) -> bool:
-        return bool(Service.objects.filter(api_root=settings.FORMULIEREN_API_ROOT))
+        return Service.objects.filter(
+            api_root=settings.ZGW_CONFIG_FORMULIEREN_API_ROOT
+        ).exists()
 
     def configure(self):
         organization = settings.OIP_ORGANIZATION or settings.ENVIRONMENT
         org_label = f"Open Inwoner {organization}".strip()
 
-        form_service, created = Service.objects.update_or_create(
-            api_root=settings.FORMULIEREN_API_ROOT,
+        Service.objects.update_or_create(
+            api_root=settings.ZGW_CONFIG_FORMULIEREN_API_ROOT,
             defaults={
                 "label": "Formulieren API",
                 "api_type": APITypes.orc,
-                "oas": settings.FORMULIEREN_API_ROOT,
+                "oas": settings.ZGW_CONFIG_FORMULIEREN_API_ROOT,
                 "auth_type": AuthTypes.zgw,
-                "client_id": settings.FORMULIEREN_API_CLIENT_ID,
-                "secret": settings.FORMULIEREN_API_SECRET,
-                "user_id": settings.FORMULIEREN_API_CLIENT_ID,
+                "client_id": settings.ZGW_CONFIG_FORMULIEREN_API_CLIENT_ID,
+                "secret": settings.ZGW_CONFIG_FORMULIEREN_API_SECRET,
+                "user_id": settings.ZGW_CONFIG_FORMULIEREN_API_CLIENT_ID,
                 "user_representation": org_label,
             },
         )
-        if not created:
-            form_service.oas = settings.FORMULIEREN_API_ROOT
-            form_service.client_id = settings.FORMULIEREN_API_CLIENT_ID
-            form_service.secret = settings.FORMULIEREN_API_SECRET
-            form_service.user_id = settings.FORMULIEREN_API_CLIENT_ID
-            form_service.user_representation = org_label
-            form_service.save()
 
     def test_configuration(self):
         """
@@ -205,7 +185,7 @@ class ZGWAPIsConfigurationStep(BaseConfigurationStep):
     """
 
     verbose_name = "ZGW APIs configuration"
-    enable_setting = "ZGW_API_CONFIG_ENABLE"
+    enable_setting = "ZGW_CONFIG_ENABLE"
 
     def is_configured(self) -> bool:
         zgw_config = OpenZaakConfig.get_solo()
@@ -218,49 +198,55 @@ class ZGWAPIsConfigurationStep(BaseConfigurationStep):
 
     def configure(self):
         config = OpenZaakConfig.get_solo()
-        config.zaak_service = Service.objects.get(api_root=settings.ZAKEN_API_ROOT)
+        config.zaak_service = Service.objects.get(
+            api_root=settings.ZGW_CONFIG_ZAKEN_API_ROOT
+        )
         config.catalogi_service = Service.objects.get(
-            api_root=settings.CATALOGI_API_ROOT
+            api_root=settings.ZGW_CONFIG_CATALOGI_API_ROOT
         )
         config.document_service = Service.objects.get(
-            api_root=settings.DOCUMENTEN_API_ROOT
+            api_root=settings.ZGW_CONFIG_DOCUMENTEN_API_ROOT
         )
         config.form_service = Service.objects.get(
-            api_root=settings.FORMULIEREN_API_ROOT
+            api_root=settings.ZGW_CONFIG_FORMULIEREN_API_ROOT
         )
 
         # General config options
-        if settings.ZAAK_MAX_CONFIDENTIALITY:
-            config.zaak_max_confidentiality = settings.ZAAK_MAX_CONFIDENTIALITY
-        if settings.DOCUMENT_MAX_CONFIDENTIALITY:
-            config.document_max_confidentiality = settings.DOCUMENT_MAX_CONFIDENTIALITY
-        if settings.ACTION_REQUIRED_DEADLINE_DAYS:
-            config.action_required_deadline_days = (
-                settings.ACTION_REQUIRED_DEADLINE_DAYS
+        if settings.ZGW_CONFIG_ZAAK_MAX_CONFIDENTIALITY:
+            config.zaak_max_confidentiality = (
+                settings.ZGW_CONFIG_ZAAK_MAX_CONFIDENTIALITY
             )
-        if settings.ALLOWED_FILE_EXTENSIONS:
-            config.allowed_file_extensions = settings.ALLOWED_FILE_EXTENSIONS
-        if settings.MIJN_AANVRAGEN_TITLE_TEXT:
-            config.title_text = settings.MIJN_AANVRAGEN_TITLE_TEXT
+        if settings.ZGW_CONFIG_DOCUMENT_MAX_CONFIDENTIALITY:
+            config.document_max_confidentiality = (
+                settings.ZGW_CONFIG_DOCUMENT_MAX_CONFIDENTIALITY
+            )
+        if settings.ZGW_CONFIG_ACTION_REQUIRED_DEADLINE_DAYS:
+            config.action_required_deadline_days = (
+                settings.ZGW_CONFIG_ACTION_REQUIRED_DEADLINE_DAYS
+            )
+        if settings.ZGW_CONFIG_ALLOWED_FILE_EXTENSIONS:
+            config.allowed_file_extensions = settings.ZGW_CONFIG_ALLOWED_FILE_EXTENSIONS
+        if settings.ZGW_CONFIG_MIJN_AANVRAGEN_TITLE_TEXT:
+            config.title_text = settings.ZGW_CONFIG_MIJN_AANVRAGEN_TITLE_TEXT
 
         # Feature flags
-        if settings.ENABLE_CATEGORIES_FILTERING_WITH_ZAKEN is not None:
+        if settings.ZGW_CONFIG_ENABLE_CATEGORIES_FILTERING_WITH_ZAKEN is not None:
             config.enable_categories_filtering_with_zaken = (
-                settings.ENABLE_CATEGORIES_FILTERING_WITH_ZAKEN
+                settings.ZGW_CONFIG_ENABLE_CATEGORIES_FILTERING_WITH_ZAKEN
             )
 
         # eSuite specific options
-        if settings.SKIP_NOTIFICATION_STATUSTYPE_INFORMEREN is not None:
+        if settings.ZGW_CONFIG_SKIP_NOTIFICATION_STATUSTYPE_INFORMEREN is not None:
             config.skip_notification_statustype_informeren = (
-                settings.SKIP_NOTIFICATION_STATUSTYPE_INFORMEREN
+                settings.ZGW_CONFIG_SKIP_NOTIFICATION_STATUSTYPE_INFORMEREN
             )
-        if settings.REFORMAT_ESUITE_ZAAK_IDENTIFICATIE is not None:
+        if settings.ZGW_CONFIG_REFORMAT_ESUITE_ZAAK_IDENTIFICATIE is not None:
             config.reformat_esuite_zaak_identificatie = (
-                settings.REFORMAT_ESUITE_ZAAK_IDENTIFICATIE
+                settings.ZGW_CONFIG_REFORMAT_ESUITE_ZAAK_IDENTIFICATIE
             )
-        if settings.FETCH_EHERKENNING_ZAKEN_WITH_RSIN is not None:
+        if settings.ZGW_CONFIG_FETCH_EHERKENNING_ZAKEN_WITH_RSIN is not None:
             config.fetch_eherkenning_zaken_with_rsin = (
-                settings.FETCH_EHERKENNING_ZAKEN_WITH_RSIN
+                settings.ZGW_CONFIG_FETCH_EHERKENNING_ZAKEN_WITH_RSIN
             )
 
         config.save()
