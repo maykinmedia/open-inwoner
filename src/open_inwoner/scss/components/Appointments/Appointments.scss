@@ -1,0 +1,7 @@
+.appointments {
+  .card__body {
+    span.button:last-child {
+      bottom: var(--spacing-large) !important;
+    }
+  }
+}

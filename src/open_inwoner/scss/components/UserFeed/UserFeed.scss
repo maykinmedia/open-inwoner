@@ -1,6 +1,4 @@
 .userfeed {
-  position: relative;
-
   &__summary {
     background-color: var(--color-white);
     color: var(--color-red-notification);
@@ -51,34 +49,6 @@
       font-size: var(--font-size-body-small);
       margin: 0;
       padding: 0;
-    }
-  }
-
-  &__heading {
-    color: var(--font-color-heading);
-    font-family: var(--font-family-heading);
-    font-size: var(--font-size-body);
-    line-height: var(--font-line-height-body);
-    padding: var(--spacing-large) var(--spacing-giant) 0 0;
-    margin: 0;
-
-    @media (min-width: 768px) {
-      padding: var(--spacing-large) 0 0 0;
-    }
-  }
-
-  .card {
-    justify-content: space-between;
-  }
-
-  .card-container {
-    grid-row-gap: var(--spacing-medium);
-
-    @media (max-width: 380px) {
-      grid-template-columns: repeat(
-        auto-fit,
-        calc(320px - var(--spacing-small))
-      );
     }
   }
 
@@ -146,29 +116,6 @@
         background-color: var(--color-error-lightest);
         color: var(--color-error-darker);
       }
-    }
-  }
-
-  .card__body {
-    background-color: #fff;
-    border-bottom-left-radius: var(--border-radius);
-    border-bottom-right-radius: var(--border-radius);
-    padding: var(--card-spacing) var(--spacing-giant) var(--card-spacing)
-      var(--card-spacing);
-
-    @media (min-width: 768px) {
-      padding: var(--card-spacing);
-    }
-
-    .tabled__value {
-      color: var(--color-gray-dark);
-      font-size: var(--font-size-body-small);
-      margin: 0;
-      padding: 0;
-    }
-
-    span.button:last-child {
-      bottom: var(--spacing-medium);
     }
   }
 }
