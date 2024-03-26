@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.utils.translation import gettext as _
 
 import requests_mock
+from requests import RequestException
 from zgw_consumers.test.factories import ServiceFactory
 
 from open_inwoner.accounts.tests.factories import DigidUserFactory
@@ -125,6 +126,31 @@ class UserFeedExternalTasksTestCase(TestCase):
         old_feed_item.refresh_from_db()
 
         self.assertTrue(old_feed_item.is_completed)
+
+    @requests_mock.Mocker()
+    def test_update_user_tasks_do_not_complete_items_if_error_occurs(self, m):
+        m.get(f"{FORMS_ROOT}openstaande-taken", exc=RequestException)
+
+        old_feed_item = FeedItemDataFactory.create(
+            type=FeedItemType.external_task,
+            user=self.user,
+            ref_uuid="f3100eea-bef4-44bb-b55b-8715d23fa77f",
+            type_data={
+                "task_name": "Aanvullende informatie gewenst",
+                "task_identificatie": "4321-2023",
+                "action_url": "https://maykinmedia.nl",
+            },
+        )
+
+        update_user_tasks(self.user)
+
+        qs_after_first_login = FeedItemData.objects.all()
+
+        self.assertEqual(qs_after_first_login.count(), 1)
+
+        old_feed_item.refresh_from_db()
+
+        self.assertFalse(old_feed_item.is_completed)
 
     @requests_mock.Mocker()
     def test_update_user_tasks_update_type_data(self, m):
