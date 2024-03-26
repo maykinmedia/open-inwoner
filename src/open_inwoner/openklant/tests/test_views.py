@@ -362,10 +362,19 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
             ),
         )
 
-    def test_display_esuite_subject_code(self, m, mock_get_kcm_answer_mapping):
+    def test_display_contactmoment_subject_duplicate_esuite_codes(
+        self, m, mock_get_kcm_answer_mapping
+    ):
+        """
+        Assert that the first OIP subject is used if several are mapped to the same e-suite code
+        """
         data = MockAPIReadData().install_mocks(m)
 
-        ContactFormSubject.objects.first().delete()
+        ContactFormSubject.objects.create(
+            subject="control_subject_for_duplicate_code",
+            subject_code=self.contactformsubject.subject_code,
+            config=OpenKlantConfig.get_solo(),
+        )
 
         detail_url = reverse(
             "cases:contactmoment_detail",
@@ -384,7 +393,44 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
                 "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),
                 "channel": cm_data["kanaal"].title(),
                 "text": cm_data["tekst"],
-                "onderwerp": "e_suite_subject_code",
+                "onderwerp": ContactFormSubject.objects.first().subject,
+                "antwoord": cm_data["antwoord"],
+                "identificatie": cm_data["identificatie"],
+                "type": cm_data["type"],
+                "status": Status.afgehandeld.label,
+                "url": detail_url,
+                "new_answer_available": False,
+            },
+        )
+
+    def test_display_contactmoment_subject_no_mapping_fallback(
+        self, m, mock_get_kcm_answer_mapping
+    ):
+        """
+        Assert that the e-suite subject code is displayed if no mapping is configured in OIP
+        """
+        data = MockAPIReadData().install_mocks(m)
+
+        self.contactformsubject.delete()
+
+        detail_url = reverse(
+            "cases:contactmoment_detail",
+            kwargs={"kcm_uuid": data.klant_contactmoment["uuid"]},
+        )
+        list_url = reverse("cases:contactmoment_list")
+        response = self.app.get(list_url, user=data.user)
+
+        kcms = response.context["contactmomenten"]
+        cm_data = data.contactmoment
+
+        self.assertEqual(len(kcms), 1)
+        self.assertEqual(
+            kcms[0],
+            {
+                "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),
+                "channel": cm_data["kanaal"].title(),
+                "text": cm_data["tekst"],
+                "onderwerp": self.contactformsubject.subject_code,
                 "antwoord": cm_data["antwoord"],
                 "identificatie": cm_data["identificatie"],
                 "type": cm_data["type"],

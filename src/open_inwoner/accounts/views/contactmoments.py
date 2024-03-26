@@ -114,20 +114,27 @@ class KlantContactMomentBaseView(
     ) -> str | None:
         """
         Determine the subject (`onderwerp`) of a `KlantContactMoment.contactmoment`:
-            1. replace e-suite subject code with OIP configured subject or
-            2. return e-suite subject code or
-            3. return an empty string as fallback
+            1. replace e-suite subject code with corresponding OIP configured subject or
+            2. return the first OIP subject if multiple subjects are mapped to the same
+               e-suite code or
+            3. return the the e-suite subject code if no mapping exists
         """
         e_suite_subject_code = getattr(kcm.contactmoment, "onderwerp", "")
 
         try:
             subject = ContactFormSubject.objects.get(subject_code=e_suite_subject_code)
-        except (
-            ContactFormSubject.DoesNotExist,
-            ContactFormSubject.MultipleObjectsReturned,
-        ) as exc:
+        except ContactFormSubject.MultipleObjectsReturned as exc:
             logger.warning(
-                "Could not determine subject ('onderwerp') for contactmoment %s",
+                "Multiple OIP subjects mapped to the same e-suite subject code for ",
+                "contactmoment %s; using the first one",
+                kcm.contactmoment.url,
+                exc_info=exc,
+            )
+            return ContactFormSubject.objects.first().subject
+        except ContactFormSubject.DoesNotExist as exc:
+            logger.warning(
+                "Could not determine OIP subject for contactmoment %s; "
+                "falling back on e-suite subject code ('onderwerp')",
                 kcm.contactmoment.url,
                 exc_info=exc,
             )
