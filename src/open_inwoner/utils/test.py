@@ -84,3 +84,7 @@ class SessionMiddleware(DefaultSessionMiddleWare):
 
     def __init__(self, *args, **kwargs):
         super().__init__(get_response=lambda x: "dummy")
+
+
+def uuid_from_url(url: str) -> str:
+    return url.split("/")[-1]

@@ -33,16 +33,16 @@ class Klant(ZGWModel):
     emailadres: str = ""
 
     # open-klant OAS
-    bedrijfsnaam: str = ""
-    functie: str = ""
-    adres: dict | None = None
-    subject: str = ""
-    subject_type: str = ""
-    subject_identificatie: dict | None = None
+    # bedrijfsnaam: str = ""
+    # functie: str = ""
+    # adres: dict | None = None
+    # subject: str = ""
+    # subject_type: str = ""
+    # subject_identificatie: dict | None = None
 
     # open-klant non-standard *AFWIJKING*
-    aanmaakkanaal: str = ""
-    geverifieerd: bool = False
+    # aanmaakkanaal: str = ""
+    # geverifieerd: bool = False
 
     def get_name_display(self):
         return " ".join(

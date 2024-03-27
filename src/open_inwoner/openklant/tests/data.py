@@ -48,18 +48,26 @@ class MockAPIReadPatchData(MockAPIData):
             rsin="000000000",
         )
 
-        self.klant_old = generate_oas_component_cached(
+        self.klant_bsn_old = generate_oas_component_cached(
             "kc",
             "schemas/Klant",
-            uuid="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            bronorganisatie="123456789",
+            klantnummer="12345678",
+            subjectIdentificatie={
+                "inpBsn": "123456789",
+            },
             url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             emailadres="bad@example.com",
             telefoonnummer="",
         )
-        self.klant_updated = generate_oas_component_cached(
+        self.klant_bsn_updated = generate_oas_component_cached(
             "kc",
             "schemas/Klant",
-            uuid="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            bronorganisatie="123456789",
+            klantnummer="12345678",
+            subjectIdentificatie={
+                "inpBsn": "123456789",
+            },
             url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             emailadres="good@example.com",
             telefoonnummer="0123456789",
@@ -111,18 +119,26 @@ class MockAPIReadData(MockAPIData):
             rsin="000000000",
         )
 
-        self.klant = generate_oas_component_cached(
+        self.klant_bsn = generate_oas_component_cached(
             "kc",
             "schemas/Klant",
-            uuid="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            bronorganisatie="123456789",
+            klantnummer="12345678",
+            subjectIdentificatie={
+                "inpBsn": "123456789",
+            },
             url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             emailadres="foo@example.com",
             telefoonnummer="0612345678",
         )
-        self.klant2 = generate_oas_component_cached(
+        self.klant_kvk = generate_oas_component_cached(
             "kc",
             "schemas/Klant",
-            uuid="aaaaaaaa-aaaa-aaaa-aaaa-ffffffffffff",
+            bronorganisatie="123456789",
+            klantnummer="87654321",
+            subjectIdentificatie={
+                "innNnpId": "87654321",
+            },
             url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-ffffffffffff",
             emailadres="foo@bar.com",
             telefoonnummer="0687654321",
@@ -130,97 +146,104 @@ class MockAPIReadData(MockAPIData):
         self.klant_vestiging = generate_oas_component_cached(
             "kc",
             "schemas/Klant",
-            uuid="bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+            bronorganisatie="123456789",
+            klantnummer="11111111",
+            subjectIdentificatie={
+                "vestigingsNummer": "123456789000",
+            },
             url=f"{KLANTEN_ROOT}klant/bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
             emailadres="foo@bar.com",
             telefoonnummer="0612345678",
         )
         self.contactmoment = generate_oas_component_cached(
             "cmc",
-            "schemas/ContactMoment",
-            uuid="aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+            "schemas/Contactmoment",
             url=f"{CONTACTMOMENTEN_ROOT}contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+            bronorganisatie="123456789",
             identificatie="AB123",
             type="SomeType",
             kanaal="MAIL",
+            registratiedatum="2022-01-01T12:00:00Z",
             status=Status.afgehandeld,
+            tekst="Garage verbouwen?",
             antwoord="foo",
             onderwerp="e_suite_subject_code",
-            registratiedatum="2022-01-01T12:00:00Z",
         )
         self.contactmoment2 = generate_oas_component_cached(
             "cmc",
-            "schemas/ContactMoment",
-            uuid="aaaaaaaa-aaaa-aaaa-aaaa-dddddddddddd",
+            "schemas/Contactmoment",
             url=f"{CONTACTMOMENTEN_ROOT}contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-dddddddddddd",
+            bronorganisatie="123456789",
             identificatie="AB123",
             type="SomeType",
             kanaal="MAIL",
             status=Status.afgehandeld,
-            antwoord="",
+            tekst="Garage verbouwen?",
+            antwoord="bar",
             onderwerp="e_suite_subject_code",
         )
         self.contactmoment_vestiging = generate_oas_component_cached(
             "cmc",
-            "schemas/ContactMoment",
-            uuid="aaaaaaaa-aaaa-aaaa-aaaa-eeeeeeeeeeee",
+            "schemas/Contactmoment",
             url=f"{CONTACTMOMENTEN_ROOT}contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-eeeeeeeeeeee",
+            bronorganisatie="123456789",
             identificatie="AB123",
             type="SomeType",
             kanaal="MAIL",
             status=Status.afgehandeld,
-            antwoord="",
+            tekst="Garage verbouwen?",
+            antwoord="baz",
             onderwerp="e_suite_subject_code",
         )
         self.klant_contactmoment = generate_oas_component_cached(
             "cmc",
-            "schemas/KlantContactMoment",
+            "schemas/Klantcontactmoment",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
             url=f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten/aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
-            klant=self.klant["url"],
+            klant=self.klant_bsn["url"],
             contactmoment=self.contactmoment["url"],
+            rol="gesprekspartner",
         )
         self.klant_contactmoment2 = generate_oas_component_cached(
             "cmc",
-            "schemas/KlantContactMoment",
+            "schemas/Klantcontactmoment",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-eeeeeeeeeeee",
             url=f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten/aaaaaaaa-aaaa-aaaa-aaaa-eeeeeeeeeeee",
-            klant=self.klant2["url"],
+            klant=self.klant_kvk["url"],
             contactmoment=self.contactmoment2["url"],
+            rol="gesprekspartner",
         )
         self.klant_contactmoment3 = generate_oas_component_cached(
             "cmc",
-            "schemas/KlantContactMoment",
-            uuid="aaaaaaaa-aaaa-aaaa-aaaa-dddddddddddd",
+            "schemas/Klantcontactmoment",
             url=f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten/aaaaaaaa-aaaa-aaaa-aaaa-dddddddddddd",
-            klant=self.klant["url"],
+            klant=self.klant_bsn["url"],
             contactmoment=self.contactmoment_vestiging["url"],
+            rol="gesprekspartner",
         )
         self.klant_contactmoment4 = generate_oas_component_cached(
             "cmc",
-            "schemas/KlantContactMoment",
-            uuid="aaaaaaaa-aaaa-aaaa-aaaa-ffffffffffff",
+            "schemas/Klantcontactmoment",
             url=f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten/aaaaaaaa-aaaa-aaaa-aaaa-ffffffffffff",
             klant=self.klant_vestiging["url"],
             contactmoment=self.contactmoment_vestiging["url"],
+            rol="gesprekspartner",
         )
         self.objectcontactmoment_other = generate_oas_component_cached(
             "cmc",
-            "schemas/ObjectContactMoment",
-            uuid="bb51784c-fa2c-4f65-b24e-7179b615efac",
+            "schemas/Objectcontactmoment",
             url=f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten/bb51784c-fa2c-4f65-b24e-7179b615efac",
             object="http://documenten.nl/api/v1/1",
             contactmoment=self.contactmoment["url"],
         )
         # Force objectType other than zaak, to verify that filtering works
-        self.objectcontactmoment_other["object_type"] = "document"
+        self.objectcontactmoment_other["objectType"] = "document"
         self.objectcontactmoment_zaak = generate_oas_component_cached(
             "cmc",
-            "schemas/ObjectContactMoment",
-            uuid="77880671-b88a-44ed-ba24-dc2ae688c2ec",
+            "schemas/Objectcontactmoment",
             url=f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten/77880671-b88a-44ed-ba24-dc2ae688c2ec",
             object=f"{ZAKEN_ROOT}zaken/410bb717-ff3d-4fd8-8357-801e5daf9775",
-            object_type="zaak",
+            objectType="zaak",
             contactmoment=self.contactmoment["url"],
         )
         self.zaak = generate_oas_component_cached(
@@ -233,8 +256,8 @@ class MockAPIReadData(MockAPIData):
 
     def install_mocks(self, m, link_objectcontactmomenten=False) -> "MockAPIReadData":
         for resource_attr in [
-            "klant",
-            "klant2",
+            "klant_bsn",
+            "klant_kvk",
             "klant_vestiging",
             "contactmoment",
             "contactmoment2",
@@ -250,18 +273,18 @@ class MockAPIReadData(MockAPIData):
 
         m.get(
             f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn={self.user.bsn}",
-            json=paginated_response([self.klant]),
+            json=paginated_response([self.klant_bsn]),
         )
 
         # Mock both RSIN and KvK fetch variations, can be toggled with feature flag
         # `use_rsin_for_innNnpId_query_parameter`
         m.get(
             f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId={self.eherkenning_user.kvk}",
-            json=paginated_response([self.klant2]),
+            json=paginated_response([self.klant_kvk]),
         )
         m.get(
             f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId={self.eherkenning_user.rsin}",
-            json=paginated_response([self.klant2]),
+            json=paginated_response([self.klant_kvk]),
         )
         m.get(
             f"{KLANTEN_ROOT}klanten?subjectVestiging__vestigingsNummer=1234",
@@ -269,11 +292,11 @@ class MockAPIReadData(MockAPIData):
         )
 
         m.get(
-            f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten?klant={self.klant['url']}",
+            f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten?klant={self.klant_bsn['url']}",
             json=paginated_response([self.klant_contactmoment]),
         )
         m.get(
-            f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten?klant={self.klant2['url']}",
+            f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten?klant={self.klant_kvk['url']}",
             json=paginated_response([self.klant_contactmoment2]),
         )
         m.get(
@@ -312,23 +335,27 @@ class MockAPICreateData(MockAPIData):
             kvk="12345678",
             rsin="000000000",
         )
-        self.klant = generate_oas_component_cached(
+        self.klant_bsn = generate_oas_component_cached(
             "kc",
             "schemas/Klant",
-            uuid="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
-            url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             bronorganisatie="123456789",
-            voornaam="Foo",
-            achternaam="Bar",
+            klantnummer="12345678",
+            subjectIdentificatie={
+                "inpBsn": "123456789",
+            },
+            url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             emailadres="foo@example.com",
             telefoonnummer="0612345678",
         )
-        self.klant_no_contact_info = generate_oas_component_cached(
+        self.klant_bsn_no_contact_info = generate_oas_component_cached(
             "kc",
             "schemas/Klant",
-            uuid="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
-            url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             bronorganisatie="123456789",
+            klantnummer="12345678",
+            subjectIdentificatie={
+                "inpBsn": "123456789",
+            },
+            url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             voornaam="Foo",
             achternaam="Bar",
             emailadres="",
@@ -336,30 +363,32 @@ class MockAPICreateData(MockAPIData):
         )
         self.contactmoment = generate_oas_component_cached(
             "cmc",
-            "schemas/ContactMoment",
-            uuid="aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+            "schemas/Contactmoment",
             url=f"{CONTACTMOMENTEN_ROOT}contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
-            # identificatie="AB123",
-            # type="SomeType",
-            # kanaal="MAIL",
+            bronorganisatie="123456789",
+            identificatie="AB123",
+            type="SomeType",
+            kanaal="MAIL",
+            registratiedatum="2022-01-01T12:00:00Z",
             status=Status.nieuw,
-            antwoord="",
             text="hey!\n\nwaddup?",
+            antwoord="foo",
+            onderwerp="e_suite_subject_code",
         )
         self.klant_contactmoment = generate_oas_component_cached(
             "cmc",
-            "schemas/KlantContactMoment",
-            uuid="aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
+            "schemas/Klantcontactmoment",
             url=f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten/aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
-            klant=self.klant["url"],
+            klant=self.klant_bsn["url"],
             contactmoment=self.contactmoment["url"],
+            rol="gesprekspartner",
         )
 
         self.matchers = []
 
     def install_mocks_anon_with_klant(self, m) -> "MockAPICreateData":
         self.matchers = [
-            m.post(f"{KLANTEN_ROOT}klanten", json=self.klant, status_code=201),
+            m.post(f"{KLANTEN_ROOT}klanten", json=self.klant_bsn, status_code=201),
             m.post(
                 f"{CONTACTMOMENTEN_ROOT}contactmomenten",
                 json=self.contactmoment,
@@ -388,7 +417,7 @@ class MockAPICreateData(MockAPIData):
         self.matchers = [
             m.get(
                 f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn={self.user.bsn}",
-                json=paginated_response([self.klant]),
+                json=paginated_response([self.klant_bsn]),
             ),
             m.post(
                 f"{CONTACTMOMENTEN_ROOT}contactmomenten",
@@ -411,7 +440,7 @@ class MockAPICreateData(MockAPIData):
             ),
             m.patch(
                 f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
-                json=self.klant,
+                json=self.klant_bsn,
                 status_code=200,
             ),
             m.post(
@@ -431,12 +460,12 @@ class MockAPICreateData(MockAPIData):
         if use_rsin:
             first_matcher = m.get(
                 f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId={self.eherkenning_user.rsin}",
-                json=paginated_response([self.klant]),
+                json=paginated_response([self.klant_bsn]),
             )
         else:
             first_matcher = m.get(
                 f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId={self.eherkenning_user.kvk}",
-                json=paginated_response([self.klant]),
+                json=paginated_response([self.klant_bsn]),
             )
 
         self.matchers = [
@@ -472,7 +501,7 @@ class MockAPICreateData(MockAPIData):
             first_matcher,
             m.patch(
                 f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
-                json=self.klant,
+                json=self.klant_bsn,
                 status_code=200,
             ),
             m.post(

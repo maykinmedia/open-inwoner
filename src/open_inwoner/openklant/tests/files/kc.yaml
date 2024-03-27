@@ -1,5 +1,6 @@
 openapi: 3.0.1
 info:
+  # source: https://dmidoffice2.esuite-development.net/klanten-api-provider/api/v1/schema/openapi.yaml
   description: Deze implementatie is niet 'compliant' maar streeft er naar 'compatible'
     te zijn met de Klanten API specificatie.
   title: E-Suite implementatie van een deel van de Klanten API versie 1.0.0
