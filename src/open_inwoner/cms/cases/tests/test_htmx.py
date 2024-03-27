@@ -277,8 +277,7 @@ class CasesPlaywrightTests(
         )
         self.contactmoment = generate_oas_component_cached(
             "cmc",
-            "schemas/ContactMoment",
-            uuid="aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+            "schemas/Contactmoment",
             url=f"{CONTACTMOMENTEN_ROOT}contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
             status=Status.nieuw,
             antwoord="",
@@ -286,8 +285,7 @@ class CasesPlaywrightTests(
         )
         self.klant_contactmoment = generate_oas_component_cached(
             "cmc",
-            "schemas/KlantContactMoment",
-            uuid="aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
+            "schemas/Klantcontactmoment",
             url=f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten/aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
             klant=self.klant["url"],
             contactmoment=self.contactmoment["url"],

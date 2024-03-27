@@ -42,6 +42,7 @@ from open_inwoner.utils.test import (
     ClearCachesMixin,
     paginated_response,
     set_kvk_branch_number_in_session,
+    uuid_from_url,
 )
 
 from ...utils.tests.helpers import AssertRedirectsMixin
@@ -468,9 +469,9 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         #
         self.contactmoment_old = generate_oas_component_cached(
             "cmc",
-            "schemas/ContactMoment",
-            uuid="aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+            "schemas/Contactmoment",
             url=f"{CONTACTMOMENTEN_ROOT}contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+            bronorganisatie="123456789",
             identificatie="AB123",
             registratiedatum="1971-07-17T20:15:07+00:00",
             type="SomeType",
@@ -482,9 +483,9 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         )
         self.contactmoment_new = generate_oas_component_cached(
             "cmc",
-            "schemas/ContactMoment",
-            uuid="aaaaaaaa-aaaa-aaaa-aaaa-dddddddddddd",
+            "schemas/Contactmoment",
             url=f"{CONTACTMOMENTEN_ROOT}contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-dddddddddddd",
+            bronorganisatie="123456789",
             identificatie="AB123",
             registratiedatum="2024-09-27T03:39:28+00:00",
             type="SomeType",
@@ -495,8 +496,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         )
         self.objectcontactmoment_old = generate_oas_component_cached(
             "cmc",
-            "schemas/ObjectContactMoment",
-            uuid="77880671-b88a-44ed-ba24-dc2ae688c2ec",
+            "schemas/Objectcontactmoment",
             url=f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten/77880671-b88a-44ed-ba24-dc2ae688c2ec",
             object=self.zaak["url"],
             object_type="zaak",
@@ -504,8 +504,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         )
         self.objectcontactmoment_new = generate_oas_component_cached(
             "cmc",
-            "schemas/ObjectContactMoment",
-            uuid="bb51784c-fa2c-4f65-b24e-7179b615efac",
+            "schemas/Objectcontactmoment",
             url=f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten/bb51784c-fa2c-4f65-b24e-7179b615efac",
             object=self.zaak["url"],
             object_type="zaak",
@@ -513,8 +512,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         )
         self.objectcontactmoment_eherkenning = generate_oas_component_cached(
             "cmc",
-            "schemas/ObjectContactMoment",
-            uuid="bb51784c-fa2c-4f65-b24e-7179b615efac",
+            "schemas/Objectcontactmoment",
             url=f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten/bb51784c-fa2c-4f65-b24e-7179b615efac",
             object=self.zaak_eherkenning["url"],
             object_type="zaak",
@@ -793,7 +791,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.assertEqual(
             links[0].attrib["href"],
             reverse(
-                "cases:kcm_redirect", kwargs={"uuid": self.contactmoment_new["uuid"]}
+                "cases:kcm_redirect",
+                kwargs={"uuid": uuid_from_url(self.contactmoment_new["url"])},
             ),
         )
 
@@ -804,7 +803,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.assertEqual(
             links[1].attrib["href"],
             reverse(
-                "cases:kcm_redirect", kwargs={"uuid": self.contactmoment_old["uuid"]}
+                "cases:kcm_redirect",
+                kwargs={"uuid": uuid_from_url(self.contactmoment_old["url"])},
             ),
         )
 
@@ -907,13 +907,15 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.assertEqual(
             links[0].attrib["href"],
             reverse(
-                "cases:kcm_redirect", kwargs={"uuid": self.contactmoment_new["uuid"]}
+                "cases:kcm_redirect",
+                kwargs={"uuid": uuid_from_url(self.contactmoment_new["url"])},
             ),
         )
         self.assertEqual(
             links[1].attrib["href"],
             reverse(
-                "cases:kcm_redirect", kwargs={"uuid": self.contactmoment_old["uuid"]}
+                "cases:kcm_redirect",
+                kwargs={"uuid": uuid_from_url(self.contactmoment_old["url"])},
             ),
         )
 
@@ -2278,15 +2280,13 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         klant = generate_oas_component_cached(
             "kc",
             "schemas/Klant",
-            uuid="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             emailadres="new@example.com",
             telefoonnummer="0612345678",
         )
         klant_contactmoment = generate_oas_component_cached(
             "cmc",
-            "schemas/KlantContactMoment",
-            uuid="aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
+            "schemas/Klantcontactmoment",
             url=f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten/aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
             klant=klant["url"],
             contactmoment=self.contactmoment_old["url"],
@@ -2314,7 +2314,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         #
         response = self.app.get(
             reverse(
-                "cases:kcm_redirect", kwargs={"uuid": self.contactmoment_old["uuid"]}
+                "cases:kcm_redirect",
+                kwargs={"uuid": uuid_from_url(self.contactmoment_old["url"])},
             ),
             user=self.user,
         )
@@ -2322,7 +2323,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             response,
             reverse(
                 "cases:contactmoment_detail",
-                kwargs={"kcm_uuid": klant_contactmoment["uuid"]},
+                kwargs={"kcm_uuid": uuid_from_url(klant_contactmoment["url"])},
             ),
             status_code=302,
             target_status_code=200,

@@ -229,7 +229,6 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         self.klant = generate_oas_component_cached(
             "kc",
             "schemas/Klant",
-            uuid="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             bronorganisatie="123456789",
             voornaam="Foo",
@@ -298,8 +297,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
     def _setUpExtraMocks(self, m):
         self.contactmoment = generate_oas_component_cached(
             "cmc",
-            "schemas/ContactMoment",
-            uuid="aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+            "schemas/Contactmoment",
             url=f"{CONTACTMOMENTEN_ROOT}contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
             status=Status.nieuw,
             antwoord="",
@@ -307,8 +305,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         )
         self.klant_contactmoment = generate_oas_component_cached(
             "cmc",
-            "schemas/KlantContactMoment",
-            uuid="aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
+            "schemas/Klantcontactmoment",
             url=f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten/aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
             klant=self.klant["url"],
             contactmoment=self.contactmoment["url"],

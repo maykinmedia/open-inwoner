@@ -44,5 +44,3 @@ def update_user_from_klant(request):
             f"updated user from klant API with fields: {', '.join(sorted(update_data.keys()))}",
             content_object=user,
         )
-
-    return (user, klant)

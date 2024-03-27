@@ -156,7 +156,7 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
                 }
                 # registering klanten won't work in e-Suite as it always pulls from BRP
                 # (but try anyway and fallback to appending details to tekst if fails)
-                klant = klanten_client.create_klant(data)
+                klant = klanten_client.create_klant(data=data)
 
                 if klant:
                     if self.request.user.is_authenticated:

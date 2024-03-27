@@ -42,8 +42,8 @@ class KlantenClient(APIClient):
         try:
             response = self.post("klanten", json=data)
             data = get_json_response(response)
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception("exception while making request")
             return
 
         klant = factory(Klant, data)
@@ -51,13 +51,13 @@ class KlantenClient(APIClient):
         return klant
 
     def _create_klant_for_bsn(self, user_bsn: str) -> Klant:
-        params = {"subjectIdentificatie": {"inpBsn": user_bsn}}
+        payload = {"subjectIdentificatie": {"inpBsn": user_bsn}}
 
         try:
-            response = self.post("klanten", params=params)
+            response = self.post("klanten", json=payload)
             data = get_json_response(response)
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception("exception while making request")
             return None
 
         klant = factory(Klant, data)
@@ -67,19 +67,19 @@ class KlantenClient(APIClient):
     def _create_klant_for_kvk_or_rsin(
         self, user_kvk_or_rsin: str, *, vestigingsnummer=None
     ) -> list[Klant]:
-        params = {"subjectIdentificatie": {"innNnpId": user_kvk_or_rsin}}
+        payload = {"subjectIdentificatie": {"innNnpId": user_kvk_or_rsin}}
 
         if vestigingsnummer:
-            params = {"subjectIdentificatie": {"vestigingsNummer": vestigingsnummer}}
+            payload = {"subjectIdentificatie": {"vestigingsNummer": vestigingsnummer}}
 
         try:
             response = self.post(
                 "klanten",
-                params=params,
+                json=payload,
             )
             data = get_json_response(response)
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception("exception while making request")
             return None
 
         klant = factory(Klant, data)

@@ -30,10 +30,14 @@ class UpdateUserFromLoginSignalAPITestCase(
     def setUp(self) -> None:
         super().setUp()
 
-        self.klant = generate_oas_component_cached(
+        self.klant_bsn = generate_oas_component_cached(
             "kc",
             "schemas/Klant",
-            uuid="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            bronorganisatie="123456789",
+            klantnummer="12345678",
+            subjectIdentificatie={
+                "inpBsn": "123456789",
+            },
             url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             emailadres="new@example.com",
             telefoonnummer="0612345678",
@@ -42,7 +46,7 @@ class UpdateUserFromLoginSignalAPITestCase(
     def test_update_user_after_login(self, m):
         m.get(
             f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn=999993847",
-            json=paginated_response([self.klant]),
+            json=paginated_response([self.klant_bsn]),
         )
 
         user = UserFactory(
@@ -94,7 +98,7 @@ class UpdateUserFromLoginSignalAPITestCase(
                 )
                 m.get(
                     f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId={identifier}",
-                    json=paginated_response([self.klant]),
+                    json=paginated_response([self.klant_bsn]),
                 )
 
                 request = RequestFactory().get("/dummy")
@@ -114,7 +118,7 @@ class UpdateUserFromLoginSignalAPITestCase(
     def test_update_user_after_login_skips_existing_email(self, m):
         m.get(
             f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn=999993847",
-            json=paginated_response([self.klant]),
+            json=paginated_response([self.klant_bsn]),
         )
 
         user = UserFactory(
@@ -143,20 +147,11 @@ class UpdateUserFromLoginSignalAPITestCase(
         self.assertTimelineLog("updated user from klant API with fields: phonenumber")
 
     def test_create_klant_for_digid_user(self, m):
-        digid_klant = {
-            "bronorganisatie": "123456789",
-            "klantnummer": "87654321",
-            "subjectIdentificatie": {
-                "inpBsn": "123456789",
-            },
-            "subjectType": "natuurlijk_persoon",
-            "url": f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
-        }
         m.get(
             f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn=123456789",
             json={"count": 0, "results": []},
         )
-        m.post(f"{KLANTEN_ROOT}klanten", json=digid_klant)
+        m.post(f"{KLANTEN_ROOT}klanten", json=self.klant_bsn)
 
         user = UserFactory(
             login_type=LoginTypeChoices.digid,
@@ -167,23 +162,28 @@ class UpdateUserFromLoginSignalAPITestCase(
         request.user = user
         user_logged_in.send(User, user=user, request=request)
 
-        self.assertTimelineLog(f"created klant ({digid_klant['klantnummer']}) for user")
+        self.assertTimelineLog(
+            f"created klant ({self.klant_bsn['klantnummer']}) for user"
+        )
 
     def test_create_klant_for_eherkenning_user(self, m):
-        eherkenning_klant = {
-            "bronorganisatie": "123456789",
-            "klantnummer": "87654321",
-            "subjectIdentificatie": {
+        klant_eherkenning = generate_oas_component_cached(
+            "kc",
+            "schemas/Klant",
+            bronorganisatie="123456789",
+            klantnummer="12345678",
+            subjectIdentificatie={
                 "innNnpId": "87654321",
             },
-            "subjectType": "natuurlijk_persoon",
-            "url": f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
-        }
+            url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            emailadres="new@example.com",
+            telefoonnummer="0612345678",
+        )
         m.get(
             f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId=87654321",
             json={"count": 0, "results": []},
         )
-        m.post(f"{KLANTEN_ROOT}klanten", json=eherkenning_klant)
+        m.post(f"{KLANTEN_ROOT}klanten", json=klant_eherkenning)
 
         user = UserFactory(
             login_type=LoginTypeChoices.eherkenning,
@@ -195,5 +195,5 @@ class UpdateUserFromLoginSignalAPITestCase(
         user_logged_in.send(User, user=user, request=request)
 
         self.assertTimelineLog(
-            f"created klant ({eherkenning_klant['klantnummer']}) for user"
+            f"created klant ({klant_eherkenning['klantnummer']}) for user"
         )
