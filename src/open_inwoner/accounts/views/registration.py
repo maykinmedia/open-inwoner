@@ -5,8 +5,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import NoReverseMatch, reverse
-from django.utils.encoding import iri_to_uri
-from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext as _
 from django.views.generic import UpdateView
 
@@ -20,6 +18,7 @@ from digid_eherkenning_oidc_generics.models import (
 from open_inwoner.utils.hash import generate_email_from_string
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
+from ...utils.url import get_next_url_from
 from ..forms import CustomRegistrationForm, NecessaryUserForm
 from ..models import Invite, User
 
@@ -146,15 +145,10 @@ class NecessaryFieldsUserView(LogMixin, LoginRequiredMixin, InviteMixin, UpdateV
         return self.request.user
 
     def get_success_url(self):
-        messages.add_message(self.request, messages.SUCCESS, "Registratie is voltooid")
-        if "next" in self.request.GET and url_has_allowed_host_and_scheme(
-            url=self.request.GET["next"],
-            allowed_hosts=[
-                self.request.get_host(),
-            ],
-        ):
-            return iri_to_uri(self.request.GET["next"])
-        return reverse("pages-root")
+        messages.add_message(
+            self.request, messages.SUCCESS, _("Registratie is voltooid")
+        )
+        return get_next_url_from(self.request, default=reverse("pages-root"))
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
