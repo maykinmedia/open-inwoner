@@ -1,0 +1,83 @@
+.form#profile-edit input[name="display_name"],
+.form#profile-edit input[name="email"],
+.form#profile-edit input[name="phonenumber"],
+.form#profile-edit button[type="submit"],
+.form#profile-edit a.button--textless,
+.plugin__categories .card,
+nav.primary-navigation__main .primary-navigation__list-item .link,
+.dropdown-nav__toggle .nav__list--open .subpage-list .link,
+  /**  */
+body > header > div > nav.primary-navigation.primary-navigation__main > ul > li > ul > li > a,
+.footer__logo a,
+.search-form input[name="query"],
+.search-form button[type=submit],
+.form#change-notifications a.button,
+.form#change-notifications button.button--primary,
+.primary-navigation__authenticated .header__list-item .link,
+  // perhaps not needed:
+body > header > div > nav.primary-navigation.primary-navigation__authenticated > ul > li > ul > li:nth-child(1) > a {
+  border: 2px solid orange !important;
+  background-color: yellow;
+}
+
+#content
+  > div
+  > div.grid__main
+  > section:nth-child(3)
+  > div
+  > a:nth-child(1)
+  > span
+  > img,
+#content .plugin__categories .card .link,
+body
+  > header
+  > div
+  > nav.primary-navigation.primary-navigation--open.primary-navigation__authenticated
+  > ul
+  > li
+  > ul
+  > li:nth-child(1)
+  > a
+  > span.link__text,
+body
+  > header
+  > div
+  > nav.primary-navigation.primary-navigation--open.primary-navigation__authenticated
+  > ul
+  > li
+  > ul
+  > .header__list-item
+  > a
+  > span.link__text,
+body
+  > header
+  > div
+  > nav.primary-navigation.primary-navigation--open.primary-navigation__main
+  > ul
+  > li
+  > ul
+  > li:nth-child(2)
+  > a
+  > span,
+body
+  > header
+  > div
+  > div.header__submenu
+  > nav.primary-navigation
+  > ul
+  > li.primary-navigation__list-item.dropdown-nav__toggle.nav__list--open
+  > ul
+  > li
+  > a
+  > span {
+  border: 2px solid deeppink;
+  background-color: pink;
+}
+
+.form#change-notifications #id_messages_notifications,
+.form#change-notifications #id_plans_notifications {
+  border: 4px solid purple;
+  background-color: mediumpurple;
+  display: inline-block !important;
+  opacity: 1;
+}
