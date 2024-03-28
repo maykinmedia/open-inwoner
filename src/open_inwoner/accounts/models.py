@@ -387,28 +387,17 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def require_necessary_fields(self) -> bool:
         """returns whether user needs to fill in necessary fields"""
-        if (
-            self.is_digid_user_with_brp
-            and self.email
-            and not self.email.endswith("@example.org")
-        ):
-            return False
+        if self.is_digid_user_with_brp:
+            return not self.has_usable_email()
         elif self.login_type == LoginTypeChoices.digid:
             return (
-                not self.first_name
-                or not self.last_name
-                or not self.email
-                or self.email.endswith("@example.org")
+                not self.first_name or not self.last_name or not self.has_usable_email()
             )
         elif self.login_type in (
             LoginTypeChoices.oidc,
             LoginTypeChoices.eherkenning,
         ):
-            return (
-                not self.email
-                or self.email.endswith("@example.org")
-                or self.email.endswith("localhost")
-            )
+            return not self.has_usable_email()
         return False
 
     def get_logout_url(self) -> str:
@@ -429,6 +418,19 @@ class User(AbstractBaseUser, PermissionsMixin):
                 return reverse("eherkenning_oidc:logout")
             return reverse("logout")
 
+    def has_usable_email(self) -> bool:
+        return User.is_usable_email(self.email)
+
+    @classmethod
+    def is_usable_email(cls, email: str) -> bool:
+        # because of legacy reasons we have @example.org and @localhost in the database as placeholders
+        return email and not email.endswith(
+            (
+                "@example.org",
+                "@localhost",
+            )
+        )
+
     def get_contact_update_url(self):
         return reverse("profile:contact_edit", kwargs={"uuid": self.uuid})
 
@@ -441,7 +443,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return choice.label
 
     def get_contact_email(self):
-        return self.email if "@example.org" not in self.email else ""
+        return self.email if self.has_usable_email() else ""
 
     def get_active_contacts(self):
         return self.user_contacts.filter(is_active=True)

@@ -5,8 +5,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import NoReverseMatch, reverse
-from django.utils.encoding import iri_to_uri
-from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext as _
 from django.views.generic import UpdateView
 
@@ -20,6 +18,7 @@ from digid_eherkenning_oidc_generics.models import (
 from open_inwoner.utils.hash import generate_email_from_string
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
+from ...utils.url import get_next_url_from
 from ..forms import CustomRegistrationForm, NecessaryUserForm
 from ..models import Invite, User
 
@@ -63,6 +62,7 @@ class InviteMixin(CommonPageMixin):
             invite.inviter.user_contacts.add(invitee)
 
 
+# TODO move InviteMixin stuff elsewhere
 class CustomRegistrationView(LogMixin, InviteMixin, RegistrationView):
     form_class = CustomRegistrationForm
 
@@ -92,7 +92,14 @@ class CustomRegistrationView(LogMixin, InviteMixin, RegistrationView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        # TODO remove necessary_fields stuff from here and rely on middleware
+        # TODO move invite stuff elsewhere
+
+        next_url = get_next_url_from(self.request, default=reverse("pages-root"))
+
         invite_key = self.request.GET.get("invite")
+        # if invite_key:
+
         necessary_fields_url = (
             furl(reverse("profile:registration_necessary"))
             .add({"invite": invite_key})
@@ -107,9 +114,7 @@ class CustomRegistrationView(LogMixin, InviteMixin, RegistrationView):
                 digid_url = reverse("digid_oidc:init")
             else:
                 digid_url = reverse("digid:login")
-            context["digid_url"] = (
-                furl(digid_url).add({"next": necessary_fields_url}).url
-            )
+            context["digid_url"] = furl(digid_url).add({"next": next_url}).url
         except NoReverseMatch:
             context["digid_url"] = ""
 
@@ -120,7 +125,7 @@ class CustomRegistrationView(LogMixin, InviteMixin, RegistrationView):
             else:
                 eherkenning_url = reverse("eherkenning:login")
             context["eherkenning_url"] = (
-                furl(eherkenning_url).add({"next": necessary_fields_url}).url
+                furl(eherkenning_url).add({"next": next_url}).url
             )
         except NoReverseMatch:
             context["eherkenning_url"] = ""
@@ -134,6 +139,7 @@ class CustomRegistrationView(LogMixin, InviteMixin, RegistrationView):
         return super().get(self, request, *args, **kwargs)
 
 
+# TODO move InviteMixin stuff elsewhere
 class NecessaryFieldsUserView(LogMixin, LoginRequiredMixin, InviteMixin, UpdateView):
     model = User
     form_class = NecessaryUserForm
@@ -146,15 +152,10 @@ class NecessaryFieldsUserView(LogMixin, LoginRequiredMixin, InviteMixin, UpdateV
         return self.request.user
 
     def get_success_url(self):
-        messages.add_message(self.request, messages.SUCCESS, "Registratie is voltooid")
-        if "next" in self.request.GET and url_has_allowed_host_and_scheme(
-            url=self.request.GET["next"],
-            allowed_hosts=[
-                self.request.get_host(),
-            ],
-        ):
-            return iri_to_uri(self.request.GET["next"])
-        return reverse("pages-root")
+        messages.add_message(
+            self.request, messages.SUCCESS, _("Registratie is voltooid")
+        )
+        return get_next_url_from(self.request, default=reverse("pages-root"))
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -177,10 +178,12 @@ class NecessaryFieldsUserView(LogMixin, LoginRequiredMixin, InviteMixin, UpdateV
         user = self.get_object()
         invite = self.get_invite()
 
+        # TODO find out what is going on here, and if user.has_usable_email() covers it
         if not invite and (
             (user.bsn and user.email == generate_email_from_string(user.bsn))
             or (user.oidc_id and user.email == generate_email_from_string(user.oidc_id))
             or (user.kvk and user.email == f"user-{user.kvk}@localhost")
+            or (not user.has_usable_email())
         ):
             initial["email"] = ""
 

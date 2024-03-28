@@ -1,19 +1,23 @@
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
-from django.urls import reverse
+from django.shortcuts import render, reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
-from furl import furl
-
 from open_inwoner.kvk.branches import KVK_BRANCH_SESSION_VARIABLE
 
+from ..utils.url import get_next_url_from
 from .client import KvKClient
 from .forms import CompanyBranchChoiceForm
 
 
 class CompanyBranchChoiceView(FormView):
     """Choose the branch ("vestiging") of a company"""
+
+    # TODO refactor for proper Class Based View usage:
+    # - get_context_data() does network IO but is called multiple times (also through super())
+    # - get_form() is called multiple times (also through super())
+    # - use regular FormView code patterns (should work without get()/post())
+    # - move saving to the form's .save() (pass arguments form_kwargs of save()-argument
 
     template_name = "pages/kvk/branches.html"
     form_class = CompanyBranchChoiceForm
@@ -28,14 +32,15 @@ class CompanyBranchChoiceView(FormView):
         )
         form = self.get_form()
 
-        if next := self.request.GET.get("next"):
-            redirect = furl(next)
-            redirect.args.update(self.request.GET)
-        elif self.request.user.require_necessary_fields():
-            redirect = furl(reverse("profile:registration_necessary"))
-            redirect.args.update(self.request.GET)
-        else:
-            redirect = furl(reverse("pages-root"))
+        redirect = get_next_url_from(self.request, default=reverse("pages-root"))
+        # if next := self.request.GET.get("next"):
+        #     redirect = furl(next)
+        #     redirect.args.update(self.request.GET)
+        # elif self.request.user.require_necessary_fields():
+        #     redirect = furl(reverse("profile:registration_necessary"))
+        #     redirect.args.update(self.request.GET)
+        # else:
+        #     redirect = furl(reverse("pages-root"))
 
         # create pseudo-branch representing the company as a whole
         master_branch = {
@@ -56,6 +61,7 @@ class CompanyBranchChoiceView(FormView):
         if not getattr(request.user, "kvk", None):
             return HttpResponse(_("Unauthorized"), status=401)
 
+        # TODO regular FormView does this
         context = self.get_context_data()
 
         redirect = context["redirect"]
@@ -66,15 +72,16 @@ class CompanyBranchChoiceView(FormView):
         if not company_branches:
             request.session[KVK_BRANCH_SESSION_VARIABLE] = None
             request.session.save()
-            return HttpResponseRedirect(redirect.url)
+            return HttpResponseRedirect(redirect)
 
         if len(company_branches) == 1:
             request.session[KVK_BRANCH_SESSION_VARIABLE] = None
             request.session.save()
-            return HttpResponseRedirect(redirect.url)
+            return HttpResponseRedirect(redirect)
 
         form = context["form"]
 
+        # TODO regular FormView does this
         return render(
             request,
             self.template_name,
@@ -88,6 +95,7 @@ class CompanyBranchChoiceView(FormView):
         if not getattr(request.user, "kvk", None):
             return HttpResponse(_("Unauthorized"), status=401)
 
+        # TODO this is also called from get_context_data()
         form = self.get_form()
 
         if form.is_valid():
@@ -111,6 +119,7 @@ class CompanyBranchChoiceView(FormView):
 
             request.session[KVK_BRANCH_SESSION_VARIABLE] = branch_number
 
-            return HttpResponseRedirect(redirect.url)
+            return HttpResponseRedirect(redirect)
 
+        # TODO this calls get_context_data() again
         return super().form_invalid(form)

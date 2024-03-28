@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.auth.admin import GroupAdmin, UserAdmin
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
@@ -148,7 +149,15 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
             },
         ),
     )
-    readonly_fields = ("bsn", "rsin", "is_prepopulated", "oidc_id", "uuid")
+    readonly_fields = (
+        "bsn",
+        "rsin",
+        "kvk",
+        "login_type",
+        "is_prepopulated",
+        "oidc_id",
+        "uuid",
+    )
     list_display = (
         "email",
         "first_name",
@@ -167,6 +176,32 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
         "groups",
         "user_permissions",
     )
+
+    debug_editable_fields = (
+        "bsn",
+        "kvk",
+        "rsin",
+        "login_type",
+        "oidc_id",
+        "is_prepopulated",
+    )
+
+    def get_fieldsets(self, request, obj=None):
+        fields = super().get_fieldsets(request, obj=obj)
+        if obj and settings.DEBUG:
+            fields += (
+                (
+                    _("Debug fields"),
+                    {"fields": self.debug_editable_fields},
+                ),
+            )
+        return fields
+
+    def get_readonly_fields(self, request, obj=None):
+        fields = super().get_readonly_fields(request, obj=obj)
+        if obj and settings.DEBUG:
+            fields = tuple((f for f in fields if f not in self.debug_editable_fields))
+        return fields
 
 
 admin.site.unregister(Group)
