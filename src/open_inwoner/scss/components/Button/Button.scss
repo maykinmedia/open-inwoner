@@ -168,6 +168,17 @@
     color: var(--color-error-darker);
   }
 
+  &--primary-close {
+    background-color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+    color: var(--color-font-primary);
+  }
+
+  &--error-confirm {
+    background-color: var(--color-error-darker);
+    color: var(--color-white);
+  }
+
   &--borderless {
     background-color: rgba(0, 0, 0, 0);
     border: none;

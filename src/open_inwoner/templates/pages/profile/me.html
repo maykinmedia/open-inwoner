@@ -294,13 +294,12 @@
                     {% trans "Hiermee worden alleen uw persoonlijke voorkeuren verwijderd. U krijgt dan bijvoorbeeld geen e-mail meer van ons over wijzigingen van uw lopende zaken. Uw persoonsgegevens en uw lopende zaken zelf worden hiermee niet verwijderd." %}
                 </p>
             </div>
-            {% render_form form=form method="POST" id="delete-form" extra_classes="confirm" spaceless=True data_confirm_title=_("Weet u zeker dat u uw account wilt verwijderen?") data_confirm_text=_("Hiermee worden alleen uw persoonlijke voorkeuren verwijderd. U krijgt dan bijvoorbeeld geen e-mail meer van ons over wijzigingen van uw lopende zaken. Uw persoonsgegevens en uw lopende zaken zelf worden hiermee niet verwijderd.") data_confirm_cancel=_("Nee, annuleren") data_confirm_default=_("Ja, verwijderen") %}
+            {% render_form form=form method="POST" id="delete-form" extra_classes="confirm" spaceless=True data_confirm_title=_("Weet je zeker dat je jouw profiel wilt verwijderen?") data_confirm_text=_("Hiermee worden alleen uw persoonlijke voorkeuren verwijderd. U krijgt dan bijvoorbeeld geen e-mail meer van ons over wijzigingen van uw lopende zaken. Uw persoonsgegevens en uw lopende zaken zelf worden hiermee niet verwijderd.") data_confirm_cancel=_("Nee, annuleren") data_confirm_default=_("Ja, verwijderen") %}
             {% csrf_token %}
                 {% button_row %}
                     {% button text=_("Profiel verwijderen") icon="delete" icon_position="before" icon_outlined=True transparent=True extra_classes="button--spaceless button--error" %}
                 {% endbutton_row %}
             {% endrender_form %}
-
     </section>
 {% endwith %}
 
