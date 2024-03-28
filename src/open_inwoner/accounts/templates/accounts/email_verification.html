@@ -1,0 +1,24 @@
+{% extends 'master.html' %}
+{% load i18n static form_tags card_tags grid_tags solo_tags %}
+
+{% block content %}
+<div class="registration-grid">
+{% render_grid %}
+    {% render_column span=9 %}
+        {% render_card tinted=True  %}
+            {% get_solo 'configurations.SiteConfiguration' as config %}
+            <h1 class="h1">{% trans "E-mailadres bevestigen" %}</h1><br>
+            {% if config.email_verification_text %}<p class="p">{{ config.email_verification_text|urlize|linebreaksbr }}</p><br>{% endif %}
+            <form method="POST" id="email-verification-form" action="{{ request.get_full_path }}" class="form" novalidate>
+                {% csrf_token %}
+{#                {% for field in form.fields %}#}
+{#                    {% autorender_field form field %}#}
+{#                {% endfor %}#}
+                {% trans "Verficatie email verzenden" as button_text %}
+                {% form_actions primary_icon='arrow_forward' primary_text=button_text %}
+            </form>
+        {% endrender_card %}
+    {% endrender_column %}
+{% endrender_grid %}
+</div>
+{% endblock content %}
