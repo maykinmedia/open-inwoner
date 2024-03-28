@@ -9,7 +9,6 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 import requests_mock
-from cms import api
 from django_webtest import WebTest
 from pyquery import PyQuery as PQ
 from webtest import Upload
@@ -26,6 +25,9 @@ from open_inwoner.utils.logentry import LOG_ACTIONS
 from open_inwoner.utils.test import ClearCachesMixin
 from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin, create_image_bytes
 
+from ...cms.cases.cms_apps import CasesApphook
+from ...cms.collaborate.cms_apps import CollaborateApphook
+from ...cms.inbox.cms_apps import InboxApphook
 from ...cms.profile.cms_apps import ProfileApphook
 from ...cms.tests import cms_tools
 from ...haalcentraal.api_models import BRPData
@@ -261,14 +263,7 @@ class ProfileViewTests(WebTest):
         self.assertNotContains(response, _("Stuur een bericht"))
 
         # case 2: unpublished message page
-        page = api.create_page(
-            "Mijn Berichten",
-            "cms/fullwidth.html",
-            "nl",
-            slug="berichten",
-        )
-        page.application_namespace = "inbox"
-        page.save()
+        page = cms_tools.create_apphook_page(InboxApphook, publish=False)
 
         response = self.app.get(self.url, user=self.user)
 
@@ -971,14 +966,7 @@ class NotificationsDisplayTests(WebTest):
         self.assertNotIn("messages_notifications", form.fields)
 
         # inbox page created but not published
-        page = api.create_page(
-            "Mijn Berichten",
-            "cms/fullwidth.html",
-            "nl",
-            slug="berichten",
-        )
-        page.application_namespace = "inbox"
-        page.save()
+        page = cms_tools.create_apphook_page(InboxApphook, publish=False)
 
         response = self.app.get(self.url, user=self.user)
         form = response.forms["change-notifications"]
@@ -1002,15 +990,7 @@ class NotificationsDisplayTests(WebTest):
         self.assertNotIn("cases_notifications", form.fields)
 
         # cases page created but not published
-        page = api.create_page(
-            "Mijn Aanvragen",
-            "cms/fullwidth.html",
-            "nl",
-            slug="aanvragen",
-        )
-        page.application_namespace = "cases"
-        page.save()
-
+        page = cms_tools.create_apphook_page(CasesApphook, publish=False)
         response = self.app.get(self.url, user=self.user)
         form = response.forms["change-notifications"]
 
@@ -1031,14 +1011,7 @@ class NotificationsDisplayTests(WebTest):
         self.assertNotIn("plans_notifications", form.fields)
 
         # collaborate page created but not published
-        page = api.create_page(
-            "Samenwerken",
-            "cms/fullwidth.html",
-            "nl",
-            slug="samenwerken",
-        )
-        page.application_namespace = "collaborate"
-        page.save()
+        page = cms_tools.create_apphook_page(CollaborateApphook, publish=False)
 
         response = self.app.get(self.url, user=self.user)
         form = response.forms["change-notifications"]
