@@ -8,12 +8,19 @@ from furl import furl
 
 from open_inwoner.kvk.branches import KVK_BRANCH_SESSION_VARIABLE
 
+from ..utils.url import get_next_url_from
 from .client import KvKClient
 from .forms import CompanyBranchChoiceForm
 
 
 class CompanyBranchChoiceView(FormView):
     """Choose the branch ("vestiging") of a company"""
+
+    # TODO refactor for proper Class Based View usage:
+    # - get_context_data() does network IO but is called multiple times (also through super())
+    # - get_form() is called multiple times (also through super())
+    # - use regular FormView code patterns (could work without get()/post())
+    # - move saving to the form's .save() (pass arguments via form kwargs or save()-arguments
 
     template_name = "pages/kvk/branches.html"
     form_class = CompanyBranchChoiceForm
@@ -28,7 +35,7 @@ class CompanyBranchChoiceView(FormView):
         )
         form = self.get_form()
 
-        if next := self.request.GET.get("next"):
+        if next := get_next_url_from(self.request, default=""):
             redirect = furl(next)
             redirect.args.update(self.request.GET)
         elif self.request.user.require_necessary_fields():
@@ -56,6 +63,7 @@ class CompanyBranchChoiceView(FormView):
         if not getattr(request.user, "kvk", None):
             return HttpResponse(_("Unauthorized"), status=401)
 
+        # TODO regular FormView does this
         context = self.get_context_data()
 
         redirect = context["redirect"]
@@ -75,6 +83,7 @@ class CompanyBranchChoiceView(FormView):
 
         form = context["form"]
 
+        # TODO regular FormView does this
         return render(
             request,
             self.template_name,
@@ -88,6 +97,7 @@ class CompanyBranchChoiceView(FormView):
         if not getattr(request.user, "kvk", None):
             return HttpResponse(_("Unauthorized"), status=401)
 
+        # TODO this is also called from super().get_context_data()
         form = self.get_form()
 
         if form.is_valid():
@@ -113,4 +123,5 @@ class CompanyBranchChoiceView(FormView):
 
             return HttpResponseRedirect(redirect.url)
 
+        # TODO this calls get_context_data() again
         return super().form_invalid(form)

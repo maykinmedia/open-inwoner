@@ -114,4 +114,8 @@ class UserQuerySet(QuerySet):
         return self.filter(contacts_for_approval=user)
 
     def having_usable_email(self):
-        return self.exclude(Q(email="") | Q(email__endswith="@example.org"))
+        return self.exclude(
+            Q(email="")
+            | Q(email__endswith="@example.org")
+            | Q(email__endswith="@localhost")
+        )

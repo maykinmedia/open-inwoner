@@ -40,10 +40,30 @@ class DigidUserFactory(UserFactory):
     is_prepopulated = True
 
 
+class NewDigidUserFactory(UserFactory):
+    first_name = ""
+    infix = ""
+    last_name = ""
+    email = factory.LazyAttribute(
+        # weird .org email
+        lambda o: "%s%d@example.org"
+        % (o.first_name.lower(), random.randint(0, 10000000))
+    )
+    login_type = LoginTypeChoices.digid
+    bsn = "123456782"  # TODO ideally this should be random (but still valid)
+    is_prepopulated = False
+
+
 class eHerkenningUserFactory(UserFactory):
     login_type = LoginTypeChoices.eherkenning
     kvk = "12345678"
     is_prepopulated = True
+
+
+class NewEHerkenningUserFactory(NewDigidUserFactory):
+    login_type = LoginTypeChoices.eherkenning
+    kvk = "12345678"
+    bsn = ""
 
 
 class TokenFactory(factory.django.DjangoModelFactory):
