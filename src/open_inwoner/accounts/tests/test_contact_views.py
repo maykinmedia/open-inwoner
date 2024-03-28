@@ -7,12 +7,13 @@ from django.test import override_settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from cms import api
 from django_webtest import WebTest
 
 from open_inwoner.accounts.models import User
 from open_inwoner.utils.tests.helpers import create_image_bytes
 
+from ...cms.inbox.cms_apps import InboxApphook
+from ...cms.tests import cms_tools
 from ..choices import ContactTypeChoices
 from .factories import DigidUserFactory, UserFactory
 
@@ -98,14 +99,7 @@ class ContactViewTests(WebTest):
         self.assertNotContains(response, _("Stuur bericht"))
 
         # case 2: unpublished message page
-        page = api.create_page(
-            "Mijn Berichten",
-            "cms/fullwidth.html",
-            "nl",
-            slug="berichten",
-        )
-        page.application_namespace = "inbox"
-        page.save()
+        page = cms_tools.create_apphook_page(InboxApphook, publish=False)
 
         response = self.app.get(self.list_url, user=self.user)
 
