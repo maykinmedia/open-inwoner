@@ -66,7 +66,7 @@ class BranchDetail(BaseModel):
 
 
 class Appointment(JSONEncoderMixin, BaseModel):
-    url: str | None
+    url: str | None = None
     services: list[QmaticService]
     title: str
     start: datetime
@@ -76,9 +76,6 @@ class Appointment(JSONEncoderMixin, BaseModel):
     publicId: str
     branch: BranchDetail
     notes: str | None
-
-    class Config(JSONEncoderMixin.Config):
-        pass
 
 
 class NoServiceConfigured(RuntimeError):

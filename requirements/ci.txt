@@ -13,6 +13,11 @@ amqp==5.1.1
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   kombu
+annotated-types==0.6.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   pydantic
 ape-pie==0.1.0
     # via
     #   -c requirements/base.txt
@@ -760,7 +765,12 @@ pycparser==2.20
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   cffi
-pydantic[email]==1.10.14
+pydantic[email]==2.6.4
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   pydantic
+pydantic-core==2.16.3
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -931,6 +941,7 @@ typing-extensions==4.10.0
     #   -r requirements/base.txt
     #   polyfactory
     #   pydantic
+    #   pydantic-core
     #   pyee
     #   xsdata
 uritemplate==4.1.1

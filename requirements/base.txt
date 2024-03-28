@@ -8,6 +8,8 @@ aldryn-apphooks-config==0.7.0
     # via -r requirements/base.in
 amqp==5.1.1
     # via kombu
+annotated-types==0.6.0
+    # via pydantic
 ape-pie==0.1.0
     # via zgw-consumers
 asgiref==3.7.2
@@ -413,8 +415,10 @@ psycopg2==2.9.9
     # via -r requirements/base.in
 pycparser==2.20
     # via cffi
-pydantic[email]==1.10.14
+pydantic[email]==2.6.4
     # via -r requirements/base.in
+pydantic-core==2.16.3
+    # via pydantic
 pydyf==0.1.2
     # via weasyprint
 pyee==11.0.1
@@ -506,6 +510,7 @@ typing-extensions==4.10.0
     # via
     #   -r requirements/base.in
     #   pydantic
+    #   pydantic-core
     #   pyee
     #   xsdata
 uritemplate==4.1.1
