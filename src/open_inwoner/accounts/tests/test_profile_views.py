@@ -1173,7 +1173,9 @@ class MyAppointmentsTests(ClearCachesMixin, WebTest):
                 name="Hoofdkantoor",
                 timeZone="Europe/Amsterdam",
                 addressCity="Amsterdam",
+                addressLine1="Hoofdkantoor",
                 addressLine2="Dam 1",
+                addressZip="1234 ZZ",
             ),
         )
         self.appointment_idcard = AppointmentFactory.build(
@@ -1184,7 +1186,9 @@ class MyAppointmentsTests(ClearCachesMixin, WebTest):
                 name="Hoofdkantoor",
                 timeZone="America/New_York",
                 addressCity="New York",
+                addressLine1="Hoofdkantoor",
                 addressLine2="Wall Street 1",
+                addressZip="1111 AA",
             ),
         )
 
@@ -1252,13 +1256,11 @@ class MyAppointmentsTests(ClearCachesMixin, WebTest):
         passport_appointment = PQ(cards[0]).find("ul").children()
 
         self.assertEqual(passport_appointment[0].text, "Aanvraag paspoort")
-        self.assertEqual(
-            PQ(passport_appointment[1]).text(), "woensdag 1 januari 2020 13:00"
-        )
-        self.assertEqual(PQ(passport_appointment[2]).text(), "foo")
+        self.assertEqual(PQ(passport_appointment[1]).text(), "Datum\n1 januari 2020")
+        self.assertEqual(PQ(passport_appointment[2]).text(), "Tijd\n13:00 uur")
         self.assertEqual(PQ(passport_appointment[3]).text(), "Locatie\nHoofdkantoor")
-        self.assertEqual(PQ(passport_appointment[4]).text(), "Amsterdam")
-        self.assertEqual(PQ(passport_appointment[5]).text(), "Dam 1")
+        self.assertEqual(PQ(passport_appointment[4]).text(), "Dam 1")
+        self.assertEqual(PQ(passport_appointment[5]).text(), "1234 ZZ Amsterdam")
         self.assertEqual(
             PQ(cards[0]).find("a").attr("href"),
             f"{self.config.booking_base_url}{self.appointment_passport.publicId}",
@@ -1267,13 +1269,11 @@ class MyAppointmentsTests(ClearCachesMixin, WebTest):
         id_card_appointment = PQ(cards[1]).find("ul").children()
 
         self.assertEqual(id_card_appointment[0].text, "Aanvraag ID kaart")
-        self.assertEqual(
-            PQ(id_card_appointment[1]).text(), "vrijdag 6 maart 2020 11:30"
-        )
-        self.assertEqual(PQ(id_card_appointment[2]).text(), "bar")
+        self.assertEqual(PQ(id_card_appointment[1]).text(), "Datum\n6 maart 2020")
+        self.assertEqual(PQ(id_card_appointment[2]).text(), "Tijd\n11:30 uur")
         self.assertEqual(PQ(id_card_appointment[3]).text(), "Locatie\nHoofdkantoor")
-        self.assertEqual(PQ(id_card_appointment[4]).text(), "New York")
-        self.assertEqual(PQ(id_card_appointment[5]).text(), "Wall Street 1")
+        self.assertEqual(PQ(id_card_appointment[4]).text(), "Wall Street 1")
+        self.assertEqual(PQ(id_card_appointment[5]).text(), "1111 AA New York")
         self.assertEqual(
             PQ(cards[1]).find("a").attr("href"),
             f"{self.config.booking_base_url}{self.appointment_idcard.publicId}",
