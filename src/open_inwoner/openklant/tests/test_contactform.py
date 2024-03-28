@@ -434,6 +434,8 @@ class ContactFormTestCase(
 
     def test_submit_and_register_kvk_or_rsin_user_via_api(self, _m):
         MockAPICreateData.setUpServices()
+        data = MockAPICreateData()
+        original_phonenumber = data.eherkenning_user.phonenumber
 
         config = OpenKlantConfig.get_solo()
         config.register_contact_moment = True
@@ -455,7 +457,9 @@ class ContactFormTestCase(
                     )
                     config.save()
 
-                    data = MockAPICreateData()
+                    data.eherkenning_user.phonenumber = original_phonenumber
+                    data.eherkenning_user.save()
+
                     data.install_mocks_eherkenning(
                         m, use_rsin=use_rsin_for_innNnpId_query_parameter
                     )
@@ -603,6 +607,7 @@ class ContactFormTestCase(
 
     def test_submit_and_register_kvk_or_rsin_user_via_api_and_update_klant(self, _m):
         MockAPICreateData.setUpServices()
+        data = MockAPICreateData()
 
         config = OpenKlantConfig.get_solo()
         config.register_contact_moment = True
@@ -624,7 +629,6 @@ class ContactFormTestCase(
                     )
                     config.save()
 
-                    data = MockAPICreateData()
                     data.install_mocks_eherkenning_missing_contact_info(
                         m, use_rsin=use_rsin_for_innNnpId_query_parameter
                     )

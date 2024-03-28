@@ -457,15 +457,15 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
     def test_form_success_with_api_eherkenning_user(self, m, contactmoment_mock):
         self._setUpMocks(m)
         self._setUpExtraMocks(m)
-
+        eherkenning_user = eHerkenningUserFactory.create(
+            kvk="12345678",
+            rsin="000000000",
+            email=self.klant["emailadres"],
+        )
         for use_rsin_for_innNnpId_query_parameter in [True, False]:
             with self.subTest(
                 use_rsin_for_innNnpId_query_parameter=use_rsin_for_innNnpId_query_parameter
             ):
-                eherkenning_user = eHerkenningUserFactory(
-                    kvk="12345678", rsin="000000000"
-                )
-
                 config = OpenKlantConfig.get_solo()
                 config.use_rsin_for_innNnpId_query_parameter = (
                     use_rsin_for_innNnpId_query_parameter
@@ -480,7 +480,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
                 m.get(
                     f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId={identifier}",
                     json=paginated_response([self.klant]),
-                ),
+                )
 
                 response = self.app.get(self.case_detail_url, user=eherkenning_user)
 
