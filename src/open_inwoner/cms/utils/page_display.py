@@ -12,11 +12,14 @@ from open_inwoner.cms.inbox.cms_apps import InboxApphook
 from open_inwoner.cms.profile.cms_apps import ProfileApphook
 
 cms_apps = {
-    "inbox": InboxApphook,
-    "collaborate": CollaborateApphook,
-    "cases": CasesApphook,
-    "ssd": SSDApphook,
-    "profile": ProfileApphook,
+    hook.app_name: hook
+    for hook in [
+        InboxApphook,
+        CollaborateApphook,
+        CasesApphook,
+        SSDApphook,
+        ProfileApphook,
+    ]
 }
 
 
@@ -24,10 +27,15 @@ def _is_published(page_name: str) -> bool:
     """
     Determine whether the page associated with a specific CMS app is published
     """
+    hook = cms_apps.get(page_name)
+    if not hook:
+        return False
+    # CMS uses the hook's classname as urls value
+    # NOTE: the old approach of filtering on application_namespace breaks for hooks with app-configs
     page = Page.objects.filter(
-        application_namespace=cms_apps[page_name].app_name, publisher_is_draft=False
+        application_urls=hook.__name__, publisher_is_draft=False
     ).first()
-    return page and page.is_published(page.languages)
+    return bool(page and page.is_published(page.languages))
 
 
 def inbox_page_is_published() -> bool:
@@ -66,12 +74,21 @@ def profile_page_is_published() -> bool:
 
 
 def get_active_app_names() -> list[str]:
-    return list(
+    qs = (
         Page.objects.published()
         .exclude(
             Q(application_urls="")
             | Q(application_urls__isnull=True)
             | Q(application_namespace="")
         )
-        .values_list("application_namespace", flat=True)
+        .values_list("application_urls", flat=True)
     )
+    # CMS uses the hook's classname as urls value
+    # NOTE: the old approach of filtering on application_namespace breaks for hooks with app-configs
+
+    hook_lookup = {hook.__name__: name for name, hook in cms_apps.items()}
+    names = set()
+    for value in qs:
+        if name := hook_lookup.get(value):
+            names.add(name)
+    return list(names)
