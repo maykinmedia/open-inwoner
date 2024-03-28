@@ -115,15 +115,22 @@
 
   &--tinted {
     --card-color-background: var(--color-gray-lightest);
+    border: var(--card-size-border) solid var(--color-gray-lightest);
 
     // contrast for accessibility
     .form .caption__content {
       color: var(--color-tinted-mute);
     }
 
-    .card__body--direction-horizontal .link .link__text {
-      text-align: right;
-      padding-left: var(--spacing-small);
+    .card__body--direction-horizontal {
+      display: flex;
+      justify-content: space-between;
+      padding: 20px;
+
+      .link .link__text {
+        text-align: right;
+        padding-left: var(--spacing-small);
+      }
     }
   }
 
@@ -264,11 +271,6 @@
     }
   }
 
-  &__body--direction-horizontal {
-    display: flex;
-    justify-content: space-between;
-  }
-
   &__body--flex {
     display: flex;
     flex-direction: column;
@@ -356,7 +358,7 @@
   }
 
   /// On a stretched card, the one and only link after a list should be placed on above the bottom border.
-  &-- stretch &__body {
+  &--stretch &__body {
     padding-bottom: var(--card-spacing);
 
     @media (min-width: 768px) {

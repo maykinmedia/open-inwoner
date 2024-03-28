@@ -100,6 +100,19 @@
     border-color: transparent;
     color: var(--color-primary);
 
+    &.button--primary {
+      border-color: transparent;
+      color: var(--color-primary);
+      background-color: transparent;
+
+      &:hover {
+        background-color: transparent;
+        border-color: transparent;
+        color: var(--color-primary);
+        text-decoration: underline;
+      }
+    }
+
     &.button--secondary {
       color: var(--color-secondary);
       background-color: transparent;

@@ -30,6 +30,7 @@ from .documents import DocumentDeleteView
 from .invite import InviteAcceptView
 from .login import (
     AddPhoneNumberWizardView,
+    CustomBusinessLoginView,
     CustomLoginView,
     ResendTokenView,
     VerifyTokenView,
@@ -72,6 +73,7 @@ __all__ = [
     "InviteAcceptView",
     "AddPhoneNumberWizardView",
     "CustomLoginView",
+    "CustomBusinessLoginView",
     "ResendTokenView",
     "VerifyTokenView",
     "PasswordResetView",
