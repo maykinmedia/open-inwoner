@@ -37,12 +37,46 @@ class EventTracker {
       'change',
       this.handleEvent.bind(this, 'change')
     )
+    document.body.addEventListener(
+      'keydown',
+      this.handleEvent.bind(this, 'keydown')
+    )
   }
 
   handleEvent(eventType, event) {
     // Iterates over the keys of selectorMap internally when events occur.
     const target = event.target
 
+    if (eventType === 'click') {
+      this.handleClickEvent(target)
+    } else if (eventType === 'change') {
+      this.handleChangeEvent(target)
+    } else if (eventType === 'keydown' && event.key === 'Enter') {
+      this.handleEnterKeyEvent(target)
+    }
+  }
+
+  handleClickEvent(target) {
+    Object.keys(this.selectorMap).forEach((selector) => {
+      if (target.matches(selector)) {
+        const eventData = this.selectorMap[selector]
+        eventData.push(this.extractEventData(target))
+        _sz.push(eventData)
+      }
+    })
+  }
+
+  handleChangeEvent(target) {
+    Object.keys(this.selectorMap).forEach((selector) => {
+      if (target.matches(selector)) {
+        const eventData = this.selectorMap[selector]
+        eventData.push(this.extractEventData(target))
+        _sz.push(eventData)
+      }
+    })
+  }
+
+  handleEnterKeyEvent(target) {
     Object.keys(this.selectorMap).forEach((selector) => {
       if (target.matches(selector)) {
         const eventData = this.selectorMap[selector]
@@ -72,72 +106,79 @@ class EventTracker {
 // Add new elements for tracking here
 const selectorMap = {
   '.form#profile-edit input[name="display_name"]': [
-    'event',
+    'change',
     'Contactgegevens',
-    'ACTION',
-    'LABEL',
+    'change',
+    'Roepnaam',
   ],
   '.form#profile-edit input[name="email"]': [
-    'event',
+    'change',
     'Contactgegevens',
-    'ACTION',
-    'LABEL',
+    'change',
+    'email',
   ],
   '.form#profile-edit input[name="phonenumber"]': [
-    'event',
+    'change',
     'Contactgegevens',
-    'ACTION',
-    'LABEL',
+    'change',
+    'Telefoonnummer',
   ],
   '.form#profile-edit button[type="submit"]': [
-    'event',
+    'click',
     'Contactgegevens',
     'Submit',
     'Profiel bewerkt',
   ],
   '.form#profile-edit a.button--textless': [
-    'event',
+    'click',
     'Contactgegevens',
     'Click',
     'No save',
   ],
-  '.plugin__categories .card': ['event', 'CATEGORY', 'ACTION', 'LABEL'],
-  'nav.primary-navigation__main .primary-navigation__list-item .link  ': [
+  // Card on Home page 4 columns
+  '#content .plugin__categories .card img': [
     'event',
     'Homepage',
-    'ACTION',
-    'Onderwerpen',
+    'Click',
+    'Onderwerpen card home img',
   ],
-  // '.dropdown-nav__toggle .nav__list--open .subpage-list .link': [
-  //   'event',
-  //   'Dropdown navigatie',
-  //   'ACTION',
-  //   'Onderwerpen',
-  // ],
-  'body > header > div > nav.primary-navigation.primary-navigation__main > ul > li > ul > li > a':
-    ['event', 'Dropdown navigatie', 'ACTION', 'Onderwerpen'],
-  '.footer__logo': ['event', 'CATEGORY', 'ACTION', 'LABEL'],
-  '.search-form input[name="query"] ': ['event', 'CATEGORY', 'ACTION', 'LABEL'],
-  '.search-form button[type=submit]': ['event', 'CATEGORY', 'ACTION', 'LABEL'],
+  '#content .plugin__categories .card .link': [
+    'event',
+    'Homepage',
+    'Click',
+    'Onderwerpen card home link',
+  ],
+  // End of cards on Home
+  'body > header > div > nav.primary-navigation.primary-navigation--open.primary-navigation__main > ul > li > ul > li > a > span':
+    ['event', 'Onderwerpen', 'Click', 'Header onderwerp'],
+  '.footer__logo .link': ['event', 'CATEGORY', 'Click', 'Footer logo'],
+  '.footer__logo .link img': [
+    'event',
+    'CATEGORY',
+    'Click',
+    'Footer logo image',
+  ],
+  '#search-form-desktop > div.form__control > label > input': [
+    'event',
+    'Zoeken',
+    'keydown',
+    'LABEL',
+  ],
+  '.search-form button[type=submit]': ['event', 'Zoeken', 'submit', 'LABEL'],
   '.form#change-notifications a.button': [
     'event',
     'Communicatievoorkeuren',
-    'ACTION',
+    'Click',
     'LABEL',
   ],
   '.form#change-notifications button.button--primary': [
     'event',
     'Communicatievoorkeuren',
-    'ACTION',
+    'Click',
     'LABEL',
   ],
-  '.primary-navigation__authenticated .header__list-item .link': [
-    'event',
-    'CATEGORY',
-    'ACTION',
-    'LABEL',
-  ],
-  // perhaps not needed:
+  'body > header > div > nav.primary-navigation.primary-navigation--open.primary-navigation__authenticated > ul > li > ul > li:nth-child(1) > a > span.link__text':
+    ['event', 'CATEGORY', 'ACTION', 'LABEL'],
   'body > header > div > nav.primary-navigation.primary-navigation__authenticated > ul > li > ul > li:nth-child(1) > a':
     ['event', 'CATEGORY', 'ACTION', 'LABEL'],
   '.form#change-notifications input[type=checkbox]': [
