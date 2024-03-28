@@ -15,12 +15,16 @@ def update_user_from_klant(request):
     if not client:
         return
 
-    klant = client.retrieve_klant(**get_fetch_parameters(request))
+    fetch_params = get_fetch_parameters(request)
 
-    if not klant:
+    if klant := client.retrieve_klant(**fetch_params):
+        msg = "retrieved klant for user"
+    elif klant := client.create_klant(**fetch_params):
+        msg = "created klant (%s) for user" % klant.klantnummer
+    else:
         return
 
-    system_action("retrieved klant for user", content_object=user)
+    system_action(msg, content_object=user)
 
     update_data = {}
 
@@ -40,3 +44,5 @@ def update_user_from_klant(request):
             f"updated user from klant API with fields: {', '.join(sorted(update_data.keys()))}",
             content_object=user,
         )
+
+    return (user, klant)
