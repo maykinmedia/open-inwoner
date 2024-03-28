@@ -22,6 +22,10 @@
     padding: 0;
   }
 
+  & .list-item__caption {
+    line-height: var(--font-line-height-body-small);
+  }
+
   &--compact:first-child {
     padding-top: 0;
   }

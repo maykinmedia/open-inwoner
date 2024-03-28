@@ -8,6 +8,7 @@
 {% if appointments %}
     <p class="tabled__key">{% trans "Een overzicht van uw afspraken" %}</p>
 
+    <div class="card__grid">
     {% render_grid %}
         {% for appointment in appointments %}
             {% render_column start=forloop.counter_0|multiply:4 span=4 %}
@@ -36,6 +37,7 @@
             {% endrender_column %}
         {% endfor %}
     {% endrender_grid %}
+    </div>
 {% else %}
     <p class="tabled__key">{% trans "Geen afspraken beschikbaar" %}</p>
 {% endif %}
