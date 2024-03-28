@@ -104,6 +104,7 @@ def create_apphook_page(
     extension_args: dict = None,
     config_args: dict = None,
     parent_page=None,
+    publish=True,
 ):
     p = api.create_page(
         (title or hook_class.name),
@@ -129,7 +130,7 @@ def create_apphook_page(
     #     config_args["namespace"] = hook_class.app_name
     #     p.app_config = hook_class.app_config.objects.create(**config_args)
 
-    if not p.publish("nl"):
+    if publish and not p.publish("nl"):
         raise Exception("failed to publish page")
 
     return p
