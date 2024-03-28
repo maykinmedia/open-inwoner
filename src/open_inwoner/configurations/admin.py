@@ -235,6 +235,7 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "email_new_message",
                     "recipients_email_digest",
                     "contact_phonenumber",
+                    "email_verification_required",
                 )
             },
         ),

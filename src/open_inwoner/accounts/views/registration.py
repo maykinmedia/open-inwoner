@@ -2,11 +2,12 @@ from urllib.parse import unquote
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.forms import Form
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import NoReverseMatch, reverse
 from django.utils.translation import gettext as _
-from django.views.generic import UpdateView
+from django.views.generic import FormView, UpdateView
 
 from django_registration.backends.one_step.views import RegistrationView
 from furl import furl
@@ -18,6 +19,7 @@ from digid_eherkenning_oidc_generics.models import (
 from open_inwoner.utils.hash import generate_email_from_string
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
+from ...mail.verification import send_user_email_verification_mail
 from ...utils.url import get_next_url_from
 from ..forms import CustomRegistrationForm, NecessaryUserForm
 from ..models import Invite, User
@@ -179,3 +181,29 @@ class NecessaryFieldsUserView(LogMixin, LoginRequiredMixin, InviteMixin, UpdateV
             initial["email"] = ""
 
         return initial
+
+
+class EmailVerificationUserView(LogMixin, LoginRequiredMixin, FormView):
+    model = User
+    # dummy form
+    form_class = Form
+    template_name = "accounts/email_verification.html"
+
+    def page_title(self):
+        return _("E-mailadres bevestigen")
+
+    def form_valid(self, form):
+        user = self.request.user
+
+        send_user_email_verification_mail(user)
+
+        messages.add_message(
+            self.request, messages.SUCCESS, _("Bevestigings e-mail is verzonden")
+        )
+
+        self.log_user_action(user, _("user requested e-mail address verification"))
+
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return get_next_url_from(self.request, default=reverse("pages-root"))

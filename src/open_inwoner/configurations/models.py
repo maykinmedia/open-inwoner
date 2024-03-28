@@ -372,6 +372,11 @@ class SiteConfiguration(SingletonModel):
         blank=True,
         default=list,
     )
+    email_verification_required = models.BooleanField(
+        verbose_name=_("Email verification required"),
+        default=False,
+        help_text=_("Whether to require users to verify their email address"),
+    )
 
     # contact info
     contact_phonenumber = models.CharField(

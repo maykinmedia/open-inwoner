@@ -470,6 +470,28 @@ MAIL_EDITOR_CONF = {
             },
         ],
     },
+    "email_verification": {
+        "name": _("Email adress verification"),
+        "description": _("This email is used by users to verify their email address"),
+        "subject_default": _("Bevestig je email address voor {{ site_name }}"),
+        "body_default": _readfile("email_verification.html"),
+        "subject": [
+            {
+                "name": "site_name",
+                "description": _("Name of the site."),
+            },
+        ],
+        "body": [
+            {
+                "name": "verification_link",
+                "description": _("Link to confirm email address"),
+            },
+            {
+                "name": "site_name",
+                "description": _("Name of the site"),
+            },
+        ],
+    },
 }
 MAIL_EDITOR_BASE_CONTEXT = {"site_name": "Open Inwoner Platform"}
 MAIL_EDITOR_DYNAMIC_CONTEXT = "open_inwoner.mail.context.mail_context"
