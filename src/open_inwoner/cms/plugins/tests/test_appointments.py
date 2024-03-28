@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 import requests_mock
@@ -7,17 +7,18 @@ from pyquery import PyQuery as PQ
 from open_inwoner.cms.tests import cms_tools
 from open_inwoner.qmatic.tests.data import QmaticMockData
 
-from ..cms_plugins import MyAppointmentsPlugin
+from ..cms_plugins import UserAppointmentsPlugin
 
 
 @requests_mock.Mocker()
-class TestMyAppointmentsPlugin(TestCase):
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+class TestUserAppointmentsPlugin(TestCase):
     def test_plugin(self, m):
         data = QmaticMockData()
         data.setUpMocks(m)
 
         html, context = cms_tools.render_plugin(
-            MyAppointmentsPlugin, plugin_data={}, user=data.user
+            UserAppointmentsPlugin, plugin_data={}, user=data.user
         )
 
         appointments = context["appointments"]
@@ -34,9 +35,9 @@ class TestMyAppointmentsPlugin(TestCase):
         self.assertEqual(len(items), 2)
 
         aanvraag_paspoort_date = PQ(items.find("p.tabled__value")[0]).text()
-        aanvraag_paspoort_title = PQ(items.find(".appointments__heading")[0]).text()
+        aanvraag_paspoort_title = PQ(items.find(".plugin-card__heading")[0]).text()
         aanvraag_id_kaart_date = PQ(items.find("p.tabled__value")[1]).text()
-        aanvraag_id_kaart_title = PQ(items.find(".appointments__heading")[1]).text()
+        aanvraag_id_kaart_title = PQ(items.find(".plugin-card__heading")[1]).text()
 
         self.assertEqual(aanvraag_paspoort_date, "1 januari 2020 om 13:00 uur")
         self.assertEqual(aanvraag_paspoort_title, "Aanvraag paspoort")

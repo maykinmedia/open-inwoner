@@ -47,7 +47,7 @@ class TestUserFeedPlugin(TestCase):
         title = items.find("p.tabled__value").text()
         self.assertEqual(title, "Test message")
 
-        message = items.find(".userfeed__heading").text()
+        message = items.find(".plugin-card__heading").text()
         self.assertEqual(message, "Hello")
 
         action_url = items[0].attrib["href"]

@@ -5,15 +5,15 @@ from django.utils.translation import gettext as _
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 
-from open_inwoner.cms.plugins.models.appointments import MyAppointments
+from open_inwoner.cms.plugins.models.appointments import UserAppointments
 from open_inwoner.qmatic.client import NoServiceConfigured, QmaticClient
 
 logger = logging.getLogger(__name__)
 
 
 @plugin_pool.register_plugin
-class MyAppointmentsPlugin(CMSPluginBase):
-    model = MyAppointments
+class UserAppointmentsPlugin(CMSPluginBase):
+    model = UserAppointments
     module = _("General")
     name = _("My appointments")
     render_template = "cms/plugins/appointments/appointments.html"

@@ -5,7 +5,7 @@ from unittest.mock import patch
 from django.conf import settings
 from django.template.defaultfilters import date as django_date
 from django.test import override_settings
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
 
 import requests_mock
@@ -1146,8 +1146,8 @@ class NewsletterSubscriptionTests(ClearCachesMixin, WebTest):
 @override_settings(
     ROOT_URLCONF="open_inwoner.cms.tests.urls", MIDDLEWARE=PATCHED_MIDDLEWARE
 )
-class MyAppointmentsTests(ClearCachesMixin, WebTest):
-    appointments_url = reverse("profile:appointments")
+class UserAppointmentsTests(ClearCachesMixin, WebTest):
+    appointments_url = reverse_lazy("profile:appointments")
 
     def setUp(self):
         super().setUp()

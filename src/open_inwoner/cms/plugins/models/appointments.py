@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from cms.models import CMSPlugin
 
 
-class MyAppointments(CMSPlugin):
+class UserAppointments(CMSPlugin):
     title = models.CharField(
         _("Title"),
         max_length=250,

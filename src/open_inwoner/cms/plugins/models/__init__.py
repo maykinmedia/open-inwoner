@@ -1,9 +1,9 @@
-from .appointments import MyAppointments
+from .appointments import UserAppointments
 from .userfeed import UserFeed
 from .videoplayer import VideoPlayer
 
 __all__ = [
-    "MyAppointments",
+    "UserAppointments",
     "UserFeed",
     "VideoPlayer",
 ]
