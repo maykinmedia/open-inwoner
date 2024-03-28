@@ -21,7 +21,7 @@ class EventTracker {
   }
 
   trackEvents() {
-    // Event listeners are added directly to document.body
+    // Event listeners added directly to document.body
     if (typeof _sz === 'undefined') {
       console.warn(
         '_sz object not found. Tracking events will not be executed.'
@@ -46,6 +46,12 @@ class EventTracker {
   handleEvent(eventType, event) {
     // Iterates over the keys of selectorMap internally when events occur.
     const target = event.target
+    const actionMap = this.selectorMap[eventType]
+
+    if (!actionMap) {
+      return
+      // No actions mapped for this event type
+    }
 
     if (eventType === 'click') {
       this.handleClickEvent(target)
@@ -57,9 +63,15 @@ class EventTracker {
   }
 
   handleClickEvent(target) {
-    Object.keys(this.selectorMap).forEach((selector) => {
+    const actionMap = this.selectorMap['click']
+
+    if (!actionMap) {
+      return // No actions mapped for click event
+    }
+
+    Object.keys(actionMap).forEach((selector) => {
       if (target.matches(selector)) {
-        const eventData = this.selectorMap[selector]
+        const eventData = actionMap[selector]
         eventData.push(this.extractEventData(target))
         _sz.push(eventData)
       }
@@ -67,9 +79,15 @@ class EventTracker {
   }
 
   handleChangeEvent(target) {
-    Object.keys(this.selectorMap).forEach((selector) => {
+    const actionMap = this.selectorMap['change']
+
+    if (!actionMap) {
+      return // No actions mapped for change event
+    }
+
+    Object.keys(actionMap).forEach((selector) => {
       if (target.matches(selector)) {
-        const eventData = this.selectorMap[selector]
+        const eventData = actionMap[selector]
         eventData.push(this.extractEventData(target))
         _sz.push(eventData)
       }
@@ -77,9 +95,15 @@ class EventTracker {
   }
 
   handleEnterKeyEvent(target) {
-    Object.keys(this.selectorMap).forEach((selector) => {
+    const actionMap = this.selectorMap['keydown']
+
+    if (!actionMap) {
+      return // No actions mapped for keydown event
+    }
+
+    Object.keys(actionMap).forEach((selector) => {
       if (target.matches(selector)) {
-        const eventData = this.selectorMap[selector]
+        const eventData = actionMap[selector]
         eventData.push(this.extractEventData(target))
         _sz.push(eventData)
       }
@@ -103,90 +127,164 @@ class EventTracker {
   }
 }
 
-// Add new elements for tracking here
+/* Add new elements for tracking here.
+  Template: "_sz.push(['event', 'CATEGORY', 'ACTION', 'LABEL']);"
+  Note: The values in the array are strings that just add labels to the Siteimprove Dashboard.
+  So 'change' or 'click' are not functional within.
+ */
 const selectorMap = {
-  '.form#profile-edit input[name="display_name"]': [
-    'change',
-    'Contactgegevens',
-    'change',
-    'Roepnaam',
-  ],
-  '.form#profile-edit input[name="email"]': [
-    'change',
-    'Contactgegevens',
-    'change',
-    'email',
-  ],
-  '.form#profile-edit input[name="phonenumber"]': [
-    'change',
-    'Contactgegevens',
-    'change',
-    'Telefoonnummer',
-  ],
-  '.form#profile-edit button[type="submit"]': [
-    'click',
-    'Contactgegevens',
-    'Submit',
-    'Profiel bewerkt',
-  ],
-  '.form#profile-edit a.button--textless': [
-    'click',
-    'Contactgegevens',
-    'Click',
-    'No save',
-  ],
-  // Card on Home page 4 columns
-  '#content .plugin__categories .card img': [
-    'event',
-    'Homepage',
-    'Click',
-    'Onderwerpen card home img',
-  ],
-  '#content .plugin__categories .card .link': [
-    'event',
-    'Homepage',
-    'Click',
-    'Onderwerpen card home link',
-  ],
-  // End of cards on Home
-  'body > header > div > nav.primary-navigation.primary-navigation--open.primary-navigation__main > ul > li > ul > li > a > span':
-    ['event', 'Onderwerpen', 'Click', 'Header onderwerp'],
-  '.footer__logo .link': ['event', 'CATEGORY', 'Click', 'Footer logo'],
-  '.footer__logo .link img': [
-    'event',
-    'CATEGORY',
-    'Click',
-    'Footer logo image',
-  ],
-  '#search-form-desktop > div.form__control > label > input': [
-    'event',
-    'Zoeken',
-    'keydown',
-    'LABEL',
-  ],
-  '.search-form button[type=submit]': ['event', 'Zoeken', 'submit', 'LABEL'],
-  '.form#change-notifications a.button': [
-    'event',
-    'Communicatievoorkeuren',
-    'Click',
-    'LABEL',
-  ],
-  '.form#change-notifications button.button--primary': [
-    'event',
-    'Communicatievoorkeuren',
-    'Click',
-    'LABEL',
-  ],
-  'body > header > div > nav.primary-navigation.primary-navigation--open.primary-navigation__authenticated > ul > li > ul > li:nth-child(1) > a > span.link__text':
-    ['event', 'CATEGORY', 'ACTION', 'LABEL'],
-  'body > header > div > nav.primary-navigation.primary-navigation__authenticated > ul > li > ul > li:nth-child(1) > a':
-    ['event', 'CATEGORY', 'ACTION', 'LABEL'],
-  '.form#change-notifications input[type=checkbox]': [
-    'event',
-    'CATEGORY',
-    'ACTION',
-    'LABEL',
-  ],
+  click: {
+    '.form#profile-edit button[type="submit"]': [
+      'change',
+      'Contactgegevens',
+      'Change',
+      'Save (Profiel bewerkt)',
+    ],
+    '.form#profile-edit a.button--textless': [
+      'click',
+      'Contactgegevens',
+      'Click',
+      'No Save (terug naar mijn profiel)',
+    ],
+    // Category cards on Home page
+    '#content .plugin__categories .card img': [
+      'click',
+      'Homepage',
+      'Click',
+      'Onderwerpen card image',
+    ],
+    '#content .plugin__categories .card .link': [
+      'click',
+      'Homepage',
+      'Click',
+      'Onderwerpen card tekstlink',
+    ],
+    // End of cards on Home
+    'body > header > div > nav.primary-navigation.primary-navigation--open.primary-navigation__main > ul > li > ul > li > a > span':
+      ['click', 'Dropdown navigatie', 'Click', 'Onderwerpen'],
+    '.footer__logo .link img': ['click', 'Footer', 'Click', 'Footer logo'],
+    'body > header > div > div.header__submenu > nav.primary-navigation > ul > li.primary-navigation__list-item.dropdown-nav__toggle.nav__list--open > ul > li > a':
+      ['click', 'Dropdown navigatie mobiel', 'Click', 'Onderwerpen'],
+    'body > header > div > div.header__submenu > nav.primary-navigation > ul > li.primary-navigation__list-item.dropdown-nav__toggle.nav__list--open > ul > li > a > span':
+      ['click', 'Dropdown navigatie mobiel', 'Click', 'Onderwerpen'],
+    // All search submits
+    '#search-form-mobile-closed > div.form__actions > button': [
+      'click',
+      'Header Zoeken',
+      'Icon click',
+      'Icon click',
+    ],
+    '#search-form-mobile-closed > div.form__actions > button > span': [
+      'click',
+      'Header mobiel Zoeken',
+      'Icon click',
+      'Icon click',
+    ],
+    '#search-form-desktop > div.form__actions > button': [
+      'click',
+      'Header desktop Zoeken',
+      'Icon click',
+      'Icon click',
+    ],
+    '#search-form-desktop > div.form__actions > button > span': [
+      'click',
+      'Header desktop Zoeken',
+      'Icon click',
+      'Icon click',
+    ],
+    '#search-form-mobile-open > div.form__actions > button': [
+      'click',
+      'Header mobiel-open Zoeken',
+      'Icon click',
+      'Icon click',
+    ],
+    '#search-form-mobile-open > div.form__actions > button > span': [
+      'click',
+      'Header mobiel-open Zoeken',
+      'Icon click',
+      'Icon click',
+    ],
+    // End search submits
+    // Start Communicatievoorkeuren
+    '.form#change-notifications #id_messages_notifications:checked': [
+      'change',
+      'Communicatievoorkeuren',
+      'check',
+      'Enable',
+    ],
+    '.form#change-notifications #id_plans_notifications:checked': [
+      'click',
+      'Communicatievoorkeuren',
+      'check',
+      'Enable',
+    ],
+    '.form#change-notifications a.button[title="Terug"]': [
+      'click',
+      'Communicatievoorkeuren',
+      'Click',
+      'LABEL',
+    ],
+    '.form#change-notifications button.button--primary': [
+      'click',
+      'Communicatievoorkeuren',
+      'Click',
+      'LABEL',
+    ],
+    // End Communicatievoorkeuren
+    // Header dropdown profiel
+    'body > header > div > nav.primary-navigation.primary-navigation--open.primary-navigation__authenticated > ul > li > ul > li:nth-child(1) > a > span.link__text':
+      ['click', 'Mijn Profiel', 'Click mijn Profiel', 'Open mijn profiel '],
+    'body > header > div > nav.primary-navigation.primary-navigation__authenticated > ul > li > ul > li:nth-child(1) > a':
+      ['click', 'Mijn Profiel', 'Click mijn Profiel', 'Open mijn profiel '],
+    'body > header > div > nav.primary-navigation.primary-navigation__authenticated > ul > li > ul > li:nth-child(1) > a > span.material-icons-outlined':
+      ['click', 'Mijn Profiel', 'Click mijn Profiel', 'Open mijn profiel '],
+    // End header dropdown profiel
+  },
+  change: {
+    '.form#profile-edit input[name="email"]': [
+      'change',
+      'Contactgegevens',
+      'change',
+      'email',
+    ],
+    '.form#profile-edit input[name="phonenumber"]': [
+      'change',
+      'Contactgegevens',
+      'change',
+      'Telefoonnummer',
+    ],
+    '.form#profile-edit input[name="display_name"]': [
+      'change',
+      'display_name',
+      'display_name',
+      'display_name form',
+    ],
+    '.form#change-notifications #id_messages_notifications': [
+      'change',
+      'Communicatievoorkeuren',
+      'uncheck',
+      'Disable',
+    ],
+    '.form#change-notifications #id_plans_notifications': [
+      'change',
+      'Communicatievoorkeuren',
+      'uncheck',
+      'Disable',
+    ],
+  },
+  keydown: {
+    '#search-form-desktop .input': [
+      'keydown',
+      'Search desktop eventje',
+      'Enter Key Pressed',
+    ],
+    '#search-form-desktop > div.form__control > label > input': [
+      'event',
+      'Zoeken',
+      'keydown',
+      'LABEL',
+    ],
+  },
 }
 
 new EventTracker(selectorMap)
