@@ -31,6 +31,7 @@ from ..models import User
 from .factories import (
     DigidUserFactory,
     InviteFactory,
+    NewDigidUserFactory,
     UserFactory,
     eHerkenningUserFactory,
 )
@@ -1437,11 +1438,7 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
         self.assertContains(response, ' href="http://foo.bar/" ')
 
     def test_any_page_for_digid_user_redirect_to_necessary_fields(self):
-        user = UserFactory(
-            first_name="",
-            last_name="",
-            login_type=LoginTypeChoices.digid,
-        )
+        user = NewDigidUserFactory()
         urls = [
             reverse("pages-root"),
             reverse("products:category_list"),
@@ -1777,7 +1774,7 @@ class TestPasswordResetFunctionality(WebTest):
         sent_mail = mail.outbox[0]
         body = sent_mail.body
         self.assertEqual(
-            _("Password reset for {domain}").format(domain=current_site.domain),
+            _("Password reset for {domain}").format(domain=current_site.name),
             sent_mail.subject,
         )
         self.assertIn(
