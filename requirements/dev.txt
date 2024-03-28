@@ -235,6 +235,7 @@ django==4.2.11
     #   django-relativedelta
     #   django-sekizai
     #   django-sendfile2
+    #   django-setup-configuration
     #   django-silk
     #   django-simple-certmanager
     #   django-sniplates
@@ -447,6 +448,10 @@ django-sessionprofile==1.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-digid-eherkenning
+django-setup-configuration==0.1.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 django-silk==5.1.0
     # via -r requirements/dev.in
 django-simple-certmanager==1.4.1
