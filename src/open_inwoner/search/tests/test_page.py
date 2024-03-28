@@ -198,8 +198,12 @@ class SearchPagePlaywrightTests(
         )
         self.tag1 = TagFactory.create(name="Tag 1")
         self.tag2 = TagFactory.create(name="Tag 2")
-        self.org1 = OrganizationFactory.create(name="Organization 1")
-        self.org2 = OrganizationFactory.create(name="Organization 2")
+        self.org1 = OrganizationFactory.create(
+            name="Organization 1", type__name="organization_type1"
+        )
+        self.org2 = OrganizationFactory.create(
+            name="Organization 2", type__name="organization_type2"
+        )
         self.category1 = CategoryFactory.create(name="Category 1")
         self.category2 = CategoryFactory.create(name="Category 2")
 
