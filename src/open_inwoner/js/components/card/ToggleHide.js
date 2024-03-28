@@ -10,15 +10,9 @@ export class ToggleHide {
     this.button.innerHTML = `${this.icon.outerHTML} ${this.button.dataset.labelReveal} (${this.button.dataset.labelNumElems})`
 
     const toggleCards = document.querySelectorAll(ToggleHide.selectorCard)
-
-    // Hide cards or the toggle button/link (if there are no cards to be hidden)
-    if (toggleCards.length === 0) {
-      this.button.classList.add('hidden')
-    } else {
-      toggleCards.forEach((element) => {
-        element.classList.add('hidden')
-      })
-    }
+    toggleCards.forEach((element) => {
+      element.classList.add('hidden')
+    })
   }
 
   toggleHide(event) {
