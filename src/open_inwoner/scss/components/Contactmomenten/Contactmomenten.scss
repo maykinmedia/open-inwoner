@@ -74,46 +74,22 @@
 }
 
 .contactmoment {
-  &__details {
-    // Set table width for word-break
-    table {
-      margin-top: 0;
-      overflow-x: auto;
-      table-layout: fixed;
-      width: 100%;
-      @media (min-width: 768px) {
-        width: var(--mobile-ms-width);
-      }
-    }
-    table th {
-      width: 100px;
-      white-space: nowrap;
-    }
-    table td {
-      width: 300px;
-      overflow: hidden;
-      word-break: break-word;
-      white-space: normal;
+  &__heading {
+    font-size: var(--font-size-body-large);
+  }
 
-      &.table__item--status {
-        .table__item--wrapper {
-          display: flex;
-          justify-content: space-between;
-        }
-      }
+  &__heading:first-of-type {
+    margin-top: 0;
+  }
 
-      .case-detail__link {
-        color: var(--color-primary);
-        text-decoration: none;
+  &__text {
+    padding-bottom: var(--spacing-large);
+    line-height: var(--font-line-height-body);
+    color: var(--font-color-body);
+  }
 
-        &::after {
-          font-family: 'Material Icons';
-          content: 'arrow_forward';
-          font-size: 1em;
-          vertical-align: middle;
-        }
-      }
-    }
+  &__actions {
+    font-weight: bold;
   }
 }
 
