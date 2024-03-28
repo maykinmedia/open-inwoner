@@ -349,7 +349,7 @@ class NewsletterSubscribeView(
         return HttpResponseRedirect(self.get_success_url())
 
 
-class MyAppointmentsView(
+class UserAppointmentsView(
     LogMixin, LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, TemplateView
 ):
     template_name = "pages/profile/appointments.html"
