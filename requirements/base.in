@@ -50,6 +50,7 @@ django-mailer
 django-image-cropping
 django-log-outgoing-requests
 xsdata
+django-setup-configuration
 
 # django cms
 django-cms

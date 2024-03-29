@@ -201,6 +201,7 @@ INSTALLED_APPS = [
     "mailer",
     "log_outgoing_requests",
     "formtools",
+    "django_setup_configuration",
     # Project applications.
     "open_inwoner.components",
     "open_inwoner.kvk",
@@ -929,6 +930,10 @@ CKEDITOR_CONFIGS = {
     }
 }
 
+#
+# django-setup-configuration
+#
+from .app.setup_configuration import *  # noqa
 
 #
 # Project specific settings
