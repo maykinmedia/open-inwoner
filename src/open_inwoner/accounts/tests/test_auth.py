@@ -1423,6 +1423,17 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
     def setUpTestData(cls):
         cms_tools.create_homepage()
 
+    def setUp(self):
+        super().setUp()
+
+        # TODO remove temporary fix after rebasing on https://github.com/maykinmedia/open-inwoner/pull/1125
+        patcher = patch(
+            "open_inwoner.accounts.middleware.profile_page_is_published",
+            return_value=True,
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
     def test_page_show_config_text(self):
         config = SiteConfiguration.get_solo()
         config.registration_text = "Hello registration text http://foo.bar/"

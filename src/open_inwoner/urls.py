@@ -95,6 +95,7 @@ urlpatterns = [
         AddPhoneNumberWizardView.as_view(),
         name="add_phone_number",
     ),
+    path("accounts/mail/", include("open_inwoner.mail.urls")),
     path("accounts/", include("django_registration.backends.one_step.urls")),
     path("accounts/", include("django.contrib.auth.urls")),
     path("api/", include("open_inwoner.api.urls", namespace="api")),

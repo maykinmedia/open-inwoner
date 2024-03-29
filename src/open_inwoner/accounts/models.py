@@ -85,6 +85,15 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(
         verbose_name=_("Email address"),
     )
+    verified_email = models.EmailField(
+        verbose_name=_("Verified email"),
+        blank=True,
+        default="",
+    )
+
+    def has_verified_email(self):
+        return self.verified_email != "" and self.email == self.verified_email
+
     phonenumber = models.CharField(
         verbose_name=_("Phonenumber"),
         blank=True,

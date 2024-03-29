@@ -90,7 +90,10 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
         "first_name",
     )
     fieldsets = (
-        (None, {"fields": ("uuid", "email", "password", "login_type")}),
+        (
+            None,
+            {"fields": ("uuid", "email", "verified_email", "password", "login_type")},
+        ),
         (
             _("Personal info"),
             {
