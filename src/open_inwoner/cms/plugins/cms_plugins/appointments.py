@@ -21,6 +21,9 @@ class UserAppointmentsPlugin(CMSPluginBase):
     def render(self, context, instance, placeholder):
         request = context["request"]
         # TODO email should be verified
+        if not request.user.is_authenticated:
+            return context
+
         try:
             client = QmaticClient()
         except NoServiceConfigured:
