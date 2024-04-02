@@ -140,7 +140,7 @@ class OpenZaakConfig(SingletonModel):
             "If enabled, Zaken for eHerkenning users are fetched using the company RSIN (Open Zaak). "
             "If not enabled, Zaken are fetched using the KvK number (eSuite)."
         ),
-        default=True,
+        default=False,
     )
 
     title_text = models.TextField(

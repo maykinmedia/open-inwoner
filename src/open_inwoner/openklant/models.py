@@ -81,7 +81,7 @@ class OpenKlantConfig(SingletonModel):
             "users are fetched using the company RSIN (Open Klant). "
             "If not enabled, these resources are fetched using the KvK number."
         ),
-        default=True,
+        default=False,
     )
 
     register_api_required_fields = (

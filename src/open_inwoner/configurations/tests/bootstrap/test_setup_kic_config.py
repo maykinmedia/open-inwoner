@@ -30,7 +30,7 @@ CONTACTMOMENTEN_API_ROOT = "https://openklant.local/contactmomenten/api/v1/"
     KIC_CONFIG_REGISTER_CHANNEL="email",
     KIC_CONFIG_REGISTER_TYPE="bericht",
     KIC_CONFIG_REGISTER_EMPLOYEE_ID="1234",
-    KIC_CONFIG_USE_RSIN_FOR_INNNNPID_QUERY_PARAMETER=False,
+    KIC_CONFIG_USE_RSIN_FOR_INNNNPID_QUERY_PARAMETER=True,
 )
 class KICConfigurationTests(TestCase):
     def test_configure(self):
@@ -57,7 +57,7 @@ class KICConfigurationTests(TestCase):
         self.assertEqual(config.register_channel, "email")
         self.assertEqual(config.register_type, "bericht")
         self.assertEqual(config.register_employee_id, "1234")
-        self.assertEqual(config.use_rsin_for_innNnpId_query_parameter, False)
+        self.assertEqual(config.use_rsin_for_innNnpId_query_parameter, True)
 
     @override_settings(
         OIP_ORGANIZATION=None,
@@ -93,7 +93,7 @@ class KICConfigurationTests(TestCase):
         self.assertEqual(config.register_channel, "contactformulier")
         self.assertEqual(config.register_type, "Melding")
         self.assertEqual(config.register_employee_id, "")
-        self.assertEqual(config.use_rsin_for_innNnpId_query_parameter, True)
+        self.assertEqual(config.use_rsin_for_innNnpId_query_parameter, False)
 
     @requests_mock.Mocker()
     def test_configuration_check_ok(self, m):

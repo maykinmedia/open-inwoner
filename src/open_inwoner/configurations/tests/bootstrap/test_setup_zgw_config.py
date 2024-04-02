@@ -47,7 +47,7 @@ FORMULIEREN_API_ROOT = "https://esuite.local.net/formulieren-provider/api/v1/"
     ZGW_CONFIG_ENABLE_CATEGORIES_FILTERING_WITH_ZAKEN=True,
     ZGW_CONFIG_SKIP_NOTIFICATION_STATUSTYPE_INFORMEREN=True,
     ZGW_CONFIG_REFORMAT_ESUITE_ZAAK_IDENTIFICATIE=True,
-    ZGW_CONFIG_FETCH_EHERKENNING_ZAKEN_WITH_RSIN=False,
+    ZGW_CONFIG_FETCH_EHERKENNING_ZAKEN_WITH_RSIN=True,
 )
 class ZGWConfigurationTests(TestCase):
     def test_configure(self):
@@ -92,7 +92,7 @@ class ZGWConfigurationTests(TestCase):
         self.assertEqual(config.enable_categories_filtering_with_zaken, True)
         self.assertEqual(config.skip_notification_statustype_informeren, True)
         self.assertEqual(config.reformat_esuite_zaak_identificatie, True)
-        self.assertEqual(config.fetch_eherkenning_zaken_with_rsin, False)
+        self.assertEqual(config.fetch_eherkenning_zaken_with_rsin, True)
 
     @override_settings(
         OIP_ORGANIZATION=None,
@@ -152,7 +152,7 @@ class ZGWConfigurationTests(TestCase):
         self.assertEqual(config.enable_categories_filtering_with_zaken, False)
         self.assertEqual(config.skip_notification_statustype_informeren, False)
         self.assertEqual(config.reformat_esuite_zaak_identificatie, False)
-        self.assertEqual(config.fetch_eherkenning_zaken_with_rsin, True)
+        self.assertEqual(config.fetch_eherkenning_zaken_with_rsin, False)
 
     @requests_mock.Mocker()
     def test_configuration_check_ok(self, m):
