@@ -6,6 +6,7 @@ from django.utils.module_loading import import_string
 from cms import api
 from cms.api import add_plugin
 from cms.app_base import CMSApp
+from cms.apphook_pool import apphook_pool
 from cms.models import Placeholder
 from cms.plugin_rendering import ContentRenderer
 
@@ -121,14 +122,13 @@ def create_apphook_page(
         extension_args["extended_object"] = p
         CommonExtension.objects.create(**extension_args)
 
-    # TODO find out why this doesn't work
     # create app_config
-    # if hook_class.app_config:
-    #     # attach it to the page for convenience
-    #     if config_args is None:
-    #         config_args = dict()
-    #     config_args["namespace"] = hook_class.app_name
-    #     p.app_config = hook_class.app_config.objects.create(**config_args)
+    if app_config := apphook_pool.get_apphook(hook_class.__name__).app_config:
+        # attach it to the page for convenience
+        if config_args is None:
+            config_args = dict()
+        config_args["namespace"] = hook_class.app_name
+        p.app_config = app_config.objects.get_or_create(**config_args)
 
     if publish and not p.publish("nl"):
         raise Exception("failed to publish page")
