@@ -27,6 +27,7 @@ from zgw_consumers.constants import APITypes
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory, eHerkenningUserFactory
 from open_inwoner.cms.cases.views.status import InnerCaseDetailView, SimpleFile
+from open_inwoner.openklant.api_models import ObjectContactMoment
 from open_inwoner.openklant.clients import ContactmomentenClient
 from open_inwoner.openklant.constants import Status as ContactMomentStatus
 from open_inwoner.openklant.models import OpenKlantConfig
@@ -2328,3 +2329,20 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             status_code=302,
             target_status_code=200,
         )
+
+    @patch.object(
+        ContactmomentenClient,
+        "retrieve_objectcontactmomenten_for_zaak",
+        autospec=True,
+    )
+    def test_objectcontactmoment_with_contactmoment_null(self, m, cm_client_mock):
+        self.maxDiff = None
+        self._setUpMocks(m)
+
+        ocm = factory(ObjectContactMoment, self.objectcontactmoment_eherkenning)
+        ocm.contactmoment = None
+        cm_client_mock.return_value = [ocm]
+
+        response = self.app.get(self.case_detail_url, user=self.eherkenning_user)
+
+        self.assertEqual(response.status_code, 200)
