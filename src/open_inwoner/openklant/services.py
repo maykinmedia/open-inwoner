@@ -20,7 +20,7 @@ def update_user_from_klant(request):
     if klant := client.retrieve_klant(**fetch_params):
         msg = "retrieved klant for user"
     elif klant := client.create_klant(**fetch_params):
-        msg = "created klant (%s) for user" % klant.klantnummer
+        msg = f"created klant ({klant.klantnummer}) for user"
     else:
         return
 

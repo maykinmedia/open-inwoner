@@ -147,24 +147,34 @@ class UpdateUserFromLoginSignalAPITestCase(
         self.assertTimelineLog("updated user from klant API with fields: phonenumber")
 
     def test_create_klant_for_digid_user(self, m):
-        m.get(
-            f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn=123456789",
-            json={"count": 0, "results": []},
-        )
-        m.post(f"{KLANTEN_ROOT}klanten", json=self.klant_bsn)
+        with requests_mock.mock(case_sensitive=True) as m:
+            m.get(
+                f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn=123456789",
+                json={"count": 0, "results": []},
+            )
+            m.post(f"{KLANTEN_ROOT}klanten", json=self.klant_bsn)
 
-        user = UserFactory(
-            login_type=LoginTypeChoices.digid,
-            bsn="123456789",
-        )
+            user = UserFactory(
+                login_type=LoginTypeChoices.digid,
+                bsn="123456789",
+            )
 
-        request = RequestFactory().get("/dummy")
-        request.user = user
-        user_logged_in.send(User, user=user, request=request)
+            request = RequestFactory().get("/dummy")
+            request.user = user
+            user_logged_in.send(User, user=user, request=request)
 
-        self.assertTimelineLog(
-            f"created klant ({self.klant_bsn['klantnummer']}) for user"
-        )
+            self.assertTimelineLog(
+                f"created klant ({self.klant_bsn['klantnummer']}) for user"
+            )
+
+            requests = m.request_history
+            self.assertEqual(len(requests), 2)
+            self.assertEqual(
+                requests[0].query, f"subjectNatuurlijkPersoon__inpBsn={user.bsn}"
+            )
+            self.assertEqual(
+                requests[1].json(), {"subjectIdentificatie": {"inpBsn": f"{user.bsn}"}}
+            )
 
     def test_create_klant_for_eherkenning_user(self, m):
         klant_eherkenning = generate_oas_component_cached(
@@ -179,21 +189,33 @@ class UpdateUserFromLoginSignalAPITestCase(
             emailadres="new@example.com",
             telefoonnummer="0612345678",
         )
-        m.get(
-            f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId=87654321",
-            json={"count": 0, "results": []},
-        )
-        m.post(f"{KLANTEN_ROOT}klanten", json=klant_eherkenning)
 
-        user = UserFactory(
-            login_type=LoginTypeChoices.eherkenning,
-            kvk="87654321",
-        )
+        with requests_mock.mock(case_sensitive=True) as m:
+            m.get(
+                f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId=87654321",
+                json={"count": 0, "results": []},
+            )
+            m.post(f"{KLANTEN_ROOT}klanten", json=klant_eherkenning)
 
-        request = RequestFactory().get("/dummy")
-        request.user = user
-        user_logged_in.send(User, user=user, request=request)
+            user = UserFactory(
+                login_type=LoginTypeChoices.eherkenning,
+                kvk="87654321",
+            )
 
-        self.assertTimelineLog(
-            f"created klant ({klant_eherkenning['klantnummer']}) for user"
-        )
+            request = RequestFactory().get("/dummy")
+            request.user = user
+            user_logged_in.send(User, user=user, request=request)
+
+            self.assertTimelineLog(
+                f"created klant ({klant_eherkenning['klantnummer']}) for user"
+            )
+
+            requests = m.request_history
+            self.assertEqual(len(requests), 2)
+            self.assertEqual(
+                requests[0].query, f"subjectNietNatuurlijkPersoon__innNnpId={user.kvk}"
+            )
+            self.assertEqual(
+                requests[1].json(),
+                {"subjectIdentificatie": {"innNnpId": f"{user.kvk}"}},
+            )
