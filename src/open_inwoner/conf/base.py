@@ -563,6 +563,7 @@ CMS_PLACEHOLDER_CONF = {
             "ProductFinderPlugin",
             "ProductLocationPlugin",
             "UserFeedPlugin",
+            "UserAppointmentsPlugin",
         ],
         "text_only_plugins": ["LinkPlugin"],
         "name": _("Content"),

@@ -5,15 +5,13 @@ from unittest.mock import patch
 from django.conf import settings
 from django.template.defaultfilters import date as django_date
 from django.test import override_settings
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
 
 import requests_mock
 from django_webtest import WebTest
 from pyquery import PyQuery as PQ
 from webtest import Upload
-from zgw_consumers.constants import APITypes
-from zgw_consumers.test.factories import ServiceFactory
 
 from open_inwoner.accounts.choices import StatusChoices
 from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
@@ -23,8 +21,7 @@ from open_inwoner.laposta.tests.factories import LapostaListFactory, Subscriptio
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.pdc.tests.factories import CategoryFactory
 from open_inwoner.plans.tests.factories import PlanFactory
-from open_inwoner.qmatic.models import QmaticConfig
-from open_inwoner.qmatic.tests.factories import AppointmentFactory, BranchDetailFactory
+from open_inwoner.qmatic.tests.data import QmaticMockData
 from open_inwoner.utils.logentry import LOG_ACTIONS
 from open_inwoner.utils.test import ClearCachesMixin
 from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin, create_image_bytes
@@ -1122,103 +1119,46 @@ class NewsletterSubscriptionTests(ClearCachesMixin, WebTest):
 @override_settings(
     ROOT_URLCONF="open_inwoner.cms.tests.urls", MIDDLEWARE=PATCHED_MIDDLEWARE
 )
-class MyAppointmentsTests(ClearCachesMixin, WebTest):
+class UserAppointmentsTests(ClearCachesMixin, WebTest):
+    appointments_url = reverse_lazy("profile:appointments")
+
     def setUp(self):
         super().setUp()
 
-        self.appointments_url = reverse("profile:appointments")
-        self.user = DigidUserFactory()
-
-        self.config = QmaticConfig.get_solo()
-        self.config.booking_base_url = "https://qmatic.local/"
-        self.api_root = "https://qmatic.local/api/"
-        self.service = ServiceFactory.create(
-            api_root=self.api_root, api_type=APITypes.orc
-        )
-        self.config.service = self.service
-        self.config.save()
-
-        self.appointment_passport = AppointmentFactory.build(
-            title="Aanvraag paspoort",
-            start="2020-01-01T12:00:00+00:00",
-            notes="foo",
-            branch=BranchDetailFactory.build(
-                name="Hoofdkantoor",
-                timeZone="Europe/Amsterdam",
-                addressCity="Amsterdam",
-                addressLine1="Hoofdkantoor",
-                addressLine2="Dam 1",
-                addressZip="1234 ZZ",
-            ),
-        )
-        self.appointment_idcard = AppointmentFactory.build(
-            title="Aanvraag ID kaart",
-            start="2020-03-06T16:30:00+00:00",
-            notes="bar",
-            branch=BranchDetailFactory.build(
-                name="Hoofdkantoor",
-                timeZone="America/New_York",
-                addressCity="New York",
-                addressLine1="Hoofdkantoor",
-                addressLine2="Wall Street 1",
-                addressZip="1111 AA",
-            ),
-        )
-
-    def setUpMocks(self, m):
-        data = {
-            "notifications": [],
-            "meta": {
-                "start": "",
-                "end": "",
-                "totalResults": 1,
-                "offset": None,
-                "limit": None,
-                "fields": "",
-                "arguments": [],
-            },
-            "appointmentList": [
-                self.appointment_passport.dict(),
-                self.appointment_idcard.dict(),
-            ],
-        }
-        m.get(
-            f"{self.api_root}v1/customers/externalId/{self.user.email}/appointments",
-            json=data,
-        )
+        self.data = QmaticMockData()
 
     def test_do_not_render_list_if_config_is_missing(self, m):
-        self.config.service = None
-        self.config.save()
+        self.data.config.service = None
+        self.data.config.save()
 
-        response = self.app.get(self.appointments_url, user=self.user)
+        response = self.app.get(self.appointments_url, user=self.data.user)
 
         self.assertIn(_("Geen afspraken beschikbaar"), response.text)
 
     def test_do_not_render_list_if_no_appointments_are_found(self, m):
         m.get(
-            f"{self.api_root}v1/customers/externalId/{self.user.email}/appointments",
+            f"{self.data.api_root}v1/customers/externalId/{self.data.user.email}/appointments",
             status_code=404,
         )
 
-        response = self.app.get(self.appointments_url, user=self.user)
+        response = self.app.get(self.appointments_url, user=self.data.user)
 
         self.assertIn(_("Geen afspraken beschikbaar"), response.text)
 
     def test_do_not_render_list_if_validation_error(self, m):
         m.get(
-            f"{self.api_root}v1/customers/externalId/{self.user.email}/appointments",
+            f"{self.data.api_root}v1/customers/externalId/{self.data.user.email}/appointments",
             json={"appointmentList": [{"invalid": "data"}]},
         )
 
-        response = self.app.get(self.appointments_url, user=self.user)
+        response = self.app.get(self.appointments_url, user=self.data.user)
 
         self.assertIn(_("Geen afspraken beschikbaar"), response.text)
 
     def test_render_list_if_appointments_are_found(self, m):
-        self.setUpMocks(m)
+        self.data.setUpMocks(m)
 
-        response = self.app.get(self.appointments_url, user=self.user)
+        response = self.app.get(self.appointments_url, user=self.data.user)
 
         self.assertIn(_("Een overzicht van uw afspraken"), response.text)
 
@@ -1236,7 +1176,7 @@ class MyAppointmentsTests(ClearCachesMixin, WebTest):
         self.assertEqual(PQ(passport_appointment[5]).text(), "1234 ZZ Amsterdam")
         self.assertEqual(
             PQ(cards[0]).find("a").attr("href"),
-            f"{self.config.booking_base_url}{self.appointment_passport.publicId}",
+            f"{self.data.config.booking_base_url}{self.data.appointment_passport.publicId}",
         )
 
         id_card_appointment = PQ(cards[1]).find("ul").children()
@@ -1249,5 +1189,5 @@ class MyAppointmentsTests(ClearCachesMixin, WebTest):
         self.assertEqual(PQ(id_card_appointment[5]).text(), "1111 AA New York")
         self.assertEqual(
             PQ(cards[1]).find("a").attr("href"),
-            f"{self.config.booking_base_url}{self.appointment_idcard.publicId}",
+            f"{self.data.config.booking_base_url}{self.data.appointment_idcard.publicId}",
         )

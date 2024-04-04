@@ -1,5 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 
+from cms.apphook_pool import apphook_pool
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 
@@ -9,6 +10,14 @@ from open_inwoner.pdc.models import Category, ProductCondition, ProductLocation
 from open_inwoner.questionnaire.models import QuestionnaireStep
 
 from ..utils.plugin_mixins import CMSActiveAppMixin
+
+
+def selected_categories_enabled() -> bool:
+    profile_app = apphook_pool.get_apphook("ProfileApphook")
+    config = profile_app.get_config("profile")
+    if config:
+        return config.selected_categories
+    return False
 
 
 @plugin_pool.register_plugin
@@ -23,7 +32,11 @@ class CategoriesPlugin(CMSActiveAppMixin, CMSPluginBase):
         config = OpenZaakConfig.get_solo()
         request = context["request"]
 
-        if request.user.is_authenticated and request.user.selected_categories.exists():
+        if (
+            request.user.is_authenticated
+            and selected_categories_enabled()
+            and request.user.selected_categories.exists()
+        ):
             context["categories"] = request.user.selected_categories.all()
         else:
             # Show the all the highlighted categories the user has access to, as well as

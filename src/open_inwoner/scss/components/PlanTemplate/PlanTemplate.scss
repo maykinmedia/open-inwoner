@@ -24,7 +24,7 @@
 
   *[class*='icon'],
   *[class*='Icon'] {
-    color: #4b4b4b;
-    font-size: 14px;
+    color: var(--color-gray-dark);
+    font-size: var(--font-size-body-small);
   }
 }

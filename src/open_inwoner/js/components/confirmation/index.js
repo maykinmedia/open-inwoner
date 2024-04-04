@@ -1,6 +1,8 @@
 import Modal from '../modal'
 
-class Confirmation {
+export class Confirmation {
+  static selector = '.form.confirm'
+
   constructor(form) {
     this.real_submit = false
     this.form = form
@@ -11,15 +13,21 @@ class Confirmation {
     if (!this.real_submit) {
       event.preventDefault()
       const modalId = document.getElementById('modal')
+      // Differentiate this modal from others
+      modalId.classList.add('confirm-modal')
       const modal = new Modal(modalId)
       modal.setTitle(this.form.dataset.confirmTitle)
       // Only show confirmation if text is set
       modal.setText(this.form.dataset.confirmText || '')
-      modal.setClose(this.form.dataset.confirmCancel)
+      modal.setModalIcons(true)
+      modal.setConfirmButtonVisibility(true)
+      modal.setCancelButtonVisibility(true)
+      modal.setButtonIconCloseVisibility(true)
+      modal.setClose(this.form.dataset.confirmCancel, 'button--primary-close')
       modal.setConfirm(
         this.form.dataset.confirmDefault,
         this.handleConfirm.bind(this),
-        'button--danger'
+        'button--error-confirm'
       )
       modal.show(this.form)
     }
@@ -32,5 +40,6 @@ class Confirmation {
   }
 }
 
-const confirmForms = document.querySelectorAll('form.confirm')
-;[...confirmForms].forEach((confirmForm) => new Confirmation(confirmForm))
+document
+  .querySelectorAll(Confirmation.selector)
+  .forEach((confirmForm) => new Confirmation(confirmForm))

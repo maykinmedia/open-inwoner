@@ -14,7 +14,7 @@
             {% endfor %}
         </ul>
     </div>
-    <div class="card-container card-container--columns-2">
+    <div class="card-container card-container--columns-2 plugin-card">
         {% for item in userfeed.items %}
             <a href="{{ item.action_url }}" class="card card--status card--status--{{ item.status_indicator }} {% if item.is_completed %}card--completed{% endif %}">
                 <div class="userfeed__marker userfeed__marker--{{ item.status_indicator }}">
@@ -25,7 +25,7 @@
 
                 <div class="card__body card__body--tabled">
                     <p class="p tabled__value">{{ item.title }}</p>
-                    <h2 class="userfeed__heading">
+                    <h2 class="plugin-card__heading">
                         <span class="status">{{ item.message }}</span>
                     </h2>
                     <span class="button button--icon-before button--transparent">
