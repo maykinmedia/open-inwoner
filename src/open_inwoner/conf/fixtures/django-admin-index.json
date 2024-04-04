@@ -28,16 +28,16 @@
                 "user"
             ],
             [
+                "laposta",
+                "subscription"
+            ],
+            [
                 "mozilla_django_oidc_db",
                 "openidconnectconfig"
             ],
             [
                 "userfeed",
                 "feeditemdata"
-            ],
-            [
-                "laposta",
-                "subscription"
             ]
         ]
     }
@@ -302,6 +302,10 @@
         "slug": "koppelingen",
         "models": [
             [
+                "laposta",
+                "lapostaconfig"
+            ],
+            [
                 "notifications_api_common",
                 "notificationsconfig"
             ],
@@ -315,19 +319,15 @@
             ],
             [
                 "openklant",
-                "openklantconfig"
+                "klantcontactmomentanswer"
             ],
             [
                 "openklant",
-                "klantcontactmomentanswer"
+                "openklantconfig"
             ],
             [
                 "openzaak",
                 "catalogusconfig"
-            ],
-            [
-                "qmatic",
-                "qmaticconfig"
             ],
             [
                 "openzaak",
@@ -354,8 +354,8 @@
                 "zaaktypeinformatieobjecttypeconfig"
             ],
             [
-                "laposta",
-                "lapostaconfig"
+                "qmatic",
+                "qmaticconfig"
             ],
             [
                 "soap",
@@ -431,7 +431,9 @@
     "model": "admin_index.appgroup",
     "fields": {
         "order": 6,
-        "translations": {},
+        "translations": {
+            "nl": "Inlog koppelingen"
+        },
         "name": "Inlog koppelingen",
         "slug": "auth-koppelingen",
         "models": [
@@ -458,6 +460,10 @@
             [
                 "kvk",
                 "kvkconfig"
+            ],
+            [
+                "mozilla_django_oidc_db",
+                "openidconnectconfig"
             ]
         ]
     }
