@@ -167,18 +167,7 @@
 
         {% session_timeout %}
 
-        <dialog class="modal" id="modal" aria-labelledby="modal__title" aria-describedby="modal__text">
-            <div class="modal__container">
-                <h2 class="modal__title" id="modal__title"></h2>
-                <div class="modal__text" id="modal__text"></div>
-                <div class="modal__actions" id="modal__actions">
-                    {% spaceless %}
-                        {% button text="" extra_classes="modal__button modal__close" %}
-                        {% button text="" extra_classes="modal__button modal__confirm" %}
-                    {% endspaceless %}
-                </div>
-            </div>
-        </dialog>
+        {% include "components/Modal/Modal.html" %}
 
         {% render_block "js" %}
         {% block extra_js %}{% endblock %}

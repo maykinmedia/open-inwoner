@@ -81,9 +81,15 @@ class SessionTimeout {
 
   configureModal(title, bodyText, buttonText, callback) {
     const modalId = document.getElementById('modal')
+    // Differentiate this modal from others
+    modalId.classList.add('session-modal')
     const modal = new Modal(modalId)
     modal.setTitle(title)
     modal.setText(bodyText)
+    modal.setModalIcons(false)
+    modal.setConfirmButtonVisibility(true)
+    modal.setCancelButtonVisibility(false)
+    modal.setButtonIconCloseVisibility(true)
     modal.setConfirm(buttonText, callback.bind(this))
     modal.show()
   }
