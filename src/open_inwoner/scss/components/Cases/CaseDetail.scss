@@ -1,4 +1,40 @@
-.cases__detail {
+.case-detail {
+  box-sizing: border-box;
+
+  &__documents {
+    .heading-2__indicator {
+      display: flex;
+      flex-direction: row;
+
+      // breaking-text fix
+      @media (min-width: 315px) {
+        display: grid;
+        grid-template-columns: 232px 10px;
+      }
+
+      @media (min-width: 440px) {
+        display: flex;
+        flex-direction: row;
+      }
+
+      @media (min-width: 768px) {
+        display: grid;
+        grid-template-columns: 232px 10px;
+      }
+
+      @media (min-width: 840px) {
+        display: flex;
+        flex-direction: row;
+      }
+    }
+
+    .h2.indicator {
+      display: inline;
+      font-size: var(--font-size-heading-2);
+      margin-bottom: var(--spacing-extra-large);
+    }
+  }
+
   .documents-upload__h3 {
     margin: var(--spacing-extra-large) 0;
   }
@@ -94,5 +130,14 @@
 
   #cases-contact-form-content > h2 {
     margin-top: var(--spacing-extra-large);
+  }
+
+  .contactmomenten {
+    margin: 0;
+  }
+
+  .textarea {
+    height: var(--header-height);
+    width: 100%;
   }
 }

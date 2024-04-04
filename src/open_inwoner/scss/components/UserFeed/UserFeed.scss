@@ -26,10 +26,14 @@
       &:after {
         content: ' ';
         position: absolute;
-        border-right: 1px solid var(--color-red-notification);
+        border-right: none;
         right: -4px;
         top: 2px;
         height: 16px;
+
+        @media (min-width: 768px) {
+          border-right: 1px solid var(--color-red-notification);
+        }
       }
 
       &:first-child {

@@ -16,6 +16,10 @@
     pointer-events: none;
   }
 
+  .icon--large[class*='icon'] {
+    font-size: 40px;
+  }
+
   .card__body {
     box-sizing: border-box;
     padding: var(--row-height);
@@ -82,10 +86,6 @@
 
   & .file-list {
     margin-bottom: var(--spacing-large) !important;
-
-    &__list-item {
-    }
-    margin-bottom: var(--spacing-large);
 
     // upload-error styles
     .file__file.error {
