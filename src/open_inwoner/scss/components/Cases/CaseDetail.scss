@@ -7,6 +7,10 @@
     &-notification {
       .notifications {
         position: static;
+
+        .notification {
+          margin-bottom: var(--spacing-extra-large);
+        }
       }
     }
   }
