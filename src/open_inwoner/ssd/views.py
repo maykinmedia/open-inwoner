@@ -4,17 +4,25 @@ from django import forms
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.shortcuts import redirect
+from django.urls import reverse
+from django.utils.functional import cached_property
+from django.utils.translation import gettext as _
 from django.views.generic.edit import FormView
 
 from furl import furl
+from view_breadcrumbs import BaseBreadcrumbMixin
 
 from .client import JaaropgaveClient, UitkeringClient
 from .forms import MonthlyReportsForm, YearlyReportsForm
 
 
-class BenefitsFormView(LoginRequiredMixin, FormView):
+class BenefitsFormView(LoginRequiredMixin, BaseBreadcrumbMixin, FormView):
     template_name: str
     form_class: forms.Form
+
+    @cached_property
+    def crumbs(self):
+        return [(_("Mijn uitkeringen"), reverse("ssd:uitkeringen"))]
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()

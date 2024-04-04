@@ -13,8 +13,10 @@ from unittest.mock import patch
 
 from django.test import TestCase, override_settings
 from django.urls import reverse
+from django.utils.translation import gettext as _
 
 from freezegun import freeze_time
+from pyquery import PyQuery
 
 from open_inwoner.accounts.tests.factories import UserFactory
 
@@ -54,6 +56,13 @@ class TestMonthlyBenefitsFormView(TestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
+
+        doc = PyQuery(response.content)
+
+        breadcrumbs = doc.find(".breadcrumbs__list-item")
+
+        self.assertEqual(len(breadcrumbs), 2)
+        self.assertIn(_("Mijn uitkeringen"), breadcrumbs[1].find("a").text)
 
     @patch(
         "open_inwoner.ssd.client.UitkeringClient.get_reports",
