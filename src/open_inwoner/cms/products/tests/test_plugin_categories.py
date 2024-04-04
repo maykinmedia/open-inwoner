@@ -5,6 +5,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 import requests_mock
+from cms.apphook_pool import apphook_pool
 from dateutil.relativedelta import relativedelta
 from django_webtest import WebTest
 from furl import furl
@@ -17,6 +18,7 @@ from open_inwoner.accounts.tests.factories import (
     eHerkenningUserFactory,
 )
 from open_inwoner.cms.products.cms_apps import ProductsApphook
+from open_inwoner.cms.profile.cms_apps import ProfileApphook
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.kvk.branches import KVK_BRANCH_SESSION_VARIABLE
 from open_inwoner.openzaak.models import OpenZaakConfig
@@ -323,6 +325,7 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
         super().setUp()
 
         cms_tools.create_apphook_page(ProductsApphook)
+        cms_tools.create_apphook_page(ProfileApphook)
 
         self.category1 = CategoryFactory(
             name="0001",
@@ -581,6 +584,13 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
     def test_categories_based_on_cases(self, m):
         self._setUpMocks(m)
 
+        # Selected categories should be ignored if feature is disabled
+        self.user.selected_categories.set([self.category1, self.category2])
+        profile_app = apphook_pool.get_apphook("ProfileApphook")
+        config = profile_app.get_config("profile")
+        config.selected_categories = False
+        config.save()
+
         html, context = cms_tools.render_plugin(CategoriesPlugin, user=self.user)
 
         self.assertEqual(context["categories"].count(), 3)
@@ -595,6 +605,11 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
         the homepage
         """
         self._setUpMocks(m)
+
+        profile_app = apphook_pool.get_apphook("ProfileApphook")
+        config = profile_app.get_config("profile")
+        config.selected_categories = True
+        config.save()
 
         self.user.selected_categories.set([self.category1, self.category2])
 
