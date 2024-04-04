@@ -169,7 +169,7 @@ django-csp==3.7
     # via -r requirements/base.in
 django-csp-reports==1.8.1
     # via -r requirements/base.in
-django-digid-eherkenning==0.9.0
+django-digid-eherkenning==0.13.0
     # via -r requirements/base.in
 django-elasticsearch-dsl==7.4
     # via -r requirements/base.in
@@ -372,7 +372,7 @@ markuppy==1.14
     # via tablib
 maykin-2fa==1.0.0
     # via -r requirements/base.in
-maykin-python3-saml==1.14.0.post0
+maykin-python3-saml==1.16.0
     # via
     #   -r requirements/base.in
     #   django-digid-eherkenning
