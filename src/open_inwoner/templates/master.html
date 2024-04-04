@@ -139,7 +139,7 @@
         {% get_solo 'configurations.SiteConfiguration' as config %}
         {% if config.kcm_survey_link_url and config.kcm_survey_link_text %}
             <div class="kcm-survey">
-                {% link bold=True href=config.kcm_survey_link_url text=config.kcm_survey_link_text blank=True hide_external_icon=True secondary=True %}
+                {% link bold=True href=config.kcm_survey_link_url text=config.kcm_survey_link_text blank=True hide_external_icon=True %}
             </div>
         {% endif %}
 
