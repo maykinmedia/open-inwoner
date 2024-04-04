@@ -275,6 +275,15 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
             },
         ),
         (
+            _("Customer satisfaction survey"),
+            {
+                "fields": (
+                    "kcm_survey_link_text",
+                    "kcm_survey_link_url",
+                ),
+            },
+        ),
+        (
             _("Display options for anonymous users"),
             {
                 "fields": (

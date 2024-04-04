@@ -452,6 +452,19 @@ class SiteConfiguration(SingletonModel):
         verbose_name=_("Privacy page link"),
         help_text=_("The link to the cookie policy page."),
     )
+    kcm_survey_link_text = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name=_("KCM survey link text"),
+        help_text=_(
+            "The text that is displayed on the customer satisfaction survey link"
+        ),
+    )
+    kcm_survey_link_url = models.URLField(
+        verbose_name=_("KCM survey URL"),
+        blank=True,
+        help_text=_("The external link for the customer satisfaction survey."),
+    )
     openid_connect_logo = FilerImageField(
         verbose_name=_("Openid Connect Logo"),
         null=True,

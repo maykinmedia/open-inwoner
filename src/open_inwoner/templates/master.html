@@ -1,4 +1,4 @@
-{% load static i18n card_tags button_tags link_tags notification_tags anchor_menu_tags view_breadcrumbs utils session_tags django_htmx cms_tags menu_tags sekizai_tags %}<!DOCTYPE html>
+{% load static i18n card_tags button_tags link_tags notification_tags anchor_menu_tags view_breadcrumbs utils solo_tags session_tags django_htmx cms_tags menu_tags sekizai_tags %}<!DOCTYPE html>
 <html lang="nl" class="view openinwoner-theme {% block view_class %}view--{{ request.resolver_match.namespaces|join:'-' }}-{{ request.resolver_match.url_name }}{% endblock %}">
     <head>
         <meta charset="utf-8">
@@ -135,6 +135,13 @@
                 {% endblock main_inner %}
             </main>
         {% endblock main_outer %}
+
+        {% get_solo 'configurations.SiteConfiguration' as config %}
+        {% if config.kcm_survey_link_url and config.kcm_survey_link_text %}
+            <div class="kcm-survey">
+                {% link bold=True href=config.kcm_survey_link_url text=config.kcm_survey_link_text blank=True hide_external_icon=True %}
+            </div>
+        {% endif %}
 
         {% if footer %}
         <footer class="footer">

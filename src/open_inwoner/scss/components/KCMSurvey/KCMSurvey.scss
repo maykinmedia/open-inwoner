@@ -1,0 +1,15 @@
+.kcm-survey {
+  position: fixed;
+  inset: 50% -20px auto auto;
+  transform: rotate(180deg) translateX(50%) translateY(50%);
+  writing-mode: vertical-rl;
+  z-index: 1010;
+  padding: var(--spacing-medium);
+  background-color: var(--color-info-lighter);
+  font-size: var(--font-size-heading-card);
+  font-weight: bold;
+
+  & .link {
+    color: var(--color-info-darker);
+  }
+}
