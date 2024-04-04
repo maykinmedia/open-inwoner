@@ -27,6 +27,7 @@ import './plan-preview'
 import './questionnaire'
 import './readmore'
 import './search'
+import { TabPanel } from './tab-panels'
 import './toggle'
 import { StatusAccordion } from './cases/status_accordion'
 import './session'
@@ -58,6 +59,8 @@ const elementWrappers = [
   [StatusAccordion.selector, (elt) => new StatusAccordion(elt)],
   [FileInput.selector, (elt) => new FileInput(elt)],
   [ToggleHide.selector, (elt) => new ToggleHide(elt)],
+  [TabPanel.selector, (elt) => new TabPanel(elt)],
+  // add more when needed
 ]
 
 // harden against multiple events

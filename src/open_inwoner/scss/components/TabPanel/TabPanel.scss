@@ -72,6 +72,7 @@
     &:target {
       scroll-margin-top: 150px;
     }
+
     &:target::before {
       scroll-margin-top: 150px;
     }
@@ -92,17 +93,14 @@
   .tab__content.active {
     margin: 1em;
     scroll-margin-top: 150px;
-
-    p {
-      padding: 0;
-    }
   }
 
   .active {
     display: block;
   }
 
-  .hide {
+  .hide,
+  &.hide {
     display: none;
   }
 
@@ -182,12 +180,32 @@
         font-size: var(--font-size-body);
       }
     }
-  }
-}
 
-/// Tabs voor login pages
-.login-tab--container {
+    &#particulier {
+      #column__email-toggle,
+      #column__login-form {
+        &.hide {
+          display: none;
+        }
+      }
+
+      #column__login-form .button--transparent {
+        color: var(--color-primary);
+        padding-left: 0;
+      }
+    }
+  }
+
   .tab-column__paragraph {
-    color: var(--color-gray-dark-900);
+    color: var(--font-color-body);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body);
+    line-height: var(--font-line-height-body);
+    font-weight: normal;
+    margin: 0;
+  }
+
+  .form__actions--single {
+    max-width: var(--form-width);
   }
 }

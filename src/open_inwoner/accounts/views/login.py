@@ -91,14 +91,6 @@ class CustomLoginView(LogMixin, LoginView):
         return redirect(furl(reverse("verify_token")).add(params).url)
 
 
-class CustomEmailLoginView(CustomLoginView):
-    template_name = "registration/login_email.html"
-
-
-class CustomBusinessLoginView(CustomLoginView):
-    template_name = "registration/login_business.html"
-
-
 class VerifyTokenView(ThrottleMixin, FormView):
     throttle_visits = 3
     throttle_period = 60
