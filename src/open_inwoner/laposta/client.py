@@ -1,6 +1,8 @@
 import logging
+from urllib.parse import quote
 
 from django.conf import settings
+from django.core.cache import cache
 
 from ape_pie.client import APIClient
 from requests.exceptions import RequestException
@@ -32,7 +34,11 @@ class LapostaClient(APIClient):
         return lists
 
     def create_subscription(self, list_id: str, user_data: UserData) -> Member | None:
-        response = self.post("member", data={"list_id": list_id, **user_data.dict()})
+        cache.delete(f"laposta_list_subscriptions:{user_data.email}")
+
+        response = self.post(
+            "member", data={"list_id": list_id, **user_data.model_dump()}
+        )
 
         if response.status_code == 400:
             data = response.json()
@@ -53,9 +59,10 @@ class LapostaClient(APIClient):
 
         return Member(**data["member"])
 
-    def remove_subscription(self, list_id: str, member_id: str) -> Member | None:
-        response = self.delete(f"member/{member_id}", params={"list_id": list_id})
+    def remove_subscription(self, list_id: str, email: str) -> Member | None:
+        cache.delete(f"laposta_list_subscriptions:{email}")
 
+        response = self.delete(f"member/{quote(email)}", params={"list_id": list_id})
         if response.status_code == 400:
             data = response.json()
             error = data.get("error", {})
@@ -70,6 +77,17 @@ class LapostaClient(APIClient):
             return None
 
         return Member(**data["member"])
+
+    @cache_result(
+        "laposta_list_subscriptions:{email}", timeout=settings.CACHE_LAPOSTA_API_TIMEOUT
+    )
+    def get_subscriptions_for_email(self, list_ids: list[str], email: str) -> list[str]:
+        subscribed_to = []
+        for list_id in list_ids:
+            response = self.get(f"member/{quote(email)}", params={"list_id": list_id})
+            if response.status_code == 200:
+                subscribed_to.append(list_id)
+        return subscribed_to
 
 
 def create_laposta_client() -> LapostaClient | None:
