@@ -321,7 +321,7 @@ django-csp-reports==1.8.1
     #   -r requirements/ci.txt
 django-debug-toolbar==3.2.2
     # via -r requirements/dev.in
-django-digid-eherkenning==0.9.0
+django-digid-eherkenning==0.13.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -770,7 +770,7 @@ maykin-2fa==1.0.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-maykin-python3-saml==1.14.0.post0
+maykin-python3-saml==1.16.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
