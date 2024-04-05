@@ -8,6 +8,7 @@ from furl import furl
 from mail_editor.helpers import find_template
 
 from open_inwoner.accounts.models import User
+from open_inwoner.utils.url import prepend_next_url_param
 
 
 class BadToken(Exception):
@@ -85,9 +86,11 @@ def validate_email_verification_token(user: User, token: str) -> bool:
     return True
 
 
-def send_user_email_verification_mail(user: User) -> bool:
+def send_user_email_verification_mail(user: User, next_url: str = None) -> bool:
     url = generate_email_verification_url(user)
     template = find_template("email_verification")
+    if next_url:
+        url = prepend_next_url_param(url, next_url)
     context = {
         "verification_link": url,
     }

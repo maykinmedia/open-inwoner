@@ -6,6 +6,7 @@ from django.urls import reverse
 
 from django_webtest import WebTest
 from freezegun.api import freeze_time
+from furl.furl import furl
 from pyquery.pyquery import PyQuery
 
 from open_inwoner.accounts.tests.factories import UserFactory
@@ -145,31 +146,57 @@ class TestTokenVerification(TestCase):
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestSendVerificationEmail(WebTest):
+    def get_sole_email_html_from_outbox(self, recipient):
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertEqual(email.to, [recipient])
+        body = email.alternatives[0][0]  # html version of the email body
+        return body
+
+    def get_prefixed_url_from_html(self, html, url_prefix):
+        pq = PyQuery(html)
+        for elem in pq.find("a"):
+            url = elem.attrib.get("href")
+            if url and url_prefix in url:
+                return url
+        else:
+            self.fail("could not locate URL in html")
+
     def test_send_user_email_verification_mail(self):
         user = UserFactory(email="foo@example.com")
 
         send_user_email_verification_mail(user)
 
-        self.assertEqual(len(mail.outbox), 1)
-        email = mail.outbox[0]
-        self.assertEqual(email.to, [user.email])
-        body = email.alternatives[0][0]  # html version of the email body
+        html = self.get_sole_email_html_from_outbox(user.email)
 
         url_path = reverse("mail:verification")
-        self.assertIn(url_path, body)
+        self.assertIn(url_path, html)
 
-        pq = PyQuery(body)
-        for elem in pq.find("a"):
-            url = elem.attrib.get("href")
-            if url and url_path in url:
-                # check url works
-                response = self.app.get(url, user=user)
+        url = self.get_prefixed_url_from_html(html, url_path)
+        response = self.app.get(url, user=user)
 
-                user.refresh_from_db()
-                self.assertTrue(user.has_verified_email())
-                break
-        else:
-            self.fail("could not locate URL in html")
+        user.refresh_from_db()
+        self.assertTrue(user.has_verified_email())
+        self.assertRedirects(response, reverse("pages-root"))
+
+    def test_send_user_email_verification_mail__with_next_url(self):
+        user = UserFactory(email="foo@example.com")
+
+        target_url = reverse("profile:detail")
+        send_user_email_verification_mail(user, target_url)
+
+        html = self.get_sole_email_html_from_outbox(user.email)
+
+        url_path = reverse("mail:verification")
+        self.assertIn(url_path, html)
+
+        url = self.get_prefixed_url_from_html(html, url_path)
+        response = self.app.get(url, user=user)
+
+        user.refresh_from_db()
+        self.assertTrue(user.has_verified_email())
+
+        self.assertRedirects(response, target_url)
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
@@ -192,7 +219,7 @@ class TestMailVerificationView(WebTest):
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class TestMailVerificationFlow(WebTest):
+class TestMailVerificationMiddlewareFlow(WebTest):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -200,17 +227,6 @@ class TestMailVerificationFlow(WebTest):
         cms_tools.create_apphook_page(ProfileApphook)
 
         cls.url = reverse("pages-root")
-
-    def setUp(self):
-        super().setUp()
-
-        # TODO remove temporary fix after rebasing on https://github.com/maykinmedia/open-inwoner/pull/1125
-        patcher = patch(
-            "open_inwoner.accounts.middleware.profile_page_is_published",
-            return_value=True,
-        )
-        patcher.start()
-        self.addCleanup(patcher.stop)
 
     @patch(
         "open_inwoner.accounts.views.registration.send_user_email_verification_mail",
@@ -239,17 +255,16 @@ class TestMailVerificationFlow(WebTest):
         user = UserFactory(email="foo@example.com")
         self.assertFalse(user.has_verified_email())
 
-        # not required
+        # no redirect when not required
         self.app.get(self.url, user=user, status=200)
 
-        # with required
+        # set required
         config.email_verification_required = True
         config.save()
 
-        verify_url = reverse("profile:email_verification_user")
-
-        # page with button
         response = self.app.get(self.url, user=user)
+
+        verify_url = reverse("profile:email_verification_user")
         self.assertRedirects(response, verify_url)
 
         response = response.follow()
@@ -259,4 +274,37 @@ class TestMailVerificationFlow(WebTest):
         self.assertRedirects(response, verify_url + "?sent=1")
         response.follow(status=200)
 
-        mock_send.assert_called_once_with(user)
+        mock_send.assert_called_once_with(user, "")
+
+    @patch(
+        "open_inwoner.accounts.views.registration.send_user_email_verification_mail",
+        autospec=True,
+    )
+    def test_unverified_user_redirects__with_next_url(self, mock_send):
+        config = SiteConfiguration.get_solo()
+        config.email_verification_required = True
+        config.save()
+
+        user = UserFactory(email="foo@example.com")
+        self.assertFalse(user.has_verified_email())
+
+        # try to non-default page
+        target_url = reverse("profile:detail")
+        response = self.app.get(target_url, user=user)
+
+        verify_url = reverse("profile:email_verification_user")
+        f = furl(verify_url)
+        f.args["next"] = target_url
+        verify_url = f.url
+
+        self.assertRedirects(response, verify_url)
+        response = response.follow()
+        response = response.forms["email-verification-form"].submit()
+
+        # redirect to same page
+        f = furl(verify_url)
+        f.args["sent"] = 1
+        self.assertRedirects(response, f.url)
+        response.follow(status=200)
+
+        mock_send.assert_called_once_with(user, target_url)

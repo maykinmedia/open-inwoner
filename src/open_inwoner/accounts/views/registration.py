@@ -218,7 +218,9 @@ class EmailVerificationUserView(LogMixin, LoginRequiredMixin, FormView):
     def form_valid(self, form):
         user: User = self.request.user
 
-        send_user_email_verification_mail(user)
+        send_user_email_verification_mail(
+            user, next_url=get_next_url_from(self.request, default="")
+        )
 
         messages.add_message(
             self.request, messages.SUCCESS, _("Bevestigings e-mail is verzonden")
@@ -231,4 +233,7 @@ class EmailVerificationUserView(LogMixin, LoginRequiredMixin, FormView):
         return super().form_invalid(form)
 
     def get_success_url(self):
-        return self.request.path + "?sent=1"
+        # redirect to self, keep any next-urls
+        f = furl(self.request.get_full_path())
+        f.args["sent"] = 1
+        return f.url

@@ -30,6 +30,14 @@ def get_next_url_param(url: str) -> str:
     return furl(url).args.get("next", "")
 
 
+def set_next_url_param(url: str, next_url: str) -> str:
+    if not next_url:
+        return url
+    f = furl(url)
+    f.args["next"] = next_url
+    return str(f)
+
+
 def prepend_next_url_param(url: str, next_url: str) -> str:
     """
     set next parameter on url,

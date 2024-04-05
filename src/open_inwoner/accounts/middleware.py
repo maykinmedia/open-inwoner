@@ -29,6 +29,6 @@ class EmailVerificationMiddleware(BaseConditionalUserRedirectMiddleware):
         user = request.user
         return (
             not user.has_verified_email()
-            # and profile_page_is_published()
+            and profile_page_is_published()
             and SiteConfiguration.get_solo().email_verification_required
         )

@@ -28,6 +28,8 @@ from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.kvk.branches import KVK_BRANCH_SESSION_VARIABLE
 from open_inwoner.openzaak.models import OpenZaakConfig
 
+from ...cms.profile.cms_apps import ProfileApphook
+from ...cms.tests import cms_tools
 from ..choices import LoginTypeChoices
 from .factories import DigidUserFactory, UserFactory, eHerkenningUserFactory
 
@@ -81,6 +83,12 @@ def perform_oidc_login(
 
 
 class OIDCFlowTests(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cms_tools.create_homepage()
+        cms_tools.create_apphook_page(ProfileApphook)
+
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
@@ -456,6 +464,12 @@ class OIDCFlowTests(TestCase):
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class DigiDOIDCFlowTests(WebTest):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cms_tools.create_homepage()
+        cms_tools.create_apphook_page(ProfileApphook)
+
     @patch("open_inwoner.haalcentraal.signals.update_brp_data_in_db")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
@@ -942,6 +956,12 @@ class DigiDOIDCFlowTests(WebTest):
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class eHerkenningOIDCFlowTests(WebTest):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cms_tools.create_homepage()
+        cms_tools.create_apphook_page(ProfileApphook)
+
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     @patch("open_inwoner.kvk.signals.KvKClient.retrieve_rsin_with_kvk")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
