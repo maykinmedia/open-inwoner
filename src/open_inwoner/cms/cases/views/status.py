@@ -315,12 +315,18 @@ class InnerCaseDetailView(
 
         # eSuite compatibility
         if isinstance(self.case.status, str):
+            # OIP requests cases, user goes to detailview of case
+            # OIP requests the statusses of the case (the status history)
+            # OIP sees a zaak.status URL which doesn't occur in the status history, however requires this status to determine the statustype and configuration options related to this statustype (Taiga #2037, uploading documents was activated for statustype in the admin but wasn't active for users
+            # Workaround: OIP requests the current zaak.status individually and adds the retrieved information to the statustype mapping
+
             logger.info(
-                "Issue #2037 -- Retrieving status individually because of eSuite"
+                "Issue #2037 -- Retrieving status individually for case {} because of eSuite".format(
+                    self.case.identification
+                )
             )
             self.case.status = zaken_client.fetch_single_status(self.case.status)
             status_types_mapping[self.case.status.statustype].append(self.case.status)
-            statuses.append(self.case.status)
 
         catalogi_client = build_client_openzaak("catalogi")
         if catalogi_client is None:
