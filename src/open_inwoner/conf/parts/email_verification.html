@@ -1,5 +1,24 @@
-<p>Beste</p>
-<p>Om door te gaan moet je je email-adres <a href="{{ verification_link }}">bevestigen</a><span class="color--secondary"> &rarr;</span></p>
-<p>Mocht je geen behoefte hieraan hebben dan staat het je vrij om dit bericht te negeren </p>
-<p>Met vriendelijke groet,
-    {{ site_name }} </p>
+<table role="presentation" border="0" cellspacing="0" cellpadding="0" width="100%" class="table-mail">
+    <tbody>
+    <tr>
+        <td class="td-mail td__padding-all" colspan="6">
+            <p>Beste inwoner,</p>
+            <p>&nbsp;</p>
+            <p>Om door te gaan moet je je e-mailadres <a href="{{ verification_link }}">bevestigen</a><span class="color--secondary"> &rarr;</span></p>
+            <p>Mocht je geen behoefte hieraan hebben dan staat het je vrij om dit bericht te negeren.</p>
+        </td>
+    </tr>
+    <tr class="tr-mail border-top">
+        <td class="td-mail border-top td__padding-zero" colspan="6">
+            <!-- <hr> styling --> &nbsp;
+        </td>
+    </tr>
+    <tr>
+        <td class="td-mail td__padding-all" colspan="6">
+            <p>Met vriendelijke groet,</p>
+            <p>&nbsp;</p>
+            <p>{{ site_name }}</p>
+        </td>
+    </tr>
+    </tbody>
+</table>

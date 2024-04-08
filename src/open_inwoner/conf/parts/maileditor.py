@@ -473,7 +473,7 @@ MAIL_EDITOR_CONF = {
     "email_verification": {
         "name": _("Email address verification"),
         "description": _("This email is used by users to verify their email address"),
-        "subject_default": _("Bevestig je email address voor {{ site_name }}"),
+        "subject_default": _("Bevestig je e-mailadres voor {{ site_name }}"),
         "body_default": _readfile("email_verification.html"),
         "subject": [
             {
