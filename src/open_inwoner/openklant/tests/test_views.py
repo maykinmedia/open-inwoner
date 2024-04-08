@@ -25,6 +25,7 @@ from open_inwoner.utils.test import (
     ClearCachesMixin,
     DisableRequestLogMixin,
     set_kvk_branch_number_in_session,
+    uuid_from_url,
 )
 
 from .factories import KlantContactMomentAnswerFactory
@@ -57,7 +58,7 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
 
         detail_url = reverse(
             "cases:contactmoment_detail",
-            kwargs={"kcm_uuid": data.klant_contactmoment["uuid"]},
+            kwargs={"kcm_uuid": uuid_from_url(data.klant_contactmoment["url"])},
         )
         list_url = reverse("cases:contactmoment_list")
         response = self.app.get(list_url, user=data.user)
@@ -84,7 +85,7 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
 
         kcm = factory(KlantContactMoment, data.klant_contactmoment)
         kcm.contactmoment = factory(ContactMoment, data.contactmoment)
-        kcm.klant = factory(Klant, data.klant)
+        kcm.klant = factory(Klant, data.klant_bsn)
 
         mock_get_kcm_answer_mapping.assert_called_once_with(
             [kcm.contactmoment], data.user
@@ -102,14 +103,16 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
         mock_get_kcm_answer_mapping.return_value = {
             data.klant_contactmoment["url"]: KlantContactMomentAnswerFactory.create(
                 user=data.user,
-                contactmoment_url=data.klant_contactmoment["contactmoment"],
+                contactmoment_url=uuid_from_url(
+                    data.klant_contactmoment["contactmoment"]
+                ),
                 is_seen=False,
             )
         }
 
         detail_url = reverse(
             "cases:contactmoment_detail",
-            kwargs={"kcm_uuid": data.klant_contactmoment["uuid"]},
+            kwargs={"kcm_uuid": uuid_from_url(data.klant_contactmoment["url"])},
         )
         list_url = reverse("cases:contactmoment_list")
         response = self.app.get(list_url, user=data.user)
@@ -136,7 +139,7 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
 
         kcm = factory(KlantContactMoment, data.klant_contactmoment)
         kcm.contactmoment = factory(ContactMoment, data.contactmoment)
-        kcm.klant = factory(Klant, data.klant)
+        kcm.klant = factory(Klant, data.klant_bsn)
 
         mock_get_kcm_answer_mapping.assert_called_once_with(
             [kcm.contactmoment], data.user
@@ -162,7 +165,9 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
 
                 detail_url = reverse(
                     "cases:contactmoment_detail",
-                    kwargs={"kcm_uuid": data.klant_contactmoment2["uuid"]},
+                    kwargs={
+                        "kcm_uuid": uuid_from_url(data.klant_contactmoment2["url"])
+                    },
                 )
                 list_url = reverse("cases:contactmoment_list")
                 response = self.app.get(list_url, user=data.eherkenning_user)
@@ -205,7 +210,9 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
 
                 detail_url = reverse(
                     "cases:contactmoment_detail",
-                    kwargs={"kcm_uuid": data.klant_contactmoment4["uuid"]},
+                    kwargs={
+                        "kcm_uuid": uuid_from_url(data.klant_contactmoment4["url"])
+                    },
                 )
                 list_url = reverse("cases:contactmoment_list")
 
@@ -237,7 +244,7 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
 
         detail_url = reverse(
             "cases:contactmoment_detail",
-            kwargs={"kcm_uuid": data.klant_contactmoment["uuid"]},
+            kwargs={"kcm_uuid": uuid_from_url(data.klant_contactmoment["url"])},
         )
         response = self.app.get(detail_url, user=data.user)
 
@@ -266,7 +273,7 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
 
         detail_url = reverse(
             "cases:contactmoment_detail",
-            kwargs={"kcm_uuid": data.klant_contactmoment["uuid"]},
+            kwargs={"kcm_uuid": uuid_from_url(data.klant_contactmoment["url"])},
         )
         response = self.app.get(detail_url, user=data.user)
 
@@ -321,7 +328,7 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
 
         detail_url = reverse(
             "cases:contactmoment_detail",
-            kwargs={"kcm_uuid": data.klant_contactmoment["uuid"]},
+            kwargs={"kcm_uuid": uuid_from_url(data.klant_contactmoment["url"])},
         )
         response = self.app.get(detail_url, user=data.user)
 
@@ -378,7 +385,7 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
 
         detail_url = reverse(
             "cases:contactmoment_detail",
-            kwargs={"kcm_uuid": data.klant_contactmoment["uuid"]},
+            kwargs={"kcm_uuid": uuid_from_url(data.klant_contactmoment["url"])},
         )
         list_url = reverse("cases:contactmoment_list")
         response = self.app.get(list_url, user=data.user)
@@ -415,7 +422,7 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
 
         detail_url = reverse(
             "cases:contactmoment_detail",
-            kwargs={"kcm_uuid": data.klant_contactmoment["uuid"]},
+            kwargs={"kcm_uuid": uuid_from_url(data.klant_contactmoment["url"])},
         )
         list_url = reverse("cases:contactmoment_list")
         response = self.app.get(list_url, user=data.user)
@@ -458,7 +465,9 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
 
                 detail_url = reverse(
                     "cases:contactmoment_detail",
-                    kwargs={"kcm_uuid": data.klant_contactmoment2["uuid"]},
+                    kwargs={
+                        "kcm_uuid": uuid_from_url(data.klant_contactmoment2["url"])
+                    },
                 )
                 response = self.app.get(detail_url, user=data.eherkenning_user)
 
@@ -496,9 +505,9 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
                 )
                 config.save()
 
+                kcm_uuid = uuid_from_url(data.klant_contactmoment4["url"])
                 detail_url = reverse(
-                    "cases:contactmoment_detail",
-                    kwargs={"kcm_uuid": data.klant_contactmoment4["uuid"]},
+                    "cases:contactmoment_detail", kwargs={"kcm_uuid": kcm_uuid}
                 )
                 response = self.client.get(detail_url)
 
@@ -540,7 +549,9 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
 
                 detail_url = reverse(
                     "cases:contactmoment_detail",
-                    kwargs={"kcm_uuid": data.klant_contactmoment2["uuid"]},
+                    kwargs={
+                        "kcm_uuid": uuid_from_url(data.klant_contactmoment2["url"])
+                    },
                 )
                 response = self.client.get(detail_url)
 

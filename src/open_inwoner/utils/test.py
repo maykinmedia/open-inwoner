@@ -1,6 +1,7 @@
 import logging
 import tempfile
 from typing import Any
+from uuid import UUID
 
 from django.contrib.sessions.middleware import (
     SessionMiddleware as DefaultSessionMiddleWare,
@@ -84,3 +85,11 @@ class SessionMiddleware(DefaultSessionMiddleWare):
 
     def __init__(self, *args, **kwargs):
         super().__init__(get_response=lambda x: "dummy")
+
+
+def uuid_from_url(url: str) -> str:
+    """
+    Extract UUID string from `url`, raise `ValueError` via UUID lib for invalid uuids
+    """
+    uuid = url.split("/")[-1]
+    return str(UUID(uuid))

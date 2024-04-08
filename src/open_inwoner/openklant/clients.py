@@ -24,13 +24,63 @@ logger = logging.getLogger(__name__)
 
 
 class KlantenClient(APIClient):
-    def create_klant(self, data: KlantCreateData) -> Klant | None:
+    def create_klant(
+        self,
+        user_bsn: str | None = None,
+        user_kvk_or_rsin: str | None = None,
+        vestigingsnummer: str | None = None,
+        data: KlantCreateData = None,
+    ) -> Klant | None:
+        if user_bsn:
+            return self._create_klant_for_bsn(user_bsn)
+
+        if user_kvk_or_rsin:
+            return self._create_klant_for_kvk_or_rsin(
+                user_kvk_or_rsin, vestigingsnummer=vestigingsnummer
+            )
+
         try:
             response = self.post("klanten", json=data)
             data = get_json_response(response)
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception("exception while making request")
             return
+
+        klant = factory(Klant, data)
+
+        return klant
+
+    def _create_klant_for_bsn(self, user_bsn: str) -> Klant:
+        payload = {"subjectIdentificatie": {"inpBsn": user_bsn}}
+
+        try:
+            response = self.post("klanten", json=payload)
+            data = get_json_response(response)
+        except (RequestException, ClientError):
+            logger.exception("exception while making request")
+            return None
+
+        klant = factory(Klant, data)
+
+        return klant
+
+    def _create_klant_for_kvk_or_rsin(
+        self, user_kvk_or_rsin: str, *, vestigingsnummer=None
+    ) -> list[Klant]:
+        payload = {"subjectIdentificatie": {"innNnpId": user_kvk_or_rsin}}
+
+        if vestigingsnummer:
+            payload = {"subjectIdentificatie": {"vestigingsNummer": vestigingsnummer}}
+
+        try:
+            response = self.post(
+                "klanten",
+                json=payload,
+            )
+            data = get_json_response(response)
+        except (RequestException, ClientError):
+            logger.exception("exception while making request")
+            return None
 
         klant = factory(Klant, data)
 

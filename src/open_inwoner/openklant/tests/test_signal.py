@@ -30,10 +30,14 @@ class UpdateUserFromLoginSignalAPITestCase(
     def setUp(self) -> None:
         super().setUp()
 
-        self.klant = generate_oas_component_cached(
+        self.klant_bsn = generate_oas_component_cached(
             "kc",
             "schemas/Klant",
-            uuid="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            bronorganisatie="123456789",
+            klantnummer="12345678",
+            subjectIdentificatie={
+                "inpBsn": "123456789",
+            },
             url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             emailadres="new@example.com",
             telefoonnummer="0612345678",
@@ -42,7 +46,7 @@ class UpdateUserFromLoginSignalAPITestCase(
     def test_update_user_after_login(self, m):
         m.get(
             f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn=999993847",
-            json=paginated_response([self.klant]),
+            json=paginated_response([self.klant_bsn]),
         )
 
         user = UserFactory(
@@ -94,7 +98,7 @@ class UpdateUserFromLoginSignalAPITestCase(
                 )
                 m.get(
                     f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId={identifier}",
-                    json=paginated_response([self.klant]),
+                    json=paginated_response([self.klant_bsn]),
                 )
 
                 request = RequestFactory().get("/dummy")
@@ -114,7 +118,7 @@ class UpdateUserFromLoginSignalAPITestCase(
     def test_update_user_after_login_skips_existing_email(self, m):
         m.get(
             f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn=999993847",
-            json=paginated_response([self.klant]),
+            json=paginated_response([self.klant_bsn]),
         )
 
         user = UserFactory(
@@ -141,3 +145,77 @@ class UpdateUserFromLoginSignalAPITestCase(
 
         self.assertTimelineLog("retrieved klant for user")
         self.assertTimelineLog("updated user from klant API with fields: phonenumber")
+
+    def test_create_klant_for_digid_user(self, m):
+        with requests_mock.mock(case_sensitive=True) as m:
+            m.get(
+                f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn=123456789",
+                json={"count": 0, "results": []},
+            )
+            m.post(f"{KLANTEN_ROOT}klanten", json=self.klant_bsn)
+
+            user = UserFactory(
+                login_type=LoginTypeChoices.digid,
+                bsn="123456789",
+            )
+
+            request = RequestFactory().get("/dummy")
+            request.user = user
+            user_logged_in.send(User, user=user, request=request)
+
+            self.assertTimelineLog(
+                f"created klant ({self.klant_bsn['klantnummer']}) for user"
+            )
+
+            requests = m.request_history
+            self.assertEqual(len(requests), 2)
+            self.assertEqual(
+                requests[0].query, f"subjectNatuurlijkPersoon__inpBsn={user.bsn}"
+            )
+            self.assertEqual(
+                requests[1].json(), {"subjectIdentificatie": {"inpBsn": f"{user.bsn}"}}
+            )
+
+    def test_create_klant_for_eherkenning_user(self, m):
+        klant_eherkenning = generate_oas_component_cached(
+            "kc",
+            "schemas/Klant",
+            bronorganisatie="123456789",
+            klantnummer="12345678",
+            subjectIdentificatie={
+                "innNnpId": "87654321",
+            },
+            url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            emailadres="new@example.com",
+            telefoonnummer="0612345678",
+        )
+
+        with requests_mock.mock(case_sensitive=True) as m:
+            m.get(
+                f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId=87654321",
+                json={"count": 0, "results": []},
+            )
+            m.post(f"{KLANTEN_ROOT}klanten", json=klant_eherkenning)
+
+            user = UserFactory(
+                login_type=LoginTypeChoices.eherkenning,
+                kvk="87654321",
+            )
+
+            request = RequestFactory().get("/dummy")
+            request.user = user
+            user_logged_in.send(User, user=user, request=request)
+
+            self.assertTimelineLog(
+                f"created klant ({klant_eherkenning['klantnummer']}) for user"
+            )
+
+            requests = m.request_history
+            self.assertEqual(len(requests), 2)
+            self.assertEqual(
+                requests[0].query, f"subjectNietNatuurlijkPersoon__innNnpId={user.kvk}"
+            )
+            self.assertEqual(
+                requests[1].json(),
+                {"subjectIdentificatie": {"innNnpId": f"{user.kvk}"}},
+            )

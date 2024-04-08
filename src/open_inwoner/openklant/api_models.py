@@ -32,18 +32,6 @@ class Klant(ZGWModel):
     telefoonnummer: str = ""
     emailadres: str = ""
 
-    # open-klant OAS
-    bedrijfsnaam: str = ""
-    functie: str = ""
-    adres: dict | None = None
-    subject: str = ""
-    subject_type: str = ""
-    subject_identificatie: dict | None = None
-
-    # open-klant non-standard *AFWIJKING*
-    aanmaakkanaal: str = ""
-    geverifieerd: bool = False
-
     def get_name_display(self):
         return " ".join(
             filter(bool, (self.voornaam, self.voorvoegsel_achternaam, self.achternaam))
