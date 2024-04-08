@@ -25,7 +25,7 @@ class NotifyComandTests(TestCase):
         html_body = sent_mail.alternatives[0][0]
 
         self.assertEqual(
-            sent_mail.subject, "Plans about to end today at Open Inwoner Platform"
+            sent_mail.subject, "Plannen vervallen vandaag op Open Inwoner Platform"
         )
         self.assertEqual(sent_mail.to, [user.email])
         self.assertIn(plan.title, html_body)
@@ -79,7 +79,7 @@ class NotifyComandTests(TestCase):
         html_body = sent_mail.alternatives[0][0]
 
         self.assertEqual(
-            sent_mail.subject, "Plans about to end today at Open Inwoner Platform"
+            sent_mail.subject, "Plannen vervallen vandaag op Open Inwoner Platform"
         )
         self.assertEqual(sent_mail.to, [user.email])
         self.assertIn(plan.title, html_body)
@@ -90,7 +90,7 @@ class NotifyComandTests(TestCase):
         html_body2 = sent_mail.alternatives[0][0]
 
         self.assertEqual(
-            sent_mail2.subject, "Plans about to end today at Open Inwoner Platform"
+            sent_mail2.subject, "Plannen vervallen vandaag op Open Inwoner Platform"
         )
         self.assertEqual(sent_mail2.to, [contact.email])
         self.assertIn(plan.title, html_body2)
@@ -111,7 +111,7 @@ class NotifyComandTests(TestCase):
         html_body = sent_mail.alternatives[0][0]
 
         self.assertEqual(
-            sent_mail.subject, "Plans about to end today at Open Inwoner Platform"
+            sent_mail.subject, "Plannen vervallen vandaag op Open Inwoner Platform"
         )
         self.assertEqual(sent_mail.to, [user.email])
         self.assertIn(plan.title, html_body)

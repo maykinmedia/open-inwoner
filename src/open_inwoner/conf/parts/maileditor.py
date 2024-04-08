@@ -40,6 +40,15 @@ MAIL_EDITOR_CONF = {
                 "description": _("Link to activate their account."),
             },
             {"name": "email", "description": _("Email of the invited user")},
+            {
+                "name": "contact_page",
+                "description": _("The link to an existing contactpage"),
+            },
+            {
+                "name": "contact_phonenumber",
+                "description": _("The callable link to the configured phonenumber"),
+                "example": "14010",
+            },
         ],
     },
     "contact_approval": {
@@ -47,7 +56,7 @@ MAIL_EDITOR_CONF = {
         "description": _(
             "This email is used to notify people for pending approvals of new contacts"
         ),
-        "subject_default": "Goedkeuring geven op {{ site_name }}: {{ sender_name }} wilt u toevoegen als contactpersoon",
+        "subject_default": "Goedkeuring geven op {{ site_name }}: {{ sender_name }} wil u toevoegen als contactpersoon",
         "body_default": _readfile("contact_approval.html"),
         "subject": [
             {
@@ -73,6 +82,21 @@ MAIL_EDITOR_CONF = {
                 "description": _("Link to contact list page."),
             },
             {"name": "email", "description": _("Email of the receiver user")},
+            {
+                "name": "contact_page",
+                "description": _("The link to an existing contactpage"),
+            },
+            {
+                "name": "contact_phonenumber",
+                "description": _("The callable link to the configured phonenumber"),
+                "example": "14010",
+            },
+            {
+                "name": "profile_notifications",
+                "description": _(
+                    "The link to the notifications and unsubscribe settings"
+                ),
+            },
         ],
     },
     "new_messages": {
@@ -80,7 +104,7 @@ MAIL_EDITOR_CONF = {
         "description": _(
             "This email is used to inform users about the new messages in their inbox"
         ),
-        "subject_default": "New messages at {{ site_name }}",
+        "subject_default": "Nieuwe berichten op {{ site_name }}",
         "body_default": _readfile("new_messages.html"),
         "subject": [
             {
@@ -105,6 +129,21 @@ MAIL_EDITOR_CONF = {
                 "name": "inbox_link",
                 "description": _("Link to see the conversation."),
             },
+            {
+                "name": "contact_page",
+                "description": _("The link to an existing contactpage"),
+            },
+            {
+                "name": "contact_phonenumber",
+                "description": _("The callable link to the configured phonenumber"),
+                "example": "14010",
+            },
+            {
+                "name": "profile_notifications",
+                "description": _(
+                    "The link to the notifications and unsubscribe settings"
+                ),
+            },
         ],
     },
     "expiring_action": {
@@ -112,7 +151,7 @@ MAIL_EDITOR_CONF = {
         "description": _(
             "This email is used to remind users that there are actions that are ending today"
         ),
-        "subject_default": "Actions about to end today at {{ site_name }}",
+        "subject_default": "Acties verlopen vandaag op {{ site_name }}",
         "body_default": _readfile("expiring_action.html"),
         "subject": [
             {
@@ -133,6 +172,21 @@ MAIL_EDITOR_CONF = {
                 "name": "site_name",
                 "description": _("Name of the site"),
             },
+            {
+                "name": "contact_page",
+                "description": _("The link to an existing contactpage"),
+            },
+            {
+                "name": "contact_phonenumber",
+                "description": _("The callable link to the configured phonenumber"),
+                "example": "14010",
+            },
+            {
+                "name": "profile_notifications",
+                "description": _(
+                    "The link to the notifications and unsubscribe settings"
+                ),
+            },
         ],
     },
     "expiring_plan": {
@@ -140,7 +194,7 @@ MAIL_EDITOR_CONF = {
         "description": _(
             "This email is used to remind users that there are plans that are ending today"
         ),
-        "subject_default": "Plans about to end today at {{ site_name }}",
+        "subject_default": "Plannen vervallen vandaag op {{ site_name }}",
         "body_default": _readfile("expiring_plan.html"),
         "subject": [
             {
@@ -161,6 +215,21 @@ MAIL_EDITOR_CONF = {
                 "name": "site_name",
                 "description": _("Name of the site"),
             },
+            {
+                "name": "contact_page",
+                "description": _("The link to an existing contactpage"),
+            },
+            {
+                "name": "contact_phonenumber",
+                "description": _("The callable link to the configured phonenumber"),
+                "example": "14010",
+            },
+            {
+                "name": "profile_notifications",
+                "description": _(
+                    "The link to the notifications and unsubscribe settings"
+                ),
+            },
         ],
     },
     "plan_action_update": {
@@ -168,7 +237,7 @@ MAIL_EDITOR_CONF = {
         "description": _(
             "This email is used to notify plan participants about the change in the plan action"
         ),
-        "subject_default": "Plan action has been updated at {{ site_name }}",
+        "subject_default": "Samenwerkingsactie bijgewerkt op {{ site_name }}",
         "body_default": _readfile("plan_action_update.html"),
         "subject": [
             {
@@ -192,6 +261,21 @@ MAIL_EDITOR_CONF = {
             {
                 "name": "site_name",
                 "description": _("Name of the site"),
+            },
+            {
+                "name": "contact_page",
+                "description": _("The link to an existing contactpage"),
+            },
+            {
+                "name": "contact_phonenumber",
+                "description": _("The callable link to the configured phonenumber"),
+                "example": "14010",
+            },
+            {
+                "name": "profile_notifications",
+                "description": _(
+                    "The link to the notifications and unsubscribe settings"
+                ),
             },
         ],
     },

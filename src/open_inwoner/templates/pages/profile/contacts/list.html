@@ -21,7 +21,7 @@
                 {% with pending_approvals.get as pending_approval %}
                 <div class="approval__single">
                     <p class="p">
-                        {% blocktrans with full_name=pending_approval.get_full_name %}{{ full_name }} wilt u toevoegen als contactpersoon.{% endblocktrans %}
+                        {% blocktrans with full_name=pending_approval.get_full_name %}{{ full_name }} wil u toevoegen als contactpersoon.{% endblocktrans %}
                     </p>
                     {% url 'profile:contact_approval' uuid=pending_approval.uuid as approval_url %}
                     {% render_form form=None method="POST" form_action=approval_url id="approval_form" spaceless=True show_notifications=True %}
