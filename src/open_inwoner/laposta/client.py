@@ -42,10 +42,6 @@ class LapostaClient(APIClient):
         return lists
 
     def create_subscription(self, list_id: str, user_data: UserData) -> Member | None:
-        # Ensure the current subscriptions for this email address are fetched again after
-        # this API call
-        cache.delete(f"laposta_list_subscriptions:{user_data.email}")
-
         response = self.post(
             "member", data={"list_id": list_id, **user_data.model_dump()}
         )
@@ -67,13 +63,13 @@ class LapostaClient(APIClient):
         if not data:
             return None
 
+        # Ensure the current subscriptions for this email address are fetched again after
+        # this API call
+        cache.delete(f"laposta_list_subscriptions:{user_data.email}")
+
         return Member(**data["member"])
 
     def remove_subscription(self, list_id: str, email: str) -> Member | None:
-        # Ensure the current subscriptions for this email address are fetched again after
-        # this API call
-        cache.delete(f"laposta_list_subscriptions:{email}")
-
         response = self.delete(
             f"member/{quote_email(email)}", params={"list_id": list_id}
         )
@@ -89,6 +85,10 @@ class LapostaClient(APIClient):
         data = get_json_response(response)
         if not data:
             return None
+
+        # Ensure the current subscriptions for this email address are fetched again after
+        # this API call
+        cache.delete(f"laposta_list_subscriptions:{email}")
 
         return Member(**data["member"])
 
