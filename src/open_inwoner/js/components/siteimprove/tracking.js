@@ -235,18 +235,20 @@ const selectorMap = {
       'check',
       'Enable',
     ],
-    '.form#change-notifications a.button[title="Terug"]': [
-      'click',
-      'Communicatievoorkeuren',
-      'Click',
-      'No Save (terug naar mijn profiel)',
-    ],
-    '.form#change-notifications a.button .material-icons': [
-      'click',
-      'Communicatievoorkeuren',
-      'Click',
-      'No Save (terug naar mijn profiel)',
-    ],
+    '.form#change-notifications > .form__actions.form__actions--fullwidth > a.button':
+      [
+        'click',
+        'Communicatievoorkeuren',
+        'Click',
+        'No Save (terug naar mijn profiel)',
+      ],
+    '.form#change-notifications > .form__actions.form__actions--fullwidth > a.button .material-icons-outlined':
+      [
+        'click',
+        'Communicatievoorkeuren',
+        'Click',
+        'No Save (terug naar mijn profiel)',
+      ],
     '.form#change-notifications button.button--primary': [
       'click',
       'Communicatievoorkeuren',
