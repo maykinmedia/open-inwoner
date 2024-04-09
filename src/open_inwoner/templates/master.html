@@ -105,11 +105,6 @@
             {% endblock mobile_anchors %}
         {% endif %}
 
-        <div class="anchor__scroll" id="scroll-anchor">
-            <div class="anchor__scroll-link">
-                {% button href="#top" text=_("Terug naar boven") icon="arrow_upward" pill=True %}
-            </div>
-        </div>
         {% render_breadcrumbs "components/Header/Breadcrumbs.html" %}
 
         {% block header_image %}{% endblock header_image %}

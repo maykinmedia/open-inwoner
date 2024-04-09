@@ -155,32 +155,3 @@
     }
   }
 }
-
-/// Scroll
-.anchor {
-  &__scroll {
-    display: none;
-    position: fixed;
-    bottom: var(--spacing-large);
-    right: var(--spacing-large);
-    z-index: 1005;
-
-    @media (min-width: 768px) {
-      position: static;
-      display: none;
-    }
-
-    &-link {
-      position: static;
-
-      @media (min-width: 768px) {
-        position: static;
-        display: none;
-      }
-
-      .link {
-        border-color: transparent;
-      }
-    }
-  }
-}
