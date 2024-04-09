@@ -37,8 +37,6 @@ class NewsletterSubscriptionForm(forms.Form):
                     if choice[0] in limited_to
                 ]
 
-            # TODO get list_ids of lists the user is subscribed to
-            # self.existing_subscriptions = laposta_client.get_subscriptions_for_email(limited_to, user.email)
             self.fields[
                 "newsletters"
             ].initial = laposta_client.get_subscriptions_for_email(
