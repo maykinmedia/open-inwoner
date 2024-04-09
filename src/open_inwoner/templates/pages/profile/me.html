@@ -101,7 +101,26 @@
         </div>
     </section>
 
-    {% if view.config.selected_categories or view.config.mentors or view.config.my_contacts or view.config.actions or view.config.ssd or view.config.selfdiagnose or view.config.newsletters or view.config.appointments %}
+    {% if view.config.newsletters and form.fields.newsletters.choices %}
+    <section class="tabled tabled--flexible profile-section profile-section--bordered" id="profile-newsletters">
+        <div class="tabled__section">
+            <h2 class="h2 title" id="newsletters">{% trans "Nieuwsbrieven" %}</h2>
+        </div>
+            <form method="POST" id="newsletter-form" class="form" novalidate>
+                {% csrf_token %}
+
+                {% for field in form.fields %}
+                    {% autorender_field form field %}
+                {% endfor %}
+
+                {% button_row %}
+                    {% button text=_("Opslaan") type="submit" extra_classes="button--primary" name="newsletter-submit" %}
+                {% endbutton_row %}
+            </form>
+    </section>
+    {% endif %}
+
+    {% if view.config.selected_categories or view.config.mentors or view.config.my_contacts or view.config.actions or view.config.ssd or view.config.selfdiagnose or view.config.appointments %}
     {# Overview #}
     <section class="profile-section profile-section__overview">
         <h2 class="h2 title" id="overview">{% trans "Overzicht" %}</h2>
@@ -251,19 +270,6 @@
                         <h4 class="card__heading-4"><span class="link link__text">{% trans "Zelftest" %}</span></h4>
                         <span class="link link--icon link--secondary profile-card__button" aria-label="{% trans "Start zelfdiagnose" %}" title="{% trans "Start zelfdiagnose" %}">
                             <span class="link__text">{% trans "Start zelfdiagnose" %}</span>
-                            {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
-                        </span>
-                    </div>
-                </a>
-            {% endif %}
-            {% if view.config.newsletters %}
-                <a href="{% url 'profile:newsletters' %}" class="card card--compact card--stretch" id="profile-section-newsletters">
-                    <div class="card__body">
-                        <h4 class="card__heading-4"><span class="link link__text">{% trans "Nieuwsbrieven" %}</span>
-                        </h4>
-
-                        <span class="link link--icon link--secondary profile-card__button" aria-label="{% trans "Bekijk nieuwsbrieven" %}" title="{% trans "Bekijk nieuwsbrieven" %}">
-                            <span class="link__text">{% trans "Bekijk nieuwsbrieven" %}</span>
                             {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
                         </span>
                     </div>
