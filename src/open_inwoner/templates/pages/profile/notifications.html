@@ -1,31 +1,81 @@
 {% extends 'master.html' %}
-{% load i18n l10n form_tags %}
+{% load i18n l10n grid_tags form_tags icon_tags button_tags %}
 
 {% block content %}
-<h1 class="h1" id="title">
-    {% trans "Ontvang berichten over" %}
-</h1>
-<p class="p">
-    {% trans "Kies voor welk onderwerp je meldingen wilt ontvangen" %}
-</p>
+    {% render_grid %}
+        {% render_column start=5 span=5 %}
+        <h1 class="h1" id="title">
+            {% trans "Ontvang berichten over" %}
+        </h1>
+        <p class="p">
+            {% trans "Kies voor welk onderwerp je meldingen wilt ontvangen" %}
+        </p>
 
-<form method="POST" id="change-notifications" action="{% url 'profile:notifications' %}" class="form" novalidate>
-    {% csrf_token %}
+        <form method="POST" id="change-notifications" action="{% url 'profile:notifications' %}" class="form" novalidate>
+            {% csrf_token %}
 
-    {% for field in form.fields %}
-        {% autorender_field form field %}
-    {% endfor %}
+            {% if form.first_name %}
+                {% input form.first_name %}
+            {% endif %}
 
-    <div class="form__control">
-        {# pseudo checkbox for notifications that cannot be disabled #}
-        <div class="checkbox">
-            <span role="checkbox" aria-disabled="true" aria-checked="true" class="checkbox__input checkbox__pseudo checkbox__input--disabled" aria-labelledby="id_cases_notifications_action_required" tabindex="0"></span>
-            <span class="checkbox__label checkbox__pseudo-label" id="id_cases_notifications_action_required">{% trans "Zaaknotificaties - actie is nodig" %}</span>
-            <p class="p">{% trans "E-mailnotificaties wanneer er actie nodig is voor een zaak (kan niet uitgeschakeld worden)" %}</p>
-        </div>
-    </div>
+            {% if form.infix %}
+                {% input form.infix %}
+            {% endif %}
 
-    {% form_actions primary_text=_("Opslaan") primary_icon="arrow_forward" secondary_href='profile:detail' secondary_text=_('Terug') secondary_icon_position="before" secondary_icon='arrow_backward' %}
-</form>
+            {% if form.last_name %}
+                {% input form.last_name %}
+            {% endif %}
 
+            {% if form.email %}
+                {% input form.email %}
+            {% endif %}
+
+            {% if form.invite %}
+                {% input form.invite no_label=True %}
+            {% endif %}
+
+            <h3 class="h3">Notificatie voorkeuren</h3>
+
+            {# Start of multiple checkbox fields #}
+            <ul class="choice-list choice-list-multiple">
+
+                {% if form.cases_notifications %}
+                    <li class="choice-list-multiple__item">
+                        <div class="choice-list-multiple__content">
+                            {% checkbox form.cases_notifications %}
+                        </div>
+                    </li>
+                {% endif %}
+
+                {% if form.messages_notifications %}
+                    <li class="choice-list-multiple__item">
+                        <div class="choice-list-multiple__content">
+                            {% checkbox form.messages_notifications %}</div>
+                    </li>
+                {% endif %}
+
+                {% if form.plans_notifications %}
+                    <li class="choice-list-multiple__item">
+                        <div class="choice-list-multiple__content">
+                            {% checkbox form.plans_notifications %}</div>
+                    </li>
+                {% endif %}
+            </ul>
+            {# End of multiple checkbox fields #}
+
+            <div class="choice-list choice-list-multiple">
+                {# Info on notifications that cannot be disabled #}
+                <div class="choice-list__information">
+                    <p class="choice-list-multiple__heading-4">{% icon icon="check" outlined=True %} {% trans "Zaaknotificaties - actie is nodig" %}</p>
+                    <p class="choice-list__p">{% trans "E-mailnotificaties wanneer er actie nodig is voor een zaak (kan niet uitgeschakeld worden)" %}</p>
+                </div>
+            </div>
+
+            <div class="form__actions form__actions--fullwidth">
+                {% button text=_("Sla wijzigingen op") primary=True type="submit" form_id="change-notifications" %}
+                {% button href="profile:detail" icon="west" text=_("Terug naar Mijn profiel") icon_outlined=True transparent=True %}
+            </div>
+        </form>
+        {% endrender_column %}
+    {% endrender_grid %}
 {% endblock content %}

@@ -31,15 +31,16 @@
       box-sizing: border-box;
       width: var(--font-line-height-body-small);
       height: var(--font-line-height-body-small);
-      border: 1px solid var(--color-gray-dark);
+      border: var(--border-width) solid var(--color-gray-dark);
       border-radius: 100%;
       background-color: var(--color-white);
     }
   }
 
   .radio__input:checked ~ .radio__label:before {
-    background-color: var(--color-secondary);
-    color: var(--color-font-secondary);
+    background-color: var(--color-white);
+    border: var(--border-width) solid var(--color-secondary);
+    color: var(--color-secondary);
     font-family: 'Material Icons';
     content: '\e876';
   }

@@ -32,18 +32,15 @@
       width: var(--font-line-height-body-small);
       height: var(--font-line-height-body-small);
       border: var(--border-width) solid var(--color-gray-dark);
-      border-radius: 1px; // intended-var-change.
+      border-radius: var(--border-radius);
       background-color: var(--color-white);
-    }
-
-    &.checkbox__pseudo-label {
-      padding-left: calc(var(--gutter-width) + 4px);
     }
   }
 
   .checkbox__input:checked ~ .checkbox__label:before {
-    background-color: var(--color-secondary);
-    color: var(--color-font-secondary);
+    background-color: var(--color-white);
+    border: var(--border-width) solid var(--color-secondary);
+    color: var(--color-secondary);
     font-family: 'Material Icons';
     content: '\e876';
   }
@@ -56,22 +53,12 @@
     content: '\e876';
   }
 
-  /// Mimic checked-styles for pseudo checkboxes
-
-  &__pseudo ~ .checkbox__label:before {
-    background-color: var(--color-secondary);
-    color: var(--color-font-secondary);
-    font-family: 'Material Icons';
-    left: 4px;
-    content: '\e876';
-  }
-
-  &__pseudo.checkbox__input--disabled ~ .checkbox__label:before {
-    border-color: var(--color-gray) !important;
-    background-color: var(--color-gray);
-    color: var(--color-white);
-    font-family: 'Material Icons';
-    left: 3px;
-    content: '\e876';
+  &__p {
+    color: var(--font-color-body);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body);
+    line-height: var(--font-line-height-body);
+    font-weight: normal;
+    margin: 0;
   }
 }
