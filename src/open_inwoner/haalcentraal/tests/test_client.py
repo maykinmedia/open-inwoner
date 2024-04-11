@@ -1,3 +1,5 @@
+import json
+
 from django.test import TestCase
 
 import requests_mock
@@ -16,6 +18,27 @@ class BRPClientTest(HaalCentraalMixin, TestCase):
         response = api_client.make_request("999993847")
 
         self.assertEqual(
-            response.request.body,
-            b'{"fields": ["naam.geslachtsnaam", "naam.voorletters", "naam.voornamen", "naam.voorvoegsel", "geslacht.omschrijving", "geboorte.plaats.omschrijving", "geboorte.datum.datum", "verblijfplaats.verblijfadres.officieleStraatnaam", "verblijfplaats.verblijfadres.huisnummer", "verblijfplaats.verblijfadres.huisletter", "verblijfplaats.verblijfadres.huisnummertoevoeging", "verblijfplaats.verblijfadres.postcode", "verblijfplaats.verblijfadres.woonplaats"], "type": "RaadpleegMetBurgerservicenummer", "burgerservicenummer": ["999993847"]}',
+            m.request_history[0].headers["Content-Type"], "application/json"
         )
+
+        data = {
+            "fields": [
+                "naam.geslachtsnaam",
+                "naam.voorletters",
+                "naam.voornamen",
+                "naam.voorvoegsel",
+                "geslacht.omschrijving",
+                "geboorte.plaats.omschrijving",
+                "geboorte.datum.datum",
+                "verblijfplaats.verblijfadres.officieleStraatnaam",
+                "verblijfplaats.verblijfadres.huisnummer",
+                "verblijfplaats.verblijfadres.huisletter",
+                "verblijfplaats.verblijfadres.huisnummertoevoeging",
+                "verblijfplaats.verblijfadres.postcode",
+                "verblijfplaats.verblijfadres.woonplaats",
+            ],
+            "type": "RaadpleegMetBurgerservicenummer",
+            "burgerservicenummer": ["999993847"],
+        }
+
+        self.assertEqual(json.loads(response.request.body), data)

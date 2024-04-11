@@ -3,6 +3,7 @@ import logging
 from abc import ABC
 from datetime import datetime
 
+import requests
 from glom import GlomError, glom
 from requests import RequestException
 from zgw_consumers.client import build_client
@@ -114,7 +115,7 @@ class BRP_1_3(BRPAPI):
 class BRP_2_1(BRPAPI):
     version = "2.1"
 
-    def make_request(self, user_bsn: str) -> dict | None:
+    def make_request(self, user_bsn: str) -> requests.Response:
         url = "personen"
         response = self.client.post(
             url=url,
@@ -145,7 +146,7 @@ class BRP_2_1(BRPAPI):
         )
         return response
 
-    def fetch_data(self, user_bsn):
+    def fetch_data(self, user_bsn) -> dict | None:
         try:
             response = self.make_request(user_bsn)
             return get_json_response(response)
