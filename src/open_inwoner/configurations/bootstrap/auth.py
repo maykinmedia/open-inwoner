@@ -1,10 +1,19 @@
 from django.conf import settings
+from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import Group
+from django.core.exceptions import ValidationError
+from django.test import RequestFactory
 
+from digid_eherkenning.admin import (
+    DigidConfigurationAdmin,
+    EherkenningConfigurationAdmin,
+)
+from digid_eherkenning.models import DigidConfiguration, EherkenningConfiguration
 from django_setup_configuration.configuration import BaseConfigurationStep
 from django_setup_configuration.exceptions import ConfigurationRunFailed
 from mozilla_django_oidc_db.forms import OpenIDConnectConfigForm
 from mozilla_django_oidc_db.models import OpenIDConnectConfig
+from simple_certmanager.models import Certificate
 
 from digid_eherkenning_oidc_generics.admin import (
     OpenIDConnectDigiDConfigForm,
@@ -14,6 +23,7 @@ from digid_eherkenning_oidc_generics.models import (
     OpenIDConnectDigiDConfig,
     OpenIDConnectEHerkenningConfig,
 )
+from open_inwoner.configurations.models import SiteConfiguration
 
 
 class DigiDOIDCConfigurationStep(BaseConfigurationStep):
@@ -240,4 +250,241 @@ class AdminOIDCConfigurationStep(BaseConfigurationStep):
         """
         TODO not sure if it is feasible (because there are different possible IdPs),
         but it would be nice if we could test the login automatically
+        """
+
+
+class DigiDConfigurationStep(BaseConfigurationStep):
+    """
+    Configure DigiD via SAML
+    """
+
+    verbose_name = "Configuration for DigiD via SAML"
+    required_settings = [
+        "DIGID_CERTIFICATE_LABEL",
+        "DIGID_CERTIFICATE_TYPE",
+        "DIGID_CERTIFICATE_PUBLIC_CERTIFICATE",
+        "DIGID_METADATA_FILE_SOURCE",
+        "DIGID_ENTITY_ID",
+        "DIGID_BASE_URL",
+        "DIGID_SERVICE_NAME",
+        "DIGID_SERVICE_DESCRIPTION",
+    ]
+    all_settings = required_settings + [
+        "DIGID_CERTIFICATE_PRIVATE_KEY",
+        "DIGID_WANT_ASSERTIONS_SIGNED",
+        "DIGID_WANT_ASSERTIONS_ENCRYPTED",
+        "DIGID_ARTIFACT_RESOLVE_CONTENT_TYPE",
+        "DIGID_KEY_PASSPHRASE",
+        "DIGID_SIGNATURE_ALGORITHM",
+        "DIGID_DIGEST_ALGORITHM",
+        "DIGID_TECHNICAL_CONTACT_PERSON_TELEPHONE",
+        "DIGID_TECHNICAL_CONTACT_PERSON_EMAIL",
+        "DIGID_ORGANIZATION_URL",
+        "DIGID_ORGANIZATION_NAME",
+        "DIGID_ATTRIBUTE_CONSUMING_SERVICE_INDEX",
+        "DIGID_REQUESTED_ATTRIBUTES",
+        "DIGID_SLO",
+    ]
+    enable_setting = "DIGID_ENABLED"
+
+    def is_configured(self) -> bool:
+        config = DigidConfiguration.get_solo()
+        return bool(
+            config.certificate
+            and config.metadata_file_source
+            and config.entity_id
+            and config.base_url
+            and config.service_name
+            and config.service_description
+        )
+
+    def configure(self):
+        config = DigidConfiguration.get_solo()
+
+        # Use the model defaults
+        form_data = {
+            field.name: getattr(config, field.name)
+            for field in DigidConfiguration._meta.fields
+        }
+
+        # Only override field values with settings if they are defined
+        for setting in self.all_settings:
+            value = getattr(settings, setting, None)
+            if value is not None:
+                model_field_name = setting.split("DIGID_")[1].lower()
+                if model_field_name.startswith("certificate"):
+                    continue
+
+                form_data[model_field_name] = value
+
+        certificate, _ = Certificate.objects.get_or_create(
+            label=settings.DIGID_CERTIFICATE_LABEL,
+            defaults={
+                "type": settings.DIGID_CERTIFICATE_TYPE,
+            },
+        )
+
+        # Save the certificates separately, to ensure the resulting file is stored in
+        # private media
+        with open(settings.DIGID_CERTIFICATE_PUBLIC_CERTIFICATE) as public_cert:
+            certificate.public_certificate.save("digid.crt", public_cert)
+
+        if settings.DIGID_CERTIFICATE_PRIVATE_KEY:
+            with open(settings.DIGID_CERTIFICATE_PRIVATE_KEY) as private_key:
+                certificate.private_key.save("digid.key", private_key)
+
+        form_data["certificate"] = certificate
+
+        request = RequestFactory().get("/")
+        digid_admin = DigidConfigurationAdmin(DigidConfiguration, AdminSite())
+        form_class = digid_admin.get_form(request)
+
+        form = form_class(data=form_data)
+        if not form.is_valid():
+            raise ConfigurationRunFailed(
+                f"Something went wrong while saving configuration: {form.errors}"
+            )
+
+        try:
+            form.save()
+        except ValidationError as e:
+            raise ConfigurationRunFailed(
+                "Something went wrong while saving configuration"
+            ) from e
+
+    def test_configuration(self):
+        """
+        TODO
+        """
+
+
+class eHerkenningConfigurationStep(BaseConfigurationStep):
+    """
+    Configure eHerkenning via SAML
+    """
+
+    verbose_name = "Configuration for eHerkenning via SAML"
+    required_settings = [
+        "EHERKENNING_CERTIFICATE_LABEL",
+        "EHERKENNING_CERTIFICATE_TYPE",
+        "EHERKENNING_CERTIFICATE_PUBLIC_CERTIFICATE",
+        "EHERKENNING_METADATA_FILE_SOURCE",
+        "EHERKENNING_ENTITY_ID",
+        "EHERKENNING_BASE_URL",
+        "EHERKENNING_SERVICE_NAME",
+        "EHERKENNING_SERVICE_DESCRIPTION",
+        "EHERKENNING_OIN",
+        "EHERKENNING_MAKELAAR_ID",
+        "EHERKENNING_PRIVACY_POLICY",
+    ]
+    all_settings = required_settings + [
+        "EHERKENNING_CERTIFICATE_PRIVATE_KEY",
+        "EHERKENNING_WANT_ASSERTIONS_SIGNED",
+        "EHERKENNING_WANT_ASSERTIONS_ENCRYPTED",
+        "EHERKENNING_ARTIFACT_RESOLVE_CONTENT_TYPE",
+        "EHERKENNING_KEY_PASSPHRASE",
+        "EHERKENNING_SIGNATURE_ALGORITHM",
+        "EHERKENNING_DIGEST_ALGORITHM",
+        "EHERKENNING_ENTITY_ID",
+        "EHERKENNING_BASE_URL",
+        "EHERKENNING_SERVICE_NAME",
+        "EHERKENNING_SERVICE_DESCRIPTION",
+        "EHERKENNING_TECHNICAL_CONTACT_PERSON_TELEPHONE",
+        "EHERKENNING_TECHNICAL_CONTACT_PERSON_EMAIL",
+        "EHERKENNING_ORGANIZATION_URL",
+        "EHERKENNING_ORGANIZATION_NAME",
+        "EHERKENNING_EH_LOA",
+        "EHERKENNING_EH_ATTRIBUTE_CONSUMING_SERVICE_INDEX",
+        "EHERKENNING_EH_REQUESTED_ATTRIBUTES",
+        "EHERKENNING_EH_SERVICE_UUID",
+        "EHERKENNING_EH_SERVICE_INSTANCE_UUID",
+        "EHERKENNING_EIDAS_LOA",
+        "EHERKENNING_EIDAS_ATTRIBUTE_CONSUMING_SERVICE_INDEX",
+        "EHERKENNING_EIDAS_REQUESTED_ATTRIBUTES",
+        "EHERKENNING_EIDAS_SERVICE_UUID",
+        "EHERKENNING_EIDAS_SERVICE_INSTANCE_UUID",
+        "EHERKENNING_NO_EIDAS",
+        "EHERKENNING_SERVICE_LANGUAGE",
+    ]
+    enable_setting = "EHERKENNING_ENABLE"
+
+    def is_configured(self) -> bool:
+        config = EherkenningConfiguration.get_solo()
+        site_config = SiteConfiguration.get_solo()
+        return site_config.eherkenning_enabled and bool(
+            config.certificate
+            and config.metadata_file_source
+            and config.entity_id
+            and config.base_url
+            and config.service_name
+            and config.service_description
+            and config.oin
+            and config.makelaar_id
+            and config.privacy_policy
+            and config.service_language
+        )
+
+    def configure(self):
+        config = EherkenningConfiguration.get_solo()
+
+        # Use the model defaults
+        form_data = {
+            field.name: getattr(config, field.name)
+            for field in EherkenningConfiguration._meta.fields
+        }
+
+        # Only override field values with settings if they are defined
+        for setting in self.all_settings:
+            value = getattr(settings, setting, None)
+            if value is not None:
+                model_field_name = setting.split("EHERKENNING_")[1].lower()
+                if model_field_name.startswith("certificate"):
+                    continue
+
+                form_data[model_field_name] = value
+
+        certificate, _ = Certificate.objects.get_or_create(
+            label=settings.EHERKENNING_CERTIFICATE_LABEL,
+            defaults={
+                "type": settings.EHERKENNING_CERTIFICATE_TYPE,
+            },
+        )
+
+        # Save the certificates separately, to ensure the resulting file is stored in
+        # private media
+        with open(settings.EHERKENNING_CERTIFICATE_PUBLIC_CERTIFICATE) as public_cert:
+            certificate.public_certificate.save("eherkenning.crt", public_cert)
+
+        if settings.EHERKENNING_CERTIFICATE_PRIVATE_KEY:
+            with open(settings.EHERKENNING_CERTIFICATE_PRIVATE_KEY) as private_key:
+                certificate.private_key.save("eherkenning.key", private_key)
+
+        form_data["certificate"] = certificate
+
+        request = RequestFactory().get("/")
+        eherkenning_admin = EherkenningConfigurationAdmin(
+            EherkenningConfiguration, AdminSite()
+        )
+        form_class = eherkenning_admin.get_form(request)
+
+        form = form_class(data=form_data)
+        if not form.is_valid():
+            raise ConfigurationRunFailed(
+                f"Something went wrong while saving configuration: {form.errors}"
+            )
+
+        try:
+            form.save()
+        except ValidationError as e:
+            raise ConfigurationRunFailed(
+                "Something went wrong while saving configuration"
+            ) from e
+
+        site_config = SiteConfiguration.get_solo()
+        site_config.eherkenning_enabled = True
+        site_config.save()
+
+    def test_configuration(self):
+        """
+        TODO
         """
