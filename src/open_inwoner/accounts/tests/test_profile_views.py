@@ -1041,7 +1041,10 @@ class NewsletterSubscriptionTests(ClearCachesMixin, WebTest):
         cms_tools.create_apphook_page(ProfileApphook)
 
         self.profile_url = reverse("profile:detail")
-        self.user = DigidUserFactory()
+        self.user = DigidUserFactory(
+            email="news@example.com", verified_email="news@example.com"
+        )
+        self.assertTrue(self.user.has_verified_email())
 
         self.config = LapostaConfig.get_solo()
         self.config.api_root = "https://laposta.local/api/v2/"
@@ -1152,6 +1155,31 @@ class NewsletterSubscriptionTests(ClearCachesMixin, WebTest):
 
         # Second field was excluded by `LapostaConfig.limit_list_selection_to`
         self.assertNotIn("Nieuwsbrief2: bar", response.text)
+
+    def test_do_not_render_form_if_email_not_verified(self, m):
+        self.setUpMocks(m)
+
+        self.user.verified_email = ""
+        self.user.save()
+        self.assertFalse(self.user.has_verified_email())
+
+        self.config.limit_list_selection_to = ["list1"]
+        self.config.save()
+
+        m.get(
+            f"{self.config.api_root}member/{self.user.email}?list_id=list1",
+            json={
+                "member": MemberFactory.build(
+                    list_id="list1",
+                    member_id="1234567",
+                    email=self.user.email,
+                    custom_fields=None,
+                ).model_dump()
+            },
+        )
+        response = self.app.get(self.profile_url, user=self.user)
+
+        self.assertNotIn("newsletter-form", response.forms)
 
 
 @requests_mock.Mocker()
