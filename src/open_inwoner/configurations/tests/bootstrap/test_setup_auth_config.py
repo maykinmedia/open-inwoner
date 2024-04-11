@@ -1,14 +1,28 @@
+import tempfile
+import urllib.error
 from unittest import skip
+from unittest.mock import patch
+from uuid import UUID
 
+from django.conf import settings
 from django.test import TestCase, override_settings
 
 import requests
 import requests_mock
+from digid_eherkenning.choices import (
+    AssuranceLevels,
+    DigestAlgorithms,
+    SignatureAlgorithms,
+    XMLContentTypes,
+)
+from digid_eherkenning.models import DigidConfiguration, EherkenningConfiguration
 from django_setup_configuration.exceptions import ConfigurationRunFailed
 from mozilla_django_oidc_db.models import (
     OpenIDConnectConfig,
     UserInformationClaimsSources,
 )
+from privates.test import temp_private_root
+from simple_certmanager.constants import CertificateTypes
 
 from digid_eherkenning_oidc_generics.models import (
     OpenIDConnectDigiDConfig,
@@ -18,7 +32,9 @@ from open_inwoner.utils.test import ClearCachesMixin
 
 from ...bootstrap.auth import (
     AdminOIDCConfigurationStep,
+    DigiDConfigurationStep,
     DigiDOIDCConfigurationStep,
+    eHerkenningConfigurationStep,
     eHerkenningOIDCConfigurationStep,
 )
 
@@ -33,6 +49,19 @@ DISCOVERY_ENDPOINT_RESPONSE = {
     "end_session_endpoint": f"{IDENTITY_PROVIDER}protocol/openid-connect/logout",
     "jwks_uri": f"{IDENTITY_PROVIDER}protocol/openid-connect/certs",
 }
+
+DIGID_XML_METADATA_PATH = (
+    "src/open_inwoner/configurations/tests/bootstrap/files/digid-metadata.xml"
+)
+
+PUBLIC_CERT_FILE = tempfile.NamedTemporaryFile()
+PRIVATE_KEY_FILE = tempfile.NamedTemporaryFile()
+
+with open(PUBLIC_CERT_FILE.name, "w") as f:
+    f.write("cert")
+
+with open(PRIVATE_KEY_FILE.name, "w") as f:
+    f.write("key")
 
 
 @override_settings(
@@ -655,5 +684,344 @@ class AdminOIDCConfigurationTests(ClearCachesMixin, TestCase):
         self.assertFalse(config.is_configured())
 
         config.configure()
+
+        self.assertTrue(config.is_configured())
+
+
+@temp_private_root()
+@override_settings(
+    DIGID_CERTIFICATE_LABEL="DigiD certificate",
+    DIGID_CERTIFICATE_TYPE=CertificateTypes.key_pair,
+    DIGID_CERTIFICATE_PUBLIC_CERTIFICATE=PUBLIC_CERT_FILE.name,
+    DIGID_CERTIFICATE_PRIVATE_KEY=PRIVATE_KEY_FILE.name,
+    DIGID_METADATA_FILE_SOURCE="http://metadata.local/file.xml",
+    DIGID_ENTITY_ID="1234",
+    DIGID_BASE_URL="http://digid.local",
+    DIGID_SERVICE_NAME="OIP",
+    DIGID_SERVICE_DESCRIPTION="Open Inwoner",
+    DIGID_WANT_ASSERTIONS_SIGNED=False,
+    DIGID_WANT_ASSERTIONS_ENCRYPTED=True,
+    DIGID_ARTIFACT_RESOLVE_CONTENT_TYPE=XMLContentTypes.text_xml,
+    DIGID_KEY_PASSPHRASE="foo",
+    DIGID_SIGNATURE_ALGORITHM=SignatureAlgorithms.dsa_sha1,
+    DIGID_DIGEST_ALGORITHM=DigestAlgorithms.sha512,
+    DIGID_TECHNICAL_CONTACT_PERSON_TELEPHONE="0612345678",
+    DIGID_TECHNICAL_CONTACT_PERSON_EMAIL="foo@bar.org",
+    DIGID_ORGANIZATION_URL="http://open-inwoner.local",
+    DIGID_ORGANIZATION_NAME="Open Inwoner",
+    DIGID_ATTRIBUTE_CONSUMING_SERVICE_INDEX="2",
+    DIGID_REQUESTED_ATTRIBUTES=[
+        {"name": "bsn", "required": True},
+        {"name": "email", "required": False},
+    ],
+    DIGID_SLO=False,
+)
+class DigiDConfigurationTests(ClearCachesMixin, TestCase):
+    def test_configure(self):
+        with open(DIGID_XML_METADATA_PATH) as f:
+            with patch(
+                "onelogin.saml2.idp_metadata_parser.urllib2.urlopen", return_value=f
+            ):
+                DigiDConfigurationStep().configure()
+
+        config = DigidConfiguration.get_solo()
+
+        self.assertEqual(config.certificate.label, "DigiD certificate")
+        self.assertEqual(config.certificate.type, CertificateTypes.key_pair)
+
+        public_cert = config.certificate.public_certificate
+        private_key = config.certificate.private_key
+
+        self.assertTrue(public_cert.path.startswith(settings.PRIVATE_MEDIA_ROOT))
+        self.assertEqual(public_cert.file.read(), b"cert")
+        self.assertTrue(private_key.path.startswith(settings.PRIVATE_MEDIA_ROOT))
+        self.assertEqual(private_key.file.read(), b"key")
+
+        self.assertEqual(config.key_passphrase, "foo")
+        self.assertEqual(config.metadata_file_source, "http://metadata.local/file.xml")
+        self.assertEqual(
+            config.idp_service_entity_id,
+            "https://was-preprod1.digid.nl/saml/idp/metadata",
+        )
+        self.assertTrue(config.idp_metadata_file.path.endswith(".xml"))
+        self.assertEqual(config.entity_id, "1234")
+        self.assertEqual(config.base_url, "http://digid.local")
+        self.assertEqual(config.service_name, "OIP")
+        self.assertEqual(config.service_description, "Open Inwoner")
+        self.assertEqual(config.want_assertions_signed, False)
+        self.assertEqual(config.want_assertions_encrypted, True)
+        self.assertEqual(config.artifact_resolve_content_type, XMLContentTypes.text_xml)
+        self.assertEqual(config.signature_algorithm, SignatureAlgorithms.dsa_sha1)
+        self.assertEqual(config.digest_algorithm, DigestAlgorithms.sha512)
+        self.assertEqual(config.technical_contact_person_telephone, "0612345678")
+        self.assertEqual(config.technical_contact_person_email, "foo@bar.org")
+        self.assertEqual(config.organization_url, "http://open-inwoner.local")
+        self.assertEqual(config.organization_name, "Open Inwoner")
+        self.assertEqual(config.attribute_consuming_service_index, "2")
+        self.assertEqual(
+            config.requested_attributes,
+            [{"name": "bsn", "required": True}, {"name": "email", "required": False}],
+        )
+        self.assertEqual(config.slo, False)
+
+    @override_settings(
+        DIGID_WANT_ASSERTIONS_SIGNED=None,
+        DIGID_WANT_ASSERTIONS_ENCRYPTED=None,
+        DIGID_ARTIFACT_RESOLVE_CONTENT_TYPE=None,
+        DIGID_KEY_PASSPHRASE=None,
+        DIGID_SIGNATURE_ALGORITHM=None,
+        DIGID_DIGEST_ALGORITHM=None,
+        DIGID_ATTRIBUTE_CONSUMING_SERVICE_INDEX=None,
+        DIGID_REQUESTED_ATTRIBUTES=None,
+        DIGID_SLO=None,
+    )
+    def test_configure_use_defaults(self):
+        with open(DIGID_XML_METADATA_PATH) as f:
+            with patch(
+                "onelogin.saml2.idp_metadata_parser.urllib2.urlopen", return_value=f
+            ):
+                DigiDConfigurationStep().configure()
+
+        config = DigidConfiguration.get_solo()
+
+        self.assertEqual(config.key_passphrase, "")
+        self.assertEqual(config.want_assertions_signed, True)
+        self.assertEqual(config.want_assertions_encrypted, False)
+        self.assertEqual(config.artifact_resolve_content_type, XMLContentTypes.soap_xml)
+        self.assertEqual(config.signature_algorithm, SignatureAlgorithms.rsa_sha1)
+        self.assertEqual(config.digest_algorithm, DigestAlgorithms.sha1)
+        self.assertEqual(config.attribute_consuming_service_index, "1")
+        self.assertEqual(
+            config.requested_attributes,
+            [{"name": "bsn", "required": True}],
+        )
+        self.assertEqual(config.slo, True)
+
+    def test_configure_failure(self):
+        exceptions = (urllib.error.HTTPError, urllib.error.URLError)
+        for exception in exceptions:
+            with self.subTest(exception=exception):
+                with patch(
+                    "onelogin.saml2.idp_metadata_parser.urllib2.urlopen",
+                    side_effect=exception,
+                ):
+                    with self.assertRaises(ConfigurationRunFailed):
+                        DigiDConfigurationStep().configure()
+
+                config = DigidConfiguration.get_solo()
+
+                self.assertFalse(config.certificate, None)
+
+    @skip("Testing config for DigiD OIDC is not implemented yet")
+    @requests_mock.Mocker()
+    def test_configuration_check_ok(self, m):
+        raise NotImplementedError
+
+    @skip("Testing config for DigiD OIDC is not implemented yet")
+    @requests_mock.Mocker()
+    def test_configuration_check_failures(self, m):
+        raise NotImplementedError
+
+    def test_is_configured(self):
+        config = DigiDConfigurationStep()
+
+        self.assertFalse(config.is_configured())
+
+        with open(DIGID_XML_METADATA_PATH) as f:
+            with patch(
+                "onelogin.saml2.idp_metadata_parser.urllib2.urlopen", return_value=f
+            ):
+                config.configure()
+
+        self.assertTrue(config.is_configured())
+
+
+@temp_private_root()
+@override_settings(
+    EHERKENNING_CERTIFICATE_LABEL="eHerkenning certificate",
+    EHERKENNING_CERTIFICATE_TYPE=CertificateTypes.key_pair,
+    EHERKENNING_CERTIFICATE_PUBLIC_CERTIFICATE=PUBLIC_CERT_FILE.name,
+    EHERKENNING_CERTIFICATE_PRIVATE_KEY=PRIVATE_KEY_FILE.name,
+    EHERKENNING_METADATA_FILE_SOURCE="http://metadata.local/file.xml",
+    EHERKENNING_ENTITY_ID="1234",
+    EHERKENNING_BASE_URL="http://eherkenning.local",
+    EHERKENNING_SERVICE_NAME="OIP",
+    EHERKENNING_SERVICE_DESCRIPTION="Open Inwoner",
+    EHERKENNING_WANT_ASSERTIONS_SIGNED=False,
+    EHERKENNING_WANT_ASSERTIONS_ENCRYPTED=True,
+    EHERKENNING_ARTIFACT_RESOLVE_CONTENT_TYPE=XMLContentTypes.text_xml,
+    EHERKENNING_KEY_PASSPHRASE="foo",
+    EHERKENNING_SIGNATURE_ALGORITHM=SignatureAlgorithms.dsa_sha1,
+    EHERKENNING_DIGEST_ALGORITHM=DigestAlgorithms.sha512,
+    EHERKENNING_TECHNICAL_CONTACT_PERSON_TELEPHONE="0612345678",
+    EHERKENNING_TECHNICAL_CONTACT_PERSON_EMAIL="foo@bar.org",
+    EHERKENNING_ORGANIZATION_URL="http://open-inwoner.local",
+    EHERKENNING_ORGANIZATION_NAME="Open Inwoner",
+    EHERKENNING_EH_LOA=AssuranceLevels.high,
+    EHERKENNING_EH_ATTRIBUTE_CONSUMING_SERVICE_INDEX="9053",
+    EHERKENNING_EH_REQUESTED_ATTRIBUTES=[{"name": "kvk", "required": True}],
+    EHERKENNING_EH_SERVICE_UUID="a89ca0cc-e0db-417a-993e-1a54300a3537",
+    EHERKENNING_EH_SERVICE_INSTANCE_UUID="feed1712-4d97-4aaf-92e1-607ebd65263d",
+    EHERKENNING_EIDAS_LOA=AssuranceLevels.high,
+    EHERKENNING_EIDAS_ATTRIBUTE_CONSUMING_SERVICE_INDEX="9054",
+    EHERKENNING_EIDAS_REQUESTED_ATTRIBUTES=[{"name": "kvk", "required": True}],
+    EHERKENNING_EIDAS_SERVICE_UUID="59d0bfe8-10e6-4830-bc2b-c7d895a16f31",
+    EHERKENNING_EIDAS_SERVICE_INSTANCE_UUID="c1cd3bfa-cd5e-4f68-8991-7a87c137f8f0",
+    EHERKENNING_OIN="11111222223333344444",
+    EHERKENNING_NO_EIDAS=True,
+    EHERKENNING_PRIVACY_POLICY="http://privacy-policy.local/",
+    EHERKENNING_MAKELAAR_ID="44444333332222211111",
+    EHERKENNING_SERVICE_LANGUAGE="en",
+)
+class eHerkenningConfigurationTests(ClearCachesMixin, TestCase):
+    def test_configure(self):
+        with open(DIGID_XML_METADATA_PATH) as f:
+            with patch(
+                "onelogin.saml2.idp_metadata_parser.urllib2.urlopen", return_value=f
+            ):
+                eHerkenningConfigurationStep().configure()
+
+        config = EherkenningConfiguration.get_solo()
+
+        self.assertEqual(config.certificate.label, "eHerkenning certificate")
+        self.assertEqual(config.certificate.type, CertificateTypes.key_pair)
+
+        public_cert = config.certificate.public_certificate
+        private_key = config.certificate.private_key
+
+        self.assertTrue(public_cert.path.startswith(settings.PRIVATE_MEDIA_ROOT))
+        self.assertEqual(public_cert.file.read(), b"cert")
+        self.assertTrue(private_key.path.startswith(settings.PRIVATE_MEDIA_ROOT))
+        self.assertEqual(private_key.file.read(), b"key")
+
+        self.assertEqual(config.key_passphrase, "foo")
+        self.assertEqual(config.metadata_file_source, "http://metadata.local/file.xml")
+        self.assertEqual(
+            config.idp_service_entity_id,
+            "https://was-preprod1.digid.nl/saml/idp/metadata",
+        )
+        self.assertTrue(config.idp_metadata_file.path.endswith(".xml"))
+        self.assertEqual(config.entity_id, "1234")
+        self.assertEqual(config.base_url, "http://eherkenning.local")
+        self.assertEqual(config.service_name, "OIP")
+        self.assertEqual(config.service_description, "Open Inwoner")
+        self.assertEqual(config.want_assertions_signed, False)
+        self.assertEqual(config.want_assertions_encrypted, True)
+        self.assertEqual(config.artifact_resolve_content_type, XMLContentTypes.text_xml)
+        self.assertEqual(config.signature_algorithm, SignatureAlgorithms.dsa_sha1)
+        self.assertEqual(config.digest_algorithm, DigestAlgorithms.sha512)
+        self.assertEqual(config.technical_contact_person_telephone, "0612345678")
+        self.assertEqual(config.technical_contact_person_email, "foo@bar.org")
+        self.assertEqual(config.organization_url, "http://open-inwoner.local")
+        self.assertEqual(config.organization_name, "Open Inwoner")
+        self.assertEqual(config.eh_loa, AssuranceLevels.high)
+        self.assertEqual(config.eh_attribute_consuming_service_index, "9053")
+        self.assertEqual(
+            config.eh_requested_attributes, [{"name": "kvk", "required": True}]
+        )
+        self.assertEqual(
+            config.eh_service_uuid, UUID("a89ca0cc-e0db-417a-993e-1a54300a3537")
+        )
+        self.assertEqual(
+            config.eh_service_instance_uuid,
+            UUID("feed1712-4d97-4aaf-92e1-607ebd65263d"),
+        )
+        self.assertEqual(config.eidas_loa, AssuranceLevels.high)
+        self.assertEqual(config.eidas_attribute_consuming_service_index, "9054")
+        self.assertEqual(
+            config.eidas_requested_attributes, [{"name": "kvk", "required": True}]
+        )
+        self.assertEqual(
+            config.eidas_service_uuid, UUID("59d0bfe8-10e6-4830-bc2b-c7d895a16f31")
+        )
+        self.assertEqual(
+            config.eidas_service_instance_uuid,
+            UUID("c1cd3bfa-cd5e-4f68-8991-7a87c137f8f0"),
+        )
+        self.assertEqual(config.oin, "11111222223333344444")
+        self.assertEqual(config.no_eidas, True)
+        self.assertEqual(config.privacy_policy, "http://privacy-policy.local/")
+        self.assertEqual(config.makelaar_id, "44444333332222211111")
+        self.assertEqual(config.service_language, "en")
+
+    @override_settings(
+        EHERKENNING_WANT_ASSERTIONS_SIGNED=None,
+        EHERKENNING_WANT_ASSERTIONS_ENCRYPTED=None,
+        EHERKENNING_ARTIFACT_RESOLVE_CONTENT_TYPE=None,
+        EHERKENNING_KEY_PASSPHRASE=None,
+        EHERKENNING_SIGNATURE_ALGORITHM=None,
+        EHERKENNING_DIGEST_ALGORITHM=None,
+        EHERKENNING_EH_LOA=None,
+        EHERKENNING_EH_ATTRIBUTE_CONSUMING_SERVICE_INDEX=None,
+        EHERKENNING_EH_SERVICE_UUID=None,
+        EHERKENNING_EH_SERVICE_INSTANCE_UUID=None,
+        EHERKENNING_EIDAS_LOA=None,
+        EHERKENNING_EIDAS_ATTRIBUTE_CONSUMING_SERVICE_INDEX=None,
+        EHERKENNING_EIDAS_SERVICE_UUID=None,
+        EHERKENNING_EIDAS_SERVICE_INSTANCE_UUID=None,
+        EHERKENNING_NO_EIDAS=None,
+        EHERKENNING_SERVICE_LANGUAGE=None,
+    )
+    def test_configure_use_defaults(self):
+        with open(DIGID_XML_METADATA_PATH) as f:
+            with patch(
+                "onelogin.saml2.idp_metadata_parser.urllib2.urlopen", return_value=f
+            ):
+                eHerkenningConfigurationStep().configure()
+
+        config = EherkenningConfiguration.get_solo()
+
+        self.assertEqual(config.want_assertions_signed, True)
+        self.assertEqual(config.want_assertions_encrypted, False)
+        self.assertEqual(config.artifact_resolve_content_type, XMLContentTypes.soap_xml)
+        self.assertEqual(config.key_passphrase, "")
+        self.assertEqual(config.signature_algorithm, SignatureAlgorithms.rsa_sha1)
+        self.assertEqual(config.digest_algorithm, DigestAlgorithms.sha1)
+        self.assertEqual(config.eh_loa, AssuranceLevels.substantial)
+        self.assertEqual(config.eh_attribute_consuming_service_index, "9052")
+        self.assertIsInstance(config.eh_service_uuid, UUID)
+        self.assertIsInstance(config.eh_service_instance_uuid, UUID)
+        self.assertEqual(config.eidas_loa, AssuranceLevels.substantial)
+        self.assertEqual(config.eidas_attribute_consuming_service_index, "9053")
+        self.assertIsInstance(config.eidas_service_uuid, UUID)
+        self.assertIsInstance(config.eidas_service_instance_uuid, UUID)
+        self.assertEqual(config.no_eidas, False)
+        self.assertEqual(config.service_language, "nl")
+
+    def test_configure_failure(self):
+        exceptions = (urllib.error.HTTPError, urllib.error.URLError)
+        for exception in exceptions:
+            with self.subTest(exception=exception):
+                with patch(
+                    "onelogin.saml2.idp_metadata_parser.urllib2.urlopen",
+                    side_effect=exception,
+                ):
+                    with self.assertRaises(ConfigurationRunFailed):
+                        eHerkenningConfigurationStep().configure()
+
+                config = EherkenningConfiguration.get_solo()
+
+                self.assertFalse(config.certificate, None)
+
+    @skip("Testing config for DigiD OIDC is not implemented yet")
+    @requests_mock.Mocker()
+    def test_configuration_check_ok(self, m):
+        raise NotImplementedError
+
+    @skip("Testing config for DigiD OIDC is not implemented yet")
+    @requests_mock.Mocker()
+    def test_configuration_check_failures(self, m):
+        raise NotImplementedError
+
+    def test_is_configured(self):
+        config = eHerkenningConfigurationStep()
+
+        self.assertFalse(config.is_configured())
+
+        with open(DIGID_XML_METADATA_PATH) as f:
+            with patch(
+                "onelogin.saml2.idp_metadata_parser.urllib2.urlopen", return_value=f
+            ):
+                config.configure()
 
         self.assertTrue(config.is_configured())
