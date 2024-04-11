@@ -1,15 +1,31 @@
 .kcm-survey {
+  display: inline-block;
+  border-top-left-radius: var(--border-radius);
+  border-top-right-radius: var(--border-radius);
+  border-bottom-right-radius: 0;
   position: fixed;
-  inset: 50% -20px auto auto;
-  transform: rotate(180deg) translateX(50%) translateY(50%);
-  writing-mode: vertical-rl;
+  bottom: 0;
+  right: 0;
   z-index: 1010;
   padding: var(--spacing-medium);
   background-color: var(--color-info-lighter);
   font-size: var(--font-size-heading-card);
   font-weight: bold;
+  writing-mode: initial;
 
   & .link {
     color: var(--color-info-darker);
+  }
+
+  @media (min-width: 768px) {
+    border-top-left-radius: 0;
+    border-top-right-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+    bottom: initial;
+    right: initial;
+    display: block;
+    inset: 50% -20px auto auto;
+    transform: rotate(180deg) translateX(50%) translateY(50%);
+    writing-mode: vertical-rl;
   }
 }
