@@ -23,6 +23,7 @@ from open_inwoner.kvk.tests.factories import CertificateFactory
 from open_inwoner.openzaak.models import OpenZaakConfig
 
 from ...cms.collaborate.cms_apps import CollaborateApphook
+from ...cms.profile.cms_apps import ProfileApphook
 from ...cms.tests import cms_tools
 from ...utils.test import ClearCachesMixin
 from ...utils.tests.helpers import AssertRedirectsMixin
@@ -1422,6 +1423,7 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
     @classmethod
     def setUpTestData(cls):
         cms_tools.create_homepage()
+        cms_tools.create_apphook_page(ProfileApphook)
 
     def test_page_show_config_text(self):
         config = SiteConfiguration.get_solo()

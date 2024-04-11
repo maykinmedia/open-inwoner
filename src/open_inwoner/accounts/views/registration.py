@@ -3,10 +3,10 @@ from urllib.parse import unquote
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import NoReverseMatch, reverse
 from django.utils.translation import gettext as _
-from django.views.generic import UpdateView
+from django.views.generic import TemplateView, UpdateView
 
 from django_registration.backends.one_step.views import RegistrationView
 from furl import furl
@@ -18,6 +18,8 @@ from digid_eherkenning_oidc_generics.models import (
 from open_inwoner.utils.hash import generate_email_from_string
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
+from ...mail.verification import send_user_email_verification_mail
+from ...utils.text import html_tag_wrap_format
 from ...utils.url import get_next_url_from
 from ..forms import CustomRegistrationForm, NecessaryUserForm
 from ..models import Invite, User
@@ -179,3 +181,53 @@ class NecessaryFieldsUserView(LogMixin, LoginRequiredMixin, InviteMixin, UpdateV
             initial["email"] = ""
 
         return initial
+
+
+class EmailVerificationUserView(LogMixin, LoginRequiredMixin, TemplateView):
+    model = User
+    template_name = "accounts/email_verification.html"
+
+    def page_title(self):
+        return _("E-mailadres bevestigen")
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        text = _("Om door te gaan moet je jouw e-mailadres {email} bevestigen.")
+        ctx["verification_text"] = html_tag_wrap_format(
+            text, "strong", email=self.request.user.email
+        )
+        if self.request.GET.get("sent"):
+            ctx["button_text"] = _("Verificatie email nogmaals verzenden")
+        else:
+            ctx["button_text"] = _("Verificatie email verzenden")
+
+        return ctx
+
+    def get(self, request, *args, **kwargs):
+        user: User = self.request.user
+        if not user.email or user.has_verified_email():
+            # shouldn't happen but would be bad
+            return HttpResponseRedirect(
+                get_next_url_from(self.request, default=reverse("pages-root"))
+            )
+        return super().get(request, *args, **kwargs)
+
+    def post(self, form):
+        user: User = self.request.user
+
+        send_user_email_verification_mail(
+            user, next_url=get_next_url_from(self.request, default="")
+        )
+
+        messages.add_message(
+            self.request, messages.SUCCESS, _("Bevestigings e-mail is verzonden")
+        )
+        self.log_user_action(user, _("user requested e-mail address verification"))
+
+        return redirect(self.get_success_url())
+
+    def get_success_url(self):
+        # redirect to self, keep any next-urls
+        f = furl(self.request.get_full_path())
+        f.args["sent"] = 1
+        return f.url
