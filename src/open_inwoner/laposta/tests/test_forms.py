@@ -1,3 +1,4 @@
+from unittest.mock import patch
 from urllib.parse import parse_qs
 
 from django.test import RequestFactory, TestCase
@@ -21,6 +22,9 @@ class NewsletterSubscriptionFormTestCase(ClearCachesMixin, TestCase):
         super().setUp()
 
         self.user = DigidUserFactory()
+        self.user.verified_email = self.user.email
+        self.user.save()
+        self.assertTrue(self.user.has_verified_email())
 
         self.request = RequestFactory().get("/")
         self.request.user = self.user
@@ -289,3 +293,41 @@ class NewsletterSubscriptionFormTestCase(ClearCachesMixin, TestCase):
                 ]
             },
         )
+
+    @patch("open_inwoner.laposta.forms.create_laposta_client")
+    def test_form__disables_when_email_not_verified(self, m, mock_create_client):
+        """
+        Verify that the form can create and delete subscriptions
+        """
+        self.setUpMocks(m)
+
+        self.user.verified_email = ""
+        self.user.save()
+        self.assertFalse(self.user.has_verified_email())
+
+        m.get(
+            f"{LAPOSTA_API_ROOT}member/{self.user.email}?list_id=123",
+            json={
+                "member": MemberFactory.build(
+                    list_id="123",
+                    member_id="1234567",
+                    email=self.user.email,
+                    custom_fields=None,
+                ).model_dump()
+            },
+        )
+
+        form = NewsletterSubscriptionForm(data={}, user=self.user)
+
+        # We don't get any newletters if not using verified email
+        self.assertEqual(form["newsletters"].initial, None)
+
+        # Because client was never built (and no request-mock exception was thrown)
+        mock_create_client.assert_not_called()
+
+        # Check forced save() doesn't do anything
+        form = NewsletterSubscriptionForm(data={"newsletters": ["123"]}, user=self.user)
+        form.save(self.request)
+
+        # Client was never built (and no request-mock exception was thrown)
+        mock_create_client.assert_not_called()

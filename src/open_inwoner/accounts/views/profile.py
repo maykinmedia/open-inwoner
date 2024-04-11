@@ -338,22 +338,29 @@ class MyNotificationsView(
 
 
 class UserAppointmentsView(
-    LogMixin, LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, TemplateView
+    LogMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    TemplateView,
 ):
     template_name = "pages/profile/appointments.html"
 
     def get_context_data(self, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        # TODO email should be verified
-        try:
-            client = QmaticClient()
-        except NoServiceConfigured:
-            logger.exception("Error occurred while creating Qmatic client")
+        user: User = self.request.user
+        if not user.has_verified_email():
             context["appointments"] = []
         else:
-            context["appointments"] = client.list_appointments_for_customer(
-                self.request.user.email
-            )
+            try:
+                client = QmaticClient()
+            except NoServiceConfigured:
+                logger.exception("Error occurred while creating Qmatic client")
+                context["appointments"] = []
+            else:
+                context["appointments"] = client.list_appointments_for_customer(
+                    user.verified_email
+                )
         return context
 
     @cached_property

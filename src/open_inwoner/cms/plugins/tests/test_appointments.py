@@ -17,6 +17,8 @@ class TestUserAppointmentsPlugin(TestCase):
         data = QmaticMockData()
         data.setUpMocks(m)
 
+        self.assertTrue(data.user.has_verified_email())
+
         html, context = cms_tools.render_plugin(
             UserAppointmentsPlugin, plugin_data={}, user=data.user
         )
@@ -46,3 +48,19 @@ class TestUserAppointmentsPlugin(TestCase):
 
         action_url = items[0].attrib["href"]
         self.assertEqual(action_url, reverse("profile:appointments"))
+
+    def test_plugin__email_not_verified(self, m):
+        data = QmaticMockData()
+        data.setUpMocks(m)
+        data.user.verified_email = ""
+        data.user.save()
+        self.assertFalse(data.user.has_verified_email())
+
+        html, context = cms_tools.render_plugin(
+            UserAppointmentsPlugin, plugin_data={}, user=data.user
+        )
+
+        appointments = context["appointments"]
+
+        # zero results
+        self.assertEqual(len(appointments), 0)

@@ -1165,6 +1165,7 @@ class UserAppointmentsTests(ClearCachesMixin, WebTest):
         super().setUp()
 
         self.data = QmaticMockData()
+        self.assertTrue(self.data.user.has_verified_email())
 
     def test_do_not_render_list_if_config_is_missing(self, m):
         self.data.config.service = None
@@ -1189,6 +1190,15 @@ class UserAppointmentsTests(ClearCachesMixin, WebTest):
             f"{self.data.api_root}v1/customers/externalId/{self.data.user.email}/appointments",
             json={"appointmentList": [{"invalid": "data"}]},
         )
+
+        response = self.app.get(self.appointments_url, user=self.data.user)
+
+        self.assertIn(_("Geen afspraken beschikbaar"), response.text)
+
+    def test_do_not_render_list_if_email_not_verified(self, m):
+        self.data.user.verified_email = ""
+        self.data.user.save()
+        self.assertFalse(self.data.user.has_verified_email())
 
         response = self.app.get(self.appointments_url, user=self.data.user)
 
