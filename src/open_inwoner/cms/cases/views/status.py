@@ -155,7 +155,11 @@ class InnerCaseDetailView(
                         self.case
                     )
                 )
-            questions = [ocm.contactmoment for ocm in objectcontactmomenten]
+            questions = []
+            for ocm in objectcontactmomenten:
+                question = getattr(ocm, "contactmoment", None)
+                if question:
+                    questions.append(question)
             questions.sort(key=lambda q: q.registratiedatum, reverse=True)
 
             kcm_answer_mapping = get_kcm_answer_mapping(questions, self.request.user)
