@@ -1035,7 +1035,12 @@ class NewsletterSubscriptionTests(ClearCachesMixin, WebTest):
     def setUp(self):
         super().setUp()
 
-        self.profile_url = reverse("profile:newsletters")
+        self.profile_app = ProfileConfig.objects.create(
+            namespace=ProfileApphook.app_name, newsletters=True
+        )
+        cms_tools.create_apphook_page(ProfileApphook)
+
+        self.profile_url = reverse("profile:detail")
         self.user = DigidUserFactory()
 
         self.config = LapostaConfig.get_solo()
@@ -1054,7 +1059,12 @@ class NewsletterSubscriptionTests(ClearCachesMixin, WebTest):
     def setUpMocks(self, m):
         m.get(
             "https://laposta.local/api/v2/list",
-            json={"data": [{"list": self.list1.dict()}, {"list": self.list2.dict()}]},
+            json={
+                "data": [
+                    {"list": self.list1.model_dump()},
+                    {"list": self.list2.model_dump()},
+                ]
+            },
         )
 
     def test_do_not_render_form_if_config_is_missing(self, m):
@@ -1063,7 +1073,6 @@ class NewsletterSubscriptionTests(ClearCachesMixin, WebTest):
 
         response = self.app.get(self.profile_url, user=self.user)
 
-        self.assertIn(_("Geen nieuwsbrieven beschikbaar"), response.text)
         self.assertNotIn("newsletter-form", response.forms)
 
     def test_do_not_render_form_if_no_newsletters_are_found(self, m):
@@ -1071,7 +1080,6 @@ class NewsletterSubscriptionTests(ClearCachesMixin, WebTest):
 
         response = self.app.get(self.profile_url, user=self.user)
 
-        self.assertIn(_("Geen nieuwsbrieven beschikbaar"), response.text)
         self.assertNotIn("newsletter-form", response.forms)
 
     def test_render_form_if_newsletters_are_found(self, m):

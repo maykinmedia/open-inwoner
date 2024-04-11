@@ -41,7 +41,6 @@ from .profile import (
     MyDataView,
     MyNotificationsView,
     MyProfileView,
-    NewsletterSubscribeView,
     UserAppointmentsView,
 )
 from .registration import CustomRegistrationView, NecessaryFieldsUserView
@@ -80,7 +79,6 @@ __all__ = [
     "MyDataView",
     "MyNotificationsView",
     "MyProfileView",
-    "NewsletterSubscribeView",
     "UserAppointmentsView",
     "CustomRegistrationView",
     "NecessaryFieldsUserView",

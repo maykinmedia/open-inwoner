@@ -22,7 +22,6 @@ from open_inwoner.accounts.views import (
     MyNotificationsView,
     MyProfileView,
     NecessaryFieldsUserView,
-    NewsletterSubscribeView,
     UserAppointmentsView,
 )
 from open_inwoner.accounts.views.actions import ActionDeleteView
@@ -108,11 +107,6 @@ urlpatterns = [
         "register/email/verification/",
         EmailVerificationUserView.as_view(),
         name="email_verification_user",
-    ),
-    path(
-        "newsletters",
-        NewsletterSubscribeView.as_view(),
-        name="newsletters",
     ),
     path("appointments", UserAppointmentsView.as_view(), name="appointments"),
     path("", MyProfileView.as_view(), name="detail"),

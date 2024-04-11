@@ -5,7 +5,6 @@ from typing import Any
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.forms.forms import Form
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
@@ -49,7 +48,31 @@ class MyProfileView(
     FormView,
 ):
     template_name = "pages/profile/me.html"
-    form_class = Form
+    form_class = NewsletterSubscriptionForm
+
+    def get_success_url(self) -> str:
+        return reverse("profile:detail")
+
+    def get_form_kwargs(self) -> dict[str, Any]:
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
+
+    def form_valid(self, form):
+        form.save(self.request)
+
+        # Display errors raised by Laposta API
+        if form.errors:
+            self.log_user_action(
+                self.request.user, _("failed to modify user newsletter subscription")
+            )
+            return self.form_invalid(form)
+
+        messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
+        self.log_user_action(
+            self.request.user, _("users newsletter subscriptions were modified")
+        )
+        return HttpResponseRedirect(self.get_success_url())
 
     @cached_property
     def crumbs(self):
@@ -140,6 +163,9 @@ class MyProfileView(
         return context
 
     def post(self, request, *args, **kwargs):
+        if "newsletter-submit" in request.POST:
+            return super().post(request, *args, **kwargs)
+
         if request.user.is_authenticated and not request.user.is_staff:
             instance = User.objects.get(id=request.user.id)
 
@@ -308,44 +334,6 @@ class MyNotificationsView(
         form.save()
         messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
         self.log_change(self.object, _("users notifications were modified"))
-        return HttpResponseRedirect(self.get_success_url())
-
-
-class NewsletterSubscribeView(
-    LogMixin, LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, FormView
-):
-    form_class = NewsletterSubscriptionForm
-    template_name = "pages/profile/newsletters.html"
-
-    def get_success_url(self) -> str:
-        return reverse("profile:newsletters")
-
-    @cached_property
-    def crumbs(self):
-        return [
-            (_("Mijn profiel"), reverse("profile:detail")),
-            (_("Nieuwsbrieven"), reverse("profile:newsletters")),
-        ]
-
-    def get_form_kwargs(self) -> dict[str, Any]:
-        kwargs = super().get_form_kwargs()
-        kwargs["user"] = self.request.user
-        return kwargs
-
-    def form_valid(self, form):
-        form.save(self.request)
-
-        # Display errors raised by Laposta API
-        if form.errors:
-            self.log_user_action(
-                self.request.user, _("failed to modify user newsletter subscription")
-            )
-            return self.form_invalid(form)
-
-        messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
-        self.log_user_action(
-            self.request.user, _("users newsletter subscriptions were modified")
-        )
         return HttpResponseRedirect(self.get_success_url())
 
 
