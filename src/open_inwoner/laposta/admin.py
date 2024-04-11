@@ -6,7 +6,7 @@ from solo.admin import SingletonModelAdmin
 
 from .choices import get_list_choices
 from .client import create_laposta_client
-from .models import LapostaConfig, Subscription
+from .models import LapostaConfig
 
 
 class LapostaConfigForm(forms.ModelForm):
@@ -49,10 +49,3 @@ class LapostaConfigAdmin(SingletonModelAdmin):
             {"fields": ("limit_list_selection_to",)},
         ),
     )
-
-
-@admin.register(Subscription)
-class SubscriptionAdmin(admin.ModelAdmin):
-    list_display = ["list_id", "user", "member_id"]
-    list_filter = ["list_id", "user"]
-    search_fields = ("user__first_name", "user__last_name", "user__email")

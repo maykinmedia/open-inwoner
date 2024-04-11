@@ -9,8 +9,8 @@ from open_inwoner.accounts.tests.factories import DigidUserFactory
 from open_inwoner.utils.test import ClearCachesMixin
 
 from ..forms import NewsletterSubscriptionForm
-from ..models import LapostaConfig, Subscription
-from .factories import LapostaListFactory, MemberFactory, SubscriptionFactory
+from ..models import LapostaConfig
+from .factories import LapostaListFactory, MemberFactory
 
 LAPOSTA_API_ROOT = "https://laposta.local/api/v2/"
 
@@ -29,6 +29,7 @@ class NewsletterSubscriptionFormTestCase(ClearCachesMixin, TestCase):
         self.config.api_root = LAPOSTA_API_ROOT
         self.config.basic_auth_username = "username"
         self.config.basic_auth_password = "password"
+        self.config.limit_list_selection_to = ["123", "456", "789"]
         self.config.save()
 
         self.list1 = LapostaListFactory.build(
@@ -46,9 +47,9 @@ class NewsletterSubscriptionFormTestCase(ClearCachesMixin, TestCase):
             f"{LAPOSTA_API_ROOT}list",
             json={
                 "data": [
-                    {"list": self.list1.dict()},
-                    {"list": self.list2.dict()},
-                    {"list": self.list3.dict()},
+                    {"list": self.list1.model_dump()},
+                    {"list": self.list2.model_dump()},
+                    {"list": self.list3.model_dump()},
                 ]
             },
         )
@@ -59,8 +60,31 @@ class NewsletterSubscriptionFormTestCase(ClearCachesMixin, TestCase):
         """
         self.setUpMocks(m)
 
-        SubscriptionFactory.create(list_id="123", member_id="member123", user=self.user)
-        SubscriptionFactory.create(list_id="456", member_id="member456", user=self.user)
+        m.get(
+            f"{LAPOSTA_API_ROOT}member/{self.user.email}?list_id=123",
+            json={
+                "member": MemberFactory.build(
+                    list_id="123",
+                    member_id="1234567",
+                    email=self.user.email,
+                    custom_fields=None,
+                ).model_dump()
+            },
+        )
+        m.get(
+            f"{LAPOSTA_API_ROOT}member/{self.user.email}?list_id=456",
+            json={
+                "member": MemberFactory.build(
+                    list_id="456",
+                    member_id="8765433",
+                    email=self.user.email,
+                    custom_fields=None,
+                ).model_dump()
+            },
+        )
+        m.get(
+            f"{LAPOSTA_API_ROOT}member/{self.user.email}?list_id=789", status_code=400
+        )
 
         form = NewsletterSubscriptionForm(data={}, user=self.user)
 
@@ -81,10 +105,12 @@ class NewsletterSubscriptionFormTestCase(ClearCachesMixin, TestCase):
                     member_id="member789",
                     email=self.user.email,
                     custom_fields=None,
-                ).dict()
+                ).model_dump()
             },
         )
-        delete_matcher = m.delete(f"{LAPOSTA_API_ROOT}member/member123?list_id=123")
+        delete_matcher = m.delete(
+            f"{LAPOSTA_API_ROOT}member/{self.user.email}?list_id=123"
+        )
 
         form.save(self.request)
 
@@ -108,28 +134,28 @@ class NewsletterSubscriptionFormTestCase(ClearCachesMixin, TestCase):
             "Unsubscribe from list if not present in the form data",
         )
 
-        subscriptions = Subscription.objects.filter(user=self.user)
-
-        self.assertEqual(subscriptions.count(), 2)
-
-        subscription1, subscription2 = subscriptions
-
-        self.assertEqual(subscription1.list_id, "456")
-        self.assertEqual(subscription1.member_id, "member456")
-        self.assertEqual(subscription2.list_id, "789")
-        self.assertEqual(subscription2.member_id, "member789")
-
     def test_save_form_create_duplicate_subscription(self, m):
         """
         Verify that the client properly handles the scenario where the user is a member
-        of the list in the API, but no Subscription exists locally and tries to create one
+        of the list in the API, but the user tries to create a new subscription for it
         """
         self.setUpMocks(m)
+
+        m.get(
+            f"{LAPOSTA_API_ROOT}member/{self.user.email}?list_id=123", status_code=400
+        )
+        m.get(
+            f"{LAPOSTA_API_ROOT}member/{self.user.email}?list_id=456", status_code=400
+        )
+        m.get(
+            f"{LAPOSTA_API_ROOT}member/{self.user.email}?list_id=789", status_code=400
+        )
 
         form = NewsletterSubscriptionForm(data={"newsletters": ["789"]}, user=self.user)
 
         self.assertTrue(form.is_valid())
 
+        # The subscription could have been created somewhere else in the meantime
         post_matcher = m.post(
             f"{LAPOSTA_API_ROOT}member",
             json={
@@ -149,28 +175,37 @@ class NewsletterSubscriptionFormTestCase(ClearCachesMixin, TestCase):
 
         self.assertEqual(len(post_matcher.request_history), 1)
 
-        subscription = Subscription.objects.filter(user=self.user).get()
-
-        # Subscription should be created locally, based on data returned by API
-        self.assertEqual(subscription.list_id, "789")
-        self.assertEqual(subscription.member_id, "member789")
-
     def test_save_form_delete_non_existent_subscription(self, m):
         """
-        Verify that the client properly handles the scenario where the user has a
-        Subscription to a list locally and tries to delete it, but that relationship
-        does not exist in the API
+        Verify that the client properly handles the scenario where the user tries to
+        delete a subscription that does not exist in the API
         """
         self.setUpMocks(m)
 
-        SubscriptionFactory.create(list_id="789", member_id="member789", user=self.user)
+        m.get(
+            f"{LAPOSTA_API_ROOT}member/{self.user.email}?list_id=123", status_code=400
+        )
+        m.get(
+            f"{LAPOSTA_API_ROOT}member/{self.user.email}?list_id=456", status_code=400
+        )
+        m.get(
+            f"{LAPOSTA_API_ROOT}member/{self.user.email}?list_id=789",
+            json={
+                "member": MemberFactory.build(
+                    list_id="789",
+                    member_id="1234567",
+                    email=self.user.email,
+                    custom_fields=None,
+                ).model_dump()
+            },
+        )
 
         form = NewsletterSubscriptionForm(data={"newsletters": []}, user=self.user)
 
         self.assertTrue(form.is_valid())
 
         delete_matcher = m.delete(
-            f"{LAPOSTA_API_ROOT}member/member789?list_id=789",
+            f"{LAPOSTA_API_ROOT}member/{self.user.email}?list_id=789",
             json={
                 "error": {
                     "type": "invalid_input",
@@ -186,15 +221,29 @@ class NewsletterSubscriptionFormTestCase(ClearCachesMixin, TestCase):
 
         self.assertEqual(len(delete_matcher.request_history), 1)
 
-        self.assertFalse(Subscription.objects.filter(user=self.user).exists())
-
     def test_save_form_raises_errors(self, m):
         """
         Form should return errors if unexpected errors occur when performing API calls
         """
         self.setUpMocks(m)
 
-        SubscriptionFactory.create(list_id="456", member_id="member456", user=self.user)
+        m.get(
+            f"{LAPOSTA_API_ROOT}member/{self.user.email}?list_id=123", status_code=400
+        )
+        m.get(
+            f"{LAPOSTA_API_ROOT}member/{self.user.email}?list_id=456",
+            json={
+                "member": MemberFactory.build(
+                    list_id="456",
+                    member_id="1234567",
+                    email=self.user.email,
+                    custom_fields=None,
+                ).model_dump()
+            },
+        )
+        m.get(
+            f"{LAPOSTA_API_ROOT}member/{self.user.email}?list_id=789", status_code=400
+        )
 
         form = NewsletterSubscriptionForm(data={"newsletters": ["789"]}, user=self.user)
 
@@ -211,7 +260,7 @@ class NewsletterSubscriptionFormTestCase(ClearCachesMixin, TestCase):
             status_code=500,
         )
         delete_matcher = m.delete(
-            f"{LAPOSTA_API_ROOT}member/member456?list_id=456",
+            f"{LAPOSTA_API_ROOT}member/{self.user.email}?list_id=456",
             json={
                 "error": {
                     "type": "internal",
@@ -240,8 +289,3 @@ class NewsletterSubscriptionFormTestCase(ClearCachesMixin, TestCase):
                 ]
             },
         )
-
-        # Local subscription should not be deleted
-        subscription = Subscription.objects.get(user=self.user)
-
-        self.assertEqual(subscription.list_id, "456")

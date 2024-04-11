@@ -17,7 +17,7 @@ from open_inwoner.accounts.choices import StatusChoices
 from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.laposta.models import LapostaConfig
-from open_inwoner.laposta.tests.factories import LapostaListFactory, SubscriptionFactory
+from open_inwoner.laposta.tests.factories import LapostaListFactory, MemberFactory
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.pdc.tests.factories import CategoryFactory
 from open_inwoner.plans.tests.factories import PlanFactory
@@ -1077,7 +1077,24 @@ class NewsletterSubscriptionTests(ClearCachesMixin, WebTest):
     def test_render_form_if_newsletters_are_found(self, m):
         self.setUpMocks(m)
 
-        SubscriptionFactory.create(list_id=self.list1.list_id, user=self.user)
+        self.config.limit_list_selection_to = ["list1", "list2"]
+        self.config.save()
+
+        m.get(
+            f"{self.config.api_root}member/{self.user.email}?list_id=list1",
+            json={
+                "member": MemberFactory.build(
+                    list_id="list1",
+                    member_id="1234567",
+                    email=self.user.email,
+                    custom_fields=None,
+                ).model_dump()
+            },
+        )
+        m.get(
+            f"{self.config.api_root}member/{self.user.email}?list_id=list2",
+            status_code=400,
+        )
 
         response = self.app.get(self.profile_url, user=self.user)
 
@@ -1098,7 +1115,21 @@ class NewsletterSubscriptionTests(ClearCachesMixin, WebTest):
         self.config.limit_list_selection_to = ["list1"]
         self.config.save()
 
-        SubscriptionFactory.create(list_id=self.list1.list_id, user=self.user)
+        m.get(
+            f"{self.config.api_root}member/{self.user.email}?list_id=list1",
+            json={
+                "member": MemberFactory.build(
+                    list_id="list1",
+                    member_id="1234567",
+                    email=self.user.email,
+                    custom_fields=None,
+                ).model_dump()
+            },
+        )
+        m.get(
+            f"{self.config.api_root}member/{self.user.email}?list_id=list2",
+            status_code=400,
+        )
 
         response = self.app.get(self.profile_url, user=self.user)
 

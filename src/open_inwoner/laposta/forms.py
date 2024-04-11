@@ -8,7 +8,7 @@ from ipware import get_client_ip
 from requests.exceptions import RequestException
 
 from open_inwoner.laposta.api_models import UserData
-from open_inwoner.laposta.models import LapostaConfig, Subscription
+from open_inwoner.laposta.models import LapostaConfig
 from open_inwoner.utils.api import ClientError
 
 from .choices import get_list_choices
@@ -37,10 +37,11 @@ class NewsletterSubscriptionForm(forms.Form):
                     if choice[0] in limited_to
                 ]
 
-            self.fields["newsletters"].initial = [
-                subscription.list_id
-                for subscription in Subscription.objects.filter(user=user)
-            ]
+            self.fields[
+                "newsletters"
+            ].initial = laposta_client.get_subscriptions_for_email(
+                limited_to, user.email
+            )
 
     def save(self, request, *args, **kwargs):
         newsletters = self.cleaned_data["newsletters"]
@@ -57,19 +58,16 @@ class NewsletterSubscriptionForm(forms.Form):
             custom_fields=None,
             options=None,
         )
+        limited_to = LapostaConfig.get_solo().limit_list_selection_to
         existing_subscriptions = set(
-            Subscription.objects.filter(user=request.user).values_list(
-                "list_id", flat=True
-            )
+            client.get_subscriptions_for_email(limited_to, request.user.email)
         )
-
-        to_create = []
         for list_id in newsletters:
             if list_id in existing_subscriptions:
                 continue
 
             try:
-                member = client.create_subscription(list_id, user_data)
+                client.create_subscription(list_id, user_data)
             except (RequestException, ClientError):
                 logger.exception(
                     "Something went wrong while trying to create subscription"
@@ -83,28 +81,11 @@ class NewsletterSubscriptionForm(forms.Form):
                         ).format(list_name=list_name_mapping[list_id])
                     ),
                 )
-            else:
-                if member:
-                    to_create.append(
-                        Subscription(
-                            list_id=member.list_id,
-                            member_id=member.member_id,
-                            user=request.user,
-                        )
-                    )
-
-        if to_create:
-            Subscription.objects.bulk_create(to_create)
 
         unsubscribe_from_ids = existing_subscriptions - set(newsletters)
-        unsubscribe_from = Subscription.objects.filter(
-            user=request.user, list_id__in=unsubscribe_from_ids
-        )
-
-        to_delete_ids = []
-        for subscription in unsubscribe_from:
+        for list_id in unsubscribe_from_ids:
             try:
-                client.remove_subscription(subscription.list_id, subscription.member_id)
+                client.remove_subscription(list_id, request.user.email)
             except (RequestException, ClientError):
                 logger.exception(
                     "Something went wrong while trying to delete subscription"
@@ -115,11 +96,6 @@ class NewsletterSubscriptionForm(forms.Form):
                         _(
                             "Something went wrong while trying to unsubscribe "
                             "from '{list_name}', please try again later"
-                        ).format(list_name=list_name_mapping[subscription.list_id])
+                        ).format(list_name=list_name_mapping[list_id])
                     ),
                 )
-            else:
-                to_delete_ids.append(subscription.list_id)
-        Subscription.objects.filter(
-            user=request.user, list_id__in=to_delete_ids
-        ).delete()
