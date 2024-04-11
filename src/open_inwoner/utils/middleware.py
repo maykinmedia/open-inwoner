@@ -14,6 +14,7 @@ def get_always_pass_prefixes() -> tuple[str, ...]:
         settings.PRIVATE_MEDIA_URL,
         settings.STATIC_URL,
         reverse("login"),
+        reverse("logout"),
         reverse("kvk:branches"),
         # prefixes from urls.py
         "/admin/",
