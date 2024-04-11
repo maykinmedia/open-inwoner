@@ -1,5 +1,6 @@
 from unittest.mock import patch
 
+from django.conf import settings
 from django.core import mail
 from django.test import TestCase, override_settings
 from django.urls import reverse
@@ -21,6 +22,7 @@ from open_inwoner.mail.verification import (
     send_user_email_verification_mail,
     validate_email_verification_token,
 )
+from open_inwoner.utils.url import set_next_url_param
 
 
 class TestTokenVerification(TestCase):
@@ -40,8 +42,7 @@ class TestTokenVerification(TestCase):
 
     def test_generate_email_verification_token__checks(self):
         with self.subTest("not active"):
-            user = UserFactory.create()
-            user.is_active = False
+            user = UserFactory.create(is_active=False)
             with self.assertRaises(BadToken):
                 generate_email_verification_token(user)
 
@@ -214,8 +215,9 @@ class TestMailVerificationView(WebTest):
     def test_mail_verification_view__login_required(self):
         user = UserFactory(email="foo@example.com")
         url = generate_email_verification_url(user)
-        # TODO more here
-        self.app.get(url, status=302)
+        response = self.app.get(url, status=302)
+        expected = set_next_url_param(settings.LOGIN_URL, url)
+        self.assertRedirects(response, expected)
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")

@@ -2,12 +2,11 @@ from urllib.parse import unquote
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.forms import Form
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import NoReverseMatch, reverse
 from django.utils.translation import gettext as _
-from django.views.generic import FormView, UpdateView
+from django.views.generic import TemplateView, UpdateView
 
 from django_registration.backends.one_step.views import RegistrationView
 from furl import furl
@@ -184,10 +183,8 @@ class NecessaryFieldsUserView(LogMixin, LoginRequiredMixin, InviteMixin, UpdateV
         return initial
 
 
-class EmailVerificationUserView(LogMixin, LoginRequiredMixin, FormView):
+class EmailVerificationUserView(LogMixin, LoginRequiredMixin, TemplateView):
     model = User
-    # dummy form
-    form_class = Form
     template_name = "accounts/email_verification.html"
 
     def page_title(self):
@@ -200,9 +197,9 @@ class EmailVerificationUserView(LogMixin, LoginRequiredMixin, FormView):
             text, "strong", email=self.request.user.email
         )
         if self.request.GET.get("sent"):
-            ctx["button_text"] = _("Verficatie email nogmaals verzenden")
+            ctx["button_text"] = _("Verificatie email nogmaals verzenden")
         else:
-            ctx["button_text"] = _("Verficatie email verzenden")
+            ctx["button_text"] = _("Verificatie email verzenden")
 
         return ctx
 
@@ -215,7 +212,7 @@ class EmailVerificationUserView(LogMixin, LoginRequiredMixin, FormView):
             )
         return super().get(request, *args, **kwargs)
 
-    def form_valid(self, form):
+    def post(self, form):
         user: User = self.request.user
 
         send_user_email_verification_mail(
@@ -227,10 +224,7 @@ class EmailVerificationUserView(LogMixin, LoginRequiredMixin, FormView):
         )
         self.log_user_action(user, _("user requested e-mail address verification"))
 
-        return super().form_valid(form)
-
-    def form_invalid(self, form):
-        return super().form_invalid(form)
+        return redirect(self.get_success_url())
 
     def get_success_url(self):
         # redirect to self, keep any next-urls

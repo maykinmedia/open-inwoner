@@ -61,7 +61,7 @@ def generate_email_verification_url(user: User) -> str:
 
 def validate_email_verification_token(user: User, token: str) -> bool:
     # check condition
-    if user.is_anonymous or not user.is_authenticated:
+    if not user.is_authenticated:
         return False
     if not user.is_active or not user.email:
         return False
