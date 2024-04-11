@@ -297,7 +297,7 @@ class NewsletterSubscriptionFormTestCase(ClearCachesMixin, TestCase):
     @patch("open_inwoner.laposta.forms.create_laposta_client")
     def test_form__disables_when_email_not_verified(self, m, mock_create_client):
         """
-        Verify that the form can create and delete subscriptions
+        Verify that form actions cannot be performed if the user's email is not verified
         """
         self.setUpMocks(m)
 
