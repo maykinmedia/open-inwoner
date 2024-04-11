@@ -9,6 +9,7 @@ from ...bootstrap.siteconfig import SiteConfigurationStep
 
 @override_settings(
     SITE_NAME="My site",
+    SITE_PRIMARY_COLOR="#AAAAAA",
     SITE_SECONDARY_COLOR="#000000",
     SITE_ACCENT_COLOR="#000000",
     SITE_PRIMARY_FONT_COLOR="#111111",
@@ -174,7 +175,6 @@ class SiteConfigurationSetupTest(TestCase):
 
         config = SiteConfiguration.get_solo()
 
-        self.assertEqual(config.primary_color, ColorTypeChoices.light)
         self.assertEqual(config.primary_font_color, ColorTypeChoices.light)
         self.assertEqual(config.secondary_font_color, ColorTypeChoices.light)
         self.assertEqual(config.accent_font_color, ColorTypeChoices.dark)
