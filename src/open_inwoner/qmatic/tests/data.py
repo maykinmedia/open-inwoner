@@ -11,7 +11,10 @@ from open_inwoner.qmatic.tests.factories import AppointmentFactory, BranchDetail
 class QmaticMockData:
     def __init__(self):
         self.appointments_url = reverse("profile:appointments")
-        self.user = DigidUserFactory()
+        self.user = DigidUserFactory(
+            email="qmatic@example.com",
+            verified_email="qmatic@example.com",
+        )
 
         self.config = QmaticConfig.get_solo()
         self.config.booking_base_url = "https://qmatic.local/"

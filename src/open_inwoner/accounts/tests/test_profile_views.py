@@ -1041,7 +1041,10 @@ class NewsletterSubscriptionTests(ClearCachesMixin, WebTest):
         cms_tools.create_apphook_page(ProfileApphook)
 
         self.profile_url = reverse("profile:detail")
-        self.user = DigidUserFactory()
+        self.user = DigidUserFactory(
+            email="news@example.com", verified_email="news@example.com"
+        )
+        self.assertTrue(self.user.has_verified_email())
 
         self.config = LapostaConfig.get_solo()
         self.config.api_root = "https://laposta.local/api/v2/"
@@ -1153,6 +1156,31 @@ class NewsletterSubscriptionTests(ClearCachesMixin, WebTest):
         # Second field was excluded by `LapostaConfig.limit_list_selection_to`
         self.assertNotIn("Nieuwsbrief2: bar", response.text)
 
+    def test_do_not_render_form_if_email_not_verified(self, m):
+        self.setUpMocks(m)
+
+        self.user.verified_email = ""
+        self.user.save()
+        self.assertFalse(self.user.has_verified_email())
+
+        self.config.limit_list_selection_to = ["list1"]
+        self.config.save()
+
+        m.get(
+            f"{self.config.api_root}member/{self.user.email}?list_id=list1",
+            json={
+                "member": MemberFactory.build(
+                    list_id="list1",
+                    member_id="1234567",
+                    email=self.user.email,
+                    custom_fields=None,
+                ).model_dump()
+            },
+        )
+        response = self.app.get(self.profile_url, user=self.user)
+
+        self.assertNotIn("newsletter-form", response.forms)
+
 
 @requests_mock.Mocker()
 @override_settings(
@@ -1165,6 +1193,7 @@ class UserAppointmentsTests(ClearCachesMixin, WebTest):
         super().setUp()
 
         self.data = QmaticMockData()
+        self.assertTrue(self.data.user.has_verified_email())
 
     def test_do_not_render_list_if_config_is_missing(self, m):
         self.data.config.service = None
@@ -1189,6 +1218,15 @@ class UserAppointmentsTests(ClearCachesMixin, WebTest):
             f"{self.data.api_root}v1/customers/externalId/{self.data.user.email}/appointments",
             json={"appointmentList": [{"invalid": "data"}]},
         )
+
+        response = self.app.get(self.appointments_url, user=self.data.user)
+
+        self.assertIn(_("Geen afspraken beschikbaar"), response.text)
+
+    def test_do_not_render_list_if_email_not_verified(self, m):
+        self.data.user.verified_email = ""
+        self.data.user.save()
+        self.assertFalse(self.data.user.has_verified_email())
 
         response = self.app.get(self.appointments_url, user=self.data.user)
 

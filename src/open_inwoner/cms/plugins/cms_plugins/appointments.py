@@ -20,17 +20,18 @@ class UserAppointmentsPlugin(CMSPluginBase):
 
     def render(self, context, instance, placeholder):
         request = context["request"]
-        # TODO email should be verified
-        if not request.user.is_authenticated:
-            return context
-
-        try:
-            client = QmaticClient()
-        except NoServiceConfigured:
-            logger.exception("Error occurred while creating Qmatic client")
+        if not request.user.is_authenticated or not request.user.has_verified_email():
             appointments = []
         else:
-            appointments = client.list_appointments_for_customer(request.user.email)
+            try:
+                client = QmaticClient()
+            except NoServiceConfigured:
+                logger.exception("Error occurred while creating Qmatic client")
+                appointments = []
+            else:
+                appointments = client.list_appointments_for_customer(
+                    request.user.verified_email
+                )
 
         context.update(
             {
