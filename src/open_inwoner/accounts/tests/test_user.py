@@ -97,8 +97,8 @@ class UserTests(TestCase):
         self.assertFalse(UserFactory(email="test@localhost").has_usable_email())
         self.assertFalse(User.is_usable_email("test@localhost"))
 
-        actual = list(User.objects.having_usable_email())
-        self.assertEqual(actual, [user_ok1, user_ok2])
+        actual = set(User.objects.having_usable_email())
+        self.assertEqual(actual, {user_ok1, user_ok2})
 
     def test_plan_contact_new_count_methods(self):
         owner = UserFactory()
