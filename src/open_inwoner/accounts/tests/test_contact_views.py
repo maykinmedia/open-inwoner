@@ -504,7 +504,7 @@ class ContactViewTests(WebTest):
         email = mail.outbox[0]
         self.assertEqual(
             email.subject,
-            f"Goedkeuring geven op Open Inwoner Platform: {self.user.get_full_name()} wilt u toevoegen als contactpersoon",
+            f"Goedkeuring geven op Open Inwoner Platform: {self.user.get_full_name()} wil u toevoegen als contactpersoon",
         )
         self.assertEqual(email.to, [existing_user.email])
         invite_url = f"http://testserver{reverse('profile:contact_list')}"
@@ -524,7 +524,7 @@ class ContactViewTests(WebTest):
         email = mail.outbox[0]
         self.assertNotEqual(
             email.subject,
-            f"Goedkeuring geven op Open Inwoner Platform: {self.user.get_full_name()} wilt u toevoegen als contactpersoon",
+            f"Goedkeuring geven op Open Inwoner Platform: {self.user.get_full_name()} wil u toevoegen als contactpersoon",
         )
         self.assertNotEqual(email.to, ["john@example.com"])
         invite_url = f"http://testserver{reverse('profile:contact_list')}"

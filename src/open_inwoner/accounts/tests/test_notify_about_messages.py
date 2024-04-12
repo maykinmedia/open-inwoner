@@ -23,9 +23,9 @@ class NotifyComandTests(TestCase):
         sent_mail = mail.outbox[0]
         html_body = sent_mail.alternatives[0][0]
 
-        self.assertEqual(sent_mail.subject, "New messages at Open Inwoner Platform")
+        self.assertEqual(sent_mail.subject, "Nieuwe berichten op Open Inwoner Platform")
         self.assertEqual(sent_mail.to, [user.email])
-        self.assertIn("You've received 3 new messages from 2 users", sent_mail.body)
+        self.assertIn("U heeft 3 berichten ontvangen van 2 gebruikers.", sent_mail.body)
         self.assertIn(reverse("inbox:index"), html_body)
 
         for message in messages:
@@ -85,11 +85,11 @@ class NotifyComandTests(TestCase):
 
         email1, email2 = sorted(mail.outbox, key=lambda x: x.to, reverse=True)
         for email in [email1, email2]:
-            self.assertEqual(email.subject, "New messages at Open Inwoner Platform")
+            self.assertEqual(email.subject, "Nieuwe berichten op Open Inwoner Platform")
             html_body = email.alternatives[0][0]
             self.assertIn(reverse("inbox:index"), html_body)
 
         self.assertEqual(email1.to, [user2.email])
-        self.assertIn("You've received 2 new messages from 1 users", email1.body)
+        self.assertIn("U heeft 2 berichten ontvangen van 1 gebruikers.", email1.body)
         self.assertEqual(email2.to, [user1.email])
-        self.assertIn("You've received 3 new messages from 1 users", email2.body)
+        self.assertIn("U heeft 3 berichten ontvangen van 1 gebruikers.", email2.body)

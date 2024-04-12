@@ -548,7 +548,7 @@ class PlanViewTests(WebTest):
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
         self.assertEqual(
-            email.subject, "Plan action has been updated at Open Inwoner Platform"
+            email.subject, "Samenwerkingsactie bijgewerkt op Open Inwoner Platform"
         )
         self.assertEqual(email.to, [self.contact.email])
         plan_url = f"http://testserver{self.detail_url}"
@@ -604,7 +604,7 @@ class PlanViewTests(WebTest):
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
         self.assertEqual(
-            email.subject, "Plan action has been updated at Open Inwoner Platform"
+            email.subject, "Samenwerkingsactie bijgewerkt op Open Inwoner Platform"
         )
         self.assertEqual(email.to, [self.contact.email])
         plan_url = f"http://testserver{self.detail_url}"

@@ -21,7 +21,7 @@ class NotifyComandTests(TestCase):
         html_body = sent_mail.alternatives[0][0]
 
         self.assertEqual(
-            sent_mail.subject, "Actions about to end today at Open Inwoner Platform"
+            sent_mail.subject, "Acties verlopen vandaag op Open Inwoner Platform"
         )
         self.assertEqual(sent_mail.to, [user.email])
         self.assertIn(action.name, html_body)
