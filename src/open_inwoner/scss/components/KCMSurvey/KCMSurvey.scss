@@ -1,8 +1,11 @@
 .kcm-survey {
   display: inline-block;
-  border-top-left-radius: var(--border-radius);
-  border-top-right-radius: var(--border-radius);
-  border-bottom-right-radius: 0;
+  border-top: 1px solid var(--color-info-darker);
+  border-right: none;
+  border-bottom: none;
+  border-left: 1px solid var(--color-info-darker);
+  outline: 1px solid var(--color-white);
+  border-radius: var(--border-radius) 0 0 0;
   position: fixed;
   bottom: 0;
   right: 0;
@@ -18,9 +21,9 @@
   }
 
   @media (min-width: 768px) {
-    border-top-left-radius: 0;
-    border-top-right-radius: var(--border-radius);
-    border-bottom-right-radius: var(--border-radius);
+    border-width: 0;
+    border-color: initial;
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
     bottom: initial;
     right: initial;
     display: block;
