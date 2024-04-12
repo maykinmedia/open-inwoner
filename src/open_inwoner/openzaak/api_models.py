@@ -71,11 +71,8 @@ class Zaak(ZGWModel):
         """
         Prepare data for template
         """
-        from open_inwoner.openzaak.models import StatusTranslation
 
-        status_translate = StatusTranslation.objects.get_lookup()
-
-        status_text = status_translate.from_glom_multiple(
+        status_text = glom_multiple(
             self,
             ("status.statustype.statustekst", "status.statustype.omschrijving"),
             default="",

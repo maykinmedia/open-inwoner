@@ -10,7 +10,6 @@ from zgw_consumers.api_models.base import factory
 from open_inwoner.openzaak.api_models import Status, StatusType, Zaak, ZaakType
 from open_inwoner.openzaak.constants import StatusIndicators
 from open_inwoner.openzaak.tests.factories import (
-    StatusTranslationFactory,
     ZaakTypeConfigFactory,
     ZaakTypeStatusTypeConfigFactory,
 )
@@ -79,12 +78,6 @@ class FeedHookTest(TestCase):
         status2 = factory(Status, data.status_final)
         status2.statustype = factory(StatusType, data.status_type_final)
 
-        # lets test status translation
-        status2.statustype.omschrijving = "not_translated"
-        StatusTranslationFactory(
-            status="not_translated", translation="translated status"
-        )
-
         # receive status update
         case_status_notification_received(user, case, status2)
 
@@ -99,7 +92,7 @@ class FeedHookTest(TestCase):
             strip_tags(item.message),
             escape(
                 _("Case status has been changed to '{status}'").format(
-                    status="translated status"
+                    status=status2.statustype.omschrijving
                 )
             ),
         )

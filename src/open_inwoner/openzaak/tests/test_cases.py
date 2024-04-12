@@ -32,7 +32,6 @@ from ..models import OpenZaakConfig
 from .factories import (
     CatalogusConfigFactory,
     ServiceFactory,
-    StatusTranslationFactory,
     ZaakTypeConfigFactory,
     ZaakTypeStatusTypeConfigFactory,
 )
@@ -760,18 +759,6 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
             with self.subTest(value=value, expected=expected):
                 actual = Zaak._reformat_esuite_zaak_identificatie(value)
                 self.assertEqual(actual, expected)
-
-    def test_list_cases_translates_status(self, m):
-        st1 = StatusTranslationFactory(
-            status=self.status_type_initial["omschrijving"],
-            translation="Translated Status Type",
-        )
-        self._setUpMocks(m)
-        self.client.force_login(user=self.user)
-        response = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
-
-        self.assertNotContains(response, st1.status)
-        self.assertContains(response, st1.translation)
 
     def test_list_cases_logs_displayed_case_ids(self, m):
         self._setUpMocks(m)

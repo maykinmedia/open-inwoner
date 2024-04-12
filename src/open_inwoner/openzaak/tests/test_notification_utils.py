@@ -18,7 +18,6 @@ from open_inwoner.openzaak.notifications import (
 from open_inwoner.openzaak.tests.factories import generate_rol
 
 from ..api_models import Status, StatusType, Zaak, ZaakType
-from ..models import StatusTranslation
 from .test_notification_data import MockAPIData
 
 
@@ -37,10 +36,6 @@ class NotificationHandlerUtilsTestCase(TestCase):
         status.statustype = factory(StatusType, data.status_type_final)
 
         case.status = status
-
-        StatusTranslation.objects.create(
-            status=status.statustype.omschrijving, translation="My Translated Status"
-        )
 
         case_url = reverse("cases:case_detail", kwargs={"object_id": str(case.uuid)})
 
@@ -65,7 +60,7 @@ class NotificationHandlerUtilsTestCase(TestCase):
         body_html = email.alternatives[0][0]
         self.assertIn(case.identificatie, body_html)
         self.assertIn(case.zaaktype.omschrijving, body_html)
-        self.assertIn("My Translated Status", body_html)
+        self.assertIn(status.statustype.omschrijving, body_html)
         self.assertIn(case_url, body_html)
         self.assertIn(config.name, body_html)
 

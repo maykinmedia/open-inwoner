@@ -3,6 +3,7 @@ from datetime import date, timedelta
 
 from django.conf import settings
 from django.urls import reverse
+from django.utils.translation import gettext as _
 
 from mail_editor.helpers import find_template
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
@@ -30,7 +31,6 @@ from open_inwoner.openzaak.utils import (
     get_zaak_type_info_object_type_config,
     is_info_object_visible,
     is_zaak_visible,
-    translate_single_status,
 )
 from open_inwoner.userfeed import hooks
 from open_inwoner.utils.logentry import system_action as log_system_action
@@ -592,8 +592,10 @@ def send_case_update_email(
     }
     if status:
         status_type = status.statustype
-        context["status_description"] = translate_single_status(
-            status_type.statustekst or status_type.omschrijving
+        context["status_description"] = (
+            status_type.statustekst
+            or status_type.omschrijving
+            or _("No data available")
         )
     if extra_context:
         context.update(extra_context)
