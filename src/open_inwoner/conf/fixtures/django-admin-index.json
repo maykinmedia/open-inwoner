@@ -28,10 +28,6 @@
                 "user"
             ],
             [
-                "laposta",
-                "subscription"
-            ],
-            [
                 "mozilla_django_oidc_db",
                 "openidconnectconfig"
             ],
