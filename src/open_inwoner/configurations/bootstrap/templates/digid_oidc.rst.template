@@ -1,0 +1,11 @@
+{% extends "base.rst.template" %}
+
+{% block link -%}
+.. _digid_oidc:
+{% endblock -%}
+
+{% block title -%}
+========================
+DigiD OIDC configuration
+========================
+{% endblock %}

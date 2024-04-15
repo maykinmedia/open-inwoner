@@ -1,0 +1,11 @@
+{% extends "base.rst.template" %}
+
+{% block link -%}
+.. _eherkenning_oidc:
+{% endblock -%}
+
+{% block title -%}
+========================
+eHerkenning OIDC configuration
+========================
+{% endblock %}
