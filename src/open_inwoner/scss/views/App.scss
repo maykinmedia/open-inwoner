@@ -80,6 +80,11 @@
     calc(var(--color-secondary-s) - 30%),
     calc(var(--color-secondary-l) + 30%)
   );
+  --color-secondary-lightest: hsl(
+    var(--color-secondary-h),
+    calc(var(--color-secondary-s) - 30%),
+    calc(var(--color-secondary-l) + 50%)
+  );
 
   --color-accent-h: 50;
   --color-accent-s: 94%;

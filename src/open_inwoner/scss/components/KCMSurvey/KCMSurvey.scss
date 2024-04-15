@@ -1,9 +1,10 @@
 .kcm-survey {
   display: inline-block;
-  border-top: 1px solid var(--color-info-darker);
+  border-color: var(--color-secondary-darker);
+  border-top: 1px solid var(--color-secondary-darker);
   border-right: none;
   border-bottom: none;
-  border-left: 1px solid var(--color-info-darker);
+  border-left: 1px solid var(--color-secondary-darker);
   outline: 1px solid var(--color-white);
   border-radius: var(--border-radius) 0 0 0;
   position: fixed;
@@ -11,18 +12,20 @@
   right: 0;
   z-index: 1010;
   padding: var(--spacing-medium);
-  background-color: var(--color-info-lighter);
+  background-color: var(--color-secondary-lightest);
   font-size: var(--font-size-heading-card);
   font-weight: bold;
   writing-mode: initial;
 
   & .link {
-    color: var(--color-info-darker);
+    color: var(--color-secondary-darker);
   }
 
   @media (min-width: 768px) {
-    border-width: 0;
-    border-color: initial;
+    border-top: 1px solid var(--color-secondary-darker);
+    border-right: 1px solid var(--color-secondary-darker);
+    border-bottom: 1px solid var(--color-secondary-darker);
+    border-left: none;
     border-radius: 0 var(--border-radius) var(--border-radius) 0;
     bottom: initial;
     right: initial;
