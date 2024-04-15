@@ -299,15 +299,22 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
             },
         )
 
-        zaak_link = response.pyquery(".case-detail__link")
+        zaak_link = response.pyquery("#origin_link")
 
-        self.assertEqual(zaak_link.text(), _("Ga naar zaak"))
+        self.assertIn(_("Terug naar aanvraag"), zaak_link.text())
         self.assertEqual(
             zaak_link.attr("href"),
             reverse(
                 "cases:case_detail",
                 kwargs={"object_id": "410bb717-ff3d-4fd8-8357-801e5daf9775"},
             ),
+        )
+
+        contactmoment_link = response.pyquery("#destination_link")
+        self.assertIn(_("Bekijk alle vragen"), contactmoment_link.text())
+        self.assertEqual(
+            contactmoment_link.attr("href"),
+            reverse("cases:contactmoment_list"),
         )
 
         kcm_local = KlantContactMomentAnswer.objects.get(
@@ -335,13 +342,8 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
         kcm = response.context["contactmoment"]
         cm_data = data.contactmoment
 
-        zaak_id = (
-            response.pyquery.find(".case-detail__link").parent().text().split(" ")[0]
-        )
-
         self.assertIsNotNone(response.context["zaak"])
         self.assertEqual(response.context["zaak"].url, data.zaak["url"])
-        self.assertEqual(zaak_id, "542-2021")
         self.assertEqual(
             kcm,
             {
@@ -358,15 +360,21 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
             },
         )
 
-        zaak_link = response.pyquery(".case-detail__link")
-
-        self.assertEqual(zaak_link.text(), _("Ga naar zaak"))
+        zaak_link = response.pyquery("#origin_link")
+        self.assertIn(_("Terug naar aanvraag"), zaak_link.text())
         self.assertEqual(
             zaak_link.attr("href"),
             reverse(
                 "cases:case_detail",
                 kwargs={"object_id": "410bb717-ff3d-4fd8-8357-801e5daf9775"},
             ),
+        )
+
+        contactmoment_link = response.pyquery("#destination_link")
+        self.assertIn(_("Bekijk alle vragen"), contactmoment_link.text())
+        self.assertEqual(
+            contactmoment_link.attr("href"),
+            reverse("cases:contactmoment_list"),
         )
 
     def test_display_contactmoment_subject_duplicate_esuite_codes(
