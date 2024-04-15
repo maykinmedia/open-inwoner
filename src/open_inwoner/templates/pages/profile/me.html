@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n l10n link_tags file_tags card_tags list_tags button_tags utils icon_tags form_tags anchor_menu_tags dropdown_tags %}
+{% load i18n l10n link_tags file_tags card_tags list_tags helpers button_tags utils icon_tags form_tags anchor_menu_tags dropdown_tags %}
 
 {% block sidebar_content %}
     {% anchor_menu anchors=anchors desktop=True %}
@@ -109,21 +109,22 @@
         </div>
             <form method="POST" id="newsletter-form" class="form" novalidate>
                 {% csrf_token %}
-
-                {% for list_id, choice_tuple in form.fields.newsletters.choices %}
+                {% with form.fields.newsletters.remarks_mapping as remarks_mapping %}
+                {% for list_id, list_name in form.fields.newsletters.choices %}
                     <div class="checkbox">
                         <input type="checkbox"
                                name="newsletters"
                                value="{{ list_id }}"
                                class="checkbox__input"
-                               id="id_newsletters_{{ list_id }}"
-                               {% if choice_tuple.0 in data or choice_tuple.0|add:0 in data %}checked="checked"{% endif %}>
-                        <label class="checkbox__label" for="id_newsletters_{{ list_id }}">
-                            {{ choice_tuple.0 }}
+                               id="id_newsletters_{{ forloop.counter0 }}"
+                               {% if list_id in form.fields.newsletters.initial %}checked="checked"{% endif %}>
+                        <label class="checkbox__label" for="id_newsletters_{{ forloop.counter0 }}">
+                            {{ list_name }}
                         </label>
-                        <p class="checkbox__p newsletter-remarks">{{ choice_tuple.1 }}</p>
+                        <p class="checkbox__p newsletter-remarks">{{ remarks_mapping|get_key:list_id }}</p>
                     </div>
                 {% endfor %}
+                {% endwith %}
 
                 {% button_row %}
                     {% button text=_("Abonneren") type="submit" icon="save" icon_position="before" icon_outlined=True extra_classes="button--primary" name="newsletter-submit" %}
