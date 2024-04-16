@@ -803,7 +803,7 @@ class Invite(models.Model):
         """
         Returns the first_name plus the last_name of the invitee, with a space in between.
         """
-        full_name = "%s %s" % (self.invitee_first_name, self.invitee_last_name)
+        full_name = "{} {}".format(self.invitee_first_name, self.invitee_last_name)
         return full_name.strip()
 
     def save(self, **kwargs):

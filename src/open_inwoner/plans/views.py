@@ -294,11 +294,7 @@ class PlanEditView(
         ]
 
     def get_queryset(self):
-        return (
-            super(PlanEditView, self)
-            .get_queryset()
-            .filter(created_by=self.request.user)
-        )
+        return super().get_queryset().filter(created_by=self.request.user)
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

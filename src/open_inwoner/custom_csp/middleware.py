@@ -31,7 +31,7 @@ class UpdateCSPMiddleware:
             return response
 
         # we're basically copying/extending the @csp_update decorator
-        update = dict((k.lower().replace("_", "-"), v) for k, v in update.items())
+        update = {k.lower().replace("_", "-"): v for k, v in update.items()}
 
         # cooperate with possible data from actual decorator
         have = getattr(response, "_csp_update", None)

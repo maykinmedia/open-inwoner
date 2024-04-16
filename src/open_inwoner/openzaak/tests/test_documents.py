@@ -138,7 +138,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
                 "geslachtsnaam": "Else",
             },
         )
-        self.informatie_object_content = "my document content".encode("utf8")
+        self.informatie_object_content = b"my document content"
         self.informatie_object = generate_oas_component_cached(
             "drc",
             "schemas/EnkelvoudigInformatieObject",

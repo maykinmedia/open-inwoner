@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 def _readfile(name):
     p = os.path.join(os.path.dirname(__file__), name)
-    with open(p, "r") as f:
+    with open(p) as f:
         return f.read()
 
 

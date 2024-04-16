@@ -85,7 +85,7 @@ def server_error(request, template_name=ERROR_500_TEMPLATE_NAME):
     return http.HttpResponseServerError(template.render(context))
 
 
-class LogMixin(object):
+class LogMixin:
     """
     CBV mixin that adds simple wrappers to logging functions
     """

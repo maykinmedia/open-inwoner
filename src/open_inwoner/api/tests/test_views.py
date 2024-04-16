@@ -27,7 +27,7 @@ class TestPDCLocation(APITestCase):
         response = self.client.get(reverse("api:categories-list"), format="json")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(
+        self.assertEqual(
             sorted(response.json(), key=lambda k: k["slug"]),
             sorted(
                 [
@@ -87,7 +87,7 @@ class TestPDCLocation(APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(
+        self.assertEqual(
             response.json(),
             {
                 "name": self.child_category_1.name,

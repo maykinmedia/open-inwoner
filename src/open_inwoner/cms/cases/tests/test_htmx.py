@@ -250,7 +250,7 @@ class CasesPlaywrightTests(
             zaak=self.zaak["url"],
             registratiedatum="2022-01-12",
         )
-        self.uploaded_zaak_informatie_object_content = "test56789".encode("utf8")
+        self.uploaded_zaak_informatie_object_content = b"test56789"
         self.uploaded_informatie_object = generate_oas_component_cached(
             "drc",
             "schemas/EnkelvoudigInformatieObject",
@@ -601,12 +601,12 @@ class CasesPlaywrightTests(
                 {
                     "name": "document_1.txt",
                     "mimeType": "text/plain",
-                    "buffer": "test12345".encode("utf8"),
+                    "buffer": b"test12345",
                 },
                 {
                     "name": "document_two.pdf",
                     "mimeType": "application/pdf",
-                    "buffer": "test67890".encode("utf8"),
+                    "buffer": b"test67890",
                 },
             ],
         )

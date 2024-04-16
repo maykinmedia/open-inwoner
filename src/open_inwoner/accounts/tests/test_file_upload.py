@@ -26,7 +26,7 @@ class TestActionFileUploadLimits(WebTest):
         self.form["file"] = Upload("readme.xlsx", b"data", "application/vnd.ms-excel")
         self.form["name"] = "Action name"
         upload_response = self.form.submit()
-        self.assertEquals(Action.objects.first().file.name, "readme.xlsx")
+        self.assertEqual(Action.objects.first().file.name, "readme.xlsx")
         self.assertRedirects(upload_response, reverse("profile:action_list"))
 
     @temp_private_root()
@@ -34,7 +34,7 @@ class TestActionFileUploadLimits(WebTest):
         self.form["file"] = Upload("readme.svg", b"data", "image/svg+xml")
         self.form["name"] = "readme"
         upload_response = self.form.submit()
-        self.assertEquals(
+        self.assertEqual(
             upload_response.context["errors"],
             [
                 _(
@@ -49,7 +49,7 @@ class TestActionFileUploadLimits(WebTest):
         self.form["file"] = Upload("readme.png", b"data", "image/png")
         self.form["name"] = "readme"
         upload_response = self.form.submit()
-        self.assertEquals(
+        self.assertEqual(
             upload_response.context["errors"],
             [
                 _(
@@ -64,7 +64,7 @@ class TestActionFileUploadLimits(WebTest):
         self.form["file"] = Upload("readme.png", b"data", "image/png")
         self.form["name"] = "readme"
         upload_response = self.form.submit()
-        self.assertEquals(
+        self.assertEqual(
             upload_response.context["errors"],
             [
                 _(
@@ -78,7 +78,7 @@ class TestActionFileUploadLimits(WebTest):
         self.form["file"] = Upload("readme.png", b"", "image/png")
         self.form["name"] = "readme"
         upload_response = self.form.submit()
-        self.assertEquals(
+        self.assertEqual(
             upload_response.context["errors"], [_("Het verstuurde bestand is leeg.")]
         )
 
@@ -98,7 +98,7 @@ class TestMessageFileUploadLimits(WebTest):
         self.form["content"] = "The message content"
         self.form["receiver"] = str(self.contact.uuid)
         upload_response = self.form.submit()
-        self.assertEquals(Message.objects.first().file.name, "readme.xlsx")
+        self.assertEqual(Message.objects.first().file.name, "readme.xlsx")
         self.assertRedirects(
             upload_response,
             reverse("inbox:index", kwargs={"uuid": self.contact.uuid})
@@ -112,7 +112,7 @@ class TestMessageFileUploadLimits(WebTest):
         self.form["content"] = "The message content"
         self.form["receiver"] = str(self.contact.uuid)
         upload_response = self.form.submit()
-        self.assertEquals(
+        self.assertEqual(
             upload_response.context["errors"],
             [
                 _(
@@ -128,7 +128,7 @@ class TestMessageFileUploadLimits(WebTest):
         self.form["content"] = "The message content"
         self.form["receiver"] = str(self.contact.uuid)
         upload_response = self.form.submit()
-        self.assertEquals(
+        self.assertEqual(
             upload_response.context["errors"],
             [
                 _(
@@ -144,7 +144,7 @@ class TestMessageFileUploadLimits(WebTest):
         self.form["content"] = "The message content"
         self.form["receiver"] = str(self.contact.uuid)
         upload_response = self.form.submit()
-        self.assertEquals(
+        self.assertEqual(
             upload_response.context["errors"],
             [
                 _(
@@ -159,6 +159,6 @@ class TestMessageFileUploadLimits(WebTest):
         self.form["content"] = "The message content"
         self.form["receiver"] = str(self.contact.uuid)
         upload_response = self.form.submit()
-        self.assertEquals(
+        self.assertEqual(
             upload_response.context["errors"], [_("Het verstuurde bestand is leeg.")]
         )

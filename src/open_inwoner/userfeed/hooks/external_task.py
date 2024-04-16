@@ -75,7 +75,7 @@ def update_external_task_items(user: User, openstaande_taken: list[OpenTask]):
     FeedItemData.objects.bulk_create(create_data)
 
     # Mark all tasks with UUIDs not occurring in the fetched results as completed
-    completed_uuids = existing_uuids - set(task.uuid for task in openstaande_taken)
+    completed_uuids = existing_uuids - {task.uuid for task in openstaande_taken}
     FeedItemData.objects.filter(
         type=FeedItemType.external_task, user=user, ref_uuid__in=completed_uuids
     ).mark_completed()

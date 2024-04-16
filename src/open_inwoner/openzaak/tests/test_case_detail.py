@@ -1323,8 +1323,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         response = self.app.get(self.case_detail_url, user=self.user)
         documents = response.context.get("case", {}).get("documents")
-        self.assertEquals(len(documents), 2)
-        self.assertEquals(
+        self.assertEqual(len(documents), 2)
+        self.assertEqual(
             documents,
             # only two visible information objects, newest first
             [self.informatie_object_file_2, self.informatie_object_file],

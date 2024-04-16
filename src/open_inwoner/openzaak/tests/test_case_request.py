@@ -39,7 +39,7 @@ class TestFetchSpecificCase(ClearCachesMixin, TestCase):
 
         case = self.client.fetch_single_case("d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d")
 
-        self.assertEquals(
+        self.assertEqual(
             case.url,
             f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
         )
