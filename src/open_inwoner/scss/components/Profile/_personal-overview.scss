@@ -34,4 +34,23 @@
   .profile-cards .card {
     min-height: 190px;
   }
+
+  .form {
+    padding: 0;
+  }
+
+  .checkbox {
+    &__label {
+      color: var(--color-black);
+      font-family: var(--font-family-heading);
+      font-weight: bold;
+    }
+
+    .checkbox__p {
+      color: var(--color-gray-dark-900);
+      font-size: var(--font-size-body-small);
+      line-height: var(--font-line-height-body-small);
+      padding-left: calc(var(--gutter-width) + var(--spacing-small));
+    }
+  }
 }

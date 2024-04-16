@@ -101,6 +101,7 @@
         </div>
     </section>
 
+    {# Newsletters #}
     {% if view.config.newsletters and form.fields.newsletters.choices %}
     <section class="tabled tabled--flexible profile-section profile-section--bordered" id="profile-newsletters">
         <div class="tabled__section">
@@ -109,12 +110,23 @@
             <form method="POST" id="newsletter-form" class="form" novalidate>
                 {% csrf_token %}
 
-                {% for field in form.fields %}
-                    {% autorender_field form field %}
+                {% for list_id, choice_tuple in form.fields.newsletters.choices %}
+                    <div class="checkbox">
+                        <input type="checkbox"
+                               name="newsletters"
+                               value="{{ list_id }}"
+                               class="checkbox__input"
+                               id="id_newsletters_{{ list_id }}"
+                               {% if choice_tuple.0 in data or choice_tuple.0|add:0 in data %}checked="checked"{% endif %}>
+                        <label class="checkbox__label" for="id_newsletters_{{ list_id }}">
+                            {{ choice_tuple.0 }}
+                        </label>
+                        <p class="checkbox__p newsletter-remarks">{{ choice_tuple.1 }}</p>
+                    </div>
                 {% endfor %}
 
                 {% button_row %}
-                    {% button text=_("Opslaan") type="submit" extra_classes="button--primary" name="newsletter-submit" %}
+                    {% button text=_("Abonneren") type="submit" icon="save" icon_position="before" icon_outlined=True extra_classes="button--primary" name="newsletter-submit" %}
                 {% endbutton_row %}
             </form>
     </section>
