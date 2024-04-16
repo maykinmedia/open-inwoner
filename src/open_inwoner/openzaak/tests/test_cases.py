@@ -211,6 +211,15 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
             volgnummer=2,
             isEindstatus=True,
         )
+        self.resultaat_type = generate_oas_component_cached(
+            "ztc",
+            "schemas/ResultaatType",
+            url=f"{CATALOGI_ROOT}resultaattypen/ab798107-ab27-4c3c-977d-777yu878km09",
+            zaaktype=self.zaaktype["url"],
+            omschrijving="Eindresultaat",
+            resultaattypeomschrijving="test1",
+            selectielijstklasse="ABC",
+        )
 
         self.catalogus_config = CatalogusConfigFactory.create(
             url=self.zaaktype["catalogus"]
@@ -274,6 +283,31 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
             datumStatusGezet="2021-03-12",
             statustoelichting="",
         )
+
+        self.zaak_result = generate_oas_component_cached(
+            "zrc",
+            "schemas/Zaak",
+            url=f"{ZAKEN_ROOT}zaken/e4d469b9-6666-4bdd-bf42-b53445298123",
+            uuid="e4d469b9-6666-4bdd-bf42-b53445298123",
+            zaaktype=self.zaaktype["url"],
+            identificatie="0014ESUITE43212022",
+            omschrijving="Result zaak",
+            startdatum="2020-01-01",
+            einddatum="2022-01-13",
+            status=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-beu760sle929",
+            resultaat=f"{ZAKEN_ROOT}resultaten/3da81560-c7fc-476a-ad13-beu760sle929",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+        )
+        self.result = generate_oas_component_cached(
+            "zrc",
+            "schemas/Resultaat",
+            uuid="a44153aa-ad2c-6a07-be75-15add5113",
+            url=self.zaak_result["resultaat"],
+            resultaattype=self.resultaat_type["url"],
+            zaak=self.zaak_result["url"],
+            toelichting="resultaat toelichting",
+        )
+
         self.zaak_eherkenning1 = generate_oas_component_cached(
             "zrc",
             "schemas/Zaak",
@@ -366,7 +400,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
             )
             .url,
             json=paginated_response(
-                [self.zaak1, self.zaak2, self.zaak3, self.zaak_intern]
+                [self.zaak1, self.zaak2, self.zaak3, self.zaak_intern, self.zaak_result]
             ),
         )
         for identifier in [self.eherkenning_user.kvk, self.eherkenning_user.rsin]:
@@ -399,6 +433,8 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
             self.zaaktype,
             self.status_type_initial,
             self.status_type_finish,
+            self.resultaat_type,
+            self.result,
             self.status1,
             self.status2,
             self.status3,
@@ -461,6 +497,20 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                     "current_status": self.status_type_finish["statustekst"],
                     "zaaktype_config": self.zaaktype_config1,
                     "statustype_config": None,
+                    "case_type": "Zaak",
+                },
+                {
+                    "uuid": self.zaak_result["uuid"],
+                    "start_date": datetime.date.fromisoformat(
+                        self.zaak_result["startdatum"]
+                    ),
+                    "end_date": datetime.date(2022, 1, 13),
+                    "identification": self.zaak_result["identificatie"],
+                    "description": self.zaaktype["omschrijving"],
+                    # use result here
+                    "current_status": self.resultaat_type["omschrijving"],
+                    "zaaktype_config": self.zaaktype_config1,
+                    "statustype_config": self.zt_statustype_config1,
                     "case_type": "Zaak",
                 },
             ],
