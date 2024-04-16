@@ -44,8 +44,7 @@
   }
 
   & .grid {
-    grid-row-gap: var(--spacing-medium);
-    grid-column-gap: var(--spacing-extra-large);
+    grid-gap: var(--spacing-extra-large);
 
     // Tablets
     @media (min-width: 500px) and (max-width: 767px) {
@@ -98,16 +97,4 @@
   .button--transparent {
     padding: var(--spacing-medium) 0 0 0;
   }
-}
-
-// overrides of elements outside of components
-section {
-  display: block;
-  padding-bottom: 2em;
-}
-
-.pagination {
-  display: table !important;
-  margin: 0 auto !important;
-  padding-top: 1em !important;
 }

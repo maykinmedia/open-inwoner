@@ -1,7 +1,7 @@
 .pagination {
   display: flex;
-  margin-top: 34px;
-  justify-content: space-between;
+  margin: var(--spacing-giant) auto 0 auto;
+  justify-content: center;
 
   &__pages {
     display: flex;
