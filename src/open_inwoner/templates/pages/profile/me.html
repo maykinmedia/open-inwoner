@@ -19,7 +19,7 @@
 
 {% if user.is_eherkenning_user %}
     {# Business information #}
-    <section class="tabled tabled--flexible profile-section profile-section--bordered">
+    <section class="tabled tabled--flexible profile-section profile-section--bordered profile-section__business-overview">
         <div class="tabled__section">
             <h2 class="h2 title" id="business-overview">{% trans "Bedrijfsgegevens" %}</h2>
         </div>
@@ -41,7 +41,7 @@
     </section>
 {% else %}
     {# Personal information #}
-    <section class="tabled tabled--flexible profile-section profile-section--bordered" id="personal-info">
+    <section class="tabled tabled--flexible profile-section profile-section--bordered profile-section__personal-info" id="personal-info">
         <div class="tabled__section">
             <h2 class="h2 title" id="personal-overview">{% trans "Persoonlijke gegevens" %}
                 <div class="tabled__item--force-right tabled__item--mobile-big">
@@ -81,7 +81,7 @@
 {% endif %}
 
     {# Notifications #}
-    <section class="tabled tabled--flexible profile-section profile-section--bordered" id="profile-notifications">
+    <section class="tabled tabled--flexible profile-section profile-section--bordered profile-section__notifications" id="profile-notifications">
         <div class="tabled__section">
             <h2 class="h2 title" id="notifications">{% trans "Voorkeuren voor meldingen" %}
                 <div class="tabled__item--force-right tabled__item--mobile-big">
@@ -103,7 +103,7 @@
 
     {# Newsletters #}
     {% if view.config.newsletters and form.fields.newsletters.choices %}
-    <section class="tabled tabled--flexible profile-section profile-section--bordered" id="profile-newsletters">
+    <section class="tabled tabled--flexible profile-section profile-section--bordered profile-section__newsletters" id="profile-newsletters">
         <div class="tabled__section">
             <h2 class="h2 title" id="newsletters">{% trans "Nieuwsbrieven" %}</h2>
         </div>
@@ -116,9 +116,9 @@
                                name="newsletters"
                                value="{{ list_id }}"
                                class="checkbox__input"
-                               id="id_newsletters_{{ forloop.counter0 }}"
+                               id="id_newsletters_{{ forloop.counter }}"
                                {% if list_id in form.fields.newsletters.initial %}checked="checked"{% endif %}>
-                        <label class="checkbox__label" for="id_newsletters_{{ forloop.counter0 }}">
+                        <label class="checkbox__label" for="id_newsletters_{{ forloop.counter }}">
                             {{ list_name }}
                         </label>
                         <p class="checkbox__p newsletter-remarks">{{ remarks_mapping|get_key:list_id }}</p>
@@ -127,7 +127,7 @@
                 {% endwith %}
 
                 {% button_row %}
-                    {% button text=_("Abonneren") type="submit" icon="save" icon_position="before" icon_outlined=True extra_classes="button--primary" name="newsletter-submit" %}
+                    {% button text=_("Abonneren") type="submit" icon_position="before" icon_outlined=True extra_classes="button--primary" name="newsletter-submit" %}
                 {% endbutton_row %}
             </form>
     </section>
@@ -305,7 +305,7 @@
     </section>
     {% endif %}
 
-    <section class="tabled profile-section profile-section--bordered">
+    <section class="tabled profile-section profile-section--bordered profile-section__remove">
         <div class="tabled__section">
             <h2 class="h2 title" id="profile-remove">{% trans "Profiel verwijderen" %}</h2></div>
             <div class="tabled">

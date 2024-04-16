@@ -53,4 +53,10 @@
       padding-left: calc(var(--gutter-width) + var(--spacing-small));
     }
   }
+
+  &.profile-section__newsletters {
+    .button {
+      padding: var(--spacing-medium) var(--spacing-giant);
+    }
+  }
 }
