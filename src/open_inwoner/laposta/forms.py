@@ -12,7 +12,7 @@ from open_inwoner.laposta.models import LapostaConfig
 from open_inwoner.utils.api import ClientError
 
 from ..accounts.models import User
-from .choices import get_list_choices
+from .choices import get_list_choices, get_list_remarks_mapping
 from .client import create_laposta_client
 
 logger = logging.getLogger(__name__)
@@ -34,6 +34,7 @@ class NewsletterSubscriptionForm(forms.Form):
         if laposta_client := create_laposta_client():
             lists = laposta_client.get_lists()
             self.fields["newsletters"].choices = get_list_choices(lists)
+            self.fields["newsletters"].remarks_mapping = get_list_remarks_mapping(lists)
             if limited_to := LapostaConfig.get_solo().limit_list_selection_to:
                 self.fields["newsletters"].choices = [
                     choice

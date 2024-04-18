@@ -14,26 +14,6 @@
         <form method="POST" id="change-notifications" action="{% url 'profile:notifications' %}" class="form" novalidate>
             {% csrf_token %}
 
-            {% if form.first_name %}
-                {% input form.first_name %}
-            {% endif %}
-
-            {% if form.infix %}
-                {% input form.infix %}
-            {% endif %}
-
-            {% if form.last_name %}
-                {% input form.last_name %}
-            {% endif %}
-
-            {% if form.email %}
-                {% input form.email %}
-            {% endif %}
-
-            {% if form.invite %}
-                {% input form.invite no_label=True %}
-            {% endif %}
-
             <h3 class="h3">Notificatie voorkeuren</h3>
 
             {# Start of multiple checkbox fields #}

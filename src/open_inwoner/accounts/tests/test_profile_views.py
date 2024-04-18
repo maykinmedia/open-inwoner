@@ -1117,8 +1117,8 @@ class NewsletterSubscriptionTests(ClearCachesMixin, WebTest):
         # First checkbox should be checked, because the user is already subscribed
         self.assertTrue(form.fields["newsletters"][0].checked)
         self.assertFalse(form.fields["newsletters"][1].checked)
-        self.assertIn("Nieuwsbrief1: foo", response.text)
-        self.assertIn("Nieuwsbrief2: bar", response.text)
+        self.assertIn("Nieuwsbrief1", response.text)
+        self.assertIn("Nieuwsbrief2", response.text)
 
     def test_render_form_limit_newsletters_to_admin_selection(self, m):
         self.setUpMocks(m)
@@ -1151,10 +1151,10 @@ class NewsletterSubscriptionTests(ClearCachesMixin, WebTest):
 
         # First checkbox should be checked, because the user is already subscribed
         self.assertTrue(form.fields["newsletters"][0].checked)
-        self.assertIn("Nieuwsbrief1: foo", response.text)
+        self.assertIn("Nieuwsbrief1", response.text)
 
         # Second field was excluded by `LapostaConfig.limit_list_selection_to`
-        self.assertNotIn("Nieuwsbrief2: bar", response.text)
+        self.assertNotIn("Nieuwsbrief2", response.text)
 
     def test_do_not_render_form_if_email_not_verified(self, m):
         self.setUpMocks(m)

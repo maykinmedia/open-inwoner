@@ -77,6 +77,11 @@
 
   &__item.selected {
     border: var(--border-width-thin) solid var(--color-secondary-lighter);
+    border-left-width: 3px;
+
+    .choice-list__label {
+      margin-left: -2px;
+    }
   }
 
   &__item.selected &__label:before {
@@ -134,7 +139,6 @@
     border-radius: var(--border-radius);
     display: flex;
     padding: 0;
-    width: 100%;
 
     .form__control {
       width: 100%;
@@ -198,6 +202,11 @@
 
     &.selected {
       border: var(--border-width-thin) solid var(--color-secondary);
+      border-left-width: 3px;
+
+      .choice-list-multiple__content {
+        margin-left: -2px;
+      }
     }
   }
 }

@@ -285,11 +285,11 @@ class NewsletterSubscriptionFormTestCase(ClearCachesMixin, TestCase):
                     _(
                         "Something went wrong while trying to subscribe to "
                         "'{list_name}', please try again later"
-                    ).format(list_name="Nieuwsbrief3: baz"),
+                    ).format(list_name="Nieuwsbrief3"),
                     _(
                         "Something went wrong while trying to unsubscribe from "
                         "'{list_name}', please try again later"
-                    ).format(list_name="Nieuwsbrief2: bar"),
+                    ).format(list_name="Nieuwsbrief2"),
                 ]
             },
         )
