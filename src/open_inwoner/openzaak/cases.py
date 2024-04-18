@@ -13,7 +13,7 @@ from .utils import is_zaak_visible
 logger = logging.getLogger(__name__)
 
 
-def resolve_zaak_type(case: Zaak, client: CatalogiClient = None) -> None:
+def resolve_zaak_type(case: Zaak, client: CatalogiClient | None = None) -> None:
     """
     Resolve `case.zaaktype` (`str`) to a `ZaakType(ZGWModel)` object
 
@@ -27,7 +27,7 @@ def resolve_zaak_type(case: Zaak, client: CatalogiClient = None) -> None:
         case.zaaktype = case_type
 
 
-def resolve_status(case: Zaak, client: ZakenClient = None) -> None:
+def resolve_status(case: Zaak, client: ZakenClient | None = None) -> None:
     """
     Resolve `case.status` (`str`) to a `Status(ZGWModel)` object
     """
@@ -36,7 +36,7 @@ def resolve_status(case: Zaak, client: ZakenClient = None) -> None:
         case.status = client.fetch_single_status(case.status)
 
 
-def resolve_status_type(case: Zaak, client: CatalogiClient = None) -> None:
+def resolve_status_type(case: Zaak, client: CatalogiClient | None = None) -> None:
     """
     Resolve `case.status.statustype` (`str`) to a `StatusType(ZGWModel)` object
     """
@@ -46,7 +46,7 @@ def resolve_status_type(case: Zaak, client: CatalogiClient = None) -> None:
         case.status.statustype = client.fetch_single_status_type(statustype_url)
 
 
-def resolve_resultaat(case: Zaak, client: ZakenClient = None) -> None:
+def resolve_resultaat(case: Zaak, client: ZakenClient | None = None) -> None:
     """
     Resolve `case.resultaat` (`str`) to a `Resultaat(ZGWModel)` object
     """
@@ -55,7 +55,7 @@ def resolve_resultaat(case: Zaak, client: ZakenClient = None) -> None:
         case.resultaat = client.fetch_single_result(case.resultaat)
 
 
-def resolve_resultaat_type(case: Zaak, client: CatalogiClient = None) -> None:
+def resolve_resultaat_type(case: Zaak, client: CatalogiClient | None = None) -> None:
     """
     Resolve `case.resultaat.resultaattype` (`str`) to a `ResultaatType(ZGWModel)` object
     """
