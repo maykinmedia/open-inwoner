@@ -74,6 +74,7 @@ class OpenKlantConfigAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "register_channel",
                     "register_employee_id",
                     "use_rsin_for_innNnpId_query_parameter",
+                    "send_email_confirmation",
                 ],
             },
         ),

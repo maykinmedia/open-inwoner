@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from unittest.mock import ANY, patch
 
 from django.conf import settings
 from django.core import mail
@@ -42,6 +42,9 @@ PATCHED_MIDDLEWARE = [
 
 
 @requests_mock.Mocker()
+@patch(
+    "open_inwoner.cms.cases.views.status.send_contact_confirmation_mail", autospec=True
+)
 @patch.object(
     ContactmomentenClient,
     "retrieve_objectcontactmomenten_for_zaak",
@@ -81,6 +84,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
 
         # openklant config
         self.ok_config = OpenKlantConfig.get_solo()
+        self.ok_config.send_email_confirmation = True
         self.ok_config.register_contact_moment = True
         self.ok_config.register_bronorganisatie_rsin = "123456788"
         self.ok_config.register_type = "Melding"
@@ -330,7 +334,9 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             json=self.contactmoment,
         )
 
-    def test_form_is_shown_if_open_klant_api_configured(self, m, contactmoment_mock):
+    def test_form_is_shown_if_open_klant_api_configured(
+        self, m, mock_contactmoment, mock_send_confirm
+    ):
         self._setUpMocks(m)
         self._setUpExtraMocks(m)
 
@@ -342,7 +348,11 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         self.assertTrue(response.context["case"]["contact_form_enabled"])
         self.assertTrue(contact_form)
 
-    def test_form_is_shown_if_open_klant_email_configured(self, m, contactmoment_mock):
+        mock_send_confirm.assert_not_called()
+
+    def test_form_is_shown_if_open_klant_email_configured(
+        self, m, mock_contactmoment, mock_send_confirm
+    ):
         self._setUpMocks(m)
         self._setUpExtraMocks(m)
 
@@ -359,8 +369,10 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         self.assertTrue(response.context["case"]["contact_form_enabled"])
         self.assertTrue(contact_form)
 
+        mock_send_confirm.assert_not_called()
+
     def test_form_is_shown_if_open_klant_email_and_api_configured(
-        self, m, contactmoment_mock
+        self, m, mock_contactmoment, mock_send_confirm
     ):
         self._setUpMocks(m)
         self._setUpExtraMocks(m)
@@ -377,7 +389,11 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         self.assertTrue(response.context["case"]["contact_form_enabled"])
         self.assertTrue(contact_form)
 
-    def test_no_form_shown_if_open_klant_not_configured(self, m, contactmoment_mock):
+        mock_send_confirm.assert_not_called()
+
+    def test_no_form_shown_if_open_klant_not_configured(
+        self, m, mock_contactmoment, mock_send_confirm
+    ):
         self._setUpMocks(m)
 
         # reset
@@ -397,7 +413,11 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         self.assertFalse(response.context["case"]["contact_form_enabled"])
         self.assertFalse(contact_form)
 
-    def test_no_form_shown_if_contact_form_disabled(self, m, contactmoment_mock):
+        mock_send_confirm.assert_not_called()
+
+    def test_no_form_shown_if_contact_form_disabled(
+        self, m, mock_contactmoment, mock_send_confirm
+    ):
         self._setUpMocks(m)
         self._setUpExtraMocks(m)
 
@@ -415,7 +435,9 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         self.assertFalse(response.context["case"]["contact_form_enabled"])
         self.assertFalse(contact_form)
 
-    def test_form_success_with_api(self, m, contactmoment_mock):
+        mock_send_confirm.assert_not_called()
+
+    def test_form_success_with_api(self, m, mock_contactmoment, mock_send_confirm):
         self._setUpMocks(m)
         self._setUpExtraMocks(m)
 
@@ -450,8 +472,11 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
                 "type": "Melding",
             },
         )
+        mock_send_confirm.assert_called_once_with("foo@example.com", ANY)
 
-    def test_form_success_with_api_eherkenning_user(self, m, contactmoment_mock):
+    def test_form_success_with_api_eherkenning_user(
+        self, m, mock_contactmoment, mock_send_confirm
+    ):
         self._setUpMocks(m)
         self._setUpExtraMocks(m)
 
@@ -515,8 +540,12 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
                         "type": "Melding",
                     },
                 )
+                # user was modified in loop
+                eherkenning_user.refresh_from_db()
+                mock_send_confirm.assert_called_once_with(eherkenning_user.email, ANY)
+                mock_send_confirm.reset_mock()
 
-    def test_form_success_with_email(self, m, contactmoment_mock):
+    def test_form_success_with_email(self, m, mock_contactmoment, mock_send_confirm):
         self._setUpMocks(m)
         self._setUpExtraMocks(m)
 
@@ -548,8 +577,11 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             message.subject,
             _("Contact formulier inzending vanaf Open Inwoner Platform"),
         )
+        mock_send_confirm.assert_called_once_with("foo@example.com", ANY)
 
-    def test_form_success_with_both_email_and_api(self, m, contactmoment_mock):
+    def test_form_success_with_both_email_and_api(
+        self, m, mock_contactmoment, mock_send_confirm
+    ):
         self._setUpMocks(m)
         self._setUpExtraMocks(m)
 
@@ -575,3 +607,43 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         self.assertEqual(redirect_messages[0].message, _("Vraag verstuurd!"))
         self.assertMockMatchersCalled(self.extra_matchers)
         self.assertEqual(len(mail.outbox), 1)
+
+        mock_send_confirm.assert_called_once_with("foo@example.com", ANY)
+
+    def test_send_email_confirmation_is_configurable__send_enabled(
+        self, m, mock_contactmoment, mock_send_confirm
+    ):
+        self._setUpMocks(m)
+        self._setUpExtraMocks(m)
+
+        config = OpenKlantConfig.get_solo()
+        config.send_email_confirmation = True
+        config.save()
+
+        response = self.app.get(self.case_detail_url, user=self.user)
+        form = response.forms["contact-form"]
+        form.action = reverse(
+            "cases:case_detail_contact_form", kwargs={"object_id": self.zaak["uuid"]}
+        )
+        form["question"] = "Sample text"
+        response = form.submit()
+        mock_send_confirm.assert_called_once()
+
+    def test_send_email_confirmation_is_configurable__send_disabled(
+        self, m, mock_contactmoment, mock_send_confirm
+    ):
+        self._setUpMocks(m)
+        self._setUpExtraMocks(m)
+
+        config = OpenKlantConfig.get_solo()
+        config.send_email_confirmation = False
+        config.save()
+
+        response = self.app.get(self.case_detail_url, user=self.user)
+        form = response.forms["contact-form"]
+        form.action = reverse(
+            "cases:case_detail_contact_form", kwargs={"object_id": self.zaak["uuid"]}
+        )
+        form["question"] = "Sample text"
+        response = form.submit()
+        mock_send_confirm.assert_not_called()

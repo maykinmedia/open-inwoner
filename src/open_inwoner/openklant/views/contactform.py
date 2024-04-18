@@ -6,6 +6,7 @@ from django.views.generic import FormView
 from mail_editor.helpers import find_template
 from view_breadcrumbs import BaseBreadcrumbMixin
 
+from open_inwoner.mail.service import send_contact_confirmation_mail
 from open_inwoner.openklant.clients import build_client
 from open_inwoner.openklant.forms import ContactForm
 from open_inwoner.openklant.models import OpenKlantConfig
@@ -52,13 +53,11 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
         context["has_form_configuration"] = config.has_form_configuration()
         return context
 
-    def get_result_message(self, success=False):
+    def set_result_message(self, success: bool):
         if success:
-            return messages.add_message(
-                self.request, messages.SUCCESS, _("Vraag verstuurd!")
-            )
+            messages.add_message(self.request, messages.SUCCESS, _("Vraag verstuurd!"))
         else:
-            return messages.add_message(
+            messages.add_message(
                 self.request,
                 messages.ERROR,
                 _("Probleem bij versturen van de vraag."),
@@ -67,13 +66,37 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
     def form_valid(self, form):
         config = OpenKlantConfig.get_solo()
 
-        success = True
-        if config.register_email:
-            success = self.register_by_email(form, config.register_email) and success
-        if config.register_contact_moment:
-            success = self.register_by_api(form, config) and success
+        # this logic is very gnarly as there are multiple destinations, and sources of user-email
 
-        self.get_result_message(success=success)
+        user = self.request.user
+        user_email = None
+        api_user_email = None
+        email_success = False
+        api_success = False
+        send_confirmation = False
+
+        if user.is_authenticated and user.email:
+            user_email = user.email
+
+        if config.register_email:
+            email_success = self.register_by_email(form, config.register_email)
+            send_confirmation = email_success
+
+        if config.register_contact_moment:
+            api_success, api_user_email = self.register_by_api(form, config)
+            if api_success:
+                send_confirmation = config.send_email_confirmation
+            # else keep the send_confirmation if email set it
+
+        # it is possible we don't have an email, user didn't enter it but we got it from the Klant
+        user_email = api_user_email or user_email or form.cleaned_data.get("email")
+
+        if send_confirmation:
+            send_contact_confirmation_mail(
+                user_email, form.cleaned_data["subject"].subject
+            )
+
+        self.set_result_message(email_success or api_success)
 
         return super().form_valid(form)
 
@@ -90,7 +113,7 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
             )
         }
 
-        parts = [form.cleaned_data[k] for k in ("first_name", "infix", "last_name")]
+        parts = (form.cleaned_data[k] for k in ("first_name", "infix", "last_name"))
         context["name"] = " ".join(p for p in parts if p)
 
         success = template.send_email([recipient_email], context)
@@ -107,8 +130,11 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
             )
             return False
 
-    def register_by_api(self, form, config: OpenKlantConfig):
+    def register_by_api(self, form, config: OpenKlantConfig) -> tuple[bool, str]:
         assert config.has_api_configuration()
+
+        # the form set the email if we didn't ask but have it on the user
+        user_email = form.cleaned_data.get("email")
 
         # fetch/update/create klant
         klant = None
@@ -119,16 +145,16 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
                 klant = klanten_client.retrieve_klant(
                     **get_fetch_parameters(self.request)
                 )
-
                 if klant:
                     self.log_system_action(
                         "retrieved klant for BSN or KVK user", user=self.request.user
                     )
+                    user_email = klant.emailadres or user_email
 
                     # check if we have some data missing from the Klant
                     update_data = {}
-                    if not klant.emailadres and form.cleaned_data["email"]:
-                        update_data["emailadres"] = form.cleaned_data["email"]
+                    if not klant.emailadres and user_email:
+                        update_data["emailadres"] = user_email
                     if not klant.telefoonnummer and form.cleaned_data["phonenumber"]:
                         update_data["telefoonnummer"] = form.cleaned_data["phonenumber"]
                     if update_data:
@@ -177,6 +203,7 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
             # if we don't have a BSN and can't create a Klant we'll add contact info to the tekst
             parts = [form.cleaned_data[k] for k in ("first_name", "infix", "last_name")]
             full_name = " ".join(p for p in parts if p)
+
             text = _("{text}\n\nNaam: {full_name}").format(
                 text=text, full_name=full_name
             )
@@ -215,9 +242,9 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
             self.log_system_action(
                 "registered contactmoment by API", user=self.request.user
             )
-            return True
+            return True, user_email
         else:
             self.log_system_action(
                 "error while registering contactmoment by API", user=self.request.user
             )
-            return False
+            return False, user_email

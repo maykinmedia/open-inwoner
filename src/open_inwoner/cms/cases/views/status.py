@@ -19,6 +19,7 @@ from mail_editor.helpers import find_template
 from view_breadcrumbs import BaseBreadcrumbMixin
 from zgw_consumers.api_models.constants import RolOmschrijving
 
+from open_inwoner.mail.service import send_contact_confirmation_mail
 from open_inwoner.openklant.clients import build_client as build_client_openklant
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.openklant.wrap import (
@@ -831,18 +832,30 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
         if form.is_valid():
             config = OpenKlantConfig.get_solo()
 
-            success = True
+            email_success = False
+            api_success = False
+            send_confirmation = False
+
             if config.register_email:
                 form.cleaned_data[
                     "question"
                 ] += f"\n\nCase number: {self.case.identificatie}"
-                success = (
-                    self.register_by_email(form, config.register_email) and success
-                )
-            if config.register_contact_moment:
-                success = self.register_by_api(form, config) and success
+                email_success = self.register_by_email(form, config.register_email)
+                send_confirmation = email_success
 
-            self.get_result_message(success=success)
+            if config.register_contact_moment:
+                api_success = self.register_by_api(form, config)
+                if api_success:
+                    send_confirmation = config.send_email_confirmation
+                # else keep the send_confirmation if email set it
+
+            if send_confirmation:
+                subject = _("Case: {case_identification}").format(
+                    case_identification=self.case.identificatie
+                )
+                send_contact_confirmation_mail(self.request.user.email, subject)
+
+            self.set_result_message(email_success or api_success)
 
             return HttpResponseClientRedirect(
                 reverse("cases:case_detail", kwargs={"object_id": str(self.case.uuid)})
@@ -855,13 +868,11 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
             "cases:case_detail_contact_form", kwargs={"object_id": str(self.case.uuid)}
         )
 
-    def get_result_message(self, success=False):
+    def set_result_message(self, success: bool):
         if success:
-            return messages.add_message(
-                self.request, messages.SUCCESS, _("Vraag verstuurd!")
-            )
+            messages.add_message(self.request, messages.SUCCESS, _("Vraag verstuurd!"))
         else:
-            return messages.add_message(
+            messages.add_message(
                 self.request,
                 messages.ERROR,
                 _("Probleem bij versturen van de vraag."),
