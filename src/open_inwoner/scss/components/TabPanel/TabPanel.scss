@@ -175,6 +175,10 @@
       margin-bottom: var(--spacing-large);
     }
 
+    .grid {
+      gap: var(--spacing-large);
+    }
+
     .card {
       & .link--next [class*='icon'] {
         font-size: var(--font-size-body);
