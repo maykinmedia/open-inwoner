@@ -34,8 +34,7 @@ services:
       - CACHE_DEFAULT=redis:6379/0
       - CACHE_AXES=redis:6379/0
       - ES_HOST=elasticsearch
-      - TWO_FACTOR_FORCE_OTP_ADMIN=0
-      - TWO_FACTOR_PATCH_ADMIN=0
+      - DISABLE_2FA=${DISABLE_2FA:-True}
     ports:
       - 8000:8000
     depends_on:
