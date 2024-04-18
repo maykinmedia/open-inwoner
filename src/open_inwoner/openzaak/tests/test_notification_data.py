@@ -84,7 +84,7 @@ class MockAPIData:
             informeren=True,
             volgnummer=2,
             omschrijving="final",
-            statustekst="",
+            statustekst="status_type_final_statustekst",
             isEindStatus=True,
         )
         self.zaak = generate_oas_component_cached(

@@ -92,7 +92,7 @@ class FeedHookTest(TestCase):
             strip_tags(item.message),
             escape(
                 _("Case status has been changed to '{status}'").format(
-                    status=status2.statustype.omschrijving
+                    status=status2.statustype.statustekst
                 )
             ),
         )
