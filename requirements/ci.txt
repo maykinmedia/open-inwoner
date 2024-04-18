@@ -43,8 +43,11 @@ attrs==21.2.0
     #   jsonschema
 autoflake==2.3.0
     # via -r requirements/test-tools.in
-beautifulsoup4==4.10.0
-    # via webtest
+beautifulsoup4==4.12.3
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   webtest
 billiard==3.6.4.0
     # via
     #   -c requirements/base.txt
@@ -128,6 +131,7 @@ cryptography==41.0.7
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   django-digid-eherkenning
     #   django-simple-certmanager
     #   josepy
     #   mozilla-django-oidc
@@ -150,8 +154,6 @@ defusedxml==0.7.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-    #   django-digid-eherkenning
-    #   maykin-python3-saml
     #   odfpy
 diff-match-patch==20200713
     # via
@@ -858,6 +860,7 @@ pyyaml==6.0
     #   -r requirements/base.txt
     #   drf-spectacular
     #   gemma-zds-client
+    #   responses
     #   tablib
 qrcode==6.1
     # via
@@ -888,9 +891,19 @@ requests==2.31.0
     #   messagebird
     #   mozilla-django-oidc
     #   requests-mock
+    #   responses
     #   zgw-consumers
-requests-mock==1.9.3
-    # via -r requirements/test-tools.in
+requests-mock==1.12.1
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   -r requirements/test-tools.in
+    #   maykin-python3-saml
+responses==0.25.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   maykin-python3-saml
 sentry-sdk==1.38.0
     # via
     #   -c requirements/base.txt
@@ -908,9 +921,11 @@ six==1.16.0
     #   orderedmultidict
     #   python-dateutil
     #   qrcode
-    #   requests-mock
-soupsieve==2.3.1
-    # via beautifulsoup4
+soupsieve==2.5
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   beautifulsoup4
 sqlparse==0.4.4
     # via
     #   -c requirements/base.txt
@@ -961,6 +976,7 @@ urllib3==1.26.18
     #   elastic-apm
     #   elasticsearch
     #   requests
+    #   responses
     #   sentry-sdk
 uwsgi==2.0.23
     # via

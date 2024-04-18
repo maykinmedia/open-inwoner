@@ -76,6 +76,8 @@ uwsgi
 sentry-sdk  # error monitoring
 elastic-apm  # Elastic APM integration
 
+beautifulsoup4
+
 # DigidLocal
 django-digid-eherkenning
 maykin-python3-saml

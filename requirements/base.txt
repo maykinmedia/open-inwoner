@@ -20,6 +20,8 @@ attrs==21.2.0
     # via
     #   glom
     #   jsonschema
+beautifulsoup4==4.12.3
+    # via -r requirements/base.in
 billiard==3.6.4.0
     # via celery
 boltons==21.0.0
@@ -61,6 +63,7 @@ confusable-homoglyphs==3.2.0
     # via django-registration
 cryptography==41.0.7
     # via
+    #   django-digid-eherkenning
     #   django-simple-certmanager
     #   josepy
     #   mozilla-django-oidc
@@ -75,10 +78,7 @@ cssselect2==0.4.1
     #   svglib
     #   weasyprint
 defusedxml==0.7.1
-    # via
-    #   django-digid-eherkenning
-    #   maykin-python3-saml
-    #   odfpy
+    # via odfpy
 diff-match-patch==20200713
     # via django-import-export
 django==4.2.11
@@ -462,6 +462,7 @@ pyyaml==6.0
     # via
     #   drf-spectacular
     #   gemma-zds-client
+    #   responses
     #   tablib
 qrcode==6.1
     # via django-two-factor-auth
@@ -481,7 +482,13 @@ requests==2.31.0
     #   maykin-python3-saml
     #   messagebird
     #   mozilla-django-oidc
+    #   requests-mock
+    #   responses
     #   zgw-consumers
+requests-mock==1.12.1
+    # via maykin-python3-saml
+responses==0.25.0
+    # via maykin-python3-saml
 sentry-sdk==1.38.0
     # via -r requirements/base.in
 six==1.16.0
@@ -495,6 +502,8 @@ six==1.16.0
     #   orderedmultidict
     #   python-dateutil
     #   qrcode
+soupsieve==2.5
+    # via beautifulsoup4
 sqlparse==0.4.4
     # via django
 svglib==1.5.1
@@ -523,6 +532,7 @@ urllib3==1.26.18
     #   elastic-apm
     #   elasticsearch
     #   requests
+    #   responses
     #   sentry-sdk
 uwsgi==2.0.23
     # via -r requirements/base.in
