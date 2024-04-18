@@ -44,8 +44,8 @@ def hex_to_hsl(color):
 
     l = (cmax + cmin) / 2
     s = 0 if delta == 0 else delta / (1 - abs(2 * l - 1))
-    s = int((s * 100))
-    l = int((l * 100))
+    s = int(s * 100)
+    l = int(l * 100)
 
     return h, s, l
 

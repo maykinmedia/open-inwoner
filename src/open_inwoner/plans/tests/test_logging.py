@@ -45,13 +45,13 @@ class TestPlans(WebTest):
             object_id=Plan.objects.get(title=plan.title).id
         ).last()
 
-        self.assertEquals(
+        self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(
+        self.assertEqual(
             log_entry.content_object.id, Plan.objects.get(title=plan.title).id
         )
-        self.assertEquals(
+        self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("plan was created"),
@@ -70,11 +70,11 @@ class TestPlans(WebTest):
         form.submit()
         log_entry = TimelineLog.objects.filter(object_id=self.plan.id).last()
 
-        self.assertEquals(
+        self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(log_entry.content_object.id, self.plan.id)
-        self.assertEquals(
+        self.assertEqual(log_entry.content_object.id, self.plan.id)
+        self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("plan was modified"),
@@ -94,11 +94,11 @@ class TestPlans(WebTest):
         form.submit()
         log_entry = TimelineLog.objects.filter(object_id=self.plan.id).last()
 
-        self.assertEquals(
+        self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(log_entry.content_object.id, self.plan.id)
-        self.assertEquals(
+        self.assertEqual(log_entry.content_object.id, self.plan.id)
+        self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("plan goal was modified"),
@@ -120,11 +120,11 @@ class TestPlans(WebTest):
         form.submit()
         log_entry = TimelineLog.objects.filter(object_id=self.plan.id).last()
 
-        self.assertEquals(
+        self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(log_entry.content_object.id, self.plan.id)
-        self.assertEquals(
+        self.assertEqual(log_entry.content_object.id, self.plan.id)
+        self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("file was uploaded"),
@@ -143,11 +143,11 @@ class TestPlans(WebTest):
 
         log_entry = TimelineLog.objects.filter(object_id=doc.id).last()
 
-        self.assertEquals(
+        self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(log_entry.content_object.id, doc.id)
-        self.assertEquals(
+        self.assertEqual(log_entry.content_object.id, doc.id)
+        self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("file was downloaded"),
@@ -169,11 +169,11 @@ class TestPlans(WebTest):
             object_id=Action.objects.first().id
         ).last()
 
-        self.assertEquals(
+        self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(log_entry.content_object.id, Action.objects.first().id)
-        self.assertEquals(
+        self.assertEqual(log_entry.content_object.id, Action.objects.first().id)
+        self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("action was created via plan"),
@@ -198,11 +198,11 @@ class TestPlans(WebTest):
             object_id=Action.objects.first().id
         ).last()
 
-        self.assertEquals(
+        self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(log_entry.content_object.id, Action.objects.first().id)
-        self.assertEquals(
+        self.assertEqual(log_entry.content_object.id, Action.objects.first().id)
+        self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("Changed: Naam."),
@@ -233,11 +233,11 @@ class TestPlans(WebTest):
         )
         log_entry = TimelineLog.objects.filter(object_id=self.user.id).last()
 
-        self.assertEquals(
+        self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(log_entry.content_object.id, self.user.id)
-        self.assertEquals(
+        self.assertEqual(log_entry.content_object.id, self.user.id)
+        self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("file plan_{plan_uuid}.pdf was exported").format(

@@ -148,7 +148,7 @@ class ProfileViewTests(WebTest):
     def test_get_empty_profile_page(self):
         response = self.app.get(self.url, user=self.user)
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertContains(response, _("U heeft geen interesses gekozen."))
         self.assertContains(response, _("U heeft nog geen contacten"))
         self.assertContains(response, "0 acties staan open")
@@ -163,7 +163,7 @@ class ProfileViewTests(WebTest):
         QuestionnaireStepFactory(published=True)
 
         response = self.app.get(self.url, user=self.user)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertContains(response, category.name)
         self.assertContains(
             response,
@@ -305,12 +305,12 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
 
     def test_save_form(self):
         response = self.app.get(self.url, user=self.user)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         form = response.forms["profile-edit"]
         base_response = form.submit()
-        self.assertEquals(base_response.url, self.return_url)
+        self.assertEqual(base_response.url, self.return_url)
         followed_response = base_response.follow()
-        self.assertEquals(followed_response.status_code, 200)
+        self.assertEqual(followed_response.status_code, 200)
 
     def test_save_empty_form_fails(self):
         response = self.app.get(self.url, user=self.user, status=200)
@@ -341,18 +341,18 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         form["postcode"] = "1013 RM"
         form["city"] = "Amsterdam"
         base_response = form.submit()
-        self.assertEquals(base_response.url, self.return_url)
+        self.assertEqual(base_response.url, self.return_url)
         followed_response = base_response.follow()
-        self.assertEquals(followed_response.status_code, 200)
+        self.assertEqual(followed_response.status_code, 200)
         self.user.refresh_from_db()
-        self.assertEquals(self.user.first_name, "First name")
-        self.assertEquals(self.user.last_name, "Last name")
-        self.assertEquals(self.user.display_name, "a nickname")
-        self.assertEquals(self.user.email, "user@example.com")
-        self.assertEquals(self.user.street, "Keizersgracht")
-        self.assertEquals(self.user.housenumber, "17 d")
-        self.assertEquals(self.user.postcode, "1013 RM")
-        self.assertEquals(self.user.city, "Amsterdam")
+        self.assertEqual(self.user.first_name, "First name")
+        self.assertEqual(self.user.last_name, "Last name")
+        self.assertEqual(self.user.display_name, "a nickname")
+        self.assertEqual(self.user.email, "user@example.com")
+        self.assertEqual(self.user.street, "Keizersgracht")
+        self.assertEqual(self.user.housenumber, "17 d")
+        self.assertEqual(self.user.postcode, "1013 RM")
+        self.assertEqual(self.user.city, "Amsterdam")
 
     def test_name_validation(self):
         invalid_characters = '<>#/"\\,.:;'

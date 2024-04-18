@@ -90,9 +90,7 @@ def settings(request):
         "search_filter_tags": config.search_filter_tags,
         "search_filter_organizations": config.search_filter_organizations,
         "has_general_faq_questions": Question.objects.general().exists(),
-        "settings": dict(
-            [(k, getattr(django_settings, k, None)) for k in public_settings]
-        ),
+        "settings": {k: getattr(django_settings, k, None) for k in public_settings},
         "hide_categories_from_anonymous_users": config.hide_categories_from_anonymous_users,
         "warning_banner_enabled": config.warning_banner_enabled,
         "warning_banner_text": config.warning_banner_text,

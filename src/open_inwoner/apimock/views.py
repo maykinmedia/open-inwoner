@@ -63,7 +63,7 @@ class APIMockView(View):
         # make dynamic from url conf?
         prefix = request.build_absolute_uri(f"/apimock/{set_name}/")
 
-        with open(file_path, "r") as f:
+        with open(file_path) as f:
             data = inject_filter_parameter_values(request, json.load(f))
             process_urls(data, prefix, self.url_replacers)
             return JsonResponse(data, safe=False)

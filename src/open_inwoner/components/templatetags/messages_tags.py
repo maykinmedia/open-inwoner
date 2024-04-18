@@ -42,7 +42,7 @@ def messages(
         """
         Returns a list of dates to render message(s) for.
         """
-        dates = sorted(set(m.created_on.date() for m in message_list))
+        dates = sorted({m.created_on.date() for m in message_list})
         return dates
 
     def get_date_text(date) -> str | datetime.date:

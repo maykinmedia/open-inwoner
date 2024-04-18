@@ -676,11 +676,9 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
             response = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
 
             e_suite_case = next(
-                (
-                    case
-                    for case in response.context["cases"]
-                    if case["uuid"] == self.zaak2["uuid"]
-                )
+                case
+                for case in response.context["cases"]
+                if case["uuid"] == self.zaak2["uuid"]
             )
 
             self.assertEqual(e_suite_case["identification"], "6639-2022")
@@ -692,11 +690,9 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
             response = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
 
             e_suite_case = next(
-                (
-                    case
-                    for case in response.context["cases"]
-                    if case["uuid"] == self.zaak2["uuid"]
-                )
+                case
+                for case in response.context["cases"]
+                if case["uuid"] == self.zaak2["uuid"]
             )
 
             self.assertEqual(e_suite_case["identification"], "0014ESUITE66392022")

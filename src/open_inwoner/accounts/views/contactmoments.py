@@ -292,7 +292,7 @@ class KlantContactMomentRedirectView(KlantContactMomentAccessMixin, View):
 
         contactmoment_uuid = kwargs["uuid"]
         kcm = next(
-            (kcm for kcm in kcms if str(kcm.contactmoment.uuid) == contactmoment_uuid)
+            kcm for kcm in kcms if str(kcm.contactmoment.uuid) == contactmoment_uuid
         )
 
         if not kcm:

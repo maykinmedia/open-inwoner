@@ -36,7 +36,7 @@ class TestFeedbackFunctionality(ESMixin, WebTest):
         url = f"{reverse('search:search')}?{urllib.parse.urlencode(params, doseq=True)}"
         response = self.app.get(url)
 
-        self.assertNotEquals(response.context["paginator"].count, 0)
+        self.assertNotEqual(response.context["paginator"].count, 0)
         feedback_form = response.forms["feedback_form"]
         feedback_form["remark"] = "Some remark"
         feedback_form["positive"] = "true"

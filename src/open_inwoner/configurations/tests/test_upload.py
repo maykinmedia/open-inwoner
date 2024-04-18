@@ -79,7 +79,7 @@ class CustomFontsTest(ClearCachesMixin, WebTest):
 
         response = self.form.submit()
 
-        self.assertEquals(
+        self.assertEqual(
             response.context["errors"],
             [
                 [

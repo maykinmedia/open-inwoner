@@ -229,7 +229,7 @@ class Product(models.Model):
         )
 
     def has_cta_tag(self):
-        return "\[CTABUTTON\]" in self.content  # noqa
+        return r"\[CTABUTTON\]" in self.content  # noqa
 
 
 class ProductFile(models.Model):

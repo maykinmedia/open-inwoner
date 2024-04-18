@@ -40,7 +40,7 @@ class PdocLocatieserver(Geocoder):
         )
 
         self.domain = domain.strip("/")
-        self.api = "%s://%s%s" % (self.scheme, self.domain, self.geocode_path)
+        self.api = "{}://{}{}".format(self.scheme, self.domain, self.geocode_path)
 
     def geocode(
         self,

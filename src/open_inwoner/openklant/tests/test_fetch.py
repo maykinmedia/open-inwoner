@@ -23,9 +23,9 @@ class FetchKlantDataTestCase(ClearCachesMixin, DisableRequestLogMixin, TestCase)
 
         res = fetch_klantcontactmomenten(user_bsn=data.user.bsn)
 
-        self.assertNotEquals(res, list())
+        self.assertNotEqual(res, list())
         self.assertIsInstance(res[0], KlantContactMoment)
-        self.assertEquals(str(res[0].uuid), data.klant_contactmoment["uuid"])
+        self.assertEqual(str(res[0].uuid), data.klant_contactmoment["uuid"])
 
     def test_fetch_klantcontactmoment_for_bsn(self, m):
         data = MockAPIReadData().install_mocks(m)
@@ -36,16 +36,16 @@ class FetchKlantDataTestCase(ClearCachesMixin, DisableRequestLogMixin, TestCase)
 
         self.assertIsNotNone(kcm)
         self.assertIsInstance(kcm, KlantContactMoment)
-        self.assertEquals(str(kcm.uuid), data.klant_contactmoment["uuid"])
+        self.assertEqual(str(kcm.uuid), data.klant_contactmoment["uuid"])
 
     def test_fetch_klantcontactmomenten_for_kvk(self, m):
         data = MockAPIReadData().install_mocks(m)
 
         res = fetch_klantcontactmomenten(user_kvk_or_rsin=data.eherkenning_user.kvk)
 
-        self.assertNotEquals(res, list())
+        self.assertNotEqual(res, list())
         self.assertIsInstance(res[0], KlantContactMoment)
-        self.assertEquals(str(res[0].uuid), data.klant_contactmoment2["uuid"])
+        self.assertEqual(str(res[0].uuid), data.klant_contactmoment2["uuid"])
 
     def test_fetch_klantcontactmoment_for_kvk(self, m):
         data = MockAPIReadData().install_mocks(m)
@@ -57,4 +57,4 @@ class FetchKlantDataTestCase(ClearCachesMixin, DisableRequestLogMixin, TestCase)
 
         self.assertIsNotNone(kcm)
         self.assertIsInstance(kcm, KlantContactMoment)
-        self.assertEquals(str(kcm.uuid), data.klant_contactmoment2["uuid"])
+        self.assertEqual(str(kcm.uuid), data.klant_contactmoment2["uuid"])

@@ -31,7 +31,7 @@ class ExtraCSSTest(ClearCachesMixin, WebTest):
         self.config.extra_css = "body {color: red; unknown: bar; }"
         self.config.save()
 
-        self.assertEquals("body {color: red; }", self.config.extra_css)
+        self.assertEqual("body {color: red; }", self.config.extra_css)
 
     def test_extra_css_rendered_in_homepage(self):
         cms_tools.create_homepage()
@@ -45,7 +45,7 @@ class ExtraCSSTest(ClearCachesMixin, WebTest):
 
         expected = "body {color: red;}"
         actual = response.pyquery("#extra-css")[0].text.strip()
-        self.assertEquals(expected, actual)
+        self.assertEqual(expected, actual)
 
     def test_extra_css_rendered_in_homepage_is_escaped(self):
         cms_tools.create_homepage()
@@ -58,7 +58,7 @@ class ExtraCSSTest(ClearCachesMixin, WebTest):
         response = self.app.get(reverse("pages-root"))
         extra_css = response.context.get("extra_css")
         # not escaped in context
-        self.assertEquals(extra_css, self.config.extra_css)
+        self.assertEqual(extra_css, self.config.extra_css)
 
         style = response.pyquery("#extra-css")
         self.assertEqual(1, len(style))
@@ -66,4 +66,4 @@ class ExtraCSSTest(ClearCachesMixin, WebTest):
         expected = escape(css)
 
         # escaped
-        self.assertEquals(expected, actual)
+        self.assertEqual(expected, actual)
