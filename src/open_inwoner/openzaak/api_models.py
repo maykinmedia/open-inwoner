@@ -8,6 +8,8 @@ from dateutil.relativedelta import relativedelta
 from zgw_consumers.api_models.base import Model, ZGWModel
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 
+from open_inwoner.utils.glom import glom_multiple
+
 logger = logging.getLogger(__name__)
 
 
@@ -33,7 +35,7 @@ class Zaak(ZGWModel):
     uiterlijke_einddatum_afdoening: Optional[date] = None
     #    publicatiedatum: Optional[date]
     einddatum: Optional[date] = None
-    resultaat: Optional[str] = None
+    resultaat: Optional[Union[str, "Resultaat"]] = None
     #    relevante_andere_zaken: list
     #    zaakgeometrie: dict
 
@@ -73,17 +75,30 @@ class Zaak(ZGWModel):
 
         status_translate = StatusTranslation.objects.get_lookup()
 
+        status_text = status_translate.from_glom_multiple(
+            self,
+            ("status.statustype.statustekst", "status.statustype.omschrijving"),
+            default="",
+        )
+        if self.einddatum and self.resultaat:
+            result_text = glom_multiple(
+                self,
+                (
+                    "resultaat.resultaattype.omschrijving",
+                    "resultaat.resultaattype.omschrijving_generiek",
+                    "resultaat.resultaattype.resultaattypeomschrijving",
+                ),
+                default="",
+            )
+            status_text = result_text or status_text
+
         return {
             "identification": self.identification,
             "uuid": str(self.uuid),
             "start_date": self.startdatum,
             "end_date": getattr(self, "einddatum", None),
             "description": self.zaaktype.omschrijving,
-            "current_status": status_translate.from_glom_multiple(
-                self,
-                ("status.statustype.statustekst", "status.statustype.omschrijving"),
-                default="",
-            ),
+            "current_status": status_text,
             "zaaktype_config": getattr(self, "zaaktype_config", None),
             "statustype_config": getattr(self, "statustype_config", None),
             "case_type": "Zaak",
