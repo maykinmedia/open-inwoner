@@ -80,6 +80,10 @@ with open(PRIVATE_KEY_FILE.name, "w") as f:
     DIGID_OIDC_USERINFO_CLAIMS_SOURCE=UserInformationClaimsSources.id_token,
     DIGID_OIDC_ERROR_MESSAGE_MAPPING={"some_error": "Some readable error"},
     DIGID_OIDC_OIDC_KEYCLOAK_IDP_HINT="parameter",
+    DIGID_OIDC_OIDC_USE_NONCE=False,
+    DIGID_OIDC_OIDC_NONCE_SIZE=64,
+    DIGID_OIDC_OIDC_STATE_SIZE=64,
+    DIGID_OIDC_OIDC_EXEMPT_URLS=["/foo"],
 )
 class DigiDOIDCConfigurationTests(ClearCachesMixin, TestCase):
     def test_configure(self):
@@ -122,6 +126,10 @@ class DigiDOIDCConfigurationTests(ClearCachesMixin, TestCase):
             config.error_message_mapping, {"some_error": "Some readable error"}
         )
         self.assertEqual(config.oidc_keycloak_idp_hint, "parameter")
+        self.assertEqual(config.oidc_use_nonce, False)
+        self.assertEqual(config.oidc_nonce_size, 64)
+        self.assertEqual(config.oidc_state_size, 64)
+        self.assertEqual(config.oidc_exempt_urls, ["/foo"])
 
     @override_settings(
         DIGID_OIDC_IDENTIFIER_CLAIM_NAME=None,
@@ -131,6 +139,10 @@ class DigiDOIDCConfigurationTests(ClearCachesMixin, TestCase):
         DIGID_OIDC_USERINFO_CLAIMS_SOURCE=None,
         DIGID_OIDC_ERROR_MESSAGE_MAPPING=None,
         DIGID_OIDC_OIDC_KEYCLOAK_IDP_HINT=None,
+        DIGID_OIDC_OIDC_USE_NONCE=None,
+        DIGID_OIDC_OIDC_NONCE_SIZE=None,
+        DIGID_OIDC_OIDC_STATE_SIZE=None,
+        DIGID_OIDC_OIDC_EXEMPT_URLS=None,
     )
     def test_configure_use_defaults(self):
         DigiDOIDCConfigurationStep().configure()
@@ -171,6 +183,10 @@ class DigiDOIDCConfigurationTests(ClearCachesMixin, TestCase):
         )
         self.assertEqual(config.error_message_mapping, {})
         self.assertEqual(config.oidc_keycloak_idp_hint, "")
+        self.assertEqual(config.oidc_use_nonce, True)
+        self.assertEqual(config.oidc_nonce_size, 32)
+        self.assertEqual(config.oidc_state_size, 32)
+        self.assertEqual(config.oidc_exempt_urls, [])
 
     @override_settings(
         DIGID_OIDC_OIDC_OP_DISCOVERY_ENDPOINT=IDENTITY_PROVIDER,
@@ -279,6 +295,10 @@ class DigiDOIDCConfigurationTests(ClearCachesMixin, TestCase):
     EHERKENNING_OIDC_USERINFO_CLAIMS_SOURCE=UserInformationClaimsSources.id_token,
     EHERKENNING_OIDC_ERROR_MESSAGE_MAPPING={"some_error": "Some readable error"},
     EHERKENNING_OIDC_OIDC_KEYCLOAK_IDP_HINT="parameter",
+    EHERKENNING_OIDC_OIDC_USE_NONCE=False,
+    EHERKENNING_OIDC_OIDC_NONCE_SIZE=64,
+    EHERKENNING_OIDC_OIDC_STATE_SIZE=64,
+    EHERKENNING_OIDC_OIDC_EXEMPT_URLS=["/foo"],
 )
 class eHerkenningOIDCConfigurationTests(ClearCachesMixin, TestCase):
     def test_configure(self):
@@ -321,6 +341,10 @@ class eHerkenningOIDCConfigurationTests(ClearCachesMixin, TestCase):
             config.error_message_mapping, {"some_error": "Some readable error"}
         )
         self.assertEqual(config.oidc_keycloak_idp_hint, "parameter")
+        self.assertEqual(config.oidc_use_nonce, False)
+        self.assertEqual(config.oidc_nonce_size, 64)
+        self.assertEqual(config.oidc_state_size, 64)
+        self.assertEqual(config.oidc_exempt_urls, ["/foo"])
 
     @override_settings(
         EHERKENNING_OIDC_IDENTIFIER_CLAIM_NAME=None,
@@ -330,6 +354,10 @@ class eHerkenningOIDCConfigurationTests(ClearCachesMixin, TestCase):
         EHERKENNING_OIDC_USERINFO_CLAIMS_SOURCE=None,
         EHERKENNING_OIDC_ERROR_MESSAGE_MAPPING=None,
         EHERKENNING_OIDC_OIDC_KEYCLOAK_IDP_HINT=None,
+        EHERKENNING_OIDC_OIDC_USE_NONCE=None,
+        EHERKENNING_OIDC_OIDC_NONCE_SIZE=None,
+        EHERKENNING_OIDC_OIDC_STATE_SIZE=None,
+        EHERKENNING_OIDC_OIDC_EXEMPT_URLS=None,
     )
     def test_configure_use_defaults(self):
         eHerkenningOIDCConfigurationStep().configure()
@@ -370,6 +398,10 @@ class eHerkenningOIDCConfigurationTests(ClearCachesMixin, TestCase):
         )
         self.assertEqual(config.error_message_mapping, {})
         self.assertEqual(config.oidc_keycloak_idp_hint, "")
+        self.assertEqual(config.oidc_use_nonce, True)
+        self.assertEqual(config.oidc_nonce_size, 32)
+        self.assertEqual(config.oidc_state_size, 32)
+        self.assertEqual(config.oidc_exempt_urls, [])
 
     @override_settings(
         EHERKENNING_OIDC_OIDC_OP_DISCOVERY_ENDPOINT=IDENTITY_PROVIDER,

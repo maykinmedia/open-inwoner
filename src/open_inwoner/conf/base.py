@@ -836,6 +836,7 @@ BRP_VERSION = config("BRP_VERSION", default="2.0")
 #
 # DIGID
 #
+DIGID_ENABLED = config("DIGID_ENABLED", default=True)
 DIGID_MOCK = config("DIGID_MOCK", default=True)
 
 #

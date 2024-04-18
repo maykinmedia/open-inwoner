@@ -22,10 +22,11 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 DIGID_MOCK = config("DIGID_MOCK", default=False)
-if DIGID_MOCK:
-    AUTHENTICATION_BACKENDS += ["digid_eherkenning.mock.backends.DigiDBackend"]
-else:
-    AUTHENTICATION_BACKENDS += ["digid_eherkenning.backends.DigiDBackend"]
+if DIGID_ENABLED:
+    if DIGID_MOCK:
+        AUTHENTICATION_BACKENDS += ["digid_eherkenning.mock.backends.DigiDBackend"]
+    else:
+        AUTHENTICATION_BACKENDS += ["digid_eherkenning.backends.DigiDBackend"]
 
 EHERKENNING_MOCK = config("EHERKENNING_MOCK", default=False)
 if EHERKENNING_MOCK:

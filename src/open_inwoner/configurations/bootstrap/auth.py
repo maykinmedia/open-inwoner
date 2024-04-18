@@ -35,11 +35,6 @@ class DigiDOIDCConfigurationStep(BaseConfigurationStep):
     required_settings = [
         "DIGID_OIDC_OIDC_RP_CLIENT_ID",
         "DIGID_OIDC_OIDC_RP_CLIENT_SECRET",
-        # NOTE these are part of the model, but not actually part of the admin form
-        # "DIGID_OIDC_OIDC_USE_NONCE",
-        # "DIGID_OIDC_OIDC_NONCE_SIZE",
-        # "DIGID_OIDC_OIDC_STATE_SIZE",
-        # "DIGID_OIDC_OIDC_EXEMPT_URLS",
     ]
     all_settings = required_settings + [
         "DIGID_OIDC_IDENTIFIER_CLAIM_NAME",
@@ -55,8 +50,12 @@ class DigiDOIDCConfigurationStep(BaseConfigurationStep):
         "DIGID_OIDC_USERINFO_CLAIMS_SOURCE",
         "DIGID_OIDC_ERROR_MESSAGE_MAPPING",
         "DIGID_OIDC_OIDC_KEYCLOAK_IDP_HINT",
+        "DIGID_OIDC_OIDC_USE_NONCE",
+        "DIGID_OIDC_OIDC_NONCE_SIZE",
+        "DIGID_OIDC_OIDC_STATE_SIZE",
+        "DIGID_OIDC_OIDC_EXEMPT_URLS",
     ]
-    enable_setting = "DIGID_OIDC_ENABLE"
+    enable_setting = "DIGID_OIDC_CONFIG_ENABLE"
 
     def is_configured(self) -> bool:
         return OpenIDConnectDigiDConfig.get_solo().enabled
@@ -83,7 +82,7 @@ class DigiDOIDCConfigurationStep(BaseConfigurationStep):
         if not form_data["error_message_mapping"]:
             del form_data["error_message_mapping"]
 
-        # Use the admin for to apply validation and fetch URLs from the discovery endpoint
+        # Use the admin form to apply validation and fetch URLs from the discovery endpoint
         form = OpenIDConnectDigiDConfigForm(data=form_data)
         if not form.is_valid():
             raise ConfigurationRunFailed(
@@ -108,11 +107,6 @@ class eHerkenningOIDCConfigurationStep(BaseConfigurationStep):
     required_settings = [
         "EHERKENNING_OIDC_OIDC_RP_CLIENT_ID",
         "EHERKENNING_OIDC_OIDC_RP_CLIENT_SECRET",
-        # NOTE these are part of the model, but not actually part of the admin form
-        # "EHERKENNING_OIDC_OIDC_USE_NONCE",
-        # "EHERKENNING_OIDC_OIDC_NONCE_SIZE",
-        # "EHERKENNING_OIDC_OIDC_STATE_SIZE",
-        # "EHERKENNING_OIDC_OIDC_EXEMPT_URLS",
     ]
     all_settings = required_settings + [
         "EHERKENNING_OIDC_IDENTIFIER_CLAIM_NAME",
@@ -128,8 +122,12 @@ class eHerkenningOIDCConfigurationStep(BaseConfigurationStep):
         "EHERKENNING_OIDC_USERINFO_CLAIMS_SOURCE",
         "EHERKENNING_OIDC_ERROR_MESSAGE_MAPPING",
         "EHERKENNING_OIDC_OIDC_KEYCLOAK_IDP_HINT",
+        "EHERKENNING_OIDC_OIDC_USE_NONCE",
+        "EHERKENNING_OIDC_OIDC_NONCE_SIZE",
+        "EHERKENNING_OIDC_OIDC_STATE_SIZE",
+        "EHERKENNING_OIDC_OIDC_EXEMPT_URLS",
     ]
-    enable_setting = "EHERKENNING_OIDC_ENABLE"
+    enable_setting = "EHERKENNING_OIDC_CONFIG_ENABLE"
 
     def is_configured(self) -> bool:
         return OpenIDConnectEHerkenningConfig.get_solo().enabled
@@ -156,7 +154,7 @@ class eHerkenningOIDCConfigurationStep(BaseConfigurationStep):
         if not form_data["error_message_mapping"]:
             del form_data["error_message_mapping"]
 
-        # Use the admin for to apply validation and fetch URLs from the discovery endpoint
+        # Use the admin form to apply validation and fetch URLs from the discovery endpoint
         form = OpenIDConnectEHerkenningConfigForm(data=form_data)
         if not form.is_valid():
             raise ConfigurationRunFailed(
@@ -205,7 +203,7 @@ class AdminOIDCConfigurationStep(BaseConfigurationStep):
         "ADMIN_OIDC_OIDC_EXEMPT_URLS",
         "ADMIN_OIDC_USERINFO_CLAIMS_SOURCE",
     ]
-    enable_setting = "ADMIN_OIDC_ENABLE"
+    enable_setting = "ADMIN_OIDC_CONFIG_ENABLE"
 
     def is_configured(self) -> bool:
         return OpenIDConnectConfig.get_solo().enabled
@@ -237,7 +235,7 @@ class AdminOIDCConfigurationStep(BaseConfigurationStep):
                 form_data[model_field_name] = value
         form_data["enabled"] = True
 
-        # Use the admin for to apply validation and fetch URLs from the discovery endpoint
+        # Use the admin form to apply validation and fetch URLs from the discovery endpoint
         form = OpenIDConnectConfigForm(data=form_data)
         if not form.is_valid():
             raise ConfigurationRunFailed(
@@ -285,7 +283,7 @@ class DigiDConfigurationStep(BaseConfigurationStep):
         "DIGID_REQUESTED_ATTRIBUTES",
         "DIGID_SLO",
     ]
-    enable_setting = "DIGID_ENABLED"
+    enable_setting = "DIGID_CONFIG_ENABLE"
 
     def is_configured(self) -> bool:
         config = DigidConfiguration.get_solo()
@@ -406,7 +404,7 @@ class eHerkenningConfigurationStep(BaseConfigurationStep):
         "EHERKENNING_NO_EIDAS",
         "EHERKENNING_SERVICE_LANGUAGE",
     ]
-    enable_setting = "EHERKENNING_ENABLE"
+    enable_setting = "EHERKENNING_CONFIG_ENABLE"
 
     def is_configured(self) -> bool:
         config = EherkenningConfiguration.get_solo()
