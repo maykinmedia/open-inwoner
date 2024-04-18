@@ -52,6 +52,7 @@ class ContactFormTestCase(
         config.register_bronorganisatie_rsin = ""
         config.register_type = ""
         config.register_employee_id = ""
+        config.send_email_confirmation = True
         config.save()
 
     def test_singleton_has_configuration_method(self, m, mock_send_confirm):
@@ -730,7 +731,7 @@ class ContactFormTestCase(
                     )
                     mock_send_confirm.reset_mock()
 
-    def test_api_sends_email_confirmation_is_configurable(self, m, mock_send_confirm):
+    def test_send_email_confirmation_is_configurable(self, m, mock_send_confirm):
         MockAPICreateData.setUpServices()
 
         config = OpenKlantConfig.get_solo()
@@ -748,9 +749,9 @@ class ContactFormTestCase(
             subject="Aanvraag document",
             subject_code="afdeling-xyz",
         )
-        for api_sends in [True, False]:
-            with self.subTest(api_sends=api_sends):
-                config.api_sends_email_confirmation = api_sends
+        for send in [True, False]:
+            with self.subTest(send=send):
+                config.send_email_confirmation = send
                 config.save()
 
                 response = self.app.get(self.url)
@@ -765,8 +766,8 @@ class ContactFormTestCase(
 
                 response = form.submit().follow()
 
-                if api_sends:
-                    mock_send_confirm.assert_not_called()
-                else:
+                if send:
                     mock_send_confirm.assert_called_once()
+                else:
+                    mock_send_confirm.assert_not_called()
                 mock_send_confirm.reset_mock()

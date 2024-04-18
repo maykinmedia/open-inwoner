@@ -84,6 +84,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
 
         # openklant config
         self.ok_config = OpenKlantConfig.get_solo()
+        self.ok_config.send_email_confirmation = True
         self.ok_config.register_contact_moment = True
         self.ok_config.register_bronorganisatie_rsin = "123456788"
         self.ok_config.register_type = "Melding"
@@ -609,14 +610,14 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
 
         mock_send_confirm.assert_called_once_with("foo@example.com", ANY)
 
-    def test_api_sends_email_confirmation_is_configurable__api_does_not_send(
+    def test_send_email_confirmation_is_configurable__send_enabled(
         self, m, mock_contactmoment, mock_send_confirm
     ):
         self._setUpMocks(m)
         self._setUpExtraMocks(m)
 
         config = OpenKlantConfig.get_solo()
-        config.api_sends_email_confirmation = False
+        config.send_email_confirmation = True
         config.save()
 
         response = self.app.get(self.case_detail_url, user=self.user)
@@ -628,14 +629,14 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         response = form.submit()
         mock_send_confirm.assert_called_once()
 
-    def test_api_sends_email_confirmation_is_configurable__api_sends(
+    def test_send_email_confirmation_is_configurable__send_disabled(
         self, m, mock_contactmoment, mock_send_confirm
     ):
         self._setUpMocks(m)
         self._setUpExtraMocks(m)
 
         config = OpenKlantConfig.get_solo()
-        config.api_sends_email_confirmation = True
+        config.send_email_confirmation = False
         config.save()
 
         response = self.app.get(self.case_detail_url, user=self.user)

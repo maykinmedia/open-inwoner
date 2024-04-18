@@ -20,6 +20,7 @@ class ContactFormTestCase(ClearCachesMixin, TestCase):
         config.register_bronorganisatie_rsin = ""
         config.register_type = ""
         config.register_employee_id = ""
+        config.send_email_confirmation = True
         config.save()
 
     def test_no_form_link_shown_in_footer_if_not_has_configuration(self):

@@ -85,10 +85,7 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
         if config.register_contact_moment:
             api_success, api_user_email = self.register_by_api(form, config)
             if api_success:
-                if config.api_sends_email_confirmation:
-                    send_confirmation = False
-                else:
-                    send_confirmation = True
+                send_confirmation = config.send_email_confirmation
             # else keep the send_confirmation if email set it
 
         # it is possible we don't have an email, user didn't enter it but we got it from the Klant
