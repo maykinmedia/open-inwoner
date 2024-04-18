@@ -29,7 +29,7 @@ services:
     build: .
     environment:
       - DJANGO_SETTINGS_MODULE=open_inwoner.conf.docker
-      - SECRET_KEY=${SECRET_KEY:-7bk)w=_%lnm#68rc!c)h@gy&5+%^f$=okq17bv!)yv!l0udu2y}
+      - SECRET_KEY=${SECRET_KEY:-7bk)w=_%lnm#68rc!c)h@gy&5+%^fl=okq17bv!)yv!l0udu2y}
       - ALLOWED_HOSTS=*
       - CACHE_DEFAULT=redis:6379/0
       - CACHE_AXES=redis:6379/0
