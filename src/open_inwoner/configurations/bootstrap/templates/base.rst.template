@@ -24,13 +24,14 @@ All settings:
     {{ setting }}
     {% endfor %}
 
+
 Detailed Information
 ====================
 
 ::
 
     {% for detail in detailed_info -%}
-    {% for part in detail -%}
+    {%- for part in detail -%}
     {{ part }}
     {% endfor %}
     {% endfor %}

@@ -59,8 +59,12 @@ For a full overview of the command and its options:
 Supported configurations
 ========================
 
-:doc:`General configuration <./siteconfig.rst>`
-:doc:`Klanten interactie configuration <./kic.rst>`
-:doc:`ZGW configuration <./zgw.rst>`
-:doc:`DigiD OIDC configuration <./digid_oidc.rst>`
-:doc:`eHerkenning OIDC <./eherkenning_oidc.rst>`
+`General configuration <./siteconfig.rst>`_
+
+`Klanten configuration <./kic.rst>`_
+
+`ZGW configuration <./zgw.rst>`_
+
+`DigiD OIDC configuration <./digid_oidc.rst>`_
+
+`eHerkenning OIDC configuration <./eherkenning_oidc.rst>`_

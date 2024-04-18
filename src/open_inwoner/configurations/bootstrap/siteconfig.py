@@ -21,7 +21,7 @@ class SiteConfigurationStep(BaseConfigurationStep):
 
         for required_setting in required_settings:
             config_field = setting_to_config[required_setting]
-            if not getattr(config, config_field, None):
+            if not getattr(config, config_field.name, None):
                 return False
         return True
 
@@ -29,10 +29,10 @@ class SiteConfigurationStep(BaseConfigurationStep):
         config = SiteConfiguration.get_solo()
         setting_to_config = SiteConfigurationSettings.get_config_mapping()
 
-        for key, value in setting_to_config.items():
-            setting = getattr(settings, key)
+        for setting_name, config_field in setting_to_config.items():
+            setting = getattr(settings, setting_name)
             if setting is not None:
-                setattr(config, value, setting)
+                setattr(config, config_field.name, setting)
         config.save()
 
     def test_configuration(self):
