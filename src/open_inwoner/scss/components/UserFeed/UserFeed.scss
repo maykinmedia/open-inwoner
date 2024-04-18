@@ -118,4 +118,9 @@
       }
     }
   }
+
+  .card-container.plugin-card {
+    grid-row-gap: var(--spacing-medium);
+    grid-column-gap: var(--spacing-giant);
+  }
 }
