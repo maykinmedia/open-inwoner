@@ -66,6 +66,7 @@ cryptography==42.0.4
     #   django-digid-eherkenning
     #   django-simple-certmanager
     #   josepy
+    #   maykin-python3-saml
     #   mozilla-django-oidc
     #   pyopenssl
     #   webauthn
@@ -377,7 +378,7 @@ markuppy==1.14
     # via tablib
 maykin-2fa==1.0.0
     # via -r requirements/base.in
-maykin-python3-saml==1.16.0
+maykin-python3-saml==1.16.1
     # via
     #   -r requirements/base.in
     #   django-digid-eherkenning
@@ -435,7 +436,6 @@ pyopenssl==24.0.0
     #   -r requirements/base.in
     #   django-simple-certmanager
     #   josepy
-    #   maykin-python3-saml
     #   webauthn
     #   zgw-consumers
 pyphen==0.12.0
@@ -462,7 +462,6 @@ pyyaml==6.0
     # via
     #   drf-spectacular
     #   gemma-zds-client
-    #   responses
     #   tablib
 qrcode==6.1
     # via django-two-factor-auth
@@ -482,13 +481,7 @@ requests==2.31.0
     #   maykin-python3-saml
     #   messagebird
     #   mozilla-django-oidc
-    #   requests-mock
-    #   responses
     #   zgw-consumers
-requests-mock==1.12.1
-    # via maykin-python3-saml
-responses==0.25.0
-    # via maykin-python3-saml
 sentry-sdk==1.38.0
     # via -r requirements/base.in
 six==1.16.0
@@ -532,7 +525,6 @@ urllib3==1.26.18
     #   elastic-apm
     #   elasticsearch
     #   requests
-    #   responses
     #   sentry-sdk
 uwsgi==2.0.23
     # via -r requirements/base.in
