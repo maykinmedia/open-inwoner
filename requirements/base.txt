@@ -61,7 +61,7 @@ click-repl==0.2.0
     # via celery
 confusable-homoglyphs==3.2.0
     # via django-registration
-cryptography==41.0.7
+cryptography==42.0.4
     # via
     #   django-digid-eherkenning
     #   django-simple-certmanager
@@ -346,7 +346,7 @@ html5lib==1.1
     #   weasyprint
 humanfriendly==10.0
     # via -r requirements/base.in
-idna==3.2
+idna==3.7
     # via
     #   email-validator
     #   requests
@@ -403,7 +403,7 @@ phonenumbers==8.13.29
     # via -r requirements/base.in
 phonenumberslite==8.13.29
     # via django-two-factor-auth
-pillow==10.2.0
+pillow==10.3.0
     # via
     #   -r requirements/base.in
     #   djangocms-text-ckeditor
@@ -430,7 +430,7 @@ pyjwt==2.8.0
     # via
     #   gemma-zds-client
     #   messagebird
-pyopenssl==23.3.0
+pyopenssl==24.0.0
     # via
     #   -r requirements/base.in
     #   django-simple-certmanager
@@ -466,7 +466,7 @@ pyyaml==6.0
     #   tablib
 qrcode==6.1
     # via django-two-factor-auth
-redis==3.5.3
+redis==5.0.3
     # via django-redis
 reportlab==3.6.13
     # via

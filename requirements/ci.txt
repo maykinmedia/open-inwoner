@@ -127,7 +127,7 @@ confusable-homoglyphs==3.2.0
     #   django-registration
 coverage==4.5.4
     # via -r requirements/test-tools.in
-cryptography==41.0.7
+cryptography==42.0.4
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -604,7 +604,7 @@ humanfriendly==10.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-idna==3.2
+idna==3.7
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -738,7 +738,7 @@ phonenumberslite==8.13.29
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-two-factor-auth
-pillow==10.2.0
+pillow==10.3.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -804,7 +804,7 @@ pyjwt==2.8.0
     #   messagebird
 pylint==2.17.7
     # via -r requirements/test-tools.in
-pyopenssl==23.3.0
+pyopenssl==24.0.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -867,7 +867,7 @@ qrcode==6.1
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-two-factor-auth
-redis==3.5.3
+redis==5.0.3
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
