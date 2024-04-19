@@ -17,8 +17,8 @@
     <div class="tab--container login-tab--container">
         <div class="tabs">
             <ul class="list tabs__headers">
-                <li class="list-item tab__header--item"><a href="/accounts/login/#particulier" class="link tab__header ">Particulier</a></li>
-                <li class="list-item tab__header--item"><a href="/accounts/login/#zakelijk" class="link tab__header">Zakelijk</a></li>
+                <li class="list-item tab__header--item"><a href="{% url 'login' %}#particulier" class="link tab__header ">Particulier</a></li>
+                <li class="list-item tab__header--item"><a href="{% url 'login' %}#zakelijk" class="link tab__header">Zakelijk</a></li>
             </ul>
             {# Panel 1 #}
             <div class="tabs__body">
@@ -60,7 +60,7 @@
                             {% get_solo 'configurations.SiteConfiguration' as site_config %}
                             {% if oidc_config.enabled and site_config.openid_enabled_for_regular_users %}
                                 {% render_column start=4 span=5 %}
-                                    {% render_card tinted=True compact=True direction='horizontal' %}                                        
+                                    {% render_card tinted=True compact=True direction='horizontal' %}
                                         {% url 'oidc_authentication_init' as href %}
                                         {% with href|addnexturl:next as href_with_next %}
                                             {% if site_config.openid_connect_logo %}
@@ -79,10 +79,13 @@
                             {% if login_allow_registration %}
                                 <div class="column column--start-4 column--span-5" id="column__email-toggle">
                                     {% render_card direction='horizontal' tinted=True compact=True %}
-                                        <a href="/accounts/login#particuliermail" class="link icon--large">
+                                        {% url 'login' as href %}
+                                        {% with href|add:"#particuliermail" as href_with_hash %}
+                                        <a href="{{ href_with_hash }}#particuliermail" class="link icon--large">
                                             {% icon icon="login" icon_position="before" outlined=True %}
                                         </a>
-                                        {% link href="/accounts/login#particuliermail" text=_('Log in met e-mail adres') primary=True icon='east' extra_classes="link--next link--email" %}
+                                        {% link href=href_with_hash text=_('Log in met e-mail adres') primary=True icon='east' extra_classes="link--next link--email" %}
+                                        {% endwith %}
                                     {% endrender_card %}
                                 </div>
 
@@ -106,10 +109,11 @@
                                 {% render_column start=4 span=5 %}
                                     <h2 class="tab__heading-4">Of registreer</h2>
                                     {% render_card direction='horizontal' tinted=True compact=True %}
-                                        <a href="/accounts/register" class="link icon--large">
+                                        {% url 'django_registration_register' as href %}
+                                        <a href="{{ href }}" class="link icon--large">
                                             {% icon icon="account_circle" icon_position="before" outlined=True %}
                                         </a>
-                                        {% link href="/accounts/register" text=_('Maak een account aan') primary=True icon='east' extra_classes="link--next link--register" %}
+                                        {% link href=href text=_('Maak een account aan') primary=True icon='east' extra_classes="link--next link--register" %}
                                     {% endrender_card %}
                                     <p class="tab-column__paragraph">{% trans 'U kunt een account aanmaken om voortaan met uw e-mail adres en wachtwoord in te loggen.' %}</p>
                                 {% endrender_column %}
