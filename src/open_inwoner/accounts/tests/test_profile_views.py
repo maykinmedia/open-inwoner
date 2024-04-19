@@ -223,7 +223,7 @@ class ProfileViewTests(WebTest):
         doc = PQ(response.content)
 
         business_section = doc.find("#business-overview")[0]
-        self.assertEqual(business_section.text, "Bedrijfsgegevens")
+        self.assertEqual(business_section.text.strip(), "Bedrijfsgegevens")
 
         # check personal overview section not displayed
         personal_section = doc.find("#personal-overview")
@@ -290,6 +290,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         self.url = reverse("profile:edit")
         self.return_url = reverse("profile:detail")
         self.user = UserFactory()
+        self.eherkenning_user = eHerkenningUserFactory()
 
     def upload_test_image_to_profile_edit_page(self, img_bytes):
         response = self.app.get(self.url, user=self.user, status=200)
@@ -393,6 +394,17 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         self.user.refresh_from_db()
         self.assertEqual(response.url, self.return_url)
         self.assertEqual(self.user.email, "user@example.com")
+
+    def test_modify_contact_details_eherkenning_succeeds(self):
+        response = self.app.get(self.url, user=self.eherkenning_user)
+        form = response.forms["profile-edit"]
+        form["email"] = "user@example.com"
+        form["phonenumber"] = "0612345678"
+        response = form.submit()
+        self.eherkenning_user.refresh_from_db()
+        self.assertEqual(response.url, self.return_url)
+        self.assertEqual(self.eherkenning_user.email, "user@example.com")
+        self.assertEqual(self.eherkenning_user.phonenumber, "0612345678")
 
     def test_updating_a_field_without_modifying_email_succeeds(self):
         initial_email = self.user.email
@@ -633,7 +645,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         )
 
     @requests_mock.Mocker()
-    def test_modify_phone_updates_klant_api_but_skip_unchanged_phone(self, m):
+    def test_modify_email_updates_klant_api_but_skip_unchanged_phone(self, m):
         MockAPIReadPatchData.setUpServices()
         data = MockAPIReadPatchData().install_mocks(m)
 

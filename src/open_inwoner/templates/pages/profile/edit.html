@@ -23,7 +23,10 @@
                     {% csrf_token %}
 
                     {% with request.user as user %}
-                        {% if user.is_digid_user_with_brp %}
+                        {% if user.is_eherkenning_user %}
+                            {% input form.email %}
+                            {% input form.phonenumber %}
+                        {% elif user.is_digid_user_with_brp %}
                             {% input form.display_name %}
                             {% input form.email %}
                             {% input form.phonenumber %}
