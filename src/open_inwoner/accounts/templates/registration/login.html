@@ -32,21 +32,21 @@
                                 {% get_solo 'digid_eherkenning_oidc_generics.OpenIDConnectDigiDConfig' as digid_oidc_config %}
                                 {% if digid_oidc_config.enabled %}
                                     {% render_card direction='horizontal' tinted=True compact=True %}
-                                        <a href="{% url 'digid_oidc:init' %}" class="link digid-logo">
-                                            <img class="digid-logo__image" src="{% static 'accounts/digid_logo.svg' %}" alt="DigiD inlogpagina">
-                                        </a>
                                         {% url 'digid_oidc:init' as href %}
                                         {% with href|addnexturl:next as href_with_next %}
+                                            <a href="{{ href_with_next }}" class="link digid-logo">
+                                                <img class="digid-logo__image" src="{% static 'accounts/digid_logo.svg' %}" alt="DigiD inlogpagina">
+                                            </a>
                                             {% link href=href_with_next text=_('Inloggen met DigiD') primary=True icon='east' extra_classes="link--next link--digid" %}
                                         {% endwith %}
                                     {% endrender_card %}
                                 {% else %}
                                     {% render_card direction='horizontal' tinted=True compact=True %}
-                                        <a href="{% url 'digid:login' %}" class="link digid-logo">
-                                            <img class="digid-logo__image" src="{% static 'accounts/digid_logo.svg' %}" alt="DigiD inlogpagina">
-                                        </a>
                                         {% url 'digid:login' as href %}
                                         {% with href|addnexturl:next as href_with_next %}
+                                            <a href="{{ href_with_next }}" class="link digid-logo">
+                                                <img class="digid-logo__image" src="{% static 'accounts/digid_logo.svg' %}" alt="DigiD inlogpagina">
+                                            </a>
                                             {% link href=href_with_next text=_('Inloggen met DigiD') primary=True icon='east' extra_classes="link--next link--digid" %}
                                         {% endwith %}
                                     {% endrender_card %}
@@ -60,16 +60,16 @@
                             {% get_solo 'configurations.SiteConfiguration' as site_config %}
                             {% if oidc_config.enabled and site_config.openid_enabled_for_regular_users %}
                                 {% render_column start=4 span=5 %}
-                                    {% render_card tinted=True compact=True direction='horizontal' %}
-                                        {% if site_config.openid_connect_logo %}
-                                            <a href="{% url 'oidc_authentication_init' %}" class="link digid-logo">
-                                                <img class="digid-logo__image" src="{{ site_config.openid_connect_logo.url }}" alt="{{ site_config.openid_connect_logo.default_alt_text }}">
-                                            </a>
-                                        {% else %}
-                                            <div></div>
-                                        {% endif %}
+                                    {% render_card tinted=True compact=True direction='horizontal' %}                                        
                                         {% url 'oidc_authentication_init' as href %}
                                         {% with href|addnexturl:next as href_with_next %}
+                                            {% if site_config.openid_connect_logo %}
+                                                <a href="{{ href_with_next }}" class="link digid-logo">
+                                                    <img class="digid-logo__image" src="{{ site_config.openid_connect_logo.url }}" alt="{{ site_config.openid_connect_logo.default_alt_text }}">
+                                                </a>
+                                            {% else %}
+                                                <div></div>
+                                            {% endif %}
                                             {% link text=site_config.openid_connect_login_text href=href_with_next primary=True icon='east' icon_position="after" extra_classes="link--next link--oidc" %}
                                         {% endwith %}
                                     {% endrender_card %}
@@ -131,21 +131,21 @@
                                 {% get_solo 'digid_eherkenning_oidc_generics.OpenIDConnectEHerkenningConfig' as eherkenning_oidc_config %}
                                 {% if eherkenning_oidc_config.enabled %}
                                     {% render_card direction='horizontal' tinted=True compact=True %}
-                                        <a href="{% url 'eherkenning_oidc:init' %}" class="link eherkenning-logo">
-                                            <img class="eherkenning-logo__image" src="{% static 'accounts/eherkenning.png' %}" height=40 alt="eHerkenning inlogpagina">
-                                        </a>
                                         {% url 'eherkenning_oidc:init' as href %}
                                         {% with href|addnexturl:next as href_with_next %}
+                                            <a href="{{ href_with_next }}" class="link eherkenning-logo">
+                                                <img class="eherkenning-logo__image" src="{% static 'accounts/eherkenning.png' %}" height=40 alt="eHerkenning inlogpagina">
+                                            </a>
                                             {% link href=href_with_next text=_('Inloggen met eHerkenning') primary=True icon='east' extra_classes="link--eherkenning" %}
                                         {% endwith %}
                                     {% endrender_card %}
                                 {% else %}
                                     {% render_card direction='horizontal' tinted=True compact=True %}
-                                        <a href="{% url 'eherkenning:login' %}" class="link eherkenning-logo">
-                                            <img class="eherkenning-logo__image" src="{% static 'accounts/eherkenning.png' %}" height=40 alt="eHerkenning inlogpagina">
-                                        </a>
                                         {% url 'eherkenning:login' as href %}
                                         {% with href|addnexturl:next as href_with_next %}
+                                            <a href="{{ href_with_next }}" class="link eherkenning-logo">
+                                                <img class="eherkenning-logo__image" src="{% static 'accounts/eherkenning.png' %}" height=40 alt="eHerkenning inlogpagina">
+                                            </a>
                                             {% link href=href_with_next text=_('Inloggen met eHerkenning') primary=True icon='east' extra_classes="link--eherkenning" %}
                                         {% endwith %}
                                     {% endrender_card %}
