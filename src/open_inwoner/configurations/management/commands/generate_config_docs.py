@@ -1,36 +1,15 @@
 import os
 from pathlib import Path
-from typing import TypeAlias
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.template import loader
 
-from jinja2 import Environment, FileSystemLoader, select_autoescape
+from open_inwoner.configurations.bootstrap.models import ConfigurationSettingsMap
+from open_inwoner.configurations.bootstrap.typing import ConfigSetting
 
-from open_inwoner.configurations.bootstrap.models import (
-    DigiDOIDCConfigurationSettings,
-    KICConfigurationSettings,
-    SiteConfigurationSettings,
-    ZGWConfigurationSettings,
-    eHerkenningDOIDCConfigurationSettings,
-)
-
-ConfigSetting: TypeAlias = (
-    DigiDOIDCConfigurationSettings
-    | KICConfigurationSettings
-    | SiteConfigurationSettings
-    | ZGWConfigurationSettings
-    | eHerkenningDOIDCConfigurationSettings
-)
-
-
-SUPPORTED_OPTIONS = ["siteconfig", "kic", "zgw", "digid_oidc", "eherkenning_oidc"]
-
-TEMPLATE_DIR = (
-    Path(os.path.abspath(os.path.dirname(__file__))).parent.parent
-    / "bootstrap"
-    / "templates"
-)
+SUPPORTED_OPTIONS = ConfigurationSettingsMap.get_field_names()
+TEMPLATE_PATH = Path("configurations/config_doc.rst")
 TARGET_DIR = Path(settings.BASE_DIR) / "docs" / "configuration"
 
 
@@ -40,29 +19,31 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("config_option", nargs="?")
 
-    def get_config(self, config_option: str) -> dict[str, ConfigSetting]:
-        mapping = {
-            "siteconfig": SiteConfigurationSettings,
-            "kic": KICConfigurationSettings,
-            "zgw": ZGWConfigurationSettings,
-            "digid_oidc": DigiDOIDCConfigurationSettings,
-            "eherkenning_oidc": eHerkenningDOIDCConfigurationSettings,
-        }
-        return mapping[config_option]
+    def get_config(self, config_option: str) -> ConfigSetting:
+        config_model = getattr(ConfigurationSettingsMap, config_option, None)
+        config_instance = config_model()
+        return config_instance
 
-    def get_detailed_info(self, config: ConfigSetting) -> list[str]:
+    def get_detailed_info(self, config: ConfigSetting) -> list[list[str]]:
         ret = []
-        for field in config.fields["all"]:
-            model_field = config.model._meta.get_field(field.name)
+        for field in config.config_fields.all:
             part = []
             part.append(f"{'Variable':<20}{config.get_setting_name(field)}")
-            part.append(f"{'Setting':<20}{str(model_field.verbose_name)}")
-            part.append(f"{'Description':<20}{str(model_field.help_text)}")
-            part.append(f"{'Model field type':<20}{field.field_type}")
-            part.append(f"{'Possible values':<20}{field.values}")
-            part.append(f"{'Default value':<20}{field.default_value}")
+            part.append(f"{'Setting':<20}{field.verbose_name}")
+            part.append(f"{'Description':<20}{field.description or 'No description'}")
+            part.append(f"{'Possible values':<20}{field.values or 'No information'}")
+            part.append(f"{'Default value':<20}{field.default_value or 'No default'}")
             ret.append(part)
         return ret
+
+    def format_display_name(self, display_name):
+        """Surround title with '=' to display as heading in rst file"""
+
+        heading_bar = f"{'=' * len(display_name)}"
+        display_name_formatted = (
+            heading_bar + "\n" + f"{display_name}" + "\n" + heading_bar
+        )
+        return display_name_formatted
 
     def write_file_from_template(
         self,
@@ -70,35 +51,33 @@ class Command(BaseCommand):
         template_variables: dict[str, list],
         output_path: os.PathLike,
     ):
-        with open(template_path, "r") as template:
-            template_str = template.read()
-            template = Environment(
-                loader=FileSystemLoader(TEMPLATE_DIR), autoescape=select_autoescape()
-            ).from_string(template_str)
-            rendered = template.render(template_variables)
+        template = loader.get_template(template_path)
+        rendered = template.render(template_variables)
 
-            with open(output_path, "w") as output:
-                output.write(rendered)
+        with open(output_path, "w") as output:
+            output.write(rendered)
 
     def generate_single_doc(self, config_option: str) -> None:
         config = self.get_config(config_option)
 
         required_settings = [
-            config.get_setting_name(field) for field in config.fields["required"]
+            config.get_setting_name(field) for field in config.config_fields.required
         ]
         required_settings.sort()
         all_settings = [
-            config.get_setting_name(field) for field in config.fields["all"]
+            config.get_setting_name(field) for field in config.config_fields.all
         ]
         all_settings.sort()
         detailed_info = self.get_detailed_info(config)
+
         template_variables = {
             "required_settings": required_settings,
             "all_settings": all_settings,
             "detailed_info": detailed_info,
+            "link": f".. _{config_option}:",
+            "title": self.format_display_name(config.display_name),
         }
-
-        template_path = TEMPLATE_DIR / f"{config_option}.rst.template"
+        template_path = TEMPLATE_PATH
         output_path = TARGET_DIR / f"{config_option}.rst"
 
         self.write_file_from_template(template_path, template_variables, output_path)
@@ -107,6 +86,8 @@ class Command(BaseCommand):
         config_option = kwargs["config_option"]
 
         if config_option and config_option not in SUPPORTED_OPTIONS:
+            self.stdout.write(f"Unsupported config option ({config_option})\n")
+            self.stdout.write(f"Supported: {', '.join(SUPPORTED_OPTIONS)}")
             return
         elif config_option:
             self.generate_single_doc(config_option)

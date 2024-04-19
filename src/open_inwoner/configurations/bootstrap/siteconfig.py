@@ -16,8 +16,9 @@ class SiteConfigurationStep(BaseConfigurationStep):
 
     def is_configured(self):
         config = SiteConfiguration.get_solo()
-        required_settings = SiteConfigurationSettings.get_required_settings()
-        setting_to_config = SiteConfigurationSettings.get_config_mapping()
+        config_settings = SiteConfigurationSettings()
+        required_settings = config_settings.get_required_settings()
+        setting_to_config = config_settings.get_config_mapping()
 
         for required_setting in required_settings:
             config_field = setting_to_config[required_setting]
@@ -27,7 +28,8 @@ class SiteConfigurationStep(BaseConfigurationStep):
 
     def configure(self):
         config = SiteConfiguration.get_solo()
-        setting_to_config = SiteConfigurationSettings.get_config_mapping()
+        config_settings = SiteConfigurationSettings()
+        setting_to_config = config_settings.get_config_mapping()
 
         for setting_name, config_field in setting_to_config.items():
             setting = getattr(settings, setting_name)

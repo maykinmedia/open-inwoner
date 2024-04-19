@@ -33,8 +33,7 @@ If the project is being configured for the first time, run the command from the 
 
     src/manage.py setup_configuration
 
-
-By default, ``setup_configuration`` checks if a configuration already exists and will stop executing if it finds one. In order to overwrite an existing configuration, use:
+By default, ``setup_configuration`` checks per configuration step if it is already configured and skips this step if that is the case. In order to overwrite an existing configuration, use:
 
 ::
 
