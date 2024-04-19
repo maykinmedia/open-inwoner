@@ -42,6 +42,20 @@ class OpenIDConnectConfigBaseAdmin(SingletonModelAdmin):
             },
         ),
         (_("Keycloak specific settings"), {"fields": ("oidc_keycloak_idp_hint",)}),
+        (
+            _("Advanced settings"),
+            {
+                "fields": (
+                    "oidc_use_nonce",
+                    "oidc_nonce_size",
+                    "oidc_state_size",
+                    "oidc_exempt_urls",
+                ),
+                "classes": [
+                    "collapse in",
+                ],
+            },
+        ),
     )
 
 

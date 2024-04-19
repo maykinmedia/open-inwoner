@@ -836,38 +836,12 @@ BRP_VERSION = config("BRP_VERSION", default="2.0")
 #
 # DIGID
 #
-
-if ALLOWED_HOSTS:
-    BASE_URL = "https://{}".format(ALLOWED_HOSTS[0])
-else:
-    BASE_URL = "https://example.com"
-
-DIGID_MOCK = config("DIGID_MOCK", default=True)
 DIGID_ENABLED = config("DIGID_ENABLED", default=True)
-DIGID_METADATA = config("DIGID_METADATA", "")
-SSL_CERTIFICATE_PATH = config("SSL_CERTIFICATE_PATH", "")
-SSL_KEY_PATH = config("SSL_KEY_PATH", "")
-DIGID_SERVICE_ENTITY_ID = config(
-    "DIGID_SERVICE_ENTITY_ID", "https://was-preprod1.digid.nl/saml/idp/metadata"
-)
-DIGID_WANT_ASSERTIONS_SIGNED = config("DIGID_WANT_ASSERTIONS_SIGNED", default=True)
+DIGID_MOCK = config("DIGID_MOCK", default=True)
 
-DIGID = {
-    "base_url": BASE_URL,
-    "entity_id": BASE_URL,
-    # This is the metadata of the **Identity provider** NOT our own!
-    "metadata_file": DIGID_METADATA,
-    # SSL/TLS key
-    "key_file": SSL_KEY_PATH,
-    "cert_file": SSL_CERTIFICATE_PATH,
-    "service_entity_id": DIGID_SERVICE_ENTITY_ID,
-    "attribute_consuming_service_index": "1",
-    "requested_attributes": ["bsn"],
-    # Logius can sign the assertions (True) but others sign the entire response
-    # (False).
-    "want_assertions_signed": DIGID_WANT_ASSERTIONS_SIGNED,
-}
-
+#
+# EHERKENNING
+#
 EHERKENNING_MOCK = config("EHERKENNING_MOCK", default=True)
 
 THUMBNAIL_ALIASES = {
@@ -918,6 +892,11 @@ from .parts.maileditor import (  # noqa
     MAIL_EDITOR_CONF,
     MAIL_EDITOR_DYNAMIC_CONTEXT,
 )
+
+if ALLOWED_HOSTS:
+    BASE_URL = "https://{}".format(ALLOWED_HOSTS[0])
+else:
+    BASE_URL = "https://example.com"
 
 MAIL_EDITOR_BASE_HOST = BASE_URL
 
