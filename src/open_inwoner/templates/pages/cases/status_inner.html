@@ -60,8 +60,13 @@
 
             {#  Documents #}
             {% if case.documents %}
-                <h2 class="h2 {% if case.new_docs %}indicator{% endif %}" id="documents">{% trans 'Eerder toegevoegde documenten' %}</h2>
-                {% case_document_list case.documents %}
+                <section class="case-detail__documents">
+                    <div class="heading-2__indicator">
+                        <h2 class="h2 {% if case.new_docs %}indicator{% endif %}" id="documents">{% trans 'Eerder toegevoegde documenten' %}</h2>
+                        {% if case.new_docs %}{% icon icon="fiber_manual_record" outlined=False extra_classes="file__file--recent" %}{% endif %}
+                    </div>
+                    {% case_document_list case.documents %}
+                </section>
             {% endif %}
 
             {# Questions/contactmomenten #}

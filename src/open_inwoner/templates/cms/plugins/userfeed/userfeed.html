@@ -2,9 +2,13 @@
 
 {% if userfeed %}
 <section class="plugin userfeed">
-    <h2 class="h2 {% if userfeed.action_required %}indicator{% endif %}">
-        {{ instance.title }}
-    </h2>
+    <div class="heading-2__indicator">
+        <h2 class="h2 {% if userfeed.action_required %}indicator{% endif %}">
+            {{ instance.title }}
+        </h2>
+        {% if userfeed.action_required %}{% icon icon="fiber_manual_record" outlined=False extra_classes="file__file--recent" %}{% endif %}
+    </div>
+
     <div class="userfeed__summary">
         <ul class="userfeed__list">
             {% for line in userfeed.summary %}

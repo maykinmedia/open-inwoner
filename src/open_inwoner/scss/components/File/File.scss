@@ -31,8 +31,17 @@
   &__data {
     display: flex;
     flex-direction: column;
+    font-family: var(--font-family-body);
+    line-height: var(--spacing-extra-large);
+    padding: var(--spacing-large);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
 
-    > * {
+    .file__name {
+      margin: 0;
       white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
@@ -45,17 +54,13 @@
     box-sizing: border-box;
   }
 
+  .file__download {
+    margin-left: auto;
+  }
+
   &__file .link:hover {
     color: var(--font-color-body);
     text-decoration: none;
-  }
-
-  &__file .file__data {
-    width: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    line-height: var(--spacing-extra-large);
   }
 
   &__file .link__text {
@@ -75,6 +80,7 @@
   }
 
   &__file + .file__data {
+    background-color: greenyellow;
     margin-top: var(--spacing-small);
   }
 

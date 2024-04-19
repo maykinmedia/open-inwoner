@@ -11,7 +11,7 @@
                 {% endif %}
             </p>
 
-            <p class="p file__data">
+            <p class="file__data">
                 {% if recently_added %}
                     <span class="file__file--recent">{% icon icon="fiber_manual_record" outlined=False extra_classes="file__file--recent" %}{% trans "Nieuw" %}</span>
                 {% endif %}
@@ -37,7 +37,7 @@
                     </div>
                     {% if show_download %}
                         <div class="dropdown__item">
-                            {% button icon="file_download" text=_("Download") href=url icon_outlined=True transparent=True %}
+                            {% button icon="download" text=_("Download") href=url icon_outlined=True transparent=True %}
                         </div>
                     {% endif %}
                     <div class="dropdown__item">
@@ -50,7 +50,7 @@
                 {% enddropdown %}
             {% elif show_download %}
                 {% trans "Download" as download %}
-                {% link href=url text=download secondary=True download=True hide_text=True icon="file_download" icon_outlined=True icon_position="before" %}
+                {% link href=url text=download primary=True download=True hide_text=True extra_classes="file__download" icon="download" icon_outlined=True icon_position="before" %}
             {% endif %}
             {% if description %}<p class="p p--small">{{ description }}</p>{% endif %}
         </div>
