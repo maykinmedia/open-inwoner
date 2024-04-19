@@ -2,8 +2,8 @@ import abc
 import logging
 from abc import ABC
 from datetime import datetime
-from urllib.parse import urljoin
 
+import requests
 from glom import GlomError, glom
 from requests import RequestException
 from zgw_consumers.client import build_client
@@ -61,7 +61,7 @@ class BRP_1_3(BRPAPI):
     version = "1.3"
 
     def fetch_data(self, user_bsn: str) -> dict | None:
-        url = urljoin(self.client.base_url, f"ingeschrevenpersonen/{user_bsn}")
+        url = f"ingeschrevenpersonen/{user_bsn}"
         headers = {
             "Accept": "application/hal+json",
         }
@@ -115,33 +115,40 @@ class BRP_1_3(BRPAPI):
 class BRP_2_1(BRPAPI):
     version = "2.1"
 
-    def fetch_data(self, user_bsn: str) -> dict | None:
-        url = urljoin(self.client.base_url, "personen")
+    def make_request(self, user_bsn: str) -> requests.Response:
+        url = "personen"
+        response = self.client.post(
+            url=url,
+            json={
+                "fields": [
+                    "naam.geslachtsnaam",
+                    "naam.voorletters",
+                    "naam.voornamen",
+                    "naam.voorvoegsel",
+                    "geslacht.omschrijving",
+                    "geboorte.plaats.omschrijving",
+                    "geboorte.datum.datum",
+                    "verblijfplaats.verblijfadres.officieleStraatnaam",
+                    "verblijfplaats.verblijfadres.huisnummer",
+                    "verblijfplaats.verblijfadres.huisletter",
+                    "verblijfplaats.verblijfadres.huisnummertoevoeging",
+                    "verblijfplaats.verblijfadres.postcode",
+                    "verblijfplaats.verblijfadres.woonplaats",
+                ],
+                "type": "RaadpleegMetBurgerservicenummer",
+                "burgerservicenummer": [user_bsn],
+            },
+            headers={
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            },
+            verify=False,
+        )
+        return response
+
+    def fetch_data(self, user_bsn) -> dict | None:
         try:
-            response = self.client.post(
-                url=url,
-                data={
-                    "fields": [
-                        "naam.geslachtsnaam",
-                        "naam.voorletters",
-                        "naam.voornamen",
-                        "naam.voorvoegsel",
-                        "geslacht.omschrijving",
-                        "geboorte.plaats.omschrijving",
-                        "geboorte.datum.datum",
-                        "verblijfplaats.verblijfadres.officieleStraatnaam",
-                        "verblijfplaats.verblijfadres.huisnummer",
-                        "verblijfplaats.verblijfadres.huisletter",
-                        "verblijfplaats.verblijfadres.huisnummertoevoeging",
-                        "verblijfplaats.verblijfadres.postcode",
-                        "verblijfplaats.verblijfadres.woonplaats",
-                    ],
-                    "type": "RaadpleegMetBurgerservicenummer",
-                    "burgerservicenummer": [user_bsn],
-                },
-                headers={"Accept": "application/json"},
-                verify=False,
-            )
+            response = self.make_request(user_bsn)
             return get_json_response(response)
         except (RequestException, ClientError) as e:
             logger.exception("exception while making request", exc_info=e)
