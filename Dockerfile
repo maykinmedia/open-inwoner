@@ -28,13 +28,13 @@ WORKDIR /app
 RUN mkdir /app/src
 
 # Ensure we use the latest version of pip
-RUN pip install pip setuptools -U
+RUN pip install pip>=24 setuptools -U
 COPY ./requirements /app/requirements
 RUN pip install -r requirements/production.txt
 
 
 # Stage 2 - Install frontend deps and build assets
-FROM node:13-buster AS frontend-build
+FROM node:20-buster AS frontend-build
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         git \
