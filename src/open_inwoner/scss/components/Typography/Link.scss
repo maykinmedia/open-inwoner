@@ -78,6 +78,17 @@
     text-decoration: none;
   }
 
+  &.icon--large {
+    &:hover {
+      text-decoration: none;
+    }
+
+    *[class*='icon'] {
+      color: var(--color-gray-90);
+      font-size: 50px;
+    }
+  }
+
   *[class*='icon']:first-child,
   *[class*='Icon']:first-child {
     transform: scale(1);

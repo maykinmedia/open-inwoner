@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n static utils grid_tags card_tags form_tags link_tags button_tags solo_tags cms_tags %}
+{% load i18n static utils grid_tags card_tags form_tags link_tags button_tags icon_tags solo_tags cms_tags %}
 
 
 {% block header_image %}
@@ -8,95 +8,161 @@
 
 
 {% block content %}
-    <div class="login-grid">
-    {% render_grid %}
-        {% render_column start=5 span=5 %}
-            {% render_card %}
-                <h1 class="h1">{% trans 'Welkom' %}</h1>
-                {% if login_text %}<div class="wysiwyg">{{ login_text|markdown|safe }}</div>{% endif %}
-                <br>
-		{% if settings.DIGID_ENABLED %}
-            {% get_solo 'digid_eherkenning_oidc_generics.OpenIDConnectDigiDConfig' as digid_oidc_config %}
-            {% if digid_oidc_config.enabled %}
-                {% render_card direction='horizontal' tinted=True compact=True %}
-                    <a href="{% url 'digid_oidc:init' %}" class="link digid-logo">
-                        <img class="digid-logo__image" src="{% static 'accounts/digid_logo.svg' %}" alt="DigiD inlogpagina">
-                    </a>
-                    {% url 'digid_oidc:init' as href %}
-                    {% with href|addnexturl:next as href_with_next %}
-                        {% link href=href_with_next text=_('Inloggen met DigiD') secondary=True icon='arrow_forward' extra_classes="link--digid" %}
-                    {% endwith %}
-                    {% endrender_card %}
-            {% else %}
-                {% render_card direction='horizontal' tinted=True compact=True %}
-                    <a href="{% url 'digid:login' %}" class="link digid-logo">
-                        <img class="digid-logo__image" src="{% static 'accounts/digid_logo.svg' %}" alt="DigiD inlogpagina">
-                    </a>
-                    {% url 'digid:login' as href %}
-                    {% with href|addnexturl:next as href_with_next %}
-                        {% link href=href_with_next text=_('Inloggen met DigiD') secondary=True icon='arrow_forward' extra_classes="link--digid" %}
-                    {% endwith %}
-                {% endrender_card %}
-            {% endif %}
-		{% endif %}
+    <h1 class="utrecht-heading-1">{% trans 'Welkom' %}</h1>
+    {% if login_text %}
+        <div class="wysiwyg">{{ login_text|markdown|safe }}</div>
+    {% endif %}
 
-        {% if eherkenning_enabled %}
-            {% get_solo 'digid_eherkenning_oidc_generics.OpenIDConnectEHerkenningConfig' as eherkenning_oidc_config %}
-            {% if eherkenning_oidc_config.enabled %}
-                {% render_card direction='horizontal' tinted=True compact=True %}
-                    <a href="{% url 'eherkenning_oidc:init' %}" class="link eherkenning-logo">
-                        <img class="eherkenning-logo__image" src="{% static 'accounts/eherkenning.png' %}" height=30 alt="eHerkenning inlogpagina">
-                    </a>
-                    {% url 'eherkenning_oidc:init' as href %}
-                    {% with href|addnexturl:next as href_with_next %}
-                    {% link href=href_with_next text=_('Inloggen met eHerkenning') secondary=True icon='arrow_forward' extra_classes="link--eherkenning" %}
-                    {% endwith %}
-                {% endrender_card %}
-            {% else %}
-                {% render_card direction='horizontal' tinted=True compact=True %}
-                    <a href="{% url 'eherkenning:login' %}" class="link eherkenning-logo">
-                        <img class="eherkenning-logo__image" src="{% static 'accounts/eherkenning.png' %}" height=30 alt="eHerkenning inlogpagina">
-                    </a>
-                    {% url 'eherkenning:login' as href %}
-                    {% with href|addnexturl:next as href_with_next %}
-                        {% link href=href_with_next text=_('Inloggen met eHerkenning') secondary=True icon='arrow_forward' extra_classes="link--eherkenning" %}
-                    {% endwith %}
-                {% endrender_card %}
-            {% endif %}
-		{% endif %}
+    {# Tab panels Start #}
+    <div class="tab--container login-tab--container">
+        <div class="tabs">
+            <ul class="list tabs__headers">
+                <li class="list-item tab__header--item"><a href="{% url 'login' %}#particulier" class="link tab__header ">Particulier</a></li>
+                <li class="list-item tab__header--item"><a href="{% url 'login' %}#zakelijk" class="link tab__header">Zakelijk</a></li>
+            </ul>
+            {# Panel 1 #}
+            <div class="tabs__body">
 
-                {% get_solo 'mozilla_django_oidc_db.OpenIDConnectConfig' as oidc_config %}
-                {% get_solo 'configurations.SiteConfiguration' as site_config %}
-                {% if oidc_config.enabled and site_config.openid_enabled_for_regular_users %}
-                    {% render_card tinted=True compact=True direction='horizontal' %}
-                    {% if site_config.openid_connect_logo %}
-                        <a href="{% url 'oidc_authentication_init' %}" class="link digid-logo">
-                            <img class="digid-logo__image" src="{{ site_config.openid_connect_logo.url }}" alt="{{ site_config.openid_connect_logo.default_alt_text }}">
-                        </a>
-                    {% else %}
-                        <div></div>
-                    {% endif %}
-                        {% url 'oidc_authentication_init' as href %}
-                        {% with href|addnexturl:next as href_with_next %}
-                            {% link text=site_config.openid_connect_login_text href=href_with_next secondary=True icon='arrow_forward' icon_position="after" %}
-                        {% endwith %}
-                    {% endrender_card %}
-                {% endif %}
+                <div id="particulier" class="tab__content">
+                    {% render_grid %}
 
-                {% if login_allow_registration %}
-                    {% render_card tinted=True compact=True %}
-                        {% render_form id="login-form" method="POST" form=form show_required=True %}
-                            {% csrf_token %}
-                            <input type="hidden" name="next" value="{{next}}" />
-                            {% input form.username %}
-                            {% input form.password %}
-                            {% button text=_('Wachtwoord vergeten?') href='password_reset' secondary=True transparent=True align='right' %}
-                            {% form_actions primary_text=_("Inloggen") primary_icon="arrow_forward" secondary_href='django_registration_register' secondary_text=_('Registreer') secondary_icon='arrow_forward' single=True %}
-                        {% endrender_form %}
-                    {% endrender_card %}
-                {% endif %}
-            {% endrender_card %}
-        {% endrender_column %}
-    {% endrender_grid %}
+                        {# Digid #}
+                        {% if settings.DIGID_ENABLED %}
+                            {% render_column start=4 span=5 %}
+                                {% get_solo 'digid_eherkenning_oidc_generics.OpenIDConnectDigiDConfig' as digid_oidc_config %}
+                                {% if digid_oidc_config.enabled %}
+                                    {% render_card direction='horizontal' tinted=True compact=True %}
+                                        {% url 'digid_oidc:init' as href %}
+                                        {% with href|addnexturl:next as href_with_next %}
+                                            <a href="{{ href_with_next }}" class="link digid-logo">
+                                                <img class="digid-logo__image" src="{% static 'accounts/digid_logo.svg' %}" alt="DigiD inlogpagina">
+                                            </a>
+                                            {% link href=href_with_next text=_('Inloggen met DigiD') primary=True icon='east' extra_classes="link--next link--digid" %}
+                                        {% endwith %}
+                                    {% endrender_card %}
+                                {% else %}
+                                    {% render_card direction='horizontal' tinted=True compact=True %}
+                                        {% url 'digid:login' as href %}
+                                        {% with href|addnexturl:next as href_with_next %}
+                                            <a href="{{ href_with_next }}" class="link digid-logo">
+                                                <img class="digid-logo__image" src="{% static 'accounts/digid_logo.svg' %}" alt="DigiD inlogpagina">
+                                            </a>
+                                            {% link href=href_with_next text=_('Inloggen met DigiD') primary=True icon='east' extra_classes="link--next link--digid" %}
+                                        {% endwith %}
+                                    {% endrender_card %}
+                                {% endif %}
+                            {% endrender_column %}
+                        {% endif %}
+                        {# end digid #}
+
+                        {% if settings.DIGID_ENABLED %}
+                            {% get_solo 'mozilla_django_oidc_db.OpenIDConnectConfig' as oidc_config %}
+                            {% get_solo 'configurations.SiteConfiguration' as site_config %}
+                            {% if oidc_config.enabled and site_config.openid_enabled_for_regular_users %}
+                                {% render_column start=4 span=5 %}
+                                    {% render_card tinted=True compact=True direction='horizontal' %}
+                                        {% url 'oidc_authentication_init' as href %}
+                                        {% with href|addnexturl:next as href_with_next %}
+                                            {% if site_config.openid_connect_logo %}
+                                                <a href="{{ href_with_next }}" class="link digid-logo">
+                                                    <img class="digid-logo__image" src="{{ site_config.openid_connect_logo.url }}" alt="{{ site_config.openid_connect_logo.default_alt_text }}">
+                                                </a>
+                                            {% else %}
+                                                <div></div>
+                                            {% endif %}
+                                            {% link text=site_config.openid_connect_login_text href=href_with_next primary=True icon='east' icon_position="after" extra_classes="link--next link--oidc" %}
+                                        {% endwith %}
+                                    {% endrender_card %}
+                                {% endrender_column %}
+                            {% endif %}
+
+                            {% if login_allow_registration %}
+                                <div class="column column--start-4 column--span-5" id="column__email-toggle">
+                                    {% render_card direction='horizontal' tinted=True compact=True %}
+                                        {% url 'login' as href %}
+                                        {% with href|add:"#particuliermail" as href_with_hash %}
+                                        <a href="{{ href_with_hash }}#particuliermail" class="link icon--large">
+                                            {% icon icon="login" icon_position="before" outlined=True %}
+                                        </a>
+                                        {% link href=href_with_hash text=_('Log in met e-mail adres') primary=True icon='east' extra_classes="link--next link--email" %}
+                                        {% endwith %}
+                                    {% endrender_card %}
+                                </div>
+
+                                {# Hide mail login initially #}
+                                <div class="column column--start-4 column--span-5" id="column__login-form">
+                                    {% if login_allow_registration %}
+                                        {% render_card tinted=True compact=True %}
+                                            {% render_form id="login-form" method="POST" form=form show_required=True %}
+                                                {% csrf_token %}
+                                                <input type="hidden" name="next" value="{{ next }}"/>
+                                                {% input form.username %}
+                                                {% input form.password %}
+                                                {% button text=_('Wachtwoord vergeten?') href='password_reset' secondary=True transparent=True align='right' %}
+                                                {% form_actions primary_text=_("Inloggen") primary_icon="east" single=True %}
+                                            {% endrender_form %}
+                                        {% endrender_card %}
+                                    {% endif %}
+                                </div>
+                                {# End hidden #}
+
+                                {% render_column start=4 span=5 %}
+                                    <h2 class="tab__heading-4">Of registreer</h2>
+                                    {% render_card direction='horizontal' tinted=True compact=True %}
+                                        {% url 'django_registration_register' as href %}
+                                        <a href="{{ href }}" class="link icon--large">
+                                            {% icon icon="account_circle" icon_position="before" outlined=True %}
+                                        </a>
+                                        {% link href=href text=_('Maak een account aan') primary=True icon='east' extra_classes="link--next link--register" %}
+                                    {% endrender_card %}
+                                    <p class="tab-column__paragraph">{% trans 'U kunt een account aanmaken om voortaan met uw e-mail adres en wachtwoord in te loggen.' %}</p>
+                                {% endrender_column %}
+                            {% endif %}
+
+                        {% endif %}
+                        {# another Digid end #}
+
+                    {% endrender_grid %}
+                </div>
+                {# Panel 1 End #}
+
+                {# Panel 2 #}
+                <div id="zakelijk" class="tab__content">
+
+                    {% render_grid %}
+                        {% render_column start=4 span=5 %}
+                            {% if eherkenning_enabled %}
+                                {% get_solo 'digid_eherkenning_oidc_generics.OpenIDConnectEHerkenningConfig' as eherkenning_oidc_config %}
+                                {% if eherkenning_oidc_config.enabled %}
+                                    {% render_card direction='horizontal' tinted=True compact=True %}
+                                        {% url 'eherkenning_oidc:init' as href %}
+                                        {% with href|addnexturl:next as href_with_next %}
+                                            <a href="{{ href_with_next }}" class="link eherkenning-logo">
+                                                <img class="eherkenning-logo__image" src="{% static 'accounts/eherkenning.png' %}" height=40 alt="eHerkenning inlogpagina">
+                                            </a>
+                                            {% link href=href_with_next text=_('Inloggen met eHerkenning') primary=True icon='east' extra_classes="link--eherkenning" %}
+                                        {% endwith %}
+                                    {% endrender_card %}
+                                {% else %}
+                                    {% render_card direction='horizontal' tinted=True compact=True %}
+                                        {% url 'eherkenning:login' as href %}
+                                        {% with href|addnexturl:next as href_with_next %}
+                                            <a href="{{ href_with_next }}" class="link eherkenning-logo">
+                                                <img class="eherkenning-logo__image" src="{% static 'accounts/eherkenning.png' %}" height=40 alt="eHerkenning inlogpagina">
+                                            </a>
+                                            {% link href=href_with_next text=_('Inloggen met eHerkenning') primary=True icon='east' extra_classes="link--eherkenning" %}
+                                        {% endwith %}
+                                    {% endrender_card %}
+                                {% endif %}
+                            {% endif %}
+                        {% endrender_column %}
+                    {% endrender_grid %}
+
+                </div>
+                {# Panel 2 End #}
+
+            </div>
+        </div>
     </div>
+    {# Tab panels End #}
 {% endblock content %}
