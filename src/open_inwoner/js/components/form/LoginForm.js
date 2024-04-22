@@ -50,13 +50,12 @@ export class LoginFormFocus {
 
   activateTabFromHash() {
     const hash = window.location.hash
+    const zakelijkTab = document.getElementById('zakelijk_tab')
+    const particulierTab = document.getElementById('particulier_tab')
     const particulierPanel = document.getElementById('particulier_panel')
     const zakelijkPanel = document.getElementById('zakelijk_panel')
 
     if (hash.includes('zakelijk')) {
-      const zakelijkTab = document.getElementById('zakelijk_tab')
-      const particulierTab = document.getElementById('particulier_tab')
-
       particulierTab.classList.remove('active')
       particulierPanel.classList.remove('active')
       particulierPanel.classList.add('hide')
@@ -65,16 +64,13 @@ export class LoginFormFocus {
       zakelijkPanel.classList.add('active')
       zakelijkTab.classList.add('active')
     } else {
-      const zakelijkHeader = document.getElementById('zakelijk_tab')
-      const particulierHeader = document.getElementById('particulier_tab')
-
       particulierPanel.classList.remove('hide')
-      particulierHeader.classList.add('active')
+      particulierTab.classList.add('active')
       particulierPanel.classList.remove('active')
 
       zakelijkPanel.classList.add('hide')
       zakelijkPanel.classList.remove('active')
-      zakelijkHeader.classList.remove('active')
+      zakelijkTab.classList.remove('active')
     }
   }
 }
