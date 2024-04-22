@@ -1,7 +1,6 @@
 import tempfile
 import urllib.error
 from unittest import skip
-from unittest.mock import patch
 from uuid import UUID
 
 from django.conf import settings
@@ -749,12 +748,12 @@ class AdminOIDCConfigurationTests(ClearCachesMixin, TestCase):
     DIGID_SLO=False,
 )
 class DigiDConfigurationTests(ClearCachesMixin, TestCase):
-    def test_configure(self):
-        with open(DIGID_XML_METADATA_PATH) as f:
-            with patch(
-                "onelogin.saml2.idp_metadata_parser.urllib2.urlopen", return_value=f
-            ):
-                DigiDConfigurationStep().configure()
+    @requests_mock.Mocker()
+    def test_configure(self, m):
+        with open(DIGID_XML_METADATA_PATH, "rb") as f:
+            m.get("http://metadata.local/file.xml", content=f.read())
+
+            DigiDConfigurationStep().configure()
 
         config = DigidConfiguration.get_solo()
 
@@ -796,6 +795,7 @@ class DigiDConfigurationTests(ClearCachesMixin, TestCase):
         )
         self.assertEqual(config.slo, False)
 
+    @requests_mock.Mocker()
     @override_settings(
         DIGID_WANT_ASSERTIONS_SIGNED=None,
         DIGID_WANT_ASSERTIONS_ENCRYPTED=None,
@@ -807,12 +807,11 @@ class DigiDConfigurationTests(ClearCachesMixin, TestCase):
         DIGID_REQUESTED_ATTRIBUTES=None,
         DIGID_SLO=None,
     )
-    def test_configure_use_defaults(self):
-        with open(DIGID_XML_METADATA_PATH) as f:
-            with patch(
-                "onelogin.saml2.idp_metadata_parser.urllib2.urlopen", return_value=f
-            ):
-                DigiDConfigurationStep().configure()
+    def test_configure_use_defaults(self, m):
+        with open(DIGID_XML_METADATA_PATH, "rb") as f:
+            m.get("http://metadata.local/file.xml", content=f.read())
+
+            DigiDConfigurationStep().configure()
 
         config = DigidConfiguration.get_solo()
 
@@ -829,16 +828,14 @@ class DigiDConfigurationTests(ClearCachesMixin, TestCase):
         )
         self.assertEqual(config.slo, True)
 
-    def test_configure_failure(self):
+    @requests_mock.Mocker()
+    def test_configure_failure(self, m):
         exceptions = (urllib.error.HTTPError, urllib.error.URLError)
         for exception in exceptions:
             with self.subTest(exception=exception):
-                with patch(
-                    "onelogin.saml2.idp_metadata_parser.urllib2.urlopen",
-                    side_effect=exception,
-                ):
-                    with self.assertRaises(ConfigurationRunFailed):
-                        DigiDConfigurationStep().configure()
+                m.get("http://metadata.local/file.xml", exc=exception)
+                with self.assertRaises(ConfigurationRunFailed):
+                    DigiDConfigurationStep().configure()
 
                 config = DigidConfiguration.get_solo()
 
@@ -854,16 +851,15 @@ class DigiDConfigurationTests(ClearCachesMixin, TestCase):
     def test_configuration_check_failures(self, m):
         raise NotImplementedError
 
-    def test_is_configured(self):
+    @requests_mock.Mocker()
+    def test_is_configured(self, m):
         config = DigiDConfigurationStep()
 
         self.assertFalse(config.is_configured())
 
-        with open(DIGID_XML_METADATA_PATH) as f:
-            with patch(
-                "onelogin.saml2.idp_metadata_parser.urllib2.urlopen", return_value=f
-            ):
-                config.configure()
+        with open(DIGID_XML_METADATA_PATH, "rb") as f:
+            m.get("http://metadata.local/file.xml", content=f.read())
+            config.configure()
 
         self.assertTrue(config.is_configured())
 
@@ -906,12 +902,12 @@ class DigiDConfigurationTests(ClearCachesMixin, TestCase):
     EHERKENNING_SERVICE_LANGUAGE="en",
 )
 class eHerkenningConfigurationTests(ClearCachesMixin, TestCase):
-    def test_configure(self):
-        with open(DIGID_XML_METADATA_PATH) as f:
-            with patch(
-                "onelogin.saml2.idp_metadata_parser.urllib2.urlopen", return_value=f
-            ):
-                eHerkenningConfigurationStep().configure()
+    @requests_mock.Mocker()
+    def test_configure(self, m):
+        with open(DIGID_XML_METADATA_PATH, "rb") as f:
+            m.get("http://metadata.local/file.xml", content=f.read())
+
+            eHerkenningConfigurationStep().configure()
 
         config = EherkenningConfiguration.get_solo()
 
@@ -976,6 +972,7 @@ class eHerkenningConfigurationTests(ClearCachesMixin, TestCase):
         self.assertEqual(config.makelaar_id, "44444333332222211111")
         self.assertEqual(config.service_language, "en")
 
+    @requests_mock.Mocker()
     @override_settings(
         EHERKENNING_WANT_ASSERTIONS_SIGNED=None,
         EHERKENNING_WANT_ASSERTIONS_ENCRYPTED=None,
@@ -994,12 +991,11 @@ class eHerkenningConfigurationTests(ClearCachesMixin, TestCase):
         EHERKENNING_NO_EIDAS=None,
         EHERKENNING_SERVICE_LANGUAGE=None,
     )
-    def test_configure_use_defaults(self):
-        with open(DIGID_XML_METADATA_PATH) as f:
-            with patch(
-                "onelogin.saml2.idp_metadata_parser.urllib2.urlopen", return_value=f
-            ):
-                eHerkenningConfigurationStep().configure()
+    def test_configure_use_defaults(self, m):
+        with open(DIGID_XML_METADATA_PATH, "rb") as f:
+            m.get("http://metadata.local/file.xml", content=f.read())
+
+            eHerkenningConfigurationStep().configure()
 
         config = EherkenningConfiguration.get_solo()
 
@@ -1020,16 +1016,14 @@ class eHerkenningConfigurationTests(ClearCachesMixin, TestCase):
         self.assertEqual(config.no_eidas, False)
         self.assertEqual(config.service_language, "nl")
 
-    def test_configure_failure(self):
+    @requests_mock.Mocker()
+    def test_configure_failure(self, m):
         exceptions = (urllib.error.HTTPError, urllib.error.URLError)
         for exception in exceptions:
             with self.subTest(exception=exception):
-                with patch(
-                    "onelogin.saml2.idp_metadata_parser.urllib2.urlopen",
-                    side_effect=exception,
-                ):
-                    with self.assertRaises(ConfigurationRunFailed):
-                        eHerkenningConfigurationStep().configure()
+                m.get("http://metadata.local/file.xml", exc=exception)
+                with self.assertRaises(ConfigurationRunFailed):
+                    eHerkenningConfigurationStep().configure()
 
                 config = EherkenningConfiguration.get_solo()
 
@@ -1045,15 +1039,15 @@ class eHerkenningConfigurationTests(ClearCachesMixin, TestCase):
     def test_configuration_check_failures(self, m):
         raise NotImplementedError
 
-    def test_is_configured(self):
+    @requests_mock.Mocker()
+    def test_is_configured(self, m):
         config = eHerkenningConfigurationStep()
 
         self.assertFalse(config.is_configured())
 
-        with open(DIGID_XML_METADATA_PATH) as f:
-            with patch(
-                "onelogin.saml2.idp_metadata_parser.urllib2.urlopen", return_value=f
-            ):
-                config.configure()
+        with open(DIGID_XML_METADATA_PATH, "rb") as f:
+            m.get("http://metadata.local/file.xml", content=f.read())
+
+            config.configure()
 
         self.assertTrue(config.is_configured())
