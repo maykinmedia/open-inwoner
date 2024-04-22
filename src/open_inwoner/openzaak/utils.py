@@ -1,18 +1,11 @@
 import logging
 
-from django.utils.translation import gettext as _
-
 from zgw_consumers.api_models.constants import RolTypes, VertrouwelijkheidsAanduidingen
 
 from open_inwoner.kvk.branches import get_kvk_branch_number
 from open_inwoner.openzaak.api_models import InformatieObject, Rol, Zaak, ZaakType
 
-from .models import (
-    OpenZaakConfig,
-    StatusTranslation,
-    ZaakTypeConfig,
-    ZaakTypeInformatieObjectTypeConfig,
-)
+from .models import OpenZaakConfig, ZaakTypeConfig, ZaakTypeInformatieObjectTypeConfig
 
 logger = logging.getLogger(__name__)
 
@@ -131,19 +124,6 @@ def get_zaak_type_info_object_type_config(
         )
     except ZaakTypeInformatieObjectTypeConfig.DoesNotExist:
         return None
-
-
-def translate_single_status(status_text: str) -> str:
-    if not status_text:
-        return _("No data available")
-
-    # in most cases try to cache with StatusTranslation.objects.get_lookup()
-    try:
-        return StatusTranslation.objects.values_list("translation", flat=True).get(
-            status=status_text
-        )
-    except StatusTranslation.DoesNotExist:
-        return status_text
 
 
 def get_user_fetch_parameters(request) -> dict:

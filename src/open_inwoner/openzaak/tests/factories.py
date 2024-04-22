@@ -11,7 +11,6 @@ from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.openzaak.api_models import Notification, Rol
 from open_inwoner.openzaak.models import (
     CatalogusConfig,
-    StatusTranslation,
     UserCaseInfoObjectNotification,
     UserCaseStatusNotification,
     ZaakTypeConfig,
@@ -150,14 +149,6 @@ class NotificationFactory(factory.Factory):
 
     class Meta:
         model = Notification
-
-
-class StatusTranslationFactory(factory.django.DjangoModelFactory):
-    status = factory.Faker("pystr", max_chars=50)
-    translation = factory.Faker("pystr", max_chars=80)
-
-    class Meta:
-        model = StatusTranslation
 
 
 def generate_rol(

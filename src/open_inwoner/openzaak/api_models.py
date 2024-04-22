@@ -4,6 +4,8 @@ from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import Optional, Union
 
+from django.utils.translation import gettext as _
+
 from dateutil.relativedelta import relativedelta
 from zgw_consumers.api_models.base import Model, ZGWModel
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
@@ -71,11 +73,8 @@ class Zaak(ZGWModel):
         """
         Prepare data for template
         """
-        from open_inwoner.openzaak.models import StatusTranslation
 
-        status_translate = StatusTranslation.objects.get_lookup()
-
-        status_text = status_translate.from_glom_multiple(
+        status_text = glom_multiple(
             self,
             ("status.statustype.statustekst", "status.statustype.omschrijving"),
             default="",
@@ -90,7 +89,7 @@ class Zaak(ZGWModel):
                 ),
                 default="",
             )
-            status_text = result_text or status_text
+            status_text = result_text or status_text or _("No data available")
 
         return {
             "identification": self.identification,

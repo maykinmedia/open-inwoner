@@ -9,7 +9,6 @@ from django.utils.translation import gettext_lazy as _
 from open_inwoner.accounts.models import User
 from open_inwoner.openzaak.api_models import Status, Zaak
 from open_inwoner.openzaak.models import ZaakTypeStatusTypeConfig
-from open_inwoner.openzaak.utils import translate_single_status
 from open_inwoner.userfeed.adapter import FeedItem
 from open_inwoner.userfeed.adapters import register_item_adapter
 from open_inwoner.userfeed.choices import FeedItemType
@@ -23,8 +22,10 @@ def case_status_notification_received(user: User, case: Zaak, status: Status):
         "case_uuid": case.uuid,
         "case_identificatie": case.identificatie,
         "case_omschrijving": case.omschrijving,
-        "status_omschrijving": translate_single_status(
-            status.statustype.statustekst or status.statustype.omschrijving
+        "status_omschrijving": (
+            status.statustype.statustekst
+            or status.statustype.omschrijving
+            or _("No data available")
         ),
         # new for actionable
         "catalogus_url": case.zaaktype.catalogus,
@@ -90,8 +91,7 @@ class CaseStatusUpdateFeedItem(FeedItem):
 
     @property
     def message(self) -> str:
-        status_text = self.get_data("status_omschrijving")
-        status_text = translate_single_status(status_text)
+        status_text = self.get_data("status_omschrijving") or _("No data available")
         html = escape(self.base_message)
         status = format_html('<span class="status">{}</span>', status_text)
         html = format_html(html, status=status)

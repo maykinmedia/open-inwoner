@@ -5,8 +5,6 @@ from django.forms import ModelForm, Textarea
 from django.forms.models import BaseInlineFormSet
 from django.utils.translation import gettext_lazy as _, ngettext
 
-from import_export.admin import ImportExportMixin
-from import_export.formats import base_formats
 from solo.admin import SingletonModelAdmin
 
 from open_inwoner.ckeditor5.widgets import CKEditorWidget
@@ -14,7 +12,6 @@ from open_inwoner.ckeditor5.widgets import CKEditorWidget
 from .models import (
     CatalogusConfig,
     OpenZaakConfig,
-    StatusTranslation,
     UserCaseInfoObjectNotification,
     UserCaseStatusNotification,
     ZaakTypeConfig,
@@ -22,7 +19,6 @@ from .models import (
     ZaakTypeResultaatTypeConfig,
     ZaakTypeStatusTypeConfig,
 )
-from .resources.import_resource import StatusTranslationImportResource
 
 
 @admin.register(OpenZaakConfig)
@@ -449,29 +445,3 @@ class UserCaseInfoObjectNotificationAdmin(admin.ModelAdmin):
 
     def has_change_permission(self, request, obj=None):
         return False
-
-
-@admin.register(StatusTranslation)
-class StatusTranslationAdmin(ImportExportMixin, admin.ModelAdmin):
-    fields = [
-        "status",
-        "translation",
-    ]
-    search_fields = [
-        "status",
-        "translation",
-    ]
-    list_display = [
-        "id",
-        "status",
-        "translation",
-    ]
-    list_editable = [
-        "status",
-        "translation",
-    ]
-    ordering = ("status",)
-
-    # import-export
-    resource_class = StatusTranslationImportResource
-    formats = [base_formats.XLSX, base_formats.CSV]

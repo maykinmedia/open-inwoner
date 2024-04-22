@@ -38,7 +38,6 @@ from open_inwoner.openzaak.documents import (
 )
 from open_inwoner.openzaak.models import (
     OpenZaakConfig,
-    StatusTranslation,
     ZaakTypeConfig,
     ZaakTypeInformatieObjectTypeConfig,
     ZaakTypeResultaatTypeConfig,
@@ -46,8 +45,8 @@ from open_inwoner.openzaak.models import (
 )
 from open_inwoner.openzaak.utils import get_role_name_display, is_info_object_visible
 from open_inwoner.userfeed import hooks
+from open_inwoner.utils.glom import glom_multiple
 from open_inwoner.utils.time import has_new_elements
-from open_inwoner.utils.translate import TranslationLookup
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from ..forms import CaseContactForm, CaseUploadForm
@@ -139,7 +138,6 @@ class InnerCaseDetailView(
             self.log_access_case_detail(self.case)
 
             config = OpenZaakConfig.get_solo()
-            status_translate = StatusTranslation.objects.get_lookup()
 
             zaken_client = build_client_openzaak("zaak")
 
@@ -194,7 +192,6 @@ class InnerCaseDetailView(
             end_statustype_data = self.handle_end_statustype_data(
                 status_types_mapping=status_types_mapping,
                 end_statustype=self.handle_end_statustype(statuses, statustypen),
-                status_translate=status_translate,
             )
             result_data = self.get_result_data(
                 self.case, self.resulttype_config_mapping, zaken_client
@@ -217,7 +214,7 @@ class InnerCaseDetailView(
                 ),
                 "description": self.case.zaaktype.omschrijving,
                 "statuses": self.get_statuses_data(
-                    statuses, status_translate, self.statustype_config_mapping
+                    statuses, self.statustype_config_mapping
                 ),
                 "end_statustype_data": end_statustype_data,
                 "second_status_preview": second_status_preview,
@@ -371,7 +368,6 @@ class InnerCaseDetailView(
         self,
         status_types_mapping: dict[str, StatusType],
         end_statustype: StatusType,
-        status_translate: StatusTranslation,
     ):
         """
         Prepare data about end statustype for use in context/template
@@ -379,9 +375,10 @@ class InnerCaseDetailView(
         end_statustype_data = None
         if not status_types_mapping.get(end_statustype.url):
             end_statustype_data = {
-                "label": status_translate(
-                    (end_statustype.statustekst or end_statustype.omschrijving),
-                    default=_("No data available"),
+                "label": (
+                    end_statustype.statustekst
+                    or end_statustype.omschrijving
+                    or _("No data available")
                 ),
                 "status_indicator": getattr(
                     self.statustype_config_mapping.get(end_statustype.url),
@@ -540,19 +537,18 @@ class InnerCaseDetailView(
     def get_initiator_display(case: Zaak) -> str:
         if client := build_client_openzaak("zaak"):
             roles = client.fetch_case_roles(case.url, RolOmschrijving.initiator)
-            return ", ".join([get_role_name_display(r) for r in roles])
+            return ", ".join(get_role_name_display(r) for r in roles)
         return ""
 
     @staticmethod
     def get_statuses_data(
         statuses: list[Status],
-        lookup: TranslationLookup,
         statustype_config_mapping: dict | None = None,
     ) -> list[dict]:
         return [
             {
                 "date": s.datum_status_gezet,
-                "label": lookup.from_glom_multiple(
+                "label": glom_multiple(
                     s,
                     ("statustype.statustekst", "statustype.omschrijving"),
                     default=_("No data available"),
