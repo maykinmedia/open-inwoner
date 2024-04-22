@@ -17,13 +17,13 @@
     <div class="tab--container login-tab--container">
         <div class="tabs">
             <ul class="list tabs__headers">
-                <li class="list-item tab__header--item"><a href="{% url 'login' %}#particulier" class="link tab__header ">Particulier</a></li>
-                <li class="list-item tab__header--item"><a href="{% url 'login' %}#zakelijk" class="link tab__header">Zakelijk</a></li>
+                <li class="list-item tab__header--item"><a href="{% url 'login' %}#particulier" class="link tab__header" data-panel="particulier-tab" id="particulier_tab">Particulier</a></li>
+                <li class="list-item tab__header--item"><a href="{% url 'login' %}#zakelijk" class="link tab__header" data-panel="zakelijk-tab" id="zakelijk_tab">Zakelijk</a></li>
             </ul>
             {# Panel 1 #}
             <div class="tabs__body">
 
-                <div id="particulier" class="tab__content">
+                <div id="particulier_panel" class="tab__content">
                     {% render_grid %}
 
                         {# Digid #}
@@ -127,7 +127,7 @@
                 {# Panel 1 End #}
 
                 {# Panel 2 #}
-                <div id="zakelijk" class="tab__content">
+                <div id="zakelijk_panel" class="tab__content">
 
                     {% render_grid %}
                         {% render_column start=4 span=5 %}
