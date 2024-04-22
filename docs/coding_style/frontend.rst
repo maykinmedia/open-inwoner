@@ -172,7 +172,7 @@ Indentation
 
 * Indent using two spaces
 
-  .. code-block:: scss
+  .. code-block:: none
 
     .block {
       width: 100%;
@@ -183,7 +183,7 @@ Nesting
 
 * Namespace BEM blocks
 
-  .. code-block:: scss
+  .. code-block:: none
 
     .block {
       // Everything should be nested inside .block
@@ -195,7 +195,7 @@ Nesting
 
 * Nest maximum 3 levels deep
 
-  .. code-block:: scss
+  .. code-block:: none
 
     .block {             // One
       .block__element {  // Two
@@ -210,7 +210,7 @@ Newlines
 
 * 1 empty newline after mixin/variable block
 
-  .. code-block:: scss
+  .. code-block:: none
 
     .block__element-one {
     }
@@ -226,7 +226,7 @@ Order
 * Block modifiers come before block elements, element modifier come after the
   element. Example:
 
-  .. code-block:: scss
+  .. code-block:: none
 
     .block {  // .block is the basic element
       // --active is the modifier for .block, and should be grouped with .block
@@ -247,7 +247,7 @@ Order
   Mixins come first so that their behaviour can still be overridden. Logical
   groups are for example text styling and borders.
 
-  .. code-block:: scss
+  .. code-block:: none
 
     .block {
       @include span-columns(4 of 12);
@@ -265,7 +265,7 @@ Selectors
 
 * Use `BEM`_ class naming.
 
-  .. code-block:: scss
+  .. code-block:: none
 
     // BEM (Block, Element, Modifier) is a structured naming convention for CSS classes
     // A double underscore (__) separates the element from a block
@@ -285,7 +285,7 @@ Selectors
 
 * Maximum one BEM block per file
 
-  .. code-block:: scss
+  .. code-block:: none
 
     // file src/open_inwoner/sass/components/blocks/_block.scss
 
@@ -295,7 +295,7 @@ Selectors
 
 * Only select using (BEM) class names (.block__element), not using tag/id.
 
-  .. code-block:: scss
+  .. code-block:: none
 
     div {  // Bad, tags may change an that would break our code
     }
@@ -330,7 +330,7 @@ Variables
 
 Privatize variables by assigning them on top of the module.
 
-.. code-block:: scss
+.. code-block:: none
 
   $article-color: $color;  // We copy the contents of a global variable into a private one
   $article-font: $font;    // This allow us easily "fix" the values and reuse our component
