@@ -40,9 +40,8 @@
                     {% endif %}
                     <div class="card__body">
                         <a href="{{ contactmoment.url }}" class="contactmomenten__link">
+                            <h2 class="card__heading-2">{{ contactmoment.onderwerp }}</h2>
                             {% render_list %}
-                                <span class="contactmomenten-list">
-                                <h2 class="card__heading-2">{{ contactmoment.onderwerp }}</h2>
                                 <li class="list-item list-item--compact">
                                     {% with register_date=contactmoment.registered_date|default:"" %}
                                     <p class="card__caption card__text--small"><span>{% trans "Vraag ingediend op:" %}</span><span class="card__text--dark">{{ register_date|date }}</span></p>
@@ -51,7 +50,6 @@
                                 {% list_item contactmoment.text compact=True strong=False %}
                                 {% list_item contactmoment.status caption=_("Status") compact=True strong=False %}
                                 {% list_item contactmoment.identificatie caption=_("Vraag nummer") compact=True strong=False %}
-                                </span>
                             {% endrender_list %}
 
                             <span class="link link--icon link--secondary" aria-label="{% trans "Bekijk vraag" %}" title="{% trans "Bekijk vraag" %}">

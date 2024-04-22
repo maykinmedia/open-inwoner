@@ -7,7 +7,6 @@
     {% endif %}
     <div class="card__body">
         {% render_list %}
-        <span class="contactmomenten-list">
             <li class="list-item list-item--compact">
                 {% with register_date=contactmoment.registratiedatum|default:"" %}
                 <p class="card__caption card__text--small"><span>{% trans "Vraag ingediend op" %}:</span><span class="card__text--dark">{{ register_date|date }}</span></p>
@@ -19,7 +18,6 @@
                 <p class="card__caption card__text--small"><span>{% trans "Ingediend via" %}:</span><span class="card__text--dark">{{ channel }}</span></p>
                 {% endwith %}
             </li>
-        </span>
         {% endrender_list %}
         <span class="link link--icon link--primary" aria-label="{% trans "Bekijk vraag" %}" title="{% trans "Bekijk vraag" %}">
             <span class="link__text">{% trans "Bekijk vraag" %}</span>

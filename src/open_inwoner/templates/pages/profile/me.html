@@ -154,22 +154,20 @@
             {% if view.config.selected_categories %}
                 <a href="{% url 'profile:categories' %}" class="card card--compact card--stretch" id="profile-selected-categories">
                     <div class="card__body">
-                        <div class="profile__link">
+                        <div class="ellipsis--none">
                             <h4 class="card__heading-4"><span class="link link__text">{% trans "Mijn Interessegebieden" %}</span></h4>
 
                             {% render_list %}
-                                <span class="profile-list ellipsis">
-                                    {% for name in selected_categories %}
-                                        {% list_item text=name compact=True strong=False %}
-                                    {% empty %}
-                                        <p class="p list_paragraph">{% trans "U heeft geen interesses gekozen." %}</p>
-                                    {% endfor %}
-                                </span>
+                                {% for name in selected_categories %}
+                                    {% list_item text=name compact=True strong=False %}
+                                {% empty %}
+                                    <li class="card__text--small">{% trans "U heeft geen interesses gekozen." %}</li>
+                                {% endfor %}
                             {% endrender_list %}
 
                             <span class="link link--icon link--secondary"
-                                aria-label="{% trans "Aanpassen" %}"
-                                title="{% trans "Aanpassen" %}">
+                                  aria-label="{% trans "Aanpassen" %}"
+                                  title="{% trans "Aanpassen" %}">
                             <span class="link__text">{% trans "Aanpassen" %}</span>
                                 {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
                             </span>
@@ -186,24 +184,23 @@
                     <a href="#" class="card card--compact card--stretch" id="profile-section-mentors">
                 {% endif %}
                         <div class="card__body">
-                            <h4 class="card__heading-4"><span class="link link__text">{% trans "Mijn begeleider" %}</span></h4>
-                            {% render_list %}
-                                <span class="profile-list ellipsis">
+                            <div class="ellipsis">
+                                <h4 class="card__heading-4"><span class="link link__text">{% trans "Mijn begeleider" %}</span></h4>
+                                {% render_list %}
                                     {% for name in mentor_contact_names %}
                                         {% list_item text=name compact=True strong=False %}
                                     {% empty %}
-                                        <p class="p list_paragraph">{% trans "U heeft geen gemeentelijke begeleider." %}</p>
+                                        <li class="card__text--small">{% trans "U heeft geen gemeentelijke begeleider." %}</li>
                                     {% endfor %}
-                                </span>
-                            {% endrender_list %}
+                                {% endrender_list %}
 
-                            {% if inbox_page_is_published %}
-                                <span class="link link--icon link--secondary" aria-label="{% trans "Stuur een bericht" %}" title="{% trans "Stuur een bericht" %}">
+                                {% if inbox_page_is_published %}
+                                    <span class="link link--icon link--secondary" aria-label="{% trans "Stuur een bericht" %}" title="{% trans "Stuur een bericht" %}">
                                     <span class="link__text">{% trans "Stuur een bericht" %}</span>
                                     {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
                                 </span>
-                            {% endif %}
-
+                                {% endif %}
+                            </div>
                         </div>
                     </a>
             {% endif %}
@@ -211,16 +208,14 @@
             {% if view.config.my_contacts %}
                     <a href="{% url 'profile:contact_list' %}" class="card card--compact card--stretch" id="profile-section-contacts">
                         <div class="card__body">
-                            <div class="profile__link">
+                            <div class="ellipsis">
                                 <h4 class="card__heading-4"><span class="link link__text">{% trans "Mijn contacten" %}</span></h4>
                                 {% render_list %}
-                                    <span class="profile-list ellipsis">
                                     {% for name in contact_names %}
                                         {% list_item text=name compact=True strong=False %}
                                     {% empty %}
-                                        <p class="p list_paragraph">{% trans "U heeft nog geen contacten" %}</p>
+                                        <li class="card__text--small">{% trans "U heeft nog geen contacten" %}</li>
                                     {% endfor %}
-                                </span>
                                 {% endrender_list %}
 
                                 <span class="link link--icon link--secondary"
@@ -229,7 +224,6 @@
                                 <span class="link__text">{% trans "Beheer contacten" %}</span>
                                     {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
                                 </span>
-
                             </div>
                         </div>
                     </a>
@@ -239,12 +233,10 @@
             {% if view.config.actions %}
                     <a href="{% url 'profile:action_list' %}" class="card card--compact card--stretch" id="profile-section-actions">
                         <div class="card__body">
-                            <div class="profile__link">
+                            <div class="ellipsis--none">
                                 <h4 class="card__heading-4"><span class="link link__text">{% trans "Acties" %}</span></h4>
                                 {% render_list %}
-                                    <span class="profile-list">
-                                        {% list_item text=action_text compact=True strong=False %}
-                                    </span>
+                                    {% list_item text=action_text compact=True strong=False %}
                                 {% endrender_list %}
                                 <span class="link link--icon link--secondary" aria-label="{% trans "Beheer acties" %}" title="{% trans "Beheer acties" %}">
                                     <span class="link__text">{% trans "Beheer acties" %}</span>
@@ -259,20 +251,19 @@
             {% if view.config.ssd %}
                 <a href="{% url 'ssd:uitkeringen' %}" class="card card--compact card--stretch" id="profile-section-ssd">
                     <div class="card__body">
-                        <h4 class="card__heading-4"><span class="link link__text">{% trans "Mijn uitkeringen" %}</span>
-                        </h4>
-                        {% render_list %}
-                            <span class="profile-list">
+                        <div class="ellipsis--none">
+                            <h4 class="card__heading-4"><span class="link link__text">{% trans "Mijn uitkeringen" %}</span></h4>
+                            {% render_list %}
                                 {% list_item text="Jaaropgaven" compact=True strong=False active=False %}
                                 {% list_item text="Maandspecificaties" compact=True strong=False %}
+                            {% endrender_list %}
+                            <span class="link link--icon link--secondary"
+                                  aria-label="{% trans "Bekijk uitkeringen" %}"
+                                  title="{% trans "Bekijk uitkeringen" %}">
+                                <span class="link__text">{% trans "Bekijk uitkeringen" %}</span>
+                                {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
                             </span>
-                        {% endrender_list %}
-                        <span class="link link--icon link--secondary"
-                              aria-label="{% trans "Bekijk uitkeringen" %}"
-                              title="{% trans "Bekijk uitkeringen" %}">
-                            <span class="link__text">{% trans "Bekijk uitkeringen" %}</span>
-                            {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
-                        </span>
+                        </div>
                     </div>
                 </a>
             {% endif %}
@@ -280,11 +271,13 @@
             {% if view.config.questions %}
                 <a href="{% url 'cases:contactmoment_list' %}" class="card card--compact card--stretch" id="profile-section-questions">
                     <div class="card__body">
-                    <h4 class="card__heading-4"><span class="link link__text">{% trans "Mijn vragen" %}</span></h4>
-                    <span class="link link--icon link--secondary profile-card__button" aria-label="{% trans "Bekijken" %}" title="{% trans "Bekijken" %}">
-                        <span class="link__text">{% trans "Bekijken" %}</span>
-                        {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
-                    </span>
+                        <div class="ellipsis--none">
+                            <h4 class="card__heading-4"><span class="link link__text">{% trans "Mijn vragen" %}</span></h4>
+                            <span class="link link--icon link--secondary profile-card__button" aria-label="{% trans "Bekijken" %}" title="{% trans "Bekijken" %}">
+                                <span class="link__text">{% trans "Bekijken" %}</span>
+                                {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+                            </span>
+                        </div>
                     </div>
                 </a>
             {% endif %}
@@ -292,24 +285,26 @@
             {% if questionnaire_exists and view.config.selfdiagnose %}
                 <a href="{% url 'products:questionnaire_list' %}" class="card card--compact card--stretch" id="profile-section-questions">
                     <div class="card__body">
-                        <h4 class="card__heading-4"><span class="link link__text">{% trans "Zelftest" %}</span></h4>
-                        <span class="link link--icon link--secondary profile-card__button" aria-label="{% trans "Start zelfdiagnose" %}" title="{% trans "Start zelfdiagnose" %}">
-                            <span class="link__text">{% trans "Start zelfdiagnose" %}</span>
-                            {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
-                        </span>
+                        <div class="ellipsis--none">
+                            <h4 class="card__heading-4"><span class="link link__text">{% trans "Zelftest" %}</span></h4>
+                            <span class="link link--icon link--secondary profile-card__button" aria-label="{% trans "Start zelfdiagnose" %}" title="{% trans "Start zelfdiagnose" %}">
+                                <span class="link__text">{% trans "Start zelfdiagnose" %}</span>
+                                {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+                            </span>
+                        </div>
                     </div>
                 </a>
             {% endif %}
             {% if view.config.appointments %}
                 <a href="{% url 'profile:appointments' %}" class="card card--compact card--stretch" id="profile-section-appointments">
                     <div class="card__body">
-                        <h4 class="card__heading-4"><span class="link link__text">{% trans "Mijn afspraken" %}</span>
-                        </h4>
-
-                        <span class="link link--icon link--secondary profile-card__button" aria-label="{% trans "Bekijk afspraken" %}" title="{% trans "Bekijk afspraken" %}">
-                            <span class="link__text">{% trans "Bekijk afspraken" %}</span>
-                            {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
-                        </span>
+                        <div class="ellipsis--none">
+                            <h4 class="card__heading-4"><span class="link link__text">{% trans "Mijn afspraken" %}</span></h4>
+                            <span class="link link--icon link--secondary profile-card__button" aria-label="{% trans "Bekijk afspraken" %}" title="{% trans "Bekijk afspraken" %}">
+                                <span class="link__text">{% trans "Bekijk afspraken" %}</span>
+                                {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+                            </span>
+                        </div>
                     </div>
                 </a>
             {% endif %}

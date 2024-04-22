@@ -193,6 +193,7 @@
   }
 
   &__text--small {
+    color: var(--color-body);
     font-size: var(--font-size-body-small);
   }
 
@@ -232,10 +233,24 @@
       text-decoration: none;
     }
 
-    .ellipsis .list-item p {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+    .ellipsis {
+      .list-item p {
+        color: var(--color-body);
+        font-size: var(--font-size-body-small);
+        line-height: var(--font-line-height-body-small);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      &--none .list-item p {
+        color: var(--color-body);
+        font-size: var(--font-size-body-small);
+        line-height: var(--font-line-height-body-small);
+        overflow: initial;
+        text-overflow: initial;
+        white-space: normal;
+      }
     }
   }
 
@@ -259,6 +274,7 @@
     .p {
       margin-top: 4px;
     }
+
     .button {
       bottom: 0;
       right: 0;
@@ -367,7 +383,10 @@
   }
 
   &--stretch &__body .list:last-of-type {
-    padding-bottom: calc(var(--font-size-body) + var(--card-spacing) + 1em);
+    padding-bottom: calc(
+      var(--font-size-body-large) + var(--card-spacing) +
+        var(--font-size-body-large)
+    );
   }
 
   &--stretch .list + .link:first-of-type:last-of-type,
