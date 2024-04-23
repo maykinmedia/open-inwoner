@@ -5,6 +5,7 @@
     .heading-2__indicator {
       display: flex;
       flex-direction: row;
+      margin-bottom: var(--spacing-extra-large);
 
       // breaking-text fix
       @media (min-width: 315px) {
@@ -31,7 +32,6 @@
     .h2.indicator {
       display: inline;
       font-size: var(--font-size-heading-2);
-      margin-bottom: var(--spacing-extra-large);
     }
   }
 
