@@ -106,6 +106,7 @@ class Product(models.Model):
         help_text=_(
             "Select a form to show this form on the product page. If a form is selected, the link will not be shown."
         ),
+        choices=[],
     )
     content = models.TextField(
         verbose_name=_("Content"),

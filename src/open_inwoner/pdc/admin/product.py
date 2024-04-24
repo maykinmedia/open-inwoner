@@ -62,6 +62,10 @@ class ProductAdminForm(forms.ModelForm):
                     "categories"
                 ].initial = self.instance.categories.intersection(user_categories)
 
+        self.fields["form"].choices = Product.form.field.get_choices(
+            include_blank=Product.form.field.blank
+        )
+
     def clean(self):
         cleaned_data = super().clean()
         if len(cleaned_data["categories"]) == 0:
