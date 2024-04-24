@@ -136,7 +136,7 @@
 
 .login-tab--container {
   .list-item.tab__header--item {
-    min-width: 100px;
+    min-width: 50%;
 
     @media (min-width: 500px) {
       min-width: 180px;
@@ -163,6 +163,7 @@
       color: var(--color-accent);
       font-weight: bold;
       margin: 0;
+      text-decoration: none;
     }
   }
 

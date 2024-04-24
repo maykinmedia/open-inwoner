@@ -50,34 +50,34 @@ export class LoginFormFocus {
 
   activateTabFromHash() {
     const hash = window.location.hash
-    const particulierLink = document.querySelector(
-      '.tab__header[href="/accounts/login/#particulier"]'
-    )
-    const zakelijkLink = document.querySelector(
-      '.tab__header[href="/accounts/login/#zakelijk"]'
-    )
-    const particulierTab = document.getElementById('particulier')
-    const zakelijkTab = document.getElementById('zakelijk')
+    const zakelijkTab = document.getElementById('zakelijk_tab')
+    const particulierTab = document.getElementById('particulier_tab')
+    const particulierPanel = document.getElementById('particulier_panel')
+    const zakelijkPanel = document.getElementById('zakelijk_panel')
 
     if (hash.includes('zakelijk')) {
-      particulierLink.classList.remove('active')
       particulierTab.classList.remove('active')
-      particulierTab.classList.add('hide')
+      particulierPanel.classList.remove('active')
+      particulierPanel.classList.add('hide')
 
-      zakelijkTab.classList.remove('hide')
+      zakelijkPanel.classList.remove('hide')
+      zakelijkPanel.classList.add('active')
       zakelijkTab.classList.add('active')
-      zakelijkLink.classList.add('active')
     } else {
-      particulierTab.classList.remove('hide')
-      particulierLink.classList.add('active')
-      particulierTab.classList.remove('active')
+      particulierPanel.classList.remove('hide')
+      particulierTab.classList.add('active')
+      particulierPanel.classList.remove('active')
 
-      zakelijkTab.classList.add('hide')
+      zakelijkPanel.classList.add('hide')
+      zakelijkPanel.classList.remove('active')
       zakelijkTab.classList.remove('active')
-      zakelijkLink.classList.remove('active')
     }
   }
 }
 
-const loginformFocuses = document.querySelectorAll(LoginFormFocus.selector)
-;[...loginformFocuses].forEach((element) => new LoginFormFocus(element))
+/**
+ * Controls focustrap and show/hide of login-form elements
+ */
+document
+  .querySelectorAll(LoginFormFocus.selector)
+  .forEach((loginformNode) => new LoginFormFocus(loginformNode))
