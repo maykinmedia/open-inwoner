@@ -19,7 +19,7 @@ jobs:
   #
   tests:
     name: Run the Django test suite
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     services:
       postgres:
@@ -79,7 +79,7 @@ jobs:
   # End-to-end tests
   #
   e2etests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
         browser:
@@ -155,7 +155,7 @@ jobs:
     needs: tests
 
     name: Build (and push) Docker image
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - uses: actions/checkout@v2
