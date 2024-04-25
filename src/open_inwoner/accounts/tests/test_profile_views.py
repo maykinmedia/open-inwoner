@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 from django.conf import settings
 from django.template.defaultfilters import date as django_date
-from django.test import override_settings
+from django.test import override_settings, tag
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
 
@@ -1038,6 +1038,7 @@ class NotificationsDisplayTests(WebTest):
         self.assertIn("plans_notifications", form.fields)
 
 
+@tag("laposta")
 @requests_mock.Mocker()
 @override_settings(
     ROOT_URLCONF="open_inwoner.cms.tests.urls", MIDDLEWARE=PATCHED_MIDDLEWARE
@@ -1131,6 +1132,111 @@ class NewsletterSubscriptionTests(ClearCachesMixin, WebTest):
         self.assertIn("Nieuwsbrief1", response.text)
         self.assertIn("Nieuwsbrief2", response.text)
 
+    def test_save_form_with_errors(self, m):
+        self.setUpMocks(m)
+
+        self.config.limit_list_selection_to = ["list1", "list2"]
+        self.config.save()
+
+        m.get(
+            f"{self.config.api_root}member/{self.user.email}?list_id=list1",
+            json={
+                "member": MemberFactory.build(
+                    list_id="list1",
+                    member_id="1234567",
+                    email=self.user.email,
+                    custom_fields=None,
+                ).model_dump()
+            },
+        )
+        m.get(
+            f"{self.config.api_root}member/{self.user.email}?list_id=list2",
+            status_code=400,
+        )
+
+        response = self.app.get(self.profile_url, user=self.user)
+
+        self.assertIn(_("Nieuwsbrieven"), response.text)
+        self.assertIn("newsletter-form", response.forms)
+
+        form = response.forms["newsletter-form"]
+
+        # First checkbox should be checked, because the user is already subscribed
+        self.assertTrue(form.fields["newsletters"][0].checked)
+        self.assertIn("Nieuwsbrief1", response.text)
+
+        post_matcher = m.post(
+            f"{self.config.api_root}member",
+            json={
+                "error": {
+                    "type": "internal",
+                    "message": "Internal server error",
+                }
+            },
+            status_code=500,
+        )
+        delete_matcher = m.delete(
+            f"{self.config.api_root}member/{self.user.email}?list_id=list1",
+            json={
+                "error": {
+                    "type": "internal",
+                    "message": "Internal server error",
+                }
+            },
+            status_code=500,
+        )
+
+        form["newsletters"] = ["list2"]
+        response = form.submit("newsletter-submit")
+
+        subscribe_error, unsubscribe_error = response.pyquery(
+            ".notifications__errors .notification__content"
+        )
+
+        self.assertEqual(
+            PQ(subscribe_error).text(),
+            _(
+                "Something went wrong while trying to subscribe to '{list_name}', please try again later"
+            ).format(list_name="Nieuwsbrief2"),
+        )
+        self.assertEqual(
+            PQ(unsubscribe_error).text(),
+            _(
+                "Something went wrong while trying to unsubscribe from '{list_name}', please try again later"
+            ).format(list_name="Nieuwsbrief1"),
+        )
+
+        form = response.forms["newsletter-form"]
+
+        # The initial data should be kept the same as the last POST
+        self.assertFalse(form.fields["newsletters"][0].checked)
+        self.assertTrue(form.fields["newsletters"][1].checked)
+
+    def test_do_not_render_form_if_email_not_verified(self, m):
+        self.setUpMocks(m)
+
+        self.user.verified_email = ""
+        self.user.save()
+        self.assertFalse(self.user.has_verified_email())
+
+        self.config.limit_list_selection_to = ["list1"]
+        self.config.save()
+
+        m.get(
+            f"{self.config.api_root}member/{self.user.email}?list_id=list1",
+            json={
+                "member": MemberFactory.build(
+                    list_id="list1",
+                    member_id="1234567",
+                    email=self.user.email,
+                    custom_fields=None,
+                ).model_dump()
+            },
+        )
+        response = self.app.get(self.profile_url, user=self.user)
+
+        self.assertNotIn("newsletter-form", response.forms)
+
     def test_render_form_limit_newsletters_to_admin_selection(self, m):
         self.setUpMocks(m)
 
@@ -1166,31 +1272,6 @@ class NewsletterSubscriptionTests(ClearCachesMixin, WebTest):
 
         # Second field was excluded by `LapostaConfig.limit_list_selection_to`
         self.assertNotIn("Nieuwsbrief2", response.text)
-
-    def test_do_not_render_form_if_email_not_verified(self, m):
-        self.setUpMocks(m)
-
-        self.user.verified_email = ""
-        self.user.save()
-        self.assertFalse(self.user.has_verified_email())
-
-        self.config.limit_list_selection_to = ["list1"]
-        self.config.save()
-
-        m.get(
-            f"{self.config.api_root}member/{self.user.email}?list_id=list1",
-            json={
-                "member": MemberFactory.build(
-                    list_id="list1",
-                    member_id="1234567",
-                    email=self.user.email,
-                    custom_fields=None,
-                ).model_dump()
-            },
-        )
-        response = self.app.get(self.profile_url, user=self.user)
-
-        self.assertNotIn("newsletter-form", response.forms)
 
 
 @requests_mock.Mocker()
