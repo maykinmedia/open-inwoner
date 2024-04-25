@@ -1,5 +1,9 @@
+from django.conf import settings
 from django.contrib import messages
+from django.urls import reverse
+from django.utils.encoding import iri_to_uri
 from django.utils.functional import cached_property
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
@@ -26,7 +30,14 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
         return _("Contact formulier")
 
     def get_success_url(self):
-        return self.request.path
+        success_url = self.request.path
+        if url_has_allowed_host_and_scheme(
+            success_url,
+            allowed_hosts=[self.request.get_host()],
+            require_https=settings.IS_HTTPS,
+        ):
+            return iri_to_uri(success_url)
+        return reverse("contactform")
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
