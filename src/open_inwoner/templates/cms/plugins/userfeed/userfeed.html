@@ -1,12 +1,14 @@
-{% load i18n icon_tags %}
+{% load i18n icon_tags button_tags %}
 
 {% if userfeed %}
 <section class="plugin userfeed">
-    <div class="heading-2__indicator">
-        <h2 class="h2 {% if userfeed.action_required %}indicator{% endif %}">
-            {{ instance.title }}
-        </h2>
-        {% if userfeed.action_required %}{% icon icon="fiber_manual_record" outlined=False extra_classes="file__file--recent" %}{% endif %}
+    <div class="userfeed__header">
+        <div class="heading-2__indicator">
+            <h2 class="h2 {% if userfeed.action_required %}indicator{% endif %}">
+                {{ instance.title }}
+            </h2>
+            {% if userfeed.action_required %}{% icon icon="fiber_manual_record" outlined=False extra_classes="file__file--recent" %}{% endif %}
+        </div>
     </div>
 
     <div class="userfeed__summary">
@@ -28,10 +30,10 @@
                 </div>
 
                 <div class="card__body card__body--tabled">
-                    <p class="p tabled__value">{{ item.title }}</p>
-                    <h2 class="plugin-card__heading">
+                    <h3 class="p tabled__value">{{ item.title }}</h3>
+                    <p class="userfeed-card__heading" id="userfeed-card__title">
                         <span class="status">{{ item.message }}</span>
-                    </h2>
+                    </p>
                     <span class="button button--icon-before button--transparent">
                 {% icon icon="east" icon_position="after" primary=True outlined=True %}
                 </span>
