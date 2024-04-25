@@ -1255,6 +1255,10 @@ class UserAppointmentsTests(ClearCachesMixin, WebTest):
 
         self.assertEqual(len(cards), 2)
 
+        self.assertEqual(
+            PQ(cards[0]).find(".card__heading-2").text(), "Aanvraag paspoort"
+        )
+
         passport_appointment = PQ(cards[0]).find("ul").children()
 
         self.assertEqual(PQ(passport_appointment[0]).text(), "Datum\n1 januari 2020")
@@ -1265,6 +1269,10 @@ class UserAppointmentsTests(ClearCachesMixin, WebTest):
         self.assertEqual(
             PQ(cards[0]).find("a").attr("href"),
             f"{self.data.config.booking_base_url}{self.data.appointment_passport.publicId}",
+        )
+
+        self.assertEqual(
+            PQ(cards[1]).find(".card__heading-2").text(), "Aanvraag ID kaart"
         )
 
         id_card_appointment = PQ(cards[1]).find("ul").children()
