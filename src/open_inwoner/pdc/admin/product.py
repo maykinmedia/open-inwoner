@@ -5,6 +5,7 @@ from django.utils.translation import gettext as _
 
 from import_export.admin import ImportExportMixin
 from import_export.formats import base_formats
+from openformsclient.mixins import OpenFormsClientMixin
 from ordered_model.admin import OrderedModelAdmin
 
 from open_inwoner.ckeditor5.widgets import CKEditorWidget
@@ -36,7 +37,7 @@ class ProductLinkInline(admin.TabularInline):
     ordering = ("pk",)
 
 
-class ProductAdminForm(forms.ModelForm):
+class ProductAdminForm(OpenFormsClientMixin, forms.ModelForm):
     class Meta:
         model = Product
         fields = "__all__"
@@ -61,10 +62,6 @@ class ProductAdminForm(forms.ModelForm):
                 self.fields[
                     "categories"
                 ].initial = self.instance.categories.intersection(user_categories)
-
-        self.fields["form"].choices = Product.form.field.get_choices(
-            include_blank=Product.form.field.blank
-        )
 
     def clean(self):
         cleaned_data = super().clean()
