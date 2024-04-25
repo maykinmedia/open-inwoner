@@ -70,7 +70,7 @@ class NewsletterSubscriptionForm(forms.Form):
             ip=get_client_ip(request)[0],
             email=user.verified_email,
             source_url=None,
-            custom_fields=None,
+            custom_fields={"toestemming": "Ja, ik wil de nieuwsbrief ontvangen"},
             options=None,
         )
         limited_to = LapostaConfig.get_solo().limit_list_selection_to
