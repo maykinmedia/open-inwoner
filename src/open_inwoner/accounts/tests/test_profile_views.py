@@ -134,8 +134,7 @@ class ProfileViewTests(WebTest):
         response = self.app.get(self.url, user=self.user)
 
         self.assertContains(response, self.user.first_name)
-        self.assertContains(response, self.user.last_name)
-        self.assertContains(response, self.user.infix)
+        self.assertContains(response, f"{self.user.infix} {self.user.last_name}")
         self.assertContains(response, self.user.email)
         self.assertContains(response, self.user.phonenumber)
         self.assertContains(response, self.user.street)
