@@ -122,13 +122,14 @@
             <form method="POST" id="newsletter-form" class="form" novalidate>
                 {% csrf_token %}
                 {% with form.fields.newsletters.remarks_mapping as remarks_mapping %}
+                {% errors form.errors.newsletters %}
                 {% for list_id, list_name in form.fields.newsletters.choices %}
                     <div class="checkbox">
                         <input type="checkbox"
-                               name="newsletters"
-                               value="{{ list_id }}"
-                               class="checkbox__input"
-                               id="id_newsletters_{{ forloop.counter }}"
+                            name="newsletters"
+                            value="{{ list_id }}"
+                            class="checkbox__input"
+                            id="id_newsletters_{{ forloop.counter }}"
                                {% if list_id in form.fields.newsletters.initial %}checked="checked"{% endif %}>
                         <label class="checkbox__label" for="id_newsletters_{{ forloop.counter }}">
                             {{ list_name }}
