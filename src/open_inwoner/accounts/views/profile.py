@@ -55,7 +55,7 @@ class MyProfileView(
 
     def get_form_kwargs(self) -> dict[str, Any]:
         kwargs = super().get_form_kwargs()
-        kwargs["user"] = self.request.user
+        kwargs["request"] = self.request
         return kwargs
 
     def form_valid(self, form):
