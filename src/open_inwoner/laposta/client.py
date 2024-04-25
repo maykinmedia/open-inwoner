@@ -43,7 +43,7 @@ class LapostaClient(APIClient):
 
     def create_subscription(self, list_id: str, user_data: UserData) -> Member | None:
         response = self.post(
-            "member", data={"list_id": list_id, **user_data.model_dump()}
+            "member", json={"list_id": list_id, **user_data.model_dump()}
         )
 
         if response.status_code == 400:

@@ -1,5 +1,4 @@
 from unittest.mock import patch
-from urllib.parse import parse_qs
 
 from django.contrib.messages.middleware import MessageMiddleware
 from django.test import TestCase, tag
@@ -130,8 +129,15 @@ class NewsletterSubscriptionFormTestCase(ClearCachesMixin, TestCase):
         [post_request] = post_matcher.request_history
 
         self.assertEqual(
-            parse_qs(post_request.body),
-            {"list_id": ["789"], "ip": ["127.0.0.1"], "email": [self.user.email]},
+            post_request.json(),
+            {
+                "list_id": "789",
+                "ip": "127.0.0.1",
+                "email": self.user.email,
+                "custom_fields": {"toestemming": "Ja, ik wil de nieuwsbrief ontvangen"},
+                "source_url": None,
+                "options": None,
+            },
         )
 
         # Because list_id 123 was present in the
