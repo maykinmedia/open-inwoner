@@ -1,3 +1,4 @@
+from django.urls import NoReverseMatch, resolve, reverse
 from django.utils.translation import gettext_lazy as _
 
 from cms.apphook_pool import apphook_pool
@@ -14,7 +15,16 @@ from ..utils.plugin_mixins import CMSActiveAppMixin
 
 def selected_categories_enabled() -> bool:
     profile_app = apphook_pool.get_apphook("ProfileApphook")
-    config = profile_app.get_config("profile")
+
+    # retrieve namespace of ProfileConfig instance that's being used
+    try:
+        categories_resolver = resolve(reverse("profile:categories"))
+    except NoReverseMatch:
+        return False
+
+    profile_namespace = categories_resolver.namespace
+    config = profile_app.get_config(profile_namespace)
+
     if config:
         return config.selected_categories
     return False
