@@ -79,6 +79,7 @@ celery==5.2.7
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   django-celery-beat
     #   notifications-api-common
 certifi==2023.11.17
     # via
@@ -133,6 +134,11 @@ confusable-homoglyphs==3.2.0
     #   django-registration
 coverage==4.5.4
     # via -r requirements/test-tools.in
+cron-descriptor==1.4.3
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   django-celery-beat
 cryptography==42.0.4
     # via
     #   -c requirements/base.txt
@@ -177,6 +183,7 @@ django==4.2.11
     #   django-appconf
     #   django-appdata
     #   django-axes
+    #   django-celery-beat
     #   django-choices
     #   django-ckeditor
     #   django-classy-tags
@@ -212,6 +219,7 @@ django==4.2.11
     #   django-sniplates
     #   django-solo
     #   django-timeline-logger
+    #   django-timezone-field
     #   django-treebeard
     #   django-two-factor-auth
     #   django-view-breadcrumbs
@@ -245,6 +253,10 @@ django-autoslug==1.9.8
     #   -c requirements/base.txt
     #   -r requirements/base.txt
 django-axes==5.25.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+django-celery-beat==2.6.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -445,6 +457,11 @@ django-timeline-logger==3.0.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+django-timezone-field==6.1.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   django-celery-beat
 django-treebeard==4.4
     # via
     #   -c requirements/base.txt
@@ -860,6 +877,11 @@ pyrsistent==0.18.0
     #   jsonschema
 pytest==8.1.1
     # via -r requirements/test-tools.in
+python-crontab==3.0.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   django-celery-beat
 python-dateutil==2.8.2
     # via
     #   -c requirements/base.txt
@@ -869,6 +891,7 @@ python-dateutil==2.8.2
     #   faker
     #   freezegun
     #   messagebird
+    #   python-crontab
 python-decouple==3.5
     # via
     #   -c requirements/base.txt
@@ -1019,6 +1042,11 @@ typing-extensions==4.10.0
     #   pydantic-core
     #   pyee
     #   xsdata
+tzdata==2024.1
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   django-celery-beat
 uritemplate==4.1.1
     # via
     #   -c requirements/base.txt

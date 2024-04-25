@@ -84,6 +84,11 @@ maykin-python3-saml
 pyopenssl
 django-sessionprofile
 
+# Workers
+celery ~= 5.0
+# celery-once
+django-celery-beat
+
 # Common Ground integration
 zgw-consumers
 notifications-api-common

@@ -101,6 +101,7 @@ celery==5.2.7
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   django-celery-beat
     #   notifications-api-common
 certifi==2023.11.17
     # via
@@ -165,6 +166,11 @@ coverage==4.5.4
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+cron-descriptor==1.4.3
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   django-celery-beat
 cryptography==42.0.4
     # via
     #   -c requirements/ci.txt
@@ -215,6 +221,7 @@ django==4.2.11
     #   django-appconf
     #   django-appdata
     #   django-axes
+    #   django-celery-beat
     #   django-choices
     #   django-ckeditor
     #   django-classy-tags
@@ -252,6 +259,7 @@ django==4.2.11
     #   django-sniplates
     #   django-solo
     #   django-timeline-logger
+    #   django-timezone-field
     #   django-treebeard
     #   django-two-factor-auth
     #   django-view-breadcrumbs
@@ -285,6 +293,10 @@ django-autoslug==1.9.8
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
 django-axes==5.25.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+django-celery-beat==2.6.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -491,6 +503,11 @@ django-timeline-logger==3.0.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+django-timezone-field==6.1.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   django-celery-beat
 django-treebeard==4.4
     # via
     #   -c requirements/ci.txt
@@ -1003,6 +1020,11 @@ pytest==8.1.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+python-crontab==3.0.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   django-celery-beat
 python-dateutil==2.8.2
     # via
     #   -c requirements/ci.txt
@@ -1012,6 +1034,7 @@ python-dateutil==2.8.2
     #   faker
     #   freezegun
     #   messagebird
+    #   python-crontab
 python-decouple==3.5
     # via
     #   -c requirements/ci.txt
@@ -1222,6 +1245,11 @@ typing-extensions==4.10.0
     #   pydantic-core
     #   pyee
     #   xsdata
+tzdata==2024.1
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   django-celery-beat
 uritemplate==4.1.1
     # via
     #   -c requirements/ci.txt
