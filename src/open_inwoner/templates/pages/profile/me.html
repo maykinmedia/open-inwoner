@@ -180,7 +180,7 @@
                 {% if mentor_contacts %}
                     <a href="{% url 'profile:contact_list' %}?type=begeleider" class="card card--compact card--stretch" id="profile-section-mentors">
                 {% else %}
-                    <a href="#" class="card card--compact card--stretch" id="profile-section-mentors">
+                    <a href="{% url 'profile:contact_list' %}" class="card card--compact card--stretch" id="profile-section-mentors">
                 {% endif %}
                         <div class="card__body">
                             <div class="ellipsis">
