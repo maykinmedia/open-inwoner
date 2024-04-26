@@ -33,7 +33,8 @@ class LapostaConfig(SingletonModel):
         blank=True,
         help_text=_(
             "If configured, users will only be able to choose from this selection of "
-            "lists to subscribe to"
+            "lists to subscribe to. Note: the list of newsletters is cached, so it may take "
+            "up to 15 minutes before newly added newsletters show up here."
         ),
     )
 

@@ -1,12 +1,13 @@
 from unittest.mock import patch
-from urllib.parse import parse_qs
 
-from django.test import RequestFactory, TestCase
+from django.contrib.messages.middleware import MessageMiddleware
+from django.test import TestCase, tag
 from django.utils.translation import gettext as _
 
 import requests_mock
 
 from open_inwoner.accounts.tests.factories import DigidUserFactory
+from open_inwoner.cms.tests.cms_tools import get_request
 from open_inwoner.utils.test import ClearCachesMixin
 
 from ..forms import NewsletterSubscriptionForm
@@ -16,6 +17,7 @@ from .factories import LapostaListFactory, MemberFactory
 LAPOSTA_API_ROOT = "https://laposta.local/api/v2/"
 
 
+@tag("laposta")
 @requests_mock.Mocker()
 class NewsletterSubscriptionFormTestCase(ClearCachesMixin, TestCase):
     def setUp(self):
@@ -26,8 +28,8 @@ class NewsletterSubscriptionFormTestCase(ClearCachesMixin, TestCase):
         self.user.save()
         self.assertTrue(self.user.has_verified_email())
 
-        self.request = RequestFactory().get("/")
-        self.request.user = self.user
+        self.request = get_request(user=self.user)
+        MessageMiddleware(lambda x: x).process_request(self.request)
 
         self.config = LapostaConfig.get_solo()
         self.config.api_root = LAPOSTA_API_ROOT
@@ -90,13 +92,13 @@ class NewsletterSubscriptionFormTestCase(ClearCachesMixin, TestCase):
             f"{LAPOSTA_API_ROOT}member/{self.user.email}?list_id=789", status_code=400
         )
 
-        form = NewsletterSubscriptionForm(data={}, user=self.user)
+        form = NewsletterSubscriptionForm(data={}, request=self.request)
 
         # User already has a subscription for the first two newsletters
         self.assertEqual(form["newsletters"].initial, ["123", "456"])
 
         form = NewsletterSubscriptionForm(
-            data={"newsletters": ["456", "789"]}, user=self.user
+            data={"newsletters": ["456", "789"]}, request=self.request
         )
 
         self.assertTrue(form.is_valid())
@@ -127,8 +129,15 @@ class NewsletterSubscriptionFormTestCase(ClearCachesMixin, TestCase):
         [post_request] = post_matcher.request_history
 
         self.assertEqual(
-            parse_qs(post_request.body),
-            {"list_id": ["789"], "ip": ["127.0.0.1"], "email": [self.user.email]},
+            post_request.json(),
+            {
+                "list_id": "789",
+                "ip": "127.0.0.1",
+                "email": self.user.email,
+                "custom_fields": {"toestemming": "Ja, ik wil de nieuwsbrief ontvangen"},
+                "source_url": None,
+                "options": None,
+            },
         )
 
         # Because list_id 123 was present in the
@@ -155,7 +164,9 @@ class NewsletterSubscriptionFormTestCase(ClearCachesMixin, TestCase):
             f"{LAPOSTA_API_ROOT}member/{self.user.email}?list_id=789", status_code=400
         )
 
-        form = NewsletterSubscriptionForm(data={"newsletters": ["789"]}, user=self.user)
+        form = NewsletterSubscriptionForm(
+            data={"newsletters": ["789"]}, request=self.request
+        )
 
         self.assertTrue(form.is_valid())
 
@@ -204,7 +215,9 @@ class NewsletterSubscriptionFormTestCase(ClearCachesMixin, TestCase):
             },
         )
 
-        form = NewsletterSubscriptionForm(data={"newsletters": []}, user=self.user)
+        form = NewsletterSubscriptionForm(
+            data={"newsletters": []}, request=self.request
+        )
 
         self.assertTrue(form.is_valid())
 
@@ -249,7 +262,9 @@ class NewsletterSubscriptionFormTestCase(ClearCachesMixin, TestCase):
             f"{LAPOSTA_API_ROOT}member/{self.user.email}?list_id=789", status_code=400
         )
 
-        form = NewsletterSubscriptionForm(data={"newsletters": ["789"]}, user=self.user)
+        form = NewsletterSubscriptionForm(
+            data={"newsletters": ["789"]}, request=self.request
+        )
 
         self.assertTrue(form.is_valid())
 
@@ -317,7 +332,7 @@ class NewsletterSubscriptionFormTestCase(ClearCachesMixin, TestCase):
             },
         )
 
-        form = NewsletterSubscriptionForm(data={}, user=self.user)
+        form = NewsletterSubscriptionForm(data={}, request=self.request)
 
         # We don't get any newletters if not using verified email
         self.assertEqual(form["newsletters"].initial, None)
@@ -326,7 +341,9 @@ class NewsletterSubscriptionFormTestCase(ClearCachesMixin, TestCase):
         mock_create_client.assert_not_called()
 
         # Check forced save() doesn't do anything
-        form = NewsletterSubscriptionForm(data={"newsletters": ["123"]}, user=self.user)
+        form = NewsletterSubscriptionForm(
+            data={"newsletters": ["123"]}, request=self.request
+        )
         form.save(self.request)
 
         # Client was never built (and no request-mock exception was thrown)

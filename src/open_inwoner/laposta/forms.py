@@ -1,6 +1,7 @@
 import logging
 
 from django import forms
+from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
@@ -25,10 +26,10 @@ class NewsletterSubscriptionForm(forms.Form):
         widget=forms.widgets.CheckboxSelectMultiple,
     )
 
-    def __init__(self, user=None, *args, **kwargs):
+    def __init__(self, request=None, *args, **kwargs):
         super().__init__(**kwargs)
 
-        if not user.has_verified_email():
+        if not request.user.has_verified_email():
             return
 
         if laposta_client := create_laposta_client():
@@ -42,11 +43,15 @@ class NewsletterSubscriptionForm(forms.Form):
                     if choice[0] in limited_to
                 ]
 
-            self.fields[
-                "newsletters"
-            ].initial = laposta_client.get_subscriptions_for_email(
-                limited_to, user.verified_email
-            )
+            # In case of errors, we want to keep the same data selected
+            if "newsletters" in request.POST:
+                initial_data = request.POST.getlist("newsletters")
+            else:
+                initial_data = laposta_client.get_subscriptions_for_email(
+                    limited_to, request.user.verified_email
+                )
+
+            self.fields["newsletters"].initial = initial_data
 
     def save(self, request, *args, **kwargs):
         user: User = request.user
@@ -58,13 +63,14 @@ class NewsletterSubscriptionForm(forms.Form):
             return
 
         newsletters = self.cleaned_data["newsletters"]
+        has_errors = False
 
         list_name_mapping = dict(self.fields["newsletters"].choices)
         user_data = UserData(
             ip=get_client_ip(request)[0],
             email=user.verified_email,
             source_url=None,
-            custom_fields=None,
+            custom_fields={"toestemming": "Ja, ik wil de nieuwsbrief ontvangen"},
             options=None,
         )
         limited_to = LapostaConfig.get_solo().limit_list_selection_to
@@ -81,6 +87,7 @@ class NewsletterSubscriptionForm(forms.Form):
                 logger.exception(
                     "Something went wrong while trying to create subscription"
                 )
+                has_errors = True
                 self.add_error(
                     "newsletters",
                     ValidationError(
@@ -99,6 +106,7 @@ class NewsletterSubscriptionForm(forms.Form):
                 logger.exception(
                     "Something went wrong while trying to delete subscription"
                 )
+                has_errors = True
                 self.add_error(
                     "newsletters",
                     ValidationError(
@@ -108,3 +116,8 @@ class NewsletterSubscriptionForm(forms.Form):
                         ).format(list_name=list_name_mapping[list_id])
                     ),
                 )
+
+        if has_errors:
+            messages.warning(
+                request, _("Er ging iets mis bij het opslaan van je voorkeuren")
+            )
