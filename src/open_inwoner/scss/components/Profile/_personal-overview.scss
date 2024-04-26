@@ -19,7 +19,7 @@
     margin-top: 0;
   }
 
-  .profile-list {
+  .list {
     .list-item--compact {
       padding: var(--spacing-small) 0;
     }
@@ -31,8 +31,16 @@
     }
   }
 
-  .profile-cards .card {
-    min-height: 190px;
+  .profile-cards {
+    @media (min-width: 500px) and (max-width: 767px) {
+      &.card-container {
+        grid-template-columns: repeat(2, 1fr) !important;
+      }
+    }
+
+    .card {
+      min-height: 190px;
+    }
   }
 
   .form {
