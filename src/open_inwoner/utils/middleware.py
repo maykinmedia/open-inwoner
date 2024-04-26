@@ -74,6 +74,8 @@ class BaseConditionalUserRedirectMiddleware(abc.ABC):
             for e in self.extra_pass_prefixes:
                 try:
                     prefixes.append(resolve_url(e))
+                    prefixes.append(reverse("profile:registration_necessary"))
+                    prefixes.append(reverse("profile:email_verification_user"))
                 except NoReverseMatch:
                     # support testing without cms app mounted
                     pass
