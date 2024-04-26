@@ -9,6 +9,13 @@ os.environ.setdefault("ALLOWED_HOSTS", "")
 
 from .base import *  # noqa isort:skip
 
+DATABASES = {
+    "default": {
+        "ENGINE": config("DB_ENGINE", "django.db.backends.sqlite3"),
+        "NAME": ":memory:",
+    }
+}
+
 LOGGING["loggers"].update(
     {
         "django": {
