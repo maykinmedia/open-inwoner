@@ -16,25 +16,34 @@ from .forms import CompanyBranchChoiceForm
 class CompanyBranchChoiceView(FormView):
     """Choose the branch ("vestiging") of a company"""
 
-    # TODO refactor for proper Class Based View usage:
-    # - get_context_data() does network IO but is called multiple times (also through super())
-    # - get_form() is called multiple times (also through super())
-    # - use regular FormView code patterns (could work without get()/post())
-    # - move saving to the form's .save() (pass arguments via form kwargs or save()-arguments
-
     template_name = "pages/kvk/branches.html"
     form_class = CompanyBranchChoiceForm
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def get_form_kwargs(self):
+        """
+        The `company_branches` data is needed several times at different stages of the
+        form view. We inject the value into the form instance instead of retrieving it
+        through `get_context_data` in order to avoid multiple IO calls.
+        """
+        kwargs = super().get_form_kwargs()
 
         kvk_client = KvKClient()
 
         company_branches = kvk_client.get_all_company_branches(
             kvk=self.request.user.kvk
         )
-        form = self.get_form()
+        # create pseudo-branch representing the company as a whole
+        master_branch = {
+            "vestigingsnummer": "",
+            "naam": company_branches[0].get("naam", "") if company_branches else "",
+        }
+        company_branches.insert(0, master_branch)
 
+        kwargs["company_branches"] = company_branches
+
+        return kwargs
+
+    def get_redirect(self):
         if next := get_next_url_from(self.request, default=""):
             redirect = furl(next)
             redirect.args.update(self.request.GET)
@@ -43,85 +52,44 @@ class CompanyBranchChoiceView(FormView):
             redirect.args.update(self.request.GET)
         else:
             redirect = furl(reverse("pages-root"))
+        return redirect.url
 
-        # create pseudo-branch representing the company as a whole
-        master_branch = {
-            "vestigingsnummer": "",
-            "naam": company_branches[0].get("naam", "") if company_branches else "",
-        }
-        company_branches.insert(0, master_branch)
-
-        context.update(
-            company_branches=company_branches,
-            form=form,
-            redirect=redirect,
-        )
-
-        return context
-
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
         if not getattr(request.user, "kvk", None):
             return HttpResponse(_("Unauthorized"), status=401)
 
-        # TODO regular FormView does this
-        context = self.get_context_data()
-
-        redirect = context["redirect"]
-        company_branches_with_master = context["company_branches"]
-        # Exclude the "master" branch from these checks, since we always insert this
-        company_branches = company_branches_with_master[1:]
-
-        if not company_branches:
-            request.session[KVK_BRANCH_SESSION_VARIABLE] = None
-            request.session.save()
-            return HttpResponseRedirect(redirect.url)
-
-        if len(company_branches) == 1:
-            request.session[KVK_BRANCH_SESSION_VARIABLE] = None
-            request.session.save()
-            return HttpResponseRedirect(redirect.url)
+        redirect = self.get_redirect()
+        context = super().get_context_data()
 
         form = context["form"]
 
-        # TODO regular FormView does this
-        return render(
-            request,
-            self.template_name,
-            {
-                "company_branches": company_branches_with_master,
-                "form": form,
-            },
-        )
+        company_branches_with_master = form.company_branches
+        # Exclude the "master" branch from these checks, since we always insert this
+        company_branches = company_branches_with_master[1:]
+
+        if not company_branches or len(company_branches) == 1:
+            request.session[KVK_BRANCH_SESSION_VARIABLE] = None
+            request.session.save()
+            return HttpResponseRedirect(redirect)
+
+        context["company_branches"] = form.company_branches
+
+        return render(request, self.template_name, context)
 
     def post(self, request):
         if not getattr(request.user, "kvk", None):
             return HttpResponse(_("Unauthorized"), status=401)
 
-        # TODO this is also called from super().get_context_data()
-        form = self.get_form()
+        redirect = self.get_redirect()
+        context = self.get_context_data()
 
-        if form.is_valid():
-            context = self.get_context_data()
-            redirect = context["redirect"]
+        form = context["form"]
 
-            cleaned = form.cleaned_data
-            branch_number = cleaned["branch_number"]
+        if not form.is_valid():
+            context["company_branches"] = form.company_branches
+            # Directly calling `super().form_invalid(form)` would override the error
+            return self.render_to_response(context)
 
-            if branch_number and not any(
-                branch.get("vestigingsnummer") == branch_number
-                for branch in context["company_branches"]
-            ):
-                form.add_error(
-                    "branch_number",
-                    _("Invalid branch number for the current KvK number"),
-                )
-                context["form"] = form
-                # Directly calling `super().form_invalid(form)` would override the error
-                return self.render_to_response(context)
+        request.session[KVK_BRANCH_SESSION_VARIABLE] = request.POST["branch_number"]
 
-            request.session[KVK_BRANCH_SESSION_VARIABLE] = branch_number
-
-            return HttpResponseRedirect(redirect.url)
-
-        # TODO this calls get_context_data() again
-        return super().form_invalid(form)
+        return HttpResponseRedirect(redirect)
