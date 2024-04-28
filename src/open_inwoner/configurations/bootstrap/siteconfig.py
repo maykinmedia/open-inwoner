@@ -13,12 +13,12 @@ class SiteConfigurationStep(BaseConfigurationStep):
     """
 
     verbose_name = "Site configuration"
+    config_settings = SiteConfigurationSettings()
 
     def is_configured(self):
         config = SiteConfiguration.get_solo()
-        config_settings = SiteConfigurationSettings()
-        required_settings = config_settings.get_required_settings()
-        setting_to_config = config_settings.get_config_mapping()
+        required_settings = self.config_settings.get_required_settings()
+        setting_to_config = self.config_settings.get_config_mapping()
 
         for required_setting in required_settings:
             config_field = setting_to_config[required_setting]
@@ -28,8 +28,7 @@ class SiteConfigurationStep(BaseConfigurationStep):
 
     def configure(self):
         config = SiteConfiguration.get_solo()
-        config_settings = SiteConfigurationSettings()
-        setting_to_config = config_settings.get_config_mapping()
+        setting_to_config = self.config_settings.get_config_mapping()
 
         for setting_name, config_field in setting_to_config.items():
             setting = getattr(settings, setting_name)

@@ -31,18 +31,16 @@ class Command(BaseCommand):
             part.append(f"{'Variable':<20}{config.get_setting_name(field)}")
             part.append(f"{'Setting':<20}{field.verbose_name}")
             part.append(f"{'Description':<20}{field.description or 'No description'}")
-            part.append(f"{'Possible values':<20}{field.values or 'No information'}")
-            part.append(f"{'Default value':<20}{field.default_value or 'No default'}")
+            part.append(f"{'Possible values':<20}{field.values}")
+            part.append(f"{'Default value':<20}{field.default_value}")
             ret.append(part)
         return ret
 
     def format_display_name(self, display_name):
         """Surround title with '=' to display as heading in rst file"""
 
-        heading_bar = f"{'=' * len(display_name)}"
-        display_name_formatted = (
-            heading_bar + "\n" + f"{display_name}" + "\n" + heading_bar
-        )
+        heading_bar = "=" * len(display_name)
+        display_name_formatted = f"{heading_bar}\n{display_name}\n{heading_bar}"
         return display_name_formatted
 
     def write_file_from_template(
@@ -69,6 +67,7 @@ class Command(BaseCommand):
         ]
         all_settings.sort()
         detailed_info = self.get_detailed_info(config)
+        detailed_info.sort()
 
         template_variables = {
             "required_settings": required_settings,

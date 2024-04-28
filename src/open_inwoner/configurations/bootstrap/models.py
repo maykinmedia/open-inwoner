@@ -1,8 +1,9 @@
 import dataclasses
-from dataclasses import dataclass, field
-from typing import Any, Iterator, TypeAlias
+from dataclasses import dataclass
+from typing import Iterator, TypeAlias
 
 from django.contrib.postgres.fields import ArrayField
+from django.db import models
 from django.db.models.fields import NOT_PROVIDED
 from django.db.models.fields.json import JSONField
 from django.db.models.fields.related import ForeignKey, OneToOneField
@@ -17,6 +18,7 @@ from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.openzaak.models import OpenZaakConfig
 
+from .choices import BasicFieldDescription
 from .dataclasses import ConfigField, Fields
 
 ConfigModel: TypeAlias = (
@@ -32,12 +34,12 @@ class ConfigSettingsBase:
     model: ConfigModel
     display_name: str
     namespace: str
-    required_fields: tuple[str, ...]
-    included_fields: tuple[str, ...]
-    excluded_fields: tuple[str, ...]
+    required_fields = tuple()
+    included_fields = tuple()
+    excluded_fields = ("id",)
 
     def __init__(self):
-        self.config_fields = Fields(all=set(), required=set())
+        self.config_fields = Fields()
 
         self.create_model_config_fields(
             require=self.required_fields,
@@ -51,52 +53,45 @@ class ConfigSettingsBase:
         return f"{cls.namespace}_" + field.name.upper()
 
     @staticmethod
-    def get_default_value(field: Any) -> str:
+    def get_default_value(field: models.Field) -> str:
         default = field.default
 
         if default is NOT_PROVIDED:
             return "No default"
         if callable(default):
-            default = default.__call__()
+            default = default()
         if isinstance(field, (JSONField, ArrayField)):
             try:
                 default = ", ".join(default)
             except TypeError:
                 default = str(default)
+        # needed to make `generate_config_docs` idempotent
+        # because UUID's are randomly generated
+        if isinstance(field, models.UUIDField):
+            default = "random UUID string"
 
         return default
 
     @staticmethod
-    def get_example_values(field: Any) -> str:
+    def get_example_values(field: models.Field) -> str:
         # fields with choices
         if choices := field.choices:
             values = [choice[0] for choice in choices]
             return ", ".join(values)
 
         # other fields
-        match field.get_internal_type():
-            case "CharField":
-                return "string"
-            case "TextField":
-                return "string"
-            case "URLField":
-                return "string (URL)"
-            case "BooleanField":
-                return "True, False"
-            case "IntegerField":
-                return "string representing a number"
-            case "PositiveIntegerField":
-                return "string representing a positive number"
-            case "ArrayField":
-                return "string, comma-delimited ('foo,bar,baz')"
+        field_type = field.get_internal_type()
+        match field_type:
+            case item if item in BasicFieldDescription.names:
+                return getattr(BasicFieldDescription, field_type)
             case _:
                 return "No information available"
 
-    def get_model_fields(self, model) -> Iterator[Any]:
+    def get_model_fields(self, model) -> Iterator[models.Field]:
         return (
             field
             for field in model._meta.concrete_fields
-            if field.name not in self.__class__.excluded_fields
+            if field.name not in self.excluded_fields
         )
 
     def create_model_config_fields(
@@ -104,8 +99,8 @@ class ConfigSettingsBase:
         require: tuple[str, ...],
         exclude: tuple[str, ...],
         include: tuple[str, ...],
-        model: Any,
-        relating_field: Any = None,
+        model: models.Field,
+        relating_field: models.Field = None,
     ) -> None:
 
         model_fields = self.get_model_fields(model)
@@ -134,16 +129,19 @@ class ConfigSettingsBase:
                     default_value=self.get_default_value(model_field),
                     values=self.get_example_values(model_field),
                 )
-                # whitelist or blacklist
-                if (
-                    config_field.name in self.included_fields
-                    or config_field not in self.excluded_fields
-                ):
-                    self.config_fields.all.add(config_field)
+
                 if config_field.name in self.required_fields:
                     self.config_fields.required.add(config_field)
 
-            # TODO: delegate image field, file field etc. to handler functions/classes
+                # use combination of whitelist/blacklist for all fields
+                if self.included_fields:
+                    if (
+                        config_field.name in self.included_fields
+                        and config_field not in self.excluded_fields
+                    ):
+                        self.config_fields.all.add(config_field)
+                elif config_field.name not in self.excluded_fields:
+                    self.config_fields.all.add(config_field)
 
     def get_required_settings(self) -> tuple[str, ...]:
         return tuple(
@@ -164,7 +162,6 @@ class SiteConfigurationSettings(ConfigSettingsBase):
         "secondary_color",
         "accent_color",
     )
-    included_fields = ()
     excluded_fields = (
         "id",
         "email_logo",
@@ -198,10 +195,12 @@ class KICConfigurationSettings(ConfigSettingsBase):
         "register_contact_moment",
         "register_email",
         "register_employee_id",
-        "register_type",
-        "use_rsin_for_innnnpid_query_parameter",
+        "use_rsin_for_innNnpId_query_parameter",
     )
-    excluded_fields = ()
+    excluded_fields = (
+        "contactmomenten_service_uuid",
+        "klanten_service_uuid",
+    )
 
 
 class ZGWConfigurationSettings(ConfigSettingsBase):
@@ -234,24 +233,20 @@ class ZGWConfigurationSettings(ConfigSettingsBase):
         "title_text",
         "zaak_max_confidentiality",
     )
-    excluded_fields = ()
 
 
 class DigiDOIDCConfigurationSettings(ConfigSettingsBase):
     model = OpenIDConnectDigiDConfig
     display_name = "DigiD OIDC Configuration"
     namespace = "DIGID_OIDC"
-    api_fields = tuple()
     required_fields = ("oidc_rp_client_id", "oidc_rp_client_secret")
     included_fields = tuple()
-    excluded_fields = ("id",)
 
 
 class DigiDSAMLConfigurationSettings(ConfigSettingsBase):
     model = DigidConfiguration
     display_name = "DigiD SAML Configuration"
     namespace = "DIGID"
-    api_fields = tuple()
     required_fields = (
         "certificate_label",
         "certificate_type",
@@ -262,34 +257,27 @@ class DigiDSAMLConfigurationSettings(ConfigSettingsBase):
         "service_name",
         "service_description",
     )
-    included_fields = ()
-    excluded_fields = ("id",)
 
 
 class eHerkenningDOIDCConfigurationSettings(ConfigSettingsBase):
     model = OpenIDConnectEHerkenningConfig
     display_name = "eHerkenning OIDC Configuration"
     namespace = "EHERKENNING_OIDC"
-    api_fields = tuple()
     required_fields = ("oidc_rp_client_id", "oidc_rp_client_secret")
-    included_fields = tuple()
-    excluded_fields = ("id",)
 
 
 @dataclass
 class ConfigurationSettingsMap:
-    siteconfig: type = field(default=SiteConfigurationSettings)
-    kic: type = field(default=KICConfigurationSettings)
-    zgw: type = field(default=ZGWConfigurationSettings)
-    digid_saml: type = field(default=DigiDSAMLConfigurationSettings)
-    digid_oidc: type = field(default=DigiDOIDCConfigurationSettings)
-    eherkenning_oidc: type = field(default=eHerkenningDOIDCConfigurationSettings)
-
-    # TODO: admin_oidc, eherkenning_saml
+    siteconfig: ConfigModel = SiteConfigurationSettings
+    kic: ConfigModel = KICConfigurationSettings
+    zgw: ConfigModel = ZGWConfigurationSettings
+    digid_oidc: ConfigModel = DigiDOIDCConfigurationSettings
+    digid_saml: ConfigModel = DigiDSAMLConfigurationSettings
+    eherkenning_oidc: ConfigModel = eHerkenningDOIDCConfigurationSettings
 
     @classmethod
     def get_fields(cls):
-        return tuple(field.default for field in dataclasses.fields(cls))
+        return tuple(getattr(cls, field.name) for field in dataclasses.fields(cls))
 
     @classmethod
     def get_field_names(cls):

@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass(frozen=True, eq=True)
@@ -12,5 +12,5 @@ class ConfigField:
 
 @dataclass
 class Fields:
-    all: set[ConfigField]
-    required: set[ConfigField]
+    all: set[ConfigField] = field(default_factory=set)
+    required: set[ConfigField] = field(default_factory=set)
