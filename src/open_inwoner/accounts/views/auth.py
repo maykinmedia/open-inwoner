@@ -90,11 +90,6 @@ class CustomDigiDAssertionConsumerServiceMockView(
         if url:
             return url
 
-        if hasattr(settings, "DIGID"):
-            digid_login_url = settings.DIGID.get("login_url")
-            if digid_login_url:
-                return resolve_url(digid_login_url)
-
         return resolve_url(settings.LOGIN_URL)
 
     def get_success_url(self):
@@ -124,10 +119,6 @@ class CustomDigiDAssertionConsumerServiceView(DigiDAssertionConsumerServiceView)
         url = self.get_redirect_url()
         if url:
             return url
-
-        digid_login_url = settings.DIGID.get("login_url")
-        if digid_login_url:
-            return resolve_url(digid_login_url)
 
         return resolve_url(settings.LOGIN_URL)
 
