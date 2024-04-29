@@ -15,10 +15,7 @@ build:
     - libxmlsec1-openssl
     - wget
   tools:
-    python: '3.10'
-#  jobs:
-#    post_checkout:
-#      - bash bin/rtd_post_checkout.sh
+    python: '3.11'
 
 python:
   install:

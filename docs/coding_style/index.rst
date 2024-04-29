@@ -3,8 +3,8 @@ Coding style
 ============
 
 Below you can find some best practices to maintain a good coding style. There
-are detailed coding style guides for the `frontend <coding_style_frontend>` and
-the `backend <coding_style_backend>`.
+are detailed coding style guides for the :ref:`frontend <coding_style_frontend>` and
+the :ref:`backend <coding_style_backend>`.
 
 .. toctree::
     :maxdepth: 2
@@ -24,7 +24,7 @@ HTML
 * Don’t put content in ``master.html``, only put boilerplate/scaffolding here.
 * Use `inclusion tags`_ for reusable components and blocks otherwise.
 * Wrap components/logical page blocks/standalone sections in ``{% block %}`` tags.
-* Respect the `coding style <coding_style_frontend>`.
+* Respect the :ref:`coding style <coding_style_frontend>`.
 * If it makes sense to divert, divert.
 
 .. _inclusion tags: https://docs.djangoproject.com/en/stable/howto/custom-template-tags/#inclusion-tags
@@ -43,7 +43,7 @@ CSS/SASS
 * The Block (B from BEM) cannot set margin on itself, only on children. This avoids
   spacing issues.
 * Use Neat mixins for (responsive) grids. Avoid complex overdoing mixins (e.g. Bourbon).
-* Respect the `coding style <coding_style_frontend>`.
+* Respect the :ref:`coding style <coding_style_frontend>`.
 * Compile to CSS and keep the compiled css in version control.
 * If it makes sense to divert, divert.
 
@@ -66,7 +66,7 @@ Javascript
 * Use a bundler (webpack) to manage dependencies/transpiling.
 * "npm run" is our task runner (manage.py for frontend).
 * Keep the JS source in the `static` folder per Django app.
-* Respect the `coding style <coding_style_frontend>`.
+* Respect the :ref:`coding style <coding_style_frontend>`.
 * If it makes sense to divert, divert.
 
 
