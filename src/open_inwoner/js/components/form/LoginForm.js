@@ -10,7 +10,6 @@ export class LoginFormFocus {
     this.removeAutofocusAndFocus()
     this.hideLoginFormOnLoad()
     this.addEmailToggleListener()
-    this.activateTabFromHash()
   }
 
   removeAutofocusAndFocus() {
@@ -22,7 +21,6 @@ export class LoginFormFocus {
 
   hideLoginFormOnLoad() {
     if (this.loginFormColumn) {
-      this.emailToggleParent.setAttribute('aria-expanded', 'false')
       this.loginFormColumn.classList.add('hide')
     }
   }
@@ -32,8 +30,11 @@ export class LoginFormFocus {
       const emailToggleParents =
         this.emailToggleParent.querySelectorAll('.link')
       emailToggleParents.forEach((link) => {
+        link.setAttribute('aria-controls', `${this.loginFormColumn.id}`)
+        link.setAttribute('aria-expanded', 'false')
         link.addEventListener('click', (event) => {
           event.preventDefault()
+          link.setAttribute('aria-expanded', 'true')
           this.emailToggleParent.classList.add('hide')
           this.toggleLoginFormVisibility()
         })
@@ -45,32 +46,6 @@ export class LoginFormFocus {
     if (this.loginFormColumn) {
       this.loginFormColumn.classList.toggle('hide')
       this.usernameInput.focus()
-    }
-  }
-
-  activateTabFromHash() {
-    const hash = window.location.hash
-    const zakelijkTab = document.getElementById('zakelijk_tab')
-    const particulierTab = document.getElementById('particulier_tab')
-    const particulierPanel = document.getElementById('particulier_panel')
-    const zakelijkPanel = document.getElementById('zakelijk_panel')
-
-    if (hash.includes('zakelijk')) {
-      particulierTab.classList.remove('active')
-      particulierPanel.classList.remove('active')
-      particulierPanel.classList.add('hide')
-
-      zakelijkPanel.classList.remove('hide')
-      zakelijkPanel.classList.add('active')
-      zakelijkTab.classList.add('active')
-    } else {
-      particulierPanel.classList.remove('hide')
-      particulierTab.classList.add('active')
-      particulierPanel.classList.remove('active')
-
-      zakelijkPanel.classList.add('hide')
-      zakelijkPanel.classList.remove('active')
-      zakelijkTab.classList.remove('active')
     }
   }
 }
