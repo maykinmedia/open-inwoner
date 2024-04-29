@@ -10,6 +10,40 @@ from open_inwoner.openzaak.clients import build_client
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.utils.api import ClientError
 
+from .base import ConfigSettingsBase
+
+
+class ZGWConfigurationSettings(ConfigSettingsBase):
+    model = OpenZaakConfig
+    display_name = "ZGW Configuration"
+    namespace = "ZGW_CONFIG"
+    required_fields = (
+        "catalogi_service_client_id",
+        "catalogi_service_secret",
+        "catalogi_service_api_root",
+        "document_service_client_id",
+        "document_service_secret",
+        "document_service_api_root",
+        "form_service_client_id",
+        "form_service_secret",
+        "form_service_api_root",
+        "zaak_service_client_id",
+        "zaak_service_secret",
+        "zaak_service_api_root",
+    )
+    all_fields = required_fields + (
+        "action_required_deadline_days",
+        "allowed_file_extensions",
+        "document_max_confidentiality",
+        "enable_categories_filtering_with_zaken",
+        "fetch_eherkenning_zaken_with_rsin",
+        "max_upload_size",
+        "reformat_esuite_zaak_identificatie",
+        "skip_notification_statustype_informeren",
+        "title_text",
+        "zaak_max_confidentiality",
+    )
+
 
 class ZakenAPIConfigurationStep(BaseConfigurationStep):
     """

@@ -4,7 +4,30 @@ from django_setup_configuration.configuration import BaseConfigurationStep
 
 from open_inwoner.configurations.models import SiteConfiguration
 
-from .models import SiteConfigurationSettings
+from .base import ConfigSettingsBase
+
+
+class SiteConfigurationSettings(ConfigSettingsBase):
+    model = SiteConfiguration
+    display_name = "General Configuration"
+    namespace = "SITE"
+    required_fields = (
+        "name",
+        "primary_color",
+        "secondary_color",
+        "accent_color",
+    )
+    excluded_fields = (
+        "id",
+        "email_logo",
+        "footer_logo",
+        "favicon",
+        "openid_connect_logo",
+        "extra_css",
+        "logo",
+        "hero_image_login",
+        "theme_stylesheet",
+    )
 
 
 class SiteConfigurationStep(BaseConfigurationStep):

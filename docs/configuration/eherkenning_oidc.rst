@@ -21,6 +21,7 @@ All settings:
 
 ::
 
+    EHERKENNING_OIDC_ENABLE
     EHERKENNING_OIDC_ENABLED
     EHERKENNING_OIDC_ERROR_MESSAGE_MAPPING
     EHERKENNING_OIDC_IDENTIFIER_CLAIM_NAME
@@ -58,7 +59,7 @@ Detailed Information
     Setting             Error message mapping
     Description         Mapping that maps error messages returned by the identity provider to human readable error messages that are shown to the user
     Possible values     No information available
-    Default value       
+    Default value       {}
     
     Variable            EHERKENNING_OIDC_IDENTIFIER_CLAIM_NAME
     Setting             KVK claim name

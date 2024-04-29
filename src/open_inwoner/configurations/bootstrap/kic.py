@@ -10,6 +10,36 @@ from open_inwoner.openklant.clients import build_client
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.utils.api import ClientError
 
+from .base import ConfigSettingsBase
+
+
+class KICConfigurationSettings(ConfigSettingsBase):
+    model = OpenKlantConfig
+    display_name = "Klanten Configuration"
+    namespace = "KIC_CONFIG"
+    required_fields = (
+        "contactmomenten_service_client_id",
+        "contactmomenten_service_secret",
+        "contactmomenten_service_api_root",
+        "klanten_service_client_id",
+        "klanten_service_secret",
+        "klanten_service_api_root",
+        "register_type",
+        "register_contact_moment",
+    )
+    all_fields = required_fields + (
+        "register_bronorganisatie_rsin",
+        "register_channel",
+        "register_contact_moment",
+        "register_email",
+        "register_employee_id",
+        "use_rsin_for_innNnpId_query_parameter",
+    )
+    excluded_fields = (
+        "contactmomenten_service_uuid",
+        "klanten_service_uuid",
+    )
+
 
 class KlantenAPIConfigurationStep(BaseConfigurationStep):
     """

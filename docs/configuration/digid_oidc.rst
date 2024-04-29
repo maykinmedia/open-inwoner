@@ -21,6 +21,7 @@ All settings:
 
 ::
 
+    DIGID_OIDC_ENABLE
     DIGID_OIDC_ENABLED
     DIGID_OIDC_ERROR_MESSAGE_MAPPING
     DIGID_OIDC_IDENTIFIER_CLAIM_NAME
@@ -58,7 +59,7 @@ Detailed Information
     Setting             Error message mapping
     Description         Mapping that maps error messages returned by the identity provider to human readable error messages that are shown to the user
     Possible values     No information available
-    Default value       
+    Default value       {}
     
     Variable            DIGID_OIDC_IDENTIFIER_CLAIM_NAME
     Setting             BSN claim name

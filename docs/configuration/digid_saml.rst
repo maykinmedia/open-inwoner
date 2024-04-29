@@ -35,6 +35,7 @@ All settings:
     DIGID_CERTIFICATE_PUBLIC_CERTIFICATE
     DIGID_CERTIFICATE_TYPE
     DIGID_DIGEST_ALGORITHM
+    DIGID_ENABLE
     DIGID_ENTITY_ID
     DIGID_IDP_METADATA_FILE
     DIGID_IDP_SERVICE_ENTITY_ID
@@ -152,7 +153,7 @@ Detailed Information
     Setting             gewenste attributen
     Description         Een lijst van strings (of objecten) met de gewenste attributen, bijvoorbeeld '["bsn"]'
     Possible values     No information available
-    Default value       [{'name': 'bsn', 'required': True}]
+    Default value       {'name': 'bsn', 'required': True}
     
     Variable            DIGID_SERVICE_DESCRIPTION
     Setting             Service-omschrijving

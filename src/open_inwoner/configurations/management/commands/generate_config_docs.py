@@ -5,10 +5,12 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.template import loader
 
-from open_inwoner.configurations.bootstrap.models import ConfigurationSettingsMap
-from open_inwoner.configurations.bootstrap.typing import ConfigSetting
+from open_inwoner.configurations.bootstrap.registry import (
+    ConfigSetting,
+    ConfigurationRegistry,
+)
 
-SUPPORTED_OPTIONS = ConfigurationSettingsMap.get_field_names()
+SUPPORTED_OPTIONS = ConfigurationRegistry.get_field_names()
 TEMPLATE_PATH = Path("configurations/config_doc.rst")
 TARGET_DIR = Path(settings.BASE_DIR) / "docs" / "configuration"
 
@@ -20,7 +22,7 @@ class Command(BaseCommand):
         parser.add_argument("config_option", nargs="?")
 
     def get_config(self, config_option: str) -> ConfigSetting:
-        config_model = getattr(ConfigurationSettingsMap, config_option, None)
+        config_model = getattr(ConfigurationRegistry, config_option, None)
         config_instance = config_model()
         return config_instance
 
@@ -62,10 +64,14 @@ class Command(BaseCommand):
             config.get_setting_name(field) for field in config.config_fields.required
         ]
         required_settings.sort()
+
         all_settings = [
             config.get_setting_name(field) for field in config.config_fields.all
         ]
+        # enable setting is not related to any model field
+        all_settings.append(f"{config.namespace}_ENABLE")
         all_settings.sort()
+
         detailed_info = self.get_detailed_info(config)
         detailed_info.sort()
 
