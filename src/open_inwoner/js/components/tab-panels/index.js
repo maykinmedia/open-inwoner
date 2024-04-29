@@ -23,11 +23,11 @@ export class TabPanel {
 
   hideContent() {
     this.tabContent.forEach((item) => {
-      item.classList.add('hide')
       item.classList.remove('active')
     })
     this.tabHeaders.forEach((item) => {
       item.classList.remove('active')
+      item.setAttribute('aria-selected', 'false')
     })
   }
 
@@ -44,6 +44,7 @@ export class TabPanel {
     this.tabHeaders.forEach((item, idx) => {
       if (idx === index) {
         item.classList.add('active')
+        item.setAttribute('aria-selected', 'true')
       } else {
         item.classList.remove('active')
       }
@@ -52,35 +53,61 @@ export class TabPanel {
 }
 
 /**
+ * Function to activate tab and panel
+ * @param {HTMLElement} activeTab - The tab to be activated
+ * @param {HTMLElement} activePanel - The panel to be activated
+ * @param {NodeList} tabHeaders - All tab headers
+ */
+function activateTab(activeTab, activePanel, tabHeaders) {
+  activeTab.classList.add('active')
+  activeTab.setAttribute('aria-selected', 'true')
+  activePanel.classList.remove('hide')
+  activePanel.classList.add('active')
+
+  tabHeaders.forEach((tabHeader) => {
+    if (tabHeader !== activeTab) {
+      tabHeader.classList.remove('active')
+      tabHeader.setAttribute('aria-selected', 'false')
+    }
+  })
+
+  document.querySelectorAll('.tab__content').forEach((panel) => {
+    if (panel !== activePanel) {
+      panel.classList.add('hide')
+      panel.classList.remove('active')
+    }
+  })
+}
+
+/**
+ * Default activation of tabs WITHOUT coming from external link.
+ * Relies on instantiated TabPanel instances.
+ */
+window.addEventListener('load', () => {
+  const hash = window.location.hash
+  const zakelijkTab = document.getElementById('zakelijk_tab')
+  const particulierTab = document.getElementById('particulier_tab')
+  const particulierPanel = document.getElementById('particulier_panel')
+  const zakelijkPanel = document.getElementById('zakelijk_panel')
+
+  if (hash.includes('zakelijk')) {
+    activateTab(
+      zakelijkTab,
+      zakelijkPanel,
+      document.querySelectorAll('.tab__header[data-panel]')
+    )
+  } else {
+    activateTab(
+      particulierTab,
+      particulierPanel,
+      document.querySelectorAll('.tab__header[data-panel]')
+    )
+  }
+})
+
+/**
  * Controls which tabs are active
  */
 document
   .querySelectorAll(TabPanel.selector)
   .forEach((tabpanel) => new TabPanel(tabpanel))
-
-/**
- * Activate Zakelijk tab from hash on page load, when coming from external link.
- * Relies on instantiated TabPanel instances.
- */
-window.addEventListener('load', () => {
-  const tabHeaders = document.querySelectorAll('.tab__header[data-panel]')
-  tabHeaders.forEach((tabHeader) => {
-    const panelId = tabHeader.dataset.panel
-    const panel = document.getElementById(panelId)
-    if (panel) {
-      tabHeader.addEventListener('click', () => {
-        // Hide all panels, ensuring only one panel is visible at a time
-        document.querySelectorAll('.tab__content').forEach((panel) => {
-          panel.classList.remove('active')
-        })
-        // Activate panel
-        panel.classList.add('active')
-        // Activate tab
-        tabHeaders.forEach((header) => {
-          header.classList.remove('active')
-        })
-        tabHeader.classList.add('active')
-      })
-    }
-  })
-})
