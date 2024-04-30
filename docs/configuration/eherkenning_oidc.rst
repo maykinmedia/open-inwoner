@@ -7,6 +7,13 @@ eHerkenning OIDC Configuration
 Settings Overview
 =================
 
+Enable/Disable configuration:
+"""""""""""""""""""""""""""""
+
+::
+
+    EHERKENNING_OIDC_CONFIG_ENABLE
+
 Required:
 """""""""
 
@@ -15,13 +22,11 @@ Required:
     EHERKENNING_OIDC_OIDC_RP_CLIENT_ID
     EHERKENNING_OIDC_OIDC_RP_CLIENT_SECRET
 
-
 All settings:
 """""""""""""
 
 ::
 
-    EHERKENNING_OIDC_ENABLE
     EHERKENNING_OIDC_ENABLED
     EHERKENNING_OIDC_ERROR_MESSAGE_MAPPING
     EHERKENNING_OIDC_IDENTIFIER_CLAIM_NAME
@@ -42,7 +47,6 @@ All settings:
     EHERKENNING_OIDC_OIDC_STATE_SIZE
     EHERKENNING_OIDC_OIDC_USE_NONCE
     EHERKENNING_OIDC_USERINFO_CLAIMS_SOURCE
-
 
 Detailed Information
 ====================

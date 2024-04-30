@@ -7,6 +7,13 @@ eHerkenning SAML Configuration
 Settings Overview
 =================
 
+Enable/Disable configuration:
+"""""""""""""""""""""""""""""
+
+::
+
+    EHERKENNING_CONFIG_ENABLE
+
 Required:
 """""""""
 
@@ -23,7 +30,6 @@ Required:
     EHERKENNING_PRIVACY_POLICY
     EHERKENNING_SERVICE_DESCRIPTION
     EHERKENNING_SERVICE_NAME
-
 
 All settings:
 """""""""""""
@@ -47,7 +53,6 @@ All settings:
     EHERKENNING_EIDAS_REQUESTED_ATTRIBUTES
     EHERKENNING_EIDAS_SERVICE_INSTANCE_UUID
     EHERKENNING_EIDAS_SERVICE_UUID
-    EHERKENNING_ENABLE
     EHERKENNING_ENTITY_ID
     EHERKENNING_KEY_PASSPHRASE
     EHERKENNING_MAKELAAR_ID
@@ -65,7 +70,6 @@ All settings:
     EHERKENNING_TECHNICAL_CONTACT_PERSON_TELEPHONE
     EHERKENNING_WANT_ASSERTIONS_ENCRYPTED
     EHERKENNING_WANT_ASSERTIONS_SIGNED
-
 
 Detailed Information
 ====================

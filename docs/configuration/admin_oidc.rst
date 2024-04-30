@@ -7,6 +7,13 @@ Admin OIDC Configuration
 Settings Overview
 =================
 
+Enable/Disable configuration:
+"""""""""""""""""""""""""""""
+
+::
+
+    ADMIN_OIDC_CONFIG_ENABLE
+
 Required:
 """""""""
 
@@ -15,14 +22,12 @@ Required:
     ADMIN_OIDC_OIDC_RP_CLIENT_ID
     ADMIN_OIDC_OIDC_RP_CLIENT_SECRET
 
-
 All settings:
 """""""""""""
 
 ::
 
     ADMIN_OIDC_CLAIM_MAPPING
-    ADMIN_OIDC_ENABLE
     ADMIN_OIDC_GROUPS_CLAIM
     ADMIN_OIDC_MAKE_USERS_STAFF
     ADMIN_OIDC_OIDC_EXEMPT_URLS
@@ -44,7 +49,6 @@ All settings:
     ADMIN_OIDC_SYNC_GROUPS_GLOB_PATTERN
     ADMIN_OIDC_USERINFO_CLAIMS_SOURCE
     ADMIN_OIDC_USERNAME_CLAIM
-
 
 Detailed Information
 ====================

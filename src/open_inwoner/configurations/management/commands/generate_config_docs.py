@@ -68,14 +68,13 @@ class Command(BaseCommand):
         all_settings = [
             config.get_setting_name(field) for field in config.config_fields.all
         ]
-        # enable setting is not related to any model field
-        all_settings.append(f"{config.namespace}_ENABLE")
         all_settings.sort()
 
         detailed_info = self.get_detailed_info(config)
         detailed_info.sort()
 
         template_variables = {
+            "enable_settings": f"{config.namespace}_CONFIG_ENABLE",
             "required_settings": required_settings,
             "all_settings": all_settings,
             "detailed_info": detailed_info,

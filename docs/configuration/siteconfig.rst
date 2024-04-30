@@ -7,6 +7,13 @@ General Configuration
 Settings Overview
 =================
 
+Enable/Disable configuration:
+"""""""""""""""""""""""""""""
+
+::
+
+    SITE_CONFIG_ENABLE
+
 Required:
 """""""""
 
@@ -16,7 +23,6 @@ Required:
     SITE_NAME
     SITE_PRIMARY_COLOR
     SITE_SECONDARY_COLOR
-
 
 All settings:
 """""""""""""
@@ -36,7 +42,6 @@ All settings:
     SITE_EHERKENNING_ENABLED
     SITE_EMAIL_NEW_MESSAGE
     SITE_EMAIL_VERIFICATION_REQUIRED
-    SITE_ENABLE
     SITE_FOOTER_LOGO_TITLE
     SITE_FOOTER_LOGO_URL
     SITE_GA_CODE
@@ -92,7 +97,6 @@ All settings:
     SITE_WARNING_BANNER_ENABLED
     SITE_WARNING_BANNER_FONT_COLOR
     SITE_WARNING_BANNER_TEXT
-
 
 Detailed Information
 ====================

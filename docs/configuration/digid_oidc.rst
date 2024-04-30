@@ -7,6 +7,13 @@ DigiD OIDC Configuration
 Settings Overview
 =================
 
+Enable/Disable configuration:
+"""""""""""""""""""""""""""""
+
+::
+
+    DIGID_OIDC_CONFIG_ENABLE
+
 Required:
 """""""""
 
@@ -15,13 +22,11 @@ Required:
     DIGID_OIDC_OIDC_RP_CLIENT_ID
     DIGID_OIDC_OIDC_RP_CLIENT_SECRET
 
-
 All settings:
 """""""""""""
 
 ::
 
-    DIGID_OIDC_ENABLE
     DIGID_OIDC_ENABLED
     DIGID_OIDC_ERROR_MESSAGE_MAPPING
     DIGID_OIDC_IDENTIFIER_CLAIM_NAME
@@ -42,7 +47,6 @@ All settings:
     DIGID_OIDC_OIDC_STATE_SIZE
     DIGID_OIDC_OIDC_USE_NONCE
     DIGID_OIDC_USERINFO_CLAIMS_SOURCE
-
 
 Detailed Information
 ====================

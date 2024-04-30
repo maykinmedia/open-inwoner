@@ -19,35 +19,35 @@ from ...bootstrap.zgw import (
     ZGWAPIsConfigurationStep,
 )
 
-ZAKEN_API_ROOT = "https://openzaak.local/zaken/api/v1/"
-CATALOGI_API_ROOT = "https://openzaak.local/catalogi/api/v1/"
-DOCUMENTEN_API_ROOT = "https://openzaak.local/documenten/api/v1/"
-FORMULIEREN_API_ROOT = "https://esuite.local.net/formulieren-provider/api/v1/"
+ZAAK_SERVICE_API_ROOT = "https://openzaak.local/zaken/api/v1/"
+CATALOGI_SERVICE_API_ROOT = "https://openzaak.local/catalogi/api/v1/"
+DOCUMENTEN_SERVICE_API_ROOT = "https://openzaak.local/documenten/api/v1/"
+FORM_SERVICE_API_ROOT = "https://esuite.local.net/formulieren-provider/api/v1/"
 
 
 @override_settings(
     OIP_ORGANIZATION="Maykin",
-    ZGW_CONFIG_ZAKEN_API_ROOT=ZAKEN_API_ROOT,
-    ZGW_CONFIG_ZAKEN_API_CLIENT_ID="open-inwoner-test",
-    ZGW_CONFIG_ZAKEN_API_SECRET="zaken-secret",
-    ZGW_CONFIG_CATALOGI_API_ROOT=CATALOGI_API_ROOT,
-    ZGW_CONFIG_CATALOGI_API_CLIENT_ID="open-inwoner-test",
-    ZGW_CONFIG_CATALOGI_API_SECRET="catalogi-secret",
-    ZGW_CONFIG_DOCUMENTEN_API_ROOT=DOCUMENTEN_API_ROOT,
-    ZGW_CONFIG_DOCUMENTEN_API_CLIENT_ID="open-inwoner-test",
-    ZGW_CONFIG_DOCUMENTEN_API_SECRET="documenten-secret",
-    ZGW_CONFIG_FORMULIEREN_API_ROOT=FORMULIEREN_API_ROOT,
-    ZGW_CONFIG_FORMULIEREN_API_CLIENT_ID="open-inwoner-test",
-    ZGW_CONFIG_FORMULIEREN_API_SECRET="forms-secret",
-    ZGW_CONFIG_ZAAK_MAX_CONFIDENTIALITY=VertrouwelijkheidsAanduidingen.vertrouwelijk,
-    ZGW_CONFIG_DOCUMENT_MAX_CONFIDENTIALITY=VertrouwelijkheidsAanduidingen.zaakvertrouwelijk,
-    ZGW_CONFIG_ACTION_REQUIRED_DEADLINE_DAYS=12,
-    ZGW_CONFIG_ALLOWED_FILE_EXTENSIONS=[".pdf", ".txt"],
-    ZGW_CONFIG_MIJN_AANVRAGEN_TITLE_TEXT="title text",
-    ZGW_CONFIG_ENABLE_CATEGORIES_FILTERING_WITH_ZAKEN=True,
-    ZGW_CONFIG_SKIP_NOTIFICATION_STATUSTYPE_INFORMEREN=True,
-    ZGW_CONFIG_REFORMAT_ESUITE_ZAAK_IDENTIFICATIE=True,
-    ZGW_CONFIG_FETCH_EHERKENNING_ZAKEN_WITH_RSIN=True,
+    ZGW_ZAAK_SERVICE_API_ROOT=ZAAK_SERVICE_API_ROOT,
+    ZGW_ZAAK_SERVICE_API_CLIENT_ID="open-inwoner-test",
+    ZGW_ZAAK_SERVICE_API_SECRET="zaken-secret",
+    ZGW_CATALOGI_SERVICE_API_ROOT=CATALOGI_SERVICE_API_ROOT,
+    ZGW_CATALOGI_SERVICE_API_CLIENT_ID="open-inwoner-test",
+    ZGW_CATALOGI_SERVICE_API_SECRET="catalogi-secret",
+    ZGW_DOCUMENTEN_SERVICE_API_ROOT=DOCUMENTEN_SERVICE_API_ROOT,
+    ZGW_DOCUMENTEN_SERVICE_API_CLIENT_ID="open-inwoner-test",
+    ZGW_DOCUMENTEN_SERVICE_API_SECRET="documenten-secret",
+    ZGW_FORM_SERVICE_API_ROOT=FORM_SERVICE_API_ROOT,
+    ZGW_FORM_SERVICE_API_CLIENT_ID="open-inwoner-test",
+    ZGW_FORM_SERVICE_API_SECRET="forms-secret",
+    ZGW_ZAAK_MAX_CONFIDENTIALITY=VertrouwelijkheidsAanduidingen.vertrouwelijk,
+    ZGW_DOCUMENT_MAX_CONFIDENTIALITY=VertrouwelijkheidsAanduidingen.zaakvertrouwelijk,
+    ZGW_ACTION_REQUIRED_DEADLINE_DAYS=12,
+    ZGW_ALLOWED_FILE_EXTENSIONS=[".pdf", ".txt"],
+    ZGW_MIJN_AANVRAGEN_TITLE_TEXT="title text",
+    ZGW_ENABLE_CATEGORIES_FILTERING_WITH_ZAKEN=True,
+    ZGW_SKIP_NOTIFICATION_STATUSTYPE_INFORMEREN=True,
+    ZGW_REFORMAT_ESUITE_ZAAK_IDENTIFICATIE=True,
+    ZGW_FETCH_EHERKENNING_ZAKEN_WITH_RSIN=True,
 )
 class ZGWConfigurationTests(TestCase):
     def test_configure(self):
@@ -65,16 +65,16 @@ class ZGWConfigurationTests(TestCase):
         document_service = config.document_service
         form_service = config.form_service
 
-        self.assertEqual(zaak_service.api_root, ZAKEN_API_ROOT)
+        self.assertEqual(zaak_service.api_root, ZAAK_SERVICE_API_ROOT)
         self.assertEqual(zaak_service.client_id, "open-inwoner-test")
         self.assertEqual(zaak_service.secret, "zaken-secret")
-        self.assertEqual(catalogi_service.api_root, CATALOGI_API_ROOT)
+        self.assertEqual(catalogi_service.api_root, CATALOGI_SERVICE_API_ROOT)
         self.assertEqual(catalogi_service.client_id, "open-inwoner-test")
         self.assertEqual(catalogi_service.secret, "catalogi-secret")
-        self.assertEqual(document_service.api_root, DOCUMENTEN_API_ROOT)
+        self.assertEqual(document_service.api_root, DOCUMENTEN_SERVICE_API_ROOT)
         self.assertEqual(document_service.client_id, "open-inwoner-test")
         self.assertEqual(document_service.secret, "documenten-secret")
-        self.assertEqual(form_service.api_root, FORMULIEREN_API_ROOT)
+        self.assertEqual(form_service.api_root, FORM_SERVICE_API_ROOT)
         self.assertEqual(form_service.client_id, "open-inwoner-test")
         self.assertEqual(form_service.secret, "forms-secret")
 
@@ -96,15 +96,15 @@ class ZGWConfigurationTests(TestCase):
 
     @override_settings(
         OIP_ORGANIZATION=None,
-        ZGW_CONFIG_ZAAK_MAX_CONFIDENTIALITY=None,
-        ZGW_CONFIG_DOCUMENT_MAX_CONFIDENTIALITY=None,
-        ZGW_CONFIG_ACTION_REQUIRED_DEADLINE_DAYS=None,
-        ZGW_CONFIG_ALLOWED_FILE_EXTENSIONS=None,
-        ZGW_CONFIG_MIJN_AANVRAGEN_TITLE_TEXT=None,
-        ZGW_CONFIG_ENABLE_CATEGORIES_FILTERING_WITH_ZAKEN=None,
-        ZGW_CONFIG_SKIP_NOTIFICATION_STATUSTYPE_INFORMEREN=None,
-        ZGW_CONFIG_REFORMAT_ESUITE_ZAAK_IDENTIFICATIE=None,
-        ZGW_CONFIG_FETCH_EHERKENNING_ZAKEN_WITH_RSIN=None,
+        ZGW_ZAAK_MAX_CONFIDENTIALITY=None,
+        ZGW_DOCUMENT_MAX_CONFIDENTIALITY=None,
+        ZGW_ACTION_REQUIRED_DEADLINE_DAYS=None,
+        ZGW_ALLOWED_FILE_EXTENSIONS=None,
+        ZGW_MIJN_AANVRAGEN_TITLE_TEXT=None,
+        ZGW_ENABLE_CATEGORIES_FILTERING_WITH_ZAKEN=None,
+        ZGW_SKIP_NOTIFICATION_STATUSTYPE_INFORMEREN=None,
+        ZGW_REFORMAT_ESUITE_ZAAK_IDENTIFICATIE=None,
+        ZGW_FETCH_EHERKENNING_ZAKEN_WITH_RSIN=None,
     )
     def test_configure_use_defaults(self):
         ZakenAPIConfigurationStep().configure()
@@ -121,16 +121,16 @@ class ZGWConfigurationTests(TestCase):
         document_service = config.document_service
         form_service = config.form_service
 
-        self.assertEqual(zaak_service.api_root, ZAKEN_API_ROOT)
+        self.assertEqual(zaak_service.api_root, ZAAK_SERVICE_API_ROOT)
         self.assertEqual(zaak_service.client_id, "open-inwoner-test")
         self.assertEqual(zaak_service.secret, "zaken-secret")
-        self.assertEqual(catalogi_service.api_root, CATALOGI_API_ROOT)
+        self.assertEqual(catalogi_service.api_root, CATALOGI_SERVICE_API_ROOT)
         self.assertEqual(catalogi_service.client_id, "open-inwoner-test")
         self.assertEqual(catalogi_service.secret, "catalogi-secret")
-        self.assertEqual(document_service.api_root, DOCUMENTEN_API_ROOT)
+        self.assertEqual(document_service.api_root, DOCUMENTEN_SERVICE_API_ROOT)
         self.assertEqual(document_service.client_id, "open-inwoner-test")
         self.assertEqual(document_service.secret, "documenten-secret")
-        self.assertEqual(form_service.api_root, FORMULIEREN_API_ROOT)
+        self.assertEqual(form_service.api_root, FORM_SERVICE_API_ROOT)
         self.assertEqual(form_service.client_id, "open-inwoner-test")
         self.assertEqual(form_service.secret, "forms-secret")
 
@@ -164,11 +164,11 @@ class ZGWConfigurationTests(TestCase):
 
         configuration.configure()
 
-        m.get(f"{ZAKEN_API_ROOT}statussen", json=[])
-        m.get(f"{CATALOGI_API_ROOT}zaaktypen", json=[])
-        m.get(f"{DOCUMENTEN_API_ROOT}objectinformatieobjecten", json=[])
+        m.get(f"{ZAAK_SERVICE_API_ROOT}statussen", json=[])
+        m.get(f"{CATALOGI_SERVICE_API_ROOT}zaaktypen", json=[])
+        m.get(f"{DOCUMENTEN_SERVICE_API_ROOT}objectinformatieobjecten", json=[])
         m.get(
-            f"{FORMULIEREN_API_ROOT}openstaande-inzendingen",
+            f"{FORM_SERVICE_API_ROOT}openstaande-inzendingen",
             json=[],
         )
 
@@ -181,14 +181,14 @@ class ZGWConfigurationTests(TestCase):
             inzendingen_request,
         ) = m.request_history
 
-        self.assertEqual(status_request.url, f"{ZAKEN_API_ROOT}statussen")
-        self.assertEqual(zaaktype_request.url, f"{CATALOGI_API_ROOT}zaaktypen")
+        self.assertEqual(status_request.url, f"{ZAAK_SERVICE_API_ROOT}statussen")
+        self.assertEqual(zaaktype_request.url, f"{CATALOGI_SERVICE_API_ROOT}zaaktypen")
         self.assertEqual(
-            oio_request.url, f"{DOCUMENTEN_API_ROOT}objectinformatieobjecten"
+            oio_request.url, f"{DOCUMENTEN_SERVICE_API_ROOT}objectinformatieobjecten"
         )
         self.assertEqual(
             inzendingen_request.url,
-            f"{FORMULIEREN_API_ROOT}openstaande-inzendingen?bsn=000000000",
+            f"{FORM_SERVICE_API_ROOT}openstaande-inzendingen?bsn=000000000",
         )
 
     @requests_mock.Mocker()
@@ -210,7 +210,7 @@ class ZGWConfigurationTests(TestCase):
         )
         for mock_config in mock_kwargs:
             with self.subTest(mock=mock_config):
-                m.get(f"{ZAKEN_API_ROOT}statussen", **mock_config)
+                m.get(f"{ZAAK_SERVICE_API_ROOT}statussen", **mock_config)
 
                 with self.assertRaises(SelfTestFailed):
                     configuration.test_configuration()

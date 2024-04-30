@@ -5,6 +5,15 @@
 Settings Overview
 =================
 
+Enable/Disable configuration:
+"""""""""""""""""""""""""""""
+
+::
+
+    {% spaceless %}
+    {{ enable_settings }}
+    {% endspaceless %}
+
 Required:
 """""""""
 
@@ -15,7 +24,6 @@ Required:
     {% endfor %}
     {% endspaceless %}
 
-
 All settings:
 """""""""""""
 
@@ -25,7 +33,6 @@ All settings:
     {% for setting in all_settings %}{{ setting }}
     {% endfor %}
     {% endspaceless %}
-
 
 Detailed Information
 ====================

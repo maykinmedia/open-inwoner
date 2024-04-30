@@ -64,6 +64,12 @@ Supported configurations
 
 `ZGW configuration <./zgw.rst>`_
 
+`Admin OIDC configuration <./admin_oidc.rst>`_
+
 `DigiD OIDC configuration <./digid_oidc.rst>`_
 
+`DigiD SAML configuration <./digid_saml.rst>`_
+
 `eHerkenning OIDC configuration <./eherkenning_oidc.rst>`_
+
+`eHerkenning SAML configuration <./eherkenning_saml.rst>`_

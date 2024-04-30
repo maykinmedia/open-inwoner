@@ -7,6 +7,13 @@ DigiD SAML Configuration
 Settings Overview
 =================
 
+Enable/Disable configuration:
+"""""""""""""""""""""""""""""
+
+::
+
+    DIGID_CONFIG_ENABLE
+
 Required:
 """""""""
 
@@ -21,7 +28,6 @@ Required:
     DIGID_SERVICE_DESCRIPTION
     DIGID_SERVICE_NAME
 
-
 All settings:
 """""""""""""
 
@@ -35,7 +41,6 @@ All settings:
     DIGID_CERTIFICATE_PUBLIC_CERTIFICATE
     DIGID_CERTIFICATE_TYPE
     DIGID_DIGEST_ALGORITHM
-    DIGID_ENABLE
     DIGID_ENTITY_ID
     DIGID_IDP_METADATA_FILE
     DIGID_IDP_SERVICE_ENTITY_ID
@@ -52,7 +57,6 @@ All settings:
     DIGID_TECHNICAL_CONTACT_PERSON_TELEPHONE
     DIGID_WANT_ASSERTIONS_ENCRYPTED
     DIGID_WANT_ASSERTIONS_SIGNED
-
 
 Detailed Information
 ====================

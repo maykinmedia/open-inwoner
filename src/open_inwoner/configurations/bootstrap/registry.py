@@ -5,13 +5,12 @@ from .auth import (
     AdminOIDCConfigurationSettings,
     DigiDOIDCConfigurationSettings,
     DigiDSAMLConfigurationSettings,
-    eHerkenningSAMLConfigurationSettings,
     eHerkenningOIDCConfigurationSettings,
+    eHerkenningSAMLConfigurationSettings,
 )
 from .kic import KICConfigurationSettings
 from .siteconfig import SiteConfigurationSettings
 from .zgw import ZGWConfigurationSettings
-
 
 ConfigSetting: TypeAlias = (
     SiteConfigurationSettings
@@ -19,6 +18,7 @@ ConfigSetting: TypeAlias = (
     | ZGWConfigurationSettings
     | AdminOIDCConfigurationSettings
     | DigiDOIDCConfigurationSettings
+    | DigiDSAMLConfigurationSettings
     | eHerkenningOIDCConfigurationSettings
     | eHerkenningSAMLConfigurationSettings
 )

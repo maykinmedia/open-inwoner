@@ -10,7 +10,7 @@ from django.db.models.fields.related import ForeignKey, OneToOneField
 from .choices import BasicFieldDescription
 
 
-@dataclass(frozen=True, eq=True)
+@dataclass(frozen=True, slots=True)
 class ConfigField:
     name: str
     verbose_name: str
@@ -92,7 +92,11 @@ class ConfigSettingsBase:
             case _:
                 return "No information available"
 
-    def get_model_fields(self, model) -> Iterator[models.Field]:
+    def get_concrete_model_fields(self, model) -> Iterator[models.Field]:
+        """
+        Get all concrete fields for a given `model`, skipping over backreferences like
+        `OneToOneRel` and fields that are blacklisted
+        """
         return (
             field
             for field in model._meta.concrete_fields
@@ -108,14 +112,14 @@ class ConfigSettingsBase:
         relating_field: models.Field | None = None,
     ) -> None:
         """
-        Create a `ConfigField` instance for each field of the provided `model` and
-        add it to `all_fields` and `required_fields`
+        Create a `ConfigField` instance for each field of the given `model` and
+        add it to `self.fields.all` and `self.fields.required`
 
-        Basic fields provided the base case, relations (`ForeignKey`, `OneToOneField`)
-        are handled recursively
+        Basic fields (`CharField`, `IntegerField` etc) constitute the base case,
+        relations (`ForeignKey`, `OneToOneField`) are handled recursively
         """
 
-        model_fields = self.get_model_fields(model)
+        model_fields = self.get_concrete_model_fields(model)
 
         for model_field in model_fields:
             if isinstance(model_field, (ForeignKey, OneToOneField)):
