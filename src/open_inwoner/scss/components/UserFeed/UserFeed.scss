@@ -70,13 +70,49 @@
   .card {
     justify-content: flex-start;
 
-    .userfeed-card__heading {
+    &__body {
+      gap: 0;
+      padding: 0;
+
+      // Start meaningful order for accessibility
+      .userfeed__title {
+        order: 2;
+      }
+
+      .card__header {
+        order: 1;
+      }
+
+      .userfeed-card__description {
+        order: 3;
+      }
+
+      .button {
+        order: 4;
+      }
+      // End of meaningful order
+
+      .userfeed__title {
+        color: var(--color-gray-dark);
+        font-family: var(--font-family-body);
+        font-size: var(--font-size-body-small);
+        font-weight: normal;
+        overflow-wrap: break-word;
+        word-break: normal;
+        padding: var(--font-size-body-small) var(--card-spacing) 0
+          var(--card-spacing);
+        margin: 0;
+      }
+    }
+
+    .userfeed-card__description {
       color: var(--font-color-heading);
       font-family: var(--font-family-heading);
       font-size: var(--font-size-body);
       line-height: var(--font-line-height-body);
       margin: 0;
-      padding: var(--spacing-large) var(--spacing-extra-large) 0 0;
+      padding: var(--spacing-medium) var(--row-height-big) var(--card-spacing)
+        var(--card-spacing);
     }
   }
 
