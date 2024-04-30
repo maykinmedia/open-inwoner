@@ -16,10 +16,13 @@
     {# Tab panels Start #}
     <div class="tab--container login-tab--container">
         <div class="tabs">
+        {# If Zakelijk is disabled, hide tab navigation #}
+        {% if eherkenning_enabled %}
             <ul role="tablist" class="list tabs__headers">
                 <li class="list-item tab__header--item"><a href="{% url 'login' %}#particulier" role="tab" aria-selected="true" aria-controls="particulier" class="link tab__header" data-panel="particulier-tab" id="particulier_tab">Particulier</a></li>
                 <li class="list-item tab__header--item"><a href="{% url 'login' %}#zakelijk" role="tab" aria-selected="false" aria-controls="zakelijk" class="link tab__header" data-panel="zakelijk-tab" id="zakelijk_tab">Zakelijk</a></li>
             </ul>
+        {% endif %}
 
             {# Panel 1 #}
             <div class="tabs__body">
