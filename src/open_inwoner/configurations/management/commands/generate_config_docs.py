@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 
 from django.conf import settings
@@ -15,14 +14,12 @@ TEMPLATE_PATH = Path("configurations/config_doc.rst")
 TARGET_DIR = Path(settings.BASE_DIR) / "docs" / "configuration"
 
 
-class Command(BaseCommand):
-    help = "Create docs for configuration setup steps"
-
-    def add_arguments(self, parser):
-        parser.add_argument("config_option", nargs="?")
-
-    def get_config(self, config_option: str) -> ConfigSetting:
+class ConfigDocBaseCommand(BaseCommand):
+    def get_config(self, config_option: str, class_name_only=False) -> ConfigSetting:
         config_model = getattr(ConfigurationRegistry, config_option, None)
+        if class_name_only:
+            return config_model.__name__
+
         config_instance = config_model()
         return config_instance
 
@@ -45,19 +42,7 @@ class Command(BaseCommand):
         display_name_formatted = f"{heading_bar}\n{display_name}\n{heading_bar}"
         return display_name_formatted
 
-    def write_file_from_template(
-        self,
-        template_path: os.PathLike,
-        template_variables: dict[str, list],
-        output_path: os.PathLike,
-    ):
-        template = loader.get_template(template_path)
-        rendered = template.render(template_variables)
-
-        with open(output_path, "w") as output:
-            output.write(rendered)
-
-    def generate_single_doc(self, config_option: str) -> None:
+    def render_doc(self, config_option: str) -> None:
         config = self.get_config(config_option)
 
         required_settings = [
@@ -81,10 +66,26 @@ class Command(BaseCommand):
             "link": f".. _{config_option}:",
             "title": self.format_display_name(config.display_name),
         }
-        template_path = TEMPLATE_PATH
+
+        template = loader.get_template(TEMPLATE_PATH)
+        rendered = template.render(template_variables)
+
+        return rendered
+
+
+class Command(ConfigDocBaseCommand):
+    help = "Create docs for configuration setup steps"
+
+    def add_arguments(self, parser):
+        parser.add_argument("config_option", nargs="?")
+
+    def write_doc(self, config_option: str) -> None:
+        rendered = self.render_doc(config_option)
+
         output_path = TARGET_DIR / f"{config_option}.rst"
 
-        self.write_file_from_template(template_path, template_variables, output_path)
+        with open(output_path, "w") as output:
+            output.write(rendered)
 
     def handle(self, *args, **kwargs) -> None:
         config_option = kwargs["config_option"]
@@ -94,7 +95,7 @@ class Command(BaseCommand):
             self.stdout.write(f"Supported: {', '.join(SUPPORTED_OPTIONS)}")
             return
         elif config_option:
-            self.generate_single_doc(config_option)
+            self.write_doc(config_option)
         else:
             for option in SUPPORTED_OPTIONS:
-                self.generate_single_doc(option)
+                self.write_doc(option)
