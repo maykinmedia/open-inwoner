@@ -493,7 +493,7 @@ class ZaakTypeResultaatTypeConfig(models.Model):
     )
     omschrijving = models.CharField(
         verbose_name=_("Omschrijving"),
-        max_length=20,
+        max_length=200,
     )
     zaaktype_uuids = ArrayField(
         models.UUIDField(
