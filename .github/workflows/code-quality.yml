@@ -128,6 +128,45 @@ jobs:
           DB_USER: postgres
           DB_PASSWORD: ''
 
+  config-docs:
+    name: Check that changes to configuration setup classes are reflected in the docs
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:12
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        # Needed because the postgres container does not provide a healthcheck
+        options:
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: 'true'
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install system packages
+        run: |
+          sudo apt-get update \
+          && sudo apt-get install -y --no-install-recommends \
+            libgdal-dev \
+            gdal-bin
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxml2-dev libxmlsec1-dev libxmlsec1-openssl
+          pip install -r requirements/ci.txt
+      - name: Run manage.py check_config_docs
+        run: |
+          src/manage.py check_config_docs
+        env:
+          DJANGO_SETTINGS_MODULE: open_inwoner.conf.ci
+
   prettier:
     name: Check code formatting with prettier
     runs-on: ubuntu-latest

@@ -11,7 +11,7 @@ SOURCE_DIR = Path(settings.BASE_DIR) / "docs" / "configuration"
 
 
 class Command(ConfigDocBaseCommand):
-    help = "Check that changes to the configuration setup classes are reflected in the documentation"
+    help = "Check that changes to configuration setup classes are reflected in the docs"
 
     def check_doc(self, config_option: str) -> None:
         source_path = SOURCE_DIR / f"{config_option}.rst"
@@ -19,10 +19,10 @@ class Command(ConfigDocBaseCommand):
         try:
             with open(source_path, "r") as file:
                 config_content = file.read()
-        except FileNotFoundError:
-            self.stdout.write(
-                "No documentation was found for {config}\n"
-                "Did you forget to run generate_config_docs?\n\n".format(
+        except FileNotFoundError as exc:
+            exc.add_note(
+                "\nNo documentation was found for {config}\n"
+                "Did you forget to run generate_config_docs?\n".format(
                     config=self.get_config(config_option, class_name_only=True)
                 )
             )
@@ -32,14 +32,13 @@ class Command(ConfigDocBaseCommand):
             rendered_content = self.render_doc(config_option)
 
             if rendered_content != config_content:
-                self.stdout.write(
-                    "Class {config} has changes which are not reflected in the documentation ({source_path})\n"
-                    "Did you forget to run generate_config_docs?\n\n".format(
+                raise ValueError(
+                    "Class {config} has changes which are not reflected in the documentation ({source_path}). "
+                    "Did you forget to run generate_config_docs?\n".format(
                         config=self.get_config(config_option, class_name_only=True),
-                        source_path=source_path,
+                        source_path=f"docs/configuration/{config_option}.rst",
                     )
                 )
-                raise ValueError("check_config_docs failed")
 
     def handle(self, *args, **kwargs) -> None:
         for option in SUPPORTED_OPTIONS:

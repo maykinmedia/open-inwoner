@@ -15,7 +15,7 @@ class SiteConfigurationSettings(ConfigSettingsBase):
         "name",
         "primary_color",
         "secondary_color",
-        # "accent_color",
+        "accent_color",
     )
     excluded_fields = (
         "id",
