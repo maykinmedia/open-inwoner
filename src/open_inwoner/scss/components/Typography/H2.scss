@@ -55,10 +55,12 @@
 .card + .h2,
 .dashboard + .h2,
 .status-list + .h2,
-.table + .h2 {
+.table + .h2,
+.table + .utrecht-heading-2 {
   margin-top: var(--row-height);
 }
 
-.p + .h2 {
+.p + .h2,
+.utrecht-heading-2 + .h2 {
   margin-top: var(--spacing-large);
 }
