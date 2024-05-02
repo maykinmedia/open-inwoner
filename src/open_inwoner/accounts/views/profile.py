@@ -103,6 +103,7 @@ class MyProfileView(
         context["anchors"] = [
             ("#personal-info", _("Persoonlijke gegevens")),
             ("#notifications", _("Voorkeuren voor meldingen")),
+            ("#newsletters", _("Nieuwsbrieven")),
             ("#overview", _("Overzicht")),
             ("#profile-remove", _("Profiel verwijderen")),
         ]
