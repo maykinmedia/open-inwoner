@@ -90,13 +90,13 @@ Detailed Information
     Variable            DIGID_CERTIFICATE_PRIVATE_KEY
     Setting             private key
     Description         The content of the private key
-    Possible values     No information available
+    Possible values     string represeting the (absolute) path to a file, including file extension: /absolute/path/to/file.xml
     Default value       No default
     
     Variable            DIGID_CERTIFICATE_PUBLIC_CERTIFICATE
     Setting             public certificate
     Description         The content of the certificate
-    Possible values     No information available
+    Possible values     string represeting the (absolute) path to a file, including file extension: /absolute/path/to/file.xml
     Default value       No default
     
     Variable            DIGID_CERTIFICATE_TYPE
@@ -120,7 +120,7 @@ Detailed Information
     Variable            DIGID_IDP_METADATA_FILE
     Setting             metadata identity provider
     Description         Het bestand met metadata van de identity provider. Deze wordt automatisch opgehaald via de ingestelde metadata-URL.
-    Possible values     No information available
+    Possible values     string represeting the (absolute) path to a file, including file extension: /absolute/path/to/file.xml
     Default value       No default
     
     Variable            DIGID_IDP_SERVICE_ENTITY_ID
@@ -156,7 +156,7 @@ Detailed Information
     Variable            DIGID_REQUESTED_ATTRIBUTES
     Setting             gewenste attributen
     Description         Een lijst van strings (of objecten) met de gewenste attributen, bijvoorbeeld '["bsn"]'
-    Possible values     No information available
+    Possible values     Mapping: {'some_key': 'Some value'}
     Default value       {'name': 'bsn', 'required': True}
     
     Variable            DIGID_SERVICE_DESCRIPTION

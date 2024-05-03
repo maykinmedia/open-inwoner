@@ -58,7 +58,7 @@ Detailed Information
     Variable            ADMIN_OIDC_CLAIM_MAPPING
     Setting             claim mapping
     Description         Mapping from user-model fields to OIDC claims
-    Possible values     No information available
+    Possible values     Mapping: {'some_key': 'Some value'}
     Default value       {'email': 'email', 'first_name': 'given_name', 'last_name': 'family_name'}
     
     Variable            ADMIN_OIDC_GROUPS_CLAIM

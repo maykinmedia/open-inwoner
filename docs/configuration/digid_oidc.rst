@@ -62,7 +62,7 @@ Detailed Information
     Variable            DIGID_OIDC_ERROR_MESSAGE_MAPPING
     Setting             Error message mapping
     Description         Mapping that maps error messages returned by the identity provider to human readable error messages that are shown to the user
-    Possible values     No information available
+    Possible values     Mapping: {'some_key': 'Some value'}
     Default value       {}
     
     Variable            DIGID_OIDC_IDENTIFIER_CLAIM_NAME

@@ -97,13 +97,13 @@ Detailed Information
     Variable            EHERKENNING_CERTIFICATE_PRIVATE_KEY
     Setting             private key
     Description         The content of the private key
-    Possible values     No information available
+    Possible values     string represeting the (absolute) path to a file, including file extension: /absolute/path/to/file.xml
     Default value       No default
     
     Variable            EHERKENNING_CERTIFICATE_PUBLIC_CERTIFICATE
     Setting             public certificate
     Description         The content of the certificate
-    Possible values     No information available
+    Possible values     string represeting the (absolute) path to a file, including file extension: /absolute/path/to/file.xml
     Default value       No default
     
     Variable            EHERKENNING_CERTIFICATE_TYPE
@@ -133,7 +133,7 @@ Detailed Information
     Variable            EHERKENNING_EH_REQUESTED_ATTRIBUTES
     Setting             gewenste attributen
     Description         Een lijst van extra gewenste attributen. Eén enkel gewenst attribuut kan een string (de naam van het attribuut) zijn of een object met de sleutels 'name' en 'required', waarbij 'name' een string is en 'required' een boolean.
-    Possible values     No information available
+    Possible values     Mapping: {'some_key': 'Some value'}
     Default value       {'name': 'urn:etoegang:1.11:attribute-represented:CompanyName', 'required': True, 'purpose_statements': {'en': 'For testing purposes.', 'nl': 'Voor testdoeleinden.'}}
     
     Variable            EHERKENNING_EH_SERVICE_INSTANCE_UUID
@@ -163,7 +163,7 @@ Detailed Information
     Variable            EHERKENNING_EIDAS_REQUESTED_ATTRIBUTES
     Setting             gewenste attributen
     Description         Een lijst van extra gewenste attributen. Eén enkel gewenst attribuut kan een string (de naam van het attribuut) zijn of een object met de sleutels 'name' en 'required', waarbij 'name' een string is en 'required' een boolean.
-    Possible values     No information available
+    Possible values     Mapping: {'some_key': 'Some value'}
     Default value       {'name': 'urn:etoegang:1.9:attribute:FirstName', 'required': True, 'purpose_statements': {'en': 'For testing purposes.', 'nl': 'Voor testdoeleinden.'}}, {'name': 'urn:etoegang:1.9:attribute:FamilyName', 'required': True, 'purpose_statements': {'en': 'For testing purposes.', 'nl': 'Voor testdoeleinden.'}}, {'name': 'urn:etoegang:1.9:attribute:DateOfBirth', 'required': True, 'purpose_statements': {'en': 'For testing purposes.', 'nl': 'Voor testdoeleinden.'}}, {'name': 'urn:etoegang:1.11:attribute-represented:CompanyName', 'required': True, 'purpose_statements': {'en': 'For testing purposes.', 'nl': 'Voor testdoeleinden.'}}
     
     Variable            EHERKENNING_EIDAS_SERVICE_INSTANCE_UUID
