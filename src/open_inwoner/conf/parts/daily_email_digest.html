@@ -1,22 +1,52 @@
-<p>Beste</p>
-<p>Het is niet gelukt om de onderstaande emails af te leveren op {{ date }}</p>
-
-<table>
-    {% for failed_email in failed_emails %}
-        <tr>
-            <th>Onderwerp</th>
-            <td>{{ failed_email.subject }}</td>
-        </tr>
-        <tr>
-            <th>Ontvanger</th>
-            <td>{{ failed_email.recipient }}</td>
-        </tr>
-        <tr>
-            <th>Datum</th>
-            <td>{{ failed_email.date }}</td>
-        </tr>
-    {% endfor %}
+<table role="presentation" border="0" cellspacing="0" cellpadding="0" width="100%" class="table-mail">
+    <tbody>
+    <tr>
+        <td class="td-mail td__padding-all" colspan="6">
+            <p>Het is niet gelukt om de onderstaande emails af te leveren op {{ date }}.</p>
+            <p>&nbsp;</p>
+            <table width="598" class="table-mail--lined">
+                <tbody>
+                {% for failed_email in failed_emails %}
+                    <tr>
+                        <th class="border-top--bold">Onderwerp:</th>
+                        <td class="border-top--bold">{{ failed_email.subject }}</td>
+                    </tr>
+                    <tr>
+                        <th>Ontvanger:</th>
+                        <td>{{ failed_email.recipient }}</td>
+                    </tr>
+                    <tr>
+                        <th>Datum:</th>
+                        <td>{{ failed_email.date }}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td class="spacing__extra" colspan="6">
+            &nbsp;
+        </td>
+    </tr>
+    <tr>
+        <td class="td-mail td__padding-all" colspan="6">
+            <p>Met vriendelijke groet,</p>
+            <p>&nbsp;</p>
+            <p>{{ site_name }}</p>
+        </td>
+    </tr>
+    <tr class="tr-mail">
+        <td class="td-mail spacer-bottom td__padding-zero" colspan="6">
+            <!-- <hr> styling -->
+        </td>
+    </tr>
+    <tr>
+        <td class="td-mail td__padding-top td__padding-right td__padding-left" colspan="6">
+            <p>Dit bericht is automatisch verzonden. U kunt <strong>niet reageren</strong> op deze e-mail. </p>
+            <p>&nbsp;</p>
+        </td>
+    </tr>
+    </tbody>
 </table>
-
-<p>Met vriendelijke groet,</p>
-<p>{{ site_name }}</p>

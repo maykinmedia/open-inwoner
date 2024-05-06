@@ -250,6 +250,16 @@ strong .color--primary, strong .color--secondary {
     padding: 8px;
 }
 
+/* Specific nested tables */
+
+.table-mail--lined td.border-bottom--zero {
+    border-bottom: 0px solid transparent;
+}
+
+.table-mail--lined th.border-top--bold, .table-mail--lined td.border-top--bold {
+    border-top: 3px solid #999999;
+}
+
 /* CKEditor only */
 
 .cke_editable a {

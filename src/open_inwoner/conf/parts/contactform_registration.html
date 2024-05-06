@@ -1,29 +1,63 @@
-<p>Beste</p>
-
-<table>
+<table role="presentation" border="0" cellspacing="0" cellpadding="0" width="100%" class="table-mail">
+    <tbody>
     <tr>
-        <th>Onderwerp:</th>
-        <td>{{ subject }}</td>
+        <td class="td-mail td__padding-all" colspan="6">
+            <p>Er is een Contact formulier inzending binnengekomen vanaf {{ site_name }}:</p>
+            <p>&nbsp;</p>
+            <table width="598" class="table-mail--lined">
+                <tbody>
+                <tr>
+                    <th>Onderwerp:</th>
+                    <td>{{ subject }}</td>
+                </tr>
+                <tr>
+                    <th>Naam:</th>
+                    <td>{{ name }}</td>
+                </tr>
+                <tr>
+                    <th>Email:</th>
+                    <td>{{ email }}</td>
+                </tr>
+                <tr>
+                    <th>Telefoonnummer:</th>
+                    <td class="border-bottom--zero">{{ phonenumber }}</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Vraag:</th>
+                </tr>
+                <tr>
+                    <td colspan="2">{{ question }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </td>
     </tr>
     <tr>
-        <th>Naam:</th>
-        <td>{{ name }}</td>
+        <td class="spacing__extra" colspan="6">
+            &nbsp;
+        </td>
     </tr>
     <tr>
-        <th>Email:</th>
-        <td>{{ email }}</td>
+        <td class="td-mail td__padding-all" colspan="6">
+            <p>Met vriendelijke groet,</p>
+            <p>&nbsp;</p>
+            <p>{{ site_name }}</p>
+        </td>
+    </tr>
+    <tr class="tr-mail">
+        <td class="td-mail spacer-bottom td__padding-zero" colspan="6">
+            <!-- <hr> styling -->
+        </td>
     </tr>
     <tr>
-        <th>Telefoonnummer:</th>
-        <td>{{ phonenumber }}</td>
+        <td class="td-mail td__padding-top td__padding-right td__padding-left" colspan="6">
+            <p>Dit bericht is automatisch verzonden. U kunt <strong>niet reageren</strong> op deze e-mail. </p>
+            <p>&nbsp;</p>
+        </td>
     </tr>
     <tr>
-        <th colspan="2">Vraag:</th>
+        <td class="td--responsive td-mail td__padding-all" colspan="2"><p><a href="{{ contact_page }}">Ga naar de contactpagina</a></p>
+        </td>
     </tr>
-    <tr>
-        <td colspan="2">{{ question }}</td>
-    </tr>
+    </tbody>
 </table>
-
-<p>Met vriendelijke groet,</p>
-<p>{{ site_name }}</p>
