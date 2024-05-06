@@ -79,8 +79,13 @@ celery==5.2.7
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   celery-once
     #   django-celery-beat
     #   notifications-api-common
+celery-once==3.0.1
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
 certifi==2023.11.17
     # via
     #   -c requirements/base.txt
@@ -929,6 +934,7 @@ redis==5.0.3
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   celery-once
     #   django-redis
 reportlab==3.6.13
     # via

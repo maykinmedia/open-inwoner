@@ -86,7 +86,7 @@ django-sessionprofile
 
 # Workers
 celery ~= 5.0
-# celery-once
+celery-once
 django-celery-beat
 
 # Common Ground integration

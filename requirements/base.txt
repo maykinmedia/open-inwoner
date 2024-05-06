@@ -35,8 +35,11 @@ cbor2==5.6.2
 celery==5.2.7
     # via
     #   -r requirements/base.in
+    #   celery-once
     #   django-celery-beat
     #   notifications-api-common
+celery-once==3.0.1
+    # via -r requirements/base.in
 certifi==2023.11.17
     # via
     #   django-simple-certmanager
@@ -480,7 +483,9 @@ pyyaml==6.0
 qrcode==6.1
     # via django-two-factor-auth
 redis==5.0.3
-    # via django-redis
+    # via
+    #   celery-once
+    #   django-redis
 reportlab==3.6.13
     # via
     #   easy-thumbnails
