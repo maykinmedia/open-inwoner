@@ -1,11 +1,12 @@
 .. _zgw:
 
-=================
-ZGW Configuration
-=================
+======================
+ZGW APIs configuration
+======================
 
 Settings Overview
 =================
+
 
 Enable/Disable configuration:
 """""""""""""""""""""""""""""
@@ -13,6 +14,8 @@ Enable/Disable configuration:
 ::
 
     ZGW_CONFIG_ENABLE
+
+
 
 Required:
 """""""""
@@ -31,6 +34,7 @@ Required:
     ZGW_ZAAK_SERVICE_API_ROOT
     ZGW_ZAAK_SERVICE_CLIENT_ID
     ZGW_ZAAK_SERVICE_SECRET
+
 
 All settings:
 """""""""""""

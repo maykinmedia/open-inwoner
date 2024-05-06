@@ -1,11 +1,12 @@
 .. _kic:
 
-=====================
-Klanten Configuration
-=====================
+==================================
+Klantinteractie APIs configuration
+==================================
 
 Settings Overview
 =================
+
 
 Enable/Disable configuration:
 """""""""""""""""""""""""""""
@@ -13,6 +14,8 @@ Enable/Disable configuration:
 ::
 
     KIC_CONFIG_ENABLE
+
+
 
 Required:
 """""""""
@@ -27,6 +30,7 @@ Required:
     KIC_KLANTEN_SERVICE_SECRET
     KIC_REGISTER_CONTACT_MOMENT
     KIC_REGISTER_TYPE
+
 
 All settings:
 """""""""""""
@@ -109,7 +113,7 @@ Detailed Information
     Variable            KIC_REGISTER_EMAIL
     Setting             Registreer op email adres
     Description         No description
-    Possible values     string
+    Possible values     string representing an Email address (foo@bar.com)
     Default value       No default
     
     Variable            KIC_REGISTER_EMPLOYEE_ID

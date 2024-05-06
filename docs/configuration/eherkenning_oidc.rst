@@ -1,11 +1,12 @@
 .. _eherkenning_oidc:
 
-==============================
-eHerkenning OIDC Configuration
-==============================
+================================================
+Configuration for eHerkenning via OpenID Connect
+================================================
 
 Settings Overview
 =================
+
 
 Enable/Disable configuration:
 """""""""""""""""""""""""""""
@@ -14,6 +15,8 @@ Enable/Disable configuration:
 
     EHERKENNING_OIDC_CONFIG_ENABLE
 
+
+
 Required:
 """""""""
 
@@ -21,6 +24,7 @@ Required:
 
     EHERKENNING_OIDC_OIDC_RP_CLIENT_ID
     EHERKENNING_OIDC_OIDC_RP_CLIENT_SECRET
+
 
 All settings:
 """""""""""""
@@ -92,37 +96,37 @@ Detailed Information
     Variable            EHERKENNING_OIDC_OIDC_OP_AUTHORIZATION_ENDPOINT
     Setting             Authorization endpoint
     Description         URL of your OpenID Connect provider authorization endpoint
-    Possible values     string
+    Possible values     string (URL)
     Default value       No default
     
     Variable            EHERKENNING_OIDC_OIDC_OP_DISCOVERY_ENDPOINT
     Setting             Discovery endpoint
     Description         URL of your OpenID Connect provider discovery endpoint ending with a slash (`.well-known/...` will be added automatically). If this is provided, the remaining endpoints can be omitted, as they will be derived from this endpoint.
-    Possible values     string
+    Possible values     string (URL)
     Default value       No default
     
     Variable            EHERKENNING_OIDC_OIDC_OP_JWKS_ENDPOINT
     Setting             JSON Web Key Set endpoint
     Description         URL of your OpenID Connect provider JSON Web Key Set endpoint. Required if `RS256` is used as signing algorithm.
-    Possible values     string
+    Possible values     string (URL)
     Default value       No default
     
     Variable            EHERKENNING_OIDC_OIDC_OP_LOGOUT_ENDPOINT
     Setting             Logout endpoint
     Description         URL of your OpenID Connect provider logout endpoint
-    Possible values     string
+    Possible values     string (URL)
     Default value       No default
     
     Variable            EHERKENNING_OIDC_OIDC_OP_TOKEN_ENDPOINT
     Setting             Token endpoint
     Description         URL of your OpenID Connect provider token endpoint
-    Possible values     string
+    Possible values     string (URL)
     Default value       No default
     
     Variable            EHERKENNING_OIDC_OIDC_OP_USER_ENDPOINT
     Setting             User endpoint
     Description         URL of your OpenID Connect provider userinfo endpoint
-    Possible values     string
+    Possible values     string (URL)
     Default value       No default
     
     Variable            EHERKENNING_OIDC_OIDC_RP_CLIENT_ID

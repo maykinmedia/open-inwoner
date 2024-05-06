@@ -1,11 +1,12 @@
 .. _digid_saml:
 
-========================
-DigiD SAML Configuration
-========================
+================================
+Configuration for DigiD via SAML
+================================
 
 Settings Overview
 =================
+
 
 Enable/Disable configuration:
 """""""""""""""""""""""""""""
@@ -13,6 +14,8 @@ Enable/Disable configuration:
 ::
 
     DIGID_CONFIG_ENABLE
+
+
 
 Required:
 """""""""
@@ -28,6 +31,7 @@ Required:
     DIGID_SERVICE_DESCRIPTION
     DIGID_SERVICE_NAME
 
+
 All settings:
 """""""""""""
 
@@ -36,10 +40,7 @@ All settings:
     DIGID_ARTIFACT_RESOLVE_CONTENT_TYPE
     DIGID_ATTRIBUTE_CONSUMING_SERVICE_INDEX
     DIGID_BASE_URL
-    DIGID_CERTIFICATE_LABEL
-    DIGID_CERTIFICATE_PRIVATE_KEY
-    DIGID_CERTIFICATE_PUBLIC_CERTIFICATE
-    DIGID_CERTIFICATE_TYPE
+    DIGID_CERTIFICATE
     DIGID_DIGEST_ALGORITHM
     DIGID_ENTITY_ID
     DIGID_IDP_METADATA_FILE
@@ -78,31 +79,13 @@ Detailed Information
     Variable            DIGID_BASE_URL
     Setting             Basis-URL
     Description         De basis-URL van de applicatie, zonder slash op het eind.
-    Possible values     string
+    Possible values     string (URL)
     Default value       No default
     
-    Variable            DIGID_CERTIFICATE_LABEL
-    Setting             label
-    Description         Recognisable label for the certificate
-    Possible values     string
-    Default value       No default
-    
-    Variable            DIGID_CERTIFICATE_PRIVATE_KEY
-    Setting             private key
-    Description         The content of the private key
-    Possible values     string represeting the (absolute) path to a file, including file extension: /absolute/path/to/file.xml
-    Default value       No default
-    
-    Variable            DIGID_CERTIFICATE_PUBLIC_CERTIFICATE
-    Setting             public certificate
-    Description         The content of the certificate
-    Possible values     string represeting the (absolute) path to a file, including file extension: /absolute/path/to/file.xml
-    Default value       No default
-    
-    Variable            DIGID_CERTIFICATE_TYPE
-    Setting             type
-    Description         Is this only a certificate or is there an associated private key?
-    Possible values     key_pair, cert_only
+    Variable            DIGID_CERTIFICATE
+    Setting             sleutelpaar
+    Description         De private-key en publieke certificaat voor de authenticatie-flow.
+    Possible values     No information available
     Default value       No default
     
     Variable            DIGID_DIGEST_ALGORITHM
@@ -120,7 +103,7 @@ Detailed Information
     Variable            DIGID_IDP_METADATA_FILE
     Setting             metadata identity provider
     Description         Het bestand met metadata van de identity provider. Deze wordt automatisch opgehaald via de ingestelde metadata-URL.
-    Possible values     string represeting the (absolute) path to a file, including file extension: /absolute/path/to/file.xml
+    Possible values     No information available
     Default value       No default
     
     Variable            DIGID_IDP_SERVICE_ENTITY_ID
@@ -138,7 +121,7 @@ Detailed Information
     Variable            DIGID_METADATA_FILE_SOURCE
     Setting             (XML) metadata-URL
     Description         De URL waar het XML metadata-bestand kan gedownload worden.
-    Possible values     string
+    Possible values     string (URL)
     Default value       
     
     Variable            DIGID_ORGANIZATION_NAME
@@ -150,7 +133,7 @@ Detailed Information
     Variable            DIGID_ORGANIZATION_URL
     Setting             organisatie-URL
     Description         URL van de organisatie die de service aanbiedt waarvoor DigiD/eHerkenning/eIDAS-authenticatie ingericht is. Je moet ook de organisatienaam opgeven voor dit in de metadata beschikbaar is.
-    Possible values     string
+    Possible values     string (URL)
     Default value       No default
     
     Variable            DIGID_REQUESTED_ATTRIBUTES

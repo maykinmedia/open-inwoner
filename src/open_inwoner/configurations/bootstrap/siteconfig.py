@@ -1,33 +1,9 @@
 from django.conf import settings
 
+from django_setup_configuration.base import ConfigSettingsModel
 from django_setup_configuration.configuration import BaseConfigurationStep
 
 from open_inwoner.configurations.models import SiteConfiguration
-
-from .base import ConfigSettingsBase
-
-
-class SiteConfigurationSettings(ConfigSettingsBase):
-    model = SiteConfiguration
-    display_name = "General Configuration"
-    namespace = "SITE"
-    required_fields = (
-        "name",
-        "primary_color",
-        "secondary_color",
-        "accent_color",
-    )
-    excluded_fields = (
-        "id",
-        "email_logo",
-        "footer_logo",
-        "favicon",
-        "openid_connect_logo",
-        "extra_css",
-        "logo",
-        "hero_image_login",
-        "theme_stylesheet",
-    )
 
 
 class SiteConfigurationStep(BaseConfigurationStep):
@@ -36,14 +12,42 @@ class SiteConfigurationStep(BaseConfigurationStep):
     """
 
     verbose_name = "Site configuration"
-    config_settings = SiteConfigurationSettings()
+    enable_setting = "SITE_CONFIG_ENABLE"
+    required_settings = [
+        "SITE_NAME",
+        "SITE_PRIMARY_COLOR",
+        "SITE_SECONDARY_COLOR",
+        "SITE_ACCENT_COLOR",
+    ]
+    config_settings = ConfigSettingsModel(
+        models=[SiteConfiguration],
+        namespace="SITE",
+        file_name="siteconfig",
+        excluded_fields=[
+            "id",
+            "email_logo",
+            "footer_logo",
+            "favicon",
+            "openid_connect_logo",
+            "extra_css",
+            "logo",
+            "hero_image_login",
+            "theme_stylesheet",
+        ],
+    )
+
+    def get_setting_to_config_mapping(self) -> dict:
+        setting_to_config = {
+            self.config_settings.get_setting_name(field): field
+            for field in self.config_settings.config_fields
+        }
+        return setting_to_config
 
     def is_configured(self):
         config = SiteConfiguration.get_solo()
-        required_settings = self.config_settings.get_required_settings()
-        setting_to_config = self.config_settings.get_config_mapping()
+        setting_to_config = self.get_setting_to_config_mapping()
 
-        for required_setting in required_settings:
+        for required_setting in self.required_settings:
             config_field = setting_to_config[required_setting]
             if not getattr(config, config_field.name, None):
                 return False
@@ -51,7 +55,7 @@ class SiteConfigurationStep(BaseConfigurationStep):
 
     def configure(self):
         config = SiteConfiguration.get_solo()
-        setting_to_config = self.config_settings.get_config_mapping()
+        setting_to_config = self.get_setting_to_config_mapping()
 
         for setting_name, config_field in setting_to_config.items():
             setting = getattr(settings, setting_name)

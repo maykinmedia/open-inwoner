@@ -1,6 +1,7 @@
 from django.conf import settings
 
 import requests
+from django_setup_configuration import ConfigSettingsModel
 from django_setup_configuration.configuration import BaseConfigurationStep
 from django_setup_configuration.exceptions import SelfTestFailed
 from zgw_consumers.constants import APITypes, AuthTypes
@@ -9,36 +10,6 @@ from zgw_consumers.models import Service
 from open_inwoner.openklant.clients import build_client
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.utils.api import ClientError
-
-from .base import ConfigSettingsBase
-
-
-class KICConfigurationSettings(ConfigSettingsBase):
-    model = OpenKlantConfig
-    display_name = "Klanten Configuration"
-    namespace = "KIC"
-    required_fields = (
-        "contactmomenten_service_client_id",
-        "contactmomenten_service_secret",
-        "contactmomenten_service_api_root",
-        "klanten_service_client_id",
-        "klanten_service_secret",
-        "klanten_service_api_root",
-        "register_type",
-        "register_contact_moment",
-    )
-    all_fields = required_fields + (
-        "register_bronorganisatie_rsin",
-        "register_channel",
-        "register_contact_moment",
-        "register_email",
-        "register_employee_id",
-        "use_rsin_for_innNnpId_query_parameter",
-    )
-    excluded_fields = (
-        "contactmomenten_service_uuid",
-        "klanten_service_uuid",
-    )
 
 
 class KlantenAPIConfigurationStep(BaseConfigurationStep):
@@ -52,7 +23,6 @@ class KlantenAPIConfigurationStep(BaseConfigurationStep):
         "KIC_KLANTEN_SERVICE_API_CLIENT_ID",
         "KIC_KLANTEN_SERVICE_API_SECRET",
     ]
-    enable_setting = "KIC_ENABLE"
 
     def is_configured(self) -> bool:
         return Service.objects.filter(
@@ -94,7 +64,6 @@ class ContactmomentenAPIConfigurationStep(BaseConfigurationStep):
         "KIC_CONTACTMOMENTEN_SERVICE_API_CLIENT_ID",
         "KIC_CONTACTMOMENTEN_SERVICE_API_SECRET",
     ]
-    enable_setting = "KIC_ENABLE"
 
     def is_configured(self) -> bool:
         return Service.objects.filter(
@@ -131,7 +100,40 @@ class KICAPIsConfigurationStep(BaseConfigurationStep):
     """
 
     verbose_name = "Klantinteractie APIs configuration"
-    enable_setting = "KIC_ENABLE"
+    enable_setting = "KIC_CONFIG_ENABLE"
+    required_settings = [
+        "KIC_CONTACTMOMENTEN_SERVICE_CLIENT_ID",
+        "KIC_CONTACTMOMENTEN_SERVICE_SECRET",
+        "KIC_CONTACTMOMENTEN_SERVICE_API_ROOT",
+        "KIC_KLANTEN_SERVICE_CLIENT_ID",
+        "KIC_KLANTEN_SERVICE_SECRET",
+        "KIC_KLANTEN_SERVICE_API_ROOT",
+        "KIC_REGISTER_TYPE",
+        "KIC_REGISTER_CONTACT_MOMENT",
+    ]
+    config_settings = ConfigSettingsModel(
+        models=[OpenKlantConfig],
+        namespace="KIC",
+        file_name="kic",
+        excluded_fields=(
+            "id",
+            "api_type",
+            "auth_type",
+            "client_certificate",
+            "confirmation",
+            "header_key",
+            "header_value",
+            "label",
+            "nlx",
+            "oas",
+            "oas_file",
+            "send_email_confirmation",
+            "server_certificate",
+            "user_id",
+            "user_representation",
+            "uuid",
+        ),
+    )
 
     def is_configured(self) -> bool:
         kic_config = OpenKlantConfig.get_solo()

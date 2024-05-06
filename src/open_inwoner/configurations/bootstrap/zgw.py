@@ -1,6 +1,7 @@
 from django.conf import settings
 
 import requests
+from django_setup_configuration.base import ConfigSettingsModel
 from django_setup_configuration.configuration import BaseConfigurationStep
 from django_setup_configuration.exceptions import SelfTestFailed
 from zgw_consumers.constants import APITypes, AuthTypes
@@ -9,40 +10,6 @@ from zgw_consumers.models import Service
 from open_inwoner.openzaak.clients import build_client
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.utils.api import ClientError
-
-from .base import ConfigSettingsBase
-
-
-class ZGWConfigurationSettings(ConfigSettingsBase):
-    model = OpenZaakConfig
-    display_name = "ZGW Configuration"
-    namespace = "ZGW"
-    required_fields = (
-        "catalogi_service_client_id",
-        "catalogi_service_secret",
-        "catalogi_service_api_root",
-        "document_service_client_id",
-        "document_service_secret",
-        "document_service_api_root",
-        "form_service_client_id",
-        "form_service_secret",
-        "form_service_api_root",
-        "zaak_service_client_id",
-        "zaak_service_secret",
-        "zaak_service_api_root",
-    )
-    all_fields = required_fields + (
-        "action_required_deadline_days",
-        "allowed_file_extensions",
-        "document_max_confidentiality",
-        "enable_categories_filtering_with_zaken",
-        "fetch_eherkenning_zaken_with_rsin",
-        "max_upload_size",
-        "reformat_esuite_zaak_identificatie",
-        "skip_notification_statustype_informeren",
-        "title_text",
-        "zaak_max_confidentiality",
-    )
 
 
 class ZakenAPIConfigurationStep(BaseConfigurationStep):
@@ -56,7 +23,6 @@ class ZakenAPIConfigurationStep(BaseConfigurationStep):
         "ZGW_ZAAK_SERVICE_API_CLIENT_ID",
         "ZGW_ZAAK_SERVICE_API_SECRET",
     ]
-    enable_setting = "ZGW_ENABLE"
 
     def is_configured(self) -> bool:
         return Service.objects.filter(
@@ -98,7 +64,6 @@ class CatalogiAPIConfigurationStep(BaseConfigurationStep):
         "ZGW_CATALOGI_SERVICE_API_CLIENT_ID",
         "ZGW_CATALOGI_SERVICE_API_SECRET",
     ]
-    enable_setting = "ZGW_ENABLE"
 
     def is_configured(self) -> bool:
         return Service.objects.filter(
@@ -140,7 +105,6 @@ class DocumentenAPIConfigurationStep(BaseConfigurationStep):
         "ZGW_DOCUMENTEN_SERVICE_API_CLIENT_ID",
         "ZGW_DOCUMENTEN_SERVICE_API_SECRET",
     ]
-    enable_setting = "ZGW_ENABLE"
 
     def is_configured(self) -> bool:
         return Service.objects.filter(
@@ -182,7 +146,6 @@ class FormulierenAPIConfigurationStep(BaseConfigurationStep):
         "ZGW_FORM_SERVICE_API_CLIENT_ID",
         "ZGW_FORM_SERVICE_API_SECRET",
     ]
-    enable_setting = "ZGW_ENABLE"
 
     def is_configured(self) -> bool:
         return Service.objects.filter(
@@ -219,7 +182,42 @@ class ZGWAPIsConfigurationStep(BaseConfigurationStep):
     """
 
     verbose_name = "ZGW APIs configuration"
-    enable_setting = "ZGW_ENABLE"
+    enable_setting = "ZGW_CONFIG_ENABLE"
+    required_settings = [
+        "ZGW_CATALOGI_SERVICE_CLIENT_ID",
+        "ZGW_CATALOGI_SERVICE_SECRET",
+        "ZGW_CATALOGI_SERVICE_API_ROOT",
+        "ZGW_DOCUMENT_SERVICE_CLIENT_ID",
+        "ZGW_DOCUMENT_SERVICE_SECRET",
+        "ZGW_DOCUMENT_SERVICE_API_ROOT",
+        "ZGW_FORM_SERVICE_CLIENT_ID",
+        "ZGW_FORM_SERVICE_SECRET",
+        "ZGW_FORM_SERVICE_API_ROOT",
+        "ZGW_ZAAK_SERVICE_CLIENT_ID",
+        "ZGW_ZAAK_SERVICE_SECRET",
+        "ZGW_ZAAK_SERVICE_API_ROOT",
+    ]
+    config_settings = ConfigSettingsModel(
+        models=[OpenZaakConfig],
+        namespace="ZGW",
+        file_name="zgw",
+        excluded_fields=(
+            "id",
+            "api_type",
+            "auth_type",
+            "client_certificate",
+            "header_key",
+            "header_value",
+            "label",
+            "nlx",
+            "oas",
+            "oas_file",
+            "server_certificate",
+            "user_id",
+            "user_representation",
+            "uuid",
+        ),
+    )
 
     def is_configured(self) -> bool:
         zgw_config = OpenZaakConfig.get_solo()

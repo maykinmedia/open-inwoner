@@ -1,11 +1,12 @@
 .. _eherkenning_saml:
 
-==============================
-eHerkenning SAML Configuration
-==============================
+======================================
+Configuration for eHerkenning via SAML
+======================================
 
 Settings Overview
 =================
+
 
 Enable/Disable configuration:
 """""""""""""""""""""""""""""
@@ -13,6 +14,8 @@ Enable/Disable configuration:
 ::
 
     EHERKENNING_CONFIG_ENABLE
+
+
 
 Required:
 """""""""
@@ -31,6 +34,7 @@ Required:
     EHERKENNING_SERVICE_DESCRIPTION
     EHERKENNING_SERVICE_NAME
 
+
 All settings:
 """""""""""""
 
@@ -38,10 +42,7 @@ All settings:
 
     EHERKENNING_ARTIFACT_RESOLVE_CONTENT_TYPE
     EHERKENNING_BASE_URL
-    EHERKENNING_CERTIFICATE_LABEL
-    EHERKENNING_CERTIFICATE_PRIVATE_KEY
-    EHERKENNING_CERTIFICATE_PUBLIC_CERTIFICATE
-    EHERKENNING_CERTIFICATE_TYPE
+    EHERKENNING_CERTIFICATE
     EHERKENNING_DIGEST_ALGORITHM
     EHERKENNING_EH_ATTRIBUTE_CONSUMING_SERVICE_INDEX
     EHERKENNING_EH_LOA
@@ -54,6 +55,8 @@ All settings:
     EHERKENNING_EIDAS_SERVICE_INSTANCE_UUID
     EHERKENNING_EIDAS_SERVICE_UUID
     EHERKENNING_ENTITY_ID
+    EHERKENNING_IDP_METADATA_FILE
+    EHERKENNING_IDP_SERVICE_ENTITY_ID
     EHERKENNING_KEY_PASSPHRASE
     EHERKENNING_MAKELAAR_ID
     EHERKENNING_METADATA_FILE_SOURCE
@@ -63,6 +66,7 @@ All settings:
     EHERKENNING_ORGANIZATION_URL
     EHERKENNING_PRIVACY_POLICY
     EHERKENNING_SERVICE_DESCRIPTION
+    EHERKENNING_SERVICE_DESCRIPTION_URL
     EHERKENNING_SERVICE_LANGUAGE
     EHERKENNING_SERVICE_NAME
     EHERKENNING_SIGNATURE_ALGORITHM
@@ -85,31 +89,13 @@ Detailed Information
     Variable            EHERKENNING_BASE_URL
     Setting             Basis-URL
     Description         De basis-URL van de applicatie, zonder slash op het eind.
-    Possible values     string
+    Possible values     string (URL)
     Default value       No default
     
-    Variable            EHERKENNING_CERTIFICATE_LABEL
-    Setting             label
-    Description         Recognisable label for the certificate
-    Possible values     string
-    Default value       No default
-    
-    Variable            EHERKENNING_CERTIFICATE_PRIVATE_KEY
-    Setting             private key
-    Description         The content of the private key
-    Possible values     string represeting the (absolute) path to a file, including file extension: /absolute/path/to/file.xml
-    Default value       No default
-    
-    Variable            EHERKENNING_CERTIFICATE_PUBLIC_CERTIFICATE
-    Setting             public certificate
-    Description         The content of the certificate
-    Possible values     string represeting the (absolute) path to a file, including file extension: /absolute/path/to/file.xml
-    Default value       No default
-    
-    Variable            EHERKENNING_CERTIFICATE_TYPE
-    Setting             type
-    Description         Is this only a certificate or is there an associated private key?
-    Possible values     key_pair, cert_only
+    Variable            EHERKENNING_CERTIFICATE
+    Setting             sleutelpaar
+    Description         De private-key en publieke certificaat voor de authenticatie-flow.
+    Possible values     No information available
     Default value       No default
     
     Variable            EHERKENNING_DIGEST_ALGORITHM
@@ -184,6 +170,18 @@ Detailed Information
     Possible values     string
     Default value       No default
     
+    Variable            EHERKENNING_IDP_METADATA_FILE
+    Setting             metadata identity provider
+    Description         Het bestand met metadata van de identity provider. Deze wordt automatisch opgehaald via de ingestelde metadata-URL.
+    Possible values     No information available
+    Default value       No default
+    
+    Variable            EHERKENNING_IDP_SERVICE_ENTITY_ID
+    Setting             identity provider service entity ID
+    Description         Bijvoorbeeld: 'https://was-preprod1.digid.nl/saml/idp/metadata'. Merk op dat dit moet overeenkomen met het 'entityID'-attribuut op het 'md-EntityDescriptor'-element in de metadata van de identity provider. Dit wordt automatisch opgehaald via de ingestelde metadata-URL.
+    Possible values     string
+    Default value       No default
+    
     Variable            EHERKENNING_KEY_PASSPHRASE
     Setting             wachtwoordzin private-key
     Description         Wachtwoord voor de private-key voor de authenticatie-flow.
@@ -199,7 +197,7 @@ Detailed Information
     Variable            EHERKENNING_METADATA_FILE_SOURCE
     Setting             (XML) metadata-URL
     Description         De URL waar het XML metadata-bestand kan gedownload worden.
-    Possible values     string
+    Possible values     string (URL)
     Default value       
     
     Variable            EHERKENNING_NO_EIDAS
@@ -223,13 +221,13 @@ Detailed Information
     Variable            EHERKENNING_ORGANIZATION_URL
     Setting             organisatie-URL
     Description         URL van de organisatie die de service aanbiedt waarvoor DigiD/eHerkenning/eIDAS-authenticatie ingericht is. Je moet ook de organisatienaam opgeven voor dit in de metadata beschikbaar is.
-    Possible values     string
+    Possible values     string (URL)
     Default value       No default
     
     Variable            EHERKENNING_PRIVACY_POLICY
     Setting             privacybeleid
     Description         De URL waar het privacybeleid van de service-aanbieder (organisatie) beschreven staat.
-    Possible values     string
+    Possible values     string (URL)
     Default value       No default
     
     Variable            EHERKENNING_SERVICE_DESCRIPTION
@@ -237,6 +235,12 @@ Detailed Information
     Description         Een beschrijving van de service die je aanbiedt.
     Possible values     string
     Default value       No default
+    
+    Variable            EHERKENNING_SERVICE_DESCRIPTION_URL
+    Setting             service description URL
+    Description         The URL where the service description can be found.
+    Possible values     string (URL)
+    Default value       
     
     Variable            EHERKENNING_SERVICE_LANGUAGE
     Setting             servicetaal

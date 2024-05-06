@@ -1,11 +1,12 @@
 .. _admin_oidc:
 
-========================
-Admin OIDC Configuration
-========================
+================================================
+Configuration for admin login via OpenID Connect
+================================================
 
 Settings Overview
 =================
+
 
 Enable/Disable configuration:
 """""""""""""""""""""""""""""
@@ -13,6 +14,8 @@ Enable/Disable configuration:
 ::
 
     ADMIN_OIDC_CONFIG_ENABLE
+
+
 
 Required:
 """""""""
@@ -22,12 +25,14 @@ Required:
     ADMIN_OIDC_OIDC_RP_CLIENT_ID
     ADMIN_OIDC_OIDC_RP_CLIENT_SECRET
 
+
 All settings:
 """""""""""""
 
 ::
 
     ADMIN_OIDC_CLAIM_MAPPING
+    ADMIN_OIDC_ENABLED
     ADMIN_OIDC_GROUPS_CLAIM
     ADMIN_OIDC_MAKE_USERS_STAFF
     ADMIN_OIDC_OIDC_EXEMPT_URLS
@@ -61,6 +66,12 @@ Detailed Information
     Possible values     Mapping: {'some_key': 'Some value'}
     Default value       {'email': 'email', 'first_name': 'given_name', 'last_name': 'family_name'}
     
+    Variable            ADMIN_OIDC_ENABLED
+    Setting             enable
+    Description         Indicates whether OpenID Connect for authentication/authorization is enabled
+    Possible values     True, False
+    Default value       False
+    
     Variable            ADMIN_OIDC_GROUPS_CLAIM
     Setting             groups claim
     Description         The name of the OIDC claim that holds the values to map to local user groups.
@@ -88,31 +99,31 @@ Detailed Information
     Variable            ADMIN_OIDC_OIDC_OP_AUTHORIZATION_ENDPOINT
     Setting             Authorization endpoint
     Description         URL of your OpenID Connect provider authorization endpoint
-    Possible values     string
+    Possible values     string (URL)
     Default value       No default
     
     Variable            ADMIN_OIDC_OIDC_OP_DISCOVERY_ENDPOINT
     Setting             Discovery endpoint
     Description         URL of your OpenID Connect provider discovery endpoint ending with a slash (`.well-known/...` will be added automatically). If this is provided, the remaining endpoints can be omitted, as they will be derived from this endpoint.
-    Possible values     string
+    Possible values     string (URL)
     Default value       No default
     
     Variable            ADMIN_OIDC_OIDC_OP_JWKS_ENDPOINT
     Setting             JSON Web Key Set endpoint
     Description         URL of your OpenID Connect provider JSON Web Key Set endpoint. Required if `RS256` is used as signing algorithm.
-    Possible values     string
+    Possible values     string (URL)
     Default value       No default
     
     Variable            ADMIN_OIDC_OIDC_OP_TOKEN_ENDPOINT
     Setting             Token endpoint
     Description         URL of your OpenID Connect provider token endpoint
-    Possible values     string
+    Possible values     string (URL)
     Default value       No default
     
     Variable            ADMIN_OIDC_OIDC_OP_USER_ENDPOINT
     Setting             User endpoint
     Description         URL of your OpenID Connect provider userinfo endpoint
-    Possible values     string
+    Possible values     string (URL)
     Default value       No default
     
     Variable            ADMIN_OIDC_OIDC_RP_CLIENT_ID
