@@ -24,7 +24,7 @@ class QmaticConfig(SingletonModel):
         null=True,
         help_text=_(
             "The Qmatic Orchestra Calendar Public Appointment API service. "
-            "Example: https://example.com:8443/calendar-backend/public/api/v1/"
+            "Example: https://example.com:8443/calendar-backend/public/api/"
         ),
     )
     booking_base_url = models.URLField(
