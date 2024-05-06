@@ -52,7 +52,10 @@
                                     {% endrender_card %}
                                 {% endif %}
                             {% endrender_column %}
+                        {% endif %}
+                        {# end digid #}
 
+                        <div class="column column--start-4 column--span-5" id="column__openid">
                             {% get_solo 'mozilla_django_oidc_db.OpenIDConnectConfig' as oidc_config %}
                             {% get_solo 'configurations.SiteConfiguration' as site_config %}
                             {% if oidc_config.enabled and site_config.openid_enabled_for_regular_users %}
@@ -72,8 +75,7 @@
                                     {% endrender_card %}
                                 {% endrender_column %}
                             {% endif %}
-                        {% endif %}
-                        {# end digid #}
+                        </div>
 
                         {# Allow registration #}
                         {% if login_allow_registration %}
