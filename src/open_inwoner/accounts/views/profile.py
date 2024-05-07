@@ -26,6 +26,7 @@ from open_inwoner.cms.utils.page_display import (
 )
 from open_inwoner.haalcentraal.utils import fetch_brp
 from open_inwoner.laposta.forms import NewsletterSubscriptionForm
+from open_inwoner.laposta.models import LapostaConfig
 from open_inwoner.openklant.clients import build_client
 from open_inwoner.openklant.wrap import get_fetch_parameters
 from open_inwoner.plans.models import Plan
@@ -106,6 +107,11 @@ class MyProfileView(
             ("#overview", _("Overzicht")),
             ("#profile-remove", _("Profiel verwijderen")),
         ]
+
+        # Check if Laposta is configured and user has verified email
+        if LapostaConfig.get_solo().api_root and user.has_verified_email():
+            # Insert #newsletters anchor
+            context["anchors"].insert(2, ("#newsletters", _("Nieuwsbrieven")))
 
         user_files = user.get_all_files()
 
