@@ -229,10 +229,9 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
             "type": config.register_type,
             "kanaal": config.register_channel,
             "onderwerp": subject_code or subject,
-            "medewerkerIdentificatie": {
-                "identificatie": config.register_employee_id,
-            },
         }
+        if employee_id := config.register_employee_id:
+            data["medewerkerIdentificatie"] = {"identificatie": employee_id}
 
         contactmoment = None
         if contactmoment_client := build_client("contactmomenten"):

@@ -375,6 +375,57 @@ class ContactFormTestCase(
         self.assertTimelineLog("registered contactmoment by API")
         mock_send_confirm.assert_called_once_with("foo@example.com", subject.subject)
 
+    def test_register_bsn_user_via_api_without_id(self, m, mock_send_confirm):
+        MockAPICreateData.setUpServices()
+
+        config = OpenKlantConfig.get_solo()
+        config.register_contact_moment = True
+        config.register_bronorganisatie_rsin = "123456789"
+        config.register_type = "Melding"
+        # empty id should be excluded from contactmoment_create_data
+        config.register_employee_id = ""
+        config.save()
+
+        data = MockAPICreateData()
+        data.install_mocks_digid(m)
+
+        subject = ContactFormSubjectFactory(
+            config=config,
+            subject="Aanvraag document",
+            subject_code="afdeling-xyz",
+        )
+
+        response = self.app.get(self.url, user=data.user)
+
+        # reset interference from signals
+        self.clearTimelineLogs()
+        m.reset_mock()
+
+        form = response.forms["contactmoment-form"]
+        self.assertFormExactFields(
+            form,
+            (
+                "subject",
+                "question",
+            ),
+        )
+        form["subject"].select(text=subject.subject)
+        form["question"] = "Lorem ipsum?"
+
+        response = form.submit().follow()
+
+        contactmoment_create_data = data.matchers[1].request_history[0].json()
+        self.assertEqual(
+            contactmoment_create_data,
+            {
+                "bronorganisatie": "123456789",
+                "tekst": "Lorem ipsum?",
+                "type": "Melding",
+                "kanaal": "contactformulier",
+                "onderwerp": "afdeling-xyz",
+            },
+        )
+
     def test_submit_and_register_bsn_user_via_api(self, m, mock_send_confirm):
         MockAPICreateData.setUpServices()
 
