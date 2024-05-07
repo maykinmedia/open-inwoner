@@ -16,17 +16,17 @@
     {# Tab panels Start #}
     <div class="tab--container login-tab--container">
         <div class="tabs">
-            <ul class="list tabs__headers">
-                <li class="list-item tab__header--item"><a href="{% url 'login' %}#particulier" class="link tab__header" data-panel="particulier-tab" id="particulier_tab">Particulier</a></li>
-                <li class="list-item tab__header--item"><a href="{% url 'login' %}#zakelijk" class="link tab__header" data-panel="zakelijk-tab" id="zakelijk_tab">Zakelijk</a></li>
+            <ul role="tablist" class="list tabs__headers">
+                <li class="list-item tab__header--item"><a href="{% url 'login' %}#particulier" role="tab" aria-selected="true" aria-controls="particulier" class="link tab__header" data-panel="particulier-tab" id="particulier_tab">Particulier</a></li>
+                <li class="list-item tab__header--item"><a href="{% url 'login' %}#zakelijk" role="tab" aria-selected="false" aria-controls="zakelijk" class="link tab__header" data-panel="zakelijk-tab" id="zakelijk_tab">Zakelijk</a></li>
             </ul>
+
             {# Panel 1 #}
             <div class="tabs__body">
-
-                <div id="particulier_panel" class="tab__content">
+                <div id="particulier_panel" class="tab__content" role="tabpanel" aria-labelledby="particulier_tab">
                     {% render_grid %}
 
-                        {# Digid #}
+                        {# Digid / Open ID Connect #}
                         {% if settings.DIGID_ENABLED %}
                             {% render_column start=4 span=5 %}
                                 {% get_solo 'digid_eherkenning_oidc_generics.OpenIDConnectDigiDConfig' as digid_oidc_config %}
@@ -55,7 +55,7 @@
                         {% endif %}
                         {# end digid #}
 
-                        {% if settings.DIGID_ENABLED %}
+                        <div class="column column--start-4 column--span-5" id="column__openid">
                             {% get_solo 'mozilla_django_oidc_db.OpenIDConnectConfig' as oidc_config %}
                             {% get_solo 'configurations.SiteConfiguration' as site_config %}
                             {% if oidc_config.enabled and site_config.openid_enabled_for_regular_users %}
@@ -75,60 +75,57 @@
                                     {% endrender_card %}
                                 {% endrender_column %}
                             {% endif %}
+                        </div>
 
-                            {% if login_allow_registration %}
-                                <div class="column column--start-4 column--span-5" id="column__email-toggle">
-                                    {% render_card direction='horizontal' tinted=True compact=True %}
-                                        {% url 'login' as href %}
-                                        {% with href|add:"#particuliermail" as href_with_hash %}
-                                        <a href="{{ href_with_hash }}#particuliermail" class="link icon--large">
-                                            {% icon icon="login" icon_position="before" outlined=True %}
-                                        </a>
-                                        {% link href=href_with_hash text=_('Log in met e-mail adres') primary=True icon='east' extra_classes="link--next link--email" %}
-                                        {% endwith %}
-                                    {% endrender_card %}
-                                </div>
+                        {# Allow registration #}
+                        {% if login_allow_registration %}
+                            <div class="column column--start-4 column--span-5" id="column__email-toggle">
+                                {% render_card direction='horizontal' tinted=True compact=True %}
+                                    {% url 'login' as href %}
+                                    {% with href|add:"#particuliermail" as href_with_hash %}
+                                    <a href="{{ href_with_hash }}#particuliermail" class="link icon--large" id="column__email-link" aria-controls="column__login-form" aria-expanded="false">
+                                        {% icon icon="login" icon_position="before" outlined=True %}
+                                    </a>
+                                    {% link href=href_with_hash text=_('Log in met e-mail adres') primary=True icon='east' extra_classes="link--next link--email" %}
+                                    {% endwith %}
+                                {% endrender_card %}
+                            </div>
 
-                                {# Hide mail login initially #}
-                                <div class="column column--start-4 column--span-5" id="column__login-form">
-                                    {% if login_allow_registration %}
-                                        {% render_card tinted=True compact=True %}
-                                            {% render_form id="login-form" method="POST" form=form show_required=True %}
-                                                {% csrf_token %}
-                                                <input type="hidden" name="next" value="{{ next }}"/>
-                                                {% input form.username %}
-                                                {% input form.password %}
-                                                {% button text=_('Wachtwoord vergeten?') href='password_reset' secondary=True transparent=True align='right' %}
-                                                {% form_actions primary_text=_("Inloggen") primary_icon="east" single=True %}
-                                            {% endrender_form %}
-                                        {% endrender_card %}
-                                    {% endif %}
-                                </div>
-                                {# End hidden #}
+                            {# Hide mail login initially #}
+                            <div class="column column--start-4 column--span-5" id="column__login-form" aria-labelledby="column__email-link">
+                                {% render_card tinted=True compact=True %}
+                                    {% render_form id="login-form" method="POST" form=form show_required=True %}
+                                        {% csrf_token %}
+                                        <input type="hidden" name="next" value="{{ next }}"/>
+                                        {% input form.username %}
+                                        {% input form.password %}
+                                        {% url 'password_reset' as href %}
+                                        {% button href=href text=_('Wachtwoord vergeten?') primary=True transparent=True extra_classes="link--bold" %}
+                                        {% form_actions primary_text=_("Inloggen") primary_icon="east" single=True fullwidth=True %}
+                                    {% endrender_form %}
+                                {% endrender_card %}
+                            </div>
+                            {# End hidden #}
 
-                                {% render_column start=4 span=5 %}
-                                    <h2 class="tab__heading-4">Of registreer</h2>
-                                    {% render_card direction='horizontal' tinted=True compact=True %}
-                                        {% url 'django_registration_register' as href %}
-                                        <a href="{{ href }}" class="link icon--large">
-                                            {% icon icon="account_circle" icon_position="before" outlined=True %}
-                                        </a>
-                                        {% link href=href text=_('Maak een account aan') primary=True icon='east' extra_classes="link--next link--register" %}
-                                    {% endrender_card %}
-                                    <p class="tab-column__paragraph">{% trans 'U kunt een account aanmaken om voortaan met uw e-mail adres en wachtwoord in te loggen.' %}</p>
-                                {% endrender_column %}
-                            {% endif %}
-
+                            {% render_column start=4 span=5 %}
+                                <h2 class="tab__heading-4">Of registreer</h2>
+                                {% render_card direction='horizontal' tinted=True compact=True %}
+                                    {% url 'django_registration_register' as href %}
+                                    <a href="{{ href }}" class="link icon--large">
+                                        {% icon icon="account_circle" icon_position="before" outlined=True %}
+                                    </a>
+                                    {% link href=href text=_('Maak een account aan') primary=True icon='east' extra_classes="link--next link--register" %}
+                                {% endrender_card %}
+                                <p class="tab-column__paragraph">{% trans 'U kunt een account aanmaken om voortaan met uw e-mail adres en wachtwoord in te loggen.' %}</p>
+                            {% endrender_column %}
                         {% endif %}
-                        {# another Digid end #}
-
+                        {# End allow registration #}
                     {% endrender_grid %}
                 </div>
                 {# Panel 1 End #}
 
                 {# Panel 2 #}
-                <div id="zakelijk_panel" class="tab__content">
-
+                <div id="zakelijk_panel" class="tab__content" role="tabpanel" aria-labelledby="zakelijk_tab">
                     {% render_grid %}
                         {% render_column start=4 span=5 %}
                             {% if eherkenning_enabled %}
@@ -157,7 +154,6 @@
                             {% endif %}
                         {% endrender_column %}
                     {% endrender_grid %}
-
                 </div>
                 {# Panel 2 End #}
 

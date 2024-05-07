@@ -199,6 +199,12 @@
         padding-left: 0;
       }
     }
+
+    .card--tinted {
+      .button.link--bold {
+        padding: 0;
+      }
+    }
   }
 
   .tab-column__paragraph {
