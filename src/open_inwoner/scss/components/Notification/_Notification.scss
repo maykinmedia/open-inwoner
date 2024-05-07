@@ -62,7 +62,7 @@
     cursor: pointer;
   }
 
-  &:not(#{&}--contents) .h2 {
+  &:not(#{&}--contents) .utrecht-heading-2 {
     line-height: var(--font-size-heading-2);
     color: var(--notification-color-text);
   }

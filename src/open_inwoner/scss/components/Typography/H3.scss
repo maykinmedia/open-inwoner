@@ -8,6 +8,8 @@
   font-weight: var(--utrecht-heading-3-font-weight);
   line-height: var(--utrecht-heading-3-line-height);
   margin: 0;
+  display: var(--oip-typography-heading-display);
+  justify-content: var(--oip-typography-heading-justify-content);
 
   @include mobile-only {
     word-break: normal;

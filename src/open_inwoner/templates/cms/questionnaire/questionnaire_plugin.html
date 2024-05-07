@@ -2,7 +2,7 @@
 
 {% if questionnaire_roots.exists %}
     <section class="plugin plugin__categories">
-        <h2 class="h2">{{ configurable_text.home_page.home_questionnaire_title }}</h2>
+        <h2 class="utrecht-heading-2">{{ configurable_text.home_page.home_questionnaire_title }}</h2>
         {% optional_paragraph configurable_text.home_page.home_questionnaire_intro %}
         {% include "components/Questionnaire/Questionnaire.html" with root_nodes=questionnaire_roots only %}
     </section>

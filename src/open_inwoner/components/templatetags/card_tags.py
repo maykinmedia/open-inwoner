@@ -12,7 +12,7 @@ def render_card(parser, token):
 
     Usage:
         {% render_card %}
-            <h1 class="h1">{% trans 'Welkom' %}</h1>
+            <h1 class="utrecht-heading-1">{% trans 'Welkom' %}</h1>
         {% endrender_card %}
 
     Variables:

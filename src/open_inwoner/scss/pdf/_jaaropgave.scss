@@ -26,8 +26,8 @@
     font-weight: bold;
   }
 
-  .h1,
-  .h2 {
+  .utrecht-heading-1,
+  .utrecht-heading-2 {
     font-size: 20px;
     font-weight: normal;
     margin: 0;
@@ -131,7 +131,7 @@
     margin-top: 0.2em;
     text-transform: uppercase;
 
-    .h2 {
+    .utrecht-heading-2 {
       font-size: 12px;
       font-weight: bold;
     }
@@ -141,11 +141,11 @@
     line-height: 1.6;
     font-size: 11px;
 
-    h1,
-    h2 {
+    .utrecht-heading-1,
+    .utrecht-heading-2 {
       font-size: 12px;
     }
-    h1 {
+    .utrecht-heading-1 {
       text-transform: uppercase;
     }
   }

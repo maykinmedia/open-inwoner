@@ -5,7 +5,7 @@
     {% if contactmoment %}
         {% render_grid %}
             {% render_column span=12 %}
-                <h1 class="h1" id="title">{{ contactmoment.onderwerp }}</h1>
+                <h1 class="utrecht-heading-1" id="title">{{ contactmoment.onderwerp }}</h1>
                 {% include "components/Dashboard/Dashboard.html" with metrics=metrics only %}
             {% endrender_column %}
         {% endrender_grid %}
@@ -42,6 +42,6 @@
         {% endrender_grid %}
 
     {% else %}
-        <h2 class="h2">{% trans 'There is no available data at the moment.' %}</h2>
+        <h2 class="utrecht-heading-2">{% trans 'There is no available data at the moment.' %}</h2>
     {% endif %}
 {% endblock content %}

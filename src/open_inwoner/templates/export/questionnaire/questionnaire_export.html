@@ -3,7 +3,7 @@
 
 {% block content %}
     <div class="qa">
-        <h1 class="h1">{% trans "Zelfdiagnose results" %}</h1>
+        <h1 class="utrecht-heading-1">{% trans "Zelfdiagnose results" %}</h1>
         <ol>
             {% for step in steps %}
             <li>
@@ -15,9 +15,9 @@
             {% endfor %}
         </ol>
     </div>
-    
+
     <div class="qa_results">
-        <h4 class="h4">{{ last_step.question }}</h4>
+        <h4 class="utrecht-heading-4">{{ last_step.question }}</h4>
         <p class="p">{{ last_step.content|ckeditor_content|safe}}</p>
         {% if related_products.exists %}
             <h4>{% trans "Related products:" %}</h4>

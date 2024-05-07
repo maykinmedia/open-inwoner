@@ -51,15 +51,8 @@
   &__item-label {
     color: var(--color-gray-dark-900);
   }
-
-  .h4 {
-    @media (min-width: 768px) {
-      margin-top: var(--spacing-large);
-    }
-  }
 }
 
-.h1 + .dashboard,
 .utrecht-heading-1 + .dashboard {
   margin-top: var(--spacing-large);
 

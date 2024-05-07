@@ -7,7 +7,7 @@
     {% endif %}
 
     <div class="notification__content">
-        {% if title %}<h2 class="h2">{{ title }}</h2>{% endif %}
+        {% if title %}<h2 class="utrecht-heading-2">{{ title }}</h2>{% endif %}
         {% if notification %}<p class="p">{{ notification }}</p>{% endif %}
         {% if action %}{% button href=action text=action_text %}{% endif %}
         {% if contents %}

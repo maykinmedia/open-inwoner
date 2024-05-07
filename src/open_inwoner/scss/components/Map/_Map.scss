@@ -1,8 +1,4 @@
 .map {
-  .h4 {
-    margin-bottom: var(--spacing-large);
-  }
-
   &__leaflet {
     height: 500px;
   }
@@ -22,8 +18,8 @@
 }
 
 .leaflet-content-name {
-  & > h4 {
-    margin: 0 !important;
+  & > .utrecht-heading-4 {
+    margin: 0;
   }
 }
 

@@ -3,7 +3,7 @@
 
 
 {% block content %}
-<h1 class="h1" id="title">
+<h1 class="h1 utrecht-heading-1" id="title">
     {% trans "Mijn contacten" %}
     {% button href="profile:contact_create" text=_("Nieuw contact toevoegen") icon="person" primary=True %}
 </h1>
@@ -14,7 +14,7 @@
     <div class="approval-container{% if approvals_count == 1 %}--solo{% endif %}">
         <div class="approval">
             <div class="approval__header">
-                <h2 class="h2">{% trans "U bent toegevoegd als contactpersoon" %}</h2>
+                <h2 class="utrecht-heading-2">{% trans "U bent toegevoegd als contactpersoon" %}</h2>
                 <p class="p">{% trans "By accepting you agree on sharing your personal data (first name, last name and phonenumber)." %}</p>
             </div>
             {% if approvals_count == 1 %}

@@ -2,7 +2,7 @@
 {% load i18n string_tags %}
 
 {% block content %}
-    <h1 class="h1">{{configurable_text.questionnaire_page.select_questionnaire_title}}</h1>
+    <h1 class="utrecht-heading-1">{{configurable_text.questionnaire_page.select_questionnaire_title}}</h1>
     {% optional_paragraph configurable_text.questionnaire_page.select_questionnaire_intro %}
     {% include "components/Questionnaire/Questionnaire.html" with root_nodes=root_nodes only %}
 {% endblock content %}

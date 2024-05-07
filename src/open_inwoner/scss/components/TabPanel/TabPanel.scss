@@ -172,8 +172,9 @@
     scroll-margin-top: 150px;
 
     .tab__heading-4 {
-      font-size: var(--font-size-heading-4);
+      font-size: var(--utrecht-heading-4-font-size);
       margin-bottom: var(--spacing-large);
+      margin-top: var(--spacing-extra-large);
     }
 
     .grid {
@@ -213,7 +214,7 @@
     font-size: var(--font-size-body);
     line-height: var(--font-line-height-body);
     font-weight: normal;
-    margin: 0;
+    margin: var(--spacing-medium) 0 0 0;
   }
 
   .form__actions--single {

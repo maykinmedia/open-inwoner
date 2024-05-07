@@ -8,7 +8,7 @@
 {% block content %}
 
     <div class="profile__grid">
-        <h1 class="h1" id="title">
+        <h1 class="utrecht-heading-1" id="title">
             {% trans "Persoonlijke gegevens" %}
         </h1>
 
@@ -21,7 +21,7 @@
         {% with request.user as user %}
             <section class="tabled tabled--flexible profile-section" id="profile-notifications">
                 <div class="tabled__section">
-                    <h2 class="h2 title" id="notifications">{% trans "Mijn BRP gegevens" %}</h2>
+                    <h2 class="utrecht-heading-2 title" id="notifications">{% trans "Mijn BRP gegevens" %}</h2>
                 </div>
                 <div class="tabled__row tabled__row--blank">
                     <div class="tabled__item tabled__key">{% trans "Voornamen" %}</div>
@@ -60,7 +60,7 @@
             <!-- BRP registration data -->
             <section class="tabled tabled--flexible profile-section" id="profile-notifications">
                 <div class="tabled__section">
-                    <h2 class="h2 title" id="notifications">{% trans "Inschrijfadres" %}</h2>
+                    <h2 class="utrecht-heading-2 title" id="notifications">{% trans "Inschrijfadres" %}</h2>
                 </div>
                 <div class="tabled__row tabled__row--blank">
                     <div class="tabled__item tabled__key">{% trans "Straat" %}</div>
@@ -89,7 +89,7 @@
             <!-- BRP contact data -->
             <section class="tabled tabled--flexible profile-section" id="profile-notifications">
                 <div class="tabled__section">
-                    <h2 class="h2 title" id="notifications">{% trans "Contactgegevens" %}
+                    <h2 class="utrecht-heading-2 title" id="notifications">{% trans "Contactgegevens" %}
                         <div class="tabled__item--force-right tabled__item--mobile-big">
                             {% button href="profile:edit" text=_("Bewerk") icon="edit" transparent=True icon_outlined=True %}
                         </div>

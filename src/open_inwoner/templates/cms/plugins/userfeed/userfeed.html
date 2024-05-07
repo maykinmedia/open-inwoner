@@ -4,7 +4,7 @@
 <section class="plugin userfeed">
     <div class="userfeed__header">
         <div class="heading-2__indicator">
-            <h2 class="h2 {% if userfeed.action_required %}indicator{% endif %}">
+            <h2 class="utrecht-heading-2 {% if userfeed.action_required %}indicator{% endif %}">
                 {{ instance.title }}
             </h2>
             {% if userfeed.action_required %}{% icon icon="fiber_manual_record" outlined=False extra_classes="file__file--recent" %}{% endif %}
@@ -26,7 +26,7 @@
                 <div class="userfeed__marker userfeed__marker--{{ item.status_indicator }}">{# ! Space for when item.status_text is empty #}</div>
 
                 <div class="card__body card__body--tabled">
-                    <h3 class="userfeed__title">{{ item.title }}</h3>
+                    <h3 class="utrecht-heading-3 userfeed__title">{{ item.title }}</h3>
                     {% if item.status_text %}
                         {% include "components/StatusIndicator/StatusIndicator.html" with status_indicator=item.status_indicator status_indicator_text=item.status_text %}
                     {% endif %}
