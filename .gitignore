@@ -6,6 +6,7 @@
 .vscode/
 .sass-cache/
 *.db
+docker-init-db.sql/*
 *.pyc
 __pycache__
 *~

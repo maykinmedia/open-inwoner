@@ -4,6 +4,7 @@ version: '3'
 services:
   db:
     image: postgis/postgis:12-2.5
+    container_name: open-inwoner-db
     environment:
       - POSTGRES_USER=${DB_USER:-open_inwoner}
       - POSTGRES_PASSWORD=${DB_PASSWORD:-open_inwoner}
@@ -21,13 +22,14 @@ services:
     volumes:
       - es_data:/usr/share/elasticsearch/data
     ports:
-      - 9201:9201
+      - ${ES_PORTS:-9201:9201}
 
   redis:
     image: redis
 
   web:
     build: .
+    container_name: open-inwoner-web
     environment:
       - DJANGO_SETTINGS_MODULE=open_inwoner.conf.docker
       - SECRET_KEY=${SECRET_KEY:-7bk)w=_%lnm#68rc!c)h@gy&5+%^fl=okq17bv!)yv!l0udu2y}
