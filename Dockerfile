@@ -5,7 +5,7 @@
 
 # Stage 1 - Backend build environment
 # includes compilers and build tooling to create the environment
-FROM python:3.11-slim-buster AS backend-build
+FROM python:3.11-slim-bookworm AS backend-build
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         pkg-config \
@@ -15,13 +15,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libxml2-dev \
         libxmlsec1-dev \
         libxmlsec1-openssl \
-        # weasyprint deps
-        libcairo2 \
-        libpango-1.0-0 \
-        libpangocairo-1.0-0 \
         libgdk-pixbuf2.0-0 \
         libffi-dev \
         shared-mime-info \
+        # weasyprint deps (https://doc.courtbouillon.org/weasyprint/stable/first_steps.html#debian-11)
+        libpango-1.0-0 \
+        libpangoft2-1.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -61,30 +60,29 @@ RUN npm run build
 
 # Stage 3 - Build docker image suitable for production
 
-FROM python:3.11-slim-buster
+FROM python:3.11-slim-bookworm
 
 # Stage 3.1 - Set up the needed production dependencies
 # Note: mime-support becomes media-types in Debian Bullseye (required for correctly serving mime-types for images)
 # Also install the dependencies for GeoDjango
 
 RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
+        curl \
         procps \
         vim \
         postgresql-client \
-        libgdal20 \
+        libgdal32 \
         libgeos-c1v5 \
-        libproj13 \
+        libproj25 \
         libxmlsec1-dev \
         libxmlsec1-openssl \
-        # weasyprint deps
-        libcairo2 \
-        libpango-1.0-0 \
-        libpangocairo-1.0-0 \
         libgdk-pixbuf2.0-0 \
         libffi-dev \
         shared-mime-info \
         mime-support \
-        curl \
+        # weasyprint deps (https://doc.courtbouillon.org/weasyprint/stable/first_steps.html#debian-11)
+        libpango-1.0-0 \
+        libpangoft2-1.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
