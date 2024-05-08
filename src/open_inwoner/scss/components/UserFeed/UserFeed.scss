@@ -1,4 +1,15 @@
 .userfeed {
+  &__header {
+    display: block;
+    line-height: var(--font-line-height-heading-2);
+    margin: 0;
+
+    @media (min-width: 768px) {
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+
   &__summary {
     background-color: var(--color-white);
     color: var(--color-red-notification);
@@ -8,7 +19,7 @@
   }
 
   &__list {
-    column-gap: var(--spacing-medium);
+    column-gap: var(--spacing-large);
     list-style: none;
     display: block;
     flex-direction: row;
@@ -27,8 +38,8 @@
         content: ' ';
         position: absolute;
         border-right: none;
-        right: -4px;
-        top: 2px;
+        right: calc(-1 * var(--spacing-medium));
+        top: 4px;
         height: 16px;
 
         @media (min-width: 768px) {
@@ -53,6 +64,55 @@
       font-size: var(--font-size-body-small);
       margin: 0;
       padding: 0;
+    }
+  }
+
+  .card {
+    justify-content: flex-start;
+
+    &__body {
+      gap: 0;
+      padding: 0;
+
+      // Start meaningful order for accessibility
+      .userfeed__title {
+        order: 2;
+      }
+
+      .card__header {
+        order: 1;
+      }
+
+      .userfeed-card__description {
+        order: 3;
+      }
+
+      .button {
+        order: 4;
+      }
+      // End of meaningful order
+
+      .userfeed__title {
+        color: var(--color-gray-dark);
+        font-family: var(--font-family-body);
+        font-size: var(--font-size-body-small);
+        font-weight: normal;
+        overflow-wrap: break-word;
+        word-break: normal;
+        padding: var(--font-size-body-small) var(--card-spacing) 0
+          var(--card-spacing);
+        margin: 0;
+      }
+    }
+
+    .userfeed-card__description {
+      color: var(--font-color-heading);
+      font-family: var(--font-family-heading);
+      font-size: var(--font-size-body);
+      line-height: var(--font-line-height-body);
+      margin: 0;
+      padding: var(--spacing-medium) var(--row-height-big) var(--card-spacing)
+        var(--card-spacing);
     }
   }
 
