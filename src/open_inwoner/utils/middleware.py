@@ -31,6 +31,27 @@ def get_always_pass_prefixes() -> tuple[str, ...]:
     )
 
 
+def get_app_pass_prefixes() -> tuple[str, ...]:
+    """
+    Urls for apps that may not be active
+    """
+    return (
+        "profile:registration_necessary",
+        "profile:email_verification_user",
+    )
+
+
+def resolve_urls(urls) -> tuple[str, ...]:
+    ret = list()
+    for url in urls:
+        try:
+            ret.append(resolve_url(url))
+        except NoReverseMatch:
+            # support testing without cms app mounted
+            pass
+    return tuple(ret)
+
+
 class BaseConditionalUserRedirectMiddleware(abc.ABC):
     """
     Base class for middleware that redirects users to another view based on conditions
@@ -64,6 +85,7 @@ class BaseConditionalUserRedirectMiddleware(abc.ABC):
         URL prefixes we're skipping without checking requires_redirect()
         """
         prefixes = get_always_pass_prefixes()
+        prefixes += resolve_urls(get_app_pass_prefixes())
         prefixes += (resolve_url(self.get_redirect_url(request)),)
         prefixes += self.get_extra_pass_prefixes()
         return prefixes
@@ -71,12 +93,7 @@ class BaseConditionalUserRedirectMiddleware(abc.ABC):
     def get_extra_pass_prefixes(self) -> tuple[str, ...]:
         prefixes = []
         if self.extra_pass_prefixes:
-            for e in self.extra_pass_prefixes:
-                try:
-                    prefixes.append(resolve_url(e))
-                except NoReverseMatch:
-                    # support testing without cms app mounted
-                    pass
+            return resolve_urls(self.extra_pass_prefixes)
         return tuple(prefixes)
 
     def __call__(self, request):

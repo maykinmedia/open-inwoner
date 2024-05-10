@@ -1140,7 +1140,7 @@ class DuplicateEmailRegistrationTest(WebTest):
         url = reverse("eherkenning-mock:password")
         params = {
             "acs": reverse("eherkenning:acs"),
-            "next": reverse("profile:registration_necessary"),
+            "next": reverse("kvk:branches"),
         }
         url = f"{url}?{urlencode(params)}"
 
@@ -1149,8 +1149,7 @@ class DuplicateEmailRegistrationTest(WebTest):
             "auth_name": "12345678",
             "auth_pass": "bar",
         }
-        # post our password to the IDP
-        response = self.app.post(url, data).follow().follow()
+        response = self.app.post(url, data).follow()
 
         # select company branch
         response = self.app.get(response["Location"])
