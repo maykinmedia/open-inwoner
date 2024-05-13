@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from ipaddress import IPv4Address
+from ipaddress import IPv4Address, IPv6Address
 from typing import Any
 
 import requests
@@ -41,6 +41,7 @@ class JSONEncoderMixin:
         json_encoders: dict = {
             datetime: lambda dt: dt.isoformat(sep=" "),
             IPv4Address: str,
+            IPv6Address: str,
             Url: str,
         }
         result = super().model_dump(**kwargs)
