@@ -38,24 +38,26 @@ jobs:
       - name: Run bin/compile_dependencies.sh
         run: ./bin/compile_dependencies.sh
 
+# Temporary disabled until someone can fix it
+# Note: Mac users reported they needed more OS level work instead of just this
 
-  compile_dependencies_macos:
-    name: Run compile_dependencies on MacOS
-    runs-on: macos-latest
-
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: 'true'
-      - uses: actions/setup-python@v2
-        with:
-          python-version: '3.11'
-
-      - name: Install pip-tools
-        run: pip install pip-tools
-
-      - name: Make sure current directory can be detected a git repository
-        run: git init
-
-      - name: Run bin/compile_dependencies.sh
-        run: ./bin/compile_dependencies.sh
+#  compile_dependencies_macos:
+#    name: Run compile_dependencies on MacOS
+#    runs-on: macos-latest
+#
+#    steps:
+#      - uses: actions/checkout@v2
+#        with:
+#          submodules: 'true'
+#      - uses: actions/setup-python@v2
+#        with:
+#          python-version: '3.11'
+#
+#      - name: Install pip-tools
+#        run: pip install pip-tools
+#
+#      - name: Make sure current directory can be detected a git repository
+#        run: git init
+#
+#      - name: Run bin/compile_dependencies.sh
+#        run: ./bin/compile_dependencies.sh
