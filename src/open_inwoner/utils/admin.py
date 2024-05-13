@@ -167,14 +167,19 @@ class PeriodicTaskAdmin(_PeriodicTaskAdmin):
         task_kwargs = json.loads(periodic_task.kwargs)
         task_args = json.loads(periodic_task.args)
 
+        # NOTE send_task() doesn't work with Celery_Once, use .delay() or .apply_async()
         # app.send_task(periodic_task.task, args=task_args, kwargs=task_kwargs)
-        if task := app.tasks.get(periodic_task.task):
+
+        task = app.tasks.get(periodic_task.task)
+        if task:
             try:
                 task.apply_async(args=task_args, kwargs=task_kwargs)
             except AlreadyQueued:
                 messages.warning(request, _("De taak wordt al uitgevoerd."))
             else:
                 messages.success(request, _("De taak wordt uitgevoerd."))
+                # we could redirect but the 'celery_monitor' view takes a few seconds to show the task, and doesnt auto-refresh
+                # return redirect(reverse("admin:celery_monitor_taskstate_changelist"))
         else:
             messages.warning(
                 request, _("Er is een probleem met het starten van de taak.")

@@ -202,7 +202,6 @@ INSTALLED_APPS = [
     "mailer",
     "log_outgoing_requests",
     "formtools",
-    "django_celery_beat",
     "django_setup_configuration",
     # Project applications.
     "open_inwoner.components",
@@ -236,6 +235,8 @@ INSTALLED_APPS = [
     "open_inwoner.cms.plugins",
     "open_inwoner.cms.benefits",
     "djchoices",
+    "django_celery_beat",
+    "django_celery_monitor",
 ]
 
 MIDDLEWARE = [
