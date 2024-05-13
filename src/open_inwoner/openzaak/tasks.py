@@ -9,8 +9,8 @@ logger = logging.getLogger(__name__)
 
 @app.task(base=QueueOnce, once={"keys": []})
 def import_zgw_data():
-    logger.info(f"starting import_zgw_data() task")
+    logger.info("starting import_zgw_data() task")
 
     call_command("zgw_import_data")
 
-    logger.info(f"finished import_zgw_data() task")
+    logger.info("finished import_zgw_data() task")

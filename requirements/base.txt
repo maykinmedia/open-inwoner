@@ -22,7 +22,7 @@ attrs==21.2.0
     #   jsonschema
 beautifulsoup4==4.12.3
     # via -r requirements/base.in
-billiard==3.6.4.0
+billiard==4.2.0
     # via celery
 boltons==21.0.0
     # via
@@ -32,11 +32,12 @@ brotli==1.0.9
     # via fonttools
 cbor2==5.6.2
     # via webauthn
-celery==5.2.7
+celery==5.4.0
     # via
     #   -r requirements/base.in
     #   celery-once
     #   django-celery-beat
+    #   django-celery-monitor
     #   notifications-api-common
 celery-once==3.0.1
     # via -r requirements/base.in
@@ -98,6 +99,7 @@ django==4.2.11
     #   django-appdata
     #   django-axes
     #   django-celery-beat
+    #   django-celery-monitor
     #   django-choices
     #   django-ckeditor
     #   django-classy-tags
@@ -159,6 +161,8 @@ django-autoslug==1.9.8
 django-axes==5.25.0
     # via -r requirements/base.in
 django-celery-beat==2.6.0
+    # via -r requirements/base.in
+django-celery-monitor @ git+https://github.com/maykinmedia/django-celery-monitor@513dc28
     # via -r requirements/base.in
 django-choices==2.0.0
     # via mail-editor
@@ -373,7 +377,7 @@ josepy==1.13.0
     # via mozilla-django-oidc
 jsonschema==4.1.0
     # via drf-spectacular
-kombu==5.2.4
+kombu==5.3.7
     # via celery
 lockfile==0.12.2
     # via django-mailer
@@ -460,6 +464,7 @@ python-crontab==3.0.0
     # via django-celery-beat
 python-dateutil==2.8.2
     # via
+    #   celery
     #   django-relativedelta
     #   elasticsearch-dsl
     #   messagebird
@@ -473,7 +478,6 @@ python-stdnum==1.17
 pytz==2021.3
     # via
     #   -r requirements/base.in
-    #   celery
     #   djangorestframework
 pyyaml==6.0
     # via
@@ -538,7 +542,9 @@ typing-extensions==4.10.0
     #   pyee
     #   xsdata
 tzdata==2024.1
-    # via django-celery-beat
+    # via
+    #   celery
+    #   django-celery-beat
 uritemplate==4.1.1
     # via drf-spectacular
 urllib3==1.26.18
@@ -549,7 +555,7 @@ urllib3==1.26.18
     #   sentry-sdk
 uwsgi==2.0.23
     # via -r requirements/base.in
-vine==5.0.0
+vine==5.1.0
     # via
     #   amqp
     #   celery

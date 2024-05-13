@@ -52,7 +52,7 @@ beautifulsoup4==4.12.3
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   webtest
-billiard==3.6.4.0
+billiard==4.2.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -75,12 +75,13 @@ cbor2==5.6.2
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   webauthn
-celery==5.2.7
+celery==5.4.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   celery-once
     #   django-celery-beat
+    #   django-celery-monitor
     #   notifications-api-common
 celery-once==3.0.1
     # via
@@ -189,6 +190,7 @@ django==4.2.11
     #   django-appdata
     #   django-axes
     #   django-celery-beat
+    #   django-celery-monitor
     #   django-choices
     #   django-ckeditor
     #   django-classy-tags
@@ -262,6 +264,10 @@ django-axes==5.25.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
 django-celery-beat==2.6.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+django-celery-monitor @ git+https://github.com/maykinmedia/django-celery-monitor@513dc28
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -678,7 +684,7 @@ jsonschema==4.1.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   drf-spectacular
-kombu==5.2.4
+kombu==5.3.7
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -891,6 +897,7 @@ python-dateutil==2.8.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   celery
     #   django-relativedelta
     #   elasticsearch-dsl
     #   faker
@@ -914,7 +921,6 @@ pytz==2021.3
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-    #   celery
     #   djangorestframework
 pyyaml==6.0
     # via
@@ -1052,6 +1058,7 @@ tzdata==2024.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   celery
     #   django-celery-beat
 uritemplate==4.1.1
     # via
@@ -1070,7 +1077,7 @@ uwsgi==2.0.23
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-vine==5.0.0
+vine==5.1.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt

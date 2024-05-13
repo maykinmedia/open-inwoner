@@ -85,10 +85,10 @@ pyopenssl
 django-sessionprofile
 
 # Workers
-celery ~= 5.0
+celery>=5.3.5
 celery-once
 django-celery-beat
--e git+https://github.com/maykinmedia/django-celery-monitor@513dc28#egg=django_celery_monitor
+git+https://github.com/maykinmedia/django-celery-monitor@513dc28#egg=django_celery_monitor
 
 # Common Ground integration
 zgw-consumers
