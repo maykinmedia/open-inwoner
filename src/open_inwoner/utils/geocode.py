@@ -47,7 +47,7 @@ class PdocLocatieserver(Geocoder):
         query,
         timeout=DEFAULT_SENTINEL,
         fq="bron:bag AND type:adres",
-        ln="id,bron,weergavenaam,rdf_seealso,centroide_ll",
+        fl="id,bron,weergavenaam,rdf_seealso,centroide_ll",
     ):
         """
         Return a location point by address.
@@ -62,10 +62,10 @@ class PdocLocatieserver(Geocoder):
 
         :param fq: Allows to specify a filter query, e.g. fq=bron:BAG.
 
-        :param ln: List of fields to display
+        :param fl: List of fields to display
         """
 
-        url = furl(self.api).add({"q": query, "fq": fq, "ln": ln}).url
+        url = furl(self.api).add({"q": query, "fq": fq, "fl": fl}).url
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         callback = self._parse_json
         return self._call_geocoder(url, callback, timeout=timeout)
