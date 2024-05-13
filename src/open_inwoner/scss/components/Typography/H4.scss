@@ -2,11 +2,11 @@
 @import '~microscope-sass/lib/responsive';
 
 .h4 {
-  color: var(--font-color-heading-4);
-  font-family: var(--font-family-heading-4);
-  font-size: var(--font-size-heading-4);
-  font-weight: var(--font-weight-heading-4);
-  line-height: var(--font-line-height-heading-4);
+  color: var(--utrecht-heading-4-color);
+  font-family: var(--utrecht-heading-4-font-family);
+  font-size: var(--utrecht-heading-4-font-size);
+  font-weight: var(--utrecht-heading-4-font-weight);
+  line-height: var(--utrecht-heading-4-line-height);
   margin: 0;
 
   @include mobile-only {
