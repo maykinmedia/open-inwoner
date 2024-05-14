@@ -29,16 +29,22 @@
   }
 }
 
-*[class^='h'] + .p {
+*[class^='h'] + .p,
+*[class^='utrecht-heading'] + .p {
   margin-top: var(--spacing-small);
 }
+
 .p + .h1,
 .p + .h2,
-.p + .h3 {
+.p + .h3,
+.p + .utrecht-heading-1,
+.p + .utrecht-heading-2,
+.p + .utrecht-heading-3 {
   margin-top: var(--gutter-width);
 }
 
-.p + .h4 {
+.p + .h4,
+.p + .utrecht-heading-4 {
   margin-top: var(--row-height-small);
 }
 

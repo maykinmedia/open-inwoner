@@ -1,16 +1,13 @@
 {
   "name": "open_inwoner",
-  "version": "1.0.0-alpha.0",
+  "version": "0.0.2-alpha.0",
   "description": "open_inwoner project",
   "main": "src/static/open_inwoner/js/open_inwoner.js",
   "directories": {
     "doc": "doc"
   },
   "scripts": {
-    "build": "npm run postinstall && npm run collect && npm run bundle",
-    "build-design-tokens": "npm --prefix open-inwoner-design-tokens run build",
-    "watch-design-tokens": "npm --prefix open-inwoner-design-tokens run start",
-    "postinstall": "npm --prefix open-inwoner-design-tokens install && npm --prefix open-inwoner-design-tokens run build",
+    "build": "npm run collect && npm run bundle",
     "bundle": "webpack",
     "collect": "cp -r node_modules/leaflet/dist/images src/open_inwoner/static/bundles && cp -r node_modules/material-icons/iconfont/*.woff src/open_inwoner/static/bundles && cp -r node_modules/material-icons/iconfont/*.woff2 src/open_inwoner/static/bundles && cp -r node_modules/@fortawesome/fontawesome-free/webfonts src/open_inwoner/static/",
     "test": "karma start",
@@ -45,6 +42,7 @@
     "@emotion/styled": "^11.3.0",
     "@fortawesome/fontawesome-free": "^6.4.2",
     "@joeattardi/emoji-button": "^4.6.4",
+    "@open-inwoner/design-tokens": "^0.0.3-alpha.0",
     "@tarekraafat/autocomplete.js": "^10.2.6",
     "bem.js": "^1.0.10",
     "emojibase-data": "^7.0.1",

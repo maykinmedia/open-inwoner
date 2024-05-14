@@ -1,17 +1,12 @@
 @import '~@utrecht/components/dist/heading-3/css/index.css';
 @import '~microscope-sass/lib/responsive';
 
-.utrecht-heading-3 {
-  display: var(--oip-typography-heading-display);
-  justify-content: var(--oip-typography-heading-justify-content);
-}
-
 .h3 {
-  color: var(--font-color-heading-3);
-  font-family: var(--font-family-heading-3);
-  font-size: var(--font-size-heading-3);
-  font-weight: var(--font-weight-heading-3);
-  line-height: var(--font-line-height-heading-3);
+  color: var(--utrecht-heading-3-color);
+  font-family: var(--utrecht-heading-3-font-family);
+  font-size: var(--utrecht-heading-3-font-size);
+  font-weight: var(--utrecht-heading-3-font-weight);
+  line-height: var(--utrecht-heading-3-line-height);
   margin: 0;
 
   @include mobile-only {
