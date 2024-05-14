@@ -12,4 +12,4 @@ def dummy_random_wait_task():
     wait = random.randint(1, 10)
     logger.info(f"dummy task start, waiting {wait}")
     time.sleep(wait)
-    logger.info(f"dummy task done")
+    logger.info("dummy task done")
