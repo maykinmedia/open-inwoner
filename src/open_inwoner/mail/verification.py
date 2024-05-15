@@ -2,6 +2,7 @@ from datetime import timedelta
 from typing import TypedDict
 
 from django.core import signing
+from django.core.management import call_command
 from django.urls import reverse
 
 from furl import furl
@@ -95,3 +96,5 @@ def send_user_email_verification_mail(user: User, next_url: str = None) -> bool:
         "verification_link": url,
     }
     template.send_email([user.email], context)
+    # Immediately attempt to send the queued e-mail
+    call_command("send_email")

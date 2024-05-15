@@ -192,14 +192,13 @@ class EmailVerificationUserView(LogMixin, LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        text = _("Om door te gaan moet je jouw e-mailadres {email} bevestigen.")
+        text = _(
+            "Om door te gaan moet je jouw e-mailadres {email} bevestigen, we hebben je een e-mail gestuurd naar dit adres."
+        )
         ctx["verification_text"] = html_tag_wrap_format(
             text, "strong", email=self.request.user.email
         )
-        if self.request.GET.get("sent"):
-            ctx["button_text"] = _("Verificatie email nogmaals verzenden")
-        else:
-            ctx["button_text"] = _("Verificatie email verzenden")
+        ctx["button_text"] = _("Verificatie email nogmaals verzenden")
 
         return ctx
 
@@ -210,6 +209,10 @@ class EmailVerificationUserView(LogMixin, LoginRequiredMixin, TemplateView):
             return HttpResponseRedirect(
                 get_next_url_from(self.request, default=reverse("pages-root"))
             )
+        send_user_email_verification_mail(
+            user, next_url=get_next_url_from(self.request, default="")
+        )
+
         return super().get(request, *args, **kwargs)
 
     def post(self, form):
