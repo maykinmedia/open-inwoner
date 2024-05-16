@@ -270,12 +270,18 @@ class TestMailVerificationMiddlewareFlow(WebTest):
         self.assertRedirects(response, verify_url)
 
         response = response.follow()
+
+        # email sent immediately on GET
+        mock_send.assert_called_once_with(user, "")
+        mock_send.reset_mock()
+
         response = response.forms["email-verification-form"].submit()
 
         # redirect to same page
         self.assertRedirects(response, verify_url + "?sent=1")
         response.follow(status=200)
 
+        # email sent after submitting form
         mock_send.assert_called_once_with(user, "")
 
     @patch(
@@ -301,6 +307,11 @@ class TestMailVerificationMiddlewareFlow(WebTest):
 
         self.assertRedirects(response, verify_url)
         response = response.follow()
+
+        # email sent immediately on GET request
+        mock_send.assert_called_once_with(user, target_url)
+        mock_send.reset_mock()
+
         response = response.forms["email-verification-form"].submit()
 
         # redirect to same page
@@ -309,4 +320,5 @@ class TestMailVerificationMiddlewareFlow(WebTest):
         self.assertRedirects(response, f.url)
         response.follow(status=200)
 
+        # email sent after submitting form
         mock_send.assert_called_once_with(user, target_url)
