@@ -1,3 +1,5 @@
+@import '~@utrecht/components/dist/button/css/index.css';
+
 .button {
   align-items: center;
   border-radius: var(--border-radius);
@@ -16,12 +18,21 @@
   text-align: center;
   text-decoration: none;
   transition: transform 300ms, background-color 300ms;
-  font-weight: normal;
+  font-weight: var(--font-weight-body);
   // modified outline for accessibility focus
   outline-width: 1px;
   outline-offset: 1px;
   border: 0;
   white-space: nowrap;
+  // values from NLDS components that need to be unset
+  block-size: initial;
+  inline-size: initial;
+  justify-content: center;
+  max-inline-size: initial;
+  min-block-size: initial;
+  min-inline-size: initial;
+  scale: 1;
+  text-transform: none;
 
   &:focus,
   &:hover {
