@@ -68,7 +68,7 @@ def button(text, **kwargs):
 
     def get_classes():
         extra_classes = kwargs.get("extra_classes")
-        classnames = "button"
+        classnames = "utrecht-button"
 
         if extra_classes:
             classnames += f" {extra_classes}"

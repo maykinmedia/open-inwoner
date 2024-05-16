@@ -26,13 +26,13 @@
                         {% endif %}
                     </div>
                     <div>
-                        <a href="{{ origin.url }}" id="origin_link" class="utrecht-button button button--primary contactmoment__actions">
+                        <a href="{{ origin.url }}" id="origin_link" class="utrecht-link-button button button--primary contactmoment__actions">
                             {% icon "arrow_backward" %}{{ origin.label }}
                         </a>
                     </div>
                     {% if destination %}
                         <div>
-                            <a href="{{ destination.url }}" id="destination_link" class="utrecht-button button button--transparent contactmoment__actions">
+                            <a href="{{ destination.url }}" id="destination_link" class="utrecht-link-button button button--transparent contactmoment__actions">
                                 <span>{{ destination.label }}</span>{% icon "arrow_forward" %}
                             </a>
                         </div>
