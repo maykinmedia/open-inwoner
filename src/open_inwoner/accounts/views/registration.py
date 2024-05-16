@@ -209,9 +209,13 @@ class EmailVerificationUserView(LogMixin, LoginRequiredMixin, TemplateView):
             return HttpResponseRedirect(
                 get_next_url_from(self.request, default=reverse("pages-root"))
             )
-        send_user_email_verification_mail(
-            user, next_url=get_next_url_from(self.request, default="")
-        )
+
+        # send verification email immediately on requesting page, but only once
+        if not request.session.get("verification_email_sent"):
+            send_user_email_verification_mail(
+                user, next_url=get_next_url_from(self.request, default="")
+            )
+            request.session["verification_email_sent"] = True
 
         return super().get(request, *args, **kwargs)
 
