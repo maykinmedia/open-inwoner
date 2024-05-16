@@ -12,25 +12,25 @@ from ...bootstrap.kic import (
     KlantenAPIConfigurationStep,
 )
 
-KLANTEN_API_ROOT = "https://openklant.local/klanten/api/v1/"
-CONTACTMOMENTEN_API_ROOT = "https://openklant.local/contactmomenten/api/v1/"
+KLANTEN_SERVICE_API_ROOT = "https://openklant.local/klanten/api/v1/"
+CONTACTMOMENTEN_SERVICE_API_ROOT = "https://openklant.local/contactmomenten/api/v1/"
 
 
 @override_settings(
     OIP_ORGANIZATION="Maykin",
-    KIC_CONFIG_KLANTEN_API_ROOT=KLANTEN_API_ROOT,
-    KIC_CONFIG_KLANTEN_API_CLIENT_ID="open-inwoner-test",
-    KIC_CONFIG_KLANTEN_API_SECRET="klanten-secret",
-    KIC_CONFIG_CONTACTMOMENTEN_API_ROOT=CONTACTMOMENTEN_API_ROOT,
-    KIC_CONFIG_CONTACTMOMENTEN_API_CLIENT_ID="open-inwoner-test",
-    KIC_CONFIG_CONTACTMOMENTEN_API_SECRET="contactmomenten-secret",
-    KIC_CONFIG_REGISTER_EMAIL="admin@oip.org",
-    KIC_CONFIG_REGISTER_CONTACT_MOMENT=True,
-    KIC_CONFIG_REGISTER_BRONORGANISATIE_RSIN="837194569",
-    KIC_CONFIG_REGISTER_CHANNEL="email",
-    KIC_CONFIG_REGISTER_TYPE="bericht",
-    KIC_CONFIG_REGISTER_EMPLOYEE_ID="1234",
-    KIC_CONFIG_USE_RSIN_FOR_INNNNPID_QUERY_PARAMETER=True,
+    KIC_KLANTEN_SERVICE_API_ROOT=KLANTEN_SERVICE_API_ROOT,
+    KIC_KLANTEN_SERVICE_API_CLIENT_ID="open-inwoner-test",
+    KIC_KLANTEN_SERVICE_API_SECRET="klanten-secret",
+    KIC_CONTACTMOMENTEN_SERVICE_API_ROOT=CONTACTMOMENTEN_SERVICE_API_ROOT,
+    KIC_CONTACTMOMENTEN_SERVICE_API_CLIENT_ID="open-inwoner-test",
+    KIC_CONTACTMOMENTEN_SERVICE_API_SECRET="contactmomenten-secret",
+    KIC_REGISTER_EMAIL="admin@oip.org",
+    KIC_REGISTER_CONTACT_MOMENT=True,
+    KIC_REGISTER_BRONORGANISATIE_RSIN="837194569",
+    KIC_REGISTER_CHANNEL="email",
+    KIC_REGISTER_TYPE="bericht",
+    KIC_REGISTER_EMPLOYEE_ID="1234",
+    KIC_USE_RSIN_FOR_INNNNPID_QUERY_PARAMETER=True,
 )
 class KICConfigurationTests(TestCase):
     def test_configure(self):
@@ -44,10 +44,12 @@ class KICConfigurationTests(TestCase):
         klanten_service = config.klanten_service
         contactmomenten_service = config.contactmomenten_service
 
-        self.assertEqual(klanten_service.api_root, KLANTEN_API_ROOT)
+        self.assertEqual(klanten_service.api_root, KLANTEN_SERVICE_API_ROOT)
         self.assertEqual(klanten_service.client_id, "open-inwoner-test")
         self.assertEqual(klanten_service.secret, "klanten-secret")
-        self.assertEqual(contactmomenten_service.api_root, CONTACTMOMENTEN_API_ROOT)
+        self.assertEqual(
+            contactmomenten_service.api_root, CONTACTMOMENTEN_SERVICE_API_ROOT
+        )
         self.assertEqual(contactmomenten_service.client_id, "open-inwoner-test")
         self.assertEqual(contactmomenten_service.secret, "contactmomenten-secret")
 
@@ -61,13 +63,13 @@ class KICConfigurationTests(TestCase):
 
     @override_settings(
         OIP_ORGANIZATION=None,
-        KIC_CONFIG_REGISTER_EMAIL=None,
-        KIC_CONFIG_REGISTER_CONTACT_MOMENT=None,
-        KIC_CONFIG_REGISTER_BRONORGANISATIE_RSIN=None,
-        KIC_CONFIG_REGISTER_CHANNEL=None,
-        KIC_CONFIG_REGISTER_TYPE=None,
-        KIC_CONFIG_REGISTER_EMPLOYEE_ID=None,
-        KIC_CONFIG_USE_RSIN_FOR_INNNNPID_QUERY_PARAMETER=None,
+        KIC_REGISTER_EMAIL=None,
+        KIC_REGISTER_CONTACT_MOMENT=None,
+        KIC_REGISTER_BRONORGANISATIE_RSIN=None,
+        KIC_REGISTER_CHANNEL=None,
+        KIC_REGISTER_TYPE=None,
+        KIC_REGISTER_EMPLOYEE_ID=None,
+        KIC_USE_RSIN_FOR_INNNNPID_QUERY_PARAMETER=None,
     )
     def test_configure_use_defaults(self):
         KlantenAPIConfigurationStep().configure()
@@ -80,10 +82,12 @@ class KICConfigurationTests(TestCase):
         klanten_service = config.klanten_service
         contactmomenten_service = config.contactmomenten_service
 
-        self.assertEqual(klanten_service.api_root, KLANTEN_API_ROOT)
+        self.assertEqual(klanten_service.api_root, KLANTEN_SERVICE_API_ROOT)
         self.assertEqual(klanten_service.client_id, "open-inwoner-test")
         self.assertEqual(klanten_service.secret, "klanten-secret")
-        self.assertEqual(contactmomenten_service.api_root, CONTACTMOMENTEN_API_ROOT)
+        self.assertEqual(
+            contactmomenten_service.api_root, CONTACTMOMENTEN_SERVICE_API_ROOT
+        )
         self.assertEqual(contactmomenten_service.client_id, "open-inwoner-test")
         self.assertEqual(contactmomenten_service.secret, "contactmomenten-secret")
 
@@ -103,8 +107,8 @@ class KICConfigurationTests(TestCase):
 
         configuration.configure()
 
-        m.get(f"{KLANTEN_API_ROOT}klanten", json=[])
-        m.get(f"{CONTACTMOMENTEN_API_ROOT}contactmomenten", json=[])
+        m.get(f"{KLANTEN_SERVICE_API_ROOT}klanten", json=[])
+        m.get(f"{CONTACTMOMENTEN_SERVICE_API_ROOT}contactmomenten", json=[])
 
         configuration.test_configuration()
 
@@ -112,11 +116,11 @@ class KICConfigurationTests(TestCase):
 
         self.assertEqual(
             status_request.url,
-            f"{KLANTEN_API_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn=000000000",
+            f"{KLANTEN_SERVICE_API_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn=000000000",
         )
         self.assertEqual(
             zaaktype_request.url,
-            f"{CONTACTMOMENTEN_API_ROOT}contactmomenten?identificatie=00000",
+            f"{CONTACTMOMENTEN_SERVICE_API_ROOT}contactmomenten?identificatie=00000",
         )
 
     @requests_mock.Mocker()
@@ -135,7 +139,7 @@ class KICConfigurationTests(TestCase):
         )
         for mock_config in mock_kwargs:
             with self.subTest(mock=mock_config):
-                m.get(f"{KLANTEN_API_ROOT}klanten", **mock_config)
+                m.get(f"{KLANTEN_SERVICE_API_ROOT}klanten", **mock_config)
 
                 with self.assertRaises(SelfTestFailed):
                     configuration.test_configuration()

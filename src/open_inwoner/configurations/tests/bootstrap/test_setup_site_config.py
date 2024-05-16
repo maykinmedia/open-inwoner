@@ -54,6 +54,7 @@ from ...bootstrap.siteconfig import SiteConfigurationStep
     SITE_SEARCH_FILTER_TAGS=False,
     SITE_SEARCH_FILTER_ORGANIZATIONS=False,
     SITE_EMAIL_NEW_MESSAGE=False,
+    SITE_EMAIL_VERIFICATION_REQUIRED=False,
     SITE_RECIPIENTS_EMAIL_DIGEST=["test1@test.nl", "test2@test.nl"],
     SITE_CONTACT_PHONENUMBER="12345",
     SITE_CONTACT_PAGE="https://test.test",

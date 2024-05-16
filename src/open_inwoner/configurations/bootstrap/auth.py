@@ -25,6 +25,18 @@ from digid_eherkenning_oidc_generics.models import (
 )
 from open_inwoner.configurations.models import SiteConfiguration
 
+from .base import ConfigSettingsBase
+
+
+#
+# DigiD OIDC
+#
+class DigiDOIDCConfigurationSettings(ConfigSettingsBase):
+    model = OpenIDConnectDigiDConfig
+    display_name = "DigiD OIDC Configuration"
+    namespace = "DIGID_OIDC"
+    required_fields = ("oidc_rp_client_id", "oidc_rp_client_secret")
+
 
 class DigiDOIDCConfigurationStep(BaseConfigurationStep):
     """
@@ -98,6 +110,16 @@ class DigiDOIDCConfigurationStep(BaseConfigurationStep):
         """
 
 
+#
+# eHerkenning OIDC
+#
+class eHerkenningOIDCConfigurationSettings(ConfigSettingsBase):
+    model = OpenIDConnectEHerkenningConfig
+    display_name = "eHerkenning OIDC Configuration"
+    namespace = "EHERKENNING_OIDC"
+    required_fields = ("oidc_rp_client_id", "oidc_rp_client_secret")
+
+
 class eHerkenningOIDCConfigurationStep(BaseConfigurationStep):
     """
     Configure eHerkenning authentication via OpenID Connect
@@ -168,6 +190,42 @@ class eHerkenningOIDCConfigurationStep(BaseConfigurationStep):
         TODO not sure if it is feasible (because there are different possible IdPs),
         but it would be nice if we could test the login automatically
         """
+
+
+#
+# Admin OIDC
+#
+class AdminOIDCConfigurationSettings(ConfigSettingsBase):
+    model = OpenIDConnectConfig
+    display_name = "Admin OIDC Configuration"
+    namespace = "ADMIN_OIDC"
+    required_fields = (
+        "oidc_rp_client_id",
+        "oidc_rp_client_secret",
+    )
+    all_fields = required_fields + (
+        "claim_mapping",
+        "default_groups",
+        "groups_claim",
+        "make_users_staff",
+        "oidc_exempt_urls",
+        "oidc_nonce_size",
+        "oidc_op_authorization_endpoint",
+        "oidc_op_discovery_endpoint",
+        "oidc_op_jwks_endpoint",
+        "oidc_op_token_endpoint",
+        "oidc_op_user_endpoint",
+        "oidc_rp_idp_sign_key",
+        "oidc_rp_scopes_list",
+        "oidc_rp_sign_algo",
+        "oidc_state_size",
+        "oidc_use_nonce",
+        "superuser_group_names",
+        "sync_groups",
+        "sync_groups_glob_pattern",
+        "userinfo_claims_source",
+        "username_claim",
+    )
 
 
 class AdminOIDCConfigurationStep(BaseConfigurationStep):
@@ -249,6 +307,25 @@ class AdminOIDCConfigurationStep(BaseConfigurationStep):
         TODO not sure if it is feasible (because there are different possible IdPs),
         but it would be nice if we could test the login automatically
         """
+
+
+#
+# DigiD SAML
+#
+class DigiDSAMLConfigurationSettings(ConfigSettingsBase):
+    model = DigidConfiguration
+    display_name = "DigiD SAML Configuration"
+    namespace = "DIGID"
+    required_fields = (
+        "certificate_label",
+        "certificate_type",
+        "certificate_public_certificate",
+        "metadata_file_source",
+        "entity_id",
+        "base_url",
+        "service_name",
+        "service_description",
+    )
 
 
 class DigiDConfigurationStep(BaseConfigurationStep):
@@ -354,6 +431,57 @@ class DigiDConfigurationStep(BaseConfigurationStep):
         """
         TODO
         """
+
+
+#
+# eHerkenning SAML
+#
+class eHerkenningSAMLConfigurationSettings(ConfigSettingsBase):
+    model = EherkenningConfiguration
+    display_name = "eHerkenning SAML Configuration"
+    namespace = "EHERKENNING"
+    required_fields = (
+        "base_url",
+        "certificate_label",
+        "certificate_public_certificate",
+        "certificate_type",
+        "entity_id",
+        "makelaar_id",
+        "metadata_file_source",
+        "oin",
+        "privacy_policy",
+        "service_description",
+        "service_name",
+    )
+    all_fields = required_fields + (
+        "artifact_resolve_content_type",
+        "base_url",
+        "certificate_private_key",
+        "digest_algorithm",
+        "eh_attribute_consuming_service_index",
+        "eh_loa",
+        "eh_requested_attributes",
+        "eh_service_instance_uuid",
+        "eh_service_uuid",
+        "eidas_attribute_consuming_service_index",
+        "eidas_loa",
+        "eidas_requested_attributes",
+        "eidas_service_instance_uuid",
+        "eidas_service_uuid",
+        "entity_id",
+        "key_passphrase",
+        "no_eidas",
+        "organization_name",
+        "organization_url",
+        "service_description",
+        "service_language",
+        "service_name",
+        "signature_algorithm",
+        "technical_contact_person_email",
+        "technical_contact_person_telephone",
+        "want_assertions_encrypted",
+        "want_assertions_signed",
+    )
 
 
 class eHerkenningConfigurationStep(BaseConfigurationStep):

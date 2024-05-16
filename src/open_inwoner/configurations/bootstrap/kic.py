@@ -10,6 +10,36 @@ from open_inwoner.openklant.clients import build_client
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.utils.api import ClientError
 
+from .base import ConfigSettingsBase
+
+
+class KICConfigurationSettings(ConfigSettingsBase):
+    model = OpenKlantConfig
+    display_name = "Klanten Configuration"
+    namespace = "KIC"
+    required_fields = (
+        "contactmomenten_service_client_id",
+        "contactmomenten_service_secret",
+        "contactmomenten_service_api_root",
+        "klanten_service_client_id",
+        "klanten_service_secret",
+        "klanten_service_api_root",
+        "register_type",
+        "register_contact_moment",
+    )
+    all_fields = required_fields + (
+        "register_bronorganisatie_rsin",
+        "register_channel",
+        "register_contact_moment",
+        "register_email",
+        "register_employee_id",
+        "use_rsin_for_innNnpId_query_parameter",
+    )
+    excluded_fields = (
+        "contactmomenten_service_uuid",
+        "klanten_service_uuid",
+    )
+
 
 class KlantenAPIConfigurationStep(BaseConfigurationStep):
     """
@@ -18,15 +48,15 @@ class KlantenAPIConfigurationStep(BaseConfigurationStep):
 
     verbose_name = "Klanten API configuration"
     required_settings = [
-        "KIC_CONFIG_KLANTEN_API_ROOT",
-        "KIC_CONFIG_KLANTEN_API_CLIENT_ID",
-        "KIC_CONFIG_KLANTEN_API_SECRET",
+        "KIC_KLANTEN_SERVICE_API_ROOT",
+        "KIC_KLANTEN_SERVICE_API_CLIENT_ID",
+        "KIC_KLANTEN_SERVICE_API_SECRET",
     ]
-    enable_setting = "KIC_CONFIG_ENABLE"
+    enable_setting = "KIC_ENABLE"
 
     def is_configured(self) -> bool:
         return Service.objects.filter(
-            api_root=settings.KIC_CONFIG_KLANTEN_API_ROOT
+            api_root=settings.KIC_KLANTEN_SERVICE_API_ROOT
         ).exists()
 
     def configure(self):
@@ -34,15 +64,15 @@ class KlantenAPIConfigurationStep(BaseConfigurationStep):
         org_label = f"Open Inwoner {organization}".strip()
 
         Service.objects.update_or_create(
-            api_root=settings.KIC_CONFIG_KLANTEN_API_ROOT,
+            api_root=settings.KIC_KLANTEN_SERVICE_API_ROOT,
             defaults={
                 "label": "Klanten API",
                 "api_type": APITypes.kc,
-                "oas": settings.KIC_CONFIG_KLANTEN_API_ROOT,
+                "oas": settings.KIC_KLANTEN_SERVICE_API_ROOT,
                 "auth_type": AuthTypes.zgw,
-                "client_id": settings.KIC_CONFIG_KLANTEN_API_CLIENT_ID,
-                "secret": settings.KIC_CONFIG_KLANTEN_API_SECRET,
-                "user_id": settings.KIC_CONFIG_KLANTEN_API_CLIENT_ID,
+                "client_id": settings.KIC_KLANTEN_SERVICE_API_CLIENT_ID,
+                "secret": settings.KIC_KLANTEN_SERVICE_API_SECRET,
+                "user_id": settings.KIC_KLANTEN_SERVICE_API_CLIENT_ID,
                 "user_representation": org_label,
             },
         )
@@ -60,15 +90,15 @@ class ContactmomentenAPIConfigurationStep(BaseConfigurationStep):
 
     verbose_name = "Contactmomenten API configuration"
     required_settings = [
-        "KIC_CONFIG_CONTACTMOMENTEN_API_ROOT",
-        "KIC_CONFIG_CONTACTMOMENTEN_API_CLIENT_ID",
-        "KIC_CONFIG_CONTACTMOMENTEN_API_SECRET",
+        "KIC_CONTACTMOMENTEN_SERVICE_API_ROOT",
+        "KIC_CONTACTMOMENTEN_SERVICE_API_CLIENT_ID",
+        "KIC_CONTACTMOMENTEN_SERVICE_API_SECRET",
     ]
-    enable_setting = "KIC_CONFIG_ENABLE"
+    enable_setting = "KIC_ENABLE"
 
     def is_configured(self) -> bool:
         return Service.objects.filter(
-            api_root=settings.KIC_CONFIG_CONTACTMOMENTEN_API_ROOT
+            api_root=settings.KIC_CONTACTMOMENTEN_SERVICE_API_ROOT
         ).exists()
 
     def configure(self):
@@ -76,15 +106,15 @@ class ContactmomentenAPIConfigurationStep(BaseConfigurationStep):
         org_label = f"Open Inwoner {organization}".strip()
 
         Service.objects.update_or_create(
-            api_root=settings.KIC_CONFIG_CONTACTMOMENTEN_API_ROOT,
+            api_root=settings.KIC_CONTACTMOMENTEN_SERVICE_API_ROOT,
             defaults={
                 "label": "Contactmomenten API",
                 "api_type": APITypes.cmc,
-                "oas": settings.KIC_CONFIG_CONTACTMOMENTEN_API_ROOT,
+                "oas": settings.KIC_CONTACTMOMENTEN_SERVICE_API_ROOT,
                 "auth_type": AuthTypes.zgw,
-                "client_id": settings.KIC_CONFIG_CONTACTMOMENTEN_API_CLIENT_ID,
-                "secret": settings.KIC_CONFIG_CONTACTMOMENTEN_API_SECRET,
-                "user_id": settings.KIC_CONFIG_CONTACTMOMENTEN_API_CLIENT_ID,
+                "client_id": settings.KIC_CONTACTMOMENTEN_SERVICE_API_CLIENT_ID,
+                "secret": settings.KIC_CONTACTMOMENTEN_SERVICE_API_SECRET,
+                "user_id": settings.KIC_CONTACTMOMENTEN_SERVICE_API_CLIENT_ID,
                 "user_representation": org_label,
             },
         )
@@ -101,7 +131,7 @@ class KICAPIsConfigurationStep(BaseConfigurationStep):
     """
 
     verbose_name = "Klantinteractie APIs configuration"
-    enable_setting = "KIC_CONFIG_ENABLE"
+    enable_setting = "KIC_ENABLE"
 
     def is_configured(self) -> bool:
         kic_config = OpenKlantConfig.get_solo()
@@ -112,29 +142,29 @@ class KICAPIsConfigurationStep(BaseConfigurationStep):
     def configure(self):
         config = OpenKlantConfig.get_solo()
         config.klanten_service = Service.objects.get(
-            api_root=settings.KIC_CONFIG_KLANTEN_API_ROOT
+            api_root=settings.KIC_KLANTEN_SERVICE_API_ROOT
         )
         config.contactmomenten_service = Service.objects.get(
-            api_root=settings.KIC_CONFIG_CONTACTMOMENTEN_API_ROOT
+            api_root=settings.KIC_CONTACTMOMENTEN_SERVICE_API_ROOT
         )
 
-        if settings.KIC_CONFIG_REGISTER_EMAIL:
-            config.register_email = settings.KIC_CONFIG_REGISTER_EMAIL
-        if settings.KIC_CONFIG_REGISTER_CONTACT_MOMENT is not None:
-            config.register_contact_moment = settings.KIC_CONFIG_REGISTER_CONTACT_MOMENT
-        if settings.KIC_CONFIG_REGISTER_BRONORGANISATIE_RSIN:
+        if settings.KIC_REGISTER_EMAIL:
+            config.register_email = settings.KIC_REGISTER_EMAIL
+        if settings.KIC_REGISTER_CONTACT_MOMENT is not None:
+            config.register_contact_moment = settings.KIC_REGISTER_CONTACT_MOMENT
+        if settings.KIC_REGISTER_BRONORGANISATIE_RSIN:
             config.register_bronorganisatie_rsin = (
-                settings.KIC_CONFIG_REGISTER_BRONORGANISATIE_RSIN
+                settings.KIC_REGISTER_BRONORGANISATIE_RSIN
             )
-        if settings.KIC_CONFIG_REGISTER_CHANNEL:
-            config.register_channel = settings.KIC_CONFIG_REGISTER_CHANNEL
-        if settings.KIC_CONFIG_REGISTER_TYPE:
-            config.register_type = settings.KIC_CONFIG_REGISTER_TYPE
-        if settings.KIC_CONFIG_REGISTER_EMPLOYEE_ID:
-            config.register_employee_id = settings.KIC_CONFIG_REGISTER_EMPLOYEE_ID
-        if settings.KIC_CONFIG_USE_RSIN_FOR_INNNNPID_QUERY_PARAMETER is not None:
+        if settings.KIC_REGISTER_CHANNEL:
+            config.register_channel = settings.KIC_REGISTER_CHANNEL
+        if settings.KIC_REGISTER_TYPE:
+            config.register_type = settings.KIC_REGISTER_TYPE
+        if settings.KIC_REGISTER_EMPLOYEE_ID:
+            config.register_employee_id = settings.KIC_REGISTER_EMPLOYEE_ID
+        if settings.KIC_USE_RSIN_FOR_INNNNPID_QUERY_PARAMETER is not None:
             config.use_rsin_for_innNnpId_query_parameter = (
-                settings.KIC_CONFIG_USE_RSIN_FOR_INNNNPID_QUERY_PARAMETER
+                settings.KIC_USE_RSIN_FOR_INNNNPID_QUERY_PARAMETER
             )
 
         config.save()
