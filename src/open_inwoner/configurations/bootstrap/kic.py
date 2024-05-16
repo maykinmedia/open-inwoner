@@ -3,6 +3,7 @@ from django.conf import settings
 import requests
 from django_setup_configuration.configuration import BaseConfigurationStep
 from django_setup_configuration.exceptions import SelfTestFailed
+from simple_certmanager.models import Certificate
 from zgw_consumers.constants import APITypes, AuthTypes
 from zgw_consumers.models import Service
 
@@ -63,6 +64,16 @@ class KlantenAPIConfigurationStep(BaseConfigurationStep):
         organization = settings.OIP_ORGANIZATION or settings.ENVIRONMENT
         org_label = f"Open Inwoner {organization}".strip()
 
+        server_certificate, _ = Certificate.objects.get_or_create(
+            label=settings.KIC_SERVER_CERTIFICATE_LABEL,
+            defaults={
+                "type": settings.KIC_SERVER_CERTIFICATE_TYPE,
+            },
+        )
+
+        with open(settings.KIC_SERVER_CERTIFICATE_PUBLIC_CERTIFICATE) as public_cert:
+            server_certificate.public_certificate.save("kic.crt", public_cert)
+
         Service.objects.update_or_create(
             api_root=settings.KIC_KLANTEN_SERVICE_API_ROOT,
             defaults={
@@ -74,6 +85,7 @@ class KlantenAPIConfigurationStep(BaseConfigurationStep):
                 "secret": settings.KIC_KLANTEN_SERVICE_API_SECRET,
                 "user_id": settings.KIC_KLANTEN_SERVICE_API_CLIENT_ID,
                 "user_representation": org_label,
+                "server_certificate": server_certificate,
             },
         )
 
@@ -105,6 +117,16 @@ class ContactmomentenAPIConfigurationStep(BaseConfigurationStep):
         organization = settings.OIP_ORGANIZATION or settings.ENVIRONMENT
         org_label = f"Open Inwoner {organization}".strip()
 
+        server_certificate, _ = Certificate.objects.get_or_create(
+            label=settings.KIC_SERVER_CERTIFICATE_LABEL,
+            defaults={
+                "type": settings.KIC_SERVER_CERTIFICATE_TYPE,
+            },
+        )
+
+        with open(settings.KIC_SERVER_CERTIFICATE_PUBLIC_CERTIFICATE) as public_cert:
+            server_certificate.public_certificate.save("zgw.crt", public_cert)
+
         Service.objects.update_or_create(
             api_root=settings.KIC_CONTACTMOMENTEN_SERVICE_API_ROOT,
             defaults={
@@ -116,6 +138,7 @@ class ContactmomentenAPIConfigurationStep(BaseConfigurationStep):
                 "secret": settings.KIC_CONTACTMOMENTEN_SERVICE_API_SECRET,
                 "user_id": settings.KIC_CONTACTMOMENTEN_SERVICE_API_CLIENT_ID,
                 "user_representation": org_label,
+                "server_certificate": server_certificate,
             },
         )
 

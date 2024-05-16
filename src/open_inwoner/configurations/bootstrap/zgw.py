@@ -69,15 +69,13 @@ class ZakenAPIConfigurationStep(BaseConfigurationStep):
         org_label = f"Open Inwoner {organization}".strip()
 
         server_certificate, _ = Certificate.objects.get_or_create(
-            label=settings.ZGW_CONFIG_SERVER_CERTIFICATE_LABEL,
+            label=settings.ZGW_SERVER_CERTIFICATE_LABEL,
             defaults={
-                "type": settings.ZGW_CONFIG_SERVER_CERTIFICATE_TYPE,
+                "type": settings.ZGW_SERVER_CERTIFICATE_TYPE,
             },
         )
 
-        with open(
-            settings.ZGW_CONFIG_SERVER_CERTIFICATE_PUBLIC_CERTIFICATE
-        ) as public_cert:
+        with open(settings.ZGW_SERVER_CERTIFICATE_PUBLIC_CERTIFICATE) as public_cert:
             server_certificate.public_certificate.save("zgw.crt", public_cert)
 
         if getattr(settings, "ZGW_CONFIG_SERVER_CERTIFICATE_PRIVATE_KEY", None):
@@ -128,15 +126,13 @@ class CatalogiAPIConfigurationStep(BaseConfigurationStep):
         org_label = f"Open Inwoner {organization}".strip()
 
         server_certificate, _ = Certificate.objects.get_or_create(
-            label=settings.ZGW_CONFIG_SERVER_CERTIFICATE_LABEL,
+            label=settings.ZGW_SERVER_CERTIFICATE_LABEL,
             defaults={
-                "type": settings.ZGW_CONFIG_SERVER_CERTIFICATE_TYPE,
+                "type": settings.ZGW_SERVER_CERTIFICATE_TYPE,
             },
         )
 
-        with open(
-            settings.ZGW_CONFIG_SERVER_CERTIFICATE_PUBLIC_CERTIFICATE
-        ) as public_cert:
+        with open(settings.ZGW_SERVER_CERTIFICATE_PUBLIC_CERTIFICATE) as public_cert:
             server_certificate.public_certificate.save("zgw.crt", public_cert)
 
         if getattr(settings, "ZGW_CONFIG_SERVER_CERTIFICATE_PRIVATE_KEY", None):
@@ -187,15 +183,13 @@ class DocumentenAPIConfigurationStep(BaseConfigurationStep):
         org_label = f"Open Inwoner {organization}".strip()
 
         server_certificate, _ = Certificate.objects.get_or_create(
-            label=settings.ZGW_CONFIG_SERVER_CERTIFICATE_LABEL,
+            label=settings.ZGW_SERVER_CERTIFICATE_LABEL,
             defaults={
-                "type": settings.ZGW_CONFIG_SERVER_CERTIFICATE_TYPE,
+                "type": settings.ZGW_SERVER_CERTIFICATE_TYPE,
             },
         )
 
-        with open(
-            settings.ZGW_CONFIG_SERVER_CERTIFICATE_PUBLIC_CERTIFICATE
-        ) as public_cert:
+        with open(settings.ZGW_SERVER_CERTIFICATE_PUBLIC_CERTIFICATE) as public_cert:
             server_certificate.public_certificate.save("zgw.crt", public_cert)
 
         if getattr(settings, "ZGW_CONFIG_SERVER_CERTIFICATE_PRIVATE_KEY", None):
@@ -246,15 +240,13 @@ class FormulierenAPIConfigurationStep(BaseConfigurationStep):
         org_label = f"Open Inwoner {organization}".strip()
 
         server_certificate, _ = Certificate.objects.get_or_create(
-            label=settings.ZGW_CONFIG_SERVER_CERTIFICATE_LABEL,
+            label=settings.ZGW_SERVER_CERTIFICATE_LABEL,
             defaults={
-                "type": settings.ZGW_CONFIG_SERVER_CERTIFICATE_TYPE,
+                "type": settings.ZGW_SERVER_CERTIFICATE_TYPE,
             },
         )
 
-        with open(
-            settings.ZGW_CONFIG_SERVER_CERTIFICATE_PUBLIC_CERTIFICATE
-        ) as public_cert:
+        with open(settings.ZGW_SERVER_CERTIFICATE_PUBLIC_CERTIFICATE) as public_cert:
             server_certificate.public_certificate.save("zgw.crt", public_cert)
 
         if getattr(settings, "ZGW_CONFIG_SERVER_CERTIFICATE_PRIVATE_KEY", None):
