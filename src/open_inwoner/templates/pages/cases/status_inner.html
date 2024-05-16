@@ -74,7 +74,7 @@
                 {% include "pages/questions/questions.html" with questions=case.questions only %}
                 {% if case.questions|length > 3 %}
                     <div class="expand">
-                        <a id="toggle-hide-elements" class="button button--textless button--icon button--icon-after button--secondary button--transparent" data-label-reveal="{% trans 'Toon alle vragen' %}" data-label-collapse="{% trans 'Toon minder' %}" data-label-num-elems={{ case.questions|length }} aria-expanded=false>
+                        <a id="toggle-hide-elements" class="utrecht-button button button--textless button--icon button--icon-after button--secondary button--transparent" data-label-reveal="{% trans 'Toon alle vragen' %}" data-label-collapse="{% trans 'Toon minder' %}" data-label-num-elems={{ case.questions|length }} aria-expanded=false>
                             {% icon extra_classes="expand-icon" icon="expand_more" icon_position="after" icon_outlined=True %}
                         </a>
                     </div>
