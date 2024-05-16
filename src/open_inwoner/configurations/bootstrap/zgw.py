@@ -3,6 +3,7 @@ from django.conf import settings
 import requests
 from django_setup_configuration.configuration import BaseConfigurationStep
 from django_setup_configuration.exceptions import SelfTestFailed
+from simple_certmanager.models import Certificate
 from zgw_consumers.constants import APITypes, AuthTypes
 from zgw_consumers.models import Service
 
@@ -67,6 +68,22 @@ class ZakenAPIConfigurationStep(BaseConfigurationStep):
         organization = settings.OIP_ORGANIZATION or settings.ENVIRONMENT
         org_label = f"Open Inwoner {organization}".strip()
 
+        server_certificate, _ = Certificate.objects.get_or_create(
+            label=settings.ZGW_CONFIG_SERVER_CERTIFICATE_LABEL,
+            defaults={
+                "type": settings.ZGW_CONFIG_SERVER_CERTIFICATE_TYPE,
+            },
+        )
+
+        with open(
+            settings.ZGW_CONFIG_SERVER_CERTIFICATE_PUBLIC_CERTIFICATE
+        ) as public_cert:
+            server_certificate.public_certificate.save("zgw.crt", public_cert)
+
+        if getattr(settings, "ZGW_CONFIG_SERVER_CERTIFICATE_PRIVATE_KEY", None):
+            with open(settings.ZGW_CONFIG_CERTIFICATE_PRIVATE_KEY) as private_key:
+                server_certificate.private_key.save("zgw.key", private_key)
+
         Service.objects.update_or_create(
             api_root=settings.ZGW_ZAAK_SERVICE_API_ROOT,
             defaults={
@@ -78,6 +95,7 @@ class ZakenAPIConfigurationStep(BaseConfigurationStep):
                 "secret": settings.ZGW_ZAAK_SERVICE_API_SECRET,
                 "user_id": settings.ZGW_ZAAK_SERVICE_API_CLIENT_ID,
                 "user_representation": org_label,
+                "server_certificate": server_certificate,
             },
         )
 
@@ -109,6 +127,22 @@ class CatalogiAPIConfigurationStep(BaseConfigurationStep):
         organization = settings.OIP_ORGANIZATION or settings.ENVIRONMENT
         org_label = f"Open Inwoner {organization}".strip()
 
+        server_certificate, _ = Certificate.objects.get_or_create(
+            label=settings.ZGW_CONFIG_SERVER_CERTIFICATE_LABEL,
+            defaults={
+                "type": settings.ZGW_CONFIG_SERVER_CERTIFICATE_TYPE,
+            },
+        )
+
+        with open(
+            settings.ZGW_CONFIG_SERVER_CERTIFICATE_PUBLIC_CERTIFICATE
+        ) as public_cert:
+            server_certificate.public_certificate.save("zgw.crt", public_cert)
+
+        if getattr(settings, "ZGW_CONFIG_SERVER_CERTIFICATE_PRIVATE_KEY", None):
+            with open(settings.ZGW_CONFIG_CERTIFICATE_PRIVATE_KEY) as private_key:
+                server_certificate.private_key.save("zgw.key", private_key)
+
         Service.objects.update_or_create(
             api_root=settings.ZGW_CATALOGI_SERVICE_API_ROOT,
             defaults={
@@ -120,6 +154,7 @@ class CatalogiAPIConfigurationStep(BaseConfigurationStep):
                 "secret": settings.ZGW_CATALOGI_SERVICE_API_SECRET,
                 "user_id": settings.ZGW_CATALOGI_SERVICE_API_CLIENT_ID,
                 "user_representation": org_label,
+                "server_certificate": server_certificate,
             },
         )
 
@@ -151,6 +186,22 @@ class DocumentenAPIConfigurationStep(BaseConfigurationStep):
         organization = settings.OIP_ORGANIZATION or settings.ENVIRONMENT
         org_label = f"Open Inwoner {organization}".strip()
 
+        server_certificate, _ = Certificate.objects.get_or_create(
+            label=settings.ZGW_CONFIG_SERVER_CERTIFICATE_LABEL,
+            defaults={
+                "type": settings.ZGW_CONFIG_SERVER_CERTIFICATE_TYPE,
+            },
+        )
+
+        with open(
+            settings.ZGW_CONFIG_SERVER_CERTIFICATE_PUBLIC_CERTIFICATE
+        ) as public_cert:
+            server_certificate.public_certificate.save("zgw.crt", public_cert)
+
+        if getattr(settings, "ZGW_CONFIG_SERVER_CERTIFICATE_PRIVATE_KEY", None):
+            with open(settings.ZGW_CONFIG_CERTIFICATE_PRIVATE_KEY) as private_key:
+                server_certificate.private_key.save("zgw.key", private_key)
+
         Service.objects.update_or_create(
             api_root=settings.ZGW_DOCUMENTEN_SERVICE_API_ROOT,
             defaults={
@@ -162,6 +213,7 @@ class DocumentenAPIConfigurationStep(BaseConfigurationStep):
                 "secret": settings.ZGW_DOCUMENTEN_SERVICE_API_SECRET,
                 "user_id": settings.ZGW_DOCUMENTEN_SERVICE_API_CLIENT_ID,
                 "user_representation": org_label,
+                "server_certificate": server_certificate,
             },
         )
 
@@ -193,6 +245,22 @@ class FormulierenAPIConfigurationStep(BaseConfigurationStep):
         organization = settings.OIP_ORGANIZATION or settings.ENVIRONMENT
         org_label = f"Open Inwoner {organization}".strip()
 
+        server_certificate, _ = Certificate.objects.get_or_create(
+            label=settings.ZGW_CONFIG_SERVER_CERTIFICATE_LABEL,
+            defaults={
+                "type": settings.ZGW_CONFIG_SERVER_CERTIFICATE_TYPE,
+            },
+        )
+
+        with open(
+            settings.ZGW_CONFIG_SERVER_CERTIFICATE_PUBLIC_CERTIFICATE
+        ) as public_cert:
+            server_certificate.public_certificate.save("zgw.crt", public_cert)
+
+        if getattr(settings, "ZGW_CONFIG_SERVER_CERTIFICATE_PRIVATE_KEY", None):
+            with open(settings.ZGW_CONFIG_CERTIFICATE_PRIVATE_KEY) as private_key:
+                server_certificate.private_key.save("zgw.key", private_key)
+
         Service.objects.update_or_create(
             api_root=settings.ZGW_FORM_SERVICE_API_ROOT,
             defaults={
@@ -204,6 +272,7 @@ class FormulierenAPIConfigurationStep(BaseConfigurationStep):
                 "secret": settings.ZGW_FORM_SERVICE_API_SECRET,
                 "user_id": settings.ZGW_FORM_SERVICE_API_CLIENT_ID,
                 "user_representation": org_label,
+                "server_certificate": server_certificate,
             },
         )
 
@@ -220,6 +289,12 @@ class ZGWAPIsConfigurationStep(BaseConfigurationStep):
 
     verbose_name = "ZGW APIs configuration"
     enable_setting = "ZGW_ENABLE"
+    required_settings = [
+        "ZGW_SERVER_CERTIFICATE_LABEL",
+        "ZGW_SERVER_CERTIFICATE_TYPE",
+        "ZGW_SERVER_CERTIFICATE_PUBLIC_CERTIFICATE",
+    ]
+    enable_setting = "ZGW_CONFIG_ENABLE"
 
     def is_configured(self) -> bool:
         zgw_config = OpenZaakConfig.get_solo()

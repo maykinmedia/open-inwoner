@@ -1,9 +1,14 @@
+import tempfile
+
+from django.conf import settings
 from django.test import TestCase, override_settings
 from django.utils.translation import gettext as _
 
 import requests
 import requests_mock
 from django_setup_configuration.exceptions import SelfTestFailed
+from privates.test import temp_private_root
+from simple_certmanager.constants import CertificateTypes
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 
 from open_inwoner.openzaak.models import (
@@ -24,9 +29,19 @@ CATALOGI_SERVICE_API_ROOT = "https://openzaak.local/catalogi/api/v1/"
 DOCUMENTEN_SERVICE_API_ROOT = "https://openzaak.local/documenten/api/v1/"
 FORM_SERVICE_API_ROOT = "https://esuite.local.net/formulieren-provider/api/v1/"
 
+PUBLIC_CERT_FILE = tempfile.NamedTemporaryFile()
+PRIVATE_KEY_FILE = tempfile.NamedTemporaryFile()
 
+with open(PUBLIC_CERT_FILE.name, "w") as f:
+    f.write("cert")
+
+
+@temp_private_root()
 @override_settings(
     OIP_ORGANIZATION="Maykin",
+    ZGW_SERVER_CERTIFICATE_LABEL="ZGW services server certificate",
+    ZGW_SERVER_CERTIFICATE_TYPE=CertificateTypes.cert_only,
+    ZGW_SERVER_CERTIFICATE_PUBLIC_CERTIFICATE=PUBLIC_CERT_FILE.name,
     ZGW_ZAAK_SERVICE_API_ROOT=ZAAK_SERVICE_API_ROOT,
     ZGW_ZAAK_SERVICE_API_CLIENT_ID="open-inwoner-test",
     ZGW_ZAAK_SERVICE_API_SECRET="zaken-secret",
@@ -65,6 +80,37 @@ class ZGWConfigurationTests(TestCase):
         document_service = config.document_service
         form_service = config.form_service
 
+        # certificates
+        zaak_cert = zaak_service.server_certificate.public_certificate
+        catalogi_cert = catalogi_service.server_certificate.public_certificate
+        document_cert = document_service.server_certificate.public_certificate
+        form_cert = form_service.server_certificate.public_certificate
+
+        self.assertEqual(
+            zaak_service.server_certificate.label, "ZGW services server certificate"
+        )
+        self.assertTrue(zaak_cert.path.startswith(settings.PRIVATE_MEDIA_ROOT))
+        self.assertEqual(zaak_cert.file.read(), b"cert")
+
+        self.assertEqual(
+            catalogi_service.server_certificate.label, "ZGW services server certificate"
+        )
+        self.assertTrue(catalogi_cert.path.startswith(settings.PRIVATE_MEDIA_ROOT))
+        self.assertEqual(catalogi_cert.file.read(), b"cert")
+
+        self.assertEqual(
+            document_service.server_certificate.label, "ZGW services server certificate"
+        )
+        self.assertTrue(document_cert.path.startswith(settings.PRIVATE_MEDIA_ROOT))
+        self.assertEqual(document_cert.file.read(), b"cert")
+
+        self.assertEqual(
+            form_service.server_certificate.label, "ZGW services server certificate"
+        )
+        self.assertTrue(form_cert.path.startswith(settings.PRIVATE_MEDIA_ROOT))
+        self.assertEqual(form_cert.file.read(), b"cert")
+
+        # other settings
         self.assertEqual(zaak_service.api_root, ZAAK_SERVICE_API_ROOT)
         self.assertEqual(zaak_service.client_id, "open-inwoner-test")
         self.assertEqual(zaak_service.secret, "zaken-secret")
