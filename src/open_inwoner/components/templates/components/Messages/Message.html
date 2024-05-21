@@ -7,11 +7,11 @@
             {% url "inbox:download" uuid=message.uuid as download_url %}
             {% link href=download_url text=message.file secondary=True download=True %}
         {% else %}
-            <p class="p">{{ message.content|linebreaksbr }}</p>
+            <p class="utrecht-paragraph">{{ message.content|linebreaksbr }}</p>
         {% endif %}
     </div>
 
     <footer class="message__footer">
-        <p class="p p--muted p--small" title="{{ message.created_on }}">{{ message.created_on|time }}</p>
+        <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-muted utrecht-paragraph--oip-small" title="{{ message.created_on }}">{{ message.created_on|time }}</p>
     </footer>
 </aside>

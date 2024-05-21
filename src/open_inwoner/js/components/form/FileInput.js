@@ -293,14 +293,14 @@ export class FileInput extends Component {
       <aside class="file">
         <div class="file__container">
           <div class="file__file ${typeError || sizeError ? 'error' : ''}">
-            <p class="file__symbol">
+            <div class="file__symbol">
               <span aria-hidden="true" class="material-icons-outlined">${
                 type.match('image') ? 'image' : 'description'
               }</span>
-            </p>
-            <p class="file__data">
+            </div>
+            <div class="file__data">
               <span class="file__name">${name} (${ext}, ${sizeMB}MB)</span>
-            </p>
+            </div>
             <a class="link link--primary file__download" href="#document-upload" role="button" aria-label="${labelDelete}">
               <span aria-hidden="true" class="material-icons-outlined">delete</span>
             </a>
@@ -308,13 +308,13 @@ export class FileInput extends Component {
           ${
             typeError && sizeError
               ? `
-              <p class="p p--small error">
+              <p class="utrecht-paragraph utrecht-paragraph--oip-small error">
                 <span aria-hidden="true" class="material-icons-outlined">warning_amber</span>
                 <span class="file-error__content">Dit type bestand (${ext}) is ongeldig en te groot. Geldige bestandstypen zijn: ${uploadFileTypes}</span>
               </p>`
               : typeError || sizeError
               ? `
-              <p class="p p--small error">
+              <p class="utrecht-paragraph utrecht-paragraph--oip-small error">
                 <span aria-hidden="true" class="material-icons-outlined">warning_amber</span>
                 ${
                   typeError

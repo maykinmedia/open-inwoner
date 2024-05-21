@@ -42,7 +42,7 @@
     "@emotion/styled": "^11.3.0",
     "@fortawesome/fontawesome-free": "^6.4.2",
     "@joeattardi/emoji-button": "^4.6.4",
-    "@open-inwoner/design-tokens": "^0.0.3-alpha.0",
+    "@open-inwoner/design-tokens": "^0.0.5-alpha.4",
     "@tarekraafat/autocomplete.js": "^10.2.6",
     "bem.js": "^1.0.10",
     "emojibase-data": "^7.0.1",

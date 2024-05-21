@@ -9,7 +9,7 @@
             <a href="{{ appointment_list_url }}" class="card">
                 <div class="card__body card__body--tabled">
                     {% timezone appointment.branch.timeZone %}
-                        <p class="p tabled__value">{{ appointment.start|date:"j F Y" }} {% trans "om" %} {{ appointment.start|date:"H:i"|add:" "|add:_("uur") }}</p>
+                        <p class="utrecht-paragraph tabled__value">{{ appointment.start|date:"j F Y" }} {% trans "om" %} {{ appointment.start|date:"H:i"|add:" "|add:_("uur") }}</p>
                     {% endtimezone %}
                     <h2 class="plugin-card__heading">
                         <span class="status">{{ appointment.title }}</span>
