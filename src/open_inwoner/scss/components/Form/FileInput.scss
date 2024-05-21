@@ -73,7 +73,7 @@
     height: var(--row-height-giant);
   }
 
-  > .p {
+  > .utrecht-paragraph {
     margin: calc(0.5 * var(--gutter-width)) 0;
     display: block;
     text-align: center;
@@ -91,7 +91,7 @@
     .file__file.error {
       border-color: var(--color-red-notification);
 
-      .p {
+      .utrecht-paragraph {
         color: var(--color-gray-dark-900);
       }
 
@@ -116,7 +116,7 @@
       }
     }
 
-    .p--small {
+    .utrecht-paragraph--oip-small {
       margin-top: var(--spacing-small);
       margin-bottom: var(--spacing-small);
 

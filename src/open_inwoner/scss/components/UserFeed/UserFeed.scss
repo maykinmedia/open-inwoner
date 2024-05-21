@@ -16,6 +16,10 @@
     display: block;
     line-height: var(--font-line-height-body);
     position: relative;
+
+    & * {
+      color: var(--color-red-notification);
+    }
   }
 
   &__list {
@@ -106,8 +110,8 @@
     }
 
     .userfeed-card__description {
-      color: var(--font-color-heading);
-      font-family: var(--font-family-heading);
+      color: var(--utrecht-heading-color);
+      font-family: var(--utrecht-heading-font-family);
       font-size: var(--font-size-body);
       line-height: var(--font-line-height-body);
       margin: 0;

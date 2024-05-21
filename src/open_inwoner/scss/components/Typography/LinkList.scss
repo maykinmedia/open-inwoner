@@ -1,5 +1,4 @@
 .link-list {
-  .h4,
   .utrecht-heading-4 {
     margin-bottom: var(--spacing-large);
   }
@@ -27,5 +26,13 @@
     &:last-child {
       margin-bottom: 0;
     }
+  }
+
+  ///
+  /// Legacy styling
+  ///
+
+  .h4 {
+    margin-bottom: var(--spacing-large);
   }
 }

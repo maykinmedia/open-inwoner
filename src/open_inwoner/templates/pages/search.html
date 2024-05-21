@@ -52,7 +52,7 @@
                 {% if paginator.count and not messages %}
                     <section class="feedback" aria-label="{% trans "Pagina feedback" %}">
                         <h4 class="utrecht-heading-4">{% trans "Feedback" %}</h4>
-                        <p class="p">{% trans "Heeft u gevonden wat u zocht?" %}</p>
+                        <p class="utrecht-paragraph">{% trans "Heeft u gevonden wat u zocht?" %}</p>
                         {% render_form form=feedback_form method="POST" form_action=request.get_full_path id="feedback_form" show_notifications=True %}
                             {% csrf_token %}
                             {{ feedback_form.errors }}
@@ -83,7 +83,7 @@
                     <h2 class="utrecht-heading-2 search-results__title">
                         {% trans "Geen zoekresultaten" %}
                     </h2>
-                    <p class="p">{% trans "Helaas, wij vonden geen resultaten voor jouw zoekopdracht." %}</p>
+                    <p class="utrecht-paragraph">{% trans "Helaas, wij vonden geen resultaten voor jouw zoekopdracht." %}</p>
                 </div>
                 <ul class="ul">
                    <li class="li">{% trans "Controleer de spelling van je zoekopdracht." %}</li>

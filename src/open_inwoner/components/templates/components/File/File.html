@@ -3,15 +3,15 @@
 <aside class="file">
     <div class="file__container {% if recently_added %}file__container--recent{% endif %}">
         <div class="file__file">
-            <p class="file__symbol">
+            <div class="file__symbol">
                 {% if is_image %}
                     {% icon icon="image" outlined=True %}
                 {% else %}
                     {% icon icon="insert_drive_file" outlined=True %}
                 {% endif %}
-            </p>
+            </div>
 
-            <p class="file__data">
+            <div class="file__data">
                 {% if recently_added %}
                     <span class="file__file--recent">{% icon icon="fiber_manual_record" outlined=False extra_classes="file__file--recent" %}{% trans "Nieuw" %}</span>
                 {% endif %}
@@ -26,7 +26,7 @@
                     {% endif %}
                 </span>
                 <span class="file__date">{{ created|date:'j F Y' }}</span>
-            </p>
+            </div>
             {% if allow_delete %}
                 {% dropdown icon="more_horiz" %}
                     <div class="dropdown__item">
@@ -52,7 +52,7 @@
                 {% trans "Download" as download %}
                 {% link href=url text=download primary=True download=True hide_text=True extra_classes="file__download" icon="download" icon_outlined=True icon_position="before" %}
             {% endif %}
-            {% if description %}<p class="p p--small">{{ description }}</p>{% endif %}
+            {% if description %}<p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-small">{{ description }}</p>{% endif %}
         </div>
     </div>
 </aside>

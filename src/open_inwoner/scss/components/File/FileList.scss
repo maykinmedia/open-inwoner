@@ -34,11 +34,20 @@
 /// Contextual
 ///
 
-.file-list + .p,
-.file-list + .utrecht-heading-2 {
+.file-list + .utrecht-heading-2,
+.file-list + .utrecht-paragraph {
   margin-top: var(--spacing-large);
 }
 
 .utrecht-heading-2 + .file-list {
   margin-top: var(--spacing-extra-large);
+}
+
+///
+/// Legacy styling
+///
+
+.file-list + .h2,
+.file-list + .p {
+  margin-top: var(--spacing-large);
 }
