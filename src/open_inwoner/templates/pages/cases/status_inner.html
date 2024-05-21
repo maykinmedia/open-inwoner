@@ -36,7 +36,7 @@
                     <div class="card__body document-upload-description">
                         {% icon icon="info" icon_position="after" extra_classes="icon--info" outlined=True %}
 
-                        <div class="document-upload-description__text">{{ case.case_type_document_upload_description|markdown|safe }}</div>
+                        <div class="document-upload-description__text wysiwyg">{{ case.case_type_document_upload_description|markdown|safe }}</div>
                     </div>
                 </div>
                 {% endif %}
@@ -49,9 +49,9 @@
             {% elif case.external_upload_enabled %}
                 <h2 class="utrecht-heading-2" id="documents-upload">{% trans "Document toevoegen" %}</h2>
                 {% if case.case_type_config_description %}
-                    <p class="p">{{ case.case_type_config_description }}</p>
+                    <p class="utrecht-paragraph">{{ case.case_type_config_description }}</p>
                 {% else %}
-                    <p class="p">{% trans "By clicking the button below you can upload a document. This is an external link and you will be redirected to a different system." %}</p>
+                    <p class="utrecht-paragraph">{% trans "By clicking the button below you can upload a document. This is an external link and you will be redirected to a different system." %}</p>
                 {% endif %}
                 {% button_row %}
                     {% button href=case.external_upload_url text=_("Document uploaden") title=_("Opens new window") primary=True icon="open_in_new" icon_position="after" %}

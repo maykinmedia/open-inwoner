@@ -13,7 +13,7 @@
   }
 }
 
-.p + .map {
+.utrecht-paragraph + .map {
   margin-top: var(--spacing-large);
 }
 
@@ -28,4 +28,25 @@
   flex-direction: column;
   row-gap: var(--spacing-small);
   flex-wrap: wrap;
+
+  &.container--no-margin {
+    margin-top: var(--spacing-small);
+
+    & > .utrecht-paragraph {
+      margin: 0 !important;
+    }
+
+    /// leaflet reset
+    .link {
+      text-decoration: underline;
+    }
+  }
+}
+
+///
+/// Legacy styling
+///
+
+.p + .map {
+  margin-top: var(--spacing-large);
 }

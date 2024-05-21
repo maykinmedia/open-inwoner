@@ -345,8 +345,8 @@ $vm: var(--spacing-large);
     width: 100%;
 
     // Cut text and display dots if username is very long
-    > .p {
-      display: inline-block !important;
+    > .utrecht-paragraph {
+      display: flex !important;
       max-width: 250px;
       overflow: hidden;
       white-space: nowrap;
@@ -366,7 +366,7 @@ $vm: var(--spacing-large);
     @media (min-width: 768px) {
       justify-content: flex-end;
 
-      > .p {
+      > .utrecht-paragraph {
         display: flex;
         max-width: initial;
         overflow: initial;
@@ -491,7 +491,7 @@ $vm: var(--spacing-large);
             margin: var(--spacing-large) 0 0 0;
             width: calc(100% - (var(--spacing-extra-large)));
 
-            .p {
+            .utrecht-paragraph {
               display: flex;
               align-items: center;
               justify-content: space-between;

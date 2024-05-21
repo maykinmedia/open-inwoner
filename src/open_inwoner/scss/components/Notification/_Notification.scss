@@ -19,7 +19,7 @@
 
   [class*='icon'],
   [class*='Icon'] {
-    line-height: 1.3;
+    line-height: var(--spacing-giant);
   }
 
   /// Individual errors.
@@ -67,7 +67,7 @@
     color: var(--notification-color-text);
   }
 
-  &:not(#{&}--contents) .p {
+  &:not(#{&}--contents) .utrecht-paragraph {
     color: var(--notification-color-text);
   }
 
@@ -99,7 +99,7 @@
   }
 
   & &__content {
-    margin-top: 0.15em;
+    margin-top: var(--spacing-tiny);
 
     & * {
       margin: 0;

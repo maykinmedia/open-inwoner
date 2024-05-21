@@ -8,7 +8,7 @@
         {% render_card tinted=True  %}
             {% get_solo 'configurations.SiteConfiguration' as config %}
             <h1 class="utrecht-heading-1">{% trans "E-mailadres bevestigen" %}</h1><br>
-            {% if verification_text %}<p class="p">{{ verification_text|linebreaksbr }}</p><br>{% endif %}
+            {% if verification_text %}<p class="utrecht-paragraph">{{ verification_text|linebreaksbr }}</p><br>{% endif %}
             <form method="POST" id="email-verification-form" action="{{ request.get_full_path }}" class="form" novalidate>
                 {% csrf_token %}
                 {% form_actions primary_icon='arrow_forward' primary_text=button_text %}
