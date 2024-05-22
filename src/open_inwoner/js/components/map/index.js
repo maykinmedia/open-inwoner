@@ -117,7 +117,7 @@ class Map {
 
     return `
       <div class="leaflet-content-name">
-        <h4 class="h4">
+        <h4 class="utrecht-heading-4">
           ${title}
         </h4>
       </div>

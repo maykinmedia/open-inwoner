@@ -10,7 +10,7 @@
 {% with user=request.user %}
 
 <section class="tabled tabled--flexible">
-    <h1 class="h1" id="title">{% trans "Welkom" %}{% if not user.is_eherkenning_user %}, {{ user.first_name }}{% endif %}</h1>
+    <h1 class="utrecht-heading-1" id="title">{% trans "Welkom" %}{% if not user.is_eherkenning_user %}, {{ user.first_name }}{% endif %}</h1>
     <p class="tabled__key">
     {% trans "voor het laatst ingelogd op" %}: <span
     class="tabled__value">{{ user.last_login|date:"j F Y" }} om {{ user.last_login|date:"G:i" }} uur</span>
@@ -21,7 +21,7 @@
     {# Business information #}
     <section class="tabled tabled--flexible profile-section profile-section--bordered profile-section__business-overview">
         <div class="tabled__section">
-            <h2 class="h2 title" id="business-overview">{% trans "Bedrijfsgegevens" %}
+            <h2 class="utrecht-heading-2 title" id="business-overview">{% trans "Bedrijfsgegevens" %}
                 <div class="tabled__item--force-right tabled__item--mobile-big">
                     {% button href="profile:edit" text=_("Bewerk") icon="edit" transparent=True icon_outlined=True %}
                 </div>
@@ -55,7 +55,7 @@
     {# Personal information #}
     <section class="tabled tabled--flexible profile-section profile-section--bordered profile-section__personal-info" id="personal-info">
         <div class="tabled__section">
-            <h2 class="h2 title" id="personal-overview">{% trans "Persoonlijke gegevens" %}
+            <h2 class="utrecht-heading-2 title" id="personal-overview">{% trans "Persoonlijke gegevens" %}
                 <div class="tabled__item--force-right tabled__item--mobile-big">
                     {% button href="profile:edit" text=_("Bewerk") icon="edit" transparent=True icon_outlined=True %}
                     {% if user.is_digid_user_with_brp and view.config.my_data %}
@@ -95,7 +95,7 @@
     {# Notifications #}
     <section class="tabled tabled--flexible profile-section profile-section--bordered profile-section__notifications" id="profile-notifications">
         <div class="tabled__section">
-            <h2 class="h2 title" id="notifications">{% trans "Voorkeuren voor meldingen" %}
+            <h2 class="utrecht-heading-2 title" id="notifications">{% trans "Voorkeuren voor meldingen" %}
                 <div class="tabled__item--force-right tabled__item--mobile-big">
                     {% button href="profile:notifications" text=_("Bewerk") icon="edit" transparent=True icon_outlined=True %}
                 </div>
@@ -117,7 +117,7 @@
     {% if view.config.newsletters and form.fields.newsletters.choices %}
     <section class="tabled tabled--flexible profile-section profile-section--bordered profile-section__newsletters" id="profile-newsletters">
         <div class="tabled__section">
-            <h2 class="h2 title" id="newsletters">{% trans "Nieuwsbrieven" %}</h2>
+            <h2 class="utrecht-heading-2 title" id="newsletters">{% trans "Nieuwsbrieven" %}</h2>
         </div>
             <p class="p">{% trans "Vink de nieuwsbrieven aan die u wilt ontvangen. Wilt u een nieuwsbrief niet meer ontvangen? Haal het vinkje dan weg. Sla daarna uw keuze op." %}</p>
             <form method="POST" id="newsletter-form" class="form" novalidate>
@@ -150,7 +150,7 @@
     {% if view.config.selected_categories or view.config.mentors or view.config.my_contacts or view.config.actions or view.config.ssd or view.config.selfdiagnose or view.config.appointments %}
     {# Overview #}
     <section class="profile-section profile-section__overview">
-        <h2 class="h2 title" id="overview">{% trans "Overzicht" %}</h2>
+        <h2 class="utrecht-heading-2 title" id="overview">{% trans "Overzicht" %}</h2>
         <div class="profile-cards card-container card-container--columns-3">
             {# Selected categories #}
             {% if view.config.selected_categories %}
@@ -310,7 +310,7 @@
 
     <section class="tabled profile-section profile-section--bordered profile-section__remove">
         <div class="tabled__section">
-            <h2 class="h2 title" id="profile-remove">{% trans "Profiel verwijderen" %}</h2></div>
+            <h2 class="utrecht-heading-2 title" id="profile-remove">{% trans "Profiel verwijderen" %}</h2></div>
             <div class="tabled">
                 <p class="p">
                     {% trans "Hiermee worden alleen uw persoonlijke voorkeuren verwijderd. U krijgt dan bijvoorbeeld geen e-mail meer van ons over wijzigingen van uw lopende zaken. Uw persoonsgegevens en uw lopende zaken zelf worden hiermee niet verwijderd." %}

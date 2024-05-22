@@ -5,9 +5,25 @@
   display: var(--oip-typography-heading-display);
   justify-content: var(--oip-typography-heading-justify-content);
 
+  &--extra {
+    margin: var(--row-height) 0 var(--spacing-medium) 0;
+  }
+
+  @include mobile-only {
+    word-break: normal;
+    overflow-wrap: break-word;
+  }
+
   // when CMS is in edit mode
   &.cms-plugin {
     margin-top: var(--gutter-width);
+  }
+
+  &.indicator {
+    display: inline-block;
+    justify-content: flex-start;
+    overflow: visible;
+    position: relative;
   }
 }
 
@@ -20,10 +36,6 @@
   margin: 0;
   display: flex;
   justify-content: space-between;
-
-  &--extra {
-    margin: var(--row-height) 0 var(--spacing-medium) 0;
-  }
 
   @include mobile-only {
     word-break: normal;
@@ -52,15 +64,15 @@
 /// Contextual.
 ///
 
-.card + .h2,
-.dashboard + .h2,
-.status-list + .h2,
 .table + .h2,
+.card + .utrecht-heading-2,
+.dashboard + .utrecht-heading-2,
+.status-list + .utrecht-heading-2,
 .table + .utrecht-heading-2 {
   margin-top: var(--row-height);
 }
 
 .p + .h2,
-.utrecht-heading-2 + .h2 {
+.p + .utrecht-heading-2 {
   margin-top: var(--spacing-large);
 }

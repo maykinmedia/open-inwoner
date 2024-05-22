@@ -3,7 +3,7 @@
 
 {% block content %}
     <div class="plan-create">
-        <h1 class="h1">{% trans "Start nieuwe samenwerking" %}</h1>
+        <h1 class="utrecht-heading-1">{% trans "Start nieuwe samenwerking" %}</h1>
         {% optional_paragraph configurable_text.plans_page.plans_intro %}
 
         {% if request.user.get_active_contacts %}
@@ -49,7 +49,7 @@
                             </div>
                             <div class="modal modal--no-reset" id="template-{{ plan_template.id }}">
                                 <div class="modal__container">
-                                    <h2 class="h2 modal__title" id="modal__title">{{ plan_template.name }}
+                                    <h2 class="utrecht-heading-2 modal__title" id="modal__title">{{ plan_template.name }}
                                         <div class="modal__actions">
                                             {% button type="button" text=_("Sluiten") hide_text=True icon="close" outlined=True extra_classes="modal__button modal__close-title button__icon-close" %}
                                         </div>

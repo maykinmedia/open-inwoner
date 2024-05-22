@@ -3,7 +3,7 @@
 
 {% block content %}
 
-    <h1 class="h1">{% trans "Plan" %} {{ object.title }}</h1>
+    <h1 class="utrecht-heading-1">{% trans "Plan" %} {{ object.title }}</h1>
 
     <table class="table">
         <tr>
@@ -41,12 +41,12 @@
     </table>
 
 
-    <h2 class="h2 h2--extra">{% trans "Bestanden" %}</h2>
+    <h2 class="utrecht-heading-2 utrecht-heading-2--extra">{% trans "Bestanden" %}</h2>
     {% if object.get_all_files %}
         {% file_table files=object.get_all_files download_view="profile:documents_download" %}
     {% endif %}
 
-    <h2 class="h2 h2--extra">{% trans "Acties" %}</h2>
+    <h2 class="utrecht-heading-2 utrecht-heading-2--extra">{% trans "Acties" %}</h2>
     {% include "export/include/actions.html" with actions=object.actions.visible %}
 
 {% endblock %}

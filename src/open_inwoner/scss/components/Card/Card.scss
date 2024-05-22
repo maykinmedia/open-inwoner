@@ -321,10 +321,9 @@
   &__heading-2 .link,
   &__heading-3 .link,
   &__heading-4 .link {
-    color: var(--color-black);
-    font-family: var(--font-family-heading);
+    color: var(--oip-color-fg-heading);
     font-size: var(--font-size-heading-card);
-    line-height: var(--font-line-height-heading-4);
+    line-height: var(--utrecht-heading-4-line-height);
     margin: 0;
   }
 
@@ -383,10 +382,7 @@
   }
 
   &--stretch &__body .list:last-of-type {
-    padding-bottom: calc(
-      var(--font-size-body-large) + var(--card-spacing) +
-        var(--font-size-body-large)
-    );
+    padding-bottom: calc(2 * var(--card-spacing-vertical));
   }
 
   &--stretch .list + .link:first-of-type:last-of-type,

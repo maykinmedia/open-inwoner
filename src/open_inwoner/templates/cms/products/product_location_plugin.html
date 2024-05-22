@@ -1,7 +1,7 @@
 {% load i18n map_tags %}
 
 <section class="plugin plugin__locations">
-    <h2 class="h2">{{ configurable_text.home_page.home_map_title }}</h2>
+    <h2 class="utrecht-heading-2">{{ configurable_text.home_page.home_map_title }}</h2>
     <p class="p">{{ configurable_text.home_page.home_map_intro|linebreaksbr }}</p>
 
     {% with centroid=product_locations.get_centroid %}

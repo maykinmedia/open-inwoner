@@ -313,7 +313,9 @@ class SearchPagePlaywrightTests(
             # is our box checked in response
             expect(page.get_by_role("checkbox", name=checkbox_name)).to_be_checked()
             # implies one exact result
-            expect(page.locator(".search-results__item h3")).to_have_text(expected_text)
+            expect(page.locator(".search-results__item-title")).to_have_text(
+                expected_text
+            )
 
         _test_search("Tag 1", self.product1.name)
         _test_search("Tag 2", self.product2.name)
@@ -358,6 +360,6 @@ class SearchPagePlaywrightTests(
             with self.subTest(str(query_params)):
                 page.goto(self.live_reverse("search:search", params=query_params))
                 # implies one exact result
-                expect(page.locator(".search-results__item h3")).to_have_text(
+                expect(page.locator(".search-results__item-title")).to_have_text(
                     result_text
                 )

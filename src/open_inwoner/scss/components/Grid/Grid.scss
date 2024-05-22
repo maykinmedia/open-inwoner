@@ -25,12 +25,12 @@
         margin-bottom: var(--spacing-large);
       }
 
-      .h2 {
+      .utrecht-heading-2 {
         margin-bottom: var(--spacing-medium);
       }
 
       &.userfeed {
-        .h2 {
+        .utrecht-heading-2 {
           margin-bottom: 0;
         }
       }
@@ -83,9 +83,10 @@
     grid-column-end: span 12;
   }
 
-  &__welcome {
+  &__welcome.plugin {
     margin-top: -80px;
     background-color: var(--color-white);
+    border-radius: var(--border-radius);
     padding: var(--spacing-large);
     box-sizing: border-box;
     width: 100%;

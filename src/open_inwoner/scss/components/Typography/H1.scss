@@ -4,17 +4,6 @@
 .utrecht-heading-1 {
   display: var(--oip-typography-heading-display);
   justify-content: var(--oip-typography-heading-justify-content);
-}
-
-.h1 {
-  color: var(--utrecht-heading-1-color);
-  font-family: var(--utrecht-heading-1-font-family);
-  font-size: var(--utrecht-heading-1-font-size);
-  font-weight: var(--utrecht-heading-1-font-weight);
-  line-height: var(--utrecht-heading-1-line-height);
-  margin: var(--row-height) 0 0 0;
-  display: flex;
-  justify-content: space-between;
 
   @include mobile-only {
     flex-direction: column;
@@ -26,13 +15,30 @@
   &:first-of-type {
     margin: 0;
   }
+}
 
-  &--bottom {
-    margin-bottom: calc(var(--row-height) / 2) !important;
+.h1 {
+  color: var(--utrecht-heading-1-color);
+  font-family: var(--utrecht-heading-1-font-family);
+  font-size: var(--utrecht-heading-1-font-size);
+  font-weight: var(--utrecht-heading-1-font-weight);
+  line-height: var(--utrecht-heading-1-line-height);
+  margin: var(--row-height) 0 0 0;
+  display: var(--oip-typography-heading-display);
+  justify-content: var(--oip-typography-heading-justify-content);
+
+  @include mobile-only {
+    flex-direction: column;
+    align-items: flex-start;
+    word-break: normal;
+    overflow-wrap: break-word;
+  }
+
+  &:first-of-type {
+    margin: 0;
   }
 }
 
-.utrecht-heading-1 + .card-container,
-h1 + .card-container {
+.utrecht-heading-1 + .card-container {
   margin-top: var(--gutter-width);
 }

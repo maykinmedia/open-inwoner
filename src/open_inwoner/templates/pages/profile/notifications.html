@@ -4,7 +4,7 @@
 {% block content %}
     {% render_grid %}
         {% render_column start=5 span=5 %}
-        <h1 class="h1" id="title">
+        <h1 class="utrecht-heading-1" id="title">
             {% trans "Ontvang berichten over" %}
         </h1>
         <p class="p">
@@ -14,7 +14,7 @@
         <form method="POST" id="change-notifications" action="{% url 'profile:notifications' %}" class="form" novalidate>
             {% csrf_token %}
 
-            <h3 class="h3">Notificatie voorkeuren</h3>
+            <h3 class="utrecht-heading-3">Notificatie voorkeuren</h3>
 
             {# Start of multiple checkbox fields #}
             <ul class="choice-list choice-list-multiple">

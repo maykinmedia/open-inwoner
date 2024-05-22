@@ -6,7 +6,7 @@
     {% render_grid %}
         {% render_column start=5 span=5 %}
             {% get_solo 'configurations.SiteConfiguration' as config %}
-            <h1 class="h1">{% trans "Registratie voltooien" %}</h1><br>
+            <h1 class="utrecht-heading-1">{% trans "Registratie voltooien" %}</h1><br>
             {% if config.registration_text %}<p class="p">{{ config.registration_text|urlize|linebreaksbr }}</p>{% endif %}
             <form method="POST" id="necessary-form" action="{{ request.get_full_path }}" class="form" novalidate>
                 {% csrf_token %}
@@ -31,7 +31,7 @@
                     {% input form.invite no_label=True %}
                 {% endif %}
 
-                <h3 class="h3">Notificatie voorkeuren</h3>
+                <h3 class="utrecht-heading-3">Notificatie voorkeuren</h3>
 
                 {# Start of multiple checkbox fields #}
                 <ul class="choice-list choice-list-multiple">

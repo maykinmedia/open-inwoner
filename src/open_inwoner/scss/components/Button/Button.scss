@@ -214,7 +214,9 @@
 
 .h2 + .button,
 .h4 + .button,
-.p + .button {
+.p + .button,
+.utrecht-heading-2 + .button,
+.utrecht-heading-4 + .button {
   margin-top: var(--spacing-large);
 }
 

@@ -43,7 +43,8 @@
     color: var(--color-secondary);
   }
 
-  .leaflet-container .h4 &--primary {
+  .leaflet-container .h4 &--primary,
+  .leaflet-container .utrecht-heading-4 &--primary {
     color: var(--color-black);
   }
 

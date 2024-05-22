@@ -3,7 +3,7 @@
 
 {% block content %}
 
-    <h1 class="h1">{% trans "Action" %} {{ object }}</h1>
+    <h1 class="utrecht-heading-1">{% trans "Action" %} {{ object }}</h1>
 
     {% url "profile:action_download" uuid=object.uuid as download_url %}
 

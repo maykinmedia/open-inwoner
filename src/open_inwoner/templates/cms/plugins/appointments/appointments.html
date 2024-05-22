@@ -2,7 +2,7 @@
 
 {% if appointments %}
 <section class="plugin appointments">
-    <h2 class="h2">{{ instance.title }}</h2>
+    <h2 class="utrecht-heading-2">{{ instance.title }}</h2>
     <div class="card-container card-container--columns-2 plugin-card">
         {% url "profile:appointments" as appointment_list_url %}
         {% for appointment in appointments %}
