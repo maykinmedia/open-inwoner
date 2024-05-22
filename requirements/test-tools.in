@@ -22,12 +22,5 @@ autoflake
 # DigidLocal
 pyopenssl
 
-# Documentation
-sphinx
-sphinx_rtd_theme
-recommonmark
-sphinx-markdown-tables
-sphinx-tabs
-
 # Debug and Docs
 django-extensions
