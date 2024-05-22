@@ -25,7 +25,7 @@ Getting started
    by adding it to ``docker-init-db.sql/``. In order to create a user for the database,
    add a ``.sql`` script in the same directory with the following content:
 
-   .. code:: bash
+   .. code::
 
         DO
         $do$

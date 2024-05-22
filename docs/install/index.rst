@@ -11,5 +11,6 @@ development, staging and production environments.
     :maxdepth: 2
 
     dev
+    docker-compose
     staging
     production

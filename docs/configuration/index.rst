@@ -73,3 +73,17 @@ Supported configurations
 `eHerkenning OIDC configuration <./eherkenning_oidc.rst>`_
 
 `eHerkenning SAML configuration <./eherkenning_saml.rst>`_
+
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Further reading
+
+   admin_oidc
+   digid_oidc
+   digid_saml
+   eherkenning_oidc
+   eherkenning_saml
+   kic
+   siteconfig
+   zgw

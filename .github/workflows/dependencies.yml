@@ -47,6 +47,9 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Install OS-level deps
+        run: brew install postgresql
+
       - name: Install pip-tools
         run: pip install pip-tools
 
