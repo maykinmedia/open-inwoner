@@ -54,30 +54,9 @@ For a full overview of the command and its options:
     src/manage.py setup_configuration --help
 
 
-
-Supported configurations
-========================
-
-`General configuration <./siteconfig.rst>`_
-
-`Klanten configuration <./kic.rst>`_
-
-`ZGW configuration <./zgw.rst>`_
-
-`Admin OIDC configuration <./admin_oidc.rst>`_
-
-`DigiD OIDC configuration <./digid_oidc.rst>`_
-
-`DigiD SAML configuration <./digid_saml.rst>`_
-
-`eHerkenning OIDC configuration <./eherkenning_oidc.rst>`_
-
-`eHerkenning SAML configuration <./eherkenning_saml.rst>`_
-
-
 .. toctree::
    :maxdepth: 1
-   :caption: Further reading
+   :caption: Supported configurations
 
    admin_oidc
    digid_oidc

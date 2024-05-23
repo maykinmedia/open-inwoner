@@ -1,8 +1,8 @@
-.. _install_docker_compose:
+.. _installation_docker_compose:
 
-============================
-Install using Docker Compose
-============================
+==============
+Docker Compose
+==============
 
 We include a compose stack for development purposes and for trying out OIP on
 your own machine.
