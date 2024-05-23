@@ -148,6 +148,7 @@
     calc(var(--color-error-l) + 50%)
   );
 
+  // From color picker
   --color-info-h: 2010;
   --color-info-s: 64%;
   --color-info-l: 80%;
@@ -167,6 +168,12 @@
     calc(var(--color-info-l) - 40%)
   );
 
+  // From design-tokens
+  --oip-color-primary: var(--color-primary);
+  --oip-color-secondary: var(--color-secondary);
+  --oip-color-primary-darker: var(--color-primary-darker);
+  --oip-color-secondary-darker: var(--color-secondary-darker);
+
   --color-success-h: 115;
   --color-success-s: 26%;
   --color-success-l: 37%;
@@ -182,8 +189,8 @@
   );
   // color-success-l was +50% but +57% is needed for 4.5:1 contrast
 
-  --color-font-primary: var(--color-white);
-  --color-font-secondary: var(--color-white);
+  //--color-font-primary: var(--color-white);
+  //--color-font-secondary: var(--color-white);
   --color-font-accent: var(--color-gray-dark);
 
   --color-body: var(--color-gray-dark);
