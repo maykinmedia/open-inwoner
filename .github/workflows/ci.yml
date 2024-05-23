@@ -144,6 +144,26 @@ jobs:
           DB_PASSWORD: ''
           E2E_DRIVER: ${{ matrix.browser }}
 
+  docs:
+    name: Build and check documentation
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: 'true'
+      - name: Set up backend environment
+        uses: maykinmedia/setup-django-backend@v1
+        with:
+          apt-packages: 'libxml2-dev libxmlsec1-dev libxmlsec1-openssl gettext libgdal-dev gdal-bin'
+          python-version: '3.11'
+          setup-node: 'no'
+
+      - name: Build and test docs
+        run: |
+          export OPENSSL_CONF=$(pwd)/openssl.conf
+          pytest check_sphinx.py -v --tb=auto
+        working-directory: docs
   #
   # Docker
   #

@@ -1,8 +1,8 @@
-.. _install_docker_compose:
+.. _installation_docker_compose:
 
-============================
-Install using Docker Compose
-============================
+==============
+Docker Compose
+==============
 
 We include a compose stack for development purposes and for trying out OIP on
 your own machine.
@@ -25,7 +25,7 @@ Getting started
    by adding it to ``docker-init-db.sql/``. In order to create a user for the database,
    add a ``.sql`` script in the same directory with the following content:
 
-   .. code:: bash
+   .. code::
 
         DO
         $do$
