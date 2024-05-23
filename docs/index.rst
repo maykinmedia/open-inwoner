@@ -26,8 +26,6 @@ Documentation
 .. toctree::
     :maxdepth: 2
 
-    general/index
     installation/index
     configuration/index
     testing
-    coding_style/index

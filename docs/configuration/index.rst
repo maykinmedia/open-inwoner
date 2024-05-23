@@ -2,13 +2,19 @@
 Setup configurations
 ====================
 
-OIP supports automating the configuration of (parts of) the platform via the management command ``setup_configuration``. The command uses environment variables to configure OIP and (by default) automatically tests the configuration to detect problems.
+OIP supports automating the configuration of (parts of) the platform via the management
+command ``setup_configuration``. The command uses environment variables to configure OIP
+and (by default) automatically tests the configuration to detect problems.
 
 
 Defining variables
 ==================
 
-Variables can be defined by creating a ``.env`` file in the root directory of the project (on the same level as the ``src`` directory, not inside it) and setting the relevant variables as documented in the sections below, replacing the example values with values of your choice. Alternatively, you can use a process manager like supervisor or systemd. For example, both of the following:
+Variables can be defined by creating a ``.env`` file in the root directory of the project
+(on the same level as the ``src`` directory, not inside it) and setting the relevant
+variables as documented in the sections below, replacing the example values with values
+of your choice. Alternatively, you can use a process manager like supervisor or systemd.
+For example, both of the following:
 
 ::
 
@@ -21,7 +27,11 @@ Variables can be defined by creating a ``.env`` file in the root directory of th
     Environment="SITE_WARNING_BANNER_ENABLED=True"
     Environment="SITE_NAME=My site"
 
-will enable the warning banner and define the name of the site as "My site". Note that the variables are namespaced: ``SITE_FOO=BAR`` for variables concerning the general configuration, ``ZGW_BAR=BAZ`` for variables concerning the configuration of ZGW, and so on. For an overview of the features that support automatic configuration and the relevant environment variables, see ``Supported configurations`` below.
+will enable the warning banner and define the name of the site as "My site". Note that the
+variables are namespaced: ``SITE_FOO=BAR`` for variables concerning the general configuration,
+``ZGW_BAR=BAZ`` for variables concerning the configuration of ZGW, and so on. For an overview
+of the features that support automatic configuration and the relevant environment variables,
+see ``Supported configurations`` below.
 
 
 Usage
@@ -33,14 +43,16 @@ If the project is being configured for the first time, run the command from the 
 
     src/manage.py setup_configuration
 
-By default, ``setup_configuration`` checks per configuration step if it is already configured and skips this step if that is the case. In order to overwrite an existing configuration, use:
+By default, ``setup_configuration`` checks per configuration step if it is already configured
+and skips this step if that is the case. In order to overwrite an existing configuration, use:
 
 ::
 
     src/manage.py setup_configuration --overwrite
 
 
-Also by default, ``setup_configuration`` tests the configuration to detect problems. You can disable this with the following:
+Also by default, ``setup_configuration`` tests the configuration to detect problems. You can
+disable this with the following:
 
 ::
 
