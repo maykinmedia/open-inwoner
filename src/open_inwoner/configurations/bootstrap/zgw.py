@@ -56,6 +56,8 @@ class ZakenAPIConfigurationStep(BaseConfigurationStep):
         "ZGW_ZAAK_SERVICE_API_ROOT",
         "ZGW_ZAAK_SERVICE_API_CLIENT_ID",
         "ZGW_ZAAK_SERVICE_API_SECRET",
+        "ZGW_SERVER_CERTIFICATE_LABEL",
+        "ZGW_SERVER_CERTIFICATE_TYPE",
     ]
     enable_setting = "ZGW_ENABLE"
 
@@ -113,6 +115,8 @@ class CatalogiAPIConfigurationStep(BaseConfigurationStep):
         "ZGW_CATALOGI_SERVICE_API_ROOT",
         "ZGW_CATALOGI_SERVICE_API_CLIENT_ID",
         "ZGW_CATALOGI_SERVICE_API_SECRET",
+        "ZGW_SERVER_CERTIFICATE_LABEL",
+        "ZGW_SERVER_CERTIFICATE_TYPE",
     ]
     enable_setting = "ZGW_ENABLE"
 
@@ -170,6 +174,8 @@ class DocumentenAPIConfigurationStep(BaseConfigurationStep):
         "ZGW_DOCUMENTEN_SERVICE_API_ROOT",
         "ZGW_DOCUMENTEN_SERVICE_API_CLIENT_ID",
         "ZGW_DOCUMENTEN_SERVICE_API_SECRET",
+        "ZGW_SERVER_CERTIFICATE_LABEL",
+        "ZGW_SERVER_CERTIFICATE_TYPE",
     ]
     enable_setting = "ZGW_ENABLE"
 
@@ -227,6 +233,8 @@ class FormulierenAPIConfigurationStep(BaseConfigurationStep):
         "ZGW_FORM_SERVICE_API_ROOT",
         "ZGW_FORM_SERVICE_API_CLIENT_ID",
         "ZGW_FORM_SERVICE_API_SECRET",
+        "ZGW_SERVER_CERTIFICATE_LABEL",
+        "ZGW_SERVER_CERTIFICATE_TYPE",
     ]
     enable_setting = "ZGW_ENABLE"
 
@@ -284,7 +292,6 @@ class ZGWAPIsConfigurationStep(BaseConfigurationStep):
     required_settings = [
         "ZGW_SERVER_CERTIFICATE_LABEL",
         "ZGW_SERVER_CERTIFICATE_TYPE",
-        "ZGW_SERVER_CERTIFICATE_PUBLIC_CERTIFICATE",
     ]
     enable_setting = "ZGW_CONFIG_ENABLE"
 

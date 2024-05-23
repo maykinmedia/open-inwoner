@@ -52,6 +52,8 @@ class KlantenAPIConfigurationStep(BaseConfigurationStep):
         "KIC_KLANTEN_SERVICE_API_ROOT",
         "KIC_KLANTEN_SERVICE_API_CLIENT_ID",
         "KIC_KLANTEN_SERVICE_API_SECRET",
+        "KIC_SERVER_CERTIFICATE_LABEL",
+        "KIC_SERVER_CERTIFICATE_TYPE",
     ]
     enable_setting = "KIC_ENABLE"
 
@@ -105,6 +107,8 @@ class ContactmomentenAPIConfigurationStep(BaseConfigurationStep):
         "KIC_CONTACTMOMENTEN_SERVICE_API_ROOT",
         "KIC_CONTACTMOMENTEN_SERVICE_API_CLIENT_ID",
         "KIC_CONTACTMOMENTEN_SERVICE_API_SECRET",
+        "KIC_SERVER_CERTIFICATE_LABEL",
+        "KIC_SERVER_CERTIFICATE_TYPE",
     ]
     enable_setting = "KIC_ENABLE"
 
