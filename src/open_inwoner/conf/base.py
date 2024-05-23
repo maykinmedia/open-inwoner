@@ -901,6 +901,9 @@ else:
 MAIL_EDITOR_BASE_HOST = BASE_URL
 
 CKEDITOR_CONFIGS = {
+    "default": {
+        "allowedContent": True,
+    },
     "mail_editor": {
         "allowedContent": True,
         "contentsCss": [
@@ -908,7 +911,7 @@ CKEDITOR_CONFIGS = {
         ],  # Enter the css file used to style the email.
         "height": 600,  # This is optional
         "entities": False,  # This is added because CKEDITOR escapes the ' when you do an if statement
-    }
+    },
 }
 
 #

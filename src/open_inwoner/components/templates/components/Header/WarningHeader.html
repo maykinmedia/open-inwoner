@@ -10,6 +10,6 @@
 <div class="warning-header">
     <div class="warning-header__container">
         <span class="warning-header__icon">{% icon icon="error_outlined" outlined=True %}</span>
-        <span class="warning-header__text">{{ warning_banner_text }}</span>
+        <span class="warning-header__text">{{ warning_banner_text|safe }}</span>
     </div>
 </div>
