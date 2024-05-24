@@ -32,7 +32,6 @@ jobs:
         options:
           --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
           --name postgres
-
       elasticsearch:
         image: docker.elastic.co/elasticsearch/elasticsearch:7.9.2
         env:
@@ -41,6 +40,10 @@ jobs:
         ports:
           - 9200:9200
           - 9300:9300
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
 
     steps:
       - uses: actions/checkout@v3
@@ -99,7 +102,6 @@ jobs:
         options:
           --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
           --name postgres
-
       elasticsearch:
         image: docker.elastic.co/elasticsearch/elasticsearch:7.9.2
         env:
