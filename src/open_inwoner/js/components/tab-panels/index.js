@@ -59,10 +59,14 @@ export class TabPanel {
  * @param {NodeList} tabHeaders - All tab headers
  */
 function activateTab(activeTab, activePanel, tabHeaders) {
-  activeTab.classList.add('active')
-  activeTab.setAttribute('aria-selected', 'true')
-  activePanel.classList.remove('hide')
-  activePanel.classList.add('active')
+  if (activeTab) {
+    activeTab.classList.add('active')
+    activeTab.setAttribute('aria-selected', 'true')
+  }
+  if (activePanel) {
+    activePanel.classList.remove('hide')
+    activePanel.classList.add('active')
+  }
 
   tabHeaders.forEach((tabHeader) => {
     if (tabHeader !== activeTab) {
