@@ -3,6 +3,7 @@ import os
 from django.utils.translation import gettext_lazy as _
 
 import sentry_sdk
+from celery.schedules import crontab
 from easy_thumbnails.conf import Settings as thumbnail_settings
 from log_outgoing_requests.formatters import HttpFormatter
 
@@ -234,6 +235,8 @@ INSTALLED_APPS = [
     "open_inwoner.cms.plugins",
     "open_inwoner.cms.benefits",
     "djchoices",
+    "django_celery_beat",
+    "django_celery_monitor",
 ]
 
 MIDDLEWARE = [
@@ -660,6 +663,29 @@ IPWARE_META_PRECEDENCE_ORDER = (
 )
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
+#
+# CELERY - async task queue
+#
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
+CELERY_TASK_TIME_LIMIT = config("CELERY_TASK_HARD_TIME_LIMIT", default=15 * 60)
+# https://docs.celeryq.dev/en/latest/userguide/periodic-tasks.html
+CELERY_BEAT_SCHEDULE = {
+    "import_zgw_data": {
+        "task": "open_inwoner.openzaak.tasks.import_zgw_data",
+        "schedule": crontab(hour=7, minute=0),
+    },
+}
+
+# Only ACK when the task has been executed. This prevents tasks from getting lost, with
+# the drawback that tasks should be idempotent (if they execute partially, the mutations
+# executed will be executed again!)
+# CELERY_TASK_ACKS_LATE = True
+
+# ensure that no tasks are scheduled to a worker that may be running a very long-running
+# operation, leading to idle workers and backed-up workers. The `-O fair` option
+# *should* have the same effect...
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 
 #
 # SENTRY - error monitoring

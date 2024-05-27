@@ -1,16 +1,23 @@
-from django.contrib import admin
+import json
+
+from django.contrib import admin, messages
 from django.contrib.admin.models import ADDITION, CHANGE, DELETION
 from django.contrib.contenttypes.models import ContentType
-from django.urls import NoReverseMatch, reverse
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import NoReverseMatch, path, reverse
 from django.utils.html import escape, format_html
 from django.utils.translation import gettext as _
 
+from celery_once import AlreadyQueued
+from django_celery_beat.admin import PeriodicTaskAdmin as _PeriodicTaskAdmin
+from django_celery_beat.models import PeriodicTask
 from import_export.admin import ExportMixin
 from import_export.formats import base_formats
 from timeline_logger.admin import TimelineLogAdmin
 from timeline_logger.models import TimelineLog
 from timeline_logger.resources import TimelineLogResource
 
+from open_inwoner.celery import app
 from open_inwoner.utils.logentry import LOG_ACTIONS
 
 
@@ -145,3 +152,49 @@ class CustomTimelineLogAdmin(ExportMixin, TimelineLogAdmin):
 
 admin.site.unregister(TimelineLog)
 admin.site.register(TimelineLog, CustomTimelineLogAdmin)
+
+
+class PeriodicTaskAdmin(_PeriodicTaskAdmin):
+    list_display = _PeriodicTaskAdmin.list_display + ("detail_url",)
+
+    def get_urls(self):
+        urls = super().get_urls()
+        return [path("<int:task_id>/run/", self.run_task, name="run_task")] + urls
+
+    def run_task(self, request, task_id):
+        periodic_task = get_object_or_404(self.model, pk=task_id)
+
+        task_kwargs = json.loads(periodic_task.kwargs)
+        task_args = json.loads(periodic_task.args)
+
+        # NOTE send_task() doesn't work with Celery_Once, use .delay() or .apply_async()
+        # app.send_task(periodic_task.task, args=task_args, kwargs=task_kwargs)
+
+        task = app.tasks.get(periodic_task.task)
+        if task:
+            try:
+                task.apply_async(args=task_args, kwargs=task_kwargs)
+            except AlreadyQueued:
+                messages.warning(request, _("De taak wordt al uitgevoerd."))
+            else:
+                messages.success(request, _("De taak wordt uitgevoerd."))
+                # we could redirect but the 'celery_monitor' view takes a few seconds to
+                # show the task, and doesnt auto-refresh
+                # return redirect(reverse("admin:celery_monitor_taskstate_changelist"))
+        else:
+            messages.warning(
+                request, _("Er is een probleem met het starten van de taak.")
+            )
+
+        return redirect(reverse("admin:django_celery_beat_periodictask_changelist"))
+
+    def detail_url(self, instance):
+        url = reverse("admin:run_task", kwargs={"task_id": instance.pk})
+        response = format_html(
+            "<a class='button' href={url}>{label}</a>", url=url, label=_("Start taak")
+        )
+        return response
+
+
+admin.site.unregister(PeriodicTask)
+admin.site.register(PeriodicTask, PeriodicTaskAdmin)

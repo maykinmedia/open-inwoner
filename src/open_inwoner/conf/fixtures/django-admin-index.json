@@ -140,7 +140,9 @@
     "model": "admin_index.appgroup",
     "fields": {
         "order": 10,
-        "translations": {},
+        "translations": {
+            "nl": "Overige/Diverse"
+        },
         "name": "Overige / Diverse",
         "slug": "overige-diverse",
         "models": [
@@ -155,6 +157,14 @@
             [
                 "admin_index",
                 "contenttypeproxy"
+            ],
+            [
+                "celery_monitor",
+                "taskstate"
+            ],
+            [
+                "django_celery_beat",
+                "periodictask"
             ],
             [
                 "easy_thumbnails",
@@ -496,4 +506,5 @@
         "link": "https://www.maykinmedia.nl/nl/"
     }
 }
+
 ]

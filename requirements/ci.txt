@@ -52,7 +52,7 @@ beautifulsoup4==4.12.3
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   webtest
-billiard==3.6.4.0
+billiard==4.2.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -75,11 +75,18 @@ cbor2==5.6.2
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   webauthn
-celery==5.2.7
+celery==5.4.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   celery-once
+    #   django-celery-beat
+    #   django-celery-monitor
     #   notifications-api-common
+celery-once==3.0.1
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
 certifi==2023.11.17
     # via
     #   -c requirements/base.txt
@@ -133,6 +140,11 @@ confusable-homoglyphs==3.2.0
     #   django-registration
 coverage==4.5.4
     # via -r requirements/test-tools.in
+cron-descriptor==1.4.3
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   django-celery-beat
 cryptography==42.0.4
     # via
     #   -c requirements/base.txt
@@ -177,6 +189,8 @@ django==4.2.11
     #   django-appconf
     #   django-appdata
     #   django-axes
+    #   django-celery-beat
+    #   django-celery-monitor
     #   django-choices
     #   django-ckeditor
     #   django-classy-tags
@@ -212,6 +226,7 @@ django==4.2.11
     #   django-sniplates
     #   django-solo
     #   django-timeline-logger
+    #   django-timezone-field
     #   django-treebeard
     #   django-two-factor-auth
     #   django-view-breadcrumbs
@@ -245,6 +260,14 @@ django-autoslug==1.9.8
     #   -c requirements/base.txt
     #   -r requirements/base.txt
 django-axes==5.25.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+django-celery-beat==2.6.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+django-celery-monitor @ git+https://github.com/maykinmedia/django-celery-monitor@513dc28
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -445,6 +468,11 @@ django-timeline-logger==3.0.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+django-timezone-field==6.1.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   django-celery-beat
 django-treebeard==4.4
     # via
     #   -c requirements/base.txt
@@ -656,7 +684,7 @@ jsonschema==4.1.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   drf-spectacular
-kombu==5.2.4
+kombu==5.3.7
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -860,15 +888,22 @@ pyrsistent==0.18.0
     #   jsonschema
 pytest==8.1.1
     # via -r requirements/test-tools.in
+python-crontab==3.0.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   django-celery-beat
 python-dateutil==2.8.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   celery
     #   django-relativedelta
     #   elasticsearch-dsl
     #   faker
     #   freezegun
     #   messagebird
+    #   python-crontab
 python-decouple==3.5
     # via
     #   -c requirements/base.txt
@@ -886,7 +921,6 @@ pytz==2021.3
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-    #   celery
     #   djangorestframework
 pyyaml==6.0
     # via
@@ -906,6 +940,7 @@ redis==5.0.3
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   celery-once
     #   django-redis
 reportlab==3.6.13
     # via
@@ -1019,6 +1054,12 @@ typing-extensions==4.10.0
     #   pydantic-core
     #   pyee
     #   xsdata
+tzdata==2024.1
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   celery
+    #   django-celery-beat
 uritemplate==4.1.1
     # via
     #   -c requirements/base.txt
@@ -1036,7 +1077,7 @@ uwsgi==2.0.23
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-vine==5.0.0
+vine==5.1.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt

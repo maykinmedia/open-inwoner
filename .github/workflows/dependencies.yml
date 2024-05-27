@@ -56,5 +56,8 @@ jobs:
       - name: Make sure current directory can be detected a git repository
         run: git init
 
+      - name: Install OS-level deps
+        run: brew install postgresql
+
       - name: Run bin/compile_dependencies.sh
         run: ./bin/compile_dependencies.sh
