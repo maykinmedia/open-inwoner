@@ -1,8 +1,12 @@
+import tempfile
+
+from django.conf import settings
 from django.test import TestCase, override_settings
 
 import requests
 import requests_mock
 from django_setup_configuration.exceptions import SelfTestFailed
+from simple_certmanager.constants import CertificateTypes
 
 from open_inwoner.openklant.models import OpenKlantConfig
 
@@ -15,9 +19,17 @@ from ...bootstrap.kic import (
 KLANTEN_SERVICE_API_ROOT = "https://openklant.local/klanten/api/v1/"
 CONTACTMOMENTEN_SERVICE_API_ROOT = "https://openklant.local/contactmomenten/api/v1/"
 
+PUBLIC_CERT_FILE = tempfile.NamedTemporaryFile()
+
+with open(PUBLIC_CERT_FILE.name, "w") as f:
+    f.write("cert")
+
 
 @override_settings(
     OIP_ORGANIZATION="Maykin",
+    KIC_SERVER_CERTIFICATE_LABEL="KIC services server certificate",
+    KIC_SERVER_CERTIFICATE_TYPE=CertificateTypes.cert_only,
+    KIC_SERVER_CERTIFICATE_PUBLIC_CERTIFICATE=PUBLIC_CERT_FILE.name,
     KIC_KLANTEN_SERVICE_API_ROOT=KLANTEN_SERVICE_API_ROOT,
     KIC_KLANTEN_SERVICE_API_CLIENT_ID="open-inwoner-test",
     KIC_KLANTEN_SERVICE_API_SECRET="klanten-secret",
@@ -44,6 +56,26 @@ class KICConfigurationTests(TestCase):
         klanten_service = config.klanten_service
         contactmomenten_service = config.contactmomenten_service
 
+        # certificates
+        klanten_cert = klanten_service.server_certificate.public_certificate
+        contactmomenten_cert = (
+            contactmomenten_service.server_certificate.public_certificate
+        )
+
+        self.assertEqual(
+            klanten_service.server_certificate.label, "KIC services server certificate"
+        )
+        self.assertTrue(klanten_cert.path.startswith(settings.PRIVATE_MEDIA_ROOT))
+        self.assertEqual(klanten_cert.file.read(), b"cert")
+        self.assertEqual(
+            klanten_service.server_certificate.label, "KIC services server certificate"
+        )
+        self.assertTrue(
+            contactmomenten_cert.path.startswith(settings.PRIVATE_MEDIA_ROOT)
+        )
+        self.assertEqual(contactmomenten_cert.file.read(), b"cert")
+
+        # other settings
         self.assertEqual(klanten_service.api_root, KLANTEN_SERVICE_API_ROOT)
         self.assertEqual(klanten_service.client_id, "open-inwoner-test")
         self.assertEqual(klanten_service.secret, "klanten-secret")
