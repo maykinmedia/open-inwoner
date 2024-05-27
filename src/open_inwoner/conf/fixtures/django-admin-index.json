@@ -474,7 +474,9 @@
     "model": "admin_index.applink",
     "fields": {
         "order": 0,
-        "translations": {},
+        "translations": {
+            "nl": "Link naar Documentatie"
+        },
         "app_group": [
             "overige-diverse"
         ],
@@ -486,7 +488,9 @@
     "model": "admin_index.applink",
     "fields": {
         "order": 1,
-        "translations": {},
+        "translations": {
+            "nl": "Link naar Github"
+        },
         "app_group": [
             "overige-diverse"
         ],
@@ -498,7 +502,9 @@
     "model": "admin_index.applink",
     "fields": {
         "order": 2,
-        "translations": {},
+        "translations": {
+            "nl": "Link naar Maykin"
+        },
         "app_group": [
             "overige-diverse"
         ],
@@ -506,5 +512,4 @@
         "link": "https://www.maykinmedia.nl/nl/"
     }
 }
-
 ]
