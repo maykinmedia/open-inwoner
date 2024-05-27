@@ -159,6 +159,10 @@
                 "contenttypeproxy"
             ],
             [
+                "celery_monitor",
+                "taskstate"
+            ],
+            [
                 "django_celery_beat",
                 "periodictask"
             ],
@@ -465,5 +469,42 @@
             ]
         ]
     }
+},
+{
+    "model": "admin_index.applink",
+    "fields": {
+        "order": 0,
+        "translations": {},
+        "app_group": [
+            "overige-diverse"
+        ],
+        "name": "Link naar Documentatie",
+        "link": "https://taiga.maykinmedia.nl/project/open-inwoner/wiki/home"
+    }
+},
+{
+    "model": "admin_index.applink",
+    "fields": {
+        "order": 1,
+        "translations": {},
+        "app_group": [
+            "overige-diverse"
+        ],
+        "name": "Link naar Github",
+        "link": "https://github.com/maykinmedia/open-inwoner"
+    }
+},
+{
+    "model": "admin_index.applink",
+    "fields": {
+        "order": 2,
+        "translations": {},
+        "app_group": [
+            "overige-diverse"
+        ],
+        "name": "Link naar Maykin",
+        "link": "https://www.maykinmedia.nl/nl/"
+    }
 }
+
 ]

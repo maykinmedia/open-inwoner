@@ -668,19 +668,12 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 # CELERY - async task queue
 #
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
-# CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://localhost:6379/0")
-
-# Add (by default) 5 (soft), 15 (hard) minute timeouts to all Celery tasks.
-# CELERY_TASK_TIME_LIMIT = config("CELERY_TASK_HARD_TIME_LIMIT", default=15 * 60)  # hard
-# CELERY_TASK_SOFT_TIME_LIMIT = config(
-#     "CELERY_TASK_SOFT_TIME_LIMIT", default=5 * 60
-# )  # soft
-
+CELERY_TASK_TIME_LIMIT = config("CELERY_TASK_HARD_TIME_LIMIT", default=15 * 60)
+# https://docs.celeryq.dev/en/latest/userguide/periodic-tasks.html
 CELERY_BEAT_SCHEDULE = {
-    "dummy_wait_task": {
-        "task": "open_inwoner.utils.tasks.dummy_random_wait_task",
-        # https://docs.celeryq.dev/en/latest/userguide/periodic-tasks.html
-        "schedule": crontab(minute=0, hour=0),
+    "import_zgw_data": {
+        "task": "open_inwoner.openzaak.tasks.import_zgw_data",
+        "schedule": crontab(hour=7, minute=0),
     },
 }
 
