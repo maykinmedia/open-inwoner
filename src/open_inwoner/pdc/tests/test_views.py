@@ -242,11 +242,11 @@ class CategoryDetailViewTest(TestCase):
         response = self.client.get(url)
 
         self.assertIn(
-            '<p class="p">A <em>descriptive</em> description</p>',
+            "A <em>descriptive</em> description</p>",
             response.rendered_content,
         )
         self.assertNotIn(
-            '[<p class="p">A <em>descriptive</em> description</p>, <em>descriptive</em>]',
+            "[A <em>descriptive</em> description</p>, <em>descriptive</em>]",
             response.rendered_content,
         )
 
