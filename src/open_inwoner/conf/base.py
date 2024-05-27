@@ -674,6 +674,10 @@ CELERY_BEAT_SCHEDULE = {
         "task": "Import ZGW data",
         "schedule": crontab(minute="0", hour="7", day_of_month="*"),
     },
+    "Rebuild search index": {
+        "task": "Rebuild search index",
+        "schedule": crontab(minute="0", hour="4", day_of_month="*"),
+    },
     "Retry emails": {
         "task": "django_yubin.tasks.retry_emails",
         "schedule": crontab(minute="1", hour="*", day_of_month="*"),
