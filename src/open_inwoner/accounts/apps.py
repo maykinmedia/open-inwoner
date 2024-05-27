@@ -7,10 +7,10 @@ from django.core.management import call_command
 from django.db.models.signals import post_migrate
 
 
-def update_admin_index(sender, **kwargs):
+def update_admin_index(sender=None, **kwargs) -> bool:
     if "django_admin_index" not in settings.INSTALLED_APPS:
         print("django_admin_index not installed, skipping update_admin_index()")
-        return
+        return False
 
     from django_admin_index.models import AppGroup
 
@@ -27,17 +27,25 @@ def update_admin_index(sender, **kwargs):
         call_command("loaddata", "django-admin-index", verbosity=0, stdout=StringIO())
     except Exception as exc:
         print(f"Error: Unable to load django-admin-index fixture ({exc})")
-        return
-    print("Loaded django-admin-index fixture")
+        return False
+    else:
+        print("Loaded django-admin-index fixture")
+        return True
 
 
 class AccountsConfig(AppConfig):
     name = "open_inwoner.accounts"
+
+    _has_run = False
 
     def ready(self):
         from .signals import (  # noqa:register the signals
             log_user_login,
             log_user_logout,
         )
+
+        if self._has_run:
+            return
+        self._has_run = True
 
         post_migrate.connect(update_admin_index, sender=self)
