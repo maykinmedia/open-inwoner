@@ -1,3 +1,4 @@
+import logging
 import json
 
 from django.contrib import admin, messages
@@ -19,6 +20,9 @@ from timeline_logger.resources import TimelineLogResource
 
 from open_inwoner.celery import app
 from open_inwoner.utils.logentry import LOG_ACTIONS
+
+
+logger = logging.getLogger(__name__)
 
 
 class LogActionListFilter(admin.SimpleListFilter):
@@ -167,26 +171,9 @@ class PeriodicTaskAdmin(_PeriodicTaskAdmin):
         task_kwargs = json.loads(periodic_task.kwargs)
         task_args = json.loads(periodic_task.args)
 
-        # NOTE send_task() doesn't work with Celery_Once, use .delay() or .apply_async()
-        # app.send_task(periodic_task.task, args=task_args, kwargs=task_kwargs)
+        app.send_task(periodic_task.task, args=task_args, kwargs=task_kwargs)
 
-        task = app.tasks.get(periodic_task.task)
-        if task:
-            try:
-                task.apply_async(args=task_args, kwargs=task_kwargs)
-            except AlreadyQueued:
-                messages.warning(request, _("De taak wordt al uitgevoerd."))
-            else:
-                messages.success(request, _("De taak wordt uitgevoerd."))
-                # we could redirect but the 'celery_monitor' view takes a few seconds to
-                # show the task, and doesnt auto-refresh
-                # return redirect(reverse("admin:celery_monitor_taskstate_changelist"))
-        else:
-            messages.warning(
-                request, _("Er is een probleem met het starten van de taak.")
-            )
-
-        return redirect(reverse("admin:django_celery_beat_periodictask_changelist"))
+        return redirect(reverse("admin:celery_monitor_taskstate_changelist"))
 
     def detail_url(self, instance):
         url = reverse("admin:run_task", kwargs={"task_id": instance.pk})

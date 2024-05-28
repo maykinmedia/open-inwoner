@@ -8,7 +8,7 @@ from open_inwoner.celery import QueueOnce, app
 logger = logging.getLogger(__name__)
 
 
-@app.task(base=QueueOnce, once={"keys": []}, name=_("Import ZGW data"))
+@app.task(name=_("Import ZGW data"))
 def import_zgw_data():
     logger.info("starting import_zgw_data() task")
 
