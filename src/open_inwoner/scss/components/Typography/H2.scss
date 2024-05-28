@@ -2,6 +2,9 @@
 @import '~microscope-sass/lib/responsive';
 
 .utrecht-heading-2 {
+  // Reverse font-family fallback order
+  font-family: var(--utrecht-heading-font-family),
+    var(--utrecht-heading-2-font-family);
   display: var(--oip-typography-heading-display);
   justify-content: var(--oip-typography-heading-justify-content);
 

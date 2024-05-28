@@ -201,42 +201,40 @@
   --font-color-heading-1: var(--font-color-heading);
   --font-family-heading-1: var(--font-family-heading);
   --font-line-height-heading-1: 41px;
-  --font-size-heading-1: 32px;
+  --font-size-heading-1: var(--utrecht-heading-1-font-size);
   --font-weight-heading-1: var(--font-weight-heading);
 
   --font-color-heading-2: var(--font-color-heading);
   --font-family-heading-2: var(--font-family-heading);
   --font-line-height-heading-2: 34px;
-  --font-size-heading-2: 24px;
+  --font-size-heading-2: var(--utrecht-heading-2-font-size);
   --font-weight-heading-2: var(--font-weight-heading);
 
   --font-color-heading-3: var(--font-color-heading);
   --font-family-heading-3: var(--font-family-heading);
   --font-line-height-heading-3: 30px;
-  --font-size-heading-3: 20px;
+  --font-size-heading-3: var(--utrecht-heading-3-font-size);
   --font-weight-heading-3: var(--font-weight-heading);
 
   --font-color-heading-4: var(--font-color-heading);
   --font-family-heading-4: var(--font-family-heading);
   --font-line-height-heading-4: 26px;
-  --font-size-heading-4: 16px;
+  --font-size-heading-4: var(--utrecht-heading-4-font-size);
   --font-weight-heading-4: var(--font-weight-heading);
 
   --font-size-heading-card: 18px;
 
   --font-family-body: 'Body';
   --font-color-body: var(--color-gray-dark);
-  --font-size-body: 16px;
+  --font-size-body: var(--utrecht-document-font-size);
   --font-line-height-body: 24px;
 
   --font-size-body-extra-small: 12px;
-  --font-size-body-small: 14px;
+  --font-size-body-small: var(--utrecht-paragraph-small-font-size);
   --font-size-body-large: 20px;
   --font-line-height-body-small: 20px;
   --font-line-height-body-medium: 24px;
   --font-line-height-body-large: 28px;
-
-  /// Spacing.
 
   --row-height: 40px;
   --row-height-small: 24px;

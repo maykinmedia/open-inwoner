@@ -20,6 +20,8 @@
   &__list {
     display: flex;
     justify-content: space-between;
+    height: var(--row-height);
+    align-items: center;
     list-style: none;
     margin: 0;
     padding: 0;
@@ -50,12 +52,17 @@
         font-size: 0;
       }
     }
+
+    &__text {
+      line-height: var(--font-line-height-body-medium);
+    }
   }
 
   .skip-link {
     position: absolute;
     top: -50px;
     transition: top 0.2s;
+
     &:focus {
       position: relative;
       top: 0;

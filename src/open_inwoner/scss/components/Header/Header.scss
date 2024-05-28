@@ -544,9 +544,10 @@ $vm: var(--spacing-large);
 
               .subpage-list {
                 margin-top: var(--spacing-extra-large);
-                margin-bottom: var(--spacing-medium);
+                margin-bottom: var(--spacing-large);
                 margin-left: var(--row-height-big);
                 display: grid;
+                gap: var(--spacing-large);
                 height: auto;
                 overflow: initial;
               }
