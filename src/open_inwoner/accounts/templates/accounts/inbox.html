@@ -22,9 +22,9 @@
             {% for conv in conversations.page_obj %}
                 {% with conv_thread_url=conv.thread_url|qs_page:conversations.page_obj.number %}
                     {% if other_user.uuid == conv.other_user_uuid %}
-                        {% list_item conv.other_user_full_name|truncatechars:25 conv.content|truncatechars:25 conv_thread_url active=True %}
+                        {% list_item conv.other_user_full_name|truncatechars:25 conv.content|truncatechars:25 conv_thread_url active=True strong=True %}
                     {% else %}
-                        {% list_item conv.other_user_full_name|truncatechars:25 conv.content|truncatechars:25 conv_thread_url %}
+                        {% list_item conv.other_user_full_name|truncatechars:25 conv.content|truncatechars:25 conv_thread_url strong=True %}
                     {% endif %}
                 {% endwith %}
             {% endfor %}
