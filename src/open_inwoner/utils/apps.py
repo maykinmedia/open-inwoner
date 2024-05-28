@@ -14,5 +14,5 @@ class UtilsConfig(AppConfig):
 
         installed_apps = [
             app_config.name for app_config in registry.apps.app_configs.values()
-        ]
+        ] + ["open_inwoner.openzaak"]
         app.autodiscover_tasks(installed_apps, force=True)

@@ -131,10 +131,6 @@ p.lead {
 <body>
   <h1 class="utrecht-heading-1">Sorry, a server error has occurred (500)</h1>
   <p class="lead">We have been automatically notified about the problem and will investigate as soon as possible.</p>
-  {% if request.sentry.id %}
-    <p>If you need assistance, you may reference this error as
-    <strong>{{ request.sentry.id }}</strong>.</p>
-  {% endif %}
   <p class="lead">
     <a href="/" class="button">Back to home</a>
   </p>

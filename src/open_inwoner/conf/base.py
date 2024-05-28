@@ -136,6 +136,7 @@ INSTALLED_APPS = [
     "django.forms",
     # load user model before CMS
     "open_inwoner.accounts",
+    "open_inwoner.openzaak",
     # Django-CMS
     "cms",
     "menus",
@@ -215,7 +216,6 @@ INSTALLED_APPS = [
     "open_inwoner.utils",
     "open_inwoner.configurations",
     "open_inwoner.haalcentraal",
-    "open_inwoner.openzaak",
     "open_inwoner.openklant",
     "open_inwoner.soap",
     "open_inwoner.ssd",
@@ -671,8 +671,8 @@ CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
 CELERY_TASK_TIME_LIMIT = config("CELERY_TASK_HARD_TIME_LIMIT", default=15 * 60)
 # https://docs.celeryq.dev/en/latest/userguide/periodic-tasks.html
 CELERY_BEAT_SCHEDULE = {
-    "import_zgw_data": {
-        "task": "open_inwoner.openzaak.tasks.import_zgw_data",
+    "Import ZGW data": {
+        "task": "Import ZGW data",
         "schedule": crontab(hour=7, minute=0),
     },
 }
