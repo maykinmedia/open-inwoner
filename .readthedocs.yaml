@@ -13,6 +13,9 @@ build:
     - libxml2-dev
     - libxmlsec1-dev
     - libxmlsec1-openssl
+    - libpq-dev
+    - gdal-bin
+    - libgdal-dev
     - wget
   tools:
     python: '3.11'
