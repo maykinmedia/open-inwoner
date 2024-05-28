@@ -22,12 +22,13 @@
 </div>
 
 {% else %}
+{# If this card has no content section #}
     <a href="{{ category.slug }}" class="card">
         <div class="card__body">
             {% if category %}
-                <h3 class="utrecht-heading-3 card__heading-3">
+                <p class="utrecht-heading-3 card__heading-3">
                     <span class="link link__text">{{ category }}</span>
-                </h3>
+                </p>
             {% endif %}
         </div>
     </a>
