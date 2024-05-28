@@ -18,7 +18,12 @@ from open_inwoner.openzaak.api_models import (
     ZaakType,
 )
 from open_inwoner.openzaak.cases import resolve_status
-from open_inwoner.openzaak.clients import CatalogiClient, ZakenClient, build_client
+from open_inwoner.openzaak.clients import (
+    CatalogiClient,
+    ZakenClient,
+    build_catalogi_client,
+    build_zaken_client,
+)
 from open_inwoner.openzaak.documents import fetch_single_information_object_url
 from open_inwoner.openzaak.models import (
     OpenZaakConfig,
@@ -68,7 +73,7 @@ def handle_zaken_notification(notification: Notification):
     resources = ("status", "zaakinformatieobject")
     r = notification.resource  # short alias for logging
 
-    client = build_client("zaak")
+    client = build_zaken_client()
     if not client:
         log_system_action(
             f"ignored {r} notification: cannot build Zaken API client for case {case_url}",
@@ -111,7 +116,7 @@ def handle_zaken_notification(notification: Notification):
         return
 
     case_type = None
-    if catalogi_client := build_client("catalogi"):
+    if catalogi_client := build_catalogi_client():
         case_type = catalogi_client.fetch_single_case_type(case.zaaktype)
 
     if not case_type:
@@ -144,7 +149,7 @@ def _handle_zaakinformatieobject_notification(
     oz_config = OpenZaakConfig.get_solo()
     r = notification.resource  # short alias for logging
 
-    client = build_client("zaak")
+    client = build_zaken_client()
     if not client:
         log_system_action(
             f"ignored {r} notification: cannot build Zaken API client for case {case.url}",
@@ -466,7 +471,7 @@ def handle_status_notification(
     """
     oz_config = OpenZaakConfig.get_solo()
 
-    catalogi_client = build_client("catalogi")
+    catalogi_client = build_catalogi_client()
     if not catalogi_client:
         log_system_action(
             f"ignored {notification.resource} notification for {case.url}: cannot create Catalogi API client",
@@ -474,7 +479,7 @@ def handle_status_notification(
         )
         return None
 
-    zaken_client = build_client("zaak")
+    zaken_client = build_zaken_client()
     if not zaken_client:
         log_system_action(
             f"ignored {notification.resource} notification for {case.url}: cannot create Zaken API client",

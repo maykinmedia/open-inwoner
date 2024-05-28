@@ -10,7 +10,7 @@ from zgw_consumers.api_models.catalogi import (
 )
 
 from open_inwoner.openzaak.api_models import ZaakType
-from open_inwoner.openzaak.clients import CatalogiClient, build_client
+from open_inwoner.openzaak.clients import CatalogiClient, build_catalogi_client
 from open_inwoner.openzaak.models import (
     CatalogusConfig,
     ZaakTypeConfig,
@@ -48,7 +48,7 @@ def import_catalog_configs() -> list[CatalogusConfig]:
 
     note this doesn't generate anything on eSuite
     """
-    client = build_client("catalogi")
+    client = build_catalogi_client()
     if not client:
         logger.warning(
             "Not importing catalogus configs: could not build Catalogi API client"
@@ -86,7 +86,7 @@ def import_zaaktype_configs() -> list[ZaakTypeConfig]:
 
     this collapses individual ZaakType versions on their identificatie and catalog
     """
-    client = build_client("catalogi")
+    client = build_catalogi_client()
     if not client:
         logger.warning(
             "Not importing zaaktype configs: could not build Catalogi API client"
@@ -138,9 +138,9 @@ def import_zaaktype_configs() -> list[ZaakTypeConfig]:
     return list((create or {}).values())
 
 
-def import_zaaktype_informatieobjecttype_configs() -> list[
-    tuple[ZaakTypeConfig, InformatieObjectType]
-]:
+def import_zaaktype_informatieobjecttype_configs() -> (
+    list[tuple[ZaakTypeConfig, InformatieObjectType]]
+):
     """
     generate ZaakTypeInformatieObjectTypeConfigs for all ZaakTypeConfig
     """
@@ -164,9 +164,9 @@ def import_zaaktype_statustype_configs() -> list[tuple[ZaakTypeConfig, StatusTyp
     return created
 
 
-def import_zaaktype_resultaattype_configs() -> list[
-    tuple[ZaakTypeConfig, ResultaatType]
-]:
+def import_zaaktype_resultaattype_configs() -> (
+    list[tuple[ZaakTypeConfig, ResultaatType]]
+):
     """
     generate ZaakTypeResultaatTypeConfigs for all ZaakTypeConfig
     """
@@ -186,7 +186,7 @@ def import_zaaktype_informatieobjecttype_configs_for_type(
 
     this is a bit complicated because one ZaakTypeConfig can represent multiple ZaakTypes
     """
-    client = build_client("catalogi")
+    client = build_catalogi_client()
     if not client:
         logger.warning(
             "Not importing zaaktype-informatieobjecttype configs: could not build Catalogi API client"
@@ -260,7 +260,7 @@ def import_statustype_configs_for_type(
 
     this is a bit complicated because one ZaakTypeConfig can represent multiple ZaakTypes
     """
-    client = build_client("catalogi")
+    client = build_catalogi_client()
     if not client:
         logger.warning(
             "Not importing statustype configs: could not build Catalogi API client"
@@ -336,7 +336,7 @@ def import_resultaattype_configs_for_type(
 
     this is a bit complicated because one ZaakTypeConfig can represent multiple ZaakTypes
     """
-    client = build_client("catalogi")
+    client = build_catalogi_client()
     if not client:
         logger.warning(
             "Not importing resultaattype configs: could not build Catalogi API client"

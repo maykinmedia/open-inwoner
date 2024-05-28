@@ -7,7 +7,12 @@ from simple_certmanager.models import Certificate
 from zgw_consumers.constants import APITypes, AuthTypes
 from zgw_consumers.models import Service
 
-from open_inwoner.openzaak.clients import build_client
+from open_inwoner.openzaak.clients import (
+    build_catalogi_client,
+    build_documenten_client,
+    build_forms_client,
+    build_zaken_client,
+)
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.utils.api import ClientError
 
@@ -361,10 +366,10 @@ class ZGWAPIsConfigurationStep(BaseConfigurationStep):
         """
         make requests to each API and verify that a connection can be made
         """
-        zaken_client = build_client("zaak")
-        catalogi_client = build_client("catalogi")
-        documenten_client = build_client("document")
-        forms_client = build_client("form")
+        zaken_client = build_zaken_client()
+        catalogi_client = build_catalogi_client()
+        documenten_client = build_documenten_client()
+        forms_client = build_forms_client()
 
         try:
             response = zaken_client.get("statussen")

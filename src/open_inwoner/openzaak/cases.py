@@ -6,7 +6,12 @@ from django.conf import settings
 from zgw_consumers.concurrent import parallel
 
 from .api_models import Zaak
-from .clients import CatalogiClient, ZakenClient, build_client
+from .clients import (
+    CatalogiClient,
+    ZakenClient,
+    build_catalogi_client,
+    build_zaken_client,
+)
 from .models import ZaakTypeConfig, ZaakTypeStatusTypeConfig
 from .utils import is_zaak_visible
 
@@ -21,7 +26,7 @@ def resolve_zaak_type(case: Zaak, client: CatalogiClient | None = None) -> None:
           is only made for new case type urls
     """
     case_type_url = case.zaaktype
-    client = client or build_client("catalogi")
+    client = client or build_catalogi_client()
     if client:
         case_type = client.fetch_single_case_type(case_type_url)
         case.zaaktype = case_type
@@ -31,7 +36,7 @@ def resolve_status(case: Zaak, client: ZakenClient | None = None) -> None:
     """
     Resolve `case.status` (`str`) to a `Status(ZGWModel)` object
     """
-    client = client or build_client("zaak")
+    client = client or build_zaken_client()
     if client:
         case.status = client.fetch_single_status(case.status)
 
@@ -41,7 +46,7 @@ def resolve_status_type(case: Zaak, client: CatalogiClient | None = None) -> Non
     Resolve `case.status.statustype` (`str`) to a `StatusType(ZGWModel)` object
     """
     statustype_url = case.status.statustype
-    client = client or build_client("catalogi")
+    client = client or build_catalogi_client()
     if client:
         case.status.statustype = client.fetch_single_status_type(statustype_url)
 
@@ -50,7 +55,7 @@ def resolve_resultaat(case: Zaak, client: ZakenClient | None = None) -> None:
     """
     Resolve `case.resultaat` (`str`) to a `Resultaat(ZGWModel)` object
     """
-    client = client or build_client("zaak")
+    client = client or build_zaken_client()
     if client and case.resultaat:
         case.resultaat = client.fetch_single_result(case.resultaat)
 
@@ -59,7 +64,7 @@ def resolve_resultaat_type(case: Zaak, client: CatalogiClient | None = None) -> 
     """
     Resolve `case.resultaat.resultaattype` (`str`) to a `ResultaatType(ZGWModel)` object
     """
-    client = client or build_client("catalogi")
+    client = client or build_catalogi_client()
     if client and case.resultaat:
         case.resultaat.resultaattype = client.fetch_single_resultaat_type(
             case.resultaat.resultaattype
@@ -104,8 +109,8 @@ def preprocess_data(cases: list[Zaak]) -> list[Zaak]:
     Note: we need to iterate twice over `cases` because the `zaak_type` must be
           resolved to a `ZaakType` object before we can filter by visibility
     """
-    zaken_client = build_client("zaak")
-    catalogi_client = build_client("catalogi")
+    zaken_client = build_zaken_client()
+    catalogi_client = build_catalogi_client()
 
     def preprocess_case(case: Zaak) -> None:
         resolve_status(case, client=zaken_client)

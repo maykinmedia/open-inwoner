@@ -9,7 +9,7 @@ from treebeard.mp_tree import MP_NodeQuerySet
 from open_inwoner.accounts.models import User
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openzaak.api_models import Zaak
-from open_inwoner.openzaak.clients import build_client
+from open_inwoner.openzaak.clients import build_zaken_client
 from open_inwoner.openzaak.models import ZaakTypeConfig
 from open_inwoner.openzaak.utils import get_user_fetch_parameters
 
@@ -54,7 +54,7 @@ class CategoryPublishedQueryset(MP_NodeQuerySet):
         if not request.user.bsn and not request.user.kvk:
             return self
 
-        client = build_client("zaak")
+        client = build_zaken_client()
         if client is None:
             return self.none()
 
