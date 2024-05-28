@@ -17,3 +17,5 @@ class TestMailContext(TestCase):
 
         self.assertIn("contact_page", context)
         self.assertIn("contact_phonenumber", context)
+
+        self.assertIn("site_name", context)
