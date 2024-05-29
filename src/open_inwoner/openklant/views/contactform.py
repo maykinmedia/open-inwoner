@@ -11,7 +11,10 @@ from mail_editor.helpers import find_template
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.mail.service import send_contact_confirmation_mail
-from open_inwoner.openklant.clients import build_client
+from open_inwoner.openklant.clients import (
+    build_contactmomenten_client,
+    build_klanten_client,
+)
 from open_inwoner.openklant.forms import ContactForm
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.openklant.wrap import get_fetch_parameters
@@ -149,7 +152,7 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
 
         # fetch/update/create klant
         klant = None
-        if klanten_client := build_client("klanten"):
+        if klanten_client := build_klanten_client():
             if self.request.user.is_authenticated and (
                 self.request.user.bsn or self.request.user.kvk
             ):
@@ -245,7 +248,7 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
             data["medewerkerIdentificatie"] = {"identificatie": employee_id}
 
         contactmoment = None
-        if contactmoment_client := build_client("contactmomenten"):
+        if contactmoment_client := build_contactmomenten_client():
             contactmoment = contactmoment_client.create_contactmoment(data, klant=klant)
 
         if contactmoment:

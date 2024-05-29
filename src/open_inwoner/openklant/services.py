@@ -1,5 +1,5 @@
 from open_inwoner.accounts.models import User
-from open_inwoner.openklant.clients import build_client
+from open_inwoner.openklant.clients import build_klanten_client
 from open_inwoner.utils.logentry import system_action
 
 from .wrap import get_fetch_parameters
@@ -11,7 +11,7 @@ def update_user_from_klant(request):
 
     user: User = request.user
 
-    client = build_client("klanten")
+    client = build_klanten_client()
     if not client:
         return
 

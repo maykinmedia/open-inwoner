@@ -20,7 +20,10 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 from zgw_consumers.api_models.constants import RolOmschrijving
 
 from open_inwoner.mail.service import send_contact_confirmation_mail
-from open_inwoner.openklant.clients import build_client as build_client_openklant
+from open_inwoner.openklant.clients import (
+    build_contactmomenten_client,
+    build_klanten_client,
+)
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.openklant.wrap import (
     contactmoment_has_new_answer,
@@ -150,7 +153,7 @@ class InnerCaseDetailView(
             self.store_resulttype_mapping(self.case.zaaktype.identificatie)
 
             objectcontactmomenten = []
-            if contactmoment_client := build_client_openklant("contactmomenten"):
+            if contactmoment_client := build_contactmomenten_client():
                 objectcontactmomenten = (
                     contactmoment_client.retrieve_objectcontactmomenten_for_zaak(
                         self.case
@@ -911,7 +914,7 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
         except ObjectDoesNotExist:
             ztc = None
 
-        if klanten_client := build_client_openklant("klanten"):
+        if klanten_client := build_klanten_client():
             klant = klanten_client.retrieve_klant(**get_fetch_parameters(self.request))
 
             if klant:
@@ -959,7 +962,7 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
         if ztc and ztc.contact_subject_code:
             data["onderwerp"] = ztc.contact_subject_code
 
-        if contactmoment_client := build_client_openklant("contactmomenten"):
+        if contactmoment_client := build_contactmomenten_client():
             contactmoment = contactmoment_client.create_contactmoment(data, klant=klant)
             if contactmoment:
                 self.log_system_action(

@@ -3,7 +3,7 @@ import logging
 from ape_pie.client import APIClient
 from requests.exceptions import RequestException
 from zgw_consumers.api_models.base import factory
-from zgw_consumers.client import build_client as _build_client
+from zgw_consumers.client import build_client
 from zgw_consumers.utils import pagination_helper
 
 from open_inwoner.openzaak.api_models import Zaak
@@ -311,7 +311,7 @@ class ContactmomentenClient(APIClient):
             return ocms[0]
 
 
-def build_client(type_) -> APIClient | None:
+def _build_open_klant_client(type_) -> APIClient | None:
     config = OpenKlantConfig.get_solo()
     services_to_client_mapping = {
         "klanten": KlantenClient,
@@ -320,8 +320,16 @@ def build_client(type_) -> APIClient | None:
     if client_class := services_to_client_mapping.get(type_):
         service = getattr(config, f"{type_}_service")
         if service:
-            client = _build_client(service, client_factory=client_class)
+            client = build_client(service, client_factory=client_class)
             return client
 
     logger.warning("no service defined for %s", type_)
     return None
+
+
+def build_contactmomenten_client() -> ContactmomentenClient | None:
+    return _build_open_klant_client("contactmomenten")
+
+
+def build_klanten_client() -> KlantenClient | None:
+    return _build_open_klant_client("klanten")

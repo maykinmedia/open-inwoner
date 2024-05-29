@@ -6,7 +6,10 @@ from django.conf import settings
 from open_inwoner.accounts.models import User
 from open_inwoner.kvk.branches import get_kvk_branch_number
 from open_inwoner.openklant.api_models import ContactMoment, KlantContactMoment
-from open_inwoner.openklant.clients import build_client
+from open_inwoner.openklant.clients import (
+    build_contactmomenten_client,
+    build_klanten_client,
+)
 from open_inwoner.openklant.models import KlantContactMomentAnswer, OpenKlantConfig
 from open_inwoner.utils.time import instance_is_new
 
@@ -21,7 +24,7 @@ def fetch_klantcontactmomenten(
     if not user_bsn and not user_kvk_or_rsin:
         return []
 
-    client = build_client("klanten")
+    client = build_klanten_client()
     if client is None:
         return []
 
@@ -35,7 +38,7 @@ def fetch_klantcontactmomenten(
     if klanten is None:
         return []
 
-    client = build_client("contactmomenten")
+    client = build_contactmomenten_client()
     if client is None:
         return []
 
