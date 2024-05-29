@@ -2,7 +2,6 @@ from django.conf import settings
 
 from celery import Celery
 from celery.signals import setup_logging
-from celery_once import QueueOnce  # noqa
 
 from .setup import setup_env
 

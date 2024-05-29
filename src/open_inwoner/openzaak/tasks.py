@@ -3,7 +3,7 @@ import logging
 from django.core.management import call_command
 from django.utils.translation import gettext as _
 
-from open_inwoner.celery import QueueOnce, app
+from open_inwoner.celery import app
 
 logger = logging.getLogger(__name__)
 
