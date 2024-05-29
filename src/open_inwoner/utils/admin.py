@@ -1,7 +1,7 @@
-import logging
 import json
+import logging
 
-from django.contrib import admin, messages
+from django.contrib import admin
 from django.contrib.admin.models import ADDITION, CHANGE, DELETION
 from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import get_object_or_404, redirect
@@ -9,7 +9,6 @@ from django.urls import NoReverseMatch, path, reverse
 from django.utils.html import escape, format_html
 from django.utils.translation import gettext as _
 
-from celery_once import AlreadyQueued
 from django_celery_beat.admin import PeriodicTaskAdmin as _PeriodicTaskAdmin
 from django_celery_beat.models import PeriodicTask
 from import_export.admin import ExportMixin
@@ -20,7 +19,6 @@ from timeline_logger.resources import TimelineLogResource
 
 from open_inwoner.celery import app
 from open_inwoner.utils.logentry import LOG_ACTIONS
-
 
 logger = logging.getLogger(__name__)
 
