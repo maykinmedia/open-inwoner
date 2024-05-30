@@ -200,10 +200,10 @@ INSTALLED_APPS = [
     "sessionprofile",
     "openformsclient",
     "django_htmx",
-    "mailer",
     "log_outgoing_requests",
     "formtools",
     "django_setup_configuration",
+    "django_yubin",
     # Project applications.
     "open_inwoner.components",
     "open_inwoner.kvk",
@@ -351,9 +351,8 @@ EMAIL_TIMEOUT = 10
 
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="openinwoner@maykinmedia.nl")
 
-
-EMAIL_BACKEND = "mailer.backend.DbBackend"
-MAILER_EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_BACKEND = "django_yubin.backends.QueuedEmailBackend"
+MAILER_USE_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
 #
 # LOGGING
