@@ -46,11 +46,11 @@ mozilla-django-oidc-db
 django-open-forms-client
 django-htmx
 playwright
-django-mailer
 django-image-cropping
 django-log-outgoing-requests
 xsdata
 django-setup-configuration
+django-yubin
 
 # django cms
 django-cms
