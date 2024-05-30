@@ -9,7 +9,7 @@ from django.views.generic import FormView
 from furl import furl
 
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.openzaak.clients import build_client
+from open_inwoner.openzaak.clients import build_zaken_client
 from open_inwoner.openzaak.utils import get_user_fetch_parameters
 from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import CommonPageMixin, LoginMaybeRequiredMixin, LogMixin
@@ -64,7 +64,7 @@ class SearchView(
 
         # Check if the query exactly matches with a case that belongs to the user
         if search_params := get_user_fetch_parameters(self.request):
-            if client := build_client("zaak"):
+            if client := build_zaken_client():
                 cases = client.fetch_cases(**search_params, identificatie=query)
                 if cases and len(cases) == 1:
                     return HttpResponseRedirect(

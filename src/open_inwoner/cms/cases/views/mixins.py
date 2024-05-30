@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 from open_inwoner.kvk.branches import get_kvk_branch_number
 from open_inwoner.openzaak.api_models import Zaak
-from open_inwoner.openzaak.clients import build_client
+from open_inwoner.openzaak.clients import build_catalogi_client, build_zaken_client
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.types import UniformCase
 from open_inwoner.openzaak.utils import is_zaak_visible
@@ -60,7 +60,7 @@ class CaseAccessMixin(AccessMixin):
             )
             return self.handle_no_permission()
 
-        client = build_client("zaak")
+        client = build_zaken_client()
         if client is None:
             return super().dispatch(request, *args, **kwargs)
 
@@ -102,7 +102,7 @@ class CaseAccessMixin(AccessMixin):
                     return self.handle_no_permission()
 
             # resolve case-type
-            if catalogi_client := build_client("catalogi"):
+            if catalogi_client := build_catalogi_client():
                 self.case.zaaktype = catalogi_client.fetch_single_case_type(
                     self.case.zaaktype
                 )

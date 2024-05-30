@@ -21,7 +21,7 @@ from zgw_consumers.constants import APITypes, AuthTypes
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.cms.cases.views.status import SimpleFile
-from open_inwoner.openzaak.clients import build_client
+from open_inwoner.openzaak.clients import build_documenten_client, build_zaken_client
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
 from ..models import OpenZaakConfig
@@ -58,7 +58,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
         self.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
         self.config.zaak_service = self.zaak_service
         self.config.save()
-        self.zaken_client = build_client("zaak")
+        self.zaken_client = build_zaken_client()
 
         self.config.zaak_service = self.zaak_service
         self.catalogi_service = ServiceFactory(
@@ -387,7 +387,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
 
         m.get(self.informatie_object["inhoud"], content=self.informatie_object_content)
 
-        document_client = build_client("document")
+        document_client = build_documenten_client()
         document_client.download_document(self.informatie_object["inhoud"])
 
         req = m.request_history[0]
@@ -411,7 +411,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
         file = get_temporary_text_file()
         title = "my_document"
 
-        documenten_client = build_client("document")
+        documenten_client = build_documenten_client()
         created_document = documenten_client.upload_document(
             self.user, file, title, zaak_type_iotc.id, self.zaak["bronorganisatie"]
         )
@@ -434,7 +434,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
         title = "my_document"
 
         m.post(f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten", status_code=404)
-        documenten_client = build_client("document")
+        documenten_client = build_documenten_client()
         created_document = documenten_client.upload_document(
             self.user, file, title, zaak_type_iotc.id, self.zaak["bronorganisatie"]
         )
@@ -457,7 +457,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
         title = "my_document"
 
         m.post(f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten", status_code=500)
-        documenten_client = build_client("document")
+        documenten_client = build_documenten_client()
         created_document = documenten_client.upload_document(
             self.user, file, title, zaak_type_iotc.id, self.zaak["bronorganisatie"]
         )

@@ -11,7 +11,7 @@ from requests import HTTPError, RequestException, Response
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.catalogi import Catalogus
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
-from zgw_consumers.client import build_client as _build_client
+from zgw_consumers.client import build_client
 from zgw_consumers.service import pagination_helper
 
 from open_inwoner.openzaak.api_models import InformatieObject
@@ -670,7 +670,7 @@ class FormClient(APIClient):
         return results
 
 
-def build_client(type_) -> APIClient | None:
+def _build_zgw_client(type_) -> APIClient | None:
     config = OpenZaakConfig.get_solo()
     services_to_client_mapping = {
         "zaak": ZakenClient,
@@ -681,8 +681,24 @@ def build_client(type_) -> APIClient | None:
     if client_class := services_to_client_mapping.get(type_):
         service = getattr(config, f"{type_}_service")
         if service:
-            client = _build_client(service, client_factory=client_class)
+            client = build_client(service, client_factory=client_class)
             return client
 
     logger.warning("no service defined for %s", type_)
     return None
+
+
+def build_zaken_client() -> ZakenClient | None:
+    return _build_zgw_client("zaak")
+
+
+def build_catalogi_client() -> CatalogiClient | None:
+    return _build_zgw_client("catalogi")
+
+
+def build_documenten_client() -> DocumentenClient | None:
+    return _build_zgw_client("document")
+
+
+def build_forms_client() -> FormClient | None:
+    return _build_zgw_client("form")

@@ -25,7 +25,7 @@ from open_inwoner.openklant.wrap import (
     get_fetch_parameters,
     get_kcm_answer_mapping,
 )
-from open_inwoner.openzaak.clients import build_client as build_client_openzaak
+from open_inwoner.openzaak.clients import build_zaken_client
 from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import CommonPageMixin
 
@@ -219,7 +219,7 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
             local_kcm.save()
 
         if client := build_client("contactmomenten"):
-            zaken_client = build_client_openzaak("zaak")
+            zaken_client = build_zaken_client()
             ocm = client.retrieve_objectcontactmoment(
                 kcm.contactmoment, "zaak", zaken_client
             )

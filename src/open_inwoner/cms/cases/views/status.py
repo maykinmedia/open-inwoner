@@ -30,7 +30,9 @@ from open_inwoner.openklant.wrap import (
 from open_inwoner.openzaak.api_models import Status, StatusType, Zaak
 from open_inwoner.openzaak.clients import (
     ZakenClient,
-    build_client as build_client_openzaak,
+    build_catalogi_client,
+    build_documenten_client,
+    build_zaken_client,
 )
 from open_inwoner.openzaak.documents import (
     fetch_single_information_object_url,
@@ -139,7 +141,7 @@ class InnerCaseDetailView(
 
             config = OpenZaakConfig.get_solo()
 
-            zaken_client = build_client_openzaak("zaak")
+            zaken_client = build_zaken_client()
 
             # fetch data associated with `self.case`
             documents = self.get_case_document_files(self.case, zaken_client)
@@ -168,7 +170,7 @@ class InnerCaseDetailView(
                 )
 
             statustypen = []
-            if catalogi_client := build_client_openzaak("catalogi"):
+            if catalogi_client := build_catalogi_client():
                 statustypen = catalogi_client.fetch_status_types_no_cache(
                     self.case.zaaktype.url
                 )
@@ -326,7 +328,7 @@ class InnerCaseDetailView(
             self.case.status = zaken_client.fetch_single_status(self.case.status)
             status_types_mapping[self.case.status.statustype].append(self.case.status)
 
-        catalogi_client = build_client_openzaak("catalogi")
+        catalogi_client = build_catalogi_client()
         if catalogi_client is None:
             return status_types_mapping
 
@@ -535,7 +537,7 @@ class InnerCaseDetailView(
 
     @staticmethod
     def get_initiator_display(case: Zaak) -> str:
-        if client := build_client_openzaak("zaak"):
+        if client := build_zaken_client():
             roles = client.fetch_case_roles(case.url, RolOmschrijving.initiator)
             return ", ".join(get_role_name_display(r) for r in roles)
         return ""
@@ -663,7 +665,7 @@ class CaseDocumentDownloadView(LogMixin, CaseAccessMixin, View):
         if not self.case:
             raise Http404
 
-        zaken_client = build_client_openzaak("zaak")
+        zaken_client = build_zaken_client()
         if not zaken_client:
             raise Http404
 
@@ -685,7 +687,7 @@ class CaseDocumentDownloadView(LogMixin, CaseAccessMixin, View):
 
         # retrieve and stream content
         content_stream = None
-        if client := build_client_openzaak("document"):
+        if client := build_documenten_client():
             content_stream = client.download_document(info_object.inhoud)
 
         if not content_stream:
@@ -748,7 +750,7 @@ class CaseDocumentUploadFormView(CaseAccessMixin, LogMixin, FormView):
             document_type = cleaned_data["type"]
             source_organization = self.case.bronorganisatie
 
-            client = build_client_openzaak("document")
+            client = build_documenten_client()
             if client is None:
                 return self.handle_document_error(request, file)
 
@@ -763,7 +765,7 @@ class CaseDocumentUploadFormView(CaseAccessMixin, LogMixin, FormView):
                 return self.handle_document_error(request, file)
 
             created_relationship = None
-            if zaken_client := build_client_openzaak("zaak"):
+            if zaken_client := build_zaken_client():
                 created_relationship = zaken_client.connect_case_with_document(
                     self.case.url, created_document.get("url")
                 )
