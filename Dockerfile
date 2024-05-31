@@ -84,6 +84,8 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-reco
 
 WORKDIR /app
 COPY ./bin/docker_start.sh /start.sh
+COPY ./bin/start_celery.sh /celery_worker.sh
+COPY ./bin/check_celery_worker_liveness.py ./bin/
 RUN mkdir /app/log
 RUN mkdir /app/media
 
@@ -91,6 +93,7 @@ RUN mkdir /app/media
 COPY --from=backend-build /usr/local/lib/python3.11 /usr/local/lib/python3.11
 COPY --from=backend-build /usr/local/bin/uwsgi /usr/local/bin/uwsgi
 COPY --from=backend-build /app/src/ /app/src/
+COPY --from=backend-build /usr/local/bin/celery /usr/local/bin/celery
 
 # copy frontend build statics
 COPY --from=frontend-build /app/src/open_inwoner/static /app/src/open_inwoner/static
