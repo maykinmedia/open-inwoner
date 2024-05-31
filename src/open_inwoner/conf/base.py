@@ -200,10 +200,10 @@ INSTALLED_APPS = [
     "sessionprofile",
     "openformsclient",
     "django_htmx",
-    "mailer",
     "log_outgoing_requests",
     "formtools",
     "django_setup_configuration",
+    "django_yubin",
     # Project applications.
     "open_inwoner.components",
     "open_inwoner.kvk",
@@ -351,9 +351,8 @@ EMAIL_TIMEOUT = 10
 
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="openinwoner@maykinmedia.nl")
 
-
-EMAIL_BACKEND = "mailer.backend.DbBackend"
-MAILER_EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_BACKEND = "django_yubin.backends.QueuedEmailBackend"
+MAILER_USE_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
 #
 # LOGGING
@@ -673,7 +672,15 @@ CELERY_TASK_TIME_LIMIT = config("CELERY_TASK_HARD_TIME_LIMIT", default=15 * 60)
 CELERY_BEAT_SCHEDULE = {
     "Import ZGW data": {
         "task": "Import ZGW data",
-        "schedule": crontab(hour=7, minute=0),
+        "schedule": crontab(minute="0", hour="7", day_of_month="*"),
+    },
+    "Retry emails": {
+        "task": "django_yubin.tasks.retry_emails",
+        "schedule": crontab(minute="1", hour="*", day_of_month="*"),
+    },
+    "Delete old emails": {
+        "task": "django_yubin.tasks.delete_old_emails",
+        "schedule": crontab(minute="0", hour="6", day_of_month="*"),
     },
 }
 
