@@ -672,7 +672,15 @@ CELERY_TASK_TIME_LIMIT = config("CELERY_TASK_HARD_TIME_LIMIT", default=15 * 60)
 CELERY_BEAT_SCHEDULE = {
     "Import ZGW data": {
         "task": "Import ZGW data",
-        "schedule": crontab(hour=7, minute=0),
+        "schedule": crontab(minute="0", hour="7", day_of_month="*"),
+    },
+    "Retry emails": {
+        "task": "django_yubin.tasks.retry_emails",
+        "schedule": crontab(minute="1", hour="*", day_of_month="*"),
+    },
+    "Delete old emails": {
+        "task": "django_yubin.tasks.delete_old_emails",
+        "schedule": crontab(minute="0", hour="6", day_of_month="*"),
     },
 }
 
