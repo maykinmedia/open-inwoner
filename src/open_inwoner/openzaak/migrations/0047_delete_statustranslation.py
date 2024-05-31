@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("openzaak", "0046_alter_openzaakconfig_fetch_eherkenning_zaken_with_rsin"),
+        ("openzaak", "0048_alter_zaaktyperesultaattypeconfig_omschrijving"),
     ]
 
     operations = [
