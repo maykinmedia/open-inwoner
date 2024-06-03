@@ -66,7 +66,7 @@ class ZakenClient(APIClient):
         return []
 
     @cache_result(
-        "cases:{user_bsn}:{max_requests}:{identificatie}",
+        "{self.base_url}:cases:{user_bsn}:{max_requests}:{identificatie}",
         timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
     )
     def fetch_cases_by_bsn(
@@ -114,7 +114,7 @@ class ZakenClient(APIClient):
         return cases
 
     @cache_result(
-        "cases:{kvk_or_rsin}:{vestigingsnummer}:{max_requests}:{zaak_identificatie}",
+        "{self.base_url}:cases:{kvk_or_rsin}:{vestigingsnummer}:{max_requests}:{zaak_identificatie}",
         timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
     )
     def fetch_cases_by_kvk_or_rsin(
@@ -174,7 +174,10 @@ class ZakenClient(APIClient):
 
         return cases
 
-    @cache_result("single_case:{case_uuid}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT)
+    @cache_result(
+        "{self.base_url}:single_case:{case_uuid}",
+        timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
+    )
     def fetch_single_case(self, case_uuid: str) -> Zaak | None:
         try:
             response = self.get(f"zaken/{case_uuid}", headers=CRS_HEADERS)
@@ -200,7 +203,8 @@ class ZakenClient(APIClient):
         return case
 
     @cache_result(
-        "single_case_information_object:{url}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT
+        "{self.base_url}:single_case_information_object:{url}",
+        timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
     )
     def fetch_single_case_information_object(
         self, url: str
@@ -246,11 +250,14 @@ class ZakenClient(APIClient):
 
         return statuses
 
-    @cache_result("status_history:{case_url}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT)
+    @cache_result(
+        "{self.base_url}:status_history:{case_url}",
+        timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
+    )
     def fetch_status_history(self, case_url: str) -> list[Status]:
         return self.fetch_status_history_no_cache(case_url)
 
-    @cache_result("status:{status_url}", timeout=60 * 60)
+    @cache_result("{self.base_url}:status:{status_url}", timeout=60 * 60)
     def fetch_single_status(self, status_url: str) -> Status | None:
         try:
             response = self.get(url=status_url)
@@ -264,7 +271,7 @@ class ZakenClient(APIClient):
         return status
 
     @cache_result(
-        "case_roles:{case_url}:{role_desc_generic}",
+        "{self.base_url}:case_roles:{case_url}:{role_desc_generic}",
         timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
     )
     def fetch_case_roles(
@@ -385,7 +392,8 @@ class ZakenClient(APIClient):
         return case_info_objects
 
     @cache_result(
-        "single_result:{result_url}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT
+        "{self.base_url}:single_result:{result_url}",
+        timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
     )
     def fetch_single_result(self, result_url: str) -> Resultaat | None:
         try:
@@ -453,7 +461,8 @@ class CatalogiClient(APIClient):
         return result_types
 
     @cache_result(
-        "status_type:{status_type_url}", timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT
+        "{self.base_url}:status_type:{status_type_url}",
+        timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT,
     )
     def fetch_single_status_type(self, status_type_url: str) -> StatusType | None:
         try:
@@ -468,7 +477,7 @@ class CatalogiClient(APIClient):
         return status_type
 
     @cache_result(
-        "resultaat_type:{resultaat_type_url}",
+        "{self.base_url}:resultaat_type:{resultaat_type_url}",
         timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT,
     )
     def fetch_single_resultaat_type(
@@ -522,7 +531,8 @@ class CatalogiClient(APIClient):
         return zaak_types
 
     @cache_result(
-        "case_type:{case_type_url}", timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT
+        "{self.base_url}:case_type:{case_type_url}",
+        timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT,
     )
     def fetch_single_case_type(self, case_type_url: str) -> ZaakType | None:
         try:
@@ -553,7 +563,7 @@ class CatalogiClient(APIClient):
         return catalogs
 
     @cache_result(
-        "information_object_type:{information_object_type_url}",
+        "{self.base_url}:information_object_type:{information_object_type_url}",
         timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT,
     )
     def fetch_single_information_object_type(
