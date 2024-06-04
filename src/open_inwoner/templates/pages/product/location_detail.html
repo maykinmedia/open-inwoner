@@ -9,16 +9,16 @@
         <div class="location__details">
             <div class="location__address">
                 {% if object.address_line_1 %}
-                    <p class="p">{{ object.address_line_1 }}</p>
+                    <p class="utrecht-paragraph">{{ object.address_line_1 }}</p>
                 {% endif %}
-                <p class="p">{{ object.address_line_2 }}</p>
+                <p class="utrecht-paragraph">{{ object.address_line_2 }}</p>
             </div>
             <div class="location__contact">
                 {% if object.phonenumber %}
-                    <p class="p">{{ object.phonenumber }}</p>
+                    <p class="utrecht-paragraph">{{ object.phonenumber }}</p>
                 {% endif %}
                 {% if object.email %}
-                    <p class="p">{{ object.email }}</p>
+                    <p class="utrecht-paragraph">{{ object.email }}</p>
                 {% endif %}
             </div>
         </div>

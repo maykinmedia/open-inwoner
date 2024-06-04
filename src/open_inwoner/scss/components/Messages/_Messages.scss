@@ -17,7 +17,7 @@
     overflow-y: auto;
   }
 
-  &__header .p {
+  &__header .utrecht-paragraph {
     margin-top: 0 !important;
   }
 
@@ -33,7 +33,7 @@
     justify-content: center;
   }
 
-  &__day-header > .p:first-child {
+  &__day-header > .utrecht-paragraph:first-child {
     display: flex;
     align-items: center;
     width: 100%;
@@ -42,19 +42,19 @@
     white-space: nowrap;
   }
 
-  &__day-header > .p:first-child:before,
-  &__day-header > .p:first-child:after {
+  &__day-header > .utrecht-paragraph:first-child:before,
+  &__day-header > .utrecht-paragraph:first-child:after {
     border-top: 1px solid var(--color-gray-lightest);
     content: '';
     margin: var(--spacing-large);
     width: 100%;
   }
 
-  &__day-header > .p:first-child:before {
+  &__day-header > .utrecht-paragraph:first-child:before {
     margin-left: 0;
   }
 
-  &__day-header > .p:first-child:after {
+  &__day-header > .utrecht-paragraph:first-child:after {
     margin-right: 0;
   }
 
@@ -85,7 +85,7 @@
     .message__body {
       border: 1px solid transparent;
 
-      .p::before {
+      .utrecht-paragraph::before {
         background-color: var(--color-primary);
         border-radius: var(--border-radius);
         bottom: 21px;

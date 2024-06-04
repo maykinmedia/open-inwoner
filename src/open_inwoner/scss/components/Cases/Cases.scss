@@ -10,8 +10,8 @@
     cursor: pointer;
   }
 
-  &__title_text {
-    padding-top: var(--spacing-medium);
-    padding-bottom: var(--spacing-extra-large);
+  > .utrecht-paragraph--oip-title-text {
+    padding-top: var(--spacing-large);
+    padding-bottom: var(--spacing-giant);
   }
 }

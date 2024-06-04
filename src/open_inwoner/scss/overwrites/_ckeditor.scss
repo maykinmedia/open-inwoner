@@ -1,10 +1,26 @@
 .li .link,
-.p .link {
+.utrecht-paragraph .link {
   text-decoration: underline;
   display: inline;
 }
 
 // Style icons separately
+.utrecht-paragraph .link *[class*='icon'] {
+  text-decoration: none;
+  transform: scale(0.75);
+  display: inline-block;
+  vertical-align: bottom;
+}
+
+///
+/// Legacy styling
+///
+
+.p .link {
+  text-decoration: underline;
+  display: inline;
+}
+
 .p .link *[class*='icon'] {
   text-decoration: none;
   transform: scale(0.75);

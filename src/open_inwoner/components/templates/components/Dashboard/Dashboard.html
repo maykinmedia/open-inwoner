@@ -4,7 +4,7 @@
     <ul class="dashboard__list">
         {% for metric in metrics %}
             <li class="dashboard__list-item">
-                <p class="p p--compact"><span class="dashboard__item-label">{{ metric.label }}</span> {{ metric.value|default:'-' }}</p>
+                <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-compact"><span class="dashboard__item-label">{{ metric.label }}</span> {{ metric.value|default:'-' }}</p>
             </li>
         {% endfor %}
     </ul>

@@ -14,8 +14,12 @@
     background-color: var(--color-white);
     color: var(--color-red-notification);
     display: block;
-    line-height: var(--font-line-height-body);
+    line-height: var(--utrecht-document-line-height);
     position: relative;
+
+    & * {
+      color: var(--color-red-notification);
+    }
   }
 
   &__list {
@@ -67,6 +71,7 @@
     }
   }
 
+  /// Cards in userfeed
   .card {
     justify-content: flex-start;
 
@@ -97,6 +102,7 @@
         font-family: var(--font-family-body);
         font-size: var(--font-size-body-small);
         font-weight: normal;
+        line-height: var(--utrecht-document-line-height);
         overflow-wrap: break-word;
         word-break: normal;
         padding: var(--font-size-body-small) var(--card-spacing) 0
@@ -106,10 +112,10 @@
     }
 
     .userfeed-card__description {
-      color: var(--font-color-heading);
-      font-family: var(--font-family-heading);
+      color: var(--utrecht-heading-color);
+      font-family: var(--utrecht-heading-font-family);
       font-size: var(--font-size-body);
-      line-height: var(--font-line-height-body);
+      line-height: var(--utrecht-document-line-height);
       margin: 0;
       padding: var(--spacing-medium) var(--row-height-big) var(--card-spacing)
         var(--card-spacing);

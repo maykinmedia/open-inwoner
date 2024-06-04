@@ -1,5 +1,4 @@
 .view--products-category_product_detail {
-  .h4,
   .utrecht-heading-4 {
     margin: 21px 0;
   }
@@ -9,5 +8,13 @@
     text-overflow: ellipsis;
     width: 99%;
     display: block;
+  }
+
+  ///
+  /// Legacy styling
+  ///
+
+  .h4 {
+    margin: 21px 0;
   }
 }

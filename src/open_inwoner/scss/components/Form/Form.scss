@@ -91,11 +91,11 @@
     transform: translateY(-5px);
   }
 
-  &__control > .label .p:last-child {
+  &__control > .label .utrecht-paragraph:last-child {
     font-size: var(--font-size-body-small);
   }
 
-  &__control > .label .p.p--compact {
+  &__control > .label .utrecht-paragraph.utrecht-paragraph--oip-compact {
     font-size: var(--font-size-body);
   }
 
