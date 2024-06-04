@@ -1,6 +1,7 @@
+import warnings
 from datetime import timedelta
 
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Q, UniqueConstraint
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -46,44 +47,159 @@ def generate_default_file_extensions():
     )
 
 
+class ZGWApiGroupConfig(models.Model):
+    """A set of of ZGW service configurations."""
+
+    open_zaak_config = models.ForeignKey(
+        "openzaak.OpenZaakConfig", on_delete=models.PROTECT, related_name="api_groups"
+    )
+
+    name = models.CharField(
+        _("name"),
+        max_length=255,
+        help_text=_("A recognisable name for this set of ZGW APIs."),
+    )
+    zrc_service = models.ForeignKey(
+        "zgw_consumers.Service",
+        verbose_name=_("Zaken API"),
+        on_delete=models.PROTECT,
+        limit_choices_to={"api_type": APITypes.zrc},
+        related_name="zgwset_zrc_config",
+        null=True,
+    )
+    drc_service = models.ForeignKey(
+        "zgw_consumers.Service",
+        verbose_name=_("Documenten API"),
+        on_delete=models.PROTECT,
+        limit_choices_to={"api_type": APITypes.drc},
+        related_name="zgwset_drc_config",
+        null=True,
+    )
+    ztc_service = models.ForeignKey(
+        "zgw_consumers.Service",
+        verbose_name=_("Catalogi API"),
+        on_delete=models.PROTECT,
+        limit_choices_to={"api_type": APITypes.ztc},
+        related_name="zgwset_ztc_config",
+        null=True,
+    )
+    form_service = models.OneToOneField(
+        "zgw_consumers.Service",
+        verbose_name=_("Form API"),
+        on_delete=models.PROTECT,
+        limit_choices_to={"api_type": APITypes.orc},
+        related_name="zgwset_orc_form_config",
+        null=True,
+    )
+
+    class Meta:
+        verbose_name = _("ZGW API set")
+        verbose_name_plural = _("ZGW API sets")
+
+    def __str__(self):
+        return self.name
+
+
+# This will help us track legacy invocations of the root-level service config
+_default_zgw_api_group_deprecation_message = (
+    "This usage of `default_zgw_api_group` should be refactored to "
+    "support multiple ZGW backends"
+)
+
+warnings.filterwarnings(
+    "once", _default_zgw_api_group_deprecation_message, category=DeprecationWarning
+)
+
+
 class OpenZaakConfig(SingletonModel):
     """
     Global configuration and defaults for zaken and catalogi services.
     """
 
-    zaak_service = models.OneToOneField(
-        "zgw_consumers.Service",
-        verbose_name=_("Open Zaak API"),
-        on_delete=models.PROTECT,
-        limit_choices_to={"api_type": APITypes.zrc},
-        related_name="+",
-        blank=True,
-        null=True,
-    )
+    @property
+    def default_zgw_api_group(self):
+        # TODO: This is a temporary solution to the new mult-backend
+        # ZGW configuration to avoid breaking the existing API.
+        # The *_service fields are proxied through this field to
+        # avoid having two sources of truth regarding the configured
+        # ZGW services. The legacy code will simply have a single
+        # backend configured and retrieve this through the proxy.
+
+        if (api_groups_count := self.api_groups.count()) == 0:
+            return None
+
+        if api_groups_count > 0:
+            warnings.warn(
+                _default_zgw_api_group_deprecation_message,
+                DeprecationWarning,
+            )
+
+            return self.api_groups.first()
+
+    def _set_zgw_service(self, field: str, service):
+        if self.pk is None:
+            raise ValueError(
+                f"Please save your {self.__class__} instance before setting services"
+            )
+
+        with transaction.atomic():
+            if self.default_zgw_api_group is None:
+                ZGWApiGroupConfig.objects.create(open_zaak_config=self)
+
+            default_group = self.default_zgw_api_group
+            setattr(default_group, field, service)
+            default_group.save()
+
+            return getattr(default_group, field)
+
+    @property
+    def zaak_service(self):
+        if self.default_zgw_api_group is None:
+            return None
+
+        return self.default_zgw_api_group.zrc_service
+
+    @zaak_service.setter
+    def zaak_service(self, service):
+        return self._set_zgw_service("zrc_service", service)
+
+    @property
+    def catalogi_service(self):
+        if self.default_zgw_api_group is None:
+            return None
+        return self.default_zgw_api_group.ztc_service
+
+    @catalogi_service.setter
+    def catalogi_service(self, service):
+        return self._set_zgw_service("ztc_service", service)
+
+    @property
+    def document_service(self):
+        if self.default_zgw_api_group is None:
+            return None
+        return self.default_zgw_api_group.drc_service
+
+    @document_service.setter
+    def document_service(self, service):
+        return self._set_zgw_service("drc_service", service)
+
+    @property
+    def form_service(self):
+        if self.default_zgw_api_group is None:
+            return None
+
+        return self.default_zgw_api_group.form_service
+
+    @form_service.setter
+    def form_service(self, service):
+        return self._set_zgw_service("form_service", service)
+
     zaak_max_confidentiality = models.CharField(
         max_length=32,
         choices=VertrouwelijkheidsAanduidingen.choices,
         default=VertrouwelijkheidsAanduidingen.openbaar,
         verbose_name=_("Case confidentiality"),
         help_text=_("Select maximum confidentiality level of cases"),
-    )
-    catalogi_service = models.OneToOneField(
-        "zgw_consumers.Service",
-        verbose_name=_("Catalogi API"),
-        on_delete=models.PROTECT,
-        limit_choices_to={"api_type": APITypes.ztc},
-        related_name="+",
-        blank=True,
-        null=True,
-    )
-    document_service = models.OneToOneField(
-        "zgw_consumers.Service",
-        verbose_name=_("Documents API"),
-        on_delete=models.PROTECT,
-        limit_choices_to={"api_type": APITypes.drc},
-        related_name="+",
-        blank=True,
-        null=True,
     )
     document_max_confidentiality = models.CharField(
         max_length=32,
@@ -104,15 +220,6 @@ class OpenZaakConfig(SingletonModel):
         ),
         default=generate_default_file_extensions,
         help_text=_("A list of the allowed file extensions."),
-    )
-    form_service = models.OneToOneField(
-        "zgw_consumers.Service",
-        verbose_name=_("Form API"),
-        on_delete=models.PROTECT,
-        limit_choices_to={"api_type": APITypes.orc},
-        related_name="+",
-        blank=True,
-        null=True,
     )
 
     skip_notification_statustype_informeren = models.BooleanField(

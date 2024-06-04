@@ -18,23 +18,20 @@ from .models import (
     ZaakTypeInformatieObjectTypeConfig,
     ZaakTypeResultaatTypeConfig,
     ZaakTypeStatusTypeConfig,
+    ZGWApiGroupConfig,
 )
+
+
+class ZGWApiGroupConfig(admin.StackedInline):
+    model = ZGWApiGroupConfig
+    extra = 0
 
 
 @admin.register(OpenZaakConfig)
 class OpenZaakConfigAdmin(SingletonModelAdmin):
+    inlines = [ZGWApiGroupConfig]
+
     fieldsets = (
-        (
-            None,
-            {
-                "fields": [
-                    "zaak_service",
-                    "catalogi_service",
-                    "document_service",
-                    "form_service",
-                ]
-            },
-        ),
         (
             "Advanced options",
             {
