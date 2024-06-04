@@ -5,13 +5,14 @@ from subprocess import CalledProcessError, check_output
 
 from django.conf import settings
 
+from typing import Any
 from decouple import Csv, config as _config, undefined
 from sentry_sdk.integrations import DidNotEnable, django, redis
 
 logger = logging.getLogger(__name__)
 
 
-def config(option: str, default=undefined, *args, **kwargs):
+def config(option: str, default: Any = undefined, *args, **kwargs):
     """
     Pull a config parameter from the environment.
 
@@ -24,6 +25,8 @@ def config(option: str, default=undefined, *args, **kwargs):
     if "split" in kwargs:
         kwargs.pop("split")
         kwargs["cast"] = Csv()
+        if isinstance(default, list):
+            default = ",".join(default)
 
     if default is not undefined and default is not None:
         kwargs.setdefault("cast", type(default))
