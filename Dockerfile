@@ -84,7 +84,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-reco
 
 WORKDIR /app
 COPY ./bin/docker_start.sh /start.sh
-COPY ./bin/start_celery.sh /celery_worker.sh
+COPY ./bin/celery_worker.sh /celery_worker.sh
 COPY ./bin/check_celery_worker_liveness.py ./bin/
 RUN mkdir /app/log
 RUN mkdir /app/media
