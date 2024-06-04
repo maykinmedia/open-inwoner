@@ -2,10 +2,10 @@ import logging
 import os
 from shutil import which
 from subprocess import CalledProcessError, check_output
+from typing import Any
 
 from django.conf import settings
 
-from typing import Any
 from decouple import Csv, config as _config, undefined
 from sentry_sdk.integrations import DidNotEnable, django, redis
 
