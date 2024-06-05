@@ -4,9 +4,9 @@
     {% if location_name %}
         <h3 class="utrecht-heading-3 card__heading-3">{% link href=location.get_absolute_url primary=True text=location_name %}</h3>
     {% endif %}
-        <div class="card__body--flex container--no-margin">
-            <p class="utrecht-paragraph">{{ address_line_1 }}</p>
-            <p class="utrecht-paragraph">{{ address_line_2 }}</p>
+        <div class="card__body--flex p--no-margin">
+            <p class="p">{{ address_line_1 }}</p>
+            <p class="p">{{ address_line_2 }}</p>
             {% if phonenumber %}
                 {% link href='tel:'|addstr:phonenumber secondary=True text=phonenumber %}
             {% endif %}

@@ -212,22 +212,14 @@
   }
 }
 
+.h2 + .button,
+.h4 + .button,
+.p + .button,
 .utrecht-heading-2 + .button,
-.utrecht-heading-4 + .button,
-.utrecht-paragraph + .button {
+.utrecht-heading-4 + .button {
   margin-top: var(--spacing-large);
 }
 
 .cta-button {
   margin-bottom: var(--spacing-large);
-}
-
-///
-/// Legacy styling
-///
-
-.h2 + .button,
-.h4 + .button,
-.p + .button {
-  margin-top: var(--spacing-large);
 }

@@ -1,14 +1,6 @@
 @import '~@utrecht/components/dist/heading-3/css/index.css';
 @import '~microscope-sass/lib/responsive';
 
-.utrecht-paragraph + .utrecht-heading-3 {
-  margin-top: var(--spacing-large);
-}
-
-///
-/// Legacy styling
-///
-
 .h3 {
   color: var(--utrecht-heading-3-color);
   font-family: var(--utrecht-heading-3-font-family);
@@ -25,6 +17,7 @@
   }
 }
 
+.p + .utrecht-heading-3,
 .p + .h3 {
   margin-top: var(--spacing-large);
 }

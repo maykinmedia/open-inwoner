@@ -2,7 +2,7 @@
 
 <section class="plugin plugin__locations">
     <h2 class="utrecht-heading-2">{{ configurable_text.home_page.home_map_title }}</h2>
-    <p class="utrecht-paragraph">{{ configurable_text.home_page.home_map_intro|linebreaksbr }}</p>
+    <p class="p">{{ configurable_text.home_page.home_map_intro|linebreaksbr }}</p>
 
     {% with centroid=product_locations.get_centroid %}
         {% map centroid.lat centroid.lng geojson_feature_collection=product_locations.get_geojson_feature_collection %}

@@ -14,7 +14,7 @@
                     {% firstof 'question-'|add:id|add:'-answer' as answer_id %}
                     {% link bold=True href='#'|add:answer_id icon='keyboard_arrow_down' secondary=True text=question.question toggle="open"  %}
                 </h3>
-                <div id="{{ answer_id }}" class="faq__answer">{{ question.answer|ckeditor_content|safe }}</div>
+                <div id="{{ answer_id }}" class="p faq__answer">{{ question.answer|ckeditor_content|safe }}</div>
             </li>
         {% endfor %}
     </ul>

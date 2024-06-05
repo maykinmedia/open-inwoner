@@ -15,12 +15,12 @@
         <div class="approval">
             <div class="approval__header">
                 <h2 class="utrecht-heading-2">{% trans "U bent toegevoegd als contactpersoon" %}</h2>
-                <p class="utrecht-paragraph">{% trans "By accepting you agree on sharing your personal data (first name, last name and phonenumber)." %}</p>
+                <p class="p">{% trans "By accepting you agree on sharing your personal data (first name, last name and phonenumber)." %}</p>
             </div>
             {% if approvals_count == 1 %}
                 {% with pending_approvals.get as pending_approval %}
                 <div class="approval__single">
-                    <p class="utrecht-paragraph">
+                    <p class="p">
                         {% blocktrans with full_name=pending_approval.get_full_name %}{{ full_name }} wil u toevoegen als contactpersoon.{% endblocktrans %}
                     </p>
                     {% url 'profile:contact_approval' uuid=pending_approval.uuid as approval_url %}
@@ -37,7 +37,7 @@
                 <ul class="approval__list">
                     {% for approval in pending_approvals %}
                         <li class="approval__list-item">
-                            <p class="utrecht-paragraph">{{approval.get_full_name}}</p>
+                            <p class="p">{{approval.get_full_name}}</p>
                             {% url 'profile:contact_approval' uuid=approval.uuid as approval_url %}
                             {% render_form form=None method="POST" form_action=approval_url id="approval_form" spaceless=True show_notifications=True %}
                                 {% csrf_token %}
@@ -71,7 +71,7 @@
             {% button text=_("Filter") type="button" bordered=True %}
         </div>
         <div class="contacts__filter-container filter__container">
-            <p class="utrecht-paragraph">{% trans "Filter op:" %}</p>
+            <p class="p">{% trans "Filter op:" %}</p>
             {% input form.type no_label=True no_help=True icon="expand_more" class="label input" id="id_type" %}
         </div>
     </div>

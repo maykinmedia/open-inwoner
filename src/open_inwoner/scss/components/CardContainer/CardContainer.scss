@@ -41,8 +41,8 @@
 
 .card-container + .card-container,
 .map + .card-container,
-.card-container + .utrecht-heading-2,
-.utrecht-paragraph + .card-container {
+.p + .card-container,
+.card-container + h2 {
   margin-top: var(--gutter-width);
 }
 
@@ -63,13 +63,4 @@
       }
     }
   }
-}
-
-///
-/// Legacy styling
-///
-
-.p + .card-container,
-.card-container + .h2 {
-  margin-top: var(--gutter-width);
 }

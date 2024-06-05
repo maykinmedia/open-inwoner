@@ -71,7 +71,7 @@
             {% form_actions primary_text=_("Verzenden") primary_icon="arrow_forward" %}
         {% endrender_form %}
         {% else %}
-            <div class="utrecht-paragraph">
+            <div class="p">
                 {% url 'profile:contact_create' as contact_create %}
                 {% link href=contact_create text=_("Maak je eerste contact aan voordat je een samenwerking start") icon="arrow_forward" icon_position="after" primary=True %}
             </div>

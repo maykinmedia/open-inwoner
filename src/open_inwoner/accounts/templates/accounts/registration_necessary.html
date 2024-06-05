@@ -7,7 +7,7 @@
         {% render_column start=5 span=5 %}
             {% get_solo 'configurations.SiteConfiguration' as config %}
             <h1 class="utrecht-heading-1">{% trans "Registratie voltooien" %}</h1><br>
-            {% if config.registration_text %}<p class="utrecht-paragraph">{{ config.registration_text|urlize|linebreaksbr }}</p>{% endif %}
+            {% if config.registration_text %}<p class="p">{{ config.registration_text|urlize|linebreaksbr }}</p>{% endif %}
             <form method="POST" id="necessary-form" action="{{ request.get_full_path }}" class="form" novalidate>
                 {% csrf_token %}
 

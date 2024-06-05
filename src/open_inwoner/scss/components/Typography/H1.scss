@@ -17,14 +17,6 @@
   }
 }
 
-.utrecht-heading-1 + .card-container {
-  margin-top: var(--gutter-width);
-}
-
-///
-/// Legacy styling
-///
-
 .h1 {
   color: var(--utrecht-heading-1-color);
   font-family: var(--utrecht-heading-1-font-family);
@@ -45,4 +37,8 @@
   &:first-of-type {
     margin: 0;
   }
+}
+
+.utrecht-heading-1 + .card-container {
+  margin-top: var(--gutter-width);
 }

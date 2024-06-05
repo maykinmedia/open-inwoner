@@ -46,19 +46,11 @@
     margin: 0;
   }
 
-  .utrecht-paragraph + .utrecht-paragraph {
+  .p + .p {
     margin-top: 0;
   }
 
   & + & {
     border-top: none;
-  }
-
-  ///
-  /// Legacy styling
-  ///
-
-  .p + .p {
-    margin-top: 0;
   }
 }

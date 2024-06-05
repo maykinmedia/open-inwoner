@@ -119,7 +119,7 @@
         <div class="tabled__section">
             <h2 class="utrecht-heading-2 title" id="newsletters">{% trans "Nieuwsbrieven" %}</h2>
         </div>
-            <p class="utrecht-paragraph">{% trans "Vink de nieuwsbrieven aan die u wilt ontvangen. Wilt u een nieuwsbrief niet meer ontvangen? Haal het vinkje dan weg. Sla daarna uw keuze op." %}</p>
+            <p class="p">{% trans "Vink de nieuwsbrieven aan die u wilt ontvangen. Wilt u een nieuwsbrief niet meer ontvangen? Haal het vinkje dan weg. Sla daarna uw keuze op." %}</p>
             <form method="POST" id="newsletter-form" class="form" novalidate>
                 {% csrf_token %}
                 {% with form.fields.newsletters.remarks_mapping as remarks_mapping %}
@@ -312,7 +312,7 @@
         <div class="tabled__section">
             <h2 class="utrecht-heading-2 title" id="profile-remove">{% trans "Profiel verwijderen" %}</h2></div>
             <div class="tabled">
-                <p class="utrecht-paragraph">
+                <p class="p">
                     {% trans "Hiermee worden alleen uw persoonlijke voorkeuren verwijderd. U krijgt dan bijvoorbeeld geen e-mail meer van ons over wijzigingen van uw lopende zaken. Uw persoonsgegevens en uw lopende zaken zelf worden hiermee niet verwijderd." %}
                 </p>
             </div>

@@ -2,13 +2,13 @@
 
 {% render_column span=6 compact=True extra_classes="product-finder" %}
     <h2 class="utrecht-heading-2">{{configurable_text.home_page.home_product_finder_title}}</h2>
-    <p class="utrecht-paragraph">{{configurable_text.home_page.home_product_finder_intro|linebreaksbr}}</p>
+    <p class="p">{{configurable_text.home_page.home_product_finder_intro|linebreaksbr}}</p>
 
     <div class="product-finder__form">
         {% if not conditions_done %}
             <h3 class="utrecht-heading-3">{{ condition.question }}</h3>
             {% if condition.rule %}
-            <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-compact">{{ condition.rule }}</p>
+            <p class="p p--compact">{{ condition.rule }}</p>
             {% endif %}
 
             {% if show_previous %}
@@ -17,7 +17,7 @@
                 {% form id="product-finder" spaceless=True form_object=form method="POST" submit_text=primary_text %}
             {% endif %}
         {% else %}
-            <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-compact">
+            <p class="p p--compact">
                 {% trans "Er zijn geen extra vragen meer. Bekijk de producten hiernaast." %}
             </p>
             {% render_form id="product-finder" method="POST" form=form %}

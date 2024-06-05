@@ -54,18 +54,18 @@
       color: var(--color-gray-dark-900);
     }
 
-    .status-list__date {
+    .p-date {
       font-size: var(--font-size-body-small);
     }
 
-    .status-list__text {
+    .p-text {
       display: flex;
       flex-direction: column;
     }
 
-    .status-list__upload {
+    .p__upload {
       display: none;
-      &.status-list__upload--enabled {
+      &.p__upload--enabled {
         //hide when final status is reached
         display: block;
       }

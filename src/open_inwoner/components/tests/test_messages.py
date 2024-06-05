@@ -143,6 +143,4 @@ class TestListItem(InclusionTagWebTest):
         Tests that:
             - Header renders the correct status.
         """
-        self.assertTextContent(
-            ".messages__header .utrecht-paragraph", "Dolor sit amet.", self.config
-        )
+        self.assertTextContent(".messages__header .p", "Dolor sit amet.", self.config)

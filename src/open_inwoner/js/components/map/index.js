@@ -121,9 +121,9 @@ class Map {
           ${title}
         </h4>
       </div>
-      <div class="leaflet-content-details container--no-margin">
-        <p class="utrecht-paragraph">${displayAddress1}</p>
-        <p class="utrecht-paragraph">${displayAddress2}</p>
+      <div class="leaflet-content-details p--no-margin">
+        <p class="p">${displayAddress1}</p>
+        <p class="p">${displayAddress2}</p>
         <a href="tel:${displayPhonenumber}" class="link link--secondary" aria-label=${displayPhonenumber} title=${displayPhonenumber}>
           <span class="link__text">${displayPhonenumber}</span>
         </a>

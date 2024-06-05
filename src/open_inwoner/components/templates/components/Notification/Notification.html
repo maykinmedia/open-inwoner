@@ -8,7 +8,7 @@
 
     <div class="notification__content">
         {% if title %}<h2 class="utrecht-heading-2">{{ title }}</h2>{% endif %}
-        {% if notification %}<p class="utrecht-paragraph">{{ notification }}</p>{% endif %}
+        {% if notification %}<p class="p">{{ notification }}</p>{% endif %}
         {% if action %}{% button href=action text=action_text %}{% endif %}
         {% if contents %}
             {{ contents }}
@@ -16,7 +16,7 @@
             {% if as_markdown %}
                 {{ message|markdown|safe }}
             {% else %}
-                <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-compact">{{ message }}</p>
+                <p class="p p--compact">{{ message }}</p>
             {% endif %}
         {% endif %}
     </div>

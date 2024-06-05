@@ -2,8 +2,8 @@
 
 <section class="messages">
     <header class="messages__header">
-        <h3 class="utrecht-heading-4">{{ subject }}</h3>
-        <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-muted">{{ status }}</p>
+        <h4 class="utrecht-heading-4">{{ subject }}</h4>
+        <p class="p p--muted">{{ status }}</p>
     </header>
 
 
@@ -17,7 +17,7 @@
             {% for day in days %}
                 <li class="messages__day">
                     <header class="messages__day-header">
-                        <p class="utrecht-paragraph utrecht-paragraph--oip-paragraph-muted">{{ day.text }}</p>
+                        <h4 class="p p--muted">{{ day.text }}</h4>
                     </header>
 
                     <ol class="messages__list">
@@ -68,7 +68,7 @@
                 {% form_actions primary_text=_("Verzenden") primary_icon='arrow_forward' %}
             {% endrender_form %}
         {% else %}
-            <p class="utrecht-paragraph utrecht-paragraph--oip-paragraph-muted">{% trans "De gebruiker is inactief. Het is niet mogelijk een bericht te sturen." %}</p>
+            <p class="p p--muted">{% trans "De gebruiker is inactief. Het is niet mogelijk een bericht te sturen." %}</p>
         {% endif %}
     </div>
 </section>
