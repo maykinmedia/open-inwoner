@@ -222,6 +222,7 @@ INSTALLED_APPS = [
     "open_inwoner.questionnaire",
     "open_inwoner.extended_sessions",
     "open_inwoner.custom_csp",
+    "open_inwoner.mail",
     "open_inwoner.media",
     "open_inwoner.userfeed",
     "open_inwoner.cms.profile",
