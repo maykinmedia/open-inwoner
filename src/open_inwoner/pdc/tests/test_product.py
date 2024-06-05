@@ -152,6 +152,17 @@ class TestPublishedProducts(WebTest):
         )
         self.assertEqual(list(response.context["products"]), [product1])
 
+    def test_detail_page_for_unpublished_product_redirects(self):
+        # regression test for Taiga #2523
+
+        product = ProductFactory(published=False)
+        response = self.app.get(
+            reverse("products:product_detail", kwargs={"slug": product.slug})
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], reverse("pages-root"))
+
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestProductFAQ(WebTest):
