@@ -63,12 +63,6 @@
   }
 
   &.profile-section__newsletters {
-    .form {
-      gap: var(--spacing-large);
-    }
-    .checkbox__p.newsletter-remarks {
-      line-height: var(--font-line-height-body);
-    }
     .button {
       padding: var(--spacing-medium) var(--spacing-giant);
     }

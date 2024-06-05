@@ -21,11 +21,11 @@ class TestListItem(InclusionTagWebTest):
         self.assertRender({"text": "Lorem ipsum"})
 
     def test_text(self):
-        self.assertTextContent("p", "Lorem ipsum", {"text": "Lorem ipsum"})
+        self.assertTextContent("h4", "Lorem ipsum", {"text": "Lorem ipsum"})
 
     def test_description(self):
         self.assertTextContent(
-            "p", "Lorem ipsum", {"text": "Lorem ipsum", "description": "Dolor sit"}
+            "p", "Dolor sit", {"text": "Lorem ipsum", "description": "Dolor sit"}
         )
 
     def test_href(self):

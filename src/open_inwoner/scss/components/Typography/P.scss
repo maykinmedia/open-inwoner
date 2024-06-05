@@ -7,7 +7,11 @@
     // Takes style values from our own design-tokens NPM package
     margin: 0;
 
-    // Extensions of the utrecht-paragraph component with OIP-specific styles.
+    &-small {
+      font-size: var(--oip-utrecht-paragraph-small-font-size);
+      line-height: var(--oip-utrecht-paragraph-small-line-height);
+    }
+
     &-muted {
       color: var(--oip-utrecht-paragraph-muted-color);
     }
@@ -17,8 +21,8 @@
     }
 
     &-compact {
-      margin-top: var(--oip-utrecht-paragraph-compact-margin-top);
-      margin-bottom: var(--oip-utrecht-paragraph-compact-margin-bottom);
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
     }
 
     &:empty {
@@ -58,14 +62,11 @@
   .content {
     text-decoration: underline;
   }
-
   &:hover {
     text-decoration: none;
   }
-
   .material-icons {
     text-decoration: none;
-
     &:hover {
       text-decoration: none;
     }
@@ -119,14 +120,11 @@
   .content {
     text-decoration: underline;
   }
-
   &:hover {
     text-decoration: none;
   }
-
   .material-icons {
     text-decoration: none;
-
     &:hover {
       text-decoration: none;
     }
