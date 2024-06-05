@@ -132,6 +132,14 @@
             [
                 "timeline_logger",
                 "timelinelog"
+            ],
+            [
+                "django_yubin",
+                "message"
+            ],
+            [
+                "django_yubin",
+                "log"
             ]
         ]
     }
