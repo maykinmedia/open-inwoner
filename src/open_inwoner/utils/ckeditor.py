@@ -5,15 +5,15 @@ import markdown
 from bs4 import BeautifulSoup
 
 CLASS_ADDERS = [
-    ("h1", "utrecht-heading-1"),
-    ("h2", "utrecht-heading-2"),
-    ("h3", "utrecht-heading-3"),
-    ("h4", "utrecht-heading-4"),
-    ("h5", "utrecht-heading-5"),
-    ("h6", "utrecht-heading-6"),
+    ("h1", "h1"),
+    ("h2", "h2"),
+    ("h3", "h3"),
+    ("h4", "h4"),
+    ("h5", "h5"),
+    ("h6", "h6"),
     ("img", "image"),
     ("li", "li"),
-    ("p", "utrecht-paragraph"),
+    ("p", "p"),
     ("a", "link link--secondary"),
     ("table", "table table--content"),
     ("th", "table__header"),
@@ -78,10 +78,7 @@ def get_product_rendered_content(product):
                 element.string = ""
                 element.attrs.update(
                     {
-                        "class": (
-                            "button button--textless button--icon "
-                            "button--icon-before button--primary cta-button"
-                        ),
+                        "class": "button button--textless button--icon button--icon-before button--primary cta-button",
                         "href": (product.link if product.link else product.form_link),
                         "title": product.button_text,
                         "aria-label": product.button_text,
