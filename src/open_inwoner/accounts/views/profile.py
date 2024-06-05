@@ -27,7 +27,7 @@ from open_inwoner.cms.utils.page_display import (
 from open_inwoner.haalcentraal.utils import fetch_brp
 from open_inwoner.laposta.forms import NewsletterSubscriptionForm
 from open_inwoner.laposta.models import LapostaConfig
-from open_inwoner.openklant.clients import build_client
+from open_inwoner.openklant.clients import build_klanten_client
 from open_inwoner.openklant.wrap import get_fetch_parameters
 from open_inwoner.plans.models import Plan
 from open_inwoner.qmatic.client import NoServiceConfigured, QmaticClient
@@ -239,7 +239,7 @@ class EditProfileView(
             if user_form_data.get(local_name)
         }
         if update_data:
-            if client := build_client("klanten"):
+            if client := build_klanten_client():
                 klant = client.retrieve_klant(**get_fetch_parameters(self.request))
 
                 if klant:

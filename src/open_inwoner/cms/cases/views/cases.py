@@ -7,7 +7,7 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.htmx.mixins import RequiresHtmxMixin
 from open_inwoner.openzaak.cases import preprocess_data
-from open_inwoner.openzaak.clients import build_client
+from open_inwoner.openzaak.clients import build_zaken_client
 from open_inwoner.openzaak.formapi import fetch_open_submissions
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.types import UniformCase
@@ -56,7 +56,7 @@ class InnerCaseListView(
         return _("Mijn aanvragen")
 
     def get_cases(self):
-        client = build_client("zaak")
+        client = build_zaken_client()
 
         if client is None:
             return []

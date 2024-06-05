@@ -14,7 +14,10 @@ from django.views.generic import TemplateView
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.openklant.api_models import KlantContactMoment
-from open_inwoner.openklant.clients import build_client
+from open_inwoner.openklant.clients import (
+    build_contactmomenten_client,
+    build_klanten_client,
+)
 from open_inwoner.openklant.constants import Status
 from open_inwoner.openklant.models import ContactFormSubject, KlantContactMomentAnswer
 from open_inwoner.openklant.views.contactform import ContactFormView
@@ -25,7 +28,7 @@ from open_inwoner.openklant.wrap import (
     get_fetch_parameters,
     get_kcm_answer_mapping,
 )
-from open_inwoner.openzaak.clients import build_client as build_client_openzaak
+from open_inwoner.openzaak.clients import build_zaken_client
 from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import CommonPageMixin
 
@@ -218,8 +221,8 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
             local_kcm.is_seen = True
             local_kcm.save()
 
-        if client := build_client("contactmomenten"):
-            zaken_client = build_client_openzaak("zaak")
+        if client := build_contactmomenten_client():
+            zaken_client = build_zaken_client()
             ocm = client.retrieve_objectcontactmoment(
                 kcm.contactmoment, "zaak", zaken_client
             )
@@ -281,8 +284,8 @@ class KlantContactMomentRedirectView(KlantContactMomentAccessMixin, View):
     """
 
     def get(self, request, *args, **kwargs):
-        klanten_client = build_client("klanten")
-        contactmoment_client = build_client("contactmomenten")
+        klanten_client = build_klanten_client()
+        contactmoment_client = build_contactmomenten_client()
 
         klant = klanten_client.retrieve_klant(**get_fetch_parameters(self.request))
         kcms = contactmoment_client.retrieve_klantcontactmomenten_for_klant(klant)

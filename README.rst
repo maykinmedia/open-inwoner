@@ -5,7 +5,7 @@ Open Inwoner
 
 :Version: 1.17.2
 :Source: https://github.com/maykinmedia/open-inwoner
-:Keywords: inwoner
+:Documentation: https://docs.openinwoner.nl
 :PythonVersion: 3.11
 
 |build-status| |docker| |black| |python-versions|
@@ -50,6 +50,7 @@ References
 ==========
 
 * `Issues <https://github.com/maykinmedia/open-inwoner/issues>`_
+* `Documentation <https://docs.openinwoner.nl>`_
 * `Code <https://github.com/maykinmedia/open-inwoner>`_
 * `Docker image <https://hub.docker.com/r/maykinmedia/open-inwoner>`_
 

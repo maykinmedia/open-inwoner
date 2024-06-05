@@ -7,7 +7,10 @@ from simple_certmanager.models import Certificate
 from zgw_consumers.constants import APITypes, AuthTypes
 from zgw_consumers.models import Service
 
-from open_inwoner.openklant.clients import build_client
+from open_inwoner.openklant.clients import (
+    build_contactmomenten_client,
+    build_klanten_client,
+)
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.utils.api import ClientError
 
@@ -200,8 +203,8 @@ class KICAPIsConfigurationStep(BaseConfigurationStep):
         """
         make requests to the APIs and verify that a connection can be made
         """
-        klanten_client = build_client("klanten")
-        contactmoment_client = build_client("contactmomenten")
+        klanten_client = build_klanten_client()
+        contactmoment_client = build_contactmomenten_client()
 
         try:
             response = klanten_client.get(

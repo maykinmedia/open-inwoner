@@ -3,7 +3,7 @@ from django.test import TestCase
 import requests_mock
 from zgw_consumers.constants import APITypes
 
-from open_inwoner.openzaak.clients import build_client
+from open_inwoner.openzaak.clients import build_zaken_client
 
 from ...utils.test import ClearCachesMixin
 from ..models import OpenZaakConfig
@@ -32,7 +32,7 @@ class TestFetchSpecificCase(ClearCachesMixin, TestCase):
             einddatum=None,
         )
 
-        self.client = build_client("zaak")
+        self.client = build_zaken_client()
 
     def test_case_is_retrieved(self, m):
         m.get(self.zaak["url"], json=self.zaak)
