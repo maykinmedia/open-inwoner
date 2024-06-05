@@ -195,6 +195,12 @@ class ProductDetailView(
         base_list += self.get_categories_breadcrumbs(slug_name="category_slug")
         return base_list + [(self.get_object().name, self.request.path)]
 
+    def get(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if not obj.published:
+            return HttpResponseRedirect(reverse("pages-root"))
+        return super().get(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         config = SiteConfiguration.get_solo()
         product = self.get_object()
