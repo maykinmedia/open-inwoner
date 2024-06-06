@@ -99,8 +99,8 @@ class QmaticMockData:
                 "arguments": [],
             },
             "appointmentList": [
-                self.appointment_passport.dict(),
                 self.appointment_idcard.dict(),
+                self.appointment_passport.dict(),
             ],
         }
         m.get(
