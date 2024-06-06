@@ -25,6 +25,10 @@ class QmaticMockData:
         self.config.service = self.service
         self.config.save()
 
+        self.public_id = (
+            "1e67fe7c82af6f359a1e7ae3293b4821c4654e918872a670920429be267aed96"
+        )
+
         self.appointment_passport = AppointmentFactory.build(
             title="Aanvraag paspoort",
             start="2020-01-01T12:00:00+00:00",
@@ -53,7 +57,37 @@ class QmaticMockData:
         )
 
     def setUpMocks(self, m):
-        data = {
+        customer_data = [
+            {
+                "id": 116475,
+                "publicId": self.public_id,
+                "firstName": "Foo",
+                "lastName": "Bar",
+                "cardNumber": "",
+                "consentIdentifier": "3c663b7c0101f7dfcf99b8ed84fffd876e981dc040ae4097af57f76d6133df68",
+                "consentTimestamp": "2024-05-29T18:11:32.223+0000",
+                "retentionPolicy": "appointment_days",
+                "lastInteractionTimestamp": "2024-08-27T07:10:00.000+0000",
+                "deletionTimestamp": "2024-11-25T07:10:00.000+0000",
+                "properties": {
+                    "customField5": "1e67fe7c82af6f359a1e7ae3293b4891c4654e918872a670920429be267aed96",
+                    "country": "",
+                    "address2": "",
+                    "city": "",
+                    "address1": "",
+                    "created": 1717005834366,
+                    "postalCode": "",
+                    "customField4": self.user.email,
+                    "custom": "{}",
+                    "externalId": "",
+                    "dateOfBirth": "2010-10-10",
+                    "phoneNumber": "31229252200",
+                    "state": "",
+                    "email": self.user.email,
+                },
+            }
+        ]
+        appointment_data = {
             "notifications": [],
             "meta": {
                 "start": "",
@@ -70,6 +104,10 @@ class QmaticMockData:
             ],
         }
         m.get(
-            f"{self.api_root}v1/customers/externalId/{self.user.email}/appointments",
-            json=data,
+            f"{self.api_root}appointment/customers/identify;{self.user.email}",
+            json=customer_data,
+        )
+        m.get(
+            f"{self.api_root}calendar-backend/public/api/v1/customers/{self.public_id}/appointments",
+            json=appointment_data,
         )
