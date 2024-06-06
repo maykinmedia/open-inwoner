@@ -1295,9 +1295,23 @@ class UserAppointmentsTests(ClearCachesMixin, WebTest):
 
         self.assertIn(_("Geen afspraken beschikbaar"), response.text)
 
+    def test_do_not_render_list_if_no_customer_is_found(self, m):
+        m.get(
+            f"{self.data.api_root}appointment/customers/identify;{self.data.user.email}",
+            json=[],
+        )
+
+        response = self.app.get(self.appointments_url, user=self.data.user)
+
+        self.assertIn(_("Geen afspraken beschikbaar"), response.text)
+
     def test_do_not_render_list_if_no_appointments_are_found(self, m):
         m.get(
-            f"{self.data.api_root}v1/customers/externalId/{self.data.user.email}/appointments",
+            f"{self.data.api_root}appointment/customers/identify;{self.data.user.email}",
+            json=[{"publicId": self.data.public_id}],
+        )
+        m.get(
+            f"{self.data.api_root}calendar-backend/public/api/v1/customers/{self.data.public_id}/appointments",
             status_code=404,
         )
 
@@ -1307,7 +1321,11 @@ class UserAppointmentsTests(ClearCachesMixin, WebTest):
 
     def test_do_not_render_list_if_validation_error(self, m):
         m.get(
-            f"{self.data.api_root}v1/customers/externalId/{self.data.user.email}/appointments",
+            f"{self.data.api_root}appointment/customers/identify;{self.data.user.email}",
+            json=[{"publicId": self.data.public_id}],
+        )
+        m.get(
+            f"{self.data.api_root}calendar-backend/public/api/v1/customers/{self.data.public_id}/appointments",
             json={"appointmentList": [{"invalid": "data"}]},
         )
 
