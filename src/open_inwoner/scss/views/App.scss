@@ -195,7 +195,8 @@
   /// Font.
 
   --font-color-heading: var(--color-black);
-  --font-family-heading: 'Heading';
+  // Font-family = 'Heading' coming from both NLDS and/or the font-upload functionality
+  --font-family-heading: var(--utrecht-heading-font-family);
   --font-weight-heading: bold;
 
   --font-color-heading-1: var(--font-color-heading);
@@ -224,7 +225,8 @@
 
   --font-size-heading-card: 18px;
 
-  --font-family-body: 'Body';
+  // Font-family = 'Body' coming from both NLDS and/or the font-upload functionality
+  --font-family-body: var(--utrecht-document-font-family);
   --font-color-body: var(--color-gray-dark);
   --font-size-body: var(--utrecht-document-font-size);
   --font-line-height-body: 24px;
