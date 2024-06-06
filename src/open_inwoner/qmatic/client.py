@@ -109,10 +109,6 @@ class Client(APIClient):
         self.headers["Content-Type"] = "application/json"
 
     def request(self, method: str, url: str, *args, **kwargs):
-        # ensure there is a version identifier in the URL
-        if not startswith_version(url):
-            url = f"v1/{url}"
-
         response = super().request(method, url, *args, **kwargs)
 
         if response.status_code == 500:
@@ -125,11 +121,25 @@ class Client(APIClient):
 
         return response
 
-    def list_appointments_for_customer(
-        self, customer_externalid: str
-    ) -> list[Appointment]:
-        endpoint = f"customers/externalId/{quote(customer_externalid)}/appointments"
-        response = self.get(endpoint)
+    def list_appointments_for_customer(self, email: str) -> list[Appointment]:
+        customers_endpoint = f"appointment/customers/identify;email={quote(email)}"
+        customers_response = self.get(customers_endpoint)
+
+        if customers_response.status_code == 404:
+            return []
+
+        customers_response.raise_for_status()
+        customers = customers_response.json()
+
+        if not customers:
+            return []
+
+        public_id = customers[0]["publicId"]
+
+        appointment_endpoint = (
+            f"calendar-backend/public/api/v1/customers/{public_id}/appointments"
+        )
+        response = self.get(appointment_endpoint)
         if response.status_code == 404:
             return []
         response.raise_for_status()
