@@ -152,6 +152,7 @@ class Client(APIClient):
                 appointment.url = (
                     f"{config.booking_base_url}{quote(appointment.publicId)}"
                 )
+            appointments.sort(key=lambda appointment: appointment.start)
             return appointments
         except ValidationError:
             logger.exception(
