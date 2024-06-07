@@ -12,7 +12,7 @@
                         <p class="p tabled__value">{{ appointment.start|date:"j F Y" }} {% trans "om" %} {{ appointment.start|date:"H:i"|add:" "|add:_("uur") }}</p>
                     {% endtimezone %}
                     <h2 class="plugin-card__heading">
-                        <span class="status">{{ appointment.title }}</span>
+                        <span class="status">{{ appointment.services.0.name|default:appointment.title }}</span>
                     </h2>
                     <span class="button button--icon-before button--transparent">
                         {% icon icon="east" icon_position="after" primary=True outlined=True %}

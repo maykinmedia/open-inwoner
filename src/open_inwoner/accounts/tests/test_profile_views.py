@@ -1274,6 +1274,7 @@ class NewsletterSubscriptionTests(ClearCachesMixin, WebTest):
         self.assertNotIn("Nieuwsbrief2", response.text)
 
 
+@tag("qmatic")
 @requests_mock.Mocker()
 @override_settings(
     ROOT_URLCONF="open_inwoner.cms.tests.urls", MIDDLEWARE=PATCHED_MIDDLEWARE
@@ -1353,9 +1354,7 @@ class UserAppointmentsTests(ClearCachesMixin, WebTest):
 
         self.assertEqual(len(cards), 2)
 
-        self.assertEqual(
-            PQ(cards[0]).find(".card__heading-2").text(), "Aanvraag paspoort"
-        )
+        self.assertEqual(PQ(cards[0]).find(".card__heading-2").text(), "Paspoort")
 
         passport_appointment = PQ(cards[0]).find("ul").children()
 
@@ -1369,9 +1368,7 @@ class UserAppointmentsTests(ClearCachesMixin, WebTest):
             f"{self.data.config.booking_base_url}{self.data.appointment_passport.publicId}",
         )
 
-        self.assertEqual(
-            PQ(cards[1]).find(".card__heading-2").text(), "Aanvraag ID kaart"
-        )
+        self.assertEqual(PQ(cards[1]).find(".card__heading-2").text(), "ID kaart")
 
         id_card_appointment = PQ(cards[1]).find("ul").children()
 
