@@ -1274,6 +1274,7 @@ class NewsletterSubscriptionTests(ClearCachesMixin, WebTest):
         self.assertNotIn("Nieuwsbrief2", response.text)
 
 
+@tag("qmatic")
 @requests_mock.Mocker()
 @override_settings(
     ROOT_URLCONF="open_inwoner.cms.tests.urls", MIDDLEWARE=PATCHED_MIDDLEWARE
@@ -1295,9 +1296,23 @@ class UserAppointmentsTests(ClearCachesMixin, WebTest):
 
         self.assertIn(_("Geen afspraken beschikbaar"), response.text)
 
+    def test_do_not_render_list_if_no_customer_is_found(self, m):
+        m.get(
+            f"{self.data.api_root}appointment/customers/identify;{self.data.user.email}",
+            json=[],
+        )
+
+        response = self.app.get(self.appointments_url, user=self.data.user)
+
+        self.assertIn(_("Geen afspraken beschikbaar"), response.text)
+
     def test_do_not_render_list_if_no_appointments_are_found(self, m):
         m.get(
-            f"{self.data.api_root}v1/customers/externalId/{self.data.user.email}/appointments",
+            f"{self.data.api_root}appointment/customers/identify;{self.data.user.email}",
+            json=[{"publicId": self.data.public_id}],
+        )
+        m.get(
+            f"{self.data.api_root}calendar-backend/public/api/v1/customers/{self.data.public_id}/appointments",
             status_code=404,
         )
 
@@ -1307,7 +1322,11 @@ class UserAppointmentsTests(ClearCachesMixin, WebTest):
 
     def test_do_not_render_list_if_validation_error(self, m):
         m.get(
-            f"{self.data.api_root}v1/customers/externalId/{self.data.user.email}/appointments",
+            f"{self.data.api_root}appointment/customers/identify;{self.data.user.email}",
+            json=[{"publicId": self.data.public_id}],
+        )
+        m.get(
+            f"{self.data.api_root}calendar-backend/public/api/v1/customers/{self.data.public_id}/appointments",
             json={"appointmentList": [{"invalid": "data"}]},
         )
 
@@ -1335,9 +1354,7 @@ class UserAppointmentsTests(ClearCachesMixin, WebTest):
 
         self.assertEqual(len(cards), 2)
 
-        self.assertEqual(
-            PQ(cards[0]).find(".card__heading-2").text(), "Aanvraag paspoort"
-        )
+        self.assertEqual(PQ(cards[0]).find(".card__heading-2").text(), "Paspoort")
 
         passport_appointment = PQ(cards[0]).find("ul").children()
 
@@ -1351,9 +1368,7 @@ class UserAppointmentsTests(ClearCachesMixin, WebTest):
             f"{self.data.config.booking_base_url}{self.data.appointment_passport.publicId}",
         )
 
-        self.assertEqual(
-            PQ(cards[1]).find(".card__heading-2").text(), "Aanvraag ID kaart"
-        )
+        self.assertEqual(PQ(cards[1]).find(".card__heading-2").text(), "ID kaart")
 
         id_card_appointment = PQ(cards[1]).find("ul").children()
 
