@@ -5,7 +5,11 @@ from zgw_consumers.test.factories import ServiceFactory
 
 from open_inwoner.accounts.tests.factories import DigidUserFactory
 from open_inwoner.qmatic.models import QmaticConfig
-from open_inwoner.qmatic.tests.factories import AppointmentFactory, BranchDetailFactory
+from open_inwoner.qmatic.tests.factories import (
+    AppointmentFactory,
+    BranchDetailFactory,
+    QmaticServiceFactory,
+)
 
 
 class QmaticMockData:
@@ -30,7 +34,7 @@ class QmaticMockData:
         )
 
         self.appointment_passport = AppointmentFactory.build(
-            title="Aanvraag paspoort",
+            title="Qmatic web booking",
             start="2020-01-01T12:00:00+00:00",
             notes="foo",
             branch=BranchDetailFactory.build(
@@ -41,9 +45,10 @@ class QmaticMockData:
                 addressLine2="Dam 1",
                 addressZip="1234 ZZ",
             ),
+            services=[QmaticServiceFactory.build(name="Paspoort")],
         )
         self.appointment_idcard = AppointmentFactory.build(
-            title="Aanvraag ID kaart",
+            title="Qmatic web booking",
             start="2020-03-06T16:30:00+00:00",
             notes="bar",
             branch=BranchDetailFactory.build(
@@ -54,6 +59,7 @@ class QmaticMockData:
                 addressLine2="Wall Street 1",
                 addressZip="1111 AA",
             ),
+            services=[QmaticServiceFactory.build(name="ID kaart")],
         )
 
     def setUpMocks(self, m):

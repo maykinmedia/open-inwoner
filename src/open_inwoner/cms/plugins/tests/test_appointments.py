@@ -27,8 +27,8 @@ class TestUserAppointmentsPlugin(TestCase):
 
         self.assertEqual(len(appointments), 2)
 
-        self.assertIn("Aanvraag paspoort", html)
-        self.assertIn("Aanvraag ID kaart", html)
+        self.assertIn("Paspoort", html)
+        self.assertIn("ID kaart", html)
 
         pyquery = PQ(html)
 
@@ -42,9 +42,9 @@ class TestUserAppointmentsPlugin(TestCase):
         aanvraag_id_kaart_title = PQ(items.find(".plugin-card__heading")[1]).text()
 
         self.assertEqual(aanvraag_paspoort_date, "1 januari 2020 om 13:00 uur")
-        self.assertEqual(aanvraag_paspoort_title, "Aanvraag paspoort")
+        self.assertEqual(aanvraag_paspoort_title, "Paspoort")
         self.assertEqual(aanvraag_id_kaart_date, "6 maart 2020 om 11:30 uur")
-        self.assertEqual(aanvraag_id_kaart_title, "Aanvraag ID kaart")
+        self.assertEqual(aanvraag_id_kaart_title, "ID kaart")
 
         action_url = items[0].attrib["href"]
         self.assertEqual(action_url, reverse("profile:appointments"))

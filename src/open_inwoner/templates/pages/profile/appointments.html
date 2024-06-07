@@ -15,7 +15,7 @@
                 <div class="card card--compact card--stretch appointment-info">
                     <div class="card__body">
                     {% with branch=appointment.branch %}
-                        <h2 class="card__heading-2">{{ appointment.title }}</h2>
+                        <h2 class="card__heading-2">{{ appointment.services.0.name|default:appointment.title }}</h2>
                         {% render_list %}
                             {% timezone branch.timeZone %}
                                 {% list_item text=appointment.start|date:"j F Y" caption=_("Datum") compact=True strong=False %}
@@ -27,7 +27,7 @@
                         {% endrender_list %}
                     {% endwith %}
 
-                        <a href="{{ appointment.url }}" class="link link--icon link--secondary"
+                        <a href="{{ appointment.url }}" target="_blank" class="link link--icon link--secondary"
                             title="{% trans "Wijzig of annuleer afspraak" %}">
                             <span class="link__text">{% trans "Wijzig of annuleer afspraak" %}</span>
                             {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
