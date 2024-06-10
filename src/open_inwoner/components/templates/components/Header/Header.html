@@ -16,7 +16,7 @@
             </button>
         {% endif %}
         {% firstof config.logo.default_alt_text config.name as logo_alt_text %}
-        {% include "components/Logo/Logo.html" with src=config.logo.file.url alt="Homepage "|add:logo_alt_text svg_height=75 only %}
+        {% include "components/Logo/Logo.html" with src=config.logo.file.url alt=logo_alt_text svg_height=75 only %}
 
         {% if request.user.is_authenticated %}
             <span class="nav-login--icon">{% icon icon="how_to_reg" icon_position="before" outlined=True %}
@@ -106,7 +106,7 @@
             {# end of submenu items #}
 
     {% firstof config.logo.default_alt_text config.name as logo_alt_text %}
-        <div class="logo__desktop">{% include "components/Logo/Logo.html" with src=config.logo.file.url alt="Homepage "|add:logo_alt_text svg_height=75 only %}</div>
+        <div class="logo__desktop">{% include "components/Logo/Logo.html" with src=config.logo.file.url alt=logo_alt_text svg_height=75 only %}</div>
 
         {% include "components/Header/PrimaryNavigation.html" %}
 
