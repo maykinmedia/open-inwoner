@@ -19,7 +19,9 @@
         {% include "components/Logo/Logo.html" with src=config.logo.file.url alt="Homepage "|add:logo_alt_text svg_height=75 only %}
 
         {% if request.user.is_authenticated %}
-            <span class="nav-login--icon">{% icon icon="how_to_reg" icon_position="before" outlined=True %}</span>
+            <span class="nav-login--icon">{% icon icon="how_to_reg" icon_position="before" outlined=True %}
+                <span class="sr-only">{% trans "U bent ingelogd." %}</span>
+            </span>
         {% elif config.login_show %}
             <span class="nav-login--icon">
                 {% url 'login' as login_url %}
