@@ -32,7 +32,7 @@
         </div>
         {# end of mobile header-menu with logo #}
 
-        <div class="header__submenu">
+        <div class="header--mobile header__submenu">
             {% if cms_apps.products and request.user.is_authenticated or not config.hide_search_from_anonymous_users %}
                 <nav class="header__actions header__actions--open" aria-label="Zoek navigatie mobiel">
                     <form id="search-form-mobile-open" class="search-form-delegate form form--inline">
@@ -42,7 +42,7 @@
                 </nav>
             {% endif %}
 
-                <nav class="primary-navigation" aria-label="Hoofd navigatie">
+                <nav class="primary-navigation primary-navigation--mobile" aria-label="Hoofd navigatie">
                     <ul class="primary-navigation__list">
 
                         <li class="primary-navigation__list-item">
