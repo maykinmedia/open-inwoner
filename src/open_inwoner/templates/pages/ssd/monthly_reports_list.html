@@ -20,7 +20,10 @@
                     </ul>
                     {% if client.config.maandspecificatie_enabled is True %}
                         <div class="tabs__body">
-                            <div id="maandspecificaties" class="tab__content active">
+                        {# Note: Mijn uitkeringen tab-content styles need to be independent from the URL, unlike the Tabs of the Login page #}
+                        {# URL-dependent styles would be coming from src/open_inwoner/js/components/tab-panels #}
+                        {# Setting class to 'tab__contents' instead of 'tab__content' is a quick-fix #}
+                            <div id="maandspecificaties" class="tab__contents active">
                                 <p>
                                     {% blocktrans with display_text=client.config.maandspecificatie_display_text %}
                                         {{ display_text }}
