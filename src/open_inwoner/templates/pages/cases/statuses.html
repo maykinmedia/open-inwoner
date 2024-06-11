@@ -49,7 +49,7 @@
                     {% icon icon="task_alt" %}
                     <div class="status-list__notification">
                         <h3 class="utrecht-heading-3 utrecht-accordion__header">
-                            <button class="status-list__button button--borderless" aria-controls="{{ completed_id }}" aria-expanded="false" id="{{ id }}"><a href="#" class="link link-success">{{ status.label }}</a>{% icon icon="expand_more" icon_position="after" outlined=True %}</button>
+                            <button class="status-list__button button--borderless" aria-controls="{{ completed_id }}" aria-expanded="false" id="{{ id }}"><span class="link link-success">{{ status.label }}</span>{% icon icon="expand_more" icon_position="after" outlined=True %}</button>
                         </h3>
                         <div class="status-list__notification-content" id="{{ completed_id }}">
                             <p class="utrecht-paragraph status-list__text utrecht-paragraph--oip utrecht-paragraph--oip-compact">
