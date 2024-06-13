@@ -1,8 +1,48 @@
 .cases {
   /// cards on cases list
   .card {
-    .cases__link {
-      text-decoration: none;
+    &__body {
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+
+      .list:last-of-type {
+        padding-bottom: 0;
+        @media (min-width: 500px) {
+          padding-bottom: calc(2 * var(--card-spacing-vertical));
+        }
+      }
+
+      // Meaningful sequence for accessibility
+      .card__heading-2 {
+        order: 2;
+        padding: var(--card-spacing-vertical) var(--card-spacing-horizontal) 0
+          var(--card-spacing-horizontal);
+      }
+
+      .card__header {
+        order: 1;
+      }
+
+      .list {
+        box-sizing: border-box;
+        order: 3;
+        padding: 0 var(--card-spacing-horizontal);
+      }
+
+      .link--secondary {
+        order: 4;
+        padding: 0 var(--card-spacing-horizontal);
+      }
+    }
+
+    &--stretch .list + .link:first-of-type:last-of-type {
+      padding-bottom: var(--card-spacing-vertical);
+
+      @media (min-width: 500px) {
+        padding-bottom: 0;
+        position: absolute;
+      }
     }
   }
 
