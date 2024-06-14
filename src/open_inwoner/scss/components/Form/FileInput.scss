@@ -71,6 +71,24 @@
     pointer-events: none;
     width: 100%;
     height: var(--row-height-giant);
+
+    // Adjacent keyboard focus for custom hidden file-input
+    &:focus + .file-input__label-empty,
+    &:focus + .file-input__label-empty + .file-input__label-selected {
+      outline: var(--focus-border-style) var(--focus-border-width)
+        var(--color-primary);
+      padding: 0 var(--spacing-large);
+    }
+  }
+
+  // Active adjacent styles for custom hidden file-input
+  &__label-empty,
+  &__label-selected {
+    &:active {
+      outline: var(--focus-border-style) var(--focus-border-width)
+        var(--color-primary);
+      padding: 0 var(--spacing-large);
+    }
   }
 
   > .utrecht-paragraph {

@@ -254,6 +254,11 @@
 
   /// Common widths
   --form-width: 500px;
+
+  /// Custom focus outline for elements that do not receive default client focus-styles
+  --focus-border-width: 3px;
+  --focus-border-style: dashed;
+  // focus-border colors can be determined by what kind of element receive them
 }
 
 @font-face {
