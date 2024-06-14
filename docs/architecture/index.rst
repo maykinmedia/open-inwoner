@@ -48,29 +48,61 @@ Datamodels
 Generated based on OIP v1.17
 
 Accounts app
+""""""""""""
+
 .. graphviz:: accounts.dot
 
-Configuration app	      
+|
+
+Configuration app
+"""""""""""""""""
+
 .. graphviz:: configurations.dot
 
+|
+
 Haal Centraal app
+"""""""""""""""""
+
 .. graphviz:: haalcentraal.dot
 
+|
+
 KVK app
+"""""""
+
 .. graphviz:: kvk.dot
 
+|
+
 Open Klant app
+""""""""""""""
+
 .. graphviz:: openklant.dot
 
+|
+
 Open Zaak app
-.. graphviz:: openzaak.dot	    
+"""""""""""""
+
+.. graphviz:: openzaak.dot
+
+|
 
 PDC app
+"""""""
+
 .. graphviz:: pdc.dot
 
+|
+
 Plans app
+"""""""""
+
 .. graphviz:: plans.dot
-	      
+
+|
+
 .. _Common Ground: https://commonground.nl
 .. _Github: https://github.com/maykinmedia/open-inwoner
 .. _Docker Hub: https://hub.docker.com/repository/docker/maykinmedia/open-inwoner
