@@ -1,6 +1,7 @@
 import base64
 import logging
 from datetime import date
+from typing import Literal, Mapping, Type, TypeAlias
 
 from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -680,9 +681,15 @@ class FormClient(APIClient):
         return results
 
 
-def _build_zgw_client(type_) -> APIClient | None:
+ZgwClientType = Literal["zaak", "catalogi", "document", "form"]
+ZgwClientFactoryReturn: TypeAlias = (
+    ZakenClient | CatalogiClient | DocumentenClient | FormClient
+)
+
+
+def _build_zgw_client(type_: ZgwClientType) -> ZgwClientFactoryReturn | None:
     config = OpenZaakConfig.get_solo()
-    services_to_client_mapping = {
+    services_to_client_mapping: Mapping[ZgwClientType, Type[ZgwClientFactoryReturn]] = {
         "zaak": ZakenClient,
         "catalogi": CatalogiClient,
         "document": DocumentenClient,
