@@ -100,11 +100,20 @@ def get_product_rendered_content(product):
                 icon.attrs.update(
                     {
                         "aria-hidden": "true",
-                        "aria-label": _("Opens in new window"),
                         "class": "material-icons",
                     }
                 )
                 icon.append("open_in_new")
+
+                screen_reader_only_text = soup.new_tag("span")
+                screen_reader_only_text.attrs.update(
+                    {
+                        "class": "sr-only",
+                    }
+                )
+                screen_reader_only_text.append(_("Opens external website"))
+
                 element.append(icon)
+                element.append(screen_reader_only_text)
 
     return soup
