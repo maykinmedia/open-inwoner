@@ -17,11 +17,11 @@
    }
 }
 
-/* Depends on logo but default seems ok for this.
+/* Depends on logo but default seems ok for this. */
 .wy-side-nav-search {
    background-color: #04A5BB;
 }
-*/
+
 
 .rst-content a:link, .rst-content a:visited {
   color: #017092;
