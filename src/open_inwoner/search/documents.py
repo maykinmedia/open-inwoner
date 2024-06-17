@@ -67,5 +67,8 @@ class ProductDocument(Document):
         model = Product
         related_models = [Tag, Organization, Category]
 
+    def get_queryset(self):
+        return super(ProductDocument, self).get_queryset().exclude(published=False)
+
     def get_instances_from_related(self, related_instance):
         return related_instance.products.all()
