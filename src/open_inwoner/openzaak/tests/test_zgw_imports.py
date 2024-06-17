@@ -118,11 +118,7 @@ class ZaakTypeMockData:
             self.extra_zaaktype,
         ]
 
-    def install_mocks(self, m, *, with_catalog=True) -> "ZaakTypeMockData":
-        if not with_catalog:
-            for zt in self.all_zaak_types:
-                zt["catalogus"] = None
-
+    def install_mocks(self, m) -> "ZaakTypeMockData":
         m.get(
             f"{CATALOGI_ROOT}zaaktypen",
             json=paginated_response(self.zaak_types),
@@ -238,38 +234,9 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
 
     def test_import_zaaktype_configs_without_catalogs(self, m):
         data = ZaakTypeMockData()
-        data.install_mocks(m, with_catalog=False)
+        data.install_mocks(m)
 
-        res = import_zaaktype_configs()
-
-        # first two got added, third one has same identificatie, fourth one is internal
-        self.assertEqual(len(res), 2)
-        self.assertEqual(ZaakTypeConfig.objects.count(), 2)
-
-        for i, config in enumerate(res):
-            self.assertEqual(config.identificatie, data.zaak_types[i]["identificatie"])
-            self.assertEqual(config.omschrijving, data.zaak_types[i]["omschrijving"])
-            self.assertIsNone(config.catalogus)
-
-        # run again with same API response
-        res = import_zaaktype_configs()
-
-        # nothing got added
-        self.assertEqual(len(res), 0)
-        self.assertEqual(ZaakTypeConfig.objects.count(), 2)
-
-        # add more elements to API response and run again
-        m.get(
-            f"{CATALOGI_ROOT}zaaktypen",
-            json=paginated_response([data.extra_zaaktype] + data.zaak_types),
-        )
-        res = import_zaaktype_configs()
-
-        # one got added
-        self.assertEqual(len(res), 1)
-        self.assertEqual(ZaakTypeConfig.objects.count(), 3)
-
-        config = res[0]
-        self.assertEqual(config.identificatie, data.extra_zaaktype["identificatie"])
-        self.assertEqual(config.omschrijving, data.extra_zaaktype["omschrijving"])
-        self.assertIsNone(config.catalogus)
+        with self.assertRaises(
+            RuntimeError, msg="Catalogus must exist prior to import"
+        ):
+            import_zaaktype_configs()

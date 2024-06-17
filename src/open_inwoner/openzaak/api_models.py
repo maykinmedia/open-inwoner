@@ -109,6 +109,7 @@ class ZaakType(ZGWModel):
     url: str
     identificatie: str
     omschrijving: str
+    catalogus: str
     vertrouwelijkheidaanduiding: str
     doel: str
     aanleiding: str
@@ -129,8 +130,6 @@ class ZaakType(ZGWModel):
     # roltypen: list
     # besluittypen: list
 
-    # catalogus not on eSuite
-    catalogus: str = ""
     begin_geldigheid: Optional[date] = None
     einde_geldigheid: Optional[date] = None
     versiedatum: Optional[date] = None
