@@ -104,16 +104,16 @@ def get_product_rendered_content(product):
                     }
                 )
                 icon.append("open_in_new")
-                # Create the screen reader only text span element
-                sr_only_text = soup.new_tag("span")
-                sr_only_text.attrs.update(
+
+                screen_reader_only_text = soup.new_tag("span")
+                screen_reader_only_text.attrs.update(
                     {
                         "class": "sr-only",
                     }
                 )
-                sr_only_text.append(_("Opens external website"))
-                # Append both elements to the anchor
+                screen_reader_only_text.append(_("Opens external website"))
+
                 element.append(icon)
-                element.append(sr_only_text)
+                element.append(screen_reader_only_text)
 
     return soup
