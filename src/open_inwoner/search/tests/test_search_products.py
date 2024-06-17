@@ -84,7 +84,7 @@ class SearchQueryTests(ESMixin, TestCase):
         self.assertEqual(int(results[0].meta.id), self.product1.id)
 
     def test_search_product_hide_unpublished(self):
-        product3 = ProductFactory.create(
+        product_unpublished = ProductFactory.create(
             name="Name 3",
             summary="Some summary",
             content="Some content",
