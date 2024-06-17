@@ -3,7 +3,7 @@
     grid-column-gap: var(--spacing-extra-large);
 
     // Tablets
-    @media (min-width: 500px) and (max-width: 767px) {
+    @media (min-width: 512px) and (max-width: 767px) {
       flex-direction: row;
       flex-wrap: wrap;
 
