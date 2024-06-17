@@ -28,6 +28,7 @@ Documentation
 .. toctree::
     :maxdepth: 2
 
+    architecture/index
     installation/index
     configuration/index
     testing
