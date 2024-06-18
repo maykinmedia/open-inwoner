@@ -107,20 +107,16 @@ def import_zaaktype_configs() -> list[ZaakTypeConfig]:
         )
 
         for zaak_type in zaak_types:
-            catalog = None
-            if zaak_type.catalogus:
-                catalog = catalog_lookup.get(zaak_type.catalogus)
-                if not catalog:
-                    # weird edge-case: if the zaak_type has a catalogus-url but we don't have the object
-                    # TODO this is bad, log/raise something
-                    pass
+            try:
+                catalog = catalog_lookup[zaak_type.catalogus]
+            except KeyError as exc:
+                raise RuntimeError(
+                    f"ZaakType `{zaak_type.url}` points to a Catalogus at"
+                    f" `{zaak_type.catalogus}` which is not currently configured."
+                ) from exc
 
             # make key for de-duplication and collapsing related zaak-types on their 'identificatie'
-            if catalog:
-                key = (catalog.id, zaak_type.identificatie)
-            else:
-                key = (None, zaak_type.identificatie)
-
+            key = (catalog.id, zaak_type.identificatie)
             if key not in known_keys:
                 known_keys.add(key)
                 create[key] = ZaakTypeConfig(
