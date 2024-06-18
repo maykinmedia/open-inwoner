@@ -151,3 +151,24 @@ class TestRequiredCatalogusConfigServiceUnhappyPath(
             " are multiple instances configured. Please (temporarily) ensure you have only a single"
             " ZGWApiGroupConfig configured, then run this migration again.",
         )
+
+
+class TestMakeZaakTypeConfigCatalogusRequired(TestFailingMigrations):
+    migrate_from = "0052_add_catalogusconfig_service"
+    migrate_to = "0053_zaaktypeconfig_catalogus_is_required"
+    app = "openzaak"
+
+    def setUpBeforeMigration(self, apps):
+        ZaakTypeConfig = apps.get_model("openzaak", "ZaakTypeConfig")
+        ZaakTypeConfig.objects.create(urls=[], catalogus=None, identificatie="foobar")
+
+    def test_migration_0051_to_0052_raises_with_descriptive_exception_message(self):
+        with self.assertRaises(DataError) as cm:
+            self.attempt_migration()
+
+        self.assertEqual(
+            str(cm.exception),
+            "Your database contains 1 ZaakTypeConfig row(s) with a missing `catalogus` field."
+            " This field is now required: please manually update all the affected rows or re-sync"
+            " your ZGW objects to ensure the field is included.",
+        )

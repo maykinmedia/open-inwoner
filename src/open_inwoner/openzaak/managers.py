@@ -86,20 +86,15 @@ class UserCaseInfoObjectNotificationManager(UserCaseNotificationBaseManager):
 
 class ZaakTypeInformatieObjectTypeConfigQueryset(models.QuerySet):
     def filter_catalogus(self, case_type: ZaakType):
-        if case_type.catalogus:
-            # support both url and resolved dataclass
-            catalogus_url = (
-                case_type.catalogus
-                if isinstance(case_type.catalogus, str)
-                else case_type.catalogus.url
-            )
-            return self.filter(
-                zaaktype_config__catalogus__url=catalogus_url,
-            )
-        else:
-            return self.filter(
-                zaaktype_config__catalogus__isnull=True,
-            )
+        # support both url and resolved dataclass
+        catalogus_url = (
+            case_type.catalogus
+            if isinstance(case_type.catalogus, str)
+            else case_type.catalogus.url
+        )
+        return self.filter(
+            zaaktype_config__catalogus__url=catalogus_url,
+        )
 
     def filter_case_type(self, case_type: ZaakType):
         return self.filter_catalogus(case_type).filter(
@@ -129,20 +124,15 @@ class ZaakTypeInformatieObjectTypeConfigQueryset(models.QuerySet):
 
 class ZaakTypeConfigQueryset(models.QuerySet):
     def filter_catalogus(self, case_type: ZaakType):
-        if case_type.catalogus:
-            # support both url and resolved dataclass
-            catalogus_url = (
-                case_type.catalogus
-                if isinstance(case_type.catalogus, str)
-                else case_type.catalogus.url
-            )
-            return self.filter(
-                catalogus__url=catalogus_url,
-            )
-        else:
-            return self.filter(
-                catalogus__isnull=True,
-            )
+        # support both url and resolved dataclass
+        catalogus_url = (
+            case_type.catalogus
+            if isinstance(case_type.catalogus, str)
+            else case_type.catalogus.url
+        )
+        return self.filter(
+            catalogus__url=catalogus_url,
+        )
 
     def filter_case_type(self, case_type: ZaakType):
         return self.filter_catalogus(case_type).filter(
@@ -150,16 +140,8 @@ class ZaakTypeConfigQueryset(models.QuerySet):
         )
 
     def filter_from_str(self, catalogus_url: str, case_type_identificatie: str):
-        qs = self
-        if catalogus_url:
-            qs = qs.filter(
-                catalogus__url=catalogus_url,
-            )
-        else:
-            qs = qs.filter(
-                catalogus__isnull=True,
-            )
-        return qs.filter(
+        return self.filter(
+            catalogus__url=catalogus_url,
             identificatie=case_type_identificatie,
         )
 

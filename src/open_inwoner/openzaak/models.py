@@ -2,7 +2,7 @@ import warnings
 from datetime import timedelta
 
 from django.db import models, transaction
-from django.db.models import Q, UniqueConstraint
+from django.db.models import UniqueConstraint
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -319,7 +319,6 @@ class ZaakTypeConfig(models.Model):
     catalogus = models.ForeignKey(
         "openzaak.CatalogusConfig",
         on_delete=models.CASCADE,
-        null=True,
     )
 
     identificatie = models.CharField(
@@ -389,12 +388,6 @@ class ZaakTypeConfig(models.Model):
             UniqueConstraint(
                 name="unique_identificatie_in_catalogus",
                 fields=["catalogus", "identificatie"],
-                condition=Q(catalogus__isnull=False),
-            ),
-            UniqueConstraint(
-                name="unique_identificatie_without_catalogus",
-                fields=["identificatie"],
-                condition=Q(catalogus__isnull=True),
             ),
         ]
 
