@@ -18,11 +18,11 @@
                 <span class="file__name">
                     {{ name }}
                     {% if extension and size %}
-                        ({{extension}}, {{size|readable_size}})
+                        ({{ extension }}, {{ size|readable_size }})
                     {% elif extension %}
-                        ({{extension}})
+                        ({{ extension }})
                     {% elif size %}
-                        ({{size|readable_size}})
+                        ({{ size|readable_size }})
                     {% endif %}
                 </span>
                 <span class="file__date">{{ created|date:'j F Y' }}</span>
@@ -50,7 +50,7 @@
                 {% enddropdown %}
             {% elif show_download %}
                 {% trans "Download" as download %}
-                {% link href=url text=download primary=True download=True hide_text=True extra_classes="file__download" icon="download" icon_outlined=True icon_position="before" %}
+                {% link href=url text=download|add:" "|add:name primary=True download=True hide_text=True extra_classes="file__download" icon="download" icon_outlined=True icon_position="before" %}
             {% endif %}
             {% if description %}<p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--small">{{ description }}</p>{% endif %}
         </div>
