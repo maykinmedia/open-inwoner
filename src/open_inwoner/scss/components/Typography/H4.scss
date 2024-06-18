@@ -1,8 +1,14 @@
 @import '~@utrecht/components/dist/heading-4/css/index.css';
 @import '~microscope-sass/lib/responsive';
 
+.utrecht-heading-4 {
+  // Reverse font-family fallback order
+  font-family: var(--utrecht-heading-font-family),
+    var(--utrecht-heading-4-font-family);
+}
+
 ///
-/// Legacy styling - other styling comes from NLDS
+/// Legacy styling
 ///
 
 .h4 {
