@@ -1,6 +1,7 @@
 from django.conf import settings
 
 import requests
+from django_setup_configuration.config_settings import ConfigSettings
 from django_setup_configuration.configuration import BaseConfigurationStep
 from django_setup_configuration.exceptions import SelfTestFailed
 from simple_certmanager.models import Certificate
@@ -14,36 +15,6 @@ from open_inwoner.openklant.clients import (
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.utils.api import ClientError
 
-from .base import ConfigSettingsBase
-
-
-class KICConfigurationSettings(ConfigSettingsBase):
-    model = OpenKlantConfig
-    display_name = "Klanten Configuration"
-    namespace = "KIC"
-    required_fields = (
-        "contactmomenten_service_client_id",
-        "contactmomenten_service_secret",
-        "contactmomenten_service_api_root",
-        "klanten_service_client_id",
-        "klanten_service_secret",
-        "klanten_service_api_root",
-        "register_type",
-        "register_contact_moment",
-    )
-    all_fields = required_fields + (
-        "register_bronorganisatie_rsin",
-        "register_channel",
-        "register_contact_moment",
-        "register_email",
-        "register_employee_id",
-        "use_rsin_for_innNnpId_query_parameter",
-    )
-    excluded_fields = (
-        "contactmomenten_service_uuid",
-        "klanten_service_uuid",
-    )
-
 
 class KlantenAPIConfigurationStep(BaseConfigurationStep):
     """
@@ -51,14 +22,36 @@ class KlantenAPIConfigurationStep(BaseConfigurationStep):
     """
 
     verbose_name = "Klanten API configuration"
-    required_settings = [
-        "KIC_KLANTEN_SERVICE_API_ROOT",
-        "KIC_KLANTEN_SERVICE_API_CLIENT_ID",
-        "KIC_KLANTEN_SERVICE_API_SECRET",
-        "KIC_SERVER_CERTIFICATE_LABEL",
-        "KIC_SERVER_CERTIFICATE_TYPE",
-    ]
-    enable_setting = "KIC_ENABLE"
+    config_settings = ConfigSettings(
+        enable_setting="KIC_CONFIG_ENABLE",
+        independent=False,
+        namespace="KIC",
+        file_name="kic_klanten_service",
+        required_settings=[
+            "KIC_KLANTEN_SERVICE_API_ROOT",
+            "KIC_KLANTEN_SERVICE_CLIENT_ID",
+            "KIC_KLANTEN_SERVICE_SECRET",
+            "KIC_SERVER_CERTIFICATE_LABEL",
+            "KIC_SERVER_CERTIFICATE_TYPE",
+        ],
+        additional_info={
+            "klanten_service_api_root": {
+                "variable": "KIC_KLANTEN_SERVICE_API_ROOT",
+                "description": "The API root of the klanten service",
+                "possible_values": "string (URL)",
+            },
+            "klanten_service_client_id": {
+                "variable": "KIC_KLANTEN_SERVICE_API_CLIENT_ID",
+                "description": "The API root of the klanten service",
+                "possible_values": "string (URL)",
+            },
+            "klanten_service_secret": {
+                "variable": "KIC_KLANTEN_SERVICE_SECRET",
+                "description": "The secret of the klanten service",
+                "possible_values": "string (URL)",
+            },
+        },
+    )
 
     def is_configured(self) -> bool:
         return Service.objects.filter(
@@ -106,14 +99,36 @@ class ContactmomentenAPIConfigurationStep(BaseConfigurationStep):
     """
 
     verbose_name = "Contactmomenten API configuration"
-    required_settings = [
-        "KIC_CONTACTMOMENTEN_SERVICE_API_ROOT",
-        "KIC_CONTACTMOMENTEN_SERVICE_API_CLIENT_ID",
-        "KIC_CONTACTMOMENTEN_SERVICE_API_SECRET",
-        "KIC_SERVER_CERTIFICATE_LABEL",
-        "KIC_SERVER_CERTIFICATE_TYPE",
-    ]
-    enable_setting = "KIC_ENABLE"
+    config_settings = ConfigSettings(
+        enable_setting="KIC_CONFIG_ENABLE",
+        independent=False,
+        namespace="KIC",
+        file_name="kic_contactmomenten_service",
+        required_settings=[
+            "KIC_CONTACTMOMENTEN_SERVICE_API_ROOT",
+            "KIC_CONTACTMOMENTEN_SERVICE_CLIENT_ID",
+            "KIC_CONTACTMOMENTEN_SERVICE_SECRET",
+            "KIC_SERVER_CERTIFICATE_LABEL",
+            "KIC_SERVER_CERTIFICATE_TYPE",
+        ],
+        additional_info={
+            "contactmomenten_service_api_root": {
+                "variable": "KIC_CONTACTMOMENTEN_SERVICE_API_ROOT",
+                "description": "The API root of the klant contactmomenten service",
+                "possible_values": "string (URL)",
+            },
+            "contactmomenten_service_client_id": {
+                "variable": "KIC_CONTACTMOMENTEN_SERVICE_API_CLIENT_ID",
+                "description": "The client ID of the klant contactmomenten service",
+                "possible_values": "string (URL)",
+            },
+            "contactmomenten_service_secret": {
+                "variable": "KIC_CONTACTMOMENTEN_SERVICE_SECRET",
+                "description": "The secret of the klant contactmomenten service",
+                "possible_values": "string (URL)",
+            },
+        },
+    )
 
     def is_configured(self) -> bool:
         return Service.objects.filter(
@@ -161,7 +176,28 @@ class KICAPIsConfigurationStep(BaseConfigurationStep):
     """
 
     verbose_name = "Klantinteractie APIs configuration"
-    enable_setting = "KIC_ENABLE"
+    config_settings = ConfigSettings(
+        enable_setting="KIC_CONFIG_ENABLE",
+        namespace="KIC",
+        file_name="kic",
+        models=[OpenKlantConfig],
+        required_settings=[],
+        independent=True,
+        optional_settings=[
+            "KIC_REGISTER_BRONORGANISATIE_RSIN",
+            "KIC_REGISTER_CHANNEL",
+            "KIC_REGISTER_CONTACT_MOMENT",
+            "KIC_REGISTER_CONTACT_MOMENT",
+            "KIC_REGISTER_EMAIL",
+            "KIC_REGISTER_EMPLOYEE_ID",
+            "KIC_REGISTER_TYPE",
+            "KIC_USE_RSIN_FOR_INNNNPID_QUERY_PARAMETER",
+        ],
+        related_config_settings=[
+            KlantenAPIConfigurationStep.config_settings,
+            ContactmomentenAPIConfigurationStep.config_settings,
+        ],
+    )
 
     def is_configured(self) -> bool:
         kic_config = OpenKlantConfig.get_solo()

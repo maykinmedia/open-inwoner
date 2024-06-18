@@ -1,11 +1,12 @@
 .. _siteconfig:
 
-=====================
-General Configuration
-=====================
+===========================
+Site configuration settings
+===========================
 
 Settings Overview
 =================
+
 
 Enable/Disable configuration:
 """""""""""""""""""""""""""""
@@ -13,6 +14,8 @@ Enable/Disable configuration:
 ::
 
     SITE_CONFIG_ENABLE
+
+
 
 Required:
 """""""""
@@ -23,6 +26,7 @@ Required:
     SITE_NAME
     SITE_PRIMARY_COLOR
     SITE_SECONDARY_COLOR
+
 
 All settings:
 """""""""""""
@@ -106,7 +110,7 @@ Detailed Information
     Variable            SITE_ACCENT_COLOR
     Setting             Accentkleur
     Description         Accentkleur van de gemeentesite/huisstijl
-    Possible values     string
+    Possible values     No information available
     Default value       #FFFFFF
     
     Variable            SITE_ACCENT_FONT_COLOR
@@ -130,7 +134,7 @@ Detailed Information
     Variable            SITE_CONTACT_PAGE
     Setting             URL
     Description         URL van de contactpagina van de organisatie
-    Possible values     string
+    Possible values     string (URL)
     Default value       No default
     
     Variable            SITE_CONTACT_PHONENUMBER
@@ -190,7 +194,7 @@ Detailed Information
     Variable            SITE_FOOTER_LOGO_URL
     Setting             Footer logo link
     Description         The external link for the footer logo.
-    Possible values     string
+    Possible values     string (URL)
     Default value       
     
     Variable            SITE_GA_CODE
@@ -292,7 +296,7 @@ Detailed Information
     Variable            SITE_KCM_SURVEY_LINK_URL
     Setting             Feedbackknop URL
     Description         De externe link achter de feedbackknop feedback.
-    Possible values     string
+    Possible values     string (URL)
     Default value       No default
     
     Variable            SITE_LOGIN_2FA_SMS
@@ -376,7 +380,7 @@ Detailed Information
     Variable            SITE_PRIMARY_COLOR
     Setting             Primaire kleur
     Description         Hoofdkleur van de gemeentesite/huisstijl
-    Possible values     string
+    Possible values     No information available
     Default value       #FFFFFF
     
     Variable            SITE_PRIMARY_FONT_COLOR
@@ -400,7 +404,7 @@ Detailed Information
     Variable            SITE_RECIPIENTS_EMAIL_DIGEST
     Setting             ontvangers e-mailsamenvatting
     Description         De e-mailadressen van beheerders die een dagelijkse samenvatting dienen te krijgen van punten van orde.
-    Possible values     string, comma-delimited ('foo,bar,baz')
+    Possible values     No information available
     Default value       
     
     Variable            SITE_REDIRECT_TO
@@ -442,7 +446,7 @@ Detailed Information
     Variable            SITE_SECONDARY_COLOR
     Setting             Secundaire kleur
     Description         Secundaire kleur van de gemeentesite/huisstijl
-    Possible values     string
+    Possible values     No information available
     Default value       #FFFFFF
     
     Variable            SITE_SECONDARY_FONT_COLOR
@@ -490,7 +494,7 @@ Detailed Information
     Variable            SITE_WARNING_BANNER_BACKGROUND_COLOR
     Setting             Waarschuwingsbanner achtergrond
     Description         Waarschuwingsbanner achtergrondkleur
-    Possible values     string
+    Possible values     No information available
     Default value       #FFDBAD
     
     Variable            SITE_WARNING_BANNER_ENABLED
@@ -502,11 +506,11 @@ Detailed Information
     Variable            SITE_WARNING_BANNER_FONT_COLOR
     Setting             Waarschuwingsbanner tekst
     Description         De tekstkleur voor de waarschuwingsbanner
-    Possible values     string
+    Possible values     No information available
     Default value       #000000
     
     Variable            SITE_WARNING_BANNER_TEXT
     Setting             Tekstinhoud waarschuwingsbanner
     Description         De tekst die zichtbaar is in de waarschuwingsbanner
-    Possible values     text (string)
+    Possible values     No information available
     Default value       No default

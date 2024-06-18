@@ -61,7 +61,7 @@ from ...bootstrap.siteconfig import SiteConfigurationStep
     SITE_GTM_CODE="gtm code",
     SITE_GA_CODE="ga code",
     SITE_MATOMO_URL="matomo url",
-    SITE_MATOMO_SITE_ID=88,
+    SITE_MATOMO_SITE_ID="88",
     SITE_SITEIMPROVE_ID="88",
     SITE_COOKIE_INFO_TEXT="cookie info text",
     SITE_COOKIE_LINK_TEXT="cookie link text",

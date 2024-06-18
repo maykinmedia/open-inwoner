@@ -31,10 +31,10 @@ from open_inwoner.utils.test import ClearCachesMixin
 
 from ...bootstrap.auth import (
     AdminOIDCConfigurationStep,
-    DigiDConfigurationStep,
     DigiDOIDCConfigurationStep,
-    eHerkenningConfigurationStep,
+    DigiDSAMLConfigurationStep,
     eHerkenningOIDCConfigurationStep,
+    eHerkenningSAMLConfigurationStep,
 )
 
 IDENTITY_PROVIDER = "https://keycloak.local/realms/digid/"
@@ -84,7 +84,7 @@ with open(PRIVATE_KEY_FILE.name, "w") as f:
     DIGID_OIDC_OIDC_STATE_SIZE=64,
     DIGID_OIDC_OIDC_EXEMPT_URLS=["/foo"],
 )
-class DigiDOIDCConfigurationTests(ClearCachesMixin, TestCase):
+class DigiDOIDCConfigurationTest(ClearCachesMixin, TestCase):
     def test_configure(self):
         DigiDOIDCConfigurationStep().configure()
 
@@ -299,7 +299,7 @@ class DigiDOIDCConfigurationTests(ClearCachesMixin, TestCase):
     EHERKENNING_OIDC_OIDC_STATE_SIZE=64,
     EHERKENNING_OIDC_OIDC_EXEMPT_URLS=["/foo"],
 )
-class eHerkenningOIDCConfigurationTests(ClearCachesMixin, TestCase):
+class eHerkenningOIDCConfigurationTest(ClearCachesMixin, TestCase):
     def test_configure(self):
         eHerkenningOIDCConfigurationStep().configure()
 
@@ -518,7 +518,7 @@ class eHerkenningOIDCConfigurationTests(ClearCachesMixin, TestCase):
     ADMIN_OIDC_OIDC_EXEMPT_URLS=["http://testserver/some-endpoint"],
     ADMIN_OIDC_USERINFO_CLAIMS_SOURCE=UserInformationClaimsSources.id_token,
 )
-class AdminOIDCConfigurationTests(ClearCachesMixin, TestCase):
+class AdminOIDCConfigurationTest(ClearCachesMixin, TestCase):
     def test_configure(self):
         AdminOIDCConfigurationStep().configure()
 
@@ -721,39 +721,39 @@ class AdminOIDCConfigurationTests(ClearCachesMixin, TestCase):
 
 @temp_private_root()
 @override_settings(
-    DIGID_CERTIFICATE_LABEL="DigiD certificate",
-    DIGID_CERTIFICATE_TYPE=CertificateTypes.key_pair,
-    DIGID_CERTIFICATE_PUBLIC_CERTIFICATE=PUBLIC_CERT_FILE.name,
-    DIGID_CERTIFICATE_PRIVATE_KEY=PRIVATE_KEY_FILE.name,
-    DIGID_METADATA_FILE_SOURCE="http://metadata.local/file.xml",
-    DIGID_ENTITY_ID="1234",
-    DIGID_BASE_URL="http://digid.local",
-    DIGID_SERVICE_NAME="OIP",
-    DIGID_SERVICE_DESCRIPTION="Open Inwoner",
-    DIGID_WANT_ASSERTIONS_SIGNED=False,
-    DIGID_WANT_ASSERTIONS_ENCRYPTED=True,
-    DIGID_ARTIFACT_RESOLVE_CONTENT_TYPE=XMLContentTypes.text_xml,
-    DIGID_KEY_PASSPHRASE="foo",
-    DIGID_SIGNATURE_ALGORITHM=SignatureAlgorithms.dsa_sha1,
-    DIGID_DIGEST_ALGORITHM=DigestAlgorithms.sha512,
-    DIGID_TECHNICAL_CONTACT_PERSON_TELEPHONE="0612345678",
-    DIGID_TECHNICAL_CONTACT_PERSON_EMAIL="foo@bar.org",
-    DIGID_ORGANIZATION_URL="http://open-inwoner.local",
-    DIGID_ORGANIZATION_NAME="Open Inwoner",
-    DIGID_ATTRIBUTE_CONSUMING_SERVICE_INDEX="2",
-    DIGID_REQUESTED_ATTRIBUTES=[
+    DIGID_SAML_CERTIFICATE_LABEL="DigiD certificate",
+    DIGID_SAML_CERTIFICATE_TYPE=CertificateTypes.key_pair,
+    DIGID_SAML_CERTIFICATE_PUBLIC_CERTIFICATE=PUBLIC_CERT_FILE.name,
+    DIGID_SAML_CERTIFICATE_PRIVATE_KEY=PRIVATE_KEY_FILE.name,
+    DIGID_SAML_METADATA_FILE_SOURCE="http://metadata.local/file.xml",
+    DIGID_SAML_ENTITY_ID="1234",
+    DIGID_SAML_BASE_URL="http://digid.local",
+    DIGID_SAML_SERVICE_NAME="OIP",
+    DIGID_SAML_SERVICE_DESCRIPTION="Open Inwoner",
+    DIGID_SAML_WANT_ASSERTIONS_SIGNED=False,
+    DIGID_SAML_WANT_ASSERTIONS_ENCRYPTED=True,
+    DIGID_SAML_ARTIFACT_RESOLVE_CONTENT_TYPE=XMLContentTypes.text_xml,
+    DIGID_SAML_KEY_PASSPHRASE="foo",
+    DIGID_SAML_SIGNATURE_ALGORITHM=SignatureAlgorithms.dsa_sha1,
+    DIGID_SAML_DIGEST_ALGORITHM=DigestAlgorithms.sha512,
+    DIGID_SAML_TECHNICAL_CONTACT_PERSON_TELEPHONE="0612345678",
+    DIGID_SAML_TECHNICAL_CONTACT_PERSON_EMAIL="foo@bar.org",
+    DIGID_SAML_ORGANIZATION_URL="http://open-inwoner.local",
+    DIGID_SAML_ORGANIZATION_NAME="Open Inwoner",
+    DIGID_SAML_ATTRIBUTE_CONSUMING_SERVICE_INDEX="2",
+    DIGID_SAML_REQUESTED_ATTRIBUTES=[
         {"name": "bsn", "required": True},
         {"name": "email", "required": False},
     ],
-    DIGID_SLO=False,
+    DIGID_SAML_SLO=False,
 )
-class DigiDConfigurationTests(ClearCachesMixin, TestCase):
+class DigiDSAMLConfigurationTest(ClearCachesMixin, TestCase):
     @requests_mock.Mocker()
     def test_configure(self, m):
         with open(DIGID_XML_METADATA_PATH, "rb") as f:
             m.get("http://metadata.local/file.xml", content=f.read())
 
-            DigiDConfigurationStep().configure()
+            DigiDSAMLConfigurationStep().configure()
 
         config = DigidConfiguration.get_solo()
 
@@ -797,21 +797,21 @@ class DigiDConfigurationTests(ClearCachesMixin, TestCase):
 
     @requests_mock.Mocker()
     @override_settings(
-        DIGID_WANT_ASSERTIONS_SIGNED=None,
-        DIGID_WANT_ASSERTIONS_ENCRYPTED=None,
-        DIGID_ARTIFACT_RESOLVE_CONTENT_TYPE=None,
-        DIGID_KEY_PASSPHRASE=None,
-        DIGID_SIGNATURE_ALGORITHM=None,
-        DIGID_DIGEST_ALGORITHM=None,
-        DIGID_ATTRIBUTE_CONSUMING_SERVICE_INDEX=None,
-        DIGID_REQUESTED_ATTRIBUTES=None,
-        DIGID_SLO=None,
+        DIGID_SAML_WANT_ASSERTIONS_SIGNED=None,
+        DIGID_SAML_WANT_ASSERTIONS_ENCRYPTED=None,
+        DIGID_SAML_ARTIFACT_RESOLVE_CONTENT_TYPE=None,
+        DIGID_SAML_KEY_PASSPHRASE=None,
+        DIGID_SAML_SIGNATURE_ALGORITHM=None,
+        DIGID_SAML_DIGEST_ALGORITHM=None,
+        DIGID_SAML_ATTRIBUTE_CONSUMING_SERVICE_INDEX=None,
+        DIGID_SAML_REQUESTED_ATTRIBUTES=None,
+        DIGID_SAML_SLO=None,
     )
     def test_configure_use_defaults(self, m):
         with open(DIGID_XML_METADATA_PATH, "rb") as f:
             m.get("http://metadata.local/file.xml", content=f.read())
 
-            DigiDConfigurationStep().configure()
+            DigiDSAMLConfigurationStep().configure()
 
         config = DigidConfiguration.get_solo()
 
@@ -835,7 +835,7 @@ class DigiDConfigurationTests(ClearCachesMixin, TestCase):
             with self.subTest(exception=exception):
                 m.get("http://metadata.local/file.xml", exc=exception)
                 with self.assertRaises(ConfigurationRunFailed):
-                    DigiDConfigurationStep().configure()
+                    DigiDSAMLConfigurationStep().configure()
 
                 config = DigidConfiguration.get_solo()
 
@@ -853,7 +853,7 @@ class DigiDConfigurationTests(ClearCachesMixin, TestCase):
 
     @requests_mock.Mocker()
     def test_is_configured(self, m):
-        config = DigiDConfigurationStep()
+        config = DigiDSAMLConfigurationStep()
 
         self.assertFalse(config.is_configured())
 
@@ -866,48 +866,48 @@ class DigiDConfigurationTests(ClearCachesMixin, TestCase):
 
 @temp_private_root()
 @override_settings(
-    EHERKENNING_CERTIFICATE_LABEL="eHerkenning certificate",
-    EHERKENNING_CERTIFICATE_TYPE=CertificateTypes.key_pair,
-    EHERKENNING_CERTIFICATE_PUBLIC_CERTIFICATE=PUBLIC_CERT_FILE.name,
-    EHERKENNING_CERTIFICATE_PRIVATE_KEY=PRIVATE_KEY_FILE.name,
-    EHERKENNING_METADATA_FILE_SOURCE="http://metadata.local/file.xml",
-    EHERKENNING_ENTITY_ID="1234",
-    EHERKENNING_BASE_URL="http://eherkenning.local",
-    EHERKENNING_SERVICE_NAME="OIP",
-    EHERKENNING_SERVICE_DESCRIPTION="Open Inwoner",
-    EHERKENNING_WANT_ASSERTIONS_SIGNED=False,
-    EHERKENNING_WANT_ASSERTIONS_ENCRYPTED=True,
-    EHERKENNING_ARTIFACT_RESOLVE_CONTENT_TYPE=XMLContentTypes.text_xml,
-    EHERKENNING_KEY_PASSPHRASE="foo",
-    EHERKENNING_SIGNATURE_ALGORITHM=SignatureAlgorithms.dsa_sha1,
-    EHERKENNING_DIGEST_ALGORITHM=DigestAlgorithms.sha512,
-    EHERKENNING_TECHNICAL_CONTACT_PERSON_TELEPHONE="0612345678",
-    EHERKENNING_TECHNICAL_CONTACT_PERSON_EMAIL="foo@bar.org",
-    EHERKENNING_ORGANIZATION_URL="http://open-inwoner.local",
-    EHERKENNING_ORGANIZATION_NAME="Open Inwoner",
-    EHERKENNING_EH_LOA=AssuranceLevels.high,
-    EHERKENNING_EH_ATTRIBUTE_CONSUMING_SERVICE_INDEX="9053",
-    EHERKENNING_EH_REQUESTED_ATTRIBUTES=[{"name": "kvk", "required": True}],
-    EHERKENNING_EH_SERVICE_UUID="a89ca0cc-e0db-417a-993e-1a54300a3537",
-    EHERKENNING_EH_SERVICE_INSTANCE_UUID="feed1712-4d97-4aaf-92e1-607ebd65263d",
-    EHERKENNING_EIDAS_LOA=AssuranceLevels.high,
-    EHERKENNING_EIDAS_ATTRIBUTE_CONSUMING_SERVICE_INDEX="9054",
-    EHERKENNING_EIDAS_REQUESTED_ATTRIBUTES=[{"name": "kvk", "required": True}],
-    EHERKENNING_EIDAS_SERVICE_UUID="59d0bfe8-10e6-4830-bc2b-c7d895a16f31",
-    EHERKENNING_EIDAS_SERVICE_INSTANCE_UUID="c1cd3bfa-cd5e-4f68-8991-7a87c137f8f0",
-    EHERKENNING_OIN="11111222223333344444",
-    EHERKENNING_NO_EIDAS=True,
-    EHERKENNING_PRIVACY_POLICY="http://privacy-policy.local/",
-    EHERKENNING_MAKELAAR_ID="44444333332222211111",
-    EHERKENNING_SERVICE_LANGUAGE="en",
+    EHERKENNING_SAML_CERTIFICATE_LABEL="eHerkenning certificate",
+    EHERKENNING_SAML_CERTIFICATE_TYPE=CertificateTypes.key_pair,
+    EHERKENNING_SAML_CERTIFICATE_PUBLIC_CERTIFICATE=PUBLIC_CERT_FILE.name,
+    EHERKENNING_SAML_CERTIFICATE_PRIVATE_KEY=PRIVATE_KEY_FILE.name,
+    EHERKENNING_SAML_METADATA_FILE_SOURCE="http://metadata.local/file.xml",
+    EHERKENNING_SAML_ENTITY_ID="1234",
+    EHERKENNING_SAML_BASE_URL="http://eherkenning.local",
+    EHERKENNING_SAML_SERVICE_NAME="OIP",
+    EHERKENNING_SAML_SERVICE_DESCRIPTION="Open Inwoner",
+    EHERKENNING_SAML_WANT_ASSERTIONS_SIGNED=False,
+    EHERKENNING_SAML_WANT_ASSERTIONS_ENCRYPTED=True,
+    EHERKENNING_SAML_ARTIFACT_RESOLVE_CONTENT_TYPE=XMLContentTypes.text_xml,
+    EHERKENNING_SAML_KEY_PASSPHRASE="foo",
+    EHERKENNING_SAML_SIGNATURE_ALGORITHM=SignatureAlgorithms.dsa_sha1,
+    EHERKENNING_SAML_DIGEST_ALGORITHM=DigestAlgorithms.sha512,
+    EHERKENNING_SAML_TECHNICAL_CONTACT_PERSON_TELEPHONE="0612345678",
+    EHERKENNING_SAML_TECHNICAL_CONTACT_PERSON_EMAIL="foo@bar.org",
+    EHERKENNING_SAML_ORGANIZATION_URL="http://open-inwoner.local",
+    EHERKENNING_SAML_ORGANIZATION_NAME="Open Inwoner",
+    EHERKENNING_SAML_EH_LOA=AssuranceLevels.high,
+    EHERKENNING_SAML_EH_ATTRIBUTE_CONSUMING_SERVICE_INDEX="9053",
+    EHERKENNING_SAML_EH_REQUESTED_ATTRIBUTES=[{"name": "kvk", "required": True}],
+    EHERKENNING_SAML_EH_SERVICE_UUID="a89ca0cc-e0db-417a-993e-1a54300a3537",
+    EHERKENNING_SAML_EH_SERVICE_INSTANCE_UUID="feed1712-4d97-4aaf-92e1-607ebd65263d",
+    EHERKENNING_SAML_EIDAS_LOA=AssuranceLevels.high,
+    EHERKENNING_SAML_EIDAS_ATTRIBUTE_CONSUMING_SERVICE_INDEX="9054",
+    EHERKENNING_SAML_EIDAS_REQUESTED_ATTRIBUTES=[{"name": "kvk", "required": True}],
+    EHERKENNING_SAML_EIDAS_SERVICE_UUID="59d0bfe8-10e6-4830-bc2b-c7d895a16f31",
+    EHERKENNING_SAML_EIDAS_SERVICE_INSTANCE_UUID="c1cd3bfa-cd5e-4f68-8991-7a87c137f8f0",
+    EHERKENNING_SAML_OIN="11111222223333344444",
+    EHERKENNING_SAML_NO_EIDAS=True,
+    EHERKENNING_SAML_PRIVACY_POLICY="http://privacy-policy.local/",
+    EHERKENNING_SAML_MAKELAAR_ID="44444333332222211111",
+    EHERKENNING_SAML_SERVICE_LANGUAGE="en",
 )
-class eHerkenningConfigurationTests(ClearCachesMixin, TestCase):
+class eHerkenningSAMLConfigurationTest(ClearCachesMixin, TestCase):
     @requests_mock.Mocker()
     def test_configure(self, m):
         with open(DIGID_XML_METADATA_PATH, "rb") as f:
             m.get("http://metadata.local/file.xml", content=f.read())
 
-            eHerkenningConfigurationStep().configure()
+            eHerkenningSAMLConfigurationStep().configure()
 
         config = EherkenningConfiguration.get_solo()
 
@@ -974,28 +974,28 @@ class eHerkenningConfigurationTests(ClearCachesMixin, TestCase):
 
     @requests_mock.Mocker()
     @override_settings(
-        EHERKENNING_WANT_ASSERTIONS_SIGNED=None,
-        EHERKENNING_WANT_ASSERTIONS_ENCRYPTED=None,
-        EHERKENNING_ARTIFACT_RESOLVE_CONTENT_TYPE=None,
-        EHERKENNING_KEY_PASSPHRASE=None,
-        EHERKENNING_SIGNATURE_ALGORITHM=None,
-        EHERKENNING_DIGEST_ALGORITHM=None,
-        EHERKENNING_EH_LOA=None,
-        EHERKENNING_EH_ATTRIBUTE_CONSUMING_SERVICE_INDEX=None,
-        EHERKENNING_EH_SERVICE_UUID=None,
-        EHERKENNING_EH_SERVICE_INSTANCE_UUID=None,
-        EHERKENNING_EIDAS_LOA=None,
-        EHERKENNING_EIDAS_ATTRIBUTE_CONSUMING_SERVICE_INDEX=None,
-        EHERKENNING_EIDAS_SERVICE_UUID=None,
-        EHERKENNING_EIDAS_SERVICE_INSTANCE_UUID=None,
-        EHERKENNING_NO_EIDAS=None,
-        EHERKENNING_SERVICE_LANGUAGE=None,
+        EHERKENNING_SAML_WANT_ASSERTIONS_SIGNED=None,
+        EHERKENNING_SAML_WANT_ASSERTIONS_ENCRYPTED=None,
+        EHERKENNING_SAML_ARTIFACT_RESOLVE_CONTENT_TYPE=None,
+        EHERKENNING_SAML_KEY_PASSPHRASE=None,
+        EHERKENNING_SAML_SIGNATURE_ALGORITHM=None,
+        EHERKENNING_SAML_DIGEST_ALGORITHM=None,
+        EHERKENNING_SAML_EH_LOA=None,
+        EHERKENNING_SAML_EH_ATTRIBUTE_CONSUMING_SERVICE_INDEX=None,
+        EHERKENNING_SAML_EH_SERVICE_UUID=None,
+        EHERKENNING_SAML_EH_SERVICE_INSTANCE_UUID=None,
+        EHERKENNING_SAML_EIDAS_LOA=None,
+        EHERKENNING_SAML_EIDAS_ATTRIBUTE_CONSUMING_SERVICE_INDEX=None,
+        EHERKENNING_SAML_EIDAS_SERVICE_UUID=None,
+        EHERKENNING_SAML_EIDAS_SERVICE_INSTANCE_UUID=None,
+        EHERKENNING_SAML_NO_EIDAS=None,
+        EHERKENNING_SAML_SERVICE_LANGUAGE=None,
     )
     def test_configure_use_defaults(self, m):
         with open(DIGID_XML_METADATA_PATH, "rb") as f:
             m.get("http://metadata.local/file.xml", content=f.read())
 
-            eHerkenningConfigurationStep().configure()
+            eHerkenningSAMLConfigurationStep().configure()
 
         config = EherkenningConfiguration.get_solo()
 
@@ -1023,7 +1023,7 @@ class eHerkenningConfigurationTests(ClearCachesMixin, TestCase):
             with self.subTest(exception=exception):
                 m.get("http://metadata.local/file.xml", exc=exception)
                 with self.assertRaises(ConfigurationRunFailed):
-                    eHerkenningConfigurationStep().configure()
+                    eHerkenningSAMLConfigurationStep().configure()
 
                 config = EherkenningConfiguration.get_solo()
 
@@ -1041,7 +1041,7 @@ class eHerkenningConfigurationTests(ClearCachesMixin, TestCase):
 
     @requests_mock.Mocker()
     def test_is_configured(self, m):
-        config = eHerkenningConfigurationStep()
+        config = eHerkenningSAMLConfigurationStep()
 
         self.assertFalse(config.is_configured())
 

@@ -71,6 +71,7 @@ For a full overview of the command and its options:
    :caption: Supported configurations
 
    admin_oidc
+   cms_ssd
    digid_oidc
    digid_saml
    eherkenning_oidc

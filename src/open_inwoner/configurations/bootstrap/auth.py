@@ -9,6 +9,7 @@ from digid_eherkenning.admin import (
     EherkenningConfigurationAdmin,
 )
 from digid_eherkenning.models import DigidConfiguration, EherkenningConfiguration
+from django_setup_configuration.config_settings import ConfigSettings
 from django_setup_configuration.configuration import BaseConfigurationStep
 from django_setup_configuration.exceptions import ConfigurationRunFailed
 from mozilla_django_oidc_db.forms import OpenIDConnectConfigForm
@@ -25,49 +26,47 @@ from digid_eherkenning_oidc_generics.models import (
 )
 from open_inwoner.configurations.models import SiteConfiguration
 
-from .base import ConfigSettingsBase
+from .utils import convert_setting_to_model_field_name
 
 
 #
 # DigiD OIDC
 #
-class DigiDOIDCConfigurationSettings(ConfigSettingsBase):
-    model = OpenIDConnectDigiDConfig
-    display_name = "DigiD OIDC Configuration"
-    namespace = "DIGID_OIDC"
-    required_fields = ("oidc_rp_client_id", "oidc_rp_client_secret")
-
-
 class DigiDOIDCConfigurationStep(BaseConfigurationStep):
     """
     Configure DigiD authentication via OpenID Connect
     """
 
     verbose_name = "Configuration for DigiD via OpenID Connect"
-    required_settings = [
-        "DIGID_OIDC_OIDC_RP_CLIENT_ID",
-        "DIGID_OIDC_OIDC_RP_CLIENT_SECRET",
-    ]
-    all_settings = required_settings + [
-        "DIGID_OIDC_IDENTIFIER_CLAIM_NAME",
-        "DIGID_OIDC_OIDC_RP_SCOPES_LIST",
-        "DIGID_OIDC_OIDC_RP_SIGN_ALGO",
-        "DIGID_OIDC_OIDC_RP_IDP_SIGN_KEY",
-        "DIGID_OIDC_OIDC_OP_DISCOVERY_ENDPOINT",
-        "DIGID_OIDC_OIDC_OP_JWKS_ENDPOINT",
-        "DIGID_OIDC_OIDC_OP_AUTHORIZATION_ENDPOINT",
-        "DIGID_OIDC_OIDC_OP_TOKEN_ENDPOINT",
-        "DIGID_OIDC_OIDC_OP_USER_ENDPOINT",
-        "DIGID_OIDC_OIDC_OP_LOGOUT_ENDPOINT",
-        "DIGID_OIDC_USERINFO_CLAIMS_SOURCE",
-        "DIGID_OIDC_ERROR_MESSAGE_MAPPING",
-        "DIGID_OIDC_OIDC_KEYCLOAK_IDP_HINT",
-        "DIGID_OIDC_OIDC_USE_NONCE",
-        "DIGID_OIDC_OIDC_NONCE_SIZE",
-        "DIGID_OIDC_OIDC_STATE_SIZE",
-        "DIGID_OIDC_OIDC_EXEMPT_URLS",
-    ]
-    enable_setting = "DIGID_OIDC_CONFIG_ENABLE"
+    config_settings = ConfigSettings(
+        enable_setting="DIGID_OIDC_CONFIG_ENABLE",
+        namespace="DIGID_OIDC",
+        models=[OpenIDConnectDigiDConfig],
+        required_settings=[
+            "DIGID_OIDC_OIDC_RP_CLIENT_ID",
+            "DIGID_OIDC_OIDC_RP_CLIENT_SECRET",
+        ],
+        optional_settings=[
+            "DIGID_OIDC_ENABLED",
+            "DIGID_OIDC_ERROR_MESSAGE_MAPPING",
+            "DIGID_OIDC_IDENTIFIER_CLAIM_NAME",
+            "DIGID_OIDC_OIDC_EXEMPT_URLS",
+            "DIGID_OIDC_OIDC_KEYCLOAK_IDP_HINT",
+            "DIGID_OIDC_OIDC_NONCE_SIZE",
+            "DIGID_OIDC_OIDC_OP_AUTHORIZATION_ENDPOINT",
+            "DIGID_OIDC_OIDC_OP_DISCOVERY_ENDPOINT",
+            "DIGID_OIDC_OIDC_OP_JWKS_ENDPOINT",
+            "DIGID_OIDC_OIDC_OP_LOGOUT_ENDPOINT",
+            "DIGID_OIDC_OIDC_OP_TOKEN_ENDPOINT",
+            "DIGID_OIDC_OIDC_OP_USER_ENDPOINT",
+            "DIGID_OIDC_OIDC_RP_IDP_SIGN_KEY",
+            "DIGID_OIDC_OIDC_RP_SCOPES_LIST",
+            "DIGID_OIDC_OIDC_RP_SIGN_ALGO",
+            "DIGID_OIDC_OIDC_STATE_SIZE",
+            "DIGID_OIDC_OIDC_USE_NONCE",
+            "DIGID_OIDC_USERINFO_CLAIMS_SOURCE",
+        ],
+    )
 
     def is_configured(self) -> bool:
         return OpenIDConnectDigiDConfig.get_solo().enabled
@@ -82,11 +81,17 @@ class DigiDOIDCConfigurationStep(BaseConfigurationStep):
         }
 
         # Only override field values with settings if they are defined
-        for setting in self.all_settings:
+        all_settings = (
+            self.config_settings.required_settings
+            + self.config_settings.optional_settings
+        )
+        for setting in all_settings:
             value = getattr(settings, setting, None)
             if value is not None:
-                model_field_name = setting.split("DIGID_OIDC_")[1].lower()
-                form_data[model_field_name] = value
+                field_name = convert_setting_to_model_field_name(
+                    setting, self.config_settings.namespace
+                )
+                form_data[field_name] = value
 
         form_data["enabled"] = True
 
@@ -113,43 +118,41 @@ class DigiDOIDCConfigurationStep(BaseConfigurationStep):
 #
 # eHerkenning OIDC
 #
-class eHerkenningOIDCConfigurationSettings(ConfigSettingsBase):
-    model = OpenIDConnectEHerkenningConfig
-    display_name = "eHerkenning OIDC Configuration"
-    namespace = "EHERKENNING_OIDC"
-    required_fields = ("oidc_rp_client_id", "oidc_rp_client_secret")
-
-
 class eHerkenningOIDCConfigurationStep(BaseConfigurationStep):
     """
     Configure eHerkenning authentication via OpenID Connect
     """
 
     verbose_name = "Configuration for eHerkenning via OpenID Connect"
-    required_settings = [
-        "EHERKENNING_OIDC_OIDC_RP_CLIENT_ID",
-        "EHERKENNING_OIDC_OIDC_RP_CLIENT_SECRET",
-    ]
-    all_settings = required_settings + [
-        "EHERKENNING_OIDC_IDENTIFIER_CLAIM_NAME",
-        "EHERKENNING_OIDC_OIDC_RP_SCOPES_LIST",
-        "EHERKENNING_OIDC_OIDC_RP_SIGN_ALGO",
-        "EHERKENNING_OIDC_OIDC_RP_IDP_SIGN_KEY",
-        "EHERKENNING_OIDC_OIDC_OP_DISCOVERY_ENDPOINT",
-        "EHERKENNING_OIDC_OIDC_OP_JWKS_ENDPOINT",
-        "EHERKENNING_OIDC_OIDC_OP_AUTHORIZATION_ENDPOINT",
-        "EHERKENNING_OIDC_OIDC_OP_TOKEN_ENDPOINT",
-        "EHERKENNING_OIDC_OIDC_OP_USER_ENDPOINT",
-        "EHERKENNING_OIDC_OIDC_OP_LOGOUT_ENDPOINT",
-        "EHERKENNING_OIDC_USERINFO_CLAIMS_SOURCE",
-        "EHERKENNING_OIDC_ERROR_MESSAGE_MAPPING",
-        "EHERKENNING_OIDC_OIDC_KEYCLOAK_IDP_HINT",
-        "EHERKENNING_OIDC_OIDC_USE_NONCE",
-        "EHERKENNING_OIDC_OIDC_NONCE_SIZE",
-        "EHERKENNING_OIDC_OIDC_STATE_SIZE",
-        "EHERKENNING_OIDC_OIDC_EXEMPT_URLS",
-    ]
-    enable_setting = "EHERKENNING_OIDC_CONFIG_ENABLE"
+    config_settings = ConfigSettings(
+        enable_setting="EHERKENNING_OIDC_CONFIG_ENABLE",
+        namespace="EHERKENNING_OIDC",
+        models=[OpenIDConnectEHerkenningConfig],
+        required_settings=[
+            "EHERKENNING_OIDC_OIDC_RP_CLIENT_ID",
+            "EHERKENNING_OIDC_OIDC_RP_CLIENT_SECRET",
+        ],
+        optional_settings=[
+            "EHERKENNING_OIDC_ENABLED",
+            "EHERKENNING_OIDC_IDENTIFIER_CLAIM_NAME",
+            "EHERKENNING_OIDC_OIDC_RP_SCOPES_LIST",
+            "EHERKENNING_OIDC_OIDC_RP_SIGN_ALGO",
+            "EHERKENNING_OIDC_OIDC_RP_IDP_SIGN_KEY",
+            "EHERKENNING_OIDC_OIDC_OP_DISCOVERY_ENDPOINT",
+            "EHERKENNING_OIDC_OIDC_OP_JWKS_ENDPOINT",
+            "EHERKENNING_OIDC_OIDC_OP_AUTHORIZATION_ENDPOINT",
+            "EHERKENNING_OIDC_OIDC_OP_TOKEN_ENDPOINT",
+            "EHERKENNING_OIDC_OIDC_OP_USER_ENDPOINT",
+            "EHERKENNING_OIDC_OIDC_OP_LOGOUT_ENDPOINT",
+            "EHERKENNING_OIDC_USERINFO_CLAIMS_SOURCE",
+            "EHERKENNING_OIDC_ERROR_MESSAGE_MAPPING",
+            "EHERKENNING_OIDC_OIDC_KEYCLOAK_IDP_HINT",
+            "EHERKENNING_OIDC_OIDC_USE_NONCE",
+            "EHERKENNING_OIDC_OIDC_NONCE_SIZE",
+            "EHERKENNING_OIDC_OIDC_STATE_SIZE",
+            "EHERKENNING_OIDC_OIDC_EXEMPT_URLS",
+        ],
+    )
 
     def is_configured(self) -> bool:
         return OpenIDConnectEHerkenningConfig.get_solo().enabled
@@ -164,11 +167,17 @@ class eHerkenningOIDCConfigurationStep(BaseConfigurationStep):
         }
 
         # Only override field values with settings if they are defined
-        for setting in self.all_settings:
+        all_settings = (
+            self.config_settings.required_settings
+            + self.config_settings.optional_settings
+        )
+        for setting in all_settings:
             value = getattr(settings, setting, None)
             if value is not None:
-                model_field_name = setting.split("EHERKENNING_OIDC_")[1].lower()
-                form_data[model_field_name] = value
+                field_name = convert_setting_to_model_field_name(
+                    setting, self.config_settings.namespace
+                )
+                form_data[field_name] = value
 
         form_data["enabled"] = True
 
@@ -195,73 +204,45 @@ class eHerkenningOIDCConfigurationStep(BaseConfigurationStep):
 #
 # Admin OIDC
 #
-class AdminOIDCConfigurationSettings(ConfigSettingsBase):
-    model = OpenIDConnectConfig
-    display_name = "Admin OIDC Configuration"
-    namespace = "ADMIN_OIDC"
-    required_fields = (
-        "oidc_rp_client_id",
-        "oidc_rp_client_secret",
-    )
-    all_fields = required_fields + (
-        "claim_mapping",
-        "default_groups",
-        "groups_claim",
-        "make_users_staff",
-        "oidc_exempt_urls",
-        "oidc_nonce_size",
-        "oidc_op_authorization_endpoint",
-        "oidc_op_discovery_endpoint",
-        "oidc_op_jwks_endpoint",
-        "oidc_op_token_endpoint",
-        "oidc_op_user_endpoint",
-        "oidc_rp_idp_sign_key",
-        "oidc_rp_scopes_list",
-        "oidc_rp_sign_algo",
-        "oidc_state_size",
-        "oidc_use_nonce",
-        "superuser_group_names",
-        "sync_groups",
-        "sync_groups_glob_pattern",
-        "userinfo_claims_source",
-        "username_claim",
-    )
-
-
 class AdminOIDCConfigurationStep(BaseConfigurationStep):
     """
     Configure admin login via OpenID Connect
     """
 
     verbose_name = "Configuration for admin login via OpenID Connect"
-    required_settings = [
-        "ADMIN_OIDC_OIDC_RP_CLIENT_ID",
-        "ADMIN_OIDC_OIDC_RP_CLIENT_SECRET",
-    ]
-    all_settings = required_settings + [
-        "ADMIN_OIDC_OIDC_RP_SCOPES_LIST",
-        "ADMIN_OIDC_OIDC_RP_SIGN_ALGO",
-        "ADMIN_OIDC_OIDC_RP_IDP_SIGN_KEY",
-        "ADMIN_OIDC_OIDC_OP_DISCOVERY_ENDPOINT",
-        "ADMIN_OIDC_OIDC_OP_JWKS_ENDPOINT",
-        "ADMIN_OIDC_OIDC_OP_AUTHORIZATION_ENDPOINT",
-        "ADMIN_OIDC_OIDC_OP_TOKEN_ENDPOINT",
-        "ADMIN_OIDC_OIDC_OP_USER_ENDPOINT",
-        "ADMIN_OIDC_USERNAME_CLAIM",
-        "ADMIN_OIDC_GROUPS_CLAIM",
-        "ADMIN_OIDC_CLAIM_MAPPING",
-        "ADMIN_OIDC_SYNC_GROUPS",
-        "ADMIN_OIDC_SYNC_GROUPS_GLOB_PATTERN",
-        "ADMIN_OIDC_DEFAULT_GROUPS",
-        "ADMIN_OIDC_MAKE_USERS_STAFF",
-        "ADMIN_OIDC_SUPERUSER_GROUP_NAMES",
-        "ADMIN_OIDC_OIDC_USE_NONCE",
-        "ADMIN_OIDC_OIDC_NONCE_SIZE",
-        "ADMIN_OIDC_OIDC_STATE_SIZE",
-        "ADMIN_OIDC_OIDC_EXEMPT_URLS",
-        "ADMIN_OIDC_USERINFO_CLAIMS_SOURCE",
-    ]
-    enable_setting = "ADMIN_OIDC_CONFIG_ENABLE"
+    config_settings = ConfigSettings(
+        enable_setting="ADMIN_OIDC_CONFIG_ENABLE",
+        display_name="Admin OIDC Configuration",
+        namespace="ADMIN_OIDC",
+        models=[OpenIDConnectConfig],
+        required_settings=[
+            "ADMIN_OIDC_OIDC_RP_CLIENT_ID",
+            "ADMIN_OIDC_OIDC_RP_CLIENT_SECRET",
+            "ADMIN_OIDC_DEFAULT_GROUPS",
+        ],
+        optional_settings=[
+            "ADMIN_OIDC_CLAIM_MAPPING",
+            "ADMIN_OIDC_GROUPS_CLAIM",
+            "ADMIN_OIDC_MAKE_USERS_STAFF",
+            "ADMIN_OIDC_OIDC_EXEMPT_URLS",
+            "ADMIN_OIDC_OIDC_NONCE_SIZE",
+            "ADMIN_OIDC_OIDC_OP_AUTHORIZATION_ENDPOINT",
+            "ADMIN_OIDC_OIDC_OP_DISCOVERY_ENDPOINT",
+            "ADMIN_OIDC_OIDC_OP_JWKS_ENDPOINT",
+            "ADMIN_OIDC_OIDC_OP_TOKEN_ENDPOINT",
+            "ADMIN_OIDC_OIDC_OP_USER_ENDPOINT",
+            "ADMIN_OIDC_OIDC_RP_IDP_SIGN_KEY",
+            "ADMIN_OIDC_OIDC_RP_SCOPES_LIST",
+            "ADMIN_OIDC_OIDC_RP_SIGN_ALGO",
+            "ADMIN_OIDC_OIDC_STATE_SIZE",
+            "ADMIN_OIDC_OIDC_USE_NONCE",
+            "ADMIN_OIDC_SUPERUSER_GROUP_NAMES",
+            "ADMIN_OIDC_SYNC_GROUPS",
+            "ADMIN_OIDC_SYNC_GROUPS_GLOB_PATTERN",
+            "ADMIN_OIDC_USERINFO_CLAIMS_SOURCE",
+            "ADMIN_OIDC_USERNAME_CLAIM",
+        ],
+    )
 
     def is_configured(self) -> bool:
         return OpenIDConnectConfig.get_solo().enabled
@@ -281,16 +262,23 @@ class AdminOIDCConfigurationStep(BaseConfigurationStep):
             del form_data["claim_mapping"]["email"]
 
         # Only override field values with settings if they are defined
-        for setting in self.all_settings:
+        all_settings = (
+            self.config_settings.required_settings
+            + self.config_settings.optional_settings
+        )
+        for setting in all_settings:
             value = getattr(settings, setting, None)
             if value is not None:
-                model_field_name = setting.split("ADMIN_OIDC_")[1].lower()
-                if model_field_name == "default_groups":
+                field_name = convert_setting_to_model_field_name(
+                    setting, self.config_settings.namespace
+                )
+                if field_name == "default_groups":
                     for group_name in value:
                         Group.objects.get_or_create(name=group_name)
                     value = Group.objects.filter(name__in=value)
 
-                form_data[model_field_name] = value
+                form_data[field_name] = value
+
         form_data["enabled"] = True
 
         # Use the admin form to apply validation and fetch URLs from the discovery endpoint
@@ -312,55 +300,44 @@ class AdminOIDCConfigurationStep(BaseConfigurationStep):
 #
 # DigiD SAML
 #
-class DigiDSAMLConfigurationSettings(ConfigSettingsBase):
-    model = DigidConfiguration
-    display_name = "DigiD SAML Configuration"
-    namespace = "DIGID"
-    required_fields = (
-        "certificate_label",
-        "certificate_type",
-        "certificate_public_certificate",
-        "metadata_file_source",
-        "entity_id",
-        "base_url",
-        "service_name",
-        "service_description",
-    )
-
-
-class DigiDConfigurationStep(BaseConfigurationStep):
+class DigiDSAMLConfigurationStep(BaseConfigurationStep):
     """
     Configure DigiD via SAML
     """
 
     verbose_name = "Configuration for DigiD via SAML"
-    required_settings = [
-        "DIGID_CERTIFICATE_LABEL",
-        "DIGID_CERTIFICATE_TYPE",
-        "DIGID_CERTIFICATE_PUBLIC_CERTIFICATE",
-        "DIGID_METADATA_FILE_SOURCE",
-        "DIGID_ENTITY_ID",
-        "DIGID_BASE_URL",
-        "DIGID_SERVICE_NAME",
-        "DIGID_SERVICE_DESCRIPTION",
-    ]
-    all_settings = required_settings + [
-        "DIGID_CERTIFICATE_PRIVATE_KEY",
-        "DIGID_WANT_ASSERTIONS_SIGNED",
-        "DIGID_WANT_ASSERTIONS_ENCRYPTED",
-        "DIGID_ARTIFACT_RESOLVE_CONTENT_TYPE",
-        "DIGID_KEY_PASSPHRASE",
-        "DIGID_SIGNATURE_ALGORITHM",
-        "DIGID_DIGEST_ALGORITHM",
-        "DIGID_TECHNICAL_CONTACT_PERSON_TELEPHONE",
-        "DIGID_TECHNICAL_CONTACT_PERSON_EMAIL",
-        "DIGID_ORGANIZATION_URL",
-        "DIGID_ORGANIZATION_NAME",
-        "DIGID_ATTRIBUTE_CONSUMING_SERVICE_INDEX",
-        "DIGID_REQUESTED_ATTRIBUTES",
-        "DIGID_SLO",
-    ]
-    enable_setting = "DIGID_CONFIG_ENABLE"
+    config_settings = ConfigSettings(
+        enable_setting="DIGID_SAML_CONFIG_ENABLE",
+        namespace="DIGID_SAML",
+        models=[DigidConfiguration],
+        update_field_descriptions=True,
+        required_settings=[
+            "DIGID_SAML_BASE_URL",
+            "DIGID_SAML_CERTIFICATE_LABEL",
+            "DIGID_SAML_CERTIFICATE_PUBLIC_CERTIFICATE",
+            "DIGID_SAML_CERTIFICATE_TYPE",
+            "DIGID_SAML_ENTITY_ID",
+            "DIGID_SAML_METADATA_FILE_SOURCE",
+            "DIGID_SAML_SERVICE_DESCRIPTION",
+            "DIGID_SAML_SERVICE_NAME",
+        ],
+        optional_settings=[
+            "DIGID_SAML_ARTIFACT_RESOLVE_CONTENT_TYPE",
+            "DIGID_SAML_ATTRIBUTE_CONSUMING_SERVICE_INDEX",
+            "DIGID_SAML_CERTIFICATE_PRIVATE_KEY",
+            "DIGID_SAML_DIGEST_ALGORITHM",
+            "DIGID_SAML_KEY_PASSPHRASE",
+            "DIGID_SAML_ORGANIZATION_NAME",
+            "DIGID_SAML_ORGANIZATION_URL",
+            "DIGID_SAML_REQUESTED_ATTRIBUTES",
+            "DIGID_SAML_SIGNATURE_ALGORITHM",
+            "DIGID_SAML_SLO",
+            "DIGID_SAML_TECHNICAL_CONTACT_PERSON_EMAIL",
+            "DIGID_SAML_TECHNICAL_CONTACT_PERSON_TELEPHONE",
+            "DIGID_SAML_WANT_ASSERTIONS_ENCRYPTED",
+            "DIGID_SAML_WANT_ASSERTIONS_SIGNED",
+        ],
+    )
 
     def is_configured(self) -> bool:
         config = DigidConfiguration.get_solo()
@@ -383,29 +360,35 @@ class DigiDConfigurationStep(BaseConfigurationStep):
         }
 
         # Only override field values with settings if they are defined
-        for setting in self.all_settings:
+        all_settings = (
+            self.config_settings.required_settings
+            + self.config_settings.optional_settings
+        )
+        for setting in all_settings:
             value = getattr(settings, setting, None)
             if value is not None:
-                model_field_name = setting.split("DIGID_")[1].lower()
-                if model_field_name.startswith("certificate"):
+                field_name = convert_setting_to_model_field_name(
+                    setting, self.config_settings.namespace
+                )
+                if field_name.startswith("certificate"):
                     continue
 
-                form_data[model_field_name] = value
+                form_data[field_name] = value
 
         certificate, _ = Certificate.objects.get_or_create(
-            label=settings.DIGID_CERTIFICATE_LABEL,
+            label=settings.DIGID_SAML_CERTIFICATE_LABEL,
             defaults={
-                "type": settings.DIGID_CERTIFICATE_TYPE,
+                "type": settings.DIGID_SAML_CERTIFICATE_TYPE,
             },
         )
 
         # Save the certificates separately, to ensure the resulting file is stored in
         # private media
-        with open(settings.DIGID_CERTIFICATE_PUBLIC_CERTIFICATE) as public_cert:
+        with open(settings.DIGID_SAML_CERTIFICATE_PUBLIC_CERTIFICATE) as public_cert:
             certificate.public_certificate.save("digid.crt", public_cert)
 
-        if settings.DIGID_CERTIFICATE_PRIVATE_KEY:
-            with open(settings.DIGID_CERTIFICATE_PRIVATE_KEY) as private_key:
+        if settings.DIGID_SAML_CERTIFICATE_PRIVATE_KEY:
+            with open(settings.DIGID_SAML_CERTIFICATE_PRIVATE_KEY) as private_key:
                 certificate.private_key.save("digid.key", private_key)
 
         form_data["certificate"] = certificate
@@ -436,103 +419,60 @@ class DigiDConfigurationStep(BaseConfigurationStep):
 #
 # eHerkenning SAML
 #
-class eHerkenningSAMLConfigurationSettings(ConfigSettingsBase):
-    model = EherkenningConfiguration
-    display_name = "eHerkenning SAML Configuration"
-    namespace = "EHERKENNING"
-    required_fields = (
-        "base_url",
-        "certificate_label",
-        "certificate_public_certificate",
-        "certificate_type",
-        "entity_id",
-        "makelaar_id",
-        "metadata_file_source",
-        "oin",
-        "privacy_policy",
-        "service_description",
-        "service_name",
-    )
-    all_fields = required_fields + (
-        "artifact_resolve_content_type",
-        "base_url",
-        "certificate_private_key",
-        "digest_algorithm",
-        "eh_attribute_consuming_service_index",
-        "eh_loa",
-        "eh_requested_attributes",
-        "eh_service_instance_uuid",
-        "eh_service_uuid",
-        "eidas_attribute_consuming_service_index",
-        "eidas_loa",
-        "eidas_requested_attributes",
-        "eidas_service_instance_uuid",
-        "eidas_service_uuid",
-        "entity_id",
-        "key_passphrase",
-        "no_eidas",
-        "organization_name",
-        "organization_url",
-        "service_description",
-        "service_language",
-        "service_name",
-        "signature_algorithm",
-        "technical_contact_person_email",
-        "technical_contact_person_telephone",
-        "want_assertions_encrypted",
-        "want_assertions_signed",
-    )
-
-
-class eHerkenningConfigurationStep(BaseConfigurationStep):
+class eHerkenningSAMLConfigurationStep(BaseConfigurationStep):
     """
     Configure eHerkenning via SAML
     """
 
     verbose_name = "Configuration for eHerkenning via SAML"
-    required_settings = [
-        "EHERKENNING_CERTIFICATE_LABEL",
-        "EHERKENNING_CERTIFICATE_TYPE",
-        "EHERKENNING_CERTIFICATE_PUBLIC_CERTIFICATE",
-        "EHERKENNING_METADATA_FILE_SOURCE",
-        "EHERKENNING_ENTITY_ID",
-        "EHERKENNING_BASE_URL",
-        "EHERKENNING_SERVICE_NAME",
-        "EHERKENNING_SERVICE_DESCRIPTION",
-        "EHERKENNING_OIN",
-        "EHERKENNING_MAKELAAR_ID",
-        "EHERKENNING_PRIVACY_POLICY",
-    ]
-    all_settings = required_settings + [
-        "EHERKENNING_CERTIFICATE_PRIVATE_KEY",
-        "EHERKENNING_WANT_ASSERTIONS_SIGNED",
-        "EHERKENNING_WANT_ASSERTIONS_ENCRYPTED",
-        "EHERKENNING_ARTIFACT_RESOLVE_CONTENT_TYPE",
-        "EHERKENNING_KEY_PASSPHRASE",
-        "EHERKENNING_SIGNATURE_ALGORITHM",
-        "EHERKENNING_DIGEST_ALGORITHM",
-        "EHERKENNING_ENTITY_ID",
-        "EHERKENNING_BASE_URL",
-        "EHERKENNING_SERVICE_NAME",
-        "EHERKENNING_SERVICE_DESCRIPTION",
-        "EHERKENNING_TECHNICAL_CONTACT_PERSON_TELEPHONE",
-        "EHERKENNING_TECHNICAL_CONTACT_PERSON_EMAIL",
-        "EHERKENNING_ORGANIZATION_URL",
-        "EHERKENNING_ORGANIZATION_NAME",
-        "EHERKENNING_EH_LOA",
-        "EHERKENNING_EH_ATTRIBUTE_CONSUMING_SERVICE_INDEX",
-        "EHERKENNING_EH_REQUESTED_ATTRIBUTES",
-        "EHERKENNING_EH_SERVICE_UUID",
-        "EHERKENNING_EH_SERVICE_INSTANCE_UUID",
-        "EHERKENNING_EIDAS_LOA",
-        "EHERKENNING_EIDAS_ATTRIBUTE_CONSUMING_SERVICE_INDEX",
-        "EHERKENNING_EIDAS_REQUESTED_ATTRIBUTES",
-        "EHERKENNING_EIDAS_SERVICE_UUID",
-        "EHERKENNING_EIDAS_SERVICE_INSTANCE_UUID",
-        "EHERKENNING_NO_EIDAS",
-        "EHERKENNING_SERVICE_LANGUAGE",
-    ]
-    enable_setting = "EHERKENNING_CONFIG_ENABLE"
+    config_settings = ConfigSettings(
+        enable_setting="EHERKENNING_SAML_CONFIG_ENABLE",
+        display_name="eHerkenning SAML Configuration",
+        namespace="EHERKENNING_SAML",
+        models=[EherkenningConfiguration],
+        required_settings=[
+            "EHERKENNING_SAML_CERTIFICATE_LABEL",
+            "EHERKENNING_SAML_CERTIFICATE_TYPE",
+            "EHERKENNING_SAML_CERTIFICATE_PUBLIC_CERTIFICATE",
+            "EHERKENNING_SAML_METADATA_FILE_SOURCE",
+            "EHERKENNING_SAML_ENTITY_ID",
+            "EHERKENNING_SAML_BASE_URL",
+            "EHERKENNING_SAML_SERVICE_NAME",
+            "EHERKENNING_SAML_SERVICE_DESCRIPTION",
+            "EHERKENNING_SAML_OIN",
+            "EHERKENNING_SAML_MAKELAAR_ID",
+            "EHERKENNING_SAML_PRIVACY_POLICY",
+        ],
+        optional_settings=[
+            "EHERKENNING_SAML_ARTIFACT_RESOLVE_CONTENT_TYPE",
+            "EHERKENNING_SAML_BASE_URL",
+            "EHERKENNING_SAML_CERTIFICATE_PRIVATE_KEY",
+            "EHERKENNING_SAML_DIGEST_ALGORITHM",
+            "EHERKENNING_SAML_EH_ATTRIBUTE_CONSUMING_SERVICE_INDEX",
+            "EHERKENNING_SAML_EH_LOA",
+            "EHERKENNING_SAML_EH_REQUESTED_ATTRIBUTES",
+            "EHERKENNING_SAML_EH_SERVICE_INSTANCE_UUID",
+            "EHERKENNING_SAML_EH_SERVICE_UUID",
+            "EHERKENNING_SAML_EIDAS_ATTRIBUTE_CONSUMING_SERVICE_INDEX",
+            "EHERKENNING_SAML_EIDAS_LOA",
+            "EHERKENNING_SAML_EIDAS_REQUESTED_ATTRIBUTES",
+            "EHERKENNING_SAML_EIDAS_SERVICE_INSTANCE_UUID",
+            "EHERKENNING_SAML_EIDAS_SERVICE_UUID",
+            "EHERKENNING_SAML_ENTITY_ID",
+            "EHERKENNING_SAML_KEY_PASSPHRASE",
+            "EHERKENNING_SAML_NO_EIDAS",
+            "EHERKENNING_SAML_ORGANIZATION_NAME",
+            "EHERKENNING_SAML_ORGANIZATION_URL",
+            "EHERKENNING_SAML_SERVICE_DESCRIPTION",
+            "EHERKENNING_SAML_SERVICE_LANGUAGE",
+            "EHERKENNING_SAML_SERVICE_NAME",
+            "EHERKENNING_SAML_SIGNATURE_ALGORITHM",
+            "EHERKENNING_SAML_TECHNICAL_CONTACT_PERSON_EMAIL",
+            "EHERKENNING_SAML_TECHNICAL_CONTACT_PERSON_TELEPHONE",
+            "EHERKENNING_SAML_WANT_ASSERTIONS_ENCRYPTED",
+            "EHERKENNING_SAML_WANT_ASSERTIONS_SIGNED",
+        ],
+    )
 
     def is_configured(self) -> bool:
         config = EherkenningConfiguration.get_solo()
@@ -560,29 +500,37 @@ class eHerkenningConfigurationStep(BaseConfigurationStep):
         }
 
         # Only override field values with settings if they are defined
-        for setting in self.all_settings:
+        all_settings = (
+            self.config_settings.required_settings
+            + self.config_settings.optional_settings
+        )
+        for setting in all_settings:
             value = getattr(settings, setting, None)
             if value is not None:
-                model_field_name = setting.split("EHERKENNING_")[1].lower()
-                if model_field_name.startswith("certificate"):
+                field_name = convert_setting_to_model_field_name(
+                    setting, self.config_settings.namespace
+                )
+                if field_name.startswith("certificate"):
                     continue
 
-                form_data[model_field_name] = value
+                form_data[field_name] = value
 
         certificate, _ = Certificate.objects.get_or_create(
-            label=settings.EHERKENNING_CERTIFICATE_LABEL,
+            label=settings.EHERKENNING_SAML_CERTIFICATE_LABEL,
             defaults={
-                "type": settings.EHERKENNING_CERTIFICATE_TYPE,
+                "type": settings.EHERKENNING_SAML_CERTIFICATE_TYPE,
             },
         )
 
         # Save the certificates separately, to ensure the resulting file is stored in
         # private media
-        with open(settings.EHERKENNING_CERTIFICATE_PUBLIC_CERTIFICATE) as public_cert:
+        with open(
+            settings.EHERKENNING_SAML_CERTIFICATE_PUBLIC_CERTIFICATE
+        ) as public_cert:
             certificate.public_certificate.save("eherkenning.crt", public_cert)
 
-        if settings.EHERKENNING_CERTIFICATE_PRIVATE_KEY:
-            with open(settings.EHERKENNING_CERTIFICATE_PRIVATE_KEY) as private_key:
+        if settings.EHERKENNING_SAML_CERTIFICATE_PRIVATE_KEY:
+            with open(settings.EHERKENNING_SAML_CERTIFICATE_PRIVATE_KEY) as private_key:
                 certificate.private_key.save("eherkenning.key", private_key)
 
         form_data["certificate"] = certificate

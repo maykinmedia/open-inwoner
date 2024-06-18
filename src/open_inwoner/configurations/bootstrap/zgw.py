@@ -1,6 +1,7 @@
 from django.conf import settings
 
 import requests
+from django_setup_configuration.config_settings import ConfigSettings
 from django_setup_configuration.configuration import BaseConfigurationStep
 from django_setup_configuration.exceptions import SelfTestFailed
 from simple_certmanager.models import Certificate
@@ -16,40 +17,6 @@ from open_inwoner.openzaak.clients import (
 from open_inwoner.openzaak.models import OpenZaakConfig, ZGWApiGroupConfig
 from open_inwoner.utils.api import ClientError
 
-from .base import ConfigSettingsBase
-
-
-class ZGWConfigurationSettings(ConfigSettingsBase):
-    model = OpenZaakConfig
-    display_name = "ZGW Configuration"
-    namespace = "ZGW"
-    required_fields = (
-        "catalogi_service_client_id",
-        "catalogi_service_secret",
-        "catalogi_service_api_root",
-        "document_service_client_id",
-        "document_service_secret",
-        "document_service_api_root",
-        "form_service_client_id",
-        "form_service_secret",
-        "form_service_api_root",
-        "zaak_service_client_id",
-        "zaak_service_secret",
-        "zaak_service_api_root",
-    )
-    all_fields = required_fields + (
-        "action_required_deadline_days",
-        "allowed_file_extensions",
-        "document_max_confidentiality",
-        "enable_categories_filtering_with_zaken",
-        "fetch_eherkenning_zaken_with_rsin",
-        "max_upload_size",
-        "reformat_esuite_zaak_identificatie",
-        "skip_notification_statustype_informeren",
-        "title_text",
-        "zaak_max_confidentiality",
-    )
-
 
 class ZakenAPIConfigurationStep(BaseConfigurationStep):
     """
@@ -57,14 +24,36 @@ class ZakenAPIConfigurationStep(BaseConfigurationStep):
     """
 
     verbose_name = "Zaken API configuration"
-    required_settings = [
-        "ZGW_ZAAK_SERVICE_API_ROOT",
-        "ZGW_ZAAK_SERVICE_API_CLIENT_ID",
-        "ZGW_ZAAK_SERVICE_API_SECRET",
-        "ZGW_SERVER_CERTIFICATE_LABEL",
-        "ZGW_SERVER_CERTIFICATE_TYPE",
-    ]
-    enable_setting = "ZGW_ENABLE"
+    config_settings = ConfigSettings(
+        enable_setting="ZGW_CONFIG_ENABLE",
+        independent=False,
+        namespace="ZGW",
+        required_settings=[
+            "ZGW_ZAAK_SERVICE_CLIENT_ID",
+            "ZGW_ZAAK_SERVICE_SECRET",
+            "ZGW_ZAAK_SERVICE_API_ROOT",
+            "ZGW_SERVER_CERTIFICATE_LABEL",
+            "ZGW_SERVER_CERTIFICATE_TYPE",
+        ],
+        optional_settings=[],
+        additional_info={
+            "zaak_service_api_root": {
+                "variable": "ZGW_ZAAK_SERVICE_API_ROOT",
+                "description": "The API root of the zaak service",
+                "possible_values": "string (URL)",
+            },
+            "zaak_service_client_id": {
+                "variable": "ZGW_ZAAK_SERVICE_CLIENT_ID",
+                "description": "The API root of the zaak service",
+                "possible_values": "string (URL)",
+            },
+            "zaak_service_secret": {
+                "variable": "ZGW_ZAAK_SERVICE_SECRET",
+                "description": "The secret of the zaak service",
+                "possible_values": "string (URL)",
+            },
+        },
+    )
 
     def is_configured(self) -> bool:
         return Service.objects.filter(
@@ -116,14 +105,36 @@ class CatalogiAPIConfigurationStep(BaseConfigurationStep):
     """
 
     verbose_name = "Catalogi API configuration"
-    required_settings = [
-        "ZGW_CATALOGI_SERVICE_API_ROOT",
-        "ZGW_CATALOGI_SERVICE_API_CLIENT_ID",
-        "ZGW_CATALOGI_SERVICE_API_SECRET",
-        "ZGW_SERVER_CERTIFICATE_LABEL",
-        "ZGW_SERVER_CERTIFICATE_TYPE",
-    ]
-    enable_setting = "ZGW_ENABLE"
+    config_settings = ConfigSettings(
+        enable_setting="ZGW_CONFIG_ENABLE",
+        independent=False,
+        namespace="ZGW",
+        required_settings=[
+            "ZGW_CATALOGI_SERVICE_CLIENT_ID",
+            "ZGW_CATALOGI_SERVICE_SECRET",
+            "ZGW_CATALOGI_SERVICE_API_ROOT",
+            "ZGW_SERVER_CERTIFICATE_LABEL",
+            "ZGW_SERVER_CERTIFICATE_TYPE",
+        ],
+        optional_settings=[],
+        additional_info={
+            "catalogi_service_api_root": {
+                "variable": "ZGW_CATALOGI_SERVICE_API_ROOT",
+                "description": "The API root of the catalogi service",
+                "possible_values": "string (URL)",
+            },
+            "catalogi_service_client_id": {
+                "variable": "ZGW_CATALOGI_SERVICE_CLIENT_ID",
+                "description": "The API root of the catalogi service",
+                "possible_values": "string (URL)",
+            },
+            "catalogi_service_secret": {
+                "variable": "ZGW_CATALOGI_SERVICE_SECRET",
+                "description": "The secret of the catalogi service",
+                "possible_values": "string (URL)",
+            },
+        },
+    )
 
     def is_configured(self) -> bool:
         return Service.objects.filter(
@@ -175,14 +186,36 @@ class DocumentenAPIConfigurationStep(BaseConfigurationStep):
     """
 
     verbose_name = "Documenten API configuration"
-    required_settings = [
-        "ZGW_DOCUMENTEN_SERVICE_API_ROOT",
-        "ZGW_DOCUMENTEN_SERVICE_API_CLIENT_ID",
-        "ZGW_DOCUMENTEN_SERVICE_API_SECRET",
-        "ZGW_SERVER_CERTIFICATE_LABEL",
-        "ZGW_SERVER_CERTIFICATE_TYPE",
-    ]
-    enable_setting = "ZGW_ENABLE"
+    config_settings = ConfigSettings(
+        enable_setting="ZGW_CONFIG_ENABLE",
+        independent=False,
+        namespace="ZGW",
+        required_settings=[
+            "ZGW_DOCUMENT_SERVICE_CLIENT_ID",
+            "ZGW_DOCUMENT_SERVICE_SECRET",
+            "ZGW_DOCUMENT_SERVICE_API_ROOT",
+            "ZGW_SERVER_CERTIFICATE_LABEL",
+            "ZGW_SERVER_CERTIFICATE_TYPE",
+        ],
+        optional_settings=[],
+        additional_info={
+            "documenten_service_api_root": {
+                "variable": "ZGW_DOCUMENT_SERVICE_API_ROOT",
+                "description": "The API root of the documenten service",
+                "possible_values": "string (URL)",
+            },
+            "documenten_service_client_id": {
+                "variable": "ZGW_DOCUMENTEN_SERVICE_CLIENT_ID",
+                "description": "The API root of the documenten service",
+                "possible_values": "string (URL)",
+            },
+            "documenten_service_secret": {
+                "variable": "ZGW_DOCUMENTEN_SERVICE_SECRET",
+                "description": "The secret of the documenten service",
+                "possible_values": "string (URL)",
+            },
+        },
+    )
 
     def is_configured(self) -> bool:
         return Service.objects.filter(
@@ -234,14 +267,36 @@ class FormulierenAPIConfigurationStep(BaseConfigurationStep):
     """
 
     verbose_name = "Formulieren APIs configuration"
-    required_settings = [
-        "ZGW_FORM_SERVICE_API_ROOT",
-        "ZGW_FORM_SERVICE_API_CLIENT_ID",
-        "ZGW_FORM_SERVICE_API_SECRET",
-        "ZGW_SERVER_CERTIFICATE_LABEL",
-        "ZGW_SERVER_CERTIFICATE_TYPE",
-    ]
-    enable_setting = "ZGW_ENABLE"
+    config_settings = ConfigSettings(
+        enable_setting="ZGW_CONFIG_ENABLE",
+        independent=False,
+        namespace="ZGW",
+        required_settings=[
+            "ZGW_FORM_SERVICE_CLIENT_ID",
+            "ZGW_FORM_SERVICE_SECRET",
+            "ZGW_FORM_SERVICE_API_ROOT",
+            "ZGW_SERVER_CERTIFICATE_LABEL",
+            "ZGW_SERVER_CERTIFICATE_TYPE",
+        ],
+        optional_settings=[],
+        additional_info={
+            "formulieren_service_api_root": {
+                "variable": "ZGW_FROMULIEREN_SERVICE_API_ROOT",
+                "description": "The API root of the formulieren service",
+                "possible_values": "string (URL)",
+            },
+            "formulieren_service_client_id": {
+                "variable": "ZGW_FORMULIEREN_SERVICE_CLIENT_ID",
+                "description": "The API root of the formulieren service",
+                "possible_values": "string (URL)",
+            },
+            "formulieren_service_secret": {
+                "variable": "ZGW_FORMULIEREN_SERVICE_SECRET",
+                "description": "The secret of the formulieren service",
+                "possible_values": "string (URL)",
+            },
+        },
+    )
 
     def is_configured(self) -> bool:
         return Service.objects.filter(
@@ -293,12 +348,30 @@ class ZGWAPIsConfigurationStep(BaseConfigurationStep):
     """
 
     verbose_name = "ZGW APIs configuration"
-    enable_setting = "ZGW_ENABLE"
-    required_settings = [
-        "ZGW_SERVER_CERTIFICATE_LABEL",
-        "ZGW_SERVER_CERTIFICATE_TYPE",
-    ]
-    enable_setting = "ZGW_CONFIG_ENABLE"
+    config_settings = ConfigSettings(
+        enable_setting="ZGW_CONFIG_ENABLE",
+        namespace="ZGW",
+        models=[OpenZaakConfig],
+        related_config_settings=[
+            ZakenAPIConfigurationStep.config_settings,
+            CatalogiAPIConfigurationStep.config_settings,
+            DocumentenAPIConfigurationStep.config_settings,
+            FormulierenAPIConfigurationStep.config_settings,
+        ],
+        required_settings=[],
+        optional_settings=[
+            "ZGW_ACTION_REQUIRED_DEADLINE_DAYS",
+            "ZGW_ALLOWED_FILE_EXTENSIONS",
+            "ZGW_DOCUMENT_MAX_CONFIDENTIALITY",
+            "ZGW_ENABLE_CATEGORIES_FILTERING_WITH_ZAKEN",
+            "ZGW_FETCH_EHERKENNING_ZAKEN_WITH_RSIN",
+            "ZGW_MAX_UPLOAD_SIZE",
+            "ZGW_REFORMAT_ESUITE_ZAAK_IDENTIFICATIE",
+            "ZGW_SKIP_NOTIFICATION_STATUSTYPE_INFORMEREN",
+            "ZGW_TITLE_TEXT",
+            "ZGW_ZAAK_MAX_CONFIDENTIALITY",
+        ],
+    )
 
     def is_configured(self) -> bool:
         """Verify that at least 1 ZGW API set is configured."""
