@@ -19,7 +19,7 @@ jobs:
       - name: Install libxml
         run: |
           sudo apt-get update
-          sudo apt-get install -y libxml2-dev libxmlsec1-dev libxmlsec1-openssl
+          sudo apt-get install -y libxml2 libxmlsec1 libxmlsec1-openssl
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
@@ -38,7 +38,7 @@ jobs:
       - name: Install libxml
         run: |
           sudo apt-get update
-          sudo apt-get install -y libxml2-dev libxmlsec1-dev libxmlsec1-openssl
+          sudo apt-get install -y libxml2 libxmlsec1 libxmlsec1-openssl
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
@@ -59,7 +59,7 @@ jobs:
       - name: Set up backend environment
         uses: maykinmedia/setup-django-backend@v1
         with:
-          apt-packages: 'libxml2-dev libxmlsec1-dev libxmlsec1-openssl gdal-bin'
+          apt-packages: 'libxml2 libxmlsec1 libxmlsec1-openssl gdal-bin'
           python-version: '3.11'
           setup-node: 'no'
       - name: Run flake8
@@ -111,7 +111,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libxml2-dev libxmlsec1-dev libxmlsec1-openssl
+          sudo apt-get install -y libxml2 libxmlsec1 libxmlsec1-openssl
           pip install -r requirements/dev.txt
       - name: Run manage.py makemigrations --check --dry-run
         run: |
@@ -143,7 +143,7 @@ jobs:
       - name: Install libxml
         run: |
           sudo apt-get update
-          sudo apt-get install -y libxml2-dev libxmlsec1-dev libxmlsec1-openssl
+          sudo apt-get install -y libxml2 libxmlsec1 libxmlsec1-openssl
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
