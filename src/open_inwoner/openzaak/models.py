@@ -293,6 +293,14 @@ class CatalogusConfig(models.Model):
         verbose_name=_("RSIN"),
         max_length=9,
     )
+    service = models.ForeignKey(
+        "zgw_consumers.Service",
+        verbose_name=_("Catalogus API"),
+        on_delete=models.PROTECT,
+        limit_choices_to={"api_type": APITypes.ztc},
+        related_name="catalogus_configs",
+        null=False,
+    )
 
     class Meta:
         ordering = ("domein", "rsin")
