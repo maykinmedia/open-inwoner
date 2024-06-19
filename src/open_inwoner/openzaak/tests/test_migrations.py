@@ -1,10 +1,10 @@
 from zgw_consumers.constants import APITypes
 
 from open_inwoner.openzaak.tests.factories import ServiceFactory
-from open_inwoner.utils.tests.test_migrations import TestMigrations
+from open_inwoner.utils.tests.test_migrations import TestSuccessfulMigrations
 
 
-class TestMultiZGWBackendMigrations(TestMigrations):
+class TestMultiZGWBackendMigrations(TestSuccessfulMigrations):
     migrate_from = "0047_delete_statustranslation"
     migrate_to = "0051_drop_root_zgw_fields"
     app = "openzaak"
