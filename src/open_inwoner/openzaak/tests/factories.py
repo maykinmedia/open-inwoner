@@ -74,6 +74,7 @@ class CatalogusConfigFactory(factory.django.DjangoModelFactory):
     url = factory.Faker("url")
     domein = factory.Faker("pystr", max_chars=5)
     rsin = factory.Faker("pystr", max_chars=9)
+    service = factory.SubFactory(ServiceFactory, api_type=APITypes.ztc)
 
     class Meta:
         model = CatalogusConfig

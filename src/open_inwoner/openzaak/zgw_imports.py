@@ -71,6 +71,7 @@ def import_catalog_configs() -> list[CatalogusConfig]:
                     url=catalog.url,
                     rsin=catalog.rsin or "",
                     domein=catalog.domein,
+                    service=client.configured_from,
                 )
             )
 
