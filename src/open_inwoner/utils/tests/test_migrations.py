@@ -76,3 +76,32 @@ class TestSuccessfulMigrations(TestMigrationsBase):
         self._revert_to_migrate_from()
         self.setUpBeforeMigration(self.old_apps)
         self._apply_migration_to()
+
+
+class TestFailingMigrations(TestMigrationsBase):
+    """Test a migration which is expected to fail.
+
+    Set the class attributes `app`, `migration_from`, and `migrate_to`. You
+    can specify your pre-migration state in `setUpBeforeMigration()`, though
+    you should not import models directly, but rather use:
+
+    ```
+    MyModel = self.apps.get_model(self.app, "MyModel")
+    ```
+
+    In your test, you can attempt to migration using `self.attempt_migration()`
+    and assert against the expected exception:
+    ```
+    def test_migration_should_fail(self):
+        # Setup failure conditions
+        self.assertRaises(SomeError):
+            self.attempt_migration()
+    ```
+    """
+
+    def setUp(self):
+        self._revert_to_migrate_from()
+        self.setUpBeforeMigration(self.old_apps)
+
+    def attempt_migration(self):
+        self._apply_migration_to()
