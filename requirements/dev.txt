@@ -1283,7 +1283,7 @@ urllib3==1.26.18
     #   elasticsearch
     #   requests
     #   sentry-sdk
-uwsgi==2.0.23
+uwsgi==2.0.26
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
