@@ -16,12 +16,12 @@
     display: grid;
     grid-template-rows: 0fr;
     transition: 0.5s;
-    overflow: hidden;
 
     &--hidden {
       // hide content if toggle-button is active
       // always show for screenreaders
       min-height: 0;
+      overflow: hidden;
     }
   }
 
@@ -41,6 +41,10 @@
     .readmore__content {
       scroll-margin-top: var(--spacing-giant);
       grid-template-rows: 1fr;
+
+      &--hidden {
+        overflow: visible;
+      }
     }
   }
 }
