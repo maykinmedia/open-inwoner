@@ -10,7 +10,12 @@ from zgw_consumers.api_models.catalogi import (
 )
 
 from open_inwoner.openzaak.api_models import ZaakType
-from open_inwoner.openzaak.clients import CatalogiClient, build_catalogi_client
+from open_inwoner.openzaak.clients import (
+    CatalogiClient,
+    MultiZgwClientProxy,
+    build_catalogi_client,
+    build_catalogi_clients,
+)
 from open_inwoner.openzaak.models import (
     CatalogusConfig,
     ZaakTypeConfig,
@@ -48,32 +53,27 @@ def import_catalog_configs() -> list[CatalogusConfig]:
 
     note this doesn't generate anything on eSuite
     """
-    client = build_catalogi_client()
-    if not client:
-        logger.warning(
-            "Not importing catalogus configs: could not build Catalogi API client"
-        )
-        return []
-
-    catalogs = client.fetch_catalogs_no_cache()
-    if not catalogs:
+    proxy = MultiZgwClientProxy(build_catalogi_clients())
+    responses = proxy.fetch_catalogs_no_cache()
+    if not responses.join_results():
         return []
 
     create = []
 
     with transaction.atomic():
         known = set(CatalogusConfig.objects.values_list("url", flat=True))
-        for catalog in catalogs:
-            if catalog.url in known:
-                continue
-            create.append(
-                CatalogusConfig(
-                    url=catalog.url,
-                    rsin=catalog.rsin or "",
-                    domein=catalog.domein,
-                    service=client.configured_from,
+        for response in responses:
+            for catalog in response.result:
+                if catalog.url in known:
+                    continue
+                create.append(
+                    CatalogusConfig(
+                        url=catalog.url,
+                        rsin=catalog.rsin or "",
+                        domein=catalog.domein,
+                        service=response.client.configured_from,
+                    )
                 )
-            )
 
         if create:
             CatalogusConfig.objects.bulk_create(create)

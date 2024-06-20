@@ -59,7 +59,6 @@ class ClientFactoryTestCase(TestCase):
 
 
 class SimpleClient:
-
     def __init__(self, url):
         self.url = url
 
