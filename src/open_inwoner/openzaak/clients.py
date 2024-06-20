@@ -1,8 +1,10 @@
 import base64
+import concurrent.futures
 import logging
 import warnings
+from dataclasses import dataclass
 from datetime import date
-from typing import Literal, Mapping, Type, TypeAlias
+from typing import Any, Literal, Mapping, Type, TypeAlias, TypeVar
 
 from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -14,11 +16,13 @@ from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.catalogi import Catalogus
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 from zgw_consumers.client import build_client
+from zgw_consumers.concurrent import parallel
 from zgw_consumers.constants import APITypes
 from zgw_consumers.models import Service
 from zgw_consumers.service import pagination_helper
 
 from open_inwoner.openzaak.api_models import InformatieObject
+from open_inwoner.openzaak.exceptions import MultiZgwClientProxyError
 from open_inwoner.utils.api import ClientError, get_json_response
 
 from ..utils.decorators import cache as cache_result
@@ -50,6 +54,9 @@ class ZgwAPIClient(APIClient):
     def __init__(self, *args, **kwargs):
         self.configured_from = kwargs.pop("configured_from")
         super().__init__(*args, **kwargs)
+
+    def __str__(self):
+        return f"Client {self.__class__.__name__} for {self.base_url}"
 
 
 class ZakenClient(ZgwAPIClient):
@@ -692,6 +699,110 @@ class FormClient(ZgwAPIClient):
         results = factory(OpenTask, all_data)
 
         return results
+
+
+TClient = TypeVar("TClient", bound=APIClient)
+
+
+@dataclass(frozen=True)
+class ZgwClientResponse:
+    """A single response in a MultiZgwClientResult."""
+
+    client: TClient
+    result: Any
+    exception: Exception | None = None
+
+
+@dataclass(frozen=True)
+class MultiZgwClientProxyResult:
+    """Container for a multi-backend responses"""
+
+    responses: list[ZgwClientResponse]
+
+    @property
+    def has_errors(self) -> bool:
+        return any(r.exception is not None for r in self.responses)
+
+    @property
+    def failing_responses(self) -> list[ZgwClientResponse]:
+        return list(r for r in self if r.exception is not None)
+
+    @property
+    def successful_responses(self) -> list[ZgwClientResponse]:
+        return list(r for r in self if r.exception is None)
+
+    def raise_on_failures(self):
+        """Raise a MultiZgwClientProxyError wrapping all errors raised by the clients."""
+        if not self.has_errors:
+            return
+
+        raise MultiZgwClientProxyError([r.exception for r in self.failing_responses])
+
+    def join_results(self):
+        """Join the results for all successful responses in a list."""
+        return list(
+            result for row in self.successful_responses for result in row.result
+        )
+
+    def __iter__(self):
+        yield from self.responses
+
+
+class MultiZgwClientProxy:
+    """A proxy to call the same method on multiple ZGW clients in parallel."""
+
+    clients: list[TClient] = []
+
+    def __init__(self, clients: list[TClient]):
+        self.clients = clients
+
+        if len(clients) == 0:
+            raise ValueError("You must specify at least one client")
+
+    def _call_method(self, method, *args, **kwargs) -> MultiZgwClientProxyResult:
+        if not all(hasattr(client, method) for client in self.clients):
+            raise AttributeError(f"Method `{method}` does not exist on the clients")
+
+        with parallel() as executor:
+            futures_mapping: Mapping[concurrent.futures.Future, TClient] = {}
+            for client in self.clients:
+                future = executor.submit(
+                    getattr(client, method),
+                    *args,
+                    **kwargs,
+                )
+                # Remember which future corresponds to which client,
+                # so we can associate them in the response
+                futures_mapping[future] = client
+
+            responses: list[ZgwClientResponse] = []
+            for task in concurrent.futures.as_completed(futures_mapping.keys()):
+                result: Any | None = None
+                exception: Exception | None = None
+                try:
+                    result: Any = task.result()
+                except BaseException:
+                    exception = task.exception()
+
+                responses.append(
+                    ZgwClientResponse(
+                        result=result, exception=exception, client=futures_mapping[task]
+                    )
+                )
+
+        # Ensure the response list is deterministic, based on the client order.
+        # This is mainly useful for testing but also generally promotes consistent
+        # behavior.
+        responses.sort(
+            key=lambda r: self.clients.index(r.client),
+        )
+        return MultiZgwClientProxyResult(responses=responses)
+
+    def __getattr__(self, name):
+        def wrapper(*args, **kwargs):
+            return self._call_method(name, *args, **kwargs)
+
+        return wrapper
 
 
 ZgwClientType = Literal["zaak", "catalogi", "document", "form"]
