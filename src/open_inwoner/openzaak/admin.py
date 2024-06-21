@@ -72,11 +72,13 @@ class CatalogusConfigAdmin(admin.ModelAdmin):
         "domein",
         "rsin",
         "url",
+        "service",
     ]
     fields = [
         "url",
         "domein",
         "rsin",
+        "service",
     ]
     readonly_fields = fields
     search_fields = [
@@ -85,6 +87,7 @@ class CatalogusConfigAdmin(admin.ModelAdmin):
         "url",
     ]
     ordering = ("domein", "rsin")
+    list_filter = ("service",)
 
 
 class HasDocNotifyListFilter(admin.SimpleListFilter):
