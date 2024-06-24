@@ -1,0 +1,20 @@
+{% extends 'master.html' %}
+{% load i18n grid_tags dropdown_tags form_tags button_tags ssd_tags render_tags %}
+
+{% block content %}
+    {% render_grid %}
+        {% render_column span=9 %}
+            <h1 class="utrecht-heading-1" id="title">
+                {% trans "Mijn uitkeringen" %}
+            </h1>
+            <p>
+                {% blocktrans with mijn_uitkeringen_text=client.config.mijn_uitkeringen_text|ckeditor_content|safe %}
+                    {{ mijn_uitkeringen_text }}
+                {% endblocktrans %}
+            <p>
+
+            {% block report %}{% endblock report %}
+
+        {% endrender_column %}
+    {% endrender_grid %}
+{% endblock content %}

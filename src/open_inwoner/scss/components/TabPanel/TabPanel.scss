@@ -90,7 +90,9 @@
   }
 
   .tab__content,
-  .tab__content.active {
+  .tab__content.active,
+  .tab__contents,
+  .tab__contents.active {
     margin: 1em;
     scroll-margin-top: 150px;
   }
