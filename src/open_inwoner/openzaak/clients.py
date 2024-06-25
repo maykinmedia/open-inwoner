@@ -1,6 +1,7 @@
 import base64
 import logging
 from datetime import date
+from typing import Literal, Mapping, Type, TypeAlias
 
 from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -12,6 +13,7 @@ from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.catalogi import Catalogus
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 from zgw_consumers.client import build_client
+from zgw_consumers.models import Service
 from zgw_consumers.service import pagination_helper
 
 from open_inwoner.openzaak.api_models import InformatieObject
@@ -38,7 +40,17 @@ CRS_HEADERS = {"Content-Crs": "EPSG:4326", "Accept-Crs": "EPSG:4326"}
 logger = logging.getLogger(__name__)
 
 
-class ZakenClient(APIClient):
+class ZgwAPIClient(APIClient):
+    """A client for interacting with ZGW services."""
+
+    configured_from: Service
+
+    def __init__(self, *args, **kwargs):
+        self.configured_from = kwargs.pop("configured_from")
+        super().__init__(*args, **kwargs)
+
+
+class ZakenClient(ZgwAPIClient):
     def fetch_cases(
         self,
         user_bsn: str | None = None,
@@ -423,7 +435,7 @@ class ZakenClient(APIClient):
         return data
 
 
-class CatalogiClient(APIClient):
+class CatalogiClient(ZgwAPIClient):
     # not cached because only used by tools,
     # and because caching (stale) listings can break lookups
     def fetch_status_types_no_cache(self, case_type_url: str) -> list[StatusType]:
@@ -582,7 +594,7 @@ class CatalogiClient(APIClient):
         return information_object_type
 
 
-class DocumentenClient(APIClient):
+class DocumentenClient(ZgwAPIClient):
     def _fetch_single_information_object(
         self, *, url: str | None = None, uuid: str | None = None
     ) -> InformatieObject | None:
@@ -644,7 +656,7 @@ class DocumentenClient(APIClient):
         return data
 
 
-class FormClient(APIClient):
+class FormClient(ZgwAPIClient):
     def fetch_open_submissions(self, bsn: str) -> list[OpenSubmission]:
         if not bsn:
             return []
@@ -680,9 +692,15 @@ class FormClient(APIClient):
         return results
 
 
-def _build_zgw_client(type_) -> APIClient | None:
+ZgwClientType = Literal["zaak", "catalogi", "document", "form"]
+ZgwClientFactoryReturn: TypeAlias = (
+    ZakenClient | CatalogiClient | DocumentenClient | FormClient
+)
+
+
+def _build_zgw_client(type_: ZgwClientType) -> ZgwClientFactoryReturn | None:
     config = OpenZaakConfig.get_solo()
-    services_to_client_mapping = {
+    services_to_client_mapping: Mapping[ZgwClientType, Type[ZgwClientFactoryReturn]] = {
         "zaak": ZakenClient,
         "catalogi": CatalogiClient,
         "document": DocumentenClient,
@@ -691,7 +709,9 @@ def _build_zgw_client(type_) -> APIClient | None:
     if client_class := services_to_client_mapping.get(type_):
         service = getattr(config, f"{type_}_service")
         if service:
-            client = build_client(service, client_factory=client_class)
+            client = build_client(
+                service, client_factory=client_class, configured_from=service
+            )
             return client
 
     logger.warning("no service defined for %s", type_)

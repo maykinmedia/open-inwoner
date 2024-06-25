@@ -16,9 +16,27 @@ CLASS_ADDERS = [
     ("p", "utrecht-paragraph"),
     ("a", "link link--secondary"),
     ("table", "table table--content"),
+    ("thead", "table__heading"),
+    ("tbody", "table__body"),
+    ("tr", "table__row"),
     ("th", "table__header"),
     ("td", "table__item"),
 ]
+
+
+def convert_first_row_to_th(html_tables):
+    """
+    Converts the first row of all tables from td to th.
+    """
+    for table in html_tables.find_all("table"):
+        first_row = table.find("tr")
+        if first_row:
+            for cell in first_row.find_all("td"):
+                th = html_tables.new_tag("th")
+                th.string = cell.string
+                th.attrs = cell.attrs
+                th["class"] = "table__header"
+                cell.replace_with(th)
 
 
 def get_rendered_content(content: str) -> str:
@@ -49,6 +67,8 @@ def get_product_rendered_content(product):
     content = product.content.replace("\\<", "<")
     html = md.convert(content)
     soup = BeautifulSoup(html, "html.parser")
+
+    convert_first_row_to_th(soup)
 
     for tag, class_name in CLASS_ADDERS:
         for element in soup.find_all(tag):

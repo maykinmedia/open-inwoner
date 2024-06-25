@@ -1,7 +1,7 @@
-from open_inwoner.utils.tests.test_migrations import TestMigrations
+from open_inwoner.utils.tests.test_migrations import TestSuccessfulMigrations
 
 
-class APIRootMigrationTest(TestMigrations):
+class APIRootMigrationTest(TestSuccessfulMigrations):
     migrate_from = "0002_alter_kvkconfig_api_root"
     migrate_to = "0003_api_root"
     app = "kvk"

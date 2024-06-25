@@ -149,7 +149,8 @@
                 {% endif %}
                 {% if footer.logo %}
                     <div class="footer__logo">
-                        {% include "components/Logo/Logo.html" with src=footer.logo.url alt=footer.logo_alt href=footer.logo_url svg_height=60 only %}
+                    {% firstof config.footer_logo.default_alt_text config.name as logo_alt_text %}
+                        {% include "components/Logo/Logo.html" with src=footer.logo.url alt=logo_alt_text href=footer.logo_url svg_height=60 only %}
                     </div>
                 {% endif %}
             </div>

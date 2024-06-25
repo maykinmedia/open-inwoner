@@ -4,6 +4,7 @@ from simple_certmanager.constants import CertificateTypes
 from simple_certmanager.models import Certificate
 from zgw_consumers.api_models.base import factory as zwg_factory
 from zgw_consumers.api_models.constants import RolOmschrijving
+from zgw_consumers.constants import APITypes
 from zgw_consumers.models import Service
 from zgw_consumers.test import generate_oas_component
 
@@ -11,11 +12,13 @@ from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.openzaak.api_models import Notification, Rol
 from open_inwoner.openzaak.models import (
     CatalogusConfig,
+    OpenZaakConfig,
     UserCaseInfoObjectNotification,
     UserCaseStatusNotification,
     ZaakTypeConfig,
     ZaakTypeInformatieObjectTypeConfig,
     ZaakTypeStatusTypeConfig,
+    ZGWApiGroupConfig,
 )
 
 
@@ -25,6 +28,18 @@ class ServiceFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = Service
+
+
+class ZGWApiGroupConfigFactory(factory.django.DjangoModelFactory):
+    name = factory.Sequence(lambda n: f"API-{n}")
+    open_zaak_config = factory.LazyAttribute(lambda _: OpenZaakConfig.get_solo())
+    zrc_service = factory.SubFactory(ServiceFactory, api_type=APITypes.zrc)
+    drc_service = factory.SubFactory(ServiceFactory, api_type=APITypes.drc)
+    ztc_service = factory.SubFactory(ServiceFactory, api_type=APITypes.ztc)
+    form_service = factory.SubFactory(ServiceFactory, api_type=APITypes.orc)
+
+    class Meta:
+        model = ZGWApiGroupConfig
 
 
 class CertificateFactory(factory.django.DjangoModelFactory):
@@ -59,6 +74,7 @@ class CatalogusConfigFactory(factory.django.DjangoModelFactory):
     url = factory.Faker("url")
     domein = factory.Faker("pystr", max_chars=5)
     rsin = factory.Faker("pystr", max_chars=9)
+    service = factory.SubFactory(ServiceFactory, api_type=APITypes.ztc)
 
     class Meta:
         model = CatalogusConfig

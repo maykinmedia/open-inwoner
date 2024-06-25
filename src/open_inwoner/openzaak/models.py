@@ -2,7 +2,7 @@ import warnings
 from datetime import timedelta
 
 from django.db import models, transaction
-from django.db.models import Q, UniqueConstraint
+from django.db.models import UniqueConstraint
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -293,6 +293,14 @@ class CatalogusConfig(models.Model):
         verbose_name=_("RSIN"),
         max_length=9,
     )
+    service = models.ForeignKey(
+        "zgw_consumers.Service",
+        verbose_name=_("Catalogus API"),
+        on_delete=models.PROTECT,
+        limit_choices_to={"api_type": APITypes.ztc},
+        related_name="catalogus_configs",
+        null=False,
+    )
 
     class Meta:
         ordering = ("domein", "rsin")
@@ -311,7 +319,6 @@ class ZaakTypeConfig(models.Model):
     catalogus = models.ForeignKey(
         "openzaak.CatalogusConfig",
         on_delete=models.CASCADE,
-        null=True,
     )
 
     identificatie = models.CharField(
@@ -381,12 +388,6 @@ class ZaakTypeConfig(models.Model):
             UniqueConstraint(
                 name="unique_identificatie_in_catalogus",
                 fields=["catalogus", "identificatie"],
-                condition=Q(catalogus__isnull=False),
-            ),
-            UniqueConstraint(
-                name="unique_identificatie_without_catalogus",
-                fields=["identificatie"],
-                condition=Q(catalogus__isnull=True),
             ),
         ]
 
