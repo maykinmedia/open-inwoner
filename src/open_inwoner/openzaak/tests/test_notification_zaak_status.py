@@ -281,7 +281,6 @@ class StatusNotificationHandlerTestCase(
         oz_config.save()
 
         data = MockAPIData()
-        data.zaak_type["catalogus"] = None
         data.install_mocks(m)
 
         handle_zaken_notification(data.status_notification)
@@ -370,46 +369,6 @@ class StatusNotificationHandlerTestCase(
             level=logging.INFO,
         )
 
-    def test_status_handle_notification_when_skip_informeren_is_set_and_zaaktypeconfig_is_found_from_zaaktype_none_catalog(
-        self, m, mock_handle: Mock
-    ):
-        oz_config = OpenZaakConfig.get_solo()
-        oz_config.skip_notification_statustype_informeren = True
-        oz_config.save()
-
-        data = MockAPIData()
-        data.zaak_type["catalogus"] = None
-        data.install_mocks(m)
-
-        ztc = ZaakTypeConfigFactory.create(
-            catalogus=None,
-            identificatie=data.zaak_type["identificatie"],
-            # set this to notify
-            notify_status_changes=True,
-        )
-        ZaakTypeStatusTypeConfigFactory.create(
-            zaaktype_config=ztc,
-            omschrijving=data.status_type_final["omschrijving"],
-            statustype_url=data.status_type_final["url"],
-            notify_status_change=True,
-        )
-
-        handle_zaken_notification(data.status_notification)
-
-        mock_handle.assert_called_once()
-
-        # check call arguments
-        args = mock_handle.call_args.args
-        self.assertEqual(args[0], data.user_initiator)
-        self.assertEqual(args[1].url, data.zaak["url"])
-        self.assertEqual(args[2].url, data.status_final["url"])
-
-        self.assertTimelineLog(
-            "accepted status notification: attempt informing users ",
-            lookup=Lookups.startswith,
-            level=logging.INFO,
-        )
-
     def test_status_bails_when_skip_informeren_is_set_and_zaaktypeconfig_is_found_but_not_set(
         self, m, mock_handle: Mock
     ):
@@ -466,7 +425,6 @@ class StatusNotificationHandlerTestCase(
         oz_config.save()
 
         data = MockAPIData()
-        data.zaak_type["catalogus"] = None
         data.install_mocks(m)
 
         user = data.user_initiator
@@ -474,7 +432,6 @@ class StatusNotificationHandlerTestCase(
         user.save()
 
         ztc = ZaakTypeConfigFactory.create(
-            catalogus=None,
             identificatie=data.zaak_type["identificatie"],
             # set this to notify
             notify_status_changes=True,
@@ -498,7 +455,6 @@ class StatusNotificationHandlerTestCase(
         oz_config.save()
 
         data = MockAPIData()
-        data.zaak_type["catalogus"] = None
         data.install_mocks(m)
 
         user = data.user_initiator
@@ -506,9 +462,9 @@ class StatusNotificationHandlerTestCase(
         user.save()
 
         ztc = ZaakTypeConfigFactory.create(
-            catalogus=None,
             identificatie=data.zaak_type["identificatie"],
             notify_status_changes=True,
+            catalogus__url=data.zaak_type["catalogus"],
         )
         ZaakTypeStatusTypeConfigFactory.create(
             zaaktype_config=ztc,
@@ -528,7 +484,6 @@ class StatusNotificationHandlerTestCase(
         oz_config.save()
 
         data = MockAPIData()
-        data.zaak_type["catalogus"] = None
         data.install_mocks(m)
 
         user = data.user_initiator
@@ -536,7 +491,6 @@ class StatusNotificationHandlerTestCase(
         user.save()
 
         ztc = ZaakTypeConfigFactory.create(
-            catalogus=None,
             identificatie=data.zaak_type["identificatie"],
             # set this to notify
             notify_status_changes=True,
@@ -578,7 +532,6 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         status_final.statustype = factory(StatusType, data.status_type_final)
 
         ztc = ZaakTypeConfigFactory.create(
-            catalogus=None,
             identificatie=data.zaak_type["identificatie"],
             # set this to notify
             notify_status_changes=True,
@@ -710,7 +663,6 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         status.statustype = factory(StatusType, data.status_type_final)
 
         ztc = ZaakTypeConfigFactory.create(
-            catalogus=None,
             identificatie=data.zaak_type["identificatie"],
             # set this to notify
             notify_status_changes=True,
