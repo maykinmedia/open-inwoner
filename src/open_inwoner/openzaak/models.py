@@ -65,7 +65,8 @@ class ZGWApiGroupConfig(models.Model):
         on_delete=models.PROTECT,
         limit_choices_to={"api_type": APITypes.zrc},
         related_name="zgwset_zrc_config",
-        null=True,
+        null=False,
+        blank=False,
     )
     drc_service = models.ForeignKey(
         "zgw_consumers.Service",
@@ -73,7 +74,8 @@ class ZGWApiGroupConfig(models.Model):
         on_delete=models.PROTECT,
         limit_choices_to={"api_type": APITypes.drc},
         related_name="zgwset_drc_config",
-        null=True,
+        null=False,
+        blank=False,
     )
     ztc_service = models.ForeignKey(
         "zgw_consumers.Service",
@@ -81,7 +83,8 @@ class ZGWApiGroupConfig(models.Model):
         on_delete=models.PROTECT,
         limit_choices_to={"api_type": APITypes.ztc},
         related_name="zgwset_ztc_config",
-        null=True,
+        null=False,
+        blank=False,
     )
     form_service = models.OneToOneField(
         "zgw_consumers.Service",
@@ -90,6 +93,7 @@ class ZGWApiGroupConfig(models.Model):
         limit_choices_to={"api_type": APITypes.orc},
         related_name="zgwset_orc_form_config",
         null=True,
+        blank=True,
     )
 
     class Meta:
@@ -144,7 +148,10 @@ class OpenZaakConfig(SingletonModel):
 
         with transaction.atomic():
             if self.default_zgw_api_group is None:
-                ZGWApiGroupConfig.objects.create(open_zaak_config=self)
+                raise RuntimeError(
+                    "You must define a default set of ZGW APIs before you can access them "
+                    "using the legacy `*_client` getters/setters."
+                )
 
             default_group = self.default_zgw_api_group
             setattr(default_group, field, service)

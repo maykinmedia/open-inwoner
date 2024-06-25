@@ -16,7 +16,7 @@ from zgw_consumers.api_models.constants import (
     RolTypes,
     VertrouwelijkheidsAanduidingen,
 )
-from zgw_consumers.constants import APITypes, AuthTypes
+from zgw_consumers.constants import AuthTypes
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
@@ -27,9 +27,9 @@ from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 from ..models import OpenZaakConfig
 from .factories import (
     CertificateFactory,
-    ServiceFactory,
     ZaakTypeConfigFactory,
     ZaakTypeInformatieObjectTypeConfigFactory,
+    ZGWApiGroupConfigFactory,
 )
 from .helpers import generate_oas_component_cached
 from .shared import CATALOGI_ROOT, DOCUMENTEN_ROOT, ZAKEN_ROOT
@@ -54,21 +54,15 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
         self.user = UserFactory(
             login_type=LoginTypeChoices.digid, bsn="900222086", email="johm@smith.nl"
         )
-        self.config = OpenZaakConfig.get_solo()
-        self.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
-        self.config.zaak_service = self.zaak_service
-        self.config.save()
+        self.api_group = ZGWApiGroupConfigFactory(
+            ztc_service__api_root=CATALOGI_ROOT,
+            zrc_service__api_root=ZAKEN_ROOT,
+            drc_service__api_root=DOCUMENTEN_ROOT,
+            form_service=None,
+        )
         self.zaken_client = build_zaken_client()
 
-        self.config.zaak_service = self.zaak_service
-        self.catalogi_service = ServiceFactory(
-            api_root=CATALOGI_ROOT, api_type=APITypes.ztc
-        )
-        self.config.catalogi_service = self.catalogi_service
-        self.document_service = ServiceFactory(
-            api_root=DOCUMENTEN_ROOT, api_type=APITypes.drc
-        )
-        self.config.document_service = self.document_service
+        self.config = OpenZaakConfig.get_solo()
         self.config.document_max_confidentiality = (
             VertrouwelijkheidsAanduidingen.beperkt_openbaar
         )
@@ -377,13 +371,13 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
         server = CertificateFactory(label="server", cert_only=True)
         client = CertificateFactory(label="client", key_pair=True)
 
-        self.document_service.server_certificate = server
-        self.document_service.client_certificate = client
+        self.api_group.drc_service.server_certificate = server
+        self.api_group.drc_service.client_certificate = client
 
-        self.document_service.client_id = "abc123"
-        self.document_service.secret = "secret"
-        self.document_service.auth_type = AuthTypes.zgw
-        self.document_service.save()
+        self.api_group.drc_service.client_id = "abc123"
+        self.api_group.drc_service.secret = "secret"
+        self.api_group.drc_service.auth_type = AuthTypes.zgw
+        self.api_group.drc_service.save()
 
         m.get(self.informatie_object["inhoud"], content=self.informatie_object_content)
 

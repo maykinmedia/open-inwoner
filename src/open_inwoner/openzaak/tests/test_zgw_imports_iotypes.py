@@ -3,7 +3,6 @@ from uuid import UUID
 from django.test import TestCase
 
 import requests_mock
-from zgw_consumers.constants import APITypes
 
 from open_inwoner.openzaak.models import (
     OpenZaakConfig,
@@ -11,8 +10,8 @@ from open_inwoner.openzaak.models import (
 )
 from open_inwoner.openzaak.tests.factories import (
     CatalogusConfigFactory,
-    ServiceFactory,
     ZaakTypeConfigFactory,
+    ZGWApiGroupConfigFactory,
 )
 from open_inwoner.openzaak.tests.helpers import generate_oas_component_cached
 from open_inwoner.openzaak.tests.shared import CATALOGI_ROOT
@@ -267,11 +266,10 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
     def setUpTestData(cls):
         super().setUpTestData()
 
-        cls.config = OpenZaakConfig.get_solo()
-        cls.config.catalogi_service = ServiceFactory(
-            api_root=CATALOGI_ROOT, api_type=APITypes.ztc
+        ZGWApiGroupConfigFactory(
+            ztc_service__api_root=CATALOGI_ROOT,
+            form_service=None,
         )
-        cls.config.save()
 
     def test_import_zaaktype_informatieobjecttype_configs_with_catalog(self, m):
         data = InformationObjectTypeMockData().install_mocks(m)

@@ -9,14 +9,13 @@ import requests_mock
 from freezegun import freeze_time
 from furl import furl
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
-from zgw_consumers.constants import APITypes
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
 from ..models import OpenZaakConfig
-from .factories import ServiceFactory
+from .factories import ZGWApiGroupConfigFactory
 from .helpers import generate_oas_component_cached
 from .shared import CATALOGI_ROOT, ZAKEN_ROOT
 
@@ -32,19 +31,20 @@ class OpenCaseListCacheTests(ClearCachesMixin, TransactionTestCase):
         self.user = UserFactory(
             login_type=LoginTypeChoices.digid, bsn="900222086", email="johm@smith.nl"
         )
-        # services
-        self.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
-        self.catalogi_service = ServiceFactory(
-            api_root=CATALOGI_ROOT, api_type=APITypes.ztc
-        )
+
         # openzaak config
         self.config = OpenZaakConfig.get_solo()
-        self.config.zaak_service = self.zaak_service
-        self.config.catalogi_service = self.catalogi_service
         self.config.zaak_max_confidentiality = (
             VertrouwelijkheidsAanduidingen.beperkt_openbaar
         )
         self.config.save()
+
+        # services
+        ZGWApiGroupConfigFactory(
+            ztc_service__api_root=CATALOGI_ROOT,
+            zrc_service__api_root=ZAKEN_ROOT,
+            form_service=None,
+        )
 
         self.zaaktype = generate_oas_component_cached(
             "ztc",
