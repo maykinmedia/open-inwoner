@@ -314,6 +314,13 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             klant=self.klant["url"],
             contactmoment=self.contactmoment["url"],
         )
+        self.object_contactmoment = generate_oas_component_cached(
+            "cmc",
+            "schemas/Objectcontactmoment",
+            url=f"{CONTACTMOMENTEN_ROOT}contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+            contactmoment=self.contactmoment["url"],
+            object=self.zaak["url"],
+        )
         self.matcher_create_contactmoment = m.post(
             f"{CONTACTMOMENTEN_ROOT}contactmomenten",
             json=self.contactmoment,
@@ -324,9 +331,15 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             json=self.klant_contactmoment,
             status_code=201,
         )
+        self.matcher_create_objectcontactmoment = m.post(
+            f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten",
+            json=self.object_contactmoment,
+            status_code=201,
+        )
         self.extra_matchers = [
             self.matcher_create_contactmoment,
             self.matcher_create_klantcontactmoment,
+            self.matcher_create_objectcontactmoment,
         ]
 
         m.get(
@@ -465,13 +478,24 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             payload,
             {
                 "bronorganisatie": "123456788",
-                "kanaal": "Internet",
+                "kanaal": "contactformulier",
                 "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
                 "onderwerp": "afdeling-x",
                 "tekst": "Sample text",
                 "type": "Melding",
             },
         )
+
+        payload = self.matcher_create_objectcontactmoment.request_history[0].json()
+        self.assertEqual(
+            payload,
+            {
+                "contactmoment": self.contactmoment["url"],
+                "object": self.zaak["url"],
+                "objectType": "zaak",
+            },
+        )
+
         mock_send_confirm.assert_called_once_with("foo@example.com", ANY)
 
     def test_form_success_with_api_eherkenning_user(
@@ -533,7 +557,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
                     payload,
                     {
                         "bronorganisatie": "123456788",
-                        "kanaal": "Internet",
+                        "kanaal": "contactformulier",
                         "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
                         "onderwerp": "afdeling-x",
                         "tekst": "Sample text",
