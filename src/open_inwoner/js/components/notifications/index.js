@@ -25,10 +25,12 @@ export class Notification {
   }
 
   /**
-   * Scrolls to the notification content.
+   * Scrolls to the notification content and sets focus.
    */
   scrollToNotification() {
-    const notificationContent = document.querySelector('.notification__content')
+    const notificationContent = this.node.querySelector(
+      '.notification__content'
+    )
 
     if (notificationContent) {
       // If errors are present, scroll and trigger the opened state
@@ -36,6 +38,8 @@ export class Notification {
         block: 'center',
         behavior: 'smooth',
       })
+      // Set focus for screen readers
+      notificationContent.focus()
     }
   }
 

@@ -594,7 +594,7 @@ class CasesPlaywrightTests(
         upload_form = page.locator("#document-upload")
         file_input = upload_form.get_by_label("Sleep of selecteer bestanden")
         submit_button = upload_form.get_by_role("button", name=_("Upload documenten"))
-        notification_list = page.get_by_role("alert").get_by_role("list")
+        notification_list = page.locator(".notification").get_by_role("list")
         notification_list_items = notification_list.get_by_role("listitem")
         file_list = page.get_by_role("list").last
         file_list_items = file_list.get_by_role("listitem")
