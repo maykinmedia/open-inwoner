@@ -5,6 +5,7 @@ from unittest.mock import patch
 from pyquery import PyQuery
 
 from ..client import UitkeringClient
+from ..models import SSDConfig
 from ..service.uitkering import (
     UitkeringsSpecificatieInfoResponse as UitkeringInfoResponse,
 )
@@ -31,9 +32,21 @@ class UitkeringTemplateTest(TestCase):
             uitkering_path, UITKERING_INFO_RESPONSE_NODE, UitkeringInfoResponse
         )
 
+        config = SSDConfig.get_solo()
+        config.maandspecificatie_pdf_comments = "Lorem ipsum dolor sit amet..."
+        config.save()
+
         uitkeringen = get_uitkeringen(None)
 
-        html = render_html(ssd_client.html_template, context={"reports": uitkeringen})
+        html = render_html(
+            ssd_client.html_template,
+            context={
+                "reports": uitkeringen,
+                "comments": config.maandspecificatie_pdf_comments,
+            },
+        )
+
+        self.assertIn("Lorem ipsum dolor sit amet...", html)
 
         doc = PyQuery(html)
 
