@@ -1,5 +1,6 @@
 import warnings
 from datetime import timedelta
+from urllib.parse import urlparse
 
 from django.db import models, transaction
 from django.db.models import UniqueConstraint
@@ -306,7 +307,8 @@ class CatalogusConfig(models.Model):
         ordering = ("domein", "rsin")
 
     def __str__(self):
-        return f"{self.domein} - {self.rsin}"
+        service_netloc = urlparse(self.service.api_root).netloc
+        return f"{self.domein} - {self.rsin} [{service_netloc}]"
 
 
 class ZaakTypeConfig(models.Model):
