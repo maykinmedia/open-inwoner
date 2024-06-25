@@ -12,6 +12,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential \
         git \
         libpq-dev \
+        libxml2-dev \
+        libxmlsec1-dev \
         libxmlsec1-openssl \
         libgdk-pixbuf2.0-0 \
         libffi-dev \
@@ -69,6 +71,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-reco
         libgdal32 \
         libgeos-c1v5 \
         libproj25 \
+        libxmlsec1-dev \
         libxmlsec1-openssl \
         libgdk-pixbuf2.0-0 \
         libffi-dev \
