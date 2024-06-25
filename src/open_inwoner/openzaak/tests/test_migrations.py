@@ -172,3 +172,32 @@ class TestMakeZaakTypeConfigCatalogusRequired(TestFailingMigrations):
             " This field is now required: please manually update all the affected rows or re-sync"
             " your ZGW objects to ensure the field is included.",
         )
+
+
+class TestAllServicesExceptFormsRequiredForZGWApiGroup(TestFailingMigrations):
+    migrate_from = "0053_zaaktypeconfig_catalogus_is_required"
+    migrate_to = "0054_zgw_api_group_requires_most_services"
+    app = "openzaak"
+
+    def setUpBeforeMigration(self, apps):
+        OpenZaakConfig = apps.get_model("openzaak", "OpenZaakConfig")
+        config = OpenZaakConfig.objects.create()
+        ZGWApiGroupConfig = apps.get_model("openzaak", "ZGWApiGroupConfig")
+        ZGWApiGroupConfig.objects.create(
+            open_zaak_config=config,
+            zrc_service=None,
+            drc_service=None,
+            ztc_service=None,
+            form_service=None,
+        )
+
+    def test_migration_0053_to_0054_raises_with_descriptive_exception_message(self):
+        with self.assertRaises(DataError) as cm:
+            self.attempt_migration()
+
+        self.assertEqual(
+            str(cm.exception),
+            "Your database contains 1 ZGWApiGroupConfig row(s) with missing ztc, drc,"
+            " or ztc service fields. All these fields are now required, with the exception of"
+            " your form field. Please manually update all the affected rows",
+        )
