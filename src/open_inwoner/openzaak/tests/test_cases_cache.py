@@ -16,7 +16,7 @@ from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
 from ..models import OpenZaakConfig
-from .factories import ServiceFactory
+from .factories import ServiceFactory, ZGWApiGroupConfigFactory
 from .helpers import generate_oas_component_cached
 from .shared import CATALOGI_ROOT, ZAKEN_ROOT
 
@@ -32,19 +32,23 @@ class OpenCaseListCacheTests(ClearCachesMixin, TransactionTestCase):
         self.user = UserFactory(
             login_type=LoginTypeChoices.digid, bsn="900222086", email="johm@smith.nl"
         )
+
+        # openzaak config
+        self.config = OpenZaakConfig.get_solo()
+        self.config.zaak_max_confidentiality = (
+            VertrouwelijkheidsAanduidingen.beperkt_openbaar
+        )
+        self.config.save()
         # services
         self.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
         self.catalogi_service = ServiceFactory(
             api_root=CATALOGI_ROOT, api_type=APITypes.ztc
         )
-        # openzaak config
-        self.config = OpenZaakConfig.get_solo()
-        self.config.zaak_service = self.zaak_service
-        self.config.catalogi_service = self.catalogi_service
-        self.config.zaak_max_confidentiality = (
-            VertrouwelijkheidsAanduidingen.beperkt_openbaar
+        ZGWApiGroupConfigFactory(
+            ztc_service=self.catalogi_service,
+            zrc_service=self.zaak_service,
+            form_service=None,
         )
-        self.config.save()
 
         self.zaaktype = generate_oas_component_cached(
             "ztc",
