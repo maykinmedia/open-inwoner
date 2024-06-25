@@ -6630,8 +6630,6 @@ msgstr ""
 "ingevuld) met deze persoon."
 
 #: templates/pages/profile/contacts/list.html:24
-#, fuzzy, python-format
-#| msgid "%(full_name)s wilt u toevoegen als contactpersoon."
 msgid "%(full_name)s wil u toevoegen als contactpersoon."
 msgstr "%(full_name)s wilt u toevoegen als contactpersoon."
 
@@ -7317,30 +7315,3 @@ msgstr "Het KVK nummer moet uit 8 cijfers bestaan."
 #: utils/validators.py:193
 msgid "Het KVK nummer moet numeriek zijn."
 msgstr "Het KVK nummer moet numeriek zijn."
-
-#~ msgid "Registreer"
-#~ msgstr "Registreer"
-
-#~ msgid "Ontvangstdatum: "
-#~ msgstr "Ontvangstdatum:"
-
-#~ msgid "List ID"
-#~ msgstr "Lijst ID"
-
-#~ msgid "Unique ID of the list in the API"
-#~ msgstr "Unieke ID van de nieuwsbrievenlijst in de API"
-
-#~ msgid "Member ID"
-#~ msgstr "Gebruikers ID"
-
-#~ msgid "Unique ID of the member for this list in the API"
-#~ msgstr "Unieke ID van het lid voor deze lijst in de API"
-
-#~ msgid "Beijk nieuwsbrieven"
-#~ msgstr "Bekijk nieuwsbrieven"
-
-#~ msgid "Weet u zeker dat u uw account wilt verwijderen?"
-#~ msgstr "Weet u zeker dat u uw account wilt verwijderen?"
-
-#~ msgid "Vink nieuwsbrieven aan en druk om opslaan om je erop te abonneren"
-#~ msgstr "Vink nieuwsbrieven aan en druk om opslaan om je erop te abonneren"
