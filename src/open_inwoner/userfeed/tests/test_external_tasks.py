@@ -5,12 +5,11 @@ from django.utils.translation import gettext as _
 
 import requests_mock
 from requests import RequestException
-from zgw_consumers.test.factories import ServiceFactory
 
 from open_inwoner.accounts.tests.factories import DigidUserFactory
 from open_inwoner.cms.plugins.cms_plugins import UserFeedPlugin
 from open_inwoner.cms.tests import cms_tools
-from open_inwoner.openzaak.models import OpenZaakConfig
+from open_inwoner.openzaak.tests.factories import ZGWApiGroupConfigFactory
 from open_inwoner.openzaak.tests.mocks import ESuiteTaskData
 from open_inwoner.openzaak.tests.shared import FORMS_ROOT
 from open_inwoner.userfeed.choices import FeedItemType
@@ -25,9 +24,10 @@ class UserFeedExternalTasksTestCase(TestCase):
 
         self.user = DigidUserFactory.create(bsn="111111110")
 
-        self.config = OpenZaakConfig.get_solo()
-        self.config.form_service = ServiceFactory(api_root=FORMS_ROOT)
-        self.config.save()
+        # services
+        ZGWApiGroupConfigFactory(
+            form_service__api_root=FORMS_ROOT,
+        )
 
     def test_userfeed_plugin_render_triggers_update_open_tasks(self):
         FeedItemDataFactory.create(

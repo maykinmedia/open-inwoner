@@ -3,13 +3,15 @@ from zgw_consumers.api_models.constants import (
     RolTypes,
     VertrouwelijkheidsAanduidingen,
 )
-from zgw_consumers.constants import APITypes
 
 from open_inwoner.accounts.tests.factories import (
     DigidUserFactory,
     eHerkenningUserFactory,
 )
-from open_inwoner.openzaak.tests.factories import NotificationFactory, ServiceFactory
+from open_inwoner.openzaak.tests.factories import (
+    NotificationFactory,
+    ZGWApiGroupConfigFactory,
+)
 from open_inwoner.utils.test import paginated_response
 
 from ..models import OpenZaakConfig
@@ -270,12 +272,11 @@ class MockAPIData:
     def setUpServices(cls):
         # openzaak config
         config = OpenZaakConfig.get_solo()
-        config.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
-        config.catalogi_service = ServiceFactory(
-            api_root=CATALOGI_ROOT, api_type=APITypes.ztc
-        )
-        config.document_service = ServiceFactory(
-            api_root=DOCUMENTEN_ROOT, api_type=APITypes.drc
+        ZGWApiGroupConfigFactory(
+            ztc_service__api_root=CATALOGI_ROOT,
+            zrc_service__api_root=ZAKEN_ROOT,
+            drc_service__api_root=DOCUMENTEN_ROOT,
+            form_service=None,
         )
         config.zaak_max_confidentiality = VertrouwelijkheidsAanduidingen.openbaar
         config.save()

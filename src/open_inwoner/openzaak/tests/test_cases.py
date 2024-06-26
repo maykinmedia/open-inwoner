@@ -12,7 +12,6 @@ from django_webtest import WebTest
 from furl import furl
 from timeline_logger.models import TimelineLog
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
-from zgw_consumers.constants import APITypes
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory, eHerkenningUserFactory
@@ -31,9 +30,9 @@ from ..constants import StatusIndicators
 from ..models import OpenZaakConfig
 from .factories import (
     CatalogusConfigFactory,
-    ServiceFactory,
     ZaakTypeConfigFactory,
     ZaakTypeStatusTypeConfigFactory,
+    ZGWApiGroupConfigFactory,
 )
 from .helpers import generate_oas_component_cached
 from .mocks import ESuiteSubmissionData
@@ -56,15 +55,11 @@ class CaseListAccessTests(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         super().setUp()
 
         # services
-        self.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
-        self.catalogi_service = ServiceFactory(
-            api_root=CATALOGI_ROOT, api_type=APITypes.ztc
+        ZGWApiGroupConfigFactory(
+            ztc_service__api_root=CATALOGI_ROOT,
+            zrc_service__api_root=ZAKEN_ROOT,
+            form_service=None,
         )
-        # openzaak config
-        self.config = OpenZaakConfig.get_solo()
-        self.config.zaak_service = self.zaak_service
-        self.config.catalogi_service = self.catalogi_service
-        self.config.save()
 
     def test_user_access_is_forbidden_when_not_logged_in_via_digid(self):
         # User's bsn is None when logged in by email (default method)
@@ -90,19 +85,6 @@ class CaseListAccessTests(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         )
 
         self.app.get(self.inner_url, user=user, status=400)
-
-    def test_missing_zaak_client_returns_empty_list(self):
-        user = UserFactory(
-            login_type=LoginTypeChoices.digid, bsn="900222086", email="john@smith.nl"
-        )
-        self.config.zaak_service = None
-        self.config.save()
-
-        response = self.app.get(
-            self.inner_url, user=user, headers={"HX-Request": "true"}
-        )
-
-        self.assertListEqual(response.context.get("cases"), [])
 
     @requests_mock.Mocker()
     def test_no_cases_are_retrieved_when_http_404(self, m):
@@ -157,19 +139,20 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
             rsin="123456789",
             login_type=LoginTypeChoices.eherkenning,
         )
-        # services
-        self.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
-        self.catalogi_service = ServiceFactory(
-            api_root=CATALOGI_ROOT, api_type=APITypes.ztc
-        )
+
         # openzaak config
         self.config = OpenZaakConfig.get_solo()
-        self.config.zaak_service = self.zaak_service
-        self.config.catalogi_service = self.catalogi_service
         self.config.zaak_max_confidentiality = (
             VertrouwelijkheidsAanduidingen.beperkt_openbaar
         )
         self.config.save()
+
+        # services
+        ZGWApiGroupConfigFactory(
+            ztc_service__api_root=CATALOGI_ROOT,
+            zrc_service__api_root=ZAKEN_ROOT,
+            form_service=None,
+        )
 
         self.zaaktype = generate_oas_component_cached(
             "ztc",
@@ -890,17 +873,26 @@ class CaseSubmissionTest(WebTest):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-
-        cls.config = OpenZaakConfig.get_solo()
-        cls.config.form_service = ServiceFactory(
-            api_root=FORMS_ROOT, api_type=APITypes.orc
+        ZGWApiGroupConfigFactory(
+            zrc_service__api_root=ZAKEN_ROOT,
+            form_service__api_root=FORMS_ROOT,
         )
-        cls.config.save()
 
     @requests_mock.Mocker()
     def test_case_submission(self, m):
         user = UserFactory(
             login_type=LoginTypeChoices.digid, bsn="900222086", email="john@smith.nl"
+        )
+        m.get(
+            furl(f"{ZAKEN_ROOT}zaken")
+            .add(
+                {
+                    "rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn": user.bsn,
+                    "maximaleVertrouwelijkheidaanduiding": VertrouwelijkheidsAanduidingen.openbaar,
+                }
+            )
+            .url,
+            json=paginated_response([]),
         )
 
         data = ESuiteSubmissionData().install_mocks(m)

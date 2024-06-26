@@ -6,12 +6,11 @@ from django.urls import reverse
 import requests_mock
 from furl import furl
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
-from zgw_consumers.constants import APITypes
 
 from open_inwoner.accounts.tests.factories import DigidUserFactory
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openzaak.models import OpenZaakConfig
-from open_inwoner.openzaak.tests.factories import ServiceFactory
+from open_inwoner.openzaak.tests.factories import ZGWApiGroupConfigFactory
 from open_inwoner.openzaak.tests.shared import CATALOGI_ROOT, ZAKEN_ROOT
 from open_inwoner.utils.test import paginated_response
 
@@ -28,15 +27,14 @@ class TestSearchView(ESMixin, TestCase):
 
         self.user = DigidUserFactory(bsn="900222086", email="johm@smith.nl")
         self.user2 = DigidUserFactory(bsn="123456782", email="jane@doe.nl")
+
         # services
-        self.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
-        self.catalogi_service = ServiceFactory(
-            api_root=CATALOGI_ROOT, api_type=APITypes.ztc
+        ZGWApiGroupConfigFactory(
+            zrc_service__api_root=ZAKEN_ROOT, ztc_service__api_root=CATALOGI_ROOT
         )
+
         # openzaak config
         self.config = OpenZaakConfig.get_solo()
-        self.config.zaak_service = self.zaak_service
-        self.config.catalogi_service = self.catalogi_service
         self.config.zaak_max_confidentiality = (
             VertrouwelijkheidsAanduidingen.beperkt_openbaar
         )
