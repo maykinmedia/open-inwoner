@@ -359,6 +359,7 @@ class SiteConfiguration(SingletonModel):
     )
 
     # email notifications
+    # TODO: remove/replace with notification fields below
     email_new_message = models.BooleanField(
         verbose_name=_("Send email about a new message"),
         default=True,
@@ -557,6 +558,28 @@ class SiteConfiguration(SingletonModel):
             "the OpenID Connect integration, navigate to `OpenID Connect configuration for eHerkenning` and enable it."
         ),
     )
+
+    # notifications
+    # TODO: for case notifications: create property that checks for existence of notificaties webhook;
+    #       or: fetch Subscription.objects.all(), check if there is a sub st. 'zaken' in sub.channels
+    #       also: add note here as well as in admin about this
+
+    # notifications_messages_enabled = models.BooleanField(
+    #     verbose_name=_("Enable notifications for messages"),
+    #     default=True,
+    #     help_text=_(
+    #         "If checked, the user will have the option to receive notifications for new messages "
+    #         "(on registration and in the profile)"
+    #     ),
+    # )
+    # notifications_plans_enabled = models.BooleanField(
+    #     verbose_name=_("Enable notifications for plans"),
+    #     default=True,
+    #     help_text=_(
+    #         "If checked, the user will have the option to receive notifications for plans + actions "
+    #         "(on registration and in the profile)"
+    #     ),
+    # )
 
     class Meta:
         verbose_name = _("Site Configuration")

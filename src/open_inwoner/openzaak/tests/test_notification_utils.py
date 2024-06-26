@@ -11,8 +11,8 @@ from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 from open_inwoner.accounts.tests.factories import DigidUserFactory, UserFactory
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openzaak.notifications import (
-    get_initiator_users_from_roles,
-    get_np_initiator_bsns_from_roles,
+    _get_initiator_users_from_roles,
+    _get_np_initiator_bsns_from_roles,
     send_case_update_email,
 )
 from open_inwoner.openzaak.tests.factories import generate_rol
@@ -136,7 +136,7 @@ class NotificationHandlerUtilsTestCase(TestCase):
             "100000001",
             "100000002",
         }
-        actual = get_np_initiator_bsns_from_roles(roles)
+        actual = _get_np_initiator_bsns_from_roles(roles)
         self.assertEqual(set(actual), expected)
 
     def test_get_initiator_users_from_roles(self):
@@ -207,7 +207,7 @@ class NotificationHandlerUtilsTestCase(TestCase):
         ]
 
         # verify we have a lot of Roles with initiators & bsn's
-        check_roles = get_np_initiator_bsns_from_roles(roles)
+        check_roles = _get_np_initiator_bsns_from_roles(roles)
         expected_roles = {
             user_1.bsn,
             user_2.bsn,
@@ -217,6 +217,6 @@ class NotificationHandlerUtilsTestCase(TestCase):
 
         # of all the Users with Roles only these match all conditions
         expected = {user_1, user_2}
-        actual = get_initiator_users_from_roles(roles)
+        actual = _get_initiator_users_from_roles(roles)
 
         self.assertEqual(set(actual), expected)

@@ -11,7 +11,7 @@ from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.openzaak.notifications import (
-    handle_zaakinformatieobject_update,
+    _handle_zaakinformatieobject_update,
     handle_zaken_notification,
 )
 from open_inwoner.openzaak.tests.factories import (
@@ -29,7 +29,7 @@ from .test_notification_data import MockAPIData
 
 @requests_mock.Mocker()
 @patch(
-    "open_inwoner.openzaak.notifications.handle_zaakinformatieobject_update",
+    "open_inwoner.openzaak.notifications._handle_zaakinformatieobject_update",
     autospec=True,
 )
 class ZaakInformatieObjectNotificationHandlerTestCase(
@@ -44,7 +44,7 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
         super().setUpTestData()
         MockAPIData.setUpServices()
 
-    def test_zio_handle_zaken_notification(self, m, mock_handle: Mock):
+    def test_ziohandle_zaken_notification(self, m, mock_handle: Mock):
         """
         happy-flow from valid data calls the (mocked) handle_zaakinformatieobject()
         """
@@ -70,7 +70,7 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
             level=logging.INFO,
         )
 
-    def test_zio_handle_zaken_notification_niet_natuurlijk_persoon_initiator(
+    def test_ziohandle_zaken_notification_niet_natuurlijk_persoon_initiator(
         self, m, mock_handle: Mock
     ):
         """
@@ -351,7 +351,7 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         zio = factory(ZaakInformatieObject, data.zaak_informatie_object)
         zio.informatieobject = factory(InformatieObject, data.informatie_object)
 
-        handle_zaakinformatieobject_update(user, case, zio)
+        _handle_zaakinformatieobject_update(user, case, zio)
 
         # not called because disabled notifications
         mock_send.assert_not_called()
@@ -384,7 +384,7 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         zio = factory(ZaakInformatieObject, data.zaak_informatie_object)
         zio.informatieobject = factory(InformatieObject, data.informatie_object)
 
-        handle_zaakinformatieobject_update(user, case, zio)
+        _handle_zaakinformatieobject_update(user, case, zio)
 
         # not called because bad email
         mock_send.assert_not_called()
@@ -416,7 +416,7 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         zio.informatieobject = factory(InformatieObject, data.informatie_object)
 
         # first call
-        handle_zaakinformatieobject_update(user, case, zio)
+        _handle_zaakinformatieobject_update(user, case, zio)
 
         mock_send.assert_called_once()
 
@@ -442,7 +442,7 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         )
 
         # second call with same case/status
-        handle_zaakinformatieobject_update(user, case, zio)
+        _handle_zaakinformatieobject_update(user, case, zio)
 
         # no duplicate mail for this user/case/status
         mock_send.assert_not_called()
@@ -455,7 +455,7 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
 
         # other user is fine
         other_user = UserFactory.create()
-        handle_zaakinformatieobject_update(other_user, case, zio)
+        _handle_zaakinformatieobject_update(other_user, case, zio)
 
         mock_send.assert_called_once()
 
@@ -474,7 +474,7 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
             InformatieObject, copy_with_new_uuid(data.informatie_object)
         )
 
-        handle_zaakinformatieobject_update(user, case, zio)
+        _handle_zaakinformatieobject_update(user, case, zio)
 
         # not sent because we already send to this user within the frequency
         mock_send.assert_not_called()
@@ -493,7 +493,7 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
             zio.informatieobject = factory(
                 InformatieObject, copy_with_new_uuid(data.informatie_object)
             )
-            handle_zaakinformatieobject_update(user, case, zio)
+            _handle_zaakinformatieobject_update(user, case, zio)
 
             # this one succeeds
             mock_send.assert_called_once()

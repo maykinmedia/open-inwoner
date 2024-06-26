@@ -669,6 +669,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 #
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
 CELERY_TASK_TIME_LIMIT = config("CELERY_TASK_HARD_TIME_LIMIT", default=15 * 60)
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 # https://docs.celeryq.dev/en/latest/userguide/periodic-tasks.html
 CELERY_BEAT_SCHEDULE = {
     "Import ZGW data": {
@@ -686,6 +687,30 @@ CELERY_BEAT_SCHEDULE = {
     "Delete old emails": {
         "task": "django_yubin.tasks.delete_old_emails",
         "schedule": crontab(minute="0", hour="6", day_of_month="*"),
+    },
+    "Send emails about expiring actions": {
+        "task": "open_inwoner.accounts.tasks.schedule_user_notifications",
+        "schedule": crontab(minute="15", hour="9", day_of_month="*"),
+        "kwargs": {
+            "notify_about": "actions",
+            "channel": "email",
+        },
+    },
+    "Send emails about expiring plans": {
+        "task": "open_inwoner.accounts.tasks.schedule_user_notifications",
+        "schedule": crontab(minute="5", hour="9", day_of_month="*"),
+        "kwargs": {
+            "notify_about": "plans",
+            "channel": "email",
+        },
+    },
+    "Send emails about messages": {
+        "task": "open_inwoner.accounts.tasks.schedule_user_notifications",
+        "schedule": crontab(minute="*/15", hour="*", day_of_month="*"),
+        "kwargs": {
+            "notify_about": "messages",
+            "channel": "email",
+        },
     },
 }
 
