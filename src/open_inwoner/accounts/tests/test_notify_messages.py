@@ -2,6 +2,8 @@ from django.core import mail
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
+from open_inwoner.configurations.models import SiteConfiguration
+
 from ..tasks import schedule_user_notifications
 from .factories import MessageFactory, UserFactory
 
@@ -39,6 +41,23 @@ class MessagesNotificationTest(TestCase):
         for message in messages:
             message.refresh_from_db()
             self.assertTrue(message.sent)
+
+    def test_no_email_about_received_message_if_disabled_globally(self):
+        config = SiteConfiguration.get_solo()
+        config.notifications_messages_enabled = False
+        config.save()
+
+        user = UserFactory()
+        sender = UserFactory()
+        message = MessageFactory.create(receiver=user, sender=sender)
+
+        schedule_user_notifications.delay(notify_about="messages", channel="email")
+
+        self.assertEqual(len(mail.outbox), 0)
+
+        message.refresh_from_db()
+
+        self.assertFalse(message.sent)
 
     def test_no_email_about_received_message_when_disabled_by_user(self):
         user = UserFactory(messages_notifications=False)

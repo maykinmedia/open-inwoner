@@ -5,6 +5,7 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from open_inwoner.accounts.tests.factories import ActionFactory, UserFactory
+from open_inwoner.configurations.models import SiteConfiguration
 
 from ..tasks import schedule_user_notifications
 
@@ -37,8 +38,19 @@ class ExpiringActionsNotificationTest(TestCase):
 
             self.assertEqual(email.to, [recipient.email])
 
-    def test_no_email_about_expiring_action_when_disabled(self):
+    def test_no_email_about_expiring_action_when_disabled_by_user(self):
         ActionFactory(end_date=date.today(), created_by__plans_notifications=False)
+
+        schedule_user_notifications.delay(notify_about="actions", channel="email")
+
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_no_email_about_expiring_actions_when_globally_disabled(self):
+        config = SiteConfiguration.get_solo()
+        config.notifications_actions_enabled = False
+        config.save()
+
+        ActionFactory(end_date=date.today())
 
         schedule_user_notifications.delay(notify_about="actions", channel="email")
 

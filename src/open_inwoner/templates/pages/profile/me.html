@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n l10n link_tags file_tags card_tags list_tags helpers button_tags utils icon_tags form_tags anchor_menu_tags dropdown_tags %}
+{% load i18n l10n link_tags file_tags card_tags list_tags helpers button_tags utils icon_tags form_tags anchor_menu_tags dropdown_tags solo_tags %}
 
 {% block sidebar_content %}
     {% anchor_menu anchors=anchors desktop=True %}
@@ -8,6 +8,8 @@
 {% block content %}
 
 {% with user=request.user %}
+
+{% get_solo 'configurations.SiteConfiguration' as siteconfig %}
 
 <section class="tabled tabled--flexible">
     <h1 class="utrecht-heading-1" id="title">{% trans "Welkom" %}{% if not user.is_eherkenning_user %}, {{ user.first_name }}{% endif %}</h1>

@@ -232,7 +232,10 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
             _("Emails"),
             {
                 "fields": (
-                    "email_new_message",
+                    "notifications_messages_enabled",
+                    "notifications_actions_enabled",
+                    "notifications_plans_enabled",
+                    "notifications_cases_enabled",
                     "recipients_email_digest",
                     "contact_phonenumber",
                     "email_verification_required",

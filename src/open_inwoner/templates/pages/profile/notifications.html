@@ -43,13 +43,15 @@
             </ul>
             {# End of multiple checkbox fields #}
 
-            <div class="choice-list choice-list-multiple">
-                {# Info on notifications that cannot be disabled #}
-                <div class="choice-list__information">
-                    <p class="choice-list-multiple__heading-4">{% icon icon="check" outlined=True %} {% trans "Zaaknotificaties - actie is nodig" %}</p>
-                    <p class="choice-list__p">{% trans "E-mailnotificaties wanneer er actie nodig is voor een zaak (kan niet uitgeschakeld worden)" %}</p>
+            {% if siteconfig.notifications_cases_enabled %}
+                <div class="choice-list choice-list-multiple">
+                    {# Info on notifications that cannot be disabled #}
+                    <div class="choice-list__information">
+                        <p class="choice-list-multiple__heading-4">{% icon icon="check" outlined=True %} {% trans "Zaaknotificaties - actie is nodig" %}</p>
+                        <p class="choice-list__p">{% trans "E-mailnotificaties wanneer er actie nodig is voor een zaak (kan niet uitgeschakeld worden)" %}</p>
+                    </div>
                 </div>
-            </div>
+            {% endif %}
 
             <div class="form__actions form__actions--fullwidth">
                 {% button text=_("Sla wijzigingen op") primary=True type="submit" form_id="change-notifications" %}

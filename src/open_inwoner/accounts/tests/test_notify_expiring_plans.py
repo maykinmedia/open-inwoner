@@ -6,6 +6,7 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.plans.models import Plan
 from open_inwoner.plans.tests.factories import PlanFactory
 
@@ -57,28 +58,39 @@ class ExpiringPlansNotificationTest(TestCase):
 
         mock_plan_expiring.assert_called_once()
 
-    def test_dont_notify_about_expiring_plan_when_disabled(self):
+    def test_no_email_about_plans_when_globally_disabled(self):
+        config = SiteConfiguration.get_solo()
+        config.notifications_plans_enabled = False
+        config.save()
+
+        PlanFactory(end_date=date.today())
+
+        schedule_user_notifications.delay(notify_about="plans", channel="email")
+
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_no_email_about_expiring_plan_when_disabled_by_user(self):
         PlanFactory(end_date=date.today(), created_by__plans_notifications=False)
 
         schedule_user_notifications(notify_about="plans", channel="email")
 
         self.assertEqual(len(mail.outbox), 0)
 
-    def test_dont_notify_about_plan_not_expiring(self):
+    def test_no_email_about_plan_not_expiring(self):
         PlanFactory(end_date=date.today() + timedelta(days=1))
 
         schedule_user_notifications(notify_about="plans", channel="email")
 
         self.assertEqual(len(mail.outbox), 0)
 
-    def test_dont_notify_about_expired_plan(self):
+    def test_no_email_about_expired_plan(self):
         PlanFactory(end_date=date.today() - timedelta(days=1))
 
         schedule_user_notifications(notify_about="plans", channel="email")
 
         self.assertEqual(len(mail.outbox), 0)
 
-    def test_dont_notify_about_expiring_plan_inactive_user(self):
+    def test_no_email_about_expiring_plan_inactive_user(self):
         PlanFactory(end_date=date.today(), created_by__is_active=False)
 
         schedule_user_notifications(notify_about="plans", channel="email")
