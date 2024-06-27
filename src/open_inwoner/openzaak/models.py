@@ -406,10 +406,7 @@ class ZaakTypeConfig(models.Model):
 
     @property
     def catalogus_url(self):
-        if self.catalogus_id:
-            return self.catalogus.url
-        else:
-            return None
+        return self.catalogus.url
 
     def __str__(self):
         bits = (
