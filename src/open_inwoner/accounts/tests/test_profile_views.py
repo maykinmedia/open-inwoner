@@ -2,9 +2,10 @@ from dataclasses import asdict
 from datetime import date
 from unittest.mock import patch
 
+from django import forms
 from django.conf import settings
 from django.template.defaultfilters import date as django_date
-from django.test import override_settings, tag
+from django.test import TestCase, override_settings, tag
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
 
@@ -14,6 +15,7 @@ from pyquery import PyQuery as PQ
 from webtest import Upload
 
 from open_inwoner.accounts.choices import StatusChoices
+from open_inwoner.accounts.mixins import ErrorMessageMixin
 from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.laposta.models import LapostaConfig
@@ -672,6 +674,39 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         self.assertTimelineLog(
             "patched klant from user profile edit with fields: emailadres"
         )
+
+
+class TestForm(ErrorMessageMixin, forms.Form):
+    name = forms.CharField(required=True, label="Naam")
+    email = forms.EmailField(required=True, label="E-mailadres")
+
+
+class ErrorMessageMixinTests(TestCase):
+    def test_default_error_messages(self):
+        form = TestForm(data={})
+        self.assertFalse(form.is_valid())
+        self.assertEqual(
+            form.errors["name"],
+            [_('Het verplichte veld "Naam" is niet (goed) ingevuld. Vul het veld in.')],
+        )
+        self.assertEqual(
+            form.errors["email"],
+            [
+                _(
+                    'Het verplichte veld "E-mailadres" is niet (goed) ingevuld. Vul het veld in.'
+                )
+            ],
+        )
+
+    def test_custom_error_messages(self):
+        custom_messages = {
+            "name": {"required": _("Naam is verplicht.")},
+            "email": {"required": _("E-mail is verplicht.")},
+        }
+        form = TestForm(data={}, custom_error_messages=custom_messages)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors["name"], [_("Naam is verplicht.")])
+        self.assertEqual(form.errors["email"], [_("E-mail is verplicht.")])
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
