@@ -15,7 +15,6 @@ from pyquery import PyQuery as PQ
 from webtest import Upload
 
 from open_inwoner.accounts.choices import StatusChoices
-from open_inwoner.accounts.mixins import ErrorMessageMixin
 from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.laposta.models import LapostaConfig
@@ -24,6 +23,7 @@ from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.pdc.tests.factories import CategoryFactory
 from open_inwoner.plans.tests.factories import PlanFactory
 from open_inwoner.qmatic.tests.data import QmaticMockData
+from open_inwoner.utils.forms import ErrorMessageMixin
 from open_inwoner.utils.logentry import LOG_ACTIONS
 from open_inwoner.utils.test import ClearCachesMixin
 from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin, create_image_bytes

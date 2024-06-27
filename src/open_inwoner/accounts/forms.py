@@ -18,7 +18,11 @@ from open_inwoner.cms.utils.page_display import (
 )
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.pdc.models.category import Category
-from open_inwoner.utils.forms import LimitedUploadFileField, PrivateFileWidget
+from open_inwoner.utils.forms import (
+    ErrorMessageMixin,
+    LimitedUploadFileField,
+    PrivateFileWidget,
+)
 from open_inwoner.utils.validators import CharFieldValidator, DutchPhoneNumberValidator
 
 from .choices import (
@@ -27,7 +31,6 @@ from .choices import (
     EmptyStatusChoices,
     LoginTypeChoices,
 )
-from .mixins import ErrorMessageMixin
 from .models import Action, Document, Invite, Message, User
 
 
