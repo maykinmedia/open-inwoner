@@ -27,6 +27,7 @@ from .choices import (
     EmptyStatusChoices,
     LoginTypeChoices,
 )
+from .mixins import ErrorMessageMixin
 from .models import Action, Document, Invite, Message, User
 
 
@@ -142,7 +143,7 @@ class BaseUserForm(forms.ModelForm):
             del self.fields["cropping"]
 
 
-class UserForm(BaseUserForm):
+class UserForm(ErrorMessageMixin, BaseUserForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.user = kwargs.pop("user")
@@ -169,7 +170,7 @@ class BrpUserForm(BaseUserForm):
     pass
 
 
-class NecessaryUserForm(forms.ModelForm):
+class NecessaryUserForm(ErrorMessageMixin, forms.ModelForm):
     invite = forms.ModelChoiceField(
         queryset=Invite.objects.all(),
         to_field_name="key",

@@ -11,6 +11,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 from django.views.generic import FormView, TemplateView, UpdateView
+from django.views.generic.edit import FormMixin
 
 from aldryn_apphooks_config.mixins import AppConfigMixin
 from view_breadcrumbs import BaseBreadcrumbMixin
@@ -38,6 +39,24 @@ from ..forms import BrpUserForm, CategoriesForm, UserForm, UserNotificationsForm
 from ..models import Action, User
 
 logger = logging.getLogger(__name__)
+
+
+class ErrorMessageMixin(FormMixin):
+    custom_error_messages = {
+        "required": _(
+            "Het verplichte veld %s is niet (goed) ingevuld. Vul het veld in."
+        ),
+    }
+
+    def form_invalid(self, form):
+        for field, errors in form.errors.items():
+            for error in errors:
+                custom_message = self.custom_error_messages.get(error, None)
+                if custom_message:
+                    messages.error(self.request, custom_message % field)
+                else:
+                    messages.error(self.request, _(f"Error in {field}: {error}"))
+        return super().form_invalid(form)
 
 
 class MyProfileView(
@@ -198,7 +217,12 @@ class MyProfileView(
 
 
 class EditProfileView(
-    LogMixin, LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, UpdateView
+    LogMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    ErrorMessageMixin,
+    UpdateView,
 ):
     template_name = "pages/profile/edit.html"
     model = User
