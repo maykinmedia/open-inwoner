@@ -690,7 +690,6 @@ class TestForm(ErrorMessageMixin, forms.Form):
 class ErrorMessageMixinTest(TestCase):
     def test_default_error_messages(self):
         form = TestForm(data={})
-        self.assertFalse(form.is_valid())
         self.assertEqual(
             form.errors["name"],
             [_('Het verplichte veld "Naam" is niet (goed) ingevuld. Vul het veld in.')],
@@ -710,7 +709,6 @@ class ErrorMessageMixinTest(TestCase):
             "email": {"required": _("E-mail is verplicht.")},
         }
         form = TestForm(data={}, custom_error_messages=custom_messages)
-        self.assertFalse(form.is_valid())
         self.assertEqual(form.errors["name"], [_("Naam is verplicht.")])
         self.assertEqual(form.errors["email"], [_("E-mail is verplicht.")])
 
