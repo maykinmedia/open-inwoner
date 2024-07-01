@@ -11,7 +11,6 @@ from django.urls import reverse, reverse_lazy
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 from django.views.generic import FormView, TemplateView, UpdateView
-from django.views.generic.edit import FormMixin
 
 from aldryn_apphooks_config.mixins import AppConfigMixin
 from view_breadcrumbs import BaseBreadcrumbMixin
