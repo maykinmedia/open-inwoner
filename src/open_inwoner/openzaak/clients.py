@@ -1,7 +1,10 @@
 import base64
+import concurrent.futures
 import logging
+import warnings
+from dataclasses import dataclass
 from datetime import date
-from typing import Literal, Mapping, Type, TypeAlias
+from typing import Any, Literal, Mapping, Type, TypeAlias, TypeVar
 
 from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -13,10 +16,13 @@ from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.catalogi import Catalogus
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 from zgw_consumers.client import build_client
+from zgw_consumers.concurrent import parallel
+from zgw_consumers.constants import APITypes
 from zgw_consumers.models import Service
 from zgw_consumers.service import pagination_helper
 
 from open_inwoner.openzaak.api_models import InformatieObject
+from open_inwoner.openzaak.exceptions import MultiZgwClientProxyError
 from open_inwoner.utils.api import ClientError, get_json_response
 
 from ..utils.decorators import cache as cache_result
@@ -48,6 +54,9 @@ class ZgwAPIClient(APIClient):
     def __init__(self, *args, **kwargs):
         self.configured_from = kwargs.pop("configured_from")
         super().__init__(*args, **kwargs)
+
+    def __str__(self):
+        return f"Client {self.__class__.__name__} for {self.base_url}"
 
 
 class ZakenClient(ZgwAPIClient):
@@ -692,43 +701,205 @@ class FormClient(ZgwAPIClient):
         return results
 
 
+TClient = TypeVar("TClient", bound=APIClient)
+
+
+@dataclass(frozen=True)
+class ZgwClientResponse:
+    """A single response in a MultiZgwClientResult."""
+
+    client: TClient
+    result: Any
+    exception: Exception | None = None
+
+
+@dataclass(frozen=True)
+class MultiZgwClientProxyResult:
+    """Container for a multi-backend responses"""
+
+    responses: list[ZgwClientResponse]
+
+    @property
+    def has_errors(self) -> bool:
+        return any(r.exception is not None for r in self.responses)
+
+    @property
+    def failing_responses(self) -> list[ZgwClientResponse]:
+        return list(r for r in self if r.exception is not None)
+
+    @property
+    def successful_responses(self) -> list[ZgwClientResponse]:
+        return list(r for r in self if r.exception is None)
+
+    def raise_on_failures(self):
+        """Raise a MultiZgwClientProxyError wrapping all errors raised by the clients."""
+        if not self.has_errors:
+            return
+
+        raise MultiZgwClientProxyError([r.exception for r in self.failing_responses])
+
+    def join_results(self):
+        """Join the results for all successful responses in a list."""
+        return list(
+            result for row in self.successful_responses for result in row.result
+        )
+
+    def __iter__(self):
+        yield from self.responses
+
+
+class MultiZgwClientProxy:
+    """A proxy to call the same method on multiple ZGW clients in parallel."""
+
+    clients: list[TClient] = []
+
+    def __init__(self, clients: list[TClient]):
+        self.clients = clients
+
+        if len(clients) == 0:
+            raise ValueError("You must specify at least one client")
+
+    def _call_method(self, method, *args, **kwargs) -> MultiZgwClientProxyResult:
+        if not all(hasattr(client, method) for client in self.clients):
+            raise AttributeError(f"Method `{method}` does not exist on the clients")
+
+        with parallel() as executor:
+            futures_mapping: Mapping[concurrent.futures.Future, TClient] = {}
+            for client in self.clients:
+                future = executor.submit(
+                    getattr(client, method),
+                    *args,
+                    **kwargs,
+                )
+                # Remember which future corresponds to which client,
+                # so we can associate them in the response
+                futures_mapping[future] = client
+
+            responses: list[ZgwClientResponse] = []
+            for task in concurrent.futures.as_completed(futures_mapping.keys()):
+                result: Any | None = None
+                exception: Exception | None = None
+                try:
+                    result: Any = task.result()
+                except BaseException:
+                    exception = task.exception()
+
+                responses.append(
+                    ZgwClientResponse(
+                        result=result, exception=exception, client=futures_mapping[task]
+                    )
+                )
+
+        # Ensure the response list is deterministic, based on the client order.
+        # This is mainly useful for testing but also generally promotes consistent
+        # behavior.
+        responses.sort(
+            key=lambda r: self.clients.index(r.client),
+        )
+        return MultiZgwClientProxyResult(responses=responses)
+
+    def __getattr__(self, name):
+        def wrapper(*args, **kwargs):
+            return self._call_method(name, *args, **kwargs)
+
+        return wrapper
+
+
 ZgwClientType = Literal["zaak", "catalogi", "document", "form"]
 ZgwClientFactoryReturn: TypeAlias = (
     ZakenClient | CatalogiClient | DocumentenClient | FormClient
 )
 
 
-def _build_zgw_client(type_: ZgwClientType) -> ZgwClientFactoryReturn | None:
-    config = OpenZaakConfig.get_solo()
-    services_to_client_mapping: Mapping[ZgwClientType, Type[ZgwClientFactoryReturn]] = {
-        "zaak": ZakenClient,
-        "catalogi": CatalogiClient,
-        "document": DocumentenClient,
-        "form": FormClient,
+def build_zgw_client_from_service(service: Service) -> ZgwClientFactoryReturn:
+    services_to_client_mapping: Mapping[str, Type[ZgwClientFactoryReturn]] = {
+        APITypes.zrc: ZakenClient,
+        APITypes.ztc: CatalogiClient,
+        APITypes.drc: DocumentenClient,
+        APITypes.orc: FormClient,
     }
-    if client_class := services_to_client_mapping.get(type_):
-        service = getattr(config, f"{type_}_service")
-        if service:
-            client = build_client(
-                service, client_factory=client_class, configured_from=service
-            )
-            return client
 
-    logger.warning("no service defined for %s", type_)
-    return None
+    try:
+        client_class = services_to_client_mapping[service.api_type]
+    except KeyError:
+        raise ValueError(
+            f"No client defined for API type {service.api_type} on service {service}"
+        )
 
-
-def build_zaken_client() -> ZakenClient | None:
-    return _build_zgw_client("zaak")
+    client = build_client(service, client_factory=client_class, configured_from=service)
+    return client
 
 
-def build_catalogi_client() -> CatalogiClient | None:
-    return _build_zgw_client("catalogi")
+def _build_all_zgw_clients_for_type(
+    type_: ZgwClientType,
+) -> list[ZakenClient | CatalogiClient | DocumentenClient | FormClient]:
+    config = OpenZaakConfig.get_solo()
+    services_to_client_mapping: Mapping[ZgwClientType, str] = {
+        "zaak": "zrc_service",
+        "catalogi": "ztc_service",
+        "document": "drc_service",
+        "form": "form_service",
+    }
+
+    return [
+        build_zgw_client_from_service(
+            getattr(api_group, services_to_client_mapping[type_])
+        )
+        for api_group in config.api_groups.all()
+    ]
 
 
-def build_documenten_client() -> DocumentenClient | None:
-    return _build_zgw_client("document")
+_SINGLETON_ZGW_CLIENT_DEPRECATION_MESSAGE = (
+    "Singleton ZGW client factories are in the process of being deprecated in favour of"
+    " multi-ZGW backend aware implementations. Use build_*_clients() or build_zgw_"
+    "client_from_service() instead."
+)
+warnings.filterwarnings(
+    "once", _SINGLETON_ZGW_CLIENT_DEPRECATION_MESSAGE, category=DeprecationWarning
+)
+
+
+def build_zaken_client() -> ZakenClient:
+    warnings.warn(_SINGLETON_ZGW_CLIENT_DEPRECATION_MESSAGE, DeprecationWarning)
+    config = OpenZaakConfig.get_solo()
+    return build_zgw_client_from_service(config.zaak_service)
+
+
+def build_zaken_clients() -> list[ZakenClient]:
+    return _build_all_zgw_clients_for_type("zaak")
+
+
+def build_catalogi_client() -> CatalogiClient:
+    warnings.warn(_SINGLETON_ZGW_CLIENT_DEPRECATION_MESSAGE, DeprecationWarning)
+    config = OpenZaakConfig.get_solo()
+    return build_zgw_client_from_service(config.catalogi_service)
+
+
+def build_catalogi_clients() -> list[CatalogiClient]:
+    return _build_all_zgw_clients_for_type("catalogi")
+
+
+def build_documenten_client() -> DocumentenClient:
+    warnings.warn(_SINGLETON_ZGW_CLIENT_DEPRECATION_MESSAGE, DeprecationWarning)
+    config = OpenZaakConfig.get_solo()
+    return build_zgw_client_from_service(config.document_service)
+
+
+def build_documenten_clients() -> list[DocumentenClient]:
+    return _build_all_zgw_clients_for_type("document")
 
 
 def build_forms_client() -> FormClient | None:
-    return _build_zgw_client("form")
+    warnings.warn(_SINGLETON_ZGW_CLIENT_DEPRECATION_MESSAGE, DeprecationWarning)
+    config = OpenZaakConfig.get_solo()
+
+    # Special case: though we require all other services,
+    # the form_service may not in fact be set
+    if not config.form_service:
+        return None
+
+    return build_zgw_client_from_service(config.form_service)
+
+
+def build_forms_clients() -> list[FormClient]:
+    return _build_all_zgw_clients_for_type("form")
