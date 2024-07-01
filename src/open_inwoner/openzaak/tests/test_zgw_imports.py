@@ -8,7 +8,7 @@ from open_inwoner.openzaak.tests.factories import (
     ZGWApiGroupConfigFactory,
 )
 from open_inwoner.openzaak.tests.helpers import generate_oas_component_cached
-from open_inwoner.openzaak.tests.shared import CATALOGI_ROOT
+from open_inwoner.openzaak.tests.shared import ANOTHER_CATALOGI_ROOT, CATALOGI_ROOT
 from open_inwoner.openzaak.zgw_imports import (
     import_catalog_configs,
     import_zaaktype_configs,
@@ -17,19 +17,20 @@ from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
 
 class CatalogMockData:
-    def __init__(self):
+    def __init__(self, root: str):
+        self.root = root
         self.catalogs = [
             generate_oas_component_cached(
                 "ztc",
                 "schemas/Catalogus",
-                url=f"{CATALOGI_ROOT}catalogussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+                url=f"{root}catalogussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
                 domein="aaaaa",
                 rsin="123456789",
             ),
             generate_oas_component_cached(
                 "ztc",
                 "schemas/Catalogus",
-                url=f"{CATALOGI_ROOT}catalogussen/bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+                url=f"{root}catalogussen/bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
                 domein="bbbbb",
                 rsin="123456789",
             ),
@@ -37,28 +38,28 @@ class CatalogMockData:
         self.extra_catalog = generate_oas_component_cached(
             "ztc",
             "schemas/Catalogus",
-            url=f"{CATALOGI_ROOT}catalogussen/cccccccc-cccc-cccc-cccc-cccccccccccc",
+            url=f"{root}catalogussen/cccccccc-cccc-cccc-cccc-cccccccccccc",
             domein="ccccc",
             rsin="123456789",
         )
 
     def install_mocks(self, m) -> "CatalogMockData":
         m.get(
-            f"{CATALOGI_ROOT}catalogussen",
+            f"{self.root}catalogussen",
             json=paginated_response(self.catalogs),
         )
         return self
 
 
 class ZaakTypeMockData:
-    def __init__(self):
-
+    def __init__(self, root: str):
+        self.root = root
         self.zaaktype_aaa_1 = generate_oas_component_cached(
             "ztc",
             "schemas/ZaakType",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-111111111111",
-            url=f"{CATALOGI_ROOT}zaaktype/aaaaaaaa-aaaa-aaaa-aaaa-111111111111",
-            catalogus=f"{CATALOGI_ROOT}catalogussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            url=f"{root}zaaktype/aaaaaaaa-aaaa-aaaa-aaaa-111111111111",
+            catalogus=f"{root}catalogussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             identificatie="AAA",
             omschrijving="zaaktype-aaa",
             indicatieInternOfExtern="extern",
@@ -67,9 +68,9 @@ class ZaakTypeMockData:
             "ztc",
             "schemas/ZaakType",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-222222222222",
-            url=f"{CATALOGI_ROOT}zaaktype/aaaaaaaa-aaaa-aaaa-aaaa-222222222222",
+            url=f"{root}zaaktype/aaaaaaaa-aaaa-aaaa-aaaa-222222222222",
             # different catalogus
-            catalogus=f"{CATALOGI_ROOT}catalogussen/bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+            catalogus=f"{root}catalogussen/bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
             identificatie="BBB",
             omschrijving="zaaktype-bbb",
             indicatieInternOfExtern="extern",
@@ -78,8 +79,8 @@ class ZaakTypeMockData:
             "ztc",
             "schemas/ZaakType",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-333333333333",
-            url=f"{CATALOGI_ROOT}zaaktype/aaaaaaaa-aaaa-aaaa-aaaa-333333333333",
-            catalogus=f"{CATALOGI_ROOT}catalogussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            url=f"{root}zaaktype/aaaaaaaa-aaaa-aaaa-aaaa-333333333333",
+            catalogus=f"{root}catalogussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             # re-use identificatie from above
             identificatie="AAA",
             omschrijving="zaaktype-aaa",
@@ -89,8 +90,8 @@ class ZaakTypeMockData:
             "ztc",
             "schemas/ZaakType",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-444444444444",
-            url=f"{CATALOGI_ROOT}zaaktype/aaaaaaaa-aaaa-aaaa-aaaa-444444444444",
-            catalogus=f"{CATALOGI_ROOT}catalogussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            url=f"{root}zaaktype/aaaaaaaa-aaaa-aaaa-aaaa-444444444444",
+            catalogus=f"{root}catalogussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             identificatie="CCC",
             omschrijving="zaaktype-ccc",
             # internal case
@@ -106,8 +107,8 @@ class ZaakTypeMockData:
             "ztc",
             "schemas/ZaakType",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-555555555555",
-            url=f"{CATALOGI_ROOT}zaaktype/aaaaaaaa-aaaa-aaaa-aaaa-555555555555",
-            catalogus=f"{CATALOGI_ROOT}catalogussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            url=f"{root}zaaktype/aaaaaaaa-aaaa-aaaa-aaaa-555555555555",
+            catalogus=f"{root}catalogussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             identificatie="DDD",
             omschrijving="zaaktype-ddd",
             indicatieInternOfExtern="extern",
@@ -122,7 +123,7 @@ class ZaakTypeMockData:
 
     def install_mocks(self, m) -> "ZaakTypeMockData":
         m.get(
-            f"{CATALOGI_ROOT}zaaktypen",
+            f"{self.root}zaaktypen",
             json=paginated_response(self.zaak_types),
         )
         return self
@@ -135,106 +136,137 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        ZGWApiGroupConfigFactory(
-            ztc_service__api_root=CATALOGI_ROOT,
-            form_service=None,
-        )
+        cls.config = OpenZaakConfig.get_solo()
+        cls.roots = (CATALOGI_ROOT, ANOTHER_CATALOGI_ROOT)
+        for root in cls.roots:
+            ZGWApiGroupConfigFactory(ztc_service__api_root=root)
 
     def test_import_catalogs(self, m):
-        data = CatalogMockData().install_mocks(m)
+        data = {root: CatalogMockData(root).install_mocks(m) for root in self.roots}
 
         res = import_catalog_configs()
 
-        # two got added
-        self.assertEqual(len(res), 2)
-        self.assertEqual(CatalogusConfig.objects.count(), 2)
-
-        for i, config in enumerate(res):
-            self.assertEqual(config.url, data.catalogs[i]["url"])
-            self.assertEqual(config.domein, data.catalogs[i]["domein"])
-            self.assertEqual(config.rsin, data.catalogs[i]["rsin"])
+        initial_set = set(CatalogusConfig.objects.values_list("url", "domein", "rsin"))
+        self.assertEqual(
+            initial_set,
+            {
+                (catalog["url"], catalog["domein"], catalog["rsin"])
+                for mock_data in data.values()
+                for catalog in mock_data.catalogs
+            },
+        )
 
         # run again with same API response
         res = import_catalog_configs()
 
         # nothing got added
-        self.assertEqual(len(res), 0)
-        self.assertEqual(CatalogusConfig.objects.count(), 2)
+        self.assertEqual(res, [])
+        self.assertEqual(
+            set(CatalogusConfig.objects.values_list("url", "domein", "rsin")),
+            initial_set,
+        )
 
         # add more elements to API response and run again
-        m.get(
-            f"{CATALOGI_ROOT}catalogussen",
-            json=paginated_response([data.extra_catalog] + data.catalogs),
-        )
+        for root in self.roots:
+            m.get(
+                f"{root}catalogussen",
+                json=paginated_response(
+                    [data[root].extra_catalog] + data[root].catalogs
+                ),
+            )
+
         res = import_catalog_configs()
 
-        # one got added
-        self.assertEqual(len(res), 1)
-        self.assertEqual(CatalogusConfig.objects.count(), 3)
-
-        config = res[0]
-        self.assertEqual(config.url, data.extra_catalog["url"])
-        self.assertEqual(config.domein, data.extra_catalog["domein"])
-        self.assertEqual(config.rsin, data.extra_catalog["rsin"])
+        # Two got added, one for each root
+        self.assertEqual(
+            {(r.url, r.domein, r.rsin) for r in res},
+            set(
+                CatalogusConfig.objects.order_by("-pk").values_list(
+                    "url", "domein", "rsin"
+                )[:2]
+            ),
+        )
 
     def test_import_zaaktype_configs_with_catalogs(self, m):
-        data = ZaakTypeMockData().install_mocks(m)
+        data = {root: ZaakTypeMockData(root).install_mocks(m) for root in self.roots}
 
-        cat_config_aa = CatalogusConfigFactory.create(
-            url=data.zaak_types[0]["catalogus"]
-        )
-        cat_config_bb = CatalogusConfigFactory.create(
-            url=data.zaak_types[1]["catalogus"]
-        )
+        cat_configs = {root: dict() for root in self.roots}
+        for root in self.roots:
+            cat_configs[root]["AAA"] = CatalogusConfigFactory.create(
+                url=data[root].zaak_types[0]["catalogus"]
+            )
+            cat_configs[root]["BBB"] = CatalogusConfigFactory.create(
+                url=data[root].zaak_types[1]["catalogus"]
+            )
 
         res = import_zaaktype_configs()
 
-        # first two got added, third one has same identificatie, fourth one is internal
-        self.assertEqual(len(res), 2)
-        self.assertEqual(ZaakTypeConfig.objects.count(), 2)
+        # Per root: first two got added, third one has same identificatie, fourth one is internal
+        self.assertEqual(len(res), 4)
+        self.assertEqual(ZaakTypeConfig.objects.count(), 4)
 
-        for i, config in enumerate(res):
-            self.assertEqual(config.identificatie, data.zaak_types[i]["identificatie"])
-            self.assertEqual(config.omschrijving, data.zaak_types[i]["omschrijving"])
-            self.assertEqual(config.catalogus.url, data.zaak_types[i]["catalogus"])
+        self.assertEqual(
+            [
+                (config.identificatie, config.omschrijving, config.catalogus.url)
+                for config in res
+            ],
+            [
+                (zt["identificatie"], zt["omschrijving"], zt["catalogus"])
+                for root in self.roots
+                for zt in data[root].zaak_types[:2]
+            ],
+        )
 
         # check we linked correctly
-        self.assertEqual(res[0].catalogus, cat_config_aa)
-        self.assertEqual(res[1].catalogus, cat_config_bb)
+        for i, root in zip((0, 2), self.roots):
+            self.assertEqual(res[i + 0].catalogus, cat_configs[root]["AAA"])
+            self.assertEqual(res[i + 1].catalogus, cat_configs[root]["BBB"])
 
-        # URLs of zaaktype versions should be stored
-        self.assertEqual(
-            res[0].urls, [data.zaak_types[0]["url"], data.zaak_types[2]["url"]]
-        )
-        self.assertEqual(res[1].urls, [data.zaak_types[1]["url"]])
+            # URLs of zaaktype versions should be stored
+            self.assertEqual(
+                res[i + 0].urls,
+                [data[root].zaak_types[0]["url"], data[root].zaak_types[2]["url"]],
+            )
+            self.assertEqual(res[i + 1].urls, [data[root].zaak_types[1]["url"]])
 
         # run again with same API response
         res = import_zaaktype_configs()
 
         # nothing got added
         self.assertEqual(len(res), 0)
-        self.assertEqual(ZaakTypeConfig.objects.count(), 2)
+        self.assertEqual(ZaakTypeConfig.objects.count(), 4)
 
         # add more elements to API response and run again
-        m.get(
-            f"{CATALOGI_ROOT}zaaktypen",
-            json=paginated_response([data.extra_zaaktype] + data.zaak_types),
-        )
+        for root in self.roots:
+            m.get(
+                f"{root}zaaktypen",
+                json=paginated_response(
+                    [data[root].extra_zaaktype] + data[root].zaak_types
+                ),
+            )
         res = import_zaaktype_configs()
 
-        # one got added
-        self.assertEqual(len(res), 1)
-        self.assertEqual(ZaakTypeConfig.objects.count(), 3)
+        # one got added for each root
+        self.assertEqual(len(res), 2)
+        self.assertEqual(ZaakTypeConfig.objects.count(), 6)
 
-        config = res[0]
-        self.assertEqual(config.identificatie, data.extra_zaaktype["identificatie"])
-        self.assertEqual(config.omschrijving, data.extra_zaaktype["omschrijving"])
-        self.assertEqual(config.catalogus.url, data.extra_zaaktype["catalogus"])
-        self.assertEqual(config.catalogus, cat_config_aa)
+        for i, root in enumerate(self.roots):
+            config = res[i + 0]
+            self.assertEqual(
+                config.identificatie, data[root].extra_zaaktype["identificatie"]
+            )
+            self.assertEqual(
+                config.omschrijving, data[root].extra_zaaktype["omschrijving"]
+            )
+            self.assertEqual(
+                config.catalogus.url, data[root].extra_zaaktype["catalogus"]
+            )
+            self.assertEqual(config.catalogus, cat_configs[root]["AAA"])
 
     def test_import_zaaktype_configs_without_catalogs(self, m):
-        data = ZaakTypeMockData()
-        data.install_mocks(m)
+        for root in self.roots:
+            data = ZaakTypeMockData(root)
+            data.install_mocks(m)
 
         with self.assertRaises(
             RuntimeError, msg="Catalogus must exist prior to import"
