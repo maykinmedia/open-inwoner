@@ -41,24 +41,6 @@ from ..models import Action, User
 logger = logging.getLogger(__name__)
 
 
-class ErrorMessageMixin(FormMixin):
-    custom_error_messages = {
-        "required": _(
-            "Het verplichte veld %s is niet (goed) ingevuld. Vul het veld in."
-        ),
-    }
-
-    def form_invalid(self, form):
-        for field, errors in form.errors.items():
-            for error in errors:
-                custom_message = self.custom_error_messages.get(error, None)
-                if custom_message:
-                    messages.error(self.request, custom_message % field)
-                else:
-                    messages.error(self.request, _(f"Error in {field}: {error}"))
-        return super().form_invalid(form)
-
-
 class MyProfileView(
     LogMixin,
     LoginRequiredMixin,
@@ -221,7 +203,6 @@ class EditProfileView(
     LoginRequiredMixin,
     CommonPageMixin,
     BaseBreadcrumbMixin,
-    ErrorMessageMixin,
     UpdateView,
 ):
     template_name = "pages/profile/edit.html"

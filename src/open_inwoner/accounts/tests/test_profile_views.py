@@ -327,7 +327,13 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         form["postcode"] = ""
         form["city"] = ""
         base_response = form.submit()
-        expected_errors = {"email": [_("Dit veld is vereist.")]}
+        expected_errors = {
+            "email": [
+                _(
+                    'Het verplichte veld "E-mailadres" is niet (goed) ingevuld. Vul het veld in.'
+                )
+            ]
+        }
         self.assertEqual(base_response.context["form"].errors, expected_errors)
 
     def test_save_filled_form(self):
@@ -681,7 +687,7 @@ class TestForm(ErrorMessageMixin, forms.Form):
     email = forms.EmailField(required=True, label="E-mailadres")
 
 
-class ErrorMessageMixinTests(TestCase):
+class ErrorMessageMixinTest(TestCase):
     def test_default_error_messages(self):
         form = TestForm(data={})
         self.assertFalse(form.is_valid())
