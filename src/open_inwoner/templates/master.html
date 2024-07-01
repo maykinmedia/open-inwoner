@@ -132,13 +132,6 @@
             </main>
         {% endblock main_outer %}
 
-        {% get_solo 'configurations.SiteConfiguration' as config %}
-        {% if config.kcm_survey_link_url and config.kcm_survey_link_text %}
-            <div class="kcm-survey">
-                {% link bold=True href=config.kcm_survey_link_url text=config.kcm_survey_link_text blank=True hide_external_icon=True %}
-            </div>
-        {% endif %}
-
         {% if footer %}
         <footer class="footer">
             {% if footer.logo_title or footer.logo %}
@@ -159,6 +152,14 @@
             <div class="footer__left wysiwyg">{% static_placeholder "footer_left" %}</div>
             <div class="footer__center wysiwyg">{% static_placeholder "footer_center" %}</div>
             <div class="footer__right wysiwyg">{% static_placeholder "footer_right" %}</div>
+
+            {% get_solo 'configurations.SiteConfiguration' as config %}
+            {% if config.kcm_survey_link_url and config.kcm_survey_link_text %}
+                <div class="kcm-survey">
+                    {% link bold=True href=config.kcm_survey_link_url text=config.kcm_survey_link_text blank=True hide_external_icon=True %}
+                </div>
+            {% endif %}
+
         </footer>
         {% endif %}
 
