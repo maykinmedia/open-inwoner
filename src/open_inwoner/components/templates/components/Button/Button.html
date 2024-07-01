@@ -9,6 +9,7 @@
         {% if href|startswith:"http" %}target="_blank"{% endif %}
         {% as_attributes extra_attributes %}
         {% if ariaExpanded %} aria-expanded="{{ ariaExpanded }}" {% endif %}
+        {% if ariaControls %} aria-controls="{{ ariaControls }}" {% endif %}
     >
         {% if icon %}{% icon icon=icon outlined=icon_outlined %}{% endif %}
         {% if text_icon %}
@@ -32,6 +33,7 @@
         {% if id %} id="{{ id }}" {% endif %}
         {% if form_id %} form="{{ form_id }}"{% endif %}
         {% if ariaExpanded %} aria-expanded="{{ ariaExpanded }}" {% endif %}
+        {% if ariaControls %} aria-controls="{{ ariaControls }}" {% endif %}
     >
         {% if icon %}{% icon icon=icon outlined=icon_outlined %}{% endif %}
         {% if text_icon %}
