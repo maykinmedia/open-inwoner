@@ -7,14 +7,16 @@ from open_inwoner.accounts.tests.factories import (
 )
 from open_inwoner.openklant.constants import Status
 from open_inwoner.openklant.models import OpenKlantConfig
-from open_inwoner.openzaak.models import OpenZaakConfig
-from open_inwoner.openzaak.tests.factories import ServiceFactory
+from open_inwoner.openzaak.tests.factories import (
+    ServiceFactory,
+    ZGWApiGroupConfigFactory,
+)
 from open_inwoner.openzaak.tests.helpers import generate_oas_component_cached
+from open_inwoner.openzaak.tests.shared import ZAKEN_ROOT
 from open_inwoner.utils.test import paginated_response
 
 KLANTEN_ROOT = "https://klanten.nl/api/v1/"
 CONTACTMOMENTEN_ROOT = "https://contactmomenten.nl/api/v1/"
-ZAKEN_ROOT = "https://zaken.nl/api/v1/"
 
 
 class MockAPIData:
@@ -29,11 +31,10 @@ class MockAPIData:
         )
         config.save()
 
-        oz_config = OpenZaakConfig.get_solo()
-        oz_config.zaak_service = ServiceFactory(
-            api_root=ZAKEN_ROOT, api_type=APITypes.zrc
+        # services
+        ZGWApiGroupConfigFactory(
+            zrc_service__api_root=ZAKEN_ROOT,
         )
-        oz_config.save()
 
 
 class MockAPIReadPatchData(MockAPIData):

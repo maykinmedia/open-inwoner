@@ -27,6 +27,7 @@ from open_inwoner.openzaak.tests.factories import (
     ZaakTypeConfigFactory,
     ZaakTypeInformatieObjectTypeConfigFactory,
     ZaakTypeStatusTypeConfigFactory,
+    ZGWApiGroupConfigFactory,
 )
 from open_inwoner.openzaak.tests.helpers import generate_oas_component_cached
 from open_inwoner.openzaak.tests.shared import (
@@ -71,18 +72,14 @@ class CasesPlaywrightTests(
         self.config.save()
 
         # services
-        self.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
-        self.catalogi_service = ServiceFactory(
-            api_root=CATALOGI_ROOT, api_type=APITypes.ztc
-        )
-        self.document_service = ServiceFactory(
-            api_root=DOCUMENTEN_ROOT, api_type=APITypes.drc
+        ZGWApiGroupConfigFactory(
+            ztc_service__api_root=CATALOGI_ROOT,
+            zrc_service__api_root=ZAKEN_ROOT,
+            drc_service__api_root=DOCUMENTEN_ROOT,
+            form_service=None,
         )
         # openzaak config
         self.oz_config = OpenZaakConfig.get_solo()
-        self.oz_config.zaak_service = self.zaak_service
-        self.oz_config.catalogi_service = self.catalogi_service
-        self.oz_config.document_service = self.document_service
         self.oz_config.document_max_confidentiality = (
             VertrouwelijkheidsAanduidingen.beperkt_openbaar
         )
@@ -290,6 +287,13 @@ class CasesPlaywrightTests(
             klant=self.klant["url"],
             contactmoment=self.contactmoment["url"],
         )
+        self.object_contactmoment = generate_oas_component_cached(
+            "cmc",
+            "schemas/Objectcontactmoment",
+            url=f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten/aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
+            contactmoment=self.contactmoment["url"],
+            object=self.zaak["url"],
+        )
 
         # enable upload and contact form
         zaak_type_config = ZaakTypeConfigFactory(
@@ -325,6 +329,7 @@ class CasesPlaywrightTests(
             self.status_type_new,
             self.status_type_finish,
             self.contactmoment,
+            self.object_contactmoment,
         ]:
             m.get(resource["url"], json=resource)
 
@@ -410,6 +415,11 @@ class CasesPlaywrightTests(
                 json=self.klant_contactmoment,
                 status_code=201,
             ),
+            m.post(
+                f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten",
+                json=self.object_contactmoment,
+                status_code=201,
+            ),
         ]
 
     def test_cases(self, m, contactmoment_mock):
@@ -433,9 +443,7 @@ class CasesPlaywrightTests(
         )
 
         # check case is visible
-        expect(page.get_by_text(self.zaak["identificatie"])).to_be_visible(
-            timeout=100_000
-        )
+        expect(page.get_by_text(self.zaak["identificatie"])).to_be_visible()
 
         # check documents show
         documents = page.locator(".file-list").get_by_role("listitem")

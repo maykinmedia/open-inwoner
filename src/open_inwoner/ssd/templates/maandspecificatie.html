@@ -1,4 +1,4 @@
-{% load ssd_tags l10n %}
+{% load ssd_tags utils static l10n %}
 
 <!DOCTYPE html>
 <html lang="nl">
@@ -156,6 +156,13 @@
         <div class="section extra-margin">
             <p class="monthly-report__p extra-margin">Op de 25e van de maand krijgt u het bedrag ad. &euro; {% format_currency last.bedrag.waarde_bedrag %} uitbetaald.</p>
         </div>
+        {% endif %}
+
+        {# Optional comments/help text #}
+        {% if comments %}
+            <section class="section">
+                {{ comments|markdown|safe }}
+            </section>
         {% endif %}
 	</div>
 	</body>

@@ -13,7 +13,7 @@ from open_inwoner.openzaak.clients import (
     build_forms_client,
     build_zaken_client,
 )
-from open_inwoner.openzaak.models import OpenZaakConfig
+from open_inwoner.openzaak.models import OpenZaakConfig, ZGWApiGroupConfig
 from open_inwoner.utils.api import ClientError
 
 from .base import ConfigSettingsBase
@@ -301,27 +301,26 @@ class ZGWAPIsConfigurationStep(BaseConfigurationStep):
     enable_setting = "ZGW_CONFIG_ENABLE"
 
     def is_configured(self) -> bool:
+        """Verify that at least 1 ZGW API set is configured."""
         zgw_config = OpenZaakConfig.get_solo()
-        return (
-            bool(zgw_config.zaak_service)
-            and bool(zgw_config.catalogi_service)
-            and bool(zgw_config.document_service)
-            and bool(zgw_config.form_service)
-        )
+        return ZGWApiGroupConfig.objects.filter(open_zaak_config=zgw_config).exists()
 
     def configure(self):
         config = OpenZaakConfig.get_solo()
-        config.zaak_service = Service.objects.get(
-            api_root=settings.ZGW_ZAAK_SERVICE_API_ROOT
-        )
-        config.catalogi_service = Service.objects.get(
-            api_root=settings.ZGW_CATALOGI_SERVICE_API_ROOT
-        )
-        config.document_service = Service.objects.get(
-            api_root=settings.ZGW_DOCUMENTEN_SERVICE_API_ROOT
-        )
-        config.form_service = Service.objects.get(
-            api_root=settings.ZGW_FORM_SERVICE_API_ROOT
+        ZGWApiGroupConfig.objects.create(
+            open_zaak_config=config,
+            zrc_service=Service.objects.get(
+                api_root=settings.ZGW_ZAAK_SERVICE_API_ROOT
+            ),
+            ztc_service=Service.objects.get(
+                api_root=settings.ZGW_CATALOGI_SERVICE_API_ROOT
+            ),
+            drc_service=Service.objects.get(
+                api_root=settings.ZGW_DOCUMENTEN_SERVICE_API_ROOT
+            ),
+            form_service=Service.objects.get(
+                api_root=settings.ZGW_FORM_SERVICE_API_ROOT
+            ),
         )
 
         # General config options

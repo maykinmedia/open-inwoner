@@ -10,7 +10,12 @@ from zgw_consumers.api_models.catalogi import (
 )
 
 from open_inwoner.openzaak.api_models import ZaakType
-from open_inwoner.openzaak.clients import CatalogiClient, build_catalogi_client
+from open_inwoner.openzaak.clients import (
+    CatalogiClient,
+    MultiZgwClientProxy,
+    build_catalogi_client,
+    build_catalogi_clients,
+)
 from open_inwoner.openzaak.models import (
     CatalogusConfig,
     ZaakTypeConfig,
@@ -26,8 +31,7 @@ def filter_zaaktypes(case_types: list[ZaakType]) -> list[ZaakType]:
     return [c for c in case_types if c.indicatie_intern_of_extern == "extern"]
 
 
-def get_configurable_zaaktypes(client: CatalogiClient) -> list[ZaakType]:
-    case_types = client.fetch_zaaktypes_no_cache()
+def get_configurable_zaaktypes(case_types: list[ZaakType]) -> list[ZaakType]:
     case_types = filter_zaaktypes(case_types)
     return case_types
 
@@ -48,32 +52,36 @@ def import_catalog_configs() -> list[CatalogusConfig]:
 
     note this doesn't generate anything on eSuite
     """
-    client = build_catalogi_client()
-    if not client:
-        logger.warning(
-            "Not importing catalogus configs: could not build Catalogi API client"
-        )
-        return []
+    proxy = MultiZgwClientProxy(build_catalogi_clients())
+    result = proxy.fetch_catalogs_no_cache()
 
-    catalogs = client.fetch_catalogs_no_cache()
-    if not catalogs:
+    if result.has_errors:
+        for response in result.failing_responses:
+            logger.exception(
+                "Client %s encountered an exception. Import will continue, for any other configured clients",
+                response.client,
+                exc_info=response.exception,
+            )
+
+    if not result.join_results():
         return []
 
     create = []
 
     with transaction.atomic():
         known = set(CatalogusConfig.objects.values_list("url", flat=True))
-        for catalog in catalogs:
-            if catalog.url in known:
-                continue
-            create.append(
-                CatalogusConfig(
-                    url=catalog.url,
-                    rsin=catalog.rsin or "",
-                    domein=catalog.domein,
-                    service=client.configured_from,
+        for response in result:
+            for catalog in response.result:
+                if catalog.url in known:
+                    continue
+                create.append(
+                    CatalogusConfig(
+                        url=catalog.url,
+                        rsin=catalog.rsin or "",
+                        domein=catalog.domein,
+                        service=response.client.configured_from,
+                    )
                 )
-            )
 
         if create:
             CatalogusConfig.objects.bulk_create(create)
@@ -87,17 +95,18 @@ def import_zaaktype_configs() -> list[ZaakTypeConfig]:
 
     this collapses individual ZaakType versions on their identificatie and catalog
     """
-    client = build_catalogi_client()
-    if not client:
-        logger.warning(
-            "Not importing zaaktype configs: could not build Catalogi API client"
-        )
-        return []
+    proxy = MultiZgwClientProxy(build_catalogi_clients())
+    result = proxy.fetch_zaaktypes_no_cache()
 
-    zaak_types = get_configurable_zaaktypes(client)
-    if not zaak_types:
-        return []
+    if result.has_errors:
+        for response in result.failing_responses:
+            logger.exception(
+                "Client %s encountered an exception. Import will continue, for any other configured clients",
+                response.client,
+                exc_info=response.exception,
+            )
 
+    zaak_types = filter_zaaktypes(result.join_results())
     create = {}
 
     with transaction.atomic():

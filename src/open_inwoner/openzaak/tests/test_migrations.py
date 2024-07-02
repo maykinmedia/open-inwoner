@@ -172,3 +172,74 @@ class TestMakeZaakTypeConfigCatalogusRequired(TestFailingMigrations):
             " This field is now required: please manually update all the affected rows or re-sync"
             " your ZGW objects to ensure the field is included.",
         )
+
+
+class TestZGWApiGroupServicesRequiredFailingMigration(TestFailingMigrations):
+    migrate_from = "0053_zaaktypeconfig_catalogus_is_required"
+    migrate_to = "0054_zgw_api_group_requires_most_services"
+    app = "openzaak"
+
+    def setUpBeforeMigration(self, apps):
+        OpenZaakConfig = apps.get_model("openzaak", "OpenZaakConfig")
+        ZGWApiGroupConfig = apps.get_model("openzaak", "ZGWApiGroupConfig")
+        config = OpenZaakConfig.objects.create()
+        ZGWApiGroupConfig.objects.create(
+            open_zaak_config=config,
+            zrc_service=None,
+            drc_service=None,
+            ztc_service=None,
+            form_service=None,
+        )
+
+    def test_migration_0053_to_0054_raises_with_descriptive_exception_message(self):
+        with self.assertRaises(DataError) as cm:
+            self.attempt_migration()
+
+        self.assertEqual(
+            str(cm.exception),
+            "Your database contains 1 ZGWApiGroupConfig row(s) with missing ztc, drc,"
+            " or ztc service fields. All these fields are now required, with the exception of"
+            " your form field. Please manually update all the affected rows",
+        )
+
+
+class TestZGWApiGroupServicesRequiredSuccessfulMigration(TestSuccessfulMigrations):
+    migrate_from = "0053_zaaktypeconfig_catalogus_is_required"
+    migrate_to = "0054_zgw_api_group_requires_most_services"
+    app = "openzaak"
+
+    def setUpBeforeMigration(self, apps):
+        OpenZaakConfig = apps.get_model("openzaak", "OpenZaakConfig")
+        config = OpenZaakConfig.objects.create()
+        ZGWApiGroupConfig = apps.get_model("openzaak", "ZGWApiGroupConfig")
+        Service = apps.get_model("zgw_consumers", "Service")
+        ZGWApiGroupConfig.objects.create(
+            open_zaak_config=config,
+            name="The Group",
+            zrc_service=Service.objects.create(
+                api_root="http://foobar/zrc", api_type=APITypes.zrc
+            ),
+            drc_service=Service.objects.create(
+                api_root="http://foobar/drc", api_type=APITypes.drc
+            ),
+            ztc_service=Service.objects.create(
+                api_root="http://foobar/ztc", api_type=APITypes.ztc
+            ),
+            form_service=None,  # Optional, should not raise
+        )
+
+    def test_migration_leaves_config_models_unchanged(self):
+        ZGWApiGroupConfig = self.apps.get_model("openzaak", "ZGWApiGroupConfig")
+        Service = self.apps.get_model("zgw_consumers", "Service")
+        self.assertEqual(
+            list(ZGWApiGroupConfig.objects.values_list("name", flat=True)),
+            ["The Group"],
+        )
+        self.assertEqual(
+            list(Service.objects.values_list("api_root", "api_type")),
+            [
+                ("http://foobar/zrc", "zrc"),
+                ("http://foobar/drc", "drc"),
+                ("http://foobar/ztc", "ztc"),
+            ],
+        )
