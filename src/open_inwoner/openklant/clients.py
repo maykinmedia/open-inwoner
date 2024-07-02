@@ -159,6 +159,9 @@ class KlantenClient(APIClient):
 
 
 class ContactmomentenClient(APIClient):
+    #
+    # contactmomenten
+    #
     def create_contactmoment(
         self,
         data: ContactMomentCreateData,
@@ -203,6 +206,33 @@ class ContactmomentenClient(APIClient):
         contact_moment = factory(ContactMoment, data)
 
         return contact_moment
+
+    #
+    # objectcontactmomenten
+    #
+    def create_objectcontactmoment(
+        self,
+        contactmoment: ContactMoment,
+        zaak: Zaak,
+        object_type: str = "zaak",
+    ) -> ObjectContactMoment | None:
+        try:
+            response = self.post(
+                "objectcontactmomenten",
+                json={
+                    "contactmoment": contactmoment.url,
+                    "object": zaak.url,
+                    "objectType": object_type,
+                },
+            )
+            data = get_json_response(response)
+        except (RequestException, ClientError) as exc:
+            logger.exception("exception while making request", exc_info=exc)
+        return None
+
+        object_contact_moment = factory(ObjectContactMoment, data)
+
+        return object_contact_moment
 
     def retrieve_objectcontactmomenten_for_zaak(
         self, zaak: Zaak
@@ -264,6 +294,9 @@ class ContactmomentenClient(APIClient):
 
         return object_contact_momenten
 
+    #
+    # klantcontactmomenten
+    #
     def retrieve_klantcontactmomenten_for_klant(
         self, klant: Klant
     ) -> list[KlantContactMoment]:

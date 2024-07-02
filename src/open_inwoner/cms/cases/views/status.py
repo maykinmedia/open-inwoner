@@ -954,7 +954,7 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
             "bronorganisatie": config.register_bronorganisatie_rsin,
             "tekst": question,
             "type": config.register_type,
-            "kanaal": "Internet",
+            "kanaal": "contactformulier",
             "medewerkerIdentificatie": {
                 "identificatie": config.register_employee_id,
             },
@@ -968,7 +968,14 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
                 self.log_system_action(
                     "registered contactmoment by API", user=self.request.user
                 )
-                return True
+            objectcontactmoment = contactmoment_client.create_objectcontactmoment(
+                contactmoment, self.case
+            )
+            if objectcontactmoment:
+                self.log_system_action(
+                    "registered objectcontactmoment by API", user=self.request.user
+                )
+            return True
         else:
             self.log_system_action(
                 "error while registering contactmoment by API", user=self.request.user

@@ -287,6 +287,13 @@ class CasesPlaywrightTests(
             klant=self.klant["url"],
             contactmoment=self.contactmoment["url"],
         )
+        self.object_contactmoment = generate_oas_component_cached(
+            "cmc",
+            "schemas/Objectcontactmoment",
+            url=f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten/aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
+            contactmoment=self.contactmoment["url"],
+            object=self.zaak["url"],
+        )
 
         # enable upload and contact form
         zaak_type_config = ZaakTypeConfigFactory(
@@ -322,6 +329,7 @@ class CasesPlaywrightTests(
             self.status_type_new,
             self.status_type_finish,
             self.contactmoment,
+            self.object_contactmoment,
         ]:
             m.get(resource["url"], json=resource)
 
@@ -407,6 +415,11 @@ class CasesPlaywrightTests(
                 json=self.klant_contactmoment,
                 status_code=201,
             ),
+            m.post(
+                f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten",
+                json=self.object_contactmoment,
+                status_code=201,
+            ),
         ]
 
     def test_cases(self, m, contactmoment_mock):
@@ -430,9 +443,7 @@ class CasesPlaywrightTests(
         )
 
         # check case is visible
-        expect(page.get_by_text(self.zaak["identificatie"])).to_be_visible(
-            timeout=100_000
-        )
+        expect(page.get_by_text(self.zaak["identificatie"])).to_be_visible()
 
         # check documents show
         documents = page.locator(".file-list").get_by_role("listitem")
