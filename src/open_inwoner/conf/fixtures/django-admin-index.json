@@ -290,10 +290,6 @@
         "models": [
             [
                 "mailer",
-                "dontsendentry"
-            ],
-            [
-                "mailer",
                 "message"
             ],
             [
