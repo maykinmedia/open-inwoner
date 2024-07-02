@@ -11,7 +11,7 @@ from django.db.models import Q, UniqueConstraint
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.crypto import get_random_string
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, pgettext_lazy
 
 from image_cropping import ImageCropField, ImageRatioField
 from localflavor.nl.models import NLBSNField, NLZipCodeField
@@ -386,7 +386,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         ):
             enabled.append(_("cases"))
         if self.messages_notifications and inbox_page_is_published():
-            enabled.append(_("messages"))
+            enabled.append(pgettext_lazy("Active notifications", "messages"))
         if self.plans_notifications and collaborate_page_is_published():
             enabled.append(_("plans"))
         if not enabled:
