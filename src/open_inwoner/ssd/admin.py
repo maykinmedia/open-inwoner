@@ -31,6 +31,7 @@ class SSDConfigAdmin(SingletonModelAdmin):
                     "maandspecificatie_delta",
                     "maandspecificatie_available_from",
                     "maandspecificatie_display_text",
+                    "maandspecificatie_pdf_comments",
                 )
             },
         ),
@@ -42,7 +43,7 @@ class SSDConfigAdmin(SingletonModelAdmin):
                     "jaaropgave_delta",
                     "jaaropgave_available_from",
                     "jaaropgave_display_text",
-                    "jaaropgave_comments",
+                    "jaaropgave_pdf_comments",
                 )
             },
         ),

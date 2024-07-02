@@ -213,7 +213,10 @@ class UitkeringClient(SSDBaseClient):
             )
         pdf = render_pdf(
             self.html_template,
-            context={"reports": uitkeringen},
+            context={
+                "reports": uitkeringen,
+                "comments": self.config.maandspecificatie_pdf_comments,
+            },
             base_url=request_base_url,
         )
         return pdf

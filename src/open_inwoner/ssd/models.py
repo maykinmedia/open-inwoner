@@ -84,7 +84,7 @@ class SSDConfig(SingletonModel):
         blank=True,
         help_text=_("The text displayed as overview of the 'Jaaropgave' tab"),
     )
-    jaaropgave_comments = models.TextField(
+    jaaropgave_pdf_comments = models.TextField(
         _("PDF help text"),
         blank=True,
         help_text=_("Help text for the columns in the Jaaropgave PDF"),
@@ -109,6 +109,14 @@ class SSDConfig(SingletonModel):
         _("Display text"),
         blank=True,
         help_text=_("The text displayed as overview of the 'Maandspecificatie' tab"),
+    )
+    maandspecificatie_pdf_comments = models.TextField(
+        _("PDF help text"),
+        blank=True,
+        help_text=_(
+            "Optional comments to be included in the maandspecificatie PDF. "
+            "Markdown formatting is supported."
+        ),
     )
 
     @property
