@@ -18,7 +18,11 @@ from open_inwoner.cms.utils.page_display import (
 )
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.pdc.models.category import Category
-from open_inwoner.utils.forms import LimitedUploadFileField, PrivateFileWidget
+from open_inwoner.utils.forms import (
+    ErrorMessageMixin,
+    LimitedUploadFileField,
+    PrivateFileWidget,
+)
 from open_inwoner.utils.validators import CharFieldValidator, DutchPhoneNumberValidator
 
 from .choices import (
@@ -142,7 +146,7 @@ class BaseUserForm(forms.ModelForm):
             del self.fields["cropping"]
 
 
-class UserForm(BaseUserForm):
+class UserForm(ErrorMessageMixin, BaseUserForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.user = kwargs.pop("user")
@@ -169,7 +173,7 @@ class BrpUserForm(BaseUserForm):
     pass
 
 
-class NecessaryUserForm(forms.ModelForm):
+class NecessaryUserForm(ErrorMessageMixin, forms.ModelForm):
     invite = forms.ModelChoiceField(
         queryset=Invite.objects.all(),
         to_field_name="key",

@@ -2,9 +2,10 @@ from dataclasses import asdict
 from datetime import date
 from unittest.mock import patch
 
+from django import forms
 from django.conf import settings
 from django.template.defaultfilters import date as django_date
-from django.test import override_settings, tag
+from django.test import TestCase, override_settings, tag
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
 
@@ -22,6 +23,7 @@ from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.pdc.tests.factories import CategoryFactory
 from open_inwoner.plans.tests.factories import PlanFactory
 from open_inwoner.qmatic.tests.data import QmaticMockData
+from open_inwoner.utils.forms import ErrorMessageMixin
 from open_inwoner.utils.logentry import LOG_ACTIONS
 from open_inwoner.utils.test import ClearCachesMixin
 from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin, create_image_bytes
@@ -325,7 +327,13 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         form["postcode"] = ""
         form["city"] = ""
         base_response = form.submit()
-        expected_errors = {"email": [_("Dit veld is vereist.")]}
+        expected_errors = {
+            "email": [
+                _(
+                    'Het verplichte veld "E-mailadres" is niet (goed) ingevuld. Vul het veld in.'
+                )
+            ]
+        }
         self.assertEqual(base_response.context["form"].errors, expected_errors)
 
     def test_save_filled_form(self):
@@ -672,6 +680,37 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         self.assertTimelineLog(
             "patched klant from user profile edit with fields: emailadres"
         )
+
+
+class TestForm(ErrorMessageMixin, forms.Form):
+    name = forms.CharField(required=True, label="Naam")
+    email = forms.EmailField(required=True, label="E-mailadres")
+
+
+class ErrorMessageMixinTest(TestCase):
+    def test_default_error_messages(self):
+        form = TestForm(data={})
+        self.assertEqual(
+            form.errors["name"],
+            [_('Het verplichte veld "Naam" is niet (goed) ingevuld. Vul het veld in.')],
+        )
+        self.assertEqual(
+            form.errors["email"],
+            [
+                _(
+                    'Het verplichte veld "E-mailadres" is niet (goed) ingevuld. Vul het veld in.'
+                )
+            ],
+        )
+
+    def test_custom_error_messages(self):
+        custom_messages = {
+            "name": {"required": _("Naam is verplicht.")},
+            "email": {"required": _("E-mail is verplicht.")},
+        }
+        form = TestForm(data={}, custom_error_messages=custom_messages)
+        self.assertEqual(form.errors["name"], [_("Naam is verplicht.")])
+        self.assertEqual(form.errors["email"], [_("E-mail is verplicht.")])
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
