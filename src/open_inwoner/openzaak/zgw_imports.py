@@ -13,8 +13,8 @@ from open_inwoner.openzaak.api_models import ZaakType
 from open_inwoner.openzaak.clients import (
     CatalogiClient,
     MultiZgwClientProxy,
-    build_catalogi_client,
     build_catalogi_clients,
+    build_zgw_client_from_service,
 )
 from open_inwoner.openzaak.models import (
     CatalogusConfig,
@@ -192,7 +192,7 @@ def import_zaaktype_informatieobjecttype_configs_for_type(
 
     this is a bit complicated because one ZaakTypeConfig can represent multiple ZaakTypes
     """
-    client = build_catalogi_client()
+    client = build_zgw_client_from_service(ztc.catalogus.service)
     if not client:
         logger.warning(
             "Not importing zaaktype-informatieobjecttype configs: could not build Catalogi API client"
@@ -266,7 +266,7 @@ def import_statustype_configs_for_type(
 
     this is a bit complicated because one ZaakTypeConfig can represent multiple ZaakTypes
     """
-    client = build_catalogi_client()
+    client = build_zgw_client_from_service(ztc.catalogus.service)
     if not client:
         logger.warning(
             "Not importing statustype configs: could not build Catalogi API client"
@@ -342,7 +342,7 @@ def import_resultaattype_configs_for_type(
 
     this is a bit complicated because one ZaakTypeConfig can represent multiple ZaakTypes
     """
-    client = build_catalogi_client()
+    client = build_zgw_client_from_service(ztc.catalogus.service)
     if not client:
         logger.warning(
             "Not importing resultaattype configs: could not build Catalogi API client"

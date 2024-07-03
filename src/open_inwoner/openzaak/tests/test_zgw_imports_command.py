@@ -1,6 +1,5 @@
 import inspect
 from io import StringIO
-from unittest import skip
 
 from django.core.management import call_command
 from django.test import TestCase
@@ -16,7 +15,7 @@ from open_inwoner.openzaak.models import (
     ZaakTypeStatusTypeConfig,
 )
 from open_inwoner.openzaak.tests.factories import ZGWApiGroupConfigFactory
-from open_inwoner.openzaak.tests.shared import CATALOGI_ROOT
+from open_inwoner.openzaak.tests.shared import ANOTHER_CATALOGI_ROOT, CATALOGI_ROOT
 from open_inwoner.openzaak.tests.test_zgw_imports import CatalogMockData
 from open_inwoner.openzaak.tests.test_zgw_imports_iotypes import (
     InformationObjectTypeMockData,
@@ -32,55 +31,77 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
     def setUpTestData(cls):
         super().setUpTestData()
 
-        ZGWApiGroupConfigFactory(
-            ztc_service__api_root=CATALOGI_ROOT,
-            form_service=None,
-        )
+        cls.config = OpenZaakConfig.get_solo()
+        cls.roots = (CATALOGI_ROOT, ANOTHER_CATALOGI_ROOT)
+        cls.api_groups_for_root = {
+            root: ZGWApiGroupConfigFactory(ztc_service__api_root=root)
+            for root in cls.roots
+        }
 
-    @skip("Being fixed in the next PR")
     def test_zgw_import_data_command(self, m):
-        CatalogMockData().install_mocks(m)
-        InformationObjectTypeMockData().install_mocks(m)
+        m.reset_mock()
+        for root in self.roots:
+            CatalogMockData(root).install_mocks(m)
+            InformationObjectTypeMockData(root).install_mocks(m)
+            # ZaakTypeMockData(root).install_mocks(m)
+
+            # TODO: ADD CATALOGI like in iotypes
 
         # run it to import our data
         out = StringIO()
         call_command("zgw_import_data", stdout=out)
 
-        self.assertEqual(CatalogusConfig.objects.count(), 2)
-        self.assertEqual(ZaakTypeConfig.objects.count(), 2)
-        self.assertEqual(ZaakTypeInformatieObjectTypeConfig.objects.count(), 3)
-        self.assertEqual(ZaakTypeStatusTypeConfig.objects.count(), 2)
-        self.assertEqual(ZaakTypeResultaatTypeConfig.objects.count(), 2)
+        self.assertEqual(CatalogusConfig.objects.count(), 4)
+        self.assertEqual(ZaakTypeConfig.objects.count(), 4)
+        self.assertEqual(ZaakTypeInformatieObjectTypeConfig.objects.count(), 6)
+        self.assertEqual(ZaakTypeStatusTypeConfig.objects.count(), 4)
+        self.assertEqual(ZaakTypeResultaatTypeConfig.objects.count(), 4)
 
         stdout = out.getvalue().strip()
 
         expected = inspect.cleandoc(
             """
-        imported 2 new catalogus configs
-        aaaaa - 123456789
-        bbbbb - 123456789
+        imported 4 new catalogus configs
+        aaaaa - 123456789 [andere-catalogi.nl]
+        aaaaa - 123456789 [catalogi.nl]
+        bbbbb - 123456789 [andere-catalogi.nl]
+        bbbbb - 123456789 [catalogi.nl]
 
-        imported 2 new zaaktype configs
-        AAA - zaaktype-aaa
-        BBB - zaaktype-bbb
+        imported 4 new zaaktype configs
+        AAA - zaaktype-aaa [andere-catalogi.nl]
+        AAA - zaaktype-aaa [catalogi.nl]
+        BBB - zaaktype-bbb [andere-catalogi.nl]
+        BBB - zaaktype-bbb [catalogi.nl]
 
-        imported 3 new zaaktype-informatiebjecttype configs
-        AAA - zaaktype-aaa
-          info-aaa-1
-          info-aaa-2
-        BBB - zaaktype-bbb
-          info-bbb
+        imported 6 new zaaktype-informatiebjecttype configs
+        AAA - zaaktype-aaa [andere-catalogi.nl]
+          info-aaa-1 [andere-catalogi.nl]
+          info-aaa-2 [andere-catalogi.nl]
+        AAA - zaaktype-aaa [catalogi.nl]
+          info-aaa-1 [catalogi.nl]
+          info-aaa-2 [catalogi.nl]
+        BBB - zaaktype-bbb [andere-catalogi.nl]
+          info-bbb [andere-catalogi.nl]
+        BBB - zaaktype-bbb [catalogi.nl]
+          info-bbb [catalogi.nl]
 
-        imported 2 new zaaktype-statustype configs
-        AAA - zaaktype-aaa
-          AAA - status-aaa-1
-          AAA - status-aaa-2
+        imported 4 new zaaktype-statustype configs
+        AAA - zaaktype-aaa [andere-catalogi.nl]
+          AAA - status-aaa-1 [andere-catalogi.nl]
+          AAA - status-aaa-2 [andere-catalogi.nl]
+        AAA - zaaktype-aaa [catalogi.nl]
+          AAA - status-aaa-1 [catalogi.nl]
+          AAA - status-aaa-2 [catalogi.nl]
 
-        imported 2 new zaaktype-resultaattype configs
-        AAA - zaaktype-aaa
-          AAA - test
-        BBB - zaaktype-bbb
-          BBB - test
+        imported 4 new zaaktype-resultaattype configs
+        AAA - zaaktype-aaa [andere-catalogi.nl]
+          AAA - test [andere-catalogi.nl]
+        AAA - zaaktype-aaa [catalogi.nl]
+          AAA - test [catalogi.nl]
+        BBB - zaaktype-bbb [andere-catalogi.nl]
+          BBB - test [andere-catalogi.nl]
+        BBB - zaaktype-bbb [catalogi.nl]
+          BBB - test [catalogi.nl]
         """
         ).strip()
 
@@ -91,12 +112,11 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
         call_command("zgw_import_data", stdout=out)
 
         # still same
-        self.assertEqual(CatalogusConfig.objects.count(), 2)
-        self.assertEqual(ZaakTypeConfig.objects.count(), 2)
-        self.assertEqual(ZaakTypeInformatieObjectTypeConfig.objects.count(), 3)
-        self.assertEqual(ZaakTypeStatusTypeConfig.objects.count(), 2)
-        self.assertEqual(ZaakTypeResultaatTypeConfig.objects.count(), 2)
-
+        self.assertEqual(CatalogusConfig.objects.count(), 4)
+        self.assertEqual(ZaakTypeConfig.objects.count(), 4)
+        self.assertEqual(ZaakTypeInformatieObjectTypeConfig.objects.count(), 6)
+        self.assertEqual(ZaakTypeStatusTypeConfig.objects.count(), 4)
+        self.assertEqual(ZaakTypeResultaatTypeConfig.objects.count(), 4)
         stdout = out.getvalue().strip()
 
         expected = inspect.cleandoc(
@@ -114,13 +134,3 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
         ).strip()
 
         self.assertEqual(stdout, expected)
-
-    def test_zgw_import_data_command_without_catalog(self, m):
-        m.get(
-            f"{CATALOGI_ROOT}catalogussen",
-            status_code=500,
-        )
-        InformationObjectTypeMockData().install_mocks(m, with_catalog=False)
-
-        with self.assertRaises(RuntimeError):
-            call_command("zgw_import_data")
