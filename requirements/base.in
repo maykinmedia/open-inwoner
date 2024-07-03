@@ -14,7 +14,7 @@ pydantic[email]
 typing-extensions
 
 # Framework libraries
-Django>=4.2<5.0
+Django>=4.2,<5.0
 django-admin-index
 django-axes
 django-filer
