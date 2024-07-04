@@ -6,7 +6,14 @@
         </div>
     {% endif %}
 
-    <div class="notification__content" tabindex="-1">
+    <div class="notification__content"
+         {% if type == "error" %}
+            role="alert"
+         {% elif type == "warning" %}
+            role="alert"
+         {% else %}
+            role="status"
+         {% endif %} tabindex="-1">
         {% if title %}<h2 class="utrecht-heading-2">{{ title }}</h2>{% endif %}
         {% if notification %}<p class="utrecht-paragraph">{{ notification }}</p>{% endif %}
         {% if action %}{% button href=action text=action_text %}{% endif %}

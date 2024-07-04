@@ -155,7 +155,7 @@ class SearchView(
             self.request,
             messages.SUCCESS,
             _(
-                "Thank you for your feedback. It will help us to improve our search engine"
+                "Thank you for your feedback, it will help us improve our search engine."
             ),
         )
         redirect = furl(reverse("search:search"))
