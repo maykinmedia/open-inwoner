@@ -8,7 +8,6 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 
-import ckeditor.fields as ckeditor_fields
 from colorfield.fields import ColorField
 from django_jsonform.models.fields import ArrayField
 from filer.fields.image import FilerImageField
@@ -69,7 +68,7 @@ class SiteConfiguration(SingletonModel):
         default=False,
         help_text=_("Whether the warning banner should be displayed"),
     )
-    warning_banner_text = ckeditor_fields.RichTextField(
+    warning_banner_text = models.TextField(
         verbose_name=_("Warning banner text"),
         blank=True,
         help_text=_("Text will be displayed on the warning banner"),
