@@ -9,3 +9,6 @@
 # Run this script from the root of the repository
 
 src/manage.py dumpdata --indent=4 --natural-foreign --natural-primary admin_index.AppGroup admin_index.AppLink > src/open_inwoner/conf/fixtures/django-admin-index.json
+
+# copy admin-index fixture to autoload dir
+cp src/open_inwoner/conf/fixtures/django-admin-index.json src/open_inwoner/conf/fixtures/autoload/

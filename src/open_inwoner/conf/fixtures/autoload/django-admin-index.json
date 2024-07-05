@@ -1,0 +1,494 @@
+[
+{
+    "model": "admin_index.appgroup",
+    "fields": {
+        "order": 0,
+        "translations": {},
+        "name": "Gebruikersprofielen",
+        "slug": "accounts",
+        "models": [
+            [
+                "accounts",
+                "action"
+            ],
+            [
+                "accounts",
+                "document"
+            ],
+            [
+                "accounts",
+                "invite"
+            ],
+            [
+                "accounts",
+                "message"
+            ],
+            [
+                "accounts",
+                "user"
+            ],
+            [
+                "userfeed",
+                "feeditemdata"
+            ]
+        ]
+    }
+},
+{
+    "model": "admin_index.appgroup",
+    "fields": {
+        "order": 2,
+        "translations": {},
+        "name": "PDC",
+        "slug": "pdc",
+        "models": [
+            [
+                "pdc",
+                "category"
+            ],
+            [
+                "pdc",
+                "organization"
+            ],
+            [
+                "pdc",
+                "organizationtype"
+            ],
+            [
+                "pdc",
+                "product"
+            ],
+            [
+                "pdc",
+                "productcondition"
+            ],
+            [
+                "pdc",
+                "productcontact"
+            ],
+            [
+                "pdc",
+                "productlocation"
+            ],
+            [
+                "pdc",
+                "question"
+            ],
+            [
+                "pdc",
+                "tag"
+            ],
+            [
+                "pdc",
+                "tagtype"
+            ],
+            [
+                "questionnaire",
+                "questionnairestep"
+            ],
+            [
+                "questionnaire",
+                "questionnairestepfile"
+            ]
+        ]
+    }
+},
+{
+    "model": "admin_index.appgroup",
+    "fields": {
+        "order": 4,
+        "translations": {},
+        "name": "Permissies, 2FA en logging",
+        "slug": "permissies-2fa-en-logging",
+        "models": [
+            [
+                "auth",
+                "group"
+            ],
+            [
+                "axes",
+                "accessattempt"
+            ],
+            [
+                "axes",
+                "accesslog"
+            ],
+            [
+                "cspreports",
+                "cspreport"
+            ],
+            [
+                "django_yubin",
+                "log"
+            ],
+            [
+                "django_yubin",
+                "message"
+            ],
+            [
+                "log_outgoing_requests",
+                "outgoingrequestslog"
+            ],
+            [
+                "log_outgoing_requests",
+                "outgoingrequestslogconfig"
+            ],
+            [
+                "otp_totp",
+                "totpdevice"
+            ],
+            [
+                "timeline_logger",
+                "timelinelog"
+            ]
+        ]
+    }
+},
+{
+    "model": "admin_index.appgroup",
+    "fields": {
+        "order": 10,
+        "translations": {
+            "nl": "Overige/Diverse"
+        },
+        "name": "Overige / Diverse",
+        "slug": "overige-diverse",
+        "models": [
+            [
+                "admin_index",
+                "appgroup"
+            ],
+            [
+                "admin_index",
+                "applink"
+            ],
+            [
+                "admin_index",
+                "contenttypeproxy"
+            ],
+            [
+                "celery_monitor",
+                "taskstate"
+            ],
+            [
+                "django_celery_beat",
+                "periodictask"
+            ],
+            [
+                "easy_thumbnails",
+                "source"
+            ],
+            [
+                "easy_thumbnails",
+                "thumbnail"
+            ],
+            [
+                "easy_thumbnails",
+                "thumbnaildimensions"
+            ],
+            [
+                "filer",
+                "folder"
+            ],
+            [
+                "filer",
+                "folderpermission"
+            ]
+        ]
+    }
+},
+{
+    "model": "admin_index.appgroup",
+    "fields": {
+        "order": 8,
+        "translations": {},
+        "name": "Configuratie",
+        "slug": "configuratie",
+        "models": [
+            [
+                "configurations",
+                "siteconfiguration"
+            ],
+            [
+                "configurations",
+                "siteconfigurationpage"
+            ],
+            [
+                "custom_csp",
+                "cspsetting"
+            ],
+            [
+                "flatpages",
+                "flatpage"
+            ],
+            [
+                "mail_editor",
+                "mailtemplate"
+            ],
+            [
+                "sites",
+                "site"
+            ]
+        ]
+    }
+},
+{
+    "model": "admin_index.appgroup",
+    "fields": {
+        "order": 3,
+        "translations": {},
+        "name": "Zoeken",
+        "slug": "zoeken",
+        "models": [
+            [
+                "search",
+                "feedback"
+            ],
+            [
+                "search",
+                "fieldboost"
+            ],
+            [
+                "search",
+                "synonym"
+            ]
+        ]
+    }
+},
+{
+    "model": "admin_index.appgroup",
+    "fields": {
+        "order": 1,
+        "translations": {},
+        "name": "Plannen",
+        "slug": "plannen",
+        "models": [
+            [
+                "plans",
+                "actiontemplate"
+            ],
+            [
+                "plans",
+                "plan"
+            ],
+            [
+                "plans",
+                "plantemplate"
+            ]
+        ]
+    }
+},
+{
+    "model": "admin_index.appgroup",
+    "fields": {
+        "order": 5,
+        "translations": {},
+        "name": "Data koppelingen",
+        "slug": "koppelingen",
+        "models": [
+            [
+                "laposta",
+                "lapostaconfig"
+            ],
+            [
+                "notifications_api_common",
+                "notificationsconfig"
+            ],
+            [
+                "notifications_api_common",
+                "subscription"
+            ],
+            [
+                "openformsclient",
+                "configuration"
+            ],
+            [
+                "openklant",
+                "klantcontactmomentanswer"
+            ],
+            [
+                "openklant",
+                "openklantconfig"
+            ],
+            [
+                "openzaak",
+                "catalogusconfig"
+            ],
+            [
+                "openzaak",
+                "openzaakconfig"
+            ],
+            [
+                "openzaak",
+                "usercaseinfoobjectnotification"
+            ],
+            [
+                "openzaak",
+                "usercasestatusnotification"
+            ],
+            [
+                "openzaak",
+                "zaaktypeconfig"
+            ],
+            [
+                "openzaak",
+                "zaaktypeinformatieobjecttypeconfig"
+            ],
+            [
+                "qmatic",
+                "qmaticconfig"
+            ],
+            [
+                "soap",
+                "soapservice"
+            ],
+            [
+                "ssd",
+                "ssdconfig"
+            ],
+            [
+                "zgw_consumers",
+                "certificate"
+            ],
+            [
+                "zgw_consumers",
+                "service"
+            ]
+        ]
+    }
+},
+{
+    "model": "admin_index.appgroup",
+    "fields": {
+        "order": 7,
+        "translations": {},
+        "name": "CMS",
+        "slug": "cms",
+        "models": [
+            [
+                "cms",
+                "aliaspluginmodel"
+            ],
+            [
+                "cms",
+                "cmsplugin"
+            ],
+            [
+                "cms",
+                "globalpagepermission"
+            ],
+            [
+                "cms",
+                "page"
+            ],
+            [
+                "cms",
+                "pagepermission"
+            ],
+            [
+                "cms",
+                "pagetype"
+            ],
+            [
+                "cms",
+                "pageuser"
+            ],
+            [
+                "cms",
+                "pageusergroup"
+            ],
+            [
+                "cms",
+                "placeholder"
+            ],
+            [
+                "cms",
+                "placeholderreference"
+            ]
+        ]
+    }
+},
+{
+    "model": "admin_index.appgroup",
+    "fields": {
+        "order": 6,
+        "translations": {
+            "nl": "Inlog koppelingen"
+        },
+        "name": "Inlog koppelingen",
+        "slug": "auth-koppelingen",
+        "models": [
+            [
+                "digid_eherkenning",
+                "digidconfiguration"
+            ],
+            [
+                "digid_eherkenning",
+                "eherkenningconfiguration"
+            ],
+            [
+                "digid_eherkenning_oidc_generics",
+                "openidconnectdigidconfig"
+            ],
+            [
+                "digid_eherkenning_oidc_generics",
+                "openidconnecteherkenningconfig"
+            ],
+            [
+                "haalcentraal",
+                "haalcentraalconfig"
+            ],
+            [
+                "kvk",
+                "kvkconfig"
+            ],
+            [
+                "mozilla_django_oidc_db",
+                "openidconnectconfig"
+            ]
+        ]
+    }
+},
+{
+    "model": "admin_index.applink",
+    "fields": {
+        "order": 0,
+        "translations": {
+            "nl": "Link naar Documentatie"
+        },
+        "app_group": [
+            "overige-diverse"
+        ],
+        "name": "Link naar Documentatie",
+        "link": "https://taiga.maykinmedia.nl/project/open-inwoner/wiki/home"
+    }
+},
+{
+    "model": "admin_index.applink",
+    "fields": {
+        "order": 1,
+        "translations": {
+            "nl": "Link naar Github"
+        },
+        "app_group": [
+            "overige-diverse"
+        ],
+        "name": "Link naar Github",
+        "link": "https://github.com/maykinmedia/open-inwoner"
+    }
+},
+{
+    "model": "admin_index.applink",
+    "fields": {
+        "order": 2,
+        "translations": {
+            "nl": "Link naar Maykin"
+        },
+        "app_group": [
+            "overige-diverse"
+        ],
+        "name": "Link naar Maykin",
+        "link": "https://www.maykinmedia.nl/nl/"
+    }
+}
+]
