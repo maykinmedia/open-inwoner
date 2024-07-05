@@ -7,7 +7,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         (
-            "digid_eherkenning_oidc_generics",
+            "digid_eherkenning_oidc_generics_legacy",
             "0003_alter_openidconnectdigidconfig_oidc_exempt_urls_and_more",
         ),
     ]
