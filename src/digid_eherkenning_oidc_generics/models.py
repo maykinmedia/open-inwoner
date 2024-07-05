@@ -3,7 +3,7 @@ from django.utils.functional import classproperty
 from django.utils.translation import gettext_lazy as _
 
 from django_jsonform.models.fields import ArrayField
-from mozilla_django_oidc_db.models import CachingMixin, OpenIDConnectConfigBase
+from mozilla_django_oidc_db.models import OpenIDConnectConfigBase
 
 from .digid_settings import DIGID_CUSTOM_OIDC_DB_PREFIX
 from .eherkenning_settings import EHERKENNING_CUSTOM_OIDC_DB_PREFIX
@@ -23,7 +23,7 @@ def get_default_scopes_kvk():
     return ["openid", "kvk"]
 
 
-class OpenIDConnectBaseConfig(CachingMixin, OpenIDConnectConfigBase):
+class OpenIDConnectBaseConfig(OpenIDConnectConfigBase):
     """
     Configuration for DigiD authentication via OpenID connect
     """
@@ -99,6 +99,7 @@ class OpenIDConnectDigiDConfig(OpenIDConnectBaseConfig):
 
     class Meta:
         verbose_name = _("OpenID Connect configuration for DigiD")
+        db_table = "digid_eherkenning_oidc_generics_openidconnectdigidconfig"
 
 
 class OpenIDConnectEHerkenningConfig(OpenIDConnectBaseConfig):
@@ -138,3 +139,4 @@ class OpenIDConnectEHerkenningConfig(OpenIDConnectBaseConfig):
 
     class Meta:
         verbose_name = _("OpenID Connect configuration for eHerkenning")
+        db_table = "digid_eherkenning_oidc_generics_openidconnecteherkenningconfig"
