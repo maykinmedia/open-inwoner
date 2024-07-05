@@ -3,7 +3,6 @@ from django.utils.functional import classproperty
 from django.utils.translation import gettext_lazy as _
 
 from django_jsonform.models.fields import ArrayField
-from mozilla_django_oidc_db.models import OpenIDConnectConfigBase
 from solo.models import SingletonModel
 
 from .digid_settings import DIGID_CUSTOM_OIDC_DB_PREFIX
@@ -22,45 +21,6 @@ def get_default_scopes_kvk():
     Returns the default scopes to request for OpenID Connect logins
     """
     return ["openid", "kvk"]
-
-
-class OpenIDConnectBaseConfig(OpenIDConnectConfigBase):
-    """
-    Configuration for DigiD authentication via OpenID connect
-    """
-
-    oidc_op_logout_endpoint = models.URLField(
-        _("Logout endpoint"),
-        max_length=1000,
-        help_text=_("URL of your OpenID Connect provider logout endpoint"),
-        blank=True,
-    )
-
-    error_message_mapping = models.JSONField(
-        _("Error message mapping"),
-        max_length=1000,
-        help_text=_(
-            "Mapping that maps error messages returned by the identity provider "
-            "to human readable error messages that are shown to the user"
-        ),
-        default=dict,
-        blank=True,
-    )
-
-    # Keycloak specific config
-    oidc_keycloak_idp_hint = models.CharField(
-        _("Keycloak Identity Provider hint"),
-        max_length=1000,
-        help_text=_(
-            "Specific for Keycloak: parameter that indicates which identity provider "
-            "should be used (therefore skipping the Keycloak login screen)."
-        ),
-        blank=True,
-    )
-
-    class Meta:
-        verbose_name = _("OpenID Connect configuration")
-        abstract = True
 
 
 class OpenIDConnectDigiDConfig(SingletonModel):
