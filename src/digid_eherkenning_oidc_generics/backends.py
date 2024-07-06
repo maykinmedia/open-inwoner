@@ -5,11 +5,12 @@ from django.urls import reverse_lazy
 from mozilla_django_oidc_db.backends import (
     OIDCAuthenticationBackend as _OIDCAuthenticationBackend,
 )
+from solo.models import SingletonModel
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.utils.hash import generate_email_from_string
 
-from .mixins import SoloConfigDigiDMixin, SoloConfigEHerkenningMixin
+from .models import OpenIDConnectDigiDConfig, OpenIDConnectEHerkenningConfig
 
 logger = logging.getLogger(__name__)
 
@@ -19,11 +20,17 @@ class OIDCAuthenticationBackend(_OIDCAuthenticationBackend):
     callback_path = None
     unique_id_user_fieldname = ""
 
+    _config_class: type[SingletonModel]
+
     def authenticate(self, request, *args, **kwargs):
         # Avoid attempting OIDC for a specific variant if we know that that is not the
         # correct variant being attempted
         if request and request.path != self.callback_path:
             return
+
+        # XXX: hack around store_config until we transition to a single backend once
+        # digid_eherkenning.oidc is available
+        request._oidcdb_config_class = self._config_class
 
         return super().authenticate(request, *args, **kwargs)
 
@@ -60,22 +67,24 @@ class OIDCAuthenticationBackend(_OIDCAuthenticationBackend):
         return user
 
 
-class OIDCAuthenticationDigiDBackend(SoloConfigDigiDMixin, OIDCAuthenticationBackend):
+class OIDCAuthenticationDigiDBackend(OIDCAuthenticationBackend):
     """
     Allows logging in via OIDC with DigiD
     """
+
+    _config_class = OpenIDConnectDigiDConfig
 
     login_type = LoginTypeChoices.digid
     callback_path = reverse_lazy("digid_oidc:callback")
     unique_id_user_fieldname = "bsn"
 
 
-class OIDCAuthenticationEHerkenningBackend(
-    SoloConfigEHerkenningMixin, OIDCAuthenticationBackend
-):
+class OIDCAuthenticationEHerkenningBackend(OIDCAuthenticationBackend):
     """
     Allows logging in via OIDC with eHerkenning
     """
+
+    _config_class = OpenIDConnectEHerkenningConfig
 
     login_type = LoginTypeChoices.eherkenning
     callback_path = reverse_lazy("eherkenning_oidc:callback")

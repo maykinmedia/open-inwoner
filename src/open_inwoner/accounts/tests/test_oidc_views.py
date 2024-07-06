@@ -94,7 +94,7 @@ class OIDCFlowTests(TestCase):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "mozilla_django_oidc_db.mixins.OpenIDConnectConfig.get_solo",
+        "mozilla_django_oidc_db.models.OpenIDConnectConfig.get_solo",
         return_value=OpenIDConnectConfig(id=1, enabled=True, make_users_staff=True),
     )
     @patch(
@@ -119,7 +119,12 @@ class OIDCFlowTests(TestCase):
         user = UserFactory.create(email="existing_user@example.com")
         self.assertEqual(user.oidc_id, "")
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "mozilla_django_oidc_db.OpenIDConnectConfig",
+            }
+        }
         session.save()
         callback_url = reverse("oidc_authentication_callback")
 
@@ -145,7 +150,7 @@ class OIDCFlowTests(TestCase):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "mozilla_django_oidc_db.mixins.OpenIDConnectConfig.get_solo",
+        "mozilla_django_oidc_db.models.OpenIDConnectConfig.get_solo",
         return_value=OpenIDConnectConfig(id=1, enabled=True, make_users_staff=False),
     )
     @patch(
@@ -170,7 +175,12 @@ class OIDCFlowTests(TestCase):
         user = UserFactory.create(email="existing_user@example.com")
         self.assertEqual(user.oidc_id, "")
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "mozilla_django_oidc_db.OpenIDConnectConfig",
+            }
+        }
         session.save()
         callback_url = reverse("oidc_authentication_callback")
 
@@ -196,7 +206,7 @@ class OIDCFlowTests(TestCase):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "mozilla_django_oidc_db.mixins.OpenIDConnectConfig.get_solo",
+        "mozilla_django_oidc_db.models.OpenIDConnectConfig.get_solo",
         return_value=OpenIDConnectConfig(
             id=1,
             enabled=True,
@@ -228,7 +238,12 @@ class OIDCFlowTests(TestCase):
             oidc_id="some_username", first_name="Foo", login_type=LoginTypeChoices.oidc
         )
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "mozilla_django_oidc_db.OpenIDConnectConfig",
+            }
+        }
         session.save()
         callback_url = reverse("oidc_authentication_callback")
 
@@ -254,7 +269,7 @@ class OIDCFlowTests(TestCase):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "mozilla_django_oidc_db.mixins.OpenIDConnectConfig.get_solo",
+        "mozilla_django_oidc_db.models.OpenIDConnectConfig.get_solo",
         return_value=OpenIDConnectConfig(id=1, enabled=True),
     )
     @patch(
@@ -281,7 +296,12 @@ class OIDCFlowTests(TestCase):
         )
         self.assertEqual(user.oidc_id, "")
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "mozilla_django_oidc_db.OpenIDConnectConfig",
+            }
+        }
         session.save()
         callback_url = reverse("oidc_authentication_callback")
 
@@ -309,7 +329,7 @@ class OIDCFlowTests(TestCase):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "mozilla_django_oidc_db.mixins.OpenIDConnectConfig.get_solo",
+        "mozilla_django_oidc_db.models.OpenIDConnectConfig.get_solo",
         return_value=OpenIDConnectConfig(id=1, enabled=True, make_users_staff=True),
     )
     @patch(
@@ -332,7 +352,12 @@ class OIDCFlowTests(TestCase):
         }
         UserFactory.create(email="existing_user@example.com")
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "mozilla_django_oidc_db.OpenIDConnectConfig",
+            }
+        }
         session.save()
         callback_url = reverse("oidc_authentication_callback")
 
@@ -358,7 +383,7 @@ class OIDCFlowTests(TestCase):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "mozilla_django_oidc_db.mixins.OpenIDConnectConfig.get_solo",
+        "mozilla_django_oidc_db.models.OpenIDConnectConfig.get_solo",
         return_value=OpenIDConnectConfig(id=1, enabled=True, make_users_staff=False),
     )
     @patch(
@@ -381,7 +406,12 @@ class OIDCFlowTests(TestCase):
         }
         UserFactory.create(email="existing_user@example.com")
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "mozilla_django_oidc_db.OpenIDConnectConfig",
+            }
+        }
         session.save()
         callback_url = reverse("oidc_authentication_callback")
 
@@ -412,7 +442,7 @@ class OIDCFlowTests(TestCase):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "mozilla_django_oidc_db.mixins.OpenIDConnectConfig.get_solo",
+        "mozilla_django_oidc_db.models.OpenIDConnectConfig.get_solo",
         return_value=OpenIDConnectConfig(id=1, enabled=True),
     )
     @patch(
@@ -443,7 +473,12 @@ class OIDCFlowTests(TestCase):
             self.assertEqual(response.status_code, 200)
 
         with self.subTest("after succesful login"):
-            session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+            session["oidc_states"] = {
+                "mock": {
+                    "nonce": "nonce",
+                    "config_class": "mozilla_django_oidc_db.OpenIDConnectConfig",
+                }
+            }
             session.save()
             callback_url = reverse("oidc_authentication_callback")
 

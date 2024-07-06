@@ -77,7 +77,7 @@ class CustomOIDCBackend(OIDCAuthenticationBackend):
         # Avoid attempting OIDC for a specific variant if we know that that is not the
         # correct variant being attempted
         # XXX, TODO, check the config class rather than the path once there's
-        # a single callback URL.
+        # a single callback URL. We can override ``_check_candidate_backend``.
         if request and request.path != self.callback_path:
             return
 
@@ -93,7 +93,7 @@ class CustomOIDCBackend(OIDCAuthenticationBackend):
 
         before we got here we already checked for existing users based on the overriden queryset from the .filter_users_by_claims()
         """
-        unique_id = self.retrieve_identifier_claim(claims)
+        unique_id = self._extract_username(claims)
 
         if "email" in claims:
             email = claims["email"]
@@ -136,7 +136,7 @@ class CustomOIDCBackend(OIDCAuthenticationBackend):
 
     def filter_users_by_claims(self, claims):
         """Return all users matching the specified subject."""
-        unique_id = self.retrieve_identifier_claim(claims)
+        unique_id = self._extract_username(claims)
 
         if not unique_id:
             return self.UserModel.objects.none()
