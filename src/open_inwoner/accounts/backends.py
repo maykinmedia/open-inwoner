@@ -76,6 +76,8 @@ class CustomOIDCBackend(OIDCAuthenticationBackend):
     def authenticate(self, request, *args, **kwargs):
         # Avoid attempting OIDC for a specific variant if we know that that is not the
         # correct variant being attempted
+        # XXX, TODO, check the config class rather than the path once there's
+        # a single callback URL.
         if request and request.path != self.callback_path:
             return
 

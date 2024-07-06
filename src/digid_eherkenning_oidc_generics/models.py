@@ -5,9 +5,6 @@ from django.utils.translation import gettext_lazy as _
 from django_jsonform.models.fields import ArrayField
 from solo.models import SingletonModel
 
-from .digid_settings import DIGID_CUSTOM_OIDC_DB_PREFIX
-from .eherkenning_settings import EHERKENNING_CUSTOM_OIDC_DB_PREFIX
-
 
 def get_default_scopes_bsn():
     """
@@ -151,9 +148,9 @@ class OpenIDConnectDigiDConfig(SingletonModel):
         verbose_name="Error message mapping",
     )
 
-    @classproperty
-    def custom_oidc_db_prefix(cls):
-        return DIGID_CUSTOM_OIDC_DB_PREFIX
+    # XXX: no longer necessary to be a separate URL, kept for backwards compatibility
+    # since OIDC providers need to update the allowed Redirect URIs
+    oidc_authentication_callback_url = "digid_oidc:callback"
 
     @property
     def identifier_claim_bits(self):
@@ -292,9 +289,9 @@ class OpenIDConnectEHerkenningConfig(SingletonModel):
         verbose_name="Error message mapping",
     )
 
-    @classproperty
-    def custom_oidc_db_prefix(cls):
-        return EHERKENNING_CUSTOM_OIDC_DB_PREFIX
+    # XXX: no longer necessary to be a separate URL, kept for backwards compatibility
+    # since OIDC providers need to update the allowed Redirect URIs
+    oidc_authentication_callback_url = "eherkenning_oidc:callback"
 
     @property
     def identifier_claim_bits(self):

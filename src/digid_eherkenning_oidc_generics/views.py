@@ -8,19 +8,17 @@ from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import View
 
-import requests
-from furl import furl
-from mozilla_django_oidc.views import (
-    OIDCAuthenticationRequestView as _OIDCAuthenticationRequestView,
-)
+from mozilla_django_oidc_db.utils import do_op_logout
 from mozilla_django_oidc_db.views import (
-    OIDC_ERROR_SESSION_KEY,
+    _OIDC_ERROR_SESSION_KEY,
     OIDCCallbackView as _OIDCCallbackView,
+    OIDCInit,
 )
+from solo.models import SingletonModel
 
-from digid_eherkenning_oidc_generics.mixins import (
-    SoloConfigDigiDMixin,
-    SoloConfigEHerkenningMixin,
+from digid_eherkenning_oidc_generics.models import (
+    OpenIDConnectDigiDConfig,
+    OpenIDConnectEHerkenningConfig,
 )
 
 logger = logging.getLogger(__name__)
@@ -39,19 +37,13 @@ GENERIC_EHERKENNING_ERROR_MSG = _(
 )
 
 
-class OIDCAuthenticationRequestView(_OIDCAuthenticationRequestView):
-    def get_extra_params(self, request):
-        kc_idp_hint = self.get_settings("OIDC_KEYCLOAK_IDP_HINT", "")
-        if kc_idp_hint:
-            return {"kc_idp_hint": kc_idp_hint}
-        return {}
-
-
+# XXX consider replacing this with mozilla_django_oidc_db.views.AdminLoginFailure?
+# Or at least, make it consistent in the library.
 class OIDCFailureView(View):
     def get(self, request):
-        if OIDC_ERROR_SESSION_KEY in self.request.session:
-            message = self.request.session[OIDC_ERROR_SESSION_KEY]
-            del self.request.session[OIDC_ERROR_SESSION_KEY]
+        if _OIDC_ERROR_SESSION_KEY in self.request.session:
+            message = self.request.session[_OIDC_ERROR_SESSION_KEY]
+            del self.request.session[_OIDC_ERROR_SESSION_KEY]
             messages.error(request, message)
         else:
             messages.error(
@@ -73,29 +65,23 @@ class OIDCCallbackView(_OIDCCallbackView):
             error, str(self.generic_error_msg)
         )
         if error and error_label:
-            request.session[OIDC_ERROR_SESSION_KEY] = error_label
-        elif OIDC_ERROR_SESSION_KEY in request.session and error_label:
-            request.session[OIDC_ERROR_SESSION_KEY] = error_label
+            request.session[_OIDC_ERROR_SESSION_KEY] = error_label
+        elif _OIDC_ERROR_SESSION_KEY in request.session and error_label:
+            request.session[_OIDC_ERROR_SESSION_KEY] = error_label
 
         return response
 
 
-class OIDCLogoutView(View):
+class BaseOIDCLogoutView(View):
+    config_class: type[SingletonModel]
+
     def get_success_url(self):
         return resolve_url(settings.LOGOUT_REDIRECT_URL)
 
     def get(self, request):
-        if "oidc_id_token" in request.session:
-            logout_endpoint = self.config_class.get_solo().oidc_op_logout_endpoint
-            if logout_endpoint:
-                logout_url = furl(logout_endpoint).set(
-                    {
-                        "id_token_hint": request.session["oidc_id_token"],
-                    }
-                )
-                requests.get(str(logout_url))
-
-            del request.session["oidc_id_token"]
+        if id_token := request.session.get("oidc_id_token"):
+            config = self.config_class.get_solo()
+            do_op_logout(config, id_token)
 
         if "oidc_login_next" in request.session:
             del request.session["oidc_login_next"]
@@ -105,31 +91,23 @@ class OIDCLogoutView(View):
         return HttpResponseRedirect(self.get_success_url())
 
 
-class DigiDOIDCAuthenticationRequestView(
-    SoloConfigDigiDMixin, OIDCAuthenticationRequestView
-):
-    pass
+digid_init = OIDCInit.as_view(config_class=OpenIDConnectDigiDConfig)
+eherkenning_init = OIDCInit.as_view(config_class=OpenIDConnectEHerkenningConfig)
 
 
-class DigiDOIDCAuthenticationCallbackView(SoloConfigDigiDMixin, OIDCCallbackView):
+# FIXME: mozilla-django-oidc-db has a proper construct for this now.
+class DigiDOIDCAuthenticationCallbackView(OIDCCallbackView):
     generic_error_msg = GENERIC_DIGID_ERROR_MSG
 
 
-class DigiDOIDCLogoutView(SoloConfigDigiDMixin, OIDCLogoutView):
-    pass
+class DigiDOIDCLogoutView(BaseOIDCLogoutView):
+    config_class = OpenIDConnectDigiDConfig
 
 
-class eHerkenningOIDCAuthenticationRequestView(
-    SoloConfigEHerkenningMixin, OIDCAuthenticationRequestView
-):
-    pass
-
-
-class eHerkenningOIDCAuthenticationCallbackView(
-    SoloConfigEHerkenningMixin, OIDCCallbackView
-):
+# FIXME: mozilla-django-oidc-db has a proper construct for this now.
+class eHerkenningOIDCAuthenticationCallbackView(OIDCCallbackView):
     generic_error_msg = GENERIC_EHERKENNING_ERROR_MSG
 
 
-class eHerkenningOIDCLogoutView(SoloConfigEHerkenningMixin, OIDCLogoutView):
-    pass
+class eHerkenningOIDCLogoutView(BaseOIDCLogoutView):
+    config_class = OpenIDConnectEHerkenningConfig

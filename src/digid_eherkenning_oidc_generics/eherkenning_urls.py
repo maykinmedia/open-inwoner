@@ -3,8 +3,8 @@ from django.urls import path
 from mozilla_django_oidc.urls import urlpatterns
 
 from .views import (
+    eherkenning_init,
     eHerkenningOIDCAuthenticationCallbackView,
-    eHerkenningOIDCAuthenticationRequestView,
     eHerkenningOIDCLogoutView,
 )
 
@@ -17,11 +17,7 @@ urlpatterns = [
         eHerkenningOIDCAuthenticationCallbackView.as_view(),
         name="callback",
     ),
-    path(
-        "authenticate/",
-        eHerkenningOIDCAuthenticationRequestView.as_view(),
-        name="init",
-    ),
+    path("authenticate/", eherkenning_init, name="init"),
     path(
         "logout/",
         eHerkenningOIDCLogoutView.as_view(),

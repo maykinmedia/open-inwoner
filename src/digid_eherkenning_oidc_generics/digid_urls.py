@@ -2,11 +2,7 @@ from django.urls import path
 
 from mozilla_django_oidc.urls import urlpatterns
 
-from .views import (
-    DigiDOIDCAuthenticationCallbackView,
-    DigiDOIDCAuthenticationRequestView,
-    DigiDOIDCLogoutView,
-)
+from .views import DigiDOIDCAuthenticationCallbackView, DigiDOIDCLogoutView, digid_init
 
 app_name = "digid_oidc"
 
@@ -17,11 +13,7 @@ urlpatterns = [
         DigiDOIDCAuthenticationCallbackView.as_view(),
         name="callback",
     ),
-    path(
-        "authenticate/",
-        DigiDOIDCAuthenticationRequestView.as_view(),
-        name="init",
-    ),
+    path("authenticate/", digid_init, name="init"),
     path(
         "logout/",
         DigiDOIDCLogoutView.as_view(),
