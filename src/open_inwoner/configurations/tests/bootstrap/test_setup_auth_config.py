@@ -504,9 +504,9 @@ class eHerkenningOIDCConfigurationTests(ClearCachesMixin, TestCase):
     ADMIN_OIDC_OIDC_OP_AUTHORIZATION_ENDPOINT=f"{IDENTITY_PROVIDER}protocol/openid-connect/auth",
     ADMIN_OIDC_OIDC_OP_TOKEN_ENDPOINT=f"{IDENTITY_PROVIDER}protocol/openid-connect/token",
     ADMIN_OIDC_OIDC_OP_USER_ENDPOINT=f"{IDENTITY_PROVIDER}protocol/openid-connect/userinfo",
-    ADMIN_OIDC_USERNAME_CLAIM="claim_name",
-    ADMIN_OIDC_GROUPS_CLAIM="groups_claim_name",
-    ADMIN_OIDC_CLAIM_MAPPING={"first_name": "given_name"},
+    ADMIN_OIDC_USERNAME_CLAIM=["claim_name"],
+    ADMIN_OIDC_GROUPS_CLAIM=["groups_claim_name"],
+    ADMIN_OIDC_CLAIM_MAPPING={"first_name": ["given_name"]},
     ADMIN_OIDC_SYNC_GROUPS=False,
     ADMIN_OIDC_SYNC_GROUPS_GLOB_PATTERN="local.groups.*",
     ADMIN_OIDC_DEFAULT_GROUPS=["Admins", "Read-only"],
@@ -549,9 +549,9 @@ class AdminOIDCConfigurationTests(ClearCachesMixin, TestCase):
             config.oidc_op_user_endpoint,
             f"{IDENTITY_PROVIDER}protocol/openid-connect/userinfo",
         )
-        self.assertEqual(config.username_claim, "claim_name")
-        self.assertEqual(config.groups_claim, "groups_claim_name")
-        self.assertEqual(config.claim_mapping, {"first_name": "given_name"})
+        self.assertEqual(config.username_claim, ["claim_name"])
+        self.assertEqual(config.groups_claim, ["groups_claim_name"])
+        self.assertEqual(config.claim_mapping, {"first_name": ["given_name"]})
         self.assertEqual(config.sync_groups, False)
         self.assertEqual(config.sync_groups_glob_pattern, "local.groups.*")
         self.assertEqual(
@@ -611,11 +611,11 @@ class AdminOIDCConfigurationTests(ClearCachesMixin, TestCase):
             config.oidc_op_user_endpoint,
             f"{IDENTITY_PROVIDER}protocol/openid-connect/userinfo",
         )
-        self.assertEqual(config.username_claim, "sub")
-        self.assertEqual(config.groups_claim, "groups_claim_name")
+        self.assertEqual(config.username_claim, ["sub"])
+        self.assertEqual(config.groups_claim, ["groups_claim_name"])
         self.assertEqual(
             config.claim_mapping,
-            {"last_name": "family_name", "first_name": "given_name"},
+            {"last_name": ["family_name"], "first_name": ["given_name"]},
         )
         self.assertEqual(config.sync_groups, True)
         self.assertEqual(config.sync_groups_glob_pattern, "*")

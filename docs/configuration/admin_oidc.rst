@@ -57,15 +57,15 @@ Detailed Information
 
     Variable            ADMIN_OIDC_CLAIM_MAPPING
     Setting             claim mapping
-    Description         Mapping from user-model fields to OIDC claims
-    Possible values     Mapping: {'some_key': 'Some value'}
-    Default value       {'email': 'email', 'first_name': 'given_name', 'last_name': 'family_name'}
+    Description         Mapping from user-model fields to OIDC claim paths
+    Possible values     Mapping: {'some_key': ['Some value']}
+    Default value       {'email': ['email'], 'first_name': ['given_name'], 'last_name': ['family_name']}
 
     Variable            ADMIN_OIDC_GROUPS_CLAIM
     Setting             groups claim
     Description         The name of the OIDC claim that holds the values to map to local user groups.
-    Possible values     string
-    Default value       roles
+    Possible values     list of strings
+    Default value       [roles]
 
     Variable            ADMIN_OIDC_MAKE_USERS_STAFF
     Setting             make users staff
@@ -184,5 +184,5 @@ Detailed Information
     Variable            ADMIN_OIDC_USERNAME_CLAIM
     Setting             username claim
     Description         The name of the OIDC claim that is used as the username
-    Possible values     string
-    Default value       sub
+    Possible values     list of strings
+    Default value       [sub]

@@ -201,7 +201,7 @@ class OIDCFlowTests(TestCase):
             id=1,
             enabled=True,
             make_users_staff=False,
-            claim_mapping={"first_name": "first_name"},
+            claim_mapping={"first_name": ["first_name"]},
         ),
     )
     @patch(

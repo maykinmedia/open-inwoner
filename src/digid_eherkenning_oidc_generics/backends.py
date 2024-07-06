@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 class OIDCAuthenticationBackend(_OIDCAuthenticationBackend):
-    config_identifier_field = "identifier_claim_name"
+    config_identifier_field = "identifier_claim_bits"
     callback_path = None
     unique_id_user_fieldname = ""
 

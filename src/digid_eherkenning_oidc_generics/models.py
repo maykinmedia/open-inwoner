@@ -155,6 +155,10 @@ class OpenIDConnectDigiDConfig(SingletonModel):
     def custom_oidc_db_prefix(cls):
         return DIGID_CUSTOM_OIDC_DB_PREFIX
 
+    @property
+    def identifier_claim_bits(self):
+        return [self.identifier_claim_name]
+
     class Meta:
         verbose_name = _("OpenID Connect configuration for DigiD")
         db_table = "digid_eherkenning_oidc_generics_openidconnectdigidconfig"
@@ -291,6 +295,10 @@ class OpenIDConnectEHerkenningConfig(SingletonModel):
     @classproperty
     def custom_oidc_db_prefix(cls):
         return EHERKENNING_CUSTOM_OIDC_DB_PREFIX
+
+    @property
+    def identifier_claim_bits(self):
+        return [self.identifier_claim_name]
 
     class Meta:
         verbose_name = _("OpenID Connect configuration for eHerkenning")
