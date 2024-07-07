@@ -1069,7 +1069,12 @@ class eHerkenningOIDCFlowTests(WebTest):
         )
         self.assertEqual(user.oidc_id, "")
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "digid_eherkenning_oidc_generics_legacy.OpenIDConnectEHerkenningConfig",
+            }
+        }
         session.save()
         callback_url = reverse("eherkenning_oidc:callback")
 
@@ -1122,7 +1127,12 @@ class eHerkenningOIDCFlowTests(WebTest):
             kvk="12345678", rsin="123456789", email="existing_user@example.com"
         )
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "digid_eherkenning_oidc_generics_legacy.OpenIDConnectEHerkenningConfig",
+            }
+        }
         session.save()
         callback_url = reverse("eherkenning_oidc:callback")
 
@@ -1160,7 +1170,12 @@ class eHerkenningOIDCFlowTests(WebTest):
         )
         self.client.force_login(user)
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "digid_eherkenning_oidc_generics_legacy.OpenIDConnectEHerkenningConfig",
+            }
+        }
         session["oidc_id_token"] = "foo"
         session[KVK_BRANCH_SESSION_VARIABLE] = None
         session.save()
@@ -1170,18 +1185,12 @@ class eHerkenningOIDCFlowTests(WebTest):
 
         # enter the logout flow
         with requests_mock.Mocker() as m:
-            logout_endpoint_url = str(
-                furl("http://localhost:8080/logout").set(
-                    {
-                        "id_token_hint": "foo",
-                    }
-                )
-            )
-            m.post(logout_endpoint_url)
-            logout_response = self.client.get(logout_url, follow=False)
+            m.post("http://localhost:8080/logout")
+            logout_response = self.client.get(logout_url)
 
             self.assertEqual(len(m.request_history), 1)
-            self.assertEqual(m.request_history[0].url, logout_endpoint_url)
+            self.assertEqual(m.request_history[0].url, "http://localhost:8080/logout")
+            self.assertEqual(m.request_history[0].body, "id_token_hint=foo")
 
         self.assertRedirects(
             logout_response, reverse("login"), fetch_redirect_response=False
@@ -1252,7 +1261,12 @@ class eHerkenningOIDCFlowTests(WebTest):
             self.assertEqual(response.status_code, 200)
 
         with self.subTest("after succesful login"):
-            session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+            session["oidc_states"] = {
+                "mock": {
+                    "nonce": "nonce",
+                    "config_class": "digid_eherkenning_oidc_generics_legacy.OpenIDConnectEHerkenningConfig",
+                }
+            }
             session.save()
             callback_url = reverse("eherkenning_oidc:callback")
 
@@ -1296,7 +1310,12 @@ class eHerkenningOIDCFlowTests(WebTest):
         }
 
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "digid_eherkenning_oidc_generics_legacy.OpenIDConnectEHerkenningConfig",
+            }
+        }
         session.save()
         callback_url = reverse("eherkenning_oidc:callback")
 
@@ -1348,7 +1367,12 @@ class eHerkenningOIDCFlowTests(WebTest):
         }
 
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "digid_eherkenning_oidc_generics_legacy.OpenIDConnectEHerkenningConfig",
+            }
+        }
         session.save()
         callback_url = reverse("eherkenning_oidc:callback")
 
@@ -1401,7 +1425,12 @@ class eHerkenningOIDCFlowTests(WebTest):
         }
 
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "digid_eherkenning_oidc_generics_legacy.OpenIDConnectEHerkenningConfig",
+            }
+        }
         session.save()
         callback_url = reverse("eherkenning_oidc:callback")
 
@@ -1475,7 +1504,12 @@ class eHerkenningOIDCFlowTests(WebTest):
         mock_get_userinfo.return_value = {"sub": "00000000"}
         eHerkenningUserFactory.create(kvk="12345678", email="existing_user@example.com")
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "digid_eherkenning_oidc_generics_legacy.OpenIDConnectEHerkenningConfig",
+            }
+        }
         session.save()
         callback_url = reverse("eherkenning_oidc:callback")
 

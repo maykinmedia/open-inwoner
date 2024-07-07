@@ -302,9 +302,11 @@ class OpenIDConnectEHerkenningConfig(OpenIDConnectConfigBase):
         return [self.identifier_claim_name]
 
     def get_callback_view(self):
-        from .views import eHerkenningOIDCAuthenticationCallbackView
+        from open_inwoner.accounts.views import (
+            CustomEHerkenningOIDCAuthenticationCallbackView as CallbackView,
+        )
 
-        return eHerkenningOIDCAuthenticationCallbackView.as_view()
+        return CallbackView.as_view()
 
     class Meta:
         verbose_name = _("OpenID Connect configuration for eHerkenning")

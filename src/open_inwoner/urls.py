@@ -122,7 +122,7 @@ urlpatterns = [
     ),
     path(
         "eherkenning-oidc/",
-        include("open_inwoner.accounts.eherkenning_urls"),
+        include("digid_eherkenning_oidc_generics.eherkenning_urls"),
     ),
     path("login/failure/", OIDCFailureView.as_view(), name="oidc-error"),
     path("faq/", FAQView.as_view(), name="general_faq"),
