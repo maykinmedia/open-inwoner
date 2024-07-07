@@ -653,7 +653,7 @@ class DigiDOIDCFlowTests(WebTest):
                     }
                 )
             )
-            m.get(logout_endpoint_url)
+            m.post(logout_endpoint_url)
             logout_response = self.client.get(logout_url)
 
             self.assertEqual(len(m.request_history), 1)
@@ -1178,7 +1178,7 @@ class eHerkenningOIDCFlowTests(WebTest):
                     }
                 )
             )
-            m.get(logout_endpoint_url)
+            m.post(logout_endpoint_url)
             logout_response = self.client.get(logout_url, follow=False)
 
             self.assertEqual(len(m.request_history), 1)
