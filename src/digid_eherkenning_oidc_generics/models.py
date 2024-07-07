@@ -1,9 +1,8 @@
 from django.db import models
-from django.utils.functional import classproperty
 from django.utils.translation import gettext_lazy as _
 
 from django_jsonform.models.fields import ArrayField
-from solo.models import SingletonModel
+from mozilla_django_oidc_db.models import OpenIDConnectConfigBase
 
 
 def get_default_scopes_bsn():
@@ -20,7 +19,7 @@ def get_default_scopes_kvk():
     return ["openid", "kvk"]
 
 
-class OpenIDConnectDigiDConfig(SingletonModel):
+class OpenIDConnectDigiDConfig(OpenIDConnectConfigBase):
     """
     Configuration for DigiD authentication via OpenID connect
     """
@@ -153,7 +152,7 @@ class OpenIDConnectDigiDConfig(SingletonModel):
     oidc_authentication_callback_url = "digid_oidc:callback"
 
     @property
-    def identifier_claim_bits(self):
+    def oidcdb_username_claim(self):
         return [self.identifier_claim_name]
 
     class Meta:
@@ -161,7 +160,7 @@ class OpenIDConnectDigiDConfig(SingletonModel):
         db_table = "digid_eherkenning_oidc_generics_openidconnectdigidconfig"
 
 
-class OpenIDConnectEHerkenningConfig(SingletonModel):
+class OpenIDConnectEHerkenningConfig(OpenIDConnectConfigBase):
     """
     Configuration for eHerkenning authentication via OpenID connect
     """
@@ -294,7 +293,7 @@ class OpenIDConnectEHerkenningConfig(SingletonModel):
     oidc_authentication_callback_url = "eherkenning_oidc:callback"
 
     @property
-    def identifier_claim_bits(self):
+    def oidcdb_username_claim(self):
         return [self.identifier_claim_name]
 
     class Meta:

@@ -2,9 +2,7 @@ import logging
 
 from django.urls import reverse_lazy
 
-from mozilla_django_oidc_db.backends import (
-    OIDCAuthenticationBackend as _OIDCAuthenticationBackend,
-)
+from mozilla_django_oidc_db.backends import OIDCAuthenticationBackend as BaseBackend
 from solo.models import SingletonModel
 
 from open_inwoner.accounts.choices import LoginTypeChoices
@@ -15,11 +13,11 @@ from .models import OpenIDConnectDigiDConfig, OpenIDConnectEHerkenningConfig
 logger = logging.getLogger(__name__)
 
 
-class OIDCAuthenticationBackend(_OIDCAuthenticationBackend):
-    config_identifier_field = "identifier_claim_bits"
+class OIDCAuthenticationBackend(BaseBackend):
     callback_path = None
     unique_id_user_fieldname = ""
 
+    login_type: LoginTypeChoices
     _config_class: type[SingletonModel]
 
     def authenticate(self, request, *args, **kwargs):
@@ -28,15 +26,14 @@ class OIDCAuthenticationBackend(_OIDCAuthenticationBackend):
         if request and request.path != self.callback_path:
             return
 
-        # XXX: hack around store_config until we transition to a single backend once
-        # digid_eherkenning.oidc is available
-        request._oidcdb_config_class = self._config_class
+        # XXX: Sanity check while we still work with subclasses.
+        assert request._oidcdb_config_class is self._config_class
 
         return super().authenticate(request, *args, **kwargs)
 
     def filter_users_by_claims(self, claims):
         """Return all users matching the specified subject."""
-        unique_id = self.retrieve_identifier_claim(claims)
+        unique_id = self._extract_username(claims)
 
         if not unique_id:
             return self.UserModel.objects.none()
@@ -46,7 +43,8 @@ class OIDCAuthenticationBackend(_OIDCAuthenticationBackend):
 
     def create_user(self, claims):
         """Return object for a newly created user account."""
-        unique_id = self.retrieve_identifier_claim(claims)
+
+        unique_id = self._extract_username(claims)
 
         logger.debug("Creating OIDC user: %s", unique_id)
 

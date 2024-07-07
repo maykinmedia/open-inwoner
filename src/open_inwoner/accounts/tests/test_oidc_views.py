@@ -590,7 +590,12 @@ class DigiDOIDCFlowTests(WebTest):
         mock_get_userinfo.return_value = {"sub": "000000000"}
         DigidUserFactory.create(bsn="123456782", email="existing_user@example.com")
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "digid_eherkenning_oidc_generics_legacy.OpenIDConnectDigiDConfig",
+            }
+        }
         session.save()
         callback_url = reverse("digid_oidc:callback")
 
@@ -627,7 +632,12 @@ class DigiDOIDCFlowTests(WebTest):
         )
         self.client.force_login(user)
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "digid_eherkenning_oidc_generics_legacy.OpenIDConnectDigiDConfig",
+            }
+        }
         session["oidc_id_token"] = "foo"
         session.save()
         logout_url = reverse("digid_oidc:logout")
@@ -695,7 +705,12 @@ class DigiDOIDCFlowTests(WebTest):
             self.assertEqual(response.status_code, 200)
 
         with self.subTest("after succesful login"):
-            session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+            session["oidc_states"] = {
+                "mock": {
+                    "nonce": "nonce",
+                    "config_class": "digid_eherkenning_oidc_generics_legacy.OpenIDConnectDigiDConfig",
+                }
+            }
             session.save()
             callback_url = reverse("digid_oidc:callback")
 
@@ -739,7 +754,12 @@ class DigiDOIDCFlowTests(WebTest):
         }
 
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "digid_eherkenning_oidc_generics_legacy.OpenIDConnectDigiDConfig",
+            }
+        }
         session.save()
         callback_url = reverse("digid_oidc:callback")
 
@@ -791,7 +811,12 @@ class DigiDOIDCFlowTests(WebTest):
         }
 
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "digid_eherkenning_oidc_generics_legacy.OpenIDConnectDigiDConfig",
+            }
+        }
         session.save()
         callback_url = reverse("digid_oidc:callback")
 
@@ -844,7 +869,12 @@ class DigiDOIDCFlowTests(WebTest):
         }
 
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "digid_eherkenning_oidc_generics_legacy.OpenIDConnectDigiDConfig",
+            }
+        }
         session.save()
         callback_url = reverse("digid_oidc:callback")
 

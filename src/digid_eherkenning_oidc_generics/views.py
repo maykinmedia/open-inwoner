@@ -8,10 +8,11 @@ from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import View
 
+from mozilla_django_oidc_db.config import lookup_config
 from mozilla_django_oidc_db.utils import do_op_logout
 from mozilla_django_oidc_db.views import (
     _OIDC_ERROR_SESSION_KEY,
-    OIDCCallbackView as _OIDCCallbackView,
+    OIDCCallbackView as BaseCallbackView,
     OIDCInit,
 )
 from solo.models import SingletonModel
@@ -53,15 +54,19 @@ class OIDCFailureView(View):
         return HttpResponseRedirect(reverse("login"))
 
 
-class OIDCCallbackView(_OIDCCallbackView):
+# XXX: can probably be cleaned up with digid_eherkenning.oidc
+class OIDCCallbackView(BaseCallbackView):
     failure_url = reverse_lazy("oidc-error")
     generic_error_msg = ""
 
     def get(self, request):
         response = super().get(request)
 
+        config_class = lookup_config(request)
+        config = config_class.get_solo()
+
         error = request.GET.get("error_description")
-        error_label = self.config.error_message_mapping.get(
+        error_label = config.error_message_mapping.get(
             error, str(self.generic_error_msg)
         )
         if error and error_label:
