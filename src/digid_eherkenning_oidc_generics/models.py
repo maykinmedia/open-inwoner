@@ -155,6 +155,11 @@ class OpenIDConnectDigiDConfig(OpenIDConnectConfigBase):
     def oidcdb_username_claim(self):
         return [self.identifier_claim_name]
 
+    def get_callback_view(self):
+        from .views import DigiDOIDCAuthenticationCallbackView
+
+        return DigiDOIDCAuthenticationCallbackView.as_view()
+
     class Meta:
         verbose_name = _("OpenID Connect configuration for DigiD")
         db_table = "digid_eherkenning_oidc_generics_openidconnectdigidconfig"
@@ -295,6 +300,11 @@ class OpenIDConnectEHerkenningConfig(OpenIDConnectConfigBase):
     @property
     def oidcdb_username_claim(self):
         return [self.identifier_claim_name]
+
+    def get_callback_view(self):
+        from .views import eHerkenningOIDCAuthenticationCallbackView
+
+        return eHerkenningOIDCAuthenticationCallbackView.as_view()
 
     class Meta:
         verbose_name = _("OpenID Connect configuration for eHerkenning")

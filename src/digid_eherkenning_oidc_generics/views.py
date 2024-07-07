@@ -2,18 +2,20 @@ import logging
 
 from django.conf import settings
 from django.contrib import auth, messages
+from django.core.exceptions import ValidationError
+from django.db import IntegrityError, transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import resolve_url
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import View
 
-from mozilla_django_oidc_db.config import lookup_config
 from mozilla_django_oidc_db.utils import do_op_logout
 from mozilla_django_oidc_db.views import (
     _OIDC_ERROR_SESSION_KEY,
-    OIDCCallbackView as BaseCallbackView,
+    OIDCAuthenticationCallbackView as BaseCallbackView,
     OIDCInit,
+    get_exception_message,
 )
 from solo.models import SingletonModel
 
@@ -60,15 +62,27 @@ class OIDCCallbackView(BaseCallbackView):
     generic_error_msg = ""
 
     def get(self, request):
-        response = super().get(request)
+        try:
+            with transaction.atomic():
+                response = super().get(request)
+        except (IntegrityError, ValidationError) as exc:
+            logger.exception(
+                "Something went wrong while attempting to authenticate via OIDC",
+                exc_info=exc,
+            )
+            exc_message = get_exception_message(exc)
+            request.session[_OIDC_ERROR_SESSION_KEY] = exc_message
+            response = self.login_failure()
+        else:
+            # Upstream library doesn't do any error handling by default.
+            if _OIDC_ERROR_SESSION_KEY in request.session:
+                del request.session[_OIDC_ERROR_SESSION_KEY]
 
-        config_class = lookup_config(request)
-        config = config_class.get_solo()
+        # XXX: move this to a separate model
+        error_message_mapping = self.get_settings("ERROR_MESSAGE_MAPPING")
 
         error = request.GET.get("error_description")
-        error_label = config.error_message_mapping.get(
-            error, str(self.generic_error_msg)
-        )
+        error_label = error_message_mapping.get(error, str(self.generic_error_msg))
         if error and error_label:
             request.session[_OIDC_ERROR_SESSION_KEY] = error_label
         elif _OIDC_ERROR_SESSION_KEY in request.session and error_label:

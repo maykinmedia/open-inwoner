@@ -651,18 +651,12 @@ class DigiDOIDCFlowTests(WebTest):
 
         # enter the logout flow
         with requests_mock.Mocker() as m:
-            logout_endpoint_url = str(
-                furl("http://localhost:8080/logout").set(
-                    {
-                        "id_token_hint": "foo",
-                    }
-                )
-            )
-            m.post(logout_endpoint_url)
+            m.post("http://localhost:8080/logout")
             logout_response = self.client.get(logout_url)
 
             self.assertEqual(len(m.request_history), 1)
-            self.assertEqual(m.request_history[0].url, logout_endpoint_url)
+            self.assertEqual(m.request_history[0].url, "http://localhost:8080/logout")
+            self.assertEqual(m.request_history[0].body, "id_token_hint=foo")
 
         self.assertRedirects(
             logout_response, reverse("login"), fetch_redirect_response=False
