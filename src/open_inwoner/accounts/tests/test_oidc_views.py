@@ -540,7 +540,12 @@ class DigiDOIDCFlowTests(WebTest):
         )
         self.assertEqual(user.oidc_id, "")
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "digid_eherkenning_oidc_generics_legacy.OpenIDConnectDigiDConfig",
+            }
+        }
         session.save()
         callback_url = reverse("digid_oidc:callback")
 
