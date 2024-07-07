@@ -30,7 +30,6 @@ All settings:
     EHERKENNING_OIDC_ENABLED
     EHERKENNING_OIDC_ERROR_MESSAGE_MAPPING
     EHERKENNING_OIDC_IDENTIFIER_CLAIM_NAME
-    EHERKENNING_OIDC_OIDC_EXEMPT_URLS
     EHERKENNING_OIDC_OIDC_KEYCLOAK_IDP_HINT
     EHERKENNING_OIDC_OIDC_NONCE_SIZE
     EHERKENNING_OIDC_OIDC_OP_AUTHORIZATION_ENDPOINT
@@ -70,13 +69,7 @@ Detailed Information
     Description         The name of the claim in which the KVK of the user is stored
     Possible values     string
     Default value       kvk
-    
-    Variable            EHERKENNING_OIDC_OIDC_EXEMPT_URLS
-    Setting             URLs exempt from session renewal
-    Description         This is a list of absolute url paths, regular expressions for url paths, or Django view names. This plus the mozilla-django-oidc urls are exempted from the session renewal by the SessionRefresh middleware.
-    Possible values     string, comma-delimited ('foo,bar,baz')
-    Default value       
-    
+
     Variable            EHERKENNING_OIDC_OIDC_KEYCLOAK_IDP_HINT
     Setting             Keycloak Identity Provider hint
     Description         Specific for Keycloak: parameter that indicates which identity provider should be used (therefore skipping the Keycloak login screen).

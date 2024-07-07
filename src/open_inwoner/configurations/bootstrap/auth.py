@@ -65,7 +65,6 @@ class DigiDOIDCConfigurationStep(BaseConfigurationStep):
         "DIGID_OIDC_OIDC_USE_NONCE",
         "DIGID_OIDC_OIDC_NONCE_SIZE",
         "DIGID_OIDC_OIDC_STATE_SIZE",
-        "DIGID_OIDC_OIDC_EXEMPT_URLS",
     ]
     enable_setting = "DIGID_OIDC_CONFIG_ENABLE"
 
@@ -147,7 +146,6 @@ class eHerkenningOIDCConfigurationStep(BaseConfigurationStep):
         "EHERKENNING_OIDC_OIDC_USE_NONCE",
         "EHERKENNING_OIDC_OIDC_NONCE_SIZE",
         "EHERKENNING_OIDC_OIDC_STATE_SIZE",
-        "EHERKENNING_OIDC_OIDC_EXEMPT_URLS",
     ]
     enable_setting = "EHERKENNING_OIDC_CONFIG_ENABLE"
 
@@ -208,7 +206,6 @@ class AdminOIDCConfigurationSettings(ConfigSettingsBase):
         "default_groups",
         "groups_claim",
         "make_users_staff",
-        "oidc_exempt_urls",
         "oidc_nonce_size",
         "oidc_op_authorization_endpoint",
         "oidc_op_discovery_endpoint",
@@ -258,7 +255,6 @@ class AdminOIDCConfigurationStep(BaseConfigurationStep):
         "ADMIN_OIDC_OIDC_USE_NONCE",
         "ADMIN_OIDC_OIDC_NONCE_SIZE",
         "ADMIN_OIDC_OIDC_STATE_SIZE",
-        "ADMIN_OIDC_OIDC_EXEMPT_URLS",
         "ADMIN_OIDC_USERINFO_CLAIMS_SOURCE",
     ]
     enable_setting = "ADMIN_OIDC_CONFIG_ENABLE"

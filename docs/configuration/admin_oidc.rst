@@ -30,7 +30,6 @@ All settings:
     ADMIN_OIDC_CLAIM_MAPPING
     ADMIN_OIDC_GROUPS_CLAIM
     ADMIN_OIDC_MAKE_USERS_STAFF
-    ADMIN_OIDC_OIDC_EXEMPT_URLS
     ADMIN_OIDC_OIDC_NONCE_SIZE
     ADMIN_OIDC_OIDC_OP_AUTHORIZATION_ENDPOINT
     ADMIN_OIDC_OIDC_OP_DISCOVERY_ENDPOINT
@@ -72,12 +71,6 @@ Detailed Information
     Description         Users will be flagged as being a staff user automatically. This allows users to login to the admin interface. By default they have no permissions, even if they are staff.
     Possible values     True, False
     Default value       False
-
-    Variable            ADMIN_OIDC_OIDC_EXEMPT_URLS
-    Setting             URLs exempt from session renewal
-    Description         This is a list of absolute url paths, regular expressions for url paths, or Django view names. This plus the mozilla-django-oidc urls are exempted from the session renewal by the SessionRefresh middleware.
-    Possible values     string, comma-delimited ('foo,bar,baz')
-    Default value
 
     Variable            ADMIN_OIDC_OIDC_NONCE_SIZE
     Setting             Nonce size
