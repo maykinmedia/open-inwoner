@@ -305,6 +305,7 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
             },
         ),
         (_("Social media"), {"fields": ("display_social",)}),
+        (_("Questions"), {"fields": ("contactmoment_contact_form_enabled",)}),
     )
     inlines = [SiteConfigurationPageInline, FontConfigurationInline]
     form = SiteConfigurationAdminForm

@@ -4,6 +4,7 @@
 {% block content %}
     <h1 class="utrecht-heading-1" id="contactmomenten">{{ page_title }} ({{ contactmomenten|length }})</h1>
 
+    {% if contactmoment_contact_form %}
     {# title + scroll down button #}
     <section class="contactmomenten__scrolldown">
         <div class="form-container">
@@ -21,6 +22,7 @@
             </div>
         </div>
     </section>
+    {% endif %}
 
     {# grid with questions #}
     <div class="contactmomenten">
@@ -68,6 +70,7 @@
         {% pagination page_obj=page_obj paginator=paginator request=request %}
     {% endif %}
 
+    {% if contactmoment_contact_form_enabled %}
     <section class="contactmomenten contactmomenten__contact-form">
         <div class="form-container">
             <div class="form-heading">
@@ -98,4 +101,5 @@
             </div>
         </div>
     </section>
+    {% endif %}
 {% endblock content %}

@@ -557,6 +557,13 @@ class SiteConfiguration(SingletonModel):
             "the OpenID Connect integration, navigate to `OpenID Connect configuration for eHerkenning` and enable it."
         ),
     )
+    contactmoment_contact_form_enabled = models.BooleanField(
+        verbose_name=_("Contactmoment contact form"),
+        default=True,
+        help_text=_(
+            "Display contact form on the questions list page so that users can create new questions"
+        ),
+    )
 
     class Meta:
         verbose_name = _("Site Configuration")
