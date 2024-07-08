@@ -198,7 +198,11 @@ class MyProfileView(
 
 
 class EditProfileView(
-    LogMixin, LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, UpdateView
+    LogMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    UpdateView,
 ):
     template_name = "pages/profile/edit.html"
     model = User

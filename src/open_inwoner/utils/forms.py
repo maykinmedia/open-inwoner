@@ -6,6 +6,39 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 
+class ErrorMessageMixin:
+    default_error_messages = {
+        "required": _(
+            "Het verplichte veld {field_name} is niet (goed) ingevuld. Vul het veld in."
+        )
+    }
+
+    def __init__(self, *args, **kwargs):
+        custom_error_messages = {}
+        if "custom_error_messages" in kwargs:
+            custom_error_messages = kwargs.pop("custom_error_messages")
+
+        super().__init__(*args, **kwargs)
+
+        for field_name, field in self.fields.items():
+
+            field_error_messages = custom_error_messages.get(field_name, {})
+
+            error_messages = {}
+            for key in self.default_error_messages.keys():
+                if key in field_error_messages.keys():
+                    error_message = field_error_messages[key].format(
+                        field_name=f'"{field.label}"'
+                    )
+                else:
+                    error_message = self.default_error_messages[key].format(
+                        field_name=f'"{field.label}"'
+                    )
+                error_messages[key] = error_message
+
+            field.error_messages.update({**error_messages})
+
+
 class PrivateFileWidget(forms.ClearableFileInput):
     template_name = "utils/widgets/private_file_input.html"
 

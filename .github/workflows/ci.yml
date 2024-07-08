@@ -63,24 +63,51 @@ jobs:
       - name: Run tests
         run: |
           if [ "${{ matrix.test-type }}" = "main" ]; then
-            coverage run \
+            coverage run -p --concurrency=multiprocessing \
               src/manage.py test src \
               --parallel \
               --exclude-tag=e2e \
               --exclude-tag=elastic
           elif [ "${{ matrix.test-type }}" = "elastic" ]; then
-            coverage run src/manage.py test src --tag=elastic --exclude-tag=e2e
+            coverage run -p src/manage.py test src --tag=elastic --exclude-tag=e2e
           else
             echo "Error: Unknown test type '${{ matrix.test-type }}'"
             exit 1
           fi
-
         env:
           DJANGO_SETTINGS_MODULE: open_inwoner.conf.ci
           SECRET_KEY: dummy
           DB_USER: postgres
           DB_PASSWORD: ''
-
+      - name: Persist coverage data files
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.test-type }}
+          path: .coverage*
+    
+  upload_coverage:
+    needs: tests
+    name: Upload coverage information to codecov
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Git repository
+        uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install coverage.py
+        # We only need coverage, but we need to match the version that was used
+        # to generate the coverage files. Grab it from the dependencies.
+        run: grep "^coverage" requirements/ci.txt | xargs -r pip install
+      - uses: actions/download-artifact@v4
+        with:
+          path: coverages
+      - name: Combine the coverage files
+        run: |
+          mv coverages/main/.coverage* .
+          mv coverages/elastic/.coverage* .
+          coverage combine
       - name: Publish coverage report
         uses: codecov/codecov-action@v3
         with:

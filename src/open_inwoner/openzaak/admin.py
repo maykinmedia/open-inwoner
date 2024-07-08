@@ -118,7 +118,7 @@ class CatalogUsedListFilter(admin.SimpleListFilter):
         catalogs = CatalogusConfig.objects.filter(
             id__in=qs.values_list("catalogus_id", flat=True).distinct()
         )
-        return [("none", "None")] + [(c.id, str(c)) for c in catalogs]
+        return [(c.id, str(c)) for c in catalogs]
 
     def queryset(self, request, queryset):
         v = self.value()

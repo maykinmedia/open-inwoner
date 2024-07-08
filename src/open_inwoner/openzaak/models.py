@@ -1,5 +1,6 @@
 import warnings
 from datetime import timedelta
+from urllib.parse import urlparse
 
 from django.db import models, transaction
 from django.db.models import UniqueConstraint
@@ -312,8 +313,13 @@ class CatalogusConfig(models.Model):
     class Meta:
         ordering = ("domein", "rsin")
 
+    @property
+    def base_url(self):
+        service_netloc = urlparse(self.service.api_root).netloc
+        return service_netloc
+
     def __str__(self):
-        return f"{self.domein} - {self.rsin}"
+        return f"{self.domein} - {self.rsin} [{self.base_url}]"
 
 
 class ZaakTypeConfig(models.Model):
@@ -400,17 +406,14 @@ class ZaakTypeConfig(models.Model):
 
     @property
     def catalogus_url(self):
-        if self.catalogus_id:
-            return self.catalogus.url
-        else:
-            return None
+        return self.catalogus.url
 
     def __str__(self):
         bits = (
             self.identificatie,
             self.omschrijving,
         )
-        return " - ".join(b for b in bits if b)
+        return " - ".join(b for b in bits if b) + f" [{self.catalogus.base_url}]"
 
 
 class ZaakTypeInformatieObjectTypeConfig(models.Model):
@@ -473,7 +476,7 @@ class ZaakTypeInformatieObjectTypeConfig(models.Model):
     informatieobjecttype_uuid.short_description = _("Information object UUID")
 
     def __str__(self):
-        return self.omschrijving
+        return f"{self.omschrijving} [{self.zaaktype_config.catalogus.base_url}]"
 
 
 class ZaakTypeStatusTypeConfig(models.Model):
@@ -593,7 +596,7 @@ class ZaakTypeStatusTypeConfig(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.zaaktype_config.identificatie} - {self.omschrijving}"
+        return f"{self.zaaktype_config.identificatie} - {self.omschrijving} [{self.zaaktype_config.catalogus.base_url}]"
 
 
 class ZaakTypeResultaatTypeConfig(models.Model):
@@ -637,7 +640,7 @@ class ZaakTypeResultaatTypeConfig(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.zaaktype_config.identificatie} - {self.omschrijving}"
+        return f"{self.zaaktype_config.identificatie} - {self.omschrijving} [{self.zaaktype_config.catalogus.base_url}]"
 
 
 class UserCaseStatusNotificationBase(models.Model):
