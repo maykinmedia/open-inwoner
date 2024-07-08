@@ -22,7 +22,6 @@ import './header'
 import './map'
 import './message-file'
 import { Notification } from './notifications'
-import { NotificationsList } from './notifications/NotificationsList'
 import './plans'
 import './plan-preview'
 import './questionnaire'
@@ -56,7 +55,6 @@ const elementWrappers = [
     (elt) => new DisableContactFormButton(elt),
   ],
   [Notification.selector, (elt) => new Notification(elt)],
-  [NotificationsList.selector, (elt) => new NotificationsList(elt)],
   [AnchorMobile.selector, (elt) => new AnchorMobile(elt)],
   [StatusAccordion.selector, (elt) => new StatusAccordion(elt)],
   [FileInput.selector, (elt) => new FileInput(elt)],

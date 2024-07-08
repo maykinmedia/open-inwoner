@@ -63,6 +63,8 @@ export class Notification {
     if (notificationContents) {
       notificationContents.forEach((content) => {
         // If errors are present, scroll and trigger the opened state
+        // The document.querySelectorAll method returns elements in the order they appear in the document,
+        // so the forEach method will create Notification instances in this same order.
         content.scrollIntoView({
           block: 'center',
           behavior: 'smooth',
@@ -97,23 +99,29 @@ export class Notification {
    * Reorders notifications based on type.
    */
   reorderNotifications() {
-    // Get all notifications in the parent container
+    // Select the parent container, in order to re-index its children
     const notificationsContainer = document.querySelector('.notifications')
-    const notifications = Array.from(
-      notificationsContainer.querySelectorAll(Notification.selector)
-    )
 
-    // Sort notifications based on type order
-    notifications.sort((a, b) => {
-      const typeA = getTypeOrderIndex(a)
-      const typeB = getTypeOrderIndex(b)
-      return typeA - typeB
-    })
+    if (notificationsContainer) {
+      const notifications = Array.from(
+        // Get first matching element in the document
+        notificationsContainer.querySelectorAll(Notification.selector)
+      )
 
-    // Re-append sorted notifications to parent container
-    notifications.forEach((notification) =>
-      notificationsContainer.appendChild(notification)
-    )
+      // Re-indexing the NodeList: Sort notifications (children/siblings) based on type order
+      notifications.sort((a, b) => {
+        const typeA = getTypeOrderIndex(a)
+        const typeB = getTypeOrderIndex(b)
+        return typeA - typeB
+      })
+
+      // Re-append sorted notifications to parent container
+      notifications.forEach((notification) =>
+        notificationsContainer.appendChild(notification)
+      )
+    } else {
+      return
+    }
   }
 }
 
