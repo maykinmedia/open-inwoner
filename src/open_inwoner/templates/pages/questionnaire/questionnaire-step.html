@@ -4,12 +4,14 @@
 {% block content %}
     {% render_grid %}
         {% render_column span=9 %}
-            <h1 class="utrecht-heading-1" data-title="{{ form.instance.get_title }}" data-code="{{ form.instance.code }}">
-                <span>{{ form.instance.get_title }}</span>
+            <header class="oip-header-group">
+                <h1 class="utrecht-heading-1" data-title="{{ form.instance.get_title }}" data-code="{{ form.instance.code }}">
+                    <span>{{ form.instance.get_title }}</span>
+                </h1>
                 {% if not form.instance.get_children %}
                     {% button href="products:questionnaire_export" text=_("Export pdf") primary=True icon="file-pdf" icon_position="after" title=_("Your results are also saved to your profile if you are logged in.") %}
                 {% endif %}
-            </h1>
+            </header>
 
             {% if form.instance.get_description %}
                 <p class="utrecht-paragraph">{{ form.instance.get_description }}</p>

@@ -1,0 +1,33 @@
+@import '~@utrecht/components/dist/heading-1/css/index.css';
+@import '~microscope-sass/lib/responsive';
+
+.oip-header-group {
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+
+  &__indicator {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .indicator {
+    display: inline-block;
+    justify-content: flex-start;
+    overflow: visible;
+    position: relative;
+  }
+
+  @include mobile-only {
+    flex-direction: column;
+    align-items: flex-start;
+    word-break: normal;
+    overflow-wrap: break-word;
+  }
+
+  .utrecht-heading-2 + .button,
+  .utrecht-heading-4 + .button,
+  .utrecht-paragraph + .button {
+    margin-top: 0;
+  }
+}

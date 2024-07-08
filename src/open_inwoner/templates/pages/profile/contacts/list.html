@@ -3,10 +3,13 @@
 
 
 {% block content %}
-<h1 class="utrecht-heading-1" id="title">
-    {% trans "Mijn contacten" %}
+<header class="oip-header-group">
+    <h1 class="utrecht-heading-1" id="title">
+        {% trans "Mijn contacten" %}
+
+    </h1>
     {% button href="profile:contact_create" text=_("Nieuw contact toevoegen") icon="person" primary=True %}
-</h1>
+</header>
 
 <!--List of contact requests: receiver's view-->
 {% if pending_approvals %}
