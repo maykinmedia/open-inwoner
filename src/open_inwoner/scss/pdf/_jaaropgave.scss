@@ -15,6 +15,7 @@
 
   .yearly-report__p,
   .yearly-report__td {
+    font-family: utrecht-paragraph;
     font-size: 13px;
   }
 
@@ -23,6 +24,7 @@
   }
 
   .yearly-report__p.inhoudingsplichtige {
+    font-family: utrecht-paragraph;
     font-weight: bold;
   }
 
@@ -72,6 +74,7 @@
   }
 
   .yearly-report__th {
+    font-family: utrecht-heading-2;
     padding: 0.3em;
     font-weight: normal;
     vertical-align: bottom;
