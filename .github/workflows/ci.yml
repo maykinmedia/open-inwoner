@@ -65,7 +65,7 @@ jobs:
           if [ "${{ matrix.test-type }}" = "main" ]; then
             coverage run -p --concurrency=multiprocessing \
               src/manage.py test src \
-              --parallel \
+              --parallel 10 \
               --exclude-tag=e2e \
               --exclude-tag=elastic
           elif [ "${{ matrix.test-type }}" = "elastic" ]; then
