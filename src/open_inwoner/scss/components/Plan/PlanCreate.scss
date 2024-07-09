@@ -10,6 +10,17 @@
     }
   }
 
+  .show-preview {
+    border: none;
+    background-color: transparent;
+
+    &:focus,
+    &:focus-visible {
+      background-color: var(--color-gray-lightest);
+      border-radius: var(--border-radius);
+    }
+  }
+
   .modal--open {
     .modal__container {
       padding: var(--spacing-giant);

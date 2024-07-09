@@ -126,9 +126,8 @@ export default class Modal {
     this.node.classList.add('modal--open')
     this.refocusOnClose = refocusOnClose
 
-    // Set focus on the close button if it exists
+    // Set focus on the cancel button if it exists
     if (this.close) {
-      console.log('value of this close: ', this.close)
       this.close.focus()
     } else if (this.confirm) {
       this.confirm.focus()
