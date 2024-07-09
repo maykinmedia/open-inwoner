@@ -1,9 +1,22 @@
+from django import forms
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
 from solo.admin import SingletonModelAdmin
 
+from open_inwoner.ckeditor5.widgets import CKEditorWidget
+
 from .models import SSDConfig
+
+
+class SSDAdminForm(forms.ModelForm):
+    class Meta:
+        model = SSDConfig
+        fields = "__all__"
+        widgets = {
+            "jaaropgave_display_text": CKEditorWidget,
+            "maandspecificatie_display_text": CKEditorWidget,
+        }
 
 
 @admin.register(SSDConfig)
@@ -48,6 +61,7 @@ class SSDConfigAdmin(SingletonModelAdmin):
             },
         ),
     )
+    form = SSDAdminForm
 
     class Meta:
         verbose_name = _("SSD configuration")
