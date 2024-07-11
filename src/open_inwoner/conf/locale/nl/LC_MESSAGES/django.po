@@ -6668,7 +6668,7 @@ msgstr "De introductietekst voor de 'Mijn Uitkeringen' sectie."
 
 #: open_inwoner/ssd/models.py:67 open_inwoner/ssd/models.py:94
 msgid "Enable download"
-msgstr "Activeer documentuploads"
+msgstr "Activeer document downloads"
 
 #: open_inwoner/ssd/models.py:71
 msgid "Show reports for the last # years"
