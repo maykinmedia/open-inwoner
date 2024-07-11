@@ -13,7 +13,7 @@
     <div class="yearly-report">
         <header class="header flex-container extra-margin-top">
             <div class="flex-box heading">
-                <h1 class="utrecht-heading-1">Jaaropgave {{ spec.dienstjaar|unlocalize }}</h1>
+                <h1 class="uitkeringen-heading-1">Jaaropgave {{ spec.dienstjaar|unlocalize }}</h1>
             </div>
             <div class="flex-box heading__logo right">
                 <img class="yearly-report__logo" src="{{ report.logo.url }}" alt="">
@@ -38,7 +38,7 @@
         <!-- PARTICIPATIEWET -->
         <section class="section section__participatiewet">
             <div class="heading">
-                <h2 class="utrecht-heading-2">Participatiewet</h2>
+                <h2 class="uitkeringen-heading-2">Participatiewet</h2>
             </div>
             <!-- row 1 -->
             <div class="subsection">
@@ -105,7 +105,7 @@
         <!-- TOELICHTING -->
         <section class="section section__toelichting extra-margin">
             <div class="subsection extra-margin">
-                <p class="yearly-report__p yearly-report__comments" >{{ report.jaaropgave_pdf_comments|markdown|safe }}</p>
+                <div class="yearly-report__p yearly-report__comments" >{{ report.pdf_comments|markdown|safe }}</div>
             </div>
         </section>
     </div>

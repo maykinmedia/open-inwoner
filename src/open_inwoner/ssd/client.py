@@ -153,7 +153,7 @@ class JaaropgaveClient(SSDBaseClient):
             report_data.update(
                 {
                     "logo": self.config.logo,
-                    "jaaropgave_comments": self.config.jaaropgave_pdf_comments,
+                    "pdf_comments": self.config.jaaropgave_pdf_comments,
                 }
             )
         pdf = render_pdf(

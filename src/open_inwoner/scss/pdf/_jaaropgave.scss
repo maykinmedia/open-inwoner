@@ -1,5 +1,6 @@
 .yearly-report {
   box-sizing: border-box;
+  font-family: sans-serif;
 
   .header {
     min-height: 50px;
@@ -15,6 +16,7 @@
 
   .yearly-report__p,
   .yearly-report__td {
+    font-family: sans-serif;
     font-size: 13px;
   }
 
@@ -23,11 +25,13 @@
   }
 
   .yearly-report__p.inhoudingsplichtige {
+    font-family: sans-serif;
     font-weight: bold;
   }
 
-  .utrecht-heading-1,
-  .utrecht-heading-2 {
+  .uitkeringen-heading-1,
+  .uitkeringen-heading-2 {
+    font-family: sans-serif;
     font-size: 20px;
     font-weight: normal;
     margin: 0;
@@ -72,6 +76,7 @@
   }
 
   .yearly-report__th {
+    font-family: uitkeringen-heading-2;
     padding: 0.3em;
     font-weight: normal;
     vertical-align: bottom;
@@ -131,7 +136,7 @@
     margin-top: 0.2em;
     text-transform: uppercase;
 
-    .utrecht-heading-2 {
+    .uitkeringen-heading-2 {
       font-size: 12px;
       font-weight: bold;
     }
@@ -141,11 +146,12 @@
     line-height: 1.6;
     font-size: 11px;
 
-    .utrecht-heading-1,
-    .utrecht-heading-2 {
+    .uitkeringen-heading-1,
+    .uitkeringen-heading-2 {
+      font-family: sans-serif;
       font-size: 12px;
     }
-    .utrecht-heading-1 {
+    .uitkeringen-heading-1 {
       text-transform: uppercase;
     }
   }
