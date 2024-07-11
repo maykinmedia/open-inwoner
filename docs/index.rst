@@ -19,7 +19,7 @@ OIP is ontwikkeld door Maykin Media in opdracht van Dimpact voor de i4Sociaal ge
 
 Deze documentatie is bedoeld ter introductie van OIP voor ontwikkel- en installatiedoeleinden.
 OIP kan bij Maykin Media als SaaS worden afgenomen. Een  handleiding voor functioneel beheer
-is beschikbaar voor download: :download:`Beheerhandleiding<./openinwoner-beheerhandleiding-v16.pdf>`.
+is beschikbaar voor download: :download:`Beheerhandleiding<./openinwoner-beheerhandleiding-v118.pdf>`.
 
 
 Documentation
