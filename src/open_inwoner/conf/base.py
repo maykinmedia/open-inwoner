@@ -964,7 +964,7 @@ CKEDITOR_CONFIGS = {
 #
 from .app.setup_configuration import *  # noqa
 
-DJANGO_SETUP_CONFIG_TEMPLATE = "django_setup_configuration/config_doc.rst"
+DJANGO_SETUP_CONFIG_TEMPLATE = "configurations/config_doc.rst"
 DJANGO_SETUP_CONFIG_DOC_PATH = f"{BASE_DIR}/docs/configuration"
 DJANGO_SETUP_CONFIG_CUSTOM_FIELDS = [
     {

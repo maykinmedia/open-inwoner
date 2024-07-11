@@ -9,7 +9,8 @@ from digid_eherkenning.admin import (
     EherkenningConfigurationAdmin,
 )
 from digid_eherkenning.models import DigidConfiguration, EherkenningConfiguration
-from django_setup_configuration.config_settings import ConfigSettings
+
+# from django_setup_configuration.config_settings import ConfigSettings
 from django_setup_configuration.configuration import BaseConfigurationStep
 from django_setup_configuration.exceptions import ConfigurationRunFailed
 from mozilla_django_oidc_db.forms import OpenIDConnectConfigForm
@@ -26,6 +27,7 @@ from digid_eherkenning_oidc_generics.models import (
 )
 from open_inwoner.configurations.models import SiteConfiguration
 
+from ..management.config_settings import ConfigSettings
 from .utils import convert_setting_to_model_field_name
 
 

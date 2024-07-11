@@ -1,10 +1,11 @@
 from django.conf import settings
 
-from django_setup_configuration.config_settings import ConfigSettings
+# from django_setup_configuration.config_settings import ConfigSettings
 from django_setup_configuration.configuration import BaseConfigurationStep
 
 from open_inwoner.configurations.models import SiteConfiguration
 
+from ..management.config_settings import ConfigSettings
 from .utils import convert_setting_to_model_field_name
 
 

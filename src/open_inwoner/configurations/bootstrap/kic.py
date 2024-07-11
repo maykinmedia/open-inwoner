@@ -1,7 +1,8 @@
 from django.conf import settings
 
 import requests
-from django_setup_configuration.config_settings import ConfigSettings
+
+# from django_setup_configuration.config_settings import ConfigSettings
 from django_setup_configuration.configuration import BaseConfigurationStep
 from django_setup_configuration.exceptions import SelfTestFailed
 from simple_certmanager.models import Certificate
@@ -14,6 +15,8 @@ from open_inwoner.openklant.clients import (
 )
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.utils.api import ClientError
+
+from ..management.config_settings import ConfigSettings
 
 
 class KlantenAPIConfigurationStep(BaseConfigurationStep):

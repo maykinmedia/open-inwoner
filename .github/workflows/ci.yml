@@ -208,7 +208,7 @@ jobs:
         working-directory: docs
 
   setup-config-docs:
-    name: Build documentation for django-setup-configuration
+    name: Check that documentation for configuration steps is up-to-date
     runs-on: ubuntu-latest
 
     steps:
@@ -224,7 +224,7 @@ jobs:
 
       - name: Build docs for django-setup-configuration steps
         run: |
-          python src/manage.py generate_config_docs
+          python src/manage.py generate_config_docs --dry-run
 
   #
   # Docker
