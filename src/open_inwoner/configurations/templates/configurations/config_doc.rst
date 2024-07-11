@@ -10,6 +10,7 @@ Enable/Disable configuration:
 
 ::
 
+    DEBUG
     {% spaceless %}
     {{ enable_settings }}
     {% endspaceless %}
