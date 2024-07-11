@@ -20,8 +20,15 @@ export class LoginFormFocus {
   }
 
   hideLoginFormOnLoad() {
+    const notificationContent = this.loginFormColumn.querySelector(
+      '.notification__content'
+    )
     if (this.loginFormColumn) {
       this.loginFormColumn.classList.add('hide')
+    }
+    // Show form on error
+    if (notificationContent) {
+      this.loginFormColumn.classList.remove('hide')
     }
   }
 

@@ -101,6 +101,12 @@
   & &__content {
     margin-top: var(--spacing-tiny);
 
+    &:focus,
+    &:focus-visible {
+      outline: none;
+      border: none;
+    }
+
     & * {
       margin: 0;
     }

@@ -6552,9 +6552,9 @@ msgstr "Zoekindex opnieuw opbouwen"
 #: open_inwoner/search/tests/test_feedback.py:192
 #: open_inwoner/search/views.py:158
 msgid ""
-"Thank you for your feedback. It will help us to improve our search engine"
+"Thank you for your feedback, it will help us improve our search engine."
 msgstr ""
-"Dank u voor uw feedback, hiermee kunnen wij de omgeving verder verbeteren"
+"Dank u voor uw feedback, hiermee kunnen wij de omgeving verder verbeteren."
 
 #: open_inwoner/search/tests/test_logging.py:33 open_inwoner/search/views.py:63
 #, python-brace-format
