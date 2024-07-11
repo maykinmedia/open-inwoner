@@ -1,6 +1,6 @@
 import Modal from '../modal'
 
-export class Preview {
+export class PlanPreview {
   // Selector for elements triggering the preview modal
   static selector = '.show-preview'
 
@@ -19,10 +19,21 @@ export class Preview {
     modal.setConfirmButtonVisibility(false)
     modal.setCancelButtonVisibility(true)
     modal.setButtonIconCloseVisibility(true)
+
+    // Track the element that opened the modal
+    modal.openedBy = this.node
+
+    // Set the modal-closed callback to focus on the element that opened it
+    modal.setModalClosedCallback(() => {
+      if (modal.openedBy) {
+        modal.openedBy.focus()
+      }
+    })
+
     modal.show()
   }
 }
 
 document
-  .querySelectorAll(Preview.selector)
-  .forEach((previewNode) => new Preview(previewNode))
+  .querySelectorAll(PlanPreview.selector)
+  .forEach((previewNode) => new PlanPreview(previewNode))

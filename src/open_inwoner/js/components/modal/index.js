@@ -11,6 +11,7 @@ export default class Modal {
       '.modal__confirm .inner-text'
     )
     this.closeTitle = this.node.querySelector('.modal__close-title')
+    this.openedBy = null // Track the element that opened the modal
 
     // This is for the prefilled modals so they will not be emptied
     if (!this.node.classList.contains('modal--no-reset')) {
@@ -124,7 +125,15 @@ export default class Modal {
   show(refocusOnClose) {
     this.node.classList.add('modal--open')
     this.refocusOnClose = refocusOnClose
-    this.close.focus()
+
+    // Set focus on the cancel button if it exists
+    if (this.close) {
+      this.close.focus()
+    } else if (this.confirm) {
+      this.confirm.focus()
+    } else {
+      this.node.focus()
+    }
   }
 
   hide() {
@@ -149,6 +158,7 @@ export default class Modal {
     if (this.modalClosedCallback) {
       this.modalClosedCallback()
     }
+    this.openedBy = null // Reset the reference to the element that opened the modal
   }
 
   escapeModal(event) {

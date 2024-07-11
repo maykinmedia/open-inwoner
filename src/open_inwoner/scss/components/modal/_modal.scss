@@ -156,4 +156,13 @@
   &.show-cancel-button .button.modal__close {
     display: flex;
   }
+
+  &.show-cancel-button .button.modal__close {
+    &:hover,
+    &:focus,
+    &:focus-visible {
+      background-color: var(--color-primary-darker);
+      transform: none;
+    }
+  }
 }

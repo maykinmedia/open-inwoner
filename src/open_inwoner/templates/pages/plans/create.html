@@ -43,9 +43,9 @@
                                 {{ plan_template.goal|truncatewords:8 }}
                             </div>
                             <div class="plan-template__icon">
-                                <div class="show-preview" data-id="template-{{ plan_template.id }}">
+                                <button class="show-preview" type="button" data-id="template-{{ plan_template.id }}">
                                     {% icon icon="visibility" outlined=True %}
-                                </div>
+                                </button>
                             </div>
                             <div class="modal modal--no-reset" id="template-{{ plan_template.id }}">
                                 <div class="modal__container">

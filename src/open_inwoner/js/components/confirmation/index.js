@@ -29,7 +29,21 @@ export class Confirmation {
         this.handleConfirm.bind(this),
         'button--error-confirm'
       )
-      modal.show(this.form)
+
+      // Set the element that opened the modal
+      const profileDeleteButton = this.form.querySelector(
+        '.button--transparent'
+      )
+      modal.openedBy = profileDeleteButton
+
+      // Set the modal closed callback to focus on the element that opened it
+      modal.setModalClosedCallback(() => {
+        if (modal.openedBy) {
+          modal.openedBy.focus()
+        }
+      })
+
+      modal.show(profileDeleteButton)
     }
   }
 
