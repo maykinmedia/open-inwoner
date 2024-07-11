@@ -78,17 +78,28 @@ class CMSConfigSettings(ConfigSettings):
     where APPNAME is the name of the cms app in upper case
     """
 
-    def __init__(self, namespace: str, required_settings: list = [], *args, **kwargs):
+    def __init__(
+        self,
+        namespace: str,
+        required_settings: list | None = None,
+        optional_settings: list | None = None,
+        *args,
+        **kwargs,
+    ):
 
         super().__init__(
-            *args, namespace=namespace, required_settings=required_settings, **kwargs
+            *args,
+            namespace=namespace,
+            required_settings=required_settings,
+            optional_settings=optional_settings,
+            **kwargs,
         )
 
         self.namespace = namespace
         self.enable_setting = f"{self.namespace}_CONFIG_ENABLE"
         self.file_name = f"{self.namespace.lower()}"
         self.required_settings = required_settings
-        self.optional_settings = [
+        self.optional_settings = optional_settings or [
             f"{self.namespace}_REQUIRES_AUTH",
             f"{self.namespace}_REQUIRES_AUTH_BSN_OR_KVK",
             f"{self.namespace}_MENU_INDICATOR",
@@ -127,9 +138,9 @@ class CMSConfigSettings(ConfigSettings):
 class CMSBenefitsConfigurationStep(GenericCMSConfigurationStep):
     verbose_name = "Configuration for CMS social benefits (SSD) app"
     config_settings = CMSConfigSettings(
+        namespace="CMS_SSD",
         enable_setting="CMS_BENEFITS_ENABLE",
         display_name="CMS apps configuration: Social Benefits",
-        namespace="CMS_SSD",
     )
 
     def __init__(self):
@@ -248,17 +259,16 @@ class CMSProfileConfigurationStep(GenericCMSConfigurationStep):
             "CMS_PROFILE_MENU_INDICATOR",
             "CMS_PROFILE_MENU_ICON",
         ]
-        config_settings = [
+        settings = [
             item
             for item in self.config_settings.optional_settings
             if item not in extension_settings
         ]
         config_mapping = {
             setting: f"{setting.split('CMS_PROFILE_', 1)[1].lower()}"
-            for setting in config_settings
+            for setting in settings
         }
 
-        # import pdbr;pdbr.set_trace()
         config_args = create_apphook_page_args(config_mapping)
         extension_args = create_apphook_page_args(
             self.config_settings.extension_settings_mapping

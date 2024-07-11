@@ -71,6 +71,11 @@ For a full overview of the command and its options:
    :caption: Supported configurations
 
    admin_oidc
+   cms_cases
+   cms_collaborate
+   cms_inbox
+   cms_products
+   cms_profile
    cms_ssd
    digid_oidc
    digid_saml
