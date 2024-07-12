@@ -153,6 +153,7 @@ class CMSSetupConfigurationTest(TestCase):
 
         self.assertTrue(benefits_page_is_published())
 
+        # import pdbr;pdbr.set_trace()
         # check common extension
         page = Page.objects.get(publisher_is_draft=False)
         extension = page.commonextension

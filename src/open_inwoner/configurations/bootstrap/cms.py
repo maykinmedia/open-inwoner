@@ -81,6 +81,7 @@ class CMSConfigSettings(ConfigSettings):
     def __init__(
         self,
         namespace: str,
+        enable_setting: str,
         required_settings: list | None = None,
         optional_settings: list | None = None,
         *args,
@@ -90,15 +91,16 @@ class CMSConfigSettings(ConfigSettings):
         super().__init__(
             *args,
             namespace=namespace,
+            enable_setting=enable_setting,
             required_settings=required_settings,
             optional_settings=optional_settings,
             **kwargs,
         )
 
+        self.enable_setting = enable_setting
         self.namespace = namespace
-        self.enable_setting = f"{self.namespace}_CONFIG_ENABLE"
         self.file_name = f"{self.namespace.lower()}"
-        self.required_settings = required_settings
+        self.required_settings = required_settings or []
         self.optional_settings = optional_settings or [
             f"{self.namespace}_REQUIRES_AUTH",
             f"{self.namespace}_REQUIRES_AUTH_BSN_OR_KVK",
@@ -138,8 +140,8 @@ class CMSConfigSettings(ConfigSettings):
 class CMSBenefitsConfigurationStep(GenericCMSConfigurationStep):
     verbose_name = "Configuration for CMS social benefits (SSD) app"
     config_settings = CMSConfigSettings(
+        enable_setting="CMS_CONFIG_BENEFITS_ENABLE",
         namespace="CMS_SSD",
-        enable_setting="CMS_BENEFITS_ENABLE",
         display_name="CMS apps configuration: Social Benefits",
     )
 
@@ -151,9 +153,9 @@ class CMSBenefitsConfigurationStep(GenericCMSConfigurationStep):
 class CMSCasesConfigurationStep(GenericCMSConfigurationStep):
     verbose_name = "Configuration for CMS cases app"
     config_settings = CMSConfigSettings(
-        enable_setting="CMS_CASES_ENABLE",
-        display_name="CMS apps configuration: Cases",
+        enable_setting="CMS_CONFIG_CASES_ENABLE",
         namespace="CMS_CASES",
+        display_name="CMS apps configuration: Cases",
     )
 
     def __init__(self):
@@ -164,7 +166,7 @@ class CMSCasesConfigurationStep(GenericCMSConfigurationStep):
 class CMSCollaborateConfigurationStep(GenericCMSConfigurationStep):
     verbose_name = "Configuration for CMS collaborate app"
     config_settings = CMSConfigSettings(
-        enable_setting="CMS_COLLABORATE_ENABLE",
+        enable_setting="CMS_CONFIG_COLLABORATE_ENABLE",
         display_name="CMS apps configuration: Collaboration",
         namespace="CMS_COLLABORATE",
     )
@@ -177,7 +179,7 @@ class CMSCollaborateConfigurationStep(GenericCMSConfigurationStep):
 class CMSInboxConfigurationStep(GenericCMSConfigurationStep):
     verbose_name = "Configuration for CMS inbox app"
     config_settings = CMSConfigSettings(
-        enable_setting="CMS_INBOX_ENABLE",
+        enable_setting="CMS_CONFIG_INBOX_ENABLE",
         display_name="CMS apps configuration: Inbox",
         namespace="CMS_INBOX",
     )
@@ -190,7 +192,7 @@ class CMSInboxConfigurationStep(GenericCMSConfigurationStep):
 class CMSProductsConfigurationStep(GenericCMSConfigurationStep):
     verbose_name = "Configuration for CMS product app"
     config_settings = CMSConfigSettings(
-        enable_setting="CMS_PRODUCTS_ENABLE",
+        enable_setting="CMS_CONFIG_PRODUCTS_ENABLE",
         display_name="CMS apps configuration: Products",
         namespace="CMS_PRODUCTS",
     )
@@ -203,7 +205,7 @@ class CMSProductsConfigurationStep(GenericCMSConfigurationStep):
 class CMSProfileConfigurationStep(GenericCMSConfigurationStep):
     verbose_name = "Configuration for CMS profile app"
     config_settings = CMSConfigSettings(
-        enable_setting="CMS_PROFILE_ENABLE",
+        enable_setting="CMS_CONFIG_PROFILE_ENABLE",
         display_name="CMS apps configuration: Profile",
         namespace="CMS_PROFILE",
         optional_settings=[
@@ -259,14 +261,14 @@ class CMSProfileConfigurationStep(GenericCMSConfigurationStep):
             "CMS_PROFILE_MENU_INDICATOR",
             "CMS_PROFILE_MENU_ICON",
         ]
-        settings = [
+        optional_settings = [
             item
             for item in self.config_settings.optional_settings
             if item not in extension_settings
         ]
         config_mapping = {
             setting: f"{setting.split('CMS_PROFILE_', 1)[1].lower()}"
-            for setting in settings
+            for setting in optional_settings
         }
 
         config_args = create_apphook_page_args(config_mapping)
