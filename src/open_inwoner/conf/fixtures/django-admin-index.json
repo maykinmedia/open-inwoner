@@ -118,6 +118,14 @@
                 "cspreport"
             ],
             [
+                "django_yubin",
+                "log"
+            ],
+            [
+                "django_yubin",
+                "message"
+            ],
+            [
                 "log_outgoing_requests",
                 "outgoingrequestslog"
             ],
@@ -132,14 +140,6 @@
             [
                 "timeline_logger",
                 "timelinelog"
-            ],
-            [
-                "django_yubin",
-                "message"
-            ],
-            [
-                "django_yubin",
-                "log"
             ]
         ]
     }
@@ -274,31 +274,6 @@
             [
                 "plans",
                 "plantemplate"
-            ]
-        ]
-    }
-},
-{
-    "model": "admin_index.appgroup",
-    "fields": {
-        "order": 9,
-        "translations": {
-            "nl": "Emails"
-        },
-        "name": "Emails",
-        "slug": "emails",
-        "models": [
-            [
-                "mailer",
-                "dontsendentry"
-            ],
-            [
-                "mailer",
-                "message"
-            ],
-            [
-                "mailer",
-                "messagelog"
             ]
         ]
     }
