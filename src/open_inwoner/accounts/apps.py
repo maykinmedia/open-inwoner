@@ -4,7 +4,8 @@ from django.apps import AppConfig, apps
 from django.conf import settings
 from django.contrib.contenttypes.management import create_contenttypes
 from django.core.management import call_command
-from django.db.models.signals import post_migrate
+
+# from django.db.models.signals import post_migrate
 
 
 def update_admin_index(sender=None, **kwargs) -> bool:
@@ -48,4 +49,9 @@ class AccountsConfig(AppConfig):
             return
         self._has_run = True
 
-        post_migrate.connect(update_admin_index, sender=self)
+        # FIXME: loading the django-admin-index fixture through the
+        # post migrate signal is broken; we now load the fixture
+        # in the docker startup script, so this only affects manual
+        # installs during development;
+
+        # post_migrate.connect(update_admin_index, sender=self)

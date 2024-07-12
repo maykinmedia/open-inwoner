@@ -7,7 +7,7 @@ set -ex
 export PGHOST=${DB_HOST:-db}
 export PGPORT=${DB_PORT:-5432}
 
-fixtures_dir=${FIXTURES_DIR:-/app/fixtures/autoload}
+fixtures_dir=${FIXTURES_DIR:-/app/src/open_inwoner/conf/fixtures/autoload}
 
 uwsgi_port=${UWSGI_PORT:-8000}
 uwsgi_processes=${UWSGI_PROCESSES:-4}
