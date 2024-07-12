@@ -13,7 +13,7 @@ Enable/Disable configuration:
 
 ::
 
-    CMS_PRODUCTS_CONFIG_ENABLE
+    CMS_CONFIG_PRODUCTS_ENABLE
 
 
 

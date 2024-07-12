@@ -13,7 +13,7 @@ Enable/Disable configuration:
 
 ::
 
-    CMS_COLLABORATE_CONFIG_ENABLE
+    CMS_CONFIG_COLLABORATE_ENABLE
 
 
 

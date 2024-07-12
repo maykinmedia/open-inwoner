@@ -13,7 +13,7 @@ Enable/Disable configuration:
 
 ::
 
-    CMS_SSD_CONFIG_ENABLE
+    CMS_CONFIG_SSD_ENABLE
 
 
 

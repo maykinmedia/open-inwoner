@@ -13,7 +13,7 @@ Enable/Disable configuration:
 
 ::
 
-    CMS_CASES_CONFIG_ENABLE
+    CMS_CONFIG_CASES_ENABLE
 
 
 

@@ -977,11 +977,11 @@ DJANGO_SETUP_CONFIG_CUSTOM_FIELDS = [
     },
     {
         "field": "django.db.models.fields.files.FileField",
-        "description": "string represeting the (absolute) path to a file, including file extension",
+        "description": "string representing the (absolute) path to a file, including file extension",
     },
     {
         "field": "privates.fields.PrivateMediaFileField",
-        "description": "string represeting the (absolute) path to a file, including file extension",
+        "description": "string representing the (absolute) path to a file, including file extension",
     },
 ]
 

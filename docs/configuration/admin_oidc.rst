@@ -82,7 +82,7 @@ Detailed Information
     Variable            ADMIN_OIDC_OIDC_EXEMPT_URLS
     Setting             URLs exempt from session renewal
     Description         This is a list of absolute url paths, regular expressions for url paths, or Django view names. This plus the mozilla-django-oidc urls are exempted from the session renewal by the SessionRefresh middleware.
-    Possible values     No information available
+    Possible values     string, comma-delimited ('foo,bar,baz')
     Default value       
     
     Variable            ADMIN_OIDC_OIDC_NONCE_SIZE
@@ -142,7 +142,7 @@ Detailed Information
     Variable            ADMIN_OIDC_OIDC_RP_SCOPES_LIST
     Setting             OpenID Connect scopes
     Description         OpenID Connect scopes that are requested during login
-    Possible values     No information available
+    Possible values     string, comma-delimited ('foo,bar,baz')
     Default value       openid, email, profile
     
     Variable            ADMIN_OIDC_OIDC_RP_SIGN_ALGO
@@ -166,7 +166,7 @@ Detailed Information
     Variable            ADMIN_OIDC_SUPERUSER_GROUP_NAMES
     Setting             Superuser group names
     Description         If any of these group names are present in the claims upon login, the user will be marked as a superuser. If none of these groups are present the user will lose superuser permissions.
-    Possible values     No information available
+    Possible values     string, comma-delimited ('foo,bar,baz')
     Default value       
     
     Variable            ADMIN_OIDC_SYNC_GROUPS

@@ -3296,14 +3296,14 @@ msgstr ""
 #: open_inwoner/configurations/bootstrap/choices.py:10
 #, python-brace-format
 msgid ""
-"string represeting the (absolute) path to a file, including file extension: "
+"string representing the (absolute) path to a file, including file extension: "
 "{example}"
 msgstr ""
 
 #: open_inwoner/configurations/bootstrap/choices.py:15
 #, python-brace-format
 msgid ""
-"string represeting the (absolute) path to an image file, including file "
+"string representing the (absolute) path to an image file, including file "
 "extension: {example}"
 msgstr ""
 

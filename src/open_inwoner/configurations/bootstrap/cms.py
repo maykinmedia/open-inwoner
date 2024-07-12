@@ -140,7 +140,7 @@ class CMSConfigSettings(ConfigSettings):
 class CMSBenefitsConfigurationStep(GenericCMSConfigurationStep):
     verbose_name = "Configuration for CMS social benefits (SSD) app"
     config_settings = CMSConfigSettings(
-        enable_setting="CMS_CONFIG_BENEFITS_ENABLE",
+        enable_setting="CMS_CONFIG_SSD_ENABLE",
         namespace="CMS_SSD",
         display_name="CMS apps configuration: Social Benefits",
     )

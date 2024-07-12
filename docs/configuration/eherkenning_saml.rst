@@ -105,13 +105,13 @@ Detailed Information
     Variable            EHERKENNING_SAML_CERTIFICATE_PRIVATE_KEY
     Setting             private key
     Description         The content of the private key
-    Possible values     No information available
+    Possible values     string representing the (absolute) path to a file, including file extension
     Default value       No default
     
     Variable            EHERKENNING_SAML_CERTIFICATE_PUBLIC_CERTIFICATE
     Setting             public certificate
     Description         The content of the certificate
-    Possible values     No information available
+    Possible values     string representing the (absolute) path to a file, including file extension
     Default value       No default
     
     Variable            EHERKENNING_SAML_CERTIFICATE_TYPE

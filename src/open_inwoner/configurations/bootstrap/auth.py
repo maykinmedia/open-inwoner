@@ -128,6 +128,7 @@ class eHerkenningOIDCConfigurationStep(BaseConfigurationStep):
         enable_setting="EHERKENNING_OIDC_CONFIG_ENABLE",
         namespace="EHERKENNING_OIDC",
         models=[OpenIDConnectEHerkenningConfig],
+        update_fields=True,
         required_settings=[
             "EHERKENNING_OIDC_OIDC_RP_CLIENT_ID",
             "EHERKENNING_OIDC_OIDC_RP_CLIENT_SECRET",
@@ -215,6 +216,7 @@ class AdminOIDCConfigurationStep(BaseConfigurationStep):
         display_name="Admin OIDC Configuration",
         namespace="ADMIN_OIDC",
         models=[OpenIDConnectConfig],
+        update_fields=True,
         required_settings=[
             "ADMIN_OIDC_OIDC_RP_CLIENT_ID",
             "ADMIN_OIDC_OIDC_RP_CLIENT_SECRET",
@@ -310,7 +312,7 @@ class DigiDSAMLConfigurationStep(BaseConfigurationStep):
         enable_setting="DIGID_SAML_CONFIG_ENABLE",
         namespace="DIGID_SAML",
         models=[DigidConfiguration],
-        update_field_descriptions=True,
+        update_fields=True,
         required_settings=[
             "DIGID_SAML_BASE_URL",
             "DIGID_SAML_CERTIFICATE_LABEL",
@@ -430,6 +432,7 @@ class eHerkenningSAMLConfigurationStep(BaseConfigurationStep):
         display_name="eHerkenning SAML Configuration",
         namespace="EHERKENNING_SAML",
         models=[EherkenningConfiguration],
+        update_fields=True,
         required_settings=[
             "EHERKENNING_SAML_CERTIFICATE_LABEL",
             "EHERKENNING_SAML_CERTIFICATE_TYPE",

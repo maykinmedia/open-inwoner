@@ -13,7 +13,7 @@ Enable/Disable configuration:
 
 ::
 
-    CMS_INBOX_CONFIG_ENABLE
+    CMS_CONFIG_INBOX_ENABLE
 
 
 

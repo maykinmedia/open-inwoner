@@ -78,7 +78,7 @@ Detailed Information
     Variable            EHERKENNING_OIDC_OIDC_EXEMPT_URLS
     Setting             URLs exempt from session renewal
     Description         This is a list of absolute url paths, regular expressions for url paths, or Django view names. This plus the mozilla-django-oidc urls are exempted from the session renewal by the SessionRefresh middleware.
-    Possible values     No information available
+    Possible values     string, comma-delimited ('foo,bar,baz')
     Default value       
     
     Variable            EHERKENNING_OIDC_OIDC_KEYCLOAK_IDP_HINT
@@ -150,7 +150,7 @@ Detailed Information
     Variable            EHERKENNING_OIDC_OIDC_RP_SCOPES_LIST
     Setting             OpenID Connect scopes
     Description         OpenID Connect-scopes die worden bevraagd tijdens het inloggen. Deze zijn hardcoded en moeten worden ondersteund door de identiteitsprovider.
-    Possible values     No information available
+    Possible values     string, comma-delimited ('foo,bar,baz')
     Default value       openid, kvk
     
     Variable            EHERKENNING_OIDC_OIDC_RP_SIGN_ALGO
