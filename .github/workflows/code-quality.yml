@@ -121,7 +121,15 @@ jobs:
           SECRET_KEY: dummy
           DB_USER: postgres
           DB_PASSWORD: ''
-
+      - name: Verify that django-admin-index fixture is up-to-date
+        run: |
+          src/manage.py loaddata django-admin-index
+        env:
+          DJANGO_SETTINGS_MODULE: open_inwoner.conf.dev
+          SECRET_KEY: dummy
+          DB_USER: postgres
+          DB_PASSWORD: ''
+       
   prettier:
     name: Check code formatting with prettier
     runs-on: ubuntu-latest
