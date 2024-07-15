@@ -16,20 +16,34 @@ def update_admin_index(sender=None, **kwargs) -> bool:
 
     AppGroup.objects.all().delete()
 
-    # Make sure project models are registered.
-    project_name = __name__.split(".")[0]
-
+    # The django-admin-index fixture depends on the contenttypes having been generated.
+    # However, given that the contenttypes framework itself uses the post_migrate hook
+    # to accomplish this, it's possible our hook will be run before their hook. Therefore,
+    # we have to run the contenttype generation manually here.
+    ct_create_exceptions = []
     for app_config in apps.get_app_configs():
-        if app_config.name.startswith(project_name):
+        try:
             create_contenttypes(app_config, verbosity=0)
+        except Exception as exc:
+            # Only an issue if the fixtures actually refer to any contenttypes within this app,
+            # which we remind the user of below.
+            ct_create_exceptions.append(exc)
 
     try:
         call_command("loaddata", "django-admin-index", verbosity=0, stdout=StringIO())
     except Exception as exc:
         print(f"Error: Unable to load django-admin-index fixture ({exc})")
+        if ct_create_exceptions:
+            ct_exc = ExceptionGroup(
+                "Unable to create contenttypes", *ct_create_exceptions
+            )
+            print(
+                "NOTE: this may be a consequence of being unable to create the following "
+                f"contenttypes: {ct_exc}"
+            )
         return False
     else:
-        print("Loaded django-admin-index fixture")
+        print("Successfully loaded django-admin-index fixture")
         return True
 
 
