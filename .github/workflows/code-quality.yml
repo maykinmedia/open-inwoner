@@ -101,8 +101,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
       - name: Set up backend environment
         uses: maykinmedia/setup-django-backend@v1
         with:
@@ -116,7 +114,7 @@ jobs:
         run: |
           src/manage.py makemigrations --check --dry-run
         env:
-          DJANGO_SETTINGS_MODULE: open_inwoner.conf.dev
+          DJANGO_SETTINGS_MODULE: open_inwoner.conf.ci
           SECRET_KEY: dummy
           DB_USER: postgres
           DB_PASSWORD: ''
