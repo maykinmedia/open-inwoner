@@ -83,12 +83,12 @@ jobs:
           python ./bin/flake8_summary.py "${{ steps.flake8.outputs.flake8_output }}" >> $GITHUB_STEP_SUMMARY
 
   migrations:
-    name: Check for model changes not present in the migrations
+    name: Check for migration and fixture freshness
     runs-on: ubuntu-latest
 
     services:
       postgres:
-        image: postgres:12
+        image: postgis/postgis:15-3.4
         env:
           POSTGRES_HOST_AUTH_METHOD: trust
         ports:
@@ -123,9 +123,10 @@ jobs:
           DB_PASSWORD: ''
       - name: Verify that django-admin-index fixture is up-to-date
         run: |
+          src/manage.py migrate
           src/manage.py loaddata django-admin-index
         env:
-          DJANGO_SETTINGS_MODULE: open_inwoner.conf.dev
+          DJANGO_SETTINGS_MODULE: open_inwoner.conf.ci
           SECRET_KEY: dummy
           DB_USER: postgres
           DB_PASSWORD: ''
