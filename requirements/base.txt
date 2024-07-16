@@ -255,7 +255,7 @@ django-sessionprofile==1.0
     # via
     #   -r requirements/base.in
     #   django-digid-eherkenning
-django-setup-configuration==0.2.0
+django-setup-configuration==0.3.0
     # via -r requirements/base.in
 django-simple-certmanager==1.4.1
     # via
