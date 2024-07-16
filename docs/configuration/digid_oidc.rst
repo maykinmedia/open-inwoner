@@ -1,11 +1,12 @@
 .. _digid_oidc:
 
-========================
-DigiD OIDC Configuration
-========================
+==========================================
+Configuration for DigiD via OpenID Connect
+==========================================
 
 Settings Overview
 =================
+
 
 Enable/Disable configuration:
 """""""""""""""""""""""""""""
@@ -14,6 +15,8 @@ Enable/Disable configuration:
 
     DIGID_OIDC_CONFIG_ENABLE
 
+
+
 Required:
 """""""""
 
@@ -21,6 +24,7 @@ Required:
 
     DIGID_OIDC_OIDC_RP_CLIENT_ID
     DIGID_OIDC_OIDC_RP_CLIENT_SECRET
+
 
 All settings:
 """""""""""""
@@ -54,32 +58,32 @@ Detailed Information
 ::
 
     Variable            DIGID_OIDC_ENABLED
-    Setting             enable
-    Description         Indicates whether OpenID Connect for authentication/authorization is enabled. This overrides overrides the usage of SAML for DigiD authentication.
+    Setting             inschakelen
+    Description         Geeft aan of OpenID Connect voor authenticatie/autorisatie is ingeschakeld. Deze overschrijft het gebruik van SAML voor DigiD-authenticatie.
     Possible values     True, False
     Default value       False
     
     Variable            DIGID_OIDC_ERROR_MESSAGE_MAPPING
-    Setting             Error message mapping
-    Description         Mapping that maps error messages returned by the identity provider to human readable error messages that are shown to the user
+    Setting             Foutmelding mapping
+    Description         Mapping die de door de identiteitsprovider geretourneerde foutmeldingen, omzet in leesbare meldingen die aan de gebruiker worden getoond
     Possible values     Mapping: {'some_key': 'Some value'}
     Default value       {}
     
     Variable            DIGID_OIDC_IDENTIFIER_CLAIM_NAME
-    Setting             BSN claim name
-    Description         The name of the claim in which the BSN of the user is stored
+    Setting             BSN claim naam
+    Description         De naam van de claim waarin het BSN nummer van de gebruiker is opgeslagen
     Possible values     string
     Default value       bsn
     
     Variable            DIGID_OIDC_OIDC_EXEMPT_URLS
     Setting             URLs exempt from session renewal
     Description         This is a list of absolute url paths, regular expressions for url paths, or Django view names. This plus the mozilla-django-oidc urls are exempted from the session renewal by the SessionRefresh middleware.
-    Possible values     string, comma-delimited ('foo,bar,baz')
+    Possible values     No information available
     Default value       
     
     Variable            DIGID_OIDC_OIDC_KEYCLOAK_IDP_HINT
-    Setting             Keycloak Identity Provider hint
-    Description         Specific for Keycloak: parameter that indicates which identity provider should be used (therefore skipping the Keycloak login screen).
+    Setting             Keycloak-identiteitsprovider hint
+    Description         Specifiek voor Keycloak: parameter die aangeeft welke identiteitsprovider gebruikt moet worden (inlogscherm van Keycloak overslaan).
     Possible values     string
     Default value       No default
     
@@ -92,37 +96,37 @@ Detailed Information
     Variable            DIGID_OIDC_OIDC_OP_AUTHORIZATION_ENDPOINT
     Setting             Authorization endpoint
     Description         URL of your OpenID Connect provider authorization endpoint
-    Possible values     string
+    Possible values     string (URL)
     Default value       No default
     
     Variable            DIGID_OIDC_OIDC_OP_DISCOVERY_ENDPOINT
     Setting             Discovery endpoint
     Description         URL of your OpenID Connect provider discovery endpoint ending with a slash (`.well-known/...` will be added automatically). If this is provided, the remaining endpoints can be omitted, as they will be derived from this endpoint.
-    Possible values     string
+    Possible values     string (URL)
     Default value       No default
     
     Variable            DIGID_OIDC_OIDC_OP_JWKS_ENDPOINT
     Setting             JSON Web Key Set endpoint
     Description         URL of your OpenID Connect provider JSON Web Key Set endpoint. Required if `RS256` is used as signing algorithm.
-    Possible values     string
+    Possible values     string (URL)
     Default value       No default
     
     Variable            DIGID_OIDC_OIDC_OP_LOGOUT_ENDPOINT
-    Setting             Logout endpoint
-    Description         URL of your OpenID Connect provider logout endpoint
-    Possible values     string
+    Setting             Endpoint uitlog
+    Description         URL van het uitlog-endpoint van uw OpenID Connect Connect-provider
+    Possible values     string (URL)
     Default value       No default
     
     Variable            DIGID_OIDC_OIDC_OP_TOKEN_ENDPOINT
     Setting             Token endpoint
     Description         URL of your OpenID Connect provider token endpoint
-    Possible values     string
+    Possible values     string (URL)
     Default value       No default
     
     Variable            DIGID_OIDC_OIDC_OP_USER_ENDPOINT
     Setting             User endpoint
     Description         URL of your OpenID Connect provider userinfo endpoint
-    Possible values     string
+    Possible values     string (URL)
     Default value       No default
     
     Variable            DIGID_OIDC_OIDC_RP_CLIENT_ID
@@ -145,8 +149,8 @@ Detailed Information
     
     Variable            DIGID_OIDC_OIDC_RP_SCOPES_LIST
     Setting             OpenID Connect scopes
-    Description         OpenID Connect scopes that are requested during login. These scopes are hardcoded and must be supported by the identity provider
-    Possible values     string, comma-delimited ('foo,bar,baz')
+    Description         OpenID Connect-scopes die worden bevraagd tijdens het inloggen. Deze zijn hardcoded en moeten worden ondersteund door de identiteitsprovider.
+    Possible values     No information available
     Default value       openid, bsn
     
     Variable            DIGID_OIDC_OIDC_RP_SIGN_ALGO

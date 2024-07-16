@@ -1,11 +1,12 @@
 .. _zgw:
 
-=================
-ZGW Configuration
-=================
+======================
+ZGW APIs configuration
+======================
 
 Settings Overview
 =================
+
 
 Enable/Disable configuration:
 """""""""""""""""""""""""""""
@@ -13,6 +14,8 @@ Enable/Disable configuration:
 ::
 
     ZGW_CONFIG_ENABLE
+
+
 
 Required:
 """""""""
@@ -28,9 +31,12 @@ Required:
     ZGW_FORM_SERVICE_API_ROOT
     ZGW_FORM_SERVICE_CLIENT_ID
     ZGW_FORM_SERVICE_SECRET
+    ZGW_SERVER_CERTIFICATE_LABEL
+    ZGW_SERVER_CERTIFICATE_TYPE
     ZGW_ZAAK_SERVICE_API_ROOT
     ZGW_ZAAK_SERVICE_CLIENT_ID
     ZGW_ZAAK_SERVICE_SECRET
+
 
 All settings:
 """""""""""""
@@ -53,6 +59,8 @@ All settings:
     ZGW_FORM_SERVICE_SECRET
     ZGW_MAX_UPLOAD_SIZE
     ZGW_REFORMAT_ESUITE_ZAAK_IDENTIFICATIE
+    ZGW_SERVER_CERTIFICATE_LABEL
+    ZGW_SERVER_CERTIFICATE_TYPE
     ZGW_SKIP_NOTIFICATION_STATUSTYPE_INFORMEREN
     ZGW_TITLE_TEXT
     ZGW_ZAAK_MAX_CONFIDENTIALITY
@@ -74,25 +82,32 @@ Detailed Information
     Variable            ZGW_ALLOWED_FILE_EXTENSIONS
     Setting             allowed file extensions
     Description         Een lijst van toegestande bestandsextensies, alleen documentuploads met een van deze extensies worden toegelaten.
-    Possible values     string, comma-delimited ('foo,bar,baz')
+    Possible values     No information available
     Default value       bmp, doc, docx, gif, jpeg, jpg, msg, pdf, png, ppt, pptx, rtf, tiff, txt, vsd, xls, xlsx
     
     Variable            ZGW_CATALOGI_SERVICE_API_ROOT
-    Setting             api root url
-    Description         No description
-    Possible values     string
+    Description         The API root of the catalogi service
+    Possible values     string (URL)
     Default value       No default
     
     Variable            ZGW_CATALOGI_SERVICE_CLIENT_ID
-    Setting             client id
-    Description         No description
-    Possible values     string
+    Description         The API root of the catalogi service
+    Possible values     string (URL)
     Default value       No default
     
     Variable            ZGW_CATALOGI_SERVICE_SECRET
-    Setting             secret
-    Description         No description
-    Possible values     string
+    Description         The secret of the catalogi service
+    Possible values     string (URL)
+    Default value       No default
+    
+    Variable            ZGW_DOCUMENTEN_SERVICE_CLIENT_ID
+    Description         The API root of the documenten service
+    Possible values     string (URL)
+    Default value       No default
+    
+    Variable            ZGW_DOCUMENTEN_SERVICE_SECRET
+    Description         The secret of the documenten service
+    Possible values     string (URL)
     Default value       No default
     
     Variable            ZGW_DOCUMENT_MAX_CONFIDENTIALITY
@@ -102,21 +117,8 @@ Detailed Information
     Default value       openbaar
     
     Variable            ZGW_DOCUMENT_SERVICE_API_ROOT
-    Setting             api root url
-    Description         No description
-    Possible values     string
-    Default value       No default
-    
-    Variable            ZGW_DOCUMENT_SERVICE_CLIENT_ID
-    Setting             client id
-    Description         No description
-    Possible values     string
-    Default value       No default
-    
-    Variable            ZGW_DOCUMENT_SERVICE_SECRET
-    Setting             secret
-    Description         No description
-    Possible values     string
+    Description         The API root of the documenten service
+    Possible values     string (URL)
     Default value       No default
     
     Variable            ZGW_ENABLE_CATEGORIES_FILTERING_WITH_ZAKEN
@@ -131,22 +133,19 @@ Detailed Information
     Possible values     True, False
     Default value       False
     
-    Variable            ZGW_FORM_SERVICE_API_ROOT
-    Setting             api root url
-    Description         No description
-    Possible values     string
+    Variable            ZGW_FORMULIEREN_SERVICE_CLIENT_ID
+    Description         The API root of the formulieren service
+    Possible values     string (URL)
     Default value       No default
     
-    Variable            ZGW_FORM_SERVICE_CLIENT_ID
-    Setting             client id
-    Description         No description
-    Possible values     string
+    Variable            ZGW_FORMULIEREN_SERVICE_SECRET
+    Description         The secret of the formulieren service
+    Possible values     string (URL)
     Default value       No default
     
-    Variable            ZGW_FORM_SERVICE_SECRET
-    Setting             secret
-    Description         No description
-    Possible values     string
+    Variable            ZGW_FROMULIEREN_SERVICE_API_ROOT
+    Description         The API root of the formulieren service
+    Possible values     string (URL)
     Default value       No default
     
     Variable            ZGW_MAX_UPLOAD_SIZE
@@ -180,19 +179,16 @@ Detailed Information
     Default value       openbaar
     
     Variable            ZGW_ZAAK_SERVICE_API_ROOT
-    Setting             api root url
-    Description         No description
-    Possible values     string
+    Description         The API root of the zaak service
+    Possible values     string (URL)
     Default value       No default
     
     Variable            ZGW_ZAAK_SERVICE_CLIENT_ID
-    Setting             client id
-    Description         No description
-    Possible values     string
+    Description         The API root of the zaak service
+    Possible values     string (URL)
     Default value       No default
     
     Variable            ZGW_ZAAK_SERVICE_SECRET
-    Setting             secret
-    Description         No description
-    Possible values     string
+    Description         The secret of the zaak service
+    Possible values     string (URL)
     Default value       No default

@@ -480,7 +480,7 @@ django-sessionprofile==1.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-digid-eherkenning
-django-setup-configuration==0.1.0
+django-setup-configuration==0.2.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt

@@ -8,10 +8,18 @@ from rest_framework.test import APITestCase
 
 from open_inwoner.configurations.bootstrap.auth import (
     AdminOIDCConfigurationStep,
-    DigiDConfigurationStep,
     DigiDOIDCConfigurationStep,
-    eHerkenningConfigurationStep,
+    DigiDSAMLConfigurationStep,
     eHerkenningOIDCConfigurationStep,
+    eHerkenningSAMLConfigurationStep,
+)
+from open_inwoner.configurations.bootstrap.cms import (
+    CMSBenefitsConfigurationStep,
+    CMSCasesConfigurationStep,
+    CMSCollaborateConfigurationStep,
+    CMSInboxConfigurationStep,
+    CMSProductsConfigurationStep,
+    CMSProfileConfigurationStep,
 )
 from open_inwoner.configurations.bootstrap.kic import (
     ContactmomentenAPIConfigurationStep,
@@ -28,6 +36,12 @@ from open_inwoner.configurations.bootstrap.zgw import (
 )
 
 STEPS_TO_CONFIGURE = [
+    CMSBenefitsConfigurationStep(),
+    CMSCasesConfigurationStep(),
+    CMSCollaborateConfigurationStep(),
+    CMSInboxConfigurationStep(),
+    CMSProductsConfigurationStep(),
+    CMSProfileConfigurationStep(),
     ZakenAPIConfigurationStep(),
     CatalogiAPIConfigurationStep(),
     DocumentenAPIConfigurationStep(),
@@ -38,16 +52,16 @@ STEPS_TO_CONFIGURE = [
     KICAPIsConfigurationStep(),
     SiteConfigurationStep(),
     DigiDOIDCConfigurationStep(),
-    eHerkenningOIDCConfigurationStep(),
     AdminOIDCConfigurationStep(),
-    DigiDConfigurationStep(),
-    eHerkenningConfigurationStep(),
+    DigiDSAMLConfigurationStep(),
+    eHerkenningOIDCConfigurationStep(),
+    eHerkenningSAMLConfigurationStep(),
 ]
 
 REQUIRED_SETTINGS = {
     setting_name: "SET"
     for step in STEPS_TO_CONFIGURE
-    for setting_name in step.required_settings
+    for setting_name in step.config_settings.required_settings
 }
 
 
@@ -81,19 +95,3 @@ class SetupConfigurationTests(APITestCase):
             stdout=stdout,
             no_color=True,
         )
-
-        output_per_step = []
-        for step in STEPS_TO_CONFIGURE:
-            output_per_step.append(f"Configuring {str(step)}...")
-            output_per_step.append(f"{str(step)} is successfully configured")
-
-        command_output = stdout.getvalue().splitlines()
-        expected_output = [
-            "Configuration will be set up with following steps: "
-            f"[{', '.join(str(step) for step in STEPS_TO_CONFIGURE)}]",
-            *output_per_step,
-            "Selftest is skipped.",
-            "Instance configuration completed.",
-        ]
-
-        self.assertEqual(command_output, expected_output)

@@ -964,6 +964,27 @@ CKEDITOR_CONFIGS = {
 #
 from .app.setup_configuration import *  # noqa
 
+DJANGO_SETUP_CONFIG_TEMPLATE = "configurations/config_doc.rst"
+DJANGO_SETUP_CONFIG_DOC_PATH = f"{BASE_DIR}/docs/configuration"
+DJANGO_SETUP_CONFIG_CUSTOM_FIELDS = [
+    {
+        "field": "django_jsonform.models.fields.ArrayField",
+        "description": "string, comma-delimited ('foo,bar,baz')",
+    },
+    {
+        "field": "django.contrib.postgres.fields.ArrayField",
+        "description": "string, comma-delimited ('foo,bar,baz')",
+    },
+    {
+        "field": "django.db.models.fields.files.FileField",
+        "description": "string representing the (absolute) path to a file, including file extension",
+    },
+    {
+        "field": "privates.fields.PrivateMediaFileField",
+        "description": "string representing the (absolute) path to a file, including file extension",
+    },
+]
+
 #
 # Project specific settings
 #
