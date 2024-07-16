@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 import requests_mock
-from django_webtest import WebTest
+from django_webtest import TransactionWebTest
 from privates.test import temp_private_root
 from timeline_logger.models import TimelineLog
 from zgw_consumers.api_models.constants import (
@@ -47,7 +47,7 @@ def get_temporary_text_file():
 @temp_private_root()
 @requests_mock.Mocker()
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
+class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
     def setUp(self):
         super().setUp()
 
@@ -159,6 +159,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
                 kwargs={
                     "object_id": self.zaak["uuid"],
                     "info_id": self.informatie_object["uuid"],
+                    "api_group_id": self.api_group.id,
                 },
             ),
         )
@@ -199,6 +200,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
             kwargs={
                 "object_id": self.zaak["uuid"],
                 "info_id": self.informatie_object["uuid"],
+                "api_group_id": self.api_group.id,
             },
         )
         response = self.app.get(url, user=self.user)
@@ -223,6 +225,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
             kwargs={
                 "object_id": self.zaak["uuid"],
                 "info_id": self.informatie_object["uuid"],
+                "api_group_id": self.api_group.id,
             },
         )
         self.app.get(url, user=self.user)
@@ -255,6 +258,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
             kwargs={
                 "object_id": self.zaak["uuid"],
                 "info_id": info_object["uuid"],
+                "api_group_id": self.api_group.id,
             },
         )
         self.app.get(url, user=self.user, status=403)
@@ -278,6 +282,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
             kwargs={
                 "object_id": self.zaak["uuid"],
                 "info_id": info_object["uuid"],
+                "api_group_id": self.api_group.id,
             },
         )
         self.app.get(url, user=self.user, status=403)

@@ -35,27 +35,27 @@ urlpatterns = [
         name="kcm_redirect",
     ),
     path(
-        "<str:object_id>/document/<str:info_id>/",
+        "<str:api_group_id>/<str:object_id>/document/<str:info_id>/",
         CaseDocumentDownloadView.as_view(),
         name="document_download",
     ),
     path(
-        "<str:object_id>/status/content/",
+        "<str:api_group_id>/<str:object_id>/status/content/",
         InnerCaseDetailView.as_view(),
         name="case_detail_content",
     ),
     path(
-        "<str:object_id>/status/",
+        "<str:api_group_id>/<str:object_id>/status/",
         OuterCaseDetailView.as_view(),
         name="case_detail",
     ),
     path(
-        "<str:object_id>/status/contact-form/",
+        "<str:api_group_id>/<str:object_id>/status/contact-form/",
         CaseContactFormView.as_view(),
         name="case_detail_contact_form",
     ),
     path(
-        "<str:object_id>/status/document-form/",
+        "<str:api_group_id>/<str:object_id>/status/document-form/",
         CaseDocumentUploadFormView.as_view(),
         name="case_detail_document_form",
     ),

@@ -12,6 +12,7 @@ from open_inwoner.openzaak.api_models import (
     ZaakInformatieObject,
     ZaakType,
 )
+from open_inwoner.openzaak.models import ZGWApiGroupConfig
 from open_inwoner.openzaak.tests.test_notification_data import MockAPIData
 from open_inwoner.userfeed.choices import FeedItemType
 from open_inwoner.userfeed.feed import get_feed
@@ -23,6 +24,10 @@ from open_inwoner.userfeed.hooks.case_document import (
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class FeedHookTest(TestCase):
+    def setUp(self):
+        MockAPIData.setUpServices()
+        self.api_group = ZGWApiGroupConfig.objects.get()
+
     @patch("open_inwoner.userfeed.feed.get_active_app_names", return_value=["cases"])
     def test_document_added(self, mock_get_active_app_names: Mock):
         data = MockAPIData()
@@ -55,7 +60,10 @@ class FeedHookTest(TestCase):
         self.assertEqual(item.title, case.omschrijving)
         self.assertEqual(
             item.action_url,
-            reverse("cases:case_detail", kwargs={"object_id": case.uuid}),
+            reverse(
+                "cases:case_detail",
+                kwargs={"object_id": case.uuid, "api_group_id": self.api_group.id},
+            ),
         )
 
         # send duplicate notification

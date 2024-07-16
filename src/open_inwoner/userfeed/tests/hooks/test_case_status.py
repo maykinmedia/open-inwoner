@@ -9,6 +9,7 @@ from zgw_consumers.api_models.base import factory
 
 from open_inwoner.openzaak.api_models import Status, StatusType, Zaak, ZaakType
 from open_inwoner.openzaak.constants import StatusIndicators
+from open_inwoner.openzaak.models import ZGWApiGroupConfig
 from open_inwoner.openzaak.tests.factories import (
     ZaakTypeConfigFactory,
     ZaakTypeStatusTypeConfigFactory,
@@ -24,6 +25,10 @@ from open_inwoner.userfeed.hooks.case_status import (
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class FeedHookTest(TestCase):
+    def setUp(self):
+        MockAPIData.setUpServices()
+        self.api_group = ZGWApiGroupConfig.objects.get()
+
     @patch("open_inwoner.userfeed.feed.get_active_app_names", return_value=["cases"])
     def test_status_update(self, mock_get_active_app_names: Mock):
         data = MockAPIData()
@@ -34,6 +39,12 @@ class FeedHookTest(TestCase):
 
         status = factory(Status, data.status_initial)
         status.statustype = factory(StatusType, data.status_type_initial)
+
+        ztc = ZaakTypeConfigFactory(
+            identificatie=case.zaaktype.identificatie,
+            catalogus__url=case.zaaktype.catalogus,
+            catalogus__service=self.api_group.ztc_service,
+        )
 
         case_status_notification_received(user, case, status)
 
@@ -55,7 +66,10 @@ class FeedHookTest(TestCase):
         self.assertEqual(item.title, case.omschrijving)
         self.assertEqual(
             item.action_url,
-            reverse("cases:case_detail", kwargs={"object_id": case.uuid}),
+            reverse(
+                "cases:case_detail",
+                kwargs={"object_id": case.uuid, "api_group_id": self.api_group.id},
+            ),
         )
 
         summary = feed.summary[0]
@@ -125,6 +139,7 @@ class FeedHookTest(TestCase):
         ztc = ZaakTypeConfigFactory(
             identificatie=case.zaaktype.identificatie,
             catalogus__url=case.zaaktype.catalogus,
+            catalogus__service=self.api_group.ztc_service,
         )
         status_config = ZaakTypeStatusTypeConfigFactory(
             zaaktype_config=ztc,
@@ -155,5 +170,8 @@ class FeedHookTest(TestCase):
         self.assertEqual(item.title, case.omschrijving)
         self.assertEqual(
             item.action_url,
-            reverse("cases:case_detail", kwargs={"object_id": case.uuid}),
+            reverse(
+                "cases:case_detail",
+                kwargs={"object_id": case.uuid, "api_group_id": self.api_group.id},
+            ),
         )

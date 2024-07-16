@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 import requests_mock
-from django_webtest import WebTest
+from django_webtest import TransactionWebTest
 from freezegun import freeze_time
 from pyquery import PyQuery
 from zgw_consumers.api_models.base import factory
@@ -22,7 +22,7 @@ from open_inwoner.openklant.models import (
     OpenKlantConfig,
 )
 from open_inwoner.openklant.tests.data import MockAPIReadData
-from open_inwoner.openzaak.models import OpenZaakConfig
+from open_inwoner.openzaak.models import OpenZaakConfig, ZGWApiGroupConfig
 from open_inwoner.utils.test import (
     ClearCachesMixin,
     DisableRequestLogMixin,
@@ -41,12 +41,15 @@ from .factories import KlantContactMomentAnswerFactory
 @modify_settings(
     MIDDLEWARE={"remove": ["open_inwoner.kvk.middleware.KvKLoginMiddleware"]}
 )
-class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
+class ContactMomentViewsTestCase(
+    ClearCachesMixin, DisableRequestLogMixin, TransactionWebTest
+):
     maxDiff = None
 
     def setUp(self):
         super().setUp()
         MockAPIReadData.setUpServices()
+        self.api_group = ZGWApiGroupConfig.objects.get()
 
         # for testing replacement of e-suite "onderwerp" code with OIP configured subject
         self.contactformsubject = ContactFormSubject.objects.create(
@@ -328,7 +331,10 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
             zaak_link.attr("href"),
             reverse(
                 "cases:case_detail",
-                kwargs={"object_id": "410bb717-ff3d-4fd8-8357-801e5daf9775"},
+                kwargs={
+                    "object_id": "410bb717-ff3d-4fd8-8357-801e5daf9775",
+                    "api_group_id": self.api_group.id,
+                },
             ),
         )
 
@@ -388,7 +394,10 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
             zaak_link.attr("href"),
             reverse(
                 "cases:case_detail",
-                kwargs={"object_id": "410bb717-ff3d-4fd8-8357-801e5daf9775"},
+                kwargs={
+                    "object_id": "410bb717-ff3d-4fd8-8357-801e5daf9775",
+                    "api_group_id": self.api_group.id,
+                },
             ),
         )
 

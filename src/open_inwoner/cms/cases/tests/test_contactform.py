@@ -65,7 +65,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         self.user = DigidUserFactory(bsn="900222086")
 
         # services
-        ZGWApiGroupConfigFactory(
+        self.api_group = ZGWApiGroupConfigFactory(
             zrc_service__api_root=ZAKEN_ROOT,
             ztc_service__api_root=CATALOGI_ROOT,
             drc_service__api_root=DOCUMENTEN_ROOT,
@@ -250,7 +250,8 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         )
 
         self.case_detail_url = reverse(
-            "cases:case_detail_content", kwargs={"object_id": self.zaak["uuid"]}
+            "cases:case_detail_content",
+            kwargs={"object_id": self.zaak["uuid"], "api_group_id": self.api_group.id},
         )
 
     def _setUpMocks(self, m):
@@ -457,14 +458,21 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         response = self.app.get(self.case_detail_url, user=self.user)
         form = response.forms["contact-form"]
         form.action = reverse(
-            "cases:case_detail_contact_form", kwargs={"object_id": self.zaak["uuid"]}
+            "cases:case_detail_contact_form",
+            kwargs={"object_id": self.zaak["uuid"], "api_group_id": self.api_group.id},
         )
         form["question"] = "Sample text"
         response = form.submit()
 
         self.assertEqual(
             response.headers["HX-Redirect"],
-            reverse("cases:case_detail", kwargs={"object_id": str(self.zaak["uuid"])}),
+            reverse(
+                "cases:case_detail",
+                kwargs={
+                    "object_id": str(self.zaak["uuid"]),
+                    "api_group_id": self.api_group.id,
+                },
+            ),
         )
 
         redirect = self.app.get(response.headers["HX-Redirect"])
@@ -533,7 +541,10 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
                 form = response.forms["contact-form"]
                 form.action = reverse(
                     "cases:case_detail_contact_form",
-                    kwargs={"object_id": self.zaak["uuid"]},
+                    kwargs={
+                        "object_id": self.zaak["uuid"],
+                        "api_group_id": self.api_group.id,
+                    },
                 )
                 form["question"] = "Sample text"
                 response = form.submit()
@@ -542,7 +553,10 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
                     response.headers["HX-Redirect"],
                     reverse(
                         "cases:case_detail",
-                        kwargs={"object_id": str(self.zaak["uuid"])},
+                        kwargs={
+                            "object_id": str(self.zaak["uuid"]),
+                            "api_group_id": self.api_group.id,
+                        },
                     ),
                 )
 
@@ -580,14 +594,21 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         response = self.app.get(self.case_detail_url, user=self.user)
         form = response.forms["contact-form"]
         form.action = reverse(
-            "cases:case_detail_contact_form", kwargs={"object_id": self.zaak["uuid"]}
+            "cases:case_detail_contact_form",
+            kwargs={"object_id": self.zaak["uuid"], "api_group_id": self.api_group.id},
         )
         form["question"] = "Sample text"
         response = form.submit()
 
         self.assertEqual(
             response.headers["HX-Redirect"],
-            reverse("cases:case_detail", kwargs={"object_id": str(self.zaak["uuid"])}),
+            reverse(
+                "cases:case_detail",
+                kwargs={
+                    "object_id": str(self.zaak["uuid"]),
+                    "api_group_id": self.api_group.id,
+                },
+            ),
         )
 
         redirect = self.app.get(response.headers["HX-Redirect"])
@@ -615,14 +636,21 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         response = self.app.get(self.case_detail_url, user=self.user)
         form = response.forms["contact-form"]
         form.action = reverse(
-            "cases:case_detail_contact_form", kwargs={"object_id": self.zaak["uuid"]}
+            "cases:case_detail_contact_form",
+            kwargs={"object_id": self.zaak["uuid"], "api_group_id": self.api_group.id},
         )
         form["question"] = "Sample text"
         response = form.submit()
 
         self.assertEqual(
             response.headers["HX-Redirect"],
-            reverse("cases:case_detail", kwargs={"object_id": str(self.zaak["uuid"])}),
+            reverse(
+                "cases:case_detail",
+                kwargs={
+                    "object_id": str(self.zaak["uuid"]),
+                    "api_group_id": self.api_group.id,
+                },
+            ),
         )
 
         redirect = self.app.get(response.headers["HX-Redirect"])
@@ -647,7 +675,8 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         response = self.app.get(self.case_detail_url, user=self.user)
         form = response.forms["contact-form"]
         form.action = reverse(
-            "cases:case_detail_contact_form", kwargs={"object_id": self.zaak["uuid"]}
+            "cases:case_detail_contact_form",
+            kwargs={"object_id": self.zaak["uuid"], "api_group_id": self.api_group.id},
         )
         form["question"] = "Sample text"
         response = form.submit()
@@ -666,7 +695,8 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         response = self.app.get(self.case_detail_url, user=self.user)
         form = response.forms["contact-form"]
         form.action = reverse(
-            "cases:case_detail_contact_form", kwargs={"object_id": self.zaak["uuid"]}
+            "cases:case_detail_contact_form",
+            kwargs={"object_id": self.zaak["uuid"], "api_group_id": self.api_group.id},
         )
         form["question"] = "Sample text"
         response = form.submit()
