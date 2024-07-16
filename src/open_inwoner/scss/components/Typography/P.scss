@@ -31,7 +31,8 @@
   }
 }
 
-*[class^='utrecht-heading'] + .utrecht-paragraph {
+*[class^='utrecht-heading'] + .utrecht-paragraph,
+.oip-header-group + .utrecht-paragraph {
   margin-top: var(--spacing-small);
 }
 
