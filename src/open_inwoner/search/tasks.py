@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 @app.task(name=_("Rebuild search index"))
-def rebuild_search_index():
+def rebuild_search_index(ignore_result=True):
     logger.info("starting rebuild_search_index() task")
 
     call_command("search_index", "--rebuild", "-f")

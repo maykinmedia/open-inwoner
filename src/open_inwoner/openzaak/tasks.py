@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 @app.task(name=_("Import ZGW data"))
-def import_zgw_data():
+def import_zgw_data(ignore_result=True):
     logger.info("starting import_zgw_data() task")
 
     call_command("zgw_import_data")

@@ -5,6 +5,10 @@ os.environ.setdefault("DB_NAME", os.getenv("DATABASE_NAME", "open_inwoner"))
 os.environ.setdefault("DB_PASSWORD", os.getenv("DATABASE_PASSWORD", "open_inwoner"))
 os.environ.setdefault("DB_HOST", os.getenv("DATABASE_HOST", "db"))
 
+os.environ.setdefault("DB_USER", "postgres")
+os.environ.setdefault("DB_NAME", "postgres")
+os.environ.setdefault("DB_PASSWORD", "postgres")
+
 os.environ.setdefault("ENVIRONMENT", "docker")
 os.environ.setdefault("LOG_STDOUT", "yes")
 
