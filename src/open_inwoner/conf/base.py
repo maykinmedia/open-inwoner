@@ -672,11 +672,11 @@ CELERY_TASK_TIME_LIMIT = config("CELERY_TASK_HARD_TIME_LIMIT", default=15 * 60)
 # https://docs.celeryq.dev/en/latest/userguide/periodic-tasks.html
 CELERY_BEAT_SCHEDULE = {
     "Import ZGW data": {
-        "task": "Import ZGW data",
+        "task": "open_inwoner.openzaak.tasks.import_zgw_data",
         "schedule": crontab(minute="0", hour="7", day_of_month="*"),
     },
     "Rebuild search index": {
-        "task": "Rebuild search index",
+        "task": "open_inwoner.search.tasks.rebuild_search_index",
         "schedule": crontab(minute="0", hour="4", day_of_month="*"),
     },
     "Retry emails": {
