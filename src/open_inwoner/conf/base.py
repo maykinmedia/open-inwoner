@@ -137,6 +137,7 @@ INSTALLED_APPS = [
     # load user model before CMS
     "open_inwoner.accounts",
     "open_inwoner.openzaak",
+    "open_inwoner.search",
     # Django-CMS
     "cms",
     "menus",
@@ -212,7 +213,6 @@ INSTALLED_APPS = [
     "open_inwoner.ckeditor5",
     "open_inwoner.pdc",
     "open_inwoner.plans",
-    "open_inwoner.search",
     "open_inwoner.utils",
     "open_inwoner.configurations",
     "open_inwoner.haalcentraal",
