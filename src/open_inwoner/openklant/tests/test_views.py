@@ -9,9 +9,11 @@ from django.utils.translation import gettext as _
 import requests_mock
 from django_webtest import WebTest
 from freezegun import freeze_time
+from pyquery import PyQuery
 from zgw_consumers.api_models.base import factory
 
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openklant.api_models import ContactMoment, Klant, KlantContactMoment
 from open_inwoner.openklant.constants import Status
 from open_inwoner.openklant.models import (
@@ -238,6 +240,26 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
                         "new_answer_available": False,
                     },
                 )
+
+    def test_disable_contactmoment_form(self, m, mock_get_kcm_answer_mapping):
+        data = MockAPIReadData().install_mocks(m)
+        list_url = reverse("cases:contactmoment_list")
+
+        config = SiteConfiguration.get_solo()
+        config.contactmoment_contact_form_enabled = False
+        config.save()
+
+        response = self.app.get(list_url, user=data.user)
+
+        doc = PyQuery(response.content)
+
+        contactform_scrolldown = doc.find(
+            "[data-testid='contactmomenten__contact_form_scrolldown']"
+        )
+        self.assertEqual(contactform_scrolldown, [])
+
+        contactform = doc.find("[data-testid='contactmomenten__contact_form']")
+        self.assertEqual(contactform, [])
 
     def test_show_detail_for_bsn(self, m, mock_get_kcm_answer_mapping):
         data = MockAPIReadData().install_mocks(m)

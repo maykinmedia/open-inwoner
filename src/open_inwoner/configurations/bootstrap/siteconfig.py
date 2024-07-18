@@ -72,6 +72,7 @@ class SiteConfigurationStep(BaseConfigurationStep):
             "SITE_RECIPIENTS_EMAIL_DIGEST",
             "SITE_CONTACT_PHONENUMBER",
             "SITE_CONTACT_PAGE",
+            "SITE_CONTACTMOMENT_CONTACT_FORM_ENABLED",
             "SITE_GTM_CODE",
             "SITE_GA_CODE",
             "SITE_MATOMO_URL",
