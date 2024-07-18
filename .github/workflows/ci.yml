@@ -84,7 +84,7 @@ jobs:
         with:
           name: ${{ matrix.test-type }}
           path: .coverage*
-    
+
   upload_coverage:
     needs: tests
     name: Upload coverage information to codecov

@@ -11,7 +11,7 @@ services:
       - ./docker-init-db.sql:/docker-entrypoint-initdb.d/init_db.sql
       - db:/var/lib/postgresql/data
     networks:
-      - openinwoner-dev    
+      - openinwoner-dev
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.9.2
@@ -21,7 +21,7 @@ services:
       - cluster.routing.allocation.disk.threshold_enabled=false
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     networks:
-      - openinwoner-dev         
+      - openinwoner-dev
     volumes:
       - es_data:/usr/share/elasticsearch/data
     ports:
@@ -58,7 +58,7 @@ services:
       - CACHE_PORTALOCKER=redis:6379/0
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
-      - CELERY_LOGLEVEL=DEBUG      
+      - CELERY_LOGLEVEL=DEBUG
       - ES_HOST=elasticsearch
       - DISABLE_2FA=${DISABLE_2FA:-True}
       - DEBUG=True
