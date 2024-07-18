@@ -85,11 +85,8 @@ sjabloon bij* **doel**\ *. De gebruiker*
 | Hier kunt u vooraf ingeven over hoeveel dagen het actiepunt dient te
   zijn afgerond.. Vul dit in voor ieder actiepunt.
 
-*Verwijderen?*
-
-Hier kunt u een vooraf ingesteld actiepunt uit de template verwijderen.
-Zet een vinkje in de betreffende checkbox. Wanneer de template is
-opgeslagen wordt het betreffende actiepunt verwijderd.
+| *Verwijderen?*
+| Hier kunt u een vooraf ingesteld actiepunt uit de template verwijderen. Zet een vinkje in de betreffende checkbox. Wanneer de template is opgeslagen wordt het betreffende actiepunt verwijderd.
 
 | *Opslaan of verwijderen*
 | U kunt in dit scherm ook het betreffende plan template verwijderen
@@ -204,9 +201,8 @@ voorkant van het platform is te zien in het volgende screenshot.
    :width: 624px
    :height: 590px
 
-*Omschrijving*
-
-Hier kunt u een korte omschrijving van de actie invullen.
+| *Omschrijving*
+| Hier kunt u een korte omschrijving van de actie invullen.
 
 .. image:: images/image25.png
    :width: 624px

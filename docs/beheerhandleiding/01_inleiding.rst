@@ -11,9 +11,3 @@ gemeentes.
 
 Wanneer u een supportovereenkomst met Maykin heeft kunnen wij u assisteren, indien u na het
 raadplegen van deze handleiding nog problemen ondervindt.
-
-.. image:: images/image2.png
-   :width: 55px
-   :height: 34px
-
-**VERSIE 7-2024**

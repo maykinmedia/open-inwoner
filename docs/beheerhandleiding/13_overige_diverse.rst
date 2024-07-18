@@ -28,13 +28,13 @@ vullen. Wanneer alle gegevens zijn ingevuld klikt u op [opslaan].
 U kunt de volgorde van de menu-items veranderen door in het overzicht op
 de icoontjes naast het betreffende menu-item te klikken.
 
-|image5|\ = helemaal naar boven
+|image5| \ = helemaal naar boven
 
-|image6|\ = één plaats naar boven
+|image6| \ = één plaats naar boven
 
-|image7|\ = éen plaats naar onder
+|image7| \ = éen plaats naar onder
 
-|image8|\ = helemaal naar onderen
+|image8| \ = helemaal naar onderen
 
 13.1.3. Application group wijzigen
 ----------------------------------
@@ -95,8 +95,8 @@ rechts bovenin het scherm. U kunt op ieder niveau een nieuwe map
 toevoegen en zo uw uploads handig te bewaren.
 
 .. image:: images/image124.png
-   :width: 6.49028in
-   :height: 0.88472in
+   :width: 623px
+   :height: 85px
 
 
 13.2.2. Bestanden uploaden
@@ -211,7 +211,7 @@ waarin u de gegevens van de periodieke taak kunt instellen.
 
 .. image:: images/image128.png
    :width: 624px
-   :height: 811px
+   :height: 700px
 
 | *Naam*
 | Hier vult u de naam van de periodieke taak in. Zorg ervoor dat de
@@ -252,16 +252,11 @@ waarin u de gegevens van de periodieke taak kunt instellen.
 | Indien aangevinkt wordt deze taak slechts eenmalig uitgevoerd in
   plaats van periodiek.
 
-**Arguments**
+| **Arguments**
+| Hier vult u indien gewenst JSON geëncodeerde positional en keyword arguments in.
 
-Hier vult u indien gewenst JSON geëncodeerde positional en keyword
-arguments in.
-
-**Execution options**
-
-Hier heeft u de mogelijkheid enkele zaken rond de uitvoering van de taak
-in te stellen. Dit item is standaard ingeklapt. Klik op [Tonen] om de
-bijbehorende velden weer te geven.
+| **Execution options**
+| Hier heeft u de mogelijkheid enkele zaken rond de uitvoering van de taak in te stellen. Dit item is standaard ingeklapt. Klik op [Tonen] om de bijbehorende velden weer te geven.
 
 | *Expires date time*
 | Hier vult u de datum en tijd in waarop de periodieke taak vervalt.
@@ -272,7 +267,7 @@ bijbehorende velden weer te geven.
 
 .. image:: images/image129.png
    :width: 624px
-   :height: 565px
+   :height: 500px
 
 | *Queue override*
 | Laat dit veld leeg voor de standaardvolgorde.
@@ -285,7 +280,7 @@ bijbehorende velden weer te geven.
 
 | *Priority*
 | Geef de periodieke taak een prioriteit mee. Hiervoor geldt een
- waarde tussen 0 en 255, waarbij 0 de hoogste prioriteit heef.
+ waarde tussen 0 en 255, waarbij 0 de hoogste prioriteit heeft.
 
 | *AMQP Message headers*
 | Vul hier een JSON geëncodeerde bericht header in voor het AMQP
@@ -295,7 +290,7 @@ bijbehorende velden weer te geven.
 ==========
 
 Onder taken vindt u een overzicht van alle door het systeem uitgevoerde
-taken. U kunt te taken filteren en sorteren. Dit overzicht is read-only
+taken. U kunt de taken filteren en sorteren. Dit overzicht is read-only
 en fungeert enkel voor analysedoeleinden.
 
 

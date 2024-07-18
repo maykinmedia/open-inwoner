@@ -9,7 +9,8 @@
 }
 
 .rst-content .image-reference + p,
-.rst-content .image-reference + section {
+.rst-content .image-reference + section,
+.rst-content .image-reference + div {
     margin-top: 16px;
 }
 

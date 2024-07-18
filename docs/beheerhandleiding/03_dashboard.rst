@@ -9,7 +9,6 @@ Wanneer u bent ingelogd komt u terecht op de dashboardpagina. Dit is de overzich
 .. image:: images/image3.png
    :alt: CMS dashboard
    :width: 600px
-   :align: center
 
 
 3.1. Gebruikersprofielen
@@ -23,7 +22,6 @@ toevoegen]. Wijzigen doet u door te klikken op de knop [aanpassen].
 .. image:: images/image4.png
    :alt: CMS dashboard
    :width: 600px
-   :align: center
 
 
 3.2. Plannen
@@ -45,7 +43,6 @@ doet u door te klikken op de knop [aanpassen].
 .. image:: images/image5.png
    :alt: CMS dashboard
    :width: 600px
-   :align: center
 
 
 3.4. Zoeken
@@ -59,7 +56,6 @@ toevoegen]. Wijzigen doet u door te klikken op de knop [aanpassen].
 .. image:: images/image6.png
    :alt: CMS dashboard
    :width: 600px
-   :align: center
 
 
 3.5. Permissies, 2FA en Logging
@@ -75,7 +71,6 @@ knop [aanpassen].
 .. image:: images/image7.png
    :alt: CMS dashboard
    :width: 600px
-   :align: center
 
 
 3.6. Datakoppelingen
@@ -86,7 +81,6 @@ Op het dashboard vindt u het overzicht van de onderdelen datakoppelingen. Het ga
 .. image:: images/image8.png
    :alt: CMS dashboard
    :width: 600px
-   :align: center
 
 
 3.7. Inlog koppelingen
@@ -100,7 +94,6 @@ wijzigen door te klikken op de knop [aanpassen].
 .. image:: images/image9.png
    :alt: CMS dashboard
    :width: 600px
-   :align: center
 
 
 3.8. CMS

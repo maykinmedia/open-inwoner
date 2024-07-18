@@ -38,7 +38,7 @@ op de zoekresultaten.
 
 .. image:: images/image56.png
    :width: 623px
-   :height: 416px
+   :height: 340px
 
 
 7.2. Synoniemen
@@ -109,7 +109,7 @@ synoniemenlijst. Om wijzigingen op te slaan klikt u op de knop
 
 .. image:: images/image58.png
    :width: 624px
-   :height: 482px
+   :height: 390px
 
 | *Opslaan of verwijderen*
 | Als u uw wijzigingen tussentijds wilt opslaan, klikt u op [opslaan en

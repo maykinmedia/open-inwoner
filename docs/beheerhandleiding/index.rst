@@ -10,15 +10,15 @@ Inhoud handleiding voor functioneel beheer:
     :maxdepth: 1
     :caption: Alle handleidingen:
 
-    1_inleiding
-    2_inloggen_op_de_beheeromgeving
-    3_dashboard
-    4_gebruikersprofielen
-    5_plannen
-    6_pdc
-    7_zoeken
-    8_permissies_2fa_logging
-    9_datakoppelingen
+    01_inleiding
+    02_inloggen_op_de_beheeromgeving
+    03_dashboard
+    04_gebruikersprofielen
+    05_plannen
+    06_pdc
+    07_zoeken
+    08_permissies_2fa_logging
+    09_datakoppelingen
     10_inlog_koppelingen
     11_cms
     12_configuratie

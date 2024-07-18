@@ -39,9 +39,8 @@ antwoord kunt formuleren.
    :width: 494px
    :height: 425px
 
-*Naam*
-Hier kunt u de conditie een naam geven.
-
+| *Naam*
+| Hier kunt u de conditie een naam geven.
 
 | *Vraag*
 | Hier formuleert u de vraag die gesteld wordt om erachter te komen of
@@ -202,8 +201,8 @@ het potlood. Om het huidige logo te verwijderen klikt u op [x].
  groep behoren.
 
 .. image:: images/image32.png
-   :width: 494px
-   :height: 229px
+   :width: 600px
+
 
 | *Zichtbaarheid onderwerpen voor plug-in op startpagina*
 | Het is mogelijk onderwerpen te tonen op de homepage. Onderwerpen
@@ -251,8 +250,8 @@ toevoegen, organisaties wijzigen en verwijderen. Bovendien kunt u
 organisaties eenvoudig filteren op naam of op stad.
 
 .. image:: images/image33.png
-   :width: 490px
-   :height: 98px
+   :width: 600px
+   :height: 130px
 
 
 6.3.1. Item toevoegen
@@ -266,8 +265,7 @@ klikken kunt u een nieuwe organisatie toevoegen.
 
 | Door op de betreffende organisatie in de lijst te klikken, kunt u deze
   wijzigen. Er wordt een nieuw scherm geopend waar u naast de adres- en
-  contactgegevens diverse wijzigingen kunt aanbrengen. Een
-| voorbeeld van dit scherm is weergegeven op de volgende pagina.
+  contactgegevens diverse wijzigingen kunt aanbrengen. Een voorbeeld van dit scherm is weergegeven in de eerstvolgende afbeelding.
 
 | *Naam*
 | Hier kunt u de naam van de organisatie wijzigen.
@@ -584,7 +582,6 @@ weergegeven hoe dit er in de backend en frontend uitziet.
    :width: 624px
    :height: 572px
 
-
 | *Video*
 | Hier selecteert u of én welke YouTube video u wilt tonen onder de
   introductietekst van het betreffende product. U selecteert de gewenste
@@ -814,7 +811,7 @@ scherm geopend waar u de velden genoemd onder 7.1.2. kunt invullen.
 
 Door op de betreffende vraag in de lijst te klikken, kunt u deze
 wijzigen. Er wordt een nieuw scherm geopend waar u diverse wijzigingen
-kunt aanbrengen. Dit scherm is weergegeven op de volgende pagina.
+kunt aanbrengen. Dit scherm is weergegeven in deze afbelding:
 
 .. image:: images/image46.png
    :width: 624px

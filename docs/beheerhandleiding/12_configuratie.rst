@@ -21,35 +21,38 @@ standaard ingeklapt. Klik op [tonen] om de paginateksten en hulpteksten te wijzi
 
 .. image:: images/image112.png
    :width: 624px
-   :height: 307px
+   :height: 280px
 
 In het bovenste gedeelte van het scherm kunt u de naam van uw gemeente aanpassen en u kunt bepaalde voorkeuren instellen door deze aan te vinken.
 
-Naam
-~~~~
-Voer hier de naam van uw gemeente in.
+| *Naam*
+| Voer hier de naam van uw gemeente in.
 
-Toon inlogknop rechts bovenin
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Dit zorgt ervoor dat er standaard een knop is om in te loggen. Wanneer deze optie uit staat is er nog altijd de mogelijkheid om in te loggen via accounts/login, maar de functie is niet zichtbaar.
+| *Toon inlogknop rechts bovenin*
+| Dit zorgt ervoor dat er standaard een knop is om in te loggen. Wanneer
+  deze optie uit staat is er nog altijd de mogelijkheid om in te loggen
+  via accounts/login, maar de functie is niet zichtbaar.
 
-Sta lokale registratie toe
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-Wanneer deze optie uit staat is het enkel toegestaan om met DigiD in te loggen. Zet deze instelling aan om ook het inloggen met gebruikersnaam/wachtwoord en het aanmelden zonder DigiD toe te staan.
+| *Sta lokale registratie toe*
+| Wanneer deze optie uit staat is het enkel toegestaan om met DigiD in
+  te loggen. Zet deze instelling aan om ook het inloggen met
+  gebruikersnaam/wachtwoord en het aanmelden zonder DigiD toe te staan.
 
-Login met 2FA-met-SMS
-~~~~~~~~~~~~~~~~~~~~~
-Vink dit aan om te bepalen of gebruikers die met een gebruikersnaam en wachtword inloggen verplicht een verificiatiecode in moeten voeren die per SMS naar het geregistreerde telefoonnummer wordt
-verstuurd. Wanneer deze optie is uitgeschakeld kunnen gebruikers met enkel gebruikersnaam en wachtwoord inloggen.
+| *Login met 2FA-met-SMS*
+| Vink dit aan om te bepalen of gebruikers die met een gebruikersnaam en
+  wachtword inloggen verplicht een verificiatiecode in moeten voeren die
+  per SMS naar het geregistreerde telefoonnummer wordt verstuurd.
+  Wanneer deze optie is uitgeschakeld kunnen gebruikers met enkel
+  gebruikersnaam en wachtwoord inloggen.
 
-Sta het delen van bestanden via Mijn Berichten toe
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Vink dit aan om te bepalen of gebruikers via Mijn Berichten bestanden kunnen delen als attachment bij berichten. Wanneer deze optie is uitgeschakeld kunnen gebruikers enkel tekstberichten versturen.
+| *Sta het delen van bestanden via Mijn Berichten toe*
+| Vink dit aan om te bepalen of gebruikers via Mijn Berichten bestanden
+  kunnen delen als attachment bij berichten. Wanneer deze optie is
+  uitgeschakeld kunnen gebruikers enkel tekstberichten versturen.
 
-Stuur niet-ingelogde gebruiker door naar
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Geef hier een URL of pad op waar niet-ingelogde gebruikers naartoe doorgestuurd moeten worden
-vanuit de niet-ingelogde homepagina.
+| *Stuur niet-ingelogde gebruiker door naar*
+| Geef hier een URL of pad op waar niet-ingelogde gebruikers naartoe
+  doorgestuurd moeten worden vanuit de niet-ingelogde homepagina.
 
 Een pad is bijvoorbeeld: '/accounts/login'.
 
@@ -71,38 +74,34 @@ accentkleur wordt gebruikt.
 Hier kunt u diverse afbeeldingen die gebruikt worden op uw Open Inwoner omgeving instellen. Het gaat
 hier om logo’s, de Favicon (de thumbnail die in de browser klein wordt gebruikt) en de banners.
 
-Logo
-~~~~
-Hier kunt u het logo van de gemeente uploaden. Sleep het gewenste bestand naar het veld of klik op [
-kies bestand].
+| *Logo*
+| Hier kunt u het logo van de gemeente uploaden. Sleep het gewenste
+  bestand naar het veld of klik op [ kies bestand].
 
-Footer logo
-~~~~~~~~~~~
-Hier kunt u het logo van de gemeente naar de footer uploaden. Sleep het gewenste bestand naar het
-veld of klik op [kies bestand].
+| *Footer logo*
+| Hier kunt u het logo van de gemeente naar de footer uploaden. Sleep
+  het gewenste bestand naar het veld of klik op [kies bestand].
 
-Footer logo title
-~~~~~~~~~~~~~~~~~
-Hier kunt u de titel van het footer logo invullen. Dit is de hulptekst die bij het logo hoort.
+| *Footer logo title*
+| Hier kunt u de titel van het footer logo invullen. Dit is de hulptekst
+  die bij het logo hoort.
 
-Footer logo link
-~~~~~~~~~~~~~~~~
-Hier vult u de URL in van de link naar het footer logo. Indien u geen bestand geüpload heeft.
+| *Footer logo link*
+| Hier vult u de URL in van de link naar het footer logo. Indien u geen
+  bestand geüpload heeft.
 
-Hoofdafbeelding op de inlogpagina
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Hier kunt u de hoofdbanner van uw Open Inwoner omgeving uploaden. Deze banner is zichtbaar op de
-homepage wanneer men niet is ingelogd. Sleep het gewenste bestand naar het veld of klik op [ kies
-bestand].
+| *Hoofdafbeelding op de inlogpagina*
+| Hier kunt u de hoofdbanner van uw Open Inwoner omgeving uploaden. Deze
+  banner is zichtbaar op de homepage wanneer men niet is ingelogd. Sleep
+  het gewenste bestand naar het veld of klik op [ kies bestand].
 
-Favicon image (32x32) als png
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Dit is een pictogrammetje dat bij uw gemeente of Open Inwoner Platform hoort. Dit pictogrammetje
-wordt gebruikt in uw internetbrowser.
+| *Favicon image (32x32) als png*
+| Dit is een pictogrammetje dat bij uw gemeente of Open Inwoner Platform
+  hoort. Dit pictogrammetje wordt gebruikt in uw internetbrowser.
 
-Banner samenwerken
-~~~~~~~~~~~~~~~~~~
-Hier kunt u de banner voor het onderdeel Samenwerken wijzigen indien gewenst.
+| *Banner samenwerken*
+| Hier kunt u de banner voor het onderdeel *Samenwerken* wijzigen indien
+  gewenst.
 
 12.1.4. Waarschuwingsbanner
 ---------------------------
@@ -113,22 +112,23 @@ configuratie van de waarschuwingsbanner heeft betrekking op zowel opmaak als inh
 
 .. image:: images/image113.png
    :width: 622px
-   :height: 206px
+   :height: 180px
 
+| *Toon waarschuwingsbanner*
+| Vink dit aan wanneer u wilt dat de waarschuwingsbanner bovenin de
+  schermen van het Open Inwoner Platform zichtbaar is. Wanneer u deze
+  optie heeft aangevinkt wordt de waarschuwingsbanner op **alle
+  pagina’s** weergegeven.
 
-Toon waarschuwingsbanner
-~~~~~~~~~~~~~~~~~~~~~~~~
-Vink dit aan wanneer u wilt dat de waarschuwingsbanner bovenin de schermen van het Open Inwoner Platform zichtbaar is. Wanneer u deze optie heeft aangevinkt wordt de waarschuwingsbanner op alle pagina’s weergegeven.
+| *Tekstinhoud waarschuwingsbanner*
+| Hier kunt u de tekst invoeren die op de waarschuwingsbanner wordt
+  weergegeven. Denk hierbij aan onderhoudsmomenten, updates etc.
 
-Tekstinhoud waarschuwingsbanner
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Hier kunt u de tekst invoeren die op de waarschuwingsbanner wordt weergegeven. Denk hierbij aan
-onderhoudsmomenten, updates etc.
-
-Waarschuwingsbanner achtergrond en Waarschuwingsbanner tekst
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Hier kunt u de kleuren selecteren voor respectievelijk de achtergrondkleur en de tekstkleur van de
-waarschuwingsbanner. De kleur kan worden geselecteerd in een pop-up kleurvinder of door het invoeren van de gewenste kleurcode.
+| *Waarschuwingsbanner achtergrond en Waarschuwingsbanner tekst*
+| Hier kunt u de kleuren selecteren voor respectievelijk de
+  achtergrondkleur en de tekstkleur van de waarschuwingsbanner. De kleur
+  kan worden geselecteerd in een pop-up kleurvinder of door het invoeren
+  van de gewenste kleurcode.
 
 Houd er rekening mee dat de waarschuwingsbanner moet opvallen. Kies bij het gebruik van de waarschuwingsbanner daarom géén kleur die bij de huisstijl van de Gemeente past. Roodtinten worden
 vaak gebruikt als waarschuwing, maar kan als negatief worden ervaren. Oranje heeft een minder
@@ -220,45 +220,45 @@ Dit zijn de teksten die in een pop-up worden getoond wanneer de gebruiker op een
 de knop [Help] in het topmenu heeft geklikt. Deze teksten geven een korte uitleg van wat de gebruiker
 op de betreffende pagina kan doen/vinden.
 
-Helptekst homepage
-~~~~~~~~~~~~~~~~~~
-Dit is de tekst die wordt weergegeven wanneer de gebruiker op de homepage op [Help] klikt.
 
-Helptekst onderwerp-pagina
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-Dit is de tekst die wordt weergegeven wanneer de gebruiker op de onderwerppagina op [Help] klikt.
+| *Helptekst homepage*
+| Dit is de tekst die wordt weergegeven wanneer de gebruiker op de
+  homepage op [Help] klikt.
 
-Helptekst producten
-~~~~~~~~~~~~~~~~~~~
-Dit is de tekst die wordt weergegeven wanneer de gebruiker op een productpagina op [Help] klikt.
+| *Helptekst onderwerp-pagina*
+| Dit is de tekst die wordt weergegeven wanneer de gebruiker op de
+  onderwerppagina op [Help] klikt.
 
-Helptekst zoeken
-~~~~~~~~~~~~~~~~
-Dit is de tekst die wordt weergegeven wanneer de gebruiker op de zoekpagina op [Help] klikt.
+| *Helptekst producten*
+| Dit is de tekst die wordt weergegeven wanneer de gebruiker op een
+  productpagina op [Help] klikt.
 
-Helptekst Mijn profiel
-~~~~~~~~~~~~~~~~~~~~~~
-Dit is de tekst die wordt weergegeven wanneer de gebruiker op de profielpagina op [Help] klikt.
+| *Helptekst zoeken*
+| Dit is de tekst die wordt weergegeven wanneer de gebruiker op de
+  zoekpagina op [Help] klikt.
 
-Helptekst vragenlijst/zelftest
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Dit is de tekst die wordt weergegeven wanneer de gebruiker tijdens de vragenlijst of zelftest op [Help]
-klikt.
+| *Helptekst Mijn profiel*
+| Dit is de tekst die wordt weergegeven wanneer de gebruiker op de
+  profielpagina op [Help] klikt.
 
-Helptekst samenwerken
-~~~~~~~~~~~~~~~~~~~~~
-Dit is de tekst die wordt weergegeven wanneer de gebruiker op de pagina Samenwerken op [Help] klikt.
+| *Helptekst vragenlijst/zelftest*
+| Dit is de tekst die wordt weergegeven wanneer de gebruiker tijdens de
+  vragenlijst of zelftest op [Help] klikt.
+
+| *Helptekst samenwerken*
+| Dit is de tekst die wordt weergegeven wanneer de gebruiker op de
+  pagina *Samenwerken* op [Help] klikt.
 
 12.1.7. Zoekfilter opties
 -------------------------
 
 Hier kunt u een onderwerpenfilter, een tagfilter en/of een organisaties-filter toevoegen aan de
 zoekresultaten. U kunt deze filters naar eigen inzicht selecteren. Deze filters worden weergegeven aan de
-linkerkant van de pagina met zoekresultaten. Een voorbeeld hiervan is weergegeven in het screenshot op de volgende pagina.
+linkerkant van de pagina met zoekresultaten. Een voorbeeld hiervan is weergegeven in het screenshot hier:
 
 .. image:: images/image114.png
    :width: 624px
-   :height: 580px
+   :height: 500px
 
 
 12.1.8. E-mails
@@ -266,18 +266,18 @@ linkerkant van de pagina met zoekresultaten. Een voorbeeld hiervan is weergegeve
 
 Hier kunt u selecteren of u wilt dat gebruikers een mail ontvangen wanneer zij een nieuw bericht hebben.
 
-Stuur een e-mail bij nieuwe berichten
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Wanneer dit is aangevinkt wordt er een e-mailnotificatie gestuurd naar gebruikers als zij in Open Inwoner een nieuw bericht hebben ontvangen.
+| *Stuur een e-mail bij nieuwe berichten*
+| Wanneer dit is aangevinkt wordt er een e-mailnotificatie gestuurd naar
+  gebruikers als zij in Open Inwoner een nieuw bericht hebben ontvangen.
 
-Ontvangers e-mailsamenvatting
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Hier vult u de e-mailadressen van beheerders die dagelijks een samenvatting dienen te ontvangen van alle op te lossen zaken (e-mails die niet aankomen).
+| *Ontvangers e-mailsamenvatting*
+| Hier vult u de e-mailadressen van beheerders die dagelijks een
+ samenvatting dienen te ontvangen van alle op te lossen zaken
+ (e-mails die niet aankomen).
 
-E-mailverificatie vereist
-~~~~~~~~~~~~~~~~~~~~~~~~~
-Hier kunt u selecteren of gebruikers verplicht zijn om na het inloggen hun e-mailadres te verifiëren voor
-bepaalde handelingen.
+| *E-mailverificatie vereist*
+| Hier kunt u selecteren of gebruikers verplicht zijn om na het
+ inloggen hun e-mailadres te verifiëren voor bepaalde handelingen.
 
 .. image:: images/image115.png
    :width: 624px
@@ -290,28 +290,30 @@ bepaalde handelingen.
 Dit is een alternatieve login methode die naast DigiD kan worden ingesteld (zie 10.9). In de algemene
 configuratie kunt u de login button voor OpenID Connect configureren. Alle andere zaken rond de OpenID Connect configuratie vindt u onder inlog koppelingen (hoofdstuk 10.5 en 10.6).
 
-OpenID Connect logo
-~~~~~~~~~~~~~~~~~~~
-Hier kunt u het logo uploaden van de OpenID connect methode die u wilt gebruiken. Door een logo te
-uploaden maakt u het voor de gebruiker duidelijker welke login methode er wordt geboden.
+| *OpenID Connect logo*
+| Hier kunt u het logo uploaden van de OpenID connect methode die u
+ wilt gebruiken. Door een logo te uploaden maakt u het voor de
+ gebruiker duidelijker welke login methode er wordt geboden.
 
-OpenID Connect login tekst
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-Hier voegt u de tekst toe die bij de login knop komt te staan. Deze tekst moet in ieder geval “Log in met
-[X]” of iets vergelijkbaars bevatten.
+| *OpenID Connect login tekst*
+| Hier voegt u de tekst toe die bij de login knop komt te staan. Deze
+ tekst moet in ieder geval “Log in met [X]” of iets vergelijkbaars
+ bevatten.
 
-Toon optie om in te loggen via OpenID Connect
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Hier kunt u selecteren welk soort gebruiker er de mogelijkheid moet krijgen om via OpenID Connect in te
-loggen. Dit kan de standaardgebruiker zijn of de Hoofdbeheerder.
+| *Toon optie om in te loggen via OpenID Connect*
+| Hier kunt u selecteren welk soort gebruiker er de mogelijkheid moet
+ krijgen om via OpenID Connect in te loggen. Dit kan de
+ standaardgebruiker zijn of de Hoofdbeheerder.
 
 12.1.10. Authenticatie
 ----------------------
-eHerkenning authenticatie ingeschakeld
-Hier kunt u aanvinken of u gebruikers de mogelijkheid wilt bieden in te loggen met eHerkenning.
-Standaard wordt er gebruik gemaakt van de SAML integratie (bij een rechtstreekse aansluiting op een
-eHerkenning Makelaar). Een OpenID Connect koppeling met eHerkenning kunt u configureren onder
-inlog koppelingen (zie hoofdstuk 10.6).
+
+| *eHerkenning authenticatie ingeschakeld*
+| Hier kunt u aanvinken of u gebruikers de mogelijkheid wilt bieden in
+  te loggen met eHerkenning. Standaard wordt er gebruik gemaakt van de
+  SAML integratie (bij een rechtstreekse aansluiting op een eHerkenning
+  Makelaar). Een OpenID Connect koppeling met eHerkenning kunt u
+  configureren onder inlog koppelingen (zie hoofdstuk 10.6).
 
 12.1.11. Analytics
 ------------------
@@ -319,31 +321,34 @@ Dit zijn de gegevens die u dient in te vullen als u Google Analytics of Matomo �
 alternatief voor Google Analytics - wilt laten draaien op het platform. Hierdoor krijgt u inzicht in het
 gedrag van de bezoekers van het platform.
 
-Google Tag Manager code
-~~~~~~~~~~~~~~~~~~~~~~~
-Deze code ziet er meestal uit als ‘GTM-XXXX’. Het invoeren van deze code zorgt ervoor dat Google Tag
-Manager geïnstalleerd wordt. Installeer Google Tag Manager om tags te configureren en te
-implementeren, inclusief tags van Google Ads, Google Analytics, Floodlight en tags van derden.
+| *Google Tag Manager code*
+| Deze code ziet er meestal uit als ‘GTM-XXXX’. Het invoeren van deze
+  code zorgt ervoor dat Google Tag Manager geïnstalleerd wordt.
+  Installeer Google Tag Manager om tags te configureren en te
+| implementeren, inclusief tags van Google Ads, Google Analytics,
+  Floodlight en tags van derden.
 
-Google Analytics code
-~~~~~~~~~~~~~~~~~~~~~
-Deze trackingcode ziet er meestal uit als ‘G-XXXXX’. Het invoeren van deze code zorgt ervoor dat
-Analytics geïnstalleerd wordt. Google Analytics verzamelt statistische gegevens waarmee inzicht kan
-worden verkregen in het gedrag van bezoekers. Hierdoor kan er beter op de bezoeker worden
-ingespeeld.
+| *Google Analytics code*
+| Deze trackingcode ziet er meestal uit als ‘G-XXXXX’. Het invoeren van
+  deze code zorgt ervoor dat Analytics geïnstalleerd wordt. Google
+  Analytics verzamelt statistische gegevens waarmee inzicht kan worden
+  verkregen in het gedrag van bezoekers. Hierdoor kan er beter op de
+  bezoeker worden ingespeeld.
 
-Matomo server URL
-~~~~~~~~~~~~~~~~~
-Vul hier de URL in van uw Matomo server. Matomo is het open source alternatief voor Google Analytics.
-Matomo site ID
-Vul hier de Matomo ID in van de website die u wilt analyseren. Deze code is te vinden wanneer u
-ingelogd bent in Matomo. https://matomo.org/faq/general/faq_19212/
+| *Matomo server URL*
+| Vul hier de URL in van uw Matomo server. Matomo is het open source
+  alternatief voor Google Analytics.
 
-SiteImprove ID
-~~~~~~~~~~~~~~
-Vul hier de SiteImprove ID in van de website die u wilt analyseren. Deze code kunt u vinden in de
-SiteImprove snippet. Dit is onderdeel van een URL zoals '//siteimproveanalytics.com/js/siteanalyze_xxxxx.js' waarbij het xxxxx-deel de SiteImprove ID is die hier
-moet worden ingevuld.
+| *Matomo site ID*
+| Vul hier de Matomo ID in van de website die u wilt analyseren. Deze
+  code is te vinden wanneer u ingelogd bent in Matomo.
+
+| *SiteImprove ID*
+| Vul hier de SiteImprove ID in van de website die u wilt analyseren.
+  Deze code kunt u vinden in de SiteImprove snippet. Dit is onderdeel
+  van een URL zoals
+| '//siteimproveanalytics.com/js/siteanalyze_xxxxx.js' waarbij het
+  xxxxx-deel de SiteImprove ID is die hier moet worden ingevuld.
 
 Let op! Wanneer de SiteImprove ID is ingevuld dienen ook de volgende twee CSP settings ingesteld te worden via het menu-item CSP settings:
 
@@ -368,40 +373,36 @@ en de URL naar de privacyverklaring aanpassen.
    :height: 95px
 
 
-Tekst cookiebanner informatie
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Hier kunt u de tekstuele informatie invoeren die in de cookiebanner wordt weergegeven. Dit is een
-disclaimer voor het gebruik van cookies, zoals: “Wij gebruiken cookies om onze website en
-dienstverlening te verbeteren.”
+| *Tekst cookiebanner informatie*
+| Hier kunt u de tekstuele informatie invoeren die in de cookiebanner
+  wordt weergegeven. Dit is een disclaimer voor het gebruik van cookies,
+  zoals: “Wij gebruiken cookies om onze website en dienstverlening te
+  verbeteren.”
 
 .. image:: images/image113.png
-   :width: 6.48611in
-   :height: 1.79028in
+   :width: 623px
+   :height: 180px
 
+| *Tekst cookiebanner link*
+| Hier kunt u de tekst invoeren waaronder de link naar de privacypagina
+  zit. Deze tekst is klikbaar indien er een URL is opgegeven.
 
-Tekst cookiebanner link
-~~~~~~~~~~~~~~~~~~~~~~~
-
-Hier kunt u de tekst invoeren waaronder de link naar de privacypagina zit. Deze tekst is klikbaar indien er
-een URL is opgegeven.
-
-URL van de privacypagina
-~~~~~~~~~~~~~~~~~~~~~~~~
-Plaats hier de link naar de privacypagina.
+| *URL van de privacypagina*
+| Plaats hier de link naar de privacypagina.
 
 12.1.13. Gebruikersfeedbackonderzoek
 ------------------------------------
 
 Hier kunt u de mogelijkheid voor gebruikers om feedback te geven over het platform configureren.
 
-Feedbackknop label
-~~~~~~~~~~~~~~~~~~
-Hier vult u de tekst in die op de CTA button wordt weergegeven om gebruikersfeedback te verzamelen.
-Denk hierbij aan de CTA richtlijnen.
+| *Feedbackknop label*
+| Hier vult u de tekst in die op de CTA button wordt weergegeven om
+  gebruikersfeedback te verzamelen. Denk hierbij aan de CTA richtlijnen.
 
-Feedbackknop URL
-~~~~~~~~~~~~~~~~
-Hier vult u de URL in naar het formulier waar gebruikers feedback kunnen geven.
+| *Feedbackknop URL*
+| Hier vult u de URL in naar het formulier waar gebruikers feedback
+  kunnen geven.
+
 
 12.1.14. Weergaveopties voor anonieme gebruikers
 ------------------------------------------------
@@ -430,23 +431,21 @@ elementen extern te delen.
 Hier kunt u de volgorde van de platte pagina’s in de footer veranderen, een nieuwe platte pagina
 toevoegen aan de footer of een platte pagina verwijderen.
 
-Platte pagina aan footer toevoegen
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Klik op de [+ nog een platte pagina toevoegen] om een extra platte pagina aan de footer toe te voegen.
-U kunt in het drop down menu de gewenste pagina selecteren. Moet de nieuwe pagina nog worden
-aangemaakt? Dan klikt u op de [+] naast het drop down menu. Er wordt nu een nieuw scherm geopend
-waar u een nieuwe platte pagina kunt creëren. Meer uitleg hierover vindt u in hoofdstuk 7.5.
+| *Platte pagina aan footer toevoegen*
+| Klik op de [+ nog een platte pagina toevoegen] om een extra platte
+  pagina aan de footer toe te voegen.U kunt in het drop down menu de gewenste pagina selecteren. Moet de nieuwe pagina nog worden aangemaakt? Dan klikt u op de [+] naast het drop down menu. Er wordt nu een nieuw scherm geopend waar u een nieuwe platte pagina kunt creëren. Meer uitleg hierover vindt u in hoofdstuk 7.5.
 
-Volgorde platte pagina’s veranderen
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-U kunt de volgorde van de platte pagina’s in de footer veranderen. Onder ‘volgorde’ ziet u de huidige
-volgorde, waarbij 0 de bovenste link is en het hoogste getal de onderste. Om de volgorde te veranderen
-gebruikt u de pijltjes knoppen achter de platte pagina’s, onder ‘verplaatsen’.
+| *Volgorde platte pagina’s veranderen*
+| U kunt de volgorde van de platte pagina’s in de footer veranderen.
+  Onder ‘volgorde’ ziet u de huidige volgorde, waarbij 0 de bovenste
+  link is en het hoogste getal de onderste. Om de volgorde te veranderen
+  gebruikt u de pijltjes knoppen achter de platte pagina’s, onder
+  ‘verplaatsen’.
 
 
 .. image:: images/image117.png
    :alt: Overige
-   :width: 20px
+   :width: 15px
    :align: left
 
 helemaal naar boven
@@ -454,7 +453,7 @@ helemaal naar boven
 
 .. image:: images/image118.png
    :alt: Overige
-   :width: 20px
+   :width: 15px
    :align: left
 
 één plaats naar boven
@@ -462,7 +461,7 @@ helemaal naar boven
 
 .. image:: images/image119.png
    :alt: Overige
-   :width: 20px
+   :width: 15px
    :align: left
 
 éen plaats naar onder
@@ -470,21 +469,21 @@ helemaal naar boven
 
 .. image:: images/image120.png
    :alt: Overige
-   :width: 20px
+   :width: 15px
    :align: left
 
 helemaal naar onderen
 
 
-Platte pagina’s uit footer verwijderen
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Selecteer de gewenste platte pagina door het vierkantje onder ‘verwijderen’ aan te klikken. Wanneer u
-nu op [Opslaan] klikt wordt de geselecteerde platte pagina uit de footer verwijderd.
+| *Platte pagina’s uit footer verwijderen*
+| Selecteer de gewenste platte pagina door het vierkantje onder
+  ‘verwijderen’ aan te klikken. Wanneer u nu op [Opslaan] klikt wordt de
+  geselecteerde platte pagina uit de footer verwijderd.
 
-Opslaan
-~~~~~~~
-Als u uw wijzigingen tussentijds wilt opslaan, klikt u op [opslaan en opnieuw bewerken]. Wanneer u
-tevreden bent met uw wijzigingen klikt u op [opslaan] om terug te keren naar het overzicht.
+| *Opslaan*
+| Als u uw wijzigingen tussentijds wilt opslaan, klikt u op [opslaan en
+  opnieuw bewerken]. Wanneer u tevreden bent met uw wijzigingen klikt u
+  op [opslaan] om terug te keren naar het overzicht.
 
 12.1.18. Fonts
 --------------
@@ -526,35 +525,33 @@ dient in te vullen. Wanneer alle gegevens zijn ingevuld klikt u op [opslaan].
 Door op een mail template in het overzicht te klikken, kunt u deze wijzigen. Er wordt een nieuw scherm
 geopend waar u diverse wijzigingen kunt aanbrengen.
 
-Interne naam
-~~~~~~~~~~~~
-Hier zet u de naam van het e-mailsjabloon voor intern gebruik, zoals hij onder medewerkers vindbaar moet zijn.
+| *Interne naam*
+| Hier zet u de naam van het e-mailsjabloon voor intern gebruik,
+ zoals hij onder medewerkers vindbaar moet zijn.
 
-Type
-~~~~
-Selecteer de soort mailsjabloon: uitnodiging of nieuwe e-mail.
+| *Type*
+| Selecteer de soort mailsjabloon: uitnodiging of nieuwe e-mail.
 
-Taal
-~~~~
-Selecteer de taal waarin de e-mailsjabloon is opgesteld.
+| *Taal*
+| Selecteer de taal waarin de e-mailsjabloon is opgesteld.
 
-Subject
-~~~~~~~
-Typ hier het onderwerp van de te verzenden e-mail. Dit is het onderwerp van de uiteindelijke mail. Deze
-is zichtbaar voor de ontvanger. Houd deze kort en bondig. Raadpleeg onder Help de subject variables
-voor beschikbare variabelen voor het onderwerp. Variabelen zijn automatisch ingevulde teksten op basis
-van de beschikbare gegevens op het moment van versturen. U plaatst deze tussen twee accolades, zoals:
-{{site_name}}.
+| *Subject*
+| Typ hier het onderwerp van de te verzenden e-mail. Dit is het
+ onderwerp van de uiteindelijke mail. Deze is zichtbaar voor de
+ ontvanger. Houd deze kort en bondig. Raadpleeg onder *Help* de
+ subject variables voor beschikbare variabelen voor het onderwerp.
+ Variabelen zijn automatisch ingevulde teksten op basis van de
+ beschikbare gegevens op het moment van versturen. U plaatst deze
+ tussen twee accolades, zoals: {{site_name}}.
 
-Body
-~~~~
-Hier kunt u de e-mail volledig opmaken. Hiervoor is een editor aanwezig, zoals hieronder afgebeeld.
-Raadpleeg onder Help de body variables voor beschikbare variabelen voor de body text.
+| *Body*
+| Hier kunt u de e-mail volledig opmaken. Hiervoor is een editor
+ aanwezig, zoals hieronder afgebeeld. Raadpleeg onder *Help* de body
+ variables voor beschikbare variabelen voor de body text.
 
 .. image:: images/image121.png
    :width: 887px
-   :height: 71px
-
+   :height: 65px
 
 1. Hier selecteert u de stijl die u aan de tekst wilt meegeven. Denk aan italic, bold, doorgehaald etc.
 2. Hier selecteert u wat voor soort tekst u aan het typen bent. Dit heeft gevolgen voor de standaardopmaak. Kies uit paragraph, heading 1, heading 2, heading 3 etc.
@@ -574,28 +571,29 @@ Raadpleeg onder Help de body variables voor beschikbare variabelen voor de body 
 16. Hiermee voegt u een speciaal teken in
 17. Hiermee wisselt u naar de broncode van de tekst
 
-Base template path
-~~~~~~~~~~~~~~~~~~
-Dit is de locatie van de e-mailsjabloon. Laat dit veld leeg voor een automatisch gegenereerd pad.
+| *Base template path*
+| Dit is de locatie van de e-mailsjabloon. Laat dit veld leeg voor een
+  automatisch gegenereerd pad.
 
 Help
 ----
 
-Subject variables, body variables
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+| *Subject variables, body variables*
+| Subject variables en body variables zijn de beschikbare variabelen
+  voor het onderwerp en de body text. Variabelen zijn automatisch
+  ingevulde teksten op basis van de beschikbare gegevens op het moment
+  van versturen. U plaatst deze tussen twee accolades, zoals:
+  {{site_name}}.
 
-Subject variables en body variables zijn de beschikbare variabelen voor het onderwerp en de body text.
-Variabelen zijn automatisch ingevulde teksten op basis van de beschikbare gegevens op het moment van
-versturen. U plaatst deze tussen twee accolades, zoals: {{site_name}}.
+| *Opmerkingen*
+| Hier kunt u enkele opmerkingen met betrekking tot de mail template
+  neerzetten. Deze opmerkingen zijn enkel voor intern gebruik.
 
-Opmerkingen
-~~~~~~~~~~~
-Hier kunt u enkele opmerkingen met betrekking tot de mail template neerzetten. Deze opmerkingen zijn
-enkel voor intern gebruik.
-
-Opslaan
-~~~~~~~
-Als u uw wijzigingen tussentijds wilt opslaan, klikt u op [opslaan en opnieuw bewerken]. Wanneer u tevreden bent met uw wijzigingen klikt u op [opslaan] om terug te keren naar het overzicht. Of u klikt op [opslaan en nieuwe toevoegen] als u een extra item wilt toevoegen.
+| *Opslaan*
+| Als u uw wijzigingen tussentijds wilt opslaan, klikt u op [opslaan en
+  opnieuw bewerken]. Wanneer u tevreden bent met uw wijzigingen klikt u
+  op [opslaan] om terug te keren naar het overzicht. Of u klikt op
+  [opslaan en nieuwe toevoegen] als u een extra item wilt toevoegen.
 
 12.3.3. Mail template verwijderen
 ---------------------------------
@@ -618,8 +616,8 @@ Let op! Bij de algemene configuratie kunt u de volgorde van de pagina’s in de 
 hoofdstuk 12.1.17.
 
 .. image:: images/image122.png
-   :width: 6.5in
-   :height: 5.40556in
+   :width: 624px
+   :height: 519px
 
 
 12.4.2. Platte pagina wijzigen
@@ -629,26 +627,27 @@ geopend waar u de pagina kunt opmaken.
 
 .. image:: images/image123.png
    :width: 624px
-   :height: 617px
+   :height: 250px
 
-URL
-~~~
-Voer hier het achtervoegsel van de URL in voor de betreffende platte pagina. Gebruik hiervoor kleine
-letters en indien nodig een koppelteken (-) in plaats van een spatie. Begin en eindig de URL met een / .
-Bijvoorbeeld: /contact-opnemen/
+| *URL*
+| Voer hier het achtervoegsel van de URL in voor de betreffende
+ platte pagina. Gebruik hiervoor kleine letters en indien nodig een
+ koppelteken (-) in plaats van een spatie. Begin en eindig de URL
+ met een / .
+| Bijvoorbeeld: _/contact-opnemen/_
 
-Titel
-~~~~~
-Voer hier de titel van de platte pagina in. Deze wordt in de footer weergegeven.
+| *Titel*
+| Voer hier de titel van de platte pagina in. Deze wordt in de footer
+ weergegeven.
 
-Content
-~~~~~~~
-Bij content vult u de inhoud in die u op de platte pagina wilt hebben. Hiervoor is een eenvoudige editor
-aanwezig, zoals hieronder afgebeeld.
+| *Content*
+| Bij content vult u de inhoud in die u op de platte pagina wilt
+ hebben. Hiervoor is een eenvoudige editor aanwezig, zoals hieronder
+ afgebeeld.
 
 .. image:: images/image47.png
    :width: 614px
-   :height: 133px
+   :height: 110px
 
 1. Hier selecteert u wat voor soort tekst u aan het typen bent. Dit heeft gevolgen voor de
 standaardopmaak. Kies uit paragraph, heading 1, heading 2, heading 3 etc.
@@ -663,29 +662,27 @@ standaardopmaak. Kies uit paragraph, heading 1, heading 2, heading 3 etc.
 10. Hiermee voegt u een tabel in
 11. Stap terug (ongedaan maken) of stap vooruit (opnieuw doen)
 
-Websites
-~~~~~~~~
-
-Selecteer hier op welke website(s) de betreffende platte pagina moet worden weergegeven. Houd [ctrl]
-ingedrukt om meerdere websites te selecteren. Staat de noodzakelijke website niet in de lijst? Dan voegt
-u deze toe door op [+] te klikken.
+| *Websites*
+| Selecteer hier op welke website(s) de betreffende platte pagina moet
+  worden weergegeven. Houd [ctrl] ingedrukt om meerdere websites te
+  selecteren. Staat de noodzakelijke website niet in de lijst? Dan voegt
+  u deze toe door op [+] te klikken.
 
 Registratie vereist?
 ~~~~~~~~~~~~~~~~~~~~
-Wanneer dit is aangevinkt zal de betreffende pagina alleen worden weergegeven wanneer de gebruiker
-is ingelogd.
 
-Sjabloonnaam
-~~~~~~~~~~~~
+Wanneer dit is aangevinkt zal de betreffende pagina alleen worden
+weergegeven wanneer de gebruiker is ingelogd.
 
-Hier kunt u eventueel een vooraf opgemaakte paginasjabloon (html) gebruiken. Laat dit veld leeg om
-zonder sjabloon te werken.
+| *Sjabloonnaam*
+| Hier kunt u eventueel een vooraf opgemaakte paginasjabloon (html)
+  gebruiken. Laat dit veld leeg om zonder sjabloon te werken.
 
-Opslaan
-~~~~~~~
-Als u uw wijzigingen tussentijds wilt opslaan, klikt u op [opslaan en opnieuw bewerken]. Wanneer u
-tevreden bent met uw wijzigingen klikt u op [opslaan] om terug te keren naar het overzicht. Of u klikt op
-[opslaan en nieuwe toevoegen] als u een extra item wilt toevoegen.
+| *Opslaan*
+| Als u uw wijzigingen tussentijds wilt opslaan, klikt u op [opslaan en
+  opnieuw bewerken]. Wanneer u tevreden bent met uw wijzigingen klikt u
+  op [opslaan] om terug te keren naar het overzicht. Of u klikt op
+  [opslaan en nieuwe toevoegen] als u een extra item wilt toevoegen.
 
 12.4.3. Platte pagina verwijderen
 ---------------------------------

@@ -63,7 +63,7 @@ keer meerdere opeenvolgende rechten te selecteren.**
 
 .. image:: images/image61.png
    :width: 624px
-   :height: 717px
+   :height: 575px
 
 
 8.4.2. Additionele rechten
@@ -132,11 +132,8 @@ waar u diverse wijzigingen kunt aanbrengen.
 | Hier zet u de naam van het TOTP device. Dit staat standaard op
   ‘default’.
 
-**Let op!**
-
-**De velden onder de onderdelen Configuration, State en Throttling zijn
-technische velden die enkel in overleg met de leverancier aangepast
-dienen te worden.**
+| **Let op!**
+| **De velden onder de onderdelen Configuration, State en Throttling zijn technische velden die enkel in overleg met de leverancier aangepast dienen te worden.**
 
 | *Opslaan*
 | Als u uw wijzigingen tussentijds wilt opslaan, klikt u op [opslaan en
@@ -166,7 +163,7 @@ uitgaande request logs zichtbaar worden.
 
 .. image:: images/image62.png
    :width: 624px
-   :height: 323px
+   :height: 280px
 
 
 8.10. Uitgaande request-logs

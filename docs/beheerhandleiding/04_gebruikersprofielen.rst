@@ -18,8 +18,7 @@ een bepaalde gebruiker horen. Dit onderdeel is enkel in te zien (read-only).
 
 .. image:: images/image10.png
    :alt: Gebruikersprofielen
-   :width: 600px
-   :align: center
+   :width: 650px
 
 
 4.1.1. Actieoverzicht sorteren
@@ -94,9 +93,9 @@ omschrijving van de actie.
 
 In de backend is het overzicht van de feed item data te raadplegen. Er is informatie te vinden over voor welke betreffende gebruiker de feed item data is, het soort feed item data, de datum waarop de actie is aangemaakt en of de informatie in de feed bekeken is of dat de actie is voltooid en zo ja, op welke datum. De gegevens kunnen worden gefilterd en gesorteerd op de al deze elementen.
 
-   .. image:: images/image14.png
-      :width: 624px
-      :height: 274px
+.. image:: images/image14.png
+   :width: 624px
+   :height: 274px
 
 
 4.5. Gebruikers
@@ -128,17 +127,14 @@ Door in het gebruikersoverzicht op de knop [Gebruiker toevoegen +] rechts boveni
 klikken kunt u een nieuwe gebruiker toevoegen. Er wordt een nieuw scherm geopend waar u enkele
 gegevens dient in te vullen. Wanneer alle gegevens zijn ingevuld klikt u op [ opslaan ].
 
-E-mailadres
-~~~~~~~~~~~
-Dit is het e-mailadres waarmee de nieuwe gebruiker kan inloggen.
+| *E-mailadres*
+| Dit is het e-mailadres waarmee de nieuwe gebruiker kan inloggen.
 
-Wachtwoord
-~~~~~~~~~~
-Voer hier het gewenste wachtwoord in
+| *Wachtwoord*
+| Voer hier het gewenste wachtwoord in
 
-Bevestiging wachtwoord
-~~~~~~~~~~~~~~~~~~~~~~
-Herhaal hier het wachtwoord ter controle.
+| *Bevestiging wachtwoord*
+| Herhaal hier het wachtwoord ter controle.
 
 4.5.3. Gebruiker wijzigen
 -------------------------
@@ -149,53 +145,39 @@ geopend waar u naast de persoonlijke gegevens diverse wijzigingen kunt aanbrenge
    :width: 624px
    :height: 385px
 
+| *E-mailadres*
+| Dit is het e-mailadres waarmee de nieuwe gebruiker kan inloggen.
 
-E-mailadres
-~~~~~~~~~~~
-Dit is het e-mailadres waarmee de nieuwe gebruiker kan inloggen.
+| *Wachtwoord*
+| Voer hier het gewenste wachtwoord in
 
-Wachtwoord
-~~~~~~~~~~
+| *Login type*
+| Hier kunt u de manier van inloggen wijzigen. Kies in het dropdown menu
+  voor e-mail en wachtwoord, DigiD of eHerkenning.
 
-Voer hier het gewenste wachtwoord in
+| *Persoonlijke informatie*
+| Hier kunt u de persoonlijke gegevens van de gebruiker wijzigen. Dit
+  gaat om alle persoonsgegevens, een eventuele pasfoto en er wordt
+  weergegeven of de gebruiker OpenID Connect heeft gebruikt om in te
+  loggen.
 
-Login type
-~~~~~~~~~~
+| *Contact type*
+| Hier kunt u selecteren om wat voor soort contactpersoon het gaat. In
+  het dropdown menu kunt u kiezen uit ‘contactpersoon’, ‘begeleider’ of
+  ‘organisatie.
 
-Hier kunt u de manier van inloggen wijzigen. Kies in het dropdown menu voor e-mail en wachtwoord, DigiD of eHerkenning.
+| *Geselecteerde onderwerpen*
+| Hier kunt u de onderwerpen waar de gebruiker in geïnteresseerd is
+  wijzigen. Selecteer de betreffende onderwerpen in de lijst of voeg een
+  nieuw onderwerp toe door op [+] te klikken.
 
-Persoonlijke informatie
-~~~~~~~~~~~~~~~~~~~~~~~
+| *Belangrijke datums*
+| Hier kunt u de datum en tijd van de creatie van de account en de datum
+  en tijd van de laatste aanmelding wijzigen. Hier wordt het e-mailadres van de gebruiker die het document geüpload heeft weergegeven. Door op [+] te klikken kunt u een extra gebruiker toevoegen.
 
-Hier kunt u de persoonlijke gegevens van de gebruiker wijzigen. Dit gaat om alle persoonsgegevens, een
-eventuele pasfoto en er wordt weergegeven of de gebruiker OpenID Connect heeft gebruikt om in te loggen.
-
-Contact type
-~~~~~~~~~~~~
-Hier kunt u selecteren om wat voor soort contactpersoon het gaat. In het dropdown menu kunt u kiezen
-uit ‘contactpersoon’, ‘begeleider’ of ‘organisatie.
-
-Geselecteerde onderwerpen
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Hier kunt u de onderwerpen waar de gebruiker in geïnteresseerd is wijzigen. Selecteer de betreffende
-onderwerpen in de lijst of voeg een nieuw onderwerp toe door op [+] te klikken.
-
-Belangrijke datums
-~~~~~~~~~~~~~~~~~~
-
-Hier kunt u de datum en tijd van de creatie van de account en de datum en tijd van de laatste aanmelding wijzigen.
-Hier wordt het e-mailadres van de gebruiker die het document geüpload heeft weergegeven. Door op [+]
-te klikken kunt u een extra gebruiker toevoegen.
-
-Opslaan of verwijderen
-~~~~~~~~~~~~~~~~~~~~~~
-
-U kunt in dit scherm ook de betreffende gebruiker verwijderen door onderaan het scherm op de rode
-knop [verwijderen] te klikken.
-Als u uw wijzigingen tussentijds wilt opslaan, klikt u op [opslaan en opnieuw bewerken]. Wanneer u
-tevreden bent met uw wijzigingen klikt u op [opslaan] om terug te keren naar het overzicht. Of u klikt op
-[opslaan en nieuwe toevoegen] als u een extra item wilt toevoegen.
+| *Opslaan of verwijderen*
+| U kunt in dit scherm ook de betreffende gebruiker verwijderen door
+  onderaan het scherm op de rode knop [verwijderen] te klikken. Als u uw wijzigingen tussentijds wilt opslaan, klikt u op [opslaan en opnieuw bewerken]. Wanneer u tevreden bent met uw wijzigingen klikt u op [opslaan] om terug te keren naar het overzicht. Of u klikt op [opslaan en nieuwe toevoegen] als u een extra item wilt toevoegen.
 
 4.5.4. Permissies wijzigen
 --------------------------
@@ -209,39 +191,37 @@ aanbrengen.
    :width: 622px
    :height: 333px
 
+| *Actief*
+| Door hier het vinkje weg te halen zet u de gebruikersaccount op
+  inactief.
 
-Actief
-~~~~~~
-Door hier het vinkje weg te halen zet u de gebruikersaccount op inactief.
+| *Beheerstatus*
+| Zet hier een vinkje wanneer u de gebruiker een beheerdersrol wilt
+  geven. **Let op! De gebruiker krijgt hiermee toegang tot de
+  beheeromgeving.**
 
-Beheerstatus
-~~~~~~~~~~~~
-Zet hier een vinkje wanneer u de gebruiker een beheerdersrol wilt geven. Let op! De gebruiker krijgt hiermee toegang tot de beheeromgeving.
+| *Supergebruikerstatus*
+| Zet hier een vinkje wanneer u de gebruiker de rol van supergebruiker
+  wilt geven. **Let op! De gebruiker krijgt hiermee alle rechten.**
 
-Supergebruikerstatus
-~~~~~~~~~~~~~~~~~~~~
-Zet hier een vinkje wanneer u de gebruiker de rol van supergebruiker wilt geven. Let op! De gebruiker
-krijgt hiermee alle rechten.
-Gedeactiveerd op:
-Selecteer hier de datum waarop u de gebruikersaccount wilt deactiveren.
+| *Gedeactiveerd op:*
+| Selecteer hier de datum waarop u de gebruikersaccount wilt
+  deactiveren.
 
-Groepen
-~~~~~~~
-Hier kunt u de gebruikersaccount aan bepaalde groepen toevoegen, waardoor zij automatisch bepaalde
-rechten krijgen. Het gaat hier om beheerdergroepen. Klik op [+] om een nieuwe groep aan te maken.
+| *Groepen*
+| Hier kunt u de gebruikersaccount aan bepaalde groepen toevoegen,
+  waardoor zij automatisch bepaalde rechten krijgen. Het gaat hier om
+  beheerdergroepen. Klik op [+] om een nieuwe groep aan te maken. Laat dit veld leeg als de gebruiker niet tot een groep behoort. U kunt de gebruiker dan in het volgende veld specifieke permissies geven.
 
-Laat dit veld leeg als de gebruiker niet tot een groep behoort. U kunt de gebruiker dan in het volgende
-veld specifieke permissies geven.
+| *Gebruikersrechten*
+| Hier kunt u de gebruikersaccount bepaalde rechten toewijzen. Houd de
+  {ctrl} toets op uw toetsenbord ingedrukt om meerdere rechten te
+  selecteren. Wanneer u tevreden bent met uw selectie klikt u op het
+  icoontje van het pijltje naar rechts, waardoor de gekozen permissies
+  naar het veld *Gekozen* worden verplaatst. Wilt u alle permissies
+  kiezen? Dan klikt u op de knop [alle kiezen]. Om alle gekozen
+  permissies te verwijderen klikt u op [alle verwijderen]. Wanneer u de permissies naar wens hebt gewijzigd, scrolt u naar de onderkant van het venster en kunt u de gebruikersaccount opslaan zoals aangegeven onder 4.5.3.
 
-Gebruikersrechten
-~~~~~~~~~~~~~~~~~
-Hier kunt u de gebruikersaccount bepaalde rechten toewijzen. Houd de {ctrl} toets op uw toetsenbord
-ingedrukt om meerdere rechten te selecteren. Wanneer u tevreden bent met uw selectie klikt u op het
-icoontje van het pijltje naar rechts, waardoor de gekozen permissies naar het veld Gekozen worden
-verplaatst. Wilt u alle permissies kiezen? Dan klikt u op de knop [alle kiezen]. Om alle gekozen permissies
-te verwijderen klikt u op [alle verwijderen].
-Wanneer u de permissies naar wens hebt gewijzigd, scrolt u naar de onderkant van het venster en kunt u
-de gebruikersaccount opslaan zoals aangegeven onder 4.5.3.
 
 4.5.5. Notificatie-instellingen aanpassen
 -----------------------------------------
@@ -294,29 +274,28 @@ Door in het uitnodigingsoverzicht op de knop [Uitnodiging toevoegen +] rechts bo
 klikken kunt u een nieuwe uitnodiging toevoegen. Er wordt een nieuw scherm geopend waar u enkele
 gegevens dient in te vullen. Wanneer alle gegevens zijn ingevuld klikt u op [opslaan].
 
-Uitnodiger
-~~~~~~~~~~
-Selecteer in het dropdown menu het e-mailadres van de uitnodiger. Door op [+] te klikken kunt u een
-extra uitnodiger aan de uitnodiging toevoegen.
+| *Uitnodiger*
+| Selecteer in het dropdown menu het e-mailadres van de uitnodiger. Door
+  op [+] te klikken kunt u een extra uitnodiger aan de uitnodiging
+  toevoegen.
 
-Uitgenodigde
-~~~~~~~~~~~~
-Selecteer in het dropdown menu het e-mailadres van degene die uitgenodigd moet worden. Klik op het
-icoontje van het potlood om een nieuw e-mailadres in uw Open Inwoner toe te voegen. Door op [+] te
-klikken kunt u een extra ontvanger aan de uitnodiging toevoegen.
+| *Uitgenodigde*
+| Selecteer in het dropdown menu het e-mailadres van degene die
+  uitgenodigd moet worden. Klik op het icoontje van het potlood om een
+  nieuw e-mailadres in uw Open Inwoner toe te voegen. Door op [+] te
+  klikken kunt u een extra ontvanger aan de uitnodiging toevoegen.
 
-Voornaam + Achternaam
-~~~~~~~~~~~~~~~~~~~~~
-Hier wordt de voor- en achternaam van de uitgenodigde weergegeven.
+| *Voornaam + Achternaam*
+| Hier wordt de voor- en achternaam van de uitgenodigde weergegeven.
 
-E-mailadres uitgenodigde
-~~~~~~~~~~~~~~~~~~~~~~~~
-Hier wordt het e-mailadres weergegeven waar de uitnodiging naartoe gestuurd is.
+| *E-mailadres uitgenodigde*
+| Hier wordt het e-mailadres weergegeven waar de uitnodiging naartoe
+  gestuurd is.
 
-Geaccepteerd
-~~~~~~~~~~~~
-Hier wordt aangegeven of de uitnodiging is geaccepteerd of niet. Wanneer de uitnodiging niet is
-geaccepteerd is de checkbox leeg en staat er in het overzicht een rood kruisje.
+| *Geaccepteerd*
+| Hier wordt aangegeven of de uitnodiging is geaccepteerd of niet.
+  Wanneer de uitnodiging niet is geaccepteerd is de checkbox leeg en
+  staat er in het overzicht een rood kruisje.
 
 4.6.2. Uitnodiging wijzigen
 ---------------------------

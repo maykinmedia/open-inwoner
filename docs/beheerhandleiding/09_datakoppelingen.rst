@@ -44,7 +44,7 @@ onderdeel Mijn aanvragen onder het uitvouwmenu bij de gebruikersnaam.
 
 .. image:: images/image63.png
    :width: 624px
-   :height: 478px
+   :height: 350px
 
 Er zijn diverse zaken die ingesteld moeten worden om Mijn aanvragen naar behoren te laten
 functioneren. In het volgende screenshot is te zien om welke elementen het gaat.
@@ -119,7 +119,7 @@ diverse niveaus, variërend van openbaar tot zeer geheim.
 
 .. image:: images/image65.png
    :width: 624px
-   :height: 919px
+   :height: 840px
 
 | *Standaard actie deadline termijn in dagen*
 | Hier stelt u in hoeveel dagen de gebruiker standaard krijgt om actie
@@ -162,29 +162,25 @@ kunt een extra API set toevoegen door op de [+] onder de reeds geconfigureerde A
 
 .. image:: images/image66.png
    :width: 624px
-   :height: 565px
+   :height: 500px
 
-Naam
-~~~~
-Hier kunt u de API set een naam geven. Deze naam is vrij in te vullen.
+| *Naam*
+| Hier kunt u de API set een naam geven. Deze naam is vrij in te vullen.
 
-Zaken API
-~~~~~~~~~
-Deze API vult de zaken of aanvragen uit Mijn aanvragen in.
+| *Zaken API*
+| Deze API vult de zaken of aanvragen uit *Mijn aanvragen* in.
 
-Documenten API
-~~~~~~~~~~~~~~
-Deze API haalt de documenten op die bij een bepaalde zaak horen.
+| *Documenten API*
+| Deze API haalt de documenten op die bij een bepaalde zaak horen.
 
-Catalogi API
-~~~~~~~~~~~~
-In de catalogi zit alle informatie over zaaktypes en andere gerelateerde informatie. De Catalogi API vult
-de zaaktypeconfiguratie in. Denk hierbij aan statussen, documenten, resultaten.
+| *Catalogi API*
+| In de catalogi zit alle informatie over zaaktypes en andere
+  gerelateerde informatie. De Catalogi API vult de zaaktypeconfiguratie
+  in. Denk hierbij aan statussen, documenten, resultaten.
 
-Formulieren API (Open Aanvragen)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Deze API slaat de gegevens van onvoltooide formulieren op en vult deze automatisch in. Dit is een
-optioneel veld.
+| *Formulieren API (Open Aanvragen)*
+| Deze API slaat de gegevens van onvoltooide formulieren op en vult deze
+  automatisch in. Dit is een optioneel veld.
 
 9.4. KlantContactMomenten
 =========================
@@ -202,7 +198,7 @@ gebruikers zich moeten kunnen inschrijven. Zoals aangegeven in de onderstaande s
 
 .. image:: images/image67.png
    :width: 624px
-   :height: 554px
+   :height: 500px
 
 Aan de voorkant van Open Inwoner krijgen gebruikers in Mijn Profiel de mogelijkheid zich in te schrijven
 voor diverse nieuwsbrieven. Afhankelijk van wat er in de backend door de beheerder mogelijk is
@@ -217,7 +213,7 @@ registratie een mail met een link waarmee zij hun e-mailadres moeten bevestigen.
 
 .. image:: images/image69.png
    :width: 608px
-   :height: 395px
+   :height: 310px
 
 
 9.6. Notificaties componentconfiguratie
@@ -232,6 +228,7 @@ zitten.
 =============================
 
 Om de notificaties van de componentconfiguratie in te stellen volgt u het volgende stappenplan:
+
 1) Creëer een ZGW Service voor de notificatie-API (NRC) met door de ZGW backend verzorgde
 referenties (/admin/zgw_consumers/service/).
 De ZGW heeft de volgende rechten nodig om referenties te kunnen verzorgen:
@@ -245,6 +242,7 @@ De ZGW heeft de volgende rechten nodig om referenties te kunnen verzorgen:
 
 2) Update Notificaties componentconfiguratie (/admin/notifications_api_common/notificationsconfig/)
 Selecteer de bovenstaande service.
+
 3) Creëer een Webhook-abonnement (/admin/notifications_api_common/subscription/)
 De Callback-url is het OIP domein met het volgende pad: /api/openzaak/notifications/webhook/zaken.
 Bijvoorbeeld: https://open-inwoner.gemeente.nl/api/openzaak/notifications/webhook/zaken
@@ -254,10 +252,11 @@ veld ‘kanalen’ moet de Zaken bevatten.
 Sla op en registreer de Webhook explciet door het in de lijst te selecteren en te klikken op [Webhook
 registreren]. De NRC-API zal worden gebruikt om de Webhook te registreren. Zodra deze met succes is
 geregistreerd zal de Webhook een URL set krijgen waarmee men zich kan abonneren.
+
 4) De Configuratie 'Open Zaak' moet worden ingesteld voor Zaken (ZRC), Catalogus (ZTC) en
 Documenten (DRC). (/admin/openzaak/openzaakconfig/)
 Selecteer in eSuite ook "Maak gebruik van StatusType.informeren workaround (eSuite)".
-79
+
 5) Configureer in eSuite de Zaaktypes (/admin/openzaak/zaaktypeconfig/)
 Selecteer de Zaaktypes en InformatieObjectTypes en configureer de bijbehorende notificatieopties. Er is
 een cronjob om deze catalogus te importeren. Dit commando kan te allen tijde worden uitgevoerd
@@ -342,31 +341,32 @@ platform hun overzichten van uitkeringen downloaden.
    :width: 624px
    :height: 260px
 
+| *SOAP Service*
+| Selecteer hier de betreffende SOAP service. Dit is de algemene manier
+  om de SSD dienst te bevragen.
 
-SOAP Service
-~~~~~~~~~~~~
-Selecteer hier de betreffende SOAP service. Dit is de algemene manier om de SSD dienst te bevragen.
+| *Maandspecificaties endpoint*
+| De API die moet worden gebruikt om maandspecificatie-informatie op te
+  halen.
 
-Maandspecificaties endpoint
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-De API die moet worden gebruikt om maandspecificatie-informatie op te halen.
+| *Jaaropgave endpoint*
+| De API die moet worden gebruikt om jaaropgave-informatie op te halen.
 
-Jaaropgave endpoint
-~~~~~~~~~~~~~~~~~~~
-De API die moet worden gebruikt om jaaropgave-informatie op te halen.
-Bedrijfsnaam
-Hier komt de naam van de leverancier te staan. In dit geval is dat Open Inwoner.
+| *Bedrijfsnaam*
+| Hier komt de naam van de leverancier te staan. In dit geval is dat
+  Open Inwoner.
 
-Applicatie naam
-~~~~~~~~~~~~~~~
-Hier komt de naam van de applicatie die gebruik maakt van de SSD Client te staan. In dit geval is dat Open Inwoner.
+| *Applicatie naam*
+| Hier komt de naam van de applicatie die gebruik maakt van de SSD
+  Client te staan. In dit geval is dat Open Inwoner.
 
-Gemeente code
-~~~~~~~~~~~~~
-Vul hier de gemeentecode in voor zaakregistratie
+| *Gemeente code*
+| Vul hier de gemeentecode in voor zaakregistratie
+
 
 9.12.2. Mijn uitkeringen
 ------------------------
+
 Hier kunt u de begeleidende tekst invullen voor het onderdeel Mijn uitkeringen. Er is hier een groot tekstveld beschikbaar zonder uitgebreide editor.
 
 9.12.3. Maandspecificatie
@@ -375,22 +375,22 @@ Hier kunt u de begeleidende tekst invullen voor het onderdeel Mijn uitkeringen. 
 Bij maandspecificatie kunnen alle overzichten van het tabblad Maandspecificatie in het onderdeel Mijn
 uitkeringen worden geconfigureerd.
 
-Activeer document downloads
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Door hier een vinkje te zetten wordt het voor de gebruiker mogelijk documenten te downloaden.
+| *Activeer document downloads*
+| Door hier een vinkje te zetten wordt het voor de gebruiker mogelijk
+  documenten te downloaden.
 
-Toon overzichten van de recente # maanden
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Hier geeft u aan van hoeveel maanden er overzichten moeten worden weergegeven.
+| *Toon overzichten van de recente \# maanden*
+| Hier geeft u aan van hoeveel maanden er overzichten moeten worden
+  weergegeven.
 
-Overzicht beschikbaar vanaf # dag van de maand
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Hier vult u in vanaf de hoeveelste dat van een maand het nieuwe maandoverzicht beschikbaar is om te downloaden
+| *Overzicht beschikbaar vanaf \# dag van de maand*
+| Hier vult u in vanaf de hoeveelste dat van een maand het nieuwe
+  maandoverzicht beschikbaar is om te downloaden
 
-Tabblad tekst
-~~~~~~~~~~~~~
-Hier kunt u de begeleidende tekst invullen voor het maandoverzicht-tabblad binnen Mijn uitkeringen. Er
-is hier een groot tekstveld beschikbaar zonder uitgebreide editor.
+| *Tabblad tekst*
+| Hier kunt u de begeleidende tekst invullen voor het
+ maandoverzicht-tabblad binnen *Mijn uitkeringen.* Er is hier een
+ groot tekstveld beschikbaar zonder uitgebreide editor.
 
 9.12.4. Jaaropgave
 ------------------
@@ -398,25 +398,26 @@ is hier een groot tekstveld beschikbaar zonder uitgebreide editor.
 Bij Jaaropgave kunnen alle overzichten van het tabblad Maandspecificatie in het onderdeel Mijn
 uitkeringen worden geconfigureerd.
 
-Activeer document downloads
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Door hier een vinkje te zetten wordt het voor de gebruiker mogelijk documenten te downloaden.
-Toon overzichten van de afgelopen # jaren
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Hier geeft u aan van hoeveel jaar er overzichten moeten worden weergegeven.
+| *Activeer document downloads*
+| Door hier een vinkje te zetten wordt het voor de gebruiker mogelijk
+ documenten te downloaden.
 
-Jaarverzicht beschikbaar vanaf # (dag-maand)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Hier vult u in vanaf de hoeveelste dat van welke maand de nieuwe jaaropgave beschikbaar is om te downloaden
+| *Toon overzichten van de afgelopen \# jaren*
+| Hier geeft u aan van hoeveel jaar er overzichten moeten worden
+ weergegeven.
 
-Tabblad tekst
-~~~~~~~~~~~~~
-Hier kunt u de begeleidende tekst invullen voor het jaaropgave-tabblad binnen Mijn uitkeringen. Er is
-hier een groot tekstveld beschikbaar zonder uitgebreide editor.
+| *Jaarverzicht beschikbaar vanaf \# (dag-maand)*
+| Hier vult u in vanaf de hoeveelste dat van welke maand de nieuwe
+ jaaropgave beschikbaar is om te downloaden
 
-PDF helpteksten
-~~~~~~~~~~~~~~~
-Hier vult u de helptekst voor de kolommen in de jaaropgave PDF in. Deze helpteksten worden ingesloten in de PDF.
+| *Tabblad tekst*
+| Hier kunt u de begeleidende tekst invullen voor het
+ jaaropgave-tabblad binnen *Mijn uitkeringen.* Er is hier een groot
+ tekstveld beschikbaar zonder uitgebreide editor.
+
+| *PDF helpteksten*
+| Hier vult u de helptekst voor de kolommen in de jaaropgave PDF in.
+ Deze helpteksten worden ingesloten in de PDF.
 
 9.13. Services
 ==============
@@ -447,50 +448,55 @@ De catalogus, de identificatie en de omschrijving. Naast deze vaste gegevens kun
 wijzigen. U kunt aangeven of er notificaties moeten worden verstuurd en of het mogelijk moet zijn om
 documenten te uploaden ter ondersteuning van het betreffende Zaaktype.
 
-Schakel het versturen van vragen via de OpenKlant Contactmomenten in
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+| *Schakel het versturen van vragen via de OpenKlant Contactmomenten in*
+| Door hier een vinkje te zetten wordt het voor de gebruiker mogelijk
+  vragen te sturen via de contactmomenten API.
 
-Door hier een vinkje te zetten wordt het voor de gebruiker mogelijk vragen te sturen via de
-contactmomenten API.
+| *Notificeren bij statuswijzigingen*
+| Door hier een vinkje te zetten wordt de gebruiker op de hoogte gesteld
+  van veranderingen rond zijn Zaken van dit type.
 
-Notificeren bij statuswijzigingen
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Door hier een vinkje te zetten wordt de gebruiker op de hoogte gesteld van veranderingen rond zijn
-Zaken van dit type.
+| *Activeer documentuploads via URL*
+| Door een vinkje te zetten bij Activeer documentuploads via URL wordt
+  het mogelijk documenten te laten uploaden via een extern systeem dat
+  niet geïntegreerd is in het Open Inwoner Platform. Wanneer dit
+  aangevinkt is komt er een knop in beeld om naar het betreffende
+  externe systeem te gaan. Wilt u de mogelijkheid hebben om via het Open
+  Inwoner Platform bestanden te uploaden, dan klikt u dit aan bij
+  Zaaktype informatieobject configuraties.
 
-Activeer documentuploads via URL
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Door een vinkje te zetten bij Activeer documentuploads via URL wordt het mogelijk documenten te laten
-uploaden via een extern systeem dat niet geïntegreerd is in het Open Inwoner Platform. Wanneer dit
-aangevinkt is komt er een knop in beeld om naar het betreffende externe systeem te gaan. Wilt u de
-mogelijkheid hebben om via het Open Inwoner Platform bestanden te uploaden, dan klikt u dit aan bij Zaaktype informatieobject configuraties.
+.. image:: images/image74.png
+   :width: 624px
+   :height: 475px
 
-Document upload URL
-~~~~~~~~~~~~~~~~~~~~~~~
-Hier vult u de externe URL in van het systeem om een document te uploaden.
+| *Document upload URL*
+| Hier vult u de externe URL in van het systeem om een document te
+  uploaden.
 
-Omschrijving
-~~~~~~~~~~~~~~~~~~~~~~~
-Hier vult u een omschrijving in. Dit is de verduidelijking waarom een gebruiker documenten zou moeten
-uploaden voor dit zaaktype.
+| *Omschrijving*
+| Hier vult u een omschrijving in. Dit is de verduidelijking waarom een
+  gebruiker documenten zou moeten uploaden voor dit zaaktype.
 
-Relevante zaakperiode
-~~~~~~~~~~~~~~~~~~~~~
-Hier vult u het aantal maanden in waarna er moet worden teruggekeken naar Zaken van dit zaaktype.
+| *Relevante zaakperiode*
+| Hier vult u het aantal maanden in waarna er moet worden teruggekeken
+  naar Zaken van dit zaaktype.
 
-Zaaktype informatieobject configuraties
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Hier kunt u de informatieobjecten die bij het betreffende Zaaktype horen configureren. U kunt per
-informatieobject aangeven of documenten via het Open Inwoner Platform mogen worden geüpload.
-Wanneer er meerdere soorten bestanden bij een bepaald Zaaktype kunnen worden geüpload, moet de
-gebruiker per upload aangeven om wat voor soort document het gaat.
+| *Zaaktype informatieobject configuraties*
+| Hier kunt u de informatieobjecten die bij het betreffende Zaaktype
+  horen configureren. U kunt per informatieobject aangeven of documenten
+  via het Open Inwoner Platform mogen worden geüpload. Wanneer er
+  meerdere soorten bestanden bij een bepaald Zaaktype kunnen worden
+  geüpload, moet de gebruiker per upload aangeven om wat voor soort
+  document het gaat. Daarnaast kunt u notificaties activeren. Hierdoor krijgen alle gebruikers van het Open Inwoner Platform een bericht wanneer er een nieuw zaakdocument voor hen beschikbaar is. Dit kan worden gedaan door een vinkje te zetten bij de kolom ‘Activeer documentnotificaties’.
 
-Daarnaast kunt u notificaties activeren. Hierdoor krijgen alle gebruikers van het Open Inwoner Platform
-een bericht wanneer er een nieuw zaakdocument voor hen beschikbaar is. Dit kan worden gedaan door
-een vinkje te zetten bij de kolom ‘Activeer documentnotificaties’.
+**Let op! Wanneer u bij Zaaktype informatieobject configuraties het
+uploaden van bestanden activeert, vindt het uploaden plaats via het Open
+Inwoner Platform zelf en niet via een extern systeem.**
 
-**Let op! Wanneer u bij Zaaktype informatieobject configuraties het uploaden van bestanden activeert,
-vindt het uploaden plaats via het Open Inwoner Platform zelf en niet via een extern systeem.**
+.. image:: images/image75.png
+   :width: 624px
+   :height: 143px
+
 
 9.16.2. Zaaktype statustype configuraties
 -----------------------------------------
@@ -498,55 +504,59 @@ Hier kunt u de statustypes die bij het betreffende Zaaktype horen configureren. 
 en kunnen niet worden gewijzigd. De elementen die kunnen worden gewijzigd worden hier behandeld.
 Klik allereerst op ‘tonen’ om alle gegevens uit te vouwen.
 
-Statustype indicator
-~~~~~~~~~~~~~~~~~~~~
-Hier heeft u de mogelijkheid om een indicator te selecteren die voor het betreffende statustype wordt
-gebruikt. Dit is de balk die in de lijstweergave boven het statustype wordt gebruikt om extra nadruk te
-geven aan de gebruiker. Elk soort indicator (info, waarschuwing, negatief of succes) heeft zijn eigen kleur.
+| Hier kunt u de statustypes die bij het betreffende Zaaktype horen
+  configureren. Enkele gegevens zijn vast en kunnen niet worden
+  gewijzigd. De elementen die kunnen worden gewijzigd worden hier
+  behandeld. Klik allereerst op ‘tonen’ om alle gegevens uit te vouwen.
 
-Status lijstweergave tekst
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-Indien hier tekst wordt ingevuld wordt er bij de lijstweergave van Mijn Aanvragen naast de kleur ook een
-melding getoond bij weergave van een zaak met de betreffende status.
+| *Statustype indicator*
+| Hier heeft u de mogelijkheid om een indicator te selecteren die voor
+  het betreffende statustype wordt gebruikt. Dit is de balk die in de
+  lijstweergave boven het statustype wordt gebruikt om extra nadruk te
+  geven aan de gebruiker. Elk soort indicator (info, waarschuwing,
+  negatief of succes) heeft zijn eigen kleur.
 
-Notificeer bij statuswijziging
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Hier kunt u aangeven of een gebruiker een notificatie dient te krijgen wanneer een zaak de betreffende
-status krijgt. Indien aangevinkt ontvangt de gebruiker een notificatie.
+| *Status lijstweergave tekst*
+| Indien hier tekst wordt ingevuld wordt er bij de lijstweergave van
+  *Mijn Aanvragen* naast de kleur ook een melding getoond bij weergave
+  van een zaak met de betreffende status.
 
-Actie benodigd
-~~~~~~~~~~~~~~
-Hier kunt u aangeven of de e-mailnotificatie van een andere soort moet zijn dan een gewone notificatie.
-De gebruiker ontvangt een meer dwingende notificatie waaruit blijkt dat de gebruiker actie moet
-ondernemen.
+| *Notificeer bij statuswijziging*
+| Hier kunt u aangeven of een gebruiker een notificatie dient te krijgen
+  wanneer een zaak de betreffende status krijgt. Indien aangevinkt
+  ontvangt de gebruiker een notificatie.
 
-Documenten uploaden
-~~~~~~~~~~~~~~~~~~~
-Hier kunt u aangeven of een gebruiker documenten kan uploaden voor zaken met de betreffende status.
-Indien aangevinkt kunnen er voor zaken met de betreffende zaken bestanden worden geüploaded..
+| *Actie benodigd*
+| Hier kunt u aangeven of de e-mailnotificatie van een andere soort moet
+  zijn dan een gewone notificatie. De gebruiker ontvangt een meer dwingende notificatie waaruit blijkt dat de gebruiker actie moet ondernemen.
 
-Document uploadomschrijving
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Dit is de omschrijving die getoond wordt aan de gebruiker boven de uploadwidget van een zaak in Mijn
-Aanvragen. Hier heeft u de mogelijkheid een uitgebreide teksteditor te gebruiken.
+| *Documenten uploaden*
+| Hier kunt u aangeven of een gebruiker documenten kan uploaden voor
+  zaken met de betreffende status. Indien aangevinkt kunnen er voor zaken met de betreffende zaken bestanden worden geüploaded..
 
-Status detailweergave omschrijving
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Hier kunt u de getoonde tekst invullen die met worden getoond bij het openklappen van de betreffende
-status op de detailweergave van een zaak in Mijn Aanvragen. Hier heeft u de mogelijkheid een
-uitgebreide teksteditor te gebruiken.
+.. image:: images/image76.png
+   :width: 6.5in
+   :height: 8.78889in
 
-Statusknop URL
-~~~~~~~~~~~~~~
-De statusknop URL maakt een call-to-action button aan waar mensen direct hun actie kunnen uitvoeren.
-Als er hier niets is ingevuld en er is wel een mogelijkheid om bestanden te uploaden, dan staat er een
-standaard uploadwidget.
+| *Document uploadomschrijving*
+| Dit is de omschrijving die getoond wordt aan de gebruiker boven de
+  uploadwidget van een zaak in *Mijn Aanvragen.* Hier heeft u de
+  mogelijkheid een uitgebreide teksteditor te gebruiken.
 
-Statusknop label
-~~~~~~~~~~~~~~~~
-Hier vult u de tekst in die u de statusknop wilt meegeven. Denk aan de richtlijnen voor CTA-buttons.
+| *Status detailweergave omschrijving*
+| Hier kunt u de getoonde tekst invullen die met worden getoond bij het
+  openklappen van de betreffende status op de detailweergave van een
+  zaak in *Mijn Aanvragen.* Hier heeft u de mogelijkheid een uitgebreide
+  teksteditor te gebruiken.
 
-Linknaam naar detailweergave
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Hier vult u de linktekst in om van de lijstweergave naar de detailweergave te navigeren. Standaard staat
-hier “Bekijk aanvraag”.
+| *Statusknop URL*
+| De statusknop URL maakt een call-to-action button aan waar mensen
+  direct hun actie kunnen uitvoeren. Als er hier niets is ingevuld en er is wel een mogelijkheid om bestanden te uploaden, dan staat er een standaard uploadwidget.
+
+| *Statusknop label*
+| Hier vult u de tekst in die u de statusknop wilt meegeven. Denk aan de
+  richtlijnen voor CTA-buttons.
+
+| *Linknaam naar detailweergave*
+| Hier vult u de linktekst in om van de lijstweergave naar de
+  detailweergave te navigeren. Standaard staat hier “Bekijk aanvraag”.
