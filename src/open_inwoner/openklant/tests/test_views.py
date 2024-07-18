@@ -9,6 +9,7 @@ from django.utils.translation import gettext as _
 import requests_mock
 from django_webtest import WebTest
 from freezegun import freeze_time
+from pyquery import PyQuery
 from zgw_consumers.api_models.base import factory
 
 from open_inwoner.accounts.tests.factories import UserFactory
@@ -250,8 +251,15 @@ class ContactMomentViewsTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTe
 
         response = self.app.get(list_url, user=data.user)
 
-        msg = "contactmomenten__scrolldown unexpectedly found in response"
-        assert "contactmomenten__scrolldown" not in response.text, msg
+        doc = PyQuery(response.content)
+
+        contactform_scrolldown = doc.find(
+            "[data-testid='contactmomenten__contact_form_scrolldown']"
+        )
+        self.assertEqual(contactform_scrolldown, [])
+
+        contactform = doc.find("[data-testid='contactmomenten__contact_form']")
+        self.assertEqual(contactform, [])
 
     def test_show_detail_for_bsn(self, m, mock_get_kcm_answer_mapping):
         data = MockAPIReadData().install_mocks(m)

@@ -97,7 +97,7 @@ def settings(request):
         "warning_banner_background_color": config.warning_banner_background_color,
         "warning_banner_font_color": config.warning_banner_font_color,
         "eherkenning_enabled": config.eherkenning_enabled,
-        "contactmoment_contact_form": config.contactmoment_contact_form_enabled,
+        "contactmoment_contact_form_enabled": config.contactmoment_contact_form_enabled,
     }
 
     if hasattr(django_settings, "SENTRY_CONFIG"):
