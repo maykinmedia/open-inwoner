@@ -15,11 +15,10 @@ Het Open Inwoner Platform is een online omgeving waarmee een gemeente haar inwon
 5. Mijn Berichten & Samenwerken, waarmee de inwoner met een begeleider laagdrempelig kan communiceren en onderling acties kunnen afspreken
 6. Vraag & antwoordmodules voor het geven van richting aan de inwoner
 
-OIP is ontwikkeld door Maykin Media in opdracht van Dimpact voor de i4Sociaal gemeenten: Deventer, Enschede, Groningen, Leeuwarden, Zaanstad, Zwolle.
+OIP is ontwikkeld door Maykin in opdracht van Dimpact voor de i4Sociaal gemeenten: Deventer, Enschede, Groningen, Leeuwarden, Zaanstad, Zwolle.
 
 Deze documentatie is bedoeld ter introductie van OIP voor ontwikkel- en installatiedoeleinden.
-OIP kan bij Maykin Media als SaaS worden afgenomen. Een  handleiding voor functioneel beheer
-is beschikbaar voor download: :download:`Beheerhandleiding<./openinwoner-beheerhandleiding-v118.pdf>`.
+OIP kan bij Maykin als SaaS worden afgenomen.
 
 
 Documentation
@@ -28,6 +27,7 @@ Documentation
 .. toctree::
     :maxdepth: 2
 
+    beheerhandleiding/index
     architecture/index
     installation/index
     configuration/index

@@ -1,3 +1,19 @@
+/* Contextual margins */
+
+.rst-content section + h2,
+.rst-content section + h3,
+.rst-content section + h4,
+.rst-content section + h5,
+.rst-content section + section {
+    margin-top: 24px;
+}
+
+.rst-content .image-reference + p,
+.rst-content .image-reference + section,
+.rst-content .image-reference + div {
+    margin-top: 16px;
+}
+
 /* override table width restrictions */
 @media screen and (min-width: 767px) {
 
@@ -21,7 +37,6 @@
 .wy-side-nav-search {
    background-color: #04A5BB;
 }
-
 
 .rst-content a:link, .rst-content a:visited {
   color: #017092;
