@@ -1,4 +1,5 @@
 from unittest import TestCase as PlainTestCase
+from unittest.mock import patch
 
 from django.test import TestCase
 
@@ -18,9 +19,16 @@ from open_inwoner.openzaak.clients import (
     build_forms_clients,
     build_zaken_client,
     build_zaken_clients,
+    build_zgw_client_from_service,
 )
 from open_inwoner.openzaak.exceptions import MultiZgwClientProxyError
+from open_inwoner.openzaak.models import ZGWApiGroupConfig
 from open_inwoner.openzaak.tests.factories import ZGWApiGroupConfigFactory
+from open_inwoner.openzaak.tests.shared import (
+    CATALOGI_ROOT,
+    DOCUMENTEN_ROOT,
+    ZAKEN_ROOT,
+)
 
 
 class ClientFactoryTestCase(TestCase):
@@ -64,6 +72,175 @@ class ClientFactoryTestCase(TestCase):
                         getattr(self.api_groups[i], api_group_field),
                     )
                     self.assertEqual(client.configured_from.api_type, api_type)
+
+
+class ZGWApiGroupConfigFilterTests(TestCase):
+    def setUp(self):
+        self.api_groups = [
+            ZGWApiGroupConfigFactory(
+                name="Default API",
+                ztc_service__api_root=CATALOGI_ROOT,
+                zrc_service__api_root=ZAKEN_ROOT,
+                drc_service__api_root=DOCUMENTEN_ROOT,
+                form_service__api_root="http://some.forms.nl",
+            ),
+            ZGWApiGroupConfigFactory(name="Second API"),
+        ]
+
+    def test_groups_can_be_filtered_by_client(self):
+        for factory, api_type in (
+            (build_forms_clients, APITypes.orc),
+            (build_zaken_clients, APITypes.zrc),
+            (build_documenten_clients, APITypes.drc),
+            (build_catalogi_clients, APITypes.ztc),
+        ):
+            with self.subTest(
+                f"ZGWApiGroupConfig can be filtered by clients of type {api_type}"
+            ):
+                clients = factory()
+                for i, client in enumerate(clients):
+                    value = list(ZGWApiGroupConfig.objects.filter_by_zgw_client(client))
+                    expected = [self.api_groups[i]]
+                    self.assertEqual(value, expected)
+
+    def test_filtering_groups_by_client_with_non_client_type_raises(self):
+        with self.assertRaises(ValueError):
+            ZGWApiGroupConfig.objects.filter_by_zgw_client("Not a client")
+
+    def test_filter_by_service(self):
+        for api_type, api_group_field in (
+            (APITypes.orc, "form_service"),
+            (APITypes.zrc, "zrc_service"),
+            (APITypes.drc, "drc_service"),
+            (APITypes.ztc, "ztc_service"),
+        ):
+            with self.subTest(
+                f"ZGWApiGroupConfig can be filtered by services of type {api_type}"
+            ):
+                service = getattr(self.api_groups[0], api_group_field)
+
+                self.assertEqual(
+                    list(ZGWApiGroupConfig.objects.filter_by_service(service)),
+                    [self.api_groups[0]],
+                )
+
+    def test_filter_by_root_url_overlap(self):
+        for root, api_group_field in (
+            ("http://some.forms.nl", "form_service"),
+            (ZAKEN_ROOT, "zrc_service"),
+            (DOCUMENTEN_ROOT, "drc_service"),
+            (ZAKEN_ROOT, "ztc_service"),
+        ):
+            with self.subTest(
+                f"ZGWApiGroupConfig can be filtered by URL for {api_group_field}"
+            ):
+                self.assertEqual(
+                    list(ZGWApiGroupConfig.objects.filter_by_url_root_overlap(root)),
+                    [self.api_groups[0]],
+                )
+
+    def test_resolve_group_from_hints_raises_on_no_args(self):
+        with self.assertRaises(ZGWApiGroupConfig.DoesNotExist):
+            ZGWApiGroupConfig.objects.resolve_group_from_hints()
+
+    @patch(
+        "open_inwoner.openzaak.models.ZGWApiGroupConfigQuerySet.filter_by_zgw_client"
+    )
+    @patch(
+        "open_inwoner.openzaak.models.ZGWApiGroupConfigQuerySet.filter_by_url_root_overlap"
+    )
+    def test_resolve_group_from_hints_uses_service_as_highest_priority(
+        self, filter_by_zgw_client_mock, filter_by_url_root_overlap_mock
+    ):
+        for group in self.api_groups:
+            for service_field in (
+                "form_service",
+                "zrc_service",
+                "drc_service",
+                "ztc_service",
+            ):
+                service = getattr(group, service_field)
+                client = build_zgw_client_from_service(service)
+                url = service.api_root
+                self.assertEqual(
+                    ZGWApiGroupConfig.objects.resolve_group_from_hints(
+                        service=service, client=client, url=url
+                    ),
+                    group,
+                )
+
+        filter_by_zgw_client_mock.assert_not_called()
+        filter_by_url_root_overlap_mock.assert_not_called()
+
+    @patch("open_inwoner.openzaak.models.ZGWApiGroupConfigQuerySet.filter_by_service")
+    @patch(
+        "open_inwoner.openzaak.models.ZGWApiGroupConfigQuerySet.filter_by_url_root_overlap"
+    )
+    def test_resolve_group_from_hints_uses_client_as_middle_priority(
+        self, filter_by_service_mock, filter_by_url_root_overlap_mock
+    ):
+        for factory in (
+            build_forms_clients,
+            build_zaken_clients,
+            build_documenten_clients,
+            build_catalogi_clients,
+        ):
+            clients = factory()
+            for i, client in enumerate(clients):
+                for service_field in (
+                    "form_service",
+                    "zrc_service",
+                    "drc_service",
+                    "ztc_service",
+                ):
+                    service = getattr(self.api_groups[i], service_field)
+                    url = service.api_root
+                    self.assertEqual(
+                        ZGWApiGroupConfig.objects.resolve_group_from_hints(
+                            client=client, url=url
+                        ),
+                        self.api_groups[i],
+                    )
+
+                    filter_by_service_mock.assert_not_called()
+                    filter_by_url_root_overlap_mock.assert_not_called()
+
+    @patch("open_inwoner.openzaak.models.ZGWApiGroupConfigQuerySet.filter_by_service")
+    @patch(
+        "open_inwoner.openzaak.models.ZGWApiGroupConfigQuerySet.filter_by_zgw_client"
+    )
+    def test_resolve_group_from_hints_uses_url_as_lowest_priority(
+        self, filter_by_service_mock, filter_by_zgw_client_mock
+    ):
+        for group in self.api_groups:
+            for service_field in (
+                "form_service",
+                "zrc_service",
+                "drc_service",
+                "ztc_service",
+            ):
+                service = getattr(group, service_field)
+
+                self.assertEqual(
+                    ZGWApiGroupConfig.objects.resolve_group_from_hints(
+                        url=service.api_root
+                    ),
+                    group,
+                )
+
+                filter_by_service_mock.assert_not_called()
+                filter_by_zgw_client_mock.assert_not_called()
+
+    def test_resolving_to_multiple_objects_raises(self):
+        service_already_used = self.api_groups[0].ztc_service
+        ZGWApiGroupConfigFactory(
+            ztc_service=service_already_used,
+        )
+
+        with self.assertRaises(ZGWApiGroupConfig.MultipleObjectsReturned):
+            ZGWApiGroupConfig.objects.resolve_group_from_hints(
+                service=service_already_used
+            )
 
 
 @requests_mock.Mocker()
