@@ -7,18 +7,20 @@ export class TabPanel {
     this.tabHeaders = node.querySelectorAll('.tab__header')
     this.tabContent = node.querySelectorAll('.tab__content')
 
-    this.tabHeadersRow.addEventListener('click', (e) => {
-      e.preventDefault() // Prevent 'other' tab__panel from disappearing immediately
+    if (this.tabHeadersRow) {
+      this.tabHeadersRow.addEventListener('click', (e) => {
+        e.preventDefault() // Prevent 'other' tab__panel from disappearing immediately
 
-      const target = e.target.closest('.tab__header')
-      if (target) {
-        const index = [...this.tabHeaders].indexOf(target)
-        if (index !== -1) {
-          this.hideContent()
-          this.showContent(index)
+        const target = e.target.closest('.tab__header')
+        if (target) {
+          const index = [...this.tabHeaders].indexOf(target)
+          if (index !== -1) {
+            this.hideContent()
+            this.showContent(index)
+          }
         }
-      }
-    })
+      })
+    }
   }
 
   hideContent() {
