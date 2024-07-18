@@ -69,6 +69,16 @@ class ZGWApiGroupConfig(models.Model):
         null=False,
         blank=False,
     )
+
+    def _build_client_from_attr(self, attr: str):
+        from .clients import build_zgw_client_from_service
+
+        return build_zgw_client_from_service(getattr(self, attr))
+
+    @property
+    def zaken_client(self):
+        return self._build_client_from_attr("zrc_service")
+
     drc_service = models.ForeignKey(
         "zgw_consumers.Service",
         verbose_name=_("Documenten API"),
@@ -78,6 +88,11 @@ class ZGWApiGroupConfig(models.Model):
         null=False,
         blank=False,
     )
+
+    @property
+    def documenten_client(self):
+        return self._build_client_from_attr("drc_service")
+
     ztc_service = models.ForeignKey(
         "zgw_consumers.Service",
         verbose_name=_("Catalogi API"),
@@ -87,6 +102,11 @@ class ZGWApiGroupConfig(models.Model):
         null=False,
         blank=False,
     )
+
+    @property
+    def catalogi_client(self):
+        return self._build_client_from_attr("ztc_service")
+
     form_service = models.OneToOneField(
         "zgw_consumers.Service",
         verbose_name=_("Form API"),
@@ -96,6 +116,11 @@ class ZGWApiGroupConfig(models.Model):
         null=True,
         blank=True,
     )
+
+    @property
+    def forms_client(self):
+        if self.form_service:
+            return self._build_client_from_attr("form_service")
 
     class Meta:
         verbose_name = _("ZGW API set")
