@@ -187,7 +187,6 @@ INSTALLED_APPS = [
     "django_jsonform",
     "simple_certmanager",
     "zgw_consumers",
-    "notifications_api_common",
     "mail_editor",
     "ckeditor",
     "privates",
@@ -238,6 +237,12 @@ INSTALLED_APPS = [
     "djchoices",
     "django_celery_beat",
     "django_celery_monitor",
+    # Temporary fix: the notifications lib interferes with
+    # celery's task loading meachanism, which prevents certain
+    # tasks from showing up in the admin when OIP is run with
+    # Docker; this needs to be fixed this in the library eventually;
+    # for now we load it after all our apps.
+    "notifications_api_common",
 ]
 
 MIDDLEWARE = [
