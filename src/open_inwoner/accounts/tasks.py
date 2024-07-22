@@ -14,9 +14,7 @@ def schedule_user_notifications(notify_about: str, channel: str):
     """
     # Note: the return value of `collect_notifications` is passed as the first
     # (positional) argument to `process_notifications` in `celery.chain()`
-    result = celery.chain(
+    celery.chain(
         collect_notifications.s(notify_about=notify_about),
         process_notifications.s(notify_about=notify_about, channel=channel),
     ).apply_async()
-
-    return result.get()
