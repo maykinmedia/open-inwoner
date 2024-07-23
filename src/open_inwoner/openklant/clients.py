@@ -228,7 +228,7 @@ class ContactmomentenClient(APIClient):
             data = get_json_response(response)
         except (RequestException, ClientError) as exc:
             logger.exception("exception while making request", exc_info=exc)
-        return None
+            return None
 
         object_contact_moment = factory(ObjectContactMoment, data)
 
