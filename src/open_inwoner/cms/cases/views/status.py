@@ -968,19 +968,28 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
                 self.log_system_action(
                     "registered contactmoment by API", user=self.request.user
                 )
-            objectcontactmoment = contactmoment_client.create_objectcontactmoment(
-                contactmoment, self.case
-            )
-            if objectcontactmoment:
-                self.log_system_action(
-                    "registered objectcontactmoment by API", user=self.request.user
+                objectcontactmoment = contactmoment_client.create_objectcontactmoment(
+                    contactmoment, self.case
                 )
+                if objectcontactmoment:
+                    self.log_system_action(
+                        "registered objectcontactmoment by API", user=self.request.user
+                    )
+                else:
+                    self.log_system_action(
+                        "error while registering objectcontactmoment by API",
+                        user=self.request.user,
+                    )
+
+            # We'll mark this call as successful if the cotactmoment is created, independent of
+            # whether we've successfully associated the contactmoment with the case, because we
+            # still want the notification email to be sent.
             return True
-        else:
-            self.log_system_action(
-                "error while registering contactmoment by API", user=self.request.user
-            )
-            return False
+
+        self.log_system_action(
+            "error while registering contactmoment by API", user=self.request.user
+        )
+        return False
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
