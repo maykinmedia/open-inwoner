@@ -675,26 +675,32 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
 CELERY_TASK_TIME_LIMIT = config("CELERY_TASK_HARD_TIME_LIMIT", default=15 * 60)
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
-# https://docs.celeryq.dev/en/latest/userguide/periodic-tasks.html
-CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+# https://docs.celeryq.dev/en/latest/userguide/periodic-tasks.html#beat-entries
 CELERY_BEAT_SCHEDULE = {
-    "Import ZGW data": {
-        "task": "Import ZGW data",
+    # Note that the keys here will be used to give human-readable names
+    # to the periodic task entries, which will be visible to users in the
+    # admin interface. Unfortunately, we we cannot use gettext here (even
+    # in lazy mode): Django allows it, Celery does not. We could consider
+    # doing this registration in one of the Celery hooks, but until this
+    # becomes a painpoint, it's cleaner to have the schedule easily accessible
+    # here in the settings file.
+    "Importeer ZGW data": {
+        "task": "open_inwoner.openzaak.tasks.import_zgw_data",
         "schedule": crontab(minute="0", hour="7", day_of_month="*"),
     },
-    "Rebuild search index": {
-        "task": "Rebuild search index",
+    "Zoekindex opnieuw opbouwen": {
+        "task": "open_inwoner.search.tasks.rebuild_search_index",
         "schedule": crontab(minute="0", hour="4", day_of_month="*"),
     },
-    "Retry emails": {
+    "Probeer emails opnieuw te sturen": {
         "task": "django_yubin.tasks.retry_emails",
         "schedule": crontab(minute="1", hour="*", day_of_month="*"),
     },
-    "Delete old emails": {
+    "Verwijder oude emails": {
         "task": "django_yubin.tasks.delete_old_emails",
         "schedule": crontab(minute="0", hour="6", day_of_month="*"),
     },
-    "Send emails about expiring actions": {
+    "Verzend emails in het kader van taken": {
         "task": "open_inwoner.accounts.tasks.schedule_user_notifications",
         "schedule": crontab(minute="15", hour="9", day_of_month="*"),
         "kwargs": {
@@ -702,7 +708,7 @@ CELERY_BEAT_SCHEDULE = {
             "channel": "email",
         },
     },
-    "Send emails about expiring plans": {
+    "Verzend emails in het kader van samenwerkingen": {
         "task": "open_inwoner.accounts.tasks.schedule_user_notifications",
         "schedule": crontab(minute="5", hour="9", day_of_month="*"),
         "kwargs": {
@@ -710,7 +716,7 @@ CELERY_BEAT_SCHEDULE = {
             "channel": "email",
         },
     },
-    "Send emails about messages": {
+    "Verzend emails in het kader van berichten": {
         "task": "open_inwoner.accounts.tasks.schedule_user_notifications",
         "schedule": crontab(minute="*/15", hour="*", day_of_month="*"),
         "kwargs": {
