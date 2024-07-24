@@ -52,8 +52,7 @@ def process_notifications(notifications: list[dict], notify_about: str, channel:
         for notification in notifications
     )
 
-    result = task_group.apply_async()
-    return result.get()
+    task_group.apply_async()
 
 
 @app.task
