@@ -31,34 +31,37 @@
                     {% input form.invite no_label=True %}
                 {% endif %}
 
-                <h3 class="utrecht-heading-3">Notificatie voorkeuren</h3>
 
-                {# Start of multiple checkbox fields #}
-                <ul class="choice-list choice-list-multiple">
+                {% if config.any_notifications_enabled %}
+                <h3 class="utrecht-heading-3">{% trans "Notification preferences" %}</h3>
 
-                    {% if form.cases_notifications %}
-                        <li class="choice-list-multiple__item">
-                            <div class="choice-list-multiple__content">
-                                {% checkbox form.cases_notifications %}
-                            </div>
-                        </li>
-                    {% endif %}
+                    {# Start of multiple checkbox fields #}
+                    <ul class="choice-list choice-list-multiple">
 
-                    {% if form.messages_notifications %}
-                        <li class="choice-list-multiple__item">
-                            <div class="choice-list-multiple__content">
-                                {% checkbox form.messages_notifications %}</div>
-                        </li>
-                    {% endif %}
+                        {% if form.cases_notifications %}
+                            <li class="choice-list-multiple__item">
+                                <div class="choice-list-multiple__content">
+                                    {% checkbox form.cases_notifications %}
+                                </div>
+                            </li>
+                        {% endif %}
 
-                    {% if form.plans_notifications %}
-                        <li class="choice-list-multiple__item">
-                            <div class="choice-list-multiple__content">
-                                {% checkbox form.plans_notifications %}</div>
-                        </li>
-                    {% endif %}
-                </ul>
-                {# End of multiple checkbox fields #}
+                        {% if form.messages_notifications %}
+                            <li class="choice-list-multiple__item">
+                                <div class="choice-list-multiple__content">
+                                    {% checkbox form.messages_notifications %}</div>
+                            </li>
+                        {% endif %}
+
+                        {% if form.plans_notifications %}
+                            <li class="choice-list-multiple__item">
+                                <div class="choice-list-multiple__content">
+                                    {% checkbox form.plans_notifications %}</div>
+                            </li>
+                        {% endif %}
+                    </ul>
+                {% endif %}
+                    {# End of multiple checkbox fields #}
 
                 {# Info on notifications that cannot be disabled #}
                 <div class="choice-list__information">

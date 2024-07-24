@@ -197,16 +197,25 @@ class NecessaryUserForm(ErrorMessageMixin, forms.ModelForm):
     def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        config = SiteConfiguration.get_solo()
+
         self.fields["first_name"].required = True
         self.fields["infix"].required = False
         self.fields["last_name"].required = True
 
         # notifications
-        if not (user.login_type == LoginTypeChoices.digid and case_page_is_published()):
+        if (
+            not user.login_type == LoginTypeChoices.digid
+            or not config.notifications_cases_enabled
+            or not case_page_is_published()
+        ):
             del self.fields["cases_notifications"]
-        if not inbox_page_is_published():
+        if not config.notifications_messages_enabled or not inbox_page_is_published():
             del self.fields["messages_notifications"]
-        if not collaborate_page_is_published():
+        if (
+            not config.notifications_plans_enabled
+            or not collaborate_page_is_published()
+        ):
             del self.fields["plans_notifications"]
 
         if user.is_digid_user_with_brp:
@@ -318,16 +327,22 @@ class UserNotificationsForm(forms.ModelForm):
     def __init__(self, user, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
+        config = SiteConfiguration.get_solo()
+
         if (
-            not case_page_is_published()
+            not config.notifications_cases_enabled
+            or not case_page_is_published()
             or not user.login_type == LoginTypeChoices.digid
         ):
             del self.fields["cases_notifications"]
 
-        if not inbox_page_is_published():
+        if not config.notifications_messages_enabled or not inbox_page_is_published():
             del self.fields["messages_notifications"]
 
-        if not collaborate_page_is_published():
+        if (
+            not config.notifications_plans_enabled
+            or not collaborate_page_is_published()
+        ):
             del self.fields["plans_notifications"]
 
 

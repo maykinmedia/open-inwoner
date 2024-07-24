@@ -54,7 +54,10 @@ from ...bootstrap.siteconfig import SiteConfigurationStep
     SITE_SEARCH_FILTER_CATEGORIES=False,
     SITE_SEARCH_FILTER_TAGS=False,
     SITE_SEARCH_FILTER_ORGANIZATIONS=False,
-    SITE_EMAIL_NEW_MESSAGE=False,
+    SITE_NOTIFICATIONS_ACTIONS_ENABLED=False,
+    SITE_NOTIFICATIONS_PLANS_ENABLED=False,
+    SITE_NOTIFICATIONS_MESSAGES_ENABLED=False,
+    SITE_NOTIFICATIONS_CASES_ENABLED=False,
     SITE_EMAIL_VERIFICATION_REQUIRED=False,
     SITE_RECIPIENTS_EMAIL_DIGEST=["test1@test.nl", "test2@test.nl"],
     SITE_CONTACT_PHONENUMBER="12345",
@@ -137,7 +140,10 @@ class SiteConfigurationSetupTest(TestCase):
         self.assertFalse(config.search_filter_categories),
         self.assertFalse(config.search_filter_tags),
         self.assertFalse(config.search_filter_organizations),
-        self.assertFalse(config.email_new_message),
+        self.assertFalse(config.notifications_actions_enabled),
+        self.assertFalse(config.notifications_cases_enabled),
+        self.assertFalse(config.notifications_messages_enabled),
+        self.assertFalse(config.notifications_plans_enabled),
         self.assertEqual(
             config.recipients_email_digest, ["test1@test.nl", "test2@test.nl"]
         ),

@@ -1,7 +1,7 @@
 import logging
 from unittest.mock import Mock, patch
 
-from django.test import TestCase, override_settings
+from django.test import RequestFactory, TestCase, override_settings
 
 import requests_mock
 from freezegun import freeze_time
@@ -10,6 +10,8 @@ from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.openzaak.api.views import ZakenNotificationsWebhookView
 from open_inwoner.openzaak.notifications import (
     _handle_status_update,
     handle_zaken_notification,
@@ -66,7 +68,15 @@ class StatusNotificationHandlerTestCase(
             statustype_url=data.status_type_final["url"],
         )
 
-        handle_zaken_notification(data.status_notification)
+        request = RequestFactory().get("/")
+        webhook_view = ZakenNotificationsWebhookView()
+        webhook_view.setup(request)
+
+        config = SiteConfiguration.get_solo()
+        config.notifications_cases_enabled = True
+        config.save()
+
+        webhook_view.handle_notification(data.status_notification)
 
         mock_handle.assert_called_once()
 
@@ -81,6 +91,39 @@ class StatusNotificationHandlerTestCase(
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
+
+    def test_case_notifications_disabled(self, m, mock_handle: Mock):
+        data = MockAPIData().install_mocks(m)
+
+        # Added for https://taiga.maykinmedia.nl/project/open-inwoner/task/1904
+        # In eSuite it is possible to reuse a StatusType for multiple ZaakTypen, which
+        # led to errors when retrieving the ZaakTypeStatusTypeConfig. This duplicate
+        # config is added to verify that that issue was solved
+        ztc = ZaakTypeConfigFactory.create(
+            catalogus__url=data.zaak_type["catalogus"],
+            identificatie=data.zaak_type["identificatie"],
+        )
+        ZaakTypeStatusTypeConfigFactory.create(
+            omschrijving=data.status_type_final["omschrijving"],
+            statustype_url=data.status_type_final["url"],
+        )
+        ZaakTypeStatusTypeConfigFactory.create(
+            zaaktype_config=ztc,
+            omschrijving=data.status_type_final["omschrijving"],
+            statustype_url=data.status_type_final["url"],
+        )
+
+        request = RequestFactory().get("/")
+        webhook_view = ZakenNotificationsWebhookView()
+        webhook_view.setup(request)
+
+        config = SiteConfiguration.get_solo()
+        config.notifications_cases_enabled = False
+        config.save()
+
+        webhook_view.handle_notification(data.status_notification)
+
+        mock_handle.assert_not_called()
 
     # start of generic checks
 

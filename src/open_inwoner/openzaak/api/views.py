@@ -1,12 +1,12 @@
 import logging
 
 from notifications_api_common.api.serializers import NotificatieSerializer
-from notifications_api_common.models import Subscription
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from zgw_consumers.api_models.base import factory
 
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openzaak.api_models import Notification
 from open_inwoner.openzaak.auth import get_valid_subscription_from_request
 from open_inwoner.openzaak.exceptions import InvalidAuth
@@ -30,9 +30,7 @@ class NotificationsWebhookBaseView(APIView):
     authentication_classes = []
     permission_classes = []
 
-    def handle_notification(
-        self, subscription: Subscription, notification: Notification
-    ) -> None:
+    def handle_notification(self, notification: Notification) -> None:
         raise NotImplementedError("extend and override this method")
 
     def post(self, request):
@@ -75,7 +73,7 @@ class NotificationsWebhookBaseView(APIView):
 
         # call actual handler
         try:
-            self.handle_notification(subscription, notification)
+            self.handle_notification(notification)
         except Exception as e:
             # handler had an error
             log_system_action(
@@ -95,7 +93,8 @@ class ZakenNotificationsWebhookView(NotificationsWebhookBaseView):
         "zaken",
     ]
 
-    def handle_notification(
-        self, subscription: Subscription, notification: Notification
-    ):
+    def handle_notification(self, notification: Notification):
+        config = SiteConfiguration.get_solo()
+        if not config.notifications_cases_enabled:
+            return
         handle_zaken_notification(notification)

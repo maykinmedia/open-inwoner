@@ -359,11 +359,34 @@ class SiteConfiguration(SingletonModel):
     )
 
     # email notifications
-    # TODO: remove/replace with notification fields below
-    email_new_message = models.BooleanField(
-        verbose_name=_("Send email about a new message"),
+    notifications_messages_enabled = models.BooleanField(
+        verbose_name=_("User notifications for messages"),
         default=True,
-        help_text=_("Whether to send email about each new message the user receives"),
+        help_text=_(
+            "Notify users of new messages (if set, individual users can still opt out)"
+        ),
+    )
+    notifications_actions_enabled = models.BooleanField(
+        verbose_name=_("User notifications for expiring actions"),
+        default=True,
+        help_text=_(
+            "Notify users of expiring actions (if set, individual users can still opt out)"
+        ),
+    )
+    notifications_plans_enabled = models.BooleanField(
+        verbose_name=_("User notifications for expiring plans"),
+        default=True,
+        help_text=_(
+            "Notify users of expiring plans (if set, individual users can still opt out)"
+        ),
+    )
+    notifications_cases_enabled = models.BooleanField(
+        verbose_name=_("User notifications for cases"),
+        default=True,
+        help_text=_(
+            "Notify users of upddates to cases or if an action is required "
+            "(if set, individual users can still opt out)"
+        ),
     )
     recipients_email_digest = ArrayField(
         models.EmailField(),
@@ -566,28 +589,6 @@ class SiteConfiguration(SingletonModel):
         ),
     )
 
-    # notifications
-    # TODO: for case notifications: create property that checks for existence of notificaties webhook;
-    #       or: fetch Subscription.objects.all(), check if there is a sub st. 'zaken' in sub.channels
-    #       also: add note here as well as in admin about this
-
-    # notifications_messages_enabled = models.BooleanField(
-    #     verbose_name=_("Enable notifications for messages"),
-    #     default=True,
-    #     help_text=_(
-    #         "If checked, the user will have the option to receive notifications for new messages "
-    #         "(on registration and in the profile)"
-    #     ),
-    # )
-    # notifications_plans_enabled = models.BooleanField(
-    #     verbose_name=_("Enable notifications for plans"),
-    #     default=True,
-    #     help_text=_(
-    #         "If checked, the user will have the option to receive notifications for plans + actions "
-    #         "(on registration and in the profile)"
-    #     ),
-    # )
-
     class Meta:
         verbose_name = _("Site Configuration")
 
@@ -638,6 +639,15 @@ class SiteConfiguration(SingletonModel):
     @property
     def openid_enabled_for_regular_users(self):
         return self.openid_display == OpenIDDisplayChoices.regular
+
+    @property
+    def any_notifications_enabled(self) -> bool:
+        return (
+            self.notifications_actions_enabled
+            or self.notifications_messages_enabled
+            or self.notifications_plans_enabled
+            or self.notifications_cases_enabled
+        )
 
     def get_help_text(self, request) -> str | None:
         match = request.resolver_match
