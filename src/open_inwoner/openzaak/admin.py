@@ -5,6 +5,7 @@ from django.forms import ModelForm, Textarea
 from django.forms.models import BaseInlineFormSet
 from django.utils.translation import gettext_lazy as _, ngettext
 
+from import_export.admin import ImportExportMixin
 from solo.admin import SingletonModelAdmin
 
 from open_inwoner.ckeditor5.widgets import CKEditorWidget
@@ -244,7 +245,7 @@ class ZaakTypeResultaattypeConfigInline(admin.StackedInline):
 
 
 @admin.register(ZaakTypeConfig)
-class ZaakTypeConfigAdmin(admin.ModelAdmin):
+class ZaakTypeConfigAdmin(ImportExportMixin, admin.ModelAdmin):
     inlines = [
         ZaakTypeInformatieObjectTypeConfigInline,
         ZaakTypeStatusTypeConfigInline,
