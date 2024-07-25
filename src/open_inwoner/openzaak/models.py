@@ -1,5 +1,7 @@
+import logging
 import warnings
 from datetime import timedelta
+from typing import Protocol
 from urllib.parse import urlparse
 
 from django.db import models, transaction
@@ -12,6 +14,7 @@ from furl import furl
 from solo.models import SingletonModel
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 from zgw_consumers.constants import APITypes
+from zgw_consumers.models import Service
 
 from open_inwoner.openzaak.managers import (
     UserCaseInfoObjectNotificationManager,
@@ -22,6 +25,8 @@ from open_inwoner.openzaak.managers import (
 )
 
 from .constants import StatusIndicators
+
+logger = logging.getLogger(__name__)
 
 
 def generate_default_file_extensions():
@@ -48,8 +53,123 @@ def generate_default_file_extensions():
     )
 
 
+class _ZgwClient(Protocol):  # Typing helper to avoid circular imports from .clients
+    configured_from: Service
+
+
+class ZGWApiGroupConfigQuerySet(models.QuerySet):
+    def resolve_group_from_hints(
+        self,
+        *,
+        service: Service | None = None,
+        client: _ZgwClient | None = None,
+        url: str | None = None,
+    ):
+        """Resolve the group based on the provided hints.
+
+        This method will raise if the hints resolve to none or more than 1
+        ZGWApiGroupConfig instances.
+        """
+        qs = self.all()
+        strategies_with_multiple_results = []
+
+        # Priority matters here: the strategies are tried in descending order
+        # of certainty, beginning with the simplest case. If there is only
+        # group, there is nothing to resolve.
+        if qs.count() == 1:
+            logger.debug("Resolved ZGWApiGroupConfig to only option")
+            return qs.first()
+
+        if service:
+            service_strategy_qs = qs.filter_by_service(service=service)
+            if (service_strategy_qs_count := service_strategy_qs.count()) == 1:
+                logger.debug("Resolved ZGWApiGroupConfig based on service")
+                return service_strategy_qs.first()
+
+            if service_strategy_qs_count > 1:
+                strategies_with_multiple_results.append("service")
+
+        if client:
+            zgw_client_strategy_qs = qs.filter_by_zgw_client(client)
+            if (zgw_client_strategy_qs_count := zgw_client_strategy_qs.count()) == 1:
+                logger.debug("Resolved ZGWApiGroupConfig based on zgw client")
+                return zgw_client_strategy_qs.first()
+
+            if zgw_client_strategy_qs_count > 1:
+                strategies_with_multiple_results.append("client")
+
+        if url:
+            url_strategy_qs = qs.filter_by_url_root_overlap(url)
+            if (url_strategy_qs_count := url_strategy_qs.count()) == 1:
+                logger.debug("Resolved ZGWApiGroupConfig by url")
+                return url_strategy_qs.first()
+
+            if url_strategy_qs_count > 1:
+                strategies_with_multiple_results.append("url")
+
+        if strategies_with_multiple_results:
+            # This shouldn't happen in the wild, but it's hard to predict without production
+            # usage, so this is solely to ensure we get a Sentry ping.
+            # Also: https://www.xkcd.com/2200/
+            logger.error(
+                "Strategies for resolving ZGWApiGroupConfig yielded multiple results for "
+                "strategies: %s",
+                strategies_with_multiple_results,
+            )
+            raise ZGWApiGroupConfig.MultipleObjectsReturned
+
+        raise ZGWApiGroupConfig.DoesNotExist
+
+    def filter_by_service(self, service: Service):
+        return self.filter(
+            models.Q(zrc_service=service)
+            | models.Q(ztc_service=service)
+            | models.Q(drc_service=service)
+            | models.Q(form_service=service)
+        )
+
+    def filter_by_zgw_client(self, client: _ZgwClient):
+        from .clients import CatalogiClient, DocumentenClient, FormClient, ZakenClient
+
+        match client:
+            case ZakenClient():
+                return self.filter(zrc_service=client.configured_from)
+            case CatalogiClient():
+                return self.filter(ztc_service=client.configured_from)
+            case DocumentenClient():
+                return self.filter(drc_service=client.configured_from)
+            case FormClient():
+                return self.filter(form_service=client.configured_from)
+            case _:
+                raise ValueError(
+                    f"Client is of type {type(client)} but expected to be one of: "
+                    "ZakenClient, DocumentenClient, FormClient, CatalogiClient"
+                )
+
+    def filter_by_url_root_overlap(self, url: str):
+        filtered_group_ids = set()
+        for group in self.all():
+            for field in ("form_service", "zrc_service", "drc_service", "ztc_service"):
+                service = getattr(group, f"{field}", None)
+                if not service:
+                    continue
+
+                parsed_service_root = urlparse(service.api_root)
+                parsed_url = urlparse(url)
+
+                same_netloc = parsed_service_root.netloc == parsed_url.netloc
+                same_protocol = parsed_service_root.scheme == parsed_url.scheme
+
+                if same_netloc and same_protocol:
+                    filtered_group_ids.add(group.id)
+
+        return self.filter(id__in=filtered_group_ids)
+
+
 class ZGWApiGroupConfig(models.Model):
     """A set of of ZGW service configurations."""
+
+    objects = models.Manager.from_queryset(ZGWApiGroupConfigQuerySet)()
 
     open_zaak_config = models.ForeignKey(
         "openzaak.OpenZaakConfig", on_delete=models.PROTECT, related_name="api_groups"
