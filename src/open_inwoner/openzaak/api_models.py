@@ -83,6 +83,7 @@ class Zaak(ZGWModel):
             result_text = glom_multiple(
                 self,
                 (
+                    "resultaat.resultaattype.naam",
                     "resultaat.resultaattype.omschrijving",
                     "resultaat.resultaattype.omschrijving_generiek",
                     "resultaat.resultaattype.resultaattypeomschrijving",
@@ -229,6 +230,9 @@ class ResultaatType(ZGWModel):
     archiefnominatie: str = ""
     archiefactietermijn: Optional[relativedelta] = None
     brondatum_archiefprocedure: Optional[dict] = None
+
+    # E-suite compatibility
+    naam: str = ""  # for result description ("omschrijving") with >20 chars
 
 
 @dataclass
