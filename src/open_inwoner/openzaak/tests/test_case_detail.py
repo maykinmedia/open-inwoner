@@ -36,6 +36,7 @@ from open_inwoner.openzaak.constants import StatusIndicators
 from open_inwoner.openzaak.tests.factories import (
     ZaakTypeConfigFactory,
     ZaakTypeInformatieObjectTypeConfigFactory,
+    ZaakTypeResultaatTypeConfigFactory,
     ZaakTypeStatusTypeConfigFactory,
 )
 from open_inwoner.utils.test import (
@@ -127,7 +128,7 @@ class TestCaseDetailView(
 
         #
         # Catalogi API (ZTC)
-        # https://test.openzaak.nl/catalogi/api/v1/schema/
+        # https://vng-realisatie.github.io/gemma-zaken/standaard/catalogi/
         #
         self.zaaktype = generate_oas_component_cached(
             "ztc",
@@ -223,10 +224,20 @@ class TestCaseDetailView(
             richting="inkomend",
             statustype=self.status_type_finish,
         )
+        self.resultaattype_with_naam = generate_oas_component_cached(
+            "ztc",
+            "schemas/ResultaatType",
+            url=f"{CATALOGI_ROOT}resultaattypen/3dc5e2d3-ed72-41ec-a91e-000f72a7b291",
+            zaaktype=self.zaaktype["url"],
+            omschrijving="Short description",
+            resultaattypeomschrijving="http://example.com",
+            selectielijstklasse="http://example.com",
+            esuite_compat_naam="Long description (>20 chars) of result",
+        )
 
         #
         # Documenten API (DRC)
-        # https://test.openzaak.nl/documenten/api/v1/schema/
+        # https://vng-realisatie.github.io/gemma-zaken/standaard/documenten/
         #
         self.informatie_object = generate_oas_component_cached(
             "drc",
@@ -295,7 +306,7 @@ class TestCaseDetailView(
 
         #
         # Zaken API (ZRC)
-        # https://test.openzaak.nl/zaken/api/v1/schema/
+        # https://vng-realisatie.github.io/gemma-zaken/standaard/zaken/
         #
         self.zaak = generate_oas_component_cached(
             "zrc",
@@ -428,7 +439,7 @@ class TestCaseDetailView(
             "schemas/Resultaat",
             uuid="a44153aa-ad2c-6a07-be75-15add5113",
             url=self.zaak["resultaat"],
-            resultaattype=f"{CATALOGI_ROOT}resultaattypen/b1a268dd-4322-47bb-a930-b83066b4a32c",
+            resultaattype=self.resultaattype_with_naam["url"],
             zaak=self.zaak["url"],
             toelichting="resultaat toelichting",
         )
@@ -594,6 +605,7 @@ class TestCaseDetailView(
             self.informatie_object,
             self.informatie_object_2,
             self.informatie_object_invisible,
+            self.resultaattype_with_naam,
             self.zaaktype_informatie_object_type,
             self.status_type_new,
             self.status_type_in_behandeling,
@@ -726,6 +738,13 @@ class TestCaseDetailView(
             case_link_text="Bekijk aanvraag",
         )
 
+        ZaakTypeResultaatTypeConfigFactory.create(
+            zaaktype_config=self.zaaktype_config,
+            resultaattype_url=self.resultaattype_with_naam["url"],
+            omschrijving=self.resultaattype_with_naam["omschrijving"],
+            zaaktype_uuids=[self.zaaktype["uuid"]],
+        )
+
         self._setUpMocks(m)
         status_new_obj, status_finish_obj = factory(
             Status, [self.status_new, self.status_finish]
@@ -779,7 +798,7 @@ class TestCaseDetailView(
                 ],
                 "initiator": "Foo Bar van der Bazz",
                 "result": "resultaat toelichting",
-                "result_description": "",
+                "result_description": "Long description (>20 chars) of result",
                 "case_type_config_description": "",
                 "case_type_document_upload_description": "",
                 "internal_upload_enabled": False,
@@ -901,7 +920,7 @@ class TestCaseDetailView(
                 ],
                 "initiator": "Foo Bar van der Bazz",
                 "result": "resultaat toelichting",
-                "result_description": "",
+                "result_description": "Long description (>20 chars) of result",
                 "case_type_config_description": "",
                 "case_type_document_upload_description": "",
                 "internal_upload_enabled": False,

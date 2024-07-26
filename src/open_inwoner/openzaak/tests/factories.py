@@ -17,6 +17,7 @@ from open_inwoner.openzaak.models import (
     UserCaseStatusNotification,
     ZaakTypeConfig,
     ZaakTypeInformatieObjectTypeConfig,
+    ZaakTypeResultaatTypeConfig,
     ZaakTypeStatusTypeConfig,
     ZGWApiGroupConfig,
 )
@@ -88,6 +89,13 @@ class ZaakTypeConfigFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = ZaakTypeConfig
+
+
+class ZaakTypeResultaatTypeConfigFactory(factory.django.DjangoModelFactory):
+    zaaktype_config = factory.SubFactory(ZaakTypeConfigFactory)
+
+    class Meta:
+        model = ZaakTypeResultaatTypeConfig
 
 
 class ZaakTypeInformatieObjectTypeConfigFactory(factory.django.DjangoModelFactory):

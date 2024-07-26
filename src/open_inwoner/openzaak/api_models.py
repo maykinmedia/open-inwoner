@@ -232,7 +232,8 @@ class ResultaatType(ZGWModel):
     brondatum_archiefprocedure: Optional[dict] = None
 
     # E-suite compatibility
-    naam: str = ""  # for result description ("omschrijving") with >20 chars
+    # result description ("omschrijving") with >20 chars
+    esuite_compat_naam: str = ""
 
 
 @dataclass
