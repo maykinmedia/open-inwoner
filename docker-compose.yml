@@ -1,5 +1,17 @@
-# Inspired by https://docs.docker.com/compose/django/
-version: '3'
+#
+# Docker-compose for full Open Inwoner stack.
+#
+# DISCLAIMER: THIS IS FOR DEVELOPMENT PURPOSES ONLY AND NOT SUITABLE FOR PRODUCTION.
+#
+# You can use this docker-compose to spin up a local Open Inwoner stack for demo/try-out
+# purposes, or to get some insight in the various components involved (e.g. to build
+# your Helm charts from). Note that various environment variables are UNSAFE and merely
+# specified so that you can get up and running with the least amount of friction.
+#
+# Before deploying to production, please review the environment configuration reference:
+# https://open-inwoner.readthedocs.io/
+#
+version: '3.4'
 
 services:
   db:
@@ -44,6 +56,8 @@ services:
   web:
     build: &web_build
       context: .
+      args:
+        RELEASE: ${TAG:-latest}
     container_name: open-inwoner-web
     image: maykinmedia/open-inwoner:${TAG:-latest}
     environment: &web_env
@@ -60,9 +74,22 @@ services:
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - CELERY_LOGLEVEL=DEBUG
       - ES_HOST=elasticsearch
+      # Needed for Celery Flower to match the TIME_ZONE configured in the
+      # settings used by workers and beat containers.
+      - TZ=Europe/Amsterdam
+      # WARNING: Strictly for development!
       - DISABLE_2FA=${DISABLE_2FA:-True}
       - DEBUG=True
       - IS_HTTPS=no
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; exit(requests.head('http://localhost:8000/admin/').status_code not in [200, 302])"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      # This should allow for enough time for migrations to run before the max
+      # retries have passed. This healthcheck in turn allows other containers
+      # to wait for the database migrations.
+      start_period: 60s
     volumes: &web_volumes
       - media:/app/media
       - private_media:/app/private_media
@@ -91,10 +118,44 @@ services:
     image: maykinmedia/open-inwoner:${TAG:-latest}
     environment: *web_env
     command: /celery_worker.sh
+    healthcheck:
+      test: ["CMD", "python", "/app/bin/check_celery_worker_liveness.py"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     volumes: *web_volumes
     depends_on:
-      - db
-      - redis
+      web:
+        # This health check condition is needed because Celery Beat will 
+        # try to convert the CELERY_BEAT_SCHEDULE into database entries. For 
+        # this, migrations need to be finished. If Celery tasks were still 
+        # pending, the database also needs to be ready for Celery itself. We 
+        # therefore have the health check here, and make Celery beat and 
+        # monitor containers depend on the celery container.
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - openinwoner-dev
+
+  celery-beat:
+    build: *web_build
+    image: maykinmedia/open-inwoner:${TAG:-latest}
+    environment: *web_env
+    command: /celery_beat.sh
+    depends_on:
+      - celery
+    networks:
+      - openinwoner-dev
+
+  celery-monitor:
+    build: *web_build
+    image: maykinmedia/open-inwoner:${TAG:-latest}
+    environment: *web_env
+    command: /celery_monitor.sh
+    depends_on:
+      - celery
     networks:
       - openinwoner-dev
 
