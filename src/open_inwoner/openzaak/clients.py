@@ -102,7 +102,7 @@ class ZakenClient(ZgwAPIClient):
         :param:max_requests - used to limit the number of requests to list_zaken resource.
         :param:identificatie - used to filter the cases by a specific identification
         """
-        config = OpenZaakConfig.get_solo()
+        config = OpenZaakConfig.objects.get()
 
         params = {
             "rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn": user_bsn,
@@ -155,7 +155,7 @@ class ZakenClient(ZgwAPIClient):
         if not kvk_or_rsin:
             return []
 
-        config = OpenZaakConfig.get_solo()
+        config = OpenZaakConfig.objects.get()
 
         params = {
             "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId": kvk_or_rsin,
