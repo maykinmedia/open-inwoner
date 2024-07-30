@@ -6,9 +6,10 @@ from unittest.mock import patch
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.test import TransactionTestCase
+from django.test import TestCase, TransactionTestCase
 from django.test.utils import override_settings
 from django.urls import reverse_lazy
+from django.utils.translation import gettext as _
 
 import requests_mock
 from django_webtest import TransactionWebTest
@@ -18,6 +19,7 @@ from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory, eHerkenningUserFactory
+from open_inwoner.cms.cases.forms import CaseFilterForm
 from open_inwoner.cms.cases.views.cases import InnerCaseListView
 from open_inwoner.openzaak.tests.shared import FORMS_ROOT
 from open_inwoner.utils.test import (
@@ -603,6 +605,36 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                 },
             )
 
+    def test_filter_cases_simple(self, m):
+        for mock in self.mocks:
+            mock._setUpMocks(m)
+
+        self.client.force_login(user=self.user)
+        inner_url = f"{reverse_lazy('cases:cases_content')}?status=Initial+request"
+
+        response = self.client.get(inner_url, HTTP_HX_REQUEST="true")
+        cases = response.context["cases"]
+
+        self.assertEqual(len(cases), 4)
+        for case in cases:
+            self.assertEqual(case["current_status"], "Initial request")
+
+    def test_filter_cases_multiple(self, m):
+        for mock in self.mocks:
+            mock._setUpMocks(m)
+
+        self.client.force_login(user=self.user)
+        inner_url = f"{reverse_lazy('cases:cases_content')}?status=Initial+request&status=Statustekst+finish"
+
+        response = self.client.get(inner_url, HTTP_HX_REQUEST="true")
+        cases = response.context["cases"]
+
+        self.assertEqual(len(cases), 6)
+        for case in cases:
+            self.assertIn(
+                case["current_status"], ["Initial request", "Statustekst finish"]
+            )
+
     @set_kvk_branch_number_in_session(None)
     def test_list_cases_for_eherkenning_user(self, m):
         for mock in self.mocks:
@@ -1066,4 +1098,30 @@ class CaseSubmissionTest(TransactionWebTest):
         self.assertEqual(
             cases[0]["datum_laatste_wijziging"].strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
             data.submission_2["datumLaatsteWijziging"],
+        )
+
+
+class CaseFilterFormTest(TestCase):
+    def test_case_filter_form_valid(self):
+        form = CaseFilterForm(
+            status_freqs={"Start": 2, "Intermediate": 2, "Finish": 3},
+            data={"status": ["Start", "Intermediate"]},
+        )
+
+        self.assertTrue(form.is_valid())
+
+    def test_case_filter_form_errors(self):
+        form = CaseFilterForm(
+            status_freqs={"Start": 2, "Intermediate": 2, "Finish": 3},
+            data={"status": ["Start", "Bogus"]},
+        )
+
+        self.assertFalse(form.is_valid())
+        self.assertEqual(
+            form.errors,
+            {
+                "status": [
+                    _("Selecteer een geldige keuze. Bogus is geen beschikbare keuze.")
+                ]
+            },
         )
