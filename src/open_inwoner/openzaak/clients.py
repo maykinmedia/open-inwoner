@@ -731,6 +731,10 @@ class MultiZgwClientProxyResult:
     def successful_responses(self) -> list[ZgwClientResponse]:
         return list(r for r in self if r.exception is None)
 
+    @property
+    def truthy_responses(self) -> list[ZgwClientResponse]:
+        return list(row for row in self.successful_responses if row.result)
+
     def raise_on_failures(self):
         """Raise a MultiZgwClientProxyError wrapping all errors raised by the clients."""
         if not self.has_errors:
