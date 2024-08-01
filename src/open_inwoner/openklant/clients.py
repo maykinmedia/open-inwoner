@@ -263,7 +263,7 @@ class ContactmomentenClient(APIClient):
         return object_contact_momenten
 
     def retrieve_objectcontactmomenten_for_contactmoment(
-        self, contactmoment: ContactMoment, zaken_client
+        self, contactmoment: ContactMoment
     ) -> list[ObjectContactMoment]:
         try:
             response = self.get(
@@ -276,21 +276,6 @@ class ContactmomentenClient(APIClient):
             return []
 
         object_contact_momenten = factory(ObjectContactMoment, all_data)
-
-        # resolve linked resources
-        if zaken_client:
-            object_mapping = {}
-            for ocm in object_contact_momenten:
-                assert ocm.contactmoment == contactmoment.url
-                ocm.contactmoment = contactmoment
-                if ocm.object_type == "zaak":
-                    object_url = ocm.object
-                    # Avoid fetching the same object, if multiple relations with the same object exist
-                    if ocm.object in object_mapping:
-                        ocm.object = object_mapping[object_url]
-                    else:
-                        ocm.object = zaken_client.fetch_case_by_url_no_cache(ocm.object)
-                        object_mapping[object_url] = ocm.object
 
         return object_contact_momenten
 
@@ -322,12 +307,10 @@ class ContactmomentenClient(APIClient):
         return klanten_contact_moments
 
     def retrieve_objectcontactmomenten_for_object_type(
-        self, contactmoment: ContactMoment, object_type: str, zaken_client
+        self, contactmoment: ContactMoment, object_type: str
     ) -> list[ObjectContactMoment]:
 
-        moments = self.retrieve_objectcontactmomenten_for_contactmoment(
-            contactmoment, zaken_client
-        )
+        moments = self.retrieve_objectcontactmomenten_for_contactmoment(contactmoment)
 
         # eSuite doesn't implement a `object_type` query parameter
         ret = [moment for moment in moments if moment.object_type == object_type]
@@ -335,10 +318,10 @@ class ContactmomentenClient(APIClient):
         return ret
 
     def retrieve_objectcontactmoment(
-        self, contactmoment: ContactMoment, object_type: str, zaken_client
+        self, contactmoment: ContactMoment, object_type: str
     ) -> ObjectContactMoment | None:
         ocms = self.retrieve_objectcontactmomenten_for_object_type(
-            contactmoment, object_type, zaken_client
+            contactmoment, object_type
         )
         if ocms:
             return ocms[0]

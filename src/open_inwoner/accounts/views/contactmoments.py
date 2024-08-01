@@ -226,10 +226,7 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
         case_url = None
         ctx["zaak"] = None
         if client := build_contactmomenten_client():
-            # Note: we cannot be sure which zaken_client to pass here. However, given that it
-            # is only used to resolve the zaak, and we do that anyway below, it is safe to pass
-            # None.
-            ocm = client.retrieve_objectcontactmoment(kcm.contactmoment, "zaak", None)
+            ocm = client.retrieve_objectcontactmoment(kcm.contactmoment, "zaak")
             if ocm and ocm.object_type == "zaak":
                 zaak_url = ocm.object
                 groups = list(ZGWApiGroupConfig.objects.all())
