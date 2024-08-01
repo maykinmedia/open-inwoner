@@ -28,7 +28,8 @@ from open_inwoner.openklant.wrap import (
     get_fetch_parameters,
     get_kcm_answer_mapping,
 )
-from open_inwoner.openzaak.clients import build_zaken_client
+from open_inwoner.openzaak.clients import MultiZgwClientProxy
+from open_inwoner.openzaak.models import ZGWApiGroupConfig
 from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import CommonPageMixin
 
@@ -221,19 +222,42 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
             local_kcm.is_seen = True
             local_kcm.save()
 
+        zaak = None
+        case_url = None
+        ctx["zaak"] = None
         if client := build_contactmomenten_client():
-            zaken_client = build_zaken_client()
-            ocm = client.retrieve_objectcontactmoment(
-                kcm.contactmoment, "zaak", zaken_client
-            )
-            zaak = getattr(ocm, "object", None)
-            if zaak:
-                zaak_url = reverse(
-                    "cases:case_detail", kwargs={"object_id": str(zaak.uuid)}
-                )
-            else:
-                zaak_url = None
-            ctx["zaak"] = zaak
+            # Note: we cannot be sure which zaken_client to pass here. However, given that it
+            # is only used to resolve the zaak, and we do that anyway below, it is safe to pass
+            # None.
+            ocm = client.retrieve_objectcontactmoment(kcm.contactmoment, "zaak", None)
+            if ocm and ocm.object_type == "zaak":
+                zaak_url = ocm.object
+                groups = list(ZGWApiGroupConfig.objects.all())
+                proxy = MultiZgwClientProxy([group.zaken_client for group in groups])
+                proxy_response = proxy.fetch_case_by_url_no_cache(zaak_url)
+                cases_found = proxy_response.truthy_responses
+                if (case_count := len(cases_found)) == 0:
+                    logger.error(
+                        "Unable to find matched contactmomenten zaak in any zgw backend"
+                    )
+                else:
+                    zaak, client = cases_found[0].result, cases_found[0].client
+                    group = ZGWApiGroupConfig.objects.resolve_group_from_hints(
+                        client=client
+                    )
+                    case_url = reverse(
+                        "cases:case_detail",
+                        kwargs={
+                            "object_id": str(zaak.uuid),
+                            "api_group_id": group.id,
+                        },
+                    )
+                    ctx["zaak"] = zaak
+                    if case_count > 1:
+                        # In principle this should not happen, a zaak should be stored in
+                        # exactly one backend. But: https://www.xkcd.com/2200/
+                        # We should at least receive a ping if this happens.
+                        logger.error("Found one zaak in multiple backends")
 
         contactmoment: KCMDict = self.get_kcm_data(kcm)
         ctx["contactmoment"] = contactmoment
@@ -264,12 +288,12 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
             if zaak:
                 ctx["destination"] = {
                     "label": _("Naar aanvraag"),
-                    "url": zaak_url,
+                    "url": case_url,
                 }
         else:
             ctx["origin"] = {
                 "label": _("Terug naar aanvraag"),
-                "url": zaak_url,
+                "url": case_url,
             }
             ctx["destination"] = {
                 "label": _("Bekijk alle vragen"),

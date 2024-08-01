@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 
 import dateutil
 import requests_mock
-from django_webtest import WebTest
+from django_webtest import TransactionWebTest
 from freezegun import freeze_time
 from pyquery import PyQuery
 from timeline_logger.models import TimelineLog
@@ -68,7 +68,11 @@ KLANTEN_ROOT = "https://klanten.nl/api/v1/"
     ROOT_URLCONF="open_inwoner.cms.tests.urls",
     MIDDLEWARE=PATCHED_MIDDLEWARE,
 )
-class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
+class TestCaseDetailView(
+    AssertRedirectsMixin,
+    ClearCachesMixin,
+    TransactionWebTest,
+):
     def setUp(self):
         super().setUp()
 
@@ -84,7 +88,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.contactmoment_service = ServiceFactory(
             api_root=CONTACTMOMENTEN_ROOT, api_type=APITypes.cmc
         )
-        ZGWApiGroupConfigFactory(
+        self.api_group = ZGWApiGroupConfigFactory(
             ztc_service__api_root=CATALOGI_ROOT,
             zrc_service__api_root=ZAKEN_ROOT,
             drc_service__api_root=DOCUMENTEN_ROOT,
@@ -108,11 +112,17 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         self.case_detail_url = reverse(
             "cases:case_detail_content",
-            kwargs={"object_id": "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"},
+            kwargs={
+                "object_id": "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
+                "api_group_id": self.api_group.id,
+            },
         )
         self.eherkenning_case_detail_url = reverse(
             "cases:case_detail_content",
-            kwargs={"object_id": "3b751e7e-cf17-4200-9ee4-4a42d801ea21"},
+            kwargs={
+                "object_id": "3b751e7e-cf17-4200-9ee4-4a42d801ea21",
+                "api_group_id": self.api_group.id,
+            },
         )
 
         #
@@ -525,6 +535,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 kwargs={
                     "object_id": self.zaak["uuid"],
                     "info_id": self.informatie_object["uuid"],
+                    "api_group_id": self.api_group.id,
                 },
             ),
             created=dateutil.parser.parse(
@@ -539,6 +550,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 kwargs={
                     "object_id": self.zaak["uuid"],
                     "info_id": self.informatie_object_2["uuid"],
+                    "api_group_id": self.api_group.id,
                 },
             ),
             created=dateutil.parser.parse(
@@ -553,6 +565,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 kwargs={
                     "object_id": self.zaak["uuid"],
                     "info_id": self.informatie_object_no_date["uuid"],
+                    "api_group_id": self.api_group.id,
                 },
             ),
         )
@@ -1319,9 +1332,16 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         user = AnonymousUser()
         response = self.app.get(self.case_detail_url, user=user)
 
+        next = reverse(
+            "cases:case_detail_content",
+            kwargs={
+                "object_id": "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
+                "api_group_id": self.api_group.id,
+            },
+        )
         self.assertRedirects(
             response,
-            f"{reverse('login')}?next={reverse('cases:case_detail_content', kwargs={'object_id': 'd8bbdeb7-770f-4ca9-b1ea-77b4730bf67d'})}",
+            f"{reverse('login')}?next={next}",
         )
 
     def test_no_access_when_no_roles_are_found_for_user_bsn(self, m):
@@ -1537,7 +1557,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(
             reverse(
                 "cases:case_detail_content",
-                kwargs={"object_id": self.zaak_invisible["uuid"]},
+                kwargs={
+                    "object_id": self.zaak_invisible["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
             ),
             user=self.user,
         )
@@ -1572,7 +1595,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(
             reverse(
                 "cases:case_detail_content",
-                kwargs={"object_id": self.zaak["uuid"]},
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
             ),
             user=self.user,
         )
@@ -1618,7 +1644,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(
             reverse(
                 "cases:case_detail_content",
-                kwargs={"object_id": self.zaak["uuid"]},
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
             ),
             user=self.user,
         )
@@ -1662,7 +1691,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(
             reverse(
                 "cases:case_detail_content",
-                kwargs={"object_id": self.zaak["uuid"]},
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
             ),
             user=self.user,
         )
@@ -1697,7 +1729,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(
             reverse(
                 "cases:case_detail_content",
-                kwargs={"object_id": self.zaak["uuid"]},
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
             ),
             user=self.user,
         )
@@ -1713,7 +1748,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(
             reverse(
                 "cases:case_detail_content",
-                kwargs={"object_id": self.zaak["uuid"]},
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
             ),
             user=self.user,
         )
@@ -1729,7 +1767,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(
             reverse(
                 "cases:case_detail_content",
-                kwargs={"object_id": self.zaak["uuid"]},
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
             ),
             user=self.user,
         )
@@ -1758,7 +1799,11 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(self.case_detail_url, user=self.user)
         form = response.forms["document-upload"]
         form.action = reverse(
-            "cases:case_detail_document_form", kwargs={"object_id": self.zaak["uuid"]}
+            "cases:case_detail_document_form",
+            kwargs={
+                "object_id": self.zaak["uuid"],
+                "api_group_id": self.api_group.id,
+            },
         )
         # form["title"] = "uploaded file"
         form["type"] = zaak_type_iotc.id
@@ -1768,7 +1813,13 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         # make sure the client-side-redirect is done with the expected url
         self.assertEqual(
             form_response.headers["HX-Redirect"],
-            reverse("cases:case_detail", kwargs={"object_id": str(self.zaak["uuid"])}),
+            reverse(
+                "cases:case_detail",
+                kwargs={
+                    "object_id": str(self.zaak["uuid"]),
+                    "api_group_id": self.api_group.id,
+                },
+            ),
         )
 
         redirect = self.app.get(form_response.headers["HX-Redirect"])
@@ -1803,7 +1854,11 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(self.case_detail_url, user=self.user)
         form = response.forms["document-upload"]
         form.action = reverse(
-            "cases:case_detail_document_form", kwargs={"object_id": self.zaak["uuid"]}
+            "cases:case_detail_document_form",
+            kwargs={
+                "object_id": self.zaak["uuid"],
+                "api_group_id": self.api_group.id,
+            },
         )
         form["type"] = zaak_type_iotc.id
         form["file"] = Upload("upload.TXT", b"data", "text/plain")
@@ -1812,7 +1867,13 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         # make sure the client-side-redirect is done with the expected url
         self.assertEqual(
             form_response.headers["HX-Redirect"],
-            reverse("cases:case_detail", kwargs={"object_id": str(self.zaak["uuid"])}),
+            reverse(
+                "cases:case_detail",
+                kwargs={
+                    "object_id": str(self.zaak["uuid"]),
+                    "api_group_id": self.api_group.id,
+                },
+            ),
         )
 
         redirect = self.app.get(form_response.headers["HX-Redirect"])
@@ -1853,7 +1914,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(
             reverse(
                 "cases:case_detail_content",
-                kwargs={"object_id": self.zaak["uuid"]},
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
             ),
             user=self.user,
         )
@@ -1897,7 +1961,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(
             reverse(
                 "cases:case_detail_content",
-                kwargs={"object_id": self.zaak["uuid"]},
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
             ),
             user=self.user,
         )
@@ -1931,7 +1998,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(
             reverse(
                 "cases:case_detail_content",
-                kwargs={"object_id": self.zaak["uuid"]},
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
             ),
             user=self.user,
         )
@@ -1956,7 +2026,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(
             reverse(
                 "cases:case_detail_content",
-                kwargs={"object_id": self.zaak["uuid"]},
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
             ),
             user=self.user,
         )
@@ -1977,7 +2050,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(
             reverse(
                 "cases:case_detail_content",
-                kwargs={"object_id": self.zaak["uuid"]},
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
             ),
             user=self.user,
         )
@@ -2001,7 +2077,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(
             reverse(
                 "cases:case_detail_content",
-                kwargs={"object_id": self.zaak["uuid"]},
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
             ),
             user=self.user,
         )
@@ -2024,7 +2103,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(
             reverse(
                 "cases:case_detail_content",
-                kwargs={"object_id": self.zaak["uuid"]},
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
             ),
             user=self.user,
         )
@@ -2047,7 +2129,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(
             reverse(
                 "cases:case_detail_content",
-                kwargs={"object_id": self.zaak["uuid"]},
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
             ),
             user=self.user,
         )
@@ -2080,7 +2165,11 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(self.case_detail_url, user=self.user)
         form = response.forms["document-upload"]
         form.action = reverse(
-            "cases:case_detail_document_form", kwargs={"object_id": self.zaak["uuid"]}
+            "cases:case_detail_document_form",
+            kwargs={
+                "object_id": self.zaak["uuid"],
+                "api_group_id": self.api_group.id,
+            },
         )
         form["file"] = Upload("upload.txt", b"data", "text/plain")
         form_response = form.submit()
@@ -2088,7 +2177,13 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         # make sure the client-side-redirect is done with the expected url
         self.assertEqual(
             form_response.headers["HX-Redirect"],
-            reverse("cases:case_detail", kwargs={"object_id": str(self.zaak["uuid"])}),
+            reverse(
+                "cases:case_detail",
+                kwargs={
+                    "object_id": str(self.zaak["uuid"]),
+                    "api_group_id": self.api_group.id,
+                },
+            ),
         )
 
         redirect = self.app.get(form_response.headers["HX-Redirect"])
@@ -2127,7 +2222,11 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(self.case_detail_url, user=self.user)
         form = response.forms["document-upload"]
         form.action = reverse(
-            "cases:case_detail_document_form", kwargs={"object_id": self.zaak["uuid"]}
+            "cases:case_detail_document_form",
+            kwargs={
+                "object_id": self.zaak["uuid"],
+                "api_group_id": self.api_group.id,
+            },
         )
         form["file"] = Upload("upload.txt", b"data", "text/plain")
         form_response = form.submit()

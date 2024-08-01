@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 
 from open_inwoner.accounts.models import User
 from open_inwoner.openzaak.api_models import Status, Zaak
-from open_inwoner.openzaak.models import ZaakTypeStatusTypeConfig
+from open_inwoner.openzaak.models import ZaakTypeStatusTypeConfig, ZGWApiGroupConfig
 from open_inwoner.userfeed.adapter import FeedItem
 from open_inwoner.userfeed.adapters import register_item_adapter
 from open_inwoner.userfeed.choices import FeedItemType
@@ -84,6 +84,15 @@ class CaseStatusUpdateFeedItem(FeedItem):
             self.get_data("case_type_identificatie"),
             self.get_data("status_type_url"),
         )
+        service = (
+            self.status_config.zaaktype_config.catalogus.service
+            if self.status_config
+            else None
+        )
+        self.api_group = ZGWApiGroupConfig.objects.resolve_group_from_hints(
+            url=self.get_data("catalogus_url"),
+            service=service,
+        )
 
     @property
     def title(self) -> str:
@@ -101,7 +110,10 @@ class CaseStatusUpdateFeedItem(FeedItem):
     @property
     def action_url(self) -> str:
         uuid = self.get_data("case_uuid")
-        return reverse("cases:case_detail", kwargs={"object_id": uuid})
+        return reverse(
+            "cases:case_detail",
+            kwargs={"object_id": uuid, "api_group_id": self.api_group.id},
+        )
 
     @property
     def status_text(self) -> str:

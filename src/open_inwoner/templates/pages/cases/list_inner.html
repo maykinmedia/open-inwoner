@@ -38,7 +38,7 @@
                 </a>
                 <!-- other cases -->
             {% else %}
-                <a href="{% url 'cases:case_detail' object_id=case.uuid %}" class="card card card__description-card card--stretch">
+                <a href="{% url 'cases:case_detail' api_group_id=case.api_group.id  object_id=case.uuid %}" class="card card card__description-card card--stretch">
                     <div class="card__body">
 
                         <h2 class="card__heading-2">{{ case.description }}</h2>

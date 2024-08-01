@@ -72,7 +72,7 @@ class CasesPlaywrightTests(
         self.config.save()
 
         # services
-        ZGWApiGroupConfigFactory(
+        self.api_group = ZGWApiGroupConfigFactory(
             ztc_service__api_root=CATALOGI_ROOT,
             zrc_service__api_root=ZAKEN_ROOT,
             drc_service__api_root=DOCUMENTEN_ROOT,
@@ -438,7 +438,12 @@ class CasesPlaywrightTests(
         case_title.click()
         page.wait_for_url(
             self.live_reverse(
-                "cases:case_detail", kwargs={"object_id": self.zaak["uuid"]}, star=True
+                "cases:case_detail",
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
+                star=True,
             )
         )
 
@@ -587,7 +592,11 @@ class CasesPlaywrightTests(
         page = context.new_page()
         page.goto(
             self.live_reverse(
-                "cases:case_detail", kwargs={"object_id": self.zaak["uuid"]}
+                "cases:case_detail",
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
             )
         )
 
@@ -621,7 +630,11 @@ class CasesPlaywrightTests(
         submit_button.click()
         page.wait_for_url(
             self.live_reverse(
-                "cases:case_detail", kwargs={"object_id": self.zaak["uuid"]}
+                "cases:case_detail",
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
             )
         )
 

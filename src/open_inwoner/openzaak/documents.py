@@ -3,7 +3,7 @@ import logging
 from django.conf import settings
 
 from open_inwoner.openzaak.api_models import InformatieObject
-from open_inwoner.openzaak.clients import build_documenten_client
+from open_inwoner.openzaak.clients import DocumentenClient, build_documenten_client
 
 from ..utils.decorators import cache as cache_result
 
@@ -17,6 +17,7 @@ def fetch_single_information_object_url(url: str) -> InformatieObject | None:
 
 
 # not cached because currently only used in info-object download view
-def fetch_single_information_object_uuid(uuid: str) -> InformatieObject | None:
-    if client := build_documenten_client():
-        return client._fetch_single_information_object(uuid=uuid)
+def fetch_single_information_object_uuid(
+    uuid: str, documenten_client: DocumentenClient
+) -> InformatieObject | None:
+    return documenten_client._fetch_single_information_object(uuid=uuid)

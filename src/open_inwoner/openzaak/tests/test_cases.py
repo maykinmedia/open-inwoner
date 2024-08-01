@@ -11,7 +11,7 @@ from django.test.utils import override_settings
 from django.urls import reverse_lazy
 
 import requests_mock
-from django_webtest import WebTest
+from django_webtest import TransactionWebTest
 from furl import furl
 from timeline_logger.models import TimelineLog
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
@@ -74,7 +74,7 @@ PATCHED_MIDDLEWARE = [
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class CaseListAccessTests(AssertRedirectsMixin, ClearCachesMixin, WebTest):
+class CaseListAccessTests(AssertRedirectsMixin, ClearCachesMixin, TransactionWebTest):
     outer_url = reverse_lazy("cases:index")
     inner_url = reverse_lazy("cases:cases_content")
 
@@ -1022,12 +1022,10 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class CaseSubmissionTest(WebTest):
+class CaseSubmissionTest(TransactionWebTest):
     inner_url = reverse_lazy("cases:cases_content")
 
-    @classmethod
-    def setUpTestData(cls):
-        super().setUpTestData()
+    def setUp(self):
         ZGWApiGroupConfigFactory(
             zrc_service__api_root=ZAKEN_ROOT,
             form_service__api_root=FORMS_ROOT,

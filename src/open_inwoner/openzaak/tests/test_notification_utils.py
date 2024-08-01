@@ -15,7 +15,8 @@ from open_inwoner.openzaak.notifications import (
     _get_np_initiator_bsns_from_roles,
     send_case_update_email,
 )
-from open_inwoner.openzaak.tests.factories import generate_rol
+from open_inwoner.openzaak.tests.factories import ZGWApiGroupConfigFactory, generate_rol
+from open_inwoner.openzaak.tests.shared import ZAKEN_ROOT
 
 from ..api_models import Status, StatusType, Zaak, ZaakType
 from .test_notification_data import MockAPIData
@@ -23,7 +24,13 @@ from .test_notification_data import MockAPIData
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class NotificationHandlerUtilsTestCase(TestCase):
+    def setUp(self):
+        self.api_group = ZGWApiGroupConfigFactory(
+            zrc_service__api_root=ZAKEN_ROOT,
+        )
+
     def test_send_case_update_email(self):
+
         config = SiteConfiguration.get_solo()
         data = MockAPIData()
 
@@ -37,7 +44,10 @@ class NotificationHandlerUtilsTestCase(TestCase):
 
         case.status = status
 
-        case_url = reverse("cases:case_detail", kwargs={"object_id": str(case.uuid)})
+        case_url = reverse(
+            "cases:case_detail",
+            kwargs={"object_id": str(case.uuid), "api_group_id": self.api_group.id},
+        )
 
         # mock `_format_zaak_identificatie`, but then continue with result of actual call
         # (test redirect for invalid BSN that passes pattern validation)
@@ -73,7 +83,10 @@ class NotificationHandlerUtilsTestCase(TestCase):
         case = factory(Zaak, data.zaak)
         case.zaaktype = factory(ZaakType, data.zaak_type)
 
-        case_url = reverse("cases:case_detail", kwargs={"object_id": str(case.uuid)})
+        case_url = reverse(
+            "cases:case_detail",
+            kwargs={"object_id": str(case.uuid), "api_group_id": self.api_group.id},
+        )
 
         send_case_update_email(user, case, "case_document_notification")
 

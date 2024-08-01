@@ -1,6 +1,6 @@
 from urllib.parse import urlencode
 
-from django.test import TestCase, override_settings, tag
+from django.test import TransactionTestCase, override_settings, tag
 from django.urls import reverse
 
 import requests_mock
@@ -21,7 +21,7 @@ from .utils import ESMixin
 @requests_mock.Mocker()
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 @tag("elastic")
-class TestSearchView(ESMixin, TestCase):
+class TestSearchView(ESMixin, TransactionTestCase):
     def setUp(self):
         super().setUp()
 
@@ -29,7 +29,7 @@ class TestSearchView(ESMixin, TestCase):
         self.user2 = DigidUserFactory(bsn="123456782", email="jane@doe.nl")
 
         # services
-        ZGWApiGroupConfigFactory(
+        self.api_group = ZGWApiGroupConfigFactory(
             zrc_service__api_root=ZAKEN_ROOT, ztc_service__api_root=CATALOGI_ROOT
         )
 
@@ -230,7 +230,10 @@ class TestSearchView(ESMixin, TestCase):
             response.url,
             reverse(
                 "cases:case_detail",
-                kwargs={"object_id": "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"},
+                kwargs={
+                    "object_id": "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
+                    "api_group_id": self.api_group.id,
+                },
             ),
         )
 
@@ -268,7 +271,10 @@ class TestSearchView(ESMixin, TestCase):
             response.url,
             reverse(
                 "cases:case_detail",
-                kwargs={"object_id": "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"},
+                kwargs={
+                    "object_id": "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
+                    "api_group_id": self.api_group.id,
+                },
             ),
         )
 

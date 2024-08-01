@@ -41,7 +41,7 @@ from open_inwoner.userfeed import hooks
 from open_inwoner.utils.logentry import system_action as log_system_action
 from open_inwoner.utils.url import build_absolute_url
 
-from .models import ZaakTypeStatusTypeConfig
+from .models import ZaakTypeStatusTypeConfig, ZGWApiGroupConfig
 
 logger = logging.getLogger(__name__)
 
@@ -145,8 +145,16 @@ def send_case_update_email(
     status: Status | None = None,
     extra_context: dict = None,
 ):
+    group = ZGWApiGroupConfig.objects.resolve_group_from_hints(url=case.url)
+
+    """
+    send the actual mail
+    """
     case_detail_url = build_absolute_url(
-        reverse("cases:case_detail", kwargs={"object_id": str(case.uuid)})
+        reverse(
+            "cases:case_detail",
+            kwargs={"object_id": str(case.uuid), "api_group_id": group.id},
+        )
     )
 
     config = OpenZaakConfig.get_solo()

@@ -1,5 +1,5 @@
 from unittest import TestCase as PlainTestCase
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from django.test import TestCase
 
@@ -297,6 +297,49 @@ class MultiZgwClientProxyTests(PlainTestCase):
             None,
             msg="raise_on_failures is a noop if all responses are successful",
         )
+
+    def test_ruthy_results_ignores_falsy_results(self, m):
+        truthy_client = Mock()
+        truthy_client.fetch_result.return_value = "foobar"
+
+        falsy_values = (None, "", [], tuple(), set(), 0)
+        for falsy_value in falsy_values:
+            with self.subTest(f"falsy value: {falsy_value}"):
+                falsy_client = Mock()
+                falsy_client.fetch_result.return_value = falsy_value
+                proxy = MultiZgwClientProxy([truthy_client, falsy_client])
+                result = proxy.fetch_result()
+                self.assertEqual(
+                    result.truthy_responses,
+                    [
+                        ZgwClientResponse(
+                            client=truthy_client, result="foobar", exception=None
+                        )
+                    ],
+                )
+
+    def test_join_truthy_results_ignores_failing_results(self, m):
+        truthy_client = Mock()
+        truthy_client.fetch_result.return_value = "foobar"
+
+        falsy_values = (None, "", [], tuple(), set(), 0)
+        for falsy_value in falsy_values:
+            with self.subTest(f"falsy value: {falsy_value}"):
+                falsy_client = Mock()
+                falsy_client.fetch_result.side_effect = [
+                    *falsy_values,
+                    ValueError("Bad stuff"),
+                ]
+                proxy = MultiZgwClientProxy([truthy_client, falsy_client])
+                result = proxy.fetch_result()
+                self.assertEqual(
+                    result.truthy_responses,
+                    [
+                        ZgwClientResponse(
+                            client=truthy_client, result="foobar", exception=None
+                        )
+                    ],
+                )
 
     def test_partial_exceptions_are_returned(self, m):
         m.get(self.a_client.url, json=["foo", "bar"])
