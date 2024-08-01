@@ -2,6 +2,7 @@
 Staging environment settings module.
 This *should* be nearly identical to production.
 """
+
 import os
 
 os.environ.setdefault("ENVIRONMENT", "test")
@@ -12,3 +13,5 @@ from .production import *  # noqa isort:skip
 
 CSP_REPORTS_SAVE = True
 PLAYWRIGHT_MULTI_ONLY_DEFAULT = False
+
+LOAD_ADMIN_INDEX_FIXTURE_ON_STARTUP = False

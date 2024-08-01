@@ -62,4 +62,5 @@ class AccountsConfig(AppConfig):
             return
         self._has_run = True
 
-        post_migrate.connect(update_admin_index, sender=self)
+        if settings.LOAD_ADMIN_INDEX_FIXTURE_ON_STARTUP:
+            post_migrate.connect(update_admin_index, sender=self)

@@ -1026,3 +1026,7 @@ DJANGO_SETUP_CONFIG_CUSTOM_FIELDS = [
 # Project specific settings
 #
 CASE_LIST_NUM_THREADS = 6
+
+# Whether to auto-load the django-admin-index.json on startup.
+# It's mostly useful to disable this during testing
+LOAD_ADMIN_INDEX_FIXTURE_ON_STARTUP = True

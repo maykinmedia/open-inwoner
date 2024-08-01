@@ -1,6 +1,6 @@
 from django.core.management import call_command
 from django.db.models.signals import post_migrate
-from django.test import TestCase, TransactionTestCase
+from django.test import TestCase, TransactionTestCase, override_settings
 
 from open_inwoner.accounts.apps import update_admin_index
 
@@ -20,7 +20,13 @@ class ManualLoadDjangoAdminIndexFixtureTestCase(TransactionTestCase):
 
 
 class AutoLoadDjangoAdminIndexFixtureTestCase(TestCase):
-    def test_update_admin_index_hook_is_registered(self):
+    @override_settings(LOAD_ADMIN_INDEX_FIXTURE_ON_STARTUP=False)
+    def test_update_admin_index_hook_is_not_registered_if_flag_is_unset(self):
+        connected_functions = [receiver[1]() for receiver in post_migrate.receivers]
+        self.assertNotIn(update_admin_index, connected_functions)
+
+    @override_settings(LOAD_ADMIN_INDEX_FIXTURE_ON_STARTUP=True)
+    def test_update_admin_index_hook_is_registered_if_flag_is_set(self):
         connected_functions = [receiver[1]() for receiver in post_migrate.receivers]
         self.assertIn(update_admin_index, connected_functions)
 
