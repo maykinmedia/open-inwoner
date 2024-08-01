@@ -73,3 +73,7 @@ PLAYWRIGHT_MULTI_ONLY_DEFAULT = False
 PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.MD5PasswordHasher",
 ]
+
+# Sip the auto-loading of the django-admin-index fixture on startup.
+# It doesn't add anything in CI, and just adds time to the run.
+SKIP_ADMIN_INDEX_FIXTURE = True

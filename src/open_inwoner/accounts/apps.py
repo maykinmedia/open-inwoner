@@ -1,3 +1,4 @@
+import logging
 from io import StringIO
 
 from django.apps import AppConfig, apps
@@ -6,10 +7,18 @@ from django.contrib.contenttypes.management import create_contenttypes
 from django.core.management import call_command
 from django.db.models.signals import post_migrate
 
+logger = logging.getLogger(__name__)
+
 
 def update_admin_index(sender=None, **kwargs) -> bool:
     if "django_admin_index" not in settings.INSTALLED_APPS:
-        print("django_admin_index not installed, skipping update_admin_index()")
+        logger.info("django_admin_index not installed, skipping update_admin_index()")
+        return False
+
+    if getattr(settings, "SKIP_ADMIN_INDEX_FIXTURE", False):
+        logger.info(
+            "SKIP_ADMIN_INDEX_FIXTURE is set to True, skipping update_admin_index()"
+        )
         return False
 
     from django_admin_index.models import AppGroup
@@ -32,18 +41,21 @@ def update_admin_index(sender=None, **kwargs) -> bool:
     try:
         call_command("loaddata", "django-admin-index", verbosity=0, stdout=StringIO())
     except Exception as exc:
-        print(f"Error: Unable to load django-admin-index fixture ({exc})")
+        error_message = f"Error: Unable to load django-admin-index fixture ({exc})"
+
         if ct_create_exceptions:
             ct_exc = ExceptionGroup(
                 "Unable to create contenttypes", *ct_create_exceptions
             )
-            print(
+            error_message += (
                 "NOTE: this may be a consequence of being unable to create the following "
                 f"contenttypes: {ct_exc}"
             )
+
+        logger.error(error_message)
         return False
     else:
-        print("Successfully loaded django-admin-index fixture")
+        logger.info("Successfully loaded django-admin-index fixture")
         return True
 
 
