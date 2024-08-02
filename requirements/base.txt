@@ -92,7 +92,7 @@ defusedxml==0.7.1
     # via odfpy
 diff-match-patch==20200713
     # via django-import-export
-django==4.2.11
+django==4.2.14
     # via
     #   -r requirements/base.in
     #   django-admin-index
