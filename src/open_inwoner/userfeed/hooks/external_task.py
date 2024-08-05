@@ -20,11 +20,15 @@ logger = logging.getLogger(__name__)
 
 class OpenTaskFeedItem(FeedItem):
     base_title = _("Open task")
+    extra_title = _("Case number")
     base_message = _("Open task that is yet to be completed")
 
     @property
     def title(self) -> str:
-        return f"{self.base_title} ({self.get_data('task_identificatie')})"
+        return (
+            f"{self.base_title} {self.get_data('task_identificatie')} "
+            f"({self.extra_title}: {self.get_data('zaak_identificatie')})"
+        )
 
     @property
     def message(self) -> str:
@@ -53,6 +57,7 @@ def update_external_task_items(user: User, openstaande_taken: list[OpenTask]):
             "action_url": task.formulier_link,
             "task_name": task.naam,
             "task_identificatie": task.identificatie,
+            "zaak_identificatie": task.zaak_identificatie,
         }
         if existing_item := existing_uuid_mapping.get(task.uuid):
             if existing_item.type_data != type_data:
