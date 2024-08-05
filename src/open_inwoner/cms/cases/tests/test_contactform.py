@@ -221,12 +221,23 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             volgnummer=1,
             isEindstatus=True,
         )
+        self.resultaattype_with_naam = generate_oas_component_cached(
+            "ztc",
+            "schemas/ResultaatType",
+            url=f"{CATALOGI_ROOT}resultaattypen/b1a268dd-4322-47bb-a930-b83066b4a32c",
+            zaaktype=self.zaaktype["url"],
+            omschrijving="Short description",
+            resultaattypeomschrijving="http://example.com",
+            selectielijstklasse="http://example.com",
+            naam="Long description (>20 chars) of result",
+        )
         self.result = generate_oas_component_cached(
             "zrc",
             "schemas/Resultaat",
             uuid="a44153aa-ad2c-6a07-be75-15add5113",
             url=self.zaak["resultaat"],
-            resultaattype=f"{CATALOGI_ROOT}resultaattypen/b1a268dd-4322-47bb-a930-b83066b4a32c",
+            # resultaattype=f"{CATALOGI_ROOT}resultaattypen/b1a268dd-4322-47bb-a930-b83066b4a32c",
+            resultaattype=self.resultaattype_with_naam["url"],
             zaak=self.zaak["url"],
             toelichting="resultaat toelichting",
         )
@@ -260,6 +271,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         for resource in [
             self.zaak,
             self.result,
+            self.resultaattype_with_naam,
             self.zaaktype,
             self.status_finish,
             self.status_type_finish,

@@ -205,7 +205,10 @@ class InnerCaseDetailView(
                 end_statustype=self.handle_end_statustype(statuses, statustypen),
             )
             result_data = self.get_result_data(
-                self.case, self.resulttype_config_mapping, zaken_client
+                self.case,
+                self.resulttype_config_mapping,
+                zaken_client,
+                catalogi_client,
             )
 
             hooks.case_status_seen(self.request.user, self.case)
@@ -526,15 +529,28 @@ class InnerCaseDetailView(
 
     @staticmethod
     def get_result_data(
-        case: Zaak, result_type_config_mapping: dict, client: ZakenClient
+        case: Zaak,
+        result_type_config_mapping: dict,
+        zaken_client: ZakenClient,
+        catalogi_client: CatalogiClient,
     ) -> dict:
+        """
+        Get display and description for the result of `case`
+
+        Note:
+            For the description, we try the `esuite_compat_naam` attribute of the corresponding
+            resultaattype first. This is for E-suite compatibility in case the E-suite returns
+            a description longer than 20 chars. Alternatively, we get the description from the
+            config of the resultaattype.
+        """
         if not case.resultaat:
             return {}
 
-        result = client.fetch_single_result(case.resultaat)
+        result = zaken_client.fetch_single_result(case.resultaat)
+        result_type = catalogi_client.fetch_single_resultaat_type(result.resultaattype)
 
         display = result.toelichting
-        description = getattr(
+        description = getattr(result_type, "esuite_compat_naam", "") or getattr(
             result_type_config_mapping.get(result.resultaattype), "description", ""
         )
 

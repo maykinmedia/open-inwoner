@@ -36,6 +36,7 @@ from open_inwoner.openzaak.constants import StatusIndicators
 from open_inwoner.openzaak.tests.factories import (
     ZaakTypeConfigFactory,
     ZaakTypeInformatieObjectTypeConfigFactory,
+    ZaakTypeResultaatTypeConfigFactory,
     ZaakTypeStatusTypeConfigFactory,
 )
 from open_inwoner.utils.test import (
@@ -126,14 +127,193 @@ class TestCaseDetailView(
         )
 
         #
-        # zaken
+        # Catalogi API (ZTC)
+        # https://vng-realisatie.github.io/gemma-zaken/standaard/catalogi/
+        #
+        self.zaaktype = generate_oas_component_cached(
+            "ztc",
+            "schemas/ZaakType",
+            uuid="0caa29cb-0167-426f-8dc1-88bebd7c8804",
+            url=f"{CATALOGI_ROOT}zaaktypen/0caa29cb-0167-426f-8dc1-88bebd7c8804",
+            identificatie="ZAAKTYPE-2020-0000000001",
+            omschrijving="Coffee zaaktype",
+            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+            doel="Ask for coffee",
+            aanleiding="Coffee is essential",
+            indicatieInternOfExtern="extern",
+            handelingInitiator="Request",
+            onderwerp="Coffee",
+            handelingBehandelaar="Behandelen",
+            opschortingEnAanhoudingMogelijk=False,
+            verlengingMogelijk=False,
+            publicatieIndicatie=False,
+            besluittypen=[],
+            beginGeldigheid="2020-09-25",
+            versiedatum="2020-09-25",
+        )
+        self.zaaktype_config = ZaakTypeConfigFactory.create(
+            identificatie=self.zaaktype["identificatie"],
+        )
+        self.status_type_new = generate_oas_component_cached(
+            "ztc",
+            "schemas/StatusType",
+            url=f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-777yu878km09",
+            zaaktype=self.zaaktype["url"],
+            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            omschrijving="Initial request",
+            omschrijvingGeneriek="some content",
+            statustekst="Registered",
+            volgnummer=1,
+            isEindstatus=False,
+        )
+        # no associated status (for testing `add_second_status_preview`)
+        self.status_type_in_behandeling = generate_oas_component_cached(
+            "ztc",
+            "schemas/StatusType",
+            url=f"{CATALOGI_ROOT}statustypen/167cb935-ac8a-428e-8cca-5abda0da47c7",
+            zaaktype=self.zaaktype["url"],
+            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            omschrijving="In behandeling",
+            omschrijvingGeneriek="some content",
+            statustekst="",
+            volgnummer=3,
+            isEindstatus=False,
+        )
+        self.status_type_finish = generate_oas_component_cached(
+            "ztc",
+            "schemas/StatusType",
+            url=f"{CATALOGI_ROOT}statustypen/d4839012-gh35-3a8d-866h-444uy935acv7",
+            zaaktype=self.zaaktype["url"],
+            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            omschrijving="Finish",
+            omschrijvingGeneriek="some content",
+            statustekst="",
+            volgnummer=4,
+            isEindstatus=True,
+        )
+        # we need to use a `StatusType` object, not the oas_component (a `dict`)
+        self.second_status_preview = StatusType(
+            url=self.status_type_in_behandeling["url"],
+            zaaktype=self.status_type_in_behandeling["zaaktype"],
+            omschrijving="In behandeling",
+            omschrijving_generiek=self.status_type_in_behandeling[
+                "omschrijvingGeneriek"
+            ],
+            statustekst=self.status_type_in_behandeling["statustekst"],
+            volgnummer=3,
+            is_eindstatus=self.status_type_in_behandeling["isEindstatus"],
+            informeren=self.status_type_in_behandeling["informeren"],
+        )
+        self.informatie_object_type = generate_oas_component_cached(
+            "ztc",
+            "schemas/InformatieObjectType",
+            url=f"{CATALOGI_ROOT}informatieobjecttype/014c38fe-b010-4412-881c-3000032fb321",
+            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            omschrijving="Some content",
+        )
+        self.zaaktype_informatie_object_type = generate_oas_component_cached(
+            "ztc",
+            "schemas/ZaakTypeInformatieObjectType",
+            uuid="3fb03882-f6f9-4e0d-ad92-f810e24b9abb",
+            url=f"{CATALOGI_ROOT}zaaktype-informatieobjecttypen/93250e6d-ef92-4474-acca-a6dbdcd61b7e",
+            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            zaaktype=self.zaaktype["url"],
+            informatieobjecttype=self.informatie_object_type["url"],
+            volgnummer=1,
+            richting="inkomend",
+            statustype=self.status_type_finish,
+        )
+        self.resultaattype_with_naam = generate_oas_component_cached(
+            "ztc",
+            "schemas/ResultaatType",
+            url=f"{CATALOGI_ROOT}resultaattypen/3dc5e2d3-ed72-41ec-a91e-000f72a7b291",
+            zaaktype=self.zaaktype["url"],
+            omschrijving="Short description",
+            resultaattypeomschrijving="http://example.com",
+            selectielijstklasse="http://example.com",
+            esuite_compat_naam="Long description (>20 chars) of result",
+        )
+
+        #
+        # Documenten API (DRC)
+        # https://vng-realisatie.github.io/gemma-zaken/standaard/documenten/
+        #
+        self.informatie_object = generate_oas_component_cached(
+            "drc",
+            "schemas/EnkelvoudigInformatieObject",
+            uuid="014c38fe-b010-4412-881c-3000032fb812",
+            url=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812",
+            inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812/download",
+            informatieobjecttype=self.informatie_object_type["url"],
+            status="definitief",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+            bestandsnaam="uploaded_document.txt",
+            titel="uploaded_document_title.txt",
+            bestandsomvang=123,
+        )
+        self.informatie_object_2 = generate_oas_component_cached(
+            "drc",
+            "schemas/EnkelvoudigInformatieObject",
+            uuid="015c38fe-b010-4412-881c-3000032fb812",
+            url=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/015c38fe-b010-4412-881c-3000032fb812",
+            inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/015c38fe-b010-4412-881c-3000032fb812/download",
+            informatieobjecttype=self.informatie_object_type["url"],
+            status="definitief",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+            bestandsnaam="uploaded_document.txt",
+            titel="another_document_title.txt",
+            bestandsomvang=123,
+        )
+        self.informatie_object_no_date = generate_oas_component_cached(
+            "drc",
+            "schemas/EnkelvoudigInformatieObject",
+            uuid="015c38fe-b010-4412-881c-3000032fb812",
+            url=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/016c38fe-b010-4412-881c-3000032fb812",
+            inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/016c38fe-b010-4412-881c-3000032fb812/download",
+            informatieobjecttype=self.informatie_object_type["url"],
+            status="definitief",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+            bestandsnaam="uploaded_document.txt",
+            titel="yet_another_document_title.txt",
+            bestandsomvang=123,
+        )
+        self.uploaded_informatie_object = generate_oas_component_cached(
+            "drc",
+            "schemas/EnkelvoudigInformatieObject",
+            uuid="85079ba3-554a-450f-b963-2ce20b176c90",
+            url=self.informatie_object["url"],
+            inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/85079ba3-554a-450f-b963-2ce20b176c90/download",
+            informatieobjecttype=self.informatie_object_type["url"],
+            status="definitief",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+            bestandsnaam="upload.txt",
+            bestandsomvang=123,
+            titel="uploaded file",
+        )
+        self.informatie_object_invisible = generate_oas_component_cached(
+            "drc",
+            "schemas/EnkelvoudigInformatieObject",
+            uuid="994c38fe-b010-4412-881c-3000032fb123",
+            url=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/994c38fe-b010-4412-881c-3000032fb123",
+            inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/994c38fe-b010-4412-881c-3000032fb123/download",
+            informatieobjecttype=self.informatie_object_type["url"],
+            status="definitief",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.geheim,
+            bestandsnaam="geheim-document.txt",
+            bestandsomvang=123,
+        )
+
+        #
+        # Zaken API (ZRC)
+        # https://vng-realisatie.github.io/gemma-zaken/standaard/zaken/
         #
         self.zaak = generate_oas_component_cached(
             "zrc",
             "schemas/Zaak",
             uuid="d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
             url=f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
-            zaaktype=f"{CATALOGI_ROOT}zaaktypen/0caa29cb-0167-426f-8dc1-88bebd7c8804",
+            zaaktype=self.zaaktype["url"],
             identificatie="ZAAK-2022-0000000024",
             omschrijving="Zaak naar aanleiding van ingezonden formulier",
             startdatum="2022-01-02",
@@ -169,40 +349,13 @@ class TestCaseDetailView(
             startdatum="2022-01-02",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.geheim,
         )
-        self.zaaktype = generate_oas_component_cached(
-            "ztc",
-            "schemas/ZaakType",
-            uuid="0caa29cb-0167-426f-8dc1-88bebd7c8804",
-            url=self.zaak["zaaktype"],
-            identificatie="ZAAKTYPE-2020-0000000001",
-            omschrijving="Coffee zaaktype",
-            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
-            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
-            doel="Ask for coffee",
-            aanleiding="Coffee is essential",
-            indicatieInternOfExtern="extern",
-            handelingInitiator="Request",
-            onderwerp="Coffee",
-            handelingBehandelaar="Behandelen",
-            opschortingEnAanhoudingMogelijk=False,
-            verlengingMogelijk=False,
-            publicatieIndicatie=False,
-            besluittypen=[],
-            beginGeldigheid="2020-09-25",
-            versiedatum="2020-09-25",
-        )
-        self.zaaktype_config = ZaakTypeConfigFactory.create(
-            identificatie=self.zaaktype["identificatie"],
-        )
-        #
         # statuses
-        #
         self.status_new = generate_oas_component_cached(
             "zrc",
             "schemas/Status",
             url=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-beu760sle929",
             zaak=self.zaak["url"],
-            statustype=f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-777yu878km09",
+            statustype=self.status_type_new["url"],
             datumStatusGezet="2021-01-12",
             statustoelichting="",
         )
@@ -211,63 +364,11 @@ class TestCaseDetailView(
             "schemas/Status",
             url=f"{ZAKEN_ROOT}statussen/29ag1264-c4he-249j-bc24-jip862tle833",
             zaak=self.zaak["url"],
-            statustype=f"{CATALOGI_ROOT}statustypen/d4839012-gh35-3a8d-866h-444uy935acv7",
+            statustype=self.status_type_finish["url"],
             datumStatusGezet="2021-03-12",
             statustoelichting="",
         )
-        #
-        # status types
-        #
-        self.status_type_new = generate_oas_component_cached(
-            "ztc",
-            "schemas/StatusType",
-            url=self.status_new["statustype"],
-            zaaktype=self.zaaktype["url"],
-            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
-            omschrijving="Initial request",
-            omschrijvingGeneriek="some content",
-            statustekst="Registered",
-            volgnummer=1,
-            isEindstatus=False,
-        )
-        # no associated status (for testing `add_second_status_preview`)
-        self.status_type_in_behandeling = generate_oas_component_cached(
-            "ztc",
-            "schemas/StatusType",
-            url=f"{CATALOGI_ROOT}statustypen/167cb935-ac8a-428e-8cca-5abda0da47c7",
-            zaaktype=self.zaaktype["url"],
-            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
-            omschrijving="In behandeling",
-            omschrijvingGeneriek="some content",
-            statustekst="",
-            volgnummer=3,
-            isEindstatus=False,
-        )
-        # we need to use a `StatusType` object, not the oas_component (a `dict`)
-        self.second_status_preview = StatusType(
-            url=self.status_type_in_behandeling["url"],
-            zaaktype=self.status_type_in_behandeling["zaaktype"],
-            omschrijving="In behandeling",
-            omschrijving_generiek=self.status_type_in_behandeling[
-                "omschrijvingGeneriek"
-            ],
-            statustekst=self.status_type_in_behandeling["statustekst"],
-            volgnummer=3,
-            is_eindstatus=self.status_type_in_behandeling["isEindstatus"],
-            informeren=self.status_type_in_behandeling["informeren"],
-        )
-        self.status_type_finish = generate_oas_component_cached(
-            "ztc",
-            "schemas/StatusType",
-            url=self.status_finish["statustype"],
-            zaaktype=self.zaaktype["url"],
-            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
-            omschrijving="Finish",
-            omschrijvingGeneriek="some content",
-            statustekst="",
-            volgnummer=4,
-            isEindstatus=True,
-        )
+        # user roles
         self.user_role = generate_oas_component_cached(
             "zrc",
             "schemas/Rol",
@@ -332,20 +433,22 @@ class TestCaseDetailView(
                 "geslachtsnaam": "Else",
             },
         )
+        # results
         self.result = generate_oas_component_cached(
             "zrc",
             "schemas/Resultaat",
             uuid="a44153aa-ad2c-6a07-be75-15add5113",
             url=self.zaak["resultaat"],
-            resultaattype=f"{CATALOGI_ROOT}resultaattypen/b1a268dd-4322-47bb-a930-b83066b4a32c",
+            resultaattype=self.resultaattype_with_naam["url"],
             zaak=self.zaak["url"],
             toelichting="resultaat toelichting",
         )
+        # informatie objecten
         self.zaak_informatie_object_old = generate_oas_component_cached(
             "zrc",
             "schemas/ZaakInformatieObject",
             url=f"{ZAKEN_ROOT}zaakinformatieobjecten/e55153aa-ad2c-4a07-ae75-15add57d6",
-            informatieobject=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812",
+            informatieobject=self.informatie_object["url"],
             zaak=self.zaak["url"],
             aardRelatieWeergave="some content",
             titel="info object 1",
@@ -356,122 +459,38 @@ class TestCaseDetailView(
             "zrc",
             "schemas/ZaakInformatieObject",
             url=f"{ZAKEN_ROOT}zaakinformatieobjecten/e55153aa-ad2c-4a07-ae75-15add57d7",
-            informatieobject=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/015c38fe-b010-4412-881c-3000032fb812",
+            informatieobject=self.informatie_object_2["url"],
             zaak=self.zaak["url"],
             aardRelatieWeergave="some content",
             titel="info object 2",
             beschrijving="",
             registratiedatum="2024-01-12T00:00:00+01:00",
         )
-        # informatie_object without registratiedatum
         self.zaak_informatie_object_no_date = generate_oas_component_cached(
             "zrc",
             "schemas/ZaakInformatieObject",
             url=f"{ZAKEN_ROOT}zaakinformatieobjecten/e55153aa-ad2c-4a07-ae75-15add57d7",
-            informatieobject=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/016c38fe-b010-4412-881c-3000032fb812",
+            informatieobject=self.informatie_object_no_date["url"],
             zaak=self.zaak["url"],
             aardRelatieWeergave="some content",
             titel="info object 3",
             beschrijving="",
             registratiedatum=None,
         )
-        self.informatie_object_type = generate_oas_component_cached(
-            "ztc",
-            "schemas/InformatieObjectType",
-            url=f"{CATALOGI_ROOT}informatieobjecttype/014c38fe-b010-4412-881c-3000032fb321",
-            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
-            omschrijving="Some content",
-        )
-        self.zaaktype_informatie_object_type = generate_oas_component_cached(
-            "ztc",
-            "schemas/ZaakTypeInformatieObjectType",
-            uuid="3fb03882-f6f9-4e0d-ad92-f810e24b9abb",
-            url=f"{CATALOGI_ROOT}zaaktype-informatieobjecttypen/93250e6d-ef92-4474-acca-a6dbdcd61b7e",
-            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
-            zaaktype=self.zaaktype["url"],
-            informatieobjecttype=self.informatie_object_type["url"],
-            volgnummer=1,
-            richting="inkomend",
-            statustype=self.status_type_finish,
-        )
-        self.informatie_object = generate_oas_component_cached(
-            "drc",
-            "schemas/EnkelvoudigInformatieObject",
-            uuid="014c38fe-b010-4412-881c-3000032fb812",
-            url=self.zaak_informatie_object_old["informatieobject"],
-            inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812/download",
-            informatieobjecttype=self.informatie_object_type["url"],
-            status="definitief",
-            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
-            bestandsnaam="uploaded_document.txt",
-            titel="uploaded_document_title.txt",
-            bestandsomvang=123,
-        )
-        self.informatie_object_2 = generate_oas_component_cached(
-            "drc",
-            "schemas/EnkelvoudigInformatieObject",
-            uuid="015c38fe-b010-4412-881c-3000032fb812",
-            url=self.zaak_informatie_object_new["informatieobject"],
-            inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/015c38fe-b010-4412-881c-3000032fb812/download",
-            informatieobjecttype=self.informatie_object_type["url"],
-            status="definitief",
-            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
-            bestandsnaam="uploaded_document.txt",
-            titel="another_document_title.txt",
-            bestandsomvang=123,
-        )
-        self.informatie_object_no_date = generate_oas_component_cached(
-            "drc",
-            "schemas/EnkelvoudigInformatieObject",
-            uuid="015c38fe-b010-4412-881c-3000032fb812",
-            url=self.zaak_informatie_object_no_date["informatieobject"],
-            inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/016c38fe-b010-4412-881c-3000032fb812/download",
-            informatieobjecttype=self.informatie_object_type["url"],
-            status="definitief",
-            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
-            bestandsnaam="uploaded_document.txt",
-            titel="yet_another_document_title.txt",
-            bestandsomvang=123,
-        )
-        self.uploaded_informatie_object = generate_oas_component_cached(
-            "drc",
-            "schemas/EnkelvoudigInformatieObject",
-            uuid="85079ba3-554a-450f-b963-2ce20b176c90",
-            url=self.zaak_informatie_object_old["informatieobject"],
-            inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/85079ba3-554a-450f-b963-2ce20b176c90/download",
-            informatieobjecttype=self.informatie_object_type["url"],
-            status="definitief",
-            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
-            bestandsnaam="upload.txt",
-            bestandsomvang=123,
-            titel="uploaded file",
-        )
-
         self.zaak_informatie_object_invisible = generate_oas_component_cached(
             "zrc",
             "schemas/ZaakInformatieObject",
             url=f"{ZAKEN_ROOT}zaakinformatieobjecten/fa5153aa-ad2c-4a07-ae75-15add57ee",
-            informatieobject=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/994c38fe-b010-4412-881c-3000032fb123",
+            informatieobject=self.informatie_object_invisible["url"],
             zaak=self.zaak_invisible["url"],
             aardRelatieWeergave="some invisible content",
             titel="",
             beschrijving="",
             registratiedatum="2021-01-12",
         )
-        self.informatie_object_invisible = generate_oas_component_cached(
-            "drc",
-            "schemas/EnkelvoudigInformatieObject",
-            uuid="994c38fe-b010-4412-881c-3000032fb123",
-            url=self.zaak_informatie_object_invisible["informatieobject"],
-            inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/994c38fe-b010-4412-881c-3000032fb123/download",
-            informatieobjecttype=self.informatie_object_type["url"],
-            status="definitief",
-            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.geheim,
-            bestandsnaam="geheim-document.txt",
-            bestandsomvang=123,
-        )
+
         #
-        # contactmomenten
+        # Contactmomenten API (CMC)
         #
         self.contactmoment_old = generate_oas_component_cached(
             "cmc",
@@ -524,6 +543,7 @@ class TestCaseDetailView(
             object_type="zaak",
             contactmoment=self.contactmoment_old["url"],
         )
+
         #
         # documents
         #
@@ -585,6 +605,7 @@ class TestCaseDetailView(
             self.informatie_object,
             self.informatie_object_2,
             self.informatie_object_invisible,
+            self.resultaattype_with_naam,
             self.zaaktype_informatie_object_type,
             self.status_type_new,
             self.status_type_in_behandeling,
@@ -717,6 +738,13 @@ class TestCaseDetailView(
             case_link_text="Bekijk aanvraag",
         )
 
+        ZaakTypeResultaatTypeConfigFactory.create(
+            zaaktype_config=self.zaaktype_config,
+            resultaattype_url=self.resultaattype_with_naam["url"],
+            omschrijving=self.resultaattype_with_naam["omschrijving"],
+            zaaktype_uuids=[self.zaaktype["uuid"]],
+        )
+
         self._setUpMocks(m)
         status_new_obj, status_finish_obj = factory(
             Status, [self.status_new, self.status_finish]
@@ -770,7 +798,7 @@ class TestCaseDetailView(
                 ],
                 "initiator": "Foo Bar van der Bazz",
                 "result": "resultaat toelichting",
-                "result_description": "",
+                "result_description": "Long description (>20 chars) of result",
                 "case_type_config_description": "",
                 "case_type_document_upload_description": "",
                 "internal_upload_enabled": False,
@@ -892,7 +920,7 @@ class TestCaseDetailView(
                 ],
                 "initiator": "Foo Bar van der Bazz",
                 "result": "resultaat toelichting",
-                "result_description": "",
+                "result_description": "Long description (>20 chars) of result",
                 "case_type_config_description": "",
                 "case_type_document_upload_description": "",
                 "internal_upload_enabled": False,
