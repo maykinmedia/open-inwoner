@@ -5,19 +5,17 @@
     {% render_grid %}
         {% render_column start=5 span=5 %}
         <h1 class="utrecht-heading-1" id="title">
-            {% trans "Ontvang berichten over" %}
+            {% trans "Notificatie voorkeuren" %}
         </h1>
-        <p class="utrecht-paragraph">
-            {% trans "Kies voor welk onderwerp je meldingen wilt ontvangen" %}
-        </p>
 
         <form method="POST" id="change-notifications" action="{% url 'profile:notifications' %}" class="form" novalidate>
             {% csrf_token %}
 
-            <h3 class="utrecht-heading-3">Notificatie voorkeuren</h3>
-
             {# Start of multiple checkbox fields #}
             <ul class="choice-list choice-list-multiple">
+
+            <h3 class="utrecht-heading-3">{% trans "Ontvang berichten over" %}</h3>
+                <p class="utrecht-paragraph">{% trans "Kies voor welk onderwerp je meldingen wilt ontvangen" %}</p>
 
                 {% if form.cases_notifications %}
                     <li class="choice-list-multiple__item">
@@ -43,15 +41,16 @@
             </ul>
             {# End of multiple checkbox fields #}
 
-            {% if siteconfig.notifications_cases_enabled %}
-                <div class="choice-list choice-list-multiple">
-                    {# Info on notifications that cannot be disabled #}
-                    <div class="choice-list__information">
-                        <p class="choice-list-multiple__heading-4">{% icon icon="check" outlined=True %} {% trans "Zaaknotificaties - actie is nodig" %}</p>
-                        <p class="choice-list__p">{% trans "E-mailnotificaties wanneer er actie nodig is voor een zaak (kan niet uitgeschakeld worden)" %}</p>
-                    </div>
+            <div class="choice-list choice-list-multiple">
+                {# Info on notifications that cannot be disabled #}
+                <div class="choice-list__information">
+                    <p class="choice-list-multiple__heading-4">{% icon icon="check" outlined=True %} {% trans "Zaaknotificaties - actie is nodig" %}</p>
+                    <p class="choice-list__p">{% trans "E-mailnotificaties wanneer er actie nodig is voor een zaak (kan niet uitgeschakeld worden)" %}</p>
                 </div>
-            {% endif %}
+            </div>
+
+            <h3 class="utrecht-heading-4">{% trans "How do you want to receive notifications about cases?" %}</h3>
+            {% choice_radio_multiple form.case_notification_channel %}
 
             <div class="form__actions form__actions--fullwidth">
                 {% button text=_("Sla wijzigingen op") primary=True type="submit" form_id="change-notifications" %}

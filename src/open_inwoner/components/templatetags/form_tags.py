@@ -263,6 +263,20 @@ def choice_radio(choice, **kwargs):
     return {**kwargs, "choice": choice}
 
 
+@register.inclusion_tag(WIDGET_TEMPLATES["RADIO"])
+def choice_radio_multiple(field, **kwargs):
+    """
+    Display multiple radio inputs that are rendered from a choice field.
+
+    Usage:
+        {% choice_radio_multiple form.radio_field %}
+
+    Variables:
+        + field: The field that needs to be rendered.
+    """
+    return {**kwargs, "field": field}
+
+
 @register.inclusion_tag("components/Form/Input.html")
 def input(field, **kwargs):
     """
@@ -433,9 +447,9 @@ def field_as_widget(field, class_string, form_id):
 
 @register.simple_tag(takes_context=True)
 def initial_match(context):
-    initial = context.get("initial")
-    choice = context.get("choice")
-    name = context.get("name")
+    initial = context.get("initial", None)
+    choice = context.get("choice", None)
+    name = context.get("name", None)
     return initial.get(name) == choice[0]
 
 

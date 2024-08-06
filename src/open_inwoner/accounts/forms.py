@@ -322,6 +322,7 @@ class UserNotificationsForm(forms.ModelForm):
             "cases_notifications",
             "messages_notifications",
             "plans_notifications",
+            "case_notification_channel",
         )
 
     def __init__(self, user, *args, **kwargs) -> None:

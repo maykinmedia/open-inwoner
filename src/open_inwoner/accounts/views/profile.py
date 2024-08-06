@@ -18,6 +18,7 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 from open_inwoner.accounts.choices import (
     ContactTypeChoices,
     LoginTypeChoices,
+    NotificationChannelChoice,
     StatusChoices,
 )
 from open_inwoner.cms.utils.page_display import (
@@ -342,9 +343,36 @@ class MyNotificationsView(
 
     def form_valid(self, form):
         form.save()
+
+        self.update_klant_api({k: form.cleaned_data[k] for k in form.changed_data})
+
         messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
         self.log_change(self.object, _("users notifications were modified"))
         return HttpResponseRedirect(self.get_success_url())
+
+    def update_klant_api(self, user_form_data: dict):
+        user: User = self.request.user
+        if not user.bsn and not user.kvk:
+            return
+
+        update_data = {}
+        if notification_channel := user_form_data.get("case_notification_channel"):
+            update_data = {
+                "toestemmingZaakNotificatiesAlleenDigitaal": notification_channel
+                == NotificationChannelChoice.digital_only
+            }
+
+        if update_data and (client := build_klanten_client()):
+            klant = client.retrieve_klant(**get_fetch_parameters(self.request))
+            if not klant:
+                return
+
+            self.log_system_action("retrieved klant for user", user=self.request.user)
+            client.partial_update_klant(klant, update_data)
+            self.log_system_action(
+                f"patched klant from user profile edit with fields: {', '.join(sorted(update_data.keys()))}",
+                user=self.request.user,
+            )
 
 
 class UserAppointmentsView(
