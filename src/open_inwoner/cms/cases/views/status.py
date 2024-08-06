@@ -7,7 +7,12 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
-from django.http import Http404, StreamingHttpResponse
+from django.http import (
+    Http404,
+    HttpRequest,
+    HttpResponseRedirect,
+    StreamingHttpResponse,
+)
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -1045,3 +1050,47 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
             "cases:case_detail_contact_form", kwargs=self.kwargs
         )
         return context
+
+
+class LegacyCaseDetailHandler(View):
+    """Redirect the legacy case detail to the current version with ZGW API group ref."""
+
+    def get(
+        self,
+        request: HttpRequest,
+        object_id: str,
+    ):
+        redirect_url = None
+        match ZGWApiGroupConfig.objects.count():
+            case 1:
+                target_api_group = ZGWApiGroupConfig.objects.get()
+                redirect_url = reverse(
+                    "cases:case_detail",
+                    kwargs={
+                        "api_group_id": target_api_group.id,
+                        "object_id": object_id,
+                    },
+                )
+            case count if count > 1:
+                messages.add_message(
+                    request,
+                    messages.ERROR,
+                    _(
+                        "The link you clicked on has expired. Please find your case in the"
+                        " list below."
+                    ),
+                )
+                logger.warning(
+                    "Could not automatically handle legacy case detail URL due to multiple"
+                    " ZGWApiGroupConfig objects"
+                )
+                redirect_url = reverse("cases:index")
+            case 0:
+                # This is an invariant violation: there should always be at least
+                # one ZGWApiGroupConfig.
+                logger.error(
+                    "Legacy redirect invoked without any configured API groups"
+                )
+                raise Http404
+
+        return HttpResponseRedirect(redirect_url)

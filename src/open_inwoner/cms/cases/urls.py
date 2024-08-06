@@ -12,6 +12,7 @@ from .views import (
     CaseDocumentUploadFormView,
     InnerCaseDetailView,
     InnerCaseListView,
+    LegacyCaseDetailHandler,
     OuterCaseDetailView,
     OuterCaseListView,
 )
@@ -61,4 +62,14 @@ urlpatterns = [
     ),
     path("content/", InnerCaseListView.as_view(), name="cases_content"),
     path("", OuterCaseListView.as_view(), name="index"),
+    # Legacy redirects for hard-coded case detail urls lacking a ZGW api group reference
+    # in the url (e.g. from old notification mails). This redirects those URLs
+    # to the new case detail URL with a reference to the only ZGW api group (if 1),
+    # or the case list page with an expiration notice (because we can't be sure which
+    # api group to use).
+    path(
+        "<str:object_id>/status/",
+        LegacyCaseDetailHandler.as_view(),
+        name="legacy_case_detail",
+    ),
 ]
