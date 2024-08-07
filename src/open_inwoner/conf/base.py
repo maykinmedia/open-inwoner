@@ -693,7 +693,7 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": crontab(minute="0", hour="4", day_of_month="*"),
     },
     "Dagelijkse misluke email samenvatting": {
-        "task": "open_inwoner.configurations.tasks.send_failed_email_digest",
+        "task": "open_inwoner.configurations.tasks.send_failed_mail_digest",
         "schedule": crontab(minute="0", hour="7", day_of_month="*"),
     },
     "Probeer emails opnieuw te sturen": {
