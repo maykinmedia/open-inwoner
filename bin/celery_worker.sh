@@ -15,5 +15,11 @@ if [[ "$ENABLE_COVERAGE" ]]; then
 fi
 
 echo "Starting celery worker $WORKER_NAME with queue $QUEUE"
-exec $_binary --workdir src -A "open_inwoner" events -l info --camera django_celery_monitor.camera.Camera --frequency=2.0 &
-exec $_binary --workdir src -A "open_inwoner" worker -l $LOGLEVEL -c $CONCURRENCY -Q $QUEUE -n $WORKER_NAME -E --max-tasks-per-child=50 -l info -B --scheduler django_celery_beat.schedulers:DatabaseScheduler
+exec $_binary --workdir src --app "open_inwoner.celery" worker \
+    -Q $QUEUE \
+    -n $WORKER_NAME \
+    -l $LOGLEVEL \
+    -O fair \
+    -c $CONCURRENCY \
+    -E \
+    --max-tasks-per-child=50
