@@ -692,6 +692,10 @@ CELERY_BEAT_SCHEDULE = {
         "task": "open_inwoner.search.tasks.rebuild_search_index",
         "schedule": crontab(minute="0", hour="4", day_of_month="*"),
     },
+    "Dagelijkse misluke email samenvatting": {
+        "task": "open_inwoner.configurations.tasks.send_failed_email_digest",
+        "schedule": crontab(minute="0", hour="7", day_of_month="*"),
+    },
     "Probeer emails opnieuw te sturen": {
         "task": "django_yubin.tasks.retry_emails",
         "schedule": crontab(minute="1", hour="*", day_of_month="*"),
