@@ -8,9 +8,9 @@ logger = logging.getLogger(__name__)
 
 
 @app.task
-def send_failed_email_digest():
-    logger.info("starting send_failed_email_digest() task")
+def send_failed_mail_digest():
+    logger.info("starting send_failed_mail_digest() task")
 
-    call_command("send_failed_email_digest")
+    call_command("send_failed_mail_digest")
 
-    logger.info("finished send_failed_email_digest() task")
+    logger.info("finished send_failed_mail_digest() task")

@@ -8,11 +8,12 @@ from django_yubin import send_mail as yubin_send_mail
 from django_yubin.models import Log
 from freezegun import freeze_time
 
-from open_inwoner.configurations.tasks import send_failed_email_digest
+from open_inwoner.configurations.tasks import send_failed_mail_digest
 
 from ..models import SiteConfiguration
 
 
+@override_settings(CELERY_TASK_ALWAYS_EAGER=True)
 class DailyFailingEmailDigestTestCase(TestCase):
     def test_no_recipients_configured(self):
         config = SiteConfiguration.get_solo()
@@ -91,12 +92,27 @@ class DailyFailingEmailDigestTestCase(TestCase):
         self.assertIn("to@example.com", email.body)
         self.assertIn("1 januari 2024 13:00", email.body)
 
+    def test_task_triggers_sending_of_digest(self):
+        config = SiteConfiguration.get_solo()
+        config.recipients_email_digest = ["admin@localhost"]
+        config.save()
 
-@override_settings(CELERY_TASK_ALWAYS_EAGER=True)
-# Due to Celery's eager task discovery, we have to mock the imported
-# call_command.
-@mock.patch("open_inwoner.configurations.tasks.call_command")
-class DailyFailingEmailDigestTaskTestCase(TestCase):
+        with freeze_time("2024-01-01T12:00:00"):
+            yubin_send_mail(
+                subject="Should show up in email",
+                from_email="from@example.com",
+                recipient_list=["to@example.com"],
+                message="test",
+            )
+
+        with freeze_time("2024-01-02T00:00:00"):
+            send_failed_mail_digest.delay()
+
+        self.assertEqual(len(mail.outbox), 1)
+
+    # Due to Celery's eager task discovery, we have to mock the imported
+    # call_command.
+    @mock.patch("open_inwoner.configurations.tasks.call_command")
     def test_task_invokes_management_command(self, m):
-        send_failed_email_digest.delay()
-        m.assert_called_once_with("send_failed_email_digest")
+        send_failed_mail_digest.delay()
+        m.assert_called_once_with("send_failed_mail_digest")
