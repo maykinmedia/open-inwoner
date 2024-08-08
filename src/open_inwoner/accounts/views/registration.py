@@ -15,6 +15,9 @@ from digid_eherkenning_oidc_generics.models import (
     OpenIDConnectDigiDConfig,
     OpenIDConnectEHerkenningConfig,
 )
+from open_inwoner.accounts.choices import NotificationChannelChoice
+from open_inwoner.openklant.clients import build_klanten_client
+from open_inwoner.openklant.wrap import get_fetch_parameters
 from open_inwoner.utils.hash import generate_email_from_string
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
@@ -160,6 +163,8 @@ class NecessaryFieldsUserView(LogMixin, LoginRequiredMixin, InviteMixin, UpdateV
     def form_valid(self, form):
         user = form.save()
 
+        self.update_klant_api({k: form.cleaned_data[k] for k in form.changed_data})
+
         invite = form.cleaned_data["invite"]
         if invite:
             self.add_invitee(invite, user)
@@ -181,6 +186,30 @@ class NecessaryFieldsUserView(LogMixin, LoginRequiredMixin, InviteMixin, UpdateV
             initial["email"] = ""
 
         return initial
+
+    def update_klant_api(self, user_form_data: dict):
+        user: User = self.request.user
+        if not user.bsn and not user.kvk:
+            return
+
+        update_data = {}
+        if notification_channel := user_form_data.get("case_notification_channel"):
+            update_data = {
+                "toestemmingZaakNotificatiesAlleenDigitaal": notification_channel
+                == NotificationChannelChoice.digital_only
+            }
+
+        if update_data and (client := build_klanten_client()):
+            klant = client.retrieve_klant(**get_fetch_parameters(self.request))
+            if not klant:
+                return
+
+            self.log_system_action("retrieved klant for user", user=self.request.user)
+            client.partial_update_klant(klant, update_data)
+            self.log_system_action(
+                f"patched klant from user profile edit with fields: {', '.join(sorted(update_data.keys()))}",
+                user=self.request.user,
+            )
 
 
 class EmailVerificationUserView(LogMixin, LoginRequiredMixin, TemplateView):

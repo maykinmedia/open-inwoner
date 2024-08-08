@@ -69,6 +69,9 @@
                     <p class="choice-list__p">{% trans "E-mailnotificaties wanneer er actie nodig is voor een zaak (kan niet uitgeschakeld worden)" %}</p>
                 </div>
 
+                <h3 class="utrecht-heading-4">{% trans "How do you want to receive notifications about cases?" %}</h3>
+                {% choice_radio_multiple form.case_notification_channel %}
+
                 {% form_actions primary_icon='east' primary_text="Voltooi registratie" fullwidth=True %}
             </form>
         {% endrender_column %}

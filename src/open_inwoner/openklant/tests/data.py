@@ -40,7 +40,6 @@ class MockAPIData:
 class MockAPIReadPatchData(MockAPIData):
     def __init__(self):
         self.user = DigidUserFactory(
-            # bsn = "123456789",
             email="old@example.com",
             phonenumber="0100000000",
         )

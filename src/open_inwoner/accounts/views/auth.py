@@ -1,3 +1,5 @@
+import logging
+
 from django.conf import settings
 from django.contrib import auth, messages
 from django.contrib.auth.mixins import UserPassesTestMixin
@@ -16,6 +18,7 @@ from digid_eherkenning.mock.views.digid import DigiDAssertionConsumerServiceMock
 from digid_eherkenning.views.base import get_redirect_url
 from digid_eherkenning.views.digid import DigiDAssertionConsumerServiceView
 from digid_eherkenning.views.eherkenning import eHerkenningAssertionConsumerServiceView
+from onelogin.saml2.utils import OneLogin_Saml2_ValidationError
 
 from digid_eherkenning_oidc_generics.views import (
     eHerkenningOIDCAuthenticationCallbackView,
@@ -24,12 +27,15 @@ from eherkenning.mock import eherkenning_conf
 from eherkenning.mock.views.eherkenning import (
     eHerkenningAssertionConsumerServiceMockView,
 )
+from open_inwoner.openklant.clients import build_klanten_client
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.utils.views import LogMixin
 
 from ..choices import LoginTypeChoices
 from ..forms import CustomPasswordResetForm
+
+logger = logging.getLogger(__name__)
 
 
 class LogPasswordChangeView(UserPassesTestMixin, LogMixin, PasswordChangeView):
@@ -103,6 +109,34 @@ class CustomDigiDAssertionConsumerServiceMockView(
 
 
 class CustomDigiDAssertionConsumerServiceView(DigiDAssertionConsumerServiceView):
+    def get(self, request):
+        errors = []
+        user = auth.authenticate(
+            request=request,
+            digid=True,
+            saml_art=request.GET.get("SAMLart"),
+            errors=errors,
+        )
+        if user is None:
+            error_code = getattr(errors[0], "code", "") if errors else ""
+            error_type = (
+                "cancelled"
+                if error_code == OneLogin_Saml2_ValidationError.STATUS_CODE_AUTHNFAILED
+                else "default"
+            )
+            messages.error(request, self.error_messages[error_type])
+            login_url = self.get_login_url(error_type=error_type)
+            return HttpResponseRedirect(login_url)
+
+        if (client := build_klanten_client()) and (
+            klant := client.create_klant(user_bsn=user.bsn)
+        ):
+            logger.info("Created klant %s for new user %s", klant, user)
+
+        auth.login(request, user)
+
+        return HttpResponseRedirect(self.get_success_url())
+
     def get_login_url(self, **kwargs):
         invite_url = self.request.session.get("invite_url")
         next_url = self.request.GET.get("RelayState")
