@@ -8,19 +8,19 @@
 FROM python:3.11-slim-bookworm AS backend-build
 
 RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
-        pkg-config \
-        build-essential \
-        git \
-        libpq-dev \
-        libxml2-dev \
-        libxmlsec1-dev \
-        libxmlsec1-openssl \
-        libgdk-pixbuf2.0-0 \
-        libffi-dev \
-        shared-mime-info \
-        # weasyprint deps (https://doc.courtbouillon.org/weasyprint/stable/first_steps.html#debian-11)
-        libpango-1.0-0 \
-        libpangoft2-1.0-0 \
+    pkg-config \
+    build-essential \
+    git \
+    libpq-dev \
+    libxml2-dev \
+    libxmlsec1-dev \
+    libxmlsec1-openssl \
+    libgdk-pixbuf2.0-0 \
+    libffi-dev \
+    shared-mime-info \
+    # weasyprint deps (https://doc.courtbouillon.org/weasyprint/stable/first_steps.html#debian-11)
+    libpango-1.0-0 \
+    libpangoft2-1.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -32,7 +32,7 @@ COPY ./requirements /app/requirements
 RUN uv pip install --system -r requirements/production.txt
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        git \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
 # Stage 2 - Install frontend deps and build assets
@@ -60,23 +60,23 @@ FROM python:3.11-slim-bookworm
 # Note: mime-support becomes media-types in Debian Bullseye (required for correctly serving mime-types for images)
 # Also install the dependencies for GeoDjango
 RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
-        curl \
-        procps \
-        nano \
-        mime-support \
-        postgresql-client \
-        libgdal32 \
-        libgeos-c1v5 \
-        libproj25 \
-        libxmlsec1-dev \
-        libxmlsec1-openssl \
-        libgdk-pixbuf2.0-0 \
-        libffi-dev \
-        gettext \
-        shared-mime-info \
-        # weasyprint deps (https://doc.courtbouillon.org/weasyprint/stable/first_steps.html#debian-11)
-        libpango-1.0-0 \
-        libpangoft2-1.0-0 \
+    curl \
+    procps \
+    nano \
+    mime-support \
+    postgresql-client \
+    libgdal32 \
+    libgeos-c1v5 \
+    libproj25 \
+    libxmlsec1-dev \
+    libxmlsec1-openssl \
+    libgdk-pixbuf2.0-0 \
+    libffi-dev \
+    gettext \
+    shared-mime-info \
+    # weasyprint deps (https://doc.courtbouillon.org/weasyprint/stable/first_steps.html#debian-11)
+    libpango-1.0-0 \
+    libpangoft2-1.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -122,9 +122,9 @@ ENV EHERKENNING_MOCK=True
 ARG SECRET_KEY=dummy
 
 LABEL org.label-schema.vcs-ref=$COMMIT_HASH \
-      org.label-schema.vcs-url="https://github.com/maykinmedia/open-inwoner" \
-      org.label-schema.version=$RELEASE \
-      org.label-schema.name="Open Inwoner"
+    org.label-schema.vcs-url="https://github.com/maykinmedia/open-inwoner" \
+    org.label-schema.version=$RELEASE \
+    org.label-schema.name="Open Inwoner"
 
 # Run collectstatic and compilemessages, so the result is already included in
 # the image
