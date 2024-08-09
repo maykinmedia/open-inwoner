@@ -354,6 +354,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_short_name(self):
         return self.first_name
 
+    @property
+    def call_name(self):
+        return self.display_name or self.first_name
+
     def get_address(self):
         if self.street:
             return f"{self.street} {self.housenumber}, {self.postcode} {self.city}"
