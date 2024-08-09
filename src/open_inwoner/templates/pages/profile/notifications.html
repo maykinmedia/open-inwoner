@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n l10n grid_tags form_tags icon_tags button_tags %}
+{% load i18n l10n grid_tags form_tags icon_tags button_tags icon_tags %}
 
 {% block content %}
     {% render_grid %}
@@ -49,8 +49,17 @@
                 </div>
             </div>
 
+            {# Choice of zaken notification channel #}
             <h3 class="utrecht-heading-4">{% trans "How do you want to receive notifications about cases?" %}</h3>
-            {% choice_radio_multiple form.case_notification_channel %}
+                <div class="radios radios--spaced">
+                    {% with form.case_notification_channel as field %}
+                        {% for choice in field.field.choices %}
+                        <div class="radio-group radio-group--stacked choice-list-multiple__item">
+                            {% choice_radio_stacked choice=choice name=field.name data=field.value index=forloop.counter initial=field.form.initial icon_class=choice.1|get_icon_class %}
+                        </div>
+                    {% endfor %}
+                    {% endwith %}
+                </div>
 
             <div class="form__actions form__actions--fullwidth">
                 {% button text=_("Sla wijzigingen op") primary=True type="submit" form_id="change-notifications" %}

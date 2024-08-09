@@ -263,6 +263,20 @@ def choice_radio(choice, **kwargs):
     return {**kwargs, "choice": choice}
 
 
+@register.inclusion_tag("components/Form/ChoiceRadioStacked.html")
+def choice_radio_stacked(choice, **kwargs):
+    """
+    Displaying a radio input that is rendered from a choice field.
+
+    Usage:
+        {% choice_radio form.radio_field %}
+
+    Variables:
+        + choice: The choice that needs to be rendered.
+    """
+    return {**kwargs, "choice": choice}
+
+
 @register.inclusion_tag(WIDGET_TEMPLATES["RADIO"])
 def choice_radio_multiple(field, **kwargs):
     """
@@ -473,3 +487,12 @@ class FormNode(template.Node):
         corrected_kwargs["classes"] = get_form_classes(**corrected_kwargs)
         rendered = render_to_string("components/Form/Form.html", corrected_kwargs)
         return rendered
+
+
+@register.filter
+def get_icon_class(key: str) -> str:
+    mapping = {
+        "Alleen digitaal": "computer",
+        "Digitaal en per brief": "mail",
+    }
+    return mapping.get(key, None)
