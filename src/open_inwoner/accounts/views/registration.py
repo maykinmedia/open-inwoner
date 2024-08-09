@@ -11,20 +11,17 @@ from django.views.generic import TemplateView, UpdateView
 from django_registration.backends.one_step.views import RegistrationView
 from furl import furl
 
-from digid_eherkenning_oidc_generics.models import (
-    OpenIDConnectDigiDConfig,
-    OpenIDConnectEHerkenningConfig,
-)
 from open_inwoner.accounts.choices import NotificationChannelChoice
 from open_inwoner.accounts.views.mixins import KlantenAPIMixin
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.utils.hash import generate_email_from_string
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from ...mail.verification import send_user_email_verification_mail
 from ...utils.text import html_tag_wrap_format
 from ...utils.url import get_next_url_from
 from ..forms import CustomRegistrationForm, NecessaryUserForm
-from ..models import Invite, User
+from ..models import Invite, OpenIDDigiDConfig, OpenIDEHerkenningConfig, User
 
 
 class InviteMixin(CommonPageMixin):
@@ -105,7 +102,7 @@ class CustomRegistrationView(LogMixin, InviteMixin, RegistrationView):
         )
 
         try:
-            config = OpenIDConnectDigiDConfig.get_solo()
+            config = OpenIDDigiDConfig.get_solo()
             if config.enabled:
                 digid_url = reverse("digid_oidc:init")
             else:
@@ -117,7 +114,7 @@ class CustomRegistrationView(LogMixin, InviteMixin, RegistrationView):
             context["digid_url"] = ""
 
         try:
-            config = OpenIDConnectEHerkenningConfig.get_solo()
+            config = OpenIDEHerkenningConfig.get_solo()
             if config.enabled:
                 eherkenning_url = reverse("eherkenning_oidc:init")
             else:

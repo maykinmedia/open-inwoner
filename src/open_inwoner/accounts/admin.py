@@ -16,6 +16,8 @@ from .choices import ContactTypeChoices
 from .forms import GroupAdminForm
 from .models import Action, Document, Invite, Message, User
 
+# XXX: register proxy models and unregister digid_eherkenning.oidc models
+
 
 class ReadOnlyFileMixin:
     """

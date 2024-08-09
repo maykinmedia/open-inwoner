@@ -13,12 +13,6 @@ from django_webtest import WebTest
 from furl import furl
 from pyquery import PyQuery as PQ
 
-from digid_eherkenning_oidc_generics.models import (
-    OpenIDConnectDigiDConfig,
-    OpenIDConnectEHerkenningConfig,
-)
-from open_inwoner.accounts.choices import NotificationChannelChoice
-from open_inwoner.accounts.signals import update_user_from_klant_on_login
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.kvk.branches import get_kvk_branch_number
@@ -33,7 +27,7 @@ from ...cms.tests import cms_tools
 from ...utils.test import ClearCachesMixin
 from ...utils.tests.helpers import AssertRedirectsMixin
 from ..choices import LoginTypeChoices
-from ..models import User
+from ..models import OpenIDDigiDConfig, OpenIDEHerkenningConfig, User
 from .factories import (
     DigidUserFactory,
     InviteFactory,
@@ -59,7 +53,7 @@ class DigiDRegistrationTest(
     def setUpTestData(cls):
         cls.homepage = cms_tools.create_homepage()
 
-    @patch("digid_eherkenning_oidc_generics.models.OpenIDConnectDigiDConfig.get_solo")
+    @patch("open_inwoner.accounts.models.OpenIDDigiDConfig.get_solo")
     def test_registration_page_only_digid(self, mock_solo):
         for oidc_enabled in [True, False]:
             with self.subTest(oidc_enabled=oidc_enabled):
@@ -523,9 +517,7 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
     def setUpTestData(cls):
         cms_tools.create_homepage()
 
-    @patch(
-        "digid_eherkenning_oidc_generics.models.OpenIDConnectEHerkenningConfig.get_solo"
-    )
+    @patch("open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo")
     @patch("open_inwoner.configurations.models.SiteConfiguration.get_solo")
     def test_registration_page_eherkenning(self, mock_solo, mock_eherkenning_config):
         mock_solo.return_value.eherkenning_enabled = True
@@ -1716,7 +1708,7 @@ class TestLoginLogoutFunctionality(AssertRedirectsMixin, WebTest):
         self.assertIn("_auth_user_id", self.app.session)
 
     def test_login_page_shows_correct_digid_login_url(self):
-        config = OpenIDConnectDigiDConfig.get_solo()
+        config = OpenIDDigiDConfig.get_solo()
 
         for oidc_enabled in [True, False]:
             with self.subTest(oidc_enabled=oidc_enabled):
@@ -1741,7 +1733,7 @@ class TestLoginLogoutFunctionality(AssertRedirectsMixin, WebTest):
         site_config.eherkenning_enabled = True
         site_config.save()
 
-        config = OpenIDConnectEHerkenningConfig.get_solo()
+        config = OpenIDEHerkenningConfig.get_solo()
 
         for oidc_enabled in [True, False]:
             with self.subTest(oidc_enabled=oidc_enabled):
