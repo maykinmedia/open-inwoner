@@ -23,10 +23,7 @@ from mozilla_django_oidc_db.models import (
 from privates.test import temp_private_root
 from simple_certmanager.constants import CertificateTypes
 
-from digid_eherkenning_oidc_generics.models import (
-    OpenIDConnectDigiDConfig,
-    OpenIDConnectEHerkenningConfig,
-)
+from open_inwoner.accounts.models import OpenIDDigiDConfig, OpenIDEHerkenningConfig
 from open_inwoner.utils.test import ClearCachesMixin
 
 from ...bootstrap.auth import (
@@ -67,7 +64,7 @@ with open(PRIVATE_KEY_FILE.name, "w") as f:
     DIGID_OIDC_CONFIG_ENABLE=True,
     DIGID_OIDC_OIDC_RP_CLIENT_ID="client-id",
     DIGID_OIDC_OIDC_RP_CLIENT_SECRET="secret",
-    DIGID_OIDC_IDENTIFIER_CLAIM_NAME="claim_name",
+    DIGID_OIDC_BSN_CLAIM=["claim_name"],
     DIGID_OIDC_OIDC_RP_SCOPES_LIST=["openid", "bsn", "extra_scope"],
     DIGID_OIDC_OIDC_RP_SIGN_ALGO="RS256",
     DIGID_OIDC_OIDC_RP_IDP_SIGN_KEY="key",
@@ -78,23 +75,21 @@ with open(PRIVATE_KEY_FILE.name, "w") as f:
     DIGID_OIDC_OIDC_OP_USER_ENDPOINT=f"{IDENTITY_PROVIDER}protocol/openid-connect/userinfo",
     DIGID_OIDC_OIDC_OP_LOGOUT_ENDPOINT=f"{IDENTITY_PROVIDER}protocol/openid-connect/logout",
     DIGID_OIDC_USERINFO_CLAIMS_SOURCE=UserInformationClaimsSources.id_token,
-    DIGID_OIDC_ERROR_MESSAGE_MAPPING={"some_error": "Some readable error"},
     DIGID_OIDC_OIDC_KEYCLOAK_IDP_HINT="parameter",
     DIGID_OIDC_OIDC_USE_NONCE=False,
     DIGID_OIDC_OIDC_NONCE_SIZE=64,
     DIGID_OIDC_OIDC_STATE_SIZE=64,
-    DIGID_OIDC_OIDC_EXEMPT_URLS=["/foo"],
 )
 class DigiDOIDCConfigurationTest(ClearCachesMixin, TestCase):
     def test_configure(self):
         DigiDOIDCConfigurationStep().configure()
 
-        config = OpenIDConnectDigiDConfig.get_solo()
+        config = OpenIDDigiDConfig.get_solo()
 
         self.assertTrue(config.enabled)
         self.assertEqual(config.oidc_rp_client_id, "client-id")
         self.assertEqual(config.oidc_rp_client_secret, "secret")
-        self.assertEqual(config.identifier_claim_name, "claim_name")
+        self.assertEqual(config.bsn_claim, ["claim_name"])
         self.assertEqual(config.oidc_rp_scopes_list, ["openid", "bsn", "extra_scope"])
         self.assertEqual(config.oidc_rp_sign_algo, "RS256")
         self.assertEqual(config.oidc_rp_idp_sign_key, "key")
@@ -122,37 +117,31 @@ class DigiDOIDCConfigurationTest(ClearCachesMixin, TestCase):
         self.assertEqual(
             config.userinfo_claims_source, UserInformationClaimsSources.id_token
         )
-        self.assertEqual(
-            config.error_message_mapping, {"some_error": "Some readable error"}
-        )
         self.assertEqual(config.oidc_keycloak_idp_hint, "parameter")
         self.assertEqual(config.oidc_use_nonce, False)
         self.assertEqual(config.oidc_nonce_size, 64)
         self.assertEqual(config.oidc_state_size, 64)
-        self.assertEqual(config.oidc_exempt_urls, ["/foo"])
 
     @override_settings(
-        DIGID_OIDC_IDENTIFIER_CLAIM_NAME=None,
+        DIGID_OIDC_BSN_CLAIM=None,
         DIGID_OIDC_OIDC_RP_SCOPES_LIST=None,
         DIGID_OIDC_OIDC_RP_SIGN_ALGO=None,
         DIGID_OIDC_OIDC_RP_IDP_SIGN_KEY=None,
         DIGID_OIDC_USERINFO_CLAIMS_SOURCE=None,
-        DIGID_OIDC_ERROR_MESSAGE_MAPPING=None,
         DIGID_OIDC_OIDC_KEYCLOAK_IDP_HINT=None,
         DIGID_OIDC_OIDC_USE_NONCE=None,
         DIGID_OIDC_OIDC_NONCE_SIZE=None,
         DIGID_OIDC_OIDC_STATE_SIZE=None,
-        DIGID_OIDC_OIDC_EXEMPT_URLS=None,
     )
     def test_configure_use_defaults(self):
         DigiDOIDCConfigurationStep().configure()
 
-        config = OpenIDConnectDigiDConfig.get_solo()
+        config = OpenIDDigiDConfig.get_solo()
 
         self.assertTrue(config.enabled)
         self.assertEqual(config.oidc_rp_client_id, "client-id")
         self.assertEqual(config.oidc_rp_client_secret, "secret")
-        self.assertEqual(config.identifier_claim_name, "bsn")
+        self.assertEqual(config.bsn_claim, ["bsn"])
         self.assertEqual(config.oidc_rp_scopes_list, ["openid", "bsn"])
         self.assertEqual(config.oidc_rp_sign_algo, "HS256")
         self.assertEqual(config.oidc_rp_idp_sign_key, "")
@@ -181,12 +170,10 @@ class DigiDOIDCConfigurationTest(ClearCachesMixin, TestCase):
             config.userinfo_claims_source,
             UserInformationClaimsSources.userinfo_endpoint,
         )
-        self.assertEqual(config.error_message_mapping, {})
         self.assertEqual(config.oidc_keycloak_idp_hint, "")
         self.assertEqual(config.oidc_use_nonce, True)
         self.assertEqual(config.oidc_nonce_size, 32)
         self.assertEqual(config.oidc_state_size, 32)
-        self.assertEqual(config.oidc_exempt_urls, [])
 
     @override_settings(
         DIGID_OIDC_OIDC_OP_DISCOVERY_ENDPOINT=IDENTITY_PROVIDER,
@@ -205,7 +192,7 @@ class DigiDOIDCConfigurationTest(ClearCachesMixin, TestCase):
 
         DigiDOIDCConfigurationStep().configure()
 
-        config = OpenIDConnectDigiDConfig.get_solo()
+        config = OpenIDDigiDConfig.get_solo()
 
         self.assertTrue(config.enabled)
         self.assertEqual(config.oidc_op_discovery_endpoint, IDENTITY_PROVIDER)
@@ -257,7 +244,7 @@ class DigiDOIDCConfigurationTest(ClearCachesMixin, TestCase):
                 with self.assertRaises(ConfigurationRunFailed):
                     DigiDOIDCConfigurationStep().configure()
 
-                self.assertFalse(OpenIDConnectDigiDConfig.get_solo().enabled)
+                self.assertFalse(OpenIDDigiDConfig.get_solo().enabled)
 
     @skip("Testing config for DigiD OIDC is not implemented yet")
     @requests_mock.Mocker()
@@ -291,7 +278,7 @@ class DigiDOIDCConfigurationTest(ClearCachesMixin, TestCase):
     EHERKENNING_OIDC_CONFIG_ENABLE=True,
     EHERKENNING_OIDC_OIDC_RP_CLIENT_ID="client-id",
     EHERKENNING_OIDC_OIDC_RP_CLIENT_SECRET="secret",
-    EHERKENNING_OIDC_IDENTIFIER_CLAIM_NAME="claim_name",
+    EHERKENNING_OIDC_LEGAL_SUBJECT_CLAIM=["claim_name"],
     EHERKENNING_OIDC_OIDC_RP_SCOPES_LIST=["openid", "kvk", "extra_scope"],
     EHERKENNING_OIDC_OIDC_RP_SIGN_ALGO="RS256",
     EHERKENNING_OIDC_OIDC_RP_IDP_SIGN_KEY="key",
@@ -302,23 +289,21 @@ class DigiDOIDCConfigurationTest(ClearCachesMixin, TestCase):
     EHERKENNING_OIDC_OIDC_OP_USER_ENDPOINT=f"{IDENTITY_PROVIDER}protocol/openid-connect/userinfo",
     EHERKENNING_OIDC_OIDC_OP_LOGOUT_ENDPOINT=f"{IDENTITY_PROVIDER}protocol/openid-connect/logout",
     EHERKENNING_OIDC_USERINFO_CLAIMS_SOURCE=UserInformationClaimsSources.id_token,
-    EHERKENNING_OIDC_ERROR_MESSAGE_MAPPING={"some_error": "Some readable error"},
     EHERKENNING_OIDC_OIDC_KEYCLOAK_IDP_HINT="parameter",
     EHERKENNING_OIDC_OIDC_USE_NONCE=False,
     EHERKENNING_OIDC_OIDC_NONCE_SIZE=64,
     EHERKENNING_OIDC_OIDC_STATE_SIZE=64,
-    EHERKENNING_OIDC_OIDC_EXEMPT_URLS=["/foo"],
 )
 class eHerkenningOIDCConfigurationTest(ClearCachesMixin, TestCase):
     def test_configure(self):
         eHerkenningOIDCConfigurationStep().configure()
 
-        config = OpenIDConnectEHerkenningConfig.get_solo()
+        config = OpenIDEHerkenningConfig.get_solo()
 
         self.assertTrue(config.enabled)
         self.assertEqual(config.oidc_rp_client_id, "client-id")
         self.assertEqual(config.oidc_rp_client_secret, "secret")
-        self.assertEqual(config.identifier_claim_name, "claim_name")
+        self.assertEqual(config.legal_subject_claim, ["claim_name"])
         self.assertEqual(config.oidc_rp_scopes_list, ["openid", "kvk", "extra_scope"])
         self.assertEqual(config.oidc_rp_sign_algo, "RS256")
         self.assertEqual(config.oidc_rp_idp_sign_key, "key")
@@ -346,37 +331,33 @@ class eHerkenningOIDCConfigurationTest(ClearCachesMixin, TestCase):
         self.assertEqual(
             config.userinfo_claims_source, UserInformationClaimsSources.id_token
         )
-        self.assertEqual(
-            config.error_message_mapping, {"some_error": "Some readable error"}
-        )
         self.assertEqual(config.oidc_keycloak_idp_hint, "parameter")
         self.assertEqual(config.oidc_use_nonce, False)
         self.assertEqual(config.oidc_nonce_size, 64)
         self.assertEqual(config.oidc_state_size, 64)
-        self.assertEqual(config.oidc_exempt_urls, ["/foo"])
 
     @override_settings(
-        EHERKENNING_OIDC_IDENTIFIER_CLAIM_NAME=None,
+        EHERKENNING_OIDC_LEGAL_SUBJECT_CLAIM=None,
         EHERKENNING_OIDC_OIDC_RP_SCOPES_LIST=None,
         EHERKENNING_OIDC_OIDC_RP_SIGN_ALGO=None,
         EHERKENNING_OIDC_OIDC_RP_IDP_SIGN_KEY=None,
         EHERKENNING_OIDC_USERINFO_CLAIMS_SOURCE=None,
-        EHERKENNING_OIDC_ERROR_MESSAGE_MAPPING=None,
         EHERKENNING_OIDC_OIDC_KEYCLOAK_IDP_HINT=None,
         EHERKENNING_OIDC_OIDC_USE_NONCE=None,
         EHERKENNING_OIDC_OIDC_NONCE_SIZE=None,
         EHERKENNING_OIDC_OIDC_STATE_SIZE=None,
-        EHERKENNING_OIDC_OIDC_EXEMPT_URLS=None,
     )
     def test_configure_use_defaults(self):
         eHerkenningOIDCConfigurationStep().configure()
 
-        config = OpenIDConnectEHerkenningConfig.get_solo()
+        config = OpenIDEHerkenningConfig.get_solo()
 
         self.assertTrue(config.enabled)
         self.assertEqual(config.oidc_rp_client_id, "client-id")
         self.assertEqual(config.oidc_rp_client_secret, "secret")
-        self.assertEqual(config.identifier_claim_name, "kvk")
+        self.assertEqual(
+            config.legal_subject_claim, ["urn:etoegang:core:LegalSubjectID"]
+        )
         self.assertEqual(config.oidc_rp_scopes_list, ["openid", "kvk"])
         self.assertEqual(config.oidc_rp_sign_algo, "HS256")
         self.assertEqual(config.oidc_rp_idp_sign_key, "")
@@ -405,12 +386,10 @@ class eHerkenningOIDCConfigurationTest(ClearCachesMixin, TestCase):
             config.userinfo_claims_source,
             UserInformationClaimsSources.userinfo_endpoint,
         )
-        self.assertEqual(config.error_message_mapping, {})
         self.assertEqual(config.oidc_keycloak_idp_hint, "")
         self.assertEqual(config.oidc_use_nonce, True)
         self.assertEqual(config.oidc_nonce_size, 32)
         self.assertEqual(config.oidc_state_size, 32)
-        self.assertEqual(config.oidc_exempt_urls, [])
 
     @override_settings(
         EHERKENNING_OIDC_OIDC_OP_DISCOVERY_ENDPOINT=IDENTITY_PROVIDER,
@@ -429,7 +408,7 @@ class eHerkenningOIDCConfigurationTest(ClearCachesMixin, TestCase):
 
         eHerkenningOIDCConfigurationStep().configure()
 
-        config = OpenIDConnectEHerkenningConfig.get_solo()
+        config = OpenIDEHerkenningConfig.get_solo()
 
         self.assertTrue(config.enabled)
         self.assertEqual(config.oidc_op_discovery_endpoint, IDENTITY_PROVIDER)
@@ -481,7 +460,7 @@ class eHerkenningOIDCConfigurationTest(ClearCachesMixin, TestCase):
                 with self.assertRaises(ConfigurationRunFailed):
                     eHerkenningOIDCConfigurationStep().configure()
 
-                self.assertFalse(OpenIDConnectEHerkenningConfig.get_solo().enabled)
+                self.assertFalse(OpenIDEHerkenningConfig.get_solo().enabled)
 
     @skip("Testing config for DigiD OIDC is not implemented yet")
     @requests_mock.Mocker()
@@ -523,9 +502,9 @@ class eHerkenningOIDCConfigurationTest(ClearCachesMixin, TestCase):
     ADMIN_OIDC_OIDC_OP_AUTHORIZATION_ENDPOINT=f"{IDENTITY_PROVIDER}protocol/openid-connect/auth",
     ADMIN_OIDC_OIDC_OP_TOKEN_ENDPOINT=f"{IDENTITY_PROVIDER}protocol/openid-connect/token",
     ADMIN_OIDC_OIDC_OP_USER_ENDPOINT=f"{IDENTITY_PROVIDER}protocol/openid-connect/userinfo",
-    ADMIN_OIDC_USERNAME_CLAIM="claim_name",
-    ADMIN_OIDC_GROUPS_CLAIM="groups_claim_name",
-    ADMIN_OIDC_CLAIM_MAPPING={"first_name": "given_name"},
+    ADMIN_OIDC_USERNAME_CLAIM=["claim_name"],
+    ADMIN_OIDC_GROUPS_CLAIM=["groups_claim_name"],
+    ADMIN_OIDC_CLAIM_MAPPING={"first_name": ["given_name"]},
     ADMIN_OIDC_SYNC_GROUPS=False,
     ADMIN_OIDC_SYNC_GROUPS_GLOB_PATTERN="local.groups.*",
     ADMIN_OIDC_DEFAULT_GROUPS=["Admins", "Read-only"],
@@ -534,7 +513,6 @@ class eHerkenningOIDCConfigurationTest(ClearCachesMixin, TestCase):
     ADMIN_OIDC_OIDC_USE_NONCE=False,
     ADMIN_OIDC_OIDC_NONCE_SIZE=48,
     ADMIN_OIDC_OIDC_STATE_SIZE=48,
-    ADMIN_OIDC_OIDC_EXEMPT_URLS=["http://testserver/some-endpoint"],
     ADMIN_OIDC_USERINFO_CLAIMS_SOURCE=UserInformationClaimsSources.id_token,
 )
 class AdminOIDCConfigurationTest(ClearCachesMixin, TestCase):
@@ -568,9 +546,9 @@ class AdminOIDCConfigurationTest(ClearCachesMixin, TestCase):
             config.oidc_op_user_endpoint,
             f"{IDENTITY_PROVIDER}protocol/openid-connect/userinfo",
         )
-        self.assertEqual(config.username_claim, "claim_name")
-        self.assertEqual(config.groups_claim, "groups_claim_name")
-        self.assertEqual(config.claim_mapping, {"first_name": "given_name"})
+        self.assertEqual(config.username_claim, ["claim_name"])
+        self.assertEqual(config.groups_claim, ["groups_claim_name"])
+        self.assertEqual(config.claim_mapping, {"first_name": ["given_name"]})
         self.assertEqual(config.sync_groups, False)
         self.assertEqual(config.sync_groups_glob_pattern, "local.groups.*")
         self.assertEqual(
@@ -582,7 +560,6 @@ class AdminOIDCConfigurationTest(ClearCachesMixin, TestCase):
         self.assertEqual(config.oidc_use_nonce, False)
         self.assertEqual(config.oidc_nonce_size, 48)
         self.assertEqual(config.oidc_state_size, 48)
-        self.assertEqual(config.oidc_exempt_urls, ["http://testserver/some-endpoint"])
         self.assertEqual(
             config.userinfo_claims_source, UserInformationClaimsSources.id_token
         )
@@ -599,7 +576,6 @@ class AdminOIDCConfigurationTest(ClearCachesMixin, TestCase):
         ADMIN_OIDC_OIDC_USE_NONCE=None,
         ADMIN_OIDC_OIDC_NONCE_SIZE=None,
         ADMIN_OIDC_OIDC_STATE_SIZE=None,
-        ADMIN_OIDC_OIDC_EXEMPT_URLS=None,
         ADMIN_OIDC_USERINFO_CLAIMS_SOURCE=None,
     )
     def test_configure_use_defaults(self):
@@ -630,11 +606,11 @@ class AdminOIDCConfigurationTest(ClearCachesMixin, TestCase):
             config.oidc_op_user_endpoint,
             f"{IDENTITY_PROVIDER}protocol/openid-connect/userinfo",
         )
-        self.assertEqual(config.username_claim, "sub")
-        self.assertEqual(config.groups_claim, "groups_claim_name")
+        self.assertEqual(config.username_claim, ["sub"])
+        self.assertEqual(config.groups_claim, ["groups_claim_name"])
         self.assertEqual(
             config.claim_mapping,
-            {"last_name": "family_name", "first_name": "given_name"},
+            {"last_name": ["family_name"], "first_name": ["given_name"]},
         )
         self.assertEqual(config.sync_groups, True)
         self.assertEqual(config.sync_groups_glob_pattern, "*")
@@ -647,7 +623,6 @@ class AdminOIDCConfigurationTest(ClearCachesMixin, TestCase):
         self.assertEqual(config.oidc_use_nonce, True)
         self.assertEqual(config.oidc_nonce_size, 32)
         self.assertEqual(config.oidc_state_size, 32)
-        self.assertEqual(config.oidc_exempt_urls, [])
         self.assertEqual(
             config.userinfo_claims_source,
             UserInformationClaimsSources.userinfo_endpoint,

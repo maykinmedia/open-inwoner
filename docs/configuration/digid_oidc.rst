@@ -34,7 +34,6 @@ All settings:
     DIGID_OIDC_ENABLED
     DIGID_OIDC_ERROR_MESSAGE_MAPPING
     DIGID_OIDC_IDENTIFIER_CLAIM_NAME
-    DIGID_OIDC_OIDC_EXEMPT_URLS
     DIGID_OIDC_OIDC_KEYCLOAK_IDP_HINT
     DIGID_OIDC_OIDC_NONCE_SIZE
     DIGID_OIDC_OIDC_OP_AUTHORIZATION_ENDPOINT
@@ -74,12 +73,6 @@ Detailed Information
     Description         De naam van de claim waarin het BSN nummer van de gebruiker is opgeslagen
     Possible values     string
     Default value       bsn
-    
-    Variable            DIGID_OIDC_OIDC_EXEMPT_URLS
-    Setting             URLs exempt from session renewal
-    Description         This is a list of absolute url paths, regular expressions for url paths, or Django view names. This plus the mozilla-django-oidc urls are exempted from the session renewal by the SessionRefresh middleware.
-    Possible values     No information available
-    Default value       
     
     Variable            DIGID_OIDC_OIDC_KEYCLOAK_IDP_HINT
     Setting             Keycloak-identiteitsprovider hint
