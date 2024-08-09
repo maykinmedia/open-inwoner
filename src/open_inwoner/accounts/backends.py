@@ -1,4 +1,5 @@
 import logging
+from typing import Literal
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -7,13 +8,16 @@ from django.contrib.auth.hashers import check_password
 from django.urls import reverse, reverse_lazy
 
 from axes.backends import AxesBackend
+from digid_eherkenning.oidc.backends import BaseBackend
 from mozilla_django_oidc_db.backends import OIDCAuthenticationBackend
+from mozilla_django_oidc_db.config import dynamic_setting
 from oath import accept_totp
 
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.utils.hash import generate_email_from_string
 
 from .choices import LoginTypeChoices
+from .models import OpenIDDigiDConfig, OpenIDEHerkenningConfig
 
 logger = logging.getLogger(__name__)
 
@@ -76,6 +80,8 @@ class CustomOIDCBackend(OIDCAuthenticationBackend):
     def authenticate(self, request, *args, **kwargs):
         # Avoid attempting OIDC for a specific variant if we know that that is not the
         # correct variant being attempted
+        # XXX, TODO, check the config class rather than the path once there's
+        # a single callback URL. We can override ``_check_candidate_backend``.
         if request and request.path != self.callback_path:
             return
 
@@ -91,7 +97,7 @@ class CustomOIDCBackend(OIDCAuthenticationBackend):
 
         before we got here we already checked for existing users based on the overriden queryset from the .filter_users_by_claims()
         """
-        unique_id = self.retrieve_identifier_claim(claims)
+        unique_id = self._extract_username(claims)
 
         if "email" in claims:
             email = claims["email"]
@@ -134,8 +140,49 @@ class CustomOIDCBackend(OIDCAuthenticationBackend):
 
     def filter_users_by_claims(self, claims):
         """Return all users matching the specified subject."""
-        unique_id = self.retrieve_identifier_claim(claims)
+        unique_id = self._extract_username(claims)
 
         if not unique_id:
             return self.UserModel.objects.none()
         return self.UserModel.objects.filter(**{"oidc_id__iexact": unique_id})
+
+
+class DigiDEHerkenningOIDCBackend(BaseBackend):
+    OIP_UNIQUE_ID_USER_FIELDNAME = dynamic_setting[Literal["bsn", "kvk"]]()
+    OIP_LOGIN_TYPE = dynamic_setting[LoginTypeChoices]()
+
+    def _check_candidate_backend(self) -> bool:
+        parent = super()._check_candidate_backend()
+        return parent and self.config_class in (
+            OpenIDDigiDConfig,
+            OpenIDEHerkenningConfig,
+        )
+
+    def filter_users_by_claims(self, claims):
+        """Return all users matching the specified subject."""
+        unique_id = self._extract_username(claims)
+
+        if not unique_id:
+            return self.UserModel.objects.none()
+        return self.UserModel.objects.filter(
+            **{f"{self.OIP_UNIQUE_ID_USER_FIELDNAME}__iexact": unique_id}
+        )
+
+    def create_user(self, claims):
+        """Return object for a newly created user account."""
+
+        unique_id = self._extract_username(claims)
+
+        logger.debug("Creating OIDC user: %s", unique_id)
+
+        user = self.UserModel.objects.create_user(
+            **{
+                self.UserModel.USERNAME_FIELD: generate_email_from_string(
+                    unique_id, domain="localhost"
+                ),
+                self.OIP_UNIQUE_ID_USER_FIELDNAME: unique_id,
+                "login_type": self.OIP_LOGIN_TYPE,
+            }
+        )
+
+        return user

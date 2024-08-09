@@ -13,10 +13,18 @@ from .auth import (
     CustomDigiDAssertionConsumerServiceView,
     CustomeHerkenningAssertionConsumerServiceMockView,
     CustomeHerkenningAssertionConsumerServiceView,
-    CustomEHerkenningOIDCAuthenticationCallbackView,
     LogPasswordChangeView,
     LogPasswordResetConfirmView,
     LogPasswordResetView,
+)
+from .auth_oidc import (
+    OIDCFailureView,
+    digid_callback,
+    digid_init,
+    digid_logout,
+    eherkenning_callback,
+    eherkenning_init,
+    eherkenning_logout,
 )
 from .contacts import (
     ContactApprovalView,
@@ -82,5 +90,12 @@ __all__ = [
     "UserAppointmentsView",
     "CustomRegistrationView",
     "NecessaryFieldsUserView",
-    "CustomEHerkenningOIDCAuthenticationCallbackView",
+    # OIDC
+    "OIDCFailureView",
+    "digid_init",
+    "digid_callback",
+    "digid_logout",
+    "eherkenning_init",
+    "eherkenning_callback",
+    "eherkenning_logout",
 ]
