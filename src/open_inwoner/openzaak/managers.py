@@ -84,7 +84,28 @@ class UserCaseInfoObjectNotificationManager(UserCaseNotificationBaseManager):
         return self.attempt_create(**kwargs)
 
 
+class CatalogusConfigManager(models.Manager):
+    def get_by_natural_key(self, url):
+        return self.get(url=url)
+
+
 class ZaakTypeInformatieObjectTypeConfigQueryset(models.QuerySet):
+    def get_by_natural_key(
+        self,
+        informatieobjecttype_url,
+        zaak_type_config_identificatie,
+        catalogus_url,
+    ):
+        from .models import ZaakTypeConfig
+
+        return self.get(
+            zaaktype_config=ZaakTypeConfig.objects.get(
+                identificatie=zaak_type_config_identificatie,
+                catalogus__url=catalogus_url,
+            ),
+            informatieobjecttype_url=informatieobjecttype_url,
+        )
+
     def filter_catalogus(self, case_type: ZaakType):
         # support both url and resolved dataclass
         catalogus_url = (
@@ -123,6 +144,16 @@ class ZaakTypeInformatieObjectTypeConfigQueryset(models.QuerySet):
 
 
 class ZaakTypeConfigQueryset(models.QuerySet):
+    def get_by_natural_key(
+        self,
+        identificatie,
+        catalogus_url,
+    ):
+        return self.get(
+            identificatie=identificatie,
+            catalogus__url=catalogus_url,
+        )
+
     def filter_catalogus(self, case_type: ZaakType):
         # support both url and resolved dataclass
         catalogus_url = (
@@ -172,6 +203,22 @@ class ZaakTypeConfigQueryset(models.QuerySet):
 
 
 class ZaakTypeStatusTypeConfigQuerySet(models.QuerySet):
+    def get_by_natural_key(
+        self,
+        statustype_url,
+        zaak_type_config_identificatie,
+        catalogus_url,
+    ):
+        from .models import ZaakTypeConfig
+
+        return self.get(
+            zaaktype_config=ZaakTypeConfig.objects.get(
+                identificatie=zaak_type_config_identificatie,
+                catalogus__url=catalogus_url,
+            ),
+            statustype_url=statustype_url,
+        )
+
     def find_for(self, case: Zaak, status: Status):
         return self.find_for_types(case.zaaktype, status.statustype)
 
@@ -194,6 +241,24 @@ class ZaakTypeStatusTypeConfigQuerySet(models.QuerySet):
         return self.filter(
             zaaktype_config__in=ztc, statustype_url=status_type_url
         ).first()
+
+
+class ZaakTypeResultaatTypeConfigManger(models.Manager):
+    def get_by_natural_key(
+        self,
+        resultaattype_url,
+        zaak_type_config_identificatie,
+        catalogus_url,
+    ):
+        from .models import ZaakTypeConfig
+
+        return self.get(
+            zaaktype_config=ZaakTypeConfig.objects.get(
+                identificatie=zaak_type_config_identificatie,
+                catalogus__url=catalogus_url,
+            ),
+            resultaattype_url=resultaattype_url,
+        )
 
 
 class StatusTranslationQuerySet(models.QuerySet):

@@ -17,10 +17,12 @@ from zgw_consumers.constants import APITypes
 from zgw_consumers.models import Service
 
 from open_inwoner.openzaak.managers import (
+    CatalogusConfigManager,
     UserCaseInfoObjectNotificationManager,
     UserCaseStatusNotificationManager,
     ZaakTypeConfigQueryset,
     ZaakTypeInformatieObjectTypeConfigQueryset,
+    ZaakTypeResultaatTypeConfigManger,
     ZaakTypeStatusTypeConfigQuerySet,
 )
 
@@ -434,6 +436,9 @@ class OpenZaakConfig(SingletonModel):
 
 
 class CatalogusConfig(models.Model):
+
+    objects = CatalogusConfigManager()
+
     url = models.URLField(
         verbose_name=_("Catalogus URL"),
         unique=True,
@@ -465,6 +470,9 @@ class CatalogusConfig(models.Model):
 
     def __str__(self):
         return f"{self.domein} - {self.rsin} [{self.base_url}]"
+
+    def natural_key(self) -> tuple[str]:
+        return (self.url,)
 
 
 class ZaakTypeConfig(models.Model):
@@ -560,6 +568,11 @@ class ZaakTypeConfig(models.Model):
         )
         return " - ".join(b for b in bits if b) + f" [{self.catalogus.base_url}]"
 
+    def natural_key(self):
+        return (self.identificatie,) + self.catalogus.natural_key()
+
+    natural_key.dependencies = ["openzaak.catalogusconfig"]
+
 
 class ZaakTypeInformatieObjectTypeConfig(models.Model):
     zaaktype_config = models.ForeignKey(
@@ -622,6 +635,11 @@ class ZaakTypeInformatieObjectTypeConfig(models.Model):
 
     def __str__(self):
         return f"{self.omschrijving} [{self.zaaktype_config.catalogus.base_url}]"
+
+    def natural_key(self):
+        return (self.informatieobjecttype_url,) + self.zaaktype_config.natural_key()
+
+    natural_key.dependencies = ["openzaak.zaaktypeconfig"]
 
 
 class ZaakTypeStatusTypeConfig(models.Model):
@@ -743,8 +761,15 @@ class ZaakTypeStatusTypeConfig(models.Model):
     def __str__(self):
         return f"{self.zaaktype_config.identificatie} - {self.omschrijving} [{self.zaaktype_config.catalogus.base_url}]"
 
+    def natural_key(self):
+        return (self.statustype_url,) + self.zaaktype_config.natural_key()
+
+    natural_key.dependencies = ["openzaak.zaaktypeconfig"]
+
 
 class ZaakTypeResultaatTypeConfig(models.Model):
+    objects = ZaakTypeResultaatTypeConfigManger()
+
     zaaktype_config = models.ForeignKey(
         "openzaak.ZaakTypeConfig",
         on_delete=models.CASCADE,
@@ -786,6 +811,11 @@ class ZaakTypeResultaatTypeConfig(models.Model):
 
     def __str__(self):
         return f"{self.zaaktype_config.identificatie} - {self.omschrijving} [{self.zaaktype_config.catalogus.base_url}]"
+
+    def natural_key(self):
+        return (self.resultaattype_url,) + self.zaaktype_config.natural_key()
+
+    natural_key.dependencies = ["openzaak.zaaktypeconfig"]
 
 
 class UserCaseStatusNotificationBase(models.Model):
