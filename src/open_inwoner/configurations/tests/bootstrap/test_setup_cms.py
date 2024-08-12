@@ -119,6 +119,14 @@ class CMSSetupConfigurationTest(TestCase):
 
         self.assertFalse(profile_page_is_published())
 
+    @override_settings(CMS_CONFIG_PROFILE_ENABLE=False)
+    def test_cms_profile_config_disable(self):
+        configuration_step = CMSProfileConfigurationStep()
+
+        configuration_step.configure()
+
+        self.assertFalse(configuration_step.is_configured())
+
     @override_settings(
         ROOT_URLCONF="open_inwoner.cms.tests.urls",
         CMS_CONFIG_SSD_ENABLE=True,
@@ -161,6 +169,14 @@ class CMSSetupConfigurationTest(TestCase):
         self.assertTrue(extension.requires_auth_bsn_or_kvk)
         self.assertEqual(extension.menu_indicator, "arrow")
         self.assertEqual(extension.menu_icon, "smiley")
+
+    @override_settings(CMS_CONFIG_SSD_ENABLE=False)
+    def test_disable_ssd_config(self):
+        configuration_step = CMSBenefitsConfigurationStep()
+
+        configuration_step.configure()
+
+        self.assertFalse(configuration_step.is_configured())
 
     @override_settings(
         ROOT_URLCONF="open_inwoner.cms.tests.urls",
@@ -205,6 +221,14 @@ class CMSSetupConfigurationTest(TestCase):
         self.assertEqual(extension.menu_indicator, "arrow")
         self.assertEqual(extension.menu_icon, "smiley")
 
+    @override_settings(CMS_CONFIG_CASES_ENABLE=False)
+    def test_disable_cms_cases_config(self):
+        configuration_step = CMSCasesConfigurationStep()
+
+        configuration_step.configure()
+
+        self.assertFalse(configuration_step.is_configured())
+
     @override_settings(
         ROOT_URLCONF="open_inwoner.cms.tests.urls",
         CMS_CONFIG_COLLABORATE_ENABLE=True,
@@ -247,6 +271,14 @@ class CMSSetupConfigurationTest(TestCase):
         self.assertTrue(extension.requires_auth_bsn_or_kvk)
         self.assertEqual(extension.menu_indicator, "arrow")
         self.assertEqual(extension.menu_icon, "smiley")
+
+    @override_settings(CMS_CONFIG_COLLABORATE_ENABLE=False)
+    def test_disable_cms_collaborate_config(self):
+        configuration_step = CMSCollaborateConfigurationStep()
+
+        configuration_step.configure()
+
+        self.assertFalse(configuration_step.is_configured())
 
     @override_settings(
         ROOT_URLCONF="open_inwoner.cms.tests.urls",
@@ -291,6 +323,14 @@ class CMSSetupConfigurationTest(TestCase):
         self.assertEqual(extension.menu_indicator, "arrow")
         self.assertEqual(extension.menu_icon, "smiley")
 
+    @override_settings(CMS_CONFIG_INBOX_ENABLE=False)
+    def test_disable_cms_inbox_config(self):
+        configuration_step = CMSInboxConfigurationStep()
+
+        configuration_step.configure()
+
+        self.assertFalse(configuration_step.is_configured())
+
     @override_settings(
         ROOT_URLCONF="open_inwoner.cms.tests.urls",
         CMS_CONFIG_PRODUCTS_ENABLE=True,
@@ -333,3 +373,11 @@ class CMSSetupConfigurationTest(TestCase):
         self.assertTrue(extension.requires_auth_bsn_or_kvk)
         self.assertEqual(extension.menu_indicator, "arrow")
         self.assertEqual(extension.menu_icon, "smiley")
+
+    @override_settings(CMS_CONFIG_PRODUCTS_ENABLE=False)
+    def test_disable_cms_profucts_config(self):
+        configuration_step = CMSProductsConfigurationStep()
+
+        configuration_step.configure()
+
+        self.assertFalse(configuration_step.is_configured())

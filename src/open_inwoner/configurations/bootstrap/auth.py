@@ -72,6 +72,9 @@ class DigiDOIDCConfigurationStep(BaseConfigurationStep):
         return OpenIDConnectDigiDConfig.get_solo().enabled
 
     def configure(self):
+        if not getattr(settings, self.config_settings.enable_setting, None):
+            return
+
         config = OpenIDConnectDigiDConfig.get_solo()
 
         # Use the model defaults
@@ -159,6 +162,9 @@ class eHerkenningOIDCConfigurationStep(BaseConfigurationStep):
         return OpenIDConnectEHerkenningConfig.get_solo().enabled
 
     def configure(self):
+        if not getattr(settings, self.config_settings.enable_setting, None):
+            return
+
         config = OpenIDConnectEHerkenningConfig.get_solo()
 
         # Use the model defaults
@@ -250,6 +256,9 @@ class AdminOIDCConfigurationStep(BaseConfigurationStep):
         return OpenIDConnectConfig.get_solo().enabled
 
     def configure(self):
+        if not getattr(settings, self.config_settings.enable_setting, None):
+            return
+
         config = OpenIDConnectConfig.get_solo()
 
         # Use the model defaults
@@ -353,6 +362,9 @@ class DigiDSAMLConfigurationStep(BaseConfigurationStep):
         )
 
     def configure(self):
+        if not getattr(settings, self.config_settings.enable_setting, None):
+            return
+
         config = DigidConfiguration.get_solo()
 
         # Use the model defaults
@@ -494,6 +506,9 @@ class eHerkenningSAMLConfigurationStep(BaseConfigurationStep):
         )
 
     def configure(self):
+        if not getattr(settings, self.config_settings.enable_setting, None):
+            return
+
         config = EherkenningConfiguration.get_solo()
 
         # Use the model defaults

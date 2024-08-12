@@ -39,9 +39,8 @@ class GenericCMSConfigurationStep(BaseConfigurationStep):
 
         Pattern for enable setting: CMS_CONFIG_APPNAME_ENABLE
         """
-        return (
+        return bool(
             getattr(settings, f"CMS_CONFIG_{self.app_name.upper()}_ENABLE", None)
-            is not None
         )
 
     def configure(self):
@@ -52,6 +51,12 @@ class GenericCMSConfigurationStep(BaseConfigurationStep):
         configuration beyond the commonextension. Override to provide additional
         arguments to :func:`create_apphook_page`.
         """
+        enable_setting = getattr(
+            settings, f"CMS_CONFIG_{self.app_name.upper()}_ENABLE", None
+        )
+        if not enable_setting:
+            return
+
         extension_args = create_apphook_page_args(
             self.config_settings.extension_settings_mapping
         )
@@ -255,6 +260,9 @@ class CMSProfileConfigurationStep(GenericCMSConfigurationStep):
         self.app_name = "profile"
 
     def configure(self):
+        if not getattr(settings, self.config_settings.enable_setting, None):
+            return
+
         extension_settings = [
             "CMS_PROFILE_REQUIRES_AUTH",
             "CMS_PROFILE_REQUIRES_AUTH_BSN_OR_KVK",

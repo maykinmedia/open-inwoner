@@ -61,6 +61,9 @@ class ZakenAPIConfigurationStep(BaseConfigurationStep):
         ).exists()
 
     def configure(self):
+        if not getattr(settings, self.config_settings.enable_setting, None):
+            return
+
         organization = settings.OIP_ORGANIZATION or settings.ENVIRONMENT
         org_label = f"Open Inwoner {organization}".strip()
 
@@ -142,6 +145,9 @@ class CatalogiAPIConfigurationStep(BaseConfigurationStep):
         ).exists()
 
     def configure(self):
+        if not getattr(settings, self.config_settings.enable_setting, None):
+            return
+
         organization = settings.OIP_ORGANIZATION or settings.ENVIRONMENT
         org_label = f"Open Inwoner {organization}".strip()
 
@@ -223,6 +229,9 @@ class DocumentenAPIConfigurationStep(BaseConfigurationStep):
         ).exists()
 
     def configure(self):
+        if not getattr(settings, self.config_settings.enable_setting, None):
+            return
+
         organization = settings.OIP_ORGANIZATION or settings.ENVIRONMENT
         org_label = f"Open Inwoner {organization}".strip()
 
@@ -304,6 +313,9 @@ class FormulierenAPIConfigurationStep(BaseConfigurationStep):
         ).exists()
 
     def configure(self):
+        if not getattr(settings, self.config_settings.enable_setting, None):
+            return
+
         organization = settings.OIP_ORGANIZATION or settings.ENVIRONMENT
         org_label = f"Open Inwoner {organization}".strip()
 
@@ -379,6 +391,9 @@ class ZGWAPIsConfigurationStep(BaseConfigurationStep):
         return ZGWApiGroupConfig.objects.filter(open_zaak_config=zgw_config).exists()
 
     def configure(self):
+        if not getattr(settings, self.config_settings.enable_setting, None):
+            return
+
         config = OpenZaakConfig.get_solo()
         ZGWApiGroupConfig.objects.create(
             open_zaak_config=config,
