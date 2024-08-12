@@ -69,18 +69,15 @@ class Zaak(ZGWModel):
     def identification(self) -> str:
         return self._format_zaak_identificatie()
 
-    def process_data(self) -> dict:
-        """
-        Prepare data for template
-        """
-
-        status_text = glom_multiple(
+    @property
+    def status_text(self) -> str:
+        _status_text = glom_multiple(
             self,
             ("status.statustype.statustekst", "status.statustype.omschrijving"),
             default="",
         )
         if self.einddatum and self.resultaat:
-            result_text = glom_multiple(
+            _status_text = glom_multiple(
                 self,
                 (
                     "resultaat.resultaattype.naam",
@@ -90,7 +87,14 @@ class Zaak(ZGWModel):
                 ),
                 default="",
             )
-            status_text = result_text or status_text or _("No data available")
+        _status_text = _status_text or _("No data available")
+
+        return _status_text
+
+    def process_data(self) -> dict:
+        """
+        Prepare data for template
+        """
 
         return {
             "identification": self.identification,
@@ -98,7 +102,7 @@ class Zaak(ZGWModel):
             "start_date": self.startdatum,
             "end_date": getattr(self, "einddatum", None),
             "description": self.zaaktype.omschrijving,
-            "current_status": status_text,
+            "current_status": self.status_text,
             "zaaktype_config": getattr(self, "zaaktype_config", None),
             "statustype_config": getattr(self, "statustype_config", None),
             "case_type": "Zaak",

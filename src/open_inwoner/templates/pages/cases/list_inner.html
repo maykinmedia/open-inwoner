@@ -4,6 +4,18 @@
 <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-title-text">{{ title_text }}</p>
 
 <div class="card__grid">
+
+<div>
+    <form method="GET" id="filter-form">
+        <table>
+            {{ form }}
+        </table>
+        <button class="button button--primary" type="submit" value="" title="{% trans 'Filter cases' %}" aria-label="{% trans 'Filter cases' %}" id="filter_cases">
+            {% trans 'Filter cases' %}
+        </button>
+    </form>
+</div>
+
 {% render_grid %}
     {% if not cases %}
         <b>{% trans "U heeft op dit moment nog geen lopende aanvragen." %}</b>
@@ -28,7 +40,7 @@
                                     <p class="card__caption card__text--small"><span>{% trans "Aanvraag verloopt op:" %}</span><span class="card__text--dark">{{ end_date|date }}</span></p>
                                 {% endwith %}
                             </li>
-                            {% list_item text="Openstaande aanvraag" caption=_("Status") compact=True strong=False %}
+                            {% list_item text=_("Openstaande aanvraag") caption=_("Status") compact=True strong=False %}
                         {% endrender_list %}
                         <span class="link link--icon link--secondary">
                         <span class="link__text">{% trans "Aanvraag afronden" %}</span>
