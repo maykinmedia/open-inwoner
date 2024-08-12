@@ -45,6 +45,7 @@ class ESuiteTaskData:
             "naam": "Aanvullende informatie gewenst",
             "startdatum": "2023-11-14",
             "formulierLink": "https://maykinmedia.nl",
+            "zaakIdentificatie": "6789-2024",
         }
         self.task2 = {
             "url": "https://maykinmedia.nl",
@@ -53,6 +54,7 @@ class ESuiteTaskData:
             "naam": "Aanvullende informatie gewenst",
             "startdatum": "2023-10-11",
             "formulierLink": "https://maykinmedia.nl",
+            "zaakIdentificatie": "9876-2024",
         }
 
     def install_mocks(self, m):

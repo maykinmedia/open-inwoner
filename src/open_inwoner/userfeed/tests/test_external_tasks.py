@@ -38,6 +38,7 @@ class UserFeedExternalTasksTestCase(TestCase):
                 "task_name": "Aanvullende informatie gewenst",
                 "task_identificatie": "4321-2023",
                 "action_url": "https://maykinmedia.nl",
+                "zaak_identificatie": "6789-2024",
             },
         )
 
@@ -49,7 +50,8 @@ class UserFeedExternalTasksTestCase(TestCase):
             # `cms_tools.render_plugin` renders twice
             mock.assert_has_calls([call(self.user), call(self.user)])
 
-            self.assertIn(f"{_('Open task')} (4321-2023)", html)
+            self.assertIn(f"{_('Open task')} 4321-2023", html)
+            self.assertIn(f"({_('Case number')}: 6789-2024)", html)
             self.assertIn("Aanvullende informatie gewenst", html)
 
     @requests_mock.Mocker()
@@ -74,6 +76,7 @@ class UserFeedExternalTasksTestCase(TestCase):
                     "task_name": "Aanvullende informatie gewenst",
                     "task_identificatie": "1234-2023",
                     "action_url": "https://maykinmedia.nl",
+                    "zaak_identificatie": "6789-2024",
                 },
             )
             self.assertEqual(
@@ -89,6 +92,7 @@ class UserFeedExternalTasksTestCase(TestCase):
                     "task_name": "Aanvullende informatie gewenst",
                     "task_identificatie": "4321-2023",
                     "action_url": "https://maykinmedia.nl",
+                    "zaak_identificatie": "9876-2024",
                 },
             )
             self.assertEqual(
@@ -114,6 +118,7 @@ class UserFeedExternalTasksTestCase(TestCase):
                 "task_name": "Aanvullende informatie gewenst",
                 "task_identificatie": "4321-2023",
                 "action_url": "https://maykinmedia.nl",
+                "zaak_identificatie": "9876-2024",
             },
         )
 
@@ -181,5 +186,6 @@ class UserFeedExternalTasksTestCase(TestCase):
                 "task_name": "Aanvullende informatie gewenst",
                 "task_identificatie": "1234-2023",
                 "action_url": "https://maykinmedia.nl",
+                "zaak_identificatie": "6789-2024",
             },
         )

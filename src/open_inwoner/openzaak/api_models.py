@@ -332,3 +332,4 @@ class OpenTask(Model):
     naam: str
     startdatum: date
     formulier_link: str
+    zaak_identificatie: str
