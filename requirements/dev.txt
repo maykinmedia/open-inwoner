@@ -279,6 +279,7 @@ django==4.2.15
     #   mozilla-django-oidc-db
     #   notifications-api-common
     #   zgw-consumers
+    #   zgw-consumers-oas
 django-admin-index==3.1.0
     # via
     #   -c requirements/ci.txt
@@ -641,12 +642,13 @@ factory-boy==3.2.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-faker==9.9.0
+faker==27.0.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   factory-boy
     #   polyfactory
+    #   zgw-consumers-oas
 flake8==7.0.0
     # via
     #   -c requirements/ci.txt
@@ -685,7 +687,6 @@ gemma-zds-client==2.0.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   notifications-api-common
-    #   zgw-consumers
 geographiclib==1.52
     # via
     #   -c requirements/ci.txt
@@ -1001,6 +1002,7 @@ pyjwt==2.8.0
     #   -r requirements/ci.txt
     #   gemma-zds-client
     #   messagebird
+    #   zgw-consumers
 pylint==2.17.7
     # via
     #   -c requirements/ci.txt
@@ -1012,7 +1014,6 @@ pyopenssl==24.0.0
     #   django-simple-certmanager
     #   josepy
     #   webauthn
-    #   zgw-consumers
 pyphen==0.12.0
     # via
     #   -c requirements/ci.txt
@@ -1074,6 +1075,7 @@ pyyaml==6.0
     #   drf-spectacular
     #   gemma-zds-client
     #   tablib
+    #   zgw-consumers-oas
 pyzmq==25.1.2
     # via locust
 qrcode==6.1
@@ -1234,11 +1236,6 @@ tblib==1.7.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-text-unidecode==1.3
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   faker
 tinycss2==1.1.1
     # via
     #   -c requirements/ci.txt
@@ -1264,6 +1261,8 @@ typing-extensions==4.10.0
     #   pydantic-core
     #   pyee
     #   xsdata
+    #   zgw-consumers
+    #   zgw-consumers-oas
 tzdata==2024.1
     # via
     #   -c requirements/ci.txt
@@ -1361,11 +1360,15 @@ xsdata==23.8
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-zgw-consumers==0.29.0
+zgw-consumers==0.34.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   notifications-api-common
+zgw-consumers-oas==1.0.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 zope-event==5.0
     # via gevent
 zope-interface==6.1

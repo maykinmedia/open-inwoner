@@ -206,6 +206,7 @@ class TestZGWApiGroupServicesRequiredFailingMigration(TestFailingMigrations):
 class TestZGWApiGroupServicesRequiredSuccessfulMigration(TestSuccessfulMigrations):
     migrate_from = "0053_zaaktypeconfig_catalogus_is_required"
     migrate_to = "0054_zgw_api_group_requires_most_services"
+    extra_migrate_from = [("zgw_consumers", "0019_alter_service_uuid")]
     app = "openzaak"
 
     def setUpBeforeMigration(self, apps):
