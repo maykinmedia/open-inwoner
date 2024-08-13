@@ -266,29 +266,21 @@ def choice_radio(choice, **kwargs):
 @register.inclusion_tag("components/Form/ChoiceRadioStacked.html")
 def choice_radio_stacked(choice, **kwargs):
     """
-    Displaying a radio input that is rendered from a choice field.
+    Display radio input rendered from a choice field.
+
+    Args:
+        choice: the choice to be rendered
+        name: the name of the form field
+        data: the value of a form field field
+        index: the index of a for-loop when looping over choices
+        initial: the initial value of the field
+        icon_class: the icon to be displayed at the top of the
+            radio stack
 
     Usage:
-        {% choice_radio form.radio_field %}
-
-    Variables:
-        + choice: The choice that needs to be rendered.
+        {% choice_radio_stacked choice=choice name=field.name ... icon_class=choice.1|get_icon_class %}
     """
     return {**kwargs, "choice": choice}
-
-
-@register.inclusion_tag(WIDGET_TEMPLATES["RADIO"])
-def choice_radio_multiple(field, **kwargs):
-    """
-    Display multiple radio inputs that are rendered from a choice field.
-
-    Usage:
-        {% choice_radio_multiple form.radio_field %}
-
-    Variables:
-        + field: The field that needs to be rendered.
-    """
-    return {**kwargs, "field": field}
 
 
 @register.inclusion_tag("components/Form/Input.html")

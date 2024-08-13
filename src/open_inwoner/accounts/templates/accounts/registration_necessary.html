@@ -69,8 +69,17 @@
                     <p class="choice-list__p">{% trans "E-mailnotificaties wanneer er actie nodig is voor een zaak (kan niet uitgeschakeld worden)" %}</p>
                 </div>
 
+                {# Choice of zaken notification channel #}
                 <h3 class="utrecht-heading-4">{% trans "How do you want to receive notifications about cases?" %}</h3>
-                {% choice_radio_multiple form.case_notification_channel %}
+                    <div class="radios radios--spaced">
+                        {% with form.case_notification_channel as field %}
+                            {% for choice in field.field.choices %}
+                            <div class="radio-group radio-group--stacked choice-list-multiple__item">
+                                {% choice_radio_stacked choice=choice name=field.name data=field.value index=forloop.counter initial=field.form.initial icon_class=choice.1|get_icon_class %}
+                            </div>
+                        {% endfor %}
+                        {% endwith %}
+                    </div>
 
                 {% form_actions primary_icon='east' primary_text="Voltooi registratie" fullwidth=True %}
             </form>

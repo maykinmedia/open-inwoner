@@ -993,6 +993,10 @@ class EditNotificationsTests(AssertTimelineLogMixin, WebTest):
         self.assertTrue(self.user.cases_notifications)
         self.assertFalse(self.user.messages_notifications)
         self.assertTrue(self.user.plans_notifications)
+        self.assertEqual(
+            self.user.case_notification_channel,
+            NotificationChannelChoice.digital_and_post,
+        )
 
     def test_cases_notifications_is_accessible_when_digid_user(self, mock_page_display):
         self.user.login_type = LoginTypeChoices.digid
