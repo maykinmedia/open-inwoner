@@ -2,7 +2,7 @@ import re
 from copy import deepcopy
 from uuid import uuid4
 
-from zgw_consumers.test import generate_oas_component
+from zgw_consumers_oas import generate_oas_component
 
 from open_inwoner.utils.hash import pyhash_value
 
