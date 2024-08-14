@@ -59,6 +59,9 @@ class KlantenAPIConfigurationStep(BaseConfigurationStep):
         ).exists()
 
     def configure(self):
+        if not getattr(settings, self.config_settings.enable_setting, None):
+            return
+
         organization = settings.OIP_ORGANIZATION or settings.ENVIRONMENT
         org_label = f"Open Inwoner {organization}".strip()
 
@@ -136,6 +139,9 @@ class ContactmomentenAPIConfigurationStep(BaseConfigurationStep):
         ).exists()
 
     def configure(self):
+        if not getattr(settings, self.config_settings.enable_setting, None):
+            return
+
         organization = settings.OIP_ORGANIZATION or settings.ENVIRONMENT
         org_label = f"Open Inwoner {organization}".strip()
 
@@ -206,6 +212,9 @@ class KICAPIsConfigurationStep(BaseConfigurationStep):
         )
 
     def configure(self):
+        if not getattr(settings, self.config_settings.enable_setting, None):
+            return
+
         config = OpenKlantConfig.get_solo()
         config.klanten_service = Service.objects.get(
             api_root=settings.KIC_KLANTEN_SERVICE_API_ROOT

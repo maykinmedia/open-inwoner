@@ -39,6 +39,7 @@ with open(PUBLIC_CERT_FILE.name, "w") as f:
 @temp_private_root()
 @override_settings(
     OIP_ORGANIZATION="Maykin",
+    ZGW_CONFIG_ENABLE=True,
     ZGW_SERVER_CERTIFICATE_LABEL="ZGW services server certificate",
     ZGW_SERVER_CERTIFICATE_TYPE=CertificateTypes.cert_only,
     ZGW_SERVER_CERTIFICATE_PUBLIC_CERTIFICATE=PUBLIC_CERT_FILE.name,
@@ -276,3 +277,15 @@ class ZGWConfigurationTests(TestCase):
                 config.configure()
 
                 self.assertTrue(config.is_configured())
+
+    @override_settings(ZGW_CONFIG_ENABLE=False)
+    def test_zgw__config_disable(self):
+        ZakenAPIConfigurationStep().configure()
+        CatalogiAPIConfigurationStep().configure()
+        DocumentenAPIConfigurationStep().configure()
+        FormulierenAPIConfigurationStep().configure()
+        configuration = ZGWAPIsConfigurationStep()
+
+        configuration.configure()
+
+        self.assertFalse(configuration.is_configured())

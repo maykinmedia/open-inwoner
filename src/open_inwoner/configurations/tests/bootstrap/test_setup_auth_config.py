@@ -64,6 +64,7 @@ with open(PRIVATE_KEY_FILE.name, "w") as f:
 
 
 @override_settings(
+    DIGID_OIDC_CONFIG_ENABLE=True,
     DIGID_OIDC_OIDC_RP_CLIENT_ID="client-id",
     DIGID_OIDC_OIDC_RP_CLIENT_SECRET="secret",
     DIGID_OIDC_IDENTIFIER_CLAIM_NAME="claim_name",
@@ -277,8 +278,17 @@ class DigiDOIDCConfigurationTest(ClearCachesMixin, TestCase):
 
         self.assertTrue(config.is_configured())
 
+    @override_settings(DIGID_OIDC_CONFIG_ENABLE=False)
+    def test_disable_digid_oidc_config(self):
+        config = DigiDOIDCConfigurationStep()
+
+        config.configure()
+
+        self.assertFalse(config.is_configured())
+
 
 @override_settings(
+    EHERKENNING_OIDC_CONFIG_ENABLE=True,
     EHERKENNING_OIDC_OIDC_RP_CLIENT_ID="client-id",
     EHERKENNING_OIDC_OIDC_RP_CLIENT_SECRET="secret",
     EHERKENNING_OIDC_IDENTIFIER_CLAIM_NAME="claim_name",
@@ -492,8 +502,17 @@ class eHerkenningOIDCConfigurationTest(ClearCachesMixin, TestCase):
 
         self.assertTrue(config.is_configured())
 
+    @override_settings(EHERKENNING_OIDC_CONFIG_ENABLE=False)
+    def test_disable_eherkenning_oidc_config(self):
+        config = eHerkenningOIDCConfigurationStep()
+
+        config.configure()
+
+        self.assertFalse(config.is_configured())
+
 
 @override_settings(
+    ADMIN_OIDC_CONFIG_ENABLE=True,
     ADMIN_OIDC_OIDC_RP_CLIENT_ID="client-id",
     ADMIN_OIDC_OIDC_RP_CLIENT_SECRET="secret",
     ADMIN_OIDC_OIDC_RP_SCOPES_LIST=["open_id", "email", "profile", "extra_scope"],
@@ -718,9 +737,18 @@ class AdminOIDCConfigurationTest(ClearCachesMixin, TestCase):
 
         self.assertTrue(config.is_configured())
 
+    @override_settings(ADMIN_OIDC_CONFIG_ENABLE=False)
+    def test_disable_admin_oidc_config(self):
+        config = AdminOIDCConfigurationStep()
+
+        config.configure()
+
+        self.assertFalse(config.is_configured())
+
 
 @temp_private_root()
 @override_settings(
+    DIGID_SAML_CONFIG_ENABLE=True,
     DIGID_SAML_CERTIFICATE_LABEL="DigiD certificate",
     DIGID_SAML_CERTIFICATE_TYPE=CertificateTypes.key_pair,
     DIGID_SAML_CERTIFICATE_PUBLIC_CERTIFICATE=PUBLIC_CERT_FILE.name,
@@ -863,9 +891,18 @@ class DigiDSAMLConfigurationTest(ClearCachesMixin, TestCase):
 
         self.assertTrue(config.is_configured())
 
+    @override_settings(DIGID_SAML_CONFIG_ENABLE=False)
+    def test_disable_digid_saml_config(self):
+        config = DigiDSAMLConfigurationStep()
+
+        config.configure()
+
+        self.assertFalse(config.is_configured())
+
 
 @temp_private_root()
 @override_settings(
+    EHERKENNING_SAML_CONFIG_ENABLE=True,
     EHERKENNING_SAML_CERTIFICATE_LABEL="eHerkenning certificate",
     EHERKENNING_SAML_CERTIFICATE_TYPE=CertificateTypes.key_pair,
     EHERKENNING_SAML_CERTIFICATE_PUBLIC_CERTIFICATE=PUBLIC_CERT_FILE.name,
@@ -1051,3 +1088,11 @@ class eHerkenningSAMLConfigurationTest(ClearCachesMixin, TestCase):
             config.configure()
 
         self.assertTrue(config.is_configured())
+
+    @override_settings(EHERKENNING_SAML_CONFIG_ENABLE=False)
+    def test_disable_eherkenning_saml_config(self):
+        config = eHerkenningSAMLConfigurationStep()
+
+        config.configure()
+
+        self.assertFalse(config.is_configured())

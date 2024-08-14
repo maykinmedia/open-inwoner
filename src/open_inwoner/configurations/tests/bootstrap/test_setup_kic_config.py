@@ -27,6 +27,7 @@ with open(PUBLIC_CERT_FILE.name, "w") as f:
 
 @override_settings(
     OIP_ORGANIZATION="Maykin",
+    KIC_CONFIG_ENABLE=True,
     KIC_SERVER_CERTIFICATE_LABEL="KIC services server certificate",
     KIC_SERVER_CERTIFICATE_TYPE=CertificateTypes.cert_only,
     KIC_SERVER_CERTIFICATE_PUBLIC_CERTIFICATE=PUBLIC_CERT_FILE.name,
@@ -95,6 +96,7 @@ class KICConfigurationTests(TestCase):
 
     @override_settings(
         OIP_ORGANIZATION=None,
+        KIC_CONFIG_ENABLE=True,
         KIC_REGISTER_EMAIL=None,
         KIC_REGISTER_CONTACT_MOMENT=None,
         KIC_REGISTER_BRONORGANISATIE_RSIN=None,
@@ -132,6 +134,7 @@ class KICConfigurationTests(TestCase):
         self.assertEqual(config.use_rsin_for_innNnpId_query_parameter, False)
 
     @requests_mock.Mocker()
+    @override_settings(KIC_CONFIG_ENABLE=True)
     def test_configuration_check_ok(self, m):
         KlantenAPIConfigurationStep().configure()
         ContactmomentenAPIConfigurationStep().configure()
@@ -156,6 +159,7 @@ class KICConfigurationTests(TestCase):
         )
 
     @requests_mock.Mocker()
+    @override_settings(KIC_CONFIG_ENABLE=True)
     def test_configuration_check_failures(self, m):
         KlantenAPIConfigurationStep().configure()
         ContactmomentenAPIConfigurationStep().configure()
@@ -176,6 +180,7 @@ class KICConfigurationTests(TestCase):
                 with self.assertRaises(SelfTestFailed):
                     configuration.test_configuration()
 
+    @override_settings(KIC_CONFIG_ENABLE=True)
     def test_is_configured(self):
         configs = [
             KlantenAPIConfigurationStep(),
@@ -189,3 +194,12 @@ class KICConfigurationTests(TestCase):
                 config.configure()
 
                 self.assertTrue(config.is_configured())
+
+    @override_settings(KIC_CONFIG_ENABLE=False)
+    def test_disable_kic_config(self):
+        KlantenAPIConfigurationStep().configure()
+        ContactmomentenAPIConfigurationStep().configure()
+        configuration = KICAPIsConfigurationStep()
+        configuration.configure()
+
+        self.assertFalse(configuration.is_configured())
