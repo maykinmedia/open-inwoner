@@ -139,7 +139,7 @@ const selectorMap = {
       'Change',
       'Save (Profiel bewerkt)',
     ],
-    '.form#profile-edit a.button': [
+    '.form#profile-edit a.utrecht-link-button': [
       'click',
       'Contactgegevens',
       'Click',
