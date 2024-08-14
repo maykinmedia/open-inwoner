@@ -7,7 +7,7 @@ from django.test.utils import override_settings
 import requests_mock
 from cms.apphook_pool import apphook_pool
 from dateutil.relativedelta import relativedelta
-from django_webtest import WebTest
+from django_webtest import TransactionWebTest, WebTest
 from furl import furl
 from requests import RequestException
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
@@ -322,7 +322,7 @@ class TestPublishedCategories(WebTest):
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
+class TestCategoriesCaseFiltering(ClearCachesMixin, TransactionWebTest):
     def setUp(self):
         super().setUp()
 

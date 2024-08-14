@@ -9,7 +9,7 @@ from treebeard.mp_tree import MP_NodeQuerySet
 from open_inwoner.accounts.models import User
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openzaak.api_models import Zaak
-from open_inwoner.openzaak.clients import build_zaken_client
+from open_inwoner.openzaak.clients import MultiZgwClientProxy, build_zaken_clients
 from open_inwoner.openzaak.models import ZaakTypeConfig
 from open_inwoner.openzaak.utils import get_user_fetch_parameters
 
@@ -54,11 +54,13 @@ class CategoryPublishedQueryset(MP_NodeQuerySet):
         if not request.user.bsn and not request.user.kvk:
             return self
 
-        client = build_zaken_client()
-        if client is None:
-            return self.none()
+        clients = build_zaken_clients()
+        proxy_result = MultiZgwClientProxy(clients)
+        proxy_result = proxy_result.fetch_cases(**get_user_fetch_parameters(request))
+        if proxy_result.has_errors:
+            self.log_system_action("unable to retrieve cases", user=request.user)
 
-        cases = client.fetch_cases(**get_user_fetch_parameters(request))
+        cases = proxy_result.join_results()
 
         return self.filter_by_zaken(cases)
 
