@@ -1,3 +1,4 @@
+import io
 import logging
 
 from django.core.management import call_command
@@ -11,6 +12,10 @@ logger = logging.getLogger(__name__)
 def send_failed_mail_digest():
     logger.info("starting send_failed_mail_digest() task")
 
-    call_command("send_failed_mail_digest")
+    out = io.StringIO()
+
+    call_command("send_failed_mail_digest", stdout=out)
 
     logger.info("finished send_failed_mail_digest() task")
+
+    return out.getvalue()
