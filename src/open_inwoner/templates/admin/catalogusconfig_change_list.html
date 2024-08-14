@@ -1,0 +1,12 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls %}
+
+{% block object-tools-items %}
+{{ block.super }}
+<li>
+    <a href="{% url 'admin:upload_zgw_import_file' %}" class="addlink">
+        {% trans "Import from file" %}
+    </a>
+</li>
+{% endblock %}
+
