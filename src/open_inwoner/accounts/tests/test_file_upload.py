@@ -38,7 +38,7 @@ class TestActionFileUploadLimits(WebTest):
             upload_response.context["errors"],
             [
                 _(
-                    "Het type bestand dat u hebt geüpload is ongeldig. Geldige bestandstypen zijn: pdf, docx, doc, xlsx, xls, jpeg, jpg, png, txt, odt, odf, ods"
+                    "Het type bestand dat u hebt geüpload is ongeldig. Geldige bestandstypen zijn: docx, doc, xlsx, xls, txt, odt, odf, ods, pdf, jpg, png"
                 )
             ],
         )
@@ -116,7 +116,7 @@ class TestMessageFileUploadLimits(WebTest):
             upload_response.context["errors"],
             [
                 _(
-                    "Het type bestand dat u hebt geüpload is ongeldig. Geldige bestandstypen zijn: pdf, docx, doc, xlsx, xls, jpeg, jpg, png, txt, odt, odf, ods"
+                    "Het type bestand dat u hebt geüpload is ongeldig. Geldige bestandstypen zijn: docx, doc, xlsx, xls, txt, odt, odf, ods, pdf, jpg, png"
                 )
             ],
         )
