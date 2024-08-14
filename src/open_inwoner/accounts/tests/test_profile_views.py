@@ -61,7 +61,9 @@ class ProfileViewTests(WebTest):
     def setUp(self):
         self.url = reverse("profile:detail")
         self.return_url = reverse("logout")
-        self.user = UserFactory(street="MyStreet")
+        self.user = UserFactory(
+            first_name="Erik", display_name="Roep", street="MyStreet"
+        )
         self.digid_user = DigidUserFactory()
         self.eherkenning_user = eHerkenningUserFactory()
 
@@ -136,6 +138,7 @@ class ProfileViewTests(WebTest):
         response = self.app.get(self.url, user=self.user)
 
         self.assertContains(response, self.user.first_name)
+        self.assertContains(response, f"Welkom, {self.user.display_name}")
         self.assertContains(response, f"{self.user.infix} {self.user.last_name}")
         self.assertContains(response, self.user.email)
         self.assertContains(response, self.user.phonenumber)
