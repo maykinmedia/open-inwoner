@@ -205,6 +205,9 @@ class NecessaryUserForm(ErrorMessageMixin, forms.ModelForm):
         self.fields["last_name"].required = True
 
         # notifications
+        if not config.enable_notification_channel_choice:
+            del self.fields["case_notification_channel"]
+
         if (
             not user.login_type == LoginTypeChoices.digid
             or not config.notifications_cases_enabled
@@ -330,6 +333,9 @@ class UserNotificationsForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         config = SiteConfiguration.get_solo()
+
+        if not config.enable_notification_channel_choice:
+            del self.fields["case_notification_channel"]
 
         if (
             not config.notifications_cases_enabled

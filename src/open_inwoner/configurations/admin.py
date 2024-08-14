@@ -229,7 +229,7 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
             },
         ),
         (
-            _("Emails"),
+            _("Notifications"),
             {
                 "fields": (
                     "notifications_messages_enabled",

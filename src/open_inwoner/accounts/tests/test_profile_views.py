@@ -16,6 +16,7 @@ from webtest import Upload
 
 from open_inwoner.accounts.choices import NotificationChannelChoice, StatusChoices
 from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.laposta.models import LapostaConfig
 from open_inwoner.laposta.tests.factories import LapostaListFactory, MemberFactory
@@ -1006,10 +1007,21 @@ class EditNotificationsTests(AssertTimelineLogMixin, WebTest):
 
         self.assertIn("cases_notifications", form.fields)
 
+    def test_notification_channel_not_accessible_when_disabled(self, mock_page_display):
+        response = self.app.get(self.url, user=self.user)
+        form = response.forms["change-notifications"]
+
+        # choice of notification channel is disabled by default
+        self.assertNotIn("case_notification_channel_choice", form.fields)
+
     @requests_mock.Mocker()
     def test_notification_channel_edit(self, mock_page_display, m):
         MockAPIReadPatchData.setUpServices()
         data = MockAPIReadPatchData().install_mocks(m)
+
+        config = SiteConfiguration.get_solo()
+        config.enable_notification_channel_choice = True
+        config.save()
 
         # reset noise from signals
         m.reset_mock()

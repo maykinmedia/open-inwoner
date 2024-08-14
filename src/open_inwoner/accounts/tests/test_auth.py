@@ -250,6 +250,10 @@ class DigiDRegistrationTest(
         MockAPIReadPatchData.setUpServices()
         mock_api_data = MockAPIReadPatchData().install_mocks(m)
 
+        config = SiteConfiguration.get_solo()
+        config.enable_notification_channel_choice = True
+        config.save()
+
         # reset noise from signals
         m.reset_mock()
         self.clearTimelineLogs()
@@ -1494,6 +1498,10 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
                 self.assertRedirects(response, redirect.url)
 
     def test_submit_without_invite(self):
+        config = SiteConfiguration.get_solo()
+        config.enable_notification_channel_choice = True
+        config.save()
+
         user = UserFactory(
             first_name="",
             last_name="",

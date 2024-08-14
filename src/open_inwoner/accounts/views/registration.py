@@ -17,6 +17,7 @@ from digid_eherkenning_oidc_generics.models import (
 )
 from open_inwoner.accounts.choices import NotificationChannelChoice
 from open_inwoner.accounts.views.mixins import KlantenAPIMixin
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.utils.hash import generate_email_from_string
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
@@ -193,6 +194,10 @@ class NecessaryFieldsUserView(
         return initial
 
     def update_klant(self, user_form_data: dict):
+        config = SiteConfiguration.get_solo()
+        if not config.enable_notification_channel_choice:
+            return
+
         if notification_channel := user_form_data.get("case_notification_channel"):
             self.patch_klant(
                 update_data={
