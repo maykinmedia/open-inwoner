@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-15 17:31+0200\n"
+"POT-Creation-Date: 2024-08-15 20:02+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1090,7 +1090,7 @@ msgstr ""
 #: open_inwoner/accounts/templates/accounts/registration_necessary.html:74
 #: open_inwoner/templates/pages/profile/notifications.html:54
 msgid "How do you want to receive notifications about cases?"
-msgstr "Hoe wilt u meldingen over cases ontvangen?"
+msgstr "Hoe wilt u meldingen over aanvragen ontvangen?"
 
 #: open_inwoner/accounts/templates/django_registration/registration_complete.html:5
 msgid "Succes"
@@ -1323,13 +1323,6 @@ msgid "Dit veld is vereist."
 msgstr "Dit veld is vereist."
 
 #: open_inwoner/accounts/tests/test_auth.py:1775
-msgid ""
-"Voer een juist E-mailadres en wachtwoord in. Let op dat beide velden "
-"hoofdlettergevoelig zijn."
-msgstr ""
-"Voer een juist E-mailadres en wachtwoord in. Let op dat beide velden "
-"hoofdlettergevoelig zijn."
-
 #: open_inwoner/accounts/tests/test_auth.py:1790
 msgid ""
 "Voer een juiste E-mailadres en wachtwoord in. Let op dat beide velden "
@@ -2155,6 +2148,8 @@ msgstr "Probleem bij versturen van de vraag."
 msgid ""
 "The link you clicked on has expired. Please find your case in the list below."
 msgstr ""
+"De link die u gebruikte, is verlopen. Uw aanvraag is via onderstaand "
+"overzicht te vinden."
 
 #: open_inwoner/cms/collaborate/cms_apps.py:10
 msgid "Collaborate Application"
@@ -3926,7 +3921,7 @@ msgstr ""
 
 #: open_inwoner/configurations/models.py:363
 msgid "Enable choice of notification channel"
-msgstr "Activeer keuzemogelijkheid voor notificiatie kanaal"
+msgstr "Activeer keuzemogelijkheid voor notificatie kanaal"
 
 #: open_inwoner/configurations/models.py:366
 msgid ""
@@ -3969,7 +3964,7 @@ msgstr ""
 
 #: open_inwoner/configurations/models.py:392
 msgid "User notifications for cases"
-msgstr "De zaakidentificatie"
+msgstr "Gebruikersnotificaties voor aanvragen"
 
 #: open_inwoner/configurations/models.py:395
 msgid ""
@@ -8001,6 +7996,3 @@ msgstr "Het KVK nummer moet uit 8 cijfers bestaan."
 #: open_inwoner/utils/validators.py:193
 msgid "Het KVK nummer moet numeriek zijn."
 msgstr "Het KVK nummer moet numeriek zijn."
-
-#~ msgid "Emails"
-#~ msgstr "E-mails"
