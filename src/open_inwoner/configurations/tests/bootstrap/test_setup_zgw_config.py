@@ -279,7 +279,7 @@ class ZGWConfigurationTests(TestCase):
                 self.assertTrue(config.is_configured())
 
     @override_settings(ZGW_CONFIG_ENABLE=False)
-    def test_zgw__config_disable(self):
+    def test_zgw_config_disable(self):
         ZakenAPIConfigurationStep().configure()
         CatalogiAPIConfigurationStep().configure()
         DocumentenAPIConfigurationStep().configure()

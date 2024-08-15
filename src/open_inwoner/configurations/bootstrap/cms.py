@@ -32,6 +32,9 @@ class GenericCMSConfigurationStep(BaseConfigurationStep):
     Generic base class for configuring CMS apps
     """
 
+    def is_enabled(self):
+        return getattr(settings, self.config_settings.enable_setting, False)
+
     def is_configured(self):
         """
         CMS apps have no required settings; we consider them "configured"
@@ -39,9 +42,7 @@ class GenericCMSConfigurationStep(BaseConfigurationStep):
 
         Pattern for enable setting: CMS_CONFIG_APPNAME_ENABLE
         """
-        return bool(
-            getattr(settings, f"CMS_CONFIG_{self.app_name.upper()}_ENABLE", None)
-        )
+        return self.is_enabled()
 
     def configure(self):
         """
@@ -51,24 +52,14 @@ class GenericCMSConfigurationStep(BaseConfigurationStep):
         configuration beyond the commonextension. Override to provide additional
         arguments to :func:`create_apphook_page`.
         """
-        enable_setting = getattr(
-            settings, f"CMS_CONFIG_{self.app_name.upper()}_ENABLE", None
-        )
-        if not enable_setting:
+        if not self.is_enabled():
             return
 
         extension_args = create_apphook_page_args(
             self.config_settings.extension_settings_mapping
         )
 
-        if (
-            getattr(settings, f"CMS_CONFIG_{self.app_name.upper()}_ENABLE", None)
-            is not None
-        ):
-            cms_tools.create_apphook_page(
-                self.app_hook,
-                extension_args=extension_args,
-            )
+        cms_tools.create_apphook_page(self.app_hook, extension_args=extension_args)
 
     def test_configuration(self):
         ...
@@ -260,7 +251,7 @@ class CMSProfileConfigurationStep(GenericCMSConfigurationStep):
         self.app_name = "profile"
 
     def configure(self):
-        if not getattr(settings, self.config_settings.enable_setting, None):
+        if not self.is_enabled():
             return
 
         extension_settings = [
@@ -284,9 +275,8 @@ class CMSProfileConfigurationStep(GenericCMSConfigurationStep):
             self.config_settings.extension_settings_mapping
         )
 
-        if getattr(settings, "CMS_CONFIG_PROFILE_ENABLE", None) is not None:
-            cms_tools.create_apphook_page(
-                ProfileApphook,
-                config_args=config_args,
-                extension_args=extension_args,
-            )
+        cms_tools.create_apphook_page(
+            ProfileApphook,
+            config_args=config_args,
+            extension_args=extension_args,
+        )

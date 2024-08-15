@@ -68,11 +68,14 @@ class DigiDOIDCConfigurationStep(BaseConfigurationStep):
         ],
     )
 
+    def is_enabled(self):
+        return getattr(settings, self.config_settings.enable_setting, False)
+
     def is_configured(self) -> bool:
         return OpenIDConnectDigiDConfig.get_solo().enabled
 
     def configure(self):
-        if not getattr(settings, self.config_settings.enable_setting, None):
+        if not self.is_enabled():
             return
 
         config = OpenIDConnectDigiDConfig.get_solo()
