@@ -1,4 +1,5 @@
 import factory
+import faker
 from notifications_api_common.models import Subscription
 from simple_certmanager.constants import CertificateTypes
 from simple_certmanager.models import Certificate
@@ -82,7 +83,7 @@ class CatalogusConfigFactory(factory.django.DjangoModelFactory):
 
 
 class ZaakTypeConfigFactory(factory.django.DjangoModelFactory):
-    urls = [factory.Faker("url")]
+    urls = factory.LazyFunction(lambda: [faker.Faker().url()])
     catalogus = factory.SubFactory(CatalogusConfigFactory)
     identificatie = factory.Faker("pystr", max_chars=50)
     omschrijving = factory.Faker("pystr", max_chars=80)
