@@ -21,6 +21,8 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
         celery_app.conf.task_always_eager = cls._old_eager
 
     @patch("open_inwoner.openzaak.tasks.call_command")
-    def test_task_calls_command(self, mock_call: Mock):
+    def test_zgw_import_task_calls_command(self, mock_call: Mock):
         import_zgw_data()
-        mock_call.assert_called_once_with("zgw_import_data")
+
+        mock_call.assert_called_once()
+        self.assertEqual(mock_call.call_args.args, ("zgw_import_data",))

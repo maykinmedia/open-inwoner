@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 import requests_mock
 
@@ -129,6 +129,7 @@ class ZaakTypeMockData:
         return self
 
 
+@override_settings(CELERY_TASK_ALWAYS_EAGER=True)
 @requests_mock.Mocker()
 class ZGWImportTest(ClearCachesMixin, TestCase):
     config: OpenZaakConfig

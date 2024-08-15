@@ -1,3 +1,4 @@
+import io
 import logging
 
 from django.core.management import call_command
@@ -11,6 +12,10 @@ logger = logging.getLogger(__name__)
 def import_zgw_data():
     logger.info("starting import_zgw_data() task")
 
-    call_command("zgw_import_data")
+    out = io.StringIO()
+
+    call_command("zgw_import_data", stdout=out)
 
     logger.info("finished import_zgw_data() task")
+
+    return out.getvalue()

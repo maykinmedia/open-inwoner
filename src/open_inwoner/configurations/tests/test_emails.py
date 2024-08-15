@@ -1,4 +1,4 @@
-from unittest import mock
+from unittest.mock import patch
 
 from django.core import mail
 from django.core.management import call_command
@@ -10,6 +10,7 @@ from freezegun import freeze_time
 
 from open_inwoner.configurations.tasks import send_failed_mail_digest
 
+from ..emails import inform_admins_about_failing_emails
 from ..models import SiteConfiguration
 
 
@@ -31,7 +32,7 @@ class DailyFailingEmailDigestTestCase(TestCase):
         self.assertEqual(Log.objects.count(), 1)
 
         with freeze_time("2024-01-02T00:00:00"):
-            call_command("send_failed_mail_digest")
+            inform_admins_about_failing_emails()
 
         self.assertEqual(len(mail.outbox), 0)
 
@@ -51,7 +52,7 @@ class DailyFailingEmailDigestTestCase(TestCase):
         self.assertEqual(Log.objects.count(), 1)
 
         with freeze_time("2024-01-02T00:00:00"):
-            call_command("send_failed_mail_digest")
+            inform_admins_about_failing_emails()
 
         self.assertEqual(len(mail.outbox), 0)
 
@@ -77,7 +78,7 @@ class DailyFailingEmailDigestTestCase(TestCase):
             )
 
         with freeze_time("2024-01-02T00:00:00"):
-            call_command("send_failed_mail_digest")
+            inform_admins_about_failing_emails()
 
         self.assertEqual(len(mail.outbox), 1)
 
@@ -106,13 +107,23 @@ class DailyFailingEmailDigestTestCase(TestCase):
             )
 
         with freeze_time("2024-01-02T00:00:00"):
-            send_failed_mail_digest.delay()
+            inform_admins_about_failing_emails()
 
         self.assertEqual(len(mail.outbox), 1)
 
-    # Due to Celery's eager task discovery, we have to mock the imported
-    # call_command.
-    @mock.patch("open_inwoner.configurations.tasks.call_command")
-    def test_task_invokes_management_command(self, m):
-        send_failed_mail_digest.delay()
-        m.assert_called_once_with("send_failed_mail_digest")
+    @patch("open_inwoner.configurations.tasks.call_command")
+    def test_command_called_when_task_triggered(self, mock_command):
+        send_failed_mail_digest()
+
+        mock_command.assert_called_once()
+        self.assertEqual(mock_command.call_args.args, ("send_failed_mail_digest",))
+
+    @patch(
+        "open_inwoner.configurations.management.commands."
+        "send_failed_mail_digest.inform_admins_about_failing_emails"
+    )
+    def test_entrypoint_called_when_command_called(self, mock):
+        call_command("send_failed_mail_digest")
+
+        mock.assert_called_once()
+        self.assertEqual(mock.call_args.args, ())
