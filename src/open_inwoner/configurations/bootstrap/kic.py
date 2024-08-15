@@ -79,6 +79,7 @@ class KlantenAPIConfigurationStep(BaseConfigurationStep):
             api_root=settings.KIC_KLANTEN_SERVICE_API_ROOT,
             defaults={
                 "label": "Klanten API",
+                "slug": "klanten-api",
                 "api_type": APITypes.kc,
                 "oas": settings.KIC_KLANTEN_SERVICE_API_ROOT,
                 "auth_type": AuthTypes.zgw,
