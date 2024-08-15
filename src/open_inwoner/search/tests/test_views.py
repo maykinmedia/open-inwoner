@@ -11,7 +11,12 @@ from open_inwoner.accounts.tests.factories import DigidUserFactory
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.tests.factories import ZGWApiGroupConfigFactory
-from open_inwoner.openzaak.tests.shared import CATALOGI_ROOT, ZAKEN_ROOT
+from open_inwoner.openzaak.tests.shared import (
+    ANOTHER_CATALOGI_ROOT,
+    ANOTHER_ZAKEN_ROOT,
+    CATALOGI_ROOT,
+    ZAKEN_ROOT,
+)
 from open_inwoner.utils.test import paginated_response
 
 from ...openzaak.tests.helpers import generate_oas_component_cached
@@ -294,3 +299,40 @@ class TestSearchView(ESMixin, TransactionTestCase):
 
         # Show regular search results page
         self.assertEqual(response.status_code, 200)
+
+    def test_search_case_found_in_two_backends_redirects_to_first(self, m):
+        ZGWApiGroupConfigFactory(
+            zrc_service__api_root=ANOTHER_ZAKEN_ROOT,
+            ztc_service__api_root=ANOTHER_CATALOGI_ROOT,
+        )
+        self._setUpMocks(m)
+        m.get(
+            furl(f"{ANOTHER_ZAKEN_ROOT}zaken")
+            .add(
+                {
+                    "rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn": self.user.bsn,
+                    "maximaleVertrouwelijkheidaanduiding": VertrouwelijkheidsAanduidingen.beperkt_openbaar,
+                    "identificatie": "ZAAK-2022-0000000001",
+                }
+            )
+            .url,
+            json=paginated_response([self.zaak2]),
+        )
+
+        self.client.force_login(self.user)
+        params = urlencode({"query": "ZAAK-2022-0000000001"}, doseq=True)
+        response = self.client.get(f'{reverse("search:search")}?{params}')
+
+        # In case of an exact identificatie match, user should be redirected to
+        # the status page of that Zaak
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response.url,
+            reverse(
+                "cases:case_detail",
+                kwargs={
+                    "object_id": "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
+                    "api_group_id": self.api_group.id,
+                },
+            ),
+        )
