@@ -53,13 +53,16 @@ class KlantenAPIConfigurationStep(BaseConfigurationStep):
         },
     )
 
+    def is_enabled(self):
+        return getattr(settings, self.config_settings.enable_setting, False)
+
     def is_configured(self) -> bool:
         return Service.objects.filter(
             api_root=settings.KIC_KLANTEN_SERVICE_API_ROOT
         ).exists()
 
     def configure(self):
-        if not getattr(settings, self.config_settings.enable_setting, None):
+        if not self.is_enabled():
             return
 
         organization = settings.OIP_ORGANIZATION or settings.ENVIRONMENT

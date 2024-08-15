@@ -385,13 +385,16 @@ class ZGWAPIsConfigurationStep(BaseConfigurationStep):
         ],
     )
 
+    def is_enabled(self):
+        return getattr(settings, self.config_settings.enable_setting, False)
+
     def is_configured(self) -> bool:
         """Verify that at least 1 ZGW API set is configured."""
         zgw_config = OpenZaakConfig.get_solo()
         return ZGWApiGroupConfig.objects.filter(open_zaak_config=zgw_config).exists()
 
     def configure(self):
-        if not getattr(settings, self.config_settings.enable_setting, None):
+        if not self.is_enabled():
             return
 
         config = OpenZaakConfig.get_solo()

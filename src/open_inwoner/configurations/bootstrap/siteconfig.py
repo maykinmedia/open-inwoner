@@ -98,6 +98,9 @@ class SiteConfigurationStep(BaseConfigurationStep):
         ],
     )
 
+    def is_enabled(self):
+        return getattr(settings, self.config_settings.enable_setting, False)
+
     def is_configured(self):
         config = SiteConfiguration.get_solo()
 
@@ -111,7 +114,7 @@ class SiteConfigurationStep(BaseConfigurationStep):
         return True
 
     def configure(self):
-        if not getattr(settings, self.config_settings.enable_setting, None):
+        if not self.is_enabled():
             return
 
         config = SiteConfiguration.get_solo()
