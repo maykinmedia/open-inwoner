@@ -263,6 +263,26 @@ def choice_radio(choice, **kwargs):
     return {**kwargs, "choice": choice}
 
 
+@register.inclusion_tag("components/Form/ChoiceRadioStacked.html")
+def choice_radio_stacked(choice, **kwargs):
+    """
+    Display radio input rendered from a choice field.
+
+    Args:
+        choice: the choice to be rendered
+        name: the name of the form field
+        data: the value of a form field field
+        index: the index of a for-loop when looping over choices
+        initial: the initial value of the field
+        icon_class: the icon to be displayed at the top of the
+            radio stack
+
+    Usage:
+        {% choice_radio_stacked choice=choice name=field.name ... icon_class=choice.1|get_icon_class %}
+    """
+    return {**kwargs, "choice": choice}
+
+
 @register.inclusion_tag("components/Form/Input.html")
 def input(field, **kwargs):
     """
@@ -433,9 +453,9 @@ def field_as_widget(field, class_string, form_id):
 
 @register.simple_tag(takes_context=True)
 def initial_match(context):
-    initial = context.get("initial")
-    choice = context.get("choice")
-    name = context.get("name")
+    initial = context.get("initial", None)
+    choice = context.get("choice", None)
+    name = context.get("name", None)
     return initial.get(name) == choice[0]
 
 
@@ -459,3 +479,12 @@ class FormNode(template.Node):
         corrected_kwargs["classes"] = get_form_classes(**corrected_kwargs)
         rendered = render_to_string("components/Form/Form.html", corrected_kwargs)
         return rendered
+
+
+@register.filter
+def get_icon_class(key: str) -> str:
+    mapping = {
+        "Alleen digitaal": "computer",
+        "Digitaal en per brief": "mail",
+    }
+    return mapping.get(key, None)

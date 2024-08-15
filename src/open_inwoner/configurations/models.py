@@ -359,6 +359,14 @@ class SiteConfiguration(SingletonModel):
     )
 
     # email notifications
+    enable_notification_channel_choice = models.BooleanField(
+        verbose_name=_("Enable choice of notification channel"),
+        default=False,
+        help_text=_(
+            "Give users the option to choose how they want to receive notifications "
+            "(digital and post or digital only)"
+        ),
+    )
     notifications_messages_enabled = models.BooleanField(
         verbose_name=_("User notifications for messages"),
         default=True,

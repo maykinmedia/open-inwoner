@@ -16,11 +16,14 @@ from digid_eherkenning_oidc_generics.models import (
     OpenIDConnectDigiDConfig,
     OpenIDConnectEHerkenningConfig,
 )
+from open_inwoner.accounts.choices import NotificationChannelChoice
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.kvk.branches import get_kvk_branch_number
 from open_inwoner.kvk.tests.factories import CertificateFactory
+from open_inwoner.openklant.tests.data import MockAPIReadPatchData
 from open_inwoner.openzaak.models import OpenZaakConfig
+from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin
 
 from ...cms.collaborate.cms_apps import CollaborateApphook
 from ...cms.profile.cms_apps import ProfileApphook
@@ -42,7 +45,9 @@ CANCEL_URL = reverse("login")
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class DigiDRegistrationTest(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
+class DigiDRegistrationTest(
+    AssertRedirectsMixin, AssertTimelineLogMixin, HaalCentraalMixin, WebTest
+):
     """Tests concerning the registration of DigiD users"""
 
     csrf_checks = False
@@ -235,12 +240,24 @@ class DigiDRegistrationTest(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
         self.assertEqual(user.first_name, "Merel")
         self.assertEqual(user.last_name, "Kooyman")
 
-    def test_notification_settings_with_cms_page_published(self):
+    @requests_mock.Mocker()
+    def test_notification_settings_with_cms_page_published(self, m):
         """
         Assert that notification settings can be changed via the necessary-fields form
         if the corresponding CMS pages are published. Fields corresponding to unpublished
         pages should not be present.
         """
+        MockAPIReadPatchData.setUpServices()
+        mock_api_data = MockAPIReadPatchData().install_mocks(m)
+
+        config = SiteConfiguration.get_solo()
+        config.enable_notification_channel_choice = True
+        config.save()
+
+        # reset noise from signals
+        m.reset_mock()
+        self.clearTimelineLogs()
+
         cms_tools.create_apphook_page(
             CollaborateApphook,
             parent_page=self.homepage,
@@ -256,7 +273,7 @@ class DigiDRegistrationTest(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
         url = f"{url}?{urlencode(params)}"
 
         data = {
-            "auth_name": "533458225",
+            "auth_name": mock_api_data.user.bsn,
             "auth_pass": "bar",
         }
 
@@ -269,6 +286,9 @@ class DigiDRegistrationTest(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
         self.assertNotIn("messages_notifications", necessary_form.fields)
 
         necessary_form["plans_notifications"] = False
+        necessary_form[
+            "case_notification_channel"
+        ] = NotificationChannelChoice.digital_only
         necessary_form.submit()
 
         user = User.objects.get(bsn=data["auth_name"])
@@ -276,6 +296,23 @@ class DigiDRegistrationTest(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
         self.assertEqual(user.cases_notifications, True)
         self.assertEqual(user.messages_notifications, True)
         self.assertEqual(user.plans_notifications, False)
+        self.assertEqual(
+            user.case_notification_channel, NotificationChannelChoice.digital_only
+        )
+
+        # check klant api update
+        self.assertTrue(mock_api_data.matchers[0].called)
+        klant_patch_data = mock_api_data.matchers[1].request_history[0].json()
+        self.assertEqual(
+            klant_patch_data,
+            {
+                "toestemmingZaakNotificatiesAlleenDigitaal": True,
+            },
+        )
+        # only check logs for klant api update
+        dump = self.getTimelineLogDump()
+        msg = "patched klant from user profile edit with fields: toestemmingZaakNotificatiesAlleenDigitaal"
+        assert msg in dump
 
     @requests_mock.Mocker()
     def test_partial_response_from_haalcentraal_when_digid_and_brp(self, m):
@@ -1461,6 +1498,10 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
                 self.assertRedirects(response, redirect.url)
 
     def test_submit_without_invite(self):
+        config = SiteConfiguration.get_solo()
+        config.enable_notification_channel_choice = True
+        config.save()
+
         user = UserFactory(
             first_name="",
             last_name="",
@@ -1471,9 +1512,12 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
         response = self.app.get(self.url, user=user)
         form = response.forms["necessary-form"]
 
+        from open_inwoner.accounts.choices import NotificationChannelChoice
+
         form["email"] = "john@smith.com"
         form["first_name"] = "John"
         form["last_name"] = "Smith"
+        form["case_notification_channel"] = NotificationChannelChoice.digital_only
 
         response = form.submit()
 

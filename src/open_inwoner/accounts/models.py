@@ -31,7 +31,13 @@ from open_inwoner.utils.validators import (
 )
 
 from ..plans.models import PlanContact
-from .choices import ContactTypeChoices, LoginTypeChoices, StatusChoices, TypeChoices
+from .choices import (
+    ContactTypeChoices,
+    LoginTypeChoices,
+    NotificationChannelChoice,
+    StatusChoices,
+    TypeChoices,
+)
 from .managers import ActionQueryset, DigidManager, UserManager, eHerkenningManager
 from .query import InviteQuerySet, MessageQuerySet
 
@@ -206,6 +212,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         help_text=_(
             "Indicates if the user wants to receive notifications for updates concerning cases."
         ),
+    )
+    case_notification_channel = models.CharField(
+        verbose_name=_("Case notifications channel"),
+        choices=NotificationChannelChoice.choices,
+        default=NotificationChannelChoice.digital_and_post,
     )
     messages_notifications = models.BooleanField(
         verbose_name=_("Messages notifications"),

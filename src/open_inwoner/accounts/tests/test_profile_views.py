@@ -14,8 +14,9 @@ from django_webtest import WebTest
 from pyquery import PyQuery as PQ
 from webtest import Upload
 
-from open_inwoner.accounts.choices import StatusChoices
+from open_inwoner.accounts.choices import NotificationChannelChoice, StatusChoices
 from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.laposta.models import LapostaConfig
 from open_inwoner.laposta.tests.factories import LapostaListFactory, MemberFactory
@@ -961,7 +962,7 @@ class EditIntrestsTests(WebTest):
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 @patch("open_inwoner.cms.utils.page_display._is_published", return_value=True)
-class EditNotificationsTests(WebTest):
+class EditNotificationsTests(AssertTimelineLogMixin, WebTest):
     def setUp(self):
         self.url = reverse("profile:notifications")
         self.user = UserFactory()
@@ -993,6 +994,10 @@ class EditNotificationsTests(WebTest):
         self.assertTrue(self.user.cases_notifications)
         self.assertFalse(self.user.messages_notifications)
         self.assertTrue(self.user.plans_notifications)
+        self.assertEqual(
+            self.user.case_notification_channel,
+            NotificationChannelChoice.digital_and_post,
+        )
 
     def test_cases_notifications_is_accessible_when_digid_user(self, mock_page_display):
         self.user.login_type = LoginTypeChoices.digid
@@ -1001,6 +1006,54 @@ class EditNotificationsTests(WebTest):
         form = response.forms["change-notifications"]
 
         self.assertIn("cases_notifications", form.fields)
+
+    def test_notification_channel_not_accessible_when_disabled(self, mock_page_display):
+        response = self.app.get(self.url, user=self.user)
+        form = response.forms["change-notifications"]
+
+        # choice of notification channel is disabled by default
+        self.assertNotIn("case_notification_channel_choice", form.fields)
+
+    @requests_mock.Mocker()
+    def test_notification_channel_edit(self, mock_page_display, m):
+        MockAPIReadPatchData.setUpServices()
+        data = MockAPIReadPatchData().install_mocks(m)
+
+        config = SiteConfiguration.get_solo()
+        config.enable_notification_channel_choice = True
+        config.save()
+
+        # reset noise from signals
+        m.reset_mock()
+        self.clearTimelineLogs()
+
+        self.user.bsn = data.user.bsn
+        self.user.save()
+
+        response = self.app.get(self.url, user=self.user)
+        form = response.forms["change-notifications"]
+        form["case_notification_channel"] = NotificationChannelChoice.digital_only
+        form.submit()
+
+        # check user
+        self.user.refresh_from_db()
+        self.assertEqual(
+            self.user.case_notification_channel, NotificationChannelChoice.digital_only
+        )
+
+        # check klant api update
+        self.assertTrue(data.matchers[0].called)
+        klant_patch_data = data.matchers[1].request_history[0].json()
+        self.assertEqual(
+            klant_patch_data,
+            {
+                "toestemmingZaakNotificatiesAlleenDigitaal": True,
+            },
+        )
+        self.assertTimelineLog("retrieved klant for user")
+        self.assertTimelineLog(
+            "patched klant from user profile edit with fields: toestemmingZaakNotificatiesAlleenDigitaal"
+        )
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")

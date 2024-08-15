@@ -1,3 +1,5 @@
+import logging
+
 from django.conf import settings
 from django.contrib import auth, messages
 from django.contrib.auth.mixins import UserPassesTestMixin
@@ -30,6 +32,8 @@ from open_inwoner.utils.views import LogMixin
 
 from ..choices import LoginTypeChoices
 from ..forms import CustomPasswordResetForm
+
+logger = logging.getLogger(__name__)
 
 
 class LogPasswordChangeView(UserPassesTestMixin, LogMixin, PasswordChangeView):

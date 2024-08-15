@@ -15,6 +15,9 @@ from digid_eherkenning_oidc_generics.models import (
     OpenIDConnectDigiDConfig,
     OpenIDConnectEHerkenningConfig,
 )
+from open_inwoner.accounts.choices import NotificationChannelChoice
+from open_inwoner.accounts.views.mixins import KlantenAPIMixin
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.utils.hash import generate_email_from_string
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
@@ -135,7 +138,13 @@ class CustomRegistrationView(LogMixin, InviteMixin, RegistrationView):
         return super().get(self, request, *args, **kwargs)
 
 
-class NecessaryFieldsUserView(LogMixin, LoginRequiredMixin, InviteMixin, UpdateView):
+class NecessaryFieldsUserView(
+    LogMixin,
+    LoginRequiredMixin,
+    KlantenAPIMixin,
+    InviteMixin,
+    UpdateView,
+):
     model = User
     form_class = NecessaryUserForm
     template_name = "accounts/registration_necessary.html"
@@ -160,6 +169,8 @@ class NecessaryFieldsUserView(LogMixin, LoginRequiredMixin, InviteMixin, UpdateV
     def form_valid(self, form):
         user = form.save()
 
+        self.update_klant({k: form.cleaned_data[k] for k in form.changed_data})
+
         invite = form.cleaned_data["invite"]
         if invite:
             self.add_invitee(invite, user)
@@ -181,6 +192,19 @@ class NecessaryFieldsUserView(LogMixin, LoginRequiredMixin, InviteMixin, UpdateV
             initial["email"] = ""
 
         return initial
+
+    def update_klant(self, user_form_data: dict):
+        config = SiteConfiguration.get_solo()
+        if not config.enable_notification_channel_choice:
+            return
+
+        if notification_channel := user_form_data.get("case_notification_channel"):
+            self.patch_klant(
+                update_data={
+                    "toestemmingZaakNotificatiesAlleenDigitaal": notification_channel
+                    == NotificationChannelChoice.digital_only
+                }
+            )
 
 
 class EmailVerificationUserView(LogMixin, LoginRequiredMixin, TemplateView):

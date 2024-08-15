@@ -68,3 +68,8 @@ class EmptyStatusChoices(models.TextChoices):
 class TypeChoices(models.TextChoices):
     incidental = "incidental", _("Incidentieel")
     recurring = "recurring", _("Terugkerend")
+
+
+class NotificationChannelChoice(models.TextChoices):
+    digital_and_post = "digital_and_post", _("Digitaal en per brief")
+    digital_only = "digital_only", _("Alleen digitaal")
