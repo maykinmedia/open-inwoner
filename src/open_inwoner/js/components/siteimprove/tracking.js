@@ -18,7 +18,7 @@
 //   console.log('-> SiteImprove _sz is not defined yet.')
 // }
 
-// Webpack entry point or main script file
+// Main script file
 ;(function () {
   function initEventTracker() {
     class EventTracker {
@@ -75,7 +75,7 @@
             const eventData = actionMap[selector]
             eventData.push(this.extractEventData(target))
             // Add console log to check eventData before pushing to _sz
-            console.log('Handling click event. Event data:', eventData)
+            // console.log('Handling click event. Event data:', eventData)
             _sz.push(eventData)
           }
         })
@@ -93,8 +93,6 @@
           if (target.matches(selector)) {
             const eventData = actionMap[selector]
             eventData.push(this.extractEventData(target))
-            // Add console log to check eventData before pushing to _sz
-            console.log('Handling change event. Event data:', eventData)
             _sz.push(eventData)
           }
         })
@@ -112,8 +110,6 @@
           if (target.matches(selector)) {
             const eventData = actionMap[selector]
             eventData.push(this.extractEventData(target))
-            // Add console log to check eventData before pushing to _sz
-            console.log('Handling keydown event. Event data:', eventData)
             _sz.push(eventData)
           }
         })
@@ -318,7 +314,6 @@
   function checkForSzObject() {
     const intervalId = setInterval(function () {
       if (typeof _sz !== 'undefined') {
-        // console.log('-> Value of _sz object currently: ', _sz)
         clearInterval(intervalId) // Stop the interval once _sz is defined
         initEventTracker() // Initialize EventTracker
       } else {
