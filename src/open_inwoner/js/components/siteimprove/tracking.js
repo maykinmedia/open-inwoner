@@ -139,127 +139,127 @@
     const selectorMap = {
       click: {
         '.form#profile-edit button[type="submit"]': [
-          'change',
+          'event',
           'Contactgegevens',
           'Change',
           'Save (Profiel bewerkt)',
         ],
         '.form#profile-edit a.button': [
-          'click',
+          'event',
           'Contactgegevens',
           'Click',
           'No Save (terug naar mijn profiel)',
         ],
         '#profile-edit > .form__actions.form__actions--fullwidth > a > .material-icons-outlined':
           [
-            'click',
+            'event',
             'Contactgegevens',
             'Click',
             'No Save (terug naar mijn profiel)',
           ],
         // Start Category events
         '#content .plugin__categories .card img': [
-          'click',
+          'event',
           'Homepage',
           'Click',
           'Onderwerpen card image',
         ],
         '#content .plugin__categories .card .link': [
-          'click',
+          'event',
           'Homepage',
           'Click',
           'Onderwerpen card tekstlink',
         ],
         '.header > .header__container > nav.primary-navigation.primary-navigation--open.primary-navigation__main > .primary-navigation__list > li > ul > li > a > .link__text':
-          ['click', 'Dropdown Onderwerpen desktop', 'Click', 'Onderwerpen'],
+          ['event', 'Dropdown Onderwerpen desktop', 'Click', 'Onderwerpen'],
         '.header .header__submenu > nav.primary-navigation > ul > li.primary-navigation__list-item.dropdown-nav__toggle.nav__list--open > ul > li > a > .link__text':
-          ['click', 'Dropdown Onderwerpen mobiel', 'Click', 'Onderwerpen'],
+          ['event', 'Dropdown Onderwerpen mobiel', 'Click', 'Onderwerpen'],
         // End of category events
-        '.footer__logo .link img': ['click', 'Footer', 'Click', 'Footer logo'],
+        '.footer__logo .link img': ['event', 'Footer', 'Click', 'Footer logo'],
         // Start Search submits
         '#search-form-mobile-closed > .form__actions > button': [
-          'click',
+          'event',
           'Header mobiel Zoeken',
           'Zoeken',
           'Icon click',
         ],
         '#search-form-mobile-closed > .form__actions > button > .material-icons ':
-          ['click', 'Header mobiel Zoeken', 'Zoeken', 'Icon click'],
+          ['event', 'Header mobiel Zoeken', 'Icon click', 'Zoeken'],
         '#search-form-desktop > .form__actions > button': [
-          'click',
+          'event',
           'Header desktop Zoeken',
-          'Zoeken',
           'Icon click',
+          'Zoeken',
         ],
         '#search-form-desktop > .form__actions > button > .material-icons ': [
-          'click',
+          'event',
           'Header desktop Zoeken',
-          'Zoeken',
           'Icon click',
+          'Zoeken',
         ],
         '#search-form-mobile-open > .form__actions > button': [
-          'click',
+          'event',
           'Header mobiel-open Zoeken',
-          'Zoeken',
           'Icon click',
+          'Zoeken',
         ],
         '#search-form-mobile-open > .form__actions > button > .material-icons':
-          ['click', 'Header mobiel-open Zoeken', 'Zoeken', 'Icon click'],
+          ['event', 'Header mobiel-open Zoeken', 'Icon click', 'Zoeken'],
         // End of search submits
         // Start Communicatievoorkeuren
         // Can get contaminated with uncheck changes
         '.form#change-notifications #id_messages_notifications': [
-          'change',
+          'event',
           'Communicatievoorkeuren Berichtnotificaties',
           'UNCHECK',
           'Disable',
         ],
         '.form#change-notifications #id_plans_notifications': [
-          'change',
+          'event',
           'Communicatievoorkeuren Samenwerkingnotificaties',
           'UNCHECK',
           'Disable',
         ],
         '.form#change-notifications #id_cases_notifications': [
-          'change',
+          'event',
           'Communicatievoorkeuren Zaaknotificaties',
           'UNCHECK',
           'Disable',
         ],
         '.form#change-notifications #id_cases_notifications:checked': [
-          'change',
+          'event',
           'Communicatievoorkeuren Zaaknotificaties',
           'check',
           'Enable',
         ],
         '.form#change-notifications #id_messages_notifications:checked': [
-          'change',
+          'event',
           'Communicatievoorkeuren Berichtnotificaties',
           'check',
           'Enable',
         ],
         '.form#change-notifications #id_plans_notifications:checked': [
-          'click',
+          'event',
           'Communicatievoorkeuren Samenwerkingnotificaties',
           'check',
           'Enable',
         ],
         '.form#change-notifications > .form__actions.form__actions--fullwidth > a.button':
           [
-            'click',
+            'event',
             'Communicatievoorkeuren',
             'Click',
             'No Save (terug naar mijn profiel)',
           ],
         '.form#change-notifications > .form__actions.form__actions--fullwidth > a.button .material-icons-outlined':
           [
-            'click',
+            'event',
             'Communicatievoorkeuren',
             'Click',
             'No Save (terug naar mijn profiel)',
           ],
         '.form#change-notifications button.button--primary': [
-          'click',
+          'event',
           'Communicatievoorkeuren',
           'Submit',
           'Save',
@@ -267,28 +267,28 @@
         // End of Communicatievoorkeuren
         // Start Header dropdown profiel
         '.header > .header__container > nav.primary-navigation.primary-navigation__authenticated > .primary-navigation__list > .primary-navigation__list-item > ul > li:nth-child(1) > a':
-          ['click', 'Mijn Profiel', 'Click mijn Profiel', 'Open mijn profiel'],
+          ['event', 'Mijn Profiel', 'Click', 'Open mijn profiel'],
         '.header > .header__container > nav.primary-navigation.primary-navigation--open.primary-navigation__authenticated > .primary-navigation__list > .primary-navigation__list-item > .subpage-list > li:nth-child(1) > a > .link__text':
-          ['click', 'Mijn Profiel', 'Click mijn Profiel', 'Open mijn profiel'],
+          ['event', 'Mijn Profiel', 'Click', 'Open mijn profiel'],
         '.header > .header__container > nav.primary-navigation.primary-navigation__authenticated > .primary-navigation__list > .primary-navigation__list-item > ul > li:nth-child(1) > a > .material-icons-outlined':
-          ['click', 'Mijn Profiel', 'Click mijn Profiel', 'Open mijn profiel'],
+          ['event', 'Mijn Profiel', 'Click', 'Open mijn profiel'],
         // End header dropdown profiel
         '.header nav.primary-navigation.primary-navigation__authenticated > ul > li > ul > li.header__list-item > a':
-          ['click', 'Logout button', 'Click on logout', 'Logout'],
+          ['event', 'Logout button', 'Click', 'Logout'],
         '.header nav.primary-navigation.primary-navigation__authenticated > ul > li > ul > li.header__list-item > a .link__text':
-          ['click', 'Logout button', 'Click on logout', 'Logout'],
+          ['event', 'Logout button', 'Click', 'Logout'],
         '.header nav.primary-navigation.primary-navigation__authenticated > ul > li > ul > li.header__list-item > a > .material-icons':
-          ['click', 'Logout button', 'Click on logout', 'Logout'],
+          ['event', 'Logout button', 'Click', 'Logout'],
       },
       change: {
         '.form#profile-edit input[name="display_name"]': [
-          'change',
+          'event',
           'Contactgegevens',
           'change',
           'Roepnaam',
         ],
         '.form#profile-edit input[name="phone"]': [
-          'change',
+          'event',
           'Contactgegevens',
           'change',
           'Telefoonnummer',
@@ -296,13 +296,13 @@
       },
       keydown: {
         '.form#profile-edit input[name="display_name"]': [
-          'change',
+          'event',
           'Contactgegevens',
           'change',
           'Roepnaam',
         ],
         '.form#profile-edit input[name="phone"]': [
-          'change',
+          'event',
           'Contactgegevens',
           'change',
           'Telefoonnummer',
