@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-15 16:08+0200\n"
+"POT-Creation-Date: 2024-08-15 17:31+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1323,6 +1323,13 @@ msgid "Dit veld is vereist."
 msgstr "Dit veld is vereist."
 
 #: open_inwoner/accounts/tests/test_auth.py:1775
+msgid ""
+"Voer een juist E-mailadres en wachtwoord in. Let op dat beide velden "
+"hoofdlettergevoelig zijn."
+msgstr ""
+"Voer een juist E-mailadres en wachtwoord in. Let op dat beide velden "
+"hoofdlettergevoelig zijn."
+
 #: open_inwoner/accounts/tests/test_auth.py:1790
 msgid ""
 "Voer een juiste E-mailadres en wachtwoord in. Let op dat beide velden "
