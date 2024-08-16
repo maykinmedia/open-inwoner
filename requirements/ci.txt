@@ -1147,7 +1147,7 @@ xsdata==23.8
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-zgw-consumers==0.34.0
+zgw-consumers==0.35.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt

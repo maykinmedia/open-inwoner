@@ -1,3 +1,5 @@
+from django.utils.text import slugify
+
 import factory
 import faker
 from notifications_api_common.models import Subscription
@@ -27,6 +29,7 @@ from open_inwoner.openzaak.models import (
 class ServiceFactory(factory.django.DjangoModelFactory):
     label = factory.Sequence(lambda n: f"API-{n}")
     api_root = factory.Sequence(lambda n: f"http://www.example{n}.com/api/v1/")
+    slug = factory.LazyAttribute(lambda o: slugify(o.label))
 
     class Meta:
         model = Service
