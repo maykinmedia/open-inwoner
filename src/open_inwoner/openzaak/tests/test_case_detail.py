@@ -51,7 +51,14 @@ from ..api_models import Status, StatusType
 from ..models import OpenZaakConfig
 from .factories import CatalogusConfigFactory, ServiceFactory, ZGWApiGroupConfigFactory
 from .helpers import generate_oas_component_cached
-from .shared import CATALOGI_ROOT, DOCUMENTEN_ROOT, ZAKEN_ROOT
+from .shared import (
+    ANOTHER_CATALOGI_ROOT,
+    ANOTHER_DOCUMENTEN_ROOT,
+    ANOTHER_ZAKEN_ROOT,
+    CATALOGI_ROOT,
+    DOCUMENTEN_ROOT,
+    ZAKEN_ROOT,
+)
 
 PATCHED_MIDDLEWARE = [
     m
@@ -93,6 +100,12 @@ class TestCaseDetailView(
             ztc_service__api_root=CATALOGI_ROOT,
             zrc_service__api_root=ZAKEN_ROOT,
             drc_service__api_root=DOCUMENTEN_ROOT,
+            form_service=None,
+        )
+        self.api_group_alt = ZGWApiGroupConfigFactory(
+            ztc_service__api_root=ANOTHER_CATALOGI_ROOT,
+            zrc_service__api_root=ANOTHER_ZAKEN_ROOT,
+            drc_service__api_root=ANOTHER_DOCUMENTEN_ROOT,
             form_service=None,
         )
 
@@ -708,6 +721,111 @@ class TestCaseDetailView(
             json=paginated_response(
                 [self.objectcontactmoment_old, self.objectcontactmoment_new]
             ),
+        )
+
+    def _setUpAdditionalMocks(self, m):
+        """
+        Mocks for testing with alternative backend
+        """
+        self.zaaktype_alt = generate_oas_component_cached(
+            "ztc",
+            "schemas/ZaakType",
+            uuid="13d30e74-4626-4223-8135-c5855bb4ad0a",
+            url=f"{ANOTHER_CATALOGI_ROOT}zaaktypen/13d30e74-4626-4223-8135-c5855bb4ad0a",
+            identificatie="ZAAKTYPE-2020-0000000001",
+            omschrijving="Coffee zaaktype",
+            catalogus=f"{ANOTHER_CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+            doel="Ask for coffee",
+            aanleiding="Coffee is essential",
+            indicatieInternOfExtern="extern",
+            handelingInitiator="Request",
+            onderwerp="Coffee",
+            handelingBehandelaar="Behandelen",
+            opschortingEnAanhoudingMogelijk=False,
+            verlengingMogelijk=False,
+            publicatieIndicatie=False,
+            besluittypen=[],
+            beginGeldigheid="2020-09-25",
+            versiedatum="2020-09-25",
+        )
+        self.zaaktype_config_alt = ZaakTypeConfigFactory.create(
+            identificatie=self.zaaktype_alt["identificatie"],
+        )
+        self.zaak_alt = generate_oas_component_cached(
+            "zrc",
+            "schemas/Zaak",
+            uuid="530bdd80-36de-40d2-bb10-c4c56a8abea1",
+            url=f"{ANOTHER_ZAKEN_ROOT}zaken/530bdd80-36de-40d2-bb10-c4c56a8abea1",
+            zaaktype=self.zaaktype_alt["url"],
+            identificatie="ZAAK-2024-0000000024",
+            omschrijving="Zaak naar aanleiding van ingezonden formulier",
+            startdatum="2024-01-02",
+            einddatumGepland="2024-01-04",
+            uiterlijkeEinddatumAfdoening="2024-01-05",
+            status=f"{ANOTHER_ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
+            resultaat=f"{ANOTHER_ZAKEN_ROOT}resultaten/a44153aa-ad2c-6a07-be75-15add5113",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+        )
+        self.informatie_object_type_alt = generate_oas_component_cached(
+            "ztc",
+            "schemas/InformatieObjectType",
+            url=f"{ANOTHER_CATALOGI_ROOT}informatieobjecttype/014c38fe-b010-4412-881c-3000032fb321",
+            catalogus=f"{ANOTHER_CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            omschrijving="Some content",
+        )
+        self.informatie_object_alt = generate_oas_component_cached(
+            "drc",
+            "schemas/EnkelvoudigInformatieObject",
+            uuid="014c38fe-b010-4412-881c-3000032fb812",
+            url=f"{ANOTHER_DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812",
+            inhoud=f"{ANOTHER_DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812/download",
+            informatieobjecttype=self.informatie_object_type_alt["url"],
+            status="definitief",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+            bestandsnaam="uploaded_document.txt",
+            titel="uploaded_document_title.txt",
+            bestandsomvang=123,
+        )
+        self.informatie_object_file_alt = SimpleFile(
+            name="uploaded_document_title.txt",
+            size=123,
+            url=reverse(
+                "cases:document_download",
+                kwargs={
+                    "object_id": self.zaak_alt["uuid"],
+                    "info_id": self.informatie_object["uuid"],
+                    "api_group_id": self.api_group_alt.id,
+                },
+            ),
+            created=dateutil.parser.parse(
+                self.zaak_informatie_object_new["registratiedatum"]
+            ),
+        )
+
+        m.get(self.zaak_alt["url"], json=self.zaak_alt)
+        m.get(self.zaaktype_alt["url"], json=self.zaaktype_alt)
+        m.post(
+            f"{ANOTHER_ZAKEN_ROOT}zaakinformatieobjecten",
+            status_code=201,
+            json=[self.zaak_informatie_object_new],
+        )
+        m.get(
+            f"{ANOTHER_ZAKEN_ROOT}rollen?zaak={self.zaak_alt['url']}",
+            json=paginated_response([self.user_role, self.not_initiator_role]),
+        )
+        m.post(
+            f"{ANOTHER_DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten",
+            status_code=201,
+            json=self.uploaded_informatie_object,
+        )
+        m.get(
+            f"{ANOTHER_CATALOGI_ROOT}zaaktype-informatieobjecttypen?zaaktype={self.zaaktype_alt['url']}&richting=inkomend",
+            json=paginated_response([self.zaaktype_informatie_object_type]),
+        )
+        m.get(
+            f"{ANOTHER_DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812/download",
+            text="document content",
         )
 
     @freeze_time("2021-01-12 17:00:00")
@@ -1809,8 +1927,9 @@ class TestCaseDetailView(
         "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
         autospec=True,
     )
-    def test_successful_document_upload_flow(self, m, upload):
+    def test_document_upload_multiple_backends(self, m, upload):
         self._setUpMocks(m)
+        self._setUpAdditionalMocks(m)
         upload.return_value = True
 
         zaak_type_config = ZaakTypeConfigFactory(
@@ -1823,42 +1942,57 @@ class TestCaseDetailView(
             zaaktype_uuids=[self.zaaktype["uuid"]],
             document_upload_enabled=True,
         )
+        zaak_type_config_alt = ZaakTypeConfigFactory(
+            catalogus__url=f"{ANOTHER_CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            identificatie=self.zaaktype_alt["identificatie"],
+        )
+        zaak_type_iotc_alt = ZaakTypeInformatieObjectTypeConfigFactory(
+            zaaktype_config=zaak_type_config_alt,
+            informatieobjecttype_url=self.informatie_object_alt["url"],
+            zaaktype_uuids=[self.zaaktype_alt["uuid"]],
+            document_upload_enabled=True,
+        )
 
         response = self.app.get(self.case_detail_url, user=self.user)
         form = response.forms["document-upload"]
-        form.action = reverse(
-            "cases:case_detail_document_form",
-            kwargs={
-                "object_id": self.zaak["uuid"],
-                "api_group_id": self.api_group.id,
-            },
-        )
-        # form["title"] = "uploaded file"
-        form["type"] = zaak_type_iotc.id
-        form["file"] = Upload("upload.txt", b"data", "text/plain")
-        form_response = form.submit()
 
-        # make sure the client-side-redirect is done with the expected url
-        self.assertEqual(
-            form_response.headers["HX-Redirect"],
-            reverse(
-                "cases:case_detail",
-                kwargs={
-                    "object_id": str(self.zaak["uuid"]),
-                    "api_group_id": self.api_group.id,
-                },
-            ),
-        )
+        for api_group, zaak, zaak_type_iotc_ in [
+            (self.api_group, self.zaak, zaak_type_iotc),
+            (self.api_group_alt, self.zaak_alt, zaak_type_iotc_alt),
+        ]:
+            with self.subTest("Api Group {group.id}"):
+                form.action = reverse(
+                    "cases:case_detail_document_form",
+                    kwargs={
+                        "object_id": zaak["uuid"],
+                        "api_group_id": api_group.id,
+                    },
+                )
+                form["type"] = zaak_type_iotc_.id
+                form["file"] = Upload("upload.txt", b"data", "text/plain")
+                form_response = form.submit()
 
-        redirect = self.app.get(form_response.headers["HX-Redirect"])
-        redirect_messages = list(redirect.context["messages"])
+                # check client-side-redirect
+                self.assertEqual(
+                    form_response.headers["HX-Redirect"],
+                    reverse(
+                        "cases:case_detail",
+                        kwargs={
+                            "object_id": str(zaak["uuid"]),
+                            "api_group_id": api_group.id,
+                        },
+                    ),
+                )
 
-        self.assertEqual(
-            redirect_messages[0].message,
-            _("Wij hebben **1 bestand(en)** succesvol geüpload:\n\n- {title}").format(
-                title="uploaded file"
-            ),
-        )
+                redirect = self.app.get(form_response.headers["HX-Redirect"])
+                redirect_messages = list(redirect.context["messages"])
+
+                self.assertEqual(
+                    redirect_messages[0].message,
+                    _(
+                        "Wij hebben **1 bestand(en)** succesvol geüpload:\n\n- {title}"
+                    ).format(title="uploaded file"),
+                )
 
     @patch(
         "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
