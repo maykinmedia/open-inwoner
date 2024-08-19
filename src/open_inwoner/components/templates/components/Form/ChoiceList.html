@@ -1,0 +1,7 @@
+{% load l10n form_tags icon_tags %}
+
+{# List component for changing the parent styles, when child is clicked #}
+
+<ul class="choice-list {% if single %}choice-list--single{% else %}choice-list-multiple{% endif %} {% if cols %}choice-list--cols-2{% endif %}">
+    {{ contents }}
+</ul>

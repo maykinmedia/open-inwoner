@@ -8,7 +8,7 @@
             {% get_solo 'configurations.SiteConfiguration' as config %}
             <h1 class="utrecht-heading-1">{% trans "Registratie voltooien" %}</h1><br>
             {% if config.registration_text %}<p class="utrecht-paragraph">{{ config.registration_text|urlize|linebreaksbr }}</p>{% endif %}
-            <form method="POST" id="necessary-form" action="{{ request.get_full_path }}" class="form" novalidate>
+            <form method="POST" id="necessary-form" action="{{ request.get_full_path }}" class="form form__choice-list" novalidate>
                 {% csrf_token %}
 
                 {% if form.first_name %}
@@ -71,17 +71,18 @@
 
                 {# Choice of zaken notification channel #}
                 {% if form.case_notification_channel %}
-                    <h3 class="utrecht-heading-4">{% trans "How do you want to receive notifications about cases?" %}</h3>
-                        <div class="radios radios--spaced">
-                            {% with form.case_notification_channel as field %}
-                                {% for choice in field.field.choices %}
-                                    <div class="radio-group radio-group--stacked choice-list-multiple__item">
-                                        {% choice_radio_stacked choice=choice name=field.name data=field.value index=forloop.counter initial=field.form.initial icon_class=choice.1|get_icon_class %}
-                                    </div>
-                                {% endfor %}
-                            {% endwith %}
-                        </div>
+                    <p class="utrecht-paragraph choice-list__p">{% trans "Hoe wilt u deze notificaties ontvangen?" %}</p>
+                    {% with form.case_notification_channel as field %}
+                        {% choice_list_list single=True cols=True %}
+                            {% for choice in field.field.choices %}
+                                {% choice_list_item input_type_radio=True choice=choice name=field.name data=field.value index=forloop.counter initial=field.form.initial icon_symbol=choice.1|get_icon_symbol %}
+                            {% endfor %}
+                        {% endchoice_list_list %}
+                    {% endwith %}
                 {% endif %}
+
+                <div class="choice-list__information--bottom-border">
+                </div>
 
                 {% form_actions primary_icon='east' primary_text="Voltooi registratie" fullwidth=True %}
             </form>

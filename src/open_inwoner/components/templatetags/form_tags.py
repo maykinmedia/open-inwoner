@@ -3,6 +3,7 @@ from django.template.library import parse_bits
 from django.template.loader import render_to_string
 from django.utils.translation import gettext as _
 
+from open_inwoner.components.templatetags.helpers import create_content_wrapper
 from open_inwoner.components.utils import safe_resolve
 
 register = template.Library()
@@ -263,22 +264,48 @@ def choice_radio(choice, **kwargs):
     return {**kwargs, "choice": choice}
 
 
-@register.inclusion_tag("components/Form/ChoiceRadioStacked.html")
-def choice_radio_stacked(choice, **kwargs):
+@register.tag()
+def choice_list_list(parser, token):
     """
-    Display radio input rendered from a choice field.
-
-    Args:
-        choice: the choice to be rendered
-        name: the name of the form field
-        data: the value of a form field field
-        index: the index of a for-loop when looping over choices
-        initial: the initial value of the field
-        icon_class: the icon to be displayed at the top of the
-            radio stack
+    renders a list containing list items (with inputs from a choice field.)
 
     Usage:
-        {% choice_radio_stacked choice=choice name=field.name ... icon_class=choice.1|get_icon_class %}
+        {% choice_list_list single=True cols=False %}
+            {% for choice in field.field.choices %}
+                {% choice_list_item input_type=True choice=choice name=field.name data=field.value index=forloop.counter initial=field.form.initial icon_symbol=False %}
+            {% endfor %}
+        {% endchoice_list_list %}
+
+    Available options::
+    + single: bool | Whether the choice to be rendered can select only one option
+    - cols: bool | Whether a horizontal grid needs to be rendered with two columns
+
+    Extra context:
+        - contents: string (HTML) | this is the context between the choice_list_list and endchoice_list_list tags
+    """
+    return create_content_wrapper(
+        "choice_list_list", "components/Form/ChoiceList.html"
+    )(parser, token)
+
+
+@register.inclusion_tag("components/Form/ChoiceListItem.html")
+def choice_list_item(choice, **kwargs):
+    """
+    Display parent labels surrounding inputs rendered from a choice field.
+
+    Args:
+        + choice: the choice to be rendered
+        + name: the name of the form field
+        + data: the value of a form field field
+        - index: the index of a for-loop when looping over choices
+        - initial: the initial value of the field
+        - input_type_radio: bool | if this is true, show radiobutton, else show checkbox
+        - icon_symbol: bool | if there should be an icon, and if so: specify the icon to be displayed at the top of the input stack
+        - bold_label: bool | If the label should contain a bold heading
+
+    Usage:
+        {% choice_radio_list_item input_type_radio=True choice=choice name=field.name data=field.value index=forloop.counter initial=field.form.initial icon_symbol=False bold_label=False %}
+        {% choice_radio_list_item input_type_radio=False choice=choice name=field.name data=field.value index=forloop.counter initial=field.form.initial icon_symbol=choice.1|get_icon_symbol bold_label=True %}
     """
     return {**kwargs, "choice": choice}
 
@@ -481,8 +508,9 @@ class FormNode(template.Node):
         return rendered
 
 
+# delete?
 @register.filter
-def get_icon_class(key: str) -> str:
+def get_icon_symbol(key: str) -> str:
     mapping = {
         "Alleen digitaal": "computer",
         "Digitaal en per brief": "mail",
