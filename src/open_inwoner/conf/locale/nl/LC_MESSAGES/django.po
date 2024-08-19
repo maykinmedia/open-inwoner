@@ -3926,6 +3926,8 @@ msgid ""
 "Give users the option to choose how they want to receive notifications "
 "(digital and post or digital only)"
 msgstr ""
+"Geef gebruikers de mogelijkheid om te kiezen hoe zij meldingen willen ontvangen"
+"(digitaal en post, of alleen digitaal)"
 
 #: open_inwoner/configurations/models.py:371
 msgid "User notifications for messages"
