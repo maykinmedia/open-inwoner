@@ -1,5 +1,6 @@
 import inspect
 from io import StringIO
+from unittest import mock
 
 from django.core.management import call_command
 from django.test import TestCase
@@ -20,6 +21,7 @@ from open_inwoner.openzaak.tests.test_zgw_imports import CatalogMockData
 from open_inwoner.openzaak.tests.test_zgw_imports_iotypes import (
     InformationObjectTypeMockData,
 )
+from open_inwoner.openzaak.zgw_imports import import_catalog_configs
 from open_inwoner.utils.test import ClearCachesMixin
 
 
@@ -134,3 +136,21 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
         ).strip()
 
         self.assertEqual(stdout, expected)
+
+
+class ZGWImportCommandWithoutConfigTest(TestCase):
+    def test_command_exits_early_if_no_zgw_api_defined(
+        self,
+    ):
+        mock_import_catalog_configs = mock.create_autospec(
+            import_catalog_configs, side_effect=import_catalog_configs
+        )
+
+        out = StringIO()
+        call_command("zgw_import_data", stdout=out)
+
+        self.assertEqual(
+            out.getvalue(),
+            "Please define at least one ZGWApiGroupConfig before running this command.\n",
+        )
+        mock_import_catalog_configs.assert_not_called()
