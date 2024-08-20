@@ -233,13 +233,13 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
             {
                 "fields": (
                     "enable_notification_channel_choice",
-                    "notifications_messages_enabled",
-                    "notifications_actions_enabled",
-                    "notifications_plans_enabled",
                     "notifications_cases_enabled",
-                    "recipients_email_digest",
-                    "contact_phonenumber",
+                    "notifications_messages_enabled",
+                    "notifications_plans_enabled",
+                    "notifications_actions_enabled",
                     "email_verification_required",
+                    "contact_phonenumber",
+                    "recipients_email_digest",
                 )
             },
         ),
