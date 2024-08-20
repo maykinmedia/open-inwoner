@@ -232,6 +232,7 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
             _("Notifications"),
             {
                 "fields": (
+                    "enable_notification_channel_choice",
                     "notifications_messages_enabled",
                     "notifications_actions_enabled",
                     "notifications_plans_enabled",
