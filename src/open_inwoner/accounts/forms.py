@@ -332,23 +332,27 @@ class UserNotificationsForm(forms.ModelForm):
     def __init__(self, user, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
-        config = SiteConfiguration.get_solo()
+        siteconfig = SiteConfiguration.get_solo()
+        self.any_notifications_enabled = siteconfig.any_notifications_enabled
 
-        if not config.enable_notification_channel_choice:
+        if not siteconfig.enable_notification_channel_choice:
             del self.fields["case_notification_channel"]
 
         if (
-            not config.notifications_cases_enabled
+            not siteconfig.notifications_cases_enabled
             or not case_page_is_published()
             or not user.login_type == LoginTypeChoices.digid
         ):
             del self.fields["cases_notifications"]
 
-        if not config.notifications_messages_enabled or not inbox_page_is_published():
+        if (
+            not siteconfig.notifications_messages_enabled
+            or not inbox_page_is_published()
+        ):
             del self.fields["messages_notifications"]
 
         if (
-            not config.notifications_plans_enabled
+            not siteconfig.notifications_plans_enabled
             or not collaborate_page_is_published()
         ):
             del self.fields["plans_notifications"]
