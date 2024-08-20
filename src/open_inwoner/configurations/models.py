@@ -392,7 +392,7 @@ class SiteConfiguration(SingletonModel):
         verbose_name=_("User notifications for cases"),
         default=True,
         help_text=_(
-            "Notify users of upddates to cases or if an action is required "
+            "Notify users of updates to cases or if an action is required "
             "(if set, individual users can still opt out)"
         ),
     )

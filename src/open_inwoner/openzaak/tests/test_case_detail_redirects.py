@@ -44,8 +44,8 @@ class LegacyCaseDetailUrlRedirectTest(TestCase):
         self.assertEqual(
             messages,
             [
-                "The link you clicked on has expired. Please find your case in the"
-                " list below."
+                "De link die u gebruikte, is verlopen. Uw aanvraag is via onderstaand "
+                "overzicht te vinden."
             ],
         )
 
