@@ -367,33 +367,36 @@ class SiteConfiguration(SingletonModel):
             "(digital and post or digital only)"
         ),
     )
+    notifications_cases_enabled = models.BooleanField(
+        verbose_name=_("User notifications for cases"),
+        default=True,
+        help_text=_(
+            "Enable notifications for cases (if enabled, individual users can still opt out of "
+            "notifications about case updates, though not of notifications that indicate that "
+            "an action concerning some case is required)"
+        ),
+    )
     notifications_messages_enabled = models.BooleanField(
         verbose_name=_("User notifications for messages"),
         default=True,
         help_text=_(
-            "Notify users of new messages (if set, individual users can still opt out)"
-        ),
-    )
-    notifications_actions_enabled = models.BooleanField(
-        verbose_name=_("User notifications for expiring actions"),
-        default=True,
-        help_text=_(
-            "Notify users of expiring actions (if set, individual users can still opt out)"
+            "Enable notifications for messages (if enabled, individual users can still opt out; "
+            "messages will only be sent if the user also opts in)"
         ),
     )
     notifications_plans_enabled = models.BooleanField(
         verbose_name=_("User notifications for expiring plans"),
         default=True,
         help_text=_(
-            "Notify users of expiring plans (if set, individual users can still opt out)"
+            "Enable notifications for plans (if enabled, individual users can still opt out)"
         ),
     )
-    notifications_cases_enabled = models.BooleanField(
-        verbose_name=_("User notifications for cases"),
+    notifications_actions_enabled = models.BooleanField(
+        verbose_name=_("User notifications for expiring actions"),
         default=True,
         help_text=_(
-            "Notify users of updates to cases or if an action is required "
-            "(if set, individual users can still opt out)"
+            "Enable notifications for expring actions concerning plans (if enabled, individual users "
+            "can still opt out by disabling notifications for plans)"
         ),
     )
     recipients_email_digest = ArrayField(
