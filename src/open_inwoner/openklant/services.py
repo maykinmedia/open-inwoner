@@ -1,18 +1,17 @@
+import logging
+
 from open_inwoner.accounts.models import User
+from open_inwoner.openklant.api_models import Klant
 from open_inwoner.openklant.clients import build_klanten_client
 from open_inwoner.utils.logentry import system_action
 
 from .wrap import get_fetch_parameters
 
+logger = logging.getLogger(__name__)
 
-def update_user_from_klant(request):
-    if not hasattr(request, "user"):
-        return
 
-    user: User = request.user
-
-    client = build_klanten_client()
-    if not client:
+def get_or_create_klant_from_request(request):
+    if not (client := build_klanten_client()):
         return
 
     fetch_params = get_fetch_parameters(request)
@@ -24,8 +23,11 @@ def update_user_from_klant(request):
     else:
         return
 
-    system_action(msg, content_object=user)
+    system_action(msg, content_object=request.user)
+    return klant
 
+
+def update_user_from_klant(klant: Klant, user: User):
     update_data = {}
 
     if klant.telefoonnummer and klant.telefoonnummer != user.phonenumber:
