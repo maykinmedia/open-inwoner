@@ -81,13 +81,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         default="",
         validators=[CharFieldValidator()],
     )
-    display_name = models.CharField(
-        verbose_name=_("Display name"),
-        max_length=255,
-        blank=True,
-        default="",
-        validators=[CharFieldValidator()],
-    )
     email = models.EmailField(
         verbose_name=_("Email address"),
     )
@@ -358,7 +351,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_full_name(self):
         # validator allowed spaces as values
-        first_name = self.display_name.strip() or self.first_name.strip()
+        first_name = self.first_name.strip()
         parts = (first_name, self.infix.strip(), self.last_name.strip())
         return " ".join(p for p in parts if p)
 
@@ -367,7 +360,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     @property
     def call_name(self):
-        return self.display_name or self.first_name
+        return self.first_name or self.first_name
 
     def get_address(self):
         if self.street:

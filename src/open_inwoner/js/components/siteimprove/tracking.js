@@ -277,12 +277,6 @@
           ['event', 'Logout button', 'Click', 'Logout'],
       },
       change: {
-        '.form#profile-edit input[name="display_name"]': [
-          'event',
-          'Contactgegevens',
-          'change',
-          'Roepnaam',
-        ],
         '.form#profile-edit input[name="phone"]': [
           'event',
           'Contactgegevens',
@@ -291,12 +285,6 @@
         ],
       },
       keydown: {
-        '.form#profile-edit input[name="display_name"]': [
-          'event',
-          'Contactgegevens',
-          'change',
-          'Roepnaam',
-        ],
         '.form#profile-edit input[name="phone"]': [
           'event',
           'Contactgegevens',

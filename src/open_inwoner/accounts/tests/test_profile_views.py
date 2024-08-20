@@ -62,9 +62,7 @@ class ProfileViewTests(WebTest):
     def setUp(self):
         self.url = reverse("profile:detail")
         self.return_url = reverse("logout")
-        self.user = UserFactory(
-            first_name="Erik", display_name="Roep", street="MyStreet"
-        )
+        self.user = UserFactory(first_name="Erik", street="MyStreet")
         self.digid_user = DigidUserFactory()
         self.eherkenning_user = eHerkenningUserFactory()
 
@@ -139,7 +137,7 @@ class ProfileViewTests(WebTest):
         response = self.app.get(self.url, user=self.user)
 
         self.assertContains(response, self.user.first_name)
-        self.assertContains(response, f"Welkom, {self.user.display_name}")
+        self.assertContains(response, f"Welkom, {self.user.first_name}")
         self.assertContains(response, f"{self.user.infix} {self.user.last_name}")
         self.assertContains(response, self.user.email)
         self.assertContains(response, self.user.phonenumber)
@@ -323,7 +321,6 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         form = response.forms["profile-edit"]
         form["first_name"] = ""
         form["last_name"] = ""
-        form["display_name"] = ""
         form["email"] = ""
         form["phonenumber"] = ""
         form["street"] = ""
@@ -345,7 +342,6 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         form = response.forms["profile-edit"]
         form["first_name"] = "First name"
         form["last_name"] = "Last name"
-        form["display_name"] = "a nickname"
         form["email"] = "user@example.com"
         form["phonenumber"] = "0612345678"
         form["street"] = "Keizersgracht"
@@ -359,7 +355,6 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         self.user.refresh_from_db()
         self.assertEqual(self.user.first_name, "First name")
         self.assertEqual(self.user.last_name, "Last name")
-        self.assertEqual(self.user.display_name, "a nickname")
         self.assertEqual(self.user.email, "user@example.com")
         self.assertEqual(self.user.street, "Keizersgracht")
         self.assertEqual(self.user.housenumber, "17 d")
@@ -377,7 +372,6 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
                 form["first_name"] = "test" + char
                 form["infix"] = char + "test"
                 form["last_name"] = "te" + char + "st"
-                form["display_name"] = "te" + char + "st"
                 form["city"] = "te" + char + "st"
                 form["street"] = "te" + char + "st"
 
@@ -391,7 +385,6 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
                     "first_name": [error_msg],
                     "infix": [error_msg],
                     "last_name": [error_msg],
-                    "display_name": [error_msg],
                     "city": [error_msg],
                     "street": [error_msg],
                 }
@@ -441,7 +434,6 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         response = self.app.get(self.url, user=user)
         form = response.forms["profile-edit"]
 
-        form["display_name"] = "a nickname"
         form["email"] = "user@example.com"
         form["phonenumber"] = "0612345678"
         response = form.submit()
@@ -450,7 +442,6 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
 
         user.refresh_from_db()
 
-        self.assertEqual(user.display_name, "a nickname")
         self.assertEqual(user.email, "user@example.com")
         self.assertEqual(user.phonenumber, "0612345678")
 
@@ -830,7 +821,6 @@ class MyDataTests(AssertTimelineLogMixin, HaalCentraalMixin, WebTest):
             infix="de",
             last_name="Kooyman",
             login_type=LoginTypeChoices.digid,
-            display_name="Meertje",
         )
         self.url = reverse("profile:data")
 
@@ -848,7 +838,6 @@ class MyDataTests(AssertTimelineLogMixin, HaalCentraalMixin, WebTest):
             self.expected_response.city,
             # self.expected_response.country,
             self.user.bsn,
-            self.user.display_name,
             self.user.email,
             self.user.phonenumber,
         ]

@@ -131,7 +131,7 @@ class BaseUserForm(forms.ModelForm):
     class Meta:
         model = User
         fields = (
-            "display_name",
+            "first_name",
             "email",
             "phonenumber",
             "image",
@@ -157,7 +157,6 @@ class UserForm(ErrorMessageMixin, BaseUserForm):
             "first_name",
             "infix",
             "last_name",
-            "display_name",
             "email",
             "phonenumber",
             "street",

@@ -22,17 +22,12 @@ class UserTests(TestCase):
         user = User(first_name="", infix="", last_name="Bar")
         self.assertEqual(user.get_full_name(), "Bar")
 
-        # use display_name instead of first_name
-        user = User(first_name="Foo", display_name="Flexi", infix="de", last_name="Bar")
-        self.assertEqual(user.get_full_name(), "Flexi de Bar")
-
         # spaces everywhere
-        user = User(first_name="Foo", display_name="    ", infix="de", last_name="Bar")
+        user = User(first_name="Foo", infix="de", last_name="Bar")
         self.assertEqual(user.get_full_name(), "Foo de Bar")
 
         user = User(
             first_name="  ",
-            display_name="  ",
             infix="  ",
             last_name="  ",
             email="foo@bar.nl",
