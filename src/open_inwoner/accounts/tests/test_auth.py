@@ -1,9 +1,10 @@
 from unittest.mock import patch
 from urllib.parse import urlencode
 
+from django.contrib.auth.signals import user_logged_in
 from django.contrib.sites.models import Site
 from django.core import mail
-from django.test import override_settings
+from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
 
@@ -17,6 +18,7 @@ from digid_eherkenning_oidc_generics.models import (
     OpenIDConnectEHerkenningConfig,
 )
 from open_inwoner.accounts.choices import NotificationChannelChoice
+from open_inwoner.accounts.signals import update_user_from_klant_on_login
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.kvk.branches import get_kvk_branch_number
@@ -1894,3 +1896,44 @@ class TestPasswordChange(WebTest):
             furl(reverse("login")).add({"next": reverse("password_change")}).url
         )
         self.assertRedirects(response, expected_url)
+
+
+@requests_mock.Mocker()
+class TestUpdateUserFromKlantUponLoginTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        MockAPIReadPatchData.setUpServices()
+        config = SiteConfiguration.get_solo()
+        config.enable_notification_channel_choice = True
+        config.save()
+
+    def test_update_hook_is_registered_on_login(self, m):
+        connected_functions = [receiver[1]() for receiver in user_logged_in.receivers]
+        self.assertIn(update_user_from_klant_on_login, connected_functions)
+
+    def test_update_user_from_klant_hook_only_called_for_digid_and_eherkenning(self, m):
+        self.data = MockAPIReadPatchData().install_mocks(m)
+        request = RequestFactory().get("/foo")
+        request.user = self.data.user
+
+        for login_type in LoginTypeChoices:
+            with self.subTest(
+                f"Test update klant hook is called for login type {login_type}"
+            ):
+                self.data.user.login_type = login_type
+                self.data.user.save()
+                with patch(
+                    "open_inwoner.accounts.signals.update_user_from_klant"
+                ) as update_user_from_klant_mock:
+                    update_user_from_klant_on_login(
+                        self.__class__,
+                        request.user,
+                        request,
+                    )
+                    if login_type in [
+                        LoginTypeChoices.digid,
+                        LoginTypeChoices.eherkenning,
+                    ]:
+                        update_user_from_klant_mock.assert_called_once()
+                    else:
+                        update_user_from_klant_mock.assert_not_called()

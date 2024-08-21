@@ -24,6 +24,11 @@ MESSAGE_TYPE = {
 
 @receiver(user_logged_in)
 def update_user_from_klant_on_login(sender, user, request, *args, **kwargs):
+    # This additional guard is mainly to facilitate easier testing, where not
+    # all request factories return a full-fledged request object.
+    if not hasattr(request, "user"):
+        return
+
     if user.login_type in [LoginTypeChoices.digid, LoginTypeChoices.eherkenning]:
         if klant := get_or_create_klant_from_request(request):
             update_user_from_klant(klant, user)
