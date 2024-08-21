@@ -7,8 +7,10 @@ from open_inwoner.haalcentraal.models import HaalCentraalConfig
 from open_inwoner.haalcentraal.utils import update_brp_data_in_db
 from open_inwoner.utils.logentry import user_action
 
-from ..openklant.models import OpenKlantConfig
-from ..openklant.services import update_user_from_klant
+from ..openklant.services import (
+    get_or_create_klant_from_request,
+    update_user_from_klant,
+)
 from .choices import LoginTypeChoices
 
 MESSAGE_TYPE = {
@@ -18,6 +20,18 @@ MESSAGE_TYPE = {
     "frontend_oidc": _("user was logged in via frontend using OpenIdConnect"),
     "logout": _("user was logged out"),
 }
+
+
+@receiver(user_logged_in)
+def update_user_from_klant_on_login(sender, user, request, *args, **kwargs):
+    # This additional guard is mainly to facilitate easier testing, where not
+    # all request factories return a full-fledged request object.
+    if not hasattr(request, "user"):
+        return
+
+    if user.login_type in [LoginTypeChoices.digid, LoginTypeChoices.eherkenning]:
+        if klant := get_or_create_klant_from_request(request):
+            update_user_from_klant(klant, user)
 
 
 @receiver(user_logged_in)
@@ -40,15 +54,10 @@ def log_user_login(sender, user, request, *args, **kwargs):
 
     # update brp fields when login with digid and brp is configured
     brp_config = HaalCentraalConfig.get_solo()
-    oc_config = OpenKlantConfig.get_solo()
 
     if user.login_type == LoginTypeChoices.digid:
         if brp_config.service:
             update_brp_data_in_db(user)
-
-    if user.login_type in [LoginTypeChoices.digid, LoginTypeChoices.eherkenning]:
-        if oc_config.klanten_service:
-            update_user_from_klant(request)
 
 
 @receiver(user_logged_out)

@@ -31,7 +31,7 @@ class Klant(ZGWModel):
     achternaam: str = ""
     telefoonnummer: str = ""
     emailadres: str = ""
-    toestemmingZaakNotificatiesAlleenDigitaal: bool | None = None
+    toestemming_zaak_notificaties_alleen_digitaal: bool | None = None
 
     def get_name_display(self):
         return " ".join(

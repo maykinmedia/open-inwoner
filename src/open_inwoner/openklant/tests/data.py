@@ -59,6 +59,7 @@ class MockAPIReadPatchData(MockAPIData):
             url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             emailadres="bad@example.com",
             telefoonnummer="",
+            toestemmingZaakNotificatiesAlleenDigitaal=False,
         )
         self.klant_bsn_updated = generate_oas_component_cached(
             "kc",
@@ -71,6 +72,7 @@ class MockAPIReadPatchData(MockAPIData):
             url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             emailadres="good@example.com",
             telefoonnummer="0123456789",
+            toestemmingZaakNotificatiesAlleenDigitaal=False,
         )
         self.klant_eherkenning_old = generate_oas_component_cached(
             "kc",
@@ -81,6 +83,7 @@ class MockAPIReadPatchData(MockAPIData):
             },
             emailadres="bad@example.com",
             telefoonnummer="",
+            toestemmingZaakNotificatiesAlleenDigitaal=False,
         )
         self.klant_eherkenning_updated = generate_oas_component_cached(
             "kc",
@@ -91,6 +94,7 @@ class MockAPIReadPatchData(MockAPIData):
             },
             emailadres="good@example.com",
             telefoonnummer="0123456789",
+            toestemmingZaakNotificatiesAlleenDigitaal=False,
         )
 
     def install_mocks(self, m) -> "MockAPIReadPatchData":
@@ -150,6 +154,7 @@ class MockAPIReadData(MockAPIData):
             url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             emailadres="foo@example.com",
             telefoonnummer="0612345678",
+            toestemmingZaakNotificatiesAlleenDigitaal=False,
         )
         self.klant_kvk = generate_oas_component_cached(
             "kc",
@@ -162,6 +167,7 @@ class MockAPIReadData(MockAPIData):
             url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-ffffffffffff",
             emailadres="foo@bar.com",
             telefoonnummer="0687654321",
+            toestemmingZaakNotificatiesAlleenDigitaal=False,
         )
         self.klant_vestiging = generate_oas_component_cached(
             "kc",
@@ -174,6 +180,7 @@ class MockAPIReadData(MockAPIData):
             url=f"{KLANTEN_ROOT}klant/bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
             emailadres="foo@bar.com",
             telefoonnummer="0612345678",
+            toestemmingZaakNotificatiesAlleenDigitaal=False,
         )
         self.contactmoment = generate_oas_component_cached(
             "cmc",
@@ -366,6 +373,7 @@ class MockAPICreateData(MockAPIData):
             url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             emailadres="foo@example.com",
             telefoonnummer="0612345678",
+            toestemmingZaakNotificatiesAlleenDigitaal=False,
         )
         self.klant_eherkenning_no_contact_info = generate_oas_component_cached(
             "kc",
@@ -380,6 +388,7 @@ class MockAPICreateData(MockAPIData):
             achternaam="Bar",
             emailadres="",
             telefoonnummer="",
+            toestemmingZaakNotificatiesAlleenDigitaal=False,
         )
         self.klant_bsn_no_contact_info = generate_oas_component_cached(
             "kc",
@@ -394,6 +403,7 @@ class MockAPICreateData(MockAPIData):
             achternaam="Bar",
             emailadres="",
             telefoonnummer="",
+            toestemmingZaakNotificatiesAlleenDigitaal=False,
         )
         self.contactmoment = generate_oas_component_cached(
             "cmc",
