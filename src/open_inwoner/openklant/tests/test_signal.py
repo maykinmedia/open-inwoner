@@ -41,6 +41,7 @@ class UpdateUserFromLoginSignalAPITestCase(
             url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             emailadres="new@example.com",
             telefoonnummer="0612345678",
+            toestemmingZaakNotificatiesAlleenDigitaal=False,
         )
 
     def test_update_user_after_login(self, m):
