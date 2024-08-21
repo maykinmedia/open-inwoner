@@ -364,6 +364,7 @@ MAILER_USE_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 # LOGGING
 #
 LOG_STDOUT = config("LOG_STDOUT", default=False)
+CELERY_LOGLEVEL = config("CELERY_LOGLEVEL", default="INFO")
 
 LOGGING_DIR = os.path.join(BASE_DIR, "log")
 
@@ -457,6 +458,11 @@ LOGGING = {
         "log_outgoing_requests": {
             "handlers": ["log_outgoing_requests", "save_outgoing_requests"],
             "level": "DEBUG",
+            "propagate": True,
+        },
+        "celery": {
+            "handlers": ["django"] if not LOG_STDOUT else ["console"],
+            "level": CELERY_LOGLEVEL,
             "propagate": True,
         },
     },
