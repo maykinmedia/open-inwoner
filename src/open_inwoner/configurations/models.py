@@ -395,7 +395,7 @@ class SiteConfiguration(SingletonModel):
         verbose_name=_("User notifications for expiring actions"),
         default=True,
         help_text=_(
-            "Enable notifications for expring actions concerning plans (if enabled, individual users "
+            "Enable notifications for expiring actions concerning plans (if enabled, individual users "
             "can still opt out by disabling notifications for plans)"
         ),
     )
