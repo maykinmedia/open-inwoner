@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-19 11:05+0200\n"
+"POT-Creation-Date: 2024-08-21 18:04+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -507,7 +507,7 @@ msgid "Verified email"
 msgstr "E-mailadres geverifieerd"
 
 #: open_inwoner/accounts/models.py:104
-#: open_inwoner/configurations/models.py:416
+#: open_inwoner/configurations/models.py:419
 #: open_inwoner/pdc/models/organization.py:42
 #: open_inwoner/pdc/models/product.py:285
 #: open_inwoner/pdc/models/product.py:360
@@ -911,7 +911,7 @@ msgstr "De ontvanger van het bericht"
 msgid "This is the date the message was created"
 msgstr "Datum dat het bericht is aangemaakt"
 
-#: open_inwoner/accounts/models.py:731 open_inwoner/conf/base.py:578
+#: open_inwoner/accounts/models.py:731 open_inwoner/conf/base.py:584
 #: open_inwoner/pdc/models/product.py:111
 msgid "Content"
 msgstr "Content"
@@ -2111,7 +2111,7 @@ msgid "Documenten"
 msgstr "Documenten"
 
 #: open_inwoner/cms/cases/views/status.py:731
-#: open_inwoner/openzaak/tests/test_documents.py:236
+#: open_inwoner/openzaak/tests/test_documents.py:386
 #, python-brace-format
 msgid "Document van zaak gedownload {case}: {filename}"
 msgstr "Document van zaak gedownload {case}: {filename}"
@@ -2798,35 +2798,35 @@ msgstr "Volgende"
 msgid "Dutch"
 msgstr "Nederlands"
 
-#: open_inwoner/conf/base.py:587
+#: open_inwoner/conf/base.py:593
 msgid "Banner Image"
 msgstr "Bannerafbeelding"
 
-#: open_inwoner/conf/base.py:588
+#: open_inwoner/conf/base.py:594
 msgid "Banner Text"
 msgstr "Banner tekst"
 
-#: open_inwoner/conf/base.py:589
+#: open_inwoner/conf/base.py:595
 msgid "Login Banner"
 msgstr "Login Banner"
 
-#: open_inwoner/conf/base.py:591
+#: open_inwoner/conf/base.py:597
 msgid "Footer, Left"
 msgstr "Footer linkerzijde"
 
-#: open_inwoner/conf/base.py:598
+#: open_inwoner/conf/base.py:604
 msgid "Footer, Center"
 msgstr "Footer midden"
 
-#: open_inwoner/conf/base.py:605
+#: open_inwoner/conf/base.py:611
 msgid "Footer, Right"
 msgstr "Footer rechterzijde"
 
-#: open_inwoner/conf/base.py:616
+#: open_inwoner/conf/base.py:622
 msgid "Arrow"
 msgstr "Pijl"
 
-#: open_inwoner/conf/base.py:961
+#: open_inwoner/conf/base.py:967
 #, python-brace-format
 msgid "Inlogcode: {token} (deze code is geldig voor 5 minuten)"
 msgstr "Inlogcode: {token} (deze code is geldig voor 5 minuten)"
@@ -3258,85 +3258,85 @@ msgstr "Helpteksten"
 msgid "Search filter options"
 msgstr "Zoekfilter opties"
 
-#: open_inwoner/configurations/admin.py:246
+#: open_inwoner/configurations/admin.py:247
 msgid "Openid Connect"
 msgstr "OpenID Connect"
 
-#: open_inwoner/configurations/admin.py:256 open_inwoner/kvk/admin.py:19
+#: open_inwoner/configurations/admin.py:257 open_inwoner/kvk/admin.py:19
 #: open_inwoner/soap/admin.py:28
 msgid "Authentication"
 msgstr "Authenticatie"
 
-#: open_inwoner/configurations/admin.py:260
+#: open_inwoner/configurations/admin.py:261
 msgid "Analytics"
 msgstr "Analytics"
 
-#: open_inwoner/configurations/admin.py:272
+#: open_inwoner/configurations/admin.py:273
 msgid "Cookie consent"
 msgstr "Toestemming voor cookies"
 
-#: open_inwoner/configurations/admin.py:282
+#: open_inwoner/configurations/admin.py:283
 msgid "Customer satisfaction survey"
 msgstr "Gebruikersfeedbackonderzoek"
 
-#: open_inwoner/configurations/admin.py:291
+#: open_inwoner/configurations/admin.py:292
 msgid "Display options for anonymous users"
 msgstr "Weergaveopties voor anonieme gebruikers"
 
-#: open_inwoner/configurations/admin.py:300
+#: open_inwoner/configurations/admin.py:301
 msgid "Advanced display options"
 msgstr "Geavanceerde opties"
 
-#: open_inwoner/configurations/admin.py:310
+#: open_inwoner/configurations/admin.py:311
 msgid "Social media"
 msgstr "Sociale media"
 
-#: open_inwoner/configurations/admin.py:311
+#: open_inwoner/configurations/admin.py:312
 msgid "Questions"
 msgstr "Vragen"
 
-#: open_inwoner/configurations/admin.py:321
+#: open_inwoner/configurations/admin.py:322
 msgid "Allowed CSS properties"
 msgstr "Toegestane CSS attributen"
 
-#: open_inwoner/configurations/admin.py:353
+#: open_inwoner/configurations/admin.py:354
 #: open_inwoner/configurations/models.py:34
 #: open_inwoner/configurations/tests/test_colors.py:42
 msgid "Primary color"
 msgstr "Primaire kleur"
 
-#: open_inwoner/configurations/admin.py:355
+#: open_inwoner/configurations/admin.py:356
 #: open_inwoner/configurations/models.py:47
 msgid "Primary font color"
 msgstr "Primaire tekstkleur"
 
-#: open_inwoner/configurations/admin.py:360
+#: open_inwoner/configurations/admin.py:361
 #: open_inwoner/configurations/models.py:39
 #: open_inwoner/configurations/tests/test_colors.py:46
 msgid "Secondary color"
 msgstr "Secundaire kleur"
 
-#: open_inwoner/configurations/admin.py:362
+#: open_inwoner/configurations/admin.py:363
 #: open_inwoner/configurations/models.py:54
 msgid "Secondary font color"
 msgstr "Secundaire tekstkleur"
 
-#: open_inwoner/configurations/admin.py:367
+#: open_inwoner/configurations/admin.py:368
 #: open_inwoner/configurations/models.py:43
 #: open_inwoner/configurations/tests/test_colors.py:50
 msgid "Accent color"
 msgstr "Accentkleur"
 
-#: open_inwoner/configurations/admin.py:369
+#: open_inwoner/configurations/admin.py:370
 #: open_inwoner/configurations/models.py:61
 msgid "Accent font color"
 msgstr "Accent tekstkleur"
 
-#: open_inwoner/configurations/admin.py:374
+#: open_inwoner/configurations/admin.py:375
 msgid "Warning banner background color"
 msgstr "De achtergrondkleur van de waarschuwingsbanner"
 
-#: open_inwoner/configurations/admin.py:376
+#: open_inwoner/configurations/admin.py:377
 msgid "Warning banner font color"
 msgstr "Waarschuwingsbanner tekstkleur"
 
@@ -3393,7 +3393,7 @@ msgid "heading_font"
 msgstr "heading_font"
 
 #: open_inwoner/configurations/choices.py:20
-#: open_inwoner/configurations/models.py:742
+#: open_inwoner/configurations/models.py:745
 msgid "Heading font"
 msgstr "Heading font"
 
@@ -3926,59 +3926,63 @@ msgid ""
 "Give users the option to choose how they want to receive notifications "
 "(digital and post or digital only)"
 msgstr ""
-"Geef gebruikers de mogelijkheid om te kiezen hoe zij meldingen willen ontvangen"
-"(digitaal en post, of alleen digitaal)"
+"Geef gebruikers de mogelijkheid om te kiezen hoe zij meldingen willen "
+"ontvangen (digitaal en post, of alleen digitaal)"
 
 #: open_inwoner/configurations/models.py:371
-msgid "User notifications for messages"
-msgstr "Gebruikersnotificaties voor berichten"
-
-#: open_inwoner/configurations/models.py:374
-msgid ""
-"Notify users of new messages (if set, individual users can still opt out)"
-msgstr ""
-"Notificaties voor nieuwe berichten (indien ingesteld, kunnen individuele "
-"gebruikers zich nog afmelden)"
-
-#: open_inwoner/configurations/models.py:378
-msgid "User notifications for expiring actions"
-msgstr "Gebruikersnotificaties voor verlopende acties"
-
-#: open_inwoner/configurations/models.py:381
-msgid ""
-"Notify users of expiring actions (if set, individual users can still opt out)"
-msgstr ""
-"Notificaties voor verlopende acties (indien ingesteld, kunnen individuele "
-"gebruikers zich nog afmelden)"
-
-#: open_inwoner/configurations/models.py:385
-msgid "User notifications for expiring plans"
-msgstr "Gebruikersnotificaties voor verlopende samenwerkingen"
-
-#: open_inwoner/configurations/models.py:388
-msgid ""
-"Notify users of expiring plans (if set, individual users can still opt out)"
-msgstr ""
-"Notificaties voor verlopende samenwerkingen (indien ingesteld, kunnen "
-"individuele gebruikers zich nog afmelden)"
-
-#: open_inwoner/configurations/models.py:392
 msgid "User notifications for cases"
 msgstr "Gebruikersnotificaties voor aanvragen"
 
-#: open_inwoner/configurations/models.py:395
+#: open_inwoner/configurations/models.py:374
 msgid ""
-"Notify users of updates to cases or if an action is required (if set, "
-"individual users can still opt out)"
-msgstr ""
-"Notificaties voor verplichte acties (indien ingesteld, kunnen individuele "
-"gebruikers zich nog afmelden)"
+"Enable notifications for cases (if enabled, individual users can still opt "
+"out of notifications about case updates, though not of notifications that "
+"indicate that an action concerning some case is required)"
+msgstr "Activeer notificaties voor aanvragen (indien ingeschakeld kunnen gebruikers "
+"zich nog steeds zelf afmelden voor meldingen over aanvraag-updates, maar niet "
+"voor meldingen betreffende verplichte acties)"
 
-#: open_inwoner/configurations/models.py:401
+#: open_inwoner/configurations/models.py:380
+msgid "User notifications for messages"
+msgstr "Gebruikersnotificaties voor berichten"
+
+#: open_inwoner/configurations/models.py:383
+msgid ""
+"Enable notifications for messages (if enabled, individual users can still "
+"opt out; messages will only be sent if the user also opts in)"
+msgstr "Activeer notificaties voor nieuwe berichten (indien actief "
+"kunnen gebruikers ervoor kiezen zichzelf alsnog af te melden)"
+
+#: open_inwoner/configurations/models.py:388
+msgid "User notifications for expiring plans"
+msgstr "Gebruikersnotificaties voor verlopende samenwerkingen"
+
+#: open_inwoner/configurations/models.py:391
+msgid ""
+"Enable notifications for plans (if enabled, individual users can still opt "
+"out)"
+msgstr ""
+"Notificaties voor verlopende samenwerkingen (indien ingesteld, kunnen "
+"individuele gebruikers ervoor kiezen zichzelf alsnog af te melden)"
+
+#: open_inwoner/configurations/models.py:395
+msgid "User notifications for expiring actions"
+msgstr "Gebruikersnotificaties voor verlopende acties"
+
+#: open_inwoner/configurations/models.py:398
+msgid ""
+"Enable notifications for expiring actions concerning plans (if enabled, "
+"individual users can still opt out by disabling notifications for plans)"
+msgstr ""
+"Notificaties voor verlopende acties (indien ingesteld, kunnen individuele "
+"gebruikers zich nog afmelden door de notificaties in het kader van "
+"aflopende samenwerkingen uit te schakelen)"
+
+#: open_inwoner/configurations/models.py:404
 msgid "recipients email digest"
 msgstr "ontvangers e-mailsamenvatting"
 
-#: open_inwoner/configurations/models.py:403
+#: open_inwoner/configurations/models.py:406
 msgid ""
 "The email addresses that should receive a daily report of items requiring "
 "attention."
@@ -3986,71 +3990,71 @@ msgstr ""
 "De e-mailadressen van beheerders die een dagelijkse samenvatting dienen te "
 "krijgen van punten van orde."
 
-#: open_inwoner/configurations/models.py:409
+#: open_inwoner/configurations/models.py:412
 msgid "Email verification required"
 msgstr "E-mailverificatie vereist"
 
-#: open_inwoner/configurations/models.py:411
+#: open_inwoner/configurations/models.py:414
 msgid "Whether to require users to verify their email address"
 msgstr ""
 "Of gebruikers verplicht zijn om na het inloggen hun e-mailadres te verifieren"
 
-#: open_inwoner/configurations/models.py:420
+#: open_inwoner/configurations/models.py:423
 msgid "The public contact phone number of the organization"
 msgstr "Telefoonnummer van de organisatie"
 
-#: open_inwoner/configurations/models.py:423 open_inwoner/soap/models.py:14
+#: open_inwoner/configurations/models.py:426 open_inwoner/soap/models.py:14
 msgid "URL"
 msgstr "URL"
 
-#: open_inwoner/configurations/models.py:425
+#: open_inwoner/configurations/models.py:428
 msgid "URL of the public contact page of the organization"
 msgstr "URL van de contactpagina van de organisatie"
 
-#: open_inwoner/configurations/models.py:430
+#: open_inwoner/configurations/models.py:433
 msgid "Google Tag Manager code"
 msgstr "Google Tag Manager code"
 
-#: open_inwoner/configurations/models.py:434
+#: open_inwoner/configurations/models.py:437
 msgid ""
 "Typically looks like 'GTM-XXXX'. Supplying this installs Google Tag Manager."
 msgstr ""
 "Normaalgesproken is dit een code van het formaat 'GTM-XXXX'. Door dit in te "
 "stellen wordt Google Tag Manager gebruikt."
 
-#: open_inwoner/configurations/models.py:438
+#: open_inwoner/configurations/models.py:441
 msgid "Google Analytics code"
 msgstr "Google Analytics code"
 
-#: open_inwoner/configurations/models.py:442
+#: open_inwoner/configurations/models.py:445
 msgid ""
 "Typically looks like 'G-XXXXX'. Supplying this installs Google Analytics."
 msgstr ""
 "Normaalgesproken is dit een code van het formaat 'G-XXXX'. Door dit in te "
 "stellen wordt Google Analytics gebruikt."
 
-#: open_inwoner/configurations/models.py:446
+#: open_inwoner/configurations/models.py:449
 msgid "Matomo server URL"
 msgstr "Matamo server URL"
 
-#: open_inwoner/configurations/models.py:449
+#: open_inwoner/configurations/models.py:452
 msgid "The base URL of your Matomo server, e.g. 'matomo.example.com'."
 msgstr ""
 "De domeinnaam / URL van de Matamo server, bijvoorbeeld 'matamo.example.com'."
 
-#: open_inwoner/configurations/models.py:452
+#: open_inwoner/configurations/models.py:455
 msgid "Matomo site ID"
 msgstr "Matamo site ID"
 
-#: open_inwoner/configurations/models.py:455
+#: open_inwoner/configurations/models.py:458
 msgid "The 'idsite' of the website you're tracking in Matomo."
 msgstr "De 'idsite' van de website in Matamo die getrackt dient te worden."
 
-#: open_inwoner/configurations/models.py:458
+#: open_inwoner/configurations/models.py:461
 msgid "SiteImprove ID"
 msgstr "SiteImprove ID"
 
-#: open_inwoner/configurations/models.py:463
+#: open_inwoner/configurations/models.py:466
 msgid ""
 "SiteImprove ID - this can be found in the snippet example, which should "
 "contain a URL like '//siteimproveanalytics.com/js/siteanalyze_xxxxx.js'. The "
@@ -4061,16 +4065,16 @@ msgstr ""
 "siteanalyze_xxxxx.js' waarbij het xxxxx-deel de SiteImprove ID is die hier "
 "ingevuld moet worden."
 
-#: open_inwoner/configurations/models.py:471
+#: open_inwoner/configurations/models.py:474
 msgid "Wij gebruiken cookies om onze website en dienstverlening te verbeteren."
 msgstr ""
 "Wij gebruiken cookies om onze website en dienstverlening te verbeteren."
 
-#: open_inwoner/configurations/models.py:474
+#: open_inwoner/configurations/models.py:477
 msgid "Cookie info text"
 msgstr "Tekst cookiebanner informatie"
 
-#: open_inwoner/configurations/models.py:476
+#: open_inwoner/configurations/models.py:479
 msgid ""
 "The text that displays inside the cookie banner. Supplying this makes the "
 "cookie banner visible."
@@ -4078,79 +4082,79 @@ msgstr ""
 "De tekstinhoud van de cookiebanner. Wanneer deze wordt ingevuld dan wordt de "
 "cookiebanner zichtbaar."
 
-#: open_inwoner/configurations/models.py:481
+#: open_inwoner/configurations/models.py:484
 msgid "Lees meer over ons cookiebeleid."
 msgstr "Lees meer over ons cookiebeleid."
 
-#: open_inwoner/configurations/models.py:483
+#: open_inwoner/configurations/models.py:486
 msgid "Cookie link text"
 msgstr "Tekst cookiebanner link"
 
-#: open_inwoner/configurations/models.py:484
+#: open_inwoner/configurations/models.py:487
 msgid "The text that is displayed as the link to the cookie policy."
 msgstr "De tekst die wordt gebruikt als link naar de privacypagina."
 
-#: open_inwoner/configurations/models.py:490
+#: open_inwoner/configurations/models.py:493
 msgid "Privacy page link"
 msgstr "URL van de privacypagina"
 
-#: open_inwoner/configurations/models.py:491
+#: open_inwoner/configurations/models.py:494
 msgid "The link to the cookie policy page."
 msgstr "De link naar de pagina met het privacybeleid."
 
-#: open_inwoner/configurations/models.py:496
+#: open_inwoner/configurations/models.py:499
 msgid "KCM survey link text"
 msgstr "Feedbackknop label"
 
-#: open_inwoner/configurations/models.py:498
+#: open_inwoner/configurations/models.py:501
 msgid "The text that is displayed on the customer satisfaction survey link"
 msgstr ""
 "De label van de knop wat wordt gebruikt om gebruikersfeedback te verzamelen"
 
-#: open_inwoner/configurations/models.py:502
+#: open_inwoner/configurations/models.py:505
 msgid "KCM survey URL"
 msgstr "Feedbackknop URL"
 
-#: open_inwoner/configurations/models.py:504
+#: open_inwoner/configurations/models.py:507
 msgid "The external link for the customer satisfaction survey."
 msgstr "De externe link achter de feedbackknop feedback."
 
-#: open_inwoner/configurations/models.py:507
+#: open_inwoner/configurations/models.py:510
 msgid "Openid Connect Logo"
 msgstr "OpenID Connect Logo"
 
-#: open_inwoner/configurations/models.py:512
+#: open_inwoner/configurations/models.py:515
 msgid "Logo that can be used for the OpenId connect login method"
 msgstr ""
 "Het logo dat gebruikt wordt voor OpenID Connect (OIDC/Azure AD) als "
 "loginmethode is ingesteld"
 
-#: open_inwoner/configurations/models.py:515
+#: open_inwoner/configurations/models.py:518
 msgid "Openid Connect login text"
 msgstr "OpenID Connect login tekst"
 
-#: open_inwoner/configurations/models.py:519
+#: open_inwoner/configurations/models.py:522
 msgid ""
 "The text that should display when OpenId connect is set as a login method"
 msgstr ""
 "De tekst die getoond wordt wanneer OpenID Connect (OIDC/Azure AD) als "
 "loginmethode is ingesteld"
 
-#: open_inwoner/configurations/models.py:523
+#: open_inwoner/configurations/models.py:526
 msgid "Show option to login via OpenId"
 msgstr "Toon optie om in te loggen via OpenID Connect"
 
-#: open_inwoner/configurations/models.py:528
+#: open_inwoner/configurations/models.py:531
 msgid "Only selected groups will see the option to login via OpenId."
 msgstr ""
 "Alleen geselecteerde groepen zullen de optie zien om met OpenID Connect in "
 "te loggen."
 
-#: open_inwoner/configurations/models.py:534
+#: open_inwoner/configurations/models.py:537
 msgid "Redirect anonymous user to"
 msgstr "Stuur niet-ingelogde gebruiker door naar"
 
-#: open_inwoner/configurations/models.py:536
+#: open_inwoner/configurations/models.py:539
 msgid ""
 "Provide a url or a path where the user should be redirected to from the "
 "anonymous page. Path example: '/accounts/login/', Url example: 'https://www."
@@ -4160,57 +4164,57 @@ msgstr ""
 "doorgestuurd moet worden vanuit de niet-ingelogde homepage.Pad voorbeeld: '/"
 "accounts/login', URL voorbeeld: 'https://gemeente.groningen.nl'"
 
-#: open_inwoner/configurations/models.py:542
+#: open_inwoner/configurations/models.py:545
 msgid "Allow messages file sharing"
 msgstr "Sta het delen van bestanden via Mijn Berichten toe"
 
-#: open_inwoner/configurations/models.py:544
+#: open_inwoner/configurations/models.py:547
 msgid "Whether file sharing via the messages is allowed or not"
 msgstr ""
 "Of het delen van bestanden via Mijn Berichten mogelijk is of niet. Indien "
 "uitgeschakeld dan kunnen alleen tekstberichten worden verzonden"
 
-#: open_inwoner/configurations/models.py:547
+#: open_inwoner/configurations/models.py:550
 msgid "Hide categories from anonymous users"
 msgstr "Blokkeer toegang tot Onderwerpen voor niet-ingelogde gebruikers"
 
-#: open_inwoner/configurations/models.py:550
+#: open_inwoner/configurations/models.py:553
 msgid "If checked, categories will be hidden from users who are not logged in."
 msgstr ""
 "Indien geselecteerd: alleen ingelogde gebruikers hebben toegang tot "
 "Onderwerpen."
 
-#: open_inwoner/configurations/models.py:554
+#: open_inwoner/configurations/models.py:557
 msgid "Hide search from anonymous users"
 msgstr "Verberg zoekbalk voor anonieme gebruiker"
 
-#: open_inwoner/configurations/models.py:557
+#: open_inwoner/configurations/models.py:560
 msgid "If checked, only authenticated users will be able to search the page."
 msgstr "Indien geselecteerd: alleen ingelogde gebruikers zien de zoekfunctie."
 
-#: open_inwoner/configurations/models.py:561
+#: open_inwoner/configurations/models.py:564
 msgid "Display social media buttons"
 msgstr "Toon sociale media knoppen bij elk product"
 
-#: open_inwoner/configurations/models.py:564
+#: open_inwoner/configurations/models.py:567
 msgid "Enable sharing of products on social media (Facebook, LinkedIn...)"
 msgstr ""
 "Maak het delen mogelijk van producten op sociale media (Facebook, "
 "LinkedIn...)"
 
-#: open_inwoner/configurations/models.py:569
+#: open_inwoner/configurations/models.py:572
 msgid "Theme stylesheet"
 msgstr "Design/thema stylesheet"
 
-#: open_inwoner/configurations/models.py:570
+#: open_inwoner/configurations/models.py:573
 msgid "Additional CSS file added to the page."
 msgstr "Additioneel CSS bestand wat op alle pagina's wordt ingeladen."
 
-#: open_inwoner/configurations/models.py:577
+#: open_inwoner/configurations/models.py:580
 msgid "Extra CSS"
 msgstr "Extra CSS stijlen"
 
-#: open_inwoner/configurations/models.py:579
+#: open_inwoner/configurations/models.py:582
 msgid ""
 "Additional CSS added to the page. Note only a (safe) subset of CSS "
 "properties is supported."
@@ -4218,11 +4222,11 @@ msgstr ""
 "Extra CSS voor de site. Let op: slechts een (veilige) subset van CSS-"
 "eigenschappen wordt ondersteund."
 
-#: open_inwoner/configurations/models.py:584
+#: open_inwoner/configurations/models.py:587
 msgid "eHerkenning authentication enabled"
 msgstr "eHerkenning authentication ingeschakeld"
 
-#: open_inwoner/configurations/models.py:587
+#: open_inwoner/configurations/models.py:590
 msgid ""
 "Whether users can log in with eHerkenning or not. By default, the SAML "
 "integration will be used for this, in order to use the OpenID Connect "
@@ -4235,75 +4239,75 @@ msgstr ""
 "Connect (OIDC) koppeling, navigeer naar `OpenID Connect configuratie voor "
 "eHerkenning` om deze te activeren."
 
-#: open_inwoner/configurations/models.py:593
+#: open_inwoner/configurations/models.py:596
 msgid "Contactmoment contact form"
 msgstr "Contactmoment contact formulier"
 
-#: open_inwoner/configurations/models.py:596
+#: open_inwoner/configurations/models.py:599
 msgid ""
 "Display contact form on the questions list page so that users can create new "
 "questions"
 msgstr ""
 
-#: open_inwoner/configurations/models.py:601
 #: open_inwoner/configurations/models.py:604
+#: open_inwoner/configurations/models.py:607
 msgid "Site Configuration"
 msgstr "Algemene configuratie"
 
-#: open_inwoner/configurations/models.py:749
+#: open_inwoner/configurations/models.py:752
 msgid "Upload heading font. TTF font types only."
 msgstr "Upload lettertype voor koppen. Alleen TTF lettertypes toegestaan."
 
-#: open_inwoner/configurations/models.py:753
-#: open_inwoner/configurations/models.py:817
+#: open_inwoner/configurations/models.py:756
+#: open_inwoner/configurations/models.py:820
 msgid "Configuration"
 msgstr "Configuratie"
 
-#: open_inwoner/configurations/models.py:758
+#: open_inwoner/configurations/models.py:761
 msgid "Body font regular"
 msgstr "Body font regular"
 
-#: open_inwoner/configurations/models.py:765
+#: open_inwoner/configurations/models.py:768
 msgid "Upload regular text body font. TTF font types only."
 msgstr "Upload reguliere tekst lettertype. Alleen TTF lettertypes toegestaan."
 
-#: open_inwoner/configurations/models.py:768
+#: open_inwoner/configurations/models.py:771
 msgid "Body font italic"
 msgstr "Body font italic"
 
-#: open_inwoner/configurations/models.py:775
+#: open_inwoner/configurations/models.py:778
 msgid "Upload italic text body font. TTF font types only."
 msgstr ""
 "Upload schuingedrukte tekst lettertype. Alleen TTF lettertypes toegestaan."
 
-#: open_inwoner/configurations/models.py:778
+#: open_inwoner/configurations/models.py:781
 msgid "Body font bold"
 msgstr "Body font bold"
 
-#: open_inwoner/configurations/models.py:785
+#: open_inwoner/configurations/models.py:788
 msgid "Upload bold text body font. TTF font types only."
 msgstr ""
 "Upload dikgedrukte tekst lettertype. Alleen TTF lettertypes toegestaan."
 
-#: open_inwoner/configurations/models.py:788
+#: open_inwoner/configurations/models.py:791
 msgid "Body font bold italic"
 msgstr "Body font bold italic"
 
-#: open_inwoner/configurations/models.py:795
+#: open_inwoner/configurations/models.py:798
 msgid "Upload bold italic text body font. TTF font types only."
 msgstr ""
 "Upload dik-en-schuingedrukte tekst lettertype. Alleen TTF lettertypes "
 "toegestaan."
 
-#: open_inwoner/configurations/models.py:823
+#: open_inwoner/configurations/models.py:826
 msgid "Flatpage"
 msgstr "Pagina"
 
-#: open_inwoner/configurations/models.py:832
+#: open_inwoner/configurations/models.py:835
 msgid "Flatpage in the footer"
 msgstr "Platte pagina in footer"
 
-#: open_inwoner/configurations/models.py:833
+#: open_inwoner/configurations/models.py:836
 msgid "Flatpages in the footer"
 msgstr "Platte pagina's in footer"
 
@@ -4749,7 +4753,7 @@ msgstr "KlantContactMomenten"
 
 #: open_inwoner/openklant/tests/test_views.py:102
 #: open_inwoner/openklant/tests/test_views.py:156
-#: open_inwoner/openzaak/tests/test_case_detail.py:839
+#: open_inwoner/openzaak/tests/test_case_detail.py:957
 #: open_inwoner/templates/pages/contactmoment/list.html:40
 #: open_inwoner/templates/pages/questions/question.html:5
 msgid "Nieuw antwoord beschikbaar"
@@ -4793,8 +4797,8 @@ msgid ""
 "Upload a file generated by the export function on the 'Catalogus Config' "
 "administration page. The maximum size of this file is %(file_size)s"
 msgstr ""
-"Upload een bestand dat met de exportfunctie is aangemaakt op de 'Catalogus Configs' "
-"beheerpagina. De maximale grootte van dit bestand is %(file_size)s"
+"Upload een bestand dat met de exportfunctie is aangemaakt op de 'Catalogus "
+"Configs' beheerpagina. De maximale grootte van dit bestand is %(file_size)s"
 
 #: open_inwoner/openzaak/admin.py:139
 msgid "Export to file"
@@ -4811,8 +4815,8 @@ msgid ""
 "We were unable to process your upload. Please regenerate the file and try "
 "again."
 msgstr ""
-"We konden uw upload niet verwerken. Genereer het bestand opnieuw en probeer het"
-"nog eens."
+"We konden uw upload niet verwerken. Genereer het bestand opnieuw en probeer "
+"het nog eens."
 
 #: open_inwoner/openzaak/admin.py:201
 msgid "notify document attachment"
@@ -5307,36 +5311,36 @@ msgstr "Open Zaak informatieobject notificatie record"
 msgid "Successfully processed 1 items"
 msgstr "1 item succesvol verwerkt"
 
-#: open_inwoner/openzaak/tests/test_case_detail.py:1355
-#: open_inwoner/openzaak/tests/test_case_detail.py:1395
-#: open_inwoner/openzaak/tests/test_case_detail.py:1435
-#: open_inwoner/openzaak/tests/test_case_detail.py:1469
-#: open_inwoner/openzaak/tests/test_case_detail.py:1505
-#: open_inwoner/openzaak/tests/test_case_detail.py:1542
-#: open_inwoner/openzaak/tests/test_case_detail.py:1598
+#: open_inwoner/openzaak/tests/test_case_detail.py:1473
+#: open_inwoner/openzaak/tests/test_case_detail.py:1513
+#: open_inwoner/openzaak/tests/test_case_detail.py:1553
+#: open_inwoner/openzaak/tests/test_case_detail.py:1587
+#: open_inwoner/openzaak/tests/test_case_detail.py:1623
+#: open_inwoner/openzaak/tests/test_case_detail.py:1660
+#: open_inwoner/openzaak/tests/test_case_detail.py:1716
 #: open_inwoner/templates/pages/cases/403.html:3
 msgid "Sorry, you don't have access to this page (403)"
 msgstr "Sorry, u heeft geen toegang tot deze pagina (403)"
 
-#: open_inwoner/openzaak/tests/test_case_detail.py:1567
-#: open_inwoner/openzaak/tests/test_case_detail.py:1575
-#: open_inwoner/openzaak/tests/test_case_detail.py:1788
+#: open_inwoner/openzaak/tests/test_case_detail.py:1685
+#: open_inwoner/openzaak/tests/test_case_detail.py:1693
+#: open_inwoner/openzaak/tests/test_case_detail.py:1906
 #: open_inwoner/templates/pages/cases/status_inner.html:96
 #: open_inwoner/templates/pages/contactmoment/detail.html:45
 msgid "There is no available data at the moment."
 msgstr "Op dit moment zijn er geen aanvragen beschikbaar."
 
-#: open_inwoner/openzaak/tests/test_case_detail.py:1730
-#: open_inwoner/openzaak/tests/test_case_detail.py:2065
+#: open_inwoner/openzaak/tests/test_case_detail.py:1848
+#: open_inwoner/openzaak/tests/test_case_detail.py:2199
 msgid "some description content"
 msgstr "some description content"
 
-#: open_inwoner/openzaak/tests/test_case_detail.py:1769
+#: open_inwoner/openzaak/tests/test_case_detail.py:1887
 msgid "Grootte max. 50 MB, toegestane document formaten:"
 msgstr "Grootte max. 50 MB, toegestane document formaten:"
 
-#: open_inwoner/openzaak/tests/test_case_detail.py:1858
-#: open_inwoner/openzaak/tests/test_case_detail.py:1918
+#: open_inwoner/openzaak/tests/test_case_detail.py:1993
+#: open_inwoner/openzaak/tests/test_case_detail.py:2052
 #, python-brace-format
 msgid ""
 "Wij hebben **1 bestand(en)** succesvol geüpload:\n"
@@ -5344,14 +5348,14 @@ msgid ""
 "- {title}"
 msgstr ""
 
-#: open_inwoner/openzaak/tests/test_case_detail.py:2039
-#: open_inwoner/openzaak/tests/test_case_detail.py:2117
-#: open_inwoner/openzaak/tests/test_case_detail.py:2143
-#: open_inwoner/openzaak/tests/test_case_detail.py:2169
+#: open_inwoner/openzaak/tests/test_case_detail.py:2173
+#: open_inwoner/openzaak/tests/test_case_detail.py:2251
+#: open_inwoner/openzaak/tests/test_case_detail.py:2277
+#: open_inwoner/openzaak/tests/test_case_detail.py:2303
 msgid "By clicking the button below you can upload a document."
 msgstr "Via onderstaande knop kunt u een bestand toevoegen."
 
-#: open_inwoner/openzaak/tests/test_case_detail.py:2092
+#: open_inwoner/openzaak/tests/test_case_detail.py:2226
 #: open_inwoner/templates/pages/cases/status_inner.html:54
 msgid ""
 "By clicking the button below you can upload a document. This is an external "
@@ -5360,8 +5364,8 @@ msgstr ""
 "Via onderstaande knop kunt u een bestand toevoegen. U wordt doorgestuurd "
 "naar een ander systeem."
 
-#: open_inwoner/openzaak/tests/test_case_detail.py:2223
-#: open_inwoner/openzaak/tests/test_case_detail.py:2268
+#: open_inwoner/openzaak/tests/test_case_detail.py:2357
+#: open_inwoner/openzaak/tests/test_case_detail.py:2402
 msgid ""
 "Een fout is opgetreden bij het uploaden van {self."
 "uploaded_informatie_object['bestandsnaam']}"
@@ -6853,6 +6857,23 @@ msgstr "Uitloggen"
 #: open_inwoner/templates/admin/catalogusconfig_change_list.html:8
 msgid "Import from file"
 msgstr "Importeer uit bestand"
+
+#: open_inwoner/templates/admin/import_zgw_export_form.html:5
+msgid "Import ZGW information from a file"
+msgstr "Importeer ZGW gegevens vanuit een bestand"
+
+#: open_inwoner/templates/admin/import_zgw_export_form.html:9
+msgid ""
+"Note that this site must have a Service configured with a \"slug\" field "
+"that matches the slug field on the Service linked to the CatalogusConfig "
+"objects in the uploaded file."
+msgstr "Houd er rekening mee dat deze site een Service object dient te bevatten met een "
+"\"slug\" veld dat overeenkomt met hetzelfde veld op de Service objecten die gelinked zijn "
+"aan de CatalogusConfig objecten in het aangeleverde bestand."
+
+#: open_inwoner/templates/admin/import_zgw_export_form.html:19
+msgid "Upload file"
+msgstr "Upload bestand"
 
 #: open_inwoner/templates/cms/banner/banner_image_plugin.html:7
 #: open_inwoner/templates/cms/fullwidth.html:19
