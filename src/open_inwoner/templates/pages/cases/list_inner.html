@@ -51,7 +51,7 @@
                 <!-- other cases -->
             {% else %}
                 <a href="{% url 'cases:case_detail' api_group_id=case.api_group.id  object_id=case.uuid %}" class="card card card__description-card card--stretch">
-                    <div class="card__body">
+                    <div class="card__body phone-parsing">
 
                         <h2 class="card__heading-2">{{ case.description }}</h2>
                         {# Meaningful sequence for accessibility: any text belonging to a heading must be below the heading #}
@@ -66,7 +66,7 @@
                             {% else %}
                                 {% list_item "No status" caption=_("Status") compact=True strong=False %}
                             {% endif %}
-                            {% list_item case.identification caption=_("Zaaknummer") compact=True strong=False %}
+                            &zwj;{% list_item case.identification caption=_("Zaaknummer") compact=True strong=False %}
                         {% endrender_list %}
 
                         <span class="link link--icon link--secondary">
