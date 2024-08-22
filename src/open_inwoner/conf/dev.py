@@ -79,19 +79,6 @@ CACHES = {
 #
 # Library settings
 #
-
-# Allow logging in with both username+password and email+password
-AUTHENTICATION_BACKENDS = [
-    "open_inwoner.accounts.backends.CustomAxesBackend",
-    "open_inwoner.accounts.backends.UserModelEmailBackend",
-    "django.contrib.auth.backends.ModelBackend",
-    "digid_eherkenning.mock.backends.DigiDBackend",
-    "eherkenning.mock.backends.eHerkenningBackend",
-    "digid_eherkenning_oidc_generics.backends.OIDCAuthenticationDigiDBackend",
-    "digid_eherkenning_oidc_generics.backends.OIDCAuthenticationEHerkenningBackend",
-    "open_inwoner.accounts.backends.CustomOIDCBackend",
-]
-
 ELASTIC_APM["DEBUG"] = True
 
 if "test" in sys.argv:
