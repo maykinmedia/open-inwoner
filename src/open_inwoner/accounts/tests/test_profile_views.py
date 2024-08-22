@@ -963,6 +963,14 @@ class EditIntrestsTests(WebTest):
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 @patch("open_inwoner.cms.utils.page_display._is_published", return_value=True)
 class EditNotificationsTests(AssertTimelineLogMixin, WebTest):
+    @classmethod
+    def setUpTestData(cls):
+        config = SiteConfiguration.get_solo()
+        config.notifications_messages_enabled = True
+        config.notifications_cases_enabled = True
+        config.notifications_plans_enabled = True
+        config.save()
+
     def setUp(self):
         self.url = reverse("profile:notifications")
         self.user = UserFactory()
@@ -1065,8 +1073,13 @@ class NotificationsDisplayTests(WebTest):
         cls.url = reverse("profile:notifications")
         cls.user = UserFactory()
 
+        config = SiteConfiguration.get_solo()
+        config.notifications_messages_enabled = True
+        config.notifications_cases_enabled = True
+        config.notifications_plans_enabled = True
+        config.save()
+
     def test_inbox_notifications_display(self):
-        # inbox page not created
         response = self.app.get(self.url, user=self.user)
         form = response.forms["change-notifications"]
 

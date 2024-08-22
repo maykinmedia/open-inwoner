@@ -121,6 +121,10 @@ class TestProfile(WebTest):
 
     @patch("open_inwoner.cms.utils.page_display._is_published", return_value=True)
     def test_user_notifications_update_is_logged(self, mock_cms_page_display):
+        config = SiteConfiguration.get_solo()
+        config.notifications_messages_enabled = True
+        config.save()
+
         form = self.app.get(reverse("profile:notifications"), user=self.user).forms[
             "change-notifications"
         ]
