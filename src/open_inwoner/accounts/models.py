@@ -351,13 +351,12 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_full_name(self):
         # validator allowed spaces as values
-        first_name = self.display_name.strip() or self.first_name.strip()
-        parts = (first_name, self.infix.strip(), self.last_name.strip())
+        parts = (self.first_name.strip(), self.infix.strip(), self.last_name.strip())
         return " ".join(p for p in parts if p)
 
     @property
     def display_name(self):
-        return self.first_name
+        return self.first_name.strip()
 
     def get_address(self):
         if self.street:

@@ -386,7 +386,6 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
                     "first_name": [error_msg],
                     "infix": [error_msg],
                     "last_name": [error_msg],
-                    "display_name": [error_msg],
                     "city": [error_msg],
                     "street": [error_msg],
                 }
@@ -824,7 +823,6 @@ class MyDataTests(AssertTimelineLogMixin, HaalCentraalMixin, WebTest):
             infix="de",
             last_name="Kooyman",
             login_type=LoginTypeChoices.digid,
-            display_name="Meertje",
         )
         self.url = reverse("profile:data")
 
@@ -837,12 +835,9 @@ class MyDataTests(AssertTimelineLogMixin, HaalCentraalMixin, WebTest):
             self.expected_response.gender,
             self.expected_response.street,
             self.expected_response.get_housenumber(),
-            # self.expected_response.housenumbersuffix,
             self.expected_response.postal_code,
             self.expected_response.city,
-            # self.expected_response.country,
             self.user.bsn,
-            self.user.display_name,
             self.user.email,
             self.user.phonenumber,
         ]
