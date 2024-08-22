@@ -260,6 +260,17 @@ strong .color--primary, strong .color--secondary {
     border-top: 3px solid #999999;
 }
 
+/* iOS specific */
+
+.phone-parsing {
+    pointer-events: none;
+}
+
+.phone-parsing > a {
+    text-decoration: none;
+    color: inherit;
+}
+
 /* CKEditor only */
 
 .cke_editable a {
