@@ -57,7 +57,11 @@ class NotificationHandlerUtilsTestCase(TestCase):
         ) as format_identificatie:
             format_identificatie.return_value = ret_val
             send_case_update_email(
-                user, case, "case_status_notification", status=status
+                user,
+                case,
+                "case_status_notification",
+                status=status,
+                api_group=self.api_group,
             )
 
         format_identificatie.assert_called_once()
@@ -88,7 +92,9 @@ class NotificationHandlerUtilsTestCase(TestCase):
             kwargs={"object_id": str(case.uuid), "api_group_id": self.api_group.id},
         )
 
-        send_case_update_email(user, case, "case_document_notification")
+        send_case_update_email(
+            user, case, "case_document_notification", api_group=self.api_group
+        )
 
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]

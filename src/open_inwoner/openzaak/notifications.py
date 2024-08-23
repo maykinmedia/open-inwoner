@@ -21,7 +21,6 @@ from open_inwoner.openzaak.cases import resolve_status
 from open_inwoner.openzaak.clients import (
     CatalogiClient,
     ZakenClient,
-    build_catalogi_client,
     build_zaken_client,
 )
 from open_inwoner.openzaak.documents import fetch_single_information_object_url
@@ -65,14 +64,6 @@ def handle_zaken_notification(notification: Notification):
     resources = ("status", "zaakinformatieobject")
     r = notification.resource  # short alias for logging
 
-    client = build_zaken_client()
-    if not client:
-        log_system_action(
-            f"ignored {r} notification: cannot build Zaken API client for case {case_url}",
-            log_level=logging.ERROR,
-        )
-        return
-
     if notification.resource not in resources:
         log_system_action(
             f"ignored {r} notification: resource is not "
@@ -81,9 +72,16 @@ def handle_zaken_notification(notification: Notification):
         )
         return
 
+    try:
+        api_group = ZGWApiGroupConfig.objects.resolve_group_from_hints(url=case_url)
+    except ZGWApiGroupConfig.DoesNotExist:
+        logger.error("No API group defined for case %s", case_url)
+        return
+
+    zaken_client = api_group.zaken_client
+
     # check if we have users that need to be informed about this case
-    roles = client.fetch_case_roles(case_url)
-    if not roles:
+    if not (roles := zaken_client.fetch_case_roles(case_url)):
         log_system_action(
             f"ignored {r} notification: cannot retrieve rollen for case {case_url}",
             # NOTE this used to be logging.ERROR, but as this is also our first call
@@ -101,17 +99,14 @@ def handle_zaken_notification(notification: Notification):
         return
 
     # check if this case is visible
-    case = client.fetch_case_by_url_no_cache(case_url)
-    if not case:
+    if not (case := zaken_client.fetch_case_by_url_no_cache(case_url)):
         log_system_action(
             f"ignored {r} notification: cannot retrieve case {case_url}",
             log_level=logging.ERROR,
         )
         return
 
-    case_type = None
-    if catalogi_client := build_catalogi_client():
-        case_type = catalogi_client.fetch_single_case_type(case.zaaktype)
+    case_type = api_group.catalogi_client.fetch_single_case_type(case.zaaktype)
 
     if not case_type:
         log_system_action(
@@ -131,7 +126,7 @@ def handle_zaken_notification(notification: Notification):
         return
 
     if notification.resource == "status":
-        _handle_status_notification(notification, case, inform_users)
+        _handle_status_notification(notification, case, inform_users, api_group)
     elif notification.resource == "zaakinformatieobject":
         _handle_zaakinformatieobject_notification(notification, case, inform_users)
     else:
@@ -142,10 +137,10 @@ def send_case_update_email(
     user: User,
     case: Zaak,
     template_name: str,
+    api_group: ZGWApiGroupConfig,
     status: Status | None = None,
     extra_context: dict = None,
 ):
-    group = ZGWApiGroupConfig.objects.resolve_group_from_hints(url=case.url)
 
     """
     send the actual mail
@@ -153,7 +148,7 @@ def send_case_update_email(
     case_detail_url = build_absolute_url(
         reverse(
             "cases:case_detail",
-            kwargs={"object_id": str(case.uuid), "api_group_id": group.id},
+            kwargs={"object_id": str(case.uuid), "api_group_id": api_group.id},
         )
     )
 
@@ -511,27 +506,14 @@ def _handle_status_notification(
     notification: Notification,
     case: Zaak,
     inform_users: list[User],
+    api_group: ZGWApiGroupConfig,
 ):
     """
     Check status notification settings of user and case-related objects/configs
     """
-    oz_config = OpenZaakConfig.get_solo()
-
-    catalogi_client = build_catalogi_client()
-    if not catalogi_client:
-        log_system_action(
-            f"ignored {notification.resource} notification for {case.url}: cannot create Catalogi API client",
-            log_level=logging.ERROR,
-        )
-        return None
-
-    zaken_client = build_zaken_client()
-    if not zaken_client:
-        log_system_action(
-            f"ignored {notification.resource} notification for {case.url}: cannot create Zaken API client",
-            log_level=logging.ERROR,
-        )
-        return
+    oz_config = api_group.open_zaak_config
+    catalogi_client = api_group.catalogi_client
+    zaken_client = api_group.zaken_client
 
     if not (status_history := _check_status_history(notification, case, zaken_client)):
         return
@@ -568,7 +550,7 @@ def _handle_status_notification(
             log_level=logging.INFO,
         )
         # TODO: replace with notify_about_status_update(...args, method: Callable)
-        _handle_status_update(user, case, status, status_type_config)
+        _handle_status_update(user, case, status, status_type_config, api_group)
 
 
 def _handle_status_update(
@@ -576,6 +558,7 @@ def _handle_status_update(
     case: Zaak,
     status: Status,
     status_type_config: ZaakTypeStatusTypeConfig,
+    api_group: ZGWApiGroupConfig,
 ):
     # choose template
     if status_type_config.action_required:
@@ -611,7 +594,9 @@ def _handle_status_update(
         )
         return
 
-    send_case_update_email(user, case, template_name, status=status)
+    send_case_update_email(
+        user, case, template_name, api_group=api_group, status=status
+    )
     note.mark_sent()
 
     log_system_action(
