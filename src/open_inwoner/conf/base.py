@@ -495,7 +495,6 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTHENTICATION_BACKENDS = [
     "open_inwoner.accounts.backends.CustomAxesBackend",
     "open_inwoner.accounts.backends.UserModelEmailBackend",
-    "django.contrib.auth.backends.ModelBackend",
     "digid_eherkenning.backends.DigiDBackend",
     "eherkenning.backends.eHerkenningBackend",
     "digid_eherkenning_oidc_generics.backends.OIDCAuthenticationDigiDBackend",
