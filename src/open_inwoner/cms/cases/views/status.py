@@ -38,7 +38,7 @@ from open_inwoner.openklant.wrap import (
 from open_inwoner.openzaak.api_models import Status, StatusType, Zaak
 from open_inwoner.openzaak.clients import CatalogiClient, ZakenClient
 from open_inwoner.openzaak.documents import (
-    fetch_single_information_object_url,
+    fetch_single_information_object_from_url,
     fetch_single_information_object_uuid,
 )
 from open_inwoner.openzaak.models import (
@@ -630,7 +630,9 @@ class InnerCaseDetailView(
         #         [case_info.informatieobject for case_info in case_info_objects],
         #     )
         info_objects = [
-            fetch_single_information_object_url(case_info.informatieobject)
+            fetch_single_information_object_from_url(
+                case_info.informatieobject, api_group=api_group
+            )
             for case_info in case_info_objects
         ]
 

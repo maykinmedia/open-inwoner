@@ -304,9 +304,9 @@ class MockAPIDataAlt:
         self.zaak_type_alt = generate_oas_component_cached(
             "ztc",
             "schemas/ZaakType",
-            uuid="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxxx",
-            url=f"{ANOTHER_CATALOGI_ROOT}zaaktype/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxxx",
-            catalogus=f"{ANOTHER_CATALOGI_ROOT}catalogussen/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxxx",
+            uuid="22fd7613-3c9d-4507-a0b1-32c503488988",
+            url=f"{ANOTHER_CATALOGI_ROOT}zaaktype/22fd7613-3c9d-4507-a0b1-32c503488988",
+            catalogus=f"{ANOTHER_CATALOGI_ROOT}catalogussen/22fd7613-3c9d-4507-a0b1-32c503488988",
             identificatie="My Zaaktype",
             indicatieInternOfExtern="extern",
             omschrijving="My Zaaktype omschrijving",
@@ -336,10 +336,10 @@ class MockAPIDataAlt:
         self.zaak_alt = generate_oas_component_cached(
             "zrc",
             "schemas/Zaak",
-            url=f"{ANOTHER_ZAKEN_ROOT}zaken/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxxx",
+            url=f"{ANOTHER_ZAKEN_ROOT}zaken/22fd7613-3c9d-4507-a0b1-32c503488988",
             zaaktype=self.zaak_type_alt["url"],
-            status=f"{ANOTHER_ZAKEN_ROOT}statussen/xxxxxxxx-xxxx-xxxx-xxxx-222222222222",
-            resultaat=f"{ANOTHER_ZAKEN_ROOT}resultaten/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxxx",
+            status=f"{ANOTHER_ZAKEN_ROOT}statussen/22fd7613-3c9d-4507-a0b1-32c503488988",
+            resultaat=f"{ANOTHER_ZAKEN_ROOT}resultaten/22fd7613-3c9d-4507-a0b1-32c503488988",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
         )
         self.zaak2_alt = generate_oas_component_cached(
@@ -354,14 +354,14 @@ class MockAPIDataAlt:
         self.status_initial_alt = generate_oas_component_cached(
             "zrc",
             "schemas/Status",
-            url=f"{ANOTHER_ZAKEN_ROOT}statussen/xxxxxxxx-xxxx-xxxx-xxxx-111111111111",
+            url=f"{ANOTHER_ZAKEN_ROOT}statussen/22fd7613-3c9d-4507-a0b1-32c503488988",
             zaak=self.zaak_alt["url"],
             statustype=self.status_type_initial_alt["url"],
         )
         self.status_final_alt = generate_oas_component_cached(
             "zrc",
             "schemas/Status",
-            url=f"{ANOTHER_ZAKEN_ROOT}statussen/xxxxxxxx-xxxx-xxxx-xxxx-222222222222",
+            url=f"{ANOTHER_ZAKEN_ROOT}statussen/22fd7613-3c9d-4507-a0b1-32c503488988",
             zaak=self.zaak_alt["url"],
             statustype=self.status_type_final_alt["url"],
         )

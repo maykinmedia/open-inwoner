@@ -18,12 +18,8 @@ from open_inwoner.openzaak.api_models import (
     ZaakType,
 )
 from open_inwoner.openzaak.cases import resolve_status
-from open_inwoner.openzaak.clients import (
-    CatalogiClient,
-    ZakenClient,
-    build_zaken_client,
-)
-from open_inwoner.openzaak.documents import fetch_single_information_object_url
+from open_inwoner.openzaak.clients import CatalogiClient, ZakenClient
+from open_inwoner.openzaak.documents import fetch_single_information_object_from_url
 from open_inwoner.openzaak.models import (
     OpenZaakConfig,
     UserCaseInfoObjectNotification,
@@ -128,7 +124,9 @@ def handle_zaken_notification(notification: Notification):
     if notification.resource == "status":
         _handle_status_notification(notification, case, inform_users, api_group)
     elif notification.resource == "zaakinformatieobject":
-        _handle_zaakinformatieobject_notification(notification, case, inform_users)
+        _handle_zaakinformatieobject_notification(
+            notification, case, inform_users, api_group
+        )
     else:
         raise NotImplementedError("programmer error in earlier resource filter")
 
@@ -192,23 +190,18 @@ def _wrap_join(iter, glue="") -> str:
 # Helper functions for ZaakInformatieObject notifications
 #
 def _handle_zaakinformatieobject_notification(
-    notification: Notification, case: Zaak, inform_users
+    notification: Notification,
+    case: Zaak,
+    inform_users: list[User],
+    api_group: ZGWApiGroupConfig,
 ):
-    oz_config = OpenZaakConfig.get_solo()
+    oz_config = api_group.open_zaak_config
     r = notification.resource  # short alias for logging
-
-    client = build_zaken_client()
-    if not client:
-        log_system_action(
-            f"ignored {r} notification: cannot build Zaken API client for case {case.url}",
-            log_level=logging.ERROR,
-        )
-        return
 
     # check if this is a zaakinformatieobject we want to inform on
     ziobj_url = notification.resource_url
 
-    ziobj = client.fetch_single_case_information_object(ziobj_url)
+    ziobj = api_group.zaken_client.fetch_single_case_information_object(ziobj_url)
 
     if not ziobj:
         log_system_action(
@@ -217,7 +210,9 @@ def _handle_zaakinformatieobject_notification(
         )
         return
 
-    info_object = fetch_single_information_object_url(ziobj.informatieobject)
+    info_object = fetch_single_information_object_from_url(
+        ziobj.informatieobject, api_group=api_group
+    )
     if not info_object:
         log_system_action(
             f"ignored {r} notification: cannot retrieve informatieobject "
@@ -262,11 +257,14 @@ def _handle_zaakinformatieobject_notification(
         log_level=logging.INFO,
     )
     for user in inform_users:
-        _handle_zaakinformatieobject_update(user, case, ziobj)
+        _handle_zaakinformatieobject_update(user, case, ziobj, api_group)
 
 
 def _handle_zaakinformatieobject_update(
-    user: User, case: Zaak, zaak_info_object: ZaakInformatieObject
+    user: User,
+    case: Zaak,
+    zaak_info_object: ZaakInformatieObject,
+    api_group: ZGWApiGroupConfig,
 ):
     template_name = "case_document_notification"
 
@@ -305,7 +303,7 @@ def _handle_zaakinformatieobject_update(
         )
         return
 
-    send_case_update_email(user, case, template_name)
+    send_case_update_email(user, case, template_name, api_group=api_group)
     note.mark_sent()
 
     log_system_action(
