@@ -76,6 +76,17 @@ CACHES = {
     "oidc": {"BACKEND": "django.core.cache.backends.dummy.DummyCache"},
 }
 
+_MOCK_AUTHENTICATION_BACKENDS = {
+    "digid_eherkenning.backends.DigiDBackend": "digid_eherkenning.mock.backends.DigiDBackend",
+    "eherkenning.backends.eHerkenningBackend": "eherkenning.mock.backends.eHerkenningBackend",
+}
+
+AUTHENTICATION_BACKENDS = [
+    _MOCK_AUTHENTICATION_BACKENDS.get(backend, backend)
+    for backend in AUTHENTICATION_BACKENDS
+]
+
+
 #
 # Library settings
 #
