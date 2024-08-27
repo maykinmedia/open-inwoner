@@ -51,15 +51,22 @@ class ContactMomentViewsTestCase(
         MockAPIReadData.setUpServices()
         self.api_group = ZGWApiGroupConfig.objects.get()
 
+        klanten_config = OpenKlantConfig.get_solo()
+        klanten_config.exclude_contactmoment_kanalen = ["intern_initiatief"]
+        klanten_config.save()
+
         # for testing replacement of e-suite "onderwerp" code with OIP configured subject
         self.contactformsubject = ContactFormSubject.objects.create(
             subject="oip_subject",
             subject_code="e_suite_subject_code",
-            config=OpenKlantConfig.get_solo(),
+            config=klanten_config,
         )
 
     def test_list_for_bsn(self, m, mock_get_kcm_answer_mapping):
         data = MockAPIReadData().install_mocks(m)
+
+        # make sure internal contactmoment is present in data (should be excluded from kcms in view)
+        assert data.contactmoment_intern
 
         detail_url = reverse(
             "cases:contactmoment_detail",
@@ -104,6 +111,9 @@ class ContactMomentViewsTestCase(
     @freeze_time("2022-01-01")
     def test_list_for_bsn_new_answer_available(self, m, mock_get_kcm_answer_mapping):
         data = MockAPIReadData().install_mocks(m)
+
+        # make sure internal contactmoment is present in data (should be excluded from kcms in view)
+        assert data.contactmoment_intern
 
         mock_get_kcm_answer_mapping.return_value = {
             data.klant_contactmoment["url"]: KlantContactMomentAnswerFactory.create(

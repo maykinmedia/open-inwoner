@@ -5,6 +5,7 @@ from django.utils.translation import gettext as _
 from ..validators import (
     DutchPhoneNumberValidator,
     format_phone_number,
+    validate_array_contents_non_empty,
     validate_phone_number,
     validate_postal_code,
 )
@@ -133,3 +134,14 @@ class ValidatorsTestCase(TestCase):
                 DutchPhoneNumberValidator(),
                 invalid_num,
             )
+
+    def test_validate_array_contents_ok(self):
+        for val in [["test"], ["t", "e", "s", "t"], []]:
+            with self.subTest(val=val):
+                validate_array_contents_non_empty(val)
+
+    def test_validate_array_contents_error(self):
+        for val in [["test", ""], ["test", "  "]]:
+            with self.subTest(val=val):
+                with self.assertRaises(ValidationError):
+                    validate_array_contents_non_empty(val)
