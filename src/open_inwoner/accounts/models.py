@@ -23,6 +23,7 @@ from digid_eherkenning_oidc_generics.models import (
     OpenIDConnectDigiDConfig,
     OpenIDConnectEHerkenningConfig,
 )
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.utils.hash import create_sha256_hash
 from open_inwoner.utils.validators import (
     CharFieldValidator,
@@ -376,23 +377,31 @@ class User(AbstractBaseUser, PermissionsMixin):
         return list(self.selected_categories.values_list("name", flat=True))
 
     def get_active_notifications(self) -> str:
+        """
+        Determine active notifications on the basis of:
+            - SiteConfiguration settings
+            - publication status of relevant CMS page
+            - user preference
+        """
         from open_inwoner.cms.utils.page_display import (
             case_page_is_published,
             collaborate_page_is_published,
             inbox_page_is_published,
         )
 
+        config = SiteConfiguration.get_solo()
+
         enabled = []
-        if (
-            self.cases_notifications
-            and self.login_type == LoginTypeChoices.digid
-            and case_page_is_published()
-        ):
-            enabled.append(_("cases"))
-        if self.messages_notifications and inbox_page_is_published():
-            enabled.append(_("messages"))
-        if self.plans_notifications and collaborate_page_is_published():
-            enabled.append(_("plans"))
+        if config.notifications_cases_enabled:
+            if self.login_type == LoginTypeChoices.digid and case_page_is_published():
+                enabled.append(_("cases"))
+        if config.notifications_messages_enabled:
+            if self.messages_notifications and inbox_page_is_published():
+                enabled.append(_("messages"))
+        if config.notifications_plans_enabled:
+            if self.plans_notifications and collaborate_page_is_published():
+                enabled.append(_("plans"))
+
         if not enabled:
             return _("You do not have any notifications enabled.")
 
