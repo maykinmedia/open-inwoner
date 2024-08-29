@@ -24,7 +24,7 @@ class CaseUploadForm(forms.Form):
         self.oz_config = OpenZaakConfig.get_solo()
         super().__init__(**kwargs)
 
-        help_text = f"Grootte max. { self.oz_config.max_upload_size } MB, toegestane document formaten: { ', '.join(self.oz_config.allowed_file_extensions) }."
+        help_text = f"Grootte max. {self.oz_config.max_upload_size} MB, toegestane document formaten: {', '.join(self.oz_config.allowed_file_extensions)}."
 
         try:
             ztc = ZaakTypeConfig.objects.filter_case_type(case.zaaktype).get()
@@ -50,7 +50,7 @@ class CaseUploadForm(forms.Form):
     def clean_files(self):
         files = self.files.getlist("file")
 
-        max_allowed_size = 1024**2 * self.oz_config.max_upload_size
+        max_allowed_size = 1024 ** 2 * self.oz_config.max_upload_size
         allowed_extensions = sorted(self.oz_config.allowed_file_extensions)
 
         cleaned_files = []
@@ -99,6 +99,43 @@ class CaseFilterForm(forms.Form):
 
     status = forms.MultipleChoiceField(
         label=_("Filter by status"),
-        widget=forms.CheckboxSelectMultiple,
+        widget=forms.Select(attrs={'id': 'choicewa'}),
         choices=dict(),
     )
+
+# on base of simple checkbox
+# class CaseFilterForm(forms.Form):
+#     def __init__(
+#         self,
+#         *args,
+#         status_freqs: dict[str, int] = None,
+#         selected_statuses: list[str] = None,
+#         **kwargs,
+#     ):
+#         # Extract status_freqs and selected_statuses from kwargs before calling the parent's init
+#         super().__init__(*args, **kwargs)
+#
+#         if status_freqs is None:
+#             status_freqs = {}
+#
+#         # Prepare choices for the multiselect checkbox
+#         self.grouped_choices = [
+#             {
+#                 'status': status,
+#                 'frequency': frequency,
+#                 'checked': status in selected_statuses if selected_statuses else False,
+#             }
+#             for status, frequency in status_freqs.items()
+#         ]
+#
+#         # Define the MultipleChoiceField after processing status_freqs
+#         self.fields['status'].choices = [
+#             (status, f"{status} ({frequency})")
+#             for status, frequency in status_freqs.items()
+#         ]
+#         self.fields['status'].initial = selected_statuses or []
+#
+#     status = forms.MultipleChoiceField(
+#         label=_("Filter by status"),
+#         widget=forms.CheckboxSelectMultiple,
+#     )

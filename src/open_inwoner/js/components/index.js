@@ -9,6 +9,8 @@ import './autocomplete-search'
 import './autocomplete'
 import './autosumbit'
 import './cases'
+// import { MultiSelectCheckbox } from './multi-select-checkbox/m'
+import './multi-select-checkbox'
 import { DisableContactFormButton } from './form/DisableContactFormButton'
 import { DisableSubmitButton } from './cases/document_upload'
 import './confirmation'
@@ -60,6 +62,7 @@ const elementWrappers = [
   [FileInput.selector, (elt) => new FileInput(elt)],
   [ToggleHide.selector, (elt) => new ToggleHide(elt)],
   [TabPanel.selector, (elt) => new TabPanel(elt)],
+  // [MultiSelectCheckboxDropdown.selector, (elt) => new MultiSelectCheckboxDropdown(elt)],
   // add more when needed
 ]
 
