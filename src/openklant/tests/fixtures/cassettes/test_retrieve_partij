@@ -1,0 +1,134 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+    method: GET
+    uri: http://localhost:8000/klantinteracties/api/v1/partijen/d5546623-9be9-4a67-9188-593e5841e3d7?expand=betrokkenen&expand=digitaleAdressen
+  response:
+    body:
+      string: '{"uuid":"d5546623-9be9-4a67-9188-593e5841e3d7","url":"http://localhost:8000/klantinteracties/api/v1/partijen/d5546623-9be9-4a67-9188-593e5841e3d7","nummer":"0000000053","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[{"uuid":"97a9e128-8df4-435e-87ed-8dd75e402d95","url":"http://localhost:8000/klantinteracties/api/v1/partij-identificatoren/97a9e128-8df4-435e-87ed-8dd75e402d95"}],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"FOO","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"P","voornaam":"Phil","voorvoegselAchternaam":"","achternaam":"Bozeman"},"volledigeNaam":"Phil
+        Bozeman"}}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '1013'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+    method: GET
+    uri: http://localhost:8000/klantinteracties/api/v1/partijen/d5546623-9be9-4a67-9188-593e5841e3d7?expand=betrokkenen&expand=digitaleAdressen
+  response:
+    body:
+      string: '{"uuid":"d5546623-9be9-4a67-9188-593e5841e3d7","url":"http://localhost:8000/klantinteracties/api/v1/partijen/d5546623-9be9-4a67-9188-593e5841e3d7","nummer":"0000000053","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[{"uuid":"97a9e128-8df4-435e-87ed-8dd75e402d95","url":"http://localhost:8000/klantinteracties/api/v1/partij-identificatoren/97a9e128-8df4-435e-87ed-8dd75e402d95"}],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"FOO","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"P","voornaam":"Phil","voorvoegselAchternaam":"","achternaam":"Bozeman"},"volledigeNaam":"Phil
+        Bozeman"}}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '1013'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+    method: GET
+    uri: http://localhost:8000/klantinteracties/api/v1/partijen/d5546623-9be9-4a67-9188-593e5841e3d7?expand=betrokkenen&expand=digitaleAdressen
+  response:
+    body:
+      string: '{"uuid":"d5546623-9be9-4a67-9188-593e5841e3d7","url":"http://localhost:8000/klantinteracties/api/v1/partijen/d5546623-9be9-4a67-9188-593e5841e3d7","nummer":"0000000053","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[{"uuid":"97a9e128-8df4-435e-87ed-8dd75e402d95","url":"http://localhost:8000/klantinteracties/api/v1/partij-identificatoren/97a9e128-8df4-435e-87ed-8dd75e402d95"}],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"FOO","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"P","voornaam":"Phil","voorvoegselAchternaam":"","achternaam":"Bozeman"},"volledigeNaam":"Phil
+        Bozeman"}}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '1013'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+    method: GET
+    uri: http://localhost:8000/klantinteracties/api/v1/partijen/d5546623-9be9-4a67-9188-593e5841e3d7?expand=betrokkenen&expand=digitaleAdressen
+  response:
+    body:
+      string: '{"uuid":"d5546623-9be9-4a67-9188-593e5841e3d7","url":"http://localhost:8000/klantinteracties/api/v1/partijen/d5546623-9be9-4a67-9188-593e5841e3d7","nummer":"0000000053","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[{"uuid":"97a9e128-8df4-435e-87ed-8dd75e402d95","url":"http://localhost:8000/klantinteracties/api/v1/partij-identificatoren/97a9e128-8df4-435e-87ed-8dd75e402d95"}],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"FOO","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"P","voornaam":"Phil","voorvoegselAchternaam":"","achternaam":"Bozeman"},"volledigeNaam":"Phil
+        Bozeman"}}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '1013'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

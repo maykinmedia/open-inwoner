@@ -1,0 +1,166 @@
+interactions:
+- request:
+    body: '{"soortPartij": "persoon", "digitaleAdressen": null, "rekeningnummers":
+      null, "voorkeursRekeningnummer": null, "voorkeurstaal": "FOO", "indicatieActief":
+      true, "indicatieGeheimhouding": false, "voorkeursDigitaalAdres": null, "partijIdentificatie":
+      {"contactnaam": null}, "bezoekadres": {}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '289'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8000/klantinteracties/api/v1/partijen
+  response:
+    body:
+      string: '{"uuid":"017a9cd6-5773-4aa9-a57b-6f24195b87e0","url":"http://localhost:8000/klantinteracties/api/v1/partijen/017a9cd6-5773-4aa9-a57b-6f24195b87e0","nummer":"0000000100","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"FOO","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"","voornaam":"","voorvoegselAchternaam":"","achternaam":""},"volledigeNaam":""}}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '828'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8000/klantinteracties/api/v1/partijen/017a9cd6-5773-4aa9-a57b-6f24195b87e0
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"soortPartij": "persoon", "digitaleAdressen": null, "rekeningnummers":
+      null, "voorkeursRekeningnummer": null, "voorkeurstaal": "FOO", "indicatieActief":
+      true, "indicatieGeheimhouding": false, "voorkeursDigitaalAdres": null, "partijIdentificatie":
+      {"contactnaam": null}, "bezoekadres": {}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '289'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8000/klantinteracties/api/v1/partijen
+  response:
+    body:
+      string: '{"uuid":"46bd0d35-2ae1-4bdd-ba70-db891c7a8ece","url":"http://localhost:8000/klantinteracties/api/v1/partijen/46bd0d35-2ae1-4bdd-ba70-db891c7a8ece","nummer":"0000000103","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"FOO","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"","voornaam":"","voorvoegselAchternaam":"","achternaam":""},"volledigeNaam":""}}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '828'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8000/klantinteracties/api/v1/partijen/46bd0d35-2ae1-4bdd-ba70-db891c7a8ece
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"soortPartij": "persoon", "digitaleAdressen": null, "rekeningnummers":
+      null, "voorkeursRekeningnummer": null, "voorkeurstaal": "FOO", "indicatieActief":
+      true, "indicatieGeheimhouding": false, "voorkeursDigitaalAdres": null, "partijIdentificatie":
+      {"contactnaam": null}, "bezoekadres": {}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '289'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8000/klantinteracties/api/v1/partijen
+  response:
+    body:
+      string: '{"uuid":"b2f4c271-aafc-41aa-83b8-e0f51ad97124","url":"http://localhost:8000/klantinteracties/api/v1/partijen/b2f4c271-aafc-41aa-83b8-e0f51ad97124","nummer":"0000000106","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"FOO","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"","voornaam":"","voorvoegselAchternaam":"","achternaam":""},"volledigeNaam":""}}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '828'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8000/klantinteracties/api/v1/partijen/b2f4c271-aafc-41aa-83b8-e0f51ad97124
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"soortPartij": "persoon", "digitaleAdressen": null, "rekeningnummers":
+      null, "voorkeursRekeningnummer": null, "voorkeurstaal": "FOO", "indicatieActief":
+      true, "indicatieGeheimhouding": false, "voorkeursDigitaalAdres": null, "partijIdentificatie":
+      {"contactnaam": null}, "bezoekadres": {}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '289'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8000/klantinteracties/api/v1/partijen
+  response:
+    body:
+      string: '{"uuid":"bad1b082-8543-4a8a-b6fc-795d54b59606","url":"http://localhost:8000/klantinteracties/api/v1/partijen/bad1b082-8543-4a8a-b6fc-795d54b59606","nummer":"0000000109","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"FOO","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"","voornaam":"","voorvoegselAchternaam":"","achternaam":""},"volledigeNaam":""}}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '828'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8000/klantinteracties/api/v1/partijen/bad1b082-8543-4a8a-b6fc-795d54b59606
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+version: 1

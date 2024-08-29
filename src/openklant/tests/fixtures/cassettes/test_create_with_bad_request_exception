@@ -1,0 +1,174 @@
+interactions:
+- request:
+    body: '{}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '2'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8000/klantinteracties/api/v1/partijen
+  response:
+    body:
+      string: '{"type":"http://localhost:8000/ref/fouten/ValidationError/","code":"invalid","title":"Invalid
+        input.","status":400,"detail":"","instance":"urn:uuid:7ddae1f0-6bde-4b8b-8d96-e40605cae2d3","invalidParams":[{"name":"digitaleAdressen","code":"required","reason":"Dit
+        veld is vereist."},{"name":"voorkeursDigitaalAdres","code":"required","reason":"Dit
+        veld is vereist."},{"name":"rekeningnummers","code":"required","reason":"Dit
+        veld is vereist."},{"name":"voorkeursRekeningnummer","code":"required","reason":"Dit
+        veld is vereist."},{"name":"soortPartij","code":"required","reason":"Dit veld
+        is vereist."},{"name":"indicatieActief","code":"required","reason":"Dit veld
+        is vereist."}]}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '678'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 400
+      message: Bad Request
+- request:
+    body: '{}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '2'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8000/klantinteracties/api/v1/partijen
+  response:
+    body:
+      string: '{"type":"http://localhost:8000/ref/fouten/ValidationError/","code":"invalid","title":"Invalid
+        input.","status":400,"detail":"","instance":"urn:uuid:6ad62cd6-6222-4359-9e47-58aa768cd979","invalidParams":[{"name":"digitaleAdressen","code":"required","reason":"Dit
+        veld is vereist."},{"name":"voorkeursDigitaalAdres","code":"required","reason":"Dit
+        veld is vereist."},{"name":"rekeningnummers","code":"required","reason":"Dit
+        veld is vereist."},{"name":"voorkeursRekeningnummer","code":"required","reason":"Dit
+        veld is vereist."},{"name":"soortPartij","code":"required","reason":"Dit veld
+        is vereist."},{"name":"indicatieActief","code":"required","reason":"Dit veld
+        is vereist."}]}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '678'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 400
+      message: Bad Request
+- request:
+    body: '{}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '2'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8000/klantinteracties/api/v1/partijen
+  response:
+    body:
+      string: '{"type":"http://localhost:8000/ref/fouten/ValidationError/","code":"invalid","title":"Invalid
+        input.","status":400,"detail":"","instance":"urn:uuid:0bab2549-446f-49d4-83d1-7b5142e1ac59","invalidParams":[{"name":"digitaleAdressen","code":"required","reason":"Dit
+        veld is vereist."},{"name":"voorkeursDigitaalAdres","code":"required","reason":"Dit
+        veld is vereist."},{"name":"rekeningnummers","code":"required","reason":"Dit
+        veld is vereist."},{"name":"voorkeursRekeningnummer","code":"required","reason":"Dit
+        veld is vereist."},{"name":"soortPartij","code":"required","reason":"Dit veld
+        is vereist."},{"name":"indicatieActief","code":"required","reason":"Dit veld
+        is vereist."}]}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '678'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 400
+      message: Bad Request
+- request:
+    body: '{}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '2'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8000/klantinteracties/api/v1/partijen
+  response:
+    body:
+      string: '{"type":"http://localhost:8000/ref/fouten/ValidationError/","code":"invalid","title":"Invalid
+        input.","status":400,"detail":"","instance":"urn:uuid:0bf751f2-27de-4bea-b9ad-b5200a5df809","invalidParams":[{"name":"digitaleAdressen","code":"required","reason":"Dit
+        veld is vereist."},{"name":"voorkeursDigitaalAdres","code":"required","reason":"Dit
+        veld is vereist."},{"name":"rekeningnummers","code":"required","reason":"Dit
+        veld is vereist."},{"name":"voorkeursRekeningnummer","code":"required","reason":"Dit
+        veld is vereist."},{"name":"soortPartij","code":"required","reason":"Dit veld
+        is vereist."},{"name":"indicatieActief","code":"required","reason":"Dit veld
+        is vereist."}]}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '678'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 400
+      message: Bad Request
+version: 1
