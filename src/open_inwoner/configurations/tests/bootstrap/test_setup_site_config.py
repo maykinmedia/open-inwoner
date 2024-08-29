@@ -1,6 +1,8 @@
 from django.test import TestCase, override_settings
 
-from open_inwoner.configurations.choices import ColorTypeChoices
+from django_setup_configuration.exceptions import ConfigurationRunFailed
+
+from open_inwoner.configurations.choices import ColorTypeChoices, OpenIDDisplayChoices
 from open_inwoner.configurations.models import SiteConfiguration
 
 from ...bootstrap.siteconfig import SiteConfigurationStep
@@ -12,9 +14,9 @@ from ...bootstrap.siteconfig import SiteConfigurationStep
     SITE_PRIMARY_COLOR="#AAAAAA",
     SITE_SECONDARY_COLOR="#000000",
     SITE_ACCENT_COLOR="#000000",
-    SITE_PRIMARY_FONT_COLOR="#111111",
-    SITE_SECONDARY_FONT_COLOR="#222222",
-    SITE_ACCENT_FONT_COLOR="#333333",
+    SITE_PRIMARY_FONT_COLOR=ColorTypeChoices.dark,
+    SITE_SECONDARY_FONT_COLOR=ColorTypeChoices.light,
+    SITE_ACCENT_FONT_COLOR=ColorTypeChoices.light,
     SITE_WARNING_BANNER_ENABLED="True",
     SITE_WARNING_BANNER_TEXT="warning banner text",
     SITE_WARNING_BANNER_BACKGROUND_COLOR="#444444",
@@ -43,7 +45,7 @@ from ...bootstrap.siteconfig import SiteConfigurationStep
     SITE_PLANS_NO_PLANS_MESSAGE="plans no plans_message",
     SITE_PLANS_EDIT_MESSAGE="plans edit message",
     SITE_FOOTER_LOGO_TITLE="footer logo title",
-    SITE_FOOTER_LOGO_URL="footer logo url",
+    SITE_FOOTER_LOGO_URL="http://www.oip-footer-logo.nl",
     SITE_HOME_HELP_TEXT="home help text",
     SITE_THEME_HELP_TEXT="theme help text",
     SITE_PRODUCT_HELP_TEXT="product help text",
@@ -60,7 +62,7 @@ from ...bootstrap.siteconfig import SiteConfigurationStep
     SITE_NOTIFICATIONS_CASES_ENABLED=False,
     SITE_EMAIL_VERIFICATION_REQUIRED=False,
     SITE_RECIPIENTS_EMAIL_DIGEST=["test1@test.nl", "test2@test.nl"],
-    SITE_CONTACT_PHONENUMBER="12345",
+    SITE_CONTACT_PHONENUMBER="0612345678",
     SITE_CONTACT_PAGE="https://test.test",
     SITE_GTM_CODE="gtm code",
     SITE_GA_CODE="ga code",
@@ -71,10 +73,10 @@ from ...bootstrap.siteconfig import SiteConfigurationStep
     SITE_COOKIE_LINK_TEXT="cookie link text",
     SITE_COOKIE_LINK_URL="cookie link url",
     SITE_KCM_SURVEY_LINK_TEXT="kcm survey link text",
-    SITE_KCM_SURVEY_LINK_URL="kcm survey link url",
+    SITE_KCM_SURVEY_LINK_URL="http://www.oip-kcm-survey-link.nl",
     SITE_OPENID_CONNECT_LOGIN_TEXT="openid connect login_text",
-    SITE_OPENID_DISPLAY="openid display",
-    SITE_REDIRECT_TO="redirect to",
+    SITE_OPENID_DISPLAY=OpenIDDisplayChoices.admin,
+    SITE_REDIRECT_TO="http://oip-test-home.nl",
     SITE_ALLOW_MESSAGES_FILE_SHARING=False,
     SITE_HIDE_CATEGORIES_FROM_ANONYMOUS_USERS=True,
     SITE_HIDE_SEARCH_FROM_ANONYMOUS_USERS=True,
@@ -94,9 +96,9 @@ class SiteConfigurationSetupTest(TestCase):
         self.assertEqual(config.name, "My site")
         self.assertEqual(config.secondary_color, "#000000"),
         self.assertEqual(config.accent_color, "#000000"),
-        self.assertEqual(config.primary_font_color, "#111111"),
-        self.assertEqual(config.secondary_font_color, "#222222"),
-        self.assertEqual(config.accent_font_color, "#333333"),
+        self.assertEqual(config.primary_font_color, ColorTypeChoices.dark),
+        self.assertEqual(config.secondary_font_color, ColorTypeChoices.light),
+        self.assertEqual(config.accent_font_color, ColorTypeChoices.light),
         self.assertTrue(config.warning_banner_enabled),
         self.assertEqual(config.warning_banner_text, "warning banner text"),
         self.assertEqual(config.warning_banner_background_color, "#444444"),
@@ -129,7 +131,7 @@ class SiteConfigurationSetupTest(TestCase):
         self.assertEqual(config.plans_no_plans_message, "plans no plans_message"),
         self.assertEqual(config.plans_edit_message, "plans edit message"),
         self.assertEqual(config.footer_logo_title, "footer logo title"),
-        self.assertEqual(config.footer_logo_url, "footer logo url"),
+        self.assertEqual(config.footer_logo_url, "http://www.oip-footer-logo.nl"),
         self.assertEqual(config.home_help_text, "home help text"),
         self.assertEqual(config.theme_help_text, "theme help text"),
         self.assertEqual(config.product_help_text, "product help text"),
@@ -147,7 +149,7 @@ class SiteConfigurationSetupTest(TestCase):
         self.assertEqual(
             config.recipients_email_digest, ["test1@test.nl", "test2@test.nl"]
         ),
-        self.assertEqual(config.contact_phonenumber, "12345"),
+        self.assertEqual(config.contact_phonenumber, "0612345678"),
         self.assertEqual(config.contact_page, "https://test.test"),
         self.assertEqual(config.gtm_code, "gtm code"),
         self.assertEqual(config.ga_code, "ga code"),
@@ -158,10 +160,12 @@ class SiteConfigurationSetupTest(TestCase):
         self.assertEqual(config.cookie_link_text, "cookie link text"),
         self.assertEqual(config.cookie_link_url, "cookie link url"),
         self.assertEqual(config.kcm_survey_link_text, "kcm survey link text"),
-        self.assertEqual(config.kcm_survey_link_url, "kcm survey link url"),
+        self.assertEqual(
+            config.kcm_survey_link_url, "http://www.oip-kcm-survey-link.nl"
+        ),
         self.assertEqual(config.openid_connect_login_text, "openid connect login_text"),
-        self.assertEqual(config.openid_display, "openid display"),
-        self.assertEqual(config.redirect_to, "redirect to"),
+        self.assertEqual(config.openid_display, OpenIDDisplayChoices.admin),
+        self.assertEqual(config.redirect_to, "http://oip-test-home.nl"),
         self.assertFalse(config.allow_messages_file_sharing),
         self.assertTrue(config.hide_categories_from_anonymous_users),
         self.assertTrue(config.hide_search_from_anonymous_users),
@@ -189,20 +193,18 @@ class SiteConfigurationSetupTest(TestCase):
         self.assertEqual(config.accent_font_color, ColorTypeChoices.dark)
         self.assertFalse(config.warning_banner_enabled)
 
-    @override_settings(
-        SITE_NAME=None,
-        SITE_SECONDARY_COLOR="#000000",
-        SITE_ACCENT_COLOR="#111111",
-    )
-    def test_site_not_configured(self):
-        configuration_step = SiteConfigurationStep()
+    @override_settings(SITE_NAME=None)
+    def test_site_configure_missing_required_setting(self):
+        with self.assertRaises(ConfigurationRunFailed):
+            SiteConfigurationStep().configure()
 
-        configuration_step.configure()
-
-        self.assertFalse(configuration_step.is_configured())
+    @override_settings(SITE_NAME="My site", SITE_SECONDARY_COLOR="#GGGGGG")
+    def test_site_configure_invalid_input(self):
+        with self.assertRaises(ConfigurationRunFailed):
+            SiteConfigurationStep().configure()
 
     @override_settings(SITE_CONFIG_ENABLE=False)
-    def test_disable_siteconfig(self):
+    def test_site_configure_disabled(self):
         configuration_step = SiteConfigurationStep()
 
         configuration_step.configure()
