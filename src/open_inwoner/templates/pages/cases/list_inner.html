@@ -5,16 +5,27 @@
 
 <div class="card__grid">
 
-<div>
+<div class="card-filter">
     <form method="GET" id="filter-form">
-        <table>
+        <section>
             {{ form }}
-        </table>
+        </section>
+        <p>///</p>
+        <div class="card-filter__dropdown dropdown">
+          <button id="dropdownButton" class="btn">Filter op status:</button>
+          <div id="dropdownMenu" class="dropdown-content">
+            <label tabindex="0"><input type="checkbox" value="Geregistreerd"> Geregistreerd</label>
+            <label tabindex="0"><input type="checkbox" value="In behandeling genomen"> In behandeling genomen</label>
+            <label tabindex="0"><input type="checkbox" value="Afgehandeld"> Afgehandeld</label>
+          </div>
+        </div>
+        <p>///</p>
         <button class="button button--primary" type="submit" value="" title="{% trans 'Filter cases' %}" aria-label="{% trans 'Filter cases' %}" id="filter_cases">
             {% trans 'Filter cases' %}
         </button>
     </form>
 </div>
+{# end of cards-filter component #}
 
 {% render_grid %}
     {% if not cases %}

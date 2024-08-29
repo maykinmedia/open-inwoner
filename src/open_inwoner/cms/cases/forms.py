@@ -24,7 +24,7 @@ class CaseUploadForm(forms.Form):
         self.oz_config = OpenZaakConfig.get_solo()
         super().__init__(**kwargs)
 
-        help_text = f"Grootte max. { self.oz_config.max_upload_size } MB, toegestane document formaten: { ', '.join(self.oz_config.allowed_file_extensions) }."
+        help_text = f"Grootte max. {self.oz_config.max_upload_size} MB, toegestane document formaten: {', '.join(self.oz_config.allowed_file_extensions)}."
 
         try:
             ztc = ZaakTypeConfig.objects.filter_case_type(case.zaaktype).get()
@@ -50,7 +50,7 @@ class CaseUploadForm(forms.Form):
     def clean_files(self):
         files = self.files.getlist("file")
 
-        max_allowed_size = 1024**2 * self.oz_config.max_upload_size
+        max_allowed_size = 1024 ** 2 * self.oz_config.max_upload_size
         allowed_extensions = sorted(self.oz_config.allowed_file_extensions)
 
         cleaned_files = []
@@ -99,6 +99,6 @@ class CaseFilterForm(forms.Form):
 
     status = forms.MultipleChoiceField(
         label=_("Filter by status"),
-        widget=forms.CheckboxSelectMultiple,
+        widget=forms.Select(attrs={'id': 'choicewa'}),
         choices=dict(),
     )
