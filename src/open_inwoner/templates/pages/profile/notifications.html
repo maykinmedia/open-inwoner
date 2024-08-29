@@ -55,11 +55,11 @@
             {% if form.case_notification_channel %}
                 <p class="utrecht-paragraph choice-list__p">{% trans "Hoe wilt u deze notificaties ontvangen?" %}</p>
                 {% with form.case_notification_channel as field %}
-                    {% choice_list_list single=True cols=True %}
+                    {% choice_list single=True cols=True %}
                         {% for choice in field.field.choices %}
                             {% choice_list_item input_type_radio=True choice=choice name=field.name data=field.value index=forloop.counter initial=field.form.initial icon_symbol=choice.1|get_icon_symbol %}
                         {% endfor %}
-                    {% endchoice_list_list %}
+                    {% endchoice_list %}
                 {% endwith %}
             {% endif %}
 

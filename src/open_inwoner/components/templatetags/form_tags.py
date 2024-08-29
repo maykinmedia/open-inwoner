@@ -265,27 +265,27 @@ def choice_radio(choice, **kwargs):
 
 
 @register.tag()
-def choice_list_list(parser, token):
+def choice_list(parser, token):
     """
-    renders a list containing list items (with inputs from a choice field.)
+    Renders a list containing list items (with inputs from a choice field.)
 
     Usage:
-        {% choice_list_list single=True cols=False %}
+        {% choice_list single=True cols=False %}
             {% for choice in field.field.choices %}
                 {% choice_list_item input_type=True choice=choice name=field.name data=field.value index=forloop.counter initial=field.form.initial icon_symbol=False %}
             {% endfor %}
-        {% endchoice_list_list %}
+        {% endchoice_list %}
 
     Available options::
     + single: bool | Whether the choice to be rendered can select only one option
     - cols: bool | Whether a horizontal grid needs to be rendered with two columns
 
     Extra context:
-        - contents: string (HTML) | this is the context between the choice_list_list and endchoice_list_list tags
+        - contents: string (HTML) | this is the context between the choice_list and endchoice_list tags
     """
-    return create_content_wrapper(
-        "choice_list_list", "components/Form/ChoiceList.html"
-    )(parser, token)
+    return create_content_wrapper("choice_list", "components/Form/ChoiceList.html")(
+        parser, token
+    )
 
 
 @register.inclusion_tag("components/Form/ChoiceListItem.html")

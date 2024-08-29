@@ -8,6 +8,15 @@ export class ChoiceListSingle {
     this.node = node
     this.labels = Array.from(node.querySelectorAll('.choice-list__label'))
 
+    // Initialize the selected state based on the checked attribute
+    this.labels.forEach((label) => {
+      const input = label.querySelector('input[type="radio"]')
+      if (input.checked) {
+        label.parentNode.classList.add('selected')
+      }
+    })
+
+    // Add event listeners for click events
     this.labels.forEach((label) => {
       label.addEventListener('click', () => {
         const selectedListItem = node.querySelector('.selected')

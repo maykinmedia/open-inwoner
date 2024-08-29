@@ -2,10 +2,10 @@
 
 {# Item component for changing the parent styles, when child is clicked #}
 
-<li class="choice-list__item {% if input_type_radio %}{% else %}radiochoice-list-multiple__item{% endif %}">
+<li class="choice-list__item {% if input_type_radio %}radiochoice-list-single__item{% else %}radiochoice-list-multiple__item{% endif %}">
     {% if input_type_radio %}
         <label class="choice-list__label {% if bold_label %}choice-list__label--large{% endif %}" for="id_{{ name }}_{{ index }}">
-            <input type="{% if input_type_radio %}radio{% else %}checkbox{% endif %}" class="choice-list__radio" id="id_{{ name }}_{{ index }}" name="{{ name }}" value="{{ choice.0|unlocalize }}" {% if choice.0 in data or checked %}checked="checked"{% endif %}>
+            <input type="radio" class="choice-list__radio" id="id_{{ name }}_{{ index }}" name="{{ name }}" value="{{ choice.0|unlocalize }}" {% if choice.0 in data or checked %}checked="checked"{% endif %}>
             <div class="choice-list__content">
                 {% if bold_label %}<h2 class="choice-list__heading">Kies {{ choice.1 }}</h2>{% endif %}
                 <p class="choice-list__p">{{ choice.1 }}</p>
