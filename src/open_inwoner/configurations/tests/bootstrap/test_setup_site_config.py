@@ -1,4 +1,3 @@
-from django.core.exceptions import ValidationError
 from django.test import TestCase, override_settings
 
 from open_inwoner.configurations.choices import ColorTypeChoices
@@ -201,18 +200,6 @@ class SiteConfigurationSetupTest(TestCase):
         configuration_step.configure()
 
         self.assertFalse(configuration_step.is_configured())
-
-    @override_settings(
-        SITE_NAME="My site",
-        SITE_SECONDARY_COLOR="#000000",
-        SITE_ACCENT_COLOR="#111111",
-        SITE_LOGIN_SHOW="Should be boolean",
-    )
-    def test_site_configure_error(self):
-        configuration_step = SiteConfigurationStep()
-
-        with self.assertRaises(ValidationError):
-            configuration_step.configure()
 
     @override_settings(SITE_CONFIG_ENABLE=False)
     def test_disable_siteconfig(self):

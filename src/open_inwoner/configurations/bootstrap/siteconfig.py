@@ -2,10 +2,12 @@ from django.conf import settings
 
 from django_setup_configuration.config_settings import ConfigSettings
 from django_setup_configuration.configuration import BaseConfigurationStep
+from django_setup_configuration.exceptions import ConfigurationRunFailed
 
+from open_inwoner.configurations.admin import SiteConfigurationAdminForm
 from open_inwoner.configurations.models import SiteConfiguration
 
-from .utils import convert_setting_to_model_field_name
+from .utils import convert_setting_to_model_field_name, print_form_errors
 
 
 class SiteConfigurationStep(BaseConfigurationStep):
@@ -13,7 +15,7 @@ class SiteConfigurationStep(BaseConfigurationStep):
     Set up general configuration ("Algemene configuratie")
     """
 
-    verbose_name = "Site configuration settings"
+    verbose_name = "Site configuration step"
     config_settings = ConfigSettings(
         enable_setting="SITE_CONFIG_ENABLE",
         namespace="SITE",
@@ -119,6 +121,12 @@ class SiteConfigurationStep(BaseConfigurationStep):
 
         config = SiteConfiguration.get_solo()
 
+        # use model defaults for form data
+        form_data = {
+            field.name: getattr(config, field.name)
+            for field in SiteConfiguration._meta.fields
+        }
+
         all_settings = (
             self.config_settings.required_settings
             + self.config_settings.optional_settings
@@ -130,8 +138,17 @@ class SiteConfigurationStep(BaseConfigurationStep):
                 field_name = convert_setting_to_model_field_name(
                     setting, self.config_settings.namespace
                 )
-                setattr(config, field_name, value)
-        config.save()
+                form_data[field_name] = value
+
+        # validate settings with admin form
+        form = SiteConfigurationAdminForm(data=form_data)
+        if not form.is_valid():
+            print_form_errors(self, form)
+            raise ConfigurationRunFailed(
+                f"Something went wrong while saving configuration: {form.errors}"
+            )
+
+        form.save()
 
     def test_configuration(self):
         ...
