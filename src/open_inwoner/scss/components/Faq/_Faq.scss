@@ -35,7 +35,7 @@
     z-index: 1;
   }
 
-  .link [class*='icon'] {
+  .link [class*='icons'] {
     transition: all 0.3s;
     transform-origin: center;
   }
@@ -48,7 +48,7 @@
     color: var(--color-secondary);
   }
 
-  .link[aria-expanded='true'] [class*='icon'] {
+  .link[aria-expanded='true'] [class*='icons'] {
     transform: rotate(180deg);
   }
 

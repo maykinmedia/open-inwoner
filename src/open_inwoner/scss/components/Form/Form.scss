@@ -75,7 +75,7 @@
     gap: var(--spacing-medium);
 
     .notifications {
-      &__errors .notification *[class*='icon'] {
+      &__errors .notification *[class*='icons'] {
         position: static;
         transform: translateY(-5px);
       }
@@ -86,7 +86,7 @@
     .label
     .notifications__errors
     .notification--warning
-    *[class*='icon'] {
+    *[class*='icons'] {
     position: static;
     transform: translateY(-5px);
   }
@@ -248,8 +248,8 @@
       transform: translateY(-50%);
     }
 
-    .notification > *[class*='icon'],
-    .notification > *[class*='Icon'] {
+    .notification > *[class*='icons'],
+    .notification > *[class*='Icons'] {
       width: auto !important;
       position: absolute;
       right: var(--spacing-small);

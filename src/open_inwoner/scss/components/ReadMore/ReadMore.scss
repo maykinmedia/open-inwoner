@@ -27,7 +27,7 @@
 
   &--open {
     .readmore__toggle {
-      [class*='icon'] {
+      [class*='icons'] {
         transform: rotate(180deg);
         transition: all 0.3s;
       }

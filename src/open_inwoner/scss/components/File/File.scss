@@ -22,8 +22,8 @@
     box-sizing: content-box;
     align-self: stretch;
 
-    *[class*='icon'],
-    *[class*='Icon'] {
+    *[class*='icons'],
+    *[class*='Icons'] {
       padding: var(--spacing-large);
     }
   }

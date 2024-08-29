@@ -12,11 +12,11 @@
   }
 
   &--drag-active .card__body,
-  .card:first-child [class*='icon'] {
+  .card:first-child [class*='icons'] {
     pointer-events: none;
   }
 
-  .icon--large[class*='icon'] {
+  .icon--large[class*='icons'] {
     font-size: 40px;
   }
 
@@ -30,7 +30,7 @@
       color: var(--color-primary);
       font-weight: bold;
 
-      [class*='icon'] {
+      [class*='icons'] {
         color: var(--color-primary);
         font-size: var(--font-size-body);
         position: static !important;
@@ -54,13 +54,13 @@
 
   .notifications {
     .notification--warning {
-      [class*='icon'] {
+      [class*='icons'] {
         color: var(--notification-color-text);
       }
     }
   }
 
-  .link--primary [class*='icon'] {
+  .link--primary [class*='icons'] {
     color: var(--color-primary);
   }
 
@@ -113,11 +113,11 @@
         color: var(--color-gray-dark-900);
       }
 
-      [class*='icon'] {
+      [class*='icons'] {
         color: var(--color-gray-light);
       }
 
-      .link [class*='icon'] {
+      .link [class*='icons'] {
         color: var(--color-red-notification);
       }
     }
@@ -129,7 +129,7 @@
       gap: var(--spacing-small);
       justify-content: flex-start;
 
-      [class*='icon'] {
+      [class*='icons'] {
         color: var(--color-red-notification);
       }
     }
@@ -139,7 +139,7 @@
       margin-bottom: var(--spacing-small);
 
       &.error {
-        [class*='icon'] {
+        [class*='icons'] {
           color: var(--color-red-notification);
           font-size: var(--font-size-body);
           height: 20px;

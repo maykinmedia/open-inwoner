@@ -29,8 +29,8 @@
     box-shadow: none;
   }
 
-  *[class*='icon'],
-  *[class*='Icon'] {
+  *[class*='icons'],
+  *[class*='Icons'] {
     font-size: 20px;
     max-width: 20px;
   }
@@ -40,8 +40,8 @@
   }
 
   &--textless {
-    *[class*='icon'],
-    *[class*='Icon'] {
+    *[class*='icons'],
+    *[class*='Icons'] {
       margin: 0;
     }
   }

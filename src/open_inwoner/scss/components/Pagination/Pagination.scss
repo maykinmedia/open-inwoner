@@ -45,7 +45,7 @@
       }
     }
 
-    [class*='icon']:first-child {
+    [class*='icons']:first-child {
       margin-right: var(--gutter-width);
     }
   }
@@ -71,7 +71,7 @@
   }
 
   &__previous {
-    [class*='icon'] {
+    [class*='icons'] {
       color: var(--color-primary);
       margin-right: var(--gutter-width);
 
@@ -80,7 +80,7 @@
       }
     }
 
-    &.pagination__item [class*='icon'] {
+    &.pagination__item [class*='icons'] {
       margin-right: var(--gutter-width);
       margin-left: 0;
       color: var(--color-body);
@@ -88,7 +88,7 @@
   }
 
   &__next {
-    [class*='icon'] {
+    [class*='icons'] {
       color: var(--color-primary);
       margin-left: var(--gutter-width);
 
@@ -97,7 +97,7 @@
       }
     }
 
-    &.pagination__item [class*='icon'] {
+    &.pagination__item [class*='icons'] {
       margin-right: 0;
       margin-left: var(--gutter-width);
       color: var(--color-body);
