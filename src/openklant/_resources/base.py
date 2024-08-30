@@ -1,15 +1,5 @@
 import json
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    List,
-    Mapping,
-    MutableMapping,
-    TypeGuard,
-    TypeVar,
-    Union,
-)
+from typing import Any, Dict, List, Mapping, MutableMapping, TypeGuard, TypeVar, Union
 
 import pydantic
 import requests
@@ -125,7 +115,7 @@ class ResourceMixin:
     ) -> requests.Response:
         with self.http_client as client:
             return client.request(
-                "delete",
+                "patch",
                 path,
                 headers=headers,
                 params=params,

@@ -262,4 +262,160 @@ interactions:
     status:
       code: 200
       message: OK
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+    method: GET
+    uri: http://localhost:8000/klantinteracties/api/v1/partijen?page=1
+  response:
+    body:
+      string: '{"count":3,"next":null,"previous":null,"results":[{"uuid":"980fa426-a44a-42c7-bcb3-c8c144ae0aa0","url":"http://localhost:8000/klantinteracties/api/v1/partijen/980fa426-a44a-42c7-bcb3-c8c144ae0aa0","nummer":"0000000003","interneNotitie":"","betrokkenen":[{"uuid":"b89c7aa6-1f94-44f9-afab-da90a73a69d4","url":"http://localhost:8000/klantinteracties/api/v1/betrokkenen/b89c7aa6-1f94-44f9-afab-da90a73a69d4"}],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"contactpersoon","indicatieGeheimhouding":true,"voorkeurstaal":"nld","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"uuid":"c184f398-d663-474b-b042-9956d9deb560","werkteVoorPartij":{"uuid":"dce80380-80ed-465e-be6a-50ec5ea971c8","url":"http://localhost:8000/klantinteracties/api/v1/partijen/dce80380-80ed-465e-be6a-50ec5ea971c8"},"contactnaam":{"voorletters":"B.","voornaam":"Bart","voorvoegselAchternaam":"","achternaam":""},"volledigeNaam":"Bart"},"_expand":{}},{"uuid":"dce80380-80ed-465e-be6a-50ec5ea971c8","url":"http://localhost:8000/klantinteracties/api/v1/partijen/dce80380-80ed-465e-be6a-50ec5ea971c8","nummer":"0000000002","interneNotitie":"","betrokkenen":[{"uuid":"cb0856cd-b2bb-4abb-9c12-b5d5b3d2aff6","url":"http://localhost:8000/klantinteracties/api/v1/betrokkenen/cb0856cd-b2bb-4abb-9c12-b5d5b3d2aff6"}],"categorieRelaties":[{"uuid":"2124ed9e-2296-4fb2-8421-b79e5c23ff97","url":"http://localhost:8000/klantinteracties/api/v1/categorie-relaties/2124ed9e-2296-4fb2-8421-b79e5c23ff97","categorieNaam":"MKB","beginDatum":"2024-03-06","eindDatum":null}],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[{"uuid":"980fa426-a44a-42c7-bcb3-c8c144ae0aa0","url":"http://localhost:8000/klantinteracties/api/v1/partijen/980fa426-a44a-42c7-bcb3-c8c144ae0aa0"}],"rekeningnummers":[{"uuid":"8b5f3eb4-4023-46f6-a05f-8ab5e3bf0be2","url":"http://localhost:8000/klantinteracties/api/v1/rekeningnummers/8b5f3eb4-4023-46f6-a05f-8ab5e3bf0be2"}],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"organisatie","indicatieGeheimhouding":true,"voorkeurstaal":"nld","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"ae758bf9-6a34-4adc-8482-147738c9509d","adresregel1":"Keizersgracht
+        117","adresregel2":"1015 CJ Amsterdam","adresregel3":"","land":"6030"},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"naam":"Maykin
+        Media"},"_expand":{}},{"uuid":"9f8e8009-2d1c-40ae-931e-c08861ba7207","url":"http://localhost:8000/klantinteracties/api/v1/partijen/9f8e8009-2d1c-40ae-931e-c08861ba7207","nummer":"0000000001","interneNotitie":"","betrokkenen":[{"uuid":"d5de314b-58a4-4d02-9d66-4e68e8927a90","url":"http://localhost:8000/klantinteracties/api/v1/betrokkenen/d5de314b-58a4-4d02-9d66-4e68e8927a90"}],"categorieRelaties":[],"digitaleAdressen":[{"uuid":"1300d2ab-13cb-4c12-9818-3b76e2a5d993","url":"http://localhost:8000/klantinteracties/api/v1/digitaleadressen/1300d2ab-13cb-4c12-9818-3b76e2a5d993"}],"voorkeursDigitaalAdres":{"uuid":"1300d2ab-13cb-4c12-9818-3b76e2a5d993","url":"http://localhost:8000/klantinteracties/api/v1/digitaleadressen/1300d2ab-13cb-4c12-9818-3b76e2a5d993"},"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[{"uuid":"dd328a2e-7b8e-4809-be28-f9f894c11c34","url":"http://localhost:8000/klantinteracties/api/v1/partij-identificatoren/dd328a2e-7b8e-4809-be28-f9f894c11c34"}],"soortPartij":"persoon","indicatieGeheimhouding":true,"voorkeurstaal":"nld","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"L.","voornaam":"Lucas","voorvoegselAchternaam":"","achternaam":"Boom"},"volledigeNaam":"Lucas
+        Boom"},"_expand":{}}]}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '4256'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+    method: GET
+    uri: http://localhost:8000/klantinteracties/api/v1/partijen?page=1
+  response:
+    body:
+      string: '{"type":"http://localhost:8000/ref/fouten/AuthenticationFailed/","code":"authentication_failed","title":"Ongeldige
+        authenticatiegegevens.","status":401,"detail":"Ongeldige token.","instance":"urn:uuid:dddd3c9a-a4fc-4214-8004-cc1ecfd1b50d"}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '239'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      WWW-Authenticate:
+      - Token
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 401
+      message: Unauthorized
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+    method: GET
+    uri: http://localhost:8000/klantinteracties/api/v1/partijen?page=1
+  response:
+    body:
+      string: '{"count":4,"next":null,"previous":null,"results":[{"uuid":"738acccb-2b7f-45c4-ab53-6608afce5733","url":"http://localhost:8000/klantinteracties/api/v1/partijen/738acccb-2b7f-45c4-ab53-6608afce5733","nummer":"0000000004","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"FOO","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"","voornaam":"","voorvoegselAchternaam":"","achternaam":""},"volledigeNaam":""},"_expand":{}},{"uuid":"980fa426-a44a-42c7-bcb3-c8c144ae0aa0","url":"http://localhost:8000/klantinteracties/api/v1/partijen/980fa426-a44a-42c7-bcb3-c8c144ae0aa0","nummer":"0000000003","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"contactpersoon","indicatieGeheimhouding":true,"voorkeurstaal":"nld","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"uuid":"c184f398-d663-474b-b042-9956d9deb560","werkteVoorPartij":{"uuid":"dce80380-80ed-465e-be6a-50ec5ea971c8","url":"http://localhost:8000/klantinteracties/api/v1/partijen/dce80380-80ed-465e-be6a-50ec5ea971c8"},"contactnaam":{"voorletters":"B.","voornaam":"Bart","voorvoegselAchternaam":"","achternaam":""},"volledigeNaam":"Bart"},"_expand":{}},{"uuid":"dce80380-80ed-465e-be6a-50ec5ea971c8","url":"http://localhost:8000/klantinteracties/api/v1/partijen/dce80380-80ed-465e-be6a-50ec5ea971c8","nummer":"0000000002","interneNotitie":"","betrokkenen":[{"uuid":"cb0856cd-b2bb-4abb-9c12-b5d5b3d2aff6","url":"http://localhost:8000/klantinteracties/api/v1/betrokkenen/cb0856cd-b2bb-4abb-9c12-b5d5b3d2aff6"}],"categorieRelaties":[{"uuid":"2124ed9e-2296-4fb2-8421-b79e5c23ff97","url":"http://localhost:8000/klantinteracties/api/v1/categorie-relaties/2124ed9e-2296-4fb2-8421-b79e5c23ff97","categorieNaam":"MKB","beginDatum":"2024-03-06","eindDatum":null}],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[{"uuid":"980fa426-a44a-42c7-bcb3-c8c144ae0aa0","url":"http://localhost:8000/klantinteracties/api/v1/partijen/980fa426-a44a-42c7-bcb3-c8c144ae0aa0"}],"rekeningnummers":[{"uuid":"8b5f3eb4-4023-46f6-a05f-8ab5e3bf0be2","url":"http://localhost:8000/klantinteracties/api/v1/rekeningnummers/8b5f3eb4-4023-46f6-a05f-8ab5e3bf0be2"}],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"organisatie","indicatieGeheimhouding":true,"voorkeurstaal":"nld","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"ae758bf9-6a34-4adc-8482-147738c9509d","adresregel1":"Keizersgracht
+        117","adresregel2":"1015 CJ Amsterdam","adresregel3":"","land":"6030"},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"naam":"Maykin
+        Media"},"_expand":{}},{"uuid":"9f8e8009-2d1c-40ae-931e-c08861ba7207","url":"http://localhost:8000/klantinteracties/api/v1/partijen/9f8e8009-2d1c-40ae-931e-c08861ba7207","nummer":"0000000001","interneNotitie":"","betrokkenen":[{"uuid":"d5de314b-58a4-4d02-9d66-4e68e8927a90","url":"http://localhost:8000/klantinteracties/api/v1/betrokkenen/d5de314b-58a4-4d02-9d66-4e68e8927a90"}],"categorieRelaties":[],"digitaleAdressen":[{"uuid":"1300d2ab-13cb-4c12-9818-3b76e2a5d993","url":"http://localhost:8000/klantinteracties/api/v1/digitaleadressen/1300d2ab-13cb-4c12-9818-3b76e2a5d993"}],"voorkeursDigitaalAdres":{"uuid":"1300d2ab-13cb-4c12-9818-3b76e2a5d993","url":"http://localhost:8000/klantinteracties/api/v1/digitaleadressen/1300d2ab-13cb-4c12-9818-3b76e2a5d993"},"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[{"uuid":"dd328a2e-7b8e-4809-be28-f9f894c11c34","url":"http://localhost:8000/klantinteracties/api/v1/partij-identificatoren/dd328a2e-7b8e-4809-be28-f9f894c11c34"}],"soortPartij":"persoon","indicatieGeheimhouding":true,"voorkeurstaal":"nld","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"L.","voornaam":"Lucas","voorvoegselAchternaam":"","achternaam":"Boom"},"volledigeNaam":"Lucas
+        Boom"},"_expand":{}}]}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '4948'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+    method: GET
+    uri: http://localhost:8000/klantinteracties/api/v1/partijen?page=1
+  response:
+    body:
+      string: '{"count":6,"next":null,"previous":null,"results":[{"uuid":"701efe39-39ad-43da-877d-3bf4d0b79349","url":"http://localhost:8000/klantinteracties/api/v1/partijen/701efe39-39ad-43da-877d-3bf4d0b79349","nummer":"0000000006","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"organisatie","indicatieGeheimhouding":false,"voorkeurstaal":"FOO","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":null,"_expand":{}},{"uuid":"ced290b8-599d-410e-927a-709d45b99eec","url":"http://localhost:8000/klantinteracties/api/v1/partijen/ced290b8-599d-410e-927a-709d45b99eec","nummer":"0000000005","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"FOO","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"","voornaam":"","voorvoegselAchternaam":"","achternaam":""},"volledigeNaam":""},"_expand":{}},{"uuid":"738acccb-2b7f-45c4-ab53-6608afce5733","url":"http://localhost:8000/klantinteracties/api/v1/partijen/738acccb-2b7f-45c4-ab53-6608afce5733","nummer":"0000000004","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"FOO","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"","voornaam":"","voorvoegselAchternaam":"","achternaam":""},"volledigeNaam":""},"_expand":{}},{"uuid":"980fa426-a44a-42c7-bcb3-c8c144ae0aa0","url":"http://localhost:8000/klantinteracties/api/v1/partijen/980fa426-a44a-42c7-bcb3-c8c144ae0aa0","nummer":"0000000003","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"contactpersoon","indicatieGeheimhouding":true,"voorkeurstaal":"nld","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"uuid":"c184f398-d663-474b-b042-9956d9deb560","werkteVoorPartij":{"uuid":"dce80380-80ed-465e-be6a-50ec5ea971c8","url":"http://localhost:8000/klantinteracties/api/v1/partijen/dce80380-80ed-465e-be6a-50ec5ea971c8"},"contactnaam":{"voorletters":"B.","voornaam":"Bart","voorvoegselAchternaam":"","achternaam":""},"volledigeNaam":"Bart"},"_expand":{}},{"uuid":"dce80380-80ed-465e-be6a-50ec5ea971c8","url":"http://localhost:8000/klantinteracties/api/v1/partijen/dce80380-80ed-465e-be6a-50ec5ea971c8","nummer":"0000000002","interneNotitie":"","betrokkenen":[{"uuid":"cb0856cd-b2bb-4abb-9c12-b5d5b3d2aff6","url":"http://localhost:8000/klantinteracties/api/v1/betrokkenen/cb0856cd-b2bb-4abb-9c12-b5d5b3d2aff6"}],"categorieRelaties":[{"uuid":"2124ed9e-2296-4fb2-8421-b79e5c23ff97","url":"http://localhost:8000/klantinteracties/api/v1/categorie-relaties/2124ed9e-2296-4fb2-8421-b79e5c23ff97","categorieNaam":"MKB","beginDatum":"2024-03-06","eindDatum":null}],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[{"uuid":"980fa426-a44a-42c7-bcb3-c8c144ae0aa0","url":"http://localhost:8000/klantinteracties/api/v1/partijen/980fa426-a44a-42c7-bcb3-c8c144ae0aa0"}],"rekeningnummers":[{"uuid":"8b5f3eb4-4023-46f6-a05f-8ab5e3bf0be2","url":"http://localhost:8000/klantinteracties/api/v1/rekeningnummers/8b5f3eb4-4023-46f6-a05f-8ab5e3bf0be2"}],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"organisatie","indicatieGeheimhouding":true,"voorkeurstaal":"nld","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"ae758bf9-6a34-4adc-8482-147738c9509d","adresregel1":"Keizersgracht
+        117","adresregel2":"1015 CJ Amsterdam","adresregel3":"","land":"6030"},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"naam":"Maykin
+        Media"},"_expand":{}},{"uuid":"9f8e8009-2d1c-40ae-931e-c08861ba7207","url":"http://localhost:8000/klantinteracties/api/v1/partijen/9f8e8009-2d1c-40ae-931e-c08861ba7207","nummer":"0000000001","interneNotitie":"","betrokkenen":[{"uuid":"d5de314b-58a4-4d02-9d66-4e68e8927a90","url":"http://localhost:8000/klantinteracties/api/v1/betrokkenen/d5de314b-58a4-4d02-9d66-4e68e8927a90"}],"categorieRelaties":[],"digitaleAdressen":[{"uuid":"1300d2ab-13cb-4c12-9818-3b76e2a5d993","url":"http://localhost:8000/klantinteracties/api/v1/digitaleadressen/1300d2ab-13cb-4c12-9818-3b76e2a5d993"}],"voorkeursDigitaalAdres":{"uuid":"1300d2ab-13cb-4c12-9818-3b76e2a5d993","url":"http://localhost:8000/klantinteracties/api/v1/digitaleadressen/1300d2ab-13cb-4c12-9818-3b76e2a5d993"},"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[{"uuid":"dd328a2e-7b8e-4809-be28-f9f894c11c34","url":"http://localhost:8000/klantinteracties/api/v1/partij-identificatoren/dd328a2e-7b8e-4809-be28-f9f894c11c34"}],"soortPartij":"persoon","indicatieGeheimhouding":true,"voorkeurstaal":"nld","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"L.","voornaam":"Lucas","voorvoegselAchternaam":"","achternaam":"Boom"},"volledigeNaam":"Lucas
+        Boom"},"_expand":{}}]}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '6530'
+      Content-Security-Policy:
+      - frame-ancestors 'none'; default-src 'self'; base-uri 'self'; frame-src 'self';
+        style-src 'self'; object-src 'none'; img-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
 version: 1

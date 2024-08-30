@@ -131,4 +131,78 @@ interactions:
     status:
       code: 200
       message: OK
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+    method: GET
+    uri: http://localhost:8000/klantinteracties/api/v1/partijen/d5546623-9be9-4a67-9188-593e5841e3d7?expand=betrokkenen&expand=digitaleAdressen
+  response:
+    body:
+      string: '{"type":"http://localhost:8000/ref/fouten/NotFound/","code":"not_found","title":"Niet
+        gevonden.","status":404,"detail":"Niet gevonden.","instance":"urn:uuid:b517e4ac-dc9c-4497-8eae-9fe27c4e1fb4"}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '195'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 404
+      message: Not Found
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+    method: GET
+    uri: http://localhost:8000/klantinteracties/api/v1/partijen/d5546623-9be9-4a67-9188-593e5841e3d7?expand=betrokkenen&expand=digitaleAdressen
+  response:
+    body:
+      string: '{"type":"http://localhost:8000/ref/fouten/NotFound/","code":"not_found","title":"Niet
+        gevonden.","status":404,"detail":"Niet gevonden.","instance":"urn:uuid:27a58a28-b846-4bde-9650-9232a2fcabf3"}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '195'
+      Content-Security-Policy:
+      - frame-ancestors 'none'; default-src 'self'; base-uri 'self'; frame-src 'self';
+        style-src 'self'; object-src 'none'; img-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 404
+      message: Not Found
 version: 1

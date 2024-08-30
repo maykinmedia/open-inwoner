@@ -1,0 +1,842 @@
+interactions:
+- request:
+    body: '{"bezoekadres": {"nummeraanduidingId": 42, "adresregel1": "straat", "adresregel2":
+      "woonplaats", "adresregel3": "", "land": ""}}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '128'
+      Content-Type:
+      - application/json
+    method: PUT
+    uri: http://localhost:8000/klantinteracties/api/v1/betrokkenen/00d653ba-8da5-4d89-9a74-be1f5315ddc6
+  response:
+    body:
+      string: '{"type":"http://localhost:8000/ref/fouten/ValidationError/","code":"invalid","title":"Invalid
+        input.","status":400,"detail":"","instance":"urn:uuid:4dbb86ef-60d0-45c1-b7e5-eeed45943cb1","invalidParams":[{"name":"wasPartij","code":"required","reason":"Dit
+        veld is vereist."},{"name":"hadKlantcontact","code":"required","reason":"Dit
+        veld is vereist."},{"name":"rol","code":"required","reason":"Dit veld is vereist."},{"name":"initiator","code":"required","reason":"Dit
+        veld is vereist."}]}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '488'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 400
+      message: Bad Request
+- request:
+    body: '{"bezoekadres": {"nummeraanduidingId": 42, "adresregel1": "straat", "adresregel2":
+      "woonplaats", "adresregel3": "", "land": ""}}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '128'
+      Content-Type:
+      - application/json
+    method: DELETE
+    uri: http://localhost:8000/klantinteracties/api/v1/betrokkenen/00d653ba-8da5-4d89-9a74-be1f5315ddc6
+  response:
+    body:
+      string: ''
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '0'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 204
+      message: No Content
+- request:
+    body: '{"bezoekadres": {"nummeraanduidingId": 42, "adresregel1": "straat", "adresregel2":
+      "woonplaats", "adresregel3": "", "land": ""}}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '128'
+      Content-Type:
+      - application/json
+    method: PATCH
+    uri: http://localhost:8000/klantinteracties/api/v1/betrokkenen/00d653ba-8da5-4d89-9a74-be1f5315ddc6
+  response:
+    body:
+      string: '{"type":"http://localhost:8000/ref/fouten/NotFound/","code":"not_found","title":"Niet
+        gevonden.","status":404,"detail":"Niet gevonden.","instance":"urn:uuid:ac1d6cb4-ea31-4ae6-8db5-474d3326dee3"}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '195'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 404
+      message: Not Found
+- request:
+    body: '{"bezoekadres": {"nummeraanduidingId": 42, "adresregel1": "straat", "adresregel2":
+      "woonplaats", "adresregel3": "", "land": ""}}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '128'
+      Content-Type:
+      - application/json
+    method: PATCH
+    uri: http://localhost:8000/klantinteracties/api/v1/betrokkenen/00d653ba-8da5-4d89-9a74-be1f5315ddc6
+  response:
+    body:
+      string: '{"type":"http://localhost:8000/ref/fouten/NotFound/","code":"not_found","title":"Niet
+        gevonden.","status":404,"detail":"Niet gevonden.","instance":"urn:uuid:95e14e3f-730d-4d7f-b198-d8cf236bb133"}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '195'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 404
+      message: Not Found
+- request:
+    body: '{"bezoekadres": {"nummeraanduidingId": 42, "adresregel1": "straat", "adresregel2":
+      "woonplaats", "adresregel3": "", "land": ""}}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '128'
+      Content-Type:
+      - application/json
+    method: PATCH
+    uri: http://localhost:8000/klantinteracties/api/v1/betrokkenen/00d653ba-8da5-4d89-9a74-be1f5315ddc6
+  response:
+    body:
+      string: '{"type":"http://localhost:8000/ref/fouten/NotFound/","code":"not_found","title":"Niet
+        gevonden.","status":404,"detail":"Niet gevonden.","instance":"urn:uuid:f5259263-a361-483c-88dc-109fbd289a4d"}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '195'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 404
+      message: Not Found
+- request:
+    body: '{"bezoekadres": {"nummeraanduidingId": 42, "adresregel1": "straat", "adresregel2":
+      "woonplaats", "adresregel3": "", "land": ""}}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '128'
+      Content-Type:
+      - application/json
+    method: PATCH
+    uri: http://localhost:8000/klantinteracties/api/v1/betrokkenen/00d653ba-8da5-4d89-9a74-be1f5315ddc6
+  response:
+    body:
+      string: '{"type":"http://localhost:8000/ref/fouten/NotFound/","code":"not_found","title":"Niet
+        gevonden.","status":404,"detail":"Niet gevonden.","instance":"urn:uuid:c039c835-6289-40d6-8133-6d3f7727ce4d"}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '195'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 404
+      message: Not Found
+- request:
+    body: '{"bezoekadres": {"nummeraanduidingId": 42, "adresregel1": "straat", "adresregel2":
+      "woonplaats", "adresregel3": "", "land": ""}}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '128'
+      Content-Type:
+      - application/json
+    method: PATCH
+    uri: http://localhost:8000/klantinteracties/api/v1/betrokkenen/00d653ba-8da5-4d89-9a74-be1f5315ddc6
+  response:
+    body:
+      string: '{"type":"http://localhost:8000/ref/fouten/NotFound/","code":"not_found","title":"Niet
+        gevonden.","status":404,"detail":"Niet gevonden.","instance":"urn:uuid:b431dea7-d3fd-486c-8856-7df889d0d3dd"}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '195'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 404
+      message: Not Found
+- request:
+    body: '{"bezoekadres": {"nummeraanduidingId": 42, "adresregel1": "straat", "adresregel2":
+      "woonplaats", "adresregel3": "", "land": ""}}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '128'
+      Content-Type:
+      - application/json
+    method: PATCH
+    uri: http://localhost:8000/klantinteracties/api/v1/betrokkenen/00d653ba-8da5-4d89-9a74-be1f5315ddc6
+  response:
+    body:
+      string: '{"type":"http://localhost:8000/ref/fouten/NotFound/","code":"not_found","title":"Niet
+        gevonden.","status":404,"detail":"Niet gevonden.","instance":"urn:uuid:ebf0292d-d8fa-44a5-928b-34e65ce5329a"}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '195'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 404
+      message: Not Found
+- request:
+    body: '{"bezoekadres": {"nummeraanduidingId": 42, "adresregel1": "straat", "adresregel2":
+      "woonplaats", "adresregel3": "", "land": ""}}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '128'
+      Content-Type:
+      - application/json
+    method: PATCH
+    uri: http://localhost:8000/klantinteracties/api/v1/betrokkenen/00d653ba-8da5-4d89-9a74-be1f5315ddc6
+  response:
+    body:
+      string: '{"type":"http://localhost:8000/ref/fouten/NotFound/","code":"not_found","title":"Niet
+        gevonden.","status":404,"detail":"Niet gevonden.","instance":"urn:uuid:2989dae7-193f-429e-adc3-586432dfd477"}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '195'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 404
+      message: Not Found
+- request:
+    body: '{"bezoekadres": {"nummeraanduidingId": 42, "adresregel1": "straat", "adresregel2":
+      "woonplaats", "adresregel3": "", "land": ""}}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '128'
+      Content-Type:
+      - application/json
+    method: PATCH
+    uri: http://localhost:8000/klantinteracties/api/v1/betrokkenen/b89c7aa6-1f94-44f9-afab-da90a73a69d4
+  response:
+    body:
+      string: '{"uuid":"b89c7aa6-1f94-44f9-afab-da90a73a69d4","url":"http://localhost:8000/klantinteracties/api/v1/betrokkenen/b89c7aa6-1f94-44f9-afab-da90a73a69d4","wasPartij":null,"hadKlantcontact":{"uuid":"33549ba5-95f0-44d2-9c63-776ec126bc55","url":"http://localhost:8000/klantinteracties/api/v1/klantcontacten/33549ba5-95f0-44d2-9c63-776ec126bc55"},"digitaleAdressen":[],"bezoekadres":{"nummeraanduidingId":"42","adresregel1":"straat","adresregel2":"woonplaats","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"contactnaam":{"voorletters":"B.","voornaam":"Bart","voorvoegselAchternaam":"","achternaam":""},"volledigeNaam":"Bart","rol":"klant","organisatienaam":"Maykin
+        Media","initiator":true}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '773'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"bezoekadres": {"nummeraanduidingId": 42, "adresregel1": "straat", "adresregel2":
+      "woonplaats", "adresregel3": "", "land": ""}}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '128'
+      Content-Type:
+      - application/json
+    method: PATCH
+    uri: http://localhost:8000/klantinteracties/api/v1/betrokkenen/b89c7aa6-1f94-44f9-afab-da90a73a69d4
+  response:
+    body:
+      string: '{"uuid":"b89c7aa6-1f94-44f9-afab-da90a73a69d4","url":"http://localhost:8000/klantinteracties/api/v1/betrokkenen/b89c7aa6-1f94-44f9-afab-da90a73a69d4","wasPartij":null,"hadKlantcontact":{"uuid":"33549ba5-95f0-44d2-9c63-776ec126bc55","url":"http://localhost:8000/klantinteracties/api/v1/klantcontacten/33549ba5-95f0-44d2-9c63-776ec126bc55"},"digitaleAdressen":[],"bezoekadres":{"nummeraanduidingId":"42","adresregel1":"straat","adresregel2":"woonplaats","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"contactnaam":{"voorletters":"B.","voornaam":"Bart","voorvoegselAchternaam":"","achternaam":""},"volledigeNaam":"Bart","rol":"klant","organisatienaam":"Maykin
+        Media","initiator":true}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '773'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"bezoekadres": {"nummeraanduidingId": 42, "adresregel1": "straat", "adresregel2":
+      "woonplaats", "adresregel3": "", "land": ""}}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '128'
+      Content-Type:
+      - application/json
+    method: PATCH
+    uri: http://localhost:8000/klantinteracties/api/v1/betrokkenen/b89c7aa6-1f94-44f9-afab-da90a73a69d4
+  response:
+    body:
+      string: '{"uuid":"b89c7aa6-1f94-44f9-afab-da90a73a69d4","url":"http://localhost:8000/klantinteracties/api/v1/betrokkenen/b89c7aa6-1f94-44f9-afab-da90a73a69d4","wasPartij":null,"hadKlantcontact":{"uuid":"33549ba5-95f0-44d2-9c63-776ec126bc55","url":"http://localhost:8000/klantinteracties/api/v1/klantcontacten/33549ba5-95f0-44d2-9c63-776ec126bc55"},"digitaleAdressen":[],"bezoekadres":{"nummeraanduidingId":"42","adresregel1":"straat","adresregel2":"woonplaats","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"contactnaam":{"voorletters":"B.","voornaam":"Bart","voorvoegselAchternaam":"","achternaam":""},"volledigeNaam":"Bart","rol":"klant","organisatienaam":"Maykin
+        Media","initiator":true}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '773'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"bezoekadres": {"nummeraanduidingId": 42, "adresregel1": "straat", "adresregel2":
+      "woonplaats", "adresregel3": "", "land": ""}}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '128'
+      Content-Type:
+      - application/json
+    method: PATCH
+    uri: http://localhost:8000/klantinteracties/api/v1/betrokkenen/b89c7aa6-1f94-44f9-afab-da90a73a69d4
+  response:
+    body:
+      string: '{"uuid":"b89c7aa6-1f94-44f9-afab-da90a73a69d4","url":"http://localhost:8000/klantinteracties/api/v1/betrokkenen/b89c7aa6-1f94-44f9-afab-da90a73a69d4","wasPartij":null,"hadKlantcontact":{"uuid":"33549ba5-95f0-44d2-9c63-776ec126bc55","url":"http://localhost:8000/klantinteracties/api/v1/klantcontacten/33549ba5-95f0-44d2-9c63-776ec126bc55"},"digitaleAdressen":[],"bezoekadres":{"nummeraanduidingId":"42","adresregel1":"straat","adresregel2":"woonplaats","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"contactnaam":{"voorletters":"B.","voornaam":"Bart","voorvoegselAchternaam":"","achternaam":""},"volledigeNaam":"Bart","rol":"klant","organisatienaam":"Maykin
+        Media","initiator":true}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '773'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"bezoekadres": {"nummeraanduidingId": 42, "adresregel1": "straat", "adresregel2":
+      "woonplaats", "adresregel3": "", "land": ""}}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '128'
+      Content-Type:
+      - application/json
+    method: PATCH
+    uri: http://localhost:8000/klantinteracties/api/v1/betrokkenen/b89c7aa6-1f94-44f9-afab-da90a73a69d4
+  response:
+    body:
+      string: '{"uuid":"b89c7aa6-1f94-44f9-afab-da90a73a69d4","url":"http://localhost:8000/klantinteracties/api/v1/betrokkenen/b89c7aa6-1f94-44f9-afab-da90a73a69d4","wasPartij":null,"hadKlantcontact":{"uuid":"33549ba5-95f0-44d2-9c63-776ec126bc55","url":"http://localhost:8000/klantinteracties/api/v1/klantcontacten/33549ba5-95f0-44d2-9c63-776ec126bc55"},"digitaleAdressen":[],"bezoekadres":{"nummeraanduidingId":"42","adresregel1":"straat","adresregel2":"woonplaats","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"contactnaam":{"voorletters":"B.","voornaam":"Bart","voorvoegselAchternaam":"","achternaam":""},"volledigeNaam":"Bart","rol":"klant","organisatienaam":"Maykin
+        Media","initiator":true}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '773'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"bezoekadres": {"nummeraanduidingId": 42, "adresregel1": "straat", "adresregel2":
+      "woonplaats", "adresregel3": "", "land": ""}}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '128'
+      Content-Type:
+      - application/json
+    method: PATCH
+    uri: http://localhost:8000/klantinteracties/api/v1/betrokkenen/b89c7aa6-1f94-44f9-afab-da90a73a69d4
+  response:
+    body:
+      string: '{"uuid":"b89c7aa6-1f94-44f9-afab-da90a73a69d4","url":"http://localhost:8000/klantinteracties/api/v1/betrokkenen/b89c7aa6-1f94-44f9-afab-da90a73a69d4","wasPartij":null,"hadKlantcontact":{"uuid":"33549ba5-95f0-44d2-9c63-776ec126bc55","url":"http://localhost:8000/klantinteracties/api/v1/klantcontacten/33549ba5-95f0-44d2-9c63-776ec126bc55"},"digitaleAdressen":[],"bezoekadres":{"nummeraanduidingId":"42","adresregel1":"straat","adresregel2":"woonplaats","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"contactnaam":{"voorletters":"B.","voornaam":"Bart","voorvoegselAchternaam":"","achternaam":""},"volledigeNaam":"Bart","rol":"klant","organisatienaam":"Maykin
+        Media","initiator":true}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '773'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"bezoekadres": {"nummeraanduidingId": 42, "adresregel1": "straat", "adresregel2":
+      "woonplaats", "adresregel3": "", "land": ""}}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '128'
+      Content-Type:
+      - application/json
+    method: PATCH
+    uri: http://localhost:8000/klantinteracties/api/v1/betrokkenen/b89c7aa6-1f94-44f9-afab-da90a73a69d4
+  response:
+    body:
+      string: '{"uuid":"b89c7aa6-1f94-44f9-afab-da90a73a69d4","url":"http://localhost:8000/klantinteracties/api/v1/betrokkenen/b89c7aa6-1f94-44f9-afab-da90a73a69d4","wasPartij":null,"hadKlantcontact":{"uuid":"33549ba5-95f0-44d2-9c63-776ec126bc55","url":"http://localhost:8000/klantinteracties/api/v1/klantcontacten/33549ba5-95f0-44d2-9c63-776ec126bc55"},"digitaleAdressen":[],"bezoekadres":{"nummeraanduidingId":"42","adresregel1":"straat","adresregel2":"woonplaats","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"contactnaam":{"voorletters":"B.","voornaam":"Bart","voorvoegselAchternaam":"","achternaam":""},"volledigeNaam":"Bart","rol":"klant","organisatienaam":"Maykin
+        Media","initiator":true}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '773'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"bezoekadres": {"nummeraanduidingId": 42, "adresregel1": "straat", "adresregel2":
+      "woonplaats", "adresregel3": "", "land": ""}}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '128'
+      Content-Type:
+      - application/json
+    method: PATCH
+    uri: http://localhost:8000/klantinteracties/api/v1/betrokkenen/b89c7aa6-1f94-44f9-afab-da90a73a69d4
+  response:
+    body:
+      string: '{"uuid":"b89c7aa6-1f94-44f9-afab-da90a73a69d4","url":"http://localhost:8000/klantinteracties/api/v1/betrokkenen/b89c7aa6-1f94-44f9-afab-da90a73a69d4","wasPartij":null,"hadKlantcontact":{"uuid":"33549ba5-95f0-44d2-9c63-776ec126bc55","url":"http://localhost:8000/klantinteracties/api/v1/klantcontacten/33549ba5-95f0-44d2-9c63-776ec126bc55"},"digitaleAdressen":[],"bezoekadres":{"nummeraanduidingId":"42","adresregel1":"straat","adresregel2":"woonplaats","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"contactnaam":{"voorletters":"B.","voornaam":"Bart","voorvoegselAchternaam":"","achternaam":""},"volledigeNaam":"Bart","rol":"klant","organisatienaam":"Maykin
+        Media","initiator":true}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '773'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"bezoekadres": {"nummeraanduidingId": 42, "adresregel1": "straat", "adresregel2":
+      "woonplaats", "adresregel3": "", "land": ""}}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '128'
+      Content-Type:
+      - application/json
+    method: PATCH
+    uri: http://localhost:8000/klantinteracties/api/v1/betrokkenen/b89c7aa6-1f94-44f9-afab-da90a73a69d4
+  response:
+    body:
+      string: '{"uuid":"b89c7aa6-1f94-44f9-afab-da90a73a69d4","url":"http://localhost:8000/klantinteracties/api/v1/betrokkenen/b89c7aa6-1f94-44f9-afab-da90a73a69d4","wasPartij":null,"hadKlantcontact":{"uuid":"33549ba5-95f0-44d2-9c63-776ec126bc55","url":"http://localhost:8000/klantinteracties/api/v1/klantcontacten/33549ba5-95f0-44d2-9c63-776ec126bc55"},"digitaleAdressen":[],"bezoekadres":{"nummeraanduidingId":"42","adresregel1":"straat","adresregel2":"woonplaats","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"contactnaam":{"voorletters":"B.","voornaam":"Bart","voorvoegselAchternaam":"","achternaam":""},"volledigeNaam":"Bart","rol":"klant","organisatienaam":"Maykin
+        Media","initiator":true}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '773'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"bezoekadres": {"nummeraanduidingId": 42, "adresregel1": "straat", "adresregel2":
+      "woonplaats", "adresregel3": "", "land": ""}}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '128'
+      Content-Type:
+      - application/json
+    method: PATCH
+    uri: http://localhost:8000/klantinteracties/api/v1/betrokkenen/b89c7aa6-1f94-44f9-afab-da90a73a69d4
+  response:
+    body:
+      string: '{"uuid":"b89c7aa6-1f94-44f9-afab-da90a73a69d4","url":"http://localhost:8000/klantinteracties/api/v1/betrokkenen/b89c7aa6-1f94-44f9-afab-da90a73a69d4","wasPartij":null,"hadKlantcontact":{"uuid":"33549ba5-95f0-44d2-9c63-776ec126bc55","url":"http://localhost:8000/klantinteracties/api/v1/klantcontacten/33549ba5-95f0-44d2-9c63-776ec126bc55"},"digitaleAdressen":[],"bezoekadres":{"nummeraanduidingId":"42","adresregel1":"straat","adresregel2":"woonplaats","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"contactnaam":{"voorletters":"B.","voornaam":"Bart","voorvoegselAchternaam":"","achternaam":""},"volledigeNaam":"Bart","rol":"klant","organisatienaam":"Maykin
+        Media","initiator":true}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '773'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"bezoekadres": {"nummeraanduidingId": 42, "adresregel1": "straat", "adresregel2":
+      "woonplaats", "adresregel3": "", "land": ""}}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '128'
+      Content-Type:
+      - application/json
+    method: PATCH
+    uri: http://localhost:8000/klantinteracties/api/v1/betrokkenen/b89c7aa6-1f94-44f9-afab-da90a73a69d4
+  response:
+    body:
+      string: '{"uuid":"b89c7aa6-1f94-44f9-afab-da90a73a69d4","url":"http://localhost:8000/klantinteracties/api/v1/betrokkenen/b89c7aa6-1f94-44f9-afab-da90a73a69d4","wasPartij":null,"hadKlantcontact":{"uuid":"33549ba5-95f0-44d2-9c63-776ec126bc55","url":"http://localhost:8000/klantinteracties/api/v1/klantcontacten/33549ba5-95f0-44d2-9c63-776ec126bc55"},"digitaleAdressen":[],"bezoekadres":{"nummeraanduidingId":"42","adresregel1":"straat","adresregel2":"woonplaats","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"contactnaam":{"voorletters":"B.","voornaam":"Bart","voorvoegselAchternaam":"","achternaam":""},"volledigeNaam":"Bart","rol":"klant","organisatienaam":"Maykin
+        Media","initiator":true}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '773'
+      Content-Security-Policy:
+      - frame-ancestors 'none'; default-src 'self'; base-uri 'self'; frame-src 'self';
+        style-src 'self'; object-src 'none'; img-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

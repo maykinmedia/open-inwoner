@@ -1,0 +1,140 @@
+interactions:
+- request:
+    body: '{}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '2'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8000/klantinteracties/api/v1/digitaleadressen
+  response:
+    body:
+      string: '{"type":"http://localhost:8000/ref/fouten/ValidationError/","code":"invalid","title":"Invalid
+        input.","status":400,"detail":"","instance":"urn:uuid:c22aa5eb-4070-45af-b4e4-b922c1696afd","invalidParams":[{"name":"verstrektDoorBetrokkene","code":"required","reason":"Dit
+        veld is vereist."},{"name":"verstrektDoorPartij","code":"required","reason":"Dit
+        veld is vereist."},{"name":"adres","code":"required","reason":"Dit veld is
+        vereist."},{"name":"soortDigitaalAdres","code":"required","reason":"Dit veld
+        is vereist."},{"name":"omschrijving","code":"required","reason":"Dit veld
+        is vereist."}]}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '591'
+      Content-Security-Policy:
+      - frame-ancestors 'none'; default-src 'self'; base-uri 'self'; frame-src 'self';
+        style-src 'self'; object-src 'none'; img-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 400
+      message: Bad Request
+- request:
+    body: '{}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '2'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8000/klantinteracties/api/v1/digitaleadressen
+  response:
+    body:
+      string: '{"type":"http://localhost:8000/ref/fouten/ValidationError/","code":"invalid","title":"Invalid
+        input.","status":400,"detail":"","instance":"urn:uuid:3bf85d87-63c8-4f51-b9ea-dfc6468d26f9","invalidParams":[{"name":"verstrektDoorBetrokkene","code":"required","reason":"Dit
+        veld is vereist."},{"name":"verstrektDoorPartij","code":"required","reason":"Dit
+        veld is vereist."},{"name":"adres","code":"required","reason":"Dit veld is
+        vereist."},{"name":"soortDigitaalAdres","code":"required","reason":"Dit veld
+        is vereist."},{"name":"omschrijving","code":"required","reason":"Dit veld
+        is vereist."}]}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '591'
+      Content-Security-Policy:
+      - frame-ancestors 'none'; default-src 'self'; base-uri 'self'; frame-src 'self';
+        style-src 'self'; object-src 'none'; img-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 400
+      message: Bad Request
+- request:
+    body: '{}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '2'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8000/klantinteracties/api/v1/digitaleadressen
+  response:
+    body:
+      string: '{"type":"http://localhost:8000/ref/fouten/ValidationError/","code":"invalid","title":"Invalid
+        input.","status":400,"detail":"","instance":"urn:uuid:1a3f41dd-fccd-442b-90b4-18eb4eea022b","invalidParams":[{"name":"verstrektDoorBetrokkene","code":"required","reason":"Dit
+        veld is vereist."},{"name":"verstrektDoorPartij","code":"required","reason":"Dit
+        veld is vereist."},{"name":"adres","code":"required","reason":"Dit veld is
+        vereist."},{"name":"soortDigitaalAdres","code":"required","reason":"Dit veld
+        is vereist."},{"name":"omschrijving","code":"required","reason":"Dit veld
+        is vereist."}]}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '591'
+      Content-Security-Policy:
+      - frame-ancestors 'none'; default-src 'self'; base-uri 'self'; frame-src 'self';
+        style-src 'self'; object-src 'none'; img-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 400
+      message: Bad Request
+version: 1

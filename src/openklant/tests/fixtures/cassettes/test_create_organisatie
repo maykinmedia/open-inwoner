@@ -163,4 +163,94 @@ interactions:
     status:
       code: 201
       message: Created
+- request:
+    body: '{"soortPartij": "organisatie", "digitaleAdressen": null, "rekeningnummers":
+      null, "voorkeursRekeningnummer": null, "voorkeurstaal": "FOO", "indicatieActief":
+      true, "indicatieGeheimhouding": false, "voorkeursDigitaalAdres": null, "partijIdentificatie":
+      {"contactnaam": null}, "bezoekadres": {}}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '293'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8000/klantinteracties/api/v1/partijen
+  response:
+    body:
+      string: '{"uuid":"701efe39-39ad-43da-877d-3bf4d0b79349","url":"http://localhost:8000/klantinteracties/api/v1/partijen/701efe39-39ad-43da-877d-3bf4d0b79349","nummer":"0000000006","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"organisatie","indicatieGeheimhouding":false,"voorkeurstaal":"FOO","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '726'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8000/klantinteracties/api/v1/partijen/701efe39-39ad-43da-877d-3bf4d0b79349
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"soortPartij": "organisatie", "digitaleAdressen": null, "rekeningnummers":
+      null, "voorkeursRekeningnummer": null, "voorkeurstaal": "FOO", "indicatieActief":
+      true, "indicatieGeheimhouding": false, "voorkeursDigitaalAdres": null, "partijIdentificatie":
+      {"contactnaam": null}, "bezoekadres": {}}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '293'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8000/klantinteracties/api/v1/partijen
+  response:
+    body:
+      string: '{"uuid":"e4840cea-229b-4449-ab00-15931943c5a0","url":"http://localhost:8000/klantinteracties/api/v1/partijen/e4840cea-229b-4449-ab00-15931943c5a0","nummer":"0000000008","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"organisatie","indicatieGeheimhouding":false,"voorkeurstaal":"FOO","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '726'
+      Content-Security-Policy:
+      - frame-ancestors 'none'; default-src 'self'; base-uri 'self'; frame-src 'self';
+        style-src 'self'; object-src 'none'; img-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8000/klantinteracties/api/v1/partijen/e4840cea-229b-4449-ab00-15931943c5a0
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
 version: 1

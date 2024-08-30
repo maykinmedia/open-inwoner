@@ -1,11 +1,13 @@
 import pytest
+from decouple import config
 
 from openklant.client import OpenKlantClient
 
 
 @pytest.fixture()
 def api_token():
-    return "b2eb1da9861da88743d72a3fb4344288fe2cba44"
+    token = config("OPEN_KLANT_TOKEN", None)
+    return token
 
 
 @pytest.fixture()

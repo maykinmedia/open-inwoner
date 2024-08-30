@@ -1,0 +1,376 @@
+interactions:
+- request:
+    body: '{}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '2'
+      Content-Type:
+      - application/json
+    method: PUT
+    uri: http://localhost:8000/klantinteracties/api/v1/digitaleadressen/da051d44-5c87-462e-8d19-8af0e2f886b7
+  response:
+    body:
+      string: '{"type":"http://localhost:8000/ref/fouten/NotFound/","code":"not_found","title":"Niet
+        gevonden.","status":404,"detail":"Niet gevonden.","instance":"urn:uuid:a263513c-8182-432b-8abf-6502a944d41a"}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '195'
+      Content-Security-Policy:
+      - frame-ancestors 'none'; default-src 'self'; base-uri 'self'; frame-src 'self';
+        style-src 'self'; object-src 'none'; img-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 404
+      message: Not Found
+- request:
+    body: '{}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '2'
+      Content-Type:
+      - application/json
+    method: PUT
+    uri: http://localhost:8000/klantinteracties/api/v1/digitaleadressen/da051d44-5c87-462e-8d19-8af0e2f886b7
+  response:
+    body:
+      string: '{"type":"http://localhost:8000/ref/fouten/NotFound/","code":"not_found","title":"Niet
+        gevonden.","status":404,"detail":"Niet gevonden.","instance":"urn:uuid:4d0607c4-bd51-4baf-a434-fe87ff1d079b"}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '195'
+      Content-Security-Policy:
+      - frame-ancestors 'none'; default-src 'self'; base-uri 'self'; frame-src 'self';
+        style-src 'self'; object-src 'none'; img-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 404
+      message: Not Found
+- request:
+    body: '{}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '2'
+      Content-Type:
+      - application/json
+    method: PUT
+    uri: http://localhost:8000/klantinteracties/api/v1/digitaleadressen/dbcf1f84-06bd-4320-b4ca-ed066f335038
+  response:
+    body:
+      string: '{"type":"http://localhost:8000/ref/fouten/ValidationError/","code":"invalid","title":"Invalid
+        input.","status":400,"detail":"","instance":"urn:uuid:04be72d3-3514-4ecf-80a3-425d7d2aa747","invalidParams":[{"name":"verstrektDoorBetrokkene","code":"required","reason":"Dit
+        veld is vereist."},{"name":"verstrektDoorPartij","code":"required","reason":"Dit
+        veld is vereist."},{"name":"adres","code":"required","reason":"Dit veld is
+        vereist."},{"name":"soortDigitaalAdres","code":"required","reason":"Dit veld
+        is vereist."},{"name":"omschrijving","code":"required","reason":"Dit veld
+        is vereist."}]}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '591'
+      Content-Security-Policy:
+      - frame-ancestors 'none'; default-src 'self'; base-uri 'self'; frame-src 'self';
+        style-src 'self'; object-src 'none'; img-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 400
+      message: Bad Request
+- request:
+    body: '{"verstrektDoorBetrokkene": null, "verstrektDoorPartij": null, "adres":
+      "test", "soortDigitaalAdres": "test", "omschrijving": "test"}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '133'
+      Content-Type:
+      - application/json
+    method: PUT
+    uri: http://localhost:8000/klantinteracties/api/v1/digitaleadressen/dbcf1f84-06bd-4320-b4ca-ed066f335038
+  response:
+    body:
+      string: '{"uuid":"dbcf1f84-06bd-4320-b4ca-ed066f335038","url":"http://localhost:8000/klantinteracties/api/v1/digitaleadressen/dbcf1f84-06bd-4320-b4ca-ed066f335038","verstrektDoorBetrokkene":null,"verstrektDoorPartij":null,"adres":"test","soortDigitaalAdres":"test","omschrijving":"test"}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '278'
+      Content-Security-Policy:
+      - frame-ancestors 'none'; default-src 'self'; base-uri 'self'; frame-src 'self';
+        style-src 'self'; object-src 'none'; img-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"verstrektDoorBetrokkene": null, "verstrektDoorPartij": null, "adres":
+      "test", "soortDigitaalAdres": "test", "omschrijving": "test"}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '133'
+      Content-Type:
+      - application/json
+    method: PUT
+    uri: http://localhost:8000/klantinteracties/api/v1/digitaleadressen/dbcf1f84-06bd-4320-b4ca-ed066f335038
+  response:
+    body:
+      string: '{"uuid":"dbcf1f84-06bd-4320-b4ca-ed066f335038","url":"http://localhost:8000/klantinteracties/api/v1/digitaleadressen/dbcf1f84-06bd-4320-b4ca-ed066f335038","verstrektDoorBetrokkene":null,"verstrektDoorPartij":null,"adres":"test","soortDigitaalAdres":"test","omschrijving":"test"}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '278'
+      Content-Security-Policy:
+      - frame-ancestors 'none'; default-src 'self'; base-uri 'self'; frame-src 'self';
+        style-src 'self'; object-src 'none'; img-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"verstrektDoorBetrokkene": null, "verstrektDoorPartij": null, "adres":
+      "updated", "soortDigitaalAdres": "test", "omschrijving": "test"}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '136'
+      Content-Type:
+      - application/json
+    method: PUT
+    uri: http://localhost:8000/klantinteracties/api/v1/digitaleadressen/dbcf1f84-06bd-4320-b4ca-ed066f335038
+  response:
+    body:
+      string: '{"uuid":"dbcf1f84-06bd-4320-b4ca-ed066f335038","url":"http://localhost:8000/klantinteracties/api/v1/digitaleadressen/dbcf1f84-06bd-4320-b4ca-ed066f335038","verstrektDoorBetrokkene":null,"verstrektDoorPartij":null,"adres":"updated","soortDigitaalAdres":"test","omschrijving":"test"}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '281'
+      Content-Security-Policy:
+      - frame-ancestors 'none'; default-src 'self'; base-uri 'self'; frame-src 'self';
+        style-src 'self'; object-src 'none'; img-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"verstrektDoorBetrokkene": null, "verstrektDoorPartij": null, "adres":
+      "updated", "soortDigitaalAdres": "updated", "omschrijving": "updated"}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '142'
+      Content-Type:
+      - application/json
+    method: PUT
+    uri: http://localhost:8000/klantinteracties/api/v1/digitaleadressen/dbcf1f84-06bd-4320-b4ca-ed066f335038
+  response:
+    body:
+      string: '{"uuid":"dbcf1f84-06bd-4320-b4ca-ed066f335038","url":"http://localhost:8000/klantinteracties/api/v1/digitaleadressen/dbcf1f84-06bd-4320-b4ca-ed066f335038","verstrektDoorBetrokkene":null,"verstrektDoorPartij":null,"adres":"updated","soortDigitaalAdres":"updated","omschrijving":"updated"}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '287'
+      Content-Security-Policy:
+      - frame-ancestors 'none'; default-src 'self'; base-uri 'self'; frame-src 'self';
+        style-src 'self'; object-src 'none'; img-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"verstrektDoorBetrokkene": null, "verstrektDoorPartij": null, "adres":
+      "updated", "soortDigitaalAdres": "updated", "omschrijving": "updated"}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '142'
+      Content-Type:
+      - application/json
+    method: PUT
+    uri: http://localhost:8000/klantinteracties/api/v1/digitaleadressen/dbcf1f84-06bd-4320-b4ca-ed066f335038
+  response:
+    body:
+      string: '{"uuid":"dbcf1f84-06bd-4320-b4ca-ed066f335038","url":"http://localhost:8000/klantinteracties/api/v1/digitaleadressen/dbcf1f84-06bd-4320-b4ca-ed066f335038","verstrektDoorBetrokkene":null,"verstrektDoorPartij":null,"adres":"updated","soortDigitaalAdres":"updated","omschrijving":"updated"}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '287'
+      Content-Security-Policy:
+      - frame-ancestors 'none'; default-src 'self'; base-uri 'self'; frame-src 'self';
+        style-src 'self'; object-src 'none'; img-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"verstrektDoorBetrokkene": null, "verstrektDoorPartij": null, "adres":
+      "updated", "soortDigitaalAdres": "updated", "omschrijving": "updated"}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '142'
+      Content-Type:
+      - application/json
+    method: PUT
+    uri: http://localhost:8000/klantinteracties/api/v1/digitaleadressen/dbcf1f84-06bd-4320-b4ca-ed066f335038
+  response:
+    body:
+      string: '{"uuid":"dbcf1f84-06bd-4320-b4ca-ed066f335038","url":"http://localhost:8000/klantinteracties/api/v1/digitaleadressen/dbcf1f84-06bd-4320-b4ca-ed066f335038","verstrektDoorBetrokkene":null,"verstrektDoorPartij":null,"adres":"updated","soortDigitaalAdres":"updated","omschrijving":"updated"}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '287'
+      Content-Security-Policy:
+      - frame-ancestors 'none'; default-src 'self'; base-uri 'self'; frame-src 'self';
+        style-src 'self'; object-src 'none'; img-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

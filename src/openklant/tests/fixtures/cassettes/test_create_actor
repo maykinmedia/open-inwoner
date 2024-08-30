@@ -1,0 +1,296 @@
+interactions:
+- request:
+    body: '{"naam": "Hieronymus", "soortActor": "medewerker"}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '50'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8000/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"uuid":"4a09517b-5a96-4b22-ac76-2281166c2329","url":"http://localhost:8000/klantinteracties/api/v1/actoren/4a09517b-5a96-4b22-ac76-2281166c2329","naam":"Hieronymus","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""},"actorIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '339'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8000/klantinteracties/api/v1/actoren/4a09517b-5a96-4b22-ac76-2281166c2329
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"naam": "Hieronymus", "soortActor": "medewerker"}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '50'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8000/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"uuid":"fdb32d85-0332-4b84-9b87-24c3a8ebfaed","url":"http://localhost:8000/klantinteracties/api/v1/actoren/fdb32d85-0332-4b84-9b87-24c3a8ebfaed","naam":"Hieronymus","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""},"actorIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '339'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8000/klantinteracties/api/v1/actoren/fdb32d85-0332-4b84-9b87-24c3a8ebfaed
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"naam": "Hieronymus", "soortActor": "medewerker"}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '50'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8000/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"uuid":"17f9e39f-9903-488b-9747-22b234f4951d","url":"http://localhost:8000/klantinteracties/api/v1/actoren/17f9e39f-9903-488b-9747-22b234f4951d","naam":"Hieronymus","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""},"actorIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '339'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8000/klantinteracties/api/v1/actoren/17f9e39f-9903-488b-9747-22b234f4951d
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"naam": "Hieronymus", "soortActor": "medewerker"}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '50'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8000/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"uuid":"a7584f85-00a3-4158-80a0-d1c398272511","url":"http://localhost:8000/klantinteracties/api/v1/actoren/a7584f85-00a3-4158-80a0-d1c398272511","naam":"Hieronymus","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""},"actorIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '339'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8000/klantinteracties/api/v1/actoren/a7584f85-00a3-4158-80a0-d1c398272511
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"naam": "Hieronymus", "soortActor": "medewerker"}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '50'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8000/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"uuid":"70041d56-d696-4be9-bc80-c52f0b7c1b62","url":"http://localhost:8000/klantinteracties/api/v1/actoren/70041d56-d696-4be9-bc80-c52f0b7c1b62","naam":"Hieronymus","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""},"actorIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '339'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8000/klantinteracties/api/v1/actoren/70041d56-d696-4be9-bc80-c52f0b7c1b62
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"naam": "Hieronymus", "soortActor": "medewerker"}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '50'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8000/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"uuid":"da051d44-5c87-462e-8d19-8af0e2f886b7","url":"http://localhost:8000/klantinteracties/api/v1/actoren/da051d44-5c87-462e-8d19-8af0e2f886b7","naam":"Hieronymus","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""},"actorIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '339'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8000/klantinteracties/api/v1/actoren/da051d44-5c87-462e-8d19-8af0e2f886b7
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"naam": "Hieronymus", "soortActor": "medewerker"}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '50'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8000/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"uuid":"809d716d-d022-44f2-b0c9-8172ff1f3a2d","url":"http://localhost:8000/klantinteracties/api/v1/actoren/809d716d-d022-44f2-b0c9-8172ff1f3a2d","naam":"Hieronymus","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""},"actorIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '339'
+      Content-Security-Policy:
+      - frame-ancestors 'none'; default-src 'self'; base-uri 'self'; frame-src 'self';
+        style-src 'self'; object-src 'none'; img-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8000/klantinteracties/api/v1/actoren/809d716d-d022-44f2-b0c9-8172ff1f3a2d
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+version: 1

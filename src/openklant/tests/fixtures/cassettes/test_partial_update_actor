@@ -1,0 +1,407 @@
+interactions:
+- request:
+    body: '{"indicatieActief": false}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '26'
+      Content-Type:
+      - application/json
+    method: PATCH
+    uri: http://localhost:8000/klantinteracties/api/v1/betrokkenen/f81b8ec7-4b1f-4c42-b1b5-6f686e223005
+  response:
+    body:
+      string: '{"type":"http://localhost:8000/ref/fouten/NotFound/","code":"not_found","title":"Niet
+        gevonden.","status":404,"detail":"Niet gevonden.","instance":"urn:uuid:3cc5251d-b45e-4217-8ae2-57bd326b480c"}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '195'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 404
+      message: Not Found
+- request:
+    body: '{"indicatieActief": false}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '26'
+      Content-Type:
+      - application/json
+    method: PATCH
+    uri: http://localhost:8000/klantinteracties/api/v1/actoren/f81b8ec7-4b1f-4c42-b1b5-6f686e223005
+  response:
+    body:
+      string: '{"type":"http://localhost:8000/ref/fouten/ValidationError/","code":"invalid","title":"Invalid
+        input.","status":400,"detail":"","instance":"urn:uuid:22ab40ab-7930-47b9-9876-526deb62ad5a","invalidParams":[{"name":"soortActor","code":"invalid","reason":"Dit
+        veld is vereist."}]}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '275'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 400
+      message: Bad Request
+- request:
+    body: '{"soortActor": "medewerker", "indicatieActief": false}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '54'
+      Content-Type:
+      - application/json
+    method: PATCH
+    uri: http://localhost:8000/klantinteracties/api/v1/actoren/f81b8ec7-4b1f-4c42-b1b5-6f686e223005
+  response:
+    body:
+      string: '{"uuid":"f81b8ec7-4b1f-4c42-b1b5-6f686e223005","url":"http://localhost:8000/klantinteracties/api/v1/actoren/f81b8ec7-4b1f-4c42-b1b5-6f686e223005","naam":"Eric","soortActor":"medewerker","indicatieActief":false,"actoridentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""},"actorIdentificatie":{"functie":"receptioniste","emailadres":"tim@email.com","telefoonnummer":"61831724618"}}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '417'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"soortActor": "medewerker", "indicatieActief": false}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '54'
+      Content-Type:
+      - application/json
+    method: PATCH
+    uri: http://localhost:8000/klantinteracties/api/v1/actoren/f81b8ec7-4b1f-4c42-b1b5-6f686e223005
+  response:
+    body:
+      string: '{"uuid":"f81b8ec7-4b1f-4c42-b1b5-6f686e223005","url":"http://localhost:8000/klantinteracties/api/v1/actoren/f81b8ec7-4b1f-4c42-b1b5-6f686e223005","naam":"Eric","soortActor":"medewerker","indicatieActief":false,"actoridentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""},"actorIdentificatie":{"functie":"receptioniste","emailadres":"tim@email.com","telefoonnummer":"61831724618"}}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '417'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"soortActor": "medewerker", "indicatieActief": false}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '54'
+      Content-Type:
+      - application/json
+    method: PATCH
+    uri: http://localhost:8000/klantinteracties/api/v1/actoren/f81b8ec7-4b1f-4c42-b1b5-6f686e223005
+  response:
+    body:
+      string: '{"uuid":"f81b8ec7-4b1f-4c42-b1b5-6f686e223005","url":"http://localhost:8000/klantinteracties/api/v1/actoren/f81b8ec7-4b1f-4c42-b1b5-6f686e223005","naam":"Eric","soortActor":"medewerker","indicatieActief":false,"actoridentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""},"actorIdentificatie":{"functie":"receptioniste","emailadres":"tim@email.com","telefoonnummer":"61831724618"}}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '417'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"indicatieActief": false}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '26'
+      Content-Type:
+      - application/json
+    method: PATCH
+    uri: http://localhost:8000/klantinteracties/api/v1/actoren/f81b8ec7-4b1f-4c42-b1b5-6f686e223005
+  response:
+    body:
+      string: '{"type":"http://localhost:8000/ref/fouten/ValidationError/","code":"invalid","title":"Invalid
+        input.","status":400,"detail":"","instance":"urn:uuid:26e478d0-a11b-487d-9774-a86a7265f4b5","invalidParams":[{"name":"soortActor","code":"invalid","reason":"Dit
+        veld is vereist."}]}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '275'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 400
+      message: Bad Request
+- request:
+    body: '{"soortActor": "medewerker", "indicatieActief": false}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '54'
+      Content-Type:
+      - application/json
+    method: PATCH
+    uri: http://localhost:8000/klantinteracties/api/v1/actoren/f81b8ec7-4b1f-4c42-b1b5-6f686e223005
+  response:
+    body:
+      string: '{"uuid":"f81b8ec7-4b1f-4c42-b1b5-6f686e223005","url":"http://localhost:8000/klantinteracties/api/v1/actoren/f81b8ec7-4b1f-4c42-b1b5-6f686e223005","naam":"Eric","soortActor":"medewerker","indicatieActief":false,"actoridentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""},"actorIdentificatie":{"functie":"receptioniste","emailadres":"tim@email.com","telefoonnummer":"61831724618"}}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '417'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"soortActor": "medewerker", "indicatieActief": false}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '54'
+      Content-Type:
+      - application/json
+    method: PATCH
+    uri: http://localhost:8000/klantinteracties/api/v1/actoren/f81b8ec7-4b1f-4c42-b1b5-6f686e223005
+  response:
+    body:
+      string: '{"uuid":"f81b8ec7-4b1f-4c42-b1b5-6f686e223005","url":"http://localhost:8000/klantinteracties/api/v1/actoren/f81b8ec7-4b1f-4c42-b1b5-6f686e223005","naam":"Eric","soortActor":"medewerker","indicatieActief":false,"actoridentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""},"actorIdentificatie":{"functie":"receptioniste","emailadres":"tim@email.com","telefoonnummer":"61831724618"}}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '417'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"soortActor": "medewerker", "indicatieActief": false}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '54'
+      Content-Type:
+      - application/json
+    method: PATCH
+    uri: http://localhost:8000/klantinteracties/api/v1/actoren/f81b8ec7-4b1f-4c42-b1b5-6f686e223005
+  response:
+    body:
+      string: '{"uuid":"f81b8ec7-4b1f-4c42-b1b5-6f686e223005","url":"http://localhost:8000/klantinteracties/api/v1/actoren/f81b8ec7-4b1f-4c42-b1b5-6f686e223005","naam":"Eric","soortActor":"medewerker","indicatieActief":false,"actoridentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""},"actorIdentificatie":{"functie":"receptioniste","emailadres":"tim@email.com","telefoonnummer":"61831724618"}}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '417'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"soortActor": "medewerker", "indicatieActief": false}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '54'
+      Content-Type:
+      - application/json
+    method: PATCH
+    uri: http://localhost:8000/klantinteracties/api/v1/actoren/f81b8ec7-4b1f-4c42-b1b5-6f686e223005
+  response:
+    body:
+      string: '{"uuid":"f81b8ec7-4b1f-4c42-b1b5-6f686e223005","url":"http://localhost:8000/klantinteracties/api/v1/actoren/f81b8ec7-4b1f-4c42-b1b5-6f686e223005","naam":"Eric","soortActor":"medewerker","indicatieActief":false,"actoridentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""},"actorIdentificatie":{"functie":"receptioniste","emailadres":"tim@email.com","telefoonnummer":"61831724618"}}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '417'
+      Content-Security-Policy:
+      - frame-ancestors 'none'; default-src 'self'; base-uri 'self'; frame-src 'self';
+        style-src 'self'; object-src 'none'; img-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

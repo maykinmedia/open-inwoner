@@ -1,0 +1,122 @@
+interactions:
+- request:
+    body: '{}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '2'
+      Content-Type:
+      - application/json
+    method: PATCH
+    uri: http://localhost:8000/klantinteracties/api/v1/digitaleadressen/dbcf1f84-06bd-4320-b4ca-ed066f335038
+  response:
+    body:
+      string: '{"uuid":"dbcf1f84-06bd-4320-b4ca-ed066f335038","url":"http://localhost:8000/klantinteracties/api/v1/digitaleadressen/dbcf1f84-06bd-4320-b4ca-ed066f335038","verstrektDoorBetrokkene":null,"verstrektDoorPartij":null,"adres":"updated","soortDigitaalAdres":"updated","omschrijving":"updated"}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '287'
+      Content-Security-Policy:
+      - frame-ancestors 'none'; default-src 'self'; base-uri 'self'; frame-src 'self';
+        style-src 'self'; object-src 'none'; img-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '2'
+      Content-Type:
+      - application/json
+    method: PATCH
+    uri: http://localhost:8000/klantinteracties/api/v1/digitaleadressen/dbcf1f84-06bd-4320-b4ca-ed066f335038
+  response:
+    body:
+      string: '{"uuid":"dbcf1f84-06bd-4320-b4ca-ed066f335038","url":"http://localhost:8000/klantinteracties/api/v1/digitaleadressen/dbcf1f84-06bd-4320-b4ca-ed066f335038","verstrektDoorBetrokkene":null,"verstrektDoorPartij":null,"adres":"updated","soortDigitaalAdres":"updated","omschrijving":"updated"}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '287'
+      Content-Security-Policy:
+      - frame-ancestors 'none'; default-src 'self'; base-uri 'self'; frame-src 'self';
+        style-src 'self'; object-src 'none'; img-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '2'
+      Content-Type:
+      - application/json
+    method: PATCH
+    uri: http://localhost:8000/klantinteracties/api/v1/digitaleadressen/dbcf1f84-06bd-4320-b4ca-ed066f335038
+  response:
+    body:
+      string: '{"uuid":"dbcf1f84-06bd-4320-b4ca-ed066f335038","url":"http://localhost:8000/klantinteracties/api/v1/digitaleadressen/dbcf1f84-06bd-4320-b4ca-ed066f335038","verstrektDoorBetrokkene":null,"verstrektDoorPartij":null,"adres":"updated","soortDigitaalAdres":"updated","omschrijving":"updated"}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '287'
+      Content-Security-Policy:
+      - frame-ancestors 'none'; default-src 'self'; base-uri 'self'; frame-src 'self';
+        style-src 'self'; object-src 'none'; img-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

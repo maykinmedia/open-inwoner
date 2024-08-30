@@ -163,4 +163,94 @@ interactions:
     status:
       code: 201
       message: Created
+- request:
+    body: '{"soortPartij": "contactpersoon", "digitaleAdressen": null, "rekeningnummers":
+      null, "voorkeursRekeningnummer": null, "voorkeurstaal": "FOO", "indicatieActief":
+      true, "indicatieGeheimhouding": false, "voorkeursDigitaalAdres": null, "partijIdentificatie":
+      {"contactnaam": null}, "bezoekadres": {}}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '296'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8000/klantinteracties/api/v1/partijen
+  response:
+    body:
+      string: '{"type":"http://localhost:8000/ref/fouten/ValidationError/","code":"invalid","title":"Invalid
+        input.","status":400,"detail":"","instance":"urn:uuid:4123e43f-3fd5-4923-b78d-2e35c4edd491","invalidParams":[{"name":"partijIdentificatie.werkteVoorPartij","code":"required","reason":"Dit
+        veld is vereist."}]}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '302'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self'; frame-ancestors
+        'none'; base-uri 'self'; style-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 400
+      message: Bad Request
+- request:
+    body: '{"soortPartij": "contactpersoon", "digitaleAdressen": null, "rekeningnummers":
+      null, "voorkeursRekeningnummer": null, "voorkeurstaal": "FOO", "indicatieActief":
+      true, "indicatieGeheimhouding": false, "voorkeursDigitaalAdres": null, "partijIdentificatie":
+      {"contactnaam": null}, "bezoekadres": {}}'
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+      Content-Length:
+      - '296'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8000/klantinteracties/api/v1/partijen
+  response:
+    body:
+      string: '{"type":"http://localhost:8000/ref/fouten/ValidationError/","code":"invalid","title":"Invalid
+        input.","status":400,"detail":"","instance":"urn:uuid:19b55bc3-cfd7-4545-a062-1c08e69d757d","invalidParams":[{"name":"partijIdentificatie.werkteVoorPartij","code":"required","reason":"Dit
+        veld is vereist."}]}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '302'
+      Content-Security-Policy:
+      - frame-ancestors 'none'; default-src 'self'; base-uri 'self'; frame-src 'self';
+        style-src 'self'; object-src 'none'; img-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 400
+      message: Bad Request
 version: 1

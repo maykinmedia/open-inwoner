@@ -1,0 +1,222 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+    method: GET
+    uri: http://localhost:8000/klantinteracties/api/v1/actoren?page=1
+  response:
+    body:
+      string: '{"count":8,"next":null,"previous":null,"results":[{"uuid":"da051d44-5c87-462e-8d19-8af0e2f886b7","url":"http://localhost:8000/klantinteracties/api/v1/actoren/da051d44-5c87-462e-8d19-8af0e2f886b7","naam":"Hieronymus","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""},"actorIdentificatie":null},{"uuid":"70041d56-d696-4be9-bc80-c52f0b7c1b62","url":"http://localhost:8000/klantinteracties/api/v1/actoren/70041d56-d696-4be9-bc80-c52f0b7c1b62","naam":"Hieronymus","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""},"actorIdentificatie":null},{"uuid":"a7584f85-00a3-4158-80a0-d1c398272511","url":"http://localhost:8000/klantinteracties/api/v1/actoren/a7584f85-00a3-4158-80a0-d1c398272511","naam":"Hieronymus","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""},"actorIdentificatie":null},{"uuid":"17f9e39f-9903-488b-9747-22b234f4951d","url":"http://localhost:8000/klantinteracties/api/v1/actoren/17f9e39f-9903-488b-9747-22b234f4951d","naam":"Hieronymus","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""},"actorIdentificatie":null},{"uuid":"fdb32d85-0332-4b84-9b87-24c3a8ebfaed","url":"http://localhost:8000/klantinteracties/api/v1/actoren/fdb32d85-0332-4b84-9b87-24c3a8ebfaed","naam":"Hieronymus","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""},"actorIdentificatie":null},{"uuid":"4a09517b-5a96-4b22-ac76-2281166c2329","url":"http://localhost:8000/klantinteracties/api/v1/actoren/4a09517b-5a96-4b22-ac76-2281166c2329","naam":"Hieronymus","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""},"actorIdentificatie":null},{"uuid":"f81b8ec7-4b1f-4c42-b1b5-6f686e223005","url":"http://localhost:8000/klantinteracties/api/v1/actoren/f81b8ec7-4b1f-4c42-b1b5-6f686e223005","naam":"Eric","soortActor":"medewerker","indicatieActief":false,"actoridentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""},"actorIdentificatie":{"functie":"receptioniste","emailadres":"tim@email.com","telefoonnummer":"61831724618"}},{"uuid":"02d4cea3-ebf4-4826-956e-7a5ca1be85ca","url":"http://localhost:8000/klantinteracties/api/v1/actoren/02d4cea3-ebf4-4826-956e-7a5ca1be85ca","naam":"Jasmijn","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""},"actorIdentificatie":{"functie":"receptioniste","emailadres":"jasmijn@email.com","telefoonnummer":"693624816"}}]}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '2931'
+      Content-Security-Policy:
+      - frame-ancestors 'none'; default-src 'self'; base-uri 'self'; frame-src 'self';
+        style-src 'self'; object-src 'none'; img-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+    method: GET
+    uri: http://localhost:8000/klantinteracties/api/v1/actoren?page=1
+  response:
+    body:
+      string: '{"count":8,"next":null,"previous":null,"results":[{"uuid":"da051d44-5c87-462e-8d19-8af0e2f886b7","url":"http://localhost:8000/klantinteracties/api/v1/actoren/da051d44-5c87-462e-8d19-8af0e2f886b7","naam":"Hieronymus","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""},"actorIdentificatie":null},{"uuid":"70041d56-d696-4be9-bc80-c52f0b7c1b62","url":"http://localhost:8000/klantinteracties/api/v1/actoren/70041d56-d696-4be9-bc80-c52f0b7c1b62","naam":"Hieronymus","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""},"actorIdentificatie":null},{"uuid":"a7584f85-00a3-4158-80a0-d1c398272511","url":"http://localhost:8000/klantinteracties/api/v1/actoren/a7584f85-00a3-4158-80a0-d1c398272511","naam":"Hieronymus","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""},"actorIdentificatie":null},{"uuid":"17f9e39f-9903-488b-9747-22b234f4951d","url":"http://localhost:8000/klantinteracties/api/v1/actoren/17f9e39f-9903-488b-9747-22b234f4951d","naam":"Hieronymus","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""},"actorIdentificatie":null},{"uuid":"fdb32d85-0332-4b84-9b87-24c3a8ebfaed","url":"http://localhost:8000/klantinteracties/api/v1/actoren/fdb32d85-0332-4b84-9b87-24c3a8ebfaed","naam":"Hieronymus","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""},"actorIdentificatie":null},{"uuid":"4a09517b-5a96-4b22-ac76-2281166c2329","url":"http://localhost:8000/klantinteracties/api/v1/actoren/4a09517b-5a96-4b22-ac76-2281166c2329","naam":"Hieronymus","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""},"actorIdentificatie":null},{"uuid":"f81b8ec7-4b1f-4c42-b1b5-6f686e223005","url":"http://localhost:8000/klantinteracties/api/v1/actoren/f81b8ec7-4b1f-4c42-b1b5-6f686e223005","naam":"Eric","soortActor":"medewerker","indicatieActief":false,"actoridentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""},"actorIdentificatie":{"functie":"receptioniste","emailadres":"tim@email.com","telefoonnummer":"61831724618"}},{"uuid":"02d4cea3-ebf4-4826-956e-7a5ca1be85ca","url":"http://localhost:8000/klantinteracties/api/v1/actoren/02d4cea3-ebf4-4826-956e-7a5ca1be85ca","naam":"Jasmijn","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""},"actorIdentificatie":{"functie":"receptioniste","emailadres":"jasmijn@email.com","telefoonnummer":"693624816"}}]}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '2931'
+      Content-Security-Policy:
+      - frame-ancestors 'none'; default-src 'self'; base-uri 'self'; frame-src 'self';
+        style-src 'self'; object-src 'none'; img-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+    method: GET
+    uri: http://localhost:8000/klantinteracties/api/v1/digitaleadressen?page=1
+  response:
+    body:
+      string: '{"count":2,"next":null,"previous":null,"results":[{"uuid":"dbcf1f84-06bd-4320-b4ca-ed066f335038","url":"http://localhost:8000/klantinteracties/api/v1/digitaleadressen/dbcf1f84-06bd-4320-b4ca-ed066f335038","verstrektDoorBetrokkene":null,"verstrektDoorPartij":null,"adres":"test","soortDigitaalAdres":"test","omschrijving":"test","_expand":{}},{"uuid":"1300d2ab-13cb-4c12-9818-3b76e2a5d993","url":"http://localhost:8000/klantinteracties/api/v1/digitaleadressen/1300d2ab-13cb-4c12-9818-3b76e2a5d993","verstrektDoorBetrokkene":{"uuid":"d5de314b-58a4-4d02-9d66-4e68e8927a90","url":"http://localhost:8000/klantinteracties/api/v1/betrokkenen/d5de314b-58a4-4d02-9d66-4e68e8927a90"},"verstrektDoorPartij":{"uuid":"9f8e8009-2d1c-40ae-931e-c08861ba7207","url":"http://localhost:8000/klantinteracties/api/v1/partijen/9f8e8009-2d1c-40ae-931e-c08861ba7207"},"adres":"lucas@boom.nl","soortDigitaalAdres":"Email","omschrijving":"Persoonlijke
+        email adres","_expand":{}}]}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '954'
+      Content-Security-Policy:
+      - frame-ancestors 'none'; default-src 'self'; base-uri 'self'; frame-src 'self';
+        style-src 'self'; object-src 'none'; img-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+    method: GET
+    uri: http://localhost:8000/klantinteracties/api/v1/digitaleadressen?page=1
+  response:
+    body:
+      string: '{"count":2,"next":null,"previous":null,"results":[{"uuid":"dbcf1f84-06bd-4320-b4ca-ed066f335038","url":"http://localhost:8000/klantinteracties/api/v1/digitaleadressen/dbcf1f84-06bd-4320-b4ca-ed066f335038","verstrektDoorBetrokkene":null,"verstrektDoorPartij":null,"adres":"test","soortDigitaalAdres":"test","omschrijving":"test","_expand":{}},{"uuid":"1300d2ab-13cb-4c12-9818-3b76e2a5d993","url":"http://localhost:8000/klantinteracties/api/v1/digitaleadressen/1300d2ab-13cb-4c12-9818-3b76e2a5d993","verstrektDoorBetrokkene":{"uuid":"d5de314b-58a4-4d02-9d66-4e68e8927a90","url":"http://localhost:8000/klantinteracties/api/v1/betrokkenen/d5de314b-58a4-4d02-9d66-4e68e8927a90"},"verstrektDoorPartij":{"uuid":"9f8e8009-2d1c-40ae-931e-c08861ba7207","url":"http://localhost:8000/klantinteracties/api/v1/partijen/9f8e8009-2d1c-40ae-931e-c08861ba7207"},"adres":"lucas@boom.nl","soortDigitaalAdres":"Email","omschrijving":"Persoonlijke
+        email adres","_expand":{}}]}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '954'
+      Content-Security-Policy:
+      - frame-ancestors 'none'; default-src 'self'; base-uri 'self'; frame-src 'self';
+        style-src 'self'; object-src 'none'; img-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+    method: GET
+    uri: http://localhost:8000/klantinteracties/api/v1/digitaleadressen?page=1
+  response:
+    body:
+      string: '{"count":2,"next":null,"previous":null,"results":[{"uuid":"dbcf1f84-06bd-4320-b4ca-ed066f335038","url":"http://localhost:8000/klantinteracties/api/v1/digitaleadressen/dbcf1f84-06bd-4320-b4ca-ed066f335038","verstrektDoorBetrokkene":null,"verstrektDoorPartij":null,"adres":"updated","soortDigitaalAdres":"updated","omschrijving":"updated","_expand":{}},{"uuid":"1300d2ab-13cb-4c12-9818-3b76e2a5d993","url":"http://localhost:8000/klantinteracties/api/v1/digitaleadressen/1300d2ab-13cb-4c12-9818-3b76e2a5d993","verstrektDoorBetrokkene":{"uuid":"d5de314b-58a4-4d02-9d66-4e68e8927a90","url":"http://localhost:8000/klantinteracties/api/v1/betrokkenen/d5de314b-58a4-4d02-9d66-4e68e8927a90"},"verstrektDoorPartij":{"uuid":"9f8e8009-2d1c-40ae-931e-c08861ba7207","url":"http://localhost:8000/klantinteracties/api/v1/partijen/9f8e8009-2d1c-40ae-931e-c08861ba7207"},"adres":"lucas@boom.nl","soortDigitaalAdres":"Email","omschrijving":"Persoonlijke
+        email adres","_expand":{}}]}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '963'
+      Content-Security-Policy:
+      - frame-ancestors 'none'; default-src 'self'; base-uri 'self'; frame-src 'self';
+        style-src 'self'; object-src 'none'; img-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token 92abb23b30e3f2b1a15dde77312bd333137e14c1
+    method: GET
+    uri: http://localhost:8000/klantinteracties/api/v1/digitaleadressen?page=1
+  response:
+    body:
+      string: '{"count":3,"next":null,"previous":null,"results":[{"uuid":"251b39f7-e121-4066-b8ad-b3fc300e355b","url":"http://localhost:8000/klantinteracties/api/v1/digitaleadressen/251b39f7-e121-4066-b8ad-b3fc300e355b","verstrektDoorBetrokkene":null,"verstrektDoorPartij":null,"adres":"test","soortDigitaalAdres":"test","omschrijving":"test","_expand":{}},{"uuid":"dbcf1f84-06bd-4320-b4ca-ed066f335038","url":"http://localhost:8000/klantinteracties/api/v1/digitaleadressen/dbcf1f84-06bd-4320-b4ca-ed066f335038","verstrektDoorBetrokkene":null,"verstrektDoorPartij":null,"adres":"updated","soortDigitaalAdres":"updated","omschrijving":"updated","_expand":{}},{"uuid":"1300d2ab-13cb-4c12-9818-3b76e2a5d993","url":"http://localhost:8000/klantinteracties/api/v1/digitaleadressen/1300d2ab-13cb-4c12-9818-3b76e2a5d993","verstrektDoorBetrokkene":{"uuid":"d5de314b-58a4-4d02-9d66-4e68e8927a90","url":"http://localhost:8000/klantinteracties/api/v1/betrokkenen/d5de314b-58a4-4d02-9d66-4e68e8927a90"},"verstrektDoorPartij":{"uuid":"9f8e8009-2d1c-40ae-931e-c08861ba7207","url":"http://localhost:8000/klantinteracties/api/v1/partijen/9f8e8009-2d1c-40ae-931e-c08861ba7207"},"adres":"lucas@boom.nl","soortDigitaalAdres":"Email","omschrijving":"Persoonlijke
+        email adres","_expand":{}}]}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '1255'
+      Content-Security-Policy:
+      - frame-ancestors 'none'; default-src 'self'; base-uri 'self'; frame-src 'self';
+        style-src 'self'; object-src 'none'; img-src 'self'; script-src 'self'; form-action
+        'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

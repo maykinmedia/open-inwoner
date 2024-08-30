@@ -97,7 +97,7 @@ def test_create_organisatie(client):
 @the_vcr.use_cassette
 def test_create_with_bad_request_exception(client):
     with pytest.raises(BadRequest) as exc_info:
-        resp = client.partij.create_organisatie(
+        client.partij.create_organisatie(
             data={},
         )
 
