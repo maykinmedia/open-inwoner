@@ -62,7 +62,9 @@ class ProfileViewTests(WebTest):
     def setUp(self):
         self.url = reverse("profile:detail")
         self.return_url = reverse("logout")
-        self.user = UserFactory(first_name="Erik", street="MyStreet")
+        self.user = UserFactory(
+            first_name="Erik", street="MyStreet", messages_notifications=True
+        )
         self.digid_user = DigidUserFactory()
         self.eherkenning_user = eHerkenningUserFactory()
 
@@ -133,7 +135,10 @@ class ProfileViewTests(WebTest):
 
                 self.assertEqual(logout_link.attr("href"), logout_url)
 
-    def test_user_information_profile_page(self):
+    @patch(
+        "open_inwoner.cms.utils.page_display.inbox_page_is_published", return_value=True
+    )
+    def test_user_information_profile_page(self, m):
         response = self.app.get(self.url, user=self.user)
 
         self.assertContains(response, self.user.first_name)
@@ -147,6 +152,27 @@ class ProfileViewTests(WebTest):
 
         # check business profile section not displayed
         self.assertNotContains(response, "Bedrijfsgegevens")
+
+        # check notification preferences displayed
+        doc = PQ(response.content)
+
+        notifications_text = doc.find("#profile-notifications")[0].text_content()
+        self.assertIn("Mijn Berichten", notifications_text)
+
+    @patch(
+        "open_inwoner.cms.utils.page_display.inbox_page_is_published", return_value=True
+    )
+    def test_admin_disable_options(self, m):
+        config = SiteConfiguration.get_solo()
+        config.notifications_messages_enabled = False
+        config.save()
+
+        response = self.app.get(self.url, user=self.user)
+
+        doc = PQ(response.content)
+
+        notifications_text = doc.find("#profile-notifications")[0].text_content()
+        self.assertNotIn("Mijn Berichten", notifications_text)
 
     def test_get_empty_profile_page(self):
         response = self.app.get(self.url, user=self.user)
