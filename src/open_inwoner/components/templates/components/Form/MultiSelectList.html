@@ -1,0 +1,10 @@
+{% load i18n l10n form_tags %}
+
+<div class="multiselect--checkbox__select multiselectcheckbox">
+    <button id="selectButton" type="button" class="button__select" role="combobox" aria-haspopup="true" aria-expanded="false" tabindex="-1" aria-disabled="false">
+        {% trans 'Filter op status' %}:
+    </button>
+    <div id="selectMenu" class="select-content">
+        {{ contents }}
+    </div>
+</div>

@@ -9,7 +9,8 @@ import './autocomplete-search'
 import './autocomplete'
 import './autosumbit'
 import './cases'
-import { CardFilterDropdown } from './card-filter/card_filter_dropdown'
+// import { MultiSelectCheckbox } from './multi-select-checkbox/m'
+import './multi-select-checkbox'
 import { DisableContactFormButton } from './form/DisableContactFormButton'
 import { DisableSubmitButton } from './cases/document_upload'
 import './confirmation'
@@ -61,7 +62,7 @@ const elementWrappers = [
   [FileInput.selector, (elt) => new FileInput(elt)],
   [ToggleHide.selector, (elt) => new ToggleHide(elt)],
   [TabPanel.selector, (elt) => new TabPanel(elt)],
-  [CardFilterDropdown.selector, (elt) => new CardFilterDropdown(elt)],
+  // [MultiSelectCheckboxDropdown.selector, (elt) => new MultiSelectCheckboxDropdown(elt)],
   // add more when needed
 ]
 

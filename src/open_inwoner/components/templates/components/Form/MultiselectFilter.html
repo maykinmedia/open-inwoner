@@ -1,0 +1,16 @@
+{% load i18n l10n form_tags %}
+
+<div class="multiselect--checkbox__select multiselectcheckbox">
+    <button id="selectButton" type="button" class="button__select" role="combobox" aria-haspopup="true" aria-expanded="false" tabindex="-1" aria-disabled="false">
+        {% trans 'Filter op status' %}:
+    </button>
+    <div id="selectMenu" class="select-content">
+        {% for option in grouped_choices %}
+            <label tabindex="0" for="id_status_{{ forloop.counter }}">
+                <input type="checkbox" name="status" value="{{ option.status|unlocalize }}" id="id_status_{{ forloop.counter }}" {% if option.checked %}checked="checked"{% endif %}>
+                {{ option.status }} ({{ option.frequency }})
+            </label>
+        {% endfor %}
+    </div>
+</div>
+
