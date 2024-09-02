@@ -1,21 +1,14 @@
 {% load i18n l10n form_tags %}
 
 {# NOTE: HTML Select tag can NOT be used because checkboxes break the options and the select #}
-{#<div class="multiselect--checkbox__select multiselectcheckbox">#}
-{#    <button id="selectButton" class="button__select" role="combobox" aria-haspopup="true" aria-expanded="false" tabindex="-1" aria-disabled="false">#}
-{#        {% trans 'Filter op status' %}:#}
-{#    </button>#}
-{#    <div id="selectMenu" class="select-content">#}
-        {% for option in group_choices %}
-            <label tabindex="0" for="id_{{ name }}_{{ index }}_{{ forloop.counter }}">
+{#        {% for option in group_choices %}#}
+            <label class="checkbox checkbox__label" tabindex="0" for="id_{{ name }}_{{ index }}_{{ forloop.counter }}">
 
-                <input type="checkbox" name="{{ name }}"
+                <input type="checkbox" class="checkbox__input" name="{{ name }}"
                        value="{{ option.0|unlocalize }}"
                        id="id_{{ name }}_{{ index }}_{{ forloop.counter }}"
                        {% if form_id %}form="{{ form_id }}"{% endif %}
                        {% if option.0 in data or option.0|add:0 in data %}checked="checked"{% endif %}>
             {{ multiselectcheckbox_name }}
             </label>
-        {% endfor %}
-{#    </div>#}
-{#</div>#}
+{#        {% endfor %}#}

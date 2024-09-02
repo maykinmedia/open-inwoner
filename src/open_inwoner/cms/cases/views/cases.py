@@ -7,7 +7,6 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
-# from django.shortcuts import render
 
 from furl import furl
 from view_breadcrumbs import BaseBreadcrumbMixin
@@ -186,7 +185,7 @@ class InnerCaseListView(
 
         self.log_access_cases(case_dicts)
 
-        # source here?
+        # note: separate here with checked state?
         context["form"] = form or CaseFilterForm(
             status_freqs=case_service.get_case_status_frequencies(),
             status_initial=statuses,
@@ -195,26 +194,5 @@ class InnerCaseListView(
         # other data
         context["hxget"] = reverse("cases:cases_content")
         context["title_text"] = config.title_text
-
-        # multi select with checkboxes
-        def your_view(request):
-            status_freqs = {
-                "Afgehandeld": 39,
-                "Geregistreerd": 52,
-                "Nieuw": 4,
-                "In behandeling genomen": 6,
-                "Aanvraag in behandeling genomen": 1,
-                "Initial request": 1,
-                "Zaak gestart": 1,
-                "Uitgereikt": 9,
-                "Verleend": 40,
-            }
-
-            selected_statuses = request.GET.getlist('status')
-            form = CaseFilterForm(status_freqs=status_freqs, selected_statuses=selected_statuses)
-
-            return render(request, 'components/Form/MultiselectFilter.html', {'form': form})
-
-            # return render(request, 'components/Form/MultiselectFilter.html', {'form': multiselectform})
 
         return context

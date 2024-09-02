@@ -1,4 +1,6 @@
 setTimeout(() => {
+  // WORK IN PROGRESS
+  // For making a post when checking a checkbox, see: src/open_inwoner/js/components/search/index.js
   // Add views here
   const pageCases = document.querySelectorAll('view--cases-case_detail')
   if (pageCases) {
@@ -8,21 +10,21 @@ setTimeout(() => {
   if (componentCard) {
     console.log('cards are loaded')
   }
+}, 500)
 
-  // JavaScript to handle select behavior
-
+// Function to initialize the select behavior
+function initSelectBehavior() {
   const selectButton = document.getElementById('selectButton')
   const selectMenu = document.getElementById('selectMenu')
   let currentIndex = -1
 
   if (selectButton) {
-    console.log('selectbutton is here')
+    console.log('selectButton is here')
     selectButton.addEventListener('click', () => {
       selectMenu.classList.toggle('show')
     })
 
     selectButton.addEventListener('keydown', (e) => {
-      e.preventDefault()
       const items = selectMenu.querySelectorAll('label')
       if (e.key === 'ArrowDown') {
         e.preventDefault()
@@ -42,7 +44,6 @@ setTimeout(() => {
   if (selectMenu) {
     console.log('select filter menu exists')
     selectMenu.addEventListener('keydown', (e) => {
-      e.preventDefault()
       if (e.key === 'ArrowDown') {
         e.preventDefault()
         currentIndex = (currentIndex + 1) % selectMenu.children.length
@@ -59,4 +60,20 @@ setTimeout(() => {
       }
     })
   }
-}, 500)
+}
+
+// MutationObserver to wait for the filter to be available
+const observer = new MutationObserver((mutations, obs) => {
+  const selectButton = document.getElementById('selectButton')
+  const selectMenu = document.getElementById('selectMenu')
+  if (selectButton && selectMenu) {
+    initSelectBehavior()
+    obs.disconnect() // Stop observing once elements are found
+  }
+})
+
+// Start observing DOM for changes
+observer.observe(document, {
+  childList: true,
+  subtree: true,
+})

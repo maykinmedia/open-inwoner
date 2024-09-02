@@ -3,6 +3,43 @@
 
 
 {% block content %}
+    <p>Front-end static click test:</p>
+    <div class="multiselect--checkbox__select multiselectcheckbox">
+        <span>Filter op status:</span>
+        <button type="button" id="selectButton" class="button__select" role="combobox" aria-haspopup="true" aria-expanded="false" tabindex="-1" aria-disabled="false">
+            Status:
+            <span aria-hidden="true" class="material-icons ">expand_more</span>
+        </button>
+        <div id="selectMenu" class="select-content">
+            <label tabindex="0" for="id__1_1">
+                <input type="checkbox" name="" value="" id="id__1_1">
+                In behandeling
+            </label>
+            <label tabindex="0" for="id__2_2">
+                <input type="checkbox" name="Afgehandeld" value="Afgehandeld" id="id__2_2" checked="checked">
+                Afgehandeld
+            </label>
+        </div>
+    </div>
+    <p>Dynamic template w.i.p.:</p>
+    <form method="GET" id="filter-form">
+        <div class="multiselect--checkbox__select multiselectcheckbox">
+            <span>{% trans 'Filter op status' %}:</span>
+            <button type="button" id="selectButton" class="button__select" role="combobox" aria-haspopup="true" aria-expanded="false" tabindex="-1" aria-disabled="false">
+                {% trans 'Status' %}:
+                {% icon icon="expand_more" icon_position="after" icon_outlined=True %}
+            </button>
+            <div id="selectMenu" class="select-content">
+                {% for case in cases %}
+                    {% include "components/Form/MultiSelectCheckbox.html" with group_choices=case.current_status data=data multiselectcheckbox_name=case.current_status index=forloop.counter initial=field.form.initial %}
+                {% endfor %}
+            </div>
+        </div>
+
+        {# preferred use #}
+        {#            {% include "components/Form/MultiSelectFilter.html" with multiselectcheckbox_name=case.current_status index=forloop.counter initial=field.form.initial  field=form.status form_id="filter-form" only %}#}
+    </form>
+
     <div class="cases" id="cases-content"></div>
 
     <div class="loader-container" id="spinner-container">

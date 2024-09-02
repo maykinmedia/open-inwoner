@@ -490,13 +490,14 @@ def get_icon_class(key: str) -> str:
     return mapping.get(key, None)
 
 
-@register.filter
-def aggregate_status_choices(cases):
-    choices = []
-    for case in cases:
-        status = case.current_status
-        # Assuming status is a list or queryset of tuples like [(value, label), ...]
-        if status:
-            choices.extend(status)
-    # Remove duplicates if necessary, and sort if needed
-    return sorted(set(choices), key=lambda x: x[1])
+# note: different way to not get duplicates?
+# @register.filter
+# def aggregate_status_choices(cases):
+#     choices = []
+#     for case in cases:
+#         status = case.current_status
+#         # Assuming status is a list or queryset of tuples like [(value, label), ...]
+#         if status:
+#             choices.extend(status)
+#     # Remove duplicates if necessary, and sort if needed
+#     return sorted(set(choices), key=lambda x: x[1])
