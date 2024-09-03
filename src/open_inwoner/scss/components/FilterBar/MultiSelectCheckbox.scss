@@ -32,14 +32,14 @@
       background-color: var(--color-white);
       max-height: calc(5 * 40px);
       left: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
       min-width: 280px;
       top: 40px;
       width: 100%;
-      z-index: 1111111;
+      z-index: 5000;
 
       @media (min-width: 768px) {
-        overflow-x: hidden;
-        overflow-y: auto;
         width: 280px;
       }
     }

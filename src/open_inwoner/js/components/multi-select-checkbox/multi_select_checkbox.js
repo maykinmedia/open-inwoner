@@ -1,17 +1,3 @@
-setTimeout(() => {
-  // WORK IN PROGRESS
-  // For making a post when checking a checkbox, see: src/open_inwoner/js/components/search/index.js
-  // Add views here
-  const pageCases = document.querySelectorAll('view--cases-case_detail')
-  if (pageCases) {
-    console.log('pagecases is loaded')
-  }
-  const componentCard = document.querySelectorAll('card')
-  if (componentCard) {
-    console.log('cards are loaded')
-  }
-}, 500)
-
 // Function to initialize the select behavior
 function initSelectBehavior() {
   const selectButton = document.getElementById('selectButton')
@@ -62,7 +48,7 @@ function initSelectBehavior() {
   }
 }
 
-// MutationObserver to wait for the filter to be available
+// MutationObserver to wait for the multiselect filter to be available
 const observer = new MutationObserver((mutations, obs) => {
   const selectButton = document.getElementById('selectButton')
   const selectMenu = document.getElementById('selectMenu')

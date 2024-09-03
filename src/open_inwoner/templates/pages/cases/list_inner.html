@@ -3,8 +3,7 @@
 <h1 class="utrecht-heading-1" id="cases">{{ page_title }} ({{ paginator.count }})</h1>
 <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-title-text">{{ title_text }}</p>
 
-
-<div class="multiselect--checkbox__select multiselectcheckbox">
+<div class="filter-bar multiselect--checkbox__select multiselectcheckbox" hx-get="{{ hxget }}" hx-trigger="load" hx-target="#cases-content">
     <form class="form filter-bar__form" method="GET" id="filter-form" novalidate>
         <span>{% trans 'Filter op' %}:</span>
         {% include "components/FilterBar/MultiSelectFilter.html" with statusfrequencies=status_freqs %}
