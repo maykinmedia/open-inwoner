@@ -282,7 +282,9 @@
     "model": "admin_index.appgroup",
     "fields": {
         "order": 5,
-        "translations": {},
+        "translations": {
+            "nl": "Data koppelingen"
+        },
         "name": "Data koppelingen",
         "slug": "koppelingen",
         "models": [

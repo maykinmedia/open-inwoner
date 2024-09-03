@@ -2,9 +2,9 @@ import re
 
 import jwt
 from jwt import InvalidTokenError
-from notifications_api_common.models import Subscription
 from zds_client.auth import JWT_ALG
 
+from notifications.models import Subscription
 from open_inwoner.openzaak.exceptions import (
     InvalidAuth,
     InvalidAuthForClientID,
