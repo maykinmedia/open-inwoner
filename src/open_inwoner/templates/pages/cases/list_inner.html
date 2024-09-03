@@ -5,14 +5,13 @@
 
 
 <div class="multiselect--checkbox__select multiselectcheckbox">
-    <form method="GET" id="filter-form">
+    <form class="form filter-bar__form" method="GET" id="filter-form" novalidate>
+        <span>{% trans 'Filter op' %}:</span>
         {% include "components/FilterBar/MultiSelectFilter.html" with statusfrequencies=status_freqs %}
     </form>
 </div>
 
-
 <div class="card__grid">
-
 {% render_grid %}
     {% if not cases %}
         <b>{% trans "U heeft op dit moment nog geen lopende aanvragen." %}</b>
