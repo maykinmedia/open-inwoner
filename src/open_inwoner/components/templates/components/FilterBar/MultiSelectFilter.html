@@ -6,16 +6,19 @@
         {% icon icon="expand_more" icon_position="after" icon_outlined=True %}
     </button>
     <div id="selectMenu" class="select-content">
-        {% for option in statusfrequencies %}
-            <label tabindex="0" for="id_status_{{ forloop.counter }}">
-                <input type="checkbox" name="status" value="{{ option.0 }}" id="id_status_{{ forloop.counter }}" {% if option.checked %}checked="checked"{% endif %}>
-                {{ option.0 }} <span class="frequencyCounter">({{ option.1 }})</span>
-            </label>
-        {% endfor %}
-    </div>
-    <div class="form__actions form__actions--fullwidth">
+        <div class="overflow">
+            {% for option in statusfrequencies %}
+                <label tabindex="0" for="id_status_{{ forloop.counter }}">
+                    <input type="checkbox" name="status" value="{{ option.0 }}" id="id_status_{{ forloop.counter }}" {% if option.checked %}checked="checked"{% endif %}>
+                    {{ option.0 }} <span class="frequencyCounter">({{ option.1 }})</span>
+                </label>
+            {% endfor %}
+        </div>
+        {# Submit button only appears on select #}
+        <div class="form__actions form__actions--fullwidth">
             <button class="button button--primary" type="submit" value="" title="{% trans 'Toon resultaten' %}" aria-label="{% trans 'Toon resultaten' %}" id="filter_cases">
                 {% trans 'Toon' %} <span id="frequencySum"></span> {% trans 'resultaten' %}
             </button>
         </div>
+    </div>
 </div>

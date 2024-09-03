@@ -30,10 +30,8 @@
       display: none;
       position: absolute;
       background-color: var(--color-white);
-      max-height: calc(5 * 40px);
+      max-height: calc(6 * 40px);
       left: 0;
-      overflow-x: hidden;
-      overflow-y: auto;
       min-width: 280px;
       top: 40px;
       width: 100%;
@@ -41,6 +39,12 @@
 
       @media (min-width: 768px) {
         width: 280px;
+      }
+
+      .overflow {
+        max-height: calc(6 * 40px);
+        overflow-x: hidden;
+        overflow-y: auto;
       }
     }
 
