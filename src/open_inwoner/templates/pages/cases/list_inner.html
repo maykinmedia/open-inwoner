@@ -3,7 +3,16 @@
 <h1 class="utrecht-heading-1" id="cases">{{ page_title }} ({{ paginator.count }})</h1>
 <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-title-text">{{ title_text }}</p>
 
+
+<div class="multiselect--checkbox__select multiselectcheckbox">
+    <form method="GET" id="filter-form">
+        {% include "components/FilterBar/MultiSelectFilter.html" with statusfrequencies=status_freqs %}
+    </form>
+</div>
+
+
 <div class="card__grid">
+
 {% render_grid %}
     {% if not cases %}
         <b>{% trans "U heeft op dit moment nog geen lopende aanvragen." %}</b>

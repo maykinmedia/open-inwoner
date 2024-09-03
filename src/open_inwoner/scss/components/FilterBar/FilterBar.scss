@@ -1,0 +1,16 @@
+.multiselect--checkbox {
+  &__select {
+    width: 100%;
+    background-color: var(--color-gray-lightest);
+    padding: var(--spacing-large) var(--spacing-tiny);
+
+    @media (min-width: 768px) {
+      padding: var(--spacing-large);
+    }
+
+    &.multiselectcheckbox {
+      position: relative;
+      display: inline-block;
+    }
+  }
+}

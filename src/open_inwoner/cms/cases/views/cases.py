@@ -185,11 +185,16 @@ class InnerCaseListView(
 
         self.log_access_cases(case_dicts)
 
-        # note: separate here with checked state?
         context["form"] = form or CaseFilterForm(
             status_freqs=case_service.get_case_status_frequencies(),
             status_initial=statuses,
         )
+
+        # Separate frequency data from statusname
+        context["status_freqs"] = [
+            (status, frequency)
+            for status, frequency in case_service.get_case_status_frequencies().items()
+        ]
 
         # other data
         context["hxget"] = reverse("cases:cases_content")
