@@ -1,0 +1,119 @@
+interactions:
+- request:
+    body: '{"digitaleAdressen": null, "voorkeursDigitaalAdres": null, "rekeningnummers":
+      null, "voorkeursRekeningnummer": null, "indicatieGeheimhouding": false, "indicatieActief":
+      true, "voorkeurstaal": "crp", "soortPartij": "persoon", "partijIdentificatie":
+      {"contactnaam": {"voorletters": "Dr.", "voornaam": "Test Persoon", "voorvoegselAchternaam":
+      "Mrs.", "achternaam": "Gamble"}}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '373'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/partijen
+  response:
+    body:
+      string: '{"uuid":"7782a309-a3cb-48ac-a1f4-80faea457811","url":"http://localhost:8338/klantinteracties/api/v1/partijen/7782a309-a3cb-48ac-a1f4-80faea457811","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"crp","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Dr.","voornaam":"Test
+        Persoon","voorvoegselAchternaam":"Mrs.","achternaam":"Gamble"},"volledigeNaam":"Test
+        Persoon Mrs. Gamble"}}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '877'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/partijen/7782a309-a3cb-48ac-a1f4-80faea457811
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"identificeerdePartij": {"uuid": "7782a309-a3cb-48ac-a1f4-80faea457811"},
+      "partijIdentificator": {"codeObjecttype": "PERSOON", "codeSoortObjectId": "BSN",
+      "objectId": "123456789", "codeRegister": "BRP"}, "anderePartijIdentificator":
+      "optional_identifier_123"}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '260'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/partij-identificatoren
+  response:
+    body:
+      string: '{"uuid":"db60dfe6-217c-4040-a462-b603b1c9bf36","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/db60dfe6-217c-4040-a462-b603b1c9bf36","identificeerdePartij":{"uuid":"7782a309-a3cb-48ac-a1f4-80faea457811","url":"http://localhost:8338/klantinteracties/api/v1/partijen/7782a309-a3cb-48ac-a1f4-80faea457811"},"anderePartijIdentificator":"optional_identifier_123","partijIdentificator":{"codeObjecttype":"PERSOON","codeSoortObjectId":"BSN","objectId":"123456789","codeRegister":"BRP"}}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '507'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/db60dfe6-217c-4040-a462-b603b1c9bf36
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+    method: GET
+    uri: http://localhost:8338/klantinteracties/api/v1/partij-identificatoren
+  response:
+    body:
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"db60dfe6-217c-4040-a462-b603b1c9bf36","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/db60dfe6-217c-4040-a462-b603b1c9bf36","identificeerdePartij":{"uuid":"7782a309-a3cb-48ac-a1f4-80faea457811","url":"http://localhost:8338/klantinteracties/api/v1/partijen/7782a309-a3cb-48ac-a1f4-80faea457811"},"anderePartijIdentificator":"optional_identifier_123","partijIdentificator":{"codeObjecttype":"PERSOON","codeSoortObjectId":"BSN","objectId":"123456789","codeRegister":"BRP"}}]}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '559'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

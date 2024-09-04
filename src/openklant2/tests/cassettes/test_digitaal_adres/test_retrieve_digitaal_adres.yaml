@@ -1,0 +1,119 @@
+interactions:
+- request:
+    body: '{"digitaleAdressen": null, "voorkeursDigitaalAdres": null, "rekeningnummers":
+      null, "voorkeursRekeningnummer": null, "indicatieGeheimhouding": false, "indicatieActief":
+      true, "voorkeurstaal": "nbl", "soortPartij": "persoon", "partijIdentificatie":
+      {"contactnaam": {"voorletters": "Mrs.", "voornaam": "Amy", "voorvoegselAchternaam":
+      "Ms.", "achternaam": "Carr"}}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '362'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/partijen
+  response:
+    body:
+      string: '{"uuid":"fed3a630-ac73-4ee0-9766-a8da217adc66","url":"http://localhost:8338/klantinteracties/api/v1/partijen/fed3a630-ac73-4ee0-9766-a8da217adc66","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"nbl","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Mrs.","voornaam":"Amy","voorvoegselAchternaam":"Ms.","achternaam":"Carr"},"volledigeNaam":"Amy
+        Ms. Carr"}}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '854'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/partijen/fed3a630-ac73-4ee0-9766-a8da217adc66
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"adres": "501 Acosta Place Suite 226\nAnnafurt, GA 19642", "omschrijving":
+      "treat", "soortDigitaalAdres": "occur", "verstrektDoorBetrokkene": null, "verstrektDoorPartij":
+      {"uuid": "fed3a630-ac73-4ee0-9766-a8da217adc66"}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '221'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/digitaleadressen
+  response:
+    body:
+      string: '{"uuid":"894299a7-bbe9-421f-a2e9-ed9c06be5e8e","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/894299a7-bbe9-421f-a2e9-ed9c06be5e8e","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"fed3a630-ac73-4ee0-9766-a8da217adc66","url":"http://localhost:8338/klantinteracties/api/v1/partijen/fed3a630-ac73-4ee0-9766-a8da217adc66"},"adres":"501
+        Acosta Place Suite 226\nAnnafurt, GA 19642","soortDigitaalAdres":"occur","omschrijving":"treat"}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '465'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/digitaleadressen/894299a7-bbe9-421f-a2e9-ed9c06be5e8e
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+    method: GET
+    uri: http://localhost:8338/klantinteracties/api/v1/digitaleadressen/894299a7-bbe9-421f-a2e9-ed9c06be5e8e
+  response:
+    body:
+      string: '{"uuid":"894299a7-bbe9-421f-a2e9-ed9c06be5e8e","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/894299a7-bbe9-421f-a2e9-ed9c06be5e8e","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"fed3a630-ac73-4ee0-9766-a8da217adc66","url":"http://localhost:8338/klantinteracties/api/v1/partijen/fed3a630-ac73-4ee0-9766-a8da217adc66"},"adres":"501
+        Acosta Place Suite 226\nAnnafurt, GA 19642","soortDigitaalAdres":"occur","omschrijving":"treat"}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '465'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

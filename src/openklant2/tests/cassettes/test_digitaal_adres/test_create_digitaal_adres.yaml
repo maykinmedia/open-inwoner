@@ -1,0 +1,85 @@
+interactions:
+- request:
+    body: '{"digitaleAdressen": null, "voorkeursDigitaalAdres": null, "rekeningnummers":
+      null, "voorkeursRekeningnummer": null, "indicatieGeheimhouding": false, "indicatieActief":
+      false, "voorkeurstaal": "lam", "soortPartij": "persoon", "partijIdentificatie":
+      {"contactnaam": {"voorletters": "Ms.", "voornaam": "Amanda", "voorvoegselAchternaam":
+      "Mr.", "achternaam": "Thompson"}}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '369'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/partijen
+  response:
+    body:
+      string: '{"uuid":"d25fe744-1d32-4854-a644-d916bb89e7ca","url":"http://localhost:8338/klantinteracties/api/v1/partijen/d25fe744-1d32-4854-a644-d916bb89e7ca","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"lam","indicatieActief":false,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Ms.","voornaam":"Amanda","voorvoegselAchternaam":"Mr.","achternaam":"Thompson"},"volledigeNaam":"Amanda
+        Mr. Thompson"}}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '868'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/partijen/d25fe744-1d32-4854-a644-d916bb89e7ca
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"verstrektDoorBetrokkene": null, "verstrektDoorPartij": {"uuid": "d25fe744-1d32-4854-a644-d916bb89e7ca"},
+      "adres": "foo@bar.com", "omschrijving": "professional", "soortDigitaalAdres":
+      "email"}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '193'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/digitaleadressen
+  response:
+    body:
+      string: '{"uuid":"b79b550d-6dee-4340-aee7-3a61d73fc170","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/b79b550d-6dee-4340-aee7-3a61d73fc170","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"d25fe744-1d32-4854-a644-d916bb89e7ca","url":"http://localhost:8338/klantinteracties/api/v1/partijen/d25fe744-1d32-4854-a644-d916bb89e7ca"},"adres":"foo@bar.com","soortDigitaalAdres":"email","omschrijving":"professional"}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '437'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/digitaleadressen/b79b550d-6dee-4340-aee7-3a61d73fc170
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+version: 1

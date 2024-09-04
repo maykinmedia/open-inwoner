@@ -1,0 +1,45 @@
+interactions:
+- request:
+    body: '{}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '2'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/partijen
+  response:
+    body:
+      string: '{"type":"http://localhost:8338/ref/fouten/ValidationError/","code":"invalid","title":"Invalid
+        input.","status":400,"detail":"","instance":"urn:uuid:3dd5b8ca-9d3e-410d-8cdb-b2986117ce62","invalidParams":[{"name":"digitaleAdressen","code":"required","reason":"Dit
+        veld is vereist."},{"name":"voorkeursDigitaalAdres","code":"required","reason":"Dit
+        veld is vereist."},{"name":"rekeningnummers","code":"required","reason":"Dit
+        veld is vereist."},{"name":"voorkeursRekeningnummer","code":"required","reason":"Dit
+        veld is vereist."},{"name":"soortPartij","code":"required","reason":"Dit veld
+        is vereist."},{"name":"indicatieActief","code":"required","reason":"Dit veld
+        is vereist."}]}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '678'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 400
+      message: Bad Request
+version: 1
