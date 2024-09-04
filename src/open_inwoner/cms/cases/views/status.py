@@ -1009,10 +1009,9 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
             "tekst": question,
             "type": config.register_type,
             "kanaal": "contactformulier",
-            "medewerkerIdentificatie": {
-                "identificatie": config.register_employee_id,
-            },
         }
+        if employee_id := config.register_employee_id:
+            data["medewerkerIdentificatie"] = {"identificatie": employee_id}
         if ztc and ztc.contact_subject_code:
             data["onderwerp"] = ztc.contact_subject_code
 
