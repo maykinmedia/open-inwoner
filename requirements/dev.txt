@@ -735,6 +735,7 @@ idna==3.7
     #   -r requirements/ci.txt
     #   email-validator
     #   requests
+    #   yarl
 imagesize==1.4.1
     # via
     #   -c requirements/ci.txt
@@ -855,6 +856,11 @@ mozilla-django-oidc-db==0.14.1
     #   -r requirements/ci.txt
 msgpack==1.0.7
     # via locust
+multidict==6.0.5
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   yarl
 mypy-extensions==1.0.0
     # via
     #   -c requirements/ci.txt
@@ -1032,6 +1038,12 @@ pytest==8.1.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   pytest-recording
+pytest-recording==0.13.2
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   -r requirements/dev.in
 python-crontab==3.0.0
     # via
     #   -c requirements/ci.txt
@@ -1075,6 +1087,7 @@ pyyaml==6.0
     #   drf-spectacular
     #   gemma-zds-client
     #   tablib
+    #   vcrpy
     #   zgw-consumers-oas
 pyzmq==25.1.2
     # via locust
@@ -1286,6 +1299,12 @@ uwsgi==2.0.23
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+vcrpy==6.0.1
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   -r requirements/dev.in
+    #   pytest-recording
 vine==5.1.0
     # via
     #   -c requirements/ci.txt
@@ -1341,6 +1360,7 @@ wrapt==1.14.1
     #   -r requirements/ci.txt
     #   astroid
     #   elastic-apm
+    #   vcrpy
 xlrd==2.0.1
     # via
     #   -c requirements/ci.txt
@@ -1360,6 +1380,11 @@ xsdata==23.8
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+yarl==1.9.8
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   vcrpy
 zgw-consumers==0.35.1
     # via
     #   -c requirements/ci.txt

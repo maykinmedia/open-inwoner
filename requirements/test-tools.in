@@ -24,3 +24,7 @@ pyopenssl
 
 # Debug and Docs
 django-extensions
+
+# VCR
+pytest-recording
+vcrpy

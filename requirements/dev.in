@@ -12,3 +12,7 @@ django-debug-toolbar
 # performance testing / profiling
 locust
 django-silk
+
+# VCR
+pytest-recording
+vcrpy
