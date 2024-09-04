@@ -79,11 +79,14 @@ jobs:
           SECRET_KEY: dummy
           DB_USER: postgres
           DB_PASSWORD: ''
+
       - name: Persist coverage data files
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.test-type }}
           path: .coverage*
+          include-hidden-files: true
+          if-no-files-found: error
 
   upload_coverage:
     needs: tests
