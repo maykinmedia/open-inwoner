@@ -54,4 +54,8 @@
     padding-top: var(--spacing-large);
     padding-bottom: var(--spacing-giant);
   }
+
+  &.cases__spinner--hide {
+    display: none;
+  }
 }

@@ -1,3 +1,9 @@
+/**
+ * When HTMX replaces parts of the DOM with new content, the JavaScript attached to the old DOM does not apply to the new content unless you explicitly reapply it.
+ * To fix this, listen for HTMX events that are triggered after new content is swapped into the DOM.
+ * Use HTMX's htmx:afterSettle (or htmx:afterSwap) events, which fire after the new content has been swapped into the DOM.
+ */
+
 // Function to initialize the select behavior
 function initSelectBehavior() {
   const selectButton = document.getElementById('selectButton')
@@ -5,7 +11,6 @@ function initSelectBehavior() {
   let currentIndex = -1
 
   if (selectButton) {
-    console.log('selectButton is here')
     selectButton.addEventListener('click', () => {
       selectMenu.classList.toggle('show')
     })
@@ -28,7 +33,6 @@ function initSelectBehavior() {
   }
 
   if (selectMenu) {
-    console.log('select filter menu exists')
     selectMenu.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowDown') {
         e.preventDefault()
@@ -48,20 +52,18 @@ function initSelectBehavior() {
   }
 }
 
-// MutationObserver to wait for the multiselect filter to be available
-const observer = new MutationObserver((mutations, obs) => {
-  // const selectButton = document.getElementById('selectButton')
+// Listen for the htmx:afterSwap event to initialize the multiselect behavior when content is swapped
+document.body.addEventListener('htmx:afterSwap', function () {
+  // Check if the target of the swap contains the multi-select filter
   const selectMenu = document.getElementById('selectMenu')
   const dataMultiSelectLabel = document.querySelectorAll('.checkbox__label')
+
   if (selectMenu && dataMultiSelectLabel) {
-    console.log('OBSERVER: multi select is present')
-    initSelectBehavior()
-    obs.disconnect() // Stop observing once elements are found
+    initSelectBehavior() // Initialize mutliselect for paginated cases
   }
 })
 
-// Start observing DOM for changes
-observer.observe(document, {
-  childList: true,
-  subtree: true,
+// Also run on initial page load to initialize the select behavior
+document.addEventListener('DOMContentLoaded', function () {
+  initSelectBehavior()
 })
