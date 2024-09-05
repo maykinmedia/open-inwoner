@@ -45,25 +45,3 @@
     content: '\e876';
   }
 }
-
-.radios {
-  &--spaced {
-    display: flex;
-    justify-content: space-evenly;
-  }
-}
-
-.radio-group {
-  padding: var(--spacing-large);
-
-  &--stacked {
-    display: inline-block;
-    text-align: center;
-  }
-  .radio__label {
-    display: block;
-  }
-  .radio__input {
-    display: inline-block;
-  }
-}

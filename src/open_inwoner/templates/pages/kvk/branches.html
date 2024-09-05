@@ -5,7 +5,7 @@
     {% render_grid %}
         {% render_column start=4 span=6 %}
             <h1 class="utrecht-heading-1" id="title">{% trans "Log in" %}</h1>
-            <form method="POST" id="eherkenning-branch-form" class="form">
+            <form method="POST" id="eherkenning-branch-form" class="form  form__choice-list">
                 {% csrf_token %}
                 {% if form.branch_number.errors %}
                     {% errors errors=form.branch_number.errors %}

@@ -285,6 +285,13 @@
     cursor: default;
     pointer-events: none;
   }
+
+  &__choice-list {
+    @media (max-width: 767px) {
+      gap: var(--spacing-large);
+      max-width: var(--form-width);
+    }
+  }
 }
 
 /// Specific forms
