@@ -16,6 +16,8 @@
     {% if field.help_text %}<p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--small utrecht-paragraph--oip-centered">{{ field.help_text }}</p>{% endif %}
     {% if field.errors %}{% errors errors=field.errors %}{% endif %}
 
+    {% form_actions primary_text=_("Upload documenten") enctype="multipart/form-data" fullwidth=True %}
+
     <div class="file-list" aria-live="polite">
         <div class="file-list-selection" hidden><h4 class="utrecht-heading-3 file-list-selection__heading">{% if multiple %}{% trans 'Geselecteerde bestanden' %}{% else %}{% trans 'Geselecteerd bestand' %}{% endif %}</h4></div>
         <ul class="file-list__list" aria-live="polite" data-label-delete="{% trans 'Verwijderen' %}"></ul>

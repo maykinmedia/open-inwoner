@@ -5,7 +5,7 @@
       max-width: var(--form-width);
     }
 
-    [class*='icon'] {
+    [class*='icons'] {
       right: 10px;
     }
   }
@@ -25,7 +25,7 @@
     .modal__container {
       padding: var(--spacing-giant);
 
-      [class*='icon'] {
+      [class*='icons'] {
         font-size: var(--font-size-body-large);
       }
 

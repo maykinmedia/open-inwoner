@@ -25,8 +25,8 @@
     text-align: right;
   }
 
-  *[class*='icon'],
-  *[class*='Icon'] {
+  *[class*='icons'],
+  *[class*='Icons'] {
     font-size: 24px;
     width: 24px;
   }
@@ -66,8 +66,8 @@
       text-decoration: underline;
     }
 
-    *[class*='icon'],
-    *[class*='Icon'] {
+    *[class*='icons'],
+    *[class*='Icons'] {
       text-decoration: none;
     }
   }
@@ -83,14 +83,14 @@
       text-decoration: none;
     }
 
-    *[class*='icon'] {
+    *[class*='icons'] {
       color: var(--color-gray-90);
       font-size: 50px;
     }
   }
 
-  *[class*='icon']:first-child,
-  *[class*='Icon']:first-child {
+  *[class*='icons']:first-child,
+  *[class*='Icons']:first-child {
     transform: scale(1);
   }
 
