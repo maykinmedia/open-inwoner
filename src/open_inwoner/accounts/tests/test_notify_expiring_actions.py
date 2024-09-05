@@ -4,6 +4,7 @@ from django.core import mail
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
+from open_inwoner.accounts.choices import StatusChoices
 from open_inwoner.accounts.tests.factories import ActionFactory, UserFactory
 from open_inwoner.configurations.models import SiteConfiguration
 
@@ -65,6 +66,13 @@ class ExpiringActionsNotificationTest(TestCase):
 
     def test_no_email_about_action_already_expired(self):
         ActionFactory(end_date=date.today() - timedelta(days=1))
+
+        schedule_user_notifications.delay(notify_about="actions", channel="email")
+
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_no_email_about_closed_action(self):
+        ActionFactory(end_date=date.today(), status=StatusChoices.closed)
 
         schedule_user_notifications.delay(notify_about="actions", channel="email")
 
