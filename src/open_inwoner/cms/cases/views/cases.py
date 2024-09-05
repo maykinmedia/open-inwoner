@@ -194,6 +194,12 @@ class InnerCaseListView(
                 status_initial=statuses,
             )
 
+        # Separate frequency data from statusname
+        context["status_freqs"] = [
+            (status, frequency)
+            for status, frequency in case_service.get_case_status_frequencies().items()
+        ]
+
         # other data
         context["hxget"] = reverse("cases:cases_content")
         context["title_text"] = config.title_text

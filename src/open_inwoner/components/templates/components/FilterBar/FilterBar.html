@@ -1,0 +1,10 @@
+{% load i18n form_tags %}
+
+{# Wrapper for multiple filters #}
+<div class="filter-bar multiselect--checkbox__select multiselectcheckbox">
+    <form class="form" method="{{ method }}" {% if no_action %}action=""{% else %}action="{% firstof form_action request.path %}"{% endif %}
+          {% if id %}id="{{ id }}"{% endif %}>
+        {# Note: each element is a flex column #}
+        {{ contents }}
+    </form>
+</div>

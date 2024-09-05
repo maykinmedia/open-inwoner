@@ -1,0 +1,26 @@
+.filter-bar {
+  &.multiselect--checkbox {
+    &__select {
+      width: 100%;
+      background-color: var(--color-gray-lightest);
+      margin-bottom: var(--spacing-extra-large);
+      padding: var(--spacing-large) var(--spacing-tiny);
+
+      @media (min-width: 768px) {
+        padding: var(--spacing-large);
+      }
+
+      &.multiselectcheckbox {
+        position: relative;
+        display: inline-block;
+
+        .filter-bar__form {
+          margin: 0;
+          padding: 0;
+          display: flex;
+          flex-direction: row;
+        }
+      }
+    }
+  }
+}

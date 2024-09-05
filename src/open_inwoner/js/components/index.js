@@ -17,6 +17,8 @@ import { CookieBanner } from './cookie-consent'
 import './datepicker'
 import { Dropdown } from './dropdown'
 import './emoji-button'
+// import { MultiSelectCheckbox } from './FilterBar/multi_select_checkbox'
+import './FilterBar/multi_select_checkbox'
 import './form'
 import './header'
 import './map'
@@ -60,6 +62,7 @@ const elementWrappers = [
   [FileInput.selector, (elt) => new FileInput(elt)],
   [ToggleHide.selector, (elt) => new ToggleHide(elt)],
   [TabPanel.selector, (elt) => new TabPanel(elt)],
+  // [MultiSelectCheckboxDropdown.selector, (elt) => new MultiSelectCheckboxDropdown(elt)],
   // add more when needed
 ]
 

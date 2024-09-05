@@ -1,0 +1,26 @@
+{% load i18n l10n form_tags icon_tags %}
+
+<div class="filter-bar__multiselect">
+    <button id="selectButton" type="button" class="button button__select" role="combobox" aria-haspopup="true" aria-expanded="false" aria-disabled="false">
+        {% trans 'Status' %}:
+        {% icon icon="expand_more" icon_position="after" icon_outlined=True %}
+    </button>
+    <div id="selectMenu" class="select-content">
+        <div class="filter-bar__scroll">
+            {% for option in statusfrequencies %}
+                <div class="checkbox">
+                    <input type="checkbox" name="status_{{ forloop.counter }}" value="{{ option.0 }}" id="id_status_{{ forloop.counter }}" {% if option.checked %}checked="checked"{% endif %} class="checkbox__input">
+                    <label class="checkbox__label" for="id_status_{{ forloop.counter }}">
+                        {{ option.0 }} <span class="frequencyCounter">({{ option.1 }})</span>
+                    </label>
+                </div>
+            {% endfor %}
+        </div>
+        {# Submit button only appears on select #}
+        <div class="form__actions form__actions--fullwidth">
+            <button class="button button--primary" type="submit" value="" title="{% trans 'Toon resultaten' %}" aria-label="{% trans 'Toon resultaten' %}" id="filter_cases">
+                {% trans 'Toon' %} <span id="frequencySum"></span> {% trans 'resultaten' %}
+            </button>
+        </div>
+    </div>
+</div>
