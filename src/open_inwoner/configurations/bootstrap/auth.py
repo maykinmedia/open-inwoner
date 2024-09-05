@@ -26,7 +26,7 @@ from digid_eherkenning_oidc_generics.models import (
 )
 from open_inwoner.configurations.models import SiteConfiguration
 
-from .utils import convert_setting_to_model_field_name
+from .utils import convert_setting_to_model_field_name, log_form_errors
 
 
 #
@@ -298,10 +298,10 @@ class AdminOIDCConfigurationStep(BaseConfigurationStep):
         # Use the admin form to apply validation and fetch URLs from the discovery endpoint
         form = OpenIDConnectConfigForm(data=form_data)
         if not form.is_valid():
+            log_form_errors(self, form)
             raise ConfigurationRunFailed(
                 f"Something went wrong while saving configuration: {form.errors}"
             )
-
         form.save()
 
     def test_configuration(self):

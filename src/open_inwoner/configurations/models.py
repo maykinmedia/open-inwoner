@@ -37,10 +37,12 @@ class SiteConfiguration(SingletonModel):
     )
     secondary_color = ColorField(
         verbose_name=_("Secondary color"),
+        default="#0000FF",
         help_text=_("The secondary color of the municipality's site"),
     )
     accent_color = ColorField(
         verbose_name=_("Accent color"),
+        default="#FF0000",
         help_text=_("The accent color of the municipality's site"),
     )
     primary_font_color = models.CharField(
@@ -278,6 +280,8 @@ class SiteConfiguration(SingletonModel):
         FlatPage,
         verbose_name=_("Flatpages"),
         through="SiteConfigurationPage",
+        null=True,
+        blank=True,
         related_name="configurations",
     )
     home_help_text = models.TextField(
