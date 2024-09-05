@@ -16,7 +16,8 @@ def get_or_create_klant_from_request(request):
     if not (client := build_klanten_client()):
         return
 
-    fetch_params = get_fetch_parameters(request)
+    if (fetch_params := get_fetch_parameters(request)) is None:
+        return
 
     if klant := client.retrieve_klant(**fetch_params):
         msg = "retrieved klant for user"
