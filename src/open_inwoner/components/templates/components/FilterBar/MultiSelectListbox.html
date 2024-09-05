@@ -1,7 +1,7 @@
-{% load i18n l10n form_tags icon_tags %}
+{% load i18n l10n form_tags icon_tags button_tags %}
 
 <div class="filter-bar__multiselect-listbox multiselect-listbox">
-    <button id="selectButton" type="button" class="button button__select" aria-haspopup="listbox" aria-expanded="false">
+    <button id="selectButton" type="button" class="button button__select" aria-haspopup="listbox" aria-expanded="false" aria-live="polite">
         {% trans 'Status' %}:
         {% icon icon="expand_more" icon_position="after" icon_outlined=True %}
     </button>
@@ -11,16 +11,19 @@
                 <div class="checkbox" role="option">
                     <input type="checkbox" name="status" value="{{ status }}" id="id_status_{{ forloop.counter }}" class="checkbox__input">
                     <label class="checkbox__label" for="id_status_{{ forloop.counter }}">
-                        {{ status }} <span class="frequencyCounter">({{ frequency }})</span>
+                        <span class="ellipsis">{{ status }} </span><span class="frequency-counter">({{ frequency }})</span>
                     </label>
                 </div>
             {% endfor %}
         </div>
         {# Submit button appears on select #}
         <div class="form__actions form__actions--fullwidth" id="filterFormActions">
-            <button class="button button--primary hide" type="submit" value="" title="{% trans 'Toon resultaten' %}" aria-label="{% trans 'Toon resultaten' %}" id="filterCases">
-                {% trans 'Toon' %}<span class="filter-bar__frequency-sum" id="frequencySum">0</span>{% trans 'resultaten' %}
+            <button class="button button--primary hide" type="submit" title="{% trans 'Toon resultaten' %}" aria-label="{% trans 'Toon resultaten' %}" id="filterCases">
+                {% trans 'Toon' %}<span class="filter-bar__frequency-sum" id="frequencySum">0</span><span id="resultText">{% trans 'resultaten' %}</span>
             </button>
         </div>
+    </div>
+    <div class="form__actions form__actions--fullwidth form__actions--reset">
+        {% button bordered=False text=_("Wis alle filters") id="resetFilters" type="button" transparent=True primary=True %}
     </div>
 </div>
