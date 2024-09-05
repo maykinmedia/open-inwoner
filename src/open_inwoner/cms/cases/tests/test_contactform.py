@@ -518,6 +518,67 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
 
         mock_send_confirm.assert_called_once_with("foo@example.com", ANY)
 
+    def test_form_success_missing_medewerker(
+        self, m, mock_contactmoment, mock_send_confirm
+    ):
+        self._setUpMocks(m)
+        self._setUpExtraMocks(m)
+
+        config = OpenKlantConfig.get_solo()
+        # empty id should be excluded from contactmoment_create_data
+        config.register_employee_id = ""
+        config.save()
+
+        response = self.app.get(self.case_detail_url, user=self.user)
+        form = response.forms["contact-form"]
+        form.action = reverse(
+            "cases:case_detail_contact_form",
+            kwargs={"object_id": self.zaak["uuid"], "api_group_id": self.api_group.id},
+        )
+        form["question"] = "Sample text"
+        response = form.submit()
+
+        self.assertEqual(
+            response.headers["HX-Redirect"],
+            reverse(
+                "cases:case_detail",
+                kwargs={
+                    "object_id": str(self.zaak["uuid"]),
+                    "api_group_id": self.api_group.id,
+                },
+            ),
+        )
+
+        redirect = self.app.get(response.headers["HX-Redirect"])
+        redirect_messages = list(redirect.context["messages"])
+
+        self.assertEqual(redirect_messages[0].message, _("Vraag verstuurd!"))
+        self.assertMockMatchersCalled(self.extra_matchers)
+
+        payload = self.matcher_create_contactmoment.request_history[0].json()
+        self.assertEqual(
+            payload,
+            {
+                "bronorganisatie": "123456788",
+                "kanaal": "contactformulier",
+                "onderwerp": "afdeling-x",
+                "tekst": "Sample text",
+                "type": "Melding",
+            },
+        )
+
+        payload = self.matcher_create_objectcontactmoment.request_history[0].json()
+        self.assertEqual(
+            payload,
+            {
+                "contactmoment": self.contactmoment["url"],
+                "object": self.zaak["url"],
+                "objectType": "zaak",
+            },
+        )
+
+        mock_send_confirm.assert_called_once_with("foo@example.com", ANY)
+
     def test_form_success_with_api_eherkenning_user(
         self, m, mock_contactmoment, mock_send_confirm
     ):
