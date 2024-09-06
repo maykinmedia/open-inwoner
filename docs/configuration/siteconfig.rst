@@ -1,8 +1,8 @@
 .. _siteconfig:
 
-===========================
-Site configuration settings
-===========================
+=======================
+Site configuration step
+=======================
 
 Settings Overview
 =================
@@ -22,10 +22,7 @@ Required:
 
 ::
 
-    SITE_ACCENT_COLOR
     SITE_NAME
-    SITE_PRIMARY_COLOR
-    SITE_SECONDARY_COLOR
 
 
 All settings:
@@ -116,7 +113,7 @@ Detailed Information
     Setting             Accentkleur
     Description         Accentkleur van de gemeentesite/huisstijl
     Possible values     No information available
-    Default value       #FFFFFF
+    Default value       #FF0000
     
     Variable            SITE_ACCENT_FONT_COLOR
     Setting             Accent tekstkleur
@@ -476,7 +473,7 @@ Detailed Information
     Setting             Secundaire kleur
     Description         Secundaire kleur van de gemeentesite/huisstijl
     Possible values     No information available
-    Default value       #FFFFFF
+    Default value       #0000FF
     
     Variable            SITE_SECONDARY_FONT_COLOR
     Setting             Secundaire tekstkleur
