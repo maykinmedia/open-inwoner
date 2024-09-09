@@ -18,7 +18,6 @@ from digid_eherkenning_oidc_generics.models import (
 from open_inwoner.accounts.choices import NotificationChannelChoice
 from open_inwoner.accounts.views.mixins import KlantenAPIMixin
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.utils.hash import generate_email_from_string
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from ...mail.verification import send_user_email_verification_mail
@@ -184,11 +183,9 @@ class NecessaryFieldsUserView(
         user = self.get_object()
         invite = self.get_invite()
 
-        if not invite and (
-            (user.bsn and user.email == generate_email_from_string(user.bsn))
-            or (user.oidc_id and user.email == generate_email_from_string(user.oidc_id))
-            or (user.kvk and user.email == f"user-{user.kvk}@localhost")
-        ):
+        # only prefill email field if user was invited or
+        # valid email has been entered or retrieved form external source
+        if not invite and not user.has_usable_email:
             initial["email"] = ""
 
         return initial
