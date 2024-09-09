@@ -605,14 +605,27 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                 },
             )
 
+        # case filter form is disabled by default
+        self.assertIsNone(response.context.get("filter_form"))
+
     def test_filter_cases_simple(self, m):
         for mock in self.mocks:
             mock._setUpMocks(m)
+
+        self.config.zaken_filter_enabled = True
+        self.config.save()
 
         self.client.force_login(user=self.user)
         inner_url = f"{reverse_lazy('cases:cases_content')}?status=Initial+request"
 
         response = self.client.get(inner_url, HTTP_HX_REQUEST="true")
+
+        # check form
+        filter_form = response.context["form"]
+        self.assertTrue(filter_form.is_valid)
+        self.assertEqual(filter_form.cleaned_data.get("status"), ["Initial request"])
+
+        # check cases
         cases = response.context["cases"]
 
         self.assertEqual(len(cases), 4)
@@ -623,10 +636,23 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
         for mock in self.mocks:
             mock._setUpMocks(m)
 
+        self.config.zaken_filter_enabled = True
+        self.config.save()
+
         self.client.force_login(user=self.user)
         inner_url = f"{reverse_lazy('cases:cases_content')}?status=Initial+request&status=Statustekst+finish"
 
         response = self.client.get(inner_url, HTTP_HX_REQUEST="true")
+
+        # check form
+        filter_form = response.context["form"]
+        self.assertTrue(filter_form.is_valid)
+        self.assertEqual(
+            filter_form.cleaned_data.get("status"),
+            ["Initial request", "Statustekst finish"],
+        )
+
+        # check cases
         cases = response.context["cases"]
 
         self.assertEqual(len(cases), 6)

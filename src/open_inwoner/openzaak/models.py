@@ -430,6 +430,11 @@ class OpenZaakConfig(SingletonModel):
         default=15,
         help_text=_("Aantal dagen voor gebruiker om actie te ondernemen."),
     )
+    zaken_filter_enabled = models.BooleanField(
+        verbose_name=_("Enable zaken filter"),
+        default=False,
+        help_text=_("Give users the option to filter zaken by status"),
+    )
 
     class Meta:
         verbose_name = _("Open Zaak configuration")

@@ -5,16 +5,18 @@
 
 <div class="card__grid">
 
+{% if filter_form %}
 <div>
     <form method="GET" id="filter-form">
         <table>
-            {{ form }}
+            {{ filter_form }}
         </table>
         <button class="button button--primary" type="submit" value="" title="{% trans 'Filter cases' %}" aria-label="{% trans 'Filter cases' %}" id="filter_cases">
             {% trans 'Filter cases' %}
         </button>
     </form>
 </div>
+{% endif %}
 
 {% render_grid %}
     {% if not cases %}
