@@ -1,0 +1,134 @@
+.filter-bar__multiselect-listbox {
+  position: relative;
+  width: 280px;
+
+  &:has(.show) {
+    .button__select {
+      *[class*='icons'] {
+        display: inline-block;
+        position: absolute;
+        right: var(--spacing-large);
+        top: 8px;
+        transform: rotate(180deg);
+        transition: all 0.3s;
+      }
+    }
+
+    .button--primary.hide,
+    .form__actions.hide {
+      opacity: 0;
+      height: 0;
+    }
+  }
+
+  .button__select {
+    background-color: var(--color-white);
+    border: 1px solid var(--color-gray-dark-900);
+    border-radius: var(--border-radius);
+    box-sizing: border-box;
+    color: var(--color-gray-dark);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body);
+    height: var(--row-height);
+    justify-content: space-between;
+    margin: 0;
+    padding: var(--spacing-medium) var(--spacing-large);
+    text-align: left;
+    max-width: 100%;
+    width: 100%;
+
+    @media (min-width: 768px) {
+      width: 280px;
+    }
+
+    *[class*='Icon'] {
+      display: inline-block;
+      position: absolute;
+      right: var(--spacing-large);
+      top: 8px;
+      transform: rotate(180deg);
+      transition: all 0.3s;
+    }
+  }
+
+  .multiselect-listbox__content {
+    display: none;
+    position: absolute;
+    background-color: var(--color-white);
+    max-height: calc(6 * 40px);
+    left: 0;
+    min-width: 280px;
+    top: 40px;
+    width: 100%;
+    z-index: 5000;
+
+    @media (min-width: 768px) {
+      width: 280px;
+    }
+
+    .multiselect-listbox__scroll {
+      max-height: calc(6 * 40px);
+      overflow-x: hidden;
+      overflow-y: auto;
+
+      & > .checkbox {
+        padding: var(--spacing-extra-large) var(--spacing-medium);
+
+        .checkbox__input:focus ~ .checkbox__label {
+          text-decoration: none;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+
+      .checkbox:has(input[type='checkbox']) {
+        display: flex;
+        justify-content: start;
+        color: var(--color-gray-dark-900);
+        line-height: 0;
+        padding: var(--spacing-medium) var(--spacing-large);
+        max-width: 260px;
+      }
+
+      .checkbox:has(input[type='checkbox']:checked) {
+        border: 1px solid var(--color-secondary);
+        border-left: 3px solid;
+        color: var(--color-secondary);
+        padding: var(--spacing-medium) var(--spacing-large)
+          var(--spacing-medium) 12px;
+        max-width: calc(100% - 18px);
+      }
+    }
+  }
+
+  .multiselect-listbox__content {
+    .checkbox__label {
+      color: black;
+      text-decoration: none;
+      display: inline-block;
+
+      &:before {
+        top: var(--spacing-tiny);
+      }
+    }
+
+    .checkbox__label:hover {
+      text-decoration: underline;
+    }
+
+    .selected {
+      background-color: #fff;
+    }
+
+    .form__actions {
+      padding-top: var(--spacing-small);
+    }
+  }
+
+  .show {
+    display: inline-block;
+    border: 1px solid var(--color-gray);
+  }
+}

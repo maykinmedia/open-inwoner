@@ -1,1 +1,1 @@
-import './multi_select_checkbox'
+import './multiselect_listbox_checkbox'

@@ -7,7 +7,7 @@
 <div class="filter-bar multiselect--checkbox__select multiselectcheckbox">
     <form class="form filter-bar__form" method="GET" id="filter-form" novalidate>
         <span>{% trans 'Filter op' %}:</span>
-        {% include "components/FilterBar/MultiSelectFilter.html" with statusfrequencies=status_freqs %}
+        {% include "components/FilterBar/MultiSelectListbox.html" with statusfrequencies=status_freqs %}
     </form>
 </div>
 {% endif %}
