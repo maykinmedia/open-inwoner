@@ -79,6 +79,14 @@ class OpenKlantConfigAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
             },
         ),
         (
+            _("Filter Contactmomenten"),
+            {
+                "fields": [
+                    "exclude_contactmoment_kanalen",
+                ]
+            },
+        ),
+        (
             _("Services"),
             {
                 "fields": [

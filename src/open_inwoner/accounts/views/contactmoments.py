@@ -11,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import TemplateView
 
+from glom import glom
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.openklant.api_models import KlantContactMoment
@@ -19,7 +20,11 @@ from open_inwoner.openklant.clients import (
     build_klanten_client,
 )
 from open_inwoner.openklant.constants import Status
-from open_inwoner.openklant.models import ContactFormSubject, KlantContactMomentAnswer
+from open_inwoner.openklant.models import (
+    ContactFormSubject,
+    KlantContactMomentAnswer,
+    OpenKlantConfig,
+)
 from open_inwoner.openklant.views.contactform import ContactFormView
 from open_inwoner.openklant.wrap import (
     contactmoment_has_new_answer,
@@ -55,8 +60,6 @@ class KlantContactMomentAccessMixin(AccessMixin):
 
         if not request.user.bsn and not request.user.kvk:
             return self.handle_no_permission()
-
-        # TODO more here?
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -171,9 +174,19 @@ class KlantContactMomentListView(
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
+
         kcms = fetch_klantcontactmomenten(
             **get_fetch_parameters(self.request, use_vestigingsnummer=True)
         )
+
+        klant_config = OpenKlantConfig.get_solo()
+        if exclude_range := klant_config.exclude_contactmoment_kanalen:
+            kcms = [
+                item
+                for item in kcms
+                if glom(item, "contactmoment.kanaal") not in exclude_range
+            ]
+
         ctx["contactmomenten"] = [
             self.get_kcm_data(
                 kcm,
