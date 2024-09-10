@@ -7,11 +7,11 @@
     </button>
     <div id="listboxDropdown" class="multiselect-listbox__content" role="listbox" aria-labelledby="selectButton">
         <div class="multiselect-listbox__scroll" role="presentation">
-            {% for option in statusfrequencies %}
+            {% for status, frequency in statusfrequencies %}
                 <div class="checkbox" role="option">
-                    <input type="checkbox" name="status" value="{{ option.0 }}" id="id_status_{{ forloop.counter }}" {% if option.checked %}checked="checked"{% endif %} class="checkbox__input">
+                    <input type="checkbox" name="status" value="{{ status }}" id="id_status_{{ forloop.counter }}" class="checkbox__input">
                     <label class="checkbox__label" for="id_status_{{ forloop.counter }}">
-                        {{ option.0 }} <span class="frequencyCounter">({{ option.1 }})</span>
+                        {{ status }} <span class="frequencyCounter">({{ frequency }})</span>
                     </label>
                 </div>
             {% endfor %}
