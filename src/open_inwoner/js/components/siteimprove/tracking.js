@@ -1,4 +1,4 @@
-// Mock _sz object for testing
+// // Mock _sz object for testing
 // if (typeof _sz === 'undefined') {
 //   var _sz = {
 //     push: function (data) {
@@ -11,25 +11,29 @@
 //     },
 //   }
 // }
-//
-// if (typeof _sz !== 'undefined') {
-//   console.log('-> SiteImprove _sz object exists: ', _sz)
-// } else {
-//   console.log('-> SiteImprove _sz is not defined yet.')
-// }
 
-// Main script file
+if (typeof _sz !== 'undefined') {
+  console.log('-> SiteImprove _sz object exists: ', _sz)
+} else {
+  console.log('-> SiteImprove _sz is not defined yet.')
+}
+
+// Ensure EventTracker is initialized only once
+let isEventTrackerInitialized = false
+
 ;(function () {
   function initEventTracker() {
+    if (isEventTrackerInitialized) return // Prevent multiple initializations
+    isEventTrackerInitialized = true
+
     class EventTracker {
-      // Class that encapsulates event tracking logic.
-      // Takes care of setting up event listeners for both click/change/typing events.
       constructor(selectorMap) {
         this.selectorMap = selectorMap
         this.trackEvents()
       }
 
       trackEvents() {
+        // Use a single event listener for each event type
         document.body.addEventListener(
           'click',
           this.handleEvent.bind(this, 'click')
@@ -45,7 +49,6 @@
       }
 
       handleEvent(eventType, event) {
-        // These arrays are pushed into _sz
         const target = event.target
         const actionMap = this.selectorMap[eventType]
 
@@ -63,7 +66,6 @@
       }
 
       handleClickEvent(target) {
-        // eventData array is pushed into _sz.
         const actionMap = this.selectorMap['click']
 
         if (!actionMap) {
@@ -74,15 +76,12 @@
           if (target.matches(selector)) {
             const eventData = actionMap[selector]
             eventData.push(this.extractEventData(target))
-            // Add console log to check eventData before pushing to _sz
-            // console.log('Handling click event. Event data:', eventData)
             _sz.push(eventData)
           }
         })
       }
 
       handleChangeEvent(target) {
-        // eventData array is pushed into _sz.
         const actionMap = this.selectorMap['change']
 
         if (!actionMap) {
@@ -99,7 +98,6 @@
       }
 
       handleEnterKeyEvent(target) {
-        // eventData array is pushed into _sz.
         const actionMap = this.selectorMap['keydown']
 
         if (!actionMap) {
@@ -116,19 +114,15 @@
       }
 
       extractEventData(target) {
-        if (typeof target === 'undefined') {
-          return
+        if (!target || typeof target.getAttribute !== 'function') {
+          return target.textContent.trim()
         }
 
-        if (typeof target.getAttribute === 'function') {
-          return (
-            target.getAttribute('aria-label') ||
-            target.value ||
-            target.textContent.trim()
-          )
-        }
-
-        return target.textContent.trim()
+        return (
+          target.getAttribute('aria-label') ||
+          target.value ||
+          target.textContent.trim()
+        )
       }
     }
 
@@ -275,6 +269,25 @@
           ['event', 'Logout button', 'Click', 'Logout'],
         '.header nav.primary-navigation.primary-navigation__authenticated > ul > li > ul > li.header__list-item > a > .material-icons':
           ['event', 'Logout button', 'Click', 'Logout'],
+        // Filters in Cases list
+        '.filter-bar #selectButton': [
+          'event',
+          'Status filter button',
+          'Click',
+          'Filter status',
+        ],
+        '.filter-bar input[type="checkbox"]': [
+          'event',
+          'Status filter checkbox',
+          'Click',
+          'Check status filter option',
+        ],
+        '.filter-bar .checkbox__label': [
+          'event',
+          'Status filter checkbox',
+          'Click',
+          'Check status filter option',
+        ],
       },
       change: {
         '.form#profile-edit input[name="phone"]': [
@@ -298,7 +311,6 @@
   }
 
   // Poller function
-  // Function to check for _sz object at regular intervals
   function checkForSzObject() {
     const intervalId = setInterval(function () {
       if (typeof _sz !== 'undefined') {
@@ -313,20 +325,14 @@
   // Start checking for _sz object
   checkForSzObject()
 
+  // MutationObserver to detect DOM changes
   const observer = new MutationObserver(function () {
     if (typeof _sz !== 'undefined') {
-      console.log(
-        '-> SiteImprove _sz object detected by MutationObserver:',
-        _sz
-      )
-      // Once _sz is available, it disconnects the observer to stop further watching and calls initEventTracker().
-      observer.disconnect()
+      observer.disconnect() // Stop observing once _sz is available
       initEventTracker()
-    } else {
-      console.log('-> MutationObserver: _sz is not available yet.')
     }
   })
 
-  // When the DOM changes, the 'observer' callback function is executed.
+  // Observe DOM changes
   observer.observe(document, { childList: true, subtree: true })
 })()

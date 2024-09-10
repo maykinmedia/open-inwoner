@@ -620,9 +620,9 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
 
         response = self.client.get(inner_url, HTTP_HX_REQUEST="true")
 
-        # check form
-        filter_form = response.context["form"]
-        self.assertTrue(filter_form.is_valid)
+        # check filter form
+        filter_form = response.context["filter_form"]
+        self.assertTrue(filter_form.is_valid())
         self.assertEqual(filter_form.cleaned_data.get("status"), ["Initial request"])
 
         # check cases
@@ -644,9 +644,9 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
 
         response = self.client.get(inner_url, HTTP_HX_REQUEST="true")
 
-        # check form
-        filter_form = response.context["form"]
-        self.assertTrue(filter_form.is_valid)
+        # check filter form
+        filter_form = response.context["filter_form"]
+        self.assertTrue(filter_form.is_valid())
         self.assertEqual(
             filter_form.cleaned_data.get("status"),
             ["Initial request", "Statustekst finish"],

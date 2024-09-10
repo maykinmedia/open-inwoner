@@ -1,0 +1,25 @@
+.filter-bar {
+  width: 100%;
+  background-color: var(--color-gray-lightest);
+  margin-bottom: var(--spacing-extra-large);
+  padding: var(--spacing-large) var(--spacing-tiny);
+  position: relative;
+  display: inline-block;
+
+  @media (min-width: 768px) {
+    padding: var(--spacing-large);
+  }
+
+  .filter-bar__form {
+    margin: 0;
+    padding: 0 0 0 var(--spacing-small);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--spacing-extra-large);
+  }
+
+  &__frequency-sum {
+    padding: 0 var(--spacing-tiny);
+  }
+}

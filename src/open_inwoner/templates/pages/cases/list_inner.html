@@ -3,21 +3,16 @@
 <h1 class="utrecht-heading-1" id="cases">{{ page_title }} ({{ paginator.count }})</h1>
 <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-title-text">{{ title_text }}</p>
 
-<div class="card__grid">
-
 {% if filter_form %}
-<div>
-    <form method="GET" id="filter-form">
-        <table>
-            {{ filter_form }}
-        </table>
-        <button class="button button--primary" type="submit" value="" title="{% trans 'Filter cases' %}" aria-label="{% trans 'Filter cases' %}" id="filter_cases">
-            {% trans 'Filter cases' %}
-        </button>
+<div class="filter-bar multiselect--checkbox__select multiselectcheckbox">
+    <form class="form filter-bar__form" method="GET" id="filter-form" novalidate>
+        <span>{% trans 'Filter op' %}:</span>
+        {% include "components/FilterBar/MultiSelectListbox.html" with statusfrequencies=status_freqs %}
     </form>
 </div>
 {% endif %}
 
+<div class="card__grid">
 {% render_grid %}
     {% if not cases %}
         <b>{% trans "U heeft op dit moment nog geen lopende aanvragen." %}</b>
