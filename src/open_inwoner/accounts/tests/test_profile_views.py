@@ -164,15 +164,17 @@ class ProfileViewTests(WebTest):
     )
     def test_admin_disable_options(self, m):
         config = SiteConfiguration.get_solo()
+        config.notifications_actions_enabled = False
+        config.notifications_cases_enabled = False
         config.notifications_messages_enabled = False
+        config.notifications_plans_enabled = False
         config.save()
 
         response = self.app.get(self.url, user=self.user)
 
         doc = PQ(response.content)
 
-        notifications_text = doc.find("#profile-notifications")[0].text_content()
-        self.assertNotIn("Mijn Berichten", notifications_text)
+        self.assertEqual(doc.find("#profile-notifications"), [])
 
     def test_get_empty_profile_page(self):
         response = self.app.get(self.url, user=self.user)
@@ -978,15 +980,13 @@ class EditIntrestsTests(WebTest):
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 @patch("open_inwoner.cms.utils.page_display._is_published", return_value=True)
 class EditNotificationsTests(AssertTimelineLogMixin, WebTest):
-    @classmethod
-    def setUpTestData(cls):
-        config = SiteConfiguration.get_solo()
-        config.notifications_messages_enabled = True
-        config.notifications_cases_enabled = True
-        config.notifications_plans_enabled = True
-        config.save()
-
     def setUp(self):
+        self.config = SiteConfiguration.get_solo()
+        self.config.notifications_messages_enabled = True
+        self.config.notifications_cases_enabled = True
+        self.config.notifications_plans_enabled = True
+        self.config.save()
+
         self.url = reverse("profile:notifications")
         self.user = UserFactory()
 
@@ -995,6 +995,17 @@ class EditNotificationsTests(AssertTimelineLogMixin, WebTest):
         response = self.app.get(self.url)
 
         self.assertRedirects(response, f"{login_url}?next={self.url}")
+
+    def test_notifications_disabled(self, mock_page_display):
+        self.config.notifications_actions_enabled = False
+        self.config.notifications_cases_enabled = False
+        self.config.notifications_messages_enabled = False
+        self.config.notifications_plans_enabled = False
+        self.config.save()
+
+        response = self.app.get(self.url, user=self.user)
+
+        self.assertRedirects(response, reverse("profile:detail"))
 
     def test_default_values_for_regular_user(self, mock_page_display):
         response = self.app.get(self.url, user=self.user)
