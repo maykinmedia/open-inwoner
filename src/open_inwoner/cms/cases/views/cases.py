@@ -151,8 +151,8 @@ class InnerCaseListView(
         preprocessed_cases: list[UniformCase] = case_service.get_cases()
 
         statuses = self.request.GET.getlist("status")
-        # GET.getlist returns [''] if no query params are passed, hence we test by GET.get
-        if self.request.GET.get("status"):
+        # GET.getlist returns [''] if no query params are passed
+        if config.zaken_filter_enabled and any(statuses):
             form = CaseFilterForm(
                 status_freqs=case_service.get_case_status_frequencies(),
                 status_initial=statuses,
@@ -168,13 +168,15 @@ class InnerCaseListView(
                     self.request.GET,
                     self.request.user,
                 )
-
-            open_submissions = (
-                open_submissions if SUBMISSION_STATUS_OPEN in statuses else []
-            )
-            preprocessed_cases = [
-                case for case in preprocessed_cases if case.zaak.status_text in statuses
-            ]
+            else:
+                open_submissions = (
+                    open_submissions if SUBMISSION_STATUS_OPEN in statuses else []
+                )
+                preprocessed_cases = [
+                    case
+                    for case in preprocessed_cases
+                    if case.zaak.status_text in statuses
+                ]
 
         paginator_dict = self.paginate_with_context(
             [*open_submissions, *preprocessed_cases]
@@ -186,10 +188,11 @@ class InnerCaseListView(
 
         self.log_access_cases(case_dicts)
 
-        context["form"] = form or CaseFilterForm(
-            status_freqs=case_service.get_case_status_frequencies(),
-            status_initial=statuses,
-        )
+        if config.zaken_filter_enabled:
+            context["filter_form"] = form or CaseFilterForm(
+                status_freqs=case_service.get_case_status_frequencies(),
+                status_initial=statuses,
+            )
 
         # other data
         context["hxget"] = reverse("cases:cases_content")
