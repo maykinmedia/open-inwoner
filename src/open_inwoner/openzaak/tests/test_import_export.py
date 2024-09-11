@@ -1,8 +1,6 @@
 import io
-import json
 
 from django.core.files.storage.memory import InMemoryStorage
-from django.core.serializers import serialize
 from django.test import TestCase
 
 from open_inwoner.openzaak.import_export import (
@@ -263,8 +261,12 @@ class TestCatalogusExport(TestCase):
 class TestCatalogusImport(TestCase):
     def setUp(self):
         self.storage = InMemoryStorage()
-        self.service = ServiceFactory(slug="service-0")
-        ServiceFactory(slug="service-1")
+        self.service = ServiceFactory(
+            slug="service-0", api_root="https://foo.0.maykinmedia.nl"
+        )
+        self.other_service = ServiceFactory(
+            slug="service-1", api_root="https://foo.1.maykinmedia.nl"
+        )
 
         self.json_lines = [
             '{"model": "openzaak.catalogusconfig", "fields": {"url": "https://foo.0.maykinmedia.nl", "domein": "DM-0", "rsin": "123456789", "service": ["service-0"]}}',
@@ -304,35 +306,14 @@ class TestCatalogusImport(TestCase):
         self.assertEqual(ZaakTypeStatusTypeConfig.objects.count(), 2)
         self.assertEqual(ZaakTypeResultaatTypeConfig.objects.count(), 2)
 
-        object_lines = [json.loads(l) for l in self.json_lines]
-        for model in (
-            CatalogusConfig,
-            ZaakTypeConfig,
-            ZaakTypeInformatieObjectTypeConfig,
-            ZaakTypeStatusTypeConfig,
-            ZaakTypeResultaatTypeConfig,
-        ):
-            for row in model.objects.all():
-                row_json = serialize(
-                    "jsonl",
-                    model.objects.filter(pk=row.pk),
-                    use_natural_foreign_keys=True,
-                    use_natural_primary_keys=True,
-                )
-                self.assertIn(
-                    json.loads(row_json),
-                    object_lines,
-                    msg=f"Each {type(model)} object in the jsonl file should appear in the database",
-                )
-
     def test_import_jsonl_merges_objects(self):
         CatalogusConfigFactory(
-            url="https://foo.maykinmedia.nl",
+            url="https://foo.0.maykinmedia.nl",
             domein="FOO",
             rsin="123456789",
             service=self.service,
         )
-        merge_line = '{"model": "openzaak.catalogusconfig", "fields": {"url": "https://foo.maykinmedia.nl", "domein": "BAR", "rsin": "987654321", "service": ["service-0"]}}'
+        merge_line = '{"model": "openzaak.catalogusconfig", "fields": {"url": "https://foo.0.maykinmedia.nl", "domein": "BAR", "rsin": "987654321", "service": ["service-0"]}}'
 
         import_result = CatalogusConfigImport.from_jsonl_stream_or_string(merge_line)
 
@@ -341,8 +322,196 @@ class TestCatalogusImport(TestCase):
 
         self.assertEqual(
             list(CatalogusConfig.objects.values_list("url", "domein", "rsin")),
-            [("https://foo.maykinmedia.nl", "BAR", "987654321")],
+            [("https://foo.0.maykinmedia.nl", "BAR", "987654321")],
             msg="Value of sole CatalogusConfig matches imported values, not original values",
+        )
+
+    def test_bad_import_types(self):
+        for bad_type in (set(), list(), b""):
+            with self.assertRaises(ValueError):
+                CatalogusConfigImport.from_jsonl_stream_or_string(bad_type)
+
+    def test_valid_input_types_are_accepted(self):
+        for input in (
+            io.StringIO(self.jsonl),
+            io.BytesIO(self.jsonl.encode("utf-8")),
+            self.jsonl,
+        ):
+            with self.subTest(f"Input type {type(input)}"):
+                import_result = CatalogusConfigImport.from_jsonl_stream_or_string(input)
+                self.assertEqual(
+                    import_result,
+                    CatalogusConfigImport(
+                        total_rows_processed=10,
+                        catalogus_configs_imported=2,
+                        zaaktype_configs_imported=2,
+                        zaak_inormatie_object_type_configs_imported=2,
+                        zaak_status_type_configs_imported=2,
+                        zaak_resultaat_type_configs_imported=2,
+                    ),
+                )
+
+                self.assertEqual(CatalogusConfig.objects.count(), 2)
+                self.assertEqual(ZaakTypeConfig.objects.count(), 2)
+                self.assertEqual(ZaakTypeInformatieObjectTypeConfig.objects.count(), 2)
+                self.assertEqual(ZaakTypeStatusTypeConfig.objects.count(), 2)
+                self.assertEqual(ZaakTypeResultaatTypeConfig.objects.count(), 2)
+
+    def test_import_is_atomic(self):
+        bad_line = '{"model": "openzaak.zaaktyperesultaattypeconfig", "fields": {}}\n'
+        bad_jsonl = self.jsonl + "\n" + bad_line
+
+        try:
+            CatalogusConfigImport.from_jsonl_stream_or_string(
+                stream_or_string=bad_jsonl
+            )
+        except Exception:
+            pass
+
+        counts = (
+            CatalogusConfig.objects.count(),
+            ZaakTypeConfig.objects.count(),
+            ZaakTypeInformatieObjectTypeConfig.objects.count(),
+            ZaakTypeStatusTypeConfig.objects.count(),
+            ZaakTypeResultaatTypeConfig.objects.count(),
+        )
+        expected_counts = (0, 0, 0, 0, 0)
+
+        self.assertEqual(
+            counts,
+            expected_counts,
+            msg="Import should have merged, and not created new values",
+        )
+
+
+class RewriteUrlsImportTests(TestCase):
+    def setUp(self):
+        self.service = ServiceFactory(
+            slug="constant-api-slug", api_root="http://one.maykinmedia.nl"
+        )
+
+        import_lines = [
+            '{"model": "openzaak.catalogusconfig", "fields": {"url": "http://one.maykinmedia.nl/catalogus/1", "domein": "ALLE", "rsin": "1234568", "service": ["constant-api-slug"]}}',
+            '{"model": "openzaak.zaaktypeconfig", "fields": {"urls": "[\\"http://one.maykinmedia.nl/types/1\\", \\"http://one.maykinmedia.nl/types/2\\"]", "catalogus": ["http://one.maykinmedia.nl/catalogus/1"], "identificatie": "zt-1", "omschrijving": "iGsHCEkCpEJyDLeAaytskGiAXSAPVVthCvOdbNdpZZcCciXFnZGltXFYsYigSkIZiaqMEvSPftMgIYyW", "notify_status_changes": false, "description": "", "external_document_upload_url": "", "document_upload_enabled": false, "contact_form_enabled": false, "contact_subject_code": "", "relevante_zaakperiode": null}}',
+            '{"model": "openzaak.zaaktypeinformatieobjecttypeconfig", "fields": {"zaaktype_config": ["zt-1", "http://one.maykinmedia.nl/catalogus/1"], "informatieobjecttype_url": "http://one.maykinmedia.nl/iotype/1", "omschrijving": "IzNqfWpVpbyMEjSXTqQUlslqAUYFdILFlSDAelAkfTROWptqgIRCmaIoWCBMBAozsJLWxGoJqmBLPCHy", "zaaktype_uuids": "[]", "document_upload_enabled": false, "document_notification_enabled": false}}',
+            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["zt-1", "http://one.maykinmedia.nl/catalogus/1"], "statustype_url": "http://one.maykinmedia.nl/status-type/1", "omschrijving": "BHEJLQkSTdMPGtSzgnIbIdhMvFiNOBHmFQkRvLxHUkmafelprqCpcuAZzqMWBLgqNkGmXpzWPjhWqKjk", "statustekst": "", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": "", "description": "", "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
+            '{"model": "openzaak.zaaktyperesultaattypeconfig", "fields": {"zaaktype_config": ["zt-1", "http://one.maykinmedia.nl/catalogus/1"], "resultaattype_url": "http://one.maykinmedia.nl/resultaat-type/1", "omschrijving": "", "zaaktype_uuids": "[]", "description": ""}}',
+        ]
+        self.jsonl = "\n".join(import_lines)
+
+    def _create_fixtures(self, base_url: str):
+        catalogus = CatalogusConfigFactory(
+            url=f"{base_url}/catalogus/1",
+            service=self.service,
+            domein="ALLE",
+            rsin="1234568",
+        )
+        zt = ZaakTypeConfigFactory(
+            catalogus=catalogus,
+            identificatie="zt-1",
+            urls=[
+                f"{base_url}/types/1",
+                f"{base_url}/types/2",
+            ],
+        )
+        ZaakTypeInformatieObjectTypeConfigFactory(
+            zaaktype_config=zt,
+            informatieobjecttype_url=f"{base_url}/iotype/1",
+        )
+        ZaakTypeStatusTypeConfigFactory(
+            zaaktype_config=zt, statustype_url=f"{base_url}/status-type/1"
+        )
+        ZaakTypeResultaatTypeConfigFactory(
+            zaaktype_config=zt,
+            resultaattype_url=f"{base_url}/resultaat-type/1",
+        )
+
+    def test_jsonl_url_rewrite(self):
+        self.service.api_root = "http://two.maykinmedia.nl"
+        self.service.save()
+
+        rewritten_lines = list(
+            CatalogusConfigImport._rewrite_jsonl_url_references(self.jsonl)
+        )
+        expected_lines = [
+            '{"model": "openzaak.catalogusconfig", "fields": {"url": "http://two.maykinmedia.nl/catalogus/1", "domein": "ALLE", "rsin": "1234568", "service": ["constant-api-slug"]}}',
+            '{"model": "openzaak.zaaktypeconfig", "fields": {"urls": "[\\"http://two.maykinmedia.nl/types/1\\", \\"http://two.maykinmedia.nl/types/2\\"]", "catalogus": ["http://two.maykinmedia.nl/catalogus/1"], "identificatie": "zt-1", "omschrijving": "iGsHCEkCpEJyDLeAaytskGiAXSAPVVthCvOdbNdpZZcCciXFnZGltXFYsYigSkIZiaqMEvSPftMgIYyW", "notify_status_changes": false, "description": "", "external_document_upload_url": "", "document_upload_enabled": false, "contact_form_enabled": false, "contact_subject_code": "", "relevante_zaakperiode": null}}',
+            '{"model": "openzaak.zaaktypeinformatieobjecttypeconfig", "fields": {"zaaktype_config": ["zt-1", "http://two.maykinmedia.nl/catalogus/1"], "informatieobjecttype_url": "http://two.maykinmedia.nl/iotype/1", "omschrijving": "IzNqfWpVpbyMEjSXTqQUlslqAUYFdILFlSDAelAkfTROWptqgIRCmaIoWCBMBAozsJLWxGoJqmBLPCHy", "zaaktype_uuids": "[]", "document_upload_enabled": false, "document_notification_enabled": false}}',
+            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["zt-1", "http://two.maykinmedia.nl/catalogus/1"], "statustype_url": "http://two.maykinmedia.nl/status-type/1", "omschrijving": "BHEJLQkSTdMPGtSzgnIbIdhMvFiNOBHmFQkRvLxHUkmafelprqCpcuAZzqMWBLgqNkGmXpzWPjhWqKjk", "statustekst": "", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": "", "description": "", "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
+            '{"model": "openzaak.zaaktyperesultaattypeconfig", "fields": {"zaaktype_config": ["zt-1", "http://two.maykinmedia.nl/catalogus/1"], "resultaattype_url": "http://two.maykinmedia.nl/resultaat-type/1", "omschrijving": "", "zaaktype_uuids": "[]", "description": ""}}',
+        ]
+
+        self.assertEqual(
+            rewritten_lines,
+            expected_lines,
+            msg="All URLs should be rewritten to match the target service root",
+        )
+
+    def test_rewrite_target_diverges_from_existing_objects(self):
+        self._create_fixtures("http://one.maykinmedia.nl/")
+        self.service.api_root = "http://two.maykinmedia.nl"
+        self.service.save()
+
+        import_result = CatalogusConfigImport.from_jsonl_stream_or_string(self.jsonl)
+
+        self.assertEqual(
+            import_result,
+            CatalogusConfigImport(
+                total_rows_processed=5,
+                catalogus_configs_imported=1,
+                zaaktype_configs_imported=1,
+                zaak_inormatie_object_type_configs_imported=1,
+                zaak_status_type_configs_imported=1,
+                zaak_resultaat_type_configs_imported=1,
+            ),
+        )
+
+        counts = (
+            CatalogusConfig.objects.count(),
+            ZaakTypeConfig.objects.count(),
+            ZaakTypeInformatieObjectTypeConfig.objects.count(),
+            ZaakTypeStatusTypeConfig.objects.count(),
+            ZaakTypeResultaatTypeConfig.objects.count(),
+        )
+        expected_counts = (2, 2, 2, 2, 2)
+
+        self.assertEqual(
+            counts,
+            expected_counts,
+            msg="Import should have merged, and not created new values",
+        )
+
+    def test_rewrite_target_matches_from_existing_objects(self):
+        self.service.api_root = "http://two.maykinmedia.nl"
+        self.service.save()
+        self._create_fixtures("http://two.maykinmedia.nl")
+
+        import_result = CatalogusConfigImport.from_jsonl_stream_or_string(self.jsonl)
+        self.assertEqual(
+            import_result,
+            CatalogusConfigImport(
+                total_rows_processed=5,
+                catalogus_configs_imported=1,
+                zaaktype_configs_imported=1,
+                zaak_inormatie_object_type_configs_imported=1,
+                zaak_status_type_configs_imported=1,
+                zaak_resultaat_type_configs_imported=1,
+            ),
+        )
+
+        counts = (
+            CatalogusConfig.objects.count(),
+            ZaakTypeConfig.objects.count(),
+            ZaakTypeInformatieObjectTypeConfig.objects.count(),
+            ZaakTypeStatusTypeConfig.objects.count(),
+            ZaakTypeResultaatTypeConfig.objects.count(),
+        )
+        expected_counts = (1, 1, 1, 1, 1)
+
+        self.assertEqual(
+            counts,
+            expected_counts,
+            msg="Import should have merged, and not created new values",
         )
 
 
