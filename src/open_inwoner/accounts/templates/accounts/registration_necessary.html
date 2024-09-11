@@ -63,22 +63,24 @@
                 {% endif %}
                     {# End of multiple checkbox fields #}
 
-                {# Info on notifications that cannot be disabled #}
-                <div class="choice-list__information">
-                    <p class="choice-list-multiple__heading-4">{% icon icon="check" outlined=True %} {% trans "Zaaknotificaties - actie is nodig" %}</p>
-                    <p class="choice-list__p">{% trans "E-mailnotificaties wanneer er actie nodig is voor een zaak (kan niet uitgeschakeld worden)" %}</p>
-                </div>
+                {% if config.notifications_cases_enabled %}
+                    {# Info on notifications that cannot be disabled #}
+                    <div class="choice-list__information">
+                        <p class="choice-list-multiple__heading-4">{% icon icon="check" outlined=True %} {% trans "Zaaknotificaties - actie is nodig" %}</p>
+                        <p class="choice-list__p">{% trans "E-mailnotificaties wanneer er actie nodig is voor een zaak (kan niet uitgeschakeld worden)" %}</p>
+                    </div>
 
-                {# Choice of zaken notification channel #}
-                {% if form.case_notification_channel %}
-                    <p class="utrecht-paragraph choice-list__p">{% trans "Hoe wilt u deze notificaties ontvangen?" %}</p>
-                    {% with form.case_notification_channel as field %}
-                        {% choice_list single=True cols=True %}
-                            {% for choice in field.field.choices %}
-                                {% choice_list_item input_type_radio=True choice=choice name=field.name data=field.value index=forloop.counter initial=field.form.initial icon_symbol=choice.1|get_icon_symbol %}
-                            {% endfor %}
-                        {% endchoice_list %}
-                    {% endwith %}
+                    {# Choice of zaken notification channel #}
+                    {% if form.case_notification_channel %}
+                        <p class="utrecht-paragraph choice-list__p">{% trans "Hoe wilt u deze notificaties ontvangen?" %}</p>
+                        {% with form.case_notification_channel as field %}
+                            {% choice_list single=True cols=True %}
+                                {% for choice in field.field.choices %}
+                                    {% choice_list_item input_type_radio=True choice=choice name=field.name data=field.value index=forloop.counter initial=field.form.initial icon_symbol=choice.1|get_icon_symbol %}
+                                {% endfor %}
+                            {% endchoice_list %}
+                        {% endwith %}
+                    {% endif %}
                 {% endif %}
 
                 <div class="choice-list__information--bottom-border">

@@ -330,6 +330,13 @@ class MyNotificationsView(
         kwargs["user"] = self.request.user
         return kwargs
 
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+
+        config = SiteConfiguration.get_solo()
+        context_data["notifications_cases_enabled"] = config.notifications_cases_enabled
+        return context_data
+
     def form_valid(self, form):
         form.save()
 
