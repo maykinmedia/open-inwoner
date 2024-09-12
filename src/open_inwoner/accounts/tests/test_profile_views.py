@@ -1043,6 +1043,7 @@ class EditNotificationsTests(AssertTimelineLogMixin, WebTest):
         data = MockAPIReadPatchData().install_mocks(m)
 
         config = SiteConfiguration.get_solo()
+        config.notifications_cases_enabled = True
         config.enable_notification_channel_choice = True
         config.save()
 

@@ -1501,6 +1501,7 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
 
     def test_submit_without_invite(self):
         config = SiteConfiguration.get_solo()
+        config.notifications_cases_enabled = True
         config.enable_notification_channel_choice = True
         config.save()
 
