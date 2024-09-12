@@ -657,6 +657,7 @@ idna==3.7
     #   -r requirements/base.txt
     #   email-validator
     #   requests
+    #   yarl
 imagesize==1.4.1
     # via sphinx
 inflection==0.5.1
@@ -751,6 +752,8 @@ mozilla-django-oidc-db==0.14.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+multidict==6.0.5
+    # via yarl
 mypy-extensions==1.0.0
     # via black
 notifications-api-common==0.2.2
@@ -890,6 +893,10 @@ pyrsistent==0.18.0
     #   -r requirements/base.txt
     #   jsonschema
 pytest==8.1.1
+    # via
+    #   -r requirements/test-tools.in
+    #   pytest-recording
+pytest-recording==0.13.2
     # via -r requirements/test-tools.in
 python-crontab==3.0.0
     # via
@@ -933,6 +940,7 @@ pyyaml==6.0
     #   drf-spectacular
     #   gemma-zds-client
     #   tablib
+    #   vcrpy
     #   zgw-consumers-oas
 qrcode==6.1
     # via
@@ -1088,6 +1096,10 @@ uwsgi==2.0.23
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+vcrpy==6.0.1
+    # via
+    #   -r requirements/test-tools.in
+    #   pytest-recording
 vine==5.1.0
     # via
     #   -c requirements/base.txt
@@ -1128,6 +1140,7 @@ wrapt==1.14.1
     #   -r requirements/base.txt
     #   astroid
     #   elastic-apm
+    #   vcrpy
 xlrd==2.0.1
     # via
     #   -c requirements/base.txt
@@ -1147,6 +1160,8 @@ xsdata==23.8
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+yarl==1.9.8
+    # via vcrpy
 zgw-consumers==0.35.1
     # via
     #   -c requirements/base.txt
