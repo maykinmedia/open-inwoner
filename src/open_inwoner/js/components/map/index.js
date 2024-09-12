@@ -32,9 +32,11 @@ class Map {
     this.lat = node.dataset.lat || 52
     this.lng = node.dataset.lng || 11
     this.zoom = node.dataset.zoom || 13
+    this.scrollWheelZoom = false
 
     const mapOptions = {
       center: L.latLng(this.lat, this.lng),
+      scrollWheelZoom: this.scrollWheelZoom,
       zoom: this.zoom,
       crs: RD_CRS,
     }
