@@ -33,7 +33,7 @@
 
 
                 {% if config.any_notifications_enabled %}
-                <h3 class="utrecht-heading-3">{% trans "Notification preferences" %}</h3>
+                    <h3 class="utrecht-heading-3">{% trans "Notification preferences" %}</h3>
 
                     {# Start of multiple checkbox fields #}
                     <ul class="choice-list choice-list-multiple">
@@ -49,14 +49,16 @@
                         {% if form.messages_notifications %}
                             <li class="choice-list-multiple__item">
                                 <div class="choice-list-multiple__content">
-                                    {% checkbox form.messages_notifications %}</div>
+                                    {% checkbox form.messages_notifications %}
+                                </div>
                             </li>
                         {% endif %}
 
                         {% if form.plans_notifications %}
                             <li class="choice-list-multiple__item">
                                 <div class="choice-list-multiple__content">
-                                    {% checkbox form.plans_notifications %}</div>
+                                    {% checkbox form.plans_notifications %}
+                                </div>
                             </li>
                         {% endif %}
                     </ul>
@@ -83,8 +85,7 @@
                     {% endif %}
                 {% endif %}
 
-                <div class="choice-list__information--bottom-border">
-                </div>
+                <div class="choice-list__information--bottom-border"></div>
 
                 {% form_actions primary_icon='east' primary_text="Voltooi registratie" fullwidth=True %}
             </form>

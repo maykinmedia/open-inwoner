@@ -97,28 +97,30 @@
 {% endif %}
 
     {# Notifications #}
-    <section class="tabled tabled--flexible profile-section profile-section--bordered profile-section__notifications" id="profile-notifications">
-        <div class="tabled__section">
-            <header class="oip-header-group title">
-                <h2 class="utrecht-heading-2" id="notifications">{% trans "Voorkeuren voor meldingen" %}
-                </h2>
-                <div class="tabled__item--force-right tabled__item--mobile-big">
-                    {% button href="profile:notifications" text=_("Bewerk") icon="edit" transparent=True icon_outlined=True %}
-                </div>
-            </header>
+    {% if siteconfig.any_notifications_enabled %}
+        <section class="tabled tabled--flexible profile-section profile-section--bordered profile-section__notifications" id="profile-notifications">
+            <div class="tabled__section">
+                <header class="oip-header-group title">
+                    <h2 class="utrecht-heading-2" id="notifications">{% trans "Voorkeuren voor meldingen" %}
+                    </h2>
+                    <div class="tabled__item--force-right tabled__item--mobile-big">
+                        {% button href="profile:notifications" text=_("Bewerk") icon="edit" transparent=True icon_outlined=True %}
+                    </div>
+                </header>
 
-        </div>
-        <div class="tabled__row tabled__row--blank">
-            <div class="tabled__item tabled__key">{% trans "Communicatiekanaal" %}</div>
-            <div class="tabled__item tabled__value">E-mail</div>
-        </div>
-        <div class="tabled__row tabled__row--blank">
-            <div class="tabled__item tabled__key">{% trans "Ontvang notificaties over" %}</div>
-            <div class="tabled__item tabled__value">
-                <div class="item__option">{{ user.get_active_notifications }}</div>
             </div>
-        </div>
-    </section>
+            <div class="tabled__row tabled__row--blank">
+                <div class="tabled__item tabled__key">{% trans "Communicatiekanaal" %}</div>
+                <div class="tabled__item tabled__value">E-mail</div>
+            </div>
+            <div class="tabled__row tabled__row--blank">
+                <div class="tabled__item tabled__key">{% trans "Ontvang notificaties over" %}</div>
+                <div class="tabled__item tabled__value">
+                    <div class="item__option">{{ user.get_active_notifications }}</div>
+                </div>
+            </div>
+        </section>
+    {% endif %}
 
     {# Newsletters #}
     {% if view.config.newsletters and form.fields.newsletters.choices %}

@@ -322,6 +322,12 @@ class MyNotificationsView(
             (_("Ontvang berichten over"), reverse("profile:notifications")),
         ]
 
+    def get(self, *args, **kwargs):
+        config = SiteConfiguration.get_solo()
+        if not config.any_notifications_enabled:
+            return HttpResponseRedirect(reverse("profile:detail"))
+        return super().get(*args, **kwargs)
+
     def get_object(self):
         return self.request.user
 
