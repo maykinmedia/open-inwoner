@@ -3,10 +3,12 @@ import io
 import json
 import logging
 from collections import defaultdict
-from typing import Any, Generator, Self
+from typing import IO, Any, Generator, Self
+from urllib.parse import urlparse
 
 from django.core import serializers
 from django.core.files.storage import Storage
+from django.db import transaction
 from django.db.models import QuerySet
 
 from .models import (
@@ -115,8 +117,98 @@ class CatalogusConfigImport:
     zaak_status_type_configs_imported: int = 0
     zaak_resultaat_type_configs_imported: int = 0
 
+    @staticmethod
+    def _get_url_root(url: str) -> str:
+        parsed = urlparse(url)
+        if not (parsed.scheme and parsed.netloc):
+            raise ValueError(f"{url} is not a valid URL")
+
+        return f"{parsed.scheme}://{parsed.netloc}"
+
     @classmethod
-    def from_jsonl_stream_or_string(cls, stream_or_string: io.IOBase | str) -> Self:
+    def _lines_iter_from_jsonl_stream_or_string(
+        cls, stream_or_string: IO | str
+    ) -> Generator[str, Any, None]:
+        lines: IO
+        if isinstance(stream_or_string, str):
+            lines = io.StringIO(stream_or_string)
+        elif hasattr(stream_or_string, "readline"):
+            lines = stream_or_string
+        else:
+            raise ValueError("Input must be a string stream-like object")
+
+        for line in lines:
+            if isinstance(line, bytes):  # lines might be BytesIO
+                line = line.decode("utf-8")
+
+            if not (line := line.strip()):
+                continue
+
+            yield line
+
+        # Reset the stream in case it gets re-used
+        lines.seek(0)
+
+    @classmethod
+    def _rewrite_jsonl_url_references(
+        cls, stream_or_string: IO | str
+    ) -> Generator[str, Any, None]:
+        # The assumption is that the exporting and importing instance both have
+        # a `Service` with the same slug as the `Service` referenced in the
+        # `configued_from` attribute of the imported CatalogusConfig. The
+        # assumption is further that all URLs in the imported objects are
+        # prefixed by an URL that matches the API root in the service. Because
+        # of this, the import file will contain URLs with a base URL pointing to
+        # the `api_root`` of the `configured_from` Service on the _source_
+        # instance, and has to be re-written to match the `api_root` of the
+        # `configured_from` Service on the _target_ instance. Put differently,
+        # we assume that we are migrating ZGW objects that _do not differ_ as
+        # far as the ZGW objects themselves are concerned (apart from the URL,
+        # they essentially point to the same ZGW backend), but that they _do_
+        # differ in terms of additional model fields that do not have their
+        # source of truth in the ZGW backends.
+        #
+        # This expectation is also encoded in our API clients: you can only
+        # fetch ZGW objects using the ApePie clients if the root of those
+        # objects matches the configured API root.
+
+        base_url_mapping = {}
+        for deserialized_object in serializers.deserialize(
+            "jsonl",
+            filter(
+                lambda row: ('"model": "openzaak.catalogusconfig"' in row),
+                cls._lines_iter_from_jsonl_stream_or_string(stream_or_string),
+            ),
+        ):
+            object_type: str = deserialized_object.object.__class__.__name__
+
+            if object_type == "CatalogusConfig":
+                target_base_url = cls._get_url_root(
+                    deserialized_object.object.service.api_root
+                )
+                source_base_url = cls._get_url_root(deserialized_object.object.url)
+                base_url_mapping[source_base_url] = target_base_url
+            else:
+                # https://www.xkcd.com/2200/
+                logger.error(
+                    "Tried to filter for catalogus config objects, but also got: %s",
+                    object_type,
+                )
+
+        for line in cls._lines_iter_from_jsonl_stream_or_string(stream_or_string):
+            source_url_found = False
+            for source, target in base_url_mapping.items():
+                line = line.replace(source, target)
+                source_url_found = True
+
+            if not source_url_found:
+                raise ValueError("Unable to rewrite ZGW urls")
+
+            yield line
+
+    @classmethod
+    @transaction.atomic()
+    def from_jsonl_stream_or_string(cls, stream_or_string: IO | str) -> Self:
         model_to_counter_mapping = {
             "CatalogusConfig": "catalogus_configs_imported",
             "ZaakTypeConfig": "zaaktype_configs_imported",
@@ -126,7 +218,10 @@ class CatalogusConfigImport:
         }
 
         object_type_counts = defaultdict(int)
-        for deserialized_object in serializers.deserialize("jsonl", stream_or_string):
+
+        for deserialized_object in serializers.deserialize(
+            "jsonl", cls._rewrite_jsonl_url_references(stream_or_string)
+        ):
             deserialized_object.save()
             object_type = deserialized_object.object.__class__.__name__
             object_type_counts[object_type] += 1
