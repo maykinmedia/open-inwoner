@@ -1,7 +1,3 @@
-/**
- * When HTMX replaces parts of the DOM with new content, the JavaScript attached to the old DOM does not apply to the new content unless we explicitly reapply it.
- * To fix this, listen for htmx:afterSwap events that are triggered after new content is swapped into the DOM.
- */
 document.addEventListener('DOMContentLoaded', function () {
   initFilterBar() // Initialize everything on page load
 })
@@ -31,12 +27,6 @@ function initFilterBar() {
       let sum = 0
       let selectedFilters = []
 
-      /**
-       * Note: dynamic text from selectedFilters is inserted using textContent,
-       * while static elements like icons or spans are appended separately using createElement and appendChild.
-       * ensuring HTML injection is safe and prevents cross-site scripting vulnerability.
-       * */
-
       checkboxes.forEach((checkbox) => {
         if (checkbox.checked) {
           const label = checkbox.nextElementSibling
@@ -64,32 +54,36 @@ function initFilterBar() {
       closeIcon.setAttribute('aria-hidden', 'true')
       closeIcon.textContent = 'close'
 
+      // Add text and icons based on selected filters
       if (selectedFilters.length === 0) {
-        // Show 'Status' text and 'expand_more' icon when no filters are selected
         selectButton.textContent = 'Status '
         selectButton.appendChild(expandIcon)
         selectButton.classList.remove('active')
+      } else if (selectedFilters.length === 1) {
+        const ellipsisSpan = document.createElement('span')
+        ellipsisSpan.classList.add('ellipsis')
+        ellipsisSpan.textContent = selectedFilters[0]
+        selectButton.appendChild(ellipsisSpan)
+        selectButton.appendChild(closeIcon)
+        selectButton.classList.add('active')
       } else {
-        if (selectedFilters.length === 1) {
-          // Show only the selected filter text and close icon
-          selectButton.textContent = ''
-          const ellipsisSpan = document.createElement('span')
-          ellipsisSpan.classList.add('ellipsis')
-          ellipsisSpan.textContent = selectedFilters[0]
-          selectButton.appendChild(ellipsisSpan)
-        } else {
-          // Show 'Status' text and the number of selected filters and close icon
-          selectButton.textContent = 'Status '
-          const activeFilterSpan = document.createElement('span')
-          activeFilterSpan.classList.add('active-filters')
-          activeFilterSpan.textContent = `${selectedFilters.length} actieve filters`
-          selectButton.appendChild(activeFilterSpan)
-        }
+        selectButton.textContent = 'Status '
+        const activeFilterSpan = document.createElement('span')
+        activeFilterSpan.classList.add('active-filters')
+        activeFilterSpan.textContent = `${selectedFilters.length} actieve filters`
+        selectButton.appendChild(activeFilterSpan)
         selectButton.appendChild(closeIcon)
         selectButton.classList.add('active')
       }
 
-      // Add aria-live to announce status updates for screen readers
+      closeIcon.addEventListener('click', function (event) {
+        event.stopPropagation()
+        checkboxes.forEach((checkbox) => {
+          checkbox.checked = false
+        })
+        calculateAndDisplayCheckedSum() // Recalculate and update the button and sum
+      })
+
       selectButton.setAttribute('aria-live', 'polite')
 
       const frequencySumElement = document.getElementById('frequencySum')
@@ -99,7 +93,6 @@ function initFilterBar() {
         frequencySumElement.textContent = sum
       }
 
-      // Update the result text based on the sum
       if (resultTextElement) {
         resultTextElement.textContent = sum === 1 ? 'resultaat' : 'resultaten'
       }
@@ -112,11 +105,11 @@ function initFilterBar() {
         if (sum > 0) {
           filterCasesButton.classList.remove('hide')
           filterFormActions.classList.remove('hide')
-          resetFilters.classList.remove('hide') // Show the reset button when there are checked filters
+          resetFilters.classList.remove('hide')
         } else {
           filterCasesButton.classList.add('hide')
           filterFormActions.classList.add('hide')
-          resetFilters.classList.add('hide') // Hide the reset button when no filters are checked
+          resetFilters.classList.add('hide')
         }
       }
     }
@@ -124,6 +117,9 @@ function initFilterBar() {
     const initSelectBehavior = function () {
       const selectButton = document.getElementById('selectButton')
       const listboxDropdown = document.getElementById('listboxDropdown')
+      const selectDropdownWrapper = document.getElementById(
+        'selectDropdownWrapper'
+      )
       let currentIndex = -1
 
       if (selectButton) {
@@ -137,7 +133,6 @@ function initFilterBar() {
           )
         })
 
-        // Accessible keyboard behaviour
         selectButton.addEventListener('keydown', (e) => {
           const items = listboxDropdown.querySelectorAll(
             '.filter-bar .checkbox__label'
@@ -179,24 +174,29 @@ function initFilterBar() {
         })
       }
 
+      // Close dropdown when clicking outside the selectButton and listboxDropdown
+      document.addEventListener('click', function (e) {
+        if (!selectDropdownWrapper.contains(e.target)) {
+          listboxDropdown.classList.remove('show')
+          selectButton.setAttribute('aria-expanded', 'false')
+        }
+      })
+
       initCheckboxStateFromURL()
     }
 
     document.addEventListener('change', function (e) {
       if (e.target && e.target.classList.contains('checkbox__input')) {
         if (e.target.closest('.filter-bar')) {
-          calculateAndDisplayCheckedSum() // Update the display when a checkbox is checked/unchecked
+          calculateAndDisplayCheckedSum()
         }
       }
     })
 
-    // Reset button functionality
     const resetFilters = document.getElementById('resetFilters')
     if (resetFilters) {
       resetFilters.addEventListener('click', function (e) {
         e.preventDefault()
-
-        // Uncheck all checkboxes
         const checkboxes = document.querySelectorAll(
           '.filter-bar .checkbox__input'
         )
@@ -204,23 +204,45 @@ function initFilterBar() {
           checkbox.checked = false
         })
 
-        calculateAndDisplayCheckedSum() // Update the button and reset state after clearing
+        calculateAndDisplayCheckedSum()
 
-        // Optionally, resubmit the form after resetting filters,
-        // may need to be added when submit button is removed in future
-        // const form = document.querySelector('#filterBar .form')
-        // if (form) {
-        //   form.submit()
-        //   console.log('Form submitted after resetting filters')
-        // }
+        const filterBarForm = document.querySelector('#filterBar .form')
+        if (filterBarForm) {
+          filterBarForm.submit()
+        }
       })
     }
 
     initSelectBehavior()
+
+    document.body.addEventListener('htmx:afterSwap', function () {
+      initFilterBar()
+      calculateAndDisplayCheckedSum() // Make sure sum is updated after swap
+    })
+
+    document.addEventListener('DOMContentLoaded', function () {
+      initSelectBehavior()
+    })
   }
 }
 
-// HTMX: Listen for htmx:afterSwap event to reinitialize the filter bar after HTMX content is swapped in
+function scrollToTopOfWindow() {
+  setTimeout(function () {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, 10)
+}
+
 document.body.addEventListener('htmx:afterSwap', function () {
-  initFilterBar()
+  setTimeout(function () {
+    initFilterBar() // Reinitialize filter bar after swap
+  }, 50)
+})
+
+document.addEventListener('click', function (e) {
+  if (e.target && e.target.classList.contains('pagination__link')) {
+    scrollToTopOfWindow()
+    setTimeout(function () {
+      initFilterBar() // Reinitialize filter bar after swap
+    }, 20)
+  }
 })

@@ -1,6 +1,6 @@
 {% load i18n l10n form_tags icon_tags button_tags %}
 
-<div class="filter-bar__multiselect-listbox multiselect-listbox">
+<div class="filter-bar__multiselect-listbox multiselect-listbox" id="selectDropdownWrapper">
     <button id="selectButton" type="button" class="button button__select" aria-haspopup="listbox" aria-expanded="false" aria-live="polite">
         {% trans 'Status' %}:
         {% icon icon="expand_more" icon_position="after" icon_outlined=True %}
