@@ -4731,8 +4731,8 @@ msgid ""
 "Contactmomenten registered via one of these channels will not be displayed "
 "to users."
 msgstr ""
-"Contactmomenten die via één van deze kanalen worden geregistreerd, worden "
-"niet aan gebruikers getoond."
+"Contactmomenten die via één van deze kanalen worden geregistreerd, zullen "
+"niet aan gebruikers getoond worden."
 
 #: open_inwoner/openklant/models.py:123
 msgid "Open Klant configuration"
