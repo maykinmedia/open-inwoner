@@ -203,6 +203,7 @@ INSTALLED_APPS = [
     "formtools",
     "django_setup_configuration",
     "django_yubin",
+    "notifications",
     # Project applications.
     "open_inwoner.components",
     "open_inwoner.kvk",

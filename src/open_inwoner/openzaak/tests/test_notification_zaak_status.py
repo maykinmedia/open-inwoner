@@ -49,6 +49,8 @@ class StatusNotificationHandlerTestCase(
         data = MockAPIData().install_mocks(m)
         data_alt = MockAPIDataAlt().install_mocks(m)
 
+        self.clearTimelineLogs()
+
         # Added for https://taiga.maykinmedia.nl/project/open-inwoner/task/1904
         # In eSuite it is possible to reuse a StatusType for multiple ZaakTypen, which
         # led to errors when retrieving the ZaakTypeStatusTypeConfig. This duplicate
