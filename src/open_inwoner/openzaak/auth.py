@@ -15,6 +15,9 @@ from open_inwoner.openzaak.exceptions import (
 def get_valid_subscription_from_request(request) -> Subscription:
     auth_header = request.headers.get("Authorization")
     if not auth_header:
+        # notificaties.test.openzaak does not provide an auth header
+        # for test notifications when registering a webhook, so this
+        # can lead to false positives when testing
         raise InvalidAuth("missing Authorization header")
     return get_valid_subscriptions_from_bearer(auth_header)
 

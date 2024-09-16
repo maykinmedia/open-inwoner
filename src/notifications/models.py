@@ -131,6 +131,7 @@ class Subscription(models.Model):
         }
 
         response = client.post("abonnement", json=data)
+        response.raise_for_status()
         response_json = response.json()
 
         self._subscription = response_json["url"]
