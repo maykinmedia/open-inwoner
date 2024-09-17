@@ -5,10 +5,11 @@ from django.utils.translation import gettext_lazy as _
 
 from ordered_model.models import OrderedModel
 
+from open_inwoner.openproducten.mixins import OpenProductenMixin
 from open_inwoner.pdc.managers import QuestionQueryset
 
 
-class Question(OrderedModel):
+class Question(OrderedModel, OpenProductenMixin):
     category = models.ForeignKey(
         "pdc.Category",
         verbose_name=_("Category"),

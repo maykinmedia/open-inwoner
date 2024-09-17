@@ -7,6 +7,8 @@ from filer.fields.image import FilerImageField
 from treebeard.exceptions import InvalidMoveToDescendant
 from treebeard.mp_tree import MP_MoveHandler, MP_Node
 
+from open_inwoner.openproducten.mixins import OpenProductenMixin
+
 from ..managers import CategoryPublishedQueryset
 
 
@@ -19,7 +21,7 @@ class PublishedMoveHandler(MP_MoveHandler):
         return super().process()
 
 
-class Category(MP_Node):
+class Category(MP_Node, OpenProductenMixin):
     name = models.CharField(
         verbose_name=_("Name"), max_length=100, help_text=_("Name of the category")
     )

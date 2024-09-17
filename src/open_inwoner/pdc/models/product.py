@@ -11,6 +11,10 @@ from filer.fields.image import FilerImageField
 from openformsclient.models import OpenFormsSlugField
 from ordered_model.models import OrderedModel
 
+from open_inwoner.openproducten.mixins import (
+    OpenProductenMixin,
+    OpenProductenProductTypeMixin,
+)
 from open_inwoner.utils.validators import DutchPhoneNumberValidator
 
 from ..managers import ProductQueryset
@@ -35,7 +39,7 @@ class CategoryProduct(OrderedModel):
     get_product_name.short_description = _("Name")
 
 
-class Product(models.Model):
+class Product(OpenProductenProductTypeMixin):
     name = models.CharField(
         verbose_name=_("Name"), max_length=100, help_text=_("Name of the product")
     )
@@ -232,7 +236,7 @@ class Product(models.Model):
         return r"\[CTABUTTON\]" in self.content  # noqa
 
 
-class ProductFile(models.Model):
+class ProductFile(OpenProductenMixin):
     product = models.ForeignKey(
         "pdc.Product",
         verbose_name=_("Product"),
@@ -256,7 +260,7 @@ class ProductFile(models.Model):
         return ""
 
 
-class ProductContact(models.Model):
+class ProductContact(OpenProductenMixin):
     organization = models.ForeignKey(
         "pdc.Organization",
         verbose_name=_("Organization"),
@@ -321,7 +325,7 @@ class ProductContact(models.Model):
         return self.organization.phonenumber
 
 
-class ProductLink(models.Model):
+class ProductLink(OpenProductenMixin):
     product = models.ForeignKey(
         "pdc.Product",
         verbose_name=_("Product"),
@@ -386,7 +390,7 @@ class ProductLocation(GeoModel):
         return reverse("products:location_detail", kwargs={"uuid": self.uuid})
 
 
-class ProductCondition(OrderedModel):
+class ProductCondition(OrderedModel, OpenProductenMixin):
     name = models.CharField(
         verbose_name=_("Name"),
         max_length=100,

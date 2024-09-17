@@ -3,12 +3,13 @@ from django.utils.translation import gettext_lazy as _
 
 from filer.fields.image import FilerImageField
 
+from open_inwoner.openproducten.mixins import OpenProductenMixin
 from open_inwoner.utils.validators import DutchPhoneNumberValidator
 
 from .mixins import GeoModel
 
 
-class Organization(GeoModel):
+class Organization(GeoModel, OpenProductenMixin):
     name = models.CharField(
         verbose_name=_("Name"), max_length=250, help_text=_("Name of the organization")
     )

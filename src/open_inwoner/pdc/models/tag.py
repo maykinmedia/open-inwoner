@@ -3,8 +3,10 @@ from django.utils.translation import gettext_lazy as _
 
 from filer.fields.image import FilerImageField
 
+from open_inwoner.openproducten.mixins import OpenProductenMixin
 
-class Tag(models.Model):
+
+class Tag(OpenProductenMixin):
     name = models.CharField(
         verbose_name=_("Name"), max_length=100, help_text=_("Name of the tag")
     )
@@ -40,7 +42,7 @@ class Tag(models.Model):
         return self.name
 
 
-class TagType(models.Model):
+class TagType(OpenProductenMixin):
     name = models.CharField(
         verbose_name=_("Name"),
         max_length=100,
