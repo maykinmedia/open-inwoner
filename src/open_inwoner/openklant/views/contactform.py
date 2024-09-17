@@ -81,6 +81,7 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
         config = OpenKlantConfig.get_solo()
 
         # this logic is very gnarly as there are multiple destinations, and sources of user-email
+        # The form_valid method will automatically handle the CAPTCHA field if added to the form.
 
         user = self.request.user
         user_email = None

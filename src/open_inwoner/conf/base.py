@@ -117,7 +117,6 @@ CACHE_ZGW_ZAKEN_TIMEOUT = config("CACHE_ZGW_ZAKEN_TIMEOUT", default=60 * 1)
 # Laposta API caching
 CACHE_LAPOSTA_API_TIMEOUT = config("CACHE_LAPOSTA_API_TIMEOUT", default=60 * 15)
 
-
 #
 # APPLICATIONS enabled for this project
 #
@@ -158,6 +157,7 @@ INSTALLED_APPS = [
     "two_factor",
     "two_factor.plugins.webauthn",
     "maykin_2fa",
+    "simplemathcaptcha",
     # Optional applications.
     "ordered_model",
     "django_admin_index",
@@ -469,13 +469,11 @@ LOGGING = {
     },
 }
 
-
 #
 # LOG OUTGOING REQUESTS
 #
 LOG_OUTGOING_REQUESTS_DB_SAVE = config("LOG_OUTGOING_REQUESTS_DB_SAVE", default=True)
 LOG_OUTGOING_REQUESTS_RESET_DB_SAVE_AFTER = None  # reset config after $ minutes
-
 
 #
 # AUTH settings - user accounts, passwords, backends...
@@ -491,7 +489,6 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "open_inwoner.utils.validators.DiversityValidator"},
 ]
 
-
 # Allow logging in with email+password
 AUTHENTICATION_BACKENDS = [
     "open_inwoner.accounts.backends.CustomAxesBackend",
@@ -502,7 +499,6 @@ AUTHENTICATION_BACKENDS = [
     "digid_eherkenning_oidc_generics.backends.OIDCAuthenticationEHerkenningBackend",
     "open_inwoner.accounts.backends.CustomOIDCBackend",
 ]
-
 
 SESSION_COOKIE_NAME = "open_inwoner_sessionid"
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
@@ -632,7 +628,6 @@ ADMIN_INDEX_SHOW_MENU = True
 ADMIN_INDEX_DISPLAY_DROP_DOWN_MENU_CONDITION_FUNCTION = (
     "open_inwoner.utils.django_two_factor_auth.should_display_dropdown_menu"
 )
-
 
 #
 # DJANGO-AXES (4.0+)
@@ -777,7 +772,6 @@ FILER_STORAGES = {
     },
 }
 
-
 THUMBNAIL_PROCESSORS = (
     "filer.thumbnail_processors.scale_and_crop_with_subject_location",
     "image_cropping.thumbnail_processors.crop_corners",
@@ -794,7 +788,6 @@ PRIVATE_MEDIA_URL = "/private_files/"
 
 CORS_ALLOWED_ORIGINS = []
 CORS_ALLOW_CREDENTIALS = True
-
 
 CSRF_TRUSTED_ORIGINS = config(
     "CSRF_TRUSTED_ORIGINS",
@@ -866,13 +859,11 @@ if not ELASTIC_APM_SERVER_URL:
     ELASTIC_APM["ENABLED"] = False
     ELASTIC_APM["SERVER_URL"] = "http://localhost:8200"
 
-
 # geopy
 GEOPY_APP = "Openinwoner"
 GEOPY_TIMEOUT = 10  # in seconds
 LOCATIESERVER_DOMAIN = "api.pdok.nl/bzk/locatieserver/search/v3_1"
 GEOCODER = "open_inwoner.utils.geocode.PdocLocatieserver"
-
 
 # ELASTICSEARCH CONFIG
 ELASTICSEARCH_DSL = {
@@ -881,7 +872,6 @@ ELASTICSEARCH_DSL = {
 ES_INDEX_PRODUCTS = config("ES_INDEX_PRODUCTS", "products")
 ES_MAX_SIZE = 10000
 ES_SUGGEST_SIZE = 5
-
 
 # django import-export
 IMPORT_EXPORT_USE_TRANSACTIONS = True
@@ -976,7 +966,6 @@ ACCOUNTS_SMS_GATEWAY = {
 from .app.csp import *  # noqa
 
 SECURE_REFERRER_POLICY = "same-origin"
-
 
 # mail-editor
 from .parts.maileditor import (  # noqa

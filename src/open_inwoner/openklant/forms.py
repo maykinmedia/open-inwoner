@@ -2,6 +2,8 @@ from django import forms
 from django.forms import Form
 from django.utils.translation import gettext_lazy as _
 
+from simplemathcaptcha.fields import MathCaptchaField
+
 from open_inwoner.accounts.models import User
 from open_inwoner.openklant.models import ContactFormSubject, OpenKlantConfig
 from open_inwoner.utils.validators import DutchPhoneNumberValidator
@@ -44,6 +46,12 @@ class ContactForm(Form):
         max_length=1024,
         widget=forms.Textarea(attrs={"rows": "5"}),
         required=True,
+    )
+    captcha = MathCaptchaField(
+        label=_("Beantwoord deze rekensom"),
+        error_messages={
+            "invalid": _("Controleer je berekening en probeer het opnieuw.")
+        },
     )
 
     user: User

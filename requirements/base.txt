@@ -262,6 +262,9 @@ django-simple-certmanager==1.4.1
     # via
     #   django-digid-eherkenning
     #   zgw-consumers
+django-simple-math-captcha==2.0.1
+    # via
+    #   -r requirements/base.in
 django-sniplates==0.7.2
     # via -r requirements/base.in
 django-solo==2.2.0

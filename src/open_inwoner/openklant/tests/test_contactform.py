@@ -108,6 +108,8 @@ class ContactFormTestCase(
                 "email",
                 "phonenumber",
                 "question",
+                "captcha_0",  # Captcha question
+                "captcha_1",  # Captcha answer
             ),
         )
         form["subject"].select(text=subject.subject)
@@ -138,10 +140,14 @@ class ContactFormTestCase(
             (
                 "subject",
                 "question",
+                "captcha_0",  # Captcha question
+                "captcha_1",  # Captcha answer
             ),
         )
         form["subject"].select(text=subject.subject)
         form["question"] = "hey!\n\nwaddup?"
+        form["captcha_0"] = "1 + 1"
+        form["captcha_1"] = "2"
 
         response = form.submit(status=302)
         mock_send_confirm.assert_called_once_with(user.email, subject.subject)
@@ -199,6 +205,8 @@ class ContactFormTestCase(
         form["email"] = "foo@example.com"
         form["phonenumber"] = "+31612345678"
         form["question"] = "hey!\n\nwaddup?"
+        form["captcha_0"] = "1 + 1"
+        form["captcha_1"] = "2"
 
         response = form.submit().follow()
 
@@ -251,6 +259,8 @@ class ContactFormTestCase(
         form["email"] = "foo@example.com"
         form["phonenumber"] = "+31612345678"
         form["question"] = "hey!\n\nwaddup?"
+        form["captcha_0"] = "1 + 1"
+        form["captcha_1"] = "2"
 
         response = form.submit().follow()
 
@@ -335,6 +345,8 @@ class ContactFormTestCase(
         form["email"] = "foo@example.com"
         form["phonenumber"] = "+31612345678"
         form["question"] = "hey!\n\nwaddup?"
+        form["captcha_0"] = "1 + 1"
+        form["captcha_1"] = "2"
 
         response = form.submit().follow()
 
@@ -373,6 +385,8 @@ class ContactFormTestCase(
                     "emailadres": "foo@example.com",
                     "telefoonnummer": "+31612345678",
                 },
+                "captcha_0": "1 + 1",
+                "captcha_1": "2",
             },
         )
         self.assertTimelineLog(
@@ -413,10 +427,14 @@ class ContactFormTestCase(
             (
                 "subject",
                 "question",
+                "captcha_0",  # Captcha question
+                "captcha_1",  # Captcha answer
             ),
         )
         form["subject"].select(text=subject.subject)
         form["question"] = "Lorem ipsum?"
+        form["captcha_0"] = "1 + 1"
+        form["captcha_1"] = "2"
 
         response = form.submit().follow()
 
@@ -463,10 +481,14 @@ class ContactFormTestCase(
             (
                 "subject",
                 "question",
+                "captcha_0",  # Captcha question
+                "captcha_1",  # Captcha answer
             ),
         )
         form["subject"].select(text=subject.subject)
         form["question"] = "hey!\n\nwaddup?"
+        form["captcha_0"] = "1 + 1"
+        form["captcha_1"] = "2"
 
         response = form.submit().follow()
 
@@ -552,10 +574,14 @@ class ContactFormTestCase(
                         (
                             "subject",
                             "question",
+                            "captcha_0",  # Captcha question
+                            "captcha_1",  # Captcha answer
                         ),
                     )
                     form["subject"].select(text=subject.subject)
                     form["question"] = "hey!\n\nwaddup?"
+                    form["captcha_0"] = "1 + 1"
+                    form["captcha_1"] = "2"
 
                     response = form.submit().follow()
 
@@ -634,10 +660,14 @@ class ContactFormTestCase(
             (
                 "subject",
                 "question",
+                "captcha_0",  # Captcha question
+                "captcha_1",  # Captcha answer
             ),
         )
         form["subject"].select(text=subject.subject)
         form["question"] = "hey!\n\nwaddup?"
+        form["captcha_0"] = "1 + 1"
+        form["captcha_1"] = "2"
 
         form.submit().follow()
         # response tested in other cases
@@ -734,10 +764,14 @@ class ContactFormTestCase(
                         (
                             "subject",
                             "question",
+                            "captcha_0",  # Captcha question
+                            "captcha_1",  # Captcha answer
                         ),
                     )
                     form["subject"].select(text=subject.subject)
                     form["question"] = "hey!\n\nwaddup?"
+                    form["captcha_0"] = "1 + 1"
+                    form["captcha_1"] = "2"
 
                     form.submit().follow()
                     # response tested in other cases
@@ -821,6 +855,8 @@ class ContactFormTestCase(
                 form["email"] = "foo@example.com"
                 form["phonenumber"] = "+31612345678"
                 form["question"] = "hey!\n\nwaddup?"
+                form["captcha_0"] = "1 + 1"
+                form["captcha_1"] = "2"
 
                 response = form.submit().follow()
 
@@ -829,3 +865,109 @@ class ContactFormTestCase(
                 else:
                     mock_send_confirm.assert_not_called()
                 mock_send_confirm.reset_mock()
+
+    def test_anon_form_requires_captcha_and_either_email_or_phonenumber(
+        self, m, mock_send_confirm
+    ):
+        """
+        Test that the anonymous user must fill out the captcha and provide either an email or phone number.
+        """
+        config = OpenKlantConfig.get_solo()
+        config.register_email = "example@example.com"
+        config.save()
+        subject = ContactFormSubjectFactory(config=config)
+
+        response = self.app.get(self.url)
+        form = response.forms["contactmoment-form"]
+        self.assertFormExactFields(
+            form,
+            (
+                "subject",
+                "first_name",
+                "infix",
+                "last_name",
+                "email",
+                "phonenumber",
+                "question",
+                "captcha_0",  # Captcha question
+                "captcha_1",  # Captcha answer
+            ),
+        )
+
+        # Fill out the form without captcha and without email/phone number
+        form["subject"].select(text=subject.subject)
+        form["first_name"] = "Foo"
+        form["last_name"] = "Bar"
+        form["email"] = ""
+        form["phonenumber"] = ""
+        form["question"] = "Some question here."
+        form["captcha_1"] = ""  # Leave the captcha answer blank
+
+        # Submit the form, expect an error due to captcha and missing email/phone
+        response = form.submit(status=200)
+        self.assertContains(response, _("Vul een e-mailadres of telefoonnummer in."))
+        self.assertContains(response, _("Fout antwoord, probeer het opnieuw."))
+        mock_send_confirm.assert_not_called()
+
+        # Now, fill in the captcha correctly but still leave email and phone blank
+        form["captcha_1"] = "2"  # Assuming this is the correct answer for the captcha
+        response = form.submit(status=200)
+        self.assertContains(response, _("Vul een e-mailadres of telefoonnummer in."))
+        mock_send_confirm.assert_not_called()
+
+        # Finally, provide a valid email and correct captcha
+        form["email"] = "foo@example.com"
+        response = form.submit().follow()
+
+        # Assert success message and that the email is sent
+        msgs = list(response.context["messages"])
+        self.assertEqual(len(msgs), 1)
+        self.assertEqual(str(msgs[0]), _("Vraag verstuurd!"))
+        self.assertEqual(msgs[0].level, messages.SUCCESS)
+        self.assertEqual(len(mail.outbox), 1)
+        mock_send_confirm.assert_called_once_with("foo@example.com", subject.subject)
+
+    def test_auth_form_requires_captcha(self, m, mock_send_confirm):
+        """
+        Test that the form requires captcha for authenticated users.
+        """
+        config = OpenKlantConfig.get_solo()
+        config.register_email = "example@example.com"
+        config.save()
+        subject = ContactFormSubjectFactory(config=config)
+
+        user = UserFactory()
+
+        response = self.app.get(self.url, user=user)
+        form = response.forms["contactmoment-form"]
+        self.assertFormExactFields(
+            form,
+            (
+                "subject",
+                "question",
+                "captcha_0",  # Captcha question
+                "captcha_1",  # Captcha answer
+            ),
+        )
+
+        # Fill out the form with incorrect captcha
+        form["subject"].select(text=subject.subject)
+        form["question"] = "Authenticated user question."
+        form["captcha_1"] = ""  # Incorrect captcha
+
+        # Submit the form and expect captcha validation error
+        response = form.submit(status=200)
+        self.assertContains(response, _("Fout antwoord, probeer het opnieuw."))
+        mock_send_confirm.assert_not_called()
+
+        # Now, fill in the correct captcha
+        form["captcha_1"] = "2"  # Assuming this is the correct answer for the captcha
+        response = form.submit().follow()
+
+        # Assert success message
+        msgs = list(response.context["messages"])
+        self.assertEqual(len(msgs), 1)
+        self.assertEqual(str(msgs[0]), _("Vraag verstuurd!"))
+        self.assertEqual(msgs[0].level, messages.SUCCESS)
+        self.assertEqual(len(mail.outbox), 1)
+        mock_send_confirm.assert_called_once_with(user.email, subject.subject)

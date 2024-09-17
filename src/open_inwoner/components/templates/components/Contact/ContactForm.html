@@ -24,6 +24,8 @@
                     {% input form_object.phonenumber %}
                 {% endif %}
                 {% input form_object.question %}
+                {% input form_object.captcha %}
+
                 {% form_actions primary_text=_("Verzenden") primary_icon="arrow_forward" %}
             {% endrender_form %}
 
