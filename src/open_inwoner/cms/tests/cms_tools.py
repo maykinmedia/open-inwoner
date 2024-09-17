@@ -58,12 +58,20 @@ def get_request(*, user=None, session_vars=None):
 
 
 def render_plugin(
-    plugin_class, plugin_data=None, *, user=None, session_vars=None
+    plugin_class,
+    plugin_data=None,
+    *,
+    user=None,
+    session_vars=None,
+    request_context=None,
 ) -> tuple[str, dict]:
     model_instance = _init_plugin(plugin_class, plugin_data)
     request = get_request(user=user, session_vars=session_vars)
 
     context = apply_context_processors(request)
+
+    if request_context:
+        context.update(**request_context)
 
     # note we render twice: once to get the html (to test template tags and parameters etc),
     #   and once to get the returned context (to test returned context content)

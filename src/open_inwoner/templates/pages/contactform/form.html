@@ -1,9 +1,13 @@
-{% extends 'master.html' %}
-{% load i18n %}
+{% load cms_tags i18n render_tags %}
 
 {% block content %}
-    <h1 class="utrecht-heading-1">
-        {% trans "Contactformulier" %}
-    </h1>
-    {% include "components/Contact/ContactForm.html" with form_object=form has_form_configuration=has_form_configuration csrf_token=csrf_token only %}
+    {% if has_form_configuration %}
+        <h1 class="utrecht-heading-1">
+            {% trans "Contactformulier" %}
+        </h1>
+        <p class="utrecht-paragraph">{{ instance.description|ckeditor_content|safe }}</p>
+        {% include "components/Contact/ContactForm.html" with form_object=form has_form_configuration=has_form_configuration csrf_token=csrf_token only %}
+    {% else %}
+    <p class="utrecht-paragraph">{% trans "Contact formulier niet geconfigureerd." %}</p>
+    {% endif %}
 {% endblock content %}

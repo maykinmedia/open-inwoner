@@ -614,6 +614,10 @@ CMS_PLACEHOLDER_CONF = {
             "TextPlugin": ["LinkPlugin"],
         },
     },
+    "contact_form": {
+        "name": _("Contact form plugin"),
+        "plugins": ["ContactFormPlugin"],
+    },
 }
 
 CMS_TOOLBAR_ANONYMOUS_ON = False

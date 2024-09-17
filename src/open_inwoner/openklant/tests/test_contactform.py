@@ -15,6 +15,7 @@ from open_inwoner.openklant.api_models import KlantContactRol
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.openklant.tests.data import MockAPICreateData
 from open_inwoner.openklant.tests.factories import ContactFormSubjectFactory
+from open_inwoner.openklant.views.contactform import ContactFormView
 from open_inwoner.openzaak.tests.factories import ServiceFactory
 from open_inwoner.utils.test import ClearCachesMixin, DisableRequestLogMixin
 from open_inwoner.utils.tests.helpers import AssertFormMixin, AssertTimelineLogMixin
@@ -28,13 +29,15 @@ from open_inwoner.utils.tests.helpers import AssertFormMixin, AssertTimelineLogM
     "open_inwoner.openklant.views.contactform.send_contact_confirmation_mail",
     autospec=True,
 )
-class ContactFormTestCase(
+class ContactFormIntegrationTest(
     ClearCachesMixin,
     AssertTimelineLogMixin,
     AssertFormMixin,
     DisableRequestLogMixin,
     WebTest,
 ):
+    """Integration tests for `ContactForm` and associated view"""
+
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -54,6 +57,9 @@ class ContactFormTestCase(
         config.register_employee_id = ""
         config.send_email_confirmation = True
         config.save()
+
+        # bypass CMS for rendering form template directly via ContactFormView
+        ContactFormView.template_name = "pages/contactform/form.html"
 
     def test_singleton_has_configuration_method(self, m, mock_send_confirm):
         # use cleared (from setUp()
@@ -98,6 +104,7 @@ class ContactFormTestCase(
 
         response = self.app.get(self.url)
         form = response.forms["contactmoment-form"]
+
         self.assertFormExactFields(
             form,
             (
@@ -560,11 +567,19 @@ class ContactFormTestCase(
                     response = form.submit().follow()
 
                     msgs = list(response.context["messages"])
+
                     self.assertEqual(len(msgs), 1)
                     self.assertEqual(str(msgs[0]), _("Vraag verstuurd!"))
                     self.assertEqual(msgs[0].level, messages.SUCCESS)
 
                     self.assertEqual(len(mail.outbox), 0)
+
+                    # Note that WebTest doesn't seem to (properly) clear the
+                    # messages after each subTest, causing spurious failures in
+                    # the assertions above. Thus, we manually clear the
+                    # cookiejar to start the next subTest with a clean messages
+                    # state.
+                    self.app.cookiejar.clear()
 
                     for m in data.matchers:
                         self.assertTrue(m.called_once, str(m._url))
