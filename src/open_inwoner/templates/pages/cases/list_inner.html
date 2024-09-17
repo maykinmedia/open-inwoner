@@ -4,11 +4,26 @@
 <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-title-text">{{ title_text }}</p>
 
 {% if filter_form_enabled %}
-<div class="filter-bar" id="filterBar">
-    <form class="form filter-bar__form" method="GET" id="filter-form" novalidate>
-        <span>{% trans 'Filter op' %}:</span>
-        {% include "components/FilterBar/MultiSelectListbox.html" with statusfrequencies=status_freqs %}
-    </form>
+<div class="filter-bar__backdrop" id="filterBarBackdrop">
+    <div class="filter-bar" id="filterBar">
+        <div class="filter-bar__mobile-controls">
+            {% button icon="close" text=_("Sluiten") hide_text=True icon_outlined=True transparent=True extra_classes="show-controls" %}
+            <div class="form__reset--mobile form__actions--fullwidth form__actions--reset">
+                <button class="button button--primary button--transparent" type="button" name="" value="" title="Wis alle filters" aria-label="Wis alle filters" id="resetAllFilters">
+                    Wis alle filters
+                </button>
+            </div>
+        </div>
+        <div class="filter-bar__mobile-button">
+            <p class="utrecht-paragraph filter-bar__heading">Filters</p>
+            {% button icon="filter_alt" text=_("Filters") icon_outlined=True transparent=True extra_classes="show-modal" %}
+            <p class="utrecht-paragraph filter-bar__status-text">Status</p>
+        </div>
+        <form class="form filter-bar__form" method="GET" id="filter-form" novalidate>
+            <span class="filter-bar__label">{% trans 'Filter op' %}:</span>
+            {% include "components/FilterBar/MultiSelectListbox.html" with statusfrequencies=status_freqs %}
+        </form>
+    </div>
 </div>
 {% endif %}
 
