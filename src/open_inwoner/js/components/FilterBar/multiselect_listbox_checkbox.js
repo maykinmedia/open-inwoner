@@ -177,7 +177,7 @@ function initFilterBar() {
       }
     })
 
-    const resetFilters = document.getElementById('resetFilters')
+    const resetFilters = document.getElementById('resetMultiSelectFilters')
     if (resetFilters) {
       resetFilters.addEventListener('click', function (e) {
         e.preventDefault()

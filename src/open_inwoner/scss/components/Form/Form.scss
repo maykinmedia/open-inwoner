@@ -218,6 +218,24 @@
     grid-area: primary;
   }
 
+  .form__reset {
+    &--desktop {
+      display: none;
+
+      @media (min-width: 768px) {
+        display: block;
+      }
+    }
+
+    &--mobile {
+      display: block;
+
+      @media (min-width: 768px) {
+        display: none;
+      }
+    }
+  }
+
   &--inline {
     grid-template-columns: 1fr auto;
     align-items: start;

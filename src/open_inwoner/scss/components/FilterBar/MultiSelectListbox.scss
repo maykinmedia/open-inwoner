@@ -107,6 +107,7 @@
             text-decoration: underline;
           }
         }
+
         .checkbox__input:focus-visible ~ .checkbox__label {
           border-radius: var(--border-radius);
           outline: var(--focus-border-style) var(--focus-border-width)
@@ -182,6 +183,7 @@
     &--reset {
       position: relative;
       z-index: 1000;
+
       .button--transparent {
         justify-content: flex-start;
         padding-left: 0;

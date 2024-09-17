@@ -5,9 +5,25 @@
 
 {% if filter_form_enabled %}
 <div class="filter-bar" id="filterBar">
+    <div class="filter-bar__mobile-controls">
+        {% button icon="close" text=_("Sluiten") hide_text=True  icon_outlined=True transparent=True extra_classes="show-controls" %}
+        <div class="form__reset--desktop form__actions--fullwidth form__actions--reset">
+            {% button bordered=False text=_("Wis alle filters") id="resetFilters" type="button" transparent=True primary=True %}
+        </div>
+    </div>
+    <div class="filter-bar__mobile-button">
+        {% button icon="filter_alt" text=_("Filters") icon_outlined=True transparent=True extra_classes="show-modal" %}
+    </div>
     <form class="form filter-bar__form" method="GET" id="filter-form" novalidate>
-        <span>{% trans 'Filter op' %}:</span>
+        <span class="filter-bar__label">{% trans 'Filter op' %}:</span>
         {% include "components/FilterBar/MultiSelectListbox.html" with statusfrequencies=status_freqs %}
+
+        {# Mobile submit button updates on select #}
+        <div class="form__reset--mobile form__actions form__actions--fullwidth" id="filterFormActions">
+            <button class="button button--primary" type="submit" title="{% trans 'Toon resultaten' %}" aria-label="{% trans 'Toon resultaten' %}" id="filterCases">
+                {% trans 'Toon' %}<span class="filter-bar__frequency-sum" id="frequencySum">0</span><span id="resultText">{% trans 'resultaten' %}</span>
+            </button>
+        </div>
     </form>
 </div>
 {% endif %}
