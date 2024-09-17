@@ -15,11 +15,11 @@
     padding: 0 0 0 var(--spacing-small);
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: flex-start;
     gap: var(--spacing-extra-large);
   }
 
   &__frequency-sum {
-    padding: 0 var(--spacing-tiny);
+    padding: 0;
   }
 }

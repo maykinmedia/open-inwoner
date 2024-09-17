@@ -1,7 +1,7 @@
 {% load i18n form_tags %}
 
 {# Wrapper for multiple filters #}
-<div class="filter-bar">
+<div class="filter-bar" id="filterBar">
     <form class="form" method="{{ method }}"
           {% if no_action %}action=""{% else %}action="{% firstof form_action request.path %}"{% endif %}
           {% if id %}id="{{ id }}"{% endif %}>
