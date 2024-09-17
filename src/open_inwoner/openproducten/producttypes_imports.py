@@ -338,7 +338,11 @@ class CategoryImporter(OpenProductenImporter):
             "image": image_object,
         }
 
-        parent_instance = _get_instance(Category, category.parent_category)
+        parent_instance = (
+            _get_instance(Category, category.parent_category)
+            if category.parent_category
+            else None
+        )
 
         if category_instance := _get_instance(Category, category.id):
             if category_instance.icon:
