@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-16 09:46+0200\n"
+"POT-Creation-Date: 2024-09-17 16:38+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -200,6 +200,192 @@ msgstr "KVK-nummer moet %(size)i tekens bevatten."
 #: eherkenning/validators.py:13
 msgid "Invalid KvK number."
 msgstr "Ongeldig KVK nummer"
+
+#: notifications/admin.py:25
+#, python-brace-format
+msgid ""
+"Something went wrong while registering subscription for {callback}: "
+"{exception}"
+msgstr ""
+"Er is iets misgegaan bij het registreren van een abonnement voor {callback}: "
+"{exception}"
+
+#: notifications/admin.py:31
+msgid "Register the webhooks"
+msgstr "Registreer de webhooks"
+
+#: notifications/api/serializers.py:10
+msgid "kanaal"
+msgstr "Kanaal"
+
+#: notifications/api/serializers.py:13
+msgid ""
+"De naam van het kanaal (`KANAAL.naam`) waar het bericht op moet worden "
+"gepubliceerd."
+msgstr ""
+"De naam van het kanaal (`KANAAL.naam`) waar het bericht op moet worden "
+"gepubliceerd."
+
+#: notifications/api/serializers.py:18
+msgid "hoofd object"
+msgstr "Hoofd object"
+
+#: notifications/api/serializers.py:20
+msgid ""
+"URL-referentie naar het hoofd object van de publicerende API die betrekking "
+"heeft op de `resource`."
+msgstr ""
+"URL-referentie naar het hoofd object van de publicerende API die betrekking "
+"heeft op de `resource`."
+
+#: notifications/api/serializers.py:25
+msgid "resource"
+msgstr "Resource"
+
+#: notifications/api/serializers.py:27
+msgid "De resourcenaam waar de notificatie over gaat."
+msgstr "De resourcenaam waar de notificatie over gaat."
+
+#: notifications/api/serializers.py:30
+msgid "resource URL"
+msgstr "Resource URL"
+
+#: notifications/api/serializers.py:31
+msgid "URL-referentie naar de `resource` van de publicerende API."
+msgstr "URL-referentie naar de `resource` van de publicerende API."
+
+#: notifications/api/serializers.py:34
+msgid "actie"
+msgstr "Actie"
+
+#: notifications/api/serializers.py:37
+msgid ""
+"De actie die door de publicerende API is gedaan. De publicerende API "
+"specificeert de toegestane acties."
+msgstr ""
+"De actie die door de publicerende API is gedaan. De publicerende API "
+"specificeert de toegestane acties."
+
+#: notifications/api/serializers.py:42
+msgid "aanmaakdatum"
+msgstr "Aanmaakdatum"
+
+#: notifications/api/serializers.py:44
+msgid "Datum en tijd waarop de actie heeft plaatsgevonden."
+msgstr "Datum en tijd waarop de actie heeft plaatsgevonden."
+
+#: notifications/api/serializers.py:47
+msgid "kenmerken"
+msgstr "Kenmerken"
+
+#: notifications/api/serializers.py:50
+msgid "kenmerk"
+msgstr "Kenmerk"
+
+#: notifications/api/serializers.py:52
+msgid "Een waarde behorende bij de sleutel."
+msgstr "Een waarde behorende bij de sleutel."
+
+#: notifications/api/serializers.py:56
+msgid ""
+"Mapping van kenmerken (sleutel/waarde) van de notificatie. De publicerende "
+"API specificeert de toegestane kenmerken."
+msgstr ""
+"Mapping van kenmerken (sleutel/waarde) van de notificatie. De publicerende "
+"API specificeert de toegestane kenmerken."
+
+#: notifications/apps.py:7
+msgid "Notifications API integration"
+msgstr "Notifications API integratie"
+
+#: notifications/models.py:19
+msgid "notifications api service"
+msgstr "Notificatievoorkeuren"
+
+#: notifications/models.py:24
+msgid ""
+"The maximum number of automatic retries. After this amount of retries, "
+"guaranteed delivery stops trying to deliver the message."
+msgstr ""
+"Het maximale aantal automatische pogingen. Na dit aantal pogingen stopt de "
+"gegarandeerde levering van het bericht."
+
+#: notifications/models.py:31
+msgid ""
+"If specified, a factor applied to the exponential backoff. This allows you "
+"to tune how quickly automatic retries are performed."
+msgstr ""
+"Indien gespecificeerd, een factor toegepast op de exponentiële backoff. "
+"Hiermee kunt u afstemmen hoe snel automatische retries worden uitgevoerd."
+
+#: notifications/models.py:37
+msgid "An upper limit in seconds to the exponential backoff time."
+msgstr "Een bovengrens in seconden voor de exponentiële backoff-tijd."
+
+#: notifications/models.py:44
+msgid "Notificatiescomponentenconfiguratie"
+msgstr "Notificatiescomponentenconfiguratie"
+
+#: notifications/models.py:50
+msgid "no service configured"
+msgstr "Geen service geconfigureerd"
+
+#: notifications/models.py:52
+#, python-brace-format
+msgid "Notifications API configuration ({api_root})"
+msgstr "Configuratie van de API voor notificaties ({api_root})"
+
+#: notifications/models.py:71
+msgid "callback url"
+msgstr "Callback URL"
+
+#: notifications/models.py:71
+msgid "Where to send the notifications (webhook url)"
+msgstr "Waar de meldingen naartoe moeten worden gestuurd (webhook-url)"
+
+#: notifications/models.py:74
+msgid "client ID"
+msgstr "Client ID"
+
+#: notifications/models.py:76
+msgid "Client ID to construct the auth token"
+msgstr "Client-ID om het auth-token samen te stellen"
+
+#: notifications/models.py:79
+msgid "client secret"
+msgstr "Client secret"
+
+#: notifications/models.py:81
+msgid "Secret to construct the auth token"
+msgstr "Secret om het auth-token samen te stellen"
+
+#: notifications/models.py:85
+msgid "channels"
+msgstr "Kanalen"
+
+#: notifications/models.py:86
+msgid "Comma-separated list of channels to subscribe to"
+msgstr "Door komma's gescheiden lijst met kanalen waarop u zich kunt abonneren"
+
+#: notifications/models.py:90
+msgid "NC subscription"
+msgstr "NC-abonnement"
+
+#: notifications/models.py:93
+msgid "Subscription as it is known in the NC"
+msgstr "Abonnement zoals het in de NC bekend staat"
+
+#: notifications/models.py:97
+msgid "Webhook subscription"
+msgstr "Webhook-abonnement"
+
+#: notifications/models.py:98
+msgid "Webhook subscriptions"
+msgstr "Webhook-abonnementen"
+
+#: notifications/validators.py:19
+msgid "Ensure this value is not in the future."
+msgstr "Zorg ervoor dat deze waarde niet in de toekomst ligt."
 
 #: open_inwoner/accounts/admin.py:38
 #, python-brace-format
@@ -907,7 +1093,7 @@ msgstr "De ontvanger van het bericht"
 msgid "This is the date the message was created"
 msgstr "Datum dat het bericht is aangemaakt"
 
-#: open_inwoner/accounts/models.py:731 open_inwoner/conf/base.py:583
+#: open_inwoner/accounts/models.py:731 open_inwoner/conf/base.py:584
 #: open_inwoner/pdc/models/product.py:111
 msgid "Content"
 msgstr "Content"
@@ -2620,6 +2806,10 @@ msgstr "Toon"
 msgid "resultaten"
 msgstr "resultaten"
 
+#: open_inwoner/components/templates/components/FilterBar/MultiSelectListbox.html:27
+msgid "Wis alle filters"
+msgstr "Wis alle filters"
+
 #: open_inwoner/components/templates/components/Form/FileInput.html:8
 msgid "Sleep of selecteer bestand"
 msgstr "Sleep of selecteer bestand"
@@ -2807,35 +2997,35 @@ msgstr "Volgende"
 msgid "Dutch"
 msgstr "Nederlands"
 
-#: open_inwoner/conf/base.py:592
+#: open_inwoner/conf/base.py:593
 msgid "Banner Image"
 msgstr "Bannerafbeelding"
 
-#: open_inwoner/conf/base.py:593
+#: open_inwoner/conf/base.py:594
 msgid "Banner Text"
 msgstr "Banner tekst"
 
-#: open_inwoner/conf/base.py:594
+#: open_inwoner/conf/base.py:595
 msgid "Login Banner"
 msgstr "Login Banner"
 
-#: open_inwoner/conf/base.py:596
+#: open_inwoner/conf/base.py:597
 msgid "Footer, Left"
 msgstr "Footer linkerzijde"
 
-#: open_inwoner/conf/base.py:603
+#: open_inwoner/conf/base.py:604
 msgid "Footer, Center"
 msgstr "Footer midden"
 
-#: open_inwoner/conf/base.py:610
+#: open_inwoner/conf/base.py:611
 msgid "Footer, Right"
 msgstr "Footer rechterzijde"
 
-#: open_inwoner/conf/base.py:621
+#: open_inwoner/conf/base.py:622
 msgid "Arrow"
 msgstr "Pijl"
 
-#: open_inwoner/conf/base.py:966
+#: open_inwoner/conf/base.py:967
 #, python-brace-format
 msgid "Inlogcode: {token} (deze code is geldig voor 5 minuten)"
 msgstr "Inlogcode: {token} (deze code is geldig voor 5 minuten)"
@@ -6993,7 +7183,7 @@ msgstr "Verwijder eerst bestanden die niet voldoen aan de voorwaarden"
 
 #: open_inwoner/templates/pages/cases/list_inner.html:9
 msgid "Filter op"
-msgstr "Filter op:"
+msgstr "Filter op"
 
 #: open_inwoner/templates/pages/cases/list_inner.html:18
 msgid "U heeft op dit moment nog geen lopende aanvragen."
