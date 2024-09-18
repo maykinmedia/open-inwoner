@@ -1,34 +1,34 @@
 interactions:
 - request:
-    body: '{"nummer": "0000000004", "kanaal": "send", "onderwerp": "into", "inhoud":
-      "Language clear thousand child continue resource thus.", "taal": "nld", "indicatieContactGelukt":
-      false, "vertrouwelijk": true, "plaatsgevondenOp": "2010-07-07T08:50:20.397459"}'
+    body: '{"nummer": "0000000004", "kanaal": "down", "onderwerp": "Republican", "inhoud":
+      "Heart out so suffer gas what.", "taal": "nld", "indicatieContactGelukt": false,
+      "vertrouwelijk": false, "plaatsgevondenOp": "1995-12-17T11:55:02.045236"}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '251'
+      - '234'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"faa289a5-f46e-4cca-b9e2-907ff238bc3e","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/faa289a5-f46e-4cca-b9e2-907ff238bc3e","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000004","kanaal":"send","onderwerp":"into","inhoud":"Language
-        clear thousand child continue resource thus.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2010-07-07T08:50:20.397459Z"}'
+      string: '{"uuid":"c9c253a2-4bd2-4d2d-a8b5-e76fbaa32927","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/c9c253a2-4bd2-4d2d-a8b5-e76fbaa32927","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000004","kanaal":"down","onderwerp":"Republican","inhoud":"Heart
+        out so suffer gas what.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"1995-12-17T11:55:02.045236Z"}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '513'
+      - '496'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/faa289a5-f46e-4cca-b9e2-907ff238bc3e
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/c9c253a2-4bd2-4d2d-a8b5-e76fbaa32927
       Referrer-Policy:
       - same-origin
       Vary:
@@ -49,15 +49,15 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1&indicatieContactGelukt=False
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"faa289a5-f46e-4cca-b9e2-907ff238bc3e","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/faa289a5-f46e-4cca-b9e2-907ff238bc3e","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000004","kanaal":"send","onderwerp":"into","inhoud":"Language
-        clear thousand child continue resource thus.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2010-07-07T08:50:20.397459Z","_expand":{}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"c9c253a2-4bd2-4d2d-a8b5-e76fbaa32927","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/c9c253a2-4bd2-4d2d-a8b5-e76fbaa32927","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000004","kanaal":"down","onderwerp":"Republican","inhoud":"Heart
+        out so suffer gas what.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"1995-12-17T11:55:02.045236Z","_expand":{}}]}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '578'
+      - '561'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

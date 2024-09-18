@@ -1,34 +1,34 @@
 interactions:
 - request:
-    body: '{"nummer": "0000000001", "kanaal": "attorney", "onderwerp": "occur", "inhoud":
-      "Lose eight issue relationship sure.", "taal": "nld", "indicatieContactGelukt":
-      null, "vertrouwelijk": true, "plaatsgevondenOp": "2023-01-21T23:44:23.111876"}'
+    body: '{"nummer": "0000000023", "kanaal": "newspaper", "onderwerp": "many", "inhoud":
+      "Our wife president up week billion single.", "taal": "nld", "indicatieContactGelukt":
+      true, "vertrouwelijk": false, "plaatsgevondenOp": "1994-12-17T09:47:20.327242"}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '237'
+      - '245'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"9148dfa2-3504-4f1d-ac15-a1220b2a4c1b","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/9148dfa2-3504-4f1d-ac15-a1220b2a4c1b","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000001","kanaal":"attorney","onderwerp":"occur","inhoud":"Lose
-        eight issue relationship sure.","indicatieContactGelukt":null,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2023-01-21T23:44:23.111876Z"}'
+      string: '{"uuid":"4039eba0-2b89-4599-8c50-024f730041ef","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/4039eba0-2b89-4599-8c50-024f730041ef","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000023","kanaal":"newspaper","onderwerp":"many","inhoud":"Our
+        wife president up week billion single.","indicatieContactGelukt":true,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"1994-12-17T09:47:20.327242Z"}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '499'
+      - '507'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/9148dfa2-3504-4f1d-ac15-a1220b2a4c1b
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/4039eba0-2b89-4599-8c50-024f730041ef
       Referrer-Policy:
       - same-origin
       Vary:
@@ -41,35 +41,35 @@ interactions:
       code: 201
       message: Created
 - request:
-    body: '{"nummer": "0000000002", "kanaal": "what", "onderwerp": "sense", "inhoud":
-      "Audience agreement a method yes be home boy.", "taal": "nld", "indicatieContactGelukt":
-      null, "vertrouwelijk": true, "plaatsgevondenOp": "1999-12-16T03:39:35.224903"}'
+    body: '{"nummer": "0000000024", "kanaal": "local", "onderwerp": "manager", "inhoud":
+      "Generation rock sound hard employee news.", "taal": "nld", "indicatieContactGelukt":
+      false, "vertrouwelijk": true, "plaatsgevondenOp": "2020-08-03T23:21:52.476104"}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '242'
+      - '243'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"768fb2d9-9162-4c57-bc90-4a6f63e32f04","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/768fb2d9-9162-4c57-bc90-4a6f63e32f04","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000002","kanaal":"what","onderwerp":"sense","inhoud":"Audience
-        agreement a method yes be home boy.","indicatieContactGelukt":null,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"1999-12-16T03:39:35.224903Z"}'
+      string: '{"uuid":"2dbfbc2a-9a5d-4f9e-85d8-37e1681b5c8a","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/2dbfbc2a-9a5d-4f9e-85d8-37e1681b5c8a","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000024","kanaal":"local","onderwerp":"manager","inhoud":"Generation
+        rock sound hard employee news.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2020-08-03T23:21:52.476104Z"}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '504'
+      - '505'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/768fb2d9-9162-4c57-bc90-4a6f63e32f04
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/2dbfbc2a-9a5d-4f9e-85d8-37e1681b5c8a
       Referrer-Policy:
       - same-origin
       Vary:
@@ -82,8 +82,8 @@ interactions:
       code: 201
       message: Created
 - request:
-    body: '{"klantcontact": {"uuid": "9148dfa2-3504-4f1d-ac15-a1220b2a4c1b"}, "wasKlantcontact":
-      {"uuid": "768fb2d9-9162-4c57-bc90-4a6f63e32f04"}}'
+    body: '{"klantcontact": {"uuid": "4039eba0-2b89-4599-8c50-024f730041ef"}, "wasKlantcontact":
+      {"uuid": "2dbfbc2a-9a5d-4f9e-85d8-37e1681b5c8a"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
@@ -95,7 +95,7 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/onderwerpobjecten
   response:
     body:
-      string: '{"uuid":"e87089c2-3932-4892-9697-4876bce8db01","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/e87089c2-3932-4892-9697-4876bce8db01","klantcontact":{"uuid":"9148dfa2-3504-4f1d-ac15-a1220b2a4c1b","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/9148dfa2-3504-4f1d-ac15-a1220b2a4c1b"},"wasKlantcontact":{"uuid":"768fb2d9-9162-4c57-bc90-4a6f63e32f04","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/768fb2d9-9162-4c57-bc90-4a6f63e32f04"},"onderwerpobjectidentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""}}'
+      string: '{"uuid":"b8abf5e6-4a57-47c1-9270-49a4061f46f6","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/b8abf5e6-4a57-47c1-9270-49a4061f46f6","klantcontact":{"uuid":"4039eba0-2b89-4599-8c50-024f730041ef","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/4039eba0-2b89-4599-8c50-024f730041ef"},"wasKlantcontact":{"uuid":"2dbfbc2a-9a5d-4f9e-85d8-37e1681b5c8a","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/2dbfbc2a-9a5d-4f9e-85d8-37e1681b5c8a"},"onderwerpobjectidentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""}}'
     headers:
       API-version:
       - 0.0.3
@@ -108,7 +108,7 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/e87089c2-3932-4892-9697-4876bce8db01
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/b8abf5e6-4a57-47c1-9270-49a4061f46f6
       Referrer-Policy:
       - same-origin
       Vary:

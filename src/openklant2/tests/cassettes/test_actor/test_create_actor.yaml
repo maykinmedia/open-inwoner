@@ -1,0 +1,84 @@
+interactions:
+- request:
+    body: '{"naam": "Miranda Peters", "soortActor": "medewerker", "indicatieActief":
+      true, "actoridentificator": {"objectId": "6070462185571", "codeObjecttype":
+      "exist", "codeRegister": "sport", "codeSoortObjectId": "style"}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '214'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"uuid":"b9cabda9-8791-4900-9d00-6818620ed786","url":"http://localhost:8338/klantinteracties/api/v1/actoren/b9cabda9-8791-4900-9d00-6818620ed786","naam":"Miranda
+        Peters","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"6070462185571","codeObjecttype":"exist","codeRegister":"sport","codeSoortObjectId":"style"},"actorIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '371'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/actoren/b9cabda9-8791-4900-9d00-6818620ed786
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"naam": "Miranda Peters", "soortActor": "medewerker", "indicatieActief":
+      true, "actoridentificator": {"objectId": "6070462185571", "codeObjecttype":
+      "exist", "codeRegister": "sport", "codeSoortObjectId": "style"}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '214'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"uuid":"efd60900-95c3-4440-9776-13aa2f9f4f3e","url":"http://localhost:8338/klantinteracties/api/v1/actoren/efd60900-95c3-4440-9776-13aa2f9f4f3e","naam":"Miranda
+        Peters","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"6070462185571","codeObjecttype":"exist","codeRegister":"sport","codeSoortObjectId":"style"},"actorIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '371'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/actoren/efd60900-95c3-4440-9776-13aa2f9f4f3e
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+version: 1

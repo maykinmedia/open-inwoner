@@ -1,5 +1,6 @@
 from ape_pie import APIClient
 
+from openklant2._resources.actor import ActorResource
 from openklant2._resources.digitaal_adres import DigitaalAdresResource
 from openklant2._resources.klant_contact import KlantContactResource
 from openklant2._resources.onderwerp_object import OnderwerpObjectResource
@@ -22,3 +23,4 @@ class OpenKlant2Client:
         self.digitaal_adres = DigitaalAdresResource(self.http_client)
         self.klant_contact = KlantContactResource(self.http_client)
         self.onderwerp_object = OnderwerpObjectResource(self.http_client)
+        self.actor = ActorResource(self.http_client)

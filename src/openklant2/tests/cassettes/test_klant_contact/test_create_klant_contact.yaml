@@ -13,8 +13,8 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"cd9ad572-9239-4e1c-a27c-7c3a70d1c7cf","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/cd9ad572-9239-4e1c-a27c-7c3a70d1c7cf","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000001","kanaal":"contactformulier","onderwerp":"vraag","inhoud":"Dit
-        is een vraag","indicatieContactGelukt":null,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2024-10-03T12:34:11.104016Z"}'
+      string: '{"uuid":"87e75327-d373-437e-85aa-657743350d1e","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/87e75327-d373-437e-85aa-657743350d1e","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000001","kanaal":"contactformulier","onderwerp":"vraag","inhoud":"Dit
+        is een vraag","indicatieContactGelukt":null,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2024-10-03T12:36:42.153820Z"}'
     headers:
       API-version:
       - 0.0.3
@@ -27,7 +27,7 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/cd9ad572-9239-4e1c-a27c-7c3a70d1c7cf
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/87e75327-d373-437e-85aa-657743350d1e
       Referrer-Policy:
       - same-origin
       Vary:

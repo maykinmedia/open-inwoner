@@ -1,34 +1,34 @@
 interactions:
 - request:
-    body: '{"nummer": "0000000019", "kanaal": "beat", "onderwerp": "nation", "inhoud":
-      "Word receive among continue do white.", "taal": "nld", "indicatieContactGelukt":
-      false, "vertrouwelijk": false, "plaatsgevondenOp": "2001-08-27T22:13:32.218438"}'
+    body: '{"nummer": "0000000019", "kanaal": "necessary", "onderwerp": "red", "inhoud":
+      "Try easy that west popular.", "taal": "nld", "indicatieContactGelukt": false,
+      "vertrouwelijk": false, "plaatsgevondenOp": "2001-08-28T09:00:43.096275"}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '238'
+      - '230'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"6826163a-dbfb-492a-a0cc-2d133a10a25e","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/6826163a-dbfb-492a-a0cc-2d133a10a25e","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000019","kanaal":"beat","onderwerp":"nation","inhoud":"Word
-        receive among continue do white.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2001-08-27T22:13:32.218438Z"}'
+      string: '{"uuid":"b8057bc7-6005-4bef-9697-3c707a29bb8d","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/b8057bc7-6005-4bef-9697-3c707a29bb8d","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000019","kanaal":"necessary","onderwerp":"red","inhoud":"Try
+        easy that west popular.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2001-08-28T09:00:43.096275Z"}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '500'
+      - '492'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/6826163a-dbfb-492a-a0cc-2d133a10a25e
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/b8057bc7-6005-4bef-9697-3c707a29bb8d
       Referrer-Policy:
       - same-origin
       Vary:
@@ -49,15 +49,15 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"6826163a-dbfb-492a-a0cc-2d133a10a25e","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/6826163a-dbfb-492a-a0cc-2d133a10a25e","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000019","kanaal":"beat","onderwerp":"nation","inhoud":"Word
-        receive among continue do white.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2001-08-27T22:13:32.218438Z","_expand":{}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"b8057bc7-6005-4bef-9697-3c707a29bb8d","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/b8057bc7-6005-4bef-9697-3c707a29bb8d","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000019","kanaal":"necessary","onderwerp":"red","inhoud":"Try
+        easy that west popular.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2001-08-28T09:00:43.096275Z","_expand":{}}]}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '565'
+      - '557'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

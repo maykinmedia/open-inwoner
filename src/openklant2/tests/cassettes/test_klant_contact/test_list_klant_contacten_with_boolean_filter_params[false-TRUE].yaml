@@ -1,34 +1,34 @@
 interactions:
 - request:
-    body: '{"nummer": "0000000014", "kanaal": "defense", "onderwerp": "stop", "inhoud":
-      "Five beyond church southern.", "taal": "nld", "indicatieContactGelukt": false,
-      "vertrouwelijk": false, "plaatsgevondenOp": "1999-09-15T12:15:30.803964"}'
+    body: '{"nummer": "0000000014", "kanaal": "reduce", "onderwerp": "report", "inhoud":
+      "Full indeed should make training factor certainly dog.", "taal": "nld", "indicatieContactGelukt":
+      false, "vertrouwelijk": true, "plaatsgevondenOp": "2009-01-01T02:55:35.730767"}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '230'
+      - '256'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"9384c083-f444-4bf1-b93c-a2ab76ab56c0","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/9384c083-f444-4bf1-b93c-a2ab76ab56c0","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000014","kanaal":"defense","onderwerp":"stop","inhoud":"Five
-        beyond church southern.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"1999-09-15T12:15:30.803964Z"}'
+      string: '{"uuid":"3c7d0d28-5358-4744-80af-f4723da6bc89","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/3c7d0d28-5358-4744-80af-f4723da6bc89","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000014","kanaal":"reduce","onderwerp":"report","inhoud":"Full
+        indeed should make training factor certainly dog.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2009-01-01T02:55:35.730767Z"}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '492'
+      - '518'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/9384c083-f444-4bf1-b93c-a2ab76ab56c0
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/3c7d0d28-5358-4744-80af-f4723da6bc89
       Referrer-Policy:
       - same-origin
       Vary:
@@ -49,15 +49,15 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1&indicatieContactGelukt=false
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"9384c083-f444-4bf1-b93c-a2ab76ab56c0","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/9384c083-f444-4bf1-b93c-a2ab76ab56c0","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000014","kanaal":"defense","onderwerp":"stop","inhoud":"Five
-        beyond church southern.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"1999-09-15T12:15:30.803964Z","_expand":{}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"3c7d0d28-5358-4744-80af-f4723da6bc89","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/3c7d0d28-5358-4744-80af-f4723da6bc89","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000014","kanaal":"reduce","onderwerp":"report","inhoud":"Full
+        indeed should make training factor certainly dog.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2009-01-01T02:55:35.730767Z","_expand":{}}]}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '557'
+      - '583'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

@@ -1,34 +1,34 @@
 interactions:
 - request:
-    body: '{"nummer": "0000000007", "kanaal": "nearly", "onderwerp": "control", "inhoud":
-      "Make particularly deep investment write.", "taal": "nld", "indicatieContactGelukt":
-      false, "vertrouwelijk": true, "plaatsgevondenOp": "2015-09-18T06:34:05.124316"}'
+    body: '{"nummer": "0000000007", "kanaal": "hard", "onderwerp": "common", "inhoud":
+      "Meet catch member pressure Republican campaign.", "taal": "nld", "indicatieContactGelukt":
+      false, "vertrouwelijk": true, "plaatsgevondenOp": "2001-06-23T16:03:07.527472"}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '243'
+      - '247'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"f31af9e6-cea7-493a-be66-95f82f7fbd93","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/f31af9e6-cea7-493a-be66-95f82f7fbd93","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000007","kanaal":"nearly","onderwerp":"control","inhoud":"Make
-        particularly deep investment write.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2015-09-18T06:34:05.124316Z"}'
+      string: '{"uuid":"c6c46dba-d1fd-422d-8341-aeeef9bf0df0","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/c6c46dba-d1fd-422d-8341-aeeef9bf0df0","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000007","kanaal":"hard","onderwerp":"common","inhoud":"Meet
+        catch member pressure Republican campaign.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2001-06-23T16:03:07.527472Z"}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '505'
+      - '509'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/f31af9e6-cea7-493a-be66-95f82f7fbd93
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/c6c46dba-d1fd-422d-8341-aeeef9bf0df0
       Referrer-Policy:
       - same-origin
       Vary:
@@ -49,15 +49,15 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1&indicatieContactGelukt=False
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"f31af9e6-cea7-493a-be66-95f82f7fbd93","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/f31af9e6-cea7-493a-be66-95f82f7fbd93","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000007","kanaal":"nearly","onderwerp":"control","inhoud":"Make
-        particularly deep investment write.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2015-09-18T06:34:05.124316Z","_expand":{}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"c6c46dba-d1fd-422d-8341-aeeef9bf0df0","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/c6c46dba-d1fd-422d-8341-aeeef9bf0df0","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000007","kanaal":"hard","onderwerp":"common","inhoud":"Meet
+        catch member pressure Republican campaign.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2001-06-23T16:03:07.527472Z","_expand":{}}]}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '570'
+      - '574'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

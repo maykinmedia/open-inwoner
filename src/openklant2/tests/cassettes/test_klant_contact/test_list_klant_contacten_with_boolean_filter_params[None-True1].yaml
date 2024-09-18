@@ -1,34 +1,34 @@
 interactions:
 - request:
-    body: '{"nummer": "0000000020", "kanaal": "understand", "onderwerp": "professional",
-      "inhoud": "Speak career analysis produce century bag.", "taal": "nld", "indicatieContactGelukt":
-      false, "vertrouwelijk": true, "plaatsgevondenOp": "2009-12-13T07:16:11.919746"}'
+    body: '{"nummer": "0000000020", "kanaal": "something", "onderwerp": "kitchen",
+      "inhoud": "Forget song central drive.", "taal": "nld", "indicatieContactGelukt":
+      false, "vertrouwelijk": true, "plaatsgevondenOp": "2018-09-03T13:56:28.483105"}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '254'
+      - '232'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"cb2ec292-f9eb-48c8-b0fe-2debf0fdf6ae","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/cb2ec292-f9eb-48c8-b0fe-2debf0fdf6ae","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000020","kanaal":"understand","onderwerp":"professional","inhoud":"Speak
-        career analysis produce century bag.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2009-12-13T07:16:11.919746Z"}'
+      string: '{"uuid":"663c8035-3275-4b74-be37-35b1b51af81b","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/663c8035-3275-4b74-be37-35b1b51af81b","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000020","kanaal":"something","onderwerp":"kitchen","inhoud":"Forget
+        song central drive.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2018-09-03T13:56:28.483105Z"}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '516'
+      - '494'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/cb2ec292-f9eb-48c8-b0fe-2debf0fdf6ae
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/663c8035-3275-4b74-be37-35b1b51af81b
       Referrer-Policy:
       - same-origin
       Vary:
@@ -49,15 +49,15 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"cb2ec292-f9eb-48c8-b0fe-2debf0fdf6ae","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/cb2ec292-f9eb-48c8-b0fe-2debf0fdf6ae","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000020","kanaal":"understand","onderwerp":"professional","inhoud":"Speak
-        career analysis produce century bag.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2009-12-13T07:16:11.919746Z","_expand":{}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"663c8035-3275-4b74-be37-35b1b51af81b","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/663c8035-3275-4b74-be37-35b1b51af81b","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000020","kanaal":"something","onderwerp":"kitchen","inhoud":"Forget
+        song central drive.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2018-09-03T13:56:28.483105Z","_expand":{}}]}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '581'
+      - '559'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

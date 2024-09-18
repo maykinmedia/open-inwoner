@@ -1,34 +1,34 @@
 interactions:
 - request:
-    body: '{"nummer": "0000000013", "kanaal": "class", "onderwerp": "race", "inhoud":
-      "International and before apply rate house.", "taal": "nld", "indicatieContactGelukt":
-      false, "vertrouwelijk": false, "plaatsgevondenOp": "2021-03-24T23:27:18.570892"}'
+    body: '{"nummer": "0000000013", "kanaal": "yes", "onderwerp": "more", "inhoud":
+      "Speak high since.", "taal": "nld", "indicatieContactGelukt": false, "vertrouwelijk":
+      true, "plaatsgevondenOp": "2017-05-03T04:21:55.181627"}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '242'
+      - '214'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"50b44493-2e6d-4484-b778-c7d3d2af9243","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/50b44493-2e6d-4484-b778-c7d3d2af9243","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000013","kanaal":"class","onderwerp":"race","inhoud":"International
-        and before apply rate house.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2021-03-24T23:27:18.570892Z"}'
+      string: '{"uuid":"42e13cb1-c231-46ac-98ce-73b8f6a315ee","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/42e13cb1-c231-46ac-98ce-73b8f6a315ee","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000013","kanaal":"yes","onderwerp":"more","inhoud":"Speak
+        high since.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2017-05-03T04:21:55.181627Z"}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '504'
+      - '476'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/50b44493-2e6d-4484-b778-c7d3d2af9243
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/42e13cb1-c231-46ac-98ce-73b8f6a315ee
       Referrer-Policy:
       - same-origin
       Vary:
@@ -49,15 +49,15 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1&indicatieContactGelukt=false
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"50b44493-2e6d-4484-b778-c7d3d2af9243","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/50b44493-2e6d-4484-b778-c7d3d2af9243","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000013","kanaal":"class","onderwerp":"race","inhoud":"International
-        and before apply rate house.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2021-03-24T23:27:18.570892Z","_expand":{}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"42e13cb1-c231-46ac-98ce-73b8f6a315ee","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/42e13cb1-c231-46ac-98ce-73b8f6a315ee","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000013","kanaal":"yes","onderwerp":"more","inhoud":"Speak
+        high since.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2017-05-03T04:21:55.181627Z","_expand":{}}]}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '569'
+      - '541'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

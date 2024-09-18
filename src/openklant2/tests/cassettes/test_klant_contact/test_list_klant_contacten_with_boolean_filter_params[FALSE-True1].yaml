@@ -1,8 +1,8 @@
 interactions:
 - request:
-    body: '{"nummer": "0000000016", "kanaal": "firm", "onderwerp": "may", "inhoud":
-      "History nor direction garden skin well.", "taal": "nld", "indicatieContactGelukt":
-      false, "vertrouwelijk": false, "plaatsgevondenOp": "2021-04-13T21:56:18.260494"}'
+    body: '{"nummer": "0000000016", "kanaal": "threat", "onderwerp": "book", "inhoud":
+      "Two remain next people situation bag.", "taal": "nld", "indicatieContactGelukt":
+      false, "vertrouwelijk": true, "plaatsgevondenOp": "2003-09-29T17:03:39.324906"}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
@@ -14,8 +14,8 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"f17501dc-da84-46e8-a556-0af6a599698c","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/f17501dc-da84-46e8-a556-0af6a599698c","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000016","kanaal":"firm","onderwerp":"may","inhoud":"History
-        nor direction garden skin well.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2021-04-13T21:56:18.260494Z"}'
+      string: '{"uuid":"cca9cb83-a9cd-4229-a8c1-1b0dae360de1","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/cca9cb83-a9cd-4229-a8c1-1b0dae360de1","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000016","kanaal":"threat","onderwerp":"book","inhoud":"Two
+        remain next people situation bag.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2003-09-29T17:03:39.324906Z"}'
     headers:
       API-version:
       - 0.0.3
@@ -28,7 +28,7 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/f17501dc-da84-46e8-a556-0af6a599698c
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/cca9cb83-a9cd-4229-a8c1-1b0dae360de1
       Referrer-Policy:
       - same-origin
       Vary:
@@ -49,8 +49,8 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1&indicatieContactGelukt=FALSE
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"f17501dc-da84-46e8-a556-0af6a599698c","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/f17501dc-da84-46e8-a556-0af6a599698c","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000016","kanaal":"firm","onderwerp":"may","inhoud":"History
-        nor direction garden skin well.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2021-04-13T21:56:18.260494Z","_expand":{}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"cca9cb83-a9cd-4229-a8c1-1b0dae360de1","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/cca9cb83-a9cd-4229-a8c1-1b0dae360de1","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000016","kanaal":"threat","onderwerp":"book","inhoud":"Two
+        remain next people situation bag.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2003-09-29T17:03:39.324906Z","_expand":{}}]}'
     headers:
       API-version:
       - 0.0.3

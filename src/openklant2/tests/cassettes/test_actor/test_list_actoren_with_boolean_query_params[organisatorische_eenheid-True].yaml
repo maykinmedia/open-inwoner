@@ -1,0 +1,314 @@
+interactions:
+- request:
+    body: '{"naam": "Laura Haynes", "soortActor": "organisatorische_eenheid", "indicatieActief":
+      false, "actoridentificator": {"objectId": "0000000019", "codeObjecttype": "city",
+      "codeRegister": "none", "codeSoortObjectId": "fish"}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '221'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"uuid":"9818ae78-ec6a-441c-8206-d6b0d78e3cf2","url":"http://localhost:8338/klantinteracties/api/v1/actoren/9818ae78-ec6a-441c-8206-d6b0d78e3cf2","naam":"Laura
+        Haynes","soortActor":"organisatorische_eenheid","indicatieActief":false,"actoridentificator":{"objectId":"0000000019","codeObjecttype":"city","codeRegister":"none","codeSoortObjectId":"fish"},"actorIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '378'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/actoren/9818ae78-ec6a-441c-8206-d6b0d78e3cf2
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"naam": "Amy Rodriguez", "soortActor": "organisatorische_eenheid", "indicatieActief":
+      false, "actoridentificator": {"objectId": "0000000020", "codeObjecttype": "himself",
+      "codeRegister": "face", "codeSoortObjectId": "serious"}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '228'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"uuid":"3bdd1a1b-1faf-4276-9b4b-2c40fdac40fa","url":"http://localhost:8338/klantinteracties/api/v1/actoren/3bdd1a1b-1faf-4276-9b4b-2c40fdac40fa","naam":"Amy
+        Rodriguez","soortActor":"organisatorische_eenheid","indicatieActief":false,"actoridentificator":{"objectId":"0000000020","codeObjecttype":"himself","codeRegister":"face","codeSoortObjectId":"serious"},"actorIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '385'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/actoren/3bdd1a1b-1faf-4276-9b4b-2c40fdac40fa
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"naam": "Roger Wilson", "soortActor": "organisatorische_eenheid", "indicatieActief":
+      true, "actoridentificator": {"objectId": "0000000021", "codeObjecttype": "student",
+      "codeRegister": "star", "codeSoortObjectId": "subject"}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '226'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"uuid":"af420aa8-b439-4ad1-974b-eba680d2a78d","url":"http://localhost:8338/klantinteracties/api/v1/actoren/af420aa8-b439-4ad1-974b-eba680d2a78d","naam":"Roger
+        Wilson","soortActor":"organisatorische_eenheid","indicatieActief":true,"actoridentificator":{"objectId":"0000000021","codeObjecttype":"student","codeRegister":"star","codeSoortObjectId":"subject"},"actorIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '383'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/actoren/af420aa8-b439-4ad1-974b-eba680d2a78d
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+    method: GET
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren?indicatieActief=True&soortActor=organisatorische_eenheid
+  response:
+    body:
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"af420aa8-b439-4ad1-974b-eba680d2a78d","url":"http://localhost:8338/klantinteracties/api/v1/actoren/af420aa8-b439-4ad1-974b-eba680d2a78d","naam":"Roger
+        Wilson","soortActor":"organisatorische_eenheid","indicatieActief":true,"actoridentificator":{"objectId":"0000000021","codeObjecttype":"student","codeRegister":"star","codeSoortObjectId":"subject"},"actorIdentificatie":null}]}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '435'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"naam": "Ernest Campbell", "soortActor": "medewerker", "indicatieActief":
+      false, "actoridentificator": {"objectId": "0000000019", "codeObjecttype": "key",
+      "codeRegister": "military", "codeSoortObjectId": "coach"}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '214'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"uuid":"f1707e42-9764-4eb3-9ac5-b005f085410f","url":"http://localhost:8338/klantinteracties/api/v1/actoren/f1707e42-9764-4eb3-9ac5-b005f085410f","naam":"Ernest
+        Campbell","soortActor":"medewerker","indicatieActief":false,"actoridentificator":{"objectId":"0000000019","codeObjecttype":"key","codeRegister":"military","codeSoortObjectId":"coach"},"actorIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '371'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/actoren/f1707e42-9764-4eb3-9ac5-b005f085410f
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"naam": "Christina Patel", "soortActor": "geautomatiseerde_actor", "indicatieActief":
+      false, "actoridentificator": {"objectId": "0000000020", "codeObjecttype": "news",
+      "codeRegister": "behavior", "codeSoortObjectId": "how"}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '225'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"uuid":"89860615-d47e-4287-a964-3c0f0ef1af06","url":"http://localhost:8338/klantinteracties/api/v1/actoren/89860615-d47e-4287-a964-3c0f0ef1af06","naam":"Christina
+        Patel","soortActor":"geautomatiseerde_actor","indicatieActief":false,"actoridentificator":{"objectId":"0000000020","codeObjecttype":"news","codeRegister":"behavior","codeSoortObjectId":"how"},"actorIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '382'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/actoren/89860615-d47e-4287-a964-3c0f0ef1af06
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"naam": "Sheila Rodriguez", "soortActor": "organisatorische_eenheid",
+      "indicatieActief": true, "actoridentificator": {"objectId": "0000000021", "codeObjecttype":
+      "water", "codeRegister": "center", "codeSoortObjectId": "hair"}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '227'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"uuid":"51a08e7d-cf11-40bb-8d86-c614ef99ff94","url":"http://localhost:8338/klantinteracties/api/v1/actoren/51a08e7d-cf11-40bb-8d86-c614ef99ff94","naam":"Sheila
+        Rodriguez","soortActor":"organisatorische_eenheid","indicatieActief":true,"actoridentificator":{"objectId":"0000000021","codeObjecttype":"water","codeRegister":"center","codeSoortObjectId":"hair"},"actorIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '384'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/actoren/51a08e7d-cf11-40bb-8d86-c614ef99ff94
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+    method: GET
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren?indicatieActief=True&soortActor=organisatorische_eenheid
+  response:
+    body:
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"51a08e7d-cf11-40bb-8d86-c614ef99ff94","url":"http://localhost:8338/klantinteracties/api/v1/actoren/51a08e7d-cf11-40bb-8d86-c614ef99ff94","naam":"Sheila
+        Rodriguez","soortActor":"organisatorische_eenheid","indicatieActief":true,"actoridentificator":{"objectId":"0000000021","codeObjecttype":"water","codeRegister":"center","codeSoortObjectId":"hair"},"actorIdentificatie":null}]}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '436'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

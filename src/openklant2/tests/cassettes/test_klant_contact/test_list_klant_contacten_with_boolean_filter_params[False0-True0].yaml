@@ -1,34 +1,34 @@
 interactions:
 - request:
-    body: '{"nummer": "0000000003", "kanaal": "I", "onderwerp": "national", "inhoud":
-      "Girl test value stand long let economic.", "taal": "nld", "indicatieContactGelukt":
-      false, "vertrouwelijk": true, "plaatsgevondenOp": "2009-05-23T15:35:36.116488"}'
+    body: '{"nummer": "0000000003", "kanaal": "statement", "onderwerp": "standard",
+      "inhoud": "Movie consumer result order.", "taal": "nld", "indicatieContactGelukt":
+      false, "vertrouwelijk": false, "plaatsgevondenOp": "1998-10-24T14:59:14.755043"}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '239'
+      - '236'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"8bfc4cfc-a7e5-48a2-9256-988664e98336","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/8bfc4cfc-a7e5-48a2-9256-988664e98336","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000003","kanaal":"I","onderwerp":"national","inhoud":"Girl
-        test value stand long let economic.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2009-05-23T15:35:36.116488Z"}'
+      string: '{"uuid":"80f702d8-fe74-4210-b71a-cc3550a45d39","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/80f702d8-fe74-4210-b71a-cc3550a45d39","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000003","kanaal":"statement","onderwerp":"standard","inhoud":"Movie
+        consumer result order.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"1998-10-24T14:59:14.755043Z"}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '501'
+      - '498'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/8bfc4cfc-a7e5-48a2-9256-988664e98336
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/80f702d8-fe74-4210-b71a-cc3550a45d39
       Referrer-Policy:
       - same-origin
       Vary:
@@ -49,15 +49,15 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1&indicatieContactGelukt=False
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"8bfc4cfc-a7e5-48a2-9256-988664e98336","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/8bfc4cfc-a7e5-48a2-9256-988664e98336","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000003","kanaal":"I","onderwerp":"national","inhoud":"Girl
-        test value stand long let economic.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2009-05-23T15:35:36.116488Z","_expand":{}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"80f702d8-fe74-4210-b71a-cc3550a45d39","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/80f702d8-fe74-4210-b71a-cc3550a45d39","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000003","kanaal":"statement","onderwerp":"standard","inhoud":"Movie
+        consumer result order.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"1998-10-24T14:59:14.755043Z","_expand":{}}]}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '566'
+      - '563'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

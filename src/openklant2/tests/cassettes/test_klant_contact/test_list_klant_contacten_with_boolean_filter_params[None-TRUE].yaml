@@ -1,34 +1,34 @@
 interactions:
 - request:
-    body: '{"nummer": "0000000022", "kanaal": "style", "onderwerp": "experience",
-      "inhoud": "Difference religious health medical here team.", "taal": "nld", "indicatieContactGelukt":
-      false, "vertrouwelijk": true, "plaatsgevondenOp": "2023-02-18T15:51:12.006313"}'
+    body: '{"nummer": "0000000022", "kanaal": "media", "onderwerp": "there", "inhoud":
+      "Prevent friend security case.", "taal": "nld", "indicatieContactGelukt": false,
+      "vertrouwelijk": true, "plaatsgevondenOp": "2011-04-18T01:00:58.936539"}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '251'
+      - '229'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"be76d2c7-a67d-48a9-a35c-29a63e6fe0d7","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/be76d2c7-a67d-48a9-a35c-29a63e6fe0d7","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000022","kanaal":"style","onderwerp":"experience","inhoud":"Difference
-        religious health medical here team.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2023-02-18T15:51:12.006313Z"}'
+      string: '{"uuid":"3d803f78-4b58-4227-8367-4efa87db2a2d","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/3d803f78-4b58-4227-8367-4efa87db2a2d","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000022","kanaal":"media","onderwerp":"there","inhoud":"Prevent
+        friend security case.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2011-04-18T01:00:58.936539Z"}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '513'
+      - '491'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/be76d2c7-a67d-48a9-a35c-29a63e6fe0d7
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/3d803f78-4b58-4227-8367-4efa87db2a2d
       Referrer-Policy:
       - same-origin
       Vary:
@@ -49,15 +49,15 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"be76d2c7-a67d-48a9-a35c-29a63e6fe0d7","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/be76d2c7-a67d-48a9-a35c-29a63e6fe0d7","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000022","kanaal":"style","onderwerp":"experience","inhoud":"Difference
-        religious health medical here team.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2023-02-18T15:51:12.006313Z","_expand":{}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"3d803f78-4b58-4227-8367-4efa87db2a2d","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/3d803f78-4b58-4227-8367-4efa87db2a2d","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000022","kanaal":"media","onderwerp":"there","inhoud":"Prevent
+        friend security case.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2011-04-18T01:00:58.936539Z","_expand":{}}]}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '578'
+      - '556'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

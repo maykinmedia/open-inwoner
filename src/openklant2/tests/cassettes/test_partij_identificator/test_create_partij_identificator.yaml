@@ -16,7 +16,7 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/partijen
   response:
     body:
-      string: '{"uuid":"e214b9a8-3287-4130-8f5b-fb52828cb793","url":"http://localhost:8338/klantinteracties/api/v1/partijen/e214b9a8-3287-4130-8f5b-fb52828cb793","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"crp","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Dr.","voornaam":"Test
+      string: '{"uuid":"6539a5c2-f939-4af4-8e6c-a443dc615a91","url":"http://localhost:8338/klantinteracties/api/v1/partijen/6539a5c2-f939-4af4-8e6c-a443dc615a91","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"crp","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Dr.","voornaam":"Test
         Persoon","voorvoegselAchternaam":"Mrs.","achternaam":"Gamble"},"volledigeNaam":"Test
         Persoon Mrs. Gamble"}}'
     headers:
@@ -31,7 +31,7 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/partijen/e214b9a8-3287-4130-8f5b-fb52828cb793
+      - http://localhost:8338/klantinteracties/api/v1/partijen/6539a5c2-f939-4af4-8e6c-a443dc615a91
       Referrer-Policy:
       - same-origin
       Vary:
@@ -44,7 +44,7 @@ interactions:
       code: 201
       message: Created
 - request:
-    body: '{"identificeerdePartij": {"uuid": "e214b9a8-3287-4130-8f5b-fb52828cb793"},
+    body: '{"identificeerdePartij": {"uuid": "6539a5c2-f939-4af4-8e6c-a443dc615a91"},
       "partijIdentificator": {"codeObjecttype": "PERSOON", "codeSoortObjectId": "BSN",
       "objectId": "123456789", "codeRegister": "BRP"}, "anderePartijIdentificator":
       "optional_identifier_123"}'
@@ -59,7 +59,7 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/partij-identificatoren
   response:
     body:
-      string: '{"uuid":"d7d802a6-9637-44a7-9cbf-828d6b854a25","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/d7d802a6-9637-44a7-9cbf-828d6b854a25","identificeerdePartij":{"uuid":"e214b9a8-3287-4130-8f5b-fb52828cb793","url":"http://localhost:8338/klantinteracties/api/v1/partijen/e214b9a8-3287-4130-8f5b-fb52828cb793"},"anderePartijIdentificator":"optional_identifier_123","partijIdentificator":{"codeObjecttype":"PERSOON","codeSoortObjectId":"BSN","objectId":"123456789","codeRegister":"BRP"}}'
+      string: '{"uuid":"ca9b5ab3-3853-46c0-8756-252a147d9101","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/ca9b5ab3-3853-46c0-8756-252a147d9101","identificeerdePartij":{"uuid":"6539a5c2-f939-4af4-8e6c-a443dc615a91","url":"http://localhost:8338/klantinteracties/api/v1/partijen/6539a5c2-f939-4af4-8e6c-a443dc615a91"},"anderePartijIdentificator":"optional_identifier_123","partijIdentificator":{"codeObjecttype":"PERSOON","codeSoortObjectId":"BSN","objectId":"123456789","codeRegister":"BRP"}}'
     headers:
       API-version:
       - 0.0.3
@@ -72,7 +72,7 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/d7d802a6-9637-44a7-9cbf-828d6b854a25
+      - http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/ca9b5ab3-3853-46c0-8756-252a147d9101
       Referrer-Policy:
       - same-origin
       Vary:

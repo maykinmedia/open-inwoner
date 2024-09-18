@@ -1,34 +1,34 @@
 interactions:
 - request:
-    body: '{"nummer": "0000000021", "kanaal": "term", "onderwerp": "conference", "inhoud":
-      "Son top above include ask happy hot herself.", "taal": "nld", "indicatieContactGelukt":
-      false, "vertrouwelijk": false, "plaatsgevondenOp": "2004-07-24T12:11:29.858288"}'
+    body: '{"nummer": "0000000021", "kanaal": "task", "onderwerp": "page", "inhoud":
+      "Scientist decade different foot.", "taal": "nld", "indicatieContactGelukt":
+      false, "vertrouwelijk": true, "plaatsgevondenOp": "2010-01-25T22:41:53.577490"}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '249'
+      - '230'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"bc80e1ae-5597-42b8-8b06-b81aede6fb49","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/bc80e1ae-5597-42b8-8b06-b81aede6fb49","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000021","kanaal":"term","onderwerp":"conference","inhoud":"Son
-        top above include ask happy hot herself.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2004-07-24T12:11:29.858288Z"}'
+      string: '{"uuid":"1a581e40-8d13-423b-980b-c50a2f331568","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/1a581e40-8d13-423b-980b-c50a2f331568","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000021","kanaal":"task","onderwerp":"page","inhoud":"Scientist
+        decade different foot.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2010-01-25T22:41:53.577490Z"}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '511'
+      - '492'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/bc80e1ae-5597-42b8-8b06-b81aede6fb49
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/1a581e40-8d13-423b-980b-c50a2f331568
       Referrer-Policy:
       - same-origin
       Vary:
@@ -49,15 +49,15 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"bc80e1ae-5597-42b8-8b06-b81aede6fb49","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/bc80e1ae-5597-42b8-8b06-b81aede6fb49","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000021","kanaal":"term","onderwerp":"conference","inhoud":"Son
-        top above include ask happy hot herself.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2004-07-24T12:11:29.858288Z","_expand":{}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"1a581e40-8d13-423b-980b-c50a2f331568","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/1a581e40-8d13-423b-980b-c50a2f331568","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000021","kanaal":"task","onderwerp":"page","inhoud":"Scientist
+        decade different foot.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2010-01-25T22:41:53.577490Z","_expand":{}}]}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '576'
+      - '557'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

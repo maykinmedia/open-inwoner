@@ -1,35 +1,34 @@
 interactions:
 - request:
-    body: '{"nummer": "0000000009", "kanaal": "performance", "onderwerp": "position",
-      "inhoud": "Conference personal since meet increase dinner stage.", "taal": "nld",
-      "indicatieContactGelukt": false, "vertrouwelijk": false, "plaatsgevondenOp":
-      "2000-11-29T18:28:14.036523"}'
+    body: '{"nummer": "0000000009", "kanaal": "down", "onderwerp": "full", "inhoud":
+      "Apply garden opportunity standard.", "taal": "nld", "indicatieContactGelukt":
+      false, "vertrouwelijk": true, "plaatsgevondenOp": "1996-03-07T21:17:36.516544"}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '263'
+      - '232'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"4cddd2bc-075d-4d07-bbb0-17d0c944b9e6","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/4cddd2bc-075d-4d07-bbb0-17d0c944b9e6","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000009","kanaal":"performance","onderwerp":"position","inhoud":"Conference
-        personal since meet increase dinner stage.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2000-11-29T18:28:14.036523Z"}'
+      string: '{"uuid":"1db607ac-cd0b-492c-8605-a7a38a45e5cf","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/1db607ac-cd0b-492c-8605-a7a38a45e5cf","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000009","kanaal":"down","onderwerp":"full","inhoud":"Apply
+        garden opportunity standard.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"1996-03-07T21:17:36.516544Z"}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '525'
+      - '494'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/4cddd2bc-075d-4d07-bbb0-17d0c944b9e6
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/1db607ac-cd0b-492c-8605-a7a38a45e5cf
       Referrer-Policy:
       - same-origin
       Vary:
@@ -50,15 +49,15 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1&indicatieContactGelukt=False
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"4cddd2bc-075d-4d07-bbb0-17d0c944b9e6","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/4cddd2bc-075d-4d07-bbb0-17d0c944b9e6","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000009","kanaal":"performance","onderwerp":"position","inhoud":"Conference
-        personal since meet increase dinner stage.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2000-11-29T18:28:14.036523Z","_expand":{}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"1db607ac-cd0b-492c-8605-a7a38a45e5cf","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/1db607ac-cd0b-492c-8605-a7a38a45e5cf","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000009","kanaal":"down","onderwerp":"full","inhoud":"Apply
+        garden opportunity standard.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"1996-03-07T21:17:36.516544Z","_expand":{}}]}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '590'
+      - '559'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

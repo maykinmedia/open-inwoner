@@ -1,34 +1,34 @@
 interactions:
 - request:
-    body: '{"nummer": "0000000001", "kanaal": "American", "onderwerp": "student",
-      "inhoud": "Personal deal result ground will learn.", "taal": "nld", "indicatieContactGelukt":
-      null, "vertrouwelijk": false, "plaatsgevondenOp": "2012-01-07T07:29:43.222794"}'
+    body: '{"nummer": "0000000001", "kanaal": "than", "onderwerp": "side", "inhoud":
+      "Share choose wish sea.", "taal": "nld", "indicatieContactGelukt": false, "vertrouwelijk":
+      true, "plaatsgevondenOp": "2019-05-25T03:57:09.478381"}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '244'
+      - '220'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"cf6929f7-787e-421c-8ddd-42a443aec733","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/cf6929f7-787e-421c-8ddd-42a443aec733","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000001","kanaal":"American","onderwerp":"student","inhoud":"Personal
-        deal result ground will learn.","indicatieContactGelukt":null,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2012-01-07T07:29:43.222794Z"}'
+      string: '{"uuid":"b2ac0cdc-af51-4c87-97f0-9fc2a5e8e786","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/b2ac0cdc-af51-4c87-97f0-9fc2a5e8e786","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000001","kanaal":"than","onderwerp":"side","inhoud":"Share
+        choose wish sea.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2019-05-25T03:57:09.478381Z"}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '506'
+      - '482'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/cf6929f7-787e-421c-8ddd-42a443aec733
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/b2ac0cdc-af51-4c87-97f0-9fc2a5e8e786
       Referrer-Policy:
       - same-origin
       Vary:
@@ -46,18 +46,18 @@ interactions:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
     method: GET
-    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten/cf6929f7-787e-421c-8ddd-42a443aec733
+    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten/b2ac0cdc-af51-4c87-97f0-9fc2a5e8e786
   response:
     body:
-      string: '{"uuid":"cf6929f7-787e-421c-8ddd-42a443aec733","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/cf6929f7-787e-421c-8ddd-42a443aec733","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000001","kanaal":"American","onderwerp":"student","inhoud":"Personal
-        deal result ground will learn.","indicatieContactGelukt":null,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2012-01-07T07:29:43.222794Z"}'
+      string: '{"uuid":"b2ac0cdc-af51-4c87-97f0-9fc2a5e8e786","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/b2ac0cdc-af51-4c87-97f0-9fc2a5e8e786","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000001","kanaal":"than","onderwerp":"side","inhoud":"Share
+        choose wish sea.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2019-05-25T03:57:09.478381Z"}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
       Content-Length:
-      - '506'
+      - '482'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

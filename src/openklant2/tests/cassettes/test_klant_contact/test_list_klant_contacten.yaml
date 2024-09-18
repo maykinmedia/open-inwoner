@@ -1,34 +1,34 @@
 interactions:
 - request:
-    body: '{"nummer": "0000000002", "kanaal": "usually", "onderwerp": "mission", "inhoud":
-      "Both several artist participant space.", "taal": "nld", "indicatieContactGelukt":
-      true, "vertrouwelijk": true, "plaatsgevondenOp": "2024-05-18T18:11:42.426137"}'
+    body: '{"nummer": "0000000002", "kanaal": "yard", "onderwerp": "individual", "inhoud":
+      "Work sing strong side science clear beyond.", "taal": "nld", "indicatieContactGelukt":
+      null, "vertrouwelijk": true, "plaatsgevondenOp": "2007-06-01T07:46:41.301062"}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '241'
+      - '246'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"3ec44e7b-5424-49dc-83f0-6436840d11e2","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/3ec44e7b-5424-49dc-83f0-6436840d11e2","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000002","kanaal":"usually","onderwerp":"mission","inhoud":"Both
-        several artist participant space.","indicatieContactGelukt":true,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2024-05-18T18:11:42.426137Z"}'
+      string: '{"uuid":"d2295208-9a42-4925-a521-80f5ffb7f0b4","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/d2295208-9a42-4925-a521-80f5ffb7f0b4","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000002","kanaal":"yard","onderwerp":"individual","inhoud":"Work
+        sing strong side science clear beyond.","indicatieContactGelukt":null,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2007-06-01T07:46:41.301062Z"}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '503'
+      - '508'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/3ec44e7b-5424-49dc-83f0-6436840d11e2
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/d2295208-9a42-4925-a521-80f5ffb7f0b4
       Referrer-Policy:
       - same-origin
       Vary:
@@ -49,15 +49,15 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"3ec44e7b-5424-49dc-83f0-6436840d11e2","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/3ec44e7b-5424-49dc-83f0-6436840d11e2","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000002","kanaal":"usually","onderwerp":"mission","inhoud":"Both
-        several artist participant space.","indicatieContactGelukt":true,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2024-05-18T18:11:42.426137Z","_expand":{}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"d2295208-9a42-4925-a521-80f5ffb7f0b4","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/d2295208-9a42-4925-a521-80f5ffb7f0b4","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000002","kanaal":"yard","onderwerp":"individual","inhoud":"Work
+        sing strong side science clear beyond.","indicatieContactGelukt":null,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2007-06-01T07:46:41.301062Z","_expand":{}}]}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '568'
+      - '573'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

@@ -1,34 +1,34 @@
 interactions:
 - request:
-    body: '{"nummer": "0000000010", "kanaal": "knowledge", "onderwerp": "daughter",
-      "inhoud": "Call attack have may.", "taal": "nld", "indicatieContactGelukt":
-      false, "vertrouwelijk": false, "plaatsgevondenOp": "2024-05-25T08:25:36.767248"}'
+    body: '{"nummer": "0000000010", "kanaal": "city", "onderwerp": "show", "inhoud":
+      "Structure game southern building always wind so these.", "taal": "nld", "indicatieContactGelukt":
+      false, "vertrouwelijk": false, "plaatsgevondenOp": "2023-06-07T13:53:55.340529"}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '229'
+      - '253'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"2c1f4cea-b0e1-4527-8063-2d8b297d6967","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/2c1f4cea-b0e1-4527-8063-2d8b297d6967","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000010","kanaal":"knowledge","onderwerp":"daughter","inhoud":"Call
-        attack have may.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2024-05-25T08:25:36.767248Z"}'
+      string: '{"uuid":"c36203e0-d8c7-49d4-a5ad-a2bbb9208dee","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/c36203e0-d8c7-49d4-a5ad-a2bbb9208dee","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000010","kanaal":"city","onderwerp":"show","inhoud":"Structure
+        game southern building always wind so these.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2023-06-07T13:53:55.340529Z"}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '491'
+      - '515'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/2c1f4cea-b0e1-4527-8063-2d8b297d6967
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/c36203e0-d8c7-49d4-a5ad-a2bbb9208dee
       Referrer-Policy:
       - same-origin
       Vary:
@@ -49,15 +49,15 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1&indicatieContactGelukt=False
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"2c1f4cea-b0e1-4527-8063-2d8b297d6967","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/2c1f4cea-b0e1-4527-8063-2d8b297d6967","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000010","kanaal":"knowledge","onderwerp":"daughter","inhoud":"Call
-        attack have may.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2024-05-25T08:25:36.767248Z","_expand":{}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"c36203e0-d8c7-49d4-a5ad-a2bbb9208dee","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/c36203e0-d8c7-49d4-a5ad-a2bbb9208dee","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000010","kanaal":"city","onderwerp":"show","inhoud":"Structure
+        game southern building always wind so these.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2023-06-07T13:53:55.340529Z","_expand":{}}]}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '556'
+      - '580'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

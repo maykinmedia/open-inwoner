@@ -1,34 +1,34 @@
 interactions:
 - request:
-    body: '{"nummer": "0000000018", "kanaal": "dream", "onderwerp": "idea", "inhoud":
-      "Stuff mouth behavior protect.", "taal": "nld", "indicatieContactGelukt": false,
-      "vertrouwelijk": true, "plaatsgevondenOp": "2024-02-08T23:57:46.487273"}'
+    body: '{"nummer": "0000000018", "kanaal": "project", "onderwerp": "conference",
+      "inhoud": "As themselves media.", "taal": "nld", "indicatieContactGelukt": false,
+      "vertrouwelijk": true, "plaatsgevondenOp": "2017-03-26T20:35:49.493494"}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '228'
+      - '227'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"f7a450a5-1665-4b2f-90ab-e11a8469bd1d","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/f7a450a5-1665-4b2f-90ab-e11a8469bd1d","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000018","kanaal":"dream","onderwerp":"idea","inhoud":"Stuff
-        mouth behavior protect.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2024-02-08T23:57:46.487273Z"}'
+      string: '{"uuid":"0bbd9b93-0ad1-40d2-b136-f4157a88e6c8","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/0bbd9b93-0ad1-40d2-b136-f4157a88e6c8","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000018","kanaal":"project","onderwerp":"conference","inhoud":"As
+        themselves media.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2017-03-26T20:35:49.493494Z"}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '490'
+      - '489'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/f7a450a5-1665-4b2f-90ab-e11a8469bd1d
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/0bbd9b93-0ad1-40d2-b136-f4157a88e6c8
       Referrer-Policy:
       - same-origin
       Vary:
@@ -49,15 +49,15 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1&indicatieContactGelukt=FALSE
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"f7a450a5-1665-4b2f-90ab-e11a8469bd1d","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/f7a450a5-1665-4b2f-90ab-e11a8469bd1d","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000018","kanaal":"dream","onderwerp":"idea","inhoud":"Stuff
-        mouth behavior protect.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2024-02-08T23:57:46.487273Z","_expand":{}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"0bbd9b93-0ad1-40d2-b136-f4157a88e6c8","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/0bbd9b93-0ad1-40d2-b136-f4157a88e6c8","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000018","kanaal":"project","onderwerp":"conference","inhoud":"As
+        themselves media.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2017-03-26T20:35:49.493494Z","_expand":{}}]}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '555'
+      - '554'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
