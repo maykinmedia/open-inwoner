@@ -39,7 +39,7 @@ class ZaakWithApiGroup(UniformCase):
     api_group: ZGWApiGroupConfig
 
     @property
-    def identifier(self):
+    def identification(self):
         return self.zaak.url
 
     def process_data(self) -> dict:
