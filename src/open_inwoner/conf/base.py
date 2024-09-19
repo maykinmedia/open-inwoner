@@ -1031,8 +1031,3 @@ DJANGO_SETUP_CONFIG_CUSTOM_FIELDS = [
         "description": "string representing the (absolute) path to a file, including file extension",
     },
 ]
-
-#
-# Project specific settings
-#
-CASE_LIST_NUM_THREADS = 6
