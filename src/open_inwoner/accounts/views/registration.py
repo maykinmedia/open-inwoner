@@ -14,7 +14,6 @@ from furl import furl
 from open_inwoner.accounts.choices import NotificationChannelChoice
 from open_inwoner.accounts.views.mixins import KlantenAPIMixin
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.utils.hash import generate_email_from_string
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from ...mail.verification import send_user_email_verification_mail

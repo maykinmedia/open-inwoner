@@ -26,8 +26,9 @@ from ...cms.profile.cms_apps import ProfileApphook
 from ...cms.tests import cms_tools
 from ...utils.test import ClearCachesMixin
 from ...utils.tests.helpers import AssertRedirectsMixin
-from ..choices import LoginTypeChoices
+from ..choices import LoginTypeChoices, NotificationChannelChoice
 from ..models import OpenIDDigiDConfig, OpenIDEHerkenningConfig, User
+from ..signals import update_user_from_klant_on_login
 from .factories import (
     DigidUserFactory,
     InviteFactory,

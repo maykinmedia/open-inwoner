@@ -24,6 +24,7 @@ from mail_editor.helpers import find_template
 from privates.storages import PrivateMediaFileSystemStorage
 from timeline_logger.models import TimelineLog
 
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.utils.hash import create_sha256_hash
 from open_inwoner.utils.validators import (
     CharFieldValidator,
