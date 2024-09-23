@@ -286,6 +286,10 @@ class ContactFormTestCase(
                 "type": "Melding",
                 "kanaal": "contactformulier",
                 "onderwerp": "afdeling-xyz",
+                "contactgegevens": {
+                    "emailadres": "foo@example.com",
+                    "telefoonnummer": "+31612345678",
+                },
             },
         )
         kcm_create_data = data.matchers[2].request_history[0].json()
@@ -353,8 +357,6 @@ class ContactFormTestCase(
         waddup?
 
         Naam: Foo de Bar
-        Email: foo@example.com
-        Telefoonnummer: +31612345678
         """
         )
 
@@ -367,6 +369,10 @@ class ContactFormTestCase(
                 "type": "Melding",
                 "kanaal": "contactformulier",
                 "onderwerp": "afdeling-xyz",
+                "contactgegevens": {
+                    "emailadres": "foo@example.com",
+                    "telefoonnummer": "+31612345678",
+                },
             },
         )
         self.assertTimelineLog(
@@ -682,6 +688,7 @@ class ContactFormTestCase(
     def test_submit_and_register_kvk_or_rsin_user_via_api_and_update_klant(
         self, _m, mock_send_confirm
     ):
+        self.maxDiff = None
         MockAPICreateData.setUpServices()
 
         config = OpenKlantConfig.get_solo()
