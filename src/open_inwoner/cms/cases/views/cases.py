@@ -13,9 +13,8 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 from zgw_consumers.concurrent import parallel
 
 from open_inwoner.htmx.mixins import RequiresHtmxMixin
-from open_inwoner.openzaak.api_models import Zaak
+from open_inwoner.openzaak.api_models import OpenSubmission, Zaak
 from open_inwoner.openzaak.cases import preprocess_data
-from open_inwoner.openzaak.formapi import fetch_open_submissions
 from open_inwoner.openzaak.models import OpenZaakConfig, ZGWApiGroupConfig
 from open_inwoner.openzaak.types import UniformCase
 from open_inwoner.openzaak.utils import get_user_fetch_parameters
@@ -44,16 +43,38 @@ class ZaakWithApiGroup(UniformCase):
         return {**self.zaak.process_data(), "api_group": self.api_group}
 
 
+@dataclass(frozen=True)
+class SubmissionWithApiGroup:
+    submission: OpenSubmission
+    api_group: ZGWApiGroupConfig
+
+    @property
+    def identifier(self):
+        return self.submission.url
+
+    def process_data(self) -> dict:
+        return {**self.submission.process_data(), "api_group": self.api_group}
+
+
 class CaseListService:
     def __init__(self, request: HttpRequest):
         self.request = request
 
-    def get_cases_for_api_group(self, group: ZGWApiGroupConfig):
+    def get_cases_for_api_group(self, group: ZGWApiGroupConfig) -> list[UniformCase]:
         raw_cases = group.zaken_client.fetch_cases(
             **get_user_fetch_parameters(self.request)
         )
         preprocessed_cases = preprocess_data(raw_cases, group)
         return preprocessed_cases
+
+    def get_submissions_for_api_group(
+        self, group: ZGWApiGroupConfig
+    ) -> list[UniformCase]:
+        if not getattr(group, "forms_client"):
+            return []
+        return group.forms_client.fetch_open_submissions(
+            **get_user_fetch_parameters(self.request)
+        )
 
     def get_cases(self) -> list[ZaakWithApiGroup]:
         all_api_groups = list(ZGWApiGroupConfig.objects.all())
@@ -81,10 +102,36 @@ class CaseListService:
         return cases_with_api_group
 
     def get_submissions(self):
-        subs = fetch_open_submissions(self.request.user.bsn)
-        subs.sort(key=lambda sub: sub.datum_laatste_wijziging, reverse=True)
+        all_api_groups = list(ZGWApiGroupConfig.objects.all())
 
-        return subs
+        with parallel() as executor:
+            futures = [
+                executor.submit(self.get_submissions_for_api_group, group)
+                for group in all_api_groups
+            ]
+
+            subs_with_api_group = []
+            for task in concurrent.futures.as_completed(futures):
+                try:
+                    group_for_task = all_api_groups[futures.index(task)]
+                    for row in task.result():
+                        subs_with_api_group.append(
+                            SubmissionWithApiGroup(
+                                submission=row, api_group=group_for_task
+                            )
+                        )
+                except BaseException:
+                    logger.exception("Error fetching and pre-processing cases")
+
+        # Ensure stable sorting for pagination and testing purposes
+        subs_with_api_group.sort(key=lambda s: (all_api_groups.index(s.api_group)))
+
+        # Sort submissions by date modified
+        subs_with_api_group.sort(
+            key=lambda sub: sub.submission.datum_laatste_wijziging, reverse=True
+        )
+
+        return subs_with_api_group
 
     def get_case_status_frequencies(self):
         cases = self.get_cases()
