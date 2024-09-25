@@ -3,24 +3,24 @@ import hashlib
 import random
 import uuid
 from unittest.mock import patch
+from urllib.parse import urlencode
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.test import TestCase, TransactionTestCase
+from django.test import TransactionTestCase
 from django.test.utils import override_settings
 from django.urls import reverse_lazy
-from django.utils.translation import gettext as _
 
 import requests_mock
 from django_webtest import TransactionWebTest
 from furl import furl
+from pyquery import PyQuery as PQ
 from timeline_logger.models import TimelineLog
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory, eHerkenningUserFactory
-from open_inwoner.cms.cases.forms import CaseFilterForm
-from open_inwoner.cms.cases.views.cases import InnerCaseListView
+from open_inwoner.cms.cases.views.cases import CaseFilterFormOption, InnerCaseListView
 from open_inwoner.openzaak.tests.shared import FORMS_ROOT
 from open_inwoner.utils.test import (
     ClearCachesMixin,
@@ -606,7 +606,34 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
             )
 
         # case filter form is disabled by default
-        self.assertIsNone(response.context.get("filter_form"))
+        self.assertFalse(response.context.get("filter_form_enabled"))
+
+    def test_filter_widget_is_controlled_by_zaken_filter_enabled(self, m):
+        self.client.force_login(user=self.user)
+
+        for flag in True, False:
+            with self.subTest(f"zaken_filter_enabled={flag}"):
+                self.config.zaken_filter_enabled = flag
+                self.config.save()
+
+                response = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
+
+                self.assertEqual(response.context.get("filter_form_enabled"), flag)
+
+                doc = PQ(response.rendered_content)
+                self.assertEqual(len(doc.find("#filterBar")), 1 if flag else 0)
+
+    @staticmethod
+    def _encode_statuses(
+        status_or_statuses: CaseFilterFormOption | list[CaseFilterFormOption],
+    ):
+        statuses = (
+            [status_or_statuses]
+            if isinstance(status_or_statuses, CaseFilterFormOption)
+            else status_or_statuses
+        )
+        parts = [urlencode({"status": status.value}) for status in statuses]
+        return "&".join(parts)
 
     def test_filter_cases_simple(self, m):
         for mock in self.mocks:
@@ -616,21 +643,16 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
         self.config.save()
 
         self.client.force_login(user=self.user)
-        inner_url = f"{reverse_lazy('cases:cases_content')}?status=Initial+request"
+        inner_url = f"{reverse_lazy('cases:cases_content')}?{self._encode_statuses(CaseFilterFormOption.OPEN_CASE)}"
 
         response = self.client.get(inner_url, HTTP_HX_REQUEST="true")
-
-        # check filter form
-        filter_form = response.context["filter_form"]
-        self.assertTrue(filter_form.is_valid())
-        self.assertEqual(filter_form.cleaned_data.get("status"), ["Initial request"])
 
         # check cases
         cases = response.context["cases"]
 
         self.assertEqual(len(cases), 4)
         for case in cases:
-            self.assertEqual(case["current_status"], "Initial request")
+            self.assertIsNone(case["end_date"])
 
     def test_filter_cases_multiple(self, m):
         for mock in self.mocks:
@@ -640,26 +662,19 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
         self.config.save()
 
         self.client.force_login(user=self.user)
-        inner_url = f"{reverse_lazy('cases:cases_content')}?status=Initial+request&status=Statustekst+finish"
+        filter_param = self._encode_statuses(
+            [CaseFilterFormOption.CLOSED_CASE, CaseFilterFormOption.OPEN_SUBMISSION]
+        )
+        inner_url = f"{reverse_lazy('cases:cases_content')}?{filter_param}"
 
         response = self.client.get(inner_url, HTTP_HX_REQUEST="true")
-
-        # check filter form
-        filter_form = response.context["filter_form"]
-        self.assertTrue(filter_form.is_valid())
-        self.assertEqual(
-            filter_form.cleaned_data.get("status"),
-            ["Initial request", "Statustekst finish"],
-        )
 
         # check cases
         cases = response.context["cases"]
 
-        self.assertEqual(len(cases), 6)
+        self.assertEqual(len(cases), 4)
         for case in cases:
-            self.assertIn(
-                case["current_status"], ["Initial request", "Statustekst finish"]
-            )
+            self.assertIsNotNone(case["end_date"])
 
     @set_kvk_branch_number_in_session(None)
     def test_list_cases_for_eherkenning_user(self, m):
@@ -1124,30 +1139,4 @@ class CaseSubmissionTest(TransactionWebTest):
         self.assertEqual(
             cases[0]["datum_laatste_wijziging"].strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
             data.submission_2["datumLaatsteWijziging"],
-        )
-
-
-class CaseFilterFormTest(TestCase):
-    def test_case_filter_form_valid(self):
-        form = CaseFilterForm(
-            status_freqs={"Start": 2, "Intermediate": 2, "Finish": 3},
-            data={"status": ["Start", "Intermediate"]},
-        )
-
-        self.assertTrue(form.is_valid())
-
-    def test_case_filter_form_errors(self):
-        form = CaseFilterForm(
-            status_freqs={"Start": 2, "Intermediate": 2, "Finish": 3},
-            data={"status": ["Start", "Bogus"]},
-        )
-
-        self.assertFalse(form.is_valid())
-        self.assertEqual(
-            form.errors,
-            {
-                "status": [
-                    _("Selecteer een geldige keuze. Bogus is geen beschikbare keuze.")
-                ]
-            },
         )

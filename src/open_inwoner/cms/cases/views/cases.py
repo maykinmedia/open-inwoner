@@ -1,4 +1,5 @@
 import concurrent.futures
+import enum
 import logging
 from dataclasses import dataclass
 
@@ -22,13 +23,15 @@ from open_inwoner.openzaak.utils import get_user_fetch_parameters
 from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import CommonPageMixin
 
-from ..forms import CaseFilterForm
 from .mixins import CaseAccessMixin, CaseLogMixin, OuterCaseAccessMixin
 
 logger = logging.getLogger(__name__)
 
 
-SUBMISSION_STATUS_OPEN = _("Openstaande aanvraag")
+class CaseFilterFormOption(enum.Enum):
+    OPEN_SUBMISSION = _("Openstaande formulieren")
+    OPEN_CASE = _("Lopende aanvragen")
+    CLOSED_CASE = _("Afgeronde aanvragen")
 
 
 @dataclass(frozen=True)
@@ -86,16 +89,25 @@ class CaseListService:
 
         return subs
 
-    def get_case_status_frequencies(self):
+    @staticmethod
+    def get_case_filter_status(zaak: Zaak) -> CaseFilterFormOption:
+        if zaak.einddatum:
+            return CaseFilterFormOption.CLOSED_CASE
+
+        return CaseFilterFormOption.OPEN_CASE
+
+    def get_case_status_frequencies(self) -> dict[CaseFilterFormOption, int]:
         cases = self.get_cases()
         submissions = self.get_submissions()
 
-        case_statuses = [case.zaak.status_text for case in cases]
+        case_statuses = [self.get_case_filter_status(case.zaak) for case in cases]
 
         # add static text for open submissions
-        case_statuses += [SUBMISSION_STATUS_OPEN for submission in submissions]
+        case_statuses += [CaseFilterFormOption.OPEN_SUBMISSION for _ in submissions]
 
-        return {status: case_statuses.count(status) for status in case_statuses}
+        return {
+            status: case_statuses.count(status) for status in list(CaseFilterFormOption)
+        }
 
 
 class OuterCaseListView(
@@ -144,38 +156,43 @@ class InnerCaseListView(
         context = super().get_context_data(**kwargs)
         config = OpenZaakConfig.get_solo()
         case_service = CaseListService(self.request)
-        form = None
+        context["filter_form_enabled"] = config.zaken_filter_enabled
 
-        # update ctx with open submissions, cases, form for filtering
+        # update ctx with open submissions and cases (possibly fitered)
         open_submissions: list[UniformCase] = case_service.get_submissions()
         preprocessed_cases: list[UniformCase] = case_service.get_cases()
 
-        statuses = self.request.GET.getlist("status")
-        # GET.getlist returns [''] if no query params are passed
-        if config.zaken_filter_enabled and any(statuses):
-            form = CaseFilterForm(
-                status_freqs=case_service.get_case_status_frequencies(),
-                status_initial=statuses,
-                data={"status": statuses},
-            )
+        if config.zaken_filter_enabled:
+            case_status_frequencies = case_service.get_case_status_frequencies()
+            # Separate frequency data from statusname
+            context["status_freqs"] = [
+                (status.value, frequency)
+                for status, frequency in case_status_frequencies.items()
+            ]
 
-            # error message to user would be unhelpful;
-            # we pass silently over invalid input and send a ping to Sentry
-            if not form.is_valid():
-                form.errors["status"] = []
-                logger.error(
-                    "Invalid data (%s) for case filtering by %s",
-                    self.request.GET,
-                    self.request.user,
-                )
-            else:
+            # Validate statuses are valid according to the options enum
+            statuses: list[CaseFilterFormOption] = []
+            for status in self.request.GET.getlist("status"):
+                try:
+                    statuses.append(CaseFilterFormOption(status))
+                except ValueError:
+                    logger.error(
+                        "Invalid data (%s) for case filtering by %s",
+                        self.request.GET,
+                        self.request.user,
+                    )
+
+            # Actually filter the submissions
+            if statuses:
                 open_submissions = (
-                    open_submissions if SUBMISSION_STATUS_OPEN in statuses else []
+                    open_submissions
+                    if CaseFilterFormOption.OPEN_SUBMISSION in statuses
+                    else []
                 )
                 preprocessed_cases = [
                     case
                     for case in preprocessed_cases
-                    if case.zaak.status_text in statuses
+                    if case_service.get_case_filter_status(case.zaak) in statuses
                 ]
 
         paginator_dict = self.paginate_with_context(
@@ -187,18 +204,6 @@ class InnerCaseListView(
         context.update(paginator_dict)
 
         self.log_access_cases(case_dicts)
-
-        if config.zaken_filter_enabled:
-            context["filter_form"] = form or CaseFilterForm(
-                status_freqs=case_service.get_case_status_frequencies(),
-                status_initial=statuses,
-            )
-
-        # Separate frequency data from statusname
-        context["status_freqs"] = [
-            (status, frequency)
-            for status, frequency in case_service.get_case_status_frequencies().items()
-        ]
 
         # other data
         context["hxget"] = reverse("cases:cases_content")
