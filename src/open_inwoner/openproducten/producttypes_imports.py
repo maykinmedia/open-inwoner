@@ -1,8 +1,14 @@
 import logging
+from abc import ABC
+from typing import TypeVar
 
-from django.db import transaction
+from django.db import models, transaction
 from django.utils.text import slugify
 
+from filer.models.filemodels import File
+from filer.models.imagemodels import Image
+
+import open_inwoner.openproducten.api_models as api_models
 from open_inwoner.openproducten.models import Price, PriceOption
 from open_inwoner.pdc.models import (
     Category,
@@ -19,31 +25,61 @@ logger = logging.getLogger(__name__)
 
 
 def _update_instance(model, commit=False, **kwargs):
-    """Update a model instance by a dict"""
+    """Update a model instance by a dict."""
     for key, value in kwargs.items():
         setattr(model, key, value)
     if commit:
         model.save()
 
 
-def _get_instance(model, uuid):
-    """Returns an model instance by uuid or None"""
+T = TypeVar("T")
+
+
+def _get_instance(model: T, uuid) -> T:
+    """Returns a model instance by uuid or None."""
     return model.objects.filter(open_producten_uuid=uuid).first()
 
 
-class OpenProductenImporter:
+class OpenProductenImporter(ABC):
     def __init__(self, client):
         self.client = client
         self.created_objects = []
         self.updated_objects = []
 
-    def _add_to_log_list(self, instance, created: bool):
+    def _get_image(self, url: str) -> Image | None:
+        if not url:
+            return None
+
+        file = self.client.fetch_file(url)
+
+        if not file:
+            return None
+
+        return Image.objects.create(original_filename=url.split("/")[-1], file=file)
+
+    def _get_file(self, url: str) -> File | None:
+        if not url:
+            return None
+
+        file = self.client.fetch_file(url)
+
+        if not file:
+            return None
+
+        return File.objects.create(original_filename=url.split("/")[-1], file=file)
+
+    def _add_to_log_list(self, instance: models.Model, created: bool):
         if created:
             self.created_objects.append(instance)
         else:
             self.updated_objects.append(instance)
 
-    def _update_or_create_question(self, question, product_type=None, category=None):
+    def _update_or_create_question(
+        self,
+        question: api_models.Question,
+        product_type: ProductType | None = None,
+        category: Category | None = None,
+    ):
 
         relation_object = product_type if product_type else category
         relation_key = "product" if product_type else "category"
@@ -69,7 +105,7 @@ class ProductTypeImporter(OpenProductenImporter):
     @transaction.atomic()
     def import_producttypes(self):
         """
-        generate a Product for every ProductType in the Open Producten API
+        Generate a Product for every ProductType in the Open Producten API.
         """
 
         self.product_types = self.client.fetch_producttypes_no_cache()
@@ -79,7 +115,7 @@ class ProductTypeImporter(OpenProductenImporter):
 
         return self.created_objects, self.updated_objects
 
-    def _handle_product_type(self, product_type):
+    def _handle_product_type(self, product_type: api_models.ProductType):
 
         if product_type.id not in self.handled_product_types:
             self.handled_product_types.add(product_type.id)
@@ -93,10 +129,10 @@ class ProductTypeImporter(OpenProductenImporter):
 
     def _handle_related_product_types(
         self,
-        related_product_types,
-        product_type_instance,
+        related_product_types: list[str],
+        product_type_instance: ProductType,
     ):
-        """recursively handles related product_types of the current type"""
+        """Recursively handles related product_types of the current type."""
 
         for related_product_type_uuid in related_product_types:
             if related_product_type_uuid not in self.handled_product_types:
@@ -116,7 +152,9 @@ class ProductTypeImporter(OpenProductenImporter):
             )
             product_type_instance.related_products.add(related_product_instance.id)
 
-    def _handle_relations(self, product_type, product_type_instance):
+    def _handle_relations(
+        self, product_type: api_models.ProductType, product_type_instance: ProductType
+    ):
 
         for tag in product_type.tags:
             tag_instance = self._update_or_create_tag(tag)
@@ -148,7 +186,7 @@ class ProductTypeImporter(OpenProductenImporter):
         for price in product_type.prices:
             self._update_or_create_price(price, product_type_instance)
 
-    def _update_or_create_tag_type(self, tag_type):
+    def _update_or_create_tag_type(self, tag_type: api_models.TagType):
         tag_type_instance, created = TagType.objects.update_or_create(
             open_producten_uuid=tag_type.id,
             defaults={"open_producten_uuid": tag_type.id, "name": tag_type.name},
@@ -156,9 +194,9 @@ class ProductTypeImporter(OpenProductenImporter):
         self._add_to_log_list(tag_type_instance, created)
         return tag_type_instance
 
-    def _update_or_create_tag(self, tag):
+    def _update_or_create_tag(self, tag: api_models.Tag):
         tag_type_instance = self._update_or_create_tag_type(tag.type)
-        icon_object = self.client.get_image(tag.icon)
+        icon_object = self._get_image(tag.icon)
 
         data = {
             "open_producten_uuid": tag.id,
@@ -180,7 +218,9 @@ class ProductTypeImporter(OpenProductenImporter):
         self._add_to_log_list(tag_instance, created)
         return tag_instance
 
-    def _update_or_create_condition(self, condition):
+    def _update_or_create_condition(
+        self, condition: api_models.Condition
+    ) -> ProductCondition:
         condition_instance, created = ProductCondition.objects.update_or_create(
             open_producten_uuid=condition.id,
             defaults={
@@ -194,7 +234,7 @@ class ProductTypeImporter(OpenProductenImporter):
         self._add_to_log_list(condition_instance, created)
         return condition_instance
 
-    def _update_or_create_link(self, link, product_type):
+    def _update_or_create_link(self, link: api_models.Link, product_type: ProductType):
         link_instance, created = ProductLink.objects.update_or_create(
             open_producten_uuid=link.id,
             defaults={
@@ -206,8 +246,8 @@ class ProductTypeImporter(OpenProductenImporter):
         )
         self._add_to_log_list(link_instance, created)
 
-    def _update_or_create_file(self, file, product_type):
-        file_object = self.client.get_file(file.file)
+    def _update_or_create_file(self, file: api_models.File, product_type: ProductType):
+        file_object = self._get_file(file.file)
 
         data = {
             "open_producten_uuid": file.id,
@@ -224,7 +264,9 @@ class ProductTypeImporter(OpenProductenImporter):
             created = True
         self._add_to_log_list(file_instance, created)
 
-    def _update_or_create_price(self, price, product_type_instance):
+    def _update_or_create_price(
+        self, price: api_models.Price, product_type_instance: ProductType
+    ):
         price_instance, created = Price.objects.update_or_create(
             open_producten_uuid=price.id,
             defaults={
@@ -237,7 +279,9 @@ class ProductTypeImporter(OpenProductenImporter):
         for option in price.options:
             self._update_or_create_price_option(option, price_instance)
 
-    def _update_or_create_price_option(self, price_option, price_instance):
+    def _update_or_create_price_option(
+        self, price_option: api_models.PriceOption, price_instance: ProductType
+    ):
         price_option_instance, created = PriceOption.objects.update_or_create(
             open_producten_uuid=price_option.id,
             defaults={
@@ -249,9 +293,11 @@ class ProductTypeImporter(OpenProductenImporter):
         )
         self._add_to_log_list(price_option_instance, created)
 
-    def _update_or_create_product_type(self, product_type):
-        icon_object = self.client.get_image(product_type.icon)
-        image_object = self.client.get_image(product_type.image)
+    def _update_or_create_product_type(
+        self, product_type: api_models.ProductType
+    ) -> ProductType:
+        icon_object = self._get_image(product_type.icon)
+        image_object = self._get_image(product_type.image)
 
         data = {
             "open_producten_uuid": product_type.id,
@@ -291,7 +337,7 @@ class CategoryImporter(OpenProductenImporter):
     @transaction.atomic()
     def import_categories(self):
         """
-        generate a Category for every Category in the Open Producten API
+        Generate a Category for every Category in the Open Producten API.
         """
 
         self.categories = self.client.fetch_categories_no_cache()
@@ -301,7 +347,7 @@ class CategoryImporter(OpenProductenImporter):
 
         return self.created_objects, self.updated_objects
 
-    def _handle_category(self, category):
+    def _handle_category(self, category: api_models.Category):
         if category.id not in self.handled_categories:
             self.handled_categories.add(category.id)
 
@@ -310,9 +356,9 @@ class CategoryImporter(OpenProductenImporter):
             category_instance = self._update_or_create_category(category)
 
             for question in category.questions:
-                self._update_or_create_question(question, category_instance)
+                self._update_or_create_question(question, category=category_instance)
 
-    def _handle_category_parent(self, parent_uuid):
+    def _handle_category_parent(self, parent_uuid: str):
         if parent_uuid is not None and parent_uuid not in self.handled_categories:
             category_parent = next(
                 (
@@ -324,9 +370,9 @@ class CategoryImporter(OpenProductenImporter):
             )
             self._handle_category(category_parent)
 
-    def _update_or_create_category(self, category):
-        icon_object = self.client.get_image(category.icon)
-        image_object = self.client.get_image(category.image)
+    def _update_or_create_category(self, category: api_models.Category) -> Category:
+        icon_object = self._get_image(category.icon)
+        image_object = self._get_image(category.image)
 
         data = {
             "open_producten_uuid": category.id,
@@ -350,14 +396,13 @@ class CategoryImporter(OpenProductenImporter):
             if category_instance.image:
                 category_instance.image.delete()
             self._update_category(category_instance, parent_instance, data)
-            created = False
         else:
             category_instance = self._create_category(parent_instance, data)
-            created = True
-        self._add_to_log_list(category_instance, created)
         return category_instance
 
-    def _update_category(self, category_instance, parent_instance, data):
+    def _update_category(
+        self, category_instance: Category, parent_instance: Category | None, data: dict
+    ) -> Category:
         existing_parent = category_instance.get_parent()
 
         if parent_instance is None and existing_parent is not None:
@@ -370,11 +415,13 @@ class CategoryImporter(OpenProductenImporter):
         category_instance.refresh_from_db()
 
         _update_instance(category_instance, True, **data)
+        self._add_to_log_list(category_instance, False)
         return category_instance
 
-    def _create_category(self, parent_instance, data):
+    def _create_category(self, parent_instance: Category | None, data) -> Category:
         if parent_instance:
             category_instance = parent_instance.add_child(**data)
         else:
             category_instance = Category.add_root(**data)
+        self._add_to_log_list(category_instance, True)
         return category_instance
