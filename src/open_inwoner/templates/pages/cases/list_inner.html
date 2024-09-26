@@ -3,7 +3,7 @@
 <h1 class="utrecht-heading-1" id="cases">{{ page_title }} ({{ paginator.count }})</h1>
 <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-title-text">{{ title_text }}</p>
 
-{% if filter_form %}
+{% if filter_form_enabled %}
 <div class="filter-bar" id="filterBar">
     <form class="form filter-bar__form" method="GET" id="filter-form" novalidate>
         <span>{% trans 'Filter op' %}:</span>
