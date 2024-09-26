@@ -79,26 +79,3 @@ class CaseContactForm(forms.Form):
         widget=forms.Textarea(attrs={"rows": "5"}),
         required=True,
     )
-
-
-class CaseFilterForm(forms.Form):
-    def __init__(
-        self,
-        status_freqs: dict[str, int],
-        status_initial: list[str] | None = None,
-        *args,
-        **kwargs,
-    ):
-        super().__init__(*args, **kwargs)
-
-        self.fields["status"].choices = (
-            (status, f"{status} ({frequency})")
-            for status, frequency in status_freqs.items()
-        )
-        self.fields["status"].initial = status_initial or []
-
-    status = forms.MultipleChoiceField(
-        label=_("Filter by status"),
-        widget=forms.CheckboxSelectMultiple,
-        choices=dict(),
-    )
