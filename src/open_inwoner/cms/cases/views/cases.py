@@ -62,7 +62,7 @@ class CaseListService:
 
     def get_cases_for_api_group(self, group: ZGWApiGroupConfig) -> list[UniformCase]:
         raw_cases = group.zaken_client.fetch_cases(
-            **get_user_fetch_parameters(self.request)
+            **get_user_fetch_parameters(self.request, check_rsin=True)
         )
         preprocessed_cases = preprocess_data(raw_cases, group)
         return preprocessed_cases
