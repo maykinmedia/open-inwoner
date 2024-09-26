@@ -96,22 +96,6 @@ function initFilterBar() {
       if (resultTextElement) {
         resultTextElement.textContent = sum === 1 ? 'resultaat' : 'resultaten'
       }
-
-      const filterCasesButton = document.getElementById('filterCases')
-      const filterFormActions = document.getElementById('filterFormActions')
-      const resetFilters = document.getElementById('resetFilters')
-
-      if (filterCasesButton && filterFormActions) {
-        if (sum > 0) {
-          filterCasesButton.classList.remove('hide')
-          filterFormActions.classList.remove('hide')
-          resetFilters.classList.remove('hide')
-        } else {
-          filterCasesButton.classList.add('hide')
-          filterFormActions.classList.add('hide')
-          resetFilters.classList.add('hide')
-        }
-      }
     }
 
     const initSelectBehavior = function () {
