@@ -879,6 +879,7 @@ class ContactFormTestCase(
 
         response = self.app.get(self.url)
         form = response.forms["contactmoment-form"]
+
         self.assertFormExactFields(
             form,
             (
@@ -905,6 +906,7 @@ class ContactFormTestCase(
 
         # Submit the form, expect an error due to captcha and missing email/phone
         response = form.submit(status=200)
+
         self.assertContains(response, _("Vul een e-mailadres of telefoonnummer in."))
         self.assertContains(response, _("Fout antwoord, probeer het opnieuw."))
         mock_send_confirm.assert_not_called()
@@ -912,10 +914,11 @@ class ContactFormTestCase(
         # Now, fill in the captcha correctly but still leave email and phone blank
         form["captcha_1"] = "2"  # Assuming this is the correct answer for the captcha
         response = form.submit(status=200)
+
+        # Assert email or phone error persists
         self.assertContains(response, _("Vul een e-mailadres of telefoonnummer in."))
         mock_send_confirm.assert_not_called()
 
-        # Finally, provide a valid email and correct captcha
         form["email"] = "foo@example.com"
         response = form.submit().follow()
 
@@ -936,10 +939,12 @@ class ContactFormTestCase(
         config.save()
         subject = ContactFormSubjectFactory(config=config)
 
+        # Create authenticated user
         user = UserFactory()
 
         response = self.app.get(self.url, user=user)
         form = response.forms["contactmoment-form"]
+
         self.assertFormExactFields(
             form,
             (
@@ -957,6 +962,8 @@ class ContactFormTestCase(
 
         # Submit the form and expect captcha validation error
         response = form.submit(status=200)
+
+        # Assert captcha error
         self.assertContains(response, _("Fout antwoord, probeer het opnieuw."))
         mock_send_confirm.assert_not_called()
 

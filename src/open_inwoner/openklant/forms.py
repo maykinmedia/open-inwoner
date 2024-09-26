@@ -1,3 +1,5 @@
+import random
+
 from django import forms
 from django.forms import Form
 from django.utils.translation import gettext_lazy as _
@@ -7,6 +9,30 @@ from simplemathcaptcha.fields import MathCaptchaField
 from open_inwoner.accounts.models import User
 from open_inwoner.openklant.models import ContactFormSubject, OpenKlantConfig
 from open_inwoner.utils.validators import DutchPhoneNumberValidator
+
+
+def _get_random_numbers():
+    # Generate two random numbers for the question
+    return random.randint(0, 10), random.randint(0, 10)  # Adjust the range as needed
+
+
+class CustomMathCaptchaField(MathCaptchaField):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.num1, self.num2 = _get_random_numbers()
+        self.answer = self.num1 + self.num2
+        self.question = _("Woettt is {} + {}?").format(self.num1, self.num2)
+        print(f"Captcha question: {self.question}")  # Debugging
+        print(f'Translation check: {_("Controleer je berekening test.")}')
+
+    def clean(self, value):
+        # Ensure to call the parent clean method
+        value = super().clean(value)
+        if value != self.answer:
+            raise forms.ValidationError(
+                _("Controleer je berekening en probeer het opnieuw.")
+            )
+        return value
 
 
 class ContactForm(Form):
@@ -47,7 +73,7 @@ class ContactForm(Form):
         widget=forms.Textarea(attrs={"rows": "5"}),
         required=True,
     )
-    captcha = MathCaptchaField(
+    captcha = CustomMathCaptchaField(
         label=_("Beantwoord deze rekensom"),
         error_messages={
             "invalid": _("Controleer je berekening en probeer het opnieuw.")
