@@ -63,21 +63,25 @@ class ZakenClient(ZgwAPIClient):
     def fetch_cases(
         self,
         user_bsn: str | None = None,
-        user_kvk_or_rsin: str | None = None,
+        user_kvk: str | None = None,
+        user_rsin: str | None = None,
         max_requests: int = 4,
         identificatie: str | None = None,
         vestigingsnummer: str | None = None,
     ):
-        if user_bsn and (user_kvk_or_rsin or vestigingsnummer):
+        if user_bsn and (user_kvk or user_rsin or vestigingsnummer):
             raise ValueError(
-                "either `user_bsn` or `user_kvk_or_rsin`/`vestigingsnummer` should be supplied, not both"
+                "either `user_bsn` or `user_kvk`/`user_risin` (+ optionally `vestigingsnummer`) "
+                "should be supplied, not both"
             )
 
         if user_bsn:
             return self.fetch_cases_by_bsn(
                 user_bsn, max_requests=max_requests, identificatie=identificatie
             )
-        elif user_kvk_or_rsin:
+
+        if user_kvk or user_rsin:
+            user_kvk_or_rsin = user_rsin if user_rsin else user_kvk
             return self.fetch_cases_by_kvk_or_rsin(
                 user_kvk_or_rsin,
                 max_requests=max_requests,
