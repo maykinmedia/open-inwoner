@@ -73,10 +73,8 @@ class CaseListService:
     def get_submissions_for_api_group(
         self, group: ZGWApiGroupConfig
     ) -> list[UniformCase]:
-        if not getattr(group, "forms_client"):
-            return []
         return group.forms_client.fetch_open_submissions(
-            **get_user_fetch_parameters(self.request)
+            **get_user_fetch_parameters(self.request, check_rsin=False)
         )
 
     def get_cases(self) -> list[ZaakWithApiGroup]:
@@ -105,7 +103,9 @@ class CaseListService:
         return cases_with_api_group
 
     def get_submissions(self):
-        all_api_groups = list(ZGWApiGroupConfig.objects.all())
+        all_api_groups = list(
+            ZGWApiGroupConfig.objects.exclude(form_service__isnull=True)
+        )
 
         with parallel() as executor:
             futures = [
@@ -125,9 +125,6 @@ class CaseListService:
                         )
                 except BaseException:
                     logger.exception("Error fetching and pre-processing cases")
-
-        # Ensure stable sorting for pagination and testing purposes
-        subs_with_api_group.sort(key=lambda s: (all_api_groups.index(s.api_group)))
 
         # Sort submissions by date modified
         subs_with_api_group.sort(
