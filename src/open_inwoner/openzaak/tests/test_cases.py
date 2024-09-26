@@ -56,7 +56,7 @@ class SeededUUIDGenerator:
         self.current_uuid = self._generate_initial_uuid()
 
     def _generate_initial_uuid(self):
-        random_bytes = []
+        random_bytes = [self.rng.randint(0, 255) for _ in range(16)]
         return uuid.UUID(bytes=bytes(random_bytes), version=4)
 
     def get_uuid(self):
