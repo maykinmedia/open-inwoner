@@ -673,13 +673,15 @@ class FormClient(ZgwAPIClient):
     def fetch_open_submissions(
         self,
         user_bsn: str | None = None,
-        user_kvk_or_rsin: str | None = None,
-        max_requests: int = 4,
+        user_kvk: str | None = None,
         vestigingsnummer: str | None = None,
+        max_requests: int = 4,
+        **kwargs,
     ):
-        if user_bsn and (user_kvk_or_rsin or vestigingsnummer):
+        if user_bsn and (user_kvk or vestigingsnummer):
             raise ValueError(
-                "either `user_bsn` or `user_kvk_or_rsin`/`vestigingsnummer` should be supplied, not both"
+                "either `user_bsn` or `user_kvk` (optionally with `vestigingsnummer`) "
+                "should be supplied, not both"
             )
 
         if user_bsn:
@@ -687,19 +689,15 @@ class FormClient(ZgwAPIClient):
                 user_bsn, max_requests=max_requests
             )
 
-        # TODO
-        # if user_kvk_or_rsin:
-        #     return self.fetch_open_submissions_by_kvk_or_rsin(
-        #         user_kvk_or_rsin,
-        #         max_requests=max_requests,
-        #         vestigingsnummer=vestigingsnummer,
-        #     )
+        if user_kvk:
+            return self.fetch_open_submissions_by_kvk(
+                user_kvk,
+                max_requests=max_requests,
+                vestigingsnummer=vestigingsnummer,
+            )
+
         return []
 
-    @cache_result(
-        "{self.base_url}:submissions:{user_bsn}:{max_requests}",
-        timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
-    )
     def fetch_open_submissions_by_bsn(
         self,
         user_bsn: str,
@@ -709,6 +707,31 @@ class FormClient(ZgwAPIClient):
             response = self.get(
                 "openstaande-inzendingen",
                 params={"bsn": user_bsn},
+            )
+            data = get_json_response(response)
+            all_data = list(pagination_helper(self, data, max_requests=max_requests))
+        except (RequestException, ClientError) as e:
+            logger.exception("exception while making request", exc_info=e)
+            return []
+
+        results = factory(OpenSubmission, all_data)
+
+        return results
+
+    def fetch_open_submissions_by_kvk(
+        self,
+        user_kvk: str,
+        vestigingsnummer: str | None,
+        max_requests: int,
+    ) -> list[OpenSubmission]:
+        request_params = {"kvk": user_kvk}
+        if vestigingsnummer:
+            request_params["vestigingsnummer"] = vestigingsnummer
+
+        try:
+            response = self.get(
+                "openstaande-inzendingen",
+                params=request_params,
             )
             data = get_json_response(response)
             all_data = list(pagination_helper(self, data, max_requests=max_requests))
