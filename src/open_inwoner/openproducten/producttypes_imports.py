@@ -45,6 +45,7 @@ class OpenProductenImporter(ABC):
         self.client = client
         self.created_objects = []
         self.updated_objects = []
+        self.deleted_count = 0
 
     def _get_image(self, url: str) -> Image | None:
         if not url:
@@ -101,8 +102,10 @@ class ProductTypeImporter(OpenProductenImporter):
         super().__init__(client)
         self.product_types = None
         self.handled_product_types = set()
+        self.handled_tags = set()
+        self.handled_tag_types = set()
+        self.handled_conditions = set()
 
-    @transaction.atomic()
     def import_producttypes(self):
         """
         Generate a Product for every ProductType in the Open Producten API.
@@ -110,10 +113,14 @@ class ProductTypeImporter(OpenProductenImporter):
 
         self.product_types = self.client.fetch_producttypes_no_cache()
 
+        self._handle_transaction()
+        self.delete_non_updated_objects()
+        return self.created_objects, self.updated_objects, self.deleted_count
+
+    @transaction.atomic()
+    def _handle_transaction(self):
         for product_type in self.product_types:
             self._handle_product_type(product_type)
-
-        return self.created_objects, self.updated_objects
 
     def _handle_product_type(self, product_type: api_models.ProductType):
 
@@ -192,6 +199,7 @@ class ProductTypeImporter(OpenProductenImporter):
             defaults={"open_producten_uuid": tag_type.id, "name": tag_type.name},
         )
         self._add_to_log_list(tag_type_instance, created)
+        self.handled_tag_types.add(tag_type.id)
         return tag_type_instance
 
     def _update_or_create_tag(self, tag: api_models.Tag):
@@ -216,6 +224,7 @@ class ProductTypeImporter(OpenProductenImporter):
             created = True
 
         self._add_to_log_list(tag_instance, created)
+        self.handled_tags.add(tag.id)
         return tag_instance
 
     def _update_or_create_condition(
@@ -232,6 +241,7 @@ class ProductTypeImporter(OpenProductenImporter):
             },
         )
         self._add_to_log_list(condition_instance, created)
+        self.handled_conditions.add(condition.id)
         return condition_instance
 
     def _update_or_create_link(self, link: api_models.Link, product_type: ProductType):
@@ -327,6 +337,30 @@ class ProductTypeImporter(OpenProductenImporter):
         self._add_to_log_list(product_type_instance, created)
         return product_type_instance
 
+    def delete_non_updated_objects(self):
+        if result := ProductType.objects.exclude(
+            open_producten_uuid__in=self.handled_product_types,
+            open_producten_uuid__isnull=False,
+        ).delete():
+            self.deleted_count += result[0]
+
+        if result := Tag.objects.exclude(
+            open_producten_uuid__in=self.handled_tags, open_producten_uuid__isnull=False
+        ).delete():
+            self.deleted_count += result[0]
+
+        if result := TagType.objects.exclude(
+            open_producten_uuid__in=self.handled_tag_types,
+            open_producten_uuid__isnull=False,
+        ).delete():
+            self.deleted_count += result[0]
+
+        if result := ProductCondition.objects.exclude(
+            open_producten_uuid__in=self.handled_conditions,
+            open_producten_uuid__isnull=False,
+        ).delete():
+            self.deleted_count += result[0]
+
 
 class CategoryImporter(OpenProductenImporter):
     def __init__(self, client):
@@ -334,7 +368,6 @@ class CategoryImporter(OpenProductenImporter):
         self.categories = None
         self.handled_categories = set()
 
-    @transaction.atomic()
     def import_categories(self):
         """
         Generate a Category for every Category in the Open Producten API.
@@ -342,10 +375,14 @@ class CategoryImporter(OpenProductenImporter):
 
         self.categories = self.client.fetch_categories_no_cache()
 
+        self._handle_transaction()
+        self.delete_non_updated_objects()
+        return self.created_objects, self.updated_objects, self.deleted_count
+
+    @transaction.atomic()
+    def _handle_transaction(self):
         for category in self.categories:
             self._handle_category(category)
-
-        return self.created_objects, self.updated_objects
 
     def _handle_category(self, category: api_models.Category):
         if category.id not in self.handled_categories:
@@ -425,3 +462,10 @@ class CategoryImporter(OpenProductenImporter):
             category_instance = Category.add_root(**data)
         self._add_to_log_list(category_instance, True)
         return category_instance
+
+    def delete_non_updated_objects(self):
+        if result := Category.objects.exclude(
+            open_producten_uuid__in=self.handled_categories,
+            open_producten_uuid__isnull=False,
+        ).delete():
+            self.deleted_count += result[0]
