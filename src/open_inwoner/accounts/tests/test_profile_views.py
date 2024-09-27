@@ -463,6 +463,10 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         response = self.app.get(self.url, user=user)
         form = response.forms["profile-edit"]
 
+        # check that first_name field is not rendered for digid_brp_user
+        with self.assertRaises(AssertionError):
+            form["first_name"] = "test"
+
         form["email"] = "user@example.com"
         form["phonenumber"] = "0612345678"
         response = form.submit()
