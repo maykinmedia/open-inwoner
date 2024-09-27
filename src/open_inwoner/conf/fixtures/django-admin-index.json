@@ -1,3 +1,4 @@
+USING LOCAL
 [
 {
     "model": "admin_index.appgroup",
@@ -282,7 +283,9 @@
     "model": "admin_index.appgroup",
     "fields": {
         "order": 5,
-        "translations": {},
+        "translations": {
+            "nl": ""
+        },
         "name": "Data koppelingen",
         "slug": "koppelingen",
         "models": [
@@ -309,6 +312,10 @@
             [
                 "openklant",
                 "openklantconfig"
+            ],
+            [
+                "openproducten",
+                "openproductenconfig"
             ],
             [
                 "openzaak",

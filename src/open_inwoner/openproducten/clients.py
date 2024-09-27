@@ -8,6 +8,7 @@ from ape_pie.client import APIClient
 from requests import RequestException
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.client import build_client
+from zgw_consumers.service import pagination_helper
 
 from open_inwoner.utils.api import ClientError, get_json_response
 
@@ -21,24 +22,26 @@ class OpenProductenClient(APIClient):
     def fetch_producttypes_no_cache(self) -> list[ProductType]:
         try:
             response = self.get("producttypes/")
-            data: list = get_json_response(response)
+            data = get_json_response(response)
+            all_data = list(pagination_helper(self, data))
         except (RequestException, ClientError) as e:
             logger.exception("exception while making request", exc_info=e)
             return []
 
-        product_types = factory(ProductType, data)
+        product_types = factory(ProductType, all_data)
 
         return product_types
 
     def fetch_categories_no_cache(self) -> list[Category]:
         try:
             response = self.get("categories/")
-            data: list = get_json_response(response)
+            data = get_json_response(response)
+            all_data = list(pagination_helper(self, data))
         except (RequestException, ClientError) as e:
             logger.exception("exception while making request", exc_info=e)
             return []
 
-        categories = factory(Category, data)
+        categories = factory(Category, all_data)
 
         return categories
 
