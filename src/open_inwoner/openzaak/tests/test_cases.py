@@ -21,7 +21,6 @@ from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory, eHerkenningUserFactory
 from open_inwoner.cms.cases.views.cases import CaseFilterFormOption, InnerCaseListView
-from open_inwoner.openzaak.tests.shared import FORMS_ROOT
 from open_inwoner.utils.test import (
     ClearCachesMixin,
     paginated_response,
@@ -41,7 +40,14 @@ from .factories import (
 )
 from .helpers import generate_oas_component_cached
 from .mocks import ESuiteSubmissionData
-from .shared import ANOTHER_CATALOGI_ROOT, ANOTHER_ZAKEN_ROOT, CATALOGI_ROOT, ZAKEN_ROOT
+from .shared import (
+    ANOTHER_CATALOGI_ROOT,
+    ANOTHER_FORMS_ROOT,
+    ANOTHER_ZAKEN_ROOT,
+    CATALOGI_ROOT,
+    FORMS_ROOT,
+    ZAKEN_ROOT,
+)
 
 
 class SeededUUIDGenerator:
@@ -1103,25 +1109,62 @@ class CaseSubmissionTest(TransactionWebTest):
             zrc_service__api_root=ZAKEN_ROOT,
             form_service__api_root=FORMS_ROOT,
         )
+        ZGWApiGroupConfigFactory(
+            zrc_service__api_root=ANOTHER_ZAKEN_ROOT,
+            form_service__api_root=ANOTHER_FORMS_ROOT,
+        )
 
     @requests_mock.Mocker()
-    def test_case_submission(self, m):
-        user = UserFactory(
+    def test_get_open_submissions_by_bsn(self, m):
+        digid_user = UserFactory(
             login_type=LoginTypeChoices.digid, bsn="900222086", email="john@smith.nl"
         )
-        m.get(
-            furl(f"{ZAKEN_ROOT}zaken")
-            .add(
-                {
-                    "rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn": user.bsn,
-                    "maximaleVertrouwelijkheidaanduiding": VertrouwelijkheidsAanduidingen.openbaar,
-                }
-            )
-            .url,
-            json=paginated_response([]),
+        data = ESuiteSubmissionData(
+            zaken_root=ZAKEN_ROOT, forms_root=FORMS_ROOT, user=digid_user
+        ).install_digid_mocks(m)
+        data_alt = ESuiteSubmissionData(
+            zaken_root=ANOTHER_ZAKEN_ROOT,
+            forms_root=ANOTHER_FORMS_ROOT,
+            user=digid_user,
+        ).install_digid_mocks(m)
+
+        response = self.app.get(
+            self.inner_url, user=digid_user, headers={"HX-Request": "true"}
         )
 
-        data = ESuiteSubmissionData().install_mocks(m)
+        cases = response.context["cases"]
+
+        self.assertEqual(len(cases), 3)
+
+        # submission cases are sorted in reverse by `last modified`
+        self.assertEqual(cases[0]["url"], data_alt.submission_3["url"])
+        self.assertEqual(cases[0]["uuid"], data_alt.submission_3["uuid"])
+        self.assertEqual(cases[0]["naam"], data_alt.submission_3["naam"])
+        self.assertEqual(cases[0]["vervolg_link"], data_alt.submission_3["vervolgLink"])
+        self.assertEqual(
+            cases[0]["datum_laatste_wijziging"].strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
+            data_alt.submission_3["datumLaatsteWijziging"],
+        )
+
+        self.assertEqual(cases[1]["url"], data.submission_2["url"])
+        self.assertEqual(cases[1]["uuid"], data.submission_2["uuid"])
+        self.assertEqual(cases[1]["naam"], data.submission_2["naam"])
+        self.assertEqual(cases[1]["vervolg_link"], data.submission_2["vervolgLink"])
+        self.assertEqual(
+            cases[1]["datum_laatste_wijziging"].strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
+            data.submission_2["datumLaatsteWijziging"],
+        )
+
+    @requests_mock.Mocker()
+    @patch("open_inwoner.kvk.middleware.kvk_branch_selected_done")
+    def test_get_open_submissions_by_kvk(self, m, kvk_branch_selected):
+        user = UserFactory(login_type=LoginTypeChoices.eherkenning, kvk="68750110")
+        data = ESuiteSubmissionData(
+            zaken_root=ZAKEN_ROOT, forms_root=FORMS_ROOT, user=user
+        ).install_eherkenning_mocks(m)
+        data_alt = ESuiteSubmissionData(
+            zaken_root=ANOTHER_ZAKEN_ROOT, forms_root=ANOTHER_FORMS_ROOT, user=user
+        ).install_eherkenning_mocks(m)
 
         response = self.app.get(
             self.inner_url, user=user, headers={"HX-Request": "true"}
@@ -1129,14 +1172,23 @@ class CaseSubmissionTest(TransactionWebTest):
 
         cases = response.context["cases"]
 
-        self.assertEqual(len(cases), 2)
+        self.assertEqual(len(cases), 3)
 
         # submission cases are sorted in reverse by `last modified`
-        self.assertEqual(cases[0]["url"], data.submission_2["url"])
-        self.assertEqual(cases[0]["uuid"], data.submission_2["uuid"])
-        self.assertEqual(cases[0]["naam"], data.submission_2["naam"])
-        self.assertEqual(cases[0]["vervolg_link"], data.submission_2["vervolgLink"])
+        self.assertEqual(cases[0]["url"], data_alt.submission_3["url"])
+        self.assertEqual(cases[0]["uuid"], data_alt.submission_3["uuid"])
+        self.assertEqual(cases[0]["naam"], data_alt.submission_3["naam"])
+        self.assertEqual(cases[0]["vervolg_link"], data_alt.submission_3["vervolgLink"])
         self.assertEqual(
             cases[0]["datum_laatste_wijziging"].strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
+            data_alt.submission_3["datumLaatsteWijziging"],
+        )
+
+        self.assertEqual(cases[1]["url"], data.submission_2["url"])
+        self.assertEqual(cases[1]["uuid"], data.submission_2["uuid"])
+        self.assertEqual(cases[1]["naam"], data.submission_2["naam"])
+        self.assertEqual(cases[1]["vervolg_link"], data.submission_2["vervolgLink"])
+        self.assertEqual(
+            cases[1]["datum_laatste_wijziging"].strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
             data.submission_2["datumLaatsteWijziging"],
         )
