@@ -1,13 +1,13 @@
 from django import forms
-from django.forms import Form
 from django.utils.translation import gettext_lazy as _
 
 from open_inwoner.accounts.models import User
 from open_inwoner.openklant.models import ContactFormSubject, OpenKlantConfig
+from open_inwoner.utils.forms import MathCaptchaField
 from open_inwoner.utils.validators import DutchPhoneNumberValidator
 
 
-class ContactForm(Form):
+class ContactForm(forms.Form):
     subject = forms.ModelChoiceField(
         label=_("Onderwerp"),
         required=True,
@@ -45,6 +45,10 @@ class ContactForm(Form):
         widget=forms.Textarea(attrs={"rows": "5"}),
         required=True,
     )
+    captcha = MathCaptchaField(
+        label=_("Beantwoord deze rekensom"),
+        required=True,
+    )
 
     user: User
 
@@ -54,11 +58,13 @@ class ContactForm(Form):
 
         config = OpenKlantConfig.get_solo()
         self.fields["subject"].queryset = config.contactformsubject_set.all()
+        self.captcha_prompt = self.fields["captcha"].question
 
         if self.user.is_authenticated:
             del self.fields["first_name"]
             del self.fields["last_name"]
             del self.fields["infix"]
+            del self.fields["captcha"]
             if self.user.email:
                 del self.fields["email"]
             if self.user.phonenumber:
