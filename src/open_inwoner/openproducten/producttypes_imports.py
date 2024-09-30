@@ -3,6 +3,7 @@ from abc import ABC
 from typing import TypeVar
 
 from django.db import models, transaction
+from django.db.models import Q
 from django.utils.text import slugify
 
 from filer.models.filemodels import File
@@ -114,7 +115,7 @@ class ProductTypeImporter(OpenProductenImporter):
         self.product_types = self.client.fetch_producttypes_no_cache()
 
         self._handle_transaction()
-        self.delete_non_updated_objects()
+        self._delete_non_updated_objects()
         return self.created_objects, self.updated_objects, self.deleted_count
 
     @transaction.atomic()
@@ -319,7 +320,7 @@ class ProductTypeImporter(OpenProductenImporter):
             "form": product_type.form_link,  # TODO product uses OpenFormsSlugField
             "icon": icon_object,
             "image": image_object,
-            "uniforme_productnaam": product_type.uniform_product_name.name,
+            "uniforme_productnaam": product_type.uniform_product_name.split("/")[-1],
             "keywords": product_type.keywords,
         }
 
@@ -337,29 +338,35 @@ class ProductTypeImporter(OpenProductenImporter):
         self._add_to_log_list(product_type_instance, created)
         return product_type_instance
 
-    def delete_non_updated_objects(self):
-        if result := ProductType.objects.exclude(
-            open_producten_uuid__in=self.handled_product_types,
-            open_producten_uuid__isnull=False,
-        ).delete():
-            self.deleted_count += result[0]
+    def _get_count_without_m2m_deletions(self, result):
+        count = result[0]
+        for k in result[1]:
+            if k in ("pdc.Product_tags", "pdc.Product_conditions"):
+                count -= result[1][k]
+        return count
 
-        if result := Tag.objects.exclude(
-            open_producten_uuid__in=self.handled_tags, open_producten_uuid__isnull=False
-        ).delete():
-            self.deleted_count += result[0]
+    def _delete_non_updated_objects(self):
+        result = ProductType.objects.exclude(
+            Q(open_producten_uuid__in=self.handled_product_types)
+            | Q(open_producten_uuid__isnull=True)
+        ).delete()
 
-        if result := TagType.objects.exclude(
-            open_producten_uuid__in=self.handled_tag_types,
-            open_producten_uuid__isnull=False,
-        ).delete():
-            self.deleted_count += result[0]
+        self.deleted_count += self._get_count_without_m2m_deletions(result)
 
-        if result := ProductCondition.objects.exclude(
-            open_producten_uuid__in=self.handled_conditions,
-            open_producten_uuid__isnull=False,
-        ).delete():
-            self.deleted_count += result[0]
+        self.deleted_count += Tag.objects.exclude(
+            Q(open_producten_uuid__in=self.handled_tags)
+            | Q(open_producten_uuid__isnull=True)
+        ).delete()[0]
+
+        self.deleted_count += TagType.objects.exclude(
+            Q(open_producten_uuid__in=self.handled_tag_types)
+            | Q(open_producten_uuid__isnull=True)
+        ).delete()[0]
+
+        self.deleted_count += ProductCondition.objects.exclude(
+            Q(open_producten_uuid__in=self.handled_conditions)
+            | Q(open_producten_uuid__isnull=True)
+        ).delete()[0]
 
 
 class CategoryImporter(OpenProductenImporter):
@@ -376,7 +383,7 @@ class CategoryImporter(OpenProductenImporter):
         self.categories = self.client.fetch_categories_no_cache()
 
         self._handle_transaction()
-        self.delete_non_updated_objects()
+        self._delete_non_updated_objects()
         return self.created_objects, self.updated_objects, self.deleted_count
 
     @transaction.atomic()
@@ -463,9 +470,20 @@ class CategoryImporter(OpenProductenImporter):
         self._add_to_log_list(category_instance, True)
         return category_instance
 
-    def delete_non_updated_objects(self):
-        if result := Category.objects.exclude(
-            open_producten_uuid__in=self.handled_categories,
-            open_producten_uuid__isnull=False,
-        ).delete():
-            self.deleted_count += result[0]
+    def get_object_count(self):
+        return (
+            Category.objects.filter(open_producten_uuid__isnull=False).count()
+            + Question.objects.filter(
+                open_producten_uuid__isnull=False, product__isnull=True
+            ).count()
+        )
+
+    def _delete_non_updated_objects(self):
+        old_count = self.get_object_count()
+        # For some reason (Probably Treebeard) Category ... .delete() returns None.
+        Category.objects.exclude(
+            Q(open_producten_uuid__in=self.handled_categories)
+            | Q(open_producten_uuid__isnull=True)
+        ).delete()
+        new_count = self.get_object_count()
+        self.deleted_count += old_count - new_count

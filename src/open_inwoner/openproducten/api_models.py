@@ -20,12 +20,6 @@ class Tag(Model):
 
 
 @dataclass
-class UniformProductName(Model):
-    name: str
-    url: str
-
-
-@dataclass
 class Link(Model):
     id: str
     name: str
@@ -95,7 +89,7 @@ class ProductType(Model):
     form_link: str
     content: str
     keywords: list[str]
-    uniform_product_name: UniformProductName
+    uniform_product_name: str
     conditions: list[Condition]
     tags: list[Tag]
     categories: list[BaseCategory]
