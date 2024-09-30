@@ -120,11 +120,12 @@ def cache(
 
             cache_key = cache_key_with_attr_placeholders.format(**key_kwargs)
             logger.debug("Resolved cache_key `%s` to `%s`", key, cache_key)
-            _cache: BaseCache = caches[alias]
-            result = _cache.get(cache_key)
 
-            # The key exists in cache so we return the already cached data
-            if result is not None:
+            _cache: BaseCache = caches[alias]
+
+            CACHE_MISS = object()
+            result = _cache.get(cache_key, default=CACHE_MISS)
+            if result is not CACHE_MISS:
                 logger.debug("Cache hit: '%s'", cache_key)
                 return result
 

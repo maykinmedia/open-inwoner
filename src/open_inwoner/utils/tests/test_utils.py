@@ -55,11 +55,11 @@ class DynamicCacheKeyTest(DjangoTestCase):
 
         self.cache.get.assert_has_calls(
             [
-                mock.call("alpha:charlie:bravo:42"),
-                mock.call("alpha:bar:bravo:baz"),
-                mock.call("alpha:bar:bravo:5"),
-                mock.call("alpha:bar:bravo:baz:charlie:charlie:42"),
-                mock.call("static"),
+                mock.call("alpha:charlie:bravo:42", default=mock.ANY),
+                mock.call("alpha:bar:bravo:baz", default=mock.ANY),
+                mock.call("alpha:bar:bravo:5", default=mock.ANY),
+                mock.call("alpha:bar:bravo:baz:charlie:charlie:42", default=mock.ANY),
+                mock.call("static", default=mock.ANY),
             ]
         )
 
@@ -201,3 +201,19 @@ class CacheBehaviorTest(DjangoTestCase):
 
         with self.assertRaises(ValueError):
             foo()
+
+    def test_returning_None_is_not_treated_as_a_cache_miss(self):
+        m = mock.Mock()
+
+        @cache("foo")
+        def returns_none():
+            m()
+            return None
+
+        # The second call should return the cached "None" from the first call,
+        # which the cache decorator should interpret as a valid cached value,
+        # not as a cache miss.
+        returns_none()
+        returns_none()
+
+        m.assert_called_once()
