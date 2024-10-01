@@ -195,8 +195,8 @@ class MathCaptchaField(forms.Field):
         # exclude negative results
         num1, num2 = max(num1, num2), min(num1, num2)
 
-        question = _("What is {num1} {operator_str} {num2}?").format(
-            num1=num1, operator_str=operator, num2=num2
+        question = _("What is {num1} {operator} {num2}?").format(
+            num1=num1, operator=operator, num2=num2
         )
 
         match operator:

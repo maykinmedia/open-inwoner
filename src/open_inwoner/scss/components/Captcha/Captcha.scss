@@ -1,0 +1,25 @@
+.captcha {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-medium);
+
+  .__label {
+    display: flex;
+  }
+
+  &__check {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap: var(--spacing-large);
+  }
+
+  &__prompt {
+    font-weight: bold;
+  }
+
+  &__input .input {
+    display: inline-block;
+    width: 100px;
+  }
+}

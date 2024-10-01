@@ -24,15 +24,25 @@
                 {% input form_object.question %}
 
                 {% if form_object.captcha %}
-                    <span class="label__label">
-                        {{ form_object.captcha.label }}<span class="label__label--required"> * </span>
-                    </span>
-                    <span>{{ form_object.captcha_prompt }}</span>
-                    <span>{{ form_object.captcha.question }}</span>
-                    {% field_as_widget form_object.captcha "input" form_id %}
+                    <div class="form__control ">
+                        <div class="captcha">
+                            <label class="label captcha__label">
+                                {{ form_object.captcha.label }}<span class="label__label--required"> * </span>
+                            </label>
+                            <div class="captcha__check">
+                                <div>
+                                    <span class="captcha__prompt">{{ form_object.captcha.field.question }}</span>
+                                </div>
+                                <span class="captcha__input">{% field_as_widget form_object.captcha "input" form_id %}</span>
+                            </div>
+                            {% if form_object.captcha.errors %}
+                                {% errors errors=form_object.captcha.errors %}
+                            {% endif %}
+                        </div>
+                    </div>
                 {% endif %}
 
-                {% form_actions primary_text=_("Verzenden") primary_icon="arrow_forward" %}
+                {% form_actions primary_text=_("Verzenden") primary_icon="arrow_forward" fullwidth=True %}
 
             {% endrender_form %}
         </div>

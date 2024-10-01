@@ -58,7 +58,6 @@ class ContactForm(forms.Form):
 
         config = OpenKlantConfig.get_solo()
         self.fields["subject"].queryset = config.contactformsubject_set.all()
-        self.captcha_prompt = self.fields["captcha"].question
 
         if self.user.is_authenticated:
             del self.fields["first_name"]
