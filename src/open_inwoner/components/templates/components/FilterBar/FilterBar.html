@@ -1,4 +1,4 @@
-{% load i18n form_tags button_tags %}
+{% load i18n form_tags %}
 
 {# Wrapper for multiple filters #}
 <div class="filter-bar" id="filterBar">
@@ -7,9 +7,5 @@
           {% if id %}id="{{ id }}"{% endif %}>
         {# Note: each element inside the form is a flex column #}
         {{ contents }}
-
-        <div class="form__actions form__actions--fullwidth form__actions--reset">
-            {% button bordered=False text=_("Wis alle filters") id="resetFilters" type="button" transparent=True primary=True %}
-        </div>
     </form>
 </div>
