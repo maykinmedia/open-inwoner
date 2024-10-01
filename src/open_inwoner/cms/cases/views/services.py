@@ -69,6 +69,16 @@ class CaseListService:
     def __init__(self, request: HttpRequest):
         self.request = request
 
+        # TODO: Ideally, this would be configured in light of:
+        # - a configured maximum number of threads and
+        # - the number of API groups configured
+        #
+        # However, distributing the available threads optimally in light of both
+        # constraints is not trivial, due to the total thread count being
+        # subject to cascading effects (each nested count is a multiple of its
+        # parent count). Hence, we provide some sane defaults for both the 1 and
+        # >1 case of API group count. Even with a small CPU count, these numbers
+        # should be fine, as the threads are primarily IO-bound.
         if ZGWApiGroupConfig.objects.count() > 1:
             self._thread_limits = {
                 "zgw_api_groups": 2,
