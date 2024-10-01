@@ -17,7 +17,6 @@ from open_inwoner.openzaak.models import (
     ZaakTypeStatusTypeConfig,
     ZGWApiGroupConfig,
 )
-from open_inwoner.openzaak.types import UniformCase
 from open_inwoner.openzaak.utils import get_user_fetch_parameters, is_zaak_visible
 
 logger = logging.getLogger(__name__)
@@ -30,12 +29,12 @@ class CaseFilterFormOption(enum.Enum):
 
 
 @dataclass(frozen=True)
-class ZaakWithApiGroup(UniformCase):
+class ZaakWithApiGroup:
     zaak: Zaak
     api_group: ZGWApiGroupConfig
 
     @property
-    def identification(self):
+    def identification(self) -> str:
         return self.zaak.url
 
     def process_data(self) -> dict:
@@ -48,7 +47,7 @@ class SubmissionWithApiGroup:
     api_group: ZGWApiGroupConfig
 
     @property
-    def identifier(self):
+    def identification(self) -> str:
         return self.submission.url
 
     def process_data(self) -> dict:
@@ -87,12 +86,15 @@ class CaseListService:
 
     def get_submissions_for_api_group(
         self, group: ZGWApiGroupConfig
-    ) -> list[UniformCase]:
+    ) -> list[OpenSubmission]:
+        if not group.forms_client:
+            raise ValueError(f"{group} has no `forms_client`")
+
         return group.forms_client.fetch_open_submissions(
             **get_user_fetch_parameters(self.request, check_rsin=False)
         )
 
-    def get_submissions(self):
+    def get_submissions(self) -> list[SubmissionWithApiGroup]:
         all_api_groups = list(
             ZGWApiGroupConfig.objects.exclude(form_service__isnull=True)
         )
@@ -103,7 +105,7 @@ class CaseListService:
                 for group in all_api_groups
             ]
 
-            subs_with_api_group = []
+            subs_with_api_group: list[SubmissionWithApiGroup] = []
             for task in concurrent.futures.as_completed(futures):
                 try:
                     group_for_task = all_api_groups[futures.index(task)]

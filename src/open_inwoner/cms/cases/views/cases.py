@@ -1,4 +1,5 @@
 import logging
+from typing import Sequence
 
 from django.urls import reverse
 from django.utils.functional import cached_property
@@ -69,8 +70,8 @@ class InnerCaseListView(
         context["filter_form_enabled"] = config.zaken_filter_enabled
 
         # update ctx with open submissions and cases (possibly fitered)
-        open_submissions: list[UniformCase] = case_service.get_submissions()
-        preprocessed_cases: list[UniformCase] = case_service.get_cases()
+        open_submissions: Sequence[UniformCase] = case_service.get_submissions()
+        preprocessed_cases: Sequence[UniformCase] = case_service.get_cases()
 
         if config.zaken_filter_enabled:
             case_status_frequencies = case_service.get_case_status_frequencies()
