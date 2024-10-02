@@ -2,10 +2,11 @@
     <tbody>
     <tr>
         <td class="td-mail td__padding-all" colspan="6">
-            <p>Beste inwoner,</p>
+            <p>Beste {{ first_name }},</p>
             <p>&nbsp;</p>
-            <p>Om door te gaan moet je je e-mailadres <a href="{{ verification_link }}">bevestigen</a><span class="color--secondary"> &rarr;</span></p>
-            <p>Mocht je geen behoefte hieraan hebben dan staat het je vrij om dit bericht te negeren.</p>
+            <p>Bedankt voor uw aanmelding op {{ site_name }}. Bevestig uw e-mailadres om verder te gaan, doe dit via onderstaande link:</p>
+	    <p><a href="{{ verification_link }}">Bevestig mijn e-mailadres</a><span class="color--secondary"> &rarr;</span></p>
+            <p>Als u problemen heeft met het bevestigen van uw e-mailadres, neem dan contact met ons op.</p>
         </td>
     </tr>
     <tr class="tr-mail border-top">

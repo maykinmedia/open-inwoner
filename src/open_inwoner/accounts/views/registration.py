@@ -247,9 +247,7 @@ class EmailVerificationUserView(LogMixin, LoginRequiredMixin, TemplateView):
             user, next_url=get_next_url_from(self.request, default="")
         )
 
-        messages.add_message(
-            self.request, messages.SUCCESS, _("Bevestigings e-mail is verzonden")
-        )
+        messages.add_message(self.request, messages.SUCCESS, _("E-mail is verzonden"))
         self.log_user_action(user, _("user requested e-mail address verification"))
 
         return redirect(self.get_success_url())

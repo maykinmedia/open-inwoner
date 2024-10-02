@@ -22,7 +22,7 @@ class EmailVerificationTokenView(LoginRequiredMixin, LogMixin, View):
 
         if validate_email_verification_token(request.user, token):
             messages.add_message(
-                self.request, messages.SUCCESS, _("E-mailadres is bevestigd")
+                self.request, messages.SUCCESS, _("Uw e-mailadres is bevestigd")
             )
             self.log_user_action(request.user, _("user verified e-mail address"))
 
