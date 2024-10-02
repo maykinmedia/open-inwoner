@@ -130,3 +130,17 @@ def test_retrieve_betrokkene(client, een_betrokkene):
 
     BetrokkeneValidator.validate_python(resp)
     assert resp["uuid"] == een_betrokkene["uuid"]
+
+
+@pytest.mark.vcr
+def test_list_betrokkenen_as_pagination_iter(client, betrokkene_factory):
+    # We can't specify the pagesize, so we have to use the default 100 to create more than 1 page of data
+    betrokkenen = [betrokkene_factory() for _ in range(101)]
+    assert client.betrokkene.list()["next"] is not None
+
+    resp = list(client.betrokkene.list_iter())
+
+    TypeAdapter(list[Betrokkene]).validate_python(resp)
+    assert sorted(resp, key=lambda b: b["uuid"]) == sorted(
+        betrokkenen, key=lambda b: b["uuid"]
+    )

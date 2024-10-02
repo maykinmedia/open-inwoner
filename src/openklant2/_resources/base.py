@@ -121,7 +121,7 @@ class ResourceMixin:
         paginated_data: PaginatedResponseBody[T],
         max_requests: Optional[int] = None,
     ) -> Generator[T, Any, None]:
-        def _iter(
+        def row_iterator(
             _data: PaginatedResponseBody[T], num_requests=0
         ) -> Generator[T, Any, None]:
             for result in _data["results"]:
@@ -141,9 +141,9 @@ class ResourceMixin:
                 response.raise_for_status()
                 data = response.json()
 
-                yield from _iter(data, num_requests)
+                yield from row_iterator(data, num_requests)
 
-        return _iter(paginated_data)
+        return row_iterator(paginated_data)
 
     def _get(
         self,
