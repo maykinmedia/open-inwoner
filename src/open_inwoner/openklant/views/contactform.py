@@ -23,7 +23,7 @@ from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
     form_class = ContactForm
-    template_name = "pages/contactform/form.html"
+    template_name = "pages/contactform/form_wrap.html"  # inner ("structure") template rendered by CMS plugin
 
     @cached_property
     def crumbs(self):
