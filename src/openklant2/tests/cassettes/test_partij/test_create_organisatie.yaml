@@ -15,7 +15,7 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/partijen
   response:
     body:
-      string: '{"uuid":"6c459ca7-1829-4eea-811e-98ab56a2c2c6","url":"http://localhost:8338/klantinteracties/api/v1/partijen/6c459ca7-1829-4eea-811e-98ab56a2c2c6","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"organisatie","indicatieGeheimhouding":false,"voorkeurstaal":"nld","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"naam":"AcmeCorp
+      string: '{"uuid":"ed2320e9-f37f-4513-beb0-f4e0b15b8b0c","url":"http://localhost:8338/klantinteracties/api/v1/partijen/ed2320e9-f37f-4513-beb0-f4e0b15b8b0c","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"organisatie","indicatieGeheimhouding":false,"voorkeurstaal":"nld","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"naam":"AcmeCorp
         Ltd"}}'
     headers:
       API-version:
@@ -29,7 +29,7 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/partijen/6c459ca7-1829-4eea-811e-98ab56a2c2c6
+      - http://localhost:8338/klantinteracties/api/v1/partijen/ed2320e9-f37f-4513-beb0-f4e0b15b8b0c
       Referrer-Policy:
       - same-origin
       Vary:

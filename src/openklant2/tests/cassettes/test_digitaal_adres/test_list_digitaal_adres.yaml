@@ -1,36 +1,36 @@
 interactions:
 - request:
     body: '{"digitaleAdressen": null, "voorkeursDigitaalAdres": null, "rekeningnummers":
-      null, "voorkeursRekeningnummer": null, "indicatieGeheimhouding": true, "indicatieActief":
-      false, "voorkeurstaal": "kam", "soortPartij": "persoon", "partijIdentificatie":
-      {"contactnaam": {"voorletters": "Mr.", "voornaam": "Sara", "voorvoegselAchternaam":
-      "Ms.", "achternaam": "Gonzalez"}}}'
+      null, "voorkeursRekeningnummer": null, "indicatieGeheimhouding": false, "indicatieActief":
+      true, "voorkeurstaal": "ast", "soortPartij": "persoon", "partijIdentificatie":
+      {"contactnaam": {"voorletters": "Mrs.", "voornaam": "Linda", "voorvoegselAchternaam":
+      "Dr.", "achternaam": "Baker"}}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '366'
+      - '365'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/partijen
   response:
     body:
-      string: '{"uuid":"71ab1bf9-ec22-4227-afcc-b126af6e42cc","url":"http://localhost:8338/klantinteracties/api/v1/partijen/71ab1bf9-ec22-4227-afcc-b126af6e42cc","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":true,"voorkeurstaal":"kam","indicatieActief":false,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Mr.","voornaam":"Sara","voorvoegselAchternaam":"Ms.","achternaam":"Gonzalez"},"volledigeNaam":"Sara
-        Ms. Gonzalez"}}'
+      string: '{"uuid":"063cd55e-522c-4f33-9fc1-12e87c3ee853","url":"http://localhost:8338/klantinteracties/api/v1/partijen/063cd55e-522c-4f33-9fc1-12e87c3ee853","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"ast","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Mrs.","voornaam":"Linda","voorvoegselAchternaam":"Dr.","achternaam":"Baker"},"volledigeNaam":"Linda
+        Dr. Baker"}}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '863'
+      - '860'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/partijen/71ab1bf9-ec22-4227-afcc-b126af6e42cc
+      - http://localhost:8338/klantinteracties/api/v1/partijen/063cd55e-522c-4f33-9fc1-12e87c3ee853
       Referrer-Policy:
       - same-origin
       Vary:
@@ -43,35 +43,35 @@ interactions:
       code: 201
       message: Created
 - request:
-    body: '{"adres": "57418 Steven Well\nRyanville, FM 15879", "omschrijving": "moment",
-      "soortDigitaalAdres": "first", "verstrektDoorBetrokkene": null, "verstrektDoorPartij":
-      {"uuid": "71ab1bf9-ec22-4227-afcc-b126af6e42cc"}}'
+    body: '{"adres": "67602 Jennifer Bridge Suite 480\nMariaburgh, MO 55486", "omschrijving":
+      "most", "soortDigitaalAdres": "head", "verstrektDoorBetrokkene": null, "verstrektDoorPartij":
+      {"uuid": "063cd55e-522c-4f33-9fc1-12e87c3ee853"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '214'
+      - '226'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/digitaleadressen
   response:
     body:
-      string: '{"uuid":"daa22885-087e-4c83-b866-6dccc7f7780d","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/daa22885-087e-4c83-b866-6dccc7f7780d","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"71ab1bf9-ec22-4227-afcc-b126af6e42cc","url":"http://localhost:8338/klantinteracties/api/v1/partijen/71ab1bf9-ec22-4227-afcc-b126af6e42cc"},"adres":"57418
-        Steven Well\nRyanville, FM 15879","soortDigitaalAdres":"first","omschrijving":"moment"}'
+      string: '{"uuid":"8342e396-9148-49ca-a002-36c82c4f3649","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/8342e396-9148-49ca-a002-36c82c4f3649","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"063cd55e-522c-4f33-9fc1-12e87c3ee853","url":"http://localhost:8338/klantinteracties/api/v1/partijen/063cd55e-522c-4f33-9fc1-12e87c3ee853"},"adres":"67602
+        Jennifer Bridge Suite 480\nMariaburgh, MO 55486","soortDigitaalAdres":"head","omschrijving":"most"}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '458'
+      - '470'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/digitaleadressen/daa22885-087e-4c83-b866-6dccc7f7780d
+      - http://localhost:8338/klantinteracties/api/v1/digitaleadressen/8342e396-9148-49ca-a002-36c82c4f3649
       Referrer-Policy:
       - same-origin
       Vary:
@@ -92,15 +92,15 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/digitaleadressen
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"daa22885-087e-4c83-b866-6dccc7f7780d","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/daa22885-087e-4c83-b866-6dccc7f7780d","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"71ab1bf9-ec22-4227-afcc-b126af6e42cc","url":"http://localhost:8338/klantinteracties/api/v1/partijen/71ab1bf9-ec22-4227-afcc-b126af6e42cc"},"adres":"57418
-        Steven Well\nRyanville, FM 15879","soortDigitaalAdres":"first","omschrijving":"moment","_expand":{}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"8342e396-9148-49ca-a002-36c82c4f3649","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/8342e396-9148-49ca-a002-36c82c4f3649","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"063cd55e-522c-4f33-9fc1-12e87c3ee853","url":"http://localhost:8338/klantinteracties/api/v1/partijen/063cd55e-522c-4f33-9fc1-12e87c3ee853"},"adres":"67602
+        Jennifer Bridge Suite 480\nMariaburgh, MO 55486","soortDigitaalAdres":"head","omschrijving":"most","_expand":{}}]}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '523'
+      - '535'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
