@@ -9,6 +9,7 @@ from openklant2.types.resources.klant_contact import (
     CreateKlantContactData,
     KlantContact,
     ListKlantContactParams,
+    RetrieveKlantContactParams,
 )
 
 
@@ -24,8 +25,14 @@ class KlantContactResource(ResourceMixin):
         response = self._post(self.base_path, data=data)
         return cast(KlantContact, self.process_response(response))
 
-    def retrieve(self, /, uuid: str | uuid.UUID) -> KlantContact:
-        response = self._get(f"{self.base_path}/{str(uuid)}")
+    def retrieve(
+        self,
+        /,
+        uuid: str | uuid.UUID,
+        *,
+        params: RetrieveKlantContactParams | None = None,
+    ) -> KlantContact:
+        response = self._get(f"{self.base_path}/{str(uuid)}", params=params)
         return cast(KlantContact, self.process_response(response))
 
     def list(

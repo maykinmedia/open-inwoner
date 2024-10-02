@@ -53,6 +53,19 @@ class ListKlantContactParams(TypedDict, total=False):
     wasOnderwerpobject__uuid: str
 
 
+class RetrieveKlantContactParams(TypedDict, total=False):
+    expand: list[
+        Literal[
+            "gingOverOnderwerpobjecten",
+            "hadBetrokkenen",
+            "hadBetrokkenen.digitaleAdressen",
+            "hadBetrokkenen.wasPartij",
+            "leiddeTotInterneTaken",
+            "omvatteBijlagen",
+        ]
+    ]
+
+
 class KlantContact(TypedDict):
     uuid: str
     url: str
