@@ -1,5 +1,12 @@
+import datetime
 import logging
-from typing import Iterable, Literal
+import uuid
+from typing import Iterable, Literal, Self
+
+from django.utils import timezone
+
+import glom
+from attr import dataclass
 
 from open_inwoner.accounts.choices import NotificationChannelChoice
 from open_inwoner.accounts.models import User
@@ -9,6 +16,7 @@ from open_inwoner.openklant.clients import build_klanten_client
 from open_inwoner.utils.logentry import system_action
 from openklant2.client import OpenKlant2Client
 from openklant2.types.resources.digitaal_adres import DigitaalAdres
+from openklant2.types.resources.klant_contact import KlantContact
 from openklant2.types.resources.partij import Partij, PartijListParams
 
 from .wrap import FetchParameters, get_fetch_parameters
@@ -86,16 +94,75 @@ def update_user_from_klant(klant: Klant, user: User):
         )
 
 
+@dataclass(frozen=True)
+class OpenKlant2Answer:
+    answer: str
+    answer_kcm_uuid: str
+    nummer: str
+    plaatsgevonden_op: datetime.datetime
+
+    @classmethod
+    def from_klantcontact(cls, klantcontact: KlantContact) -> Self:
+        if klantcontact["inhoud"] is None:
+            raise ValueError("Klantcontact did not contain any content in `inhoud`")
+
+        return cls(
+            answer=klantcontact["inhoud"],
+            answer_kcm_uuid=klantcontact["uuid"],
+            nummer=klantcontact["nummer"],
+            plaatsgevonden_op=datetime.datetime.fromisoformat(
+                klantcontact["plaatsgevondenOp"]
+            ),
+        )
+
+
+@dataclass(frozen=True)
+class OpenKlant2Question:
+    question: str
+    question_kcm_uuid: str
+    nummer: str
+    plaatsgevonden_op: datetime.datetime
+
+    answer: OpenKlant2Answer | None = None
+
+    @classmethod
+    def from_klantcontact_and_answer(
+        cls, klantcontact: KlantContact, answer: OpenKlant2Answer | None = None
+    ) -> Self:
+        if klantcontact["inhoud"] is None:
+            raise ValueError("Klantcontact did not contain any content in `inhoud`")
+
+        return cls(
+            question=klantcontact["inhoud"],
+            question_kcm_uuid=klantcontact["uuid"],
+            nummer=klantcontact["nummer"],
+            plaatsgevonden_op=datetime.datetime.fromisoformat(
+                klantcontact["plaatsgevondenOp"]
+            ),
+            answer=answer,
+        )
+
+
 class OpenKlant2Service:
 
     client: OpenKlant2Client
+    mijn_vragen_actor: uuid.UUID | None
+    MIJN_VRAGEN_KANAAL: str = "oip_mijn_vragen"
 
-    def __init__(self, client: OpenKlant2Client):
+    def __init__(
+        self, client: OpenKlant2Client, mijn_vragen_actor: str | uuid.UUID | None = None
+    ):
         if not isinstance(client, OpenKlant2Client):
             raise ValueError(
                 f"`client` must be an instance of {type(OpenKlant2Client)}"
             )
         self.client = client
+        if mijn_vragen_actor:
+            self.mijn_vragen_actor = (
+                uuid.UUID(mijn_vragen_actor)
+                if isinstance(mijn_vragen_actor, str)
+                else mijn_vragen_actor
+            )
 
     def find_partij_for_params(self, params: PartijListParams):
         resp = self.client.partij.list(params=params)
@@ -380,3 +447,177 @@ class OpenKlant2Service:
                 f"updated Partij from user with fields: {', '.join(sorted(updated_fields))}",
                 content_object=user,
             )
+
+    def create_question(
+        self, partij: Partij, question: str, subject: str
+    ) -> OpenKlant2Question:
+
+        if len(question.rstrip()) == 0:
+            raise ValueError("You must provide a question")
+
+        if self.mijn_vragen_actor is None:
+            raise RuntimeError(
+                "You must define an actor to whom the question will be assigned. "
+                "Initialize the service with a value for `mijn_vragen_actor`."
+            )
+
+        klantcontact = self.client.klant_contact.create(
+            data={
+                "inhoud": question,
+                "onderwerp": subject,
+                "taal": "nld",
+                "kanaal": self.MIJN_VRAGEN_KANAAL,
+                "vertrouwelijk": False,
+                "plaatsgevondenOp": timezone.now().isoformat(),
+            }
+        )
+        logger.info("Created klantcontact: %s", klantcontact["uuid"])
+
+        betrokkene = self.client.betrokkene.create(
+            data={
+                "rol": "klant",
+                "hadKlantcontact": {"uuid": klantcontact["uuid"]},
+                "initiator": True,
+                "wasPartij": {"uuid": partij["uuid"]},
+                "organisatienaam": "Open Inwoner Platform",
+            }
+        )
+        logger.info("Created betrokkene: %s", betrokkene["uuid"])
+
+        taak = self.client.interne_taak.create(
+            data={
+                "aanleidinggevendKlantcontact": {"uuid": klantcontact["uuid"]},
+                "toelichting": "Beantwoorden vraag",
+                "gevraagdeHandeling": "Vraag beantwoorden in aanleiding gevend klant contact",
+                "status": "te_verwerken",
+                "toegewezenAanActor": {"uuid": str(self.mijn_vragen_actor)},
+            }
+        )
+        logger.info("Created taak: %s", taak["uuid"])
+
+        return OpenKlant2Question.from_klantcontact_and_answer(klantcontact)
+
+    def create_answer(
+        self, partij: Partij, question_klantcontact_uuid: str, answer: str
+    ) -> OpenKlant2Answer:
+        """Create an answer for a question identified through `question_klantcontact_uuid`.
+
+        Note that this method is mainly for documentation and testing. In practice, answers will be
+        created by other systems (e.g. the customer support software at the municipality).
+        """
+        question_klantcontact = self.client.klant_contact.retrieve(
+            question_klantcontact_uuid
+        )
+        answer_klantcontact = self.client.klant_contact.create(
+            data={
+                "inhoud": answer,
+                "onderwerp": question_klantcontact["onderwerp"],
+                "taal": "nld",
+                "kanaal": self.MIJN_VRAGEN_KANAAL,
+                "vertrouwelijk": False,
+                "plaatsgevondenOp": timezone.now().isoformat(),
+            }
+        )
+
+        self.client.betrokkene.create(
+            data={
+                "rol": "klant",
+                "hadKlantcontact": {"uuid": answer_klantcontact["uuid"]},
+                "initiator": True,
+                "wasPartij": {"uuid": partij["uuid"]},
+                "organisatienaam": "Open Inwoner Platform",
+            }
+        )
+
+        self.client.onderwerp_object.create(
+            data={
+                "klantcontact": {
+                    "uuid": answer_klantcontact["uuid"],
+                },
+                "wasKlantcontact": {
+                    "uuid": question_klantcontact["uuid"],
+                },
+            }
+        )
+
+        return OpenKlant2Answer.from_klantcontact(answer_klantcontact)
+
+    def klantcontacten_for_partij(self, partij: Partij) -> Iterable[KlantContact]:
+        # There is currently no good way to filter the klantcontacten by a
+        # Partij (see https://github.com/maykinmedia/open-klant/issues/256). So
+        # unfortunately, we have to fetch all rows and do the filtering client
+        # side.
+        klantcontacten = self.client.klant_contact.list_iter(
+            params={
+                "expand": [
+                    "leiddeTotInterneTaken",
+                    "gingOverOnderwerpobjecten",
+                    "hadBetrokkenen",
+                    "hadBetrokkenen.wasPartij",
+                ],
+                "kanaal": self.MIJN_VRAGEN_KANAAL,
+            }
+        )
+
+        klantcontacten_for_partij = filter(
+            lambda row: partij["uuid"]
+            in glom.glom(
+                row,
+                ("_expand.hadBetrokkenen", ["wasPartij.uuid"]),
+            ),
+            klantcontacten,
+        )
+
+        return klantcontacten_for_partij
+
+    def questions_for_partij(self, partij: Partij) -> list[OpenKlant2Question]:
+        answers_for_klantcontact_uuid = {}
+        question_uuids = []
+        klantcontact_uuid_to_klantcontact_object = {}
+
+        for klantcontact in self.klantcontacten_for_partij(partij):
+            klantcontact_uuid_to_klantcontact_object[
+                klantcontact["uuid"]
+            ] = klantcontact
+
+            # A klantcontact is an answer if it is linked to a Question via an onderwerp object
+            if onderwerp_objecten := klantcontact["gingOverOnderwerpobjecten"]:
+
+                # To which question klantcontact is this an answer?
+                answer_onderwerp_object = self.client.onderwerp_object.retrieve(
+                    onderwerp_objecten[0]["uuid"]
+                )
+
+                if not answer_onderwerp_object["wasKlantcontact"]:
+                    logger.error(
+                        "Onderwerp object %s should point to question klantcontact",
+                        answer_onderwerp_object["uuid"],
+                    )
+                    continue
+
+                # Map the question to the answer
+                question_uuid = answer_onderwerp_object["wasKlantcontact"]["uuid"]
+                answers_for_klantcontact_uuid[question_uuid] = klantcontact["uuid"]
+            else:
+                # No onderwerp object, so we treat this klantcontact as a question
+                question_uuids.append(klantcontact["uuid"])
+
+        question_objs: list[OpenKlant2Question] = []
+        for question_uuid in question_uuids:
+            question = klantcontact_uuid_to_klantcontact_object[question_uuid]
+            try:
+                answer_uuid = answers_for_klantcontact_uuid[question_uuid]
+                answer = klantcontact_uuid_to_klantcontact_object[answer_uuid]
+            except KeyError:
+                answer = None
+
+            answer_obj = None
+            if answer:
+                answer_obj = OpenKlant2Answer.from_klantcontact(answer)
+
+            question_objs.append(
+                OpenKlant2Question.from_klantcontact_and_answer(question, answer_obj)
+            )
+
+        question_objs.sort(key=lambda o: o.plaatsgevonden_op)
+        return question_objs
