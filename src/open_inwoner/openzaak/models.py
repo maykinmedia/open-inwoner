@@ -1,7 +1,7 @@
 import logging
 import warnings
 from datetime import timedelta
-from typing import Protocol
+from typing import Protocol, cast
 from urllib.parse import urlparse
 
 from django.db import models, transaction
@@ -199,7 +199,9 @@ class ZGWApiGroupConfig(models.Model):
 
     @property
     def zaken_client(self):
-        return self._build_client_from_attr("zrc_service")
+        from .clients import ZakenClient
+
+        return cast(ZakenClient, self._build_client_from_attr("zrc_service"))
 
     drc_service = models.ForeignKey(
         "zgw_consumers.Service",
@@ -213,7 +215,9 @@ class ZGWApiGroupConfig(models.Model):
 
     @property
     def documenten_client(self):
-        return self._build_client_from_attr("drc_service")
+        from .clients import DocumentenClient
+
+        return cast(DocumentenClient, self._build_client_from_attr("drc_service"))
 
     ztc_service = models.ForeignKey(
         "zgw_consumers.Service",
@@ -227,7 +231,9 @@ class ZGWApiGroupConfig(models.Model):
 
     @property
     def catalogi_client(self):
-        return self._build_client_from_attr("ztc_service")
+        from .clients import CatalogiClient
+
+        return cast(CatalogiClient, self._build_client_from_attr("ztc_service"))
 
     form_service = models.OneToOneField(
         "zgw_consumers.Service",
@@ -241,8 +247,10 @@ class ZGWApiGroupConfig(models.Model):
 
     @property
     def forms_client(self):
+        from .clients import FormClient
+
         if self.form_service:
-            return self._build_client_from_attr("form_service")
+            return cast(FormClient, self._build_client_from_attr("form_service"))
 
     class Meta:
         verbose_name = _("ZGW API set")

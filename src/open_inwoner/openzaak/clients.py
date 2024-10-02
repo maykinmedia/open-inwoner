@@ -677,7 +677,7 @@ class FormClient(ZgwAPIClient):
         vestigingsnummer: str | None = None,
         max_requests: int = 4,
         **kwargs,
-    ):
+    ) -> list[OpenSubmission]:
         if user_bsn and (user_kvk or vestigingsnummer):
             raise ValueError(
                 "either `user_bsn` or `user_kvk` (optionally with `vestigingsnummer`) "
