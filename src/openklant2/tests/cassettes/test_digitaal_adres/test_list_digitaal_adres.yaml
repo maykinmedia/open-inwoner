@@ -2,35 +2,35 @@ interactions:
 - request:
     body: '{"digitaleAdressen": null, "voorkeursDigitaalAdres": null, "rekeningnummers":
       null, "voorkeursRekeningnummer": null, "indicatieGeheimhouding": false, "indicatieActief":
-      true, "voorkeurstaal": "ast", "soortPartij": "persoon", "partijIdentificatie":
-      {"contactnaam": {"voorletters": "Mrs.", "voornaam": "Linda", "voorvoegselAchternaam":
-      "Dr.", "achternaam": "Baker"}}}'
+      false, "voorkeurstaal": "sag", "soortPartij": "persoon", "partijIdentificatie":
+      {"contactnaam": {"voorletters": "Mr.", "voornaam": "Gregory", "voorvoegselAchternaam":
+      "Mrs.", "achternaam": "Curtis"}}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '365'
+      - '369'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/partijen
   response:
     body:
-      string: '{"uuid":"063cd55e-522c-4f33-9fc1-12e87c3ee853","url":"http://localhost:8338/klantinteracties/api/v1/partijen/063cd55e-522c-4f33-9fc1-12e87c3ee853","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"ast","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Mrs.","voornaam":"Linda","voorvoegselAchternaam":"Dr.","achternaam":"Baker"},"volledigeNaam":"Linda
-        Dr. Baker"}}'
+      string: '{"uuid":"91a61e90-fea0-402c-85b6-6fddca6fcddc","url":"http://localhost:8338/klantinteracties/api/v1/partijen/91a61e90-fea0-402c-85b6-6fddca6fcddc","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"sag","indicatieActief":false,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Mr.","voornaam":"Gregory","voorvoegselAchternaam":"Mrs.","achternaam":"Curtis"},"volledigeNaam":"Gregory
+        Mrs. Curtis"}}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '860'
+      - '868'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/partijen/063cd55e-522c-4f33-9fc1-12e87c3ee853
+      - http://localhost:8338/klantinteracties/api/v1/partijen/91a61e90-fea0-402c-85b6-6fddca6fcddc
       Referrer-Policy:
       - same-origin
       Vary:
@@ -43,35 +43,35 @@ interactions:
       code: 201
       message: Created
 - request:
-    body: '{"adres": "67602 Jennifer Bridge Suite 480\nMariaburgh, MO 55486", "omschrijving":
-      "most", "soortDigitaalAdres": "head", "verstrektDoorBetrokkene": null, "verstrektDoorPartij":
-      {"uuid": "063cd55e-522c-4f33-9fc1-12e87c3ee853"}}'
+    body: '{"adres": "USNS Smith\nFPO AP 68279", "omschrijving": "myself", "soortDigitaalAdres":
+      "company", "verstrektDoorBetrokkene": null, "verstrektDoorPartij": {"uuid":
+      "91a61e90-fea0-402c-85b6-6fddca6fcddc"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '226'
+      - '202'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/digitaleadressen
   response:
     body:
-      string: '{"uuid":"8342e396-9148-49ca-a002-36c82c4f3649","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/8342e396-9148-49ca-a002-36c82c4f3649","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"063cd55e-522c-4f33-9fc1-12e87c3ee853","url":"http://localhost:8338/klantinteracties/api/v1/partijen/063cd55e-522c-4f33-9fc1-12e87c3ee853"},"adres":"67602
-        Jennifer Bridge Suite 480\nMariaburgh, MO 55486","soortDigitaalAdres":"head","omschrijving":"most"}'
+      string: '{"uuid":"0ed64d93-831d-4411-9658-ef35c760b47b","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/0ed64d93-831d-4411-9658-ef35c760b47b","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"91a61e90-fea0-402c-85b6-6fddca6fcddc","url":"http://localhost:8338/klantinteracties/api/v1/partijen/91a61e90-fea0-402c-85b6-6fddca6fcddc"},"adres":"USNS
+        Smith\nFPO AP 68279","soortDigitaalAdres":"company","omschrijving":"myself"}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '470'
+      - '446'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/digitaleadressen/8342e396-9148-49ca-a002-36c82c4f3649
+      - http://localhost:8338/klantinteracties/api/v1/digitaleadressen/0ed64d93-831d-4411-9658-ef35c760b47b
       Referrer-Policy:
       - same-origin
       Vary:
@@ -92,15 +92,15 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/digitaleadressen
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"8342e396-9148-49ca-a002-36c82c4f3649","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/8342e396-9148-49ca-a002-36c82c4f3649","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"063cd55e-522c-4f33-9fc1-12e87c3ee853","url":"http://localhost:8338/klantinteracties/api/v1/partijen/063cd55e-522c-4f33-9fc1-12e87c3ee853"},"adres":"67602
-        Jennifer Bridge Suite 480\nMariaburgh, MO 55486","soortDigitaalAdres":"head","omschrijving":"most","_expand":{}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"0ed64d93-831d-4411-9658-ef35c760b47b","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/0ed64d93-831d-4411-9658-ef35c760b47b","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"91a61e90-fea0-402c-85b6-6fddca6fcddc","url":"http://localhost:8338/klantinteracties/api/v1/partijen/91a61e90-fea0-402c-85b6-6fddca6fcddc"},"adres":"USNS
+        Smith\nFPO AP 68279","soortDigitaalAdres":"company","omschrijving":"myself","_expand":{}}]}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '535'
+      - '511'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

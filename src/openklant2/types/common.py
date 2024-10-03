@@ -1,6 +1,14 @@
-from typing import NotRequired, Required
+from typing import Literal, NotRequired, Required
 
 from typing_extensions import TypedDict
+
+# The API uses django-filter, which maps booleans to a BooleanField, of which
+# the docs at
+# https://django-filter.readthedocs.io/en/stable/ref/widgets.html#booleanwidget
+# note:
+# This widget converts its input into Python’s True/False values. It will
+# convert all case variations of True and False into the internal Python values.
+BooleanQueryParam = Literal["True", "False", "true", "false"] | bool
 
 
 class CreateAdres(TypedDict):

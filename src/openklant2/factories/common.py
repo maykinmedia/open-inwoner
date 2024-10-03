@@ -7,3 +7,6 @@ class ForeignKeyRef(factory.Factory):
         model = dict
 
     uuid = factory.Faker("uuid4")
+
+
+IdentificationNumber = lambda: factory.LazyAttributeSequence(lambda o, n: f"{n+1:010d}")

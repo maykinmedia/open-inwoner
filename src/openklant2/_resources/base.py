@@ -1,5 +1,20 @@
 import json
-from typing import Any, Dict, List, Mapping, MutableMapping, TypeGuard, Union
+import logging
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Generator,
+    List,
+    Mapping,
+    MutableMapping,
+    Optional,
+    ParamSpec,
+    TypeGuard,
+    TypeVar,
+    Union,
+    cast,
+)
 
 import pydantic
 import requests
@@ -19,6 +34,9 @@ from openklant2.types.error import (
     ErrorResponseBodyValidator,
     ValidationErrorResponseBodyValidator,
 )
+from openklant2.types.pagination import PaginatedResponseBody
+
+logger = logging.getLogger(__name__)
 
 ResourceResponse = MutableMapping[str, Any]
 
@@ -26,6 +44,9 @@ ResourceResponse = MutableMapping[str, Any]
 JSONPrimitive = Union[str, int, None, float]
 JSONValue = Union[JSONPrimitive, "JSONObject", List["JSONValue"]]
 JSONObject = Dict[str, JSONValue]
+
+P = ParamSpec("P")
+T = TypeVar("T")
 
 
 class ResourceMixin:
@@ -94,6 +115,35 @@ class ResourceMixin:
                 transposed_params[key] = ",".join(str(element) for element in val)
 
         return transposed_params
+
+    def _paginator(
+        self,
+        paginated_data: PaginatedResponseBody[T],
+        max_requests: Optional[int] = None,
+    ) -> Generator[T, Any, None]:
+        def row_iterator(
+            _data: PaginatedResponseBody[T], num_requests=0
+        ) -> Generator[T, Any, None]:
+            for result in _data["results"]:
+                yield cast(T, result)
+
+            if next_url := _data.get("next"):
+                if max_requests and num_requests >= max_requests:
+                    logger.info(
+                        "Number of requests while retrieving paginated results reached "
+                        "maximum of %s requests, returning results",
+                        max_requests,
+                    )
+                    return
+
+                response = self.http_client.get(next_url)
+                num_requests += 1
+                response.raise_for_status()
+                data = response.json()
+
+                yield from row_iterator(data, num_requests)
+
+        return row_iterator(paginated_data)
 
     def _get(
         self,
@@ -172,3 +222,13 @@ class ResourceMixin:
             headers=headers,
             params=self._process_params(params),
         )
+
+    def _make_list_iter(
+        self, f: Callable[P, PaginatedResponseBody[T]]
+    ) -> Callable[P, Generator[T, Any, Any]]:
+        """Create a fully paginated iterator for the resource list() method."""
+
+        def inner(*args: P.args, **kwargs: P.kwargs) -> Generator[T, Any, None]:
+            return self._paginator(f(*args, **kwargs))
+
+        return inner

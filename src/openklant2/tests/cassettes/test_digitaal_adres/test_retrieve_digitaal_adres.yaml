@@ -2,35 +2,35 @@ interactions:
 - request:
     body: '{"digitaleAdressen": null, "voorkeursDigitaalAdres": null, "rekeningnummers":
       null, "voorkeursRekeningnummer": null, "indicatieGeheimhouding": true, "indicatieActief":
-      true, "voorkeurstaal": "jbo", "soortPartij": "persoon", "partijIdentificatie":
-      {"contactnaam": {"voorletters": "Mr.", "voornaam": "Wendy", "voorvoegselAchternaam":
-      "Mr.", "achternaam": "Newton"}}}'
+      false, "voorkeurstaal": "tgl", "soortPartij": "persoon", "partijIdentificatie":
+      {"contactnaam": {"voorletters": "Mx.", "voornaam": "Michael", "voorvoegselAchternaam":
+      "Mx.", "achternaam": "Parker"}}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '364'
+      - '367'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/partijen
   response:
     body:
-      string: '{"uuid":"28fb4dff-f37d-44b2-9ef1-ea9f490c69d1","url":"http://localhost:8338/klantinteracties/api/v1/partijen/28fb4dff-f37d-44b2-9ef1-ea9f490c69d1","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":true,"voorkeurstaal":"jbo","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Mr.","voornaam":"Wendy","voorvoegselAchternaam":"Mr.","achternaam":"Newton"},"volledigeNaam":"Wendy
-        Mr. Newton"}}'
+      string: '{"uuid":"e9bf4ff8-c566-4de3-81a5-5170b366409d","url":"http://localhost:8338/klantinteracties/api/v1/partijen/e9bf4ff8-c566-4de3-81a5-5170b366409d","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":true,"voorkeurstaal":"tgl","indicatieActief":false,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Mx.","voornaam":"Michael","voorvoegselAchternaam":"Mx.","achternaam":"Parker"},"volledigeNaam":"Michael
+        Mx. Parker"}}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '860'
+      - '865'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/partijen/28fb4dff-f37d-44b2-9ef1-ea9f490c69d1
+      - http://localhost:8338/klantinteracties/api/v1/partijen/e9bf4ff8-c566-4de3-81a5-5170b366409d
       Referrer-Policy:
       - same-origin
       Vary:
@@ -43,35 +43,35 @@ interactions:
       code: 201
       message: Created
 - request:
-    body: '{"adres": "481 Kayla Isle\nWest Christopher, FL 36594", "omschrijving":
-      "pick", "soortDigitaalAdres": "spend", "verstrektDoorBetrokkene": null, "verstrektDoorPartij":
-      {"uuid": "28fb4dff-f37d-44b2-9ef1-ea9f490c69d1"}}'
+    body: '{"adres": "1033 Taylor Gateway\nLake Debbie, UT 20652", "omschrijving":
+      "direction", "soortDigitaalAdres": "good", "verstrektDoorBetrokkene": null,
+      "verstrektDoorPartij": {"uuid": "e9bf4ff8-c566-4de3-81a5-5170b366409d"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '216'
+      - '220'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/digitaleadressen
   response:
     body:
-      string: '{"uuid":"625bba7b-33cb-4e0d-b291-35394adbc042","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/625bba7b-33cb-4e0d-b291-35394adbc042","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"28fb4dff-f37d-44b2-9ef1-ea9f490c69d1","url":"http://localhost:8338/klantinteracties/api/v1/partijen/28fb4dff-f37d-44b2-9ef1-ea9f490c69d1"},"adres":"481
-        Kayla Isle\nWest Christopher, FL 36594","soortDigitaalAdres":"spend","omschrijving":"pick"}'
+      string: '{"uuid":"557b8cd2-3516-4991-9ea9-482dceeef362","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/557b8cd2-3516-4991-9ea9-482dceeef362","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"e9bf4ff8-c566-4de3-81a5-5170b366409d","url":"http://localhost:8338/klantinteracties/api/v1/partijen/e9bf4ff8-c566-4de3-81a5-5170b366409d"},"adres":"1033
+        Taylor Gateway\nLake Debbie, UT 20652","soortDigitaalAdres":"good","omschrijving":"direction"}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '460'
+      - '464'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/digitaleadressen/625bba7b-33cb-4e0d-b291-35394adbc042
+      - http://localhost:8338/klantinteracties/api/v1/digitaleadressen/557b8cd2-3516-4991-9ea9-482dceeef362
       Referrer-Policy:
       - same-origin
       Vary:
@@ -89,18 +89,18 @@ interactions:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
     method: GET
-    uri: http://localhost:8338/klantinteracties/api/v1/digitaleadressen/625bba7b-33cb-4e0d-b291-35394adbc042
+    uri: http://localhost:8338/klantinteracties/api/v1/digitaleadressen/557b8cd2-3516-4991-9ea9-482dceeef362
   response:
     body:
-      string: '{"uuid":"625bba7b-33cb-4e0d-b291-35394adbc042","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/625bba7b-33cb-4e0d-b291-35394adbc042","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"28fb4dff-f37d-44b2-9ef1-ea9f490c69d1","url":"http://localhost:8338/klantinteracties/api/v1/partijen/28fb4dff-f37d-44b2-9ef1-ea9f490c69d1"},"adres":"481
-        Kayla Isle\nWest Christopher, FL 36594","soortDigitaalAdres":"spend","omschrijving":"pick"}'
+      string: '{"uuid":"557b8cd2-3516-4991-9ea9-482dceeef362","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/557b8cd2-3516-4991-9ea9-482dceeef362","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"e9bf4ff8-c566-4de3-81a5-5170b366409d","url":"http://localhost:8338/klantinteracties/api/v1/partijen/e9bf4ff8-c566-4de3-81a5-5170b366409d"},"adres":"1033
+        Taylor Gateway\nLake Debbie, UT 20652","soortDigitaalAdres":"good","omschrijving":"direction"}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
       Content-Length:
-      - '460'
+      - '464'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
