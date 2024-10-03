@@ -111,7 +111,7 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/partijen
   response:
     body:
-      string: '{"uuid":"08ba4f07-2e8b-4096-881b-66548a6b3ddc","url":"http://localhost:8338/klantinteracties/api/v1/partijen/08ba4f07-2e8b-4096-881b-66548a6b3ddc","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"organisatie","indicatieGeheimhouding":false,"voorkeurstaal":"nld","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"naam":""}}'
+      string: '{"uuid":"2edfb375-d8a2-4103-be33-cf2bf4766209","url":"http://localhost:8338/klantinteracties/api/v1/partijen/2edfb375-d8a2-4103-be33-cf2bf4766209","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"organisatie","indicatieGeheimhouding":false,"voorkeurstaal":"nld","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"naam":""}}'
     headers:
       API-version:
       - 0.0.3
@@ -124,7 +124,7 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/partijen/08ba4f07-2e8b-4096-881b-66548a6b3ddc
+      - http://localhost:8338/klantinteracties/api/v1/partijen/2edfb375-d8a2-4103-be33-cf2bf4766209
       Referrer-Policy:
       - same-origin
       Vary:
@@ -137,7 +137,7 @@ interactions:
       code: 201
       message: Created
 - request:
-    body: '{"identificeerdePartij": {"uuid": "08ba4f07-2e8b-4096-881b-66548a6b3ddc"},
+    body: '{"identificeerdePartij": {"uuid": "2edfb375-d8a2-4103-be33-cf2bf4766209"},
       "partijIdentificator": {"codeObjecttype": "nnp", "codeSoortObjectId": "kvk",
       "objectId": "123456789", "codeRegister": "hr"}}'
     headers:
@@ -151,7 +151,7 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/partij-identificatoren
   response:
     body:
-      string: '{"uuid":"a86fd8c8-2853-4d4a-82a1-622d7072a456","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/a86fd8c8-2853-4d4a-82a1-622d7072a456","identificeerdePartij":{"uuid":"08ba4f07-2e8b-4096-881b-66548a6b3ddc","url":"http://localhost:8338/klantinteracties/api/v1/partijen/08ba4f07-2e8b-4096-881b-66548a6b3ddc"},"anderePartijIdentificator":"","partijIdentificator":{"codeObjecttype":"nnp","codeSoortObjectId":"kvk","objectId":"123456789","codeRegister":"hr"}}'
+      string: '{"uuid":"9481b829-a1ee-490e-bd39-ca961025137e","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/9481b829-a1ee-490e-bd39-ca961025137e","identificeerdePartij":{"uuid":"2edfb375-d8a2-4103-be33-cf2bf4766209","url":"http://localhost:8338/klantinteracties/api/v1/partijen/2edfb375-d8a2-4103-be33-cf2bf4766209"},"anderePartijIdentificator":"","partijIdentificator":{"codeObjecttype":"nnp","codeSoortObjectId":"kvk","objectId":"123456789","codeRegister":"hr"}}'
     headers:
       API-version:
       - 0.0.3
@@ -164,7 +164,7 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/a86fd8c8-2853-4d4a-82a1-622d7072a456
+      - http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/9481b829-a1ee-490e-bd39-ca961025137e
       Referrer-Policy:
       - same-origin
       Vary:
@@ -185,7 +185,7 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/partijen
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"08ba4f07-2e8b-4096-881b-66548a6b3ddc","url":"http://localhost:8338/klantinteracties/api/v1/partijen/08ba4f07-2e8b-4096-881b-66548a6b3ddc","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[{"uuid":"a86fd8c8-2853-4d4a-82a1-622d7072a456","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/a86fd8c8-2853-4d4a-82a1-622d7072a456"}],"soortPartij":"organisatie","indicatieGeheimhouding":false,"voorkeurstaal":"nld","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"naam":""},"_expand":{}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"2edfb375-d8a2-4103-be33-cf2bf4766209","url":"http://localhost:8338/klantinteracties/api/v1/partijen/2edfb375-d8a2-4103-be33-cf2bf4766209","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[{"uuid":"9481b829-a1ee-490e-bd39-ca961025137e","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/9481b829-a1ee-490e-bd39-ca961025137e"}],"soortPartij":"organisatie","indicatieGeheimhouding":false,"voorkeurstaal":"nld","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"naam":""},"_expand":{}}]}'
     headers:
       API-version:
       - 0.0.3
@@ -217,7 +217,7 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/partij-identificatoren
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"a86fd8c8-2853-4d4a-82a1-622d7072a456","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/a86fd8c8-2853-4d4a-82a1-622d7072a456","identificeerdePartij":{"uuid":"08ba4f07-2e8b-4096-881b-66548a6b3ddc","url":"http://localhost:8338/klantinteracties/api/v1/partijen/08ba4f07-2e8b-4096-881b-66548a6b3ddc"},"anderePartijIdentificator":"","partijIdentificator":{"codeObjecttype":"nnp","codeSoortObjectId":"kvk","objectId":"123456789","codeRegister":"hr"}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"9481b829-a1ee-490e-bd39-ca961025137e","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/9481b829-a1ee-490e-bd39-ca961025137e","identificeerdePartij":{"uuid":"2edfb375-d8a2-4103-be33-cf2bf4766209","url":"http://localhost:8338/klantinteracties/api/v1/partijen/2edfb375-d8a2-4103-be33-cf2bf4766209"},"anderePartijIdentificator":"","partijIdentificator":{"codeObjecttype":"nnp","codeSoortObjectId":"kvk","objectId":"123456789","codeRegister":"hr"}}]}'
     headers:
       API-version:
       - 0.0.3
@@ -249,7 +249,7 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/partijen?partijIdentificator__codeSoortObjectId=kvk&partijIdentificator__codeRegister=hr&partijIdentificator__codeObjecttype=nnp&partijIdentificator__objectId=123456789&soortPartij=organisatie
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"08ba4f07-2e8b-4096-881b-66548a6b3ddc","url":"http://localhost:8338/klantinteracties/api/v1/partijen/08ba4f07-2e8b-4096-881b-66548a6b3ddc","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[{"uuid":"a86fd8c8-2853-4d4a-82a1-622d7072a456","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/a86fd8c8-2853-4d4a-82a1-622d7072a456"}],"soortPartij":"organisatie","indicatieGeheimhouding":false,"voorkeurstaal":"nld","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"naam":""},"_expand":{}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"2edfb375-d8a2-4103-be33-cf2bf4766209","url":"http://localhost:8338/klantinteracties/api/v1/partijen/2edfb375-d8a2-4103-be33-cf2bf4766209","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[{"uuid":"9481b829-a1ee-490e-bd39-ca961025137e","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/9481b829-a1ee-490e-bd39-ca961025137e"}],"soortPartij":"organisatie","indicatieGeheimhouding":false,"voorkeurstaal":"nld","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"naam":""},"_expand":{}}]}'
     headers:
       API-version:
       - 0.0.3
@@ -278,10 +278,10 @@ interactions:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
     method: GET
-    uri: http://localhost:8338/klantinteracties/api/v1/partijen/08ba4f07-2e8b-4096-881b-66548a6b3ddc?expand=digitaleAdressen&expand=betrokkenen&expand=betrokkenen.hadKlantcontact
+    uri: http://localhost:8338/klantinteracties/api/v1/partijen/2edfb375-d8a2-4103-be33-cf2bf4766209?expand=digitaleAdressen%2Cbetrokkenen%2Cbetrokkenen.hadKlantcontact
   response:
     body:
-      string: '{"uuid":"08ba4f07-2e8b-4096-881b-66548a6b3ddc","url":"http://localhost:8338/klantinteracties/api/v1/partijen/08ba4f07-2e8b-4096-881b-66548a6b3ddc","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[{"uuid":"a86fd8c8-2853-4d4a-82a1-622d7072a456","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/a86fd8c8-2853-4d4a-82a1-622d7072a456"}],"soortPartij":"organisatie","indicatieGeheimhouding":false,"voorkeurstaal":"nld","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"naam":""}}'
+      string: '{"uuid":"2edfb375-d8a2-4103-be33-cf2bf4766209","url":"http://localhost:8338/klantinteracties/api/v1/partijen/2edfb375-d8a2-4103-be33-cf2bf4766209","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[{"uuid":"9481b829-a1ee-490e-bd39-ca961025137e","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/9481b829-a1ee-490e-bd39-ca961025137e"}],"soortPartij":"organisatie","indicatieGeheimhouding":false,"voorkeurstaal":"nld","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"naam":""}}'
     headers:
       API-version:
       - 0.0.3
@@ -313,7 +313,7 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/partijen
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"08ba4f07-2e8b-4096-881b-66548a6b3ddc","url":"http://localhost:8338/klantinteracties/api/v1/partijen/08ba4f07-2e8b-4096-881b-66548a6b3ddc","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[{"uuid":"a86fd8c8-2853-4d4a-82a1-622d7072a456","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/a86fd8c8-2853-4d4a-82a1-622d7072a456"}],"soortPartij":"organisatie","indicatieGeheimhouding":false,"voorkeurstaal":"nld","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"naam":""},"_expand":{}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"2edfb375-d8a2-4103-be33-cf2bf4766209","url":"http://localhost:8338/klantinteracties/api/v1/partijen/2edfb375-d8a2-4103-be33-cf2bf4766209","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[{"uuid":"9481b829-a1ee-490e-bd39-ca961025137e","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/9481b829-a1ee-490e-bd39-ca961025137e"}],"soortPartij":"organisatie","indicatieGeheimhouding":false,"voorkeurstaal":"nld","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"naam":""},"_expand":{}}]}'
     headers:
       API-version:
       - 0.0.3
@@ -345,7 +345,7 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/partij-identificatoren
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"a86fd8c8-2853-4d4a-82a1-622d7072a456","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/a86fd8c8-2853-4d4a-82a1-622d7072a456","identificeerdePartij":{"uuid":"08ba4f07-2e8b-4096-881b-66548a6b3ddc","url":"http://localhost:8338/klantinteracties/api/v1/partijen/08ba4f07-2e8b-4096-881b-66548a6b3ddc"},"anderePartijIdentificator":"","partijIdentificator":{"codeObjecttype":"nnp","codeSoortObjectId":"kvk","objectId":"123456789","codeRegister":"hr"}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"9481b829-a1ee-490e-bd39-ca961025137e","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/9481b829-a1ee-490e-bd39-ca961025137e","identificeerdePartij":{"uuid":"2edfb375-d8a2-4103-be33-cf2bf4766209","url":"http://localhost:8338/klantinteracties/api/v1/partijen/2edfb375-d8a2-4103-be33-cf2bf4766209"},"anderePartijIdentificator":"","partijIdentificator":{"codeObjecttype":"nnp","codeSoortObjectId":"kvk","objectId":"123456789","codeRegister":"hr"}}]}'
     headers:
       API-version:
       - 0.0.3
