@@ -1,5 +1,4 @@
 import logging
-from abc import ABC
 from typing import TypeVar
 
 from django.db import models, transaction
@@ -41,7 +40,7 @@ def _get_instance(model: T, uuid) -> T:
     return model.objects.filter(open_producten_uuid=uuid).first()
 
 
-class OpenProductenImporter(ABC):
+class OpenProductenImporterMixin:
     def __init__(self, client):
         self.client = client
         self.created_objects = []
@@ -98,7 +97,7 @@ class OpenProductenImporter(ABC):
         self._add_to_log_list(question_instance, created)
 
 
-class ProductTypeImporter(OpenProductenImporter):
+class ProductTypeImporter(OpenProductenImporterMixin):
     def __init__(self, client):
         super().__init__(client)
         self.product_types = None
@@ -369,7 +368,7 @@ class ProductTypeImporter(OpenProductenImporter):
         ).delete()[0]
 
 
-class CategoryImporter(OpenProductenImporter):
+class CategoryImporter(OpenProductenImporterMixin):
     def __init__(self, client):
         super().__init__(client)
         self.categories = None
