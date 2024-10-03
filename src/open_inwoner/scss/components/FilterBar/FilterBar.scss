@@ -6,33 +6,6 @@
   position: relative;
   display: inline-block;
 
-  &--mobile {
-    width: 100%;
-    background-color: var(--color-gray-lightest);
-    border-radius: var(--border-radius-large) var(--border-radius-large) 0 0;
-    margin: 0 0 0 calc(-1 * var(--spacing-medium));
-    padding: 0;
-    height: 70vh;
-    position: fixed;
-    top: 30vh;
-    transition: top 2s linear;
-    z-index: 500;
-
-    .multiselect-listbox__modal {
-      display: block !important;
-      z-index: 600;
-    }
-
-    .filter-bar__mobile-controls {
-      display: flex !important;
-      justify-content: space-between;
-
-      @media (min-width: 768px) {
-        display: none;
-      }
-    }
-  }
-
   // Pop-ups for future multiple filters on-load may go here
   .multiselect-listbox__modal {
     display: none;
@@ -46,7 +19,13 @@
     padding: var(--spacing-large);
   }
 
+  .filter-bar__heading,
+  .filter-bar__status-text {
+    display: none;
+  }
+
   .filter-bar__form {
+    display: none;
     margin: 0;
     padding: 0 0 0 var(--spacing-small);
 
@@ -77,6 +56,67 @@
     padding-top: calc(var(--font-size-body) / 2);
     @media (min-width: 768px) {
       display: inline;
+    }
+  }
+
+  // In mobile view all child elements become part of a pop-up
+  &--mobile {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-giant);
+    width: 100%;
+    background-color: var(--color-gray-lightest);
+    border-radius: var(--border-radius-large) var(--border-radius-large) 0 0;
+    margin: 0 0 0 calc(-1 * var(--spacing-large));
+    padding: var(--spacing-large);
+    height: 70vh;
+    position: fixed;
+    top: 30vh;
+    transition: top 2s linear;
+    z-index: 1020;
+
+    .multiselect-listbox__popup {
+      display: block;
+      z-index: 600;
+    }
+
+    .filter-bar__form {
+      display: flex !important;
+      flex-direction: row;
+      align-items: flex-start;
+      gap: var(--spacing-extra-large);
+    }
+
+    .filter-bar__mobile-controls {
+      display: flex;
+      justify-content: space-between;
+
+      .button {
+        padding: 0;
+
+        [class*='icons'] {
+          font-size: 32px;
+        }
+      }
+
+      @media (min-width: 768px) {
+        display: none;
+      }
+    }
+
+    .button.show-modal {
+      display: none;
+    }
+
+    .filter-bar__heading {
+      display: block;
+      font-size: var(--font-size-body-larger);
+      font-weight: bold;
+    }
+
+    .filter-bar__status-text {
+      color: var(--utrecht-document-color);
+      display: block;
     }
   }
 }

@@ -3,13 +3,15 @@
 {# Wrapper for multiple filters #}
 <div class="filter-bar" id="filterBar">
     <div class="filter-bar__mobile-controls">
-        {% button icon="close" text=_("Sluiten") hide_text=True  icon_outlined=True transparent=True extra_classes="show-controls" %}
+        {% button icon="close" text=_("Sluiten") hide_text=True icon_outlined=True transparent=True extra_classes="show-controls" %}
         <div class="form__actions form__actions--fullwidth form__actions--reset">
             {% button bordered=False text=_("Wis alle filters") id="resetFilters" type="button" transparent=True primary=True %}
         </div>
     </div>
     <div class="filter-bar__mobile-button">
+        <p class="utrecht-paragraph">Filters</p>
         {% button icon="filter_alt" text=_("Filters") icon_outlined=True transparent=True extra_classes="show-modal" %}
+        <span class="filter-bar__status-text">Status</span>
     </div>
     <form class="form" method="{{ method }}"
           {% if no_action %}action="" {% else %}action="{% firstof form_action request.path %}" {% endif %}
@@ -17,11 +19,11 @@
         {# Note: each element inside the form is a flex column #}
         {{ contents }}
 
-        {# Submit button updates on select #}
-            <div class="form__actions form__actions--fullwidth" id="multiselectFormActions">
-                <button class="button button--primary" type="submit" title="{% trans 'Toon resultaten' %}" aria-label="{% trans 'Toon resultaten' %}" id="filterCases">
-                    {% trans 'Toon' %}<span class="filter-bar__frequency-sum" id="frequencySum">0</span><span id="resultText">{% trans 'resultaten' %}</span>
-                </button>
-            </div>
+        {# Mobile submit button updates on select #}
+        <div class="form__reload--mobile form__actions form__actions--fullwidth" id="filterFormActions">
+            <button class="button button--primary" type="submit" title="{% trans 'Toon resultaten' %}" aria-label="{% trans 'Toon resultaten' %}" id="filterCases">
+                {% trans 'Toon' %}<span class="filter-bar__frequency-sum" id="frequencySum">0</span><span id="resultText">{% trans 'resultaten' %}</span>
+            </button>
+        </div>
     </form>
 </div>

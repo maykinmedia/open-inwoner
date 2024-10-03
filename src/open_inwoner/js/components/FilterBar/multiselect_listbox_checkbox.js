@@ -81,7 +81,11 @@ function initFilterBar() {
         checkboxes.forEach((checkbox) => {
           checkbox.checked = false
         })
-        calculateAndDisplayCheckedSum() // Recalculate and update the button and sum
+        calculateAndDisplayCheckedSum() // Recalculate and update the button and sum, even after refresh
+        const filterBarForm = document.querySelector('#filterBar .form')
+        if (filterBarForm) {
+          filterBarForm.submit()
+        }
       })
 
       selectButton.setAttribute('aria-live', 'polite')

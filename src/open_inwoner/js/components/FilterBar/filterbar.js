@@ -80,6 +80,7 @@ htmx.on('htmx:afterSwap', function (e) {
 document.addEventListener('DOMContentLoaded', () => {
   const filterBars = document.querySelectorAll(FilterBar.selector)
   if (filterBars.length === 0) {
+    // If filter-bar is disabled, leave be.
     console.error('No filter bars found on the page.')
   } else {
     filterBars.forEach((filterbar) => new FilterBar(filterbar))
