@@ -40,6 +40,5 @@ class Openklant2ServiceTestCase(VCRMixin, LiveOpenKlantTestMixin, DjangoTestCase
             "port",
             "path",
             "query",
-            "body",
         ]
         return vcr
