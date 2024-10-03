@@ -181,10 +181,37 @@ function initFilterBar() {
       }
     })
 
-    const resetFilters = document.getElementById('resetMultiSelectFilters')
-    if (resetFilters) {
-      resetFilters.addEventListener('click', function (e) {
+    const resetMultiSelectFilters = document.getElementById(
+      'resetMultiSelectFilters'
+    )
+    const resetAllFilters = document.getElementById('resetAllFilters')
+
+    if (resetMultiSelectFilters) {
+      resetMultiSelectFilters.addEventListener('click', function (e) {
         e.preventDefault()
+        console.log('Alleen de multi-select filters worden gereset')
+
+        const checkboxes = document.querySelectorAll(
+          '.filter-bar .checkbox__input'
+        )
+        checkboxes.forEach((checkbox) => {
+          checkbox.checked = false
+        })
+
+        calculateAndDisplayCheckedSum()
+
+        const filterBarForm = document.querySelector('#filterBar .form')
+        if (filterBarForm) {
+          filterBarForm.submit()
+        }
+      })
+    }
+
+    if (resetAllFilters) {
+      resetAllFilters.addEventListener('click', function (e) {
+        e.preventDefault()
+        console.log('alle filters worden gereset')
+
         const checkboxes = document.querySelectorAll(
           '.filter-bar .checkbox__input'
         )

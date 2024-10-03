@@ -5,6 +5,8 @@ export class FilterBar {
     this.node = node
     this.filterPopup = node.querySelector('.show-modal')
     this.filterButton = node.querySelector('#selectButton')
+    this.backdrop = document.getElementById('filterBarBackdrop')
+    this.closeButton = node.querySelector('.show-controls')
 
     // Check if elements are found
     if (!this.filterPopup) {
@@ -19,9 +21,14 @@ export class FilterBar {
 
     console.log('Initializing FilterBar for:', this.node)
 
+    // Event listeners
     this.filterPopup.addEventListener(
       'click',
       this.toggleOpenFilterPopup.bind(this)
+    )
+    this.closeButton.addEventListener(
+      'click',
+      this.closeFilterPopupDirect.bind(this) // Added a specific handler for direct close button click
     )
     document.addEventListener('click', this.closeFilterPopup.bind(this), false)
     document.addEventListener(
@@ -34,6 +41,9 @@ export class FilterBar {
   toggleOpenFilterPopup(event) {
     event.preventDefault()
     console.log('Filter button is clicked...')
+
+    // Add 'show' class to the backdrop to make it visible
+    this.backdrop.classList.add('show')
 
     // Toggle mobile filter class
     setTimeout(() => {
@@ -48,15 +58,33 @@ export class FilterBar {
     }, 5)
   }
 
+  closeFilterPopupDirect(event) {
+    // Direct handler for close button click
+    console.log('Close button clicked...')
+
+    // Remove 'show' class from the backdrop to hide it
+    this.backdrop.classList.remove('show')
+
+    // Remove mobile class and reset aria-expanded
+    this.node.classList.remove('filter-bar--mobile')
+    this.filterPopup.setAttribute('aria-expanded', 'false')
+  }
+
   closeFilterPopup(event) {
     // Close on clicking outside or pressing Escape
     if (
       (event.type === 'keydown' && event.key === 'Escape') ||
       (event.type === 'click' &&
         !this.node.contains(event.target) &&
-        !this.filterPopup.contains(event.target))
+        !this.filterPopup.contains(event.target) &&
+        !this.backdrop.contains(event.target))
     ) {
       console.log('Closing filters...')
+
+      // Remove 'show' class from the backdrop to hide it
+      this.backdrop.classList.remove('show')
+
+      // Remove mobile class and reset aria-expanded
       this.node.classList.remove('filter-bar--mobile')
       this.filterPopup.setAttribute('aria-expanded', 'false')
     }
@@ -80,22 +108,9 @@ htmx.on('htmx:afterSwap', function (e) {
 document.addEventListener('DOMContentLoaded', () => {
   const filterBars = document.querySelectorAll(FilterBar.selector)
   if (filterBars.length === 0) {
-    // If filter-bar is disabled, leave be.
     console.error('No filter bars found on the page.')
   } else {
     filterBars.forEach((filterbar) => new FilterBar(filterbar))
     console.log('FilterBar instances created:', filterBars.length)
   }
 })
-
-const resetFilters = document.getElementById('resetFilters')
-if (resetFilters) {
-  console.log('rest filter for filterbar exists')
-  resetFilters.addEventListener('click', function (e) {
-    const filterBarForm = document.querySelector('#filterBar .form')
-    if (filterBarForm) {
-      console.log('the form exists for submitting')
-      filterBarForm.submit()
-    }
-  })
-}

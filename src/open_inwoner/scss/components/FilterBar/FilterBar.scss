@@ -67,8 +67,8 @@
     width: 100%;
     background-color: var(--color-gray-lightest);
     border-radius: var(--border-radius-large) var(--border-radius-large) 0 0;
-    margin: 0 0 0 calc(-1 * var(--spacing-large));
-    padding: var(--spacing-large);
+    margin: 0 var(--spacing-tiny);
+    padding: 0 var(--spacing-extra-large);
     height: 70vh;
     position: fixed;
     top: 30vh;
@@ -112,11 +112,34 @@
       display: block;
       font-size: var(--font-size-body-larger);
       font-weight: bold;
+      margin-bottom: var(--row-height);
     }
 
     .filter-bar__status-text {
-      color: var(--utrecht-document-color);
+      color: var(--color-gray-dark);
       display: block;
+    }
+  }
+
+  &__backdrop.show {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 0;
+    background-color: rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 0 solid transparent;
+    border-radius: var(--border-radius);
+    justify-content: center;
+    position: fixed;
+    z-index: 1000000;
+
+    @media (min-width: 768px) {
+      background-color: initial;
+      position: static;
+      z-index: initial;
     }
   }
 }
