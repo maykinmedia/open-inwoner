@@ -13,7 +13,7 @@ interactions:
   response:
     body:
       string: '{"type":"http://localhost:8338/ref/fouten/ValidationError/","code":"invalid","title":"Invalid
-        input.","status":400,"detail":"","instance":"urn:uuid:3dd5b8ca-9d3e-410d-8cdb-b2986117ce62","invalidParams":[{"name":"digitaleAdressen","code":"required","reason":"Dit
+        input.","status":400,"detail":"","instance":"urn:uuid:79c2d234-4468-45e7-b0ee-e7d3a88aa060","invalidParams":[{"name":"digitaleAdressen","code":"required","reason":"Dit
         veld is vereist."},{"name":"voorkeursDigitaalAdres","code":"required","reason":"Dit
         veld is vereist."},{"name":"rekeningnummers","code":"required","reason":"Dit
         veld is vereist."},{"name":"voorkeursRekeningnummer","code":"required","reason":"Dit

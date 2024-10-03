@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict, List, Mapping, MutableMapping, TypeGuard, TypeVar, Union
+from typing import Any, Dict, List, Mapping, MutableMapping, TypeGuard, Union
 
 import pydantic
 import requests
@@ -19,8 +19,6 @@ from openklant2.types.error import (
     ErrorResponseBodyValidator,
     ValidationErrorResponseBodyValidator,
 )
-
-T = TypeVar("T")
 
 ResourceResponse = MutableMapping[str, Any]
 
@@ -82,6 +80,21 @@ class ResourceMixin:
 
         raise ResponseError(response, msg="Error response")
 
+    @staticmethod
+    def _process_params(params: Mapping | None) -> None | Mapping:
+        # The default approach to serializing lists in the requests library is
+        # not supported by OpenKlant 2. See:
+        # https://github.com/maykinmedia/open-klant/issues/250
+        if params is None:
+            return params
+
+        transposed_params = dict(params)
+        for key, val in params.items():
+            if isinstance(val, list):
+                transposed_params[key] = ",".join(str(element) for element in val)
+
+        return transposed_params
+
     def _get(
         self,
         path: str,
@@ -89,7 +102,9 @@ class ResourceMixin:
         params: Mapping | None = None,
     ) -> requests.Response:
 
-        return self.http_client.request("get", path, headers=headers, params=params)
+        return self.http_client.request(
+            "get", path, headers=headers, params=self._process_params(params)
+        )
 
     def _post(
         self,
@@ -99,7 +114,11 @@ class ResourceMixin:
         data: Any = None,
     ) -> requests.Response:
         return self.http_client.request(
-            "post", path, headers=headers, json=data, params=params
+            "post",
+            path,
+            headers=headers,
+            json=data,
+            params=self._process_params(params),
         )
 
     def _put(
@@ -110,7 +129,7 @@ class ResourceMixin:
         data: Any = None,
     ) -> requests.Response:
         return self.http_client.request(
-            "put", path, headers=headers, json=data, params=params
+            "put", path, headers=headers, json=data, params=self._process_params(params)
         )
 
     def _delete(
@@ -123,7 +142,7 @@ class ResourceMixin:
             "delete",
             path,
             headers=headers,
-            params=params,
+            params=self._process_params(params),
         )
 
     def _patch(
@@ -137,7 +156,7 @@ class ResourceMixin:
             "patch",
             path,
             headers=headers,
-            params=params,
+            params=self._process_params(params),
             json=data,
         )
 
@@ -145,11 +164,11 @@ class ResourceMixin:
         self,
         path: str,
         headers: Mapping | None = None,
-        params: Mapping | None = None,
+        params: MutableMapping | None = None,
     ) -> requests.Response:
         return self.http_client.request(
             "delete",
             path,
             headers=headers,
-            params=params,
+            params=self._process_params(params),
         )

@@ -15,7 +15,7 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/partijen
   response:
     body:
-      string: '{"uuid":"b742bf52-b6ed-41ea-a5f0-51677af6804d","url":"http://localhost:8338/klantinteracties/api/v1/partijen/b742bf52-b6ed-41ea-a5f0-51677af6804d","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"organisatie","indicatieGeheimhouding":false,"voorkeurstaal":"tiv","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"naam":"Test
+      string: '{"uuid":"5c2a8887-c872-4538-abe9-8204fe21dfdf","url":"http://localhost:8338/klantinteracties/api/v1/partijen/5c2a8887-c872-4538-abe9-8204fe21dfdf","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"organisatie","indicatieGeheimhouding":false,"voorkeurstaal":"tiv","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"naam":"Test
         Organisatie"}}'
     headers:
       API-version:
@@ -29,7 +29,7 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/partijen/b742bf52-b6ed-41ea-a5f0-51677af6804d
+      - http://localhost:8338/klantinteracties/api/v1/partijen/5c2a8887-c872-4538-abe9-8204fe21dfdf
       Referrer-Policy:
       - same-origin
       Vary:
@@ -45,7 +45,7 @@ interactions:
     body: '{"soortPartij": "contactpersoon", "digitaleAdressen": null, "rekeningnummers":
       null, "voorkeursRekeningnummer": null, "voorkeurstaal": "nld", "indicatieActief":
       true, "indicatieGeheimhouding": false, "voorkeursDigitaalAdres": null, "partijIdentificatie":
-      {"contactnaam": null, "werkteVoorPartij": {"uuid": "b742bf52-b6ed-41ea-a5f0-51677af6804d"}}}'
+      {"contactnaam": null, "werkteVoorPartij": {"uuid": "5c2a8887-c872-4538-abe9-8204fe21dfdf"}}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
@@ -57,7 +57,7 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/partijen
   response:
     body:
-      string: '{"uuid":"7d014229-967c-4fda-b3a6-3be830044bb8","url":"http://localhost:8338/klantinteracties/api/v1/partijen/7d014229-967c-4fda-b3a6-3be830044bb8","nummer":"0000000002","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"contactpersoon","indicatieGeheimhouding":false,"voorkeurstaal":"nld","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"uuid":"56973fe0-f12b-469a-b5dc-e0a6e8e9eb5c","werkteVoorPartij":{"uuid":"b742bf52-b6ed-41ea-a5f0-51677af6804d","url":"http://localhost:8338/klantinteracties/api/v1/partijen/b742bf52-b6ed-41ea-a5f0-51677af6804d"},"contactnaam":{"voorletters":"","voornaam":"","voorvoegselAchternaam":"","achternaam":""},"volledigeNaam":""}}'
+      string: '{"uuid":"cee781ca-9148-426a-835a-50dc3eab9f25","url":"http://localhost:8338/klantinteracties/api/v1/partijen/cee781ca-9148-426a-835a-50dc3eab9f25","nummer":"0000000002","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"contactpersoon","indicatieGeheimhouding":false,"voorkeurstaal":"nld","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"uuid":"2ec909f1-0e09-48a7-8c7c-bc024223c61f","werkteVoorPartij":{"uuid":"5c2a8887-c872-4538-abe9-8204fe21dfdf","url":"http://localhost:8338/klantinteracties/api/v1/partijen/5c2a8887-c872-4538-abe9-8204fe21dfdf"},"contactnaam":{"voorletters":"","voornaam":"","voorvoegselAchternaam":"","achternaam":""},"volledigeNaam":""}}'
     headers:
       API-version:
       - 0.0.3
@@ -70,7 +70,7 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/partijen/7d014229-967c-4fda-b3a6-3be830044bb8
+      - http://localhost:8338/klantinteracties/api/v1/partijen/cee781ca-9148-426a-835a-50dc3eab9f25
       Referrer-Policy:
       - same-origin
       Vary:

@@ -1,36 +1,36 @@
 interactions:
 - request:
     body: '{"digitaleAdressen": null, "voorkeursDigitaalAdres": null, "rekeningnummers":
-      null, "voorkeursRekeningnummer": null, "indicatieGeheimhouding": false, "indicatieActief":
-      true, "voorkeurstaal": "nbl", "soortPartij": "persoon", "partijIdentificatie":
-      {"contactnaam": {"voorletters": "Mrs.", "voornaam": "Amy", "voorvoegselAchternaam":
-      "Ms.", "achternaam": "Carr"}}}'
+      null, "voorkeursRekeningnummer": null, "indicatieGeheimhouding": true, "indicatieActief":
+      true, "voorkeurstaal": "jbo", "soortPartij": "persoon", "partijIdentificatie":
+      {"contactnaam": {"voorletters": "Mr.", "voornaam": "Wendy", "voorvoegselAchternaam":
+      "Mr.", "achternaam": "Newton"}}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '362'
+      - '364'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/partijen
   response:
     body:
-      string: '{"uuid":"fed3a630-ac73-4ee0-9766-a8da217adc66","url":"http://localhost:8338/klantinteracties/api/v1/partijen/fed3a630-ac73-4ee0-9766-a8da217adc66","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"nbl","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Mrs.","voornaam":"Amy","voorvoegselAchternaam":"Ms.","achternaam":"Carr"},"volledigeNaam":"Amy
-        Ms. Carr"}}'
+      string: '{"uuid":"28fb4dff-f37d-44b2-9ef1-ea9f490c69d1","url":"http://localhost:8338/klantinteracties/api/v1/partijen/28fb4dff-f37d-44b2-9ef1-ea9f490c69d1","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":true,"voorkeurstaal":"jbo","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Mr.","voornaam":"Wendy","voorvoegselAchternaam":"Mr.","achternaam":"Newton"},"volledigeNaam":"Wendy
+        Mr. Newton"}}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '854'
+      - '860'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/partijen/fed3a630-ac73-4ee0-9766-a8da217adc66
+      - http://localhost:8338/klantinteracties/api/v1/partijen/28fb4dff-f37d-44b2-9ef1-ea9f490c69d1
       Referrer-Policy:
       - same-origin
       Vary:
@@ -43,35 +43,35 @@ interactions:
       code: 201
       message: Created
 - request:
-    body: '{"adres": "501 Acosta Place Suite 226\nAnnafurt, GA 19642", "omschrijving":
-      "treat", "soortDigitaalAdres": "occur", "verstrektDoorBetrokkene": null, "verstrektDoorPartij":
-      {"uuid": "fed3a630-ac73-4ee0-9766-a8da217adc66"}}'
+    body: '{"adres": "481 Kayla Isle\nWest Christopher, FL 36594", "omschrijving":
+      "pick", "soortDigitaalAdres": "spend", "verstrektDoorBetrokkene": null, "verstrektDoorPartij":
+      {"uuid": "28fb4dff-f37d-44b2-9ef1-ea9f490c69d1"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '221'
+      - '216'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/digitaleadressen
   response:
     body:
-      string: '{"uuid":"894299a7-bbe9-421f-a2e9-ed9c06be5e8e","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/894299a7-bbe9-421f-a2e9-ed9c06be5e8e","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"fed3a630-ac73-4ee0-9766-a8da217adc66","url":"http://localhost:8338/klantinteracties/api/v1/partijen/fed3a630-ac73-4ee0-9766-a8da217adc66"},"adres":"501
-        Acosta Place Suite 226\nAnnafurt, GA 19642","soortDigitaalAdres":"occur","omschrijving":"treat"}'
+      string: '{"uuid":"625bba7b-33cb-4e0d-b291-35394adbc042","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/625bba7b-33cb-4e0d-b291-35394adbc042","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"28fb4dff-f37d-44b2-9ef1-ea9f490c69d1","url":"http://localhost:8338/klantinteracties/api/v1/partijen/28fb4dff-f37d-44b2-9ef1-ea9f490c69d1"},"adres":"481
+        Kayla Isle\nWest Christopher, FL 36594","soortDigitaalAdres":"spend","omschrijving":"pick"}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '465'
+      - '460'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/digitaleadressen/894299a7-bbe9-421f-a2e9-ed9c06be5e8e
+      - http://localhost:8338/klantinteracties/api/v1/digitaleadressen/625bba7b-33cb-4e0d-b291-35394adbc042
       Referrer-Policy:
       - same-origin
       Vary:
@@ -89,18 +89,18 @@ interactions:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
     method: GET
-    uri: http://localhost:8338/klantinteracties/api/v1/digitaleadressen/894299a7-bbe9-421f-a2e9-ed9c06be5e8e
+    uri: http://localhost:8338/klantinteracties/api/v1/digitaleadressen/625bba7b-33cb-4e0d-b291-35394adbc042
   response:
     body:
-      string: '{"uuid":"894299a7-bbe9-421f-a2e9-ed9c06be5e8e","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/894299a7-bbe9-421f-a2e9-ed9c06be5e8e","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"fed3a630-ac73-4ee0-9766-a8da217adc66","url":"http://localhost:8338/klantinteracties/api/v1/partijen/fed3a630-ac73-4ee0-9766-a8da217adc66"},"adres":"501
-        Acosta Place Suite 226\nAnnafurt, GA 19642","soortDigitaalAdres":"occur","omschrijving":"treat"}'
+      string: '{"uuid":"625bba7b-33cb-4e0d-b291-35394adbc042","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/625bba7b-33cb-4e0d-b291-35394adbc042","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"28fb4dff-f37d-44b2-9ef1-ea9f490c69d1","url":"http://localhost:8338/klantinteracties/api/v1/partijen/28fb4dff-f37d-44b2-9ef1-ea9f490c69d1"},"adres":"481
+        Kayla Isle\nWest Christopher, FL 36594","soortDigitaalAdres":"spend","omschrijving":"pick"}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
       Content-Length:
-      - '465'
+      - '460'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
