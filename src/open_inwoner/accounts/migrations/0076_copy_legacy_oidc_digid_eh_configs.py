@@ -41,6 +41,14 @@ def forwards(apps, _):
         "OpenIDConnectEHerkenningConfig",
     )
 
+    # models have the wrong db_table associated
+    OpenIDConnectDigiDConfig.objects.model._meta.db_table = (
+        "digid_eherkenning_oidc_generics_legacy_openidconnectdigidconfig"
+    )
+    OpenIDConnectEHerkenningConfig.objects.model._meta.db_table = (
+        "digid_eherkenning_oidc_generics_legacy_openidconnecteherkenningconfig"
+    )
+
     # new models
     DigiDConfig = apps.get_model(
         "digid_eherkenning_oidc_generics",
@@ -54,13 +62,13 @@ def forwards(apps, _):
         digid_create_kwargs = {
             field_name: getattr(legacy_digid, field_name)
             for field_name in SHARED_FIELDS
-        } | {"bsn_claim": legacy_digid.identifier_claim_name}
+        } | {"bsn_claim": [legacy_digid.identifier_claim_name]}
         DigiDConfig.objects.create(**digid_create_kwargs)
 
     if legacy_eh := OpenIDConnectEHerkenningConfig.objects.first():
         eh_create_kwargs = {
             field_name: getattr(legacy_eh, field_name) for field_name in SHARED_FIELDS
-        } | {"legal_subject_claim": legacy_eh.identifier_claim_name}
+        } | {"legal_subject_claim": [legacy_eh.identifier_claim_name]}
         EHerkenningConfig.objects.create(**eh_create_kwargs)
 
 

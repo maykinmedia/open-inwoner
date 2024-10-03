@@ -36,4 +36,22 @@ class Migration(migrations.Migration):
                 verbose_name="URLs exempt from session renewal",
             ),
         ),
+        migrations.AddField(
+            model_name="openidconnectdigidconfig",
+            name="oidc_token_use_basic_auth",
+            field=models.BooleanField(
+                default=False,
+                help_text="If enabled, the client ID and secret are sent in the HTTP Basic auth header when obtaining the access token. Otherwise, they are sent in the request body.",
+                verbose_name="Use Basic auth for token endpoint",
+            ),
+        ),
+        migrations.AddField(
+            model_name="openidconnecteherkenningconfig",
+            name="oidc_token_use_basic_auth",
+            field=models.BooleanField(
+                default=False,
+                help_text="If enabled, the client ID and secret are sent in the HTTP Basic auth header when obtaining the access token. Otherwise, they are sent in the request body.",
+                verbose_name="Use Basic auth for token endpoint",
+            ),
+        ),
     ]

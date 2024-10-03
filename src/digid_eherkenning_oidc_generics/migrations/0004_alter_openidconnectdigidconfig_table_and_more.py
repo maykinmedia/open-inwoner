@@ -12,13 +12,15 @@ class Migration(migrations.Migration):
         ),
     ]
 
-    operations = [
-        migrations.AlterModelTable(
-            name="openidconnectdigidconfig",
-            table="digid_eherkenning_oidc_generics_openidconnectdigidconfig",
-        ),
-        migrations.AlterModelTable(
-            name="openidconnecteherkenningconfig",
-            table="digid_eherkenning_oidc_generics_openidconnecteherkenningconfig",
-        ),
-    ]
+    # models have the wrong db_table associated
+    query1 = """
+        ALTER TABLE "digid_eherkenning_oidc_generics_openidconnectdigidconfig"
+        RENAME TO "digid_eherkenning_oidc_generics_legacy_openidconnectdigidconfig";
+    """
+
+    query2 = """
+        ALTER TABLE "digid_eherkenning_oidc_generics_openidconnecteherkenningconfig"
+        RENAME TO "digid_eherkenning_oidc_generics_legacy_openidconnecteherkenningconfig";
+    """
+
+    operations = [migrations.RunSQL(query1), migrations.RunSQL(query2)]

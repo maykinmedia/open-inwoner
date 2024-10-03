@@ -16,11 +16,13 @@ class Migration(migrations.Migration):
         ),
     ]
 
-    operations = [
-        migrations.DeleteModel(
-            name="OpenIDConnectDigiDConfig",
-        ),
-        migrations.DeleteModel(
-            name="OpenIDConnectEHerkenningConfig",
-        ),
-    ]
+    # models have the wrong db_table associated
+    query1 = """
+        DROP TABLE "digid_eherkenning_oidc_generics_legacy_openidconnectdigidconfig" CASCADE;
+    """
+
+    query2 = """
+        DROP TABLE "digid_eherkenning_oidc_generics_legacy_openidconnecteherkenningconfig" CASCADE;
+    """
+
+    operations = [migrations.RunSQL(query1), migrations.RunSQL(query2)]
