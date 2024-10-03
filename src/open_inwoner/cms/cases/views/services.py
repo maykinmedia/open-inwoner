@@ -63,11 +63,15 @@ class ThreadLimits(TypedDict):
 class CaseListService:
     request: HttpRequest
     _thread_limits: ThreadLimits
-    _cumulative_case_fetching_timeout: int = 60
-    _fetch_task_timeout: int = 6
+    _thread_timeouts: ThreadLimits
 
     def __init__(self, request: HttpRequest):
         self.request = request
+        self._thread_timeouts = {
+            "zgw_api_groups": 60,
+            "resolve_case_instance": 15,
+            "resolve_case_list": 15,
+        }
 
         # TODO: Ideally, this would be configured in light of:
         # - a configured maximum number of threads and
@@ -167,7 +171,7 @@ class CaseListService:
             cases_with_api_group = []
             for task in concurrent.futures.as_completed(
                 futures,
-                timeout=self._cumulative_case_fetching_timeout,
+                timeout=self._thread_timeouts["zgw_api_groups"],
             ):
                 group_for_task = all_api_groups[futures.index(task)]
                 try:
@@ -214,7 +218,8 @@ class CaseListService:
             }
 
             for task in concurrent.futures.as_completed(
-                futures, timeout=self._fetch_task_timeout
+                futures,
+                timeout=self._thread_timeouts["resolve_case_list"],
             ):
                 try:
                     resolved_case = task.result()
@@ -258,7 +263,8 @@ class CaseListService:
                 futures = [executor.submit(func, case) for func in functions]
 
             for task in concurrent.futures.as_completed(
-                futures, timeout=self._fetch_task_timeout
+                futures,
+                timeout=self._thread_timeouts["resolve_case_instance"],
             ):
                 try:
                     update_case = task.result()
