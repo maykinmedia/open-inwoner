@@ -17,6 +17,7 @@ from open_inwoner.openklant.tests.data import MockAPICreateData
 from open_inwoner.openklant.tests.factories import ContactFormSubjectFactory
 from open_inwoner.openklant.views.contactform import ContactFormView
 from open_inwoner.openzaak.tests.factories import ServiceFactory
+from open_inwoner.utils.forms import MathCaptchaField
 from open_inwoner.utils.test import ClearCachesMixin, DisableRequestLogMixin
 from open_inwoner.utils.tests.helpers import AssertFormMixin, AssertTimelineLogMixin
 
@@ -25,6 +26,7 @@ from open_inwoner.utils.tests.helpers import AssertFormMixin, AssertTimelineLogM
 @modify_settings(
     MIDDLEWARE={"remove": ["open_inwoner.kvk.middleware.KvKLoginMiddleware"]}
 )
+@patch.object(MathCaptchaField, "clean", autospec=True)
 @patch(
     "open_inwoner.openklant.views.contactform.send_contact_confirmation_mail",
     autospec=True,
@@ -61,7 +63,9 @@ class ContactFormIntegrationTest(
         # bypass CMS for rendering form template directly via ContactFormView
         ContactFormView.template_name = "pages/contactform/form.html"
 
-    def test_singleton_has_configuration_method(self, m, mock_send_confirm):
+    def test_singleton_has_configuration_method(
+        self, m, mock_send_confirm, mock_captcha
+    ):
         # use cleared (from setUp()
         config = OpenKlantConfig.get_solo()
         self.assertFalse(config.has_form_configuration())
@@ -87,7 +91,9 @@ class ContactFormIntegrationTest(
 
         mock_send_confirm.assert_not_called()
 
-    def test_no_form_shown_if_not_has_configuration(self, m, mock_send_confirm):
+    def test_no_form_shown_if_not_has_configuration(
+        self, m, mock_send_confirm, mock_captcha
+    ):
         # set nothing
         config = OpenKlantConfig.get_solo()
         self.assertFalse(config.has_form_configuration())
@@ -96,7 +102,9 @@ class ContactFormIntegrationTest(
         self.assertContains(response, _("Contact formulier niet geconfigureerd."))
         self.assertEqual(0, len(response.pyquery("#contactmoment-form")))
 
-    def test_anon_form_requires_either_email_or_phonenumber(self, m, mock_send_confirm):
+    def test_anon_form_requires_either_email_or_phonenumber(
+        self, m, mock_send_confirm, mock_captcha
+    ):
         config = OpenKlantConfig.get_solo()
         config.register_email = "example@example.com"
         config.save()
@@ -115,6 +123,7 @@ class ContactFormIntegrationTest(
                 "email",
                 "phonenumber",
                 "question",
+                "captcha",  # captcha present for anon user
             ),
         )
         form["subject"].select(text=subject.subject)
@@ -130,7 +139,9 @@ class ContactFormIntegrationTest(
         )
         mock_send_confirm.assert_not_called()
 
-    def test_regular_auth_form_fills_email_and_phonenumber(self, m, mock_send_confirm):
+    def test_regular_auth_form_fills_email_and_phonenumber(
+        self, m, mock_send_confirm, mock_captcha
+    ):
         config = OpenKlantConfig.get_solo()
         config.register_email = "example@example.com"
         config.save()
@@ -153,7 +164,9 @@ class ContactFormIntegrationTest(
         response = form.submit(status=302)
         mock_send_confirm.assert_called_once_with(user.email, subject.subject)
 
-    def test_expected_ordered_subjects_are_shown(self, m, mock_send_confirm):
+    def test_expected_ordered_subjects_are_shown(
+        self, m, mock_send_confirm, mock_captcha
+    ):
         config = OpenKlantConfig.get_solo()
         config.register_email = "example@example.com"
         config.save()
@@ -190,7 +203,7 @@ class ContactFormIntegrationTest(
         )
         mock_send_confirm.assert_not_called()
 
-    def test_submit_and_register_via_email(self, m, mock_send_confirm):
+    def test_submit_and_register_via_email(self, m, mock_send_confirm, mock_captcha):
         config = OpenKlantConfig.get_solo()
         config.register_email = "example@example.com"
         config.has_form_configuration = True
@@ -230,7 +243,9 @@ class ContactFormIntegrationTest(
 
         mock_send_confirm.assert_called_once_with("foo@example.com", subject.subject)
 
-    def test_submit_and_register_anon_via_api_with_klant(self, m, mock_send_confirm):
+    def test_submit_and_register_anon_via_api_with_klant(
+        self, m, mock_send_confirm, mock_captcha
+    ):
         MockAPICreateData.setUpServices()
 
         config = OpenKlantConfig.get_solo()
@@ -313,7 +328,9 @@ class ContactFormIntegrationTest(
 
         mock_send_confirm.assert_called_once_with("foo@example.com", subject.subject)
 
-    def test_submit_and_register_anon_via_api_without_klant(self, m, mock_send_confirm):
+    def test_submit_and_register_anon_via_api_without_klant(
+        self, m, mock_send_confirm, mock_captcha
+    ):
         MockAPICreateData.setUpServices()
 
         config = OpenKlantConfig.get_solo()
@@ -388,7 +405,9 @@ class ContactFormIntegrationTest(
         self.assertTimelineLog("registered contactmoment by API")
         mock_send_confirm.assert_called_once_with("foo@example.com", subject.subject)
 
-    def test_register_bsn_user_via_api_without_id(self, m, mock_send_confirm):
+    def test_register_bsn_user_via_api_without_id(
+        self, m, mock_send_confirm, mock_captcha
+    ):
         MockAPICreateData.setUpServices()
 
         config = OpenKlantConfig.get_solo()
@@ -439,7 +458,9 @@ class ContactFormIntegrationTest(
             },
         )
 
-    def test_submit_and_register_bsn_user_via_api(self, m, mock_send_confirm):
+    def test_submit_and_register_bsn_user_via_api(
+        self, m, mock_send_confirm, mock_captcha
+    ):
         MockAPICreateData.setUpServices()
 
         config = OpenKlantConfig.get_solo()
@@ -513,7 +534,9 @@ class ContactFormIntegrationTest(
         self.assertTimelineLog("registered contactmoment by API")
         mock_send_confirm.assert_called_once_with("foo@example.com", subject.subject)
 
-    def test_submit_and_register_kvk_or_rsin_user_via_api(self, _m, mock_send_confirm):
+    def test_submit_and_register_kvk_or_rsin_user_via_api(
+        self, _m, mock_send_confirm, mock_captcha
+    ):
         MockAPICreateData.setUpServices()
 
         config = OpenKlantConfig.get_solo()
@@ -617,7 +640,7 @@ class ContactFormIntegrationTest(
                     mock_send_confirm.reset_mock()
 
     def test_submit_and_register_bsn_user_via_api_and_update_klant(
-        self, m, mock_send_confirm
+        self, m, mock_send_confirm, mock_captcha
     ):
         MockAPICreateData.setUpServices()
 
@@ -701,7 +724,7 @@ class ContactFormIntegrationTest(
         mock_send_confirm.reset_mock()
 
     def test_submit_and_register_kvk_or_rsin_user_via_api_and_update_klant(
-        self, _m, mock_send_confirm
+        self, m, mock_send_confirm, mock_captcha
     ):
         self.maxDiff = None
         MockAPICreateData.setUpServices()
@@ -804,7 +827,9 @@ class ContactFormIntegrationTest(
                     )
                     mock_send_confirm.reset_mock()
 
-    def test_send_email_confirmation_is_configurable(self, m, mock_send_confirm):
+    def test_send_email_confirmation_is_configurable(
+        self, m, mock_send_confirm, mock_captcha
+    ):
         MockAPICreateData.setUpServices()
 
         config = OpenKlantConfig.get_solo()
