@@ -1501,12 +1501,14 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
 
     def test_submit_without_invite(self):
         config = SiteConfiguration.get_solo()
+        config.notifications_cases_enabled = True
         config.enable_notification_channel_choice = True
         config.save()
 
         user = UserFactory(
             first_name="",
             last_name="",
+            email="test@example.org",
             login_type=LoginTypeChoices.digid,
         )
         self.assertTrue(user.require_necessary_fields())
@@ -1514,7 +1516,8 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
         response = self.app.get(self.url, user=user)
         form = response.forms["necessary-form"]
 
-        from open_inwoner.accounts.choices import NotificationChannelChoice
+        # check email is not prefilled
+        self.assertEqual(form["email"].value, "")
 
         form["email"] = "john@smith.com"
         form["first_name"] = "John"
@@ -1535,7 +1538,7 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
 
     def test_submit_with_invite(self):
         user = UserFactory()
-        contact = UserFactory.build()
+        contact = UserFactory.build(email="test@example.org")
         invite = InviteFactory.create(
             inviter=user,
             invitee_email=contact.email,

@@ -191,3 +191,10 @@ def validate_kvk(value):
         )
     if not value.isdigit():
         raise ValidationError(_("Het KVK nummer moet numeriek zijn."), code="invalid")
+
+
+def validate_array_contents_non_empty(list_: list) -> None:
+    if any(item.isspace() or len(item) < 1 for item in list_):
+        raise ValidationError(
+            _("Valid strings must include at least one non-space character")
+        )

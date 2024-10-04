@@ -11,56 +11,56 @@
         <form method="POST" id="change-notifications" action="{% url 'profile:notifications' %}" class="form form__choice-list" novalidate>
             {% csrf_token %}
 
-            {% if form.any_notifications_enabled %}
-                {# Start of multiple checkbox fields #}
-                <ul class="choice-list choice-list-multiple">
+            {# Start of multiple checkbox fields #}
+            <ul class="choice-list choice-list-multiple">
 
-                <h3 class="utrecht-heading-3">{% trans "Ontvang berichten over" %}</h3>
-                    <p class="utrecht-paragraph">{% trans "Kies voor welk onderwerp je meldingen wilt ontvangen" %}</p>
+            <h3 class="utrecht-heading-3">{% trans "Ontvang berichten over" %}</h3>
+                <p class="utrecht-paragraph">{% trans "Kies voor welk onderwerp je meldingen wilt ontvangen" %}</p>
 
-                    {% if form.cases_notifications %}
-                        <li class="choice-list-multiple__item">
-                            <div class="choice-list-multiple__content">
-                                {% checkbox form.cases_notifications %}
-                            </div>
-                        </li>
-                    {% endif %}
+                {% if form.cases_notifications %}
+                    <li class="choice-list-multiple__item">
+                        <div class="choice-list-multiple__content">
+                            {% checkbox form.cases_notifications %}
+                        </div>
+                    </li>
+                {% endif %}
 
-                    {% if form.messages_notifications %}
-                        <li class="choice-list-multiple__item">
-                            <div class="choice-list-multiple__content">
-                                {% checkbox form.messages_notifications %}</div>
-                        </li>
-                    {% endif %}
+                {% if form.messages_notifications %}
+                    <li class="choice-list-multiple__item">
+                        <div class="choice-list-multiple__content">
+                            {% checkbox form.messages_notifications %}</div>
+                    </li>
+                {% endif %}
 
-                    {% if form.plans_notifications %}
-                        <li class="choice-list-multiple__item">
-                            <div class="choice-list-multiple__content">
-                                {% checkbox form.plans_notifications %}</div>
-                        </li>
-                    {% endif %}
-                </ul>
-                {# End of multiple checkbox fields #}
-            {% endif %}
+                {% if form.plans_notifications %}
+                    <li class="choice-list-multiple__item">
+                        <div class="choice-list-multiple__content">
+                            {% checkbox form.plans_notifications %}</div>
+                    </li>
+                {% endif %}
+            </ul>
+            {# End of multiple checkbox fields #}
 
-            <div class="choice-list choice-list-multiple">
-                {# Info on notifications that cannot be disabled #}
-                <div class="choice-list__information">
-                    <p class="choice-list-multiple__heading-4">{% icon icon="check" outlined=True %} {% trans "Zaaknotificaties - actie is nodig" %}</p>
-                    <p class="choice-list__p">{% trans "E-mailnotificaties wanneer er actie nodig is voor een zaak (kan niet uitgeschakeld worden)" %}</p>
+            {% if notifications_cases_enabled %}
+                <div class="choice-list choice-list-multiple">
+                    {# Info on notifications that cannot be disabled #}
+                    <div class="choice-list__information">
+                        <p class="choice-list-multiple__heading-4">{% icon icon="check" outlined=True %} {% trans "Zaaknotificaties wanneer actie nodig is" %}</p>
+                        <p class="choice-list__p">{% trans "E-mailnotificaties wanneer er actie nodig is voor een zaak (kan niet uitgeschakeld worden)" %}</p>
+                    </div>
                 </div>
-            </div>
 
-            {# Choice of zaken notification channel #}
-            {% if form.case_notification_channel %}
-                <p class="utrecht-paragraph choice-list__p">{% trans "Hoe wilt u deze notificaties ontvangen?" %}</p>
-                {% with form.case_notification_channel as field %}
-                    {% choice_list single=True cols=True %}
-                        {% for choice in field.field.choices %}
-                            {% choice_list_item input_type_radio=True choice=choice name=field.name data=field.value index=forloop.counter initial=field.form.initial icon_symbol=choice.1|get_icon_symbol %}
-                        {% endfor %}
-                    {% endchoice_list %}
-                {% endwith %}
+                {# Choice of zaken notification channel #}
+                {% if form.case_notification_channel %}
+                    <p class="utrecht-paragraph choice-list__p">{% trans "Hoe wilt u deze notificaties ontvangen?" %}</p>
+                    {% with form.case_notification_channel as field %}
+                        {% choice_list single=True cols=True %}
+                            {% for choice in field.field.choices %}
+                                {% choice_list_item input_type_radio=True choice=choice name=field.name data=field.value index=forloop.counter initial=field.form.initial icon_symbol=choice.1|get_icon_symbol %}
+                            {% endfor %}
+                        {% endchoice_list %}
+                    {% endwith %}
+                {% endif %}
             {% endif %}
 
             <div class="choice-list__information--bottom-border">

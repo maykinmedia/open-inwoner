@@ -1,0 +1,630 @@
+interactions:
+- request:
+    body: '{"nummer": "0000000002", "kanaal": "capital", "onderwerp": "responsibility",
+      "inhoud": "Century wear paper majority throw wear arrive.", "taal": "nld", "indicatieContactGelukt":
+      false, "vertrouwelijk": true, "plaatsgevondenOp": "2022-04-30T03:10:54.486638"}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '257'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
+  response:
+    body:
+      string: '{"uuid":"f3c41128-caea-45a7-9621-9dd64a7378f4","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/f3c41128-caea-45a7-9621-9dd64a7378f4","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000002","kanaal":"capital","onderwerp":"responsibility","inhoud":"Century
+        wear paper majority throw wear arrive.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2022-04-30T03:10:54.486638Z"}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '519'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/f3c41128-caea-45a7-9621-9dd64a7378f4
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"naam": "Richard Davis", "soortActor": "geautomatiseerde_actor", "indicatieActief":
+      true, "actoridentificator": {"objectId": "0000000002", "codeObjecttype": "us",
+      "codeRegister": "key", "codeSoortObjectId": "service"}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '219'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"uuid":"319e9379-533b-4fe7-8384-d9a8cafda14b","url":"http://localhost:8338/klantinteracties/api/v1/actoren/319e9379-533b-4fe7-8384-d9a8cafda14b","naam":"Richard
+        Davis","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000002","codeObjecttype":"us","codeRegister":"key","codeSoortObjectId":"service"},"actorIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '376'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/actoren/319e9379-533b-4fe7-8384-d9a8cafda14b
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"nummer": "0000000001", "gevraagdeHandeling": "herself", "aanleidinggevendKlantcontact":
+      {"uuid": "f3c41128-caea-45a7-9621-9dd64a7378f4"}, "toegewezenAanActor": {"uuid":
+      "319e9379-533b-4fe7-8384-d9a8cafda14b"}, "status": "te_verwerken"}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '237'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/internetaken
+  response:
+    body:
+      string: '{"uuid":"d70f56af-c844-4ea9-bb6e-2ce4777f9904","url":"http://localhost:8338/klantinteracties/api/v1/internetaken/d70f56af-c844-4ea9-bb6e-2ce4777f9904","nummer":"0000000001","gevraagdeHandeling":"herself","aanleidinggevendKlantcontact":{"uuid":"f3c41128-caea-45a7-9621-9dd64a7378f4","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/f3c41128-caea-45a7-9621-9dd64a7378f4"},"toegewezenAanActor":{"uuid":"319e9379-533b-4fe7-8384-d9a8cafda14b","url":"http://localhost:8338/klantinteracties/api/v1/actoren/319e9379-533b-4fe7-8384-d9a8cafda14b"},"toelichting":"","status":"te_verwerken","toegewezenOp":"2024-09-23T09:40:50.671554Z","afgehandeldOp":null}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '664'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/internetaken/d70f56af-c844-4ea9-bb6e-2ce4777f9904
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"nummer": "0000000002", "gevraagdeHandeling": "bit", "aanleidinggevendKlantcontact":
+      {"uuid": "f3c41128-caea-45a7-9621-9dd64a7378f4"}, "toegewezenAanActor": {"uuid":
+      "319e9379-533b-4fe7-8384-d9a8cafda14b"}, "status": "te_verwerken"}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '233'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/internetaken
+  response:
+    body:
+      string: '{"uuid":"9b300303-64df-4c08-bbd6-0a2df9788ea5","url":"http://localhost:8338/klantinteracties/api/v1/internetaken/9b300303-64df-4c08-bbd6-0a2df9788ea5","nummer":"0000000002","gevraagdeHandeling":"bit","aanleidinggevendKlantcontact":{"uuid":"f3c41128-caea-45a7-9621-9dd64a7378f4","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/f3c41128-caea-45a7-9621-9dd64a7378f4"},"toegewezenAanActor":{"uuid":"319e9379-533b-4fe7-8384-d9a8cafda14b","url":"http://localhost:8338/klantinteracties/api/v1/actoren/319e9379-533b-4fe7-8384-d9a8cafda14b"},"toelichting":"","status":"te_verwerken","toegewezenOp":"2024-09-23T09:40:50.680239Z","afgehandeldOp":null}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '660'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/internetaken/9b300303-64df-4c08-bbd6-0a2df9788ea5
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"nummer": "0000000003", "gevraagdeHandeling": "so", "aanleidinggevendKlantcontact":
+      {"uuid": "f3c41128-caea-45a7-9621-9dd64a7378f4"}, "toegewezenAanActor": {"uuid":
+      "319e9379-533b-4fe7-8384-d9a8cafda14b"}, "status": "te_verwerken"}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '232'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/internetaken
+  response:
+    body:
+      string: '{"uuid":"16a007b6-1dfb-423b-9b99-22368aaaa0b1","url":"http://localhost:8338/klantinteracties/api/v1/internetaken/16a007b6-1dfb-423b-9b99-22368aaaa0b1","nummer":"0000000003","gevraagdeHandeling":"so","aanleidinggevendKlantcontact":{"uuid":"f3c41128-caea-45a7-9621-9dd64a7378f4","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/f3c41128-caea-45a7-9621-9dd64a7378f4"},"toegewezenAanActor":{"uuid":"319e9379-533b-4fe7-8384-d9a8cafda14b","url":"http://localhost:8338/klantinteracties/api/v1/actoren/319e9379-533b-4fe7-8384-d9a8cafda14b"},"toelichting":"","status":"te_verwerken","toegewezenOp":"2024-09-23T09:40:50.688543Z","afgehandeldOp":null}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '659'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/internetaken/16a007b6-1dfb-423b-9b99-22368aaaa0b1
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"nummer": "0000000004", "gevraagdeHandeling": "already", "aanleidinggevendKlantcontact":
+      {"uuid": "f3c41128-caea-45a7-9621-9dd64a7378f4"}, "toegewezenAanActor": {"uuid":
+      "319e9379-533b-4fe7-8384-d9a8cafda14b"}, "status": "verwerkt"}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '233'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/internetaken
+  response:
+    body:
+      string: '{"uuid":"197a0f8b-17eb-447a-b4ee-70a9d67feb40","url":"http://localhost:8338/klantinteracties/api/v1/internetaken/197a0f8b-17eb-447a-b4ee-70a9d67feb40","nummer":"0000000004","gevraagdeHandeling":"already","aanleidinggevendKlantcontact":{"uuid":"f3c41128-caea-45a7-9621-9dd64a7378f4","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/f3c41128-caea-45a7-9621-9dd64a7378f4"},"toegewezenAanActor":{"uuid":"319e9379-533b-4fe7-8384-d9a8cafda14b","url":"http://localhost:8338/klantinteracties/api/v1/actoren/319e9379-533b-4fe7-8384-d9a8cafda14b"},"toelichting":"","status":"verwerkt","toegewezenOp":"2024-09-23T09:40:50.696914Z","afgehandeldOp":"2024-09-23T09:40:50.696850Z"}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '685'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/internetaken/197a0f8b-17eb-447a-b4ee-70a9d67feb40
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"nummer": "0000000005", "gevraagdeHandeling": "suffer", "aanleidinggevendKlantcontact":
+      {"uuid": "f3c41128-caea-45a7-9621-9dd64a7378f4"}, "toegewezenAanActor": {"uuid":
+      "319e9379-533b-4fe7-8384-d9a8cafda14b"}, "status": "verwerkt"}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '232'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/internetaken
+  response:
+    body:
+      string: '{"uuid":"ecdaac06-e2bb-40b6-9cdd-f8b1ed08a900","url":"http://localhost:8338/klantinteracties/api/v1/internetaken/ecdaac06-e2bb-40b6-9cdd-f8b1ed08a900","nummer":"0000000005","gevraagdeHandeling":"suffer","aanleidinggevendKlantcontact":{"uuid":"f3c41128-caea-45a7-9621-9dd64a7378f4","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/f3c41128-caea-45a7-9621-9dd64a7378f4"},"toegewezenAanActor":{"uuid":"319e9379-533b-4fe7-8384-d9a8cafda14b","url":"http://localhost:8338/klantinteracties/api/v1/actoren/319e9379-533b-4fe7-8384-d9a8cafda14b"},"toelichting":"","status":"verwerkt","toegewezenOp":"2024-09-23T09:40:50.704933Z","afgehandeldOp":"2024-09-23T09:40:50.704874Z"}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '684'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/internetaken/ecdaac06-e2bb-40b6-9cdd-f8b1ed08a900
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+    method: GET
+    uri: http://localhost:8338/klantinteracties/api/v1/internetaken
+  response:
+    body:
+      string: '{"count":5,"next":null,"previous":null,"results":[{"uuid":"ecdaac06-e2bb-40b6-9cdd-f8b1ed08a900","url":"http://localhost:8338/klantinteracties/api/v1/internetaken/ecdaac06-e2bb-40b6-9cdd-f8b1ed08a900","nummer":"0000000005","gevraagdeHandeling":"suffer","aanleidinggevendKlantcontact":{"uuid":"f3c41128-caea-45a7-9621-9dd64a7378f4","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/f3c41128-caea-45a7-9621-9dd64a7378f4"},"toegewezenAanActor":{"uuid":"319e9379-533b-4fe7-8384-d9a8cafda14b","url":"http://localhost:8338/klantinteracties/api/v1/actoren/319e9379-533b-4fe7-8384-d9a8cafda14b"},"toelichting":"","status":"verwerkt","toegewezenOp":"2024-09-23T09:40:50.704933Z","afgehandeldOp":"2024-09-23T09:40:50.704874Z"},{"uuid":"197a0f8b-17eb-447a-b4ee-70a9d67feb40","url":"http://localhost:8338/klantinteracties/api/v1/internetaken/197a0f8b-17eb-447a-b4ee-70a9d67feb40","nummer":"0000000004","gevraagdeHandeling":"already","aanleidinggevendKlantcontact":{"uuid":"f3c41128-caea-45a7-9621-9dd64a7378f4","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/f3c41128-caea-45a7-9621-9dd64a7378f4"},"toegewezenAanActor":{"uuid":"319e9379-533b-4fe7-8384-d9a8cafda14b","url":"http://localhost:8338/klantinteracties/api/v1/actoren/319e9379-533b-4fe7-8384-d9a8cafda14b"},"toelichting":"","status":"verwerkt","toegewezenOp":"2024-09-23T09:40:50.696914Z","afgehandeldOp":"2024-09-23T09:40:50.696850Z"},{"uuid":"16a007b6-1dfb-423b-9b99-22368aaaa0b1","url":"http://localhost:8338/klantinteracties/api/v1/internetaken/16a007b6-1dfb-423b-9b99-22368aaaa0b1","nummer":"0000000003","gevraagdeHandeling":"so","aanleidinggevendKlantcontact":{"uuid":"f3c41128-caea-45a7-9621-9dd64a7378f4","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/f3c41128-caea-45a7-9621-9dd64a7378f4"},"toegewezenAanActor":{"uuid":"319e9379-533b-4fe7-8384-d9a8cafda14b","url":"http://localhost:8338/klantinteracties/api/v1/actoren/319e9379-533b-4fe7-8384-d9a8cafda14b"},"toelichting":"","status":"te_verwerken","toegewezenOp":"2024-09-23T09:40:50.688543Z","afgehandeldOp":null},{"uuid":"9b300303-64df-4c08-bbd6-0a2df9788ea5","url":"http://localhost:8338/klantinteracties/api/v1/internetaken/9b300303-64df-4c08-bbd6-0a2df9788ea5","nummer":"0000000002","gevraagdeHandeling":"bit","aanleidinggevendKlantcontact":{"uuid":"f3c41128-caea-45a7-9621-9dd64a7378f4","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/f3c41128-caea-45a7-9621-9dd64a7378f4"},"toegewezenAanActor":{"uuid":"319e9379-533b-4fe7-8384-d9a8cafda14b","url":"http://localhost:8338/klantinteracties/api/v1/actoren/319e9379-533b-4fe7-8384-d9a8cafda14b"},"toelichting":"","status":"te_verwerken","toegewezenOp":"2024-09-23T09:40:50.680239Z","afgehandeldOp":null},{"uuid":"d70f56af-c844-4ea9-bb6e-2ce4777f9904","url":"http://localhost:8338/klantinteracties/api/v1/internetaken/d70f56af-c844-4ea9-bb6e-2ce4777f9904","nummer":"0000000001","gevraagdeHandeling":"herself","aanleidinggevendKlantcontact":{"uuid":"f3c41128-caea-45a7-9621-9dd64a7378f4","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/f3c41128-caea-45a7-9621-9dd64a7378f4"},"toegewezenAanActor":{"uuid":"319e9379-533b-4fe7-8384-d9a8cafda14b","url":"http://localhost:8338/klantinteracties/api/v1/actoren/319e9379-533b-4fe7-8384-d9a8cafda14b"},"toelichting":"","status":"te_verwerken","toegewezenOp":"2024-09-23T09:40:50.671554Z","afgehandeldOp":null}]}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '3408'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"nummer": "0000000002", "kanaal": "simply", "onderwerp": "wife", "inhoud":
+      "Opportunity accept attorney campaign this.", "taal": "nld", "indicatieContactGelukt":
+      false, "vertrouwelijk": false, "plaatsgevondenOp": "2010-03-06T07:05:10.366707"}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '243'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
+  response:
+    body:
+      string: '{"uuid":"5d1fd69a-faa9-4a97-b955-9dbbd7e5be4a","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/5d1fd69a-faa9-4a97-b955-9dbbd7e5be4a","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000002","kanaal":"simply","onderwerp":"wife","inhoud":"Opportunity
+        accept attorney campaign this.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2010-03-06T07:05:10.366707Z"}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '505'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/5d1fd69a-faa9-4a97-b955-9dbbd7e5be4a
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"naam": "David Robinson", "soortActor": "medewerker", "indicatieActief":
+      true, "actoridentificator": {"objectId": "0000000002", "codeObjecttype": "foreign",
+      "codeRegister": "TV", "codeSoortObjectId": "certainly"}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '214'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"uuid":"6d79624c-2c10-4f06-b6e8-b3fbb80f0295","url":"http://localhost:8338/klantinteracties/api/v1/actoren/6d79624c-2c10-4f06-b6e8-b3fbb80f0295","naam":"David
+        Robinson","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000002","codeObjecttype":"foreign","codeRegister":"TV","codeSoortObjectId":"certainly"},"actorIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '371'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/actoren/6d79624c-2c10-4f06-b6e8-b3fbb80f0295
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"nummer": "0000000001", "gevraagdeHandeling": "little", "aanleidinggevendKlantcontact":
+      {"uuid": "5d1fd69a-faa9-4a97-b955-9dbbd7e5be4a"}, "toegewezenAanActor": {"uuid":
+      "6d79624c-2c10-4f06-b6e8-b3fbb80f0295"}, "status": "te_verwerken"}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '236'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/internetaken
+  response:
+    body:
+      string: '{"uuid":"ec3ad155-d4c9-455c-90d3-584f515d3f47","url":"http://localhost:8338/klantinteracties/api/v1/internetaken/ec3ad155-d4c9-455c-90d3-584f515d3f47","nummer":"0000000001","gevraagdeHandeling":"little","aanleidinggevendKlantcontact":{"uuid":"5d1fd69a-faa9-4a97-b955-9dbbd7e5be4a","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/5d1fd69a-faa9-4a97-b955-9dbbd7e5be4a"},"toegewezenAanActor":{"uuid":"6d79624c-2c10-4f06-b6e8-b3fbb80f0295","url":"http://localhost:8338/klantinteracties/api/v1/actoren/6d79624c-2c10-4f06-b6e8-b3fbb80f0295"},"toelichting":"","status":"te_verwerken","toegewezenOp":"2024-10-03T12:46:10.975329Z","afgehandeldOp":null}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '663'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/internetaken/ec3ad155-d4c9-455c-90d3-584f515d3f47
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"nummer": "0000000002", "gevraagdeHandeling": "watch", "aanleidinggevendKlantcontact":
+      {"uuid": "5d1fd69a-faa9-4a97-b955-9dbbd7e5be4a"}, "toegewezenAanActor": {"uuid":
+      "6d79624c-2c10-4f06-b6e8-b3fbb80f0295"}, "status": "verwerkt"}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '231'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/internetaken
+  response:
+    body:
+      string: '{"uuid":"dfe837ff-4267-41d1-8077-88e449254d66","url":"http://localhost:8338/klantinteracties/api/v1/internetaken/dfe837ff-4267-41d1-8077-88e449254d66","nummer":"0000000002","gevraagdeHandeling":"watch","aanleidinggevendKlantcontact":{"uuid":"5d1fd69a-faa9-4a97-b955-9dbbd7e5be4a","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/5d1fd69a-faa9-4a97-b955-9dbbd7e5be4a"},"toegewezenAanActor":{"uuid":"6d79624c-2c10-4f06-b6e8-b3fbb80f0295","url":"http://localhost:8338/klantinteracties/api/v1/actoren/6d79624c-2c10-4f06-b6e8-b3fbb80f0295"},"toelichting":"","status":"verwerkt","toegewezenOp":"2024-10-03T12:46:10.983071Z","afgehandeldOp":"2024-10-03T12:46:10.983008Z"}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '683'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/internetaken/dfe837ff-4267-41d1-8077-88e449254d66
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"nummer": "0000000003", "gevraagdeHandeling": "usually", "aanleidinggevendKlantcontact":
+      {"uuid": "5d1fd69a-faa9-4a97-b955-9dbbd7e5be4a"}, "toegewezenAanActor": {"uuid":
+      "6d79624c-2c10-4f06-b6e8-b3fbb80f0295"}, "status": "te_verwerken"}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '237'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/internetaken
+  response:
+    body:
+      string: '{"uuid":"19c22394-2945-4c3e-b3e1-e94af21907ce","url":"http://localhost:8338/klantinteracties/api/v1/internetaken/19c22394-2945-4c3e-b3e1-e94af21907ce","nummer":"0000000003","gevraagdeHandeling":"usually","aanleidinggevendKlantcontact":{"uuid":"5d1fd69a-faa9-4a97-b955-9dbbd7e5be4a","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/5d1fd69a-faa9-4a97-b955-9dbbd7e5be4a"},"toegewezenAanActor":{"uuid":"6d79624c-2c10-4f06-b6e8-b3fbb80f0295","url":"http://localhost:8338/klantinteracties/api/v1/actoren/6d79624c-2c10-4f06-b6e8-b3fbb80f0295"},"toelichting":"","status":"te_verwerken","toegewezenOp":"2024-10-03T12:46:10.991250Z","afgehandeldOp":null}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '664'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/internetaken/19c22394-2945-4c3e-b3e1-e94af21907ce
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"nummer": "0000000004", "gevraagdeHandeling": "property", "aanleidinggevendKlantcontact":
+      {"uuid": "5d1fd69a-faa9-4a97-b955-9dbbd7e5be4a"}, "toegewezenAanActor": {"uuid":
+      "6d79624c-2c10-4f06-b6e8-b3fbb80f0295"}, "status": "te_verwerken"}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '238'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/internetaken
+  response:
+    body:
+      string: '{"uuid":"6858c98a-4fc1-47b2-82fb-c45394cf707a","url":"http://localhost:8338/klantinteracties/api/v1/internetaken/6858c98a-4fc1-47b2-82fb-c45394cf707a","nummer":"0000000004","gevraagdeHandeling":"property","aanleidinggevendKlantcontact":{"uuid":"5d1fd69a-faa9-4a97-b955-9dbbd7e5be4a","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/5d1fd69a-faa9-4a97-b955-9dbbd7e5be4a"},"toegewezenAanActor":{"uuid":"6d79624c-2c10-4f06-b6e8-b3fbb80f0295","url":"http://localhost:8338/klantinteracties/api/v1/actoren/6d79624c-2c10-4f06-b6e8-b3fbb80f0295"},"toelichting":"","status":"te_verwerken","toegewezenOp":"2024-10-03T12:46:11.032082Z","afgehandeldOp":null}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '665'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/internetaken/6858c98a-4fc1-47b2-82fb-c45394cf707a
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"nummer": "0000000005", "gevraagdeHandeling": "coach", "aanleidinggevendKlantcontact":
+      {"uuid": "5d1fd69a-faa9-4a97-b955-9dbbd7e5be4a"}, "toegewezenAanActor": {"uuid":
+      "6d79624c-2c10-4f06-b6e8-b3fbb80f0295"}, "status": "verwerkt"}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '231'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/internetaken
+  response:
+    body:
+      string: '{"uuid":"567865b4-ed21-4ad9-916b-a4954c575570","url":"http://localhost:8338/klantinteracties/api/v1/internetaken/567865b4-ed21-4ad9-916b-a4954c575570","nummer":"0000000005","gevraagdeHandeling":"coach","aanleidinggevendKlantcontact":{"uuid":"5d1fd69a-faa9-4a97-b955-9dbbd7e5be4a","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/5d1fd69a-faa9-4a97-b955-9dbbd7e5be4a"},"toegewezenAanActor":{"uuid":"6d79624c-2c10-4f06-b6e8-b3fbb80f0295","url":"http://localhost:8338/klantinteracties/api/v1/actoren/6d79624c-2c10-4f06-b6e8-b3fbb80f0295"},"toelichting":"","status":"verwerkt","toegewezenOp":"2024-10-03T12:46:11.039823Z","afgehandeldOp":"2024-10-03T12:46:11.039759Z"}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '683'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/internetaken/567865b4-ed21-4ad9-916b-a4954c575570
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+    method: GET
+    uri: http://localhost:8338/klantinteracties/api/v1/internetaken
+  response:
+    body:
+      string: '{"count":5,"next":null,"previous":null,"results":[{"uuid":"567865b4-ed21-4ad9-916b-a4954c575570","url":"http://localhost:8338/klantinteracties/api/v1/internetaken/567865b4-ed21-4ad9-916b-a4954c575570","nummer":"0000000005","gevraagdeHandeling":"coach","aanleidinggevendKlantcontact":{"uuid":"5d1fd69a-faa9-4a97-b955-9dbbd7e5be4a","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/5d1fd69a-faa9-4a97-b955-9dbbd7e5be4a"},"toegewezenAanActor":{"uuid":"6d79624c-2c10-4f06-b6e8-b3fbb80f0295","url":"http://localhost:8338/klantinteracties/api/v1/actoren/6d79624c-2c10-4f06-b6e8-b3fbb80f0295"},"toelichting":"","status":"verwerkt","toegewezenOp":"2024-10-03T12:46:11.039823Z","afgehandeldOp":"2024-10-03T12:46:11.039759Z"},{"uuid":"6858c98a-4fc1-47b2-82fb-c45394cf707a","url":"http://localhost:8338/klantinteracties/api/v1/internetaken/6858c98a-4fc1-47b2-82fb-c45394cf707a","nummer":"0000000004","gevraagdeHandeling":"property","aanleidinggevendKlantcontact":{"uuid":"5d1fd69a-faa9-4a97-b955-9dbbd7e5be4a","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/5d1fd69a-faa9-4a97-b955-9dbbd7e5be4a"},"toegewezenAanActor":{"uuid":"6d79624c-2c10-4f06-b6e8-b3fbb80f0295","url":"http://localhost:8338/klantinteracties/api/v1/actoren/6d79624c-2c10-4f06-b6e8-b3fbb80f0295"},"toelichting":"","status":"te_verwerken","toegewezenOp":"2024-10-03T12:46:11.032082Z","afgehandeldOp":null},{"uuid":"19c22394-2945-4c3e-b3e1-e94af21907ce","url":"http://localhost:8338/klantinteracties/api/v1/internetaken/19c22394-2945-4c3e-b3e1-e94af21907ce","nummer":"0000000003","gevraagdeHandeling":"usually","aanleidinggevendKlantcontact":{"uuid":"5d1fd69a-faa9-4a97-b955-9dbbd7e5be4a","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/5d1fd69a-faa9-4a97-b955-9dbbd7e5be4a"},"toegewezenAanActor":{"uuid":"6d79624c-2c10-4f06-b6e8-b3fbb80f0295","url":"http://localhost:8338/klantinteracties/api/v1/actoren/6d79624c-2c10-4f06-b6e8-b3fbb80f0295"},"toelichting":"","status":"te_verwerken","toegewezenOp":"2024-10-03T12:46:10.991250Z","afgehandeldOp":null},{"uuid":"dfe837ff-4267-41d1-8077-88e449254d66","url":"http://localhost:8338/klantinteracties/api/v1/internetaken/dfe837ff-4267-41d1-8077-88e449254d66","nummer":"0000000002","gevraagdeHandeling":"watch","aanleidinggevendKlantcontact":{"uuid":"5d1fd69a-faa9-4a97-b955-9dbbd7e5be4a","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/5d1fd69a-faa9-4a97-b955-9dbbd7e5be4a"},"toegewezenAanActor":{"uuid":"6d79624c-2c10-4f06-b6e8-b3fbb80f0295","url":"http://localhost:8338/klantinteracties/api/v1/actoren/6d79624c-2c10-4f06-b6e8-b3fbb80f0295"},"toelichting":"","status":"verwerkt","toegewezenOp":"2024-10-03T12:46:10.983071Z","afgehandeldOp":"2024-10-03T12:46:10.983008Z"},{"uuid":"ec3ad155-d4c9-455c-90d3-584f515d3f47","url":"http://localhost:8338/klantinteracties/api/v1/internetaken/ec3ad155-d4c9-455c-90d3-584f515d3f47","nummer":"0000000001","gevraagdeHandeling":"little","aanleidinggevendKlantcontact":{"uuid":"5d1fd69a-faa9-4a97-b955-9dbbd7e5be4a","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/5d1fd69a-faa9-4a97-b955-9dbbd7e5be4a"},"toegewezenAanActor":{"uuid":"6d79624c-2c10-4f06-b6e8-b3fbb80f0295","url":"http://localhost:8338/klantinteracties/api/v1/actoren/6d79624c-2c10-4f06-b6e8-b3fbb80f0295"},"toelichting":"","status":"te_verwerken","toegewezenOp":"2024-10-03T12:46:10.975329Z","afgehandeldOp":null}]}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '3414'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

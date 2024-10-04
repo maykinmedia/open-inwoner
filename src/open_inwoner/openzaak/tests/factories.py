@@ -2,7 +2,6 @@ from django.utils.text import slugify
 
 import factory
 import faker
-from notifications_api_common.models import Subscription
 from simple_certmanager.constants import CertificateTypes
 from simple_certmanager.models import Certificate
 from zgw_consumers.api_models.base import factory as zwg_factory
@@ -11,6 +10,7 @@ from zgw_consumers.constants import APITypes
 from zgw_consumers.models import Service
 from zgw_consumers.test import generate_oas_component
 
+from notifications.models import NotificationsAPIConfig, Subscription
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.openzaak.api_models import Notification, Rol
 from open_inwoner.openzaak.models import (
@@ -65,7 +65,17 @@ class CertificateFactory(factory.django.DjangoModelFactory):
         )
 
 
+class NotificationsAPIConfigFactory(factory.django.DjangoModelFactory):
+    notifications_api_service = factory.SubFactory(
+        ServiceFactory, api_type=APITypes.nrc
+    )
+
+    class Meta:
+        model = NotificationsAPIConfig
+
+
 class SubscriptionFactory(factory.django.DjangoModelFactory):
+    notifications_api_config = factory.SubFactory(NotificationsAPIConfigFactory)
     callback_url = factory.Faker("url")
     client_id = factory.Faker("word")
     secret = factory.Faker("pystr")

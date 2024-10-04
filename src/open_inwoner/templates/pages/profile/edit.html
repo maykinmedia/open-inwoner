@@ -27,7 +27,6 @@
                             {% input form.email %}
                             {% input form.phonenumber %}
                         {% elif user.is_digid_user_with_brp %}
-                            {% input form.first_name %}
                             {% input form.email %}
                             {% input form.phonenumber %}
                             {% if user.contact_type == "begeleider" %}

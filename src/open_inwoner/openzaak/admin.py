@@ -66,7 +66,10 @@ class OpenZaakConfigAdmin(SingletonModelAdmin):
             "Feature flags",
             {
                 "classes": ("collapse",),
-                "fields": ("enable_categories_filtering_with_zaken",),
+                "fields": (
+                    "enable_categories_filtering_with_zaken",
+                    "zaken_filter_enabled",
+                ),
             },
         ),
         (

@@ -5,6 +5,7 @@ from django.urls import reverse
 
 from mail_editor.helpers import find_template
 
+from open_inwoner.accounts.choices import StatusChoices
 from open_inwoner.accounts.models import Action, User
 from open_inwoner.utils.url import build_absolute_url
 
@@ -25,6 +26,7 @@ def collect_notifications_about_expiring_actions() -> list[dict]:
         is_active=True,
         plans_notifications=True,
         actions__end_date=today,
+        actions__status__in=[StatusChoices.open, StatusChoices.approval],
     ).distinct()
 
     notifications = [

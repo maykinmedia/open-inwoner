@@ -98,16 +98,20 @@ class MyProfileView(
         return (string_func(item) for item in items)
 
     def get_context_data(self, **kwargs):
+        config = SiteConfiguration.get_solo()
         context = super().get_context_data(**kwargs)
         user = self.request.user
         today = date.today()
 
         context["anchors"] = [
             ("#personal-info", _("Persoonlijke gegevens")),
-            ("#notifications", _("Voorkeuren voor meldingen")),
             ("#overview", _("Overzicht")),
             ("#profile-remove", _("Profiel verwijderen")),
         ]
+        if config.any_notifications_enabled:
+            context["anchors"].insert(
+                1, ("#notifications", _("Voorkeuren voor meldingen"))
+            )
 
         # Check if Laposta is configured and user has verified email
         if LapostaConfig.get_solo().api_root and user.has_verified_email():
@@ -322,6 +326,12 @@ class MyNotificationsView(
             (_("Ontvang berichten over"), reverse("profile:notifications")),
         ]
 
+    def get(self, *args, **kwargs):
+        config = SiteConfiguration.get_solo()
+        if not config.any_notifications_enabled:
+            return HttpResponseRedirect(reverse("profile:detail"))
+        return super().get(*args, **kwargs)
+
     def get_object(self):
         return self.request.user
 
@@ -329,6 +339,13 @@ class MyNotificationsView(
         kwargs = super().get_form_kwargs()
         kwargs["user"] = self.request.user
         return kwargs
+
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+
+        config = SiteConfiguration.get_solo()
+        context_data["notifications_cases_enabled"] = config.notifications_cases_enabled
+        return context_data
 
     def form_valid(self, form):
         form.save()

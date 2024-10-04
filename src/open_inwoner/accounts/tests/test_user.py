@@ -78,23 +78,18 @@ class UserTests(TestCase):
 
     def test_has_usable_email(self):
         user_ok1 = UserFactory(email="foo@bar.baz")
-        self.assertTrue(user_ok1.has_usable_email())
-        self.assertTrue(User.is_usable_email("foo@bar.baz"))
+        self.assertTrue(user_ok1.has_usable_email)
 
         user_ok2 = UserFactory(email="test@example.com")
-        self.assertTrue(user_ok2.has_usable_email())
-        self.assertTrue(User.is_usable_email("test@example.com"))
+        self.assertTrue(user_ok2.has_usable_email)
 
-        self.assertFalse(UserFactory(email="").has_usable_email())
-        self.assertFalse(User.is_usable_email(""))
+        self.assertFalse(UserFactory(email="").has_usable_email)
 
         # @example.org is used as placeholder
-        self.assertFalse(UserFactory(email="test@example.org").has_usable_email())
-        self.assertFalse(User.is_usable_email("test@example.org"))
+        self.assertFalse(UserFactory(email="test@example.org").has_usable_email)
 
         # @localhost occurs in some old code
-        self.assertFalse(UserFactory(email="test@localhost").has_usable_email())
-        self.assertFalse(User.is_usable_email("test@localhost"))
+        self.assertFalse(UserFactory(email="test@localhost").has_usable_email)
 
         actual = set(User.objects.having_usable_email())
         self.assertEqual(actual, {user_ok1, user_ok2})

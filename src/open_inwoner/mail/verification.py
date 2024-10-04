@@ -93,5 +93,7 @@ def send_user_email_verification_mail(user: User, next_url: str = None) -> bool:
         url = prepend_next_url_param(url, next_url)
     context = {
         "verification_link": url,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
     }
     template.send_email([user.email], context)

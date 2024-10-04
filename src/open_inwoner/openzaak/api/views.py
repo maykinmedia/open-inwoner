@@ -1,11 +1,11 @@
 import logging
 
-from notifications_api_common.api.serializers import NotificatieSerializer
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from zgw_consumers.api_models.base import factory
 
+from notifications.api.serializers import NotificatieSerializer
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openzaak.api_models import Notification
 from open_inwoner.openzaak.auth import get_valid_subscription_from_request
@@ -18,9 +18,7 @@ logger = logging.getLogger(__name__)
 
 class NotificationsWebhookBaseView(APIView):
     """
-    generic ZGW notification webhook handler
-
-    theoretically this could be moved to notifications-api-common
+    Generic ZGW notification webhook handler
     """
 
     # optionally filter incoming channels

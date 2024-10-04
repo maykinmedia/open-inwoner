@@ -1,9 +1,12 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from django_jsonform.models.fields import ArrayField
 from ordered_model.models import OrderedModel, OrderedModelManager
 from solo.models import SingletonModel
 from zgw_consumers.constants import APITypes
+
+from open_inwoner.utils.validators import validate_array_contents_non_empty
 
 
 class OpenKlantConfigManager(models.Manager):
@@ -90,6 +93,20 @@ class OpenKlantConfig(SingletonModel):
             "If disabled the external API will send a confirmation email."
         ),
         default=False,
+    )
+    exclude_contactmoment_kanalen = ArrayField(
+        base_field=models.CharField(
+            blank=True,
+            max_length=100,
+            help_text=_(
+                "Contactmomenten registered via one of these channels will not be "
+                "displayed to users."
+            ),
+        ),
+        null=True,
+        blank=True,
+        default=list,
+        validators=[validate_array_contents_non_empty],
     )
 
     register_api_required_fields = (

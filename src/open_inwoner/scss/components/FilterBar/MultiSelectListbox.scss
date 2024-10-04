@@ -1,0 +1,199 @@
+.filter-bar__multiselect-listbox {
+  position: relative;
+  width: 280px;
+
+  &:has(.show) {
+    .button__select {
+      *[class*='icons'] {
+        display: inline-block;
+        position: absolute;
+        right: var(--spacing-large);
+        top: 8px;
+        transform: rotate(180deg);
+      }
+    }
+
+    .button--primary.hide,
+    .form__actions.hide {
+      opacity: 0;
+      height: 0;
+      z-index: 1;
+    }
+  }
+
+  .button__select {
+    background-color: var(--color-white);
+    border: 1px solid var(--color-gray-dark-900);
+    border-radius: var(--border-radius);
+    box-sizing: border-box;
+    color: var(--color-gray-dark);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body);
+    height: var(--row-height);
+    justify-content: space-between;
+    margin: 0;
+    padding: var(--spacing-medium) var(--spacing-large);
+    text-align: left;
+    max-width: 100%;
+    width: 100%;
+
+    @media (min-width: 768px) {
+      width: 280px;
+    }
+
+    *[class*='Icon'] {
+      display: inline-block;
+      position: absolute;
+      right: var(--spacing-large);
+      transition: all 0.3s;
+    }
+
+    &.active {
+      background-color: var(--color-secondary);
+      border: 1px solid var(--color-secondary);
+      color: white;
+      justify-content: flex-start;
+
+      *[class*='icons'] {
+        color: var(--color-white);
+        position: absolute;
+        right: 12px;
+      }
+
+      .ellipsis {
+        display: inline-block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: 190px;
+      }
+    }
+
+    .active-filters {
+      background-color: var(--color-white);
+      color: var(--color-gray-dark);
+      border-radius: var(--border-radius);
+      padding: 0 var(--spacing-medium);
+    }
+  }
+
+  .multiselect-listbox__content {
+    position: absolute;
+    background-color: var(--color-white);
+    max-height: calc(6 * 40px);
+    left: 0;
+    min-width: 280px;
+    opacity: 0;
+    top: 40px;
+    width: 100%;
+    z-index: 1;
+
+    @media (min-width: 768px) {
+      width: 280px;
+    }
+
+    .multiselect-listbox__scroll {
+      max-height: calc(6 * 40px);
+      overflow-x: hidden;
+      overflow-y: auto;
+
+      & > .checkbox {
+        padding: var(--spacing-extra-large) var(--spacing-medium);
+
+        .checkbox__input:focus ~ .checkbox__label {
+          text-decoration: none;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+        .checkbox__input:focus-visible ~ .checkbox__label {
+          border-radius: var(--border-radius);
+          outline: var(--focus-border-style) var(--focus-border-width)
+            var(--color-secondary);
+        }
+      }
+
+      .checkbox:has(input[type='checkbox']) {
+        display: flex;
+        justify-content: start;
+        color: var(--color-gray-dark-900);
+        border: 1px solid var(--color-gray);
+        border-top: none;
+        line-height: 0;
+        padding: var(--spacing-medium) var(--spacing-large);
+        max-width: 260px;
+      }
+
+      .checkbox:has(input[type='checkbox']:checked) {
+        border: 1px solid var(--color-secondary);
+        border-left: 3px solid;
+        color: var(--color-secondary);
+        padding: var(--spacing-medium) var(--spacing-large)
+          var(--spacing-medium) 12px;
+        max-width: calc(100% - 18px);
+      }
+    }
+  }
+
+  .multiselect-listbox__content {
+    .checkbox__label {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      color: var(--color-black);
+      text-decoration: none;
+      padding: 0 var(--spacing-small) var(--spacing-small) 30px;
+
+      &:before {
+        top: var(--spacing-tiny);
+      }
+
+      .ellipsis {
+        display: inline-block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: 170px;
+      }
+    }
+
+    .checkbox__label:hover {
+      text-decoration: underline;
+    }
+
+    .selected {
+      background-color: #fff;
+    }
+
+    .form__actions {
+      background-color: var(--color-white);
+      padding-top: var(--spacing-small);
+    }
+  }
+
+  .show {
+    display: inline-block;
+    opacity: 1;
+    z-index: 2000;
+  }
+
+  .form__actions {
+    &--reset {
+      position: relative;
+      z-index: 1000;
+      .button--transparent {
+        justify-content: flex-start;
+        padding-left: 0;
+
+        &:focus {
+          background-color: transparent;
+        }
+      }
+
+      .hide {
+        display: none;
+      }
+    }
+  }
+}

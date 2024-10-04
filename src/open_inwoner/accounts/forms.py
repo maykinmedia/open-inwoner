@@ -204,7 +204,10 @@ class NecessaryUserForm(ErrorMessageMixin, forms.ModelForm):
         self.fields["last_name"].required = True
 
         # notifications
-        if not config.enable_notification_channel_choice:
+        if (
+            not config.notifications_cases_enabled
+            or not config.enable_notification_channel_choice
+        ):
             del self.fields["case_notification_channel"]
 
         if (
@@ -334,7 +337,10 @@ class UserNotificationsForm(forms.ModelForm):
         siteconfig = SiteConfiguration.get_solo()
         self.any_notifications_enabled = siteconfig.any_notifications_enabled
 
-        if not siteconfig.enable_notification_channel_choice:
+        if (
+            not siteconfig.notifications_cases_enabled
+            or not siteconfig.enable_notification_channel_choice
+        ):
             del self.fields["case_notification_channel"]
 
         if (

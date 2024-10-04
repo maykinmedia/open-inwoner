@@ -284,7 +284,7 @@ USING LOCAL
     "fields": {
         "order": 5,
         "translations": {
-            "nl": ""
+            "nl": "Data koppelingen"
         },
         "name": "Data koppelingen",
         "slug": "koppelingen",
@@ -294,11 +294,11 @@ USING LOCAL
                 "lapostaconfig"
             ],
             [
-                "notifications_api_common",
-                "notificationsconfig"
+                "notifications",
+                "notificationsapiconfig"
             ],
             [
-                "notifications_api_common",
+                "notifications",
                 "subscription"
             ],
             [

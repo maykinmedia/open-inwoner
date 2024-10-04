@@ -1,4 +1,5 @@
 import mimetypes
+import secrets
 
 from django import forms
 from django.conf import settings
@@ -163,3 +164,56 @@ class LimitedUploadFileField(forms.FileField):
                 )
 
         return f
+
+
+class MathCaptchaField(forms.Field):
+    def __init__(
+        self,
+        range_: tuple = (1, 10),
+        operators: list[str] | None = None,
+        *args,
+        **kwargs,
+    ):
+        super().__init__(*args, **kwargs)
+        self.widget = forms.TextInput()
+        self.range_ = range_
+        self.operators = operators or ["+", "-"]
+        self.question, self.answer = self.generate_question_answer_pair(
+            self.range_, self.operators
+        )
+
+    @staticmethod
+    def generate_question_answer_pair(
+        range_: tuple[int, int],
+        operators: list[str],
+    ) -> tuple[str, int]:
+        lower, upper = range_
+        num1 = secrets.choice(range(lower, upper))
+        num2 = secrets.choice(range(lower, upper))
+        operator = secrets.choice(operators)
+
+        # exclude negative results
+        num1, num2 = max(num1, num2), min(num1, num2)
+
+        question = _("What is {num1} {operator} {num2}?").format(
+            num1=num1, operator=operator, num2=num2
+        )
+
+        match operator:
+            case "+":
+                answer = num1 + num2
+            case "-":
+                answer = num1 - num2
+
+        return question, answer
+
+    def clean(self, value: str) -> str:
+        if not value:
+            raise forms.ValidationError(_("Dit veld is vereist."))
+        if not isinstance(value, str):
+            raise forms.ValidationError(_("Voer een geheel getal in."))
+        if value.isspace():
+            raise forms.ValidationError(_("Voer een geheel getal in."))
+        if int(value) != self.answer:
+            raise forms.ValidationError(_("Fout antwoord, probeer het opnieuw."))
+        return value

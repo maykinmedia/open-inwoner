@@ -222,6 +222,20 @@ class MockAPIReadData(MockAPIData):
             antwoord="baz",
             onderwerp="e_suite_subject_code",
         )
+        self.contactmoment_intern = generate_oas_component_cached(
+            "cmc",
+            "schemas/Contactmoment",
+            url=f"{CONTACTMOMENTEN_ROOT}contactmoment/bbbbbbbb-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+            bronorganisatie="123456789",
+            identificatie="AB123",
+            type="SomeType",
+            kanaal="intern_initiatief",
+            registratiedatum="2022-01-01T12:00:00Z",
+            status=Status.afgehandeld,
+            tekst="Garage verbouwen?",
+            antwoord="foo",
+            onderwerp="e_suite_subject_code",
+        )
         self.klant_contactmoment = generate_oas_component_cached(
             "cmc",
             "schemas/Klantcontactmoment",
@@ -254,6 +268,15 @@ class MockAPIReadData(MockAPIData):
             url=f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten/aaaaaaaa-aaaa-aaaa-aaaa-ffffffffffff",
             klant=self.klant_vestiging["url"],
             contactmoment=self.contactmoment_vestiging["url"],
+            rol="gesprekspartner",
+        )
+        self.klant_contactmoment_intern = generate_oas_component_cached(
+            "cmc",
+            "schemas/Klantcontactmoment",
+            uuid="bbbbbbbb-aaaa-aaaa-aaaa-cccccccccccc",
+            url=f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten/bbbbbbbb-aaaa-aaaa-aaaa-cccccccccccc",
+            klant=self.klant_bsn["url"],
+            contactmoment=self.contactmoment_intern["url"],
             rol="gesprekspartner",
         )
         self.objectcontactmoment_other = generate_oas_component_cached(
@@ -289,6 +312,7 @@ class MockAPIReadData(MockAPIData):
             "contactmoment",
             "contactmoment2",
             "contactmoment_vestiging",
+            "contactmoment_intern",
             "klant_contactmoment",
             "klant_contactmoment2",
             "klant_contactmoment3",
@@ -320,7 +344,9 @@ class MockAPIReadData(MockAPIData):
 
         m.get(
             f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten?klant={self.klant_bsn['url']}",
-            json=paginated_response([self.klant_contactmoment]),
+            json=paginated_response(
+                [self.klant_contactmoment, self.klant_contactmoment_intern]
+            ),
         )
         m.get(
             f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten?klant={self.klant_kvk['url']}",
@@ -330,7 +356,10 @@ class MockAPIReadData(MockAPIData):
             f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten?klant={self.klant_vestiging['url']}",
             json=paginated_response([self.klant_contactmoment4]),
         )
-
+        m.get(
+            f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten?klant={self.klant_contactmoment_intern['url']}",
+            json=paginated_response([self.klant_contactmoment_intern]),
+        )
         m.get(
             f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten?contactmoment={self.contactmoment['url']}",
             json=paginated_response(

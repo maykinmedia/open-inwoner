@@ -17,7 +17,6 @@ from open_inwoner.openzaak.api_models import (
     ZaakInformatieObject,
     ZaakType,
 )
-from open_inwoner.openzaak.cases import resolve_status
 from open_inwoner.openzaak.clients import CatalogiClient, ZakenClient
 from open_inwoner.openzaak.documents import fetch_single_information_object_from_url
 from open_inwoner.openzaak.models import (
@@ -139,7 +138,6 @@ def send_case_update_email(
     status: Status | None = None,
     extra_context: dict = None,
 ):
-
     """
     send the actual mail
     """
@@ -529,7 +527,11 @@ def _handle_status_notification(
     if not (ztc := _check_zaaktype_config(notification, case, oz_config)):
         return
 
-    resolve_status(case, client=zaken_client)
+    status = zaken_client.fetch_single_status(case.status)
+    if not status:
+        logger.error("Unable to fetch status for %s", case.status)
+
+    case.status = status
     if not (status_type_config := _check_statustype_config(notification, case, ztc)):
         return
 

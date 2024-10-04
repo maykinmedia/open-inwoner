@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        test-type: [main, elastic]
+        test-type: [main, elastic, openklant]
 
     services:
       postgres:
@@ -70,6 +70,8 @@ jobs:
               --exclude-tag=elastic
           elif [ "${{ matrix.test-type }}" = "elastic" ]; then
             coverage run -p src/manage.py test src --tag=elastic --exclude-tag=e2e
+          elif [ "${{ matrix.test-type }}" = "openklant" ]; then
+            coverage run -m pytest --block-network --record-mode=none -vvv src/openklant2
           else
             echo "Error: Unknown test type '${{ matrix.test-type }}'"
             exit 1
@@ -98,7 +100,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: '3.11'
       - name: Install coverage.py
         # We only need coverage, but we need to match the version that was used
         # to generate the coverage files. Grab it from the dependencies.
@@ -110,6 +112,7 @@ jobs:
         run: |
           mv coverages/main/.coverage* .
           mv coverages/elastic/.coverage* .
+          mv coverages/openklant/.coverage* .
           coverage combine
       - name: Publish coverage report
         uses: codecov/codecov-action@v3
@@ -169,8 +172,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: /home/runner/.cache/ms-playwright
-          key:
-            ${{ runner.os }}-${{ matrix.browser }}-playwright-${{ hashFiles('requirements/ci.txt') }}
+          key: ${{ runner.os }}-${{ matrix.browser }}-playwright-${{ hashFiles('requirements/ci.txt') }}
 
       - name: Install playwright deps
         run: playwright install --with-deps ${{ matrix.browser }}

@@ -1,5 +1,6 @@
 import logging
 from datetime import timedelta
+from typing import NotRequired, TypedDict
 
 from django.conf import settings
 
@@ -81,7 +82,21 @@ def fetch_klantcontactmoment(
     return kcm
 
 
-def get_fetch_parameters(request, use_vestigingsnummer: bool = False) -> dict:
+class BsnFetchParam(TypedDict):
+    user_bsn: str
+
+
+class OrgFetchParam(TypedDict):
+    user_kvk_or_rsin: str
+    vestigingsnummer: NotRequired[str]
+
+
+FetchParameters = BsnFetchParam | OrgFetchParam
+
+
+def get_fetch_parameters(
+    request, use_vestigingsnummer: bool = False
+) -> FetchParameters | None:
     """
     Determine the parameters used to perform Klanten/Contactmomenten fetches
     """
@@ -95,13 +110,17 @@ def get_fetch_parameters(request, use_vestigingsnummer: bool = False) -> dict:
         if config.use_rsin_for_innNnpId_query_parameter:
             kvk_or_rsin = user.rsin
 
-        parameters = {"user_kvk_or_rsin": kvk_or_rsin}
         if use_vestigingsnummer:
             vestigingsnummer = get_kvk_branch_number(request.session)
             if vestigingsnummer:
-                parameters.update({"vestigingsnummer": vestigingsnummer})
-        return parameters
-    return {}
+                return {
+                    "user_kvk_or_rsin": kvk_or_rsin,
+                    "vestigingsnummer": vestigingsnummer,
+                }
+
+        return {"user_kvk_or_rsin": kvk_or_rsin}
+
+    return None
 
 
 def get_kcm_answer_mapping(

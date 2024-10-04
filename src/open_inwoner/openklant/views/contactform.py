@@ -23,7 +23,7 @@ from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
     form_class = ContactForm
-    template_name = "pages/contactform/form.html"
+    template_name = "pages/contactform/form_wrap.html"  # inner ("structure") template rendered by CMS plugin
 
     @cached_property
     def crumbs(self):
@@ -194,8 +194,6 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
                     "emailadres": form.cleaned_data["email"],
                     "telefoonnummer": form.cleaned_data["phonenumber"],
                 }
-                # registering klanten won't work in e-Suite as it always pulls from BRP
-                # (but try anyway and fallback to appending details to tekst if fails)
                 klant = klanten_client.create_klant(data=data)
 
                 if klant:
@@ -222,16 +220,6 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
                 text=text, full_name=full_name
             )
 
-            if form.cleaned_data["email"]:
-                text = _("{text}\nEmail: {email}").format(
-                    text=text, email=form.cleaned_data["email"]
-                )
-
-            if form.cleaned_data["phonenumber"]:
-                text = _("{text}\nTelefoonnummer: {phone}").format(
-                    text=text, phone=form.cleaned_data["phonenumber"]
-                )
-
             self.log_system_action(
                 "could not retrieve or create klant for user, appended info to message",
                 user=self.request.user,
@@ -244,6 +232,13 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
             "kanaal": config.register_channel,
             "onderwerp": subject_code or subject,
         }
+
+        if not self.request.user.is_authenticated:
+            data["contactgegevens"] = {
+                "emailadres": form.cleaned_data["email"],
+                "telefoonnummer": form.cleaned_data["phonenumber"],
+            }
+
         if employee_id := config.register_employee_id:
             data["medewerkerIdentificatie"] = {"identificatie": employee_id}
 

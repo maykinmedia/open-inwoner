@@ -37,10 +37,10 @@ class CategoryPublishedQueryset(MP_NodeQuerySet):
             # Show all categories to staff users
             if user.is_staff:
                 return self
-            elif user.bsn:
-                return self.filter(visible_for_citizens=True)
             elif user.kvk:
                 return self.filter(visible_for_companies=True)
+            # User is DigiD or non-staff username/password
+            return self.filter(visible_for_citizens=True)
 
         config = SiteConfiguration.get_solo()
         if config.hide_categories_from_anonymous_users:

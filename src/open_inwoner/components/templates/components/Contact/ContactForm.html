@@ -3,8 +3,6 @@
 {% render_grid %}
     {% render_column start=1 span=6 %}
         <div class="contactform__content">
-        {% if has_form_configuration %}
-
             {% render_form form=form_object method="POST" id="contactmoment-form" show_required=True submit_text=_('Verzenden') %}
                 {% csrf_token %}
                 {% input form_object.subject icon="expand_more" icon_position="after" icon_outlined=True %}
@@ -24,12 +22,29 @@
                     {% input form_object.phonenumber %}
                 {% endif %}
                 {% input form_object.question %}
-                {% form_actions primary_text=_("Verzenden") primary_icon="arrow_forward" %}
-            {% endrender_form %}
 
-        {% else %}
-            <p class="utrecht-paragraph">{% trans "Contact formulier niet geconfigureerd." %}</p>
-        {% endif %}
+                {% if form_object.captcha %}
+                    <div class="form__control ">
+                        <div class="captcha">
+                            <label class="label captcha__label">
+                                {{ form_object.captcha.label }}<span class="label__label--required"> * </span>
+                            </label>
+                            <div class="captcha__check">
+                                <div>
+                                    <span class="captcha__prompt">{{ form_object.captcha.field.question }}</span>
+                                </div>
+                                <span class="captcha__input">{% field_as_widget form_object.captcha "input" form_id %}</span>
+                            </div>
+                            {% if form_object.captcha.errors %}
+                                {% errors errors=form_object.captcha.errors %}
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% form_actions primary_text=_("Verzenden") primary_icon="arrow_forward" fullwidth=True %}
+
+            {% endrender_form %}
         </div>
     {% endrender_column %}
 {% endrender_grid %}

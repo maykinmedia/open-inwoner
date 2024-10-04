@@ -12,7 +12,7 @@ from open_inwoner.utils.test import ClearCachesMixin, DisableRequestLogMixin
 
 
 @requests_mock.Mocker()
-class HelpersTestCase(ClearCachesMixin, DisableRequestLogMixin, TestCase):
+class KlantHelperTest(ClearCachesMixin, DisableRequestLogMixin, TestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -30,19 +30,36 @@ class HelpersTestCase(ClearCachesMixin, DisableRequestLogMixin, TestCase):
                 [kcm.contactmoment for kcm in kcms], data.user
             )
 
-            self.assertEqual(KlantContactMomentAnswer.objects.count(), 1)
+            self.assertEqual(KlantContactMomentAnswer.objects.count(), 2)
 
-            kcm_local = KlantContactMomentAnswer.objects.get()
+            kcm_answers = KlantContactMomentAnswer.objects.all()
 
-            self.assertEqual(mapping, {kcms[0].contactmoment.url: kcm_local})
-            self.assertEqual(kcm_local.user, data.user)
-            self.assertEqual(kcm_local.contactmoment_url, kcms[0].contactmoment.url)
-            self.assertEqual(kcm_local.is_seen, False)
+            self.assertEqual(
+                mapping,
+                {
+                    kcms[0].contactmoment.url: kcm_answers[0],
+                    kcms[1].contactmoment.url: kcm_answers[1],
+                },
+            )
+            self.assertEqual(kcm_answers[0].user, data.user)
+            self.assertEqual(
+                kcm_answers[0].contactmoment_url, kcms[0].contactmoment.url
+            )
+            self.assertEqual(
+                kcm_answers[1].contactmoment_url, kcms[1].contactmoment.url
+            )
+            self.assertEqual(kcm_answers[0].is_seen, False)
 
         with self.subTest("running function again will ignore existing entries"):
             mapping = get_kcm_answer_mapping(
                 [kcm.contactmoment for kcm in kcms], data.user
             )
 
-            self.assertEqual(KlantContactMomentAnswer.objects.count(), 1)
-            self.assertEqual(mapping, {kcms[0].contactmoment.url: kcm_local})
+            self.assertEqual(KlantContactMomentAnswer.objects.count(), 2)
+            self.assertEqual(
+                mapping,
+                {
+                    kcms[0].contactmoment.url: kcm_answers[0],
+                    kcms[1].contactmoment.url: kcm_answers[1],
+                },
+            )

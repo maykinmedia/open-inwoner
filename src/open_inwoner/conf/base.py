@@ -203,6 +203,7 @@ INSTALLED_APPS = [
     "formtools",
     "django_setup_configuration",
     "django_yubin",
+    "notifications",
     # Project applications.
     "open_inwoner.components",
     "open_inwoner.kvk",
@@ -614,6 +615,10 @@ CMS_PLACEHOLDER_CONF = {
             "TextPlugin": ["LinkPlugin"],
         },
     },
+    "contact_form": {
+        "name": _("Contact form plugin"),
+        "plugins": ["ContactFormPlugin"],
+    },
 }
 
 CMS_TOOLBAR_ANONYMOUS_ON = False
@@ -754,7 +759,7 @@ CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 # SENTRY - error monitoring
 #
 SENTRY_DSN = config("SENTRY_DSN", None)
-RELEASE = "v1.20.0"  # get_current_version()
+RELEASE = "v1.21.0"  # get_current_version()
 
 PRIVATE_MEDIA_ROOT = os.path.join(BASE_DIR, "private_media")
 FILER_ROOT = os.path.join(BASE_DIR, "media", "filer")
@@ -1035,8 +1040,3 @@ DJANGO_SETUP_CONFIG_CUSTOM_FIELDS = [
         "description": "string representing the (absolute) path to a file, including file extension",
     },
 ]
-
-#
-# Project specific settings
-#
-CASE_LIST_NUM_THREADS = 6
