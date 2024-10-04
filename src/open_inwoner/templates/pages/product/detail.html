@@ -56,7 +56,7 @@
         {% include "cms/plugins/videoplayer/videoplayer.html" with instance=object %}
     {% endif %}
 
-    {% if object.question_set.exists or object.files.exists or object.conditions.exists or object.locations.exists or product_links.exists or object.related_products.published.exists or object.contacts.exists %}
+    {% if object.question_set.exists or object.files.exists or object.conditions.exists or object.locations.exists or product_links.exists or object.related_products.published.exists or object.contacts.exists or object.current_price %}
         <hr class="divider">
     {% endif %}
 
@@ -80,6 +80,16 @@
                 {% render_column start=7 span=6 compact=True %}
                     <h3 class="utrecht-heading-3">{% trans "U komt niet in aanmerking" %}</h3>
                     {% include "components/Condition/ConditionList.html" with conditions=object.conditions.all negative=True only %}
+                {% endrender_column %}
+            {% endrender_grid %}
+        {% endif %}
+
+        {# Prices #}
+        {% if object.current_price %}
+            {% render_grid %}
+                {% render_column span=6 compact=True %}
+                    <h3 class="utrecht-heading-3" id="prices">{% trans "Prijzen" %}</h3>
+                    {% include "components/Price/PriceList.html" with price_options=object.current_price.options.all only %}
                 {% endrender_column %}
             {% endrender_grid %}
         {% endif %}

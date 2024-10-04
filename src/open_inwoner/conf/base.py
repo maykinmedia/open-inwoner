@@ -217,6 +217,7 @@ INSTALLED_APPS = [
     "open_inwoner.configurations",
     "open_inwoner.haalcentraal",
     "open_inwoner.openklant",
+    "open_inwoner.openproducten",
     "open_inwoner.soap",
     "open_inwoner.ssd",
     "open_inwoner.questionnaire",
@@ -737,6 +738,10 @@ CELERY_BEAT_SCHEDULE = {
             "notify_about": "messages",
             "channel": "email",
         },
+    },
+    "Importeer open producten data": {
+        "task": "open_inwoner.openproducten.tasks.import_product_types",
+        "schedule": crontab(minute="0", hour="7", day_of_month="*"),
     },
 }
 
