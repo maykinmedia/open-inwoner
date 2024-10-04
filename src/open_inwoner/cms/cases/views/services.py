@@ -63,11 +63,15 @@ class ThreadLimits(TypedDict):
 class CaseListService:
     request: HttpRequest
     _thread_limits: ThreadLimits
-    _cumulative_case_fetching_timeout: int = 60
-    _fetch_task_timeout: int = 6
+    _thread_timeouts: ThreadLimits
 
     def __init__(self, request: HttpRequest):
         self.request = request
+        self._thread_timeouts = {
+            "zgw_api_groups": 60,
+            "resolve_case_instance": 15,
+            "resolve_case_list": 15,
+        }
 
         # TODO: Ideally, this would be configured in light of:
         # - a configured maximum number of threads and
@@ -167,7 +171,7 @@ class CaseListService:
             cases_with_api_group = []
             for task in concurrent.futures.as_completed(
                 futures,
-                timeout=self._cumulative_case_fetching_timeout,
+                timeout=self._thread_timeouts["zgw_api_groups"],
             ):
                 group_for_task = all_api_groups[futures.index(task)]
                 try:
@@ -186,31 +190,52 @@ class CaseListService:
 
         return cases_with_api_group
 
-    def _get_cases_for_api_group(self, group: ZGWApiGroupConfig):
+    def _get_cases_for_api_group(self, group: ZGWApiGroupConfig) -> list[Zaak]:
         raw_cases = group.zaken_client.fetch_cases(
             **get_user_fetch_parameters(self.request)
         )
-        preprocessed_cases = self.resolve_cases(raw_cases, group)
-        return preprocessed_cases
+        resolved_cases = self.resolve_cases(raw_cases, group)
+
+        filtered_cases = [
+            case for case in resolved_cases if case.status and is_zaak_visible(case)
+        ]
+        filtered_cases.sort(key=lambda case: case.startdatum, reverse=True)
+        return filtered_cases
 
     def resolve_cases(
         self,
         cases: list[Zaak],
         group: ZGWApiGroupConfig,
     ) -> list[Zaak]:
+        resolved_cases = []
         with parallel(max_workers=self._thread_limits["resolve_case_list"]) as executor:
-            futures = [
-                executor.submit(self.resolve_case, case, group) for case in cases
-            ]
+            futures = {
+                executor.submit(self.resolve_case, case, group): {
+                    "case": case,
+                    "api_group": group,
+                }
+                for case in cases
+            }
 
-            concurrent.futures.wait(futures, timeout=self._fetch_task_timeout)
+            for task in concurrent.futures.as_completed(
+                futures,
+                timeout=self._thread_timeouts["resolve_case_list"],
+            ):
+                try:
+                    resolved_case = task.result()
+                    resolved_cases.append(resolved_case)
+                except BaseException:
+                    case = futures[task]["case"]
+                    group = futures[task]["api_group"]
+                    logger.exception(
+                        "Error while resolving case {case} with API group {group}".format(
+                            case=case, group=group
+                        )
+                    )
 
-        cases = [case for case in cases if case.status and is_zaak_visible(case)]
-        cases.sort(key=lambda case: case.startdatum, reverse=True)
+        return resolved_cases
 
-        return cases
-
-    def resolve_case(self, case: Zaak, group: ZGWApiGroupConfig):
+    def resolve_case(self, case: Zaak, group: ZGWApiGroupConfig) -> Zaak:
         logger.debug("Resolving case %s with group %s", case.identificatie, group)
 
         functions = [
@@ -238,14 +263,15 @@ class CaseListService:
                 futures = [executor.submit(func, case) for func in functions]
 
             for task in concurrent.futures.as_completed(
-                futures, timeout=self._fetch_task_timeout
+                futures,
+                timeout=self._thread_timeouts["resolve_case_instance"],
             ):
-                if exc := task.exception():
-                    logger.error("Error in resolving case: %s", exc, stack_info=True)
-
-                update_case = task.result()
-                if hasattr(update_case, "__call__"):
-                    update_case(case)
+                try:
+                    update_case = task.result()
+                    if hasattr(update_case, "__call__"):
+                        update_case(case)
+                except BaseException:
+                    logger.exception("Error in resolving case", stack_info=True)
 
         try:
             zaaktype_config = ZaakTypeConfig.objects.filter_case_type(
@@ -270,6 +296,8 @@ class CaseListService:
                 case.identificatie,
                 exc_info=True,
             )
+
+        return case
 
     @staticmethod
     def _resolve_zaak_type(
