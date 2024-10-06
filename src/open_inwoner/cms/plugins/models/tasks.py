@@ -1,12 +1,8 @@
-import json
-
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-import requests
 from cms.models import CMSPlugin
 from objectsapiclient.models import Configuration, ObjectTypeField
-from zgw_consumers.constants import APITypes
 
 
 class TasksConfig(CMSPlugin):
