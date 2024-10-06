@@ -33,6 +33,11 @@ asn1crypto==1.5.1
     #   webauthn
 astroid==2.15.8
     # via pylint
+async-timeout==4.0.3
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   redis
 attrs==21.2.0
     # via
     #   -c requirements/base.txt
@@ -234,6 +239,7 @@ django==4.2.20
     #   mozilla-django-oidc-db
     #   notifications-api-common
     #   sentry-sdk
+    #   objects-api-client-django
     #   zgw-consumers
     #   zgw-consumers-oas
 django-admin-index==3.1.0
@@ -457,6 +463,7 @@ django-solo==2.2.0
     #   django-open-forms-client
     #   mozilla-django-oidc-db
     #   notifications-api-common
+    #   objects-api-client-django
     #   zgw-consumers
 django-timeline-logger==4.0.0
     # via
@@ -762,6 +769,10 @@ oath==1.4.4
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+objects-api-client-django @ git+https://github.com/maykinmedia/objects-api-client-django.git
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
 odfpy==1.4.1
     # via
     #   -c requirements/base.txt
@@ -978,6 +989,7 @@ requests==2.31.0
     #   maykin-python3-saml
     #   messagebird
     #   mozilla-django-oidc
+    #   objects-api-client-django
     #   requests-mock
     #   sphinx
     #   zgw-consumers
@@ -1184,6 +1196,7 @@ zgw-consumers==0.36.1
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   notifications-api-common
+    #   objects-api-client-django
 zgw-consumers-oas==1.0.0
     # via
     #   -c requirements/base.txt

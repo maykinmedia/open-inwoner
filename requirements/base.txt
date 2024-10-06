@@ -12,6 +12,8 @@ asgiref==3.7.2
     # via django
 asn1crypto==1.5.1
     # via webauthn
+async-timeout==4.0.3
+    # via redis
 attrs==21.2.0
     # via
     #   glom
@@ -142,6 +144,7 @@ django==4.2.20
     #   mozilla-django-oidc-db
     #   notifications-api-common
     #   sentry-sdk
+    #   objects-api-client-django
     #   zgw-consumers
     #   zgw-consumers-oas
 django-admin-index==3.1.0
@@ -270,6 +273,7 @@ django-solo==2.2.0
     #   django-open-forms-client
     #   mozilla-django-oidc-db
     #   notifications-api-common
+    #   objects-api-client-django
     #   zgw-consumers
 django-timeline-logger==4.0.0
     # via -r requirements/base.in
@@ -411,6 +415,8 @@ notifications-api-common==0.2.2
     # via -r requirements/base.in
 oath==1.4.4
     # via -r requirements/base.in
+objects-api-client-django @ git+https://github.com/maykinmedia/objects-api-client-django.git
+    # via -r requirements/base.in
 odfpy==1.4.1
     # via tablib
 openpyxl==3.0.9
@@ -515,6 +521,7 @@ requests==2.31.0
     #   maykin-python3-saml
     #   messagebird
     #   mozilla-django-oidc
+    #   objects-api-client-django
     #   zgw-consumers
 ruamel-yaml==0.18.10
     # via django-setup-configuration
@@ -604,6 +611,7 @@ zgw-consumers==0.36.1
     # via
     #   -r requirements/base.in
     #   notifications-api-common
+    #   objects-api-client-django
 zgw-consumers-oas==1.0.0
     # via -r requirements/base.in
 zopfli==0.1.9
