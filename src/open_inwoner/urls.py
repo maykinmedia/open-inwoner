@@ -193,15 +193,6 @@ if settings.DEBUG:
             "style-demo/",
             TemplateView.as_view(template_name="components/Typography/StyleDemo.html"),
         ),
-        # Temorary URLs to view front-end for Hackathon
-        path(
-          "myservices/",
-          TemplateView.as_view(template_name="pages/myservices/myservices-list.html"),
-        ),
-        path(
-          "myservices/detail-1/",
-          TemplateView.as_view(template_name="pages/myservices/service-detail.html"),
-        ),
         # fix annoying favicon http error
         path("favicon.ico", RedirectView.as_view(url="/static/ico/favicon.png")),
     ] + urlpatterns
