@@ -1,7 +1,52 @@
-Berichten List. 
+{% extends 'master.html' %}
+{% load i18n button_tags card_tags map_tags utils icon_tags file_tags action_tags dropdown_tags anchor_menu_tags %}
 
-{% for bericht in berichten %} 
+{% block content %}
 
-{{ bericht.berichtTekst }} 
+    <div class="berichtenlist">
+        <h1 class="utrecht-heading-1" id="title">
+            Mijn berichten
+        </h1>
+        <p class="utrecht-paragraph">Welkom in uw berichten centrum. Hier vindt u een overzicht van uw notificaties.</p>
 
-{% endfor %}
+        <div class="berichtenlist__table">
+            <table class="table plans-extended">
+                <thead class="table__heading">
+                <tr>
+                    <td class="table__item" colspan="4">Onderwerp</td>
+                    <td class="table__item">Einddatum</td>
+                    <td class="table__item">Status</td>
+                    <td class="table__item">Bericht type</td>
+                </tr>
+                </thead>
+                <tbody>
+
+                {% for bericht in berichten %}
+                    <tr>
+                        <td class="table__header" colspan="4">
+                            <a href="{{ bericht.object_uuid }}" class="link" aria-label="{{ bericht.berichtTekst }} " title="{{ bericht.berichtTekst }} ">
+                                <span class="link__text">{{ bericht.onderwerp }}</span>
+                            </a>
+                        </td>
+                        <td class="table__item table__item--no-lb">{{ bericht.publicatiedatum }}</td>
+                        <td class="table__item">
+                            <div class="table__item--notification-danger">
+                                {% if bericht.geopend %}
+                                    <span>V</span> Goepend
+                                {% else %}
+                                    <span>X</span> Niet goepend
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="table__item">{{ bericht.berichtType }}</td>
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+            </table>
+
+            {#        end service list#}
+        </div>
+
+    </div>
+{% endblock %}

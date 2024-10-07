@@ -1,3 +1,97 @@
 Bericht Detail.
 
-{{ bericht.berichtTekst }} 
+
+{% extends 'master.html' %}
+{% load i18n button_tags utils icon_tags anchor_menu_tags %}
+
+{% block content %}
+
+    <div class="berichtdetail column column--start-0 column--span-8">
+        <div class="denhaag-page-content__header">
+            <h1 class="utrecht-heading-1" id="title">
+                {{ bericht.onderwerp }}
+            </h1>
+            <p class="utrecht-paragraph"> Bericht ontvangen op {{ bericht.publicatiedatum }}</p>
+        </div>
+        <div class="denhaag-action denhaag-action--multi denhaag-page-content__task">
+            <div class="denhaag-action__content">{{ bericht.onderwerp }}</div>
+            <div class="denhaag-action__details">
+                <div class="denhaag-action__date denhaag-action__date--warning">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="none" viewBox="0 0 20 21" class="denhaag-action__warning-icon" focusable="false" aria-hidden="true" shape-rendering="auto">
+                        <g stroke-linecap="round" stroke-linejoin="round" stroke-width="2" clip-path="url(#alert-triangle-filled_svg__a)">
+                            <path fill="#E15601" stroke="#E15601" d="M8.575 3.717 1.516 15.5A1.667 1.667 0 0 0 2.941 18h14.117a1.665 1.665 0 0 0 1.425-2.5L11.425 3.717a1.667 1.667 0 0 0-2.85 0"></path>
+                            <path stroke="#fff" d="M10 14.667h.008M10 8v3.333"></path>
+                        </g>
+                        <defs>
+                            <clipPath id="alert-triangle-filled_svg__a">
+                                <path fill="#fff" d="M0 .5h20v20H0z"></path>
+                            </clipPath>
+                        </defs>
+                    </svg>
+                    <time datetime="2023-09-30T19:47:36.593Z">nog 1 dag</time>
+                </div>
+                <div class="denhaag-action__actions"><a href="#example" class="utrecht-button-link utrecht-button-link--html-a utrecht-button-link--external" rel="external noopener noreferrer">Betalen</a></div>
+            </div>
+        </div>
+        <p class="utrecht-paragraph denhaag-page-content__message">{{ bericht.berichtTekst }}</p>
+        <div class="denhaag-action denhaag-action--multi denhaag-page-content__task">
+            <div class="denhaag-action__content">{{ bericht.handelingsperspectief }}</div>
+            <div>
+                <h2>Bijlagen</h2>
+                {% for attachment in bericht.bijlages %}
+                    <a href="{{ attachment }}" download="Example" class="denhaag-file" aria-labelledby="name" aria-describedby="description">
+                        <div class="denhaag-file__left">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="none" viewBox="0 0 24 25" class="denhaag-icon denhaag-file__icon" focusable="false" aria-hidden="true" shape-rendering="auto">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 3.5H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-14a2 2 0 0 0-2-2"></path>
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.5 10.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3M21 15.5l-5-5-11 11"></path>
+                            </svg>
+                        </div>
+                        <div class="denhaag-file__right">
+                            <div class="denhaag-file__label"><span id="name">Example </span><span id="description">(png, 2000, 31/08/2023)</span></div>
+                            <div class="denhaag-file__link">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" class="denhaag-icon denhaag-file__link__icon" focusable="false" aria-hidden="true" shape-rendering="auto">
+                                    <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 13v4a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-4M5 8l5 5 5-5M10 13V1"></path>
+                                </svg>
+                                <div class="utrecht-link" tabindex="-1">Download</div>
+                            </div>
+                        </div>
+                    </a><a href="{{ attachment }}" download="Example" class="denhaag-file" aria-labelledby="name" aria-describedby="description">
+                    <div class="denhaag-file__left">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="none" viewBox="0 0 24 25" class="denhaag-icon denhaag-file__icon" focusable="false" aria-hidden="true" shape-rendering="auto">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 3.5H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-14a2 2 0 0 0-2-2"></path>
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.5 10.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3M21 15.5l-5-5-11 11"></path>
+                        </svg>
+                    </div>
+                    <div class="denhaag-file__right">
+                        <div class="denhaag-file__label"><span id="name">Example </span><span id="description">(png, 2000, 31/08/2023)</span></div>
+                        <div class="denhaag-file__link">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" class="denhaag-icon denhaag-file__link__icon" focusable="false" aria-hidden="true" shape-rendering="auto">
+                                <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 13v4a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-4M5 8l5 5 5-5M10 13V1"></path>
+                            </svg>
+                            <div class="utrecht-link" tabindex="-1">Download</div>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+
+            </div>
+            <div class="denhaag-action__details">
+                <div class="denhaag-action__date denhaag-action__date--warning">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="none" viewBox="0 0 20 21" class="denhaag-action__warning-icon" focusable="false" aria-hidden="true" shape-rendering="auto">
+                        <g stroke-linecap="round" stroke-linejoin="round" stroke-width="2" clip-path="url(#alert-triangle-filled_svg__a)">
+                            <path fill="#E15601" stroke="#E15601" d="M8.575 3.717 1.516 15.5A1.667 1.667 0 0 0 2.941 18h14.117a1.665 1.665 0 0 0 1.425-2.5L11.425 3.717a1.667 1.667 0 0 0-2.85 0"></path>
+                            <path stroke="#fff" d="M10 14.667h.008M10 8v3.333"></path>
+                        </g>
+                        <defs>
+                            <clipPath id="alert-triangle-filled_svg__a">
+                                <path fill="#fff" d="M0 .5h20v20H0z"></path>
+                            </clipPath>
+                        </defs>
+                    </svg>
+                    <time datetime="2023-09-30T19:47:36.593Z">nog 1 dag</time>
+                </div>
+                <div class="denhaag-action__actions"><a href="#example" class="utrecht-button-link utrecht-button-link--html-a utrecht-button-link--external" rel="external noopener noreferrer">{{ bericht.handelingsperspectief }}</a></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
