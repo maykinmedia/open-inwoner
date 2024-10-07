@@ -7,13 +7,13 @@
         <h1 class="utrecht-heading-1" id="title">
             Mijn berichten
         </h1>
-        <p class="utrecht-paragraph">Welkom in uw berichten centrum. Hier vindt u een overzicht van uw notificaties.</p>
+        <p class="utrecht-paragraph">Welkom in uw berichtencentrum. Hier vindt u een overzicht van uw notificaties.</p>
 
         <div class="berichtenlist__table">
             <table class="table plans-extended">
                 <thead class="table__heading">
                 <tr>
-                    <td class="table__item" colspan="4">Onderwerp</td>
+                    <td class="table__item berichtenlist__table-item--wide">Onderwerp</td>
                     <td class="table__item">Einddatum</td>
                     <td class="table__item">Status</td>
                     <td class="table__item">Bericht type</td>
@@ -23,9 +23,9 @@
 
                 {% for bericht in berichten %}
                     <tr>
-                        <td class="table__header" colspan="4">
+                        <td class="table__header berichtenlist__table-item--wide">
                             <a href="{{ bericht.object_uuid }}" class="link" aria-label="{{ bericht.berichtTekst }} " title="{{ bericht.berichtTekst }} ">
-                                <span class="link__text">{{ bericht.onderwerp }}</span>
+                                <span class="link__text {% if not bericht.geopend %}berichtenlist--unread{% endif %}">{{ bericht.onderwerp }}</span>
                             </a>
                         </td>
                         <td class="table__item table__item--no-lb">{{ bericht.publicatiedatum }}</td>
