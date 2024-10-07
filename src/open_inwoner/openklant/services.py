@@ -146,8 +146,16 @@ class OpenKlant2Question:
 class OpenKlant2Service:
 
     client: OpenKlant2Client
+
+    # TODO: When we hook up this service to the main application flows, these
+    # constants should be turned into configurable parameters.
     mijn_vragen_actor: uuid.UUID | None
-    MIJN_VRAGEN_KANAAL: str = "oip_mijn_vragen"
+    VRAGEN_DEFAULTS = {
+        "kanaal": "oip_mijn_vragen",
+        "oip_organisatie_naam": "Open Inwoner Platform",
+        "interne_taak_gevraagde_handeling": "Beantwoorden vraag Mijn Omgeving",
+        "interne_taak_toelichting": "Beantwoorden vraag",
+    }
 
     def __init__(
         self, client: OpenKlant2Client, mijn_vragen_actor: str | uuid.UUID | None = None
@@ -466,7 +474,7 @@ class OpenKlant2Service:
                 "inhoud": question,
                 "onderwerp": subject,
                 "taal": "nld",
-                "kanaal": self.MIJN_VRAGEN_KANAAL,
+                "kanaal": self.VRAGEN_DEFAULTS["kanaal"],
                 "vertrouwelijk": False,
                 "plaatsgevondenOp": timezone.now().isoformat(),
             }
@@ -479,7 +487,7 @@ class OpenKlant2Service:
                 "hadKlantcontact": {"uuid": klantcontact["uuid"]},
                 "initiator": True,
                 "wasPartij": {"uuid": partij["uuid"]},
-                "organisatienaam": "Open Inwoner Platform",
+                "organisatienaam": self.VRAGEN_DEFAULTS["oip_organisatie_naam"],
             }
         )
         logger.info("Created betrokkene: %s", betrokkene["uuid"])
@@ -487,8 +495,10 @@ class OpenKlant2Service:
         taak = self.client.interne_taak.create(
             data={
                 "aanleidinggevendKlantcontact": {"uuid": klantcontact["uuid"]},
-                "toelichting": "Beantwoorden vraag",
-                "gevraagdeHandeling": "Vraag beantwoorden in aanleiding gevend klant contact",
+                "toelichting": self.VRAGEN_DEFAULTS["interne_taak_toelichting"],
+                "gevraagdeHandeling": self.VRAGEN_DEFAULTS[
+                    "interne_taak_gevraagde_handeling"
+                ],
                 "status": "te_verwerken",
                 "toegewezenAanActor": {"uuid": str(self.mijn_vragen_actor)},
             }
@@ -513,7 +523,7 @@ class OpenKlant2Service:
                 "inhoud": answer,
                 "onderwerp": question_klantcontact["onderwerp"],
                 "taal": "nld",
-                "kanaal": self.MIJN_VRAGEN_KANAAL,
+                "kanaal": self.VRAGEN_DEFAULTS["kanaal"],
                 "vertrouwelijk": False,
                 "plaatsgevondenOp": timezone.now().isoformat(),
             }
@@ -525,7 +535,7 @@ class OpenKlant2Service:
                 "hadKlantcontact": {"uuid": answer_klantcontact["uuid"]},
                 "initiator": True,
                 "wasPartij": {"uuid": partij["uuid"]},
-                "organisatienaam": "Open Inwoner Platform",
+                "organisatienaam": self.VRAGEN_DEFAULTS["oip_organisatie_naam"],
             }
         )
 
@@ -555,7 +565,7 @@ class OpenKlant2Service:
                     "hadBetrokkenen",
                     "hadBetrokkenen.wasPartij",
                 ],
-                "kanaal": self.MIJN_VRAGEN_KANAAL,
+                "kanaal": self.VRAGEN_DEFAULTS["kanaal"],
             }
         )
 

@@ -350,7 +350,7 @@ class QuestionAnswerTestCase(Openklant2ServiceTestCase):
         (betrokkene,) = self.service.client.betrokkene.list_iter()
         (taak,) = self.service.client.interne_taak.list_iter()
 
-        self.assertEqual(klantcontact["kanaal"], self.service.MIJN_VRAGEN_KANAAL)
+        self.assertEqual(klantcontact["kanaal"], self.service.VRAGEN_DEFAULTS["kanaal"])
         self.assertEqual(betrokkene["hadKlantcontact"]["uuid"], klantcontact["uuid"])
         self.assertEqual(betrokkene["wasPartij"]["uuid"], self.een_persoon["uuid"])
         self.assertEqual(
