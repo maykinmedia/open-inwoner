@@ -58,18 +58,18 @@ def update_user_from_klant(klant: Klant, user: User):
             klant.toestemming_zaak_notificaties_alleen_digitaal is True
             and user.case_notification_channel != NotificationChannelChoice.digital_only
         ):
-            update_data[
-                "case_notification_channel"
-            ] = NotificationChannelChoice.digital_only
+            update_data["case_notification_channel"] = (
+                NotificationChannelChoice.digital_only
+            )
 
         elif (
             klant.toestemming_zaak_notificaties_alleen_digitaal is False
             and user.case_notification_channel
             != NotificationChannelChoice.digital_and_post
         ):
-            update_data[
-                "case_notification_channel"
-            ] = NotificationChannelChoice.digital_and_post
+            update_data["case_notification_channel"] = (
+                NotificationChannelChoice.digital_and_post
+            )
         else:
             # This is a guard against the scenario where a deployment is
             # configured to use an older version of the klanten backend (that
@@ -148,6 +148,16 @@ class OpenKlant2Service:
     client: OpenKlant2Client
     mijn_vragen_actor: uuid.UUID | None
     MIJN_VRAGEN_KANAAL: str = "oip_mijn_vragen"
+    ORGANISATIE_NAAM: str = "Open Inwoner Platform"
+    VRAAG_INTERNE_TAAK_GEVRAAGDE_HANDELING = "Beantwoorden vraag Mijn Omgeving"
+    VRAAG_INTERNE_TAAK_TOELICHTING = "Beantwoorden vraag"
+
+    VRAGEN_DEFAULTS = {
+        "kanaal": "oip_mijn_vragen",
+        "oip_organisatie_naam": "Open Inwoner Platform",
+        "interne_taak_gevraagde_handeling": "Beantwoorden vraag Mijn Omgeving",
+        "interne_taak_toelichting": "Beantwoorden vraag",
+    }
 
     def __init__(
         self, client: OpenKlant2Client, mijn_vragen_actor: str | uuid.UUID | None = None
@@ -479,7 +489,7 @@ class OpenKlant2Service:
                 "hadKlantcontact": {"uuid": klantcontact["uuid"]},
                 "initiator": True,
                 "wasPartij": {"uuid": partij["uuid"]},
-                "organisatienaam": "Open Inwoner Platform",
+                "organisatienaam": self.ORGANISATIE_NAAM,
             }
         )
         logger.info("Created betrokkene: %s", betrokkene["uuid"])
@@ -487,8 +497,8 @@ class OpenKlant2Service:
         taak = self.client.interne_taak.create(
             data={
                 "aanleidinggevendKlantcontact": {"uuid": klantcontact["uuid"]},
-                "toelichting": "Beantwoorden vraag",
-                "gevraagdeHandeling": "Vraag beantwoorden in aanleiding gevend klant contact",
+                "toelichting": self.VRAAG_INTERNE_TAAK_TOELICHTING,
+                "gevraagdeHandeling": self.VRAAG_INTERNE_TAAK_GEVRAAGDE_HANDELING,
                 "status": "te_verwerken",
                 "toegewezenAanActor": {"uuid": str(self.mijn_vragen_actor)},
             }
@@ -525,7 +535,7 @@ class OpenKlant2Service:
                 "hadKlantcontact": {"uuid": answer_klantcontact["uuid"]},
                 "initiator": True,
                 "wasPartij": {"uuid": partij["uuid"]},
-                "organisatienaam": "Open Inwoner Platform",
+                "organisatienaam": self.ORGANISATIE_NAAM,
             }
         )
 
@@ -576,9 +586,9 @@ class OpenKlant2Service:
         klantcontact_uuid_to_klantcontact_object = {}
 
         for klantcontact in self.klantcontacten_for_partij(partij):
-            klantcontact_uuid_to_klantcontact_object[
-                klantcontact["uuid"]
-            ] = klantcontact
+            klantcontact_uuid_to_klantcontact_object[klantcontact["uuid"]] = (
+                klantcontact
+            )
 
             # A klantcontact is an answer if it is linked to a Question via an onderwerp object
             if onderwerp_objecten := klantcontact["gingOverOnderwerpobjecten"]:
