@@ -20,15 +20,17 @@ from ..api_models import BaseCategory
 from ..models import Price, PriceOption
 from .factories import PriceOptionFactory
 from .helpers import (
-    _create_condition,
-    _create_file,
     _create_file_instance,
-    _create_link,
-    _create_price,
-    _create_product_type,
-    _create_question,
-    _create_tag,
-    _create_tag_type,
+    create_complete_product_type,
+    create_condition,
+    create_file,
+    create_link,
+    create_price,
+    create_product_type,
+    create_question,
+    create_tag,
+    create_tag_type,
+    get_all_product_type_objects,
 )
 
 
@@ -67,7 +69,7 @@ class TestProductTypeImporter(TestCase):
                         open_producten_uuid=uuid, name="abc"
                     )
 
-                tag_type = _create_tag_type(uuid)
+                tag_type = create_tag_type(uuid)
 
                 importer = ProductTypeImporter(self.client)
                 instance = importer._update_or_create_tag_type(tag_type)
@@ -91,12 +93,13 @@ class TestProductTypeImporter(TestCase):
                 if not create:
                     TagFactory.create(open_producten_uuid=tag_uuid, name="abc")
 
-                tag = _create_tag(tag_uuid)
+                tag = create_tag(tag_uuid)
 
                 importer = ProductTypeImporter(self.client)
                 instance = importer._update_or_create_tag(tag)
 
                 self.assertEqual(pdc_models.Tag.objects.count(), 1)
+                self.assertEqual(pdc_models.TagType.objects.count(), 1)
                 self.assertEqual(instance.open_producten_uuid, tag_uuid)
                 self.assertEqual(instance.name, tag.name)
 
@@ -116,7 +119,7 @@ class TestProductTypeImporter(TestCase):
                 if not create:
                     ProductConditionFactory(open_producten_uuid=uuid)
 
-                condition = _create_condition(uuid)
+                condition = create_condition(uuid)
 
                 importer = ProductTypeImporter(self.client)
                 instance = importer._update_or_create_condition(condition)
@@ -147,7 +150,7 @@ class TestProductTypeImporter(TestCase):
                         product=product,
                     )
 
-                link = _create_link(uuid)
+                link = create_link(uuid)
                 importer = ProductTypeImporter(self.client)
                 importer._update_or_create_link(link, product)
 
@@ -178,7 +181,7 @@ class TestProductTypeImporter(TestCase):
                         product=product,
                     )
 
-                file = _create_file(uuid)
+                file = create_file(uuid)
                 importer = ProductTypeImporter(self.client)
                 importer._update_or_create_file(file, product)
 
@@ -208,7 +211,7 @@ class TestProductTypeImporter(TestCase):
                         product_type=product,
                     )
 
-                price = _create_price(uuid)
+                price = create_price(uuid)
 
                 importer = ProductTypeImporter(self.client)
                 importer._update_or_create_price(price, product)
@@ -238,7 +241,7 @@ class TestProductTypeImporter(TestCase):
                 if not create:
                     ProductFactory.create(open_producten_uuid=uuid)
 
-                product_type = _create_product_type(uuid)
+                product_type = create_product_type(uuid)
 
                 importer = ProductTypeImporter(self.client)
                 instance = importer._update_or_create_product_type(product_type)
@@ -269,7 +272,7 @@ class TestProductTypeImporter(TestCase):
                         product=product,
                     )
 
-                question = _create_question(uuid)
+                question = create_question(uuid)
 
                 importer = ProductTypeImporter(self.client)
                 importer._update_or_create_question(question, product)
@@ -287,19 +290,19 @@ class TestProductTypeImporter(TestCase):
         product_type_uuid = uuid4()
         category_uuid = uuid4()
 
-        tag = _create_tag(uuid4())
-        condition = _create_condition(uuid4())
+        tag = create_tag(uuid4())
+        condition = create_condition(uuid4())
 
-        link = _create_link(uuid4())
-        question = _create_question(uuid4())
-        file = _create_file(uuid4())
+        link = create_link(uuid4())
+        question = create_question(uuid4())
+        file = create_file(uuid4())
 
         product_type_instance = ProductFactory.create(
             open_producten_uuid=product_type_uuid
         )
         CategoryFactory.create(open_producten_uuid=category_uuid)
 
-        product_type = _create_product_type(product_type_uuid)
+        product_type = create_product_type(product_type_uuid)
         product_type.tags = [tag]
         product_type.conditions = [condition]
         product_type.categories = [BaseCategory(id=category_uuid)]
@@ -338,7 +341,7 @@ class TestProductTypeImporter(TestCase):
 
         ProductFactory(open_producten_uuid=related_type_uuid)
         product_type_instance = ProductFactory.create(open_producten_uuid=uuid4())
-        related_product_type = _create_product_type(related_type_uuid)
+        related_product_type = create_product_type(related_type_uuid)
 
         importer = ProductTypeImporter(self.client)
         importer.product_types = [related_product_type]
@@ -358,7 +361,7 @@ class TestProductTypeImporter(TestCase):
 
         ProductFactory(open_producten_uuid=related_type_uuid)
         product_type_instance = ProductFactory.create(open_producten_uuid=uuid4())
-        related_product_type = _create_product_type(related_type_uuid)
+        related_product_type = create_product_type(related_type_uuid)
 
         importer = ProductTypeImporter(self.client)
         importer.product_types = [related_product_type]
@@ -382,7 +385,7 @@ class TestProductTypeImporter(TestCase):
     ):
         importer = ProductTypeImporter(self.client)
 
-        product_type = _create_product_type(uuid4())
+        product_type = create_product_type(uuid4())
         importer._handle_product_type(product_type)
 
         mock_handle_related_product_types.assert_called_once()
@@ -402,7 +405,7 @@ class TestProductTypeImporter(TestCase):
 
         importer = ProductTypeImporter(self.client)
         importer.handled_product_types = {uuid}
-        product_type = _create_product_type(uuid)
+        product_type = create_product_type(uuid)
         importer._handle_product_type(product_type)
 
         mock_handle_related_product_types.assert_not_called()
@@ -410,11 +413,10 @@ class TestProductTypeImporter(TestCase):
 
     def test_circular_product_type_dependency(self):
         importer = ProductTypeImporter(self.client)
-        product_type_a = _create_product_type(uuid4())
-        product_type_b = _create_product_type(uuid4())
+        product_type_a = create_product_type(uuid4(), "a")
+        product_type_b = create_product_type(uuid4(), "b")
         product_type_a.related_product_types.append(product_type_b.id)
         product_type_b.related_product_types.append(product_type_a.id)
-        product_type_b.name = "def"
 
         self.client.fetch_producttypes_no_cache.return_value = [
             product_type_a,
@@ -478,5 +480,85 @@ class TestProductTypeImporter(TestCase):
         importer._delete_non_updated_objects()
         self.assertEqual(importer.deleted_count, 0)
 
-    def test_complete_import(self):  # TODO
-        ...
+    def test_complete_import_with_new_objects(self):
+        related_product_type = create_product_type(uuid4())
+        product_type = create_complete_product_type("test2")
+        product_type.related_product_types.append(related_product_type.id)
+
+        self.client.fetch_producttypes_no_cache.return_value = [
+            product_type,
+            related_product_type,
+        ]
+        importer = ProductTypeImporter(self.client)
+        created, updated, deleted = importer.import_producttypes()
+
+        self.assertEqual(pdc_models.Product.objects.count(), 2)
+        self.assertEqual(pdc_models.ProductCondition.objects.count(), 1)
+        self.assertEqual(pdc_models.Tag.objects.count(), 1)
+        self.assertEqual(pdc_models.TagType.objects.count(), 1)
+        self.assertEqual(pdc_models.ProductLink.objects.count(), 1)
+        self.assertEqual(Price.objects.count(), 1)
+        self.assertEqual(PriceOption.objects.count(), 1)
+        self.assertEqual(pdc_models.Question.objects.count(), 1)
+
+        all_objects = get_all_product_type_objects()
+
+        self.assertEqual(updated, [])
+        self.assertEqual(deleted, 0)
+        self.assertEqual(
+            sorted([obj.open_producten_uuid for obj in created]),
+            sorted([obj.open_producten_uuid for obj in all_objects]),
+        )
+
+    def test_complete_import_with_existing_objects(self):
+        related_product_type = create_product_type(uuid4())
+        product_type = create_complete_product_type("test2")
+        product_type.related_product_types.append(related_product_type.id)
+
+        self.client.fetch_producttypes_no_cache.return_value = [
+            product_type,
+            related_product_type,
+        ]
+        importer = ProductTypeImporter(self.client)
+        importer.import_producttypes()
+
+        importer = ProductTypeImporter(self.client)
+        created, updated, deleted = importer.import_producttypes()
+
+        self.assertEqual(pdc_models.Product.objects.count(), 2)
+        self.assertEqual(pdc_models.ProductCondition.objects.count(), 1)
+        self.assertEqual(pdc_models.Tag.objects.count(), 1)
+        self.assertEqual(pdc_models.TagType.objects.count(), 1)
+        self.assertEqual(pdc_models.ProductLink.objects.count(), 1)
+        self.assertEqual(Price.objects.count(), 1)
+        self.assertEqual(PriceOption.objects.count(), 1)
+        self.assertEqual(pdc_models.Question.objects.count(), 1)
+
+        all_objects = get_all_product_type_objects()
+
+        self.assertEqual(created, [])
+        self.assertEqual(deleted, 0)
+        self.assertEqual(
+            sorted([obj.open_producten_uuid for obj in updated]),
+            sorted([obj.open_producten_uuid for obj in all_objects]),
+        )
+
+    def test_complete_import_without_objects(self):
+        related_product_type = create_product_type(uuid4())
+        product_type = create_complete_product_type("test2")
+        product_type.related_product_types.append(related_product_type.id)
+
+        self.client.fetch_producttypes_no_cache.return_value = [
+            product_type,
+            related_product_type,
+        ]
+        importer = ProductTypeImporter(self.client)
+        importer.import_producttypes()
+
+        self.client.fetch_producttypes_no_cache.return_value = []
+        importer = ProductTypeImporter(self.client)
+        created, updated, deleted = importer.import_producttypes()
+
+        self.assertEqual(created, [])
+        self.assertEqual(updated, [])
+        self.assertEqual(deleted, 9)

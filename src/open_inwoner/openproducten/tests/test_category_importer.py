@@ -7,7 +7,12 @@ import open_inwoner.pdc.models as pdc_models
 from open_inwoner.openproducten.producttypes_imports import CategoryImporter
 from open_inwoner.pdc.tests.factories import CategoryFactory, QuestionFactory
 
-from .helpers import _create_category, _create_question
+from .helpers import (
+    create_category,
+    create_complete_category,
+    create_question,
+    get_all_category_objects,
+)
 
 
 class TestCategoryImporter(TestCase):
@@ -39,7 +44,7 @@ class TestCategoryImporter(TestCase):
                 if not create:
                     CategoryFactory.create(open_producten_uuid=uuid)
 
-                category = _create_category(uuid)
+                category = create_category(uuid)
 
                 importer = CategoryImporter(self.client)
                 instance = importer._update_or_create_category(category)
@@ -156,7 +161,7 @@ class TestCategoryImporter(TestCase):
                         category=category,
                     )
 
-                question = _create_question(uuid)
+                question = create_question(uuid)
 
                 importer = CategoryImporter(self.client)
                 importer._update_or_create_question(question, category=category)
@@ -177,7 +182,7 @@ class TestCategoryImporter(TestCase):
         self, mock_handle_category_parent
     ):
         category_uuid = uuid4()
-        category = _create_category(category_uuid)
+        category = create_category(category_uuid)
         importer = CategoryImporter(self.client)
         importer._handle_category(category)
 
@@ -190,7 +195,7 @@ class TestCategoryImporter(TestCase):
         self, mock_handle_category_parent
     ):
         category_uuid = uuid4()
-        category = _create_category(category_uuid)
+        category = create_category(category_uuid)
         importer = CategoryImporter(self.client)
         importer.handled_categories = {category_uuid}
         importer._handle_category(category)
@@ -204,7 +209,7 @@ class TestCategoryImporter(TestCase):
         self, mock_handle_category
     ):
         category_uuid = uuid4()
-        category = _create_category(category_uuid)
+        category = create_category(category_uuid)
         importer = CategoryImporter(self.client)
         importer.categories = [category]
         importer._handle_category_parent(category_uuid)
@@ -251,5 +256,73 @@ class TestCategoryImporter(TestCase):
         importer._delete_non_updated_objects()
         self.assertEqual(importer.deleted_count, 0)
 
-    def test_complete_import(self):  # TODO
-        ...
+    def test_complete_import_with_new_objects(self):
+        parent = create_category(uuid4())
+        category = create_complete_category("test2")
+        category.parent_category = parent.id
+
+        self.client.fetch_categories_no_cache.return_value = [
+            category,
+            parent,
+        ]
+        importer = CategoryImporter(self.client)
+        created, updated, deleted = importer.import_categories()
+
+        self.assertEqual(pdc_models.Category.objects.count(), 2)
+        self.assertEqual(pdc_models.Question.objects.count(), 1)
+
+        all_objects = get_all_category_objects()
+
+        self.assertEqual(updated, [])
+        self.assertEqual(deleted, 0)
+        self.assertEqual(
+            sorted([obj.open_producten_uuid for obj in created]),
+            sorted([obj.open_producten_uuid for obj in all_objects]),
+        )
+
+    def test_complete_import_with_existing_objects(self):
+        parent = create_category(uuid4())
+        category = create_complete_category("test2")
+        category.parent_category = parent.id
+
+        self.client.fetch_categories_no_cache.return_value = [
+            category,
+            parent,
+        ]
+        importer = CategoryImporter(self.client)
+        importer.import_categories()
+
+        importer = CategoryImporter(self.client)
+        created, updated, deleted = importer.import_categories()
+
+        self.assertEqual(pdc_models.Category.objects.count(), 2)
+        self.assertEqual(pdc_models.Question.objects.count(), 1)
+
+        all_objects = get_all_category_objects()
+
+        self.assertEqual(created, [])
+        self.assertEqual(deleted, 0)
+        self.assertEqual(
+            sorted([obj.open_producten_uuid for obj in updated]),
+            sorted([obj.open_producten_uuid for obj in all_objects]),
+        )
+
+    def test_complete_import_without_objects(self):
+        parent = create_category(uuid4())
+        category = create_complete_category("test2")
+        category.parent_category = parent.id
+
+        self.client.fetch_categories_no_cache.return_value = [
+            category,
+            parent,
+        ]
+        importer = CategoryImporter(self.client)
+        importer.import_categories()
+
+        self.client.fetch_categories_no_cache.return_value = []
+        importer = CategoryImporter(self.client)
+        created, updated, deleted = importer.import_categories()
+
+        self.assertEqual(created, [])
+        self.assertEqual(updated, [])
+        self.assertEqual(deleted, 3)

@@ -10,7 +10,7 @@ from open_inwoner.openproducten.producttypes_imports import (
 from open_inwoner.pdc.models import Tag
 from open_inwoner.pdc.tests.factories import TagFactory
 
-from .helpers import _create_file_object
+from .helpers import create_file_object
 
 
 class TestOpenProductenImporter(TestCase):
@@ -51,7 +51,7 @@ class TestOpenProductenImporter(TestCase):
         self.assertIsNone(file)
 
     def test_get_file_returns_file_instance_when_client_returns_file(self):
-        self.client.fetch_file.return_value = _create_file_object(b"content")
+        self.client.fetch_file.return_value = create_file_object(b"content")
         importer = OpenProductenImporterMixin(self.client)
         file = importer._get_file("test/media/file.txt")
 
@@ -65,7 +65,7 @@ class TestOpenProductenImporter(TestCase):
         self.assertIsNone(file)
 
     def test_get_image_returns_file_instance_when_client_returns_file(self):
-        self.client.fetch_file.return_value = _create_file_object(b"content")
+        self.client.fetch_file.return_value = create_file_object(b"content")
         importer = OpenProductenImporterMixin(self.client)
         file = importer._get_image("test/media/file.png")
 

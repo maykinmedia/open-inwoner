@@ -1,4 +1,5 @@
 import logging
+from decimal import Decimal
 from typing import TypeVar
 
 from django.db import models, transaction
@@ -297,7 +298,7 @@ class ProductTypeImporter(OpenProductenImporterMixin):
             defaults={
                 "open_producten_uuid": price_option.id,
                 "description": price_option.description,
-                "amount": price_option.amount,
+                "amount": Decimal(price_option.amount),
                 "price": price_instance,
             },
         )
@@ -340,7 +341,7 @@ class ProductTypeImporter(OpenProductenImporterMixin):
     def _get_count_without_m2m_deletions(self, result):
         count = result[0]
         for k in result[1]:
-            if k in ("pdc.Product_tags", "pdc.Product_conditions"):
+            if "pdc.Product_" in k:
                 count -= result[1][k]
         return count
 

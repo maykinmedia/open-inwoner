@@ -6,6 +6,7 @@ from django.core.files.temp import NamedTemporaryFile
 
 from filer.models.filemodels import File as FilerFile
 
+from open_inwoner.openproducten import models as op_models
 from open_inwoner.openproducten.api_models import (
     Category,
     Condition,
@@ -18,46 +19,47 @@ from open_inwoner.openproducten.api_models import (
     Tag,
     TagType,
 )
+from open_inwoner.pdc import models as pdc_models
 
 
-def _create_file_object(content):
+def create_file_object(content):
     temp_file = NamedTemporaryFile(delete=True)
     temp_file.write(content)
     return DjangoFile(temp_file)
 
 
 def _create_file_instance(content):
-    file = _create_file_object(content)
+    file = create_file_object(content)
     return FilerFile.objects.create(file=file)
 
 
-def _create_tag_type(uuid):
+def create_tag_type(uuid):
     return TagType(id=uuid, name="test tag type")
 
 
-def _create_tag(uuid):
-    return Tag(id=uuid, name="test tag", type=_create_tag_type(uuid4()), icon=None)
+def create_tag(uuid):
+    return Tag(id=uuid, name="test tag", type=create_tag_type(uuid4()), icon=None)
 
 
-def _create_condition(uuid):
+def create_condition(uuid):
     return Condition(
         id=uuid, question="?", positive_text="+", negative_text="-", name="test"
     )
 
 
-def _create_link(uuid):
+def create_link(uuid):
     return Link(id=uuid, name="test tag type", url="https://example.com")
 
 
-def _create_file(uuid):
+def create_file(uuid):
     return File(id=uuid, file="None")
 
 
-def _create_product_type(uuid):
+def create_product_type(uuid, name="product type"):
     return ProductType(
         id=uuid,
         published=False,
-        name="abc",
+        name=name,
         summary="abc",
         icon=None,
         image=None,
@@ -76,15 +78,15 @@ def _create_product_type(uuid):
     )
 
 
-def _create_question(uuid):
+def create_question(uuid):
     return Question(id=uuid, question="?", answer="a")
 
 
-def _create_category(uuid):
+def create_category(uuid, name="category"):
     return Category(
         id=uuid,
         published=False,
-        name="category",
+        name=name,
         description="description",
         icon=None,
         image=None,
@@ -93,17 +95,53 @@ def _create_category(uuid):
     )
 
 
-def _create_price_option(uuid):
+def create_price_option(uuid):
     return PriceOption(
         id=uuid,
-        amount="10",
+        amount="10.00",
         description="description",
     )
 
 
-def _create_price(uuid):
+def create_price(uuid):
     return Price(
         id=uuid,
         valid_from=date.today(),
-        options=[_create_price_option(uuid4()).__dict__],
+        options=[
+            create_price_option(uuid4()).__dict__
+        ],  # __dict__ is needed for zgw_consumers.api_models.Model _type_cast
     )
+
+
+def create_complete_product_type(name):
+    product_type = create_product_type(uuid4(), name=name)
+    product_type.conditions.append(create_condition(uuid4()))
+    product_type.tags.append(create_tag(uuid4()))
+    product_type.links.append(create_link(uuid4()))
+    product_type.prices.append(create_price(uuid4()))
+    product_type.questions.append(create_question(uuid4()))
+    return product_type
+
+
+def get_all_product_type_objects():
+    return [
+        pdc_models.ProductCondition.objects.first(),
+        pdc_models.Tag.objects.first(),
+        pdc_models.TagType.objects.first(),
+        pdc_models.ProductLink.objects.first(),
+        op_models.Price.objects.first(),
+        op_models.PriceOption.objects.first(),
+        pdc_models.Question.objects.first(),
+    ] + list(pdc_models.Product.objects.all())
+
+
+def create_complete_category(name):
+    category = create_category(uuid4(), name)
+    category.questions.append(create_question(uuid4()))
+    return category
+
+
+def get_all_category_objects():
+    return [
+        pdc_models.Question.objects.first(),
+    ] + list(pdc_models.Category.objects.all())
