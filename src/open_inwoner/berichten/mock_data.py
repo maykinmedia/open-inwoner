@@ -1,5 +1,6 @@
 import uuid
 from datetime import date
+
 from open_inwoner.berichten.api_models import Bericht
 
 MOCK_BERICHT_1 = {
