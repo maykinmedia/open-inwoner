@@ -35,7 +35,7 @@
             </div>
         </div>
         <p class="utrecht-paragraph denhaag-page-content__message">berichtTekst: <br>
-            <span>{{ bericht.berichtTekst|linebreaks }}</span></p>
+            <span>{{ bericht.bericht_tekst|linebreaks }}</span></p>
         <div class="denhaag-action denhaag-action--multi denhaag-page-content__task">
             <div class="denhaag-action__content">handelingsperspectief: {{ bericht.handelingsperspectief }}</div>
             <div>
@@ -67,7 +67,7 @@
 
     <script>
             // Get the end date from the Django context
-            const einddatum = new Date("{{ bericht.einddatumHandelingstermijn }}");
+            const einddatum = new Date("{{ bericht.einddatum_handelingstermijn }}");
             const today = new Date();
 
             // Calculate the remaining days
