@@ -37,6 +37,11 @@ asn1crypto==1.5.1
     #   webauthn
 astroid==2.15.8
     # via pylint
+async-timeout==4.0.3
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   redis
 attrs==21.2.0
     # via
     #   -c requirements/base.txt
@@ -238,6 +243,7 @@ django==4.2.16
     #   mozilla-django-oidc
     #   mozilla-django-oidc-db
     #   notifications-api-common
+    #   objects-api-client-django
     #   zgw-consumers
     #   zgw-consumers-oas
 django-admin-index==3.1.0
@@ -460,6 +466,7 @@ django-solo==2.2.0
     #   django-open-forms-client
     #   mozilla-django-oidc-db
     #   notifications-api-common
+    #   objects-api-client-django
     #   zgw-consumers
 django-timeline-logger==3.0.0
     # via
@@ -480,7 +487,6 @@ django-two-factor-auth[phonenumberslite,webauthn]==1.16.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-    #   django-two-factor-auth
     #   maykin-2fa
 django-view-breadcrumbs==2.5.1
     # via
@@ -553,7 +559,6 @@ easy-thumbnails[svg]==2.8.5
     #   -r requirements/base.txt
     #   django-filer
     #   djangocms-picture
-    #   easy-thumbnails
 ecs-logging==2.1.0
     # via
     #   -c requirements/base.txt
@@ -607,7 +612,6 @@ fonttools[woff]==4.43.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-    #   fonttools
     #   weasyprint
 freezegun==1.1.0
     # via -r requirements/test-tools.in
@@ -764,6 +768,10 @@ oath==1.4.4
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+objects-api-client-django @ git+https://github.com/maykinmedia/objects-api-client-django.git
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
 odfpy==1.4.1
     # via
     #   -c requirements/base.txt
@@ -839,7 +847,6 @@ pydantic[email]==2.6.4
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-    #   pydantic
 pydantic-core==2.16.3
     # via
     #   -c requirements/base.txt
@@ -973,6 +980,7 @@ requests==2.31.0
     #   maykin-python3-saml
     #   messagebird
     #   mozilla-django-oidc
+    #   objects-api-client-django
     #   requests-mock
     #   sphinx
     #   zgw-consumers
@@ -1050,7 +1058,6 @@ tablib[html,ods,xls,xlsx,yaml]==3.1.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-import-export
-    #   tablib
 tblib==1.7.0
     # via -r requirements/test-tools.in
 tinycss2==1.1.1
@@ -1167,6 +1174,7 @@ zgw-consumers==0.35.1
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   notifications-api-common
+    #   objects-api-client-django
 zgw-consumers-oas==1.0.0
     # via
     #   -c requirements/base.txt
