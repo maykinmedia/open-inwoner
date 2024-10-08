@@ -878,7 +878,7 @@ oath==1.4.4
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-objects-api-client-django @ git+https://github.com/maykinmedia/objects-api-client-django.git
+objects-api-client-django @ git+https://github.com/maykinmedia/objects-api-client-django.git@f499caf
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
