@@ -7,7 +7,7 @@ from __future__ import annotations
 from datetime import date
 from typing import List, Optional
 
-from pydantic import AnyUrl, BaseModel, Field, constr
+from pydantic import BaseModel, Field, constr
 from typing_extensions import Literal
 
 
@@ -19,7 +19,7 @@ class Identificatie(BaseModel):
 class Bericht(BaseModel):
     object_uuid: str = Field(..., description="UUID van het onderliggende object")
     onderwerp: str = Field(..., description="Onderwerp van het bericht")
-    berichtTekst: str = Field(
+    bericht_tekst: str = Field(
         ...,
         description="Tekst van het bericht. Mag URL bevatten en /r/n voor newline. Geen verdere opmaak mogelijk.",
     )
@@ -27,7 +27,7 @@ class Bericht(BaseModel):
         ...,
         description="Tijdstip van verwerken van het bericht of de PublicatieDatum indien deze is ingevuld",
     )
-    einddatumHandelingstermijn: Optional[date] = Field(
+    einddatum_handelingstermijn: Optional[date] = Field(
         None, description="Termijn waarbinnen de geadresseerde moet reageren"
     )
     referentie: Optional[str] = Field(None, description="TODO")
@@ -38,11 +38,12 @@ class Bericht(BaseModel):
         ...,
         description="Het bericht is door de geadresseerde geopend of nog niet geopend",
     )
-    berichtType: Literal[
+    bericht_type: Literal[
         "notificatie", "betaalverzoek", "uitnodiging", "verzoek", "TODO"
     ] = Field(..., description="Type bericht")
     identificatie: Identificatie = Field(..., description="TODO")
-    bijlages: List[AnyUrl] = Field(
+    # TODO: Should be AnyUrl
+    bijlages: List[str] = Field(
         ...,
         description="TODO",
         examples=[["https://documenten.nl/api/v1/enkelvoudiginformatieobjecten/1"]],
