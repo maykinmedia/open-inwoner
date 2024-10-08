@@ -89,6 +89,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         self.ok_config.register_bronorganisatie_rsin = "123456788"
         self.ok_config.register_type = "Melding"
         self.ok_config.register_employee_id = "FooVonBar"
+        self.ok_config.register_channel = "the-designated-channel"
         self.ok_config.klanten_service = ServiceFactory(
             api_root=KLANTEN_ROOT, api_type=APITypes.kc
         )
@@ -498,7 +499,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             payload,
             {
                 "bronorganisatie": "123456788",
-                "kanaal": "contactformulier",
+                "kanaal": "the-designated-channel",
                 "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
                 "onderwerp": "afdeling-x",
                 "tekst": "Sample text",
@@ -560,7 +561,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             payload,
             {
                 "bronorganisatie": "123456788",
-                "kanaal": "contactformulier",
+                "kanaal": "the-designated-channel",
                 "onderwerp": "afdeling-x",
                 "tekst": "Sample text",
                 "type": "Melding",
@@ -644,7 +645,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
                     payload,
                     {
                         "bronorganisatie": "123456788",
-                        "kanaal": "contactformulier",
+                        "kanaal": "the-designated-channel",
                         "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
                         "onderwerp": "afdeling-x",
                         "tekst": "Sample text",
