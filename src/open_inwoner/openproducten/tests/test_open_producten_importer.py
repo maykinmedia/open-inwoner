@@ -1,7 +1,8 @@
+import shutil
 from unittest.mock import MagicMock
 from uuid import uuid4
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from open_inwoner.openproducten.producttypes_imports import (
     OpenProductenImporterMixin,
@@ -10,12 +11,22 @@ from open_inwoner.openproducten.producttypes_imports import (
 from open_inwoner.pdc.models import Tag
 from open_inwoner.pdc.tests.factories import TagFactory
 
-from .helpers import create_file_object
+from .helpers import TEST_MEDIA_ROOT, create_temp_file
 
 
+@override_settings(MEDIA_ROOT=TEST_MEDIA_ROOT)
 class TestOpenProductenImporter(TestCase):
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(TEST_MEDIA_ROOT)
+        super().tearDownClass()
+
     def setUp(self):
+        self.temp_file = create_temp_file(b"content")
         self.client = MagicMock()
+
+    def tearDown(self):
+        self.temp_file.close()
 
     def test_get_instance_should_return_instance_with_uuid(self):
         uuid = uuid4()
@@ -51,7 +62,7 @@ class TestOpenProductenImporter(TestCase):
         self.assertIsNone(file)
 
     def test_get_file_returns_file_instance_when_client_returns_file(self):
-        self.client.fetch_file.return_value = create_file_object(b"content")
+        self.client.fetch_file.return_value = self.temp_file
         importer = OpenProductenImporterMixin(self.client)
         file = importer._get_file("test/media/file.txt")
 
@@ -65,7 +76,7 @@ class TestOpenProductenImporter(TestCase):
         self.assertIsNone(file)
 
     def test_get_image_returns_file_instance_when_client_returns_file(self):
-        self.client.fetch_file.return_value = create_file_object(b"content")
+        self.client.fetch_file.return_value = self.temp_file
         importer = OpenProductenImporterMixin(self.client)
         file = importer._get_image("test/media/file.png")
 

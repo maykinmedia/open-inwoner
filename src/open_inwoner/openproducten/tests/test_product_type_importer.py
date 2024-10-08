@@ -1,9 +1,10 @@
+import shutil
 from datetime import date
 from decimal import Decimal
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, Mock, patch
 from uuid import uuid4
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 import open_inwoner.pdc.models as pdc_models
 from open_inwoner.openproducten.producttypes_imports import ProductTypeImporter
@@ -15,15 +16,16 @@ from open_inwoner.pdc.tests.factories import (
     TagFactory,
 )
 
-from ...pdc.models import Product, ProductLink, TagType
+from ...pdc.models import Product, ProductFile, ProductLink, TagType
 from ..api_models import BaseCategory
 from ..models import Price, PriceOption
 from .factories import PriceOptionFactory
 from .helpers import (
-    _create_file_instance,
+    TEST_MEDIA_ROOT,
     create_complete_product_type,
     create_condition,
     create_file,
+    create_file_instance,
     create_link,
     create_price,
     create_product_type,
@@ -34,26 +36,30 @@ from .helpers import (
 )
 
 
+@patch(
+    "open_inwoner.openproducten.producttypes_imports.OpenProductenImporterMixin._get_image",
+    new=Mock(return_value=None),
+)
+@patch(
+    "open_inwoner.openproducten.producttypes_imports.OpenProductenImporterMixin._get_file",
+    new=Mock(return_value=create_file_instance(b"mocked file")),
+)
+@override_settings(MEDIA_ROOT=TEST_MEDIA_ROOT)
 class TestProductTypeImporter(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        patch(
-            "open_inwoner.openproducten.producttypes_imports.OpenProductenImporterMixin._get_image",
-            return_value=None,
-        ).start()
-        patch(
-            "open_inwoner.openproducten.producttypes_imports.OpenProductenImporterMixin._get_file",
-            return_value=_create_file_instance(b"mocked file"),
-        ).start()
-
-    @classmethod
-    def tearDownClass(cls):
-        patch.stopall()
-        super().tearDownClass()
 
     def setUp(self):
         self.client = MagicMock()
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(TEST_MEDIA_ROOT)
+        super().tearDownClass()
+
+    def tearDown(self):
+        ProductFile.objects.all().delete()
 
     def test_update_or_create_tag_type(self):
         for create in (True, False):
@@ -177,7 +183,7 @@ class TestProductTypeImporter(TestCase):
                 if not create:
                     pdc_models.ProductFile.objects.create(
                         open_producten_uuid=uuid,
-                        file=_create_file_instance(b"initial file"),
+                        file=create_file_instance(b"initial file"),
                         product=product,
                     )
 
@@ -497,6 +503,7 @@ class TestProductTypeImporter(TestCase):
         self.assertEqual(pdc_models.Tag.objects.count(), 1)
         self.assertEqual(pdc_models.TagType.objects.count(), 1)
         self.assertEqual(pdc_models.ProductLink.objects.count(), 1)
+        self.assertEqual(pdc_models.ProductFile.objects.count(), 1)
         self.assertEqual(Price.objects.count(), 1)
         self.assertEqual(PriceOption.objects.count(), 1)
         self.assertEqual(pdc_models.Question.objects.count(), 1)
@@ -506,8 +513,8 @@ class TestProductTypeImporter(TestCase):
         self.assertEqual(updated, [])
         self.assertEqual(deleted, 0)
         self.assertEqual(
-            sorted([obj.open_producten_uuid for obj in created]),
-            sorted([obj.open_producten_uuid for obj in all_objects]),
+            sorted({obj.open_producten_uuid for obj in created}),
+            sorted({obj.open_producten_uuid for obj in all_objects}),
         )
 
     def test_complete_import_with_existing_objects(self):
@@ -519,28 +526,28 @@ class TestProductTypeImporter(TestCase):
             product_type,
             related_product_type,
         ]
-        importer = ProductTypeImporter(self.client)
-        importer.import_producttypes()
 
-        importer = ProductTypeImporter(self.client)
-        created, updated, deleted = importer.import_producttypes()
+        for _ in range(2):
+            importer = ProductTypeImporter(self.client)
+            created, updated, deleted = importer.import_producttypes()
 
-        self.assertEqual(pdc_models.Product.objects.count(), 2)
-        self.assertEqual(pdc_models.ProductCondition.objects.count(), 1)
-        self.assertEqual(pdc_models.Tag.objects.count(), 1)
-        self.assertEqual(pdc_models.TagType.objects.count(), 1)
-        self.assertEqual(pdc_models.ProductLink.objects.count(), 1)
-        self.assertEqual(Price.objects.count(), 1)
-        self.assertEqual(PriceOption.objects.count(), 1)
-        self.assertEqual(pdc_models.Question.objects.count(), 1)
+            self.assertEqual(pdc_models.Product.objects.count(), 2)
+            self.assertEqual(pdc_models.ProductCondition.objects.count(), 1)
+            self.assertEqual(pdc_models.Tag.objects.count(), 1)
+            self.assertEqual(pdc_models.TagType.objects.count(), 1)
+            self.assertEqual(pdc_models.ProductLink.objects.count(), 1)
+            self.assertEqual(pdc_models.ProductFile.objects.count(), 1)
+            self.assertEqual(Price.objects.count(), 1)
+            self.assertEqual(PriceOption.objects.count(), 1)
+            self.assertEqual(pdc_models.Question.objects.count(), 1)
 
         all_objects = get_all_product_type_objects()
 
         self.assertEqual(created, [])
         self.assertEqual(deleted, 0)
         self.assertEqual(
-            sorted([obj.open_producten_uuid for obj in updated]),
-            sorted([obj.open_producten_uuid for obj in all_objects]),
+            sorted({obj.open_producten_uuid for obj in updated}),
+            sorted({obj.open_producten_uuid for obj in all_objects}),
         )
 
     def test_complete_import_without_objects(self):
@@ -548,17 +555,17 @@ class TestProductTypeImporter(TestCase):
         product_type = create_complete_product_type("test2")
         product_type.related_product_types.append(related_product_type.id)
 
-        self.client.fetch_producttypes_no_cache.return_value = [
-            product_type,
-            related_product_type,
-        ]
-        importer = ProductTypeImporter(self.client)
-        importer.import_producttypes()
-
-        self.client.fetch_producttypes_no_cache.return_value = []
-        importer = ProductTypeImporter(self.client)
-        created, updated, deleted = importer.import_producttypes()
+        for return_value in (
+            [
+                product_type,
+                related_product_type,
+            ],
+            [],
+        ):
+            self.client.fetch_producttypes_no_cache.return_value = return_value
+            importer = ProductTypeImporter(self.client)
+            created, updated, deleted = importer.import_producttypes()
 
         self.assertEqual(created, [])
         self.assertEqual(updated, [])
-        self.assertEqual(deleted, 9)
+        self.assertEqual(deleted, 10)

@@ -1,6 +1,8 @@
+import os
 from datetime import date
 from uuid import uuid4
 
+from django.conf import settings
 from django.core.files import File as DjangoFile
 from django.core.files.temp import NamedTemporaryFile
 
@@ -21,15 +23,17 @@ from open_inwoner.openproducten.api_models import (
 )
 from open_inwoner.pdc import models as pdc_models
 
+TEST_MEDIA_ROOT = os.path.join(settings.BASE_DIR, "test_media")
 
-def create_file_object(content):
+
+def create_temp_file(content):
     temp_file = NamedTemporaryFile(delete=True)
     temp_file.write(content)
     return DjangoFile(temp_file)
 
 
-def _create_file_instance(content):
-    file = create_file_object(content)
+def create_file_instance(content):
+    file = create_temp_file(content)
     return FilerFile.objects.create(file=file)
 
 
@@ -52,7 +56,7 @@ def create_link(uuid):
 
 
 def create_file(uuid):
-    return File(id=uuid, file="None")
+    return File(id=uuid, file=None)
 
 
 def create_product_type(uuid, name="product type"):
@@ -118,21 +122,24 @@ def create_complete_product_type(name):
     product_type.conditions.append(create_condition(uuid4()))
     product_type.tags.append(create_tag(uuid4()))
     product_type.links.append(create_link(uuid4()))
+    product_type.files.append(create_file(uuid4()))
     product_type.prices.append(create_price(uuid4()))
     product_type.questions.append(create_question(uuid4()))
     return product_type
 
 
 def get_all_product_type_objects():
-    return [
-        pdc_models.ProductCondition.objects.first(),
-        pdc_models.Tag.objects.first(),
-        pdc_models.TagType.objects.first(),
-        pdc_models.ProductLink.objects.first(),
-        op_models.Price.objects.first(),
-        op_models.PriceOption.objects.first(),
-        pdc_models.Question.objects.first(),
-    ] + list(pdc_models.Product.objects.all())
+    return (
+        list(pdc_models.ProductCondition.objects.all())
+        + list(pdc_models.Tag.objects.all())
+        + list(pdc_models.TagType.objects.all())
+        + list(pdc_models.ProductLink.objects.all())
+        + list(pdc_models.ProductFile.objects.all())
+        + list(op_models.Price.objects.all())
+        + list(op_models.PriceOption.objects.all())
+        + list(pdc_models.Question.objects.all())
+        + list(pdc_models.Product.objects.all())
+    )
 
 
 def create_complete_category(name):
@@ -142,6 +149,6 @@ def create_complete_category(name):
 
 
 def get_all_category_objects():
-    return [
-        pdc_models.Question.objects.first(),
-    ] + list(pdc_models.Category.objects.all())
+    return list(pdc_models.Question.objects.all()) + list(
+        pdc_models.Category.objects.all()
+    )

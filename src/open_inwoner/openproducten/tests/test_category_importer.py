@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, Mock, patch
 from uuid import uuid4
 
 from django.test import TestCase
@@ -15,14 +15,14 @@ from .helpers import (
 )
 
 
+@patch(
+    "open_inwoner.openproducten.producttypes_imports.OpenProductenImporterMixin._get_image",
+    new=Mock(return_value=None),
+)
 class TestCategoryImporter(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        patch(
-            "open_inwoner.openproducten.producttypes_imports.OpenProductenImporterMixin._get_image",
-            return_value=None,
-        ).start()
 
     @classmethod
     def tearDownClass(cls):
@@ -39,7 +39,7 @@ class TestCategoryImporter(TestCase):
                 if create
                 else "should update instance if uuid exists"
             ):
-                uuid = str(uuid4())
+                uuid = uuid4()
 
                 if not create:
                     CategoryFactory.create(open_producten_uuid=uuid)
@@ -50,7 +50,7 @@ class TestCategoryImporter(TestCase):
                 instance = importer._update_or_create_category(category)
 
                 self.assertEqual(pdc_models.Category.objects.count(), 1)
-                self.assertEqual(str(instance.open_producten_uuid), uuid)
+                self.assertEqual(instance.open_producten_uuid, uuid)
                 self.assertEqual(instance.name, category.name)
 
                 # Subtest does not reset db
@@ -149,7 +149,7 @@ class TestCategoryImporter(TestCase):
                 if create
                 else "should update instance if uuid exists"
             ):
-                uuid = str(uuid4())
+                uuid = uuid4()
 
                 category = CategoryFactory()
 
@@ -169,7 +169,7 @@ class TestCategoryImporter(TestCase):
                 instance = pdc_models.Question.objects.first()
 
                 self.assertEqual(pdc_models.Question.objects.count(), 1)
-                self.assertEqual(str(instance.open_producten_uuid), uuid)
+                self.assertEqual(instance.open_producten_uuid, uuid)
                 self.assertEqual(instance.question, question.question)
 
                 # Subtest does not reset db
@@ -276,8 +276,8 @@ class TestCategoryImporter(TestCase):
         self.assertEqual(updated, [])
         self.assertEqual(deleted, 0)
         self.assertEqual(
-            sorted([obj.open_producten_uuid for obj in created]),
-            sorted([obj.open_producten_uuid for obj in all_objects]),
+            sorted({obj.open_producten_uuid for obj in created}),
+            sorted({obj.open_producten_uuid for obj in all_objects}),
         )
 
     def test_complete_import_with_existing_objects(self):
@@ -289,22 +289,20 @@ class TestCategoryImporter(TestCase):
             category,
             parent,
         ]
-        importer = CategoryImporter(self.client)
-        importer.import_categories()
+        for _ in range(2):
+            importer = CategoryImporter(self.client)
+            created, updated, deleted = importer.import_categories()
 
-        importer = CategoryImporter(self.client)
-        created, updated, deleted = importer.import_categories()
-
-        self.assertEqual(pdc_models.Category.objects.count(), 2)
-        self.assertEqual(pdc_models.Question.objects.count(), 1)
+            self.assertEqual(pdc_models.Category.objects.count(), 2)
+            self.assertEqual(pdc_models.Question.objects.count(), 1)
 
         all_objects = get_all_category_objects()
 
         self.assertEqual(created, [])
         self.assertEqual(deleted, 0)
         self.assertEqual(
-            sorted([obj.open_producten_uuid for obj in updated]),
-            sorted([obj.open_producten_uuid for obj in all_objects]),
+            sorted({obj.open_producten_uuid for obj in updated}),
+            sorted({obj.open_producten_uuid for obj in all_objects}),
         )
 
     def test_complete_import_without_objects(self):
@@ -312,16 +310,16 @@ class TestCategoryImporter(TestCase):
         category = create_complete_category("test2")
         category.parent_category = parent.id
 
-        self.client.fetch_categories_no_cache.return_value = [
-            category,
-            parent,
-        ]
-        importer = CategoryImporter(self.client)
-        importer.import_categories()
-
-        self.client.fetch_categories_no_cache.return_value = []
-        importer = CategoryImporter(self.client)
-        created, updated, deleted = importer.import_categories()
+        for return_value in (
+            [
+                category,
+                parent,
+            ],
+            [],
+        ):
+            self.client.fetch_categories_no_cache.return_value = return_value
+            importer = CategoryImporter(self.client)
+            created, updated, deleted = importer.import_categories()
 
         self.assertEqual(created, [])
         self.assertEqual(updated, [])
