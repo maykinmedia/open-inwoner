@@ -1,17 +1,59 @@
 .berichtenlist {
   display: grid;
 
+  .link {
+    .table__item {
+      &--notification-danger {
+        padding: var(--spacing-small) var(--spacing-medium);
+      }
+
+      &--notification-success {
+        background-color: var(--color-success-lighter);
+        border-radius: var(--border-radius-large);
+        color: var(--color-success);
+        font-size: var(--font-size-body);
+        padding: var(--spacing-small) var(--spacing-medium);
+        text-align: center;
+      }
+    }
+    &.nohover:hover {
+      text-decoration: none !important;
+    }
+  }
+
   &__table {
     display: grid;
+
+    &-row:hover th,
+    &-row:hover td {
+      background-color: var(--color-gray-lightest);
+    }
+
     &-item {
       &--wide {
-        min-width: 250px;
+        min-width: 100px;
+
+        @media (min-width: 768px) {
+          min-width: 250px;
+        }
       }
+
+      &--flex {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+    }
+
+    .table__heading .table__item {
+      color: var(--color-black);
+      font-weight: bold;
     }
   }
 
   &--unread {
-    color: var(--color-secondary);
+    color: var(--color-body);
     font-weight: bold;
   }
 }
