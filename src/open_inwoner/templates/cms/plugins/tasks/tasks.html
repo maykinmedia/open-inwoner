@@ -12,7 +12,7 @@
 
     <div class="card-container card-container--columns-2 plugin-card">
         {% for task in tasks %}
-            <a href="{{ task.task_url }}" class="card card--status card--status--info {% if task.status != "open" %}card--completed{% endif %}">
+            <a href="{{ task.task_url }}" target="_blank" class="card card--status card--status--info {% if task.status != "open" %}card--completed{% endif %}">
                 <div class="userfeed__marker userfeed__marker--info"></div>
 
                 <div class="card__body card__body--tabled">
