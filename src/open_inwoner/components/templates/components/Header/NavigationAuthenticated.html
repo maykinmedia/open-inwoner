@@ -23,7 +23,10 @@
                         </li>
                     {% endif %}
 
-                    <li class="header__list-item">
+                      <li class="primary-navigation__list-item">
+                          {% link text='Omnichannel berichten' href='/hackathon/berichten/' icon="move_to_inbox" icon_position="before" icon_outlined=True %}
+                      </li>
+                      <li class="header__list-item">
                         {% trans "Logout" as logout %}
                         {% link text=logout href=request.user.get_logout_url icon="logout" icon_position="before" primary=True %}
                     </li>
