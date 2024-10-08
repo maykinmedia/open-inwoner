@@ -27,7 +27,7 @@ class TasksConfig(CMSPlugin):
             )
         ]
 
-    def get_tasks_by_bsn(self, bsn):
+    def get_tasks_by_bsn(self, bsn, status="open"):
         tasks = []
         for task in self.get_tasks():
             identificatie = task["identificatie"]
@@ -35,5 +35,7 @@ class TasksConfig(CMSPlugin):
                 continue
             task_bsn = identificatie["value"]
             if task_bsn and task_bsn == bsn:
+                if status and task["status"] != status:
+                    continue
                 tasks += [task]
         return tasks
