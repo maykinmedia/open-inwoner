@@ -1,0 +1,17 @@
+.berichtenlist {
+  display: grid;
+
+  &__table {
+    display: grid;
+    &-item {
+      &--wide {
+        min-width: 250px;
+      }
+    }
+  }
+
+  &--unread {
+    color: var(--color-secondary);
+    font-weight: bold;
+  }
+}
