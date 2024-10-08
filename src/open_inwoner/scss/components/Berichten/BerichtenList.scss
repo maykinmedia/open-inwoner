@@ -1,9 +1,12 @@
 .berichtenlist {
   display: grid;
 
-  &__table-item {
-    &--wide {
-      min-width: 250px;
+  &__table {
+    display: grid;
+    &-item {
+      &--wide {
+        min-width: 250px;
+      }
     }
   }
 

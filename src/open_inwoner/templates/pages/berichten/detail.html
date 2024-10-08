@@ -6,12 +6,12 @@
     <div class="berichtdetail column column--start-0 column--span-8">
         <div class="denhaag-page-content__header">
             <h1 class="utrecht-heading-1" id="title">
-                {{ bericht.onderwerp }}
+               onderwerp: {{ bericht.onderwerp }}
             </h1>
-            <p class="utrecht-paragraph"> Bericht ontvangen op {{ bericht.publicatiedatum }}</p>
+            <p class="utrecht-paragraph"> Bericht ontvangen op publicatiedatum: {{ bericht.publicatiedatum }}</p>
         </div>
         <div class="denhaag-action denhaag-action--multi denhaag-page-content__task">
-            <div class="denhaag-action__content">{{ bericht.onderwerp }}</div>
+            <div class="denhaag-action__content">~</div>
             <div class="denhaag-action__details">
                 <div class="denhaag-action__date denhaag-action__date--warning">
                     <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="none" viewBox="0 0 20 21" class="denhaag-action__warning-icon" focusable="false" aria-hidden="true" shape-rendering="auto">
@@ -25,14 +25,19 @@
                             </clipPath>
                         </defs>
                     </svg>
-                    <time datetime="2023-09-30T19:47:36.593Z">nog 1 dag</time>
+                    <time datetime="2024-09-30T19:47:36.593Z">einddatumHandelingstermijn {{ bericht.einddatumHandelingstermijn }}</time>
+                    <p id="remainingDays" class="utrecht-paragraph"></p> <!-- Placeholder for remaining days -->
+
+                    <hr>
+
                 </div>
-                <div class="denhaag-action__actions"><a href="#handelen" class="utrecht-button-link utrecht-button-link--html-a utrecht-button-link--external" rel="external noopener noreferrer">{{ bericht.handelingsperspectief }}</a></div>
+                <div class="denhaag-action__actions"><a href="#handelen" class="utrecht-button-link utrecht-button-link--html-a utrecht-button-link--external" rel="external noopener noreferrer">handelingsperspectief: {{ bericht.handelingsperspectief }}</a></div>
             </div>
         </div>
-        <p class="utrecht-paragraph denhaag-page-content__message">{{ bericht.berichtTekst }}</p>
+        <p class="utrecht-paragraph denhaag-page-content__message">berichtTekst: <br>
+            <span>{{ bericht.berichtTekst|linebreaks }}</span></p>
         <div class="denhaag-action denhaag-action--multi denhaag-page-content__task">
-            <div class="denhaag-action__content">{{ bericht.handelingsperspectief }}</div>
+            <div class="denhaag-action__content">handelingsperspectief: {{ bericht.handelingsperspectief }}</div>
             <div>
                 <h2>Bijlagen</h2>
                 {% for attachment in bericht.bijlages %}
@@ -56,25 +61,27 @@
                 {% endfor %}
 
             </div>
-            <div class="denhaag-action__details">
-                <div class="denhaag-action__date denhaag-action__date--warning">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="none" viewBox="0 0 20 21" class="denhaag-action__warning-icon" focusable="false" aria-hidden="true" shape-rendering="auto">
-                        <g stroke-linecap="round" stroke-linejoin="round" stroke-width="2" clip-path="url(#alert-triangle-filled_svg__a)">
-                            <path fill="#E15601" stroke="#E15601" d="M8.575 3.717 1.516 15.5A1.667 1.667 0 0 0 2.941 18h14.117a1.665 1.665 0 0 0 1.425-2.5L11.425 3.717a1.667 1.667 0 0 0-2.85 0"></path>
-                            <path stroke="#fff" d="M10 14.667h.008M10 8v3.333"></path>
-                        </g>
-                        <defs>
-                            <clipPath id="alert-triangle-filled_svg__a">
-                                <path fill="#fff" d="M0 .5h20v20H0z"></path>
-                            </clipPath>
-                        </defs>
-                    </svg>
-                    <time datetime="2023-09-30T19:47:36.593Z">nog 1 dag</time>
-                </div>
-                <div class="denhaag-action__actions">
-                    <a href="#handelen" class="utrecht-button-link utrecht-button-link--html-a utrecht-button-link--external" rel="external noopener noreferrer">{{ bericht.handelingsperspectief }}</a>
-                </div>
-            </div>
+
         </div>
     </div>
+
+    <script>
+            // Get the end date from the Django context
+            const einddatum = new Date("{{ bericht.einddatumHandelingstermijn }}");
+            const today = new Date();
+
+            // Calculate the remaining days
+            const remainingTime = einddatum - today; // in milliseconds
+            const remainingDays = Math.ceil(remainingTime / (1000 * 60 * 60 * 24)); // convert to days
+
+            // Display the result
+            const remainingDaysElement = document.getElementById("remainingDays");
+            if (remainingDays > 0) {
+                remainingDaysElement.textContent = `Er zijn nog ${remainingDays} dagen tot de einddatum.`;
+            } else if (remainingDays === 0) {
+                remainingDaysElement.textContent = "Vandaag is de einddatum.";
+            } else {
+                remainingDaysElement.textContent = "De einddatum is verstreken.";
+            }
+        </script>
 {% endblock %}
