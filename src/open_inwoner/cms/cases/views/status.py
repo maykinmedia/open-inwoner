@@ -1008,7 +1008,7 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
             "bronorganisatie": config.register_bronorganisatie_rsin,
             "tekst": question,
             "type": config.register_type,
-            "kanaal": "contactformulier",
+            "kanaal": config.register_channel,
         }
         if employee_id := config.register_employee_id:
             data["medewerkerIdentificatie"] = {"identificatie": employee_id}
