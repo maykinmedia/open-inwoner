@@ -23,7 +23,7 @@
                                     {% icon icon="warning_amber" icon_position="after" extra_classes="icon--danger" outlined=True %}
                                 {% endif %}
                                 <span class="dashboard__item-label">
-                                    <span> Einddatum: </span> 
+                                    <span> Einddatum: </span>
                                 </span>
                                 <span>{{ bericht.einddatum_handelingstermijn }}</span>
                                 <span class="dashboard__item-label"><span id="remainingDays" class="utrecht-paragraph table__item--notification-danger"></span> <!-- Placeholder for remaining days --></span>
@@ -36,7 +36,7 @@
 
         {% render_grid %}
             {% render_column start=4 span=6 %}
-                
+
                 {# Handeling #}
                 <section class="bericht__userfeed plugin userfeed">
                     <div class="card-container card-container--columns-1 plugin-card">
