@@ -130,6 +130,8 @@ urlpatterns = [
     path("kvk/", include("open_inwoner.kvk.urls")),
     # TODO move search to products cms app?
     path("", include("open_inwoner.search.urls", namespace="search")),
+    # Hackathon! Put me someplace beter
+    path("hackathon/berichten/", include("open_inwoner.berichten.urls")),
     re_path(r"^", include("cms.urls")),
 ]
 
