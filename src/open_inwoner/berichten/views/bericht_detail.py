@@ -30,5 +30,9 @@ class BerichtDetailView(CommonPageMixin, BaseBreadcrumbMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         service = BerichtenService()
-        context["bericht"] = service.fetch_bericht(self.kwargs["object_uuid"])
+        bericht = service.fetch_bericht(self.kwargs["object_uuid"])
+        context["bericht"] = bericht
+        if not bericht.geopend:
+            service.update_object(self.kwargs["object_uuid"], {"geopend": True})
+
         return context
