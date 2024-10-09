@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n button_tags card_tags map_tags utils icon_tags file_tags action_tags dropdown_tags anchor_menu_tags %}
+{% load i18n button_tags card_tags map_tags utils icon_tags file_tags action_tags dropdown_tags anchor_menu_tags file_tags %}
 
 {% block content %}
 
@@ -25,24 +25,32 @@
                 {% endif %}
 
                 {% for bericht in berichten %}
-                    <tr>
+                    <tr class="berichtenlist__table-row">
                         <td class="table__header berichtenlist__table-item--wide">
                             <a href="{{ bericht.object_uuid }}" class="link" aria-label="{{ bericht.berichtTekst }} " title="{{ bericht.berichtTekst }} ">
                                 <span class="link__text {% if not bericht.geopend %}berichtenlist--unread{% endif %}">{{ bericht.onderwerp }}</span>
                             </a>
                         </td>
-                        <td class="table__item table__item--no-lb">{{ bericht.publicatiedatum }}</td>
+                        <td class="table__item table__item--no-lb">
+                            <a href="{{ bericht.object_uuid }}" class="link">
+                                {{ bericht.publicatiedatum }}</a></td>
                         <td class="table__item">
-                            <div class="table__item--notification-danger">
+                            <a href="{{ bericht.object_uuid }}" class="link">
                                 {% if bericht.geopend %}
-                                    <span>V</span> Geopend
+                                    <div class="table__item--notification-success">
+                                        Geopend
+                                    </div>
                                 {% else %}
-                                    <span>X</span> Niet geopend
+                                    <div class="table__item--notification-danger">
+                                        Niet geopend
+                                    </div>
                                 {% endif %}
-                            </div>
+                            </a>
                         </td>
-                        <td class="table__item">{{ bericht.bericht_type }}
-                            <a href="{{ bericht.object_uuid }}">
+                        <td class="table__item berichtenlist__table-item--flex">
+                            <a href="{{ bericht.object_uuid }}" class="link nohover">
+                                {{ bericht.bericht_type }}
+
                                 <span class="button button--icon-before button--transparent button--secondary">
                                     <span aria-hidden="true" class="material-icons-outlined ">arrow_forward</span>
                                 </span>
