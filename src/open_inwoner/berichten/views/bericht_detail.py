@@ -1,5 +1,8 @@
 import logging
 
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -13,7 +16,9 @@ from open_inwoner.utils.views import CommonPageMixin
 logger = logging.getLogger(__name__)
 
 
-class BerichtDetailView(CommonPageMixin, BaseBreadcrumbMixin, TemplateView):
+class BerichtDetailView(
+    CommonPageMixin, BaseBreadcrumbMixin, TemplateView, LoginRequiredMixin
+):
 
     template_name = "pages/berichten/detail.html"
 
@@ -36,3 +41,10 @@ class BerichtDetailView(CommonPageMixin, BaseBreadcrumbMixin, TemplateView):
             service.update_object(self.kwargs["object_uuid"], {"geopend": True})
 
         return context
+
+
+@login_required
+def mark_bericht_as_unread(request, object_uuid):
+    service = BerichtenService()
+    service.update_object(object_uuid, {"geopend": False})
+    return HttpResponseRedirect(reverse("berichten:list"))
