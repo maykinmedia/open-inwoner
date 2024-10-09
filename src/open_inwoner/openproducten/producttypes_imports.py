@@ -54,7 +54,7 @@ class OpenProductenImporterMixin:
 
         file = self.client.fetch_file(url)
 
-        if not file:
+        if file is None:
             return None
 
         return Image.objects.create(original_filename=url.split("/")[-1], file=file)
@@ -65,7 +65,7 @@ class OpenProductenImporterMixin:
 
         file = self.client.fetch_file(url)
 
-        if not file:
+        if file is None:
             return None
 
         return File.objects.create(original_filename=url.split("/")[-1], file=file)

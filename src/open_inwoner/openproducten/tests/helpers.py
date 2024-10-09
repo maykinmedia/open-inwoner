@@ -1,11 +1,7 @@
-import os
-import shutil
 from datetime import date
 from uuid import uuid4
 
-from django.conf import settings
 from django.core.files import File as DjangoFile
-from django.core.files.temp import NamedTemporaryFile
 
 from filer.models.filemodels import File as FilerFile
 
@@ -24,17 +20,9 @@ from open_inwoner.openproducten.api_models import (
 )
 from open_inwoner.pdc import models as pdc_models
 
-TEST_MEDIA_ROOT = os.path.join(settings.BASE_DIR, "test_media")
-
-
-def remove_test_media_root():
-    shutil.rmtree(TEST_MEDIA_ROOT)
-
 
 def create_django_file_object(content):
-    temp_file = NamedTemporaryFile(delete=True)
-    temp_file.write(content)
-    return DjangoFile(temp_file)
+    return DjangoFile(content)
 
 
 def create_filer_file_instance(content):

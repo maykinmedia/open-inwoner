@@ -2,7 +2,7 @@ from decimal import Decimal
 from unittest.mock import MagicMock, Mock, patch
 from uuid import uuid4
 
-from django.test import TestCase, override_settings
+from django.test import TestCase
 
 import open_inwoner.pdc.models as pdc_models
 from open_inwoner.openproducten.producttypes_imports import ProductTypeImporter
@@ -19,7 +19,6 @@ from ..api_models import BaseCategory
 from ..models import Price, PriceOption
 from .factories import PriceOptionFactory
 from .helpers import (
-    TEST_MEDIA_ROOT,
     create_complete_product_type,
     create_condition,
     create_file,
@@ -31,7 +30,6 @@ from .helpers import (
     create_tag,
     create_tag_type,
     get_all_product_type_objects,
-    remove_test_media_root,
 )
 
 
@@ -43,15 +41,9 @@ from .helpers import (
     "open_inwoner.openproducten.producttypes_imports.OpenProductenImporterMixin._get_file",
     new=Mock(side_effect=lambda _: create_filer_file_instance(b"mocked file")),
 )
-@override_settings(MEDIA_ROOT=TEST_MEDIA_ROOT)
 class TestProductTypeImporter(TestCase):
     def setUp(self):
         self.client = MagicMock()
-
-    @classmethod
-    def tearDownClass(cls):
-        remove_test_media_root()
-        super().tearDownClass()
 
     def test_update_or_create_tag_type(self):
         uuid = uuid4()

@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock
 from uuid import uuid4
 
-from django.test import TestCase, override_settings
+from django.test import TestCase
 
 from open_inwoner.openproducten.producttypes_imports import (
     OpenProductenImporterMixin,
@@ -10,18 +10,12 @@ from open_inwoner.openproducten.producttypes_imports import (
 from open_inwoner.pdc.models import Tag
 from open_inwoner.pdc.tests.factories import TagFactory
 
-from .helpers import TEST_MEDIA_ROOT, create_django_file_object, remove_test_media_root
+from .helpers import create_django_file_object
 
 
-@override_settings(MEDIA_ROOT=TEST_MEDIA_ROOT)
 class TestOpenProductenImporter(TestCase):
     def setUp(self):
         self.client = MagicMock()
-
-    @classmethod
-    def tearDownClass(cls):
-        remove_test_media_root()
-        super().tearDownClass()
 
     def test_get_instance_should_return_instance_with_uuid(self):
         uuid = uuid4()
