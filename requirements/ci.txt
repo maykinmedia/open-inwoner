@@ -37,6 +37,11 @@ asn1crypto==1.5.1
     #   webauthn
 astroid==2.15.8
     # via pylint
+async-timeout==4.0.3
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   redis
 attrs==21.2.0
     # via
     #   -c requirements/base.txt
@@ -482,7 +487,6 @@ django-two-factor-auth[phonenumberslite,webauthn]==1.16.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-    #   django-two-factor-auth
     #   maykin-2fa
 django-view-breadcrumbs==2.5.1
     # via
@@ -555,7 +559,6 @@ easy-thumbnails[svg]==2.8.5
     #   -r requirements/base.txt
     #   django-filer
     #   djangocms-picture
-    #   easy-thumbnails
 ecs-logging==2.1.0
     # via
     #   -c requirements/base.txt
@@ -609,7 +612,6 @@ fonttools[woff]==4.43.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-    #   fonttools
     #   weasyprint
 freezegun==1.1.0
     # via -r requirements/test-tools.in
@@ -845,7 +847,6 @@ pydantic[email]==2.6.4
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-    #   pydantic
 pydantic-core==2.16.3
     # via
     #   -c requirements/base.txt
@@ -1057,7 +1058,6 @@ tablib[html,ods,xls,xlsx,yaml]==3.1.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-import-export
-    #   tablib
 tblib==1.7.0
     # via -r requirements/test-tools.in
 tinycss2==1.1.1

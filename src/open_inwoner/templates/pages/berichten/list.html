@@ -1,69 +1,118 @@
 {% extends 'master.html' %}
-{% load i18n button_tags card_tags map_tags utils icon_tags file_tags action_tags dropdown_tags anchor_menu_tags file_tags %}
+{% load i18n grid_tags button_tags icon_tags %}
 
 {% block content %}
+    {% if bericht %}
+        {% render_grid %}
+            {% render_column span=12 %}
+                <h1 class="utrecht-heading-1" id="title">{{ bericht.onderwerp }}</h1>
+                <aside class="bericht__dashboard dashboard" aria-label="{% trans "Dashboard" %}">
+                    <ul class="dashboard__list">
+                        <li class="dashboard__list-item">
+                            <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-compact">
+                                <span class="dashboard__item-label">Ontvangstdatum:</span> {{ bericht.publicatiedatum }}</p>
+                        </li>
+                        <li class="dashboard__list-item">
+                            <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-compact">
+                                <span class="dashboard__item-label">Bericht type: </span> {{ bericht.bericht_type }}</p>
+                        </li>
+                        <li class="dashboard__list-item">
+                            <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-compact">
+                                <span class="dashboard__item-label">{% if bericht.einddatum_handelingstermijn %}<span aria-hidden="true" class="material-icons-outlined icon--alert">warning</span>{% endif %}
+                                    Deadline: </span> {{ bericht.einddatum_handelingstermijn }}
+                                <span class="dashboard__item-label"><span id="remainingDays" class="utrecht-paragraph table__item--notification-danger"></span> <!-- Placeholder for remaining days --></span>
+                            </p>
+                        </li>
+                    </ul>
+                </aside>
+            {% endrender_column %}
+        {% endrender_grid %}
 
-    <div class="berichtenlist">
-        <h1 class="utrecht-heading-1" id="title">
-            Mijn berichten
-        </h1>
-        <p class="utrecht-paragraph">Welkom in uw berichtencentrum. Hier vindt u een overzicht van uw notificaties.</p>
+        {% render_grid %}
+            {% render_column start=4 span=6 %}
+                <section class="bericht__userfeed plugin userfeed">
+                    <div class="card-container card-container--columns-1 plugin-card">
+                        <a href="#handelingsperspectief" class="card card--status card--status--info ">
+                            <div class="userfeed__marker userfeed__marker--info"></div>
+                            <div class="card__body card__body--tabled">
+                                <h3 class="utrecht-heading-3 userfeed__title">Actie</h3>
+                                <p class="userfeed-card__description">
+                                    {% if bericht.handelingsperspectief %}
+                                        <span class="status">{{ bericht.handelingsperspectief }}</span>
+                                    {% else %}
+                                        <span class="status">{% trans "Geen verdere acties nodig. U hoeft niets te doen." %}</span>
+                                    {% endif %}
+                                </p>
+                                <span class="button button--icon-before button--transparent">
+                                    <span aria-hidden="true" class="material-icons-outlined ">east</span>
+                                </span>
+                            </div>
+                        </a>
+                    </div>
+                </section>
+                {# End of handelingsperspectief alert #}
 
-        <div class="berichtenlist__table">
-            <table class="table">
-                <thead class="table__heading">
-                <tr>
-                    <td class="table__item berichtenlist__table-item--wide">Onderwerp</td>
-                    <td class="table__item">Einddatum</td>
-                    <td class="table__item">Status</td>
-                    <td class="table__item">Bericht type</td>
-                </tr>
-                </thead>
-                <tbody>
-                {% if not berichten %}
-                    <b>{% trans "U heeft op dit moment nog geen berichten." %}</b>
+                <section class="bericht">
+                    <div>
+                        <p class="bericht__text">{{ bericht.bericht_tekst|linebreaks }}</p>
+                    </div>
+
+
+                    <div>
+                        <a href="/hackathon/berichten/" class="button button--primary bericht__actions" id="handelingsperspectief">
+                            {% icon "arrow_backward" %}Terug naar mijn berichten
+                        </a>
+                    </div>
+                    {% if destination %}
+                        <div>
+                            <a href="{{ destination.url }}" id="destination_link" class="button button--transparent bericht__actions">
+                                <span>{{ destination.label }}</span>{% icon "arrow_forward" %}
+                            </a>
+                        </div>
+                    {% endif %}
+                </section>
+
+                {% if bericht.bijlages %}
+                    <section class="bericht__bijlagen case-detail__documents">
+                        <div class="heading-2__indicator">
+                            <h2 class="utrecht-heading-2 " id="documents">Bijlagen</h2>
+                        </div>
+                        <div class="file-list">
+                            <ul class="file-list__list">
+                                {% for attachment in bericht.bijlages %}
+                                    <li class="file-list__list-item">
+                                        <aside class="file">
+                                            <div class="file__container ">
+                                                <div class="file__file">
+                                                    <div class="file__symbol">
+                                                        <span aria-hidden="true" class="material-icons-outlined ">image</span>
+                                                    </div>
+                                                    <div class="file__data">
+                                            <span class="file__name">
+                                            {{ attachment }}
+                                            (PDF)
+                                            </span>
+                                                        <span class="file__date">{{ bericht.publicatiedatum }}</span>
+                                                    </div>
+                                                    <a href="https://www.maykinmedia.nl/media/filer_public/94/50/9450f9e9-70d1-4d00-99e4-08bc49fb3dc7/2194530_nl_2019.pdf" download="" class="link link--icon link--icon-position-before file__download link--primary file__download" aria-label="Download namefile" title="Download dit bestand">
+                                                        <span aria-hidden="true" class="material-icons-outlined ">download</span>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </aside>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </section>
+                {% else %}
+                    <h2 class="utrecht-heading-2">{% trans 'Er zijn geen bijlagen bij dit bericht.' %}</h2>
                 {% endif %}
 
-                {% for bericht in berichten %}
-                    <tr class="berichtenlist__table-row">
-                        <td class="table__header berichtenlist__table-item--wide">
-                            <a href="{{ bericht.object_uuid }}" class="link" aria-label="{{ bericht.berichtTekst }} " title="{{ bericht.berichtTekst }} ">
-                                <span class="link__text {% if not bericht.geopend %}berichtenlist--unread{% endif %}">{{ bericht.onderwerp }}</span>
-                            </a>
-                        </td>
-                        <td class="table__item table__item--no-lb">
-                            <a href="{{ bericht.object_uuid }}" class="link">
-                                {{ bericht.publicatiedatum }}</a></td>
-                        <td class="table__item">
-                            <a href="{{ bericht.object_uuid }}" class="link">
-                                {% if bericht.geopend %}
-                                    <div class="table__item--notification-success">
-                                        Geopend
-                                    </div>
-                                {% else %}
-                                    <div class="table__item--notification-danger">
-                                        Niet geopend
-                                    </div>
-                                {% endif %}
-                            </a>
-                        </td>
-                        <td class="table__item berichtenlist__table-item--flex">
-                            <a href="{{ bericht.object_uuid }}" class="link nohover">
-                                {{ bericht.bericht_type }}
+            {% endrender_column %}
+        {% endrender_grid %}
 
-                                <span class="button button--icon-before button--transparent button--secondary">
-                                    <span aria-hidden="true" class="material-icons-outlined ">arrow_forward</span>
-                                </span>
-                            </a>
-                        </td>
-                    </tr>
-                {% endfor %}
-
-                </tbody>
-            </table>
-
-            {#        end service list#}
-        </div>
-
-    </div>
-{% endblock %}
+    {% else %}
+        <h2 class="utrecht-heading-2">{% trans 'Dit bericht is momenteel niet beschikbaar.' %}</h2>
+    {% endif %}
+{% endblock content %}
