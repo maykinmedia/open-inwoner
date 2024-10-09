@@ -21,7 +21,7 @@ class BerichtDetailView(CommonPageMixin, BaseBreadcrumbMixin, TemplateView):
     def crumbs(self):
         return [
             (_("Mijn berichten"), reverse("berichten:list")),
-            (_("Overzicht"), reverse("berichten:detail", kwargs=self.kwargs)),
+            (_("Bericht"), reverse("berichten:detail", kwargs=self.kwargs)),
         ]
 
     def page_title(self):
