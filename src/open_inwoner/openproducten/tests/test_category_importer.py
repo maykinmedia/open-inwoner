@@ -33,28 +33,22 @@ class TestCategoryImporter(TestCase):
         self.client = MagicMock()
 
     def test_update_or_create_category(self):
+        uuid = uuid4()
+        importer = CategoryImporter(self.client)
+
         for create in (True, False):
             with self.subTest(
                 "should create instance if uuid does not exist"
                 if create
                 else "should update instance if uuid exists"
             ):
-                uuid = uuid4()
-
-                if not create:
-                    CategoryFactory.create(open_producten_uuid=uuid)
 
                 category = create_category(uuid)
-
-                importer = CategoryImporter(self.client)
                 instance = importer._update_or_create_category(category)
 
                 self.assertEqual(pdc_models.Category.objects.count(), 1)
                 self.assertEqual(instance.open_producten_uuid, uuid)
                 self.assertEqual(instance.name, category.name)
-
-                # Subtest does not reset db
-                pdc_models.Category.objects.all().delete()
 
     def test_update_category_to_parent_root(self):
         category_uuid = uuid4()
@@ -143,37 +137,24 @@ class TestCategoryImporter(TestCase):
         self.assertEqual(created_instance.get_parent(update=True), parent_instance)
 
     def test_update_or_create_question(self):
+        uuid = uuid4()
+        category = CategoryFactory()
+        importer = CategoryImporter(self.client)
+
         for create in (True, False):
             with self.subTest(
                 "should create instance if uuid does not exist"
                 if create
                 else "should update instance if uuid exists"
             ):
-                uuid = uuid4()
-
-                category = CategoryFactory()
-
-                if not create:
-                    pdc_models.Question.objects.create(
-                        open_producten_uuid=uuid,
-                        question="?",
-                        answer="b",
-                        category=category,
-                    )
 
                 question = create_question(uuid)
-
-                importer = CategoryImporter(self.client)
                 importer._update_or_create_question(question, category=category)
-
                 instance = pdc_models.Question.objects.first()
 
                 self.assertEqual(pdc_models.Question.objects.count(), 1)
                 self.assertEqual(instance.open_producten_uuid, uuid)
                 self.assertEqual(instance.question, question.question)
-
-                # Subtest does not reset db
-                pdc_models.Question.objects.all().delete()
 
     @patch(
         "open_inwoner.openproducten.producttypes_imports.CategoryImporter._handle_category_parent"

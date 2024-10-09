@@ -1,5 +1,3 @@
-import shutil
-from datetime import date
 from decimal import Decimal
 from unittest.mock import MagicMock, Mock, patch
 from uuid import uuid4
@@ -16,7 +14,7 @@ from open_inwoner.pdc.tests.factories import (
     TagFactory,
 )
 
-from ...pdc.models import Product, ProductFile, ProductLink, TagType
+from ...pdc.models import Product, ProductLink, TagType
 from ..api_models import BaseCategory
 from ..models import Price, PriceOption
 from .factories import PriceOptionFactory
@@ -25,7 +23,7 @@ from .helpers import (
     create_complete_product_type,
     create_condition,
     create_file,
-    create_file_instance,
+    create_filer_file_instance,
     create_link,
     create_price,
     create_product_type,
@@ -33,6 +31,7 @@ from .helpers import (
     create_tag,
     create_tag_type,
     get_all_product_type_objects,
+    remove_test_media_root,
 )
 
 
@@ -42,66 +41,49 @@ from .helpers import (
 )
 @patch(
     "open_inwoner.openproducten.producttypes_imports.OpenProductenImporterMixin._get_file",
-    new=Mock(return_value=create_file_instance(b"mocked file")),
+    new=Mock(side_effect=lambda _: create_filer_file_instance(b"mocked file")),
 )
 @override_settings(MEDIA_ROOT=TEST_MEDIA_ROOT)
 class TestProductTypeImporter(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-
     def setUp(self):
         self.client = MagicMock()
 
     @classmethod
     def tearDownClass(cls):
-        shutil.rmtree(TEST_MEDIA_ROOT)
+        remove_test_media_root()
         super().tearDownClass()
 
-    def tearDown(self):
-        ProductFile.objects.all().delete()
-
     def test_update_or_create_tag_type(self):
+        uuid = uuid4()
+        importer = ProductTypeImporter(self.client)
+
         for create in (True, False):
             with self.subTest(
                 "should create instance if uuid does not exist"
                 if create
                 else "should update instance if uuid exists"
             ):
-                uuid = uuid4()
-
-                if not create:
-                    pdc_models.TagType.objects.create(
-                        open_producten_uuid=uuid, name="abc"
-                    )
 
                 tag_type = create_tag_type(uuid)
-
-                importer = ProductTypeImporter(self.client)
                 instance = importer._update_or_create_tag_type(tag_type)
 
                 self.assertEqual(pdc_models.TagType.objects.count(), 1)
                 self.assertEqual(instance.open_producten_uuid, uuid)
                 self.assertEqual(instance.name, tag_type.name)
 
-                # Subtest does not reset db
-                pdc_models.TagType.objects.all().delete()
-
     def test_update_or_create_tag(self):
+        tag_uuid = uuid4()
+        tag_type_uuid = uuid4()
+        importer = ProductTypeImporter(self.client)
+
         for create in (True, False):
             with self.subTest(
                 "should create instance if uuid does not exist"
                 if create
                 else "should update instance if uuid exists"
             ):
-                tag_uuid = uuid4()
 
-                if not create:
-                    TagFactory.create(open_producten_uuid=tag_uuid, name="abc")
-
-                tag = create_tag(tag_uuid)
-
-                importer = ProductTypeImporter(self.client)
+                tag = create_tag(tag_uuid, tag_type_uuid)
                 instance = importer._update_or_create_tag(tag)
 
                 self.assertEqual(pdc_models.Tag.objects.count(), 1)
@@ -109,194 +91,126 @@ class TestProductTypeImporter(TestCase):
                 self.assertEqual(instance.open_producten_uuid, tag_uuid)
                 self.assertEqual(instance.name, tag.name)
 
-                # Subtest does not reset db
-                pdc_models.Tag.objects.all().delete()
-                pdc_models.TagType.objects.all().delete()
-
     def test_update_or_create_condition(self):
+        uuid = uuid4()
+        importer = ProductTypeImporter(self.client)
         for create in (True, False):
             with self.subTest(
                 "should create instance if uuid does not exist"
                 if create
                 else "should update instance if uuid exists"
             ):
-                uuid = uuid4()
-
-                if not create:
-                    ProductConditionFactory(open_producten_uuid=uuid)
 
                 condition = create_condition(uuid)
-
-                importer = ProductTypeImporter(self.client)
                 instance = importer._update_or_create_condition(condition)
 
                 self.assertEqual(pdc_models.ProductCondition.objects.count(), 1)
                 self.assertEqual(instance.open_producten_uuid, uuid)
                 self.assertEqual(instance.name, condition.name)
 
-                # Subtest does not reset db
-                pdc_models.ProductCondition.objects.all().delete()
-
     def test_update_or_create_link(self):
+        uuid = uuid4()
+        product = ProductFactory()
+        importer = ProductTypeImporter(self.client)
         for create in (True, False):
             with self.subTest(
                 "should create instance if uuid does not exist"
                 if create
                 else "should update instance if uuid exists"
             ):
-                uuid = uuid4()
-
-                product = ProductFactory()
-
-                if not create:
-                    pdc_models.ProductLink.objects.create(
-                        open_producten_uuid=uuid,
-                        name="abc",
-                        url="https://example.com",
-                        product=product,
-                    )
 
                 link = create_link(uuid)
-                importer = ProductTypeImporter(self.client)
                 importer._update_or_create_link(link, product)
-
                 instance = pdc_models.ProductLink.objects.first()
 
                 self.assertEqual(pdc_models.ProductLink.objects.count(), 1)
                 self.assertEqual(instance.open_producten_uuid, uuid)
                 self.assertEqual(instance.name, link.name)
 
-                # Subtest does not reset db
-                pdc_models.ProductLink.objects.all().delete()
-
     def test_update_or_create_file(self):
+        uuid = uuid4()
+        product = ProductFactory()
+        importer = ProductTypeImporter(self.client)
         for create in (True, False):
             with self.subTest(
                 "should create instance if uuid does not exist"
                 if create
                 else "should update instance if uuid exists"
             ):
-                uuid = uuid4()
-
-                product = ProductFactory()
-
-                if not create:
-                    pdc_models.ProductFile.objects.create(
-                        open_producten_uuid=uuid,
-                        file=create_file_instance(b"initial file"),
-                        product=product,
-                    )
 
                 file = create_file(uuid)
-                importer = ProductTypeImporter(self.client)
                 importer._update_or_create_file(file, product)
-
                 instance = pdc_models.ProductFile.objects.first()
 
                 self.assertEqual(pdc_models.ProductFile.objects.count(), 1)
                 self.assertEqual(instance.open_producten_uuid, uuid)
 
-                # Subtest does not reset db
-                pdc_models.ProductFile.objects.all().delete()
-
     def test_update_or_create_price(self):
+        price_uuid = uuid4()
+        option_uuid = uuid4()
+        product = ProductFactory()
+        importer = ProductTypeImporter(self.client)
         for create in (True, False):
             with self.subTest(
                 "should create instance if uuid does not exist"
                 if create
                 else "should update instance if uuid exists"
             ):
-                uuid = uuid4()
 
-                product = ProductFactory()
-
-                if not create:
-                    Price.objects.create(
-                        open_producten_uuid=uuid,
-                        valid_from=date.today(),
-                        product_type=product,
-                    )
-
-                price = create_price(uuid)
-
-                importer = ProductTypeImporter(self.client)
+                price = create_price(price_uuid, option_uuid)
                 importer._update_or_create_price(price, product)
-
                 instance = Price.objects.first()
 
                 self.assertEqual(Price.objects.count(), 1)
                 self.assertEqual(PriceOption.objects.count(), 1)
-                self.assertEqual(instance.open_producten_uuid, uuid)
+                self.assertEqual(instance.open_producten_uuid, price_uuid)
                 self.assertEqual(
                     instance.options.first().amount, Decimal(price.options[0].amount)
                 )
 
-                # Subtest does not reset db
-                PriceOption.objects.all().delete()
-                Price.objects.all().delete()
-
     def test_update_or_create_product_type(self):
+        uuid = uuid4()
+        importer = ProductTypeImporter(self.client)
+
         for create in (True, False):
             with self.subTest(
                 "should create instance if uuid does not exist"
                 if create
                 else "should update instance if uuid exists"
             ):
-                uuid = uuid4()
-
-                if not create:
-                    ProductFactory.create(open_producten_uuid=uuid)
 
                 product_type = create_product_type(uuid)
-
-                importer = ProductTypeImporter(self.client)
                 instance = importer._update_or_create_product_type(product_type)
 
                 self.assertEqual(pdc_models.Product.objects.count(), 1)
                 self.assertEqual(instance.open_producten_uuid, uuid)
                 self.assertEqual(instance.name, product_type.name)
 
-                # Subtest does not reset db
-                pdc_models.Product.objects.all().delete()
-
     def test_update_or_create_question(self):
+        uuid = uuid4()
+        product = ProductFactory()
+        importer = ProductTypeImporter(self.client)
+
         for create in (True, False):
             with self.subTest(
                 "should create instance if uuid does not exist"
                 if create
                 else "should update instance if uuid exists"
             ):
-                uuid = uuid4()
-
-                product = ProductFactory()
-
-                if not create:
-                    pdc_models.Question.objects.create(
-                        open_producten_uuid=uuid,
-                        question="?",
-                        answer="b",
-                        product=product,
-                    )
 
                 question = create_question(uuid)
-
-                importer = ProductTypeImporter(self.client)
                 importer._update_or_create_question(question, product)
-
                 instance = pdc_models.Question.objects.first()
 
                 self.assertEqual(pdc_models.Question.objects.count(), 1)
                 self.assertEqual(instance.open_producten_uuid, uuid)
                 self.assertEqual(instance.question, question.question)
 
-                # Subtest does not reset db
-                pdc_models.Question.objects.all().delete()
-
     def test_handle_relations_adds_adds_all_relations_to_product_type(self):
         product_type_uuid = uuid4()
         category_uuid = uuid4()
 
-        tag = create_tag(uuid4())
+        tag = create_tag(uuid4(), uuid4())
         condition = create_condition(uuid4())
 
         link = create_link(uuid4())

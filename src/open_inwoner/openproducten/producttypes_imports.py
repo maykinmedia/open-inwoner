@@ -267,7 +267,7 @@ class ProductTypeImporter(OpenProductenImporterMixin):
         }
 
         if file_instance := _get_instance(ProductFile, file.id):
-            file_instance.delete()
+            file_instance.file.delete()
             _update_instance(file_instance, True, **data)
             created = False
         else:

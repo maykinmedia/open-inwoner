@@ -1,4 +1,5 @@
 import os
+import shutil
 from datetime import date
 from uuid import uuid4
 
@@ -26,14 +27,18 @@ from open_inwoner.pdc import models as pdc_models
 TEST_MEDIA_ROOT = os.path.join(settings.BASE_DIR, "test_media")
 
 
-def create_temp_file(content):
+def remove_test_media_root():
+    shutil.rmtree(TEST_MEDIA_ROOT)
+
+
+def create_django_file_object(content):
     temp_file = NamedTemporaryFile(delete=True)
     temp_file.write(content)
     return DjangoFile(temp_file)
 
 
-def create_file_instance(content):
-    file = create_temp_file(content)
+def create_filer_file_instance(content):
+    file = create_django_file_object(content)
     return FilerFile.objects.create(file=file)
 
 
@@ -41,8 +46,10 @@ def create_tag_type(uuid):
     return TagType(id=uuid, name="test tag type")
 
 
-def create_tag(uuid):
-    return Tag(id=uuid, name="test tag", type=create_tag_type(uuid4()), icon=None)
+def create_tag(tag_uuid, tag_type_uuid):
+    return Tag(
+        id=tag_uuid, name="test tag", type=create_tag_type(tag_type_uuid), icon=None
+    )
 
 
 def create_condition(uuid):
@@ -56,7 +63,7 @@ def create_link(uuid):
 
 
 def create_file(uuid):
-    return File(id=uuid, file=None)
+    return File(id=uuid, file="None")
 
 
 def create_product_type(uuid, name="product type"):
@@ -107,12 +114,12 @@ def create_price_option(uuid):
     )
 
 
-def create_price(uuid):
+def create_price(price_uuid, option_uuid):
     return Price(
-        id=uuid,
+        id=price_uuid,
         valid_from=date.today(),
         options=[
-            create_price_option(uuid4()).__dict__
+            create_price_option(option_uuid).__dict__
         ],  # __dict__ is needed for zgw_consumers.api_models.Model _type_cast
     )
 
@@ -120,10 +127,10 @@ def create_price(uuid):
 def create_complete_product_type(name):
     product_type = create_product_type(uuid4(), name=name)
     product_type.conditions.append(create_condition(uuid4()))
-    product_type.tags.append(create_tag(uuid4()))
+    product_type.tags.append(create_tag(uuid4(), uuid4()))
     product_type.links.append(create_link(uuid4()))
     product_type.files.append(create_file(uuid4()))
-    product_type.prices.append(create_price(uuid4()))
+    product_type.prices.append(create_price(uuid4(), uuid4()))
     product_type.questions.append(create_question(uuid4()))
     return product_type
 
