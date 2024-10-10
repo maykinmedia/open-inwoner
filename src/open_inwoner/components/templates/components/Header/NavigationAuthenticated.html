@@ -17,15 +17,19 @@
                 <ul class="primary-navigation__list subpage-list">
                     {{ rendered_cms_menu__home }}
 
+
+
+                      <li class="primary-navigation__list-item">
+                        {% url 'berichten:list' as berichten_href %}
+                        {% link text='Mijn berichten' href=berichten_href icon="move_to_inbox" icon_position="before" icon_outlined=True %}
+                      </li>
+
                     {% if has_general_faq_questions %}
                         <li class="primary-navigation__list-item">
                             {% link text=_('FAQ') href='general_faq' icon="help_outline" icon_position="before" icon_outlined=True %}
                         </li>
                     {% endif %}
 
-                      <li class="primary-navigation__list-item">
-                          {% link text='Omnichannel berichten' href='/hackathon/berichten/' icon="move_to_inbox" icon_position="before" icon_outlined=True %}
-                      </li>
                       <li class="header__list-item">
                         {% trans "Logout" as logout %}
                         {% link text=logout href=request.user.get_logout_url icon="logout" icon_position="before" primary=True %}
