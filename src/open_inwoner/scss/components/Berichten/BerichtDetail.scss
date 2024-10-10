@@ -10,6 +10,16 @@
       margin-left: var(--spacing-medium);
       padding: var(--spacing-small) var(--spacing-medium);
     }
+
+    .handelingstermijn {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      align-content: baseline;
+      justify-items: baseline;
+      justify-content: space-between;
+    }
   }
 
   &__heading {
@@ -33,7 +43,19 @@
     font-weight: bold;
   }
 
+  .utrecht-heading-2 {
+    margin-top: var(--spacing-large);
+  }
+
   .button--transparent {
     padding: var(--spacing-medium) 0 0 0;
+  }
+
+  &__bijlagen {
+    .file__name {
+      // Reverse ellipsis: only show last part of URL
+      direction: rtl;
+      text-align: left;
+    }
   }
 }

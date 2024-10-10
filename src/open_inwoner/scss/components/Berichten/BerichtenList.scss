@@ -16,13 +16,26 @@
         text-align: center;
       }
     }
-    &.nohover:hover {
-      text-decoration: none !important;
+    &.nohover {
+      width: 100%;
+      justify-content: space-between;
+
+      &:hover {
+        text-decoration: none;
+      }
+
+      .button {
+        padding-right: 0;
+      }
     }
   }
 
   &__table {
     display: grid;
+
+    .table {
+      border-collapse: separate;
+    }
 
     &-row:hover th,
     &-row:hover td {
