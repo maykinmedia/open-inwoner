@@ -2,6 +2,13 @@
 {% load i18n grid_tags button_tags icon_tags %}
 
 {% block content %}
+    {# Serialize the data as JSON so the Javascript snippet to compute days remaining can pick it up #}
+    <script id="bericht-data-json" type="application/json">
+        {
+            "einddatumHandelingstermijn": "{{ bericht.einddatum_handelingstermijn.isoformat }}"
+        }
+    </script>
+
     {% if bericht %}
         {% render_grid %}
             {% render_column span=12 %}

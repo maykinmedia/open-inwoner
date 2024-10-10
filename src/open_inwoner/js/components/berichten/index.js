@@ -1,20 +1,23 @@
-// Get the end date from the Django context
-const einddatum = new Date('{{ bericht.einddatum_handelingstermijn }}')
-const today = new Date()
+const berichtDataJsonElement = document.getElementById('bericht-data-json')
 
-// Calculate the remaining days
-const remainingTime = einddatum - today // in milliseconds
-const remainingDays = Math.ceil(remainingTime / (1000 * 60 * 60 * 24)) // convert to days
+if (berichtDataJsonElement) {
+  const berichtData = JSON.parse(berichtDataJsonElement.textContent)
+  const einddatum = new Date(berichtData.einddatumHandelingstermijn)
+  const today = new Date()
 
-// Display the result
-const remainingDaysElement = document.getElementById('remainingDays')
-if (remainingDaysElement) {
-  console.log('ELEMNT {{ bericht.publicatiedatum }} BESTAAT')
-  if (remainingDays > 0) {
-    remainingDaysElement.textContent = `Er zijn nog ${remainingDays} dagen tot de einddatum.`
-  } else if (remainingDays === 0) {
-    remainingDaysElement.textContent = 'Vandaag is de einddatum.'
-  } else {
-    remainingDaysElement.textContent = 'De einddatum is verstreken.'
-  }
+  // Calculate the remaining days
+  const remainingTime = einddatum - today // in milliseconds
+  const remainingDays = Math.ceil(remainingTime / (1000 * 60 * 60 * 24)) // convert to days
+
+  // Display the result
+  const remainingDaysElement = document.getElementById('remainingDays')
+  if (remainingDaysElement) {
+    if (remainingDays > 0) {
+      remainingDaysElement.textContent = `Er zijn nog ${remainingDays} dagen tot de einddatum.`
+    } else if (remainingDays === 0) {
+      remainingDaysElement.textContent = 'Vandaag is de einddatum.'
+    } else {
+      remainingDaysElement.textContent = 'De einddatum is verstreken.'
+    }
+  } else console.error('Unable to find #remainingDays')
 }
