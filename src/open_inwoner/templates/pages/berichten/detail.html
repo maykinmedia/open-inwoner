@@ -44,29 +44,6 @@
         {% render_grid %}
             {% render_column start=4 span=6 %}
 
-                {# Handeling #}
-                <section class="bericht__userfeed plugin userfeed">
-                    <div class="card-container card-container--columns-1 plugin-card">
-                        <a href="#handelingsperspectief" class="card card--status card--status--info ">
-                            <div class="userfeed__marker userfeed__marker--info"></div>
-                            <div class="card__body card__body--tabled">
-                                <h2 class="utrecht-heading-3 userfeed__title">Actie</h2>
-                                <p class="userfeed-card__description">
-                                    {% if bericht.handelingsperspectief %}
-                                        <span class="status">{{ bericht.handelingsperspectief }}</span>
-                                    {% else %}
-                                        <span class="status">{% trans "Geen verdere acties nodig. U hoeft niets te doen." %}</span>
-                                    {% endif %}
-                                </p>
-                                <span class="button button--icon-before button--transparent">
-                                   {% icon "east" %}
-                                </span>
-                            </div>
-                        </a>
-                    </div>
-                </section>
-                {# End of handelingsperspectief alert #}
-
                 <section class="bericht">
                     <div>
                         <h3 class="utrecht-heading-2" id="title">{{ bericht.onderwerp }}</h3>
