@@ -74,8 +74,21 @@
                     </div>
 
                     <div>
-                        <a href="/hackathon/berichten/" class="button button--primary bericht__actions" id="handelingsperspectief">
+                        <a href="{% url 'berichten:list' %}" class="button button--primary bericht__actions" id="handelingsperspectief">
                             {% icon "arrow_backward" %}Terug naar mijn berichten
+                        </a>
+                    </div>
+                    {% if destination %}
+                        <div>
+                            <a href="{{ destination.url }}" id="destination_link" class="button button--transparent bericht__actions">
+                                <span>{{ destination.label }}</span>{% icon "arrow_forward" %}
+                            </a>
+                        </div>
+                    {% endif %}
+                    <br/>
+                    <div>
+                        <a href="{% url 'berichten:mark-bericht-unread' object_uuid=bericht.object_uuid %}" class="button">
+                            {% icon "arrow_backward" %}Markeer dit bericht als ongeopend
                         </a>
                     </div>
                 </section>
