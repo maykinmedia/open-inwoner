@@ -2,6 +2,13 @@
 {% load i18n grid_tags button_tags icon_tags %}
 
 {% block content %}
+    {# Serialize the data as JSON so the Javascript snippet to compute days remaining can pick it up #}
+    <script id="bericht-data-json" type="application/json">
+        {
+            "einddatumHandelingstermijn": "{{ bericht.einddatum_handelingstermijn.isoformat }}"
+        }
+    </script>
+
     {% if bericht %}
         {% render_grid %}
             {% render_column span=12 %}
@@ -37,29 +44,6 @@
         {% render_grid %}
             {% render_column start=4 span=6 %}
 
-                {# Handeling #}
-                <section class="bericht__userfeed plugin userfeed">
-                    <div class="card-container card-container--columns-1 plugin-card">
-                        <a href="#handelingsperspectief" class="card card--status card--status--info ">
-                            <div class="userfeed__marker userfeed__marker--info"></div>
-                            <div class="card__body card__body--tabled">
-                                <h2 class="utrecht-heading-3 userfeed__title">Actie</h2>
-                                <p class="userfeed-card__description">
-                                    {% if bericht.handelingsperspectief %}
-                                        <span class="status">{{ bericht.handelingsperspectief }}</span>
-                                    {% else %}
-                                        <span class="status">{% trans "Geen verdere acties nodig. U hoeft niets te doen." %}</span>
-                                    {% endif %}
-                                </p>
-                                <span class="button button--icon-before button--transparent">
-                                   {% icon "east" %}
-                                </span>
-                            </div>
-                        </a>
-                    </div>
-                </section>
-                {# End of handelingsperspectief alert #}
-
                 <section class="bericht">
                     <div>
                         <h3 class="utrecht-heading-2" id="title">{{ bericht.onderwerp }}</h3>
@@ -67,8 +51,21 @@
                     </div>
 
                     <div>
-                        <a href="/hackathon/berichten/" class="button button--primary bericht__actions" id="handelingsperspectief">
+                        <a href="{% url 'berichten:list' %}" class="button button--primary bericht__actions" id="handelingsperspectief">
                             {% icon "arrow_backward" %}Terug naar mijn berichten
+                        </a>
+                    </div>
+                    {% if destination %}
+                        <div>
+                            <a href="{{ destination.url }}" id="destination_link" class="button button--transparent bericht__actions">
+                                <span>{{ destination.label }}</span>{% icon "arrow_forward" %}
+                            </a>
+                        </div>
+                    {% endif %}
+                    <br/>
+                    <div>
+                        <a href="{% url 'berichten:mark-bericht-unread' object_uuid=bericht.object_uuid %}" class="button">
+                            {% icon "arrow_backward" %}Markeer dit bericht als ongeopend
                         </a>
                     </div>
                 </section>
