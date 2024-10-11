@@ -89,7 +89,7 @@
                                                         <span class="file__name">{{ attachment }} (PDF)</span>
                                                         <span class="file__date">{{ bericht.publicatiedatum }}</span>
                                                     </div>
-                                                    <a href="https://www.maykinmedia.nl/media/filer_public/94/50/9450f9e9-70d1-4d00-99e4-08bc49fb3dc7/2194530_nl_2019.pdf" download="" class="link link--icon link--icon-position-before file__download link--primary file__download" aria-label="Download namefile" title="Download dit bestand" target="_blank">
+                                                    <a href="{% url 'berichten:download-bericht-attachment' object_uuid=bericht.object_uuid  %}?url={{ attachment|urlencode }}" download="" class="link link--icon link--icon-position-before file__download link--primary file__download" aria-label="Download namefile" title="Download dit bestand" target="_blank">
                                                         {% icon "download" outlined=True %}
                                                     </a>
                                                 </div>
