@@ -28,12 +28,15 @@
                                 {# Icon only if deadline exists  #}
                                 {% if bericht.einddatum_handelingstermijn %}
                                     {% icon icon="warning_amber" icon_position="after" extra_classes="icon--danger" outlined=True %}
-                                {% endif %}
+
                                 <span class="dashboard__item-label">
                                     <span> Einddatum: </span>
                                 </span>
                                 <span>{{ bericht.einddatum_handelingstermijn }}</span>
                                 <span class="dashboard__item-label"><span id="remainingDays" class="utrecht-paragraph table__item--notification-danger"></span> <!-- Placeholder for remaining days --></span>
+                                {% else %}
+                                <span class="dashboard__item-label">Voor dit bericht is geen uiterste handelingstermijn</span>
+                                {% endif %}
                             </p>
                         </li>
                     </ul>
