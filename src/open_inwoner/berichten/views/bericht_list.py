@@ -8,12 +8,18 @@ from django.views.generic import TemplateView
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.berichten.services import BerichtenService
+from open_inwoner.berichten.views.mixins import RequireBsnMixin
 from open_inwoner.utils.views import CommonPageMixin
 
 logger = logging.getLogger(__name__)
 
 
-class BerichtListView(CommonPageMixin, BaseBreadcrumbMixin, TemplateView):
+class BerichtListView(
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    RequireBsnMixin,
+    TemplateView,
+):
 
     template_name = "pages/berichten/list.html"
 
@@ -29,7 +35,7 @@ class BerichtListView(CommonPageMixin, BaseBreadcrumbMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         service = BerichtenService()
-        if self.request.user.is_authenticated and (bsn := self.request.user.bsn):
-            context["berichten"] = service.fetch_berichten_for_bsn(bsn)
+        bsn = self.request.user.bsn if hasattr(self.request.user, "bsn") else None
+        context["berichten"] = service.fetch_berichten_for_bsn(bsn) if bsn else []
 
         return context
