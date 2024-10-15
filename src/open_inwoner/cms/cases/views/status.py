@@ -189,11 +189,14 @@ class InnerCaseDetailView(
                 self.case.zaaktype.url
             )
 
-            # NOTE we cannot sort on the Status.datum_status_gezet (datetime) because eSuite
+            # NOTE we cannot always sort on the Status.datum_status_gezet (datetime) because eSuite
             # returns zeros as the time component of the datetime, so we're going with the
             # observation that on both OpenZaak and eSuite the returned list is ordered 'oldest-last'
             # here we want it 'oldest-first' so we reverse() it instead of sort()-ing
-            statuses.reverse()
+            if config.order_statusses_by_date_set:
+                statuses.sort()
+            else:
+                statuses.reverse()
 
             # get preview of second status
             if len(statuses) == 1:
