@@ -425,6 +425,19 @@ class OpenZaakConfig(SingletonModel):
         default=False,
     )
 
+    order_statuses_by_date_set = models.BooleanField(
+        verbose_name=_(
+            "On the detail page of the case, order the statuses based on the date they have been set"
+        ),
+        help_text=_(
+            "If enabled, the statuses of a case are ordered based on 'datum_status_gezet'. "
+            "If not enabled, we show the statuses in the reverse order they are returned via the API, "
+            "this because the eSuite does not return the timestamps of the statuses (eSuite, but also "
+            "works for Open Zaak)."
+        ),
+        default=False,
+    )
+
     title_text = models.TextField(
         verbose_name=_("Title text"),
         help_text=_(

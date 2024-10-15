@@ -2485,3 +2485,48 @@ class TestCaseDetailView(
         response = self.app.get(self.case_detail_url, user=self.eherkenning_user)
 
         self.assertEqual(response.status_code, 200)
+
+    def test_zaak_status_ordering(self, m):
+        self._setUpMocks(m)
+
+        status_type_intermediate = generate_oas_component_cached(
+            "ztc",
+            "schemas/StatusType",
+            url=f"{CATALOGI_ROOT}statustypen/625f373c-2828-49b3-9a29-bc36dc84d729",
+            zaaktype=self.zaaktype["url"],
+            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            omschrijving="Intermediate request",
+            omschrijvingGeneriek="some content",
+            statustekst="Modified",
+            volgnummer=2,
+            isEindstatus=False,
+        )
+        status_intermediate = generate_oas_component_cached(
+            "zrc",
+            "schemas/Status",
+            url=f"{ZAKEN_ROOT}statussen/07a4ae16-8eea-4a93-a01a-f822d7235d0c",
+            zaak=self.zaak["url"],
+            statustype=status_type_intermediate["url"],
+            datumStatusGezet="2021-02-12",
+            statustoelichting="",
+        )
+
+        for resource in [status_type_intermediate, status_intermediate]:
+            m.get(resource["url"], json=resource)
+
+        m.get(
+            f"{ZAKEN_ROOT}statussen?zaak={self.zaak['url']}",
+            json=paginated_response(
+                [status_intermediate, self.status_new, self.status_finish]
+            ),
+        )
+
+        self.config.order_statuses_by_date_set = True
+        self.config.save()
+
+        response = self.app.get(self.case_detail_url, user=self.user)
+        case = response.context.get("case")
+
+        self.assertEqual(case["statuses"][0]["label"], "Registered")
+        self.assertEqual(case["statuses"][1]["label"], "Modified")
+        self.assertEqual(case["statuses"][2]["label"], "Finish")
