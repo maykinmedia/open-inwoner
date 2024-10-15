@@ -405,6 +405,63 @@ class ContactFormIntegrationTest(
         self.assertTimelineLog("registered contactmoment by API")
         mock_send_confirm.assert_called_once_with("foo@example.com", subject.subject)
 
+    def test_submit_and_register_anon_via_api_without_klant_does_not_send_empty_email_or_telephone(
+        self, m, mock_send_confirm, mock_captcha
+    ):
+        config = OpenKlantConfig.get_solo()
+        config.register_contact_moment = True
+        config.register_bronorganisatie_rsin = "123456789"
+        config.register_type = "Melding"
+        config.register_channel = "contactformulier"
+        config.register_employee_id = "FooVonBar"
+        config.save()
+
+        MockAPICreateData.setUpServices()
+        data = MockAPICreateData()
+        data.install_mocks_anon_without_klant(m)
+
+        subject = ContactFormSubjectFactory(
+            config=config,
+            subject="Aanvraag document",
+            subject_code="afdeling-xyz",
+        )
+
+        for contact_details in (
+            {"phonenumber": "+31612345678", "email": ""},
+            {"phonenumber": "", "email": "foo@example.com"},
+        ):
+            with self.subTest():
+                m.reset_mock()
+                response = self.app.get(self.url)
+                form = response.forms["contactmoment-form"]
+                form["subject"].select(text=subject.subject)
+                form["first_name"] = "Foo"
+                form["infix"] = "de"
+                form["last_name"] = "Bar"
+                form["question"] = "foobar"
+                form["phonenumber"] = contact_details["phonenumber"]
+                form["email"] = contact_details["email"]
+
+                response = form.submit().follow()
+
+                contactmoment_create_data = data.matchers[1].request_history[0].json()
+                contactgegevens = contactmoment_create_data["contactgegevens"]
+
+                if contact_details["email"]:
+                    self.assertEqual(
+                        contactgegevens["emailadres"], contact_details["email"]
+                    )
+                else:
+                    self.assertNotIn("emailadres", contactgegevens.keys())
+
+                if contact_details["phonenumber"]:
+                    self.assertEqual(
+                        contactgegevens["telefoonnummer"],
+                        contact_details["phonenumber"],
+                    )
+                else:
+                    self.assertNotIn("telefoonnummer", contactgegevens.keys())
+
     def test_register_bsn_user_via_api_without_id(
         self, m, mock_send_confirm, mock_captcha
     ):
