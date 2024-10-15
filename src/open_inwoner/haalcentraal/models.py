@@ -4,6 +4,8 @@ from django.utils.translation import gettext_lazy as _
 from solo.models import SingletonModel
 from zgw_consumers.constants import APITypes
 
+from .validators import validate_verwerking_header
+
 
 class HaalCentraalConfigManager(models.Manager):
     def get_queryset(self):
@@ -29,7 +31,7 @@ class HaalCentraalConfig(SingletonModel):
         max_length=64,
         blank=True,
         help_text=_(
-            "Value of the 'x-origin-oin' header for Haalcentraal BRP v1.3 API requests."
+            "Value of the 'x-origin-oin' header for Haalcentraal BRP API requests."
         ),
     )
     api_doelbinding = models.CharField(
@@ -37,7 +39,16 @@ class HaalCentraalConfig(SingletonModel):
         max_length=64,
         blank=True,
         help_text=_(
-            "Value of the 'x-doelbinding' header for Haalcentraal BRP v1.3 API requests."
+            "Value of the 'x-doelbinding' header for Haalcentraal BRP API requests."
+        ),
+    )
+    api_verwerking = models.CharField(
+        _("API 'verwerking' header"),
+        max_length=242,
+        blank=True,
+        validators=[validate_verwerking_header],
+        help_text=_(
+            "Value of the 'x-verwerking' header for Haalcentraal BRP API requests"
         ),
     )
 

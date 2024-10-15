@@ -117,6 +117,18 @@ class BRP_2_1(BRPAPI):
 
     def make_request(self, user_bsn: str) -> requests.Response:
         url = "personen"
+
+        headers = {
+            "Accept": "application/json",
+            "x-gebruiker": "BurgerZelf",
+        }
+        if self.config.api_origin_oin:  # See Taiga #755
+            headers["x-origin-oin"] = self.config.api_origin_oin
+        if self.config.api_doelbinding:  # See Taiga #755
+            headers["x-doelbinding"] = self.config.api_doelbinding
+        if self.config.api_verwerking:
+            headers["x-verwerking"] = self.config.api_verwerking
+
         response = self.client.post(
             url=url,
             json={
@@ -138,10 +150,7 @@ class BRP_2_1(BRPAPI):
                 "type": "RaadpleegMetBurgerservicenummer",
                 "burgerservicenummer": [user_bsn],
             },
-            headers={
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-            },
+            headers=headers,
             verify=False,
         )
         return response
