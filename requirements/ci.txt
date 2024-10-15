@@ -461,7 +461,7 @@ django-solo==2.2.0
     #   mozilla-django-oidc-db
     #   notifications-api-common
     #   zgw-consumers
-django-timeline-logger==3.0.0
+django-timeline-logger==4.0.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
