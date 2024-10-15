@@ -4,6 +4,7 @@ import logging
 from django.contrib import admin
 from django.contrib.admin.models import ADDITION, CHANGE, DELETION
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import NoReverseMatch, path, reverse
 from django.utils.html import escape, format_html
@@ -62,6 +63,32 @@ class ContentTypeUsedListFilter(admin.SimpleListFilter):
         return queryset
 
 
+class TimelineLogLevelFilter(admin.SimpleListFilter):
+    title = _("log level")
+    parameter_name = "log_level"
+
+    def lookups(self, request, model_admin):
+        return [(v, v) for v in logging.getLevelNamesMapping().keys()] + [
+            ("unknown", _("Unknown"))
+        ]
+
+    def queryset(self, request, queryset):
+        if not (value := self.value()):
+            return queryset
+
+        if value == "unknown":
+            return queryset.filter(
+                ~Q(extra_data__has_key="log_level")
+                | Q(extra_data__log_level__isnull=True)
+            )
+
+        try:
+            log_level = logging.getLevelNamesMapping()[value]
+            return queryset.filter(extra_data__log_level=log_level)
+        except KeyError:
+            return queryset
+
+
 class CustomTimelineLogAdmin(ExportMixin, TimelineLogAdmin):
     show_full_result_count = False
     fields = ["content_type", "timestamp", "extra_data", "user"]
@@ -74,7 +101,12 @@ class CustomTimelineLogAdmin(ExportMixin, TimelineLogAdmin):
         "get_action_flag",
         "message",
     ]
-    list_filter = ["timestamp", LogActionListFilter, ContentTypeUsedListFilter]
+    list_filter = [
+        "timestamp",
+        TimelineLogLevelFilter,
+        LogActionListFilter,
+        ContentTypeUsedListFilter,
+    ]
     list_select_related = ["content_type"]
     search_fields = [
         "user__email",
