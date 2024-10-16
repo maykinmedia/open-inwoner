@@ -194,7 +194,7 @@ class InnerCaseDetailView(
             # observation that on both OpenZaak and eSuite the returned list is ordered 'oldest-last'
             # here we want it 'oldest-first' so we reverse() it instead of sort()-ing
             if config.order_statusses_by_date_set:
-                statuses.sort()
+                statuses.sort(key=lambda s: s.datum_status_gezet)
             else:
                 statuses.reverse()
 
