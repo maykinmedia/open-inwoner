@@ -36,7 +36,6 @@ All settings:
     ADMIN_OIDC_DEFAULT_GROUPS
     ADMIN_OIDC_GROUPS_CLAIM
     ADMIN_OIDC_MAKE_USERS_STAFF
-    ADMIN_OIDC_OIDC_EXEMPT_URLS
     ADMIN_OIDC_OIDC_NONCE_SIZE
     ADMIN_OIDC_OIDC_OP_AUTHORIZATION_ENDPOINT
     ADMIN_OIDC_OIDC_OP_DISCOVERY_ENDPOINT
@@ -65,12 +64,12 @@ Detailed Information
     Setting             claim mapping
     Description         Mapping from user-model fields to OIDC claims
     Possible values     Mapping: {'some_key': 'Some value'}
-    Default value       {'email': 'email', 'first_name': 'given_name', 'last_name': 'family_name'}
+    Default value       {'email': ['email'], 'first_name': ['given_name'], 'last_name': ['family_name']}
     
     Variable            ADMIN_OIDC_GROUPS_CLAIM
     Setting             groups claim
     Description         The name of the OIDC claim that holds the values to map to local user groups.
-    Possible values     string
+    Possible values     No information available
     Default value       roles
     
     Variable            ADMIN_OIDC_MAKE_USERS_STAFF
@@ -78,12 +77,6 @@ Detailed Information
     Description         Users will be flagged as being a staff user automatically. This allows users to login to the admin interface. By default they have no permissions, even if they are staff.
     Possible values     True, False
     Default value       False
-    
-    Variable            ADMIN_OIDC_OIDC_EXEMPT_URLS
-    Setting             URLs exempt from session renewal
-    Description         This is a list of absolute url paths, regular expressions for url paths, or Django view names. This plus the mozilla-django-oidc urls are exempted from the session renewal by the SessionRefresh middleware.
-    Possible values     string, comma-delimited ('foo,bar,baz')
-    Default value       
     
     Variable            ADMIN_OIDC_OIDC_NONCE_SIZE
     Setting             Nonce size
@@ -190,5 +183,5 @@ Detailed Information
     Variable            ADMIN_OIDC_USERNAME_CLAIM
     Setting             username claim
     Description         The name of the OIDC claim that is used as the username
-    Possible values     string
+    Possible values     No information available
     Default value       sub
