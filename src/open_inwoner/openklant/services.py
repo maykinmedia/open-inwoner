@@ -345,14 +345,10 @@ class OpenKlant2Service:
         return partij
 
     def retrieve_digitale_addressen_for_partij(
-        self, partij: Partij
+        self, partij_uuid: str
     ) -> list[DigitaalAdres]:
-        if expand := partij.get("_expand"):
-            if digitale_adressen := expand.get("digitaleAdressen"):
-                return digitale_adressen
-
         expand_partij = self.client.partij.retrieve(
-            partij["uuid"], params={"expand": ["digitaleAdressen"]}
+            partij_uuid, params={"expand": ["digitaleAdressen"]}
         )
 
         if expand := expand_partij.get("_expand"):
@@ -365,13 +361,13 @@ class OpenKlant2Service:
 
     def filter_digitale_addressen_for_partij(
         self,
-        partij: Partij,
+        partij_uuid: str,
         *,
         soortDigitaalAdres: str,
         adressen: Iterable[DigitaalAdres] | None = None,
     ) -> list[DigitaalAdres]:
         if adressen is None:
-            adressen = self.retrieve_digitale_addressen_for_partij(partij)
+            adressen = self.retrieve_digitale_addressen_for_partij(partij_uuid)
 
         return [
             digitaal_adres
@@ -381,12 +377,12 @@ class OpenKlant2Service:
 
     def get_or_create_digitaal_adres(
         self,
-        partij: Partij,
+        partij_uuid: str,
         soortAdres: Literal["email", "telefoon"],
         adres: str,
     ) -> tuple[DigitaalAdres, bool]:
         digitale_adressen = self.filter_digitale_addressen_for_partij(
-            partij, soortDigitaalAdres=soortAdres
+            partij_uuid, soortDigitaalAdres=soortAdres
         )
         for digitaal_adres in digitale_adressen:
             if digitaal_adres["adres"] == adres:
@@ -398,7 +394,7 @@ class OpenKlant2Service:
                     "adres": adres,
                     "soortDigitaalAdres": soortAdres,
                     "verstrektDoorPartij": {
-                        "uuid": partij["uuid"],
+                        "uuid": partij_uuid,
                     },
                     "verstrektDoorBetrokkene": None,
                     "omschrijving": "OIP profiel",
@@ -407,20 +403,20 @@ class OpenKlant2Service:
             True,
         )
 
-    def update_user_from_partij(self, partij: Partij, user: User):
+    def update_user_from_partij(self, partij_uuid: str, user: User):
         update_data = {}
 
-        adressen = self.retrieve_digitale_addressen_for_partij(partij)
+        adressen = self.retrieve_digitale_addressen_for_partij(partij_uuid)
 
         if email_adressen := self.filter_digitale_addressen_for_partij(
-            partij, soortDigitaalAdres="email", adressen=adressen
+            partij_uuid, soortDigitaalAdres="email", adressen=adressen
         ):
             email = email_adressen[0]["adres"]
             if not User.objects.filter(email__iexact=email).exists():
                 update_data["email"] = email
 
         if phone_adressen := self.filter_digitale_addressen_for_partij(
-            partij, soortDigitaalAdres="telefoon", adressen=adressen
+            partij_uuid, soortDigitaalAdres="telefoon", adressen=adressen
         ):
             update_data["phonenumber"] = phone_adressen[0]["adres"]
 
@@ -434,11 +430,11 @@ class OpenKlant2Service:
                 content_object=user,
             )
 
-    def update_partij_from_user(self, partij: Partij, user: User):
+    def update_partij_from_user(self, partij_uuid: str, user: User):
         updated_fields = []
         for attr, soort_adres in (("email", "email"), ("phonenumber", "telefoon")):
             _, created = self.get_or_create_digitaal_adres(
-                partij,
+                partij_uuid,
                 soort_adres,
                 getattr(user, attr),
             )
@@ -452,7 +448,7 @@ class OpenKlant2Service:
             )
 
     def create_question(
-        self, partij: Partij, question: str, subject: str
+        self, partij_uuid: str, question: str, subject: str
     ) -> OpenKlant2Question:
 
         if len(question.rstrip()) == 0:
@@ -481,7 +477,7 @@ class OpenKlant2Service:
                 "rol": "klant",
                 "hadKlantcontact": {"uuid": klantcontact["uuid"]},
                 "initiator": True,
-                "wasPartij": {"uuid": partij["uuid"]},
+                "wasPartij": {"uuid": partij_uuid},
                 "organisatienaam": "Open Inwoner Platform",
             }
         )
@@ -501,7 +497,7 @@ class OpenKlant2Service:
         return OpenKlant2Question.from_klantcontact_and_answer(klantcontact)
 
     def create_answer(
-        self, partij: Partij, question_klantcontact_uuid: str, answer: str
+        self, partij_uuid: str, question_klantcontact_uuid: str, answer: str
     ) -> OpenKlant2Answer:
         """Create an answer for a question identified through `question_klantcontact_uuid`.
 
@@ -527,7 +523,7 @@ class OpenKlant2Service:
                 "rol": "klant",
                 "hadKlantcontact": {"uuid": answer_klantcontact["uuid"]},
                 "initiator": True,
-                "wasPartij": {"uuid": partij["uuid"]},
+                "wasPartij": {"uuid": partij_uuid},
                 "organisatienaam": "Open Inwoner Platform",
             }
         )
@@ -546,7 +542,7 @@ class OpenKlant2Service:
         return OpenKlant2Answer.from_klantcontact(answer_klantcontact)
 
     def klantcontacten_for_partij(
-        self, partij: Partij, *, kanaal: str | None = None
+        self, partij_uuid: str, *, kanaal: str | None = None
     ) -> Iterable[KlantContact]:
         params: ListKlantContactParams = {
             "expand": [
@@ -566,7 +562,7 @@ class OpenKlant2Service:
         # unfortunately, we have to fetch all rows and do the filtering client
         # side.
         klantcontacten_for_partij = filter(
-            lambda row: partij["uuid"]
+            lambda row: partij_uuid
             in glom.glom(
                 row,
                 ("_expand.hadBetrokkenen", ["wasPartij.uuid"]),
@@ -576,13 +572,13 @@ class OpenKlant2Service:
 
         return klantcontacten_for_partij
 
-    def questions_for_partij(self, partij: Partij) -> list[OpenKlant2Question]:
+    def questions_for_partij(self, partij_uuid: str) -> list[OpenKlant2Question]:
         answers_for_klantcontact_uuid = {}
         question_uuids = []
         klantcontact_uuid_to_klantcontact_object = {}
 
         for klantcontact in self.klantcontacten_for_partij(
-            partij, kanaal=self.MIJN_VRAGEN_KANAAL
+            partij_uuid, kanaal=self.MIJN_VRAGEN_KANAAL
         ):
             klantcontact_uuid_to_klantcontact_object[
                 klantcontact["uuid"]
