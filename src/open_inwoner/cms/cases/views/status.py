@@ -193,7 +193,7 @@ class InnerCaseDetailView(
             # returns zeros as the time component of the datetime, so we're going with the
             # observation that on both OpenZaak and eSuite the returned list is ordered 'oldest-last'
             # here we want it 'oldest-first' so we reverse() it instead of sort()-ing
-            statuses.reverse()
+            statuses.sort(key=lambda s: s.datum_status_gezet)
 
             # get preview of second status
             if len(statuses) == 1:
