@@ -28,18 +28,20 @@ CACHES.update(
     }
 )
 
-# Allow logging in with both username+password and email+password
+
+_MOCK_AUTHENTICATION_BACKENDS = {
+    "digid_eherkenning.backends.DigiDBackend": "digid_eherkenning.mock.backends.DigiDBackend",
+    "eherkenning.backends.eHerkenningBackend": "eherkenning.mock.backends.eHerkenningBackend",
+}
+
 AUTHENTICATION_BACKENDS = [
-    "open_inwoner.accounts.backends.CustomAxesBackend",
-    "open_inwoner.accounts.backends.UserModelEmailBackend",
+    _MOCK_AUTHENTICATION_BACKENDS.get(backend, backend)
+    for backend in AUTHENTICATION_BACKENDS
+] + [
+    # Allow logging in with both username+password and email+password
     "django.contrib.auth.backends.ModelBackend",
-    # mock login like dev.py
-    "digid_eherkenning.mock.backends.DigiDBackend",
-    "eherkenning.mock.backends.eHerkenningBackend",
-    "digid_eherkenning_oidc_generics.backends.OIDCAuthenticationDigiDBackend",
-    "digid_eherkenning_oidc_generics.backends.OIDCAuthenticationEHerkenningBackend",
-    "open_inwoner.accounts.backends.CustomOIDCBackend",
 ]
+
 
 ELASTIC_APM["DEBUG"] = True
 
