@@ -223,17 +223,17 @@ class Openklant2ServiceTest(Openklant2ServiceTestCase):
     def test_update_user_from_partij(self):
         user: User = UserFactory(phonenumber="", email="foo@bar.com")
         self.service.get_or_create_digitaal_adres(
-            self.persoon,
+            self.persoon["uuid"],
             "telefoon",
             "0644938475",
         )
         self.service.get_or_create_digitaal_adres(
-            self.persoon,
+            self.persoon["uuid"],
             "email",
             "bar@foo.com",
         )
 
-        self.service.update_user_from_partij(self.persoon, user)
+        self.service.update_user_from_partij(self.persoon["uuid"], user)
         self.assertEqual(user.phonenumber, "0644938475")
         self.assertEqual(user.email, "bar@foo.com")
 
@@ -243,12 +243,12 @@ class Openklant2ServiceTest(Openklant2ServiceTestCase):
 
         # Set user's OK email to another user's email
         self.service.get_or_create_digitaal_adres(
-            self.persoon,
+            self.persoon["uuid"],
             "email",
             another_user.email,
         )
 
-        self.service.update_user_from_partij(self.persoon, user)
+        self.service.update_user_from_partij(self.persoon["uuid"], user)
         self.assertEqual(
             user.email,
             "user@bar.com",
@@ -259,17 +259,17 @@ class Openklant2ServiceTest(Openklant2ServiceTestCase):
         user: User = UserFactory(phonenumber="0644938475", email="user@bar.com")
 
         self.assertEqual(
-            self.service.retrieve_digitale_addressen_for_partij(self.persoon),
+            self.service.retrieve_digitale_addressen_for_partij(self.persoon["uuid"]),
             [],
         )
 
-        self.service.update_partij_from_user(self.persoon, user)
+        self.service.update_partij_from_user(self.persoon["uuid"], user)
 
         self.assertEqual(
             [
                 (da["soortDigitaalAdres"], da["adres"])
                 for da in self.service.retrieve_digitale_addressen_for_partij(
-                    self.persoon
+                    self.persoon["uuid"]
                 )
             ],
             [("email", "user@bar.com"), ("telefoon", "0644938475")],
@@ -323,7 +323,7 @@ class QuestionAnswerTestCase(Openklant2ServiceTestCase):
 
         with self.assertRaises(RuntimeError):
             self.service.create_question(
-                self.een_persoon,
+                self.een_persoon["uuid"],
                 question="A question asked by Alice",
                 subject="Important questions",
             )
@@ -333,14 +333,14 @@ class QuestionAnswerTestCase(Openklant2ServiceTestCase):
             with self.subTest("{q=} is not a valid question"):
                 with self.assertRaises(ValueError):
                     self.service.create_question(
-                        self.een_persoon,
+                        self.een_persoon["uuid"],
                         question=question,
                         subject="Important questions",
                     )
 
     def test_create_question(self):
         question = self.service.create_question(
-            self.een_persoon,
+            self.een_persoon["uuid"],
             question="A question asked by Alice",
             subject="Important questions",
         )
@@ -372,7 +372,7 @@ class QuestionAnswerTestCase(Openklant2ServiceTestCase):
         for persoon in (self.een_persoon, self.een_ander_persoon):
             raw_questions = [
                 self.service.create_question(
-                    persoon,
+                    persoon["uuid"],
                     question=f"A question asked by {persoon['uuid']}, part {i}",
                     subject="Life and stuff",
                 )
@@ -381,10 +381,10 @@ class QuestionAnswerTestCase(Openklant2ServiceTestCase):
 
             for rq in raw_questions[:1]:
                 self.service.create_answer(
-                    persoon, rq.question_kcm_uuid, "The answer is 42"
+                    persoon["uuid"], rq.question_kcm_uuid, "The answer is 42"
                 )
 
-        questions = self.service.questions_for_partij(self.een_persoon)
+        questions = self.service.questions_for_partij(self.een_persoon["uuid"])
 
         self.assertEqual(
             len(questions), 2, msg="Only the user's questions should be returned"
