@@ -95,7 +95,7 @@ class ProfileViewTests(WebTest):
 
         self.assertEqual(logout_link.attr("href"), reverse("logout"))
 
-    @patch("digid_eherkenning_oidc_generics.models.OpenIDConnectDigiDConfig.get_solo")
+    @patch("open_inwoner.accounts.models.OpenIDDigiDConfig.get_solo")
     def test_show_correct_logout_button_for_login_type_digid(self, mock_solo):
         for oidc_enabled in [True, False]:
             with self.subTest(oidc_enabled=oidc_enabled):
@@ -114,9 +114,7 @@ class ProfileViewTests(WebTest):
 
                 self.assertEqual(logout_link.attr("href"), logout_url)
 
-    @patch(
-        "digid_eherkenning_oidc_generics.models.OpenIDConnectEHerkenningConfig.get_solo"
-    )
+    @patch("open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo")
     def test_show_correct_logout_button_for_login_type_eherkenning(self, mock_solo):
         for oidc_enabled in [True, False]:
             with self.subTest(oidc_enabled=oidc_enabled):

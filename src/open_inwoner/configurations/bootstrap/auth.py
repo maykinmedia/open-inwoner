@@ -9,6 +9,8 @@ from digid_eherkenning.admin import (
     EherkenningConfigurationAdmin,
 )
 from digid_eherkenning.models import DigidConfiguration, EherkenningConfiguration
+from digid_eherkenning.oidc.admin import admin_modelform_factory
+from django_jsonform.forms.fields import JSONFormField
 from django_setup_configuration.config_settings import ConfigSettings
 from django_setup_configuration.configuration import BaseConfigurationStep
 from django_setup_configuration.exceptions import ConfigurationRunFailed
@@ -16,17 +18,34 @@ from mozilla_django_oidc_db.forms import OpenIDConnectConfigForm
 from mozilla_django_oidc_db.models import OpenIDConnectConfig
 from simple_certmanager.models import Certificate
 
-from digid_eherkenning_oidc_generics.admin import (
-    OpenIDConnectDigiDConfigForm,
-    OpenIDConnectEHerkenningConfigForm,
-)
-from digid_eherkenning_oidc_generics.models import (
-    OpenIDConnectDigiDConfig,
-    OpenIDConnectEHerkenningConfig,
-)
+from open_inwoner.accounts.models import OpenIDDigiDConfig, OpenIDEHerkenningConfig
 from open_inwoner.configurations.models import SiteConfiguration
 
 from .utils import convert_setting_to_model_field_name, log_form_errors
+
+
+class LOAValueMappingField(JSONFormField):
+    def to_python(self, value):
+        value = super().to_python(value)
+        # super class treats [] as empty (not wrong), but converts it to None, which
+        # doesn't pass the schema validation
+        if value is None:
+            value = []
+        return value
+
+
+def formfield_callback(model_field, **kwargs):
+    if model_field.name == "loa_value_mapping":
+        kwargs["form_class"] = LOAValueMappingField
+    return model_field.formfield(**kwargs)
+
+
+OpenIDDigiDConfigForm = admin_modelform_factory(
+    OpenIDDigiDConfig, formfield_callback=formfield_callback
+)
+OpenIDEHerkenningConfigForm = admin_modelform_factory(
+    OpenIDEHerkenningConfig, formfield_callback=formfield_callback
+)
 
 
 #
@@ -41,16 +60,14 @@ class DigiDOIDCConfigurationStep(BaseConfigurationStep):
     config_settings = ConfigSettings(
         enable_setting="DIGID_OIDC_CONFIG_ENABLE",
         namespace="DIGID_OIDC",
-        models=[OpenIDConnectDigiDConfig],
+        models=[OpenIDDigiDConfig],
         required_settings=[
             "DIGID_OIDC_OIDC_RP_CLIENT_ID",
             "DIGID_OIDC_OIDC_RP_CLIENT_SECRET",
         ],
         optional_settings=[
             "DIGID_OIDC_ENABLED",
-            "DIGID_OIDC_ERROR_MESSAGE_MAPPING",
-            "DIGID_OIDC_IDENTIFIER_CLAIM_NAME",
-            "DIGID_OIDC_OIDC_EXEMPT_URLS",
+            "DIGID_OIDC_BSN_CLAIM",
             "DIGID_OIDC_OIDC_KEYCLOAK_IDP_HINT",
             "DIGID_OIDC_OIDC_NONCE_SIZE",
             "DIGID_OIDC_OIDC_OP_AUTHORIZATION_ENDPOINT",
@@ -72,18 +89,18 @@ class DigiDOIDCConfigurationStep(BaseConfigurationStep):
         return getattr(settings, self.config_settings.enable_setting, False)
 
     def is_configured(self) -> bool:
-        return OpenIDConnectDigiDConfig.get_solo().enabled
+        return OpenIDDigiDConfig.get_solo().enabled
 
     def configure(self):
         if not self.is_enabled():
             return
 
-        config = OpenIDConnectDigiDConfig.get_solo()
+        config = OpenIDDigiDConfig.get_solo()
 
         # Use the model defaults
         form_data = {
             field.name: getattr(config, field.name)
-            for field in OpenIDConnectDigiDConfig._meta.fields
+            for field in OpenIDDigiDConfig._meta.fields
         }
 
         # Only override field values with settings if they are defined
@@ -101,12 +118,8 @@ class DigiDOIDCConfigurationStep(BaseConfigurationStep):
 
         form_data["enabled"] = True
 
-        # Saving the form with the default error_message_mapping `{}` causes the save to fail
-        if not form_data["error_message_mapping"]:
-            del form_data["error_message_mapping"]
-
         # Use the admin form to apply validation and fetch URLs from the discovery endpoint
-        form = OpenIDConnectDigiDConfigForm(data=form_data)
+        form = OpenIDDigiDConfigForm(data=form_data)
         if not form.is_valid():
             raise ConfigurationRunFailed(
                 f"Something went wrong while saving configuration: {form.errors}"
@@ -133,7 +146,7 @@ class eHerkenningOIDCConfigurationStep(BaseConfigurationStep):
     config_settings = ConfigSettings(
         enable_setting="EHERKENNING_OIDC_CONFIG_ENABLE",
         namespace="EHERKENNING_OIDC",
-        models=[OpenIDConnectEHerkenningConfig],
+        models=[OpenIDEHerkenningConfig],
         update_fields=True,
         required_settings=[
             "EHERKENNING_OIDC_OIDC_RP_CLIENT_ID",
@@ -141,7 +154,7 @@ class eHerkenningOIDCConfigurationStep(BaseConfigurationStep):
         ],
         optional_settings=[
             "EHERKENNING_OIDC_ENABLED",
-            "EHERKENNING_OIDC_IDENTIFIER_CLAIM_NAME",
+            "EHERKENNING_OIDC_LEGAL_SUBJECT_CLAIM",
             "EHERKENNING_OIDC_OIDC_RP_SCOPES_LIST",
             "EHERKENNING_OIDC_OIDC_RP_SIGN_ALGO",
             "EHERKENNING_OIDC_OIDC_RP_IDP_SIGN_KEY",
@@ -152,28 +165,26 @@ class eHerkenningOIDCConfigurationStep(BaseConfigurationStep):
             "EHERKENNING_OIDC_OIDC_OP_USER_ENDPOINT",
             "EHERKENNING_OIDC_OIDC_OP_LOGOUT_ENDPOINT",
             "EHERKENNING_OIDC_USERINFO_CLAIMS_SOURCE",
-            "EHERKENNING_OIDC_ERROR_MESSAGE_MAPPING",
             "EHERKENNING_OIDC_OIDC_KEYCLOAK_IDP_HINT",
             "EHERKENNING_OIDC_OIDC_USE_NONCE",
             "EHERKENNING_OIDC_OIDC_NONCE_SIZE",
             "EHERKENNING_OIDC_OIDC_STATE_SIZE",
-            "EHERKENNING_OIDC_OIDC_EXEMPT_URLS",
         ],
     )
 
     def is_configured(self) -> bool:
-        return OpenIDConnectEHerkenningConfig.get_solo().enabled
+        return OpenIDEHerkenningConfig.get_solo().enabled
 
     def configure(self):
         if not getattr(settings, self.config_settings.enable_setting, None):
             return
 
-        config = OpenIDConnectEHerkenningConfig.get_solo()
+        config = OpenIDEHerkenningConfig.get_solo()
 
         # Use the model defaults
         form_data = {
             field.name: getattr(config, field.name)
-            for field in OpenIDConnectEHerkenningConfig._meta.fields
+            for field in OpenIDEHerkenningConfig._meta.fields
         }
 
         # Only override field values with settings if they are defined
@@ -191,12 +202,8 @@ class eHerkenningOIDCConfigurationStep(BaseConfigurationStep):
 
         form_data["enabled"] = True
 
-        # Saving the form with the default error_message_mapping `{}` causes the save to fail
-        if not form_data["error_message_mapping"]:
-            del form_data["error_message_mapping"]
-
         # Use the admin form to apply validation and fetch URLs from the discovery endpoint
-        form = OpenIDConnectEHerkenningConfigForm(data=form_data)
+        form = OpenIDEHerkenningConfigForm(data=form_data)
         if not form.is_valid():
             raise ConfigurationRunFailed(
                 f"Something went wrong while saving configuration: {form.errors}"
@@ -235,7 +242,6 @@ class AdminOIDCConfigurationStep(BaseConfigurationStep):
             "ADMIN_OIDC_CLAIM_MAPPING",
             "ADMIN_OIDC_GROUPS_CLAIM",
             "ADMIN_OIDC_MAKE_USERS_STAFF",
-            "ADMIN_OIDC_OIDC_EXEMPT_URLS",
             "ADMIN_OIDC_OIDC_NONCE_SIZE",
             "ADMIN_OIDC_OIDC_OP_AUTHORIZATION_ENDPOINT",
             "ADMIN_OIDC_OIDC_OP_DISCOVERY_ENDPOINT",

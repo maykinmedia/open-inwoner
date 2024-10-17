@@ -32,9 +32,7 @@ All settings:
 ::
 
     EHERKENNING_OIDC_ENABLED
-    EHERKENNING_OIDC_ERROR_MESSAGE_MAPPING
-    EHERKENNING_OIDC_IDENTIFIER_CLAIM_NAME
-    EHERKENNING_OIDC_OIDC_EXEMPT_URLS
+    EHERKENNING_OIDC_LEGAL_SUBJECT_CLAIM
     EHERKENNING_OIDC_OIDC_KEYCLOAK_IDP_HINT
     EHERKENNING_OIDC_OIDC_NONCE_SIZE
     EHERKENNING_OIDC_OIDC_OP_AUTHORIZATION_ENDPOINT
@@ -59,27 +57,15 @@ Detailed Information
 
     Variable            EHERKENNING_OIDC_ENABLED
     Setting             inschakelen
-    Description         Geeft aan of OpenID Connect voor authenticatie/autorisatie is ingeschakeld. Deze heeft voorrang op het gebruik van SAML voor eHerkenning-authenticatie.
+    Description         Indicates whether OpenID Connect for authentication/authorization is enabled
     Possible values     True, False
     Default value       False
     
-    Variable            EHERKENNING_OIDC_ERROR_MESSAGE_MAPPING
-    Setting             Foutmelding mapping
-    Description         Mapping die de door de identiteitsprovider geretourneerde foutmeldingen, omzet in leesbare meldingen die aan de gebruiker worden getoond
-    Possible values     Mapping: {'some_key': 'Some value'}
-    Default value       {}
-    
-    Variable            EHERKENNING_OIDC_IDENTIFIER_CLAIM_NAME
-    Setting             KVK claim naam
-    Description         De naam van de claim waarin het KVK nummer van de gebruiker is opgeslagen
-    Possible values     string
-    Default value       kvk
-    
-    Variable            EHERKENNING_OIDC_OIDC_EXEMPT_URLS
-    Setting             URLs exempt from session renewal
-    Description         This is a list of absolute url paths, regular expressions for url paths, or Django view names. This plus the mozilla-django-oidc urls are exempted from the session renewal by the SessionRefresh middleware.
-    Possible values     string, comma-delimited ('foo,bar,baz')
-    Default value       
+    Variable            EHERKENNING_OIDC_LEGAL_SUBJECT_CLAIM
+    Setting             bedrijfsidenticatie-claim
+    Description         Naam van de claim die de identificatie van het ingelogde/vertegenwoordigde bedrijf bevat.
+    Possible values     No information available
+    Default value       urn:etoegang:core:LegalSubjectID
     
     Variable            EHERKENNING_OIDC_OIDC_KEYCLOAK_IDP_HINT
     Setting             Keycloak-identiteitsprovider hint
@@ -149,7 +135,7 @@ Detailed Information
     
     Variable            EHERKENNING_OIDC_OIDC_RP_SCOPES_LIST
     Setting             OpenID Connect scopes
-    Description         OpenID Connect-scopes die worden bevraagd tijdens het inloggen. Deze zijn hardcoded en moeten worden ondersteund door de identiteitsprovider.
+    Description         OpenID Connect scopes that are requested during login. These scopes are hardcoded and must be supported by the identity provider.
     Possible values     string, comma-delimited ('foo,bar,baz')
     Default value       openid, kvk
     

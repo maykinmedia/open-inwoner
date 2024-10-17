@@ -11,18 +11,19 @@ from django.db.models import Q, UniqueConstraint
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.crypto import get_random_string
+from django.utils.functional import classproperty
 from django.utils.translation import gettext_lazy as _
 
+from digid_eherkenning.oidc.models import (
+    DigiDConfig as _OIDCDigiDConfig,
+    EHerkenningConfig as _OIDCEHerkenningConfig,
+)
 from image_cropping import ImageCropField, ImageRatioField
 from localflavor.nl.models import NLBSNField, NLZipCodeField
 from mail_editor.helpers import find_template
 from privates.storages import PrivateMediaFileSystemStorage
 from timeline_logger.models import TimelineLog
 
-from digid_eherkenning_oidc_generics.models import (
-    OpenIDConnectDigiDConfig,
-    OpenIDConnectEHerkenningConfig,
-)
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.utils.hash import create_sha256_hash
 from open_inwoner.utils.validators import (
@@ -41,6 +42,69 @@ from .choices import (
 )
 from .managers import ActionQueryset, DigidManager, UserManager, eHerkenningManager
 from .query import InviteQuerySet, MessageQuerySet
+
+###
+# Configuration
+###
+
+
+class OpenIDDigiDConfig(_OIDCDigiDConfig):
+    """
+    Proxy upstream library configuration model to override Python behaviour.
+    """
+
+    oip_unique_id_user_fieldname = "bsn"
+    oip_login_type = LoginTypeChoices.digid
+
+    class Meta:
+        proxy = True
+
+    # XXX: enabling this requires the tests/mocks to be updated. exercise left to the
+    # reader.
+    @classproperty
+    def oidcdb_check_idp_availability(cls):
+        return False
+
+    @property
+    def oidc_authentication_callback_url(self):
+        return "digid_oidc:callback"
+
+    def get_callback_view(self):
+        from .views import digid_callback
+
+        return digid_callback
+
+
+class OpenIDEHerkenningConfig(_OIDCEHerkenningConfig):
+    """
+    Proxy upstream library configuration model to override Python behaviour.
+    """
+
+    oip_unique_id_user_fieldname = "kvk"
+    oip_login_type = LoginTypeChoices.eherkenning
+
+    class Meta:
+        proxy = True
+
+    # XXX: enabling this requires the tests/mocks to be updated. exercise left to the
+    # reader.
+    @classproperty
+    def oidcdb_check_idp_availability(cls):
+        return False
+
+    @property
+    def oidc_authentication_callback_url(self):
+        return "eherkenning_oidc:callback"
+
+    def get_callback_view(self):
+        from .views import eherkenning_callback
+
+        return eherkenning_callback
+
+
+###
+# Content
+###
 
 
 def generate_uuid_image_name(instance, filename):
@@ -432,11 +496,11 @@ class User(AbstractBaseUser, PermissionsMixin):
             return reverse("logout")
 
         if self.login_type == LoginTypeChoices.digid:
-            if OpenIDConnectDigiDConfig.get_solo().enabled:
+            if OpenIDDigiDConfig.get_solo().enabled:
                 return reverse("digid_oidc:logout")
             return reverse("digid:logout")
         elif self.login_type == LoginTypeChoices.eherkenning:
-            if OpenIDConnectEHerkenningConfig.get_solo().enabled:
+            if OpenIDEHerkenningConfig.get_solo().enabled:
                 return reverse("eherkenning_oidc:logout")
             return reverse("logout")
 
