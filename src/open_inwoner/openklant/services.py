@@ -16,7 +16,10 @@ from open_inwoner.openklant.clients import build_klanten_client
 from open_inwoner.utils.logentry import system_action
 from openklant2.client import OpenKlant2Client
 from openklant2.types.resources.digitaal_adres import DigitaalAdres
-from openklant2.types.resources.klant_contact import KlantContact
+from openklant2.types.resources.klant_contact import (
+    KlantContact,
+    ListKlantContactParams,
+)
 from openklant2.types.resources.partij import Partij, PartijListParams
 
 from .wrap import FetchParameters, get_fetch_parameters
@@ -542,23 +545,26 @@ class OpenKlant2Service:
 
         return OpenKlant2Answer.from_klantcontact(answer_klantcontact)
 
-    def klantcontacten_for_partij(self, partij: Partij) -> Iterable[KlantContact]:
+    def klantcontacten_for_partij(
+        self, partij: Partij, *, kanaal: str | None = None
+    ) -> Iterable[KlantContact]:
+        params: ListKlantContactParams = {
+            "expand": [
+                "leiddeTotInterneTaken",
+                "gingOverOnderwerpobjecten",
+                "hadBetrokkenen",
+                "hadBetrokkenen.wasPartij",
+            ],
+        }
+        if kanaal:
+            params["kanaal"] = kanaal
+
+        klantcontacten = self.client.klant_contact.list_iter(params=params)
+
         # There is currently no good way to filter the klantcontacten by a
         # Partij (see https://github.com/maykinmedia/open-klant/issues/256). So
         # unfortunately, we have to fetch all rows and do the filtering client
         # side.
-        klantcontacten = self.client.klant_contact.list_iter(
-            params={
-                "expand": [
-                    "leiddeTotInterneTaken",
-                    "gingOverOnderwerpobjecten",
-                    "hadBetrokkenen",
-                    "hadBetrokkenen.wasPartij",
-                ],
-                "kanaal": self.MIJN_VRAGEN_KANAAL,
-            }
-        )
-
         klantcontacten_for_partij = filter(
             lambda row: partij["uuid"]
             in glom.glom(
@@ -575,7 +581,9 @@ class OpenKlant2Service:
         question_uuids = []
         klantcontact_uuid_to_klantcontact_object = {}
 
-        for klantcontact in self.klantcontacten_for_partij(partij):
+        for klantcontact in self.klantcontacten_for_partij(
+            partij, kanaal=self.MIJN_VRAGEN_KANAAL
+        ):
             klantcontact_uuid_to_klantcontact_object[
                 klantcontact["uuid"]
             ] = klantcontact
