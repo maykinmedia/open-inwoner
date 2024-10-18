@@ -7,7 +7,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Q, UniqueConstraint
+from django.db.models import CheckConstraint, Q, UniqueConstraint
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.crypto import get_random_string
@@ -196,8 +196,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(
         verbose_name=_("Date joined"), default=timezone.now
     )
-    # TODO shouldn't rsin & bsn be unique? (possibly fixed in model constraints)
-    # TODO fix rsin & bsn to not be both null AND blank (!)
     rsin = models.CharField(
         verbose_name=_("Rsin"), max_length=9, blank=True, default=""
     )
@@ -324,31 +322,43 @@ class User(AbstractBaseUser, PermissionsMixin):
                 & ~Q(login_type=LoginTypeChoices.eherkenning),
                 name="unique_email_when_not_digid_or_eherkenning",
             ),
-            # UniqueConstraint(
-            #     fields=["bsn"],
-            #     condition=Q(login_type=LoginTypeChoices.digid)
-            #     # not quite sure if we want this (bsn shouldn't be null AND blank)
-            #     & ~(Q(bsn="") | Q(bsn__isnull=True)),
-            #     name="unique_bsn_when_digid",
-            # ),
-            # UniqueConstraint(
-            #     fields=["rsin"],
-            #     condition=Q(login_type=LoginTypeChoices.eherkenning)
-            #     # not quite sure if we want this (rsin shouldn't be null AND blank)
-            #     & ~(Q(rsin="") | Q(rsin__isnull=True)),
-            #     name="unique_rsin_when_eherkenning",
-            # ),
-            # UniqueConstraint(
-            #     fields=["oidc_id"],
-            #     condition=Q(login_type=LoginTypeChoices.oidc),
-            #     name="unique_bsn_when_digid",
-            # ),
-            # CheckConstraint(
-            #     # maybe this is not correct?
-            #     check=(Q(bsn="") | Q(bsn__isnull=True))
-            #     | ~Q(login_type=LoginTypeChoices.digid),
-            #     name="check_digid_bsn_required_when_digid",
-            # ),
+            UniqueConstraint(
+                fields=["bsn"],
+                condition=Q(login_type=LoginTypeChoices.digid),
+                name="unique_bsn_when_login_digid",
+            ),
+            UniqueConstraint(
+                fields=["rsin"],
+                condition=Q(login_type=LoginTypeChoices.eherkenning) & ~Q(rsin=""),
+                name="unique_rsin_when_login_eherkenning",
+            ),
+            UniqueConstraint(
+                fields=["kvk"],
+                condition=Q(login_type=LoginTypeChoices.eherkenning) & ~Q(kvk=""),
+                name="unique_kvk_when_login_eherkenning",
+            ),
+            UniqueConstraint(
+                fields=["oidc_id"],
+                condition=Q(login_type=LoginTypeChoices.oidc),
+                name="unique_oidc_id_when_login_oidc",
+            ),
+            # --- --- ---
+            CheckConstraint(
+                check=Q(bsn="") | Q(login_type=LoginTypeChoices.digid),
+                name="check_bsn_only_set_when_login_digid",
+            ),
+            CheckConstraint(
+                check=Q(oidc_id="") | Q(login_type=LoginTypeChoices.oidc),
+                name="check_oidc_id_only_set_when_login_oidc",
+            ),
+            CheckConstraint(
+                check=(Q(kvk="") & Q(rsin=""))
+                | Q(login_type=LoginTypeChoices.eherkenning),
+                name="check_kvk_or_rsin_only_set_when_login_eherkenning",
+            ),
+            # NOTE: we do not need a constraint that enforces exclusivity between
+            # `KVK` and `RSIN`, because companies have both of these attributes and we
+            # need both of them to fetch cases for these companies
         ]
 
     def __init__(self, *args, **kwargs):
