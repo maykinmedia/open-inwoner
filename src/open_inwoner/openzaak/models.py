@@ -412,6 +412,19 @@ class OpenZaakConfig(SingletonModel):
         default=False,
     )
 
+    use_zaak_omschrijving_as_title = models.BooleanField(
+        verbose_name=_(
+            "Make use of zaak.omschrijving for the title of the cases instead of "
+            "zaaktype.omschrijving (eSuite)"
+        ),
+        help_text=_(
+            "If enabled, we use zaak.omschrijving for the title of the cases, and use "
+            "zaaktype.omschrijving as a fallback in case it is not filled in. "
+            "If not enabled, we ignore zaak.omschrijving and always use zaaktype.omschrijving."
+        ),
+        default=False,
+    )
+
     title_text = models.TextField(
         verbose_name=_("Title text"),
         help_text=_(
