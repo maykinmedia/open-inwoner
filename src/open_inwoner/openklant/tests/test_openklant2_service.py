@@ -9,6 +9,7 @@ from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.openklant.services import OpenKlant2Question, OpenKlant2Service
 from open_inwoner.openklant.tests.helpers import Openklant2ServiceTestCase
 from openklant2.factories.partij import CreatePartijPersoonDataFactory
+from openklant2.models import OpenKlant2Config
 from openklant2.types.resources.partij import PartijValidator
 
 
@@ -16,7 +17,14 @@ from openklant2.types.resources.partij import PartijValidator
 class PartijGetOrCreateTestCase(Openklant2ServiceTestCase):
     def setUp(self):
         super().setUp()
-        self.service = OpenKlant2Service(self.openklant_client)
+        self.openklant2_config = OpenKlant2Config(
+            api_root="http://localhost:8338",
+            api_path="/klantinteracties/api/v1",
+            api_token="b2eb1da9861da88743d72a3fb4344288fe2cba44",
+            mijn_vragen_kanaal="oip_mijn_vragen",
+            mijn_vragen_organisatie_naam="Open Inwoner Platform",
+        )
+        self.service = OpenKlant2Service(config=self.openklant2_config)
         self.user = UserFactory(first_name="John", last_name="Doe")
 
     def test_get_or_create_persoon(self):
@@ -185,7 +193,14 @@ class PartijGetOrCreateTestCase(Openklant2ServiceTestCase):
 class Openklant2ServiceTest(Openklant2ServiceTestCase):
     def setUp(self):
         super().setUp()
-        self.service = OpenKlant2Service(self.openklant_client)
+        self.openklant2_config = OpenKlant2Config(
+            api_root="http://localhost:8338",
+            api_path="/klantinteracties/api/v1",
+            api_token="b2eb1da9861da88743d72a3fb4344288fe2cba44",
+            mijn_vragen_kanaal="oip_mijn_vragen",
+            mijn_vragen_organisatie_naam="Open Inwoner Platform",
+        )
+        self.service = OpenKlant2Service(config=self.openklant2_config)
 
         self.persoon = self.openklant_client.partij.create_persoon(
             data={
@@ -314,8 +329,18 @@ class QuestionAnswerTestCase(Openklant2ServiceTestCase):
                 "soortActor": "organisatorische_eenheid",
             }
         )
+
+        self.openklant2_config = OpenKlant2Config(
+            api_root="http://localhost:8338",
+            api_path="/klantinteracties/api/v1",
+            api_token="b2eb1da9861da88743d72a3fb4344288fe2cba44",
+            mijn_vragen_kanaal="oip_mijn_vragen",
+            mijn_vragen_organisatie_naam="Open Inwoner Platform",
+        )
+        # self.service = OpenKlant2Service(config=self.openklant2_config)
         self.service = OpenKlant2Service(
-            self.openklant_client, mijn_vragen_actor=self.designated_actor["uuid"]
+            config=self.openklant2_config,
+            mijn_vragen_actor=self.designated_actor["uuid"],
         )
 
     def test_designated_actor_is_required_to_create_question(self):
@@ -350,7 +375,9 @@ class QuestionAnswerTestCase(Openklant2ServiceTestCase):
         (betrokkene,) = self.service.client.betrokkene.list_iter()
         (taak,) = self.service.client.interne_taak.list_iter()
 
-        self.assertEqual(klantcontact["kanaal"], self.service.MIJN_VRAGEN_KANAAL)
+        self.assertEqual(
+            klantcontact["kanaal"], self.openklant2_config.mijn_vragen_kanaal
+        )
         self.assertEqual(betrokkene["hadKlantcontact"]["uuid"], klantcontact["uuid"])
         self.assertEqual(betrokkene["wasPartij"]["uuid"], self.een_persoon["uuid"])
         self.assertEqual(

@@ -15,6 +15,7 @@ from open_inwoner.openklant.api_models import Klant
 from open_inwoner.openklant.clients import build_klanten_client
 from open_inwoner.utils.logentry import system_action
 from openklant2.client import OpenKlant2Client
+from openklant2.models import OpenKlant2Config
 from openklant2.types.resources.digitaal_adres import DigitaalAdres
 from openklant2.types.resources.klant_contact import KlantContact
 from openklant2.types.resources.partij import Partij, PartijListParams
@@ -144,19 +145,20 @@ class OpenKlant2Question:
 
 
 class OpenKlant2Service:
-
+    config: OpenKlant2Config
     client: OpenKlant2Client
     mijn_vragen_actor: uuid.UUID | None
-    MIJN_VRAGEN_KANAAL: str = "oip_mijn_vragen"
 
     def __init__(
-        self, client: OpenKlant2Client, mijn_vragen_actor: str | uuid.UUID | None = None
+        self,
+        config: OpenKlant2Config | None = None,
+        mijn_vragen_actor: str | uuid.UUID | None = None,
     ):
-        if not isinstance(client, OpenKlant2Client):
-            raise ValueError(
-                f"`client` must be an instance of {type(OpenKlant2Client)}"
-            )
-        self.client = client
+        self.config = config or OpenKlant2Config.from_django_settings()
+        self.client = OpenKlant2Client(
+            api_url=self.config.api_url,
+            api_token=self.config.api_token,
+        )
         if mijn_vragen_actor:
             self.mijn_vragen_actor = (
                 uuid.UUID(mijn_vragen_actor)
@@ -466,7 +468,7 @@ class OpenKlant2Service:
                 "inhoud": question,
                 "onderwerp": subject,
                 "taal": "nld",
-                "kanaal": self.MIJN_VRAGEN_KANAAL,
+                "kanaal": self.config.mijn_vragen_kanaal,
                 "vertrouwelijk": False,
                 "plaatsgevondenOp": timezone.now().isoformat(),
             }
@@ -513,7 +515,7 @@ class OpenKlant2Service:
                 "inhoud": answer,
                 "onderwerp": question_klantcontact["onderwerp"],
                 "taal": "nld",
-                "kanaal": self.MIJN_VRAGEN_KANAAL,
+                "kanaal": self.config.mijn_vragen_kanaal,
                 "vertrouwelijk": False,
                 "plaatsgevondenOp": timezone.now().isoformat(),
             }
@@ -555,7 +557,7 @@ class OpenKlant2Service:
                     "hadBetrokkenen",
                     "hadBetrokkenen.wasPartij",
                 ],
-                "kanaal": self.MIJN_VRAGEN_KANAAL,
+                "kanaal": self.config.mijn_vragen_kanaal,
             }
         )
 
