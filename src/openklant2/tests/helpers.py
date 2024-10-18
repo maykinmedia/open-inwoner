@@ -143,16 +143,13 @@ class OpenKlantServiceManager:
         self._in_server_context = False
 
     @property
-    def api_root(self):
-        return urljoin(
-            self._api_root,
-            self._api_path,
-        )
+    def api_url(self):
+        return urljoin(self._api_root, self._api_path)
 
     def client_factory(self):
         return OpenKlant2Client(
-            api_root=self.api_root,
-            token=self._api_token,
+            api_url=self.api_url,
+            api_token=self._api_token,
         )
 
     def clean_state(self):

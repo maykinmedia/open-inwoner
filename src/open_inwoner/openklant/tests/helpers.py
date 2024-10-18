@@ -42,3 +42,15 @@ class Openklant2ServiceTestCase(VCRMixin, LiveOpenKlantTestMixin, DjangoTestCase
             "query",
         ]
         return vcr
+
+    @property
+    def openklant2_api_root(self):
+        return self._service._api_root
+
+    @property
+    def openklant2_api_path(self):
+        return self._service._api_path
+
+    @property
+    def openklant2_api_token(self):
+        return self._service._api_token

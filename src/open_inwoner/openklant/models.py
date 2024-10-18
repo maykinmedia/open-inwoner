@@ -1,3 +1,7 @@
+import uuid
+from dataclasses import dataclass
+from urllib.parse import urljoin
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -184,3 +188,28 @@ class KlantContactMomentAnswer(models.Model):
         verbose_name = _("KlantContactMoment")
         verbose_name_plural = _("KlantContactMomenten")
         unique_together = [["user", "contactmoment_url"]]
+
+
+@dataclass
+class OpenKlant2Config:
+    api_root: str
+    api_path: str
+    api_token: str
+
+    # Question/Answer settings
+    mijn_vragen_kanaal: str
+    mijn_vragen_organisatie_naam: str
+    mijn_vragen_actor: str | uuid.UUID | None
+    interne_taak_gevraagde_handeling: str
+    interne_taak_toelichting: str
+
+    @property
+    def api_url(self):
+        return urljoin(self.api_root, self.api_path)
+
+    @classmethod
+    def from_django_settings(cls):
+        from django.conf import settings
+
+        if config := getattr(settings, "OPENKLANT2_CONFIG", None):
+            return cls(**config)
