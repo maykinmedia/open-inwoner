@@ -15,11 +15,7 @@ from furl import furl
 from mozilla_django_oidc_db.models import OpenIDConnectConfig
 from pyquery import PyQuery as PQ
 
-from digid_eherkenning_oidc_generics.models import (
-    OpenIDConnectDigiDConfig,
-    OpenIDConnectEHerkenningConfig,
-)
-from digid_eherkenning_oidc_generics.views import (
+from open_inwoner.accounts.views.auth_oidc import (
     GENERIC_DIGID_ERROR_MSG,
     GENERIC_EHERKENNING_ERROR_MSG,
 )
@@ -31,6 +27,7 @@ from open_inwoner.openzaak.models import OpenZaakConfig
 from ...cms.profile.cms_apps import ProfileApphook
 from ...cms.tests import cms_tools
 from ..choices import LoginTypeChoices
+from ..models import OpenIDDigiDConfig, OpenIDEHerkenningConfig
 from .factories import DigidUserFactory, UserFactory, eHerkenningUserFactory
 
 User = get_user_model()
@@ -94,7 +91,7 @@ class OIDCFlowTests(TestCase):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "mozilla_django_oidc_db.mixins.OpenIDConnectConfig.get_solo",
+        "mozilla_django_oidc_db.models.OpenIDConnectConfig.get_solo",
         return_value=OpenIDConnectConfig(id=1, enabled=True, make_users_staff=True),
     )
     @patch(
@@ -119,7 +116,12 @@ class OIDCFlowTests(TestCase):
         user = UserFactory.create(email="existing_user@example.com")
         self.assertEqual(user.oidc_id, "")
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "mozilla_django_oidc_db.OpenIDConnectConfig",
+            }
+        }
         session.save()
         callback_url = reverse("oidc_authentication_callback")
 
@@ -145,7 +147,7 @@ class OIDCFlowTests(TestCase):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "mozilla_django_oidc_db.mixins.OpenIDConnectConfig.get_solo",
+        "mozilla_django_oidc_db.models.OpenIDConnectConfig.get_solo",
         return_value=OpenIDConnectConfig(id=1, enabled=True, make_users_staff=False),
     )
     @patch(
@@ -170,7 +172,12 @@ class OIDCFlowTests(TestCase):
         user = UserFactory.create(email="existing_user@example.com")
         self.assertEqual(user.oidc_id, "")
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "mozilla_django_oidc_db.OpenIDConnectConfig",
+            }
+        }
         session.save()
         callback_url = reverse("oidc_authentication_callback")
 
@@ -196,12 +203,12 @@ class OIDCFlowTests(TestCase):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "mozilla_django_oidc_db.mixins.OpenIDConnectConfig.get_solo",
+        "mozilla_django_oidc_db.models.OpenIDConnectConfig.get_solo",
         return_value=OpenIDConnectConfig(
             id=1,
             enabled=True,
             make_users_staff=False,
-            claim_mapping={"first_name": "first_name"},
+            claim_mapping={"first_name": ["first_name"]},
         ),
     )
     @patch(
@@ -228,7 +235,12 @@ class OIDCFlowTests(TestCase):
             oidc_id="some_username", first_name="Foo", login_type=LoginTypeChoices.oidc
         )
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "mozilla_django_oidc_db.OpenIDConnectConfig",
+            }
+        }
         session.save()
         callback_url = reverse("oidc_authentication_callback")
 
@@ -254,7 +266,7 @@ class OIDCFlowTests(TestCase):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "mozilla_django_oidc_db.mixins.OpenIDConnectConfig.get_solo",
+        "mozilla_django_oidc_db.models.OpenIDConnectConfig.get_solo",
         return_value=OpenIDConnectConfig(id=1, enabled=True),
     )
     @patch(
@@ -281,7 +293,12 @@ class OIDCFlowTests(TestCase):
         )
         self.assertEqual(user.oidc_id, "")
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "mozilla_django_oidc_db.OpenIDConnectConfig",
+            }
+        }
         session.save()
         callback_url = reverse("oidc_authentication_callback")
 
@@ -309,7 +326,7 @@ class OIDCFlowTests(TestCase):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "mozilla_django_oidc_db.mixins.OpenIDConnectConfig.get_solo",
+        "mozilla_django_oidc_db.models.OpenIDConnectConfig.get_solo",
         return_value=OpenIDConnectConfig(id=1, enabled=True, make_users_staff=True),
     )
     @patch(
@@ -332,7 +349,12 @@ class OIDCFlowTests(TestCase):
         }
         UserFactory.create(email="existing_user@example.com")
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "mozilla_django_oidc_db.OpenIDConnectConfig",
+            }
+        }
         session.save()
         callback_url = reverse("oidc_authentication_callback")
 
@@ -358,7 +380,7 @@ class OIDCFlowTests(TestCase):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "mozilla_django_oidc_db.mixins.OpenIDConnectConfig.get_solo",
+        "mozilla_django_oidc_db.models.OpenIDConnectConfig.get_solo",
         return_value=OpenIDConnectConfig(id=1, enabled=True, make_users_staff=False),
     )
     @patch(
@@ -381,7 +403,12 @@ class OIDCFlowTests(TestCase):
         }
         UserFactory.create(email="existing_user@example.com")
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "mozilla_django_oidc_db.OpenIDConnectConfig",
+            }
+        }
         session.save()
         callback_url = reverse("oidc_authentication_callback")
 
@@ -412,7 +439,7 @@ class OIDCFlowTests(TestCase):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "mozilla_django_oidc_db.mixins.OpenIDConnectConfig.get_solo",
+        "mozilla_django_oidc_db.models.OpenIDConnectConfig.get_solo",
         return_value=OpenIDConnectConfig(id=1, enabled=True),
     )
     @patch(
@@ -443,7 +470,12 @@ class OIDCFlowTests(TestCase):
             self.assertEqual(response.status_code, 200)
 
         with self.subTest("after succesful login"):
-            session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+            session["oidc_states"] = {
+                "mock": {
+                    "nonce": "nonce",
+                    "config_class": "mozilla_django_oidc_db.OpenIDConnectConfig",
+                }
+            }
             session.save()
             callback_url = reverse("oidc_authentication_callback")
 
@@ -476,10 +508,8 @@ class DigiDOIDCFlowTests(WebTest):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "digid_eherkenning_oidc_generics.models.OpenIDConnectDigiDConfig.get_solo",
-        return_value=OpenIDConnectDigiDConfig(
-            id=1, enabled=True, identifier_claim_name="sub"
-        ),
+        "open_inwoner.accounts.models.OpenIDDigiDConfig.get_solo",
+        return_value=OpenIDDigiDConfig(id=1, enabled=True, bsn_claim=["sub"]),
     )
     def test_existing_bsn_creates_no_new_user(
         self,
@@ -505,7 +535,12 @@ class DigiDOIDCFlowTests(WebTest):
         )
         self.assertEqual(user.oidc_id, "")
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "accounts.OpenIDDigiDConfig",
+            }
+        }
         session.save()
         callback_url = reverse("digid_oidc:callback")
 
@@ -537,10 +572,8 @@ class DigiDOIDCFlowTests(WebTest):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "digid_eherkenning_oidc_generics.models.OpenIDConnectDigiDConfig.get_solo",
-        return_value=OpenIDConnectDigiDConfig(
-            id=1, enabled=True, identifier_claim_name="sub"
-        ),
+        "open_inwoner.accounts.models.OpenIDDigiDConfig.get_solo",
+        return_value=OpenIDDigiDConfig(id=1, enabled=True, bsn_claim=["sub"]),
     )
     def test_new_user_is_created_when_new_bsn(
         self,
@@ -555,7 +588,12 @@ class DigiDOIDCFlowTests(WebTest):
         mock_get_userinfo.return_value = {"sub": "000000000"}
         DigidUserFactory.create(bsn="123456782", email="existing_user@example.com")
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "accounts.OpenIDDigiDConfig",
+            }
+        }
         session.save()
         callback_url = reverse("digid_oidc:callback")
 
@@ -580,8 +618,8 @@ class DigiDOIDCFlowTests(WebTest):
         self.assertEqual(new_user.login_type, LoginTypeChoices.digid)
 
     @patch(
-        "digid_eherkenning_oidc_generics.models.OpenIDConnectDigiDConfig.get_solo",
-        return_value=OpenIDConnectDigiDConfig(
+        "open_inwoner.accounts.models.OpenIDDigiDConfig.get_solo",
+        return_value=OpenIDDigiDConfig(
             id=1, enabled=True, oidc_op_logout_endpoint="http://localhost:8080/logout"
         ),
     )
@@ -592,7 +630,12 @@ class DigiDOIDCFlowTests(WebTest):
         )
         self.client.force_login(user)
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "accounts.OpenIDDigiDConfig",
+            }
+        }
         session["oidc_id_token"] = "foo"
         session.save()
         logout_url = reverse("digid_oidc:logout")
@@ -601,18 +644,12 @@ class DigiDOIDCFlowTests(WebTest):
 
         # enter the logout flow
         with requests_mock.Mocker() as m:
-            logout_endpoint_url = str(
-                furl("http://localhost:8080/logout").set(
-                    {
-                        "id_token_hint": "foo",
-                    }
-                )
-            )
-            m.get(logout_endpoint_url)
+            m.post("http://localhost:8080/logout")
             logout_response = self.client.get(logout_url)
 
             self.assertEqual(len(m.request_history), 1)
-            self.assertEqual(m.request_history[0].url, logout_endpoint_url)
+            self.assertEqual(m.request_history[0].url, "http://localhost:8080/logout")
+            self.assertEqual(m.request_history[0].body, "id_token_hint=foo")
 
         self.assertRedirects(
             logout_response, reverse("login"), fetch_redirect_response=False
@@ -633,8 +670,8 @@ class DigiDOIDCFlowTests(WebTest):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "digid_eherkenning_oidc_generics.models.OpenIDConnectDigiDConfig.get_solo",
-        return_value=OpenIDConnectDigiDConfig(id=1, enabled=True),
+        "open_inwoner.accounts.models.OpenIDDigiDConfig.get_solo",
+        return_value=OpenIDDigiDConfig(id=1, enabled=True),
     )
     def test_error_first_cleared_after_succesful_login(
         self,
@@ -660,7 +697,12 @@ class DigiDOIDCFlowTests(WebTest):
             self.assertEqual(response.status_code, 200)
 
         with self.subTest("after succesful login"):
-            session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+            session["oidc_states"] = {
+                "mock": {
+                    "nonce": "nonce",
+                    "config_class": "accounts.OpenIDDigiDConfig",
+                }
+            }
             session.save()
             callback_url = reverse("digid_oidc:callback")
 
@@ -683,12 +725,8 @@ class DigiDOIDCFlowTests(WebTest):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "digid_eherkenning_oidc_generics.models.OpenIDConnectDigiDConfig.get_solo",
-        return_value=OpenIDConnectDigiDConfig(
-            id=1,
-            enabled=True,
-            error_message_mapping={"some mapped message": "Some Error"},
-        ),
+        "open_inwoner.accounts.models.OpenIDDigiDConfig.get_solo",
+        return_value=OpenIDDigiDConfig(id=1, enabled=True),
     )
     def test_login_error_message_mapped_in_config(
         self,
@@ -704,7 +742,12 @@ class DigiDOIDCFlowTests(WebTest):
         }
 
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "accounts.OpenIDDigiDConfig",
+            }
+        }
         session.save()
         callback_url = reverse("digid_oidc:callback")
 
@@ -713,7 +756,7 @@ class DigiDOIDCFlowTests(WebTest):
             callback_url,
             {
                 "error": "access_denied",
-                "error_description": "some mapped message",
+                "error_description": "The user cancelled",
                 "state": "mock",
             },
         )
@@ -732,15 +775,15 @@ class DigiDOIDCFlowTests(WebTest):
         doc = PQ(login_response.content)
         error_msg = doc.find(".notification__content").text()
 
-        self.assertEqual(error_msg, "Some Error")
+        self.assertEqual(error_msg, "Je hebt het inloggen met DigiD geannuleerd.")
 
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "digid_eherkenning_oidc_generics.models.OpenIDConnectDigiDConfig.get_solo",
-        return_value=OpenIDConnectDigiDConfig(id=1, enabled=True),
+        "open_inwoner.accounts.models.OpenIDDigiDConfig.get_solo",
+        return_value=OpenIDDigiDConfig(id=1, enabled=True),
     )
     def test_login_error_message_not_mapped_in_config(
         self,
@@ -756,7 +799,12 @@ class DigiDOIDCFlowTests(WebTest):
         }
 
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "accounts.OpenIDDigiDConfig",
+            }
+        }
         session.save()
         callback_url = reverse("digid_oidc:callback")
 
@@ -765,7 +813,7 @@ class DigiDOIDCFlowTests(WebTest):
             callback_url,
             {
                 "error": "access_denied",
-                "error_description": "some unmapped message",
+                "error_description": "Some generic error",
                 "state": "mock",
             },
         )
@@ -791,8 +839,8 @@ class DigiDOIDCFlowTests(WebTest):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "digid_eherkenning_oidc_generics.models.OpenIDConnectDigiDConfig.get_solo",
-        return_value=OpenIDConnectDigiDConfig(id=1, enabled=True),
+        "open_inwoner.accounts.models.OpenIDDigiDConfig.get_solo",
+        return_value=OpenIDDigiDConfig(id=1, enabled=True),
     )
     def test_login_validation_error(
         self,
@@ -809,7 +857,12 @@ class DigiDOIDCFlowTests(WebTest):
         }
 
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "accounts.OpenIDDigiDConfig",
+            }
+        }
         session.save()
         callback_url = reverse("digid_oidc:callback")
 
@@ -839,8 +892,8 @@ class DigiDOIDCFlowTests(WebTest):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "digid_eherkenning_oidc_generics.models.OpenIDConnectDigiDConfig.get_solo",
-        return_value=OpenIDConnectDigiDConfig(
+        "open_inwoner.accounts.models.OpenIDDigiDConfig.get_solo",
+        return_value=OpenIDDigiDConfig(
             id=1, enabled=True, oidc_op_authorization_endpoint="http://idp.local/auth"
         ),
     )
@@ -909,8 +962,8 @@ class DigiDOIDCFlowTests(WebTest):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "digid_eherkenning_oidc_generics.models.OpenIDConnectDigiDConfig.get_solo",
-        return_value=OpenIDConnectDigiDConfig(
+        "open_inwoner.accounts.models.OpenIDDigiDConfig.get_solo",
+        return_value=OpenIDDigiDConfig(
             id=1, enabled=True, oidc_op_authorization_endpoint="http://idp.local/auth"
         ),
     )
@@ -969,9 +1022,9 @@ class eHerkenningOIDCFlowTests(WebTest):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "digid_eherkenning_oidc_generics.models.OpenIDConnectEHerkenningConfig.get_solo",
-        return_value=OpenIDConnectEHerkenningConfig(
-            id=1, enabled=True, identifier_claim_name="sub"
+        "open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo",
+        return_value=OpenIDEHerkenningConfig(
+            id=1, enabled=True, legal_subject_claim=["sub"]
         ),
     )
     def test_existing_kvk_creates_no_new_user(
@@ -1005,7 +1058,12 @@ class eHerkenningOIDCFlowTests(WebTest):
         )
         self.assertEqual(user.oidc_id, "")
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "accounts.OpenIDEHerkenningConfig",
+            }
+        }
         session.save()
         callback_url = reverse("eherkenning_oidc:callback")
 
@@ -1037,9 +1095,9 @@ class eHerkenningOIDCFlowTests(WebTest):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "digid_eherkenning_oidc_generics.models.OpenIDConnectEHerkenningConfig.get_solo",
-        return_value=OpenIDConnectEHerkenningConfig(
-            id=1, enabled=True, identifier_claim_name="sub"
+        "open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo",
+        return_value=OpenIDEHerkenningConfig(
+            id=1, enabled=True, legal_subject_claim=["sub"]
         ),
     )
     def test_new_user_is_created_when_new_kvk(
@@ -1058,7 +1116,12 @@ class eHerkenningOIDCFlowTests(WebTest):
             kvk="12345678", rsin="123456789", email="existing_user@example.com"
         )
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "accounts.OpenIDEHerkenningConfig",
+            }
+        }
         session.save()
         callback_url = reverse("eherkenning_oidc:callback")
 
@@ -1084,9 +1147,12 @@ class eHerkenningOIDCFlowTests(WebTest):
         self.assertEqual(new_user.login_type, LoginTypeChoices.eherkenning)
 
     @patch(
-        "digid_eherkenning_oidc_generics.models.OpenIDConnectEHerkenningConfig.get_solo",
-        return_value=OpenIDConnectEHerkenningConfig(
-            id=1, enabled=True, oidc_op_logout_endpoint="http://localhost:8080/logout"
+        "open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo",
+        return_value=OpenIDEHerkenningConfig(
+            id=1,
+            enabled=True,
+            legal_subject_claim=["kvk"],
+            oidc_op_logout_endpoint="http://localhost:8080/logout",
         ),
     )
     def test_logout(self, mock_get_solo):
@@ -1096,7 +1162,12 @@ class eHerkenningOIDCFlowTests(WebTest):
         )
         self.client.force_login(user)
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "accounts.OpenIDEHerkenningConfig",
+            }
+        }
         session["oidc_id_token"] = "foo"
         session[KVK_BRANCH_SESSION_VARIABLE] = None
         session.save()
@@ -1106,18 +1177,12 @@ class eHerkenningOIDCFlowTests(WebTest):
 
         # enter the logout flow
         with requests_mock.Mocker() as m:
-            logout_endpoint_url = str(
-                furl("http://localhost:8080/logout").set(
-                    {
-                        "id_token_hint": "foo",
-                    }
-                )
-            )
-            m.get(logout_endpoint_url)
-            logout_response = self.client.get(logout_url, follow=False)
+            m.post("http://localhost:8080/logout")
+            logout_response = self.client.get(logout_url)
 
             self.assertEqual(len(m.request_history), 1)
-            self.assertEqual(m.request_history[0].url, logout_endpoint_url)
+            self.assertEqual(m.request_history[0].url, "http://localhost:8080/logout")
+            self.assertEqual(m.request_history[0].body, "id_token_hint=foo")
 
         self.assertRedirects(
             logout_response, reverse("login"), fetch_redirect_response=False
@@ -1157,8 +1222,10 @@ class eHerkenningOIDCFlowTests(WebTest):
         autospec=True,
     )
     @patch(
-        "digid_eherkenning_oidc_generics.models.OpenIDConnectEHerkenningConfig.get_solo",
-        return_value=OpenIDConnectEHerkenningConfig(id=1, enabled=True),
+        "open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo",
+        return_value=OpenIDEHerkenningConfig(
+            id=1, enabled=True, legal_subject_claim=["kvk"]
+        ),
         autospec=True,
     )
     def test_error_first_cleared_after_succesful_login(
@@ -1188,7 +1255,12 @@ class eHerkenningOIDCFlowTests(WebTest):
             self.assertEqual(response.status_code, 200)
 
         with self.subTest("after succesful login"):
-            session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+            session["oidc_states"] = {
+                "mock": {
+                    "nonce": "nonce",
+                    "config_class": "accounts.OpenIDEHerkenningConfig",
+                }
+            }
             session.save()
             callback_url = reverse("eherkenning_oidc:callback")
 
@@ -1211,11 +1283,9 @@ class eHerkenningOIDCFlowTests(WebTest):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "digid_eherkenning_oidc_generics.models.OpenIDConnectEHerkenningConfig.get_solo",
-        return_value=OpenIDConnectEHerkenningConfig(
-            id=1,
-            enabled=True,
-            error_message_mapping={"some mapped message": "Some Error"},
+        "open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo",
+        return_value=OpenIDEHerkenningConfig(
+            id=1, enabled=True, legal_subject_claim=["kvk"]
         ),
     )
     def test_login_error_message_mapped_in_config(
@@ -1232,7 +1302,12 @@ class eHerkenningOIDCFlowTests(WebTest):
         }
 
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "accounts.OpenIDEHerkenningConfig",
+            }
+        }
         session.save()
         callback_url = reverse("eherkenning_oidc:callback")
 
@@ -1241,7 +1316,7 @@ class eHerkenningOIDCFlowTests(WebTest):
             callback_url,
             {
                 "error": "access_denied",
-                "error_description": "some mapped message",
+                "error_description": "The user cancelled",
                 "state": "mock",
             },
         )
@@ -1260,15 +1335,17 @@ class eHerkenningOIDCFlowTests(WebTest):
         doc = PQ(login_response.content)
         error_msg = doc.find(".notification__content").text()
 
-        self.assertEqual(error_msg, "Some Error")
+        self.assertEqual(error_msg, "Je hebt het inloggen met eHerkenning geannuleerd.")
 
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "digid_eherkenning_oidc_generics.models.OpenIDConnectEHerkenningConfig.get_solo",
-        return_value=OpenIDConnectEHerkenningConfig(id=1, enabled=True),
+        "open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo",
+        return_value=OpenIDEHerkenningConfig(
+            id=1, enabled=True, legal_subject_claim=["kvk"]
+        ),
     )
     def test_login_error_message_not_mapped_in_config(
         self,
@@ -1284,7 +1361,12 @@ class eHerkenningOIDCFlowTests(WebTest):
         }
 
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "accounts.OpenIDEHerkenningConfig",
+            }
+        }
         session.save()
         callback_url = reverse("eherkenning_oidc:callback")
 
@@ -1293,7 +1375,7 @@ class eHerkenningOIDCFlowTests(WebTest):
             callback_url,
             {
                 "error": "access_denied",
-                "error_description": "some unmapped message",
+                "error_description": "Some generic error",
                 "state": "mock",
             },
         )
@@ -1319,8 +1401,10 @@ class eHerkenningOIDCFlowTests(WebTest):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "digid_eherkenning_oidc_generics.models.OpenIDConnectEHerkenningConfig.get_solo",
-        return_value=OpenIDConnectEHerkenningConfig(id=1, enabled=True),
+        "open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo",
+        return_value=OpenIDEHerkenningConfig(
+            id=1, enabled=True, legal_subject_claim=["kvk"]
+        ),
     )
     def test_login_validation_error(
         self,
@@ -1337,7 +1421,12 @@ class eHerkenningOIDCFlowTests(WebTest):
         }
 
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "accounts.OpenIDEHerkenningConfig",
+            }
+        }
         session.save()
         callback_url = reverse("eherkenning_oidc:callback")
 
@@ -1385,9 +1474,9 @@ class eHerkenningOIDCFlowTests(WebTest):
         autospec=True,
     )
     @patch(
-        "digid_eherkenning_oidc_generics.models.OpenIDConnectEHerkenningConfig.get_solo",
-        return_value=OpenIDConnectEHerkenningConfig(
-            id=1, enabled=True, identifier_claim_name="sub"
+        "open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo",
+        return_value=OpenIDEHerkenningConfig(
+            id=1, enabled=True, legal_subject_claim=["sub"]
         ),
         autospec=True,
     )
@@ -1411,7 +1500,12 @@ class eHerkenningOIDCFlowTests(WebTest):
         mock_get_userinfo.return_value = {"sub": "00000000"}
         eHerkenningUserFactory.create(kvk="12345678", email="existing_user@example.com")
         session = self.client.session
-        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "accounts.OpenIDEHerkenningConfig",
+            }
+        }
         session.save()
         callback_url = reverse("eherkenning_oidc:callback")
 
@@ -1462,9 +1556,12 @@ class eHerkenningOIDCFlowTests(WebTest):
         autospec=True,
     )
     @patch(
-        "digid_eherkenning_oidc_generics.models.OpenIDConnectEHerkenningConfig.get_solo",
-        return_value=OpenIDConnectEHerkenningConfig(
-            id=1, enabled=True, oidc_op_authorization_endpoint="http://idp.local/auth"
+        "open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo",
+        return_value=OpenIDEHerkenningConfig(
+            id=1,
+            enabled=True,
+            legal_subject_claim=["kvk"],
+            oidc_op_authorization_endpoint="http://idp.local/auth",
         ),
         autospec=True,
     )
@@ -1577,9 +1674,12 @@ class eHerkenningOIDCFlowTests(WebTest):
         autospec=True,
     )
     @patch(
-        "digid_eherkenning_oidc_generics.models.OpenIDConnectEHerkenningConfig.get_solo",
-        return_value=OpenIDConnectEHerkenningConfig(
-            id=1, enabled=True, oidc_op_authorization_endpoint="http://idp.local/auth"
+        "open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo",
+        return_value=OpenIDEHerkenningConfig(
+            id=1,
+            enabled=True,
+            legal_subject_claim=["kvk"],
+            oidc_op_authorization_endpoint="http://idp.local/auth",
         ),
         autospec=True,
     )
@@ -1657,9 +1757,12 @@ class eHerkenningOIDCFlowTests(WebTest):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "digid_eherkenning_oidc_generics.models.OpenIDConnectEHerkenningConfig.get_solo",
-        return_value=OpenIDConnectEHerkenningConfig(
-            id=1, enabled=True, oidc_op_authorization_endpoint="http://idp.local/auth"
+        "open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo",
+        return_value=OpenIDEHerkenningConfig(
+            id=1,
+            enabled=True,
+            legal_subject_claim=["kvk"],
+            oidc_op_authorization_endpoint="http://idp.local/auth",
         ),
     )
     def test_redirect_after_login_no_registration_and_no_branch_selection(

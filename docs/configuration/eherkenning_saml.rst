@@ -134,7 +134,7 @@ Detailed Information
     
     Variable            EHERKENNING_SAML_EH_LOA
     Setting             eHerkenning LoA
-    Description         Level of Assurance (LoA) to use for the eHerkenning service.
+    Description         Betrouwbaarheidsniveau (LoA) voor de eHerkenningservice.
     Possible values     urn:etoegang:core:assurance-class:loa1, urn:etoegang:core:assurance-class:loa2, urn:etoegang:core:assurance-class:loa2plus, urn:etoegang:core:assurance-class:loa3, urn:etoegang:core:assurance-class:loa4
     Default value       urn:etoegang:core:assurance-class:loa3
     
@@ -164,7 +164,7 @@ Detailed Information
     
     Variable            EHERKENNING_SAML_EIDAS_LOA
     Setting             eIDAS LoA
-    Description         Level of Assurance (LoA) to use for the eIDAS service.
+    Description         Betrouwbaarheidsniveau (LoA) voor de eIDAS-service.
     Possible values     urn:etoegang:core:assurance-class:loa1, urn:etoegang:core:assurance-class:loa2, urn:etoegang:core:assurance-class:loa2plus, urn:etoegang:core:assurance-class:loa3, urn:etoegang:core:assurance-class:loa4
     Default value       urn:etoegang:core:assurance-class:loa3
     
