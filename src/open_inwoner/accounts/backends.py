@@ -2,7 +2,7 @@ import logging
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.auth.backends import ModelBackend
+from django.contrib.auth.backends import BaseBackend, ModelBackend
 from django.contrib.auth.hashers import check_password
 from django.urls import reverse, reverse_lazy
 
@@ -21,47 +21,57 @@ logger = logging.getLogger(__name__)
 class UserModelEmailBackend(ModelBackend):
     """
     Authentication backend for login with email address.
+
+    Based on the default ModelBackend, but with support for case insensitive
+    email lookups, scoped to the correct login type.
     """
 
-    def authenticate(
-        self, request, username=None, password=None, user=None, token=None, **kwargs
-    ):
-        config = SiteConfiguration.get_solo()
+    def authenticate(self, request, username=None, password=None):
+        if not username or not password:
+            return
+
         User = get_user_model()
-        if username and password and not config.login_2fa_sms:
-            try:
-                user = User.objects.get(
-                    email__iexact=username,
-                    login_type=LoginTypeChoices.default,
-                )
-                if check_password(
-                    password, user.password
-                ) and self.user_can_authenticate(user):
-                    return user
-            except User.MultipleObjectsReturned:
-                # Found multiple users with this email (shouldn't happen if we added checks)
-                # Run the default password hasher once to reduce the timing
-                # difference between an existing and a nonexistent user (#20760).
-                User().set_password(password)
-                return None
-            except User.DoesNotExist:
-                # No user was found, return None - triggers default login failed
-                # Run the default password hasher once to reduce the timing
-                # difference between an existing and a nonexistent user (#20760).
-                User().set_password(password)
-                return None
-
-        # 2FA with sms verification
-        if config.login_2fa_sms and user and token:
-            accepted, drift = accept_totp(
-                key=user.seed,
-                response=token,
-                period=getattr(settings, "ACCOUNTS_USER_TOKEN_EXPIRE_TIME", 300),
+        try:
+            user = User.objects.get(
+                email__iexact=username,
+                login_type=LoginTypeChoices.default,
             )
-            if not accepted:
-                return None
+            if check_password(password, user.password) and self.user_can_authenticate(
+                user
+            ):
+                return user
+        except User.MultipleObjectsReturned:
+            # Found multiple users with this email (shouldn't happen if we added checks)
+            # Run the default password hasher once to reduce the timing
+            # difference between an existing and a nonexistent user (#20760).
+            User().set_password(password)
+            return None
+        except User.DoesNotExist:
+            # No user was found, return None - triggers default login failed
+            # Run the default password hasher once to reduce the timing
+            # difference between an existing and a nonexistent user (#20760).
+            User().set_password(password)
+            return None
 
-            return user
+
+class Verify2FATokenBackend(BaseBackend):
+    """
+    Verify a TOTP token for a user.
+    """
+
+    def authenticate(self, request, *, user=None, token=None):
+        if not user or not token:
+            return
+
+        accepted, drift = accept_totp(
+            key=user.seed,
+            response=token,
+            period=getattr(settings, "ACCOUNTS_USER_TOKEN_EXPIRE_TIME", 300),
+        )
+        if not accepted:
+            return None
+
+        return user
 
 
 class CustomAxesBackend(AxesBackend):

@@ -496,6 +496,7 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTHENTICATION_BACKENDS = [
     "open_inwoner.accounts.backends.CustomAxesBackend",
     "open_inwoner.accounts.backends.UserModelEmailBackend",
+    "open_inwoner.accounts.backends.Verify2FATokenBackend",
     "digid_eherkenning.backends.DigiDBackend",
     "eherkenning.backends.eHerkenningBackend",
     "digid_eherkenning_oidc_generics.backends.OIDCAuthenticationDigiDBackend",
