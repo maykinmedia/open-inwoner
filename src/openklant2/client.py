@@ -14,10 +14,10 @@ class OpenKlant2Client:
     http_client: APIClient
     partij: PartijResource
 
-    def __init__(self, token: str, api_root: str):
+    def __init__(self, api_url: str, api_token: str):
         self.http_client = APIClient(
-            request_kwargs={"headers": {"Authorization": f"Token {token}"}},
-            base_url=api_root,
+            request_kwargs={"headers": {"Authorization": f"Token {api_token}"}},
+            base_url=api_url,
         )
 
         self.partij = PartijResource(self.http_client)

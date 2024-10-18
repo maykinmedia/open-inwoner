@@ -4,11 +4,11 @@ import subprocess
 import time
 from contextlib import contextmanager
 from pathlib import Path
-from urllib.parse import urljoin
 
 import requests
 
 from openklant2.client import OpenKlant2Client
+from openklant2.models import OpenKlant2Config
 
 BASE_DIR = Path(__file__).parent.parent.resolve()
 
@@ -23,6 +23,9 @@ class OpenKlantServiceManager:
     _api_token: str = "b2eb1da9861da88743d72a3fb4344288fe2cba44"
     _docker_compose_project_name: str = "openklant2-api-test"
     _docker_compose_path: Path = BASE_DIR / "docker-compose.yaml"
+
+    def __init__(self, config: OpenKlant2Config | None = None):
+        self.config = config or OpenKlant2Config.from_django_settings()
 
     def _docker_compose(
         self,
@@ -142,17 +145,10 @@ class OpenKlantServiceManager:
         self._service_teardown()
         self._in_server_context = False
 
-    @property
-    def api_root(self):
-        return urljoin(
-            self._api_root,
-            self._api_path,
-        )
-
     def client_factory(self):
         return OpenKlant2Client(
-            api_root=self.api_root,
-            token=self._api_token,
+            api_url=self.config.api_url,
+            api_token=self.config.api_token,
         )
 
     def clean_state(self):
@@ -226,7 +222,14 @@ class LiveOpenKlantTestMixin:
 
     @classmethod
     def setUpClass(cls):
-        cls._service = OpenKlantServiceManager()
+        openklant2_config = OpenKlant2Config(
+            api_root="http://localhost:8338",
+            api_path="/klantinteracties/api/v1",
+            api_token="b2eb1da9861da88743d72a3fb4344288fe2cba44",
+            mijn_vragen_kanaal="oip_mijn_vragen",
+            mijn_vragen_organisatie_naam="Open Inwoner Platform",
+        )
+        cls._service = OpenKlantServiceManager(config=openklant2_config)
 
         if not cls.should_bypass_live_server():
             cls._service.setUp()
