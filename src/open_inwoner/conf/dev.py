@@ -76,20 +76,21 @@ CACHES = {
     "oidc": {"BACKEND": "django.core.cache.backends.dummy.DummyCache"},
 }
 
-_MOCK_AUTHENTICATION_BACKENDS = {
-    "digid_eherkenning.backends.DigiDBackend": "digid_eherkenning.mock.backends.DigiDBackend",
-    "eherkenning.backends.eHerkenningBackend": "eherkenning.mock.backends.eHerkenningBackend",
-}
-
-AUTHENTICATION_BACKENDS = [
-    _MOCK_AUTHENTICATION_BACKENDS.get(backend, backend)
-    for backend in AUTHENTICATION_BACKENDS
-]
-
-
 #
 # Library settings
 #
+
+# Allow logging in with both username+password and email+password
+AUTHENTICATION_BACKENDS = [
+    "open_inwoner.accounts.backends.CustomAxesBackend",
+    "open_inwoner.accounts.backends.UserModelEmailBackend",
+    "django.contrib.auth.backends.ModelBackend",
+    "digid_eherkenning.mock.backends.DigiDBackend",
+    "eherkenning.mock.backends.eHerkenningBackend",
+    "open_inwoner.accounts.backends.DigiDEHerkenningOIDCBackend",
+    "open_inwoner.accounts.backends.CustomOIDCBackend",
+]
+
 ELASTIC_APM["DEBUG"] = True
 
 if "test" in sys.argv:

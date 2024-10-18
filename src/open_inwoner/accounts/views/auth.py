@@ -19,9 +19,6 @@ from digid_eherkenning.views.base import get_redirect_url
 from digid_eherkenning.views.digid import DigiDAssertionConsumerServiceView
 from digid_eherkenning.views.eherkenning import eHerkenningAssertionConsumerServiceView
 
-from digid_eherkenning_oidc_generics.views import (
-    eHerkenningOIDCAuthenticationCallbackView,
-)
 from eherkenning.mock import eherkenning_conf
 from eherkenning.mock.views.eherkenning import (
     eHerkenningAssertionConsumerServiceMockView,
@@ -225,10 +222,3 @@ class CustomeHerkenningAssertionConsumerServiceView(
             del session["invite_url"]
 
         return super().get_success_url()
-
-
-class CustomEHerkenningOIDCAuthenticationCallbackView(
-    BlockEenmanszaakLoginMixin, eHerkenningOIDCAuthenticationCallbackView
-):
-    def get_failure_url(self):
-        return settings.LOGIN_URL

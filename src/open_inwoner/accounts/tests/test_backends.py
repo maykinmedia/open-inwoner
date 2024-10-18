@@ -4,7 +4,10 @@ from django.contrib import auth
 from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse
 
-from open_inwoner.accounts.tests.factories import UserFactory
+from furl import furl
+from mozilla_django_oidc_db.config import store_config
+
+from .factories import UserFactory
 
 
 class OIDCBackendTestCase(TestCase):
@@ -17,45 +20,48 @@ class OIDCBackendTestCase(TestCase):
     @override_settings(
         AUTHENTICATION_BACKENDS=[
             "open_inwoner.accounts.backends.CustomOIDCBackend",
-            "digid_eherkenning_oidc_generics.backends.OIDCAuthenticationEHerkenningBackend",
-            "digid_eherkenning_oidc_generics.backends.OIDCAuthenticationDigiDBackend",
+            "open_inwoner.accounts.backends.DigiDEHerkenningOIDCBackend",
         ]
     )
-    @patch(
-        "digid_eherkenning_oidc_generics.backends.OIDCAuthenticationDigiDBackend.authenticate"
-    )
-    @patch(
-        "open_inwoner.accounts.backends.OIDCAuthenticationBackend.authenticate",
-        side_effect=Exception,
-    )
-    def test_digid_oidc_use_correct_backend(
-        self, mock_authenticate, mock_digid_authenticate
-    ):
+    @patch("open_inwoner.accounts.backends.DigiDEHerkenningOIDCBackend.authenticate")
+    def test_digid_oidc_selects_correct_backend(self, mock_authenticate):
         """
         Both the regular OIDC and eHerkenning backend should check if the request path matches
         their callback before trying to authenticate
         """
-        mock_digid_authenticate.return_value = self.user
+        mock_authenticate.return_value = self.user
+        init_response = self.client.get(reverse("digid_oidc:init"))
+        assert "oidc_states" in self.client.session
+        state = furl(init_response["Location"]).query.params["state"]
+        nonce = self.client.session["oidc_states"][state]["nonce"]
+        # set up a request
+        callback_request = RequestFactory().get(
+            reverse("digid_oidc:callback"),
+            {"state": state, "nonce": nonce},
+        )
+        callback_request.session = self.client.session
+        store_config(callback_request)
 
-        request = RequestFactory().get(reverse("digid_oidc:callback"))
-
-        result = auth.authenticate(request)
+        result = auth.authenticate(callback_request)
 
         self.assertEqual(result, self.user)
+        # django keeps track of which backend was used to authenticate
+        self.assertEqual(
+            result.backend, "open_inwoner.accounts.backends.DigiDEHerkenningOIDCBackend"
+        )
 
     @override_settings(
         AUTHENTICATION_BACKENDS=[
-            "digid_eherkenning_oidc_generics.backends.OIDCAuthenticationDigiDBackend",
-            "digid_eherkenning_oidc_generics.backends.OIDCAuthenticationEHerkenningBackend",
+            "open_inwoner.accounts.backends.DigiDEHerkenningOIDCBackend",
             "open_inwoner.accounts.backends.CustomOIDCBackend",
         ]
     )
     @patch(
-        "mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.authenticate",
+        "mozilla_django_oidc_db.backends.BaseBackend.authenticate",
         side_effect=Exception,
     )
     @patch("open_inwoner.accounts.backends.CustomOIDCBackend.authenticate")
-    def test_admin_oidc_use_correct_backend(
+    def test_admin_oidc_selects_correct_backend(
         self, mock_authenticate, mock_digid_eherkenning_authenticate
     ):
         """
@@ -63,9 +69,21 @@ class OIDCBackendTestCase(TestCase):
         their callback before trying to authenticate
         """
         mock_authenticate.return_value = self.user
+        init_response = self.client.get(reverse("oidc_authentication_init"))
+        assert "oidc_states" in self.client.session
+        state = furl(init_response["Location"]).query.params["state"]
+        nonce = self.client.session["oidc_states"][state]["nonce"]
+        # set up a request
+        callback_request = RequestFactory().get(
+            reverse("oidc_authentication_callback"),
+            {"state": state, "nonce": nonce},
+        )
+        callback_request.session = self.client.session
+        store_config(callback_request)
 
-        request = RequestFactory().get(reverse("oidc_authentication_callback"))
-
-        result = auth.authenticate(request)
+        result = auth.authenticate(callback_request)
 
         self.assertEqual(result, self.user)
+        self.assertEqual(
+            result.backend, "open_inwoner.accounts.backends.CustomOIDCBackend"
+        )
