@@ -532,6 +532,19 @@ class TestCaseDetailView(
             antwoord="no",
             onderwerp="e_suite_subject_code",
         )
+        self.contactmoment_balie = generate_oas_component_cached(
+            "cmc",
+            "schemas/Contactmoment",
+            url=f"{CONTACTMOMENTEN_ROOT}contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
+            bronorganisatie="123456789",
+            identificatie="AB123",
+            registratiedatum="2024-09-27T03:39:28+00:00",
+            type="SomeType",
+            kanaal="Balie",
+            status=ContactMomentStatus.afgehandeld,
+            antwoord="no",
+            onderwerp="e_suite_subject_code",
+        )
         self.objectcontactmoment_old = generate_oas_component_cached(
             "cmc",
             "schemas/Objectcontactmoment",
@@ -547,6 +560,14 @@ class TestCaseDetailView(
             object=self.zaak["url"],
             object_type="zaak",
             contactmoment=self.contactmoment_new["url"],
+        )
+        self.objectcontactmoment_balie = generate_oas_component_cached(
+            "cmc",
+            "schemas/Objectcontactmoment",
+            url=f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten/bb51784c-fa2c-4f65-b24e-7179b615efac",
+            object=self.zaak["url"],
+            object_type="zaak",
+            contactmoment=self.contactmoment_balie["url"],
         )
         self.objectcontactmoment_eherkenning = generate_oas_component_cached(
             "cmc",
@@ -625,8 +646,10 @@ class TestCaseDetailView(
             self.status_type_finish,
             self.contactmoment_old,
             self.contactmoment_new,
+            self.contactmoment_balie,
             self.objectcontactmoment_old,
             self.objectcontactmoment_new,
+            self.objectcontactmoment_balie,
         ]:
             m.get(resource["url"], json=resource)
 
@@ -707,7 +730,11 @@ class TestCaseDetailView(
         m.get(
             f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten?object={self.zaak['url']}",
             json=paginated_response(
-                [self.objectcontactmoment_old, self.objectcontactmoment_new]
+                [
+                    self.objectcontactmoment_old,
+                    self.objectcontactmoment_new,
+                    self.objectcontactmoment_balie,
+                ]
             ),
         )
 
@@ -719,7 +746,11 @@ class TestCaseDetailView(
         m.get(
             f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten?object={self.zaak['url']}",
             json=paginated_response(
-                [self.objectcontactmoment_old, self.objectcontactmoment_new]
+                [
+                    self.objectcontactmoment_old,
+                    self.objectcontactmoment_new,
+                    self.objectcontactmoment_balie,
+                ]
             ),
         )
 
@@ -869,6 +900,9 @@ class TestCaseDetailView(
         )
         status_new_obj.statustype = factory(StatusType, self.status_type_new)
         status_finish_obj.statustype = factory(StatusType, self.status_type_finish)
+
+        self.openklant_config.exclude_contactmoment_kanalen = ["Balie"]
+        self.openklant_config.save()
 
         response = self.app.get(self.case_detail_url, user=self.user)
 
@@ -1049,6 +1083,7 @@ class TestCaseDetailView(
                 "new_docs": False,
                 "questions": [
                     make_contactmoment(self.contactmoment_new),
+                    make_contactmoment(self.contactmoment_balie),
                     make_contactmoment(self.contactmoment_old),
                 ],
             },
@@ -1058,7 +1093,7 @@ class TestCaseDetailView(
         doc = PyQuery(response.text)
         links = doc.find(".contactmomenten__link")
 
-        self.assertEqual(len(links), 2)
+        self.assertEqual(len(links), 3)
         self.assertEqual(
             links[0].attrib["href"],
             reverse(
@@ -1068,6 +1103,13 @@ class TestCaseDetailView(
         )
         self.assertEqual(
             links[1].attrib["href"],
+            reverse(
+                "cases:kcm_redirect",
+                kwargs={"uuid": uuid_from_url(self.contactmoment_balie["url"])},
+            ),
+        )
+        self.assertEqual(
+            links[2].attrib["href"],
             reverse(
                 "cases:kcm_redirect",
                 kwargs={"uuid": uuid_from_url(self.contactmoment_old["url"])},
