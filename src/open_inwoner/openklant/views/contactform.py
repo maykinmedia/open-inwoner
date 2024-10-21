@@ -203,9 +203,13 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
                     "voornaam": form.cleaned_data["first_name"],
                     "voorvoegselAchternaam": form.cleaned_data["infix"],
                     "achternaam": form.cleaned_data["last_name"],
-                    "emailadres": form.cleaned_data["email"],
-                    "telefoonnummer": form.cleaned_data["phonenumber"],
                 }
+                if form.cleaned_data["email"]:
+                    data["emailadres"] = form.cleaned_data["email"]
+
+                if form.cleaned_data["phonenumber"]:
+                    data["telefoonnummer"] = form.cleaned_data["phonenumber"]
+
                 klant = klanten_client.create_klant(data=data)
 
                 if klant:
