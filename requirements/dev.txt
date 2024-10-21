@@ -356,10 +356,11 @@ django-csp-reports==1.8.1
     #   -r requirements/ci.txt
 django-debug-toolbar==3.2.2
     # via -r requirements/dev.in
-django-digid-eherkenning==0.13.1
+django-digid-eherkenning[oidc]==0.16.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   django-digid-eherkenning
 django-elasticsearch-dsl==7.4
     # via
     #   -c requirements/ci.txt
@@ -507,7 +508,7 @@ django-solo==2.2.0
     #   mozilla-django-oidc-db
     #   notifications-api-common
     #   zgw-consumers
-django-timeline-logger==3.0.0
+django-timeline-logger==4.0.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -845,15 +846,16 @@ messagebird==2.1.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-mozilla-django-oidc==2.0.0
+mozilla-django-oidc==4.0.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   mozilla-django-oidc-db
-mozilla-django-oidc-db==0.14.1
+mozilla-django-oidc-db==0.19.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   django-digid-eherkenning
 msgpack==1.0.7
     # via locust
 multidict==6.0.5
@@ -1269,6 +1271,7 @@ typing-extensions==4.10.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   mozilla-django-oidc-db
     #   polyfactory
     #   pydantic
     #   pydantic-core

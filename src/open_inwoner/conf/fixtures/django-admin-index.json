@@ -429,12 +429,12 @@
                 "eherkenningconfiguration"
             ],
             [
-                "digid_eherkenning_oidc_generics",
-                "openidconnectdigidconfig"
+                "accounts",
+                "openiddigidconfig"
             ],
             [
-                "digid_eherkenning_oidc_generics",
-                "openidconnecteherkenningconfig"
+                "accounts",
+                "openideherkenningconfig"
             ],
             [
                 "haalcentraal",

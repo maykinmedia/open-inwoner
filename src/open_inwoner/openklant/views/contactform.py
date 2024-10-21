@@ -234,10 +234,16 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
         }
 
         if not self.request.user.is_authenticated:
-            data["contactgegevens"] = {
-                "emailadres": form.cleaned_data["email"],
-                "telefoonnummer": form.cleaned_data["phonenumber"],
-            }
+            # Ensure we don't send an empty (and thus invalid) email or phonenumber
+            contactgegevens = {}
+            if form.cleaned_data["email"]:
+                contactgegevens["emailadres"] = form.cleaned_data["email"]
+
+            if form.cleaned_data["phonenumber"]:
+                contactgegevens["telefoonnummer"] = form.cleaned_data["phonenumber"]
+
+            if contactgegevens:
+                data["contactgegevens"] = contactgegevens
 
         if employee_id := config.register_employee_id:
             data["medewerkerIdentificatie"] = {"identificatie": employee_id}

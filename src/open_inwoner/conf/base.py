@@ -175,6 +175,7 @@ INSTALLED_APPS = [
     "sniplates",
     "digid_eherkenning",
     "eherkenning",
+    "digid_eherkenning.oidc",
     "localflavor",
     "easy_thumbnails",  # used by filer
     "image_cropping",
@@ -195,7 +196,6 @@ INSTALLED_APPS = [
     "cspreports",
     "mozilla_django_oidc",
     "mozilla_django_oidc_db",
-    "digid_eherkenning_oidc_generics",
     "sessionprofile",
     "openformsclient",
     "django_htmx",
@@ -496,10 +496,10 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTHENTICATION_BACKENDS = [
     "open_inwoner.accounts.backends.CustomAxesBackend",
     "open_inwoner.accounts.backends.UserModelEmailBackend",
+    "django.contrib.auth.backends.ModelBackend",
     "digid_eherkenning.backends.DigiDBackend",
     "eherkenning.backends.eHerkenningBackend",
-    "digid_eherkenning_oidc_generics.backends.OIDCAuthenticationDigiDBackend",
-    "digid_eherkenning_oidc_generics.backends.OIDCAuthenticationEHerkenningBackend",
+    "open_inwoner.accounts.backends.DigiDEHerkenningOIDCBackend",
     "open_inwoner.accounts.backends.CustomOIDCBackend",
 ]
 
@@ -754,7 +754,7 @@ CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 # SENTRY - error monitoring
 #
 SENTRY_DSN = config("SENTRY_DSN", None)
-RELEASE = "v1.21.0"  # get_current_version()
+RELEASE = "v1.22.0"  # get_current_version()
 
 PRIVATE_MEDIA_ROOT = os.path.join(BASE_DIR, "private_media")
 FILER_ROOT = os.path.join(BASE_DIR, "media", "filer")

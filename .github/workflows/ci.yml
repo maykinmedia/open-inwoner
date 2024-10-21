@@ -166,14 +166,6 @@ jobs:
           setup-node: 'yes'
           npm-ci-flags: '--legacy-peer-deps'
 
-      # See https://playwright.dev/python/docs/ci#caching-browsers
-      - name: Cache Playwright browser
-        id: cache-browser
-        uses: actions/cache@v3
-        with:
-          path: /home/runner/.cache/ms-playwright
-          key: ${{ runner.os }}-${{ matrix.browser }}-playwright-${{ hashFiles('requirements/ci.txt') }}
-
       - name: Install playwright deps
         run: playwright install --with-deps ${{ matrix.browser }}
 
