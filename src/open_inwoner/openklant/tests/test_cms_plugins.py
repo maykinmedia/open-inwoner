@@ -13,7 +13,7 @@ class ContactFormPluginRenderTest(TestCase):
         description = "A description for the contactform"
 
         user = UserFactory()
-        form = ContactForm(user=user)
+        form = ContactForm(user=user, request_session={})
 
         html, context = cms_tools.render_plugin(
             ContactFormPlugin,
