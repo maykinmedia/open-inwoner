@@ -316,6 +316,19 @@ class TestCaseDetailView(
             bestandsnaam="geheim-document.txt",
             bestandsomvang=123,
         )
+        self.informatie_object_archived = generate_oas_component_cached(
+            "drc",
+            "schemas/EnkelvoudigInformatieObject",
+            uuid="7e4c4bbb-982e-4dfb-86b6-23ef41f97282",
+            url=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/7e4c4bbb-982e-4dfb-86b6-23ef41f97282",
+            inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812/download",
+            informatieobjecttype=self.informatie_object_type["url"],
+            status="gearchiveerd",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+            bestandsnaam="uploaded_document.txt",
+            titel="uploaded_document_title.txt",
+            bestandsomvang=123,
+        )
 
         #
         # Zaken API (ZRC)
@@ -501,6 +514,17 @@ class TestCaseDetailView(
             beschrijving="",
             registratiedatum="2021-01-12",
         )
+        self.zaak_informatie_object_archived = generate_oas_component_cached(
+            "zrc",
+            "schemas/ZaakInformatieObject",
+            url=f"{ZAKEN_ROOT}zaakinformatieobjecten/fa5153aa-ad2c-4a07-ae75-15add57ee",
+            informatieobject=self.informatie_object_archived["url"],
+            zaak=self.zaak_invisible["url"],
+            aardRelatieWeergave="some invisible content",
+            titel="",
+            beschrijving="",
+            registratiedatum="2021-01-12",
+        )
 
         #
         # Contactmomenten API (CMC)
@@ -600,6 +624,21 @@ class TestCaseDetailView(
                     "info_id": self.informatie_object_no_date["uuid"],
                     "api_group_id": self.api_group.id,
                 },
+            ),
+        )
+        self.informatie_object_file_archived = SimpleFile(
+            name="document_archived.txt",
+            size=123,
+            url=reverse(
+                "cases:document_download",
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "info_id": self.informatie_object_archived["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
+            ),
+            created=dateutil.parser.parse(
+                self.zaak_informatie_object_new["registratiedatum"]
             ),
         )
 
@@ -1238,6 +1277,9 @@ class TestCaseDetailView(
         # install mocks with additional case documents
         m.get(self.informatie_object["url"], json=self.informatie_object)
         m.get(self.informatie_object_2["url"], json=self.informatie_object_2)
+        m.get(
+            self.informatie_object_archived["url"], json=self.informatie_object_archived
+        )
 
         m.post(
             f"{ZAKEN_ROOT}zaakinformatieobjecten",
@@ -1252,6 +1294,7 @@ class TestCaseDetailView(
             json=[
                 self.zaak_informatie_object_old,
                 self.zaak_informatie_object_new,
+                self.zaak_informatie_object_archived,
             ],
         )
 
@@ -1264,10 +1307,12 @@ class TestCaseDetailView(
         response = self.app.get(self.case_detail_url, user=self.user)
 
         documents = response.context.get("case")["documents"]
+        self.assertEqual(len(documents), 3)
 
         # order should be reverse of list order from response
         self.assertEqual(documents[0].name, self.informatie_object_2["titel"])
         self.assertEqual(documents[1].name, self.informatie_object["titel"])
+        self.assertEqual(documents[1].name, self.informatie_object_archived["titel"])
 
     def test_document_ordering_by_name(self, m):
         """
