@@ -91,17 +91,28 @@ class Zaak(ZGWModel):
 
         return _status_text
 
+    @property
+    def description(self) -> str:
+        from open_inwoner.openzaak.models import OpenZaakConfig
+
+        zaak_config = OpenZaakConfig.get_solo()
+
+        description = self.zaaktype.omschrijving
+        if zaak_config.use_zaak_omschrijving_as_title and self.omschrijving:
+            description = self.omschrijving
+
+        return description
+
     def process_data(self) -> dict:
         """
         Prepare data for template
         """
-
         return {
             "identification": self.identification,
             "uuid": str(self.uuid),
             "start_date": self.startdatum,
             "end_date": getattr(self, "einddatum", None),
-            "description": self.zaaktype.omschrijving,
+            "description": self.description,
             "current_status": self.status_text,
             "zaaktype_config": getattr(self, "zaaktype_config", None),
             "statustype_config": getattr(self, "statustype_config", None),

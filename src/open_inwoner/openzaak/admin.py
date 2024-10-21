@@ -69,6 +69,7 @@ class OpenZaakConfigAdmin(SingletonModelAdmin):
                 "fields": (
                     "enable_categories_filtering_with_zaken",
                     "zaken_filter_enabled",
+                    "use_zaak_omschrijving_as_title",
                 ),
             },
         ),

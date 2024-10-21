@@ -420,6 +420,18 @@ class OpenZaakConfig(SingletonModel):
             "If enabled, order the statusses of a case based on 'datum_status_gezet'. "
             "If not enabled, we show the statusses in the reverse order they are returned via the API, this because the eSuite does not return the timestamps of the statusses (eSuite, but also works for Open Zaak)."
         ),
+    )
+
+    use_zaak_omschrijving_as_title = models.BooleanField(
+        verbose_name=_(
+            "Make use of zaak.omschrijving for the title of the cases instead of "
+            "zaaktype.omschrijving (eSuite)"
+        ),
+        help_text=_(
+            "If enabled, we use zaak.omschrijving for the title of the cases, and use "
+            "zaaktype.omschrijving as a fallback in case it is not filled in. "
+            "If not enabled, we ignore zaak.omschrijving and always use zaaktype.omschrijving."
+        ),
         default=False,
     )
 

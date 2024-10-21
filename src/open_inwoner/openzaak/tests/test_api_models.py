@@ -3,7 +3,8 @@ from django.utils.translation import gettext as _
 
 from zgw_consumers.api_models.base import factory
 
-from open_inwoner.openzaak.api_models import Zaak
+from open_inwoner.openzaak.api_models import Zaak, ZaakType
+from open_inwoner.openzaak.models import OpenZaakConfig
 
 
 class ZaakAPIModelTest(TestCase):
@@ -90,3 +91,36 @@ class ZaakAPIModelTest(TestCase):
         case = factory(Zaak, data=self.zaak_data)
 
         self.assertEqual(case.status_text, _("No data available"))
+
+    def test_zaak_omschrijving(self):
+        zaaktype = factory(
+            ZaakType,
+            data={
+                "url": "https://example.com",
+                "identificatie": "VTH001",
+                "catalogus": "https://example.com",
+                "vertrouwelijkheidaanduiding": "openbaar",
+                "doel": "-",
+                "aanleiding": "-",
+                "indicatie_intern_of_extern": "extern",
+                "handeling_initiator": "Aanvragen",
+                "onderwerp": "VTH",
+                "handeling_behandelaar": "Behandelen",
+                "statustypen": [],
+                "resultaattypen": [],
+                "informatieobjecttypen": [],
+                "omschrijving": "Vergunning",
+            },
+        )
+        self.zaak_data["zaaktype"] = zaaktype
+        self.zaak_data["omschrijving"] = "Vergunning voor Joeri"
+
+        case = factory(Zaak, data=self.zaak_data)
+
+        self.assertEqual(case.description, "Vergunning")
+
+        zaak_config = OpenZaakConfig.get_solo()
+        zaak_config.use_zaak_omschrijving_as_title = True
+        zaak_config.save()
+
+        self.assertEqual(case.description, "Vergunning voor Joeri")
