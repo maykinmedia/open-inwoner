@@ -13,7 +13,7 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/actoren
   response:
     body:
-      string: '{"uuid":"dce8196d-05a3-4258-8bb0-d02a70f6bf73","url":"http://localhost:8338/klantinteracties/api/v1/actoren/dce8196d-05a3-4258-8bb0-d02a70f6bf73","naam":"Afdeling
+      string: '{"uuid":"0a0f4dbd-a714-4c52-854d-01eda2fcbf6e","url":"http://localhost:8338/klantinteracties/api/v1/actoren/0a0f4dbd-a714-4c52-854d-01eda2fcbf6e","naam":"Afdeling
         Klantenservice","soortActor":"organisatorische_eenheid","indicatieActief":true,"actoridentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""},"actorIdentificatie":null}'
     headers:
       API-version:
@@ -27,7 +27,7 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/dce8196d-05a3-4258-8bb0-d02a70f6bf73
+      - http://localhost:8338/klantinteracties/api/v1/actoren/0a0f4dbd-a714-4c52-854d-01eda2fcbf6e
       Referrer-Policy:
       - same-origin
       Vary:
@@ -41,36 +41,36 @@ interactions:
       message: Created
 - request:
     body: '{"digitaleAdressen": null, "voorkeursDigitaalAdres": null, "rekeningnummers":
-      null, "voorkeursRekeningnummer": null, "indicatieGeheimhouding": false, "indicatieActief":
-      false, "voorkeurstaal": "nde", "soortPartij": "persoon", "partijIdentificatie":
-      {"contactnaam": {"voorletters": "Mrs.", "voornaam": "Alice", "voorvoegselAchternaam":
-      "Mx.", "achternaam": "McAlice"}}}'
+      null, "voorkeursRekeningnummer": null, "indicatieGeheimhouding": true, "indicatieActief":
+      false, "voorkeurstaal": "nyn", "soortPartij": "persoon", "partijIdentificatie":
+      {"contactnaam": {"voorletters": "Mr.", "voornaam": "Alice", "voorvoegselAchternaam":
+      "Dr.", "achternaam": "McAlice"}}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '368'
+      - '366'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/partijen
   response:
     body:
-      string: '{"uuid":"addf84d8-93f0-4869-867d-47bd9aadc350","url":"http://localhost:8338/klantinteracties/api/v1/partijen/addf84d8-93f0-4869-867d-47bd9aadc350","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"nde","indicatieActief":false,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Mrs.","voornaam":"Alice","voorvoegselAchternaam":"Mx.","achternaam":"McAlice"},"volledigeNaam":"Alice
-        Mx. McAlice"}}'
+      string: '{"uuid":"d6657df7-6031-4e68-b0c8-4e901c7e8223","url":"http://localhost:8338/klantinteracties/api/v1/partijen/d6657df7-6031-4e68-b0c8-4e901c7e8223","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":true,"voorkeurstaal":"nyn","indicatieActief":false,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Mr.","voornaam":"Alice","voorvoegselAchternaam":"Dr.","achternaam":"McAlice"},"volledigeNaam":"Alice
+        Dr. McAlice"}}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '865'
+      - '863'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/partijen/addf84d8-93f0-4869-867d-47bd9aadc350
+      - http://localhost:8338/klantinteracties/api/v1/partijen/d6657df7-6031-4e68-b0c8-4e901c7e8223
       Referrer-Policy:
       - same-origin
       Vary:
@@ -84,9 +84,9 @@ interactions:
       message: Created
 - request:
     body: '{"digitaleAdressen": null, "voorkeursDigitaalAdres": null, "rekeningnummers":
-      null, "voorkeursRekeningnummer": null, "indicatieGeheimhouding": false, "indicatieActief":
-      false, "voorkeurstaal": "hai", "soortPartij": "persoon", "partijIdentificatie":
-      {"contactnaam": {"voorletters": "Dr.", "voornaam": "Bob", "voorvoegselAchternaam":
+      null, "voorkeursRekeningnummer": null, "indicatieGeheimhouding": true, "indicatieActief":
+      false, "voorkeurstaal": "ewo", "soortPartij": "persoon", "partijIdentificatie":
+      {"contactnaam": {"voorletters": "Mrs.", "voornaam": "Bob", "voorvoegselAchternaam":
       "Mx.", "achternaam": "McBob"}}}'
     headers:
       Authorization:
@@ -99,7 +99,7 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/partijen
   response:
     body:
-      string: '{"uuid":"e5d2d61f-3f07-48ea-b097-3197219ff955","url":"http://localhost:8338/klantinteracties/api/v1/partijen/e5d2d61f-3f07-48ea-b097-3197219ff955","nummer":"0000000002","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"hai","indicatieActief":false,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Dr.","voornaam":"Bob","voorvoegselAchternaam":"Mx.","achternaam":"McBob"},"volledigeNaam":"Bob
+      string: '{"uuid":"6f120693-4d25-4b87-a25d-9fb0851c054a","url":"http://localhost:8338/klantinteracties/api/v1/partijen/6f120693-4d25-4b87-a25d-9fb0851c054a","nummer":"0000000002","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":true,"voorkeurstaal":"ewo","indicatieActief":false,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Mrs.","voornaam":"Bob","voorvoegselAchternaam":"Mx.","achternaam":"McBob"},"volledigeNaam":"Bob
         Mx. McBob"}}'
     headers:
       API-version:
@@ -113,7 +113,7 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/partijen/e5d2d61f-3f07-48ea-b097-3197219ff955
+      - http://localhost:8338/klantinteracties/api/v1/partijen/6f120693-4d25-4b87-a25d-9fb0851c054a
       Referrer-Policy:
       - same-origin
       Vary:
@@ -139,7 +139,7 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/actoren
   response:
     body:
-      string: '{"uuid":"884c8660-c7f2-4185-afc9-b3b45ebcbd98","url":"http://localhost:8338/klantinteracties/api/v1/actoren/884c8660-c7f2-4185-afc9-b3b45ebcbd98","naam":"Afdeling
+      string: '{"uuid":"40472e98-312f-495f-bde7-8e3d0b2bd86e","url":"http://localhost:8338/klantinteracties/api/v1/actoren/40472e98-312f-495f-bde7-8e3d0b2bd86e","naam":"Afdeling
         klantenservice","soortActor":"organisatorische_eenheid","indicatieActief":true,"actoridentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""},"actorIdentificatie":null}'
     headers:
       API-version:
@@ -153,7 +153,7 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/884c8660-c7f2-4185-afc9-b3b45ebcbd98
+      - http://localhost:8338/klantinteracties/api/v1/actoren/40472e98-312f-495f-bde7-8e3d0b2bd86e
       Referrer-Policy:
       - same-origin
       Vary:
@@ -180,7 +180,7 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"ded0fd5e-03c5-4ce9-a545-cdd04b4d55b2","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/ded0fd5e-03c5-4ce9-a545-cdd04b4d55b2","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000001","kanaal":"oip_mijn_vragen","onderwerp":"Important
+      string: '{"uuid":"abaf5558-1044-4f64-87f6-4ce1c792e815","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/abaf5558-1044-4f64-87f6-4ce1c792e815","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000001","kanaal":"oip_mijn_vragen","onderwerp":"Important
         questions","inhoud":"A question asked by Alice","indicatieContactGelukt":null,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2024-10-02T14:00:25.587564Z"}'
     headers:
       API-version:
@@ -194,7 +194,7 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/ded0fd5e-03c5-4ce9-a545-cdd04b4d55b2
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/abaf5558-1044-4f64-87f6-4ce1c792e815
       Referrer-Policy:
       - same-origin
       Vary:
@@ -207,8 +207,8 @@ interactions:
       code: 201
       message: Created
 - request:
-    body: '{"rol": "klant", "hadKlantcontact": {"uuid": "ded0fd5e-03c5-4ce9-a545-cdd04b4d55b2"},
-      "initiator": true, "wasPartij": {"uuid": "addf84d8-93f0-4869-867d-47bd9aadc350"},
+    body: '{"rol": "klant", "hadKlantcontact": {"uuid": "abaf5558-1044-4f64-87f6-4ce1c792e815"},
+      "initiator": true, "wasPartij": {"uuid": "d6657df7-6031-4e68-b0c8-4e901c7e8223"},
       "organisatienaam": "Open Inwoner Platform"}'
     headers:
       Authorization:
@@ -221,7 +221,7 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/betrokkenen
   response:
     body:
-      string: '{"uuid":"48a80d3d-84d0-4e0e-ad42-0a9a60f4fcc3","url":"http://localhost:8338/klantinteracties/api/v1/betrokkenen/48a80d3d-84d0-4e0e-ad42-0a9a60f4fcc3","wasPartij":{"uuid":"addf84d8-93f0-4869-867d-47bd9aadc350","url":"http://localhost:8338/klantinteracties/api/v1/partijen/addf84d8-93f0-4869-867d-47bd9aadc350"},"hadKlantcontact":{"uuid":"ded0fd5e-03c5-4ce9-a545-cdd04b4d55b2","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/ded0fd5e-03c5-4ce9-a545-cdd04b4d55b2"},"digitaleAdressen":[],"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"contactnaam":{"voorletters":"","voornaam":"","voorvoegselAchternaam":"","achternaam":""},"volledigeNaam":"","rol":"klant","organisatienaam":"Open
+      string: '{"uuid":"17bacef4-dc8d-4b48-91e9-f219d4a9f259","url":"http://localhost:8338/klantinteracties/api/v1/betrokkenen/17bacef4-dc8d-4b48-91e9-f219d4a9f259","wasPartij":{"uuid":"d6657df7-6031-4e68-b0c8-4e901c7e8223","url":"http://localhost:8338/klantinteracties/api/v1/partijen/d6657df7-6031-4e68-b0c8-4e901c7e8223"},"hadKlantcontact":{"uuid":"abaf5558-1044-4f64-87f6-4ce1c792e815","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/abaf5558-1044-4f64-87f6-4ce1c792e815"},"digitaleAdressen":[],"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"contactnaam":{"voorletters":"","voornaam":"","voorvoegselAchternaam":"","achternaam":""},"volledigeNaam":"","rol":"klant","organisatienaam":"Open
         Inwoner Platform","initiator":true}'
     headers:
       API-version:
@@ -235,7 +235,7 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/betrokkenen/48a80d3d-84d0-4e0e-ad42-0a9a60f4fcc3
+      - http://localhost:8338/klantinteracties/api/v1/betrokkenen/17bacef4-dc8d-4b48-91e9-f219d4a9f259
       Referrer-Policy:
       - same-origin
       Vary:
@@ -248,10 +248,10 @@ interactions:
       code: 201
       message: Created
 - request:
-    body: '{"aanleidinggevendKlantcontact": {"uuid": "ded0fd5e-03c5-4ce9-a545-cdd04b4d55b2"},
+    body: '{"aanleidinggevendKlantcontact": {"uuid": "abaf5558-1044-4f64-87f6-4ce1c792e815"},
       "toelichting": "Beantwoorden vraag", "gevraagdeHandeling": "Vraag beantwoorden
       in aanleiding gevend klant contact", "status": "te_verwerken", "toegewezenAanActor":
-      {"uuid": "884c8660-c7f2-4185-afc9-b3b45ebcbd98"}}'
+      {"uuid": "40472e98-312f-495f-bde7-8e3d0b2bd86e"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
@@ -263,9 +263,9 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/internetaken
   response:
     body:
-      string: '{"uuid":"6d1b186b-a53f-4bd2-ac71-865d7faef516","url":"http://localhost:8338/klantinteracties/api/v1/internetaken/6d1b186b-a53f-4bd2-ac71-865d7faef516","nummer":"0000000001","gevraagdeHandeling":"Vraag
-        beantwoorden in aanleiding gevend klant contact","aanleidinggevendKlantcontact":{"uuid":"ded0fd5e-03c5-4ce9-a545-cdd04b4d55b2","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/ded0fd5e-03c5-4ce9-a545-cdd04b4d55b2"},"toegewezenAanActor":{"uuid":"884c8660-c7f2-4185-afc9-b3b45ebcbd98","url":"http://localhost:8338/klantinteracties/api/v1/actoren/884c8660-c7f2-4185-afc9-b3b45ebcbd98"},"toelichting":"Beantwoorden
-        vraag","status":"te_verwerken","toegewezenOp":"2024-10-03T13:17:33.303109Z","afgehandeldOp":null}'
+      string: '{"uuid":"3daa1aea-7b48-4c34-844e-f34b216dc5bf","url":"http://localhost:8338/klantinteracties/api/v1/internetaken/3daa1aea-7b48-4c34-844e-f34b216dc5bf","nummer":"0000000001","gevraagdeHandeling":"Vraag
+        beantwoorden in aanleiding gevend klant contact","aanleidinggevendKlantcontact":{"uuid":"abaf5558-1044-4f64-87f6-4ce1c792e815","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/abaf5558-1044-4f64-87f6-4ce1c792e815"},"toegewezenAanActor":{"uuid":"40472e98-312f-495f-bde7-8e3d0b2bd86e","url":"http://localhost:8338/klantinteracties/api/v1/actoren/40472e98-312f-495f-bde7-8e3d0b2bd86e"},"toelichting":"Beantwoorden
+        vraag","status":"te_verwerken","toegewezenOp":"2024-10-17T12:12:59.889034Z","afgehandeldOp":null}'
     headers:
       API-version:
       - 0.0.3
@@ -278,7 +278,7 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/internetaken/6d1b186b-a53f-4bd2-ac71-865d7faef516
+      - http://localhost:8338/klantinteracties/api/v1/internetaken/3daa1aea-7b48-4c34-844e-f34b216dc5bf
       Referrer-Policy:
       - same-origin
       Vary:
@@ -299,7 +299,7 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"ded0fd5e-03c5-4ce9-a545-cdd04b4d55b2","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/ded0fd5e-03c5-4ce9-a545-cdd04b4d55b2","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[{"uuid":"48a80d3d-84d0-4e0e-ad42-0a9a60f4fcc3","url":"http://localhost:8338/klantinteracties/api/v1/betrokkenen/48a80d3d-84d0-4e0e-ad42-0a9a60f4fcc3"}],"leiddeTotInterneTaken":[{"uuid":"6d1b186b-a53f-4bd2-ac71-865d7faef516","url":"http://localhost:8338/klantinteracties/api/v1/internetaken/6d1b186b-a53f-4bd2-ac71-865d7faef516"}],"nummer":"0000000001","kanaal":"oip_mijn_vragen","onderwerp":"Important
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"abaf5558-1044-4f64-87f6-4ce1c792e815","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/abaf5558-1044-4f64-87f6-4ce1c792e815","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[{"uuid":"17bacef4-dc8d-4b48-91e9-f219d4a9f259","url":"http://localhost:8338/klantinteracties/api/v1/betrokkenen/17bacef4-dc8d-4b48-91e9-f219d4a9f259"}],"leiddeTotInterneTaken":[{"uuid":"3daa1aea-7b48-4c34-844e-f34b216dc5bf","url":"http://localhost:8338/klantinteracties/api/v1/internetaken/3daa1aea-7b48-4c34-844e-f34b216dc5bf"}],"nummer":"0000000001","kanaal":"oip_mijn_vragen","onderwerp":"Important
         questions","inhoud":"A question asked by Alice","indicatieContactGelukt":null,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2024-10-02T14:00:25.587564Z","_expand":{}}]}'
     headers:
       API-version:
@@ -332,7 +332,7 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/betrokkenen
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"48a80d3d-84d0-4e0e-ad42-0a9a60f4fcc3","url":"http://localhost:8338/klantinteracties/api/v1/betrokkenen/48a80d3d-84d0-4e0e-ad42-0a9a60f4fcc3","wasPartij":{"uuid":"addf84d8-93f0-4869-867d-47bd9aadc350","url":"http://localhost:8338/klantinteracties/api/v1/partijen/addf84d8-93f0-4869-867d-47bd9aadc350"},"hadKlantcontact":{"uuid":"ded0fd5e-03c5-4ce9-a545-cdd04b4d55b2","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/ded0fd5e-03c5-4ce9-a545-cdd04b4d55b2"},"digitaleAdressen":[],"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"contactnaam":{"voorletters":"","voornaam":"","voorvoegselAchternaam":"","achternaam":""},"volledigeNaam":"","rol":"klant","organisatienaam":"Open
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"17bacef4-dc8d-4b48-91e9-f219d4a9f259","url":"http://localhost:8338/klantinteracties/api/v1/betrokkenen/17bacef4-dc8d-4b48-91e9-f219d4a9f259","wasPartij":{"uuid":"d6657df7-6031-4e68-b0c8-4e901c7e8223","url":"http://localhost:8338/klantinteracties/api/v1/partijen/d6657df7-6031-4e68-b0c8-4e901c7e8223"},"hadKlantcontact":{"uuid":"abaf5558-1044-4f64-87f6-4ce1c792e815","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/abaf5558-1044-4f64-87f6-4ce1c792e815"},"digitaleAdressen":[],"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"contactnaam":{"voorletters":"","voornaam":"","voorvoegselAchternaam":"","achternaam":""},"volledigeNaam":"","rol":"klant","organisatienaam":"Open
         Inwoner Platform","initiator":true}]}'
     headers:
       API-version:
@@ -365,9 +365,9 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/internetaken
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"6d1b186b-a53f-4bd2-ac71-865d7faef516","url":"http://localhost:8338/klantinteracties/api/v1/internetaken/6d1b186b-a53f-4bd2-ac71-865d7faef516","nummer":"0000000001","gevraagdeHandeling":"Vraag
-        beantwoorden in aanleiding gevend klant contact","aanleidinggevendKlantcontact":{"uuid":"ded0fd5e-03c5-4ce9-a545-cdd04b4d55b2","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/ded0fd5e-03c5-4ce9-a545-cdd04b4d55b2"},"toegewezenAanActor":{"uuid":"884c8660-c7f2-4185-afc9-b3b45ebcbd98","url":"http://localhost:8338/klantinteracties/api/v1/actoren/884c8660-c7f2-4185-afc9-b3b45ebcbd98"},"toelichting":"Beantwoorden
-        vraag","status":"te_verwerken","toegewezenOp":"2024-10-03T13:17:33.303109Z","afgehandeldOp":null}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"3daa1aea-7b48-4c34-844e-f34b216dc5bf","url":"http://localhost:8338/klantinteracties/api/v1/internetaken/3daa1aea-7b48-4c34-844e-f34b216dc5bf","nummer":"0000000001","gevraagdeHandeling":"Vraag
+        beantwoorden in aanleiding gevend klant contact","aanleidinggevendKlantcontact":{"uuid":"abaf5558-1044-4f64-87f6-4ce1c792e815","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/abaf5558-1044-4f64-87f6-4ce1c792e815"},"toegewezenAanActor":{"uuid":"40472e98-312f-495f-bde7-8e3d0b2bd86e","url":"http://localhost:8338/klantinteracties/api/v1/actoren/40472e98-312f-495f-bde7-8e3d0b2bd86e"},"toelichting":"Beantwoorden
+        vraag","status":"te_verwerken","toegewezenOp":"2024-10-17T12:12:59.889034Z","afgehandeldOp":null}]}'
     headers:
       API-version:
       - 0.0.3
