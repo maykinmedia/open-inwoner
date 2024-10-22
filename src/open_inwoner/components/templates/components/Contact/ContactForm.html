@@ -26,18 +26,18 @@
                 {% if form_object.captcha %}
                     <div class="form__control ">
                         <div class="captcha">
-                            <label class="label captcha__label">
+                            <p class="utrecht-paragraph">
                                 {{ form_object.captcha.label }}<span class="label__label--required"> * </span>
+                            </p>
+                            <label class="label captcha__label">
+                                <span class="captcha__check">
+                                    {{ form_object.captcha.field.question }}
+                                    <span class="captcha__input">{% field_as_widget form_object.captcha "input" form_id %}</span>
+                                </span>
+                                {% if form_object.captcha.errors %}
+                                    {% errors errors=form_object.captcha.errors %}
+                                {% endif %}
                             </label>
-                            <div class="captcha__check">
-                                <div>
-                                    <span class="captcha__prompt">{{ form_object.captcha.field.question }}</span>
-                                </div>
-                                <span class="captcha__input">{% field_as_widget form_object.captcha "input" form_id %}</span>
-                            </div>
-                            {% if form_object.captcha.errors %}
-                                {% errors errors=form_object.captcha.errors %}
-                            {% endif %}
                         </div>
                     </div>
                 {% endif %}
