@@ -20,6 +20,7 @@ from django.views import View
 from django.views.generic import FormView, TemplateView
 
 from django_htmx.http import HttpResponseClientRedirect
+from glom import glom
 from mail_editor.helpers import find_template
 from view_breadcrumbs import BaseBreadcrumbMixin
 from zgw_consumers.api_models.constants import RolOmschrijving
@@ -163,6 +164,7 @@ class InnerCaseDetailView(
             self.store_statustype_mapping(self.case.zaaktype.identificatie)
             self.store_resulttype_mapping(self.case.zaaktype.identificatie)
 
+            # questions/E-suite contactmomenten
             objectcontactmomenten = []
             if contactmoment_client := build_contactmomenten_client():
                 objectcontactmomenten = (
@@ -182,6 +184,15 @@ class InnerCaseDetailView(
                 question.new_answer_available = contactmoment_has_new_answer(
                     question, kcm_answer_mapping
                 )
+
+            # filter questions
+            openklant_config = OpenKlantConfig.get_solo()
+            if exclude_range := openklant_config.exclude_contactmoment_kanalen:
+                questions = [
+                    item
+                    for item in questions
+                    if glom(item, "kanaal") not in exclude_range
+                ]
 
             statustypen = []
             catalogi_client = api_group.catalogi_client
