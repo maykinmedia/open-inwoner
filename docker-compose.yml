@@ -53,7 +53,7 @@ services:
     volumes:
       - private_media:/private-media
 
-  web:
+  web: &web-service
     build: &web_build
       context: .
       args:
@@ -100,6 +100,14 @@ services:
       - redis
     networks:
       - openinwoner-dev
+
+  web-init:
+    <<: *web-service
+    container_name: open-inwoner-web-init
+    ports: []
+    env_file:
+      - django-setup-config.env
+    command: /setup_configuration.sh
 
   nginx:
     image: nginx
