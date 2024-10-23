@@ -1,3 +1,5 @@
+from typing import Any
+
 from ape_pie import APIClient
 
 from openklant2._resources.actor import ActorResource
@@ -10,21 +12,21 @@ from openklant2._resources.partij import PartijResource
 from openklant2._resources.partij_identificator import PartijIdentificatorResource
 
 
-class OpenKlant2Client:
-    http_client: APIClient
+class OpenKlant2Client(APIClient):
     partij: PartijResource
 
-    def __init__(self, api_url: str, api_token: str):
-        self.http_client = APIClient(
-            request_kwargs={"headers": {"Authorization": f"Token {api_token}"}},
-            base_url=api_url,
-        )
+    def __init__(
+        self,
+        base_url: str,
+        request_kwargs: dict[str, Any] | None = None,
+    ):
+        super().__init__(base_url=base_url, request_kwargs=request_kwargs)
 
-        self.partij = PartijResource(self.http_client)
-        self.partij_identificator = PartijIdentificatorResource(self.http_client)
-        self.digitaal_adres = DigitaalAdresResource(self.http_client)
-        self.klant_contact = KlantContactResource(self.http_client)
-        self.onderwerp_object = OnderwerpObjectResource(self.http_client)
-        self.actor = ActorResource(self.http_client)
-        self.interne_taak = InterneTaakResource(self.http_client)
-        self.betrokkene = BetrokkeneResource(self.http_client)
+        self.partij = PartijResource(self)
+        self.partij_identificator = PartijIdentificatorResource(self)
+        self.digitaal_adres = DigitaalAdresResource(self)
+        self.klant_contact = KlantContactResource(self)
+        self.onderwerp_object = OnderwerpObjectResource(self)
+        self.actor = ActorResource(self)
+        self.interne_taak = InterneTaakResource(self)
+        self.betrokkene = BetrokkeneResource(self)
