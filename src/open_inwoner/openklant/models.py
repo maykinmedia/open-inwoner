@@ -215,6 +215,7 @@ class OpenKlant2Config:
 
         if not (config := getattr(settings, "OPENKLANT2_CONFIG", None)):
             raise ImproperlyConfigured(
+            raise RuntimeError(
                 "Please set OPENKLANT2_CONFIG in your settings to configure OpenKlant2"
             )
 
