@@ -18,9 +18,11 @@ services:
     image: postgis/postgis:${PG_VERSION:-14-master}
     container_name: open-inwoner-db
     environment:
-      - POSTGRES_HOST_AUTH_METHOD=trust
+      - POSTGRES_HOST_AUTH_METHOD=${POSTGRES_HOST_AUTH_METHOD:-trust}
+      - POSTGRES_DB=${POSTGRES_DB:-open_inwoner}
+      - POSTGRES_USER=${POSTGRES_USER:-open_inwoner}
     volumes:
-      - ./docker-init-db.sql:/docker-entrypoint-initdb.d/init_db.sql
+      - ./docker-initdb.d/:/docker-entrypoint-initdb.d
       - db:/var/lib/postgresql/data
     networks:
       - openinwoner-dev
@@ -135,11 +137,11 @@ services:
     volumes: *web_volumes
     depends_on:
       web:
-        # This health check condition is needed because Celery Beat will 
-        # try to convert the CELERY_BEAT_SCHEDULE into database entries. For 
-        # this, migrations need to be finished. If Celery tasks were still 
-        # pending, the database also needs to be ready for Celery itself. We 
-        # therefore have the health check here, and make Celery beat and 
+        # This health check condition is needed because Celery Beat will
+        # try to convert the CELERY_BEAT_SCHEDULE into database entries. For
+        # this, migrations need to be finished. If Celery tasks were still
+        # pending, the database also needs to be ready for Celery itself. We
+        # therefore have the health check here, and make Celery beat and
         # monitor containers depend on the celery container.
         condition: service_healthy
       redis:
