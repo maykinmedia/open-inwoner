@@ -148,8 +148,8 @@ class OpenKlantServiceManager:
 
     def client_factory(self):
         return OpenKlant2Client(
-            api_url=self.api_url,
-            api_token=self._api_token,
+            base_url=self.api_url,
+            request_kwargs={"headers": {"Authorization": f"Token {self._api_token}"}},
         )
 
     def clean_state(self):
