@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from typing import TypedDict
+from typing import Iterable, NotRequired, Protocol, TypedDict
 
 from django.contrib.auth.mixins import AccessMixin
 from django.http import Http404, HttpResponseRedirect
@@ -14,6 +14,7 @@ from django.views.generic import TemplateView
 from glom import glom
 from view_breadcrumbs import BaseBreadcrumbMixin
 
+from open_inwoner.accounts.models import User
 from open_inwoner.openklant.api_models import KlantContactMoment
 from open_inwoner.openklant.clients import (
     build_contactmomenten_client,
@@ -27,6 +28,7 @@ from open_inwoner.openklant.models import (
 )
 from open_inwoner.openklant.views.contactform import ContactFormView
 from open_inwoner.openklant.wrap import (
+    FetchParameters,
     contactmoment_has_new_answer,
     fetch_klantcontactmoment,
     fetch_klantcontactmomenten,
@@ -75,6 +77,7 @@ class KCMDict(TypedDict):
     channel: str
     text: str
     url: str
+    case_url: str | None
     identificatie: str
     type: str
     onderwerp: str
@@ -83,40 +86,20 @@ class KCMDict(TypedDict):
     new_answer_available: bool
 
 
-class KlantContactMomentBaseView(
-    CommonPageMixin, BaseBreadcrumbMixin, KlantContactMomentAccessMixin, TemplateView
-):
-    def get_kcm_data(
-        self,
-        kcm: KlantContactMoment,
-        local_kcm_mapping: dict[str, KlantContactMomentAnswer] | None = None,
-    ) -> KCMDict:
-        data = {
-            "registered_date": kcm.contactmoment.registratiedatum,
-            "channel": kcm.contactmoment.kanaal.title(),
-            "text": kcm.contactmoment.tekst,
-            "url": reverse("cases:contactmoment_detail", kwargs={"kcm_uuid": kcm.uuid}),
-            # eSuite extra
-            "identificatie": kcm.contactmoment.identificatie,
-            "type": kcm.contactmoment.type,
-            "status": Status.safe_label(kcm.contactmoment.status, _("Onbekend")),
-            "antwoord": kcm.contactmoment.antwoord,
-            "new_answer_available": contactmoment_has_new_answer(
-                kcm.contactmoment, local_kcm_mapping=local_kcm_mapping
-            ),
-        }
+class QuestionAnswerService(Protocol):
 
-        data["onderwerp"] = self.get_kcm_subject(kcm)
+    def list_questions(
+        self, fetch_params: FetchParameters, user: User
+    ) -> Iterable[KCMDict]: ...
 
-        return data
+    def retrieve_question(
+        self, fetch_params: FetchParameters, question_uuid: str, user: User
+    ) -> KCMDict | None: ...
 
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx["anchors"] = self.get_anchors()
-        return ctx
 
-    def get_kcm_subject(
-        self,
+class ContactMomentenService(QuestionAnswerService):
+    @staticmethod
+    def _get_kcm_subject(
         kcm: KlantContactMoment,
     ) -> str | None:
         """
@@ -149,6 +132,130 @@ class KlantContactMomentBaseView(
 
         return subject.subject
 
+    @staticmethod
+    def _get_kcm_data(
+        kcm: KlantContactMoment,
+        local_kcm_mapping: dict[str, KlantContactMomentAnswer] | None = None,
+    ) -> KCMDict:
+        if isinstance(kcm.contactmoment, str):
+            raise ValueError
+
+        data: KCMDict = {
+            "registered_date": kcm.contactmoment.registratiedatum,
+            "channel": kcm.contactmoment.kanaal.title(),
+            "text": kcm.contactmoment.tekst,
+            "url": reverse("cases:contactmoment_detail", kwargs={"kcm_uuid": kcm.uuid}),
+            "case_url": None,
+            "onderwerp": ContactMomentenService._get_kcm_subject(kcm) or "",
+            # eSuite extra
+            "identificatie": kcm.contactmoment.identificatie,
+            "type": kcm.contactmoment.type,
+            "status": Status.safe_label(kcm.contactmoment.status, _("Onbekend")),
+            "antwoord": kcm.contactmoment.antwoord,
+            "new_answer_available": contactmoment_has_new_answer(
+                kcm.contactmoment, local_kcm_mapping=local_kcm_mapping
+            ),
+        }
+
+        return data
+
+    def list_questions(
+        self, fetch_params: FetchParameters, user: User
+    ) -> Iterable[KCMDict]:
+        kcms = fetch_klantcontactmomenten(**fetch_params)
+
+        klant_config = OpenKlantConfig.get_solo()
+        if exclude_range := klant_config.exclude_contactmoment_kanalen:
+            kcms = [
+                item
+                for item in kcms
+                if glom(item, "contactmoment.kanaal") not in exclude_range
+            ]
+
+        contactmomenten = [
+            self._get_kcm_data(
+                kcm,
+                local_kcm_mapping=get_kcm_answer_mapping(
+                    [kcm.contactmoment for kcm in kcms], user
+                ),
+            )
+            for kcm in kcms
+        ]
+        return contactmomenten
+
+    def retrieve_question(
+        self, fetch_params: FetchParameters, question_uuid: str, user: User
+    ) -> KCMDict | None:
+        if not (kcm := fetch_klantcontactmoment(question_uuid, **fetch_params)):
+            return None
+
+        local_kcm, is_created = KlantContactMomentAnswer.objects.get_or_create(  # noqa
+            user=user, contactmoment_url=kcm.contactmoment.url
+        )
+        if not local_kcm.is_seen:
+            local_kcm.is_seen = True
+            local_kcm.save()
+
+        zaak = None
+        case_url = None
+        zaak = None
+        if client := build_contactmomenten_client():
+            ocm = client.retrieve_objectcontactmoment(kcm.contactmoment, "zaak")
+            if ocm and ocm.object_type == "zaak":
+                zaak_url = ocm.object
+                groups = list(ZGWApiGroupConfig.objects.all())
+                proxy = MultiZgwClientProxy([group.zaken_client for group in groups])
+                proxy_response = proxy.fetch_case_by_url_no_cache(zaak_url)
+                cases_found = proxy_response.truthy_responses
+                if (case_count := len(cases_found)) == 0:
+                    logger.error(
+                        "Unable to find matched contactmomenten zaak in any zgw backend"
+                    )
+                else:
+                    zaak, client = cases_found[0].result, cases_found[0].client
+                    group = ZGWApiGroupConfig.objects.resolve_group_from_hints(
+                        client=client
+                    )
+                    case_url = reverse(
+                        "cases:case_detail",
+                        kwargs={
+                            "object_id": str(zaak.uuid),
+                            "api_group_id": group.id,
+                        },
+                    )
+                    if case_count > 1:
+                        # In principle this should not happen, a zaak should be stored in
+                        # exactly one backend. But: https://www.xkcd.com/2200/
+                        # We should at least receive a ping if this happens.
+                        logger.error("Found one zaak in multiple backends")
+
+        data = self._get_kcm_data(kcm)
+        data["case_url"] = case_url
+        return data
+
+
+class KlantContactMomentBaseView(
+    CommonPageMixin, BaseBreadcrumbMixin, KlantContactMomentAccessMixin, TemplateView
+):
+    def get_service(self) -> QuestionAnswerService:
+        return ContactMomentenService()
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["anchors"] = self.get_anchors()
+        return ctx
+
+    @property
+    def fetch_params(self):
+        if not (
+            fetch_params := get_fetch_parameters(
+                self.request, use_vestigingsnummer=True
+            )
+        ):
+            raise ValueError("User has no bsn or kvk attributes")
+
+        return fetch_params
+
 
 class KlantContactMomentListView(
     PaginationMixin, ContactFormView, KlantContactMomentBaseView
@@ -174,28 +281,10 @@ class KlantContactMomentListView(
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-
-        kcms = fetch_klantcontactmomenten(
-            **get_fetch_parameters(self.request, use_vestigingsnummer=True)
+        service = self.get_service()
+        ctx["contactmomenten"] = service.list_questions(
+            self.fetch_params, user=self.request.user
         )
-
-        klant_config = OpenKlantConfig.get_solo()
-        if exclude_range := klant_config.exclude_contactmoment_kanalen:
-            kcms = [
-                item
-                for item in kcms
-                if glom(item, "contactmoment.kanaal") not in exclude_range
-            ]
-
-        ctx["contactmomenten"] = [
-            self.get_kcm_data(
-                kcm,
-                local_kcm_mapping=get_kcm_answer_mapping(
-                    [kcm.contactmoment for kcm in kcms], self.request.user
-                ),
-            )
-            for kcm in kcms
-        ]
         paginator_dict = self.paginate_with_context(ctx["contactmomenten"])
         ctx.update(paginator_dict)
         return ctx
@@ -219,55 +308,20 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
+        service = self.get_service()
 
-        kcm = fetch_klantcontactmoment(
-            kwargs["kcm_uuid"],
-            **get_fetch_parameters(self.request, use_vestigingsnummer=True),
+        kcm = service.retrieve_question(
+            self.fetch_params, kwargs["kcm_uuid"], user=self.request.user
         )
-
         if not kcm:
             raise Http404()
 
-        local_kcm, is_created = KlantContactMomentAnswer.objects.get_or_create(  # noqa
-            user=self.request.user, contactmoment_url=kcm.contactmoment.url
+        local_kcm, created = KlantContactMomentAnswer.objects.get_or_create(  # noqa
+            user=self.request.user, contactmoment_url=kcm["url"]
         )
         if not local_kcm.is_seen:
             local_kcm.is_seen = True
             local_kcm.save()
-
-        zaak = None
-        case_url = None
-        ctx["zaak"] = None
-        if client := build_contactmomenten_client():
-            ocm = client.retrieve_objectcontactmoment(kcm.contactmoment, "zaak")
-            if ocm and ocm.object_type == "zaak":
-                zaak_url = ocm.object
-                groups = list(ZGWApiGroupConfig.objects.all())
-                proxy = MultiZgwClientProxy([group.zaken_client for group in groups])
-                proxy_response = proxy.fetch_case_by_url_no_cache(zaak_url)
-                cases_found = proxy_response.truthy_responses
-                if (case_count := len(cases_found)) == 0:
-                    logger.error(
-                        "Unable to find matched contactmomenten zaak in any zgw backend"
-                    )
-                else:
-                    zaak, client = cases_found[0].result, cases_found[0].client
-                    group = ZGWApiGroupConfig.objects.resolve_group_from_hints(
-                        client=client
-                    )
-                    case_url = reverse(
-                        "cases:case_detail",
-                        kwargs={
-                            "object_id": str(zaak.uuid),
-                            "api_group_id": group.id,
-                        },
-                    )
-                    ctx["zaak"] = zaak
-                    if case_count > 1:
-                        # In principle this should not happen, a zaak should be stored in
-                        # exactly one backend. But: https://www.xkcd.com/2200/
-                        # We should at least receive a ping if this happens.
-                        logger.error("Found one zaak in multiple backends")
 
         contactmoment: KCMDict = self.get_kcm_data(kcm)
         ctx["contactmoment"] = contactmoment
@@ -295,10 +349,10 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
                 "label": _("Terug naar overzicht"),
                 "url": origin,
             }
-            if zaak:
+            if kcm["case_url"]:
                 ctx["destination"] = {
                     "label": _("Naar aanvraag"),
-                    "url": case_url,
+                    "url": kcm["case_url"],
                 }
         else:
             ctx["origin"] = {
