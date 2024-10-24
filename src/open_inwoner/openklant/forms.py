@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 from open_inwoner.accounts.models import User
 from open_inwoner.openklant.models import ContactFormSubject, OpenKlantConfig
-from open_inwoner.utils.forms import MathCaptchaField
+from open_inwoner.openklant.views.utils import generate_question_answer_pair
 from open_inwoner.utils.validators import DutchPhoneNumberValidator
 
 
@@ -45,16 +45,17 @@ class ContactForm(forms.Form):
         widget=forms.Textarea(attrs={"rows": "5"}),
         required=True,
     )
-    captcha = MathCaptchaField(
+    captcha = forms.IntegerField(
         label=_("Beantwoord deze rekensom"),
         required=True,
     )
 
     user: User
 
-    def __init__(self, user, *args, **kwargs):
+    def __init__(self, user, request_session, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.user = user
+        self.request_session = request_session
 
         config = OpenKlantConfig.get_solo()
         self.fields["subject"].queryset = config.contactformsubject_set.all()
@@ -91,5 +92,18 @@ class ContactForm(forms.Form):
             cleaned_data["first_name"] = self.user.first_name
             cleaned_data["infix"] = self.user.infix
             cleaned_data["last_name"] = self.user.last_name
+        else:
+            # captcha for anon users
+            captcha_answer = cleaned_data.get("captcha")
+            if (
+                captcha_answer
+                and not captcha_answer == self.request_session["captcha_answer"]
+            ):
+                self.add_error("captcha", _("Fout antwoord, probeer het opnieuw."))
+
+            captcha_question, captcha_answer = generate_question_answer_pair()
+
+            self.request_session["captcha_question"] = captcha_question
+            self.request_session["captcha_answer"] = captcha_answer
 
         return cleaned_data

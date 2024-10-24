@@ -31,7 +31,7 @@
                             </p>
                             <label class="label captcha__label">
                                 <span class="captcha__check">
-                                    {{ form_object.captcha.field.question }}
+                                    {{ form_object.request_session.captcha_question }}
                                     <span class="captcha__input">{% field_as_widget form_object.captcha "input" form_id %}</span>
                                 </span>
                                 {% if form_object.captcha.errors %}
