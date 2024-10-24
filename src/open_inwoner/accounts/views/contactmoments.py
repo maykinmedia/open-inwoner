@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from typing import TypedDict
+from typing import Iterable, TypedDict
 
 from django.contrib.auth.mixins import AccessMixin
 from django.http import Http404, HttpResponseRedirect
@@ -14,6 +14,7 @@ from django.views.generic import TemplateView
 from glom import glom
 from view_breadcrumbs import BaseBreadcrumbMixin
 
+from open_inwoner.accounts.models import User
 from open_inwoner.openklant.api_models import KlantContactMoment
 from open_inwoner.openklant.clients import (
     build_contactmomenten_client,
@@ -27,6 +28,7 @@ from open_inwoner.openklant.models import (
 )
 from open_inwoner.openklant.views.contactform import ContactFormView
 from open_inwoner.openklant.wrap import (
+    FetchParameters,
     contactmoment_has_new_answer,
     fetch_klantcontactmoment,
     fetch_klantcontactmomenten,
@@ -83,40 +85,9 @@ class KCMDict(TypedDict):
     new_answer_available: bool
 
 
-class KlantContactMomentBaseView(
-    CommonPageMixin, BaseBreadcrumbMixin, KlantContactMomentAccessMixin, TemplateView
-):
-    def get_kcm_data(
-        self,
-        kcm: KlantContactMoment,
-        local_kcm_mapping: dict[str, KlantContactMomentAnswer] | None = None,
-    ) -> KCMDict:
-        data = {
-            "registered_date": kcm.contactmoment.registratiedatum,
-            "channel": kcm.contactmoment.kanaal.title(),
-            "text": kcm.contactmoment.tekst,
-            "url": reverse("cases:contactmoment_detail", kwargs={"kcm_uuid": kcm.uuid}),
-            # eSuite extra
-            "identificatie": kcm.contactmoment.identificatie,
-            "type": kcm.contactmoment.type,
-            "status": Status.safe_label(kcm.contactmoment.status, _("Onbekend")),
-            "antwoord": kcm.contactmoment.antwoord,
-            "new_answer_available": contactmoment_has_new_answer(
-                kcm.contactmoment, local_kcm_mapping=local_kcm_mapping
-            ),
-        }
-
-        data["onderwerp"] = self.get_kcm_subject(kcm)
-
-        return data
-
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx["anchors"] = self.get_anchors()
-        return ctx
-
-    def get_kcm_subject(
-        self,
+class ContactMomentenService:
+    @staticmethod
+    def _get_kcm_subject(
         kcm: KlantContactMoment,
     ) -> str | None:
         """
@@ -149,6 +120,84 @@ class KlantContactMomentBaseView(
 
         return subject.subject
 
+    @staticmethod
+    def _get_kcm_data(
+        kcm: KlantContactMoment,
+        local_kcm_mapping: dict[str, KlantContactMomentAnswer] | None = None,
+    ) -> KCMDict:
+        if isinstance(kcm.contactmoment, str):
+            raise ValueError
+
+        data: KCMDict = {
+            "registered_date": kcm.contactmoment.registratiedatum,
+            "channel": kcm.contactmoment.kanaal.title(),
+            "text": kcm.contactmoment.tekst,
+            "url": reverse("cases:contactmoment_detail", kwargs={"kcm_uuid": kcm.uuid}),
+            "onderwerp": ContactMomentenService._get_kcm_subject(kcm) or "",
+            # eSuite extra
+            "identificatie": kcm.contactmoment.identificatie,
+            "type": kcm.contactmoment.type,
+            "status": Status.safe_label(kcm.contactmoment.status, _("Onbekend")),
+            "antwoord": kcm.contactmoment.antwoord,
+            "new_answer_available": contactmoment_has_new_answer(
+                kcm.contactmoment, local_kcm_mapping=local_kcm_mapping
+            ),
+        }
+
+        return data
+
+    def list_questions(
+        self, fetch_params: FetchParameters, user: User
+    ) -> Iterable[KCMDict]:
+        kcms = fetch_klantcontactmomenten(**fetch_params)
+
+        klant_config = OpenKlantConfig.get_solo()
+        if exclude_range := klant_config.exclude_contactmoment_kanalen:
+            kcms = [
+                item
+                for item in kcms
+                if glom(item, "contactmoment.kanaal") not in exclude_range
+            ]
+
+        contactmomenten = [
+            self._get_kcm_data(
+                kcm,
+                local_kcm_mapping=get_kcm_answer_mapping(
+                    [kcm.contactmoment for kcm in kcms], user
+                ),
+            )
+            for kcm in kcms
+        ]
+        return contactmomenten
+
+    def retrieve_question(
+        self, fetch_params: FetchParameters, question_uuid: str
+    ) -> KCMDict:
+        raise NotImplementedError
+
+
+class KlantContactMomentBaseView(
+    CommonPageMixin, BaseBreadcrumbMixin, KlantContactMomentAccessMixin, TemplateView
+):
+    def get_service(self) -> ContactMomentenService:
+        return ContactMomentenService()
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["anchors"] = self.get_anchors()
+        return ctx
+
+    @property
+    def fetch_params(self):
+        if not (
+            fetch_params := get_fetch_parameters(
+                self.request, use_vestigingsnummer=True
+            )
+        ):
+            raise ValueError("User has no bsn or kvk attributes")
+
+        return fetch_params
+
 
 class KlantContactMomentListView(
     PaginationMixin, ContactFormView, KlantContactMomentBaseView
@@ -174,28 +223,10 @@ class KlantContactMomentListView(
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-
-        kcms = fetch_klantcontactmomenten(
-            **get_fetch_parameters(self.request, use_vestigingsnummer=True)
+        service = self.get_service()
+        ctx["contactmomenten"] = service.list_questions(
+            self.fetch_params, user=self.request.user
         )
-
-        klant_config = OpenKlantConfig.get_solo()
-        if exclude_range := klant_config.exclude_contactmoment_kanalen:
-            kcms = [
-                item
-                for item in kcms
-                if glom(item, "contactmoment.kanaal") not in exclude_range
-            ]
-
-        ctx["contactmomenten"] = [
-            self.get_kcm_data(
-                kcm,
-                local_kcm_mapping=get_kcm_answer_mapping(
-                    [kcm.contactmoment for kcm in kcms], self.request.user
-                ),
-            )
-            for kcm in kcms
-        ]
         paginator_dict = self.paginate_with_context(ctx["contactmomenten"])
         ctx.update(paginator_dict)
         return ctx
