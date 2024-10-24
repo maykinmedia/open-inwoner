@@ -1,5 +1,6 @@
 import uuid
 from dataclasses import dataclass
+from typing import Self
 from urllib.parse import urljoin
 
 from django.db import models
@@ -208,8 +209,12 @@ class OpenKlant2Config:
         return urljoin(self.api_root, self.api_path)
 
     @classmethod
-    def from_django_settings(cls):
+    def from_django_settings(cls) -> Self:
         from django.conf import settings
 
-        if config := getattr(settings, "OPENKLANT2_CONFIG", None):
-            return cls(**config)
+        if not (config := getattr(settings, "OPENKLANT2_CONFIG", None)):
+            raise RuntimeError(
+                "Please set OPENKLANT2_CONFIG in your settings to configure OpenKlant2"
+            )
+
+        return cls(**config)
