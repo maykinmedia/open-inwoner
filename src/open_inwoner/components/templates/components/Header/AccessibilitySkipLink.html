@@ -1,0 +1,6 @@
+{% load i18n link_tags %}
+
+<p class="utrecht-paragraph">
+    {% trans "Doorgaan naar hoofdinhoud" as link_text %}
+    {% link href="#content" icon="south" text=link_text extra_classes="utrecht-skip-link utrecht-skip-link--visible-on-focus utrecht-skip-link--focus-visible" %}
+</p>
