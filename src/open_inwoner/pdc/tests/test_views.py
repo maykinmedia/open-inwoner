@@ -202,8 +202,7 @@ class CategoryDetailViewTest(TestCase):
             description="A <em>descriptive</em> description",
             visible_for_citizens=False,
         )
-        user = DigidUserFactory()
-        self.client.force_login(user)
+        self.client.force_login(self.user)
 
         url = reverse("products:category_detail", kwargs={"slug": category.slug})
 

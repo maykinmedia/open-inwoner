@@ -595,6 +595,8 @@ class ContactFormIntegrationTest(
         self, _m, mock_send_confirm, mock_captcha
     ):
         MockAPICreateData.setUpServices()
+        data = MockAPICreateData()
+        original_phonenumber = data.eherkenning_user.phonenumber
 
         config = OpenKlantConfig.get_solo()
         config.register_contact_moment = True
@@ -616,7 +618,9 @@ class ContactFormIntegrationTest(
                     )
                     config.save()
 
-                    data = MockAPICreateData()
+                    data.eherkenning_user.phonenumber = original_phonenumber
+                    data.eherkenning_user.save()
+
                     data.install_mocks_eherkenning(
                         m, use_rsin=use_rsin_for_innNnpId_query_parameter
                     )
@@ -785,6 +789,7 @@ class ContactFormIntegrationTest(
     ):
         self.maxDiff = None
         MockAPICreateData.setUpServices()
+        data = MockAPICreateData()
 
         config = OpenKlantConfig.get_solo()
         config.register_contact_moment = True
@@ -806,7 +811,6 @@ class ContactFormIntegrationTest(
                     )
                     config.save()
 
-                    data = MockAPICreateData()
                     data.install_mocks_eherkenning_missing_contact_info(
                         m, use_rsin=use_rsin_for_innNnpId_query_parameter
                     )
