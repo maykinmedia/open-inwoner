@@ -1,14 +1,26 @@
 .filter-bar__multiselect-listbox {
+  padding: 0;
   position: relative;
-  width: 280px;
+  width: 100%;
+
+  @media (min-width: 768px) {
+    padding: 1px;
+    width: 280px;
+  }
+
+  .button,
+  .button:hover {
+    transition: none !important;
+    transform: none !important;
+  }
 
   &:has(.show) {
     .button__select {
       *[class*='icons'] {
-        display: inline-block;
+        display: flex;
         position: absolute;
         right: var(--spacing-large);
-        top: 8px;
+        top: 11px;
         transform: rotate(180deg);
       }
     }
@@ -22,22 +34,24 @@
   }
 
   .button__select {
-    background-color: var(--color-white);
-    border: 1px solid var(--color-gray-dark-900);
-    border-radius: var(--border-radius);
-    box-sizing: border-box;
-    color: var(--color-gray-dark);
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-body);
-    height: var(--row-height);
-    justify-content: space-between;
-    margin: 0;
-    padding: var(--spacing-medium) var(--spacing-large);
-    text-align: left;
-    max-width: 100%;
+    display: none;
     width: 100%;
 
     @media (min-width: 768px) {
+      background-color: var(--color-white);
+      border: 1px solid var(--color-gray-dark-900);
+      border-radius: var(--border-radius);
+      box-sizing: border-box;
+      color: var(--color-gray-dark);
+      display: flex;
+      font-family: var(--font-family-body);
+      font-size: var(--font-size-body);
+      height: var(--row-height);
+      justify-content: space-between;
+      margin: 0;
+      padding: var(--spacing-medium) var(--spacing-large);
+      text-align: left;
+      max-width: 100%;
       width: 280px;
     }
 
@@ -45,7 +59,6 @@
       display: inline-block;
       position: absolute;
       right: var(--spacing-large);
-      transition: all 0.3s;
     }
 
     &.active {
@@ -78,17 +91,20 @@
   }
 
   .multiselect-listbox__content {
-    position: absolute;
-    background-color: var(--color-white);
-    max-height: calc(6 * 40px);
-    left: 0;
-    min-width: 280px;
-    opacity: 0;
-    top: 40px;
+    position: static;
+    opacity: 1;
     width: 100%;
     z-index: 1;
 
     @media (min-width: 768px) {
+      position: absolute;
+      background-color: var(--color-white);
+      max-height: calc(6 * 40px);
+      left: 0;
+      min-width: 280px;
+      opacity: 0;
+      top: 40px;
+      z-index: 1;
       width: 280px;
     }
 
@@ -98,6 +114,8 @@
       overflow-y: auto;
 
       & > .checkbox {
+        background-color: var(--color-white);
+        margin-bottom: var(--spacing-medium);
         padding: var(--spacing-extra-large) var(--spacing-medium);
 
         .checkbox__input:focus ~ .checkbox__label {
@@ -107,10 +125,15 @@
             text-decoration: underline;
           }
         }
+
         .checkbox__input:focus-visible ~ .checkbox__label {
           border-radius: var(--border-radius);
           outline: var(--focus-border-style) var(--focus-border-width)
             var(--color-secondary);
+        }
+
+        @media (min-width: 768px) {
+          margin-bottom: 0;
         }
       }
 
@@ -118,11 +141,14 @@
         display: flex;
         justify-content: start;
         color: var(--color-gray-dark-900);
-        border: 1px solid var(--color-gray);
+        border: 1px solid var(--color-gray-lightest);
         border-top: none;
         line-height: 0;
         padding: var(--spacing-medium) var(--spacing-large);
-        max-width: 260px;
+
+        @media (min-width: 768px) {
+          border: 1px solid var(--color-gray);
+        }
       }
 
       .checkbox:has(input[type='checkbox']:checked) {
@@ -141,7 +167,7 @@
       display: flex;
       flex-direction: row;
       flex-wrap: wrap;
-      color: var(--color-black);
+      color: var(--color-gray-dark);
       text-decoration: none;
       padding: 0 var(--spacing-small) var(--spacing-small) 30px;
 
@@ -182,9 +208,15 @@
     &--reset {
       position: relative;
       z-index: 1000;
+
       .button--transparent {
         justify-content: flex-start;
         padding-left: 0;
+        display: inline-flex;
+
+        &.hide {
+          display: none;
+        }
 
         &:focus {
           background-color: transparent;
@@ -194,6 +226,10 @@
       .hide {
         display: none;
       }
+    }
+
+    &--fullwidth {
+      max-width: 100%;
     }
   }
 }

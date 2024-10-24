@@ -26,9 +26,11 @@ function initFilterBar() {
       )
       let sum = 0
       let selectedFilters = []
+      let anyChecked = false
 
       checkboxes.forEach((checkbox) => {
         if (checkbox.checked) {
+          anyChecked = true // Mark that we have at least one checkbox checked
           const label = checkbox.nextElementSibling
           selectedFilters.push(label.textContent.trim())
           const frequencyCounter = label.querySelector('.frequency-counter')
@@ -52,6 +54,7 @@ function initFilterBar() {
       let closeIcon = document.createElement('span')
       closeIcon.classList.add('material-icons', 'close-icon')
       closeIcon.setAttribute('aria-hidden', 'true')
+      closeIcon.setAttribute('tabindex', '0') // Adding tabindex for keyboard focus
       closeIcon.textContent = 'close'
 
       // Add text and icons based on selected filters
@@ -76,12 +79,28 @@ function initFilterBar() {
         selectButton.classList.add('active')
       }
 
-      closeIcon.addEventListener('click', function (event) {
-        event.stopPropagation()
+      const handleClose = function () {
         checkboxes.forEach((checkbox) => {
           checkbox.checked = false
         })
-        calculateAndDisplayCheckedSum() // Recalculate and update the button and sum
+        calculateAndDisplayCheckedSum() // Recalculate and update the button and sum, even after refresh
+        const filterBarForm = document.querySelector('#filterBar .form')
+        if (filterBarForm) {
+          filterBarForm.submit()
+        }
+      }
+
+      closeIcon.addEventListener('click', function (event) {
+        event.stopPropagation()
+        handleClose()
+      })
+
+      // Add accessibility functionality for close icon
+      closeIcon.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault()
+          handleClose()
+        }
       })
 
       selectButton.setAttribute('aria-live', 'polite')
@@ -95,6 +114,18 @@ function initFilterBar() {
 
       if (resultTextElement) {
         resultTextElement.textContent = sum === 1 ? 'resultaat' : 'resultaten'
+      }
+
+      // Handle visibility of resetMultiSelectFilters
+      const resetMultiSelectFilters = document.getElementById(
+        'resetMultiSelectFilters'
+      )
+      if (resetMultiSelectFilters) {
+        if (anyChecked) {
+          resetMultiSelectFilters.classList.remove('hide') // Show the button
+        } else {
+          resetMultiSelectFilters.classList.add('hide') // Hide the button
+        }
       }
     }
 
@@ -177,10 +208,35 @@ function initFilterBar() {
       }
     })
 
-    const resetFilters = document.getElementById('resetFilters')
-    if (resetFilters) {
-      resetFilters.addEventListener('click', function (e) {
+    const resetMultiSelectFilters = document.getElementById(
+      'resetMultiSelectFilters'
+    )
+    const resetAllFilters = document.getElementById('resetAllFilters')
+
+    if (resetMultiSelectFilters) {
+      resetMultiSelectFilters.addEventListener('click', function (e) {
         e.preventDefault()
+
+        const checkboxes = document.querySelectorAll(
+          '.filter-bar .checkbox__input'
+        )
+        checkboxes.forEach((checkbox) => {
+          checkbox.checked = false
+        })
+
+        calculateAndDisplayCheckedSum()
+
+        const filterBarForm = document.querySelector('#filterBar .form')
+        if (filterBarForm) {
+          filterBarForm.submit()
+        }
+      })
+    }
+
+    if (resetAllFilters) {
+      resetAllFilters.addEventListener('click', function (e) {
+        e.preventDefault()
+
         const checkboxes = document.querySelectorAll(
           '.filter-bar .checkbox__input'
         )
@@ -224,9 +280,6 @@ document.body.addEventListener('htmx:afterSwap', function () {
 
 document.addEventListener('click', function (e) {
   if (e.target && e.target.classList.contains('pagination__link')) {
-    scrollToTopOfWindow()
-    setTimeout(function () {
-      initFilterBar() // Reinitialize filter bar after swap
-    }, 20)
+    scrollToTopOfWindow() // Scroll up after clicking pagination
   }
 })
