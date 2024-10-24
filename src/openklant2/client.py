@@ -14,6 +14,13 @@ from openklant2._resources.partij_identificator import PartijIdentificatorResour
 
 class OpenKlant2Client(APIClient):
     partij: PartijResource
+    partij_identificator: PartijIdentificatorResource
+    digitaal_adres: DigitaalAdresResource
+    klant_contact: KlantContactResource
+    onderwerp_object: OnderwerpObjectResource
+    actor: ActorResource
+    interne_taak: InterneTaakResource
+    betrokkene: BetrokkeneResource
 
     def __init__(
         self,
