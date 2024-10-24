@@ -99,6 +99,7 @@ class SiteConfigurationAdminForm(forms.ModelForm):
         widgets = {
             "extra_css": CSSEditorWidget,
             "login_text": CKEditorWidget,
+            "warning_banner_text": CKEditorWidget,
         }
 
     def clean_redirect_to(self):
