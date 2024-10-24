@@ -181,7 +181,6 @@ class SearchPagePlaywrightTests(
     form_delegates = [
         ("search-form-desktop", 1280, False),
         ("search-form-mobile-closed", 480, False),
-        ("search-form-mobile-open", 480, True),
     ]
 
     def iter_delegate_ids(self):

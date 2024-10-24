@@ -1,0 +1,16 @@
+@import '~@utrecht/components/dist/skip-link/css/index.css';
+
+.utrecht-skip-link {
+  text-decoration: none;
+
+  &--visible-on-focus {
+    &:focus {
+      text-decoration: none;
+    }
+  }
+
+  .skip-link__text {
+    margin-right: var(--spacing-large);
+    text-decoration: var(--utrecht-skip-link-focus-text-decoration);
+  }
+}

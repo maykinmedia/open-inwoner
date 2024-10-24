@@ -20,7 +20,7 @@
     align-self: flex-start;
     gap: var(--spacing-medium);
     list-style: none;
-    font-size: var(--font-size-body-large);
+    font-size: var(--font-size-body-larger);
     margin: 0;
     padding: 0;
     overflow-x: hidden;
@@ -41,10 +41,13 @@
     padding: 0;
 
     .link {
-      font-size: var(--font-size-body-large);
+      color: var(--color-black);
+      font-size: var(--font-size-body-larger);
+      font-weight: bold;
       line-height: var(--font-line-height-body);
       @media (min-width: 768px) {
         font-size: var(--font-size-body);
+        font-weight: normal;
         overflow: hidden;
         word-wrap: normal;
       }
@@ -205,7 +208,7 @@
     }
 
     .link {
-      font-size: var(--font-size-body-large);
+      font-size: var(--font-size-body-larger);
       line-height: var(--row-height);
 
       @media (min-width: 768px) {

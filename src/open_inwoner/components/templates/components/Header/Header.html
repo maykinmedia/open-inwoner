@@ -2,7 +2,7 @@
 
 {% get_solo "configurations.SiteConfiguration" as config %}
 
-{% accessibility_header request=request %}
+{% accessibility_header request=request desktop=True %}
 
 <header class="header" aria-label="Navigatie header">
     <div class="header__container">
@@ -33,77 +33,92 @@
         {# end of mobile header-menu with logo #}
 
         <div class="header--mobile header__submenu">
-            {% if cms_apps.products and request.user.is_authenticated or not config.hide_search_from_anonymous_users %}
-                <nav class="header__actions header__actions--open" aria-label="Zoek navigatie mobiel">
-                    <form id="search-form-mobile-open" class="search-form-delegate form form--inline">
-                        {% input search_form.query no_label=True %}
-                        {% form_actions primary_icon="search" primary_text=_("Zoeken") hide_primary_text=True %}
-                    </form>
-                </nav>
-            {% endif %}
+        
+            <div class="header--mobile__close">
+                {% button icon="close" text=_("Sluiten") hide_text=True icon_outlined=True transparent=True id="closeMobileNav" %}
+            </div>
 
-                <nav class="primary-navigation primary-navigation--mobile" aria-label="Hoofd navigatie">
-                    <ul class="primary-navigation__list">
+            <nav class="primary-navigation primary-navigation--mobile" aria-label="Hoofd navigatie">
+                <ul class="primary-navigation__list">
 
-                        <li class="primary-navigation__list-item">
-                            {% trans "Overzicht" as link_text %}
-                            {% link text=link_text href="/" icon="grid_view" icon_position="before" %}
-                        </li>
+                    <li class="primary-navigation__list-item">
+                        {% trans "Homepage" as link_text %}
+                        {% link text=link_text href="/" icon="home" icon_position="before" icon_outlined=True %}
+                    </li>
 
-                        {% if cms_apps.products %}
-                            {% if request.user.is_authenticated or not config.hide_categories_from_anonymous_users %}
-                                <li class="primary-navigation__list-item dropdown-nav__toggle">
-                                    <a href="#" class="link link--toggle link--icon link--icon-position-before" aria-label="{% trans "Onderwerpen" %}" title="{% trans "Onderwerpen" %}" aria-expanded="false">
-                                        <span >{% trans "Onderwerpen" %}</span>
-                                        <span aria-hidden="true" class="material-icons-outlined ">description</span>
-                                        {% icon icon="expand_more" icon_position="after" icon_outlined=True %}
-                                    </a>
+                    {% if cms_apps.products %}
+                        {% if request.user.is_authenticated or not config.hide_categories_from_anonymous_users %}
+                            <li class="primary-navigation__list-item dropdown-nav__toggle">
+                                <a href="#" class="link link--toggle link--icon link--icon-position-before" aria-label="{% trans "Onderwerpen" %}" title="{% trans "Onderwerpen" %}" aria-expanded="false">
+                                    <span >{% trans "Onderwerpen" %}</span>
+                                    <span aria-hidden="true" class="material-icons-outlined ">source</span>
+                                    {% icon icon="expand_more" icon_position="after" icon_outlined=True %}
+                                </a>
 
-                                    {% if menu_categories %}
-                                        <ul class="primary-navigation__list subpage-list">
-                                            {% for category in menu_categories %}
-                                                <li class="primary-navigation__list-item">
-                                                    {% url 'products:category_detail' slug=category.slug as category_href %}
-                                                    {% link text=category.name href=category_href %}
-                                                </li>
-                                            {% endfor %}
-                                        </ul>
-                                    {% endif %}
-                                </li>
-                            {% endif %}
-                        {% endif %}
-
-                        {{ rendered_cms_menu__home }}
-
-                        {% if has_general_faq_questions %}
-                            <li class="primary-navigation__list-item">
-                                {% link text=_('FAQ') href='general_faq' icon="help_outline" icon_position="before" icon_outlined=True %}
+                                {% if menu_categories %}
+                                    <ul class="primary-navigation__list subpage-list">
+                                        {% for category in menu_categories %}
+                                            <li class="primary-navigation__list-item">
+                                                {% url 'products:category_detail' slug=category.slug as category_href %}
+                                                {% link text=category.name href=category_href %}
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
                             </li>
                         {% endif %}
-                    </ul>
-                </nav>
+                    {% endif %}
 
-                <section class="header__actions" aria-label="Navigatie mobiel voor inloggen en uitloggen">
-                    <div class="header__text-actions">
+                    {{ rendered_cms_menu__home }}
 
-                        {% if request.user.is_authenticated %}
-                            <p class="utrecht-paragraph">
-                                {% icon icon="person" icon_position="before" outlined=True %}{% trans "Ingelogd als" %} {{ request.user.display_name }}
-                            </p>
-                            <ul class="header__list">
+                    {% if has_general_faq_questions %}
+                        <li class="primary-navigation__list-item">
+                            {% link text=_('Veelgestelde vragen') href='general_faq' icon="question_answer" icon_position="before" icon_outlined=True %}
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+
+            <section class="header__actions" aria-label="Navigatie mobiel voor inloggen en uitloggen">
+                <div class="header__text-actions">
+
+                    {% if request.user.is_authenticated %}
+                        <ul class="header__list">
+                            <li class="header__list-item">
+                                {% trans "Logout" as logout %}
+                                {% link text=logout href=request.user.get_logout_url icon="login" icon_position="before" primary=True %}
+                            </li>
+                            {% if cms_apps.products and request.user.is_authenticated or not config.hide_search_from_anonymous_users %}
                                 <li class="header__list-item">
-                                    {% trans "Logout" as logout %}
-                                    {% link text=logout href=request.user.get_logout_url icon="arrow_forward" icon_position="before" secondary=True %}
+                                    {% trans "Zoeken" as search %}
+                                    {% link text=search href="/search" icon="search" icon_position="before" %}
                                 </li>
-                            </ul>
-                        {% elif config.login_show %}
-                            <p></p>
-                        {% endif %}
-                    </div>
-                </section>
+                            {% endif %}
+                        </ul>
+                    {% elif config.login_show %}
+                        <ul class="header__list">
+                            <li class="header__list-item">
+                                {% url 'login' as login_url %}
+                                {% trans "Log in" as loginmobile %}
+                                {% link text=loginmobile title=loginmobile href=login_url icon="account_circle" icon_position="before" primary=True icon_outlined=True %}
+                            </li>
+                            <li class="header__list-item">
+                                {% trans "Zoeken" as search %}
+                                {% link text=search href="/search" icon="search" icon_position="before" %}
+                            </li>
+                        </ul>
+                    {% endif %}
+                </div>
+            </section>
 
-            </div>
-            {# end of submenu items #}
+            <section class="accessibility-header__mobilenav">
+                <p class="utrecht-paragraph">Toegankelijkheid:</p>
+                {% accessibility_header request=request desktop=False %}
+                <span class="spacer"></span>
+            </section>
+
+        </div>
+        {# end of submenu items #}
 
     {% firstof config.logo.default_alt_text config.name as logo_alt_text %}
         <div class="logo__desktop">{% include "components/Logo/Logo.html" with src=config.logo.file.url alt=logo_alt_text svg_height=75 only %}</div>

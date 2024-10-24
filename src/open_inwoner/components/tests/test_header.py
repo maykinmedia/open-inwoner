@@ -161,12 +161,17 @@ class HeaderTest(TestCase):
         config.save()
 
         response = self.client.get("/")
-
         doc = PyQuery(response.content)
 
-        search_buttons = doc.find("[title='Zoeken']")
+        search_forms = [
+            form
+            for form in doc.find("form").items()
+            if form.find("button[title='Zoeken']")
+        ]
 
-        self.assertEqual(len(search_buttons), 0)
+        self.assertEqual(
+            len(search_forms), 0, "Search form should be hidden for anonymous users."
+        )
 
     def test_search_bar_not_hidden_from_anonymous_users(self):
         config = SiteConfiguration.get_solo()
@@ -174,10 +179,23 @@ class HeaderTest(TestCase):
         config.save()
 
         response = self.client.get("/")
-
         doc = PyQuery(response.content)
 
-        search_buttons = doc.find("[title='Zoeken']")
+        search_forms = [
+            form
+            for form in doc.find("form").items()
+            if form.find("button[title='Zoeken']")
+        ]
 
-        for button in search_buttons:
-            self.assertEqual(button.tag, "button")
+        self.assertGreater(
+            len(search_forms), 0, "Search form should be visible for anonymous users."
+        )
+
+        # Check each search form for the expected input element
+        for search_form in search_forms:
+            search_input = search_form.find("input[type='text'][name='query']")
+            self.assertEqual(
+                len(search_input),
+                1,
+                "Each search form should have a single text input named 'query'.",
+            )

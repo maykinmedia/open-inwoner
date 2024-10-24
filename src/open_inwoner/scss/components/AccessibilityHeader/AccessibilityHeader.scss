@@ -69,3 +69,56 @@
     }
   }
 }
+
+// Accessibility header within different components
+.accessibility-header__mobilenav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-extra-large);
+  height: var(--mobile-xs-width);
+  padding: 0 var(--spacing-large);
+  margin: var(--spacing-extra-large) 0;
+
+  .accessibility-header {
+    display: block;
+    background-color: var(--color-gray-lightest);
+    padding: 0;
+
+    &__list {
+      display: flex;
+      align-items: flex-start;
+      flex-direction: column;
+      gap: var(--spacing-extra-large);
+    }
+
+    .link {
+      color: var(--oip-color-red-notification);
+      font-size: var(--font-size-body);
+      padding: 0;
+      @media (max-width: 767px) {
+        &:not(:focus):not(:hover) {
+          font-size: var(--font-size-body);
+        }
+      }
+    }
+  }
+
+  .spacer {
+    border: 1px solid transparent;
+    display: inline-block;
+    width: 100%;
+    height: var(--row-height);
+  }
+}
+
+/* Default (desktop): Show filled icons */
+.accessibility-header__list-item .material-icons::before {
+  content: attr(data-icon-filled);
+}
+
+/* Mobile (max-width: 768px): Show outlined icons */
+@media (max-width: 768px) {
+  .accessibility-header__list-item .material-icons::before {
+    content: attr(data-icon-outlined);
+  }
+}

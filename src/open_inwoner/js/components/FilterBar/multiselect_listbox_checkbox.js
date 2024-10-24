@@ -53,7 +53,7 @@ function initFilterBar() {
 
       let closeIcon = document.createElement('span')
       closeIcon.classList.add('material-icons', 'close-icon')
-      closeIcon.setAttribute('aria-hidden', 'true')
+      closeIcon.setAttribute('aria-hidden', 'false') // Hiding element that gets focus is not allowed in accessibility
       closeIcon.setAttribute('tabindex', '0') // Adding tabindex for keyboard focus
       closeIcon.textContent = 'close'
 

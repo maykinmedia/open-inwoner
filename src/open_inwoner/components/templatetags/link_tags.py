@@ -31,6 +31,7 @@ def link(href, text, **kwargs):
         - extra_classes: str | Extra classes
         - hide_text: bool | whether to hide the text and use aria attribute instead.
         - icon: str | The icon that should be displayed.
+        - icon_outlined: bool | Whether the icon needs to be filled or only show line-art
         - icon_position: str | "before" or "after".
         - primary: bool | If the primary styling should be used
         - secondary: bool | If the secondary styling should be used

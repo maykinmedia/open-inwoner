@@ -20,6 +20,10 @@ export const interactiveButton = document.querySelectorAll('.header__button')
  * Controls the main header and interaction with the mobile menu and dismissing it using the escape key.
  */
 class Header extends Component {
+  constructor(node, initialState = { dismissed: false }) {
+    super(node, initialState)
+  }
+
   /**
    * Binds events to callbacks.
    * Callbacks should trigger `setState` which in turn triggers `render`.
@@ -40,6 +44,11 @@ class Header extends Component {
     this.node.addEventListener('click', this.toggleMobileNavOpen.bind(this))
     this.node.addEventListener('focusout', this.onFocusMobileOut.bind(this))
     window.addEventListener('keyup', this.onEscape.bind(this))
+
+    const closeMobileNav = document.getElementById('closeMobileNav') // Use ID to reference the close button
+    if (closeMobileNav) {
+      closeMobileNav.addEventListener('click', this.closeMenu.bind(this))
+    }
   }
 
   /**
@@ -72,9 +81,18 @@ class Header extends Component {
   }
 
   /**
+   * Only if body--open exists, handle close-button.
+   */
+  closeMenu() {
+    if (document.body.classList.contains('body--open')) {
+      document.body.classList.remove('body--open')
+    }
+  }
+
+  /**
    * Gets called when a key is released.
    * If key is escape key, explicitly close the mobile menu.
-   //* @param {KeyboardEvent} event
+   * @param {KeyboardEvent} event
    */
   onEscape(event) {
     if (event.key === 'Escape') {

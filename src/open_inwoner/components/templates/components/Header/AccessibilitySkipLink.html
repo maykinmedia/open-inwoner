@@ -1,0 +1,9 @@
+{% load i18n link_tags %}
+
+<p class="utrecht-paragraph">
+    {% trans "Doorgaan naar hoofdinhoud" as link_text %}
+ <a href="#content" class="utrecht-skip-link utrecht-skip-link--visible-on-focus utrecht-skip-link--focus-visible" aria-label="{{ link_text }}" title="{{ link_text }}">
+    <span class="skip-link__text">{{ link_text }}</span>
+    <span aria-hidden="true" class="material-icons ">south</span>
+    </a>
+</p>

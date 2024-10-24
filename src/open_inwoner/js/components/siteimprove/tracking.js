@@ -187,14 +187,6 @@ let isEventTrackerInitialized = false
           'Icon click',
           'Zoeken',
         ],
-        '#search-form-mobile-open > .form__actions > button': [
-          'event',
-          'Header mobiel-open Zoeken',
-          'Icon click',
-          'Zoeken',
-        ],
-        '#search-form-mobile-open > .form__actions > button > .material-icons':
-          ['event', 'Header mobiel-open Zoeken', 'Icon click', 'Zoeken'],
         // End of search submits
         // Start Communicatievoorkeuren
         // Can get contaminated with uncheck changes
