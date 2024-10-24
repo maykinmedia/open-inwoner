@@ -69,3 +69,36 @@
     }
   }
 }
+
+// Accessibility header within different components
+.accessibility-header__mobilenav {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding: 0 var(--spacing-large);
+  margin-bottom: var(--row-height);
+
+  .accessibility-header {
+    display: block;
+    background-color: var(--color-white);
+    padding: 0;
+
+    &__list {
+      display: flex;
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    .link {
+      color: var(--oip-color-red-notification);
+      font-size: var(--font-size-body);
+      padding: 0;
+      @media (max-width: 767px) {
+        &:not(:focus):not(:hover) {
+          font-size: var(--font-size-body);
+        }
+      }
+    }
+  }
+}

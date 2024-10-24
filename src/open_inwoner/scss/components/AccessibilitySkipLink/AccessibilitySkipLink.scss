@@ -1,0 +1,46 @@
+.utrecht-skip-link {
+  background-color: var(--utrecht-skip-link-background-color, #f0f0f0);
+  color: var(--utrecht-skip-link-color, #000);
+  min-block-size: var(--utrecht-skip-link-min-block-size, 0);
+  min-inline-size: var(--utrecht-skip-link-min-inline-size, 0);
+  padding-block-start: var(--utrecht-skip-link-padding-block-start, 0.5rem);
+  padding-block-end: var(--utrecht-skip-link-padding-block-end, 0.5rem);
+  padding-inline-start: var(--utrecht-skip-link-padding-inline-start, 1rem);
+  padding-inline-end: var(--utrecht-skip-link-padding-inline-end, 1rem);
+  text-decoration: var(--utrecht-skip-link-text-decoration, underline);
+  z-index: var(--utrecht-skip-link-z-index, 5000);
+
+  &--visible-on-focus {
+    inset-block-start: -200%;
+    position: fixed;
+    &:focus {
+      inset-block-start: 0;
+      background-color: var(
+        --utrecht-skip-link-focus-background-color,
+        var(--color-accent)
+      );
+      color: var(--utrecht-skip-link-focus-color, #fff);
+      text-decoration: var(
+        --utrecht-skip-link-focus-text-decoration,
+        underline
+      );
+    }
+  }
+
+  &--focus-visible {
+    inset-block-start: -200%;
+    position: fixed;
+    &:focus-visible {
+      inset-block-start: 0;
+      background-color: var(
+        --utrecht-skip-link-focus-visible-background-color,
+        var(--color-accent)
+      );
+      color: var(--utrecht-skip-link-focus-visible-color, #fff);
+      text-decoration: var(
+        --utrecht-skip-link-focus-visible-text-decoration,
+        underline
+      );
+    }
+  }
+}
