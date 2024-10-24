@@ -68,6 +68,7 @@ export class EnlargeFont {
       this.root.style.getPropertyValue(this.styles.bodyFontSizeDefault) ===
       this.enlargeSizes.default
 
+    // Loop through all styles and set either the enlarged size or the base size
     Object.keys(this.styles).forEach((key) => {
       const sizeKey = this.getSizeKey(key)
       this.root.style.setProperty(
@@ -78,12 +79,20 @@ export class EnlargeFont {
       )
     })
 
-    this.text.innerText = isEnlarged
-      ? this.node.dataset.text
-      : this.node.dataset.altText
-    this.icon.innerText = isEnlarged
-      ? this.node.dataset.icon
-      : this.node.dataset.altIcon
+    // Update text, aria-label, and title based on the state
+    if (isEnlarged) {
+      // Set back to original state
+      this.text.innerText = this.node.dataset.text
+      this.node.setAttribute('aria-label', this.node.dataset.text)
+      this.node.setAttribute('title', this.node.dataset.text)
+      this.icon.innerText = this.node.dataset.icon
+    } else {
+      // Switch to larger font state
+      this.text.innerText = this.node.dataset.altText
+      this.node.setAttribute('aria-label', this.node.dataset.altText)
+      this.node.setAttribute('title', this.node.dataset.altText)
+      this.icon.innerText = this.node.dataset.altIcon
+    }
   }
 }
 
