@@ -16,4 +16,4 @@ def log_form_errors(config_step, form):
         % f"\n\n{RED}There are problems with the settings for {config_step.verbose_name}:{NORMAL}"
     )
     for field, errors in form.errors.items():
-        logger.error("%s" % "; ".join(errors))
+        logger.error("%s : %s" % (field, "; ".join(errors)))
