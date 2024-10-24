@@ -265,6 +265,7 @@ class MockAPIReadData(MockAPIData):
         self.klant_contactmoment4 = generate_oas_component_cached(
             "cmc",
             "schemas/Klantcontactmoment",
+            uuid="aaaaaaaa-aaaa-aaaa-aaaa-ffffffffffff",
             url=f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten/aaaaaaaa-aaaa-aaaa-aaaa-ffffffffffff",
             klant=self.klant_vestiging["url"],
             contactmoment=self.contactmoment_vestiging["url"],

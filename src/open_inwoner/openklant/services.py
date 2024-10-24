@@ -1,14 +1,18 @@
 import datetime
 import logging
 import uuid
-from typing import Iterable, Literal, NotRequired, Protocol, Self, TypedDict
+from typing import Iterable, Literal, NotRequired, Protocol, Self
 
+from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 import glom
 from ape_pie.client import APIClient
 from attr import dataclass
+from pydantic import TypeAdapter
 from requests.exceptions import RequestException
+from typing_extensions import TypedDict
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.client import build_client as build_zgw_client
 from zgw_consumers.models.services import Service as ServiceConfig
@@ -27,8 +31,22 @@ from open_inwoner.openklant.api_models import (
     KlantCreateData,
     ObjectContactMoment,
 )
-from open_inwoner.openklant.models import OpenKlant2Config, OpenKlantConfig
+from open_inwoner.openklant.constants import Status
+from open_inwoner.openklant.models import (
+    ContactFormSubject,
+    KlantContactMomentAnswer,
+    OpenKlant2Config,
+    OpenKlantConfig,
+)
+from open_inwoner.openklant.wrap import (
+    contactmoment_has_new_answer,
+    fetch_klantcontactmoment,
+    fetch_klantcontactmomenten,
+    get_kcm_answer_mapping,
+)
 from open_inwoner.openzaak.api_models import Zaak
+from open_inwoner.openzaak.clients import MultiZgwClientProxy
+from open_inwoner.openzaak.models import ZGWApiGroupConfig
 from open_inwoner.utils.api import ClientError, get_json_response
 from open_inwoner.utils.logentry import system_action
 from openklant2.client import OpenKlant2Client
@@ -52,6 +70,28 @@ class OrgFetchParam(TypedDict):
 
 
 FetchParameters = BsnFetchParam | OrgFetchParam
+
+
+@dataclass(frozen=True)
+class ZaakWithApiGroup:
+    zaak: Zaak
+    api_group: ZGWApiGroupConfig
+
+
+class Question(TypedDict):
+    identification: str
+    subject: str
+    registered_date: datetime.datetime
+    question_text: str
+    answer_text: str | None
+    status: str
+
+    new_answer_available: bool
+    case_detail_url: str
+    channel: str
+
+
+QuestionValidator = TypeAdapter(Question)
 
 
 class KlantenService(Protocol):
@@ -492,6 +532,165 @@ class eSuiteVragenService(KlantenService):
             kcm.contactmoment = self.retrieve_contactmoment(kcm.contactmoment)
 
         return klanten_contact_moments
+
+    @staticmethod
+    def _get_kcm_subject(
+        kcm: KlantContactMoment,
+    ) -> str | None:
+        """
+        Determine the subject (`onderwerp`) of a `KlantContactMoment.contactmoment`:
+            1. replace e-suite subject code with corresponding OIP configured subject or
+            2. return the first OIP subject if multiple subjects are mapped to the same
+               e-suite code or
+            3. return the the e-suite subject code if no mapping exists
+        """
+        e_suite_subject_code = getattr(kcm.contactmoment, "onderwerp", "")
+
+        try:
+            subject = ContactFormSubject.objects.get(subject_code=e_suite_subject_code)
+        except ContactFormSubject.MultipleObjectsReturned as exc:
+            logger.warning(
+                "Multiple OIP subjects mapped to the same e-suite subject code for ",
+                "contactmoment %s; using the first one",
+                kcm.contactmoment.url,
+                exc_info=exc,
+            )
+            return ContactFormSubject.objects.first().subject
+        except ContactFormSubject.DoesNotExist as exc:
+            logger.warning(
+                "Could not determine OIP subject for contactmoment %s; "
+                "falling back on e-suite subject code ('onderwerp')",
+                kcm.contactmoment.url,
+                exc_info=exc,
+            )
+            return e_suite_subject_code
+
+        return subject.subject
+
+    def contactmoment_has_new_answer(
+        self,
+        contactmoment: ContactMoment,
+        local_kcm_mapping: dict[str, KlantContactMomentAnswer] | None = None,
+    ) -> bool:
+        return contactmoment_has_new_answer(
+            contactmoment,
+            local_kcm_mapping,
+        )
+
+    @staticmethod
+    def get_kcm_answer_mapping(
+        contactmomenten: list[ContactMoment],
+        user: User,
+    ) -> dict[str, KlantContactMomentAnswer]:
+        return get_kcm_answer_mapping(contactmomenten, user)
+
+    def _get_question_data(
+        self,
+        kcm: KlantContactMoment,
+        local_kcm_mapping: dict[str, KlantContactMomentAnswer] | None = None,
+    ) -> Question:
+
+        if isinstance(kcm.contactmoment, str):
+            raise ValueError("Received unresolved contactmoment")
+
+        return {
+            "answer_text": kcm.contactmoment.antwoord,
+            "identification": kcm.contactmoment.identificatie,
+            "question_text": kcm.contactmoment.tekst,
+            "new_answer_available": self.contactmoment_has_new_answer(
+                kcm.contactmoment, local_kcm_mapping=local_kcm_mapping
+            ),
+            "subject": self._get_kcm_subject(kcm) or "",
+            "registered_date": kcm.contactmoment.registratiedatum,
+            "status": str(Status.safe_label(kcm.contactmoment.status, _("Onbekend"))),
+            "case_detail_url": reverse(
+                "cases:contactmoment_detail", kwargs={"kcm_uuid": kcm.uuid}
+            ),
+            "channel": kcm.contactmoment.kanaal.title(),
+        }
+
+    def fetch_klantcontactmomenten(
+        self,
+        user_bsn: str | None = None,
+        user_kvk_or_rsin: str | None = None,
+        vestigingsnummer: str | None = None,
+    ) -> list[KlantContactMoment]:
+        return fetch_klantcontactmomenten(user_bsn, user_kvk_or_rsin, vestigingsnummer)
+
+    def fetch_klantcontactmoment(
+        self,
+        kcm_uuid: str,
+        user_bsn: str | None = None,
+        user_kvk_or_rsin: str | None = None,
+        vestigingsnummer: str | None = None,
+    ) -> KlantContactMoment | None:
+        return fetch_klantcontactmoment(
+            kcm_uuid, user_bsn, user_kvk_or_rsin, vestigingsnummer
+        )
+
+    def list_questions(
+        self, fetch_params: FetchParameters, user: User
+    ) -> Iterable[Question]:
+        kcms = self.fetch_klantcontactmomenten(**fetch_params)
+
+        klant_config = OpenKlantConfig.get_solo()
+        if exclude_range := klant_config.exclude_contactmoment_kanalen:
+            kcms = [
+                item
+                for item in kcms
+                if glom.glom(item, "contactmoment.kanaal") not in exclude_range
+            ]
+
+        contactmomenten = [
+            self._get_question_data(
+                kcm,
+                local_kcm_mapping=self.get_kcm_answer_mapping(
+                    [kcm.contactmoment for kcm in kcms], user
+                ),
+            )
+            for kcm in kcms
+        ]
+        return contactmomenten
+
+    def retrieve_question(
+        self, fetch_params: FetchParameters, question_uuid: str, user: User
+    ) -> tuple[Question | None, ZaakWithApiGroup | None]:
+        if not (kcm := self.fetch_klantcontactmoment(question_uuid, **fetch_params)):
+            return None, None
+
+        local_kcm, is_created = KlantContactMomentAnswer.objects.get_or_create(  # noqa
+            user=user, contactmoment_url=kcm.contactmoment.url
+        )
+        if not local_kcm.is_seen:
+            local_kcm.is_seen = True
+            local_kcm.save()
+
+        zaak_with_api_group = None
+
+        ocm = self.retrieve_objectcontactmoment(kcm.contactmoment, "zaak")
+        if ocm and ocm.object_type == "zaak":
+            zaak_url = ocm.object
+            groups = list(ZGWApiGroupConfig.objects.all())
+            proxy = MultiZgwClientProxy([group.zaken_client for group in groups])
+            proxy_response = proxy.fetch_case_by_url_no_cache(zaak_url)
+            cases_found = proxy_response.truthy_responses
+            if (case_count := len(cases_found)) == 0:
+                logger.error(
+                    "Unable to find matched contactmomenten zaak in any zgw backend"
+                )
+            else:
+                zaak, client = cases_found[0].result, cases_found[0].client
+                group = ZGWApiGroupConfig.objects.resolve_group_from_hints(
+                    client=client
+                )
+                zaak_with_api_group = ZaakWithApiGroup(zaak=zaak, api_group=group)
+                if case_count > 1:
+                    # In principle this should not happen, a zaak should be stored in
+                    # exactly one backend. But: https://www.xkcd.com/2200/
+                    # We should at least receive a ping if this happens.
+                    logger.error("Found one zaak in multiple backends")
+
+        return self._get_question_data(kcm), zaak_with_api_group
 
 
 @dataclass(frozen=True)
