@@ -1,7 +1,7 @@
 import dataclasses
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional, TypedDict, Union
+from typing import NotRequired, Optional, TypedDict, Union
 
 from zgw_consumers.api_models.base import ZGWModel
 
@@ -41,7 +41,7 @@ class Klant(ZGWModel):
 
 class MedewerkerIdentificatie(TypedDict):
     identificatie: str
-    achternaam: str = ""
+    achternaam: NotRequired[str]
 
 
 class ContactMomentCreateData(TypedDict):
@@ -50,7 +50,8 @@ class ContactMomentCreateData(TypedDict):
     onderwerp: str
     type: str
     kanaal: str
-    medewerkerIdentificatie: MedewerkerIdentificatie
+    contactgegevens: NotRequired[dict[str, str]]
+    medewerkerIdentificatie: NotRequired[MedewerkerIdentificatie]
 
 
 @dataclass
