@@ -13,6 +13,7 @@ from open_inwoner.accounts.models import User
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openklant.api_models import Klant
 from open_inwoner.openklant.clients import build_klanten_client
+from open_inwoner.openklant.models import OpenKlant2Config
 from open_inwoner.utils.logentry import system_action
 from openklant2.client import OpenKlant2Client
 from openklant2.types.resources.digitaal_adres import DigitaalAdres
@@ -147,20 +148,16 @@ class OpenKlant2Question:
 
 
 class OpenKlant2Service:
-
+    config: OpenKlant2Config
     client: OpenKlant2Client
-    mijn_vragen_actor: uuid.UUID | None
-    MIJN_VRAGEN_KANAAL: str = "oip_mijn_vragen"
 
-    def __init__(
-        self, client: OpenKlant2Client, mijn_vragen_actor: str | uuid.UUID | None = None
-    ):
-        if not isinstance(client, OpenKlant2Client):
-            raise ValueError(
-                f"`client` must be an instance of {type(OpenKlant2Client)}"
-            )
-        self.client = client
-        if mijn_vragen_actor:
+    def __init__(self, config: OpenKlant2Config | None = None):
+        self.config = config or OpenKlant2Config.from_django_settings()
+        self.client = OpenKlant2Client(
+            api_url=self.config.api_url,
+            api_token=self.config.api_token,
+        )
+        if mijn_vragen_actor := getattr(config, "mijn_vragen_actor", None):
             self.mijn_vragen_actor = (
                 uuid.UUID(mijn_vragen_actor)
                 if isinstance(mijn_vragen_actor, str)
@@ -465,7 +462,7 @@ class OpenKlant2Service:
                 "inhoud": question,
                 "onderwerp": subject,
                 "taal": "nld",
-                "kanaal": self.MIJN_VRAGEN_KANAAL,
+                "kanaal": self.config.mijn_vragen_kanaal,
                 "vertrouwelijk": False,
                 "plaatsgevondenOp": timezone.now().isoformat(),
             }
@@ -512,7 +509,7 @@ class OpenKlant2Service:
                 "inhoud": answer,
                 "onderwerp": question_klantcontact["onderwerp"],
                 "taal": "nld",
-                "kanaal": self.MIJN_VRAGEN_KANAAL,
+                "kanaal": self.config.mijn_vragen_kanaal,
                 "vertrouwelijk": False,
                 "plaatsgevondenOp": timezone.now().isoformat(),
             }
@@ -561,6 +558,18 @@ class OpenKlant2Service:
         # Partij (see https://github.com/maykinmedia/open-klant/issues/256). So
         # unfortunately, we have to fetch all rows and do the filtering client
         # side.
+        klantcontacten = self.client.klant_contact.list_iter(
+            params={
+                "expand": [
+                    "leiddeTotInterneTaken",
+                    "gingOverOnderwerpobjecten",
+                    "hadBetrokkenen",
+                    "hadBetrokkenen.wasPartij",
+                ],
+                "kanaal": self.config.mijn_vragen_kanaal,
+            }
+        )
+
         klantcontacten_for_partij = filter(
             lambda row: partij_uuid
             in glom.glom(
@@ -578,7 +587,7 @@ class OpenKlant2Service:
         klantcontact_uuid_to_klantcontact_object = {}
 
         for klantcontact in self.klantcontacten_for_partij(
-            partij_uuid, kanaal=self.MIJN_VRAGEN_KANAAL
+            partij_uuid, kanaal=self.config.mijn_vragen_kanaal
         ):
             klantcontact_uuid_to_klantcontact_object[
                 klantcontact["uuid"]

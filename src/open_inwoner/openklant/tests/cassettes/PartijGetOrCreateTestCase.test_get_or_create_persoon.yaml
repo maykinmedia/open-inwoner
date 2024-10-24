@@ -112,7 +112,7 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/partijen
   response:
     body:
-      string: '{"uuid":"bc095214-6e00-4642-9a7b-afff82da9a54","url":"http://localhost:8338/klantinteracties/api/v1/partijen/bc095214-6e00-4642-9a7b-afff82da9a54","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"nld","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"","voornaam":"John","voorvoegselAchternaam":"","achternaam":"Doe"},"volledigeNaam":"John
+      string: '{"uuid":"95860af8-329d-4b85-b39e-cc9ef9162190","url":"http://localhost:8338/klantinteracties/api/v1/partijen/95860af8-329d-4b85-b39e-cc9ef9162190","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"nld","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"","voornaam":"John","voorvoegselAchternaam":"","achternaam":"Doe"},"volledigeNaam":"John
         Doe"}}'
     headers:
       API-version:
@@ -126,7 +126,7 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/partijen/bc095214-6e00-4642-9a7b-afff82da9a54
+      - http://localhost:8338/klantinteracties/api/v1/partijen/95860af8-329d-4b85-b39e-cc9ef9162190
       Referrer-Policy:
       - same-origin
       Vary:
@@ -139,7 +139,7 @@ interactions:
       code: 201
       message: Created
 - request:
-    body: '{"identificeerdePartij": {"uuid": "bc095214-6e00-4642-9a7b-afff82da9a54"},
+    body: '{"identificeerdePartij": {"uuid": "95860af8-329d-4b85-b39e-cc9ef9162190"},
       "partijIdentificator": {"codeObjecttype": "inp", "codeSoortObjectId": "bsn",
       "objectId": "123456789", "codeRegister": "brp"}}'
     headers:
@@ -153,7 +153,7 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/partij-identificatoren
   response:
     body:
-      string: '{"uuid":"d103518e-a3d5-46ff-bf90-87959e6159c9","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/d103518e-a3d5-46ff-bf90-87959e6159c9","identificeerdePartij":{"uuid":"bc095214-6e00-4642-9a7b-afff82da9a54","url":"http://localhost:8338/klantinteracties/api/v1/partijen/bc095214-6e00-4642-9a7b-afff82da9a54"},"anderePartijIdentificator":"","partijIdentificator":{"codeObjecttype":"inp","codeSoortObjectId":"bsn","objectId":"123456789","codeRegister":"brp"}}'
+      string: '{"uuid":"551324bd-5bf8-46d2-b7a9-9f59f3d6f2cc","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/551324bd-5bf8-46d2-b7a9-9f59f3d6f2cc","identificeerdePartij":{"uuid":"95860af8-329d-4b85-b39e-cc9ef9162190","url":"http://localhost:8338/klantinteracties/api/v1/partijen/95860af8-329d-4b85-b39e-cc9ef9162190"},"anderePartijIdentificator":"","partijIdentificator":{"codeObjecttype":"inp","codeSoortObjectId":"bsn","objectId":"123456789","codeRegister":"brp"}}'
     headers:
       API-version:
       - 0.0.3
@@ -166,7 +166,7 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/d103518e-a3d5-46ff-bf90-87959e6159c9
+      - http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/551324bd-5bf8-46d2-b7a9-9f59f3d6f2cc
       Referrer-Policy:
       - same-origin
       Vary:
@@ -187,7 +187,7 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/partijen
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"bc095214-6e00-4642-9a7b-afff82da9a54","url":"http://localhost:8338/klantinteracties/api/v1/partijen/bc095214-6e00-4642-9a7b-afff82da9a54","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[{"uuid":"d103518e-a3d5-46ff-bf90-87959e6159c9","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/d103518e-a3d5-46ff-bf90-87959e6159c9"}],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"nld","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"","voornaam":"John","voorvoegselAchternaam":"","achternaam":"Doe"},"volledigeNaam":"John
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"95860af8-329d-4b85-b39e-cc9ef9162190","url":"http://localhost:8338/klantinteracties/api/v1/partijen/95860af8-329d-4b85-b39e-cc9ef9162190","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[{"uuid":"551324bd-5bf8-46d2-b7a9-9f59f3d6f2cc","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/551324bd-5bf8-46d2-b7a9-9f59f3d6f2cc"}],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"nld","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"","voornaam":"John","voorvoegselAchternaam":"","achternaam":"Doe"},"volledigeNaam":"John
         Doe"},"_expand":{}}]}'
     headers:
       API-version:
@@ -220,7 +220,7 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/partij-identificatoren
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"d103518e-a3d5-46ff-bf90-87959e6159c9","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/d103518e-a3d5-46ff-bf90-87959e6159c9","identificeerdePartij":{"uuid":"bc095214-6e00-4642-9a7b-afff82da9a54","url":"http://localhost:8338/klantinteracties/api/v1/partijen/bc095214-6e00-4642-9a7b-afff82da9a54"},"anderePartijIdentificator":"","partijIdentificator":{"codeObjecttype":"inp","codeSoortObjectId":"bsn","objectId":"123456789","codeRegister":"brp"}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"551324bd-5bf8-46d2-b7a9-9f59f3d6f2cc","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/551324bd-5bf8-46d2-b7a9-9f59f3d6f2cc","identificeerdePartij":{"uuid":"95860af8-329d-4b85-b39e-cc9ef9162190","url":"http://localhost:8338/klantinteracties/api/v1/partijen/95860af8-329d-4b85-b39e-cc9ef9162190"},"anderePartijIdentificator":"","partijIdentificator":{"codeObjecttype":"inp","codeSoortObjectId":"bsn","objectId":"123456789","codeRegister":"brp"}}]}'
     headers:
       API-version:
       - 0.0.3
@@ -252,7 +252,7 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/partijen?partijIdentificator__codeSoortObjectId=bsn&partijIdentificator__codeRegister=brp&partijIdentificator__codeObjecttype=inp&partijIdentificator__objectId=123456789&soortPartij=persoon
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"bc095214-6e00-4642-9a7b-afff82da9a54","url":"http://localhost:8338/klantinteracties/api/v1/partijen/bc095214-6e00-4642-9a7b-afff82da9a54","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[{"uuid":"d103518e-a3d5-46ff-bf90-87959e6159c9","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/d103518e-a3d5-46ff-bf90-87959e6159c9"}],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"nld","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"","voornaam":"John","voorvoegselAchternaam":"","achternaam":"Doe"},"volledigeNaam":"John
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"95860af8-329d-4b85-b39e-cc9ef9162190","url":"http://localhost:8338/klantinteracties/api/v1/partijen/95860af8-329d-4b85-b39e-cc9ef9162190","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[{"uuid":"551324bd-5bf8-46d2-b7a9-9f59f3d6f2cc","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/551324bd-5bf8-46d2-b7a9-9f59f3d6f2cc"}],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"nld","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"","voornaam":"John","voorvoegselAchternaam":"","achternaam":"Doe"},"volledigeNaam":"John
         Doe"},"_expand":{}}]}'
     headers:
       API-version:
@@ -282,10 +282,10 @@ interactions:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
     method: GET
-    uri: http://localhost:8338/klantinteracties/api/v1/partijen/bc095214-6e00-4642-9a7b-afff82da9a54?expand=digitaleAdressen%2Cbetrokkenen%2Cbetrokkenen.hadKlantcontact
+    uri: http://localhost:8338/klantinteracties/api/v1/partijen/95860af8-329d-4b85-b39e-cc9ef9162190?expand=digitaleAdressen%2Cbetrokkenen%2Cbetrokkenen.hadKlantcontact
   response:
     body:
-      string: '{"uuid":"bc095214-6e00-4642-9a7b-afff82da9a54","url":"http://localhost:8338/klantinteracties/api/v1/partijen/bc095214-6e00-4642-9a7b-afff82da9a54","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[{"uuid":"d103518e-a3d5-46ff-bf90-87959e6159c9","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/d103518e-a3d5-46ff-bf90-87959e6159c9"}],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"nld","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"","voornaam":"John","voorvoegselAchternaam":"","achternaam":"Doe"},"volledigeNaam":"John
+      string: '{"uuid":"95860af8-329d-4b85-b39e-cc9ef9162190","url":"http://localhost:8338/klantinteracties/api/v1/partijen/95860af8-329d-4b85-b39e-cc9ef9162190","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[{"uuid":"551324bd-5bf8-46d2-b7a9-9f59f3d6f2cc","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/551324bd-5bf8-46d2-b7a9-9f59f3d6f2cc"}],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"nld","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"","voornaam":"John","voorvoegselAchternaam":"","achternaam":"Doe"},"volledigeNaam":"John
         Doe"}}'
     headers:
       API-version:
@@ -318,7 +318,7 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/partijen
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"bc095214-6e00-4642-9a7b-afff82da9a54","url":"http://localhost:8338/klantinteracties/api/v1/partijen/bc095214-6e00-4642-9a7b-afff82da9a54","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[{"uuid":"d103518e-a3d5-46ff-bf90-87959e6159c9","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/d103518e-a3d5-46ff-bf90-87959e6159c9"}],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"nld","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"","voornaam":"John","voorvoegselAchternaam":"","achternaam":"Doe"},"volledigeNaam":"John
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"95860af8-329d-4b85-b39e-cc9ef9162190","url":"http://localhost:8338/klantinteracties/api/v1/partijen/95860af8-329d-4b85-b39e-cc9ef9162190","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[{"uuid":"551324bd-5bf8-46d2-b7a9-9f59f3d6f2cc","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/551324bd-5bf8-46d2-b7a9-9f59f3d6f2cc"}],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"nld","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"","voornaam":"John","voorvoegselAchternaam":"","achternaam":"Doe"},"volledigeNaam":"John
         Doe"},"_expand":{}}]}'
     headers:
       API-version:
@@ -351,7 +351,7 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/partij-identificatoren
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"d103518e-a3d5-46ff-bf90-87959e6159c9","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/d103518e-a3d5-46ff-bf90-87959e6159c9","identificeerdePartij":{"uuid":"bc095214-6e00-4642-9a7b-afff82da9a54","url":"http://localhost:8338/klantinteracties/api/v1/partijen/bc095214-6e00-4642-9a7b-afff82da9a54"},"anderePartijIdentificator":"","partijIdentificator":{"codeObjecttype":"inp","codeSoortObjectId":"bsn","objectId":"123456789","codeRegister":"brp"}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"551324bd-5bf8-46d2-b7a9-9f59f3d6f2cc","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/551324bd-5bf8-46d2-b7a9-9f59f3d6f2cc","identificeerdePartij":{"uuid":"95860af8-329d-4b85-b39e-cc9ef9162190","url":"http://localhost:8338/klantinteracties/api/v1/partijen/95860af8-329d-4b85-b39e-cc9ef9162190"},"anderePartijIdentificator":"","partijIdentificator":{"codeObjecttype":"inp","codeSoortObjectId":"bsn","objectId":"123456789","codeRegister":"brp"}}]}'
     headers:
       API-version:
       - 0.0.3
