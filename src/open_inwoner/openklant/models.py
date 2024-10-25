@@ -194,6 +194,7 @@ class KlantContactMomentAnswer(models.Model):
 
 @dataclass
 class OpenKlant2Config:
+    # TODO: move to service_config object
     api_root: str
     api_path: str
     api_token: str
@@ -220,3 +221,5 @@ class OpenKlant2Config:
             )
 
         return cls(**config)
+
+    # TODO: add from_openklant_config_model or similar

@@ -7,6 +7,7 @@ from django.utils import timezone
 
 import glom
 from attr import dataclass
+from zgw_consumers.models.services import Service as ServiceConfig
 
 from open_inwoner.accounts.choices import NotificationChannelChoice
 from open_inwoner.accounts.models import User
@@ -41,6 +42,7 @@ FetchParameters = BsnFetchParam | OrgFetchParam
 
 class KlantenService(Protocol):
     config: OpenKlantConfig | OpenKlant2Config
+    service_config: ServiceConfig
     client: KlantenClient | OpenKlant2Client
 
     def get_fetch_parameters(
@@ -81,21 +83,18 @@ class eSuiteKlantenService(KlantenService):
 
     def __init__(self, config: OpenKlantConfig | None = None):
         self.config = config or OpenKlantConfig.get_solo()
+        if not self.config:
+            raise RuntimeError("eSuiteKlantenService instance needs a configuration")
+
+        self.service_config = self.config.klanten_service
+
         self.client = build_klanten_client()
+        if not self.client:
+            raise RuntimeError("eSuiteKlantenService instance needs a client")
 
     def get_or_create_klant(
         self, fetch_params: FetchParameters, user: User
     ) -> (Klant | None, bool):
-        # TODO: all tests that have a user logged in involve the user_logged_in
-        # signal and so depend on the klant machinery (config, service, client).
-        # These tests fail if the machinery is not set up, and currently pass
-        # only because we (silently) return if the client fails to be built.
-        # We should log an error if the client cannot be built for some reason,
-        # but also consider introducing a way of disabling the signal for tests
-        # completely unrelated to openklant.
-        if not self.client:
-            return None, False
-
         if klant := self.client.retrieve_klant(**fetch_params):
             msg = "retrieved klant for user"
             created = False
@@ -216,12 +215,18 @@ class OpenKlant2Service(KlantenService):
 
     def __init__(self, config: OpenKlant2Config | None = None):
         self.config = config or OpenKlant2Config.from_django_settings()
+        if not self.config:
+            raise RuntimeError("OpenKlant2Service instance needs a configuration")
+
         self.client = OpenKlant2Client(
             base_url=self.config.api_url,
             request_kwargs={
                 "headers": {"Authorization": f"Token {self.config.api_token}"}
             },
         )
+        if not self.client:
+            raise RuntimeError("OpenKlant2Service instance needs a client")
+
         if mijn_vragen_actor := getattr(config, "mijn_vragen_actor", None):
             self.mijn_vragen_actor = (
                 uuid.UUID(mijn_vragen_actor)

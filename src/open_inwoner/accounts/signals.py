@@ -1,3 +1,5 @@
+import logging
+
 from django.conf import settings
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.dispatch import receiver
@@ -11,6 +13,9 @@ from open_inwoner.openklant.services import OpenKlant2Service, eSuiteKlantenServ
 from open_inwoner.utils.logentry import user_action
 
 from .choices import LoginTypeChoices
+
+logger = logging.getLogger(__name__)
+
 
 MESSAGE_TYPE = {
     "admin": _("user was logged in via admin page"),
@@ -35,7 +40,11 @@ def update_user_from_klant_on_login(sender, user, request, *args, **kwargs):
     # TODO: replace with proper config and refactor branching
     use_ok2 = getattr(settings, "OPENKLANT2_ACTIVE", None)
     if use_ok2 and (openklant2_config := OpenKlant2Config.from_django_settings()):
-        service = OpenKlant2Service(config=openklant2_config)
+        try:
+            service = OpenKlant2Service(config=openklant2_config)
+        except RuntimeError:
+            logger.error("OpenKlant2 service failed to build")
+            return
 
         if not (
             fetch_params := service.get_fetch_parameters(
@@ -51,7 +60,11 @@ def update_user_from_klant_on_login(sender, user, request, *args, **kwargs):
             service.update_user_from_partij(partij_uuid=partij.uuid, user=user)
 
     # eSuite
-    service = eSuiteKlantenService()
+    try:
+        service = eSuiteKlantenService()
+    except RuntimeError:
+        logger.error("eSuiteKlantenService failed to build")
+        return
 
     if not (
         fetch_params := service.get_fetch_parameters(
