@@ -1,7 +1,7 @@
 import datetime
 import logging
 import uuid
-from typing import Iterable, Literal, Self
+from typing import Iterable, Literal, NotRequired, Protocol, Self, TypedDict
 
 from django.utils import timezone
 
@@ -11,9 +11,10 @@ from attr import dataclass
 from open_inwoner.accounts.choices import NotificationChannelChoice
 from open_inwoner.accounts.models import User
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.kvk.branches import get_kvk_branch_number
 from open_inwoner.openklant.api_models import Klant
-from open_inwoner.openklant.clients import build_klanten_client
-from open_inwoner.openklant.models import OpenKlant2Config
+from open_inwoner.openklant.clients import KlantenClient, build_klanten_client
+from open_inwoner.openklant.models import OpenKlant2Config, OpenKlantConfig
 from open_inwoner.utils.logentry import system_action
 from openklant2.client import OpenKlant2Client
 from openklant2.types.resources.digitaal_adres import DigitaalAdres
@@ -23,79 +24,141 @@ from openklant2.types.resources.klant_contact import (
 )
 from openklant2.types.resources.partij import Partij, PartijListParams
 
-from .wrap import FetchParameters, get_fetch_parameters
-
 logger = logging.getLogger(__name__)
 
 
-def get_or_create_klant_from_request(request):
-    if not (client := build_klanten_client()):
-        return
-
-    if (fetch_params := get_fetch_parameters(request)) is None:
-        return
-
-    if klant := client.retrieve_klant(**fetch_params):
-        msg = "retrieved klant for user"
-    elif klant := client.create_klant(**fetch_params):
-        msg = f"created klant ({klant.klantnummer}) for user"
-    else:
-        return
-
-    system_action(msg, content_object=request.user)
-    return klant
+class BsnFetchParam(TypedDict):
+    user_bsn: str
 
 
-def update_user_from_klant(klant: Klant, user: User):
-    update_data = {}
+class OrgFetchParam(TypedDict):
+    user_kvk_or_rsin: str
+    vestigingsnummer: NotRequired[str]
 
-    if klant.telefoonnummer and klant.telefoonnummer != user.phonenumber:
-        update_data["phonenumber"] = klant.telefoonnummer
 
-    if klant.emailadres and klant.emailadres != user.email:
-        if not User.objects.filter(email__iexact=klant.emailadres).exists():
-            update_data["email"] = klant.emailadres
+FetchParameters = BsnFetchParam | OrgFetchParam
 
-    config = SiteConfiguration.get_solo()
-    if config.enable_notification_channel_choice:
-        if (
-            klant.toestemming_zaak_notificaties_alleen_digitaal is True
-            and user.case_notification_channel != NotificationChannelChoice.digital_only
-        ):
-            update_data[
-                "case_notification_channel"
-            ] = NotificationChannelChoice.digital_only
 
-        elif (
-            klant.toestemming_zaak_notificaties_alleen_digitaal is False
-            and user.case_notification_channel
-            != NotificationChannelChoice.digital_and_post
-        ):
-            update_data[
-                "case_notification_channel"
-            ] = NotificationChannelChoice.digital_and_post
+class KlantenService(Protocol):
+    config: OpenKlantConfig | OpenKlant2Config
+    client: KlantenClient | OpenKlant2Client
+
+    def get_fetch_parameters(
+        self,
+        user: User | None = None,
+        request=None,
+        use_vestigingsnummer: bool = False,
+    ) -> FetchParameters | None:
+        """
+        Determine the parameters used to perform Klanten/Contactmomenten fetches
+        """
+        user = user or request.user
+
+        if user.bsn:
+            return {"user_bsn": user.bsn}
+        elif user.kvk:
+            kvk_or_rsin = user.kvk
+            config = OpenKlantConfig.get_solo()
+            if config.use_rsin_for_innNnpId_query_parameter:
+                kvk_or_rsin = user.rsin
+
+            if use_vestigingsnummer:
+                vestigingsnummer = get_kvk_branch_number(request.session)
+                if vestigingsnummer:
+                    return {
+                        "user_kvk_or_rsin": kvk_or_rsin,
+                        "vestigingsnummer": vestigingsnummer,
+                    }
+
+            return {"user_kvk_or_rsin": kvk_or_rsin}
+
+        return None
+
+
+class eSuiteKlantenService(KlantenService):
+    config: OpenKlantConfig
+    client: KlantenClient
+
+    def __init__(self, config: OpenKlantConfig | None = None):
+        self.config = config or OpenKlantConfig.get_solo()
+        self.client = build_klanten_client()
+
+    def get_or_create_klant(
+        self, fetch_params: FetchParameters, user: User
+    ) -> (Klant | None, bool):
+        # TODO: all tests that have a user logged in involve the user_logged_in
+        # signal and so depend on the klant machinery (config, service, client).
+        # These tests fail if the machinery is not set up, and currently pass
+        # only because we (silently) return if the client fails to be built.
+        # We should log an error if the client cannot be built for some reason,
+        # but also consider introducing a way of disabling the signal for tests
+        # completely unrelated to openklant.
+        if not self.client:
+            return None, False
+
+        if klant := self.client.retrieve_klant(**fetch_params):
+            msg = "retrieved klant for user"
+            created = False
+        elif klant := self.client.create_klant(**fetch_params):
+            msg = f"created klant ({klant.klantnummer}) for user"
+            created = True
         else:
-            # This is a guard against the scenario where a deployment is
-            # configured to use an older version of the klanten backend (that
-            # is, one that lacks the toestemmingZaakNotificatiesAlleenDigitaal
-            # field). In such a scenario, the enable_notification_channel_choice
-            # flag really shouldn't be set until the update has completed, but
-            # we suspect this is rare. But to validate that assumption, we log
-            # an error so we can remedy this in case we're wrong.
-            logger.error(
-                "SiteConfig.enable_notification_channel_choice should not be set if"
-                " toestemmingZaakNotificatiesAlleenDigitaal is not available from the klanten backend"
+            return None, False
+
+        system_action(msg, content_object=user)
+        return klant, created
+
+    def update_user_from_klant(self, klant: Klant, user: User):
+        update_data = {}
+
+        if klant.telefoonnummer and klant.telefoonnummer != user.phonenumber:
+            update_data["phonenumber"] = klant.telefoonnummer
+
+        if klant.emailadres and klant.emailadres != user.email:
+            if not User.objects.filter(email__iexact=klant.emailadres).exists():
+                update_data["email"] = klant.emailadres
+
+        config = SiteConfiguration.get_solo()
+        if config.enable_notification_channel_choice:
+            if (
+                klant.toestemming_zaak_notificaties_alleen_digitaal is True
+                and user.case_notification_channel
+                != NotificationChannelChoice.digital_only
+            ):
+                update_data[
+                    "case_notification_channel"
+                ] = NotificationChannelChoice.digital_only
+
+            elif (
+                klant.toestemming_zaak_notificaties_alleen_digitaal is False
+                and user.case_notification_channel
+                != NotificationChannelChoice.digital_and_post
+            ):
+                update_data[
+                    "case_notification_channel"
+                ] = NotificationChannelChoice.digital_and_post
+            else:
+                # This is a guard against the scenario where a deployment is
+                # configured to use an older version of the klanten backend (that
+                # is, one that lacks the toestemmingZaakNotificatiesAlleenDigitaal
+                # field). In such a scenario, the enable_notification_channel_choice
+                # flag really shouldn't be set until the update has completed, but
+                # we suspect this is rare. But to validate that assumption, we log
+                # an error so we can remedy this in case we're wrong.
+                logger.error(
+                    "SiteConfig.enable_notification_channel_choice should not be set if"
+                    " toestemmingZaakNotificatiesAlleenDigitaal is not available from the klanten backend"
+                )
+
+        if update_data:
+            for attr, value in update_data.items():
+                setattr(user, attr, value)
+            user.save(update_fields=update_data.keys())
+
+            system_action(
+                f"updated user from klant API with fields: {', '.join(sorted(update_data.keys()))}",
+                content_object=user,
             )
-
-    if update_data:
-        for attr, value in update_data.items():
-            setattr(user, attr, value)
-        user.save(update_fields=update_data.keys())
-
-        system_action(
-            f"updated user from klant API with fields: {', '.join(sorted(update_data.keys()))}",
-            content_object=user,
-        )
 
 
 @dataclass(frozen=True)
@@ -147,7 +210,7 @@ class OpenKlant2Question:
         )
 
 
-class OpenKlant2Service:
+class OpenKlant2Service(KlantenService):
     config: OpenKlant2Config
     client: OpenKlant2Client
 
@@ -232,7 +295,7 @@ class OpenKlant2Service:
 
     def get_or_create_partij_for_user(
         self, fetch_params: FetchParameters, user: User
-    ) -> Partij | None:
+    ) -> (Partij | None, bool):
         partij = None
         created = False
 
@@ -334,14 +397,14 @@ class OpenKlant2Service:
 
         if not partij:
             logger.error("Unable to create OpenKlant2 partij for user")
-            return
+            return None, False
 
         msg = (
             f"{'created' if created else 'retrieved'} partij {partij['uuid']} for user"
         )
         system_action(msg, content_object=user)
 
-        return partij
+        return partij, created
 
     def retrieve_digitale_addressen_for_partij(
         self, partij_uuid: str

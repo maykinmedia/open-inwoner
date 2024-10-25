@@ -337,6 +337,8 @@ def _build_open_klant_client(type_) -> APIClient | None:
         service = getattr(config, f"{type_}_service")
         if service:
             client = build_client(service, client_factory=client_class)
+            if not client:
+                logger.error("%s could not be build", client_class)
             return client
 
     logger.warning("no service defined for %s", type_)
