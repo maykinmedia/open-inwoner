@@ -1,0 +1,61 @@
+.berichtdetail {
+  display: grid;
+}
+
+.bericht {
+  margin-bottom: var(--spacing-extra-large);
+
+  &__dashboard {
+    .table__item--notification-danger {
+      margin-left: var(--spacing-medium);
+      padding: var(--spacing-small) var(--spacing-medium);
+    }
+
+    .handelingstermijn {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      align-content: baseline;
+      justify-items: baseline;
+      justify-content: space-between;
+    }
+  }
+
+  &__heading {
+    margin: 0 0 var(--spacing-large) 0;
+    line-height: var(--font-line-height-heading-3);
+    font-family: var(--font-family-heading);
+    font-size: var(--font-size-heading-3);
+    font-weight: var(--font-weight-heading-3);
+  }
+
+  &__text {
+    margin: 0 0 var(--row-height) 0;
+    line-height: var(--font-line-height-body);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body);
+    font-weight: normal;
+    color: var(--font-color-body);
+  }
+
+  &__actions {
+    font-weight: bold;
+  }
+
+  .utrecht-heading-2 {
+    margin-top: var(--spacing-large);
+  }
+
+  .button--transparent {
+    padding: var(--spacing-medium) 0 0 0;
+  }
+
+  &__bijlagen {
+    .file__name {
+      // Reverse ellipsis: only show last part of URL
+      direction: rtl;
+      text-align: left;
+    }
+  }
+}

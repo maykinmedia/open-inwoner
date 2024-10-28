@@ -204,6 +204,7 @@ INSTALLED_APPS = [
     "django_setup_configuration",
     "django_yubin",
     "notifications",
+    "objectsapiclient",
     # Project applications.
     "open_inwoner.components",
     "open_inwoner.kvk",
@@ -235,6 +236,7 @@ INSTALLED_APPS = [
     "open_inwoner.cms.footer",
     "open_inwoner.cms.plugins",
     "open_inwoner.cms.benefits",
+    "open_inwoner.berichten",
     "djchoices",
     "django_celery_beat",
     "django_celery_monitor",
@@ -579,6 +581,7 @@ CMS_PLACEHOLDER_CONF = {
             "ProductLocationPlugin",
             "UserFeedPlugin",
             "UserAppointmentsPlugin",
+            "TasksPlugin",
         ],
         "text_only_plugins": ["LinkPlugin"],
         "name": _("Content"),

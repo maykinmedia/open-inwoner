@@ -1,0 +1,32 @@
+{% load i18n icon_tags button_tags %}
+
+{% if instance and tasks %}
+<section class="plugin userfeed">
+    <header class="userfeed__header">
+        <div class="heading-2__indicator">
+            <h2 class="utrecht-heading-2 {% if userfeed.action_required %}indicator{% endif %}">
+                {{ instance.title }}
+            </h2>
+        </div>
+    </header>
+
+    <div class="card-container card-container--columns-2 plugin-card">
+        {% for task in tasks %}
+            <a href="{{ task.task_url }}" target="_blank" class="card card--status card--status--info {% if task.status != "open" %}card--completed{% endif %}">
+                <div class="userfeed__marker userfeed__marker--info"></div>
+
+                <div class="card__body card__body--tabled">
+                  <h3 class="utrecht-heading-3 userfeed__title">Status:{{ task.status }} - Soort: {{ task.soort }}</h3>
+                  {% include "components/StatusIndicator/StatusIndicator.html" with status_indicator=info status_indicator_text="Let op!" %}
+                    <p class="userfeed-card__description">
+                        <span class="status">{{ task.titel }}</span>
+                    </p>
+                    <span class="button button--icon-before button--transparent">
+                    {% icon icon="east" icon_position="after" primary=True outlined=True %}
+                    </span>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}

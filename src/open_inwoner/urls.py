@@ -121,6 +121,8 @@ urlpatterns = [
     path("apimock/", include("open_inwoner.apimock.urls")),
     path("kvk/", include("open_inwoner.kvk.urls")),
     path("", include("open_inwoner.search.urls", namespace="search")),
+    # Hackathon! Put me someplace beter
+    path("hackathon/berichten/", include("open_inwoner.berichten.urls")),
     re_path(r"^", include("cms.urls")),
 ]
 
