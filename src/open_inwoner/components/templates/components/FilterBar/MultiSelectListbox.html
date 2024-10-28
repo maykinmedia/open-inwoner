@@ -1,29 +1,31 @@
 {% load i18n l10n form_tags icon_tags button_tags %}
 
 <div class="filter-bar__multiselect-listbox multiselect-listbox" id="selectDropdownWrapper">
-    <button id="selectButton" type="button" class="button button__select" aria-haspopup="listbox" aria-expanded="false" aria-live="polite">
-        {% trans 'Status' %}:
-        {% icon icon="expand_more" icon_position="after" icon_outlined=True %}
-    </button>
-    <div id="listboxDropdown" class="multiselect-listbox__content" role="listbox" aria-labelledby="selectButton">
-        <div class="multiselect-listbox__scroll" role="presentation">
-            {% for status, frequency in statusfrequencies %}
-                <div class="checkbox" role="option">
-                    <input type="checkbox" name="status" value="{{ status }}" id="id_status_{{ forloop.counter }}" class="checkbox__input">
-                    <label class="checkbox__label" for="id_status_{{ forloop.counter }}">
-                        <span class="ellipsis">{{ status }} </span><span class="frequency-counter">({{ frequency }})</span>
-                    </label>
-                </div>
-            {% endfor %}
+    <div class="multiselect-listbox__popup">
+        <button id="selectButton" type="button" class="button button__select" aria-haspopup="listbox" aria-expanded="false" aria-live="polite">
+            {% trans 'Status' %}:
+            {% icon icon="expand_more" icon_position="after" icon_outlined=True %}
+        </button>
+        <div id="listboxDropdown" class="multiselect-listbox__content" role="listbox" aria-labelledby="selectButton">
+            <div class="multiselect-listbox__scroll" role="presentation">
+                {% for status, frequency in statusfrequencies %}
+                    <div class="checkbox" role="option">
+                        <input type="checkbox" name="status" value="{{ status }}" id="id_status_{{ forloop.counter }}" class="checkbox__input">
+                        <label class="checkbox__label" for="id_status_{{ forloop.counter }}">
+                            <span class="ellipsis">{{ status }} </span><span class="frequency-counter">({{ frequency }})</span>
+                        </label>
+                    </div>
+                {% endfor %}
+            </div>
+            {# Submit button updates on select #}
+            <div class="form__actions form__actions--fullwidth" id="multiselectFormActions">
+                <button class="button button--primary" type="submit" title="{% trans 'Toon resultaten' %}" aria-label="{% trans 'Toon resultaten' %}" id="filterCases">
+                    {% trans 'Toon' %}<span class="filter-bar__frequency-sum" id="frequencySum">0</span><span id="resultText">{% trans 'resultaten' %}</span>
+                </button>
+            </div>
         </div>
-        {# Submit button appears on select #}
-        <div class="form__actions form__actions--fullwidth" id="filterFormActions">
-            <button class="button button--primary" type="submit" title="{% trans 'Toon resultaten' %}" aria-label="{% trans 'Toon resultaten' %}" id="filterCases">
-                {% trans 'Toon' %}<span class="filter-bar__frequency-sum" id="frequencySum">0</span><span id="resultText">{% trans 'resultaten' %}</span>
-            </button>
+        <div class="form__reset--desktop form__actions--fullwidth form__actions--reset">
+            {% button bordered=False text=_("Wis alle filters") id="resetMultiSelectFilters" type="button" transparent=True primary=True %}
         </div>
-    </div>
-    <div class="form__actions form__actions--fullwidth form__actions--reset">
-        {% button bordered=False text=_("Wis alle filters") id="resetFilters" type="button" transparent=True primary=True %}
     </div>
 </div>

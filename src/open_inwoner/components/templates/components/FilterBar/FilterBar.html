@@ -1,11 +1,33 @@
-{% load i18n form_tags %}
+{% load i18n form_tags button_tags %}
 
-{# Wrapper for multiple filters #}
-<div class="filter-bar" id="filterBar">
-    <form class="form" method="{{ method }}"
-          {% if no_action %}action=""{% else %}action="{% firstof form_action request.path %}"{% endif %}
-          {% if id %}id="{{ id }}"{% endif %}>
-        {# Note: each element inside the form is a flex column #}
-        {{ contents }}
-    </form>
+<div class="filter-bar__backdrop" id="filterBarBackdrop">
+    {# Wrapper for multiple filters #}
+    <div class="filter-bar" id="filterBar">
+        <div class="filter-bar__mobile-controls">
+            {% button icon="close" text=_("Sluiten") hide_text=True icon_outlined=True transparent=True extra_classes="show-controls" %}
+            <div class="form__reset--mobile form__actions--fullwidth form__actions--reset">
+                <button class="button button--primary button--transparent" type="button" name="" value="" title="Wis alle filters" aria-label="Wis alle filters" id="resetAllFilters">
+                    Wis alle filters
+                </button>
+            </div>
+        </div>
+        <div class="filter-bar__mobile-button">
+            <p class="utrecht-paragraph filter-bar__heading">Filters</p>
+            {% button icon="filter_alt" text=_("Filters") icon_outlined=True transparent=True extra_classes="show-modal" %}
+            <p class="utrecht-paragraph filter-bar__status-text">Status</p>
+        </div>
+        <form class="form filter-bar__form" method="{{ method }}"
+              {% if no_action %}action="" {% else %}action="{% firstof form_action request.path %}" {% endif %}
+              {% if id %}id="{{ id }}" {% endif %}>
+            {# Note: each element inside the form is a flex column #}
+            {{ contents }}
+
+            {# Mobile submit button updates on select #}
+            <div class="form__reload--mobile form__actions form__actions--fullwidth" id="filterFormActions">
+                <button class="button button--primary" type="submit" title="{% trans 'Toon resultaten' %}" aria-label="{% trans 'Toon resultaten' %}" id="filterCases">
+                    {% trans 'Toon' %}<span class="filter-bar__frequency-sum" id="frequencySum">0</span><span id="resultText">{% trans 'resultaten' %}</span>
+                </button>
+            </div>
+        </form>
+    </div>
 </div>

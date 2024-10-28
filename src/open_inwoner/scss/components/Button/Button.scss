@@ -203,6 +203,10 @@
     display: flex;
   }
 
+  &__inner-text {
+    font-family: var(--font-family-body);
+  }
+
   > .link__text {
     width: 100%;
   }
