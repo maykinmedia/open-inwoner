@@ -154,8 +154,10 @@ class OpenKlant2Service:
     def __init__(self, config: OpenKlant2Config | None = None):
         self.config = config or OpenKlant2Config.from_django_settings()
         self.client = OpenKlant2Client(
-            api_url=self.config.api_url,
-            api_token=self.config.api_token,
+            base_url=self.config.api_url,
+            request_kwargs={
+                "headers": {"Authorization": f"Token {self.config.api_token}"}
+            },
         )
         if mijn_vragen_actor := getattr(config, "mijn_vragen_actor", None):
             self.mijn_vragen_actor = (
