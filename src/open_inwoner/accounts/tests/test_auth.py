@@ -1920,7 +1920,7 @@ class TestUpdateUserFromKlantUponLoginTests(TestCase):
                 self.data.user.login_type = login_type
                 self.data.user.save()
                 with patch(
-                    "open_inwoner.accounts.signals.update_user_from_klant_on_login"
+                    "open_inwoner.openklant.services.eSuiteKlantenService.update_user_from_klant"
                 ) as update_user_from_klant_mock:
                     update_user_from_klant_on_login(
                         self.__class__,

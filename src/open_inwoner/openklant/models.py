@@ -194,7 +194,6 @@ class KlantContactMomentAnswer(models.Model):
 
 @dataclass
 class OpenKlant2Config:
-    # TODO: move to service_config object
     api_root: str
     api_path: str
     api_token: str
@@ -216,7 +215,6 @@ class OpenKlant2Config:
 
         if not (config := getattr(settings, "OPENKLANT2_CONFIG", None)):
             raise ImproperlyConfigured(
-            raise RuntimeError(
                 "Please set OPENKLANT2_CONFIG in your settings to configure OpenKlant2"
             )
 

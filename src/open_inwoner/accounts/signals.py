@@ -46,11 +46,7 @@ def update_user_from_klant_on_login(sender, user, request, *args, **kwargs):
             logger.error("OpenKlant2 service failed to build")
             return
 
-        if not (
-            fetch_params := service.get_fetch_parameters(
-                request=request, use_vestigingsnummer=True
-            )
-        ):
+        if not (fetch_params := service.get_fetch_parameters(request=request)):
             return
 
         partij, created = service.get_or_create_partij_for_user(
@@ -66,11 +62,7 @@ def update_user_from_klant_on_login(sender, user, request, *args, **kwargs):
         logger.error("eSuiteKlantenService failed to build")
         return
 
-    if not (
-        fetch_params := service.get_fetch_parameters(
-            request=request, use_vestigingsnummer=True
-        )
-    ):
+    if not (fetch_params := service.get_fetch_parameters(request=request)):
         return
 
     klant, created = service.get_or_create_klant(fetch_params=fetch_params, user=user)

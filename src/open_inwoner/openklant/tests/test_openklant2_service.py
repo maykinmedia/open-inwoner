@@ -36,8 +36,12 @@ class PartijGetOrCreateTestCase(Openklant2ServiceTestCase):
         self.assertEqual(self.service.client.partij_identificator.list()["count"], 0)
 
         # First call creates
-        persoon = self.service.get_or_create_partij_for_user(
+        persoon, created = self.service.get_or_create_partij_for_user(
             {"user_bsn": "123456789"}, self.user
+        )
+
+        self.assertTrue(
+            created, "persoon was retrieved (GET), expected create via POST"
         )
 
         PartijValidator.validate_python(persoon)
@@ -58,8 +62,12 @@ class PartijGetOrCreateTestCase(Openklant2ServiceTestCase):
         )
 
         # Second call gets
-        persoon = self.service.get_or_create_partij_for_user(
+        persoon, created = self.service.get_or_create_partij_for_user(
             {"user_bsn": "123456789"}, self.user
+        )
+
+        self.assertFalse(
+            created, "persoon was was created (POST), expected retrieve via GET"
         )
 
         PartijValidator.validate_python(persoon)
@@ -85,9 +93,13 @@ class PartijGetOrCreateTestCase(Openklant2ServiceTestCase):
         self.assertEqual(self.service.client.partij_identificator.list()["count"], 0)
 
         # First call creates
-        persoon = self.service.get_or_create_partij_for_user(
+        persoon, created = self.service.get_or_create_partij_for_user(
             {"user_kvk_or_rsin": "123456789"},
             self.user,
+        )
+
+        self.assertTrue(
+            created, "persoon was retrieved (GET), expected create via POST"
         )
 
         PartijValidator.validate_python(persoon)
@@ -108,8 +120,12 @@ class PartijGetOrCreateTestCase(Openklant2ServiceTestCase):
         )
 
         # Second call gets
-        persoon = self.service.get_or_create_partij_for_user(
+        persoon, created = self.service.get_or_create_partij_for_user(
             {"user_kvk_or_rsin": "123456789"}, self.user
+        )
+
+        self.assertFalse(
+            created, "persoon was was created (POST), expected retrieve via GET"
         )
 
         PartijValidator.validate_python(persoon)
@@ -135,9 +151,13 @@ class PartijGetOrCreateTestCase(Openklant2ServiceTestCase):
         self.assertEqual(self.service.client.partij_identificator.list()["count"], 0)
 
         # First call creates
-        persoon = self.service.get_or_create_partij_for_user(
+        persoon, created = self.service.get_or_create_partij_for_user(
             {"user_kvk_or_rsin": "123456789", "vestigingsnummer": "987654321"},
             self.user,
+        )
+
+        self.assertTrue(
+            created, "persoon was retrieved (GET), expected create via POST"
         )
 
         PartijValidator.validate_python(persoon)
@@ -164,8 +184,12 @@ class PartijGetOrCreateTestCase(Openklant2ServiceTestCase):
         )
 
         # Second call gets
-        persoon = self.service.get_or_create_partij_for_user(
+        persoon, created = self.service.get_or_create_partij_for_user(
             {"user_kvk_or_rsin": "123456789"}, self.user
+        )
+
+        self.assertFalse(
+            created, "persoon was was created (POST), expected retrieve via GET"
         )
 
         PartijValidator.validate_python(persoon)

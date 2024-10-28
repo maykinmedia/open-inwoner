@@ -26,11 +26,8 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 from zgw_consumers.api_models.constants import RolOmschrijving
 
 from open_inwoner.mail.service import send_contact_confirmation_mail
-from open_inwoner.openklant.clients import (
-    build_contactmomenten_client,
-    build_klanten_client,
-)
 from open_inwoner.openklant.models import OpenKlantConfig
+from open_inwoner.openklant.services import eSuiteKlantenService, eSuiteVragenService
 from open_inwoner.openklant.wrap import (
     contactmoment_has_new_answer,
     get_fetch_parameters,
@@ -153,7 +150,8 @@ class InnerCaseDetailView(
         if self.case:
             self.log_access_case_detail(self.case)
 
-            config = OpenZaakConfig.get_solo()
+            openzaak_config = OpenZaakConfig.get_solo()
+            openklant_config = OpenKlantConfig.get_solo()
 
             api_group = ZGWApiGroupConfig.objects.get(pk=self.kwargs["api_group_id"])
             zaken_client = api_group.zaken_client
@@ -165,13 +163,16 @@ class InnerCaseDetailView(
             self.store_resulttype_mapping(self.case.zaaktype.identificatie)
 
             # questions/E-suite contactmomenten
-            objectcontactmomenten = []
-            if contactmoment_client := build_contactmomenten_client():
-                objectcontactmomenten = (
-                    contactmoment_client.retrieve_objectcontactmomenten_for_zaak(
-                        self.case
-                    )
+            try:
+                service = eSuiteVragenService(config=openklant_config)
+            except RuntimeError:
+                logger.error("Failed to build eSuiteVragenService")
+                objectcontactmomenten = []
+            else:
+                objectcontactmomenten = service.retrieve_objectcontactmomenten_for_zaak(
+                    self.case
                 )
+
             questions = []
             for ocm in objectcontactmomenten:
                 question = getattr(ocm, "contactmoment", None)
@@ -204,7 +205,7 @@ class InnerCaseDetailView(
             # returns zeros as the time component of the datetime, so we're going with the
             # observation that on both OpenZaak and eSuite the returned list is ordered 'oldest-last'
             # here we want it 'oldest-first' so we reverse() it instead of sort()-ing
-            if config.order_statuses_by_date_set:
+            if openzaak_config.order_statuses_by_date_set:
                 statuses.sort(key=lambda s: s.datum_status_gezet)
             else:
                 statuses.reverse()
@@ -252,7 +253,9 @@ class InnerCaseDetailView(
                 "end_statustype_data": end_statustype_data,
                 "second_status_preview": second_status_preview,
                 "documents": documents,
-                "allowed_file_extensions": sorted(config.allowed_file_extensions),
+                "allowed_file_extensions": sorted(
+                    openzaak_config.allowed_file_extensions
+                ),
                 "new_docs": has_new_elements(
                     documents,
                     "created",
@@ -982,8 +985,12 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
         except ObjectDoesNotExist:
             ztc = None
 
-        if klanten_client := build_klanten_client():
-            klant = klanten_client.retrieve_klant(**get_fetch_parameters(self.request))
+        # TODO
+        openklant_config = OpenKlantConfig.get_solo()
+        service = eSuiteKlantenService(config=openklant_config)
+
+        if klanten_client := service.client:
+            klant = service.retrieve_klant(**get_fetch_parameters(self.request))
 
             if klant:
                 self.log_system_action(
@@ -1002,7 +1009,7 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
                     "telefoonnummer": self.request.user.phonenumber,
                 }
                 # registering klanten won't work in e-Suite as it always pulls from BRP (but try anyway and fallback to appending details to tekst if fails)
-                klant = klanten_client.create_klant(data)
+                klant = service.create_klant(data)
 
                 if klant:
                     self.log_system_action(
@@ -1029,34 +1036,40 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
         if ztc and ztc.contact_subject_code:
             data["onderwerp"] = ztc.contact_subject_code
 
-        if contactmoment_client := build_contactmomenten_client():
-            contactmoment = contactmoment_client.create_contactmoment(data, klant=klant)
-            if contactmoment:
-                self.log_system_action(
-                    "registered contactmoment by API", user=self.request.user
-                )
-                objectcontactmoment = contactmoment_client.create_objectcontactmoment(
-                    contactmoment, self.case
-                )
-                if objectcontactmoment:
-                    self.log_system_action(
-                        "registered objectcontactmoment by API", user=self.request.user
-                    )
-                else:
-                    self.log_system_action(
-                        "error while registering objectcontactmoment by API",
-                        user=self.request.user,
-                    )
+        try:
+            service = eSuiteVragenService(config=openklant_config)
+        except RuntimeError:
+            logger.error("Failed to build eSuiteVragenService")
+            return
 
-            # We'll mark this call as successful if the cotactmoment is created, independent of
-            # whether we've successfully associated the contactmoment with the case, because we
-            # still want the notification email to be sent.
-            return True
+        contactmoment = service.create_contactmoment(data, klant=klant)
+
+        if not contactmoment:
+            self.log_system_action(
+                "error while registering contactmoment by API", user=self.request.user
+            )
+            return False
 
         self.log_system_action(
-            "error while registering contactmoment by API", user=self.request.user
+            "registered contactmoment by API", user=self.request.user
         )
-        return False
+        objectcontactmoment = service.create_objectcontactmoment(
+            contactmoment, self.case
+        )
+        if objectcontactmoment:
+            self.log_system_action(
+                "registered objectcontactmoment by API", user=self.request.user
+            )
+        else:
+            self.log_system_action(
+                "error while registering objectcontactmoment by API",
+                user=self.request.user,
+            )
+
+        # We'll mark this call as successful if the cotactmoment is created, independent of
+        # whether we've successfully associated the contactmoment with the case, because we
+        # still want the notification email to be sent.
+        return True
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
