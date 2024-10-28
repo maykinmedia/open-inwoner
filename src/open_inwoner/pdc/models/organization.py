@@ -64,7 +64,7 @@ class Organization(GeoModel, OpenProductenMixin):
         return f"{self.name}"
 
 
-class OrganizationType(models.Model):
+class OrganizationType(OpenProductenMixin):
     name = models.CharField(
         verbose_name=_("Name"),
         max_length=100,

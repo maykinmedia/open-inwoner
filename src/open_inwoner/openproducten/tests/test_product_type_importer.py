@@ -8,22 +8,27 @@ import open_inwoner.pdc.models as pdc_models
 from open_inwoner.openproducten.producttypes_imports import ProductTypeImporter
 from open_inwoner.pdc.tests.factories import (
     CategoryFactory,
+    OrganizationFactory,
     ProductConditionFactory,
     ProductFactory,
     QuestionFactory,
     TagFactory,
 )
 
-from ...pdc.models import Product, ProductLink, TagType
 from ..api_models import BaseCategory
 from ..models import Price, PriceOption
 from .factories import PriceOptionFactory
 from .helpers import (
     create_complete_product_type,
     create_condition,
+    create_contact,
     create_file,
     create_filer_file_instance,
     create_link,
+    create_location,
+    create_neighbourhood,
+    create_organisation,
+    create_organisation_type,
     create_price,
     create_product_type,
     create_question,
@@ -99,6 +104,102 @@ class TestProductTypeImporter(TestCase):
                 self.assertEqual(pdc_models.ProductCondition.objects.count(), 1)
                 self.assertEqual(instance.open_producten_uuid, uuid)
                 self.assertEqual(instance.name, condition.name)
+
+    def test_update_or_create_location(self):
+        uuid = uuid4()
+        importer = ProductTypeImporter(self.client)
+        for create in (True, False):
+            with self.subTest(
+                "should create instance if uuid does not exist"
+                if create
+                else "should update instance if uuid exists"
+            ):
+
+                location = create_location(uuid)
+                instance = importer._update_or_create_location(location)
+
+                self.assertEqual(pdc_models.ProductLocation.objects.count(), 1)
+                self.assertEqual(instance.open_producten_uuid, uuid)
+                self.assertEqual(instance.name, location.name)
+
+    def test_update_or_create_organisation_type(self):
+        uuid = uuid4()
+        importer = ProductTypeImporter(self.client)
+
+        for create in (True, False):
+            with self.subTest(
+                "should create instance if uuid does not exist"
+                if create
+                else "should update instance if uuid exists"
+            ):
+
+                organisation_type = create_organisation_type(uuid)
+                instance = importer._update_or_create_organisation_type(
+                    organisation_type
+                )
+
+                self.assertEqual(pdc_models.OrganizationType.objects.count(), 1)
+                self.assertEqual(instance.open_producten_uuid, uuid)
+                self.assertEqual(instance.name, organisation_type.name)
+
+    def test_update_or_create_neighbourhood(self):
+        uuid = uuid4()
+        importer = ProductTypeImporter(self.client)
+
+        for create in (True, False):
+            with self.subTest(
+                "should create instance if uuid does not exist"
+                if create
+                else "should update instance if uuid exists"
+            ):
+
+                neighbourhood = create_neighbourhood(uuid)
+                instance = importer._update_or_create_neighbourhood(neighbourhood)
+
+                self.assertEqual(pdc_models.Neighbourhood.objects.count(), 1)
+                self.assertEqual(instance.open_producten_uuid, uuid)
+                self.assertEqual(instance.name, neighbourhood.name)
+
+    def test_update_or_create_organisation(self):
+        organisation_uuid = uuid4()
+        organisation_type_uuid = uuid4()
+        neighbourhood_uuid = uuid4()
+        importer = ProductTypeImporter(self.client)
+
+        for create in (True, False):
+            with self.subTest(
+                "should create instance if uuid does not exist"
+                if create
+                else "should update instance if uuid exists"
+            ):
+
+                organisation = create_organisation(
+                    organisation_uuid, organisation_type_uuid, neighbourhood_uuid
+                )
+                instance = importer._update_or_create_organisation(organisation)
+
+                self.assertEqual(pdc_models.Organization.objects.count(), 1)
+                self.assertEqual(pdc_models.OrganizationType.objects.count(), 1)
+                self.assertEqual(pdc_models.Neighbourhood.objects.count(), 1)
+                self.assertEqual(instance.open_producten_uuid, organisation_uuid)
+                self.assertEqual(instance.name, organisation.name)
+
+    def test_update_or_create_contact(self):
+        uuid = uuid4()
+        org = OrganizationFactory.create(open_producten_uuid=uuid4())
+        importer = ProductTypeImporter(self.client)
+        for create in (True, False):
+            with self.subTest(
+                "should create instance if uuid does not exist"
+                if create
+                else "should update instance if uuid exists"
+            ):
+                contact = create_contact(uuid, org.open_producten_uuid)
+                instance = importer._update_or_create_contact(contact)
+
+                self.assertEqual(pdc_models.ProductContact.objects.count(), 1)
+                self.assertEqual(instance.open_producten_uuid, uuid)
+                self.assertEqual(instance.first_name, contact.first_name)
 
     def test_update_or_create_link(self):
         uuid = uuid4()
@@ -353,7 +454,7 @@ class TestProductTypeImporter(TestCase):
                     {product_type_a.id, product_type_b.id},
                 )
 
-        self.assertEqual(Product.objects.count(), 2)
+        self.assertEqual(pdc_models.Product.objects.count(), 2)
 
     def test_updated_objects_are_not_deleted(self):
         tag = TagFactory.create(open_producten_uuid=uuid4())
@@ -362,8 +463,8 @@ class TestProductTypeImporter(TestCase):
 
         importer = ProductTypeImporter(self.client)
 
-        importer.handled_tags.add(tag.open_producten_uuid)
-        importer.handled_conditions.add(condition.open_producten_uuid)
+        importer.handled_m2m_instances.add(tag.open_producten_uuid)
+        importer.handled_m2m_instances.add(condition.open_producten_uuid)
         importer.handled_product_types.add(product.open_producten_uuid)
         importer._delete_non_updated_objects()
         self.assertEqual(importer.deleted_count, 0)
@@ -381,11 +482,11 @@ class TestProductTypeImporter(TestCase):
     def test_non_updated_objects_without_open_producten_uuid_are_kept(self):
         product = ProductFactory.create()
         TagFactory.create()
-        TagType.objects.create(name="test")
+        pdc_models.TagType.objects.create(name="test")
         ProductConditionFactory.create()
         QuestionFactory.create()
         PriceOptionFactory.create()
-        ProductLink.objects.create(product=product)
+        pdc_models.ProductLink.objects.create(product=product)
 
         importer = ProductTypeImporter(self.client)
 
@@ -474,4 +575,4 @@ class TestProductTypeImporter(TestCase):
 
         self.assertEqual(created, [])
         self.assertEqual(updated, [])
-        self.assertEqual(deleted, 10)
+        self.assertEqual(deleted, 15)

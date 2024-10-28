@@ -2,6 +2,7 @@ import logging
 from decimal import Decimal
 from typing import TypeVar
 
+from django.contrib.gis.geos import Point
 from django.db import models, transaction
 from django.db.models import Q
 from django.utils.text import slugify
@@ -13,10 +14,15 @@ import open_inwoner.openproducten.api_models as api_models
 from open_inwoner.openproducten.models import Price, PriceOption
 from open_inwoner.pdc.models import (
     Category,
+    Neighbourhood,
+    Organization,
+    OrganizationType,
     Product as ProductType,
     ProductCondition,
+    ProductContact,
     ProductFile,
     ProductLink,
+    ProductLocation,
     Question,
     Tag,
     TagType,
@@ -39,6 +45,14 @@ T = TypeVar("T")
 def _get_instance(model: T, uuid) -> T:
     """Returns a model instance by uuid or None."""
     return model.objects.filter(open_producten_uuid=uuid).first()
+
+
+def _delete_from_model(model, uuid_list, full_output=False):
+    result = model.objects.exclude(
+        Q(open_producten_uuid__in=uuid_list) | Q(open_producten_uuid__isnull=True)
+    ).delete()
+
+    return result if full_output else result[0]
 
 
 class OpenProductenImporterMixin:
@@ -103,9 +117,7 @@ class ProductTypeImporter(OpenProductenImporterMixin):
         super().__init__(client)
         self.product_types = None
         self.handled_product_types = set()
-        self.handled_tags = set()
-        self.handled_tag_types = set()
-        self.handled_conditions = set()
+        self.handled_m2m_instances = set()
 
     def import_producttypes(self):
         """
@@ -172,6 +184,18 @@ class ProductTypeImporter(OpenProductenImporterMixin):
             condition_instance = self._update_or_create_condition(condition)
             product_type_instance.conditions.add(condition_instance)
 
+        for location in product_type.locations:
+            location_instance = self._update_or_create_location(location)
+            product_type_instance.locations.add(location_instance)
+
+        for organisation in product_type.organisations:
+            organisation_instance = self._update_or_create_organisation(organisation)
+            product_type_instance.organizations.add(organisation_instance)
+
+        for contact in product_type.contacts:
+            contact_instance = self._update_or_create_contact(contact)
+            product_type_instance.contacts.add(contact_instance)
+
         category_uuids = [category.id for category in product_type.categories]
         pdc_ids = list(
             Category.objects.filter(open_producten_uuid__in=category_uuids).values_list(
@@ -179,8 +203,6 @@ class ProductTypeImporter(OpenProductenImporterMixin):
             )
         )
         product_type_instance.categories.set(pdc_ids)
-
-        # TODO location, contacts, organisations
 
         for link in product_type.links:
             self._update_or_create_link(link, product_type_instance)
@@ -200,7 +222,7 @@ class ProductTypeImporter(OpenProductenImporterMixin):
             defaults={"open_producten_uuid": tag_type.id, "name": tag_type.name},
         )
         self._add_to_log_list(tag_type_instance, created)
-        self.handled_tag_types.add(tag_type.id)
+        self.handled_m2m_instances.add(tag_type.id)
         return tag_type_instance
 
     def _update_or_create_tag(self, tag: api_models.Tag):
@@ -225,7 +247,7 @@ class ProductTypeImporter(OpenProductenImporterMixin):
             created = True
 
         self._add_to_log_list(tag_instance, created)
-        self.handled_tags.add(tag.id)
+        self.handled_m2m_instances.add(tag.id)
         return tag_instance
 
     def _update_or_create_condition(
@@ -242,8 +264,110 @@ class ProductTypeImporter(OpenProductenImporterMixin):
             },
         )
         self._add_to_log_list(condition_instance, created)
-        self.handled_conditions.add(condition.id)
+        self.handled_m2m_instances.add(condition.id)
         return condition_instance
+
+    def _update_or_create_location(self, location: api_models.Location):
+        location_instance, created = ProductLocation.objects.update_or_create(
+            open_producten_uuid=location.id,
+            defaults={
+                "open_producten_uuid": location.id,
+                "name": location.name,
+                "email": location.email,
+                "phonenumber": location.phone_number,
+                "street": location.street,
+                "housenumber": location.house_number,
+                "postcode": location.postcode,
+                "city": location.city,
+                "geometry": Point(location.coordinates),
+            },
+        )
+
+        self._add_to_log_list(location_instance, created)
+        self.handled_m2m_instances.add(location.id)
+        return location_instance
+
+    def _update_or_create_organisation_type(
+        self, organisation_type: api_models.OrganisationType
+    ):
+        organisation_type_instance, created = OrganizationType.objects.update_or_create(
+            open_producten_uuid=organisation_type.id,
+            defaults={
+                "open_producten_uuid": organisation_type.id,
+                "name": organisation_type.name,
+            },
+        )
+        self._add_to_log_list(organisation_type_instance, created)
+        self.handled_m2m_instances.add(organisation_type.id)
+        return organisation_type_instance
+
+    def _update_or_create_neighbourhood(self, neighbourhood: api_models.Neighbourhood):
+        neighbourhood_instance, created = Neighbourhood.objects.update_or_create(
+            open_producten_uuid=neighbourhood.id,
+            defaults={
+                "open_producten_uuid": neighbourhood.id,
+                "name": neighbourhood.name,
+            },
+        )
+        self._add_to_log_list(neighbourhood_instance, created)
+        self.handled_m2m_instances.add(neighbourhood.id)
+        return neighbourhood_instance
+
+    def _update_or_create_organisation(self, organisation: api_models.Organisation):
+        organisation_type_instance = self._update_or_create_organisation_type(
+            organisation.type
+        )
+        neighbourhood_instance = self._update_or_create_neighbourhood(
+            organisation.neighbourhood
+        )
+        logo_object = self._get_image(organisation.logo)
+
+        data = {
+            "open_producten_uuid": organisation.id,
+            "name": organisation.name,
+            "slug": slugify(organisation.name),
+            "email": organisation.email,
+            "phonenumber": organisation.phone_number,
+            "street": organisation.street,
+            "housenumber": organisation.house_number,
+            "postcode": organisation.postcode,
+            "city": organisation.city,
+            "geometry": Point(organisation.coordinates),
+            "neighbourhood": neighbourhood_instance,
+            "type": organisation_type_instance,
+            "logo": logo_object,
+        }
+
+        if organisation_instance := _get_instance(Organization, organisation.id):
+            if organisation_instance.logo:
+                organisation_instance.logo.delete()
+            _update_instance(organisation_instance, True, **data)
+            created = False
+        else:
+            organisation_instance = Organization.objects.create(**data)
+            created = True
+
+        self._add_to_log_list(organisation_instance, created)
+        self.handled_m2m_instances.add(organisation.id)
+        return organisation_instance
+
+    def _update_or_create_contact(self, contact: api_models.Contact):
+        contact_instance, created = ProductContact.objects.update_or_create(
+            open_producten_uuid=contact.id,
+            defaults={
+                "open_producten_uuid": contact.id,
+                "first_name": contact.first_name,
+                "last_name": contact.last_name,
+                "email": contact.email,
+                "phonenumber": contact.phone_number,
+                "role": contact.role,
+                "organization": _get_instance(Organization, contact.organisation_id),
+            },
+        )
+
+        self._add_to_log_list(contact_instance, created)
+        self.handled_m2m_instances.add(contact.id)
+        return contact_instance
 
     def _update_or_create_link(self, link: api_models.Link, product_type: ProductType):
         link_instance, created = ProductLink.objects.update_or_create(
@@ -317,7 +441,7 @@ class ProductTypeImporter(OpenProductenImporterMixin):
             "published": product_type.published,
             "summary": product_type.summary,
             "content": product_type.content,
-            "form": product_type.form_link,  # TODO product uses OpenFormsSlugField
+            "form": product_type.open_forms_slug,
             "icon": icon_object,
             "image": image_object,
             "uniforme_productnaam": product_type.uniform_product_name.split("/")[-1],
@@ -353,20 +477,28 @@ class ProductTypeImporter(OpenProductenImporterMixin):
 
         self.deleted_count += self._get_count_without_m2m_deletions(result)
 
-        self.deleted_count += Tag.objects.exclude(
-            Q(open_producten_uuid__in=self.handled_tags)
-            | Q(open_producten_uuid__isnull=True)
-        ).delete()[0]
+        # M2M deletions
+        self.deleted_count += _delete_from_model(Tag, self.handled_m2m_instances)
+        self.deleted_count += _delete_from_model(TagType, self.handled_m2m_instances)
+        self.deleted_count += _delete_from_model(
+            ProductCondition, self.handled_m2m_instances
+        )
 
-        self.deleted_count += TagType.objects.exclude(
-            Q(open_producten_uuid__in=self.handled_tag_types)
-            | Q(open_producten_uuid__isnull=True)
-        ).delete()[0]
-
-        self.deleted_count += ProductCondition.objects.exclude(
-            Q(open_producten_uuid__in=self.handled_conditions)
-            | Q(open_producten_uuid__isnull=True)
-        ).delete()[0]
+        self.deleted_count += _delete_from_model(
+            ProductLocation, self.handled_m2m_instances
+        )
+        self.deleted_count += _delete_from_model(
+            ProductContact, self.handled_m2m_instances
+        )
+        self.deleted_count += _delete_from_model(
+            Organization, self.handled_m2m_instances
+        )
+        self.deleted_count += _delete_from_model(
+            OrganizationType, self.handled_m2m_instances
+        )
+        self.deleted_count += _delete_from_model(
+            Neighbourhood, self.handled_m2m_instances
+        )
 
 
 class CategoryImporter(OpenProductenImporterMixin):

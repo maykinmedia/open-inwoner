@@ -346,7 +346,7 @@ class ProductLink(OpenProductenMixin):
         return f"{self.product}: {self.name}"
 
 
-class ProductLocation(GeoModel):
+class ProductLocation(GeoModel, OpenProductenMixin):
     uuid = models.UUIDField(verbose_name=_("UUID"), default=uuid4, unique=True)
     name = models.CharField(
         verbose_name=_("Name"),

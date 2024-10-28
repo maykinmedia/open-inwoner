@@ -1,8 +1,10 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from open_inwoner.openproducten.mixins import OpenProductenMixin
 
-class Neighbourhood(models.Model):
+
+class Neighbourhood(OpenProductenMixin):
     name = models.CharField(
         verbose_name=_("Name"),
         max_length=100,

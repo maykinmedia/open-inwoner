@@ -9,8 +9,13 @@ from open_inwoner.openproducten import models as op_models
 from open_inwoner.openproducten.api_models import (
     Category,
     Condition,
+    Contact,
     File,
     Link,
+    Location,
+    Neighbourhood,
+    Organisation,
+    OrganisationType,
     Price,
     PriceOption,
     ProductType,
@@ -73,6 +78,9 @@ def create_product_type(uuid, name="product type"):
         files=[],
         prices=[],
         questions=[],
+        locations=[],
+        organisations=[],
+        contacts=[],
         related_product_types=[],
     )
 
@@ -112,6 +120,57 @@ def create_price(price_uuid, option_uuid):
     )
 
 
+def create_location(uuid):
+    return Location(
+        id=uuid,
+        name="Maykin Media",
+        email="test@gmail.com",
+        phone_number="",
+        street="Kingsfortweg",
+        house_number="151",
+        postcode="1111 AA",
+        city="Amsterdam",
+        coordinates=[4.86687019, 52.08613284],
+    )
+
+
+def create_organisation_type(uuid):
+    return OrganisationType(id=uuid, name="test organisation type")
+
+
+def create_neighbourhood(uuid):
+    return Neighbourhood(id=uuid, name="test neighbourhood")
+
+
+def create_organisation(org_uuid, type_uuid, neighbourhood_uuid):
+    return Organisation(
+        id=org_uuid,
+        name="Maykin Media",
+        email="test@gmail.com",
+        phone_number="",
+        street="Kingsfortweg",
+        house_number="151",
+        postcode="1111 AA",
+        city="Amsterdam",
+        coordinates=[4.86687019, 52.08613284],
+        type=create_organisation_type(type_uuid),
+        neighbourhood=create_neighbourhood(neighbourhood_uuid),
+        logo=None,
+    )
+
+
+def create_contact(contact_uuid, org_uuid):
+    return Contact(
+        id=contact_uuid,
+        first_name="Bob",
+        last_name="de Vries",
+        email="test@mail.com",
+        phone_number="",
+        role="",
+        organisation_id=org_uuid,
+    )
+
+
 def create_complete_product_type(name):
     product_type = create_product_type(uuid4(), name=name)
     product_type.conditions.append(create_condition(uuid4()))
@@ -120,6 +179,11 @@ def create_complete_product_type(name):
     product_type.files.append(create_file(uuid4()))
     product_type.prices.append(create_price(uuid4(), uuid4()))
     product_type.questions.append(create_question(uuid4()))
+    product_type.locations.append(create_location(uuid4()))
+
+    org_uuid = uuid4()
+    product_type.organisations.append(create_organisation(org_uuid, uuid4(), uuid4()))
+    product_type.contacts.append(create_contact(uuid4(), org_uuid))
     return product_type
 
 
@@ -134,6 +198,11 @@ def get_all_product_type_objects():
         + list(op_models.PriceOption.objects.all())
         + list(pdc_models.Question.objects.all())
         + list(pdc_models.Product.objects.all())
+        + list(pdc_models.ProductLocation.objects.all())
+        + list(pdc_models.ProductContact.objects.all())
+        + list(pdc_models.Organization.objects.all())
+        + list(pdc_models.OrganizationType.objects.all())
+        + list(pdc_models.Neighbourhood.objects.all())
     )
 
 

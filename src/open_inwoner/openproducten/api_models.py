@@ -79,6 +79,49 @@ class Price(Model):
 
 
 @dataclass
+class Location(Model):
+    id: str
+    coordinates: list[float]
+    name: str
+    email: str
+    phone_number: str
+    street: str
+    house_number: str
+    postcode: str
+    city: str
+
+
+@dataclass
+class Neighbourhood(Model):
+    id: str
+    name: str
+
+
+@dataclass
+class OrganisationType(Model):
+    id: str
+    name: str
+
+
+@dataclass
+class Organisation(Location):
+    neighbourhood: Neighbourhood
+    type: OrganisationType
+    logo: Optional[str]
+
+
+@dataclass
+class Contact(Model):
+    id: str
+    organisation_id: str
+    first_name: str
+    last_name: str
+    email: str
+    phone_number: str
+    role: str
+
+
+@dataclass
 class ProductType(Model):
     id: str
     published: bool
@@ -87,6 +130,7 @@ class ProductType(Model):
     icon: Optional[str]
     image: Optional[str]
     form_link: str
+    open_forms_slug: str
     content: str
     keywords: list[str]
     uniform_product_name: str
@@ -97,6 +141,9 @@ class ProductType(Model):
     files: list[File]
     prices: list[Price]
     questions: list[Question]
+    locations: list[Location]
+    organisations: list[Organisation]
+    contacts: list[Contact]
     related_product_types: list[str]
 
     related_product_types: list = field(default_factory=list)
