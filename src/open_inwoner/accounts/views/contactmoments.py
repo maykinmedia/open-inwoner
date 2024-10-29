@@ -78,9 +78,12 @@ class KCMDict(TypedDict):
     identificatie: str
     type: str
     onderwerp: str
-    status: str
     antwoord: str
     new_answer_available: bool
+    status: str
+
+
+QuestionValidator = TypeAdapter(Question)
 
 
 class KlantContactMomentBaseView(
