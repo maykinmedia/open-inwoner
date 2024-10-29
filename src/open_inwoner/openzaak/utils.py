@@ -34,10 +34,10 @@ def is_info_object_visible(
     """
     Test if a InformatieObject (case info object) should be visible to the user.
 
-    We check on its definitive status, and a maximum confidentiality level (compared the
-    ordering from the VertrouwelijkheidsAanduidingen.choices)
+    We check on its definitive or archived status, and a maximum confidentiality
+    level (compared the ordering from the VertrouwelijkheidsAanduidingen.choices)
     """
-    if info_object.status != "definitief":
+    if info_object.status not in ["definitief", "gearchiveerd"]:
         return False
 
     return is_object_visible(info_object, max_confidentiality_level)
