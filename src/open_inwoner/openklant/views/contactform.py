@@ -17,6 +17,7 @@ from open_inwoner.openklant.clients import (
 )
 from open_inwoner.openklant.forms import ContactForm
 from open_inwoner.openklant.models import OpenKlantConfig
+from open_inwoner.openklant.views.utils import generate_question_answer_pair
 from open_inwoner.openklant.wrap import get_fetch_parameters
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
@@ -44,7 +45,18 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
+
+        captcha_question = self.request.session.get("captcha_question")
+        captcha_answer = self.request.session.get("captcha_answer")
+
+        if not (captcha_question and captcha_answer):
+            captcha_question, captcha_answer = generate_question_answer_pair()
+
+        self.request.session["captcha_question"] = captcha_question
+        self.request.session["captcha_answer"] = captcha_answer
+
         kwargs["user"] = self.request.user
+        kwargs["request_session"] = self.request.session
         return kwargs
 
     def get_initial(self):
