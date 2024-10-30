@@ -19,9 +19,9 @@ from open_inwoner.accounts.tests.factories import (
     DigidUserFactory,
     eHerkenningUserFactory,
 )
-from open_inwoner.openklant.clients import ContactmomentenClient
 from open_inwoner.openklant.constants import Status
 from open_inwoner.openklant.models import OpenKlantConfig
+from open_inwoner.openklant.services import eSuiteVragenService
 from open_inwoner.openklant.tests.data import CONTACTMOMENTEN_ROOT, KLANTEN_ROOT
 from open_inwoner.openzaak.models import CatalogusConfig, OpenZaakConfig
 from open_inwoner.openzaak.tests.factories import (
@@ -50,7 +50,7 @@ PATCHED_MIDDLEWARE = [
     "open_inwoner.cms.cases.views.status.send_contact_confirmation_mail", autospec=True
 )
 @patch.object(
-    ContactmomentenClient,
+    eSuiteVragenService,
     "retrieve_objectcontactmomenten_for_zaak",
     autospec=True,
     return_value=[],
@@ -285,6 +285,10 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         m.get(
             f"{CATALOGI_ROOT}statustypen?zaaktype={self.zaak['zaaktype']}",
             json=paginated_response([self.status_type_new, self.status_type_finish]),
+        )
+        m.get(
+            f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten?object={self.zaak['url']}",
+            json=paginated_response([]),
         )
 
         self.matchers += [

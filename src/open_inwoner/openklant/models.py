@@ -219,3 +219,5 @@ class OpenKlant2Config:
             )
 
         return cls(**config)
+
+    # TODO: add from_openklant_config_model or similar

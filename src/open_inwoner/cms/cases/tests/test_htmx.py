@@ -17,9 +17,9 @@ from zgw_consumers.constants import APITypes
 from open_inwoner.accounts.tests.factories import DigidUserFactory
 from open_inwoner.cms.tests import cms_tools
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.openklant.clients import ContactmomentenClient
 from open_inwoner.openklant.constants import Status
 from open_inwoner.openklant.models import OpenKlantConfig
+from open_inwoner.openklant.services import eSuiteVragenService
 from open_inwoner.openklant.tests.data import CONTACTMOMENTEN_ROOT, KLANTEN_ROOT
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.tests.factories import (
@@ -47,7 +47,7 @@ from open_inwoner.utils.tests.playwright import PlaywrightSyncLiveServerTestCase
 @tag("e2e")
 @requests_mock.Mocker()
 @patch.object(
-    ContactmomentenClient,
+    eSuiteVragenService,
     "retrieve_objectcontactmomenten_for_zaak",
     autospec=True,
     return_value=[],

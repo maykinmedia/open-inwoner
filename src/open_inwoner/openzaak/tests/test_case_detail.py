@@ -28,9 +28,9 @@ from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory, eHerkenningUserFactory
 from open_inwoner.cms.cases.views.status import InnerCaseDetailView, SimpleFile
 from open_inwoner.openklant.api_models import ObjectContactMoment
-from open_inwoner.openklant.clients import ContactmomentenClient
 from open_inwoner.openklant.constants import Status as ContactMomentStatus
 from open_inwoner.openklant.models import OpenKlantConfig
+from open_inwoner.openklant.services import eSuiteVragenService
 from open_inwoner.openklant.tests.factories import make_contactmoment
 from open_inwoner.openzaak.constants import StatusIndicators
 from open_inwoner.openzaak.tests.factories import (
@@ -1434,7 +1434,7 @@ class TestCaseDetailView(
         self.assertContains(response, "uploaded_document_title")
 
     @patch.object(
-        ContactmomentenClient,
+        eSuiteVragenService,
         "retrieve_objectcontactmomenten_for_zaak",
         autospec=True,
         return_value=[],
@@ -1461,7 +1461,7 @@ class TestCaseDetailView(
 
     @set_kvk_branch_number_in_session("1234")
     @patch.object(
-        ContactmomentenClient,
+        eSuiteVragenService,
         "retrieve_objectcontactmomenten_for_zaak",
         autospec=True,
         return_value=[],
@@ -1526,7 +1526,7 @@ class TestCaseDetailView(
         self.assertEqual(self.user, log.content_object)
 
     @patch.object(
-        ContactmomentenClient,
+        eSuiteVragenService,
         "retrieve_objectcontactmomenten_for_zaak",
         autospec=True,
         return_value=[],
@@ -2557,7 +2557,7 @@ class TestCaseDetailView(
         )
 
     @patch.object(
-        ContactmomentenClient,
+        eSuiteVragenService,
         "retrieve_objectcontactmomenten_for_zaak",
         autospec=True,
     )

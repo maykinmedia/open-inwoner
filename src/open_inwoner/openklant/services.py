@@ -1,19 +1,35 @@
 import datetime
 import logging
 import uuid
-from typing import Iterable, Literal, Self
+from typing import Iterable, Literal, NotRequired, Protocol, Self, TypedDict
 
 from django.utils import timezone
 
 import glom
+from ape_pie.client import APIClient
 from attr import dataclass
+from requests.exceptions import RequestException
+from zgw_consumers.api_models.base import factory
+from zgw_consumers.client import build_client as build_zgw_client
+from zgw_consumers.models.services import Service as ServiceConfig
+from zgw_consumers.utils import pagination_helper
 
 from open_inwoner.accounts.choices import NotificationChannelChoice
 from open_inwoner.accounts.models import User
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.openklant.api_models import Klant
-from open_inwoner.openklant.clients import build_klanten_client
-from open_inwoner.openklant.models import OpenKlant2Config
+from open_inwoner.kvk.branches import get_kvk_branch_number
+from open_inwoner.openklant.api_models import (
+    ContactMoment,
+    ContactMomentCreateData,
+    Klant,
+    KlantContactMoment,
+    KlantContactRol,
+    KlantCreateData,
+    ObjectContactMoment,
+)
+from open_inwoner.openklant.models import OpenKlant2Config, OpenKlantConfig
+from open_inwoner.openzaak.api_models import Zaak
+from open_inwoner.utils.api import ClientError, get_json_response
 from open_inwoner.utils.logentry import system_action
 from openklant2.client import OpenKlant2Client
 from openklant2.types.resources.digitaal_adres import DigitaalAdres
@@ -23,79 +39,459 @@ from openklant2.types.resources.klant_contact import (
 )
 from openklant2.types.resources.partij import Partij, PartijListParams
 
-from .wrap import FetchParameters, get_fetch_parameters
-
 logger = logging.getLogger(__name__)
 
 
-def get_or_create_klant_from_request(request):
-    if not (client := build_klanten_client()):
-        return
-
-    if (fetch_params := get_fetch_parameters(request)) is None:
-        return
-
-    if klant := client.retrieve_klant(**fetch_params):
-        msg = "retrieved klant for user"
-    elif klant := client.create_klant(**fetch_params):
-        msg = f"created klant ({klant.klantnummer}) for user"
-    else:
-        return
-
-    system_action(msg, content_object=request.user)
-    return klant
+class BsnFetchParam(TypedDict):
+    user_bsn: str
 
 
-def update_user_from_klant(klant: Klant, user: User):
-    update_data = {}
+class OrgFetchParam(TypedDict):
+    user_kvk_or_rsin: str
+    vestigingsnummer: NotRequired[str]
 
-    if klant.telefoonnummer and klant.telefoonnummer != user.phonenumber:
-        update_data["phonenumber"] = klant.telefoonnummer
 
-    if klant.emailadres and klant.emailadres != user.email:
-        if not User.objects.filter(email__iexact=klant.emailadres).exists():
-            update_data["email"] = klant.emailadres
+FetchParameters = BsnFetchParam | OrgFetchParam
 
-    config = SiteConfiguration.get_solo()
-    if config.enable_notification_channel_choice:
-        if (
-            klant.toestemming_zaak_notificaties_alleen_digitaal is True
-            and user.case_notification_channel != NotificationChannelChoice.digital_only
-        ):
-            update_data[
-                "case_notification_channel"
-            ] = NotificationChannelChoice.digital_only
 
-        elif (
-            klant.toestemming_zaak_notificaties_alleen_digitaal is False
-            and user.case_notification_channel
-            != NotificationChannelChoice.digital_and_post
-        ):
-            update_data[
-                "case_notification_channel"
-            ] = NotificationChannelChoice.digital_and_post
-        else:
-            # This is a guard against the scenario where a deployment is
-            # configured to use an older version of the klanten backend (that
-            # is, one that lacks the toestemmingZaakNotificatiesAlleenDigitaal
-            # field). In such a scenario, the enable_notification_channel_choice
-            # flag really shouldn't be set until the update has completed, but
-            # we suspect this is rare. But to validate that assumption, we log
-            # an error so we can remedy this in case we're wrong.
-            logger.error(
-                "SiteConfig.enable_notification_channel_choice should not be set if"
-                " toestemmingZaakNotificatiesAlleenDigitaal is not available from the klanten backend"
+class KlantenService(Protocol):
+    config: OpenKlantConfig | OpenKlant2Config
+    service_config: ServiceConfig
+    client: APIClient
+
+    def get_fetch_parameters(
+        self,
+        request=None,
+        user: User | None = None,
+        use_vestigingsnummer: bool = False,
+    ) -> FetchParameters | None:
+        """
+        Determine the parameters used to perform Klanten/Contactmomenten fetches
+        """
+        user = user or request.user
+
+        if user.bsn:
+            return {"user_bsn": user.bsn}
+        elif user.kvk:
+            kvk_or_rsin = user.kvk
+            config = OpenKlantConfig.get_solo()
+            if config.use_rsin_for_innNnpId_query_parameter:
+                kvk_or_rsin = user.rsin
+
+            if use_vestigingsnummer:
+                vestigingsnummer = get_kvk_branch_number(request.session)
+                if vestigingsnummer:
+                    return {
+                        "user_kvk_or_rsin": kvk_or_rsin,
+                        "vestigingsnummer": vestigingsnummer,
+                    }
+
+            return {"user_kvk_or_rsin": kvk_or_rsin}
+
+        return None
+
+
+class eSuiteKlantenService(KlantenService):
+    config: OpenKlantConfig
+
+    def __init__(self, config: OpenKlantConfig | None = None):
+        self.config = config or OpenKlantConfig.get_solo()
+        if not self.config:
+            raise RuntimeError("eSuiteKlantenService instance needs a configuration")
+
+        self.service_config = self.config.klanten_service
+        if not self.service_config:
+            raise RuntimeError(
+                "eSuiteKlantenService instance needs a servivce configuration"
             )
 
-    if update_data:
-        for attr, value in update_data.items():
-            setattr(user, attr, value)
-        user.save(update_fields=update_data.keys())
+        self.client = build_zgw_client(service=self.service_config)
+        if not self.client:
+            raise RuntimeError("eSuiteKlantenService instance needs a client")
 
-        system_action(
-            f"updated user from klant API with fields: {', '.join(sorted(update_data.keys()))}",
-            content_object=user,
+    def get_or_create_klant(
+        self, fetch_params: FetchParameters, user: User
+    ) -> tuple[Klant | None, bool]:
+        if klant := self.retrieve_klant(**fetch_params):
+            msg = "retrieved klant for user"
+            created = False
+        elif klant := self.create_klant(**fetch_params):
+            msg = f"created klant ({klant.klantnummer}) for user"
+            created = True
+        else:
+            return None, False
+
+        system_action(msg, content_object=user)
+        return klant, created
+
+    def retrieve_klant(
+        self,
+        user_bsn: str | None = None,
+        user_kvk_or_rsin: str | None = None,
+    ):
+        klanten = None
+        # this is technically a search operation and could return multiple records
+        if user_bsn:
+            klanten = self._retrieve_klanten_for_bsn(user_bsn)
+        elif user_kvk_or_rsin:
+            klanten = self._retrieve_klanten_for_kvk_or_rsin(user_kvk_or_rsin)
+
+        return klanten[0] if klanten else None
+
+    def _retrieve_klanten_for_bsn(self, user_bsn: str) -> list[Klant]:
+        try:
+            response = self.client.get(
+                "klanten",
+                params={"subjectNatuurlijkPersoon__inpBsn": user_bsn},
+            )
+            data = get_json_response(response)
+            all_data = list(pagination_helper(self, data))
+        except (RequestException, ClientError) as e:
+            logger.exception("exception while making request", exc_info=e)
+            return []
+
+        klanten = factory(Klant, all_data)
+
+        return klanten
+
+    def _retrieve_klanten_for_kvk_or_rsin(
+        self, user_kvk_or_rsin: str, *, vestigingsnummer=None
+    ) -> list[Klant]:
+        params = {"subjectNietNatuurlijkPersoon__innNnpId": user_kvk_or_rsin}
+
+        if vestigingsnummer:
+            params = {
+                "subjectVestiging__vestigingsNummer": vestigingsnummer,
+            }
+
+        try:
+            response = self.client.get(
+                "klanten",
+                params=params,
+            )
+            data = get_json_response(response)
+            all_data = list(pagination_helper(self, data))
+        except (RequestException, ClientError) as e:
+            logger.exception("exception while making request", exc_info=e)
+            return []
+
+        klanten = factory(Klant, all_data)
+
+        return klanten
+
+    def create_klant(
+        self,
+        user_bsn: str | None = None,
+        user_kvk_or_rsin: str | None = None,
+        vestigingsnummer: str | None = None,
+        data: KlantCreateData = None,
+    ) -> Klant | None:
+        if user_bsn:
+            return self._create_klant_for_bsn(user_bsn)
+
+        if user_kvk_or_rsin:
+            return self._create_klant_for_kvk_or_rsin(
+                user_kvk_or_rsin, vestigingsnummer=vestigingsnummer
+            )
+
+        try:
+            response = self.post("klanten", json=data)
+            data = get_json_response(response)
+        except (RequestException, ClientError):
+            logger.exception("exception while making request")
+            return
+
+        klant = factory(Klant, data)
+
+        return klant
+
+    def _create_klant_for_bsn(self, user_bsn: str) -> Klant:
+        payload = {"subjectIdentificatie": {"inpBsn": user_bsn}}
+
+        try:
+            response = self.client.post("klanten", json=payload)
+            data = get_json_response(response)
+        except (RequestException, ClientError):
+            logger.exception("exception while making request")
+            return None
+
+        klant = factory(Klant, data)
+
+        return klant
+
+    def _create_klant_for_kvk_or_rsin(
+        self, user_kvk_or_rsin: str, *, vestigingsnummer=None
+    ) -> list[Klant]:
+        payload = {"subjectIdentificatie": {"innNnpId": user_kvk_or_rsin}}
+
+        if vestigingsnummer:
+            payload = {"subjectIdentificatie": {"vestigingsNummer": vestigingsnummer}}
+
+        try:
+            response = self.client.post(
+                "klanten",
+                json=payload,
+            )
+            data = get_json_response(response)
+        except (RequestException, ClientError):
+            logger.exception("exception while making request")
+            return None
+
+        klant = factory(Klant, data)
+
+        return klant
+
+    def update_user_from_klant(self, klant: Klant, user: User):
+        update_data = {}
+
+        if klant.telefoonnummer and klant.telefoonnummer != user.phonenumber:
+            update_data["phonenumber"] = klant.telefoonnummer
+
+        if klant.emailadres and klant.emailadres != user.email:
+            if not User.objects.filter(email__iexact=klant.emailadres).exists():
+                update_data["email"] = klant.emailadres
+
+        config = SiteConfiguration.get_solo()
+        if config.enable_notification_channel_choice:
+            if (
+                klant.toestemming_zaak_notificaties_alleen_digitaal is True
+                and user.case_notification_channel
+                != NotificationChannelChoice.digital_only
+            ):
+                update_data[
+                    "case_notification_channel"
+                ] = NotificationChannelChoice.digital_only
+
+            elif (
+                klant.toestemming_zaak_notificaties_alleen_digitaal is False
+                and user.case_notification_channel
+                != NotificationChannelChoice.digital_and_post
+            ):
+                update_data[
+                    "case_notification_channel"
+                ] = NotificationChannelChoice.digital_and_post
+            else:
+                # This is a guard against the scenario where a deployment is
+                # configured to use an older version of the klanten backend (that
+                # is, one that lacks the toestemmingZaakNotificatiesAlleenDigitaal
+                # field). In such a scenario, the enable_notification_channel_choice
+                # flag really shouldn't be set until the update has completed, but
+                # we suspect this is rare. But to validate that assumption, we log
+                # an error so we can remedy this in case we're wrong.
+                logger.error(
+                    "SiteConfig.enable_notification_channel_choice should not be set if"
+                    " toestemmingZaakNotificatiesAlleenDigitaal is not available from the klanten backend"
+                )
+
+        if update_data:
+            for attr, value in update_data.items():
+                setattr(user, attr, value)
+            user.save(update_fields=update_data.keys())
+
+            system_action(
+                f"updated user from klant API with fields: {', '.join(sorted(update_data.keys()))}",
+                content_object=user,
+            )
+
+    def partial_update_klant(self, klant: Klant, update_data) -> Klant | None:
+        try:
+            response = self.client.patch(url=klant.url, json=update_data)
+            data = get_json_response(response)
+        except (RequestException, ClientError) as e:
+            logger.exception("exception while making request", exc_info=e)
+            return
+
+        klant = factory(Klant, data)
+
+        return klant
+
+
+class eSuiteVragenService(KlantenService):
+    config: OpenKlantConfig
+
+    def __init__(self, config: OpenKlantConfig | None = None):
+        self.config = config or OpenKlantConfig.get_solo()
+        if not self.config:
+            raise RuntimeError("eSuiteVragenService instance needs a configuration")
+
+        self.service_config = self.config.contactmomenten_service
+        if not self.service_config:
+            raise RuntimeError(
+                "eSuiteVragenService instance needs a servivce configuration"
+            )
+
+        self.client = build_zgw_client(service=self.service_config)
+        if not self.client:
+            raise RuntimeError("eSuiteVragenService instance needs a client")
+
+    #
+    # contactmomenten
+    #
+    def retrieve_contactmoment(self, url) -> ContactMoment | None:
+        try:
+            response = self.client.get(url)
+            data = get_json_response(response)
+        except (RequestException, ClientError) as e:
+            logger.exception("exception while making request", exc_info=e)
+            return
+
+        contact_moment = factory(ContactMoment, data)
+
+        return contact_moment
+
+    def create_contactmoment(
+        self,
+        data: ContactMomentCreateData,
+        *,
+        klant: Klant | None = None,
+        rol: str | None = KlantContactRol.BELANGHEBBENDE,
+    ) -> ContactMoment | None:
+        try:
+            response = self.client.post("contactmomenten", json=data)
+            data = get_json_response(response)
+        except (RequestException, ClientError) as e:
+            logger.exception("exception while making request", exc_info=e)
+            return
+
+        contactmoment = factory(ContactMoment, data)
+
+        if klant:
+            # relate contact to klant though a klantcontactmoment
+            try:
+                self.client.post(
+                    "klantcontactmomenten",
+                    json={
+                        "klant": klant.url,
+                        "contactmoment": contactmoment.url,
+                        "rol": rol,
+                    },
+                )
+            except (RequestException, ClientError) as e:
+                logger.exception("exception while making request", exc_info=e)
+                return
+
+        return contactmoment
+
+    #
+    # objectcontactmomenten
+    #
+    def retrieve_objectcontactmoment(
+        self, contactmoment: ContactMoment, object_type: str
+    ) -> ObjectContactMoment | None:
+        ocms = self.retrieve_objectcontactmomenten_for_object_type(
+            contactmoment, object_type
         )
+        if ocms:
+            return ocms[0]
+
+    def retrieve_objectcontactmomenten_for_object_type(
+        self, contactmoment: ContactMoment, object_type: str
+    ) -> list[ObjectContactMoment]:
+
+        moments = self.retrieve_objectcontactmomenten_for_contactmoment(contactmoment)
+
+        # eSuite doesn't implement a `object_type` query parameter
+        ret = [moment for moment in moments if moment.object_type == object_type]
+
+        return ret
+
+    def create_objectcontactmoment(
+        self,
+        contactmoment: ContactMoment,
+        zaak: Zaak,
+        object_type: str = "zaak",
+    ) -> ObjectContactMoment | None:
+        try:
+            response = self.client.post(
+                "objectcontactmomenten",
+                json={
+                    "contactmoment": contactmoment.url,
+                    "object": zaak.url,
+                    "objectType": object_type,
+                },
+            )
+            data = get_json_response(response)
+        except (RequestException, ClientError) as exc:
+            logger.exception("exception while making request", exc_info=exc)
+            return None
+
+        object_contact_moment = factory(ObjectContactMoment, data)
+
+        return object_contact_moment
+
+    def retrieve_objectcontactmomenten_for_zaak(
+        self, zaak: Zaak
+    ) -> list[ObjectContactMoment]:
+        try:
+            response = self.client.get(
+                "objectcontactmomenten", params={"object": zaak.url}
+            )
+            data = get_json_response(response)
+            all_data = list(pagination_helper(self, data))
+        except (RequestException, ClientError) as exc:
+            logger.exception("exception while making request", exc_info=exc)
+            return []
+
+        object_contact_momenten = factory(ObjectContactMoment, all_data)
+
+        # resolve linked resources
+        contactmoment_mapping = {}
+        for ocm in object_contact_momenten:
+            assert ocm.object == zaak.url
+            ocm.object = zaak
+
+            contactmoment_url = ocm.contactmoment
+            if contactmoment_url in contactmoment_mapping:
+                ocm.contactmoment = contactmoment_mapping[contactmoment_url]
+            else:
+                ocm.contactmoment = self.retrieve_contactmoment(contactmoment_url)
+                contactmoment_mapping[contactmoment_url] = ocm.contactmoment
+
+        return object_contact_momenten
+
+    def retrieve_objectcontactmomenten_for_contactmoment(
+        self, contactmoment: ContactMoment
+    ) -> list[ObjectContactMoment]:
+        try:
+            response = self.client.get(
+                "objectcontactmomenten", params={"contactmoment": contactmoment.url}
+            )
+            data = get_json_response(response)
+            all_data = list(pagination_helper(self, data))
+        except (RequestException, ClientError) as e:
+            logger.exception("exception while making request", exc_info=e)
+            return []
+
+        object_contact_momenten = factory(ObjectContactMoment, all_data)
+
+        return object_contact_momenten
+
+    #
+    # klantcontactmomenten
+    #
+    def retrieve_klantcontactmomenten_for_klant(
+        self, klant: Klant
+    ) -> list[KlantContactMoment]:
+        try:
+            response = self.client.get(
+                "klantcontactmomenten",
+                params={"klant": klant.url},
+            )
+            data = get_json_response(response)
+            all_data = list(pagination_helper(self, data))
+        except (RequestException, ClientError) as e:
+            logger.exception("exception while making request", exc_info=e)
+            return []
+
+        klanten_contact_moments = factory(KlantContactMoment, all_data)
+
+        # resolve linked resources
+        for kcm in klanten_contact_moments:
+            assert kcm.klant == klant.url
+            kcm.klant = klant
+            kcm.contactmoment = self.retrieve_contactmoment(kcm.contactmoment)
+
+        return klanten_contact_moments
 
 
 @dataclass(frozen=True)
@@ -147,18 +543,24 @@ class OpenKlant2Question:
         )
 
 
-class OpenKlant2Service:
+class OpenKlant2Service(KlantenService):
     config: OpenKlant2Config
     client: OpenKlant2Client
 
     def __init__(self, config: OpenKlant2Config | None = None):
         self.config = config or OpenKlant2Config.from_django_settings()
+        if not self.config:
+            raise RuntimeError("OpenKlant2Service instance needs a configuration")
+
         self.client = OpenKlant2Client(
             base_url=self.config.api_url,
             request_kwargs={
                 "headers": {"Authorization": f"Token {self.config.api_token}"}
             },
         )
+        if not self.client:
+            raise RuntimeError("OpenKlant2Service instance needs a client")
+
         if mijn_vragen_actor := getattr(config, "mijn_vragen_actor", None):
             self.mijn_vragen_actor = (
                 uuid.UUID(mijn_vragen_actor)
@@ -232,7 +634,7 @@ class OpenKlant2Service:
 
     def get_or_create_partij_for_user(
         self, fetch_params: FetchParameters, user: User
-    ) -> Partij | None:
+    ) -> (Partij | None, bool):
         partij = None
         created = False
 
@@ -334,14 +736,14 @@ class OpenKlant2Service:
 
         if not partij:
             logger.error("Unable to create OpenKlant2 partij for user")
-            return
+            return None, False
 
         msg = (
             f"{'created' if created else 'retrieved'} partij {partij['uuid']} for user"
         )
         system_action(msg, content_object=user)
 
-        return partij
+        return partij, created
 
     def retrieve_digitale_addressen_for_partij(
         self, partij_uuid: str
