@@ -2,6 +2,7 @@ import logging
 from datetime import datetime
 from typing import TypedDict
 
+from django.contrib import messages
 from django.contrib.auth.mixins import AccessMixin
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import redirect
@@ -12,6 +13,7 @@ from django.views import View
 from django.views.generic import TemplateView
 
 from glom import glom
+from requests.exceptions import RequestException
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.openklant.api_models import KlantContactMoment
@@ -35,6 +37,7 @@ from open_inwoner.openklant.wrap import (
 )
 from open_inwoner.openzaak.clients import MultiZgwClientProxy
 from open_inwoner.openzaak.models import ZGWApiGroupConfig
+from open_inwoner.utils.api import ClientError
 from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import CommonPageMixin
 
@@ -175,9 +178,20 @@ class KlantContactMomentListView(
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
 
-        kcms = fetch_klantcontactmomenten(
-            **get_fetch_parameters(self.request, use_vestigingsnummer=True)
-        )
+        try:
+            kcms = fetch_klantcontactmomenten(
+                **get_fetch_parameters(self.request, use_vestigingsnummer=True)
+            )
+        # TODO: replace with custom exception when openklant refactor is done
+        except (RequestException, ClientError):
+            kcms = []
+            messages.add_message(
+                self.request,
+                messages.ERROR,
+                _(
+                    "Het was niet mogelijk om uw vragen op te halen, probeer het later nog eens"
+                ),
+            )
 
         klant_config = OpenKlantConfig.get_solo()
         if exclude_range := klant_config.exclude_contactmoment_kanalen:

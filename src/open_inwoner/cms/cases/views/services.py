@@ -19,6 +19,8 @@ from open_inwoner.openzaak.models import (
 )
 from open_inwoner.openzaak.utils import get_user_fetch_parameters, is_zaak_visible
 
+from .exceptions import ZakenServiceError
+
 logger = logging.getLogger(__name__)
 
 
@@ -131,6 +133,7 @@ class CaseListService:
                         )
                 except BaseException:
                     logger.exception("Error fetching and pre-processing cases")
+                    raise ZakenServiceError
 
         # Sort submissions by date modified
         subs_with_api_group.sort(
@@ -184,6 +187,7 @@ class CaseListService:
                         "Error while fetching and pre-processing cases for API group %s",
                         group_for_task,
                     )
+                    raise
 
         # Ensure stable sorting for pagination and testing purposes
         cases_with_api_group.sort(key=lambda c: all_api_groups.index(c.api_group))

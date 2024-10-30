@@ -1,5 +1,6 @@
 import logging
 
+from open_inwoner.openklant.exceptions import KlantenServiceError
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.openklant.services import eSuiteKlantenService
 
@@ -13,7 +14,7 @@ class KlantenAPIMixin:
 
         try:
             service = eSuiteKlantenService(config=OpenKlantConfig.get_solo())
-        except RuntimeError:
+        except KlantenServiceError:
             logger.error("Error building KlantenService")
             return
 

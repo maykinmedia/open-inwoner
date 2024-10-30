@@ -1,0 +1,2 @@
+class ZakenServiceError(Exception):
+    pass

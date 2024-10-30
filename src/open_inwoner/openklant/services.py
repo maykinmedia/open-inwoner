@@ -27,6 +27,7 @@ from open_inwoner.openklant.api_models import (
     KlantCreateData,
     ObjectContactMoment,
 )
+from open_inwoner.openklant.exceptions import KlantenServiceError
 from open_inwoner.openklant.models import OpenKlant2Config, OpenKlantConfig
 from open_inwoner.openzaak.api_models import Zaak
 from open_inwoner.utils.api import ClientError, get_json_response
@@ -97,17 +98,19 @@ class eSuiteKlantenService(KlantenService):
     def __init__(self, config: OpenKlantConfig | None = None):
         self.config = config or OpenKlantConfig.get_solo()
         if not self.config:
-            raise RuntimeError("eSuiteKlantenService instance needs a configuration")
+            raise KlantenServiceError(
+                "eSuiteKlantenService instance needs a configuration"
+            )
 
         self.service_config = self.config.klanten_service
         if not self.service_config:
-            raise RuntimeError(
+            raise KlantenServiceError(
                 "eSuiteKlantenService instance needs a servivce configuration"
             )
 
         self.client = build_zgw_client(service=self.service_config)
         if not self.client:
-            raise RuntimeError("eSuiteKlantenService instance needs a client")
+            raise KlantenServiceError("eSuiteKlantenService instance needs a client")
 
     def get_or_create_klant(
         self, fetch_params: FetchParameters, user: User
@@ -312,17 +315,19 @@ class eSuiteVragenService(KlantenService):
     def __init__(self, config: OpenKlantConfig | None = None):
         self.config = config or OpenKlantConfig.get_solo()
         if not self.config:
-            raise RuntimeError("eSuiteVragenService instance needs a configuration")
+            raise KlantenServiceError(
+                "eSuiteVragenService instance needs a configuration"
+            )
 
         self.service_config = self.config.contactmomenten_service
         if not self.service_config:
-            raise RuntimeError(
+            raise KlantenServiceError(
                 "eSuiteVragenService instance needs a servivce configuration"
             )
 
         self.client = build_zgw_client(service=self.service_config)
         if not self.client:
-            raise RuntimeError("eSuiteVragenService instance needs a client")
+            raise KlantenServiceError("eSuiteVragenService instance needs a client")
 
     #
     # contactmomenten
@@ -430,7 +435,7 @@ class eSuiteVragenService(KlantenService):
             all_data = list(pagination_helper(self, data))
         except (RequestException, ClientError) as exc:
             logger.exception("exception while making request", exc_info=exc)
-            return []
+            raise KlantenServiceError
 
         object_contact_momenten = factory(ObjectContactMoment, all_data)
 
@@ -550,7 +555,9 @@ class OpenKlant2Service(KlantenService):
     def __init__(self, config: OpenKlant2Config | None = None):
         self.config = config or OpenKlant2Config.from_django_settings()
         if not self.config:
-            raise RuntimeError("OpenKlant2Service instance needs a configuration")
+            raise KlantenServiceError(
+                "OpenKlant2Service instance needs a configuration"
+            )
 
         self.client = OpenKlant2Client(
             base_url=self.config.api_url,
@@ -559,7 +566,7 @@ class OpenKlant2Service(KlantenService):
             },
         )
         if not self.client:
-            raise RuntimeError("OpenKlant2Service instance needs a client")
+            raise KlantenServiceError("OpenKlant2Service instance needs a client")
 
         if mijn_vragen_actor := getattr(config, "mijn_vragen_actor", None):
             self.mijn_vragen_actor = (

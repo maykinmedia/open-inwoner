@@ -114,7 +114,7 @@ class KlantenClient(APIClient):
             all_data = list(pagination_helper(self, data))
         except (RequestException, ClientError) as e:
             logger.exception("exception while making request", exc_info=e)
-            return []
+            raise
 
         klanten = factory(Klant, all_data)
 
@@ -139,7 +139,7 @@ class KlantenClient(APIClient):
             all_data = list(pagination_helper(self, data))
         except (RequestException, ClientError) as e:
             logger.exception("exception while making request", exc_info=e)
-            return []
+            raise
 
         klanten = factory(Klant, all_data)
 
@@ -243,7 +243,7 @@ class ContactmomentenClient(APIClient):
             all_data = list(pagination_helper(self, data))
         except (RequestException, ClientError) as exc:
             logger.exception("exception while making request", exc_info=exc)
-            return []
+            raise
 
         object_contact_momenten = factory(ObjectContactMoment, all_data)
 
