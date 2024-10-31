@@ -43,10 +43,13 @@ class ProductAdminForm(forms.ModelForm):
         widgets = {"content": CKEditorWidget}
 
     categories = forms.ModelMultipleChoiceField(
-        label=_("Allowed admin categories"),
+        label=_("Categories"),
         queryset=Category.objects.all(),
-        required=False,
+        required=True,
         widget=FilteredSelectMultiple(verbose_name=_("Category"), is_stacked=False),
+        error_messages={
+            "required": _("At least one category is required"),
+        },
     )
 
     def __init__(self, *args, **kwargs):
@@ -61,12 +64,6 @@ class ProductAdminForm(forms.ModelForm):
                 self.fields[
                     "categories"
                 ].initial = self.instance.categories.intersection(user_categories)
-
-    def clean(self):
-        cleaned_data = super().clean()
-        if len(cleaned_data["categories"]) == 0:
-            self.add_error("categories", _("At least one category is required"))
-        return cleaned_data
 
     def _save_m2m(self):
         # remember this before we run regular _save_m2m()
