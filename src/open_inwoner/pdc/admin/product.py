@@ -43,9 +43,9 @@ class ProductAdminForm(forms.ModelForm):
         widgets = {"content": CKEditorWidget}
 
     categories = forms.ModelMultipleChoiceField(
-        label=_("Allowed admin categories"),
+        label=_("Categories"),
         queryset=Category.objects.all(),
-        required=False,
+        required=True,
         widget=FilteredSelectMultiple(verbose_name=_("Category"), is_stacked=False),
     )
 
