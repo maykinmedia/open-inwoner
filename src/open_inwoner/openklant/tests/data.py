@@ -459,14 +459,14 @@ class MockAPICreateData(MockAPIData):
 
         self.matchers = []
 
-    def install_mocks_anon_with_klant(self, m) -> "MockAPICreateData":
+    def install_mocks_anon(self, m) -> "MockAPICreateData":
         self.matchers = [
-            m.post(f"{KLANTEN_ROOT}klanten", json=self.klant_bsn, status_code=201),
             m.post(
                 f"{CONTACTMOMENTEN_ROOT}contactmomenten",
                 json=self.contactmoment,
                 status_code=201,
             ),
+            m.post(f"{KLANTEN_ROOT}klanten", json=self.klant_bsn, status_code=201),
             m.post(
                 f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten",
                 json=self.klant_contactmoment,
