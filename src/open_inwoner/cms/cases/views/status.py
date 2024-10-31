@@ -26,6 +26,7 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 from zgw_consumers.api_models.constants import RolOmschrijving
 
 from open_inwoner.mail.service import send_contact_confirmation_mail
+from open_inwoner.openklant.exceptions import KlantenServiceError
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.openklant.services import eSuiteKlantenService, eSuiteVragenService
 from open_inwoner.openklant.wrap import (
@@ -165,14 +166,22 @@ class InnerCaseDetailView(
             # questions/E-suite contactmomenten
             try:
                 service = eSuiteVragenService(config=openklant_config)
-            except RuntimeError:
-                logger.error("Failed to build eSuiteVragenService")
-                objectcontactmomenten = []
-            else:
                 objectcontactmomenten = service.retrieve_objectcontactmomenten_for_zaak(
                     self.case
                 )
-
+            except KlantenServiceError:
+                logger.error(
+                    "There was a problem fetching objectcontactmomenten with eSuiteVragenService for %s"
+                    % self.case
+                )
+                objectcontactmomenten = []
+                messages.add_message(
+                    self.request,
+                    messages.ERROR,
+                    _(
+                        "Het was niet mogelijk om uw vragen op te halen, probeer het later nog eens"
+                    ),
+                )
             questions = []
             for ocm in objectcontactmomenten:
                 question = getattr(ocm, "contactmoment", None)

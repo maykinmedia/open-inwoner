@@ -130,7 +130,7 @@ class ZakenClient(ZgwAPIClient):
                     headers=CRS_HEADERS,
                 )
             )
-        except (RequestException, ClientError) as e:
+        except (RequestException, ClientError, Exception) as e:
             logger.exception("exception while making request", exc_info=e)
             return []
 

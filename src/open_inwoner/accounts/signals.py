@@ -8,6 +8,7 @@ from django.utils.translation import gettext as _
 
 from open_inwoner.haalcentraal.models import HaalCentraalConfig
 from open_inwoner.haalcentraal.utils import update_brp_data_in_db
+from open_inwoner.openklant.exceptions import KlantenServiceError
 from open_inwoner.openklant.models import OpenKlant2Config
 from open_inwoner.openklant.services import OpenKlant2Service, eSuiteKlantenService
 from open_inwoner.utils.logentry import user_action
@@ -42,7 +43,7 @@ def update_user_from_klant_on_login(sender, user, request, *args, **kwargs):
     if use_ok2 and (openklant2_config := OpenKlant2Config.from_django_settings()):
         try:
             service = OpenKlant2Service(config=openklant2_config)
-        except RuntimeError:
+        except KlantenServiceError:
             logger.error("OpenKlant2 service failed to build")
             return
 
@@ -58,7 +59,7 @@ def update_user_from_klant_on_login(sender, user, request, *args, **kwargs):
     # eSuite
     try:
         service = eSuiteKlantenService()
-    except RuntimeError:
+    except KlantenServiceError:
         logger.error("eSuiteKlantenService failed to build")
         return
 

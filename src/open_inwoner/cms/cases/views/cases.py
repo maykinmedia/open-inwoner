@@ -1,6 +1,7 @@
 import logging
 from typing import Sequence
 
+from django.contrib import messages
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -15,6 +16,7 @@ from open_inwoner.openzaak.types import UniformCase
 from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import CommonPageMixin
 
+from .exceptions import ZakenServiceError
 from .mixins import CaseAccessMixin, CaseLogMixin, OuterCaseAccessMixin
 from .services import CaseFilterFormOption, CaseListService
 
@@ -70,8 +72,19 @@ class InnerCaseListView(
         context["filter_form_enabled"] = config.zaken_filter_enabled
 
         # update ctx with open submissions and cases (possibly fitered)
-        open_submissions: Sequence[UniformCase] = case_service.get_submissions()
-        preprocessed_cases: Sequence[UniformCase] = case_service.get_cases()
+        open_submissions = []
+        preprocessed_cases = []
+        try:
+            open_submissions: Sequence[UniformCase] = case_service.get_submissions()
+            preprocessed_cases: Sequence[UniformCase] = case_service.get_cases()
+        except ZakenServiceError:
+            messages.add_message(
+                self.request,
+                messages.ERROR,
+                _(
+                    "Het was niet mogelijk om uw anvragen op te halen, probeer het later nog eens"
+                ),
+            )
 
         if config.zaken_filter_enabled:
             case_status_frequencies = case_service.get_case_status_frequencies()

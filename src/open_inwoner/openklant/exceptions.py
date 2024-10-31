@@ -1,0 +1,2 @@
+class KlantenServiceError(Exception):
+    pass
