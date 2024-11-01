@@ -21,6 +21,7 @@ from open_inwoner.openklant.models import (
     KlantContactMomentAnswer,
     OpenKlantConfig,
 )
+from open_inwoner.openklant.services import eSuiteVragenService
 from open_inwoner.openklant.tests.data import MockAPIReadData
 from open_inwoner.openzaak.models import OpenZaakConfig, ZGWApiGroupConfig
 from open_inwoner.utils.test import (
@@ -34,9 +35,7 @@ from .factories import KlantContactMomentAnswerFactory
 
 
 @requests_mock.Mocker()
-@patch(
-    "open_inwoner.accounts.views.contactmoments.get_kcm_answer_mapping", autospec=True
-)
+@patch.object(eSuiteVragenService, "get_kcm_answer_mapping", autospec=True)
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 @modify_settings(
     MIDDLEWARE={"remove": ["open_inwoner.kvk.middleware.KvKLoginMiddleware"]}
@@ -84,13 +83,12 @@ class ContactMomentViewsTestCase(
             {
                 "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),
                 "channel": cm_data["kanaal"].title(),
-                "text": cm_data["tekst"],
-                "onderwerp": self.contactformsubject.subject,
-                "antwoord": cm_data["antwoord"],
-                "identificatie": cm_data["identificatie"],
-                "type": cm_data["type"],
-                "status": Status.afgehandeld.label,
-                "url": detail_url,
+                "question_text": cm_data["tekst"],
+                "subject": self.contactformsubject.subject,
+                "answer_text": cm_data["antwoord"],
+                "identification": cm_data["identificatie"],
+                "status": str(Status.afgehandeld.label),
+                "case_detail_url": detail_url,
                 "new_answer_available": False,
             },
         )
@@ -141,13 +139,12 @@ class ContactMomentViewsTestCase(
             {
                 "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),
                 "channel": cm_data["kanaal"].title(),
-                "text": cm_data["tekst"],
-                "onderwerp": self.contactformsubject.subject,
-                "antwoord": cm_data["antwoord"],
-                "identificatie": cm_data["identificatie"],
-                "type": cm_data["type"],
-                "status": Status.afgehandeld.label,
-                "url": detail_url,
+                "question_text": cm_data["tekst"],
+                "subject": self.contactformsubject.subject,
+                "answer_text": cm_data["antwoord"],
+                "identification": cm_data["identificatie"],
+                "status": str(Status.afgehandeld.label),
+                "case_detail_url": detail_url,
                 "new_answer_available": True,
             },
         )
@@ -195,15 +192,16 @@ class ContactMomentViewsTestCase(
                 self.assertEqual(
                     kcms[0],
                     {
-                        "registered_date": registratiedatum,
+                        "registered_date": datetime.fromisoformat(
+                            cm_data["registratiedatum"]
+                        ),
                         "channel": cm_data["kanaal"].title(),
-                        "text": cm_data["tekst"],
-                        "onderwerp": self.contactformsubject.subject,
-                        "antwoord": cm_data["antwoord"],
-                        "identificatie": cm_data["identificatie"],
-                        "type": cm_data["type"],
-                        "status": Status.afgehandeld.label,
-                        "url": detail_url,
+                        "question_text": cm_data["tekst"],
+                        "subject": self.contactformsubject.subject,
+                        "answer_text": cm_data["antwoord"],
+                        "identification": cm_data["identificatie"],
+                        "status": str(Status.afgehandeld.label),
+                        "case_detail_url": detail_url,
                         "new_answer_available": False,
                     },
                 )
@@ -241,15 +239,16 @@ class ContactMomentViewsTestCase(
                 self.assertEqual(
                     kcms[0],
                     {
-                        "registered_date": registratiedatum,
+                        "registered_date": datetime.fromisoformat(
+                            cm_data["registratiedatum"]
+                        ),
                         "channel": cm_data["kanaal"].title(),
-                        "text": cm_data["tekst"],
-                        "onderwerp": self.contactformsubject.subject,
-                        "antwoord": cm_data["antwoord"],
-                        "identificatie": cm_data["identificatie"],
-                        "type": cm_data["type"],
-                        "status": Status.afgehandeld.label,
-                        "url": detail_url,
+                        "question_text": cm_data["tekst"],
+                        "subject": self.contactformsubject.subject,
+                        "answer_text": cm_data["antwoord"],
+                        "identification": cm_data["identificatie"],
+                        "status": str(Status.afgehandeld.label),
+                        "case_detail_url": detail_url,
                         "new_answer_available": False,
                     },
                 )
@@ -292,13 +291,12 @@ class ContactMomentViewsTestCase(
             {
                 "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),
                 "channel": cm_data["kanaal"].title(),
-                "text": cm_data["tekst"],
-                "onderwerp": self.contactformsubject.subject,
-                "antwoord": cm_data["antwoord"],
-                "identificatie": cm_data["identificatie"],
-                "type": cm_data["type"],
-                "status": Status.afgehandeld.label,
-                "url": detail_url,
+                "question_text": cm_data["tekst"],
+                "subject": self.contactformsubject.subject,
+                "answer_text": cm_data["antwoord"],
+                "identification": cm_data["identificatie"],
+                "status": str(Status.afgehandeld.label),
+                "case_detail_url": detail_url,
                 "new_answer_available": False,
             },
         )
@@ -323,13 +321,12 @@ class ContactMomentViewsTestCase(
             {
                 "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),
                 "channel": cm_data["kanaal"].title(),
-                "text": cm_data["tekst"],
-                "onderwerp": self.contactformsubject.subject,
-                "antwoord": cm_data["antwoord"],
-                "identificatie": cm_data["identificatie"],
-                "type": cm_data["type"],
-                "status": Status.afgehandeld.label,
-                "url": detail_url,
+                "question_text": cm_data["tekst"],
+                "subject": self.contactformsubject.subject,
+                "answer_text": cm_data["antwoord"],
+                "identification": cm_data["identificatie"],
+                "status": str(Status.afgehandeld.label),
+                "case_detail_url": detail_url,
                 "new_answer_available": False,
             },
         )
@@ -387,13 +384,12 @@ class ContactMomentViewsTestCase(
             {
                 "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),
                 "channel": cm_data["kanaal"].title(),
-                "text": cm_data["tekst"],
-                "onderwerp": self.contactformsubject.subject,
-                "antwoord": cm_data["antwoord"],
-                "identificatie": cm_data["identificatie"],
-                "type": cm_data["type"],
-                "status": Status.afgehandeld.label,
-                "url": detail_url,
+                "question_text": cm_data["tekst"],
+                "subject": self.contactformsubject.subject,
+                "answer_text": cm_data["antwoord"],
+                "identification": cm_data["identificatie"],
+                "status": str(Status.afgehandeld.label),
+                "case_detail_url": detail_url,
                 "new_answer_available": False,
             },
         )
@@ -448,13 +444,12 @@ class ContactMomentViewsTestCase(
             {
                 "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),
                 "channel": cm_data["kanaal"].title(),
-                "text": cm_data["tekst"],
-                "onderwerp": ContactFormSubject.objects.first().subject,
-                "antwoord": cm_data["antwoord"],
-                "identificatie": cm_data["identificatie"],
-                "type": cm_data["type"],
-                "status": Status.afgehandeld.label,
-                "url": detail_url,
+                "question_text": cm_data["tekst"],
+                "subject": self.contactformsubject.subject,
+                "answer_text": cm_data["antwoord"],
+                "identification": cm_data["identificatie"],
+                "status": str(Status.afgehandeld.label),
+                "case_detail_url": detail_url,
                 "new_answer_available": False,
             },
         )
@@ -485,13 +480,12 @@ class ContactMomentViewsTestCase(
             {
                 "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),
                 "channel": cm_data["kanaal"].title(),
-                "text": cm_data["tekst"],
-                "onderwerp": self.contactformsubject.subject_code,
-                "antwoord": cm_data["antwoord"],
-                "identificatie": cm_data["identificatie"],
-                "type": cm_data["type"],
-                "status": Status.afgehandeld.label,
-                "url": detail_url,
+                "question_text": cm_data["tekst"],
+                "subject": self.contactformsubject.subject_code,
+                "answer_text": cm_data["antwoord"],
+                "identification": cm_data["identificatie"],
+                "status": str(Status.afgehandeld.label),
+                "case_detail_url": detail_url,
                 "new_answer_available": False,
             },
         )
@@ -526,15 +520,16 @@ class ContactMomentViewsTestCase(
                 self.assertEqual(
                     kcm,
                     {
-                        "registered_date": registratiedatum,
+                        "registered_date": datetime.fromisoformat(
+                            cm_data["registratiedatum"]
+                        ),
                         "channel": cm_data["kanaal"].title(),
-                        "text": cm_data["tekst"],
-                        "onderwerp": self.contactformsubject.subject,
-                        "antwoord": cm_data["antwoord"],
-                        "identificatie": cm_data["identificatie"],
-                        "type": cm_data["type"],
-                        "status": Status.afgehandeld.label,
-                        "url": detail_url,
+                        "question_text": cm_data["tekst"],
+                        "subject": self.contactformsubject.subject,
+                        "answer_text": cm_data["antwoord"],
+                        "identification": cm_data["identificatie"],
+                        "status": str(Status.afgehandeld.label),
+                        "case_detail_url": detail_url,
                         "new_answer_available": False,
                     },
                 )
@@ -566,15 +561,16 @@ class ContactMomentViewsTestCase(
                 self.assertEqual(
                     kcm,
                     {
-                        "registered_date": registratie_datum,
+                        "registered_date": datetime.fromisoformat(
+                            cm_data["registratiedatum"]
+                        ),
                         "channel": cm_data["kanaal"].title(),
-                        "text": cm_data["tekst"],
-                        "onderwerp": self.contactformsubject.subject,
-                        "antwoord": cm_data["antwoord"],
-                        "identificatie": cm_data["identificatie"],
-                        "type": cm_data["type"],
-                        "status": Status.afgehandeld.label,
-                        "url": detail_url,
+                        "question_text": cm_data["tekst"],
+                        "subject": self.contactformsubject.subject,
+                        "answer_text": cm_data["antwoord"],
+                        "identification": cm_data["identificatie"],
+                        "status": str(Status.afgehandeld.label),
+                        "case_detail_url": detail_url,
                         "new_answer_available": False,
                     },
                 )
