@@ -416,10 +416,14 @@ class QuestionAnswerTestCase(Openklant2ServiceTestCase):
         self.assertEqual(
             question,
             OpenKlant2Question(
+                url=klantcontact["url"],
                 answer=None,
                 nummer=klantcontact["nummer"],
                 question_kcm_uuid=klantcontact["uuid"],
                 question="A question asked by Alice",
+                onderwerp="Important questions",
+                kanaal=self.openklant2_config.mijn_vragen_kanaal,
+                taal="nld",
                 plaatsgevonden_op=QUESTION_DATE,
             ),
         )

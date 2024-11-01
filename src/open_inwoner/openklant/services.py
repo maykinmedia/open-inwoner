@@ -1,8 +1,10 @@
 import datetime
 import logging
 import uuid
+from datetime import timedelta
 from typing import Iterable, Literal, NotRequired, Protocol, Self
 
+from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -10,7 +12,7 @@ from django.utils.translation import gettext_lazy as _
 import glom
 from ape_pie.client import APIClient
 from attr import dataclass
-from pydantic import TypeAdapter
+from pydantic import BaseModel, ConfigDict, TypeAdapter
 from requests.exceptions import RequestException
 from typing_extensions import TypedDict
 from zgw_consumers.api_models.base import factory
@@ -31,7 +33,7 @@ from open_inwoner.openklant.api_models import (
     KlantCreateData,
     ObjectContactMoment,
 )
-from open_inwoner.openklant.constants import Status
+from open_inwoner.openklant.constants import KlantenServiceType, Status
 from open_inwoner.openklant.models import (
     ContactFormSubject,
     KlantContactMomentAnswer,
@@ -49,6 +51,7 @@ from open_inwoner.openzaak.clients import MultiZgwClientProxy
 from open_inwoner.openzaak.models import ZGWApiGroupConfig
 from open_inwoner.utils.api import ClientError, get_json_response
 from open_inwoner.utils.logentry import system_action
+from open_inwoner.utils.time import instance_is_new
 from openklant2.client import OpenKlant2Client
 from openklant2.types.resources.digitaal_adres import DigitaalAdres
 from openklant2.types.resources.klant_contact import (
@@ -80,15 +83,17 @@ class ZaakWithApiGroup:
 
 class Question(TypedDict):
     identification: str
+    source_url: str  # points to contactmoment or klantcontact
     subject: str
     registered_date: datetime.datetime
     question_text: str
     answer_text: str | None
     status: str
-
-    new_answer_available: bool
-    case_detail_url: str
     channel: str
+    case_detail_url: str | None = None
+
+    api_service: KlantenServiceType
+    new_answer_available: bool = False
 
 
 QuestionValidator = TypeAdapter(Question)
@@ -593,7 +598,7 @@ class eSuiteVragenService(KlantenService):
         if isinstance(kcm.contactmoment, str):
             raise ValueError("Received unresolved contactmoment")
 
-        return {
+        question_data = {
             "answer_text": kcm.contactmoment.antwoord,
             "identification": kcm.contactmoment.identificatie,
             "question_text": kcm.contactmoment.tekst,
@@ -607,7 +612,10 @@ class eSuiteVragenService(KlantenService):
                 "cases:contactmoment_detail", kwargs={"kcm_uuid": kcm.uuid}
             ),
             "channel": kcm.contactmoment.kanaal.title(),
+            "source_url": kcm.contactmoment.url,
+            "api_service": KlantenServiceType.ESUITE,
         }
+        return QuestionValidator.validate_python(question_data)
 
     def fetch_klantcontactmomenten(
         self,
@@ -700,6 +708,9 @@ class OpenKlant2Answer:
     nummer: str
     plaatsgevonden_op: datetime.datetime
 
+    # metadata
+    viewed: bool = False
+
     @classmethod
     def from_klantcontact(cls, klantcontact: KlantContact) -> Self:
         if klantcontact["inhoud"] is None:
@@ -716,13 +727,19 @@ class OpenKlant2Answer:
 
 
 @dataclass(frozen=True)
-class OpenKlant2Question:
+class OpenKlant2Question(BaseModel):
+    url: str
     question: str
     question_kcm_uuid: str
+    onderwerp: str
+    kanaal: str
+    taal: str
     nummer: str
     plaatsgevonden_op: datetime.datetime
 
     answer: OpenKlant2Answer | None = None
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @classmethod
     def from_klantcontact_and_answer(
@@ -734,11 +751,15 @@ class OpenKlant2Question:
         return cls(
             question=klantcontact["inhoud"],
             question_kcm_uuid=klantcontact["uuid"],
+            onderwerp=klantcontact["onderwerp"],
+            kanaal=klantcontact["kanaal"],
+            taal=klantcontact["taal"],
             nummer=klantcontact["nummer"],
             plaatsgevonden_op=datetime.datetime.fromisoformat(
                 klantcontact["plaatsgevondenOp"]
             ),
             answer=answer,
+            url=klantcontact["url"],
         )
 
 
@@ -1144,6 +1165,10 @@ class OpenKlant2Service(KlantenService):
     def klantcontacten_for_partij(
         self, partij_uuid: str, *, kanaal: str | None = None
     ) -> Iterable[KlantContact]:
+        # There is currently no good way to filter the klantcontacten by a
+        # Partij (see https://github.com/maykinmedia/open-klant/issues/256). So
+        # unfortunately, we have to fetch all rows and do the filtering client
+        # side.
         params: ListKlantContactParams = {
             "expand": [
                 "leiddeTotInterneTaken",
@@ -1151,28 +1176,9 @@ class OpenKlant2Service(KlantenService):
                 "hadBetrokkenen",
                 "hadBetrokkenen.wasPartij",
             ],
+            "kanaal": kanaal or self.config.mijn_vragen_kanaal,
         }
-        if kanaal:
-            params["kanaal"] = kanaal
-
         klantcontacten = self.client.klant_contact.list_iter(params=params)
-
-        # There is currently no good way to filter the klantcontacten by a
-        # Partij (see https://github.com/maykinmedia/open-klant/issues/256). So
-        # unfortunately, we have to fetch all rows and do the filtering client
-        # side.
-        klantcontacten = self.client.klant_contact.list_iter(
-            params={
-                "expand": [
-                    "leiddeTotInterneTaken",
-                    "gingOverOnderwerpobjecten",
-                    "hadBetrokkenen",
-                    "hadBetrokkenen.wasPartij",
-                ],
-                "kanaal": self.config.mijn_vragen_kanaal,
-            }
-        )
-
         klantcontacten_for_partij = filter(
             lambda row: partij_uuid
             in glom.glom(
@@ -1237,3 +1243,55 @@ class OpenKlant2Service(KlantenService):
 
         question_objs.sort(key=lambda o: o.plaatsgevonden_op)
         return question_objs
+
+    def list_questions(
+        self, fetch_params: FetchParameters, user: User
+    ) -> list[Question]:
+        if bsn := fetch_params.get("user_bsn"):
+            partij = self.find_persoon_for_bsn(bsn)
+        elif kvk_or_rsin := fetch_params.get("user_kvk_or_rsin"):
+            partij = self.find_organisatie_for_kvk(kvk_or_rsin)
+
+        questions = self.questions_for_partij(partij_uuid=partij["uuid"])
+        return self._reformat_questions(questions, user)
+
+    # TODO: handle `status` + `new_answer_available`
+    # `case_detail_url`: will be handled in integration of detail view
+    # `status`: eSuite has three: "nieuw", "in behandeling", "afgehandeld"
+    def _reformat_questions(
+        self,
+        questions_ok2: list[OpenKlant2Question],
+        user: User,
+    ) -> list[Question]:
+        questions = []
+        for q in questions_ok2:
+            answer_metadata = KlantContactMomentAnswer.objects.get_or_create(
+                user=user, contactmoment_url=q.url
+            )
+            question = {
+                "identification": q.nummer,
+                "source_url": q.url,
+                "subject": q.onderwerp,
+                "registered_date": q.plaatsgevonden_op,
+                "question_text": q.question,
+                "answer_text": q.answer.answer,
+                "status": "",
+                "channel": q.kanaal,
+                "case_detail_url": "",
+                "api_service": KlantenServiceType.OPENKLANT2,
+                "new_answer_available": self._has_new_answer_available(
+                    q, answer=answer_metadata
+                ),
+            }
+            questions.append(question)
+        return [QuestionValidator.validate_python(q) for q in questions]
+
+    def _has_new_answer_available(
+        self, question: Question, answer: KlantContactMomentAnswer
+    ) -> bool:
+        answer_is_recent = instance_is_new(
+            question.answer,
+            "plaatsgevonden_op",
+            timedelta(days=settings.CONTACTMOMENT_NEW_DAYS),
+        )
+        return answer_is_recent and not answer.is_seen

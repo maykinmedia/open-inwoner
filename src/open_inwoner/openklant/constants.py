@@ -1,3 +1,5 @@
+import enum
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -17,3 +19,8 @@ class Status(models.TextChoices):
             if default:
                 return default
             return str(value).replace("_", " ").title()
+
+
+class KlantenServiceType(enum.Enum):
+    ESUITE = "esuite"
+    OPENKLANT2 = "openklant2"
