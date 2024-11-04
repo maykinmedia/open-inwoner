@@ -4,7 +4,7 @@ import django.db.models.deletion
 from django.conf import settings
 from django.db import migrations, models
 
-import django_better_admin_arrayfield.models.fields
+import django_jsonform.models.fields
 
 
 class Migration(migrations.Migration):
@@ -77,7 +77,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="synonym",
             name="synonyms",
-            field=django_better_admin_arrayfield.models.fields.ArrayField(
+            field=django_jsonform.models.fields.ArrayField(
                 base_field=models.TextField(verbose_name="Synonyms"),
                 help_text="Words-synonyms concerning the term",
                 size=None,

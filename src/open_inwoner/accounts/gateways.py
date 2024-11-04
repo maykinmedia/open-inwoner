@@ -15,10 +15,8 @@ class GatewayError(Exception):
     text message.
     """
 
-    pass
 
-
-class Gateway(object):
+class Gateway:
     def get_message(self, token):
         msg = getattr(settings, "ACCOUNTS_SMS_MESSAGE", "Your token is: {token}")
         return msg.format(token=token)

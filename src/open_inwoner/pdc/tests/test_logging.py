@@ -176,6 +176,10 @@ class TestCategoryLogging(WebTest):
         form = response.forms["category_form"]
         form["name"] = self.category.name
         form["slug"] = self.category.slug
+        # django-jsonform requires JS to work properly and with Webtest the default
+        # value for ArrayFields is an empty string, causing it crash to when trying to parse
+        # that value as JSON
+        form["zaaktypen"] = "[]"
         form.submit()
         category = Category.objects.filter(slug=self.category.slug).first()
         log_entry = TimelineLog.objects.last()
@@ -201,6 +205,10 @@ class TestCategoryLogging(WebTest):
         )
         form = response.forms["category_form"]
         form["description"] = "Updated description"
+        # django-jsonform requires JS to work properly and with Webtest the default
+        # value for ArrayFields is an empty string, causing it crash to when trying to parse
+        # that value as JSON
+        form["zaaktypen"] = "[]"
         form.submit()
         log_entry = TimelineLog.objects.last()
 
@@ -212,7 +220,7 @@ class TestCategoryLogging(WebTest):
         self.assertEqual(
             log_entry.extra_data,
             {
-                "message": "Omschrijving, Ten opzichte van and Zaaktypen gewijzigd.",
+                "message": "Omschrijving and Ten opzichte van gewijzigd.",
                 "action_flag": [2, "Change"],
                 "content_object_repr": category.name,
             },

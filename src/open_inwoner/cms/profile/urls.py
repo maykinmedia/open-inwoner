@@ -17,12 +17,15 @@ from open_inwoner.accounts.views import (
     DocumentPrivateMediaView,
     EditProfileView,
     InviteAcceptView,
+    MyCategoriesView,
     MyDataView,
     MyNotificationsView,
     MyProfileView,
     NecessaryFieldsUserView,
+    UserAppointmentsView,
 )
 from open_inwoner.accounts.views.actions import ActionDeleteView
+from open_inwoner.accounts.views.registration import EmailVerificationUserView
 
 app_name = "profile"
 
@@ -90,6 +93,7 @@ urlpatterns = [
     path("actions/", include(action_patterns)),
     path("contacts/", include(contact_patterns)),
     path("documenten/", include(documents_patterns)),
+    path("onderwerpen/", MyCategoriesView.as_view(), name="categories"),
     path("notificaties/", MyNotificationsView.as_view(), name="notifications"),
     path("mydata/", MyDataView.as_view(), name="data"),
     path("edit/", EditProfileView.as_view(), name="edit"),
@@ -99,5 +103,11 @@ urlpatterns = [
         NecessaryFieldsUserView.as_view(),
         name="registration_necessary",
     ),
+    path(
+        "register/email/verification/",
+        EmailVerificationUserView.as_view(),
+        name="email_verification_user",
+    ),
+    path("appointments", UserAppointmentsView.as_view(), name="appointments"),
     path("", MyProfileView.as_view(), name="detail"),
 ]

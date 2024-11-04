@@ -1,16 +1,15 @@
 .wysiwyg {
-  font-family: var(--font-family-body);
+  font-family: var(--utrecht-document-font-family);
 
   a {
     display: inline-flex;
     flex-direction: row;
     align-items: center;
-    font-size: var(--font-size-body);
-    line-height: var(--font-line-height-body);
+    font-size: var(--utrecht-document-font-size);
+    line-height: var(--utrecht-document-line-height);
     text-decoration: none;
     gap: var(--spacing-small);
     color: var(--color-secondary);
-
     word-wrap: break-word;
   }
 
@@ -20,11 +19,11 @@
   h4,
   h5,
   h6 {
-    font-family: var(--font-family-heading);
+    font-family: var(--utrecht-heading-font-family);
   }
 
   ul {
     margin: 0;
-    padding: 0 0 0 var(--font-size-body);
+    padding: 0 0 0 var(--utrecht-document-font-size);
   }
 }

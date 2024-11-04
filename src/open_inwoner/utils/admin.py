@@ -1,17 +1,26 @@
+import json
+import logging
+
 from django.contrib import admin
 from django.contrib.admin.models import ADDITION, CHANGE, DELETION
 from django.contrib.contenttypes.models import ContentType
-from django.urls import NoReverseMatch, reverse
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import NoReverseMatch, path, reverse
 from django.utils.html import escape, format_html
 from django.utils.translation import gettext as _
 
+from django_celery_beat.admin import PeriodicTaskAdmin as _PeriodicTaskAdmin
+from django_celery_beat.models import PeriodicTask
 from import_export.admin import ExportMixin
 from import_export.formats import base_formats
 from timeline_logger.admin import TimelineLogAdmin
 from timeline_logger.models import TimelineLog
 from timeline_logger.resources import TimelineLogResource
 
+from open_inwoner.celery import app
 from open_inwoner.utils.logentry import LOG_ACTIONS
+
+logger = logging.getLogger(__name__)
 
 
 class LogActionListFilter(admin.SimpleListFilter):
@@ -145,3 +154,43 @@ class CustomTimelineLogAdmin(ExportMixin, TimelineLogAdmin):
 
 admin.site.unregister(TimelineLog)
 admin.site.register(TimelineLog, CustomTimelineLogAdmin)
+
+
+class PeriodicTaskAdmin(_PeriodicTaskAdmin):
+    list_display = _PeriodicTaskAdmin.list_display + ("detail_url",)
+
+    def get_urls(self):
+        urls = super().get_urls()
+        return [path("<int:task_id>/run/", self.run_task, name="run_task")] + urls
+
+    def run_task(self, request, task_id):
+        periodic_task = get_object_or_404(self.model, pk=task_id)
+
+        task_kwargs = json.loads(periodic_task.kwargs)
+        task_args = json.loads(periodic_task.args)
+
+        app.send_task(periodic_task.task, args=task_args, kwargs=task_kwargs)
+
+        return redirect(reverse("admin:celery_monitor_taskstate_changelist"))
+
+    def detail_url(self, instance):
+        url = reverse("admin:run_task", kwargs={"task_id": instance.pk})
+        response = format_html(
+            "<a class='button' href={url}>{label}</a>", url=url, label=_("Start taak")
+        )
+        return response
+
+
+admin.site.unregister(PeriodicTask)
+admin.site.register(PeriodicTask, PeriodicTaskAdmin)
+
+
+class ReadOnlyAdminMixin:
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False

@@ -1,12 +1,12 @@
 import logging
-from typing import List, Optional
 
 from ape_pie.client import APIClient
 from requests.exceptions import RequestException
 from zgw_consumers.api_models.base import factory
-from zgw_consumers.client import build_client as _build_client
+from zgw_consumers.client import build_client
 from zgw_consumers.utils import pagination_helper
 
+from open_inwoner.openzaak.api_models import Zaak
 from open_inwoner.utils.api import ClientError, get_json_response
 
 from .api_models import (
@@ -24,21 +24,71 @@ logger = logging.getLogger(__name__)
 
 
 class KlantenClient(APIClient):
-    def create_klant(self, data: KlantCreateData) -> Optional[Klant]:
+    def create_klant(
+        self,
+        user_bsn: str | None = None,
+        user_kvk_or_rsin: str | None = None,
+        vestigingsnummer: str | None = None,
+        data: KlantCreateData = None,
+    ) -> Klant | None:
+        if user_bsn:
+            return self._create_klant_for_bsn(user_bsn)
+
+        if user_kvk_or_rsin:
+            return self._create_klant_for_kvk_or_rsin(
+                user_kvk_or_rsin, vestigingsnummer=vestigingsnummer
+            )
+
         try:
             response = self.post("klanten", json=data)
             data = get_json_response(response)
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception("exception while making request")
             return
 
         klant = factory(Klant, data)
 
         return klant
 
+    def _create_klant_for_bsn(self, user_bsn: str) -> Klant:
+        payload = {"subjectIdentificatie": {"inpBsn": user_bsn}}
+
+        try:
+            response = self.post("klanten", json=payload)
+            data = get_json_response(response)
+        except (RequestException, ClientError):
+            logger.exception("exception while making request")
+            return None
+
+        klant = factory(Klant, data)
+
+        return klant
+
+    def _create_klant_for_kvk_or_rsin(
+        self, user_kvk_or_rsin: str, *, vestigingsnummer=None
+    ) -> list[Klant]:
+        payload = {"subjectIdentificatie": {"innNnpId": user_kvk_or_rsin}}
+
+        if vestigingsnummer:
+            payload = {"subjectIdentificatie": {"vestigingsNummer": vestigingsnummer}}
+
+        try:
+            response = self.post(
+                "klanten",
+                json=payload,
+            )
+            data = get_json_response(response)
+        except (RequestException, ClientError):
+            logger.exception("exception while making request")
+            return None
+
+        klant = factory(Klant, data)
+
+        return klant
+
     def retrieve_klant(
-        self, user_bsn: Optional[str] = None, user_kvk_or_rsin: Optional[str] = None
-    ) -> Optional[Klant]:
+        self, user_bsn: str | None = None, user_kvk_or_rsin: str | None = None
+    ) -> Klant | None:
         if not user_bsn and not user_kvk_or_rsin:
             return
 
@@ -54,7 +104,7 @@ class KlantenClient(APIClient):
         else:
             return
 
-    def retrieve_klanten_for_bsn(self, user_bsn: str) -> List[Klant]:
+    def retrieve_klanten_for_bsn(self, user_bsn: str) -> list[Klant]:
         try:
             response = self.get(
                 "klanten",
@@ -72,7 +122,7 @@ class KlantenClient(APIClient):
 
     def retrieve_klanten_for_kvk_or_rsin(
         self, user_kvk_or_rsin: str, *, vestigingsnummer=None
-    ) -> List[Klant]:
+    ) -> list[Klant]:
         params = {"subjectNietNatuurlijkPersoon__innNnpId": user_kvk_or_rsin}
 
         if vestigingsnummer:
@@ -95,7 +145,7 @@ class KlantenClient(APIClient):
 
         return klanten
 
-    def partial_update_klant(self, klant: Klant, update_data) -> Optional[Klant]:
+    def partial_update_klant(self, klant: Klant, update_data) -> Klant | None:
         try:
             response = self.patch(url=klant.url, json=update_data)
             data = get_json_response(response)
@@ -109,13 +159,16 @@ class KlantenClient(APIClient):
 
 
 class ContactmomentenClient(APIClient):
+    #
+    # contactmomenten
+    #
     def create_contactmoment(
         self,
         data: ContactMomentCreateData,
         *,
-        klant: Optional[Klant] = None,
-        rol: Optional[str] = KlantContactRol.BELANGHEBBENDE,
-    ) -> Optional[ContactMoment]:
+        klant: Klant | None = None,
+        rol: str | None = KlantContactRol.BELANGHEBBENDE,
+    ) -> ContactMoment | None:
         try:
             response = self.post("contactmomenten", json=data)
             data = get_json_response(response)
@@ -142,7 +195,7 @@ class ContactmomentenClient(APIClient):
 
         return contactmoment
 
-    def retrieve_contactmoment(self, url) -> Optional[ContactMoment]:
+    def retrieve_contactmoment(self, url) -> ContactMoment | None:
         try:
             response = self.get(url)
             data = get_json_response(response)
@@ -154,9 +207,64 @@ class ContactmomentenClient(APIClient):
 
         return contact_moment
 
+    #
+    # objectcontactmomenten
+    #
+    def create_objectcontactmoment(
+        self,
+        contactmoment: ContactMoment,
+        zaak: Zaak,
+        object_type: str = "zaak",
+    ) -> ObjectContactMoment | None:
+        try:
+            response = self.post(
+                "objectcontactmomenten",
+                json={
+                    "contactmoment": contactmoment.url,
+                    "object": zaak.url,
+                    "objectType": object_type,
+                },
+            )
+            data = get_json_response(response)
+        except (RequestException, ClientError) as exc:
+            logger.exception("exception while making request", exc_info=exc)
+            return None
+
+        object_contact_moment = factory(ObjectContactMoment, data)
+
+        return object_contact_moment
+
+    def retrieve_objectcontactmomenten_for_zaak(
+        self, zaak: Zaak
+    ) -> list[ObjectContactMoment]:
+        try:
+            response = self.get("objectcontactmomenten", params={"object": zaak.url})
+            data = get_json_response(response)
+            all_data = list(pagination_helper(self, data))
+        except (RequestException, ClientError) as exc:
+            logger.exception("exception while making request", exc_info=exc)
+            return []
+
+        object_contact_momenten = factory(ObjectContactMoment, all_data)
+
+        # resolve linked resources
+        contactmoment_mapping = {}
+        for ocm in object_contact_momenten:
+            assert ocm.object == zaak.url
+            ocm.object = zaak
+
+            contactmoment_url = ocm.contactmoment
+            if contactmoment_url in contactmoment_mapping:
+                ocm.contactmoment = contactmoment_mapping[contactmoment_url]
+            else:
+                ocm.contactmoment = self.retrieve_contactmoment(contactmoment_url)
+                contactmoment_mapping[contactmoment_url] = ocm.contactmoment
+
+        return object_contact_momenten
+
     def retrieve_objectcontactmomenten_for_contactmoment(
-        self, contactmoment: ContactMoment, zaken_client
-    ) -> List[ObjectContactMoment]:
+        self, contactmoment: ContactMoment
+    ) -> list[ObjectContactMoment]:
         try:
             response = self.get(
                 "objectcontactmomenten", params={"contactmoment": contactmoment.url}
@@ -169,26 +277,14 @@ class ContactmomentenClient(APIClient):
 
         object_contact_momenten = factory(ObjectContactMoment, all_data)
 
-        # resolve linked resources
-        if zaken_client:
-            object_mapping = {}
-            for ocm in object_contact_momenten:
-                assert ocm.contactmoment == contactmoment.url
-                ocm.contactmoment = contactmoment
-                if ocm.object_type == "zaak":
-                    object_url = ocm.object
-                    # Avoid fetching the same object, if multiple relations with the same object exist
-                    if ocm.object in object_mapping:
-                        ocm.object = object_mapping[object_url]
-                    else:
-                        ocm.object = zaken_client.fetch_case_by_url_no_cache(ocm.object)
-                        object_mapping[object_url] = ocm.object
-
         return object_contact_momenten
 
+    #
+    # klantcontactmomenten
+    #
     def retrieve_klantcontactmomenten_for_klant(
         self, klant: Klant
-    ) -> List[KlantContactMoment]:
+    ) -> list[KlantContactMoment]:
         try:
             response = self.get(
                 "klantcontactmomenten",
@@ -211,12 +307,10 @@ class ContactmomentenClient(APIClient):
         return klanten_contact_moments
 
     def retrieve_objectcontactmomenten_for_object_type(
-        self, contactmoment: ContactMoment, object_type: str, zaken_client
-    ) -> List[ObjectContactMoment]:
+        self, contactmoment: ContactMoment, object_type: str
+    ) -> list[ObjectContactMoment]:
 
-        moments = self.retrieve_objectcontactmomenten_for_contactmoment(
-            contactmoment, zaken_client
-        )
+        moments = self.retrieve_objectcontactmomenten_for_contactmoment(contactmoment)
 
         # eSuite doesn't implement a `object_type` query parameter
         ret = [moment for moment in moments if moment.object_type == object_type]
@@ -224,16 +318,16 @@ class ContactmomentenClient(APIClient):
         return ret
 
     def retrieve_objectcontactmoment(
-        self, contactmoment: ContactMoment, object_type: str, zaken_client
-    ) -> Optional[ObjectContactMoment]:
+        self, contactmoment: ContactMoment, object_type: str
+    ) -> ObjectContactMoment | None:
         ocms = self.retrieve_objectcontactmomenten_for_object_type(
-            contactmoment, object_type, zaken_client
+            contactmoment, object_type
         )
         if ocms:
             return ocms[0]
 
 
-def build_client(type_) -> Optional[APIClient]:
+def _build_open_klant_client(type_) -> APIClient | None:
     config = OpenKlantConfig.get_solo()
     services_to_client_mapping = {
         "klanten": KlantenClient,
@@ -242,8 +336,16 @@ def build_client(type_) -> Optional[APIClient]:
     if client_class := services_to_client_mapping.get(type_):
         service = getattr(config, f"{type_}_service")
         if service:
-            client = _build_client(service, client_factory=client_class)
+            client = build_client(service, client_factory=client_class)
             return client
 
     logger.warning("no service defined for %s", type_)
     return None
+
+
+def build_contactmomenten_client() -> ContactmomentenClient | None:
+    return _build_open_klant_client("contactmomenten")
+
+
+def build_klanten_client() -> KlantenClient | None:
+    return _build_open_klant_client("klanten")

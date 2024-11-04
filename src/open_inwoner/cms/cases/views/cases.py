@@ -1,21 +1,24 @@
+import logging
+from typing import Sequence
+
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
+from furl import furl
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.htmx.mixins import RequiresHtmxMixin
-from open_inwoner.openzaak.cases import preprocess_data
-from open_inwoner.openzaak.clients import build_client
-from open_inwoner.openzaak.formapi import fetch_open_submissions
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.types import UniformCase
-from open_inwoner.openzaak.utils import get_user_fetch_parameters
 from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import CommonPageMixin
 
 from .mixins import CaseAccessMixin, CaseLogMixin, OuterCaseAccessMixin
+from .services import CaseFilterFormOption, CaseListService
+
+logger = logging.getLogger(__name__)
 
 
 class OuterCaseListView(
@@ -37,7 +40,12 @@ class OuterCaseListView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context["hxget"] = reverse("cases:cases_content")
+        statuses = self.request.GET.getlist("status")
+
+        f_url = furl(reverse("cases:cases_content"))
+        f_url.args.addlist("status", statuses)
+
+        context["hxget"] = f_url.url
         return context
 
 
@@ -55,29 +63,49 @@ class InnerCaseListView(
     def page_title(self):
         return _("Mijn aanvragen")
 
-    def get_cases(self):
-        client = build_client("zaak")
-
-        if client is None:
-            return []
-
-        raw_cases = client.fetch_cases(**get_user_fetch_parameters(self.request))
-
-        preprocessed_cases = preprocess_data(raw_cases)
-        return preprocessed_cases
-
-    def get_submissions(self):
-        subs = fetch_open_submissions(self.request.user.bsn)
-        subs.sort(key=lambda sub: sub.datum_laatste_wijziging, reverse=True)
-        return subs
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         config = OpenZaakConfig.get_solo()
+        case_service = CaseListService(self.request)
+        context["filter_form_enabled"] = config.zaken_filter_enabled
 
-        # update ctx with submissions + cases
-        open_submissions: list[UniformCase] = self.get_submissions()
-        preprocessed_cases: list[UniformCase] = self.get_cases()
+        # update ctx with open submissions and cases (possibly fitered)
+        open_submissions: Sequence[UniformCase] = case_service.get_submissions()
+        preprocessed_cases: Sequence[UniformCase] = case_service.get_cases()
+
+        if config.zaken_filter_enabled:
+            case_status_frequencies = case_service.get_case_status_frequencies()
+            # Separate frequency data from statusname
+            context["status_freqs"] = [
+                (status.value, frequency)
+                for status, frequency in case_status_frequencies.items()
+            ]
+
+            # Validate statuses are valid according to the options enum
+            statuses: list[CaseFilterFormOption] = []
+            for status in self.request.GET.getlist("status"):
+                try:
+                    statuses.append(CaseFilterFormOption(status))
+                except ValueError:
+                    logger.error(
+                        "Invalid data (%s) for case filtering by %s",
+                        self.request.GET,
+                        self.request.user,
+                    )
+
+            # Actually filter the submissions
+            if statuses:
+                open_submissions = (
+                    open_submissions
+                    if CaseFilterFormOption.OPEN_SUBMISSION in statuses
+                    else []
+                )
+                preprocessed_cases = [
+                    case
+                    for case in preprocessed_cases
+                    if case_service.get_case_filter_status(case.zaak) in statuses
+                ]
+
         paginator_dict = self.paginate_with_context(
             [*open_submissions, *preprocessed_cases]
         )
@@ -91,4 +119,5 @@ class InnerCaseListView(
         # other data
         context["hxget"] = reverse("cases:cases_content")
         context["title_text"] = config.title_text
+
         return context

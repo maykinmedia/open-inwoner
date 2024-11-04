@@ -32,9 +32,11 @@ class Map {
     this.lat = node.dataset.lat || 52
     this.lng = node.dataset.lng || 11
     this.zoom = node.dataset.zoom || 13
+    this.scrollWheelZoom = false
 
     const mapOptions = {
       center: L.latLng(this.lat, this.lng),
+      scrollWheelZoom: this.scrollWheelZoom,
       zoom: this.zoom,
       crs: RD_CRS,
     }
@@ -117,13 +119,13 @@ class Map {
 
     return `
       <div class="leaflet-content-name">
-        <h4 class="h4">
+        <h4 class="utrecht-heading-4">
           ${title}
         </h4>
       </div>
-      <div class="leaflet-content-details p--no-margin">
-        <p class="p">${displayAddress1}</p>
-        <p class="p">${displayAddress2}</p>
+      <div class="leaflet-content-details container--no-margin">
+        <p class="utrecht-paragraph">${displayAddress1}</p>
+        <p class="utrecht-paragraph">${displayAddress2}</p>
         <a href="tel:${displayPhonenumber}" class="link link--secondary" aria-label=${displayPhonenumber} title=${displayPhonenumber}>
           <span class="link__text">${displayPhonenumber}</span>
         </a>

@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from typing import List, Optional
 
 from open_inwoner.ssd.service.uitkering.fwi_include_resolved import Actor
 
@@ -11,7 +10,7 @@ class NietsGevonden:
     class Meta:
         namespace = "http://www.centric.nl/GWS/FWI/v0200"
 
-    any_element: Optional[object] = field(
+    any_element: object | None = field(
         default=None,
         metadata={
             "type": "Wildcard",
@@ -22,7 +21,7 @@ class NietsGevonden:
 
 @dataclass
 class Melding:
-    code: Optional[str] = field(
+    code: str | None = field(
         default=None,
         metadata={
             "name": "Code",
@@ -31,7 +30,7 @@ class Melding:
             "required": True,
         },
     )
-    tekst: Optional[str] = field(
+    tekst: str | None = field(
         default=None,
         metadata={
             "name": "Tekst",
@@ -40,7 +39,7 @@ class Melding:
             "required": True,
         },
     )
-    detail: List[str] = field(
+    detail: list[str] = field(
         default_factory=list,
         metadata={
             "name": "Detail",
@@ -48,7 +47,7 @@ class Melding:
             "namespace": "",
         },
     )
-    bron: Optional[Actor] = field(
+    bron: Actor | None = field(
         default=None,
         metadata={
             "name": "Bron",
@@ -65,7 +64,7 @@ class Fwi:
         name = "FWI"
         namespace = "http://www.centric.nl/GWS/FWI/v0200"
 
-    fout: List[Melding] = field(
+    fout: list[Melding] = field(
         default_factory=list,
         metadata={
             "name": "Fout",
@@ -73,7 +72,7 @@ class Fwi:
             "namespace": "",
         },
     )
-    waarschuwing: List[Melding] = field(
+    waarschuwing: list[Melding] = field(
         default_factory=list,
         metadata={
             "name": "Waarschuwing",
@@ -81,7 +80,7 @@ class Fwi:
             "namespace": "",
         },
     )
-    informatie: List[Melding] = field(
+    informatie: list[Melding] = field(
         default_factory=list,
         metadata={
             "name": "Informatie",

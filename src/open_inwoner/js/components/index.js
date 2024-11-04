@@ -9,7 +9,7 @@ import './autocomplete-search'
 import './autocomplete'
 import './autosumbit'
 import './cases'
-import { DisableCaseContactButton } from './cases/case_contact_form'
+import { DisableContactFormButton } from './form/DisableContactFormButton'
 import { DisableSubmitButton } from './cases/document_upload'
 import './confirmation'
 import './contacts'
@@ -17,21 +17,25 @@ import { CookieBanner } from './cookie-consent'
 import './datepicker'
 import { Dropdown } from './dropdown'
 import './emoji-button'
+import './FilterBar'
 import './form'
 import './header'
 import './map'
 import './message-file'
 import { Notification } from './notifications'
 import './plans'
-import './preview'
+import './plan-preview'
 import './questionnaire'
 import './readmore'
 import './search'
+import { TabPanel } from './tab-panels'
 import './toggle'
 import { StatusAccordion } from './cases/status_accordion'
 import './session'
+import './siteimprove/tracking'
 import './twofactor-sms'
 import { FileInput } from './form/FileInput'
+import { ToggleHide } from './card/ToggleHide'
 
 const htmx = (window.htmx = require('htmx.org'))
 
@@ -48,13 +52,16 @@ const elementWrappers = [
   [CreateGumshoe.selector, (elt) => new CreateGumshoe(elt)],
   [DisableSubmitButton.selector, (elt) => new DisableSubmitButton(elt)],
   [
-    DisableCaseContactButton.selector,
-    (elt) => new DisableCaseContactButton(elt),
+    DisableContactFormButton.selector,
+    (elt) => new DisableContactFormButton(elt),
   ],
   [Notification.selector, (elt) => new Notification(elt)],
   [AnchorMobile.selector, (elt) => new AnchorMobile(elt)],
   [StatusAccordion.selector, (elt) => new StatusAccordion(elt)],
   [FileInput.selector, (elt) => new FileInput(elt)],
+  [ToggleHide.selector, (elt) => new ToggleHide(elt)],
+  [TabPanel.selector, (elt) => new TabPanel(elt)],
+  // add more when needed
 ]
 
 // harden against multiple events

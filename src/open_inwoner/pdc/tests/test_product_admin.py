@@ -1,6 +1,6 @@
 from django.contrib.auth.models import Permission
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from django_webtest import WebTest
 from maykin_2fa.test import disable_admin_mfa

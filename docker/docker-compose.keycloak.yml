@@ -2,13 +2,13 @@ version: '3.4'
 
 services:
   keycloak:
-    image: jboss/keycloak
+    image: keycloak/keycloak:24.0.1-0
     environment:
-      - KEYCLOAK_USER=demo
-      - KEYCLOAK_PASSWORD=demo
-      - KEYCLOAK_IMPORT=/realm.json
+      - KEYCLOAK_ADMIN=demo
+      - KEYCLOAK_ADMIN_PASSWORD=demo
+    command: start-dev --import-realm
     volumes:
-      - ./keycloak/fixtures/realm.json:/realm.json
+      - ./keycloak/fixtures/realm.json:/opt/keycloak/data/import/realm.json
     ports:
       - 8080:8080
     networks:

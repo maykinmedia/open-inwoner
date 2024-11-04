@@ -7,3 +7,7 @@
     color: var(--color-danger);
   }
 }
+
+*[class*='icon'].icon--large {
+  font-size: 40px;
+}

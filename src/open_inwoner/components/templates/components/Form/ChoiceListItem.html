@@ -1,0 +1,33 @@
+{% load l10n form_tags icon_tags %}
+
+{# Item component for changing the parent styles, when child is clicked #}
+
+<li class="choice-list__item {% if input_type_radio %}radiochoice-list-single__item{% else %}radiochoice-list-multiple__item{% endif %}">
+    {% if input_type_radio %}
+        <label class="choice-list__label {% if bold_label %}choice-list__label--large{% endif %}" for="id_{{ name }}_{{ index }}">
+            <input type="radio" class="choice-list__radio" id="id_{{ name }}_{{ index }}" name="{{ name }}" value="{{ choice.0|unlocalize }}" {% if choice.0 in data or checked %}checked="checked"{% endif %}>
+            <div class="choice-list__content">
+                {% if bold_label %}<h2 class="choice-list__heading">Kies {{ choice.1 }}</h2>{% endif %}
+                <p class="choice-list__p">{{ choice.1 }}</p>
+            </div>
+            {% if icon_symbol %}
+                {% icon icon_symbol outlined=True extra_classes="icon--large" %}
+            {% endif %}
+        </label>
+
+    {% else %}
+        <div class="choice-list-multiple__content">
+            <div class="form__control">
+                <div class="checkbox">
+                    <input type="checkbox" class="checkbox__input" id="id_{{ name }}_{{ index }}" name="{{ name }}" value="{{ choice.0|unlocalize }}" {% if choice.0 in data or checked %}checked="checked"{% endif %}>
+                    <label class="checkbox__label" for="id_{{ name }}_{{ index }}">
+                        {% if icon_symbol %}
+                            {% icon icon_symbol outlined=True extra_classes="icon--large" %}
+                        {% endif %}
+                        <p class="checkbox__p">{{ choice.1 }}</p>
+                    </label>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</li>

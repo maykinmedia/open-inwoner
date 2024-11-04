@@ -1,12 +1,14 @@
 {% load i18n button_tags %}
 {% if categories %}
-    <h2 class="h2">
-        {{configurable_text.home_page.home_theme_title}}
-        {% trans "Alle onderwerpen" as button_text %}
-        <span class="spacer"></span>
-        {% button href='products:category_list' text=button_text icon="arrow_forward" icon_position="after" %}
-    </h2>
-    <p class="p">{{configurable_text.home_page.home_theme_intro|linebreaksbr}}</p>
+    <section class="plugin plugin__categories">
+        <header class="oip-header-group">
+            <h2 class="utrecht-heading-2">{{ configurable_text.home_page.home_theme_title }}</h2>
+            {% trans "Alle onderwerpen" as button_text %}
+            {% button href='products:category_list' text=button_text icon="arrow_forward" icon_position="after" %}
+        </header>
 
-    {% include "components/Card/CardContainer.html" with categories=categories columns=4 image_object_fit="cover" only %}
+        <p class="utrecht-paragraph">{{ configurable_text.home_page.home_theme_intro|linebreaksbr }}</p>
+
+        {% include "components/Card/CardContainer.html" with categories=categories columns=4 image_object_fit="cover" only %}
+    </section>
 {% endif %}

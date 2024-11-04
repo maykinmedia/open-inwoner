@@ -41,7 +41,7 @@ class HaalCentraalMixin:
 
     def load_json_mock(self, name):
         path = os.path.join(os.path.dirname(__file__), "files", name)
-        with open(path, "r") as f:
+        with open(path) as f:
             return json.load(f)
 
     def load_binary_mock(self, name):

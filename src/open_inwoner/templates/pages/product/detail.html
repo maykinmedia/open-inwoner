@@ -33,7 +33,7 @@
         {% endif %}
     </h1>
     {% include "components/Tag/Tag.html" with tags=object.tags.all only %}
-    <p class="p p-summary">{{ object.summary }}</p>
+    <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-summary">{{ object.summary }}</p>
 
     {# Collapsable content #}
     <div class="readmore">
@@ -73,12 +73,12 @@
         {% if object.conditions.exists %}
             {% render_grid %}
                 {% render_column span=6 compact=True %}
-                    <h3 class="h3">{% trans "U komt in aanmerking" %}</h3>
+                    <h3 class="utrecht-heading-3">{% trans "U komt in aanmerking" %}</h3>
                     {% include "components/Condition/ConditionList.html" with conditions=object.conditions.all only %}
                 {% endrender_column %}
 
                 {% render_column start=7 span=6 compact=True %}
-                    <h3 class="h3">{% trans "U komt niet in aanmerking" %}</h3>
+                    <h3 class="utrecht-heading-3">{% trans "U komt niet in aanmerking" %}</h3>
                     {% include "components/Condition/ConditionList.html" with conditions=object.conditions.all negative=True only %}
                 {% endrender_column %}
             {% endrender_grid %}
@@ -98,7 +98,7 @@
                 {# Links. #}
                 {% if product_links.exists %}
                     <nav class="link-list" aria-label="{% trans "links" %}">
-                        <h3 class="h3" id="links">{% trans "Links" %}</h3>
+                        <h3 class="utrecht-heading-3" id="links">{% trans "Links" %}</h3>
                         <ul class="link-list__list">
                             {% for link in product_links %}
                                 <li class="link-list__list-item link-list__list-item--wrap">
@@ -114,7 +114,7 @@
                 {# Related products. #}
                 {% if object.related_products.published.exists %}
                     <nav class="link-list" aria-label="{% trans "Gerelateerde links" %}">
-                        <h3 class="h3" id="see">{% trans "Zie ook" %}</h3>
+                        <h3 class="utrecht-heading-3" id="see">{% trans "Zie ook" %}</h3>
                         <ul class="link-list__list">
                             {% for related in object.related_products.published %}
                                 <li class="link-list__list-item link-list__list-item--wrap">
@@ -130,17 +130,17 @@
             {% render_column span=9 %}
                 {% if object.contacts.exists %}
                     <div class="contact-block">
-                        <h3 class="h3" id="contact">{% trans 'Contact' %}</h3>
+                        <h3 class="utrecht-heading-3" id="contact">{% trans 'Contact' %}</h3>
 
                         {% for contact in object.contacts.all %}
                             {% render_grid compact=True %}
                                 {% render_column span=12 %}
-                                    <h4 class="h4">{{ contact.first_name }} {{ contact.last_name }}</h4>
+                                    <h4 class="utrecht-heading-4">{{ contact.first_name }} {{ contact.last_name }}</h4>
                                 {% endrender_column %}
 
                                 {% if contact.phonenumber %}
                                     {% render_column span=6 %}
-                                        <span class="p">{{ contact.role|default:_('Telefoonnummer') }}</span>
+                                        <span class="utrecht-paragraph">{{ contact.role|default:_('Telefoonnummer') }}</span>
                                     {% endrender_column %}
 
                                     {% render_column start=7 span=6 %}
@@ -150,7 +150,7 @@
 
                                 {% if contact.email %}
                                     {% render_column span=6 %}
-                                        <p class="p">{{ contact.organization|default:_('E-mail')}}</p>
+                                        <p class="utrecht-paragraph">{{ contact.organization|default:_('E-mail')}}</p>
                                     {% endrender_column %}
 
                                     {% render_column start=7 span=6 %}
@@ -166,7 +166,7 @@
 
         {% if display_social %}
             <nav class="sharing-list" aria-label="{% trans "Deel dit artikel" %}">
-                <h3 class="h3" id="sharing">{% trans "Deel dit artikel" %}</h3>
+                <h3 class="utrecht-heading-3" id="sharing">{% trans "Deel dit artikel" %}</h3>
                 {% with request.build_absolute_uri as page_url %}
                     {% include "components/ShareButton/ShareButton.html" with platform="facebook" platform_verbose="Facebook" text_to_share=page_url %}
                     {% include "components/ShareButton/ShareButton.html" with platform="x-twitter" platform_verbose="X" text_to_share=page_url %}

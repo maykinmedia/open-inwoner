@@ -3,6 +3,7 @@ from django.template.library import parse_bits
 from django.template.loader import render_to_string
 from django.utils.translation import gettext as _
 
+from open_inwoner.components.templatetags.helpers import create_content_wrapper
 from open_inwoner.components.utils import safe_resolve
 
 register = template.Library()
@@ -167,18 +168,20 @@ def autorender_field(form_object, field_name, **kwargs):
     fn = input
     tmplt = WIDGET_TEMPLATES["INPUT"]
 
-    if type(field) == forms.fields.DateField:
+    if type(field) is forms.fields.DateField:
         tmplt = WIDGET_TEMPLATES["DATE"]
-    elif type(field) == forms.models.ModelMultipleChoiceField:
+    elif type(field) is forms.models.ModelMultipleChoiceField:
         tmplt = WIDGET_TEMPLATES["MULTIPLECHECKBOX"]
-    elif type(field) == forms.fields.BooleanField:
+    elif type(field) is forms.MultipleChoiceField:
+        tmplt = WIDGET_TEMPLATES["MULTIPLECHECKBOX"]
+    elif type(field) is forms.fields.BooleanField:
         fn = checkbox
         tmplt = WIDGET_TEMPLATES["CHECKBOX"]
-    elif type(field.widget) == forms.fields.HiddenInput:
+    elif type(field.widget) is forms.fields.HiddenInput:
         tmplt = WIDGET_TEMPLATES["HIDDEN"]
-    elif type(field.widget) == forms.widgets.RadioSelect:
+    elif type(field.widget) is forms.widgets.RadioSelect:
         tmplt = WIDGET_TEMPLATES["RADIO"]
-    elif type(field.widget) == forms.fields.Textarea:
+    elif type(field.widget) is forms.fields.Textarea:
         tmplt = WIDGET_TEMPLATES["TEXTAREA"]
 
     context = fn(bound_field, **kwargs)
@@ -257,6 +260,52 @@ def choice_radio(choice, **kwargs):
 
     Variables:
         + choice: The choice that needs to be rendered.
+    """
+    return {**kwargs, "choice": choice}
+
+
+@register.tag()
+def choice_list(parser, token):
+    """
+    Renders a list containing list items (with inputs from a choice field.)
+
+    Usage:
+        {% choice_list single=True cols=False %}
+            {% for choice in field.field.choices %}
+                {% choice_list_item input_type=True choice=choice name=field.name data=field.value index=forloop.counter initial=field.form.initial icon_symbol=False %}
+            {% endfor %}
+        {% endchoice_list %}
+
+    Available options::
+    + single: bool | Whether the choice to be rendered can select only one option
+    - cols: bool | Whether a horizontal grid needs to be rendered with two columns
+
+    Extra context:
+        - contents: string (HTML) | this is the context between the choice_list and endchoice_list tags
+    """
+    return create_content_wrapper("choice_list", "components/Form/ChoiceList.html")(
+        parser, token
+    )
+
+
+@register.inclusion_tag("components/Form/ChoiceListItem.html")
+def choice_list_item(choice, **kwargs):
+    """
+    Display parent labels surrounding inputs rendered from a choice field.
+
+    Args:
+        + choice: the choice to be rendered
+        + name: the name of the form field
+        + data: the value of a form field field
+        - index: the index of a for-loop when looping over choices
+        - initial: the initial value of the field
+        - input_type_radio: bool | if this is true, show radiobutton, else show checkbox
+        - icon_symbol: bool | if there should be an icon, and if so: specify the icon to be displayed at the top of the input stack
+        - bold_label: bool | If the label should contain a bold heading
+
+    Usage:
+        {% choice_radio_list_item input_type_radio=True choice=choice name=field.name data=field.value index=forloop.counter initial=field.form.initial icon_symbol=False bold_label=False %}
+        {% choice_radio_list_item input_type_radio=False choice=choice name=field.name data=field.value index=forloop.counter initial=field.form.initial icon_symbol=choice.1|get_icon_symbol bold_label=True %}
     """
     return {**kwargs, "choice": choice}
 
@@ -431,9 +480,9 @@ def field_as_widget(field, class_string, form_id):
 
 @register.simple_tag(takes_context=True)
 def initial_match(context):
-    initial = context.get("initial")
-    choice = context.get("choice")
-    name = context.get("name")
+    initial = context.get("initial", None)
+    choice = context.get("choice", None)
+    name = context.get("name", None)
     return initial.get(name) == choice[0]
 
 
@@ -457,3 +506,13 @@ class FormNode(template.Node):
         corrected_kwargs["classes"] = get_form_classes(**corrected_kwargs)
         rendered = render_to_string("components/Form/Form.html", corrected_kwargs)
         return rendered
+
+
+# delete?
+@register.filter
+def get_icon_symbol(key: str) -> str:
+    mapping = {
+        "Alleen digitaal": "computer",
+        "Digitaal en per brief": "mail",
+    }
+    return mapping.get(key, None)

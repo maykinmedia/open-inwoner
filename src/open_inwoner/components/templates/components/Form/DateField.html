@@ -6,7 +6,7 @@
         {% if not no_label %}{{ field.label }}{% endif %}
         {{ field|addclass:"input datefield" }}
         {% if field.help_text and not no_help %}
-            <p class="p">{{ field.help_text }}</p>
+            <p class="utrecht-paragraph">{{ field.help_text }}</p>
         {% endif %}
 
         {% if field.errors %}

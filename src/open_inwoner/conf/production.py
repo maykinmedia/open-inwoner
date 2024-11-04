@@ -16,20 +16,16 @@ AUTHENTICATION_BACKENDS = [
     "open_inwoner.accounts.backends.CustomAxesBackend",
     "open_inwoner.accounts.backends.UserModelEmailBackend",
     "django.contrib.auth.backends.ModelBackend",
-    "digid_eherkenning_oidc_generics.backends.OIDCAuthenticationDigiDBackend",
-    "digid_eherkenning_oidc_generics.backends.OIDCAuthenticationEHerkenningBackend",
+    "open_inwoner.accounts.backends.DigiDEHerkenningOIDCBackend",
     "open_inwoner.accounts.backends.CustomOIDCBackend",
 ]
 
 DIGID_MOCK = config("DIGID_MOCK", default=False)
-if DIGID_METADATA and not DEBUG:
-    AUTHENTICATION_BACKENDS += ["digid_eherkenning.backends.DigiDBackend"]
-    DIGID_ENABLED = True
-elif DIGID_MOCK:
-    AUTHENTICATION_BACKENDS += ["digid_eherkenning.mock.backends.DigiDBackend"]
-    DIGID_ENABLED = True
-else:
-    DIGID_ENABLED = False
+if DIGID_ENABLED:
+    if DIGID_MOCK:
+        AUTHENTICATION_BACKENDS += ["digid_eherkenning.mock.backends.DigiDBackend"]
+    else:
+        AUTHENTICATION_BACKENDS += ["digid_eherkenning.backends.DigiDBackend"]
 
 EHERKENNING_MOCK = config("EHERKENNING_MOCK", default=False)
 if EHERKENNING_MOCK:

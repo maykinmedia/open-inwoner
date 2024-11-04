@@ -1,11 +1,10 @@
 import json
 import re
-from typing import Union
 
 from django.contrib.gis.db.models import PointField
 from django.core.exceptions import ValidationError
 from django.db import connection, models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from geopy.exc import GeopyError
 from localflavor.nl.models import NLZipCodeField
@@ -25,7 +24,7 @@ class GeoModelQuerySet(models.QuerySet):
             }
         )
 
-    def get_centroid(self) -> Union[dict, None]:
+    def get_centroid(self) -> dict | None:
         """
         I apologize.
 
@@ -122,7 +121,7 @@ class GeoModel(models.Model):
             )
         self.geometry = geometry
 
-    def get_geojson_feature(self, stringify: bool = True) -> Union[str, dict]:
+    def get_geojson_feature(self, stringify: bool = True) -> str | dict:
         """
         Returns a geojson feature for this object.
         If stringify equals `True` (default), a JSON string is returned, a dict otherwise.

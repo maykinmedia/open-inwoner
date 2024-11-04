@@ -5,20 +5,38 @@ import markdown
 from bs4 import BeautifulSoup
 
 CLASS_ADDERS = [
-    ("h1", "h1"),
-    ("h2", "h2"),
-    ("h3", "h3"),
-    ("h4", "h4"),
-    ("h5", "h5"),
-    ("h6", "h6"),
+    ("h1", "utrecht-heading-1"),
+    ("h2", "utrecht-heading-2"),
+    ("h3", "utrecht-heading-3"),
+    ("h4", "utrecht-heading-4"),
+    ("h5", "utrecht-heading-5"),
+    ("h6", "utrecht-heading-6"),
     ("img", "image"),
     ("li", "li"),
-    ("p", "p"),
+    ("p", "utrecht-paragraph"),
     ("a", "link link--secondary"),
     ("table", "table table--content"),
+    ("thead", "table__heading"),
+    ("tbody", "table__body"),
+    ("tr", "table__row"),
     ("th", "table__header"),
     ("td", "table__item"),
 ]
+
+
+def convert_first_row_to_th(html_tables):
+    """
+    Converts the first row of all tables from td to th.
+    """
+    for table in html_tables.find_all("table"):
+        first_row = table.find("tr")
+        if first_row:
+            for cell in first_row.find_all("td"):
+                th = html_tables.new_tag("th")
+                th.string = cell.string
+                th.attrs = cell.attrs
+                th["class"] = "table__header"
+                cell.replace_with(th)
 
 
 def get_rendered_content(content: str) -> str:
@@ -50,6 +68,8 @@ def get_product_rendered_content(product):
     html = md.convert(content)
     soup = BeautifulSoup(html, "html.parser")
 
+    convert_first_row_to_th(soup)
+
     for tag, class_name in CLASS_ADDERS:
         for element in soup.find_all(tag):
             if element.attrs.get("class") and "cta-button" in element.attrs["class"]:
@@ -78,7 +98,10 @@ def get_product_rendered_content(product):
                 element.string = ""
                 element.attrs.update(
                     {
-                        "class": "button button--textless button--icon button--icon-before button--primary cta-button",
+                        "class": (
+                            "button button--textless button--icon "
+                            "button--icon-before button--primary cta-button"
+                        ),
                         "href": (product.link if product.link else product.form_link),
                         "title": product.button_text,
                         "aria-label": product.button_text,
@@ -97,11 +120,20 @@ def get_product_rendered_content(product):
                 icon.attrs.update(
                     {
                         "aria-hidden": "true",
-                        "aria-label": _("Opens in new window"),
                         "class": "material-icons",
                     }
                 )
                 icon.append("open_in_new")
+
+                screen_reader_only_text = soup.new_tag("span")
+                screen_reader_only_text.attrs.update(
+                    {
+                        "class": "sr-only",
+                    }
+                )
+                screen_reader_only_text.append(_("Opens external website"))
+
                 element.append(icon)
+                element.append(screen_reader_only_text)
 
     return soup

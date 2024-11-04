@@ -1,4 +1,40 @@
-.cases__detail {
+.case-detail {
+  box-sizing: border-box;
+
+  &__documents {
+    .heading-2__indicator {
+      display: flex;
+      flex-direction: row;
+      margin-bottom: var(--spacing-extra-large);
+
+      // breaking-text fix
+      @media (min-width: 315px) {
+        display: grid;
+        grid-template-columns: 232px 10px;
+      }
+
+      @media (min-width: 440px) {
+        display: flex;
+        flex-direction: row;
+      }
+
+      @media (min-width: 768px) {
+        display: grid;
+        grid-template-columns: 232px 10px;
+      }
+
+      @media (min-width: 840px) {
+        display: flex;
+        flex-direction: row;
+      }
+    }
+
+    .utrecht-heading-2.indicator {
+      display: inline;
+      font-size: var(--font-size-heading-2);
+    }
+  }
+
   .documents-upload__h3 {
     margin: var(--spacing-extra-large) 0;
   }
@@ -7,6 +43,10 @@
     &-notification {
       .notifications {
         position: static;
+
+        .notification {
+          margin-bottom: var(--spacing-extra-large);
+        }
       }
     }
   }
@@ -66,12 +106,13 @@
       display: block;
       margin: 0;
 
-      &-selection__h4 {
-        color: var(--font-color-heading-4);
-        font-family: var(--font-family-heading-4);
-        font-size: var(--font-size-heading-4);
-        font-weight: var(--font-weight-heading-4);
-        line-height: var(--font-line-height-heading-4);
+      &-selection__heading.utrecht-heading-3 {
+        color: var(--font-color-heading-3);
+        font-family: var(--font-family-heading-3);
+        font-size: var(--font-size-heading-3);
+        font-weight: var(--font-weight-heading-3);
+        line-height: var(--font-line-height-heading-3);
+        margin: var(--row-height) 0 var(--spacing-large) 0;
       }
     }
 
@@ -84,18 +125,20 @@
     }
   }
 
-  #cases-contact-form-content > h2 {
-    margin-top: var(--spacing-large);
+  #toggle-hide-elements {
+    padding-left: 0;
   }
 
-  .case-contact-form {
-    .button[type='submit']:disabled,
-    .button--primary.button--disabled {
-      background-color: var(--color-gray) !important;
-      border-color: var(--color-gray) !important;
-      color: var(--color-white);
-      cursor: default;
-      pointer-events: none;
-    }
+  #cases-contact-form-content > .utrecht-heading-2 {
+    margin-top: var(--spacing-extra-large);
+  }
+
+  .contactmomenten {
+    margin: 0;
+  }
+
+  .textarea {
+    height: var(--header-height);
+    width: 100%;
   }
 }

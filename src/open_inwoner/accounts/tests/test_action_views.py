@@ -147,7 +147,7 @@ class ActionViewTests(WebTest):
 
     def test_action_delete_login_required(self):
         response = self.client.post(self.delete_url)
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
     def test_action_delete_http_get_is_not_allowed(self):
         self.client.force_login(self.user)

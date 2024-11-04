@@ -7,7 +7,7 @@ from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
 from django.template import loader
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from django_registration.forms import RegistrationForm
 
@@ -18,7 +18,11 @@ from open_inwoner.cms.utils.page_display import (
 )
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.pdc.models.category import Category
-from open_inwoner.utils.forms import LimitedUploadFileField, PrivateFileWidget
+from open_inwoner.utils.forms import (
+    ErrorMessageMixin,
+    LimitedUploadFileField,
+    PrivateFileWidget,
+)
 from open_inwoner.utils.validators import CharFieldValidator, DutchPhoneNumberValidator
 
 from .choices import (
@@ -127,7 +131,7 @@ class BaseUserForm(forms.ModelForm):
     class Meta:
         model = User
         fields = (
-            "display_name",
+            "first_name",
             "email",
             "phonenumber",
             "image",
@@ -142,7 +146,7 @@ class BaseUserForm(forms.ModelForm):
             del self.fields["cropping"]
 
 
-class UserForm(BaseUserForm):
+class UserForm(ErrorMessageMixin, BaseUserForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.user = kwargs.pop("user")
@@ -153,7 +157,6 @@ class UserForm(BaseUserForm):
             "first_name",
             "infix",
             "last_name",
-            "display_name",
             "email",
             "phonenumber",
             "street",
@@ -169,7 +172,7 @@ class BrpUserForm(BaseUserForm):
     pass
 
 
-class NecessaryUserForm(forms.ModelForm):
+class NecessaryUserForm(ErrorMessageMixin, forms.ModelForm):
     invite = forms.ModelChoiceField(
         queryset=Invite.objects.all(),
         to_field_name="key",
@@ -188,21 +191,37 @@ class NecessaryUserForm(forms.ModelForm):
             "cases_notifications",
             "messages_notifications",
             "plans_notifications",
+            "case_notification_channel",
         )
 
     def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        config = SiteConfiguration.get_solo()
 
         self.fields["first_name"].required = True
         self.fields["infix"].required = False
         self.fields["last_name"].required = True
 
         # notifications
-        if not (user.login_type == LoginTypeChoices.digid and case_page_is_published()):
+        if (
+            not config.notifications_cases_enabled
+            or not config.enable_notification_channel_choice
+        ):
+            del self.fields["case_notification_channel"]
+
+        if (
+            not user.login_type == LoginTypeChoices.digid
+            or not config.notifications_cases_enabled
+            or not case_page_is_published()
+        ):
             del self.fields["cases_notifications"]
-        if not inbox_page_is_published():
+        if not config.notifications_messages_enabled or not inbox_page_is_published():
             del self.fields["messages_notifications"]
-        if not collaborate_page_is_published():
+        if (
+            not config.notifications_plans_enabled
+            or not collaborate_page_is_published()
+        ):
             del self.fields["plans_notifications"]
 
         if user.is_digid_user_with_brp:
@@ -290,6 +309,18 @@ class CustomPasswordResetForm(PasswordResetForm):
         email_message.send()
 
 
+class CategoriesForm(forms.ModelForm):
+    selected_categories = forms.ModelMultipleChoiceField(
+        queryset=Category.objects.published(),
+        widget=forms.widgets.CheckboxSelectMultiple,
+        required=False,
+    )
+
+    class Meta:
+        model = User
+        fields = ("selected_categories",)
+
+
 class UserNotificationsForm(forms.ModelForm):
     class Meta:
         model = User
@@ -297,21 +328,38 @@ class UserNotificationsForm(forms.ModelForm):
             "cases_notifications",
             "messages_notifications",
             "plans_notifications",
+            "case_notification_channel",
         )
 
     def __init__(self, user, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
+        siteconfig = SiteConfiguration.get_solo()
+        self.any_notifications_enabled = siteconfig.any_notifications_enabled
+
         if (
-            not case_page_is_published()
+            not siteconfig.notifications_cases_enabled
+            or not siteconfig.enable_notification_channel_choice
+        ):
+            del self.fields["case_notification_channel"]
+
+        if (
+            not siteconfig.notifications_cases_enabled
+            or not case_page_is_published()
             or not user.login_type == LoginTypeChoices.digid
         ):
             del self.fields["cases_notifications"]
 
-        if not inbox_page_is_published():
+        if (
+            not siteconfig.notifications_messages_enabled
+            or not inbox_page_is_published()
+        ):
             del self.fields["messages_notifications"]
 
-        if not collaborate_page_is_published():
+        if (
+            not siteconfig.notifications_plans_enabled
+            or not collaborate_page_is_published()
+        ):
             del self.fields["plans_notifications"]
 
 

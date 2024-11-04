@@ -1,1 +1,1 @@
-from .video import VideoAdmin
+from .video import VideoAdmin  # noqa

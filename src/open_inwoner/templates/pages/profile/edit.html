@@ -12,7 +12,7 @@
 {% block content %}
 
     <div class="profile__grid">
-        <h1 class="h1" id="title">
+        <h1 class="utrecht-heading-1" id="title">
             {% trans "Bewerk contactgegevens" %}
         </h1>
 
@@ -23,8 +23,10 @@
                     {% csrf_token %}
 
                     {% with request.user as user %}
-                        {% if user.is_digid_user_with_brp %}
-                            {% input form.display_name %}
+                        {% if user.is_eherkenning_user %}
+                            {% input form.email %}
+                            {% input form.phonenumber %}
+                        {% elif user.is_digid_user_with_brp %}
                             {% input form.email %}
                             {% input form.phonenumber %}
                             {% if user.contact_type == "begeleider" %}
@@ -35,7 +37,6 @@
                             {% input form.first_name %}
                             {% input form.infix %}
                             {% input form.last_name %}
-                            {% input form.display_name %}
                             {% input form.email %}
                             {% input form.phonenumber %}
                             {% input form.street %}
@@ -49,7 +50,7 @@
                         {% endif %}
                     {% endwith %}
                     <div class="form__actions form__actions--fullwidth">
-                        {% button text="Sla wijzigingen op" primary=True type="submit" form_id="profile-edit" %}
+                        {% button text=_("Sla wijzigingen op") primary=True type="submit" form_id="profile-edit" %}
                         {% button href="profile:detail" icon="west" text=_("Terug naar Mijn profiel") icon_outlined=True transparent=True %}
                     </div>
                 {% endrender_form %}

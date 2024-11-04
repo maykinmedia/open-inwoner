@@ -3,10 +3,10 @@
 
 
 {% block content %}
-<h1 class="h1">
+<h1 class="utrecht-heading-1">
     {% trans "Accept an invitation" %}
 </h1>
-<p class="p">
+<p class="utrecht-paragraph">
     {% blocktranslate with inviter_name=object.inviter.get_full_name %}Accept invitation from {{ inviter_name }} and join Open Inwoner Platform {% endblocktranslate %}
 </p>
 

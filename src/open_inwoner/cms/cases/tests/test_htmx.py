@@ -1,4 +1,5 @@
 import json
+from unittest.mock import patch
 from uuid import UUID
 
 from django.test import override_settings, tag
@@ -18,6 +19,7 @@ from open_inwoner.cms.tests import cms_tools
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openklant.constants import Status
 from open_inwoner.openklant.models import OpenKlantConfig
+from open_inwoner.openklant.services import eSuiteVragenService
 from open_inwoner.openklant.tests.data import CONTACTMOMENTEN_ROOT, KLANTEN_ROOT
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.tests.factories import (
@@ -25,6 +27,7 @@ from open_inwoner.openzaak.tests.factories import (
     ZaakTypeConfigFactory,
     ZaakTypeInformatieObjectTypeConfigFactory,
     ZaakTypeStatusTypeConfigFactory,
+    ZGWApiGroupConfigFactory,
 )
 from open_inwoner.openzaak.tests.helpers import generate_oas_component_cached
 from open_inwoner.openzaak.tests.shared import (
@@ -43,6 +46,12 @@ from open_inwoner.utils.tests.playwright import PlaywrightSyncLiveServerTestCase
 
 @tag("e2e")
 @requests_mock.Mocker()
+@patch.object(
+    eSuiteVragenService,
+    "retrieve_objectcontactmomenten_for_zaak",
+    autospec=True,
+    return_value=[],
+)
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class CasesPlaywrightTests(
     AssertMockMatchersMixin,
@@ -63,18 +72,14 @@ class CasesPlaywrightTests(
         self.config.save()
 
         # services
-        self.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
-        self.catalogi_service = ServiceFactory(
-            api_root=CATALOGI_ROOT, api_type=APITypes.ztc
-        )
-        self.document_service = ServiceFactory(
-            api_root=DOCUMENTEN_ROOT, api_type=APITypes.drc
+        self.api_group = ZGWApiGroupConfigFactory(
+            ztc_service__api_root=CATALOGI_ROOT,
+            zrc_service__api_root=ZAKEN_ROOT,
+            drc_service__api_root=DOCUMENTEN_ROOT,
+            form_service=None,
         )
         # openzaak config
         self.oz_config = OpenZaakConfig.get_solo()
-        self.oz_config.zaak_service = self.zaak_service
-        self.oz_config.catalogi_service = self.catalogi_service
-        self.oz_config.document_service = self.document_service
         self.oz_config.document_max_confidentiality = (
             VertrouwelijkheidsAanduidingen.beperkt_openbaar
         )
@@ -183,12 +188,22 @@ class CasesPlaywrightTests(
                 "geslachtsnaam": "Bazz",
             },
         )
+        self.resultaattype_with_naam = generate_oas_component_cached(
+            "ztc",
+            "schemas/ResultaatType",
+            url=f"{CATALOGI_ROOT}resultaattypen/b1a268dd-4322-47bb-a930-b83066b4a32c",
+            zaaktype=self.zaaktype["url"],
+            omschrijving="Short description",
+            resultaattypeomschrijving="http://example.com",
+            selectielijstklasse="http://example.com",
+            naam="Long description (>20 chars) of result",
+        )
         self.result = generate_oas_component_cached(
             "zrc",
             "schemas/Resultaat",
             uuid="a44153aa-ad2c-6a07-be75-15add5113",
             url=self.zaak["resultaat"],
-            resultaattype=f"{CATALOGI_ROOT}resultaattypen/b1a268dd-4322-47bb-a930-b83066b4a32c",
+            resultaattype=self.resultaattype_with_naam["url"],
             zaak=self.zaak["url"],
             toelichting="resultaat toelichting",
         )
@@ -242,7 +257,7 @@ class CasesPlaywrightTests(
             zaak=self.zaak["url"],
             registratiedatum="2022-01-12",
         )
-        self.uploaded_zaak_informatie_object_content = "test56789".encode("utf8")
+        self.uploaded_zaak_informatie_object_content = b"test56789"
         self.uploaded_informatie_object = generate_oas_component_cached(
             "drc",
             "schemas/EnkelvoudigInformatieObject",
@@ -269,8 +284,7 @@ class CasesPlaywrightTests(
         )
         self.contactmoment = generate_oas_component_cached(
             "cmc",
-            "schemas/ContactMoment",
-            uuid="aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+            "schemas/Contactmoment",
             url=f"{CONTACTMOMENTEN_ROOT}contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
             status=Status.nieuw,
             antwoord="",
@@ -278,11 +292,17 @@ class CasesPlaywrightTests(
         )
         self.klant_contactmoment = generate_oas_component_cached(
             "cmc",
-            "schemas/KlantContactMoment",
-            uuid="aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
+            "schemas/Klantcontactmoment",
             url=f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten/aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
             klant=self.klant["url"],
             contactmoment=self.contactmoment["url"],
+        )
+        self.object_contactmoment = generate_oas_component_cached(
+            "cmc",
+            "schemas/Objectcontactmoment",
+            url=f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten/aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
+            contactmoment=self.contactmoment["url"],
+            object=self.zaak["url"],
         )
 
         # enable upload and contact form
@@ -314,10 +334,13 @@ class CasesPlaywrightTests(
 
         for resource in [
             self.zaak,
+            self.resultaattype_with_naam,
             self.result,
             self.zaaktype,
             self.status_type_new,
             self.status_type_finish,
+            self.contactmoment,
+            self.object_contactmoment,
         ]:
             m.get(resource["url"], json=resource)
 
@@ -403,9 +426,14 @@ class CasesPlaywrightTests(
                 json=self.klant_contactmoment,
                 status_code=201,
             ),
+            m.post(
+                f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten",
+                json=self.object_contactmoment,
+                status_code=201,
+            ),
         ]
 
-    def test_cases(self, m):
+    def test_cases(self, m, contactmoment_mock):
         self._setUpMocks(m)
 
         context = self.browser.new_context(storage_state=self.user_login_state)
@@ -421,14 +449,17 @@ class CasesPlaywrightTests(
         case_title.click()
         page.wait_for_url(
             self.live_reverse(
-                "cases:case_detail", kwargs={"object_id": self.zaak["uuid"]}, star=True
+                "cases:case_detail",
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
+                star=True,
             )
         )
 
         # check case is visible
-        expect(page.get_by_text(self.zaak["identificatie"])).to_be_visible(
-            timeout=100_000
-        )
+        expect(page.get_by_text(self.zaak["identificatie"])).to_be_visible()
 
         # check documents show
         documents = page.locator(".file-list").get_by_role("listitem")
@@ -498,7 +529,7 @@ class CasesPlaywrightTests(
         # finally check if our mock matchers are accurate
         self.assertMockMatchersCalled(self.matchers)
 
-    def test_multiple_file_upload(self, m):
+    def test_multiple_file_upload(self, m, contactmoment_mock):
         self._setUpMocks(m)
 
         # Keep track of uploaded files (schemas/EnkelvoudigInformatieObject array)
@@ -572,14 +603,18 @@ class CasesPlaywrightTests(
         page = context.new_page()
         page.goto(
             self.live_reverse(
-                "cases:case_detail", kwargs={"object_id": self.zaak["uuid"]}
+                "cases:case_detail",
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
             )
         )
 
         upload_form = page.locator("#document-upload")
         file_input = upload_form.get_by_label("Sleep of selecteer bestanden")
         submit_button = upload_form.get_by_role("button", name=_("Upload documenten"))
-        notification_list = page.get_by_role("alert").get_by_role("list")
+        notification_list = page.locator(".notification").get_by_role("list")
         notification_list_items = notification_list.get_by_role("listitem")
         file_list = page.get_by_role("list").last
         file_list_items = file_list.get_by_role("listitem")
@@ -594,19 +629,23 @@ class CasesPlaywrightTests(
                 {
                     "name": "document_1.txt",
                     "mimeType": "text/plain",
-                    "buffer": "test12345".encode("utf8"),
+                    "buffer": b"test12345",
                 },
                 {
                     "name": "document_two.pdf",
                     "mimeType": "application/pdf",
-                    "buffer": "test67890".encode("utf8"),
+                    "buffer": b"test67890",
                 },
             ],
         )
         submit_button.click()
         page.wait_for_url(
             self.live_reverse(
-                "cases:case_detail", kwargs={"object_id": self.zaak["uuid"]}
+                "cases:case_detail",
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
             )
         )
 

@@ -1,8 +1,4 @@
 .map {
-  .h4 {
-    margin-bottom: var(--spacing-large);
-  }
-
   &__leaflet {
     height: 500px;
   }
@@ -17,13 +13,13 @@
   }
 }
 
-.p + .map {
+.utrecht-paragraph + .map {
   margin-top: var(--spacing-large);
 }
 
 .leaflet-content-name {
-  & > h4 {
-    margin: 0 !important;
+  & > .utrecht-heading-4 {
+    margin: 0;
   }
 }
 
@@ -32,4 +28,25 @@
   flex-direction: column;
   row-gap: var(--spacing-small);
   flex-wrap: wrap;
+
+  &.container--no-margin {
+    margin-top: var(--spacing-small);
+
+    & > .utrecht-paragraph {
+      margin: 0 !important;
+    }
+
+    /// leaflet reset
+    .link {
+      text-decoration: underline;
+    }
+  }
+}
+
+///
+/// Legacy styling
+///
+
+.p + .map {
+  margin-top: var(--spacing-large);
 }

@@ -1,21 +1,42 @@
+from django.conf import settings
 from django.contrib import messages
+from django.urls import reverse
+from django.utils.encoding import iri_to_uri
 from django.utils.functional import cached_property
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
 from mail_editor.helpers import find_template
 from view_breadcrumbs import BaseBreadcrumbMixin
 
-from open_inwoner.openklant.clients import build_client
+from open_inwoner.mail.service import send_contact_confirmation_mail
+from open_inwoner.openklant.api_models import (
+    ContactMomentCreateData,
+    Klant,
+    MedewerkerIdentificatie,
+)
+from open_inwoner.openklant.clients import (
+    KlantenClient,
+    build_contactmomenten_client,
+    build_klanten_client,
+)
 from open_inwoner.openklant.forms import ContactForm
 from open_inwoner.openklant.models import OpenKlantConfig
+from open_inwoner.openklant.views.utils import generate_question_answer_pair
 from open_inwoner.openklant.wrap import get_fetch_parameters
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 
 class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
     form_class = ContactForm
-    template_name = "pages/contactform/form.html"
+    template_name = "pages/contactform/form_wrap.html"  # inner ("structure") template rendered by CMS plugin
+    klanten_client: KlantenClient | None
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.klanten_client = build_klanten_client()
 
     @cached_property
     def crumbs(self):
@@ -25,11 +46,29 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
         return _("Contact formulier")
 
     def get_success_url(self):
-        return self.request.path
+        success_url = self.request.path
+        if url_has_allowed_host_and_scheme(
+            success_url,
+            allowed_hosts=[self.request.get_host()],
+            require_https=settings.IS_HTTPS,
+        ):
+            return iri_to_uri(success_url)
+        return reverse("contactform")
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
+
+        captcha_question = self.request.session.get("captcha_question")
+        captcha_answer = self.request.session.get("captcha_answer")
+
+        if not (captcha_question and captcha_answer):
+            captcha_question, captcha_answer = generate_question_answer_pair()
+
+        self.request.session["captcha_question"] = captcha_question
+        self.request.session["captcha_answer"] = captcha_answer
+
         kwargs["user"] = self.request.user
+        kwargs["request_session"] = self.request.session
         return kwargs
 
     def get_initial(self):
@@ -52,32 +91,54 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
         context["has_form_configuration"] = config.has_form_configuration()
         return context
 
-    def get_result_message(self, success=False):
+    def set_result_message(self, success: bool):
         if success:
-            return messages.add_message(
-                self.request, messages.SUCCESS, _("Vraag verstuurd!")
-            )
+            messages.add_message(self.request, messages.SUCCESS, _("Vraag verstuurd!"))
         else:
-            return messages.add_message(
+            messages.add_message(
                 self.request,
                 messages.ERROR,
                 _("Probleem bij versturen van de vraag."),
             )
 
-    def form_valid(self, form):
+    def form_valid(self, form: ContactForm):
         config = OpenKlantConfig.get_solo()
 
-        success = True
-        if config.register_email:
-            success = self.register_by_email(form, config.register_email) and success
-        if config.register_contact_moment:
-            success = self.register_by_api(form, config) and success
+        email_success = False
+        api_success = False
+        send_confirmation = False
+        api_user_email = None
 
-        self.get_result_message(success=success)
+        if config.register_email:
+            email_success = self.register_contactmoment_by_email(
+                form, config.register_email
+            )
+            send_confirmation = email_success
+
+        if config.register_contact_moment:
+            api_success, api_user_email = self.register_contactmoment_by_api(
+                form, config
+            )
+            if api_success:
+                send_confirmation = config.send_email_confirmation
+            # else keep the send_confirmation if email set it
+
+        user_email = (
+            api_user_email  # pulled from klanten api
+            or getattr(self.request.user, "email", None)
+            or form.cleaned_data["email"]
+        )
+
+        if send_confirmation:
+            send_contact_confirmation_mail(
+                user_email, form.cleaned_data["subject"].subject
+            )
+
+        self.set_result_message(email_success or api_success)
 
         return super().form_valid(form)
 
-    def register_by_email(self, form, recipient_email):
+    def register_contactmoment_by_email(self, form: ContactForm, recipient_email: str):
         template = find_template("contactform_registration")
 
         context = {
@@ -90,7 +151,7 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
             )
         }
 
-        parts = [form.cleaned_data[k] for k in ("first_name", "infix", "last_name")]
+        parts = (form.cleaned_data[k] for k in ("first_name", "infix", "last_name"))
         context["name"] = " ".join(p for p in parts if p)
 
         success = template.send_email([recipient_email], context)
@@ -107,121 +168,116 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
             )
             return False
 
-    def register_by_api(self, form, config: OpenKlantConfig):
-        assert config.has_api_configuration()
+    def register_contactmoment_by_api(
+        self,
+        form: ContactForm,
+        klanten_config: OpenKlantConfig,
+    ) -> tuple[bool, str]:
+        assert klanten_config.has_api_configuration()
 
-        # fetch/update/create klant
-        klant = None
-        if klanten_client := build_client("klanten"):
-            if self.request.user.is_authenticated and (
-                self.request.user.bsn or self.request.user.kvk
-            ):
-                klant = klanten_client.retrieve_klant(
-                    **get_fetch_parameters(self.request)
-                )
+        klant = self._fetch_klant()
+        if klant:
+            self._update_klant_with_form_data(klant, form.cleaned_data)
 
-                if klant:
-                    self.log_system_action(
-                        "retrieved klant for BSN or KVK user", user=self.request.user
-                    )
-
-                    # check if we have some data missing from the Klant
-                    update_data = {}
-                    if not klant.emailadres and form.cleaned_data["email"]:
-                        update_data["emailadres"] = form.cleaned_data["email"]
-                    if not klant.telefoonnummer and form.cleaned_data["phonenumber"]:
-                        update_data["telefoonnummer"] = form.cleaned_data["phonenumber"]
-                    if update_data:
-                        klanten_client.partial_update_klant(klant, update_data)
-                        self.log_system_action(
-                            "patched klant from user with missing fields: {patched}".format(
-                                patched=", ".join(sorted(update_data.keys()))
-                            ),
-                            user=self.request.user,
-                        )
-                else:
-                    self.log_system_action(
-                        "could not retrieve klant for BSN or KVK user",
-                        user=self.request.user,
-                    )
-
-            else:
-                data = {
-                    "bronorganisatie": config.register_bronorganisatie_rsin,
-                    "voornaam": form.cleaned_data["first_name"],
-                    "voorvoegselAchternaam": form.cleaned_data["infix"],
-                    "achternaam": form.cleaned_data["last_name"],
-                    "emailadres": form.cleaned_data["email"],
-                    "telefoonnummer": form.cleaned_data["phonenumber"],
-                }
-                # registering klanten won't work in e-Suite as it always pulls from BRP
-                # (but try anyway and fallback to appending details to tekst if fails)
-                klant = klanten_client.create_klant(data)
-
-                if klant:
-                    if self.request.user.is_authenticated:
-                        self.log_system_action(
-                            "created klant for basic authenticated user",
-                            user=self.request.user,
-                        )
-                    else:
-                        self.log_system_action("created klant for anonymous user")
-
-        # create contact moment
-        subject = form.cleaned_data["subject"].subject
-        subject_code = form.cleaned_data["subject"].subject_code
-        question = form.cleaned_data["question"]
-        text = _("Onderwerp: {subject}\n\n{question}").format(
-            subject=subject, question=question
+        contactmoment = self._create_contactmoment(
+            form.cleaned_data, klanten_config, klant
         )
+
+        if not contactmoment:
+            self.log_system_action(
+                "error while registering contactmoment by API", user=self.request.user
+            )
+            return False, getattr(klant, "emailadres", None)
+        self.log_system_action(
+            "registered contactmoment by API", user=self.request.user
+        )
+        return True, getattr(klant, "emailadres", None)
+
+    def _fetch_klant(self) -> Klant | None:
+        user = self.request.user
+
+        if not user.is_authenticated or (not user.bsn and not user.kvk):
+            return
+
+        if not self.klanten_client:
+            return
+
+        klant = self.klanten_client.retrieve_klant(**get_fetch_parameters(self.request))
+
+        self.log_system_action("retrieved klant for BSN or KVK user", user=user)
+
+        return klant
+
+    def _update_klant_with_form_data(self, klant: Klant, form_data: dict):
+        user = self.request.user
+
+        update_data = {}
+        user_email = form_data.get("email")
+        phonenumber = form_data.get("phonenumber")
+
+        if not klant.emailadres and user_email:
+            update_data["emailadres"] = user_email
+        if not klant.telefoonnummer and phonenumber:
+            update_data["telefoonnummer"] = phonenumber
+        if update_data:
+            self.klanten_client.partial_update_klant(klant, update_data)
+            self.log_system_action(
+                "patched klant from user with missing fields: {patched}".format(
+                    patched=", ".join(sorted(update_data.keys()))
+                ),
+                user=user,
+            )
+
+    def _create_contactmoment(
+        self,
+        form_data: dict,
+        klanten_config: OpenKlantConfig,
+        klant: Klant | None = None,
+    ):
+        if not (contactmoment_client := build_contactmomenten_client()):
+            return
+
+        subject = form_data["subject"].subject
+        subject_code = form_data["subject"].subject_code
+        text = form_data["question"]
 
         if not klant:
             # if we don't have a BSN and can't create a Klant we'll add contact info to the tekst
-            parts = [form.cleaned_data[k] for k in ("first_name", "infix", "last_name")]
+            parts = [form_data[k] for k in ("first_name", "infix", "last_name")]
             full_name = " ".join(p for p in parts if p)
+
             text = _("{text}\n\nNaam: {full_name}").format(
                 text=text, full_name=full_name
             )
-
-            if form.cleaned_data["email"]:
-                text = _("{text}\nEmail: {email}").format(
-                    text=text, email=form.cleaned_data["email"]
-                )
-
-            if form.cleaned_data["phonenumber"]:
-                text = _("{text}\nTelefoonnummer: {phone}").format(
-                    text=text, phone=form.cleaned_data["phonenumber"]
-                )
 
             self.log_system_action(
                 "could not retrieve or create klant for user, appended info to message",
                 user=self.request.user,
             )
 
-        data = {
-            "bronorganisatie": config.register_bronorganisatie_rsin,
-            "tekst": text,
-            "type": config.register_type,
-            "kanaal": "Internet",
-            "onderwerp": subject_code or subject,
-            "medewerkerIdentificatie": {
-                "identificatie": config.register_employee_id,
-            },
-        }
+        data = ContactMomentCreateData(
+            bronorganisatie=klanten_config.register_bronorganisatie_rsin,
+            tekst=text,
+            type=klanten_config.register_type,
+            kanaal=klanten_config.register_channel,
+            onderwerp=subject_code or subject,
+        )
 
-        contactmoment = None
-        if contactmomenten_client := build_client("contactmomenten"):
-            contactmoment = contactmomenten_client.create_contactmoment(
-                data, klant=klant
+        if not self.request.user.is_authenticated:
+            # Ensure we don't send an empty (and thus invalid) email or phonenumber
+            contactgegevens = {}
+            if form_data["email"]:
+                contactgegevens["emailadres"] = form_data["email"]
+
+            if form_data["phonenumber"]:
+                contactgegevens["telefoonnummer"] = form_data["phonenumber"]
+
+            if contactgegevens:
+                data["contactgegevens"] = contactgegevens
+
+        if employee_id := klanten_config.register_employee_id:
+            data["medewerkerIdentificatie"] = MedewerkerIdentificatie(
+                identificatie=employee_id
             )
 
-        if contactmoment:
-            self.log_system_action(
-                "registered contactmoment by API", user=self.request.user
-            )
-            return True
-        else:
-            self.log_system_action(
-                "error while registering contactmoment by API", user=self.request.user
-            )
-            return False
+        return contactmoment_client.create_contactmoment(data, klant=klant)

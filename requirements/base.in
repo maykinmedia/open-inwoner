@@ -10,9 +10,11 @@ furl # processing urls
 weasyprint # export to pdf
 tinycss2
 css_inline
+pydantic[email]
+typing-extensions
 
 # Framework libraries
-Django>=3.2.11<4.0
+Django>=4.2,<5.0
 django-admin-index
 django-axes
 django-filer
@@ -33,9 +35,10 @@ django-colorfield
 django-registration
 django-view-breadcrumbs
 markdown
-django_better_admin_arrayfield
+django-jsonform
 humanfriendly
-git+https://github.com/maykinmedia/mail-editor.git@0.3.5#egg=mail-editor
+mail-editor
+fontawesomefree
 django-timeline-logger
 django-csp
 django-csp-reports
@@ -43,10 +46,11 @@ mozilla-django-oidc-db
 django-open-forms-client
 django-htmx
 playwright
-django-yubin
 django-image-cropping
 django-log-outgoing-requests
 xsdata
+django-setup-configuration
+django-yubin
 
 # django cms
 django-cms
@@ -72,14 +76,23 @@ uwsgi
 sentry-sdk  # error monitoring
 elastic-apm  # Elastic APM integration
 
+beautifulsoup4
+
 # DigidLocal
-django-digid-eherkenning
+django-digid-eherkenning[oidc]
 maykin-python3-saml
 pyopenssl
 django-sessionprofile
 
+# Workers
+celery>=5.3.5
+celery-once
+django-celery-beat
+git+https://github.com/maykinmedia/django-celery-monitor@513dc28#egg=django_celery_monitor
+
 # Common Ground integration
 zgw-consumers
+zgw-consumers-oas
 notifications-api-common
 
 # 2FA SMS verification

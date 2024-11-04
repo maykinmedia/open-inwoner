@@ -1,5 +1,3 @@
-from typing import List
-
 from drf_spectacular.utils import extend_schema_field
 from filer.models import File, Image
 from rest_framework import serializers
@@ -129,7 +127,7 @@ class ProductLocationSerializer(serializers.ModelSerializer):
         model = ProductLocation
         fields = ("name", "street", "housenumber", "postcode", "city", "coordinates")
 
-    @extend_schema_field(List[str])
+    @extend_schema_field(list[str])
     def get_coordinates(self, obj):
         return obj.geometry.coords
 

@@ -1,13 +1,11 @@
 from django.test import TestCase
-from django.utils import timezone
 from django.utils.html import strip_tags
 from django.utils.translation import ngettext
 
-from freezegun import freeze_time
-
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.openzaak.constants import StatusIndicators
 from open_inwoner.userfeed.choices import FeedItemType
-from open_inwoner.userfeed.feed import ACTION_COMPLETED_HISTORY_RANGE, get_feed
+from open_inwoner.userfeed.feed import get_feed
 from open_inwoner.userfeed.hooks.common import simple_message
 from open_inwoner.userfeed.models import FeedItemData
 from open_inwoner.userfeed.tests.factories import FeedItemDataFactory
@@ -39,6 +37,8 @@ class FeedTests(TestCase):
         self.assertEqual(item.message, "Hello")
         self.assertEqual(item.title, "Test message")
         self.assertEqual(item.action_url, "http://foo.bar")
+        self.assertEqual(item.status_text, "")
+        self.assertEqual(item.status_indicator, StatusIndicators.info)
 
         # check summary
         summary = feed.summary[0]
@@ -49,20 +49,10 @@ class FeedTests(TestCase):
         ).format(count=1)
         self.assertEqual(strip_tags(summary), expected)
 
-        # forward in time past range
-        with freeze_time(timezone.now() + ACTION_COMPLETED_HISTORY_RANGE):
-            # not completed so still visible in the future
-            feed = get_feed(self.user, with_history=True)
-            self.assertEqual(feed.total_items, 1)
-
         # mark as completed
         item.mark_completed()
         self.assertEqual(item.is_completed, True)
 
-        # not visible, neither now nor in the future
+        # not visible anymore
         feed = get_feed(self.user)
         self.assertEqual(feed.total_items, 0)
-
-        with freeze_time(timezone.now() + ACTION_COMPLETED_HISTORY_RANGE):
-            feed = get_feed(self.user, with_history=True)
-            self.assertEqual(feed.total_items, 0)

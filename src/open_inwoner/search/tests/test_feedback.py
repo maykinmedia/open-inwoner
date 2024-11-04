@@ -3,7 +3,7 @@ import urllib
 from django.contrib import messages
 from django.test import override_settings, tag
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from django_webtest import WebTest
 from furl import furl
@@ -36,7 +36,7 @@ class TestFeedbackFunctionality(ESMixin, WebTest):
         url = f"{reverse('search:search')}?{urllib.parse.urlencode(params, doseq=True)}"
         response = self.app.get(url)
 
-        self.assertNotEquals(response.context["paginator"].count, 0)
+        self.assertNotEqual(response.context["paginator"].count, 0)
         feedback_form = response.forms["feedback_form"]
         feedback_form["remark"] = "Some remark"
         feedback_form["positive"] = "true"
@@ -189,6 +189,6 @@ class TestFeedbackFunctionality(ESMixin, WebTest):
         self.assertEqual(
             message.message,
             _(
-                "Thank you for your feedback. It will help us to improve our search engine"
+                "Thank you for your feedback, it will help us improve our search engine."
             ),
         )

@@ -1,32 +1,63 @@
 {% extends 'master.html' %}
-{% load i18n anchor_menu_tags card_tags grid_tags icon_tags link_tags list_tags pagination_tags utils %}
+{% load i18n anchor_menu_tags button_tags card_tags form_tags grid_tags icon_tags link_tags list_tags pagination_tags utils %}
 
 {% block content %}
     <h1 class="utrecht-heading-1" id="contactmomenten">{{ page_title }} ({{ contactmomenten|length }})</h1>
 
+    {% if contactmoment_contact_form_enabled %}
+    {# title + scroll down button #}
+    <section class="contactmomenten__scrolldown" data-testid="contactmomenten__contact_form_scrolldown">
+        <div class="form-container">
+            <div class="form-heading">
+                <h2 class="utrecht-heading-2">{% trans "Stel een vraag" %}</h2>
+                <p class="utrecht-paragraph">
+                {% blocktrans trimmed %}
+                    Heeft u een vraag? Dan kunt u deze hier stellen.
+                    Een van onze medewerkers beantwoord uw vraag z.s.m.
+                {% endblocktrans %}
+                </p>
+            </div>
+            <div class="button-row">
+                {% button href="#question-form" text=_("Stel een vraag") title=_("Stel een vraag") primary=True icon="arrow_downward" icon_position="after" %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {# grid with questions #}
     <div class="contactmomenten">
+        {% if contactmomenten %}
+            <h2 class="contactmomenten__title">{% trans "Eerder gestelde vragen" %}</h2>
+        {% else %}
+            <h2>{% trans "U heeft op dit moment nog geen vragen." %}</h2>
+        {% endif %}
+
         {% render_grid %}
             {% for contactmoment in page_obj.object_list %}
                 {% render_column start=forloop.counter_0|multiply:4 span=4 %}
                 <div class="card card--compact card--stretch">
+                    {% if contactmoment.new_answer_available %}
+                        {% translate "Nieuw antwoord beschikbaar" as new_answer_text %}
+                        {% include "components/StatusIndicator/StatusIndicator.html" with status_indicator="info" status_indicator_text=new_answer_text only %}
+                    {% endif %}
                     <div class="card__body">
-                        <a href="{{ contactmoment.url }}" class="contactmomenten__link">
+                        <a href="{{ contactmoment.case_detail_url }}" class="contactmomenten__link">
+                            <h2 class="card__heading-2">{{ contactmoment.subject }}</h2>
                             {% render_list %}
-                                <span class="contactmomenten-list">
-                                {% list_item contactmoment.registered_date caption=_("Ontvangstdatum") compact=True strong=False %}
-                                {% list_item contactmoment.channel caption=_("Contactwijze") compact=True strong=False %}
+                                <li class="list-item list-item--compact">
+                                    {% with register_date=contactmoment.registered_date|default:"" %}
+                                    <p class="card__caption card__text--small"><span>{% trans "Vraag ingediend op:" %}</span><span class="card__text--dark">{{ register_date|date }}</span></p>
+                                    {% endwith %}
+                                </li>
+                                {{ contactmoment.text }}
+                                {% list_item contactmoment.question_text compact=True strong=False %}
                                 {% list_item contactmoment.status caption=_("Status") compact=True strong=False %}
-                                {% if contactmoment.onderwerp %}
-                                    {% list_item contactmoment.onderwerp|truncatechars:25 caption=_("Onderwerp") compact=True strong=False %}
-                                {% else %}
-                                    {% list_item contactmoment.text|truncatechars:25 caption=_("Bericht") compact=True strong=False %}
-                                {% endif %}
-                                </span>
+                                {% list_item contactmoment.identification caption=_("Vraag nummer") compact=True strong=False %}
                             {% endrender_list %}
 
                             <span class="link link--icon link--secondary" aria-label="{% trans "Bekijk vraag" %}" title="{% trans "Bekijk vraag" %}">
                                 <span class="link__text">{% trans "Bekijk vraag" %}</span>
-                                {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+                                {% icon icon="east" icon_position="after" primary=True outlined=True %}
                             </span>
                         </a>
                     </div>
@@ -38,5 +69,38 @@
 
     {% if contactmomenten %}
         {% pagination page_obj=page_obj paginator=paginator request=request %}
+    {% endif %}
+
+    {% if contactmoment_contact_form_enabled %}
+    <section class="contactmomenten contactmomenten__contact-form" data-testid="contactmomenten__contact_form">
+        <div class="form-container">
+            <div class="form-heading">
+                <h2 class="utrecht-heading-2">{% trans "Stel een vraag" %}</h2>
+                <p class="utrecht-paragraph">
+                {% blocktrans trimmed %}
+                    Heeft u een vraag? Dan kunt u deze hier stellen.
+                    Een van onze medewerkers beantwoord uw vraag z.s.m.
+                {% endblocktrans %}
+                </p>
+            </div>
+            <div>
+                <form action="{% url 'cases:contactmoment_list' %}" method="POST" id="question-form" class="form contact-form">
+                    {% csrf_token %}
+
+                    {% input form.subject no_help=True icon="expand_more" %}
+                    {% if form.phonenumber %}
+                        {% input form.phonenumber no_help=True %}
+                    {% endif %}
+                    {% input form.question no_help=True %}
+
+                    <div class="form__submit">
+                        {% button_row %}
+                            {% button text=_("Vraag versturen") icon="east" icon_position="after" icon_outlined=True id="submit_question" type="submit" disabled=True primary=True name="question_form_submit" %}
+                        {% endbutton_row %}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
     {% endif %}
 {% endblock content %}

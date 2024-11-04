@@ -80,3 +80,8 @@ def create_content_wrapper(name, template_name):
         return ContentsNode(nodelist, template_name, **context_kwargs)
 
     return inner
+
+
+@register.filter
+def get_key(dict, key):
+    return dict[key]

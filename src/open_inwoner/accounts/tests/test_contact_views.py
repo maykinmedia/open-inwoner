@@ -5,14 +5,15 @@ from django.core import mail
 from django.core.files.images import ImageFile
 from django.test import override_settings
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
-from cms import api
 from django_webtest import WebTest
 
 from open_inwoner.accounts.models import User
 from open_inwoner.utils.tests.helpers import create_image_bytes
 
+from ...cms.inbox.cms_apps import InboxApphook
+from ...cms.tests import cms_tools
 from ..choices import ContactTypeChoices
 from .factories import DigidUserFactory, UserFactory
 
@@ -98,14 +99,7 @@ class ContactViewTests(WebTest):
         self.assertNotContains(response, _("Stuur bericht"))
 
         # case 2: unpublished message page
-        page = api.create_page(
-            "Mijn Berichten",
-            "cms/fullwidth.html",
-            "nl",
-            slug="berichten",
-        )
-        page.application_namespace = "inbox"
-        page.save()
+        page = cms_tools.create_apphook_page(InboxApphook, publish=False)
 
         response = self.app.get(self.list_url, user=self.user)
 
@@ -510,7 +504,7 @@ class ContactViewTests(WebTest):
         email = mail.outbox[0]
         self.assertEqual(
             email.subject,
-            f"Goedkeuring geven op Open Inwoner Platform: {self.user.get_full_name()} wilt u toevoegen als contactpersoon",
+            f"Goedkeuring geven op Open Inwoner Platform: {self.user.get_full_name()} wil u toevoegen als contactpersoon",
         )
         self.assertEqual(email.to, [existing_user.email])
         invite_url = f"http://testserver{reverse('profile:contact_list')}"
@@ -530,7 +524,7 @@ class ContactViewTests(WebTest):
         email = mail.outbox[0]
         self.assertNotEqual(
             email.subject,
-            f"Goedkeuring geven op Open Inwoner Platform: {self.user.get_full_name()} wilt u toevoegen als contactpersoon",
+            f"Goedkeuring geven op Open Inwoner Platform: {self.user.get_full_name()} wil u toevoegen als contactpersoon",
         )
         self.assertNotEqual(email.to, ["john@example.com"])
         invite_url = f"http://testserver{reverse('profile:contact_list')}"

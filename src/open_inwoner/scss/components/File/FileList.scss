@@ -1,7 +1,13 @@
 .file-list {
   margin-bottom: var(--row-height);
 
-  .h4 {
+  .utrecht-heading-1 {
+    &--bottom {
+      margin-bottom: calc(var(--row-height) / 2) !important;
+    }
+  }
+
+  .utrecht-heading-4 {
     margin-bottom: var(--spacing-large);
   }
 
@@ -18,17 +24,30 @@
       margin-bottom: 0;
     }
   }
+
+  &__heading {
+    display: flex;
+  }
 }
 
 ///
 /// Contextual
 ///
 
-.file-list + .h2,
-.file-list + .p {
+.file-list + .utrecht-heading-2,
+.file-list + .utrecht-paragraph {
   margin-top: var(--spacing-large);
 }
 
-.h2 + .file-list {
+.utrecht-heading-2 + .file-list {
   margin-top: var(--spacing-extra-large);
+}
+
+///
+/// Legacy styling
+///
+
+.file-list + .h2,
+.file-list + .p {
+  margin-top: var(--spacing-large);
 }

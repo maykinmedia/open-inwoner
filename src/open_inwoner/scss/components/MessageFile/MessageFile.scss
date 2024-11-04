@@ -24,7 +24,7 @@
     cursor: pointer;
   }
 
-  *[class*='icon'] {
+  *[class*='icons'] {
     color: var(--color-gray-lighter);
     left: 0;
     top: 0;
@@ -40,7 +40,7 @@
     cursor: pointer;
     flex-direction: row;
 
-    *[class*='icon'] {
+    *[class*='icons'] {
       top: var(--spacing-tiny);
       left: -5px;
     }

@@ -1,5 +1,5 @@
 from django import forms
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from .models import Feedback
 
@@ -11,9 +11,7 @@ class MultipleChoiceNoValidationField(forms.MultipleChoiceField):
 
 
 class SearchForm(forms.Form):
-    query = forms.CharField(
-        label=_("Zoek op trefwoord"), max_length=400, required=False
-    )
+    query = forms.CharField(label=_("Zoeken"), max_length=400, required=False)
     categories = MultipleChoiceNoValidationField(
         label=_("Categories"), required=False, widget=forms.CheckboxSelectMultiple
     )
@@ -26,7 +24,7 @@ class SearchForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["query"].widget.attrs["placeholder"] = _("Zoeken...")
+        self.fields["query"].widget.attrs["placeholder"] = _("Zoeken")
 
 
 class FeedbackForm(forms.ModelForm):

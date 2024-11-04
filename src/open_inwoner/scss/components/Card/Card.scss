@@ -18,6 +18,49 @@
   position: relative;
   text-decoration: none;
 
+  .card__header {
+    display: flex;
+    background-color: var(--color-info-lighter);
+    border-top-left-radius: var(--border-radius);
+    border-top-right-radius: var(--border-radius);
+    color: var(--color-info-darker);
+    font-size: var(--font-size-body);
+
+    .card__status_indicator_text {
+      // Fix for optical illusion
+      padding: 8px var(--spacing-large) 10px 0;
+    }
+
+    [class*='icons'] {
+      // Fix for optical illusion
+      margin: 8px 10px 6px 10px;
+    }
+
+    &.success {
+      display: flex;
+      background-color: var(--color-success-lighter);
+      color: var(--color-success);
+    }
+
+    &.info {
+      display: flex;
+      background-color: var(--color-info-lighter);
+      color: var(--color-info-darker);
+    }
+
+    &.warning {
+      display: flex;
+      background-color: var(--color-danger-lightest);
+      color: var(--color-danger-darker);
+    }
+
+    &.failure {
+      display: flex;
+      background-color: var(--color-error-lighter);
+      color: var(--color-error-darker);
+    }
+  }
+
   &__product-card {
     min-height: 150px;
   }
@@ -72,15 +115,65 @@
 
   &--tinted {
     --card-color-background: var(--color-gray-lightest);
+    border: var(--card-size-border) solid var(--color-gray-lightest);
 
     // contrast for accessibility
     .form .caption__content {
       color: var(--color-tinted-mute);
     }
 
-    .card__body--direction-horizontal .link .link__text {
-      text-align: right;
-      padding-left: var(--spacing-small);
+    .card__body--direction-horizontal {
+      display: flex;
+      justify-content: space-between;
+      padding: 20px;
+
+      .link .link__text {
+        text-align: right;
+        padding-left: var(--spacing-small);
+      }
+    }
+  }
+
+  &__header {
+    display: flex;
+    background-color: var(--color-info-lighter);
+    border-top-left-radius: var(--border-radius);
+    border-top-right-radius: var(--border-radius);
+    color: var(--color-info-darker);
+    font-size: var(--font-size-body);
+
+    .card__status_indicator_text {
+      // Fix for optical illusion
+      padding: 8px var(--spacing-large) 10px 0;
+    }
+
+    [class*='icons'] {
+      // Fix for optical illusion
+      margin: 6px 10px 6px 10px;
+    }
+
+    &.success {
+      display: flex;
+      background-color: var(--color-success-lighter);
+      color: var(--color-success);
+    }
+
+    &.info {
+      display: flex;
+      background-color: var(--color-info-lighter);
+      color: var(--color-info-darker);
+    }
+
+    &.warning {
+      display: flex;
+      background-color: var(--color-danger-lightest);
+      color: var(--color-danger-darker);
+    }
+
+    &.failure {
+      display: flex;
+      background-color: var(--color-error-lighter);
+      color: var(--color-error-darker);
     }
   }
 
@@ -100,6 +193,7 @@
   }
 
   &__text--small {
+    color: var(--color-body);
     font-size: var(--font-size-body-small);
   }
 
@@ -139,10 +233,24 @@
       text-decoration: none;
     }
 
-    .ellipsis .list-item p {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+    .ellipsis {
+      .list-item p {
+        color: var(--color-body);
+        font-size: var(--font-size-body-small);
+        line-height: var(--font-line-height-body-small);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      &--none .list-item p {
+        color: var(--color-body);
+        font-size: var(--font-size-body-small);
+        line-height: var(--font-line-height-body-small);
+        overflow: initial;
+        text-overflow: initial;
+        white-space: normal;
+      }
     }
   }
 
@@ -163,9 +271,10 @@
     flex-wrap: wrap;
     justify-content: space-between;
 
-    .p {
+    .utrecht-paragraph {
       margin-top: 4px;
     }
+
     .button {
       bottom: 0;
       right: 0;
@@ -176,11 +285,6 @@
     &--tabled {
       padding: 0;
     }
-  }
-
-  &__body--direction-horizontal {
-    display: flex;
-    justify-content: space-between;
   }
 
   &__body--flex {
@@ -217,10 +321,10 @@
   &__heading-2 .link,
   &__heading-3 .link,
   &__heading-4 .link {
-    color: var(--color-black);
-    font-family: var(--font-family-heading);
+    color: var(--oip-color-fg-heading);
+    font-family: var(--utrecht-heading-font-family);
     font-size: var(--font-size-heading-card);
-    line-height: var(--font-line-height-heading-4);
+    line-height: var(--utrecht-heading-4-line-height);
     margin: 0;
   }
 
@@ -232,7 +336,7 @@
       width: 100%;
     }
 
-    .p {
+    .utrecht-paragraph {
       width: 100%;
     }
   }
@@ -270,7 +374,7 @@
   }
 
   /// On a stretched card, the one and only link after a list should be placed on above the bottom border.
-  &-- stretch &__body {
+  &--stretch &__body {
     padding-bottom: var(--card-spacing);
 
     @media (min-width: 768px) {
@@ -279,7 +383,7 @@
   }
 
   &--stretch &__body .list:last-of-type {
-    padding-bottom: calc(var(--font-size-body) + var(--card-spacing) + 1em);
+    padding-bottom: calc(2 * var(--card-spacing-vertical));
   }
 
   &--stretch .list + .link:first-of-type:last-of-type,
@@ -291,12 +395,8 @@
       position: absolute;
     }
   }
-}
 
-///
-/// Contextual.
-///
-
-.h2 + .card {
-  margin-top: var(--spacing-large);
+  &.hidden {
+    display: none;
+  }
 }

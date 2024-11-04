@@ -14,7 +14,7 @@ from django.shortcuts import redirect
 from django.urls import resolve, reverse
 from django.urls.exceptions import Resolver404
 from django.utils.html import format_html, format_html_join
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from ordered_model.admin import OrderedInlineModelAdminMixin, OrderedTabularInline
 from solo.admin import SingletonModelAdmin
@@ -229,10 +229,16 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
             },
         ),
         (
-            _("Emails"),
+            _("Notifications"),
             {
                 "fields": (
-                    "email_new_message",
+                    "enable_notification_channel_choice",
+                    "notifications_cases_enabled",
+                    "notifications_messages_enabled",
+                    "notifications_plans_enabled",
+                    "notifications_actions_enabled",
+                    "email_verification_required",
+                    "contact_phonenumber",
                     "recipients_email_digest",
                 )
             },
@@ -274,6 +280,15 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
             },
         ),
         (
+            _("Customer satisfaction survey"),
+            {
+                "fields": (
+                    "kcm_survey_link_text",
+                    "kcm_survey_link_url",
+                ),
+            },
+        ),
+        (
             _("Display options for anonymous users"),
             {
                 "fields": (
@@ -294,6 +309,7 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
             },
         ),
         (_("Social media"), {"fields": ("display_social",)}),
+        (_("Questions"), {"fields": ("contactmoment_contact_form_enabled",)}),
     )
     inlines = [SiteConfigurationPageInline, FontConfigurationInline]
     form = SiteConfigurationAdminForm

@@ -25,8 +25,8 @@
     text-align: right;
   }
 
-  *[class*='icon'],
-  *[class*='Icon'] {
+  *[class*='icons'],
+  *[class*='Icons'] {
     font-size: 24px;
     width: 24px;
   }
@@ -43,7 +43,7 @@
     color: var(--color-secondary);
   }
 
-  .leaflet-container .h4 &--primary {
+  .leaflet-container .utrecht-heading-4 &--primary {
     color: var(--color-black);
   }
 
@@ -66,8 +66,8 @@
       text-decoration: underline;
     }
 
-    *[class*='icon'],
-    *[class*='Icon'] {
+    *[class*='icons'],
+    *[class*='Icons'] {
       text-decoration: none;
     }
   }
@@ -78,8 +78,27 @@
     text-decoration: none;
   }
 
-  *[class*='icon']:first-child,
-  *[class*='Icon']:first-child {
+  &.icon--large {
+    &:hover {
+      text-decoration: none;
+    }
+
+    *[class*='icons'] {
+      color: var(--color-gray-90);
+      font-size: 50px;
+    }
+  }
+
+  *[class*='icons']:first-child,
+  *[class*='Icons']:first-child {
     transform: scale(1);
+  }
+
+  ///
+  /// Legacy styling
+  ///
+
+  .leaflet-container .h4 &--primary {
+    color: var(--color-black);
   }
 }

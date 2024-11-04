@@ -1,6 +1,5 @@
 import dataclasses
 from datetime import date
-from typing import Optional
 
 from open_inwoner.accounts.models import User
 
@@ -18,7 +17,7 @@ class BRPData:
     housenumbersuffix: str = ""
 
     city: str = ""
-    birthday: Optional[date] = None
+    birthday: date | None = None
 
     # extra fields for My Data
     initials: str = ""

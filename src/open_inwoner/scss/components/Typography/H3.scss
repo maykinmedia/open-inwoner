@@ -2,17 +2,28 @@
 @import '~microscope-sass/lib/responsive';
 
 .utrecht-heading-3 {
-  display: var(--oip-typography-heading-display);
-  justify-content: var(--oip-typography-heading-justify-content);
+  // Reverse font-family fallback order
+  font-family: var(--utrecht-heading-font-family),
+    var(--utrecht-heading-3-font-family);
 }
 
+.utrecht-paragraph + .utrecht-heading-3 {
+  margin-top: var(--spacing-large);
+}
+
+///
+/// Legacy styling
+///
+
 .h3 {
-  color: var(--font-color-heading-3);
-  font-family: var(--font-family-heading-3);
-  font-size: var(--font-size-heading-3);
-  font-weight: var(--font-weight-heading-3);
-  line-height: var(--font-line-height-heading-3);
+  color: var(--utrecht-heading-3-color);
+  font-family: var(--utrecht-heading-3-font-family);
+  font-size: var(--utrecht-heading-3-font-size);
+  font-weight: var(--utrecht-heading-3-font-weight);
+  line-height: var(--utrecht-heading-3-line-height);
   margin: 0;
+  display: flex;
+  justify-content: space-between;
 
   @include mobile-only {
     word-break: normal;
@@ -20,7 +31,6 @@
   }
 }
 
-.p + .utrecht-heading-3,
 .p + .h3 {
   margin-top: var(--spacing-large);
 }

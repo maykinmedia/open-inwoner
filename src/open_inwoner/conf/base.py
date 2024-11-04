@@ -1,8 +1,9 @@
 import os
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 import sentry_sdk
+from celery.schedules import crontab
 from easy_thumbnails.conf import Settings as thumbnail_settings
 from log_outgoing_requests.formatters import HttpFormatter
 
@@ -113,6 +114,10 @@ SOLO_CACHE = "local"  # Avoid Redis overhead
 CACHE_ZGW_CATALOGI_TIMEOUT = config("CACHE_ZGW_CATALOGI_TIMEOUT", default=60 * 60 * 24)
 CACHE_ZGW_ZAKEN_TIMEOUT = config("CACHE_ZGW_ZAKEN_TIMEOUT", default=60 * 1)
 
+# Laposta API caching
+CACHE_LAPOSTA_API_TIMEOUT = config("CACHE_LAPOSTA_API_TIMEOUT", default=60 * 15)
+
+
 #
 # APPLICATIONS enabled for this project
 #
@@ -131,6 +136,7 @@ INSTALLED_APPS = [
     "django.forms",
     # load user model before CMS
     "open_inwoner.accounts",
+    "open_inwoner.openzaak",
     # Django-CMS
     "cms",
     "menus",
@@ -169,6 +175,7 @@ INSTALLED_APPS = [
     "sniplates",
     "digid_eherkenning",
     "eherkenning",
+    "digid_eherkenning.oidc",
     "localflavor",
     "easy_thumbnails",  # used by filer
     "image_cropping",
@@ -178,10 +185,9 @@ INSTALLED_APPS = [
     "solo",
     "colorfield",
     "view_breadcrumbs",
-    "django_better_admin_arrayfield",
+    "django_jsonform",
     "simple_certmanager",
     "zgw_consumers",
-    "notifications_api_common",
     "mail_editor",
     "ckeditor",
     "privates",
@@ -190,16 +196,20 @@ INSTALLED_APPS = [
     "cspreports",
     "mozilla_django_oidc",
     "mozilla_django_oidc_db",
-    "digid_eherkenning_oidc_generics",
     "sessionprofile",
     "openformsclient",
     "django_htmx",
-    "django_yubin",
     "log_outgoing_requests",
     "formtools",
+    "django_setup_configuration",
+    "django_yubin",
+    "notifications",
+    "custom_migrations",
     # Project applications.
     "open_inwoner.components",
     "open_inwoner.kvk",
+    "open_inwoner.laposta",
+    "open_inwoner.qmatic",
     "open_inwoner.ckeditor5",
     "open_inwoner.pdc",
     "open_inwoner.plans",
@@ -207,13 +217,13 @@ INSTALLED_APPS = [
     "open_inwoner.utils",
     "open_inwoner.configurations",
     "open_inwoner.haalcentraal",
-    "open_inwoner.openzaak",
     "open_inwoner.openklant",
     "open_inwoner.soap",
     "open_inwoner.ssd",
     "open_inwoner.questionnaire",
     "open_inwoner.extended_sessions",
     "open_inwoner.custom_csp",
+    "open_inwoner.mail",
     "open_inwoner.media",
     "open_inwoner.userfeed",
     "open_inwoner.cms.profile",
@@ -227,6 +237,14 @@ INSTALLED_APPS = [
     "open_inwoner.cms.plugins",
     "open_inwoner.cms.benefits",
     "djchoices",
+    "django_celery_beat",
+    "django_celery_monitor",
+    # Temporary fix: the notifications lib interferes with
+    # celery's task loading meachanism, which prevents certain
+    # tasks from showing up in the admin when OIP is run with
+    # Docker; this needs to be fixed this in the library eventually;
+    # for now we load it after all our apps.
+    "notifications_api_common",
 ]
 
 MIDDLEWARE = [
@@ -258,6 +276,7 @@ MIDDLEWARE = [
     "open_inwoner.extended_sessions.middleware.SessionTimeoutMiddleware",
     "open_inwoner.kvk.middleware.KvKLoginMiddleware",
     "open_inwoner.accounts.middleware.NecessaryFieldsMiddleware",
+    "open_inwoner.accounts.middleware.EmailVerificationMiddleware",
     "open_inwoner.cms.utils.middleware.AnonymousHomePageRedirectMiddleware",
     "mozilla_django_oidc_db.middleware.SessionRefresh",
 ]
@@ -340,12 +359,14 @@ EMAIL_TIMEOUT = 10
 
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="openinwoner@maykinmedia.nl")
 
-EMAIL_BACKEND = "django_yubin.smtp_queue.EmailBackend"
+EMAIL_BACKEND = "django_yubin.backends.QueuedEmailBackend"
+MAILER_USE_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
 #
 # LOGGING
 #
 LOG_STDOUT = config("LOG_STDOUT", default=False)
+CELERY_LOGLEVEL = config("CELERY_LOGLEVEL", default="INFO")
 
 LOGGING_DIR = os.path.join(BASE_DIR, "log")
 
@@ -441,6 +462,11 @@ LOGGING = {
             "level": "DEBUG",
             "propagate": True,
         },
+        "celery": {
+            "handlers": ["django"] if not LOG_STDOUT else ["console"],
+            "level": CELERY_LOGLEVEL,
+            "propagate": True,
+        },
     },
 }
 
@@ -474,8 +500,7 @@ AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
     "digid_eherkenning.backends.DigiDBackend",
     "eherkenning.backends.eHerkenningBackend",
-    "digid_eherkenning_oidc_generics.backends.OIDCAuthenticationDigiDBackend",
-    "digid_eherkenning_oidc_generics.backends.OIDCAuthenticationEHerkenningBackend",
+    "open_inwoner.accounts.backends.DigiDEHerkenningOIDCBackend",
     "open_inwoner.accounts.backends.CustomOIDCBackend",
 ]
 
@@ -486,7 +511,7 @@ SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 ADMIN_SESSION_COOKIE_AGE = config(
     "ADMIN_SESSION_COOKIE_AGE", 3600
 )  # Default 1 hour max session duration for admins
-SESSION_WARN_DELTA = 60  # Warn 1 minute before end of session.
+SESSION_WARN_DELTA = 120  # Warn 2 minutes before end of session.
 SESSION_COOKIE_AGE = 900  # Set to 15 minutes or less for testing
 
 LOGIN_REDIRECT_URL = "/"
@@ -554,6 +579,7 @@ CMS_PLACEHOLDER_CONF = {
             "ProductFinderPlugin",
             "ProductLocationPlugin",
             "UserFeedPlugin",
+            "UserAppointmentsPlugin",
         ],
         "text_only_plugins": ["LinkPlugin"],
         "name": _("Content"),
@@ -588,6 +614,10 @@ CMS_PLACEHOLDER_CONF = {
         "child_classes": {
             "TextPlugin": ["LinkPlugin"],
         },
+    },
+    "contact_form": {
+        "name": _("Contact form plugin"),
+        "plugins": ["ContactFormPlugin"],
     },
 }
 
@@ -630,6 +660,9 @@ AXES_LOCKOUT_TEMPLATE = "account_blocked.html"
 AXES_USE_USER_AGENT = True  # Default: False
 AXES_LOCK_OUT_BY_COMBINATION_USER_AND_IP = True  # Default: False
 AXES_BEHIND_REVERSE_PROXY = IS_HTTPS
+# By default, Axes obfuscates values for formfields named "password", but the admin
+# interface login formfield name is "auth-password", so we obfuscate that as well
+AXES_SENSITIVE_PARAMETERS = ["password", "auth-password"]  # nosec
 
 # The default meta precedence order
 IPWARE_META_PRECEDENCE_ORDER = (
@@ -648,10 +681,81 @@ IPWARE_META_PRECEDENCE_ORDER = (
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 #
+# CELERY - async task queue
+#
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
+CELERY_TASK_TIME_LIMIT = config("CELERY_TASK_HARD_TIME_LIMIT", default=15 * 60)
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+# https://docs.celeryq.dev/en/latest/userguide/periodic-tasks.html#beat-entries
+CELERY_BEAT_SCHEDULE = {
+    # Note that the keys here will be used to give human-readable names
+    # to the periodic task entries, which will be visible to users in the
+    # admin interface. Unfortunately, we we cannot use gettext here (even
+    # in lazy mode): Django allows it, Celery does not. We could consider
+    # doing this registration in one of the Celery hooks, but until this
+    # becomes a painpoint, it's cleaner to have the schedule easily accessible
+    # here in the settings file.
+    "Importeer ZGW data": {
+        "task": "open_inwoner.openzaak.tasks.import_zgw_data",
+        "schedule": crontab(minute="0", hour="7", day_of_month="*"),
+    },
+    "Zoekindex opnieuw opbouwen": {
+        "task": "open_inwoner.search.tasks.rebuild_search_index",
+        "schedule": crontab(minute="0", hour="4", day_of_month="*"),
+    },
+    "Dagelijkse misluke email samenvatting": {
+        "task": "open_inwoner.configurations.tasks.send_failed_mail_digest",
+        "schedule": crontab(minute="0", hour="7", day_of_month="*"),
+    },
+    "Probeer emails opnieuw te sturen": {
+        "task": "django_yubin.tasks.retry_emails",
+        "schedule": crontab(minute="1", hour="*", day_of_month="*"),
+    },
+    "Verwijder oude emails": {
+        "task": "django_yubin.tasks.delete_old_emails",
+        "schedule": crontab(minute="0", hour="6", day_of_month="*"),
+    },
+    "Verzend emails in het kader van taken": {
+        "task": "open_inwoner.accounts.tasks.schedule_user_notifications",
+        "schedule": crontab(minute="15", hour="9", day_of_month="*"),
+        "kwargs": {
+            "notify_about": "actions",
+            "channel": "email",
+        },
+    },
+    "Verzend emails in het kader van samenwerkingen": {
+        "task": "open_inwoner.accounts.tasks.schedule_user_notifications",
+        "schedule": crontab(minute="5", hour="9", day_of_month="*"),
+        "kwargs": {
+            "notify_about": "plans",
+            "channel": "email",
+        },
+    },
+    "Verzend emails in het kader van berichten": {
+        "task": "open_inwoner.accounts.tasks.schedule_user_notifications",
+        "schedule": crontab(minute="*/15", hour="*", day_of_month="*"),
+        "kwargs": {
+            "notify_about": "messages",
+            "channel": "email",
+        },
+    },
+}
+
+# Only ACK when the task has been executed. This prevents tasks from getting lost, with
+# the drawback that tasks should be idempotent (if they execute partially, the mutations
+# executed will be executed again!)
+# CELERY_TASK_ACKS_LATE = True
+
+# ensure that no tasks are scheduled to a worker that may be running a very long-running
+# operation, leading to idle workers and backed-up workers. The `-O fair` option
+# *should* have the same effect...
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
+
+#
 # SENTRY - error monitoring
 #
 SENTRY_DSN = config("SENTRY_DSN", None)
-RELEASE = "v1.14"  # get_current_version()
+RELEASE = "v1.22.0"  # get_current_version()
 
 PRIVATE_MEDIA_ROOT = os.path.join(BASE_DIR, "private_media")
 FILER_ROOT = os.path.join(BASE_DIR, "media", "filer")
@@ -695,6 +799,13 @@ PRIVATE_MEDIA_URL = "/private_files/"
 
 CORS_ALLOWED_ORIGINS = []
 CORS_ALLOW_CREDENTIALS = True
+
+
+CSRF_TRUSTED_ORIGINS = config(
+    "CSRF_TRUSTED_ORIGINS",
+    split=True,
+    default=CORS_ALLOWED_ORIGINS,
+)
 
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
@@ -764,7 +875,7 @@ if not ELASTIC_APM_SERVER_URL:
 # geopy
 GEOPY_APP = "Openinwoner"
 GEOPY_TIMEOUT = 10  # in seconds
-LOCATIESERVER_DOMAIN = "geodata.nationaalgeoregister.nl/locatieserver/v3"
+LOCATIESERVER_DOMAIN = "api.pdok.nl/bzk/locatieserver/search/v3_1"
 GEOCODER = "open_inwoner.utils.geocode.PdocLocatieserver"
 
 
@@ -797,6 +908,9 @@ ZGW_LIMIT_NOTIFICATIONS_FREQUENCY = config(
 # recent documents: created/added no longer than n days in the past
 DOCUMENT_RECENT_DAYS = config("DOCUMENT_RECENT_DAYS", default=1)
 
+# recent answers to contactmomenten: no longer than n days in the past
+CONTACTMOMENT_NEW_DAYS = config("CONTACTMOMENT_NEW_DAYS", default=7)
+
 #
 # Maykin 2FA
 #
@@ -819,38 +933,12 @@ BRP_VERSION = config("BRP_VERSION", default="2.0")
 #
 # DIGID
 #
-
-if ALLOWED_HOSTS:
-    BASE_URL = "https://{}".format(ALLOWED_HOSTS[0])
-else:
-    BASE_URL = "https://example.com"
-
-DIGID_MOCK = config("DIGID_MOCK", default=True)
 DIGID_ENABLED = config("DIGID_ENABLED", default=True)
-DIGID_METADATA = config("DIGID_METADATA", "")
-SSL_CERTIFICATE_PATH = config("SSL_CERTIFICATE_PATH", "")
-SSL_KEY_PATH = config("SSL_KEY_PATH", "")
-DIGID_SERVICE_ENTITY_ID = config(
-    "DIGID_SERVICE_ENTITY_ID", "https://was-preprod1.digid.nl/saml/idp/metadata"
-)
-DIGID_WANT_ASSERTIONS_SIGNED = config("DIGID_WANT_ASSERTIONS_SIGNED", default=True)
+DIGID_MOCK = config("DIGID_MOCK", default=True)
 
-DIGID = {
-    "base_url": BASE_URL,
-    "entity_id": BASE_URL,
-    # This is the metadata of the **Identity provider** NOT our own!
-    "metadata_file": DIGID_METADATA,
-    # SSL/TLS key
-    "key_file": SSL_KEY_PATH,
-    "cert_file": SSL_CERTIFICATE_PATH,
-    "service_entity_id": DIGID_SERVICE_ENTITY_ID,
-    "attribute_consuming_service_index": "1",
-    "requested_attributes": ["bsn"],
-    # Logius can sign the assertions (True) but others sign the entire response
-    # (False).
-    "want_assertions_signed": DIGID_WANT_ASSERTIONS_SIGNED,
-}
-
+#
+# EHERKENNING
+#
 EHERKENNING_MOCK = config("EHERKENNING_MOCK", default=True)
 
 THUMBNAIL_ALIASES = {
@@ -902,9 +990,17 @@ from .parts.maileditor import (  # noqa
     MAIL_EDITOR_DYNAMIC_CONTEXT,
 )
 
+if ALLOWED_HOSTS:
+    BASE_URL = "https://{}".format(ALLOWED_HOSTS[0])
+else:
+    BASE_URL = "https://example.com"
+
 MAIL_EDITOR_BASE_HOST = BASE_URL
 
 CKEDITOR_CONFIGS = {
+    "default": {
+        "allowedContent": True,
+    },
     "mail_editor": {
         "allowedContent": True,
         "contentsCss": [
@@ -912,11 +1008,31 @@ CKEDITOR_CONFIGS = {
         ],  # Enter the css file used to style the email.
         "height": 600,  # This is optional
         "entities": False,  # This is added because CKEDITOR escapes the ' when you do an if statement
-    }
+    },
 }
 
+#
+# django-setup-configuration
+#
+from .app.setup_configuration import *  # noqa
 
-#
-# Project specific settings
-#
-CASE_LIST_NUM_THREADS = 6
+DJANGO_SETUP_CONFIG_TEMPLATE = "configurations/config_doc.rst"
+DJANGO_SETUP_CONFIG_DOC_PATH = f"{BASE_DIR}/docs/configuration"
+DJANGO_SETUP_CONFIG_CUSTOM_FIELDS = [
+    {
+        "field": "django_jsonform.models.fields.ArrayField",
+        "description": "string, comma-delimited ('foo,bar,baz')",
+    },
+    {
+        "field": "django.contrib.postgres.fields.ArrayField",
+        "description": "string, comma-delimited ('foo,bar,baz')",
+    },
+    {
+        "field": "django.db.models.fields.files.FileField",
+        "description": "string representing the (absolute) path to a file, including file extension",
+    },
+    {
+        "field": "privates.fields.PrivateMediaFileField",
+        "description": "string representing the (absolute) path to a file, including file extension",
+    },
+]

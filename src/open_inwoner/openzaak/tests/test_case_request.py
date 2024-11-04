@@ -1,13 +1,12 @@
 from django.test import TestCase
 
 import requests_mock
-from zgw_consumers.constants import APITypes
 
-from open_inwoner.openzaak.clients import build_client
+from open_inwoner.openzaak.clients import build_zaken_client
 
 from ...utils.test import ClearCachesMixin
 from ..models import OpenZaakConfig
-from .factories import ServiceFactory
+from .factories import ZGWApiGroupConfigFactory
 from .helpers import generate_oas_component_cached
 from .shared import ZAKEN_ROOT
 
@@ -17,11 +16,11 @@ class TestFetchSpecificCase(ClearCachesMixin, TestCase):
     def setUp(self):
         super().setUp()
 
-        self.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
+        ZGWApiGroupConfigFactory(
+            zrc_service__api_root=ZAKEN_ROOT,
+            form_service=None,
+        )
         self.config = OpenZaakConfig.get_solo()
-        self.config.zaak_service = self.zaak_service
-        self.config.save()
-
         self.zaak = generate_oas_component_cached(
             "zrc",
             "schemas/Zaak",
@@ -32,14 +31,14 @@ class TestFetchSpecificCase(ClearCachesMixin, TestCase):
             einddatum=None,
         )
 
-        self.client = build_client("zaak")
+        self.client = build_zaken_client()
 
     def test_case_is_retrieved(self, m):
         m.get(self.zaak["url"], json=self.zaak)
 
         case = self.client.fetch_single_case("d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d")
 
-        self.assertEquals(
+        self.assertEqual(
             case.url,
             f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
         )

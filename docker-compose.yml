@@ -1,14 +1,31 @@
-# Inspired by https://docs.docker.com/compose/django/
-version: '3'
+#
+# Docker-compose for full Open Inwoner stack.
+#
+# DISCLAIMER: THIS IS FOR DEVELOPMENT PURPOSES ONLY AND NOT SUITABLE FOR PRODUCTION.
+#
+# You can use this docker-compose to spin up a local Open Inwoner stack for demo/try-out
+# purposes, or to get some insight in the various components involved (e.g. to build
+# your Helm charts from). Note that various environment variables are UNSAFE and merely
+# specified so that you can get up and running with the least amount of friction.
+#
+# Before deploying to production, please review the environment configuration reference:
+# https://open-inwoner.readthedocs.io/
+#
+version: '3.4'
 
 services:
   db:
-    image: postgis/postgis:12-2.5
+    image: postgis/postgis:${PG_VERSION:-14-master}
+    container_name: open-inwoner-db
     environment:
-      - POSTGRES_USER=${DB_USER:-open_inwoner}
-      - POSTGRES_PASSWORD=${DB_PASSWORD:-open_inwoner}
+      - POSTGRES_HOST_AUTH_METHOD=${POSTGRES_HOST_AUTH_METHOD:-trust}
+      - POSTGRES_DB=${POSTGRES_DB:-open_inwoner}
+      - POSTGRES_USER=${POSTGRES_USER:-open_inwoner}
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - ./docker-initdb.d/:/docker-entrypoint-initdb.d
+      - db:/var/lib/postgresql/data
+    networks:
+      - openinwoner-dev
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.9.2
@@ -17,32 +34,148 @@ services:
       - discovery.type=single-node
       - cluster.routing.allocation.disk.threshold_enabled=false
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    networks:
+      - openinwoner-dev
     volumes:
       - es_data:/usr/share/elasticsearch/data
     ports:
-      - 9200:9200
+      - ${ES_PORTS:-9201:9201}
 
   redis:
-    image: redis
+    image: redis:6
+    command: ["redis-server", "--appendonly", "yes"]
+    networks:
+      - openinwoner-dev
+    volumes:
+      - data:/data
 
-  web:
-    build: .
-    environment:
+  busybox:
+    image: busybox
+    command: /bin/chown -R 1000 /private-media
+    volumes:
+      - private_media:/private-media
+
+  web: &web-service
+    build: &web_build
+      context: .
+      args:
+        RELEASE: ${TAG:-latest}
+    container_name: open-inwoner-web
+    image: maykinmedia/open-inwoner:${TAG:-latest}
+    environment: &web_env
       - DJANGO_SETTINGS_MODULE=open_inwoner.conf.docker
-      - SECRET_KEY=${SECRET_KEY:-7bk)w=_%lnm#68rc!c)h@gy&5+%^f$=okq17bv!)yv!l0udu2y}
+      - SECRET_KEY=${SECRET_KEY:-7bk)w=_%lnm#68rc!c)h@gy&5+%^fl=okq17bv!)yv!l0udu2y}
       - ALLOWED_HOSTS=*
+      - CORS_ALLOW_ALL_ORIGINS=${CORS_ALLOW_ALL_ORIGINS:-true}
+      - CSRF_TRUSTED_ORIGINS='http://localhost:9000'
       - CACHE_DEFAULT=redis:6379/0
       - CACHE_AXES=redis:6379/0
+      - CACHE_OIDC=redis:6379/0
+      - CACHE_PORTALOCKER=redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - CELERY_LOGLEVEL=DEBUG
       - ES_HOST=elasticsearch
-      - TWO_FACTOR_FORCE_OTP_ADMIN=0
-      - TWO_FACTOR_PATCH_ADMIN=0
+      # Needed for Celery Flower to match the TIME_ZONE configured in the
+      # settings used by workers and beat containers.
+      - TZ=Europe/Amsterdam
+      # WARNING: Strictly for development!
+      - DISABLE_2FA=${DISABLE_2FA:-True}
+      - DEBUG=True
+      - IS_HTTPS=no
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; exit(requests.head('http://localhost:8000/admin/').status_code not in [200, 302])"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      # This should allow for enough time for migrations to run before the max
+      # retries have passed. This healthcheck in turn allows other containers
+      # to wait for the database migrations.
+      start_period: 60s
+    volumes: &web_volumes
+      - media:/app/media
+      - private_media:/app/private_media
     ports:
       - 8000:8000
     depends_on:
       - db
       - redis
-      - elasticsearch
+    networks:
+      - openinwoner-dev
+
+  web-init:
+    <<: *web-service
+    container_name: open-inwoner-web-init
+    ports: []
+    env_file:
+      - django-setup-config.env
+    command: /setup_configuration.sh
+
+  nginx:
+    image: nginx
+    volumes:
+      - ./docker-nginx-default.conf:/etc/nginx/conf.d/default.conf
+      - private_media:/private-media
+    ports:
+      - '9000:80'
+    depends_on:
+      - web
+    networks:
+      - openinwoner-dev
+
+  celery:
+    build: *web_build
+    image: maykinmedia/open-inwoner:${TAG:-latest}
+    environment: *web_env
+    command: /celery_worker.sh
+    healthcheck:
+      test: ["CMD", "python", "/app/bin/check_celery_worker_liveness.py"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    volumes: *web_volumes
+    depends_on:
+      web:
+        # This health check condition is needed because Celery Beat will
+        # try to convert the CELERY_BEAT_SCHEDULE into database entries. For
+        # this, migrations need to be finished. If Celery tasks were still
+        # pending, the database also needs to be ready for Celery itself. We
+        # therefore have the health check here, and make Celery beat and
+        # monitor containers depend on the celery container.
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - openinwoner-dev
+
+  celery-beat:
+    build: *web_build
+    image: maykinmedia/open-inwoner:${TAG:-latest}
+    environment: *web_env
+    command: /celery_beat.sh
+    depends_on:
+      - celery
+    networks:
+      - openinwoner-dev
+
+  celery-monitor:
+    build: *web_build
+    image: maykinmedia/open-inwoner:${TAG:-latest}
+    environment: *web_env
+    command: /celery_monitor.sh
+    depends_on:
+      - celery
+    networks:
+      - openinwoner-dev
 
 volumes:
-  db_data:
+  db:
+  media:
+  private_media:
+  data:
   es_data:
+
+networks:
+  openinwoner-dev:
+    name: openinwoner-dev

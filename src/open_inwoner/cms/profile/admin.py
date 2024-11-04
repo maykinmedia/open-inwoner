@@ -10,6 +10,7 @@ class ProfileConfigAdmin(BaseAppHookConfig, admin.ModelAdmin):
     def get_config_fields(self):
         return (
             "my_data",
+            "selected_categories",
             "mentors",
             "my_contacts",
             "selfdiagnose",
@@ -17,4 +18,6 @@ class ProfileConfigAdmin(BaseAppHookConfig, admin.ModelAdmin):
             "notifications",
             "questions",
             "ssd",
+            "newsletters",
+            "appointments",
         )

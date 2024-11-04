@@ -1,5 +1,4 @@
 import os
-from typing import Optional
 
 from django.conf import settings
 from django.contrib.flatpages.models import FlatPage
@@ -7,10 +6,11 @@ from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
+import ckeditor.fields as ckeditor_fields
 from colorfield.fields import ColorField
-from django_better_admin_arrayfield.models.fields import ArrayField
+from django_jsonform.models.fields import ArrayField
 from filer.fields.image import FilerImageField
 from ordered_model.models import OrderedModel, OrderedModelManager
 from solo.models import SingletonModel
@@ -19,7 +19,7 @@ from ..utils.colors import hex_to_hsl
 from ..utils.css import clean_stylesheet
 from ..utils.fields import CSSField
 from ..utils.files import OverwriteStorage
-from ..utils.validators import FilerExactImageSizeValidator
+from ..utils.validators import DutchPhoneNumberValidator, FilerExactImageSizeValidator
 from .choices import ColorTypeChoices, CustomFontName, OpenIDDisplayChoices
 from .validators import validate_oidc_config
 
@@ -37,10 +37,12 @@ class SiteConfiguration(SingletonModel):
     )
     secondary_color = ColorField(
         verbose_name=_("Secondary color"),
+        default="#0000FF",
         help_text=_("The secondary color of the municipality's site"),
     )
     accent_color = ColorField(
         verbose_name=_("Accent color"),
+        default="#FF0000",
         help_text=_("The accent color of the municipality's site"),
     )
     primary_font_color = models.CharField(
@@ -69,7 +71,7 @@ class SiteConfiguration(SingletonModel):
         default=False,
         help_text=_("Whether the warning banner should be displayed"),
     )
-    warning_banner_text = models.TextField(
+    warning_banner_text = ckeditor_fields.RichTextField(
         verbose_name=_("Warning banner text"),
         blank=True,
         help_text=_("Text will be displayed on the warning banner"),
@@ -278,6 +280,8 @@ class SiteConfiguration(SingletonModel):
         FlatPage,
         verbose_name=_("Flatpages"),
         through="SiteConfigurationPage",
+        null=True,
+        blank=True,
         related_name="configurations",
     )
     home_help_text = models.TextField(
@@ -359,10 +363,45 @@ class SiteConfiguration(SingletonModel):
     )
 
     # email notifications
-    email_new_message = models.BooleanField(
-        verbose_name=_("Send email about a new message"),
+    enable_notification_channel_choice = models.BooleanField(
+        verbose_name=_("Enable choice of notification channel"),
+        default=False,
+        help_text=_(
+            "Give users the option to choose how they want to receive notifications "
+            "(digital and post or digital only)"
+        ),
+    )
+    notifications_cases_enabled = models.BooleanField(
+        verbose_name=_("User notifications for cases"),
         default=True,
-        help_text=_("Whether to send email about each new message the user receives"),
+        help_text=_(
+            "Enable notifications for cases (if enabled, individual users can still opt out of "
+            "notifications about case updates, though not of notifications that indicate that "
+            "an action concerning some case is required)"
+        ),
+    )
+    notifications_messages_enabled = models.BooleanField(
+        verbose_name=_("User notifications for messages"),
+        default=True,
+        help_text=_(
+            "Enable notifications for messages (if enabled, individual users can still opt out; "
+            "messages will only be sent if the user also opts in)"
+        ),
+    )
+    notifications_plans_enabled = models.BooleanField(
+        verbose_name=_("User notifications for expiring plans"),
+        default=True,
+        help_text=_(
+            "Enable notifications for plans (if enabled, individual users can still opt out)"
+        ),
+    )
+    notifications_actions_enabled = models.BooleanField(
+        verbose_name=_("User notifications for expiring actions"),
+        default=True,
+        help_text=_(
+            "Enable notifications for expiring actions concerning plans (if enabled, individual users "
+            "can still opt out by disabling notifications for plans)"
+        ),
     )
     recipients_email_digest = ArrayField(
         models.EmailField(),
@@ -372,6 +411,25 @@ class SiteConfiguration(SingletonModel):
         ),
         blank=True,
         default=list,
+    )
+    email_verification_required = models.BooleanField(
+        verbose_name=_("Email verification required"),
+        default=False,
+        help_text=_("Whether to require users to verify their email address"),
+    )
+
+    # contact info
+    contact_phonenumber = models.CharField(
+        verbose_name=_("Phonenumber"),
+        blank=True,
+        max_length=15,
+        validators=[DutchPhoneNumberValidator()],
+        help_text=_("The public contact phone number of the organization"),
+    )
+    contact_page = models.URLField(
+        verbose_name=_("URL"),
+        blank=True,
+        help_text=_("URL of the public contact page of the organization"),
     )
 
     # analytics
@@ -438,6 +496,19 @@ class SiteConfiguration(SingletonModel):
         blank=True,
         verbose_name=_("Privacy page link"),
         help_text=_("The link to the cookie policy page."),
+    )
+    kcm_survey_link_text = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name=_("KCM survey link text"),
+        help_text=_(
+            "The text that is displayed on the customer satisfaction survey link"
+        ),
+    )
+    kcm_survey_link_url = models.URLField(
+        verbose_name=_("KCM survey URL"),
+        blank=True,
+        help_text=_("The external link for the customer satisfaction survey."),
     )
     openid_connect_logo = FilerImageField(
         verbose_name=_("Openid Connect Logo"),
@@ -525,6 +596,13 @@ class SiteConfiguration(SingletonModel):
             "the OpenID Connect integration, navigate to `OpenID Connect configuration for eHerkenning` and enable it."
         ),
     )
+    contactmoment_contact_form_enabled = models.BooleanField(
+        verbose_name=_("Contactmoment contact form"),
+        default=True,
+        help_text=_(
+            "Display contact form on the questions list page so that users can create new questions"
+        ),
+    )
 
     class Meta:
         verbose_name = _("Site Configuration")
@@ -577,7 +655,16 @@ class SiteConfiguration(SingletonModel):
     def openid_enabled_for_regular_users(self):
         return self.openid_display == OpenIDDisplayChoices.regular
 
-    def get_help_text(self, request) -> Optional[str]:
+    @property
+    def any_notifications_enabled(self) -> bool:
+        return (
+            self.notifications_actions_enabled
+            or self.notifications_messages_enabled
+            or self.notifications_plans_enabled
+            or self.notifications_cases_enabled
+        )
+
+    def get_help_text(self, request) -> str | None:
         match = request.resolver_match
         path = request.get_full_path()
         if not match:

@@ -7,19 +7,27 @@
     display: flex;
     align-items: flex-start;
     padding: 0;
-    margin: 0 auto;
+    margin: 0;
 
     @media (min-width: 768px) {
       max-width: var(--container-width);
+      margin: 0
+        max((100vw - var(--container-width)) / 2 - 7px, var(--spacing-large));
     }
 
     .warning-header__text {
-      padding: var(--spacing-small);
+      padding: var(--spacing-tiny) 0 0 0;
     }
 
-    *[class*='icon'],
-    *[class*='Icon'] {
+    *[class*='icons'],
+    *[class*='Icons'] {
       max-width: var(--spacing-giant);
     }
+  }
+
+  // override paragraph styling from CKEditor
+  p {
+    margin: 0;
+    padding: 0;
   }
 }

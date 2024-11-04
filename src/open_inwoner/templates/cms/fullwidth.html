@@ -23,10 +23,10 @@
 
 {% block content %}
     {% if not request.user.is_authenticated %}
-        <div class="grid__welcome">
+        <section class="plugin grid__welcome">
             <h1 class="utrecht-heading-1">{{configurable_text.home_page.home_welcome_title}}</h1>
-            <p class="p">{{configurable_text.home_page.home_welcome_intro|linebreaksbr}}</p>
-        </div>
+            <p class="utrecht-paragraph">{{configurable_text.home_page.home_welcome_intro|linebreaksbr}}</p>
+        </section>
     {% else %}
         {% placeholder 'banner_text' %}
     {% endif %}

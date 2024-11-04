@@ -2,11 +2,15 @@ import logging
 import re
 from dataclasses import dataclass, field
 from datetime import date, datetime
-from typing import Dict, Optional, Union
+from typing import Optional, Union
+
+from django.utils.translation import gettext as _
 
 from dateutil.relativedelta import relativedelta
 from zgw_consumers.api_models.base import Model, ZGWModel
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
+
+from open_inwoner.utils.glom import glom_multiple
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +37,7 @@ class Zaak(ZGWModel):
     uiterlijke_einddatum_afdoening: Optional[date] = None
     #    publicatiedatum: Optional[date]
     einddatum: Optional[date] = None
-    resultaat: Optional[str] = None
+    resultaat: Optional[Union[str, "Resultaat"]] = None
     #    relevante_andere_zaken: list
     #    zaakgeometrie: dict
 
@@ -65,23 +69,51 @@ class Zaak(ZGWModel):
     def identification(self) -> str:
         return self._format_zaak_identificatie()
 
+    @property
+    def status_text(self) -> str:
+        _status_text = glom_multiple(
+            self,
+            ("status.statustype.statustekst", "status.statustype.omschrijving"),
+            default="",
+        )
+        if self.einddatum and self.resultaat:
+            _status_text = glom_multiple(
+                self,
+                (
+                    "resultaat.resultaattype.naam",
+                    "resultaat.resultaattype.omschrijving",
+                    "resultaat.resultaattype.omschrijving_generiek",
+                    "resultaat.resultaattype.resultaattypeomschrijving",
+                ),
+                default="",
+            )
+        _status_text = _status_text or _("No data available")
+
+        return _status_text
+
+    @property
+    def description(self) -> str:
+        from open_inwoner.openzaak.models import OpenZaakConfig
+
+        zaak_config = OpenZaakConfig.get_solo()
+
+        description = self.zaaktype.omschrijving
+        if zaak_config.use_zaak_omschrijving_as_title and self.omschrijving:
+            description = self.omschrijving
+
+        return description
+
     def process_data(self) -> dict:
         """
         Prepare data for template
         """
-        from open_inwoner.openzaak.models import StatusTranslation
-
-        status_translate = StatusTranslation.objects.get_lookup()
-
         return {
             "identification": self.identification,
             "uuid": str(self.uuid),
             "start_date": self.startdatum,
             "end_date": getattr(self, "einddatum", None),
-            "description": self.zaaktype.omschrijving,
-            "current_status": status_translate.from_glom(
-                self, "status.statustype.omschrijving", default=""
-            ),
+            "description": self.description,
+            "current_status": self.status_text,
             "zaaktype_config": getattr(self, "zaaktype_config", None),
             "statustype_config": getattr(self, "statustype_config", None),
             "case_type": "Zaak",
@@ -93,6 +125,7 @@ class ZaakType(ZGWModel):
     url: str
     identificatie: str
     omschrijving: str
+    catalogus: str
     vertrouwelijkheidaanduiding: str
     doel: str
     aanleiding: str
@@ -113,8 +146,6 @@ class ZaakType(ZGWModel):
     # roltypen: list
     # besluittypen: list
 
-    # catalogus not on eSuite
-    catalogus: str = ""
     begin_geldigheid: Optional[date] = None
     einde_geldigheid: Optional[date] = None
     versiedatum: Optional[date] = None
@@ -215,6 +246,10 @@ class ResultaatType(ZGWModel):
     archiefactietermijn: Optional[relativedelta] = None
     brondatum_archiefprocedure: Optional[dict] = None
 
+    # E-suite compatibility
+    # result description ("omschrijving") with >20 chars
+    esuite_compat_naam: str = ""
+
 
 @dataclass
 class Resultaat(ZGWModel):
@@ -272,7 +307,7 @@ class Notification(Model):
     hoofd_object: str
     actie: str
     aanmaakdatum: datetime
-    kenmerken: Dict = field(default_factory=dict)
+    kenmerken: dict = field(default_factory=dict)
 
 
 @dataclass
@@ -302,3 +337,14 @@ class OpenSubmission(Model):
             "eind_datum_geldigheid": self.eind_datum_geldigheid or "Geen",
             "case_type": "OpenSubmission",
         }
+
+
+@dataclass
+class OpenTask(Model):
+    url: str
+    uuid: str
+    identificatie: str
+    naam: str
+    startdatum: date
+    formulier_link: str
+    zaak_identificatie: str

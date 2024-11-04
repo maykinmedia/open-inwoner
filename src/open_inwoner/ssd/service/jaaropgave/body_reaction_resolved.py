@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from typing import List, Optional
 
 from open_inwoner.ssd.service.jaaropgave.fwi_include_resolved import (
     Adres,
@@ -14,7 +13,7 @@ __NAMESPACE__ = "http://www.centric.nl/GWS/Diensten/JaarOpgaveClient/v0400"
 
 @dataclass
 class Inhoudingsplichtige:
-    gemeentecode: Optional[str] = field(
+    gemeentecode: str | None = field(
         default=None,
         metadata={
             "name": "Gemeentecode",
@@ -25,7 +24,7 @@ class Inhoudingsplichtige:
             "pattern": r"\d*",
         },
     )
-    gemeentenaam: Optional[str] = field(
+    gemeentenaam: str | None = field(
         default=None,
         metadata={
             "name": "Gemeentenaam",
@@ -34,7 +33,7 @@ class Inhoudingsplichtige:
             "max_length": 40,
         },
     )
-    bezoekadres: Optional[str] = field(
+    bezoekadres: str | None = field(
         default=None,
         metadata={
             "name": "Bezoekadres",
@@ -43,7 +42,7 @@ class Inhoudingsplichtige:
             "max_length": 30,
         },
     )
-    postcode: Optional[str] = field(
+    postcode: str | None = field(
         default=None,
         metadata={
             "name": "Postcode",
@@ -53,7 +52,7 @@ class Inhoudingsplichtige:
             "pattern": r"[1-9][0-9]{3}[A-Z]{2}",
         },
     )
-    woonplaatsnaam: Optional[str] = field(
+    woonplaatsnaam: str | None = field(
         default=None,
         metadata={
             "name": "Woonplaatsnaam",
@@ -66,7 +65,7 @@ class Inhoudingsplichtige:
 
 @dataclass
 class Loonheffingskorting:
-    ingangsdatum: Optional[str] = field(
+    ingangsdatum: str | None = field(
         default=None,
         metadata={
             "name": "Ingangsdatum",
@@ -77,7 +76,7 @@ class Loonheffingskorting:
             "pattern": r"[1-2][0-9]{3}(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])",
         },
     )
-    cd_loonheffingskorting: Optional[object] = field(
+    cd_loonheffingskorting: object | None = field(
         default=None,
         metadata={
             "name": "CdLoonheffingskorting",
@@ -89,7 +88,7 @@ class Loonheffingskorting:
 
 @dataclass
 class Client(Persoon):
-    adres: Optional[Adres] = field(
+    adres: Adres | None = field(
         default=None,
         metadata={
             "name": "Adres",
@@ -101,7 +100,7 @@ class Client(Persoon):
 
 @dataclass
 class SpecificatieJaarOpgave:
-    regeling: Optional[str] = field(
+    regeling: str | None = field(
         default=None,
         metadata={
             "name": "Regeling",
@@ -111,7 +110,7 @@ class SpecificatieJaarOpgave:
             "max_length": 30,
         },
     )
-    dienstjaar: Optional[int] = field(
+    dienstjaar: int | None = field(
         default=None,
         metadata={
             "name": "Dienstjaar",
@@ -122,7 +121,7 @@ class SpecificatieJaarOpgave:
             "max_inclusive": 2999,
         },
     )
-    aangifte_periode_van: Optional[str] = field(
+    aangifte_periode_van: str | None = field(
         default=None,
         metadata={
             "name": "AangiftePeriodeVan",
@@ -133,7 +132,7 @@ class SpecificatieJaarOpgave:
             "pattern": r"[1-2][0-9]{3}(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])",
         },
     )
-    aangifte_periode_tot: Optional[str] = field(
+    aangifte_periode_tot: str | None = field(
         default=None,
         metadata={
             "name": "AangiftePeriodeTot",
@@ -144,7 +143,7 @@ class SpecificatieJaarOpgave:
             "pattern": r"[1-2][0-9]{3}(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])",
         },
     )
-    fiscaalloon: Optional[StandaardBedrag] = field(
+    fiscaalloon: StandaardBedrag | None = field(
         default=None,
         metadata={
             "name": "Fiscaalloon",
@@ -153,7 +152,7 @@ class SpecificatieJaarOpgave:
             "required": True,
         },
     )
-    loonheffing: Optional[StandaardBedrag] = field(
+    loonheffing: StandaardBedrag | None = field(
         default=None,
         metadata={
             "name": "Loonheffing",
@@ -161,7 +160,7 @@ class SpecificatieJaarOpgave:
             "namespace": "",
         },
     )
-    cd_premie_volksverzekering: Optional[object] = field(
+    cd_premie_volksverzekering: object | None = field(
         default=None,
         metadata={
             "name": "CdPremieVolksverzekering",
@@ -169,7 +168,7 @@ class SpecificatieJaarOpgave:
             "namespace": "",
         },
     )
-    indicatie_zvw: Optional[StdIndJn] = field(
+    indicatie_zvw: StdIndJn | None = field(
         default=None,
         metadata={
             "name": "IndicatieZVW",
@@ -178,7 +177,7 @@ class SpecificatieJaarOpgave:
             "required": True,
         },
     )
-    ingehouden_premie_zvw: Optional[StandaardBedrag] = field(
+    ingehouden_premie_zvw: StandaardBedrag | None = field(
         default=None,
         metadata={
             "name": "IngehoudenPremieZVW",
@@ -186,7 +185,7 @@ class SpecificatieJaarOpgave:
             "namespace": "",
         },
     )
-    vergoeding_premie_zvw: Optional[StandaardBedrag] = field(
+    vergoeding_premie_zvw: StandaardBedrag | None = field(
         default=None,
         metadata={
             "name": "VergoedingPremieZVW",
@@ -194,7 +193,7 @@ class SpecificatieJaarOpgave:
             "namespace": "",
         },
     )
-    ontvangsten_fiscaalloon: Optional[StandaardBedrag] = field(
+    ontvangsten_fiscaalloon: StandaardBedrag | None = field(
         default=None,
         metadata={
             "name": "OntvangstenFiscaalloon",
@@ -202,7 +201,7 @@ class SpecificatieJaarOpgave:
             "namespace": "",
         },
     )
-    ontvangsten_ingehouden_premie_zvw: Optional[StandaardBedrag] = field(
+    ontvangsten_ingehouden_premie_zvw: StandaardBedrag | None = field(
         default=None,
         metadata={
             "name": "OntvangstenIngehoudenPremieZVW",
@@ -210,7 +209,7 @@ class SpecificatieJaarOpgave:
             "namespace": "",
         },
     )
-    ontvangsten_vergoeding_premie_zvw: Optional[StandaardBedrag] = field(
+    ontvangsten_vergoeding_premie_zvw: StandaardBedrag | None = field(
         default=None,
         metadata={
             "name": "OntvangstenVergoedingPremieZVW",
@@ -218,7 +217,7 @@ class SpecificatieJaarOpgave:
             "namespace": "",
         },
     )
-    ontvangsten_premieloon: Optional[StandaardBedrag] = field(
+    ontvangsten_premieloon: StandaardBedrag | None = field(
         default=None,
         metadata={
             "name": "OntvangstenPremieloon",
@@ -226,7 +225,7 @@ class SpecificatieJaarOpgave:
             "namespace": "",
         },
     )
-    werkgeversheffing_premie_zvw: Optional[StandaardBedrag] = field(
+    werkgeversheffing_premie_zvw: StandaardBedrag | None = field(
         default=None,
         metadata={
             "name": "WerkgeversheffingPremieZVW",
@@ -234,7 +233,7 @@ class SpecificatieJaarOpgave:
             "namespace": "",
         },
     )
-    ontvangsten_werkgeversheffing_premie_zvw: Optional[StandaardBedrag] = field(
+    ontvangsten_werkgeversheffing_premie_zvw: StandaardBedrag | None = field(
         default=None,
         metadata={
             "name": "OntvangstenWerkgeversheffingPremieZVW",
@@ -242,7 +241,7 @@ class SpecificatieJaarOpgave:
             "namespace": "",
         },
     )
-    loonheffingskorting: List[Loonheffingskorting] = field(
+    loonheffingskorting: list[Loonheffingskorting] = field(
         default_factory=list,
         metadata={
             "name": "Loonheffingskorting",
@@ -251,7 +250,7 @@ class SpecificatieJaarOpgave:
             "max_occurs": 3,
         },
     )
-    belaste_alimentatie: Optional[StandaardBedrag] = field(
+    belaste_alimentatie: StandaardBedrag | None = field(
         default=None,
         metadata={
             "name": "BelasteAlimentatie",
@@ -263,7 +262,7 @@ class SpecificatieJaarOpgave:
 
 @dataclass
 class JaarOpgave:
-    inhoudingsplichtige: Optional[Inhoudingsplichtige] = field(
+    inhoudingsplichtige: Inhoudingsplichtige | None = field(
         default=None,
         metadata={
             "name": "Inhoudingsplichtige",
@@ -272,7 +271,7 @@ class JaarOpgave:
             "required": True,
         },
     )
-    specificatie_jaar_opgave: List[SpecificatieJaarOpgave] = field(
+    specificatie_jaar_opgave: list[SpecificatieJaarOpgave] = field(
         default_factory=list,
         metadata={
             "name": "SpecificatieJaarOpgave",
@@ -285,7 +284,7 @@ class JaarOpgave:
 
 @dataclass
 class JaarOpgaveClient:
-    client: Optional[Client] = field(
+    client: Client | None = field(
         default=None,
         metadata={
             "name": "Client",
@@ -293,7 +292,7 @@ class JaarOpgaveClient:
             "namespace": "",
         },
     )
-    jaar_opgave: List[JaarOpgave] = field(
+    jaar_opgave: list[JaarOpgave] = field(
         default_factory=list,
         metadata={
             "name": "JaarOpgave",
@@ -305,7 +304,7 @@ class JaarOpgaveClient:
 
 @dataclass
 class Response:
-    jaar_opgave_client: Optional[JaarOpgaveClient] = field(
+    jaar_opgave_client: JaarOpgaveClient | None = field(
         default=None,
         metadata={
             "name": "JaarOpgaveClient",
@@ -313,7 +312,7 @@ class Response:
             "namespace": "",
         },
     )
-    fwi: Optional[Fwi] = field(
+    fwi: Fwi | None = field(
         default=None,
         metadata={
             "name": "FWI",
@@ -321,7 +320,7 @@ class Response:
             "namespace": "http://www.centric.nl/GWS/FWI/v0200",
         },
     )
-    niets_gevonden: Optional[NietsGevonden] = field(
+    niets_gevonden: NietsGevonden | None = field(
         default=None,
         metadata={
             "name": "NietsGevonden",

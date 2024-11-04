@@ -1,9 +1,10 @@
+import logging
+from collections.abc import Generator
 from datetime import date
-from typing import Generator, Union
+from typing import Any
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.forms.forms import Form
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
@@ -17,21 +18,27 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 from open_inwoner.accounts.choices import (
     ContactTypeChoices,
     LoginTypeChoices,
+    NotificationChannelChoice,
     StatusChoices,
 )
 from open_inwoner.cms.utils.page_display import (
     benefits_page_is_published,
     inbox_page_is_published,
 )
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.haalcentraal.utils import fetch_brp
-from open_inwoner.openklant.clients import build_client
-from open_inwoner.openklant.wrap import get_fetch_parameters
+from open_inwoner.laposta.forms import NewsletterSubscriptionForm
+from open_inwoner.laposta.models import LapostaConfig
 from open_inwoner.plans.models import Plan
+from open_inwoner.qmatic.client import NoServiceConfigured, QmaticClient
 from open_inwoner.questionnaire.models import QuestionnaireStep
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
-from ..forms import BrpUserForm, UserForm, UserNotificationsForm
+from ..forms import BrpUserForm, CategoriesForm, UserForm, UserNotificationsForm
 from ..models import Action, User
+from .mixins import KlantenAPIMixin
+
+logger = logging.getLogger(__name__)
 
 
 class MyProfileView(
@@ -43,7 +50,31 @@ class MyProfileView(
     FormView,
 ):
     template_name = "pages/profile/me.html"
-    form_class = Form
+    form_class = NewsletterSubscriptionForm
+
+    def get_success_url(self) -> str:
+        return reverse("profile:detail")
+
+    def get_form_kwargs(self) -> dict[str, Any]:
+        kwargs = super().get_form_kwargs()
+        kwargs["request"] = self.request
+        return kwargs
+
+    def form_valid(self, form):
+        form.save(self.request)
+
+        # Display errors raised by Laposta API
+        if form.errors:
+            self.log_user_action(
+                self.request.user, _("failed to modify user newsletter subscription")
+            )
+            return self.form_invalid(form)
+
+        messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
+        self.log_user_action(
+            self.request.user, _("users newsletter subscriptions were modified")
+        )
+        return HttpResponseRedirect(self.get_success_url())
 
     @cached_property
     def crumbs(self):
@@ -52,7 +83,7 @@ class MyProfileView(
     @staticmethod
     def stringify(
         items: list, string_func: callable, lump: bool = False
-    ) -> Union[Generator, str]:
+    ) -> Generator | str:
         """
         Create string representation(s) of `items` for display
 
@@ -67,16 +98,25 @@ class MyProfileView(
         return (string_func(item) for item in items)
 
     def get_context_data(self, **kwargs):
+        config = SiteConfiguration.get_solo()
         context = super().get_context_data(**kwargs)
         user = self.request.user
         today = date.today()
 
         context["anchors"] = [
             ("#personal-info", _("Persoonlijke gegevens")),
-            ("#notifications", _("Voorkeuren voor meldingen")),
             ("#overview", _("Overzicht")),
             ("#profile-remove", _("Profiel verwijderen")),
         ]
+        if config.any_notifications_enabled:
+            context["anchors"].insert(
+                1, ("#notifications", _("Voorkeuren voor meldingen"))
+            )
+
+        # Check if Laposta is configured and user has verified email
+        if LapostaConfig.get_solo().api_root and user.has_verified_email():
+            # Insert #newsletters anchor
+            context["anchors"].insert(2, ("#newsletters", _("Nieuwsbrieven")))
 
         user_files = user.get_all_files()
 
@@ -119,6 +159,8 @@ class MyProfileView(
 
         context["files"] = user_files
 
+        context["selected_categories"] = user.get_interests()
+
         context["questionnaire_exists"] = QuestionnaireStep.objects.filter(
             published=True
         ).exists()
@@ -132,6 +174,9 @@ class MyProfileView(
         return context
 
     def post(self, request, *args, **kwargs):
+        if "newsletter-submit" in request.POST:
+            return super().post(request, *args, **kwargs)
+
         if request.user.is_authenticated and not request.user.is_staff:
             instance = User.objects.get(id=request.user.id)
 
@@ -158,7 +203,12 @@ class MyProfileView(
 
 
 class EditProfileView(
-    LogMixin, LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, UpdateView
+    LogMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    KlantenAPIMixin,
+    BaseBreadcrumbMixin,
+    UpdateView,
 ):
     template_name = "pages/profile/edit.html"
     model = User
@@ -178,17 +228,13 @@ class EditProfileView(
     def form_valid(self, form):
         form.save()
 
-        self.update_klant_api({k: form.cleaned_data[k] for k in form.changed_data})
+        self.update_klant({k: form.cleaned_data[k] for k in form.changed_data})
 
         messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
         self.log_change(self.get_object(), _("profile was modified"))
         return HttpResponseRedirect(self.get_success_url())
 
-    def update_klant_api(self, user_form_data: dict):
-        user: User = self.request.user
-        if not user.bsn and not user.kvk:
-            return
-
+    def update_klant(self, user_form_data: dict):
         field_mapping = {
             "emailadres": "email",
             "telefoonnummer": "phonenumber",
@@ -198,20 +244,7 @@ class EditProfileView(
             for api_name, local_name in field_mapping.items()
             if user_form_data.get(local_name)
         }
-        if update_data:
-            if client := build_client("klanten"):
-                klant = client.retrieve_klant(**get_fetch_parameters(self.request))
-
-                if klant:
-                    self.log_system_action(
-                        "retrieved klant for user", user=self.request.user
-                    )
-                    client.partial_update_klant(klant, update_data)
-                    if klant:
-                        self.log_system_action(
-                            f"patched klant from user profile edit with fields: {', '.join(sorted(update_data.keys()))}",
-                            user=self.request.user,
-                        )
+        self.patch_klant(update_data)
 
     def get_form_class(self):
         user = self.request.user
@@ -223,6 +256,31 @@ class EditProfileView(
         kwargs = super().get_form_kwargs()
         kwargs["user"] = self.request.user
         return kwargs
+
+
+class MyCategoriesView(
+    LogMixin, LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, UpdateView
+):
+    template_name = "pages/profile/categories.html"
+    model = User
+    form_class = CategoriesForm
+    success_url = reverse_lazy("profile:detail")
+
+    @cached_property
+    def crumbs(self):
+        return [
+            (_("Mijn profiel"), reverse("profile:detail")),
+            (_("Mijn interessegebieden"), reverse("profile:categories")),
+        ]
+
+    def get_object(self):
+        return self.request.user
+
+    def form_valid(self, form):
+        form.save()
+        messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
+        self.log_change(self.object, _("categories were modified"))
+        return HttpResponseRedirect(self.get_success_url())
 
 
 class MyDataView(
@@ -249,7 +307,12 @@ class MyDataView(
 
 
 class MyNotificationsView(
-    LogMixin, LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, UpdateView
+    LogMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    KlantenAPIMixin,
+    BaseBreadcrumbMixin,
+    UpdateView,
 ):
     template_name = "pages/profile/notifications.html"
     model = User
@@ -263,6 +326,12 @@ class MyNotificationsView(
             (_("Ontvang berichten over"), reverse("profile:notifications")),
         ]
 
+    def get(self, *args, **kwargs):
+        config = SiteConfiguration.get_solo()
+        if not config.any_notifications_enabled:
+            return HttpResponseRedirect(reverse("profile:detail"))
+        return super().get(*args, **kwargs)
+
     def get_object(self):
         return self.request.user
 
@@ -271,8 +340,67 @@ class MyNotificationsView(
         kwargs["user"] = self.request.user
         return kwargs
 
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+
+        config = SiteConfiguration.get_solo()
+        context_data["notifications_cases_enabled"] = config.notifications_cases_enabled
+        return context_data
+
     def form_valid(self, form):
         form.save()
+
+        self.update_klant(
+            user_form_data={k: form.cleaned_data[k] for k in form.changed_data}
+        )
+
         messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
         self.log_change(self.object, _("users notifications were modified"))
         return HttpResponseRedirect(self.get_success_url())
+
+    def update_klant(self, user_form_data: dict):
+        config = SiteConfiguration.get_solo()
+        if not config.enable_notification_channel_choice:
+            return
+
+        if notification_channel := user_form_data.get("case_notification_channel"):
+            self.patch_klant(
+                update_data={
+                    "toestemmingZaakNotificatiesAlleenDigitaal": notification_channel
+                    == NotificationChannelChoice.digital_only
+                }
+            )
+
+
+class UserAppointmentsView(
+    LogMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    TemplateView,
+):
+    template_name = "pages/profile/appointments.html"
+
+    def get_context_data(self, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        user: User = self.request.user
+        if not user.has_verified_email():
+            context["appointments"] = []
+        else:
+            try:
+                client = QmaticClient()
+            except NoServiceConfigured:
+                logger.exception("Error occurred while creating Qmatic client")
+                context["appointments"] = []
+            else:
+                context["appointments"] = client.list_appointments_for_customer(
+                    user.verified_email
+                )
+        return context
+
+    @cached_property
+    def crumbs(self):
+        return [
+            (_("Mijn profiel"), reverse("profile:detail")),
+            (_("Mijn afspraken"), reverse("profile:appointments")),
+        ]

@@ -12,6 +12,13 @@ class ProfileConfig(AppHookConfig):
             "Designates whether 'My data' section is rendered or not (Only for digid users)."
         ),
     )
+    selected_categories = models.BooleanField(
+        verbose_name=_("Gekozen onderwerpen"),
+        default=True,
+        help_text=_(
+            "Designates whether 'selected categories' section is rendered or not."
+        ),
+    )
     mentors = models.BooleanField(
         verbose_name=_("Begeleiders"),
         default=True,
@@ -53,4 +60,14 @@ class ProfileConfig(AppHookConfig):
             "Should only be enabled if a CMS app has been created and the corresponding "
             "CMS page has been published."
         ),
+    )
+    newsletters = models.BooleanField(
+        verbose_name=_("Nieuwsbrieven"),
+        default=False,
+        help_text=_("Designates whether 'Nieuwsbrieven' section is rendered or not."),
+    )
+    appointments = models.BooleanField(
+        verbose_name=_("Mijn afspraken"),
+        default=False,
+        help_text=_("Designates whether 'Mijn afspraken' section is rendered or not."),
     )

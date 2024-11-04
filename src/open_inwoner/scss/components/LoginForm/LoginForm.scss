@@ -1,0 +1,7 @@
+#login-form {
+  //display: none;
+
+  &.active {
+    display: grid;
+  }
+}

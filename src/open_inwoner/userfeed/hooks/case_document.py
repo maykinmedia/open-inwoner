@@ -1,9 +1,10 @@
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from open_inwoner.accounts.models import User
 from open_inwoner.openzaak.api_models import Zaak, ZaakInformatieObject
+from open_inwoner.openzaak.models import ZGWApiGroupConfig
 from open_inwoner.userfeed.adapter import FeedItem
 from open_inwoner.userfeed.adapters import register_item_adapter
 from open_inwoner.userfeed.choices import FeedItemType
@@ -14,6 +15,7 @@ def case_document_added_notification_received(
     user: User, case: Zaak, case_info_object: ZaakInformatieObject
 ):
     data = {
+        "case_url": case.url,
         "case_uuid": case.uuid,
         "case_identificatie": case.identificatie,
         "case_omschrijving": case.omschrijving,
@@ -61,6 +63,13 @@ class CaseDocumentAddedFeedItem(FeedItem):
 
     cms_apps = ["cases"]
 
+    def __init__(self, data: FeedItemData):
+        super().__init__(data)
+
+        self.api_group = ZGWApiGroupConfig.objects.resolve_group_from_hints(
+            url=self.get_data("case_url"),
+        )
+
     @property
     def title(self) -> str:
         return self.get_data("case_omschrijving", super().title)
@@ -77,7 +86,10 @@ class CaseDocumentAddedFeedItem(FeedItem):
     @property
     def action_url(self) -> str:
         uuid = self.get_data("case_uuid")
-        return reverse("cases:case_detail", kwargs={"object_id": uuid})
+        return reverse(
+            "cases:case_detail",
+            kwargs={"object_id": uuid, "api_group_id": self.api_group.id},
+        )
 
 
 register_item_adapter(CaseDocumentAddedFeedItem, FeedItemType.case_document_added)

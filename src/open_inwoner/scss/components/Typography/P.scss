@@ -1,27 +1,29 @@
-.p {
-  color: var(--font-color-body);
-  font-family: var(--font-family-body);
-  font-size: var(--font-size-body);
-  line-height: var(--font-line-height-body);
-  font-weight: normal;
-  margin: 0;
+@import '~@utrecht/components/dist/paragraph/css/index.css';
 
-  &#{&}--compact {
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-  }
+.utrecht-paragraph {
+  // Takes style values from NLDS community
 
-  &--small {
-    font-size: var(--font-size-body-small);
-    line-height: var(--font-line-height-body-small);
-  }
+  &--oip {
+    // Takes style values from our own design-tokens NPM package
+    margin: 0;
 
-  &--muted {
-    color: var(--color-mute);
-  }
+    // Extensions of the utrecht-paragraph component with OIP-specific styles.
+    &-muted {
+      color: var(--oip-utrecht-paragraph-muted-color);
+    }
 
-  &--centered {
-    text-align: center;
+    &-centered {
+      text-align: var(--oip-utrecht-paragraph-centered-text-align);
+    }
+
+    &-compact {
+      margin-top: var(--oip-utrecht-paragraph-compact-margin-top);
+      margin-bottom: var(--oip-utrecht-paragraph-compact-margin-bottom);
+    }
+
+    &:empty {
+      margin: 0 !important;
+    }
   }
 
   &:empty {
@@ -29,9 +31,72 @@
   }
 }
 
-*[class^='h'] + .p {
+*[class^='utrecht-heading'] + .utrecht-paragraph,
+.oip-header-group + .utrecht-paragraph {
   margin-top: var(--spacing-small);
 }
+
+.utrecht-paragraph + .utrecht-heading-1,
+.utrecht-paragraph + .utrecht-heading-2,
+.utrecht-paragraph + .utrecht-heading-3 {
+  margin-top: var(--gutter-width);
+}
+
+.utrecht-paragraph + .utrecht-heading-4 {
+  margin-top: var(--row-height-small);
+}
+
+.utrecht-paragraph + .utrecht-paragraph {
+  margin-top: var(--font-line-height-body);
+}
+
+.tag-list + .utrecht-paragraph,
+.utrecht-paragraph + .form {
+  margin-top: var(--spacing-extra-large);
+}
+
+.utrecht-paragraph .link {
+  .content {
+    text-decoration: underline;
+  }
+
+  &:hover {
+    text-decoration: none;
+  }
+
+  .material-icons {
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}
+
+///
+/// Legacy styling
+///
+
+.p {
+  color: var(--utrecht-paragraph-color);
+  font-family: var(--utrecht-paragraph-font-family);
+  font-size: var(--utrecht-paragraph-font-size);
+  line-height: var(--utrecht-paragraph-line-height);
+  font-weight: normal;
+  margin: 0;
+
+  &:empty {
+    margin: 0 !important;
+  }
+}
+
+*[class^='h1'] + .p,
+*[class^='h2'] + .p,
+*[class^='h3'] + .p,
+*[class^='h4'] + .p {
+  margin-top: var(--spacing-small);
+}
+
 .p + .h1,
 .p + .h2,
 .p + .h3 {
@@ -46,35 +111,25 @@
   margin-top: var(--font-line-height-body);
 }
 
-.tag-list + .p {
+.tag-list + .p,
+.p + .form {
   margin-top: var(--spacing-extra-large);
 }
 
 .p .link {
-  //text-decoration: underline;
   .content {
     text-decoration: underline;
   }
+
   &:hover {
     text-decoration: none;
   }
+
   .material-icons {
     text-decoration: none;
+
     &:hover {
       text-decoration: none;
     }
-  }
-}
-
-.p--no-margin {
-  margin-top: var(--spacing-small);
-
-  & > .p {
-    margin: 0 !important;
-  }
-
-  /// leaflet reset
-  .link {
-    text-decoration: underline;
   }
 }

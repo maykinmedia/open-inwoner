@@ -3,12 +3,12 @@ Utility functions/classes related to (date-)times
 """
 
 import datetime as dt
-from typing import Sequence
+from collections.abc import Sequence
 
 from django.utils import timezone
 
 
-def is_new(instance: object, attribute_name: str, delta: dt.timedelta) -> bool:
+def instance_is_new(instance: object, attribute_name: str, delta: dt.timedelta) -> bool:
     """
     Return `True` if `instance` is "new", `False` otherwise
 
@@ -37,4 +37,4 @@ def has_new_elements(
     Return `True` if `collection` has at least one "new" element, `False`
     otherwise
     """
-    return any(is_new(elem, attribute_name, delta) for elem in collection)
+    return any(instance_is_new(elem, attribute_name, delta) for elem in collection)

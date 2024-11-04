@@ -1,9 +1,18 @@
+import uuid
+from dataclasses import dataclass
+from typing import Self
+from urllib.parse import urljoin
+
+from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from django_jsonform.models.fields import ArrayField
 from ordered_model.models import OrderedModel, OrderedModelManager
 from solo.models import SingletonModel
 from zgw_consumers.constants import APITypes
+
+from open_inwoner.utils.validators import validate_array_contents_non_empty
 
 
 class OpenKlantConfigManager(models.Manager):
@@ -50,6 +59,13 @@ class OpenKlantConfig(SingletonModel):
         default="",
         blank=True,
     )
+    register_channel = models.CharField(
+        verbose_name=_("Contactmoment kanaal"),
+        max_length=50,
+        default="contactformulier",
+        blank=True,
+        help_text=_("The channel through which contactmomenten are created"),
+    )
     register_type = models.CharField(
         verbose_name=_("Contactmoment type"),
         max_length=50,
@@ -74,7 +90,29 @@ class OpenKlantConfig(SingletonModel):
             "users are fetched using the company RSIN (Open Klant). "
             "If not enabled, these resources are fetched using the KvK number."
         ),
-        default=True,
+        default=False,
+    )
+    send_email_confirmation = models.BooleanField(
+        verbose_name=_("Stuur contactformulier e-mailbevestiging"),
+        help_text=_(
+            "If enabled the 'contactform_confirmation' email template will be sent. "
+            "If disabled the external API will send a confirmation email."
+        ),
+        default=False,
+    )
+    exclude_contactmoment_kanalen = ArrayField(
+        base_field=models.CharField(
+            blank=True,
+            max_length=100,
+            help_text=_(
+                "Contactmomenten registered via one of these channels will not be "
+                "displayed to users."
+            ),
+        ),
+        null=True,
+        blank=True,
+        default=list,
+        validators=[validate_array_contents_non_empty],
     )
 
     register_api_required_fields = (
@@ -127,3 +165,59 @@ class ContactFormSubject(OrderedModel):
 
     def __str__(self):
         return self.subject
+
+
+class KlantContactMomentAnswer(models.Model):
+    user = models.ForeignKey(
+        "accounts.User",
+        verbose_name=_("User"),
+        on_delete=models.CASCADE,
+        related_name="contactmoment_answers",
+        help_text=_(
+            "This is the user that asked the question to which this is an answer."
+        ),
+    )
+    contactmoment_url = models.URLField(
+        verbose_name=_("ContactMoment URL"), max_length=1000
+    )
+    is_seen = models.BooleanField(
+        verbose_name=_("Is seen"),
+        help_text=_("Whether or not the user has seen the answer"),
+        default=False,
+    )
+
+    class Meta:
+        verbose_name = _("KlantContactMoment")
+        verbose_name_plural = _("KlantContactMomenten")
+        unique_together = [["user", "contactmoment_url"]]
+
+
+@dataclass
+class OpenKlant2Config:
+    api_root: str
+    api_path: str
+    api_token: str
+
+    # Question/Answer settings
+    mijn_vragen_kanaal: str
+    mijn_vragen_organisatie_naam: str
+    mijn_vragen_actor: str | uuid.UUID | None
+    interne_taak_gevraagde_handeling: str
+    interne_taak_toelichting: str
+
+    @property
+    def api_url(self):
+        return urljoin(self.api_root, self.api_path)
+
+    @classmethod
+    def from_django_settings(cls) -> Self:
+        from django.conf import settings
+
+        if not (config := getattr(settings, "OPENKLANT2_CONFIG", None)):
+            raise ImproperlyConfigured(
+                "Please set OPENKLANT2_CONFIG in your settings to configure OpenKlant2"
+            )
+
+        return cls(**config)
+
+    # TODO: add from_openklant_config_model or similar

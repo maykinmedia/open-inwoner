@@ -1,29 +1,104 @@
-class EnlageFont {
+export class EnlargeFont {
+  static selector = '.accessibility--enlarge-font'
+
   constructor(node) {
     this.node = node
     this.text = node.querySelector('.link__text')
     this.icon = node.querySelector('.material-icons')
     this.node.addEventListener('click', this.enlarge.bind(this))
+
+    this.root = document.documentElement
+
+    // Target specific sizes that need to be enlarged
+    this.styles = {
+      bodyFontSizeDefault: '--utrecht-document-font-size',
+      paragraphFontSizeDefault: '--utrecht-paragraph-font-size',
+      paragraphFontSizeSmall: '--utrecht-paragraph-small-font-size',
+      headingThreeFontSize: '--utrecht-heading-3-font-size',
+      headingFourFontSize: '--utrecht-heading-4-font-size',
+      // Legacy styles' initial values
+      oipBodyFontSizeDefault: '--font-size-body',
+      oipBodyFontSizeSmall: '--font-size-body-small',
+      oipHeadingThreeFontSize: '--font-size-heading-3',
+      oipHeadingFourFontSize: '--font-size-heading-4',
+      // OIP specific card-heading
+      oipCardHeadingFontSize: '--font-size-heading-card',
+    }
+
+    // Set initial values for toggling default styles
+    this.baseSizes = {
+      default: '16px',
+      small: '14px',
+      headingThree: '20px',
+      headingFour: '16px',
+      cardHeading: '18px',
+    }
+
+    // Enlarge the different types of body-font as well as paragraphs
+    // and set all lower types of headings (lower than H2) to get the same larger font-size
+    this.enlargeSizes = {
+      default: '20px',
+      small: '17px',
+      headings: '22px',
+    }
+
+    this.setInitialStyles()
+  }
+
+  setInitialStyles() {
+    Object.keys(this.styles).forEach((key) => {
+      const sizeKey = this.getSizeKey(key)
+      this.root.style.setProperty(this.styles[key], this.baseSizes[sizeKey])
+    })
+  }
+
+  // Target both NL Design System values and legacy variables by their component type
+  getSizeKey(styleKey) {
+    if (styleKey.includes('Small')) return 'small'
+    if (styleKey.includes('Three')) return 'headingThree'
+    if (styleKey.includes('Four')) return 'headingFour'
+    if (styleKey.includes('CardHeading')) return 'cardHeading'
+    return 'default'
   }
 
   enlarge(event) {
     event.preventDefault()
-    let root = document.documentElement
-    const varName = '--font-size-body'
-    const baseSize = '16px'
-    const enlargeSize = '20px'
 
-    if (root.style.getPropertyValue(varName) == enlargeSize) {
-      root.style.setProperty(varName, baseSize)
+    const isEnlarged =
+      this.root.style.getPropertyValue(this.styles.bodyFontSizeDefault) ===
+      this.enlargeSizes.default
+
+    // Loop through all styles and set either the enlarged size or the base size
+    Object.keys(this.styles).forEach((key) => {
+      const sizeKey = this.getSizeKey(key)
+      this.root.style.setProperty(
+        this.styles[key],
+        isEnlarged
+          ? this.baseSizes[sizeKey]
+          : this.enlargeSizes[sizeKey] || this.enlargeSizes.headings
+      )
+    })
+
+    // Update text, aria-label, and title based on the state
+    if (isEnlarged) {
+      // Set back to original state
       this.text.innerText = this.node.dataset.text
+      this.node.setAttribute('aria-label', this.node.dataset.text)
+      this.node.setAttribute('title', this.node.dataset.text)
       this.icon.innerText = this.node.dataset.icon
     } else {
-      root.style.setProperty(varName, enlargeSize)
+      // Switch to larger font state
       this.text.innerText = this.node.dataset.altText
+      this.node.setAttribute('aria-label', this.node.dataset.altText)
+      this.node.setAttribute('title', this.node.dataset.altText)
       this.icon.innerText = this.node.dataset.altIcon
     }
   }
 }
 
-const enlargeButtons = document.querySelectorAll('.accessibility--enlarge-font')
-;[...enlargeButtons].forEach((enlargeButton) => new EnlageFont(enlargeButton))
+/**
+ * Controls the toggling of larger font-sizes of body-text and small texts when button is clicked
+ */
+document
+  .querySelectorAll(EnlargeFont.selector)
+  .forEach((enlargeButton) => new EnlargeFont(enlargeButton))

@@ -4,118 +4,222 @@
   display: flex;
   max-width: 100%;
   width: 100%;
-}
 
-.tabs {
-  background: #fff;
-  overflow: initial;
-  width: 100%;
+  .tabs {
+    background: #fff;
+    overflow: initial;
+    width: 100%;
 
-  @media (min-width: 500px) {
-    overflow: hidden;
+    @media (min-width: 500px) {
+      overflow: hidden;
+    }
   }
-}
 
-.list.tabs__headers {
-  display: block;
-  align-items: center;
-  box-sizing: border-box;
-  width: 100%;
-  margin: 0;
-  overflow: hidden;
-  padding: 0;
-  position: relative;
-
-  &::before {
-    left: 0;
-    right: 0;
-    bottom: 0px;
-    height: 0;
-    border-bottom: 2px solid var(--color-gray-light);
-    content: '';
-    top: auto;
+  .list.tabs__headers {
     display: block;
-    position: absolute;
-  }
-
-  &::after {
-    clear: both;
-    display: block;
-    content: '';
-  }
-}
-
-.list-item.tab__header--item {
-  max-width: var(--mobile-xs-width);
-  border: none;
-  display: block;
-  float: none;
-  padding: 0;
-  border: 0;
-  margin-right: -1px;
-  position: relative;
-
-  @media (min-width: 360px) {
-    max-width: 200px;
-    float: left;
-  }
-}
-
-.link.tab__header {
-  box-sizing: border-box;
-  color: var(--color-gray-lighter);
-  display: inline-block;
-  cursor: pointer;
-  width: 100%;
-  padding: var(--spacing-large);
-  transition: 0.3s;
-
-  &:target {
-    scroll-margin-top: 150px;
-  }
-  &:target::before {
-    scroll-margin-top: 150px;
-  }
-
-  &.active {
-    border-bottom: 2px solid var(--color-primary);
-    color: var(--font-color-body);
-    font-weight: bold;
+    align-items: center;
+    box-sizing: border-box;
+    width: 100%;
     margin: 0;
-  }
-}
-
-.tabs__body {
-  padding: 0;
-
-  // Styling for Benefits reports/Mijn uitkeringen
-  .form {
-    max-width: var(--mobile-ms-width);
-
-    .form__actions {
-      margin-top: 0;
-    }
-
-    .form__control [class*='icon'] {
-      transform: none;
-    }
-  }
-}
-
-.tab__content,
-.tab__content.active {
-  margin: 1em;
-  scroll-margin-top: 150px;
-
-  p {
+    overflow: hidden;
     padding: 0;
+    position: relative;
+
+    &::before {
+      left: 0;
+      right: 0;
+      bottom: 0px;
+      height: 0;
+      border-bottom: 2px solid var(--color-gray-light);
+      content: '';
+      top: auto;
+      display: block;
+      position: absolute;
+    }
+
+    &::after {
+      clear: both;
+      display: block;
+      content: '';
+    }
+  }
+
+  .list-item.tab__header--item {
+    max-width: var(--mobile-xs-width);
+    border: none;
+    display: block;
+    float: none;
+    padding: 0;
+    border: 0;
+    margin-right: -1px;
+    position: relative;
+
+    @media (min-width: 360px) {
+      max-width: 200px;
+      float: left;
+    }
+  }
+
+  .link.tab__header {
+    box-sizing: border-box;
+    color: var(--color-gray-lighter);
+    display: inline-block;
+    cursor: pointer;
+    width: 100%;
+    padding: var(--spacing-large);
+    transition: 0.3s;
+
+    &:target {
+      scroll-margin-top: 150px;
+    }
+
+    &:target::before {
+      scroll-margin-top: 150px;
+    }
+
+    &:active {
+      background-color: var(--color-white);
+    }
+
+    &.active {
+      border-bottom: 2px solid var(--color-primary);
+      color: var(--font-color-body);
+      font-weight: bold;
+      margin: 0;
+    }
+  }
+
+  .tab__content,
+  .tab__content.active,
+  .tab__contents,
+  .tab__contents.active {
+    margin: 1em;
+    scroll-margin-top: 150px;
+  }
+
+  .active {
+    display: block;
+  }
+
+  .hide,
+  &.hide {
+    display: none;
+  }
+
+  .tabs__body {
+    padding: 0;
+
+    // Styling for Benefits reports/Mijn uitkeringen
+    .form {
+      max-width: var(--mobile-ms-width);
+
+      .form__actions {
+        margin-top: 0;
+      }
+
+      .form__control [class*='icons'] {
+        transform: none;
+      }
+    }
+  }
+
+  .form {
+    /// Make required asterisk visible for this component
+    .label__label--required {
+      color: var(--color-red);
+      padding-left: var(--spacing-tiny);
+      //make asterisks invisible by default, only make them visible if component has the caption
+      display: inline;
+    }
   }
 }
 
-.active {
-  display: block;
-}
+/// Tabs on login page
 
-.hide {
-  display: none;
+.login-tab--container {
+  .list-item.tab__header--item {
+    min-width: 50%;
+
+    @media (min-width: 500px) {
+      min-width: 180px;
+    }
+  }
+
+  .link.tab__header {
+    font-weight: normal;
+    padding: var(--spacing-large) var(--spacing-large) var(--spacing-large) 0;
+    border-bottom: 2px solid var(--color-gray-light);
+
+    // for inactive tabs
+    @media (min-width: 500px) {
+      border-bottom: none;
+    }
+
+    &:active {
+      background-color: var(--color-white);
+    }
+
+    &.active {
+      background-color: var(--color-white);
+      border-bottom: 2px solid var(--color-accent);
+      color: var(--color-accent);
+      font-weight: bold;
+      margin: 0;
+      text-decoration: none;
+    }
+  }
+
+  .tab__content {
+    margin: var(--row-height) 0 0 0;
+    scroll-margin-top: 150px;
+
+    .tab__heading-4 {
+      font-size: var(--utrecht-heading-4-font-size);
+      margin-bottom: var(--spacing-large);
+      margin-top: var(--spacing-extra-large);
+    }
+
+    .grid {
+      gap: var(--spacing-large);
+    }
+
+    .card {
+      & .link--next [class*='icons'] {
+        font-size: var(--font-size-body);
+      }
+    }
+
+    &#particulier {
+      #column__email-toggle,
+      #column__login-form {
+        &.hide {
+          display: none;
+        }
+      }
+
+      #column__login-form .button--transparent {
+        color: var(--color-primary);
+        padding-left: 0;
+      }
+    }
+
+    .card--tinted {
+      .button.link--bold {
+        padding: 0;
+      }
+    }
+  }
+
+  .tab-column__paragraph {
+    color: var(--font-color-body);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body);
+    line-height: var(--font-line-height-body);
+    font-weight: normal;
+    margin: var(--spacing-medium) 0 0 0;
+  }
+
+  .form__actions--single {
+    max-width: var(--form-width);
+  }
 }

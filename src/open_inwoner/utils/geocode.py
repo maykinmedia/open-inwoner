@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 
 from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry, Point
@@ -41,14 +40,14 @@ class PdocLocatieserver(Geocoder):
         )
 
         self.domain = domain.strip("/")
-        self.api = "%s://%s%s" % (self.scheme, self.domain, self.geocode_path)
+        self.api = "{}://{}{}".format(self.scheme, self.domain, self.geocode_path)
 
     def geocode(
         self,
         query,
         timeout=DEFAULT_SENTINEL,
         fq="bron:bag AND type:adres",
-        ln="id,bron,weergavenaam,rdf_seealso,centroide_ll",
+        fl="id,bron,weergavenaam,rdf_seealso,centroide_ll",
     ):
         """
         Return a location point by address.
@@ -63,15 +62,15 @@ class PdocLocatieserver(Geocoder):
 
         :param fq: Allows to specify a filter query, e.g. fq=bron:BAG.
 
-        :param ln: List of fields to display
+        :param fl: List of fields to display
         """
 
-        url = furl(self.api).add({"q": query, "fq": fq, "ln": ln}).url
+        url = furl(self.api).add({"q": query, "fq": fq, "fl": fl}).url
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         callback = self._parse_json
         return self._call_geocoder(url, callback, timeout=timeout)
 
-    def _parse_json(self, result) -> Optional[Location]:
+    def _parse_json(self, result) -> Location | None:
         if not result:
             return None
 
@@ -84,7 +83,7 @@ class PdocLocatieserver(Geocoder):
         return Location(placename, (point.y, point.x), place)
 
 
-def geocode_address(address: str) -> Optional[Point]:
+def geocode_address(address: str) -> Point | None:
     geocoder_class = import_string(settings.GEOCODER)
     geocoder = geocoder_class(
         user_agent=settings.GEOPY_APP, timeout=settings.GEOPY_TIMEOUT

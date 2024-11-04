@@ -16,6 +16,16 @@
     padding: 0.5em 0;
   }
 
+  &--extra-compact {
+    border-top: none;
+    border-bottom: none;
+    padding: 0;
+  }
+
+  & .list-item__caption {
+    line-height: var(--font-line-height-body-small);
+  }
+
   &--compact:first-child {
     padding-top: 0;
   }
@@ -32,15 +42,23 @@
     align-items: flex-start;
   }
 
-  .h4 {
+  .utrecht-heading-4 {
     margin: 0;
   }
 
-  .p + .p {
+  .utrecht-paragraph + .utrecht-paragraph {
     margin-top: 0;
   }
 
   & + & {
     border-top: none;
+  }
+
+  ///
+  /// Legacy styling
+  ///
+
+  .p + .p {
+    margin-top: 0;
   }
 }

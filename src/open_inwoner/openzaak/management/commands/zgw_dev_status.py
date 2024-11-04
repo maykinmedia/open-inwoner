@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from open_inwoner.accounts.models import User
-from open_inwoner.openzaak.clients import build_client
+from open_inwoner.openzaak.clients import build_catalogi_client, build_zaken_client
 from open_inwoner.openzaak.utils import get_zaak_type_config, is_zaak_visible
 
 logger = logging.getLogger(__name__)
@@ -41,11 +41,11 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.silence()
 
-        zaken_client = build_client("zaak")
+        zaken_client = build_zaken_client()
         if zaken_client is None:
             self.die(self.style.ERROR("Could not build Zaken API client"))
 
-        catalogi_client = build_client("catalogi")
+        catalogi_client = build_catalogi_client()
         if catalogi_client is None:
             self.die(self.style.ERROR("Could not build Catalogi API client"))
 

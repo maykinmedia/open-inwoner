@@ -140,7 +140,7 @@
       padding-right: var(--spacing-giant);
       width: 170px;
 
-      & [class*='icon'] {
+      & [class*='icons'] {
         position: absolute;
         top: 10px;
         right: 13px;
@@ -188,7 +188,7 @@
     padding-bottom: var(--spacing-medium);
     display: grid;
     grid-template-columns: repeat(1, 1fr);
-    gap: var(--spacing-small);
+    gap: var(--spacing-large);
     width: 100%;
 
     @media (min-width: 768px) {
@@ -211,6 +211,10 @@
       @media (min-width: 768px) {
         font-size: var(--font-size-body);
         color: var(--font-color-body);
+      }
+
+      .link__text {
+        line-height: var(--font-line-height-body);
       }
     }
   }

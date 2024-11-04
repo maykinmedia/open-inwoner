@@ -3,7 +3,7 @@ from unittest.mock import Mock, patch
 
 from django.test import TestCase, override_settings
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.plans.tests.factories import PlanFactory

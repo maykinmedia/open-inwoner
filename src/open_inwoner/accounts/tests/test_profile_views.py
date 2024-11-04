@@ -2,27 +2,36 @@ from dataclasses import asdict
 from datetime import date
 from unittest.mock import patch
 
+from django import forms
 from django.conf import settings
 from django.template.defaultfilters import date as django_date
-from django.test import override_settings
-from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.test import TestCase, override_settings, tag
+from django.urls import reverse, reverse_lazy
+from django.utils.translation import gettext as _
 
 import requests_mock
-from cms import api
 from django_webtest import WebTest
 from pyquery import PyQuery as PQ
 from webtest import Upload
 
-from open_inwoner.accounts.choices import StatusChoices
+from open_inwoner.accounts.choices import NotificationChannelChoice, StatusChoices
 from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
+from open_inwoner.laposta.models import LapostaConfig
+from open_inwoner.laposta.tests.factories import LapostaListFactory, MemberFactory
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.pdc.tests.factories import CategoryFactory
 from open_inwoner.plans.tests.factories import PlanFactory
+from open_inwoner.qmatic.tests.data import QmaticMockData
+from open_inwoner.utils.forms import ErrorMessageMixin
 from open_inwoner.utils.logentry import LOG_ACTIONS
+from open_inwoner.utils.test import ClearCachesMixin
 from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin, create_image_bytes
 
+from ...cms.cases.cms_apps import CasesApphook
+from ...cms.collaborate.cms_apps import CollaborateApphook
+from ...cms.inbox.cms_apps import InboxApphook
 from ...cms.profile.cms_apps import ProfileApphook
 from ...cms.tests import cms_tools
 from ...haalcentraal.api_models import BRPData
@@ -53,7 +62,9 @@ class ProfileViewTests(WebTest):
     def setUp(self):
         self.url = reverse("profile:detail")
         self.return_url = reverse("logout")
-        self.user = UserFactory(street="MyStreet")
+        self.user = UserFactory(
+            first_name="Erik", street="MyStreet", messages_notifications=True
+        )
         self.digid_user = DigidUserFactory()
         self.eherkenning_user = eHerkenningUserFactory()
 
@@ -84,7 +95,7 @@ class ProfileViewTests(WebTest):
 
         self.assertEqual(logout_link.attr("href"), reverse("logout"))
 
-    @patch("digid_eherkenning_oidc_generics.models.OpenIDConnectDigiDConfig.get_solo")
+    @patch("open_inwoner.accounts.models.OpenIDDigiDConfig.get_solo")
     def test_show_correct_logout_button_for_login_type_digid(self, mock_solo):
         for oidc_enabled in [True, False]:
             with self.subTest(oidc_enabled=oidc_enabled):
@@ -103,9 +114,7 @@ class ProfileViewTests(WebTest):
 
                 self.assertEqual(logout_link.attr("href"), logout_url)
 
-    @patch(
-        "digid_eherkenning_oidc_generics.models.OpenIDConnectEHerkenningConfig.get_solo"
-    )
+    @patch("open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo")
     def test_show_correct_logout_button_for_login_type_eherkenning(self, mock_solo):
         for oidc_enabled in [True, False]:
             with self.subTest(oidc_enabled=oidc_enabled):
@@ -124,12 +133,15 @@ class ProfileViewTests(WebTest):
 
                 self.assertEqual(logout_link.attr("href"), logout_url)
 
-    def test_user_information_profile_page(self):
+    @patch(
+        "open_inwoner.cms.utils.page_display.inbox_page_is_published", return_value=True
+    )
+    def test_user_information_profile_page(self, m):
         response = self.app.get(self.url, user=self.user)
 
         self.assertContains(response, self.user.first_name)
-        self.assertContains(response, self.user.last_name)
-        self.assertContains(response, self.user.infix)
+        self.assertContains(response, f"Welkom, {self.user.display_name}")
+        self.assertContains(response, f"{self.user.infix} {self.user.last_name}")
         self.assertContains(response, self.user.email)
         self.assertContains(response, self.user.phonenumber)
         self.assertContains(response, self.user.street)
@@ -139,10 +151,34 @@ class ProfileViewTests(WebTest):
         # check business profile section not displayed
         self.assertNotContains(response, "Bedrijfsgegevens")
 
+        # check notification preferences displayed
+        doc = PQ(response.content)
+
+        notifications_text = doc.find("#profile-notifications")[0].text_content()
+        self.assertIn("Mijn Berichten", notifications_text)
+
+    @patch(
+        "open_inwoner.cms.utils.page_display.inbox_page_is_published", return_value=True
+    )
+    def test_admin_disable_options(self, m):
+        config = SiteConfiguration.get_solo()
+        config.notifications_actions_enabled = False
+        config.notifications_cases_enabled = False
+        config.notifications_messages_enabled = False
+        config.notifications_plans_enabled = False
+        config.save()
+
+        response = self.app.get(self.url, user=self.user)
+
+        doc = PQ(response.content)
+
+        self.assertEqual(doc.find("#profile-notifications"), [])
+
     def test_get_empty_profile_page(self):
         response = self.app.get(self.url, user=self.user)
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, _("U heeft geen interesses gekozen."))
         self.assertContains(response, _("U heeft nog geen contacten"))
         self.assertContains(response, "0 acties staan open")
         self.assertNotContains(response, reverse("products:questionnaire_list"))
@@ -151,11 +187,13 @@ class ProfileViewTests(WebTest):
         ActionFactory(created_by=self.user)
         contact = UserFactory()
         self.user.user_contacts.add(contact)
-        CategoryFactory()
+        category = CategoryFactory()
+        self.user.selected_categories.add(category)
         QuestionnaireStepFactory(published=True)
 
         response = self.app.get(self.url, user=self.user)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, category.name)
         self.assertContains(
             response,
             f"{contact.first_name} ({contact.get_contact_type_display()})",
@@ -214,7 +252,7 @@ class ProfileViewTests(WebTest):
         doc = PQ(response.content)
 
         business_section = doc.find("#business-overview")[0]
-        self.assertEqual(business_section.text, "Bedrijfsgegevens")
+        self.assertEqual(business_section.text.strip(), "Bedrijfsgegevens")
 
         # check personal overview section not displayed
         personal_section = doc.find("#personal-overview")
@@ -255,14 +293,7 @@ class ProfileViewTests(WebTest):
         self.assertNotContains(response, _("Stuur een bericht"))
 
         # case 2: unpublished message page
-        page = api.create_page(
-            "Mijn Berichten",
-            "cms/fullwidth.html",
-            "nl",
-            slug="berichten",
-        )
-        page.application_namespace = "inbox"
-        page.save()
+        page = cms_tools.create_apphook_page(InboxApphook, publish=False)
 
         response = self.app.get(self.url, user=self.user)
 
@@ -288,6 +319,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         self.url = reverse("profile:edit")
         self.return_url = reverse("profile:detail")
         self.user = UserFactory()
+        self.eherkenning_user = eHerkenningUserFactory()
 
     def upload_test_image_to_profile_edit_page(self, img_bytes):
         response = self.app.get(self.url, user=self.user, status=200)
@@ -303,19 +335,18 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
 
     def test_save_form(self):
         response = self.app.get(self.url, user=self.user)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         form = response.forms["profile-edit"]
         base_response = form.submit()
-        self.assertEquals(base_response.url, self.return_url)
+        self.assertEqual(base_response.url, self.return_url)
         followed_response = base_response.follow()
-        self.assertEquals(followed_response.status_code, 200)
+        self.assertEqual(followed_response.status_code, 200)
 
     def test_save_empty_form_fails(self):
         response = self.app.get(self.url, user=self.user, status=200)
         form = response.forms["profile-edit"]
         form["first_name"] = ""
         form["last_name"] = ""
-        form["display_name"] = ""
         form["email"] = ""
         form["phonenumber"] = ""
         form["street"] = ""
@@ -323,7 +354,13 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         form["postcode"] = ""
         form["city"] = ""
         base_response = form.submit()
-        expected_errors = {"email": [_("Dit veld is vereist.")]}
+        expected_errors = {
+            "email": [
+                _(
+                    'Het verplichte veld "E-mailadres" is niet (goed) ingevuld. Vul het veld in.'
+                )
+            ]
+        }
         self.assertEqual(base_response.context["form"].errors, expected_errors)
 
     def test_save_filled_form(self):
@@ -331,7 +368,6 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         form = response.forms["profile-edit"]
         form["first_name"] = "First name"
         form["last_name"] = "Last name"
-        form["display_name"] = "a nickname"
         form["email"] = "user@example.com"
         form["phonenumber"] = "0612345678"
         form["street"] = "Keizersgracht"
@@ -339,18 +375,18 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         form["postcode"] = "1013 RM"
         form["city"] = "Amsterdam"
         base_response = form.submit()
-        self.assertEquals(base_response.url, self.return_url)
+        self.assertEqual(base_response.url, self.return_url)
         followed_response = base_response.follow()
-        self.assertEquals(followed_response.status_code, 200)
+        self.assertEqual(followed_response.status_code, 200)
         self.user.refresh_from_db()
-        self.assertEquals(self.user.first_name, "First name")
-        self.assertEquals(self.user.last_name, "Last name")
-        self.assertEquals(self.user.display_name, "a nickname")
-        self.assertEquals(self.user.email, "user@example.com")
-        self.assertEquals(self.user.street, "Keizersgracht")
-        self.assertEquals(self.user.housenumber, "17 d")
-        self.assertEquals(self.user.postcode, "1013 RM")
-        self.assertEquals(self.user.city, "Amsterdam")
+        self.assertEqual(self.user.first_name, "First name")
+        self.assertEqual(self.user.last_name, "Last name")
+        self.assertEqual(self.user.display_name, "First name")
+        self.assertEqual(self.user.email, "user@example.com")
+        self.assertEqual(self.user.street, "Keizersgracht")
+        self.assertEqual(self.user.housenumber, "17 d")
+        self.assertEqual(self.user.postcode, "1013 RM")
+        self.assertEqual(self.user.city, "Amsterdam")
 
     def test_name_validation(self):
         invalid_characters = '<>#/"\\,.:;'
@@ -363,7 +399,6 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
                 form["first_name"] = "test" + char
                 form["infix"] = char + "test"
                 form["last_name"] = "te" + char + "st"
-                form["display_name"] = "te" + char + "st"
                 form["city"] = "te" + char + "st"
                 form["street"] = "te" + char + "st"
 
@@ -377,7 +412,6 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
                     "first_name": [error_msg],
                     "infix": [error_msg],
                     "last_name": [error_msg],
-                    "display_name": [error_msg],
                     "city": [error_msg],
                     "street": [error_msg],
                 }
@@ -391,6 +425,17 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         self.user.refresh_from_db()
         self.assertEqual(response.url, self.return_url)
         self.assertEqual(self.user.email, "user@example.com")
+
+    def test_modify_contact_details_eherkenning_succeeds(self):
+        response = self.app.get(self.url, user=self.eherkenning_user)
+        form = response.forms["profile-edit"]
+        form["email"] = "user@example.com"
+        form["phonenumber"] = "0612345678"
+        response = form.submit()
+        self.eherkenning_user.refresh_from_db()
+        self.assertEqual(response.url, self.return_url)
+        self.assertEqual(self.eherkenning_user.email, "user@example.com")
+        self.assertEqual(self.eherkenning_user.phonenumber, "0612345678")
 
     def test_updating_a_field_without_modifying_email_succeeds(self):
         initial_email = self.user.email
@@ -416,7 +461,10 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         response = self.app.get(self.url, user=user)
         form = response.forms["profile-edit"]
 
-        form["display_name"] = "a nickname"
+        # check that first_name field is not rendered for digid_brp_user
+        with self.assertRaises(AssertionError):
+            form["first_name"] = "test"
+
         form["email"] = "user@example.com"
         form["phonenumber"] = "0612345678"
         response = form.submit()
@@ -425,7 +473,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
 
         user.refresh_from_db()
 
-        self.assertEqual(user.display_name, "a nickname")
+        self.assertEqual(user.display_name, "name")
         self.assertEqual(user.email, "user@example.com")
         self.assertEqual(user.phonenumber, "0612345678")
 
@@ -631,7 +679,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         )
 
     @requests_mock.Mocker()
-    def test_modify_phone_updates_klant_api_but_skip_unchanged_phone(self, m):
+    def test_modify_email_updates_klant_api_but_skip_unchanged_phone(self, m):
         MockAPIReadPatchData.setUpServices()
         data = MockAPIReadPatchData().install_mocks(m)
 
@@ -659,6 +707,37 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         self.assertTimelineLog(
             "patched klant from user profile edit with fields: emailadres"
         )
+
+
+class TestForm(ErrorMessageMixin, forms.Form):
+    name = forms.CharField(required=True, label="Naam")
+    email = forms.EmailField(required=True, label="E-mailadres")
+
+
+class ErrorMessageMixinTest(TestCase):
+    def test_default_error_messages(self):
+        form = TestForm(data={})
+        self.assertEqual(
+            form.errors["name"],
+            [_('Het verplichte veld "Naam" is niet (goed) ingevuld. Vul het veld in.')],
+        )
+        self.assertEqual(
+            form.errors["email"],
+            [
+                _(
+                    'Het verplichte veld "E-mailadres" is niet (goed) ingevuld. Vul het veld in.'
+                )
+            ],
+        )
+
+    def test_custom_error_messages(self):
+        custom_messages = {
+            "name": {"required": _("Naam is verplicht.")},
+            "email": {"required": _("E-mail is verplicht.")},
+        }
+        form = TestForm(data={}, custom_error_messages=custom_messages)
+        self.assertEqual(form.errors["name"], [_("Naam is verplicht.")])
+        self.assertEqual(form.errors["email"], [_("E-mail is verplicht.")])
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
@@ -774,7 +853,6 @@ class MyDataTests(AssertTimelineLogMixin, HaalCentraalMixin, WebTest):
             infix="de",
             last_name="Kooyman",
             login_type=LoginTypeChoices.digid,
-            display_name="Meertje",
         )
         self.url = reverse("profile:data")
 
@@ -787,12 +865,9 @@ class MyDataTests(AssertTimelineLogMixin, HaalCentraalMixin, WebTest):
             self.expected_response.gender,
             self.expected_response.street,
             self.expected_response.get_housenumber(),
-            # self.expected_response.housenumbersuffix,
             self.expected_response.postal_code,
             self.expected_response.city,
-            # self.expected_response.country,
             self.user.bsn,
-            self.user.display_name,
             self.user.email,
             self.user.phonenumber,
         ]
@@ -882,9 +957,38 @@ class MyDataTests(AssertTimelineLogMixin, HaalCentraalMixin, WebTest):
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-@patch("open_inwoner.cms.utils.page_display._is_published", return_value=True)
-class EditNotificationsTests(WebTest):
+class EditIntrestsTests(WebTest):
     def setUp(self):
+        self.url = reverse("profile:categories")
+        self.user = UserFactory()
+
+    def test_login_required(self):
+        login_url = reverse("login")
+        response = self.app.get(self.url)
+        self.assertRedirects(response, f"{login_url}?next={self.url}")
+
+    def test_preselected_values(self):
+        category = CategoryFactory(name="a")
+        CategoryFactory(name="b")
+        CategoryFactory(name="c")
+        self.user.selected_categories.add(category)
+        response = self.app.get(self.url, user=self.user)
+        form = response.forms["change-categories"]
+        self.assertTrue(form.get("selected_categories", index=0).checked)
+        self.assertFalse(form.get("selected_categories", index=1).checked)
+        self.assertFalse(form.get("selected_categories", index=2).checked)
+
+
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@patch("open_inwoner.cms.utils.page_display._is_published", return_value=True)
+class EditNotificationsTests(AssertTimelineLogMixin, WebTest):
+    def setUp(self):
+        self.config = SiteConfiguration.get_solo()
+        self.config.notifications_messages_enabled = True
+        self.config.notifications_cases_enabled = True
+        self.config.notifications_plans_enabled = True
+        self.config.save()
+
         self.url = reverse("profile:notifications")
         self.user = UserFactory()
 
@@ -893,6 +997,17 @@ class EditNotificationsTests(WebTest):
         response = self.app.get(self.url)
 
         self.assertRedirects(response, f"{login_url}?next={self.url}")
+
+    def test_notifications_disabled(self, mock_page_display):
+        self.config.notifications_actions_enabled = False
+        self.config.notifications_cases_enabled = False
+        self.config.notifications_messages_enabled = False
+        self.config.notifications_plans_enabled = False
+        self.config.save()
+
+        response = self.app.get(self.url, user=self.user)
+
+        self.assertRedirects(response, reverse("profile:detail"))
 
     def test_default_values_for_regular_user(self, mock_page_display):
         response = self.app.get(self.url, user=self.user)
@@ -915,6 +1030,10 @@ class EditNotificationsTests(WebTest):
         self.assertTrue(self.user.cases_notifications)
         self.assertFalse(self.user.messages_notifications)
         self.assertTrue(self.user.plans_notifications)
+        self.assertEqual(
+            self.user.case_notification_channel,
+            NotificationChannelChoice.digital_and_post,
+        )
 
     def test_cases_notifications_is_accessible_when_digid_user(self, mock_page_display):
         self.user.login_type = LoginTypeChoices.digid
@@ -923,6 +1042,55 @@ class EditNotificationsTests(WebTest):
         form = response.forms["change-notifications"]
 
         self.assertIn("cases_notifications", form.fields)
+
+    def test_notification_channel_not_accessible_when_disabled(self, mock_page_display):
+        response = self.app.get(self.url, user=self.user)
+        form = response.forms["change-notifications"]
+
+        # choice of notification channel is disabled by default
+        self.assertNotIn("case_notification_channel_choice", form.fields)
+
+    @requests_mock.Mocker()
+    def test_notification_channel_edit(self, mock_page_display, m):
+        MockAPIReadPatchData.setUpServices()
+        data = MockAPIReadPatchData().install_mocks(m)
+
+        config = SiteConfiguration.get_solo()
+        config.notifications_cases_enabled = True
+        config.enable_notification_channel_choice = True
+        config.save()
+
+        # reset noise from signals
+        m.reset_mock()
+        self.clearTimelineLogs()
+
+        self.user.bsn = data.user.bsn
+        self.user.save()
+
+        response = self.app.get(self.url, user=self.user)
+        form = response.forms["change-notifications"]
+        form["case_notification_channel"] = NotificationChannelChoice.digital_only
+        form.submit()
+
+        # check user
+        self.user.refresh_from_db()
+        self.assertEqual(
+            self.user.case_notification_channel, NotificationChannelChoice.digital_only
+        )
+
+        # check klant api update
+        self.assertTrue(data.matchers[0].called)
+        klant_patch_data = data.matchers[1].request_history[0].json()
+        self.assertEqual(
+            klant_patch_data,
+            {
+                "toestemmingZaakNotificatiesAlleenDigitaal": True,
+            },
+        )
+        self.assertTimelineLog("retrieved klant for user")
+        self.assertTimelineLog(
+            "patched klant from user profile edit with fields: toestemmingZaakNotificatiesAlleenDigitaal"
+        )
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
@@ -934,22 +1102,20 @@ class NotificationsDisplayTests(WebTest):
         cls.url = reverse("profile:notifications")
         cls.user = UserFactory()
 
+        config = SiteConfiguration.get_solo()
+        config.notifications_messages_enabled = True
+        config.notifications_cases_enabled = True
+        config.notifications_plans_enabled = True
+        config.save()
+
     def test_inbox_notifications_display(self):
-        # inbox page not created
         response = self.app.get(self.url, user=self.user)
         form = response.forms["change-notifications"]
 
         self.assertNotIn("messages_notifications", form.fields)
 
         # inbox page created but not published
-        page = api.create_page(
-            "Mijn Berichten",
-            "cms/fullwidth.html",
-            "nl",
-            slug="berichten",
-        )
-        page.application_namespace = "inbox"
-        page.save()
+        page = cms_tools.create_apphook_page(InboxApphook, publish=False)
 
         response = self.app.get(self.url, user=self.user)
         form = response.forms["change-notifications"]
@@ -973,15 +1139,7 @@ class NotificationsDisplayTests(WebTest):
         self.assertNotIn("cases_notifications", form.fields)
 
         # cases page created but not published
-        page = api.create_page(
-            "Mijn Aanvragen",
-            "cms/fullwidth.html",
-            "nl",
-            slug="aanvragen",
-        )
-        page.application_namespace = "cases"
-        page.save()
-
+        page = cms_tools.create_apphook_page(CasesApphook, publish=False)
         response = self.app.get(self.url, user=self.user)
         form = response.forms["change-notifications"]
 
@@ -1002,14 +1160,7 @@ class NotificationsDisplayTests(WebTest):
         self.assertNotIn("plans_notifications", form.fields)
 
         # collaborate page created but not published
-        page = api.create_page(
-            "Samenwerken",
-            "cms/fullwidth.html",
-            "nl",
-            slug="samenwerken",
-        )
-        page.application_namespace = "collaborate"
-        page.save()
+        page = cms_tools.create_apphook_page(CollaborateApphook, publish=False)
 
         response = self.app.get(self.url, user=self.user)
         form = response.forms["change-notifications"]
@@ -1022,3 +1173,348 @@ class NotificationsDisplayTests(WebTest):
         form = response.forms["change-notifications"]
 
         self.assertIn("plans_notifications", form.fields)
+
+
+@tag("laposta")
+@requests_mock.Mocker()
+@override_settings(
+    ROOT_URLCONF="open_inwoner.cms.tests.urls", MIDDLEWARE=PATCHED_MIDDLEWARE
+)
+class NewsletterSubscriptionTests(ClearCachesMixin, WebTest):
+    def setUp(self):
+        super().setUp()
+
+        self.profile_app = ProfileConfig.objects.create(
+            namespace=ProfileApphook.app_name, newsletters=True
+        )
+        cms_tools.create_apphook_page(ProfileApphook)
+
+        self.profile_url = reverse("profile:detail")
+        self.user = DigidUserFactory(
+            email="news@example.com", verified_email="news@example.com"
+        )
+        self.assertTrue(self.user.has_verified_email())
+
+        self.config = LapostaConfig.get_solo()
+        self.config.api_root = "https://laposta.local/api/v2/"
+        self.config.basic_auth_username = "username"
+        self.config.basic_auth_password = "password"
+        self.config.save()
+
+        self.list1 = LapostaListFactory.build(
+            list_id="list1", name="Nieuwsbrief1", remarks="foo"
+        )
+        self.list2 = LapostaListFactory.build(
+            list_id="list2", name="Nieuwsbrief2", remarks="bar"
+        )
+
+    def setUpMocks(self, m):
+        m.get(
+            "https://laposta.local/api/v2/list",
+            json={
+                "data": [
+                    {"list": self.list1.model_dump()},
+                    {"list": self.list2.model_dump()},
+                ]
+            },
+        )
+
+    def test_do_not_render_form_if_config_is_missing(self, m):
+        self.config.api_root = ""
+        self.config.save()
+
+        response = self.app.get(self.profile_url, user=self.user)
+
+        self.assertNotIn("newsletter-form", response.forms)
+
+    def test_do_not_render_form_if_no_newsletters_are_found(self, m):
+        m.get("https://laposta.local/api/v2/list", json=[])
+
+        response = self.app.get(self.profile_url, user=self.user)
+
+        self.assertNotIn("newsletter-form", response.forms)
+
+    def test_render_form_if_newsletters_are_found(self, m):
+        self.setUpMocks(m)
+
+        self.config.limit_list_selection_to = ["list1", "list2"]
+        self.config.save()
+
+        m.get(
+            f"{self.config.api_root}member/{self.user.email}?list_id=list1",
+            json={
+                "member": MemberFactory.build(
+                    list_id="list1",
+                    member_id="1234567",
+                    email=self.user.email,
+                    custom_fields=None,
+                ).model_dump()
+            },
+        )
+        m.get(
+            f"{self.config.api_root}member/{self.user.email}?list_id=list2",
+            status_code=400,
+        )
+
+        response = self.app.get(self.profile_url, user=self.user)
+
+        self.assertIn(_("Nieuwsbrieven"), response.text)
+        self.assertIn("newsletter-form", response.forms)
+
+        form = response.forms["newsletter-form"]
+
+        # First checkbox should be checked, because the user is already subscribed
+        self.assertTrue(form.fields["newsletters"][0].checked)
+        self.assertFalse(form.fields["newsletters"][1].checked)
+        self.assertIn("Nieuwsbrief1", response.text)
+        self.assertIn("Nieuwsbrief2", response.text)
+
+    def test_save_form_with_errors(self, m):
+        self.setUpMocks(m)
+
+        self.config.limit_list_selection_to = ["list1", "list2"]
+        self.config.save()
+
+        m.get(
+            f"{self.config.api_root}member/{self.user.email}?list_id=list1",
+            json={
+                "member": MemberFactory.build(
+                    list_id="list1",
+                    member_id="1234567",
+                    email=self.user.email,
+                    custom_fields=None,
+                ).model_dump()
+            },
+        )
+        m.get(
+            f"{self.config.api_root}member/{self.user.email}?list_id=list2",
+            status_code=400,
+        )
+
+        response = self.app.get(self.profile_url, user=self.user)
+
+        self.assertIn(_("Nieuwsbrieven"), response.text)
+        self.assertIn("newsletter-form", response.forms)
+
+        form = response.forms["newsletter-form"]
+
+        # First checkbox should be checked, because the user is already subscribed
+        self.assertTrue(form.fields["newsletters"][0].checked)
+        self.assertIn("Nieuwsbrief1", response.text)
+
+        post_matcher = m.post(
+            f"{self.config.api_root}member",
+            json={
+                "error": {
+                    "type": "internal",
+                    "message": "Internal server error",
+                }
+            },
+            status_code=500,
+        )
+        delete_matcher = m.delete(
+            f"{self.config.api_root}member/{self.user.email}?list_id=list1",
+            json={
+                "error": {
+                    "type": "internal",
+                    "message": "Internal server error",
+                }
+            },
+            status_code=500,
+        )
+
+        form["newsletters"] = ["list2"]
+        response = form.submit("newsletter-submit")
+
+        subscribe_error, unsubscribe_error = response.pyquery(
+            ".notifications__errors .notification__content"
+        )
+
+        self.assertEqual(
+            PQ(subscribe_error).text(),
+            _(
+                "Something went wrong while trying to subscribe to '{list_name}', please try again later"
+            ).format(list_name="Nieuwsbrief2"),
+        )
+        self.assertEqual(
+            PQ(unsubscribe_error).text(),
+            _(
+                "Something went wrong while trying to unsubscribe from '{list_name}', please try again later"
+            ).format(list_name="Nieuwsbrief1"),
+        )
+
+        form = response.forms["newsletter-form"]
+
+        # The initial data should be kept the same as the last POST
+        self.assertFalse(form.fields["newsletters"][0].checked)
+        self.assertTrue(form.fields["newsletters"][1].checked)
+
+    def test_do_not_render_form_if_email_not_verified(self, m):
+        self.setUpMocks(m)
+
+        self.user.verified_email = ""
+        self.user.save()
+        self.assertFalse(self.user.has_verified_email())
+
+        self.config.limit_list_selection_to = ["list1"]
+        self.config.save()
+
+        m.get(
+            f"{self.config.api_root}member/{self.user.email}?list_id=list1",
+            json={
+                "member": MemberFactory.build(
+                    list_id="list1",
+                    member_id="1234567",
+                    email=self.user.email,
+                    custom_fields=None,
+                ).model_dump()
+            },
+        )
+        response = self.app.get(self.profile_url, user=self.user)
+
+        self.assertNotIn("newsletter-form", response.forms)
+
+    def test_render_form_limit_newsletters_to_admin_selection(self, m):
+        self.setUpMocks(m)
+
+        self.config.limit_list_selection_to = ["list1"]
+        self.config.save()
+
+        m.get(
+            f"{self.config.api_root}member/{self.user.email}?list_id=list1",
+            json={
+                "member": MemberFactory.build(
+                    list_id="list1",
+                    member_id="1234567",
+                    email=self.user.email,
+                    custom_fields=None,
+                ).model_dump()
+            },
+        )
+        m.get(
+            f"{self.config.api_root}member/{self.user.email}?list_id=list2",
+            status_code=400,
+        )
+
+        response = self.app.get(self.profile_url, user=self.user)
+
+        self.assertIn(_("Nieuwsbrieven"), response.text)
+        self.assertIn("newsletter-form", response.forms)
+
+        form = response.forms["newsletter-form"]
+
+        # First checkbox should be checked, because the user is already subscribed
+        self.assertTrue(form.fields["newsletters"][0].checked)
+        self.assertIn("Nieuwsbrief1", response.text)
+
+        # Second field was excluded by `LapostaConfig.limit_list_selection_to`
+        self.assertNotIn("Nieuwsbrief2", response.text)
+
+
+@tag("qmatic")
+@requests_mock.Mocker()
+@override_settings(
+    ROOT_URLCONF="open_inwoner.cms.tests.urls", MIDDLEWARE=PATCHED_MIDDLEWARE
+)
+class UserAppointmentsTests(ClearCachesMixin, WebTest):
+    appointments_url = reverse_lazy("profile:appointments")
+
+    def setUp(self):
+        super().setUp()
+
+        self.data = QmaticMockData()
+        self.assertTrue(self.data.user.has_verified_email())
+
+    def test_do_not_render_list_if_config_is_missing(self, m):
+        self.data.config.service = None
+        self.data.config.save()
+
+        response = self.app.get(self.appointments_url, user=self.data.user)
+
+        self.assertIn(_("Geen afspraken beschikbaar"), response.text)
+
+    def test_do_not_render_list_if_no_customer_is_found(self, m):
+        m.get(
+            f"{self.data.api_root}appointment/customers/identify;{self.data.user.email}",
+            json=[],
+        )
+
+        response = self.app.get(self.appointments_url, user=self.data.user)
+
+        self.assertIn(_("Geen afspraken beschikbaar"), response.text)
+
+    def test_do_not_render_list_if_no_appointments_are_found(self, m):
+        m.get(
+            f"{self.data.api_root}appointment/customers/identify;{self.data.user.email}",
+            json=[{"publicId": self.data.public_id}],
+        )
+        m.get(
+            f"{self.data.api_root}calendar-backend/public/api/v1/customers/{self.data.public_id}/appointments",
+            status_code=404,
+        )
+
+        response = self.app.get(self.appointments_url, user=self.data.user)
+
+        self.assertIn(_("Geen afspraken beschikbaar"), response.text)
+
+    def test_do_not_render_list_if_validation_error(self, m):
+        m.get(
+            f"{self.data.api_root}appointment/customers/identify;{self.data.user.email}",
+            json=[{"publicId": self.data.public_id}],
+        )
+        m.get(
+            f"{self.data.api_root}calendar-backend/public/api/v1/customers/{self.data.public_id}/appointments",
+            json={"appointmentList": [{"invalid": "data"}]},
+        )
+
+        response = self.app.get(self.appointments_url, user=self.data.user)
+
+        self.assertIn(_("Geen afspraken beschikbaar"), response.text)
+
+    def test_do_not_render_list_if_email_not_verified(self, m):
+        self.data.user.verified_email = ""
+        self.data.user.save()
+        self.assertFalse(self.data.user.has_verified_email())
+
+        response = self.app.get(self.appointments_url, user=self.data.user)
+
+        self.assertIn(_("Geen afspraken beschikbaar"), response.text)
+
+    def test_render_list_if_appointments_are_found(self, m):
+        self.data.setUpMocks(m)
+
+        response = self.app.get(self.appointments_url, user=self.data.user)
+
+        self.assertIn(_("Een overzicht van uw afspraken"), response.text)
+
+        cards = response.pyquery(".appointment-info")
+
+        self.assertEqual(len(cards), 2)
+
+        self.assertEqual(PQ(cards[0]).find(".card__heading-2").text(), "Paspoort")
+
+        passport_appointment = PQ(cards[0]).find("ul").children()
+
+        self.assertEqual(PQ(passport_appointment[0]).text(), "Datum\n1 januari 2020")
+        self.assertEqual(PQ(passport_appointment[1]).text(), "Tijd\n13:00 uur")
+        self.assertEqual(PQ(passport_appointment[2]).text(), "Locatie\nHoofdkantoor")
+        self.assertEqual(PQ(passport_appointment[3]).text(), "Dam 1")
+        self.assertEqual(PQ(passport_appointment[4]).text(), "1234 ZZ Amsterdam")
+        self.assertEqual(
+            PQ(cards[0]).find("a").attr("href"),
+            f"{self.data.config.booking_base_url}{self.data.appointment_passport.publicId}",
+        )
+
+        self.assertEqual(PQ(cards[1]).find(".card__heading-2").text(), "ID kaart")
+
+        id_card_appointment = PQ(cards[1]).find("ul").children()
+
+        self.assertEqual(PQ(id_card_appointment[0]).text(), "Datum\n6 maart 2020")
+        self.assertEqual(PQ(id_card_appointment[1]).text(), "Tijd\n11:30 uur")
+        self.assertEqual(PQ(id_card_appointment[2]).text(), "Locatie\nHoofdkantoor")
+        self.assertEqual(PQ(id_card_appointment[3]).text(), "Wall Street 1")
+        self.assertEqual(PQ(id_card_appointment[4]).text(), "1111 AA New York")
+        self.assertEqual(
+            PQ(cards[1]).find("a").attr("href"),
+            f"{self.data.config.booking_base_url}{self.data.appointment_idcard.publicId}",
+        )

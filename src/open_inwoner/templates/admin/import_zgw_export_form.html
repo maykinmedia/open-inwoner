@@ -1,0 +1,22 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls %}
+
+{% block content %}
+<h1>{% trans "Import ZGW information from a file" %}</h1>
+
+<ul class="messagelist">
+    <li class="warning">
+        {% blocktranslate trimmed %}
+            Note that this site must have a Service configured with a "slug" field that matches the slug field on the Service linked to the CatalogusConfig objects in the uploaded file.
+        {% endblocktranslate %}
+    </li>
+</ul>
+
+<div>
+    <form method="post" enctype="multipart/form-data">    
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="{% trans "Upload file" %}" />
+    </form>
+</div>
+{% endblock %}

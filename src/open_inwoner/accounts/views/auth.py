@@ -1,10 +1,14 @@
+import logging
+
 from django.conf import settings
+from django.contrib import auth, messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth.views import (
     PasswordChangeView,
     PasswordResetConfirmView,
     PasswordResetView,
 )
+from django.http import HttpResponseRedirect
 from django.shortcuts import resolve_url
 from django.urls import reverse
 from django.utils.translation import gettext as _
@@ -19,10 +23,14 @@ from eherkenning.mock import eherkenning_conf
 from eherkenning.mock.views.eherkenning import (
     eHerkenningAssertionConsumerServiceMockView,
 )
+from open_inwoner.openklant.models import OpenKlantConfig
+from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.utils.views import LogMixin
 
 from ..choices import LoginTypeChoices
 from ..forms import CustomPasswordResetForm
+
+logger = logging.getLogger(__name__)
 
 
 class LogPasswordChangeView(UserPassesTestMixin, LogMixin, PasswordChangeView):
@@ -83,11 +91,6 @@ class CustomDigiDAssertionConsumerServiceMockView(
         if url:
             return url
 
-        if hasattr(settings, "DIGID"):
-            digid_login_url = settings.DIGID.get("login_url")
-            if digid_login_url:
-                return resolve_url(digid_login_url)
-
         return resolve_url(settings.LOGIN_URL)
 
     def get_success_url(self):
@@ -118,10 +121,6 @@ class CustomDigiDAssertionConsumerServiceView(DigiDAssertionConsumerServiceView)
         if url:
             return url
 
-        digid_login_url = settings.DIGID.get("login_url")
-        if digid_login_url:
-            return resolve_url(digid_login_url)
-
         return resolve_url(settings.LOGIN_URL)
 
     def get_success_url(self):
@@ -133,8 +132,30 @@ class CustomDigiDAssertionConsumerServiceView(DigiDAssertionConsumerServiceView)
         return super().get_success_url()
 
 
+class BlockEenmanszaakLoginMixin:
+    def get(self, request):
+        response = super().get(request)
+
+        openzaak_config = OpenZaakConfig.get_solo()
+        openklant_config = OpenKlantConfig.get_solo()
+        if (
+            hasattr(request.user, "rsin")
+            and not request.user.rsin
+            and (
+                openzaak_config.fetch_eherkenning_zaken_with_rsin
+                or openklant_config.use_rsin_for_innNnpId_query_parameter
+            )
+        ):
+            auth.logout(request)
+            message = _("Use DigiD to log in as a sole proprietor.")
+            messages.error(request, message)
+            failure_url = self.get_failure_url()
+            return HttpResponseRedirect(failure_url)
+        return response
+
+
 class CustomeHerkenningAssertionConsumerServiceMockView(
-    eHerkenningAssertionConsumerServiceMockView
+    BlockEenmanszaakLoginMixin, eHerkenningAssertionConsumerServiceMockView
 ):
     def get_login_url(self):
         """

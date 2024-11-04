@@ -12,8 +12,12 @@
   }
 
   &--drag-active .card__body,
-  .card:first-child [class*='icon'] {
+  .card:first-child [class*='icons'] {
     pointer-events: none;
+  }
+
+  .icon--large[class*='icons'] {
+    font-size: 40px;
   }
 
   .card__body {
@@ -26,7 +30,7 @@
       color: var(--color-primary);
       font-weight: bold;
 
-      [class*='icon'] {
+      [class*='icons'] {
         color: var(--color-primary);
         font-size: var(--font-size-body);
         position: static !important;
@@ -40,7 +44,7 @@
     }
   }
 
-  [class*='icon'] {
+  [class*='icons'] {
     color: var(--color-gray-dark);
     pointer-events: none;
     position: static !important;
@@ -50,13 +54,13 @@
 
   .notifications {
     .notification--warning {
-      [class*='icon'] {
+      [class*='icons'] {
         color: var(--notification-color-text);
       }
     }
   }
 
-  .link--primary [class*='icon'] {
+  .link--primary [class*='icons'] {
     color: var(--color-primary);
   }
 
@@ -67,15 +71,33 @@
     pointer-events: none;
     width: 100%;
     height: var(--row-height-giant);
+
+    // Adjacent keyboard focus for custom hidden file-input
+    &:focus + .file-input__label-empty,
+    &:focus + .file-input__label-empty + .file-input__label-selected {
+      outline: var(--focus-border-style) var(--focus-border-width)
+        var(--color-primary);
+      padding: 0 var(--spacing-large);
+    }
   }
 
-  > .p {
+  // Active adjacent styles for custom hidden file-input
+  &__label-empty,
+  &__label-selected {
+    &:active {
+      outline: var(--focus-border-style) var(--focus-border-width)
+        var(--color-primary);
+      padding: 0 var(--spacing-large);
+    }
+  }
+
+  > .utrecht-paragraph {
     margin: calc(0.5 * var(--gutter-width)) 0;
     display: block;
     text-align: center;
   }
 
-  .h4 {
+  .utrecht-heading-4 {
     margin-top: var(--spacing-large);
     margin-bottom: calc(0.5 * var(--spacing-large));
   }
@@ -87,15 +109,15 @@
     .file__file.error {
       border-color: var(--color-red-notification);
 
-      .p {
+      .utrecht-paragraph {
         color: var(--color-gray-dark-900);
       }
 
-      [class*='icon'] {
+      [class*='icons'] {
         color: var(--color-gray-light);
       }
 
-      .link [class*='icon'] {
+      .link [class*='icons'] {
         color: var(--color-red-notification);
       }
     }
@@ -107,19 +129,20 @@
       gap: var(--spacing-small);
       justify-content: flex-start;
 
-      [class*='icon'] {
+      [class*='icons'] {
         color: var(--color-red-notification);
       }
     }
 
-    .p--small {
+    .utrecht-paragraph--oip-small {
       margin-top: var(--spacing-small);
       margin-bottom: var(--spacing-small);
 
       &.error {
-        [class*='icon'] {
+        [class*='icons'] {
           color: var(--color-red-notification);
           font-size: var(--font-size-body);
+          height: 20px;
           margin-top: 2px;
         }
       }

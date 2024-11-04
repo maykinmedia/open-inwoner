@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import hashlib
 
 from filer.models import Folder, Image

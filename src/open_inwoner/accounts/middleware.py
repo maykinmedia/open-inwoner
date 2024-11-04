@@ -1,53 +1,34 @@
-import logging
+from django.urls import reverse_lazy
 
-from django.http import HttpResponseRedirect
-from django.urls import NoReverseMatch, reverse
+from open_inwoner.cms.utils.page_display import profile_page_is_published
+from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.utils.middleware import BaseConditionalUserRedirectMiddleware
 
-logger = logging.getLogger(__name__)
 
-
-class NecessaryFieldsMiddleware:
+class NecessaryFieldsMiddleware(BaseConditionalUserRedirectMiddleware):
     """
     Redirect the user to a view to fill in necessary fields
     """
 
-    def __init__(self, get_response):
-        self.get_response = get_response
+    redirect_url = reverse_lazy("profile:registration_necessary")
 
-    def __call__(self, request):
-        try:
-            necessary_fields_url = reverse("profile:registration_necessary")
-        except NoReverseMatch:
-            logger.warning(
-                "cannot reverse 'profile:registration_necessary' URL: apphook not active"
-            )
-            return self.get_response(request)
-
+    def requires_redirect(self, request) -> bool:
         user = request.user
-        if user.is_authenticated:
+        return user.require_necessary_fields() and profile_page_is_published()
 
-            # If the user is currently not editing their information, but it is required
-            # redirect to that view.
 
-            try:
-                digid_logout = reverse("digid:logout")
-                digid_slo_redirect = reverse("digid:slo-redirect")
-            except NoReverseMatch:
-                # temporary fix to make tests pass in case reverse fails
-                digid_logout = "/digid/logout/"
-                digid_slo_redirect = "/digid/slo/redirect/"
-            if (
-                not request.path.startswith(
-                    (
-                        necessary_fields_url,
-                        reverse("logout"),
-                        digid_logout,
-                        digid_slo_redirect,
-                        reverse("kvk:branches"),
-                    )
-                )
-                and request.user.require_necessary_fields()
-            ):
-                return HttpResponseRedirect(necessary_fields_url)
+class EmailVerificationMiddleware(BaseConditionalUserRedirectMiddleware):
+    """
+    Redirect the user to a view to verify email
+    """
 
-        return self.get_response(request)
+    redirect_url = reverse_lazy("profile:email_verification_user")
+    extra_pass_prefixes = (reverse_lazy("mail:verification"),)
+
+    def requires_redirect(self, request) -> bool:
+        user = request.user
+        return (
+            not user.has_verified_email()
+            and profile_page_is_published()
+            and SiteConfiguration.get_solo().email_verification_required
+        )

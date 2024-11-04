@@ -4,7 +4,9 @@
 #
 #    ./bin/compile_dependencies.sh
 #
-aldryn-apphooks-config==0.6.0
+alabaster==0.7.16
+    # via sphinx
+aldryn-apphooks-config==0.7.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -13,12 +15,17 @@ amqp==5.1.1
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   kombu
+annotated-types==0.6.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   pydantic
 ape-pie==0.1.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   zgw-consumers
-asgiref==3.4.1
+asgiref==3.7.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -36,9 +43,16 @@ attrs==21.2.0
     #   -r requirements/base.txt
     #   glom
     #   jsonschema
-beautifulsoup4==4.10.0
-    # via webtest
-billiard==3.6.4.0
+autoflake==2.3.0
+    # via -r requirements/test-tools.in
+babel==2.15.0
+    # via sphinx
+beautifulsoup4==4.12.3
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   webtest
+billiard==4.2.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -61,11 +75,19 @@ cbor2==5.6.2
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   webauthn
-celery==5.2.7
+celery==5.4.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   celery-once
+    #   django-celery-beat
+    #   django-celery-monitor
+    #   django-yubin
     #   notifications-api-common
+celery-once==3.0.1
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
 certifi==2023.11.17
     # via
     #   -c requirements/base.txt
@@ -110,6 +132,8 @@ click-repl==0.2.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   celery
+commonmark==0.9.1
+    # via recommonmark
 confusable-homoglyphs==3.2.0
     # via
     #   -c requirements/base.txt
@@ -117,12 +141,19 @@ confusable-homoglyphs==3.2.0
     #   django-registration
 coverage==4.5.4
     # via -r requirements/test-tools.in
-cryptography==41.0.7
+cron-descriptor==1.4.3
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   django-celery-beat
+cryptography==42.0.4
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   django-digid-eherkenning
     #   django-simple-certmanager
     #   josepy
+    #   maykin-python3-saml
     #   mozilla-django-oidc
     #   pyopenssl
     #   webauthn
@@ -143,8 +174,6 @@ defusedxml==0.7.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-    #   django-digid-eherkenning
-    #   maykin-python3-saml
     #   odfpy
 diff-match-patch==20200713
     # via
@@ -153,7 +182,7 @@ diff-match-patch==20200713
     #   django-import-export
 dill==0.3.7
     # via pylint
-django==3.2.24
+django==4.2.16
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -161,19 +190,25 @@ django==3.2.24
     #   django-appconf
     #   django-appdata
     #   django-axes
+    #   django-celery-beat
+    #   django-celery-monitor
     #   django-choices
+    #   django-ckeditor
     #   django-classy-tags
     #   django-cms
     #   django-cors-headers
     #   django-csp
     #   django-csp-reports
     #   django-digid-eherkenning
+    #   django-extensions
     #   django-extra-fields
     #   django-filer
     #   django-filter
     #   django-formtools
     #   django-htmx
     #   django-import-export
+    #   django-js-asset
+    #   django-jsonform
     #   django-localflavor
     #   django-log-outgoing-requests
     #   django-open-forms-client
@@ -186,9 +221,12 @@ django==3.2.24
     #   django-relativedelta
     #   django-sekizai
     #   django-sendfile2
+    #   django-setup-configuration
     #   django-simple-certmanager
     #   django-sniplates
+    #   django-solo
     #   django-timeline-logger
+    #   django-timezone-field
     #   django-treebeard
     #   django-two-factor-auth
     #   django-view-breadcrumbs
@@ -201,6 +239,7 @@ django==3.2.24
     #   mozilla-django-oidc-db
     #   notifications-api-common
     #   zgw-consumers
+    #   zgw-consumers-oas
 django-admin-index==3.1.0
     # via
     #   -c requirements/base.txt
@@ -212,7 +251,7 @@ django-appconf==1.0.5
     #   django-image-cropping
     #   django-log-outgoing-requests
     #   django-timeline-logger
-django-appdata==0.3.2
+django-appdata==0.4.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -225,17 +264,20 @@ django-axes==5.25.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-django-better-admin-arrayfield==1.4.2
+django-celery-beat==2.6.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-    #   mozilla-django-oidc-db
+django-celery-monitor @ git+https://github.com/maykinmedia/django-celery-monitor@513dc28
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
 django-choices==2.0.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   mail-editor
-django-ckeditor==6.2.0
+django-ckeditor==6.7.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -272,14 +314,17 @@ django-csp-reports==1.8.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-django-digid-eherkenning==0.9.0
+django-digid-eherkenning[oidc]==0.16.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-django-elasticsearch-dsl==7.2.1
+    #   django-digid-eherkenning
+django-elasticsearch-dsl==7.4
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+django-extensions==3.2.3
+    # via -r requirements/test-tools.in
 django-extra-fields==3.0.2
     # via
     #   -c requirements/base.txt
@@ -318,11 +363,16 @@ django-ipware==4.0.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-axes
-django-js-asset==1.2.2
+django-js-asset==2.2.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-ckeditor
+django-jsonform==2.22.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   mozilla-django-oidc-db
 django-localflavor==3.1
     # via
     #   -c requirements/base.txt
@@ -331,7 +381,7 @@ django-log-outgoing-requests==0.6.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-django-open-forms-client==0.3.0
+django-open-forms-client==0.4.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -388,17 +438,21 @@ django-sessionprofile==1.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-digid-eherkenning
+django-setup-configuration==0.3.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
 django-simple-certmanager==1.4.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-digid-eherkenning
     #   zgw-consumers
-django-sniplates==0.7.0
+django-sniplates==0.7.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-django-solo==1.2.0
+django-solo==2.2.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -408,10 +462,15 @@ django-solo==1.2.0
     #   mozilla-django-oidc-db
     #   notifications-api-common
     #   zgw-consumers
-django-timeline-logger==2.0.0
+django-timeline-logger==4.0.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+django-timezone-field==6.1.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   django-celery-beat
 django-treebeard==4.4
     # via
     #   -c requirements/base.txt
@@ -424,13 +483,13 @@ django-two-factor-auth[phonenumberslite,webauthn]==1.16.0
     #   -r requirements/base.txt
     #   django-two-factor-auth
     #   maykin-2fa
-django-view-breadcrumbs==2.2.4
+django-view-breadcrumbs==2.5.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-django-webtest==1.9.7
+django-webtest==1.9.11
     # via -r requirements/test-tools.in
-django-yubin==1.7.1
+django-yubin==2.0.4
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -446,7 +505,7 @@ djangocms-attributes-field==2.1.0
     #   djangocms-file
     #   djangocms-link
     #   djangocms-picture
-djangocms-file==3.0.0
+djangocms-file==3.0.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -454,7 +513,7 @@ djangocms-link==3.1.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-djangocms-picture==4.0.0
+djangocms-picture==4.1.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -462,18 +521,29 @@ djangocms-text-ckeditor==5.1.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-djangorestframework==3.12.4
+djangorestframework==3.14.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-extra-fields
     #   drf-spectacular
     #   notifications-api-common
-djangorestframework-camel-case==1.2.0
+djangorestframework-camel-case==1.4.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   notifications-api-common
+dnspython==2.6.1
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   email-validator
+docutils==0.20.1
+    # via
+    #   recommonmark
+    #   sphinx
+    #   sphinx-rtd-theme
+    #   sphinx-tabs
 drf-spectacular==0.20.1
     # via
     #   -c requirements/base.txt
@@ -504,6 +574,11 @@ elasticsearch-dsl==7.4.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-elasticsearch-dsl
+email-validator==2.1.1
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   pydantic
 et-xmlfile==1.1.0
     # via
     #   -c requirements/base.txt
@@ -516,10 +591,19 @@ face==20.1.1
     #   glom
 factory-boy==3.2.0
     # via -r requirements/test-tools.in
-faker==9.9.0
-    # via factory-boy
-flake8==3.9.2
+faker==27.0.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   factory-boy
+    #   polyfactory
+    #   zgw-consumers-oas
+flake8==7.0.0
     # via -r requirements/test-tools.in
+fontawesomefree==6.4.2
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
 fonttools[woff]==4.43.0
     # via
     #   -c requirements/base.txt
@@ -539,7 +623,6 @@ gemma-zds-client==2.0.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   notifications-api-common
-    #   zgw-consumers
 geographiclib==1.52
     # via
     #   -c requirements/base.txt
@@ -569,16 +652,22 @@ humanfriendly==10.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-idna==3.2
+idna==3.7
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   email-validator
     #   requests
+    #   yarl
+imagesize==1.4.1
+    # via sphinx
 inflection==0.5.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   drf-spectacular
+iniconfig==2.0.0
+    # via pytest
 isodate==0.6.1
     # via
     #   -c requirements/base.txt
@@ -588,6 +677,8 @@ isort==5.9.3
     # via
     #   -r requirements/test-tools.in
     #   pylint
+jinja2==3.1.4
+    # via sphinx
 josepy==1.13.0
     # via
     #   -c requirements/base.txt
@@ -598,18 +689,13 @@ jsonschema==4.1.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   drf-spectacular
-kombu==5.2.4
+kombu==5.3.7
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   celery
 lazy-object-proxy==1.6.0
     # via astroid
-lockfile==0.12.2
-    # via
-    #   -c requirements/base.txt
-    #   -r requirements/base.txt
-    #   django-yubin
 lxml==4.9.1
     # via
     #   -c requirements/base.txt
@@ -620,7 +706,7 @@ lxml==4.9.1
     #   pyquery
     #   svglib
     #   xmlsec
-mail-editor @ git+https://github.com/maykinmedia/mail-editor.git@0.3.5
+mail-editor==0.3.7
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -633,21 +719,24 @@ markdown==3.3.6
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   sphinx-markdown-tables
 markuppy==1.14
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   tablib
+markupsafe==2.1.5
+    # via jinja2
 maykin-2fa==1.0.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-maykin-python3-saml==1.14.0.post0
+maykin-python3-saml==1.16.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-digid-eherkenning
-mccabe==0.6.1
+mccabe==0.7.0
     # via
     #   flake8
     #   pylint
@@ -655,15 +744,18 @@ messagebird==2.1.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-mozilla-django-oidc==2.0.0
+mozilla-django-oidc==4.0.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   mozilla-django-oidc-db
-mozilla-django-oidc-db==0.12.0
+mozilla-django-oidc-db==0.19.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   django-digid-eherkenning
+multidict==6.0.5
+    # via yarl
 mypy-extensions==1.0.0
     # via black
 notifications-api-common==0.2.2
@@ -694,6 +786,8 @@ packaging==23.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   djangocms-text-ckeditor
+    #   pytest
+    #   sphinx
 pathspec==0.12.1
     # via black
 pep8==1.7.1
@@ -707,7 +801,7 @@ phonenumberslite==8.13.29
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-two-factor-auth
-pillow==10.2.0
+pillow==10.3.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -719,10 +813,14 @@ platformdirs==2.4.0
     # via
     #   black
     #   pylint
-playwright==1.41.0
+playwright==1.47.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+pluggy==1.4.0
+    # via pytest
+polyfactory==2.13.0
+    # via -r requirements/test-tools.in
 prompt-toolkit==3.0.36
     # via
     #   -c requirements/base.txt
@@ -732,43 +830,58 @@ psycopg2==2.9.9
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-pycodestyle==2.7.0
+pycodestyle==2.11.1
     # via flake8
 pycparser==2.20
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   cffi
+pydantic[email]==2.6.4
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   pydantic
+pydantic-core==2.16.3
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   pydantic
 pydyf==0.1.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   weasyprint
-pyee==11.0.1
+pyee==12.0.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   playwright
-pyflakes==2.3.1
-    # via flake8
+pyflakes==3.2.0
+    # via
+    #   autoflake
+    #   flake8
+pygments==2.18.0
+    # via
+    #   sphinx
+    #   sphinx-tabs
 pyjwt==2.8.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   gemma-zds-client
     #   messagebird
+    #   zgw-consumers
 pylint==2.17.7
     # via -r requirements/test-tools.in
-pyopenssl==23.3.0
+pyopenssl==24.0.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   -r requirements/test-tools.in
     #   django-simple-certmanager
     #   josepy
-    #   maykin-python3-saml
     #   webauthn
-    #   zgw-consumers
 pyphen==0.12.0
     # via
     #   -c requirements/base.txt
@@ -781,15 +894,28 @@ pyrsistent==0.18.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   jsonschema
+pytest==8.1.1
+    # via
+    #   -r requirements/test-tools.in
+    #   pytest-recording
+pytest-recording==0.13.2
+    # via -r requirements/test-tools.in
+python-crontab==3.0.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   django-celery-beat
 python-dateutil==2.8.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   celery
     #   django-relativedelta
     #   elasticsearch-dsl
     #   faker
     #   freezegun
     #   messagebird
+    #   python-crontab
 python-decouple==3.5
     # via
     #   -c requirements/base.txt
@@ -807,9 +933,8 @@ pytz==2021.3
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-    #   celery
-    #   django
     #   django-yubin
+    #   djangorestframework
 pyyaml==6.0
     # via
     #   -c requirements/base.txt
@@ -817,15 +942,20 @@ pyyaml==6.0
     #   drf-spectacular
     #   gemma-zds-client
     #   tablib
+    #   vcrpy
+    #   zgw-consumers-oas
 qrcode==6.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-two-factor-auth
-redis==3.5.3
+recommonmark==0.7.1
+    # via -r requirements/docs.in
+redis==5.0.3
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   celery-once
     #   django-redis
 reportlab==3.6.13
     # via
@@ -846,14 +976,15 @@ requests==2.31.0
     #   messagebird
     #   mozilla-django-oidc
     #   requests-mock
+    #   sphinx
     #   zgw-consumers
-requests-mock==1.9.3
+requests-mock==1.12.1
     # via -r requirements/test-tools.in
 sentry-sdk==1.38.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-simplejson==3.18.0
+simplejson==3.19.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -863,7 +994,6 @@ six==1.16.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   click-repl
-    #   django-appdata
     #   django-elasticsearch-dsl
     #   elasticsearch-dsl
     #   furl
@@ -873,9 +1003,40 @@ six==1.16.0
     #   orderedmultidict
     #   python-dateutil
     #   qrcode
-    #   requests-mock
-soupsieve==2.3.1
-    # via beautifulsoup4
+snowballstemmer==2.2.0
+    # via sphinx
+soupsieve==2.5
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   beautifulsoup4
+sphinx==7.3.7
+    # via
+    #   -r requirements/docs.in
+    #   recommonmark
+    #   sphinx-rtd-theme
+    #   sphinx-tabs
+    #   sphinxcontrib-jquery
+sphinx-markdown-tables==0.0.16
+    # via -r requirements/docs.in
+sphinx-rtd-theme==2.0.0
+    # via -r requirements/docs.in
+sphinx-tabs==3.4.5
+    # via -r requirements/docs.in
+sphinxcontrib-applehelp==1.0.8
+    # via sphinx
+sphinxcontrib-devhelp==1.0.6
+    # via sphinx
+sphinxcontrib-htmlhelp==2.0.5
+    # via sphinx
+sphinxcontrib-jquery==4.1
+    # via sphinx-rtd-theme
+sphinxcontrib-jsmath==1.0.1
+    # via sphinx
+sphinxcontrib-qthelp==1.0.7
+    # via sphinx
+sphinxcontrib-serializinghtml==1.1.10
+    # via sphinx
 sqlparse==0.4.4
     # via
     #   -c requirements/base.txt
@@ -894,8 +1055,6 @@ tablib[html,ods,xls,xlsx,yaml]==3.1.0
     #   tablib
 tblib==1.7.0
     # via -r requirements/test-tools.in
-text-unidecode==1.3
-    # via faker
 tinycss2==1.1.1
     # via
     #   -c requirements/base.txt
@@ -905,12 +1064,24 @@ tinycss2==1.1.1
     #   weasyprint
 tomlkit==0.12.3
     # via pylint
-typing-extensions==4.4.0
+typing-extensions==4.10.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   mozilla-django-oidc-db
+    #   polyfactory
+    #   pydantic
+    #   pydantic-core
     #   pyee
     #   xsdata
+    #   zgw-consumers
+    #   zgw-consumers-oas
+tzdata==2024.1
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   celery
+    #   django-celery-beat
 uritemplate==4.1.1
     # via
     #   -c requirements/base.txt
@@ -928,7 +1099,11 @@ uwsgi==2.0.23
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-vine==5.0.0
+vcrpy==6.0.1
+    # via
+    #   -r requirements/test-tools.in
+    #   pytest-recording
+vine==5.1.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -968,6 +1143,7 @@ wrapt==1.14.1
     #   -r requirements/base.txt
     #   astroid
     #   elastic-apm
+    #   vcrpy
 xlrd==2.0.1
     # via
     #   -c requirements/base.txt
@@ -987,11 +1163,17 @@ xsdata==23.8
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-zgw-consumers==0.29.0
+yarl==1.9.8
+    # via vcrpy
+zgw-consumers==0.35.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   notifications-api-common
+zgw-consumers-oas==1.0.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
 zopfli==0.1.9
     # via
     #   -c requirements/base.txt

@@ -4,17 +4,27 @@
 coverage < 5.0
 django-webtest
 factory-boy
+polyfactory
 freezegun
 pep8
 pylint>=2.17.7
 pyquery  # integrates with webtest
 requests-mock
 tblib
+pytest  # for docs test
 
 # Code formatting
 black
 isort
 flake8
+autoflake
 
 # DigidLocal
 pyopenssl
+
+# Debug and Docs
+django-extensions
+
+# VCR
+pytest-recording
+vcrpy

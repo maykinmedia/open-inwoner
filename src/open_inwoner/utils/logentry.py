@@ -5,7 +5,7 @@ from django.contrib.admin.utils import _get_changed_field_labels_from_form
 from django.forms.fields import TypedChoiceField
 from django.utils.encoding import force_str
 from django.utils.text import get_text_list
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from timeline_logger.models import TimelineLog
 

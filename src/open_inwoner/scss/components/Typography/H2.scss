@@ -2,24 +2,9 @@
 @import '~microscope-sass/lib/responsive';
 
 .utrecht-heading-2 {
-  display: var(--oip-typography-heading-display);
-  justify-content: var(--oip-typography-heading-justify-content);
-
-  // when CMS is in edit mode
-  &.cms-plugin {
-    margin-top: var(--gutter-width);
-  }
-}
-
-.h2 {
-  color: var(--font-color-heading-2);
-  font-family: var(--font-family-heading-2);
-  font-size: var(--font-size-heading-2);
-  font-weight: var(--font-weight-heading-2);
-  line-height: var(--font-line-height-heading-2);
-  margin: 0;
-  display: flex;
-  justify-content: space-between;
+  // Reverse font-family fallback order
+  font-family: var(--utrecht-heading-font-family),
+    var(--utrecht-heading-2-font-family);
 
   &--extra {
     margin: var(--row-height) 0 var(--spacing-medium) 0;
@@ -37,30 +22,64 @@
 
   &.indicator {
     display: inline-block;
+    justify-content: flex-start;
     overflow: visible;
     position: relative;
-
-    &:after {
-      content: '';
-      background-color: var(--color-red-notification);
-      border-radius: 100px;
-      display: inline-block;
-      height: 8px;
-      position: absolute;
-      right: -12px;
-      top: 6px;
-      width: 8px;
-    }
   }
+}
+
+.heading-2__indicator {
+  display: flex;
+  flex-direction: row;
 }
 
 ///
 /// Contextual.
 ///
 
-.card + .h2,
-.dashboard + .h2,
-.status-list + .h2,
+.card + .utrecht-heading-2,
+.dashboard + .utrecht-heading-2,
+.status-list + .utrecht-heading-2,
+.table + .utrecht-heading-2 {
+  margin-top: var(--row-height);
+}
+
+.utrecht-paragraph + .utrecht-heading-2 {
+  margin-top: var(--spacing-large);
+}
+
+///
+/// Legacy styling
+///
+
+.h2 {
+  color: var(--utrecht-heading-2-color);
+  font-family: var(--utrecht-heading-2-font-family);
+  font-size: var(--utrecht-heading-2-font-size);
+  font-weight: var(--utrecht-heading-2-font-weight);
+  line-height: var(--utrecht-heading-2-line-height);
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+
+  @include mobile-only {
+    word-break: normal;
+    overflow-wrap: break-word;
+  }
+
+  // when CMS is in edit mode
+  &.cms-plugin {
+    margin-top: var(--gutter-width);
+  }
+
+  &.indicator {
+    display: inline-block;
+    justify-content: flex-start;
+    overflow: visible;
+    position: relative;
+  }
+}
+
 .table + .h2 {
   margin-top: var(--row-height);
 }

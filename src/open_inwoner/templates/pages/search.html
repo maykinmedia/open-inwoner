@@ -6,7 +6,7 @@
     <div class="grid">
         <div class="grid__sidebar">&nbsp;</div>
         <div class="grid__main">
-            <h1 class="h1">{% trans "Zoeken naar " %} "{% firstof search_form.query.value "" %}"</h1>
+            <h1 class="utrecht-heading-1">{% trans "Zoeken naar " %} "{% firstof search_form.query.value "" %}"</h1>
         </div>
     </div>
 
@@ -14,7 +14,7 @@
     <div class="grid">
         <aside class="grid__sidebar grid__filters" aria-label="{% trans "Zoekfilters" %}">
         {% if search_filter_categories or search_filter_tags or search_filter_organizations %}
-            <h2 class="h2">{% trans "Zoekfilters" %}</h2>
+            <h2 class="utrecht-heading-2">{% trans "Zoekfilters" %}</h2>
                 {% if search_filter_categories %}
                     {% include "components/Filter/Filter.html" with field=search_form.categories form_id="search-form" only %}
                 {% endif %}
@@ -28,17 +28,17 @@
         {#  end search filters #}
         </aside>
 
-        <div class="grid__main">
+        <div class="grid__main grid__main--search">
             {% if paginator.count %}
                 <div class="search-results">
-                    <h2 class="h2 search-results__title">
+                    <h2 class="utrecht-heading-2 search-results__title">
                         {% trans "Zoekresultaten" %}
                         <span class="search-results__title-small">{{paginator.count}} zoekresultaten</span>
                     </h2>
                     <div class="search-results__list">
                         {% for hit in page_obj %}
                             <a class="search-results__item" href="{% url 'products:product_detail' hit.slug %}">
-                                <h3 class="search-results__item-title">{{ hit.name }}</h3>
+                                <h3 class="utrecht-heading-3 search-results__item-title">{{ hit.name }}</h3>
                                 <div class="search-results__item-info-container">
                                     <p class="search-results__item-intro">{{ hit.summary }}</p>
                                 </div>
@@ -51,8 +51,8 @@
 
                 {% if paginator.count and not messages %}
                     <section class="feedback" aria-label="{% trans "Pagina feedback" %}">
-                        <h4 class="h4">{% trans "Feedback" %}</h4>
-                        <p class="p">{% trans "Heeft u gevonden wat u zocht?" %}</p>
+                        <h4 class="utrecht-heading-4">{% trans "Feedback" %}</h4>
+                        <p class="utrecht-paragraph">{% trans "Heeft u gevonden wat u zocht?" %}</p>
                         {% render_form form=feedback_form method="POST" form_action=request.get_full_path id="feedback_form" show_notifications=True %}
                             {% csrf_token %}
                             {{ feedback_form.errors }}
@@ -80,10 +80,10 @@
 
             {% else %}
                 <div class="search-results search-results--none">
-                    <h2 class="h2 search-results__title">
+                    <h2 class="utrecht-heading-2 search-results__title">
                         {% trans "Geen zoekresultaten" %}
                     </h2>
-                    <p class="p">{% trans "Helaas, wij vonden geen resultaten voor jouw zoekopdracht." %}</p>
+                    <p class="utrecht-paragraph">{% trans "Helaas, wij vonden geen resultaten voor jouw zoekopdracht." %}</p>
                 </div>
                 <ul class="ul">
                    <li class="li">{% trans "Controleer de spelling van je zoekopdracht." %}</li>

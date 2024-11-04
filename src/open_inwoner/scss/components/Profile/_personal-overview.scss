@@ -4,8 +4,7 @@
     padding-bottom: var(--spacing-large);
   }
 
-  h2,
-  .h2 {
+  .oip-header-group {
     display: block;
     height: initial;
     margin: calc(var(--row-height)) 0 0 0;
@@ -16,11 +15,11 @@
     }
   }
 
-  .h2 + .grid {
+  .utrecht-heading-2 + .grid {
     margin-top: 0;
   }
 
-  .profile-list {
+  .list {
     .list-item--compact {
       padding: var(--spacing-small) 0;
     }
@@ -32,7 +31,46 @@
     }
   }
 
-  .profile-cards .card {
-    min-height: 190px;
+  .profile-cards {
+    @media (min-width: 500px) and (max-width: 767px) {
+      &.card-container {
+        grid-template-columns: repeat(2, 1fr) !important;
+      }
+    }
+
+    .card {
+      min-height: 190px;
+    }
+  }
+
+  .form {
+    padding: 0;
+  }
+
+  .checkbox {
+    &__label {
+      color: var(--color-black);
+      font-family: var(--font-family-heading);
+      font-weight: bold;
+    }
+
+    .checkbox__p {
+      color: var(--color-gray-dark-900);
+      font-size: var(--font-size-body-small);
+      line-height: var(--font-line-height-body-small);
+      padding-left: calc(var(--gutter-width) + var(--spacing-small));
+    }
+  }
+
+  &.profile-section__newsletters {
+    .form {
+      gap: var(--spacing-large);
+    }
+    .checkbox__p.newsletter-remarks {
+      line-height: var(--font-line-height-body);
+    }
+    .button {
+      padding: var(--spacing-medium) var(--spacing-giant);
+    }
   }
 }

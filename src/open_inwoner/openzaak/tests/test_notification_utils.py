@@ -11,19 +11,26 @@ from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 from open_inwoner.accounts.tests.factories import DigidUserFactory, UserFactory
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openzaak.notifications import (
-    get_initiator_users_from_roles,
-    get_np_initiator_bsns_from_roles,
+    _get_initiator_users_from_roles,
+    _get_np_initiator_bsns_from_roles,
     send_case_update_email,
 )
-from open_inwoner.openzaak.tests.factories import generate_rol
+from open_inwoner.openzaak.tests.factories import ZGWApiGroupConfigFactory, generate_rol
+from open_inwoner.openzaak.tests.shared import ZAKEN_ROOT
 
-from ..api_models import Zaak, ZaakType
+from ..api_models import Status, StatusType, Zaak, ZaakType
 from .test_notification_data import MockAPIData
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class NotificationHandlerUtilsTestCase(TestCase):
+    def setUp(self):
+        self.api_group = ZGWApiGroupConfigFactory(
+            zrc_service__api_root=ZAKEN_ROOT,
+        )
+
     def test_send_case_update_email(self):
+
         config = SiteConfiguration.get_solo()
         data = MockAPIData()
 
@@ -32,7 +39,15 @@ class NotificationHandlerUtilsTestCase(TestCase):
         case = factory(Zaak, data.zaak)
         case.zaaktype = factory(ZaakType, data.zaak_type)
 
-        case_url = reverse("cases:case_detail", kwargs={"object_id": str(case.uuid)})
+        status = factory(Status, data.status_final)
+        status.statustype = factory(StatusType, data.status_type_final)
+
+        case.status = status
+
+        case_url = reverse(
+            "cases:case_detail",
+            kwargs={"object_id": str(case.uuid), "api_group_id": self.api_group.id},
+        )
 
         # mock `_format_zaak_identificatie`, but then continue with result of actual call
         # (test redirect for invalid BSN that passes pattern validation)
@@ -41,9 +56,45 @@ class NotificationHandlerUtilsTestCase(TestCase):
             Zaak, "_format_zaak_identificatie"
         ) as format_identificatie:
             format_identificatie.return_value = ret_val
-            send_case_update_email(user, case, "case_status_notification")
+            send_case_update_email(
+                user,
+                case,
+                "case_status_notification",
+                status=status,
+                api_group=self.api_group,
+            )
 
         format_identificatie.assert_called_once()
+
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertEqual(email.to, [user.email])
+        self.assertIn(config.name, email.subject)
+
+        body_html = email.alternatives[0][0]
+        self.assertIn(case.identificatie, body_html)
+        self.assertIn(case.zaaktype.omschrijving, body_html)
+        self.assertIn(status.statustype.statustekst, body_html)
+        self.assertIn(case_url, body_html)
+        self.assertIn(config.name, body_html)
+
+    def test_send_case_update_email__no_status(self):
+        config = SiteConfiguration.get_solo()
+        data = MockAPIData()
+
+        user = data.user_initiator
+
+        case = factory(Zaak, data.zaak)
+        case.zaaktype = factory(ZaakType, data.zaak_type)
+
+        case_url = reverse(
+            "cases:case_detail",
+            kwargs={"object_id": str(case.uuid), "api_group_id": self.api_group.id},
+        )
+
+        send_case_update_email(
+            user, case, "case_document_notification", api_group=self.api_group
+        )
 
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
@@ -104,7 +155,7 @@ class NotificationHandlerUtilsTestCase(TestCase):
             "100000001",
             "100000002",
         }
-        actual = get_np_initiator_bsns_from_roles(roles)
+        actual = _get_np_initiator_bsns_from_roles(roles)
         self.assertEqual(set(actual), expected)
 
     def test_get_initiator_users_from_roles(self):
@@ -175,7 +226,7 @@ class NotificationHandlerUtilsTestCase(TestCase):
         ]
 
         # verify we have a lot of Roles with initiators & bsn's
-        check_roles = get_np_initiator_bsns_from_roles(roles)
+        check_roles = _get_np_initiator_bsns_from_roles(roles)
         expected_roles = {
             user_1.bsn,
             user_2.bsn,
@@ -185,6 +236,6 @@ class NotificationHandlerUtilsTestCase(TestCase):
 
         # of all the Users with Roles only these match all conditions
         expected = {user_1, user_2}
-        actual = get_initiator_users_from_roles(roles)
+        actual = _get_initiator_users_from_roles(roles)
 
         self.assertEqual(set(actual), expected)

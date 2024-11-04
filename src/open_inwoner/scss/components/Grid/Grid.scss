@@ -9,6 +9,40 @@
     gap: 0;
   }
 
+  &__main {
+    display: block;
+
+    @media (min-width: 768px) {
+      display: grid;
+    }
+
+    /// Home grid
+
+    .plugin {
+      padding-top: var(--row-height);
+
+      .utrecht-heading-1 {
+        margin-bottom: var(--spacing-large);
+      }
+
+      .oip-header-group {
+        margin-bottom: var(--spacing-medium);
+      }
+
+      &.userfeed {
+        .utrecht-heading-2 {
+          margin-bottom: 0;
+        }
+      }
+    }
+
+    /// Search grid
+    &--search {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
   &--limit &__sidebar,
   &--limit &__main {
     max-height: 75vh;
@@ -55,11 +89,10 @@
     grid-column-end: span 12;
   }
 
-  &__welcome {
-    margin-bottom: var(--row-height);
+  &__welcome.plugin {
     margin-top: -80px;
     background-color: var(--color-white);
-    box-shadow: 0 0 var(--row-height) 0 var(--color-gray);
+    border-radius: var(--border-radius);
     padding: var(--spacing-large);
     box-sizing: border-box;
     width: 100%;
@@ -73,11 +106,4 @@
   .form__grid-box {
     grid-template-columns: 1fr;
   }
-}
-
-.grid + .grid,
-.h1 + .grid,
-.h2 + .grid,
-.h4 + .grid {
-  margin-top: var(--spacing-large);
 }

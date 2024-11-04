@@ -1,13 +1,13 @@
-{% load i18n header_tags form_tags icon_tags link_tags string_tags solo_tags menu_tags button_tags %}
+{% load i18n form_tags icon_tags link_tags string_tags solo_tags menu_tags button_tags %}
 
 {% get_solo "configurations.SiteConfiguration" as config %}
 
 {% if request.user.is_authenticated %}
 
-    <nav class="primary-navigation primary-navigation__authenticated" aria-label="Navigatie na inloggen">
+    <nav class="primary-navigation primary-navigation--desktop primary-navigation__authenticated" aria-label="Navigatie na inloggen">
         <ul class="primary-navigation__list">
             <li class="primary-navigation__list-item">
-            {% button text=_('Welkom ')|addstr:request.user.get_short_name type="button" icon="expand_more" icon_position="after" icon_outlined=True transparent=True extra_classes="primary-navigation--toggle" %}
+            {% button text=_('Welkom ')|addstr:request.user.display_name type="button" icon="expand_more" icon_position="after" icon_outlined=True transparent=True extra_classes="primary-navigation--toggle" %}
 
                 {% if request.user.num_indicators %}
                     {# num_indicators is set from a modifier in show_menu_below_id #}
@@ -36,7 +36,7 @@
         <span class="desktop-login__link">
             {% url 'login' as login_url %}
             {% trans "Inloggen" as login %}
-            {% button text="Inloggen" href=login_url icon="person" icon_position="before" primary=True icon_outlined=True transparent=True %}
+            {% button text="Inloggen" href=login_url icon="person" icon_position="before" primary=True icon_outlined=True %}
         </span>
     </div>
 {% endif %}

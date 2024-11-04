@@ -293,37 +293,37 @@ export class FileInput extends Component {
       <aside class="file">
         <div class="file__container">
           <div class="file__file ${typeError || sizeError ? 'error' : ''}">
-            <p class="file__symbol">
+            <div class="file__symbol">
               <span aria-hidden="true" class="material-icons-outlined">${
                 type.match('image') ? 'image' : 'description'
               }</span>
-            </p>
-            <p class="p file__data">
+            </div>
+            <div class="file__data">
               <span class="file__name">${name} (${ext}, ${sizeMB}MB)</span>
-            </p>
-            <a class="link link--primary" href="#document-upload" role="button" aria-label="${labelDelete}">
+            </div>
+            <a class="link link--primary file__download" href="#document-upload" role="button" aria-label="${labelDelete}">
               <span aria-hidden="true" class="material-icons-outlined">delete</span>
             </a>
         </div>
           ${
             typeError && sizeError
               ? `
-              <p class="p p--small error">
+              <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-small error">
                 <span aria-hidden="true" class="material-icons-outlined">warning_amber</span>
-                <span class="file-error__content">Dit bestand is te groot - en van een ongeldig type ("${ext}"). <br />Toegestaan zijn: ${uploadFileTypes}.</span>
+                <span class="file-error__content">Dit type bestand (${ext}) is ongeldig en te groot. Geldige bestandstypen zijn: ${uploadFileTypes}</span>
               </p>`
               : typeError || sizeError
               ? `
-              <p class="p p--small error">
+              <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-small error">
                 <span aria-hidden="true" class="material-icons-outlined">warning_amber</span>
                 ${
                   typeError
-                    ? `<span class="file-error__content">Dit type bestand ("${ext}") is ongeldig. Geldige bestandstypen zijn: ${uploadFileTypes}.</span>`
+                    ? `<span class="file-error__content">Dit type bestand (${ext}) is ongeldig. Geldige bestandstypen zijn: ${uploadFileTypes}</span>`
                     : ''
                 }
                 ${
                   sizeError
-                    ? '<span class="file-error__content">Dit bestand is te groot.</span>'
+                    ? '<span class="file-error__content">Dit bestand is te groot</span>'
                     : ''
                 }
               </p>`

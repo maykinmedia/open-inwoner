@@ -31,12 +31,9 @@
   }
 
   &__item-title {
-    color: var(--color-black);
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-heading-3);
-    font-weight: bold;
+    font-size: var(--utrecht-heading-3-font-size);
+    line-height: var(--utrecht-heading-3-line-height);
     letter-spacing: 0;
-    line-height: var(--font-line-height-heading-3);
     margin: 0 0 6px;
   }
 

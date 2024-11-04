@@ -5,7 +5,7 @@ from django.contrib.messages import get_messages
 from django.core import mail
 from django.test import override_settings, tag
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from django_webtest import WebTest
 from freezegun import freeze_time
@@ -115,7 +115,7 @@ class PlanViewTests(WebTest):
 
         response = self.app.get(self.detail_url, user=self.contact)
         self.assertContains(response, self.user.get_full_name())
-        self.assertContains(response, self.contact.first_name)
+        self.assertContains(response, self.contact.display_name)
 
         # Contact for one user, but not the other
         # Check if all users can see eachother in the plan
@@ -130,12 +130,12 @@ class PlanViewTests(WebTest):
 
         response = self.app.get(self.detail_url, user=self.contact)
         self.assertContains(response, self.user.get_full_name())
-        self.assertContains(response, self.contact.first_name)
+        self.assertContains(response, self.contact.display_name)
         self.assertContains(response, new_contact.get_full_name())
 
         response = self.app.get(self.detail_url, user=new_contact)
         self.assertContains(response, self.user.get_full_name())
-        self.assertContains(response, new_contact.first_name)
+        self.assertContains(response, new_contact.display_name)
         self.assertContains(response, self.contact.get_full_name())
 
         new_contact.delete()
@@ -148,7 +148,7 @@ class PlanViewTests(WebTest):
         self.assertContains(response, self.contact.get_full_name())
         self.assertNotContains(response, new_contact.get_full_name())
 
-    @patch("open_inwoner.userfeed.hooks.plan_completed")
+    @patch("open_inwoner.userfeed.hooks.plan_completed", autospec=True)
     def test_plan_detail_userfeed_hook(self, mock_plan_completed: Mock):
         self.plan.end_date = date.today()
         self.plan.save()
@@ -548,7 +548,7 @@ class PlanViewTests(WebTest):
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
         self.assertEqual(
-            email.subject, "Plan action has been updated at Open Inwoner Platform"
+            email.subject, "Samenwerkingsactie bijgewerkt op Open Inwoner Platform"
         )
         self.assertEqual(email.to, [self.contact.email])
         plan_url = f"http://testserver{self.detail_url}"
@@ -577,7 +577,7 @@ class PlanViewTests(WebTest):
 
     def test_plan_action_delete_login_required_http_403(self):
         response = self.client.post(self.action_delete_url)
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
     def test_plan_action_delete_http_get_is_not_allowed(self):
         self.client.force_login(self.user)
@@ -604,7 +604,7 @@ class PlanViewTests(WebTest):
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
         self.assertEqual(
-            email.subject, "Plan action has been updated at Open Inwoner Platform"
+            email.subject, "Samenwerkingsactie bijgewerkt op Open Inwoner Platform"
         )
         self.assertEqual(email.to, [self.contact.email])
         plan_url = f"http://testserver{self.detail_url}"

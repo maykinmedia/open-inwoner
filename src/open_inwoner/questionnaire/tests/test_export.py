@@ -30,9 +30,9 @@ class QuestionnaireExportTests(TestCase):
     def test_anonymous_user_exports_file_without_being_saved(self):
         filename = _("questionnaire_{slug}.pdf").format(slug=self.questionnaire.slug)
         response = self.client.get(reverse("products:questionnaire_export"))
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.headers["Content-Type"], "application/pdf")
-        self.assertEquals(
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"], "application/pdf")
+        self.assertEqual(
             response.headers["Content-Disposition"],
             f'attachment; filename="{filename}"',
         )
@@ -42,9 +42,9 @@ class QuestionnaireExportTests(TestCase):
         self.client.force_login(self.user)
         filename = _("questionnaire_{slug}.pdf").format(slug=self.questionnaire.slug)
         response = self.client.get(reverse("products:questionnaire_export"))
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.headers["Content-Type"], "application/pdf")
-        self.assertEquals(
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"], "application/pdf")
+        self.assertEqual(
             response.headers["Content-Disposition"],
             f'attachment; filename="{filename}"',
         )
@@ -60,7 +60,7 @@ class QuestionnaireExportTests(TestCase):
         self.session_cookie_name = settings.SESSION_COOKIE_NAME
         self.client.cookies[self.session_cookie_name] = self.session.session_key
         response = self.client.get(reverse("products:questionnaire_export"))
-        self.assertEquals(response.context["root_title"], self.questionnaire.title)
+        self.assertEqual(response.context["root_title"], self.questionnaire.title)
         self.assertListEqual(
             response.context["steps"],
             [
@@ -76,7 +76,7 @@ class QuestionnaireExportTests(TestCase):
                 },
             ],
         )
-        self.assertEquals(
+        self.assertEqual(
             response.context["last_step"],
             {"question": child.question, "content": child.content},
         )

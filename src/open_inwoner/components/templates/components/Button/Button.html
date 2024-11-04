@@ -3,44 +3,46 @@
 {% if href %}
     <a
         class="{{ classes }}"
-        href="{{href}}"
+        href="{{ href }}"
         title="{% firstof title text %}"
-        aria-label="{% firstof title text %}"
+        aria-label="{% firstof text title %}"
         {% if href|startswith:"http" %}target="_blank"{% endif %}
         {% as_attributes extra_attributes %}
         {% if ariaExpanded %} aria-expanded="{{ ariaExpanded }}" {% endif %}
+        {% if ariaControls %} aria-controls="{{ ariaControls }}" {% endif %}
     >
         {% if icon %}{% icon icon=icon outlined=icon_outlined %}{% endif %}
         {% if text_icon %}
             <span class="button__text-wrapper">
             {% icon icon=text_icon outlined=icon_outlined %}
-            {% if not hide_text %}{{text}}{% endif %}
+            {% if not hide_text %}{{ text }}{% endif %}
             </span>
         {% else %}
-            {% if not hide_text %}{{text}}{% endif %}
+            {% if not hide_text %}{{ text }}{% endif %}
         {% endif %}
     </a>
 {% else %}
     <button
         class="{{ classes }}"
-        type="{{type}}"
+        type="{{ type }}"
         name="{{ name }}"
         value="{{ value }}"
         title="{% firstof title text %}"
-        aria-label="{% firstof title text %}"
+        aria-label="{% firstof text title %}"
         {% as_attributes extra_attributes %}
         {% if id %} id="{{ id }}" {% endif %}
         {% if form_id %} form="{{ form_id }}"{% endif %}
         {% if ariaExpanded %} aria-expanded="{{ ariaExpanded }}" {% endif %}
+        {% if ariaControls %} aria-controls="{{ ariaControls }}" {% endif %}
     >
         {% if icon %}{% icon icon=icon outlined=icon_outlined %}{% endif %}
         {% if text_icon %}
             <span class="button__text-wrapper">
             {% icon icon=text_icon outlined=icon_outlined %}
-            {% if not hide_text %}{{text}}{% endif %}
+            {% if not hide_text %}<span class="button__inner-text">{{ text }}</span>{% endif %}
             </span>
         {% else %}
-            {% if not hide_text %}{{text}}{% endif %}
+            {% if not hide_text %}<span class="button__inner-text">{{ text }}</span>{% endif %}
         {% endif %}
     </button>
 {% endif %}

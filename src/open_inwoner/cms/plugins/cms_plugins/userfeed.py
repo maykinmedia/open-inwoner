@@ -16,7 +16,7 @@ class UserFeedPlugin(CMSPluginBase):
 
     def render(self, context, instance, placeholder):
         request = context["request"]
-        feed = get_feed(request.user, with_history=True)
+        feed = get_feed(request.user)
         context.update(
             {
                 "instance": instance,

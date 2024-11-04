@@ -1,3 +1,4 @@
+import json
 from unittest.mock import patch
 
 from django.contrib.auth.models import Permission
@@ -28,6 +29,10 @@ class TestAdminCategoryForm(WebTest):
         form["published"] = True
         form["_position"] = "first-child"
         form["_ref_node_id"] = 0
+        # django-jsonform requires JS to work properly and with Webtest the default
+        # value for ArrayFields is an empty string, causing it crash to when trying to parse
+        # that value as JSON
+        form["zaaktypen"] = "[]"
         form.submit()
         category = Category.objects.first()
         self.assertEqual(category.slug, "foo1")
@@ -43,6 +48,10 @@ class TestAdminCategoryForm(WebTest):
         form["published"] = True
         form["_position"] = "first-child"
         form["_ref_node_id"] = root.id
+        # django-jsonform requires JS to work properly and with Webtest the default
+        # value for ArrayFields is an empty string, causing it crash to when trying to parse
+        # that value as JSON
+        form["zaaktypen"] = "[]"
         form.submit()
         updated_category = Category.objects.get(slug="bar1")
         self.assertTrue(updated_category.published)
@@ -178,7 +187,7 @@ class TestAdminCategoryForm(WebTest):
             user=self.user,
         ).form
 
-        form["zaaktypen"] = "001"
+        form["zaaktypen"] = json.dumps(["001"])
         response = form.submit("_save")
 
         self.assertEqual(response.status_code, 302)
@@ -201,7 +210,7 @@ class TestAdminCategoryForm(WebTest):
             user=self.user,
         ).form
 
-        form["zaaktypen"] = "001"
+        form["zaaktypen"] = json.dumps(["001"])
         response = form.submit()
 
         self.assertEqual(response.status_code, 200)

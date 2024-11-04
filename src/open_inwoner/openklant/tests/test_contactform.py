@@ -1,4 +1,4 @@
-import inspect
+from unittest.mock import patch
 
 from django.contrib import messages
 from django.core import mail
@@ -14,6 +14,7 @@ from open_inwoner.openklant.api_models import KlantContactRol
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.openklant.tests.data import MockAPICreateData
 from open_inwoner.openklant.tests.factories import ContactFormSubjectFactory
+from open_inwoner.openklant.views.contactform import ContactFormView
 from open_inwoner.openzaak.tests.factories import ServiceFactory
 from open_inwoner.utils.test import ClearCachesMixin, DisableRequestLogMixin
 from open_inwoner.utils.tests.helpers import AssertFormMixin, AssertTimelineLogMixin
@@ -23,13 +24,24 @@ from open_inwoner.utils.tests.helpers import AssertFormMixin, AssertTimelineLogM
 @modify_settings(
     MIDDLEWARE={"remove": ["open_inwoner.kvk.middleware.KvKLoginMiddleware"]}
 )
-class ContactFormTestCase(
+@patch(
+    "open_inwoner.openklant.views.contactform.send_contact_confirmation_mail",
+    autospec=True,
+)
+@patch(
+    "open_inwoner.openklant.views.contactform.generate_question_answer_pair",
+    autospec=True,
+    return_value=("", 42),
+)
+class ContactFormIntegrationTest(
     ClearCachesMixin,
     AssertTimelineLogMixin,
     AssertFormMixin,
     DisableRequestLogMixin,
     WebTest,
 ):
+    """Integration tests for `ContactForm` and associated view"""
+
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -47,9 +59,15 @@ class ContactFormTestCase(
         config.register_bronorganisatie_rsin = ""
         config.register_type = ""
         config.register_employee_id = ""
+        config.send_email_confirmation = True
         config.save()
 
-    def test_singleton_has_configuration_method(self, m):
+        # bypass CMS for rendering form template directly via ContactFormView
+        ContactFormView.template_name = "pages/contactform/form.html"
+
+    def test_singleton_has_configuration_method(
+        self, m, mock_captcha, mock_send_confirm
+    ):
         # use cleared (from setUp()
         config = OpenKlantConfig.get_solo()
         self.assertFalse(config.has_form_configuration())
@@ -73,7 +91,11 @@ class ContactFormTestCase(
         config.register_employee_id = "FooVonBar"
         self.assertTrue(config.has_form_configuration())
 
-    def test_no_form_shown_if_not_has_configuration(self, m):
+        mock_send_confirm.assert_not_called()
+
+    def test_no_form_shown_if_not_has_configuration(
+        self, m, mock_captcha, mock_send_confirm
+    ):
         # set nothing
         config = OpenKlantConfig.get_solo()
         self.assertFalse(config.has_form_configuration())
@@ -82,7 +104,9 @@ class ContactFormTestCase(
         self.assertContains(response, _("Contact formulier niet geconfigureerd."))
         self.assertEqual(0, len(response.pyquery("#contactmoment-form")))
 
-    def test_anon_form_requires_either_email_or_phonenumber(self, m):
+    def test_anon_form_requires_either_email_or_phonenumber(
+        self, m, mock_captcha, mock_send_confirm
+    ):
         config = OpenKlantConfig.get_solo()
         config.register_email = "example@example.com"
         config.save()
@@ -90,6 +114,7 @@ class ContactFormTestCase(
 
         response = self.app.get(self.url)
         form = response.forms["contactmoment-form"]
+
         self.assertFormExactFields(
             form,
             (
@@ -100,6 +125,7 @@ class ContactFormTestCase(
                 "email",
                 "phonenumber",
                 "question",
+                "captcha",  # captcha present for anon user
             ),
         )
         form["subject"].select(text=subject.subject)
@@ -108,13 +134,17 @@ class ContactFormTestCase(
         form["email"] = ""
         form["phonenumber"] = ""
         form["question"] = "hey!\n\nwaddup?"
+        form["captcha"] = 42
 
         response = form.submit(status=200)
         self.assertEqual(
             response.context["errors"], [_("Vul een e-mailadres of telefoonnummer in.")]
         )
+        mock_send_confirm.assert_not_called()
 
-    def test_regular_auth_form_fills_email_and_phonenumber(self, m):
+    def test_regular_auth_form_fills_email_and_phonenumber(
+        self, m, mock_captcha, mock_send_confirm
+    ):
         config = OpenKlantConfig.get_solo()
         config.register_email = "example@example.com"
         config.save()
@@ -135,8 +165,11 @@ class ContactFormTestCase(
         form["question"] = "hey!\n\nwaddup?"
 
         response = form.submit(status=302)
+        mock_send_confirm.assert_called_once_with(user.email, subject.subject)
 
-    def test_expected_ordered_subjects_are_shown(self, m):
+    def test_expected_ordered_subjects_are_shown(
+        self, m, mock_captcha, mock_send_confirm
+    ):
         config = OpenKlantConfig.get_solo()
         config.register_email = "example@example.com"
         config.save()
@@ -171,8 +204,9 @@ class ContactFormTestCase(
                 (str(subject_1.pk), False, subject_1.subject),
             ],
         )
+        mock_send_confirm.assert_not_called()
 
-    def test_submit_and_register_via_email(self, m):
+    def test_register_contactmoment_via_email(self, m, mock_captcha, mock_send_confirm):
         config = OpenKlantConfig.get_solo()
         config.register_email = "example@example.com"
         config.has_form_configuration = True
@@ -188,6 +222,7 @@ class ContactFormTestCase(
         form["email"] = "foo@example.com"
         form["phonenumber"] = "+31612345678"
         form["question"] = "hey!\n\nwaddup?"
+        form["captcha"] = 42
 
         response = form.submit().follow()
 
@@ -210,7 +245,11 @@ class ContactFormTestCase(
 
         self.assertTimelineLog("registered contactmoment by email")
 
-    def test_submit_and_register_anon_via_api_with_klant(self, m):
+        mock_send_confirm.assert_called_once_with("foo@example.com", subject.subject)
+
+    def test_register_contactmoment_for_anon_user_via_api(
+        self, m, mock_captcha, mock_send_confirm
+    ):
         MockAPICreateData.setUpServices()
 
         config = OpenKlantConfig.get_solo()
@@ -221,7 +260,7 @@ class ContactFormTestCase(
         config.save()
 
         data = MockAPICreateData()
-        data.install_mocks_anon_with_klant(m)
+        data.install_mocks_anon(m)
 
         subject = ContactFormSubjectFactory(
             config=config,
@@ -238,6 +277,7 @@ class ContactFormTestCase(
         form["email"] = "foo@example.com"
         form["phonenumber"] = "+31612345678"
         form["question"] = "hey!\n\nwaddup?"
+        form["captcha"] = 42
 
         response = form.submit().follow()
 
@@ -248,55 +288,46 @@ class ContactFormTestCase(
 
         self.assertEqual(len(mail.outbox), 0)
 
-        for m in data.matchers:
-            self.assertTrue(m.called_once, str(m))
+        # check that contactmomenten API but not klanten API is hit for anon user
+        self.assertTrue(data.matchers[0].called_once, str(m))
+        self.assertFalse(data.matchers[1].called_once, str(m))
+        self.assertFalse(data.matchers[2].called_once, str(m))
 
-        klant_create_data = data.matchers[0].request_history[0].json()
-        self.assertEqual(
-            klant_create_data,
-            {
-                "bronorganisatie": "123456789",
-                "voornaam": "Foo",
-                "voorvoegselAchternaam": "de",
-                "achternaam": "Bar",
-                "emailadres": "foo@example.com",
-                "telefoonnummer": "+31612345678",
-            },
-        )
-        contactmoment_create_data = data.matchers[1].request_history[0].json()
+        contactmoment_create_data = data.matchers[0].request_history[0].json()
         self.assertEqual(
             contactmoment_create_data,
             {
                 "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
                 "bronorganisatie": "123456789",
-                "tekst": "Onderwerp: Aanvraag document\n\nhey!\n\nwaddup?",
+                "tekst": "hey!\n\nwaddup?\n\nNaam: Foo de Bar",
                 "type": "Melding",
-                "kanaal": "Internet",
+                "kanaal": "contactformulier",
                 "onderwerp": "afdeling-xyz",
+                "contactgegevens": {
+                    "emailadres": "foo@example.com",
+                    "telefoonnummer": "+31612345678",
+                },
             },
         )
-        kcm_create_data = data.matchers[2].request_history[0].json()
-        self.assertEqual(
-            kcm_create_data,
-            {
-                "contactmoment": "https://contactmomenten.nl/api/v1/contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
-                "klant": "https://klanten.nl/api/v1/klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
-                "rol": KlantContactRol.BELANGHEBBENDE,
-            },
-        )
-        self.assertTimelineLog("created klant for anonymous user")
         self.assertTimelineLog("registered contactmoment by API")
+        mock_send_confirm.assert_called_once_with("foo@example.com", subject.subject)
 
-    def test_submit_and_register_anon_via_api_without_klant(self, m):
-        MockAPICreateData.setUpServices()
+    @patch("open_inwoner.openklant.forms.generate_question_answer_pair")
+    def test_register_contactmoment_for_anon_user_via_api_does_not_send_empty_email_or_telephone(
+        self, m, mock_captcha2, mock_captcha, mock_send_confirm
+    ):
+        # we need to patch the captcha Q&A twice because they are re-generated by the form
+        mock_captcha2.return_value = ("", 42)
 
         config = OpenKlantConfig.get_solo()
         config.register_contact_moment = True
         config.register_bronorganisatie_rsin = "123456789"
         config.register_type = "Melding"
+        config.register_channel = "contactformulier"
         config.register_employee_id = "FooVonBar"
         config.save()
 
+        MockAPICreateData.setUpServices()
         data = MockAPICreateData()
         data.install_mocks_anon_without_klant(m)
 
@@ -306,61 +337,46 @@ class ContactFormTestCase(
             subject_code="afdeling-xyz",
         )
 
-        response = self.app.get(self.url)
-        form = response.forms["contactmoment-form"]
-        form["subject"].select(text=subject.subject)
-        form["first_name"] = "Foo"
-        form["infix"] = "de"
-        form["last_name"] = "Bar"
-        form["email"] = "foo@example.com"
-        form["phonenumber"] = "+31612345678"
-        form["question"] = "hey!\n\nwaddup?"
+        for contact_details in (
+            {"phonenumber": "+31612345678", "email": ""},
+            {"phonenumber": "", "email": "foo@example.com"},
+        ):
+            with self.subTest():
+                m.reset_mock()
+                response = self.app.get(self.url)
+                form = response.forms["contactmoment-form"]
+                form["subject"].select(text=subject.subject)
+                form["first_name"] = "Foo"
+                form["infix"] = "de"
+                form["last_name"] = "Bar"
+                form["question"] = "foobar"
+                form["phonenumber"] = contact_details["phonenumber"]
+                form["email"] = contact_details["email"]
+                form["captcha"] = 42
 
-        response = form.submit().follow()
+                response = form.submit().follow()
 
-        msgs = list(response.context["messages"])
-        self.assertEqual(len(msgs), 1)
-        self.assertEqual(str(msgs[0]), _("Vraag verstuurd!"))
-        self.assertEqual(msgs[0].level, messages.SUCCESS)
+                contactmoment_create_data = data.matchers[1].request_history[0].json()
+                contactgegevens = contactmoment_create_data["contactgegevens"]
 
-        self.assertEqual(len(mail.outbox), 0)
+                if contact_details["email"]:
+                    self.assertEqual(
+                        contactgegevens["emailadres"], contact_details["email"]
+                    )
+                else:
+                    self.assertNotIn("emailadres", contactgegevens.keys())
 
-        for m in data.matchers:
-            self.assertTrue(m.called_once, str(m))
+                if contact_details["phonenumber"]:
+                    self.assertEqual(
+                        contactgegevens["telefoonnummer"],
+                        contact_details["phonenumber"],
+                    )
+                else:
+                    self.assertNotIn("telefoonnummer", contactgegevens.keys())
 
-        contactmoment_create_data = data.matchers[1].request_history[0].json()
-
-        text = inspect.cleandoc(
-            """
-        Onderwerp: Aanvraag document
-
-        hey!
-
-        waddup?
-
-        Naam: Foo de Bar
-        Email: foo@example.com
-        Telefoonnummer: +31612345678
-        """
-        )
-
-        self.assertEqual(
-            contactmoment_create_data,
-            {
-                "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
-                "bronorganisatie": "123456789",
-                "tekst": text,
-                "type": "Melding",
-                "kanaal": "Internet",
-                "onderwerp": "afdeling-xyz",
-            },
-        )
-        self.assertTimelineLog(
-            "could not retrieve or create klant for user, appended info to message"
-        )
-        self.assertTimelineLog("registered contactmoment by API")
-
-    def test_submit_and_register_bsn_user_via_api(self, m):
+    def test_register_contactmoment_for_bsn_user_via_api(
+        self, m, mock_captcha, mock_send_confirm
+    ):
         MockAPICreateData.setUpServices()
 
         config = OpenKlantConfig.get_solo()
@@ -414,9 +430,9 @@ class ContactFormTestCase(
             {
                 "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
                 "bronorganisatie": "123456789",
-                "tekst": "Onderwerp: Aanvraag document\n\nhey!\n\nwaddup?",
+                "tekst": "hey!\n\nwaddup?",
                 "type": "Melding",
-                "kanaal": "Internet",
+                "kanaal": "contactformulier",
                 "onderwerp": "afdeling-xyz",
             },
         )
@@ -432,8 +448,64 @@ class ContactFormTestCase(
 
         self.assertTimelineLog("retrieved klant for BSN or KVK user")
         self.assertTimelineLog("registered contactmoment by API")
+        mock_send_confirm.assert_called_once_with("foo@example.com", subject.subject)
 
-    def test_submit_and_register_kvk_or_rsin_user_via_api(self, _m):
+    def test_register_contactmoment_for_bsn_user_via_api_without_id(
+        self, m, mock_captcha, mock_send_confirm
+    ):
+        MockAPICreateData.setUpServices()
+
+        config = OpenKlantConfig.get_solo()
+        config.register_contact_moment = True
+        config.register_bronorganisatie_rsin = "123456789"
+        config.register_type = "Melding"
+        # empty id should be excluded from contactmoment_create_data
+        config.register_employee_id = ""
+        config.save()
+
+        data = MockAPICreateData()
+        data.install_mocks_digid(m)
+
+        subject = ContactFormSubjectFactory(
+            config=config,
+            subject="Aanvraag document",
+            subject_code="afdeling-xyz",
+        )
+
+        response = self.app.get(self.url, user=data.user)
+
+        # reset interference from signals
+        self.clearTimelineLogs()
+        m.reset_mock()
+
+        form = response.forms["contactmoment-form"]
+        self.assertFormExactFields(
+            form,
+            (
+                "subject",
+                "question",
+            ),
+        )
+        form["subject"].select(text=subject.subject)
+        form["question"] = "Lorem ipsum?"
+
+        response = form.submit().follow()
+
+        contactmoment_create_data = data.matchers[1].request_history[0].json()
+        self.assertEqual(
+            contactmoment_create_data,
+            {
+                "bronorganisatie": "123456789",
+                "tekst": "Lorem ipsum?",
+                "type": "Melding",
+                "kanaal": "contactformulier",
+                "onderwerp": "afdeling-xyz",
+            },
+        )
+
+    def test_register_contactmoment_for_kvk_or_rsin_user_via_api(
+        self, _m, mock_captcha, mock_send_confirm
+    ):
         MockAPICreateData.setUpServices()
 
         config = OpenKlantConfig.get_solo()
@@ -487,11 +559,19 @@ class ContactFormTestCase(
                     response = form.submit().follow()
 
                     msgs = list(response.context["messages"])
+
                     self.assertEqual(len(msgs), 1)
                     self.assertEqual(str(msgs[0]), _("Vraag verstuurd!"))
                     self.assertEqual(msgs[0].level, messages.SUCCESS)
 
                     self.assertEqual(len(mail.outbox), 0)
+
+                    # Note that WebTest doesn't seem to (properly) clear the
+                    # messages after each subTest, causing spurious failures in
+                    # the assertions above. Thus, we manually clear the
+                    # cookiejar to start the next subTest with a clean messages
+                    # state.
+                    self.app.cookiejar.clear()
 
                     for m in data.matchers:
                         self.assertTrue(m.called_once, str(m._url))
@@ -504,9 +584,9 @@ class ContactFormTestCase(
                         {
                             "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
                             "bronorganisatie": "123456789",
-                            "tekst": "Onderwerp: Aanvraag document\n\nhey!\n\nwaddup?",
+                            "tekst": "hey!\n\nwaddup?",
                             "type": "Melding",
-                            "kanaal": "Internet",
+                            "kanaal": "contactformulier",
                             "onderwerp": "afdeling-xyz",
                         },
                     )
@@ -523,7 +603,14 @@ class ContactFormTestCase(
                     self.assertTimelineLog("retrieved klant for BSN or KVK user")
                     self.assertTimelineLog("registered contactmoment by API")
 
-    def test_submit_and_register_bsn_user_via_api_and_update_klant(self, m):
+                    mock_send_confirm.assert_called_once_with(
+                        "foo@example.com", subject.subject
+                    )
+                    mock_send_confirm.reset_mock()
+
+    def test_register_contactmoment_for_bsn_user_via_api_and_update_klant(
+        self, m, mock_captcha, mock_send_confirm
+    ):
         MockAPICreateData.setUpServices()
 
         config = OpenKlantConfig.get_solo()
@@ -580,9 +667,9 @@ class ContactFormTestCase(
             {
                 "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
                 "bronorganisatie": "123456789",
-                "tekst": "Onderwerp: Aanvraag document\n\nhey!\n\nwaddup?",
+                "tekst": "hey!\n\nwaddup?",
                 "type": "Melding",
-                "kanaal": "Internet",
+                "kanaal": "contactformulier",
                 "onderwerp": "afdeling-xyz",
             },
         )
@@ -602,8 +689,18 @@ class ContactFormTestCase(
         )
         self.assertTimelineLog("registered contactmoment by API")
 
-    def test_submit_and_register_kvk_or_rsin_user_via_api_and_update_klant(self, _m):
+        mock_send_confirm.assert_called_once_with(data.user.email, subject.subject)
+        mock_send_confirm.reset_mock()
+
+    @patch("open_inwoner.openklant.forms.generate_question_answer_pair")
+    def test_register_contactmoment_for_kvk_or_rsin_user_via_api_and_update_klant(
+        self, m, mock_captcha2, mock_captcha, mock_send_confirm
+    ):
+        self.maxDiff = None
         MockAPICreateData.setUpServices()
+
+        # we need to patch the captcha Q&A twice because they are re-generated by the form
+        mock_captcha2.return_value = ("", 42)
 
         config = OpenKlantConfig.get_solo()
         config.register_contact_moment = True
@@ -676,9 +773,9 @@ class ContactFormTestCase(
                         {
                             "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
                             "bronorganisatie": "123456789",
-                            "tekst": "Onderwerp: Aanvraag document\n\nhey!\n\nwaddup?",
+                            "tekst": "hey!\n\nwaddup?",
                             "type": "Melding",
-                            "kanaal": "Internet",
+                            "kanaal": "contactformulier",
                             "onderwerp": "afdeling-xyz",
                         },
                     )
@@ -697,3 +794,56 @@ class ContactFormTestCase(
                         "patched klant from user with missing fields: emailadres, telefoonnummer"
                     )
                     self.assertTimelineLog("registered contactmoment by API")
+
+                    mock_send_confirm.assert_called_once_with(
+                        data.eherkenning_user.email, subject.subject
+                    )
+                    mock_send_confirm.reset_mock()
+
+    @patch("open_inwoner.openklant.forms.generate_question_answer_pair")
+    def test_send_email_confirmation_is_configurable(
+        self, m, mock_captcha2, mock_captcha, mock_send_confirm
+    ):
+        MockAPICreateData.setUpServices()
+
+        # we need to patch the captcha Q&A twice because they are re-generated by the form
+        mock_captcha2.return_value = ("", 42)
+
+        config = OpenKlantConfig.get_solo()
+        config.register_contact_moment = True
+        config.register_bronorganisatie_rsin = "123456789"
+        config.register_type = "Melding"
+        config.register_employee_id = "FooVonBar"
+        config.save()
+
+        data = MockAPICreateData()
+        data.install_mocks_anon(m)
+
+        subject = ContactFormSubjectFactory(
+            config=config,
+            subject="Aanvraag document",
+            subject_code="afdeling-xyz",
+        )
+        for send in [True, False]:
+            with self.subTest(send=send):
+                config.send_email_confirmation = send
+                config.save()
+
+                response = self.app.get(self.url)
+                form = response.forms["contactmoment-form"]
+                form["subject"].select(text=subject.subject)
+                form["first_name"] = "Foo"
+                form["infix"] = "de"
+                form["last_name"] = "Bar"
+                form["email"] = "foo@example.com"
+                form["phonenumber"] = "+31612345678"
+                form["question"] = "hey!\n\nwaddup?"
+                form["captcha"] = 42
+
+                response = form.submit().follow()
+
+                if send:
+                    mock_send_confirm.assert_called_once()
+                else:
+                    mock_send_confirm.assert_not_called()
+                mock_send_confirm.reset_mock()

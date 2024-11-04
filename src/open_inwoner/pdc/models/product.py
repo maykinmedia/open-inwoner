@@ -1,11 +1,10 @@
 import json
-from typing import Union
 from uuid import uuid4
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from filer.fields.file import FilerFileField
 from filer.fields.image import FilerImageField
@@ -230,7 +229,7 @@ class Product(models.Model):
         )
 
     def has_cta_tag(self):
-        return "\[CTABUTTON\]" in self.content  # noqa
+        return r"\[CTABUTTON\]" in self.content  # noqa
 
 
 class ProductFile(models.Model):
@@ -373,7 +372,7 @@ class ProductLocation(GeoModel):
     def __str__(self) -> str:
         return f"{self.name}: {self.address_str}" if self.name else self.address_str
 
-    def get_geojson_feature(self, stringify: bool = True) -> Union[str, dict]:
+    def get_geojson_feature(self, stringify: bool = True) -> str | dict:
         feature = super().get_geojson_feature(False)
 
         if feature.get("properties"):

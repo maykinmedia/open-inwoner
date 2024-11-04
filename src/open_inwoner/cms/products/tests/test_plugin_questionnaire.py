@@ -74,7 +74,7 @@ class QuestionnaireTestCase(WebTest):
         html, context = cms_tools.render_plugin(QuestionnairePlugin)
         html, context = cms_tools.render_plugin(QuestionnairePlugin)
 
-        self.assertEquals(context.get("questionnaire_roots").count(), 2)
+        self.assertEqual(context.get("questionnaire_roots").count(), 2)
         self.assertIn(self.root_nodes[0].get_absolute_url(), html)
         self.assertIn(self.root_nodes[1].get_absolute_url(), html)
 

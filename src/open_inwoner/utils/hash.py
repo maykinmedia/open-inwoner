@@ -1,10 +1,7 @@
 from hashlib import md5, sha256
-from typing import Optional
 
 
-def generate_email_from_string(
-    value: str, domain: Optional[str] = "example.org"
-) -> str:
+def generate_email_from_string(value: str, domain: str | None = "example.org") -> str:
     """generate email address based on string"""
     salt = "generate_email_from_bsn"
     hashed_bsn = md5((salt + value).encode(), usedforsecurity=False).hexdigest()

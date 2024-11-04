@@ -1,32 +1,32 @@
 {% load i18n l10n link_tags utils icon_tags form_tags dropdown_tags button_tags string_tags %}
 
-<aside class="file" aria-label="{% trans "Bestand" %} {{ name }}">
+<aside class="file">
     <div class="file__container {% if recently_added %}file__container--recent{% endif %}">
         <div class="file__file">
-            <p class="file__symbol">
+            <div class="file__symbol">
                 {% if is_image %}
                     {% icon icon="image" outlined=True %}
                 {% else %}
                     {% icon icon="insert_drive_file" outlined=True %}
                 {% endif %}
-            </p>
+            </div>
 
-            <p class="p file__data">
+            <div class="file__data">
                 {% if recently_added %}
                     <span class="file__file--recent">{% icon icon="fiber_manual_record" outlined=False extra_classes="file__file--recent" %}{% trans "Nieuw" %}</span>
                 {% endif %}
                 <span class="file__name">
                     {{ name }}
                     {% if extension and size %}
-                        ({{extension}}, {{size|readable_size}})
+                        ({{ extension }}, {{ size|readable_size }})
                     {% elif extension %}
-                        ({{extension}})
+                        ({{ extension }})
                     {% elif size %}
-                        ({{size|readable_size}})
+                        ({{ size|readable_size }})
                     {% endif %}
                 </span>
                 <span class="file__date">{{ created|date:'j F Y' }}</span>
-            </p>
+            </div>
             {% if allow_delete %}
                 {% dropdown icon="more_horiz" %}
                     <div class="dropdown__item">
@@ -37,7 +37,7 @@
                     </div>
                     {% if show_download %}
                         <div class="dropdown__item">
-                            {% button icon="file_download" text=_("Download") href=url icon_outlined=True transparent=True %}
+                            {% button icon="download" text=_("Download") href=url icon_outlined=True transparent=True %}
                         </div>
                     {% endif %}
                     <div class="dropdown__item">
@@ -50,9 +50,9 @@
                 {% enddropdown %}
             {% elif show_download %}
                 {% trans "Download" as download %}
-                {% link href=url text=download secondary=True download=True hide_text=True icon="file_download" icon_outlined=True icon_position="before" %}
+                {% link href=url text=download|add:" "|add:name primary=True download=True hide_text=True extra_classes="file__download" icon="download" icon_outlined=True icon_position="before" %}
             {% endif %}
-            {% if description %}<p class="p p--small">{{ description }}</p>{% endif %}
+            {% if description %}<p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--small">{{ description }}</p>{% endif %}
         </div>
     </div>
 </aside>

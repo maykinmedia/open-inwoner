@@ -75,7 +75,7 @@
     gap: var(--spacing-medium);
 
     .notifications {
-      &__errors .notification *[class*='icon'] {
+      &__errors .notification *[class*='icons'] {
         position: static;
         transform: translateY(-5px);
       }
@@ -86,16 +86,16 @@
     .label
     .notifications__errors
     .notification--warning
-    *[class*='icon'] {
+    *[class*='icons'] {
     position: static;
     transform: translateY(-5px);
   }
 
-  &__control > .label .p:last-child {
+  &__control > .label .utrecht-paragraph:last-child {
     font-size: var(--font-size-body-small);
   }
 
-  &__control > .label .p.p--compact {
+  &__control > .label .utrecht-paragraph.utrecht-paragraph--oip-compact {
     font-size: var(--font-size-body);
   }
 
@@ -196,6 +196,7 @@
     &--fullwidth {
       display: block;
       margin: 0;
+      max-width: var(--form-width);
 
       .button {
         width: 100%;
@@ -215,6 +216,24 @@
 
   &__actions > *:last-child {
     grid-area: primary;
+  }
+
+  .form__reset {
+    &--desktop {
+      display: none;
+
+      @media (min-width: 768px) {
+        display: block;
+      }
+    }
+
+    &--mobile {
+      display: block;
+
+      @media (min-width: 768px) {
+        display: none;
+      }
+    }
   }
 
   &--inline {
@@ -238,8 +257,8 @@
   &__control {
     position: relative;
 
-    *[class*='icon'],
-    *[class*='Icon'] {
+    *[class*='icons'],
+    *[class*='Icons'] {
       width: auto !important;
       position: absolute;
       right: 5px;
@@ -247,8 +266,8 @@
       transform: translateY(-50%);
     }
 
-    .notification > *[class*='icon'],
-    .notification > *[class*='Icon'] {
+    .notification > *[class*='icons'],
+    .notification > *[class*='Icons'] {
       width: auto !important;
       position: absolute;
       right: var(--spacing-small);
@@ -271,6 +290,24 @@
 
     @media (min-width: 905px) {
       grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
+  }
+
+  /// buttons
+
+  .button[type='submit']:disabled,
+  .button--primary.button--disabled {
+    background-color: var(--color-gray) !important;
+    border-color: var(--color-gray) !important;
+    color: var(--color-white);
+    cursor: default;
+    pointer-events: none;
+  }
+
+  &__choice-list {
+    @media (max-width: 767px) {
+      gap: var(--spacing-large);
+      max-width: var(--form-width);
     }
   }
 }

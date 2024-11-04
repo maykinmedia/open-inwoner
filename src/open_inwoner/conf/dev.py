@@ -76,22 +76,20 @@ CACHES = {
     "oidc": {"BACKEND": "django.core.cache.backends.dummy.DummyCache"},
 }
 
+_MOCK_AUTHENTICATION_BACKENDS = {
+    "digid_eherkenning.backends.DigiDBackend": "digid_eherkenning.mock.backends.DigiDBackend",
+    "eherkenning.backends.eHerkenningBackend": "eherkenning.mock.backends.eHerkenningBackend",
+}
+
+AUTHENTICATION_BACKENDS = [
+    _MOCK_AUTHENTICATION_BACKENDS.get(backend, backend)
+    for backend in AUTHENTICATION_BACKENDS
+]
+
+
 #
 # Library settings
 #
-
-# Allow logging in with both username+password and email+password
-AUTHENTICATION_BACKENDS = [
-    "open_inwoner.accounts.backends.CustomAxesBackend",
-    "open_inwoner.accounts.backends.UserModelEmailBackend",
-    "django.contrib.auth.backends.ModelBackend",
-    "digid_eherkenning.mock.backends.DigiDBackend",
-    "eherkenning.mock.backends.eHerkenningBackend",
-    "digid_eherkenning_oidc_generics.backends.OIDCAuthenticationDigiDBackend",
-    "digid_eherkenning_oidc_generics.backends.OIDCAuthenticationEHerkenningBackend",
-    "open_inwoner.accounts.backends.CustomOIDCBackend",
-]
-
 ELASTIC_APM["DEBUG"] = True
 
 if "test" in sys.argv:
@@ -100,7 +98,7 @@ if "test" in sys.argv:
     ES_INDEX_PRODUCTS = "products_test"
 
 # Django debug toolbar
-INSTALLED_APPS += ["ddt_api_calls", "django_extensions"]
+INSTALLED_APPS += ["django_extensions"]
 # MIDDLEWARE += [
 #     "debug_toolbar.middleware.DebugToolbarMiddleware",
 # ]
@@ -120,7 +118,6 @@ DEBUG_TOOLBAR_PANELS = [
     "debug_toolbar.panels.logging.LoggingPanel",
     "debug_toolbar.panels.redirects.RedirectsPanel",
     "debug_toolbar.panels.profiling.ProfilingPanel",
-    "ddt_api_calls.panels.APICallsPanel",
 ]
 
 # THOU SHALT NOT USE NAIVE DATETIMES
@@ -145,7 +142,7 @@ SOLO_CACHE = None
 TWO_FACTOR_PATCH_ADMIN = False
 
 # Disable two-factor authentication by default for development
-if config("DISABLE_2FA", default=True):
+if config("DISABLE_2FA", default=True, cast=bool):
     MAYKIN_2FA_ALLOW_MFA_BYPASS_BACKENDS = AUTHENTICATION_BACKENDS
 
 # playwright multi browser

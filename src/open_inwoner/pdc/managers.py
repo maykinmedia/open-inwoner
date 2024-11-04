@@ -1,5 +1,4 @@
 from datetime import date
-from typing import List
 
 from django.db import models
 
@@ -10,7 +9,7 @@ from treebeard.mp_tree import MP_NodeQuerySet
 from open_inwoner.accounts.models import User
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openzaak.api_models import Zaak
-from open_inwoner.openzaak.clients import build_client
+from open_inwoner.openzaak.clients import MultiZgwClientProxy, build_zaken_clients
 from open_inwoner.openzaak.models import ZaakTypeConfig
 from open_inwoner.openzaak.utils import get_user_fetch_parameters
 
@@ -38,10 +37,10 @@ class CategoryPublishedQueryset(MP_NodeQuerySet):
             # Show all categories to staff users
             if user.is_staff:
                 return self
-            elif user.bsn:
-                return self.filter(visible_for_citizens=True)
             elif user.kvk:
                 return self.filter(visible_for_companies=True)
+            # User is DigiD or non-staff username/password
+            return self.filter(visible_for_citizens=True)
 
         config = SiteConfiguration.get_solo()
         if config.hide_categories_from_anonymous_users:
@@ -55,15 +54,17 @@ class CategoryPublishedQueryset(MP_NodeQuerySet):
         if not request.user.bsn and not request.user.kvk:
             return self
 
-        client = build_client("zaak")
-        if client is None:
-            return self.none()
+        clients = build_zaken_clients()
+        proxy_result = MultiZgwClientProxy(clients)
+        proxy_result = proxy_result.fetch_cases(**get_user_fetch_parameters(request))
+        if proxy_result.has_errors:
+            self.log_system_action("unable to retrieve cases", user=request.user)
 
-        cases = client.fetch_cases(**get_user_fetch_parameters(request))
+        cases = proxy_result.join_results()
 
         return self.filter_by_zaken(cases)
 
-    def filter_by_zaken(self, cases: List[Zaak]):
+    def filter_by_zaken(self, cases: list[Zaak]):
         """
         Returns the categories linked to ZaakTypen matching with the specified Zaken.
         """

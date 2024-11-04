@@ -9,13 +9,10 @@ register = template.Library()
 def accessibility_header(request, **kwargs):
     """
     This is used to display the accessibility header
-
     Usage:
         {% accessibility_header request=request%}
-
     Variables:
         + request: Request | The django request object.
-
     Extra context:
         - help_text: str | The help text depending on the current path.
     """

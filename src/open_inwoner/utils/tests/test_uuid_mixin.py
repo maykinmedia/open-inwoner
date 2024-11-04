@@ -31,9 +31,9 @@ class TestUUIDFirstInOrder(TestCase):
     def test_uuid_is_first_in_add_form(self):
         fields = self.ma.get_fields(request, obj=None)
 
-        self.assertEquals(fields, ["uuid", "field1", "field2"])
+        self.assertEqual(fields, ["uuid", "field1", "field2"])
 
     def test_uuid_is_first_in_change_form(self):
         fields = self.ma.get_fields(request, obj=obj)
 
-        self.assertEquals(fields, ["uuid", "field1", "field2"])
+        self.assertEqual(fields, ["uuid", "field1", "field2"])

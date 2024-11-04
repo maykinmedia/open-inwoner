@@ -1,0 +1,30 @@
+[
+    {
+        "id": 116475,
+        "publicId": "12345",
+        "firstName": "Foo",
+        "lastName": "Bar",
+        "cardNumber": "",
+        "consentIdentifier": "3c663b7c0101f7dfcf99b8ed84fffd876e981dc040ae4097af57f76d6133df68",
+        "consentTimestamp": "2024-05-29T18:11:32.223+0000",
+        "retentionPolicy": "appointment_days",
+        "lastInteractionTimestamp": "2024-08-27T07:10:00.000+0000",
+        "deletionTimestamp": "2024-11-25T07:10:00.000+0000",
+        "properties": {
+            "customField5": "1e67fe7c82af6f359a1e7ae3293b4891c4654e918872a670920429be267aed96",
+            "country": "",
+            "address2": "",
+            "city": "",
+            "address1": "",
+            "created": 1717005834366,
+            "postalCode": "",
+            "customField4": "foo@bar.org",
+            "custom": "{}",
+            "externalId": "",
+            "dateOfBirth": "2010-10-10",
+            "phoneNumber": "31229252200",
+            "state": "",
+            "email": "foo@bar.org"
+        }
+    }
+]

@@ -1,4 +1,5 @@
-from typing import Any, Iterable, Tuple
+from collections.abc import Iterable, Sequence
+from typing import Any
 
 from glom import glom
 
@@ -8,7 +9,7 @@ class TranslationLookup:
     simple key value lookup seeded from queryset.values_list(key, value)
     """
 
-    def __init__(self, key_value_iterable: Iterable[Tuple[str, str]]):
+    def __init__(self, key_value_iterable: Iterable[tuple[str, str]]):
         self.mapping = dict(key_value_iterable)
 
     def __call__(self, key: str, *, default: str = "") -> str:
@@ -36,3 +37,12 @@ class TranslationLookup:
             ),
             default=default,
         )
+
+    def from_glom_multiple(
+        self, obj: Any, paths: Sequence, *, default: str = ""
+    ) -> str:
+        for p in paths:
+            value = self.from_glom(obj, p, default=None)
+            if value:
+                return self(value)
+        return default

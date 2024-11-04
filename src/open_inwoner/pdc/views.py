@@ -3,7 +3,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, FormView, ListView, TemplateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin, ListBreadcrumbMixin
@@ -194,6 +194,12 @@ class ProductDetailView(
         base_list = [(_("Onderwerpen"), reverse("products:category_list"))]
         base_list += self.get_categories_breadcrumbs(slug_name="category_slug")
         return base_list + [(self.get_object().name, self.request.path)]
+
+    def get(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if not obj.published:
+            return HttpResponseRedirect(reverse("pages-root"))
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         config = SiteConfiguration.get_solo()

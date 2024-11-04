@@ -1,14 +1,6 @@
-.view--pdc-category_product_detail {
-  .h4 {
+.view--products-category_product_detail {
+  .utrecht-heading-4 {
     margin: 21px 0;
-  }
-
-  .anchor-menu {
-    &--mobile__title {
-      &.h4 {
-        margin: 0;
-      }
-    }
   }
 
   .link-list .link {
@@ -16,5 +8,13 @@
     text-overflow: ellipsis;
     width: 99%;
     display: block;
+  }
+
+  ///
+  /// Legacy styling
+  ///
+
+  .h4 {
+    margin: 21px 0;
   }
 }

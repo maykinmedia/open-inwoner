@@ -5,7 +5,7 @@ from django.contrib.auth.models import Group
 from django.forms import ValidationError
 from django.urls import reverse
 from django.utils.html import format_html
-from django.utils.translation import ngettext, ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _, ngettext
 
 from image_cropping import ImageCroppingMixin
 from privates.admin import PrivateMediaMixin
@@ -29,11 +29,11 @@ class ReadOnlyFileMixin:
         return fields
 
     def display_file_url(self, obj):
-        view_name = "%(app_label)s_%(model_name)s_%(field)s" % {
-            "app_label": self.opts.app_label,
-            "model_name": self.opts.model_name,
-            "field": "file",
-        }
+        view_name = "{app_label}_{model_name}_{field}".format(
+            app_label=self.opts.app_label,
+            model_name=self.opts.model_name,
+            field="file",
+        )
         return format_html(
             _("<a href='{url}'>{text}</a>"),
             url=reverse(f"admin:{view_name}", kwargs={"pk": obj.pk}),
@@ -90,7 +90,10 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
         "first_name",
     )
     fieldsets = (
-        (None, {"fields": ("uuid", "email", "password", "login_type")}),
+        (
+            None,
+            {"fields": ("uuid", "email", "verified_email", "password", "login_type")},
+        ),
         (
             _("Personal info"),
             {
@@ -103,6 +106,7 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
                     "image",
                     "cropping",
                     "phonenumber",
+                    "selected_categories",
                 )
             },
         ),

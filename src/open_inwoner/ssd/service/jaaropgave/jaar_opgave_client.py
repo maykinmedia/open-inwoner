@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from typing import Optional
 
 from open_inwoner.ssd.service.jaaropgave.body_action_resolved import JaarOpgaveInfo
 from open_inwoner.ssd.service.jaaropgave.body_reaction_resolved import (
@@ -17,16 +16,14 @@ class JaarOpgaveClientPortTypeSendJaarOpgaveClientInput:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
-    header: Optional[
-        "JaarOpgaveClientPortTypeSendJaarOpgaveClientInput.Header"
-    ] = field(
+    header: "JaarOpgaveClientPortTypeSendJaarOpgaveClientInput.Header | None" = field(
         default=None,
         metadata={
             "name": "Header",
             "type": "Element",
         },
     )
-    body: Optional["JaarOpgaveClientPortTypeSendJaarOpgaveClientInput.Body"] = field(
+    body: "JaarOpgaveClientPortTypeSendJaarOpgaveClientInput.Body | None" = field(
         default=None,
         metadata={
             "name": "Body",
@@ -36,7 +33,7 @@ class JaarOpgaveClientPortTypeSendJaarOpgaveClientInput:
 
     @dataclass
     class Header:
-        header: Optional[Header] = field(
+        header: Header | None = field(
             default=None,
             metadata={
                 "name": "Header",
@@ -47,7 +44,7 @@ class JaarOpgaveClientPortTypeSendJaarOpgaveClientInput:
 
     @dataclass
     class Body:
-        jaar_opgave_info: Optional[JaarOpgaveInfo] = field(
+        jaar_opgave_info: JaarOpgaveInfo | None = field(
             default=None,
             metadata={
                 "name": "JaarOpgaveInfo",
@@ -63,16 +60,14 @@ class JaarOpgaveClientPortTypeSendJaarOpgaveClientOutput:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
-    header: Optional[
-        "JaarOpgaveClientPortTypeSendJaarOpgaveClientOutput.Header"
-    ] = field(
+    header: "JaarOpgaveClientPortTypeSendJaarOpgaveClientOutput.Header | None" = field(
         default=None,
         metadata={
             "name": "Header",
             "type": "Element",
         },
     )
-    body: Optional["JaarOpgaveClientPortTypeSendJaarOpgaveClientOutput.Body"] = field(
+    body: "JaarOpgaveClientPortTypeSendJaarOpgaveClientOutput.Body | None" = field(
         default=None,
         metadata={
             "name": "Body",
@@ -82,7 +77,7 @@ class JaarOpgaveClientPortTypeSendJaarOpgaveClientOutput:
 
     @dataclass
     class Header:
-        header: Optional[Header] = field(
+        header: Header | None = field(
             default=None,
             metadata={
                 "name": "Header",
@@ -93,7 +88,7 @@ class JaarOpgaveClientPortTypeSendJaarOpgaveClientOutput:
 
     @dataclass
     class Body:
-        jaar_opgave_info_response: Optional[JaarOpgaveInfoResponse] = field(
+        jaar_opgave_info_response: JaarOpgaveInfoResponse | None = field(
             default=None,
             metadata={
                 "name": "JaarOpgaveInfoResponse",
@@ -101,9 +96,7 @@ class JaarOpgaveClientPortTypeSendJaarOpgaveClientOutput:
                 "namespace": "http://www.centric.nl/GWS/Diensten/JaarOpgaveClient/v0400",
             },
         )
-        fault: Optional[
-            "JaarOpgaveClientPortTypeSendJaarOpgaveClientOutput.Body.Fault"
-        ] = field(
+        fault: "JaarOpgaveClientPortTypeSendJaarOpgaveClientOutput.Body.Fault | None" = field(
             default=None,
             metadata={
                 "name": "Fault",
@@ -113,30 +106,28 @@ class JaarOpgaveClientPortTypeSendJaarOpgaveClientOutput:
 
         @dataclass
         class Fault:
-            faultcode: Optional[str] = field(
+            faultcode: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultstring: Optional[str] = field(
+            faultstring: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultactor: Optional[str] = field(
+            faultactor: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            detail: Optional[
-                "JaarOpgaveClientPortTypeSendJaarOpgaveClientOutput.Body.Fault.Detail"
-            ] = field(
+            detail: "JaarOpgaveClientPortTypeSendJaarOpgaveClientOutput.Body.Fault.Detail | None" = field(
                 default=None,
                 metadata={
                     "type": "Element",
@@ -146,7 +137,7 @@ class JaarOpgaveClientPortTypeSendJaarOpgaveClientOutput:
 
             @dataclass
             class Detail:
-                fwi: Optional[Fwi] = field(
+                fwi: Fwi | None = field(
                     default=None,
                     metadata={
                         "name": "FWI",

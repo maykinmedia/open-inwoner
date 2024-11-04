@@ -1,5 +1,6 @@
+from collections.abc import Iterable
 from time import time
-from typing import Iterable, Tuple
+from typing import Any, TypedDict
 
 from django.core.cache import caches
 from django.core.exceptions import PermissionDenied
@@ -95,6 +96,13 @@ class IPThrottleMixin(ThrottleMixin):
         return str(self.request.META["REMOTE_ADDR"])
 
 
+class PaginationContext(TypedDict):
+    paginator: Paginator
+    page_obj: Page
+    object_list: Iterable[Any]
+    is_paginated: bool
+
+
 class PaginationMixin:
     paginator_class = Paginator
     page_kwarg = "page"
@@ -104,7 +112,7 @@ class PaginationMixin:
 
     def paginate_object_list(
         self, object_list: Iterable, page_size: int = None
-    ) -> Tuple[Paginator, Page, Iterable, bool]:
+    ) -> tuple[Paginator, Page, Iterable, bool]:
         """copy MultipleObjectMixin.paginate_queryset method"""
         page_size = page_size or self.paginate_by
         paginator = self.paginator_class(
@@ -135,7 +143,7 @@ class PaginationMixin:
 
     def paginate_with_context(
         self, object_list: Iterable, page_size: int = None
-    ) -> dict:
+    ) -> PaginationContext:
         """
         Paginate objects with ``self.paginate_object_list`` but returns dict
         instead of the tuple. The returned dict has keys which are used in

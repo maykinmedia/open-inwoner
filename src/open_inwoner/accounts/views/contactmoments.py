@@ -1,27 +1,29 @@
 import logging
-from datetime import datetime
-from typing import TypedDict
+from typing import Iterable, Protocol
 
 from django.contrib.auth.mixins import AccessMixin
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
+from django.views import View
 from django.views.generic import TemplateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
 
-from open_inwoner.openklant.api_models import KlantContactMoment
-from open_inwoner.openklant.clients import build_client
-from open_inwoner.openklant.constants import Status
-from open_inwoner.openklant.models import ContactFormSubject
-from open_inwoner.openklant.wrap import (
-    fetch_klantcontactmoment,
-    fetch_klantcontactmomenten,
-    get_fetch_parameters,
+from open_inwoner.accounts.models import User
+from open_inwoner.openklant.models import KlantContactMomentAnswer
+from open_inwoner.openklant.services import (
+    KlantenService,
+    Question,
+    QuestionValidator,
+    ZaakWithApiGroup,
+    eSuiteKlantenService,
+    eSuiteVragenService,
 )
-from open_inwoner.openzaak.clients import build_client as build_client_openzaak
+from open_inwoner.openklant.views.contactform import ContactFormView
+from open_inwoner.openklant.wrap import FetchParameters
 from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import CommonPageMixin
 
@@ -48,8 +50,6 @@ class KlantContactMomentAccessMixin(AccessMixin):
         if not request.user.bsn and not request.user.kvk:
             return self.handle_no_permission()
 
-        # TODO more here?
-
         return super().dispatch(request, *args, **kwargs)
 
     def handle_no_permission(self):
@@ -59,66 +59,61 @@ class KlantContactMomentAccessMixin(AccessMixin):
             return super().handle_no_permission()
 
 
-class KCMDict(TypedDict):
-    registered_date: datetime
-    channel: str
-    text: str
-    url: str
-    identificatie: str
-    type: str
-    onderwerp: str
-    status: str
-    antwoord: str
+class VragenService(Protocol):
+    def list_questions(
+        self,
+        fetch_params: FetchParameters,
+        user: User,
+    ) -> Iterable[Question]:  # noqa: E704
+        ...
+
+    def retrieve_question(
+        self,
+        fetch_params: FetchParameters,
+        question_uuid: str,
+        user: User,
+    ) -> tuple[Question | None, ZaakWithApiGroup | None]:  # noqa: E704
+        ...
+
+    def get_fetch_parameters(
+        self,
+        request=None,
+        user: User | None = None,
+        use_vestigingsnummer: bool = False,
+    ) -> FetchParameters | None:  # noqa: E704
+        ...
 
 
 class KlantContactMomentBaseView(
     CommonPageMixin, BaseBreadcrumbMixin, KlantContactMomentAccessMixin, TemplateView
 ):
-    def get_kcm_data(self, kcm: KlantContactMoment) -> KCMDict:
-        data = {
-            "registered_date": kcm.contactmoment.registratiedatum,
-            "channel": kcm.contactmoment.kanaal.title(),
-            "text": kcm.contactmoment.tekst,
-            "url": reverse("cases:contactmoment_detail", kwargs={"kcm_uuid": kcm.uuid}),
-            # eSuite extra
-            "identificatie": kcm.contactmoment.identificatie,
-            "type": kcm.contactmoment.type,
-            "status": Status.safe_label(kcm.contactmoment.status, _("Onbekend")),
-            "antwoord": kcm.contactmoment.antwoord,
-        }
-
-        # replace e_suite_subject_code with OIP configured subject, if applicable
-        e_suite_subject_code = getattr(kcm.contactmoment, "onderwerp", None)
-
-        if not e_suite_subject_code:
-            data["onderwerp"] = None
-        else:
-            try:
-                subject = ContactFormSubject.objects.get(
-                    subject_code=e_suite_subject_code
-                )
-            except (
-                ContactFormSubject.DoesNotExist,
-                ContactFormSubject.MultipleObjectsReturned,
-            ) as e:
-                logger.warning(
-                    "Could not determine subject ('onderwerp') for contactmoment %s (%s)",
-                    kcm.contactmoment.url,
-                    e,
-                )
-                data["onderwerp"] = None
-            else:
-                data["onderwerp"] = subject.subject
-
-        return data
+    def get_service(self) -> VragenService:
+        # TODO: Refactor to support both OpenKlant2 and eSuite services at once
+        return eSuiteVragenService()
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx["anchors"] = self.get_anchors()
         return ctx
 
+    def get_fetch_params(self, service: VragenService):
+        if not (
+            fetch_params := service.get_fetch_parameters(
+                self.request, use_vestigingsnummer=True
+            )
+        ):
+            raise ValueError("User has no bsn or kvk attributes")
 
-class KlantContactMomentListView(PaginationMixin, KlantContactMomentBaseView):
+        return fetch_params
+
+
+class KlantContactMomentListView(
+    PaginationMixin, ContactFormView, KlantContactMomentBaseView
+):
+    """
+    Display "contactmomenten" (questions), and a form (via ContactFormView) to send a new question
+    """
+
     template_name = "pages/contactmoment/list.html"
     paginate_by = 9
 
@@ -136,12 +131,16 @@ class KlantContactMomentListView(PaginationMixin, KlantContactMomentBaseView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        kcms = fetch_klantcontactmomenten(
-            **get_fetch_parameters(self.request, use_vestigingsnummer=True)
+        service = self.get_service()
+        questions = service.list_questions(
+            self.get_fetch_params(service), user=self.request.user
         )
-        ctx["contactmomenten"] = [self.get_kcm_data(kcm) for kcm in kcms]
+        ctx["contactmomenten"] = [
+            QuestionValidator.validate_python(q) for q in questions
+        ]
         paginator_dict = self.paginate_with_context(ctx["contactmomenten"])
         ctx.update(paginator_dict)
+
         return ctx
 
 
@@ -163,36 +162,102 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
+        service = self.get_service()
 
-        kcm = fetch_klantcontactmoment(
-            kwargs["kcm_uuid"],
-            **get_fetch_parameters(self.request, use_vestigingsnummer=True),
+        kcm, zaak = service.retrieve_question(
+            self.get_fetch_params(service), kwargs["kcm_uuid"], user=self.request.user
         )
-
         if not kcm:
             raise Http404()
 
-        if client := build_client("contactmomenten"):
-            zaken_client = build_client_openzaak("zaak")
-            ocm = client.retrieve_objectcontactmoment(
-                kcm.contactmoment, "zaak", zaken_client
-            )
-            ctx["zaak"] = getattr(ocm, "object", None)
+        QuestionValidator.validate_python(kcm)
 
-        contactmoment: KCMDict = self.get_kcm_data(kcm)
+        local_kcm, created = KlantContactMomentAnswer.objects.get_or_create(  # noqa
+            user=self.request.user, contactmoment_url=kcm["case_detail_url"]
+        )
+        if not local_kcm.is_seen:
+            local_kcm.is_seen = True
+            local_kcm.save()
+
+        contactmoment = kcm
         ctx["contactmoment"] = contactmoment
+        ctx["zaak"] = zaak.zaak if zaak else None
+        case_url = (
+            reverse(
+                "cases:case_detail",
+                kwargs={
+                    "object_id": str(zaak.zaak.uuid),
+                    "api_group_id": zaak.api_group.id,
+                },
+            )
+            if zaak
+            else None
+        )
         ctx["metrics"] = [
-            {
-                "label": _("Ontvangstdatum: "),
-                "value": contactmoment["registered_date"],
-            },
-            {
-                "label": _("Contactwijze: "),
-                "value": contactmoment["channel"],
-            },
             {
                 "label": _("Status: "),
                 "value": contactmoment["status"],
             },
+            {
+                "label": _("Ingediend op: "),
+                "value": contactmoment["registered_date"],
+            },
+            {
+                "label": _("Vraag nummer: "),
+                "value": contactmoment["identification"],
+            },
+            {
+                "label": _("Contact gehad via: "),
+                "value": contactmoment["channel"],
+            },
         ]
+        origin = self.request.headers.get("Referer")
+        if origin and reverse("cases:contactmoment_list") in origin:
+            ctx["origin"] = {
+                "label": _("Terug naar overzicht"),
+                "url": origin,
+            }
+            if zaak:
+                ctx["destination"] = {
+                    "label": _("Naar aanvraag"),
+                    "url": case_url,
+                }
+        else:
+            ctx["origin"] = {
+                "label": _("Terug naar aanvraag"),
+                "url": case_url,
+            }
+            ctx["destination"] = {
+                "label": _("Bekijk alle vragen"),
+                "url": reverse("cases:contactmoment_list"),
+            }
         return ctx
+
+
+class KlantContactMomentRedirectView(KlantContactMomentAccessMixin, View):
+    """
+    Redirect to `KlantContactMomentDetailView` on the basis of contactmoment uuid
+    """
+
+    def get(self, request, *args, **kwargs):
+        vragen_service: VragenService = eSuiteVragenService()
+        klanten_service: KlantenService = eSuiteKlantenService()
+        fetch_params = klanten_service.get_fetch_parameters(self.request)
+
+        klant = klanten_service.retrieve_klant(**fetch_params)
+        kcms = vragen_service.retrieve_klantcontactmomenten_for_klant(klant)
+
+        if not kcms:
+            raise Http404
+
+        contactmoment_uuid = kwargs["uuid"]
+        kcm = next(
+            kcm for kcm in kcms if str(kcm.contactmoment.uuid) == contactmoment_uuid
+        )
+
+        if not kcm:
+            raise Http404
+
+        return HttpResponseRedirect(
+            reverse("cases:contactmoment_detail", kwargs={"kcm_uuid": kcm.uuid})
+        )

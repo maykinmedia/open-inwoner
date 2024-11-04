@@ -61,7 +61,7 @@ class QuestionnaireStep {
    * @return {(HTMLElement|null)}
    */
   getTitleElement() {
-    return this.node.querySelector('.grid__main .h1')
+    return this.node.querySelector('.grid__main .utrecht-heading-1')
   }
 
   /**

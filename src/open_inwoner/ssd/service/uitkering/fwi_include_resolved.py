@@ -1,6 +1,5 @@
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional
 
 __NAMESPACE__ = "http://www.centric.nl/GWS/Basisschema/v0400"
 
@@ -27,7 +26,7 @@ class AanduidingNaamgebruik(Enum):
 
 @dataclass
 class Actor:
-    bedrijfsnaam: Optional[str] = field(
+    bedrijfsnaam: str | None = field(
         default=None,
         metadata={
             "name": "Bedrijfsnaam",
@@ -36,7 +35,7 @@ class Actor:
             "max_length": 100,
         },
     )
-    gemeentecode: Optional[str] = field(
+    gemeentecode: str | None = field(
         default=None,
         metadata={
             "name": "Gemeentecode",
@@ -46,7 +45,7 @@ class Actor:
             "pattern": r"\d*",
         },
     )
-    applicatie_naam: Optional[str] = field(
+    applicatie_naam: str | None = field(
         default=None,
         metadata={
             "name": "ApplicatieNaam",
@@ -59,7 +58,7 @@ class Actor:
 
 @dataclass
 class Adres:
-    locatie: Optional[str] = field(
+    locatie: str | None = field(
         default=None,
         metadata={
             "name": "Locatie",
@@ -68,7 +67,7 @@ class Adres:
             "max_length": 35,
         },
     )
-    straatnaam: Optional[str] = field(
+    straatnaam: str | None = field(
         default=None,
         metadata={
             "name": "Straatnaam",
@@ -77,7 +76,7 @@ class Adres:
             "max_length": 24,
         },
     )
-    huisnummer: Optional[int] = field(
+    huisnummer: int | None = field(
         default=None,
         metadata={
             "name": "Huisnummer",
@@ -86,7 +85,7 @@ class Adres:
             "total_digits": 5,
         },
     )
-    huisletter: Optional[str] = field(
+    huisletter: str | None = field(
         default=None,
         metadata={
             "name": "Huisletter",
@@ -95,7 +94,7 @@ class Adres:
             "pattern": r"([A-Z]{1}|[a-z]{1})",
         },
     )
-    huisnr_toevoeging: Optional[str] = field(
+    huisnr_toevoeging: str | None = field(
         default=None,
         metadata={
             "name": "HuisnrToevoeging",
@@ -104,7 +103,7 @@ class Adres:
             "max_length": 6,
         },
     )
-    postcode: Optional[str] = field(
+    postcode: str | None = field(
         default=None,
         metadata={
             "name": "Postcode",
@@ -114,7 +113,7 @@ class Adres:
             "pattern": r"[1-9][0-9]{3}[A-Z]{2}",
         },
     )
-    woonplaatsnaam: Optional[str] = field(
+    woonplaatsnaam: str | None = field(
         default=None,
         metadata={
             "name": "Woonplaatsnaam",
@@ -123,7 +122,7 @@ class Adres:
             "max_length": 80,
         },
     )
-    gemeentenaam: Optional[str] = field(
+    gemeentenaam: str | None = field(
         default=None,
         metadata={
             "name": "Gemeentenaam",
@@ -170,7 +169,7 @@ class TypePeriode(Enum):
 
 @dataclass
 class Persoon:
-    burger_service_nr: Optional[str] = field(
+    burger_service_nr: str | None = field(
         default=None,
         metadata={
             "name": "BurgerServiceNr",
@@ -181,7 +180,7 @@ class Persoon:
             "pattern": r"\d*",
         },
     )
-    voornamen: Optional[str] = field(
+    voornamen: str | None = field(
         default=None,
         metadata={
             "name": "Voornamen",
@@ -191,7 +190,7 @@ class Persoon:
             "pattern": r"\D*",
         },
     )
-    voorletters: Optional[str] = field(
+    voorletters: str | None = field(
         default=None,
         metadata={
             "name": "Voorletters",
@@ -201,7 +200,7 @@ class Persoon:
             "pattern": r"\D*",
         },
     )
-    voorvoegsel: Optional[str] = field(
+    voorvoegsel: str | None = field(
         default=None,
         metadata={
             "name": "Voorvoegsel",
@@ -211,7 +210,7 @@ class Persoon:
             "pattern": r"\D*",
         },
     )
-    achternaam: Optional[str] = field(
+    achternaam: str | None = field(
         default=None,
         metadata={
             "name": "Achternaam",
@@ -222,7 +221,7 @@ class Persoon:
             "pattern": r"\D*",
         },
     )
-    aanduiding_naamgebruik: Optional[AanduidingNaamgebruik] = field(
+    aanduiding_naamgebruik: AanduidingNaamgebruik | None = field(
         default=None,
         metadata={
             "name": "AanduidingNaamgebruik",
@@ -230,7 +229,7 @@ class Persoon:
             "namespace": "",
         },
     )
-    voorvoegsel_echtgenoot: Optional[str] = field(
+    voorvoegsel_echtgenoot: str | None = field(
         default=None,
         metadata={
             "name": "VoorvoegselEchtgenoot",
@@ -240,7 +239,7 @@ class Persoon:
             "pattern": r"\D*",
         },
     )
-    achternaam_echtgenoot: Optional[str] = field(
+    achternaam_echtgenoot: str | None = field(
         default=None,
         metadata={
             "name": "AchternaamEchtgenoot",
@@ -254,7 +253,7 @@ class Persoon:
 
 @dataclass
 class StandaardBedrag:
-    cd_positief_negatief: Optional[CdPositiefNegatief] = field(
+    cd_positief_negatief: CdPositiefNegatief | None = field(
         default=None,
         metadata={
             "name": "CdPositiefNegatief",
@@ -263,7 +262,7 @@ class StandaardBedrag:
             "required": True,
         },
     )
-    waarde_bedrag: Optional[int] = field(
+    waarde_bedrag: int | None = field(
         default=None,
         metadata={
             "name": "WaardeBedrag",

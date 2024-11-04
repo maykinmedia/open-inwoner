@@ -8,11 +8,11 @@
 {% block content %}
 
     <div class="profile__grid">
-        <h1 class="h1" id="title">
+        <h1 class="utrecht-heading-1" id="title">
             {% trans "Persoonlijke gegevens" %}
         </h1>
 
-        <p class="p">
+        <p class="utrecht-paragraph">
             {% trans "Hier ziet u een beperkte set van gegevens die van u zijn opgeslagen in de Basisregistratie Personen (BRP). Al uw persoonlijke gegevens kunt u vinden op " %}
             {% link href="https://mijn.overheid.nl" text="mijn.overheid.nl" primary=True %}
         </p>
@@ -21,7 +21,9 @@
         {% with request.user as user %}
             <section class="tabled tabled--flexible profile-section" id="profile-notifications">
                 <div class="tabled__section">
-                    <h2 class="h2 title" id="notifications">{% trans "Mijn BRP gegevens" %}</h2>
+                    <header class="oip-header-group title">
+                        <h2 class="utrecht-heading-2" id="notifications">{% trans "Mijn BRP gegevens" %}</h2>
+                    </header>
                 </div>
                 <div class="tabled__row tabled__row--blank">
                     <div class="tabled__item tabled__key">{% trans "Voornamen" %}</div>
@@ -60,7 +62,9 @@
             <!-- BRP registration data -->
             <section class="tabled tabled--flexible profile-section" id="profile-notifications">
                 <div class="tabled__section">
-                    <h2 class="h2 title" id="notifications">{% trans "Inschrijfadres" %}</h2>
+                    <header class="oip-header-group title">
+                        <h2 class="utrecht-heading-2" id="notifications">{% trans "Inschrijfadres" %}</h2>
+                    </header>
                 </div>
                 <div class="tabled__row tabled__row--blank">
                     <div class="tabled__item tabled__key">{% trans "Straat" %}</div>
@@ -89,15 +93,12 @@
             <!-- BRP contact data -->
             <section class="tabled tabled--flexible profile-section" id="profile-notifications">
                 <div class="tabled__section">
-                    <h2 class="h2 title" id="notifications">{% trans "Contactgegevens" %}
+                    <header class="oip-header-group title">
+                        <h2 class="utrecht-heading-2 title" id="notifications">{% trans "Contactgegevens" %}</h2>
                         <div class="tabled__item--force-right tabled__item--mobile-big">
                             {% button href="profile:edit" text=_("Bewerk") icon="edit" transparent=True icon_outlined=True %}
                         </div>
-                    </h2>
-                </div>
-                <div class="tabled__row tabled__row--blank">
-                    <div class="tabled__item tabled__key">{% trans "Roepnaam" %}</div>
-                    <div class="tabled__item tabled__value">{{ user.display_name|default:"-" }}</div>
+                    </header>
                 </div>
                 <div class="tabled__row tabled__row--blank">
                     <div class="tabled__item tabled__key">{% trans "Telefoonnummer" %}</div>

@@ -17,9 +17,9 @@
     display: block;
   }
 
-  [class*='icon'],
-  [class*='Icon'] {
-    line-height: 1.3;
+  [class*='icons'],
+  [class*='Icons'] {
+    line-height: var(--spacing-giant);
   }
 
   /// Individual errors.
@@ -62,12 +62,12 @@
     cursor: pointer;
   }
 
-  &:not(#{&}--contents) .h2 {
+  &:not(#{&}--contents) .utrecht-heading-2 {
     line-height: var(--font-size-heading-2);
     color: var(--notification-color-text);
   }
 
-  &:not(#{&}--contents) .p {
+  &:not(#{&}--contents) .utrecht-paragraph {
     color: var(--notification-color-text);
   }
 
@@ -99,7 +99,13 @@
   }
 
   & &__content {
-    margin-top: 0.15em;
+    margin-top: var(--spacing-tiny);
+
+    &:focus,
+    &:focus-visible {
+      outline: none;
+      border: none;
+    }
 
     & * {
       margin: 0;

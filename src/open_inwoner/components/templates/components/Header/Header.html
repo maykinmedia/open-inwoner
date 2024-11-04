@@ -16,21 +16,23 @@
             </button>
         {% endif %}
         {% firstof config.logo.default_alt_text config.name as logo_alt_text %}
-        {% include "components/Logo/Logo.html" with src=config.logo.file.url alt="Homepage "|add:logo_alt_text svg_height=75 only %}
+        {% include "components/Logo/Logo.html" with src=config.logo.file.url alt=logo_alt_text svg_height=75 only %}
 
         {% if request.user.is_authenticated %}
-            <span class="nav-login--icon">{% icon icon="how_to_reg" icon_position="before" outlined=True %}</span>
+            <span class="nav-login--icon">{% icon icon="how_to_reg" icon_position="before" outlined=True %}
+                <span class="sr-only">{% trans "U bent ingelogd." %}</span>
+            </span>
         {% elif config.login_show %}
             <span class="nav-login--icon">
                 {% url 'login' as login_url %}
                 {% trans "Inloggen" as login %}
-                {% button text="" title="Inloggen" href=login_url icon="person" icon_position="before" primary=True icon_outlined=True transparent=True %}
+                {% button text="" title="Inloggen" href=login_url icon="person" icon_position="before" primary=True icon_outlined=True %}
             </span>
         {% endif %}
         </div>
         {# end of mobile header-menu with logo #}
 
-        <div class="header__submenu">
+        <div class="header--mobile header__submenu">
             {% if cms_apps.products and request.user.is_authenticated or not config.hide_search_from_anonymous_users %}
                 <nav class="header__actions header__actions--open" aria-label="Zoek navigatie mobiel">
                     <form id="search-form-mobile-open" class="search-form-delegate form form--inline">
@@ -40,7 +42,7 @@
                 </nav>
             {% endif %}
 
-                <nav class="primary-navigation" aria-label="Hoofd navigatie">
+                <nav class="primary-navigation primary-navigation--mobile" aria-label="Hoofd navigatie">
                     <ul class="primary-navigation__list">
 
                         <li class="primary-navigation__list-item">
@@ -85,8 +87,8 @@
                     <div class="header__text-actions">
 
                         {% if request.user.is_authenticated %}
-                            <p class="p">
-                                {% icon icon="person" icon_position="before" outlined=True %}{% trans "Ingelogd als" %} {{ request.user.get_short_name }}
+                            <p class="utrecht-paragraph">
+                                {% icon icon="person" icon_position="before" outlined=True %}{% trans "Ingelogd als" %} {{ request.user.display_name }}
                             </p>
                             <ul class="header__list">
                                 <li class="header__list-item">
@@ -104,7 +106,7 @@
             {# end of submenu items #}
 
     {% firstof config.logo.default_alt_text config.name as logo_alt_text %}
-        <div class="logo__desktop">{% include "components/Logo/Logo.html" with src=config.logo.file.url alt="Homepage "|add:logo_alt_text svg_height=75 only %}</div>
+        <div class="logo__desktop">{% include "components/Logo/Logo.html" with src=config.logo.file.url alt=logo_alt_text svg_height=75 only %}</div>
 
         {% include "components/Header/PrimaryNavigation.html" %}
 

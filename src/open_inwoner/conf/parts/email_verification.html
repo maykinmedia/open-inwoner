@@ -1,0 +1,25 @@
+<table role="presentation" border="0" cellspacing="0" cellpadding="0" width="100%" class="table-mail">
+    <tbody>
+    <tr>
+        <td class="td-mail td__padding-all" colspan="6">
+            <p>Beste {{ first_name }},</p>
+            <p>&nbsp;</p>
+            <p>Bedankt voor uw aanmelding op {{ site_name }}. Bevestig uw e-mailadres om verder te gaan, doe dit via onderstaande link:</p>
+	    <p><a href="{{ verification_link }}">Bevestig mijn e-mailadres</a><span class="color--secondary"> &rarr;</span></p>
+            <p>Als u problemen heeft met het bevestigen van uw e-mailadres, neem dan contact met ons op.</p>
+        </td>
+    </tr>
+    <tr class="tr-mail border-top">
+        <td class="td-mail border-top td__padding-zero" colspan="6">
+            <!-- <hr> styling --> &nbsp;
+        </td>
+    </tr>
+    <tr>
+        <td class="td-mail td__padding-all" colspan="6">
+            <p>Met vriendelijke groet,</p>
+            <p>&nbsp;</p>
+            <p>{{ site_name }}</p>
+        </td>
+    </tr>
+    </tbody>
+</table>

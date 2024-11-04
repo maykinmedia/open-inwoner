@@ -7,7 +7,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from django_webtest import WebTest
 from freezegun import freeze_time
@@ -17,6 +17,7 @@ from timeline_logger.models import TimelineLog
 
 from open_inwoner.accounts.models import Invite
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.pdc.tests.factories import CategoryFactory
 from open_inwoner.utils.logentry import LOG_ACTIONS
 
 from ..choices import LoginTypeChoices, StatusChoices
@@ -94,8 +95,36 @@ class TestProfile(WebTest):
             },
         )
 
+    def test_categories_modification_is_logged(self):
+        CategoryFactory()
+        CategoryFactory()
+        form = self.app.get(reverse("profile:categories"), user=self.user).forms[
+            "change-categories"
+        ]
+
+        form.get("selected_categories", index=1).checked = True
+        form.submit()
+        log_entry = TimelineLog.objects.last()
+
+        self.assertEqual(
+            log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
+        )
+        self.assertEqual(log_entry.content_object.id, self.user.id)
+        self.assertEqual(
+            log_entry.extra_data,
+            {
+                "message": _("categories were modified"),
+                "action_flag": list(LOG_ACTIONS[CHANGE]),
+                "content_object_repr": str(self.user),
+            },
+        )
+
     @patch("open_inwoner.cms.utils.page_display._is_published", return_value=True)
     def test_user_notifications_update_is_logged(self, mock_cms_page_display):
+        config = SiteConfiguration.get_solo()
+        config.notifications_messages_enabled = True
+        config.save()
+
         form = self.app.get(reverse("profile:notifications"), user=self.user).forms[
             "change-notifications"
         ]

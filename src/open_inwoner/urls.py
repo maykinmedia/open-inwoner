@@ -11,7 +11,6 @@ from maykin_2fa import monkeypatch_admin
 from maykin_2fa.urls import urlpatterns, webauthn_urlpatterns
 from mozilla_django_oidc_db.views import AdminLoginFailure
 
-from digid_eherkenning_oidc_generics.views import OIDCFailureView
 from open_inwoner.accounts.forms import CustomRegistrationForm
 from open_inwoner.accounts.views import (
     AddPhoneNumberWizardView,
@@ -24,6 +23,7 @@ from open_inwoner.accounts.views import (
     LogPasswordChangeView,
     LogPasswordResetConfirmView,
     LogPasswordResetView,
+    OIDCFailureView,
     PasswordResetView,
     ResendTokenView,
     VerifyTokenView,
@@ -95,6 +95,7 @@ urlpatterns = [
         AddPhoneNumberWizardView.as_view(),
         name="add_phone_number",
     ),
+    path("accounts/mail/", include("open_inwoner.mail.urls")),
     path("accounts/", include("django_registration.backends.one_step.urls")),
     path("accounts/", include("django.contrib.auth.urls")),
     path("api/", include("open_inwoner.api.urls", namespace="api")),
@@ -113,27 +114,16 @@ urlpatterns = [
     ),
     path("contactformulier/", ContactFormView.as_view(), name="contactform"),
     path("oidc/", include("mozilla_django_oidc.urls")),
-    path(
-        "digid-oidc/",
-        include(
-            "digid_eherkenning_oidc_generics.digid_urls",
-        ),
-    ),
-    path(
-        "eherkenning-oidc/",
-        include(
-            "digid_eherkenning_oidc_generics.eherkenning_urls",
-        ),
-    ),
+    path("digid-oidc/", include("open_inwoner.accounts.digid_urls")),
+    path("eherkenning-oidc/", include("open_inwoner.accounts.eherkenning_urls")),
     path("login/failure/", OIDCFailureView.as_view(), name="oidc-error"),
     path("faq/", FAQView.as_view(), name="general_faq"),
-    path("yubin/", include("django_yubin.urls")),
     path("apimock/", include("open_inwoner.apimock.urls")),
     path("kvk/", include("open_inwoner.kvk.urls")),
-    # TODO move search to products cms app?
     path("", include("open_inwoner.search.urls", namespace="search")),
     re_path(r"^", include("cms.urls")),
 ]
+
 
 # NOTE: The staticfiles_urlpatterns also discovers static files (ie. no need to run collectstatic). Both the static
 # folder and the media folder are only served via Django if DEBUG = True.

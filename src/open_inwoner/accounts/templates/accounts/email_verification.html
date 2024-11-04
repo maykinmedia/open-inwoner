@@ -1,0 +1,20 @@
+{% extends 'master.html' %}
+{% load i18n static form_tags card_tags grid_tags solo_tags %}
+
+{% block content %}
+<div class="registration-grid">
+{% render_grid %}
+    {% render_column span=9 %}
+        {% render_card tinted=True  %}
+            {% get_solo 'configurations.SiteConfiguration' as config %}
+            <h1 class="utrecht-heading-1">{% trans "E-mail is verzonden" %}</h1><br>
+            {% if verification_text %}<p class="utrecht-paragraph">{{ verification_text|linebreaksbr }}</p><br>{% endif %}
+            <form method="POST" id="email-verification-form" action="{{ request.get_full_path }}" class="form" novalidate>
+                {% csrf_token %}
+                {% form_actions primary_icon='arrow_forward' primary_text=button_text %}
+            </form>
+        {% endrender_card %}
+    {% endrender_column %}
+{% endrender_grid %}
+</div>
+{% endblock content %}

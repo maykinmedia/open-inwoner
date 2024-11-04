@@ -3,10 +3,13 @@
 
 
 {% block content %}
-<h1 class="h1" id="title">
-    {% trans "Mijn contacten" %}
+<header class="oip-header-group">
+    <h1 class="utrecht-heading-1" id="title">
+        {% trans "Mijn contacten" %}
+
+    </h1>
     {% button href="profile:contact_create" text=_("Nieuw contact toevoegen") icon="person" primary=True %}
-</h1>
+</header>
 
 <!--List of contact requests: receiver's view-->
 {% if pending_approvals %}
@@ -14,14 +17,14 @@
     <div class="approval-container{% if approvals_count == 1 %}--solo{% endif %}">
         <div class="approval">
             <div class="approval__header">
-                <h2 class="h2">{% trans "U bent toegevoegd als contactpersoon" %}</h2>
-                <p class="p">{% trans "By accepting you agree on sharing your personal data (first name, last name and phonenumber)." %}</p>
+                <h2 class="utrecht-heading-2">{% trans "U bent toegevoegd als contactpersoon" %}</h2>
+                <p class="utrecht-paragraph">{% trans "By accepting you agree on sharing your personal data (first name, last name and phonenumber)." %}</p>
             </div>
             {% if approvals_count == 1 %}
                 {% with pending_approvals.get as pending_approval %}
                 <div class="approval__single">
-                    <p class="p">
-                        {% blocktrans with full_name=pending_approval.get_full_name %}{{ full_name }} wilt u toevoegen als contactpersoon.{% endblocktrans %}
+                    <p class="utrecht-paragraph">
+                        {% blocktrans with full_name=pending_approval.get_full_name %}{{ full_name }} wil u toevoegen als contactpersoon.{% endblocktrans %}
                     </p>
                     {% url 'profile:contact_approval' uuid=pending_approval.uuid as approval_url %}
                     {% render_form form=None method="POST" form_action=approval_url id="approval_form" spaceless=True show_notifications=True %}
@@ -37,7 +40,7 @@
                 <ul class="approval__list">
                     {% for approval in pending_approvals %}
                         <li class="approval__list-item">
-                            <p class="p">{{approval.get_full_name}}</p>
+                            <p class="utrecht-paragraph">{{approval.get_full_name}}</p>
                             {% url 'profile:contact_approval' uuid=approval.uuid as approval_url %}
                             {% render_form form=None method="POST" form_action=approval_url id="approval_form" spaceless=True show_notifications=True %}
                                 {% csrf_token %}
@@ -71,7 +74,7 @@
             {% button text=_("Filter") type="button" bordered=True %}
         </div>
         <div class="contacts__filter-container filter__container">
-            <p class="p">{% trans "Filter op:" %}</p>
+            <p class="utrecht-paragraph">{% trans "Filter op:" %}</p>
             {% input form.type no_label=True no_help=True icon="expand_more" class="label input" id="id_type" %}
         </div>
     </div>
@@ -141,9 +144,9 @@
                             {% dropdown icon="settings" disabled=contact.is_not_active %}
                                 <div class="dropdown__item">
                                     {% url 'profile:contact_delete' uuid=contact.uuid as delete_url %}
-                                    {% render_form form=None form_action=delete_url method="POST" spaceless=True id="delete-contact-form" extra_classes="confirm" data_confirm_title=_("Are you sure you want to delete this contact?") data_confirm_cancel=_("Nee") data_confirm_default=_("Ja") %}
+                                    {% render_form form=None form_action=delete_url method="POST" spaceless=True id="delete-contact-form" extra_classes="confirm" data_confirm_title=_("Are you sure you want to delete this contact?") data_confirm_cancel=_("Nee, annuleren") data_confirm_default=_("Ja, verwijderen") %}
                                         {% csrf_token %}
-                                        {% button icon="delete" text=_("Verwijderen") transparent=True %}
+                                        {% button icon="delete" icon_outlined=True text=_("Verwijderen") transparent=True %}
                                     {% endrender_form %}
                                 </div>
                             {% enddropdown %}

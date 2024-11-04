@@ -8,8 +8,9 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
+import dateutil
 import requests_mock
-from django_webtest import WebTest
+from django_webtest import TransactionWebTest
 from freezegun import freeze_time
 from pyquery import PyQuery
 from timeline_logger.models import TimelineLog
@@ -26,25 +27,38 @@ from zgw_consumers.constants import APITypes
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory, eHerkenningUserFactory
 from open_inwoner.cms.cases.views.status import InnerCaseDetailView, SimpleFile
+from open_inwoner.openklant.api_models import ObjectContactMoment
+from open_inwoner.openklant.constants import Status as ContactMomentStatus
+from open_inwoner.openklant.models import OpenKlantConfig
+from open_inwoner.openklant.services import eSuiteVragenService
+from open_inwoner.openklant.tests.factories import make_contactmoment
 from open_inwoner.openzaak.constants import StatusIndicators
 from open_inwoner.openzaak.tests.factories import (
-    StatusTranslationFactory,
     ZaakTypeConfigFactory,
     ZaakTypeInformatieObjectTypeConfigFactory,
+    ZaakTypeResultaatTypeConfigFactory,
     ZaakTypeStatusTypeConfigFactory,
 )
 from open_inwoner.utils.test import (
     ClearCachesMixin,
     paginated_response,
     set_kvk_branch_number_in_session,
+    uuid_from_url,
 )
 
 from ...utils.tests.helpers import AssertRedirectsMixin
 from ..api_models import Status, StatusType
 from ..models import OpenZaakConfig
-from .factories import CatalogusConfigFactory, ServiceFactory
+from .factories import CatalogusConfigFactory, ServiceFactory, ZGWApiGroupConfigFactory
 from .helpers import generate_oas_component_cached
-from .shared import CATALOGI_ROOT, DOCUMENTEN_ROOT, ZAKEN_ROOT
+from .shared import (
+    ANOTHER_CATALOGI_ROOT,
+    ANOTHER_DOCUMENTEN_ROOT,
+    ANOTHER_ZAKEN_ROOT,
+    CATALOGI_ROOT,
+    DOCUMENTEN_ROOT,
+    ZAKEN_ROOT,
+)
 
 PATCHED_MIDDLEWARE = [
     m
@@ -53,12 +67,20 @@ PATCHED_MIDDLEWARE = [
 ]
 
 
+CONTACTMOMENTEN_ROOT = "https://contactmomenten.nl/api/v1/"
+KLANTEN_ROOT = "https://klanten.nl/api/v1/"
+
+
 @requests_mock.Mocker()
 @override_settings(
     ROOT_URLCONF="open_inwoner.cms.tests.urls",
     MIDDLEWARE=PATCHED_MIDDLEWARE,
 )
-class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
+class TestCaseDetailView(
+    AssertRedirectsMixin,
+    ClearCachesMixin,
+    TransactionWebTest,
+):
     def setUp(self):
         super().setUp()
 
@@ -71,18 +93,24 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             login_type=LoginTypeChoices.eherkenning,
         )
         # services
-        self.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
-        self.catalogi_service = ServiceFactory(
-            api_root=CATALOGI_ROOT, api_type=APITypes.ztc
+        self.contactmoment_service = ServiceFactory(
+            api_root=CONTACTMOMENTEN_ROOT, api_type=APITypes.cmc
         )
-        self.document_service = ServiceFactory(
-            api_root=DOCUMENTEN_ROOT, api_type=APITypes.drc
+        self.api_group = ZGWApiGroupConfigFactory(
+            ztc_service__api_root=CATALOGI_ROOT,
+            zrc_service__api_root=ZAKEN_ROOT,
+            drc_service__api_root=DOCUMENTEN_ROOT,
+            form_service=None,
         )
+        self.api_group_alt = ZGWApiGroupConfigFactory(
+            ztc_service__api_root=ANOTHER_CATALOGI_ROOT,
+            zrc_service__api_root=ANOTHER_ZAKEN_ROOT,
+            drc_service__api_root=ANOTHER_DOCUMENTEN_ROOT,
+            form_service=None,
+        )
+
         # openzaak config
         self.config = OpenZaakConfig.get_solo()
-        self.config.zaak_service = self.zaak_service
-        self.config.catalogi_service = self.catalogi_service
-        self.config.document_service = self.document_service
         self.config.document_max_confidentiality = (
             VertrouwelijkheidsAanduidingen.beperkt_openbaar
         )
@@ -91,24 +119,227 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         )
         self.config.save()
 
+        # openklant config
+        self.openklant_config = OpenKlantConfig.get_solo()
+        self.openklant_config.contactmomenten_service = self.contactmoment_service
+        self.openklant_config.save()
+
         self.case_detail_url = reverse(
             "cases:case_detail_content",
-            kwargs={"object_id": "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"},
+            kwargs={
+                "object_id": "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
+                "api_group_id": self.api_group.id,
+            },
         )
         self.eherkenning_case_detail_url = reverse(
             "cases:case_detail_content",
-            kwargs={"object_id": "3b751e7e-cf17-4200-9ee4-4a42d801ea21"},
+            kwargs={
+                "object_id": "3b751e7e-cf17-4200-9ee4-4a42d801ea21",
+                "api_group_id": self.api_group.id,
+            },
         )
 
         #
-        # zaken
+        # Catalogi API (ZTC)
+        # https://vng-realisatie.github.io/gemma-zaken/standaard/catalogi/
+        #
+        self.zaaktype = generate_oas_component_cached(
+            "ztc",
+            "schemas/ZaakType",
+            uuid="0caa29cb-0167-426f-8dc1-88bebd7c8804",
+            url=f"{CATALOGI_ROOT}zaaktypen/0caa29cb-0167-426f-8dc1-88bebd7c8804",
+            identificatie="ZAAKTYPE-2020-0000000001",
+            omschrijving="Coffee zaaktype",
+            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+            doel="Ask for coffee",
+            aanleiding="Coffee is essential",
+            indicatieInternOfExtern="extern",
+            handelingInitiator="Request",
+            onderwerp="Coffee",
+            handelingBehandelaar="Behandelen",
+            opschortingEnAanhoudingMogelijk=False,
+            verlengingMogelijk=False,
+            publicatieIndicatie=False,
+            besluittypen=[],
+            beginGeldigheid="2020-09-25",
+            versiedatum="2020-09-25",
+        )
+        self.zaaktype_config = ZaakTypeConfigFactory.create(
+            identificatie=self.zaaktype["identificatie"],
+        )
+        self.status_type_new = generate_oas_component_cached(
+            "ztc",
+            "schemas/StatusType",
+            url=f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-777yu878km09",
+            zaaktype=self.zaaktype["url"],
+            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            omschrijving="Initial request",
+            omschrijvingGeneriek="some content",
+            statustekst="Registered",
+            volgnummer=1,
+            isEindstatus=False,
+        )
+        # no associated status (for testing `add_second_status_preview`)
+        self.status_type_in_behandeling = generate_oas_component_cached(
+            "ztc",
+            "schemas/StatusType",
+            url=f"{CATALOGI_ROOT}statustypen/167cb935-ac8a-428e-8cca-5abda0da47c7",
+            zaaktype=self.zaaktype["url"],
+            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            omschrijving="In behandeling",
+            omschrijvingGeneriek="some content",
+            statustekst="",
+            volgnummer=3,
+            isEindstatus=False,
+        )
+        self.status_type_finish = generate_oas_component_cached(
+            "ztc",
+            "schemas/StatusType",
+            url=f"{CATALOGI_ROOT}statustypen/d4839012-gh35-3a8d-866h-444uy935acv7",
+            zaaktype=self.zaaktype["url"],
+            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            omschrijving="Finish",
+            omschrijvingGeneriek="some content",
+            statustekst="",
+            volgnummer=4,
+            isEindstatus=True,
+        )
+        # we need to use a `StatusType` object, not the oas_component (a `dict`)
+        self.second_status_preview = StatusType(
+            url=self.status_type_in_behandeling["url"],
+            zaaktype=self.status_type_in_behandeling["zaaktype"],
+            omschrijving="In behandeling",
+            omschrijving_generiek=self.status_type_in_behandeling[
+                "omschrijvingGeneriek"
+            ],
+            statustekst=self.status_type_in_behandeling["statustekst"],
+            volgnummer=3,
+            is_eindstatus=self.status_type_in_behandeling["isEindstatus"],
+            informeren=self.status_type_in_behandeling["informeren"],
+        )
+        self.informatie_object_type = generate_oas_component_cached(
+            "ztc",
+            "schemas/InformatieObjectType",
+            url=f"{CATALOGI_ROOT}informatieobjecttype/014c38fe-b010-4412-881c-3000032fb321",
+            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            omschrijving="Some content",
+        )
+        self.zaaktype_informatie_object_type = generate_oas_component_cached(
+            "ztc",
+            "schemas/ZaakTypeInformatieObjectType",
+            uuid="3fb03882-f6f9-4e0d-ad92-f810e24b9abb",
+            url=f"{CATALOGI_ROOT}zaaktype-informatieobjecttypen/93250e6d-ef92-4474-acca-a6dbdcd61b7e",
+            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            zaaktype=self.zaaktype["url"],
+            informatieobjecttype=self.informatie_object_type["url"],
+            volgnummer=1,
+            richting="inkomend",
+            statustype=self.status_type_finish,
+        )
+        self.resultaattype_with_naam = generate_oas_component_cached(
+            "ztc",
+            "schemas/ResultaatType",
+            url=f"{CATALOGI_ROOT}resultaattypen/3dc5e2d3-ed72-41ec-a91e-000f72a7b291",
+            zaaktype=self.zaaktype["url"],
+            omschrijving="Short description",
+            resultaattypeomschrijving="http://example.com",
+            selectielijstklasse="http://example.com",
+            esuite_compat_naam="Long description (>20 chars) of result",
+        )
+
+        #
+        # Documenten API (DRC)
+        # https://vng-realisatie.github.io/gemma-zaken/standaard/documenten/
+        #
+        self.informatie_object = generate_oas_component_cached(
+            "drc",
+            "schemas/EnkelvoudigInformatieObject",
+            uuid="014c38fe-b010-4412-881c-3000032fb812",
+            url=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812",
+            inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812/download",
+            informatieobjecttype=self.informatie_object_type["url"],
+            status="definitief",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+            bestandsnaam="uploaded_document.txt",
+            titel="uploaded_document_title.txt",
+            bestandsomvang=123,
+        )
+        self.informatie_object_2 = generate_oas_component_cached(
+            "drc",
+            "schemas/EnkelvoudigInformatieObject",
+            uuid="015c38fe-b010-4412-881c-3000032fb812",
+            url=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/015c38fe-b010-4412-881c-3000032fb812",
+            inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/015c38fe-b010-4412-881c-3000032fb812/download",
+            informatieobjecttype=self.informatie_object_type["url"],
+            status="definitief",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+            bestandsnaam="uploaded_document.txt",
+            titel="another_document_title.txt",
+            bestandsomvang=123,
+        )
+        self.informatie_object_no_date = generate_oas_component_cached(
+            "drc",
+            "schemas/EnkelvoudigInformatieObject",
+            uuid="015c38fe-b010-4412-881c-3000032fb812",
+            url=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/016c38fe-b010-4412-881c-3000032fb812",
+            inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/016c38fe-b010-4412-881c-3000032fb812/download",
+            informatieobjecttype=self.informatie_object_type["url"],
+            status="definitief",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+            bestandsnaam="uploaded_document.txt",
+            titel="yet_another_document_title.txt",
+            bestandsomvang=123,
+        )
+        self.uploaded_informatie_object = generate_oas_component_cached(
+            "drc",
+            "schemas/EnkelvoudigInformatieObject",
+            uuid="85079ba3-554a-450f-b963-2ce20b176c90",
+            url=self.informatie_object["url"],
+            inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/85079ba3-554a-450f-b963-2ce20b176c90/download",
+            informatieobjecttype=self.informatie_object_type["url"],
+            status="definitief",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+            bestandsnaam="upload.txt",
+            bestandsomvang=123,
+            titel="uploaded file",
+        )
+        self.informatie_object_invisible = generate_oas_component_cached(
+            "drc",
+            "schemas/EnkelvoudigInformatieObject",
+            uuid="994c38fe-b010-4412-881c-3000032fb123",
+            url=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/994c38fe-b010-4412-881c-3000032fb123",
+            inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/994c38fe-b010-4412-881c-3000032fb123/download",
+            informatieobjecttype=self.informatie_object_type["url"],
+            status="definitief",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.geheim,
+            bestandsnaam="geheim-document.txt",
+            bestandsomvang=123,
+        )
+        self.informatie_object_archived = generate_oas_component_cached(
+            "drc",
+            "schemas/EnkelvoudigInformatieObject",
+            uuid="7e4c4bbb-982e-4dfb-86b6-23ef41f97282",
+            url=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/7e4c4bbb-982e-4dfb-86b6-23ef41f97282",
+            inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812/download",
+            informatieobjecttype=self.informatie_object_type["url"],
+            status="gearchiveerd",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+            bestandsnaam="uploaded_document.txt",
+            titel="uploaded_document_title.txt",
+            bestandsomvang=123,
+        )
+
+        #
+        # Zaken API (ZRC)
+        # https://vng-realisatie.github.io/gemma-zaken/standaard/zaken/
         #
         self.zaak = generate_oas_component_cached(
             "zrc",
             "schemas/Zaak",
             uuid="d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
             url=f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
-            zaaktype=f"{CATALOGI_ROOT}zaaktypen/0caa29cb-0167-426f-8dc1-88bebd7c8804",
+            zaaktype=self.zaaktype["url"],
             identificatie="ZAAK-2022-0000000024",
             omschrijving="Zaak naar aanleiding van ingezonden formulier",
             startdatum="2022-01-02",
@@ -144,40 +375,13 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             startdatum="2022-01-02",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.geheim,
         )
-        self.zaaktype = generate_oas_component_cached(
-            "ztc",
-            "schemas/ZaakType",
-            uuid="0caa29cb-0167-426f-8dc1-88bebd7c8804",
-            url=self.zaak["zaaktype"],
-            identificatie="ZAAKTYPE-2020-0000000001",
-            omschrijving="Coffee zaaktype",
-            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
-            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
-            doel="Ask for coffee",
-            aanleiding="Coffee is essential",
-            indicatieInternOfExtern="extern",
-            handelingInitiator="Request",
-            onderwerp="Coffee",
-            handelingBehandelaar="Behandelen",
-            opschortingEnAanhoudingMogelijk=False,
-            verlengingMogelijk=False,
-            publicatieIndicatie=False,
-            besluittypen=[],
-            beginGeldigheid="2020-09-25",
-            versiedatum="2020-09-25",
-        )
-        self.zaaktype_config = ZaakTypeConfigFactory.create(
-            identificatie=self.zaaktype["identificatie"],
-        )
-        #
         # statuses
-        #
         self.status_new = generate_oas_component_cached(
             "zrc",
             "schemas/Status",
             url=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-beu760sle929",
             zaak=self.zaak["url"],
-            statustype=f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-777yu878km09",
+            statustype=self.status_type_new["url"],
             datumStatusGezet="2021-01-12",
             statustoelichting="",
         )
@@ -186,63 +390,11 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             "schemas/Status",
             url=f"{ZAKEN_ROOT}statussen/29ag1264-c4he-249j-bc24-jip862tle833",
             zaak=self.zaak["url"],
-            statustype=f"{CATALOGI_ROOT}statustypen/d4839012-gh35-3a8d-866h-444uy935acv7",
+            statustype=self.status_type_finish["url"],
             datumStatusGezet="2021-03-12",
             statustoelichting="",
         )
-        #
-        # status types
-        #
-        self.status_type_new = generate_oas_component_cached(
-            "ztc",
-            "schemas/StatusType",
-            url=self.status_new["statustype"],
-            zaaktype=self.zaaktype["url"],
-            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
-            omschrijving="Initial request",
-            omschrijvingGeneriek="some content",
-            statustekst="",
-            volgnummer=1,
-            isEindstatus=False,
-        )
-        # no associated status (for testing `add_second_status_preview`)
-        self.status_type_in_behandeling = generate_oas_component_cached(
-            "ztc",
-            "schemas/StatusType",
-            url=f"{CATALOGI_ROOT}statustypen/167cb935-ac8a-428e-8cca-5abda0da47c7",
-            zaaktype=self.zaaktype["url"],
-            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
-            omschrijving="In behandeling",
-            omschrijvingGeneriek="some content",
-            statustekst="",
-            volgnummer=3,
-            isEindstatus=False,
-        )
-        # we need to use a `StatusType` object, not the oas_component (a `dict`)
-        self.second_status_preview = StatusType(
-            url=self.status_type_in_behandeling["url"],
-            zaaktype=self.status_type_in_behandeling["zaaktype"],
-            omschrijving="In behandeling",
-            omschrijving_generiek=self.status_type_in_behandeling[
-                "omschrijvingGeneriek"
-            ],
-            statustekst=self.status_type_in_behandeling["statustekst"],
-            volgnummer=3,
-            is_eindstatus=self.status_type_in_behandeling["isEindstatus"],
-            informeren=self.status_type_in_behandeling["informeren"],
-        )
-        self.status_type_finish = generate_oas_component_cached(
-            "ztc",
-            "schemas/StatusType",
-            url=self.status_finish["statustype"],
-            zaaktype=self.zaaktype["url"],
-            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
-            omschrijving="Finish",
-            omschrijvingGeneriek="some content",
-            statustekst="",
-            volgnummer=4,
-            isEindstatus=True,
-        )
+        # user roles
         self.user_role = generate_oas_component_cached(
             "zrc",
             "schemas/Rol",
@@ -307,145 +459,152 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 "geslachtsnaam": "Else",
             },
         )
+        # results
         self.result = generate_oas_component_cached(
             "zrc",
             "schemas/Resultaat",
             uuid="a44153aa-ad2c-6a07-be75-15add5113",
             url=self.zaak["resultaat"],
-            resultaattype=f"{CATALOGI_ROOT}resultaattypen/b1a268dd-4322-47bb-a930-b83066b4a32c",
+            resultaattype=self.resultaattype_with_naam["url"],
             zaak=self.zaak["url"],
             toelichting="resultaat toelichting",
         )
-        self.zaak_informatie_object = generate_oas_component_cached(
+        # informatie objecten
+        self.zaak_informatie_object_old = generate_oas_component_cached(
             "zrc",
             "schemas/ZaakInformatieObject",
             url=f"{ZAKEN_ROOT}zaakinformatieobjecten/e55153aa-ad2c-4a07-ae75-15add57d6",
-            informatieobject=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812",
+            informatieobject=self.informatie_object["url"],
             zaak=self.zaak["url"],
             aardRelatieWeergave="some content",
             titel="info object 1",
             beschrijving="",
             registratiedatum="2021-01-12T00:00:00+01:00",
         )
-        self.zaak_informatie_object_2 = generate_oas_component_cached(
+        self.zaak_informatie_object_new = generate_oas_component_cached(
             "zrc",
             "schemas/ZaakInformatieObject",
             url=f"{ZAKEN_ROOT}zaakinformatieobjecten/e55153aa-ad2c-4a07-ae75-15add57d7",
-            informatieobject=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/015c38fe-b010-4412-881c-3000032fb812",
+            informatieobject=self.informatie_object_2["url"],
             zaak=self.zaak["url"],
             aardRelatieWeergave="some content",
             titel="info object 2",
             beschrijving="",
             registratiedatum="2024-01-12T00:00:00+01:00",
         )
-        # informatie_object without registratiedatum
         self.zaak_informatie_object_no_date = generate_oas_component_cached(
             "zrc",
             "schemas/ZaakInformatieObject",
             url=f"{ZAKEN_ROOT}zaakinformatieobjecten/e55153aa-ad2c-4a07-ae75-15add57d7",
-            informatieobject=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/016c38fe-b010-4412-881c-3000032fb812",
+            informatieobject=self.informatie_object_no_date["url"],
             zaak=self.zaak["url"],
             aardRelatieWeergave="some content",
             titel="info object 3",
             beschrijving="",
             registratiedatum=None,
         )
-        self.informatie_object_type = generate_oas_component_cached(
-            "ztc",
-            "schemas/InformatieObjectType",
-            url=f"{CATALOGI_ROOT}informatieobjecttype/014c38fe-b010-4412-881c-3000032fb321",
-            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
-            omschrijving="Some content",
-        )
-        self.zaaktype_informatie_object_type = generate_oas_component_cached(
-            "ztc",
-            "schemas/ZaakTypeInformatieObjectType",
-            uuid="3fb03882-f6f9-4e0d-ad92-f810e24b9abb",
-            url=f"{CATALOGI_ROOT}zaaktype-informatieobjecttypen/93250e6d-ef92-4474-acca-a6dbdcd61b7e",
-            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
-            zaaktype=self.zaaktype["url"],
-            informatieobjecttype=self.informatie_object_type["url"],
-            volgnummer=1,
-            richting="inkomend",
-            statustype=self.status_type_finish,
-        )
-        self.informatie_object = generate_oas_component_cached(
-            "drc",
-            "schemas/EnkelvoudigInformatieObject",
-            uuid="014c38fe-b010-4412-881c-3000032fb812",
-            url=self.zaak_informatie_object["informatieobject"],
-            inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812/download",
-            informatieobjecttype=self.informatie_object_type["url"],
-            status="definitief",
-            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
-            bestandsnaam="uploaded_document.txt",
-            titel="uploaded_document_title.txt",
-            bestandsomvang=123,
-        )
-        self.informatie_object_2 = generate_oas_component_cached(
-            "drc",
-            "schemas/EnkelvoudigInformatieObject",
-            uuid="015c38fe-b010-4412-881c-3000032fb812",
-            url=self.zaak_informatie_object_2["informatieobject"],
-            inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/015c38fe-b010-4412-881c-3000032fb812/download",
-            informatieobjecttype=self.informatie_object_type["url"],
-            status="definitief",
-            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
-            bestandsnaam="uploaded_document.txt",
-            titel="another_document_title.txt",
-            bestandsomvang=123,
-        )
-        self.informatie_object_no_date = generate_oas_component_cached(
-            "drc",
-            "schemas/EnkelvoudigInformatieObject",
-            uuid="015c38fe-b010-4412-881c-3000032fb812",
-            url=self.zaak_informatie_object_no_date["informatieobject"],
-            inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/016c38fe-b010-4412-881c-3000032fb812/download",
-            informatieobjecttype=self.informatie_object_type["url"],
-            status="definitief",
-            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
-            bestandsnaam="uploaded_document.txt",
-            titel="yet_another_document_title.txt",
-            bestandsomvang=123,
-        )
-        self.uploaded_informatie_object = generate_oas_component_cached(
-            "drc",
-            "schemas/EnkelvoudigInformatieObject",
-            uuid="85079ba3-554a-450f-b963-2ce20b176c90",
-            url=self.zaak_informatie_object["informatieobject"],
-            inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/85079ba3-554a-450f-b963-2ce20b176c90/download",
-            informatieobjecttype=self.informatie_object_type["url"],
-            status="definitief",
-            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
-            bestandsnaam="upload.txt",
-            bestandsomvang=123,
-            titel="uploaded file",
-        )
-
         self.zaak_informatie_object_invisible = generate_oas_component_cached(
             "zrc",
             "schemas/ZaakInformatieObject",
             url=f"{ZAKEN_ROOT}zaakinformatieobjecten/fa5153aa-ad2c-4a07-ae75-15add57ee",
-            informatieobject=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/994c38fe-b010-4412-881c-3000032fb123",
+            informatieobject=self.informatie_object_invisible["url"],
             zaak=self.zaak_invisible["url"],
             aardRelatieWeergave="some invisible content",
             titel="",
             beschrijving="",
             registratiedatum="2021-01-12",
         )
-        self.informatie_object_invisible = generate_oas_component_cached(
-            "drc",
-            "schemas/EnkelvoudigInformatieObject",
-            uuid="994c38fe-b010-4412-881c-3000032fb123",
-            url=self.zaak_informatie_object_invisible["informatieobject"],
-            inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/994c38fe-b010-4412-881c-3000032fb123/download",
-            informatieobjecttype=self.informatie_object_type["url"],
-            status="definitief",
-            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.geheim,
-            bestandsnaam="geheim-document.txt",
-            bestandsomvang=123,
+        self.zaak_informatie_object_archived = generate_oas_component_cached(
+            "zrc",
+            "schemas/ZaakInformatieObject",
+            url=f"{ZAKEN_ROOT}zaakinformatieobjecten/fa5153aa-ad2c-4a07-ae75-15add57ee",
+            informatieobject=self.informatie_object_archived["url"],
+            zaak=self.zaak_invisible["url"],
+            aardRelatieWeergave="some invisible content",
+            titel="",
+            beschrijving="",
+            registratiedatum="2021-01-12",
         )
 
+        #
+        # Contactmomenten API (CMC)
+        #
+        self.contactmoment_old = generate_oas_component_cached(
+            "cmc",
+            "schemas/Contactmoment",
+            url=f"{CONTACTMOMENTEN_ROOT}contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+            bronorganisatie="123456789",
+            identificatie="AB123",
+            registratiedatum="1971-07-17T20:15:07+00:00",
+            type="SomeType",
+            kanaal="Contactformulier",
+            status=ContactMomentStatus.afgehandeld,
+            tekst="Garage verbouwen?",
+            antwoord="Nee",
+            onderwerp="e_suite_subject_code",
+        )
+        self.contactmoment_new = generate_oas_component_cached(
+            "cmc",
+            "schemas/Contactmoment",
+            url=f"{CONTACTMOMENTEN_ROOT}contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-dddddddddddd",
+            bronorganisatie="123456789",
+            identificatie="AB123",
+            registratiedatum="2024-09-27T03:39:28+00:00",
+            type="SomeType",
+            kanaal="MAIL",
+            status=ContactMomentStatus.afgehandeld,
+            antwoord="no",
+            onderwerp="e_suite_subject_code",
+        )
+        self.contactmoment_balie = generate_oas_component_cached(
+            "cmc",
+            "schemas/Contactmoment",
+            url=f"{CONTACTMOMENTEN_ROOT}contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
+            bronorganisatie="123456789",
+            identificatie="AB123",
+            registratiedatum="2024-09-27T03:39:28+00:00",
+            type="SomeType",
+            kanaal="Balie",
+            status=ContactMomentStatus.afgehandeld,
+            antwoord="no",
+            onderwerp="e_suite_subject_code",
+        )
+        self.objectcontactmoment_old = generate_oas_component_cached(
+            "cmc",
+            "schemas/Objectcontactmoment",
+            url=f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten/77880671-b88a-44ed-ba24-dc2ae688c2ec",
+            object=self.zaak["url"],
+            object_type="zaak",
+            contactmoment=self.contactmoment_old["url"],
+        )
+        self.objectcontactmoment_new = generate_oas_component_cached(
+            "cmc",
+            "schemas/Objectcontactmoment",
+            url=f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten/bb51784c-fa2c-4f65-b24e-7179b615efac",
+            object=self.zaak["url"],
+            object_type="zaak",
+            contactmoment=self.contactmoment_new["url"],
+        )
+        self.objectcontactmoment_balie = generate_oas_component_cached(
+            "cmc",
+            "schemas/Objectcontactmoment",
+            url=f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten/bb51784c-fa2c-4f65-b24e-7179b615efac",
+            object=self.zaak["url"],
+            object_type="zaak",
+            contactmoment=self.contactmoment_balie["url"],
+        )
+        self.objectcontactmoment_eherkenning = generate_oas_component_cached(
+            "cmc",
+            "schemas/Objectcontactmoment",
+            url=f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten/bb51784c-fa2c-4f65-b24e-7179b615efac",
+            object=self.zaak_eherkenning["url"],
+            object_type="zaak",
+            contactmoment=self.contactmoment_old["url"],
+        )
+
+        #
+        # documents
+        #
         self.informatie_object_file = SimpleFile(
             name="uploaded_document_title.txt",
             size=123,
@@ -454,10 +613,11 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 kwargs={
                     "object_id": self.zaak["uuid"],
                     "info_id": self.informatie_object["uuid"],
+                    "api_group_id": self.api_group.id,
                 },
             ),
-            created=datetime.datetime.fromisoformat(
-                self.zaak_informatie_object["registratiedatum"]
+            created=dateutil.parser.parse(
+                self.zaak_informatie_object_old["registratiedatum"]
             ),
         )
         self.informatie_object_file_2 = SimpleFile(
@@ -468,10 +628,11 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 kwargs={
                     "object_id": self.zaak["uuid"],
                     "info_id": self.informatie_object_2["uuid"],
+                    "api_group_id": self.api_group.id,
                 },
             ),
-            created=datetime.datetime.fromisoformat(
-                self.zaak_informatie_object_2["registratiedatum"]
+            created=dateutil.parser.parse(
+                self.zaak_informatie_object_new["registratiedatum"]
             ),
         )
         self.informatie_object_file_no_date = SimpleFile(
@@ -482,7 +643,23 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 kwargs={
                     "object_id": self.zaak["uuid"],
                     "info_id": self.informatie_object_no_date["uuid"],
+                    "api_group_id": self.api_group.id,
                 },
+            ),
+        )
+        self.informatie_object_file_archived = SimpleFile(
+            name="document_archived.txt",
+            size=123,
+            url=reverse(
+                "cases:document_download",
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "info_id": self.informatie_object_archived["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
+            ),
+            created=dateutil.parser.parse(
+                self.zaak_informatie_object_new["registratiedatum"]
             ),
         )
 
@@ -501,10 +678,17 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             self.informatie_object,
             self.informatie_object_2,
             self.informatie_object_invisible,
+            self.resultaattype_with_naam,
             self.zaaktype_informatie_object_type,
             self.status_type_new,
             self.status_type_in_behandeling,
             self.status_type_finish,
+            self.contactmoment_old,
+            self.contactmoment_new,
+            self.contactmoment_balie,
+            self.objectcontactmoment_old,
+            self.objectcontactmoment_new,
+            self.objectcontactmoment_balie,
         ]:
             m.get(resource["url"], json=resource)
 
@@ -512,15 +696,15 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             f"{ZAKEN_ROOT}zaakinformatieobjecten",
             status_code=201,
             json=[
-                self.zaak_informatie_object,
-                self.zaak_informatie_object_2,
+                self.zaak_informatie_object_old,
+                self.zaak_informatie_object_new,
             ],
         )
         m.get(
             f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak['url']}",
             json=[
-                self.zaak_informatie_object,
-                self.zaak_informatie_object_2,
+                self.zaak_informatie_object_old,
+                self.zaak_informatie_object_new,
                 self.zaak_informatie_object_invisible,
             ],
         )
@@ -582,17 +766,146 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 ]
             ),
         )
+        m.get(
+            f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten?object={self.zaak['url']}",
+            json=paginated_response(
+                [
+                    self.objectcontactmoment_old,
+                    self.objectcontactmoment_new,
+                    self.objectcontactmoment_balie,
+                ]
+            ),
+        )
 
         # extra mock for fetching single status (#2037)
         m.get(
             f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
             json=self.status_new,
         )
+        m.get(
+            f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten?object={self.zaak['url']}",
+            json=paginated_response(
+                [
+                    self.objectcontactmoment_old,
+                    self.objectcontactmoment_new,
+                    self.objectcontactmoment_balie,
+                ]
+            ),
+        )
 
-    @patch("open_inwoner.userfeed.hooks.case_status_seen")
-    @patch("open_inwoner.userfeed.hooks.case_documents_seen")
+    def _setUpAdditionalMocks(self, m):
+        """
+        Mocks for testing with alternative backend
+        """
+        self.zaaktype_alt = generate_oas_component_cached(
+            "ztc",
+            "schemas/ZaakType",
+            uuid="13d30e74-4626-4223-8135-c5855bb4ad0a",
+            url=f"{ANOTHER_CATALOGI_ROOT}zaaktypen/13d30e74-4626-4223-8135-c5855bb4ad0a",
+            identificatie="ZAAKTYPE-2020-0000000001",
+            omschrijving="Coffee zaaktype",
+            catalogus=f"{ANOTHER_CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+            doel="Ask for coffee",
+            aanleiding="Coffee is essential",
+            indicatieInternOfExtern="extern",
+            handelingInitiator="Request",
+            onderwerp="Coffee",
+            handelingBehandelaar="Behandelen",
+            opschortingEnAanhoudingMogelijk=False,
+            verlengingMogelijk=False,
+            publicatieIndicatie=False,
+            besluittypen=[],
+            beginGeldigheid="2020-09-25",
+            versiedatum="2020-09-25",
+        )
+        self.zaaktype_config_alt = ZaakTypeConfigFactory.create(
+            identificatie=self.zaaktype_alt["identificatie"],
+        )
+        self.zaak_alt = generate_oas_component_cached(
+            "zrc",
+            "schemas/Zaak",
+            uuid="530bdd80-36de-40d2-bb10-c4c56a8abea1",
+            url=f"{ANOTHER_ZAKEN_ROOT}zaken/530bdd80-36de-40d2-bb10-c4c56a8abea1",
+            zaaktype=self.zaaktype_alt["url"],
+            identificatie="ZAAK-2024-0000000024",
+            omschrijving="Zaak naar aanleiding van ingezonden formulier",
+            startdatum="2024-01-02",
+            einddatumGepland="2024-01-04",
+            uiterlijkeEinddatumAfdoening="2024-01-05",
+            status=f"{ANOTHER_ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
+            resultaat=f"{ANOTHER_ZAKEN_ROOT}resultaten/a44153aa-ad2c-6a07-be75-15add5113",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+        )
+        self.informatie_object_type_alt = generate_oas_component_cached(
+            "ztc",
+            "schemas/InformatieObjectType",
+            url=f"{ANOTHER_CATALOGI_ROOT}informatieobjecttype/014c38fe-b010-4412-881c-3000032fb321",
+            catalogus=f"{ANOTHER_CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            omschrijving="Some content",
+        )
+        self.informatie_object_alt = generate_oas_component_cached(
+            "drc",
+            "schemas/EnkelvoudigInformatieObject",
+            uuid="014c38fe-b010-4412-881c-3000032fb812",
+            url=f"{ANOTHER_DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812",
+            inhoud=f"{ANOTHER_DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812/download",
+            informatieobjecttype=self.informatie_object_type_alt["url"],
+            status="definitief",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+            bestandsnaam="uploaded_document.txt",
+            titel="uploaded_document_title.txt",
+            bestandsomvang=123,
+        )
+        self.informatie_object_file_alt = SimpleFile(
+            name="uploaded_document_title.txt",
+            size=123,
+            url=reverse(
+                "cases:document_download",
+                kwargs={
+                    "object_id": self.zaak_alt["uuid"],
+                    "info_id": self.informatie_object["uuid"],
+                    "api_group_id": self.api_group_alt.id,
+                },
+            ),
+            created=dateutil.parser.parse(
+                self.zaak_informatie_object_new["registratiedatum"]
+            ),
+        )
+
+        m.get(self.zaak_alt["url"], json=self.zaak_alt)
+        m.get(self.zaaktype_alt["url"], json=self.zaaktype_alt)
+        m.post(
+            f"{ANOTHER_ZAKEN_ROOT}zaakinformatieobjecten",
+            status_code=201,
+            json=[self.zaak_informatie_object_new],
+        )
+        m.get(
+            f"{ANOTHER_ZAKEN_ROOT}rollen?zaak={self.zaak_alt['url']}",
+            json=paginated_response([self.user_role, self.not_initiator_role]),
+        )
+        m.post(
+            f"{ANOTHER_DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten",
+            status_code=201,
+            json=self.uploaded_informatie_object,
+        )
+        m.get(
+            f"{ANOTHER_CATALOGI_ROOT}zaaktype-informatieobjecttypen?zaaktype={self.zaaktype_alt['url']}&richting=inkomend",
+            json=paginated_response([self.zaaktype_informatie_object_type]),
+        )
+        m.get(
+            f"{ANOTHER_DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812/download",
+            text="document content",
+        )
+
+    @freeze_time("2021-01-12 17:00:00")
+    @patch("open_inwoner.userfeed.hooks.case_status_seen", autospec=True)
+    @patch("open_inwoner.userfeed.hooks.case_documents_seen", autospec=True)
     def test_status_is_retrieved_when_user_logged_in_via_digid(
-        self, m, mock_hook_status: Mock, mock_hook_documents: Mock
+        self,
+        m,
+        mock_hook_status: Mock,
+        mock_hook_documents: Mock,
     ):
         self.maxDiff = None
 
@@ -613,6 +926,13 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             case_link_text="Bekijk aanvraag",
         )
 
+        ZaakTypeResultaatTypeConfigFactory.create(
+            zaaktype_config=self.zaaktype_config,
+            resultaattype_url=self.resultaattype_with_naam["url"],
+            omschrijving=self.resultaattype_with_naam["omschrijving"],
+            zaaktype_uuids=[self.zaaktype["uuid"]],
+        )
+
         self._setUpMocks(m)
         status_new_obj, status_finish_obj = factory(
             Status, [self.status_new, self.status_finish]
@@ -620,10 +940,15 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         status_new_obj.statustype = factory(StatusType, self.status_type_new)
         status_finish_obj.statustype = factory(StatusType, self.status_type_finish)
 
+        self.openklant_config.exclude_contactmoment_kanalen = ["Balie"]
+        self.openklant_config.save()
+
         response = self.app.get(self.case_detail_url, user=self.user)
 
+        case = response.context.get("case")
+
         self.assertEqual(
-            response.context.get("case"),
+            case,
             {
                 "id": self.zaak["uuid"],
                 "identification": "ZAAK-2022-0000000024",
@@ -636,7 +961,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 "statuses": [
                     {
                         "date": datetime.datetime(2021, 1, 12),
-                        "label": "Initial request",
+                        "label": "Registered",
                         "status_indicator": "warning",
                         "status_indicator_text": "foo",
                         "call_to_action_url": "",
@@ -664,7 +989,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 ],
                 "initiator": "Foo Bar van der Bazz",
                 "result": "resultaat toelichting",
-                "result_description": "",
+                "result_description": "Long description (>20 chars) of result",
                 "case_type_config_description": "",
                 "case_type_document_upload_description": "",
                 "internal_upload_enabled": False,
@@ -672,12 +997,44 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 "external_upload_url": "",
                 "allowed_file_extensions": sorted(self.config.allowed_file_extensions),
                 "contact_form_enabled": False,
-                "new_docs": False,
+                "new_docs": True,
+                "questions": [
+                    make_contactmoment(self.contactmoment_new),
+                    make_contactmoment(self.contactmoment_old),
+                ],
             },
         )
+        self.assertTrue(case["questions"][0].new_answer_available)
+        self.assertFalse(case["questions"][1].new_answer_available)
+
         # check userfeed hooks
         mock_hook_status.assert_called_once()
         mock_hook_documents.assert_called_once()
+
+        # check question links (should be ordered by contactmoment: recent first)
+        doc = PyQuery(response.text)
+        links = doc.find(".contactmomenten__link")
+
+        self.assertEqual(len(links), 2)
+        self.assertEqual(
+            links[0].attrib["href"],
+            reverse(
+                "cases:kcm_redirect",
+                kwargs={"uuid": uuid_from_url(self.contactmoment_new["url"])},
+            ),
+        )
+
+        new_answer_headers = links.find(".card__status_indicator_text")
+
+        self.assertEqual(len(new_answer_headers), 1)
+        self.assertEqual(new_answer_headers[0].text, _("Nieuw antwoord beschikbaar"))
+        self.assertEqual(
+            links[1].attrib["href"],
+            reverse(
+                "cases:kcm_redirect",
+                kwargs={"uuid": uuid_from_url(self.contactmoment_old["url"])},
+            ),
+        )
 
     def test_pass_endstatus_type_data_if_endstatus_not_reached(self, m):
         self.maxDiff = None
@@ -729,7 +1086,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 "statuses": [
                     {
                         "date": datetime.datetime(2021, 1, 12),
-                        "label": "Initial request",
+                        "label": "Registered",
                         "status_indicator": "warning",
                         "status_indicator_text": "foo",
                         "call_to_action_url": "",
@@ -754,7 +1111,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 ],
                 "initiator": "Foo Bar van der Bazz",
                 "result": "resultaat toelichting",
-                "result_description": "",
+                "result_description": "Long description (>20 chars) of result",
                 "case_type_config_description": "",
                 "case_type_document_upload_description": "",
                 "internal_upload_enabled": False,
@@ -763,7 +1120,39 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 "allowed_file_extensions": sorted(self.config.allowed_file_extensions),
                 "contact_form_enabled": False,
                 "new_docs": False,
+                "questions": [
+                    make_contactmoment(self.contactmoment_new),
+                    make_contactmoment(self.contactmoment_balie),
+                    make_contactmoment(self.contactmoment_old),
+                ],
             },
+        )
+
+        # check question links (should be ordered by contactmoment: recent first)
+        doc = PyQuery(response.text)
+        links = doc.find(".contactmomenten__link")
+
+        self.assertEqual(len(links), 3)
+        self.assertEqual(
+            links[0].attrib["href"],
+            reverse(
+                "cases:kcm_redirect",
+                kwargs={"uuid": uuid_from_url(self.contactmoment_new["url"])},
+            ),
+        )
+        self.assertEqual(
+            links[1].attrib["href"],
+            reverse(
+                "cases:kcm_redirect",
+                kwargs={"uuid": uuid_from_url(self.contactmoment_balie["url"])},
+            ),
+        )
+        self.assertEqual(
+            links[2].attrib["href"],
+            reverse(
+                "cases:kcm_redirect",
+                kwargs={"uuid": uuid_from_url(self.contactmoment_old["url"])},
+            ),
         )
 
     def test_second_status_preview(self, m):
@@ -930,20 +1319,24 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         # install mocks with additional case documents
         m.get(self.informatie_object["url"], json=self.informatie_object)
         m.get(self.informatie_object_2["url"], json=self.informatie_object_2)
+        m.get(
+            self.informatie_object_archived["url"], json=self.informatie_object_archived
+        )
 
         m.post(
             f"{ZAKEN_ROOT}zaakinformatieobjecten",
             status_code=201,
             json=[
-                self.zaak_informatie_object,
-                self.zaak_informatie_object_2,
+                self.zaak_informatie_object_old,
+                self.zaak_informatie_object_new,
             ],
         )
         m.get(
             f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak['url']}",
             json=[
-                self.zaak_informatie_object,
-                self.zaak_informatie_object_2,
+                self.zaak_informatie_object_old,
+                self.zaak_informatie_object_new,
+                self.zaak_informatie_object_archived,
             ],
         )
 
@@ -956,10 +1349,12 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(self.case_detail_url, user=self.user)
 
         documents = response.context.get("case")["documents"]
+        self.assertEqual(len(documents), 3)
 
         # order should be reverse of list order from response
         self.assertEqual(documents[0].name, self.informatie_object_2["titel"])
         self.assertEqual(documents[1].name, self.informatie_object["titel"])
+        self.assertEqual(documents[1].name, self.informatie_object_archived["titel"])
 
     def test_document_ordering_by_name(self, m):
         """
@@ -992,16 +1387,16 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             f"{ZAKEN_ROOT}zaakinformatieobjecten",
             status_code=201,
             json=[
-                self.zaak_informatie_object,
-                self.zaak_informatie_object_2,
+                self.zaak_informatie_object_old,
+                self.zaak_informatie_object_new,
                 self.zaak_informatie_object_no_date,
             ],
         )
         m.get(
             f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak['url']}",
             json=[
-                self.zaak_informatie_object,
-                self.zaak_informatie_object_2,
+                self.zaak_informatie_object_old,
+                self.zaak_informatie_object_new,
                 self.zaak_informatie_object_no_date,
             ],
         )
@@ -1021,102 +1416,6 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.assertEqual(documents[1].name, self.informatie_object["titel"])
         self.assertEqual(documents[2].name, self.informatie_object_no_date["titel"])
 
-    @patch("open_inwoner.openzaak.clients.ZakenClient.fetch_status_history")
-    def test_e_suite_missing_current_status_fetch_status(
-        self, m, mock_fetch_status_history
-    ):
-        """
-        Regression test for #2037
-
-        eSuite can fail to return the status of the current case as part of status
-        history, which causes the upload button to be hidden. Check that the status
-        is fetched if it's missing from the eSuite response.
-        """
-        self.maxDiff = None
-        self._setUpMocks(m)
-
-        # e-suite returns nothing, hence status history list is empty
-        mock_fetch_status_history.return_value = []
-        m.get(
-            f"{ZAKEN_ROOT}statussen/29ag1264-c4he-249j-bc24-jip862tle833",
-            json=self.status_finish,
-        )
-
-        status_new_obj, status_finish_obj = factory(
-            Status, [self.status_new, self.status_finish]
-        )
-        status_new_obj.statustype = factory(StatusType, self.status_type_new)
-        status_finish_obj.statustype = factory(StatusType, self.status_type_finish)
-
-        response = self.app.get(self.case_detail_url, user=self.user)
-
-        self.assertEqual(
-            response.context.get("case")["statuses"],
-            [
-                {
-                    "date": datetime.datetime(2021, 3, 12, 0, 0),
-                    "label": "Finish",
-                    "status_indicator": None,
-                    "status_indicator_text": None,
-                    "call_to_action_url": None,
-                    "call_to_action_text": None,
-                    "description": None,
-                    "case_link_text": "Bekijk aanvraag",
-                }
-            ],
-        )
-
-    @patch("open_inwoner.openzaak.clients.ZakenClient.fetch_status_history")
-    def test_e_suite_missing_current_status_upload_button_displayed(
-        self, m, mock_fetch_status_history
-    ):
-        """
-        Regression test for #2037
-
-        eSuite can fail to return the status of the current case as part of status
-        history, which causes the upload button to be hidden. Check that the upload
-        button is displayed.
-        """
-        self.maxDiff = None
-        self._setUpMocks(m)
-
-        # e-suite returns nothing, hence status history list is empty
-        mock_fetch_status_history.return_value = []
-        m.get(
-            f"{ZAKEN_ROOT}statussen/29ag1264-c4he-249j-bc24-jip862tle833",
-            json=self.status_finish,
-        )
-
-        zaak_type_config = ZaakTypeConfigFactory(
-            catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
-            identificatie=self.zaaktype["identificatie"],
-        )
-        zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory(
-            zaaktype_config=zaak_type_config,
-            informatieobjecttype_url=self.informatie_object["url"],
-            zaaktype_uuids=[self.zaaktype["uuid"]],
-            document_upload_enabled=True,
-        )
-        zt_statustype_config = ZaakTypeStatusTypeConfigFactory(
-            zaaktype_config=zaak_type_config,
-            statustype_url=self.status_type_finish["url"],
-            zaaktype_uuids=[self.zaaktype["uuid"]],
-            document_upload_description="- Foo\n- bar",
-        )
-        response = self.app.get(
-            reverse(
-                "cases:case_detail_content",
-                kwargs={"object_id": self.zaak["uuid"]},
-            ),
-            user=self.user,
-        )
-
-        doc = PyQuery(response.content)
-
-        upload_button = doc.find("#document-upload").find("button")
-
-        self.assertEqual(upload_button.text(), "Upload documenten")
-
     @freeze_time("2021-01-12 17:00:00")
     def test_new_docs(self, m):
         self._setUpMocks(m)
@@ -1134,7 +1433,13 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.assertContains(response, "Coffee zaaktype")
         self.assertContains(response, "uploaded_document_title")
 
-    def test_page_displays_expected_data_for_eherkenning_user(self, m):
+    @patch.object(
+        eSuiteVragenService,
+        "retrieve_objectcontactmomenten_for_zaak",
+        autospec=True,
+        return_value=[],
+    )
+    def test_page_displays_expected_data_for_eherkenning_user(self, m, cm_client_mock):
         self._setUpMocks(m)
 
         for fetch_eherkenning_zaken_with_rsin in [True, False]:
@@ -1155,8 +1460,14 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 self.assertContains(response, "Coffee zaaktype")
 
     @set_kvk_branch_number_in_session("1234")
+    @patch.object(
+        eSuiteVragenService,
+        "retrieve_objectcontactmomenten_for_zaak",
+        autospec=True,
+        return_value=[],
+    )
     def test_page_displays_expected_data_for_eherkenning_user_with_vestigingsnummer(
-        self, m
+        self, m, cm_client_mock
     ):
         """
         In order to have access to a case detail page when logged in as a specific
@@ -1204,24 +1515,6 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         # once for the log, once for adding case to context
         spy_format.assert_called
 
-    def test_page_translates_statuses(self, m):
-        st1 = StatusTranslationFactory(
-            status=self.status_type_new["omschrijving"],
-            translation="Translated First Status Type",
-        )
-        st2 = StatusTranslationFactory(
-            status=self.status_type_finish["omschrijving"],
-            translation="Translated Second Status Type",
-        )
-        self._setUpMocks(m)
-        response = self.app.get(
-            self.case_detail_url, user=self.user, headers={"HX-Request": "true"}
-        )
-        self.assertNotContains(response, st1.status)
-        self.assertNotContains(response, st2.status)
-        self.assertContains(response, st1.translation)
-        self.assertContains(response, st2.translation)
-
     def test_when_accessing_case_detail_a_timelinelog_is_created(self, m):
         self._setUpMocks(m)
 
@@ -1232,13 +1525,21 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.assertEqual(self.user, log.user)
         self.assertEqual(self.user, log.content_object)
 
-    def test_case_io_objects_are_retrieved_when_user_logged_in_via_digid(self, m):
+    @patch.object(
+        eSuiteVragenService,
+        "retrieve_objectcontactmomenten_for_zaak",
+        autospec=True,
+        return_value=[],
+    )
+    def test_case_io_objects_are_retrieved_when_user_logged_in_via_digid(
+        self, m, cm_client_mock
+    ):
         self._setUpMocks(m)
 
         response = self.app.get(self.case_detail_url, user=self.user)
         documents = response.context.get("case", {}).get("documents")
-        self.assertEquals(len(documents), 2)
-        self.assertEquals(
+        self.assertEqual(len(documents), 2)
+        self.assertEqual(
             documents,
             # only two visible information objects, newest first
             [self.informatie_object_file_2, self.informatie_object_file],
@@ -1264,9 +1565,16 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         user = AnonymousUser()
         response = self.app.get(self.case_detail_url, user=user)
 
+        next = reverse(
+            "cases:case_detail_content",
+            kwargs={
+                "object_id": "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
+                "api_group_id": self.api_group.id,
+            },
+        )
         self.assertRedirects(
             response,
-            f"{reverse('login')}?next={reverse('cases:case_detail_content', kwargs={'object_id': 'd8bbdeb7-770f-4ca9-b1ea-77b4730bf67d'})}",
+            f"{reverse('login')}?next={next}",
         )
 
     def test_no_access_when_no_roles_are_found_for_user_bsn(self, m):
@@ -1279,7 +1587,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         )
         # m.get(
         #     f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak['url']}",
-        #     json=[self.zaak_informatie_object, self.zaak_informatie_object_invisible],
+        #     json=[self.zaak_informatie_object_old, self.zaak_informatie_object_invisible],
         # )
         # m.get(
         #     f"{ZAKEN_ROOT}statussen?zaak={self.zaak['url']}",
@@ -1482,7 +1790,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(
             reverse(
                 "cases:case_detail_content",
-                kwargs={"object_id": self.zaak_invisible["uuid"]},
+                kwargs={
+                    "object_id": self.zaak_invisible["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
             ),
             user=self.user,
         )
@@ -1517,7 +1828,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(
             reverse(
                 "cases:case_detail_content",
-                kwargs={"object_id": self.zaak["uuid"]},
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
             ),
             user=self.user,
         )
@@ -1534,7 +1848,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.assertEqual(info_card.text.strip(), "info\n\nFoo\nbar")
 
     @patch(
-        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype"
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
+        autospec=True,
     )
     def test_expected_information_object_types_are_available_in_upload_form(
         self, m, upload
@@ -1562,21 +1877,34 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(
             reverse(
                 "cases:case_detail_content",
-                kwargs={"object_id": self.zaak["uuid"]},
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
             ),
             user=self.user,
         )
         form = response.forms["document-upload"]
         type_field = form["type"]
         expected_choices = [
-            (str(zaak_type_iotc1.id), False, zaak_type_iotc1.omschrijving),
-            (str(zaak_type_iotc2.id), False, zaak_type_iotc2.omschrijving),
+            (
+                str(zaak_type_iotc1.id),
+                False,
+                f"{zaak_type_iotc1.omschrijving} [{zaak_type_iotc1.zaaktype_config.catalogus.base_url}]",
+            ),
+            (
+                str(zaak_type_iotc2.id),
+                False,
+                f"{zaak_type_iotc2.omschrijving} [{zaak_type_iotc2.zaaktype_config.catalogus.base_url}]",
+            ),
         ]
 
+        # zaak_type_iotc1.zaaktype_config.catalogus.base_url
         self.assertEqual(sorted(type_field.options), sorted(expected_choices))
 
     @patch(
-        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_internal_file_upload_enabled"
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_internal_file_upload_enabled",
+        autospec=True,
     )
     def test_case_type_config_description_is_rendered_when_internal_upload(
         self, m, upload
@@ -1596,7 +1924,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(
             reverse(
                 "cases:case_detail_content",
-                kwargs={"object_id": self.zaak["uuid"]},
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
             ),
             user=self.user,
         )
@@ -1604,7 +1935,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.assertContains(response, _("some description content"))
 
     @patch(
-        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_internal_file_upload_enabled"
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_internal_file_upload_enabled",
+        autospec=True,
     )
     def test_fixed_text_is_rendered_when_no_description_in_internal_upload(
         self, m, upload
@@ -1630,7 +1962,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(
             reverse(
                 "cases:case_detail_content",
-                kwargs={"object_id": self.zaak["uuid"]},
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
             ),
             user=self.user,
         )
@@ -1646,7 +1981,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(
             reverse(
                 "cases:case_detail_content",
-                kwargs={"object_id": self.zaak["uuid"]},
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
             ),
             user=self.user,
         )
@@ -1662,7 +2000,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(
             reverse(
                 "cases:case_detail_content",
-                kwargs={"object_id": self.zaak["uuid"]},
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
             ),
             user=self.user,
         )
@@ -1670,10 +2011,12 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.assertNotIn("document-upload", response.forms)
 
     @patch(
-        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype"
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
+        autospec=True,
     )
-    def test_successful_document_upload_flow(self, m, upload):
+    def test_document_upload_multiple_backends(self, m, upload):
         self._setUpMocks(m)
+        self._setUpAdditionalMocks(m)
         upload.return_value = True
 
         zaak_type_config = ZaakTypeConfigFactory(
@@ -1686,35 +2029,61 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             zaaktype_uuids=[self.zaaktype["uuid"]],
             document_upload_enabled=True,
         )
+        zaak_type_config_alt = ZaakTypeConfigFactory(
+            catalogus__url=f"{ANOTHER_CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            identificatie=self.zaaktype_alt["identificatie"],
+        )
+        zaak_type_iotc_alt = ZaakTypeInformatieObjectTypeConfigFactory(
+            zaaktype_config=zaak_type_config_alt,
+            informatieobjecttype_url=self.informatie_object_alt["url"],
+            zaaktype_uuids=[self.zaaktype_alt["uuid"]],
+            document_upload_enabled=True,
+        )
 
         response = self.app.get(self.case_detail_url, user=self.user)
         form = response.forms["document-upload"]
-        form.action = reverse(
-            "cases:case_detail_document_form", kwargs={"object_id": self.zaak["uuid"]}
-        )
-        # form["title"] = "uploaded file"
-        form["type"] = zaak_type_iotc.id
-        form["file"] = Upload("upload.txt", b"data", "text/plain")
-        form_response = form.submit()
 
-        # make sure the client-side-redirect is done with the expected url
-        self.assertEqual(
-            form_response.headers["HX-Redirect"],
-            reverse("cases:case_detail", kwargs={"object_id": str(self.zaak["uuid"])}),
-        )
+        for api_group, zaak, zaak_type_iotc_ in [
+            (self.api_group, self.zaak, zaak_type_iotc),
+            (self.api_group_alt, self.zaak_alt, zaak_type_iotc_alt),
+        ]:
+            with self.subTest("Api Group {group.id}"):
+                form.action = reverse(
+                    "cases:case_detail_document_form",
+                    kwargs={
+                        "object_id": zaak["uuid"],
+                        "api_group_id": api_group.id,
+                    },
+                )
+                form["type"] = zaak_type_iotc_.id
+                form["file"] = Upload("upload.txt", b"data", "text/plain")
+                form_response = form.submit()
 
-        redirect = self.app.get(form_response.headers["HX-Redirect"])
-        redirect_messages = list(redirect.context["messages"])
+                # check client-side-redirect
+                self.assertEqual(
+                    form_response.headers["HX-Redirect"],
+                    reverse(
+                        "cases:case_detail",
+                        kwargs={
+                            "object_id": str(zaak["uuid"]),
+                            "api_group_id": api_group.id,
+                        },
+                    ),
+                )
 
-        self.assertEqual(
-            redirect_messages[0].message,
-            _("Wij hebben **1 bestand(en)** succesvol geüpload:\n\n- {title}").format(
-                title="uploaded file"
-            ),
-        )
+                redirect = self.app.get(form_response.headers["HX-Redirect"])
+                redirect_messages = list(redirect.context["messages"])
+
+                self.assertEqual(
+                    redirect_messages[0].message,
+                    _(
+                        "Wij hebben **1 bestand(en)** succesvol geüpload:\n\n- {title}"
+                    ).format(title="uploaded file"),
+                )
 
     @patch(
-        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype"
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
+        autospec=True,
     )
     def test_successful_document_upload_flow_with_uppercase_extension(self, m, upload):
         self._setUpMocks(m)
@@ -1734,7 +2103,11 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(self.case_detail_url, user=self.user)
         form = response.forms["document-upload"]
         form.action = reverse(
-            "cases:case_detail_document_form", kwargs={"object_id": self.zaak["uuid"]}
+            "cases:case_detail_document_form",
+            kwargs={
+                "object_id": self.zaak["uuid"],
+                "api_group_id": self.api_group.id,
+            },
         )
         form["type"] = zaak_type_iotc.id
         form["file"] = Upload("upload.TXT", b"data", "text/plain")
@@ -1743,7 +2116,13 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         # make sure the client-side-redirect is done with the expected url
         self.assertEqual(
             form_response.headers["HX-Redirect"],
-            reverse("cases:case_detail", kwargs={"object_id": str(self.zaak["uuid"])}),
+            reverse(
+                "cases:case_detail",
+                kwargs={
+                    "object_id": str(self.zaak["uuid"]),
+                    "api_group_id": self.api_group.id,
+                },
+            ),
         )
 
         redirect = self.app.get(form_response.headers["HX-Redirect"])
@@ -1763,7 +2142,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         )
 
     @patch(
-        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype"
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
+        autospec=True,
     )
     def test_upload_file_flow_fails_with_invalid_file_extension(self, m, upload):
         self._setUpMocks(m)
@@ -1783,7 +2163,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(
             reverse(
                 "cases:case_detail_content",
-                kwargs={"object_id": self.zaak["uuid"]},
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
             ),
             user=self.user,
         )
@@ -1802,7 +2185,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         )
 
     @patch(
-        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype"
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
+        autospec=True,
     )
     def test_upload_with_larger_file_size_fails(self, m, upload):
         self._setUpMocks(m)
@@ -1826,7 +2210,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(
             reverse(
                 "cases:case_detail_content",
-                kwargs={"object_id": self.zaak["uuid"]},
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
             ),
             user=self.user,
         )
@@ -1860,7 +2247,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(
             reverse(
                 "cases:case_detail_content",
-                kwargs={"object_id": self.zaak["uuid"]},
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
             ),
             user=self.user,
         )
@@ -1885,7 +2275,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(
             reverse(
                 "cases:case_detail_content",
-                kwargs={"object_id": self.zaak["uuid"]},
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
             ),
             user=self.user,
         )
@@ -1906,7 +2299,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(
             reverse(
                 "cases:case_detail_content",
-                kwargs={"object_id": self.zaak["uuid"]},
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
             ),
             user=self.user,
         )
@@ -1930,7 +2326,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(
             reverse(
                 "cases:case_detail_content",
-                kwargs={"object_id": self.zaak["uuid"]},
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
             ),
             user=self.user,
         )
@@ -1953,7 +2352,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(
             reverse(
                 "cases:case_detail_content",
-                kwargs={"object_id": self.zaak["uuid"]},
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
             ),
             user=self.user,
         )
@@ -1976,7 +2378,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(
             reverse(
                 "cases:case_detail_content",
-                kwargs={"object_id": self.zaak["uuid"]},
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
             ),
             user=self.user,
         )
@@ -1986,7 +2391,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         )
 
     @patch(
-        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype"
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
+        autospec=True,
     )
     def test_request_error_in_uploading_document_shows_proper_message(self, m, upload):
         self._setUpMocks(m)
@@ -2008,7 +2414,11 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(self.case_detail_url, user=self.user)
         form = response.forms["document-upload"]
         form.action = reverse(
-            "cases:case_detail_document_form", kwargs={"object_id": self.zaak["uuid"]}
+            "cases:case_detail_document_form",
+            kwargs={
+                "object_id": self.zaak["uuid"],
+                "api_group_id": self.api_group.id,
+            },
         )
         form["file"] = Upload("upload.txt", b"data", "text/plain")
         form_response = form.submit()
@@ -2016,7 +2426,13 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         # make sure the client-side-redirect is done with the expected url
         self.assertEqual(
             form_response.headers["HX-Redirect"],
-            reverse("cases:case_detail", kwargs={"object_id": str(self.zaak["uuid"])}),
+            reverse(
+                "cases:case_detail",
+                kwargs={
+                    "object_id": str(self.zaak["uuid"]),
+                    "api_group_id": self.api_group.id,
+                },
+            ),
         )
 
         redirect = self.app.get(form_response.headers["HX-Redirect"])
@@ -2030,7 +2446,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         )
 
     @patch(
-        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype"
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
+        autospec=True,
     )
     def test_request_error_in_connecting_doc_with_zaak_shows_proper_message(
         self, m, upload
@@ -2054,7 +2471,11 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(self.case_detail_url, user=self.user)
         form = response.forms["document-upload"]
         form.action = reverse(
-            "cases:case_detail_document_form", kwargs={"object_id": self.zaak["uuid"]}
+            "cases:case_detail_document_form",
+            kwargs={
+                "object_id": self.zaak["uuid"],
+                "api_group_id": self.api_group.id,
+            },
         )
         form["file"] = Upload("upload.txt", b"data", "text/plain")
         form_response = form.submit()
@@ -2068,3 +2489,131 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 f"Een fout is opgetreden bij het uploaden van {self.uploaded_informatie_object['bestandsnaam']}"
             ),
         )
+
+    def test_kcm_redirect(self, m):
+        """Check redirect from question embedded in case detail to klant_contactmoment detail"""
+
+        self._setUpMocks(m)
+
+        #
+        # extra configs + mocks
+        #
+        self.klanten_service = ServiceFactory(
+            api_root=KLANTEN_ROOT, api_type=APITypes.kc
+        )
+        self.openklant_config.klanten_service = self.klanten_service
+        self.openklant_config.save()
+
+        klant = generate_oas_component_cached(
+            "kc",
+            "schemas/Klant",
+            url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            emailadres="new@example.com",
+            telefoonnummer="0612345678",
+        )
+        klant_contactmoment = generate_oas_component_cached(
+            "cmc",
+            "schemas/Klantcontactmoment",
+            url=f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten/aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
+            klant=klant["url"],
+            contactmoment=self.contactmoment_old["url"],
+        )
+
+        m.get(
+            f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn={self.user.bsn}",
+            json=paginated_response([klant]),
+        )
+        m.get(
+            f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId={self.eherkenning_user.rsin}",
+            json=paginated_response([klant]),
+        )
+        m.get(
+            f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten?klant={klant['url']}",
+            json=paginated_response([klant_contactmoment]),
+        )
+        m.get(
+            f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten?contactmoment={self.contactmoment_old['url']}",
+            json=paginated_response([self.objectcontactmoment_old]),
+        )
+
+        #
+        # asserts
+        #
+        response = self.app.get(
+            reverse(
+                "cases:kcm_redirect",
+                kwargs={"uuid": uuid_from_url(self.contactmoment_old["url"])},
+            ),
+            user=self.user,
+        )
+        self.assertRedirects(
+            response,
+            reverse(
+                "cases:contactmoment_detail",
+                kwargs={"kcm_uuid": uuid_from_url(klant_contactmoment["url"])},
+            ),
+            status_code=302,
+            target_status_code=200,
+        )
+
+    @patch.object(
+        eSuiteVragenService,
+        "retrieve_objectcontactmomenten_for_zaak",
+        autospec=True,
+    )
+    def test_objectcontactmoment_with_contactmoment_null(self, m, cm_client_mock):
+        self.maxDiff = None
+        self._setUpMocks(m)
+
+        ocm = factory(ObjectContactMoment, self.objectcontactmoment_eherkenning)
+        ocm.contactmoment = None
+        cm_client_mock.return_value = [ocm]
+
+        response = self.app.get(self.case_detail_url, user=self.eherkenning_user)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_zaak_status_ordering(self, m):
+        self._setUpMocks(m)
+
+        status_type_intermediate = generate_oas_component_cached(
+            "ztc",
+            "schemas/StatusType",
+            url=f"{CATALOGI_ROOT}statustypen/625f373c-2828-49b3-9a29-bc36dc84d729",
+            zaaktype=self.zaaktype["url"],
+            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            omschrijving="Intermediate request",
+            omschrijvingGeneriek="some content",
+            statustekst="Modified",
+            volgnummer=2,
+            isEindstatus=False,
+        )
+        status_intermediate = generate_oas_component_cached(
+            "zrc",
+            "schemas/Status",
+            url=f"{ZAKEN_ROOT}statussen/07a4ae16-8eea-4a93-a01a-f822d7235d0c",
+            zaak=self.zaak["url"],
+            statustype=status_type_intermediate["url"],
+            datumStatusGezet="2021-02-12",
+            statustoelichting="",
+        )
+
+        for resource in [status_type_intermediate, status_intermediate]:
+            m.get(resource["url"], json=resource)
+
+        m.get(
+            f"{ZAKEN_ROOT}statussen?zaak={self.zaak['url']}",
+            json=paginated_response(
+                [status_intermediate, self.status_new, self.status_finish]
+            ),
+        )
+
+        self.config.order_statuses_by_date_set = True
+        self.config.save()
+
+        response = self.app.get(self.case_detail_url, user=self.user)
+        case = response.context.get("case")
+
+        self.assertEqual(case["statuses"][0]["label"], "Registered")
+        self.assertEqual(case["statuses"][1]["label"], "Modified")
+        self.assertEqual(case["statuses"][2]["label"], "Finish")

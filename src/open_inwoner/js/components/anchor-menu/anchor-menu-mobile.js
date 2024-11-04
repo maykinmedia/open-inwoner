@@ -9,12 +9,18 @@ export class AnchorMobile {
 
   toggleOpen(event) {
     event.preventDefault()
-    this.node.parentElement.classList.toggle('anchor-menu__list--open')
+    const isExpanded = this.node.getAttribute('aria-expanded') === 'true'
+    this.node.parentElement.classList.toggle(
+      'anchor-menu__list--open',
+      !isExpanded
+    )
+    this.node.setAttribute('aria-expanded', !isExpanded)
   }
 
   anchorClosing(event) {
     if (event.type === 'keydown' && event.key === 'Escape') {
       this.node.parentElement.classList.remove('anchor-menu__list--open')
+      this.node.setAttribute('aria-expanded', 'false')
     }
   }
 }

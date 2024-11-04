@@ -1,7 +1,8 @@
-{% load static i18n header_tags card_tags button_tags link_tags notification_tags anchor_menu_tags view_breadcrumbs utils session_tags django_htmx cms_tags menu_tags sekizai_tags %}<!DOCTYPE html>
-<html lang="nl" class="view openinwoner-theme {% block view_class %}view--{{ request.resolver_match.namespaces|join:'-' }}-{{ request.resolver_match.url_name }}{% endblock %}">
+{% load static i18n card_tags button_tags link_tags notification_tags anchor_menu_tags view_breadcrumbs utils solo_tags session_tags django_htmx cms_tags menu_tags sekizai_tags %}<!DOCTYPE html>
+<html lang="nl" class="view utrecht-document openinwoner-theme {% block view_class %}view--{{ request.resolver_match.namespaces|join:'-' }}-{{ request.resolver_match.url_name }}{% endblock %}">
     <head>
         <meta charset="utf-8">
+        <meta name="format-detection" content="telephone=no">
         <title>{% block title %}{% if page_title %}{{ page_title }} - {% endif %}{{ site_name }}{% endblock %}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -61,7 +62,7 @@
 	{% endif %}
     </head>
 
-    <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+    <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="utrecht-page">
 
         {% if cookiebanner_enabled %}
         {# render cookiebanner first #}
@@ -105,11 +106,6 @@
             {% endblock mobile_anchors %}
         {% endif %}
 
-        <div class="anchor__scroll" id="scroll-anchor">
-            <div class="anchor__scroll-link">
-                {% button href="#top" text=_("Terug naar boven") icon="arrow_upward" pill=True %}
-            </div>
-        </div>
         {% render_breadcrumbs "components/Header/Breadcrumbs.html" %}
 
         {% block header_image %}{% endblock header_image %}
@@ -142,12 +138,13 @@
             <div class="footer__header">
                 {% if footer.logo_title %}
                     <div class="footer__logo-text">
-                        <p class="p">{{ footer.logo_title|linebreaksbr }}</p>
+                        <p class="utrecht-paragraph">{{ footer.logo_title|linebreaksbr }}</p>
                     </div>
                 {% endif %}
                 {% if footer.logo %}
                     <div class="footer__logo">
-                        {% include "components/Logo/Logo.html" with src=footer.logo.url alt=footer.logo_alt href=footer.logo_url svg_height=60 only %}
+                        {% firstof footer.logo.default_alt_text config.name as footer_logo_alt_text %}
+                        {% include "components/Logo/Logo.html" with src=footer.logo.url alt=footer_logo_alt_text href=footer.logo_url svg_height=60 only %}
                     </div>
                 {% endif %}
             </div>
@@ -155,23 +152,20 @@
             <div class="footer__left wysiwyg">{% static_placeholder "footer_left" %}</div>
             <div class="footer__center wysiwyg">{% static_placeholder "footer_center" %}</div>
             <div class="footer__right wysiwyg">{% static_placeholder "footer_right" %}</div>
+
+            {% get_solo 'configurations.SiteConfiguration' as config %}
+            {% if config.kcm_survey_link_url and config.kcm_survey_link_text %}
+                <div class="kcm-survey">
+                    {% link bold=True href=config.kcm_survey_link_url text=config.kcm_survey_link_text blank=True hide_external_icon=True %}
+                </div>
+            {% endif %}
+
         </footer>
         {% endif %}
 
         {% session_timeout %}
 
-        <dialog class="modal" id="modal" aria-labelledby="modal__title" aria-describedby="modal__text">
-            <div class="modal__container">
-                <h2 class="modal__title" id="modal__title"></h2>
-                <div class="modal__text" id="modal__text"></div>
-                <div class="modal__actions" id="modal__actions">
-                    {% spaceless %}
-                        {% button text="" extra_classes="modal__button modal__close" %}
-                        {% button text="" extra_classes="modal__button modal__confirm" %}
-                    {% endspaceless %}
-                </div>
-            </div>
-        </dialog>
+        {% include "components/Modal/Modal.html" %}
 
         {% render_block "js" %}
         {% block extra_js %}{% endblock %}

@@ -1,13 +1,10 @@
-.h1,
 .utrecht-heading-1,
-.h2,
-.h3,
-.h4,
-.h5,
-.h6 {
+.utrecht-heading-2,
+.utrecht-heading-3,
+.utrecht-heading-4,
+.utrecht-heading-5,
+.utrecht-heading-6 {
   scroll-margin-top: 122px;
-
-  font-family: var(--font-family-heading);
 
   @media (min-width: 768px) {
     scroll-margin-top: var(--spacing-medium);
@@ -156,31 +153,19 @@
   }
 }
 
-/// Scroll
-.anchor {
-  &__scroll {
-    display: none;
-    position: fixed;
-    bottom: var(--spacing-large);
-    right: var(--spacing-large);
-    z-index: 1005;
+///
+/// Legacy scroll styling
+///
 
-    @media (min-width: 768px) {
-      position: static;
-      display: none;
-    }
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6 {
+  scroll-margin-top: 122px;
 
-    &-link {
-      position: static;
-
-      @media (min-width: 768px) {
-        position: static;
-        display: none;
-      }
-
-      .link {
-        border-color: transparent;
-      }
-    }
+  @media (min-width: 768px) {
+    scroll-margin-top: var(--spacing-medium);
   }
 }

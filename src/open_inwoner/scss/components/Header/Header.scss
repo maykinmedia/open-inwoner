@@ -220,7 +220,7 @@ $vm: var(--spacing-large);
     background-color: var(--color-white);
     box-sizing: border-box;
     display: none;
-    height: 100%;
+    height: 100vh;
     left: 0;
     margin: 0;
     max-height: calc(100% - (2 * var(--row-height)));
@@ -345,8 +345,8 @@ $vm: var(--spacing-large);
     width: 100%;
 
     // Cut text and display dots if username is very long
-    > .p {
-      display: inline-block !important;
+    > .utrecht-paragraph {
+      display: flex !important;
       max-width: 250px;
       overflow: hidden;
       white-space: nowrap;
@@ -366,7 +366,7 @@ $vm: var(--spacing-large);
     @media (min-width: 768px) {
       justify-content: flex-end;
 
-      > .p {
+      > .utrecht-paragraph {
         display: flex;
         max-width: initial;
         overflow: initial;
@@ -491,7 +491,7 @@ $vm: var(--spacing-large);
             margin: var(--spacing-large) 0 0 0;
             width: calc(100% - (var(--spacing-extra-large)));
 
-            .p {
+            .utrecht-paragraph {
               display: flex;
               align-items: center;
               justify-content: space-between;
@@ -544,9 +544,10 @@ $vm: var(--spacing-large);
 
               .subpage-list {
                 margin-top: var(--spacing-extra-large);
-                margin-bottom: var(--spacing-medium);
+                margin-bottom: var(--spacing-large);
                 margin-left: var(--row-height-big);
                 display: grid;
+                gap: var(--spacing-large);
                 height: auto;
                 overflow: initial;
               }

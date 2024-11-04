@@ -1,8 +1,8 @@
-{% load i18n header_tags form_tags icon_tags link_tags string_tags solo_tags menu_tags button_tags %}
+{% load i18n form_tags icon_tags link_tags string_tags solo_tags menu_tags button_tags %}
 
 {% get_solo "configurations.SiteConfiguration" as config %}
 
-<nav class="primary-navigation primary-navigation__main" aria-label="Hoofd navigatie">
+<nav class="primary-navigation primary-navigation--desktop primary-navigation__main" aria-label="Hoofd navigatie">
     <ul class="primary-navigation__list">
         {% if cms_apps.products and menu_categories %}
             {% if request.user.is_authenticated or not config.hide_categories_from_anonymous_users %}

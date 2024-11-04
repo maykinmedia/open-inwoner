@@ -1,5 +1,3 @@
-from typing import Optional, Union
-
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -46,7 +44,7 @@ class KvKConfig(SingletonModel):
         verbose_name = _("KvK configuration")
 
     @property
-    def cert(self) -> Optional[Union[str, tuple[str, str]]]:
+    def cert(self) -> str | tuple[str, str] | None:
         certificate = self.client_certificate
         if not certificate:
             return None
@@ -57,7 +55,7 @@ class KvKConfig(SingletonModel):
             return certificate.public_certificate.path
 
     @property
-    def verify(self) -> Union[bool, str]:
+    def verify(self) -> bool | str:
         certificate = self.server_certificate
         if certificate:
             return certificate.public_certificate.path

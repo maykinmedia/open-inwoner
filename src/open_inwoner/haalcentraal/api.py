@@ -2,9 +2,8 @@ import abc
 import logging
 from abc import ABC
 from datetime import datetime
-from typing import Optional
-from urllib.parse import urljoin
 
+import requests
 from glom import GlomError, glom
 from requests import RequestException
 from zgw_consumers.client import build_client
@@ -29,14 +28,14 @@ class BRPAPI(ABC):
             self._is_ready = True
 
     @abc.abstractmethod
-    def fetch_data(self, user_bsn: str) -> Optional[dict]:
+    def fetch_data(self, user_bsn: str) -> dict | None:
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def parse_data(self, data: dict) -> Optional[BRPData]:
+    def parse_data(self, data: dict) -> BRPData | None:
         raise NotImplementedError()
 
-    def fetch_brp(self, user_bsn: str) -> Optional[BRPData]:
+    def fetch_brp(self, user_bsn: str) -> BRPData | None:
         if not self._is_ready:
             return None
 
@@ -61,8 +60,8 @@ class BRPAPI(ABC):
 class BRP_1_3(BRPAPI):
     version = "1.3"
 
-    def fetch_data(self, user_bsn: str) -> Optional[dict]:
-        url = urljoin(self.client.base_url, f"ingeschrevenpersonen/{user_bsn}")
+    def fetch_data(self, user_bsn: str) -> dict | None:
+        url = f"ingeschrevenpersonen/{user_bsn}"
         headers = {
             "Accept": "application/hal+json",
         }
@@ -90,7 +89,7 @@ class BRP_1_3(BRPAPI):
             logger.exception("exception while making request", exc_info=e)
             return None
 
-    def parse_data(self, data: dict) -> Optional[BRPData]:
+    def parse_data(self, data: dict) -> BRPData | None:
         brp = BRPData(
             first_name=glom(data, "naam.voornamen", default=""),
             infix=glom(data, "naam.voorvoegsel", default=""),
@@ -116,39 +115,55 @@ class BRP_1_3(BRPAPI):
 class BRP_2_1(BRPAPI):
     version = "2.1"
 
-    def fetch_data(self, user_bsn: str) -> Optional[dict]:
-        url = urljoin(self.client.base_url, "personen")
+    def make_request(self, user_bsn: str) -> requests.Response:
+        url = "personen"
+
+        headers = {
+            "Accept": "application/json",
+            "x-gebruiker": "BurgerZelf",
+        }
+        if self.config.api_origin_oin:  # See Taiga #755
+            headers["x-origin-oin"] = self.config.api_origin_oin
+        if self.config.api_doelbinding:  # See Taiga #755
+            headers["x-doelbinding"] = self.config.api_doelbinding
+        if self.config.api_verwerking:
+            headers["x-verwerking"] = self.config.api_verwerking
+
+        response = self.client.post(
+            url=url,
+            json={
+                "fields": [
+                    "naam.geslachtsnaam",
+                    "naam.voorletters",
+                    "naam.voornamen",
+                    "naam.voorvoegsel",
+                    "geslacht.omschrijving",
+                    "geboorte.plaats.omschrijving",
+                    "geboorte.datum.datum",
+                    "verblijfplaats.verblijfadres.officieleStraatnaam",
+                    "verblijfplaats.verblijfadres.huisnummer",
+                    "verblijfplaats.verblijfadres.huisletter",
+                    "verblijfplaats.verblijfadres.huisnummertoevoeging",
+                    "verblijfplaats.verblijfadres.postcode",
+                    "verblijfplaats.verblijfadres.woonplaats",
+                ],
+                "type": "RaadpleegMetBurgerservicenummer",
+                "burgerservicenummer": [user_bsn],
+            },
+            headers=headers,
+            verify=False,
+        )
+        return response
+
+    def fetch_data(self, user_bsn) -> dict | None:
         try:
-            response = self.client.post(
-                url=url,
-                data={
-                    "fields": [
-                        "naam.geslachtsnaam",
-                        "naam.voorletters",
-                        "naam.voornamen",
-                        "naam.voorvoegsel",
-                        "geslacht.omschrijving",
-                        "geboorte.plaats.omschrijving",
-                        "geboorte.datum.datum",
-                        "verblijfplaats.verblijfadres.officieleStraatnaam",
-                        "verblijfplaats.verblijfadres.huisnummer",
-                        "verblijfplaats.verblijfadres.huisletter",
-                        "verblijfplaats.verblijfadres.huisnummertoevoeging",
-                        "verblijfplaats.verblijfadres.postcode",
-                        "verblijfplaats.verblijfadres.woonplaats",
-                    ],
-                    "type": "RaadpleegMetBurgerservicenummer",
-                    "burgerservicenummer": [user_bsn],
-                },
-                headers={"Accept": "application/json"},
-                verify=False,
-            )
+            response = self.make_request(user_bsn)
             return get_json_response(response)
         except (RequestException, ClientError) as e:
             logger.exception("exception while making request", exc_info=e)
             return None
 
-    def parse_data(self, data: dict) -> Optional[BRPData]:
+    def parse_data(self, data: dict) -> BRPData | None:
         # use first record
         if not data["personen"]:
             return None

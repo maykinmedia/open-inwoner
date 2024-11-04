@@ -1,18 +1,17 @@
-from typing import Tuple
-
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import RequestFactory
 from django.utils.module_loading import import_string
 
 from cms import api
 from cms.api import add_plugin
 from cms.app_base import CMSApp
+from cms.apphook_pool import apphook_pool
 from cms.models import Placeholder
 from cms.plugin_rendering import ContentRenderer
 
 from open_inwoner.cms.extensions.models import CommonExtension
+from open_inwoner.utils.test import SessionMiddleware
 
 
 def create_homepage():
@@ -30,7 +29,7 @@ def create_homepage():
     return p
 
 
-def _init_plugin(plugin_class, plugin_data=None) -> Tuple[dict, str]:
+def _init_plugin(plugin_class, plugin_data=None) -> tuple[dict, str]:
     if plugin_data is None:
         plugin_data = dict()
 
@@ -59,12 +58,20 @@ def get_request(*, user=None, session_vars=None):
 
 
 def render_plugin(
-    plugin_class, plugin_data=None, *, user=None, session_vars=None
-) -> Tuple[str, dict]:
+    plugin_class,
+    plugin_data=None,
+    *,
+    user=None,
+    session_vars=None,
+    request_context=None,
+) -> tuple[str, dict]:
     model_instance = _init_plugin(plugin_class, plugin_data)
     request = get_request(user=user, session_vars=session_vars)
 
     context = apply_context_processors(request)
+
+    if request_context:
+        context.update(**request_context)
 
     # note we render twice: once to get the html (to test template tags and parameters etc),
     #   and once to get the returned context (to test returned context content)
@@ -106,6 +113,7 @@ def create_apphook_page(
     extension_args: dict = None,
     config_args: dict = None,
     parent_page=None,
+    publish=True,
 ):
     p = api.create_page(
         (title or hook_class.name),
@@ -122,16 +130,15 @@ def create_apphook_page(
         extension_args["extended_object"] = p
         CommonExtension.objects.create(**extension_args)
 
-    # TODO find out why this doesn't work
     # create app_config
-    # if hook_class.app_config:
-    #     # attach it to the page for convenience
-    #     if config_args is None:
-    #         config_args = dict()
-    #     config_args["namespace"] = hook_class.app_name
-    #     p.app_config = hook_class.app_config.objects.create(**config_args)
+    if app_config := apphook_pool.get_apphook(hook_class.__name__).app_config:
+        # attach it to the page for convenience
+        if config_args is None:
+            config_args = dict()
+        config_args["namespace"] = hook_class.app_name
+        p.app_config = app_config.objects.get_or_create(**config_args)
 
-    if not p.publish("nl"):
+    if publish and not p.publish("nl"):
         raise Exception("failed to publish page")
 
     return p

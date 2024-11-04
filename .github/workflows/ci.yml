@@ -20,10 +20,13 @@ jobs:
   tests:
     name: Run the Django test suite
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        test-type: [main, elastic, openklant]
 
     services:
       postgres:
-        image: postgis/postgis:10-2.5
+        image: postgis/postgis:15-3.4
         env:
           POSTGRES_HOST_AUTH_METHOD: trust
         ports:
@@ -32,7 +35,6 @@ jobs:
         options:
           --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
           --name postgres
-
       elasticsearch:
         image: docker.elastic.co/elasticsearch/elasticsearch:7.9.2
         env:
@@ -41,13 +43,15 @@ jobs:
         ports:
           - 9200:9200
           - 9300:9300
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
 
     steps:
       - uses: actions/checkout@v3
-        with:
-          submodules: 'true'
       - name: Set up backend environment
-        uses: maykinmedia/setup-django-backend@v1
+        uses: maykinmedia/setup-django-backend@v1.3
         with:
           apt-packages: 'libxml2-dev libxmlsec1-dev libxmlsec1-openssl gettext postgresql-client libgdal-dev gdal-bin'
           python-version: '3.11'
@@ -56,20 +60,60 @@ jobs:
           setup-node: 'yes'
           npm-ci-flags: '--legacy-peer-deps'
 
-      # We temporarily disable parallel test runs due to a Django bug:
-      # https://code.djangoproject.com/ticket/32114
-      # https://github.com/django/django/pull/17650
       - name: Run tests
         run: |
-          python src/manage.py collectstatic --noinput --link
-          coverage run src/manage.py test src --exclude-tag=e2e
-
+          if [ "${{ matrix.test-type }}" = "main" ]; then
+            coverage run -p --concurrency=multiprocessing \
+              src/manage.py test src \
+              --parallel \
+              --exclude-tag=e2e \
+              --exclude-tag=elastic
+          elif [ "${{ matrix.test-type }}" = "elastic" ]; then
+            coverage run -p src/manage.py test src --tag=elastic --exclude-tag=e2e
+          elif [ "${{ matrix.test-type }}" = "openklant" ]; then
+            coverage run -m pytest --block-network --record-mode=none -vvv src/openklant2
+          else
+            echo "Error: Unknown test type '${{ matrix.test-type }}'"
+            exit 1
+          fi
         env:
           DJANGO_SETTINGS_MODULE: open_inwoner.conf.ci
           SECRET_KEY: dummy
           DB_USER: postgres
           DB_PASSWORD: ''
 
+      - name: Persist coverage data files
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.test-type }}
+          path: .coverage*
+          include-hidden-files: true
+          if-no-files-found: error
+
+  upload_coverage:
+    needs: tests
+    name: Upload coverage information to codecov
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Git repository
+        uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install coverage.py
+        # We only need coverage, but we need to match the version that was used
+        # to generate the coverage files. Grab it from the dependencies.
+        run: grep "^coverage" requirements/ci.txt | xargs -r pip install
+      - uses: actions/download-artifact@v4
+        with:
+          path: coverages
+      - name: Combine the coverage files
+        run: |
+          mv coverages/main/.coverage* .
+          mv coverages/elastic/.coverage* .
+          mv coverages/openklant/.coverage* .
+          coverage combine
       - name: Publish coverage report
         uses: codecov/codecov-action@v3
         with:
@@ -92,7 +136,7 @@ jobs:
 
     services:
       postgres:
-        image: postgis/postgis:10-2.5
+        image: postgis/postgis:15-3.4
         env:
           POSTGRES_HOST_AUTH_METHOD: trust
         ports:
@@ -101,7 +145,6 @@ jobs:
         options:
           --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
           --name postgres
-
       elasticsearch:
         image: docker.elastic.co/elasticsearch/elasticsearch:7.9.2
         env:
@@ -113,8 +156,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-        with:
-          submodules: 'true'
       - name: Set up backend environment
         uses: maykinmedia/setup-django-backend@v1
         with:
@@ -124,15 +165,6 @@ jobs:
           pg-service: 'postgres'
           setup-node: 'yes'
           npm-ci-flags: '--legacy-peer-deps'
-
-      # See https://playwright.dev/python/docs/ci#caching-browsers
-      - name: Cache Playwright browser
-        id: cache-browser
-        uses: actions/cache@v3
-        with:
-          path: /home/runner/.cache/ms-playwright
-          key:
-            ${{ runner.os }}-${{ matrix.browser }}-playwright-${{ hashFiles('requirements/ci.txt') }}
 
       - name: Install playwright deps
         run: playwright install --with-deps ${{ matrix.browser }}
@@ -149,6 +181,49 @@ jobs:
           E2E_DRIVER: ${{ matrix.browser }}
 
   #
+  # Docs
+  #
+  docs:
+    name: Build and check documentation
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: 'true'
+      - name: Set up backend environment
+        uses: maykinmedia/setup-django-backend@v1
+        with:
+          apt-packages: 'libxml2-dev libxmlsec1-dev libxmlsec1-openssl gettext libgdal-dev gdal-bin graphviz'
+          python-version: '3.11'
+          setup-node: 'no'
+
+      - name: Build and test docs
+        run: |
+          export OPENSSL_CONF=$(pwd)/openssl.conf
+          pytest check_sphinx.py -v --tb=auto
+        working-directory: docs
+
+  setup-config-docs:
+    name: Check that documentation for configuration steps is up-to-date
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: 'true'
+      - name: Set up backend environment
+        uses: maykinmedia/setup-django-backend@v1
+        with:
+          apt-packages: 'libxml2-dev libxmlsec1-dev libxmlsec1-openssl gettext libgdal-dev gdal-bin graphviz'
+          python-version: '3.11'
+          setup-node: 'no'
+
+      - name: Build docs for django-setup-configuration steps
+        run: |
+          python src/manage.py generate_config_docs --dry-run
+
+  #
   # Docker
   #
   docker:
@@ -159,9 +234,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-        with:
-          submodules: 'true'
-
       - name: Set tag
         id: vars
         run: |

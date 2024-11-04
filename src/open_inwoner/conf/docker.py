@@ -13,3 +13,6 @@ os.environ.setdefault("LOG_STDOUT", "yes")
 # os.environ.setdefault("ALLOWED_HOSTS", "*")
 
 from .production import *  # noqa isort:skip
+
+if config("DISABLE_2FA", default=False, cast=bool):
+    MAYKIN_2FA_ALLOW_MFA_BYPASS_BACKENDS = AUTHENTICATION_BACKENDS

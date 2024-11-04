@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib import messages
 from django.core.paginator import InvalidPage, Paginator
 from django.http import Http404
@@ -9,13 +11,16 @@ from django.views.generic import FormView
 from furl import furl
 
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.openzaak.clients import build_client
+from open_inwoner.openzaak.clients import MultiZgwClientProxy, build_zaken_clients
+from open_inwoner.openzaak.models import ZGWApiGroupConfig
 from open_inwoner.openzaak.utils import get_user_fetch_parameters
 from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import CommonPageMixin, LoginMaybeRequiredMixin, LogMixin
 
 from .forms import FeedbackForm, SearchForm
 from .searches import search_products
+
+logger = logging.getLogger(__name__)
 
 
 class SearchView(
@@ -64,13 +69,33 @@ class SearchView(
 
         # Check if the query exactly matches with a case that belongs to the user
         if search_params := get_user_fetch_parameters(self.request):
-            if client := build_client("zaak"):
-                cases = client.fetch_cases(**search_params, identificatie=query)
-                if cases and len(cases) == 1:
+            clients = build_zaken_clients()
+            proxy_result = MultiZgwClientProxy(clients)
+            proxy_result = proxy_result.fetch_cases(
+                **search_params,
+                identificatie=query,
+            )
+            if proxy_result.has_errors:
+                self.log_system_action("unable to retrieve cases", user=user)
+
+            # TODO: We should simply return multiple cases in the search results,
+            # rather than redirect. For now, we maintain the existing behavior
+            # by returning and redirect to the first case found, if any.
+            if len(proxy_result.join_results()) > 1:
+                logger.error("found multiple cases for a single set of search params")
+
+            for case_result in proxy_result.successful_responses:
+                if case_result.result:
+                    api_group = ZGWApiGroupConfig.objects.resolve_group_from_hints(
+                        client=case_result.client
+                    )
                     return HttpResponseRedirect(
                         reverse(
                             "cases:case_detail",
-                            kwargs={"object_id": str(cases[0].uuid)},
+                            kwargs={
+                                "object_id": str(case_result.result[0].uuid),
+                                "api_group_id": api_group.id,
+                            },
                         )
                     )
 
@@ -155,7 +180,7 @@ class SearchView(
             self.request,
             messages.SUCCESS,
             _(
-                "Thank you for your feedback. It will help us to improve our search engine"
+                "Thank you for your feedback, it will help us improve our search engine."
             ),
         )
         redirect = furl(reverse("search:search"))

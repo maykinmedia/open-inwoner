@@ -1,5 +1,3 @@
-from typing import Dict, List
-
 from .models import CSPSetting
 
 
@@ -12,7 +10,7 @@ class UpdateCSPMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
-    def get_csp_update(self) -> Dict[str, List[str]]:
+    def get_csp_update(self) -> dict[str, list[str]]:
         update = dict()
 
         # known standard stuff from commonn settings
@@ -33,7 +31,7 @@ class UpdateCSPMiddleware:
             return response
 
         # we're basically copying/extending the @csp_update decorator
-        update = dict((k.lower().replace("_", "-"), v) for k, v in update.items())
+        update = {k.lower().replace("_", "-"): v for k, v in update.items()}
 
         # cooperate with possible data from actual decorator
         have = getattr(response, "_csp_update", None)
@@ -45,7 +43,7 @@ class UpdateCSPMiddleware:
         return response
 
 
-def _merge_list_values(left, right) -> List[str]:
+def _merge_list_values(left, right) -> list[str]:
     # combine strings or lists to a list with unique values
     if isinstance(left, str):
         left = [left]

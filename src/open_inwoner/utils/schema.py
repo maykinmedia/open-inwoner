@@ -1,4 +1,4 @@
-from typing import List, Type
+from typing import Type
 
 from drf_spectacular.plumbing import force_instance
 from drf_spectacular.utils import OpenApiParameter
@@ -7,7 +7,7 @@ from rest_framework import serializers
 
 def input_serializer_to_parameters(
     serializer_class: Type[serializers.Serializer],
-) -> List[OpenApiParameter]:
+) -> list[OpenApiParameter]:
     serializer = force_instance(serializer_class)
     parameters = []
 

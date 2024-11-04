@@ -6,10 +6,12 @@
 {% endblock header_image %}
 
 {% block content %}
-    <h1 class="h1">
-        {% trans "Samenwerken" %}
+    <header class="oip-header-group">
+        <h1 class="utrecht-heading-1">
+            {% trans "Samenwerken" %}
+        </h1>
         {% button href="collaborate:plan_create" text=_("Start nieuwe samenwerking") primary=True icon="group" icon_outlined=True %}
-    </h1>
+    </header>
     {% optional_paragraph configurable_text.plans_page.plans_intro %}
 
     {% if plans.extended_plans %}
@@ -19,7 +21,7 @@
                 {% button text=_("Filter") type="button" bordered=True %}
             </div>
             <div class="plan-filter__container filter__container">
-                <p class="p">{% trans "Filter op:" %}</p>
+                <p class="utrecht-paragraph">{% trans "Filter op:" %}</p>
                 {% input plan_filter_form.plan_contacts no_label=True no_help=True icon="person" %}
                 {% input plan_filter_form.status no_label=True no_help=True icon="expand_more" %}
                 <div class="plan-filter__search-container">

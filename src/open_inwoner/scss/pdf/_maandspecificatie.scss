@@ -7,12 +7,14 @@
 
 .monthly-report {
   box-sizing: border-box;
+  font-family: sans-serif;
 
   .header {
     min-height: 50px;
   }
 
   .monthly-report__p {
+    font-family: sans-serif;
     font-size: 11px;
   }
 
@@ -21,7 +23,8 @@
     display: flex;
     justify-content: space-between;
 
-    .h1 {
+    .uitkeringen-heading-1 {
+      font-family: sans-serif;
       font-size: 20px;
       font-weight: normal;
       margin: 0;
@@ -61,6 +64,7 @@
   }
 
   .monthly-report__td {
+    font-family: sans-serif;
     font-size: 10px;
     padding: 0.3em;
   }
@@ -93,6 +97,7 @@
   }
 
   .section-title {
+    font-family: sans-serif;
     font-size: 10px;
     font-weight: bold;
     padding: 15px 0 5px 0;

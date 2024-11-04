@@ -1,25 +1,34 @@
+import logging
+import warnings
 from datetime import timedelta
+from typing import Protocol, cast
+from urllib.parse import urlparse
 
-from django.db import models
-from django.db.models import Q, UniqueConstraint
+from django.db import models, transaction
+from django.db.models import UniqueConstraint
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from django_better_admin_arrayfield.models.fields import ArrayField
+from django_jsonform.models.fields import ArrayField
 from furl import furl
 from solo.models import SingletonModel
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 from zgw_consumers.constants import APITypes
+from zgw_consumers.models import Service
 
 from open_inwoner.openzaak.managers import (
-    StatusTranslationQuerySet,
+    CatalogusConfigManager,
     UserCaseInfoObjectNotificationManager,
     UserCaseStatusNotificationManager,
     ZaakTypeConfigQueryset,
     ZaakTypeInformatieObjectTypeConfigQueryset,
+    ZaakTypeResultaatTypeConfigManger,
+    ZaakTypeStatusTypeConfigQuerySet,
 )
 
 from .constants import StatusIndicators
+
+logger = logging.getLogger(__name__)
 
 
 def generate_default_file_extensions():
@@ -46,44 +55,314 @@ def generate_default_file_extensions():
     )
 
 
+class _ZgwClient(Protocol):  # Typing helper to avoid circular imports from .clients
+    configured_from: Service
+
+
+class ZGWApiGroupConfigQuerySet(models.QuerySet):
+    def resolve_group_from_hints(
+        self,
+        *,
+        service: Service | None = None,
+        client: _ZgwClient | None = None,
+        url: str | None = None,
+    ):
+        """Resolve the group based on the provided hints.
+
+        This method will raise if the hints resolve to none or more than 1
+        ZGWApiGroupConfig instances.
+        """
+        qs = self.all()
+        strategies_with_multiple_results = []
+
+        # Priority matters here: the strategies are tried in descending order
+        # of certainty, beginning with the simplest case. If there is only
+        # group, there is nothing to resolve.
+        if qs.count() == 1:
+            logger.debug("Resolved ZGWApiGroupConfig to only option")
+            return qs.first()
+
+        if service:
+            service_strategy_qs = qs.filter_by_service(service=service)
+            if (service_strategy_qs_count := service_strategy_qs.count()) == 1:
+                logger.debug("Resolved ZGWApiGroupConfig based on service")
+                return service_strategy_qs.first()
+
+            if service_strategy_qs_count > 1:
+                strategies_with_multiple_results.append("service")
+
+        if client:
+            zgw_client_strategy_qs = qs.filter_by_zgw_client(client)
+            if (zgw_client_strategy_qs_count := zgw_client_strategy_qs.count()) == 1:
+                logger.debug("Resolved ZGWApiGroupConfig based on zgw client")
+                return zgw_client_strategy_qs.first()
+
+            if zgw_client_strategy_qs_count > 1:
+                strategies_with_multiple_results.append("client")
+
+        if url:
+            url_strategy_qs = qs.filter_by_url_root_overlap(url)
+            if (url_strategy_qs_count := url_strategy_qs.count()) == 1:
+                logger.debug("Resolved ZGWApiGroupConfig by url")
+                return url_strategy_qs.first()
+
+            if url_strategy_qs_count > 1:
+                strategies_with_multiple_results.append("url")
+
+        if strategies_with_multiple_results:
+            # This shouldn't happen in the wild, but it's hard to predict without production
+            # usage, so this is solely to ensure we get a Sentry ping.
+            # Also: https://www.xkcd.com/2200/
+            logger.error(
+                "Strategies for resolving ZGWApiGroupConfig yielded multiple results for "
+                "strategies: %s",
+                strategies_with_multiple_results,
+            )
+            raise ZGWApiGroupConfig.MultipleObjectsReturned
+
+        raise ZGWApiGroupConfig.DoesNotExist
+
+    def filter_by_service(self, service: Service):
+        return self.filter(
+            models.Q(zrc_service=service)
+            | models.Q(ztc_service=service)
+            | models.Q(drc_service=service)
+            | models.Q(form_service=service)
+        )
+
+    def filter_by_zgw_client(self, client: _ZgwClient):
+        from .clients import CatalogiClient, DocumentenClient, FormClient, ZakenClient
+
+        match client:
+            case ZakenClient():
+                return self.filter(zrc_service=client.configured_from)
+            case CatalogiClient():
+                return self.filter(ztc_service=client.configured_from)
+            case DocumentenClient():
+                return self.filter(drc_service=client.configured_from)
+            case FormClient():
+                return self.filter(form_service=client.configured_from)
+            case _:
+                raise ValueError(
+                    f"Client is of type {type(client)} but expected to be one of: "
+                    "ZakenClient, DocumentenClient, FormClient, CatalogiClient"
+                )
+
+    def filter_by_url_root_overlap(self, url: str):
+        filtered_group_ids = set()
+        for group in self.all():
+            for field in ("form_service", "zrc_service", "drc_service", "ztc_service"):
+                service = getattr(group, f"{field}", None)
+                if not service:
+                    continue
+
+                parsed_service_root = urlparse(service.api_root)
+                parsed_url = urlparse(url)
+
+                same_netloc = parsed_service_root.netloc == parsed_url.netloc
+                same_protocol = parsed_service_root.scheme == parsed_url.scheme
+
+                if same_netloc and same_protocol:
+                    filtered_group_ids.add(group.id)
+
+        return self.filter(id__in=filtered_group_ids)
+
+
+class ZGWApiGroupConfig(models.Model):
+    """A set of of ZGW service configurations."""
+
+    objects = models.Manager.from_queryset(ZGWApiGroupConfigQuerySet)()
+
+    open_zaak_config = models.ForeignKey(
+        "openzaak.OpenZaakConfig", on_delete=models.PROTECT, related_name="api_groups"
+    )
+
+    name = models.CharField(
+        _("name"),
+        max_length=255,
+        help_text=_("A recognisable name for this set of ZGW APIs."),
+    )
+    zrc_service = models.ForeignKey(
+        "zgw_consumers.Service",
+        verbose_name=_("Zaken API"),
+        on_delete=models.PROTECT,
+        limit_choices_to={"api_type": APITypes.zrc},
+        related_name="zgwset_zrc_config",
+        null=False,
+        blank=False,
+    )
+
+    def _build_client_from_attr(self, attr: str):
+        from .clients import build_zgw_client_from_service
+
+        return build_zgw_client_from_service(getattr(self, attr))
+
+    @property
+    def zaken_client(self):
+        from .clients import ZakenClient
+
+        return cast(ZakenClient, self._build_client_from_attr("zrc_service"))
+
+    drc_service = models.ForeignKey(
+        "zgw_consumers.Service",
+        verbose_name=_("Documenten API"),
+        on_delete=models.PROTECT,
+        limit_choices_to={"api_type": APITypes.drc},
+        related_name="zgwset_drc_config",
+        null=False,
+        blank=False,
+    )
+
+    @property
+    def documenten_client(self):
+        from .clients import DocumentenClient
+
+        return cast(DocumentenClient, self._build_client_from_attr("drc_service"))
+
+    ztc_service = models.ForeignKey(
+        "zgw_consumers.Service",
+        verbose_name=_("Catalogi API"),
+        on_delete=models.PROTECT,
+        limit_choices_to={"api_type": APITypes.ztc},
+        related_name="zgwset_ztc_config",
+        null=False,
+        blank=False,
+    )
+
+    @property
+    def catalogi_client(self):
+        from .clients import CatalogiClient
+
+        return cast(CatalogiClient, self._build_client_from_attr("ztc_service"))
+
+    form_service = models.OneToOneField(
+        "zgw_consumers.Service",
+        verbose_name=_("Form API"),
+        on_delete=models.PROTECT,
+        limit_choices_to={"api_type": APITypes.orc},
+        related_name="zgwset_orc_form_config",
+        null=True,
+        blank=True,
+    )
+
+    @property
+    def forms_client(self):
+        from .clients import FormClient
+
+        if self.form_service:
+            return cast(FormClient, self._build_client_from_attr("form_service"))
+
+    class Meta:
+        verbose_name = _("ZGW API set")
+        verbose_name_plural = _("ZGW API sets")
+
+    def __str__(self):
+        return self.name
+
+
+# This will help us track legacy invocations of the root-level service config
+_default_zgw_api_group_deprecation_message = (
+    "This usage of `default_zgw_api_group` should be refactored to "
+    "support multiple ZGW backends"
+)
+
+warnings.filterwarnings(
+    "once", _default_zgw_api_group_deprecation_message, category=DeprecationWarning
+)
+
+
 class OpenZaakConfig(SingletonModel):
     """
     Global configuration and defaults for zaken and catalogi services.
     """
 
-    zaak_service = models.OneToOneField(
-        "zgw_consumers.Service",
-        verbose_name=_("Open Zaak API"),
-        on_delete=models.PROTECT,
-        limit_choices_to={"api_type": APITypes.zrc},
-        related_name="+",
-        blank=True,
-        null=True,
-    )
+    @property
+    def default_zgw_api_group(self):
+        # TODO: This is a temporary solution to the new mult-backend
+        # ZGW configuration to avoid breaking the existing API.
+        # The *_service fields are proxied through this field to
+        # avoid having two sources of truth regarding the configured
+        # ZGW services. The legacy code will simply have a single
+        # backend configured and retrieve this through the proxy.
+
+        if (api_groups_count := self.api_groups.count()) == 0:
+            return None
+
+        if api_groups_count > 0:
+            warnings.warn(
+                _default_zgw_api_group_deprecation_message,
+                DeprecationWarning,
+            )
+
+            return self.api_groups.first()
+
+    def _set_zgw_service(self, field: str, service):
+        if self.pk is None:
+            raise ValueError(
+                f"Please save your {self.__class__} instance before setting services"
+            )
+
+        with transaction.atomic():
+            if self.default_zgw_api_group is None:
+                raise RuntimeError(
+                    "You must define a default set of ZGW APIs before you can access them "
+                    "using the legacy `*_client` getters/setters."
+                )
+
+            default_group = self.default_zgw_api_group
+            setattr(default_group, field, service)
+            default_group.save()
+
+            return getattr(default_group, field)
+
+    @property
+    def zaak_service(self):
+        if self.default_zgw_api_group is None:
+            return None
+
+        return self.default_zgw_api_group.zrc_service
+
+    @zaak_service.setter
+    def zaak_service(self, service):
+        return self._set_zgw_service("zrc_service", service)
+
+    @property
+    def catalogi_service(self):
+        if self.default_zgw_api_group is None:
+            return None
+        return self.default_zgw_api_group.ztc_service
+
+    @catalogi_service.setter
+    def catalogi_service(self, service):
+        return self._set_zgw_service("ztc_service", service)
+
+    @property
+    def document_service(self):
+        if self.default_zgw_api_group is None:
+            return None
+        return self.default_zgw_api_group.drc_service
+
+    @document_service.setter
+    def document_service(self, service):
+        return self._set_zgw_service("drc_service", service)
+
+    @property
+    def form_service(self):
+        if self.default_zgw_api_group is None:
+            return None
+
+        return self.default_zgw_api_group.form_service
+
+    @form_service.setter
+    def form_service(self, service):
+        return self._set_zgw_service("form_service", service)
+
     zaak_max_confidentiality = models.CharField(
         max_length=32,
         choices=VertrouwelijkheidsAanduidingen.choices,
         default=VertrouwelijkheidsAanduidingen.openbaar,
         verbose_name=_("Case confidentiality"),
         help_text=_("Select maximum confidentiality level of cases"),
-    )
-    catalogi_service = models.OneToOneField(
-        "zgw_consumers.Service",
-        verbose_name=_("Catalogi API"),
-        on_delete=models.PROTECT,
-        limit_choices_to={"api_type": APITypes.ztc},
-        related_name="+",
-        blank=True,
-        null=True,
-    )
-    document_service = models.OneToOneField(
-        "zgw_consumers.Service",
-        verbose_name=_("Documents API"),
-        on_delete=models.PROTECT,
-        limit_choices_to={"api_type": APITypes.drc},
-        related_name="+",
-        blank=True,
-        null=True,
     )
     document_max_confidentiality = models.CharField(
         max_length=32,
@@ -104,15 +383,6 @@ class OpenZaakConfig(SingletonModel):
         ),
         default=generate_default_file_extensions,
         help_text=_("A list of the allowed file extensions."),
-    )
-    form_service = models.OneToOneField(
-        "zgw_consumers.Service",
-        verbose_name=_("Form API"),
-        on_delete=models.PROTECT,
-        limit_choices_to={"api_type": APITypes.orc},
-        related_name="+",
-        blank=True,
-        null=True,
     )
 
     skip_notification_statustype_informeren = models.BooleanField(
@@ -139,7 +409,33 @@ class OpenZaakConfig(SingletonModel):
             "If enabled, Zaken for eHerkenning users are fetched using the company RSIN (Open Zaak). "
             "If not enabled, Zaken are fetched using the KvK number (eSuite)."
         ),
-        default=True,
+        default=False,
+    )
+
+    use_zaak_omschrijving_as_title = models.BooleanField(
+        verbose_name=_(
+            "Make use of zaak.omschrijving for the title of the cases instead of "
+            "zaaktype.omschrijving (eSuite)"
+        ),
+        help_text=_(
+            "If enabled, we use zaak.omschrijving for the title of the cases, and use "
+            "zaaktype.omschrijving as a fallback in case it is not filled in. "
+            "If not enabled, we ignore zaak.omschrijving and always use zaaktype.omschrijving."
+        ),
+        default=False,
+    )
+
+    order_statuses_by_date_set = models.BooleanField(
+        verbose_name=_(
+            "On the detail page of the case, order the statuses based on the date they have been set"
+        ),
+        help_text=_(
+            "If enabled, the statuses of a case are ordered based on 'datum_status_gezet'. "
+            "If not enabled, we show the statuses in the reverse order they are returned via the API, "
+            "this because the eSuite does not return the timestamps of the statuses (eSuite, but also "
+            "works for Open Zaak)."
+        ),
+        default=False,
     )
 
     title_text = models.TextField(
@@ -168,12 +464,20 @@ class OpenZaakConfig(SingletonModel):
         default=15,
         help_text=_("Aantal dagen voor gebruiker om actie te ondernemen."),
     )
+    zaken_filter_enabled = models.BooleanField(
+        verbose_name=_("Enable zaken filter"),
+        default=False,
+        help_text=_("Give users the option to filter zaken by status"),
+    )
 
     class Meta:
         verbose_name = _("Open Zaak configuration")
 
 
 class CatalogusConfig(models.Model):
+
+    objects = CatalogusConfigManager()
+
     url = models.URLField(
         verbose_name=_("Catalogus URL"),
         unique=True,
@@ -186,12 +490,28 @@ class CatalogusConfig(models.Model):
         verbose_name=_("RSIN"),
         max_length=9,
     )
+    service = models.ForeignKey(
+        "zgw_consumers.Service",
+        verbose_name=_("Catalogus API"),
+        on_delete=models.PROTECT,
+        limit_choices_to={"api_type": APITypes.ztc},
+        related_name="catalogus_configs",
+        null=False,
+    )
 
     class Meta:
         ordering = ("domein", "rsin")
 
+    @property
+    def base_url(self):
+        service_netloc = urlparse(self.service.api_root).netloc
+        return service_netloc
+
     def __str__(self):
-        return f"{self.domein} - {self.rsin}"
+        return f"{self.domein} - {self.rsin} [{self.base_url}]"
+
+    def natural_key(self) -> tuple[str]:
+        return (self.url,)
 
 
 class ZaakTypeConfig(models.Model):
@@ -204,7 +524,6 @@ class ZaakTypeConfig(models.Model):
     catalogus = models.ForeignKey(
         "openzaak.CatalogusConfig",
         on_delete=models.CASCADE,
-        null=True,
     )
 
     identificatie = models.CharField(
@@ -274,28 +593,24 @@ class ZaakTypeConfig(models.Model):
             UniqueConstraint(
                 name="unique_identificatie_in_catalogus",
                 fields=["catalogus", "identificatie"],
-                condition=Q(catalogus__isnull=False),
-            ),
-            UniqueConstraint(
-                name="unique_identificatie_without_catalogus",
-                fields=["identificatie"],
-                condition=Q(catalogus__isnull=True),
             ),
         ]
 
     @property
     def catalogus_url(self):
-        if self.catalogus_id:
-            return self.catalogus.url
-        else:
-            return None
+        return self.catalogus.url
 
     def __str__(self):
         bits = (
             self.identificatie,
             self.omschrijving,
         )
-        return " - ".join(b for b in bits if b)
+        return " - ".join(b for b in bits if b) + f" [{self.catalogus.base_url}]"
+
+    def natural_key(self):
+        return (self.identificatie,) + self.catalogus.natural_key()
+
+    natural_key.dependencies = ["openzaak.catalogusconfig"]
 
 
 class ZaakTypeInformatieObjectTypeConfig(models.Model):
@@ -358,7 +673,12 @@ class ZaakTypeInformatieObjectTypeConfig(models.Model):
     informatieobjecttype_uuid.short_description = _("Information object UUID")
 
     def __str__(self):
-        return self.omschrijving
+        return f"{self.omschrijving} [{self.zaaktype_config.catalogus.base_url}]"
+
+    def natural_key(self):
+        return (self.informatieobjecttype_url,) + self.zaaktype_config.natural_key()
+
+    natural_key.dependencies = ["openzaak.zaaktypeconfig"]
 
 
 class ZaakTypeStatusTypeConfig(models.Model):
@@ -465,6 +785,8 @@ class ZaakTypeStatusTypeConfig(models.Model):
         ),
     )
 
+    objects = ZaakTypeStatusTypeConfigQuerySet.as_manager()
+
     class Meta:
         verbose_name = _("Zaaktype Statustype Configuration")
 
@@ -476,10 +798,17 @@ class ZaakTypeStatusTypeConfig(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.zaaktype_config.identificatie} - {self.omschrijving}"
+        return f"{self.zaaktype_config.identificatie} - {self.omschrijving} [{self.zaaktype_config.catalogus.base_url}]"
+
+    def natural_key(self):
+        return (self.statustype_url,) + self.zaaktype_config.natural_key()
+
+    natural_key.dependencies = ["openzaak.zaaktypeconfig"]
 
 
 class ZaakTypeResultaatTypeConfig(models.Model):
+    objects = ZaakTypeResultaatTypeConfigManger()
+
     zaaktype_config = models.ForeignKey(
         "openzaak.ZaakTypeConfig",
         on_delete=models.CASCADE,
@@ -490,7 +819,7 @@ class ZaakTypeResultaatTypeConfig(models.Model):
     )
     omschrijving = models.CharField(
         verbose_name=_("Omschrijving"),
-        max_length=20,
+        max_length=200,
     )
     zaaktype_uuids = ArrayField(
         models.UUIDField(
@@ -520,7 +849,12 @@ class ZaakTypeResultaatTypeConfig(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.zaaktype_config.identificatie} - {self.omschrijving}"
+        return f"{self.zaaktype_config.identificatie} - {self.omschrijving} [{self.zaaktype_config.catalogus.base_url}]"
+
+    def natural_key(self):
+        return (self.resultaattype_url,) + self.zaaktype_config.natural_key()
+
+    natural_key.dependencies = ["openzaak.zaaktypeconfig"]
 
 
 class UserCaseStatusNotificationBase(models.Model):
@@ -535,6 +869,7 @@ class UserCaseStatusNotificationBase(models.Model):
         verbose_name=_("Created on"), default=timezone.now
     )
     is_sent = models.BooleanField(_("Is sent"), default=False)
+    collision_key = models.CharField(_("Collision key"), blank=True, max_length=255)
 
     def mark_sent(self):
         self.is_sent = True
@@ -560,11 +895,11 @@ class UserCaseStatusNotification(UserCaseStatusNotificationBase):
             )
         ]
 
-    def has_received_similar_notes_within(self, period: timedelta) -> bool:
+    def has_received_similar_notes_within(
+        self, period: timedelta, collision_key: str
+    ) -> bool:
         return UserCaseStatusNotification.objects.has_received_similar_notes_within(
-            self.user, self.case_uuid, period, not_record_id=self.id
-        ) or UserCaseInfoObjectNotification.objects.has_received_similar_notes_within(
-            self.user, self.case_uuid, period
+            self.user, self.case_uuid, period, collision_key, not_record_id=self.id
         )
 
 
@@ -584,27 +919,9 @@ class UserCaseInfoObjectNotification(UserCaseStatusNotificationBase):
             )
         ]
 
-    def has_received_similar_notes_within(self, period: timedelta) -> bool:
+    def has_received_similar_notes_within(
+        self, period: timedelta, collision_key: str
+    ) -> bool:
         return UserCaseInfoObjectNotification.objects.has_received_similar_notes_within(
-            self.user, self.case_uuid, period, not_record_id=self.id
-        ) or UserCaseStatusNotification.objects.has_received_similar_notes_within(
-            self.user, self.case_uuid, period
+            self.user, self.case_uuid, period, collision_key, not_record_id=self.id
         )
-
-
-class StatusTranslation(models.Model):
-    status = models.CharField(
-        verbose_name=_("Status tekst"),
-        max_length=255,
-        unique=True,
-    )
-    translation = models.CharField(
-        verbose_name=_("Vertaling"),
-        max_length=255,
-    )
-
-    objects = StatusTranslationQuerySet.as_manager()
-
-    class Meta:
-        verbose_name = _("Status vertaling")
-        verbose_name_plural = _("Status vertalingen")

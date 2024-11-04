@@ -10,6 +10,7 @@ def mail_context():
     """
     context = {}
     config = SiteConfiguration.get_solo()
+    context["site_name"] = config.name or "Open Inwoner Platform"
     context["logo"] = config.email_logo
     context["theming"] = {
         "primary_color": config.primary_color,
@@ -29,7 +30,7 @@ def mail_context():
         context["profile_notifications"] = ""
         context["profile_page"] = ""
 
-    # if a contact page exists it is a FlatPage
-    context["contactpage"] = "????"
+    context["contact_page"] = config.contact_page
+    context["contact_phonenumber"] = config.contact_phonenumber
 
     return context

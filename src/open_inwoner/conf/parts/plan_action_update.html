@@ -1,24 +1,76 @@
-<p>Dear</p>
-<p>You are receiving this email because the action in your <a href="{{ plan_url }}">plan</a> was updated.</p>
-
-<table>
+<table role="presentation" border="0" cellspacing="0" cellpadding="0" width="100%" class="table-mail">
+    <tbody>
     <tr>
-        <th>Action name</th>
-        <td>{{ action.name }}</td>
+        <td class="td-mail td__padding-all" colspan="6">
+            <p>Beste inwoner,</p>
+            <p>U ontvangt deze e-mail omdat een actie in uw <a href="{{ plan_url }}">samenwerkingsplan</a> is bijgewerkt.</p>
+        </td>
     </tr>
     <tr>
-        <th>Plan</th>
-        <td><a href="{{ plan_url }}">{{ plan.title }}</a></td>
+        <td class="td-mail td__padding-left td__padding-right" colspan="6">
+            <table width="598" class="table-mail--lined">
+                <tr>
+                    <td><strong>Actie naam</strong></td>
+                    <td>{{ action.name }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Plan</strong></td>
+                    <td><a href="{{ plan_url }}">{{ plan.title }}</a></td>
+                </tr>
+                <tr>
+                    <td><strong>Bijgewerkt op</strong></td>
+                    <td>{{ action.updated_on }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Details</strong></td>
+                    <td>{{ message }}</td>
+                </tr>
+            </table>
+        </td>
     </tr>
     <tr>
-        <th>Updated at</th>
-        <td>{{ action.updated_on }}</td>
+        <td class="td-mail td__padding-right td__padding-left" colspan="6">
+            <p><a href="{{ plan_url }}" class="button--primary">Ga naar samenwerkingsplan</a></p>
+        </td>
     </tr>
     <tr>
-        <th>Details</th>
-        <td>{{ message }}</td>
+        <td class="spacing__extra" colspan="6">
+            &nbsp;
+        </td>
     </tr>
+    <tr>
+        <td class="td-mail td__padding-all" colspan="6">
+            <p>Met vriendelijke groet,</p>
+            <p>&nbsp;</p>
+            <p>{{ site_name }}</p>
+        </td>
+    </tr>
+    <tr class="tr-mail">
+        <td class="td-mail spacer-bottom td__padding-zero" colspan="6">
+            <!-- <hr> styling -->
+        </td>
+    </tr>
+    <tr>
+        <td class="td-mail td__padding-top td__padding-right td__padding-left" colspan="6">
+            <p>Dit bericht is automatisch verzonden. U kunt <strong>niet reageren</strong> op deze e-mail. </p>
+            <p>&nbsp;</p>
+            <p><strong>Contact opnemen</strong></p>
+        </td>
+    </tr>
+    <tr>
+        <td class="td--responsive td-mail td__padding-right td__padding-bottom td__padding-left td__leftcell" colspan="2"><p><a href="{{ contact_page }}">Ga naar onze contactpagina</a></p>
+        </td>
+        <td class="td--responsive td-mail td__padding-right td__padding-bottom td__padding-left td__rightcell td__nowrap" colspan="4"><p><a href="tel:{{ contact_phonenumber }}" data-rel="external">Bel {{ contact_phonenumber }}</a></p></td>
+    </tr>
+    <tr class="tr-mail border-top">
+        <td class="td-mail border-top td__padding-zero" colspan="6">
+            <!-- <hr> styling --> &nbsp;
+        </td>
+    </tr>
+    <tr>
+        <td class="td-mail td__padding-right td__padding-bottom td__padding-left" colspan="6">
+            <p>Pas hier uw <a href="{{ profile_notifications }}">voorkeuren</a> aan voor de notificaties. </p>
+        </td>
+    </tr>
+    </tbody>
 </table>
-
-<p>Met vriendelijke groet,
-    {{ site_name }} </p>

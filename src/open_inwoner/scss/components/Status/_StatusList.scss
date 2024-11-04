@@ -38,7 +38,7 @@
       font-weight: normal;
       justify-content: space-between;
       padding: 0;
-      margin: var(--spacing-small) 0 0 0;
+      margin: 0;
       width: 100%;
     }
 
@@ -47,25 +47,25 @@
     }
 
     .link--bold {
-      margin: var(--spacing-small) 0 0 0;
+      margin: 0;
     }
 
     .link-future {
       color: var(--color-gray-dark-900);
     }
 
-    .p-date {
+    .status-list__date {
       font-size: var(--font-size-body-small);
     }
 
-    .p-text {
+    .status-list__text {
       display: flex;
       flex-direction: column;
     }
 
-    .p__upload {
+    .status-list__upload {
       display: none;
-      &.p__upload--enabled {
+      &.status-list__upload--enabled {
         //hide when final status is reached
         display: block;
       }
@@ -200,6 +200,15 @@
         color: var(--color-black);
       }
     }
+
+    .status-list__open-paragraph {
+      color: var(--font-color-body);
+      font-family: var(--font-family-body);
+      font-size: var(--font-size-body);
+      font-weight: bold;
+      line-height: var(--font-line-height-body);
+      margin: 0;
+    }
   }
 
   /// Toggle styles
@@ -218,6 +227,6 @@
 /// Contextual
 ///
 
-.h2 + .status-list {
+.utrecht-heading-2 + .status-list {
   margin-top: var(--spacing-large);
 }

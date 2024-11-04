@@ -1,17 +1,11 @@
 import logging
-from typing import Optional
 
 from zgw_consumers.api_models.constants import RolTypes, VertrouwelijkheidsAanduidingen
 
 from open_inwoner.kvk.branches import get_kvk_branch_number
 from open_inwoner.openzaak.api_models import InformatieObject, Rol, Zaak, ZaakType
 
-from .models import (
-    OpenZaakConfig,
-    StatusTranslation,
-    ZaakTypeConfig,
-    ZaakTypeInformatieObjectTypeConfig,
-)
+from .models import OpenZaakConfig, ZaakTypeConfig, ZaakTypeInformatieObjectTypeConfig
 
 logger = logging.getLogger(__name__)
 
@@ -40,10 +34,10 @@ def is_info_object_visible(
     """
     Test if a InformatieObject (case info object) should be visible to the user.
 
-    We check on its definitive status, and a maximum confidentiality level (compared the
-    ordering from the VertrouwelijkheidsAanduidingen.choices)
+    We check on its definitive or archived status, and a maximum confidentiality
+    level (compared the ordering from the VertrouwelijkheidsAanduidingen.choices)
     """
-    if info_object.status != "definitief":
+    if info_object.status not in ["definitief", "gearchiveerd"]:
         return False
 
     return is_object_visible(info_object, max_confidentiality_level)
@@ -112,7 +106,7 @@ def get_role_name_display(rol: Rol) -> str:
         return display
 
 
-def get_zaak_type_config(case_type: ZaakType) -> Optional[ZaakTypeConfig]:
+def get_zaak_type_config(case_type: ZaakType) -> ZaakTypeConfig | None:
     try:
         return ZaakTypeConfig.objects.filter_case_type(case_type).get()
     except ZaakTypeConfig.DoesNotExist:
@@ -122,7 +116,7 @@ def get_zaak_type_config(case_type: ZaakType) -> Optional[ZaakTypeConfig]:
 def get_zaak_type_info_object_type_config(
     case_type: ZaakType,
     info_object_type_url: str,
-) -> Optional[ZaakTypeInformatieObjectTypeConfig]:
+) -> ZaakTypeInformatieObjectTypeConfig | None:
     assert isinstance(info_object_type_url, str)
     try:
         return ZaakTypeInformatieObjectTypeConfig.objects.get_for_case_and_info_type(
@@ -132,20 +126,7 @@ def get_zaak_type_info_object_type_config(
         return None
 
 
-def translate_single_status(status_text: str) -> str:
-    if not status_text:
-        return ""
-
-    # in most cases try to cache with StatusTranslation.objects.get_lookup()
-    try:
-        return StatusTranslation.objects.values_list("translation", flat=True).get(
-            status=status_text
-        )
-    except StatusTranslation.DoesNotExist:
-        return ""
-
-
-def get_user_fetch_parameters(request) -> dict:
+def get_user_fetch_parameters(request, check_rsin: bool = True) -> dict:
     """
     Determine the parameters used to perform ZGW resource fetches
     """
@@ -156,15 +137,19 @@ def get_user_fetch_parameters(request) -> dict:
 
     if user.bsn:
         return {"user_bsn": user.bsn}
-    elif user.kvk:
-        kvk_or_rsin = user.kvk
-        config = OpenZaakConfig.get_solo()
-        if config.fetch_eherkenning_zaken_with_rsin:
-            kvk_or_rsin = user.rsin
 
-        parameters = {"user_kvk_or_rsin": kvk_or_rsin}
+    if user.kvk:
+        parameters = {"user_kvk": user.kvk}
+
+        if check_rsin:
+            config = OpenZaakConfig.get_solo()
+            if config.fetch_eherkenning_zaken_with_rsin:
+                parameters = {"user_rsin": user.rsin}
+
         vestigingsnummer = get_kvk_branch_number(request.session)
         if vestigingsnummer:
             parameters.update({"vestigingsnummer": vestigingsnummer})
+
         return parameters
+
     return {}

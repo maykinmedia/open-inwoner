@@ -1,3 +1,5 @@
+from unittest.mock import ANY, patch
+
 from django.conf import settings
 from django.core import mail
 from django.test import override_settings
@@ -19,9 +21,14 @@ from open_inwoner.accounts.tests.factories import (
 )
 from open_inwoner.openklant.constants import Status
 from open_inwoner.openklant.models import OpenKlantConfig
+from open_inwoner.openklant.services import eSuiteVragenService
 from open_inwoner.openklant.tests.data import CONTACTMOMENTEN_ROOT, KLANTEN_ROOT
 from open_inwoner.openzaak.models import CatalogusConfig, OpenZaakConfig
-from open_inwoner.openzaak.tests.factories import ServiceFactory, ZaakTypeConfigFactory
+from open_inwoner.openzaak.tests.factories import (
+    ServiceFactory,
+    ZaakTypeConfigFactory,
+    ZGWApiGroupConfigFactory,
+)
 from open_inwoner.openzaak.tests.helpers import generate_oas_component_cached
 from open_inwoner.openzaak.tests.shared import (
     CATALOGI_ROOT,
@@ -39,6 +46,15 @@ PATCHED_MIDDLEWARE = [
 
 
 @requests_mock.Mocker()
+@patch(
+    "open_inwoner.cms.cases.views.status.send_contact_confirmation_mail", autospec=True
+)
+@patch.object(
+    eSuiteVragenService,
+    "retrieve_objectcontactmomenten_for_zaak",
+    autospec=True,
+    return_value=[],
+)
 @override_settings(
     ROOT_URLCONF="open_inwoner.cms.tests.urls", MIDDLEWARE=PATCHED_MIDDLEWARE
 )
@@ -49,18 +65,15 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         self.user = DigidUserFactory(bsn="900222086")
 
         # services
-        self.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
-        self.catalogi_service = ServiceFactory(
-            api_root=CATALOGI_ROOT, api_type=APITypes.ztc
+        self.api_group = ZGWApiGroupConfigFactory(
+            zrc_service__api_root=ZAKEN_ROOT,
+            ztc_service__api_root=CATALOGI_ROOT,
+            drc_service__api_root=DOCUMENTEN_ROOT,
+            form_service=None,
         )
-        self.document_service = ServiceFactory(
-            api_root=DOCUMENTEN_ROOT, api_type=APITypes.drc
-        )
+
         # openzaak config
         self.oz_config = OpenZaakConfig.get_solo()
-        self.oz_config.zaak_service = self.zaak_service
-        self.oz_config.catalogi_service = self.catalogi_service
-        self.oz_config.document_service = self.document_service
         self.oz_config.document_max_confidentiality = (
             VertrouwelijkheidsAanduidingen.beperkt_openbaar
         )
@@ -71,10 +84,12 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
 
         # openklant config
         self.ok_config = OpenKlantConfig.get_solo()
+        self.ok_config.send_email_confirmation = True
         self.ok_config.register_contact_moment = True
         self.ok_config.register_bronorganisatie_rsin = "123456788"
         self.ok_config.register_type = "Melding"
         self.ok_config.register_employee_id = "FooVonBar"
+        self.ok_config.register_channel = "the-designated-channel"
         self.ok_config.klanten_service = ServiceFactory(
             api_root=KLANTEN_ROOT, api_type=APITypes.kc
         )
@@ -92,7 +107,6 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             identificatie="ZAAK-2022-0000000024",
             omschrijving="Zaak naar aanleiding van ingezonden formulier",
             startdatum="2022-01-02",
-            einddatum=None,
             status=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
             resultaat=f"{ZAKEN_ROOT}resultaten/a44153aa-ad2c-6a07-be75-15add5113",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
@@ -208,19 +222,29 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             volgnummer=1,
             isEindstatus=True,
         )
+        self.resultaattype_with_naam = generate_oas_component_cached(
+            "ztc",
+            "schemas/ResultaatType",
+            url=f"{CATALOGI_ROOT}resultaattypen/b1a268dd-4322-47bb-a930-b83066b4a32c",
+            zaaktype=self.zaaktype["url"],
+            omschrijving="Short description",
+            resultaattypeomschrijving="http://example.com",
+            selectielijstklasse="http://example.com",
+            naam="Long description (>20 chars) of result",
+        )
         self.result = generate_oas_component_cached(
             "zrc",
             "schemas/Resultaat",
             uuid="a44153aa-ad2c-6a07-be75-15add5113",
             url=self.zaak["resultaat"],
-            resultaattype=f"{CATALOGI_ROOT}resultaattypen/b1a268dd-4322-47bb-a930-b83066b4a32c",
+            # resultaattype=f"{CATALOGI_ROOT}resultaattypen/b1a268dd-4322-47bb-a930-b83066b4a32c",
+            resultaattype=self.resultaattype_with_naam["url"],
             zaak=self.zaak["url"],
             toelichting="resultaat toelichting",
         )
         self.klant = generate_oas_component_cached(
             "kc",
             "schemas/Klant",
-            uuid="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             bronorganisatie="123456789",
             voornaam="Foo",
@@ -238,7 +262,8 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         )
 
         self.case_detail_url = reverse(
-            "cases:case_detail_content", kwargs={"object_id": self.zaak["uuid"]}
+            "cases:case_detail_content",
+            kwargs={"object_id": self.zaak["uuid"], "api_group_id": self.api_group.id},
         )
 
     def _setUpMocks(self, m):
@@ -247,6 +272,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         for resource in [
             self.zaak,
             self.result,
+            self.resultaattype_with_naam,
             self.zaaktype,
             self.status_finish,
             self.status_type_finish,
@@ -259,6 +285,10 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         m.get(
             f"{CATALOGI_ROOT}statustypen?zaaktype={self.zaak['zaaktype']}",
             json=paginated_response([self.status_type_new, self.status_type_finish]),
+        )
+        m.get(
+            f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten?object={self.zaak['url']}",
+            json=paginated_response([]),
         )
 
         self.matchers += [
@@ -289,8 +319,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
     def _setUpExtraMocks(self, m):
         self.contactmoment = generate_oas_component_cached(
             "cmc",
-            "schemas/ContactMoment",
-            uuid="aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+            "schemas/Contactmoment",
             url=f"{CONTACTMOMENTEN_ROOT}contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
             status=Status.nieuw,
             antwoord="",
@@ -298,11 +327,17 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         )
         self.klant_contactmoment = generate_oas_component_cached(
             "cmc",
-            "schemas/KlantContactMoment",
-            uuid="aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
+            "schemas/Klantcontactmoment",
             url=f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten/aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
             klant=self.klant["url"],
             contactmoment=self.contactmoment["url"],
+        )
+        self.object_contactmoment = generate_oas_component_cached(
+            "cmc",
+            "schemas/Objectcontactmoment",
+            url=f"{CONTACTMOMENTEN_ROOT}contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+            contactmoment=self.contactmoment["url"],
+            object=self.zaak["url"],
         )
         self.matcher_create_contactmoment = m.post(
             f"{CONTACTMOMENTEN_ROOT}contactmomenten",
@@ -314,13 +349,27 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             json=self.klant_contactmoment,
             status_code=201,
         )
+        self.matcher_create_objectcontactmoment = m.post(
+            f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten",
+            json=self.object_contactmoment,
+            status_code=201,
+        )
         self.extra_matchers = [
             self.matcher_create_contactmoment,
             self.matcher_create_klantcontactmoment,
+            self.matcher_create_objectcontactmoment,
         ]
 
-    def test_form_is_shown_if_open_klant_api_configured(self, m):
+        m.get(
+            self.contactmoment["url"],
+            json=self.contactmoment,
+        )
+
+    def test_form_is_shown_if_open_klant_api_configured(
+        self, m, mock_contactmoment, mock_send_confirm
+    ):
         self._setUpMocks(m)
+        self._setUpExtraMocks(m)
 
         self.assertTrue(self.ok_config.has_api_configuration())
 
@@ -330,8 +379,13 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         self.assertTrue(response.context["case"]["contact_form_enabled"])
         self.assertTrue(contact_form)
 
-    def test_form_is_shown_if_open_klant_email_configured(self, m):
+        mock_send_confirm.assert_not_called()
+
+    def test_form_is_shown_if_open_klant_email_configured(
+        self, m, mock_contactmoment, mock_send_confirm
+    ):
         self._setUpMocks(m)
+        self._setUpExtraMocks(m)
 
         self.ok_config.register_email = "example@example.com"
         self.ok_config.register_contact_moment = False
@@ -346,8 +400,13 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         self.assertTrue(response.context["case"]["contact_form_enabled"])
         self.assertTrue(contact_form)
 
-    def test_form_is_shown_if_open_klant_email_and_api_configured(self, m):
+        mock_send_confirm.assert_not_called()
+
+    def test_form_is_shown_if_open_klant_email_and_api_configured(
+        self, m, mock_contactmoment, mock_send_confirm
+    ):
         self._setUpMocks(m)
+        self._setUpExtraMocks(m)
 
         self.ok_config.register_email = "example@example.com"
         self.ok_config.save()
@@ -361,7 +420,11 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         self.assertTrue(response.context["case"]["contact_form_enabled"])
         self.assertTrue(contact_form)
 
-    def test_no_form_shown_if_open_klant_not_configured(self, m):
+        mock_send_confirm.assert_not_called()
+
+    def test_no_form_shown_if_open_klant_not_configured(
+        self, m, mock_contactmoment, mock_send_confirm
+    ):
         self._setUpMocks(m)
 
         # reset
@@ -381,8 +444,13 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         self.assertFalse(response.context["case"]["contact_form_enabled"])
         self.assertFalse(contact_form)
 
-    def test_no_form_shown_if_contact_form_disabled(self, m):
+        mock_send_confirm.assert_not_called()
+
+    def test_no_form_shown_if_contact_form_disabled(
+        self, m, mock_contactmoment, mock_send_confirm
+    ):
         self._setUpMocks(m)
+        self._setUpExtraMocks(m)
 
         CatalogusConfig.objects.all().delete()
         self.zaak_type_config.delete()
@@ -398,21 +466,30 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         self.assertFalse(response.context["case"]["contact_form_enabled"])
         self.assertFalse(contact_form)
 
-    def test_form_success_with_api(self, m):
+        mock_send_confirm.assert_not_called()
+
+    def test_form_success_with_api(self, m, mock_contactmoment, mock_send_confirm):
         self._setUpMocks(m)
         self._setUpExtraMocks(m)
 
         response = self.app.get(self.case_detail_url, user=self.user)
         form = response.forms["contact-form"]
         form.action = reverse(
-            "cases:case_detail_contact_form", kwargs={"object_id": self.zaak["uuid"]}
+            "cases:case_detail_contact_form",
+            kwargs={"object_id": self.zaak["uuid"], "api_group_id": self.api_group.id},
         )
         form["question"] = "Sample text"
         response = form.submit()
 
         self.assertEqual(
             response.headers["HX-Redirect"],
-            reverse("cases:case_detail", kwargs={"object_id": str(self.zaak["uuid"])}),
+            reverse(
+                "cases:case_detail",
+                kwargs={
+                    "object_id": str(self.zaak["uuid"]),
+                    "api_group_id": self.api_group.id,
+                },
+            ),
         )
 
         redirect = self.app.get(response.headers["HX-Redirect"])
@@ -426,7 +503,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             payload,
             {
                 "bronorganisatie": "123456788",
-                "kanaal": "Internet",
+                "kanaal": "the-designated-channel",
                 "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
                 "onderwerp": "afdeling-x",
                 "tekst": "Sample text",
@@ -434,7 +511,82 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             },
         )
 
-    def test_form_success_with_api_eherkenning_user(self, m):
+        payload = self.matcher_create_objectcontactmoment.request_history[0].json()
+        self.assertEqual(
+            payload,
+            {
+                "contactmoment": self.contactmoment["url"],
+                "object": self.zaak["url"],
+                "objectType": "zaak",
+            },
+        )
+
+        mock_send_confirm.assert_called_once_with("foo@example.com", ANY)
+
+    def test_form_success_missing_medewerker(
+        self, m, mock_contactmoment, mock_send_confirm
+    ):
+        self._setUpMocks(m)
+        self._setUpExtraMocks(m)
+
+        config = OpenKlantConfig.get_solo()
+        # empty id should be excluded from contactmoment_create_data
+        config.register_employee_id = ""
+        config.save()
+
+        response = self.app.get(self.case_detail_url, user=self.user)
+        form = response.forms["contact-form"]
+        form.action = reverse(
+            "cases:case_detail_contact_form",
+            kwargs={"object_id": self.zaak["uuid"], "api_group_id": self.api_group.id},
+        )
+        form["question"] = "Sample text"
+        response = form.submit()
+
+        self.assertEqual(
+            response.headers["HX-Redirect"],
+            reverse(
+                "cases:case_detail",
+                kwargs={
+                    "object_id": str(self.zaak["uuid"]),
+                    "api_group_id": self.api_group.id,
+                },
+            ),
+        )
+
+        redirect = self.app.get(response.headers["HX-Redirect"])
+        redirect_messages = list(redirect.context["messages"])
+
+        self.assertEqual(redirect_messages[0].message, _("Vraag verstuurd!"))
+        self.assertMockMatchersCalled(self.extra_matchers)
+
+        payload = self.matcher_create_contactmoment.request_history[0].json()
+        self.assertEqual(
+            payload,
+            {
+                "bronorganisatie": "123456788",
+                "kanaal": "the-designated-channel",
+                "onderwerp": "afdeling-x",
+                "tekst": "Sample text",
+                "type": "Melding",
+            },
+        )
+
+        payload = self.matcher_create_objectcontactmoment.request_history[0].json()
+        self.assertEqual(
+            payload,
+            {
+                "contactmoment": self.contactmoment["url"],
+                "object": self.zaak["url"],
+                "objectType": "zaak",
+            },
+        )
+
+        mock_send_confirm.assert_called_once_with("foo@example.com", ANY)
+
+    def test_form_success_with_api_eherkenning_user(
+        self, m, mock_contactmoment, mock_send_confirm
+    ):
         self._setUpMocks(m)
         self._setUpExtraMocks(m)
 
@@ -467,7 +619,10 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
                 form = response.forms["contact-form"]
                 form.action = reverse(
                     "cases:case_detail_contact_form",
-                    kwargs={"object_id": self.zaak["uuid"]},
+                    kwargs={
+                        "object_id": self.zaak["uuid"],
+                        "api_group_id": self.api_group.id,
+                    },
                 )
                 form["question"] = "Sample text"
                 response = form.submit()
@@ -476,7 +631,10 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
                     response.headers["HX-Redirect"],
                     reverse(
                         "cases:case_detail",
-                        kwargs={"object_id": str(self.zaak["uuid"])},
+                        kwargs={
+                            "object_id": str(self.zaak["uuid"]),
+                            "api_group_id": self.api_group.id,
+                        },
                     ),
                 )
 
@@ -491,15 +649,19 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
                     payload,
                     {
                         "bronorganisatie": "123456788",
-                        "kanaal": "Internet",
+                        "kanaal": "the-designated-channel",
                         "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
                         "onderwerp": "afdeling-x",
                         "tekst": "Sample text",
                         "type": "Melding",
                     },
                 )
+                # user was modified in loop
+                eherkenning_user.refresh_from_db()
+                mock_send_confirm.assert_called_once_with(eherkenning_user.email, ANY)
+                mock_send_confirm.reset_mock()
 
-    def test_form_success_with_email(self, m):
+    def test_form_success_with_email(self, m, mock_contactmoment, mock_send_confirm):
         self._setUpMocks(m)
         self._setUpExtraMocks(m)
 
@@ -510,14 +672,21 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         response = self.app.get(self.case_detail_url, user=self.user)
         form = response.forms["contact-form"]
         form.action = reverse(
-            "cases:case_detail_contact_form", kwargs={"object_id": self.zaak["uuid"]}
+            "cases:case_detail_contact_form",
+            kwargs={"object_id": self.zaak["uuid"], "api_group_id": self.api_group.id},
         )
         form["question"] = "Sample text"
         response = form.submit()
 
         self.assertEqual(
             response.headers["HX-Redirect"],
-            reverse("cases:case_detail", kwargs={"object_id": str(self.zaak["uuid"])}),
+            reverse(
+                "cases:case_detail",
+                kwargs={
+                    "object_id": str(self.zaak["uuid"]),
+                    "api_group_id": self.api_group.id,
+                },
+            ),
         )
 
         redirect = self.app.get(response.headers["HX-Redirect"])
@@ -531,8 +700,11 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             message.subject,
             _("Contact formulier inzending vanaf Open Inwoner Platform"),
         )
+        mock_send_confirm.assert_called_once_with("foo@example.com", ANY)
 
-    def test_form_success_with_both_email_and_api(self, m):
+    def test_form_success_with_both_email_and_api(
+        self, m, mock_contactmoment, mock_send_confirm
+    ):
         self._setUpMocks(m)
         self._setUpExtraMocks(m)
 
@@ -542,14 +714,21 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         response = self.app.get(self.case_detail_url, user=self.user)
         form = response.forms["contact-form"]
         form.action = reverse(
-            "cases:case_detail_contact_form", kwargs={"object_id": self.zaak["uuid"]}
+            "cases:case_detail_contact_form",
+            kwargs={"object_id": self.zaak["uuid"], "api_group_id": self.api_group.id},
         )
         form["question"] = "Sample text"
         response = form.submit()
 
         self.assertEqual(
             response.headers["HX-Redirect"],
-            reverse("cases:case_detail", kwargs={"object_id": str(self.zaak["uuid"])}),
+            reverse(
+                "cases:case_detail",
+                kwargs={
+                    "object_id": str(self.zaak["uuid"]),
+                    "api_group_id": self.api_group.id,
+                },
+            ),
         )
 
         redirect = self.app.get(response.headers["HX-Redirect"])
@@ -558,3 +737,45 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         self.assertEqual(redirect_messages[0].message, _("Vraag verstuurd!"))
         self.assertMockMatchersCalled(self.extra_matchers)
         self.assertEqual(len(mail.outbox), 1)
+
+        mock_send_confirm.assert_called_once_with("foo@example.com", ANY)
+
+    def test_send_email_confirmation_is_configurable__send_enabled(
+        self, m, mock_contactmoment, mock_send_confirm
+    ):
+        self._setUpMocks(m)
+        self._setUpExtraMocks(m)
+
+        config = OpenKlantConfig.get_solo()
+        config.send_email_confirmation = True
+        config.save()
+
+        response = self.app.get(self.case_detail_url, user=self.user)
+        form = response.forms["contact-form"]
+        form.action = reverse(
+            "cases:case_detail_contact_form",
+            kwargs={"object_id": self.zaak["uuid"], "api_group_id": self.api_group.id},
+        )
+        form["question"] = "Sample text"
+        response = form.submit()
+        mock_send_confirm.assert_called_once()
+
+    def test_send_email_confirmation_is_configurable__send_disabled(
+        self, m, mock_contactmoment, mock_send_confirm
+    ):
+        self._setUpMocks(m)
+        self._setUpExtraMocks(m)
+
+        config = OpenKlantConfig.get_solo()
+        config.send_email_confirmation = False
+        config.save()
+
+        response = self.app.get(self.case_detail_url, user=self.user)
+        form = response.forms["contact-form"]
+        form.action = reverse(
+            "cases:case_detail_contact_form",
+            kwargs={"object_id": self.zaak["uuid"], "api_group_id": self.api_group.id},
+        )
+        form["question"] = "Sample text"
+        response = form.submit()
+        mock_send_confirm.assert_not_called()

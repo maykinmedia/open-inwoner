@@ -1,9 +1,9 @@
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models.deletion import CASCADE
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
-from django_better_admin_arrayfield.models.fields import ArrayField
+from django_jsonform.models.fields import ArrayField
 
 from .query import FieldBoostQueryset
 

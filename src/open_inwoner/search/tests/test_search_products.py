@@ -83,6 +83,20 @@ class SearchQueryTests(ESMixin, TestCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(int(results[0].meta.id), self.product1.id)
 
+    def test_search_product_hide_unpublished(self):
+        product_unpublished = ProductFactory.create(
+            name="Name 3",
+            summary="Some summary",
+            content="Some content",
+            keywords=["keyword1", "keyword2"],
+            published=False,
+        )
+        self.update_index()
+        results = search_products("Name").results
+
+        self.assertEqual(len(results), 1)
+        self.assertEqual(int(results[0].meta.id), self.product1.id)
+
 
 @tag("elastic")
 class SearchFacetTests(ESMixin, TestCase):

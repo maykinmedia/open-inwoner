@@ -1,12 +1,12 @@
 {% load link_tags %}
-<li class="list-item{% if active %} list-item--active{% endif %}{% if compact %} list-item--compact{% endif %}">
+<li class="list-item{% if active %} list-item--active{% endif %}{% if compact %} list-item--compact{% endif %}{% if extra_compact %} list-item--extra-compact{% endif %}">
     {% if href %}<a class="link" href="{{ href }}">{% endif %}
-    {% if caption %}<p class="p list-item__caption">{{ caption }}</p>{% endif %}
+    {% if caption %}<p class="utrecht-paragraph list-item__caption">{{ caption }}</p>{% endif %}
     {% if strong %}
-        <h4 class="h4">{{ text }}</h4>
+        <p class="utrecht-heading-4">{{ text }}</p>
     {% else %}
-        <p class="p">{{ text }}</p>
+        <p class="utrecht-paragraph">{{ text }}</p>
     {% endif %}
-    {% if description %}<p class="p p--muted">{{ description }}</p>{% endif %}
+    {% if description %}<p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-muted">{{ description }}</p>{% endif %}
     {% if href %}</a>{% endif %}
 </li>

@@ -1,21 +1,69 @@
-<p>Dear</p>
-<p>You are receiving this email because you have some plans that are expiring.</p>
-
-<table width="600">
+<table role="presentation" border="0" cellspacing="0" cellpadding="0" width="100%" class="table-mail">
+    <tbody>
     <tr>
-        <td>Plan name</td>
-        <td>Goal</td>
-        <td>End date</td>
+        <td class="td-mail td__padding-all" colspan="6">
+            <p>Beste inwoner,</p>
+            <p>U ontvangt deze e-mail omdat 1 of meer van uw samenwerkingsplannen verlopen.</p>
+            <p>&nbsp;</p>
+            <table width="598" class="table-mail--lined">
+                <tr>
+                    <th><strong>Samenwerking naam</strong></th>
+                    <th><strong>Doel</strong></th>
+                    <th><strong>Vervaldatum</strong></th>
+                </tr>
+                {% for plan in plans %}
+                    <tr>
+                        <td>{{ plan.title }}</td>
+                        <td>{{ plan.goal }}</td>
+                        <td>{{ plan.end_date|date:"j F Y" }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </td>
     </tr>
-    {% for plan in plans %}
-        <tr>
-            <td>{{ plan.title }}</td>
-            <td>{{ plan.goal }}</td>
-            <td>{{ plan.end_date|date:"j F Y" }}</td>
-        </tr>
-    {% endfor %}
+    <tr>
+        <td class="td-mail td__padding-right td__padding-left" colspan="6">
+            <p><a href="{{ plan_list_link }}" class="button--primary">Ga naar Samenwerkingsplannen</a></p>
+        </td>
+    </tr>
+    <tr>
+        <td class="spacing__extra" colspan="6">
+            &nbsp;
+        </td>
+    </tr>
+    <tr>
+        <td class="td-mail td__padding-all" colspan="6">
+            <p>Met vriendelijke groet,</p>
+            <p>&nbsp;</p>
+            <p>{{ site_name }}</p>
+        </td>
+    </tr>
+    <tr class="tr-mail">
+        <td class="td-mail spacer-bottom td__padding-zero" colspan="6">
+            <!-- <hr> styling -->
+        </td>
+    </tr>
+    <tr>
+        <td class="td-mail td__padding-top td__padding-right td__padding-left" colspan="6">
+            <p>Dit bericht is automatisch verzonden. U kunt <strong>niet reageren</strong> op deze e-mail. </p>
+            <p>&nbsp;</p>
+            <p><strong>Contact opnemen</strong></p>
+        </td>
+    </tr>
+    <tr class="tr--responsive">
+        <td class="td--responsive td-mail td__padding-right td__padding-bottom td__padding-left td__leftcell" colspan="2"><p><a href="{{ contact_page }}">Ga naar onze contactpagina</a></p>
+        </td>
+        <td class="td--responsive td-mail td__padding-right td__padding-bottom td__padding-left td__rightcell td__nowrap" colspan="4"><p><a href="tel:{{ contact_phonenumber }}" data-rel="external">Bel {{ contact_phonenumber }}</a></p></td>
+    </tr>
+    <tr class="tr-mail border-top">
+        <td class="td-mail border-top td__padding-zero" colspan="6">
+            <!-- <hr> styling --> &nbsp;
+        </td>
+    </tr>
+    <tr>
+        <td class="td-mail td__padding-right td__padding-bottom td__padding-left" colspan="6">
+            <p>Pas hier uw <a href="{{ profile_notifications }}">voorkeuren</a> aan voor de notificaties. </p>
+        </td>
+    </tr>
+    </tbody>
 </table>
-
-<p><a href="{{ plan_list_link }}">Go to your plans</a></p>
-<p>Met vriendelijke groet,
-    {{ site_name }} </p>

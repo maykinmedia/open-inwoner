@@ -1,5 +1,55 @@
-<p>Dear</p>
-<p>You've received {{ total_messages }} new messages from {{ total_senders }} users</p>
-<p><a href="{{ inbox_link }}">Go to the inbox</a><span class="color--secondary"> &rarr;</span></p>
-<p>Met vriendelijke groet,
-    {{ site_name }} </p>
+<table role="presentation" border="0" cellspacing="0" cellpadding="0" width="100%" class="table-mail">
+    <tbody>
+    <tr>
+        <td class="td-mail td__padding-all" colspan="6">
+            <p>Beste inwoner,</p>
+            <p>&nbsp;</p>
+            <p>U heeft {{ total_messages }} berichten ontvangen van {{ total_senders }} gebruikers.</p>
+        </td>
+    </tr>
+    <tr>
+        <td class="td-mail td__padding-right td__padding-left" colspan="6">
+            <p><a href="{{ inbox_link }}" class="button--primary">Ga naar 'Mijn berichten'</a></p>
+        </td>
+    </tr>
+    <tr>
+        <td class="spacing__extra" colspan="6">
+            &nbsp;
+        </td>
+    </tr>
+    <tr>
+        <td class="td-mail td__padding-all" colspan="6">
+            <p>Met vriendelijke groet,</p>
+            <p>&nbsp;</p>
+            <p>{{ site_name }}</p>
+        </td>
+    </tr>
+    <tr class="tr-mail">
+        <td class="td-mail spacer-bottom td__padding-zero" colspan="6">
+            <!-- <hr> styling -->
+        </td>
+    </tr>
+    <tr>
+        <td class="td-mail td__padding-top td__padding-right td__padding-left" colspan="6">
+            <p>Dit bericht is automatisch verzonden. U kunt <strong>niet reageren</strong> op deze e-mail. </p>
+            <p>&nbsp;</p>
+            <p><strong>Contact opnemen</strong></p>
+        </td>
+    </tr>
+    <tr>
+        <td class="td--responsive td-mail td__padding-right td__padding-bottom td__padding-left td__leftcell" colspan="2"><p><a href="{{ contact_page }}">Ga naar onze contactpagina</a></p>
+        </td>
+        <td class="td--responsive td-mail td__padding-right td__padding-bottom td__padding-left td__rightcell td__nowrap" colspan="4"><p><a href="tel:{{ contact_phonenumber }}" data-rel="external">Bel {{ contact_phonenumber }}</a></p></td>
+    </tr>
+    <tr class="tr-mail border-top">
+        <td class="td-mail border-top td__padding-zero" colspan="6">
+            <!-- <hr> styling --> &nbsp;
+        </td>
+    </tr>
+    <tr>
+        <td class="td-mail td__padding-right td__padding-bottom td__padding-left" colspan="6">
+            <p>Pas hier uw <a href="{{ profile_notifications }}">voorkeuren</a> aan voor de notificaties. </p>
+        </td>
+    </tr>
+    </tbody>
+</table>

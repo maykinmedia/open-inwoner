@@ -11,18 +11,20 @@ from django.db.models import Q, UniqueConstraint
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.crypto import get_random_string
-from django.utils.translation import ugettext_lazy as _
+from django.utils.functional import classproperty
+from django.utils.translation import gettext_lazy as _
 
+from digid_eherkenning.oidc.models import (
+    DigiDConfig as _OIDCDigiDConfig,
+    EHerkenningConfig as _OIDCEHerkenningConfig,
+)
 from image_cropping import ImageCropField, ImageRatioField
 from localflavor.nl.models import NLBSNField, NLZipCodeField
 from mail_editor.helpers import find_template
 from privates.storages import PrivateMediaFileSystemStorage
 from timeline_logger.models import TimelineLog
 
-from digid_eherkenning_oidc_generics.models import (
-    OpenIDConnectDigiDConfig,
-    OpenIDConnectEHerkenningConfig,
-)
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.utils.hash import create_sha256_hash
 from open_inwoner.utils.validators import (
     CharFieldValidator,
@@ -31,9 +33,78 @@ from open_inwoner.utils.validators import (
 )
 
 from ..plans.models import PlanContact
-from .choices import ContactTypeChoices, LoginTypeChoices, StatusChoices, TypeChoices
+from .choices import (
+    ContactTypeChoices,
+    LoginTypeChoices,
+    NotificationChannelChoice,
+    StatusChoices,
+    TypeChoices,
+)
 from .managers import ActionQueryset, DigidManager, UserManager, eHerkenningManager
 from .query import InviteQuerySet, MessageQuerySet
+
+###
+# Configuration
+###
+
+
+class OpenIDDigiDConfig(_OIDCDigiDConfig):
+    """
+    Proxy upstream library configuration model to override Python behaviour.
+    """
+
+    oip_unique_id_user_fieldname = "bsn"
+    oip_login_type = LoginTypeChoices.digid
+
+    class Meta:
+        proxy = True
+
+    # XXX: enabling this requires the tests/mocks to be updated. exercise left to the
+    # reader.
+    @classproperty
+    def oidcdb_check_idp_availability(cls):
+        return False
+
+    @property
+    def oidc_authentication_callback_url(self):
+        return "digid_oidc:callback"
+
+    def get_callback_view(self):
+        from .views import digid_callback
+
+        return digid_callback
+
+
+class OpenIDEHerkenningConfig(_OIDCEHerkenningConfig):
+    """
+    Proxy upstream library configuration model to override Python behaviour.
+    """
+
+    oip_unique_id_user_fieldname = "kvk"
+    oip_login_type = LoginTypeChoices.eherkenning
+
+    class Meta:
+        proxy = True
+
+    # XXX: enabling this requires the tests/mocks to be updated. exercise left to the
+    # reader.
+    @classproperty
+    def oidcdb_check_idp_availability(cls):
+        return False
+
+    @property
+    def oidc_authentication_callback_url(self):
+        return "eherkenning_oidc:callback"
+
+    def get_callback_view(self):
+        from .views import eherkenning_callback
+
+        return eherkenning_callback
+
+
+###
+# Content
+###
 
 
 def generate_uuid_image_name(instance, filename):
@@ -75,16 +146,18 @@ class User(AbstractBaseUser, PermissionsMixin):
         default="",
         validators=[CharFieldValidator()],
     )
-    display_name = models.CharField(
-        verbose_name=_("Display name"),
-        max_length=255,
-        blank=True,
-        default="",
-        validators=[CharFieldValidator()],
-    )
     email = models.EmailField(
         verbose_name=_("Email address"),
     )
+    verified_email = models.EmailField(
+        verbose_name=_("Verified email"),
+        blank=True,
+        default="",
+    )
+
+    def has_verified_email(self):
+        return self.verified_email != "" and self.email == self.verified_email
+
     phonenumber = models.CharField(
         verbose_name=_("Phonenumber"),
         blank=True,
@@ -178,6 +251,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         default=False,
         help_text=_("Indicates if fields have been prepopulated by Haal Central API."),
     )
+    selected_categories = models.ManyToManyField(
+        "pdc.Category",
+        verbose_name=_("Selected categories"),
+        related_name="selected_by",
+        blank=True,
+    )
     oidc_id = models.CharField(
         verbose_name=_("OpenId Connect id"),
         max_length=250,
@@ -191,6 +270,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         help_text=_(
             "Indicates if the user wants to receive notifications for updates concerning cases."
         ),
+    )
+    case_notification_channel = models.CharField(
+        verbose_name=_("Case notifications channel"),
+        choices=NotificationChannelChoice.choices,
+        default=NotificationChannelChoice.digital_and_post,
     )
     messages_notifications = models.BooleanField(
         verbose_name=_("Messages notifications"),
@@ -332,12 +416,12 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_full_name(self):
         # validator allowed spaces as values
-        first_name = self.display_name.strip() or self.first_name.strip()
-        parts = (first_name, self.infix.strip(), self.last_name.strip())
+        parts = (self.first_name.strip(), self.infix.strip(), self.last_name.strip())
         return " ".join(p for p in parts if p)
 
-    def get_short_name(self):
-        return self.first_name
+    @property
+    def display_name(self):
+        return self.first_name.strip()
 
     def get_address(self):
         if self.street:
@@ -350,24 +434,38 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_all_files(self):
         return self.documents.order_by("-created_on")
 
+    def get_interests(self) -> list:
+        if not self.selected_categories.exists():
+            return []
+
+        return list(self.selected_categories.values_list("name", flat=True))
+
     def get_active_notifications(self) -> str:
+        """
+        Determine active notifications on the basis of:
+            - SiteConfiguration settings
+            - publication status of relevant CMS page
+            - user preference
+        """
         from open_inwoner.cms.utils.page_display import (
             case_page_is_published,
             collaborate_page_is_published,
             inbox_page_is_published,
         )
 
+        config = SiteConfiguration.get_solo()
+
         enabled = []
-        if (
-            self.cases_notifications
-            and self.login_type == LoginTypeChoices.digid
-            and case_page_is_published()
-        ):
-            enabled.append(_("cases"))
-        if self.messages_notifications and inbox_page_is_published():
-            enabled.append(_("messages"))
-        if self.plans_notifications and collaborate_page_is_published():
-            enabled.append(_("plans"))
+        if config.notifications_cases_enabled:
+            if self.login_type == LoginTypeChoices.digid and case_page_is_published():
+                enabled.append(_("cases"))
+        if config.notifications_messages_enabled:
+            if self.messages_notifications and inbox_page_is_published():
+                enabled.append(_("messages"))
+        if config.notifications_plans_enabled:
+            if self.plans_notifications and collaborate_page_is_published():
+                enabled.append(_("plans"))
+
         if not enabled:
             return _("You do not have any notifications enabled.")
 
@@ -375,28 +473,17 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def require_necessary_fields(self) -> bool:
         """returns whether user needs to fill in necessary fields"""
-        if (
-            self.is_digid_user_with_brp
-            and self.email
-            and not self.email.endswith("@example.org")
-        ):
-            return False
+        if self.is_digid_user_with_brp:
+            return not self.has_usable_email
         elif self.login_type == LoginTypeChoices.digid:
             return (
-                not self.first_name
-                or not self.last_name
-                or not self.email
-                or self.email.endswith("@example.org")
+                not self.first_name or not self.last_name or not self.has_usable_email
             )
         elif self.login_type in (
             LoginTypeChoices.oidc,
             LoginTypeChoices.eherkenning,
         ):
-            return (
-                not self.email
-                or self.email.endswith("@example.org")
-                or self.email.endswith("localhost")
-            )
+            return not self.has_usable_email
         return False
 
     def get_logout_url(self) -> str:
@@ -409,13 +496,28 @@ class User(AbstractBaseUser, PermissionsMixin):
             return reverse("logout")
 
         if self.login_type == LoginTypeChoices.digid:
-            if OpenIDConnectDigiDConfig.get_solo().enabled:
+            if OpenIDDigiDConfig.get_solo().enabled:
                 return reverse("digid_oidc:logout")
             return reverse("digid:logout")
         elif self.login_type == LoginTypeChoices.eherkenning:
-            if OpenIDConnectEHerkenningConfig.get_solo().enabled:
+            if OpenIDEHerkenningConfig.get_solo().enabled:
                 return reverse("eherkenning_oidc:logout")
             return reverse("logout")
+
+    @property
+    def has_usable_email(self) -> bool:
+        """
+        For legacy reasons we have emails ending in @example.org and @localhost in
+        the database (these are auto-generated when users register with bsn, kvk, or
+        via oidc but no valid email could be retrieved from an external source, and
+        are overridden with user input via the NecessaryUserForm).
+        """
+        return self.email and not self.email.endswith(
+            (
+                "@example.org",
+                "@localhost",
+            )
+        )
 
     def get_contact_update_url(self):
         return reverse("profile:contact_edit", kwargs={"uuid": self.uuid})
@@ -429,7 +531,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return choice.label
 
     def get_contact_email(self):
-        return self.email if "@example.org" not in self.email else ""
+        return self.email if self.has_usable_email else ""
 
     def get_active_contacts(self):
         return self.user_contacts.filter(is_active=True)
@@ -780,7 +882,7 @@ class Invite(models.Model):
         """
         Returns the first_name plus the last_name of the invitee, with a space in between.
         """
-        full_name = "%s %s" % (self.invitee_first_name, self.invitee_last_name)
+        full_name = "{} {}".format(self.invitee_first_name, self.invitee_last_name)
         return full_name.strip()
 
     def save(self, **kwargs):

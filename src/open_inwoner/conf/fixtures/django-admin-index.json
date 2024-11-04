@@ -3,6 +3,7 @@
     "model": "admin_index.appgroup",
     "fields": {
         "order": 0,
+        "translations": {},
         "name": "Gebruikersprofielen",
         "slug": "accounts",
         "models": [
@@ -27,10 +28,6 @@
                 "user"
             ],
             [
-                "mozilla_django_oidc_db",
-                "openidconnectconfig"
-            ],
-            [
                 "userfeed",
                 "feeditemdata"
             ]
@@ -41,6 +38,7 @@
     "model": "admin_index.appgroup",
     "fields": {
         "order": 2,
+        "translations": {},
         "name": "PDC",
         "slug": "pdc",
         "models": [
@@ -99,6 +97,7 @@
     "model": "admin_index.appgroup",
     "fields": {
         "order": 4,
+        "translations": {},
         "name": "Permissies, 2FA en logging",
         "slug": "permissies-2fa-en-logging",
         "models": [
@@ -117,6 +116,14 @@
             [
                 "cspreports",
                 "cspreport"
+            ],
+            [
+                "django_yubin",
+                "log"
+            ],
+            [
+                "django_yubin",
+                "message"
             ],
             [
                 "log_outgoing_requests",
@@ -141,6 +148,9 @@
     "model": "admin_index.appgroup",
     "fields": {
         "order": 10,
+        "translations": {
+            "nl": "Overige/Diverse"
+        },
         "name": "Overige / Diverse",
         "slug": "overige-diverse",
         "models": [
@@ -155,6 +165,14 @@
             [
                 "admin_index",
                 "contenttypeproxy"
+            ],
+            [
+                "celery_monitor",
+                "taskstate"
+            ],
+            [
+                "django_celery_beat",
+                "periodictask"
             ],
             [
                 "easy_thumbnails",
@@ -183,6 +201,7 @@
     "model": "admin_index.appgroup",
     "fields": {
         "order": 8,
+        "translations": {},
         "name": "Configuratie",
         "slug": "configuratie",
         "models": [
@@ -217,6 +236,7 @@
     "model": "admin_index.appgroup",
     "fields": {
         "order": 3,
+        "translations": {},
         "name": "Zoeken",
         "slug": "zoeken",
         "models": [
@@ -239,6 +259,7 @@
     "model": "admin_index.appgroup",
     "fields": {
         "order": 1,
+        "translations": {},
         "name": "Plannen",
         "slug": "plannen",
         "models": [
@@ -260,47 +281,32 @@
 {
     "model": "admin_index.appgroup",
     "fields": {
-        "order": 9,
-        "name": "Emails",
-        "slug": "emails",
-        "models": [
-            [
-                "django_yubin",
-                "blacklist"
-            ],
-            [
-                "django_yubin",
-                "log"
-            ],
-            [
-                "django_yubin",
-                "message"
-            ],
-            [
-                "django_yubin",
-                "queuedmessage"
-            ]
-        ]
-    }
-},
-{
-    "model": "admin_index.appgroup",
-    "fields": {
         "order": 5,
+        "translations": {
+            "nl": "Data koppelingen"
+        },
         "name": "Data koppelingen",
         "slug": "koppelingen",
         "models": [
             [
-                "notifications_api_common",
-                "notificationsconfig"
+                "laposta",
+                "lapostaconfig"
             ],
             [
-                "notifications_api_common",
+                "notifications",
+                "notificationsapiconfig"
+            ],
+            [
+                "notifications",
                 "subscription"
             ],
             [
                 "openformsclient",
                 "configuration"
+            ],
+            [
+                "openklant",
+                "klantcontactmomentanswer"
             ],
             [
                 "openklant",
@@ -313,10 +319,6 @@
             [
                 "openzaak",
                 "openzaakconfig"
-            ],
-            [
-                "openzaak",
-                "statustranslation"
             ],
             [
                 "openzaak",
@@ -333,6 +335,10 @@
             [
                 "openzaak",
                 "zaaktypeinformatieobjecttypeconfig"
+            ],
+            [
+                "qmatic",
+                "qmaticconfig"
             ],
             [
                 "soap",
@@ -357,6 +363,7 @@
     "model": "admin_index.appgroup",
     "fields": {
         "order": 7,
+        "translations": {},
         "name": "CMS",
         "slug": "cms",
         "models": [
@@ -407,6 +414,9 @@
     "model": "admin_index.appgroup",
     "fields": {
         "order": 6,
+        "translations": {
+            "nl": "Inlog koppelingen"
+        },
         "name": "Inlog koppelingen",
         "slug": "auth-koppelingen",
         "models": [
@@ -419,12 +429,12 @@
                 "eherkenningconfiguration"
             ],
             [
-                "digid_eherkenning_oidc_generics",
-                "openidconnectdigidconfig"
+                "accounts",
+                "openiddigidconfig"
             ],
             [
-                "digid_eherkenning_oidc_generics",
-                "openidconnecteherkenningconfig"
+                "accounts",
+                "openideherkenningconfig"
             ],
             [
                 "haalcentraal",
@@ -433,6 +443,10 @@
             [
                 "kvk",
                 "kvkconfig"
+            ],
+            [
+                "mozilla_django_oidc_db",
+                "openidconnectconfig"
             ]
         ]
     }
@@ -441,6 +455,9 @@
     "model": "admin_index.applink",
     "fields": {
         "order": 0,
+        "translations": {
+            "nl": "Link naar Documentatie"
+        },
         "app_group": [
             "overige-diverse"
         ],
@@ -452,6 +469,9 @@
     "model": "admin_index.applink",
     "fields": {
         "order": 1,
+        "translations": {
+            "nl": "Link naar Github"
+        },
         "app_group": [
             "overige-diverse"
         ],
@@ -463,6 +483,9 @@
     "model": "admin_index.applink",
     "fields": {
         "order": 2,
+        "translations": {
+            "nl": "Link naar Maykin"
+        },
         "app_group": [
             "overige-diverse"
         ],

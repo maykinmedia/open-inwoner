@@ -1,7 +1,7 @@
 import dataclasses
 from dataclasses import dataclass
 from datetime import datetime
-from typing import List, Optional, TypedDict, Union
+from typing import NotRequired, Optional, TypedDict, Union
 
 from zgw_consumers.api_models.base import ZGWModel
 
@@ -31,18 +31,7 @@ class Klant(ZGWModel):
     achternaam: str = ""
     telefoonnummer: str = ""
     emailadres: str = ""
-
-    # open-klant OAS
-    bedrijfsnaam: str = ""
-    functie: str = ""
-    adres: Optional[dict] = None
-    subject: str = ""
-    subject_type: str = ""
-    subject_identificatie: Optional[dict] = None
-
-    # open-klant non-standard *AFWIJKING*
-    aanmaakkanaal: str = ""
-    geverifieerd: bool = False
+    toestemming_zaak_notificaties_alleen_digitaal: bool | None = None
 
     def get_name_display(self):
         return " ".join(
@@ -52,7 +41,7 @@ class Klant(ZGWModel):
 
 class MedewerkerIdentificatie(TypedDict):
     identificatie: str
-    achternaam: str = ""
+    achternaam: NotRequired[str]
 
 
 class ContactMomentCreateData(TypedDict):
@@ -61,7 +50,8 @@ class ContactMomentCreateData(TypedDict):
     onderwerp: str
     type: str
     kanaal: str
-    medewerkerIdentificatie: MedewerkerIdentificatie
+    contactgegevens: NotRequired[dict[str, str]]
+    medewerkerIdentificatie: NotRequired[MedewerkerIdentificatie]
 
 
 @dataclass
@@ -91,7 +81,7 @@ class ContactMoment(ZGWModel):
     voorkeurstaal: str = ""
     vorig_contactmoment: Optional[str] = None
     volgend_contactmoment: Optional[str] = None
-    onderwerp_links: List[str] = dataclasses.field(default_factory=list)
+    onderwerp_links: list[str] = dataclasses.field(default_factory=list)
 
     initiatiefnemer: str = ""
     medewerker: str = ""

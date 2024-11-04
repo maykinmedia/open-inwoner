@@ -2,6 +2,7 @@ import logging
 
 from django.core.management.base import BaseCommand
 
+from open_inwoner.openzaak.models import ZGWApiGroupConfig
 from open_inwoner.openzaak.zgw_imports import (
     import_catalog_configs,
     import_zaaktype_configs,
@@ -47,6 +48,12 @@ class Command(BaseCommand):
         self.stdout.write("")
 
     def handle(self, *args, **options):
+        if ZGWApiGroupConfig.objects.count() == 0:
+            self.stdout.write(
+                "Please define at least one ZGWApiGroupConfig before running this command."
+            )
+            return
+
         # catalogus config
         imported = import_catalog_configs()
 

@@ -5,22 +5,26 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 import requests_mock
+from cms.apphook_pool import apphook_pool
 from dateutil.relativedelta import relativedelta
-from django_webtest import WebTest
+from django_webtest import TransactionWebTest, WebTest
 from furl import furl
 from requests import RequestException
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
-from zgw_consumers.constants import APITypes
 
 from open_inwoner.accounts.tests.factories import (
     DigidUserFactory,
     eHerkenningUserFactory,
 )
 from open_inwoner.cms.products.cms_apps import ProductsApphook
+from open_inwoner.cms.profile.cms_apps import ProfileApphook
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.kvk.branches import KVK_BRANCH_SESSION_VARIABLE
 from open_inwoner.openzaak.models import OpenZaakConfig
-from open_inwoner.openzaak.tests.factories import ServiceFactory, ZaakTypeConfigFactory
+from open_inwoner.openzaak.tests.factories import (
+    ZaakTypeConfigFactory,
+    ZGWApiGroupConfigFactory,
+)
 from open_inwoner.openzaak.tests.helpers import generate_oas_component_cached
 from open_inwoner.openzaak.tests.shared import (
     CATALOGI_ROOT,
@@ -318,11 +322,12 @@ class TestPublishedCategories(WebTest):
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
+class TestCategoriesCaseFiltering(ClearCachesMixin, TransactionWebTest):
     def setUp(self):
         super().setUp()
 
         cms_tools.create_apphook_page(ProductsApphook)
+        cms_tools.create_apphook_page(ProfileApphook)
 
         self.category1 = CategoryFactory(
             name="0001",
@@ -384,18 +389,15 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
         self.eherkenning_user = eHerkenningUserFactory(kvk="12345678", rsin="123456789")
 
         # services
-        self.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
-        self.catalogi_service = ServiceFactory(
-            api_root=CATALOGI_ROOT, api_type=APITypes.ztc
+        ZGWApiGroupConfigFactory(
+            zrc_service__api_root=ZAKEN_ROOT,
+            ztc_service__api_root=CATALOGI_ROOT,
+            drc_service__api_root=DOCUMENTEN_ROOT,
+            form_service=None,
         )
-        self.document_service = ServiceFactory(
-            api_root=DOCUMENTEN_ROOT, api_type=APITypes.drc
-        )
+
         # openzaak config
         self.config = OpenZaakConfig.get_solo()
-        self.config.zaak_service = self.zaak_service
-        self.config.catalogi_service = self.catalogi_service
-        self.config.document_service = self.document_service
         self.config.document_max_confidentiality = (
             VertrouwelijkheidsAanduidingen.beperkt_openbaar
         )
@@ -581,12 +583,40 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
     def test_categories_based_on_cases(self, m):
         self._setUpMocks(m)
 
+        # Selected categories should be ignored if feature is disabled
+        self.user.selected_categories.set([self.category1, self.category2])
+        profile_app = apphook_pool.get_apphook("ProfileApphook")
+        config = profile_app.get_config("profile")
+        config.selected_categories = False
+        config.save()
+
         html, context = cms_tools.render_plugin(CategoriesPlugin, user=self.user)
 
         self.assertEqual(context["categories"].count(), 3)
         self.assertEqual(context["categories"].first(), self.category2)
         self.assertEqual(context["categories"][1], self.category6)
         self.assertEqual(context["categories"].last(), self.category7)
+
+    @requests_mock.Mocker()
+    def test_categories_based_on_selected_categories(self, m):
+        """
+        If the user has selected categories, only these categories should show up on
+        the homepage
+        """
+        self._setUpMocks(m)
+
+        profile_app = apphook_pool.get_apphook("ProfileApphook")
+        config = profile_app.get_config("profile")
+        config.selected_categories = True
+        config.save()
+
+        self.user.selected_categories.set([self.category1, self.category2])
+
+        html, context = cms_tools.render_plugin(CategoriesPlugin, user=self.user)
+
+        self.assertEqual(context["categories"].count(), 2)
+        self.assertEqual(context["categories"].first(), self.category1)
+        self.assertEqual(context["categories"].last(), self.category2)
 
     @requests_mock.Mocker()
     def test_categories_based_on_cases_for_eherkenning_user(self, m):

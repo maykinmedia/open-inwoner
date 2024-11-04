@@ -1,0 +1,197 @@
+interactions:
+- request:
+    body: '{"digitaleAdressen": null, "voorkeursDigitaalAdres": null, "rekeningnummers":
+      null, "voorkeursRekeningnummer": null, "indicatieGeheimhouding": false, "indicatieActief":
+      true, "voorkeurstaal": "crp", "soortPartij": "persoon", "partijIdentificatie":
+      {"contactnaam": {"voorletters": "Dr.", "voornaam": "Test Persoon", "voorvoegselAchternaam":
+      "Mrs.", "achternaam": "Gamble"}}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '373'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/partijen
+  response:
+    body:
+      string: '{"uuid":"89424a8a-fc4e-41f2-81ed-d5cc21675c2b","url":"http://localhost:8338/klantinteracties/api/v1/partijen/89424a8a-fc4e-41f2-81ed-d5cc21675c2b","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"crp","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Dr.","voornaam":"Test
+        Persoon","voorvoegselAchternaam":"Mrs.","achternaam":"Gamble"},"volledigeNaam":"Test
+        Persoon Mrs. Gamble"}}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '877'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/partijen/89424a8a-fc4e-41f2-81ed-d5cc21675c2b
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"identificeerdePartij": {"uuid": "89424a8a-fc4e-41f2-81ed-d5cc21675c2b"},
+      "partijIdentificator": {"codeObjecttype": "bsn", "codeSoortObjectId": "inp",
+      "objectId": "123456789", "codeRegister": "brp"}, "anderePartijIdentificator":
+      "optional_identifier_123"}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '256'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/partij-identificatoren
+  response:
+    body:
+      string: '{"uuid":"350ed1a7-7551-4ed5-8fdf-cc95942d67e2","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/350ed1a7-7551-4ed5-8fdf-cc95942d67e2","identificeerdePartij":{"uuid":"89424a8a-fc4e-41f2-81ed-d5cc21675c2b","url":"http://localhost:8338/klantinteracties/api/v1/partijen/89424a8a-fc4e-41f2-81ed-d5cc21675c2b"},"anderePartijIdentificator":"optional_identifier_123","partijIdentificator":{"codeObjecttype":"bsn","codeSoortObjectId":"inp","objectId":"123456789","codeRegister":"brp"}}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '503'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/350ed1a7-7551-4ed5-8fdf-cc95942d67e2
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+    method: GET
+    uri: http://localhost:8338/klantinteracties/api/v1/partijen/89424a8a-fc4e-41f2-81ed-d5cc21675c2b?expand=digitaleAdressen
+  response:
+    body:
+      string: '{"uuid":"89424a8a-fc4e-41f2-81ed-d5cc21675c2b","url":"http://localhost:8338/klantinteracties/api/v1/partijen/89424a8a-fc4e-41f2-81ed-d5cc21675c2b","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[{"uuid":"350ed1a7-7551-4ed5-8fdf-cc95942d67e2","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/350ed1a7-7551-4ed5-8fdf-cc95942d67e2"}],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"crp","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Dr.","voornaam":"Test
+        Persoon","voorvoegselAchternaam":"Mrs.","achternaam":"Gamble"},"volledigeNaam":"Test
+        Persoon Mrs. Gamble"}}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '1038'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"adres": "another-user@foo.com", "soortDigitaalAdres": "email", "verstrektDoorPartij":
+      {"uuid": "89424a8a-fc4e-41f2-81ed-d5cc21675c2b"}, "verstrektDoorBetrokkene":
+      null, "omschrijving": "OIP profiel"}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '201'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/digitaleadressen
+  response:
+    body:
+      string: '{"uuid":"3cc1c616-a8dc-4d23-9ce4-8a3d15871309","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/3cc1c616-a8dc-4d23-9ce4-8a3d15871309","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"89424a8a-fc4e-41f2-81ed-d5cc21675c2b","url":"http://localhost:8338/klantinteracties/api/v1/partijen/89424a8a-fc4e-41f2-81ed-d5cc21675c2b"},"adres":"another-user@foo.com","soortDigitaalAdres":"email","omschrijving":"OIP
+        profiel"}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '445'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/digitaleadressen/3cc1c616-a8dc-4d23-9ce4-8a3d15871309
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+    method: GET
+    uri: http://localhost:8338/klantinteracties/api/v1/partijen/89424a8a-fc4e-41f2-81ed-d5cc21675c2b?expand=digitaleAdressen
+  response:
+    body:
+      string: '{"uuid":"89424a8a-fc4e-41f2-81ed-d5cc21675c2b","url":"http://localhost:8338/klantinteracties/api/v1/partijen/89424a8a-fc4e-41f2-81ed-d5cc21675c2b","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[{"uuid":"3cc1c616-a8dc-4d23-9ce4-8a3d15871309","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/3cc1c616-a8dc-4d23-9ce4-8a3d15871309"}],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[{"uuid":"350ed1a7-7551-4ed5-8fdf-cc95942d67e2","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/350ed1a7-7551-4ed5-8fdf-cc95942d67e2"}],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"crp","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Dr.","voornaam":"Test
+        Persoon","voorvoegselAchternaam":"Mrs.","achternaam":"Gamble"},"volledigeNaam":"Test
+        Persoon Mrs. Gamble"},"_expand":{"digitaleAdressen":[{"uuid":"3cc1c616-a8dc-4d23-9ce4-8a3d15871309","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/3cc1c616-a8dc-4d23-9ce4-8a3d15871309","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"89424a8a-fc4e-41f2-81ed-d5cc21675c2b","url":"http://localhost:8338/klantinteracties/api/v1/partijen/89424a8a-fc4e-41f2-81ed-d5cc21675c2b"},"adres":"another-user@foo.com","soortDigitaalAdres":"email","omschrijving":"OIP
+        profiel"}]}}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '1672'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

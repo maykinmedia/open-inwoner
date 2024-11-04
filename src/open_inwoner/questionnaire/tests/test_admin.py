@@ -82,6 +82,7 @@ class TestQuestionnaireStepForm(WebTest):
         questionnaire = QuestionnaireStepFactory(
             related_products=(product1, product2, product3)
         )
+
         form = self.app.get(
             reverse(
                 "admin:questionnaire_questionnairestep_change",
@@ -90,10 +91,7 @@ class TestQuestionnaireStepForm(WebTest):
             user=self.user,
         ).forms["questionnairestep_form"]
         options = form["related_products"].options
-        self.assertEqual(
-            options,
-            [
-                (str(product1.id), True, product1.name),
-                (str(product2.id), True, product2.name),
-            ],
-        )
+
+        self.assertIn((str(product1.id), True, product1.name), options)
+        self.assertIn((str(product2.id), True, product2.name), options)
+        self.assertNotIn((str(product3.id), True, product3.name), options)

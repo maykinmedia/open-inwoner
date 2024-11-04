@@ -1,0 +1,45 @@
+{% extends 'master.html' %}
+{% load i18n tz list_tags icon_tags grid_tags utils %}
+
+{% block content %}
+
+<h1 class="utrecht-heading-1" id="title">{% trans "Mijn balie-afspraken" %}</h1>
+
+{% if appointments %}
+    <p class="tabled__key">{% trans "Een overzicht van uw afspraken" %}</p>
+
+    <div class="card__grid">
+    {% render_grid %}
+        {% for appointment in appointments %}
+            {% render_column start=forloop.counter_0|multiply:4 span=4 %}
+                <div class="card card--compact card--stretch appointment-info">
+                    <div class="card__body">
+                    {% with branch=appointment.branch %}
+                        <h2 class="card__heading-2">{{ appointment.services.0.name|default:appointment.title }}</h2>
+                        {% render_list %}
+                            {% timezone branch.timeZone %}
+                                {% list_item text=appointment.start|date:"j F Y" caption=_("Datum") compact=True strong=False %}
+                                {% list_item text=appointment.start|date:"H:i"|add:" "|add:_("uur") caption=_("Tijd") compact=True strong=False %}
+                            {% endtimezone %}
+                            {% list_item text=branch.addressLine1 caption=_("Locatie") extra_compact=True strong=False %}
+                            {% list_item text=branch.addressLine2 extra_compact=True strong=False %}
+                            {% list_item text=branch.addressZip|add:" "|add:branch.addressCity extra_compact=True strong=False %}
+                        {% endrender_list %}
+                    {% endwith %}
+
+                        <a href="{{ appointment.url }}" target="_blank" class="link link--icon link--secondary"
+                            title="{% trans "Wijzig of annuleer afspraak" %}">
+                            <span class="link__text">{% trans "Wijzig of annuleer afspraak" %}</span>
+                            {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+                        </a>
+                    </div>
+                </div>
+            {% endrender_column %}
+        {% endfor %}
+    {% endrender_grid %}
+    </div>
+{% else %}
+    <p class="tabled__key">{% trans "Geen afspraken beschikbaar" %}</p>
+{% endif %}
+
+{% endblock %}

@@ -133,7 +133,9 @@ class TestListItem(InclusionTagWebTest):
             - Header renders the correct subject.
         """
         self.assertTextContent(
-            ".messages__header .h4", self.other_user.get_full_name(), self.config
+            ".messages__header .utrecht-heading-4",
+            self.other_user.get_full_name(),
+            self.config,
         )
 
     def test_status(self):
@@ -141,4 +143,6 @@ class TestListItem(InclusionTagWebTest):
         Tests that:
             - Header renders the correct status.
         """
-        self.assertTextContent(".messages__header .p", "Dolor sit amet.", self.config)
+        self.assertTextContent(
+            ".messages__header .utrecht-paragraph", "Dolor sit amet.", self.config
+        )

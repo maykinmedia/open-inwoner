@@ -1,0 +1,19 @@
+.captcha {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-medium);
+
+  &__check {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    justify-content: start;
+    gap: var(--spacing-large);
+    margin-bottom: var(--spacing-medium);
+  }
+
+  &__input .input {
+    display: inline-block;
+    width: 100px;
+  }
+}

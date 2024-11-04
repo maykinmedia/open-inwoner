@@ -17,6 +17,15 @@ from .auth import (
     LogPasswordResetConfirmView,
     LogPasswordResetView,
 )
+from .auth_oidc import (
+    OIDCFailureView,
+    digid_callback,
+    digid_init,
+    digid_logout,
+    eherkenning_callback,
+    eherkenning_init,
+    eherkenning_logout,
+)
 from .contacts import (
     ContactApprovalView,
     ContactCreateView,
@@ -34,7 +43,14 @@ from .login import (
     VerifyTokenView,
 )
 from .password_reset import PasswordResetView
-from .profile import EditProfileView, MyDataView, MyNotificationsView, MyProfileView
+from .profile import (
+    EditProfileView,
+    MyCategoriesView,
+    MyDataView,
+    MyNotificationsView,
+    MyProfileView,
+    UserAppointmentsView,
+)
 from .registration import CustomRegistrationView, NecessaryFieldsUserView
 
 __all__ = [
@@ -67,9 +83,19 @@ __all__ = [
     "VerifyTokenView",
     "PasswordResetView",
     "EditProfileView",
+    "MyCategoriesView",
     "MyDataView",
     "MyNotificationsView",
     "MyProfileView",
+    "UserAppointmentsView",
     "CustomRegistrationView",
     "NecessaryFieldsUserView",
+    # OIDC
+    "OIDCFailureView",
+    "digid_init",
+    "digid_callback",
+    "digid_logout",
+    "eherkenning_init",
+    "eherkenning_callback",
+    "eherkenning_logout",
 ]

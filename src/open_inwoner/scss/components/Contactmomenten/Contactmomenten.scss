@@ -1,9 +1,50 @@
 .contactmomenten {
   margin-top: var(--spacing-giant);
 
+  &__scrolldown {
+    padding-top: 3em;
+
+    .form-container {
+      width: 50%;
+    }
+
+    .button {
+      margin-top: var(--spacing-giant);
+    }
+  }
+
+  &__contact-form {
+    text-align: center;
+
+    .form-container {
+      margin: auto;
+      width: 50%;
+    }
+
+    .form-heading {
+      padding-bottom: var(--spacing-giant);
+      text-align: left;
+    }
+
+    form {
+      textarea {
+        width: 100%;
+      }
+
+      .form__control {
+        label {
+          padding-bottom: var(--spacing-extra-large);
+        }
+
+        .input {
+          max-width: 100% !important;
+        }
+      }
+    }
+  }
+
   & .grid {
-    grid-row-gap: var(--spacing-medium);
-    grid-column-gap: var(--spacing-extra-large);
+    grid-gap: var(--spacing-extra-large);
 
     // Tablets
     @media (min-width: 500px) and (max-width: 767px) {
@@ -22,54 +63,38 @@
     }
   }
 
-  /// cards on cases page
-  .card {
-    .contactmomenten__link {
-      text-decoration: none;
-    }
+  .contactmomenten__link {
+    text-decoration: none;
+  }
+
+  &__title {
+    padding-bottom: var(--spacing-large);
   }
 }
 
 .contactmoment {
-  &__details {
-    // Set table width for word-break
-    table {
-      margin-top: 0;
-      overflow-x: auto;
-      table-layout: fixed;
-      width: 100%;
-      @media (min-width: 768px) {
-        width: var(--mobile-ms-width);
-      }
-    }
-    table th {
-      width: 100px;
-      white-space: nowrap;
-    }
-    table td {
-      width: 300px;
-      overflow: hidden;
-      word-break: break-word;
-      white-space: normal;
+  &__heading {
+    margin: 0 0 var(--spacing-large) 0;
+    line-height: var(--font-line-height-heading-3);
+    font-family: var(--font-family-heading);
+    font-size: var(--font-size-heading-3);
+    font-weight: var(--font-weight-heading-3);
+  }
 
-      &.table__item--status {
-        .table__item--wrapper {
-          display: flex;
-          justify-content: space-between;
-        }
-      }
+  &__text {
+    margin: 0 0 var(--row-height) 0;
+    line-height: var(--font-line-height-body);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body);
+    font-weight: normal;
+    color: var(--font-color-body);
+  }
 
-      .case-detail__link {
-        color: var(--color-primary);
-        text-decoration: none;
+  &__actions {
+    font-weight: bold;
+  }
 
-        &::after {
-          font-family: 'Material Icons';
-          content: 'arrow_forward';
-          font-size: 1em;
-          vertical-align: middle;
-        }
-      }
-    }
+  .button--transparent {
+    padding: var(--spacing-medium) 0 0 0;
   }
 }

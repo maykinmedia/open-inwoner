@@ -1,4 +1,4 @@
-{% load i18n utils anchor_menu_tags card_tags file_tags grid_tags table_tags solo_tags link_tags button_tags icon_tags notification_tags %}
+{% load i18n utils anchor_menu_tags card_tags file_tags form_tags grid_tags solo_tags link_tags button_tags icon_tags notification_tags %}
 
 {# Messages #}
 <div class="container container--no-margin" id="cases-status-messages-oob" hx-swap-oob="true">
@@ -11,20 +11,20 @@
 {% if case %}
     {% render_grid %}
         {% render_column span=12 %}
-            {# Title/dashboard. #}
+            {# Title/dashboard #}
             <h1 class="utrecht-heading-1" id="title">{{ case.description }}</h1>
             {% include "components/Dashboard/Dashboard.html" with metrics=metrics only %}
         {% endrender_column %}
 
         {% render_column start=4 span=6 %}
-            {#  Status history. #}
+            {#  Status history #}
             <section id="statuses_component" class="statuses__section">
                 {% include 'pages/cases/statuses.html' %}
             </section>
 
             {% if case.internal_upload_enabled %}
-                <h2 class="h2" id="documents-upload">{% trans "Documenten" %}</h2>
-                <h3 class="h3 documents-upload__h3">{% trans "Voeg documenten toe" %}</h3>
+                <h2 class="utrecht-heading-2" id="documents-upload">{% trans "Documenten" %}</h2>
+                <h3 class="utrecht-heading-3 documents-upload__h3">{% trans "Voeg documenten toe" %}</h3>
 
                 <div class="document-upload-notification">
                 {% notifications messages show_local_messages=True closable=False %}
@@ -36,46 +36,63 @@
                     <div class="card__body document-upload-description">
                         {% icon icon="info" icon_position="after" extra_classes="icon--info" outlined=True %}
 
-                        <div class="document-upload-description__text">{{ case.case_type_document_upload_description|markdown|safe }}</div>
+                        <div class="document-upload-description__text wysiwyg">{{ case.case_type_document_upload_description|markdown|safe }}</div>
                     </div>
                 </div>
                 {% endif %}
 
-                {#  Upload document form. #}
+                {#  Upload document form #}
                 <section id="form_upload" class="form__open-upload">
                     {% include 'pages/cases/document_form.html' %}
                 </section>
 
             {% elif case.external_upload_enabled %}
-                <h2 class="h2" id="documents-upload">{% trans "Document toevoegen" %}</h2>
+                <h2 class="utrecht-heading-2" id="documents-upload">{% trans "Document toevoegen" %}</h2>
                 {% if case.case_type_config_description %}
-                    <p class="p">{{ case.case_type_config_description }}</p>
+                    <p class="utrecht-paragraph">{{ case.case_type_config_description }}</p>
                 {% else %}
-                    <p class="p">{% trans "By clicking the button below you can upload a document. This is an external link and you will be redirected to a different system." %}</p>
+                    <p class="utrecht-paragraph">{% trans "By clicking the button below you can upload a document. This is an external link and you will be redirected to a different system." %}</p>
                 {% endif %}
                 {% button_row %}
                     {% button href=case.external_upload_url text=_("Document uploaden") title=_("Opens new window") primary=True icon="open_in_new" icon_position="after" %}
                 {% endbutton_row %}
             {% endif %}
 
-            {#  Documents. #}
+            {#  Documents #}
             {% if case.documents %}
-                <h2 class="h2 {% if case.new_docs %}indicator{% endif %}" id="documents">{% trans 'Eerder toegevoegde documenten' %}</h2>
-                {% case_document_list case.documents %}
+                <section class="case-detail__documents">
+                    <div class="heading-2__indicator">
+                        <h2 class="utrecht-heading-2 {% if case.new_docs %}indicator{% endif %}" id="documents">{% trans 'Eerder toegevoegde documenten' %}</h2>
+                        {% if case.new_docs %}{% icon icon="fiber_manual_record" outlined=False extra_classes="file__file--recent" %}{% endif %}
+                    </div>
+                    {% case_document_list case.documents %}
+                </section>
             {% endif %}
 
-            {#  Contact moment form #}
-            {% if case.contact_form_enabled %}
-                <section id="cases-contact-form" class="form_contact">
-                    <div id="cases-contact-form-content">
-                        {% include 'pages/cases/contact_form.html' %}
+            {# Questions/contactmomenten #}
+            {% if case.questions %}
+                {% include "pages/questions/questions.html" with questions=case.questions only %}
+                {% if case.questions|length > 3 %}
+                    <div class="expand">
+                        <a id="toggle-hide-elements" class="button button--textless button--icon button--icon-after button--secondary button--transparent" data-label-reveal="{% trans 'Toon alle vragen' %}" data-label-collapse="{% trans 'Toon minder' %}" data-label-num-elems={{ case.questions|length }} aria-expanded=false>
+                            {% icon extra_classes="expand-icon" icon="expand_more" icon_position="after" icon_outlined=True %}
+                        </a>
                     </div>
-                </section>
+                {% endif %}
+            {% endif %}
+
+            {#  Contact form #}
+            {% if case.contact_form_enabled %}
+            <section id="cases-contact-form" class="form_contact">
+                <div id="cases-contact-form-content" class="spaced">
+                    {% include 'pages/cases/contact_form.html' %}
+                </div>
+            </section>
             {% endif %}
 
         {% endrender_column %}
     {% endrender_grid %}
 {% else %}
-    <h2 class="h2">{% trans 'There is no available data at the moment.' %}</h2>
+    <h2 class="utrecht-heading-2">{% trans 'There is no available data at the moment.' %}</h2>
 {% endif %}
 </div>

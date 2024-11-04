@@ -1,8 +1,4 @@
 .location-card-list {
-  .h4 {
-    margin-bottom: var(--spacing-large);
-  }
-
   &__list {
     grid-template-columns: repeat(2, 1fr);
     display: grid;
@@ -18,5 +14,13 @@
 
   .card {
     height: 100%;
+  }
+
+  ///
+  /// Legacy styling
+  ///
+
+  .h4 {
+    margin-bottom: var(--spacing-large);
   }
 }

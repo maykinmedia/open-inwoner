@@ -24,7 +24,7 @@ def get_component_value(componenthistorie, omschrijving):  # pragma: no cover
     componenthistorie by `omschrijving'
     """
     return next(
-        (item for item in componenthistorie if item.omschrijving == omschrijving)
+        item for item in componenthistorie if item.omschrijving == omschrijving
     ).bedrag.waarde_bedrag
 
 

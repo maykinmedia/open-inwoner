@@ -29,8 +29,8 @@
     box-shadow: none;
   }
 
-  *[class*='icon'],
-  *[class*='Icon'] {
+  *[class*='icons'],
+  *[class*='Icons'] {
     font-size: 20px;
     max-width: 20px;
   }
@@ -40,8 +40,8 @@
   }
 
   &--textless {
-    *[class*='icon'],
-    *[class*='Icon'] {
+    *[class*='icons'],
+    *[class*='Icons'] {
       margin: 0;
     }
   }
@@ -99,6 +99,19 @@
     background-color: transparent;
     border-color: transparent;
     color: var(--color-primary);
+
+    &.button--primary {
+      border-color: transparent;
+      color: var(--color-primary);
+      background-color: transparent;
+
+      &:hover {
+        background-color: transparent;
+        border-color: transparent;
+        color: var(--color-primary);
+        text-decoration: underline;
+      }
+    }
 
     &.button--secondary {
       color: var(--color-secondary);
@@ -168,6 +181,17 @@
     color: var(--color-error-darker);
   }
 
+  &--primary-close {
+    background-color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+    color: var(--color-font-primary);
+  }
+
+  &--error-confirm {
+    background-color: var(--color-error-darker);
+    color: var(--color-white);
+  }
+
   &--borderless {
     background-color: rgba(0, 0, 0, 0);
     border: none;
@@ -179,6 +203,10 @@
     display: flex;
   }
 
+  &__inner-text {
+    font-family: var(--font-family-body);
+  }
+
   > .link__text {
     width: 100%;
   }
@@ -188,12 +216,22 @@
   }
 }
 
-.h2 + .button,
-.h4 + .button,
-.p + .button {
+.utrecht-heading-2 + .button,
+.utrecht-heading-4 + .button,
+.utrecht-paragraph + .button {
   margin-top: var(--spacing-large);
 }
 
 .cta-button {
   margin-bottom: var(--spacing-large);
+}
+
+///
+/// Legacy styling
+///
+
+.h2 + .button,
+.h4 + .button,
+.p + .button {
+  margin-top: var(--spacing-large);
 }

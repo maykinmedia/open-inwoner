@@ -1,17 +1,29 @@
 .userfeed {
-  position: relative;
-  margin-top: var(--row-height);
+  &__header {
+    display: block;
+    line-height: var(--font-line-height-heading-2);
+    margin: 0;
+
+    @media (min-width: 768px) {
+      display: flex;
+      justify-content: space-between;
+    }
+  }
 
   &__summary {
     background-color: var(--color-white);
     color: var(--color-red-notification);
     display: block;
-    line-height: var(--font-line-height-body);
+    line-height: var(--utrecht-document-line-height);
     position: relative;
+
+    & * {
+      color: var(--color-red-notification);
+    }
   }
 
   &__list {
-    column-gap: var(--spacing-medium);
+    column-gap: var(--spacing-large);
     list-style: none;
     display: block;
     flex-direction: row;
@@ -29,10 +41,14 @@
       &:after {
         content: ' ';
         position: absolute;
-        border-right: 1px solid var(--color-red-notification);
-        right: -4px;
-        top: 2px;
+        border-right: none;
+        right: calc(-1 * var(--spacing-medium));
+        top: 4px;
         height: 16px;
+
+        @media (min-width: 768px) {
+          border-right: 1px solid var(--color-red-notification);
+        }
       }
 
       &:first-child {
@@ -55,39 +71,126 @@
     }
   }
 
-  &__heading {
-    color: var(--font-color-heading);
-    font-family: var(--font-family-heading);
-    font-size: var(--font-size-body);
-    line-height: var(--font-line-height-body);
-    padding: var(--spacing-large) 0 0 0;
-    margin: 0;
+  /// Cards in userfeed
+  .card {
+    justify-content: flex-start;
+
+    &__body {
+      gap: 0;
+      padding: 0;
+
+      // Start meaningful order for accessibility
+      .userfeed__title {
+        order: 2;
+      }
+
+      .card__header {
+        order: 1;
+      }
+
+      .userfeed-card__description {
+        order: 3;
+      }
+
+      .button {
+        order: 4;
+      }
+      // End of meaningful order
+
+      .userfeed__title {
+        color: var(--color-gray-dark);
+        font-family: var(--font-family-body);
+        font-size: var(--font-size-body-small);
+        font-weight: normal;
+        line-height: var(--utrecht-document-line-height);
+        overflow-wrap: break-word;
+        word-break: normal;
+        padding: var(--font-size-body-small) var(--card-spacing) 0
+          var(--card-spacing);
+        margin: 0;
+      }
+    }
+
+    .userfeed-card__description {
+      color: var(--utrecht-heading-color);
+      font-family: var(--utrecht-heading-font-family);
+      font-size: var(--font-size-body);
+      line-height: var(--utrecht-document-line-height);
+      margin: 0;
+      padding: var(--spacing-medium) var(--row-height-big) var(--card-spacing)
+        var(--card-spacing);
+    }
   }
 
   .card--status {
-    padding-top: 5px;
-    background-color: var(--color-danger-lightest);
-  }
+    // Default color
+    padding: 0;
+    background-color: var(--color-white);
 
-  .card__body {
-    background-color: #fff;
-    border-radius: var(--border-radius);
-    padding: var(--card-spacing);
+    .card__header {
+      display: flex;
 
-    .tabled__value {
-      color: var(--color-gray-dark);
-      font-size: var(--font-size-body-small);
-      margin: 0;
-      padding: 0;
+      &.warning {
+        background-color: var(--color-danger-lightest);
+        color: var(--color-danger-darker);
+      }
+
+      &.info {
+        background-color: var(--color-info-lighter);
+        color: var(--color-info-darker);
+      }
+
+      &.success {
+        background-color: var(--color-success-lighter);
+        color: var(--color-success);
+      }
+
+      &.failure {
+        background-color: var(--color-error-lightest);
+        color: var(--color-error-darker);
+      }
+
+      [class*='icons'] {
+        display: inline-block;
+        margin: 0 10px 6px 10px;
+      }
+
+      .card__status_indicator_text {
+        display: inline-block;
+        margin: var(--spacing-tiny) var(--spacing-large) var(--spacing-medium) 0;
+        padding: 0;
+      }
     }
 
-    span.button:last-child {
-      bottom: var(--spacing-medium);
+    .userfeed__marker {
+      // Default color
+      padding: var(--spacing-medium) 0 0 0;
+      background-color: var(--color-white);
+
+      &--warning {
+        background-color: var(--color-danger-lightest);
+        color: var(--color-danger-darker);
+      }
+
+      &--info {
+        background-color: var(--color-info-lighter);
+        color: var(--color-info-darker);
+      }
+
+      &--success {
+        background-color: var(--color-success-lighter);
+        color: var(--color-success);
+      }
+
+      &--failure {
+        background-color: var(--color-error-lightest);
+        color: var(--color-error-darker);
+      }
     }
   }
-}
 
-/// Contextual
-.userfeed + h2 {
-  margin-top: var(--row-height);
+  .card-container.plugin-card {
+    grid-row-gap: var(--spacing-medium);
+    grid-column-gap: var(--spacing-giant);
+  }
 }

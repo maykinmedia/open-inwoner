@@ -1,4 +1,3 @@
-from typing import Optional, Union
 from uuid import UUID
 
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -8,7 +7,7 @@ from django.db import models
 from django.db.models import CheckConstraint, Q
 from django.utils import timezone
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from open_inwoner.accounts.models import User
 from open_inwoner.userfeed.choices import FeedItemType
@@ -19,8 +18,8 @@ class FeedItemManager(models.Manager):
         self,
         user: User,
         type: FeedItemType,
-        ref_uuid: Union[str, UUID],
-        ref_key: Optional[str] = None,
+        ref_uuid: str | UUID,
+        ref_key: str | None = None,
         force: bool = False,
     ):
         qs = self.filter(
@@ -37,7 +36,7 @@ class FeedItemManager(models.Manager):
         user: User,
         type: FeedItemType,
         ref_object: models.Model,
-        ref_key: Optional[str] = None,
+        ref_key: str | None = None,
         force: bool = False,
     ):
         qs = self.filter(
@@ -127,7 +126,7 @@ class FeedItemData(models.Model):
     ref_object_id = models.PositiveIntegerField(blank=True, null=True)
 
     @cached_property
-    def ref_object(self) -> Optional[models.Model]:
+    def ref_object(self) -> models.Model | None:
         # don't raise but return None
         if self.ref_object_type_id and self.ref_object_id:
             return self.ref_object_field

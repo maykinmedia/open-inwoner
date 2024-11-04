@@ -1,7 +1,10 @@
 import base64
+import concurrent.futures
 import logging
+import warnings
+from dataclasses import dataclass
 from datetime import date
-from typing import List, Optional
+from typing import Any, Literal, Mapping, Type, TypeAlias, TypeVar
 
 from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -12,16 +15,21 @@ from requests import HTTPError, RequestException, Response
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.catalogi import Catalogus
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
-from zgw_consumers.client import build_client as _build_client
+from zgw_consumers.client import build_client
+from zgw_consumers.concurrent import parallel
+from zgw_consumers.constants import APITypes
+from zgw_consumers.models import Service
 from zgw_consumers.service import pagination_helper
 
 from open_inwoner.openzaak.api_models import InformatieObject
+from open_inwoner.openzaak.exceptions import MultiZgwClientProxyError
 from open_inwoner.utils.api import ClientError, get_json_response
 
 from ..utils.decorators import cache as cache_result
 from .api_models import (
     InformatieObjectType,
     OpenSubmission,
+    OpenTask,
     Resultaat,
     ResultaatType,
     Rol,
@@ -38,25 +46,42 @@ CRS_HEADERS = {"Content-Crs": "EPSG:4326", "Accept-Crs": "EPSG:4326"}
 logger = logging.getLogger(__name__)
 
 
-class ZakenClient(APIClient):
+class ZgwAPIClient(APIClient):
+    """A client for interacting with ZGW services."""
+
+    configured_from: Service
+
+    def __init__(self, *args, **kwargs):
+        self.configured_from = kwargs.pop("configured_from")
+        super().__init__(*args, **kwargs)
+
+    def __str__(self):
+        return f"Client {self.__class__.__name__} for {self.base_url}"
+
+
+class ZakenClient(ZgwAPIClient):
     def fetch_cases(
         self,
-        user_bsn: Optional[str] = None,
-        user_kvk_or_rsin: Optional[str] = None,
+        user_bsn: str | None = None,
+        user_kvk: str | None = None,
+        user_rsin: str | None = None,
         max_requests: int = 4,
-        identificatie: Optional[str] = None,
-        vestigingsnummer: Optional[str] = None,
+        identificatie: str | None = None,
+        vestigingsnummer: str | None = None,
     ):
-        if user_bsn and (user_kvk_or_rsin or vestigingsnummer):
+        if user_bsn and (user_kvk or user_rsin or vestigingsnummer):
             raise ValueError(
-                "either `user_bsn` or `user_kvk_or_rsin`/`vestigingsnummer` should be supplied, not both"
+                "either `user_bsn` or `user_kvk`/`user_risin` (+ optionally `vestigingsnummer`) "
+                "should be supplied, not both"
             )
 
         if user_bsn:
             return self.fetch_cases_by_bsn(
                 user_bsn, max_requests=max_requests, identificatie=identificatie
             )
-        elif user_kvk_or_rsin:
+
+        if user_kvk or user_rsin:
+            user_kvk_or_rsin = user_rsin if user_rsin else user_kvk
             return self.fetch_cases_by_kvk_or_rsin(
                 user_kvk_or_rsin,
                 max_requests=max_requests,
@@ -66,15 +91,15 @@ class ZakenClient(APIClient):
         return []
 
     @cache_result(
-        "cases:{user_bsn}:{max_requests}:{identificatie}",
+        "{self.base_url}:cases:{user_bsn}:{max_requests}:{identificatie}",
         timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
     )
     def fetch_cases_by_bsn(
         self,
         user_bsn: str,
-        max_requests: Optional[int] = 4,
-        identificatie: Optional[str] = None,
-    ) -> List[Zaak]:
+        max_requests: int | None = 4,
+        identificatie: str | None = None,
+    ) -> list[Zaak]:
         """
         retrieve cases for particular user with allowed confidentiality level
 
@@ -114,16 +139,16 @@ class ZakenClient(APIClient):
         return cases
 
     @cache_result(
-        "cases:{kvk_or_rsin}:{vestigingsnummer}:{max_requests}:{zaak_identificatie}",
+        "{self.base_url}:cases:{kvk_or_rsin}:{vestigingsnummer}:{max_requests}:{zaak_identificatie}",
         timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
     )
     def fetch_cases_by_kvk_or_rsin(
         self,
-        kvk_or_rsin: Optional[str],
-        max_requests: Optional[int] = 4,
-        zaak_identificatie: Optional[str] = None,
-        vestigingsnummer: Optional[str] = None,
-    ) -> List[Zaak]:
+        kvk_or_rsin: str | None,
+        max_requests: int | None = 4,
+        zaak_identificatie: str | None = None,
+        vestigingsnummer: str | None = None,
+    ) -> list[Zaak]:
         """
         retrieve cases for particular company with allowed confidentiality level
 
@@ -174,8 +199,11 @@ class ZakenClient(APIClient):
 
         return cases
 
-    @cache_result("single_case:{case_uuid}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT)
-    def fetch_single_case(self, case_uuid: str) -> Optional[Zaak]:
+    @cache_result(
+        "{self.base_url}:single_case:{case_uuid}",
+        timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
+    )
+    def fetch_single_case(self, case_uuid: str) -> Zaak | None:
         try:
             response = self.get(f"zaken/{case_uuid}", headers=CRS_HEADERS)
             data = get_json_response(response)
@@ -187,7 +215,7 @@ class ZakenClient(APIClient):
 
         return case
 
-    def fetch_case_by_url_no_cache(self, case_url: str) -> Optional[Zaak]:
+    def fetch_case_by_url_no_cache(self, case_url: str) -> Zaak | None:
         try:
             response = self.get(url=case_url, headers=CRS_HEADERS)
             data = get_json_response(response)
@@ -200,11 +228,12 @@ class ZakenClient(APIClient):
         return case
 
     @cache_result(
-        "single_case_information_object:{url}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT
+        "{self.base_url}:single_case_information_object:{url}",
+        timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
     )
     def fetch_single_case_information_object(
         self, url: str
-    ) -> Optional[ZaakInformatieObject]:
+    ) -> ZaakInformatieObject | None:
         try:
             response = self.get(url=url)
             data = get_json_response(response)
@@ -218,7 +247,7 @@ class ZakenClient(APIClient):
 
     def fetch_case_information_objects(
         self, case_url: str
-    ) -> List[ZaakInformatieObject]:
+    ) -> list[ZaakInformatieObject]:
         try:
             response = self.get(
                 "zaakinformatieobjecten",
@@ -233,7 +262,7 @@ class ZakenClient(APIClient):
 
         return case_info_objects
 
-    def fetch_status_history_no_cache(self, case_url: str) -> List[Status]:
+    def fetch_status_history_no_cache(self, case_url: str) -> list[Status]:
         try:
             response = self.get("statussen", params={"zaak": case_url})
             data = get_json_response(response)
@@ -246,12 +275,15 @@ class ZakenClient(APIClient):
 
         return statuses
 
-    @cache_result("status_history:{case_url}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT)
-    def fetch_status_history(self, case_url: str) -> List[Status]:
+    @cache_result(
+        "{self.base_url}:status_history:{case_url}",
+        timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
+    )
+    def fetch_status_history(self, case_url: str) -> list[Status]:
         return self.fetch_status_history_no_cache(case_url)
 
-    @cache_result("status:{status_url}", timeout=60 * 60)
-    def fetch_single_status(self, status_url: str) -> Optional[Status]:
+    @cache_result("{self.base_url}:status:{status_url}", timeout=60 * 60)
+    def fetch_single_status(self, status_url: str) -> Status | None:
         try:
             response = self.get(url=status_url)
             data = get_json_response(response)
@@ -264,12 +296,12 @@ class ZakenClient(APIClient):
         return status
 
     @cache_result(
-        "case_roles:{case_url}:{role_desc_generic}",
+        "{self.base_url}:case_roles:{case_url}:{role_desc_generic}",
         timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
     )
     def fetch_case_roles(
-        self, case_url: str, role_desc_generic: Optional[str] = None
-    ) -> List[Rol]:
+        self, case_url: str, role_desc_generic: str | None = None
+    ) -> list[Rol]:
         params = {
             "zaak": case_url,
         }
@@ -297,7 +329,7 @@ class ZakenClient(APIClient):
         return roles
 
     # implicitly cached because it uses fetch_case_roles()
-    def fetch_roles_for_case_and_bsn(self, case_url: str, bsn: str) -> List[Rol]:
+    def fetch_roles_for_case_and_bsn(self, case_url: str, bsn: str) -> list[Rol]:
         """
         note we do a query on all case_roles and then manually filter our roles from the result,
         because e-Suite doesn't support querying on both "zaak" AND "betrokkeneIdentificatie__natuurlijkPersoon__inpBsn"
@@ -320,7 +352,7 @@ class ZakenClient(APIClient):
     # implicitly cached because it uses fetch_case_roles()
     def fetch_roles_for_case_and_kvk_or_rsin(
         self, case_url: str, kvk_or_rsin: str
-    ) -> List[Rol]:
+    ) -> list[Rol]:
         """
         note we do a query on all case_roles and then manually filter our roles from the result,
         because e-Suite doesn't support querying on both "zaak" AND "betrokkeneIdentificatie__nietNatuurlijkPersoon__inn_nnp_id"
@@ -343,7 +375,7 @@ class ZakenClient(APIClient):
     # implicitly cached because it uses fetch_case_roles()
     def fetch_roles_for_case_and_vestigingsnummer(
         self, case_url: str, vestigingsnummer: str
-    ) -> List[Rol]:
+    ) -> list[Rol]:
         """
         note we do a query on all case_roles and then manually filter our roles from the result,
         because e-Suite doesn't support querying on both "zaak" AND "rol__betrokkeneIdentificatie__vestiging__vestigingsNummer"
@@ -366,7 +398,7 @@ class ZakenClient(APIClient):
     # not cached because currently only used in info-object download view
     def fetch_case_information_objects_for_case_and_info(
         self, case_url: str, info_object_url: str
-    ) -> List[ZaakInformatieObject]:
+    ) -> list[ZaakInformatieObject]:
         try:
             response = self.get(
                 "zaakinformatieobjecten",
@@ -385,9 +417,10 @@ class ZakenClient(APIClient):
         return case_info_objects
 
     @cache_result(
-        "single_result:{result_url}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT
+        "{self.base_url}:single_result:{result_url}",
+        timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
     )
-    def fetch_single_result(self, result_url: str) -> Optional[Resultaat]:
+    def fetch_single_result(self, result_url: str) -> Resultaat | None:
         try:
             response = self.get(url=result_url)
             data = get_json_response(response)
@@ -401,7 +434,7 @@ class ZakenClient(APIClient):
 
     def connect_case_with_document(
         self, case_url: str, document_url: str
-    ) -> Optional[dict]:
+    ) -> dict | None:
         try:
             response = self.post(
                 "zaakinformatieobjecten",
@@ -415,10 +448,10 @@ class ZakenClient(APIClient):
         return data
 
 
-class CatalogiClient(APIClient):
+class CatalogiClient(ZgwAPIClient):
     # not cached because only used by tools,
     # and because caching (stale) listings can break lookups
-    def fetch_status_types_no_cache(self, case_type_url: str) -> List[StatusType]:
+    def fetch_status_types_no_cache(self, case_type_url: str) -> list[StatusType]:
         try:
             response = self.get(
                 "statustypen",
@@ -436,7 +469,7 @@ class CatalogiClient(APIClient):
 
     # not cached because only used by tools,
     # and because caching (stale) listings can break lookups
-    def fetch_result_types_no_cache(self, case_type_url: str) -> List[ResultaatType]:
+    def fetch_result_types_no_cache(self, case_type_url: str) -> list[ResultaatType]:
         try:
             response = self.get(
                 "resultaattypen",
@@ -453,9 +486,10 @@ class CatalogiClient(APIClient):
         return result_types
 
     @cache_result(
-        "status_type:{status_type_url}", timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT
+        "{self.base_url}:status_type:{status_type_url}",
+        timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT,
     )
-    def fetch_single_status_type(self, status_type_url: str) -> Optional[StatusType]:
+    def fetch_single_status_type(self, status_type_url: str) -> StatusType | None:
         try:
             response = self.get(url=status_type_url)
             data = get_json_response(response)
@@ -468,12 +502,12 @@ class CatalogiClient(APIClient):
         return status_type
 
     @cache_result(
-        "resultaat_type:{resultaat_type_url}",
+        "{self.base_url}:resultaat_type:{resultaat_type_url}",
         timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT,
     )
     def fetch_single_resultaat_type(
         self, resultaat_type_url: str
-    ) -> Optional[ResultaatType]:
+    ) -> ResultaatType | None:
         try:
             response = self.get(url=resultaat_type_url)
             data = get_json_response(response)
@@ -485,7 +519,7 @@ class CatalogiClient(APIClient):
 
         return resultaat_type
 
-    def fetch_zaaktypes_no_cache(self) -> List[ZaakType]:
+    def fetch_zaaktypes_no_cache(self) -> list[ZaakType]:
         try:
             response = self.get("zaaktypen")
             data = get_json_response(response)
@@ -501,8 +535,8 @@ class CatalogiClient(APIClient):
     # not cached because only used by cronjob
     # and because caching (stale) listings can break lookups
     def fetch_case_types_by_identification_no_cache(
-        self, case_type_identification: str, catalog_url: Optional[str] = None
-    ) -> List[ZaakType]:
+        self, case_type_identification: str, catalog_url: str | None = None
+    ) -> list[ZaakType]:
         try:
             params = {
                 "identificatie": case_type_identification,
@@ -522,9 +556,10 @@ class CatalogiClient(APIClient):
         return zaak_types
 
     @cache_result(
-        "case_type:{case_type_url}", timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT
+        "{self.base_url}:case_type:{case_type_url}",
+        timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT,
     )
-    def fetch_single_case_type(self, case_type_url: str) -> Optional[ZaakType]:
+    def fetch_single_case_type(self, case_type_url: str) -> ZaakType | None:
         try:
             response = self.get(url=case_type_url)
             data = get_json_response(response)
@@ -536,7 +571,7 @@ class CatalogiClient(APIClient):
 
         return case_type
 
-    def fetch_catalogs_no_cache(self) -> List[Catalogus]:
+    def fetch_catalogs_no_cache(self) -> list[Catalogus]:
         """
         note the eSuite implementation returns status 500 for this call
         """
@@ -553,13 +588,13 @@ class CatalogiClient(APIClient):
         return catalogs
 
     @cache_result(
-        "information_object_type:{information_object_type_url}",
+        "{self.base_url}:information_object_type:{information_object_type_url}",
         timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT,
     )
     def fetch_single_information_object_type(
         self,
         information_object_type_url: str,
-    ) -> Optional[InformatieObjectType]:
+    ) -> InformatieObjectType | None:
         try:
             response = self.get(url=information_object_type_url)
             data = get_json_response(response)
@@ -572,10 +607,10 @@ class CatalogiClient(APIClient):
         return information_object_type
 
 
-class DocumentenClient(APIClient):
+class DocumentenClient(ZgwAPIClient):
     def _fetch_single_information_object(
-        self, *, url: Optional[str] = None, uuid: Optional[str] = None
-    ) -> Optional[InformatieObject]:
+        self, *, url: str | None = None, uuid: str | None = None
+    ) -> InformatieObject | None:
         if (url and uuid) or (not url and not uuid):
             raise ValueError("supply either 'url' or 'uuid' argument")
 
@@ -593,7 +628,7 @@ class DocumentenClient(APIClient):
 
         return info_object
 
-    def download_document(self, url: str) -> Optional[Response]:
+    def download_document(self, url: str) -> Response | None:
         try:
             response = self.get(url)
             response.raise_for_status()
@@ -609,7 +644,7 @@ class DocumentenClient(APIClient):
         title: str,
         informatieobjecttype_url: str,
         source_organization: str,
-    ) -> Optional[dict]:
+    ) -> dict | None:
         document_body = {
             "bronorganisatie": source_organization,
             "creatiedatum": date.today().strftime("%Y-%m-%d"),
@@ -634,18 +669,47 @@ class DocumentenClient(APIClient):
         return data
 
 
-class FormClient(APIClient):
-    def fetch_open_submissions(self, bsn: str) -> List[OpenSubmission]:
-        if not bsn:
-            return []
+class FormClient(ZgwAPIClient):
+    def fetch_open_submissions(
+        self,
+        user_bsn: str | None = None,
+        user_kvk: str | None = None,
+        vestigingsnummer: str | None = None,
+        max_requests: int = 4,
+        **kwargs,
+    ) -> list[OpenSubmission]:
+        if user_bsn and (user_kvk or vestigingsnummer):
+            raise ValueError(
+                "either `user_bsn` or `user_kvk` (optionally with `vestigingsnummer`) "
+                "should be supplied, not both"
+            )
 
+        if user_bsn:
+            return self.fetch_open_submissions_by_bsn(
+                user_bsn, max_requests=max_requests
+            )
+
+        if user_kvk:
+            return self.fetch_open_submissions_by_kvk(
+                user_kvk,
+                max_requests=max_requests,
+                vestigingsnummer=vestigingsnummer,
+            )
+
+        return []
+
+    def fetch_open_submissions_by_bsn(
+        self,
+        user_bsn: str,
+        max_requests: int,
+    ) -> list[OpenSubmission]:
         try:
             response = self.get(
                 "openstaande-inzendingen",
-                params={"bsn": bsn},
+                params={"bsn": user_bsn},
             )
             data = get_json_response(response)
-            all_data = list(pagination_helper(self, data))
+            all_data = list(pagination_helper(self, data, max_requests=max_requests))
         except (RequestException, ClientError) as e:
             logger.exception("exception while making request", exc_info=e)
             return []
@@ -654,20 +718,250 @@ class FormClient(APIClient):
 
         return results
 
+    def fetch_open_submissions_by_kvk(
+        self,
+        user_kvk: str,
+        vestigingsnummer: str | None,
+        max_requests: int,
+    ) -> list[OpenSubmission]:
+        request_params = {"kvk": user_kvk}
+        if vestigingsnummer:
+            request_params["vestigingsnummer"] = vestigingsnummer
 
-def build_client(type_) -> Optional[APIClient]:
-    config = OpenZaakConfig.get_solo()
-    services_to_client_mapping = {
-        "zaak": ZakenClient,
-        "catalogi": CatalogiClient,
-        "document": DocumentenClient,
-        "form": FormClient,
+        try:
+            response = self.get(
+                "openstaande-inzendingen",
+                params=request_params,
+            )
+            data = get_json_response(response)
+            all_data = list(pagination_helper(self, data, max_requests=max_requests))
+        except (RequestException, ClientError) as e:
+            logger.exception("exception while making request", exc_info=e)
+            return []
+
+        results = factory(OpenSubmission, all_data)
+
+        return results
+
+    def fetch_open_tasks(self, bsn: str) -> list[OpenTask]:
+        if not bsn:
+            return []
+
+        response = self.get(
+            "openstaande-taken",
+            params={"bsn": bsn},
+        )
+        data = get_json_response(response)
+        all_data = list(pagination_helper(self, data))
+
+        results = factory(OpenTask, all_data)
+
+        return results
+
+
+TClient = TypeVar("TClient", bound=APIClient)
+
+
+@dataclass(frozen=True)
+class ZgwClientResponse:
+    """A single response in a MultiZgwClientResult."""
+
+    client: TClient
+    result: Any
+    exception: Exception | None = None
+
+
+@dataclass(frozen=True)
+class MultiZgwClientProxyResult:
+    """Container for a multi-backend responses"""
+
+    responses: list[ZgwClientResponse]
+
+    @property
+    def has_errors(self) -> bool:
+        return any(r.exception is not None for r in self.responses)
+
+    @property
+    def failing_responses(self) -> list[ZgwClientResponse]:
+        return list(r for r in self if r.exception is not None)
+
+    @property
+    def successful_responses(self) -> list[ZgwClientResponse]:
+        return list(r for r in self if r.exception is None)
+
+    @property
+    def truthy_responses(self) -> list[ZgwClientResponse]:
+        return list(row for row in self.successful_responses if row.result)
+
+    def raise_on_failures(self):
+        """Raise a MultiZgwClientProxyError wrapping all errors raised by the clients."""
+        if not self.has_errors:
+            return
+
+        raise MultiZgwClientProxyError([r.exception for r in self.failing_responses])
+
+    def join_results(self):
+        """Join the results for all successful responses in a list."""
+        return list(
+            result for row in self.successful_responses for result in row.result
+        )
+
+    def __iter__(self):
+        yield from self.responses
+
+
+class MultiZgwClientProxy:
+    """A proxy to call the same method on multiple ZGW clients in parallel."""
+
+    clients: list[TClient] = []
+
+    def __init__(self, clients: list[TClient]):
+        self.clients = clients
+
+        if len(clients) == 0:
+            raise ValueError("You must specify at least one client")
+
+    def _call_method(self, method, *args, **kwargs) -> MultiZgwClientProxyResult:
+        if not all(hasattr(client, method) for client in self.clients):
+            raise AttributeError(f"Method `{method}` does not exist on the clients")
+
+        with parallel() as executor:
+            futures_mapping: Mapping[concurrent.futures.Future, TClient] = {}
+            for client in self.clients:
+                future = executor.submit(
+                    getattr(client, method),
+                    *args,
+                    **kwargs,
+                )
+                # Remember which future corresponds to which client,
+                # so we can associate them in the response
+                futures_mapping[future] = client
+
+            responses: list[ZgwClientResponse] = []
+            for task in concurrent.futures.as_completed(futures_mapping.keys()):
+                result: Any | None = None
+                exception: Exception | None = None
+                try:
+                    result: Any = task.result()
+                except BaseException:
+                    exception = task.exception()
+
+                responses.append(
+                    ZgwClientResponse(
+                        result=result, exception=exception, client=futures_mapping[task]
+                    )
+                )
+
+        # Ensure the response list is deterministic, based on the client order.
+        # This is mainly useful for testing but also generally promotes consistent
+        # behavior.
+        responses.sort(
+            key=lambda r: self.clients.index(r.client),
+        )
+        return MultiZgwClientProxyResult(responses=responses)
+
+    def __getattr__(self, name):
+        def wrapper(*args, **kwargs):
+            return self._call_method(name, *args, **kwargs)
+
+        return wrapper
+
+
+ZgwClientType = Literal["zaak", "catalogi", "document", "form"]
+ZgwClientFactoryReturn: TypeAlias = (
+    ZakenClient | CatalogiClient | DocumentenClient | FormClient
+)
+
+
+def build_zgw_client_from_service(service: Service) -> ZgwClientFactoryReturn:
+    services_to_client_mapping: Mapping[str, Type[ZgwClientFactoryReturn]] = {
+        APITypes.zrc: ZakenClient,
+        APITypes.ztc: CatalogiClient,
+        APITypes.drc: DocumentenClient,
+        APITypes.orc: FormClient,
     }
-    if client_class := services_to_client_mapping.get(type_):
-        service = getattr(config, f"{type_}_service")
-        if service:
-            client = _build_client(service, client_factory=client_class)
-            return client
 
-    logger.warning("no service defined for %s", type_)
-    return None
+    try:
+        client_class = services_to_client_mapping[service.api_type]
+    except KeyError:
+        raise ValueError(
+            f"No client defined for API type {service.api_type} on service {service}"
+        )
+
+    client = build_client(service, client_factory=client_class, configured_from=service)
+    return client
+
+
+def _build_all_zgw_clients_for_type(
+    type_: ZgwClientType,
+) -> list[ZakenClient | CatalogiClient | DocumentenClient | FormClient]:
+    config = OpenZaakConfig.get_solo()
+    services_to_client_mapping: Mapping[ZgwClientType, str] = {
+        "zaak": "zrc_service",
+        "catalogi": "ztc_service",
+        "document": "drc_service",
+        "form": "form_service",
+    }
+
+    return [
+        build_zgw_client_from_service(
+            getattr(api_group, services_to_client_mapping[type_])
+        )
+        for api_group in config.api_groups.all()
+    ]
+
+
+_SINGLETON_ZGW_CLIENT_DEPRECATION_MESSAGE = (
+    "Singleton ZGW client factories are in the process of being deprecated in favour of"
+    " multi-ZGW backend aware implementations. Use build_*_clients() or build_zgw_"
+    "client_from_service() instead."
+)
+warnings.filterwarnings(
+    "once", _SINGLETON_ZGW_CLIENT_DEPRECATION_MESSAGE, category=DeprecationWarning
+)
+
+
+def build_zaken_client() -> ZakenClient:
+    warnings.warn(_SINGLETON_ZGW_CLIENT_DEPRECATION_MESSAGE, DeprecationWarning)
+    config = OpenZaakConfig.get_solo()
+    return build_zgw_client_from_service(config.zaak_service)
+
+
+def build_zaken_clients() -> list[ZakenClient]:
+    return _build_all_zgw_clients_for_type("zaak")
+
+
+def build_catalogi_client() -> CatalogiClient:
+    warnings.warn(_SINGLETON_ZGW_CLIENT_DEPRECATION_MESSAGE, DeprecationWarning)
+    config = OpenZaakConfig.get_solo()
+    return build_zgw_client_from_service(config.catalogi_service)
+
+
+def build_catalogi_clients() -> list[CatalogiClient]:
+    return _build_all_zgw_clients_for_type("catalogi")
+
+
+def build_documenten_client() -> DocumentenClient:
+    warnings.warn(_SINGLETON_ZGW_CLIENT_DEPRECATION_MESSAGE, DeprecationWarning)
+    config = OpenZaakConfig.get_solo()
+    return build_zgw_client_from_service(config.document_service)
+
+
+def build_documenten_clients() -> list[DocumentenClient]:
+    return _build_all_zgw_clients_for_type("document")
+
+
+def build_forms_client() -> FormClient | None:
+    warnings.warn(_SINGLETON_ZGW_CLIENT_DEPRECATION_MESSAGE, DeprecationWarning)
+    config = OpenZaakConfig.get_solo()
+
+    # Special case: though we require all other services,
+    # the form_service may not in fact be set
+    if not config.form_service:
+        return None
+
+    return build_zgw_client_from_service(config.form_service)
+
+
+def build_forms_clients() -> list[FormClient]:
+    return _build_all_zgw_clients_for_type("form")

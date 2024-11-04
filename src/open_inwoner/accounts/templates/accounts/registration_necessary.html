@@ -1,32 +1,95 @@
 {% extends 'master.html' %}
-{% load i18n static form_tags card_tags grid_tags solo_tags %}
+{% load i18n static form_tags card_tags grid_tags solo_tags icon_tags %}
 
 {% block content %}
 <div class="registration-grid">
-{% render_grid %}
-    {% render_column span=9 %}
-        {% render_card tinted=True  %}
+    {% render_grid %}
+        {% render_column start=5 span=5 %}
             {% get_solo 'configurations.SiteConfiguration' as config %}
-            <h1 class="h1">{% trans "Registratie voltooien" %}</h1><br>
-            {% if config.registration_text %}<p class="p">{{ config.registration_text|urlize|linebreaksbr }}</p><br>{% endif %}
-            <form method="POST" id="necessary-form" action="{% url 'profile:registration_necessary' %}" class="form" novalidate>
+            <h1 class="utrecht-heading-1">{% trans "Registratie voltooien" %}</h1><br>
+            {% if config.registration_text %}<p class="utrecht-paragraph">{{ config.registration_text|urlize|linebreaksbr }}</p>{% endif %}
+            <form method="POST" id="necessary-form" action="{{ request.get_full_path }}" class="form form__choice-list" novalidate>
                 {% csrf_token %}
 
-                {% for field in form.fields %}
-                    {% autorender_field form field %}
-                {% endfor %}
+                {% if form.first_name %}
+                    {% input form.first_name %}
+                {% endif %}
 
-                {# pseudo checkbox for notifications that cannot be disabled #}
-                <div class="checkbox">
-                    <input type="checkbox" name="cases_notifications_action_required" disabled="" class="checkbox__input checkbox__input--disabled" checked="">
-                    <label class="checkbox__label" for="id_cases_notifications_action_required">{% trans "Zaaknotificaties - action required" %}</label>
-                    <p class="p">{% trans "E-mail notifications for case updates that require action (cannot be disabled)" %}</p>
-                </div>
+                {% if form.infix %}
+                    {% input form.infix %}
+                {% endif %}
 
-                {% form_actions primary_icon='arrow_forward' primary_text="Verzenden" %}
+                {% if form.last_name %}
+                    {% input form.last_name %}
+                {% endif %}
+
+                {% if form.email %}
+                    {% input form.email %}
+                {% endif %}
+
+                {% if form.invite %}
+                    {% input form.invite no_label=True %}
+                {% endif %}
+
+
+                {% if config.any_notifications_enabled %}
+                    <h3 class="utrecht-heading-3">{% trans "Notification preferences" %}</h3>
+
+                    {# Start of multiple checkbox fields #}
+                    <ul class="choice-list choice-list-multiple">
+
+                        {% if form.cases_notifications %}
+                            <li class="choice-list-multiple__item">
+                                <div class="choice-list-multiple__content">
+                                    {% checkbox form.cases_notifications %}
+                                </div>
+                            </li>
+                        {% endif %}
+
+                        {% if form.messages_notifications %}
+                            <li class="choice-list-multiple__item">
+                                <div class="choice-list-multiple__content">
+                                    {% checkbox form.messages_notifications %}
+                                </div>
+                            </li>
+                        {% endif %}
+
+                        {% if form.plans_notifications %}
+                            <li class="choice-list-multiple__item">
+                                <div class="choice-list-multiple__content">
+                                    {% checkbox form.plans_notifications %}
+                                </div>
+                            </li>
+                        {% endif %}
+                    </ul>
+                {% endif %}
+                    {# End of multiple checkbox fields #}
+
+                {% if config.notifications_cases_enabled %}
+                    {# Info on notifications that cannot be disabled #}
+                    <div class="choice-list__information">
+                        <p class="choice-list-multiple__heading-4">{% icon icon="check" outlined=True %} {% trans "Zaaknotificaties wanneer actie nodig is" %}</p>
+                        <p class="choice-list__p">{% trans "E-mailnotificaties wanneer er actie nodig is voor een zaak (kan niet uitgeschakeld worden)" %}</p>
+                    </div>
+
+                    {# Choice of zaken notification channel #}
+                    {% if form.case_notification_channel %}
+                        <p class="utrecht-paragraph choice-list__p">{% trans "Hoe wilt u deze notificaties ontvangen?" %}</p>
+                        {% with form.case_notification_channel as field %}
+                            {% choice_list single=True cols=True %}
+                                {% for choice in field.field.choices %}
+                                    {% choice_list_item input_type_radio=True choice=choice name=field.name data=field.value index=forloop.counter initial=field.form.initial icon_symbol=choice.1|get_icon_symbol %}
+                                {% endfor %}
+                            {% endchoice_list %}
+                        {% endwith %}
+                    {% endif %}
+                {% endif %}
+
+                <div class="choice-list__information--bottom-border"></div>
+
+                {% form_actions primary_icon='east' primary_text="Voltooi registratie" fullwidth=True %}
             </form>
-        {% endrender_card %}
-    {% endrender_column %}
-{% endrender_grid %}
+        {% endrender_column %}
+    {% endrender_grid %}
 </div>
 {% endblock content %}
