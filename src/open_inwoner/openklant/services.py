@@ -291,6 +291,9 @@ class eSuiteKlantenService(KlantenService):
             if not User.objects.filter(email__iexact=klant.emailadres).exists():
                 update_data["email"] = klant.emailadres
 
+        if klant.bedrijfsnaam and klant.bedrijfsnaam != user.company_name:
+            update_data["company_name"] = klant.bedrijfsnaam
+
         config = SiteConfiguration.get_solo()
         if config.enable_notification_channel_choice:
             if (
