@@ -13,7 +13,7 @@ from furl import furl
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openzaak.clients import MultiZgwClientProxy, build_zaken_clients
 from open_inwoner.openzaak.models import ZGWApiGroupConfig
-from open_inwoner.openzaak.utils import get_user_fetch_parameters
+from open_inwoner.openzaak.utils import get_user_fetch_parameters, is_zaak_visible
 from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import CommonPageMixin, LoginMaybeRequiredMixin, LogMixin
 
@@ -89,15 +89,21 @@ class SearchView(
                     api_group = ZGWApiGroupConfig.objects.resolve_group_from_hints(
                         client=case_result.client
                     )
-                    return HttpResponseRedirect(
-                        reverse(
-                            "cases:case_detail",
-                            kwargs={
-                                "object_id": str(case_result.result[0].uuid),
-                                "api_group_id": api_group.id,
-                            },
-                        )
+                    zaak = proxy_result.responses[0].result[0]
+                    zaaktype = api_group.catalogi_client.fetch_single_case_type(
+                        zaak.zaaktype
                     )
+                    zaak.zaaktype = zaaktype
+                    if is_zaak_visible(zaak):
+                        return HttpResponseRedirect(
+                            reverse(
+                                "cases:case_detail",
+                                kwargs={
+                                    "object_id": str(zaak.uuid),
+                                    "api_group_id": api_group.id,
+                                },
+                            )
+                        )
 
         # perform search
         results = search_products(query, filters=data)
