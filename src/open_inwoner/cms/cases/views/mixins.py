@@ -49,11 +49,11 @@ class CaseAccessMixin(AccessMixin):
 
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            logger.debug("CaseAccessMixin - permission denied: user not authenticated")
+            logger.info("CaseAccessMixin - permission denied: user not authenticated")
             return self.handle_no_permission()
 
         if not request.user.bsn and not request.user.kvk:
-            logger.debug(
+            logger.info(
                 "CaseAccessMixin - permission denied: user doesn't have a bsn or kvk number"
             )
             return self.handle_no_permission()
@@ -71,8 +71,8 @@ class CaseAccessMixin(AccessMixin):
                     if not client.fetch_roles_for_case_and_bsn(
                         self.case.url, request.user.bsn
                     ):
-                        logger.debug(
-                            f"CaseAccessMixin - permission denied: no role for the case {self.case.url}"
+                        logger.info(
+                            f"CaseAccessMixin - permission denied via bsn: no role for the case {self.case.url}"
                         )
                         return self.handle_no_permission()
                 elif request.user.kvk:
@@ -82,24 +82,22 @@ class CaseAccessMixin(AccessMixin):
                         identifier = self.request.user.rsin
 
                     vestigingsnummer = get_kvk_branch_number(self.request.session)
-                    if (
-                        vestigingsnummer
-                        and not client.fetch_roles_for_case_and_vestigingsnummer(
+                    if vestigingsnummer:
+                        if not client.fetch_roles_for_case_and_vestigingsnummer(
                             self.case.url, vestigingsnummer
-                        )
-                    ):
-                        logger.debug(
-                            f"CaseAccessMixin - permission denied: no role for the case {self.case.url}"
-                        )
-                        return self.handle_no_permission()
-
-                    if not client.fetch_roles_for_case_and_kvk_or_rsin(
-                        self.case.url, identifier
-                    ):
-                        logger.debug(
-                            f"CaseAccessMixin - permission denied: no role for the case {self.case.url}"
-                        )
-                        return self.handle_no_permission()
+                        ):
+                            logger.info(
+                                f"CaseAccessMixin - permission denied via vestigingsnummer: no role for the case {self.case.url}"
+                            )
+                            return self.handle_no_permission()
+                    else:
+                        if not client.fetch_roles_for_case_and_kvk_or_rsin(
+                            self.case.url, identifier
+                        ):
+                            logger.info(
+                                f"CaseAccessMixin - permission denied via kvk/rsin: no role for the case {self.case.url}"
+                            )
+                            return self.handle_no_permission()
 
                 # resolve case-type
                 catalogi_client = api_group.catalogi_client
@@ -107,14 +105,14 @@ class CaseAccessMixin(AccessMixin):
                     self.case.zaaktype
                 )
                 if not self.case.zaaktype:
-                    logger.debug(
+                    logger.info(
                         f"CaseAccessMixin - permission denied: no case type for case {self.case.url}"
                     )
                     return self.handle_no_permission()
 
                 # check if case + case-type are visible
                 if not is_zaak_visible(self.case):
-                    logger.debug(
+                    logger.info(
                         f"CaseAccessMixin - permission denied: case {self.case.url} is not visible"
                     )
                     return self.handle_no_permission()
@@ -135,7 +133,7 @@ class OuterCaseAccessMixin(LoginRequiredMixin):
             and not request.user.bsn
             and not request.user.kvk
         ):
-            logger.debug(
+            logger.info(
                 "OuterCaseAccessMixin - permission denied: user doesn't have a bsn or kvk number"
             )
             return self.handle_no_permission()

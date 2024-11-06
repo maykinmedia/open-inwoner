@@ -1596,15 +1596,14 @@ class TestCaseDetailView(
                 )
 
     @set_kvk_branch_number_in_session("1234")
-    def test_no_access_as_vestiging_when_no_roles_are_found_for_user_kvk_or_rsin(
-        self, m
-    ):
+    def test_access_as_vestiging_when_only_role_for_vestiging(self, m):
         """
         Just having a role with betrokkeneType vestiging that matches for a case
-        is not sufficient to have access
+        is sufficient to have access.
         """
         self.client.force_login(user=self.eherkenning_user)
 
+        # Requires manually setting mocks to avoid default roles on case
         m.get(self.zaak["url"], json=self.zaak)
         m.get(self.zaaktype["url"], json=self.zaaktype)
         m.get(
@@ -1612,6 +1611,31 @@ class TestCaseDetailView(
             # no main branch roles for our user found
             json=paginated_response([self.eherkenning_user_role_kvk_vestiging]),
         )
+        m.get(f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak['url']}", json=[])
+        m.get(
+            f"{ZAKEN_ROOT}statussen?zaak={self.zaak['url']}",
+            json=paginated_response([self.status_new]),
+        )
+        m.get(
+            f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
+            json=self.status_new,
+        )
+        m.get(
+            f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten?object={self.zaak['url']}",
+            json=paginated_response([]),
+        )
+        m.get(
+            f"{CATALOGI_ROOT}statustypen?zaaktype={self.zaaktype['url']}",
+            json=paginated_response(
+                [
+                    self.status_type_new,
+                    self.status_type_finish,
+                ]
+            ),
+        )
+        m.get(self.status_type_new["url"], json=self.status_type_new)
+        m.get(self.result["url"], json=self.result)
+        m.get(self.resultaattype_with_naam["url"], json=self.resultaattype_with_naam)
 
         for fetch_eherkenning_zaken_with_rsin in [True, False]:
             with self.subTest(
@@ -1624,10 +1648,8 @@ class TestCaseDetailView(
 
                 response = self.client.get(self.case_detail_url)
 
-                self.assertTemplateUsed("pages/cases/403.html")
-                self.assertContains(
-                    response, _("Sorry, you don't have access to this page (403)")
-                )
+                self.assertEquals(response.status_code, 200)
+                self.assertContains(response, self.zaak["identificatie"])
 
     @set_kvk_branch_number_in_session("1234")
     def test_no_access_as_vestiging_when_no_roles_are_found_for_vestigingsnummer(
@@ -1665,6 +1687,7 @@ class TestCaseDetailView(
                     response, _("Sorry, you don't have access to this page (403)")
                 )
 
+    @set_kvk_branch_number_in_session(value=None)
     def test_no_access_if_fetch_eherkenning_zaken_with_rsin_and_user_has_no_rsin(
         self, m
     ):
