@@ -162,7 +162,6 @@ class ZakenClient(ZgwAPIClient):
         config = OpenZaakConfig.get_solo()
 
         params = {
-            "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId": kvk_or_rsin,
             "maximaleVertrouwelijkheidaanduiding": config.zaak_max_confidentiality,
         }
 
@@ -170,6 +169,12 @@ class ZakenClient(ZgwAPIClient):
             params.update(
                 {
                     "rol__betrokkeneIdentificatie__vestiging__vestigingsNummer": vestigingsnummer,
+                }
+            )
+        else:
+            params.update(
+                {
+                    "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId": kvk_or_rsin,
                 }
             )
 

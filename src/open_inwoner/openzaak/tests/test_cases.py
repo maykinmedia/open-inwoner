@@ -422,7 +422,6 @@ class CaseListMocks:
                 furl(f"{self.zaken_root}zaken")
                 .add(
                     {
-                        "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId": identifier,
                         "maximaleVertrouwelijkheidaanduiding": VertrouwelijkheidsAanduidingen.beperkt_openbaar,
                         "rol__betrokkeneIdentificatie__vestiging__vestigingsNummer": "1234",
                     }
@@ -840,13 +839,10 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                         else self.eherkenning_user.kvk
                     )
 
-                    self.assertEqual(len(list_zaken_req.qs), 3)
+                    self.assertEqual(len(list_zaken_req.qs), 2)
                     self.assertEqual(
                         list_zaken_req.qs,
                         {
-                            "rol__betrokkeneidentificatie__nietnatuurlijkpersoon__innnnpid": [
-                                identifier
-                            ],
                             "maximalevertrouwelijkheidaanduiding": [
                                 VertrouwelijkheidsAanduidingen.beperkt_openbaar
                             ],
