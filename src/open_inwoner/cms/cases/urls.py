@@ -26,7 +26,7 @@ urlpatterns = [
         name="contactmoment_list",
     ),
     path(
-        "contactmomenten/<str:kcm_uuid>/",
+        "contactmomenten/<str:api_service>/<str:kcm_uuid>/",
         KlantContactMomentDetailView.as_view(),
         name="contactmoment_detail",
     ),

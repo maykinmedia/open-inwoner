@@ -84,17 +84,17 @@ class ZaakWithApiGroup:
 
 class Question(TypedDict):
     identification: str
-    source_url: str  # points to contactmoment or klantcontact
+    url: str
+    api_source_url: str  # points to contactmoment or klantcontact url
     subject: str
     registered_date: datetime.datetime
     question_text: str
     answer_text: str | None
     status: str
     channel: str
-    case_detail_url: str | None = None
+    new_answer_available: bool = False
 
     api_service: KlantenServiceType
-    new_answer_available: bool = False
 
 
 QuestionValidator = TypeAdapter(Question)
@@ -602,22 +602,28 @@ class eSuiteVragenService(KlantenService):
             raise ValueError("Received unresolved contactmoment")
 
         question_data = {
-            "answer_text": kcm.contactmoment.antwoord,
             "identification": kcm.contactmoment.identificatie,
+            "url": reverse(
+                "cases:contactmoment_detail",
+                kwargs={
+                    "api_service": KlantenServiceType.ESUITE.value,
+                    "kcm_uuid": kcm.uuid,
+                },
+            ),
+            "api_source_url": kcm.contactmoment.url,
+            "subject": self._get_kcm_subject(kcm) or "",
+            "registered_date": kcm.contactmoment.registratiedatum,
             "question_text": kcm.contactmoment.tekst,
+            "answer_text": kcm.contactmoment.antwoord,
+            "status": str(Status.safe_label(kcm.contactmoment.status, _("Onbekend"))),
+            "channel": kcm.contactmoment.kanaal.title(),
             "new_answer_available": self.contactmoment_has_new_answer(
                 kcm.contactmoment, local_kcm_mapping=local_kcm_mapping
             ),
-            "subject": self._get_kcm_subject(kcm) or "",
-            "registered_date": kcm.contactmoment.registratiedatum,
-            "status": str(Status.safe_label(kcm.contactmoment.status, _("Onbekend"))),
-            "case_detail_url": reverse(
-                "cases:contactmoment_detail", kwargs={"kcm_uuid": kcm.uuid}
-            ),
-            "channel": kcm.contactmoment.kanaal.title(),
-            "source_url": kcm.contactmoment.url,
             "api_service": KlantenServiceType.ESUITE,
         }
+        # TODO: remove
+        # import pdbr;pdbr.set_trace()
         return QuestionValidator.validate_python(question_data)
 
     def fetch_klantcontactmomenten(
@@ -1258,6 +1264,28 @@ class OpenKlant2Service(KlantenService):
         questions = self.questions_for_partij(partij_uuid=partij["uuid"])
         return self._reformat_questions(questions, user)
 
+    def retrieve_question(
+        self,
+        fetch_params: FetchParameters,
+        question_uuid: str,
+        user: User,  # is this needed?
+    ) -> tuple[Question | None, ZaakWithApiGroup | None]:  # noqa: E704
+        if bsn := fetch_params.get("user_bsn"):
+            partij = self.find_persoon_for_bsn(bsn)
+        elif kvk_or_rsin := fetch_params.get("user_kvk_or_rsin"):
+            partij = self.find_organisatie_for_kvk(kvk_or_rsin)
+
+        all_questions = self.questions_for_partij(partij_uuid=partij["uuid"])
+        question = next(
+            q for q in all_questions if q.question_kcm_uuid == question_uuid
+        )
+
+        # FIXME
+        # should return (Question, zaak_with_api_group); the latter is left out until a
+        # standard for linking klantcontact + zaak is agreed upon
+        # https://github.com/Klantinteractie-Servicesysteem/KISS-frontend/issues/808#issuecomment-2357637675
+        return self._reformat_question(question), None
+
     # TODO: handle `status` + `new_answer_available`
     # `case_detail_url`: will be handled in integration of detail view
     # `status`: eSuite has three: "nieuw", "in behandeling", "afgehandeld"
@@ -1273,7 +1301,7 @@ class OpenKlant2Service(KlantenService):
             )
             question = {
                 "identification": q.nummer,
-                "source_url": q.url,
+                "api_source_url": q.url,
                 "subject": q.onderwerp,
                 "registered_date": q.plaatsgevonden_op,
                 "question_text": q.question,
@@ -1288,6 +1316,20 @@ class OpenKlant2Service(KlantenService):
             }
             questions.append(question)
         return [QuestionValidator.validate_python(q) for q in questions]
+
+    def _reformat_question(self, question_ok2: OpenKlant2Question) -> Question:
+        return {
+            "identification": question_ok2.nummer,
+            "subject": question_ok2.onderwerp,
+            "registered_date": question_ok2.plaatsgevonden_op,
+            "question_text": question_ok2.question,
+            "answer_text": question_ok2.answer.answer,
+            "status": "",
+            "channel": question_ok2.kanaal,
+            "case_detail_url": getattr(question_ok2, "zaak_url", None),
+            "api_source": KlantenServiceType.openklant2,
+            "new_answer_available": self._has_new_answer_available(question_ok2),
+        }
 
     def _has_new_answer_available(
         self, question: OpenKlant2Question, answer: KlantContactMomentAnswer

@@ -187,7 +187,11 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        service = self.get_service(service_type=KlantenServiceType.ESUITE)
+
+        if KlantenServiceType.esuite in self.request.path:
+            service = self.get_service(service_type=KlantenServiceType.esuite)
+        elif KlantenServiceType.openklant2 in self.request.path:
+            service = self.get_service(service_type=KlantenServiceType.openklant2)
 
         kcm, zaak = service.retrieve_question(
             self.get_fetch_params(service), kwargs["kcm_uuid"], user=self.request.user
@@ -198,7 +202,7 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
         QuestionValidator.validate_python(kcm)
 
         local_kcm, created = KlantContactMomentAnswer.objects.get_or_create(  # noqa
-            user=self.request.user, contactmoment_url=kcm["case_detail_url"]
+            user=self.request.user, contactmoment_url=kcm["url"]
         )
         if not local_kcm.is_seen:
             local_kcm.is_seen = True
