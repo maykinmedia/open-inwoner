@@ -245,7 +245,7 @@ class InnerCaseDetailView(
                 "end_date_legal": getattr(
                     self.case, "uiterlijke_einddatum_afdoening", None
                 ),
-                "description": self.case.zaaktype.omschrijving,
+                "description": self.case.description,
                 "statuses": self.get_statuses_data(
                     statuses, self.statustype_config_mapping
                 ),
