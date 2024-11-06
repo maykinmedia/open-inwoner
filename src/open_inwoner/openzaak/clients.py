@@ -79,14 +79,18 @@ class ZakenClient(ZgwAPIClient):
             return self.fetch_cases_by_bsn(
                 user_bsn, max_requests=max_requests, identificatie=identificatie
             )
-
-        if user_kvk or user_rsin:
-            user_kvk_or_rsin = user_rsin if user_rsin else user_kvk
-            return self.fetch_cases_by_kvk_or_rsin(
-                user_kvk_or_rsin,
+        if vestigingsnummer:
+            return self.fetch_cases_for_company(
                 max_requests=max_requests,
                 zaak_identificatie=identificatie,
                 vestigingsnummer=vestigingsnummer,
+            )
+        if user_kvk or user_rsin:
+            user_kvk_or_rsin = user_rsin if user_rsin else user_kvk
+            return self.fetch_cases_for_company(
+                kvk_or_rsin=user_kvk_or_rsin,
+                max_requests=max_requests,
+                zaak_identificatie=identificatie,
             )
         return []
 
@@ -142,9 +146,9 @@ class ZakenClient(ZgwAPIClient):
         "{self.base_url}:cases:{kvk_or_rsin}:{vestigingsnummer}:{max_requests}:{zaak_identificatie}",
         timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
     )
-    def fetch_cases_by_kvk_or_rsin(
+    def fetch_cases_for_company(
         self,
-        kvk_or_rsin: str | None,
+        kvk_or_rsin: str | None = None,
         max_requests: int | None = 4,
         zaak_identificatie: str | None = None,
         vestigingsnummer: str | None = None,
@@ -152,26 +156,31 @@ class ZakenClient(ZgwAPIClient):
         """
         retrieve cases for particular company with allowed confidentiality level
 
+        :param kvk_or_rsin: - used to filter the cases by a KVK number or RSIN (configured via OpenZaakConfig)
         :param max_requests: - used to limit the number of requests to list_zaken resource.
         :param zaak_identificatie: - used to filter the cases by a unique Zaak identification number
         :param vestigingsnummer: - used to filter the cases by a vestigingsnummer
         """
-        if not kvk_or_rsin:
-            return []
 
         config = OpenZaakConfig.get_solo()
 
         params = {
-            "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId": kvk_or_rsin,
             "maximaleVertrouwelijkheidaanduiding": config.zaak_max_confidentiality,
         }
-
         if vestigingsnummer:
             params.update(
                 {
                     "rol__betrokkeneIdentificatie__vestiging__vestigingsNummer": vestigingsnummer,
                 }
             )
+        elif kvk_or_rsin:
+            params.update(
+                {
+                    "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId": kvk_or_rsin,
+                }
+            )
+        else:
+            return []
 
         if zaak_identificatie:
             params.update({"identificatie": zaak_identificatie})

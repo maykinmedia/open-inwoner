@@ -665,7 +665,6 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, TransactionWebTest):
                 furl(f"{ZAKEN_ROOT}zaken")
                 .add(
                     {
-                        "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId": identifier,
                         "maximaleVertrouwelijkheidaanduiding": VertrouwelijkheidsAanduidingen.beperkt_openbaar,
                         "rol__betrokkeneIdentificatie__vestiging__vestigingsNummer": "1234",
                     }
