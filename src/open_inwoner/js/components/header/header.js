@@ -69,6 +69,14 @@ class Header extends Component {
       )
     })
     window.scrollTo(0, 0)
+
+    // Focus on the first navigation item in opened mobile menu
+    const firstNavItem = document.querySelector(
+      '.primary-navigation__list-item .link'
+    )
+    if (firstNavItem) {
+      firstNavItem.focus()
+    }
   }
 
   /**
