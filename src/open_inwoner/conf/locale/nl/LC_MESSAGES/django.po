@@ -767,7 +767,7 @@ msgstr "Postcode"
 
 #: open_inwoner/accounts/models.py:169
 msgid "City"
-msgstr "Stad"
+msgstr "Plaats"
 
 #: open_inwoner/accounts/models.py:176
 msgid "Deactivated on"
@@ -5829,11 +5829,11 @@ msgstr "Postcode"
 
 #: open_inwoner/pdc/models/mixins.py:69
 msgid "city"
-msgstr "stad"
+msgstr "plaats"
 
 #: open_inwoner/pdc/models/mixins.py:69
 msgid "Address city"
-msgstr "Stad"
+msgstr "Adres plaats"
 
 #: open_inwoner/pdc/models/mixins.py:71
 msgid "geometry"
