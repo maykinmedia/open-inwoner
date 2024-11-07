@@ -2,10 +2,10 @@
 {% load i18n grid_tags button_tags icon_tags %}
 
 {% block content %}
-    {% if contactmoment %}
+    {% if question %}
         {% render_grid %}
             {% render_column span=12 %}
-                <h1 class="utrecht-heading-1" id="title">{{ contactmoment.subject }}</h1>
+                <h1 class="utrecht-heading-1" id="title">{{ question.subject }}</h1>
                 {% include "components/Dashboard/Dashboard.html" with metrics=metrics only %}
             {% endrender_column %}
         {% endrender_grid %}
@@ -15,12 +15,12 @@
                 <section class="contactmoment">
                     <div>
                         <h2 class="contactmoment__heading">{% trans "Uw vraag" %}</h2>
-                        <p class="contactmoment__text">{{ contactmoment.question_text }}</p>
+                        <p class="contactmoment__text">{{ question.question_text }}</p>
                     </div>
                     <div>
                         <h2 class="contactmoment__heading">{% trans "Antwoord" %}</h2>
-                        {% if contactmoment.answer_text %}
-                            <p class="contactmoment__text">{{ contactmoment.answer_text }}</p>
+                        {% if question.answer_text %}
+                            <p class="contactmoment__text">{{ question.answer_text }}</p>
                         {% else %}
                             <p class="contactmoment__text">{% trans "Nog geen antwoord beschijkbaar" %}</p>
                         {% endif %}

@@ -1,20 +1,18 @@
 {% load i18n icon_tags list_tags %}
 
-<a href="{% url 'cases:kcm_redirect' contactmoment.uuid %}" class="card card--compact card--stretch {% if toggle_hide %}card--toggle-hide{% endif %} contactmomenten__link">
-    {% if contactmoment.new_answer_available %}
+<a href="{% url 'cases:kcm_redirect' question.api_source_uuid %}" class="card card--compact card--stretch {% if toggle_hide %}card--toggle-hide{% endif %} contactmomenten__link">
+    {% if question.new_answer_available %}
         {% translate "Nieuw antwoord beschikbaar" as new_answer_text %}
         {% include "components/StatusIndicator/StatusIndicator.html" with status_indicator="info" status_indicator_text=new_answer_text only %}
     {% endif %}
     <div class="card__body">
         {% render_list %}
             <li class="list-item list-item--compact">
-                {% with register_date=contactmoment.registratiedatum|default:"" %}
-                <p class="card__caption card__text--small"><span>{% trans "Vraag ingediend op" %}:</span><span class="card__text--dark">{{ register_date|date }}</span></p>
-                {% endwith %}
+                <p class="card__caption card__text--small"><span>{% trans "Vraag ingediend op" %}:</span><span class="card__text--dark">{{ question.registered_date|date|default:"" }}</span></p>
             </li>
-            {% list_item contactmoment.tekst compact=True strong=False %}
+            {% list_item question.question_text compact=True strong=False %}
             <li class="list-item list-item--compact">
-                {% with channel=contactmoment.kanaal|default:"" %}
+                {% with channel=question.channel|upper|default:"" %}
                 <p class="card__caption card__text--small"><span>{% trans "Ingediend via" %}:</span><span class="card__text--dark">{{ channel }}</span></p>
                 {% endwith %}
             </li>

@@ -53,6 +53,7 @@ from open_inwoner.openzaak.models import ZGWApiGroupConfig
 from open_inwoner.utils.api import ClientError, get_json_response
 from open_inwoner.utils.logentry import system_action
 from open_inwoner.utils.time import instance_is_new
+from open_inwoner.utils.url import uuid_from_url
 from openklant2.client import OpenKlant2Client
 from openklant2.types.resources.digitaal_adres import DigitaalAdres
 from openklant2.types.resources.klant_contact import (
@@ -84,16 +85,15 @@ class ZaakWithApiGroup:
 
 class Question(TypedDict):
     identification: str
-    url: str
     api_source_url: str  # points to contactmoment or klantcontact url
+    api_source_uuid: uuid.UUID  # points to contactmoment or klantcontact uuid
     subject: str
-    registered_date: datetime.datetime
     question_text: str
     answer_text: str | None
+    registered_date: datetime.datetime
     status: str
     channel: str
     new_answer_available: bool = False
-
     api_service: KlantenServiceType
 
 
@@ -243,7 +243,7 @@ class eSuiteKlantenService(KlantenService):
             )
 
         try:
-            response = self.post("klanten", json=data)
+            response = self.client.post("klanten", json=data)
             data = get_json_response(response)
         except (RequestException, ClientError):
             logger.exception("exception while making request")
@@ -592,7 +592,7 @@ class eSuiteVragenService(KlantenService):
     ) -> dict[str, KlantContactMomentAnswer]:
         return get_kcm_answer_mapping(contactmomenten, user)
 
-    def _get_question_data(
+    def _build_question_dto(
         self,
         kcm: KlantContactMoment,
         local_kcm_mapping: dict[str, KlantContactMomentAnswer] | None = None,
@@ -611,19 +611,20 @@ class eSuiteVragenService(KlantenService):
                 },
             ),
             "api_source_url": kcm.contactmoment.url,
+            "api_source_uuid": kcm.contactmoment.uuid,
             "subject": self._get_kcm_subject(kcm) or "",
-            "registered_date": kcm.contactmoment.registratiedatum,
             "question_text": kcm.contactmoment.tekst,
             "answer_text": kcm.contactmoment.antwoord,
+            "registered_date": datetime.datetime.fromisoformat(
+                kcm.contactmoment.registratiedatum.isoformat()
+            ),
             "status": str(Status.safe_label(kcm.contactmoment.status, _("Onbekend"))),
-            "channel": kcm.contactmoment.kanaal.title(),
+            "channel": kcm.contactmoment.kanaal,
             "new_answer_available": self.contactmoment_has_new_answer(
                 kcm.contactmoment, local_kcm_mapping=local_kcm_mapping
             ),
             "api_service": KlantenServiceType.ESUITE,
         }
-        # TODO: remove
-        # import pdbr;pdbr.set_trace()
         return QuestionValidator.validate_python(question_data)
 
     def fetch_klantcontactmomenten(
@@ -659,7 +660,7 @@ class eSuiteVragenService(KlantenService):
             ]
 
         contactmomenten = [
-            self._get_question_data(
+            self._build_question_dto(
                 kcm,
                 local_kcm_mapping=self.get_kcm_answer_mapping(
                     [kcm.contactmoment for kcm in kcms], user
@@ -707,7 +708,52 @@ class eSuiteVragenService(KlantenService):
                     # We should at least receive a ping if this happens.
                     logger.error("Found one zaak in multiple backends")
 
-        return self._get_question_data(kcm), zaak_with_api_group
+        return self._build_question_dto(kcm), zaak_with_api_group
+
+    def list_questions_for_zaak(self, zaak: Zaak, user: User) -> list[Question]:
+        objectcontactmomenten = self.retrieve_objectcontactmomenten_for_zaak(zaak)
+
+        contactmomenten = []
+        for ocm in objectcontactmomenten:
+            question = getattr(ocm, "contactmoment", None)
+            if question:
+                contactmomenten.append(question)
+        contactmomenten.sort(key=lambda q: q.registratiedatum, reverse=True)
+
+        if exclude_range := self.config.exclude_contactmoment_kanalen:
+            contactmomenten = [
+                item
+                for item in contactmomenten
+                if glom.glom(item, "kanaal") not in exclude_range
+            ]
+
+        kcm_answer_mapping = get_kcm_answer_mapping(contactmomenten, user)
+        questions = []
+        for contactmoment in contactmomenten:
+            new_answer_available = contactmoment_has_new_answer(
+                contactmoment, kcm_answer_mapping
+            )
+            questions.append(
+                Question(
+                    identification=contactmoment.identificatie,
+                    api_source_url=contactmoment.url,
+                    api_source_uuid=contactmoment.uuid,
+                    zaak_detail_url=zaak.url,
+                    subject=contactmoment.onderwerp,
+                    question_text=contactmoment.tekst,
+                    answer_text=contactmoment.antwoord,
+                    registered_date=contactmoment.registratiedatum,
+                    # registered_date=datetime.datetime.fromisoformat(
+                    #     contactmoment.registratiedatum.isoformat()
+                    status=contactmoment.status,
+                    # ),
+                    channel=contactmoment.kanaal,
+                    new_answer_available=new_answer_available,
+                    api_service=KlantenServiceType.ESUITE,
+                )
+            )
+
+        return [QuestionValidator.validate_python(q) for q in questions]
 
 
 @dataclass(frozen=True)
@@ -1262,13 +1308,13 @@ class OpenKlant2Service(KlantenService):
             return []
 
         questions = self.questions_for_partij(partij_uuid=partij["uuid"])
-        return self._reformat_questions(questions, user)
+        return self._build_question_dtos(questions, user)
 
     def retrieve_question(
         self,
         fetch_params: FetchParameters,
         question_uuid: str,
-        user: User,  # is this needed?
+        user: User,
     ) -> tuple[Question | None, ZaakWithApiGroup | None]:  # noqa: E704
         if bsn := fetch_params.get("user_bsn"):
             partij = self.find_persoon_for_bsn(bsn)
@@ -1280,56 +1326,48 @@ class OpenKlant2Service(KlantenService):
             q for q in all_questions if q.question_kcm_uuid == question_uuid
         )
 
-        # FIXME
+        # TODO
         # should return (Question, zaak_with_api_group); the latter is left out until a
         # standard for linking klantcontact + zaak is agreed upon
         # https://github.com/Klantinteractie-Servicesysteem/KISS-frontend/issues/808#issuecomment-2357637675
-        return self._reformat_question(question), None
+        return self._build_question_dto(question), None
 
-    # TODO: handle `status` + `new_answer_available`
-    # `case_detail_url`: will be handled in integration of detail view
-    # `status`: eSuite has three: "nieuw", "in behandeling", "afgehandeld"
-    def _reformat_questions(
+    def _build_question_dtos(
         self,
         questions_ok2: list[OpenKlant2Question],
         user: User,
     ) -> list[Question]:
-        questions = []
-        for q in questions_ok2:
-            answer_metadata, _ = KlantContactMomentAnswer.objects.get_or_create(
-                user=user, contactmoment_url=q.url
-            )
-            question = {
-                "identification": q.nummer,
-                "api_source_url": q.url,
-                "subject": q.onderwerp,
-                "registered_date": q.plaatsgevonden_op,
-                "question_text": q.question,
-                "answer_text": getattr(q.answer, "answer", None),
-                "status": "",
-                "channel": q.kanaal,
-                "case_detail_url": "",
-                "api_service": KlantenServiceType.OPENKLANT2,
-                "new_answer_available": self._has_new_answer_available(
-                    q, answer=answer_metadata
-                ),
-            }
-            questions.append(question)
-        return [QuestionValidator.validate_python(q) for q in questions]
+        return [
+            self._build_question_dto(questions_ok2, user=user)
+            for question in questions_ok2
+        ]
 
-    def _reformat_question(self, question_ok2: OpenKlant2Question) -> Question:
-        return {
-            "identification": question_ok2.nummer,
-            "subject": question_ok2.onderwerp,
-            "registered_date": question_ok2.plaatsgevonden_op,
-            "question_text": question_ok2.question,
-            "answer_text": question_ok2.answer.answer,
-            "status": "",
-            "channel": question_ok2.kanaal,
-            "case_detail_url": getattr(question_ok2, "zaak_url", None),
-            "api_source": KlantenServiceType.openklant2,
-            "new_answer_available": self._has_new_answer_available(question_ok2),
-        }
+    def _build_question_dto(
+        self,
+        question_ok2: OpenKlant2Question,
+        user: User,
+    ) -> Question:
+        answer_metadata = KlantContactMomentAnswer.objects.get_or_create(
+            user=user, contactmoment_url=question_ok2.url
+        )
+        return QuestionValidator.validate_python(
+            {
+                "identification": question_ok2.nummer,
+                "api_source_url": question_ok2.url,
+                "api_source_uuid": uuid_from_url(question_ok2.url),
+                "subject": question_ok2.onderwerp,
+                "question_text": question_ok2.question,
+                "answer_text": question_ok2.answer.answer,
+                "registered_date": question_ok2.plaatsgevonden_op,
+                "status": "",
+                "channel": question_ok2.kanaal,
+                "case_detail_url": getattr(question_ok2, "zaak_url", None),
+                "new_answer_available": self._has_new_answer_available(
+                    question_ok2, answer=answer_metadata
+                ),
+                "api_service": KlantenServiceType.openklant2,
+            }
+        )
 
     def _has_new_answer_available(
         self, question: OpenKlant2Question, answer: KlantContactMomentAnswer
@@ -1340,3 +1378,6 @@ class OpenKlant2Service(KlantenService):
             timedelta(days=settings.CONTACTMOMENT_NEW_DAYS),
         )
         return answer_is_recent and not answer.is_seen
+
+    def list_questions_for_zaak(self, zaak: Zaak, user: User) -> list[Question]:
+        return []

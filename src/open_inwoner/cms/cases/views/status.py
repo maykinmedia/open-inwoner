@@ -3,10 +3,15 @@ import datetime as dt
 import logging
 from collections import defaultdict
 from datetime import datetime
+from typing import Iterable, Protocol
 
 from django.conf import settings
 from django.contrib import messages
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from django.core.exceptions import (
+    ImproperlyConfigured,
+    ObjectDoesNotExist,
+    PermissionDenied,
+)
 from django.http import (
     Http404,
     HttpRequest,
@@ -20,19 +25,21 @@ from django.views import View
 from django.views.generic import FormView, TemplateView
 
 from django_htmx.http import HttpResponseClientRedirect
-from glom import glom
 from mail_editor.helpers import find_template
 from view_breadcrumbs import BaseBreadcrumbMixin
 from zgw_consumers.api_models.constants import RolOmschrijving
 
+from open_inwoner.accounts.models import User
 from open_inwoner.mail.service import send_contact_confirmation_mail
+from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.models import OpenKlantConfig
-from open_inwoner.openklant.services import eSuiteKlantenService, eSuiteVragenService
-from open_inwoner.openklant.wrap import (
-    contactmoment_has_new_answer,
-    get_fetch_parameters,
-    get_kcm_answer_mapping,
+from open_inwoner.openklant.services import (
+    OpenKlant2Service,
+    Question,
+    eSuiteKlantenService,
+    eSuiteVragenService,
 )
+from open_inwoner.openklant.wrap import get_fetch_parameters
 from open_inwoner.openzaak.api_models import Status, StatusType, Zaak
 from open_inwoner.openzaak.clients import CatalogiClient, ZakenClient
 from open_inwoner.openzaak.documents import (
@@ -65,6 +72,15 @@ class SimpleFile:
     size: int
     url: str
     created: datetime | None = None
+
+
+class VragenService(Protocol):
+    def list_questions_for_zaak(
+        self,
+        zaak: Zaak,
+        user: User | None = None,
+    ) -> Iterable[Question]:  # noqa: E704
+        ...
 
 
 class OuterCaseDetailView(
@@ -110,6 +126,20 @@ class InnerCaseDetailView(
     contact_form_class = CaseContactForm
     case: Zaak | None = None
 
+    def get_service(self, service_type: KlantenServiceType) -> VragenService | None:
+        if service_type == KlantenServiceType.OPENKLANT2:
+            try:
+                return OpenKlant2Service()
+            except ImproperlyConfigured:
+                logger.error("OpenKlant2 configuration missing")
+        if service_type == KlantenServiceType.ESUITE:
+            try:
+                return eSuiteVragenService()
+            except ImproperlyConfigured:
+                logger.error("eSuiteVragenService configuration missing")
+            except RuntimeError:
+                logger.error("Failed to build eSuiteVragenService")
+
     def store_statustype_mapping(self, zaaktype_identificatie):
         # Filter on ZaakType identificatie to avoid eSuite situation where one statustype
         # is linked to multiple zaaktypes
@@ -151,7 +181,6 @@ class InnerCaseDetailView(
             self.log_access_case_detail(self.case)
 
             openzaak_config = OpenZaakConfig.get_solo()
-            openklant_config = OpenKlantConfig.get_solo()
 
             api_group = ZGWApiGroupConfig.objects.get(pk=self.kwargs["api_group_id"])
             zaken_client = api_group.zaken_client
@@ -162,38 +191,24 @@ class InnerCaseDetailView(
             self.store_statustype_mapping(self.case.zaaktype.identificatie)
             self.store_resulttype_mapping(self.case.zaaktype.identificatie)
 
-            # questions/E-suite contactmomenten
-            try:
-                service = eSuiteVragenService(config=openklant_config)
-            except RuntimeError:
-                logger.error("Failed to build eSuiteVragenService")
-                objectcontactmomenten = []
-            else:
-                objectcontactmomenten = service.retrieve_objectcontactmomenten_for_zaak(
-                    self.case
-                )
-
             questions = []
-            for ocm in objectcontactmomenten:
-                question = getattr(ocm, "contactmoment", None)
-                if question:
-                    questions.append(question)
-            questions.sort(key=lambda q: q.registratiedatum, reverse=True)
-
-            kcm_answer_mapping = get_kcm_answer_mapping(questions, self.request.user)
-            for question in questions:
-                question.new_answer_available = contactmoment_has_new_answer(
-                    question, kcm_answer_mapping
+            if ok2_service := self.get_service(
+                service_type=KlantenServiceType.OPENKLANT2
+            ):
+                questions.extend(
+                    ok2_service.list_questions_for_zaak(
+                        self.case, user=self.request.user
+                    )
                 )
-
-            # filter questions
-            openklant_config = OpenKlantConfig.get_solo()
-            if exclude_range := openklant_config.exclude_contactmoment_kanalen:
-                questions = [
-                    item
-                    for item in questions
-                    if glom(item, "kanaal") not in exclude_range
-                ]
+            if esuite_service := self.get_service(
+                service_type=KlantenServiceType.ESUITE
+            ):
+                questions.extend(
+                    esuite_service.list_questions_for_zaak(
+                        self.case, user=self.request.user
+                    )
+                )
+            questions.sort(key=lambda q: q["registered_date"], reverse=True)
 
             statustypen = []
             catalogi_client = api_group.catalogi_client
