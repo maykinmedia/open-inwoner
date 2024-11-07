@@ -1,6 +1,7 @@
 import logging
 
-from django.test import TestCase, override_settings
+from django.contrib.auth import user_logged_in
+from django.test import RequestFactory, TestCase, override_settings
 from django.utils.translation import gettext as _
 
 import requests_mock
@@ -8,6 +9,7 @@ from freezegun import freeze_time
 from timeline_logger.models import TimelineLog
 
 from open_inwoner.accounts.choices import LoginTypeChoices
+from open_inwoner.accounts.models import User
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin
 
@@ -106,8 +108,10 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
         user = UserFactory(
             first_name="", infix="", last_name="", login_type=LoginTypeChoices.default
         )
-        user.bsn = "999993847"
-        user.save()
+
+        request = RequestFactory().get("/dummy")
+        request.user = user
+        user_logged_in.send(User, user=user, request=request)
 
         user.refresh_from_db()
 

@@ -1167,7 +1167,7 @@ class DuplicateEmailRegistrationTest(WebTest):
         test_user = eHerkenningUserFactory.create(
             email="test@localhost",
             kvk="64819772",
-            rsin="123456789",
+            rsin="123456782",
         )
 
         url = reverse("eherkenning-mock:password")

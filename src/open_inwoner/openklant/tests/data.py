@@ -43,6 +43,7 @@ class MockAPIReadPatchData(MockAPIData):
             email="old@example.com",
             phonenumber="0100000000",
         )
+
         self.eherkenning_user = eHerkenningUserFactory(
             email="old2@example.com",
             kvk="12345678",
@@ -138,9 +139,11 @@ class MockAPIReadData(MockAPIData):
         self.user = DigidUserFactory(
             bsn="100000001",
         )
+
         self.eherkenning_user = eHerkenningUserFactory(
             kvk="12345678",
             rsin="000000000",
+            email="foo@bar.com",
         )
 
         self.klant_bsn = generate_oas_component_cached(
