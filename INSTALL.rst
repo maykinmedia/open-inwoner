@@ -132,6 +132,9 @@ using ``npm run watch``.
 .. _ECMA: https://ecma-international.org/
 .. _Sass: https://sass-lang.com/
 
+**Note:** The project makes use of the `open-inwoner-design-tokens package`_ , a node module which contains the values for the project's design tokens from the NL Design System.
+
+.. _open-inwoner-design-tokens package: https://github.com/maykinmedia/open-inwoner-design-tokens
 
 ElasticSearch
 -------------

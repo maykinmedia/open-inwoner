@@ -30,17 +30,6 @@ class Header extends Component {
    * Focus is split to be handled in Safari
    */
   bindEvents() {
-    this.node.addEventListener('click', (e) => {
-      /**
-       * Remove focus from search in order to prevent native keyboard on mobile
-       */
-      const blurInput = document.querySelectorAll(
-        '.header__submenu .form .input'
-      )
-      blurInput.forEach((elem) => {
-        elem.blur()
-      })
-    })
     this.node.addEventListener('click', this.toggleMobileNavOpen.bind(this))
     this.node.addEventListener('focusout', this.onFocusMobileOut.bind(this))
     window.addEventListener('keyup', this.onEscape.bind(this))

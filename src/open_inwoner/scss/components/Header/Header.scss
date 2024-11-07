@@ -331,7 +331,7 @@ $vm: var(--spacing-large);
     left: 0;
     margin: 0;
     max-width: 100%;
-    padding: 0 var(--spacing-medium) var(--spacing-medium) var(--spacing-medium);
+    padding: 0 var(--spacing-medium) 0 var(--spacing-medium);
     position: initial;
     right: 0;
     top: calc(2 * var(--row-height));
@@ -509,7 +509,7 @@ $vm: var(--spacing-large);
             }
 
             .link {
-              gap: var(--spacing-medium);
+              gap: var(--spacing-large);
               vertical-align: bottom;
             }
           }
