@@ -13,9 +13,11 @@ from django.views.generic import TemplateView
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.models import User
+from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.models import KlantContactMomentAnswer
 from open_inwoner.openklant.services import (
     KlantenService,
+    OpenKlant2Service,
     Question,
     QuestionValidator,
     ZaakWithApiGroup,
@@ -63,7 +65,7 @@ class VragenService(Protocol):
     def list_questions(
         self,
         fetch_params: FetchParameters,
-        user: User,
+        user: User | None = None,
     ) -> Iterable[Question]:  # noqa: E704
         ...
 
@@ -87,9 +89,11 @@ class VragenService(Protocol):
 class KlantContactMomentBaseView(
     CommonPageMixin, BaseBreadcrumbMixin, KlantContactMomentAccessMixin, TemplateView
 ):
-    def get_service(self) -> VragenService:
-        # TODO: Refactor to support both OpenKlant2 and eSuite services at once
-        return eSuiteVragenService()
+    def get_service(self, service_type: str) -> VragenService:
+        if service_type == KlantenServiceType.ESUITE:
+            return eSuiteVragenService()
+        elif service_type == KlantenServiceType.OPENKLANT2:
+            return OpenKlant2Service()
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
@@ -131,13 +135,21 @@ class KlantContactMomentListView(
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        service = self.get_service()
-        questions = service.list_questions(
-            self.get_fetch_params(service), user=self.request.user
+        esuite_service = self.get_service(service_type=KlantenServiceType.ESUITE)
+        ok2_service = self.get_service(service_type=KlantenServiceType.OPENKLANT2)
+
+        questions_esuite = esuite_service.list_questions(
+            fetch_params=self.get_fetch_params(esuite_service),
+            user=self.request.user,
         )
-        ctx["contactmomenten"] = [
-            QuestionValidator.validate_python(q) for q in questions
-        ]
+        questions_ok2 = ok2_service.list_questions(
+            self.get_fetch_params(ok2_service),
+            user=self.request.user,
+        )
+        all_questions = questions_esuite + questions_ok2
+        all_questions.sort(key=lambda q: q["registered_date"], reverse=True)
+        ctx["contactmomenten"] = all_questions
+
         paginator_dict = self.paginate_with_context(ctx["contactmomenten"])
         ctx.update(paginator_dict)
 
@@ -162,7 +174,7 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        service = self.get_service()
+        service = self.get_service(service_type=KlantenServiceType.ESUITE)
 
         kcm, zaak = service.retrieve_question(
             self.get_fetch_params(service), kwargs["kcm_uuid"], user=self.request.user

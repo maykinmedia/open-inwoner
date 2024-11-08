@@ -1,7 +1,7 @@
 import uuid
 from dataclasses import dataclass
 from typing import Self
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse, urlunparse
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
@@ -207,7 +207,10 @@ class OpenKlant2Config:
 
     @property
     def api_url(self):
-        return urljoin(self.api_root, self.api_path)
+        joined = urljoin(self.api_root, self.api_path)
+        scheme, netloc, path, params, query, fragment = urlparse(joined)
+        path = path.replace("//", "/")
+        return urlunparse((scheme, netloc, path, params, query, fragment))
 
     @classmethod
     def from_django_settings(cls) -> Self:

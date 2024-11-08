@@ -6,7 +6,7 @@ from django.urls import reverse
 import requests_mock
 
 from open_inwoner.accounts.tests.factories import UserFactory
-from open_inwoner.openklant.constants import Status
+from open_inwoner.openklant.constants import KlantenServiceType, Status
 from open_inwoner.openklant.models import ContactFormSubject, OpenKlantConfig
 from open_inwoner.openklant.services import eSuiteVragenService
 from open_inwoner.openklant.tests.data import MockAPIReadData
@@ -89,16 +89,18 @@ class eSuiteVragenServiceTestCase(TestCase):
                 self.assertEqual(
                     questions[0],
                     {
+                        "identification": expected_contactmoment["identificatie"],
+                        "source_url": expected_contactmoment["url"],
+                        "subject": self.contactformsubject.subject,
                         "registered_date": datetime.fromisoformat(
                             expected_contactmoment["registratiedatum"]
                         ),
-                        "channel": expected_contactmoment["kanaal"].title(),
                         "question_text": expected_contactmoment["tekst"],
-                        "subject": self.contactformsubject.subject,
                         "answer_text": expected_contactmoment["antwoord"],
-                        "identification": expected_contactmoment["identificatie"],
                         "status": str(Status.afgehandeld.label),
+                        "channel": expected_contactmoment["kanaal"].title(),
                         "case_detail_url": detail_url,
+                        "api_service": KlantenServiceType.ESUITE,
                         "new_answer_available": False,
                     },
                 )
@@ -162,16 +164,18 @@ class eSuiteVragenServiceTestCase(TestCase):
                 self.assertEqual(
                     question,
                     {
+                        "identification": expected_contactmoment["identificatie"],
+                        "source_url": expected_contactmoment["url"],
+                        "subject": self.contactformsubject.subject,
                         "registered_date": datetime.fromisoformat(
                             expected_contactmoment["registratiedatum"]
                         ),
-                        "channel": expected_contactmoment["kanaal"].title(),
                         "question_text": expected_contactmoment["tekst"],
-                        "subject": self.contactformsubject.subject,
                         "answer_text": expected_contactmoment["antwoord"],
-                        "identification": expected_contactmoment["identificatie"],
                         "status": str(Status.afgehandeld.label),
+                        "channel": expected_contactmoment["kanaal"].title(),
                         "case_detail_url": detail_url,
+                        "api_service": KlantenServiceType.ESUITE,
                         "new_answer_available": False,
                     },
                 )
