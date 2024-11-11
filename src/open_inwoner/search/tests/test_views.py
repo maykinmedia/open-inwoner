@@ -98,12 +98,12 @@ class TestSearchView(ESMixin, TransactionTestCase):
             "schemas/Zaak",
             url=f"{ZAKEN_ROOT}zaken/e4d469b9-6666-4bdd-bf42-b53445298102",
             zaaktype=self.zaaktype["url"],
-            identificatie="ZAAK-2022-0008800002",
+            identificatie="ZAAK-2024-0000000000",
             omschrijving="Coffee zaak2",
             startdatum="2022-01-12",
             einddatum=None,
             status=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-beu760sle929",
-            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.zeer_geheim,
         )
         self.status2 = generate_oas_component_cached(
             "zrc",
@@ -193,6 +193,18 @@ class TestSearchView(ESMixin, TransactionTestCase):
             .url,
             json=paginated_response([]),
         )
+        m.get(
+            furl(f"{ZAKEN_ROOT}zaken")
+            .add(
+                {
+                    "rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn": self.user.bsn,
+                    "maximaleVertrouwelijkheidaanduiding": VertrouwelijkheidsAanduidingen.beperkt_openbaar,
+                    "identificatie": "ZAAK-2024-0000000000",
+                }
+            )
+            .url,
+            json=paginated_response([self.zaak2]),
+        )
         for resource in [
             self.zaaktype,
             self.status_type1,
@@ -242,32 +254,53 @@ class TestSearchView(ESMixin, TransactionTestCase):
             ),
         )
 
+    def test_search_case_not_visible(self, m):
+        self._setUpMocks(m)
+
+        self.client.force_login(self.user)
+
+        search_url = reverse("search:search")
+        params = urlencode({"query": "ZAAK-2024-0000000000"}, doseq=True)
+        response = self.client.get(f"{search_url}?{params}")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.request["PATH_INFO"], search_url)
+        self.assertNotIn(self.zaak2["omschrijving"], str(response.content))
+
     def test_search_case_identificatie_case_does_not_belong_to_user(self, m):
         self._setUpMocks(m)
 
         self.client.force_login(self.user2)
+
+        search_url = reverse("search:search")
         params = urlencode({"query": "ZAAK-2022-0000000001"}, doseq=True)
         response = self.client.get(f'{reverse("search:search")}?{params}')
 
         # Show regular search results page
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.request["PATH_INFO"], search_url)
 
     def test_search_case_identificatie_no_exact_match(self, m):
         self._setUpMocks(m)
 
         self.client.force_login(self.user)
+
+        search_url = reverse("search:search")
         params = urlencode({"query": "ZAAK-2022-000000000"}, doseq=True)
         response = self.client.get(f'{reverse("search:search")}?{params}')
 
         # Show regular search results page
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.request["PATH_INFO"], search_url)
 
     def test_search_case_identificatie_cache(self, m):
         self._setUpMocks(m)
 
         self.client.force_login(self.user)
+
+        search_url = reverse("search:search")
         params = urlencode({"query": "ZAAK-2022-0000000001"}, doseq=True)
-        response = self.client.get(f'{reverse("search:search")}?{params}')
+        response = self.client.get(f"{search_url}?{params}")
 
         # In case of an exact identificatie match, user should be redirected to
         # the status page of that Zaak
@@ -285,20 +318,24 @@ class TestSearchView(ESMixin, TransactionTestCase):
 
         # Search with different query should not use cached result from previous search
         params = urlencode({"query": "ZAAK-2022-000000000"}, doseq=True)
-        response = self.client.get(f'{reverse("search:search")}?{params}')
+        response = self.client.get(f"{search_url}?{params}")
 
         # Show regular search results page
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.request["PATH_INFO"], search_url)
 
     def test_search_case_empty_query(self, m):
         self._setUpMocks(m)
 
         self.client.force_login(self.user)
+
+        search_url = reverse("search:search")
         params = urlencode({"query": ""}, doseq=True)
-        response = self.client.get(f'{reverse("search:search")}?{params}')
+        response = self.client.get(f"{search_url}?{params}")
 
         # Show regular search results page
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.request["PATH_INFO"], search_url)
 
     def test_search_case_found_in_two_backends_redirects_to_first(self, m):
         ZGWApiGroupConfigFactory(
