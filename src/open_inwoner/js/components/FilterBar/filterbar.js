@@ -83,9 +83,7 @@ export class FilterBar {
 htmx.on('htmx:afterSwap', function (e) {
   if (e.detail && e.detail.target.id === 'cases-content') {
     const filterBars = document.querySelectorAll(FilterBar.selector)
-    if (filterBars.length === 0) {
-      console.error('No filter bars found on the page after swap.')
-    } else {
+    if (filterBars.length !== 0) {
       filterBars.forEach((filterbar) => new FilterBar(filterbar))
     }
   }
@@ -94,9 +92,7 @@ htmx.on('htmx:afterSwap', function (e) {
 // Initialize FilterBar on DOM load for the initial page load
 document.addEventListener('DOMContentLoaded', () => {
   const filterBars = document.querySelectorAll(FilterBar.selector)
-  if (filterBars.length === 0) {
-    console.error('No filter bars found on the page.')
-  } else {
+  if (filterBars.length !== 0) {
     filterBars.forEach((filterbar) => new FilterBar(filterbar))
   }
 })

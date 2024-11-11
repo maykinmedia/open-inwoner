@@ -211,27 +211,40 @@ $vm: var(--spacing-large);
     background-color: white;
   }
 
+  // header--mobile
+  &--mobile__close {
+    display: flex;
+    justify-content: flex-end;
+    padding: var(--spacing-medium) 0;
+
+    .button [class*='icons'] {
+      font-size: 24px;
+    }
+  }
+
   &__submenu {
     border-top: 1px solid var(--color-gray-light);
+    border-top-left-radius: var(--spacing-medium);
+    border-top-right-radius: var(--spacing-medium);
     border-bottom: 1px solid var(--color-gray-light);
     border-left: none;
     border-right: none;
     bottom: 0;
-    background-color: var(--color-white);
+    background-color: var(--color-gray-lightest);
     box-sizing: border-box;
     display: none;
     height: 100vh;
     left: 0;
     margin: 0;
-    max-height: calc(100% - (2 * var(--row-height)));
+    max-height: 100%;
     max-width: 100%;
     overflow-y: auto;
     padding: 0 var(--spacing-large) var(--spacing-extra-large)
       var(--spacing-large);
-    position: relative;
+    position: absolute;
     right: 0;
     text-align: left;
-    top: 0;
+    top: var(--spacing-medium);
     width: 100%;
     z-index: 2;
 
@@ -312,14 +325,13 @@ $vm: var(--spacing-large);
   &__actions {
     border-left: none;
     border-right: none;
+    border-bottom: 1px solid var(--color-gray-light);
     bottom: 0;
-    background-color: var(--color-white);
     box-sizing: border-box;
-    height: calc(2 * var(--row-height));
     left: 0;
     margin: 0;
     max-width: 100%;
-    padding: 0 var(--spacing-medium) var(--spacing-medium) var(--spacing-medium);
+    padding: 0 var(--spacing-medium) 0 var(--spacing-medium);
     position: initial;
     right: 0;
     top: calc(2 * var(--row-height));
@@ -337,11 +349,6 @@ $vm: var(--spacing-large);
   }
 
   &__text-actions {
-    align-items: center;
-    display: flex;
-    justify-content: space-between;
-    height: var(--row-height);
-    white-space: nowrap;
     width: 100%;
 
     // Cut text and display dots if username is very long
@@ -376,15 +383,14 @@ $vm: var(--spacing-large);
   }
 
   &__actions &__list {
-    display: flex;
+    display: block;
     list-style: none;
     margin: 0;
     padding: 0;
   }
 
   &__actions &__list-item {
-    display: inline;
-    margin-left: var(--spacing-extra-large);
+    display: list-item;
   }
 
   .form {
@@ -450,6 +456,7 @@ $vm: var(--spacing-large);
 
         &.dropdown-nav__toggle {
           flex-direction: column;
+          margin-bottom: 0;
         }
       }
 
@@ -483,13 +490,16 @@ $vm: var(--spacing-large);
       .header {
         &__actions {
           box-sizing: border-box;
-          padding: 0;
           margin: 0;
 
           .header__text-actions {
-            padding: 0 0 0 var(--spacing-large);
-            margin: var(--spacing-large) 0 0 0;
+            padding: 0 0 0 var(--spacing-small);
+            margin: var(--spacing-extra-large) 0;
             width: calc(100% - (var(--spacing-extra-large)));
+
+            .header__list-item {
+              margin: var(--spacing-extra-large) 0;
+            }
 
             .utrecht-paragraph {
               display: flex;
@@ -499,7 +509,7 @@ $vm: var(--spacing-large);
             }
 
             .link {
-              gap: var(--spacing-medium);
+              gap: var(--spacing-large);
               vertical-align: bottom;
             }
           }
@@ -525,7 +535,6 @@ $vm: var(--spacing-large);
             > .primary-navigation__list
             > .primary-navigation__list-item.dropdown-nav__toggle {
             position: relative;
-            border-bottom: 1px solid var(--color-gray-light);
 
             &.nav__list--open {
               .link--toggle {
@@ -544,8 +553,9 @@ $vm: var(--spacing-large);
 
               .subpage-list {
                 margin-top: var(--spacing-extra-large);
-                margin-bottom: var(--spacing-large);
+                margin-bottom: 0;
                 margin-left: var(--row-height-big);
+                padding-bottom: 0;
                 display: grid;
                 gap: var(--spacing-large);
                 height: auto;
@@ -564,7 +574,7 @@ $vm: var(--spacing-large);
               display: inline-block;
               transition: all 0.3s;
               transform: rotate(0deg);
-              top: 8px;
+              top: 2px;
               right: var(--spacing-large);
             }
           }

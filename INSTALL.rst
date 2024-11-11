@@ -60,12 +60,6 @@ development machine.
 
        git clone git@github.com:maykinmedia/open-inwoner.git
        cd open-inwoner
-       # initialize submodules
-       git submodule update --init --recursive
-
-This will include the `Open-Inwoner-Design-Tokens`_ subdirectory. When all is built and run this is where the OIP design tokens CSS will be generated. When this repository gets updated, it needs to be pulled again.
-
-.. _Open-Inwoner-Design-Tokens: https://github.com/maykinmedia/open-inwoner-design-tokens
 
 3. Install all required (backend) libraries.
    **Tip:** You can use the ``bootstrap.py`` script to install the requirements
@@ -138,6 +132,9 @@ using ``npm run watch``.
 .. _ECMA: https://ecma-international.org/
 .. _Sass: https://sass-lang.com/
 
+**Note:** The project makes use of the `open-inwoner-design-tokens package`_ , a node module which contains the values for the project's design tokens from the NL Design System.
+
+.. _open-inwoner-design-tokens package: https://github.com/maykinmedia/open-inwoner-design-tokens
 
 ElasticSearch
 -------------
