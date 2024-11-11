@@ -56,7 +56,7 @@ Detailed Information
 ::
 
     Variable            EHERKENNING_OIDC_ENABLED
-    Setting             inschakelen
+    Setting             enable
     Description         Indicates whether OpenID Connect for authentication/authorization is enabled
     Possible values     True, False
     Default value       False
@@ -68,8 +68,8 @@ Detailed Information
     Default value       urn:etoegang:core:LegalSubjectID
     
     Variable            EHERKENNING_OIDC_OIDC_KEYCLOAK_IDP_HINT
-    Setting             Keycloak-identiteitsprovider hint
-    Description         Specifiek voor Keycloak: parameter die aangeeft welke identiteitsprovider gebruikt moet worden (inlogscherm van Keycloak overslaan).
+    Setting             Keycloak Identity Provider hint
+    Description         Specific for Keycloak: parameter that indicates which identity provider should be used (therefore skipping the Keycloak login screen).
     Possible values     string
     Default value       No default
     
@@ -98,8 +98,8 @@ Detailed Information
     Default value       No default
     
     Variable            EHERKENNING_OIDC_OIDC_OP_LOGOUT_ENDPOINT
-    Setting             Endpoint uitlog
-    Description         URL van het uitlog-endpoint van uw OpenID Connect Connect-provider
+    Setting             Logout endpoint
+    Description         URL of your OpenID Connect provider logout endpoint
     Possible values     string (URL)
     Default value       No default
     
