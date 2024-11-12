@@ -1247,10 +1247,10 @@ class OpenKlant2Service(KlantenService):
     def list_questions(
         self, fetch_params: FetchParameters, user: User
     ) -> list[Question]:
-        if bsn := fetch_params.get("user_bsn"):
-            partij = self.find_persoon_for_bsn(bsn)
-        elif kvk_or_rsin := fetch_params.get("user_kvk_or_rsin"):
-            partij = self.find_organisatie_for_kvk(kvk_or_rsin)
+        partij, created = self.get_or_create_partij_for_user(fetch_params, user)
+        if not partij:
+            # Will be logged by get_or_create_partij_for_user
+            return []
 
         questions = self.questions_for_partij(partij_uuid=partij["uuid"])
         return self._reformat_questions(questions, user)
