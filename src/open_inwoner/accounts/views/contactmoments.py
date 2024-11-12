@@ -65,7 +65,7 @@ class VragenService(Protocol):
     def list_questions(
         self,
         fetch_params: FetchParameters,
-        user: User | None = None,
+        user: User,
     ) -> Iterable[Question]:  # noqa: E704
         ...
 
@@ -89,7 +89,7 @@ class VragenService(Protocol):
 class KlantContactMomentBaseView(
     CommonPageMixin, BaseBreadcrumbMixin, KlantContactMomentAccessMixin, TemplateView
 ):
-    def get_service(self, service_type: str) -> VragenService:
+    def get_service(self, service_type: KlantenServiceType) -> VragenService:
         if service_type == KlantenServiceType.ESUITE:
             return eSuiteVragenService()
         elif service_type == KlantenServiceType.OPENKLANT2:
