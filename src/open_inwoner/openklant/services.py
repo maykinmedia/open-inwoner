@@ -854,7 +854,7 @@ class OpenKlant2Service(KlantenService):
 
     def get_or_create_partij_for_user(
         self, fetch_params: FetchParameters, user: User
-    ) -> (Partij | None, bool):
+    ) -> tuple[Partij | None, bool]:
         partij = None
         created = False
 
