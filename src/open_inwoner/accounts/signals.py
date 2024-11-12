@@ -53,7 +53,7 @@ def update_user_from_klant_on_login(sender, user, request, *args, **kwargs):
             fetch_params=fetch_params, user=user
         )
         if partij and not created:
-            service.update_user_from_partij(partij_uuid=partij.uuid, user=user)
+            service.update_user_from_partij(partij_uuid=partij["uuid"], user=user)
 
     # eSuite
     try:
