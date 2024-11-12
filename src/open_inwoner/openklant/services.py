@@ -1265,7 +1265,7 @@ class OpenKlant2Service(KlantenService):
     ) -> list[Question]:
         questions = []
         for q in questions_ok2:
-            answer_metadata = KlantContactMomentAnswer.objects.get_or_create(
+            answer_metadata, _ = KlantContactMomentAnswer.objects.get_or_create(
                 user=user, contactmoment_url=q.url
             )
             question = {
@@ -1274,7 +1274,7 @@ class OpenKlant2Service(KlantenService):
                 "subject": q.onderwerp,
                 "registered_date": q.plaatsgevonden_op,
                 "question_text": q.question,
-                "answer_text": q.answer.answer,
+                "answer_text": getattr(q.answer, "answer", None),
                 "status": "",
                 "channel": q.kanaal,
                 "case_detail_url": "",
@@ -1287,7 +1287,7 @@ class OpenKlant2Service(KlantenService):
         return [QuestionValidator.validate_python(q) for q in questions]
 
     def _has_new_answer_available(
-        self, question: Question, answer: KlantContactMomentAnswer
+        self, question: OpenKlant2Question, answer: KlantContactMomentAnswer
     ) -> bool:
         answer_is_recent = instance_is_new(
             question.answer,
