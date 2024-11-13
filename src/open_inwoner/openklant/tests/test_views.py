@@ -2,6 +2,7 @@ from datetime import datetime
 from unittest.mock import patch
 from uuid import uuid4
 
+from django.contrib.auth import signals
 from django.test import modify_settings, override_settings
 from django.urls import reverse
 from django.utils.translation import gettext as _
@@ -12,6 +13,7 @@ from freezegun import freeze_time
 from pyquery import PyQuery
 from zgw_consumers.api_models.base import factory
 
+from open_inwoner.accounts.signals import update_user_from_klant_on_login
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openklant.api_models import ContactMoment, Klant, KlantContactMoment
@@ -91,6 +93,8 @@ class ContactMomentViewsTestCase(
 
     def setUp(self):
         super().setUp()
+        signals.user_logged_in.disconnect(receiver=update_user_from_klant_on_login)
+
         MockAPIReadData.setUpServices()
         self.api_group = ZGWApiGroupConfig.objects.get()
 

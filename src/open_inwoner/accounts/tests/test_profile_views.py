@@ -4,6 +4,7 @@ from unittest.mock import patch
 
 from django import forms
 from django.conf import settings
+from django.contrib.auth import signals
 from django.template.defaultfilters import date as django_date
 from django.test import TestCase, override_settings, tag
 from django.urls import reverse, reverse_lazy
@@ -15,6 +16,7 @@ from pyquery import PyQuery as PQ
 from webtest import Upload
 
 from open_inwoner.accounts.choices import NotificationChannelChoice, StatusChoices
+from open_inwoner.accounts.signals import update_user_from_klant_on_login
 from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
@@ -316,6 +318,8 @@ class ProfileViewTests(WebTest):
 )
 class EditProfileTests(AssertTimelineLogMixin, WebTest):
     def setUp(self):
+        signals.user_logged_in.disconnect(receiver=update_user_from_klant_on_login)
+
         self.url = reverse("profile:edit")
         self.return_url = reverse("profile:detail")
         self.user = UserFactory()

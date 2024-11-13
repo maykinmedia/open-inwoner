@@ -5,6 +5,7 @@ from datetime import timedelta
 from typing import Iterable, Literal, NotRequired, Protocol, Self
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -142,11 +143,13 @@ class eSuiteKlantenService(KlantenService):
     def __init__(self, config: OpenKlantConfig | None = None):
         self.config = config or OpenKlantConfig.get_solo()
         if not self.config:
-            raise RuntimeError("eSuiteKlantenService instance needs a configuration")
+            raise ImproperlyConfigured(
+                "eSuiteKlantenService instance needs a configuration"
+            )
 
         self.service_config = self.config.klanten_service
         if not self.service_config:
-            raise RuntimeError(
+            raise ImproperlyConfigured(
                 "eSuiteKlantenService instance needs a servivce configuration"
             )
 
@@ -770,7 +773,9 @@ class OpenKlant2Service(KlantenService):
     def __init__(self, config: OpenKlant2Config | None = None):
         self.config = config or OpenKlant2Config.from_django_settings()
         if not self.config:
-            raise RuntimeError("OpenKlant2Service instance needs a configuration")
+            raise ImproperlyConfigured(
+                "Please set OPENKLANT2_CONFIG in your settings to configure OpenKlant2"
+            )
 
         self.client = OpenKlant2Client(
             base_url=self.config.api_url,
@@ -778,8 +783,6 @@ class OpenKlant2Service(KlantenService):
                 "headers": {"Authorization": f"Token {self.config.api_token}"}
             },
         )
-        if not self.client:
-            raise RuntimeError("OpenKlant2Service instance needs a client")
 
         if mijn_vragen_actor := getattr(config, "mijn_vragen_actor", None):
             self.mijn_vragen_actor = (
