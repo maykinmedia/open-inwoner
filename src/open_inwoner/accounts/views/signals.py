@@ -24,7 +24,7 @@ def get_or_create_klant_for_new_user(
 
     # OpenKlant2
     # TODO: replace with proper config and refactor branching
-    use_ok2 = getattr(settings, "OPENKLANT2_ACTIVE", None)
+    use_ok2 = getattr(settings, "OPENKLANT2_CONFIG", None)
     if use_ok2 and (openklant2_config := OpenKlant2Config.from_django_settings()):
         try:
             service = OpenKlant2Service(config=openklant2_config)

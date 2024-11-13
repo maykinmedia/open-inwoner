@@ -854,7 +854,7 @@ class OpenKlant2Service(KlantenService):
 
     def get_or_create_partij_for_user(
         self, fetch_params: FetchParameters, user: User
-    ) -> (Partij | None, bool):
+    ) -> tuple[Partij | None, bool]:
         partij = None
         created = False
 
@@ -1247,10 +1247,10 @@ class OpenKlant2Service(KlantenService):
     def list_questions(
         self, fetch_params: FetchParameters, user: User
     ) -> list[Question]:
-        if bsn := fetch_params.get("user_bsn"):
-            partij = self.find_persoon_for_bsn(bsn)
-        elif kvk_or_rsin := fetch_params.get("user_kvk_or_rsin"):
-            partij = self.find_organisatie_for_kvk(kvk_or_rsin)
+        partij, created = self.get_or_create_partij_for_user(fetch_params, user)
+        if not partij:
+            # Will be logged by get_or_create_partij_for_user
+            return []
 
         questions = self.questions_for_partij(partij_uuid=partij["uuid"])
         return self._reformat_questions(questions, user)
@@ -1265,7 +1265,7 @@ class OpenKlant2Service(KlantenService):
     ) -> list[Question]:
         questions = []
         for q in questions_ok2:
-            answer_metadata = KlantContactMomentAnswer.objects.get_or_create(
+            answer_metadata, _ = KlantContactMomentAnswer.objects.get_or_create(
                 user=user, contactmoment_url=q.url
             )
             question = {
@@ -1274,7 +1274,7 @@ class OpenKlant2Service(KlantenService):
                 "subject": q.onderwerp,
                 "registered_date": q.plaatsgevonden_op,
                 "question_text": q.question,
-                "answer_text": q.answer.answer,
+                "answer_text": getattr(q.answer, "answer", None),
                 "status": "",
                 "channel": q.kanaal,
                 "case_detail_url": "",
@@ -1287,7 +1287,7 @@ class OpenKlant2Service(KlantenService):
         return [QuestionValidator.validate_python(q) for q in questions]
 
     def _has_new_answer_available(
-        self, question: Question, answer: KlantContactMomentAnswer
+        self, question: OpenKlant2Question, answer: KlantContactMomentAnswer
     ) -> bool:
         answer_is_recent = instance_is_new(
             question.answer,
