@@ -1,14 +1,14 @@
 import logging
 
-from django.conf import settings
 from django.contrib.auth.signals import user_logged_in, user_logged_out
+from django.core.exceptions import ImproperlyConfigured
 from django.dispatch import receiver
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
+from open_inwoner.accounts.models import User
 from open_inwoner.haalcentraal.models import HaalCentraalConfig
 from open_inwoner.haalcentraal.utils import update_brp_data_in_db
-from open_inwoner.openklant.models import OpenKlant2Config
 from open_inwoner.openklant.services import OpenKlant2Service, eSuiteKlantenService
 from open_inwoner.utils.logentry import user_action
 
@@ -37,31 +37,38 @@ def update_user_from_klant_on_login(sender, user, request, *args, **kwargs):
         return
 
     # OpenKlant2
-    # TODO: replace with proper config and refactor branching
-    use_ok2 = getattr(settings, "OPENKLANT2_ACTIVE", None)
-    if use_ok2 and (openklant2_config := OpenKlant2Config.from_django_settings()):
-        try:
-            service = OpenKlant2Service(config=openklant2_config)
-        except RuntimeError:
-            logger.error("OpenKlant2 service failed to build")
-            return
-
-        if not (fetch_params := service.get_fetch_parameters(request=request)):
-            return
-
-        partij, created = service.get_or_create_partij_for_user(
-            fetch_params=fetch_params, user=user
-        )
-        if partij and not created:
-            service.update_user_from_partij(partij_uuid=partij["uuid"], user=user)
+    try:
+        service = OpenKlant2Service()
+    except ImproperlyConfigured:
+        logger.error("OpenKlant2 configuration missing")
+    else:
+        _update_user_from_openklant2(user=user, service=service, request=request)
 
     # eSuite
     try:
         service = eSuiteKlantenService()
+    except ImproperlyConfigured:
+        logger.error("eSuiteKlantenService missing configuration")
     except RuntimeError:
         logger.error("eSuiteKlantenService failed to build")
-        return
+    else:
+        _update_user_from_esuite(user=user, service=service, request=request)
 
+
+def _update_user_from_openklant2(
+    user: User, service: OpenKlant2Service, request
+) -> None:
+    if fetch_params := service.get_fetch_parameters(request=request):
+        partij, created = service.get_or_create_partij_for_user(
+            fetch_params=fetch_params, user=user
+        )
+        if partij and not created:
+            service.update_user_from_partij(partij_uuid=partij.uuid, user=user)
+
+
+def _update_user_from_esuite(
+    user: User, service: eSuiteKlantenService, request
+) -> None:
     if not (fetch_params := service.get_fetch_parameters(request=request)):
         return
 

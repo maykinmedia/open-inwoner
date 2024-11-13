@@ -2,6 +2,7 @@ import logging
 from typing import Iterable, Protocol
 
 from django.contrib.auth.mixins import AccessMixin
+from django.core.exceptions import ImproperlyConfigured
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -89,11 +90,19 @@ class VragenService(Protocol):
 class KlantContactMomentBaseView(
     CommonPageMixin, BaseBreadcrumbMixin, KlantContactMomentAccessMixin, TemplateView
 ):
-    def get_service(self, service_type: KlantenServiceType) -> VragenService:
+    def get_service(self, service_type: KlantenServiceType) -> VragenService | None:
         if service_type == KlantenServiceType.ESUITE:
-            return eSuiteVragenService()
+            try:
+                return eSuiteVragenService()
+            except ImproperlyConfigured:
+                logger.error("eSuiteVragenService configuration missing")
         elif service_type == KlantenServiceType.OPENKLANT2:
-            return OpenKlant2Service()
+            try:
+                return OpenKlant2Service()
+            except ImproperlyConfigured:
+                logger.error("OpenKlant2 configuration missing")
+            except RuntimeError:
+                logger.error("Failed to build OpenKlant2Service")
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
@@ -135,20 +144,24 @@ class KlantContactMomentListView(
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        esuite_service = self.get_service(service_type=KlantenServiceType.ESUITE)
-        ok2_service = self.get_service(service_type=KlantenServiceType.OPENKLANT2)
 
-        questions_esuite = esuite_service.list_questions(
-            fetch_params=self.get_fetch_params(esuite_service),
-            user=self.request.user,
-        )
-        questions_ok2 = ok2_service.list_questions(
-            self.get_fetch_params(ok2_service),
-            user=self.request.user,
-        )
-        all_questions = questions_esuite + questions_ok2
-        all_questions.sort(key=lambda q: q["registered_date"], reverse=True)
-        ctx["contactmomenten"] = all_questions
+        questions = []
+        if esuite_service := self.get_service(service_type=KlantenServiceType.ESUITE):
+            questions.extend(
+                esuite_service.list_questions(
+                    fetch_params=self.get_fetch_params(esuite_service),
+                    user=self.request.user,
+                )
+            )
+        if ok2_service := self.get_service(service_type=KlantenServiceType.OPENKLANT2):
+            questions.extend(
+                ok2_service.list_questions(
+                    self.get_fetch_params(ok2_service),
+                    user=self.request.user,
+                )
+            )
+        questions.sort(key=lambda q: q["registered_date"], reverse=True)
+        ctx["contactmomenten"] = questions
 
         paginator_dict = self.paginate_with_context(ctx["contactmomenten"])
         ctx.update(paginator_dict)
