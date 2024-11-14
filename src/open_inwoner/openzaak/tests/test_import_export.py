@@ -115,9 +115,9 @@ class ExportObjectTests(TestCase):
             (
                 "catalogus_configs",
                 "zaak_type_configs",
-                "zaak_informatie_object_type_configs",
                 "zaak_status_type_configs",
                 "zaak_resultaat_type_configs",
+                "zaak_informatie_object_type_configs",
             ),
             (
                 "catalogus",
@@ -169,7 +169,7 @@ class TestCatalogusExport(TestCase):
                 "model": "openzaak.zaaktypeconfig",
                 "fields": {
                     "urls": '["https://foo.0.maykinmedia.nl"]',
-                    "catalogus": ["https://foo.0.maykinmedia.nl"],
+                    "catalogus": ["DM-0", "123456789"],
                     "identificatie": "ztc-id-a-0",
                     "omschrijving": "zaaktypeconfig",
                     "notify_status_changes": False,
@@ -184,7 +184,7 @@ class TestCatalogusExport(TestCase):
             {
                 "model": "openzaak.zaaktypeinformatieobjecttypeconfig",
                 "fields": {
-                    "zaaktype_config": ["ztc-id-a-0", "https://foo.0.maykinmedia.nl"],
+                    "zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"],
                     "informatieobjecttype_url": "http://foo.0.maykinmedia.nl",
                     "omschrijving": "informatieobject",
                     "zaaktype_uuids": "[]",
@@ -195,7 +195,7 @@ class TestCatalogusExport(TestCase):
             {
                 "model": "openzaak.zaaktypestatustypeconfig",
                 "fields": {
-                    "zaaktype_config": ["ztc-id-a-0", "https://foo.0.maykinmedia.nl"],
+                    "zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"],
                     "statustype_url": "https://foo.0.maykinmedia.nl",
                     "omschrijving": "status omschrijving",
                     "statustekst": "",
@@ -215,7 +215,7 @@ class TestCatalogusExport(TestCase):
             {
                 "model": "openzaak.zaaktyperesultaattypeconfig",
                 "fields": {
-                    "zaaktype_config": ["ztc-id-a-0", "https://foo.0.maykinmedia.nl"],
+                    "zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"],
                     "resultaattype_url": "https://foo.0.maykinmedia.nl",
                     "omschrijving": "resultaat",
                     "zaaktype_uuids": "[]",
@@ -237,21 +237,21 @@ class TestCatalogusExport(TestCase):
             "\n",
             '{"model": "openzaak.catalogusconfig", "fields": {"url": "https://foo.1.maykinmedia.nl", "domein": "DM-1", "rsin": "123456789", "service": ["service-1"]}}',
             "\n",
-            '{"model": "openzaak.zaaktypeconfig", "fields": {"urls": "[\\"https://foo.0.maykinmedia.nl\\"]", "catalogus": ["https://foo.0.maykinmedia.nl"], "identificatie": "ztc-id-a-0", "omschrijving": "zaaktypeconfig", "notify_status_changes": false, "description": "", "external_document_upload_url": "", "document_upload_enabled": false, "contact_form_enabled": false, "contact_subject_code": "", "relevante_zaakperiode": null}}',
+            '{"model": "openzaak.zaaktypeconfig", "fields": {"urls": "[\\"https://foo.0.maykinmedia.nl\\"]", "catalogus": ["DM-0", "123456789"], "identificatie": "ztc-id-a-0", "omschrijving": "zaaktypeconfig", "notify_status_changes": false, "description": "", "external_document_upload_url": "", "document_upload_enabled": false, "contact_form_enabled": false, "contact_subject_code": "", "relevante_zaakperiode": null}}',
             "\n",
-            '{"model": "openzaak.zaaktypeconfig", "fields": {"urls": "[\\"https://foo.1.maykinmedia.nl\\"]", "catalogus": ["https://foo.1.maykinmedia.nl"], "identificatie": "ztc-id-a-1", "omschrijving": "zaaktypeconfig", "notify_status_changes": false, "description": "", "external_document_upload_url": "", "document_upload_enabled": false, "contact_form_enabled": false, "contact_subject_code": "", "relevante_zaakperiode": null}}',
+            '{"model": "openzaak.zaaktypeconfig", "fields": {"urls": "[\\"https://foo.1.maykinmedia.nl\\"]", "catalogus": ["DM-1", "123456789"], "identificatie": "ztc-id-a-1", "omschrijving": "zaaktypeconfig", "notify_status_changes": false, "description": "", "external_document_upload_url": "", "document_upload_enabled": false, "contact_form_enabled": false, "contact_subject_code": "", "relevante_zaakperiode": null}}',
             "\n",
-            '{"model": "openzaak.zaaktypeinformatieobjecttypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "https://foo.0.maykinmedia.nl"], "informatieobjecttype_url": "http://foo.0.maykinmedia.nl", "omschrijving": "informatieobject", "zaaktype_uuids": "[]", "document_upload_enabled": false, "document_notification_enabled": false}}',
+            '{"model": "openzaak.zaaktypeinformatieobjecttypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "informatieobjecttype_url": "http://foo.0.maykinmedia.nl", "omschrijving": "informatieobject", "zaaktype_uuids": "[]", "document_upload_enabled": false, "document_notification_enabled": false}}',
             "\n",
-            '{"model": "openzaak.zaaktypeinformatieobjecttypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-1", "https://foo.1.maykinmedia.nl"], "informatieobjecttype_url": "http://foo.1.maykinmedia.nl", "omschrijving": "informatieobject", "zaaktype_uuids": "[]", "document_upload_enabled": false, "document_notification_enabled": false}}',
+            '{"model": "openzaak.zaaktypeinformatieobjecttypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-1", "DM-1", "123456789"], "informatieobjecttype_url": "http://foo.1.maykinmedia.nl", "omschrijving": "informatieobject", "zaaktype_uuids": "[]", "document_upload_enabled": false, "document_notification_enabled": false}}',
             "\n",
-            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "https://foo.0.maykinmedia.nl"], "statustype_url": "https://foo.0.maykinmedia.nl", "omschrijving": "status omschrijving", "statustekst": "", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": "", "description": "status", "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
+            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "statustype_url": "https://foo.0.maykinmedia.nl", "omschrijving": "status omschrijving", "statustekst": "", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": "", "description": "status", "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
             "\n",
-            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-1", "https://foo.1.maykinmedia.nl"], "statustype_url": "https://foo.1.maykinmedia.nl", "omschrijving": "status omschrijving", "statustekst": "", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": "", "description": "status", "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
+            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-1", "DM-1", "123456789"], "statustype_url": "https://foo.1.maykinmedia.nl", "omschrijving": "status omschrijving", "statustekst": "", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": "", "description": "status", "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
             "\n",
-            '{"model": "openzaak.zaaktyperesultaattypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "https://foo.0.maykinmedia.nl"], "resultaattype_url": "https://foo.0.maykinmedia.nl", "omschrijving": "resultaat", "zaaktype_uuids": "[]", "description": ""}}',
+            '{"model": "openzaak.zaaktyperesultaattypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "resultaattype_url": "https://foo.0.maykinmedia.nl", "omschrijving": "resultaat", "zaaktype_uuids": "[]", "description": ""}}',
             "\n",
-            '{"model": "openzaak.zaaktyperesultaattypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-1", "https://foo.1.maykinmedia.nl"], "resultaattype_url": "https://foo.1.maykinmedia.nl", "omschrijving": "resultaat", "zaaktype_uuids": "[]", "description": ""}}',
+            '{"model": "openzaak.zaaktyperesultaattypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-1", "DM-1", "123456789"], "resultaattype_url": "https://foo.1.maykinmedia.nl", "omschrijving": "resultaat", "zaaktype_uuids": "[]", "description": ""}}',
             "\n",
         ]
 
@@ -271,14 +271,14 @@ class TestCatalogusImport(TestCase):
         self.json_lines = [
             '{"model": "openzaak.catalogusconfig", "fields": {"url": "https://foo.0.maykinmedia.nl", "domein": "DM-0", "rsin": "123456789", "service": ["service-0"]}}',
             '{"model": "openzaak.catalogusconfig", "fields": {"url": "https://foo.1.maykinmedia.nl", "domein": "DM-1", "rsin": "123456789", "service": ["service-1"]}}',
-            '{"model": "openzaak.zaaktypeconfig", "fields": {"urls": "[\\"https://foo.0.maykinmedia.nl\\"]", "catalogus": ["https://foo.0.maykinmedia.nl"], "identificatie": "ztc-id-a-0", "omschrijving": "zaaktypeconfig", "notify_status_changes": false, "description": "", "external_document_upload_url": "", "document_upload_enabled": false, "contact_form_enabled": false, "contact_subject_code": "", "relevante_zaakperiode": null}}',
-            '{"model": "openzaak.zaaktypeconfig", "fields": {"urls": "[\\"https://foo.1.maykinmedia.nl\\"]", "catalogus": ["https://foo.1.maykinmedia.nl"], "identificatie": "ztc-id-a-1", "omschrijving": "zaaktypeconfig", "notify_status_changes": false, "description": "", "external_document_upload_url": "", "document_upload_enabled": false, "contact_form_enabled": false, "contact_subject_code": "", "relevante_zaakperiode": null}}',
-            '{"model": "openzaak.zaaktypeinformatieobjecttypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "https://foo.0.maykinmedia.nl"], "informatieobjecttype_url": "http://foo.0.maykinmedia.nl", "omschrijving": "informatieobject", "zaaktype_uuids": "[]", "document_upload_enabled": false, "document_notification_enabled": false}}',
-            '{"model": "openzaak.zaaktypeinformatieobjecttypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-1", "https://foo.1.maykinmedia.nl"], "informatieobjecttype_url": "http://foo.1.maykinmedia.nl", "omschrijving": "informatieobject", "zaaktype_uuids": "[]", "document_upload_enabled": false, "document_notification_enabled": false}}',
-            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "https://foo.0.maykinmedia.nl"], "statustype_url": "https://foo.0.maykinmedia.nl", "omschrijving": "status omschrijving", "statustekst": "", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": "", "description": "status", "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
-            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-1", "https://foo.1.maykinmedia.nl"], "statustype_url": "https://foo.1.maykinmedia.nl", "omschrijving": "status omschrijving", "statustekst": "", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": "", "description": "status", "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
-            '{"model": "openzaak.zaaktyperesultaattypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "https://foo.0.maykinmedia.nl"], "resultaattype_url": "https://foo.0.maykinmedia.nl", "omschrijving": "resultaat", "zaaktype_uuids": "[]", "description": ""}}',
-            '{"model": "openzaak.zaaktyperesultaattypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-1", "https://foo.1.maykinmedia.nl"], "resultaattype_url": "https://foo.1.maykinmedia.nl", "omschrijving": "resultaat", "zaaktype_uuids": "[]", "description": ""}}',
+            '{"model": "openzaak.zaaktypeconfig", "fields": {"urls": "[\\"https://foo.0.maykinmedia.nl\\"]", "catalogus": ["DM-0", "123456789"], "identificatie": "ztc-id-a-0", "omschrijving": "zaaktypeconfig", "notify_status_changes": false, "description": "", "external_document_upload_url": "", "document_upload_enabled": false, "contact_form_enabled": false, "contact_subject_code": "", "relevante_zaakperiode": null}}',
+            '{"model": "openzaak.zaaktypeconfig", "fields": {"urls": "[\\"https://foo.1.maykinmedia.nl\\"]", "catalogus": ["DM-1", "123456789"], "identificatie": "ztc-id-a-1", "omschrijving": "zaaktypeconfig", "notify_status_changes": false, "description": "", "external_document_upload_url": "", "document_upload_enabled": false, "contact_form_enabled": false, "contact_subject_code": "", "relevante_zaakperiode": null}}',
+            '{"model": "openzaak.zaaktypeinformatieobjecttypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "informatieobjecttype_url": "http://foo.0.maykinmedia.nl", "omschrijving": "informatieobject", "zaaktype_uuids": "[]", "document_upload_enabled": false, "document_notification_enabled": false}}',
+            '{"model": "openzaak.zaaktypeinformatieobjecttypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-1", "DM-1", "123456789"], "informatieobjecttype_url": "http://foo.1.maykinmedia.nl", "omschrijving": "informatieobject", "zaaktype_uuids": "[]", "document_upload_enabled": false, "document_notification_enabled": false}}',
+            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "statustype_url": "https://foo.0.maykinmedia.nl", "omschrijving": "status omschrijving", "statustekst": "", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": "", "description": "status", "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
+            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-1", "DM-1", "123456789"], "statustype_url": "https://foo.1.maykinmedia.nl", "omschrijving": "status omschrijving", "statustekst": "", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": "", "description": "status", "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
+            '{"model": "openzaak.zaaktyperesultaattypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "resultaattype_url": "https://foo.0.maykinmedia.nl", "omschrijving": "resultaat", "zaaktype_uuids": "[]", "description": ""}}',
+            '{"model": "openzaak.zaaktyperesultaattypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-1", "DM-1", "123456789"], "resultaattype_url": "https://foo.1.maykinmedia.nl", "omschrijving": "resultaat", "zaaktype_uuids": "[]", "description": ""}}',
         ]
         self.jsonl = "\n".join(self.json_lines)
 

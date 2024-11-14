@@ -179,6 +179,8 @@ class CatalogusConfigImport:
                 lambda row: ('"model": "openzaak.catalogusconfig"' in row),
                 cls._lines_iter_from_jsonl_stream_or_string(stream_or_string),
             ),
+            use_natural_foreign_keys=True,
+            use_natural_primary_keys=True,
         ):
             object_type: str = deserialized_object.object.__class__.__name__
 
@@ -220,7 +222,10 @@ class CatalogusConfigImport:
         object_type_counts = defaultdict(int)
 
         for deserialized_object in serializers.deserialize(
-            "jsonl", cls._rewrite_jsonl_url_references(stream_or_string)
+            "jsonl",
+            cls._rewrite_jsonl_url_references(stream_or_string),
+            use_natural_foreign_keys=True,
+            use_natural_primary_keys=True,
         ):
             deserialized_object.save()
             object_type = deserialized_object.object.__class__.__name__
