@@ -4,6 +4,7 @@ from datetime import timedelta
 from typing import Protocol
 from urllib.parse import urlparse
 
+from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models import UniqueConstraint
 from django.utils import timezone
@@ -477,7 +478,7 @@ class CatalogusConfig(models.Model):
         return f"{self.domein} - {self.rsin} [{self.base_url}]"
 
     def natural_key(self) -> tuple[str]:
-        return (self.url,)
+        return (self.domein, self.rsin)
 
 
 class ZaakTypeConfig(models.Model):
@@ -555,12 +556,6 @@ class ZaakTypeConfig(models.Model):
 
     class Meta:
         verbose_name = _("Zaaktype Configuration")
-        constraints = [
-            UniqueConstraint(
-                name="unique_identificatie_in_catalogus",
-                fields=["catalogus", "identificatie"],
-            ),
-        ]
 
     @property
     def catalogus_url(self):
@@ -617,13 +612,6 @@ class ZaakTypeInformatieObjectTypeConfig(models.Model):
     class Meta:
         verbose_name = _("Zaaktype Information Object Configuration")
 
-        constraints = [
-            UniqueConstraint(
-                name="unique_zaaktype_config_informatieobjecttype_url",
-                fields=["zaaktype_config", "informatieobjecttype_url"],
-            )
-        ]
-
     def informatieobjecttype_uuid(self):
         if self.informatieobjecttype_url:
             segments = furl(self.informatieobjecttype_url).path.segments
@@ -642,7 +630,7 @@ class ZaakTypeInformatieObjectTypeConfig(models.Model):
         return f"{self.omschrijving} [{self.zaaktype_config.catalogus.base_url}]"
 
     def natural_key(self):
-        return (self.informatieobjecttype_url,) + self.zaaktype_config.natural_key()
+        return (self.omschrijving,) + self.zaaktype_config.natural_key()
 
     natural_key.dependencies = ["openzaak.zaaktypeconfig"]
 
@@ -756,18 +744,11 @@ class ZaakTypeStatusTypeConfig(models.Model):
     class Meta:
         verbose_name = _("Zaaktype Statustype Configuration")
 
-        constraints = [
-            UniqueConstraint(
-                name="unique_zaaktype_config_statustype_url",
-                fields=["zaaktype_config", "statustype_url"],
-            )
-        ]
-
     def __str__(self):
         return f"{self.zaaktype_config.identificatie} - {self.omschrijving} [{self.zaaktype_config.catalogus.base_url}]"
 
     def natural_key(self):
-        return (self.statustype_url,) + self.zaaktype_config.natural_key()
+        return (self.omschrijving,) + self.zaaktype_config.natural_key()
 
     natural_key.dependencies = ["openzaak.zaaktypeconfig"]
 
@@ -807,18 +788,11 @@ class ZaakTypeResultaatTypeConfig(models.Model):
     class Meta:
         verbose_name = _("Zaaktype Resultaattype Configuration")
 
-        constraints = [
-            UniqueConstraint(
-                name="unique_zaaktype_config_resultaattype_url",
-                fields=["zaaktype_config", "resultaattype_url"],
-            )
-        ]
-
     def __str__(self):
         return f"{self.zaaktype_config.identificatie} - {self.omschrijving} [{self.zaaktype_config.catalogus.base_url}]"
 
     def natural_key(self):
-        return (self.resultaattype_url,) + self.zaaktype_config.natural_key()
+        return (self.omschrijving,) + self.zaaktype_config.natural_key()
 
     natural_key.dependencies = ["openzaak.zaaktypeconfig"]
 
