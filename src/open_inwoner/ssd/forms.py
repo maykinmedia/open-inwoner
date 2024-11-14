@@ -78,6 +78,7 @@ class MonthlyReportsForm(forms.Form):
         self.fields["report_date"] = forms.DateTimeField(
             widget=forms.Select(choices=get_monthly_report_dates()),
             label="Toon uitkeringsspecificatie:",
+            required=False,
         )
 
     def is_valid(self):
@@ -95,6 +96,7 @@ class YearlyReportsForm(forms.Form):
         self.fields["report_date"] = forms.DateTimeField(
             widget=forms.Select(choices=get_yearly_report_dates()),
             label="Toon uitkeringsspecificatie:",
+            required=False,
         )
 
     def is_valid(self):
