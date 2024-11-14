@@ -85,25 +85,27 @@ class UserCaseInfoObjectNotificationManager(UserCaseNotificationBaseManager):
 
 
 class CatalogusConfigManager(models.Manager):
-    def get_by_natural_key(self, url):
-        return self.get(url=url)
+    def get_by_natural_key(self, domein, rsin):
+        return self.get(domein=domein, rsin=rsin)
 
 
 class ZaakTypeInformatieObjectTypeConfigQueryset(models.QuerySet):
     def get_by_natural_key(
         self,
-        informatieobjecttype_url,
+        omschrijving,
         zaak_type_config_identificatie,
-        catalogus_url,
+        catalogus_domein,
+        catalogus_rsin,
     ):
         from .models import ZaakTypeConfig
 
         return self.get(
             zaaktype_config=ZaakTypeConfig.objects.get(
                 identificatie=zaak_type_config_identificatie,
-                catalogus__url=catalogus_url,
+                catalogus__domein=catalogus_domein,
+                catalogus__rsin=catalogus_rsin,
             ),
-            informatieobjecttype_url=informatieobjecttype_url,
+            omschrijving=omschrijving,
         )
 
     def filter_catalogus(self, case_type: ZaakType):
@@ -144,14 +146,11 @@ class ZaakTypeInformatieObjectTypeConfigQueryset(models.QuerySet):
 
 
 class ZaakTypeConfigQueryset(models.QuerySet):
-    def get_by_natural_key(
-        self,
-        identificatie,
-        catalogus_url,
-    ):
+    def get_by_natural_key(self, identificatie, catalogus_domein, catalogus_rsin):
         return self.get(
             identificatie=identificatie,
-            catalogus__url=catalogus_url,
+            catalogus__domein=catalogus_domein,
+            catalogus__rsin=catalogus_rsin,
         )
 
     def filter_catalogus(self, case_type: ZaakType):
@@ -205,18 +204,20 @@ class ZaakTypeConfigQueryset(models.QuerySet):
 class ZaakTypeStatusTypeConfigQuerySet(models.QuerySet):
     def get_by_natural_key(
         self,
-        statustype_url,
-        zaak_type_config_identificatie,
-        catalogus_url,
+        omschrijving,
+        zaaktype_config_identificatie,
+        catalogus_domein,
+        catalogus_rsin,
     ):
         from .models import ZaakTypeConfig
 
         return self.get(
             zaaktype_config=ZaakTypeConfig.objects.get(
-                identificatie=zaak_type_config_identificatie,
-                catalogus__url=catalogus_url,
+                identificatie=zaaktype_config_identificatie,
+                catalogus__domein=catalogus_domein,
+                catalogus__rsin=catalogus_rsin,
             ),
-            statustype_url=statustype_url,
+            omschrijving=omschrijving,
         )
 
     def find_for(self, case: Zaak, status: Status):
@@ -246,18 +247,20 @@ class ZaakTypeStatusTypeConfigQuerySet(models.QuerySet):
 class ZaakTypeResultaatTypeConfigManger(models.Manager):
     def get_by_natural_key(
         self,
-        resultaattype_url,
+        omschrijving,
         zaak_type_config_identificatie,
-        catalogus_url,
+        catalogus_domein,
+        catalogus_rsin,
     ):
         from .models import ZaakTypeConfig
 
         return self.get(
             zaaktype_config=ZaakTypeConfig.objects.get(
                 identificatie=zaak_type_config_identificatie,
-                catalogus__url=catalogus_url,
+                catalogus__domein=catalogus_domein,
+                catalogus__rsin=catalogus_rsin,
             ),
-            resultaattype_url=resultaattype_url,
+            omschrijving=omschrijving,
         )
 
 
