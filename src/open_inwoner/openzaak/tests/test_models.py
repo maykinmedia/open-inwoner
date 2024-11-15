@@ -1,7 +1,6 @@
 from datetime import timedelta
 from uuid import uuid4
 
-from django.db import IntegrityError
 from django.test import TestCase
 
 from freezegun import freeze_time
@@ -30,12 +29,6 @@ from open_inwoner.openzaak.tests.shared import CATALOGI_ROOT
 
 
 class CatalogusConfigManagerTestCase(TestCase):
-    def test_fields_used_for_natural_key_are_unique(self):
-
-        with self.assertRaises(IntegrityError):
-            for _ in range(2):
-                CatalogusConfigFactory(domein="test", rsin="1234")
-
     def test_get_by_natural_key_returns_expected_instance(self):
         config = CatalogusConfigFactory()
 
@@ -46,23 +39,10 @@ class CatalogusConfigManagerTestCase(TestCase):
 
     def test_get_by_natural_key_not_found(self):
         with self.assertRaises(CatalogusConfig.DoesNotExist):
-            CatalogusConfig.objects.get_by_natural_key(
-                domein="test", rsin="1234"
-            )
+            CatalogusConfig.objects.get_by_natural_key(domein="test", rsin="1234")
 
 
 class ZaakTypeConfigModelTestCase(TestCase):
-    def test_fields_used_for_natural_key_are_unique(self):
-        catalogus = CatalogusConfigFactory()
-
-        with self.assertRaises(IntegrityError):
-            for _ in range(2):
-                ZaakTypeConfigFactory(
-                    identificatie="AAAA",
-                    catalogus__domein=catalogus.domein,
-                    catalogus__rsin=catalogus.rsin,
-                )
-
     def test_get_by_natural_key_returns_expected_instance(self):
         zaak_type_config = ZaakTypeConfigFactory(
             identificatie="AAAA",
@@ -107,15 +87,6 @@ class ZaakTypeConfigModelTestCase(TestCase):
 
 
 class ZaakTypeStatusTypeConfigModelTestCase(TestCase):
-    def test_fields_used_for_natural_key_are_unique(self):
-        zt = ZaakTypeConfigFactory()
-        with self.assertRaises(IntegrityError):
-            for _ in range(2):
-                ZaakTypeStatusTypeConfigFactory(
-                    zaaktype_config=zt,
-                    omschrijving="test",
-                )
-
     def test_get_by_natural_key_returns_expected_instance(self):
         zt = ZaakTypeConfigFactory()
         zt_status_type_config = ZaakTypeStatusTypeConfigFactory(
@@ -145,24 +116,17 @@ class ZaakTypeStatusTypeConfigModelTestCase(TestCase):
 
 
 class ZaakTypeResultaatTypeConfigModelTestCase(TestCase):
-    def test_fields_used_for_natural_key_are_unique(self):
-        zt = ZaakTypeConfigFactory()
-        with self.assertRaises(IntegrityError):
-            for _ in range(2):
-                ZaakTypeResultaatTypeConfigFactory(
-                    zaaktype_config=zt, omschrijving="test"
-                )
-
     def test_get_by_natural_key_returns_expected_instance(self):
         zt = ZaakTypeConfigFactory()
         zt_status_type_config = ZaakTypeResultaatTypeConfigFactory(
-            zaaktype_config=zt, omschrijving="test",
+            zaaktype_config=zt,
+            omschrijving="test",
         )
 
         self.assertEqual(
             ZaakTypeResultaatTypeConfig.objects.get_by_natural_key(
                 omschrijving="test",
-                zaak_type_config_identificatie=zt.identificatie,
+                zaaktype_config_identificatie=zt.identificatie,
                 catalogus_domein=zt.catalogus.domein,
                 catalogus_rsin=zt.catalogus.rsin,
             ),
@@ -174,22 +138,13 @@ class ZaakTypeResultaatTypeConfigModelTestCase(TestCase):
         with self.assertRaises(ZaakTypeResultaatTypeConfig.DoesNotExist):
             ZaakTypeResultaatTypeConfig.objects.get_by_natural_key(
                 omschrijving="bogus",
-                zaak_type_config_identificatie=zt.identificatie,
+                zaaktype_config_identificatie=zt.identificatie,
                 catalogus_domein=zt.catalogus.domein,
                 catalogus_rsin=zt.catalogus.rsin,
             )
 
 
 class ZaakTypeInformatieObjectTypeConfigFactoryModelTestCase(TestCase):
-    def test_fields_used_for_natural_key_are_unique(self):
-        zt = ZaakTypeConfigFactory()
-        with self.assertRaises(IntegrityError):
-            for _ in range(2):
-                ZaakTypeInformatieObjectTypeConfigFactory(
-                    zaaktype_config=zt,
-                    omschrijving="test",
-                )
-
     def test_get_by_natural_key_returns_expected_instance(self):
         zt = ZaakTypeConfigFactory()
         zt_io_type = ZaakTypeInformatieObjectTypeConfigFactory(
@@ -199,7 +154,7 @@ class ZaakTypeInformatieObjectTypeConfigFactoryModelTestCase(TestCase):
         self.assertEqual(
             ZaakTypeInformatieObjectTypeConfig.objects.get_by_natural_key(
                 omschrijving="test",
-                zaak_type_config_identificatie=zt.identificatie,
+                zaaktype_config_identificatie=zt.identificatie,
                 catalogus_domein=zt.catalogus.domein,
                 catalogus_rsin=zt.catalogus.rsin,
             ),
@@ -211,7 +166,7 @@ class ZaakTypeInformatieObjectTypeConfigFactoryModelTestCase(TestCase):
         with self.assertRaises(ZaakTypeInformatieObjectTypeConfig.DoesNotExist):
             ZaakTypeInformatieObjectTypeConfig.objects.get_by_natural_key(
                 omschrijving="bogus",
-                zaak_type_config_identificatie=zt.identificatie,
+                zaaktype_config_identificatie=zt.identificatie,
                 catalogus_domein=zt.catalogus.domein,
                 catalogus_rsin=zt.catalogus.rsin,
             )

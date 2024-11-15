@@ -93,7 +93,7 @@ class ZaakTypeInformatieObjectTypeConfigQueryset(models.QuerySet):
     def get_by_natural_key(
         self,
         omschrijving,
-        zaak_type_config_identificatie,
+        zaaktype_config_identificatie,
         catalogus_domein,
         catalogus_rsin,
     ):
@@ -101,7 +101,7 @@ class ZaakTypeInformatieObjectTypeConfigQueryset(models.QuerySet):
 
         return self.get(
             zaaktype_config=ZaakTypeConfig.objects.get(
-                identificatie=zaak_type_config_identificatie,
+                identificatie=zaaktype_config_identificatie,
                 catalogus__domein=catalogus_domein,
                 catalogus__rsin=catalogus_rsin,
             ),
@@ -248,7 +248,7 @@ class ZaakTypeResultaatTypeConfigManger(models.Manager):
     def get_by_natural_key(
         self,
         omschrijving,
-        zaak_type_config_identificatie,
+        zaaktype_config_identificatie,
         catalogus_domein,
         catalogus_rsin,
     ):
@@ -256,7 +256,7 @@ class ZaakTypeResultaatTypeConfigManger(models.Manager):
 
         return self.get(
             zaaktype_config=ZaakTypeConfig.objects.get(
-                identificatie=zaak_type_config_identificatie,
+                identificatie=zaaktype_config_identificatie,
                 catalogus__domein=catalogus_domein,
                 catalogus__rsin=catalogus_rsin,
             ),
