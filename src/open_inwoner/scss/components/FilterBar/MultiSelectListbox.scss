@@ -83,6 +83,9 @@
       padding: 0 var(--spacing-medium);
     }
   }
+  #selectButton .close-icon {
+    pointer-events: all;
+  }
 
   #selectButton .close-icon {
     border-radius: var(--border-radius);
