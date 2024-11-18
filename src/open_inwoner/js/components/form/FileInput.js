@@ -301,7 +301,7 @@ export class FileInput extends Component {
             <div class="file__data">
               <span class="file__name">${name} (${ext}, ${sizeMB}MB)</span>
             </div>
-            <a class="link link--primary file__download" href="#document-upload" role="button" aria-label="${labelDelete}">
+            <a class="link link--primary file__download file__delete" href="#document-upload" role="button" aria-label="${labelDelete}">
               <span aria-hidden="true" class="material-icons-outlined">delete</span>
             </a>
         </div>
@@ -310,7 +310,7 @@ export class FileInput extends Component {
               ? `
               <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-small error">
                 <span aria-hidden="true" class="material-icons-outlined">warning_amber</span>
-                <span class="file-error__content">Dit type bestand (${ext}) is ongeldig en te groot. Geldige bestandstypen zijn: ${uploadFileTypes}</span>
+                <span class="file-error__content file-error__type-size">Dit type bestand (${ext}) is ongeldig en te groot. Geldige bestandstypen zijn: ${uploadFileTypes}</span>
               </p>`
               : typeError || sizeError
               ? `
@@ -318,12 +318,12 @@ export class FileInput extends Component {
                 <span aria-hidden="true" class="material-icons-outlined">warning_amber</span>
                 ${
                   typeError
-                    ? `<span class="file-error__content">Dit type bestand (${ext}) is ongeldig. Geldige bestandstypen zijn: ${uploadFileTypes}</span>`
+                    ? `<span class="file-error__content file-error__type">Dit type bestand (${ext}) is ongeldig. Geldige bestandstypen zijn: ${uploadFileTypes}</span>`
                     : ''
                 }
                 ${
                   sizeError
-                    ? '<span class="file-error__content">Dit bestand is te groot</span>'
+                    ? '<span class="file-error__content file-error__size">Dit bestand is te groot</span>'
                     : ''
                 }
               </p>`
