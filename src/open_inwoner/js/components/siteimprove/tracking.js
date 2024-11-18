@@ -1,16 +1,16 @@
 // // Mock _sz object for testing
-// if (typeof _sz === 'undefined') {
-//   var _sz = {
-//     push: function (data) {
-//       try {
-//         console.log('Event pushed to _sz:', data)
-//       } catch (error) {
-//         // Log the error
-//         console.error('Error occurred while pushing event data:', error)
-//       }
-//     },
-//   }
-// }
+if (typeof _sz === 'undefined') {
+  var _sz = {
+    push: function (data) {
+      try {
+        console.log('Event pushed to _sz:', data)
+      } catch (error) {
+        // Log the error
+        console.error('Error occurred while pushing event data:', error)
+      }
+    },
+  }
+}
 
 if (typeof _sz !== 'undefined') {
   console.log('-> SiteImprove _sz object exists: ', _sz)
@@ -247,20 +247,41 @@ let isEventTrackerInitialized = false
           'Save',
         ],
         // End of Communicatievoorkeuren
-        // Start Header dropdown profiel
+        // Header desktop dropdown profiel
         '.header > .header__container > nav.primary-navigation.primary-navigation__authenticated > .primary-navigation__list > .primary-navigation__list-item > ul > li:nth-child(1) > a':
           ['event', 'Mijn Profiel', 'Click', 'Open mijn profiel'],
         '.header > .header__container > nav.primary-navigation.primary-navigation--open.primary-navigation__authenticated > .primary-navigation__list > .primary-navigation__list-item > .subpage-list > li:nth-child(1) > a > .link__text':
           ['event', 'Mijn Profiel', 'Click', 'Open mijn profiel'],
         '.header > .header__container > nav.primary-navigation.primary-navigation__authenticated > .primary-navigation__list > .primary-navigation__list-item > ul > li:nth-child(1) > a > .material-icons-outlined':
           ['event', 'Mijn Profiel', 'Click', 'Open mijn profiel'],
-        // End header dropdown profiel
+        // header mobile dropdown profiel
+        '.header nav.primary-navigation.primary-navigation__authenticated > ul > li > ul > li.header__list-item > a[aria-label="Mijn profiel"]':
+          ['event', 'Profiel nav', 'Click', 'Open mijn profiel'],
+        '.header nav.primary-navigation.primary-navigation__authenticated > ul > li > ul > li.header__list-item > a[aria-label="Mijn profiel"] .link__text':
+          ['event', 'Profiel nav', 'Click', 'Open mijn profiel'],
+        '.header > div > div.header--mobile.header__submenu > nav > ul > li > a[aria-label="Mijn profiel"] .material-icons-outlined':
+          ['event', 'Profiel nav', 'Click', 'Open mijn profiel'],
+        // Header desktop dropdown uitloggen
         '.header nav.primary-navigation.primary-navigation__authenticated > ul > li > ul > li.header__list-item > a':
           ['event', 'Logout button', 'Click', 'Logout'],
         '.header nav.primary-navigation.primary-navigation__authenticated > ul > li > ul > li.header__list-item > a .link__text':
           ['event', 'Logout button', 'Click', 'Logout'],
         '.header nav.primary-navigation.primary-navigation__authenticated > ul > li > ul > li.header__list-item > a > .material-icons':
           ['event', 'Logout button', 'Click', 'Logout'],
+        // Start Header dropdown Aanvragen desktop
+        '.header > .header__container > nav.primary-navigation.primary-navigation__authenticated > .primary-navigation__list > .primary-navigation__list-item > ul > li > a[aria-label="Mijn aanvragen"]':
+          ['event', 'Mijn aanvragen', 'Click', 'Open mijn aanvragen'],
+        '.header > .header__container > nav.primary-navigation.primary-navigation--open.primary-navigation__authenticated > .primary-navigation__list > .primary-navigation__list-item > .subpage-list > li > a[aria-label="Mijn aanvragen"] > .link__text':
+          ['event', 'Mijn aanvragen', 'Click', 'Open mijn aanvragen'],
+        '.header > div > div.header--mobile.header__submenu > nav > ul > li > a[aria-label="Mijn aanvragen"] .material-icons-outlined':
+          ['event', 'Mijn aanvragen', 'Click', 'Open mijn aanvragen'],
+        // End header dropdown Aanvragen mobile
+        '.header .header--mobile.header__submenu > nav.primary-navigation--mobile > .primary-navigation__list > .primary-navigation__list-item > a[aria-label="Mijn aanvragen"]':
+          ['event', 'Mobile nav', 'Click', 'Logout'],
+        '.header .header--mobile.header__submenu > nav.primary-navigation--mobile > .primary-navigation__list > .primary-navigation__list-item > a[aria-label="Mijn aanvragen"] .link__text':
+          ['event', 'Mobile nav', 'Click', 'Logout'],
+        '.header .header--mobile.header__submenu > nav.primary-navigation--mobile > .primary-navigation__list > .primary-navigation__list-item > a[aria-label="Mijn aanvragen"] > .material-icons':
+          ['event', 'Mobile nav', 'Click', 'Logout'],
         // Filters in Cases list
         '.filter-bar #selectButton': [
           'event',
@@ -282,7 +303,7 @@ let isEventTrackerInitialized = false
         ],
       },
       change: {
-        '.form#profile-edit input[name="phone"]': [
+        '.form#profile-edit input[name="phonenumber"]': [
           'event',
           'Contactgegevens',
           'change',
@@ -290,7 +311,7 @@ let isEventTrackerInitialized = false
         ],
       },
       keydown: {
-        '.form#profile-edit input[name="phone"]': [
+        '.form#profile-edit input[name="phonenumber"]': [
           'event',
           'Contactgegevens',
           'change',
