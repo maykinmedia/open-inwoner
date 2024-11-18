@@ -1,16 +1,16 @@
 // // Mock _sz object for testing
-if (typeof _sz === 'undefined') {
-  var _sz = {
-    push: function (data) {
-      try {
-        console.log('Event pushed to _sz:', data)
-      } catch (error) {
-        // Log the error
-        console.error('Error occurred while pushing event data:', error)
-      }
-    },
-  }
-}
+// if (typeof _sz === 'undefined') {
+//   var _sz = {
+//     push: function (data) {
+//       try {
+//         console.log('Event pushed to _sz:', data)
+//       } catch (error) {
+//         // Log the error
+//         console.error('Error occurred while pushing event data:', error)
+//       }
+//     },
+//   }
+// }
 
 if (typeof _sz !== 'undefined') {
   console.log('-> SiteImprove _sz object exists: ', _sz)
