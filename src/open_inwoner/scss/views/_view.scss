@@ -63,3 +63,17 @@
     }
   }
 }
+
+//TEST
+//.header .header--mobile.header__submenu > nav.primary-navigation--mobile > .primary-navigation__list > .primary-navigation__list-item > a[aria-label="Mijn aanvragen"],
+//.header > div > div.header--mobile.header__submenu > nav > ul > li > a[aria-label="Mijn aanvragen"] .material-icons-outlined,
+.header
+  > div
+  > div.header--mobile.header__submenu
+  > nav
+  > ul
+  > li
+  > a[aria-label='Mijn profiel']
+  .material-icons-outlined {
+  background-color: yellow;
+}
