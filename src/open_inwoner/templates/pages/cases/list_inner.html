@@ -73,10 +73,10 @@
                             <li class="list-item list-item--compact">
                                 <p class="card__caption card__text--small"><span>{% trans "Aanvraag ingediend op:" %}</span><span class="card__text--dark">{{ case.start_date }}</span></p>
                             </li>
-                            {% if case.current_status %}
-                                {% list_item case.current_status caption=_("Status") compact=True strong=False %}
+                            {% if case.result %}
+                                {% list_item case.result caption=_("Resultaat") compact=True strong=False %}
                             {% else %}
-                                {% list_item "No status" caption=_("Status") compact=True strong=False %}
+                                {% list_item case.current_status caption=_("Status") compact=True strong=False %}
                             {% endif %}
                             {% list_item case.identification caption=_("Zaaknummer") compact=True strong=False %}
                         {% endrender_list %}
