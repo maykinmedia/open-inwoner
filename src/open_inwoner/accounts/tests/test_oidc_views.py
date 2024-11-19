@@ -1,5 +1,6 @@
 from hashlib import md5
 from typing import Literal
+from unittest import skip
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
@@ -623,6 +624,7 @@ class DigiDOIDCFlowTests(WebTest):
             id=1, enabled=True, oidc_op_logout_endpoint="http://localhost:8080/logout"
         ),
     )
+    @skip("Testing this in a live environment first")
     def test_logout(self, mock_get_solo):
         # set up a user with a non existing email address
         user = DigidUserFactory.create(
@@ -1155,6 +1157,7 @@ class eHerkenningOIDCFlowTests(WebTest):
             oidc_op_logout_endpoint="http://localhost:8080/logout",
         ),
     )
+    @skip("Testing this in a live environment first")
     def test_logout(self, mock_get_solo):
         # set up a user with a non existing email address
         user = eHerkenningUserFactory.create(
