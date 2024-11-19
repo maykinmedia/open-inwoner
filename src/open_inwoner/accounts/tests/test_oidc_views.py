@@ -1,7 +1,9 @@
 from hashlib import md5
 from typing import Literal
 from unittest.mock import patch
+from urllib.parse import urlencode
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test import TestCase, modify_settings, override_settings
@@ -643,20 +645,64 @@ class DigiDOIDCFlowTests(WebTest):
         self.assertFalse(User.objects.filter(email="new_user@example.com").exists())
 
         # enter the logout flow
-        with requests_mock.Mocker() as m:
-            m.post("http://localhost:8080/logout")
-            logout_response = self.client.get(logout_url)
-
-            self.assertEqual(len(m.request_history), 1)
-            self.assertEqual(m.request_history[0].url, "http://localhost:8080/logout")
-            self.assertEqual(m.request_history[0].body, "id_token_hint=foo")
+        logout_response = self.client.get(logout_url)
 
         self.assertRedirects(
-            logout_response, reverse("login"), fetch_redirect_response=False
+            logout_response,
+            "http://localhost:8080/logout"
+            + "?"
+            + urlencode(
+                dict(
+                    id_token_hint="foo",
+                    post_logout_redirect_uri=f"http://testserver{settings.LOGOUT_REDIRECT_URL}",
+                )
+            ),
+            fetch_redirect_response=False,
         )
 
         self.assertNotIn("oidc_states", self.client.session)
         self.assertNotIn("oidc_id_token", self.client.session)
+        self.assertFalse(logout_response.wsgi_request.user.is_authenticated)
+
+    @patch(
+        "open_inwoner.accounts.models.OpenIDDigiDConfig.get_solo",
+        return_value=OpenIDDigiDConfig(
+            id=1,
+            enabled=True,
+            oidc_op_logout_endpoint=None,
+        ),
+    )
+    def test_logout_without_sso_logout_configured(self, mock_get_solo):
+        # set up a user with a non existing email address
+        user = DigidUserFactory.create(
+            bsn="123456782", email="existing_user@example.com"
+        )
+        self.client.force_login(user)
+        session = self.client.session
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "accounts.OpenIDDigiDConfig",
+            }
+        }
+        session["oidc_id_token"] = "foo"
+        session.save()
+        logout_url = reverse("digid_oidc:logout")
+
+        self.assertFalse(User.objects.filter(email="new_user@example.com").exists())
+
+        # enter the logout flow
+        logout_response = self.client.get(logout_url)
+
+        self.assertRedirects(
+            logout_response,
+            settings.LOGOUT_REDIRECT_URL,
+            fetch_redirect_response=False,
+        )
+
+        self.assertNotIn("oidc_states", self.client.session)
+        self.assertNotIn("oidc_id_token", self.client.session)
+        self.assertFalse(logout_response.wsgi_request.user.is_authenticated)
 
     def test_error_page_direct_access(self):
         error_url = reverse("oidc-error")
@@ -1176,20 +1222,66 @@ class eHerkenningOIDCFlowTests(WebTest):
         self.assertFalse(User.objects.filter(email="new_user@example.com").exists())
 
         # enter the logout flow
-        with requests_mock.Mocker() as m:
-            m.post("http://localhost:8080/logout")
-            logout_response = self.client.get(logout_url)
-
-            self.assertEqual(len(m.request_history), 1)
-            self.assertEqual(m.request_history[0].url, "http://localhost:8080/logout")
-            self.assertEqual(m.request_history[0].body, "id_token_hint=foo")
+        logout_response = self.client.get(logout_url)
 
         self.assertRedirects(
-            logout_response, reverse("login"), fetch_redirect_response=False
+            logout_response,
+            "http://localhost:8080/logout"
+            + "?"
+            + urlencode(
+                dict(
+                    id_token_hint="foo",
+                    post_logout_redirect_uri=f"http://testserver{settings.LOGOUT_REDIRECT_URL}",
+                )
+            ),
+            fetch_redirect_response=False,
         )
 
         self.assertNotIn("oidc_states", self.client.session)
         self.assertNotIn("oidc_id_token", self.client.session)
+        self.assertFalse(logout_response.wsgi_request.user.is_authenticated)
+
+    @patch(
+        "open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo",
+        return_value=OpenIDEHerkenningConfig(
+            id=1,
+            enabled=True,
+            legal_subject_claim=["kvk"],
+            oidc_op_logout_endpoint=None,
+        ),
+    )
+    def test_logout_without_sso_logout_configured(self, mock_get_solo):
+        # set up a user with a non existing email address
+        user = eHerkenningUserFactory.create(
+            kvk="12345678", email="existing_user@example.com"
+        )
+        self.client.force_login(user)
+        session = self.client.session
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "accounts.OpenIDEHerkenningConfig",
+            }
+        }
+        session["oidc_id_token"] = "foo"
+        session[KVK_BRANCH_SESSION_VARIABLE] = None
+        session.save()
+        logout_url = reverse("eherkenning_oidc:logout")
+
+        self.assertFalse(User.objects.filter(email="new_user@example.com").exists())
+
+        # enter the logout flow
+        logout_response = self.client.get(logout_url)
+
+        self.assertRedirects(
+            logout_response,
+            settings.LOGOUT_REDIRECT_URL,
+            fetch_redirect_response=False,
+        )
+
+        self.assertNotIn("oidc_states", self.client.session)
+        self.assertNotIn("oidc_id_token", self.client.session)
+        self.assertFalse(logout_response.wsgi_request.user.is_authenticated)
 
     @modify_settings(
         MIDDLEWARE={

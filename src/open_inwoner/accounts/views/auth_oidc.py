@@ -1,4 +1,5 @@
 import logging
+from urllib.parse import urlencode
 
 from django.conf import settings
 from django.contrib import auth, messages
@@ -12,7 +13,6 @@ from django.views.generic import View
 
 from digid_eherkenning.oidc.models import BaseConfig
 from digid_eherkenning.oidc.views import OIDCAuthenticationCallbackView
-from mozilla_django_oidc_db.utils import do_op_logout
 from mozilla_django_oidc_db.views import _OIDC_ERROR_SESSION_KEY, OIDCInit
 
 from ..models import OpenIDDigiDConfig, OpenIDEHerkenningConfig
@@ -97,16 +97,32 @@ class OIDCLogoutView(View):
 
     def get(self, request):
         assert self.config_class is not None
+        config = self.config_class.get_solo()
 
-        if id_token := request.session.get("oidc_id_token"):
-            config = self.config_class.get_solo()
-            do_op_logout(config, id_token)
-
+        id_token = request.session.get("oidc_id_token")
         if "oidc_login_next" in request.session:
             del request.session["oidc_login_next"]
 
+        # Always destroy our session first before trying to initiate single-sign out
         auth.logout(request)
 
+        # Try to initiate a frontchannel redirect
+        if logout_endpoint := config.oidc_op_logout_endpoint:
+            params = {
+                # The value MUST have been previously registered with the
+                # OP, either using the post_logout_redirect_uri
+                # registration parameter or via another mechanism.
+                "post_logout_redirect_uri": self.request.build_absolute_uri(
+                    self.get_success_url()
+                ),
+            }
+            if id_token:
+                params["id_token_hint"] = id_token
+
+            logout_url = f"{logout_endpoint}?{urlencode(params)}"
+            return HttpResponseRedirect(logout_url)
+
+        logger.warning("No OIDC logout endpoint defined")
         return HttpResponseRedirect(self.get_success_url())
 
 
