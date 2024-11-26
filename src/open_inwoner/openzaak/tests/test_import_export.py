@@ -5,10 +5,7 @@ import uuid
 from django.core.files.storage.memory import InMemoryStorage
 from django.test import TestCase
 
-from open_inwoner.openzaak.import_export import (
-    CatalogusConfigExport,
-    CatalogusConfigImport,
-)
+from open_inwoner.openzaak.import_export import CatalogusConfigImport, ZGWConfigExport
 from open_inwoner.openzaak.models import (
     CatalogusConfig,
     ZaakTypeConfig,
@@ -94,17 +91,17 @@ class ExportObjectTests(TestCase):
         for arg in (list(), set(), tuple(), None, "", CatalogusConfig.objects.first()):
             with self.subTest(f"Default factory should not accept {arg}"):
                 with self.assertRaises(TypeError):
-                    CatalogusConfigExport.from_catalogus_configs(arg)
+                    ZGWConfigExport.from_catalogus_configs(arg)
 
     def test_export_only_accepts_queryset_of_correct_type(self):
         with self.assertRaises(ValueError):
-            CatalogusConfigExport.from_catalogus_configs(ZaakTypeConfig.objects.all())
+            ZGWConfigExport.from_catalogus_configs(ZaakTypeConfig.objects.all())
 
     def test_equality_operator(self):
-        export_a = CatalogusConfigExport.from_catalogus_configs(
+        export_a = ZGWConfigExport.from_catalogus_configs(
             CatalogusConfig.objects.filter(pk=self.mocks[0].catalogus.pk)
         )
-        export_b = CatalogusConfigExport.from_catalogus_configs(
+        export_b = ZGWConfigExport.from_catalogus_configs(
             CatalogusConfig.objects.filter(pk=self.mocks[1].catalogus.pk)
         )
 
@@ -113,14 +110,14 @@ class ExportObjectTests(TestCase):
         self.assertFalse(export_a == export_b)
 
     def test_only_models_related_to_exported_catalogus_config_are_included(self):
-        export = CatalogusConfigExport.from_catalogus_configs(
+        export = ZGWConfigExport.from_catalogus_configs(
             CatalogusConfig.objects.filter(pk=self.mocks[0].catalogus.pk)
         )
 
         for export_field, mock_field in zip(
             (
                 "catalogus_configs",
-                "zaak_type_configs",
+                "zaaktype_configs",
                 "zaak_status_type_configs",
                 "zaak_resultaat_type_configs",
                 "zaak_informatie_object_type_configs",
@@ -148,6 +145,79 @@ class ExportObjectTests(TestCase):
                 )
 
 
+class ZaakTypeConfigExportTest(TestCase):
+    def setUp(self):
+        self.mocks = ZGWExportImportMockData(0)
+
+    def test_export_zaaktype_configs(self):
+        export = ZGWConfigExport.from_zaaktype_configs(
+            ZaakTypeConfig.objects.filter(pk=self.mocks.ztc.pk)
+        )
+        rows = export.as_dicts()
+
+        expected = [
+            {
+                "model": "openzaak.zaaktypeconfig",
+                "fields": {
+                    "urls": '["https://foo.0.maykinmedia.nl"]',
+                    "catalogus": ["DM-0", "123456789"],
+                    "identificatie": "ztc-id-a-0",
+                    "omschrijving": "zaaktypeconfig",
+                    "notify_status_changes": False,
+                    "description": "",
+                    "external_document_upload_url": "",
+                    "document_upload_enabled": False,
+                    "contact_form_enabled": False,
+                    "contact_subject_code": "",
+                    "relevante_zaakperiode": None,
+                },
+            },
+            {
+                "model": "openzaak.zaaktypeinformatieobjecttypeconfig",
+                "fields": {
+                    "zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"],
+                    "informatieobjecttype_url": "https://foo.0.maykinmedia.nl",
+                    "omschrijving": "informatieobject",
+                    "zaaktype_uuids": '["a1591906-3368-470a-a957-4b8634c275a1"]',
+                    "document_upload_enabled": False,
+                    "document_notification_enabled": False,
+                },
+            },
+            {
+                "model": "openzaak.zaaktypestatustypeconfig",
+                "fields": {
+                    "zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"],
+                    "statustype_url": "https://foo.0.maykinmedia.nl",
+                    "omschrijving": "status omschrijving",
+                    "statustekst": "",
+                    "zaaktype_uuids": '["a1591906-3368-470a-a957-4b8634c275a1"]',
+                    "status_indicator": "",
+                    "status_indicator_text": "",
+                    "document_upload_description": "",
+                    "description": "status",
+                    "notify_status_change": True,
+                    "action_required": False,
+                    "document_upload_enabled": True,
+                    "call_to_action_url": "",
+                    "call_to_action_text": "",
+                    "case_link_text": "",
+                },
+            },
+            {
+                "model": "openzaak.zaaktyperesultaattypeconfig",
+                "fields": {
+                    "zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"],
+                    "resultaattype_url": "https://foo.0.maykinmedia.nl",
+                    "omschrijving": "resultaat",
+                    "zaaktype_uuids": '["a1591906-3368-470a-a957-4b8634c275a1"]',
+                    "description": "",
+                },
+            },
+        ]
+
+        self.assertEqual(rows, expected)
+
+
 class TestCatalogusExport(TestCase):
     def setUp(self):
         self.mocks = [
@@ -156,7 +226,7 @@ class TestCatalogusExport(TestCase):
         ]
 
     def test_export_catalogus_configs(self):
-        export = CatalogusConfigExport.from_catalogus_configs(
+        export = ZGWConfigExport.from_catalogus_configs(
             CatalogusConfig.objects.filter(pk=self.mocks[0].catalogus.pk)
         )
         rows = export.as_dicts()
@@ -233,9 +303,7 @@ class TestCatalogusExport(TestCase):
         self.assertEqual(rows, expected)
 
     def test_export_catalogus_configs_as_jsonl(self):
-        export = CatalogusConfigExport.from_catalogus_configs(
-            CatalogusConfig.objects.all()
-        )
+        export = ZGWConfigExport.from_catalogus_configs(CatalogusConfig.objects.all())
         rows = list(export.as_jsonl_iter())
 
         expected = [
@@ -585,9 +653,7 @@ class ImportExportTestCase(TestCase):
         ZGWExportImportMockData()
 
     def test_exports_can_be_imported(self):
-        export = CatalogusConfigExport.from_catalogus_configs(
-            CatalogusConfig.objects.all()
-        )
+        export = ZGWConfigExport.from_catalogus_configs(CatalogusConfig.objects.all())
         import_result = CatalogusConfigImport.from_jsonl_stream_or_string(
             export.as_jsonl()
         )

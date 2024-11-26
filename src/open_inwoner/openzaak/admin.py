@@ -13,15 +13,11 @@ from django.urls import path, reverse
 from django.utils.html import format_html, format_html_join
 from django.utils.translation import gettext_lazy as _, ngettext
 
-from import_export.admin import ImportExportMixin
 from privates.storages import PrivateMediaFileSystemStorage
 from solo.admin import SingletonModelAdmin
 
 from open_inwoner.ckeditor5.widgets import CKEditorWidget
-from open_inwoner.openzaak.import_export import (
-    CatalogusConfigExport,
-    CatalogusConfigImport,
-)
+from open_inwoner.openzaak.import_export import CatalogusConfigImport, ZGWConfigExport
 from open_inwoner.utils.forms import LimitedUploadFileField
 
 from .models import (
@@ -142,7 +138,7 @@ class CatalogusConfigAdmin(admin.ModelAdmin):
 
     @admin.action(description=_("Export to file"))
     def export_catalogus_configs(modeladmin, request, queryset):
-        export = CatalogusConfigExport.from_catalogus_configs(queryset)
+        export = ZGWConfigExport.from_catalogus_configs(queryset)
         response = StreamingHttpResponse(
             export.as_jsonl_iter(),
             content_type="application/json",
@@ -374,7 +370,7 @@ class ZaakTypeResultaattypeConfigInline(admin.StackedInline):
 
 
 @admin.register(ZaakTypeConfig)
-class ZaakTypeConfigAdmin(ImportExportMixin, admin.ModelAdmin):
+class ZaakTypeConfigAdmin(admin.ModelAdmin):
     inlines = [
         ZaakTypeInformatieObjectTypeConfigInline,
         ZaakTypeStatusTypeConfigInline,
@@ -383,6 +379,7 @@ class ZaakTypeConfigAdmin(ImportExportMixin, admin.ModelAdmin):
     actions = [
         "mark_as_notify_status_changes",
         "mark_as_not_notify_status_changes",
+        "export_zaaktype_configs",
     ]
     fields = [
         "urls",
@@ -436,6 +433,18 @@ class ZaakTypeConfigAdmin(ImportExportMixin, admin.ModelAdmin):
         "contact_subject_code",
     ]
     ordering = ("identificatie", "catalogus__domein")
+
+    @admin.action(description=_("Export to file"))
+    def export_zaaktype_configs(modeladmin, request, queryset):
+        export = ZGWConfigExport.from_zaaktype_configs(queryset)
+        response = StreamingHttpResponse(
+            export.as_jsonl_iter(),
+            content_type="application/json",
+        )
+        response[
+            "Content-Disposition"
+        ] = 'attachment; filename="zgw-zaaktype-export.json"'
+        return response
 
     def has_add_permission(self, request):
         return False
