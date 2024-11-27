@@ -580,6 +580,7 @@ CMS_PLACEHOLDER_CONF = {
             "ProductLocationPlugin",
             "UserFeedPlugin",
             "UserAppointmentsPlugin",
+            "ContactFormPlugin",
         ],
         "text_only_plugins": ["LinkPlugin"],
         "name": _("Content"),
@@ -614,10 +615,6 @@ CMS_PLACEHOLDER_CONF = {
         "child_classes": {
             "TextPlugin": ["LinkPlugin"],
         },
-    },
-    "contact_form": {
-        "name": _("Contact form plugin"),
-        "plugins": ["ContactFormPlugin"],
     },
 }
 

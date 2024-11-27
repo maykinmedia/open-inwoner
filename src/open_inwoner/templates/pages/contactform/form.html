@@ -1,6 +1,5 @@
 {% load cms_tags i18n render_tags %}
 
-{% block content %}
     {% if has_form_configuration %}
         <h1 class="utrecht-heading-1">
             {% trans "Contactformulier" %}
@@ -10,4 +9,3 @@
     {% else %}
     <p class="utrecht-paragraph">{% trans "Contact formulier niet geconfigureerd." %}</p>
     {% endif %}
-{% endblock content %}
