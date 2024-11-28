@@ -561,6 +561,7 @@ CMS_PLUGIN_CACHE = False
 
 CMS_TEMPLATES = [
     ("cms/fullwidth.html", "Home page template"),
+    ("cms/basic.html", "Base template for CMS pages"),
 ]
 CMS_PLACEHOLDER_CONF = {
     # TODO properly configure this based on actual available plugins

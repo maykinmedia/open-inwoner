@@ -44,15 +44,10 @@ class ContactFormPlugin(CMSPluginBase):
     form = ContactFormConfigForm
     name = _("Contact form plugin")
     render_template = "pages/contactform/form.html"
+    # render_template = "cms/contactform/form.html"
     cache = False
 
     fieldsets = ((None, {"fields": ("title", "description")}),)
-
-    # def get_render_template(self, context, instance, placeholder):
-    #     request = context["request"]
-    #     if request.path == "/contactform/":
-    #         return "pages/contactform/form.html"
-    #     return ""
 
     def render(self, context, instance, placeholder):
         config = OpenKlantConfig.get_solo()

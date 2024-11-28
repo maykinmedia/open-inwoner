@@ -3,7 +3,7 @@
 {% block content %}
     {% if has_form_configuration %}
         <h1 class="utrecht-heading-1">
-            {% if instance.title %}{{ instance.title }}{% else %}{% trans "Contactformulier" %}{% endif %}
+            {% trans "Contactformulier" %}
         </h1>
         <p class="utrecht-paragraph">{{ instance.description|ckeditor_content|safe }}</p>
         {% include "components/Contact/ContactForm.html" with form_object=form has_form_configuration=has_form_configuration csrf_token=csrf_token only %}
