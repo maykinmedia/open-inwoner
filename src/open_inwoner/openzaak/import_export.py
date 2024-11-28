@@ -27,16 +27,19 @@ logger = logging.getLogger(__name__)
 
 class ZGWImportError(Exception):
     @classmethod
-    def extract_error_data(cls, exc: Exception, jsonl: str):
-        exc_source = type(exc.__context__)
-        data = json.loads(jsonl) if jsonl else {}
+    def extract_error_data(
+        cls, exception: Exception | None = None, jsonl: str | None = None
+    ):
+        data = json.loads(jsonl) if jsonl is not None else {}
         source_config = apps.get_model(data["model"])
 
-        # error type
-        if exc_source is CatalogusConfig.DoesNotExist or source_config.DoesNotExist:
-            error_type = ObjectDoesNotExist
-        if exc_source is source_config.MultipleObjectsReturned:
-            error_type = MultipleObjectsReturned
+        error_type = None
+        if exception:
+            exc_source = type(exception.__context__)
+            if exc_source is CatalogusConfig.DoesNotExist or source_config.DoesNotExist:
+                error_type = ObjectDoesNotExist
+            if exc_source is source_config.MultipleObjectsReturned:
+                error_type = MultipleObjectsReturned
 
         # metadata about source_config
         items = []
@@ -60,8 +63,6 @@ class ZGWImportError(Exception):
             items = [
                 f"omschrijving = {fields['omschrijving']!r}",
                 f"ZaakTypeConfig identificatie = {fields['zaaktype_config'][0]!r}",
-                f"Catalogus domein = {fields['zaaktype_config'][1]!r}",
-                f"Catalogus rsin = {fields['zaaktype_config'][2]!r}",
             ]
 
         return {
@@ -71,8 +72,8 @@ class ZGWImportError(Exception):
         }
 
     @classmethod
-    def from_exception_and_jsonl(cls, exception: Exception, jsonl: str) -> Self:
-        error_data = cls.extract_error_data(exception, jsonl)
+    def from_exception_and_jsonl(cls, jsonl: str, exception: Exception) -> Self:
+        error_data = cls.extract_error_data(exception=exception, jsonl=jsonl)
 
         error_template = (
             "%(source_config_name)s not found in target environment: %(info)s"
@@ -82,16 +83,26 @@ class ZGWImportError(Exception):
 
         return cls(error_template % error_data)
 
+    @classmethod
+    def from_jsonl(cls, jsonl: str) -> Self:
+        error_data = cls.extract_error_data(jsonl=jsonl)
+        error_template = (
+            "%(source_config_name)s was processed multiple times because it contains "
+            "duplicate natural keys: %(info)s"
+        )
+        return cls(error_template % error_data)
+
 
 def check_catalogus_config_exists(source_config: CatalogusConfig, jsonl: str):
     try:
         CatalogusConfig.objects.get_by_natural_key(
             domein=source_config.domein, rsin=source_config.rsin
         )
-    except CatalogusConfig.MultipleObjectsReturned as exc:
-        raise ZGWImportError.from_exception_and_jsonl(exc, jsonl)
-    except CatalogusConfig.DoesNotExist as exc:
-        raise ZGWImportError.from_exception_and_jsonl(exc, jsonl)
+    except (
+        CatalogusConfig.DoesNotExist,
+        CatalogusConfig.MultipleObjectsReturned,
+    ) as exc:
+        raise ZGWImportError.from_exception_and_jsonl(exception=exc, jsonl=jsonl)
 
 
 def _update_config(source, target, exclude_fields):
@@ -113,10 +124,13 @@ def _update_zaaktype_config(source_config: ZaakTypeConfig, jsonl: str):
             catalogus_domein=source_config.catalogus.domein,
             catalogus_rsin=source_config.catalogus.rsin,
         )
-    except ZaakTypeConfig.MultipleObjectsReturned as exc:
-        raise ZGWImportError.from_exception_and_jsonl(exc, jsonl)
-    except (CatalogusConfig.DoesNotExist, ZaakTypeConfig.DoesNotExist) as exc:
-        raise ZGWImportError.from_exception_and_jsonl(exc, jsonl)
+    except (
+        CatalogusConfig.DoesNotExist,
+        CatalogusConfig.MultipleObjectsReturned,
+        ZaakTypeConfig.DoesNotExist,
+        ZaakTypeConfig.MultipleObjectsReturned,
+    ) as exc:
+        raise ZGWImportError.from_exception_and_jsonl(exception=exc, jsonl=jsonl)
     else:
         exclude_fields = [
             "id",
@@ -146,7 +160,7 @@ def _update_nested_zgw_config(
             catalogus_rsin=catalogus_rsin,
         )
     except (source_config.DoesNotExist, source_config.MultipleObjectsReturned) as exc:
-        raise ZGWImportError.from_exception_and_jsonl(exc, jsonl)
+        raise ZGWImportError.from_exception_and_jsonl(exception=exc, jsonl=jsonl)
     else:
         _update_config(source_config, target, exclude_fields)
 
@@ -293,6 +307,7 @@ class CatalogusConfigImport:
 
         rows_successfully_processed = 0
         import_errors = []
+        natural_keys_seen = set()
         for line in cls._lines_iter_from_jsonl_stream_or_string(stream_or_string):
             try:
                 (deserialized_object,) = serializers.deserialize(
@@ -302,11 +317,17 @@ class CatalogusConfigImport:
                     use_natural_foreign_keys=True,
                 )
             except DeserializationError as exc:
-                error = ZGWImportError.from_exception_and_jsonl(exc, line)
+                error = ZGWImportError.from_exception_and_jsonl(
+                    exception=exc, jsonl=line
+                )
                 logger.error(error)
                 import_errors.append(error)
             else:
                 source_config = deserialized_object.object
+                if (natural_key := source_config.natural_key()) in natural_keys_seen:
+                    import_errors.append(ZGWImportError.from_jsonl(line))
+                    continue
+                natural_keys_seen.add(natural_key)
                 try:
                     match source_config:
                         case CatalogusConfig():

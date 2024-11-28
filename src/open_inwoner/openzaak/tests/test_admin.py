@@ -293,18 +293,18 @@ class TestCatalogusConfigExportAdmin(WebTest):
             messages[1],
         )
         self.assertIn(
-            "ZaakTypeStatusTypeConfig not found in target environment: omschrijving = 'status omschrijving', "
-            "ZaakTypeConfig identificatie = 'ztc-id-a-0', Catalogus domein = 'DM-0', Catalogus rsin = '123456789'",
+            "ZaakTypeStatusTypeConfig not found in target environment: omschrijving = 'bogus', "
+            "ZaakTypeConfig identificatie = 'ztc-id-a-0'",
             messages[1],
         )
         self.assertIn(
             "ZaakTypeStatusTypeConfig not found in target environment: omschrijving = 'bogus', ZaakTypeConfig "
-            "identificatie = 'ztc-id-a-0', Catalogus domein = 'DM-0', Catalogus rsin = '123456789'",
+            "identificatie = 'ztc-id-a-0'",
             messages[1],
         )
         self.assertIn(
             "ZaakTypeInformatieObjectTypeConfig not found in target environment: omschrijving = 'informatieobject', "
-            "ZaakTypeConfig identificatie = 'ztc-id-a-0', Catalogus domein = 'DM-0', Catalogus rsin = '123456789'",
+            "ZaakTypeConfig identificatie = 'ztc-id-a-0'",
             messages[1],
         )
         self.assertIn(
@@ -313,7 +313,7 @@ class TestCatalogusConfigExportAdmin(WebTest):
         )
         self.assertIn(
             "ZaakTypeResultaatTypeConfig not found in target environment: omschrijving = 'resultaat', "
-            "ZaakTypeConfig identificatie = 'ztc-id-a-0', Catalogus domein = 'DM-0', Catalogus rsin = '123456789'",
+            "ZaakTypeConfig identificatie = 'ztc-id-a-0'",
             messages[1],
         )
 
