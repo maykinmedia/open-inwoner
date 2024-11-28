@@ -274,7 +274,11 @@ class TestCatalogusImport(TestCase):
             '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "statustype_url": "https://bar.maykinmedia.nl", "omschrijving": "status omschrijving", "statustekst": "statustekst nieuw", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": "", "description": "status", "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
             '{"model": "openzaak.zaaktyperesultaattypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "resultaattype_url": "https://bar.maykinmedia.nl", "omschrijving": "resultaat", "zaaktype_uuids": "[]", "description": "description new"}}',
         ]
+        self.json_dupes = [
+            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "statustype_url": "https://bar.maykinmedia.nl", "omschrijving": "status omschrijving", "statustekst": "statustekst nieuw", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": "", "description": "status", "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
+        ]
         self.jsonl = "\n".join(self.json_lines)
+        self.jsonl_with_dupes = "\n".join(self.json_lines + self.json_dupes)
 
     def test_import_jsonl_update_success(self):
         mocks = ZGWExportImportMockData()
@@ -373,7 +377,7 @@ class TestCatalogusImport(TestCase):
         )
         expected_error = ZGWImportError(
             "ZaakTypeStatusTypeConfig not found in target environment: omschrijving = 'bogus', "
-            "ZaakTypeConfig identificatie = 'ztc-id-a-0', Catalogus domein = 'DM-0', Catalogus rsin = '123456789'"
+            "ZaakTypeConfig identificatie = 'ztc-id-a-0'"
         )
         import_expected = dataclasses.asdict(
             CatalogusConfigImport(
@@ -419,7 +423,7 @@ class TestCatalogusImport(TestCase):
         )
         expected_error = ZGWImportError(
             "ZaakTypeStatusTypeConfig not found in target environment: omschrijving = 'status omschrijving', "
-            "ZaakTypeConfig identificatie = 'bogus', Catalogus domein = 'DM-1', Catalogus rsin = '666666666'"
+            "ZaakTypeConfig identificatie = 'bogus'"
         )
         import_expected = dataclasses.asdict(
             CatalogusConfigImport(
@@ -445,7 +449,7 @@ class TestCatalogusImport(TestCase):
         self.assertEqual(ZaakTypeStatusTypeConfig.objects.count(), 1)
         self.assertEqual(ZaakTypeResultaatTypeConfig.objects.count(), 1)
 
-    def test_import_jsonl_update_reports_duplicates(self):
+    def test_import_jsonl_update_reports_duplicate_db_records(self):
         mocks = ZGWExportImportMockData()
 
         ZaakTypeResultaatTypeConfigFactory(
@@ -465,7 +469,7 @@ class TestCatalogusImport(TestCase):
         )
         expected_error = ZGWImportError(
             "Got multiple results for ZaakTypeResultaatTypeConfig: omschrijving = 'resultaat', "
-            "ZaakTypeConfig identificatie = 'ztc-id-a-0', Catalogus domein = 'DM-0', Catalogus rsin = '123456789'"
+            "ZaakTypeConfig identificatie = 'ztc-id-a-0'"
         )
         import_expected = dataclasses.asdict(
             CatalogusConfigImport(
@@ -475,6 +479,39 @@ class TestCatalogusImport(TestCase):
                 zaak_informatie_object_type_configs_imported=1,
                 zaak_status_type_configs_imported=1,
                 zaak_resultaat_type_configs_imported=0,
+                import_errors=[expected_error],
+            ),
+        )
+        import_result["import_errors"][0] = str(import_result["import_errors"][0])
+        import_expected["import_errors"][0] = str(import_expected["import_errors"][0])
+
+        # check import
+        self.assertEqual(import_result, import_expected)
+
+    def test_import_jsonl_update_reports_duplicate_natural_keys_in_upload_file(self):
+        mocks = ZGWExportImportMockData()
+
+        self.storage.save("import.jsonl", io.StringIO(self.jsonl_with_dupes))
+
+        # we use `asdict` and replace the Exceptions with string representations
+        # because for Exceptions raised from within dataclasses, equality ==/is identity
+        import_result = dataclasses.asdict(
+            CatalogusConfigImport.import_from_jsonl_file_in_django_storage(
+                "import.jsonl", self.storage
+            )
+        )
+        expected_error = ZGWImportError(
+            "ZaakTypeStatusTypeConfig was processed multiple times because it contains duplicate "
+            "natural keys: omschrijving = 'status omschrijving', ZaakTypeConfig identificatie = 'ztc-id-a-0'"
+        )
+        import_expected = dataclasses.asdict(
+            CatalogusConfigImport(
+                total_rows_processed=6,
+                catalogus_configs_imported=1,
+                zaaktype_configs_imported=1,
+                zaak_informatie_object_type_configs_imported=1,
+                zaak_status_type_configs_imported=1,
+                zaak_resultaat_type_configs_imported=1,
                 import_errors=[expected_error],
             ),
         )
