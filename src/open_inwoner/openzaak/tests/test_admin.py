@@ -175,28 +175,34 @@ class TestCatalogusConfigExportAdmin(WebTest):
             msg="Response should be valid JSONL matching the input object",
         )
 
-    @mock.patch(
-        "open_inwoner.openzaak.import_export.CatalogusConfigImport.import_from_jsonl_file_in_django_storage"
-    )
-    def test_import_flow_reports_success(self, m) -> None:
+    def test_import_flow_reports_success(self) -> None:
+        service = ServiceFactory.create(slug="service-0")
+        CatalogusConfigFactory.create(
+            url="https://foo.0.maykinmedia.nl",
+            domein="DM-0",
+            rsin="123456789",
+            service=service,
+        )
+        import_lines = [
+            b'{"model": "openzaak.catalogusconfig", "fields": {"url": "https://foo.0.maykinmedia.nl", "domein": "DM-0", "rsin": "123456789", "service": ["service-0"]}}',
+        ]
+        import_line = b"\n".join(import_lines)
+        mock_file = Upload("dump.json", import_line, "application/json")
+
         form = self.app.get(
             reverse(
                 "admin:upload_zgw_import_file",
             ),
             user=self.user,
         ).form
-        form["zgw_export_file"] = self.mock_file
+        form["zgw_export_file"] = mock_file
 
         response = form.submit().follow()
-
-        self.assertEqual(m.call_count, 1)
-        self.assertEqual(m.call_args[0][0], "zgw_import_dump_2024-08-14-17-50-01.json")
-        self.assertTrue(isinstance(m.call_args[0][1], PrivateMediaFileSystemStorage))
 
         messages = [str(msg) for msg in response.context["messages"]]
         self.assertEqual(
             messages,
-            [_("Successfully processed 1 items")],
+            [_("1 item(s) processed in total, with 0 failing row(s).")],
         )
         self.assertFalse(
             PrivateMediaFileSystemStorage().exists(
@@ -250,4 +256,98 @@ class TestCatalogusConfigExportAdmin(WebTest):
             reverse(
                 "admin:upload_zgw_import_file",
             ),
+        )
+
+    def test_import_flow_reports_errors(self) -> None:
+        import_lines = [
+            b'{"model": "openzaak.catalogusconfig", "fields": {"url": "https://foo.0.maykinmedia.nl", "domein": "DM-0", "rsin": "123456789", "service": ["service-0"]}}',
+            b'{"model": "openzaak.zaaktypeconfig", "fields": {"urls": "[\\"https://foo.0.maykinmedia.nl\\"]", "catalogus": ["DM-0", "123456789"], "identificatie": "ztc-id-a-0", "omschrijving": "zaaktypeconfig", "notify_status_changes": false, "description": "", "external_document_upload_url": "", "document_upload_enabled": true, "contact_form_enabled": false, "contact_subject_code": "", "relevante_zaakperiode": null}}',
+            b'{"model": "openzaak.zaaktypeinformatieobjecttypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "informatieobjecttype_url": "http://foo.0.maykinmedia.nl", "omschrijving": "informatieobject", "zaaktype_uuids": "[]", "document_upload_enabled": true, "document_notification_enabled": true}}',
+            b'{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "statustype_url": "https://foo.0.maykinmedia.nl", "omschrijving": "status omschrijving", "statustekst": "statustekst nieuw", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": "", "description": "status", "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
+            b'{"model": "openzaak.zaaktyperesultaattypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "resultaattype_url": "https://foo.0.maykinmedia.nl", "omschrijving": "resultaat", "zaaktype_uuids": "[]", "description": "description new"}}',
+            b'{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "statustype_url": "https://foo.0.maykinmedia.nl", "omschrijving": "bogus", "statustekst": "bogus", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": "", "description": "status", "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
+        ]
+        import_line = b"\n".join(import_lines)
+        mock_file = Upload("dump.json", import_line, "application/json")
+
+        form = self.app.get(
+            reverse(
+                "admin:upload_zgw_import_file",
+            ),
+            user=self.user,
+        ).form
+        form["zgw_export_file"] = mock_file
+
+        response = form.submit().follow()
+
+        messages = [str(msg) for msg in response.context["messages"]]
+        self.assertEqual(len(messages), 2)
+        self.assertEqual(
+            _("6 item(s) processed in total, with 6 failing row(s)."),
+            messages[0],
+        )
+        self.assertIn(
+            "ZaakTypeConfig not found in target environment: Identificatie = ztc-id-a-0, "
+            "Catalogus domein = DM-0, Catalogus rsin = 123456789",
+            messages[1],
+        )
+        self.assertIn(
+            "ZaakTypeStatusTypeConfig not found in target environment: omschrijving = status omschrijving, "
+            "ZaakTypeConfig identificatie = ztc-id-a-0, Catalogus domein = DM-0, Catalogus rsin = 123456789",
+            messages[1],
+        )
+        self.assertIn(
+            "ZaakTypeStatusTypeConfig not found in target environment: omschrijving = bogus, ZaakTypeConfig "
+            "identificatie = ztc-id-a-0, Catalogus domein = DM-0, Catalogus rsin = 123456789",
+            messages[1],
+        )
+        self.assertIn(
+            "ZaakTypeInformatieObjectTypeConfig not found in target environment: omschrijving = informatieobject, "
+            "ZaakTypeConfig identificatie = ztc-id-a-0, Catalogus domein = DM-0, Catalogus rsin = 123456789",
+            messages[1],
+        )
+        self.assertIn(
+            "CatalogusConfig not found in target environment: Domein = DM-0, Rsin = 123456789",
+            messages[1],
+        )
+        self.assertIn(
+            "ZaakTypeResultaatTypeConfig not found in target environment: omschrijving = resultaat, "
+            "ZaakTypeConfig identificatie = ztc-id-a-0, Catalogus domein = DM-0, Catalogus rsin = 123456789",
+            messages[1],
+        )
+
+    def test_import_flow_reports_partial_errors(self) -> None:
+        service = ServiceFactory.create(slug="service-0")
+        CatalogusConfigFactory.create(
+            url="https://foo.0.maykinmedia.nl",
+            domein="DM-0",
+            rsin="123456789",
+            service=service,
+        )
+        import_lines = [
+            b'{"model": "openzaak.catalogusconfig", "fields": {"url": "https://foo.0.maykinmedia.nl", "domein": "DM-0", "rsin": "123456789", "service": ["service-0"]}}',
+            b'{"model": "openzaak.zaaktypeconfig", "fields": {"urls": "[\\"https://foo.0.maykinmedia.nl\\"]", "catalogus": ["DM-0", "123456789"], "identificatie": "ztc-id-a-0", "omschrijving": "zaaktypeconfig", "notify_status_changes": false, "description": "", "external_document_upload_url": "", "document_upload_enabled": true, "contact_form_enabled": false, "contact_subject_code": "", "relevante_zaakperiode": null}}',
+        ]
+        import_line = b"\n".join(import_lines)
+        mock_file = Upload("dump.json", import_line, "application/json")
+
+        form = self.app.get(
+            reverse(
+                "admin:upload_zgw_import_file",
+            ),
+            user=self.user,
+        ).form
+        form["zgw_export_file"] = mock_file
+
+        response = form.submit().follow()
+
+        messages = [str(msg) for msg in response.context["messages"]]
+        self.assertEqual(len(messages), 2)
+        self.assertEqual(
+            _("2 item(s) processed in total, with 1 failing row(s)."),
+            messages[0],
+        )
+        self.assertEqual(
+            "It was not possible to import the following items:<ol> <li>ZaakTypeConfig not found in target environment: Identificatie = ztc-id-a-0, Catalogus domein = DM-0, Catalogus rsin = 123456789</li> </ol>",
+            messages[1],
         )

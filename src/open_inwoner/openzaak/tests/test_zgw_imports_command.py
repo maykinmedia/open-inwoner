@@ -43,11 +43,8 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
     def test_zgw_import_data_command(self, m):
         m.reset_mock()
         for root in self.roots:
-            CatalogMockData(root).install_mocks(m)
             InformationObjectTypeMockData(root).install_mocks(m)
-            # ZaakTypeMockData(root).install_mocks(m)
-
-            # TODO: ADD CATALOGI like in iotypes
+            CatalogMockData(root).install_mocks(m)
 
         # run it to import our data
         out = StringIO()
