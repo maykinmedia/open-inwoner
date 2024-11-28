@@ -43,14 +43,14 @@ class ZGWImportError(Exception):
         fields = data.get("fields", None)
         if source_config is CatalogusConfig:
             items = [
-                f"Domein = {fields['domein']}",
-                f"Rsin = {fields['rsin']}",
+                f"Domein = {fields['domein']!r}",
+                f"Rsin = {fields['rsin']!r}",
             ]
         if source_config is ZaakTypeConfig:
             items = [
-                f"Identificatie = {fields['identificatie']}",
-                f"Catalogus domein = {fields['catalogus'][0]}",
-                f"Catalogus rsin = {fields['catalogus'][1]}",
+                f"Identificatie = {fields['identificatie']!r}",
+                f"Catalogus domein = {fields['catalogus'][0]!r}",
+                f"Catalogus rsin = {fields['catalogus'][1]!r}",
             ]
         if source_config in {
             ZaakTypeStatusTypeConfig,
@@ -58,10 +58,10 @@ class ZGWImportError(Exception):
             ZaakTypeInformatieObjectTypeConfig,
         }:
             items = [
-                f"omschrijving = {fields['omschrijving']}",
-                f"ZaakTypeConfig identificatie = {fields['zaaktype_config'][0]}",
-                f"Catalogus domein = {fields['zaaktype_config'][1]}",
-                f"Catalogus rsin = {fields['zaaktype_config'][2]}",
+                f"omschrijving = {fields['omschrijving']!r}",
+                f"ZaakTypeConfig identificatie = {fields['zaaktype_config'][0]!r}",
+                f"Catalogus domein = {fields['zaaktype_config'][1]!r}",
+                f"Catalogus rsin = {fields['zaaktype_config'][2]!r}",
             ]
 
         return {
