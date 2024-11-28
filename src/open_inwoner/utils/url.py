@@ -1,3 +1,6 @@
+import re
+import uuid
+
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.utils.encoding import iri_to_uri
@@ -58,3 +61,27 @@ def prepend_next_url_param(url: str, next_url: str) -> str:
         next_url = prepend_next_url_param(next_url, current_next)
     u.args.set("next", next_url)
     return u.url
+
+
+_UUID_PATTERN = re.compile(
+    r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", re.IGNORECASE
+)
+
+
+def uuid_from_url(
+    url: str, allow_multiple: bool = False
+) -> uuid.UUID | list[uuid.UUID] | None:
+    """Extract UUID(s) from a given URL"""
+
+    matches = re.findall(_UUID_PATTERN, url)
+
+    if not matches:
+        return None
+    if len(matches) > 1:
+        if allow_multiple:
+            return [uuid.UUID(match) for match in matches]
+        raise ValueError(
+            "url contains more than 1 UUID (use allow_multiple=True if you expect multiple results)"
+        )
+
+    return uuid.UUID(matches[0])

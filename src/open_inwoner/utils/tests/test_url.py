@@ -1,9 +1,12 @@
+from uuid import UUID
+
 from django.test import TestCase, override_settings
 
 from open_inwoner.utils.url import (
     get_next_url_from,
     get_next_url_param,
     prepend_next_url_param,
+    uuid_from_url,
 )
 
 
@@ -98,3 +101,31 @@ class URLTest(TestCase):
 
         param = get_next_url_param(param)
         self.assertEqual(param, "/foo")
+
+
+class UUIDfromURLTest(TestCase):
+    def test_uuid_from_url(self):
+        testcases = [
+            (
+                "https://example.com/123e4567-e89b-12d3-a456-426614174000",
+                UUID("123e4567-e89b-12d3-a456-426614174000"),
+            ),
+            (
+                "https://example.com/123e4567-e89b-12d3-a456-426614174000/987fEDCB-A987-654c-B321-123456789ABC",
+                [
+                    UUID("123e4567-e89b-12d3-a456-426614174000"),
+                    UUID("987fEDCB-A987-654c-B321-123456789ABC"),
+                ],
+            ),
+            ("https://example.com/aaa-aaaaaa-bbbb-ccccc-426614174000", None),
+        ]
+        for url, expected in testcases:
+            with self.subTest():
+                actual = uuid_from_url(url, allow_multiple=True)
+                self.assertEqual(actual, expected)
+
+    def test_uuid_from_url_no_multiple(self):
+        url = "https://example.com/123e4567-e89b-12d3-a456-426614174000/987fEDCB-A987-654c-B321-123456789ABC"
+
+        with self.assertRaises(ValueError):
+            uuid_from_url(url)

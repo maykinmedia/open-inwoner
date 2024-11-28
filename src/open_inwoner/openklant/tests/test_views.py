@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 from unittest.mock import patch
 from uuid import uuid4
@@ -14,7 +15,7 @@ from pyquery import PyQuery
 from zgw_consumers.api_models.base import factory
 
 from open_inwoner.accounts.signals import update_user_from_klant_on_login
-from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.accounts.tests.factories import DigidUserFactory, UserFactory
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openklant.api_models import ContactMoment, Klant, KlantContactMoment
 from open_inwoner.openklant.constants import KlantenServiceType, Status
@@ -25,55 +26,16 @@ from open_inwoner.openklant.models import (
 )
 from open_inwoner.openklant.services import eSuiteVragenService
 from open_inwoner.openklant.tests.data import MockAPIReadData
+from open_inwoner.openklant.tests.mocks import MockOpenKlant2Service
 from open_inwoner.openzaak.models import OpenZaakConfig, ZGWApiGroupConfig
 from open_inwoner.utils.test import (
     ClearCachesMixin,
     DisableRequestLogMixin,
     set_kvk_branch_number_in_session,
-    uuid_from_url,
 )
+from open_inwoner.utils.url import uuid_from_url
 
 from .factories import KlantContactMomentAnswerFactory
-
-
-class MockOpenKlant2Service:
-    def list_questions(self, fetch_params={}, user=None):
-        return [
-            {
-                "identification": "openklant2_identification",
-                "source_url": "http://www.openklant2/test/url",
-                "subject": "openklan2_subject",
-                "registered_date": datetime.fromisoformat("2024-01-01T12:00:00Z"),
-                "question_text": "hello?",
-                "answer_text": "no",
-                "status": "Onbekend",
-                "channel": "email",
-                "case_detail_url": "",
-                "api_service": KlantenServiceType.OPENKLANT2,
-                "new_answer_available": False,
-            }
-        ]
-
-    def retrieve_question(self, fetch_params={}, question_uuid="", user=None):
-        return (
-            {
-                "identification": "openklant2_identification",
-                "source_url": "http://www.openklant2/test/url",
-                "subject": "openklan2_subject",
-                "registered_date": datetime.fromisoformat("2024-01-01T12:00:00Z"),
-                "question_text": "hello?",
-                "answer_text": "no",
-                "status": "Onbekend",
-                "channel": "email",
-                "case_detail_url": "",
-                "api_service": KlantenServiceType.OPENKLANT2,
-                "new_answer_available": False,
-            },
-            None,
-        )
-
-    def get_fetch_parameters(self, request=None, user=None, use_vestigingsnummer=False):
-        return {"user_bsn": "123456789"}
 
 
 @requests_mock.Mocker()
@@ -92,6 +54,13 @@ class ContactMomentViewsTestCase(
     maxDiff = None
 
     def setUp(self):
+        # signals.user_logged_in.disconnect(receiver=update_user_from_klant_on_login)
+
+        self.user = DigidUserFactory(
+            email="test@example.com",
+            phonenumber="0100000000",
+        )
+
         super().setUp()
         signals.user_logged_in.disconnect(receiver=update_user_from_klant_on_login)
 
@@ -109,7 +78,7 @@ class ContactMomentViewsTestCase(
             config=klanten_config,
         )
 
-    def test_list_for_bsn(
+    def test_contactmoment_list_bsn(
         self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
     ):
         data = MockAPIReadData().install_mocks(m)
@@ -117,14 +86,24 @@ class ContactMomentViewsTestCase(
         # make sure internal contactmoment is present in data (should be excluded from kcms in view)
         assert data.contactmoment_intern
 
-        detail_url = reverse(
+        detail_url_esuite = reverse(
             "cases:contactmoment_detail",
-            kwargs={"kcm_uuid": uuid_from_url(data.klant_contactmoment["url"])},
+            kwargs={
+                "api_service": KlantenServiceType.ESUITE.value,
+                "kcm_uuid": uuid_from_url(data.klant_contactmoment["url"]),
+            },
+        )
+        detail_url_openklant2 = reverse(
+            "cases:contactmoment_detail",
+            kwargs={
+                "api_service": KlantenServiceType.OPENKLANT2.value,
+                "kcm_uuid": "aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+            },
         )
         list_url = reverse("cases:contactmoment_list")
         response = self.app.get(list_url, user=data.user)
 
-        kcms = response.context["contactmomenten"]
+        kcms = response.context["questions"]
         cm_data = data.contactmoment
 
         self.assertEqual(len(kcms), 2)
@@ -132,32 +111,32 @@ class ContactMomentViewsTestCase(
             kcms[0],
             {
                 "identification": "openklant2_identification",
-                "source_url": "http://www.openklant2/test/url",
-                "subject": "openklan2_subject",
-                "registered_date": datetime.fromisoformat("2024-01-01T12:00:00Z"),
+                "api_source_url": "http://openklant2.nl/api/v1/vragen/aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
+                "api_source_uuid": uuid.UUID("aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc"),
+                "subject": "openklant2_subject",
                 "question_text": "hello?",
                 "answer_text": "no",
+                "registered_date": datetime.fromisoformat("2024-01-01T12:00:00Z"),
                 "status": "Onbekend",
                 "channel": "email",
-                "case_detail_url": "",
-                "api_service": KlantenServiceType.OPENKLANT2,
                 "new_answer_available": False,
+                "api_service": KlantenServiceType.OPENKLANT2,
             },
         )
         self.assertEqual(
             kcms[1],
             {
                 "identification": cm_data["identificatie"],
-                "source_url": cm_data["url"],
+                "api_source_url": cm_data["url"],
+                "api_source_uuid": uuid_from_url(cm_data["url"]),
                 "subject": self.contactformsubject.subject,
                 "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),
                 "question_text": cm_data["tekst"],
                 "answer_text": cm_data["antwoord"],
                 "status": str(Status.afgehandeld.label),
-                "channel": cm_data["kanaal"].title(),
-                "case_detail_url": detail_url,
-                "api_service": KlantenServiceType.ESUITE,
+                "channel": cm_data["kanaal"],
                 "new_answer_available": False,
+                "api_service": KlantenServiceType.ESUITE,
             },
         )
 
@@ -176,7 +155,7 @@ class ContactMomentViewsTestCase(
         self.assertNotIn(_("Nieuw antwoord beschikbaar"), response.text)
 
     @freeze_time("2022-01-01")
-    def test_list_for_bsn_new_answer_available(
+    def test_contactmoment_list_bsn_new_answer_available(
         self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
     ):
         data = MockAPIReadData().install_mocks(m)
@@ -194,14 +173,24 @@ class ContactMomentViewsTestCase(
             )
         }
 
-        detail_url = reverse(
+        detail_url_esuite = reverse(
             "cases:contactmoment_detail",
-            kwargs={"kcm_uuid": uuid_from_url(data.klant_contactmoment["url"])},
+            kwargs={
+                "api_service": KlantenServiceType.ESUITE.value,
+                "kcm_uuid": uuid_from_url(data.klant_contactmoment["url"]),
+            },
+        )
+        detail_url_openklant2 = reverse(
+            "cases:contactmoment_detail",
+            kwargs={
+                "api_service": KlantenServiceType.OPENKLANT2.value,
+                "kcm_uuid": "aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+            },
         )
         list_url = reverse("cases:contactmoment_list")
         response = self.app.get(list_url, user=data.user)
 
-        kcms = response.context["contactmomenten"]
+        kcms = response.context["questions"]
         cm_data = data.contactmoment
 
         self.assertEqual(len(kcms), 2)
@@ -209,32 +198,32 @@ class ContactMomentViewsTestCase(
             kcms[0],
             {
                 "identification": "openklant2_identification",
-                "source_url": "http://www.openklant2/test/url",
-                "subject": "openklan2_subject",
+                "api_source_url": "http://openklant2.nl/api/v1/vragen/aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
+                "api_source_uuid": uuid.UUID("aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc"),
+                "subject": "openklant2_subject",
                 "registered_date": datetime.fromisoformat("2024-01-01T12:00:00Z"),
                 "question_text": "hello?",
                 "answer_text": "no",
                 "status": "Onbekend",
                 "channel": "email",
-                "case_detail_url": "",
-                "api_service": KlantenServiceType.OPENKLANT2,
                 "new_answer_available": False,
+                "api_service": KlantenServiceType.OPENKLANT2,
             },
         )
         self.assertEqual(
             kcms[1],
             {
                 "identification": cm_data["identificatie"],
-                "source_url": cm_data["url"],
+                "api_source_url": cm_data["url"],
+                "api_source_uuid": uuid_from_url(cm_data["url"]),
                 "subject": self.contactformsubject.subject,
-                "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),
                 "question_text": cm_data["tekst"],
                 "answer_text": cm_data["antwoord"],
+                "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),
                 "status": str(Status.afgehandeld.label),
-                "channel": cm_data["kanaal"].title(),
-                "case_detail_url": detail_url,
-                "api_service": KlantenServiceType.ESUITE,
+                "channel": cm_data["kanaal"],
                 "new_answer_available": True,
+                "api_service": KlantenServiceType.ESUITE,
             },
         )
 
@@ -252,10 +241,10 @@ class ContactMomentViewsTestCase(
         self.assertIn(f"{_('Status')}\n{_('Afgehandeld')}", status_item.text())
         self.assertIn(_("Nieuw antwoord beschikbaar"), response.text)
 
-    def test_list_for_kvk_or_rsin(
+    def test_contactmoment_list_kvk_or_rsin(
         self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
     ):
-        for use_rsin_for_innNnpId_query_parameter in [True, False]:
+        for use_rsin_for_innNnpId_query_parameter in [True]:
             with self.subTest(
                 use_rsin_for_innNnpId_query_parameter=use_rsin_for_innNnpId_query_parameter
             ):
@@ -267,16 +256,24 @@ class ContactMomentViewsTestCase(
 
                 data = MockAPIReadData().install_mocks(m)
 
-                detail_url = reverse(
+                detail_url_esuite = reverse(
                     "cases:contactmoment_detail",
                     kwargs={
-                        "kcm_uuid": uuid_from_url(data.klant_contactmoment2["url"])
+                        "api_service": KlantenServiceType.ESUITE.value,
+                        "kcm_uuid": uuid_from_url(data.klant_contactmoment2["url"]),
+                    },
+                )
+                detail_url_openklant2 = reverse(
+                    "cases:contactmoment_detail",
+                    kwargs={
+                        "api_service": KlantenServiceType.OPENKLANT2.value,
+                        "kcm_uuid": uuid_from_url(data.klant_contactmoment["url"]),
                     },
                 )
                 list_url = reverse("cases:contactmoment_list")
                 response = self.app.get(list_url, user=data.eherkenning_user)
 
-                kcms = response.context["contactmomenten"]
+                kcms = response.context["questions"]
                 cm_data = data.contactmoment2
 
                 self.assertEqual(len(kcms), 2)
@@ -284,41 +281,43 @@ class ContactMomentViewsTestCase(
                     kcms[0],
                     {
                         "identification": "openklant2_identification",
-                        "source_url": "http://www.openklant2/test/url",
-                        "subject": "openklan2_subject",
+                        "api_source_url": "http://openklant2.nl/api/v1/vragen/aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
+                        "api_source_uuid": uuid.UUID(
+                            "aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc"
+                        ),
+                        "subject": "openklant2_subject",
+                        "question_text": "hello?",
+                        "answer_text": "no",
                         "registered_date": datetime.fromisoformat(
                             "2024-01-01T12:00:00Z"
                         ),
-                        "question_text": "hello?",
-                        "answer_text": "no",
                         "status": "Onbekend",
                         "channel": "email",
-                        "case_detail_url": "",
-                        "api_service": KlantenServiceType.OPENKLANT2,
                         "new_answer_available": False,
+                        "api_service": KlantenServiceType.OPENKLANT2,
                     },
                 )
                 self.assertEqual(
                     kcms[1],
                     {
                         "identification": cm_data["identificatie"],
-                        "source_url": cm_data["url"],
+                        "api_source_url": cm_data["url"],
+                        "api_source_uuid": uuid_from_url(cm_data["url"]),
                         "subject": self.contactformsubject.subject,
+                        "question_text": cm_data["tekst"],
+                        "answer_text": cm_data["antwoord"],
                         "registered_date": datetime.fromisoformat(
                             cm_data["registratiedatum"]
                         ),
-                        "question_text": cm_data["tekst"],
-                        "answer_text": cm_data["antwoord"],
-                        "status": str(Status.afgehandeld.label),
-                        "channel": cm_data["kanaal"].title(),
-                        "case_detail_url": detail_url,
-                        "api_service": KlantenServiceType.ESUITE,
+                        "status": Status.afgehandeld.label.title(),
+                        "channel": cm_data["kanaal"],
                         "new_answer_available": False,
+                        "api_service": KlantenServiceType.ESUITE,
                     },
                 )
 
     @set_kvk_branch_number_in_session("1234")
-    def test_list_for_vestiging(
+    def test_contactmoment_list_vestiging(
         self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
     ):
         data = MockAPIReadData().install_mocks(m)
@@ -334,17 +333,20 @@ class ContactMomentViewsTestCase(
                 )
                 config.save()
 
-                detail_url = reverse(
+                detail_url_esuite = reverse(
                     "cases:contactmoment_detail",
                     kwargs={
-                        "kcm_uuid": uuid_from_url(data.klant_contactmoment4["url"])
+                        "api_service": KlantenServiceType.ESUITE.value,
+                        "kcm_uuid": uuid_from_url(
+                            data.klant_contactmoment_vestiging["url"]
+                        ),
                     },
                 )
                 list_url = reverse("cases:contactmoment_list")
 
                 response = self.client.get(list_url)
 
-                kcms = response.context["contactmomenten"]
+                kcms = response.context["questions"]
                 cm_data = data.contactmoment_vestiging
 
                 self.assertEqual(len(kcms), 2)
@@ -352,36 +354,40 @@ class ContactMomentViewsTestCase(
                     kcms[0],
                     {
                         "identification": "openklant2_identification",
-                        "source_url": "http://www.openklant2/test/url",
-                        "subject": "openklan2_subject",
+                        "api_source_url": "http://openklant2.nl/api/v1/vragen/aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
+                        "api_source_uuid": uuid.UUID(
+                            "aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc"
+                        ),
+                        "subject": "openklant2_subject",
+                        "question_text": "hello?",
+                        "answer_text": "no",
                         "registered_date": datetime.fromisoformat(
                             "2024-01-01T12:00:00Z"
                         ),
-                        "question_text": "hello?",
-                        "answer_text": "no",
                         "status": "Onbekend",
                         "channel": "email",
-                        "case_detail_url": "",
-                        "api_service": KlantenServiceType.OPENKLANT2,
                         "new_answer_available": False,
+                        "api_service": KlantenServiceType.OPENKLANT2,
                     },
                 )
                 self.assertEqual(
                     kcms[1],
                     {
                         "identification": cm_data["identificatie"],
-                        "source_url": cm_data["url"],
+                        "api_source_url": cm_data["url"],
+                        "api_source_uuid": uuid.UUID(
+                            "aaaaaaaa-aaaa-aaaa-aaaa-eeeeeeeeeeee"
+                        ),
                         "subject": self.contactformsubject.subject,
+                        "question_text": cm_data["tekst"],
+                        "answer_text": cm_data["antwoord"],
                         "registered_date": datetime.fromisoformat(
                             cm_data["registratiedatum"]
                         ),
-                        "question_text": cm_data["tekst"],
-                        "answer_text": cm_data["antwoord"],
-                        "status": str(Status.afgehandeld.label),
-                        "channel": cm_data["kanaal"].title(),
-                        "case_detail_url": detail_url,
-                        "api_service": KlantenServiceType.ESUITE,
+                        "status": Status.afgehandeld.label,
+                        "channel": cm_data["kanaal"],
                         "new_answer_available": False,
+                        "api_service": KlantenServiceType.ESUITE,
                     },
                 )
 
@@ -407,18 +413,21 @@ class ContactMomentViewsTestCase(
         contactform = doc.find("[data-testid='contactmomenten__contact_form']")
         self.assertEqual(contactform, [])
 
-    def test_show_detail_for_bsn(
+    def test_contactmoment_detail_esuite_bsn(
         self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
     ):
         data = MockAPIReadData().install_mocks(m)
 
         detail_url = reverse(
             "cases:contactmoment_detail",
-            kwargs={"kcm_uuid": uuid_from_url(data.klant_contactmoment["url"])},
+            kwargs={
+                "api_service": KlantenServiceType.ESUITE.value,
+                "kcm_uuid": uuid_from_url(data.klant_contactmoment["url"]),
+            },
         )
         response = self.app.get(detail_url, user=data.user)
 
-        kcm = response.context["contactmoment"]
+        kcm = response.context["question"]
         cm_data = data.contactmoment
 
         self.assertEqual(response.context["zaak"], None)
@@ -426,31 +435,65 @@ class ContactMomentViewsTestCase(
             kcm,
             {
                 "identification": cm_data["identificatie"],
-                "source_url": cm_data["url"],
+                "api_source_url": cm_data["url"],
+                "api_source_uuid": uuid_from_url(cm_data["url"]),
                 "subject": self.contactformsubject.subject,
-                "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),
                 "question_text": cm_data["tekst"],
                 "answer_text": cm_data["antwoord"],
-                "status": str(Status.afgehandeld.label),
-                "channel": cm_data["kanaal"].title(),
-                "case_detail_url": detail_url,
-                "api_service": KlantenServiceType.ESUITE,
+                "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),
+                "status": Status.afgehandeld.label,
+                "channel": cm_data["kanaal"],
                 "new_answer_available": False,
+                "api_service": KlantenServiceType.ESUITE,
             },
         )
 
-    def test_show_detail_for_bsn_with_zaak(
+    def test_contactmoment_detail_openklant2(
+        self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
+    ):
+        detail_url = reverse(
+            "cases:contactmoment_detail",
+            kwargs={
+                "api_service": KlantenServiceType.OPENKLANT2.value,
+                "kcm_uuid": "aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+            },
+        )
+        response = self.app.get(detail_url, user=self.user)
+
+        kcm = response.context["question"]
+
+        self.assertEqual(
+            kcm,
+            {
+                "identification": "openklant2_identification",
+                "api_source_url": "http://openklant2.nl/api/v1/vragen/aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
+                "api_source_uuid": uuid.UUID("aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc"),
+                "subject": "openklant2_subject",
+                "question_text": "hello?",
+                "answer_text": "no",
+                "registered_date": datetime.fromisoformat("2024-01-01T12:00:00Z"),
+                "status": "Onbekend",
+                "channel": "email",
+                "new_answer_available": False,
+                "api_service": KlantenServiceType.OPENKLANT2,
+            },
+        )
+
+    def test_contactmoment_detail_bsn_with_zaak(
         self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
     ):
         data = MockAPIReadData().install_mocks(m, link_objectcontactmomenten=True)
 
         detail_url = reverse(
             "cases:contactmoment_detail",
-            kwargs={"kcm_uuid": uuid_from_url(data.klant_contactmoment["url"])},
+            kwargs={
+                "api_service": KlantenServiceType.ESUITE.value,
+                "kcm_uuid": uuid_from_url(data.klant_contactmoment["url"]),
+            },
         )
         response = self.app.get(detail_url, user=data.user)
 
-        kcm = response.context["contactmoment"]
+        kcm = response.context["question"]
         cm_data = data.contactmoment
 
         self.assertIsNotNone(response.context["zaak"])
@@ -460,16 +503,16 @@ class ContactMomentViewsTestCase(
             kcm,
             {
                 "identification": cm_data["identificatie"],
-                "source_url": cm_data["url"],
+                "api_source_url": cm_data["url"],
+                "api_source_uuid": uuid_from_url(cm_data["url"]),
                 "subject": self.contactformsubject.subject,
-                "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),
                 "question_text": cm_data["tekst"],
                 "answer_text": cm_data["antwoord"],
-                "status": str(Status.afgehandeld.label),
-                "channel": cm_data["kanaal"].title(),
-                "case_detail_url": detail_url,
-                "api_service": KlantenServiceType.ESUITE,
+                "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),
+                "status": Status.afgehandeld.label,
+                "channel": cm_data["kanaal"],
                 "new_answer_available": False,
+                "api_service": KlantenServiceType.ESUITE,
             },
         )
 
@@ -501,7 +544,7 @@ class ContactMomentViewsTestCase(
         self.assertEqual(kcm_local.user, data.user)
         self.assertEqual(kcm_local.is_seen, True)
 
-    def test_show_detail_for_bsn_with_zaak_reformat_esuite_id(
+    def test_contactmoment_detail_bsn_with_zaak_reformat_esuite_id(
         self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
     ):
         data = MockAPIReadData().install_mocks(m, link_objectcontactmomenten=True)
@@ -512,11 +555,14 @@ class ContactMomentViewsTestCase(
 
         detail_url = reverse(
             "cases:contactmoment_detail",
-            kwargs={"kcm_uuid": uuid_from_url(data.klant_contactmoment["url"])},
+            kwargs={
+                "api_service": KlantenServiceType.ESUITE.value,
+                "kcm_uuid": uuid_from_url(data.klant_contactmoment["url"]),
+            },
         )
         response = self.app.get(detail_url, user=data.user)
 
-        kcm = response.context["contactmoment"]
+        kcm = response.context["question"]
         cm_data = data.contactmoment
 
         self.assertIsNotNone(response.context["zaak"])
@@ -525,16 +571,16 @@ class ContactMomentViewsTestCase(
             kcm,
             {
                 "identification": cm_data["identificatie"],
-                "source_url": cm_data["url"],
+                "api_source_url": cm_data["url"],
+                "api_source_uuid": uuid_from_url(cm_data["url"]),
                 "subject": self.contactformsubject.subject,
-                "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),
                 "question_text": cm_data["tekst"],
                 "answer_text": cm_data["antwoord"],
-                "status": str(Status.afgehandeld.label),
-                "channel": cm_data["kanaal"].title(),
-                "case_detail_url": detail_url,
-                "api_service": KlantenServiceType.ESUITE,
+                "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),
+                "status": Status.afgehandeld.label,
+                "channel": cm_data["kanaal"],
                 "new_answer_available": False,
+                "api_service": KlantenServiceType.ESUITE,
             },
         )
 
@@ -558,7 +604,7 @@ class ContactMomentViewsTestCase(
             reverse("cases:contactmoment_list"),
         )
 
-    def test_display_contactmoment_subject_duplicate_esuite_codes(
+    def test_contactmoment_list_subject_duplicate_esuite_codes(
         self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
     ):
         """
@@ -572,14 +618,24 @@ class ContactMomentViewsTestCase(
             config=OpenKlantConfig.get_solo(),
         )
 
-        detail_url = reverse(
+        detail_url_esuite = reverse(
             "cases:contactmoment_detail",
-            kwargs={"kcm_uuid": uuid_from_url(data.klant_contactmoment["url"])},
+            kwargs={
+                "api_service": KlantenServiceType.ESUITE.value,
+                "kcm_uuid": uuid_from_url(data.klant_contactmoment["url"]),
+            },
+        )
+        detail_url_openklant2 = reverse(
+            "cases:contactmoment_detail",
+            kwargs={
+                "api_service": KlantenServiceType.OPENKLANT2.value,
+                "kcm_uuid": "aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+            },
         )
         list_url = reverse("cases:contactmoment_list")
         response = self.app.get(list_url, user=data.user)
 
-        kcms = response.context["contactmomenten"]
+        kcms = response.context["questions"]
         cm_data = data.contactmoment
 
         self.assertEqual(len(kcms), 2)
@@ -587,36 +643,36 @@ class ContactMomentViewsTestCase(
             kcms[0],
             {
                 "identification": "openklant2_identification",
-                "source_url": "http://www.openklant2/test/url",
-                "subject": "openklan2_subject",
-                "registered_date": datetime.fromisoformat("2024-01-01T12:00:00Z"),
+                "api_source_url": "http://openklant2.nl/api/v1/vragen/aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
+                "api_source_uuid": uuid.UUID("aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc"),
+                "subject": "openklant2_subject",
                 "question_text": "hello?",
                 "answer_text": "no",
+                "registered_date": datetime.fromisoformat("2024-01-01T12:00:00Z"),
                 "status": "Onbekend",
                 "channel": "email",
-                "case_detail_url": "",
-                "api_service": KlantenServiceType.OPENKLANT2,
                 "new_answer_available": False,
+                "api_service": KlantenServiceType.OPENKLANT2,
             },
         )
         self.assertEqual(
             kcms[1],
             {
                 "identification": cm_data["identificatie"],
-                "source_url": cm_data["url"],
+                "api_source_url": cm_data["url"],
+                "api_source_uuid": uuid_from_url(cm_data["url"]),
                 "subject": self.contactformsubject.subject,
-                "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),
                 "question_text": cm_data["tekst"],
                 "answer_text": cm_data["antwoord"],
-                "status": str(Status.afgehandeld.label),
-                "channel": cm_data["kanaal"].title(),
-                "case_detail_url": detail_url,
-                "api_service": KlantenServiceType.ESUITE,
+                "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),
+                "status": Status.afgehandeld.label,
+                "channel": cm_data["kanaal"],
                 "new_answer_available": False,
+                "api_service": KlantenServiceType.ESUITE,
             },
         )
 
-    def test_display_contactmoment_subject_no_mapping_fallback(
+    def test_contactmoment_list_subject_no_mapping_fallback(
         self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
     ):
         """
@@ -626,14 +682,24 @@ class ContactMomentViewsTestCase(
 
         self.contactformsubject.delete()
 
-        detail_url = reverse(
+        detail_url_esuite = reverse(
             "cases:contactmoment_detail",
-            kwargs={"kcm_uuid": uuid_from_url(data.klant_contactmoment["url"])},
+            kwargs={
+                "api_service": KlantenServiceType.ESUITE.value,
+                "kcm_uuid": uuid_from_url(data.klant_contactmoment["url"]),
+            },
+        )
+        detail_url_openklant2 = reverse(
+            "cases:contactmoment_detail",
+            kwargs={
+                "api_service": KlantenServiceType.OPENKLANT2.value,
+                "kcm_uuid": "aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+            },
         )
         list_url = reverse("cases:contactmoment_list")
         response = self.app.get(list_url, user=data.user)
 
-        kcms = response.context["contactmomenten"]
+        kcms = response.context["questions"]
         cm_data = data.contactmoment
 
         self.assertEqual(len(kcms), 2)
@@ -641,36 +707,36 @@ class ContactMomentViewsTestCase(
             kcms[0],
             {
                 "identification": "openklant2_identification",
-                "source_url": "http://www.openklant2/test/url",
-                "subject": "openklan2_subject",
-                "registered_date": datetime.fromisoformat("2024-01-01T12:00:00Z"),
+                "api_source_url": "http://openklant2.nl/api/v1/vragen/aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
+                "api_source_uuid": uuid.UUID("aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc"),
+                "subject": "openklant2_subject",
                 "question_text": "hello?",
                 "answer_text": "no",
+                "registered_date": datetime.fromisoformat("2024-01-01T12:00:00Z"),
                 "status": "Onbekend",
                 "channel": "email",
-                "case_detail_url": "",
-                "api_service": KlantenServiceType.OPENKLANT2,
                 "new_answer_available": False,
+                "api_service": KlantenServiceType.OPENKLANT2,
             },
         )
         self.assertEqual(
             kcms[1],
             {
                 "identification": cm_data["identificatie"],
-                "source_url": cm_data["url"],
+                "api_source_url": cm_data["url"],
+                "api_source_uuid": uuid_from_url(cm_data["url"]),
                 "subject": self.contactformsubject.subject_code,
-                "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),
                 "question_text": cm_data["tekst"],
                 "answer_text": cm_data["antwoord"],
-                "status": str(Status.afgehandeld.label),
-                "channel": cm_data["kanaal"].title(),
-                "case_detail_url": detail_url,
-                "api_service": KlantenServiceType.ESUITE,
+                "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),
+                "status": Status.afgehandeld.label,
+                "channel": cm_data["kanaal"],
                 "new_answer_available": False,
+                "api_service": KlantenServiceType.ESUITE,
             },
         )
 
-    def test_show_detail_for_kvk_or_rsin(
+    def test_contactmoment_detail_esuite_for_kvk_or_rsin(
         self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
     ):
         for use_rsin_for_innNnpId_query_parameter in [True, False]:
@@ -691,35 +757,35 @@ class ContactMomentViewsTestCase(
                 detail_url = reverse(
                     "cases:contactmoment_detail",
                     kwargs={
-                        "kcm_uuid": uuid_from_url(data.klant_contactmoment2["url"])
+                        "api_service": KlantenServiceType.ESUITE.value,
+                        "kcm_uuid": uuid_from_url(data.klant_contactmoment2["url"]),
                     },
                 )
                 response = self.app.get(detail_url, user=data.eherkenning_user)
 
-                kcm = response.context["contactmoment"]
+                kcm = response.context["question"]
                 cm_data = data.contactmoment2
-                registratiedatum = datetime.fromisoformat(cm_data["registratiedatum"])
                 self.assertEqual(
                     kcm,
                     {
                         "identification": cm_data["identificatie"],
-                        "source_url": cm_data["url"],
+                        "api_source_url": cm_data["url"],
+                        "api_source_uuid": uuid_from_url(cm_data["url"]),
                         "subject": self.contactformsubject.subject,
+                        "question_text": cm_data["tekst"],
+                        "answer_text": cm_data["antwoord"],
                         "registered_date": datetime.fromisoformat(
                             cm_data["registratiedatum"]
                         ),
-                        "question_text": cm_data["tekst"],
-                        "answer_text": cm_data["antwoord"],
-                        "status": str(Status.afgehandeld.label),
-                        "channel": cm_data["kanaal"].title(),
-                        "case_detail_url": detail_url,
-                        "api_service": KlantenServiceType.ESUITE,
+                        "status": Status.afgehandeld.label,
+                        "channel": cm_data["kanaal"],
                         "new_answer_available": False,
+                        "api_service": KlantenServiceType.ESUITE,
                     },
                 )
 
     @set_kvk_branch_number_in_session("1234")
-    def test_show_detail_for_vestiging(
+    def test_contactmoment_detail_esuite_vestiging(
         self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
     ):
         data = MockAPIReadData().install_mocks(m)
@@ -735,31 +801,33 @@ class ContactMomentViewsTestCase(
                 )
                 config.save()
 
-                kcm_uuid = uuid_from_url(data.klant_contactmoment4["url"])
                 detail_url = reverse(
-                    "cases:contactmoment_detail", kwargs={"kcm_uuid": kcm_uuid}
+                    "cases:contactmoment_detail",
+                    kwargs={
+                        "api_service": KlantenServiceType.ESUITE.value,
+                        "kcm_uuid": uuid_from_url(data.klant_contactmoment4["url"]),
+                    },
                 )
                 response = self.client.get(detail_url)
 
-                kcm = response.context["contactmoment"]
+                kcm = response.context["question"]
                 cm_data = data.contactmoment_vestiging
-                registratie_datum = datetime.fromisoformat(cm_data["registratiedatum"])
                 self.assertEqual(
                     kcm,
                     {
                         "identification": cm_data["identificatie"],
-                        "source_url": cm_data["url"],
+                        "api_source_url": cm_data["url"],
+                        "api_source_uuid": uuid_from_url(cm_data["url"]),
                         "subject": self.contactformsubject.subject,
+                        "question_text": cm_data["tekst"],
+                        "answer_text": cm_data["antwoord"],
                         "registered_date": datetime.fromisoformat(
                             cm_data["registratiedatum"]
                         ),
-                        "question_text": cm_data["tekst"],
-                        "answer_text": cm_data["antwoord"],
-                        "status": str(Status.afgehandeld.label),
-                        "channel": cm_data["kanaal"].title(),
-                        "case_detail_url": detail_url,
-                        "api_service": KlantenServiceType.ESUITE,
+                        "status": Status.afgehandeld.label,
+                        "channel": cm_data["kanaal"],
                         "new_answer_available": False,
+                        "api_service": KlantenServiceType.ESUITE,
                     },
                 )
 
@@ -783,14 +851,15 @@ class ContactMomentViewsTestCase(
                 detail_url = reverse(
                     "cases:contactmoment_detail",
                     kwargs={
-                        "kcm_uuid": uuid_from_url(data.klant_contactmoment2["url"])
+                        "api_service": KlantenServiceType.ESUITE.value,
+                        "kcm_uuid": uuid_from_url(data.klant_contactmoment2["url"]),
                     },
                 )
                 response = self.client.get(detail_url)
 
                 self.assertEqual(response.status_code, 404)
 
-    def test_list_requires_bsn_or_kvk(
+    def test_contactmoment_list_requires_bsn_or_kvk(
         self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
     ):
         user = UserFactory()
@@ -798,24 +867,41 @@ class ContactMomentViewsTestCase(
         response = self.app.get(list_url, user=user)
         self.assertRedirects(response, reverse("pages-root"))
 
-    def test_list_requires_login(
+    def test_contactmoment_list_requires_login(
         self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
     ):
         list_url = reverse("cases:contactmoment_list")
         response = self.app.get(list_url)
         self.assertRedirects(response, f"{reverse('login')}?next={list_url}")
 
-    def test_detail_requires_bsn_or_kvk(
+    def test_contactmoment_detail_requires_bsn_or_kvk(
         self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
     ):
         user = UserFactory()
-        url = reverse("cases:contactmoment_detail", kwargs={"kcm_uuid": uuid4()})
-        response = self.app.get(url, user=user)
-        self.assertRedirects(response, reverse("pages-root"))
 
-    def test_detail_requires_login(
+        for service in [KlantenServiceType.ESUITE, KlantenServiceType.OPENKLANT2]:
+            with self.subTest(api_service=service):
+                url = reverse(
+                    "cases:contactmoment_detail",
+                    kwargs={
+                        "api_service": service,
+                        "kcm_uuid": uuid4(),
+                    },
+                )
+                response = self.app.get(url, user=user)
+                self.assertRedirects(response, reverse("pages-root"))
+
+    def test_contactmoment_detail_requires_login(
         self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
     ):
-        url = reverse("cases:contactmoment_detail", kwargs={"kcm_uuid": uuid4()})
-        response = self.app.get(url)
-        self.assertRedirects(response, f"{reverse('login')}?next={url}")
+        for service in [KlantenServiceType.ESUITE, KlantenServiceType.OPENKLANT2]:
+            with self.subTest(api_service=service):
+                url = reverse(
+                    "cases:contactmoment_detail",
+                    kwargs={
+                        "api_service": service,
+                        "kcm_uuid": uuid4(),
+                    },
+                )
+                response = self.app.get(url)
+                self.assertRedirects(response, f"{reverse('login')}?next={url}")

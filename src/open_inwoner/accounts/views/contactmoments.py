@@ -91,18 +91,18 @@ class KlantContactMomentBaseView(
     CommonPageMixin, BaseBreadcrumbMixin, KlantContactMomentAccessMixin, TemplateView
 ):
     def get_service(self, service_type: KlantenServiceType) -> VragenService | None:
+        if service_type == KlantenServiceType.OPENKLANT2:
+            try:
+                return OpenKlant2Service()
+            except ImproperlyConfigured:
+                logger.error("OpenKlant2 configuration missing")
         if service_type == KlantenServiceType.ESUITE:
             try:
                 return eSuiteVragenService()
             except ImproperlyConfigured:
                 logger.error("eSuiteVragenService configuration missing")
-        elif service_type == KlantenServiceType.OPENKLANT2:
-            try:
-                return OpenKlant2Service()
-            except ImproperlyConfigured:
-                logger.error("OpenKlant2 configuration missing")
             except RuntimeError:
-                logger.error("Failed to build OpenKlant2Service")
+                logger.error("Failed to build eSuiteVragenService")
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
@@ -146,13 +146,6 @@ class KlantContactMomentListView(
         ctx = super().get_context_data(**kwargs)
 
         questions = []
-        if esuite_service := self.get_service(service_type=KlantenServiceType.ESUITE):
-            questions.extend(
-                esuite_service.list_questions(
-                    fetch_params=self.get_fetch_params(esuite_service),
-                    user=self.request.user,
-                )
-            )
         if ok2_service := self.get_service(service_type=KlantenServiceType.OPENKLANT2):
             questions.extend(
                 ok2_service.list_questions(
@@ -160,10 +153,17 @@ class KlantContactMomentListView(
                     user=self.request.user,
                 )
             )
+        if esuite_service := self.get_service(service_type=KlantenServiceType.ESUITE):
+            questions.extend(
+                esuite_service.list_questions(
+                    fetch_params=self.get_fetch_params(esuite_service),
+                    user=self.request.user,
+                )
+            )
         questions.sort(key=lambda q: q["registered_date"], reverse=True)
-        ctx["contactmomenten"] = questions
+        ctx["questions"] = questions
 
-        paginator_dict = self.paginate_with_context(ctx["contactmomenten"])
+        paginator_dict = self.paginate_with_context(ctx["questions"])
         ctx.update(paginator_dict)
 
         return ctx
@@ -187,25 +187,28 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        service = self.get_service(service_type=KlantenServiceType.ESUITE)
 
-        kcm, zaak = service.retrieve_question(
+        if KlantenServiceType.ESUITE.value in self.request.path:
+            service = self.get_service(service_type=KlantenServiceType.ESUITE)
+        elif KlantenServiceType.OPENKLANT2.value in self.request.path:
+            service = self.get_service(service_type=KlantenServiceType.OPENKLANT2)
+
+        question, zaak = service.retrieve_question(
             self.get_fetch_params(service), kwargs["kcm_uuid"], user=self.request.user
         )
-        if not kcm:
+        if not question:
             raise Http404()
 
-        QuestionValidator.validate_python(kcm)
+        QuestionValidator.validate_python(question)
 
         local_kcm, created = KlantContactMomentAnswer.objects.get_or_create(  # noqa
-            user=self.request.user, contactmoment_url=kcm["case_detail_url"]
+            user=self.request.user, contactmoment_url=question["api_source_url"]
         )
         if not local_kcm.is_seen:
             local_kcm.is_seen = True
             local_kcm.save()
 
-        contactmoment = kcm
-        ctx["contactmoment"] = contactmoment
+        ctx["question"] = question
         ctx["zaak"] = zaak.zaak if zaak else None
         case_url = (
             reverse(
@@ -221,19 +224,19 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
         ctx["metrics"] = [
             {
                 "label": _("Status: "),
-                "value": contactmoment["status"],
+                "value": question["status"].capitalize(),
             },
             {
                 "label": _("Ingediend op: "),
-                "value": contactmoment["registered_date"],
+                "value": question["registered_date"],
             },
             {
                 "label": _("Vraag nummer: "),
-                "value": contactmoment["identification"],
+                "value": question["identification"],
             },
             {
                 "label": _("Contact gehad via: "),
-                "value": contactmoment["channel"],
+                "value": question["channel"].capitalize(),
             },
         ]
         origin = self.request.headers.get("Referer")
@@ -284,5 +287,11 @@ class KlantContactMomentRedirectView(KlantContactMomentAccessMixin, View):
             raise Http404
 
         return HttpResponseRedirect(
-            reverse("cases:contactmoment_detail", kwargs={"kcm_uuid": kcm.uuid})
+            reverse(
+                "cases:contactmoment_detail",
+                kwargs={
+                    "api_service": KlantenServiceType.ESUITE.value,
+                    "kcm_uuid": kcm.uuid,
+                },
+            )
         )

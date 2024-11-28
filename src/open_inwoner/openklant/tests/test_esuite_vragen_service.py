@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from django.test import TestCase, override_settings
-from django.urls import reverse
 
 import requests_mock
 
@@ -10,7 +9,7 @@ from open_inwoner.openklant.constants import KlantenServiceType, Status
 from open_inwoner.openklant.models import ContactFormSubject, OpenKlantConfig
 from open_inwoner.openklant.services import eSuiteVragenService
 from open_inwoner.openklant.tests.data import MockAPIReadData
-from open_inwoner.utils.test import uuid_from_url
+from open_inwoner.utils.url import uuid_from_url
 
 
 @requests_mock.Mocker()
@@ -79,29 +78,26 @@ class eSuiteVragenServiceTestCase(TestCase):
             with self.subTest(f"{user=} {params=} {use_rsin=}"):
                 config.use_rsin_for_innNnpId_query_parameter = use_rsin
                 config.save()
+
                 questions = list(self.service.list_questions(params, user))
 
-                detail_url = reverse(
-                    "cases:contactmoment_detail",
-                    kwargs={"kcm_uuid": uuid_from_url(expected_klantcontact["url"])},
-                )
                 self.assertEqual(len(questions), 1)
                 self.assertEqual(
                     questions[0],
                     {
                         "identification": expected_contactmoment["identificatie"],
-                        "source_url": expected_contactmoment["url"],
+                        "api_source_url": expected_contactmoment["url"],
+                        "api_source_uuid": uuid_from_url(expected_contactmoment["url"]),
                         "subject": self.contactformsubject.subject,
+                        "question_text": expected_contactmoment["tekst"],
+                        "answer_text": expected_contactmoment["antwoord"],
                         "registered_date": datetime.fromisoformat(
                             expected_contactmoment["registratiedatum"]
                         ),
-                        "question_text": expected_contactmoment["tekst"],
-                        "answer_text": expected_contactmoment["antwoord"],
-                        "status": str(Status.afgehandeld.label),
-                        "channel": expected_contactmoment["kanaal"].title(),
-                        "case_detail_url": detail_url,
-                        "api_service": KlantenServiceType.ESUITE,
+                        "status": Status.afgehandeld.label,
+                        "channel": expected_contactmoment["kanaal"],
                         "new_answer_available": False,
+                        "api_service": KlantenServiceType.ESUITE,
                     },
                 )
                 m.reset_mock()
@@ -153,30 +149,27 @@ class eSuiteVragenServiceTestCase(TestCase):
             with self.subTest(f"{user=} {params=} {use_rsin=}"):
                 config.use_rsin_for_innNnpId_query_parameter = use_rsin
                 config.save()
+
                 question, _ = self.service.retrieve_question(
                     params, expected_klantcontact["uuid"], user
                 )
 
-                detail_url = reverse(
-                    "cases:contactmoment_detail",
-                    kwargs={"kcm_uuid": uuid_from_url(expected_klantcontact["url"])},
-                )
                 self.assertEqual(
                     question,
                     {
                         "identification": expected_contactmoment["identificatie"],
-                        "source_url": expected_contactmoment["url"],
+                        "api_source_url": expected_contactmoment["url"],
+                        "api_source_uuid": uuid_from_url(expected_contactmoment["url"]),
                         "subject": self.contactformsubject.subject,
+                        "question_text": expected_contactmoment["tekst"],
+                        "answer_text": expected_contactmoment["antwoord"],
                         "registered_date": datetime.fromisoformat(
                             expected_contactmoment["registratiedatum"]
                         ),
-                        "question_text": expected_contactmoment["tekst"],
-                        "answer_text": expected_contactmoment["antwoord"],
-                        "status": str(Status.afgehandeld.label),
-                        "channel": expected_contactmoment["kanaal"].title(),
-                        "case_detail_url": detail_url,
-                        "api_service": KlantenServiceType.ESUITE,
+                        "status": Status.afgehandeld.label,
+                        "channel": expected_contactmoment["kanaal"],
                         "new_answer_available": False,
+                        "api_service": KlantenServiceType.ESUITE,
                     },
                 )
                 m.reset_mock()
