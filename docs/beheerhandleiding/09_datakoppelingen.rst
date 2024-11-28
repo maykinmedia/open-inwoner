@@ -27,12 +27,86 @@ gebruikers. Dit is overzichtelijk weergegeven in de tabel op deze pagina.
 |    | Webhook-abonnementen         |    | Mijn aanvragen - notificaties                            |
 +-----------------------------------+---------------------------------------------------------------+
 
+9.1 Catalogus Configs
+=====================
 
-9.1. Catalogus configs
-======================
+Catalogus configs worden automatisch geïmporteerd vanuit Open Zaak of eSuite via de 
+ZGW-koppeling. Aan deze catalogi zijn zaaktypes gekoppeld, zoals geconfigureerd in 
+het onderdeel Zaaktypeconfiguratie.
 
-Dit zijn de catalogi die automatisch worden geïmporteerd vanuit Open Zaak of eSuite via de ZGW-
-koppeling. Aan de catalogi zijn zaaktypes geconfigureerd, zoals in het onderdeel Zaaktypeconfiguratie.
+Import en Export
+----------------
+
+Catalogi kunnen worden geëxporteerd en geïmporteerd tussen verschillende OIP-installaties 
+(bijvoorbeeld tussen acceptatie- en testomgevingen).
+
+.. note::
+   De import/export-functionaliteit vereist dat de gekoppelde zaaksystemen 
+   materieel gelijk zijn. Dit betekent dat de catalogi en onderliggende zaaktypes 
+   in beide ZGW API's aanwezig moeten zijn (hoewel de URLs en UUIDs mogen verschillen).
+   Voer daarom de ``Importeer ZGW data`` periodieke taak eerst handmatig uit op zowel de
+   bron als bestemming zodat de ZGW objecten volledig in sync zijn.
+
+Importproces
+^^^^^^^^^^^^
+
+Tijdens de import zoekt de ontvangende installatie catalogi en zaaktypes op basis van 
+specifieke kenmerken. Deze matching bepaalt hoe bijbehorende data (beschrijvingen, 
+instellingen en metadata) worden gekoppeld.
+
+Matching-attributen
+"""""""""""""""""""
+
+- **Catalogus Config**: ``domein`` en ``rsin`` moeten gelijk zijn
+- **Zaaktype Configuratie**: ``identificatie`` en bovenliggende ``catalogus`` moeten gelijk zijn
+- **Status, Resultaat en Informatie Object Typen**: ``omschrijving`` en de bovenliggende
+  ``zaaktype`` moeten gelijk zijn
+
+Exporteren
+----------
+
+Stappen voor exporteren:
+
+#. Selecteer een of meer Catalogus Config-objecten
+#. Kies "Opslaan als bestand" in de "Actie" dropdown linksboven de catalogilijst
+
+.. figure:: images/image140.png
+   :width: 709px
+   :height: 305px
+   :alt: Exporteren van catalogus configuraties
+
+   Exporteren van catalogus configuraties
+
+De export omvat alle zaaktypes en onderliggende objecten (resultaattypen, 
+informatie-objecttypen, etc.) van de geselecteerde catalogi.
+
+Importeren
+----------
+
+Stappen voor importeren:
+
+#. Klik op "Importeer uit een bestand" rechtsboven op de catalogus configs-overzichtspagina
+
+.. figure:: images/image141.png
+   :width: 1178px
+   :height: 120px
+   :alt: Importeren van catalogus configuraties
+
+   Importeren van catalogus configuraties
+
+#. Selecteer een bestand van uw lokale computer
+#. Upload het bestand
+
+    .. warning::
+      - Het importeren kan aanzienlijke tijd in beslag nemen
+
+#. Na afloop toont het systeem:
+
+     * Aantal succesvol geïmporteerde objecten
+     * Aantal niet-geïmporteerde objecten. De meest voorkomende reden voor foutmeldingen
+       betreft pntbrekende objecten met de gespecificeerde matching-attributen. De
+       attributen die ertoe leidde dat bepaalde objecten niet gevonden konden worden,
+       zullen zoveel mogelijk worden vermeld.
 
 9.2. Configuratie ‘Open Klant’
 ==============================
