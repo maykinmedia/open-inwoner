@@ -346,6 +346,7 @@ class CaseListMocks:
             startdatum="2021-07-26",
             einddatum="2022-01-16",
             status=f"{zaken_root}statussen/98659876-bbb3-476a-ad13-n3nvcght758js",
+            resultaat=f"{zaken_root}resultaten/3da81560-c7fc-476a-ad13-beu760sle929",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
         )
         self.status3 = generate_oas_component_cached(
@@ -531,6 +532,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                         "identification": mock.zaak2["identificatie"],
                         "description": mock.zaaktype["omschrijving"],
                         "current_status": mock.status_type_initial["omschrijving"],
+                        "result": "",
                         "zaaktype_config": mock.zaaktype_config1,
                         "statustype_config": mock.zt_statustype_config1,
                         "case_type": "Zaak",
@@ -545,6 +547,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                         "identification": mock.zaak1["identificatie"],
                         "description": mock.zaaktype["omschrijving"],
                         "current_status": mock.status_type_initial["omschrijving"],
+                        "result": "",
                         "zaaktype_config": mock.zaaktype_config1,
                         "statustype_config": mock.zt_statustype_config1,
                         "case_type": "Zaak",
@@ -561,6 +564,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                         "identification": mock.zaak3["identificatie"],
                         "description": mock.zaaktype["omschrijving"],
                         "current_status": mock.status_type_finish["statustekst"],
+                        "result": mock.resultaat_type["omschrijving"],
                         "zaaktype_config": mock.zaaktype_config1,
                         "statustype_config": None,
                         "case_type": "Zaak",
@@ -574,8 +578,8 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                         "end_date": datetime.date(2022, 1, 13),
                         "identification": mock.zaak_result["identificatie"],
                         "description": mock.zaaktype["omschrijving"],
-                        # use result here
-                        "current_status": mock.resultaat_type["omschrijving"],
+                        "current_status": mock.status_type_initial["omschrijving"],
+                        "result": mock.resultaat_type["omschrijving"],
                         "zaaktype_config": mock.zaaktype_config1,
                         "statustype_config": mock.zt_statustype_config1,
                         "case_type": "Zaak",
@@ -583,6 +587,8 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                     },
                 ]
             )
+
+        cases = response.context["cases"]
 
         self.assertListEqual(response.context["cases"], expected_cases)
         # don't show internal cases
@@ -612,6 +618,15 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
 
         # case filter form is disabled by default
         self.assertFalse(response.context.get("filter_form_enabled"))
+
+        # check status/result label
+        doc = PQ(response.content)
+
+        status_labels = doc.find(".list-item__caption:Contains('Status')")
+        result_labels = doc.find(".list-item__caption:Contains('Resultaat')")
+
+        self.assertEqual(len(status_labels), 4)
+        self.assertEqual(len(result_labels), 4)
 
     def test_filter_widget_is_controlled_by_zaken_filter_enabled(self, m):
         self.client.force_login(user=self.user)
@@ -717,6 +732,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                                 "current_status": mock.status_type_initial[
                                     "omschrijving"
                                 ],
+                                "result": "",
                                 "zaaktype_config": mock.zaaktype_config1,
                                 "statustype_config": mock.zt_statustype_config1,
                                 "case_type": "Zaak",
@@ -735,6 +751,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                                 "current_status": mock.status_type_initial[
                                     "omschrijving"
                                 ],
+                                "result": "",
                                 "zaaktype_config": mock.zaaktype_config1,
                                 "statustype_config": mock.zt_statustype_config1,
                                 "case_type": "Zaak",
@@ -793,7 +810,6 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
         m.reset_mock()
 
         response = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
-
         expected_cases = [
             {
                 "uuid": mock.zaak_eherkenning1["uuid"],
@@ -804,6 +820,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                 "identification": mock.zaak_eherkenning1["identificatie"],
                 "description": mock.zaaktype["omschrijving"],
                 "current_status": mock.status_type_initial["omschrijving"],
+                "result": "",
                 "zaaktype_config": mock.zaaktype_config1,
                 "statustype_config": mock.zt_statustype_config1,
                 "case_type": "Zaak",
@@ -869,6 +886,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                 "identification": mock.zaak_eherkenning1["identificatie"],
                 "description": mock.zaaktype["omschrijving"],
                 "current_status": mock.status_type_initial["omschrijving"],
+                "result": "",
                 "zaaktype_config": mock.zaaktype_config1,
                 "statustype_config": mock.zt_statustype_config1,
                 "case_type": "Zaak",
@@ -1045,6 +1063,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                     "identification": mock.zaak2["identificatie"],
                     "description": mock.zaaktype["omschrijving"],
                     "current_status": mock.status_type_initial["omschrijving"],
+                    "result": "",
                     "zaaktype_config": mock.zaaktype_config1,
                     "statustype_config": mock.zt_statustype_config1,
                     "case_type": "Zaak",
@@ -1057,6 +1076,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                     "identification": mock.zaak1["identificatie"],
                     "description": mock.zaaktype["omschrijving"],
                     "current_status": mock.status_type_initial["omschrijving"],
+                    "result": "",
                     "zaaktype_config": mock.zaaktype_config1,
                     "statustype_config": mock.zt_statustype_config1,
                     "case_type": "Zaak",
@@ -1069,6 +1089,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                     "identification": mock.zaak3["identificatie"],
                     "description": mock.zaaktype["omschrijving"],
                     "current_status": mock.status_type_finish["statustekst"],
+                    "result": mock.resultaat_type["omschrijving"],
                     "zaaktype_config": mock.zaaktype_config1,
                     "statustype_config": None,
                     "case_type": "Zaak",
@@ -1082,8 +1103,8 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                     "end_date": datetime.date(2022, 1, 13),
                     "identification": mock.zaak_result["identificatie"],
                     "description": mock.zaaktype["omschrijving"],
-                    # use result here
-                    "current_status": mock.resultaat_type["omschrijving"],
+                    "current_status": mock.status_type_initial["omschrijving"],
+                    "result": mock.resultaat_type["omschrijving"],
                     "zaaktype_config": mock.zaaktype_config1,
                     "statustype_config": mock.zt_statustype_config1,
                     "case_type": "Zaak",

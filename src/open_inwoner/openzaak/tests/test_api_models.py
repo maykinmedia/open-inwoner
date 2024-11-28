@@ -10,7 +10,7 @@ from open_inwoner.openzaak.models import OpenZaakConfig
 class ZaakAPIModelTest(TestCase):
     def setUp(self):
         self.zaak_data = {
-            "url": "",
+            "url": "http://zaak-api-model-test.nl/0f70e292-ec68-46fd-870c-772b38fe5b28",
             "identificatie": "",
             "bronorganisatie": "",
             "omschrijving": "",
@@ -20,77 +20,68 @@ class ZaakAPIModelTest(TestCase):
             "vertrouwelijkheidaanduiding": "",
             "status": {
                 "statustype": {
-                    "statustekst": "",
-                    "omschrijving": "",
+                    "statustekst": "statustekst",
+                    "omschrijving": "omschrijving",
                 }
             },
-            "einddatum": None,
+            "einddatum": "2024-08-06",
             "resultaat": {
                 "resultaattype": {
-                    "naam": "",
-                    "omschrijving": "",
-                    "omschrijving_generiek": "",
-                    "resultaattypeomschrijving": "",
+                    "naam": "resultaat naam",
+                    "omschrijving": "resultaat omschrijving",
+                    "omschrijving_generiek": "resultaat omschrijving_generiek",
+                    "resultaattypeomschrijving": "resultaattypeomschrijving",
                 },
             },
         }
 
-    def test_status_text_no_result(self):
-        zaak_statustype = self.zaak_data["status"]["statustype"]
-
-        zaak_statustype["statustekst"] = "test statustekst"
-        zaak_statustype["omschrijving"] = "test omschrijving"
-
+    def test_status_text(self):
         case = factory(Zaak, data=self.zaak_data)
 
-        self.assertEqual(case.status_text, "test statustekst")
+        data = case.process_data()
+        self.assertEqual(data["current_status"], "statustekst")
 
         case.status["statustype"]["statustekst"] = ""
+        data = case.process_data()
+        self.assertEqual(data["current_status"], "omschrijving")
 
-        self.assertEqual(case.status_text, "test omschrijving")
-
-    def test_status_text_with_result(self):
-        self.zaak_data["status"]["statustype"]["statustekst"] = "test statustekst"
-        self.zaak_data["einddatum"] = "2024-08-06"
-
-        resultaattype = self.zaak_data["resultaat"]["resultaattype"]
-
-        resultaattype["naam"] = "test naam"
-        resultaattype["omschrijving"] = "test omschrijving"
-        resultaattype["omschrijving_generiek"] = "test omschrijving_generiek"
-        resultaattype["resultaattypeomschrijving"] = "test resultaattypeomschrijving"
-
+    def test_result_text(self):
         case = factory(Zaak, data=self.zaak_data)
 
-        self.assertEqual(case.status_text, "test naam")
+        data = case.process_data()
+        self.assertEqual(data["result"], "resultaat naam")
 
-        case.resultaat["resultaattype"]["naam"] = ""
+        resultaattype = case.resultaat["resultaattype"]
 
-        self.assertEqual(case.status_text, "test omschrijving")
+        resultaattype["naam"] = ""
+        data = case.process_data()
+        self.assertEqual(data["result"], "resultaat omschrijving")
 
-        case.resultaat["resultaattype"]["omschrijving"] = ""
+        resultaattype["omschrijving"] = ""
+        data = case.process_data()
+        self.assertEqual(data["result"], "resultaat omschrijving_generiek")
 
-        self.assertEqual(case.status_text, "test omschrijving_generiek")
+        resultaattype["omschrijving_generiek"] = ""
+        data = case.process_data()
+        self.assertEqual(data["result"], "resultaattypeomschrijving")
 
-        case.resultaat["resultaattype"]["omschrijving_generiek"] = ""
+    def test_status_text_no_end_date(self):
+        zaak_data_no_end_date = self.zaak_data
+        zaak_data_no_end_date["einddatum"] = None
+        case = factory(Zaak, data=zaak_data_no_end_date)
 
-        self.assertEqual(case.status_text, "test resultaattypeomschrijving")
+        data = case.process_data()
 
-    def test_status_text_with_result_but_no_end_data(self):
-        self.zaak_data["status"]["statustype"]["statustekst"] = "test statustekst"
-
-        resultaattype = self.zaak_data["resultaat"]["resultaattype"]
-
-        resultaattype["naam"] = "test naam"
-
-        case = factory(Zaak, data=self.zaak_data)
-
-        self.assertEqual(case.status_text, "test statustekst")
+        self.assertEqual(data["result"], "")
 
     def test_status_text_default(self):
         case = factory(Zaak, data=self.zaak_data)
+        case.status["statustype"]["statustekst"] = ""
+        case.status["statustype"]["omschrijving"] = ""
 
-        self.assertEqual(case.status_text, _("No data available"))
+        data = case.process_data()
+
+        self.assertEqual(data["current_status"], _("No data available"))
 
     def test_zaak_omschrijving(self):
         zaaktype = factory(
