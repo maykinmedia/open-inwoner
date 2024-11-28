@@ -1,3 +1,4 @@
+import html
 import json
 from unittest import mock
 
@@ -280,39 +281,39 @@ class TestCatalogusConfigExportAdmin(WebTest):
 
         response = form.submit().follow()
 
-        messages = [str(msg) for msg in response.context["messages"]]
+        messages = [html.unescape(str(msg)) for msg in response.context["messages"]]
         self.assertEqual(len(messages), 2)
         self.assertEqual(
             _("6 item(s) processed in total, with 6 failing row(s)."),
             messages[0],
         )
         self.assertIn(
-            "ZaakTypeConfig not found in target environment: Identificatie = ztc-id-a-0, "
-            "Catalogus domein = DM-0, Catalogus rsin = 123456789",
+            "ZaakTypeConfig not found in target environment: Identificatie = 'ztc-id-a-0', "
+            "Catalogus domein = 'DM-0', Catalogus rsin = '123456789'",
             messages[1],
         )
         self.assertIn(
-            "ZaakTypeStatusTypeConfig not found in target environment: omschrijving = status omschrijving, "
-            "ZaakTypeConfig identificatie = ztc-id-a-0, Catalogus domein = DM-0, Catalogus rsin = 123456789",
+            "ZaakTypeStatusTypeConfig not found in target environment: omschrijving = 'status omschrijving', "
+            "ZaakTypeConfig identificatie = 'ztc-id-a-0', Catalogus domein = 'DM-0', Catalogus rsin = '123456789'",
             messages[1],
         )
         self.assertIn(
-            "ZaakTypeStatusTypeConfig not found in target environment: omschrijving = bogus, ZaakTypeConfig "
-            "identificatie = ztc-id-a-0, Catalogus domein = DM-0, Catalogus rsin = 123456789",
+            "ZaakTypeStatusTypeConfig not found in target environment: omschrijving = 'bogus', ZaakTypeConfig "
+            "identificatie = 'ztc-id-a-0', Catalogus domein = 'DM-0', Catalogus rsin = '123456789'",
             messages[1],
         )
         self.assertIn(
-            "ZaakTypeInformatieObjectTypeConfig not found in target environment: omschrijving = informatieobject, "
-            "ZaakTypeConfig identificatie = ztc-id-a-0, Catalogus domein = DM-0, Catalogus rsin = 123456789",
+            "ZaakTypeInformatieObjectTypeConfig not found in target environment: omschrijving = 'informatieobject', "
+            "ZaakTypeConfig identificatie = 'ztc-id-a-0', Catalogus domein = 'DM-0', Catalogus rsin = '123456789'",
             messages[1],
         )
         self.assertIn(
-            "CatalogusConfig not found in target environment: Domein = DM-0, Rsin = 123456789",
+            "CatalogusConfig not found in target environment: Domein = 'DM-0', Rsin = '123456789'",
             messages[1],
         )
         self.assertIn(
-            "ZaakTypeResultaatTypeConfig not found in target environment: omschrijving = resultaat, "
-            "ZaakTypeConfig identificatie = ztc-id-a-0, Catalogus domein = DM-0, Catalogus rsin = 123456789",
+            "ZaakTypeResultaatTypeConfig not found in target environment: omschrijving = 'resultaat', "
+            "ZaakTypeConfig identificatie = 'ztc-id-a-0', Catalogus domein = 'DM-0', Catalogus rsin = '123456789'",
             messages[1],
         )
 
@@ -341,13 +342,13 @@ class TestCatalogusConfigExportAdmin(WebTest):
 
         response = form.submit().follow()
 
-        messages = [str(msg) for msg in response.context["messages"]]
+        messages = [html.unescape(str(msg)) for msg in response.context["messages"]]
         self.assertEqual(len(messages), 2)
         self.assertEqual(
             _("2 item(s) processed in total, with 1 failing row(s)."),
             messages[0],
         )
         self.assertEqual(
-            "It was not possible to import the following items:<ol> <li>ZaakTypeConfig not found in target environment: Identificatie = ztc-id-a-0, Catalogus domein = DM-0, Catalogus rsin = 123456789</li> </ol>",
+            "It was not possible to import the following items:<div><p> - ZaakTypeConfig not found in target environment: Identificatie = 'ztc-id-a-0', Catalogus domein = 'DM-0', Catalogus rsin = '123456789'</p></div>",
             messages[1],
         )
