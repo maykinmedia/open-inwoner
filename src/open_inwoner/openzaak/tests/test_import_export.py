@@ -372,8 +372,8 @@ class TestCatalogusImport(TestCase):
             )
         )
         expected_error = ZGWImportError(
-            "ZaakTypeStatusTypeConfig not found in target environment: omschrijving = bogus, "
-            "ZaakTypeConfig identificatie = ztc-id-a-0, Catalogus domein = DM-0, Catalogus rsin = 123456789"
+            "ZaakTypeStatusTypeConfig not found in target environment: omschrijving = 'bogus', "
+            "ZaakTypeConfig identificatie = 'ztc-id-a-0', Catalogus domein = 'DM-0', Catalogus rsin = '123456789'"
         )
         import_expected = dataclasses.asdict(
             CatalogusConfigImport(
@@ -418,8 +418,8 @@ class TestCatalogusImport(TestCase):
             )
         )
         expected_error = ZGWImportError(
-            "ZaakTypeStatusTypeConfig not found in target environment: omschrijving = status omschrijving, "
-            "ZaakTypeConfig identificatie = bogus, Catalogus domein = DM-1, Catalogus rsin = 666666666"
+            "ZaakTypeStatusTypeConfig not found in target environment: omschrijving = 'status omschrijving', "
+            "ZaakTypeConfig identificatie = 'bogus', Catalogus domein = 'DM-1', Catalogus rsin = '666666666'"
         )
         import_expected = dataclasses.asdict(
             CatalogusConfigImport(
@@ -464,8 +464,8 @@ class TestCatalogusImport(TestCase):
             )
         )
         expected_error = ZGWImportError(
-            "Got multiple results for ZaakTypeResultaatTypeConfig: omschrijving = resultaat, "
-            "ZaakTypeConfig identificatie = ztc-id-a-0, Catalogus domein = DM-0, Catalogus rsin = 123456789"
+            "Got multiple results for ZaakTypeResultaatTypeConfig: omschrijving = 'resultaat', "
+            "ZaakTypeConfig identificatie = 'ztc-id-a-0', Catalogus domein = 'DM-0', Catalogus rsin = '123456789'"
         )
         import_expected = dataclasses.asdict(
             CatalogusConfigImport(
@@ -509,10 +509,10 @@ class TestCatalogusImport(TestCase):
                 [
                     # error from trying to load existing CatalogusConfig
                     "ERROR:open_inwoner.openzaak.import_export:"
-                    "CatalogusConfig not found in target environment: Domein = BAR, Rsin = 987654321",
+                    "CatalogusConfig not found in target environment: Domein = 'BAR', Rsin = '987654321'",
                     # error from deserializing nested ZGW objects
                     "ERROR:open_inwoner.openzaak.import_export:"
-                    "ZaakTypeConfig not found in target environment: Identificatie = ztc-id-a-0, Catalogus domein = DM-0, Catalogus rsin = 123456789",
+                    "ZaakTypeConfig not found in target environment: Identificatie = 'ztc-id-a-0', Catalogus domein = 'DM-0', Catalogus rsin = '123456789'",
                 ],
             )
 
