@@ -184,15 +184,13 @@ class CatalogusConfigAdmin(admin.ModelAdmin):
                         error_msg_iterator = ([msg] for msg in msgs_deduped)
 
                         error_msg_html = format_html_join(
-                            "\n", "<li>{}</li>", error_msg_iterator
+                            "\n", "<p> - {}</p>", error_msg_iterator
                         )
-                        error_msg_html_ordered = format_html(
+                        error_msg_html = format_html(
                             _("It was not possible to import the following items:")
-                            + f"<ol> {error_msg_html} </ol>"
+                            + f"<div>{error_msg_html}</div>"
                         )
-                        self.message_user(
-                            request, error_msg_html_ordered, messages.ERROR
-                        )
+                        self.message_user(request, error_msg_html, messages.ERROR)
 
                     return HttpResponseRedirect(
                         reverse(
