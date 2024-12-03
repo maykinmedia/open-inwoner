@@ -76,23 +76,31 @@ class Zaak(ZGWModel):
             ("status.statustype.statustekst", "status.statustype.omschrijving"),
             default="",
         )
-        if self.einddatum and self.resultaat:
-            _status_text = glom_multiple(
-                self,
-                (
-                    "resultaat.resultaattype.naam",
-                    "resultaat.resultaattype.omschrijving",
-                    "resultaat.resultaattype.omschrijving_generiek",
-                    "resultaat.resultaattype.resultaattypeomschrijving",
-                ),
-                default="",
-            )
-        _status_text = _status_text or _("No data available")
 
-        return _status_text
+        return _status_text or _("No data available")
+
+    @property
+    def result_text(self) -> str:
+        if not self.einddatum or not self.resultaat:
+            return ""
+
+        _result_text = glom_multiple(
+            self,
+            (
+                "resultaat.resultaattype.naam",
+                "resultaat.resultaattype.omschrijving",
+                "resultaat.resultaattype.omschrijving_generiek",
+                "resultaat.resultaattype.resultaattypeomschrijving",
+            ),
+            default="",
+        )
+        return _result_text
 
     @property
     def description(self) -> str:
+        if isinstance(self.zaaktype, str):
+            return ""
+
         from open_inwoner.openzaak.models import OpenZaakConfig
 
         zaak_config = OpenZaakConfig.get_solo()
@@ -114,6 +122,7 @@ class Zaak(ZGWModel):
             "end_date": getattr(self, "einddatum", None),
             "description": self.description,
             "current_status": self.status_text,
+            "result": self.result_text,
             "zaaktype_config": getattr(self, "zaaktype_config", None),
             "statustype_config": getattr(self, "statustype_config", None),
             "case_type": "Zaak",

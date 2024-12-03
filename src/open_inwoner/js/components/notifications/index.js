@@ -93,6 +93,8 @@ export class Notification {
    */
   close() {
     this.node.parentElement.removeChild(this.node)
+    // Dispatch a custom event to notify other components that a notification has been closed
+    document.dispatchEvent(new CustomEvent('notificationClosed'))
   }
 
   /**

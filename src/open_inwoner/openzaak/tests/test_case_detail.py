@@ -28,10 +28,14 @@ from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory, eHerkenningUserFactory
 from open_inwoner.cms.cases.views.status import InnerCaseDetailView, SimpleFile
 from open_inwoner.openklant.api_models import ObjectContactMoment
-from open_inwoner.openklant.constants import Status as ContactMomentStatus
+from open_inwoner.openklant.constants import (
+    KlantenServiceType,
+    Status as ContactMomentStatus,
+)
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.openklant.services import eSuiteVragenService
-from open_inwoner.openklant.tests.factories import make_contactmoment
+from open_inwoner.openklant.tests.factories import make_question_from_contactmoment
+from open_inwoner.openklant.tests.mocks import MockOpenKlant2Service
 from open_inwoner.openzaak.constants import StatusIndicators
 from open_inwoner.openzaak.tests.factories import (
     ZaakTypeConfigFactory,
@@ -538,7 +542,7 @@ class TestCaseDetailView(
             registratiedatum="1971-07-17T20:15:07+00:00",
             type="SomeType",
             kanaal="Contactformulier",
-            status=ContactMomentStatus.afgehandeld,
+            status=str(ContactMomentStatus.afgehandeld.label),
             tekst="Garage verbouwen?",
             antwoord="Nee",
             onderwerp="e_suite_subject_code",
@@ -552,7 +556,8 @@ class TestCaseDetailView(
             registratiedatum="2024-09-27T03:39:28+00:00",
             type="SomeType",
             kanaal="MAIL",
-            status=ContactMomentStatus.afgehandeld,
+            status=str(ContactMomentStatus.afgehandeld.label),
+            tekst="Garage verbouwen?",
             antwoord="no",
             onderwerp="e_suite_subject_code",
         )
@@ -565,7 +570,8 @@ class TestCaseDetailView(
             registratiedatum="2024-09-27T03:39:28+00:00",
             type="SomeType",
             kanaal="Balie",
-            status=ContactMomentStatus.afgehandeld,
+            status=str(ContactMomentStatus.afgehandeld.label),
+            tekst="Garage verbouwen?",
             antwoord="no",
             onderwerp="e_suite_subject_code",
         )
@@ -899,6 +905,10 @@ class TestCaseDetailView(
         )
 
     @freeze_time("2021-01-12 17:00:00")
+    @patch(
+        "open_inwoner.cms.cases.views.status.OpenKlant2Service",
+        return_value=MockOpenKlant2Service(),
+    )
     @patch("open_inwoner.userfeed.hooks.case_status_seen", autospec=True)
     @patch("open_inwoner.userfeed.hooks.case_documents_seen", autospec=True)
     def test_status_is_retrieved_when_user_logged_in_via_digid(
@@ -906,6 +916,7 @@ class TestCaseDetailView(
         m,
         mock_hook_status: Mock,
         mock_hook_documents: Mock,
+        mock_openklant2_service,
     ):
         self.maxDiff = None
 
@@ -999,44 +1010,48 @@ class TestCaseDetailView(
                 "contact_form_enabled": False,
                 "new_docs": True,
                 "questions": [
-                    make_contactmoment(self.contactmoment_new),
-                    make_contactmoment(self.contactmoment_old),
+                    make_question_from_contactmoment(
+                        self.contactmoment_new,
+                        new_answer_available=True,
+                    ),
+                    MockOpenKlant2Service().retrieve_question()[0],
+                    make_question_from_contactmoment(self.contactmoment_old),
                 ],
             },
         )
-        self.assertTrue(case["questions"][0].new_answer_available)
-        self.assertFalse(case["questions"][1].new_answer_available)
 
         # check userfeed hooks
         mock_hook_status.assert_called_once()
         mock_hook_documents.assert_called_once()
 
-        # check question links (should be ordered by contactmoment: recent first)
+        # check question links (should be ordered by question: recent first)
         doc = PyQuery(response.text)
         links = doc.find(".contactmomenten__link")
 
-        self.assertEqual(len(links), 2)
-        self.assertEqual(
-            links[0].attrib["href"],
-            reverse(
-                "cases:kcm_redirect",
-                kwargs={"uuid": uuid_from_url(self.contactmoment_new["url"])},
-            ),
-        )
+        self.assertEqual(len(links), 3)
+        for link, question in zip(links, case["questions"]):
+            self.assertEqual(
+                link.attrib["href"],
+                reverse(
+                    "cases:kcm_redirect",
+                    kwargs={
+                        "uuid": question["api_source_uuid"],
+                    },
+                ),
+            )
 
         new_answer_headers = links.find(".card__status_indicator_text")
 
         self.assertEqual(len(new_answer_headers), 1)
         self.assertEqual(new_answer_headers[0].text, _("Nieuw antwoord beschikbaar"))
-        self.assertEqual(
-            links[1].attrib["href"],
-            reverse(
-                "cases:kcm_redirect",
-                kwargs={"uuid": uuid_from_url(self.contactmoment_old["url"])},
-            ),
-        )
 
-    def test_pass_endstatus_type_data_if_endstatus_not_reached(self, m):
+    @patch(
+        "open_inwoner.cms.cases.views.status.OpenKlant2Service",
+        return_value=MockOpenKlant2Service(),
+    )
+    def test_pass_endstatus_type_data_if_endstatus_not_reached(
+        self, m, mock_openklant2_service
+    ):
         self.maxDiff = None
 
         ZaakTypeStatusTypeConfigFactory.create(
@@ -1072,8 +1087,9 @@ class TestCaseDetailView(
 
         response = self.app.get(self.case_detail_url, user=self.user)
 
+        case = response.context.get("case")
         self.assertEqual(
-            response.context.get("case"),
+            case,
             {
                 "id": self.zaak["uuid"],
                 "identification": "ZAAK-2022-0000000024",
@@ -1121,39 +1137,30 @@ class TestCaseDetailView(
                 "contact_form_enabled": False,
                 "new_docs": False,
                 "questions": [
-                    make_contactmoment(self.contactmoment_new),
-                    make_contactmoment(self.contactmoment_balie),
-                    make_contactmoment(self.contactmoment_old),
+                    make_question_from_contactmoment(self.contactmoment_new),
+                    make_question_from_contactmoment(self.contactmoment_balie),
+                    MockOpenKlant2Service().retrieve_question()[0],
+                    make_question_from_contactmoment(self.contactmoment_old),
                 ],
             },
         )
 
-        # check question links (should be ordered by contactmoment: recent first)
+        # check question links (should be ordered by question: recent first)
         doc = PyQuery(response.text)
         links = doc.find(".contactmomenten__link")
 
-        self.assertEqual(len(links), 3)
-        self.assertEqual(
-            links[0].attrib["href"],
-            reverse(
-                "cases:kcm_redirect",
-                kwargs={"uuid": uuid_from_url(self.contactmoment_new["url"])},
-            ),
-        )
-        self.assertEqual(
-            links[1].attrib["href"],
-            reverse(
-                "cases:kcm_redirect",
-                kwargs={"uuid": uuid_from_url(self.contactmoment_balie["url"])},
-            ),
-        )
-        self.assertEqual(
-            links[2].attrib["href"],
-            reverse(
-                "cases:kcm_redirect",
-                kwargs={"uuid": uuid_from_url(self.contactmoment_old["url"])},
-            ),
-        )
+        self.assertEqual(len(links), 4)
+
+        for link, question in zip(links, case["questions"]):
+            self.assertEqual(
+                link.attrib["href"],
+                reverse(
+                    "cases:kcm_redirect",
+                    kwargs={
+                        "uuid": question["api_source_uuid"],
+                    },
+                ),
+            )
 
     def test_second_status_preview(self, m):
         """Unit test for `InnerCaseDetailView.get_second_status_preview`"""
@@ -1641,15 +1648,14 @@ class TestCaseDetailView(
                 )
 
     @set_kvk_branch_number_in_session("1234")
-    def test_no_access_as_vestiging_when_no_roles_are_found_for_user_kvk_or_rsin(
-        self, m
-    ):
+    def test_access_as_vestiging_when_only_role_for_vestiging(self, m):
         """
         Just having a role with betrokkeneType vestiging that matches for a case
-        is not sufficient to have access
+        is sufficient to have access.
         """
         self.client.force_login(user=self.eherkenning_user)
 
+        # Requires manually setting mocks to avoid default roles on case
         m.get(self.zaak["url"], json=self.zaak)
         m.get(self.zaaktype["url"], json=self.zaaktype)
         m.get(
@@ -1657,6 +1663,31 @@ class TestCaseDetailView(
             # no main branch roles for our user found
             json=paginated_response([self.eherkenning_user_role_kvk_vestiging]),
         )
+        m.get(f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak['url']}", json=[])
+        m.get(
+            f"{ZAKEN_ROOT}statussen?zaak={self.zaak['url']}",
+            json=paginated_response([self.status_new]),
+        )
+        m.get(
+            f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
+            json=self.status_new,
+        )
+        m.get(
+            f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten?object={self.zaak['url']}",
+            json=paginated_response([]),
+        )
+        m.get(
+            f"{CATALOGI_ROOT}statustypen?zaaktype={self.zaaktype['url']}",
+            json=paginated_response(
+                [
+                    self.status_type_new,
+                    self.status_type_finish,
+                ]
+            ),
+        )
+        m.get(self.status_type_new["url"], json=self.status_type_new)
+        m.get(self.result["url"], json=self.result)
+        m.get(self.resultaattype_with_naam["url"], json=self.resultaattype_with_naam)
 
         for fetch_eherkenning_zaken_with_rsin in [True, False]:
             with self.subTest(
@@ -1669,10 +1700,8 @@ class TestCaseDetailView(
 
                 response = self.client.get(self.case_detail_url)
 
-                self.assertTemplateUsed("pages/cases/403.html")
-                self.assertContains(
-                    response, _("Sorry, you don't have access to this page (403)")
-                )
+                self.assertEquals(response.status_code, 200)
+                self.assertContains(response, self.zaak["identificatie"])
 
     @set_kvk_branch_number_in_session("1234")
     def test_no_access_as_vestiging_when_no_roles_are_found_for_vestigingsnummer(
@@ -1710,6 +1739,7 @@ class TestCaseDetailView(
                     response, _("Sorry, you don't have access to this page (403)")
                 )
 
+    @set_kvk_branch_number_in_session(value=None)
     def test_no_access_if_fetch_eherkenning_zaken_with_rsin_and_user_has_no_rsin(
         self, m
     ):
@@ -2550,7 +2580,10 @@ class TestCaseDetailView(
             response,
             reverse(
                 "cases:contactmoment_detail",
-                kwargs={"kcm_uuid": uuid_from_url(klant_contactmoment["url"])},
+                kwargs={
+                    "api_service": KlantenServiceType.ESUITE.value,
+                    "kcm_uuid": uuid_from_url(klant_contactmoment["url"]),
+                },
             ),
             status_code=302,
             target_status_code=200,

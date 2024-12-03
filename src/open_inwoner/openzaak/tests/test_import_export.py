@@ -1,4 +1,6 @@
+import dataclasses
 import io
+import uuid
 
 from django.core.files.storage.memory import InMemoryStorage
 from django.test import TestCase
@@ -15,6 +17,7 @@ from open_inwoner.openzaak.models import (
     ZaakTypeStatusTypeConfig,
 )
 
+from ..import_export import ZGWImportError
 from .factories import (
     CatalogusConfigFactory,
     ServiceFactory,
@@ -27,9 +30,11 @@ from .factories import (
 
 class ZGWExportImportMockData:
     def __init__(self, count=0):
+        self.original_url = f"https://foo.{count}.maykinmedia.nl"
+        self.original_uuid = "a1591906-3368-470a-a957-4b8634c275a1"
         self.service = ServiceFactory(slug=f"service-{count}")
         self.catalogus = CatalogusConfigFactory(
-            url=f"https://foo.{count}.maykinmedia.nl",
+            url=self.original_url,
             domein=f"DM-{count}",
             rsin="123456789",
             service=self.service,
@@ -44,14 +49,14 @@ class ZGWExportImportMockData:
             contact_form_enabled=False,
             contact_subject_code="",
             relevante_zaakperiode=None,
-            urls=[f"https://foo.{count}.maykinmedia.nl"],
+            urls=[self.original_url],
         )
         self.ztc_status = ZaakTypeStatusTypeConfigFactory(
             zaaktype_config=self.ztc,
-            statustype_url=f"https://foo.{count}.maykinmedia.nl",
+            statustype_url=self.original_url,
             omschrijving="status omschrijving",
             statustekst="",
-            zaaktype_uuids=[],
+            zaaktype_uuids=[self.original_uuid],
             status_indicator="",
             status_indicator_text="",
             document_upload_description="",
@@ -65,15 +70,16 @@ class ZGWExportImportMockData:
         )
         self.ztc_resultaat = ZaakTypeResultaatTypeConfigFactory(
             zaaktype_config=self.ztc,
-            resultaattype_url=f"https://foo.{count}.maykinmedia.nl",
+            resultaattype_url=self.original_url,
             omschrijving="resultaat",
-            zaaktype_uuids=[],
+            zaaktype_uuids=[self.original_uuid],
             description="",
         )
         self.ztiotc = ZaakTypeInformatieObjectTypeConfigFactory(
             zaaktype_config=self.ztc,
-            informatieobjecttype_url=f"http://foo.{count}.maykinmedia.nl",
+            informatieobjecttype_url=self.original_url,
             omschrijving="informatieobject",
+            zaaktype_uuids=[self.original_uuid],
         )
 
 
@@ -115,9 +121,9 @@ class ExportObjectTests(TestCase):
             (
                 "catalogus_configs",
                 "zaak_type_configs",
-                "zaak_informatie_object_type_configs",
                 "zaak_status_type_configs",
                 "zaak_resultaat_type_configs",
+                "zaak_informatie_object_type_configs",
             ),
             (
                 "catalogus",
@@ -169,7 +175,7 @@ class TestCatalogusExport(TestCase):
                 "model": "openzaak.zaaktypeconfig",
                 "fields": {
                     "urls": '["https://foo.0.maykinmedia.nl"]',
-                    "catalogus": ["https://foo.0.maykinmedia.nl"],
+                    "catalogus": ["DM-0", "123456789"],
                     "identificatie": "ztc-id-a-0",
                     "omschrijving": "zaaktypeconfig",
                     "notify_status_changes": False,
@@ -184,10 +190,10 @@ class TestCatalogusExport(TestCase):
             {
                 "model": "openzaak.zaaktypeinformatieobjecttypeconfig",
                 "fields": {
-                    "zaaktype_config": ["ztc-id-a-0", "https://foo.0.maykinmedia.nl"],
-                    "informatieobjecttype_url": "http://foo.0.maykinmedia.nl",
+                    "zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"],
+                    "informatieobjecttype_url": "https://foo.0.maykinmedia.nl",
                     "omschrijving": "informatieobject",
-                    "zaaktype_uuids": "[]",
+                    "zaaktype_uuids": '["a1591906-3368-470a-a957-4b8634c275a1"]',
                     "document_upload_enabled": False,
                     "document_notification_enabled": False,
                 },
@@ -195,11 +201,11 @@ class TestCatalogusExport(TestCase):
             {
                 "model": "openzaak.zaaktypestatustypeconfig",
                 "fields": {
-                    "zaaktype_config": ["ztc-id-a-0", "https://foo.0.maykinmedia.nl"],
+                    "zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"],
                     "statustype_url": "https://foo.0.maykinmedia.nl",
                     "omschrijving": "status omschrijving",
                     "statustekst": "",
-                    "zaaktype_uuids": "[]",
+                    "zaaktype_uuids": '["a1591906-3368-470a-a957-4b8634c275a1"]',
                     "status_indicator": "",
                     "status_indicator_text": "",
                     "document_upload_description": "",
@@ -215,10 +221,10 @@ class TestCatalogusExport(TestCase):
             {
                 "model": "openzaak.zaaktyperesultaattypeconfig",
                 "fields": {
-                    "zaaktype_config": ["ztc-id-a-0", "https://foo.0.maykinmedia.nl"],
+                    "zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"],
                     "resultaattype_url": "https://foo.0.maykinmedia.nl",
                     "omschrijving": "resultaat",
-                    "zaaktype_uuids": "[]",
+                    "zaaktype_uuids": '["a1591906-3368-470a-a957-4b8634c275a1"]',
                     "description": "",
                 },
             },
@@ -237,21 +243,21 @@ class TestCatalogusExport(TestCase):
             "\n",
             '{"model": "openzaak.catalogusconfig", "fields": {"url": "https://foo.1.maykinmedia.nl", "domein": "DM-1", "rsin": "123456789", "service": ["service-1"]}}',
             "\n",
-            '{"model": "openzaak.zaaktypeconfig", "fields": {"urls": "[\\"https://foo.0.maykinmedia.nl\\"]", "catalogus": ["https://foo.0.maykinmedia.nl"], "identificatie": "ztc-id-a-0", "omschrijving": "zaaktypeconfig", "notify_status_changes": false, "description": "", "external_document_upload_url": "", "document_upload_enabled": false, "contact_form_enabled": false, "contact_subject_code": "", "relevante_zaakperiode": null}}',
+            '{"model": "openzaak.zaaktypeconfig", "fields": {"urls": "[\\"https://foo.0.maykinmedia.nl\\"]", "catalogus": ["DM-0", "123456789"], "identificatie": "ztc-id-a-0", "omschrijving": "zaaktypeconfig", "notify_status_changes": false, "description": "", "external_document_upload_url": "", "document_upload_enabled": false, "contact_form_enabled": false, "contact_subject_code": "", "relevante_zaakperiode": null}}',
             "\n",
-            '{"model": "openzaak.zaaktypeconfig", "fields": {"urls": "[\\"https://foo.1.maykinmedia.nl\\"]", "catalogus": ["https://foo.1.maykinmedia.nl"], "identificatie": "ztc-id-a-1", "omschrijving": "zaaktypeconfig", "notify_status_changes": false, "description": "", "external_document_upload_url": "", "document_upload_enabled": false, "contact_form_enabled": false, "contact_subject_code": "", "relevante_zaakperiode": null}}',
+            '{"model": "openzaak.zaaktypeconfig", "fields": {"urls": "[\\"https://foo.1.maykinmedia.nl\\"]", "catalogus": ["DM-1", "123456789"], "identificatie": "ztc-id-a-1", "omschrijving": "zaaktypeconfig", "notify_status_changes": false, "description": "", "external_document_upload_url": "", "document_upload_enabled": false, "contact_form_enabled": false, "contact_subject_code": "", "relevante_zaakperiode": null}}',
             "\n",
-            '{"model": "openzaak.zaaktypeinformatieobjecttypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "https://foo.0.maykinmedia.nl"], "informatieobjecttype_url": "http://foo.0.maykinmedia.nl", "omschrijving": "informatieobject", "zaaktype_uuids": "[]", "document_upload_enabled": false, "document_notification_enabled": false}}',
+            '{"model": "openzaak.zaaktypeinformatieobjecttypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "informatieobjecttype_url": "https://foo.0.maykinmedia.nl", "omschrijving": "informatieobject", "zaaktype_uuids": "[\\"a1591906-3368-470a-a957-4b8634c275a1\\"]", "document_upload_enabled": false, "document_notification_enabled": false}}',
             "\n",
-            '{"model": "openzaak.zaaktypeinformatieobjecttypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-1", "https://foo.1.maykinmedia.nl"], "informatieobjecttype_url": "http://foo.1.maykinmedia.nl", "omschrijving": "informatieobject", "zaaktype_uuids": "[]", "document_upload_enabled": false, "document_notification_enabled": false}}',
+            '{"model": "openzaak.zaaktypeinformatieobjecttypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-1", "DM-1", "123456789"], "informatieobjecttype_url": "https://foo.1.maykinmedia.nl", "omschrijving": "informatieobject", "zaaktype_uuids": "[\\"a1591906-3368-470a-a957-4b8634c275a1\\"]", "document_upload_enabled": false, "document_notification_enabled": false}}',
             "\n",
-            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "https://foo.0.maykinmedia.nl"], "statustype_url": "https://foo.0.maykinmedia.nl", "omschrijving": "status omschrijving", "statustekst": "", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": "", "description": "status", "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
+            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "statustype_url": "https://foo.0.maykinmedia.nl", "omschrijving": "status omschrijving", "statustekst": "", "zaaktype_uuids": "[\\"a1591906-3368-470a-a957-4b8634c275a1\\"]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": "", "description": "status", "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
             "\n",
-            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-1", "https://foo.1.maykinmedia.nl"], "statustype_url": "https://foo.1.maykinmedia.nl", "omschrijving": "status omschrijving", "statustekst": "", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": "", "description": "status", "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
+            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-1", "DM-1", "123456789"], "statustype_url": "https://foo.1.maykinmedia.nl", "omschrijving": "status omschrijving", "statustekst": "", "zaaktype_uuids": "[\\"a1591906-3368-470a-a957-4b8634c275a1\\"]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": "", "description": "status", "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
             "\n",
-            '{"model": "openzaak.zaaktyperesultaattypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "https://foo.0.maykinmedia.nl"], "resultaattype_url": "https://foo.0.maykinmedia.nl", "omschrijving": "resultaat", "zaaktype_uuids": "[]", "description": ""}}',
+            '{"model": "openzaak.zaaktyperesultaattypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "resultaattype_url": "https://foo.0.maykinmedia.nl", "omschrijving": "resultaat", "zaaktype_uuids": "[\\"a1591906-3368-470a-a957-4b8634c275a1\\"]", "description": ""}}',
             "\n",
-            '{"model": "openzaak.zaaktyperesultaattypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-1", "https://foo.1.maykinmedia.nl"], "resultaattype_url": "https://foo.1.maykinmedia.nl", "omschrijving": "resultaat", "zaaktype_uuids": "[]", "description": ""}}',
+            '{"model": "openzaak.zaaktyperesultaattypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-1", "DM-1", "123456789"], "resultaattype_url": "https://foo.1.maykinmedia.nl", "omschrijving": "resultaat", "zaaktype_uuids": "[\\"a1591906-3368-470a-a957-4b8634c275a1\\"]", "description": ""}}',
             "\n",
         ]
 
@@ -261,68 +267,300 @@ class TestCatalogusExport(TestCase):
 class TestCatalogusImport(TestCase):
     def setUp(self):
         self.storage = InMemoryStorage()
-        self.service = ServiceFactory(
-            slug="service-0", api_root="https://foo.0.maykinmedia.nl"
-        )
-        self.other_service = ServiceFactory(
-            slug="service-1", api_root="https://foo.1.maykinmedia.nl"
-        )
-
         self.json_lines = [
-            '{"model": "openzaak.catalogusconfig", "fields": {"url": "https://foo.0.maykinmedia.nl", "domein": "DM-0", "rsin": "123456789", "service": ["service-0"]}}',
-            '{"model": "openzaak.catalogusconfig", "fields": {"url": "https://foo.1.maykinmedia.nl", "domein": "DM-1", "rsin": "123456789", "service": ["service-1"]}}',
-            '{"model": "openzaak.zaaktypeconfig", "fields": {"urls": "[\\"https://foo.0.maykinmedia.nl\\"]", "catalogus": ["https://foo.0.maykinmedia.nl"], "identificatie": "ztc-id-a-0", "omschrijving": "zaaktypeconfig", "notify_status_changes": false, "description": "", "external_document_upload_url": "", "document_upload_enabled": false, "contact_form_enabled": false, "contact_subject_code": "", "relevante_zaakperiode": null}}',
-            '{"model": "openzaak.zaaktypeconfig", "fields": {"urls": "[\\"https://foo.1.maykinmedia.nl\\"]", "catalogus": ["https://foo.1.maykinmedia.nl"], "identificatie": "ztc-id-a-1", "omschrijving": "zaaktypeconfig", "notify_status_changes": false, "description": "", "external_document_upload_url": "", "document_upload_enabled": false, "contact_form_enabled": false, "contact_subject_code": "", "relevante_zaakperiode": null}}',
-            '{"model": "openzaak.zaaktypeinformatieobjecttypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "https://foo.0.maykinmedia.nl"], "informatieobjecttype_url": "http://foo.0.maykinmedia.nl", "omschrijving": "informatieobject", "zaaktype_uuids": "[]", "document_upload_enabled": false, "document_notification_enabled": false}}',
-            '{"model": "openzaak.zaaktypeinformatieobjecttypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-1", "https://foo.1.maykinmedia.nl"], "informatieobjecttype_url": "http://foo.1.maykinmedia.nl", "omschrijving": "informatieobject", "zaaktype_uuids": "[]", "document_upload_enabled": false, "document_notification_enabled": false}}',
-            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "https://foo.0.maykinmedia.nl"], "statustype_url": "https://foo.0.maykinmedia.nl", "omschrijving": "status omschrijving", "statustekst": "", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": "", "description": "status", "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
-            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-1", "https://foo.1.maykinmedia.nl"], "statustype_url": "https://foo.1.maykinmedia.nl", "omschrijving": "status omschrijving", "statustekst": "", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": "", "description": "status", "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
-            '{"model": "openzaak.zaaktyperesultaattypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "https://foo.0.maykinmedia.nl"], "resultaattype_url": "https://foo.0.maykinmedia.nl", "omschrijving": "resultaat", "zaaktype_uuids": "[]", "description": ""}}',
-            '{"model": "openzaak.zaaktyperesultaattypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-1", "https://foo.1.maykinmedia.nl"], "resultaattype_url": "https://foo.1.maykinmedia.nl", "omschrijving": "resultaat", "zaaktype_uuids": "[]", "description": ""}}',
+            '{"model": "openzaak.catalogusconfig", "fields": {"url": "https://bar.maykinmedia.nl", "domein": "DM-0", "rsin": "123456789", "service": ["service-0"]}}',
+            '{"model": "openzaak.zaaktypeconfig", "fields": {"urls": "[\\"https://bar.maykinmedia.nl\\"]", "catalogus": ["DM-0", "123456789"], "identificatie": "ztc-id-a-0", "omschrijving": "zaaktypeconfig", "notify_status_changes": false, "description": "", "external_document_upload_url": "", "document_upload_enabled": true, "contact_form_enabled": false, "contact_subject_code": "", "relevante_zaakperiode": null}}',
+            '{"model": "openzaak.zaaktypeinformatieobjecttypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "informatieobjecttype_url": "https://bar.maykinmedia.nl", "omschrijving": "informatieobject", "zaaktype_uuids": "[]", "document_upload_enabled": true, "document_notification_enabled": true}}',
+            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "statustype_url": "https://bar.maykinmedia.nl", "omschrijving": "status omschrijving", "statustekst": "statustekst nieuw", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": "", "description": "status", "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
+            '{"model": "openzaak.zaaktyperesultaattypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "resultaattype_url": "https://bar.maykinmedia.nl", "omschrijving": "resultaat", "zaaktype_uuids": "[]", "description": "description new"}}',
+        ]
+        self.json_dupes = [
+            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "statustype_url": "https://bar.maykinmedia.nl", "omschrijving": "status omschrijving", "statustekst": "statustekst nieuw", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": "", "description": "status", "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
         ]
         self.jsonl = "\n".join(self.json_lines)
+        self.jsonl_with_dupes = "\n".join(self.json_lines + self.json_dupes)
 
-    def test_import_jsonl_creates_objects(self):
+    def test_import_jsonl_update_success(self):
+        mocks = ZGWExportImportMockData()
         self.storage.save("import.jsonl", io.StringIO(self.jsonl))
 
         import_result = CatalogusConfigImport.import_from_jsonl_file_in_django_storage(
             "import.jsonl", self.storage
         )
+
+        # check import
         self.assertEqual(
             import_result,
             CatalogusConfigImport(
-                total_rows_processed=10,
-                catalogus_configs_imported=2,
-                zaaktype_configs_imported=2,
-                zaak_inormatie_object_type_configs_imported=2,
-                zaak_status_type_configs_imported=2,
-                zaak_resultaat_type_configs_imported=2,
+                total_rows_processed=5,
+                catalogus_configs_imported=1,
+                zaaktype_configs_imported=1,
+                zaak_informatie_object_type_configs_imported=1,
+                zaak_status_type_configs_imported=1,
+                zaak_resultaat_type_configs_imported=1,
+                import_errors=[],
             ),
         )
 
-        self.assertEqual(CatalogusConfig.objects.count(), 2)
-        self.assertEqual(ZaakTypeConfig.objects.count(), 2)
-        self.assertEqual(ZaakTypeInformatieObjectTypeConfig.objects.count(), 2)
-        self.assertEqual(ZaakTypeStatusTypeConfig.objects.count(), 2)
-        self.assertEqual(ZaakTypeResultaatTypeConfig.objects.count(), 2)
+        # check number of configs
+        self.assertEqual(CatalogusConfig.objects.count(), 1)
+        self.assertEqual(ZaakTypeConfig.objects.count(), 1)
+        self.assertEqual(ZaakTypeInformatieObjectTypeConfig.objects.count(), 1)
+        self.assertEqual(ZaakTypeStatusTypeConfig.objects.count(), 1)
+        self.assertEqual(ZaakTypeResultaatTypeConfig.objects.count(), 1)
 
-    def test_import_jsonl_merges_objects(self):
+        catalogus_config = CatalogusConfig.objects.get()
+        zt_config = ZaakTypeConfig.objects.get()
+        zt_informatie_objecttype_config = (
+            ZaakTypeInformatieObjectTypeConfig.objects.get()
+        )
+        zt_statustype_config = ZaakTypeStatusTypeConfig.objects.get()
+        zt_resultaattype_config = ZaakTypeResultaatTypeConfig.objects.get()
+
+        # check that urls are not overridden
+        self.assertEqual(catalogus_config.url, mocks.original_url)
+        self.assertEqual(zt_config.urls, [mocks.original_url])
+        self.assertEqual(
+            zt_informatie_objecttype_config.informatieobjecttype_url,
+            mocks.original_url,
+        )
+        self.assertEqual(zt_statustype_config.statustype_url, mocks.original_url)
+        self.assertEqual(zt_resultaattype_config.resultaattype_url, mocks.original_url)
+
+        # check that zaaktype uuids are not overridden
+        self.assertEqual(
+            zt_informatie_objecttype_config.zaaktype_uuids,
+            [uuid.UUID(mocks.original_uuid)],
+        )
+        self.assertEqual(
+            zt_statustype_config.zaaktype_uuids, [uuid.UUID(mocks.original_uuid)]
+        )
+        self.assertEqual(
+            zt_resultaattype_config.zaaktype_uuids, [uuid.UUID(mocks.original_uuid)]
+        )
+
+        # check updated content
+        zaaktype_statustype_config = ZaakTypeStatusTypeConfig.objects.get()
+        self.assertEqual(zaaktype_statustype_config.statustekst, "statustekst nieuw")
+        self.assertEqual(zaaktype_statustype_config.notify_status_change, True)
+
+        zaaktype_resultaattype_config = ZaakTypeResultaatTypeConfig.objects.get()
+        self.assertEqual(zaaktype_resultaattype_config.description, "description new")
+
+        zaaktype_informatie_objecttype_config = (
+            ZaakTypeInformatieObjectTypeConfig.objects.get()
+        )
+        self.assertEqual(
+            zaaktype_informatie_objecttype_config.document_upload_enabled, True
+        )
+        self.assertEqual(
+            zaaktype_informatie_objecttype_config.document_notification_enabled, True
+        )
+
+    def test_import_jsonl_missing_statustype_config(self):
+        ZGWExportImportMockData()
+
+        # missing ZaakTypeStatusTypeConfig
+        json_line_extra = [
+            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "statustype_url": "https://foo.0.maykinmedia.nl", "omschrijving": "bogus", "statustekst": "bogus", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": "", "description": "status", "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
+        ]
+        json_lines = "\n".join(self.json_lines + json_line_extra)
+
+        self.storage.save("import.jsonl", io.StringIO(json_lines))
+
+        # we use `asdict` and replace the Exceptions with string representations
+        # because for Exceptions raised from within dataclasses, equality ==/is identity
+        import_result = dataclasses.asdict(
+            CatalogusConfigImport.import_from_jsonl_file_in_django_storage(
+                "import.jsonl", self.storage
+            )
+        )
+        expected_error = ZGWImportError(
+            "ZaakTypeStatusTypeConfig not found in target environment: omschrijving = 'bogus', "
+            "ZaakTypeConfig identificatie = 'ztc-id-a-0'"
+        )
+        import_expected = dataclasses.asdict(
+            CatalogusConfigImport(
+                total_rows_processed=6,
+                catalogus_configs_imported=1,
+                zaaktype_configs_imported=1,
+                zaak_informatie_object_type_configs_imported=1,
+                zaak_status_type_configs_imported=1,
+                zaak_resultaat_type_configs_imported=1,
+                import_errors=[expected_error],
+            ),
+        )
+        import_result["import_errors"][0] = str(import_result["import_errors"][0])
+        import_expected["import_errors"][0] = str(import_expected["import_errors"][0])
+
+        # check import
+        self.assertEqual(import_result, import_expected)
+
+        # check number of configs
+        self.assertEqual(CatalogusConfig.objects.count(), 1)
+        self.assertEqual(ZaakTypeConfig.objects.count(), 1)
+        self.assertEqual(ZaakTypeInformatieObjectTypeConfig.objects.count(), 1)
+        self.assertEqual(ZaakTypeStatusTypeConfig.objects.count(), 1)
+        self.assertEqual(ZaakTypeResultaatTypeConfig.objects.count(), 1)
+
+    def test_import_jsonl_update_statustype_config_missing_zt_config(self):
+        ZGWExportImportMockData()
+
+        # import fails due to missing ZaakTypeConfig
+        json_line_extra = [
+            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["bogus", "DM-1", "666666666"], "statustype_url": "https://foo.1.maykinmedia.nl", "omschrijving": "status omschrijving", "statustekst": "", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": "", "description": "status", "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
+        ]
+        json_lines = "\n".join(self.json_lines + json_line_extra)
+
+        self.storage.save("import.jsonl", io.StringIO(json_lines))
+
+        # we use `asdict` and replace the Exceptions with string representations
+        # because for Exceptions raised from within dataclasses, equality ==/is identity
+        import_result = dataclasses.asdict(
+            CatalogusConfigImport.import_from_jsonl_file_in_django_storage(
+                "import.jsonl", self.storage
+            )
+        )
+        expected_error = ZGWImportError(
+            "ZaakTypeStatusTypeConfig not found in target environment: omschrijving = 'status omschrijving', "
+            "ZaakTypeConfig identificatie = 'bogus'"
+        )
+        import_expected = dataclasses.asdict(
+            CatalogusConfigImport(
+                total_rows_processed=6,
+                catalogus_configs_imported=1,
+                zaaktype_configs_imported=1,
+                zaak_informatie_object_type_configs_imported=1,
+                zaak_status_type_configs_imported=1,
+                zaak_resultaat_type_configs_imported=1,
+                import_errors=[expected_error],
+            ),
+        )
+        import_result["import_errors"][0] = str(import_result["import_errors"][0])
+        import_expected["import_errors"][0] = str(import_expected["import_errors"][0])
+
+        # check import
+        self.assertEqual(import_result, import_expected)
+
+        # check number of configs
+        self.assertEqual(CatalogusConfig.objects.count(), 1)
+        self.assertEqual(ZaakTypeConfig.objects.count(), 1)
+        self.assertEqual(ZaakTypeInformatieObjectTypeConfig.objects.count(), 1)
+        self.assertEqual(ZaakTypeStatusTypeConfig.objects.count(), 1)
+        self.assertEqual(ZaakTypeResultaatTypeConfig.objects.count(), 1)
+
+    def test_import_jsonl_update_reports_duplicate_db_records(self):
+        mocks = ZGWExportImportMockData()
+
+        ZaakTypeResultaatTypeConfigFactory(
+            resultaattype_url=mocks.ztc_resultaat.resultaattype_url,
+            zaaktype_config=mocks.ztc_resultaat.zaaktype_config,
+            omschrijving=mocks.ztc_resultaat.omschrijving,
+            description=mocks.ztc_resultaat.description,
+        )
+        self.storage.save("import.jsonl", io.StringIO(self.jsonl))
+
+        # we use `asdict` and replace the Exceptions with string representations
+        # because for Exceptions raised from within dataclasses, equality ==/is identity
+        import_result = dataclasses.asdict(
+            CatalogusConfigImport.import_from_jsonl_file_in_django_storage(
+                "import.jsonl", self.storage
+            )
+        )
+        expected_error = ZGWImportError(
+            "Got multiple results for ZaakTypeResultaatTypeConfig: omschrijving = 'resultaat', "
+            "ZaakTypeConfig identificatie = 'ztc-id-a-0'"
+        )
+        import_expected = dataclasses.asdict(
+            CatalogusConfigImport(
+                total_rows_processed=5,
+                catalogus_configs_imported=1,
+                zaaktype_configs_imported=1,
+                zaak_informatie_object_type_configs_imported=1,
+                zaak_status_type_configs_imported=1,
+                zaak_resultaat_type_configs_imported=0,
+                import_errors=[expected_error],
+            ),
+        )
+        import_result["import_errors"][0] = str(import_result["import_errors"][0])
+        import_expected["import_errors"][0] = str(import_expected["import_errors"][0])
+
+        # check import
+        self.assertEqual(import_result, import_expected)
+
+    def test_import_jsonl_update_reports_duplicate_natural_keys_in_upload_file(self):
+        mocks = ZGWExportImportMockData()
+
+        self.storage.save("import.jsonl", io.StringIO(self.jsonl_with_dupes))
+
+        # we use `asdict` and replace the Exceptions with string representations
+        # because for Exceptions raised from within dataclasses, equality ==/is identity
+        import_result = dataclasses.asdict(
+            CatalogusConfigImport.import_from_jsonl_file_in_django_storage(
+                "import.jsonl", self.storage
+            )
+        )
+        expected_error = ZGWImportError(
+            "ZaakTypeStatusTypeConfig was processed multiple times because it contains duplicate "
+            "natural keys: omschrijving = 'status omschrijving', ZaakTypeConfig identificatie = 'ztc-id-a-0'"
+        )
+        import_expected = dataclasses.asdict(
+            CatalogusConfigImport(
+                total_rows_processed=6,
+                catalogus_configs_imported=1,
+                zaaktype_configs_imported=1,
+                zaak_informatie_object_type_configs_imported=1,
+                zaak_status_type_configs_imported=1,
+                zaak_resultaat_type_configs_imported=1,
+                import_errors=[expected_error],
+            ),
+        )
+        import_result["import_errors"][0] = str(import_result["import_errors"][0])
+        import_expected["import_errors"][0] = str(import_expected["import_errors"][0])
+
+        # check import
+        self.assertEqual(import_result, import_expected)
+
+    def test_import_jsonl_fails_with_catalogus_domein_rsin_mismatch(self):
+        service = ServiceFactory(slug="service-0")
         CatalogusConfigFactory(
             url="https://foo.0.maykinmedia.nl",
             domein="FOO",
             rsin="123456789",
-            service=self.service,
+            service=service,
         )
-        merge_line = '{"model": "openzaak.catalogusconfig", "fields": {"url": "https://foo.0.maykinmedia.nl", "domein": "BAR", "rsin": "987654321", "service": ["service-0"]}}'
+        import_lines = [
+            '{"model": "openzaak.catalogusconfig", "fields": {"url": "https://foo.0.maykinmedia.nl", "domein": "BAR", "rsin": "987654321", "service": ["service-0"]}}',
+            '{"model": "openzaak.zaaktypeconfig", "fields": {"urls": "[\\"https://foo.0.maykinmedia.nl\\"]", "catalogus": ["DM-0", "123456789"], "identificatie": "ztc-id-a-0", "omschrijving": "zaaktypeconfig", "notify_status_changes": false, "description": "", "external_document_upload_url": "", "document_upload_enabled": false, "contact_form_enabled": false, "contact_subject_code": "", "relevante_zaakperiode": null}}',
+        ]
+        import_line = "\n".join(import_lines)
 
-        import_result = CatalogusConfigImport.from_jsonl_stream_or_string(merge_line)
+        with self.assertLogs(
+            logger="open_inwoner.openzaak.import_export", level="ERROR"
+        ) as cm:
+            import_result = CatalogusConfigImport.from_jsonl_stream_or_string(
+                import_line
+            )
+            self.assertEqual(
+                cm.output,
+                [
+                    # error from trying to load existing CatalogusConfig
+                    "ERROR:open_inwoner.openzaak.import_export:"
+                    "CatalogusConfig not found in target environment: Domein = 'BAR', Rsin = '987654321'",
+                    # error from deserializing nested ZGW objects
+                    "ERROR:open_inwoner.openzaak.import_export:"
+                    "ZaakTypeConfig not found in target environment: Identificatie = 'ztc-id-a-0', Catalogus domein = 'DM-0', Catalogus rsin = '123456789'",
+                ],
+            )
 
-        self.assertEqual(import_result.catalogus_configs_imported, 1)
-        self.assertEqual(import_result.total_rows_processed, 1)
+        self.assertEqual(CatalogusConfig.objects.count(), 1)
+
+        self.assertEqual(import_result.catalogus_configs_imported, 0)
+        self.assertEqual(import_result.total_rows_processed, 2)
 
         self.assertEqual(
             list(CatalogusConfig.objects.values_list("url", "domein", "rsin")),
-            [("https://foo.0.maykinmedia.nl", "BAR", "987654321")],
+            [("https://foo.0.maykinmedia.nl", "FOO", "123456789")],
             msg="Value of sole CatalogusConfig matches imported values, not original values",
         )
 
@@ -332,6 +570,8 @@ class TestCatalogusImport(TestCase):
                 CatalogusConfigImport.from_jsonl_stream_or_string(bad_type)
 
     def test_valid_input_types_are_accepted(self):
+        ZGWExportImportMockData()
+
         for input in (
             io.StringIO(self.jsonl),
             io.BytesIO(self.jsonl.encode("utf-8")),
@@ -342,31 +582,24 @@ class TestCatalogusImport(TestCase):
                 self.assertEqual(
                     import_result,
                     CatalogusConfigImport(
-                        total_rows_processed=10,
-                        catalogus_configs_imported=2,
-                        zaaktype_configs_imported=2,
-                        zaak_inormatie_object_type_configs_imported=2,
-                        zaak_status_type_configs_imported=2,
-                        zaak_resultaat_type_configs_imported=2,
+                        total_rows_processed=5,
+                        catalogus_configs_imported=1,
+                        zaaktype_configs_imported=1,
+                        zaak_informatie_object_type_configs_imported=1,
+                        zaak_status_type_configs_imported=1,
+                        zaak_resultaat_type_configs_imported=1,
+                        import_errors=[],
                     ),
                 )
-
-                self.assertEqual(CatalogusConfig.objects.count(), 2)
-                self.assertEqual(ZaakTypeConfig.objects.count(), 2)
-                self.assertEqual(ZaakTypeInformatieObjectTypeConfig.objects.count(), 2)
-                self.assertEqual(ZaakTypeStatusTypeConfig.objects.count(), 2)
-                self.assertEqual(ZaakTypeResultaatTypeConfig.objects.count(), 2)
 
     def test_import_is_atomic(self):
         bad_line = '{"model": "openzaak.zaaktyperesultaattypeconfig", "fields": {}}\n'
         bad_jsonl = self.jsonl + "\n" + bad_line
 
-        try:
+        with self.assertRaises(KeyError):
             CatalogusConfigImport.from_jsonl_stream_or_string(
                 stream_or_string=bad_jsonl
             )
-        except Exception:
-            pass
 
         counts = (
             CatalogusConfig.objects.count(),
@@ -376,137 +609,6 @@ class TestCatalogusImport(TestCase):
             ZaakTypeResultaatTypeConfig.objects.count(),
         )
         expected_counts = (0, 0, 0, 0, 0)
-
-        self.assertEqual(
-            counts,
-            expected_counts,
-            msg="Import should have merged, and not created new values",
-        )
-
-
-class RewriteUrlsImportTests(TestCase):
-    def setUp(self):
-        self.service = ServiceFactory(
-            slug="constant-api-slug", api_root="http://one.maykinmedia.nl"
-        )
-
-        import_lines = [
-            '{"model": "openzaak.catalogusconfig", "fields": {"url": "http://one.maykinmedia.nl/catalogus/1", "domein": "ALLE", "rsin": "1234568", "service": ["constant-api-slug"]}}',
-            '{"model": "openzaak.zaaktypeconfig", "fields": {"urls": "[\\"http://one.maykinmedia.nl/types/1\\", \\"http://one.maykinmedia.nl/types/2\\"]", "catalogus": ["http://one.maykinmedia.nl/catalogus/1"], "identificatie": "zt-1", "omschrijving": "iGsHCEkCpEJyDLeAaytskGiAXSAPVVthCvOdbNdpZZcCciXFnZGltXFYsYigSkIZiaqMEvSPftMgIYyW", "notify_status_changes": false, "description": "", "external_document_upload_url": "", "document_upload_enabled": false, "contact_form_enabled": false, "contact_subject_code": "", "relevante_zaakperiode": null}}',
-            '{"model": "openzaak.zaaktypeinformatieobjecttypeconfig", "fields": {"zaaktype_config": ["zt-1", "http://one.maykinmedia.nl/catalogus/1"], "informatieobjecttype_url": "http://one.maykinmedia.nl/iotype/1", "omschrijving": "IzNqfWpVpbyMEjSXTqQUlslqAUYFdILFlSDAelAkfTROWptqgIRCmaIoWCBMBAozsJLWxGoJqmBLPCHy", "zaaktype_uuids": "[]", "document_upload_enabled": false, "document_notification_enabled": false}}',
-            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["zt-1", "http://one.maykinmedia.nl/catalogus/1"], "statustype_url": "http://one.maykinmedia.nl/status-type/1", "omschrijving": "BHEJLQkSTdMPGtSzgnIbIdhMvFiNOBHmFQkRvLxHUkmafelprqCpcuAZzqMWBLgqNkGmXpzWPjhWqKjk", "statustekst": "", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": "", "description": "", "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
-            '{"model": "openzaak.zaaktyperesultaattypeconfig", "fields": {"zaaktype_config": ["zt-1", "http://one.maykinmedia.nl/catalogus/1"], "resultaattype_url": "http://one.maykinmedia.nl/resultaat-type/1", "omschrijving": "", "zaaktype_uuids": "[]", "description": ""}}',
-        ]
-        self.jsonl = "\n".join(import_lines)
-
-    def _create_fixtures(self, base_url: str):
-        catalogus = CatalogusConfigFactory(
-            url=f"{base_url}/catalogus/1",
-            service=self.service,
-            domein="ALLE",
-            rsin="1234568",
-        )
-        zt = ZaakTypeConfigFactory(
-            catalogus=catalogus,
-            identificatie="zt-1",
-            urls=[
-                f"{base_url}/types/1",
-                f"{base_url}/types/2",
-            ],
-        )
-        ZaakTypeInformatieObjectTypeConfigFactory(
-            zaaktype_config=zt,
-            informatieobjecttype_url=f"{base_url}/iotype/1",
-        )
-        ZaakTypeStatusTypeConfigFactory(
-            zaaktype_config=zt, statustype_url=f"{base_url}/status-type/1"
-        )
-        ZaakTypeResultaatTypeConfigFactory(
-            zaaktype_config=zt,
-            resultaattype_url=f"{base_url}/resultaat-type/1",
-        )
-
-    def test_jsonl_url_rewrite(self):
-        self.service.api_root = "http://two.maykinmedia.nl"
-        self.service.save()
-
-        rewritten_lines = list(
-            CatalogusConfigImport._rewrite_jsonl_url_references(self.jsonl)
-        )
-        expected_lines = [
-            '{"model": "openzaak.catalogusconfig", "fields": {"url": "http://two.maykinmedia.nl/catalogus/1", "domein": "ALLE", "rsin": "1234568", "service": ["constant-api-slug"]}}',
-            '{"model": "openzaak.zaaktypeconfig", "fields": {"urls": "[\\"http://two.maykinmedia.nl/types/1\\", \\"http://two.maykinmedia.nl/types/2\\"]", "catalogus": ["http://two.maykinmedia.nl/catalogus/1"], "identificatie": "zt-1", "omschrijving": "iGsHCEkCpEJyDLeAaytskGiAXSAPVVthCvOdbNdpZZcCciXFnZGltXFYsYigSkIZiaqMEvSPftMgIYyW", "notify_status_changes": false, "description": "", "external_document_upload_url": "", "document_upload_enabled": false, "contact_form_enabled": false, "contact_subject_code": "", "relevante_zaakperiode": null}}',
-            '{"model": "openzaak.zaaktypeinformatieobjecttypeconfig", "fields": {"zaaktype_config": ["zt-1", "http://two.maykinmedia.nl/catalogus/1"], "informatieobjecttype_url": "http://two.maykinmedia.nl/iotype/1", "omschrijving": "IzNqfWpVpbyMEjSXTqQUlslqAUYFdILFlSDAelAkfTROWptqgIRCmaIoWCBMBAozsJLWxGoJqmBLPCHy", "zaaktype_uuids": "[]", "document_upload_enabled": false, "document_notification_enabled": false}}',
-            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["zt-1", "http://two.maykinmedia.nl/catalogus/1"], "statustype_url": "http://two.maykinmedia.nl/status-type/1", "omschrijving": "BHEJLQkSTdMPGtSzgnIbIdhMvFiNOBHmFQkRvLxHUkmafelprqCpcuAZzqMWBLgqNkGmXpzWPjhWqKjk", "statustekst": "", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": "", "description": "", "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
-            '{"model": "openzaak.zaaktyperesultaattypeconfig", "fields": {"zaaktype_config": ["zt-1", "http://two.maykinmedia.nl/catalogus/1"], "resultaattype_url": "http://two.maykinmedia.nl/resultaat-type/1", "omschrijving": "", "zaaktype_uuids": "[]", "description": ""}}',
-        ]
-
-        self.assertEqual(
-            rewritten_lines,
-            expected_lines,
-            msg="All URLs should be rewritten to match the target service root",
-        )
-
-    def test_rewrite_target_diverges_from_existing_objects(self):
-        self._create_fixtures("http://one.maykinmedia.nl/")
-        self.service.api_root = "http://two.maykinmedia.nl"
-        self.service.save()
-
-        import_result = CatalogusConfigImport.from_jsonl_stream_or_string(self.jsonl)
-
-        self.assertEqual(
-            import_result,
-            CatalogusConfigImport(
-                total_rows_processed=5,
-                catalogus_configs_imported=1,
-                zaaktype_configs_imported=1,
-                zaak_inormatie_object_type_configs_imported=1,
-                zaak_status_type_configs_imported=1,
-                zaak_resultaat_type_configs_imported=1,
-            ),
-        )
-
-        counts = (
-            CatalogusConfig.objects.count(),
-            ZaakTypeConfig.objects.count(),
-            ZaakTypeInformatieObjectTypeConfig.objects.count(),
-            ZaakTypeStatusTypeConfig.objects.count(),
-            ZaakTypeResultaatTypeConfig.objects.count(),
-        )
-        expected_counts = (2, 2, 2, 2, 2)
-
-        self.assertEqual(
-            counts,
-            expected_counts,
-            msg="Import should have merged, and not created new values",
-        )
-
-    def test_rewrite_target_matches_from_existing_objects(self):
-        self.service.api_root = "http://two.maykinmedia.nl"
-        self.service.save()
-        self._create_fixtures("http://two.maykinmedia.nl")
-
-        import_result = CatalogusConfigImport.from_jsonl_stream_or_string(self.jsonl)
-        self.assertEqual(
-            import_result,
-            CatalogusConfigImport(
-                total_rows_processed=5,
-                catalogus_configs_imported=1,
-                zaaktype_configs_imported=1,
-                zaak_inormatie_object_type_configs_imported=1,
-                zaak_status_type_configs_imported=1,
-                zaak_resultaat_type_configs_imported=1,
-            ),
-        )
-
-        counts = (
-            CatalogusConfig.objects.count(),
-            ZaakTypeConfig.objects.count(),
-            ZaakTypeInformatieObjectTypeConfig.objects.count(),
-            ZaakTypeStatusTypeConfig.objects.count(),
-            ZaakTypeResultaatTypeConfig.objects.count(),
-        )
-        expected_counts = (1, 1, 1, 1, 1)
 
         self.assertEqual(
             counts,

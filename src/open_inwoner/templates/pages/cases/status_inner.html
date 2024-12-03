@@ -71,7 +71,7 @@
 
             {# Questions/contactmomenten #}
             {% if case.questions %}
-                {% include "pages/questions/questions.html" with questions=case.questions only %}
+                {% include "pages/partials/questions.html" with questions=case.questions only %}
                 {% if case.questions|length > 3 %}
                     <div class="expand">
                         <a id="toggle-hide-elements" class="button button--textless button--icon button--icon-after button--secondary button--transparent" data-label-reveal="{% trans 'Toon alle vragen' %}" data-label-collapse="{% trans 'Toon minder' %}" data-label-num-elems={{ case.questions|length }} aria-expanded=false>

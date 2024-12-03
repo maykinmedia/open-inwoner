@@ -10,6 +10,7 @@ from django.http import HttpResponseRedirect, StreamingHttpResponse
 from django.template.defaultfilters import filesizeformat
 from django.template.response import TemplateResponse
 from django.urls import path, reverse
+from django.utils.html import format_html, format_html_join
 from django.utils.translation import gettext_lazy as _, ngettext
 
 from import_export.admin import ImportExportMixin
@@ -174,11 +175,28 @@ class CatalogusConfigAdmin(admin.ModelAdmin):
                     self.message_user(
                         request,
                         _(
-                            "Successfully processed %(num_rows)d items"
-                            % {"num_rows": import_result.total_rows_processed}
+                            "%(num_rows)d item(s) processed in total, with %(error_rows)d failing row(s)."
+                            % {
+                                "num_rows": import_result.total_rows_processed,
+                                "error_rows": len(import_result.import_errors),
+                            }
                         ),
-                        messages.SUCCESS,
+                        messages.SUCCESS
+                        if not import_result.import_errors
+                        else messages.WARNING,
                     )
+                    if errors := import_result.import_errors:
+                        msgs_deduped = set(error.__str__() for error in errors)
+                        error_msg_iterator = ([msg] for msg in msgs_deduped)
+
+                        error_msg_html = format_html_join(
+                            "\n", "<p> - {}</p>", error_msg_iterator
+                        )
+                        error_msg_html = format_html(
+                            _("It was not possible to import the following items:")
+                            + f"<div>{error_msg_html}</div>"
+                        )
+                        self.message_user(request, error_msg_html, messages.ERROR)
 
                     return HttpResponseRedirect(
                         reverse(

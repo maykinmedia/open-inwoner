@@ -739,6 +739,10 @@ CELERY_BEAT_SCHEDULE = {
             "channel": "email",
         },
     },
+    "Opschonen uitgaande request-logs": {
+        "task": "log_outgoing_requests.tasks.prune_logs",
+        "schedule": crontab(hour=0, minute=0),
+    },
 }
 
 # Only ACK when the task has been executed. This prevents tasks from getting lost, with

@@ -346,6 +346,7 @@ class CaseListMocks:
             startdatum="2021-07-26",
             einddatum="2022-01-16",
             status=f"{zaken_root}statussen/98659876-bbb3-476a-ad13-n3nvcght758js",
+            resultaat=f"{zaken_root}resultaten/3da81560-c7fc-476a-ad13-beu760sle929",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
         )
         self.status3 = generate_oas_component_cached(
@@ -422,7 +423,6 @@ class CaseListMocks:
                 furl(f"{self.zaken_root}zaken")
                 .add(
                     {
-                        "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId": identifier,
                         "maximaleVertrouwelijkheidaanduiding": VertrouwelijkheidsAanduidingen.beperkt_openbaar,
                         "rol__betrokkeneIdentificatie__vestiging__vestigingsNummer": "1234",
                     }
@@ -532,6 +532,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                         "identification": mock.zaak2["identificatie"],
                         "description": mock.zaaktype["omschrijving"],
                         "current_status": mock.status_type_initial["omschrijving"],
+                        "result": "",
                         "zaaktype_config": mock.zaaktype_config1,
                         "statustype_config": mock.zt_statustype_config1,
                         "case_type": "Zaak",
@@ -546,6 +547,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                         "identification": mock.zaak1["identificatie"],
                         "description": mock.zaaktype["omschrijving"],
                         "current_status": mock.status_type_initial["omschrijving"],
+                        "result": "",
                         "zaaktype_config": mock.zaaktype_config1,
                         "statustype_config": mock.zt_statustype_config1,
                         "case_type": "Zaak",
@@ -562,6 +564,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                         "identification": mock.zaak3["identificatie"],
                         "description": mock.zaaktype["omschrijving"],
                         "current_status": mock.status_type_finish["statustekst"],
+                        "result": mock.resultaat_type["omschrijving"],
                         "zaaktype_config": mock.zaaktype_config1,
                         "statustype_config": None,
                         "case_type": "Zaak",
@@ -575,8 +578,8 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                         "end_date": datetime.date(2022, 1, 13),
                         "identification": mock.zaak_result["identificatie"],
                         "description": mock.zaaktype["omschrijving"],
-                        # use result here
-                        "current_status": mock.resultaat_type["omschrijving"],
+                        "current_status": mock.status_type_initial["omschrijving"],
+                        "result": mock.resultaat_type["omschrijving"],
                         "zaaktype_config": mock.zaaktype_config1,
                         "statustype_config": mock.zt_statustype_config1,
                         "case_type": "Zaak",
@@ -584,6 +587,8 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                     },
                 ]
             )
+
+        cases = response.context["cases"]
 
         self.assertListEqual(response.context["cases"], expected_cases)
         # don't show internal cases
@@ -613,6 +618,15 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
 
         # case filter form is disabled by default
         self.assertFalse(response.context.get("filter_form_enabled"))
+
+        # check status/result label
+        doc = PQ(response.content)
+
+        status_labels = doc.find(".list-item__caption:Contains('Status')")
+        result_labels = doc.find(".list-item__caption:Contains('Resultaat')")
+
+        self.assertEqual(len(status_labels), 4)
+        self.assertEqual(len(result_labels), 4)
 
     def test_filter_widget_is_controlled_by_zaken_filter_enabled(self, m):
         self.client.force_login(user=self.user)
@@ -718,6 +732,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                                 "current_status": mock.status_type_initial[
                                     "omschrijving"
                                 ],
+                                "result": "",
                                 "zaaktype_config": mock.zaaktype_config1,
                                 "statustype_config": mock.zt_statustype_config1,
                                 "case_type": "Zaak",
@@ -736,6 +751,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                                 "current_status": mock.status_type_initial[
                                     "omschrijving"
                                 ],
+                                "result": "",
                                 "zaaktype_config": mock.zaaktype_config1,
                                 "statustype_config": mock.zt_statustype_config1,
                                 "case_type": "Zaak",
@@ -778,7 +794,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                     )
 
     @set_kvk_branch_number_in_session("1234")
-    def test_list_cases_for_eherkenning_user_with_vestigingsnummer(self, m):
+    def test_list_cases_for_kvk_user_with_vestigingsnummer(self, m):
         """
         If a KVK_BRANCH_NUMBER that is different from the KVK number is specified,
         additional filtering by vestiging should be applied when retrieving zaken
@@ -788,73 +804,125 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
 
         self.client.force_login(user=self.eherkenning_user)
 
-        for fetch_eherkenning_zaken_with_rsin in [True, False]:
-            with self.subTest(
-                fetch_eherkenning_zaken_with_rsin=fetch_eherkenning_zaken_with_rsin
-            ):
-                self.config.fetch_eherkenning_zaken_with_rsin = (
-                    fetch_eherkenning_zaken_with_rsin
-                )
-                self.config.save()
+        self.config.fetch_eherkenning_zaken_with_rsin = False
+        self.config.save()
 
-                m.reset_mock()
+        m.reset_mock()
 
-                response = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
+        response = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
+        expected_cases = [
+            {
+                "uuid": mock.zaak_eherkenning1["uuid"],
+                "start_date": datetime.date.fromisoformat(
+                    mock.zaak_eherkenning1["startdatum"]
+                ),
+                "end_date": None,
+                "identification": mock.zaak_eherkenning1["identificatie"],
+                "description": mock.zaaktype["omschrijving"],
+                "current_status": mock.status_type_initial["omschrijving"],
+                "result": "",
+                "zaaktype_config": mock.zaaktype_config1,
+                "statustype_config": mock.zt_statustype_config1,
+                "case_type": "Zaak",
+                "api_group": self.api_groups[i],
+            }
+            for i, mock in enumerate(self.mocks)
+        ]
+        self.assertListEqual(
+            response.context["cases"],
+            expected_cases,
+        )
+        for mock in self.mocks:
+            # don't show internal cases
+            self.assertNotContains(response, mock.zaak_intern["omschrijving"])
+            self.assertNotContains(response, mock.zaak_intern["identificatie"])
 
-                expected_cases = [
-                    {
-                        "uuid": mock.zaak_eherkenning1["uuid"],
-                        "start_date": datetime.date.fromisoformat(
-                            mock.zaak_eherkenning1["startdatum"]
-                        ),
-                        "end_date": None,
-                        "identification": mock.zaak_eherkenning1["identificatie"],
-                        "description": mock.zaaktype["omschrijving"],
-                        "current_status": mock.status_type_initial["omschrijving"],
-                        "zaaktype_config": mock.zaaktype_config1,
-                        "statustype_config": mock.zt_statustype_config1,
-                        "case_type": "Zaak",
-                        "api_group": self.api_groups[i],
-                    }
-                    for i, mock in enumerate(self.mocks)
-                ]
-                self.assertListEqual(
-                    response.context["cases"],
-                    expected_cases,
-                )
-                for mock in self.mocks:
-                    # don't show internal cases
-                    self.assertNotContains(response, mock.zaak_intern["omschrijving"])
-                    self.assertNotContains(response, mock.zaak_intern["identificatie"])
+        # check zaken request query parameters
+        for zaken_root in ("zaken.nl", "andere-zaken.nl"):
+            list_zaken_req = [
+                req
+                for req in m.request_history
+                if req.hostname == zaken_root and req.path == "/api/v1/zaken"
+            ][0]
 
-                # check zaken request query parameters
-                for zaken_root in ("zaken.nl", "andere-zaken.nl"):
-                    list_zaken_req = [
-                        req
-                        for req in m.request_history
-                        if req.hostname == zaken_root and req.path == "/api/v1/zaken"
-                    ][0]
-                    identifier = (
-                        self.eherkenning_user.rsin
-                        if fetch_eherkenning_zaken_with_rsin
-                        else self.eherkenning_user.kvk
-                    )
+            self.assertEqual(len(list_zaken_req.qs), 2)
+            self.assertEqual(
+                list_zaken_req.qs,
+                {
+                    "maximalevertrouwelijkheidaanduiding": [
+                        VertrouwelijkheidsAanduidingen.beperkt_openbaar
+                    ],
+                    "rol__betrokkeneidentificatie__vestiging__vestigingsnummer": [
+                        "1234"
+                    ],
+                },
+            )
 
-                    self.assertEqual(len(list_zaken_req.qs), 3)
-                    self.assertEqual(
-                        list_zaken_req.qs,
-                        {
-                            "rol__betrokkeneidentificatie__nietnatuurlijkpersoon__innnnpid": [
-                                identifier
-                            ],
-                            "maximalevertrouwelijkheidaanduiding": [
-                                VertrouwelijkheidsAanduidingen.beperkt_openbaar
-                            ],
-                            "rol__betrokkeneidentificatie__vestiging__vestigingsnummer": [
-                                "1234"
-                            ],
-                        },
-                    )
+    @set_kvk_branch_number_in_session("1234")
+    def test_list_cases_for_rsin_user_with_vestigingsnummer(self, m):
+        """
+        If a KVK_BRANCH_NUMBER that is different from the RSIN number is specified,
+        cases should be filter by vestigingsnummber rather than rsin
+        """
+        for mock in self.mocks:
+            mock._setUpMocks(m)
+
+        self.client.force_login(user=self.eherkenning_user)
+
+        self.config.fetch_eherkenning_zaken_with_rsin = True
+        self.config.save()
+
+        m.reset_mock()
+
+        response = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
+
+        expected_cases = [
+            {
+                "uuid": mock.zaak_eherkenning1["uuid"],
+                "start_date": datetime.date.fromisoformat(
+                    mock.zaak_eherkenning1["startdatum"]
+                ),
+                "end_date": None,
+                "identification": mock.zaak_eherkenning1["identificatie"],
+                "description": mock.zaaktype["omschrijving"],
+                "current_status": mock.status_type_initial["omschrijving"],
+                "result": "",
+                "zaaktype_config": mock.zaaktype_config1,
+                "statustype_config": mock.zt_statustype_config1,
+                "case_type": "Zaak",
+                "api_group": self.api_groups[i],
+            }
+            for i, mock in enumerate(self.mocks)
+        ]
+        self.assertListEqual(
+            response.context["cases"],
+            expected_cases,
+        )
+        for mock in self.mocks:
+            # don't show internal cases
+            self.assertNotContains(response, mock.zaak_intern["omschrijving"])
+            self.assertNotContains(response, mock.zaak_intern["identificatie"])
+
+        # check zaken request query parameters
+        for zaken_root in ("zaken.nl", "andere-zaken.nl"):
+            list_zaken_req = [
+                req
+                for req in m.request_history
+                if req.hostname == zaken_root and req.path == "/api/v1/zaken"
+            ][0]
+
+            self.assertEqual(len(list_zaken_req.qs), 2)
+            self.assertEqual(
+                list_zaken_req.qs,
+                {
+                    "maximalevertrouwelijkheidaanduiding": [
+                        VertrouwelijkheidsAanduidingen.beperkt_openbaar
+                    ],
+                    "rol__betrokkeneidentificatie__vestiging__vestigingsnummer": [
+                        "1234"
+                    ],
+                },
+            )
 
     def test_list_cases_for_eherkenning_user_missing_rsin(self, m):
         for mock in self.mocks:
@@ -995,6 +1063,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                     "identification": mock.zaak2["identificatie"],
                     "description": mock.zaaktype["omschrijving"],
                     "current_status": mock.status_type_initial["omschrijving"],
+                    "result": "",
                     "zaaktype_config": mock.zaaktype_config1,
                     "statustype_config": mock.zt_statustype_config1,
                     "case_type": "Zaak",
@@ -1007,6 +1076,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                     "identification": mock.zaak1["identificatie"],
                     "description": mock.zaaktype["omschrijving"],
                     "current_status": mock.status_type_initial["omschrijving"],
+                    "result": "",
                     "zaaktype_config": mock.zaaktype_config1,
                     "statustype_config": mock.zt_statustype_config1,
                     "case_type": "Zaak",
@@ -1019,6 +1089,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                     "identification": mock.zaak3["identificatie"],
                     "description": mock.zaaktype["omschrijving"],
                     "current_status": mock.status_type_finish["statustekst"],
+                    "result": mock.resultaat_type["omschrijving"],
                     "zaaktype_config": mock.zaaktype_config1,
                     "statustype_config": None,
                     "case_type": "Zaak",
@@ -1032,8 +1103,8 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                     "end_date": datetime.date(2022, 1, 13),
                     "identification": mock.zaak_result["identificatie"],
                     "description": mock.zaaktype["omschrijving"],
-                    # use result here
-                    "current_status": mock.resultaat_type["omschrijving"],
+                    "current_status": mock.status_type_initial["omschrijving"],
+                    "result": mock.resultaat_type["omschrijving"],
                     "zaaktype_config": mock.zaaktype_config1,
                     "statustype_config": mock.zt_statustype_config1,
                     "case_type": "Zaak",

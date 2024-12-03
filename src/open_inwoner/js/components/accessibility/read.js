@@ -58,8 +58,34 @@ export class ReadOut {
         main = document.querySelector('main')
       }
 
+      // Select the warning header element and get its text content
+      const warningHeader = document.querySelector('.warning-header')
+      let warningText = ''
+
+      if (warningHeader) {
+        const iconContainer = warningHeader.querySelector(
+          '.warning-header__icon'
+        )
+        const warningIcon = iconContainer.querySelector(
+          '.material-icons-outlined'
+        )
+
+        if (warningIcon) {
+          // Temporarily hide warning icon to prevent it from being read
+          iconContainer.removeChild(warningIcon)
+
+          setTimeout(() => {
+            iconContainer.appendChild(warningIcon)
+          }, 10)
+        }
+
+        warningText = warningHeader.textContent.trim()
+      }
+
       // console.log(main.textContent)
-      let text = this.getText(main)
+      // Combine warning-header with main content text, setting warning text first in read order
+      let text = warningText
+      text += ` ${this.getText(main)}`
       // console.log(text)
       const utterThis = new this.SpeechSynthesisUtterance(text)
 
@@ -99,10 +125,19 @@ export class ReadOut {
 
   getText = (node) => {
     let baseText = ''
-    if (node.getAttribute('aria-hidden')) {
+    if (node.getAttribute('aria-hidden') === 'true') {
       return undefined
     }
     // console.log('node', node)
+
+    if (node.tagName === 'SELECT' && node.classList.contains('input')) {
+      const selectedOption = node.options[node.selectedIndex]
+      if (selectedOption) {
+        baseText += ` ${selectedOption.textContent.trim()}`
+      }
+      return baseText
+    }
+
     if (node.childNodes) {
       for (let index = 0; index < node.childNodes.length; index++) {
         const childNode = node.childNodes[index]
@@ -110,10 +145,7 @@ export class ReadOut {
         if (childNode.nodeName === '#text') {
           if (childNode.nodeValue) {
             let nodeValue = childNode.nodeValue.replaceAll('\n', '').trim()
-            if (
-              nodeValue.replace(/\s/g, '') !== '' &&
-              nodeValue.replace(/\s/g, '')
-            ) {
+            if (nodeValue.replace(/\s/g, '') !== '') {
               baseText += ` ${nodeValue}`
             }
           }

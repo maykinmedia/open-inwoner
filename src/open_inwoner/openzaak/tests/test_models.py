@@ -1,7 +1,6 @@
 from datetime import timedelta
 from uuid import uuid4
 
-from django.db import IntegrityError
 from django.test import TestCase
 
 from freezegun import freeze_time
@@ -30,12 +29,6 @@ from open_inwoner.openzaak.tests.shared import CATALOGI_ROOT
 
 
 class CatalogusConfigManagerTestCase(TestCase):
-    def test_fields_used_for_natural_key_are_unique(self):
-
-        with self.assertRaises(IntegrityError):
-            for _ in range(2):
-                CatalogusConfigFactory(url="http://foo.maykinmedia.nl")
-
     def test_get_by_natural_key_returns_expected_instance(self):
         config = CatalogusConfigFactory()
 
@@ -46,21 +39,10 @@ class CatalogusConfigManagerTestCase(TestCase):
 
     def test_get_by_natural_key_not_found(self):
         with self.assertRaises(CatalogusConfig.DoesNotExist):
-            CatalogusConfig.objects.get_by_natural_key(
-                "http://non-existent.maykinmedia.nl"
-            )
+            CatalogusConfig.objects.get_by_natural_key(domein="test", rsin="1234")
 
 
 class ZaakTypeConfigModelTestCase(TestCase):
-    def test_fields_used_for_natural_key_are_unique(self):
-        catalogus = CatalogusConfigFactory()
-
-        with self.assertRaises(IntegrityError):
-            for _ in range(2):
-                ZaakTypeConfigFactory(
-                    identificatie="AAAA", catalogus__url=catalogus.url
-                )
-
     def test_get_by_natural_key_returns_expected_instance(self):
         zaak_type_config = ZaakTypeConfigFactory(
             identificatie="AAAA",
@@ -74,8 +56,10 @@ class ZaakTypeConfigModelTestCase(TestCase):
     def test_get_by_natural_key_not_found(self):
         unused_catalogus = CatalogusConfig()
         with self.assertRaises(ZaakTypeConfig.DoesNotExist):
-            ZaakTypeConfig.objects.get_by_natural_key(
-                identificatie="FOO", catalogus_url=unused_catalogus.url
+            ZaakTypeConfig.objects.get(
+                identificatie="AAAA",
+                catalogus__domein="bogus",
+                catalogus__rsin="bogus",
             )
 
     def test_queryset_filter_case_type_with_catalog(self):
@@ -103,25 +87,19 @@ class ZaakTypeConfigModelTestCase(TestCase):
 
 
 class ZaakTypeStatusTypeConfigModelTestCase(TestCase):
-    def test_fields_used_for_natural_key_are_unique(self):
-        zt = ZaakTypeConfigFactory()
-        with self.assertRaises(IntegrityError):
-            for _ in range(2):
-                ZaakTypeStatusTypeConfigFactory(
-                    zaaktype_config=zt,
-                    statustype_url="http://foo.maykinmedia.nl",
-                )
-
     def test_get_by_natural_key_returns_expected_instance(self):
         zt = ZaakTypeConfigFactory()
         zt_status_type_config = ZaakTypeStatusTypeConfigFactory(
             zaaktype_config=zt,
-            statustype_url="http://foo.maykinmedia.nl",
+            omschrijving="test",
         )
 
         self.assertEqual(
             ZaakTypeStatusTypeConfig.objects.get_by_natural_key(
-                "http://foo.maykinmedia.nl", *zt.natural_key()
+                omschrijving="test",
+                zaaktype_config_identificatie=zt.identificatie,
+                catalogus_domein=zt.catalogus.domein,
+                catalogus_rsin=zt.catalogus.rsin,
             ),
             zt_status_type_config,
         )
@@ -130,69 +108,67 @@ class ZaakTypeStatusTypeConfigModelTestCase(TestCase):
         unused_zt = ZaakTypeConfigFactory()
         with self.assertRaises(ZaakTypeStatusTypeConfig.DoesNotExist):
             ZaakTypeStatusTypeConfig.objects.get_by_natural_key(
-                "http://foo.maykinmedia.nl",
-                *unused_zt.natural_key(),
+                omschrijving="test",
+                zaaktype_config_identificatie=unused_zt.identificatie,
+                catalogus_domein=unused_zt.catalogus.domein,
+                catalogus_rsin=unused_zt.catalogus.rsin,
             )
 
 
 class ZaakTypeResultaatTypeConfigModelTestCase(TestCase):
-    def test_fields_used_for_natural_key_are_unique(self):
-        zt = ZaakTypeConfigFactory()
-        with self.assertRaises(IntegrityError):
-            for _ in range(2):
-                ZaakTypeResultaatTypeConfigFactory(
-                    zaaktype_config=zt, resultaattype_url="http://foo.maykinmedia.nl"
-                )
-
     def test_get_by_natural_key_returns_expected_instance(self):
         zt = ZaakTypeConfigFactory()
         zt_status_type_config = ZaakTypeResultaatTypeConfigFactory(
-            zaaktype_config=zt, resultaattype_url="http://foo.maykinmedia.nl"
+            zaaktype_config=zt,
+            omschrijving="test",
         )
 
         self.assertEqual(
             ZaakTypeResultaatTypeConfig.objects.get_by_natural_key(
-                "http://foo.maykinmedia.nl", *zt.natural_key()
+                omschrijving="test",
+                zaaktype_config_identificatie=zt.identificatie,
+                catalogus_domein=zt.catalogus.domein,
+                catalogus_rsin=zt.catalogus.rsin,
             ),
             zt_status_type_config,
         )
 
     def test_get_by_natural_key_not_found(self):
-        unused_zt = ZaakTypeConfigFactory()
+        zt = ZaakTypeConfigFactory()
         with self.assertRaises(ZaakTypeResultaatTypeConfig.DoesNotExist):
             ZaakTypeResultaatTypeConfig.objects.get_by_natural_key(
-                "http://foo.maykinmedia.nl", *unused_zt.natural_key()
+                omschrijving="bogus",
+                zaaktype_config_identificatie=zt.identificatie,
+                catalogus_domein=zt.catalogus.domein,
+                catalogus_rsin=zt.catalogus.rsin,
             )
 
 
 class ZaakTypeInformatieObjectTypeConfigFactoryModelTestCase(TestCase):
-    def test_fields_used_for_natural_key_are_unique(self):
-        zt = ZaakTypeConfigFactory()
-        with self.assertRaises(IntegrityError):
-            for _ in range(2):
-                ZaakTypeInformatieObjectTypeConfigFactory(
-                    zaaktype_config=zt,
-                    informatieobjecttype_url="http://foo.maykinmedia.nl",
-                )
-
     def test_get_by_natural_key_returns_expected_instance(self):
         zt = ZaakTypeConfigFactory()
         zt_io_type = ZaakTypeInformatieObjectTypeConfigFactory(
-            zaaktype_config=zt, informatieobjecttype_url="http://foo.maykinmedia.nl"
+            zaaktype_config=zt, omschrijving="test"
         )
 
         self.assertEqual(
             ZaakTypeInformatieObjectTypeConfig.objects.get_by_natural_key(
-                "http://foo.maykinmedia.nl", *zt.natural_key()
+                omschrijving="test",
+                zaaktype_config_identificatie=zt.identificatie,
+                catalogus_domein=zt.catalogus.domein,
+                catalogus_rsin=zt.catalogus.rsin,
             ),
             zt_io_type,
         )
 
     def test_get_by_natural_key_not_found(self):
-        unused_zt = ZaakTypeConfigFactory()
+        zt = ZaakTypeConfigFactory()
         with self.assertRaises(ZaakTypeInformatieObjectTypeConfig.DoesNotExist):
             ZaakTypeInformatieObjectTypeConfig.objects.get_by_natural_key(
-                "http://foo.maykinmedia.nl", *unused_zt.natural_key()
+                omschrijving="bogus",
+                zaaktype_config_identificatie=zt.identificatie,
+                catalogus_domein=zt.catalogus.domein,
+                catalogus_rsin=zt.catalogus.rsin,
             )
 
     def test_queryset_filter_case_type_with_catalog(self):

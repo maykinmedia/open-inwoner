@@ -90,7 +90,7 @@
   }
 
   &__welcome.plugin {
-    margin-top: -80px;
+    margin-top: -130px;
     background-color: var(--color-white);
     border-radius: var(--border-radius);
     padding: var(--spacing-large);
@@ -98,7 +98,6 @@
     width: 100%;
 
     @media (min-width: 768px) {
-      margin-top: -130px;
       width: 50%;
     }
   }
