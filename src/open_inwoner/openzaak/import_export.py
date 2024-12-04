@@ -334,7 +334,7 @@ class ZGWConfigImport:
 
         rows_successfully_processed = 0
         import_errors = []
-        natural_keys_seen = set()
+        natural_keys_seen = defaultdict(set)
         for line in cls._lines_iter_from_jsonl_stream_or_string(stream_or_string):
             try:
                 (deserialized_object,) = serializers.deserialize(
@@ -351,10 +351,11 @@ class ZGWConfigImport:
                 import_errors.append(error)
             else:
                 source_config = deserialized_object.object
-                if (natural_key := source_config.natural_key()) in natural_keys_seen:
+                natural_key = source_config.natural_key()
+                if natural_key in natural_keys_seen[source_config.__class__.__name__]:
                     import_errors.append(ZGWImportError.from_jsonl(line))
                     continue
-                natural_keys_seen.add(natural_key)
+                natural_keys_seen[source_config.__class__.__name__].add(natural_key)
                 try:
                     match source_config:
                         case CatalogusConfig():
