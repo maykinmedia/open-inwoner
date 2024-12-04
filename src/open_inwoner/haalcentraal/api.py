@@ -69,7 +69,7 @@ class BRP_1_3(BRPAPI):
             headers["x-origin-oin"] = self.config.api_origin_oin
         if self.config.api_doelbinding:  # See Taiga #755
             headers["x-doelbinding"] = self.config.api_doelbinding
-
+            
         try:
             response = self.client.get(
                 url=url,
@@ -128,7 +128,10 @@ class BRP_2_1(BRPAPI):
             headers["x-doelbinding"] = self.config.api_doelbinding
         if self.config.api_verwerking:
             headers["x-verwerking"] = self.config.api_verwerking
+        if self.config.api_afnemer_oin:  # See Taiga #2860 / Yenlo
+            headers["x-afnemer-oin"] = self.config.api_afnemer_oin
 
+            
         response = self.client.post(
             url=url,
             json={
