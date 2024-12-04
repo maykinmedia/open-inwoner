@@ -26,7 +26,7 @@ from .factories import (
 
 
 class ZGWExportImportMockData:
-    def __init__(self, count=0):
+    def __init__(self, count=0, with_dupes=False):
         self.original_url = f"https://foo.{count}.maykinmedia.nl"
         self.original_uuid = "a1591906-3368-470a-a957-4b8634c275a1"
         self.service = ServiceFactory(slug=f"service-{count}")
@@ -78,6 +78,14 @@ class ZGWExportImportMockData:
             omschrijving="informatieobject",
             zaaktype_uuids=[self.original_uuid],
         )
+        if with_dupes:
+            self.ztc_resultaat_2 = ZaakTypeResultaatTypeConfigFactory(
+                zaaktype_config=self.ztc,
+                resultaattype_url=self.original_url,
+                omschrijving="status omschrijving",  # test dupes across models
+                zaaktype_uuids=[self.original_uuid],
+                description="",
+            )
 
 
 class ExportObjectTests(TestCase):
@@ -344,6 +352,7 @@ class TestCatalogusImport(TestCase):
         ]
         self.json_dupes = [
             '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "statustype_url": "https://bar.maykinmedia.nl", "omschrijving": "status omschrijving", "statustekst": "statustekst nieuw", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": "", "description": "status", "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
+            '{"model": "openzaak.zaaktyperesultaattypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "resultaattype_url": "https://bar.maykinmedia.nl", "omschrijving": "status omschrijving", "zaaktype_uuids": "[]", "description": "description new"}}',
         ]
         self.jsonl = "\n".join(self.json_lines)
         self.jsonl_with_dupes = "\n".join(self.json_lines + self.json_dupes)
@@ -557,7 +566,7 @@ class TestCatalogusImport(TestCase):
         self.assertEqual(import_result, import_expected)
 
     def test_import_jsonl_update_reports_duplicate_natural_keys_in_upload_file(self):
-        mocks = ZGWExportImportMockData()
+        mocks = ZGWExportImportMockData(with_dupes=True)
 
         self.storage.save("import.jsonl", io.StringIO(self.jsonl_with_dupes))
 
@@ -574,12 +583,13 @@ class TestCatalogusImport(TestCase):
         )
         import_expected = dataclasses.asdict(
             ZGWConfigImport(
-                total_rows_processed=6,
+                total_rows_processed=7,
                 catalogus_configs_imported=1,
                 zaaktype_configs_imported=1,
                 zaak_informatie_object_type_configs_imported=1,
                 zaak_status_type_configs_imported=1,
-                zaak_resultaat_type_configs_imported=1,
+                # resultaat_type_config with "status omschrijving" should be imported
+                zaak_resultaat_type_configs_imported=2,
                 import_errors=[expected_error],
             ),
         )
