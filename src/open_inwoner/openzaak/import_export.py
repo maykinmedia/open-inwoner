@@ -166,11 +166,9 @@ def _update_nested_zgw_config(
 
 
 @dataclasses.dataclass(frozen=True)
-class CatalogusConfigExport:
-    """Gather and export CatalogusConfig(s) and all associated relations."""
-
+class ZGWConfigExport:
     catalogus_configs: QuerySet
-    zaak_type_configs: QuerySet
+    zaaktype_configs: QuerySet
     zaak_informatie_object_type_configs: QuerySet
     zaak_status_type_configs: QuerySet
     zaak_resultaat_type_configs: QuerySet
@@ -178,7 +176,7 @@ class CatalogusConfigExport:
     def __iter__(self) -> Generator[QuerySet, Any, None]:
         yield from (
             self.catalogus_configs,
-            self.zaak_type_configs,
+            self.zaaktype_configs,
             self.zaak_informatie_object_type_configs,
             self.zaak_status_type_configs,
             self.zaak_resultaat_type_configs,
@@ -188,41 +186,7 @@ class CatalogusConfigExport:
         for a, b in zip(self, other):
             if a.difference(b).exists():
                 return False
-
         return True
-
-    @classmethod
-    def from_catalogus_configs(cls, catalogus_configs: QuerySet) -> Self:
-        if not isinstance(catalogus_configs, QuerySet):
-            raise TypeError(
-                f"`catalogus_configs` is not a QuerySet, but a {type(catalogus_configs)}"
-            )
-
-        if catalogus_configs.model != CatalogusConfig:
-            raise ValueError(
-                f"`catalogus_configs` is of type {catalogus_configs.model}, not CatalogusConfig"
-            )
-
-        zaak_type_configs = ZaakTypeConfig.objects.filter(
-            catalogus__in=catalogus_configs
-        )
-        informatie_object_types = ZaakTypeInformatieObjectTypeConfig.objects.filter(
-            zaaktype_config__in=zaak_type_configs
-        )
-        zaak_status_type_configs = ZaakTypeStatusTypeConfig.objects.filter(
-            zaaktype_config__in=zaak_type_configs
-        )
-        zaak_resultaat_type_configs = ZaakTypeResultaatTypeConfig.objects.filter(
-            zaaktype_config__in=zaak_type_configs
-        )
-
-        return cls(
-            catalogus_configs=catalogus_configs,
-            zaak_type_configs=zaak_type_configs,
-            zaak_informatie_object_type_configs=informatie_object_types,
-            zaak_status_type_configs=zaak_status_type_configs,
-            zaak_resultaat_type_configs=zaak_resultaat_type_configs,
-        )
 
     def as_dicts_iter(self) -> Generator[dict, Any, None]:
         for qs in self:
@@ -248,9 +212,72 @@ class CatalogusConfigExport:
     def as_jsonl(self) -> str:
         return "".join(self.as_jsonl_iter())
 
+    @classmethod
+    def from_catalogus_configs(cls, catalogus_configs: QuerySet) -> Self:
+        if not isinstance(catalogus_configs, QuerySet):
+            raise TypeError(
+                f"`catalogus_configs` is not a QuerySet, but a {type(catalogus_configs)}"
+            )
+
+        if catalogus_configs.model != CatalogusConfig:
+            raise ValueError(
+                f"`catalogus_configs` is of type {catalogus_configs.model}, not CatalogusConfig"
+            )
+
+        zaaktype_configs = ZaakTypeConfig.objects.filter(
+            catalogus__in=catalogus_configs
+        )
+        informatie_object_types = ZaakTypeInformatieObjectTypeConfig.objects.filter(
+            zaaktype_config__in=zaaktype_configs
+        )
+        zaak_status_type_configs = ZaakTypeStatusTypeConfig.objects.filter(
+            zaaktype_config__in=zaaktype_configs
+        )
+        zaak_resultaat_type_configs = ZaakTypeResultaatTypeConfig.objects.filter(
+            zaaktype_config__in=zaaktype_configs
+        )
+
+        return cls(
+            catalogus_configs=catalogus_configs,
+            zaaktype_configs=zaaktype_configs,
+            zaak_informatie_object_type_configs=informatie_object_types,
+            zaak_status_type_configs=zaak_status_type_configs,
+            zaak_resultaat_type_configs=zaak_resultaat_type_configs,
+        )
+
+    @classmethod
+    def from_zaaktype_configs(cls, zaaktype_configs: QuerySet) -> Self:
+        if not isinstance(zaaktype_configs, QuerySet):
+            raise TypeError(
+                f"`zaaktype_configs` is not a QuerySet, but a {type(zaaktype_configs)}"
+            )
+
+        if zaaktype_configs.model != ZaakTypeConfig:
+            raise ValueError(
+                f"`zaaktype_configs` is of type {zaaktype_configs.model}, not ZaakTypeConfig"
+            )
+
+        informatie_object_types = ZaakTypeInformatieObjectTypeConfig.objects.filter(
+            zaaktype_config__in=zaaktype_configs
+        )
+        zaak_status_type_configs = ZaakTypeStatusTypeConfig.objects.filter(
+            zaaktype_config__in=zaaktype_configs
+        )
+        zaak_resultaat_type_configs = ZaakTypeResultaatTypeConfig.objects.filter(
+            zaaktype_config__in=zaaktype_configs
+        )
+
+        return cls(
+            catalogus_configs=CatalogusConfig.objects.none(),
+            zaaktype_configs=zaaktype_configs,
+            zaak_informatie_object_type_configs=informatie_object_types,
+            zaak_status_type_configs=zaak_status_type_configs,
+            zaak_resultaat_type_configs=zaak_resultaat_type_configs,
+        )
+
 
 @dataclasses.dataclass(frozen=True)
-class CatalogusConfigImport:
+class ZGWConfigImport:
     """Import CatalogusConfig(s) and all associated relations."""
 
     total_rows_processed: int = 0
