@@ -191,7 +191,7 @@ class TestCatalogusConfigExportAdmin(WebTest):
 
         form = self.app.get(
             reverse(
-                "admin:upload_zgw_import_file",
+                "admin:upload_catalogus_import_file",
             ),
             user=self.user,
         ).form
@@ -218,13 +218,13 @@ class TestCatalogusConfigExportAdmin(WebTest):
         )
 
     @mock.patch(
-        "open_inwoner.openzaak.import_export.CatalogusConfigImport.import_from_jsonl_file_in_django_storage"
+        "open_inwoner.openzaak.import_export.ZGWConfigImport.import_from_jsonl_file_in_django_storage"
     )
     def test_import_flow_errors_reports_failure_to_user(self, m) -> None:
         m.side_effect = Exception("something went wrong")
         form = self.app.get(
             reverse(
-                "admin:upload_zgw_import_file",
+                "admin:upload_catalogus_import_file",
             ),
             user=self.user,
         ).form
@@ -254,7 +254,7 @@ class TestCatalogusConfigExportAdmin(WebTest):
         self.assertEqual(
             response.request.path,
             reverse(
-                "admin:upload_zgw_import_file",
+                "admin:upload_catalogus_import_file",
             ),
         )
 
@@ -272,7 +272,7 @@ class TestCatalogusConfigExportAdmin(WebTest):
 
         form = self.app.get(
             reverse(
-                "admin:upload_zgw_import_file",
+                "admin:upload_catalogus_import_file",
             ),
             user=self.user,
         ).form
@@ -333,7 +333,7 @@ class TestCatalogusConfigExportAdmin(WebTest):
 
         form = self.app.get(
             reverse(
-                "admin:upload_zgw_import_file",
+                "admin:upload_catalogus_import_file",
             ),
             user=self.user,
         ).form
