@@ -5,10 +5,7 @@ import uuid
 from django.core.files.storage.memory import InMemoryStorage
 from django.test import TestCase
 
-from open_inwoner.openzaak.import_export import (
-    CatalogusConfigExport,
-    CatalogusConfigImport,
-)
+from open_inwoner.openzaak.import_export import ZGWConfigExport, ZGWConfigImport
 from open_inwoner.openzaak.models import (
     CatalogusConfig,
     ZaakTypeConfig,
@@ -29,7 +26,7 @@ from .factories import (
 
 
 class ZGWExportImportMockData:
-    def __init__(self, count=0):
+    def __init__(self, count=0, with_dupes=False):
         self.original_url = f"https://foo.{count}.maykinmedia.nl"
         self.original_uuid = "a1591906-3368-470a-a957-4b8634c275a1"
         self.service = ServiceFactory(slug=f"service-{count}")
@@ -81,6 +78,14 @@ class ZGWExportImportMockData:
             omschrijving="informatieobject",
             zaaktype_uuids=[self.original_uuid],
         )
+        if with_dupes:
+            self.ztc_resultaat_2 = ZaakTypeResultaatTypeConfigFactory(
+                zaaktype_config=self.ztc,
+                resultaattype_url=self.original_url,
+                omschrijving="status omschrijving",  # test dupes across models
+                zaaktype_uuids=[self.original_uuid],
+                description="",
+            )
 
 
 class ExportObjectTests(TestCase):
@@ -94,17 +99,17 @@ class ExportObjectTests(TestCase):
         for arg in (list(), set(), tuple(), None, "", CatalogusConfig.objects.first()):
             with self.subTest(f"Default factory should not accept {arg}"):
                 with self.assertRaises(TypeError):
-                    CatalogusConfigExport.from_catalogus_configs(arg)
+                    ZGWConfigExport.from_catalogus_configs(arg)
 
     def test_export_only_accepts_queryset_of_correct_type(self):
         with self.assertRaises(ValueError):
-            CatalogusConfigExport.from_catalogus_configs(ZaakTypeConfig.objects.all())
+            ZGWConfigExport.from_catalogus_configs(ZaakTypeConfig.objects.all())
 
     def test_equality_operator(self):
-        export_a = CatalogusConfigExport.from_catalogus_configs(
+        export_a = ZGWConfigExport.from_catalogus_configs(
             CatalogusConfig.objects.filter(pk=self.mocks[0].catalogus.pk)
         )
-        export_b = CatalogusConfigExport.from_catalogus_configs(
+        export_b = ZGWConfigExport.from_catalogus_configs(
             CatalogusConfig.objects.filter(pk=self.mocks[1].catalogus.pk)
         )
 
@@ -113,14 +118,14 @@ class ExportObjectTests(TestCase):
         self.assertFalse(export_a == export_b)
 
     def test_only_models_related_to_exported_catalogus_config_are_included(self):
-        export = CatalogusConfigExport.from_catalogus_configs(
+        export = ZGWConfigExport.from_catalogus_configs(
             CatalogusConfig.objects.filter(pk=self.mocks[0].catalogus.pk)
         )
 
         for export_field, mock_field in zip(
             (
                 "catalogus_configs",
-                "zaak_type_configs",
+                "zaaktype_configs",
                 "zaak_status_type_configs",
                 "zaak_resultaat_type_configs",
                 "zaak_informatie_object_type_configs",
@@ -148,6 +153,79 @@ class ExportObjectTests(TestCase):
                 )
 
 
+class ZaakTypeConfigExportTest(TestCase):
+    def setUp(self):
+        self.mocks = ZGWExportImportMockData(0)
+
+    def test_export_zaaktype_configs(self):
+        export = ZGWConfigExport.from_zaaktype_configs(
+            ZaakTypeConfig.objects.filter(pk=self.mocks.ztc.pk)
+        )
+        rows = export.as_dicts()
+
+        expected = [
+            {
+                "model": "openzaak.zaaktypeconfig",
+                "fields": {
+                    "urls": '["https://foo.0.maykinmedia.nl"]',
+                    "catalogus": ["DM-0", "123456789"],
+                    "identificatie": "ztc-id-a-0",
+                    "omschrijving": "zaaktypeconfig",
+                    "notify_status_changes": False,
+                    "description": "",
+                    "external_document_upload_url": "",
+                    "document_upload_enabled": False,
+                    "contact_form_enabled": False,
+                    "contact_subject_code": "",
+                    "relevante_zaakperiode": None,
+                },
+            },
+            {
+                "model": "openzaak.zaaktypeinformatieobjecttypeconfig",
+                "fields": {
+                    "zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"],
+                    "informatieobjecttype_url": "https://foo.0.maykinmedia.nl",
+                    "omschrijving": "informatieobject",
+                    "zaaktype_uuids": '["a1591906-3368-470a-a957-4b8634c275a1"]',
+                    "document_upload_enabled": False,
+                    "document_notification_enabled": False,
+                },
+            },
+            {
+                "model": "openzaak.zaaktypestatustypeconfig",
+                "fields": {
+                    "zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"],
+                    "statustype_url": "https://foo.0.maykinmedia.nl",
+                    "omschrijving": "status omschrijving",
+                    "statustekst": "",
+                    "zaaktype_uuids": '["a1591906-3368-470a-a957-4b8634c275a1"]',
+                    "status_indicator": "",
+                    "status_indicator_text": "",
+                    "document_upload_description": "",
+                    "description": "status",
+                    "notify_status_change": True,
+                    "action_required": False,
+                    "document_upload_enabled": True,
+                    "call_to_action_url": "",
+                    "call_to_action_text": "",
+                    "case_link_text": "",
+                },
+            },
+            {
+                "model": "openzaak.zaaktyperesultaattypeconfig",
+                "fields": {
+                    "zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"],
+                    "resultaattype_url": "https://foo.0.maykinmedia.nl",
+                    "omschrijving": "resultaat",
+                    "zaaktype_uuids": '["a1591906-3368-470a-a957-4b8634c275a1"]',
+                    "description": "",
+                },
+            },
+        ]
+
+        self.assertEqual(rows, expected)
+
+
 class TestCatalogusExport(TestCase):
     def setUp(self):
         self.mocks = [
@@ -156,7 +234,7 @@ class TestCatalogusExport(TestCase):
         ]
 
     def test_export_catalogus_configs(self):
-        export = CatalogusConfigExport.from_catalogus_configs(
+        export = ZGWConfigExport.from_catalogus_configs(
             CatalogusConfig.objects.filter(pk=self.mocks[0].catalogus.pk)
         )
         rows = export.as_dicts()
@@ -233,9 +311,7 @@ class TestCatalogusExport(TestCase):
         self.assertEqual(rows, expected)
 
     def test_export_catalogus_configs_as_jsonl(self):
-        export = CatalogusConfigExport.from_catalogus_configs(
-            CatalogusConfig.objects.all()
-        )
+        export = ZGWConfigExport.from_catalogus_configs(CatalogusConfig.objects.all())
         rows = list(export.as_jsonl_iter())
 
         expected = [
@@ -276,6 +352,7 @@ class TestCatalogusImport(TestCase):
         ]
         self.json_dupes = [
             '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "statustype_url": "https://bar.maykinmedia.nl", "omschrijving": "status omschrijving", "statustekst": "statustekst nieuw", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": "", "description": "status", "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
+            '{"model": "openzaak.zaaktyperesultaattypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "resultaattype_url": "https://bar.maykinmedia.nl", "omschrijving": "status omschrijving", "zaaktype_uuids": "[]", "description": "description new"}}',
         ]
         self.jsonl = "\n".join(self.json_lines)
         self.jsonl_with_dupes = "\n".join(self.json_lines + self.json_dupes)
@@ -284,14 +361,14 @@ class TestCatalogusImport(TestCase):
         mocks = ZGWExportImportMockData()
         self.storage.save("import.jsonl", io.StringIO(self.jsonl))
 
-        import_result = CatalogusConfigImport.import_from_jsonl_file_in_django_storage(
+        import_result = ZGWConfigImport.import_from_jsonl_file_in_django_storage(
             "import.jsonl", self.storage
         )
 
         # check import
         self.assertEqual(
             import_result,
-            CatalogusConfigImport(
+            ZGWConfigImport(
                 total_rows_processed=5,
                 catalogus_configs_imported=1,
                 zaaktype_configs_imported=1,
@@ -371,7 +448,7 @@ class TestCatalogusImport(TestCase):
         # we use `asdict` and replace the Exceptions with string representations
         # because for Exceptions raised from within dataclasses, equality ==/is identity
         import_result = dataclasses.asdict(
-            CatalogusConfigImport.import_from_jsonl_file_in_django_storage(
+            ZGWConfigImport.import_from_jsonl_file_in_django_storage(
                 "import.jsonl", self.storage
             )
         )
@@ -380,7 +457,7 @@ class TestCatalogusImport(TestCase):
             "ZaakTypeConfig identificatie = 'ztc-id-a-0'"
         )
         import_expected = dataclasses.asdict(
-            CatalogusConfigImport(
+            ZGWConfigImport(
                 total_rows_processed=6,
                 catalogus_configs_imported=1,
                 zaaktype_configs_imported=1,
@@ -417,7 +494,7 @@ class TestCatalogusImport(TestCase):
         # we use `asdict` and replace the Exceptions with string representations
         # because for Exceptions raised from within dataclasses, equality ==/is identity
         import_result = dataclasses.asdict(
-            CatalogusConfigImport.import_from_jsonl_file_in_django_storage(
+            ZGWConfigImport.import_from_jsonl_file_in_django_storage(
                 "import.jsonl", self.storage
             )
         )
@@ -426,7 +503,7 @@ class TestCatalogusImport(TestCase):
             "ZaakTypeConfig identificatie = 'bogus'"
         )
         import_expected = dataclasses.asdict(
-            CatalogusConfigImport(
+            ZGWConfigImport(
                 total_rows_processed=6,
                 catalogus_configs_imported=1,
                 zaaktype_configs_imported=1,
@@ -463,7 +540,7 @@ class TestCatalogusImport(TestCase):
         # we use `asdict` and replace the Exceptions with string representations
         # because for Exceptions raised from within dataclasses, equality ==/is identity
         import_result = dataclasses.asdict(
-            CatalogusConfigImport.import_from_jsonl_file_in_django_storage(
+            ZGWConfigImport.import_from_jsonl_file_in_django_storage(
                 "import.jsonl", self.storage
             )
         )
@@ -472,7 +549,7 @@ class TestCatalogusImport(TestCase):
             "ZaakTypeConfig identificatie = 'ztc-id-a-0'"
         )
         import_expected = dataclasses.asdict(
-            CatalogusConfigImport(
+            ZGWConfigImport(
                 total_rows_processed=5,
                 catalogus_configs_imported=1,
                 zaaktype_configs_imported=1,
@@ -489,14 +566,14 @@ class TestCatalogusImport(TestCase):
         self.assertEqual(import_result, import_expected)
 
     def test_import_jsonl_update_reports_duplicate_natural_keys_in_upload_file(self):
-        mocks = ZGWExportImportMockData()
+        mocks = ZGWExportImportMockData(with_dupes=True)
 
         self.storage.save("import.jsonl", io.StringIO(self.jsonl_with_dupes))
 
         # we use `asdict` and replace the Exceptions with string representations
         # because for Exceptions raised from within dataclasses, equality ==/is identity
         import_result = dataclasses.asdict(
-            CatalogusConfigImport.import_from_jsonl_file_in_django_storage(
+            ZGWConfigImport.import_from_jsonl_file_in_django_storage(
                 "import.jsonl", self.storage
             )
         )
@@ -505,13 +582,14 @@ class TestCatalogusImport(TestCase):
             "natural keys: omschrijving = 'status omschrijving', ZaakTypeConfig identificatie = 'ztc-id-a-0'"
         )
         import_expected = dataclasses.asdict(
-            CatalogusConfigImport(
-                total_rows_processed=6,
+            ZGWConfigImport(
+                total_rows_processed=7,
                 catalogus_configs_imported=1,
                 zaaktype_configs_imported=1,
                 zaak_informatie_object_type_configs_imported=1,
                 zaak_status_type_configs_imported=1,
-                zaak_resultaat_type_configs_imported=1,
+                # resultaat_type_config with "status omschrijving" should be imported
+                zaak_resultaat_type_configs_imported=2,
                 import_errors=[expected_error],
             ),
         )
@@ -538,9 +616,7 @@ class TestCatalogusImport(TestCase):
         with self.assertLogs(
             logger="open_inwoner.openzaak.import_export", level="ERROR"
         ) as cm:
-            import_result = CatalogusConfigImport.from_jsonl_stream_or_string(
-                import_line
-            )
+            import_result = ZGWConfigImport.from_jsonl_stream_or_string(import_line)
             self.assertEqual(
                 cm.output,
                 [
@@ -567,7 +643,7 @@ class TestCatalogusImport(TestCase):
     def test_bad_import_types(self):
         for bad_type in (set(), list(), b""):
             with self.assertRaises(ValueError):
-                CatalogusConfigImport.from_jsonl_stream_or_string(bad_type)
+                ZGWConfigImport.from_jsonl_stream_or_string(bad_type)
 
     def test_valid_input_types_are_accepted(self):
         ZGWExportImportMockData()
@@ -578,10 +654,10 @@ class TestCatalogusImport(TestCase):
             self.jsonl,
         ):
             with self.subTest(f"Input type {type(input)}"):
-                import_result = CatalogusConfigImport.from_jsonl_stream_or_string(input)
+                import_result = ZGWConfigImport.from_jsonl_stream_or_string(input)
                 self.assertEqual(
                     import_result,
-                    CatalogusConfigImport(
+                    ZGWConfigImport(
                         total_rows_processed=5,
                         catalogus_configs_imported=1,
                         zaaktype_configs_imported=1,
@@ -597,9 +673,7 @@ class TestCatalogusImport(TestCase):
         bad_jsonl = self.jsonl + "\n" + bad_line
 
         with self.assertRaises(KeyError):
-            CatalogusConfigImport.from_jsonl_stream_or_string(
-                stream_or_string=bad_jsonl
-            )
+            ZGWConfigImport.from_jsonl_stream_or_string(stream_or_string=bad_jsonl)
 
         counts = (
             CatalogusConfig.objects.count(),
@@ -622,11 +696,7 @@ class ImportExportTestCase(TestCase):
         ZGWExportImportMockData()
 
     def test_exports_can_be_imported(self):
-        export = CatalogusConfigExport.from_catalogus_configs(
-            CatalogusConfig.objects.all()
-        )
-        import_result = CatalogusConfigImport.from_jsonl_stream_or_string(
-            export.as_jsonl()
-        )
+        export = ZGWConfigExport.from_catalogus_configs(CatalogusConfig.objects.all())
+        import_result = ZGWConfigImport.from_jsonl_stream_or_string(export.as_jsonl())
 
         self.assertEqual(import_result.total_rows_processed, 5)
