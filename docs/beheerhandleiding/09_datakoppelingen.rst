@@ -34,11 +34,13 @@ Catalogus configs worden automatisch geïmporteerd vanuit Open Zaak of eSuite vi
 ZGW-koppeling. Aan deze catalogi zijn zaaktypes gekoppeld, zoals geconfigureerd in 
 het onderdeel Zaaktypeconfiguratie.
 
-Import en Export
-----------------
+.. _CatalogusImportExport:
 
-Catalogi kunnen worden geëxporteerd en geïmporteerd tussen verschillende OIP-installaties 
-(bijvoorbeeld tussen acceptatie- en testomgevingen).
+Catalogus Configs Importeren en Exporteren
+------------------------------------------
+
+Catalogi en Zaaktype Configuraties kunnen worden geëxporteerd en geïmporteerd tussen
+verschillende OIP-installaties (bijvoorbeeld tussen acceptatie- en testomgevingen).
 
 .. note::
    De import/export-functionaliteit vereist dat de gekoppelde zaaksystemen 
@@ -46,6 +48,16 @@ Catalogi kunnen worden geëxporteerd en geïmporteerd tussen verschillende OIP-i
    in beide ZGW API's aanwezig moeten zijn (hoewel de URLs en UUIDs mogen verschillen).
    Voer daarom de ``Importeer ZGW data`` periodieke taak eerst handmatig uit op zowel de
    bron als bestemming zodat de ZGW objecten volledig in sync zijn.
+  
+
+.. note::
+   Het onderstaande proces spitst zich toe op het importeren van hele Catalogus
+   Configuraties. Echter, het is eveneens mogelijk om alleen bepaalde Zaaktype Configuraties
+   te importeren/exporteren. Dit werkt op exact dezelfde wijze als in deze sectie is
+   omschreven voor de Catalogus Configuraties. Ongeacht via welk scherm de export is
+   aangemaakt, kunnen de opgeslagen bestande op zowel de totaaloverzichten van
+   Catalogus Configuraties en Zaaktype Configruates geïmporteerd worden.
+   Zie ook :ref:`ZTCImportExport`.
 
 Importproces
 ^^^^^^^^^^^^
@@ -67,7 +79,7 @@ Exporteren
 
 Stappen voor exporteren:
 
-#. Selecteer een of meer Catalogus Config-objecten
+#. Selecteer een of meer Catalogus Config-objecten of Zaaktype Configuratie-objecten
 #. Kies "Opslaan als bestand" in de "Actie" dropdown linksboven de catalogilijst
 
 .. figure:: images/image140.png
@@ -77,7 +89,7 @@ Stappen voor exporteren:
 
    Exporteren van catalogus configuraties
 
-De export omvat alle zaaktypes en onderliggende objecten (resultaattypen, 
+De export omvat alle catalogi, zaaktypes en onderliggende objecten (resultaattypen, 
 informatie-objecttypen, etc.) van de geselecteerde catalogi.
 
 Importeren
@@ -634,3 +646,32 @@ Klik allereerst op ‘tonen’ om alle gegevens uit te vouwen.
 | *Linknaam naar detailweergave*
 | Hier vult u de linktekst in om van de lijstweergave naar de
   detailweergave te navigeren. Standaard staat hier “Bekijk aanvraag”.
+
+.. _ZTCImportExport:
+
+9.16.3. Zaaktype configuratie importeren/exporteren
+---------------------------------------------------
+
+Het is mogelijk om individuele Zaaktype Configuratie objecten te importeren, op
+analoge wijze zoals beschreven voor de Catalogus Configuraties (zie 
+:ref:`CatalogusImportExport`).
+
+Voor meer details verwijzen we u naar deze sectie. In hoofdlijnen: via het totaaloverzicht
+met alle Zaaktype Configuraties selecteert u 1 of meer objecten om te exporteren:
+
+.. image:: images/image142.png
+   :width: 727px
+   :height: 345px
+
+U kunt het aldus opgeslagen bestand vervolgens op een andere installatie importeren
+via de knop "Importeer bestand":
+
+.. image:: images/image143.png
+   :width: 1238px
+   :height: 171px
+
+
+.. note::
+   Zaaktype Configuraties die via deze wijze worden gexporteerd, kunnen ook worden
+   geimporteerd via het Catalogus Configuratie scherm, en omgekeerd. 
+   Zie verder :ref:`CatalogusImportExport`.
