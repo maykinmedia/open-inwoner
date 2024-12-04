@@ -5,7 +5,7 @@ import uuid
 from django.core.files.storage.memory import InMemoryStorage
 from django.test import TestCase
 
-from open_inwoner.openzaak.import_export import CatalogusConfigImport, ZGWConfigExport
+from open_inwoner.openzaak.import_export import ZGWConfigExport, ZGWConfigImport
 from open_inwoner.openzaak.models import (
     CatalogusConfig,
     ZaakTypeConfig,
@@ -352,14 +352,14 @@ class TestCatalogusImport(TestCase):
         mocks = ZGWExportImportMockData()
         self.storage.save("import.jsonl", io.StringIO(self.jsonl))
 
-        import_result = CatalogusConfigImport.import_from_jsonl_file_in_django_storage(
+        import_result = ZGWConfigImport.import_from_jsonl_file_in_django_storage(
             "import.jsonl", self.storage
         )
 
         # check import
         self.assertEqual(
             import_result,
-            CatalogusConfigImport(
+            ZGWConfigImport(
                 total_rows_processed=5,
                 catalogus_configs_imported=1,
                 zaaktype_configs_imported=1,
@@ -439,7 +439,7 @@ class TestCatalogusImport(TestCase):
         # we use `asdict` and replace the Exceptions with string representations
         # because for Exceptions raised from within dataclasses, equality ==/is identity
         import_result = dataclasses.asdict(
-            CatalogusConfigImport.import_from_jsonl_file_in_django_storage(
+            ZGWConfigImport.import_from_jsonl_file_in_django_storage(
                 "import.jsonl", self.storage
             )
         )
@@ -448,7 +448,7 @@ class TestCatalogusImport(TestCase):
             "ZaakTypeConfig identificatie = 'ztc-id-a-0'"
         )
         import_expected = dataclasses.asdict(
-            CatalogusConfigImport(
+            ZGWConfigImport(
                 total_rows_processed=6,
                 catalogus_configs_imported=1,
                 zaaktype_configs_imported=1,
@@ -485,7 +485,7 @@ class TestCatalogusImport(TestCase):
         # we use `asdict` and replace the Exceptions with string representations
         # because for Exceptions raised from within dataclasses, equality ==/is identity
         import_result = dataclasses.asdict(
-            CatalogusConfigImport.import_from_jsonl_file_in_django_storage(
+            ZGWConfigImport.import_from_jsonl_file_in_django_storage(
                 "import.jsonl", self.storage
             )
         )
@@ -494,7 +494,7 @@ class TestCatalogusImport(TestCase):
             "ZaakTypeConfig identificatie = 'bogus'"
         )
         import_expected = dataclasses.asdict(
-            CatalogusConfigImport(
+            ZGWConfigImport(
                 total_rows_processed=6,
                 catalogus_configs_imported=1,
                 zaaktype_configs_imported=1,
@@ -531,7 +531,7 @@ class TestCatalogusImport(TestCase):
         # we use `asdict` and replace the Exceptions with string representations
         # because for Exceptions raised from within dataclasses, equality ==/is identity
         import_result = dataclasses.asdict(
-            CatalogusConfigImport.import_from_jsonl_file_in_django_storage(
+            ZGWConfigImport.import_from_jsonl_file_in_django_storage(
                 "import.jsonl", self.storage
             )
         )
@@ -540,7 +540,7 @@ class TestCatalogusImport(TestCase):
             "ZaakTypeConfig identificatie = 'ztc-id-a-0'"
         )
         import_expected = dataclasses.asdict(
-            CatalogusConfigImport(
+            ZGWConfigImport(
                 total_rows_processed=5,
                 catalogus_configs_imported=1,
                 zaaktype_configs_imported=1,
@@ -564,7 +564,7 @@ class TestCatalogusImport(TestCase):
         # we use `asdict` and replace the Exceptions with string representations
         # because for Exceptions raised from within dataclasses, equality ==/is identity
         import_result = dataclasses.asdict(
-            CatalogusConfigImport.import_from_jsonl_file_in_django_storage(
+            ZGWConfigImport.import_from_jsonl_file_in_django_storage(
                 "import.jsonl", self.storage
             )
         )
@@ -573,7 +573,7 @@ class TestCatalogusImport(TestCase):
             "natural keys: omschrijving = 'status omschrijving', ZaakTypeConfig identificatie = 'ztc-id-a-0'"
         )
         import_expected = dataclasses.asdict(
-            CatalogusConfigImport(
+            ZGWConfigImport(
                 total_rows_processed=6,
                 catalogus_configs_imported=1,
                 zaaktype_configs_imported=1,
@@ -606,9 +606,7 @@ class TestCatalogusImport(TestCase):
         with self.assertLogs(
             logger="open_inwoner.openzaak.import_export", level="ERROR"
         ) as cm:
-            import_result = CatalogusConfigImport.from_jsonl_stream_or_string(
-                import_line
-            )
+            import_result = ZGWConfigImport.from_jsonl_stream_or_string(import_line)
             self.assertEqual(
                 cm.output,
                 [
@@ -635,7 +633,7 @@ class TestCatalogusImport(TestCase):
     def test_bad_import_types(self):
         for bad_type in (set(), list(), b""):
             with self.assertRaises(ValueError):
-                CatalogusConfigImport.from_jsonl_stream_or_string(bad_type)
+                ZGWConfigImport.from_jsonl_stream_or_string(bad_type)
 
     def test_valid_input_types_are_accepted(self):
         ZGWExportImportMockData()
@@ -646,10 +644,10 @@ class TestCatalogusImport(TestCase):
             self.jsonl,
         ):
             with self.subTest(f"Input type {type(input)}"):
-                import_result = CatalogusConfigImport.from_jsonl_stream_or_string(input)
+                import_result = ZGWConfigImport.from_jsonl_stream_or_string(input)
                 self.assertEqual(
                     import_result,
-                    CatalogusConfigImport(
+                    ZGWConfigImport(
                         total_rows_processed=5,
                         catalogus_configs_imported=1,
                         zaaktype_configs_imported=1,
@@ -665,9 +663,7 @@ class TestCatalogusImport(TestCase):
         bad_jsonl = self.jsonl + "\n" + bad_line
 
         with self.assertRaises(KeyError):
-            CatalogusConfigImport.from_jsonl_stream_or_string(
-                stream_or_string=bad_jsonl
-            )
+            ZGWConfigImport.from_jsonl_stream_or_string(stream_or_string=bad_jsonl)
 
         counts = (
             CatalogusConfig.objects.count(),
@@ -691,8 +687,6 @@ class ImportExportTestCase(TestCase):
 
     def test_exports_can_be_imported(self):
         export = ZGWConfigExport.from_catalogus_configs(CatalogusConfig.objects.all())
-        import_result = CatalogusConfigImport.from_jsonl_stream_or_string(
-            export.as_jsonl()
-        )
+        import_result = ZGWConfigImport.from_jsonl_stream_or_string(export.as_jsonl())
 
         self.assertEqual(import_result.total_rows_processed, 5)

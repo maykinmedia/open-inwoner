@@ -277,7 +277,7 @@ class ZGWConfigExport:
 
 
 @dataclasses.dataclass(frozen=True)
-class CatalogusConfigImport:
+class ZGWConfigImport:
     """Import CatalogusConfig(s) and all associated relations."""
 
     total_rows_processed: int = 0
