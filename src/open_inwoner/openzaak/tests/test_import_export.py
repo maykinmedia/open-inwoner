@@ -1,6 +1,7 @@
 import dataclasses
 import io
 import uuid
+from unittest import skip
 
 from django.core.files.storage.memory import InMemoryStorage
 from django.test import TestCase
@@ -526,6 +527,7 @@ class TestCatalogusImport(TestCase):
         self.assertEqual(ZaakTypeStatusTypeConfig.objects.count(), 1)
         self.assertEqual(ZaakTypeResultaatTypeConfig.objects.count(), 1)
 
+    @skip("Disabled for v1.21.4 backport")
     def test_import_jsonl_update_reports_duplicate_db_records(self):
         mocks = ZGWExportImportMockData()
 
@@ -565,6 +567,7 @@ class TestCatalogusImport(TestCase):
         # check import
         self.assertEqual(import_result, import_expected)
 
+    @skip("Disabled for v1.21.4 backport")
     def test_import_jsonl_update_reports_duplicate_natural_keys_in_upload_file(self):
         mocks = ZGWExportImportMockData(with_dupes=True)
 
