@@ -247,20 +247,151 @@ let isEventTrackerInitialized = false
           'Save',
         ],
         // End of Communicatievoorkeuren
-        // Start Header dropdown profiel
+        // Header desktop dropdown profiel
         '.header > .header__container > nav.primary-navigation.primary-navigation__authenticated > .primary-navigation__list > .primary-navigation__list-item > ul > li:nth-child(1) > a':
           ['event', 'Mijn Profiel', 'Click', 'Open mijn profiel'],
         '.header > .header__container > nav.primary-navigation.primary-navigation--open.primary-navigation__authenticated > .primary-navigation__list > .primary-navigation__list-item > .subpage-list > li:nth-child(1) > a > .link__text':
           ['event', 'Mijn Profiel', 'Click', 'Open mijn profiel'],
         '.header > .header__container > nav.primary-navigation.primary-navigation__authenticated > .primary-navigation__list > .primary-navigation__list-item > ul > li:nth-child(1) > a > .material-icons-outlined':
           ['event', 'Mijn Profiel', 'Click', 'Open mijn profiel'],
-        // End header dropdown profiel
-        '.header nav.primary-navigation.primary-navigation__authenticated > ul > li > ul > li.header__list-item > a':
-          ['event', 'Logout button', 'Click', 'Logout'],
-        '.header nav.primary-navigation.primary-navigation__authenticated > ul > li > ul > li.header__list-item > a .link__text':
-          ['event', 'Logout button', 'Click', 'Logout'],
-        '.header nav.primary-navigation.primary-navigation__authenticated > ul > li > ul > li.header__list-item > a > .material-icons':
-          ['event', 'Logout button', 'Click', 'Logout'],
+        // header mobile dropdown profiel
+        '.header nav.primary-navigation.primary-navigation__authenticated > ul > li > ul > li.header__list-item > a[aria-label="Mijn profiel"]':
+          ['event', 'Profiel nav', 'Click', 'Open mijn profiel'],
+        '.header nav.primary-navigation.primary-navigation__authenticated > ul > li > ul > li.header__list-item > a[aria-label="Mijn profiel"] .link__text':
+          ['event', 'Profiel nav', 'Click', 'Open mijn profiel'],
+        '.header > div > div.header--mobile.header__submenu > nav > ul > li > a[aria-label="Mijn profiel"] .material-icons-outlined':
+          ['event', 'Profiel nav', 'Click', 'Open mijn profiel'],
+        // Mijn aanvragen desktop and cards
+        '.header > div > nav.primary-navigation.primary-navigation--desktop.primary-navigation__authenticated > ul > li > ul > li > a':
+          ['event', 'Mijn aanvragen', 'Click', 'Open mijn hele link'],
+        '.header > div > nav.primary-navigation.primary-navigation--desktop.primary-navigation__authenticated > ul > li > ul > li > a span':
+          ['event', 'Mijn aanvragen', 'Click', 'Open mijn tekst span'],
+        // Header dropdown Aanvragen mobile
+        '.header .header--mobile.header__submenu > nav.primary-navigation--mobile > .primary-navigation__list > .primary-navigation__list-item > a[aria-label="Mijn aanvragen"]':
+          ['event', 'Mobile nav', 'Click', 'Logout'],
+        '.header .header--mobile.header__submenu > nav.primary-navigation--mobile > .primary-navigation__list > .primary-navigation__list-item > a[aria-label="Mijn aanvragen"] .link__text':
+          ['event', 'Mobile nav', 'Click', 'Logout'],
+        '.header .header--mobile.header__submenu > nav.primary-navigation--mobile > .primary-navigation__list > .primary-navigation__list-item > a[aria-label="Mijn aanvragen"] > .material-icons':
+          ['event', 'Mobile nav', 'Click', 'Logout'],
+        //cards
+        '#cases-content > .card__grid .column a.card div': [
+          'event',
+          'Mijn aanvragen overzicht',
+          'Click',
+          '1e div',
+        ],
+        '#cases-content > div.card__grid > div > div > a > div > div > span.card__status_indicator_text':
+          [
+            'event',
+            'Mijn aanvragen overzicht',
+            'Click',
+            'span.card__status_indicator_text',
+          ],
+        '#cases-content > div.card__grid > div > div > a > div > ul > li > p.utrecht-paragraph':
+          [
+            'event',
+            'Mijn aanvragen overzicht',
+            'Click',
+            'li > p.utrecht-paragraph',
+          ],
+        '#cases-content > div.card__grid > div > div > a > div > span > span': [
+          'event',
+          'Mijn aanvragen overzicht',
+          'Click',
+          'span > span',
+        ],
+        '#cases-content > div.card__grid > div > div > a > div > h2': [
+          'event',
+          'Mijn aanvragen overzicht',
+          'Click',
+          'H2',
+        ],
+        '#cases-content > div.card__grid > div > div > a > div > ul > li': [
+          'event',
+          'Mijn aanvragen overzicht',
+          'Click',
+          'ul > li',
+        ],
+        '#cases-content > div.card__grid > div > div > a > div > ul > li .utrecht-paragraph':
+          [
+            'event',
+            'Mijn aanvragen overzicht',
+            'Click',
+            'li .utrecht-paragraph',
+          ],
+        '#cases-content > div.card__grid > div > div > a > div > ul > li .card__caption span':
+          ['event', 'Mijn aanvragen overzicht', 'Click', 'card__caption span'],
+        '#cases-content > div.card__grid > div > div > a > div > span > span.link__text':
+          ['event', 'Mijn aanvragen overzicht', 'Click', 'Open de aanvraag'],
+        // Detail Case view
+        '#statuses_component .status-list__notification-content > p.utrecht-paragraph.status-list__upload.status-list__upload--enabled > a':
+          ['event', 'Aanvraag detail', 'Scroll click', 'Scroll omlaag'],
+        '#cases-detail-content .column.column--start-4.column--span-6 > section.case-detail__documents > .file-list > ul > li > aside > div > div > a > span':
+          ['event', 'Aanvraag detail', 'Click', 'Download document'],
+        '#document-upload > div.form__control.file-input > div.card > div > label.button.button--primary.file-input__label-empty':
+          ['event', 'Aanvraag detail', 'Click', 'Selecteer bestanden'],
+        '#document-upload > div.form__control.file-input > div.form__actions.form__actions--fullwidth > button':
+          ['event', 'Aanvraag detail', 'Click', 'Upload documenten'],
+        '#document-upload > div.form__control.file-input > div.form__actions.form__actions--fullwidth > button span':
+          ['event', 'Aanvraag detail', 'Click', 'Upload documenten'],
+        '#document-upload > div.form__control.file-input > div.file-list > ul > li > aside > div > div > a':
+          ['event', 'Aanvraag detail', 'Click', 'Verwijder document'],
+        '#document-upload > div.form__control.file-input > div.file-list > ul > li > aside > div > div > a > span':
+          ['event', 'Aanvraag detail', 'Click', 'Verwijder document'],
+        // Detail case toggle stautses
+        '#statuses_component > aside > ul > li.status-list__list-item.status--current > div > h3 > button':
+          [
+            'event',
+            'Aanvraag status accordeon',
+            'Scroll click',
+            'Open huidige status',
+          ],
+        '#statuses_component > aside > ul > li.status-list__list-item.status--current > div > h3 > button span':
+          [
+            'event',
+            'Aanvraag status accordeon',
+            'Scroll click',
+            'Open huidige status',
+          ],
+        '#statuses_component > aside > ul > li.status--completed.status-list__list-item > div > h3 > button':
+          [
+            'event',
+            'Aanvraag status accordeon',
+            'Scroll click',
+            'Open voltooide status',
+          ],
+        '#statuses_component > aside > ul > li.status--completed.status-list__list-item > div > h3 > button span':
+          [
+            'event',
+            'Aanvraag status accordeon',
+            'Scroll click',
+            'Open voltooide status',
+          ],
+        '#statuses_component > aside > ul > li.status--active.status-list__list-item > div > h3 > button':
+          [
+            'event',
+            'Aanvraag status accordeon',
+            'Scroll click',
+            'Open openstaande status',
+          ],
+        '#statuses_component > aside > ul > li.status--active.status-list__list-item > div > h3 > button span':
+          [
+            'event',
+            'Aanvraag status accordeon',
+            'Scroll click',
+            'Open openstaande status',
+          ],
+        '#statuses_component > aside > ul > li > div > h3 > button[aria-expanded="false"]':
+          ['event', 'Aanvraag status accordeon', 'Scroll click', 'Open status'],
+        '#statuses_component > aside > ul > li > div > h3 > button[aria-expanded="false"] span':
+          ['event', 'Aanvraag status accordeon', 'Scroll click', 'Open status'],
+        // Accessibility header
+        '.accessibility-header > ul > li > a > .link__text': [
+          'event',
+          'Aanvraag status accordeon',
+          'Scroll click',
+          'Open status',
+        ],
         // Filters in Cases list
         '.filter-bar #selectButton': [
           'event',
@@ -282,7 +413,7 @@ let isEventTrackerInitialized = false
         ],
       },
       change: {
-        '.form#profile-edit input[name="phone"]': [
+        '.form#profile-edit input[name="phonenumber"]': [
           'event',
           'Contactgegevens',
           'change',
@@ -290,7 +421,7 @@ let isEventTrackerInitialized = false
         ],
       },
       keydown: {
-        '.form#profile-edit input[name="phone"]': [
+        '.form#profile-edit input[name="phonenumber"]': [
           'event',
           'Contactgegevens',
           'change',
@@ -302,29 +433,72 @@ let isEventTrackerInitialized = false
     new EventTracker(selectorMap)
   }
 
-  // Poller function
+  function trackDynamicElements() {
+    const fileList = document.querySelector('#document-upload')
+
+    if (fileList) {
+      const fileObserver = new MutationObserver(() => {
+        const deleteButton = fileList.querySelector(
+          'div.form__control.file-input > div.file-list > ul > li > aside > div > div > a'
+        )
+        const deleteButtonText = fileList.querySelector(
+          'div.form__control.file-input > div.file-list > ul > li > aside > div > div > a > span'
+        )
+
+        if (deleteButton) {
+          deleteButton.addEventListener('click', () => {
+            const eventData = [
+              'event',
+              'Aanvraag detail',
+              'Click',
+              'Verwijder document',
+            ]
+            _sz.push(eventData)
+            console.log('Tracked event:', eventData)
+          })
+        }
+
+        if (deleteButtonText) {
+          deleteButtonText.addEventListener('click', () => {
+            const eventData = [
+              'event',
+              'Aanvraag detail',
+              'Click',
+              'Verwijder document',
+            ]
+            _sz.push(eventData)
+            console.log('Tracked event:', eventData)
+          })
+        }
+      })
+
+      fileObserver.observe(fileList, { childList: true, subtree: true })
+    } else {
+      console.warn('File list container not found. Dynamic tracking skipped.')
+    }
+  }
+
   function checkForSzObject() {
-    const intervalId = setInterval(function () {
+    const intervalId = setInterval(() => {
       if (typeof _sz !== 'undefined') {
-        clearInterval(intervalId) // Stop the interval once _sz is defined
-        initEventTracker() // Initialize EventTracker
+        clearInterval(intervalId)
+        initEventTracker()
+        trackDynamicElements() // Add dynamic tracking here too, if needed
       } else {
         console.log('-> SiteImprove _sz is not defined yet.')
       }
-    }, 1000) // Check every 1000 milliseconds (1 second)
+    }, 1000)
   }
 
-  // Start checking for _sz object
   checkForSzObject()
 
-  // MutationObserver to detect DOM changes
-  const observer = new MutationObserver(function () {
+  const observer = new MutationObserver(() => {
     if (typeof _sz !== 'undefined') {
-      observer.disconnect() // Stop observing once _sz is available
+      observer.disconnect()
       initEventTracker()
+      trackDynamicElements()
     }
   })
 
-  // Observe DOM changes
   observer.observe(document, { childList: true, subtree: true })
 })()
