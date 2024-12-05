@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("openzaak", "0057_openzaakconfig_order_statusses_by_date_set"),
+        ("openzaak", "0055_openzaakconfig_zaken_filter_enabled"),
     ]
 
     operations = [
