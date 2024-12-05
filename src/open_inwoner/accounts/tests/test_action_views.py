@@ -361,6 +361,7 @@ class ActionsPlaywrightTests(PlaywrightSyncLiveServerTestCase):
 
         expect(dropdown_button).to_contain_text(open_label)
         # grab buttons
+        # remove role
         status_closed_button = dropdown_content.get_by_role("button", name=closed_label)
         status_approval_button = dropdown_content.get_by_role(
             "button", name=approval_label
