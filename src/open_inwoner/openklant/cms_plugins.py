@@ -7,6 +7,8 @@ from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 
 from open_inwoner.ckeditor5.widgets import CKEditorWidget
+from open_inwoner.openklant.forms import ContactForm
+from open_inwoner.openklant.models import OpenKlantConfig
 
 #
 # contact form plugin
@@ -14,6 +16,11 @@ from open_inwoner.ckeditor5.widgets import CKEditorWidget
 
 
 class ContactFormConfig(CMSPlugin):
+    title = models.TextField(
+        _("Title"),
+        blank=True,
+        help_text=_("Title of the contact form."),
+    )
     description = models.TextField(
         _("Description"),
         blank=True,
@@ -26,6 +33,7 @@ class ContactFormConfigForm(forms.ModelForm):
         model = ContactFormConfig
         fields = "__all__"
         widgets = {
+            "title": CKEditorWidget,
             "description": CKEditorWidget,
         }
 
@@ -36,4 +44,22 @@ class ContactFormPlugin(CMSPluginBase):
     form = ContactFormConfigForm
     name = _("Contact form plugin")
     render_template = "pages/contactform/form.html"
+    # render_template = "cms/contactform/form.html"
     cache = False
+
+    fieldsets = ((None, {"fields": ("title", "description")}),)
+
+    def render(self, context, instance, placeholder):
+        config = OpenKlantConfig.get_solo()
+        context.update(
+            {
+                "has_form_configuration": config.has_form_configuration(),
+                "form": ContactForm(
+                    user=context["user"], request_session=context["request"].session
+                ),
+                "instance": instance,
+                "title": instance.title,
+                "description": instance.description,
+            }
+        )
+        return context
