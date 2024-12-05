@@ -1,0 +1,17 @@
+.inline-group {
+    margin-bottom: 16px;
+
+    border: 1px solid #ddd;
+    border-radius: 5px;
+
+    > fieldset > h2 {
+      margin-bottom: 5px;
+      background-color: #498fc9;
+    }
+}
+
+.inline-related {
+  h3 {
+    display: none;
+  }
+}
