@@ -1,10 +1,10 @@
 interactions:
 - request:
     body: '{"digitaleAdressen": null, "voorkeursDigitaalAdres": null, "rekeningnummers":
-      null, "voorkeursRekeningnummer": null, "indicatieGeheimhouding": true, "indicatieActief":
-      false, "voorkeurstaal": "aka", "soortPartij": "persoon", "partijIdentificatie":
-      {"contactnaam": {"voorletters": "Mx.", "voornaam": "Duane", "voorvoegselAchternaam":
-      "Mr.", "achternaam": "Roberts"}}}'
+      null, "voorkeursRekeningnummer": null, "indicatieGeheimhouding": false, "indicatieActief":
+      false, "voorkeurstaal": "und", "soortPartij": "persoon", "partijIdentificatie":
+      {"contactnaam": {"voorletters": "Mx.", "voornaam": "Angela", "voorvoegselAchternaam":
+      "Mx.", "achternaam": "Hogan"}}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
@@ -16,21 +16,27 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/partijen
   response:
     body:
-      string: '{"uuid":"bc07e1be-e119-4b5f-bcc0-0afef1dc33dc","url":"http://localhost:8338/klantinteracties/api/v1/partijen/bc07e1be-e119-4b5f-bcc0-0afef1dc33dc","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":true,"voorkeurstaal":"aka","indicatieActief":false,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Mx.","voornaam":"Duane","voorvoegselAchternaam":"Mr.","achternaam":"Roberts"},"volledigeNaam":"Duane
-        Mr. Roberts"}}'
+      string: '{"uuid":"82e8fc18-c268-4526-b64a-96713fcbc92e","url":"http://localhost:8338/klantinteracties/api/v1/partijen/82e8fc18-c268-4526-b64a-96713fcbc92e","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"und","indicatieActief":false,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Mx.","voornaam":"Angela","voorvoegselAchternaam":"Mx.","achternaam":"Hogan"},"volledigeNaam":"Angela
+        Mx. Hogan"}}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '863'
+      - '862'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/partijen/bc07e1be-e119-4b5f-bcc0-0afef1dc33dc
+      - http://localhost:8338/klantinteracties/api/v1/partijen/82e8fc18-c268-4526-b64a-96713fcbc92e
       Referrer-Policy:
       - same-origin
       Vary:
@@ -43,7 +49,7 @@ interactions:
       code: 201
       message: Created
 - request:
-    body: '{"verstrektDoorBetrokkene": null, "verstrektDoorPartij": {"uuid": "bc07e1be-e119-4b5f-bcc0-0afef1dc33dc"},
+    body: '{"verstrektDoorBetrokkene": null, "verstrektDoorPartij": {"uuid": "82e8fc18-c268-4526-b64a-96713fcbc92e"},
       "adres": "foo@bar.com", "omschrijving": "professional", "soortDigitaalAdres":
       "email"}'
     headers:
@@ -57,20 +63,26 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/digitaleadressen
   response:
     body:
-      string: '{"uuid":"f300a1e4-c066-4eaa-9694-e41036986d03","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/f300a1e4-c066-4eaa-9694-e41036986d03","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"bc07e1be-e119-4b5f-bcc0-0afef1dc33dc","url":"http://localhost:8338/klantinteracties/api/v1/partijen/bc07e1be-e119-4b5f-bcc0-0afef1dc33dc"},"adres":"foo@bar.com","soortDigitaalAdres":"email","omschrijving":"professional"}'
+      string: '{"uuid":"3b8e8c88-bb66-4335-8e92-6c39ed4e27bd","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/3b8e8c88-bb66-4335-8e92-6c39ed4e27bd","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"82e8fc18-c268-4526-b64a-96713fcbc92e","url":"http://localhost:8338/klantinteracties/api/v1/partijen/82e8fc18-c268-4526-b64a-96713fcbc92e"},"adres":"foo@bar.com","soortDigitaalAdres":"email","isStandaardAdres":false,"omschrijving":"professional"}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '437'
+      - '462'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/digitaleadressen/f300a1e4-c066-4eaa-9694-e41036986d03
+      - http://localhost:8338/klantinteracties/api/v1/digitaleadressen/3b8e8c88-bb66-4335-8e92-6c39ed4e27bd
       Referrer-Policy:
       - same-origin
       Vary:

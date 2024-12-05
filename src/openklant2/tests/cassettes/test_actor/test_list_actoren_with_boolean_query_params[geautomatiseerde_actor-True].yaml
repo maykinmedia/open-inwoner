@@ -1,34 +1,40 @@
 interactions:
 - request:
-    body: '{"naam": "Dr. Jeffery Austin", "soortActor": "organisatorische_eenheid",
-      "indicatieActief": false, "actoridentificator": {"objectId": "0000000013", "codeObjecttype":
-      "day", "codeRegister": "good", "codeSoortObjectId": "health"}}'
+    body: '{"naam": "Robert Martin", "soortActor": "organisatorische_eenheid", "indicatieActief":
+      false, "actoridentificator": {"objectId": "0000000013", "codeObjecttype": "low",
+      "codeRegister": "cup", "codeSoortObjectId": "away"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '228'
+      - '220'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/actoren
   response:
     body:
-      string: '{"uuid":"4e799110-b2e8-4b8e-ba0f-80535ef4ecff","url":"http://localhost:8338/klantinteracties/api/v1/actoren/4e799110-b2e8-4b8e-ba0f-80535ef4ecff","naam":"Dr.
-        Jeffery Austin","soortActor":"organisatorische_eenheid","indicatieActief":false,"actoridentificator":{"objectId":"0000000013","codeObjecttype":"day","codeRegister":"good","codeSoortObjectId":"health"},"actorIdentificatie":null}'
+      string: '{"uuid":"c3b845e8-77d0-416e-a198-f36eb73c4f8e","url":"http://localhost:8338/klantinteracties/api/v1/actoren/c3b845e8-77d0-416e-a198-f36eb73c4f8e","naam":"Robert
+        Martin","soortActor":"organisatorische_eenheid","indicatieActief":false,"actoridentificator":{"objectId":"0000000013","codeObjecttype":"low","codeRegister":"cup","codeSoortObjectId":"away"},"actorIdentificatie":null}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '385'
+      - '377'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/4e799110-b2e8-4b8e-ba0f-80535ef4ecff
+      - http://localhost:8338/klantinteracties/api/v1/actoren/c3b845e8-77d0-416e-a198-f36eb73c4f8e
       Referrer-Policy:
       - same-origin
       Vary:
@@ -41,50 +47,9 @@ interactions:
       code: 201
       message: Created
 - request:
-    body: '{"naam": "Jeanne Fernandez", "soortActor": "geautomatiseerde_actor", "indicatieActief":
-      false, "actoridentificator": {"objectId": "0000000014", "codeObjecttype": "help",
-      "codeRegister": "feel", "codeSoortObjectId": "operation"}}'
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-      Content-Length:
-      - '228'
-      Content-Type:
-      - application/json
-    method: POST
-    uri: http://localhost:8338/klantinteracties/api/v1/actoren
-  response:
-    body:
-      string: '{"uuid":"8075b19f-e7d7-4951-bf1c-c02763f069f4","url":"http://localhost:8338/klantinteracties/api/v1/actoren/8075b19f-e7d7-4951-bf1c-c02763f069f4","naam":"Jeanne
-        Fernandez","soortActor":"geautomatiseerde_actor","indicatieActief":false,"actoridentificator":{"objectId":"0000000014","codeObjecttype":"help","codeRegister":"feel","codeSoortObjectId":"operation"},"actorIdentificatie":null}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '385'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/8075b19f-e7d7-4951-bf1c-c02763f069f4
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 201
-      message: Created
-- request:
-    body: '{"naam": "Bethany Morgan", "soortActor": "geautomatiseerde_actor", "indicatieActief":
-      true, "actoridentificator": {"objectId": "0000000015", "codeObjecttype": "military",
-      "codeRegister": "move", "codeSoortObjectId": "less"}}'
+    body: '{"naam": "David Jenkins", "soortActor": "organisatorische_eenheid", "indicatieActief":
+      false, "actoridentificator": {"objectId": "0000000014", "codeObjecttype": "late",
+      "codeRegister": "music", "codeSoortObjectId": "media"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
@@ -96,8 +61,8 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/actoren
   response:
     body:
-      string: '{"uuid":"0ebea89c-9c45-4f6e-a2e3-2db909e4b5d5","url":"http://localhost:8338/klantinteracties/api/v1/actoren/0ebea89c-9c45-4f6e-a2e3-2db909e4b5d5","naam":"Bethany
-        Morgan","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000015","codeObjecttype":"military","codeRegister":"move","codeSoortObjectId":"less"},"actorIdentificatie":null}'
+      string: '{"uuid":"a53f7379-69fe-4159-becb-fb18b1c838a2","url":"http://localhost:8338/klantinteracties/api/v1/actoren/a53f7379-69fe-4159-becb-fb18b1c838a2","naam":"David
+        Jenkins","soortActor":"organisatorische_eenheid","indicatieActief":false,"actoridentificator":{"objectId":"0000000014","codeObjecttype":"late","codeRegister":"music","codeSoortObjectId":"media"},"actorIdentificatie":null}'
     headers:
       API-version:
       - 0.0.3
@@ -105,12 +70,65 @@ interactions:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
       - '381'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/0ebea89c-9c45-4f6e-a2e3-2db909e4b5d5
+      - http://localhost:8338/klantinteracties/api/v1/actoren/a53f7379-69fe-4159-becb-fb18b1c838a2
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"naam": "Donna Williams", "soortActor": "geautomatiseerde_actor", "indicatieActief":
+      true, "actoridentificator": {"objectId": "0000000015", "codeObjecttype": "because",
+      "codeRegister": "decade", "codeSoortObjectId": "behavior"}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '229'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"uuid":"f5b95973-0976-411c-917c-015b68ea5ca3","url":"http://localhost:8338/klantinteracties/api/v1/actoren/f5b95973-0976-411c-917c-015b68ea5ca3","naam":"Donna
+        Williams","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000015","codeObjecttype":"because","codeRegister":"decade","codeSoortObjectId":"behavior"},"actorIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '386'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/actoren/f5b95973-0976-411c-917c-015b68ea5ca3
       Referrer-Policy:
       - same-origin
       Vary:
@@ -131,171 +149,21 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/actoren?indicatieActief=True&soortActor=geautomatiseerde_actor
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"0ebea89c-9c45-4f6e-a2e3-2db909e4b5d5","url":"http://localhost:8338/klantinteracties/api/v1/actoren/0ebea89c-9c45-4f6e-a2e3-2db909e4b5d5","naam":"Bethany
-        Morgan","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000015","codeObjecttype":"military","codeRegister":"move","codeSoortObjectId":"less"},"actorIdentificatie":null}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"f5b95973-0976-411c-917c-015b68ea5ca3","url":"http://localhost:8338/klantinteracties/api/v1/actoren/f5b95973-0976-411c-917c-015b68ea5ca3","naam":"Donna
+        Williams","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000015","codeObjecttype":"because","codeRegister":"decade","codeSoortObjectId":"behavior"},"actorIdentificatie":null}]}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '433'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 200
-      message: OK
-- request:
-    body: '{"naam": "Michael Brown", "soortActor": "medewerker", "indicatieActief":
-      false, "actoridentificator": {"objectId": "0000000013", "codeObjecttype": "six",
-      "codeRegister": "there", "codeSoortObjectId": "new"}}'
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-      Content-Length:
-      - '207'
-      Content-Type:
-      - application/json
-    method: POST
-    uri: http://localhost:8338/klantinteracties/api/v1/actoren
-  response:
-    body:
-      string: '{"uuid":"51b37769-a3c7-46a1-be19-768f61e428e1","url":"http://localhost:8338/klantinteracties/api/v1/actoren/51b37769-a3c7-46a1-be19-768f61e428e1","naam":"Michael
-        Brown","soortActor":"medewerker","indicatieActief":false,"actoridentificator":{"objectId":"0000000013","codeObjecttype":"six","codeRegister":"there","codeSoortObjectId":"new"},"actorIdentificatie":null}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '364'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/51b37769-a3c7-46a1-be19-768f61e428e1
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 201
-      message: Created
-- request:
-    body: '{"naam": "Michelle Walker", "soortActor": "medewerker", "indicatieActief":
-      false, "actoridentificator": {"objectId": "0000000014", "codeObjecttype": "half",
-      "codeRegister": "boy", "codeSoortObjectId": "series"}}'
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-      Content-Length:
-      - '211'
-      Content-Type:
-      - application/json
-    method: POST
-    uri: http://localhost:8338/klantinteracties/api/v1/actoren
-  response:
-    body:
-      string: '{"uuid":"db301798-6c5f-46e1-aa53-b7bf9cf231af","url":"http://localhost:8338/klantinteracties/api/v1/actoren/db301798-6c5f-46e1-aa53-b7bf9cf231af","naam":"Michelle
-        Walker","soortActor":"medewerker","indicatieActief":false,"actoridentificator":{"objectId":"0000000014","codeObjecttype":"half","codeRegister":"boy","codeSoortObjectId":"series"},"actorIdentificatie":null}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '368'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/db301798-6c5f-46e1-aa53-b7bf9cf231af
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 201
-      message: Created
-- request:
-    body: '{"naam": "Craig Moore", "soortActor": "geautomatiseerde_actor", "indicatieActief":
-      true, "actoridentificator": {"objectId": "0000000015", "codeObjecttype": "then",
-      "codeRegister": "article", "codeSoortObjectId": "charge"}}'
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-      Content-Length:
-      - '222'
-      Content-Type:
-      - application/json
-    method: POST
-    uri: http://localhost:8338/klantinteracties/api/v1/actoren
-  response:
-    body:
-      string: '{"uuid":"050ed5e8-6d48-4276-8d14-ed647b0be751","url":"http://localhost:8338/klantinteracties/api/v1/actoren/050ed5e8-6d48-4276-8d14-ed647b0be751","naam":"Craig
-        Moore","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000015","codeObjecttype":"then","codeRegister":"article","codeSoortObjectId":"charge"},"actorIdentificatie":null}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '379'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/050ed5e8-6d48-4276-8d14-ed647b0be751
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 201
-      message: Created
-- request:
-    body: null
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-    method: GET
-    uri: http://localhost:8338/klantinteracties/api/v1/actoren?indicatieActief=True&soortActor=geautomatiseerde_actor
-  response:
-    body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"050ed5e8-6d48-4276-8d14-ed647b0be751","url":"http://localhost:8338/klantinteracties/api/v1/actoren/050ed5e8-6d48-4276-8d14-ed647b0be751","naam":"Craig
-        Moore","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000015","codeObjecttype":"then","codeRegister":"article","codeSoortObjectId":"charge"},"actorIdentificatie":null}]}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '431'
+      - '438'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

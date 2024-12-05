@@ -1,34 +1,40 @@
 interactions:
 - request:
-    body: '{"nummer": "0000000005", "kanaal": "impact", "onderwerp": "consumer", "inhoud":
-      "While often letter.", "taal": "nld", "indicatieContactGelukt": false, "vertrouwelijk":
-      false, "plaatsgevondenOp": "2002-11-26T10:57:36.537736"}'
+    body: '{"nummer": "0000000116", "kanaal": "ask", "onderwerp": "focus", "inhoud":
+      "Around oil right rather company outside describe.", "taal": "nld", "indicatieContactGelukt":
+      false, "vertrouwelijk": true, "plaatsgevondenOp": "2004-10-24T01:55:55.993083"}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '224'
+      - '247'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"e8e30b1f-3fed-4c90-b111-1a8caf1fb5a2","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/e8e30b1f-3fed-4c90-b111-1a8caf1fb5a2","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000005","kanaal":"impact","onderwerp":"consumer","inhoud":"While
-        often letter.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2002-11-26T10:57:36.537736Z"}'
+      string: '{"uuid":"9a1f9329-63fb-4ca7-bf71-c511d33b7b9f","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/9a1f9329-63fb-4ca7-bf71-c511d33b7b9f","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000116","kanaal":"ask","onderwerp":"focus","inhoud":"Around
+        oil right rather company outside describe.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2004-10-24T01:55:55.993083Z"}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '486'
+      - '509'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/e8e30b1f-3fed-4c90-b111-1a8caf1fb5a2
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/9a1f9329-63fb-4ca7-bf71-c511d33b7b9f
       Referrer-Policy:
       - same-origin
       Vary:
@@ -49,15 +55,21 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1&indicatieContactGelukt=False
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"e8e30b1f-3fed-4c90-b111-1a8caf1fb5a2","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/e8e30b1f-3fed-4c90-b111-1a8caf1fb5a2","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000005","kanaal":"impact","onderwerp":"consumer","inhoud":"While
-        often letter.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2002-11-26T10:57:36.537736Z","_expand":{}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"9a1f9329-63fb-4ca7-bf71-c511d33b7b9f","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/9a1f9329-63fb-4ca7-bf71-c511d33b7b9f","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000116","kanaal":"ask","onderwerp":"focus","inhoud":"Around
+        oil right rather company outside describe.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2004-10-24T01:55:55.993083Z","_expand":{}}]}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '551'
+      - '574'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
@@ -90,113 +102,12 @@ interactions:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
       - '52'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 200
-      message: OK
-- request:
-    body: '{"nummer": "0000000005", "kanaal": "whether", "onderwerp": "industry",
-      "inhoud": "From bag happy subject else marriage worry difference.", "taal":
-      "nld", "indicatieContactGelukt": false, "vertrouwelijk": true, "plaatsgevondenOp":
-      "1996-02-05T06:55:58.392112"}'
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-      Content-Length:
-      - '259'
-      Content-Type:
-      - application/json
-    method: POST
-    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
-  response:
-    body:
-      string: '{"uuid":"afeefc39-7685-47c6-b9e6-af0645a3632e","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/afeefc39-7685-47c6-b9e6-af0645a3632e","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000005","kanaal":"whether","onderwerp":"industry","inhoud":"From
-        bag happy subject else marriage worry difference.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"1996-02-05T06:55:58.392112Z"}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '521'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/afeefc39-7685-47c6-b9e6-af0645a3632e
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 201
-      message: Created
-- request:
-    body: null
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-    method: GET
-    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1&indicatieContactGelukt=False
-  response:
-    body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"afeefc39-7685-47c6-b9e6-af0645a3632e","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/afeefc39-7685-47c6-b9e6-af0645a3632e","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000005","kanaal":"whether","onderwerp":"industry","inhoud":"From
-        bag happy subject else marriage worry difference.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"1996-02-05T06:55:58.392112Z","_expand":{}}]}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '586'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 200
-      message: OK
-- request:
-    body: null
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-    method: GET
-    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1&indicatieContactGelukt=true
-  response:
-    body:
-      string: '{"count":0,"next":null,"previous":null,"results":[]}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '52'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

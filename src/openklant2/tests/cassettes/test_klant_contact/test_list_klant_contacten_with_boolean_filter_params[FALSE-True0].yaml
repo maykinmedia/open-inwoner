@@ -1,34 +1,40 @@
 interactions:
 - request:
-    body: '{"nummer": "0000000015", "kanaal": "finish", "onderwerp": "some", "inhoud":
-      "Country why power later want although edge.", "taal": "nld", "indicatieContactGelukt":
-      false, "vertrouwelijk": true, "plaatsgevondenOp": "2017-05-28T05:19:33.749451"}'
+    body: '{"nummer": "0000000126", "kanaal": "issue", "onderwerp": "economy", "inhoud":
+      "Up as institution great much.", "taal": "nld", "indicatieContactGelukt": false,
+      "vertrouwelijk": true, "plaatsgevondenOp": "2022-08-28T20:39:17.895189"}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '243'
+      - '231'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"978c4dd0-44b0-44fe-b624-4b7e8b5a9013","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/978c4dd0-44b0-44fe-b624-4b7e8b5a9013","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000015","kanaal":"finish","onderwerp":"some","inhoud":"Country
-        why power later want although edge.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2017-05-28T05:19:33.749451Z"}'
+      string: '{"uuid":"76366322-693a-446f-a332-f71999495e4e","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/76366322-693a-446f-a332-f71999495e4e","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000126","kanaal":"issue","onderwerp":"economy","inhoud":"Up
+        as institution great much.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2022-08-28T20:39:17.895189Z"}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '505'
+      - '493'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/978c4dd0-44b0-44fe-b624-4b7e8b5a9013
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/76366322-693a-446f-a332-f71999495e4e
       Referrer-Policy:
       - same-origin
       Vary:
@@ -49,15 +55,21 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1&indicatieContactGelukt=FALSE
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"978c4dd0-44b0-44fe-b624-4b7e8b5a9013","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/978c4dd0-44b0-44fe-b624-4b7e8b5a9013","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000015","kanaal":"finish","onderwerp":"some","inhoud":"Country
-        why power later want although edge.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2017-05-28T05:19:33.749451Z","_expand":{}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"76366322-693a-446f-a332-f71999495e4e","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/76366322-693a-446f-a332-f71999495e4e","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000126","kanaal":"issue","onderwerp":"economy","inhoud":"Up
+        as institution great much.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2022-08-28T20:39:17.895189Z","_expand":{}}]}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '570'
+      - '558'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
@@ -90,112 +102,12 @@ interactions:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
       - '52'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 200
-      message: OK
-- request:
-    body: '{"nummer": "0000000015", "kanaal": "project", "onderwerp": "whether", "inhoud":
-      "Best check product form.", "taal": "nld", "indicatieContactGelukt": false,
-      "vertrouwelijk": false, "plaatsgevondenOp": "2021-02-01T17:26:34.946708"}'
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-      Content-Length:
-      - '229'
-      Content-Type:
-      - application/json
-    method: POST
-    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
-  response:
-    body:
-      string: '{"uuid":"ec73fb4f-63ab-4ac9-8a01-f9617d5057a9","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/ec73fb4f-63ab-4ac9-8a01-f9617d5057a9","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000015","kanaal":"project","onderwerp":"whether","inhoud":"Best
-        check product form.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2021-02-01T17:26:34.946708Z"}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '491'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/ec73fb4f-63ab-4ac9-8a01-f9617d5057a9
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 201
-      message: Created
-- request:
-    body: null
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-    method: GET
-    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1&indicatieContactGelukt=FALSE
-  response:
-    body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"ec73fb4f-63ab-4ac9-8a01-f9617d5057a9","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/ec73fb4f-63ab-4ac9-8a01-f9617d5057a9","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000015","kanaal":"project","onderwerp":"whether","inhoud":"Best
-        check product form.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2021-02-01T17:26:34.946708Z","_expand":{}}]}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '556'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 200
-      message: OK
-- request:
-    body: null
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-    method: GET
-    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1&indicatieContactGelukt=True
-  response:
-    body:
-      string: '{"count":0,"next":null,"previous":null,"results":[]}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '52'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

@@ -1,34 +1,40 @@
 interactions:
 - request:
-    body: '{"naam": "Danielle Smith", "soortActor": "geautomatiseerde_actor", "indicatieActief":
-      true, "actoridentificator": {"objectId": "0000000006", "codeObjecttype": "shoulder",
-      "codeRegister": "out", "codeSoortObjectId": "onto"}}'
+    body: '{"naam": "Robert Winters", "soortActor": "geautomatiseerde_actor", "indicatieActief":
+      true, "actoridentificator": {"objectId": "0000000006", "codeObjecttype": "specific",
+      "codeRegister": "career", "codeSoortObjectId": "language"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '223'
+      - '230'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/actoren
   response:
     body:
-      string: '{"uuid":"bc315bb9-dec9-49fb-afaf-a07bcf3e246d","url":"http://localhost:8338/klantinteracties/api/v1/actoren/bc315bb9-dec9-49fb-afaf-a07bcf3e246d","naam":"Danielle
-        Smith","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000006","codeObjecttype":"shoulder","codeRegister":"out","codeSoortObjectId":"onto"},"actorIdentificatie":null}'
+      string: '{"uuid":"0a7adfd0-bfcc-487f-9b54-9f20ef135558","url":"http://localhost:8338/klantinteracties/api/v1/actoren/0a7adfd0-bfcc-487f-9b54-9f20ef135558","naam":"Robert
+        Winters","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000006","codeObjecttype":"specific","codeRegister":"career","codeSoortObjectId":"language"},"actorIdentificatie":null}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '380'
+      - '387'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/bc315bb9-dec9-49fb-afaf-a07bcf3e246d
+      - http://localhost:8338/klantinteracties/api/v1/actoren/0a7adfd0-bfcc-487f-9b54-9f20ef135558
       Referrer-Policy:
       - same-origin
       Vary:
@@ -46,92 +52,24 @@ interactions:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
     method: GET
-    uri: http://localhost:8338/klantinteracties/api/v1/actoren/bc315bb9-dec9-49fb-afaf-a07bcf3e246d
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren/0a7adfd0-bfcc-487f-9b54-9f20ef135558
   response:
     body:
-      string: '{"uuid":"bc315bb9-dec9-49fb-afaf-a07bcf3e246d","url":"http://localhost:8338/klantinteracties/api/v1/actoren/bc315bb9-dec9-49fb-afaf-a07bcf3e246d","naam":"Danielle
-        Smith","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000006","codeObjecttype":"shoulder","codeRegister":"out","codeSoortObjectId":"onto"},"actorIdentificatie":null}'
+      string: '{"uuid":"0a7adfd0-bfcc-487f-9b54-9f20ef135558","url":"http://localhost:8338/klantinteracties/api/v1/actoren/0a7adfd0-bfcc-487f-9b54-9f20ef135558","naam":"Robert
+        Winters","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000006","codeObjecttype":"specific","codeRegister":"career","codeSoortObjectId":"language"},"actorIdentificatie":null}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
       Content-Length:
-      - '380'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 200
-      message: OK
-- request:
-    body: '{"naam": "Erik Hernandez", "soortActor": "medewerker", "indicatieActief":
-      true, "actoridentificator": {"objectId": "0000000006", "codeObjecttype": "need",
-      "codeRegister": "against", "codeSoortObjectId": "fight"}}'
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-      Content-Length:
-      - '212'
-      Content-Type:
-      - application/json
-    method: POST
-    uri: http://localhost:8338/klantinteracties/api/v1/actoren
-  response:
-    body:
-      string: '{"uuid":"5020e525-61d8-499c-a7d2-ef725e7d4e1f","url":"http://localhost:8338/klantinteracties/api/v1/actoren/5020e525-61d8-499c-a7d2-ef725e7d4e1f","naam":"Erik
-        Hernandez","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000006","codeObjecttype":"need","codeRegister":"against","codeSoortObjectId":"fight"},"actorIdentificatie":null}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '369'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/5020e525-61d8-499c-a7d2-ef725e7d4e1f
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 201
-      message: Created
-- request:
-    body: null
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-    method: GET
-    uri: http://localhost:8338/klantinteracties/api/v1/actoren/5020e525-61d8-499c-a7d2-ef725e7d4e1f
-  response:
-    body:
-      string: '{"uuid":"5020e525-61d8-499c-a7d2-ef725e7d4e1f","url":"http://localhost:8338/klantinteracties/api/v1/actoren/5020e525-61d8-499c-a7d2-ef725e7d4e1f","naam":"Erik
-        Hernandez","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000006","codeObjecttype":"need","codeRegister":"against","codeSoortObjectId":"fight"},"actorIdentificatie":null}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
-      Content-Length:
-      - '369'
+      - '387'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

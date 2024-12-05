@@ -1054,7 +1054,7 @@ class OpenKlant2Service(KlantenService):
     def get_or_create_digitaal_adres(
         self,
         partij_uuid: str,
-        soortAdres: Literal["email", "telefoon"],
+        soortAdres: Literal["email", "telefoonnummer"],
         adres: str,
     ) -> tuple[DigitaalAdres, bool]:
         digitale_adressen = self.filter_digitale_addressen_for_partij(
@@ -1092,7 +1092,7 @@ class OpenKlant2Service(KlantenService):
                 update_data["email"] = email
 
         if phone_adressen := self.filter_digitale_addressen_for_partij(
-            partij_uuid, soortDigitaalAdres="telefoon", adressen=adressen
+            partij_uuid, soortDigitaalAdres="telefoonnummer", adressen=adressen
         ):
             update_data["phonenumber"] = phone_adressen[0]["adres"]
 
@@ -1108,7 +1108,10 @@ class OpenKlant2Service(KlantenService):
 
     def update_partij_from_user(self, partij_uuid: str, user: User):
         updated_fields = []
-        for attr, soort_adres in (("email", "email"), ("phonenumber", "telefoon")):
+        for attr, soort_adres in (
+            ("email", "email"),
+            ("phonenumber", "telefoonnummer"),
+        ):
             _, created = self.get_or_create_digitaal_adres(
                 partij_uuid,
                 soort_adres,

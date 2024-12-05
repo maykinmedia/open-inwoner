@@ -1,34 +1,40 @@
 interactions:
 - request:
-    body: '{"nummer": "0000000016", "kanaal": "threat", "onderwerp": "book", "inhoud":
-      "Two remain next people situation bag.", "taal": "nld", "indicatieContactGelukt":
-      false, "vertrouwelijk": true, "plaatsgevondenOp": "2003-09-29T17:03:39.324906"}'
+    body: '{"nummer": "0000000127", "kanaal": "story", "onderwerp": "reflect", "inhoud":
+      "Them most mean amount.", "taal": "nld", "indicatieContactGelukt": false, "vertrouwelijk":
+      false, "plaatsgevondenOp": "2004-08-25T09:15:03.861670"}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '237'
+      - '225'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"cca9cb83-a9cd-4229-a8c1-1b0dae360de1","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/cca9cb83-a9cd-4229-a8c1-1b0dae360de1","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000016","kanaal":"threat","onderwerp":"book","inhoud":"Two
-        remain next people situation bag.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2003-09-29T17:03:39.324906Z"}'
+      string: '{"uuid":"3230f437-8b88-4cf4-9722-5a263288644a","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/3230f437-8b88-4cf4-9722-5a263288644a","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000127","kanaal":"story","onderwerp":"reflect","inhoud":"Them
+        most mean amount.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2004-08-25T09:15:03.861670Z"}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '499'
+      - '487'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/cca9cb83-a9cd-4229-a8c1-1b0dae360de1
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/3230f437-8b88-4cf4-9722-5a263288644a
       Referrer-Policy:
       - same-origin
       Vary:
@@ -49,15 +55,21 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1&indicatieContactGelukt=FALSE
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"cca9cb83-a9cd-4229-a8c1-1b0dae360de1","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/cca9cb83-a9cd-4229-a8c1-1b0dae360de1","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000016","kanaal":"threat","onderwerp":"book","inhoud":"Two
-        remain next people situation bag.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2003-09-29T17:03:39.324906Z","_expand":{}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"3230f437-8b88-4cf4-9722-5a263288644a","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/3230f437-8b88-4cf4-9722-5a263288644a","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000127","kanaal":"story","onderwerp":"reflect","inhoud":"Them
+        most mean amount.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2004-08-25T09:15:03.861670Z","_expand":{}}]}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '564'
+      - '552'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
@@ -90,112 +102,12 @@ interactions:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
       - '52'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 200
-      message: OK
-- request:
-    body: '{"nummer": "0000000016", "kanaal": "future", "onderwerp": "whose", "inhoud":
-      "Piece manager woman between identify.", "taal": "nld", "indicatieContactGelukt":
-      false, "vertrouwelijk": false, "plaatsgevondenOp": "2019-01-05T10:16:29.841740"}'
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-      Content-Length:
-      - '239'
-      Content-Type:
-      - application/json
-    method: POST
-    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
-  response:
-    body:
-      string: '{"uuid":"7bd7a304-59c1-455a-bbb2-46a2a6927ba6","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/7bd7a304-59c1-455a-bbb2-46a2a6927ba6","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000016","kanaal":"future","onderwerp":"whose","inhoud":"Piece
-        manager woman between identify.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2019-01-05T10:16:29.841740Z"}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '501'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/7bd7a304-59c1-455a-bbb2-46a2a6927ba6
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 201
-      message: Created
-- request:
-    body: null
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-    method: GET
-    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1&indicatieContactGelukt=FALSE
-  response:
-    body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"7bd7a304-59c1-455a-bbb2-46a2a6927ba6","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/7bd7a304-59c1-455a-bbb2-46a2a6927ba6","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000016","kanaal":"future","onderwerp":"whose","inhoud":"Piece
-        manager woman between identify.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2019-01-05T10:16:29.841740Z","_expand":{}}]}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '566'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 200
-      message: OK
-- request:
-    body: null
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-    method: GET
-    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1&indicatieContactGelukt=True
-  response:
-    body:
-      string: '{"count":0,"next":null,"previous":null,"results":[]}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '52'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

@@ -16,7 +16,7 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/partijen
   response:
     body:
-      string: '{"uuid":"132921e6-bd2b-4dbc-9854-ff97cdd3db41","url":"http://localhost:8338/klantinteracties/api/v1/partijen/132921e6-bd2b-4dbc-9854-ff97cdd3db41","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"crp","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Dr.","voornaam":"Test
+      string: '{"uuid":"0fb38a2c-9b7f-4f8b-b5aa-6f392ed93b32","url":"http://localhost:8338/klantinteracties/api/v1/partijen/0fb38a2c-9b7f-4f8b-b5aa-6f392ed93b32","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"crp","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Dr.","voornaam":"Test
         Persoon","voorvoegselAchternaam":"Mrs.","achternaam":"Gamble"},"volledigeNaam":"Test
         Persoon Mrs. Gamble"}}'
     headers:
@@ -26,12 +26,18 @@ interactions:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
       - '877'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/partijen/132921e6-bd2b-4dbc-9854-ff97cdd3db41
+      - http://localhost:8338/klantinteracties/api/v1/partijen/0fb38a2c-9b7f-4f8b-b5aa-6f392ed93b32
       Referrer-Policy:
       - same-origin
       Vary:
@@ -49,10 +55,10 @@ interactions:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
     method: GET
-    uri: http://localhost:8338/klantinteracties/api/v1/partijen/132921e6-bd2b-4dbc-9854-ff97cdd3db41?expand=betrokkenen.hadKlantcontact
+    uri: http://localhost:8338/klantinteracties/api/v1/partijen/0fb38a2c-9b7f-4f8b-b5aa-6f392ed93b32?expand=betrokkenen.hadKlantcontact
   response:
     body:
-      string: '{"uuid":"132921e6-bd2b-4dbc-9854-ff97cdd3db41","url":"http://localhost:8338/klantinteracties/api/v1/partijen/132921e6-bd2b-4dbc-9854-ff97cdd3db41","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"crp","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Dr.","voornaam":"Test
+      string: '{"uuid":"0fb38a2c-9b7f-4f8b-b5aa-6f392ed93b32","url":"http://localhost:8338/klantinteracties/api/v1/partijen/0fb38a2c-9b7f-4f8b-b5aa-6f392ed93b32","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"crp","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Dr.","voornaam":"Test
         Persoon","voorvoegselAchternaam":"Mrs.","achternaam":"Gamble"},"volledigeNaam":"Test
         Persoon Mrs. Gamble"}}'
     headers:
@@ -62,6 +68,12 @@ interactions:
       - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
       Content-Length:
       - '877'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

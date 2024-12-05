@@ -269,7 +269,7 @@ class Openklant2ServiceTest(Openklant2ServiceTestCase):
         user: User = UserFactory(phonenumber="", email="foo@bar.com")
         self.service.get_or_create_digitaal_adres(
             self.persoon["uuid"],
-            "telefoon",
+            "telefoonnummer",
             "0644938475",
         )
         self.service.get_or_create_digitaal_adres(
@@ -317,7 +317,7 @@ class Openklant2ServiceTest(Openklant2ServiceTestCase):
                     self.persoon["uuid"]
                 )
             ],
-            [("email", "user@bar.com"), ("telefoon", "0644938475")],
+            [("email", "user@bar.com"), ("telefoonnummer", "0644938475")],
         )
 
 
