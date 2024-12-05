@@ -5,7 +5,13 @@ from django.utils.translation import gettext_lazy as _
 from ordered_model.admin import OrderedInlineModelAdminMixin, OrderedTabularInline
 from solo.admin import SingletonModelAdmin
 
-from .models import ContactFormSubject, KlantContactMomentAnswer, OpenKlantConfig
+from .models import (
+    ContactFormSubject,
+    KlantContactMomentAnswer,
+    KlantenInteractiesConfig,
+    OpenKlant2Config2,
+    OpenKlantConfig,
+)
 
 
 class ContactFormSubjectForm(forms.ModelForm):
@@ -49,8 +55,8 @@ class OpenKlantConfigAdminForm(forms.ModelForm):
                     self.add_error(field_name, msg)
 
 
-@admin.register(OpenKlantConfig)
-class OpenKlantConfigAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
+class OpenKlantConfigAdmin(admin.StackedInline):
+    model = OpenKlantConfig
     form = OpenKlantConfigAdminForm
     inlines = [
         ContactFormSubjectInlineAdmin,
@@ -108,3 +114,54 @@ class KlantContactMomentAnswerAdmin(admin.ModelAdmin):
     ]
     list_filter = ["is_seen"]
     list_display = ["user", "contactmoment_url", "is_seen"]
+
+
+#
+# OpenKlant2
+#
+
+
+class OpenKlant2ConfigAdminForm(forms.ModelForm):
+    class Meta:
+        model = OpenKlantConfig
+        fields = "__all__"
+
+
+class OpenKlant2Config2Admin(admin.StackedInline):
+    model = OpenKlant2Config2
+    form = OpenKlant2ConfigAdminForm
+    fieldsets = [
+        (
+            _("API configuration"),
+            {
+                "fields": [
+                    "api_root",
+                    "api_token",
+                ]
+            },
+        ),
+        (
+            _("Vragen"),
+            {
+                "fields": [
+                    "mijn_vragen_kanaal",
+                    "mijn_vragen_organisatie_naam",
+                    "mijn_vragen_actor",
+                    "interne_taak_gevraagde_handeling",
+                    "interne_taak_toelichting",
+                ]
+            },
+        ),
+    ]
+
+    class Media:
+        css = {"all": ("css/custom_admin.css",)}
+
+
+@admin.register(KlantenInteractiesConfig)
+class KlantenInteractiesConfigAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
+    inlines = [
+        OpenKlant2Config2Admin,
+        OpenKlantConfigAdmin,
+        ContactFormSubjectInlineAdmin,
+    ]
