@@ -1175,7 +1175,7 @@ xsdata==23.8
     #   -r requirements/base.txt
 yarl==1.9.8
     # via vcrpy
-zgw-consumers==0.35.1
+zgw-consumers==0.36.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
