@@ -1,6 +1,11 @@
 from ..utils import config
 
-SETUP_CONFIGURATION_STEPS = []
+SETUP_CONFIGURATION_STEPS = [
+    "mozilla_django_oidc_db.setup_configuration.steps.AdminOIDCConfigurationStep",
+    "zgw_consumers.contrib.setup_configuration.steps.ServiceConfigurationStep",
+    "open_inwoner.configurations.bootstrap.zgw.OpenZaakConfigurationStep",
+    "open_inwoner.configurations.bootstrap.openklant.OpenKlantConfigurationStep",
+]
 OIP_ORGANIZATION = config("OIP_ORGANIZATION", "")
 
 # ZGW configuration variables

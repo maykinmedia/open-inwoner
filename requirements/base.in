@@ -42,7 +42,7 @@ fontawesomefree
 django-timeline-logger
 django-csp
 django-csp-reports
-mozilla-django-oidc-db
+mozilla-django-oidc-db[setup-configuration]
 django-open-forms-client
 django-htmx
 playwright
