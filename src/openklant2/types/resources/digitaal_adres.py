@@ -1,7 +1,12 @@
+from typing import Literal
+
 from pydantic import TypeAdapter
 from typing_extensions import TypedDict
 
 from openklant2.types.common import ForeignKeyRef, FullForeigKeyRef
+
+SoortDigitaalAdres = Literal["email", "telefoonnummer", "overig"]
+
 
 #
 # Input
@@ -13,7 +18,7 @@ class CreateDigitaalAdresData(TypedDict):
     verstrektDoorPartij: ForeignKeyRef | None
     adres: str
     omschrijving: str
-    soortDigitaalAdres: str
+    soortDigitaalAdres: SoortDigitaalAdres
 
 
 class ListDigitaalAdresParams(TypedDict):
@@ -30,7 +35,7 @@ class DigitaalAdres(TypedDict):
     verstrektDoorPartij: FullForeigKeyRef | None
     adres: str
     omschrijving: str
-    soortDigitaalAdres: str
+    soortDigitaalAdres: SoortDigitaalAdres
 
 
 CreateDigitaalAdresDataValidator = TypeAdapter(CreateDigitaalAdresData)

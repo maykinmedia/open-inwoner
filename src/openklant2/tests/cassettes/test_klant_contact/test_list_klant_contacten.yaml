@@ -1,34 +1,40 @@
 interactions:
 - request:
-    body: '{"nummer": "0000000002", "kanaal": "yard", "onderwerp": "individual", "inhoud":
-      "Work sing strong side science clear beyond.", "taal": "nld", "indicatieContactGelukt":
-      null, "vertrouwelijk": true, "plaatsgevondenOp": "2007-06-01T07:46:41.301062"}'
+    body: '{"nummer": "0000000113", "kanaal": "work", "onderwerp": "room", "inhoud":
+      "Form door resource serve born across.", "taal": "nld", "indicatieContactGelukt":
+      null, "vertrouwelijk": true, "plaatsgevondenOp": "2002-07-15T03:50:22.240297"}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '246'
+      - '234'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"d2295208-9a42-4925-a521-80f5ffb7f0b4","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/d2295208-9a42-4925-a521-80f5ffb7f0b4","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000002","kanaal":"yard","onderwerp":"individual","inhoud":"Work
-        sing strong side science clear beyond.","indicatieContactGelukt":null,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2007-06-01T07:46:41.301062Z"}'
+      string: '{"uuid":"38253b14-a023-4052-b084-6a8bed9e9a6a","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/38253b14-a023-4052-b084-6a8bed9e9a6a","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000113","kanaal":"work","onderwerp":"room","inhoud":"Form
+        door resource serve born across.","indicatieContactGelukt":null,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2002-07-15T03:50:22.240297Z"}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '508'
+      - '496'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/d2295208-9a42-4925-a521-80f5ffb7f0b4
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/38253b14-a023-4052-b084-6a8bed9e9a6a
       Referrer-Policy:
       - same-origin
       Vary:
@@ -49,89 +55,21 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"d2295208-9a42-4925-a521-80f5ffb7f0b4","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/d2295208-9a42-4925-a521-80f5ffb7f0b4","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000002","kanaal":"yard","onderwerp":"individual","inhoud":"Work
-        sing strong side science clear beyond.","indicatieContactGelukt":null,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2007-06-01T07:46:41.301062Z","_expand":{}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"38253b14-a023-4052-b084-6a8bed9e9a6a","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/38253b14-a023-4052-b084-6a8bed9e9a6a","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000113","kanaal":"work","onderwerp":"room","inhoud":"Form
+        door resource serve born across.","indicatieContactGelukt":null,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2002-07-15T03:50:22.240297Z","_expand":{}}]}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '573'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 200
-      message: OK
-- request:
-    body: '{"nummer": "0000000002", "kanaal": "film", "onderwerp": "development",
-      "inhoud": "Media put reality from television kid tonight.", "taal": "nld", "indicatieContactGelukt":
-      false, "vertrouwelijk": false, "plaatsgevondenOp": "2015-01-26T12:52:40.565670"}'
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-      Content-Length:
-      - '252'
-      Content-Type:
-      - application/json
-    method: POST
-    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
-  response:
-    body:
-      string: '{"uuid":"6399f85a-18de-4f51-9219-7b1fc98046ae","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/6399f85a-18de-4f51-9219-7b1fc98046ae","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000002","kanaal":"film","onderwerp":"development","inhoud":"Media
-        put reality from television kid tonight.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2015-01-26T12:52:40.565670Z"}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '514'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/6399f85a-18de-4f51-9219-7b1fc98046ae
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 201
-      message: Created
-- request:
-    body: null
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-    method: GET
-    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
-  response:
-    body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"6399f85a-18de-4f51-9219-7b1fc98046ae","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/6399f85a-18de-4f51-9219-7b1fc98046ae","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000002","kanaal":"film","onderwerp":"development","inhoud":"Media
-        put reality from television kid tonight.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2015-01-26T12:52:40.565670Z","_expand":{}}]}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '579'
+      - '561'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

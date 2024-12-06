@@ -1,34 +1,40 @@
 interactions:
 - request:
-    body: '{"naam": "Megan Terry", "soortActor": "medewerker", "indicatieActief":
-      true, "actoridentificator": {"objectId": "0000000001", "codeObjecttype": "summer",
-      "codeRegister": "effect", "codeSoortObjectId": "official"}}'
+    body: '{"naam": "Bonnie Lynch", "soortActor": "geautomatiseerde_actor", "indicatieActief":
+      true, "actoridentificator": {"objectId": "0000000001", "codeObjecttype": "fish",
+      "codeRegister": "day", "codeSoortObjectId": "serve"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '213'
+      - '218'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/actoren
   response:
     body:
-      string: '{"uuid":"cd558f00-3625-4935-8e0f-06f3dc3a13c7","url":"http://localhost:8338/klantinteracties/api/v1/actoren/cd558f00-3625-4935-8e0f-06f3dc3a13c7","naam":"Megan
-        Terry","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000001","codeObjecttype":"summer","codeRegister":"effect","codeSoortObjectId":"official"},"actorIdentificatie":null}'
+      string: '{"uuid":"94edef26-fb99-42b6-a6e5-7cab3c60835c","url":"http://localhost:8338/klantinteracties/api/v1/actoren/94edef26-fb99-42b6-a6e5-7cab3c60835c","naam":"Bonnie
+        Lynch","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000001","codeObjecttype":"fish","codeRegister":"day","codeSoortObjectId":"serve"},"actorIdentificatie":null}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '370'
+      - '375'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/cd558f00-3625-4935-8e0f-06f3dc3a13c7
+      - http://localhost:8338/klantinteracties/api/v1/actoren/94edef26-fb99-42b6-a6e5-7cab3c60835c
       Referrer-Policy:
       - same-origin
       Vary:
@@ -41,91 +47,9 @@ interactions:
       code: 201
       message: Created
 - request:
-    body: '{"naam": "Erik White", "soortActor": "organisatorische_eenheid", "indicatieActief":
-      true, "actoridentificator": {"objectId": "0000000002", "codeObjecttype": "knowledge",
-      "codeRegister": "instead", "codeSoortObjectId": "process"}}'
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-      Content-Length:
-      - '229'
-      Content-Type:
-      - application/json
-    method: POST
-    uri: http://localhost:8338/klantinteracties/api/v1/actoren
-  response:
-    body:
-      string: '{"uuid":"5df31ea3-b165-47ea-a100-8191ce304207","url":"http://localhost:8338/klantinteracties/api/v1/actoren/5df31ea3-b165-47ea-a100-8191ce304207","naam":"Erik
-        White","soortActor":"organisatorische_eenheid","indicatieActief":true,"actoridentificator":{"objectId":"0000000002","codeObjecttype":"knowledge","codeRegister":"instead","codeSoortObjectId":"process"},"actorIdentificatie":null}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '386'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/5df31ea3-b165-47ea-a100-8191ce304207
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 201
-      message: Created
-- request:
-    body: '{"naam": "Ryan Figueroa", "soortActor": "medewerker", "indicatieActief":
-      true, "actoridentificator": {"objectId": "0000000003", "codeObjecttype": "note",
-      "codeRegister": "age", "codeSoortObjectId": "each"}}'
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-      Content-Length:
-      - '206'
-      Content-Type:
-      - application/json
-    method: POST
-    uri: http://localhost:8338/klantinteracties/api/v1/actoren
-  response:
-    body:
-      string: '{"uuid":"48d067dd-a17b-4868-b944-978cb1167677","url":"http://localhost:8338/klantinteracties/api/v1/actoren/48d067dd-a17b-4868-b944-978cb1167677","naam":"Ryan
-        Figueroa","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000003","codeObjecttype":"note","codeRegister":"age","codeSoortObjectId":"each"},"actorIdentificatie":null}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '363'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/48d067dd-a17b-4868-b944-978cb1167677
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 201
-      message: Created
-- request:
-    body: '{"naam": "Lisa Hess", "soortActor": "organisatorische_eenheid", "indicatieActief":
-      true, "actoridentificator": {"objectId": "0000000004", "codeObjecttype": "simply",
-      "codeRegister": "month", "codeSoortObjectId": "always"}}'
+    body: '{"naam": "Kristin Harris", "soortActor": "organisatorische_eenheid", "indicatieActief":
+      true, "actoridentificator": {"objectId": "0000000002", "codeObjecttype": "better",
+      "codeRegister": "high", "codeSoortObjectId": "my"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
@@ -137,8 +61,8 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/actoren
   response:
     body:
-      string: '{"uuid":"df3a80f7-fdce-450b-9265-338d2253d171","url":"http://localhost:8338/klantinteracties/api/v1/actoren/df3a80f7-fdce-450b-9265-338d2253d171","naam":"Lisa
-        Hess","soortActor":"organisatorische_eenheid","indicatieActief":true,"actoridentificator":{"objectId":"0000000004","codeObjecttype":"simply","codeRegister":"month","codeSoortObjectId":"always"},"actorIdentificatie":null}'
+      string: '{"uuid":"eaead3a8-a7a2-45a5-9237-f69635c069da","url":"http://localhost:8338/klantinteracties/api/v1/actoren/eaead3a8-a7a2-45a5-9237-f69635c069da","naam":"Kristin
+        Harris","soortActor":"organisatorische_eenheid","indicatieActief":true,"actoridentificator":{"objectId":"0000000002","codeObjecttype":"better","codeRegister":"high","codeSoortObjectId":"my"},"actorIdentificatie":null}'
     headers:
       API-version:
       - 0.0.3
@@ -146,12 +70,18 @@ interactions:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
       - '379'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/df3a80f7-fdce-450b-9265-338d2253d171
+      - http://localhost:8338/klantinteracties/api/v1/actoren/eaead3a8-a7a2-45a5-9237-f69635c069da
       Referrer-Policy:
       - same-origin
       Vary:
@@ -164,35 +94,135 @@ interactions:
       code: 201
       message: Created
 - request:
-    body: '{"naam": "Samuel Mitchell", "soortActor": "geautomatiseerde_actor", "indicatieActief":
-      true, "actoridentificator": {"objectId": "0000000005", "codeObjecttype": "but",
-      "codeRegister": "character", "codeSoortObjectId": "miss"}}'
+    body: '{"naam": "Timothy Rivera", "soortActor": "organisatorische_eenheid", "indicatieActief":
+      true, "actoridentificator": {"objectId": "0000000003", "codeObjecttype": "and",
+      "codeRegister": "such", "codeSoortObjectId": "difficult"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '225'
+      - '226'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/actoren
   response:
     body:
-      string: '{"uuid":"540473f3-6184-4933-87e4-fe1ff5aa4888","url":"http://localhost:8338/klantinteracties/api/v1/actoren/540473f3-6184-4933-87e4-fe1ff5aa4888","naam":"Samuel
-        Mitchell","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000005","codeObjecttype":"but","codeRegister":"character","codeSoortObjectId":"miss"},"actorIdentificatie":null}'
+      string: '{"uuid":"473bee12-13dc-4deb-acbb-80e8e254a7a8","url":"http://localhost:8338/klantinteracties/api/v1/actoren/473bee12-13dc-4deb-acbb-80e8e254a7a8","naam":"Timothy
+        Rivera","soortActor":"organisatorische_eenheid","indicatieActief":true,"actoridentificator":{"objectId":"0000000003","codeObjecttype":"and","codeRegister":"such","codeSoortObjectId":"difficult"},"actorIdentificatie":null}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '382'
+      - '383'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/540473f3-6184-4933-87e4-fe1ff5aa4888
+      - http://localhost:8338/klantinteracties/api/v1/actoren/473bee12-13dc-4deb-acbb-80e8e254a7a8
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"naam": "Ms. Amber Allen", "soortActor": "geautomatiseerde_actor", "indicatieActief":
+      true, "actoridentificator": {"objectId": "0000000004", "codeObjecttype": "dog",
+      "codeRegister": "professor", "codeSoortObjectId": "democratic"}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '231'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"uuid":"9c8a5756-1fe7-4343-ab4e-011d0e62ae62","url":"http://localhost:8338/klantinteracties/api/v1/actoren/9c8a5756-1fe7-4343-ab4e-011d0e62ae62","naam":"Ms.
+        Amber Allen","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000004","codeObjecttype":"dog","codeRegister":"professor","codeSoortObjectId":"democratic"},"actorIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '388'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/actoren/9c8a5756-1fe7-4343-ab4e-011d0e62ae62
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"naam": "Jennifer Gomez", "soortActor": "medewerker", "indicatieActief":
+      true, "actoridentificator": {"objectId": "0000000005", "codeObjecttype": "garden",
+      "codeRegister": "offer", "codeSoortObjectId": "result"}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '213'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"uuid":"2f79176b-f25f-4071-8de5-df8be647a5d8","url":"http://localhost:8338/klantinteracties/api/v1/actoren/2f79176b-f25f-4071-8de5-df8be647a5d8","naam":"Jennifer
+        Gomez","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000005","codeObjecttype":"garden","codeRegister":"offer","codeSoortObjectId":"result"},"actorIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.0.3
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '370'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/actoren/2f79176b-f25f-4071-8de5-df8be647a5d8
       Referrer-Policy:
       - same-origin
       Vary:
@@ -213,261 +243,25 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/actoren
   response:
     body:
-      string: '{"count":5,"next":null,"previous":null,"results":[{"uuid":"540473f3-6184-4933-87e4-fe1ff5aa4888","url":"http://localhost:8338/klantinteracties/api/v1/actoren/540473f3-6184-4933-87e4-fe1ff5aa4888","naam":"Samuel
-        Mitchell","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000005","codeObjecttype":"but","codeRegister":"character","codeSoortObjectId":"miss"},"actorIdentificatie":null},{"uuid":"df3a80f7-fdce-450b-9265-338d2253d171","url":"http://localhost:8338/klantinteracties/api/v1/actoren/df3a80f7-fdce-450b-9265-338d2253d171","naam":"Lisa
-        Hess","soortActor":"organisatorische_eenheid","indicatieActief":true,"actoridentificator":{"objectId":"0000000004","codeObjecttype":"simply","codeRegister":"month","codeSoortObjectId":"always"},"actorIdentificatie":null},{"uuid":"48d067dd-a17b-4868-b944-978cb1167677","url":"http://localhost:8338/klantinteracties/api/v1/actoren/48d067dd-a17b-4868-b944-978cb1167677","naam":"Ryan
-        Figueroa","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000003","codeObjecttype":"note","codeRegister":"age","codeSoortObjectId":"each"},"actorIdentificatie":null},{"uuid":"5df31ea3-b165-47ea-a100-8191ce304207","url":"http://localhost:8338/klantinteracties/api/v1/actoren/5df31ea3-b165-47ea-a100-8191ce304207","naam":"Erik
-        White","soortActor":"organisatorische_eenheid","indicatieActief":true,"actoridentificator":{"objectId":"0000000002","codeObjecttype":"knowledge","codeRegister":"instead","codeSoortObjectId":"process"},"actorIdentificatie":null},{"uuid":"cd558f00-3625-4935-8e0f-06f3dc3a13c7","url":"http://localhost:8338/klantinteracties/api/v1/actoren/cd558f00-3625-4935-8e0f-06f3dc3a13c7","naam":"Megan
-        Terry","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000001","codeObjecttype":"summer","codeRegister":"effect","codeSoortObjectId":"official"},"actorIdentificatie":null}]}'
+      string: '{"count":5,"next":null,"previous":null,"results":[{"uuid":"2f79176b-f25f-4071-8de5-df8be647a5d8","url":"http://localhost:8338/klantinteracties/api/v1/actoren/2f79176b-f25f-4071-8de5-df8be647a5d8","naam":"Jennifer
+        Gomez","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000005","codeObjecttype":"garden","codeRegister":"offer","codeSoortObjectId":"result"},"actorIdentificatie":null},{"uuid":"9c8a5756-1fe7-4343-ab4e-011d0e62ae62","url":"http://localhost:8338/klantinteracties/api/v1/actoren/9c8a5756-1fe7-4343-ab4e-011d0e62ae62","naam":"Ms.
+        Amber Allen","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000004","codeObjecttype":"dog","codeRegister":"professor","codeSoortObjectId":"democratic"},"actorIdentificatie":null},{"uuid":"473bee12-13dc-4deb-acbb-80e8e254a7a8","url":"http://localhost:8338/klantinteracties/api/v1/actoren/473bee12-13dc-4deb-acbb-80e8e254a7a8","naam":"Timothy
+        Rivera","soortActor":"organisatorische_eenheid","indicatieActief":true,"actoridentificator":{"objectId":"0000000003","codeObjecttype":"and","codeRegister":"such","codeSoortObjectId":"difficult"},"actorIdentificatie":null},{"uuid":"eaead3a8-a7a2-45a5-9237-f69635c069da","url":"http://localhost:8338/klantinteracties/api/v1/actoren/eaead3a8-a7a2-45a5-9237-f69635c069da","naam":"Kristin
+        Harris","soortActor":"organisatorische_eenheid","indicatieActief":true,"actoridentificator":{"objectId":"0000000002","codeObjecttype":"better","codeRegister":"high","codeSoortObjectId":"my"},"actorIdentificatie":null},{"uuid":"94edef26-fb99-42b6-a6e5-7cab3c60835c","url":"http://localhost:8338/klantinteracties/api/v1/actoren/94edef26-fb99-42b6-a6e5-7cab3c60835c","naam":"Bonnie
+        Lynch","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000001","codeObjecttype":"fish","codeRegister":"day","codeSoortObjectId":"serve"},"actorIdentificatie":null}]}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '1936'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 200
-      message: OK
-- request:
-    body: '{"naam": "Sandy Knight", "soortActor": "organisatorische_eenheid", "indicatieActief":
-      true, "actoridentificator": {"objectId": "0000000001", "codeObjecttype": "sport",
-      "codeRegister": "boy", "codeSoortObjectId": "fast"}}'
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-      Content-Length:
-      - '220'
-      Content-Type:
-      - application/json
-    method: POST
-    uri: http://localhost:8338/klantinteracties/api/v1/actoren
-  response:
-    body:
-      string: '{"uuid":"eb7ef513-df5b-4a5a-945d-d73baff09de2","url":"http://localhost:8338/klantinteracties/api/v1/actoren/eb7ef513-df5b-4a5a-945d-d73baff09de2","naam":"Sandy
-        Knight","soortActor":"organisatorische_eenheid","indicatieActief":true,"actoridentificator":{"objectId":"0000000001","codeObjecttype":"sport","codeRegister":"boy","codeSoortObjectId":"fast"},"actorIdentificatie":null}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '377'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/eb7ef513-df5b-4a5a-945d-d73baff09de2
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 201
-      message: Created
-- request:
-    body: '{"naam": "Adam Stanley", "soortActor": "medewerker", "indicatieActief":
-      true, "actoridentificator": {"objectId": "0000000002", "codeObjecttype": "thing",
-      "codeRegister": "end", "codeSoortObjectId": "success"}}'
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-      Content-Length:
-      - '209'
-      Content-Type:
-      - application/json
-    method: POST
-    uri: http://localhost:8338/klantinteracties/api/v1/actoren
-  response:
-    body:
-      string: '{"uuid":"2bb1eac8-d935-4a7a-9452-12c37e7f4d05","url":"http://localhost:8338/klantinteracties/api/v1/actoren/2bb1eac8-d935-4a7a-9452-12c37e7f4d05","naam":"Adam
-        Stanley","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000002","codeObjecttype":"thing","codeRegister":"end","codeSoortObjectId":"success"},"actorIdentificatie":null}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '366'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/2bb1eac8-d935-4a7a-9452-12c37e7f4d05
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 201
-      message: Created
-- request:
-    body: '{"naam": "Sydney Morton", "soortActor": "medewerker", "indicatieActief":
-      true, "actoridentificator": {"objectId": "0000000003", "codeObjecttype": "attorney",
-      "codeRegister": "young", "codeSoortObjectId": "professional"}}'
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-      Content-Length:
-      - '220'
-      Content-Type:
-      - application/json
-    method: POST
-    uri: http://localhost:8338/klantinteracties/api/v1/actoren
-  response:
-    body:
-      string: '{"uuid":"12016f31-c065-4987-a437-5619dc18a717","url":"http://localhost:8338/klantinteracties/api/v1/actoren/12016f31-c065-4987-a437-5619dc18a717","naam":"Sydney
-        Morton","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000003","codeObjecttype":"attorney","codeRegister":"young","codeSoortObjectId":"professional"},"actorIdentificatie":null}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '377'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/12016f31-c065-4987-a437-5619dc18a717
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 201
-      message: Created
-- request:
-    body: '{"naam": "Wesley Richardson", "soortActor": "medewerker", "indicatieActief":
-      true, "actoridentificator": {"objectId": "0000000004", "codeObjecttype": "hair",
-      "codeRegister": "safe", "codeSoortObjectId": "task"}}'
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-      Content-Length:
-      - '211'
-      Content-Type:
-      - application/json
-    method: POST
-    uri: http://localhost:8338/klantinteracties/api/v1/actoren
-  response:
-    body:
-      string: '{"uuid":"6c3bcc76-39ba-4e9c-bc90-a7ba40a7bbc3","url":"http://localhost:8338/klantinteracties/api/v1/actoren/6c3bcc76-39ba-4e9c-bc90-a7ba40a7bbc3","naam":"Wesley
-        Richardson","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000004","codeObjecttype":"hair","codeRegister":"safe","codeSoortObjectId":"task"},"actorIdentificatie":null}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '368'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/6c3bcc76-39ba-4e9c-bc90-a7ba40a7bbc3
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 201
-      message: Created
-- request:
-    body: '{"naam": "Brianna Webb", "soortActor": "medewerker", "indicatieActief":
-      true, "actoridentificator": {"objectId": "0000000005", "codeObjecttype": "friend",
-      "codeRegister": "under", "codeSoortObjectId": "me"}}'
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-      Content-Length:
-      - '207'
-      Content-Type:
-      - application/json
-    method: POST
-    uri: http://localhost:8338/klantinteracties/api/v1/actoren
-  response:
-    body:
-      string: '{"uuid":"574fa151-6120-4ebe-8257-af500266e3b7","url":"http://localhost:8338/klantinteracties/api/v1/actoren/574fa151-6120-4ebe-8257-af500266e3b7","naam":"Brianna
-        Webb","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000005","codeObjecttype":"friend","codeRegister":"under","codeSoortObjectId":"me"},"actorIdentificatie":null}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '364'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/574fa151-6120-4ebe-8257-af500266e3b7
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 201
-      message: Created
-- request:
-    body: null
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-    method: GET
-    uri: http://localhost:8338/klantinteracties/api/v1/actoren
-  response:
-    body:
-      string: '{"count":5,"next":null,"previous":null,"results":[{"uuid":"574fa151-6120-4ebe-8257-af500266e3b7","url":"http://localhost:8338/klantinteracties/api/v1/actoren/574fa151-6120-4ebe-8257-af500266e3b7","naam":"Brianna
-        Webb","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000005","codeObjecttype":"friend","codeRegister":"under","codeSoortObjectId":"me"},"actorIdentificatie":null},{"uuid":"6c3bcc76-39ba-4e9c-bc90-a7ba40a7bbc3","url":"http://localhost:8338/klantinteracties/api/v1/actoren/6c3bcc76-39ba-4e9c-bc90-a7ba40a7bbc3","naam":"Wesley
-        Richardson","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000004","codeObjecttype":"hair","codeRegister":"safe","codeSoortObjectId":"task"},"actorIdentificatie":null},{"uuid":"12016f31-c065-4987-a437-5619dc18a717","url":"http://localhost:8338/klantinteracties/api/v1/actoren/12016f31-c065-4987-a437-5619dc18a717","naam":"Sydney
-        Morton","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000003","codeObjecttype":"attorney","codeRegister":"young","codeSoortObjectId":"professional"},"actorIdentificatie":null},{"uuid":"2bb1eac8-d935-4a7a-9452-12c37e7f4d05","url":"http://localhost:8338/klantinteracties/api/v1/actoren/2bb1eac8-d935-4a7a-9452-12c37e7f4d05","naam":"Adam
-        Stanley","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000002","codeObjecttype":"thing","codeRegister":"end","codeSoortObjectId":"success"},"actorIdentificatie":null},{"uuid":"eb7ef513-df5b-4a5a-945d-d73baff09de2","url":"http://localhost:8338/klantinteracties/api/v1/actoren/eb7ef513-df5b-4a5a-945d-d73baff09de2","naam":"Sandy
-        Knight","soortActor":"organisatorische_eenheid","indicatieActief":true,"actoridentificator":{"objectId":"0000000001","codeObjecttype":"sport","codeRegister":"boy","codeSoortObjectId":"fast"},"actorIdentificatie":null}]}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '1908'
+      - '1951'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

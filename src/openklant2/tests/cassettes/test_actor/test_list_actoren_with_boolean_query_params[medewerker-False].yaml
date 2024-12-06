@@ -1,34 +1,40 @@
 interactions:
 - request:
-    body: '{"naam": "Erica Evans", "soortActor": "medewerker", "indicatieActief":
-      true, "actoridentificator": {"objectId": "0000000010", "codeObjecttype": "unit",
-      "codeRegister": "way", "codeSoortObjectId": "wrong"}}'
+    body: '{"naam": "Allison Beck", "soortActor": "geautomatiseerde_actor", "indicatieActief":
+      true, "actoridentificator": {"objectId": "0000000010", "codeObjecttype": "dream",
+      "codeRegister": "page", "codeSoortObjectId": "compare"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '205'
+      - '222'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/actoren
   response:
     body:
-      string: '{"uuid":"cec0a8f0-a3ef-4541-a3d9-cee75181465d","url":"http://localhost:8338/klantinteracties/api/v1/actoren/cec0a8f0-a3ef-4541-a3d9-cee75181465d","naam":"Erica
-        Evans","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000010","codeObjecttype":"unit","codeRegister":"way","codeSoortObjectId":"wrong"},"actorIdentificatie":null}'
+      string: '{"uuid":"e6c3978f-2c6f-44cf-bf0e-4edd664f1918","url":"http://localhost:8338/klantinteracties/api/v1/actoren/e6c3978f-2c6f-44cf-bf0e-4edd664f1918","naam":"Allison
+        Beck","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000010","codeObjecttype":"dream","codeRegister":"page","codeSoortObjectId":"compare"},"actorIdentificatie":null}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '362'
+      - '379'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/cec0a8f0-a3ef-4541-a3d9-cee75181465d
+      - http://localhost:8338/klantinteracties/api/v1/actoren/e6c3978f-2c6f-44cf-bf0e-4edd664f1918
       Referrer-Policy:
       - same-origin
       Vary:
@@ -41,35 +47,41 @@ interactions:
       code: 201
       message: Created
 - request:
-    body: '{"naam": "Michael Benitez DDS", "soortActor": "medewerker", "indicatieActief":
-      true, "actoridentificator": {"objectId": "0000000011", "codeObjecttype": "age",
-      "codeRegister": "it", "codeSoortObjectId": "growth"}}'
+    body: '{"naam": "Lindsay Lee", "soortActor": "medewerker", "indicatieActief":
+      true, "actoridentificator": {"objectId": "0000000011", "codeObjecttype": "decide",
+      "codeRegister": "media", "codeSoortObjectId": "keep"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '212'
+      - '208'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/actoren
   response:
     body:
-      string: '{"uuid":"47c4d5d6-4668-407c-88ab-0ec98287ff7b","url":"http://localhost:8338/klantinteracties/api/v1/actoren/47c4d5d6-4668-407c-88ab-0ec98287ff7b","naam":"Michael
-        Benitez DDS","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000011","codeObjecttype":"age","codeRegister":"it","codeSoortObjectId":"growth"},"actorIdentificatie":null}'
+      string: '{"uuid":"cdfa3b35-c19f-481a-b056-a7c084e676c3","url":"http://localhost:8338/klantinteracties/api/v1/actoren/cdfa3b35-c19f-481a-b056-a7c084e676c3","naam":"Lindsay
+        Lee","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000011","codeObjecttype":"decide","codeRegister":"media","codeSoortObjectId":"keep"},"actorIdentificatie":null}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '369'
+      - '365'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/47c4d5d6-4668-407c-88ab-0ec98287ff7b
+      - http://localhost:8338/klantinteracties/api/v1/actoren/cdfa3b35-c19f-481a-b056-a7c084e676c3
       Referrer-Policy:
       - same-origin
       Vary:
@@ -82,191 +94,41 @@ interactions:
       code: 201
       message: Created
 - request:
-    body: '{"naam": "Heather Lopez", "soortActor": "medewerker", "indicatieActief":
-      false, "actoridentificator": {"objectId": "0000000012", "codeObjecttype": "last",
-      "codeRegister": "represent", "codeSoortObjectId": "grow"}}'
+    body: '{"naam": "Julie Fuentes", "soortActor": "medewerker", "indicatieActief":
+      false, "actoridentificator": {"objectId": "0000000012", "codeObjecttype": "theory",
+      "codeRegister": "store", "codeSoortObjectId": "the"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '213'
+      - '210'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/actoren
   response:
     body:
-      string: '{"uuid":"0bfec001-3833-494e-9a8d-1650cb2cd350","url":"http://localhost:8338/klantinteracties/api/v1/actoren/0bfec001-3833-494e-9a8d-1650cb2cd350","naam":"Heather
-        Lopez","soortActor":"medewerker","indicatieActief":false,"actoridentificator":{"objectId":"0000000012","codeObjecttype":"last","codeRegister":"represent","codeSoortObjectId":"grow"},"actorIdentificatie":null}'
+      string: '{"uuid":"99154d61-0243-4e90-b322-e9de967d903e","url":"http://localhost:8338/klantinteracties/api/v1/actoren/99154d61-0243-4e90-b322-e9de967d903e","naam":"Julie
+        Fuentes","soortActor":"medewerker","indicatieActief":false,"actoridentificator":{"objectId":"0000000012","codeObjecttype":"theory","codeRegister":"store","codeSoortObjectId":"the"},"actorIdentificatie":null}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '370'
+      - '367'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/0bfec001-3833-494e-9a8d-1650cb2cd350
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 201
-      message: Created
-- request:
-    body: null
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-    method: GET
-    uri: http://localhost:8338/klantinteracties/api/v1/actoren?indicatieActief=False&soortActor=medewerker
-  response:
-    body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"0bfec001-3833-494e-9a8d-1650cb2cd350","url":"http://localhost:8338/klantinteracties/api/v1/actoren/0bfec001-3833-494e-9a8d-1650cb2cd350","naam":"Heather
-        Lopez","soortActor":"medewerker","indicatieActief":false,"actoridentificator":{"objectId":"0000000012","codeObjecttype":"last","codeRegister":"represent","codeSoortObjectId":"grow"},"actorIdentificatie":null}]}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '422'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 200
-      message: OK
-- request:
-    body: '{"naam": "Kyle Petersen", "soortActor": "medewerker", "indicatieActief":
-      true, "actoridentificator": {"objectId": "0000000010", "codeObjecttype": "consider",
-      "codeRegister": "condition", "codeSoortObjectId": "decade"}}'
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-      Content-Length:
-      - '218'
-      Content-Type:
-      - application/json
-    method: POST
-    uri: http://localhost:8338/klantinteracties/api/v1/actoren
-  response:
-    body:
-      string: '{"uuid":"982ca8d7-ca47-409e-839b-150e6849c63d","url":"http://localhost:8338/klantinteracties/api/v1/actoren/982ca8d7-ca47-409e-839b-150e6849c63d","naam":"Kyle
-        Petersen","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000010","codeObjecttype":"consider","codeRegister":"condition","codeSoortObjectId":"decade"},"actorIdentificatie":null}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '375'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/982ca8d7-ca47-409e-839b-150e6849c63d
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 201
-      message: Created
-- request:
-    body: '{"naam": "Elizabeth Daniels", "soortActor": "medewerker", "indicatieActief":
-      true, "actoridentificator": {"objectId": "0000000011", "codeObjecttype": "sing",
-      "codeRegister": "director", "codeSoortObjectId": "budget"}}'
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-      Content-Length:
-      - '217'
-      Content-Type:
-      - application/json
-    method: POST
-    uri: http://localhost:8338/klantinteracties/api/v1/actoren
-  response:
-    body:
-      string: '{"uuid":"c695985f-dc5a-49da-9999-fd8669288726","url":"http://localhost:8338/klantinteracties/api/v1/actoren/c695985f-dc5a-49da-9999-fd8669288726","naam":"Elizabeth
-        Daniels","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000011","codeObjecttype":"sing","codeRegister":"director","codeSoortObjectId":"budget"},"actorIdentificatie":null}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '374'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/c695985f-dc5a-49da-9999-fd8669288726
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 201
-      message: Created
-- request:
-    body: '{"naam": "Chris Jimenez", "soortActor": "medewerker", "indicatieActief":
-      false, "actoridentificator": {"objectId": "0000000012", "codeObjecttype": "wind",
-      "codeRegister": "since", "codeSoortObjectId": "finally"}}'
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-      Content-Length:
-      - '212'
-      Content-Type:
-      - application/json
-    method: POST
-    uri: http://localhost:8338/klantinteracties/api/v1/actoren
-  response:
-    body:
-      string: '{"uuid":"a2f46d36-61b5-4357-9902-4a930a428b4c","url":"http://localhost:8338/klantinteracties/api/v1/actoren/a2f46d36-61b5-4357-9902-4a930a428b4c","naam":"Chris
-        Jimenez","soortActor":"medewerker","indicatieActief":false,"actoridentificator":{"objectId":"0000000012","codeObjecttype":"wind","codeRegister":"since","codeSoortObjectId":"finally"},"actorIdentificatie":null}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '369'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/a2f46d36-61b5-4357-9902-4a930a428b4c
+      - http://localhost:8338/klantinteracties/api/v1/actoren/99154d61-0243-4e90-b322-e9de967d903e
       Referrer-Policy:
       - same-origin
       Vary:
@@ -287,15 +149,21 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/actoren?indicatieActief=False&soortActor=medewerker
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"a2f46d36-61b5-4357-9902-4a930a428b4c","url":"http://localhost:8338/klantinteracties/api/v1/actoren/a2f46d36-61b5-4357-9902-4a930a428b4c","naam":"Chris
-        Jimenez","soortActor":"medewerker","indicatieActief":false,"actoridentificator":{"objectId":"0000000012","codeObjecttype":"wind","codeRegister":"since","codeSoortObjectId":"finally"},"actorIdentificatie":null}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"99154d61-0243-4e90-b322-e9de967d903e","url":"http://localhost:8338/klantinteracties/api/v1/actoren/99154d61-0243-4e90-b322-e9de967d903e","naam":"Julie
+        Fuentes","soortActor":"medewerker","indicatieActief":false,"actoridentificator":{"objectId":"0000000012","codeObjecttype":"theory","codeRegister":"store","codeSoortObjectId":"the"},"actorIdentificatie":null}]}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '421'
+      - '419'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
