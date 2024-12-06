@@ -1,0 +1,19 @@
+openzaak_config_enable: true
+openzaak_config:
+  zaak_max_confidentiality: openbaar
+  document_max_confidentiality: vertrouwelijk
+  max_upload_size: 50
+  skip_notification_statustype_informeren: false
+  reformat_esuite_zaak_identificatie: true
+  fetch_eherkenning_zaken_with_rsin: false
+  use_zaak_omschrijving_as_title: 'true'
+  order_statuses_by_date_set: false
+  title_text: title text from setup configuration
+  enable_categories_filtering_with_zaken: true
+  action_required_deadline_days: 1874
+  zaken_filter_enabled: 'true'
+  allowed_file_extensions:
+    - .pdf
+    - .txt
+  # Should raise a require fields error
+  # api_groups: []

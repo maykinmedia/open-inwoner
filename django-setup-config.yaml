@@ -1,0 +1,58 @@
+zgw_consumers_config_enable: True
+zgw_consumers:
+  services:
+    - identifier: zaken-test
+      label: Open Zaak - Zaken API
+      api_root: http://localhost:8003/zaken/api/v1/
+      api_type: zrc
+      auth_type: zgw
+      client_id: test-vcr
+      secret: test-vcr
+    - identifier: documenten-test
+      label: Open Zaak - Documenten API
+      api_root: http://localhost:8003/documenten/api/v1/
+      api_type: drc
+      auth_type: zgw
+      client_id: test-vcr
+      secret: test-vcr
+    - identifier: catalogi-test
+      label: Open Zaak - Catalogi API
+      api_root: http://localhost:8003/catalogi/api/v1/
+      api_type: ztc
+      auth_type: zgw
+      client_id: test-vcr
+      secret: test-vcr
+    - identifier: besluiten-test
+      label: Open Zaak - Besluiten API
+      api_root: http://localhost:8003/besluiten/api/v1/
+      api_type: brc
+      auth_type: zgw
+      client_id: test-vcr
+      secret: test-vcr
+    - identifier: selectielijst
+      label: Open Zaak (public) - Selectielijst API
+      api_root: https://selectielijst.openzaak.nl/api/v1/
+      api_type: orc
+      auth_type: no_auth
+
+openzaak_config_enable: true
+openzaak_config:
+  zaak_max_confidentiality: openbaar
+  document_max_confidentiality: vertrouwelijk
+  max_upload_size: 50
+  skip_notification_statustype_informeren: false
+  reformat_esuite_zaak_identificatie: true
+  fetch_eherkenning_zaken_with_rsin: false
+  use_zaak_omschrijving_as_title: 'true'
+  order_statuses_by_date_set: false
+  title_text: title text from setup configuration
+  enable_categories_filtering_with_zaken: true
+  action_required_deadline_days: 1874
+  zaken_filter_enabled: 'true'
+  allowed_file_extensions:
+    - .pdf
+    - .txt
+  api_groups:
+    - zaken_api_identifier: zaken-test
+      documenten_api_identifier: documenten-test
+      catalogi_api_identifier: catalogi-test
