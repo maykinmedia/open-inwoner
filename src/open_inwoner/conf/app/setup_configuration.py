@@ -1,27 +1,6 @@
 from ..utils import config
 
-SETUP_CONFIGURATION_STEPS = [
-    "open_inwoner.configurations.bootstrap.zgw.ZakenAPIConfigurationStep",
-    "open_inwoner.configurations.bootstrap.zgw.CatalogiAPIConfigurationStep",
-    "open_inwoner.configurations.bootstrap.zgw.DocumentenAPIConfigurationStep",
-    "open_inwoner.configurations.bootstrap.zgw.FormulierenAPIConfigurationStep",
-    "open_inwoner.configurations.bootstrap.zgw.ZGWAPIsConfigurationStep",
-    "open_inwoner.configurations.bootstrap.kic.KlantenAPIConfigurationStep",
-    "open_inwoner.configurations.bootstrap.kic.ContactmomentenAPIConfigurationStep",
-    "open_inwoner.configurations.bootstrap.kic.KICAPIsConfigurationStep",
-    "open_inwoner.configurations.bootstrap.siteconfig.SiteConfigurationStep",
-    "open_inwoner.configurations.bootstrap.auth.DigiDOIDCConfigurationStep",
-    "open_inwoner.configurations.bootstrap.auth.eHerkenningOIDCConfigurationStep",
-    "open_inwoner.configurations.bootstrap.auth.AdminOIDCConfigurationStep",
-    "open_inwoner.configurations.bootstrap.auth.DigiDSAMLConfigurationStep",
-    "open_inwoner.configurations.bootstrap.auth.eHerkenningSAMLConfigurationStep",
-    "open_inwoner.configurations.bootstrap.cms.CMSBenefitsConfigurationStep",
-    "open_inwoner.configurations.bootstrap.cms.CMSCasesConfigurationStep",
-    "open_inwoner.configurations.bootstrap.cms.CMSCollaborateConfigurationStep",
-    "open_inwoner.configurations.bootstrap.cms.CMSInboxConfigurationStep",
-    "open_inwoner.configurations.bootstrap.cms.CMSProductsConfigurationStep",
-    "open_inwoner.configurations.bootstrap.cms.CMSProfileConfigurationStep",
-]
+SETUP_CONFIGURATION_STEPS = []
 OIP_ORGANIZATION = config("OIP_ORGANIZATION", "")
 
 # ZGW configuration variables

@@ -256,7 +256,7 @@ django-sessionprofile==1.0
     # via
     #   -r requirements/base.in
     #   django-digid-eherkenning
-django-setup-configuration==0.3.0
+django-setup-configuration==0.5.0
     # via -r requirements/base.in
 django-simple-certmanager==1.4.1
     # via
@@ -440,10 +440,17 @@ psycopg2==2.9.9
     # via -r requirements/base.in
 pycparser==2.20
     # via cffi
-pydantic[email]==2.6.4
-    # via -r requirements/base.in
-pydantic-core==2.16.3
+pydantic[email]==2.9.2
+    # via
+    #   -r requirements/base.in
+    #   django-setup-configuration
+    #   pydantic-settings
+pydantic-core==2.23.4
     # via pydantic
+pydantic-settings[yaml]==2.7.0
+    # via
+    #   django-setup-configuration
+    #   pydantic-settings
 pydyf==0.1.2
     # via weasyprint
 pyee==12.0.0
@@ -475,8 +482,10 @@ python-dateutil==2.8.2
     #   python-crontab
 python-decouple==3.5
     # via -r requirements/base.in
-python-dotenv==0.19.0
-    # via -r requirements/base.in
+python-dotenv==1.0.1
+    # via
+    #   -r requirements/base.in
+    #   pydantic-settings
 python-stdnum==1.17
     # via django-localflavor
 pytz==2021.3
@@ -484,10 +493,11 @@ pytz==2021.3
     #   -r requirements/base.in
     #   django-yubin
     #   djangorestframework
-pyyaml==6.0
+pyyaml==6.0.2
     # via
     #   drf-spectacular
     #   gemma-zds-client
+    #   pydantic-settings
     #   tablib
     #   zgw-consumers-oas
 qrcode==6.1

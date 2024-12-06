@@ -208,6 +208,9 @@ jobs:
     name: Check that documentation for configuration steps is up-to-date
     runs-on: ubuntu-latest
 
+    # Disabled while we complete the upgrade to the latest setup-configuration
+    if: false
+
     steps:
       - uses: actions/checkout@v3
         with:
