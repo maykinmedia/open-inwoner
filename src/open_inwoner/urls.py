@@ -28,7 +28,9 @@ from open_inwoner.accounts.views import (
     ResendTokenView,
     VerifyTokenView,
 )
-from open_inwoner.openklant.views.contactform import ContactFormView
+
+# TODO: remove
+# from open_inwoner.openklant.views.contactform import ContactFormView
 from open_inwoner.pdc.views import FAQView
 
 handler500 = "open_inwoner.utils.views.server_error"
@@ -112,7 +114,8 @@ urlpatterns = [
         "sessions/",
         include("open_inwoner.extended_sessions.urls", namespace="sessions"),
     ),
-    path("contactformulier/", ContactFormView.as_view(), name="contactform"),
+    # TODO: remove
+    # path("contactformulier/", ContactFormView.as_view(), name="contactform"),
     path("oidc/", include("mozilla_django_oidc.urls")),
     path("digid-oidc/", include("open_inwoner.accounts.digid_urls")),
     path("eherkenning-oidc/", include("open_inwoner.accounts.eherkenning_urls")),
