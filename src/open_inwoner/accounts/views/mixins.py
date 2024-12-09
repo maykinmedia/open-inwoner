@@ -19,7 +19,9 @@ class KlantenAPIMixin:
             logger.error("Error building KlantenService")
             return
 
-        klant = service.retrieve_klant(**service.get_fetch_parameters(self.request))
+        klant = service.retrieve_klant(
+            **service.get_fetch_parameters(self.request, use_rsin=False)
+        )
         if not klant:
             logger.error("Failed to retrieve klant for user %s", self.request.user)
             return

@@ -11,6 +11,7 @@ from open_inwoner.kvk.branches import KVK_BRANCH_SESSION_VARIABLE
 from ..utils.url import get_next_url_from
 from .client import KvKClient
 from .forms import CompanyBranchChoiceForm
+from .signals import company_branch_selected
 
 
 class CompanyBranchChoiceView(FormView):
@@ -90,6 +91,34 @@ class CompanyBranchChoiceView(FormView):
             # Directly calling `super().form_invalid(form)` would override the error
             return self.render_to_response(context)
 
-        request.session[KVK_BRANCH_SESSION_VARIABLE] = request.POST["branch_number"]
+        branch_number = request.POST["branch_number"]
+        request.session[KVK_BRANCH_SESSION_VARIABLE] = branch_number
+
+        # data for update company signal
+        company_branch = (
+            next(
+                branch
+                for branch in form.company_branches
+                if branch.get("vestigingsnummer", None) == branch_number
+            )
+            or form.company_branches[0]
+        )
+        company_address = company_branch.get("adres", {}).get("binnenlandsAdres", {})
+        company_data = {
+            "name": company_branch["naam"],
+            "address": {
+                "city": company_address.get("plaats", None),
+                "postcode": company_address.get("postcode", None),
+                "street": company_address.get("straatnaam", None),
+                "house_number": company_address.get("huisnummer", None),
+                "house_letter": company_address.get("huisletter", None),
+            },
+        }
+
+        company_branch_selected.send(
+            sender=self,
+            request=request,
+            company_data=company_data,
+        )
 
         return HttpResponseRedirect(redirect)
