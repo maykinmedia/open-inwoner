@@ -1,11 +1,12 @@
 import logging
 from functools import cached_property
+from typing import cast
 from urllib.parse import urlencode
 
 import requests
 from requests.exceptions import JSONDecodeError
 
-from .constants import CompanyType
+from .constants import Bedrijf, CompanyType
 from .models import KvKConfig
 
 logger = logging.getLogger(__name__)
@@ -121,6 +122,11 @@ class KvKClient:
                 branches.insert(0, branches.pop(branches.index(branch)))
 
         return branches
+
+    def get_company_branch(self, vestigingsnummer: str, **kwargs) -> dict:
+        kwargs.update({"vestigingsnummer": vestigingsnummer})
+        vestiging = self.search(**kwargs).get("resultaten", {})
+        return cast(Bedrijf, vestiging)
 
     def retrieve_rsin_with_kvk(self, kvk, **kwargs) -> str | None:
         basisprofiel = self._request(
