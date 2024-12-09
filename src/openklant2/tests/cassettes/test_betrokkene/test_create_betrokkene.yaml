@@ -16,7 +16,7 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/partijen
   response:
     body:
-      string: '{"uuid":"45117274-654b-4447-b0a7-1731d682ea34","url":"http://localhost:8338/klantinteracties/api/v1/partijen/45117274-654b-4447-b0a7-1731d682ea34","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"crp","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Dr.","voornaam":"Test
+      string: '{"uuid":"276c1435-2575-4c17-a130-00bfcc1e69e0","url":"http://localhost:8338/klantinteracties/api/v1/partijen/276c1435-2575-4c17-a130-00bfcc1e69e0","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"crp","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Dr.","voornaam":"Test
         Persoon","voorvoegselAchternaam":"Mrs.","achternaam":"Gamble"},"volledigeNaam":"Test
         Persoon Mrs. Gamble"}}'
     headers:
@@ -26,12 +26,18 @@ interactions:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
       - '877'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/partijen/45117274-654b-4447-b0a7-1731d682ea34
+      - http://localhost:8338/klantinteracties/api/v1/partijen/276c1435-2575-4c17-a130-00bfcc1e69e0
       Referrer-Policy:
       - same-origin
       Vary:
@@ -44,35 +50,41 @@ interactions:
       code: 201
       message: Created
 - request:
-    body: '{"nummer": "0000000001", "kanaal": "recognize", "onderwerp": "possible",
-      "inhoud": "Ground better recognize.", "taal": "nld", "indicatieContactGelukt":
-      null, "vertrouwelijk": false, "plaatsgevondenOp": "1997-11-23T02:16:20.909281"}'
+    body: '{"nummer": "0000000001", "kanaal": "rate", "onderwerp": "yes", "inhoud":
+      "She born over program girl.", "taal": "nld", "indicatieContactGelukt": null,
+      "vertrouwelijk": false, "plaatsgevondenOp": "2016-01-17T16:40:08.119942"}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '231'
+      - '224'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"13a2b406-f284-403f-ba11-073287488ac6","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/13a2b406-f284-403f-ba11-073287488ac6","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000001","kanaal":"recognize","onderwerp":"possible","inhoud":"Ground
-        better recognize.","indicatieContactGelukt":null,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"1997-11-23T02:16:20.909281Z"}'
+      string: '{"uuid":"90acc2dd-58bd-40f7-a2a2-68d29852d118","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/90acc2dd-58bd-40f7-a2a2-68d29852d118","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000001","kanaal":"rate","onderwerp":"yes","inhoud":"She
+        born over program girl.","indicatieContactGelukt":null,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2016-01-17T16:40:08.119942Z"}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '493'
+      - '486'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/13a2b406-f284-403f-ba11-073287488ac6
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/90acc2dd-58bd-40f7-a2a2-68d29852d118
       Referrer-Policy:
       - same-origin
       Vary:
@@ -85,8 +97,8 @@ interactions:
       code: 201
       message: Created
 - request:
-    body: '{"wasPartij": {"uuid": "45117274-654b-4447-b0a7-1731d682ea34"}, "hadKlantcontact":
-      {"uuid": "13a2b406-f284-403f-ba11-073287488ac6"}, "rol": "klant", "organisatienaam":
+    body: '{"wasPartij": {"uuid": "276c1435-2575-4c17-a130-00bfcc1e69e0"}, "hadKlantcontact":
+      {"uuid": "90acc2dd-58bd-40f7-a2a2-68d29852d118"}, "rol": "klant", "organisatienaam":
       "foobar", "initiator": true}'
     headers:
       Authorization:
@@ -99,7 +111,7 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/betrokkenen
   response:
     body:
-      string: '{"uuid":"cb012c4c-eef3-41f5-a23e-359174ef8e4e","url":"http://localhost:8338/klantinteracties/api/v1/betrokkenen/cb012c4c-eef3-41f5-a23e-359174ef8e4e","wasPartij":{"uuid":"45117274-654b-4447-b0a7-1731d682ea34","url":"http://localhost:8338/klantinteracties/api/v1/partijen/45117274-654b-4447-b0a7-1731d682ea34"},"hadKlantcontact":{"uuid":"13a2b406-f284-403f-ba11-073287488ac6","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/13a2b406-f284-403f-ba11-073287488ac6"},"digitaleAdressen":[],"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"contactnaam":{"voorletters":"","voornaam":"","voorvoegselAchternaam":"","achternaam":""},"volledigeNaam":"","rol":"klant","organisatienaam":"foobar","initiator":true}'
+      string: '{"uuid":"6d40e5eb-17ec-438a-a641-2dd0c3522751","url":"http://localhost:8338/klantinteracties/api/v1/betrokkenen/6d40e5eb-17ec-438a-a641-2dd0c3522751","wasPartij":{"uuid":"276c1435-2575-4c17-a130-00bfcc1e69e0","url":"http://localhost:8338/klantinteracties/api/v1/partijen/276c1435-2575-4c17-a130-00bfcc1e69e0"},"hadKlantcontact":{"uuid":"90acc2dd-58bd-40f7-a2a2-68d29852d118","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/90acc2dd-58bd-40f7-a2a2-68d29852d118"},"digitaleAdressen":[],"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"contactnaam":{"voorletters":"","voornaam":"","voorvoegselAchternaam":"","achternaam":""},"volledigeNaam":"","rol":"klant","organisatienaam":"foobar","initiator":true}'
     headers:
       API-version:
       - 0.0.3
@@ -107,262 +119,18 @@ interactions:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
       - '882'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/betrokkenen/cb012c4c-eef3-41f5-a23e-359174ef8e4e
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 201
-      message: Created
-- request:
-    body: '{"digitaleAdressen": null, "voorkeursDigitaalAdres": null, "rekeningnummers":
-      null, "voorkeursRekeningnummer": null, "indicatieGeheimhouding": false, "indicatieActief":
-      true, "voorkeurstaal": "crp", "soortPartij": "persoon", "partijIdentificatie":
-      {"contactnaam": {"voorletters": "Dr.", "voornaam": "Test Persoon", "voorvoegselAchternaam":
-      "Mrs.", "achternaam": "Gamble"}}}'
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-      Content-Length:
-      - '373'
-      Content-Type:
-      - application/json
-    method: POST
-    uri: http://localhost:8338/klantinteracties/api/v1/partijen
-  response:
-    body:
-      string: '{"uuid":"be00c20a-d2e6-4b8e-9500-3ac603066a68","url":"http://localhost:8338/klantinteracties/api/v1/partijen/be00c20a-d2e6-4b8e-9500-3ac603066a68","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"crp","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Dr.","voornaam":"Test
-        Persoon","voorvoegselAchternaam":"Mrs.","achternaam":"Gamble"},"volledigeNaam":"Test
-        Persoon Mrs. Gamble"}}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '877'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Location:
-      - http://localhost:8338/klantinteracties/api/v1/partijen/be00c20a-d2e6-4b8e-9500-3ac603066a68
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 201
-      message: Created
-- request:
-    body: '{"nummer": "0000000001", "kanaal": "voice", "onderwerp": "finish", "inhoud":
-      "Sign piece seven finally.", "taal": "nld", "indicatieContactGelukt": false,
-      "vertrouwelijk": true, "plaatsgevondenOp": "2014-10-31T14:51:09.162502"}'
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-      Content-Length:
-      - '226'
-      Content-Type:
-      - application/json
-    method: POST
-    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
-  response:
-    body:
-      string: '{"uuid":"7310f42e-4c63-4067-9402-b7e715ae825f","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/7310f42e-4c63-4067-9402-b7e715ae825f","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000001","kanaal":"voice","onderwerp":"finish","inhoud":"Sign
-        piece seven finally.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2014-10-31T14:51:09.162502Z"}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '488'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/7310f42e-4c63-4067-9402-b7e715ae825f
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 201
-      message: Created
-- request:
-    body: '{"wasPartij": {"uuid": "be00c20a-d2e6-4b8e-9500-3ac603066a68"}, "hadKlantcontact":
-      {"uuid": "7310f42e-4c63-4067-9402-b7e715ae825f"}, "rol": "klant", "organisatienaam":
-      "foobar", "initiator": true}'
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-      Content-Length:
-      - '196'
-      Content-Type:
-      - application/json
-    method: POST
-    uri: http://localhost:8338/klantinteracties/api/v1/betrokkenen
-  response:
-    body:
-      string: '{"uuid":"d174dbfa-6069-4a38-960d-d4574344991a","url":"http://localhost:8338/klantinteracties/api/v1/betrokkenen/d174dbfa-6069-4a38-960d-d4574344991a","wasPartij":{"uuid":"be00c20a-d2e6-4b8e-9500-3ac603066a68","url":"http://localhost:8338/klantinteracties/api/v1/partijen/be00c20a-d2e6-4b8e-9500-3ac603066a68"},"hadKlantcontact":{"uuid":"7310f42e-4c63-4067-9402-b7e715ae825f","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/7310f42e-4c63-4067-9402-b7e715ae825f"},"digitaleAdressen":[],"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"contactnaam":{"voorletters":"","voornaam":"","voorvoegselAchternaam":"","achternaam":""},"volledigeNaam":"","rol":"klant","organisatienaam":"foobar","initiator":true}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '882'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Location:
-      - http://localhost:8338/klantinteracties/api/v1/betrokkenen/d174dbfa-6069-4a38-960d-d4574344991a
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 201
-      message: Created
-- request:
-    body: '{"digitaleAdressen": null, "voorkeursDigitaalAdres": null, "rekeningnummers":
-      null, "voorkeursRekeningnummer": null, "indicatieGeheimhouding": false, "indicatieActief":
-      true, "voorkeurstaal": "crp", "soortPartij": "persoon", "partijIdentificatie":
-      {"contactnaam": {"voorletters": "Dr.", "voornaam": "Test Persoon", "voorvoegselAchternaam":
-      "Mrs.", "achternaam": "Gamble"}}}'
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-      Content-Length:
-      - '373'
-      Content-Type:
-      - application/json
-    method: POST
-    uri: http://localhost:8338/klantinteracties/api/v1/partijen
-  response:
-    body:
-      string: '{"uuid":"5fd94f2a-0c27-4a27-ba08-c977eec84970","url":"http://localhost:8338/klantinteracties/api/v1/partijen/5fd94f2a-0c27-4a27-ba08-c977eec84970","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"crp","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Dr.","voornaam":"Test
-        Persoon","voorvoegselAchternaam":"Mrs.","achternaam":"Gamble"},"volledigeNaam":"Test
-        Persoon Mrs. Gamble"}}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '877'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Location:
-      - http://localhost:8338/klantinteracties/api/v1/partijen/5fd94f2a-0c27-4a27-ba08-c977eec84970
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 201
-      message: Created
-- request:
-    body: '{"nummer": "0000000001", "kanaal": "movie", "onderwerp": "charge", "inhoud":
-      "Money would court since.", "taal": "nld", "indicatieContactGelukt": null, "vertrouwelijk":
-      false, "plaatsgevondenOp": "2013-05-02T03:05:52.009962"}'
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-      Content-Length:
-      - '225'
-      Content-Type:
-      - application/json
-    method: POST
-    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
-  response:
-    body:
-      string: '{"uuid":"87a501d3-1894-40ad-a543-1ffe3e25f885","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/87a501d3-1894-40ad-a543-1ffe3e25f885","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000001","kanaal":"movie","onderwerp":"charge","inhoud":"Money
-        would court since.","indicatieContactGelukt":null,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2013-05-02T03:05:52.009962Z"}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '487'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/87a501d3-1894-40ad-a543-1ffe3e25f885
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 201
-      message: Created
-- request:
-    body: '{"wasPartij": {"uuid": "5fd94f2a-0c27-4a27-ba08-c977eec84970"}, "hadKlantcontact":
-      {"uuid": "87a501d3-1894-40ad-a543-1ffe3e25f885"}, "rol": "klant", "organisatienaam":
-      "foobar", "initiator": true}'
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-      Content-Length:
-      - '196'
-      Content-Type:
-      - application/json
-    method: POST
-    uri: http://localhost:8338/klantinteracties/api/v1/betrokkenen
-  response:
-    body:
-      string: '{"uuid":"0b5c681e-eed3-4a3c-9886-9a2e29bb2421","url":"http://localhost:8338/klantinteracties/api/v1/betrokkenen/0b5c681e-eed3-4a3c-9886-9a2e29bb2421","wasPartij":{"uuid":"5fd94f2a-0c27-4a27-ba08-c977eec84970","url":"http://localhost:8338/klantinteracties/api/v1/partijen/5fd94f2a-0c27-4a27-ba08-c977eec84970"},"hadKlantcontact":{"uuid":"87a501d3-1894-40ad-a543-1ffe3e25f885","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/87a501d3-1894-40ad-a543-1ffe3e25f885"},"digitaleAdressen":[],"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"contactnaam":{"voorletters":"","voornaam":"","voorvoegselAchternaam":"","achternaam":""},"volledigeNaam":"","rol":"klant","organisatienaam":"foobar","initiator":true}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '882'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Location:
-      - http://localhost:8338/klantinteracties/api/v1/betrokkenen/0b5c681e-eed3-4a3c-9886-9a2e29bb2421
+      - http://localhost:8338/klantinteracties/api/v1/betrokkenen/6d40e5eb-17ec-438a-a641-2dd0c3522751
       Referrer-Policy:
       - same-origin
       Vary:

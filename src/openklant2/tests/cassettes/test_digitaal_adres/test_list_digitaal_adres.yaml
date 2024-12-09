@@ -2,35 +2,41 @@ interactions:
 - request:
     body: '{"digitaleAdressen": null, "voorkeursDigitaalAdres": null, "rekeningnummers":
       null, "voorkeursRekeningnummer": null, "indicatieGeheimhouding": false, "indicatieActief":
-      false, "voorkeurstaal": "sag", "soortPartij": "persoon", "partijIdentificatie":
-      {"contactnaam": {"voorletters": "Mr.", "voornaam": "Gregory", "voorvoegselAchternaam":
-      "Mrs.", "achternaam": "Curtis"}}}'
+      false, "voorkeurstaal": "lua", "soortPartij": "persoon", "partijIdentificatie":
+      {"contactnaam": {"voorletters": "Mr.", "voornaam": "Valerie", "voorvoegselAchternaam":
+      "Mr.", "achternaam": "Rodriguez"}}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '369'
+      - '371'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/partijen
   response:
     body:
-      string: '{"uuid":"91a61e90-fea0-402c-85b6-6fddca6fcddc","url":"http://localhost:8338/klantinteracties/api/v1/partijen/91a61e90-fea0-402c-85b6-6fddca6fcddc","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"sag","indicatieActief":false,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Mr.","voornaam":"Gregory","voorvoegselAchternaam":"Mrs.","achternaam":"Curtis"},"volledigeNaam":"Gregory
-        Mrs. Curtis"}}'
+      string: '{"uuid":"e541373c-19e3-4dfe-9243-032b9102248c","url":"http://localhost:8338/klantinteracties/api/v1/partijen/e541373c-19e3-4dfe-9243-032b9102248c","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"lua","indicatieActief":false,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Mr.","voornaam":"Valerie","voorvoegselAchternaam":"Mr.","achternaam":"Rodriguez"},"volledigeNaam":"Valerie
+        Mr. Rodriguez"}}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '868'
+      - '872'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/partijen/91a61e90-fea0-402c-85b6-6fddca6fcddc
+      - http://localhost:8338/klantinteracties/api/v1/partijen/e541373c-19e3-4dfe-9243-032b9102248c
       Referrer-Policy:
       - same-origin
       Vary:
@@ -43,9 +49,8 @@ interactions:
       code: 201
       message: Created
 - request:
-    body: '{"adres": "USNS Smith\nFPO AP 68279", "omschrijving": "myself", "soortDigitaalAdres":
-      "company", "verstrektDoorBetrokkene": null, "verstrektDoorPartij": {"uuid":
-      "91a61e90-fea0-402c-85b6-6fddca6fcddc"}}'
+    body: '{"adres": "jennifer85@example.com", "omschrijving": "especially", "soortDigitaalAdres":
+      "email", "verstrektDoorBetrokkene": null, "verstrektDoorPartij": {"uuid": "e541373c-19e3-4dfe-9243-032b9102248c"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
@@ -57,21 +62,26 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/digitaleadressen
   response:
     body:
-      string: '{"uuid":"0ed64d93-831d-4411-9658-ef35c760b47b","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/0ed64d93-831d-4411-9658-ef35c760b47b","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"91a61e90-fea0-402c-85b6-6fddca6fcddc","url":"http://localhost:8338/klantinteracties/api/v1/partijen/91a61e90-fea0-402c-85b6-6fddca6fcddc"},"adres":"USNS
-        Smith\nFPO AP 68279","soortDigitaalAdres":"company","omschrijving":"myself"}'
+      string: '{"uuid":"89181047-6609-4e6e-85c8-d5e5a24c6cb0","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/89181047-6609-4e6e-85c8-d5e5a24c6cb0","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"e541373c-19e3-4dfe-9243-032b9102248c","url":"http://localhost:8338/klantinteracties/api/v1/partijen/e541373c-19e3-4dfe-9243-032b9102248c"},"adres":"jennifer85@example.com","soortDigitaalAdres":"email","isStandaardAdres":false,"omschrijving":"especially"}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '446'
+      - '471'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/digitaleadressen/0ed64d93-831d-4411-9658-ef35c760b47b
+      - http://localhost:8338/klantinteracties/api/v1/digitaleadressen/89181047-6609-4e6e-85c8-d5e5a24c6cb0
       Referrer-Policy:
       - same-origin
       Vary:
@@ -92,15 +102,20 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/digitaleadressen
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"0ed64d93-831d-4411-9658-ef35c760b47b","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/0ed64d93-831d-4411-9658-ef35c760b47b","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"91a61e90-fea0-402c-85b6-6fddca6fcddc","url":"http://localhost:8338/klantinteracties/api/v1/partijen/91a61e90-fea0-402c-85b6-6fddca6fcddc"},"adres":"USNS
-        Smith\nFPO AP 68279","soortDigitaalAdres":"company","omschrijving":"myself","_expand":{}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"89181047-6609-4e6e-85c8-d5e5a24c6cb0","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/89181047-6609-4e6e-85c8-d5e5a24c6cb0","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"e541373c-19e3-4dfe-9243-032b9102248c","url":"http://localhost:8338/klantinteracties/api/v1/partijen/e541373c-19e3-4dfe-9243-032b9102248c"},"adres":"jennifer85@example.com","soortDigitaalAdres":"email","isStandaardAdres":false,"omschrijving":"especially","_expand":{}}]}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '511'
+      - '536'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

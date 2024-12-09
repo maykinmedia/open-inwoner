@@ -13,8 +13,8 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"87e75327-d373-437e-85aa-657743350d1e","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/87e75327-d373-437e-85aa-657743350d1e","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000001","kanaal":"contactformulier","onderwerp":"vraag","inhoud":"Dit
-        is een vraag","indicatieContactGelukt":null,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2024-10-03T12:36:42.153820Z"}'
+      string: '{"uuid":"8e23e12b-2a4a-4575-824e-705870336a3a","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/8e23e12b-2a4a-4575-824e-705870336a3a","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000001","kanaal":"contactformulier","onderwerp":"vraag","inhoud":"Dit
+        is een vraag","indicatieContactGelukt":null,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2024-12-06T11:35:03.253467Z"}'
     headers:
       API-version:
       - 0.0.3
@@ -22,52 +22,18 @@ interactions:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
       - '488'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/87e75327-d373-437e-85aa-657743350d1e
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 201
-      message: Created
-- request:
-    body: '{"kanaal": "contactformulier", "onderwerp": "vraag", "inhoud": "Dit is
-      een vraag", "taal": "nld", "vertrouwelijk": true}'
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-      Content-Length:
-      - '120'
-      Content-Type:
-      - application/json
-    method: POST
-    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
-  response:
-    body:
-      string: '{"uuid":"576a62c1-5514-450a-bf71-ccbea10e790e","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/576a62c1-5514-450a-bf71-ccbea10e790e","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000001","kanaal":"contactformulier","onderwerp":"vraag","inhoud":"Dit
-        is een vraag","indicatieContactGelukt":null,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2024-10-03T12:41:05.588567Z"}'
-    headers:
-      API-version:
-      - 0.0.3
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '488'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/576a62c1-5514-450a-bf71-ccbea10e790e
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/8e23e12b-2a4a-4575-824e-705870336a3a
       Referrer-Policy:
       - same-origin
       Vary:

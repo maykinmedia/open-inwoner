@@ -2,9 +2,9 @@ interactions:
 - request:
     body: '{"digitaleAdressen": null, "voorkeursDigitaalAdres": null, "rekeningnummers":
       null, "voorkeursRekeningnummer": null, "indicatieGeheimhouding": true, "indicatieActief":
-      false, "voorkeurstaal": "tgl", "soortPartij": "persoon", "partijIdentificatie":
-      {"contactnaam": {"voorletters": "Mx.", "voornaam": "Michael", "voorvoegselAchternaam":
-      "Mx.", "achternaam": "Parker"}}}'
+      false, "voorkeurstaal": "ace", "soortPartij": "persoon", "partijIdentificatie":
+      {"contactnaam": {"voorletters": "Ms.", "voornaam": "Jillian", "voorvoegselAchternaam":
+      "Mr.", "achternaam": "Flores"}}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
@@ -16,8 +16,8 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/partijen
   response:
     body:
-      string: '{"uuid":"e9bf4ff8-c566-4de3-81a5-5170b366409d","url":"http://localhost:8338/klantinteracties/api/v1/partijen/e9bf4ff8-c566-4de3-81a5-5170b366409d","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":true,"voorkeurstaal":"tgl","indicatieActief":false,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Mx.","voornaam":"Michael","voorvoegselAchternaam":"Mx.","achternaam":"Parker"},"volledigeNaam":"Michael
-        Mx. Parker"}}'
+      string: '{"uuid":"3e038cb5-9f24-4f00-8a3c-882ad1315cd2","url":"http://localhost:8338/klantinteracties/api/v1/partijen/3e038cb5-9f24-4f00-8a3c-882ad1315cd2","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":true,"voorkeurstaal":"ace","indicatieActief":false,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Ms.","voornaam":"Jillian","voorvoegselAchternaam":"Mr.","achternaam":"Flores"},"volledigeNaam":"Jillian
+        Mr. Flores"}}'
     headers:
       API-version:
       - 0.0.3
@@ -25,12 +25,18 @@ interactions:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
       - '865'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/partijen/e9bf4ff8-c566-4de3-81a5-5170b366409d
+      - http://localhost:8338/klantinteracties/api/v1/partijen/3e038cb5-9f24-4f00-8a3c-882ad1315cd2
       Referrer-Policy:
       - same-origin
       Vary:
@@ -43,35 +49,39 @@ interactions:
       code: 201
       message: Created
 - request:
-    body: '{"adres": "1033 Taylor Gateway\nLake Debbie, UT 20652", "omschrijving":
-      "direction", "soortDigitaalAdres": "good", "verstrektDoorBetrokkene": null,
-      "verstrektDoorPartij": {"uuid": "e9bf4ff8-c566-4de3-81a5-5170b366409d"}}'
+    body: '{"adres": "valeriethout@example.net", "omschrijving": "couple", "soortDigitaalAdres":
+      "email", "verstrektDoorBetrokkene": null, "verstrektDoorPartij": {"uuid": "3e038cb5-9f24-4f00-8a3c-882ad1315cd2"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '220'
+      - '200'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/digitaleadressen
   response:
     body:
-      string: '{"uuid":"557b8cd2-3516-4991-9ea9-482dceeef362","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/557b8cd2-3516-4991-9ea9-482dceeef362","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"e9bf4ff8-c566-4de3-81a5-5170b366409d","url":"http://localhost:8338/klantinteracties/api/v1/partijen/e9bf4ff8-c566-4de3-81a5-5170b366409d"},"adres":"1033
-        Taylor Gateway\nLake Debbie, UT 20652","soortDigitaalAdres":"good","omschrijving":"direction"}'
+      string: '{"uuid":"2d9baeed-4c4d-4726-9fc5-9601403da41f","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/2d9baeed-4c4d-4726-9fc5-9601403da41f","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"3e038cb5-9f24-4f00-8a3c-882ad1315cd2","url":"http://localhost:8338/klantinteracties/api/v1/partijen/3e038cb5-9f24-4f00-8a3c-882ad1315cd2"},"adres":"valeriethout@example.net","soortDigitaalAdres":"email","isStandaardAdres":false,"omschrijving":"couple"}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '464'
+      - '469'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/digitaleadressen/557b8cd2-3516-4991-9ea9-482dceeef362
+      - http://localhost:8338/klantinteracties/api/v1/digitaleadressen/2d9baeed-4c4d-4726-9fc5-9601403da41f
       Referrer-Policy:
       - same-origin
       Vary:
@@ -89,18 +99,23 @@ interactions:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
     method: GET
-    uri: http://localhost:8338/klantinteracties/api/v1/digitaleadressen/557b8cd2-3516-4991-9ea9-482dceeef362
+    uri: http://localhost:8338/klantinteracties/api/v1/digitaleadressen/2d9baeed-4c4d-4726-9fc5-9601403da41f
   response:
     body:
-      string: '{"uuid":"557b8cd2-3516-4991-9ea9-482dceeef362","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/557b8cd2-3516-4991-9ea9-482dceeef362","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"e9bf4ff8-c566-4de3-81a5-5170b366409d","url":"http://localhost:8338/klantinteracties/api/v1/partijen/e9bf4ff8-c566-4de3-81a5-5170b366409d"},"adres":"1033
-        Taylor Gateway\nLake Debbie, UT 20652","soortDigitaalAdres":"good","omschrijving":"direction"}'
+      string: '{"uuid":"2d9baeed-4c4d-4726-9fc5-9601403da41f","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/2d9baeed-4c4d-4726-9fc5-9601403da41f","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"3e038cb5-9f24-4f00-8a3c-882ad1315cd2","url":"http://localhost:8338/klantinteracties/api/v1/partijen/3e038cb5-9f24-4f00-8a3c-882ad1315cd2"},"adres":"valeriethout@example.net","soortDigitaalAdres":"email","isStandaardAdres":false,"omschrijving":"couple"}'
     headers:
       API-version:
       - 0.0.3
       Allow:
       - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
       Content-Length:
-      - '464'
+      - '469'
+      Content-Security-Policy:
+      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
+        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
+        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
