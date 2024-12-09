@@ -46,7 +46,7 @@ def get_or_create_klant_for_new_user(
             logger.error("Failed to create partij for new user %s", user)
             return
         elif not created:
-            service.update_user_from_partij(partij_uuid=partij.uuid, user=user)
+            service.update_user_from_partij(partij_uuid=partij["uuid"], user=user)
 
         logger.info("Created partij %s for new user %s", partij, user)
 

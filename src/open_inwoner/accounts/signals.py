@@ -63,7 +63,7 @@ def _update_user_from_openklant2(
             fetch_params=fetch_params, user=user
         )
         if partij and not created:
-            service.update_user_from_partij(partij_uuid=partij.uuid, user=user)
+            service.update_user_from_partij(partij_uuid=partij["uuid"], user=user)
 
 
 def _update_user_from_esuite(
