@@ -83,6 +83,7 @@ class VragenService(Protocol):
         request=None,
         user: User | None = None,
         use_vestigingsnummer: bool = False,
+        use_rsin: bool = False,
     ) -> FetchParameters | None:  # noqa: E704
         ...
 
@@ -270,7 +271,7 @@ class KlantContactMomentRedirectView(KlantContactMomentAccessMixin, View):
     def get(self, request, *args, **kwargs):
         vragen_service: VragenService = eSuiteVragenService()
         klanten_service: KlantenService = eSuiteKlantenService()
-        fetch_params = klanten_service.get_fetch_parameters(self.request)
+        fetch_params = klanten_service.get_fetch_parameters(self.request, use_rsin=False)
 
         klant = klanten_service.retrieve_klant(**fetch_params)
         kcms = vragen_service.retrieve_klantcontactmomenten_for_klant(klant)

@@ -106,35 +106,32 @@ class KlantenService(Protocol):
     client: APIClient
 
     def get_fetch_parameters(
-        self,
-        request=None,
-        user: User | None = None,
-        use_vestigingsnummer: bool = False,
-    ) -> FetchParameters | None:
-        """
-        Determine the parameters used to perform Klanten/Contactmomenten fetches
-        """
-        user = user or request.user
+            self,
+            request=None,
+            user: User | None = None,
+            use_vestigingsnummer: bool = False,
+            use_rsin: bool = False,
+        ) -> FetchParameters | None:
+            """
+            Determine the parameters used to perform Klanten/Contactmomenten fetches
+            """
+            user = user or request.user
 
-        if user.bsn:
-            return {"user_bsn": user.bsn}
-        elif user.kvk:
-            kvk_or_rsin = user.kvk
-            config = OpenKlantConfig.get_solo()
-            if config.use_rsin_for_innNnpId_query_parameter:
-                kvk_or_rsin = user.rsin
+            if user.bsn:
+                return {"user_bsn": user.bsn}
+            elif user.kvk:
+                kvk_or_rsin = user.rsin if use_rsin else user.kvk
+                if use_vestigingsnummer:
+                    vestigingsnummer = get_kvk_branch_number(request.session)
+                    if vestigingsnummer:
+                        return {
+                            "user_kvk_or_rsin": kvk_or_rsin,
+                            "vestigingsnummer": vestigingsnummer,
+                        }
 
-            if use_vestigingsnummer:
-                vestigingsnummer = get_kvk_branch_number(request.session)
-                if vestigingsnummer:
-                    return {
-                        "user_kvk_or_rsin": kvk_or_rsin,
-                        "vestigingsnummer": vestigingsnummer,
-                    }
+                return {"user_kvk_or_rsin": kvk_or_rsin}
 
-            return {"user_kvk_or_rsin": kvk_or_rsin}
-
-        return None
+            return None
 
 
 class eSuiteKlantenService(KlantenService):

@@ -34,7 +34,7 @@ def get_or_create_klant_for_new_user(
 
         if not (
             fetch_params := service.get_fetch_parameters(
-                user=user, use_vestigingsnummer=True
+                user=user, use_vestigingsnummer=True, use_rsin=True
             )
         ):
             return
@@ -59,7 +59,7 @@ def get_or_create_klant_for_new_user(
 
     if not (
         fetch_params := service.get_fetch_parameters(
-            user=user, use_vestigingsnummer=True
+            user=user, use_vestigingsnummer=True, use_rsin=False
         )
     ):
         return
