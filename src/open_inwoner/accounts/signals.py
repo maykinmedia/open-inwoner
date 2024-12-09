@@ -9,6 +9,7 @@ from django.utils.translation import gettext as _
 from open_inwoner.accounts.models import User
 from open_inwoner.haalcentraal.models import HaalCentraalConfig
 from open_inwoner.haalcentraal.utils import update_brp_data_in_db
+from open_inwoner.kvk.signals import company_branch_selected
 from open_inwoner.openklant.services import OpenKlant2Service, eSuiteKlantenService
 from open_inwoner.utils.logentry import user_action
 
@@ -24,6 +25,31 @@ MESSAGE_TYPE = {
     "frontend_oidc": _("user was logged in via frontend using OpenIdConnect"),
     "logout": _("user was logged out"),
 }
+
+
+@receiver(company_branch_selected)
+def update_company_from_kvk_api(sender, *args, **kwargs):
+    request = kwargs["request"]
+    user = request.user
+
+    company_data = kwargs["company_data"]
+    user.company_name = company_data["name"]
+
+    address = company_data["address"]
+    city = address.get("city", None)
+    if city and city != user.city:
+        user.city = city
+    postcode = address.get("postcode", None)
+    if postcode and postcode != user.postcode:
+        user.postcode = postcode
+    street = address.get("street", None)
+    if street and street != user.street:
+        user.street = street
+    house_number = address.get("house_number", None)
+    if house_number and house_number != user.housenumber:
+        user.housenumber = house_number
+
+    user.save()
 
 
 @receiver(user_logged_in)
