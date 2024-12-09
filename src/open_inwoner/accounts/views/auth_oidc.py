@@ -1,4 +1,5 @@
 import logging
+from urllib.parse import urlencode
 
 from django.conf import settings
 from django.contrib import auth, messages
@@ -97,15 +98,37 @@ class OIDCLogoutView(View):
 
     def get(self, request):
         assert self.config_class is not None
+        config = self.config_class.get_solo()
 
-        if id_token := request.session.get("oidc_id_token"):
-            config = self.config_class.get_solo()
-            do_op_logout(config, id_token)
+        if not (logout_endpoint := config.oidc_op_logout_endpoint):
+            logger.warning("No OIDC logout endpoint defined")
 
+        id_token = request.session.get("oidc_id_token")
         if "oidc_login_next" in request.session:
             del request.session["oidc_login_next"]
 
+        # Always destroy our session, having obtained the OIDC artifacts from the session
         auth.logout(request)
+
+        # Try to initiate a frontchannel redirect
+        if id_token:
+            if not logout_endpoint:
+                # Fallback: no frontchannel flow possible
+                # TODO: we can actually still redirect here, but it might be a
+                # bad UX, because no id token hint.
+                do_op_logout(config, id_token)
+            else:
+                params = {
+                    "id_token_hint": id_token,
+                    # The value MUST have been previously registered with the
+                    # OP, either using the post_logout_redirect_uris
+                    # Registration parameter or via another mechanism.
+                    "post_logout_redirect_uri": self.request.build_absolute_uri(
+                        self.get_success_url()
+                    ),
+                }
+                logout_url = f"{logout_endpoint}?{urlencode(params)}"
+                return HttpResponseRedirect(logout_url)
 
         return HttpResponseRedirect(self.get_success_url())
 
