@@ -16,7 +16,6 @@ uwsgi_port=${UWSGI_PORT:-8000}
 uwsgi_processes=${UWSGI_PROCESSES:-4}
 uwsgi_threads=${UWSGI_THREADS:-8}
 uwsgi_http_timeout=${UWSGI_HTTP_TIMEOUT:-120}
-uwsgi_max_requests=${UWSGI_MAX_REQUESTS:-100}
 
 # Apply database migrations
 >&2 echo "Apply database migrations"
@@ -25,9 +24,9 @@ python src/manage.py migrate
 # Start server
 >&2 echo "Starting server"
 exec uwsgi \
+    --die-on-term \
     --http :$uwsgi_port \
     --http-keepalive \
-    --max-requests $uwsgi_max_requests \
     --http-timeout $uwsgi_http_timeout \
     --module open_inwoner.wsgi \
     --static-map /static=/app/static \
