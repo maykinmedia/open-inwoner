@@ -22,6 +22,8 @@ class eHerkenningBackend(BaseBackend):
         }
     )
 
+    # TODO: update mock to test retrieval/storage of vestigingsnummer
+
     def get_or_create_user(self, request, kvk):
         created = False
         try:

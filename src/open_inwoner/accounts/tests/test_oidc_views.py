@@ -1828,3 +1828,66 @@ class eHerkenningOIDCFlowTests(WebTest):
         profile_response = self.app.get(profile_response.url)
 
         self.assertEqual(profile_response.status_code, 200)
+
+    @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
+    @patch("open_inwoner.utils.context_processors.SiteConfiguration")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
+    @patch(
+        "open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo",
+        return_value=OpenIDEHerkenningConfig(
+            id=1,
+            enabled=True,
+            legal_subject_claim=["kvk"],
+            oidc_op_authorization_endpoint="http://idp.local/auth",
+        ),
+    )
+    def test_redirect_after_login_branch_already_selected(
+        self,
+        mock_get_solo,
+        mock_get_token,
+        mock_verify_token,
+        mock_store_tokens,
+        mock_get_userinfo,
+        mock_siteconfig,
+        mock_kvk,
+    ):
+        """
+        KVK branch selection should be skipped if KVK_BRANCH_SESSION_VARIABLE is present in session
+        """
+        user = eHerkenningUserFactory.create(kvk="12345678", rsin="123456789")
+        mock_get_userinfo.return_value = {
+            "sub": "some_username",
+            "kvk": "12345678",
+            "urn:etoegang:1.9:ServiceRestriction:Vestigingsnr": "123456789000",
+        }
+        mock_siteconfig.return_value = SiteConfiguration(id=1, eherkenning_enabled=True)
+        mock_kvk.return_value = [
+            {"kvkNummer": "12345678"},
+            {"kvkNummer": "87654321"},
+        ]
+
+        self.assertEqual(User.objects.count(), 1)
+
+        redirect_url = reverse("profile:detail")
+
+        callback_response = perform_oidc_login(
+            self.app, "eherkenning", redirect_url=redirect_url
+        )
+
+        user = User.objects.get()
+
+        self.assertEqual(user.pk, int(self.app.session.get("_auth_user_id")))
+        self.assertEqual(user.kvk, "12345678")
+        self.assertEqual(
+            self.app.session.get(KVK_BRANCH_SESSION_VARIABLE), "123456789000"
+        )
+
+        self.assertRedirects(
+            callback_response, reverse("profile:detail"), fetch_redirect_response=False
+        )
+
+        response = self.app.get(callback_response.url)
+        self.assertEqual(response.status_code, 200)
