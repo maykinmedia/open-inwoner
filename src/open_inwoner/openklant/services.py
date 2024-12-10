@@ -1133,7 +1133,7 @@ class OpenKlant2Service(KlantenService):
         if len(question.rstrip()) == 0:
             raise ValueError("You must provide a question")
 
-        if self.mijn_vragen_actor is None:
+        if self.config.mijn_vragen_actor is None:
             raise RuntimeError(
                 "You must define an actor to whom the question will be assigned. "
                 "Initialize the service with a value for `mijn_vragen_actor`."
@@ -1168,7 +1168,7 @@ class OpenKlant2Service(KlantenService):
                 "toelichting": "Beantwoorden vraag",
                 "gevraagdeHandeling": "Vraag beantwoorden in aanleiding gevend klant contact",
                 "status": "te_verwerken",
-                "toegewezenAanActor": {"uuid": str(self.mijn_vragen_actor)},
+                "toegewezenAanActor": {"uuid": str(self.config.mijn_vragen_actor)},
             }
         )
         logger.info("Created taak: %s", taak["uuid"])
@@ -1333,7 +1333,7 @@ class OpenKlant2Service(KlantenService):
         # should return (Question, zaak_with_api_group); the latter is left out until a
         # standard for linking klantcontact + zaak is agreed upon
         # https://github.com/Klantinteractie-Servicesysteem/KISS-frontend/issues/808#issuecomment-2357637675
-        return self._build_question_dto(question), None
+        return self._build_question_dto(question_ok2=question, user=user), None
 
     def _build_question_dtos(
         self,
@@ -1341,8 +1341,7 @@ class OpenKlant2Service(KlantenService):
         user: User,
     ) -> list[Question]:
         return [
-            self._build_question_dto(questions_ok2, user=user)
-            for question in questions_ok2
+            self._build_question_dto(question, user=user) for question in questions_ok2
         ]
 
     def _build_question_dto(
@@ -1350,9 +1349,11 @@ class OpenKlant2Service(KlantenService):
         question_ok2: OpenKlant2Question,
         user: User,
     ) -> Question:
-        answer_metadata = KlantContactMomentAnswer.objects.get_or_create(
+        answer_metadata, _ = KlantContactMomentAnswer.objects.get_or_create(
             user=user, contactmoment_url=question_ok2.url
         )
+        answer_text = question_ok2.answer.answer if question_ok2.answer else None
+
         return QuestionValidator.validate_python(
             {
                 "identification": question_ok2.nummer,
@@ -1360,15 +1361,15 @@ class OpenKlant2Service(KlantenService):
                 "api_source_uuid": uuid_from_url(question_ok2.url),
                 "subject": question_ok2.onderwerp,
                 "question_text": question_ok2.question,
-                "answer_text": question_ok2.answer.answer,
+                "answer_text": answer_text,
                 "registered_date": question_ok2.plaatsgevonden_op,
-                "status": "",
+                "status": "Beantwoord" if answer_text is not None else "Onbeantwoord",
                 "channel": question_ok2.kanaal,
                 "case_detail_url": getattr(question_ok2, "zaak_url", None),
                 "new_answer_available": self._has_new_answer_available(
                     question_ok2, answer=answer_metadata
                 ),
-                "api_service": KlantenServiceType.openklant2,
+                "api_service": KlantenServiceType.OPENKLANT2,
             }
         )
 

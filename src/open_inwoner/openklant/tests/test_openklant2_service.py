@@ -373,7 +373,7 @@ class QuestionAnswerTestCase(Openklant2ServiceTestCase):
         self.service = OpenKlant2Service(config=self.openklant2_config)
 
     def test_designated_actor_is_required_to_create_question(self):
-        self.service.mijn_vragen_actor = None
+        self.openklant2_config.mijn_vragen_actor = None
 
         with self.assertRaises(RuntimeError):
             self.service.create_question(
