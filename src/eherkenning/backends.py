@@ -12,6 +12,8 @@ class eHerkenningBackend(_eHerkenningBackend):
     Custom backend to identify users based on the KvK number instead of RSIN
     """
 
+    # TODO: get vestigingsnummer from saml_response
+
     def get_or_create_user(self, request, saml_response, saml_attributes):
         kvk = self.get_kvk_number(saml_attributes)
         if kvk == "":

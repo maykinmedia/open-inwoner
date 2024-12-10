@@ -59,6 +59,10 @@ class CompanyBranchChoiceView(FormView):
             return HttpResponse(_("Unauthorized"), status=401)
 
         redirect = self.get_redirect()
+
+        if request.session.get(KVK_BRANCH_SESSION_VARIABLE, None):
+            return HttpResponseRedirect(redirect)
+
         context = super().get_context_data()
 
         form = context["form"]

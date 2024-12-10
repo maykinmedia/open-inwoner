@@ -5,15 +5,19 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.hashers import check_password
+from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import SuspiciousOperation
 from django.urls import reverse, reverse_lazy
 
 from axes.backends import AxesBackend
 from digid_eherkenning.oidc.backends import BaseBackend
 from mozilla_django_oidc_db.backends import OIDCAuthenticationBackend
 from mozilla_django_oidc_db.config import dynamic_setting
+from mozilla_django_oidc_db.typing import JSONObject
 from oath import accept_totp
 
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.kvk.branches import KVK_BRANCH_SESSION_VARIABLE
 from open_inwoner.utils.hash import generate_email_from_string
 
 from .choices import LoginTypeChoices
@@ -185,4 +189,14 @@ class DigiDEHerkenningOIDCBackend(BaseBackend):
             }
         )
 
+        if vestigingsnummer := claims.get("vestigingsnummer", None):
+            self.request.session[KVK_BRANCH_SESSION_VARIABLE] = vestigingsnummer
+            self.request.session.save()
+
         return user
+
+    def update_user(self, user: AbstractUser, claims: JSONObject):
+        if vestigingsnummer := claims.get("vestigingsnummer", None):
+            self.request.session[KVK_BRANCH_SESSION_VARIABLE] = vestigingsnummer
+            self.request.session.save()
+        return super().update_user(user, claims)
