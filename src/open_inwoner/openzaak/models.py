@@ -438,6 +438,13 @@ class OpenZaakConfig(SingletonModel):
         default=False,
     )
 
+    show_cases_without_status = models.BooleanField(
+        verbose_name=_(
+            "By default cases are only shown if they have a status set."
+        ),
+        default=False,
+    )
+
     title_text = models.TextField(
         verbose_name=_("Title text"),
         help_text=_(

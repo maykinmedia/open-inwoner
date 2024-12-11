@@ -197,7 +197,7 @@ class CaseListService:
         resolved_cases = self.resolve_cases(raw_cases, group)
 
         filtered_cases = [
-            case for case in resolved_cases if case.status and is_zaak_visible(case)
+            case for case in resolved_cases if is_zaak_visible(case)
         ]
         filtered_cases.sort(key=lambda case: case.startdatum, reverse=True)
         return filtered_cases
