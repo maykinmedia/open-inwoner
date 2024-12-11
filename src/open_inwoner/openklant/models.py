@@ -115,6 +115,13 @@ class OpenKlantConfig(SingletonModel):
         validators=[validate_array_contents_non_empty],
     )
 
+    # FK for easy inline admins
+    config = models.OneToOneField(
+        "KlantenInteractiesConfig",
+        null=True,
+        on_delete=models.CASCADE,
+    )
+
     register_api_required_fields = (
         "register_contact_moment",
         "contactmomenten_service",
@@ -126,7 +133,7 @@ class OpenKlantConfig(SingletonModel):
     objects = OpenKlantConfigManager()
 
     class Meta:
-        verbose_name = _("Open Klant configuration")
+        verbose_name = _("Esuite configuration")
 
     def has_register(self) -> bool:
         return self.register_email or self.has_api_configuration()
@@ -150,7 +157,7 @@ class ContactFormSubject(OrderedModel):
     )
     # FK for easy inline admins
     config = models.ForeignKey(
-        OpenKlantConfig,
+        "KlantenInteractiesConfig",
         on_delete=models.CASCADE,
     )
 
@@ -223,4 +230,45 @@ class OpenKlant2Config:
 
         return cls(**config)
 
-    # TODO: add from_openklant_config_model or similar
+
+# TODO: rename after removing dataclass config
+class OpenKlant2Config2(SingletonModel):
+    api_root = models.URLField(
+        verbose_name=_("API root url"),
+    )
+    api_token = models.CharField(
+        verbose_name=_("API key token"),
+    )
+
+    # Vragen
+    mijn_vragen_kanaal = models.CharField(
+        verbose_name=_("Mijn vragen kanaal"),
+    )
+    mijn_vragen_organisatie_naam = models.CharField(
+        verbose_name=_("Mijn vragen organisatie naam"),
+    )
+    mijn_vragen_actor = models.CharField(
+        verbose_name=_("Mijn vragen actor"),
+    )
+    interne_taak_gevraagde_handeling = models.CharField(
+        verbose_name=_("Interne taak gevraagde handeling"),
+    )
+    interne_taak_toelichting = models.CharField(
+        verbose_name=_("Interne taak toelichting"),
+    )
+
+    # FK for admin inline
+    config = models.OneToOneField(
+        "KlantenInteractiesConfig",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+    )
+
+    class Meta:
+        verbose_name = _("Open Klant configuration")
+
+
+class KlantenInteractiesConfig(SingletonModel):
+    class Meta:
+        verbose_name = _("Configuratie Klanten Interacties")
