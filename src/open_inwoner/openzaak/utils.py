@@ -49,6 +49,9 @@ def is_zaak_visible(zaak: Zaak) -> bool:
     if isinstance(zaak.zaaktype, str):
         raise ValueError("expected zaak.zaaktype to be resolved from url to model")
 
+    if not zaak.status and not config.show_cases_without_status:
+        return False
+
     if not zaak.zaaktype or zaak.zaaktype.indicatie_intern_of_extern != "extern":
         return False
 
