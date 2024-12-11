@@ -1,6 +1,7 @@
 import logging
 
 from django.contrib.auth.signals import user_logged_in
+from django.db.models.signals import Signal
 from django.dispatch import receiver
 from django.utils.translation import gettext as _
 
@@ -34,3 +35,6 @@ def on_kvk_change(sender, user, request, *args, **kwargs):
             user.rsin = rsin
             user.is_prepopulated = True
             user.save()
+
+
+company_branch_selected = Signal()
