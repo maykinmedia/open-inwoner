@@ -3,12 +3,11 @@ from typing import Literal
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.auth.backends import ModelBackend
+from django.contrib.auth.backends import BaseBackend, ModelBackend
 from django.contrib.auth.hashers import check_password
 from django.urls import reverse, reverse_lazy
 
 from axes.backends import AxesBackend
-from digid_eherkenning.oidc.backends import BaseBackend
 from mozilla_django_oidc_db.backends import OIDCAuthenticationBackend
 from mozilla_django_oidc_db.config import dynamic_setting
 from oath import accept_totp
@@ -25,14 +24,14 @@ logger = logging.getLogger(__name__)
 class UserModelEmailBackend(ModelBackend):
     """
     Authentication backend for login with email address.
+
+    Based on the default ModelBackend, but with support for case insensitive
+    email lookups, scoped to the correct login type.
     """
 
-    def authenticate(
-        self, request, username=None, password=None, user=None, token=None, **kwargs
-    ):
-        config = SiteConfiguration.get_solo()
+    def authenticate(self, request, username=None, password=None):
         User = get_user_model()
-        if username and password and not config.login_2fa_sms:
+        if username and password:
             try:
                 user = User.objects.get(
                     email__iexact=username,
@@ -55,8 +54,15 @@ class UserModelEmailBackend(ModelBackend):
                 User().set_password(password)
                 return None
 
+
+class Verify2FATokenBackend(BaseBackend):
+    """
+    Verify a TOTP token for a user.
+    """
+
+    def authenticate(self, request, *, user=None, token=None):
         # 2FA with sms verification
-        if config.login_2fa_sms and user and token:
+        if user and token:
             accepted, drift = accept_totp(
                 key=user.seed,
                 response=token,

@@ -32,6 +32,7 @@ CACHES.update(
 AUTHENTICATION_BACKENDS = [
     "open_inwoner.accounts.backends.CustomAxesBackend",
     "open_inwoner.accounts.backends.UserModelEmailBackend",
+    "open_inwoner.accounts.backends.Verify2FATokenBackend",
     "django.contrib.auth.backends.ModelBackend",
     # mock login like dev.py
     "digid_eherkenning.mock.backends.DigiDBackend",
