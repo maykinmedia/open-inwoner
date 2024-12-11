@@ -6,7 +6,6 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import AbstractUser
-from django.core.exceptions import SuspiciousOperation
 from django.urls import reverse, reverse_lazy
 
 from axes.backends import AxesBackend

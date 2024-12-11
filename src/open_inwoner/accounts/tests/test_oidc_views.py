@@ -2,7 +2,6 @@ from hashlib import md5
 from typing import Literal
 from unittest.mock import patch
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test import TestCase, modify_settings, override_settings
