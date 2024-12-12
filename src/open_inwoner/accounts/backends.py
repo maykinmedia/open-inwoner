@@ -188,14 +188,23 @@ class DigiDEHerkenningOIDCBackend(BaseBackend):
             }
         )
 
-        if vestigingsnummer := claims.get("vestigingsnummer", None):
+        logger.error(f"create_user was called with claims: {claims}")
+        if vestigingsnummer := claims.get(
+            "urn:etoegang:1.9:ServiceRestriction:Vestigingsnr", None
+        ):
             self.request.session[KVK_BRANCH_SESSION_VARIABLE] = vestigingsnummer
             self.request.session.save()
 
         return user
 
     def update_user(self, user: AbstractUser, claims: JSONObject):
-        if vestigingsnummer := claims.get("vestigingsnummer", None):
+        config = self.config_class.get_solo()
+
+        logger.error(
+            f"update_user was called with claims: {claims}, {config.branch_number_claim}, {claims.get('urn:etoegang:1.9:ServiceRestriction:Vestigingsnr')}"
+        )
+
+        if vestigingsnummer := claims.get(config.branch_number_claim[0], None):
             self.request.session[KVK_BRANCH_SESSION_VARIABLE] = vestigingsnummer
             self.request.session.save()
         return super().update_user(user, claims)
