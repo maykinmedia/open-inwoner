@@ -183,6 +183,24 @@ class KvKViewsTestCase(TestCase):
         # Following redirect should not result in endless redirect
         self.assertEqual(response.status_code, 200)
 
+    def test_get_branches_page_skips_if_vestigingsnummer_present(self):
+        session = self.client.session
+        session[KVK_BRANCH_SESSION_VARIABLE] = "12345678"
+        session.save()
+
+        self.client.force_login(user=self.user)
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("pages-root"))
+        self.assertEqual(kvk_branch_selected_done(self.client.session), True)
+
+        response = self.client.get(response.url)
+
+        # Following redirect should not result in endless redirect
+        self.assertEqual(response.status_code, 200)
+
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     @patch(
         "open_inwoner.kvk.models.KvKConfig.get_solo",
