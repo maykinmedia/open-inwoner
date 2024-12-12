@@ -142,6 +142,12 @@ class TestUtils(ClearCachesMixin, TestCase):
         # resolve the zaaktype
         zaak.zaaktype = zaaktype
 
+        with self.subTest("normal visible without status"):
+            self.assertFalse(is_zaak_visible(zaak))
+
+        config.show_cases_without_status = True
+        config.save()
+
         with self.subTest("normal visible"):
             self.assertTrue(is_zaak_visible(zaak))
 
