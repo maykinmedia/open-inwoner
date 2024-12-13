@@ -69,6 +69,57 @@ hoofdvestiging = {
     },
 }
 
+
+nevenvestigingen = {
+    "pagina": 1,
+    "resultatenPerPagina": 10,
+    "totaal": 2,
+    "resultaten": [
+        {
+            "kvkNummer": "68750110",
+            "vestigingsnummer": "000037178601",
+            "naam": "Test BV Donald Nevenvestiging",
+            "adres": {
+                "binnenlandsAdres": {
+                    "type": "bezoekadres",
+                    "straatnaam": "Brinkerinckbaan",
+                    "plaats": "Diepenveen",
+                }
+            },
+            "type": "nevenvestiging",
+            "_links": {
+                "basisprofiel": {
+                    "href": "https://api.kvk.nl/test/api/v1/basisprofielen/68750110"
+                },
+                "vestigingsprofiel": {
+                    "href": "https://api.kvk.nl/test/api/v1/vestigingsprofielen/000037178601"
+                },
+            },
+        },
+        {
+            "kvkNummer": "12345678",
+            "vestigingsnummer": "000037178601",
+            "naam": "Andere Nevenvestiging",
+            "adres": {
+                "binnenlandsAdres": {
+                    "type": "bezoekadres",
+                    "straatnaam": "Brinkerinckbaan",
+                    "plaats": "Fantasieland",
+                }
+            },
+            "type": "nevenvestiging",
+            "_links": {
+                "basisprofiel": {
+                    "href": "https://api.kvk.nl/test/api/v1/basisprofielen/68750110"
+                },
+                "vestigingsprofiel": {
+                    "href": "https://api.kvk.nl/test/api/v1/vestigingsprofielen/000037178601"
+                },
+            },
+        },
+    ],
+}
+
 multiple_branches = {
     "pagina": 1,
     "resultatenPerPagina": 10,

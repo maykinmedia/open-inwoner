@@ -37,11 +37,12 @@ class KvKViewsTestCase(TestCase):
         self.assertEqual(response.status_code, 401)
 
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
+    @patch("open_inwoner.kvk.client.KvKClient.get_vestiging")
     @patch(
         "open_inwoner.kvk.models.KvKConfig.get_solo",
     )
     def test_post_branches_page_with_correct_vestigingsnummer(
-        self, mock_solo, mock_kvk
+        self, mock_solo, mock_vestiging, mock_kvk
     ):
         mock_kvk_value = {
             "kvkNummer": "12345678",
@@ -67,6 +68,7 @@ class KvKViewsTestCase(TestCase):
             },
         }
         mock_kvk.return_value = [mock_kvk_value, mock_kvk_value_vestiging]
+        mock_vestiging.return_value = mock_kvk_value_vestiging
 
         mock_solo.return_value.api_key = "123"
         mock_solo.return_value.api_root = "http://foo.bar/api/v1/"
@@ -89,10 +91,13 @@ class KvKViewsTestCase(TestCase):
         self.assertEqual(self.user.street, "Hizzaarderlaan")
 
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
+    @patch("open_inwoner.kvk.client.KvKClient.get_vestiging")
     @patch(
         "open_inwoner.kvk.models.KvKConfig.get_solo",
     )
-    def test_post_branches_page_with_empty_vestigingsnummer(self, mock_solo, mock_kvk):
+    def test_post_branches_page_with_empty_vestigingsnummer(
+        self, mock_solo, mock_get_vestiging, mock_kvk
+    ):
         mock_kvk_value = {
             "kvkNummer": "12345678",
             "naam": "Test BV Donald",
@@ -117,6 +122,7 @@ class KvKViewsTestCase(TestCase):
             },
         }
         mock_kvk.return_value = [mock_kvk_value, mock_kvk_value_vestiging]
+        mock_get_vestiging.return_value = mock_kvk_value_vestiging
 
         mock_solo.return_value.api_key = "123"
         mock_solo.return_value.api_root = "http://foo.bar/api/v1/"
@@ -133,10 +139,10 @@ class KvKViewsTestCase(TestCase):
 
         # check result of company_branch_selected signal (should only get name)
         self.user.refresh_from_db()
-        self.assertEqual(self.user.company_name, "Test BV Donald")
-        self.assertEqual(self.user.city, "")
-        self.assertEqual(self.user.postcode, "")
-        self.assertEqual(self.user.street, "")
+        self.assertEqual(self.user.company_name, "Test BV Donald Nevenvestiging")
+        self.assertEqual(self.user.city, "Lollum Dollum")
+        self.assertEqual(self.user.postcode, "4321")
+        self.assertEqual(self.user.street, "Hizzaarderlaan")
 
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     @patch(

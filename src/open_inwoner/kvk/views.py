@@ -11,6 +11,7 @@ from open_inwoner.kvk.branches import KVK_BRANCH_SESSION_VARIABLE
 from ..utils.url import get_next_url_from
 from .client import KvKClient
 from .forms import CompanyBranchChoiceForm
+from .signals import company_branch_selected
 
 
 class CompanyBranchChoiceView(FormView):
@@ -91,5 +92,9 @@ class CompanyBranchChoiceView(FormView):
             return self.render_to_response(context)
 
         request.session[KVK_BRANCH_SESSION_VARIABLE] = request.POST["branch_number"]
+
+        company_branch_selected.send(
+            sender=self, request=request, vestigingsnummer=request.POST["branch_number"]
+        )
 
         return HttpResponseRedirect(redirect)

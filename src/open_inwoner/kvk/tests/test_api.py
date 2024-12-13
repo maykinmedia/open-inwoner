@@ -1,11 +1,13 @@
+import datetime
 from unittest.mock import patch
 
 from django.test import TestCase
 
 import requests_mock
+from freezegun import freeze_time
 from requests.exceptions import InvalidJSONError, SSLError
 
-from ..client import KvKClient
+from ..client import KvKClient, logger
 from ..models import KvKConfig
 from . import mocks
 from .factories import CLIENT_CERT, CLIENT_CERT_PAIR, SERVER_CERT
@@ -178,6 +180,110 @@ class KvKAPITest(TestCase):
                 },
             ],
         )
+
+    def test_search_vestiging(self, m):
+        m.return_value.json.return_value = mocks.nevenvestigingen
+
+        # test caching
+        with freeze_time("2024-12-13 12:00") as frozen_time:
+            branch = self.kvk_client.get_vestiging(
+                kvk="68750110", vestigingsnummer="000037178601"
+            )
+            self.kvk_client.get_vestiging(
+                kvk="68750110", vestigingsnummer="000037178601"
+            )
+
+            m.assert_called_once()
+
+            frozen_time.tick(delta=datetime.timedelta(hours=1))
+
+            self.kvk_client.get_vestiging(
+                kvk="68750110", vestigingsnummer="000037178601"
+            )
+
+            with self.assertRaises(AssertionError):
+                m.assert_called_once()
+
+        # test result
+        self.assertEqual(
+            branch,
+            {
+                "kvkNummer": "68750110",
+                "vestigingsnummer": "000037178601",
+                "naam": "Test BV Donald Nevenvestiging",
+                "adres": {
+                    "binnenlandsAdres": {
+                        "type": "bezoekadres",
+                        "straatnaam": "Brinkerinckbaan",
+                        "plaats": "Diepenveen",
+                    },
+                },
+                "type": "nevenvestiging",
+                "_links": {
+                    "basisprofiel": {
+                        "href": "https://api.kvk.nl/test/api/v1/basisprofielen/68750110"
+                    },
+                    "vestigingsprofiel": {
+                        "href": "https://api.kvk.nl/test/api/v1/vestigingsprofielen/000037178601"
+                    },
+                },
+            },
+        )
+
+    def test_search_vestiging_cache_invalidation_with_new_kvk(self, m):
+        m.return_value.json.return_value = mocks.nevenvestigingen
+
+        branch = self.kvk_client.get_vestiging(
+            kvk="68750110", vestigingsnummer="000037178601"
+        )
+        branch = self.kvk_client.get_vestiging(
+            kvk="12345678", vestigingsnummer="000037178601"
+        )
+
+        with self.assertRaises(AssertionError):
+            m.assert_called_once()
+
+        self.assertEqual(
+            branch,
+            {
+                "kvkNummer": "12345678",
+                "vestigingsnummer": "000037178601",
+                "naam": "Andere Nevenvestiging",
+                "adres": {
+                    "binnenlandsAdres": {
+                        "type": "bezoekadres",
+                        "straatnaam": "Brinkerinckbaan",
+                        "plaats": "Fantasieland",
+                    }
+                },
+                "type": "nevenvestiging",
+                "_links": {
+                    "basisprofiel": {
+                        "href": "https://api.kvk.nl/test/api/v1/basisprofielen/68750110"
+                    },
+                    "vestigingsprofiel": {
+                        "href": "https://api.kvk.nl/test/api/v1/vestigingsprofielen/000037178601"
+                    },
+                },
+            },
+        )
+
+    def test_search_vestiging_invalid_combination_kvk_vestigingsnummer(self, m):
+        m.return_value.json.return_value = mocks.nevenvestigingen
+
+        with self.assertLogs(logger.name, level="ERROR") as cm:
+            branch = self.kvk_client.get_vestiging(
+                kvk="00000000", vestigingsnummer="000037178601"
+            )
+
+            self.assertEqual(len(cm.output), 1)
+            self.assertEqual(
+                cm.output[0],
+                "ERROR:open_inwoner.kvk.client:Company branch with vestigingsnummer "
+                "000037178601 and kvk number 00000000 not found",
+            )
+
+        self.assertEqual(branch, {})
 
     def test_no_search_without_config(self, m):
         m.return_value.json.return_value = mocks.multiple_branches

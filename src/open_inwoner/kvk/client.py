@@ -1,13 +1,15 @@
 import logging
 from functools import cached_property
-from typing import cast
 from urllib.parse import urlencode
 
 import requests
 from requests.exceptions import JSONDecodeError
 
-from .constants import Bedrijf, CompanyType
+from open_inwoner.utils.decorators import cache
+
+from .constants import CompanyType
 from .models import KvKConfig
+from .types import BedrijfValidator
 
 logger = logging.getLogger(__name__)
 
@@ -123,10 +125,29 @@ class KvKClient:
 
         return branches
 
-    def get_company_branch(self, vestigingsnummer: str, **kwargs) -> dict:
-        kwargs.update({"vestigingsnummer": vestigingsnummer})
-        vestiging = self.search(**kwargs).get("resultaten", {})
-        return cast(Bedrijf, vestiging)
+    @cache("kvk:{kvk}vestiging:{vestigingsnummer}")
+    def get_vestiging(self, kvk: str, vestigingsnummer: str) -> dict:
+        response = self.search(vestigingsnummer=vestigingsnummer)
+
+        results = response.get("resultaten")
+        if not results:
+            logger.error(
+                "No company branch with vestigingsnummer %s found", vestigingsnummer
+            )
+            return {}
+
+        # the same vestigingsnummer could be associated with different kvk numbers
+        try:
+            vestiging = next(r for r in results if r["kvkNummer"] == kvk)
+        except StopIteration:
+            logger.error(
+                "Company branch with vestigingsnummer %s and kvk number %s not found",
+                vestigingsnummer,
+                kvk,
+            )
+            return {}
+
+        return BedrijfValidator.validate_python(vestiging)
 
     def retrieve_rsin_with_kvk(self, kvk, **kwargs) -> str | None:
         basisprofiel = self._request(

@@ -9,6 +9,8 @@ from django.utils.translation import gettext as _
 from open_inwoner.accounts.models import User
 from open_inwoner.haalcentraal.models import HaalCentraalConfig
 from open_inwoner.haalcentraal.utils import update_brp_data_in_db
+from open_inwoner.kvk.client import KvKClient
+from open_inwoner.kvk.signals import company_branch_selected
 from open_inwoner.openklant.services import OpenKlant2Service, eSuiteKlantenService
 from open_inwoner.utils.logentry import user_action
 
@@ -24,6 +26,35 @@ MESSAGE_TYPE = {
     "frontend_oidc": _("user was logged in via frontend using OpenIdConnect"),
     "logout": _("user was logged out"),
 }
+
+
+@receiver(company_branch_selected)
+def update_company_from_kvk_api(sender, *args, **kwargs):
+    request = kwargs["request"]
+    user = request.user
+    kvk = user.kvk
+    vestigingsnummer = kwargs["vestigingsnummer"]
+
+    kvk_client = KvKClient()
+
+    vestiging = kvk_client.get_vestiging(kvk=kvk, vestigingsnummer=vestigingsnummer)
+
+    binnenlandsadres = vestiging.get("adres", {}).get("binnenlandsAdres", {})
+
+    fields = {
+        "company_name": vestiging.get("naam"),
+        "city": binnenlandsadres.get("plaats"),
+        "postcode": binnenlandsadres.get("postcode"),
+        "street": binnenlandsadres.get("straatnaam"),
+        "housenumber": binnenlandsadres.get("huisnummer"),
+    }
+
+    for field, new_value in fields.items():
+        current_value = getattr(user, field, None)
+        if new_value and new_value != current_value:
+            setattr(user, field, new_value)
+
+    user.save()
 
 
 @receiver(user_logged_in)
