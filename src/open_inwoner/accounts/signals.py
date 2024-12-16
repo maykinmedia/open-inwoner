@@ -1,7 +1,6 @@
 import logging
 
 from django.contrib.auth.signals import user_logged_in, user_logged_out
-from django.core.exceptions import ImproperlyConfigured
 from django.dispatch import receiver
 from django.urls import reverse
 from django.utils.translation import gettext as _
@@ -39,17 +38,15 @@ def update_user_from_klant_on_login(sender, user, request, *args, **kwargs):
     # OpenKlant2
     try:
         service = OpenKlant2Service()
-    except ImproperlyConfigured:
-        logger.error("OpenKlant2 configuration missing")
+    except Exception:
+        logger.error("OpenKlant2 service failed to build")
     else:
         _update_user_from_openklant2(user=user, service=service, request=request)
 
     # eSuite
     try:
         service = eSuiteKlantenService()
-    except ImproperlyConfigured:
-        logger.error("eSuiteKlantenService missing configuration")
-    except RuntimeError:
+    except Exception:
         logger.error("eSuiteKlantenService failed to build")
     else:
         _update_user_from_esuite(user=user, service=service, request=request)

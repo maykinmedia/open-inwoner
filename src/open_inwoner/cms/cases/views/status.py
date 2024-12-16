@@ -7,11 +7,7 @@ from typing import Iterable, Protocol
 
 from django.conf import settings
 from django.contrib import messages
-from django.core.exceptions import (
-    ImproperlyConfigured,
-    ObjectDoesNotExist,
-    PermissionDenied,
-)
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.http import (
     Http404,
     HttpRequest,
@@ -130,14 +126,12 @@ class InnerCaseDetailView(
         if service_type == KlantenServiceType.OPENKLANT2:
             try:
                 return OpenKlant2Service()
-            except ImproperlyConfigured:
-                logger.error("OpenKlant2 configuration missing")
+            except Exception:
+                logger.error("Failed to build OpenKlant2 service")
         if service_type == KlantenServiceType.ESUITE:
             try:
                 return eSuiteVragenService()
-            except ImproperlyConfigured:
-                logger.error("eSuiteVragenService configuration missing")
-            except RuntimeError:
+            except Exception:
                 logger.error("Failed to build eSuiteVragenService")
 
     def store_statustype_mapping(self, zaaktype_identificatie):

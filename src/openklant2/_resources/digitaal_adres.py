@@ -14,7 +14,7 @@ from openklant2.types.resources.digitaal_adres import (
 
 class DigitaalAdresResource(ResourceMixin):
     http_client: APIClient
-    base_path: str = "/digitaleadressen"
+    base_path: str = "digitaleadressen"
 
     def list(
         self, *, params: ListDigitaalAdresParams | None = None

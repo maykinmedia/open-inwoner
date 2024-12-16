@@ -10,7 +10,7 @@ from openklant2.types.resources.interne_taak import CreateInterneTaakData, Inter
 
 class InterneTaakResource(ResourceMixin):
     http_client: APIClient
-    base_path: str = "/internetaken"
+    base_path: str = "internetaken"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

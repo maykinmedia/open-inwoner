@@ -17,7 +17,7 @@ from openklant2.types.resources.partij import (
 
 class PartijResource(ResourceMixin):
     http_client: APIClient
-    base_path: str = "/partijen"
+    base_path: str = "partijen"
 
     def list(
         self, *, params: PartijListParams | None = None

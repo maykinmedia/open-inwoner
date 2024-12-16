@@ -15,7 +15,7 @@ from openklant2.types.resources.klant_contact import (
 
 class KlantContactResource(ResourceMixin):
     http_client: APIClient
-    base_path: str = "/klantcontacten"
+    base_path: str = "klantcontacten"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

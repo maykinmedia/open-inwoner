@@ -62,7 +62,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
     def setUp(self):
         super().setUp()
 
-        self.user = DigidUserFactory(bsn="900222086")
+        self.user = DigidUserFactory(bsn="900222086", email="foo@example.com")
 
         # services
         self.api_group = ZGWApiGroupConfigFactory(

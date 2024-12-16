@@ -14,7 +14,7 @@ from openklant2.types.resources.onderwerp_object import (
 
 class OnderwerpObjectResource(ResourceMixin):
     http_client: APIClient
-    base_path: str = "/onderwerpobjecten"
+    base_path: str = "onderwerpobjecten"
 
     def create(
         self,
