@@ -5,16 +5,20 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.hashers import check_password
+from django.contrib.auth.models import AbstractUser
 from django.urls import reverse, reverse_lazy
 
 from axes.backends import AxesBackend
 from digid_eherkenning.oidc.backends import BaseBackend
 from mozilla_django_oidc_db.backends import OIDCAuthenticationBackend
 from mozilla_django_oidc_db.config import dynamic_setting
+from mozilla_django_oidc_db.typing import JSONObject
 from oath import accept_totp
 
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.kvk.branches import KVK_BRANCH_SESSION_VARIABLE
 from open_inwoner.utils.hash import generate_email_from_string
+from open_inwoner.utils.views import LogMixin
 
 from .choices import LoginTypeChoices
 from .models import OpenIDDigiDConfig, OpenIDEHerkenningConfig
@@ -147,7 +151,7 @@ class CustomOIDCBackend(OIDCAuthenticationBackend):
         return self.UserModel.objects.filter(**{"oidc_id__iexact": unique_id})
 
 
-class DigiDEHerkenningOIDCBackend(BaseBackend):
+class DigiDEHerkenningOIDCBackend(LogMixin, BaseBackend):
     OIP_UNIQUE_ID_USER_FIELDNAME = dynamic_setting[Literal["bsn", "kvk"]]()
     OIP_LOGIN_TYPE = dynamic_setting[LoginTypeChoices]()
 
@@ -156,6 +160,26 @@ class DigiDEHerkenningOIDCBackend(BaseBackend):
         return parent and self.config_class in (
             OpenIDDigiDConfig,
             OpenIDEHerkenningConfig,
+        )
+
+    def _store_vestigingsnummer_in_session(self, claims: JSONObject):
+        """Get company vestigingsnummer from OIDC claims & store in session"""
+
+        eherkenning_config = self.config_class.get_solo()
+
+        branch_number_claim = eherkenning_config.branch_number_claim[0]
+        if not (vestigingsnummer := claims.get(branch_number_claim)):
+            return
+
+        self.request.session[KVK_BRANCH_SESSION_VARIABLE] = vestigingsnummer
+        self.request.session.save()
+
+        identifier_claim = eherkenning_config.identifier_type_claim[0]
+        kvk_or_rsin = claims.get(identifier_claim)
+
+        self.log_system_action(
+            f"Vestigingsnummer {vestigingsnummer} retrieved from IdP for "
+            f"eHerkenning user (KVK/RSIN: {kvk_or_rsin})"
         )
 
     def filter_users_by_claims(self, claims):
@@ -169,7 +193,11 @@ class DigiDEHerkenningOIDCBackend(BaseBackend):
         )
 
     def create_user(self, claims):
-        """Return object for a newly created user account."""
+        """
+        Return object for a newly created user account.
+
+        Get vestigingsnummer from OIDC claims & store in session
+        """
 
         unique_id = self._extract_username(claims)
 
@@ -185,4 +213,12 @@ class DigiDEHerkenningOIDCBackend(BaseBackend):
             }
         )
 
+        if self.config_class is OpenIDEHerkenningConfig:
+            self._store_vestigingsnummer_in_session(claims)
+
         return user
+
+    def update_user(self, user: AbstractUser, claims: JSONObject):
+        if self.config_class is OpenIDEHerkenningConfig:
+            self._store_vestigingsnummer_in_session(claims)
+        return super().update_user(user, claims)
