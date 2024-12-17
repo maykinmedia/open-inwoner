@@ -1,0 +1,123 @@
+# Admin OIDC
+oidc_db_config_enable: true
+oidc_db_config_admin_auth:
+  items:
+    - identifier: admin-oidc
+      enabled: True
+      oidc_rp_client_id: testid
+      oidc_rp_client_secret: 7DB3KUAAizYCcmZufpHRVOcD0TOkNO3I
+      oidc_rp_scopes_list:
+        - openid
+        - email
+        - profile
+      oidc_rp_sign_algo: RS256
+      endpoint_config:
+        oidc_op_authorization_endpoint: https://example.com/realms/test/protocol/openid-connect/auth
+        oidc_op_token_endpoint: https://example.com/realms/test/protocol/openid-connect/token
+        oidc_op_user_endpoint: https://example.com/realms/test/protocol/openid-connect/userinfo
+      username_claim:
+        - sub
+      groups_claim:
+        - roles
+      claim_mapping:
+        first_name:
+          - given_name
+      sync_groups: true
+      sync_groups_glob_pattern: '*'
+      default_groups:
+        - Functioneel beheer
+      make_users_staff: true
+      superuser_group_names:
+        - superuser
+      oidc_use_nonce: true
+      oidc_nonce_size: 32
+      oidc_state_size: 32
+      userinfo_claims_source: id_token
+
+# Setup service connectivity
+zgw_consumers_config_enable: True
+zgw_consumers:
+  services:
+    - identifier: zaken-test
+      label: Open Zaak - Zaken API
+      api_root: http://localhost:8003/zaken/api/v1/
+      api_type: zrc
+      auth_type: zgw
+      client_id: test-vcr
+      secret: test-vcr
+    - identifier: documenten-test
+      label: Open Zaak - Documenten API
+      api_root: http://localhost:8003/documenten/api/v1/
+      api_type: drc
+      auth_type: zgw
+      client_id: test-vcr
+      secret: test-vcr
+    - identifier: catalogi-test
+      label: Open Zaak - Catalogi API
+      api_root: http://localhost:8003/catalogi/api/v1/
+      api_type: ztc
+      auth_type: zgw
+      client_id: test-vcr
+      secret: test-vcr
+    - identifier: besluiten-test
+      label: Open Zaak - Besluiten API
+      api_root: http://localhost:8003/besluiten/api/v1/
+      api_type: brc
+      auth_type: zgw
+      client_id: test-vcr
+      secret: test-vcr
+    - identifier: selectielijst
+      label: Open Zaak (public) - Selectielijst API
+      api_root: https://selectielijst.openzaak.nl/api/v1/
+      api_type: orc
+      auth_type: no_auth
+    - identifier: klanten-test
+      label: eSuite klanten API
+      api_root: http://localhost:8003/klanten/api/v1/
+      api_type: kc
+      auth_type: zgw
+      client_id: test-vcr
+      secret: test-vcr
+    - identifier: contactmomenten-test
+      label: eSuite contactmomemnten API
+      api_root: http://localhost:8003/contactmomenten/api/v1/
+      api_type: cmc
+      auth_type: zgw
+      client_id: test-vcr
+      secret: test-vcr
+
+openzaak_config_enable: true
+openzaak_config:
+  zaak_max_confidentiality: openbaar
+  document_max_confidentiality: vertrouwelijk
+  max_upload_size: 50
+  skip_notification_statustype_informeren: false
+  reformat_esuite_zaak_identificatie: true
+  fetch_eherkenning_zaken_with_rsin: false
+  use_zaak_omschrijving_as_title: 'true'
+  order_statuses_by_date_set: false
+  title_text: title text from setup configuration
+  enable_categories_filtering_with_zaken: true
+  action_required_deadline_days: 1874
+  zaken_filter_enabled: 'true'
+  allowed_file_extensions:
+    - .pdf
+    - .txt
+  api_groups:
+    - zaken_api_identifier: zaken-test
+      documenten_api_identifier: documenten-test
+      catalogi_api_identifier: catalogi-test
+
+openklant_config_enable: true
+openklant_config:
+  klanten_service_identifier: klanten-test
+  contactmomenten_service_identifier: contactmomenten-test
+  exclude_contactmoment_kanalen: []
+  register_email: admin@oip.org
+  register_contact_moment: true
+  register_bronorganisatie_rsin: '837194569'
+  register_channel: email
+  register_type: bericht
+  register_employee_id: '1234'
+  use_rsin_for_innNnpId_query_parameter: true
+  send_email_confirmation: false
