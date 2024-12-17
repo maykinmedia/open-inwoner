@@ -435,7 +435,7 @@ Detailed Information
     
     Variable            SITE_REDIRECT_TO
     Setting             Stuur niet-ingelogde gebruiker door naar
-    Description         Geef een URL of pad op waar de niet-ingelogde gebruiker naar toe doorgestuurd moet worden vanuit de niet-ingelogde homepage.Pad voorbeeld: '/accounts/login', URL voorbeeld: 'https://gemeente.groningen.nl'
+    Description         Geef een URL of pad op waar de niet-ingelogde gebruiker naar toe doorgestuurd moet worden vanuit de niet-ingelogde homepage. Pad voorbeeld: '/accounts/login', URL voorbeeld: 'https://gemeente.groningen.nl'
     Possible values     string
     Default value       No default
     

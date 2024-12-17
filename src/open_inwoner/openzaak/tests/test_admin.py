@@ -349,6 +349,6 @@ class TestCatalogusConfigExportAdmin(WebTest):
             messages[0],
         )
         self.assertEqual(
-            "It was not possible to import the following items:<div><p> - ZaakTypeConfig not found in target environment: Identificatie = 'ztc-id-a-0', Catalogus domein = 'DM-0', Catalogus rsin = '123456789'</p></div>",
+            "Het was niet mogelijk om de volgene items te importeren:<div><p> - ZaakTypeConfig not found in target environment: Identificatie = 'ztc-id-a-0', Catalogus domein = 'DM-0', Catalogus rsin = '123456789'</p></div>",
             messages[1],
         )

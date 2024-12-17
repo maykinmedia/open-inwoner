@@ -759,7 +759,7 @@ CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 # SENTRY - error monitoring
 #
 SENTRY_DSN = config("SENTRY_DSN", None)
-RELEASE = "v1.23.0"  # get_current_version()
+RELEASE = "v1.24.0"  # get_current_version()
 
 PRIVATE_MEDIA_ROOT = os.path.join(BASE_DIR, "private_media")
 FILER_ROOT = os.path.join(BASE_DIR, "media", "filer")
