@@ -6,16 +6,20 @@ from django_setup_configuration.exceptions import ConfigurationRunFailed
 from django_setup_configuration.test_utils import execute_single_step
 from zgw_consumers.constants import APITypes
 
-from open_inwoner.openklant.models import OpenKlantConfig
+from open_inwoner.openklant.models import OpenKlant2Config, OpenKlantConfig
 from open_inwoner.openzaak.tests.factories import ServiceFactory
 
-from ...bootstrap.openklant import OpenKlantConfigurationStep
+from ...bootstrap.openklant import (
+    OpenKlant2ConfigurationStep,
+    OpenKlantConfigurationStep,
+)
 
 KLANTEN_SERVICE_API_ROOT = "https://openklant.local/klanten/api/v1/"
 CONTACTMOMENTEN_SERVICE_API_ROOT = "https://openklant.local/contactmomenten/api/v1/"
 
 BASE_DIR = Path(__file__).parent / "files"
 OPENKLANT_CONFIG_STEP_FULL_YAML = str(BASE_DIR / "openklant_config_step_full.yaml")
+OPENKLANT2_CONFIG_STEP_FULL_YAML = str(BASE_DIR / "openklant2_config_step_full.yaml")
 
 
 class OpenKlantConfigurationStepTestCase(TestCase):
@@ -171,3 +175,30 @@ class OpenKlantConfigurationStepTestCase(TestCase):
         )
 
         assert_values()
+
+
+class OpenKlant2ConfigurationStepTestCase(TestCase):
+    def test_configure(self):
+        kc = ServiceFactory(
+            slug="klanten-service",
+            api_root=KLANTEN_SERVICE_API_ROOT,
+            api_type=APITypes.kc,
+        )
+
+        execute_single_step(
+            OpenKlant2ConfigurationStep, yaml_source=OPENKLANT2_CONFIG_STEP_FULL_YAML
+        )
+
+        config = OpenKlant2Config.objects.get()
+
+        self.assertEqual(config.service, kc)
+        self.assertEqual(config.mijn_vragen_kanaal, "formulier")
+
+        self.assertEqual(config.mijn_vragen_organisatie_naam, "De Gemeente")
+        self.assertEqual(
+            config.mijn_vragen_actor, "e412c6f6-bc31-4fd4-b883-0fb5e88d3f5b"
+        )
+        self.assertEqual(config.interne_taak_gevraagde_handeling, "Vraag beantwoorden")
+        self.assertEqual(
+            config.interne_taak_toelichting, "Vraag via OIP, graag beantwoorden"
+        )
