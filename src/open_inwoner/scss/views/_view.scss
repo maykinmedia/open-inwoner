@@ -62,4 +62,13 @@
       display: inline;
     }
   }
+
+  // Remove Safar phone-parsing from specific elements
+  .phone-parsing {
+    pointer-events: none;
+  }
+  .phone-parsing > a {
+    text-decoration: none;
+    color: inherit;
+  }
 }
