@@ -482,10 +482,11 @@ django-sessionprofile==1.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-digid-eherkenning
-django-setup-configuration==0.3.0
+django-setup-configuration==0.5.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   mozilla-django-oidc-db
 django-silk==5.1.0
     # via -r requirements/dev.in
 django-simple-certmanager==1.4.1
@@ -851,11 +852,12 @@ mozilla-django-oidc==4.0.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   mozilla-django-oidc-db
-mozilla-django-oidc-db==0.19.0
+mozilla-django-oidc-db[setup-configuration]==0.21.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-digid-eherkenning
+    #   mozilla-django-oidc-db
 msgpack==1.0.7
     # via locust
 multidict==6.0.5
@@ -972,16 +974,24 @@ pycparser==2.20
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   cffi
-pydantic[email]==2.6.4
+pydantic[email]==2.9.2
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   django-setup-configuration
+    #   pydantic
+    #   pydantic-settings
+pydantic-core==2.23.4
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   pydantic
-pydantic-core==2.16.3
+pydantic-settings[yaml]==2.7.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-    #   pydantic
+    #   django-setup-configuration
+    #   pydantic-settings
 pydyf==0.1.2
     # via
     #   -c requirements/ci.txt
@@ -1066,10 +1076,11 @@ python-decouple==3.5
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-python-dotenv==0.19.0
+python-dotenv==1.0.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   pydantic-settings
 python-stdnum==1.17
     # via
     #   -c requirements/ci.txt
@@ -1081,13 +1092,14 @@ pytz==2021.3
     #   -r requirements/ci.txt
     #   django-yubin
     #   djangorestframework
-pyyaml==6.0
+pyyaml==6.0.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   bandit
     #   drf-spectacular
     #   gemma-zds-client
+    #   pydantic-settings
     #   tablib
     #   vcrpy
     #   zgw-consumers-oas
@@ -1388,7 +1400,7 @@ yarl==1.9.8
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   vcrpy
-zgw-consumers==0.35.1
+zgw-consumers==0.36.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt

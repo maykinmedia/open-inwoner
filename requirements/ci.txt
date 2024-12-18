@@ -438,10 +438,11 @@ django-sessionprofile==1.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-digid-eherkenning
-django-setup-configuration==0.3.0
+django-setup-configuration==0.5.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   mozilla-django-oidc-db
 django-simple-certmanager==1.4.1
     # via
     #   -c requirements/base.txt
@@ -749,11 +750,12 @@ mozilla-django-oidc==4.0.1
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   mozilla-django-oidc-db
-mozilla-django-oidc-db==0.19.0
+mozilla-django-oidc-db[setup-configuration]==0.21.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-digid-eherkenning
+    #   mozilla-django-oidc-db
 multidict==6.0.5
     # via yarl
 mypy-extensions==1.0.0
@@ -837,16 +839,24 @@ pycparser==2.20
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   cffi
-pydantic[email]==2.6.4
+pydantic[email]==2.9.2
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   django-setup-configuration
+    #   pydantic
+    #   pydantic-settings
+pydantic-core==2.23.4
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   pydantic
-pydantic-core==2.16.3
+pydantic-settings[yaml]==2.7.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-    #   pydantic
+    #   django-setup-configuration
+    #   pydantic-settings
 pydyf==0.1.2
     # via
     #   -c requirements/base.txt
@@ -920,10 +930,11 @@ python-decouple==3.5
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-python-dotenv==0.19.0
+python-dotenv==1.0.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   pydantic-settings
 python-stdnum==1.17
     # via
     #   -c requirements/base.txt
@@ -935,12 +946,13 @@ pytz==2021.3
     #   -r requirements/base.txt
     #   django-yubin
     #   djangorestframework
-pyyaml==6.0
+pyyaml==6.0.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   drf-spectacular
     #   gemma-zds-client
+    #   pydantic-settings
     #   tablib
     #   vcrpy
     #   zgw-consumers-oas
@@ -1165,7 +1177,7 @@ xsdata==23.8
     #   -r requirements/base.txt
 yarl==1.9.8
     # via vcrpy
-zgw-consumers==0.35.1
+zgw-consumers==0.36.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt

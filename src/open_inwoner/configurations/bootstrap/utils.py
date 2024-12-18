@@ -1,5 +1,7 @@
 import logging
 
+from zgw_consumers.models import Service
+
 RED = "\033[31m"
 NORMAL = "\033[0m"
 
@@ -17,3 +19,14 @@ def log_form_errors(config_step, form):
     )
     for field, errors in form.errors.items():
         logger.error("%s : %s" % (field, "; ".join(errors)))
+
+
+def get_service(slug: str) -> Service:
+    """
+    Try to find a Service and re-raise DoesNotExist with the identifier to make debugging
+    easier
+    """
+    try:
+        return Service.objects.get(slug=slug)
+    except Service.DoesNotExist as e:
+        raise Service.DoesNotExist(f"{str(e)} (identifier = {slug})")

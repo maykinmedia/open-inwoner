@@ -1,291 +1,168 @@
-import tempfile
+from pathlib import Path
 
-from django.conf import settings
-from django.test import TestCase, override_settings
-from django.utils.translation import gettext as _
+from django.test import TestCase
 
-import requests
-import requests_mock
-from django_setup_configuration.exceptions import SelfTestFailed
+from django_setup_configuration.exceptions import (
+    ConfigurationRunFailed,
+    PrerequisiteFailed,
+)
+from django_setup_configuration.test_utils import execute_single_step
 from privates.test import temp_private_root
-from simple_certmanager.constants import CertificateTypes
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
+from zgw_consumers.constants import APITypes
+from zgw_consumers.models import Service
 
-from open_inwoner.openzaak.models import (
-    OpenZaakConfig,
-    generate_default_file_extensions,
-)
-
-from ...bootstrap.zgw import (
-    CatalogiAPIConfigurationStep,
-    DocumentenAPIConfigurationStep,
-    FormulierenAPIConfigurationStep,
-    ZakenAPIConfigurationStep,
-    ZGWAPIsConfigurationStep,
-)
+from open_inwoner.configurations.bootstrap.zgw import OpenZaakConfigurationStep
+from open_inwoner.openzaak.models import OpenZaakConfig
+from open_inwoner.openzaak.tests.factories import ServiceFactory
 
 ZAAK_SERVICE_API_ROOT = "https://openzaak.local/zaken/api/v1/"
 CATALOGI_SERVICE_API_ROOT = "https://openzaak.local/catalogi/api/v1/"
 DOCUMENTEN_SERVICE_API_ROOT = "https://openzaak.local/documenten/api/v1/"
 FORM_SERVICE_API_ROOT = "https://esuite.local.net/formulieren-provider/api/v1/"
 
-PUBLIC_CERT_FILE = tempfile.NamedTemporaryFile()
-PRIVATE_KEY_FILE = tempfile.NamedTemporaryFile()
 
-with open(PUBLIC_CERT_FILE.name, "w") as f:
-    f.write("cert")
+BASE_DIR = Path(__file__).parent / "files"
+ZGW_API_STEP_YAML_FULL = str(BASE_DIR / "zgw_api_step_full.yaml")
+ZGW_API_STEP_YAML_ZERO_GROUPS = str(BASE_DIR / "zgw_api_step_zero_groups.yaml")
+ZGW_API_STEP_YAML_MISSING_GROUPS = str(BASE_DIR / "zgw_api_step_missing_groups.yaml")
 
 
 @temp_private_root()
-@override_settings(
-    OIP_ORGANIZATION="Maykin",
-    ZGW_CONFIG_ENABLE=True,
-    ZGW_SERVER_CERTIFICATE_LABEL="ZGW services server certificate",
-    ZGW_SERVER_CERTIFICATE_TYPE=CertificateTypes.cert_only,
-    ZGW_SERVER_CERTIFICATE_PUBLIC_CERTIFICATE=PUBLIC_CERT_FILE.name,
-    ZGW_ZAAK_SERVICE_API_ROOT=ZAAK_SERVICE_API_ROOT,
-    ZGW_ZAAK_SERVICE_API_CLIENT_ID="open-inwoner-test",
-    ZGW_ZAAK_SERVICE_API_SECRET="zaken-secret",
-    ZGW_CATALOGI_SERVICE_API_ROOT=CATALOGI_SERVICE_API_ROOT,
-    ZGW_CATALOGI_SERVICE_API_CLIENT_ID="open-inwoner-test",
-    ZGW_CATALOGI_SERVICE_API_SECRET="catalogi-secret",
-    ZGW_DOCUMENTEN_SERVICE_API_ROOT=DOCUMENTEN_SERVICE_API_ROOT,
-    ZGW_DOCUMENTEN_SERVICE_API_CLIENT_ID="open-inwoner-test",
-    ZGW_DOCUMENTEN_SERVICE_API_SECRET="documenten-secret",
-    ZGW_FORM_SERVICE_API_ROOT=FORM_SERVICE_API_ROOT,
-    ZGW_FORM_SERVICE_API_CLIENT_ID="open-inwoner-test",
-    ZGW_FORM_SERVICE_API_SECRET="forms-secret",
-    ZGW_ZAAK_MAX_CONFIDENTIALITY=VertrouwelijkheidsAanduidingen.vertrouwelijk,
-    ZGW_DOCUMENT_MAX_CONFIDENTIALITY=VertrouwelijkheidsAanduidingen.zaakvertrouwelijk,
-    ZGW_ACTION_REQUIRED_DEADLINE_DAYS=12,
-    ZGW_ALLOWED_FILE_EXTENSIONS=[".pdf", ".txt"],
-    ZGW_MIJN_AANVRAGEN_TITLE_TEXT="title text",
-    ZGW_ENABLE_CATEGORIES_FILTERING_WITH_ZAKEN=True,
-    ZGW_SKIP_NOTIFICATION_STATUSTYPE_INFORMEREN=True,
-    ZGW_REFORMAT_ESUITE_ZAAK_IDENTIFICATIE=True,
-    ZGW_FETCH_EHERKENNING_ZAKEN_WITH_RSIN=True,
-)
 class ZGWConfigurationTests(TestCase):
-    def test_configure(self):
-        ZakenAPIConfigurationStep().configure()
-        CatalogiAPIConfigurationStep().configure()
-        DocumentenAPIConfigurationStep().configure()
-        FormulierenAPIConfigurationStep().configure()
-        configuration = ZGWAPIsConfigurationStep()
+    def setUp(self):
+        self.zaak_service = ServiceFactory(
+            api_type=APITypes.zrc, slug="zaak-api", api_root=ZAAK_SERVICE_API_ROOT
+        )
+        self.catalogi_service = ServiceFactory(
+            api_type=APITypes.ztc,
+            slug="catalogus-api",
+            api_root=CATALOGI_SERVICE_API_ROOT,
+        )
+        self.document_service = ServiceFactory(
+            api_type=APITypes.drc,
+            slug="document-api",
+            api_root=DOCUMENTEN_SERVICE_API_ROOT,
+        )
+        self.form_service = ServiceFactory(
+            api_type=APITypes.orc, slug="form-api", api_root=FORM_SERVICE_API_ROOT
+        )
+        # Some other services
+        for _ in range(10):
+            ServiceFactory()
 
-        configuration.configure()
-
+    def assert_openzaak_config_defaults(self):
         config = OpenZaakConfig.get_solo()
-        zaak_service = config.zaak_service
-        catalogi_service = config.catalogi_service
-        document_service = config.document_service
-        form_service = config.form_service
+        self.assertIsNone(config.zaak_service)
+        self.assertIsNone(config.catalogi_service)
+        self.assertIsNone(config.document_service)
+        self.assertIsNone(config.form_service)
 
-        # certificates
-        zaak_cert = zaak_service.server_certificate.public_certificate
-        catalogi_cert = catalogi_service.server_certificate.public_certificate
-        document_cert = document_service.server_certificate.public_certificate
-        form_cert = form_service.server_certificate.public_certificate
-
-        self.assertEqual(
-            zaak_service.server_certificate.label, "ZGW services server certificate"
-        )
-        self.assertTrue(zaak_cert.path.startswith(settings.PRIVATE_MEDIA_ROOT))
-        self.assertEqual(zaak_cert.file.read(), b"cert")
-
-        self.assertEqual(
-            catalogi_service.server_certificate.label, "ZGW services server certificate"
-        )
-        self.assertTrue(catalogi_cert.path.startswith(settings.PRIVATE_MEDIA_ROOT))
-        self.assertEqual(catalogi_cert.file.read(), b"cert")
-
-        self.assertEqual(
-            document_service.server_certificate.label, "ZGW services server certificate"
-        )
-        self.assertTrue(document_cert.path.startswith(settings.PRIVATE_MEDIA_ROOT))
-        self.assertEqual(document_cert.file.read(), b"cert")
-
-        self.assertEqual(
-            form_service.server_certificate.label, "ZGW services server certificate"
-        )
-        self.assertTrue(form_cert.path.startswith(settings.PRIVATE_MEDIA_ROOT))
-        self.assertEqual(form_cert.file.read(), b"cert")
-
-        # other settings
-        self.assertEqual(zaak_service.api_root, ZAAK_SERVICE_API_ROOT)
-        self.assertEqual(zaak_service.client_id, "open-inwoner-test")
-        self.assertEqual(zaak_service.secret, "zaken-secret")
-        self.assertEqual(catalogi_service.api_root, CATALOGI_SERVICE_API_ROOT)
-        self.assertEqual(catalogi_service.client_id, "open-inwoner-test")
-        self.assertEqual(catalogi_service.secret, "catalogi-secret")
-        self.assertEqual(document_service.api_root, DOCUMENTEN_SERVICE_API_ROOT)
-        self.assertEqual(document_service.client_id, "open-inwoner-test")
-        self.assertEqual(document_service.secret, "documenten-secret")
-        self.assertEqual(form_service.api_root, FORM_SERVICE_API_ROOT)
-        self.assertEqual(form_service.client_id, "open-inwoner-test")
-        self.assertEqual(form_service.secret, "forms-secret")
-
-        self.assertEqual(
-            config.zaak_max_confidentiality,
-            VertrouwelijkheidsAanduidingen.vertrouwelijk,
-        )
-        self.assertEqual(
-            config.document_max_confidentiality,
-            VertrouwelijkheidsAanduidingen.zaakvertrouwelijk,
-        )
-        self.assertEqual(config.action_required_deadline_days, 12)
-        self.assertEqual(config.allowed_file_extensions, [".pdf", ".txt"])
-        self.assertEqual(config.title_text, "title text")
-        self.assertEqual(config.enable_categories_filtering_with_zaken, True)
-        self.assertEqual(config.skip_notification_statustype_informeren, True)
-        self.assertEqual(config.reformat_esuite_zaak_identificatie, True)
-        self.assertEqual(config.fetch_eherkenning_zaken_with_rsin, True)
-
-    @override_settings(
-        OIP_ORGANIZATION=None,
-        ZGW_ZAAK_MAX_CONFIDENTIALITY=None,
-        ZGW_DOCUMENT_MAX_CONFIDENTIALITY=None,
-        ZGW_ACTION_REQUIRED_DEADLINE_DAYS=None,
-        ZGW_ALLOWED_FILE_EXTENSIONS=None,
-        ZGW_MIJN_AANVRAGEN_TITLE_TEXT=None,
-        ZGW_ENABLE_CATEGORIES_FILTERING_WITH_ZAKEN=None,
-        ZGW_SKIP_NOTIFICATION_STATUSTYPE_INFORMEREN=None,
-        ZGW_REFORMAT_ESUITE_ZAAK_IDENTIFICATIE=None,
-        ZGW_FETCH_EHERKENNING_ZAKEN_WITH_RSIN=None,
-    )
-    def test_configure_use_defaults(self):
-        ZakenAPIConfigurationStep().configure()
-        CatalogiAPIConfigurationStep().configure()
-        DocumentenAPIConfigurationStep().configure()
-        FormulierenAPIConfigurationStep().configure()
-        configuration = ZGWAPIsConfigurationStep()
-
-        configuration.configure()
-
-        config = OpenZaakConfig.get_solo()
-        zaak_service = config.zaak_service
-        catalogi_service = config.catalogi_service
-        document_service = config.document_service
-        form_service = config.form_service
-
-        self.assertEqual(zaak_service.api_root, ZAAK_SERVICE_API_ROOT)
-        self.assertEqual(zaak_service.client_id, "open-inwoner-test")
-        self.assertEqual(zaak_service.secret, "zaken-secret")
-        self.assertEqual(catalogi_service.api_root, CATALOGI_SERVICE_API_ROOT)
-        self.assertEqual(catalogi_service.client_id, "open-inwoner-test")
-        self.assertEqual(catalogi_service.secret, "catalogi-secret")
-        self.assertEqual(document_service.api_root, DOCUMENTEN_SERVICE_API_ROOT)
-        self.assertEqual(document_service.client_id, "open-inwoner-test")
-        self.assertEqual(document_service.secret, "documenten-secret")
-        self.assertEqual(form_service.api_root, FORM_SERVICE_API_ROOT)
-        self.assertEqual(form_service.client_id, "open-inwoner-test")
-        self.assertEqual(form_service.secret, "forms-secret")
-
-        # Defaults should be used
-        self.assertEqual(
-            config.zaak_max_confidentiality, VertrouwelijkheidsAanduidingen.openbaar
-        )
-        self.assertEqual(
-            config.document_max_confidentiality, VertrouwelijkheidsAanduidingen.openbaar
-        )
         self.assertEqual(config.action_required_deadline_days, 15)
         self.assertEqual(
-            config.allowed_file_extensions, generate_default_file_extensions()
+            config.allowed_file_extensions,
+            [
+                "bmp",
+                "doc",
+                "docx",
+                "gif",
+                "jpeg",
+                "jpg",
+                "msg",
+                "pdf",
+                "png",
+                "ppt",
+                "pptx",
+                "rtf",
+                "tiff",
+                "txt",
+                "vsd",
+                "xls",
+                "xlsx",
+            ],
         )
         self.assertEqual(
             config.title_text,
-            _("Hier vindt u een overzicht van al uw lopende en afgeronde aanvragen."),
+            "Hier vindt u een overzicht van al uw lopende en afgeronde aanvragen.",
         )
         self.assertEqual(config.enable_categories_filtering_with_zaken, False)
         self.assertEqual(config.skip_notification_statustype_informeren, False)
         self.assertEqual(config.reformat_esuite_zaak_identificatie, False)
         self.assertEqual(config.fetch_eherkenning_zaken_with_rsin, False)
 
-    @requests_mock.Mocker()
-    def test_configuration_check_ok(self, m):
-        ZakenAPIConfigurationStep().configure()
-        CatalogiAPIConfigurationStep().configure()
-        DocumentenAPIConfigurationStep().configure()
-        FormulierenAPIConfigurationStep().configure()
-        configuration = ZGWAPIsConfigurationStep()
-
-        configuration.configure()
-
-        m.get(f"{ZAAK_SERVICE_API_ROOT}statussen", json=[])
-        m.get(f"{CATALOGI_SERVICE_API_ROOT}zaaktypen", json=[])
-        m.get(f"{DOCUMENTEN_SERVICE_API_ROOT}objectinformatieobjecten", json=[])
-        m.get(
-            f"{FORM_SERVICE_API_ROOT}openstaande-inzendingen",
-            json=[],
+    def test_configure_full_sets_the_correct_fields(self):
+        execute_single_step(
+            OpenZaakConfigurationStep, yaml_source=ZGW_API_STEP_YAML_FULL
         )
+        config = OpenZaakConfig.get_solo()
 
-        configuration.test_configuration()
+        zaak_service = config.zaak_service
+        catalogi_service = config.catalogi_service
+        document_service = config.document_service
+        form_service = config.form_service
 
-        (
-            status_request,
-            zaaktype_request,
-            oio_request,
-            inzendingen_request,
-        ) = m.request_history
+        self.assertEqual(zaak_service.api_root, ZAAK_SERVICE_API_ROOT)
+        self.assertEqual(catalogi_service.api_root, CATALOGI_SERVICE_API_ROOT)
+        self.assertEqual(document_service.api_root, DOCUMENTEN_SERVICE_API_ROOT)
+        self.assertEqual(form_service.api_root, FORM_SERVICE_API_ROOT)
 
-        self.assertEqual(status_request.url, f"{ZAAK_SERVICE_API_ROOT}statussen")
-        self.assertEqual(zaaktype_request.url, f"{CATALOGI_SERVICE_API_ROOT}zaaktypen")
         self.assertEqual(
-            oio_request.url, f"{DOCUMENTEN_SERVICE_API_ROOT}objectinformatieobjecten"
+            config.zaak_max_confidentiality,
+            VertrouwelijkheidsAanduidingen.openbaar,
         )
         self.assertEqual(
-            inzendingen_request.url,
-            f"{FORM_SERVICE_API_ROOT}openstaande-inzendingen?bsn=000000000",
+            config.document_max_confidentiality,
+            VertrouwelijkheidsAanduidingen.vertrouwelijk,
+        )
+        self.assertEqual(config.action_required_deadline_days, 1874)
+        self.assertEqual(config.allowed_file_extensions, [".pdf", ".txt"])
+        self.assertEqual(config.title_text, "title text from setup configuration")
+        self.assertEqual(config.enable_categories_filtering_with_zaken, True)
+        self.assertEqual(config.skip_notification_statustype_informeren, False)
+        self.assertEqual(config.reformat_esuite_zaak_identificatie, True)
+        self.assertEqual(config.fetch_eherkenning_zaken_with_rsin, False)
+
+    def test_configure_raises_on_missing_groups(self):
+        with self.assertRaises(PrerequisiteFailed):
+            execute_single_step(
+                OpenZaakConfigurationStep, yaml_source=ZGW_API_STEP_YAML_MISSING_GROUPS
+            )
+
+        self.assert_openzaak_config_defaults()
+
+    def test_configure_raises_on_zero_groups(self):
+        with self.assertRaises(ConfigurationRunFailed):
+            execute_single_step(
+                OpenZaakConfigurationStep, yaml_source=ZGW_API_STEP_YAML_ZERO_GROUPS
+            )
+
+        self.assert_openzaak_config_defaults()
+
+    def test_configure_updates_existing_values_for_services(self):
+        for attr in (
+            "zaak",
+            "document",
+            "catalogus",
+            "form",
+        ):
+            assert (
+                Service.objects.filter(slug=f"{attr}-api").update(
+                    api_root=f"http://an/updated/root/{attr}"
+                )
+                == 1
+            )
+
+        execute_single_step(
+            OpenZaakConfigurationStep, yaml_source=ZGW_API_STEP_YAML_FULL
         )
 
-    @requests_mock.Mocker()
-    def test_configuration_check_failures(self, m):
-        ZakenAPIConfigurationStep().configure()
-        CatalogiAPIConfigurationStep().configure()
-        DocumentenAPIConfigurationStep().configure()
-        FormulierenAPIConfigurationStep().configure()
-        configuration = ZGWAPIsConfigurationStep()
+        config = OpenZaakConfig.get_solo()
 
-        configuration.configure()
-
-        mock_kwargs = (
-            {"exc": requests.ConnectTimeout},
-            {"exc": requests.ConnectionError},
-            {"status_code": 404},
-            {"status_code": 403},
-            {"status_code": 500},
+        self.assertEqual(config.zaak_service.api_root, "http://an/updated/root/zaak")
+        self.assertEqual(
+            config.catalogi_service.api_root, "http://an/updated/root/catalogus"
         )
-        for mock_config in mock_kwargs:
-            with self.subTest(mock=mock_config):
-                m.get(f"{ZAAK_SERVICE_API_ROOT}statussen", **mock_config)
-
-                with self.assertRaises(SelfTestFailed):
-                    configuration.test_configuration()
-
-    def test_is_configured(self):
-        configs = [
-            ZakenAPIConfigurationStep(),
-            CatalogiAPIConfigurationStep(),
-            DocumentenAPIConfigurationStep(),
-            FormulierenAPIConfigurationStep(),
-            ZGWAPIsConfigurationStep(),
-        ]
-        for config in configs:
-            with self.subTest(config=config.verbose_name):
-                self.assertFalse(config.is_configured())
-
-                config.configure()
-
-                self.assertTrue(config.is_configured())
-
-    @override_settings(ZGW_CONFIG_ENABLE=False)
-    def test_zgw_config_disable(self):
-        ZakenAPIConfigurationStep().configure()
-        CatalogiAPIConfigurationStep().configure()
-        DocumentenAPIConfigurationStep().configure()
-        FormulierenAPIConfigurationStep().configure()
-        configuration = ZGWAPIsConfigurationStep()
-
-        configuration.configure()
-
-        self.assertFalse(configuration.is_configured())
+        self.assertEqual(
+            config.document_service.api_root, "http://an/updated/root/document"
+        )
+        self.assertEqual(config.form_service.api_root, "http://an/updated/root/form")

@@ -12,4 +12,5 @@ SCRIPTPATH=$(dirname "$SCRIPT")
 ${SCRIPTPATH}/wait_for_db.sh
 
 src/manage.py migrate
-src/manage.py setup_configuration --no-selftest
+src/manage.py setup_configuration \
+    --yaml-file /app/setup_configuration/data.yaml

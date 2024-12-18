@@ -21,7 +21,7 @@ from open_inwoner.configurations.bootstrap.cms import (
     CMSProductsConfigurationStep,
     CMSProfileConfigurationStep,
 )
-from open_inwoner.configurations.bootstrap.kic import (
+from open_inwoner.configurations.bootstrap.openklant import (
     ContactmomentenAPIConfigurationStep,
     KICAPIsConfigurationStep,
     KlantenAPIConfigurationStep,
@@ -31,8 +31,8 @@ from open_inwoner.configurations.bootstrap.zgw import (
     CatalogiAPIConfigurationStep,
     DocumentenAPIConfigurationStep,
     FormulierenAPIConfigurationStep,
+    OpenZaakConfigurationStep,
     ZakenAPIConfigurationStep,
-    ZGWAPIsConfigurationStep,
 )
 
 STEPS_TO_CONFIGURE = [
@@ -46,7 +46,7 @@ STEPS_TO_CONFIGURE = [
     CatalogiAPIConfigurationStep(),
     DocumentenAPIConfigurationStep(),
     FormulierenAPIConfigurationStep(),
-    ZGWAPIsConfigurationStep(),
+    OpenZaakConfigurationStep(),
     KlantenAPIConfigurationStep(),
     ContactmomentenAPIConfigurationStep(),
     KICAPIsConfigurationStep(),

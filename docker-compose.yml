@@ -107,9 +107,9 @@ services:
     <<: *web-service
     container_name: open-inwoner-web-init
     ports: []
-    env_file:
-      - django-setup-config.env
     command: /setup_configuration.sh
+    volumes:
+      - ./docker/setup_configuration:/app/setup_configuration
 
   nginx:
     image: nginx
