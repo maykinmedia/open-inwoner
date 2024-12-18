@@ -14,7 +14,7 @@ from openklant2.types.resources.partij_identificator import (
 
 class PartijIdentificatorResource(ResourceMixin):
     http_client: APIClient
-    base_path: str = "/partij-identificatoren"
+    base_path: str = "partij-identificatoren"
 
     def list(
         self, *, params: ListPartijIdentificatorenParams | None = None

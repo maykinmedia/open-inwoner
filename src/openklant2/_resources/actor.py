@@ -10,7 +10,7 @@ from openklant2.types.resources.actor import Actor, ActorListParams, CreateActor
 
 class ActorResource(ResourceMixin):
     http_client: APIClient
-    base_path: str = "/actoren"
+    base_path: str = "actoren"
 
     def create(
         self,

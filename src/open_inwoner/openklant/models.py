@@ -1,9 +1,3 @@
-import uuid
-from dataclasses import dataclass
-from typing import Self
-from urllib.parse import urljoin, urlparse, urlunparse
-
-from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -138,6 +132,51 @@ class OpenKlantConfig(SingletonModel):
         return all(getattr(self, f, "") for f in self.register_api_required_fields)
 
 
+class OpenKlant2ConfigManager(models.Manager):
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.select_related("service")
+
+
+class OpenKlant2Config(models.Model):
+    service = models.OneToOneField(
+        "zgw_consumers.Service",
+        verbose_name=_("Klanten API"),
+        on_delete=models.PROTECT,
+        related_name="+",
+    )
+
+    # Vragen
+    mijn_vragen_kanaal = models.CharField(
+        verbose_name=_("Mijn vragen kanaal"),
+        default="",
+        blank=True,
+    )
+    mijn_vragen_organisatie_naam = models.CharField(
+        verbose_name=_("Mijn vragen organisatie naam"),
+        default="",
+        blank=True,
+    )
+    mijn_vragen_actor = models.CharField(
+        verbose_name=_("Mijn vragen actor"),
+        default="",
+        blank=True,
+    )
+    interne_taak_gevraagde_handeling = models.CharField(
+        verbose_name=_("Interne taak gevraagde handeling"),
+        default="",
+        blank=True,
+    )
+    interne_taak_toelichting = models.CharField(
+        verbose_name=_("Interne taak toelichting"),
+        default="",
+        blank=True,
+    )
+
+    class Meta:
+        verbose_name = _("OpenKlant2 configuration")
+
+
 class ContactFormSubject(OrderedModel):
     subject = models.CharField(
         verbose_name=_("Onderwerp"),
@@ -190,37 +229,3 @@ class KlantContactMomentAnswer(models.Model):
         verbose_name = _("KlantContactMoment")
         verbose_name_plural = _("KlantContactMomenten")
         unique_together = [["user", "contactmoment_url"]]
-
-
-@dataclass
-class OpenKlant2Config:
-    api_root: str
-    api_path: str
-    api_token: str
-
-    # Question/Answer settings
-    mijn_vragen_kanaal: str
-    mijn_vragen_organisatie_naam: str
-    mijn_vragen_actor: str | uuid.UUID | None
-    interne_taak_gevraagde_handeling: str
-    interne_taak_toelichting: str
-
-    @property
-    def api_url(self):
-        joined = urljoin(self.api_root, self.api_path)
-        scheme, netloc, path, params, query, fragment = urlparse(joined)
-        path = path.replace("//", "/")
-        return urlunparse((scheme, netloc, path, params, query, fragment))
-
-    @classmethod
-    def from_django_settings(cls) -> Self:
-        from django.conf import settings
-
-        if not (config := getattr(settings, "OPENKLANT2_CONFIG", None)):
-            raise ImproperlyConfigured(
-                "Please set OPENKLANT2_CONFIG in your settings to configure OpenKlant2"
-            )
-
-        return cls(**config)
-
-    # TODO: add from_openklant_config_model or similar

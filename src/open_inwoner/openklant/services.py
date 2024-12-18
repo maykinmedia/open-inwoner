@@ -823,16 +823,17 @@ class OpenKlant2Service(KlantenService):
     client: OpenKlant2Client
 
     def __init__(self, config: OpenKlant2Config | None = None):
-        self.config = config or OpenKlant2Config.from_django_settings()
-        if not self.config:
-            raise ImproperlyConfigured(
-                "Please set OPENKLANT2_CONFIG in your settings to configure OpenKlant2"
-            )
+        try:
+            self.config = config or OpenKlant2Config.objects.get()
+        except OpenKlant2Config.DoesNotExist:
+            raise ImproperlyConfigured("OpenKlant2Config not configured")
+        except OpenKlant2Config.MultipleObjectsReturned:
+            raise ImproperlyConfigured("Found multiple instances of OpenKlant2Config")
 
         self.client = OpenKlant2Client(
-            base_url=self.config.api_url,
+            base_url=self.config.service.api_root,
             request_kwargs={
-                "headers": {"Authorization": f"Token {self.config.api_token}"}
+                "headers": {"Authorization": f"Token {self.config.service.secret}"}
             },
         )
 
@@ -1133,7 +1134,7 @@ class OpenKlant2Service(KlantenService):
         if len(question.rstrip()) == 0:
             raise ValueError("You must provide a question")
 
-        if self.config.mijn_vragen_actor is None:
+        if not self.config.mijn_vragen_actor:
             raise RuntimeError(
                 "You must define an actor to whom the question will be assigned. "
                 "Initialize the service with a value for `mijn_vragen_actor`."

@@ -54,8 +54,6 @@ class ContactMomentViewsTestCase(
     maxDiff = None
 
     def setUp(self):
-        # signals.user_logged_in.disconnect(receiver=update_user_from_klant_on_login)
-
         self.user = DigidUserFactory(
             email="test@example.com",
             phonenumber="0100000000",

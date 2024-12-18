@@ -16,6 +16,7 @@ from open_inwoner.openzaak.tests.shared import ZAKEN_ROOT
 from open_inwoner.utils.test import paginated_response
 
 KLANTEN_ROOT = "https://klanten.nl/api/v1/"
+OPENKLANT2_ROOT = "http://localhost:8338/klantinteracties/api/v1"
 CONTACTMOMENTEN_ROOT = "https://contactmomenten.nl/api/v1/"
 
 

@@ -10,7 +10,7 @@ from openklant2.types.resources.betrokkene import Betrokkene, BetrokkeneCreateDa
 
 class BetrokkeneResource(ResourceMixin):
     http_client: APIClient
-    base_path: str = "/betrokkenen"
+    base_path: str = "betrokkenen"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

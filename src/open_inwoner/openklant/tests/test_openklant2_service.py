@@ -6,8 +6,8 @@ import freezegun
 
 from open_inwoner.accounts.models import User
 from open_inwoner.accounts.tests.factories import UserFactory
-from open_inwoner.openklant.models import OpenKlant2Config
 from open_inwoner.openklant.services import OpenKlant2Question, OpenKlant2Service
+from open_inwoner.openklant.tests.factories import OpenKlant2ConfigFactory
 from open_inwoner.openklant.tests.helpers import Openklant2ServiceTestCase
 from openklant2.factories.partij import CreatePartijPersoonDataFactory
 from openklant2.types.resources.partij import PartijValidator
@@ -17,16 +17,8 @@ from openklant2.types.resources.partij import PartijValidator
 class PartijGetOrCreateTestCase(Openklant2ServiceTestCase):
     def setUp(self):
         super().setUp()
-        self.openklant2_config = OpenKlant2Config(
-            api_root=self.openklant2_api_root,
-            api_path=self.openklant2_api_path,
-            api_token=self.openklant2_api_token,
-            mijn_vragen_kanaal="oip_mijn_vragen",
-            mijn_vragen_organisatie_naam="Open Inwoner Platform",
-            mijn_vragen_actor="ca0783a1-1d74-4e07-b3e0-185b1d2fccd4",
-            interne_taak_gevraagde_handeling="Beantwoorden vraag Mijn Omgeving",
-            interne_taak_toelichting="Beantwoorden vraag",
-        )
+
+        self.openklant2_config = OpenKlant2ConfigFactory()
         self.service = OpenKlant2Service(config=self.openklant2_config)
         self.user = UserFactory(first_name="John", last_name="Doe")
 
@@ -220,16 +212,8 @@ class PartijGetOrCreateTestCase(Openklant2ServiceTestCase):
 class Openklant2ServiceTest(Openklant2ServiceTestCase):
     def setUp(self):
         super().setUp()
-        self.openklant2_config = OpenKlant2Config(
-            api_root=self.openklant2_api_root,
-            api_path=self.openklant2_api_path,
-            api_token=self.openklant2_api_token,
-            mijn_vragen_kanaal="oip_mijn_vragen",
-            mijn_vragen_organisatie_naam="Open Inwoner Platform",
-            mijn_vragen_actor="ca0783a1-1d74-4e07-b3e0-185b1d2fccd4",
-            interne_taak_gevraagde_handeling="Beantwoorden vraag Mijn Omgeving",
-            interne_taak_toelichting="Beantwoorden vraag",
-        )
+
+        self.openklant2_config = OpenKlant2ConfigFactory()
         self.service = OpenKlant2Service(config=self.openklant2_config)
 
         self.persoon = self.openklant_client.partij.create_persoon(
@@ -360,16 +344,7 @@ class QuestionAnswerTestCase(Openklant2ServiceTestCase):
             }
         )
 
-        self.openklant2_config = OpenKlant2Config(
-            api_root=self.openklant2_api_root,
-            api_path=self.openklant2_api_path,
-            api_token=self.openklant2_api_token,
-            mijn_vragen_kanaal="oip_mijn_vragen",
-            mijn_vragen_organisatie_naam="Open Inwoner Platform",
-            mijn_vragen_actor=self.designated_actor["uuid"],
-            interne_taak_gevraagde_handeling="Beantwoorden vraag Mijn Omgeving",
-            interne_taak_toelichting="Beantwoorden vraag",
-        )
+        self.openklant2_config = OpenKlant2ConfigFactory()
         self.service = OpenKlant2Service(config=self.openklant2_config)
 
     def test_designated_actor_is_required_to_create_question(self):
