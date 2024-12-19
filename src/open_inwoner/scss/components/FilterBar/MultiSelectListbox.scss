@@ -163,6 +163,8 @@
   }
 
   .multiselect-listbox__content {
+    z-index: 0;
+
     .checkbox__label {
       display: flex;
       flex-direction: row;
