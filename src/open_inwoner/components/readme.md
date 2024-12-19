@@ -96,7 +96,7 @@ Given an example of a hyperlink with an icon:
 
 ```html
 {% load i18n %}
-<a class="button button--primary" href="{% url 'inbox:index' %}">
+<a class="utrecht-link-button button button--primary" href="{% url 'inbox:index' %}">
     <span class="material-icon">arrow_forward</span>
     {% trans 'My messages' %}
 </a>
