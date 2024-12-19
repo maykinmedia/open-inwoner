@@ -14,7 +14,7 @@ from freezegun import freeze_time
 from pyquery import PyQuery
 from zgw_consumers.api_models.base import factory
 
-from open_inwoner.accounts.signals import update_user_from_klant_on_login
+from open_inwoner.accounts.signals import update_user_on_login
 from open_inwoner.accounts.tests.factories import DigidUserFactory, UserFactory
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openklant.api_models import ContactMoment, Klant, KlantContactMoment
@@ -60,7 +60,7 @@ class ContactMomentViewsTestCase(
         )
 
         super().setUp()
-        signals.user_logged_in.disconnect(receiver=update_user_from_klant_on_login)
+        signals.user_logged_in.disconnect(receiver=update_user_on_login)
 
         MockAPIReadData.setUpServices()
         self.api_group = ZGWApiGroupConfig.objects.get()

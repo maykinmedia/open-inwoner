@@ -8,6 +8,7 @@ from django.utils.translation import gettext as _
 from open_inwoner.accounts.models import User
 from open_inwoner.haalcentraal.models import HaalCentraalConfig
 from open_inwoner.haalcentraal.utils import update_brp_data_in_db
+from open_inwoner.kvk.client import KvKClient
 from open_inwoner.openklant.services import OpenKlant2Service, eSuiteKlantenService
 from open_inwoner.utils.logentry import user_action
 
@@ -26,7 +27,7 @@ MESSAGE_TYPE = {
 
 
 @receiver(user_logged_in)
-def update_user_from_klant_on_login(sender, user, request, *args, **kwargs):
+def update_user_on_login(sender, user, request, *args, **kwargs):
     # This additional guard is mainly to facilitate easier testing, where not
     # all request factories return a full-fledged request object.
     if not hasattr(request, "user"):
@@ -34,6 +35,9 @@ def update_user_from_klant_on_login(sender, user, request, *args, **kwargs):
 
     if user.login_type not in [LoginTypeChoices.digid, LoginTypeChoices.eherkenning]:
         return
+
+    if user.login_type is LoginTypeChoices.eherkenning:
+        _update_eherkenning_user_from_kvk_api(user=user)
 
     # OpenKlant2
     try:
@@ -72,6 +76,16 @@ def _update_user_from_esuite(
     klant, created = service.get_or_create_klant(fetch_params=fetch_params, user=user)
     if klant and not created:
         service.update_user_from_klant(klant, user)
+
+
+def _update_eherkenning_user_from_kvk_api(user: User):
+    kvk_client = KvKClient()
+
+    vestiging = kvk_client.get_company_headquarters(kvk=user.kvk)
+
+    if company_name := vestiging.get("naam"):
+        user.company_name = company_name
+        user.save()
 
 
 @receiver(user_logged_in)

@@ -14,7 +14,7 @@ from furl import furl
 from pyquery import PyQuery as PQ
 
 from open_inwoner.accounts.choices import NotificationChannelChoice
-from open_inwoner.accounts.signals import update_user_from_klant_on_login
+from open_inwoner.accounts.signals import KvKClient, update_user_on_login
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.kvk.branches import get_kvk_branch_number
@@ -1896,7 +1896,7 @@ class TestPasswordChange(WebTest):
 
 
 @requests_mock.Mocker()
-class TestUpdateUserFromKlantUponLoginTests(TestCase):
+class UpdateUserOnLoginTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         MockAPIReadPatchData.setUpServices()
@@ -1906,31 +1906,86 @@ class TestUpdateUserFromKlantUponLoginTests(TestCase):
 
     def test_update_hook_is_registered_on_login(self, m):
         connected_functions = [receiver[1]() for receiver in user_logged_in.receivers]
-        self.assertIn(update_user_from_klant_on_login, connected_functions)
+        self.assertIn(update_user_on_login, connected_functions)
 
-    def test_update_user_from_klant_hook_only_called_for_digid_and_eherkenning(self, m):
+    def test_update_hook_not_called(self, m):
         self.data = MockAPIReadPatchData().install_mocks(m)
         request = RequestFactory().get("/foo")
         request.user = self.data.user
 
-        for login_type in LoginTypeChoices:
-            with self.subTest(
-                f"Test update klant hook is called for login type {login_type}"
-            ):
+        for login_type in [LoginTypeChoices.default, LoginTypeChoices.oidc]:
+            with self.subTest(f"{login_type}"):
                 self.data.user.login_type = login_type
                 self.data.user.save()
+
+                update_user_on_login(
+                    self.__class__,
+                    request.user,
+                    request,
+                )
+
                 with patch(
                     "open_inwoner.openklant.services.eSuiteKlantenService.update_user_from_klant"
-                ) as update_user_from_klant_mock:
-                    update_user_from_klant_on_login(
-                        self.__class__,
-                        request.user,
-                        request,
-                    )
-                    if login_type in [
-                        LoginTypeChoices.digid,
-                        LoginTypeChoices.eherkenning,
-                    ]:
-                        update_user_from_klant_mock.assert_called_once()
-                    else:
-                        update_user_from_klant_mock.assert_not_called()
+                ) as update_user_mock:
+                    update_user_mock.assert_not_called()
+
+    def test_digid_user_update_hook_called(self, m):
+        self.data = MockAPIReadPatchData().install_mocks(m)
+        request = RequestFactory().get("/foo")
+        request.user = self.data.user
+
+        self.data.user.login_type = LoginTypeChoices.digid
+        self.data.user.save()
+        with patch(
+            "open_inwoner.openklant.services.eSuiteKlantenService.update_user_from_klant"
+        ) as update_user_mock:
+            update_user_on_login(
+                self.__class__,
+                request.user,
+                request,
+            )
+            update_user_mock.assert_called_once()
+
+    def test_update_eherkenning_user(self, m):
+        self.data = MockAPIReadPatchData().install_mocks(m)
+        request = RequestFactory().get("/foo")
+        request.user = self.data.user
+
+        self.data.user.login_type = LoginTypeChoices.eherkenning
+        self.data.user.save()
+
+        self.assertEqual(request.user.company_name, "")
+
+        vestiging = {
+            "kvkNummer": "68750110",
+            "vestigingsnummer": "000037178598",
+            "naam": "Test BV Donald",
+            "adres": {
+                "binnenlandsAdres": {
+                    "type": "bezoekadres",
+                    "straatnaam": "Hizzaarderlaan",
+                    "plaats": "Lollum",
+                }
+            },
+            "type": "hoofdvestiging",
+            "_links": {
+                "basisprofiel": {
+                    "href": "https://api.kvk.nl/test/api/v1/basisprofielen/68750110"
+                },
+                "vestigingsprofiel": {
+                    "href": "https://api.kvk.nl/test/api/v1/vestigingsprofielen/000037178598"
+                },
+            },
+        }
+
+        with patch.object(KvKClient, "get_company_headquarters") as mock_kvk:
+            mock_kvk.return_value = vestiging
+            update_user_on_login(
+                self.__class__,
+                request.user,
+                request,
+            )
+
+            mock_kvk.assert_called_once()
+
+        self.assertEqual(request.user.company_name, "Test BV Donald")
