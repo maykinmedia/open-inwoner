@@ -5,6 +5,7 @@ SETUP_CONFIGURATION_STEPS = [
     "zgw_consumers.contrib.setup_configuration.steps.ServiceConfigurationStep",
     "open_inwoner.configurations.bootstrap.zgw.OpenZaakConfigurationStep",
     "open_inwoner.configurations.bootstrap.openklant.OpenKlantConfigurationStep",
+    "open_inwoner.configurations.bootstrap.openklant.OpenKlant2ConfigurationStep",
 ]
 OIP_ORGANIZATION = config("OIP_ORGANIZATION", "")
 
