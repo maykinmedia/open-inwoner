@@ -86,6 +86,7 @@ zgw_consumers:
       client_id: test-vcr
       secret: test-vcr
 
+# Openzaak
 openzaak_config_enable: true
 openzaak_config:
   zaak_max_confidentiality: openbaar
@@ -108,6 +109,7 @@ openzaak_config:
       documenten_api_identifier: documenten-test
       catalogi_api_identifier: catalogi-test
 
+# OpenKlant (v1, i.e. eSuite)
 openklant_config_enable: true
 openklant_config:
   klanten_service_identifier: klanten-test
@@ -121,3 +123,13 @@ openklant_config:
   register_employee_id: '1234'
   use_rsin_for_innNnpId_query_parameter: true
   send_email_confirmation: false
+
+# OpenKlant2
+openklant2_config_enable: true
+openklant2_config:
+  service_identifier: klanten-service
+  mijn_vragen_kanaal: formulier
+  mijn_vragen_organisatie_naam: De Gemeente
+  mijn_vragen_actor: e412c6f6-bc31-4fd4-b883-0fb5e88d3f5b
+  interne_taak_gevraagde_handeling: Vraag beantwoorden
+  interne_taak_toelichting: Vraag via OIP, graag beantwoorden
