@@ -606,7 +606,7 @@ class InnerCaseDetailView(
                 "label": glom_multiple(
                     s,
                     ("statustype.statustekst", "statustype.omschrijving"),
-                    default=_("No data available"),
+                    default=_("Nieuwe aanvraag"),
                 ),
                 "status_indicator": getattr(
                     statustype_config_mapping.get(s.statustype.url),
