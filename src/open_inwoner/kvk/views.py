@@ -7,13 +7,14 @@ from django.views.generic import FormView
 from furl import furl
 
 from open_inwoner.kvk.branches import KVK_BRANCH_SESSION_VARIABLE
+from open_inwoner.utils.views import LogMixin
 
 from ..utils.url import get_next_url_from
 from .client import KvKClient
 from .forms import CompanyBranchChoiceForm
 
 
-class CompanyBranchChoiceView(FormView):
+class CompanyBranchChoiceView(LogMixin, FormView):
     """Choose the branch ("vestiging") of a company"""
 
     template_name = "pages/kvk/branches.html"
@@ -32,12 +33,14 @@ class CompanyBranchChoiceView(FormView):
         company_branches = kvk_client.get_all_company_branches(
             kvk=self.request.user.kvk
         )
-        # create pseudo-branch representing the company as a whole
-        master_branch = {
+        # create pseudo-branch representing the company as a whole (the "rechtspersoon").
+        # technically, the compnay as a legal entity is represented as "rechtspersoon",
+        # but this is not always included in query results
+        rechtspersoon_entry = {
             "vestigingsnummer": "",
             "naam": company_branches[0].get("naam", "") if company_branches else "",
         }
-        company_branches.insert(0, master_branch)
+        company_branches.insert(0, rechtspersoon_entry)
 
         kwargs["company_branches"] = company_branches
 
@@ -63,11 +66,13 @@ class CompanyBranchChoiceView(FormView):
 
         form = context["form"]
 
-        company_branches_with_master = form.company_branches
-        # Exclude the "master" branch from these checks, since we always insert this
-        company_branches = company_branches_with_master[1:]
-
-        if not company_branches or len(company_branches) == 1:
+        # check that there are company branches besides our artifical "rechtspersoon_entry"
+        vestigingen = form.company_branches[1:]
+        if not vestigingen or not any(v.get("vestigingsnummer") for v in vestigingen):
+            self.log_system_action(
+                f"List of company branches for KVK number {request.user.kvk} contains "
+                "no branch with vestigingsnummer"
+            )
             request.session[KVK_BRANCH_SESSION_VARIABLE] = None
             request.session.save()
             return HttpResponseRedirect(redirect)
@@ -90,6 +95,8 @@ class CompanyBranchChoiceView(FormView):
             # Directly calling `super().form_invalid(form)` would override the error
             return self.render_to_response(context)
 
+        # empty string for KVK_BRANCH_SESSION_VARIABLE is interpreted as
+        # "interact as the rechtspersoon, not as any specific branch"
         request.session[KVK_BRANCH_SESSION_VARIABLE] = request.POST["branch_number"]
 
         return HttpResponseRedirect(redirect)

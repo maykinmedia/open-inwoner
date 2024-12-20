@@ -152,14 +152,23 @@ class KvKViewsTestCase(TestCase):
     @patch(
         "open_inwoner.kvk.models.KvKConfig.get_solo",
     )
-    def test_get_branches_page_one_branch_found_sets_branch_check_done(
-        self, mock_solo, mock_kvk
-    ):
+    def test_get_branches_page_one_branch_found(self, mock_solo, mock_kvk):
         """
-        Regression test for endless redirect: https://taiga.maykinmedia.nl/project/open-inwoner/task/2000
+        The branch selection page should be displayed, and the vestigingsnummer stored in the
+        session, even if only one branch is found.
+
+        Taiga: https://taiga.maykinmedia.nl/project/open-inwoner/task/2946
+
+        We previously skipped the branch selection for single-branch companies because of problems
+        with our redirect middleware: https://taiga.maykinmedia.nl/project/open-inwoner/task/2000
         """
         mock_kvk.return_value = [
-            {"kvkNummer": "12345678", "vestigingsnummer": "1234"},
+            {
+                "kvkNummer": "12345678",
+                "vestigingsnummer": "1234",
+                "naam": "Makers and Shakers",
+                "type": "hoofdvestiging",
+            },
         ]
 
         mock_solo.return_value.api_key = "123"
@@ -171,17 +180,24 @@ class KvKViewsTestCase(TestCase):
 
         response = self.client.get(self.url)
 
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("pages-root"))
-        # Because no branches were found, the branch check should be skipped in the future
-        # and no branch number should be set
-        self.assertEqual(kvk_branch_selected_done(self.client.session), True)
-        self.assertEqual(get_kvk_branch_number(self.client.session), None)
-
-        response = self.client.get(response.url)
-
-        # Following redirect should not result in endless redirect
         self.assertEqual(response.status_code, 200)
+
+        doc = PyQuery(response.content)
+
+        branch_inputs = doc.find("[name='branch_number']")
+
+        # check that pseudo-branch representing company as a whole has been added
+        self.assertEqual(len(branch_inputs), 2)
+
+        self.assertEqual(branch_inputs[0], doc.find("[id='entire-company']")[0])
+        self.assertEqual(branch_inputs[1], doc.find("[id='branch-1234']")[0])
+
+        # chack that company name is displayed for every branch
+        company_name_displays = doc("h2:Contains('Makers and Shakers')")
+        self.assertEqual(len(company_name_displays), 2)
+
+        main_branch_display = doc("p:Contains('Hoofdvestiging')")
+        self.assertEqual(len(main_branch_display), 1)
 
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     @patch(
