@@ -493,11 +493,10 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Allow logging in with email+password
 AUTHENTICATION_BACKENDS = [
     "open_inwoner.accounts.backends.CustomAxesBackend",
     "open_inwoner.accounts.backends.UserModelEmailBackend",
-    "django.contrib.auth.backends.ModelBackend",
+    "open_inwoner.accounts.backends.Verify2FATokenBackend",
     "digid_eherkenning.backends.DigiDBackend",
     "eherkenning.backends.eHerkenningBackend",
     "open_inwoner.accounts.backends.DigiDEHerkenningOIDCBackend",

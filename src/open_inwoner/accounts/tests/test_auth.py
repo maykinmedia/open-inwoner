@@ -1,15 +1,17 @@
-from unittest.mock import patch
+from unittest.mock import ANY, patch
 from urllib.parse import urlencode
 
 from django.contrib.auth.signals import user_logged_in
 from django.contrib.sites.models import Site
 from django.core import mail
+from django.core.signing import TimestampSigner
 from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
 
 import requests_mock
 from django_webtest import WebTest
+from freezegun import freeze_time
 from furl import furl
 from pyquery import PyQuery as PQ
 
@@ -1708,6 +1710,38 @@ class TestLoginLogoutFunctionality(AssertRedirectsMixin, WebTest):
         form.submit().follow()
         # Verify that the user has been authenticated
         self.assertIn("_auth_user_id", self.app.session)
+
+    @patch("open_inwoner.accounts.gateways.gateway.send")
+    @freeze_time("2023-05-22 12:05:01")
+    def test_regular_login_with_valid_credentials_triggers_the_2fa_flow(
+        self, mock_gateway_send
+    ):
+        config = SiteConfiguration.get_solo()
+        config.login_2fa_sms = True
+        config.save()
+
+        response = self.app.get(reverse("login"))
+        mock_gateway_send.assert_not_called()
+
+        login_form = response.forms["login-form"]
+        login_form["username"] = self.user.email
+        login_form["password"] = "test"
+        login_form_response = login_form.submit()
+        login_form_response.follow()
+
+        mock_gateway_send.assert_called_once_with(to=self.user.phonenumber, token=ANY)
+
+        params = {
+            "next": "",
+            "user": TimestampSigner().sign(self.user.pk),
+        }
+        verify_token_url = furl(reverse("verify_token")).add(params).url
+        self.assertRedirects(login_form_response, verify_token_url)
+        self.assertNotIn(
+            "_auth_user_id",
+            self.app.session,
+            msg="Valid credentials alone should not authenticate a user, second factor required",
+        )
 
     def test_login_page_shows_correct_digid_login_url(self):
         config = OpenIDDigiDConfig.get_solo()
