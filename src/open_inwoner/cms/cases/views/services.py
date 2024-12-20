@@ -192,7 +192,16 @@ class CaseListService:
 
     def _get_cases_for_api_group(self, group: ZGWApiGroupConfig) -> list[Zaak]:
         raw_cases = group.zaken_client.fetch_cases(
-            **get_user_fetch_parameters(self.request)
+            **get_user_fetch_parameters(self.request),
+            # TODO: This is not ideal. We should really paginate with the full knowledge
+            # of the total count (which the API returns but our current client
+            # implementation does not expose), and simply fetch a page at a time whilst
+            # providing next/previous and arbitrary jumping functionality. But that will
+            # need new client methods.
+            #
+            # This is a stopgap to avoid people running into a limit, as 100ish cases
+            # is, certainly in test environments, not uncommon.
+            max_requests=15,
         )
         resolved_cases = self.resolve_cases(raw_cases, group)
 
