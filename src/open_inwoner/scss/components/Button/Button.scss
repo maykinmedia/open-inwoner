@@ -1,3 +1,6 @@
+@import '~@utrecht/components/dist/button/css/index.css';
+
+.utrecht-button,
 .button {
   align-items: center;
   border-radius: var(--border-radius);
@@ -16,12 +19,21 @@
   text-align: center;
   text-decoration: none;
   transition: transform 300ms, background-color 300ms;
-  font-weight: normal;
+  font-weight: var(--font-weight-body);
   // modified outline for accessibility focus
   outline-width: 1px;
   outline-offset: 1px;
   border: 0;
   white-space: nowrap;
+  // values from NLDS components that need to be unset
+  block-size: initial;
+  inline-size: initial;
+  justify-content: center;
+  max-inline-size: initial;
+  min-block-size: initial;
+  min-inline-size: initial;
+  scale: 1;
+  text-transform: none;
 
   &:focus,
   &:hover {
@@ -73,9 +85,9 @@
   }
 
   &#{&}--primary {
-    background-color: var(--color-primary);
-    border: 1px solid var(--color-primary);
-    color: var(--color-font-primary);
+    background-color: var(--utrecht-button-primary-action-background-color);
+    border: 1px solid var(--utrecht-button-primary-action-background-color);
+    color: var(--utrecht-button-secondary-color);
 
     &:focus,
     &:hover {
@@ -84,9 +96,9 @@
   }
 
   &--secondary {
-    background-color: var(--color-secondary);
-    border: 1px solid var(--color-secondary);
-    color: var(--color-white);
+    background-color: var(--utrecht-button-secondary-action-background-color);
+    border: 1px solid var(--utrecht-button-secondary-action-background-color);
+    color: var(--utrecht-button-secondary-action-color);
 
     &:focus,
     &:hover {

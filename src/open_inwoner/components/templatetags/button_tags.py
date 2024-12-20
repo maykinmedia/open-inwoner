@@ -68,7 +68,7 @@ def button(text, **kwargs):
 
     def get_classes():
         extra_classes = kwargs.get("extra_classes")
-        classnames = "button"
+        classnames = "utrecht-button"
 
         if extra_classes:
             classnames += f" {extra_classes}"
@@ -93,19 +93,19 @@ def button(text, **kwargs):
             classnames += " button--bordered"
 
         if kwargs.get("primary"):
-            classnames += " button--primary"
+            classnames += " utrecht-button--primary-action button--primary"
 
         if kwargs.get("danger"):
             classnames += " button--danger"
 
         if kwargs.get("secondary"):
-            classnames += " button--secondary"
+            classnames += " utrecht-button--secondary-action button--secondary"
 
         if kwargs.get("transparent"):
             classnames += " button--transparent"
 
         if kwargs.get("disabled"):
-            classnames += " button--disabled"
+            classnames += " utrecht-button-disabled button--disabled"
 
         if kwargs.get("pill"):
             classnames += " button--pill"
