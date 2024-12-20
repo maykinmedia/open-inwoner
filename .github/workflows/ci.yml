@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        test-type: [main, elastic, openklant]
+        test-type: [main, elastic, openklant, sequential]
 
     services:
       postgres:
@@ -67,11 +67,14 @@ jobs:
               src/manage.py test src \
               --parallel \
               --exclude-tag=e2e \
-              --exclude-tag=elastic
+              --exclude-tag=elastic \
+              --exclude-tag=sequential
           elif [ "${{ matrix.test-type }}" = "elastic" ]; then
             coverage run -p src/manage.py test src --tag=elastic --exclude-tag=e2e
           elif [ "${{ matrix.test-type }}" = "openklant" ]; then
             coverage run -m pytest --block-network --record-mode=none -vvv src/openklant2
+          elif [ "${{ matrix.test-type }}" = "sequential" ]; then
+            coverage run -p src/manage.py test src --tag=sequential
           else
             echo "Error: Unknown test type '${{ matrix.test-type }}'"
             exit 1
@@ -113,6 +116,7 @@ jobs:
           mv coverages/main/.coverage* .
           mv coverages/elastic/.coverage* .
           mv coverages/openklant/.coverage* .
+          mv coverages/sequential/.coverage* .
           coverage combine
       - name: Publish coverage report
         uses: codecov/codecov-action@v3

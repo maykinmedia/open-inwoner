@@ -1,5 +1,5 @@
 from django.contrib.auth import user_logged_in
-from django.test import RequestFactory
+from django.test import RequestFactory, tag
 
 import requests_mock
 from django_webtest import WebTest
@@ -19,6 +19,7 @@ from open_inwoner.utils.test import (
 from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin
 
 
+@tag("sequential")
 @requests_mock.Mocker()
 class UpdateUserFromLoginSignalAPITestCase(
     ClearCachesMixin, DisableRequestLogMixin, AssertTimelineLogMixin, WebTest
