@@ -30,8 +30,8 @@ gebruikers. Dit is overzichtelijk weergegeven in de tabel op deze pagina.
 9.1 Catalogus Configs
 =====================
 
-Catalogus configs worden automatisch geïmporteerd vanuit Open Zaak of eSuite via de 
-ZGW-koppeling. Aan deze catalogi zijn zaaktypes gekoppeld, zoals geconfigureerd in 
+Catalogus configs worden automatisch geïmporteerd vanuit Open Zaak of eSuite via de
+ZGW-koppeling. Aan deze catalogi zijn zaaktypes gekoppeld, zoals geconfigureerd in
 het onderdeel Zaaktypeconfiguratie.
 
 .. _CatalogusImportExport:
@@ -43,12 +43,12 @@ Catalogi en Zaaktype Configuraties kunnen worden geëxporteerd en geïmporteerd 
 verschillende OIP-installaties (bijvoorbeeld tussen acceptatie- en testomgevingen).
 
 .. note::
-   De import/export-functionaliteit vereist dat de gekoppelde zaaksystemen 
-   materieel gelijk zijn. Dit betekent dat de catalogi en onderliggende zaaktypes 
+   De import/export-functionaliteit vereist dat de gekoppelde zaaksystemen
+   materieel gelijk zijn. Dit betekent dat de catalogi en onderliggende zaaktypes
    in beide ZGW API's aanwezig moeten zijn (hoewel de URLs en UUIDs mogen verschillen).
    Voer daarom de ``Importeer ZGW data`` periodieke taak eerst handmatig uit op zowel de
    bron als bestemming zodat de ZGW objecten volledig in sync zijn.
-  
+
 
 .. note::
    Het onderstaande proces spitst zich toe op het importeren van hele Catalogus
@@ -62,8 +62,8 @@ verschillende OIP-installaties (bijvoorbeeld tussen acceptatie- en testomgevinge
 Importproces
 ^^^^^^^^^^^^
 
-Tijdens de import zoekt de ontvangende installatie catalogi en zaaktypes op basis van 
-specifieke kenmerken. Deze matching bepaalt hoe bijbehorende data (beschrijvingen, 
+Tijdens de import zoekt de ontvangende installatie catalogi en zaaktypes op basis van
+specifieke kenmerken. Deze matching bepaalt hoe bijbehorende data (beschrijvingen,
 instellingen en metadata) worden gekoppeld.
 
 Matching-attributen
@@ -89,7 +89,7 @@ Stappen voor exporteren:
 
    Exporteren van catalogus configuraties
 
-De export omvat alle catalogi, zaaktypes en onderliggende objecten (resultaattypen, 
+De export omvat alle catalogi, zaaktypes en onderliggende objecten (resultaattypen,
 informatie-objecttypen, etc.) van de geselecteerde catalogi.
 
 Importeren
@@ -653,7 +653,7 @@ Klik allereerst op ‘tonen’ om alle gegevens uit te vouwen.
 ---------------------------------------------------
 
 Het is mogelijk om individuele Zaaktype Configuratie objecten te importeren, op
-analoge wijze zoals beschreven voor de Catalogus Configuraties (zie 
+analoge wijze zoals beschreven voor de Catalogus Configuraties (zie
 :ref:`CatalogusImportExport`).
 
 Voor meer details verwijzen we u naar deze sectie. In hoofdlijnen: via het totaaloverzicht
@@ -673,5 +673,5 @@ via de knop "Importeer bestand":
 
 .. note::
    Zaaktype Configuraties die via deze wijze worden gexporteerd, kunnen ook worden
-   geimporteerd via het Catalogus Configuratie scherm, en omgekeerd. 
+   geimporteerd via het Catalogus Configuratie scherm, en omgekeerd.
    Zie verder :ref:`CatalogusImportExport`.

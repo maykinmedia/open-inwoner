@@ -36,22 +36,33 @@ indent-width = 4
 target-version = "py311"
 
 [lint]
-# Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
-# Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
-# McCabe complexity (`C901`) by default.
 select = [
-    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-    "B",
+    # https://docs.astral.sh/ruff/rules/#pyflakes-f
     "E",
+    # https://docs.astral.sh/ruff/rules/#pyflakes-f
     "F",
-    "S",
-    "I",
-    "BLE",
-    "C90",
-    "S106",
-    "UP",
 ]
-ignore = ["E501"]
+ignore = [
+    # Whitespace before ':' (conflicts with Black)
+    "E203",
+    # Two spaces before inline comment
+    "E261",
+    # Line too long
+    "E501",
+    # Do not assign a lambda expression
+    "E731",
+    # Name may be undefined from '*' import
+    "F405",
+    # Blank line contains whitespace
+    "W293",
+    # Trailing whitespace
+    "W291",
+    # Local variable is assigned but never used
+    "F841",
+    # Ambiguous variable name
+    "E741",
+]
+
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]

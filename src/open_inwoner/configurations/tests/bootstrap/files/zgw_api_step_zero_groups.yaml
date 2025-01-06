@@ -16,5 +16,5 @@ openzaak_config:
     - .pdf
     - .txt
   # Empty api_groups should not raise a missing exception, but should raise a
-  # 
+  #
   api_groups: []

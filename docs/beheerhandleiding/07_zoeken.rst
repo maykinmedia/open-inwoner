@@ -167,4 +167,3 @@ Door op een specifiek veld in het overzicht te klikken kunt u de
 zoekveldgewicht aanpassen. Er wordt een nieuw scherm geopend (zie 7.3.1)
 waar u de zoekveldgewicht en eventueel het veld kunt wijzigen. Om
 wijzigingen op te slaan klikt u op de knop [opslaan].
-

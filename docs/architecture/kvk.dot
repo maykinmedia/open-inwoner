@@ -28,7 +28,7 @@ digraph model_graph {
     <FONT FACE="Roboto" COLOR="white" POINT-SIZE="10"><B>
     SingletonModel
     </B></FONT></TD></TR>
-  
+
     </TABLE>
     >]
 
@@ -38,47 +38,47 @@ digraph model_graph {
     <FONT FACE="Roboto" COLOR="white" POINT-SIZE="10"><B>
     KvKConfig<BR/>&lt;<FONT FACE="Roboto"><I>SingletonModel</I></FONT>&gt;
     </B></FONT></TD></TR>
-  
-  
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto"><B>id</B></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto"><B>AutoField</B></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT COLOR="#7B7B7B" FACE="Roboto"><B>client_certificate</B></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT COLOR="#7B7B7B" FACE="Roboto"><B>ForeignKey (id)</B></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT COLOR="#7B7B7B" FACE="Roboto"><B>server_certificate</B></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT COLOR="#7B7B7B" FACE="Roboto"><B>ForeignKey (id)</B></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT COLOR="#7B7B7B" FACE="Roboto">api_key</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT COLOR="#7B7B7B" FACE="Roboto">CharField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">api_root</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">URLField</FONT>
     </TD></TR>
-  
-  
+
+
     </TABLE>
     >]
 

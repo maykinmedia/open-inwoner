@@ -28,47 +28,47 @@ digraph model_graph {
     <FONT FACE="Roboto" COLOR="white" POINT-SIZE="10"><B>
     UserCaseStatusNotificationBase
     </B></FONT></TD></TR>
-  
-  
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto"><B>user</B></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto"><B>ForeignKey (None)</B></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">case_uuid</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">UUIDField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT COLOR="#7B7B7B" FACE="Roboto">collision_key</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT COLOR="#7B7B7B" FACE="Roboto">CharField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">created_on</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">DateTimeField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">is_sent</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">BooleanField</FONT>
     </TD></TR>
-  
-  
+
+
     </TABLE>
     >]
 
@@ -78,7 +78,7 @@ digraph model_graph {
     <FONT FACE="Roboto" COLOR="white" POINT-SIZE="10"><B>
     SingletonModel
     </B></FONT></TD></TR>
-  
+
     </TABLE>
     >]
 
@@ -88,127 +88,127 @@ digraph model_graph {
     <FONT FACE="Roboto" COLOR="white" POINT-SIZE="10"><B>
     OpenZaakConfig<BR/>&lt;<FONT FACE="Roboto"><I>SingletonModel</I></FONT>&gt;
     </B></FONT></TD></TR>
-  
-  
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto"><B>id</B></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto"><B>AutoField</B></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT COLOR="#7B7B7B" FACE="Roboto"><B>catalogi_service</B></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT COLOR="#7B7B7B" FACE="Roboto"><B>OneToOneField (id)</B></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT COLOR="#7B7B7B" FACE="Roboto"><B>document_service</B></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT COLOR="#7B7B7B" FACE="Roboto"><B>OneToOneField (id)</B></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT COLOR="#7B7B7B" FACE="Roboto"><B>form_service</B></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT COLOR="#7B7B7B" FACE="Roboto"><B>OneToOneField (id)</B></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT COLOR="#7B7B7B" FACE="Roboto"><B>zaak_service</B></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT COLOR="#7B7B7B" FACE="Roboto"><B>OneToOneField (id)</B></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">action_required_deadline_days</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">IntegerField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">allowed_file_extensions</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">ArrayField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">document_max_confidentiality</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">CharField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">enable_categories_filtering_with_zaken</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">BooleanField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">fetch_eherkenning_zaken_with_rsin</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">BooleanField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">max_upload_size</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">PositiveIntegerField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">reformat_esuite_zaak_identificatie</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">BooleanField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">skip_notification_statustype_informeren</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">BooleanField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">title_text</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">TextField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">zaak_max_confidentiality</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">CharField</FONT>
     </TD></TR>
-  
-  
+
+
     </TABLE>
     >]
 
@@ -218,39 +218,39 @@ digraph model_graph {
     <FONT FACE="Roboto" COLOR="white" POINT-SIZE="10"><B>
     CatalogusConfig
     </B></FONT></TD></TR>
-  
-  
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto"><B>id</B></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto"><B>AutoField</B></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">domein</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">CharField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">rsin</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">CharField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">url</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">URLField</FONT>
     </TD></TR>
-  
-  
+
+
     </TABLE>
     >]
 
@@ -260,103 +260,103 @@ digraph model_graph {
     <FONT FACE="Roboto" COLOR="white" POINT-SIZE="10"><B>
     ZaakTypeConfig
     </B></FONT></TD></TR>
-  
-  
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto"><B>id</B></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto"><B>AutoField</B></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto"><B>catalogus</B></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto"><B>ForeignKey (id)</B></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">contact_form_enabled</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">BooleanField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT COLOR="#7B7B7B" FACE="Roboto">contact_subject_code</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT COLOR="#7B7B7B" FACE="Roboto">CharField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT COLOR="#7B7B7B" FACE="Roboto">description</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT COLOR="#7B7B7B" FACE="Roboto">TextField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">document_upload_enabled</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">BooleanField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT COLOR="#7B7B7B" FACE="Roboto">external_document_upload_url</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT COLOR="#7B7B7B" FACE="Roboto">URLField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">identificatie</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">CharField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">notify_status_changes</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">BooleanField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT COLOR="#7B7B7B" FACE="Roboto">omschrijving</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT COLOR="#7B7B7B" FACE="Roboto">CharField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT COLOR="#7B7B7B" FACE="Roboto">relevante_zaakperiode</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT COLOR="#7B7B7B" FACE="Roboto">PositiveIntegerField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">urls</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">ArrayField</FONT>
     </TD></TR>
-  
-  
+
+
     </TABLE>
     >]
 
@@ -366,63 +366,63 @@ digraph model_graph {
     <FONT FACE="Roboto" COLOR="white" POINT-SIZE="10"><B>
     ZaakTypeInformatieObjectTypeConfig
     </B></FONT></TD></TR>
-  
-  
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto"><B>id</B></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto"><B>AutoField</B></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto"><B>zaaktype_config</B></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto"><B>ForeignKey (id)</B></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">document_notification_enabled</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">BooleanField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">document_upload_enabled</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">BooleanField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">informatieobjecttype_url</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">URLField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">omschrijving</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">CharField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">zaaktype_uuids</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">ArrayField</FONT>
     </TD></TR>
-  
-  
+
+
     </TABLE>
     >]
 
@@ -432,135 +432,135 @@ digraph model_graph {
     <FONT FACE="Roboto" COLOR="white" POINT-SIZE="10"><B>
     ZaakTypeStatusTypeConfig
     </B></FONT></TD></TR>
-  
-  
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto"><B>id</B></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto"><B>AutoField</B></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto"><B>zaaktype_config</B></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto"><B>ForeignKey (id)</B></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">action_required</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">BooleanField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT COLOR="#7B7B7B" FACE="Roboto">call_to_action_text</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT COLOR="#7B7B7B" FACE="Roboto">CharField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT COLOR="#7B7B7B" FACE="Roboto">call_to_action_url</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT COLOR="#7B7B7B" FACE="Roboto">URLField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT COLOR="#7B7B7B" FACE="Roboto">case_link_text</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT COLOR="#7B7B7B" FACE="Roboto">CharField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT COLOR="#7B7B7B" FACE="Roboto">description</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT COLOR="#7B7B7B" FACE="Roboto">TextField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT COLOR="#7B7B7B" FACE="Roboto">document_upload_description</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT COLOR="#7B7B7B" FACE="Roboto">TextField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">document_upload_enabled</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">BooleanField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">notify_status_change</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">BooleanField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">omschrijving</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">CharField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT COLOR="#7B7B7B" FACE="Roboto">status_indicator</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT COLOR="#7B7B7B" FACE="Roboto">CharField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT COLOR="#7B7B7B" FACE="Roboto">status_indicator_text</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT COLOR="#7B7B7B" FACE="Roboto">TextField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">statustekst</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">CharField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">statustype_url</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">URLField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">zaaktype_uuids</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">ArrayField</FONT>
     </TD></TR>
-  
-  
+
+
     </TABLE>
     >]
 
@@ -570,55 +570,55 @@ digraph model_graph {
     <FONT FACE="Roboto" COLOR="white" POINT-SIZE="10"><B>
     ZaakTypeResultaatTypeConfig
     </B></FONT></TD></TR>
-  
-  
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto"><B>id</B></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto"><B>AutoField</B></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto"><B>zaaktype_config</B></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto"><B>ForeignKey (id)</B></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT COLOR="#7B7B7B" FACE="Roboto">description</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT COLOR="#7B7B7B" FACE="Roboto">TextField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">omschrijving</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">CharField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">resultaattype_url</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">URLField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">zaaktype_uuids</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">ArrayField</FONT>
     </TD></TR>
-  
-  
+
+
     </TABLE>
     >]
 
@@ -628,63 +628,63 @@ digraph model_graph {
     <FONT FACE="Roboto" COLOR="white" POINT-SIZE="10"><B>
     UserCaseStatusNotification<BR/>&lt;<FONT FACE="Roboto"><I>UserCaseStatusNotificationBase</I></FONT>&gt;
     </B></FONT></TD></TR>
-  
-  
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto"><B>id</B></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto"><B>AutoField</B></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto"><I><B>user</B></I></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto"><I><B>ForeignKey (id)</B></I></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto"><I>case_uuid</I></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto"><I>UUIDField</I></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT COLOR="#7B7B7B" FACE="Roboto"><I>collision_key</I></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT COLOR="#7B7B7B" FACE="Roboto"><I>CharField</I></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto"><I>created_on</I></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto"><I>DateTimeField</I></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto"><I>is_sent</I></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto"><I>BooleanField</I></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">status_uuid</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">UUIDField</FONT>
     </TD></TR>
-  
-  
+
+
     </TABLE>
     >]
 
@@ -694,63 +694,63 @@ digraph model_graph {
     <FONT FACE="Roboto" COLOR="white" POINT-SIZE="10"><B>
     UserCaseInfoObjectNotification<BR/>&lt;<FONT FACE="Roboto"><I>UserCaseStatusNotificationBase</I></FONT>&gt;
     </B></FONT></TD></TR>
-  
-  
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto"><B>id</B></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto"><B>AutoField</B></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto"><I><B>user</B></I></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto"><I><B>ForeignKey (id)</B></I></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto"><I>case_uuid</I></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto"><I>UUIDField</I></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT COLOR="#7B7B7B" FACE="Roboto"><I>collision_key</I></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT COLOR="#7B7B7B" FACE="Roboto"><I>CharField</I></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto"><I>created_on</I></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto"><I>DateTimeField</I></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto"><I>is_sent</I></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto"><I>BooleanField</I></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">zaak_info_object_uuid</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">UUIDField</FONT>
     </TD></TR>
-  
-  
+
+
     </TABLE>
     >]
 

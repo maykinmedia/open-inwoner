@@ -1,6 +1,6 @@
 # This docker-compose is used internally in the testsuite to dynamically spin up
 # an OpenKlant2 backend, seed it with known data, and record VCR fixtures. Be
-# sure to verify any changes here are consistent with 
+# sure to verify any changes here are consistent with
 version: '3'
 
 services:

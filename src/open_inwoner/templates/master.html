@@ -63,7 +63,7 @@
     </head>
 
     <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="utrecht-page">
-    
+
         {% if cookiebanner_enabled %}
         {# render cookiebanner first #}
         <div class="cookie-banner" id="cookie-banner" aria-labelledby="cookie-banner__title" aria-describedby="cookie-banner__text">
@@ -79,7 +79,7 @@
             </div>
         </div>
         {% endif %}
-        
+
         {% include "components/Header/AccessibilitySkipLink.html" %}
 
         {% if warning_banner_enabled %}
