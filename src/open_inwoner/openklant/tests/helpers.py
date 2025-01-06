@@ -1,5 +1,4 @@
 from django.test import TestCase as DjangoTestCase
-
 from typing_extensions import TypedDict
 from vcr.record_mode import RecordMode
 from vcr.unittest import VCRMixin

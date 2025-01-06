@@ -6,7 +6,6 @@ import open_inwoner.utils.validators
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("pdc", "0028_auto_20220312_1107"),
     ]

@@ -1,6 +1,5 @@
 from django.contrib import admin, messages
 from django.utils.translation import gettext_lazy as _
-
 from requests.exceptions import RequestException
 
 from .models import NotificationsAPIConfig, Subscription

@@ -1,6 +1,5 @@
 from django.test import override_settings, tag
 from django.urls import reverse_lazy
-
 from django_webtest import WebTest
 from playwright.sync_api import expect
 

@@ -4,7 +4,6 @@ from django import forms
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-
 from ipware import get_client_ip
 from requests.exceptions import RequestException
 

@@ -1,5 +1,4 @@
 from django.db import DataError
-
 from zgw_consumers.constants import APITypes
 
 from open_inwoner.openzaak.tests.factories import (
@@ -141,7 +140,6 @@ class TestRequiredCatalogusConfigServiceUnhappyPath(
         )
 
     def test_migration_0051_to_0052_raises_for_multiple_api_groups(self):
-
         with self.assertRaises(DataError) as cm:
             self.attempt_migration()
 

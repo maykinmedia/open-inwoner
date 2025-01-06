@@ -2,12 +2,12 @@ import concurrent.futures
 import enum
 import functools
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable, TypedDict
+from typing import TypedDict
 
 from django.http import HttpRequest
 from django.utils.translation import gettext_lazy as _
-
 from zgw_consumers.concurrent import parallel
 
 from open_inwoner.openzaak.api_models import OpenSubmission, Zaak
@@ -226,9 +226,7 @@ class CaseListService:
                     case = futures[task]["case"]
                     group = futures[task]["api_group"]
                     logger.exception(
-                        "Error while resolving case {case} with API group {group}".format(
-                            case=case, group=group
-                        )
+                        f"Error while resolving case {case} with API group {group}"
                     )
 
         return resolved_cases
@@ -266,7 +264,7 @@ class CaseListService:
             ):
                 try:
                     update_case = task.result()
-                    if hasattr(update_case, "__call__"):
+                    if callable(update_case):
                         update_case(case)
                 except BaseException:
                     logger.exception("Error in resolving case", stack_info=True)

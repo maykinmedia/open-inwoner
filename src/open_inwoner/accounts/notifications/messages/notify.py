@@ -2,7 +2,6 @@ import logging
 
 from django.db.models import Count
 from django.urls import reverse
-
 from mail_editor.helpers import find_template
 
 from open_inwoner.accounts.models import Message, User

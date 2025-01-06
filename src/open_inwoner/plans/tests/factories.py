@@ -1,6 +1,5 @@
-from django.core.files.uploadedfile import SimpleUploadedFile
-
 import factory
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 from open_inwoner.accounts.tests.factories import UserFactory
 

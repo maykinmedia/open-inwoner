@@ -1,10 +1,9 @@
-from django import forms
-from django.db import models
-from django.utils.translation import gettext_lazy as _
-
 from cms.models import CMSPlugin
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
+from django import forms
+from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from open_inwoner.ckeditor5.widgets import CKEditorWidget
 

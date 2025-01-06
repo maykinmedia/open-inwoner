@@ -2,17 +2,15 @@
 
 import django.contrib.gis.db.models.fields
 import django.db.models.deletion
-from django.conf import settings
-from django.db import migrations, models
-
 import filer.fields.image
 import localflavor.nl.models
+from django.conf import settings
+from django.db import migrations, models
 
 import open_inwoner.utils.validators
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.FILER_IMAGE_MODEL),
         ("pdc", "0004_productlink_productlocation"),

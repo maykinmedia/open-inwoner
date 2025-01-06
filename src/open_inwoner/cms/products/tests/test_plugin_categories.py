@@ -1,12 +1,11 @@
 from datetime import date
 from unittest.mock import patch
 
-from django.test import TestCase
-from django.test.utils import override_settings
-
 import requests_mock
 from cms.apphook_pool import apphook_pool
 from dateutil.relativedelta import relativedelta
+from django.test import TestCase
+from django.test.utils import override_settings
 from django_webtest import TransactionWebTest, WebTest
 from furl import furl
 from requests import RequestException

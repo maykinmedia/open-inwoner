@@ -15,7 +15,6 @@ from django.urls import resolve, reverse
 from django.urls.exceptions import Resolver404
 from django.utils.html import format_html, format_html_join
 from django.utils.translation import gettext_lazy as _
-
 from ordered_model.admin import OrderedInlineModelAdminMixin, OrderedTabularInline
 from solo.admin import SingletonModelAdmin
 
@@ -340,14 +339,7 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
         def check_contrast_ratio(label1, color1, label2, color2, expected_ratio):
             ratio = get_contrast_ratio(color1, color2)
             if ratio < expected_ratio:
-                message = "'{label1}' ({color1}) en '{label2}' ({color2}) hebben niet genoeg contrast: {ratio}:1 waar {expected}:1 wordt verwacht.".format(
-                    label1=label1,
-                    color1=color1,
-                    label2=label2,
-                    color2=color2,
-                    ratio=round(ratio, 1),
-                    expected=expected_ratio,
-                )
+                message = f"'{label1}' ({color1}) en '{label2}' ({color2}) hebben niet genoeg contrast: {round(ratio, 1)}:1 waar {expected_ratio}:1 wordt verwacht."
                 self.message_user(request, message, messages.WARNING)
 
         check_contrast_ratio(

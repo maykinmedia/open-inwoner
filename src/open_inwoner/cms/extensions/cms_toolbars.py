@@ -1,7 +1,6 @@
-from django.utils.translation import gettext_lazy as _
-
 from cms.extensions.toolbar import ExtensionToolbar
 from cms.toolbar_pool import toolbar_pool
+from django.utils.translation import gettext_lazy as _
 
 from .models import CommonExtension
 

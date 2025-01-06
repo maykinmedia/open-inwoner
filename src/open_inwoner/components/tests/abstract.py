@@ -1,8 +1,7 @@
-from django.template import Context, Template
-from django.test import RequestFactory
-
 from bs4 import BeautifulSoup
 from bs4.element import ResultSet, Tag
+from django.template import Context, Template
+from django.test import RequestFactory
 from django_webtest import WebTest
 
 

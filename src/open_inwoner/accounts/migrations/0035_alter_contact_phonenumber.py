@@ -6,7 +6,6 @@ import open_inwoner.utils.validators
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("accounts", "0034_alter_message_content"),
     ]

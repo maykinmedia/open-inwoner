@@ -1,13 +1,12 @@
 from datetime import date
 from io import BytesIO
 
+import requests_mock
 from django.contrib.auth.models import AnonymousUser
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-
-import requests_mock
 from django_webtest import TransactionWebTest
 from privates.test import temp_private_root
 from timeline_logger.models import TimelineLog

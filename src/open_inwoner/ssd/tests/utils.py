@@ -1,5 +1,4 @@
 from django.template.loader import render_to_string
-
 from lxml import etree
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.parsers import XmlParser

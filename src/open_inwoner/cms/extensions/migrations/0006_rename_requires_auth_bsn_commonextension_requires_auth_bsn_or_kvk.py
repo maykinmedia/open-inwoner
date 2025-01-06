@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("extensions", "0005_alter_commonextension_menu_icon"),
     ]

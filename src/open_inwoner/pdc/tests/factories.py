@@ -1,7 +1,6 @@
+import factory.fuzzy
 from django.contrib.gis.geos import Point
 from django.utils.text import slugify
-
-import factory.fuzzy
 
 from ..models import (
     Category,

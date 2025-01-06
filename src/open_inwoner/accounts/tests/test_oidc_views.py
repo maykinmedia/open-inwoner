@@ -3,15 +3,14 @@ from typing import Literal
 from unittest.mock import patch
 from urllib.parse import urlencode
 
+import requests
+import requests_mock
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test import TestCase, modify_settings, override_settings
 from django.urls import reverse
 from django.utils.translation import gettext as _
-
-import requests
-import requests_mock
 from django_webtest import DjangoTestApp, DjangoWebtestResponse, WebTest
 from furl import furl
 from mozilla_django_oidc_db.models import OpenIDConnectConfig

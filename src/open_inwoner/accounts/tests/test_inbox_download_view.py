@@ -1,7 +1,6 @@
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import override_settings
 from django.urls import reverse
-
 from django_webtest import WebTest
 from privates.test import temp_private_root
 

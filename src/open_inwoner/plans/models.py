@@ -6,7 +6,6 @@ from django.db.models import Q
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-
 from filer.fields.file import FilerFileField
 
 from open_inwoner.accounts.choices import StatusChoices, TypeChoices

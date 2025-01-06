@@ -2,7 +2,6 @@ from django.contrib.admin.models import ADDITION, CHANGE
 from django.test import override_settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-
 from django_webtest import WebTest
 from freezegun import freeze_time
 from privates.test import temp_private_root

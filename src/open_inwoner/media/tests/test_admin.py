@@ -1,6 +1,5 @@
-from django.urls import reverse
-
 from cms.utils.permissions import set_current_user
+from django.urls import reverse
 from django_webtest import WebTest
 from maykin_2fa.test import disable_admin_mfa
 

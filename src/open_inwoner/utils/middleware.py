@@ -4,7 +4,6 @@ from django.conf import settings
 from django.shortcuts import redirect, resolve_url
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
-
 from furl import furl
 
 

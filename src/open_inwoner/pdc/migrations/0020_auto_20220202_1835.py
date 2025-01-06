@@ -2,14 +2,12 @@
 
 import django.contrib.postgres.fields
 import django.db.models.deletion
+import filer.fields.image
 from django.conf import settings
 from django.db import migrations, models
 
-import filer.fields.image
-
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.FILER_IMAGE_MODEL),
         ("pdc", "0019_product_uniforme_productnaam"),

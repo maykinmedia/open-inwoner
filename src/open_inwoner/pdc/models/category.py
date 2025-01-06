@@ -1,7 +1,6 @@
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-
 from django_jsonform.models.fields import ArrayField
 from filer.fields.image import FilerImageField
 from treebeard.exceptions import InvalidMoveToDescendant

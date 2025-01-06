@@ -3,7 +3,6 @@ from typing import TypedDict
 
 from django.core import signing
 from django.urls import reverse
-
 from furl import furl
 from mail_editor.helpers import find_template
 

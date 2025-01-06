@@ -7,7 +7,6 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import NoReverseMatch, reverse
 from django.utils.translation import gettext as _
 from django.views.generic import TemplateView, UpdateView
-
 from django_registration.backends.one_step.views import RegistrationView
 from furl import furl
 

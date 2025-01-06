@@ -8,7 +8,6 @@ from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
 from django.template import loader
 from django.utils.translation import gettext_lazy as _
-
 from django_registration.forms import RegistrationForm
 
 from open_inwoner.cms.utils.page_display import (

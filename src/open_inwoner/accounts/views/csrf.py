@@ -3,6 +3,8 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views.csrf import (
     CSRF_FAILURE_TEMPLATE_NAME,
+)
+from django.views.csrf import (
     csrf_failure as original_csrf_failure,
 )
 

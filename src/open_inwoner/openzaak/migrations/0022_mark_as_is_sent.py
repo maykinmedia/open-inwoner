@@ -15,7 +15,6 @@ def mark_as_is_sent(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("openzaak", "0021_add_is_sent_to_notification_records"),
     ]

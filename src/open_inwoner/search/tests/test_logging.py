@@ -1,7 +1,6 @@
 from django.test import tag
 from django.urls import reverse
 from django.utils.translation import gettext as _
-
 from django_webtest import WebTest
 from freezegun import freeze_time
 from timeline_logger.models import TimelineLog

@@ -2,13 +2,11 @@
 
 import uuid
 
-from django.db import migrations, models
-
 import privates.storages
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("accounts", "0007_contact_uuid"),
     ]

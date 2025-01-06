@@ -8,7 +8,6 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import NoReverseMatch, path, reverse
 from django.utils.html import escape, format_html
 from django.utils.translation import gettext as _
-
 from django_celery_beat.admin import PeriodicTaskAdmin as _PeriodicTaskAdmin
 from django_celery_beat.models import PeriodicTask
 from import_export.admin import ExportMixin
@@ -121,9 +120,7 @@ class CustomTimelineLogAdmin(ExportMixin, TimelineLogAdmin):
             ct = obj.content_type
             try:
                 url = reverse(
-                    ("admin:{app_label}_{model}_change").format(
-                        app_label=ct.app_label, model=ct.model
-                    ),
+                    (f"admin:{ct.app_label}_{ct.model}_change"),
                     args=[obj.object_id],
                 )
                 link = format_html(

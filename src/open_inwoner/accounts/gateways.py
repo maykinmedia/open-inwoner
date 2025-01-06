@@ -1,10 +1,9 @@
 import logging
 
+import messagebird
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.module_loading import import_string
-
-import messagebird
 
 logger = logging.getLogger(__name__)
 
@@ -66,9 +65,7 @@ class MessageBird(Gateway):
             )
         except messagebird.client.ErrorException as e:
             for error in e.errors:
-                logger.critical(
-                    ("Could not send SMS to {to}:\n{error}").format(to=to, error=error)
-                )
+                logger.critical(f"Could not send SMS to {to}:\n{error}")
             raise GatewayError()
         else:
             logging.debug('Sent SMS to %s: "%s"', to, self.get_message(token))

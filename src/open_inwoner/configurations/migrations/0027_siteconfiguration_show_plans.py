@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("configurations", "0026_alter_siteconfiguration_select_questionnaire_intro"),
     ]

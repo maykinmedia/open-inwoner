@@ -1,15 +1,14 @@
 import logging
 from typing import Literal
 
+from axes.backends import AxesBackend
+from digid_eherkenning.oidc.backends import BaseBackend
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import AbstractUser
 from django.urls import reverse, reverse_lazy
-
-from axes.backends import AxesBackend
-from digid_eherkenning.oidc.backends import BaseBackend
 from mozilla_django_oidc_db.backends import OIDCAuthenticationBackend
 from mozilla_django_oidc_db.config import dynamic_setting
 from mozilla_django_oidc_db.typing import JSONObject

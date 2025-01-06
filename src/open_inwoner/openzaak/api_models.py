@@ -2,11 +2,10 @@ import logging
 import re
 from dataclasses import dataclass, field
 from datetime import date, datetime
-from typing import Optional, Union
-
-from django.utils.translation import gettext as _
+from typing import Union
 
 from dateutil.relativedelta import relativedelta
+from django.utils.translation import gettext as _
 from zgw_consumers.api_models.base import Model, ZGWModel
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 
@@ -32,12 +31,12 @@ class Zaak(ZGWModel):
     registratiedatum: date
     startdatum: date
     vertrouwelijkheidaanduiding: str
-    status: Optional[Union[str, "Status"]]
-    einddatum_gepland: Optional[date] = None
-    uiterlijke_einddatum_afdoening: Optional[date] = None
+    status: Union[str, "Status"] | None
+    einddatum_gepland: date | None = None
+    uiterlijke_einddatum_afdoening: date | None = None
     #    publicatiedatum: Optional[date]
-    einddatum: Optional[date] = None
-    resultaat: Optional[Union[str, "Resultaat"]] = None
+    einddatum: date | None = None
+    resultaat: Union[str, "Resultaat"] | None = None
     #    relevante_andere_zaken: list
     #    zaakgeometrie: dict
 
@@ -155,21 +154,21 @@ class ZaakType(ZGWModel):
     # roltypen: list
     # besluittypen: list
 
-    begin_geldigheid: Optional[date] = None
-    einde_geldigheid: Optional[date] = None
-    versiedatum: Optional[date] = None
-    concept: Optional[bool] = None
+    begin_geldigheid: date | None = None
+    einde_geldigheid: date | None = None
+    versiedatum: date | None = None
+    concept: bool | None = None
 
 
 @dataclass
 class ZaakInformatieObject(ZGWModel):
     url: str
     informatieobject: Union[str, "InformatieObject"]
-    zaak: Union[str, Zaak]
+    zaak: str | Zaak
     # aard_relatie_weergave: str
     titel: str
     # beschrijving: str
-    registratiedatum: Optional[datetime]
+    registratiedatum: datetime | None
 
 
 @dataclass
@@ -178,8 +177,8 @@ class InformatieObjectType(ZGWModel):
     catalogus: str
     omschrijving: str
     vertrouwelijkheidaanduiding: str
-    begin_geldigheid: Optional[date] = None
-    einde_geldigheid: Optional[date] = None
+    begin_geldigheid: date | None = None
+    einde_geldigheid: date | None = None
     concept: bool = False
 
 
@@ -201,15 +200,15 @@ class InformatieObject(ZGWModel):
     inhoud: str
     bestandsomvang: int
     # indicatieGebruiksrecht: str
-    informatieobjecttype: Union[str, InformatieObjectType]
+    informatieobjecttype: str | InformatieObjectType
     locked: bool
     # bestandsdelen: List[str]
-    beschrijving: Optional[str] = ""
-    link: Optional[str] = ""
-    ontvangstdatum: Optional[str] = ""
-    verzenddatum: Optional[str] = ""
-    ondertekening: Optional[dict] = None  # {'soort': '', 'datum': None}
-    integriteit: Optional[dict] = None  # {'algoritme': '', 'waarde': '', 'datum': None}
+    beschrijving: str | None = ""
+    link: str | None = ""
+    ontvangstdatum: str | None = ""
+    verzenddatum: str | None = ""
+    ondertekening: dict | None = None  # {'soort': '', 'datum': None}
+    integriteit: dict | None = None  # {'algoritme': '', 'waarde': '', 'datum': None}
 
 
 @dataclass
@@ -225,14 +224,14 @@ class Rol(ZGWModel):
     url: str
     zaak: str
     betrokkene_type: str
-    roltype: Union[str, RolType]
+    roltype: str | RolType
     omschrijving: str
     omschrijving_generiek: str
     roltoelichting: str
-    indicatie_machtiging: Optional[str] = ""
-    registratiedatum: Optional[datetime] = None
-    betrokkene: Optional[str] = ""
-    betrokkene_identificatie: Optional[dict] = None
+    indicatie_machtiging: str | None = ""
+    registratiedatum: datetime | None = None
+    betrokkene: str | None = ""
+    betrokkene_identificatie: dict | None = None
 
     def get_betrokkene_type_display(self):
         return RolTypes[self.betrokkene_type].label
@@ -252,8 +251,8 @@ class ResultaatType(ZGWModel):
     omschrijving_generiek: str = ""
     toelichting: str = ""
     archiefnominatie: str = ""
-    archiefactietermijn: Optional[relativedelta] = None
-    brondatum_archiefprocedure: Optional[dict] = None
+    archiefactietermijn: relativedelta | None = None
+    brondatum_archiefprocedure: dict | None = None
 
     # E-suite compatibility
     # result description ("omschrijving") with >20 chars
@@ -263,9 +262,9 @@ class ResultaatType(ZGWModel):
 @dataclass
 class Resultaat(ZGWModel):
     url: str
-    zaak: Union[str, Zaak]
-    resultaattype: Union[str, ResultaatType]
-    toelichting: Optional[str] = ""
+    zaak: str | Zaak
+    resultaattype: str | ResultaatType
+    toelichting: str | None = ""
 
 
 @dataclass
@@ -273,21 +272,21 @@ class StatusType(ZGWModel):
     url: str  # bug: not required according to OAS
     zaaktype: str
     omschrijving: str
-    volgnummer: Optional[int]  # not in eSuite
+    volgnummer: int | None  # not in eSuite
     omschrijving_generiek: str = ""
     statustekst: str = ""
     is_eindstatus: bool = False
     # not in eSuite
-    informeren: Optional[bool] = False
+    informeren: bool | None = False
 
 
 @dataclass
 class Status(ZGWModel):
     url: str
-    zaak: Union[str, Zaak]
-    statustype: Union[str, StatusType]
-    datum_status_gezet: Optional[datetime] = None
-    statustoelichting: Optional[str] = ""
+    zaak: str | Zaak
+    statustype: str | StatusType
+    datum_status_gezet: datetime | None = None
+    statustoelichting: str | None = ""
 
 
 @dataclass
@@ -325,8 +324,8 @@ class OpenSubmission(Model):
     uuid: str
     naam: str
     datum_laatste_wijziging: datetime
-    vervolg_link: Optional[str] = None
-    eind_datum_geldigheid: Optional[datetime] = None
+    vervolg_link: str | None = None
+    eind_datum_geldigheid: datetime | None = None
 
     @property
     def identification(self) -> str:

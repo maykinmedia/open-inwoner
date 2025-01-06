@@ -1,9 +1,8 @@
 from urllib.parse import urlencode
 
+import requests_mock
 from django.test import TransactionTestCase, override_settings, tag
 from django.urls import reverse
-
-import requests_mock
 from furl import furl
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 

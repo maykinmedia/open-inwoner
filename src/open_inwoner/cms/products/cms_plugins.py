@@ -1,9 +1,8 @@
-from django.urls import NoReverseMatch, resolve, reverse
-from django.utils.translation import gettext_lazy as _
-
 from cms.apphook_pool import apphook_pool
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
+from django.urls import NoReverseMatch, resolve, reverse
+from django.utils.translation import gettext_lazy as _
 
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.pdc.forms import ProductFinderForm

@@ -1,10 +1,9 @@
+import markdown as md
 from django import template
 from django.conf import settings
 from django.http import HttpRequest
 from django.template.defaultfilters import stringfilter
 from django.utils.html import format_html
-
-import markdown as md
 from humanfriendly import format_size
 
 register = template.Library()
@@ -59,7 +58,7 @@ def placekitten(width=800, height=600):
         {%placekitten %}
         {%placekitten 200 200 %}
     """
-    return format_html('<img src="{}" />'.format(placekitten_src(width, height)))
+    return format_html(f'<img src="{placekitten_src(width, height)}" />')
 
 
 @register.simple_tag
@@ -72,7 +71,7 @@ def placekitten_src(width=800, height=600):
         {% placekitten_src 200 200 as mobile_src %}
         {% include 'components/image/image.html' with mobile_src=mobile_src src=src alt='placekitten' only %}
     """
-    return "//placekitten.com/{}/{}".format(width, height)
+    return f"//placekitten.com/{width}/{height}"
 
 
 @register.simple_tag

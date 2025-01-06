@@ -1,6 +1,7 @@
 import logging
 from urllib.parse import urlencode
 
+from digid_eherkenning.views.base import get_redirect_url
 from django.conf import settings
 from django.contrib import auth, messages
 from django.http import HttpResponseBadRequest, HttpResponseRedirect
@@ -9,8 +10,6 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import RedirectView
-
-from digid_eherkenning.views.base import get_redirect_url
 
 from eherkenning.mock import eherkenning_conf as conf
 

@@ -2,7 +2,6 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.test import override_settings
 from django.urls import reverse
-
 from django_webtest import WebTest
 
 from ..models import Question

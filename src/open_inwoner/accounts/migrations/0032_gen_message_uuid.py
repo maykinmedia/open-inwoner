@@ -13,7 +13,6 @@ def gen_uuid_message(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("accounts", "0031_message_uuid"),
     ]

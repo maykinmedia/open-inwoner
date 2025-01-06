@@ -1,11 +1,10 @@
 import logging
-from typing import Sequence
+from collections.abc import Sequence
 
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
-
 from furl import furl
 from view_breadcrumbs import BaseBreadcrumbMixin
 

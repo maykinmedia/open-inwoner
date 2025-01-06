@@ -1,9 +1,8 @@
 import logging
 
+import tablib
 from django.urls import reverse
 from django.utils.translation import gettext as _
-
-import tablib
 from django_webtest import WebTest
 from freezegun import freeze_time
 from maykin_2fa.test import disable_admin_mfa

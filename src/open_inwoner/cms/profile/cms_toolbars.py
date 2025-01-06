@@ -1,9 +1,8 @@
-from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
-
 from aldryn_apphooks_config.utils import get_app_instance
 from cms.extensions.toolbar import ExtensionToolbar
 from cms.toolbar_pool import toolbar_pool
+from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
 

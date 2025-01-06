@@ -56,7 +56,6 @@ class OpenZaakConfigurationStep(BaseConfigurationStep):
         config = OpenZaakConfig.get_solo()
 
         for api_group in model.api_groups:
-
             try:
                 zrc_service = get_service(
                     api_group.zaken_api_identifier,

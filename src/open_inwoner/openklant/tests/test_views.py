@@ -3,12 +3,11 @@ from datetime import datetime
 from unittest.mock import patch
 from uuid import uuid4
 
+import requests_mock
 from django.contrib.auth import signals
 from django.test import modify_settings, override_settings
 from django.urls import reverse
 from django.utils.translation import gettext as _
-
-import requests_mock
 from django_webtest import TransactionWebTest
 from freezegun import freeze_time
 from pyquery import PyQuery

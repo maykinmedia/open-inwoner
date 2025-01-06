@@ -3,7 +3,6 @@ from django.template.defaultfilters import filesizeformat
 from django.test import override_settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-
 from django_webtest import WebTest
 from privates.test import temp_private_root
 from webtest import Upload
@@ -22,7 +21,6 @@ class TestActionFileUploadLimits(WebTest):
 
     @temp_private_root()
     def test_valid_type_of_file_is_uploaded(self):
-
         self.form["file"] = Upload("readme.xlsx", b"data", "application/vnd.ms-excel")
         self.form["name"] = "Action name"
         upload_response = self.form.submit()

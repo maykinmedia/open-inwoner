@@ -1,10 +1,9 @@
 import logging
 from urllib.parse import quote
 
+from ape_pie.client import APIClient
 from django.conf import settings
 from django.core.cache import cache
-
-from ape_pie.client import APIClient
 from requests.exceptions import RequestException
 
 from open_inwoner.utils.api import ClientError, get_json_response

@@ -43,7 +43,7 @@ def format_currency(value: str) -> str:
         return "0,00"
 
     try:
-        return "{:.2f}".format(float(value) / 100).replace(".", ",")
+        return f"{float(value) / 100:.2f}".replace(".", ",")
     except ValueError:
         return ""
 

@@ -1,10 +1,9 @@
 from unittest.mock import patch
 
+import requests_mock
 from django.contrib.messages.middleware import MessageMiddleware
 from django.test import TestCase, tag
 from django.utils.translation import gettext as _
-
-import requests_mock
 
 from open_inwoner.accounts.tests.factories import DigidUserFactory
 from open_inwoner.cms.tests.cms_tools import get_request

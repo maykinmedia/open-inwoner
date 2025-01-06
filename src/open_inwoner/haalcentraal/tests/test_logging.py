@@ -1,6 +1,5 @@
-from django.test import TestCase, override_settings
-
 import requests_mock
+from django.test import TestCase, override_settings
 from freezegun import freeze_time
 from log_outgoing_requests.models import OutgoingRequestsLog
 

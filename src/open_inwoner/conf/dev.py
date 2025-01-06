@@ -10,9 +10,9 @@ os.environ.setdefault(
 os.environ.setdefault("IS_HTTPS", "no")
 os.environ.setdefault("VERSION_TAG", "dev")
 
-os.environ.setdefault("DB_NAME", "open_inwoner"),
-os.environ.setdefault("DB_USER", "open_inwoner"),
-os.environ.setdefault("DB_PASSWORD", "open_inwoner"),
+(os.environ.setdefault("DB_NAME", "open_inwoner"),)
+(os.environ.setdefault("DB_USER", "open_inwoner"),)
+(os.environ.setdefault("DB_PASSWORD", "open_inwoner"),)
 
 os.environ.setdefault("ENVIRONMENT", "development")
 

@@ -1,5 +1,4 @@
 from django.core.exceptions import ValidationError
-
 from django_setup_configuration.configuration import BaseConfigurationStep
 from django_setup_configuration.exceptions import ConfigurationRunFailed
 from django_setup_configuration.fields import DjangoModelRef
@@ -13,7 +12,6 @@ from open_inwoner.openklant.models import OpenKlant2Config, OpenKlantConfig
 
 
 class OpenKlant2Configuration(ConfigurationModel):
-
     service_identifier: str = DjangoModelRef(OpenKlant2Config, "service")
     mijn_vragen_actor: UUID4 = DjangoModelRef(OpenKlant2Config, "mijn_vragen_actor")
 

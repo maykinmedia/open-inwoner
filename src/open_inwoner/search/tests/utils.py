@@ -1,5 +1,4 @@
 from django.core.management import call_command
-
 from django_elasticsearch_dsl.registries import registry
 from django_elasticsearch_dsl.test.testcases import ESTestCase
 

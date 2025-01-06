@@ -1,6 +1,5 @@
 from django.contrib.staticfiles import finders
 from django.template.loader import render_to_string
-
 from weasyprint import CSS, HTML
 
 

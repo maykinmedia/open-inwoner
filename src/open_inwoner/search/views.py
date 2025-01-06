@@ -7,7 +7,6 @@ from django.http.response import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
 from django.views.generic import FormView
-
 from furl import furl
 
 from open_inwoner.configurations.models import SiteConfiguration

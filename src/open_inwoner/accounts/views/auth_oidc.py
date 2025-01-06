@@ -1,6 +1,8 @@
 import logging
 from urllib.parse import urlencode
 
+from digid_eherkenning.oidc.models import BaseConfig
+from digid_eherkenning.oidc.views import OIDCAuthenticationCallbackView
 from django.conf import settings
 from django.contrib import auth, messages
 from django.core.exceptions import ValidationError
@@ -10,9 +12,6 @@ from django.shortcuts import resolve_url
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import View
-
-from digid_eherkenning.oidc.models import BaseConfig
-from digid_eherkenning.oidc.views import OIDCAuthenticationCallbackView
 from mozilla_django_oidc_db.views import _OIDC_ERROR_SESSION_KEY, OIDCInit
 
 from ..models import OpenIDDigiDConfig, OpenIDEHerkenningConfig

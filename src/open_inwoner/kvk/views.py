@@ -3,7 +3,6 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
-
 from furl import furl
 
 from open_inwoner.kvk.branches import KVK_BRANCH_SESSION_VARIABLE

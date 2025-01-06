@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("pdc", "0020_auto_20220202_1835"),
         ("pdc", "0020_productcontact_role"),

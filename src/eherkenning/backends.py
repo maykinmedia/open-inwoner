@@ -1,8 +1,7 @@
-from django.contrib.auth import get_user_model
-
 from digid_eherkenning.backends import eHerkenningBackend as _eHerkenningBackend
 from digid_eherkenning.exceptions import eHerkenningError
 from digid_eherkenning.utils import get_client_ip
+from django.contrib.auth import get_user_model
 
 from open_inwoner.kvk.branches import KVK_BRANCH_SESSION_VARIABLE
 

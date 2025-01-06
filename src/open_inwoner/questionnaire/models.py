@@ -2,7 +2,6 @@ from django.db import models
 from django.db.models import QuerySet
 from django.urls import reverse
 from django.utils.translation import gettext as _
-
 from filer.fields.file import FilerFileField
 from treebeard.mp_tree import MP_Node
 
@@ -110,7 +109,7 @@ class QuestionnaireStep(MP_Node):
         ordering = ("path",)
 
     def __str__(self) -> str:
-        return "({} - {}) {}".format(self.id, self.code, self.question)
+        return f"({self.id} - {self.code}) {self.question}"
 
     def get_absolute_url(self) -> str:
         if self.is_root():

@@ -1,7 +1,6 @@
+from digid_eherkenning.managers import BaseDigidManager, BaseeHerkenningManager
 from django.contrib.auth.models import BaseUserManager
 from django.db.models import Q, QuerySet
-
-from digid_eherkenning.managers import BaseDigidManager, BaseeHerkenningManager
 
 from open_inwoner.utils.hash import generate_email_from_string
 
@@ -34,7 +33,7 @@ class eHerkenningManager(BaseeHerkenningManager):
 
     def eherkenning_create(self, kvk, **kwargs):
         return super().create(
-            email="user-{}@localhost".format(kvk),
+            email=f"user-{kvk}@localhost",
             login_type=LoginTypeChoices.eherkenning,
             kvk=kvk,
         )

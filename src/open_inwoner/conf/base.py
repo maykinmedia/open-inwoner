@@ -1,9 +1,8 @@
 import os
 
-from django.utils.translation import gettext_lazy as _
-
 import sentry_sdk
 from celery.schedules import crontab
+from django.utils.translation import gettext_lazy as _
 from easy_thumbnails.conf import Settings as thumbnail_settings
 from log_outgoing_requests.formatters import HttpFormatter
 
@@ -995,7 +994,7 @@ from .parts.maileditor import (  # noqa
 )
 
 if ALLOWED_HOSTS:
-    BASE_URL = "https://{}".format(ALLOWED_HOSTS[0])
+    BASE_URL = f"https://{ALLOWED_HOSTS[0]}"
 else:
     BASE_URL = "https://example.com"
 

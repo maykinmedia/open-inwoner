@@ -1,6 +1,5 @@
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-
 from mozilla_django_oidc_db.models import OpenIDConnectConfig
 
 from .choices import OpenIDDisplayChoices

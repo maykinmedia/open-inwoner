@@ -1,12 +1,11 @@
 from unittest.mock import patch
 
+import requests_mock
 from django.contrib import messages
 from django.core import mail
 from django.test import modify_settings
 from django.urls import reverse
 from django.utils.translation import gettext as _
-
-import requests_mock
 from django_webtest import WebTest
 
 from open_inwoner.accounts.tests.factories import UserFactory

@@ -3,7 +3,6 @@ from unittest.mock import patch
 from django.contrib import auth
 from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse
-
 from furl import furl
 from mozilla_django_oidc_db.config import store_config
 

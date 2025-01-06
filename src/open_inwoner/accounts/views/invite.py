@@ -3,7 +3,6 @@ from django.http.response import Http404, HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
 from django.views.generic import UpdateView
-
 from furl import furl
 
 from open_inwoner.utils.views import CommonPageMixin, LogMixin

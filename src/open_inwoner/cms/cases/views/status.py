@@ -2,8 +2,9 @@ import dataclasses
 import datetime as dt
 import logging
 from collections import defaultdict
+from collections.abc import Iterable
 from datetime import datetime
-from typing import Iterable, Protocol
+from typing import Protocol
 
 from django.conf import settings
 from django.contrib import messages
@@ -19,7 +20,6 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import FormView, TemplateView
-
 from django_htmx.http import HttpResponseClientRedirect
 from mail_editor.helpers import find_template
 from view_breadcrumbs import BaseBreadcrumbMixin
@@ -317,7 +317,7 @@ class InnerCaseDetailView(
         # only 1 statustype for `self.case`
         # (this scenario is blocked by openzaak, but not part of the zgw standard)
         if len(statustype_numbers) < 2:
-            logger.info("Case {case} has only one statustype".format(case=self.case))
+            logger.info(f"Case {self.case} has only one statustype")
             return
 
         statustype_numbers.sort()
@@ -367,9 +367,7 @@ class InnerCaseDetailView(
             # Workaround: OIP requests the current zaak.status individually and adds the retrieved information to the statustype mapping
 
             logger.info(
-                "Issue #2037 -- Retrieving status individually for case {} because of eSuite".format(
-                    self.case.identification
-                )
+                f"Issue #2037 -- Retrieving status individually for case {self.case.identification} because of eSuite"
             )
             self.case.status = zaken_client.fetch_single_status(self.case.status)
             status_types_mapping[self.case.status.statustype].append(self.case.status)
@@ -460,9 +458,7 @@ class InnerCaseDetailView(
             ).exists()
         )
         logger.info(
-            "Case {url} has case type file upload: {case_upload_enabled}".format(
-                url=self.case.url, case_upload_enabled=case_upload_enabled
-            )
+            f"Case {self.case.url} has case type file upload: {case_upload_enabled}"
         )
         return case_upload_enabled
 
@@ -475,26 +471,18 @@ class InnerCaseDetailView(
         except AttributeError as e:
             logger.exception(e)
             logger.info(
-                "Could not retrieve status type for case {case}; "
-                "the status has not been resolved to a ZGW model object.".format(
-                    case=self.case
-                )
+                f"Could not retrieve status type for case {self.case}; "
+                "the status has not been resolved to a ZGW model object."
             )
             return True
         except KeyError as e:
             logger.exception(e)
             logger.info(
-                "Could not retrieve status type config for url {url}".format(
-                    url=self.case.status.statustype.url
-                )
+                f"Could not retrieve status type config for url {self.case.status.statustype.url}"
             )
             return True
         logger.info(
-            "Case {url} status type {status_type} has status type file upload: {enabled_for_status_type}".format(
-                url=self.case.url,
-                status_type=self.case.status.statustype,
-                enabled_for_status_type=enabled_for_status_type,
-            )
+            f"Case {self.case.url} status type {self.case.status.statustype} has status type file upload: {enabled_for_status_type}"
         )
         return enabled_for_status_type
 
@@ -664,7 +652,9 @@ class InnerCaseDetailView(
 
         config = OpenZaakConfig.get_solo()
         documents = []
-        for case_info_obj, info_obj in zip(case_info_objects, info_objects):
+        for case_info_obj, info_obj in zip(
+            case_info_objects, info_objects, strict=False
+        ):
             if not info_obj:
                 continue
             if not is_info_object_visible(
@@ -912,9 +902,9 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
             send_confirmation = False
 
             if config.register_email:
-                form.cleaned_data[
-                    "question"
-                ] += f"\n\nCase number: {self.case.identificatie}"
+                form.cleaned_data["question"] += (
+                    f"\n\nCase number: {self.case.identificatie}"
+                )
                 email_success = self.register_by_email(form, config.register_email)
                 send_confirmation = email_success
 

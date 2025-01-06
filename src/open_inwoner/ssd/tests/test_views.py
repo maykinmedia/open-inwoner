@@ -14,7 +14,6 @@ from unittest.mock import patch
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils.translation import gettext as _
-
 from freezegun import freeze_time
 from pyquery import PyQuery
 
@@ -135,7 +134,6 @@ class TestYearlyBenefitsFormView(TestCase):
         self.user.save()
 
     def test_jaaropgave_get(self):
-
         # request with anonymous user
         url = reverse("ssd:yearly_benefits_index")
         response = self.client.get(url)

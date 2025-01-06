@@ -1,6 +1,5 @@
-from django.test import TestCase
-
 import requests_mock
+from django.test import TestCase
 
 from open_inwoner.openklant.models import KlantContactMomentAnswer
 from open_inwoner.openklant.tests.data import MockAPIReadData

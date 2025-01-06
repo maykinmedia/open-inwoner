@@ -1,7 +1,6 @@
 from pathlib import Path
 
 from django.test import TestCase
-
 from django_setup_configuration.exceptions import ConfigurationRunFailed
 from django_setup_configuration.test_utils import execute_single_step
 from zgw_consumers.constants import APITypes

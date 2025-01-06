@@ -1,10 +1,8 @@
 from collections import OrderedDict
 from dataclasses import dataclass
 from operator import attrgetter
-from typing import Type
 
 from django.db import models
-
 from elasticsearch_dsl import FacetedResponse
 from elasticsearch_dsl.response import Response
 
@@ -29,7 +27,7 @@ class FacetBucket:
 class Facet:
     name: str
     buckets: list[FacetBucket]
-    model: Type[models.Model]
+    model: type[models.Model]
 
     def __init__(self, name: str, buckets: list, model: models.Model):
         self.name = name

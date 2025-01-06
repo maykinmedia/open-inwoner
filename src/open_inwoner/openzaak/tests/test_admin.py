@@ -2,11 +2,10 @@ import html
 import json
 from unittest import mock
 
+import freezegun
 from django.test import override_settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-
-import freezegun
 from django_webtest import WebTest
 from maykin_2fa.test import disable_admin_mfa
 from privates.storages import PrivateMediaFileSystemStorage
@@ -33,7 +32,6 @@ class TestZaakTypeConfigAdmin(WebTest):
         )
 
     def test_enabling_only_ztc_succeeds(self):
-
         response = self.app.get(
             reverse(
                 "admin:openzaak_zaaktypeconfig_change",
@@ -55,7 +53,6 @@ class TestZaakTypeConfigAdmin(WebTest):
         self.assertFalse(self.ztiotc.document_upload_enabled)
 
     def test_enabling_only_ztiotc_succeeds(self):
-
         response = self.app.get(
             reverse(
                 "admin:openzaak_zaaktypeconfig_change",

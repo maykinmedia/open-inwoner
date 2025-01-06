@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.test import TestCase, override_settings
 from django.urls import reverse
-
 from maykin_2fa.test import disable_admin_mfa
 from pyquery import PyQuery as pq
 

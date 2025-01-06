@@ -1,9 +1,8 @@
 import logging
 
+import requests_mock
 from django.test import TestCase, override_settings
 from django.utils.translation import gettext as _
-
-import requests_mock
 from freezegun import freeze_time
 from timeline_logger.models import TimelineLog
 

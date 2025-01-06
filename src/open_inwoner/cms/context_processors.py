@@ -1,6 +1,5 @@
-from django.db.models import Q
-
 from cms.models import Page
+from django.db.models import Q
 
 
 def active_apphooks(request):

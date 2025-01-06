@@ -1,7 +1,6 @@
-from django.utils.text import slugify
-
 import markdown
 from bs4 import BeautifulSoup
+from django.utils.text import slugify
 
 PRODUCT_PATH_NAME = "products"
 

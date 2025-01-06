@@ -2,7 +2,6 @@ from datetime import timedelta
 from uuid import uuid4
 
 from django.test import TestCase
-
 from freezegun import freeze_time
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.test import generate_oas_component

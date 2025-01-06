@@ -3,7 +3,6 @@ from unittest.mock import Mock, patch
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils.translation import gettext as _
-
 from zgw_consumers.api_models.base import factory
 
 from open_inwoner.openzaak.api_models import (

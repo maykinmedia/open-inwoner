@@ -1,9 +1,8 @@
 import logging
 
-from django.utils.translation import gettext as _
-
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
+from django.utils.translation import gettext as _
 
 from open_inwoner.cms.plugins.models.appointments import UserAppointments
 from open_inwoner.qmatic.client import NoServiceConfigured, QmaticClient

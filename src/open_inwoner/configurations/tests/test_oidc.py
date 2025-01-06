@@ -1,6 +1,5 @@
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-
 from django_webtest import WebTest
 from maykin_2fa.test import disable_admin_mfa
 from mozilla_django_oidc_db.models import OpenIDConnectConfig

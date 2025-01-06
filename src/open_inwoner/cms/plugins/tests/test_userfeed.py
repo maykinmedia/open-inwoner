@@ -1,7 +1,6 @@
 from django.test import TestCase
 from django.utils.html import strip_tags
 from django.utils.translation import ngettext
-
 from pyquery import PyQuery as PQ
 
 from open_inwoner.accounts.tests.factories import UserFactory

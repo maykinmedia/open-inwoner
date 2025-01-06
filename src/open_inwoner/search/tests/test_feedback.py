@@ -4,7 +4,6 @@ from django.contrib import messages
 from django.test import override_settings, tag
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-
 from django_webtest import WebTest
 from furl import furl
 

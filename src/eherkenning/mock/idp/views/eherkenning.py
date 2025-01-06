@@ -4,7 +4,6 @@ from urllib.parse import urlencode
 from django.http import HttpResponseBadRequest
 from django.urls import reverse
 from django.views.generic import FormView, TemplateView
-
 from furl import furl
 
 from eherkenning.mock import eherkenning_conf as conf

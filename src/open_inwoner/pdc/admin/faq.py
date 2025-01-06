@@ -1,6 +1,5 @@
 from django import forms
 from django.contrib import admin
-
 from ordered_model.admin import OrderedModelAdmin
 
 from open_inwoner.ckeditor5.widgets import CKEditorWidget

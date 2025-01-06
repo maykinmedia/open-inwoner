@@ -2,6 +2,12 @@ import os
 from datetime import timedelta
 from uuid import uuid4
 
+from digid_eherkenning.oidc.models import (
+    DigiDConfig as _OIDCDigiDConfig,
+)
+from digid_eherkenning.oidc.models import (
+    EHerkenningConfig as _OIDCEHerkenningConfig,
+)
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.contrib.contenttypes.fields import GenericRelation
@@ -13,11 +19,6 @@ from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.functional import classproperty
 from django.utils.translation import gettext_lazy as _
-
-from digid_eherkenning.oidc.models import (
-    DigiDConfig as _OIDCDigiDConfig,
-    EHerkenningConfig as _OIDCEHerkenningConfig,
-)
 from image_cropping import ImageCropField, ImageRatioField
 from localflavor.nl.models import NLBSNField, NLZipCodeField
 from mail_editor.helpers import find_template
@@ -109,9 +110,7 @@ class OpenIDEHerkenningConfig(_OIDCEHerkenningConfig):
 
 def generate_uuid_image_name(instance, filename):
     filename, file_extension = os.path.splitext(filename)
-    return "profile/{uuid}{file_extension}".format(
-        uuid=uuid4(), file_extension=file_extension.lower()
-    )
+    return f"profile/{uuid4()}{file_extension.lower()}"
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -882,7 +881,7 @@ class Invite(models.Model):
         """
         Returns the first_name plus the last_name of the invitee, with a space in between.
         """
-        full_name = "{} {}".format(self.invitee_first_name, self.invitee_last_name)
+        full_name = f"{self.invitee_first_name} {self.invitee_last_name}"
         return full_name.strip()
 
     def save(self, **kwargs):

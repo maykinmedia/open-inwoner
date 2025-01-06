@@ -1,6 +1,5 @@
 from django.test import TestCase
 from django.utils.translation import gettext as _
-
 from zgw_consumers.api_models.base import factory
 
 from open_inwoner.openzaak.api_models import Zaak, ZaakType

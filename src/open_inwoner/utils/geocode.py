@@ -3,7 +3,6 @@ import logging
 from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry, Point
 from django.utils.module_loading import import_string
-
 from furl import furl
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
@@ -28,7 +27,7 @@ class PdocLocatieserver(Geocoder):
         scheme="https",
         user_agent=None,
         ssl_context=DEFAULT_SENTINEL,
-        adapter_factory=None
+        adapter_factory=None,
     ):
         super().__init__(
             scheme=scheme,
@@ -40,7 +39,7 @@ class PdocLocatieserver(Geocoder):
         )
 
         self.domain = domain.strip("/")
-        self.api = "{}://{}{}".format(self.scheme, self.domain, self.geocode_path)
+        self.api = f"{self.scheme}://{self.domain}{self.geocode_path}"
 
     def geocode(
         self,

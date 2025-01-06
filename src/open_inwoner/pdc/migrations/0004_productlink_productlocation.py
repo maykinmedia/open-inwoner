@@ -2,13 +2,11 @@
 
 import django.contrib.gis.db.models.fields
 import django.db.models.deletion
-from django.db import migrations, models
-
 import localflavor.nl.models
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("pdc", "0003_auto_20211020_1234"),
     ]

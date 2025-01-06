@@ -5,13 +5,12 @@ import uuid
 from unittest.mock import patch
 from urllib.parse import urlencode
 
+import requests_mock
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.test import TransactionTestCase
 from django.test.utils import override_settings
 from django.urls import reverse_lazy
-
-import requests_mock
 from django_webtest import TransactionWebTest
 from furl import furl
 from pyquery import PyQuery as PQ

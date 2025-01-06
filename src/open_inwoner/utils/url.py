@@ -5,7 +5,6 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.utils.encoding import iri_to_uri
 from django.utils.http import url_has_allowed_host_and_scheme
-
 from furl.furl import furl
 
 

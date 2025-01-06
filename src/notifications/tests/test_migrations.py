@@ -12,6 +12,8 @@ class NotificationsAPILibraryMigrationTest(TestSuccessfulMigrations):
     def setUpBeforeMigration(self, apps):
         from notifications_api_common.models import (
             NotificationsConfig as LegacyNotificationsConfig,
+        )
+        from notifications_api_common.models import (
             Subscription as LegacySubscription,
         )
 

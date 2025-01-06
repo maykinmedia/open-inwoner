@@ -2,7 +2,6 @@ from django.core.files.base import ContentFile
 from django.test import override_settings
 from django.urls import reverse
 from django.utils.html import escape
-
 from django_webtest import WebTest
 
 from ...cms.tests import cms_tools

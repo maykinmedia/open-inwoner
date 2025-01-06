@@ -2,7 +2,6 @@ from datetime import timedelta
 
 from django.db.models import F
 from django.utils import timezone
-
 from django_yubin.models import Message
 from mail_editor.helpers import find_template
 

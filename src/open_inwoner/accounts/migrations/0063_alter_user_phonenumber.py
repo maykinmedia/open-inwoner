@@ -6,7 +6,6 @@ import open_inwoner.utils.validators
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("accounts", "0062_alter_user_deactivated_on"),
     ]

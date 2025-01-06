@@ -1,6 +1,5 @@
-from django.test import TestCase, override_settings
-
 from cms.models import Page
+from django.test import TestCase, override_settings
 
 from open_inwoner.cms.profile.cms_apps import ProfileConfig
 from open_inwoner.cms.utils.page_display import (

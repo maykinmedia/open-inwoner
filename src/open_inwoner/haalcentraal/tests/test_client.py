@@ -1,8 +1,7 @@
 import json
 
-from django.test import TestCase
-
 import requests_mock
+from django.test import TestCase
 
 from ..api import BRP_2_1
 from ..models import HaalCentraalConfig

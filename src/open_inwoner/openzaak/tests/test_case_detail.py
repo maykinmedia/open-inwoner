@@ -1,15 +1,14 @@
 import datetime
 from unittest.mock import Mock, patch
 
+import dateutil
+import requests_mock
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.test import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-
-import dateutil
-import requests_mock
 from django_webtest import TransactionWebTest
 from freezegun import freeze_time
 from pyquery import PyQuery
@@ -30,6 +29,8 @@ from open_inwoner.cms.cases.views.status import InnerCaseDetailView, SimpleFile
 from open_inwoner.openklant.api_models import ObjectContactMoment
 from open_inwoner.openklant.constants import (
     KlantenServiceType,
+)
+from open_inwoner.openklant.constants import (
     Status as ContactMomentStatus,
 )
 from open_inwoner.openklant.models import OpenKlantConfig
@@ -1029,7 +1030,7 @@ class TestCaseDetailView(
         links = doc.find(".contactmomenten__link")
 
         self.assertEqual(len(links), 3)
-        for link, question in zip(links, case["questions"]):
+        for link, question in zip(links, case["questions"], strict=False):
             self.assertEqual(
                 link.attrib["href"],
                 reverse(
@@ -1151,7 +1152,7 @@ class TestCaseDetailView(
 
         self.assertEqual(len(links), 4)
 
-        for link, question in zip(links, case["questions"]):
+        for link, question in zip(links, case["questions"], strict=False):
             self.assertEqual(
                 link.attrib["href"],
                 reverse(
@@ -1700,7 +1701,7 @@ class TestCaseDetailView(
 
                 response = self.client.get(self.case_detail_url)
 
-                self.assertEquals(response.status_code, 200)
+                self.assertEqual(response.status_code, 200)
                 self.assertContains(response, self.zaak["identificatie"])
 
     @set_kvk_branch_number_in_session("1234")

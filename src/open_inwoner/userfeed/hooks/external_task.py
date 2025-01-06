@@ -1,7 +1,6 @@
 import logging
 
 from django.utils.translation import gettext_lazy as _
-
 from requests import RequestException
 
 from open_inwoner.accounts.choices import LoginTypeChoices

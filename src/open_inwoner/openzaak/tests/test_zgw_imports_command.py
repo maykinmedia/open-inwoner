@@ -2,10 +2,9 @@ import inspect
 from io import StringIO
 from unittest import mock
 
+import requests_mock
 from django.core.management import call_command
 from django.test import TestCase
-
-import requests_mock
 
 from open_inwoner.openzaak.models import (
     CatalogusConfig,

@@ -1,7 +1,6 @@
-from django.utils.text import slugify
-
 import factory
 import faker
+from django.utils.text import slugify
 from simple_certmanager.constants import CertificateTypes
 from simple_certmanager.models import Certificate
 from zgw_consumers.api_models.base import factory as zwg_factory

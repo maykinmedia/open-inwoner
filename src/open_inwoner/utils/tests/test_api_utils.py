@@ -1,7 +1,6 @@
 from ipaddress import IPv4Address, IPv6Address
 
 from django.test import TestCase
-
 from pydantic import BaseModel, HttpUrl
 
 from ..api import JSONEncoderMixin

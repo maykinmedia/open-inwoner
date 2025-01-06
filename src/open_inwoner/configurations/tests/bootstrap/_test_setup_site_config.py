@@ -1,5 +1,4 @@
 from django.test import TestCase, override_settings
-
 from django_setup_configuration.exceptions import ConfigurationRunFailed
 
 from open_inwoner.configurations.choices import ColorTypeChoices, OpenIDDisplayChoices
@@ -94,83 +93,103 @@ class SiteConfigurationSetupTest(TestCase):
         self.assertTrue(configuration_step.is_configured())
 
         self.assertEqual(config.name, "My site")
-        self.assertEqual(config.secondary_color, "#000000"),
-        self.assertEqual(config.accent_color, "#000000"),
-        self.assertEqual(config.primary_font_color, ColorTypeChoices.dark),
-        self.assertEqual(config.secondary_font_color, ColorTypeChoices.light),
-        self.assertEqual(config.accent_font_color, ColorTypeChoices.light),
-        self.assertTrue(config.warning_banner_enabled),
-        self.assertEqual(config.warning_banner_text, "warning banner text"),
-        self.assertEqual(config.warning_banner_background_color, "#444444"),
-        self.assertEqual(config.warning_banner_font_color, "#555555"),
-        self.assertFalse(config.contactmoment_contact_form_enabled),
-        self.assertFalse(config.login_show),
-        self.assertTrue(config.login_allow_registration),
-        self.assertTrue(config.login_2fa_sms),
-        self.assertEqual(config.login_text, "login text"),
-        self.assertEqual(config.registration_text, "registration text"),
-        self.assertEqual(config.home_welcome_title, "welcome title"),
-        self.assertEqual(config.home_welcome_intro, "welcome intro"),
-        self.assertEqual(config.home_theme_title, "home theme title"),
-        self.assertEqual(config.home_theme_intro, "home theme intro"),
-        self.assertEqual(config.theme_title, "theme title"),
-        self.assertEqual(config.theme_intro, "theme intro"),
-        self.assertEqual(config.home_map_title, "home map title"),
-        self.assertEqual(config.home_map_intro, "home map intro"),
-        self.assertEqual(config.home_questionnaire_title, "home questionnaire title"),
-        self.assertEqual(config.home_questionnaire_intro, "home questionnaire intro"),
-        self.assertEqual(config.home_product_finder_title, "home product finder title"),
-        self.assertEqual(config.home_product_finder_intro, "home product finder intro"),
-        self.assertEqual(
-            config.select_questionnaire_title, "select questionnaire title"
-        ),
-        self.assertEqual(
-            config.select_questionnaire_intro, "select questionnaire intro"
-        ),
-        self.assertEqual(config.plans_intro, "plans intro"),
-        self.assertEqual(config.plans_no_plans_message, "plans no plans_message"),
-        self.assertEqual(config.plans_edit_message, "plans edit message"),
-        self.assertEqual(config.footer_logo_title, "footer logo title"),
-        self.assertEqual(config.footer_logo_url, "http://www.oip-footer-logo.nl"),
-        self.assertEqual(config.home_help_text, "home help text"),
-        self.assertEqual(config.theme_help_text, "theme help text"),
-        self.assertEqual(config.product_help_text, "product help text"),
-        self.assertEqual(config.search_help_text, "search help text"),
-        self.assertEqual(config.account_help_text, "account help text"),
-        self.assertEqual(config.questionnaire_help_text, "questionnaire help text"),
-        self.assertEqual(config.plan_help_text, "plan help text"),
-        self.assertFalse(config.search_filter_categories),
-        self.assertFalse(config.search_filter_tags),
-        self.assertFalse(config.search_filter_organizations),
-        self.assertFalse(config.notifications_actions_enabled),
-        self.assertFalse(config.notifications_cases_enabled),
-        self.assertFalse(config.notifications_messages_enabled),
-        self.assertFalse(config.notifications_plans_enabled),
-        self.assertEqual(
-            config.recipients_email_digest, ["test1@test.nl", "test2@test.nl"]
-        ),
-        self.assertEqual(config.contact_phonenumber, "0612345678"),
-        self.assertEqual(config.contact_page, "https://test.test"),
-        self.assertEqual(config.gtm_code, "gtm code"),
-        self.assertEqual(config.ga_code, "ga code"),
-        self.assertEqual(config.matomo_url, "matomo url"),
-        self.assertEqual(config.matomo_site_id, 88),
-        self.assertEqual(config.siteimprove_id, "88"),
-        self.assertEqual(config.cookie_info_text, "cookie info text"),
-        self.assertEqual(config.cookie_link_text, "cookie link text"),
-        self.assertEqual(config.cookie_link_url, "cookie link url"),
-        self.assertEqual(config.kcm_survey_link_text, "kcm survey link text"),
-        self.assertEqual(
-            config.kcm_survey_link_url, "http://www.oip-kcm-survey-link.nl"
-        ),
-        self.assertEqual(config.openid_connect_login_text, "openid connect login_text"),
-        self.assertEqual(config.openid_display, OpenIDDisplayChoices.admin),
-        self.assertEqual(config.redirect_to, "http://oip-test-home.nl"),
-        self.assertFalse(config.allow_messages_file_sharing),
-        self.assertTrue(config.hide_categories_from_anonymous_users),
-        self.assertTrue(config.hide_search_from_anonymous_users),
-        self.assertFalse(config.display_social),
-        self.assertTrue(config.eherkenning_enabled),
+        (self.assertEqual(config.secondary_color, "#000000"),)
+        (self.assertEqual(config.accent_color, "#000000"),)
+        (self.assertEqual(config.primary_font_color, ColorTypeChoices.dark),)
+        (self.assertEqual(config.secondary_font_color, ColorTypeChoices.light),)
+        (self.assertEqual(config.accent_font_color, ColorTypeChoices.light),)
+        (self.assertTrue(config.warning_banner_enabled),)
+        (self.assertEqual(config.warning_banner_text, "warning banner text"),)
+        (self.assertEqual(config.warning_banner_background_color, "#444444"),)
+        (self.assertEqual(config.warning_banner_font_color, "#555555"),)
+        (self.assertFalse(config.contactmoment_contact_form_enabled),)
+        (self.assertFalse(config.login_show),)
+        (self.assertTrue(config.login_allow_registration),)
+        (self.assertTrue(config.login_2fa_sms),)
+        (self.assertEqual(config.login_text, "login text"),)
+        (self.assertEqual(config.registration_text, "registration text"),)
+        (self.assertEqual(config.home_welcome_title, "welcome title"),)
+        (self.assertEqual(config.home_welcome_intro, "welcome intro"),)
+        (self.assertEqual(config.home_theme_title, "home theme title"),)
+        (self.assertEqual(config.home_theme_intro, "home theme intro"),)
+        (self.assertEqual(config.theme_title, "theme title"),)
+        (self.assertEqual(config.theme_intro, "theme intro"),)
+        (self.assertEqual(config.home_map_title, "home map title"),)
+        (self.assertEqual(config.home_map_intro, "home map intro"),)
+        (self.assertEqual(config.home_questionnaire_title, "home questionnaire title"),)
+        (self.assertEqual(config.home_questionnaire_intro, "home questionnaire intro"),)
+        (
+            self.assertEqual(
+                config.home_product_finder_title, "home product finder title"
+            ),
+        )
+        (
+            self.assertEqual(
+                config.home_product_finder_intro, "home product finder intro"
+            ),
+        )
+        (
+            self.assertEqual(
+                config.select_questionnaire_title, "select questionnaire title"
+            ),
+        )
+        (
+            self.assertEqual(
+                config.select_questionnaire_intro, "select questionnaire intro"
+            ),
+        )
+        (self.assertEqual(config.plans_intro, "plans intro"),)
+        (self.assertEqual(config.plans_no_plans_message, "plans no plans_message"),)
+        (self.assertEqual(config.plans_edit_message, "plans edit message"),)
+        (self.assertEqual(config.footer_logo_title, "footer logo title"),)
+        (self.assertEqual(config.footer_logo_url, "http://www.oip-footer-logo.nl"),)
+        (self.assertEqual(config.home_help_text, "home help text"),)
+        (self.assertEqual(config.theme_help_text, "theme help text"),)
+        (self.assertEqual(config.product_help_text, "product help text"),)
+        (self.assertEqual(config.search_help_text, "search help text"),)
+        (self.assertEqual(config.account_help_text, "account help text"),)
+        (self.assertEqual(config.questionnaire_help_text, "questionnaire help text"),)
+        (self.assertEqual(config.plan_help_text, "plan help text"),)
+        (self.assertFalse(config.search_filter_categories),)
+        (self.assertFalse(config.search_filter_tags),)
+        (self.assertFalse(config.search_filter_organizations),)
+        (self.assertFalse(config.notifications_actions_enabled),)
+        (self.assertFalse(config.notifications_cases_enabled),)
+        (self.assertFalse(config.notifications_messages_enabled),)
+        (self.assertFalse(config.notifications_plans_enabled),)
+        (
+            self.assertEqual(
+                config.recipients_email_digest, ["test1@test.nl", "test2@test.nl"]
+            ),
+        )
+        (self.assertEqual(config.contact_phonenumber, "0612345678"),)
+        (self.assertEqual(config.contact_page, "https://test.test"),)
+        (self.assertEqual(config.gtm_code, "gtm code"),)
+        (self.assertEqual(config.ga_code, "ga code"),)
+        (self.assertEqual(config.matomo_url, "matomo url"),)
+        (self.assertEqual(config.matomo_site_id, 88),)
+        (self.assertEqual(config.siteimprove_id, "88"),)
+        (self.assertEqual(config.cookie_info_text, "cookie info text"),)
+        (self.assertEqual(config.cookie_link_text, "cookie link text"),)
+        (self.assertEqual(config.cookie_link_url, "cookie link url"),)
+        (self.assertEqual(config.kcm_survey_link_text, "kcm survey link text"),)
+        (
+            self.assertEqual(
+                config.kcm_survey_link_url, "http://www.oip-kcm-survey-link.nl"
+            ),
+        )
+        (
+            self.assertEqual(
+                config.openid_connect_login_text, "openid connect login_text"
+            ),
+        )
+        (self.assertEqual(config.openid_display, OpenIDDisplayChoices.admin),)
+        (self.assertEqual(config.redirect_to, "http://oip-test-home.nl"),)
+        (self.assertFalse(config.allow_messages_file_sharing),)
+        (self.assertTrue(config.hide_categories_from_anonymous_users),)
+        (self.assertTrue(config.hide_search_from_anonymous_users),)
+        (self.assertFalse(config.display_social),)
+        (self.assertTrue(config.eherkenning_enabled),)
 
     @override_settings(
         SITE_NAME="My site",

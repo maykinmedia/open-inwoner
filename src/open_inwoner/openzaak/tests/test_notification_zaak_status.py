@@ -1,9 +1,8 @@
 import logging
 from unittest.mock import Mock, patch
 
-from django.test import RequestFactory, TestCase, override_settings
-
 import requests_mock
+from django.test import RequestFactory, TestCase, override_settings
 from freezegun import freeze_time
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen

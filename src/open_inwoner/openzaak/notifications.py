@@ -4,7 +4,6 @@ from datetime import date, timedelta
 from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import gettext as _
-
 from mail_editor.helpers import find_template
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 

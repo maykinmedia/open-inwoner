@@ -1,5 +1,4 @@
 from django.test import TestCase
-
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.constants import RolTypes, VertrouwelijkheidsAanduidingen
 from zgw_consumers.test import generate_oas_component

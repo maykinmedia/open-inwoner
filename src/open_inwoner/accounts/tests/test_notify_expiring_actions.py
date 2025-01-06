@@ -30,7 +30,7 @@ class ExpiringActionsNotificationTest(TestCase):
 
         email1, email2 = mail.outbox
 
-        for email, recipient in zip([email1, email2], [joe, schmoe]):
+        for email, recipient in zip([email1, email2], [joe, schmoe], strict=False):
             self.assertEqual(
                 email.subject, "Acties verlopen vandaag op Open Inwoner Platform"
             )

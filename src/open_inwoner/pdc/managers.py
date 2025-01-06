@@ -1,8 +1,7 @@
 from datetime import date
 
-from django.db import models
-
 from dateutil.relativedelta import relativedelta
+from django.db import models
 from ordered_model.models import OrderedModelQuerySet
 from treebeard.mp_tree import MP_NodeQuerySet
 
@@ -94,9 +93,9 @@ class CategoryPublishedQueryset(MP_NodeQuerySet):
                 or months_since_last_zaak_per_zaaktype[zaaktype_identificatie]
                 > duration_since_start.months
             ):
-                months_since_last_zaak_per_zaaktype[
-                    zaaktype_identificatie
-                ] = duration_since_start.months
+                months_since_last_zaak_per_zaaktype[zaaktype_identificatie] = (
+                    duration_since_start.months
+                )
 
         zaaktype_ids = list(months_since_last_zaak_per_zaaktype.keys())
 

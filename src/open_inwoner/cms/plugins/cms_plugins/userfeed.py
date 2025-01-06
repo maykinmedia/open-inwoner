@@ -1,7 +1,6 @@
-from django.utils.translation import gettext as _
-
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
+from django.utils.translation import gettext as _
 
 from open_inwoner.cms.plugins.models.userfeed import UserFeed
 from open_inwoner.userfeed.feed import get_feed

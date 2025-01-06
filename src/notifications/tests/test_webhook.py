@@ -1,9 +1,8 @@
 from unittest.mock import patch
 
+import requests_mock
 from django.contrib.messages import get_messages
 from django.test import TestCase
-
-import requests_mock
 from requests.exceptions import RequestException
 from zgw_consumers.constants import APITypes
 from zgw_consumers.models.services import Service

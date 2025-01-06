@@ -4,9 +4,9 @@ from shutil import which
 from subprocess import CalledProcessError, check_output
 from typing import Any
 
+from decouple import Csv, undefined
+from decouple import config as _config
 from django.conf import settings
-
-from decouple import Csv, config as _config, undefined
 from sentry_sdk.integrations import DidNotEnable, django, redis
 
 logger = logging.getLogger(__name__)

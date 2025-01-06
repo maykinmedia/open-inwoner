@@ -1,9 +1,8 @@
 from datetime import date, datetime
 
+from dateutil.relativedelta import relativedelta
 from django import forms
 from django.template.defaultfilters import date as django_date
-
-from dateutil.relativedelta import relativedelta
 
 from .models import SSDConfig
 

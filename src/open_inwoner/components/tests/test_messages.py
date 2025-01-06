@@ -1,7 +1,6 @@
 import datetime
 
 from django.utils import timezone
-
 from freezegun import freeze_time
 
 from ...accounts.forms import InboxForm

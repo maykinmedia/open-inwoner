@@ -1,14 +1,13 @@
-from django.conf import settings
-from django.contrib.auth.models import AnonymousUser
-from django.test import RequestFactory
-from django.utils.module_loading import import_string
-
 from cms import api
 from cms.api import add_plugin
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
 from cms.models import Placeholder
 from cms.plugin_rendering import ContentRenderer
+from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
+from django.test import RequestFactory
+from django.utils.module_loading import import_string
 
 from open_inwoner.cms.extensions.models import CommonExtension
 from open_inwoner.utils.test import SessionMiddleware

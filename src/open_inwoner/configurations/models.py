@@ -1,5 +1,7 @@
 import os
 
+import ckeditor.fields as ckeditor_fields
+from colorfield.fields import ColorField
 from django.conf import settings
 from django.contrib.flatpages.models import FlatPage
 from django.core.validators import FileExtensionValidator
@@ -7,9 +9,6 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
-
-import ckeditor.fields as ckeditor_fields
-from colorfield.fields import ColorField
 from django_jsonform.models.fields import ArrayField
 from filer.fields.image import FilerImageField
 from ordered_model.models import OrderedModel, OrderedModelManager
@@ -703,7 +702,7 @@ class CustomFontSet(models.Model):
     def update_filename(self, filename: str, new_name: str, path: str) -> str:
         ext = filename.split(".")[1]
         filename = f"{new_name}.{ext}"
-        return "{path}/{filename}".format(path=path, filename=filename)
+        return f"{path}/{filename}"
 
     def update_filename_body(self, filename: str) -> str:
         return CustomFontSet.update_filename(

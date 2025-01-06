@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("accounts", "0071_delete_appointment"),
         ("accounts", "0071_remove_user_birthday"),

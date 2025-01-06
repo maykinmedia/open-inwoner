@@ -1,15 +1,14 @@
-from django.conf import settings
-from django.contrib.admin.sites import AdminSite
-from django.contrib.auth.models import Group
-from django.core.exceptions import ValidationError
-from django.test import RequestFactory
-
 from digid_eherkenning.admin import (
     DigidConfigurationAdmin,
     EherkenningConfigurationAdmin,
 )
 from digid_eherkenning.models import DigidConfiguration, EherkenningConfiguration
 from digid_eherkenning.oidc.admin import admin_modelform_factory
+from django.conf import settings
+from django.contrib.admin.sites import AdminSite
+from django.contrib.auth.models import Group
+from django.core.exceptions import ValidationError
+from django.test import RequestFactory
 from django_jsonform.forms.fields import JSONFormField
 from django_setup_configuration.config_settings import ConfigSettings
 from django_setup_configuration.configuration import BaseConfigurationStep

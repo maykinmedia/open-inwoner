@@ -1,11 +1,11 @@
 from datetime import timedelta
 from unittest import mock
 
+import freezegun
 from django.core.cache import caches
 from django.core.cache.backends.dummy import DummyCache
-from django.test import TestCase as DjangoTestCase, override_settings
-
-import freezegun
+from django.test import TestCase as DjangoTestCase
+from django.test import override_settings
 
 from open_inwoner.utils.decorators import cache
 
@@ -22,7 +22,6 @@ class DynamicCacheKeyTest(DjangoTestCase):
 
     def test_method_key_accepts_permutations_of_attr_and_kwarg_keys(self):
         class TestClass:
-
             foo = "bar"
             bar = "baz"
 

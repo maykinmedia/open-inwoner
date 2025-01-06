@@ -30,7 +30,7 @@ class UserQueryTests(TestCase):
         ]
 
         # bad
-        UserFactory(first_name="placeholder", email="placeholder@example.org"),
+        (UserFactory(first_name="placeholder", email="placeholder@example.org"),)
         UserFactory(first_name="empty", email="")
 
         actual = User.objects.having_usable_email()

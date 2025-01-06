@@ -3,6 +3,7 @@ from collections.abc import Generator
 from datetime import date
 from typing import Any
 
+from aldryn_apphooks_config.mixins import AppConfigMixin
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
@@ -11,8 +12,6 @@ from django.urls import reverse, reverse_lazy
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 from django.views.generic import FormView, TemplateView, UpdateView
-
-from aldryn_apphooks_config.mixins import AppConfigMixin
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.choices import (

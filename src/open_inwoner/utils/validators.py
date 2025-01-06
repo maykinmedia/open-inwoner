@@ -1,13 +1,12 @@
 from typing import TYPE_CHECKING, Protocol
 
+import phonenumbers
 from django.core.exceptions import ValidationError
 from django.core.files.images import get_image_dimensions
 from django.core.validators import RegexValidator
 from django.utils.deconstruct import deconstructible
 from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
-
-import phonenumbers
 from filer.models import Image
 
 if TYPE_CHECKING:
@@ -15,8 +14,7 @@ if TYPE_CHECKING:
 
 
 class ParsePhoneNumber(Protocol):
-    def __call__(self, value: str) -> "PhoneNumber":
-        ...  # pragma: nocover
+    def __call__(self, value: str) -> "PhoneNumber": ...  # pragma: nocover
 
 
 @deconstructible
@@ -130,7 +128,7 @@ class CustomRegexValidator(RegexValidator):
         Validates that the input matches the regular expression.
         """
         if not self.regex.search(force_str(value)):
-            message = "{}: {}".format(self.message, force_str(value))
+            message = f"{self.message}: {force_str(value)}"
             raise ValidationError(message, code=self.code)
 
 

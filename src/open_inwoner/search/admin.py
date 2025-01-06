@@ -2,7 +2,6 @@ from django import forms
 from django.contrib import admin, messages
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
-
 from import_export.admin import ImportExportMixin
 from import_export.formats import base_formats
 

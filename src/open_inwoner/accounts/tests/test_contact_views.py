@@ -6,7 +6,6 @@ from django.core.files.images import ImageFile
 from django.test import override_settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-
 from django_webtest import WebTest
 
 from open_inwoner.accounts.models import User

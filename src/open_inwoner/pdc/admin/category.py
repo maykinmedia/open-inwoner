@@ -2,7 +2,6 @@ from django import forms
 from django.contrib import admin
 from django.forms import BaseModelFormSet
 from django.utils.translation import gettext as _
-
 from django_jsonform.forms.fields import JSONFormField
 from import_export.admin import ImportExportMixin
 from import_export.formats import base_formats

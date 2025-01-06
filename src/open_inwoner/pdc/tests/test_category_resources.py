@@ -1,8 +1,7 @@
 from collections import OrderedDict
 
-from django.test import TestCase
-
 import tablib
+from django.test import TestCase
 from import_export.exceptions import ImportExportError
 
 from ..models import Category

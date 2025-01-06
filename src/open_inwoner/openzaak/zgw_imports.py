@@ -2,7 +2,6 @@ import logging
 from collections import defaultdict
 
 from django.db import transaction
-
 from zgw_consumers.api_models.catalogi import (
     InformatieObjectType,
     ResultaatType,

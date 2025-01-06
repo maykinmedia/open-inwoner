@@ -1,7 +1,6 @@
+from cms.models import CMSPlugin
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
-from cms.models import CMSPlugin
 
 
 class UserAppointments(CMSPlugin):

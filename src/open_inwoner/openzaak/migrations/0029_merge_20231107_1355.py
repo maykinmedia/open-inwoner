@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("openzaak", "0028_merge_20231101_1705"),
         ("openzaak", "0028_zaaktype_statustype_button"),

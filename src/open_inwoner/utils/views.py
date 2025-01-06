@@ -3,7 +3,6 @@ from django.contrib.auth.mixins import AccessMixin
 from django.template import TemplateDoesNotExist, loader
 from django.views.decorators.csrf import requires_csrf_token
 from django.views.defaults import ERROR_500_TEMPLATE_NAME
-
 from view_breadcrumbs import DetailBreadcrumbMixin
 
 from .logentry import addition, change, deletion, system_action, user_action

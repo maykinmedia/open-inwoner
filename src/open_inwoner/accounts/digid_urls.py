@@ -1,5 +1,4 @@
 from django.urls import path
-
 from mozilla_django_oidc.urls import urlpatterns
 from mozilla_django_oidc_db.views import OIDCCallbackView
 

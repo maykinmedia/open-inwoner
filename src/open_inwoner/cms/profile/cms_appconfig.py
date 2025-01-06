@@ -1,7 +1,6 @@
+from aldryn_apphooks_config.models import AppHookConfig
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
-from aldryn_apphooks_config.models import AppHookConfig
 
 
 class ProfileConfig(AppHookConfig):

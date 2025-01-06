@@ -16,7 +16,6 @@ def migrate_slugs(apps, _):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("pdc", "0010_auto_20211119_1158")]
 
     operations = [migrations.RunPython(migrate_slugs, migrations.RunPython.noop)]

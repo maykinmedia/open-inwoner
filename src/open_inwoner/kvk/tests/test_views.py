@@ -2,7 +2,6 @@ from unittest.mock import patch
 
 from django.test import TestCase
 from django.urls import reverse, reverse_lazy
-
 from pyquery import PyQuery
 
 from open_inwoner.accounts.tests.factories import eHerkenningUserFactory
@@ -19,7 +18,6 @@ class KvKViewsTestCase(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-
         super().setUpTestData()
 
         cls.user = eHerkenningUserFactory.create(

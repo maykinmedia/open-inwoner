@@ -1,10 +1,9 @@
 from unittest import TestCase as PlainTestCase
 from unittest.mock import Mock, patch
 
-from django.test import TestCase
-
 import requests
 import requests_mock
+from django.test import TestCase
 from zgw_consumers.constants import APITypes
 
 from open_inwoner.openzaak.clients import (

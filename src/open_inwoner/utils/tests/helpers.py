@@ -7,7 +7,6 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import resolve_url
 from django.urls import reverse
 from django.utils.encoding import force_str
-
 from django_otp import DEVICE_ID_SESSION_KEY
 from furl import furl
 from PIL import Image
@@ -42,7 +41,6 @@ class AssertTimelineLogMixin:
         content_object_repr=None,
         action_flag=None,
     ) -> TimelineLog:
-
         kwargs = {
             f"extra_data__message__{lookup}": force_str(message),
         }

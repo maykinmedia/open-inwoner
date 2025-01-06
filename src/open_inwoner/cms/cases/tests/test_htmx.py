@@ -2,10 +2,9 @@ import json
 from unittest.mock import patch
 from uuid import UUID
 
+import requests_mock
 from django.test import override_settings, tag
 from django.utils.translation import gettext as _
-
-import requests_mock
 from playwright.sync_api import expect
 from zgw_consumers.api_models.constants import (
     RolOmschrijving,
@@ -555,10 +554,12 @@ class CasesPlaywrightTests(
             ]
             return json.dumps(items)
 
-        m.get(
-            f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak['url']}",
-            text=mock_list,
-        ),
+        (
+            m.get(
+                f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak['url']}",
+                text=mock_list,
+            ),
+        )
 
         # Upload mock.
         def mock_upload(request, context):
@@ -592,11 +593,13 @@ class CasesPlaywrightTests(
             uploads.append(uploaded_informatie_object)
             return json.dumps(uploaded_informatie_object)
 
-        m.post(
-            f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten",
-            status_code=201,
-            text=mock_upload,
-        ),
+        (
+            m.post(
+                f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten",
+                status_code=201,
+                text=mock_upload,
+            ),
+        )
 
         # Setup.
         context = self.browser.new_context(storage_state=self.user_login_state)

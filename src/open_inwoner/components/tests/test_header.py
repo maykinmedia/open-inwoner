@@ -1,5 +1,4 @@
 from django.test import TestCase
-
 from pyquery import PyQuery
 
 from open_inwoner.accounts.tests.factories import (

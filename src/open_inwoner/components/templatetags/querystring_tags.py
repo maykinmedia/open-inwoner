@@ -3,7 +3,6 @@ import logging
 from django import template
 from django.http import QueryDict
 from django.utils.html import format_html
-
 from furl import furl
 
 logger = logging.getLogger(__name__)

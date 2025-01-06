@@ -1,9 +1,8 @@
 from unittest.mock import call, patch
 
+import requests_mock
 from django.test import TestCase
 from django.utils.translation import gettext as _
-
-import requests_mock
 from requests import RequestException
 
 from open_inwoner.accounts.tests.factories import DigidUserFactory

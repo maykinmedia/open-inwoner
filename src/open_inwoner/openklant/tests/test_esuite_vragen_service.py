@@ -1,8 +1,7 @@
 from datetime import datetime
 
-from django.test import TestCase, override_settings
-
 import requests_mock
+from django.test import TestCase, override_settings
 
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.openklant.constants import KlantenServiceType, Status

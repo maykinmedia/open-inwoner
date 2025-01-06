@@ -1,6 +1,5 @@
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse_lazy
-
 from filer.models import Image
 from rest_framework import status
 from rest_framework.test import APITestCase

@@ -1,7 +1,6 @@
 import logging
 
 from django.test import TestCase
-
 from timeline_logger.models import TimelineLog
 
 from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin, Lookups

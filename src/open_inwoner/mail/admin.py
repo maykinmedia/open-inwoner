@@ -1,10 +1,12 @@
 from django.contrib import admin
-
 from django_yubin.admin import (
     LogAdmin as YubinLogAdmin,
+)
+from django_yubin.admin import (
     MessageAdmin as YubinMessageAdmin,
 )
-from django_yubin.models import Log as YubinLog, Message as YubinMessage
+from django_yubin.models import Log as YubinLog
+from django_yubin.models import Message as YubinMessage
 
 from ..utils.admin import ReadOnlyAdminMixin
 

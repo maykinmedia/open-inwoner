@@ -1,7 +1,6 @@
 from django import template
 from django.urls import NoReverseMatch, reverse
 from django.utils.html import format_html
-
 from furl import furl
 
 register = template.Library()

@@ -1,5 +1,6 @@
 from datetime import date
 
+from cms.apphook_pool import apphook_pool
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
@@ -9,8 +10,6 @@ from django.urls.base import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
-
-from cms.apphook_pool import apphook_pool
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.choices import ContactTypeChoices
@@ -435,7 +434,7 @@ class PlanActionCreateView(PlanActionsEnabledMixin, ActionCreateView):
             return Plan.objects.connected(self.request.user).get(
                 uuid=self.kwargs.get("uuid")
             )
-        except ObjectDoesNotExist as e:
+        except ObjectDoesNotExist:
             raise Http404
 
     def form_valid(self, form):
@@ -486,7 +485,7 @@ class PlanActionEditView(PlanActionsEnabledMixin, ActionUpdateView):
             return Plan.objects.connected(self.request.user).get(
                 uuid=self.kwargs.get("plan_uuid")
             )
-        except ObjectDoesNotExist as e:
+        except ObjectDoesNotExist:
             raise Http404
 
     def form_valid(self, form):
@@ -520,7 +519,7 @@ class PlanActionEditStatusTagView(PlanActionsEnabledMixin, ActionUpdateStatusTag
             return Plan.objects.connected(self.request.user).get(
                 uuid=self.kwargs.get("plan_uuid")
             )
-        except ObjectDoesNotExist as e:
+        except ObjectDoesNotExist:
             raise Http404
 
     def get_template_tag_args(self, context):
@@ -535,7 +534,7 @@ class PlanActionDeleteView(PlanActionsEnabledMixin, ActionDeleteView):
             return Plan.objects.connected(self.request.user).get(
                 uuid=self.kwargs.get("plan_uuid")
             )
-        except ObjectDoesNotExist as e:
+        except ObjectDoesNotExist:
             raise Http404
 
     def get_success_url(self) -> str:
@@ -578,7 +577,7 @@ class PlanActionHistoryView(PlanActionsEnabledMixin, ActionHistoryView):
             return Plan.objects.connected(self.request.user).get(
                 uuid=self.kwargs.get("plan_uuid")
             )
-        except ObjectDoesNotExist as e:
+        except ObjectDoesNotExist:
             raise Http404
 
 

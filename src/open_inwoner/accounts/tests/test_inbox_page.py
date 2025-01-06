@@ -3,7 +3,6 @@ from unittest import skip
 from django.test import override_settings, tag
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-
 from django_webtest import WebTest
 from playwright.sync_api import expect
 from privates.test import temp_private_root

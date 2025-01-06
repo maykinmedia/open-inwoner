@@ -80,14 +80,16 @@ def cache(
 
         if argspec.defaults:
             positional_count = len(argspec.args) - len(argspec.defaults)
-            defaults = dict(zip(argspec.args[positional_count:], argspec.defaults))
+            defaults = dict(
+                zip(argspec.args[positional_count:], argspec.defaults, strict=False)
+            )
         else:
             defaults = {}
 
         @wraps(func)
         def wrapped(*args, **kwargs) -> RT:
             key_kwargs = defaults.copy()
-            named_args = dict(zip(argspec.args, args), **kwargs)
+            named_args = dict(zip(argspec.args, args, strict=False), **kwargs)
             key_kwargs.update(**named_args)
 
             if argspec.varkw:

@@ -1,11 +1,10 @@
 import datetime
 
+import requests_mock
 from django.core.cache import cache
 from django.test import TransactionTestCase
 from django.test.utils import override_settings
 from django.urls import reverse_lazy
-
-import requests_mock
 from freezegun import freeze_time
 from furl import furl
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen

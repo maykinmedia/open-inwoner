@@ -1,18 +1,18 @@
 import datetime
 import logging
 import uuid
+from collections.abc import Iterable
 from datetime import timedelta
-from typing import Iterable, Literal, NotRequired, Protocol, Self
+from typing import Literal, NotRequired, Protocol, Self
 
+import glom
+from ape_pie.client import APIClient
+from attr import dataclass
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-
-import glom
-from ape_pie.client import APIClient
-from attr import dataclass
 from pydantic import BaseModel, ConfigDict, TypeAdapter
 from requests.exceptions import RequestException
 from typing_extensions import TypedDict
@@ -306,18 +306,18 @@ class eSuiteKlantenService(KlantenService):
                 and user.case_notification_channel
                 != NotificationChannelChoice.digital_only
             ):
-                update_data[
-                    "case_notification_channel"
-                ] = NotificationChannelChoice.digital_only
+                update_data["case_notification_channel"] = (
+                    NotificationChannelChoice.digital_only
+                )
 
             elif (
                 klant.toestemming_zaak_notificaties_alleen_digitaal is False
                 and user.case_notification_channel
                 != NotificationChannelChoice.digital_and_post
             ):
-                update_data[
-                    "case_notification_channel"
-                ] = NotificationChannelChoice.digital_and_post
+                update_data["case_notification_channel"] = (
+                    NotificationChannelChoice.digital_and_post
+                )
             else:
                 # This is a guard against the scenario where a deployment is
                 # configured to use an older version of the klanten backend (that
@@ -435,7 +435,6 @@ class eSuiteVragenService(KlantenService):
     def retrieve_objectcontactmomenten_for_object_type(
         self, contactmoment: ContactMoment, object_type: str
     ) -> list[ObjectContactMoment]:
-
         moments = self.retrieve_objectcontactmomenten_for_contactmoment(contactmoment)
 
         # eSuite doesn't implement a `object_type` query parameter
@@ -597,7 +596,6 @@ class eSuiteVragenService(KlantenService):
         kcm: KlantContactMoment,
         local_kcm_mapping: dict[str, KlantContactMomentAnswer] | None = None,
     ) -> Question:
-
         if isinstance(kcm.contactmoment, str):
             raise ValueError("Received unresolved contactmoment")
 
@@ -956,7 +954,6 @@ class OpenKlant2Service(KlantenService):
             partij = persoon
 
         elif kvk := fetch_params.get("user_kvk_or_rsin"):
-
             # Prefer vestigingsnummer if present, to stay consistent with OK1 behavior
             organisatie: Partij | None
             if vestigingsnummer := fetch_params.get("vestigingsnummer"):
@@ -1130,7 +1127,6 @@ class OpenKlant2Service(KlantenService):
     def create_question(
         self, partij_uuid: str, question: str, subject: str
     ) -> OpenKlant2Question:
-
         if len(question.rstrip()) == 0:
             raise ValueError("You must provide a question")
 
@@ -1257,13 +1253,12 @@ class OpenKlant2Service(KlantenService):
         for klantcontact in self.klantcontacten_for_partij(
             partij_uuid, kanaal=self.config.mijn_vragen_kanaal
         ):
-            klantcontact_uuid_to_klantcontact_object[
-                klantcontact["uuid"]
-            ] = klantcontact
+            klantcontact_uuid_to_klantcontact_object[klantcontact["uuid"]] = (
+                klantcontact
+            )
 
             # A klantcontact is an answer if it is linked to a Question via an onderwerp object
             if onderwerp_objecten := klantcontact["gingOverOnderwerpobjecten"]:
-
                 # To which question klantcontact is this an answer?
                 answer_onderwerp_object = self.client.onderwerp_object.retrieve(
                     onderwerp_objecten[0]["uuid"]

@@ -309,7 +309,6 @@ class ContactmomentenClient(APIClient):
     def retrieve_objectcontactmomenten_for_object_type(
         self, contactmoment: ContactMoment, object_type: str
     ) -> list[ObjectContactMoment]:
-
         moments = self.retrieve_objectcontactmomenten_for_contactmoment(contactmoment)
 
         # eSuite doesn't implement a `object_type` query parameter

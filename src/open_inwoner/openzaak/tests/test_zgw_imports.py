@@ -1,6 +1,5 @@
-from django.test import TestCase, override_settings
-
 import requests_mock
+from django.test import TestCase, override_settings
 
 from open_inwoner.openzaak.models import CatalogusConfig, OpenZaakConfig, ZaakTypeConfig
 from open_inwoner.openzaak.tests.factories import (
@@ -219,7 +218,7 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
         )
 
         # check we linked correctly
-        for i, root in zip((0, 2), self.roots):
+        for i, root in zip((0, 2), self.roots, strict=False):
             self.assertEqual(res[i + 0].catalogus, cat_configs[root]["AAA"])
             self.assertEqual(res[i + 1].catalogus, cat_configs[root]["BBB"])
 

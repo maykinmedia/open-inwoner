@@ -1,10 +1,9 @@
 import random
 from uuid import uuid4
 
+import factory.fuzzy
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models.signals import post_save, pre_save
-
-import factory.fuzzy
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 

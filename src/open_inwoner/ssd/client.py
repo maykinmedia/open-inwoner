@@ -4,11 +4,10 @@ from datetime import datetime
 from pathlib import Path
 from uuid import uuid4
 
+import requests
 from django.template import loader
 from django.template.defaultfilters import date as django_date
 from django.utils import timezone
-
-import requests
 from requests import Response
 
 from ..utils.export import render_pdf
@@ -138,7 +137,6 @@ class JaaropgaveClient(SSDBaseClient):
     def get_reports(
         self, bsn: str, report_date: str, request_base_url: str
     ) -> bytes | None:
-
         response = self.templated_request(bsn=bsn, dienstjaar=report_date)
 
         if not response or response.status_code != 200:
@@ -194,7 +192,6 @@ class UitkeringClient(SSDBaseClient):
     def get_reports(
         self, bsn: str, report_date: str, request_base_url: str
     ) -> bytes | None:
-
         response = self.templated_request(bsn=bsn, period=report_date)
 
         if not response or response.status_code != 200:

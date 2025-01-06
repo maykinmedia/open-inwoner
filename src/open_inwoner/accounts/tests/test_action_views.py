@@ -6,7 +6,6 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import override_settings, tag
 from django.urls import reverse
 from django.utils.translation import gettext as _
-
 from django_webtest import WebTest
 from playwright.sync_api import expect
 from privates.test import temp_private_root

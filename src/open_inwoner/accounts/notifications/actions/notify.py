@@ -2,7 +2,6 @@ import logging
 from datetime import date
 
 from django.urls import reverse
-
 from mail_editor.helpers import find_template
 
 from open_inwoner.accounts.choices import StatusChoices

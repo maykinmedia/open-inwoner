@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.urls import reverse
-
 from django_webtest import WebTest
 
 from open_inwoner.accounts.tests.factories import UserFactory

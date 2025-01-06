@@ -1,5 +1,6 @@
 import logging
-from typing import Iterable, Protocol
+from collections.abc import Iterable
+from typing import Protocol
 
 from django.contrib.auth.mixins import AccessMixin
 from django.core.exceptions import ImproperlyConfigured
@@ -10,7 +11,6 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import TemplateView
-
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.models import User

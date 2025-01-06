@@ -1,10 +1,9 @@
 import logging
 
+import requests_mock
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.utils.translation import gettext as _
-
-import requests_mock
 from freezegun import freeze_time
 from timeline_logger.models import TimelineLog
 

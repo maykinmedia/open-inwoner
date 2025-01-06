@@ -2,15 +2,15 @@ import base64
 import concurrent.futures
 import logging
 import warnings
+from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import date
-from typing import Any, Literal, Mapping, Type, TypeAlias, TypeVar
+from typing import Any, Literal, TypeAlias, TypeVar
 
+from ape_pie.client import APIClient
 from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.utils.functional import SimpleLazyObject
-
-from ape_pie.client import APIClient
 from requests import HTTPError, RequestException, Response
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.catalogi import Catalogus
@@ -883,7 +883,7 @@ ZgwClientFactoryReturn: TypeAlias = (
 
 
 def build_zgw_client_from_service(service: Service) -> ZgwClientFactoryReturn:
-    services_to_client_mapping: Mapping[str, Type[ZgwClientFactoryReturn]] = {
+    services_to_client_mapping: Mapping[str, type[ZgwClientFactoryReturn]] = {
         APITypes.zrc: ZakenClient,
         APITypes.ztc: CatalogiClient,
         APITypes.drc: DocumentenClient,

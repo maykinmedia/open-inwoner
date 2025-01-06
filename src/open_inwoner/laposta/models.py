@@ -1,7 +1,6 @@
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
 from requests.auth import HTTPBasicAuth
 from solo.models import SingletonModel
 

@@ -1,6 +1,5 @@
 from django.core.management import call_command
 from django.test import TestCase
-
 from freezegun import freeze_time
 
 from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin

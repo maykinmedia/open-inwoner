@@ -9,7 +9,6 @@ from django.urls import reverse, reverse_lazy
 from django.utils import formats
 from django.utils.translation import gettext as _
 from django.views.generic import FormView
-
 from privates.views import PrivateMediaView
 
 from open_inwoner.configurations.models import SiteConfiguration

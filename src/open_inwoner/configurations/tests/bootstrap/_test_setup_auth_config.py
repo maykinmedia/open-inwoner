@@ -3,9 +3,6 @@ import urllib.error
 from unittest import skip
 from uuid import UUID
 
-from django.conf import settings
-from django.test import TestCase, override_settings
-
 import requests
 import requests_mock
 from digid_eherkenning.choices import (
@@ -15,6 +12,8 @@ from digid_eherkenning.choices import (
     XMLContentTypes,
 )
 from digid_eherkenning.models import DigidConfiguration, EherkenningConfiguration
+from django.conf import settings
+from django.test import TestCase, override_settings
 from django_setup_configuration.exceptions import ConfigurationRunFailed
 from mozilla_django_oidc_db.models import (
     OpenIDConnectConfig,

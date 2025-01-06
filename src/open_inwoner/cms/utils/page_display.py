@@ -1,9 +1,7 @@
 """Utilities for determining whether CMS pages are published"""
 
-
-from django.db.models import Q
-
 from cms.models import Page
+from django.db.models import Q
 
 from open_inwoner.cms.benefits.cms_apps import SSDApphook
 from open_inwoner.cms.cases.cms_apps import CasesApphook

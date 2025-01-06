@@ -1,5 +1,10 @@
 import logging
 
+from digid_eherkenning.mock import conf as digid_conf
+from digid_eherkenning.mock.views.digid import DigiDAssertionConsumerServiceMockView
+from digid_eherkenning.views.base import get_redirect_url
+from digid_eherkenning.views.digid import DigiDAssertionConsumerServiceView
+from digid_eherkenning.views.eherkenning import eHerkenningAssertionConsumerServiceView
 from django.conf import settings
 from django.contrib import auth, messages
 from django.contrib.auth.mixins import UserPassesTestMixin
@@ -12,12 +17,6 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import resolve_url
 from django.urls import reverse
 from django.utils.translation import gettext as _
-
-from digid_eherkenning.mock import conf as digid_conf
-from digid_eherkenning.mock.views.digid import DigiDAssertionConsumerServiceMockView
-from digid_eherkenning.views.base import get_redirect_url
-from digid_eherkenning.views.digid import DigiDAssertionConsumerServiceView
-from digid_eherkenning.views.eherkenning import eHerkenningAssertionConsumerServiceView
 
 from eherkenning.mock import eherkenning_conf
 from eherkenning.mock.views.eherkenning import (

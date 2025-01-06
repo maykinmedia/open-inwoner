@@ -1,7 +1,6 @@
+import requests_mock
 from django.contrib.auth import user_logged_in
 from django.test import RequestFactory, tag
-
-import requests_mock
 from django_webtest import WebTest
 
 from open_inwoner.accounts.choices import LoginTypeChoices, NotificationChannelChoice

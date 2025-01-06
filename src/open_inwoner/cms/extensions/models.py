@@ -1,8 +1,7 @@
-from django.db import models
-from django.utils.translation import gettext_lazy as _
-
 from cms.extensions import PageExtension
 from cms.extensions.extension_pool import extension_pool
+from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from open_inwoner.cms.extensions.constants import Icons, IndicatorChoices
 

@@ -1,8 +1,7 @@
-from django.utils.text import slugify
-from django.utils.translation import gettext as _
-
 import markdown
 from bs4 import BeautifulSoup
+from django.utils.text import slugify
+from django.utils.translation import gettext as _
 
 CLASS_ADDERS = [
     ("h1", "utrecht-heading-1"),

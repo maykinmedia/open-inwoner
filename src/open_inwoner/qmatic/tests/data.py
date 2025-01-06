@@ -1,5 +1,4 @@
 from django.urls import reverse
-
 from zgw_consumers.constants import APITypes
 from zgw_consumers.test.factories import ServiceFactory
 

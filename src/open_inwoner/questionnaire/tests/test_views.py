@@ -4,7 +4,6 @@ from django.http import Http404
 from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse
 from django.views.generic import FormView
-
 from django_webtest import WebTest
 
 from open_inwoner.utils.test import SessionMiddleware

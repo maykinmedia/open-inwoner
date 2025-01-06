@@ -1,5 +1,4 @@
 from django.conf import settings
-
 from django_elasticsearch_dsl import Document, fields
 from django_elasticsearch_dsl.registries import registry
 

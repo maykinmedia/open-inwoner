@@ -2,9 +2,9 @@
 this file contains tests for the RESTful API
 The logic of `autocomplete` is tested at `open_inwoner.search.tests` folder
 """
+
 from django.test import tag
 from django.urls import reverse_lazy
-
 from rest_framework import status
 from rest_framework.test import APITestCase
 

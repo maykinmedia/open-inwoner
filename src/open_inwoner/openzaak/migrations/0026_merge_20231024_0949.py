@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("openzaak", "0025_auto_20231016_0957"),
         ("openzaak", "0025_openzaakconfig_title_text"),

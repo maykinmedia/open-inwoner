@@ -9,11 +9,11 @@ they are available for Django settings initialization.
     do NOT import anything Django related here, as this file needs to be loaded
     before Django is initialized.
 """
+
 import logging
 import os
 
 from django.conf import settings
-
 from dotenv import load_dotenv
 from requests import Session
 

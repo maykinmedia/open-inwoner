@@ -8,7 +8,6 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 from django.views.generic.edit import FormView
-
 from furl import furl
 from view_breadcrumbs import BaseBreadcrumbMixin
 

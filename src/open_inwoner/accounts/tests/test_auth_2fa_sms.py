@@ -9,7 +9,6 @@ from django.test.utils import freeze_time as dj_freeze_time
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext as _
-
 from django_webtest import WebTest
 from freezegun import freeze_time
 from furl import furl

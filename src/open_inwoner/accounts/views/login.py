@@ -2,7 +2,8 @@ from collections import OrderedDict
 
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import REDIRECT_FIELD_NAME, get_user_model, login as auth_login
+from django.contrib.auth import REDIRECT_FIELD_NAME, get_user_model
+from django.contrib.auth import login as auth_login
 from django.contrib.auth.views import LoginView
 from django.core.signing import BadSignature, SignatureExpired, TimestampSigner
 from django.shortcuts import redirect
@@ -12,7 +13,6 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext as _
 from django.views.decorators.cache import never_cache
 from django.views.generic import FormView, View
-
 from formtools.wizard.views import SessionWizardView
 from furl import furl
 from oath import totp
@@ -83,7 +83,7 @@ class CustomLoginView(LogMixin, LoginView):
         else:
             self.log_user_action(
                 user,
-                "SMS bericht met code is verzonden aan {}".format(user.phonenumber),
+                f"SMS bericht met code is verzonden aan {user.phonenumber}",
             )
 
             messages.debug(self.request, gateway.get_message(token))
@@ -255,7 +255,7 @@ class ResendTokenView(ThrottleMixin, LogMixin, View):
         else:
             self.log_user_action(
                 user,
-                "SMS bericht met code is verzonden aan {}".format(user.phonenumber),
+                f"SMS bericht met code is verzonden aan {user.phonenumber}",
             )
 
             messages.debug(self.request, gateway.get_message(token))
@@ -333,7 +333,7 @@ class AddPhoneNumberWizardView(LogMixin, SessionWizardView):
 
                 self.log_user_action(
                     self.user_cache,
-                    "SMS bericht met code is verzonden aan {}".format(phonenumber),
+                    f"SMS bericht met code is verzonden aan {phonenumber}",
                 )
 
         return super().render_next_step(form, **kwargs)
@@ -345,7 +345,7 @@ class AddPhoneNumberWizardView(LogMixin, SessionWizardView):
         self.request.user = self.user_cache
         self.log_change(
             self.user_cache,
-            "Telefoonnummer gewijzigd: {}".format(phonenumber),
+            f"Telefoonnummer gewijzigd: {phonenumber}",
         )
 
         self.user_cache.save()

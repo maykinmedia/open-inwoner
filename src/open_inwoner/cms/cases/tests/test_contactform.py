@@ -1,12 +1,11 @@
 from unittest.mock import ANY, patch
 
+import requests_mock
 from django.conf import settings
 from django.core import mail
 from django.test import override_settings
 from django.urls import reverse
 from django.utils.translation import gettext as _
-
-import requests_mock
 from django_webtest import WebTest
 from zgw_consumers.api_models.constants import (
     RolOmschrijving,
@@ -609,10 +608,12 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
                     if use_rsin_for_innNnpId_query_parameter
                     else eherkenning_user.kvk
                 )
-                m.get(
-                    f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId={identifier}",
-                    json=paginated_response([self.klant]),
-                ),
+                (
+                    m.get(
+                        f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId={identifier}",
+                        json=paginated_response([self.klant]),
+                    ),
+                )
 
                 response = self.app.get(self.case_detail_url, user=eherkenning_user)
 

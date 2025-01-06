@@ -1,7 +1,6 @@
 from django.test import TestCase, override_settings, tag
 from django.urls import reverse
 from django.utils.translation import gettext as _
-
 from playwright.sync_api import expect
 
 from open_inwoner.utils.test import ClearCachesMixin

@@ -1,5 +1,4 @@
 from django.conf import settings
-
 from elasticsearch_dsl import FacetedSearch, NestedFacet, TermsFacet, query
 
 from .constants import FacetChoices

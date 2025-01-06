@@ -5,7 +5,6 @@ from django.urls import reverse, reverse_lazy
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, FormView, ListView, TemplateView
-
 from view_breadcrumbs import BaseBreadcrumbMixin, ListBreadcrumbMixin
 
 from open_inwoner.configurations.models import SiteConfiguration

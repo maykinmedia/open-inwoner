@@ -4,7 +4,6 @@ from collections.abc import Callable
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.core.files.base import ContentFile
 from django.urls import reverse
-
 from furl import furl
 from playwright.sync_api import Browser, Playwright, sync_playwright
 

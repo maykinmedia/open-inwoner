@@ -2,9 +2,8 @@ from datetime import datetime
 from pathlib import Path
 from unittest.mock import patch
 
-from django.test import TestCase
-
 import requests_mock
+from django.test import TestCase
 from lxml import etree
 from requests.exceptions import ConnectionError
 

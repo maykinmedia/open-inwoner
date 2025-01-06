@@ -1,10 +1,9 @@
 import logging
 import re
 
-from django.contrib.auth import get_user_model
-
 from digid_eherkenning.backends import BaseBackend
 from digid_eherkenning.utils import get_client_ip
+from django.contrib.auth import get_user_model
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +18,7 @@ class eHerkenningBackend(BaseBackend):
             "eherkenning_no_kvk": "Login failed due to no KvK being returned by eHerkenning.",
             "eherkenning_len_kvk": "Login failed due to no KvK having more then 8 digits.",
             "eherkenning_num_kvk": "Login failed due to no KvK not being numerical.",
-        }
+        },
     )
 
     def get_or_create_user(self, request, kvk):

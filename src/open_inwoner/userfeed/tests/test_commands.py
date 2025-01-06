@@ -4,7 +4,6 @@ from unittest.mock import patch
 from django.core.management import call_command
 from django.test import TestCase
 from django.utils.timezone import make_aware
-
 from freezegun import freeze_time
 
 from open_inwoner.accounts.tests.factories import UserFactory

@@ -1,7 +1,6 @@
+import requests_mock
 from django.test import TestCase, override_settings
 from django.urls import reverse
-
-import requests_mock
 from freezegun import freeze_time
 from pyquery import PyQuery as PQ
 

@@ -1,6 +1,5 @@
-from django.http import HttpResponseRedirect
-
 from cms.toolbar.utils import get_toolbar_from_request
+from django.http import HttpResponseRedirect
 
 from open_inwoner.configurations.models import SiteConfiguration
 

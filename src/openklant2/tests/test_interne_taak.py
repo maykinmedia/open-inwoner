@@ -31,7 +31,7 @@ def interne_taak_factory(client, een_klant_contact, een_actor):
             *args,
             **kwargs,
             aanleidinggevendKlantcontact={"uuid": een_klant_contact["uuid"]},
-            toegewezenAanActor={"uuid": een_actor["uuid"]}
+            toegewezenAanActor={"uuid": een_actor["uuid"]},
         )
         return client.interne_taak.create(data=data)
 

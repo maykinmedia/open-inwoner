@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("questionnaire", "0006_auto_20220328_1042"),
         ("questionnaire", "0008_alter_questionnairestep_options"),

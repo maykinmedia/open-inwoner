@@ -1,7 +1,6 @@
+from cms import api
 from django.test import override_settings
 from django.urls import reverse
-
-from cms import api
 from django_webtest import WebTest
 
 from open_inwoner.accounts.tests.factories import ActionFactory, UserFactory

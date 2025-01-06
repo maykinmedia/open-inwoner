@@ -9,7 +9,6 @@ def migrate_seen(apps, _):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("accounts", "0024_merge_0021_alter_contact_type_0023_auto_20220202_0951")
     ]

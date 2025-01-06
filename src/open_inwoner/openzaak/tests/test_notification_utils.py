@@ -4,7 +4,6 @@ from django.core import mail
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
-
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 
@@ -30,7 +29,6 @@ class NotificationHandlerUtilsTestCase(TestCase):
         )
 
     def test_send_case_update_email(self):
-
         config = SiteConfiguration.get_solo()
         data = MockAPIData()
 

@@ -3,7 +3,6 @@ import pathlib
 
 from django import template
 from django.conf import settings
-
 from filer.models.filemodels import File
 
 from open_inwoner.cms.cases.views.status import SimpleFile

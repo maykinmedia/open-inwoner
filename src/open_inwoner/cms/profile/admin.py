@@ -1,6 +1,5 @@
-from django.contrib import admin
-
 from aldryn_apphooks_config.admin import BaseAppHookConfig
+from django.contrib import admin
 
 from .cms_appconfig import ProfileConfig
 

@@ -90,7 +90,9 @@ class UitkeringsSpecificatieClientPortTypeSendUitkeringsSpecificatieClientOutput
 
     @dataclass
     class Body:
-        uitkerings_specificatie_info_response: UitkeringsSpecificatieInfoResponse | None = field(
+        uitkerings_specificatie_info_response: (
+            UitkeringsSpecificatieInfoResponse | None
+        ) = field(
             default=None,
             metadata={
                 "name": "UitkeringsSpecificatieInfoResponse",

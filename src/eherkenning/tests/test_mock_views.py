@@ -4,7 +4,6 @@ from urllib.parse import urlencode
 from django.contrib.auth import get_user_model
 from django.test import TestCase, modify_settings, override_settings
 from django.urls import reverse
-
 from furl import furl
 
 from open_inwoner.kvk.branches import get_kvk_branch_number

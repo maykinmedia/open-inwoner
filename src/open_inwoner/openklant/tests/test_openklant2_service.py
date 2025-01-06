@@ -1,8 +1,7 @@
 import datetime
 
-from django.test import tag
-
 import freezegun
+from django.test import tag
 
 from open_inwoner.accounts.models import User
 from open_inwoner.accounts.tests.factories import UserFactory
@@ -305,9 +304,7 @@ class Openklant2ServiceTest(Openklant2ServiceTestCase):
         )
 
 
-QUESTION_DATE = datetime.datetime(
-    2024, 10, 2, 14, 0, 25, 587564, tzinfo=datetime.timezone.utc
-)
+QUESTION_DATE = datetime.datetime(2024, 10, 2, 14, 0, 25, 587564, tzinfo=datetime.UTC)
 
 
 @tag("openklant2")

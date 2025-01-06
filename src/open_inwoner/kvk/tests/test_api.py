@@ -1,8 +1,7 @@
 from unittest.mock import patch
 
-from django.test import TestCase
-
 import requests_mock
+from django.test import TestCase
 from requests.exceptions import InvalidJSONError, SSLError
 
 from ..client import KvKClient

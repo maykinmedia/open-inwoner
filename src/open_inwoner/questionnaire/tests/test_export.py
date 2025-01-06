@@ -2,7 +2,6 @@ from django.conf import settings
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-
 from privates.test import temp_private_root
 
 from open_inwoner.accounts.models import Document

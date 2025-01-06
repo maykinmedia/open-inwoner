@@ -8,7 +8,6 @@ from django.db import models, transaction
 from django.db.models import UniqueConstraint
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-
 from django_jsonform.models.fields import ArrayField
 from furl import furl
 from solo.models import SingletonModel
@@ -480,7 +479,6 @@ class OpenZaakConfig(SingletonModel):
 
 
 class CatalogusConfig(models.Model):
-
     objects = CatalogusConfigManager()
 
     url = models.URLField(

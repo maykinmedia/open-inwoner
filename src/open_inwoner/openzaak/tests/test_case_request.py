@@ -1,6 +1,5 @@
-from django.test import TestCase
-
 import requests_mock
+from django.test import TestCase
 
 from open_inwoner.openzaak.clients import build_zaken_client
 

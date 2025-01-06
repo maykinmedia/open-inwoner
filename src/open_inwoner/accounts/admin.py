@@ -5,8 +5,8 @@ from django.contrib.auth.models import Group
 from django.forms import ValidationError
 from django.urls import reverse
 from django.utils.html import format_html
-from django.utils.translation import gettext_lazy as _, ngettext
-
+from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ngettext
 from image_cropping import ImageCroppingMixin
 from privates.admin import PrivateMediaMixin
 
@@ -60,7 +60,6 @@ class _UserChangeForm(UserChangeForm):
             raise ValidationError(_("Only a 'begeleider' user can add an image."))
 
         if cleaned_data.get("email"):
-
             if (
                 User.objects.filter(email__iexact=cleaned_data["email"])
                 and self.instance.email != cleaned_data["email"]

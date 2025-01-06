@@ -1,5 +1,8 @@
 from datetime import datetime
 
+from aldryn_apphooks_config.mixins import AppConfigMixin
+from aldryn_apphooks_config.utils import get_app_instance
+from cms.models import Page
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
@@ -11,10 +14,6 @@ from django.views import View
 from django.views.generic import CreateView, DetailView, ListView
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import DeletionMixin, UpdateView
-
-from aldryn_apphooks_config.mixins import AppConfigMixin
-from aldryn_apphooks_config.utils import get_app_instance
-from cms.models import Page
 from privates.views import PrivateMediaView
 from view_breadcrumbs import BaseBreadcrumbMixin
 

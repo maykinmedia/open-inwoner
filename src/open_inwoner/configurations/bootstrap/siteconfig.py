@@ -1,5 +1,4 @@
 from django.conf import settings
-
 from django_setup_configuration.config_settings import ConfigSettings
 from django_setup_configuration.configuration import BaseConfigurationStep
 from django_setup_configuration.exceptions import ConfigurationRunFailed
@@ -150,5 +149,4 @@ class SiteConfigurationStep(BaseConfigurationStep):
 
         form.save()
 
-    def test_configuration(self):
-        ...
+    def test_configuration(self): ...

@@ -1,9 +1,8 @@
 from collections import OrderedDict
 
+import tablib
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-
-import tablib
 
 from ..models import Synonym
 from ..resources import SynonymResource

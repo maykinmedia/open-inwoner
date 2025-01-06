@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("configurations", "0052_siteconfiguration_registration_text"),
         ("configurations", "0052_siteconfiguration_search_filters"),

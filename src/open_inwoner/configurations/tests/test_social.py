@@ -1,6 +1,5 @@
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
-
 from pyquery import PyQuery
 
 from ...pdc.tests.factories import ProductFactory

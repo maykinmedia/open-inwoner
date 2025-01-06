@@ -1,7 +1,6 @@
 from unittest.mock import patch
 
 from django.test import TestCase
-
 from pyquery import PyQuery as PQ
 
 from open_inwoner.cms.profile.cms_apps import ProfileApphook
@@ -37,7 +36,6 @@ class KCMSurveyTestCase(TestCase):
         )
         for text, url in invalid_configs:
             with self.subTest(text=text, url=url):
-
                 with patch(
                     "open_inwoner.configurations.models.SiteConfiguration.get_solo",
                     return_value=SiteConfiguration(

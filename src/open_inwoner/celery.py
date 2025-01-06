@@ -1,9 +1,8 @@
 from pathlib import Path
 
-from django.conf import settings
-
 from celery import Celery, bootsteps
 from celery.signals import setup_logging, worker_ready, worker_shutdown
+from django.conf import settings
 
 from .setup import setup_env
 

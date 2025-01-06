@@ -2,14 +2,13 @@ from dataclasses import asdict
 from datetime import date
 from unittest.mock import patch
 
+import requests_mock
 from django import forms
 from django.conf import settings
 from django.template.defaultfilters import date as django_date
 from django.test import TestCase, override_settings, tag
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
-
-import requests_mock
 from django_webtest import WebTest
 from freezegun import freeze_time
 from pyquery import PyQuery as PQ

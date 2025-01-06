@@ -1,9 +1,8 @@
 from collections import OrderedDict
 
+import tablib
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-
-import tablib
 from freezegun import freeze_time
 from import_export.exceptions import ImportExportError
 
