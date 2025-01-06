@@ -33,7 +33,7 @@ class eHerkenningManager(BaseeHerkenningManager):
 
     def eherkenning_create(self, kvk, **kwargs):
         return super().create(
-            email=f"user-{kvk}@localhost",
+            email="user-{}@localhost".format(kvk),
             login_type=LoginTypeChoices.eherkenning,
             kvk=kvk,
         )

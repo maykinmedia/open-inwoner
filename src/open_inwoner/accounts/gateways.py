@@ -65,7 +65,9 @@ class MessageBird(Gateway):
             )
         except messagebird.client.ErrorException as e:
             for error in e.errors:
-                logger.critical(f"Could not send SMS to {to}:\n{error}")
+                logger.critical(
+                    ("Could not send SMS to {to}:\n{error}").format(to=to, error=error)
+                )
             raise GatewayError()
         else:
             logging.debug('Sent SMS to %s: "%s"', to, self.get_message(token))

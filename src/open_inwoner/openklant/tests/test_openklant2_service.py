@@ -304,7 +304,9 @@ class Openklant2ServiceTest(Openklant2ServiceTestCase):
         )
 
 
-QUESTION_DATE = datetime.datetime(2024, 10, 2, 14, 0, 25, 587564, tzinfo=datetime.UTC)
+QUESTION_DATE = datetime.datetime(
+    2024, 10, 2, 14, 0, 25, 587564, tzinfo=datetime.timezone.utc
+)
 
 
 @tag("openklant2")

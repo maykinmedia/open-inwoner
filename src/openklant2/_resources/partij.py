@@ -1,5 +1,5 @@
 import uuid
-from typing import cast
+from typing import Optional, cast
 
 from ape_pie import APIClient
 
@@ -26,7 +26,7 @@ class PartijResource(ResourceMixin):
         return cast(PaginatedResponseBody[Partij], self.process_response(response))
 
     def retrieve(
-        self, /, uuid: str | uuid.UUID, *, params: PartijRetrieveParams | None = None
+        self, /, uuid: str | uuid.UUID, *, params: Optional[PartijRetrieveParams] = None
     ) -> Partij:
         response = self._get(f"{self.base_path}/{str(uuid)}", params=params)
         return cast(Partij, self.process_response(response))

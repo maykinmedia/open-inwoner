@@ -110,7 +110,9 @@ class OpenIDEHerkenningConfig(_OIDCEHerkenningConfig):
 
 def generate_uuid_image_name(instance, filename):
     filename, file_extension = os.path.splitext(filename)
-    return f"profile/{uuid4()}{file_extension.lower()}"
+    return "profile/{uuid}{file_extension}".format(
+        uuid=uuid4(), file_extension=file_extension.lower()
+    )
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -881,7 +883,7 @@ class Invite(models.Model):
         """
         Returns the first_name plus the last_name of the invitee, with a space in between.
         """
-        full_name = f"{self.invitee_first_name} {self.invitee_last_name}"
+        full_name = "{} {}".format(self.invitee_first_name, self.invitee_last_name)
         return full_name.strip()
 
     def save(self, **kwargs):

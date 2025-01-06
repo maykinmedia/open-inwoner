@@ -1,7 +1,7 @@
 import dataclasses
 from dataclasses import dataclass
 from datetime import datetime
-from typing import NotRequired, TypedDict
+from typing import NotRequired, Optional, TypedDict, Union
 
 from zgw_consumers.api_models.base import ZGWModel
 
@@ -63,11 +63,11 @@ class ContactMoment(ZGWModel):
     # eSuite OAS (compatible)
     url: str
     bronorganisatie: str
-    registratiedatum: datetime | None = None
+    registratiedatum: Optional[datetime] = None
     kanaal: str = ""
     tekst: str = ""
     # NOTE annoyingly we can't put MedewerkerIdentificatie here as type because of
-    medewerker_identificatie: dict | None = None
+    medewerker_identificatie: Optional[dict] = None
 
     # modification to API for eSuite usefulness *AFWIJKING*
     identificatie: str = ""
@@ -79,8 +79,8 @@ class ContactMoment(ZGWModel):
     # open-klant OAS
     voorkeurskanaal: str = ""
     voorkeurstaal: str = ""
-    vorig_contactmoment: str | None = None
-    volgend_contactmoment: str | None = None
+    vorig_contactmoment: Optional[str] = None
+    volgend_contactmoment: Optional[str] = None
     onderwerp_links: list[str] = dataclasses.field(default_factory=list)
 
     initiatiefnemer: str = ""
@@ -124,8 +124,8 @@ class KlantContactMoment(ZGWModel):
 
     # eSuite OAS (compatible)
     url: str
-    contactmoment: str | ContactMoment
-    klant: str | Klant
+    contactmoment: Union[str, ContactMoment]
+    klant: Union[str, Klant]
     rol: str
 
     # open-klant non-standard *AFWIJKING*
@@ -138,6 +138,6 @@ class ObjectContactMoment(ZGWModel):
     Contactmomenten API
     """
 
-    contactmoment: str | ContactMoment
-    object: str | Klant
+    contactmoment: Union[str, ContactMoment]
+    object: Union[str, Klant]
     object_type: str

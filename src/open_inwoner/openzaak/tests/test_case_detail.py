@@ -1030,7 +1030,7 @@ class TestCaseDetailView(
         links = doc.find(".contactmomenten__link")
 
         self.assertEqual(len(links), 3)
-        for link, question in zip(links, case["questions"], strict=False):
+        for link, question in zip(links, case["questions"]):
             self.assertEqual(
                 link.attrib["href"],
                 reverse(
@@ -1152,7 +1152,7 @@ class TestCaseDetailView(
 
         self.assertEqual(len(links), 4)
 
-        for link, question in zip(links, case["questions"], strict=False):
+        for link, question in zip(links, case["questions"]):
             self.assertEqual(
                 link.attrib["href"],
                 reverse(
@@ -1701,7 +1701,7 @@ class TestCaseDetailView(
 
                 response = self.client.get(self.case_detail_url)
 
-                self.assertEqual(response.status_code, 200)
+                self.assertEquals(response.status_code, 200)
                 self.assertContains(response, self.zaak["identificatie"])
 
     @set_kvk_branch_number_in_session("1234")

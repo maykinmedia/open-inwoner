@@ -1,8 +1,14 @@
 import json
 import logging
-from collections.abc import Callable, Generator, Mapping, MutableMapping
 from typing import (
     Any,
+    Callable,
+    Dict,
+    Generator,
+    List,
+    Mapping,
+    MutableMapping,
+    Optional,
     ParamSpec,
     TypeGuard,
     TypeVar,
@@ -36,8 +42,8 @@ ResourceResponse = MutableMapping[str, Any]
 
 
 JSONPrimitive = Union[str, int, None, float]
-JSONValue = Union[JSONPrimitive, "JSONObject", list["JSONValue"]]
-JSONObject = dict[str, JSONValue]
+JSONValue = Union[JSONPrimitive, "JSONObject", List["JSONValue"]]
+JSONObject = Dict[str, JSONValue]
 
 P = ParamSpec("P")
 T = TypeVar("T")
@@ -113,7 +119,7 @@ class ResourceMixin:
     def _paginator(
         self,
         paginated_data: PaginatedResponseBody[T],
-        max_requests: int | None = None,
+        max_requests: Optional[int] = None,
     ) -> Generator[T, Any, None]:
         def row_iterator(
             _data: PaginatedResponseBody[T], num_requests=0

@@ -1,5 +1,5 @@
 import logging
-from collections.abc import Sequence
+from typing import Sequence
 
 from django.urls import reverse
 from django.utils.functional import cached_property

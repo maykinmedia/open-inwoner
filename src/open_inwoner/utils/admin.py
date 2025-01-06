@@ -120,7 +120,9 @@ class CustomTimelineLogAdmin(ExportMixin, TimelineLogAdmin):
             ct = obj.content_type
             try:
                 url = reverse(
-                    (f"admin:{ct.app_label}_{ct.model}_change"),
+                    ("admin:{app_label}_{model}_change").format(
+                        app_label=ct.app_label, model=ct.model
+                    ),
                     args=[obj.object_id],
                 )
                 link = format_html(

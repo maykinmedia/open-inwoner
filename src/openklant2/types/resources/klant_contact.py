@@ -1,4 +1,4 @@
-from typing import Literal, NotRequired, Required
+from typing import Literal, NotRequired, Optional, Required
 
 from pydantic import TypeAdapter
 from typing_extensions import TypedDict
@@ -79,7 +79,7 @@ class KlantContact(TypedDict):
     nummer: str
     kanaal: str
     onderwerp: str
-    inhoud: str | None
+    inhoud: Optional[str]
     indicatieContactGelukt: Required[bool | None]
 
     taal: LanguageCode

@@ -2,9 +2,8 @@ import dataclasses
 import datetime as dt
 import logging
 from collections import defaultdict
-from collections.abc import Iterable
 from datetime import datetime
-from typing import Protocol
+from typing import Iterable, Protocol
 
 from django.conf import settings
 from django.contrib import messages
@@ -317,7 +316,7 @@ class InnerCaseDetailView(
         # only 1 statustype for `self.case`
         # (this scenario is blocked by openzaak, but not part of the zgw standard)
         if len(statustype_numbers) < 2:
-            logger.info(f"Case {self.case} has only one statustype")
+            logger.info("Case {case} has only one statustype".format(case=self.case))
             return
 
         statustype_numbers.sort()
@@ -367,7 +366,9 @@ class InnerCaseDetailView(
             # Workaround: OIP requests the current zaak.status individually and adds the retrieved information to the statustype mapping
 
             logger.info(
-                f"Issue #2037 -- Retrieving status individually for case {self.case.identification} because of eSuite"
+                "Issue #2037 -- Retrieving status individually for case {} because of eSuite".format(
+                    self.case.identification
+                )
             )
             self.case.status = zaken_client.fetch_single_status(self.case.status)
             status_types_mapping[self.case.status.statustype].append(self.case.status)
@@ -458,7 +459,9 @@ class InnerCaseDetailView(
             ).exists()
         )
         logger.info(
-            f"Case {self.case.url} has case type file upload: {case_upload_enabled}"
+            "Case {url} has case type file upload: {case_upload_enabled}".format(
+                url=self.case.url, case_upload_enabled=case_upload_enabled
+            )
         )
         return case_upload_enabled
 
@@ -471,18 +474,26 @@ class InnerCaseDetailView(
         except AttributeError as e:
             logger.exception(e)
             logger.info(
-                f"Could not retrieve status type for case {self.case}; "
-                "the status has not been resolved to a ZGW model object."
+                "Could not retrieve status type for case {case}; "
+                "the status has not been resolved to a ZGW model object.".format(
+                    case=self.case
+                )
             )
             return True
         except KeyError as e:
             logger.exception(e)
             logger.info(
-                f"Could not retrieve status type config for url {self.case.status.statustype.url}"
+                "Could not retrieve status type config for url {url}".format(
+                    url=self.case.status.statustype.url
+                )
             )
             return True
         logger.info(
-            f"Case {self.case.url} status type {self.case.status.statustype} has status type file upload: {enabled_for_status_type}"
+            "Case {url} status type {status_type} has status type file upload: {enabled_for_status_type}".format(
+                url=self.case.url,
+                status_type=self.case.status.statustype,
+                enabled_for_status_type=enabled_for_status_type,
+            )
         )
         return enabled_for_status_type
 
@@ -652,9 +663,7 @@ class InnerCaseDetailView(
 
         config = OpenZaakConfig.get_solo()
         documents = []
-        for case_info_obj, info_obj in zip(
-            case_info_objects, info_objects, strict=False
-        ):
+        for case_info_obj, info_obj in zip(case_info_objects, info_objects):
             if not info_obj:
                 continue
             if not is_info_object_visible(

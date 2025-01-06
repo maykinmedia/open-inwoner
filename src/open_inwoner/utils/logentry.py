@@ -67,7 +67,11 @@ def addition(request, object, message=""):
     """
     Log that an object has been successfully added.
     """
-    logger.info(f"Added: {object}, {message}. \n{request}")
+    logger.info(
+        ("Added: {object}, {message}. \n{request}").format(
+            object=object, message=message, request=request
+        )
+    )
     TimelineLog.log_from_request(
         request=request,
         content_object=object,
@@ -82,7 +86,11 @@ def change(request, object, message):
     """
     Log that an object has been successfully changed.
     """
-    logger.info(f"Changed: {object}, {message}. \n{request}")
+    logger.info(
+        ("Changed: {object}, {message}. \n{request}").format(
+            object=object, message=message, request=request
+        )
+    )
     TimelineLog.log_from_request(
         request=request,
         content_object=object,
@@ -97,7 +105,11 @@ def deletion(request, object, message=""):
     """
     Log that an object was deleted.
     """
-    logger.info(f"Deleted: {object}, {message}. \n{request}")
+    logger.info(
+        ("Deleted: {object}, {message}. \n{request}").format(
+            object=object, message=message, request=request
+        )
+    )
     TimelineLog.log_from_request(
         request=request,
         content_object=object,
@@ -113,7 +125,11 @@ def user_action(request, object, message):
     Log a generic action done by a user, useful for when add/change/delete
     aren't appropriate.
     """
-    logger.info(f"User action: {object}, {message}. \n{request}")
+    logger.info(
+        ("User action: {object}, {message}. \n{request}").format(
+            object=object, message=message, request=request
+        )
+    )
     TimelineLog.log_from_request(
         request=request,
         content_object=object,

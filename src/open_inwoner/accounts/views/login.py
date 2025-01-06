@@ -83,7 +83,7 @@ class CustomLoginView(LogMixin, LoginView):
         else:
             self.log_user_action(
                 user,
-                f"SMS bericht met code is verzonden aan {user.phonenumber}",
+                "SMS bericht met code is verzonden aan {}".format(user.phonenumber),
             )
 
             messages.debug(self.request, gateway.get_message(token))
@@ -255,7 +255,7 @@ class ResendTokenView(ThrottleMixin, LogMixin, View):
         else:
             self.log_user_action(
                 user,
-                f"SMS bericht met code is verzonden aan {user.phonenumber}",
+                "SMS bericht met code is verzonden aan {}".format(user.phonenumber),
             )
 
             messages.debug(self.request, gateway.get_message(token))
@@ -333,7 +333,7 @@ class AddPhoneNumberWizardView(LogMixin, SessionWizardView):
 
                 self.log_user_action(
                     self.user_cache,
-                    f"SMS bericht met code is verzonden aan {phonenumber}",
+                    "SMS bericht met code is verzonden aan {}".format(phonenumber),
                 )
 
         return super().render_next_step(form, **kwargs)
@@ -345,7 +345,7 @@ class AddPhoneNumberWizardView(LogMixin, SessionWizardView):
         self.request.user = self.user_cache
         self.log_change(
             self.user_cache,
-            f"Telefoonnummer gewijzigd: {phonenumber}",
+            "Telefoonnummer gewijzigd: {}".format(phonenumber),
         )
 
         self.user_cache.save()

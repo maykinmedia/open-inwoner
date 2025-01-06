@@ -11,7 +11,7 @@ def validator(validator: TypeAdapter):
         def validate(obj, *args, **kwargs):
             validator.validate_python(obj)
 
-        cls.post_generation_validator = validate
+        setattr(cls, "post_generation_validator", validate)
 
         return cls
 

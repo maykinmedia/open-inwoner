@@ -103,14 +103,14 @@ class QuestionnaireStepAdmin(TreeAdmin):
     def display_question_answer(self, obj):
         redirect = ""
         if obj.redirect_to:
-            redirect = (
-                f" - doorsturen -> {obj.redirect_to.question} - {obj.redirect_to.id}"
+            redirect = " - doorsturen -> {} - {}".format(
+                obj.redirect_to.question, obj.redirect_to.id
             )
 
-        postfix = f" <small>({obj.id} - {obj.code}{redirect})</small>"
+        postfix = " <small>({} - {}{})</small>".format(obj.id, obj.code, redirect)
         if not obj.parent_answer:
             return obj.question + postfix
-        return f"{obj.parent_answer} -> {obj.question}" + postfix
+        return "{} -> {}".format(obj.parent_answer, obj.question) + postfix
 
     display_question_answer.allow_tags = True
 

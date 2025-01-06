@@ -1,9 +1,8 @@
 import datetime
 import logging
 import uuid
-from collections.abc import Iterable
 from datetime import timedelta
-from typing import Literal, NotRequired, Protocol, Self
+from typing import Iterable, Literal, NotRequired, Protocol, Self
 
 import glom
 from ape_pie.client import APIClient

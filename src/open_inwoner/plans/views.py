@@ -434,7 +434,7 @@ class PlanActionCreateView(PlanActionsEnabledMixin, ActionCreateView):
             return Plan.objects.connected(self.request.user).get(
                 uuid=self.kwargs.get("uuid")
             )
-        except ObjectDoesNotExist:
+        except ObjectDoesNotExist as e:
             raise Http404
 
     def form_valid(self, form):
@@ -485,7 +485,7 @@ class PlanActionEditView(PlanActionsEnabledMixin, ActionUpdateView):
             return Plan.objects.connected(self.request.user).get(
                 uuid=self.kwargs.get("plan_uuid")
             )
-        except ObjectDoesNotExist:
+        except ObjectDoesNotExist as e:
             raise Http404
 
     def form_valid(self, form):
@@ -519,7 +519,7 @@ class PlanActionEditStatusTagView(PlanActionsEnabledMixin, ActionUpdateStatusTag
             return Plan.objects.connected(self.request.user).get(
                 uuid=self.kwargs.get("plan_uuid")
             )
-        except ObjectDoesNotExist:
+        except ObjectDoesNotExist as e:
             raise Http404
 
     def get_template_tag_args(self, context):
@@ -534,7 +534,7 @@ class PlanActionDeleteView(PlanActionsEnabledMixin, ActionDeleteView):
             return Plan.objects.connected(self.request.user).get(
                 uuid=self.kwargs.get("plan_uuid")
             )
-        except ObjectDoesNotExist:
+        except ObjectDoesNotExist as e:
             raise Http404
 
     def get_success_url(self) -> str:
@@ -577,7 +577,7 @@ class PlanActionHistoryView(PlanActionsEnabledMixin, ActionHistoryView):
             return Plan.objects.connected(self.request.user).get(
                 uuid=self.kwargs.get("plan_uuid")
             )
-        except ObjectDoesNotExist:
+        except ObjectDoesNotExist as e:
             raise Http404
 
 

@@ -9,6 +9,6 @@ class GlomTestCase(SimpleTestCase):
             "aa": {"bb": 1},
             "cc": {"dd": 2},
         }
-        self.assertEqual(glom_multiple(obj, ("aa.bb", "cc.dd")), 1)
-        self.assertEqual(glom_multiple(obj, ("aa.xyz", "cc.dd")), 2)
-        self.assertEqual(glom_multiple(obj, ("aa.xyz", "cc.xyz"), default=999), 999)
+        self.assertEquals(glom_multiple(obj, ("aa.bb", "cc.dd")), 1)
+        self.assertEquals(glom_multiple(obj, ("aa.xyz", "cc.dd")), 2)
+        self.assertEquals(glom_multiple(obj, ("aa.xyz", "cc.xyz"), default=999), 999)

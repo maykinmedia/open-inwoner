@@ -3,8 +3,7 @@ import io
 import json
 import logging
 from collections import defaultdict
-from collections.abc import Generator
-from typing import IO, Any, Self
+from typing import IO, Any, Generator, Self
 from urllib.parse import urlparse
 
 from django.apps import apps
@@ -184,7 +183,7 @@ class ZGWConfigExport:
         )
 
     def __eq__(self, other: QuerySet) -> bool:
-        for a, b in zip(self, other, strict=False):
+        for a, b in zip(self, other):
             if a.difference(b).exists():
                 return False
         return True

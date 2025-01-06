@@ -109,7 +109,7 @@ class QuestionnaireStep(MP_Node):
         ordering = ("path",)
 
     def __str__(self) -> str:
-        return f"({self.id} - {self.code}) {self.question}"
+        return "({} - {}) {}".format(self.id, self.code, self.question)
 
     def get_absolute_url(self) -> str:
         if self.is_root():

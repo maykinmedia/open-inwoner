@@ -702,7 +702,7 @@ class CustomFontSet(models.Model):
     def update_filename(self, filename: str, new_name: str, path: str) -> str:
         ext = filename.split(".")[1]
         filename = f"{new_name}.{ext}"
-        return f"{path}/{filename}"
+        return "{path}/{filename}".format(path=path, filename=filename)
 
     def update_filename_body(self, filename: str) -> str:
         return CustomFontSet.update_filename(

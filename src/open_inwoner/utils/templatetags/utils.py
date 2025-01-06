@@ -58,7 +58,7 @@ def placekitten(width=800, height=600):
         {%placekitten %}
         {%placekitten 200 200 %}
     """
-    return format_html(f'<img src="{placekitten_src(width, height)}" />')
+    return format_html('<img src="{}" />'.format(placekitten_src(width, height)))
 
 
 @register.simple_tag
@@ -71,7 +71,7 @@ def placekitten_src(width=800, height=600):
         {% placekitten_src 200 200 as mobile_src %}
         {% include 'components/image/image.html' with mobile_src=mobile_src src=src alt='placekitten' only %}
     """
-    return f"//placekitten.com/{width}/{height}"
+    return "//placekitten.com/{}/{}".format(width, height)
 
 
 @register.simple_tag

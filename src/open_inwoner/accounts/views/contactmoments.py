@@ -1,6 +1,5 @@
 import logging
-from collections.abc import Iterable
-from typing import Protocol
+from typing import Iterable, Protocol
 
 from django.contrib.auth.mixins import AccessMixin
 from django.core.exceptions import ImproperlyConfigured

@@ -93,6 +93,7 @@ def test_create_persoon(client) -> None:
             "digitaleAdressen": None,
             "rekeningnummers": None,
             "voorkeursRekeningnummer": None,
+            "soortPartij": "persoon",
             "voorkeurstaal": "nld",
             "indicatieActief": True,
             "indicatieGeheimhouding": False,

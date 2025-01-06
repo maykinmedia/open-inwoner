@@ -994,7 +994,7 @@ from .parts.maileditor import (  # noqa
 )
 
 if ALLOWED_HOSTS:
-    BASE_URL = f"https://{ALLOWED_HOSTS[0]}"
+    BASE_URL = "https://{}".format(ALLOWED_HOSTS[0])
 else:
     BASE_URL = "https://example.com"
 

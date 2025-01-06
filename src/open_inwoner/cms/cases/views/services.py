@@ -2,9 +2,8 @@ import concurrent.futures
 import enum
 import functools
 import logging
-from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TypedDict
+from typing import Callable, TypedDict
 
 from django.http import HttpRequest
 from django.utils.translation import gettext_lazy as _
@@ -226,7 +225,9 @@ class CaseListService:
                     case = futures[task]["case"]
                     group = futures[task]["api_group"]
                     logger.exception(
-                        f"Error while resolving case {case} with API group {group}"
+                        "Error while resolving case {case} with API group {group}".format(
+                            case=case, group=group
+                        )
                     )
 
         return resolved_cases
@@ -264,7 +265,7 @@ class CaseListService:
             ):
                 try:
                     update_case = task.result()
-                    if callable(update_case):
+                    if hasattr(update_case, "__call__"):
                         update_case(case)
                 except BaseException:
                     logger.exception("Error in resolving case", stack_info=True)
