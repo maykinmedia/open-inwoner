@@ -167,12 +167,5 @@ jobs:
       - name: Install pre-commit
         run: pip install pre-commit
 
-      - name: Get changed files
-        id: changed-files
-        run: |
-          echo "files=$(git diff --name-only origin/develop...HEAD | tr '\n' ' ')" >> $GITHUB_OUTPUT
-
-      - name: Run pre-commit on changed files
-        continue-on-error: true
-        run: |
-          pre-commit run --files ${{ steps.changed-files.outputs.files }}
+      - name: Run pre-commit on all files
+        run: pre-commit run --all-files
