@@ -80,9 +80,9 @@ def action_status_button(action, request, plan=None, **kwargs):
         for value, label, icon in StatusChoices.choices_with_icons()
     ]
 
-    kwargs["class"] = (
-        f"actions__status-selector actions__status-selector--{action.status}"
-    )
+    kwargs[
+        "class"
+    ] = f"actions__status-selector actions__status-selector--{action.status}"
     kwargs.update(
         action=action,
         request=request,

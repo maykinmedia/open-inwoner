@@ -9,7 +9,8 @@ class UniformCase(Protocol):
     """
 
     @property
-    def identification(self) -> str: ...
+    def identification(self) -> str:
+        ...
 
     def process_data(self) -> dict:
         """

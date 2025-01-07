@@ -16,4 +16,13 @@ repos:
       - id: ruff
         args: [--fix]
       # Run the formatter.
-      - id: ruff-format
+      # - id: ruff-format
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+  - repo: https://github.com/psf/black-pre-commit-mirror
+    rev: 22.12.0
+    hooks:
+      - id: black
+        language_version: python3.11

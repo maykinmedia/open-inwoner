@@ -911,9 +911,9 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
             send_confirmation = False
 
             if config.register_email:
-                form.cleaned_data["question"] += (
-                    f"\n\nCase number: {self.case.identificatie}"
-                )
+                form.cleaned_data[
+                    "question"
+                ] += f"\n\nCase number: {self.case.identificatie}"
                 email_success = self.register_by_email(form, config.register_email)
                 send_confirmation = email_success
 

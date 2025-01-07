@@ -37,10 +37,8 @@ class CaseUploadForm(forms.Form):
         if case:
             self.fields[
                 "type"
-            ].queryset = (
-                ZaakTypeInformatieObjectTypeConfig.objects.filter_enabled_for_case_type(
-                    case.zaaktype
-                )
+            ].queryset = ZaakTypeInformatieObjectTypeConfig.objects.filter_enabled_for_case_type(
+                case.zaaktype
             )
 
         choices = self.fields["type"].choices
