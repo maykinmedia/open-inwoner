@@ -94,8 +94,7 @@ jobs:
         ports:
           - 5432:5432
         # Needed because the postgres container does not provide a healthcheck
-        options:
-          --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
       - uses: actions/checkout@v3
@@ -154,3 +153,29 @@ jobs:
       - name: Run Bandit
         run: |
           bandit -r ./src/ -x tests,conf/utils.py -s B101
+
+  pre-commit:
+    name: Pre-commit hooks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install pre-commit
+        run: pip install pre-commit
+
+      - name: Get changed files
+        id: changed-files
+        run: |
+          echo "files=$(git diff --name-only origin/main...HEAD | tr '\n' ' ')" >> $GITHUB_OUTPUT
+
+      - name: Run pre-commit
+        continue-on-error: true
+        run: |
+          pre-commit run --files ${{ steps.changed-files.outputs.files }}
