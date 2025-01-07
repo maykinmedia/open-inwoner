@@ -318,6 +318,7 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
         for root, root_offset in zip(
             self.roots,
             (0, 2),
+            strict=False,
         ):
             # first ZaakTypeConfig has two ZaakTypes and two InfoObjectTypes
             ztc, ztiotcs = res[root_offset]
@@ -419,6 +420,7 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
         for root, root_offset in zip(
             self.roots,
             (0, 1),
+            strict=False,
         ):
             self.assertEqual(
                 catalog_and_zaak_type[root][

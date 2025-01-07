@@ -183,7 +183,7 @@ class ZGWConfigExport:
         )
 
     def __eq__(self, other: QuerySet) -> bool:
-        for a, b in zip(self, other):
+        for a, b in zip(self, other, strict=False):
             if a.difference(b).exists():
                 return False
         return True

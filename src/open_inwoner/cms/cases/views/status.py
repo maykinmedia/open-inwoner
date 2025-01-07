@@ -663,7 +663,9 @@ class InnerCaseDetailView(
 
         config = OpenZaakConfig.get_solo()
         documents = []
-        for case_info_obj, info_obj in zip(case_info_objects, info_objects):
+        for case_info_obj, info_obj in zip(
+            case_info_objects, info_objects, strict=False
+        ):
             if not info_obj:
                 continue
             if not is_info_object_visible(

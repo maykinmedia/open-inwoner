@@ -137,6 +137,7 @@ class ExportObjectTests(TestCase):
                 "ztc_resultaat",
                 "ztiotc",
             ),
+            strict=False,
         ):
             with self.subTest(
                 f"{mock_field} should not be in the export's {export_field} field"

@@ -1030,7 +1030,7 @@ class TestCaseDetailView(
         links = doc.find(".contactmomenten__link")
 
         self.assertEqual(len(links), 3)
-        for link, question in zip(links, case["questions"]):
+        for link, question in zip(links, case["questions"], strict=False):
             self.assertEqual(
                 link.attrib["href"],
                 reverse(
@@ -1152,7 +1152,7 @@ class TestCaseDetailView(
 
         self.assertEqual(len(links), 4)
 
-        for link, question in zip(links, case["questions"]):
+        for link, question in zip(links, case["questions"], strict=False):
             self.assertEqual(
                 link.attrib["href"],
                 reverse(
