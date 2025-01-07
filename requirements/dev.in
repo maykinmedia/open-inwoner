@@ -16,3 +16,5 @@ django-silk
 # VCR
 pytest-recording
 vcrpy
+
+pre-commit
