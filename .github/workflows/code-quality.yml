@@ -170,7 +170,7 @@ jobs:
       - name: Get changed files
         id: changed-files
         run: |
-          echo "files=$(git diff --name-only origin/main...HEAD | tr '\n' ' ')" >> $GITHUB_OUTPUT
+          echo "files=$(git diff --name-only origin/develop...HEAD | tr '\n' ' ')" >> $GITHUB_OUTPUT
 
       - name: Run pre-commit on changed files
         continue-on-error: true
