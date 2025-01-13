@@ -443,6 +443,48 @@ class CreateKlantForNewUserSignalTestCase(
             },
         )
 
+    def test_sync_bsn_user_to_esuite_upon_creation_without_notificaion_channel(self, m):
+        config = SiteConfiguration.get_solo()
+        config.enable_notification_channel_choice = False
+        config.save()
+        m.get(
+            f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn=999993847",
+            json=paginated_response([]),
+        )
+        m.post(
+            f"{KLANTEN_ROOT}klanten",
+            json=self.klant_bsn,
+        )
+        m.patch(
+            f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            json=self.klant_bsn,
+        )
+
+        user = UserFactory(
+            phonenumber="0123456789",
+            email="old@example.com",
+            login_type=LoginTypeChoices.digid,
+            bsn="999993847",
+        )
+
+        post_save.send(sender=User, instance=user, created=True)
+
+        self.assertEqual(
+            m.request_history[1].json(),
+            {
+                "subjectIdentificatie": {
+                    "inpBsn": "999993847",
+                }
+            },
+        )
+        self.assertEqual(
+            m.request_history[2].json(),
+            {
+                "emailadres": "old@example.com",
+                "telefoonnummer": "0123456789",
+            },
+        )
+
     def test_sync_eherkenning_user_to_esuite_upon_creation(self, m):
         klant_eherkenning = generate_oas_component_cached(
             "kc",
@@ -487,5 +529,56 @@ class CreateKlantForNewUserSignalTestCase(
                 "emailadres": user.email,
                 "telefoonnummer": user.phonenumber,
                 "toestemmingZaakNotificatiesAlleenDigitaal": False,
+            },
+        )
+
+    def test_sync_eherkenning_user_to_esuite_upon_creation_without_notification_channel(
+        self, m
+    ):
+        config = SiteConfiguration.get_solo()
+        config.enable_notification_channel_choice = False
+        config.save()
+        klant_eherkenning = generate_oas_component_cached(
+            "kc",
+            "schemas/Klant",
+            bronorganisatie="123456789",
+            klantnummer="12345678",
+            subjectIdentificatie={
+                "innNnpId": "87654321",
+            },
+            url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            emailadres="new@example.com",
+            telefoonnummer="0612345678",
+        )
+        m.get(
+            f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId=87654321",
+            json={"count": 0, "results": []},
+        )
+        m.post(f"{KLANTEN_ROOT}klanten", json=klant_eherkenning)
+        m.patch(
+            f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            json=self.klant_bsn,
+        )
+
+        user = UserFactory(
+            login_type=LoginTypeChoices.eherkenning,
+            kvk="87654321",
+        )
+
+        post_save.send(sender=User, instance=user, created=True)
+
+        self.assertEqual(
+            m.request_history[1].json(),
+            {
+                "subjectIdentificatie": {
+                    "innNnpId": "87654321",
+                }
+            },
+        )
+        self.assertEqual(
+            m.request_history[2].json(),
+            {
+                "emailadres": user.email,
+                "telefoonnummer": user.phonenumber,
             },
         )
