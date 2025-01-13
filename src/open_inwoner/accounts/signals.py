@@ -97,8 +97,8 @@ def _update_esuite_from_user(
     if not (fetch_params := service.get_fetch_parameters(user=user, request=request)):
         return
 
-    klant, _ = service.get_or_create_klant(fetch_params=fetch_params, user=user)
-    if klant:
+    klant, created = service.get_or_create_klant(fetch_params=fetch_params, user=user)
+    if klant and created:
         config = SiteConfiguration.get_solo()
         update_data: KlantWritePayload = {
             "emailadres": user.email,
@@ -127,6 +127,8 @@ def create_klant_for_new_user(
         return
 
     user = instance
+    if user.login_type not in [LoginTypeChoices.digid, LoginTypeChoices.eherkenning]:
+        return
 
     # eSuite
     try:

@@ -1,4 +1,7 @@
+from unittest.mock import patch
+
 from django.contrib.auth import user_logged_in
+from django.db.models.signals import post_save
 from django.test import RequestFactory, tag
 
 import requests_mock
@@ -312,3 +315,160 @@ class UpdateUserFromLoginSignalAPITestCase(
                 requests[1].json(),
                 {"subjectIdentificatie": {"innNnpId": f"{user.kvk}"}},
             )
+
+
+@tag("sequential")
+@requests_mock.Mocker()
+class CreateKlantForNewUserSignalTestCase(
+    ClearCachesMixin, DisableRequestLogMixin, AssertTimelineLogMixin, WebTest
+):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        MockAPIReadData.setUpServices()
+        config = SiteConfiguration.get_solo()
+        config.enable_notification_channel_choice = True
+        config.save()
+
+    def setUp(self) -> None:
+        super().setUp()
+
+        self.klant_bsn = generate_oas_component_cached(
+            "kc",
+            "schemas/Klant",
+            bronorganisatie="123456789",
+            klantnummer="12345678",
+            subjectIdentificatie={
+                "inpBsn": "123456789",
+            },
+            url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            emailadres="new@example.com",
+            telefoonnummer="0612345678",
+            toestemmingZaakNotificatiesAlleenDigitaal=False,
+        )
+
+    def test_sync_aborted_for_non_digid_eherkennng(self, m):
+        for lt in [
+            lt
+            for lt in LoginTypeChoices
+            if lt not in [LoginTypeChoices.digid, LoginTypeChoices.eherkenning]
+        ]:
+            with self.subTest(lt):
+                with patch(
+                    "open_inwoner.accounts.signals._update_esuite_from_user"
+                ) as update_func:
+                    User.objects.all().delete()
+                    user = UserFactory(
+                        phonenumber="0123456789",
+                        email="old@example.com",
+                        login_type=lt,
+                        bsn="999993847",
+                    )
+
+                    post_save.send(sender=User, instance=user, created=True)
+                    update_func.assert_not_called()
+
+    def test_sync_aborted_for_existing_klant(self, m):
+        m.get(
+            f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn=999993847",
+            json=paginated_response([self.klant_bsn]),
+        )
+        with patch(
+            "open_inwoner.accounts.signals.eSuiteKlantenService.partial_update_klant"
+        ) as update_func:
+            user = UserFactory(
+                phonenumber="0123456789",
+                email="old@example.com",
+                login_type=LoginTypeChoices.digid,
+                bsn="999993847",
+            )
+
+            post_save.send(sender=User, instance=user, created=True)
+            update_func.assert_not_called()
+
+    def test_sync_bsn_user_to_esuite_upon_creation(self, m):
+        m.get(
+            f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn=999993847",
+            json=paginated_response([]),
+        )
+        m.post(
+            f"{KLANTEN_ROOT}klanten",
+            json=self.klant_bsn,
+        )
+        m.patch(
+            f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            json=self.klant_bsn,
+        )
+
+        user = UserFactory(
+            phonenumber="0123456789",
+            email="old@example.com",
+            login_type=LoginTypeChoices.digid,
+            bsn="999993847",
+        )
+
+        post_save.send(sender=User, instance=user, created=True)
+
+        self.assertEqual(
+            m.request_history[1].json(),
+            {
+                "subjectIdentificatie": {
+                    "inpBsn": "999993847",
+                }
+            },
+        )
+        self.assertEqual(
+            m.request_history[2].json(),
+            {
+                "emailadres": "old@example.com",
+                "telefoonnummer": "0123456789",
+                "toestemmingZaakNotificatiesAlleenDigitaal": False,
+            },
+        )
+
+    def test_sync_eherkenning_user_to_esuite_upon_creation(self, m):
+        klant_eherkenning = generate_oas_component_cached(
+            "kc",
+            "schemas/Klant",
+            bronorganisatie="123456789",
+            klantnummer="12345678",
+            subjectIdentificatie={
+                "innNnpId": "87654321",
+            },
+            url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            emailadres="new@example.com",
+            telefoonnummer="0612345678",
+        )
+        m.get(
+            f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId=87654321",
+            json={"count": 0, "results": []},
+        )
+        m.post(f"{KLANTEN_ROOT}klanten", json=klant_eherkenning)
+        m.patch(
+            f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            json=self.klant_bsn,
+        )
+
+        user = UserFactory(
+            login_type=LoginTypeChoices.eherkenning,
+            kvk="87654321",
+        )
+
+        post_save.send(sender=User, instance=user, created=True)
+
+        self.assertEqual(
+            m.request_history[1].json(),
+            {
+                "subjectIdentificatie": {
+                    "innNnpId": "87654321",
+                }
+            },
+        )
+        self.assertEqual(
+            m.request_history[2].json(),
+            {
+                "emailadres": user.email,
+                "telefoonnummer": user.phonenumber,
+                "toestemmingZaakNotificatiesAlleenDigitaal": False,
+            },
+        )
