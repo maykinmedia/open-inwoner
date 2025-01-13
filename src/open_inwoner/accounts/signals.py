@@ -60,7 +60,7 @@ def update_user_on_login(sender, user, request, *args, **kwargs):
 def _update_user_from_openklant2(
     user: User, service: OpenKlant2Service, request: None = None
 ) -> None:
-    if fetch_params := service.get_fetch_parameters(request=request):
+    if fetch_params := service.get_fetch_parameters(user=user, request=request):
         partij, created = service.get_or_create_partij_for_user(
             fetch_params=fetch_params, user=user
         )
@@ -71,7 +71,7 @@ def _update_user_from_openklant2(
 def _update_user_from_esuite(
     user: User, service: eSuiteKlantenService, request: None = None
 ) -> None:
-    if not (fetch_params := service.get_fetch_parameters(request=request)):
+    if not (fetch_params := service.get_fetch_parameters(user=user, request=request)):
         return
 
     klant, created = service.get_or_create_klant(fetch_params=fetch_params, user=user)
@@ -89,28 +89,36 @@ def _update_eherkenning_user_from_kvk_api(user: User):
         user.save()
 
 
-# TODO: Should we also try to fetch pre-existing klant for new user and update?
-# The klant could have been created by a different service.
+def _update_esuite_from_user(
+    user: User, service: eSuiteKlantenService, request: None = None
+):
+    if not (fetch_params := service.get_fetch_parameters(user=user, request=request)):
+        return
+
+    klant, _ = service.get_or_create_klant(fetch_params=fetch_params, user=user)
+    if klant:
+        service.partial_update_klant(
+            klant,
+            update_data={
+                "emailadres": user.email,
+                "telefoonnummer": user.phonenumber,
+                # TODO: toestemmingZaakNotificatiesAlleenDigitaal
+            },
+        )
+
+
 @receiver(post_save, sender=User)
-def get_or_create_klant_for_new_user(
+def create_klant_for_new_user(
     sender: type, instance: User, created: bool, **kwargs
 ) -> None:
+    """
+    Sync newly created user data to the klanten systeem, creating the klant if it does
+    not yet exist.
+    """
     if not created:
-        logger.info("No klanten sync performed because user has just been created")
         return
 
     user = instance
-
-    # OpenKlant2
-    try:
-        service = OpenKlant2Service()
-    except Exception:
-        logger.error("OpenKlant2 service failed to build")
-    else:
-        _update_user_from_openklant2(
-            user,
-            service,
-        )
 
     # eSuite
     try:
@@ -118,7 +126,9 @@ def get_or_create_klant_for_new_user(
     except Exception:
         logger.error("eSuiteKlantenService failed to build")
     else:
-        _update_user_from_esuite(user, service)
+        _update_esuite_from_user(user, service)
+
+    # TODO: Sync newly created user to OpenKlant2
 
 
 @receiver(user_logged_in)

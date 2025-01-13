@@ -170,11 +170,7 @@ class UpdateUserFromLoginSignalAPITestCase(
             with self.subTest(
                 use_rsin_for_innNnpId_query_parameter=use_rsin_for_innNnpId_query_parameter
             ):
-                user.email = "old@example.com"
-                user.phonenumber = "0123456789"
-                user.save()
                 self.clearTimelineLogs()
-
                 config = ESuiteKlantConfig.get_solo()
                 config.use_rsin_for_innNnpId_query_parameter = (
                     use_rsin_for_innNnpId_query_parameter
@@ -189,8 +185,17 @@ class UpdateUserFromLoginSignalAPITestCase(
                     json=paginated_response([self.klant_bsn]),
                 )
 
+                user.email = "old@example.com"
+                user.phonenumber = "0123456789"
+                user.save()
+
+                # 2 logs: retrieved, updated
+                # 1 signal: post_save, get_or_create_klant_for_new_user
                 request = RequestFactory().get("/dummy")
                 request.user = user
+                # Sending this signal will also trigger Django's own
+                # update_last_login handler, which in _turn_ will trigger the post_save
+                # handler.
                 user_logged_in.send(User, user=user, request=request)
 
                 user.refresh_from_db()

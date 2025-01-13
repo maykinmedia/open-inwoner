@@ -114,7 +114,9 @@ class KlantenService(Protocol):
         """
         Determine the parameters used to perform Klanten/Contactmomenten fetches
         """
-        user = user or request.user
+        user = user or getattr(request, "user", None)
+        if not user:
+            raise ValueError("You must provide either a user or a request")
 
         if user.bsn:
             return {"user_bsn": user.bsn}
@@ -309,22 +311,28 @@ class eSuiteKlantenService(KlantenService):
                 )
 
         if update_data:
-            for attr, value in update_data.items():
-                setattr(user, attr, value)
-            user.save(update_fields=update_data.keys())
+            # for attr, value in update_data.items():
+            #     setattr(user, attr, value)
+            # Avoid signal dispatching
+            User.objects.filter(pk=user.pk).update(**update_data)
 
             system_action(
                 f"updated user from klant API with fields: {', '.join(sorted(update_data.keys()))}",
                 content_object=user,
             )
 
-    def partial_update_klant(self, klant: Klant, update_data) -> Klant | None:
+    def partial_update_klant(
+        self, klant: Klant, update_data: KlantWritePayload
+    ) -> Klant | None:
         try:
             response = self.client.patch(url=klant.url, json=update_data)
             data = get_json_response(response)
         except (RequestException, ClientError) as e:
             logger.exception("exception while making request", exc_info=e)
             return
+
+        if not data:
+            return None
 
         klant = factory(Klant, data)
 
