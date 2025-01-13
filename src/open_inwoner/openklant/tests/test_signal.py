@@ -347,7 +347,7 @@ class CreateKlantForNewUserSignalTestCase(
             toestemmingZaakNotificatiesAlleenDigitaal=False,
         )
 
-    def test_sync_aborted_for_non_digid_eherkennng(self, m):
+    def test_sync_aborted_for_non_digid_eherkenning(self, m):
         for lt in [
             lt
             for lt in LoginTypeChoices
@@ -366,6 +366,23 @@ class CreateKlantForNewUserSignalTestCase(
                     )
 
                     post_save.send(sender=User, instance=user, created=True)
+                    update_func.assert_not_called()
+
+    def test_sync_aborted_for_non_created_user(self, m):
+        for lt in [LoginTypeChoices.digid, LoginTypeChoices.eherkenning]:
+            with self.subTest(lt):
+                with patch(
+                    "open_inwoner.accounts.signals._update_esuite_from_user"
+                ) as update_func:
+                    User.objects.all().delete()
+                    user = UserFactory(
+                        phonenumber="0123456789",
+                        email="old@example.com",
+                        login_type=lt,
+                        bsn="999993847",
+                    )
+
+                    post_save.send(sender=User, instance=user, created=False)
                     update_func.assert_not_called()
 
     def test_sync_aborted_for_existing_klant(self, m):

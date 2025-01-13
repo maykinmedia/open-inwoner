@@ -138,7 +138,7 @@ def create_klant_for_new_user(
     else:
         _update_esuite_from_user(user, service)
 
-    # TODO: Sync newly created user to OpenKlant2
+    # TODO: Also sync newly created user to OpenKlant2
 
 
 @receiver(user_logged_in)
