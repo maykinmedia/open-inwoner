@@ -7,13 +7,15 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from open_inwoner.accounts.models import User
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.haalcentraal.models import HaalCentraalConfig
 from open_inwoner.haalcentraal.utils import update_brp_data_in_db
 from open_inwoner.kvk.client import KvKClient
+from open_inwoner.openklant.api_models import KlantWritePayload
 from open_inwoner.openklant.services import OpenKlant2Service, eSuiteKlantenService
 from open_inwoner.utils.logentry import user_action
 
-from .choices import LoginTypeChoices
+from .choices import LoginTypeChoices, NotificationChannelChoice
 
 logger = logging.getLogger(__name__)
 
@@ -97,13 +99,19 @@ def _update_esuite_from_user(
 
     klant, _ = service.get_or_create_klant(fetch_params=fetch_params, user=user)
     if klant:
+        config = SiteConfiguration.get_solo()
+        update_data: KlantWritePayload = {
+            "emailadres": user.email,
+            "telefoonnummer": user.phonenumber,
+        }
+        if config.enable_notification_channel_choice:
+            update_data["toestemmingZaakNotificatiesAlleenDigitaal"] = (
+                user.case_notification_channel == NotificationChannelChoice.digital_only
+            )
+
         service.partial_update_klant(
             klant,
-            update_data={
-                "emailadres": user.email,
-                "telefoonnummer": user.phonenumber,
-                # TODO: toestemmingZaakNotificatiesAlleenDigitaal
-            },
+            update_data=update_data,
         )
 
 

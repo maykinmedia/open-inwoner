@@ -311,10 +311,10 @@ class eSuiteKlantenService(KlantenService):
                 )
 
         if update_data:
-            # for attr, value in update_data.items():
-            #     setattr(user, attr, value)
-            # Avoid signal dispatching
-            User.objects.filter(pk=user.pk).update(**update_data)
+            for attr, value in update_data.items():
+                setattr(user, attr, value)
+
+            user.save(update_fields=update_data.keys())
 
             system_action(
                 f"updated user from klant API with fields: {', '.join(sorted(update_data.keys()))}",
