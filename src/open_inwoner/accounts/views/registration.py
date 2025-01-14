@@ -14,6 +14,7 @@ from furl import furl
 from open_inwoner.accounts.choices import NotificationChannelChoice
 from open_inwoner.accounts.views.mixins import KlantenAPIMixin
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.openklant.api_models import KlantWritePayload
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from ...mail.verification import send_user_email_verification_mail
@@ -188,16 +189,22 @@ class NecessaryFieldsUserView(
 
     def update_klant(self, user_form_data: dict):
         config = SiteConfiguration.get_solo()
-        if not config.enable_notification_channel_choice:
-            return
 
-        if notification_channel := user_form_data.get("case_notification_channel"):
-            self.patch_klant(
-                update_data={
-                    "toestemmingZaakNotificatiesAlleenDigitaal": notification_channel
-                    == NotificationChannelChoice.digital_only
-                }
+        update_data: KlantWritePayload = {}
+
+        if email := user_form_data.get("email"):
+            update_data["emailadres"] = email
+
+        if (
+            notification_channel := user_form_data.get("case_notification_channel")
+            and config.enable_notification_channel_choice
+        ):
+            update_data["toestemmingZaakNotificatiesAlleenDigitaal"] = (
+                notification_channel == NotificationChannelChoice.digital_only
             )
+
+        if update_data:
+            self.patch_klant(update_data=update_data)
 
 
 class EmailVerificationUserView(LogMixin, LoginRequiredMixin, TemplateView):

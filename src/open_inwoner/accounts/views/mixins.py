@@ -19,12 +19,19 @@ class KlantenAPIMixin:
             logger.error("Error building KlantenService")
             return
 
-        klant = service.retrieve_klant(**service.get_fetch_parameters(self.request))
+        klant, klant_created = service.get_or_create_klant(
+            fetch_params=service.get_fetch_parameters(self.request),
+            user=self.request.user,
+        )
         if not klant:
             logger.error("Failed to retrieve klant for user %s", self.request.user)
             return
 
-        self.log_system_action("retrieved klant for user", user=self.request.user)
+        if klant_created:
+            self.log_system_action("created klant for user", user=self.request.user)
+        else:
+            self.log_system_action("retrieved klant for user", user=self.request.user)
+
         service.partial_update_klant(klant, update_data)
         self.log_system_action(
             f"patched klant from user profile edit with fields: {', '.join(sorted(update_data.keys()))}",
