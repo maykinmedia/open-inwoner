@@ -1,7 +1,9 @@
+import logging
 from urllib.parse import unquote
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import NoReverseMatch, reverse
@@ -11,9 +13,7 @@ from django.views.generic import TemplateView, UpdateView
 from django_registration.backends.one_step.views import RegistrationView
 from furl import furl
 
-from open_inwoner.accounts.choices import NotificationChannelChoice
-from open_inwoner.accounts.views.mixins import KlantenAPIMixin
-from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.openklant.services import eSuiteKlantenService
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from ...mail.verification import send_user_email_verification_mail
@@ -21,6 +21,8 @@ from ...utils.text import html_tag_wrap_format
 from ...utils.url import get_next_url_from
 from ..forms import CustomRegistrationForm, NecessaryUserForm
 from ..models import Invite, OpenIDDigiDConfig, OpenIDEHerkenningConfig, User
+
+logger = logging.getLogger(__name__)
 
 
 class InviteMixin(CommonPageMixin):
@@ -136,7 +138,6 @@ class CustomRegistrationView(LogMixin, InviteMixin, RegistrationView):
 class NecessaryFieldsUserView(
     LogMixin,
     LoginRequiredMixin,
-    KlantenAPIMixin,
     InviteMixin,
     UpdateView,
 ):
@@ -164,7 +165,7 @@ class NecessaryFieldsUserView(
     def form_valid(self, form):
         user = form.save()
 
-        self.update_klant({k: form.cleaned_data[k] for k in form.changed_data})
+        self.update_klant(form)
 
         invite = form.cleaned_data["invite"]
         if invite:
@@ -186,18 +187,34 @@ class NecessaryFieldsUserView(
 
         return initial
 
-    def update_klant(self, user_form_data: dict):
-        config = SiteConfiguration.get_solo()
-        if not config.enable_notification_channel_choice:
+    def update_klant(self, form: NecessaryUserForm):
+        try:
+            service = eSuiteKlantenService()
+        except ImproperlyConfigured:
+            logger.info("Unable to build KlantenService")
             return
 
-        if notification_channel := user_form_data.get("case_notification_channel"):
-            self.patch_klant(
-                update_data={
-                    "toestemmingZaakNotificatiesAlleenDigitaal": notification_channel
-                    == NotificationChannelChoice.digital_only
-                }
+        user = form.instance
+
+        klant, _ = service.get_or_create_klant(
+            user=user, fetch_params=service.get_fetch_parameters(user=user)
+        )
+
+        if not klant:
+            logger.error(
+                "Unable to create klant during post-registration sync",
+                extra={"user": user},
             )
+            return
+
+        update_fields = ["emailadres"]
+        if "phonenumber" in form.cleaned_data.keys():
+            update_fields.append("telefoonnummer")
+
+        if "case_notification_channel" in form.cleaned_data.keys():
+            update_fields.append("toestemmingZaakNotificatiesAlleenDigitaal")
+
+        service.update_klant_from_user(klant, user, update_fields=update_fields)
 
 
 class EmailVerificationUserView(LogMixin, LoginRequiredMixin, TemplateView):
