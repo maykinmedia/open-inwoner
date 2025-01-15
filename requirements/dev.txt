@@ -114,7 +114,6 @@ certifi==2023.11.17
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-    #   django-simple-certmanager
     #   elastic-apm
     #   elasticsearch
     #   geventhttpclient
@@ -488,7 +487,7 @@ django-setup-configuration==0.3.0
     #   -r requirements/ci.txt
 django-silk==5.1.0
     # via -r requirements/dev.in
-django-simple-certmanager==1.4.1
+django-simple-certmanager==2.4.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -1019,7 +1018,6 @@ pyopenssl==24.0.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-    #   django-simple-certmanager
     #   josepy
     #   webauthn
 pyphen==0.12.0

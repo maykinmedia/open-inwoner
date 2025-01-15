@@ -92,7 +92,6 @@ certifi==2023.11.17
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-    #   django-simple-certmanager
     #   elastic-apm
     #   elasticsearch
     #   requests
@@ -442,7 +441,7 @@ django-setup-configuration==0.3.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-django-simple-certmanager==1.4.1
+django-simple-certmanager==2.4.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -879,7 +878,6 @@ pyopenssl==24.0.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   -r requirements/test-tools.in
-    #   django-simple-certmanager
     #   josepy
     #   webauthn
 pyphen==0.12.0

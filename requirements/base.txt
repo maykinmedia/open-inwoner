@@ -44,7 +44,6 @@ celery-once==3.0.1
     # via -r requirements/base.in
 certifi==2023.11.17
     # via
-    #   django-simple-certmanager
     #   elastic-apm
     #   elasticsearch
     #   requests
@@ -258,7 +257,7 @@ django-sessionprofile==1.0
     #   django-digid-eherkenning
 django-setup-configuration==0.3.0
     # via -r requirements/base.in
-django-simple-certmanager==1.4.1
+django-simple-certmanager==2.4.1
     # via
     #   django-digid-eherkenning
     #   zgw-consumers
@@ -456,7 +455,6 @@ pyjwt==2.8.0
 pyopenssl==24.0.0
     # via
     #   -r requirements/base.in
-    #   django-simple-certmanager
     #   josepy
     #   webauthn
 pyphen==0.12.0
