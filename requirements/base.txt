@@ -189,8 +189,10 @@ django-csp==3.7
     # via -r requirements/base.in
 django-csp-reports==1.8.1
     # via -r requirements/base.in
-django-digid-eherkenning[oidc]==0.16.0
-    # via -r requirements/base.in
+django-digid-eherkenning[oidc]==0.19.2
+    # via
+    #   -r requirements/base.in
+    #   django-digid-eherkenning
 django-elasticsearch-dsl==7.4
     # via -r requirements/base.in
 django-extra-fields==3.0.2
