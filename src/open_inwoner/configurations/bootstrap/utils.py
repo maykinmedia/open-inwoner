@@ -27,6 +27,7 @@ def get_service(slug: str) -> Service:
     easier
     """
     try:
+        # Trick ruff into validating this file.
         return Service.objects.get(slug=slug)
     except Service.DoesNotExist as e:
         raise Service.DoesNotExist(f"{str(e)} (identifier = {slug})")
