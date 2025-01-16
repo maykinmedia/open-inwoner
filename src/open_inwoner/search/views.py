@@ -70,40 +70,43 @@ class SearchView(
         # Check if the query exactly matches with a case that belongs to the user
         if search_params := get_user_fetch_parameters(self.request):
             clients = build_zaken_clients()
-            proxy_result = MultiZgwClientProxy(clients)
-            proxy_result = proxy_result.fetch_cases(
-                **search_params,
-                identificatie=query,
-            )
-            if proxy_result.has_errors:
-                self.log_system_action("unable to retrieve cases", user=user)
+            if clients:
+                proxy_result = MultiZgwClientProxy(clients)
+                proxy_result = proxy_result.fetch_cases(
+                    **search_params,
+                    identificatie=query,
+                )
+                if proxy_result.has_errors:
+                    self.log_system_action("unable to retrieve cases", user=user)
 
-            # TODO: We should simply return multiple cases in the search results,
-            # rather than redirect. For now, we maintain the existing behavior
-            # by returning and redirect to the first case found, if any.
-            if len(proxy_result.join_results()) > 1:
-                logger.error("found multiple cases for a single set of search params")
+                # TODO: We should simply return multiple cases in the search results,
+                # rather than redirect. For now, we maintain the existing behavior
+                # by returning and redirect to the first case found, if any.
+                if len(proxy_result.join_results()) > 1:
+                    logger.error(
+                        "found multiple cases for a single set of search params"
+                    )
 
-            for case_result in proxy_result.successful_responses:
-                if case_result.result:
-                    api_group = ZGWApiGroupConfig.objects.resolve_group_from_hints(
-                        client=case_result.client
-                    )
-                    zaak = proxy_result.responses[0].result[0]
-                    zaaktype = api_group.catalogi_client.fetch_single_case_type(
-                        zaak.zaaktype
-                    )
-                    zaak.zaaktype = zaaktype
-                    if is_zaak_visible(zaak):
-                        return HttpResponseRedirect(
-                            reverse(
-                                "cases:case_detail",
-                                kwargs={
-                                    "object_id": str(zaak.uuid),
-                                    "api_group_id": api_group.id,
-                                },
-                            )
+                for case_result in proxy_result.successful_responses:
+                    if case_result.result:
+                        api_group = ZGWApiGroupConfig.objects.resolve_group_from_hints(
+                            client=case_result.client
                         )
+                        zaak = proxy_result.responses[0].result[0]
+                        zaaktype = api_group.catalogi_client.fetch_single_case_type(
+                            zaak.zaaktype
+                        )
+                        zaak.zaaktype = zaaktype
+                        if is_zaak_visible(zaak):
+                            return HttpResponseRedirect(
+                                reverse(
+                                    "cases:case_detail",
+                                    kwargs={
+                                        "object_id": str(zaak.uuid),
+                                        "api_group_id": api_group.id,
+                                    },
+                                )
+                            )
 
         # perform search
         results = search_products(query, filters=data)
