@@ -1,10 +1,11 @@
-// Mock _sz object for testing
+// // Mock _sz object for testing
 // if (typeof _sz === 'undefined') {
 //   var _sz = {
 //     push: function (data) {
 //       try {
 //         console.log('Event pushed to _sz:', data)
 //       } catch (error) {
+//         // Log the error
 //         console.error('Error occurred while pushing event data:', error)
 //       }
 //     },
@@ -326,7 +327,7 @@ let isEventTrackerInitialized = false
         '#cases-content > div.card__grid > div > div > a > div > span > span.link__text':
           [
             'event',
-            'Mijn aanvragen overzicht',
+            'Mijn aanvragen',
             'Click',
             "Open aanvraag via 'Bekijk aanvraag' link",
           ],
@@ -502,162 +503,28 @@ let isEventTrackerInitialized = false
     new EventTracker(selectorMap)
   }
 
-  document.addEventListener('DOMContentLoaded', function () {
-    // console.log('Static HTMX DOM fully loaded and parsed. Initializing tracker...')
-
-    // Stable parent element for checking existence
-    const casesParentSelector = '#cases-detail-content'
-
-    // Retry interval in milliseconds
-    const casesRetryInterval = 20
-
-    // Function to track delete links and spans
-    function trackDeleteEvents() {
-      const formUpload = document.querySelector('#form_upload')
-
-      if (!formUpload) {
-        return false
-      }
-
-      const fileList = formUpload.querySelector(
-        '.file-list .file-list__list .file-list__list-item'
-      )
-
-      if (!fileList) {
-        return false
-      }
-
-      const links = formUpload.querySelectorAll(
-        '.file-list .file-list__list .file-list__list-item a'
-      )
-      if (links.length) {
-        // console.log(`Found ${links.length} delete links. Adding click listeners...`)
-        links.forEach((link, index) => {
-          link.addEventListener('click', function () {
-            // console.log(`Link ${index + 1} clicked. Sending Siteimprove event.`)
-            if (typeof _sz !== 'undefined') {
-              _sz.push([
-                'event',
-                'Aanvraag detail',
-                'Click',
-                'Verwijder document',
-              ])
-            }
-          })
-        })
-      }
-
-      const spans = formUpload.querySelectorAll(
-        '.file-list .file-list__list .file-list__list-item a span'
-      )
-      if (spans.length) {
-        // console.log( `Found ${spans.length} delete spans. Adding click listeners...` )
-        spans.forEach((span, index) => {
-          span.addEventListener('click', function () {
-            // console.log(`Span ${index + 1} clicked. Sending Siteimprove event.`)
-            if (typeof _sz !== 'undefined') {
-              _sz.push([
-                'event',
-                'Aanvraag detail',
-                'Click',
-                'Verwijder document',
-              ])
-            }
-          })
-        })
-      } // else { console.log('No delete spans found within the file list.') }
-
-      return true // Successfully tracked
-    }
-
-    function startPolling() {
-      // console.log('Starting polling for #form_upload...')
-      const pollingInterval = setInterval(() => {
-        const parent = document.querySelector(casesParentSelector)
-
-        if (!parent) {
-          clearInterval(pollingInterval)
-          return
-        }
-
-        if (trackDeleteEvents()) {
-          // console.log( 'Delete-file elements found and tracked. Stopping polling.' )
-          clearInterval(pollingInterval)
-        }
-      }, casesRetryInterval)
-    }
-
-    startPolling()
-  })
-
   function checkForSzObject() {
     const intervalId = setInterval(() => {
       if (typeof _sz !== 'undefined') {
-        clearInterval(intervalId)
-        initEventTracker()
+        clearInterval(intervalId) // Stop the interval once _sz is defined
+        initEventTracker() // Initialize EventTracker
       } else {
         console.log('-> SiteImprove _sz is not defined yet.')
       }
     }, 1000)
   }
 
+  // Start checking for _sz object
   checkForSzObject()
 
+  // MutationObserver to detect DOM changes
   const observer = new MutationObserver(() => {
     if (typeof _sz !== 'undefined') {
-      observer.disconnect()
+      observer.disconnect() // Stop observing once _sz is available
       initEventTracker()
     }
   })
 
+  // Observe DOM changes
   observer.observe(document, { childList: true, subtree: true })
 })()
-
-function trackFileErrors() {
-  const fileErrorSize = document.querySelector('.file-error__size')
-  const fileErrorType = document.querySelector('.file-error__type')
-  const fileErrorTypeSize = document.querySelector('.file-error__type-size')
-
-  if (typeof _sz !== 'undefined') {
-    const errors = [
-      { condition: fileErrorSize, message: 'Error bestand te groot' },
-      { condition: fileErrorType, message: 'Error verkeerd bestand type' },
-      {
-        condition: fileErrorTypeSize,
-        message: 'Error bestand te groot en van verkeerde type',
-      },
-    ]
-
-    errors.forEach(({ condition, message }) => {
-      if (condition) {
-        _sz.push(['event', 'Mijn Aanvragen', 'Error', message])
-      }
-    })
-  }
-}
-
-function observeDocumentUploadForm() {
-  const observer = new MutationObserver((mutationsList, observer) => {
-    for (const mutation of mutationsList) {
-      if (mutation.type === 'childList') {
-        const documentUploadForm = document.querySelector('#document-upload')
-        if (documentUploadForm) {
-          observer.disconnect()
-          observeFormErrors(documentUploadForm)
-        }
-      }
-    }
-  })
-
-  observer.observe(document.body, { childList: true, subtree: true })
-}
-
-function observeFormErrors(form) {
-  const observer = new MutationObserver(() => {
-    trackFileErrors()
-  })
-
-  observer.observe(form, { childList: true, subtree: true })
-}
-
-observeDocumentUploadForm()
