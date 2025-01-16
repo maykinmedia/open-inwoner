@@ -94,8 +94,7 @@ jobs:
         ports:
           - 5432:5432
         # Needed because the postgres container does not provide a healthcheck
-        options:
-          --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
       - uses: actions/checkout@v3
@@ -135,6 +134,43 @@ jobs:
       - name: Run Prettier
         run: |
           npm run check-linting
+
+  ruff:
+    name: Lint code with ruff
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Required to get all history for comparing changes
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff
+      # This is mostly to have an convenient location to check how far away we are from
+      # 100% compliance for the whole codebase. The -e flag ensures it'll always return
+      # 0.
+      - name: Run ruff on all files
+        run: ruff check -e --output-format=github .
+      # Run ruff with a non-zero exit code on the changed files
+      - name: Run ruff on changed files
+        run: |
+          # Get changed Python files only
+          CHANGED_FILES=$(git diff --name-only origin/${GITHUB_BASE_REF}...HEAD | grep '\.py$' || true)
+
+          if [ -n "$CHANGED_FILES" ]; then
+            echo "Changed Python files:"
+            echo "$CHANGED_FILES"
+            echo "Running Ruff on changed files..."
+            echo "$CHANGED_FILES" | xargs ruff check --output-format=github
+          else
+            echo "No Python files changed"
+          fi
+
   bandit:
     name: Python security check using Bandit
     runs-on: ubuntu-latest
