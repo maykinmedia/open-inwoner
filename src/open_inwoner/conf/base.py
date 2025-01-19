@@ -968,6 +968,9 @@ OIDC_STORE_ID_TOKEN = True
 MOZILLA_DJANGO_OIDC_DB_CACHE = "oidc"
 MOZILLA_DJANGO_OIDC_DB_CACHE_TIMEOUT = 1
 
+# In order to support zaaktypeconfig admin screens with many statusses/results
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000
+
 #
 # 2FA SMS Verification
 #
