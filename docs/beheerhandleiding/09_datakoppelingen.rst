@@ -120,17 +120,31 @@ Stappen voor importeren:
        attributen die ertoe leidde dat bepaalde objecten niet gevonden konden worden,
        zullen zoveel mogelijk worden vermeld.
 
-9.2. Configuratie ‘Open Klant’
-==============================
+9.2. Configuratie Klanten Systeem
+=================================
 
-Dit is de configuratie voor de koppeling van het Open Inwoner platform met Open Klant. Om Mijn
-Aanvragen te kunnen gebruiken is het noodzakelijk om de Open Zaak API en de Contactmomenten API in
-te stellen. Hierdoor worden – na het inloggen met DigiD - de aanvragen van burgers getoond onder het
-onderdeel Mijn aanvragen onder het uitvouwmenu bij de gebruikersnaam.
+Dit is de configuratie voor de koppeling van het Open Inwoner Platform met een klantensysteem, 
+zoals eSuite of OpenKlant2. Indien één of beide systemen zijn geconfigureerd, worden klantgegevens
+(zoals e-mailadres en telefoonnummer) met deze systemen uitgewisseld. Deze systemen zijn 
+ook noodzakelijk om gebruik te kunnen maken van het "Mijn Vragen" gedeelte van het platform.
 
-.. image:: images/image63.png
-   :width: 624px
-   :height: 350px
+In het hoofdscherm is het belangrijk om een "primaire" backend te kiezen. Dit is de 
+backend waaruit klantgegevens worden uitgelezen en waarin nieuwe vragen in "Mijn Vragen" 
+worden aangemaakt. 
+
+Het wegschrijven van klantgegevens gebeurt altijd naar alle geconfigureerde backends tegelijk,
+maar voor het bijwerken van de klantgegevens op basis van het klantensysteem zal alleen naar
+de primaire backend worden gekeken.
+
+U dient eerst de betreffende backends via de daarvoor bestemde links te configureren.
+Vervolgens kunt u een primaire backend selecteren via het dropdown-menu.
+
+.. image:: images/image144.png
+   :width: 695px
+   :height: 394px
+
+9.2.1. E-suite
+--------------
 
 Er zijn diverse zaken die ingesteld moeten worden om Mijn aanvragen naar behoren te laten
 functioneren. In het volgende screenshot is te zien om welke elementen het gaat.
@@ -140,13 +154,13 @@ functioneren. In het volgende screenshot is te zien om welke elementen het gaat.
    :height: 540px
 
 
-9.2.1. E-mailregistratie
-------------------------
+9.2.1.1. E-mailregistratie
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Hier vult u het e-mailadres in waarop de ingezonden contactformulieren ontvangen moeten worden.
 
-9.2.2. Klanten en contacten API registratie
--------------------------------------------
+9.2.1.2. Klanten en contacten API registratie
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Hier kunt u aanvinken of u de aanvraag in de contactmomenten API geregistreerd wilt hebben. Laat u het
 vinkje hier weg, dan wordt de aanvraag niet geregistreerd in de contactmomenten API. De Organisatie
@@ -166,15 +180,23 @@ het 'contactform_confimation' e-mailsjabloon gebruikt om een e-mailbevestiging t
 insturen van het contactformulier. Indien dit is uitgeschakeld wordt aangenomen dat de externe
 contactmomenten API (eg. eSuite) de e-mailbevestiging zal sturen.
 
-9.2.3. Services
----------------
+
+9.2.1.3. Filter contactmomenten
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In deze sectie kunt u een lijst van eSuite-kanalen configureren die uitgesloten worden 
+bij het opvragen van contactmomenten. Dit is met name nuttig voor kanalen die alleen voor
+intern gebruik bestemd zijn.
+
+9.2.1.4. Services
+^^^^^^^^^^^^^^^^^
 
 Hier staan de API’s van de te koppelen services. Bij de configuratie van Open Zaak gaat het om een
 Klanten API en een Contactmomenten API. Deze services kunnen niet worden verwijderd of veranderd.
 U selecteert hier de juiste API van de betreffende gemeente.
 
-9.2.4. Contactformulier onderwerpen
------------------------------------
+9.2.1.5. Contactformulier onderwerpen
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Bij Mijn Aanvragen vindt de gebruiker een contactformulier om de aanvraag in te dienen. U kunt als
 beheerder dit contactformulier configureren door de tekstuele labels aan te passen. Deze onderdelen
@@ -184,6 +206,31 @@ De volgorde van de elementen van het contactformulier kan indien gewenst worden 
 Bovendien kunt u elementen uit het formulier verwijderen door een vinkje te zetten bij [verwijderen].
 Om nog een onderwerp aan het contactformulier toe te voegen klikt u op [+ Nog een contactformulier
 onderwerp toevoegen]. Als alles naar wens is geconfigureerd klikt u op [Opslaan].
+
+9.2.2. OpenKlant2
+-----------------
+
+Er zijn diverse zaken die ingesteld moeten worden om Mijn aanvragen naar behoren te laten
+functioneren. In het volgende screenshot is te zien om welke elementen het gaat.
+
+.. image:: images/image145.png
+   :width: 624px
+   :height: 428px
+
+9.2.2.1. API Configuratie
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Bij deze configuratie kan een Service geselecteerd (of aangemaakt) worden die de technische
+configuratie bevat voor het communiceren met het OpenKlant2 systeem.
+
+9.2.2.1. Vragen
+^^^^^^^^^^^^^^^
+
+Deze instellingen zijn noodzakelijk voor de integratie met OpenKlant2 in het "Mijn Vragen" 
+gedeelte van de website. Hoewel alle velden afzonderlijk worden toegelicht, verdient het
+veld "Mijn Vragen Actor" speciale aandacht. Dit veld vereist een geldige UUID van een
+bestaande Actor in het OpenKlant2 systeem. Deze Actor wordt gebruikt om nieuwe vragen
+automatisch als interne taken toe te wijzen voor afhandeling.
 
 9.3. Configuratie ‘Open Zaak’
 =============================

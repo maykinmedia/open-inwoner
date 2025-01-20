@@ -202,6 +202,9 @@ class OpenKlant2Config(SingletonModel):
         verbose_name=_("Mijn vragen kanaal"),
         default="",
         blank=True,
+        help_text=_(
+            "Het kanaal waaronder nieuwe vragen als Klantcontact object zullen worden aangemaakt"
+        ),
     )
     mijn_vragen_organisatie_naam = models.CharField(
         verbose_name=_("Mijn vragen organisatie naam"),
@@ -212,16 +215,25 @@ class OpenKlant2Config(SingletonModel):
         verbose_name=_("Mijn vragen actor"),
         default="",
         blank=True,
+        help_text=_(
+            "De UUID van een bestaande Actor in de de configureerde API waaraan nieuwe vragen worden toegewezen"
+        ),
     )
     interne_taak_gevraagde_handeling = models.CharField(
         verbose_name=_("Interne taak gevraagde handeling"),
         default="",
         blank=True,
+        help_text=_(
+            "Beschrijving van de gevraagde handeling voor de interne taak die ontstaat als resultaat van een vraag"
+        ),
     )
     interne_taak_toelichting = models.CharField(
         verbose_name=_("Interne taak toelichting"),
         default="",
         blank=True,
+        help_text=_(
+            "Toelichting bij de gevraagde handeling voor de interne taak die ontstaat als resultaat van een vraag"
+        ),
     )
 
     class Meta:
