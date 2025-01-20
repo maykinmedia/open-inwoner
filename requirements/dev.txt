@@ -219,7 +219,7 @@ dill==0.3.7
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   pylint
-django==4.2.16
+django==4.2.18
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -715,7 +715,7 @@ glom==20.11.0
     #   mozilla-django-oidc-db
 gprof2dot==2022.7.29
     # via django-silk
-greenlet==3.0.3
+greenlet==3.1.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -939,7 +939,7 @@ platformdirs==2.4.0
     #   -r requirements/ci.txt
     #   black
     #   pylint
-playwright==1.47.0
+playwright==1.49.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt

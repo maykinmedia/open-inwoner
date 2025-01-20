@@ -1,10 +1,15 @@
-{% extends "admin/solo/change_form.html" %}
-
-{% block content %}
-    <p>Configure the backends for retrieving Klanten data:</p>
-    <ul>
-        <li><a href="{% url 'admin:openklant_esuiteklantconfig_change' %}">Configure eSuite backend</a></li>
-        <li><a href="{% url 'admin:openklant_openklant2config_change' %}">Configure OpenKlant2 backend</a></li>
-    </ul>
-    {{ block.super }}
-{% endblock content %}
+{% extends "admin/solo/change_form.html" %}{% load i18n %} {% block content %}
+<p>{% trans "Configure the backends for retrieving Klanten data:" %}</p>
+<ul>
+  <li>
+    <a href="{% url 'admin:openklant_esuiteklantconfig_change' %}"
+      >{% trans "Configure eSuite backend" %}</a
+    >
+  </li>
+  <li>
+    <a href="{% url 'admin:openklant_openklant2config_change' %}"
+      >{% trans "Configure OpenKlant2 backend" %}</a
+    >
+  </li>
+</ul>
+{{ block.super }} {% endblock content %}

@@ -287,6 +287,7 @@ class DigiDRegistrationTest(
         necessary_form[
             "case_notification_channel"
         ] = NotificationChannelChoice.digital_only
+        necessary_form["email"] = "foo@bar.com"
         necessary_form.submit()
 
         user = User.objects.get(bsn=data["auth_name"])
@@ -304,12 +305,13 @@ class DigiDRegistrationTest(
         self.assertEqual(
             klant_patch_data,
             {
+                "emailadres": "foo@bar.com",
                 "toestemmingZaakNotificatiesAlleenDigitaal": True,
             },
         )
         # only check logs for klant api update
         dump = self.getTimelineLogDump()
-        msg = "patched klant from user profile edit with fields: toestemmingZaakNotificatiesAlleenDigitaal"
+        msg = "patched klant from user profile edit with fields: emailadres, toestemmingZaakNotificatiesAlleenDigitaal"
         assert msg in dump
 
     @requests_mock.Mocker()
@@ -506,6 +508,72 @@ class DigiDRegistrationTest(
         user.refresh_from_db()
 
         self.assertNotEqual(user.first_name, "UpdatedName")
+
+    @requests_mock.Mocker()
+    def test_user_without_klant_is_created_and_updated(self, m):
+        """
+        Assert that if no klant exists during the filling of the necessary fields form,
+        the klant is created and updated with the writable fields (though not with
+        the toestemmingZaakNotificatiesAlleenDigitaal by default, which is tested
+        above).
+        """
+        MockAPIReadPatchData.setUpServices()
+        mock_api_data = MockAPIReadPatchData().install_mocks(m)
+
+        # reset noise from signals
+        m.reset_mock()
+        self.clearTimelineLogs()
+
+        invite = InviteFactory()
+
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": f"{reverse('profile:registration_necessary')}?invite={invite.key}",
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": mock_api_data.user_without_klant.bsn,
+            "auth_pass": "bar",
+        }
+
+        # post our password to the IDP
+        response = self.app.post(url, data).follow().follow()
+
+        necessary_form = response.forms["necessary-form"]
+
+        self.assertNotIn("cases_notifications", necessary_form.fields)
+        self.assertNotIn("messages_notifications", necessary_form.fields)
+
+        necessary_form["email"] = "foo@bar.com"
+        necessary_form.submit()
+
+        # klant did not exist, so is created
+        klant_post_data = mock_api_data.matchers[3].request_history[0].json()
+        self.assertEqual(
+            klant_post_data,
+            {"subjectIdentificatie": {"inpBsn": "665155311"}},
+        )
+
+        # klant is patched with email address
+        klant_patch_data = mock_api_data.matchers[4].request_history[0].json()
+        self.assertEqual(
+            klant_patch_data,
+            {
+                "emailadres": "foo@bar.com",
+                # Not enabled
+                # "toestemmingZaakNotificatiesAlleenDigitaal": True,
+            },
+        )
+
+        # ensure klant operations are logged
+        dump = self.getTimelineLogDump()
+        for msg in (
+            "created klant (87654321) for user",
+            "patched klant from user profile edit with fields: emailadres",
+        ):
+            assert msg in dump
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")

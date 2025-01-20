@@ -91,7 +91,7 @@ defusedxml==0.7.1
     # via odfpy
 diff-match-patch==20200713
     # via django-import-export
-django==4.2.16
+django==4.2.18
     # via
     #   -r requirements/base.in
     #   django-admin-index
@@ -360,7 +360,7 @@ glom==20.11.0
     # via
     #   -r requirements/base.in
     #   mozilla-django-oidc-db
-greenlet==3.0.3
+greenlet==3.1.1
     # via playwright
 html5lib==1.1
     # via
@@ -434,7 +434,7 @@ pillow==10.3.0
     #   easy-thumbnails
     #   reportlab
     #   weasyprint
-playwright==1.47.0
+playwright==1.49.1
     # via -r requirements/base.in
 prompt-toolkit==3.0.36
     # via click-repl

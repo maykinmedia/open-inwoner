@@ -1,7 +1,6 @@
 import logging
 
 from django.contrib.auth.signals import user_logged_in, user_logged_out
-from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.urls import reverse
 from django.utils.translation import gettext as _
@@ -37,6 +36,7 @@ def update_user_on_login(sender, user, request, *args, **kwargs):
     if user.login_type not in [LoginTypeChoices.digid, LoginTypeChoices.eherkenning]:
         return
 
+    # KvK API
     if user.login_type is LoginTypeChoices.eherkenning:
         _update_eherkenning_user_from_kvk_api(user=user)
 
@@ -87,38 +87,6 @@ def _update_eherkenning_user_from_kvk_api(user: User):
     if company_name := vestiging.get("naam"):
         user.company_name = company_name
         user.save()
-
-
-# TODO: Should we also try to fetch pre-existing klant for new user and update?
-# The klant could have been created by a different service.
-@receiver(post_save, sender=User)
-def get_or_create_klant_for_new_user(
-    sender: type, instance: User, created: bool, **kwargs
-) -> None:
-    if not created:
-        logger.info("No klanten sync performed because user has just been created")
-        return
-
-    user = instance
-
-    # OpenKlant2
-    try:
-        service = OpenKlant2Service()
-    except Exception:
-        logger.error("OpenKlant2 service failed to build")
-    else:
-        _update_user_from_openklant2(
-            user,
-            service,
-        )
-
-    # eSuite
-    try:
-        service = eSuiteKlantenService()
-    except Exception:
-        logger.error("eSuiteKlantenService failed to build")
-    else:
-        _update_user_from_esuite(user, service)
 
 
 @receiver(user_logged_in)

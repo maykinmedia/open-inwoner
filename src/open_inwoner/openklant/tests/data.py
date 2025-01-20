@@ -44,6 +44,11 @@ class MockAPIReadPatchData(MockAPIData):
             email="old@example.com",
             phonenumber="0100000000",
         )
+        self.user_without_klant = DigidUserFactory(
+            email="new@example.com",
+            phonenumber="0100000000",
+            bsn="665155311",
+        )
         self.eherkenning_user = eHerkenningUserFactory(
             email="old2@example.com",
             kvk="12345678",
@@ -73,6 +78,32 @@ class MockAPIReadPatchData(MockAPIData):
             url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             emailadres="good@example.com",
             telefoonnummer="0123456789",
+            toestemmingZaakNotificatiesAlleenDigitaal=False,
+        )
+        self.created_klant_bsn = generate_oas_component_cached(
+            "kc",
+            "schemas/Klant",
+            bronorganisatie="123456789",
+            klantnummer="87654321",
+            subjectIdentificatie={
+                "inpBsn": "665155311",
+            },
+            url=f"{KLANTEN_ROOT}klant/bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+            emailadres="foooo@bar.com",
+            telefoonnummer="0199995544",
+            toestemmingZaakNotificatiesAlleenDigitaal=False,
+        )
+        self.created_klant_bsn_updated = generate_oas_component_cached(
+            "kc",
+            "schemas/Klant",
+            bronorganisatie="123456789",
+            klantnummer="87654321",
+            subjectIdentificatie={
+                "inpBsn": "665155311",
+            },
+            url=f"{KLANTEN_ROOT}klant/bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+            emailadres="foooo@bar.com",
+            telefoonnummer="0199995544",
             toestemmingZaakNotificatiesAlleenDigitaal=False,
         )
         self.klant_eherkenning_old = generate_oas_component_cached(
@@ -107,6 +138,21 @@ class MockAPIReadPatchData(MockAPIData):
             m.patch(
                 f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
                 json=self.klant_bsn_updated,
+                status_code=200,
+            ),
+            # Create and update flow
+            m.get(
+                f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn={self.user_without_klant.bsn}",
+                json=paginated_response([]),
+            ),
+            m.post(
+                f"{KLANTEN_ROOT}klanten",
+                json=self.created_klant_bsn,
+                status_code=201,
+            ),
+            m.patch(
+                f"{KLANTEN_ROOT}klant/bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+                json=self.created_klant_bsn_updated,
                 status_code=200,
             ),
         ]

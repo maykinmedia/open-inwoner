@@ -2,7 +2,7 @@ import datetime
 import logging
 import uuid
 from datetime import timedelta
-from typing import Iterable, Literal, NotRequired, Protocol, Self
+from typing import Iterable, Literal, NotRequired, Protocol, Self, Sequence
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -329,6 +329,51 @@ class eSuiteKlantenService(KlantenService):
         klant = factory(Klant, data)
 
         return klant
+
+    def update_klant_from_user(
+        self,
+        klant: Klant,
+        user: User,
+        update_fields: (
+            Sequence[
+                Literal[
+                    "telefoonnummer",
+                    "emailadres",
+                    "toestemmingZaakNotificatiesAlleenDigitaal",
+                ]
+            ]
+            | None
+        ) = None,
+    ):
+        valid_update_fields = {
+            "telefoonnummer",
+            "emailadres",
+            "toestemmingZaakNotificatiesAlleenDigitaal",
+        }
+
+        if update_fields:
+            for field in update_fields:
+                if field not in valid_update_fields:
+                    raise ValueError(f"{field} is not a valid entry for update_fields")
+
+        update_data: KlantWritePayload = {
+            "emailadres": user.email,
+            "telefoonnummer": user.phonenumber,
+            "toestemmingZaakNotificatiesAlleenDigitaal": user.case_notification_channel
+            == NotificationChannelChoice.digital_only,
+        }
+
+        the_keys = set(update_data.keys())
+        if update_fields and set(update_fields) != valid_update_fields:
+            for field in the_keys:
+                if field not in update_fields:
+                    del update_data[field]
+
+        self.partial_update_klant(klant, update_data)
+        system_action(
+            f"patched klant from user profile edit with fields: {', '.join(sorted(update_data.keys()))}",
+            user=user,
+        )
 
 
 class eSuiteVragenService(KlantenService):

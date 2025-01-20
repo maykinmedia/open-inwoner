@@ -56,24 +56,33 @@ def _map_cache_key_instance_attrs_to_placeholders(key):
     return mapped_key, identifiers
 
 
+_DEFAULT_CACHE_TIMEOUT = 60
+_CACHE_MISS = object()
+
+
 def cache(
     key: str,
     alias: str = "default",
     *,
-    timeout: int = 60,
+    timeout: int = _DEFAULT_CACHE_TIMEOUT,
 ):
     """
     Decorator factory for updating the django low-level cache.
 
-    It determines if the key exists in cache and skips it by calling the decorated function
-    or creates it if doesn't exist.
+    It determines if the key exists in cache and skips it by calling the decorated
+    function or creates it if doesn't exist.
 
-    :param key: the caching key to use. Can contain any named positional and keyword argument
-    of the wrapped function as interpolation placeholders. When deocarating a method,
-    you can also include instance attributes using the `"cache:{self.attr}"` syntax.
+    :param key: the caching key to use. Can contain any named positional and keyword
+    argument of the wrapped function as interpolation placeholders. When deocarating a
+    method, you can also include instance attributes using the `"cache:{self.attr}"`
+    syntax.
     :param alias: the Django cache to use, defaults to "default"
-    :param timeout: the timeout for the cache in seconds. Defaults to 60
+    :param timeout: the timeout for the cache in seconds. Defaults to 60. Note that you
+    cannot cache forever (`None` will raise a `ValueError`, but you can set this to `0`
+    to avoid caching, as per the Django low-level cache docs.
     """
+    if not isinstance(timeout, int):
+        raise ValueError("`timeout` must be an integer")
 
     def decorator(func: Callable[..., RT]) -> Callable[..., RT]:
         argspec = inspect.getfullargspec(func)
@@ -123,9 +132,8 @@ def cache(
 
             _cache: BaseCache = caches[alias]
 
-            CACHE_MISS = object()
-            result = _cache.get(cache_key, default=CACHE_MISS)
-            if result is not CACHE_MISS:
+            result = _cache.get(cache_key, default=_CACHE_MISS)
+            if result is not _CACHE_MISS:
                 logger.debug("Cache hit: '%s'", cache_key)
                 return result
 

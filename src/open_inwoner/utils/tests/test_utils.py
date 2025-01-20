@@ -7,7 +7,7 @@ from django.test import TestCase as DjangoTestCase, override_settings
 
 import freezegun
 
-from open_inwoner.utils.decorators import cache
+from open_inwoner.utils.decorators import _CACHE_MISS, _DEFAULT_CACHE_TIMEOUT, cache
 
 MockCache = mock.create_autospec(DummyCache)
 
@@ -62,6 +62,35 @@ class DynamicCacheKeyTest(DjangoTestCase):
                 mock.call("static", default=mock.ANY),
             ]
         )
+
+    def test_missing_timeout_kwarg_uses_default_timeout(self):
+        @cache("foo")
+        def foo():
+            return "bar"
+
+        self.cache.get.return_value = _CACHE_MISS
+        foo()
+
+        self.cache.get.assert_has_calls(
+            [
+                mock.call("foo", default=_CACHE_MISS),
+            ]
+        )
+        self.cache.set.assert_has_calls(
+            [
+                mock.call("foo", "bar", timeout=_DEFAULT_CACHE_TIMEOUT),
+            ]
+        )
+
+    def test_timeout_value_must_be_an_integer(self):
+
+        for timeout in (None, "1", 1.0, object()):
+            with self.subTest(timeout):
+                with self.assertRaises(ValueError):
+
+                    @cache("foo", timeout=timeout)
+                    def foo():
+                        pass
 
 
 @override_settings(
