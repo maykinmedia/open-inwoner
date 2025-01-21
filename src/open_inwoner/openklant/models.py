@@ -108,6 +108,7 @@ class ESuiteKlantConfig(SingletonModel):
     class Meta:
         verbose_name = _("eSuite Klant configuration")
 
+    @property
     def has_api_configuration(self):
         return all(getattr(self, f, "") for f in self.register_api_required_fields)
 
@@ -117,17 +118,24 @@ class ContactFormSubject(OrderedModel):
         verbose_name=_("Onderwerp"),
         max_length=255,
     )
-    subject_code = models.CharField(
+    esuite_subject_code = models.CharField(
         verbose_name=_("e-Suite 'onderwerp' code"),
         max_length=255,
+        null=True,
         blank=True,
     )
-    config = models.ForeignKey(
+    esuite_config = models.ForeignKey(
         "ESuiteKlantConfig",
+        null=True,
+        on_delete=models.CASCADE,
+    )
+    openklant_config = models.ForeignKey(
+        "OpenKlant2Config",
+        null=True,
         on_delete=models.CASCADE,
     )
 
-    order_with_respect_to = "config"
+    order_with_respect_to = "esuite_config"
 
     objects = OrderedModelManager()
 
@@ -212,6 +220,12 @@ class OpenKlant2Config(SingletonModel):
             "Toelichting bij de gevraagde handeling voor de interne taak die ontstaat als resultaat van een vraag"
         ),
     )
+
+    register_api_required_fields = ("service",)
+
+    @property
+    def has_api_configuration(self):
+        return all(getattr(self, f, "") for f in self.register_api_required_fields)
 
     class Meta:
         verbose_name = _("OpenKlant2 configuration")
@@ -309,12 +323,14 @@ class KlantenSysteemConfig(SingletonModel):
 
     @property
     def has_api_configuration(self) -> bool:
-        if self.primary_backend == KlantenServiceType.ESUITE.value:
-            esuite_config = ESuiteKlantConfig.get_solo()
-            return esuite_config.has_api_configuration()
-
-        # TODO: support `has_api_configuration` check for OK2?
-        return False
+        match self.primary_backend:
+            case KlantenServiceType.ESUITE.value:
+                config = ESuiteKlantConfig.get_solo()
+            case KlantenServiceType.OPENKLANT2.value:
+                config = OpenKlant2Config.get_solo()
+            case _:
+                config = None
+        return getattr(config, "has_api_configuration", False)
 
     @property
     def contact_registration_enabled(self) -> bool:
@@ -322,12 +338,9 @@ class KlantenSysteemConfig(SingletonModel):
 
     @property
     def has_contactform_configuration(self) -> bool:
-        if not self.contact_registration_enabled:
-            return False
-
-        if self.primary_backend == KlantenServiceType.ESUITE.value:
-            esuite_config = ESuiteKlantConfig.get_solo()
-            return esuite_config.contactformsubject_set.exists()
-
-        # TODO: check conditions for OK2
-        return False
+        contactform_subjects = ContactFormSubject.objects.filter(
+            esuite_subject_code__isnull=False
+            if self.primary_backend == KlantenServiceType.ESUITE.value
+            else True
+        )
+        return self.contact_registration_enabled and contactform_subjects.exists()

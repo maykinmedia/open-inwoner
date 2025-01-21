@@ -136,9 +136,20 @@ class KlantenService(Protocol):
 
         return None
 
+    @property
+    def supports_anonymous_questions(self):
+        match self.config:
+            case ESuiteKlantConfig():
+                return True
+            case OpenKlant2Config():
+                return False
+            case _:
+                raise ValueError("Unsupported backend for KlantenService")
+
 
 class eSuiteKlantenService(KlantenService):
     config: ESuiteKlantConfig
+    supports_anonymous_questions: bool = True
 
     def __init__(self, config: ESuiteKlantConfig | None = None):
         self.config = config or ESuiteKlantConfig.get_solo()
@@ -574,10 +585,12 @@ class eSuiteVragenService(KlantenService):
                e-suite code or
             3. return the the e-suite subject code if no mapping exists
         """
-        e_suite_subject_code = getattr(kcm.contactmoment, "onderwerp", "")
+        esuite_subject_code = getattr(kcm.contactmoment, "onderwerp", "")
 
         try:
-            subject = ContactFormSubject.objects.get(subject_code=e_suite_subject_code)
+            subject = ContactFormSubject.objects.get(
+                esuite_subject_code=esuite_subject_code
+            )
         except ContactFormSubject.MultipleObjectsReturned as exc:
             logger.warning(
                 "Multiple OIP subjects mapped to the same e-suite subject code for ",
@@ -593,7 +606,7 @@ class eSuiteVragenService(KlantenService):
                 kcm.contactmoment.url,
                 exc_info=exc,
             )
-            return e_suite_subject_code
+            return esuite_subject_code
 
         return subject.subject
 
@@ -843,6 +856,7 @@ class OpenKlant2Question(BaseModel):
 class OpenKlant2Service(KlantenService):
     config: OpenKlant2Config
     client: OpenKlant2Client
+    supports_anonymous_questions: bool = False
 
     def __init__(self, config: OpenKlant2Config | None = None):
         self.config = config or OpenKlant2Config.get_solo()

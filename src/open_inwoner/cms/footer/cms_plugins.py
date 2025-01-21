@@ -11,11 +11,9 @@ from open_inwoner.openklant.models import KlantenSysteemConfig
 class FooterPagesPlugin(CMSPluginBase):
     name = _("Pages List")
     render_template = "cms/footer/footer_pages_plugin.html"
-
     # cache = False
 
     def render(self, context, instance, placeholder):
-        # TODO move options to plugin model
         config = SiteConfiguration.get_solo()
         klant_config = KlantenSysteemConfig.get_solo()
         context["flatpages"] = config.get_ordered_flatpages

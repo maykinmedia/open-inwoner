@@ -576,6 +576,135 @@ class MockAPICreateData(MockAPIData):
         ]
         return self
 
+    def install_mocks_openklant(self, m):
+        self.digid_user = DigidUserFactory()
+        m.get(
+            "http://localhost:8338/klantinteracties/api/v1/partijen?partijIdentificator__codeSoortObjectId=bsn&partijIdentificator__codeRegister=brp&partijIdentificator__codeObjecttype=natuurlijk_persoon&partijIdentificator__objectId=123456782&soortPartij=persoon",
+            headers={"Content-Type": "application/json"},
+            json={
+                "count": 1,
+                "next": None,
+                "previous": None,
+                "results": [
+                    {
+                        "uuid": "7260ea01-12c0-4750-8fd1-dfa777818837",
+                    },
+                ],
+            },
+            status_code=200,
+        )
+        m.get(
+            "http://localhost:8338/klantinteracties/api/v1/partijen?partijIdentificator__codeSoortObjectId=bsn&partijIdentificator__codeRegister=brp&partijIdentificator__codeObjecttype=natuurlijk_persoon&partijIdentificator__objectId=100000001&soortPartij=persoon",
+            headers={"Content-Type": "application/json"},
+            json={
+                "count": 1,
+                "next": None,
+                "previous": None,
+                "results": [
+                    {
+                        "uuid": "7260ea01-12c0-4750-8fd1-dfa777818837",
+                    },
+                ],
+            },
+            status_code=200,
+        )
+
+        m.get(
+            "http://localhost:8338/klantinteracties/api/v1/partijen/7260ea01-12c0-4750-8fd1-dfa777818837?expand=digitaleAdressen%2Cbetrokkenen%2Cbetrokkenen.hadKlantcontact",
+            headers={"Content-Type": "application/json"},
+            json={
+                "uuid": "7260ea01-12c0-4750-8fd1-dfa777818837",
+                "digitaleAdressen": None,
+                "voorkeursDigitaalAdres": None,
+                "rekeningnummers": None,
+                "voorkeursRekeningnummer": None,
+                "indicatieGeheimhouding": False,
+                "indicatieActief": True,
+                "voorkeurstaal": "crp",
+                "soortPartij": "persoon",
+                "partijIdentificatie": {
+                    "contactnaam": {
+                        "voorletters": "Dr.",
+                        "voornaam": "Test Persoon",
+                        "voorvoegselAchternaam": "Mrs.",
+                        "achternaam": "Gamble",
+                    }
+                },
+            },
+        )
+        m.get(
+            "http://localhost:8338/klantinteracties/api/v1/partijen/7260ea01-12c0-4750-8fd1-dfa777818837?expand=digitaleAdressen",
+            headers={"Content-Type": "application/json"},
+            json={
+                "count": 0,
+                "next": None,
+                "previous": None,
+                "results": [],
+            },
+        )
+
+        klantcontact = {
+            "uuid": "095be615-a8ad-4c33-8e9c-c7612fbf6c9f",
+            "url": "http://example.com",
+            "gingOverOnderwerpobjecten": [],
+            "hadBetrokkenActoren": [],
+            "omvatteBijlagen": [],
+            "hadBetrokkenen": [],
+            "leiddeTotInterneTaken": [],
+            "nummer": "007",
+            "kanaal": "email",
+            "onderwerp": "Aanvraag",
+            "inhoud": "Hoe gaat het?",
+            "taal": "nl",
+            "vertrouwelijk": False,
+            "plaatsgevondenOp": "2019-08-24T14:15:22Z",
+        }
+        betrokkene = {
+            "uuid": "095be615-a8ad-4c33-8e9c-c7612fbf6c9f",
+            "url": "http://example.com",
+            "wasPartij": {
+                "uuid": "095be615-a8ad-4c33-8e9c-c7612fbf6c9f",
+                "url": "http://example.com",
+            },
+            "hadKlantcontact": {
+                "uuid": "095be615-a8ad-4c33-8e9c-c7612fbf6c9f",
+                "url": "http://example.com",
+            },
+            "digitaleAdressen": [{}],
+            "volledigeNaam": "John Doe",
+            "rol": "medewerker",
+            "initiator": True,
+        }
+        interne_taak = {
+            "uuid": "095be615-a8ad-4c33-8e9c-c7612fbf6c9f",
+            "url": "http://example.com",
+            "gevraagdeHandeling": "",
+            "aanleidinggevendKlantcontact": {
+                "uuid": klantcontact["uuid"],
+                "url": "http://example.com",
+            },
+            "status": "te_verwerken",
+            "toegewezenOp": "2019-08-24T14:15:22Z",
+        }
+
+        self.matchers = [
+            m.post(
+                "http://localhost:8338/klantinteracties/api/v1/betrokkenen",
+                headers={"Content-Type": "application/json"},
+                json=betrokkene,
+            ),
+            m.post(
+                "http://localhost:8338/klantinteracties/api/v1/klantcontacten",
+                headers={"Content-Type": "application/json"},
+                json=klantcontact,
+            ),
+            m.post(
+                "http://localhost:8338/klantinteracties/api/v1/internetaken",
+                headers={"Content-Type": "application/json"},
+                json=interne_taak,
+            ),
+        ]
+
     def install_mocks_digid_missing_contact_info(self, m) -> "MockAPICreateData":
         self.matchers = [
             m.get(

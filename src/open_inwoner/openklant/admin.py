@@ -17,25 +17,33 @@ from .models import (
 class ContactFormSubjectForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["subject_code"].widget.attrs["placeholder"] = _(
-            "Must be configured if E-suite is used"
-        )
+        if esuite_subject_code := self.fields.get("esuite_subject_code", None):
+            esuite_subject_code.widget.attrs["placeholder"] = _(
+                "Must be configured if E-suite is used"
+            )
 
     class Meta:
         model = ContactFormSubject
         fields = (
             "subject",
-            "subject_code",
+            "esuite_subject_code",
         )
 
 
 class ContactFormSubjectInlineAdmin(OrderedTabularInline):
     model = ContactFormSubject
     form = ContactFormSubjectForm
-    fields = ("subject", "subject_code", "order", "move_up_down_links")
     readonly_fields = ("order", "move_up_down_links")
     ordering = ("order",)
     extra = 0
+
+
+class ContactFormSubjectInlineAdminESuite(ContactFormSubjectInlineAdmin):
+    fields = ("subject", "esuite_subject_code", "order", "move_up_down_links")
+
+
+class ContactFormSubjectInlineAdminOpenKlant(ContactFormSubjectInlineAdmin):
+    fields = ("subject", "order", "move_up_down_links")
 
 
 class ESuiteKlantConfigAdminForm(forms.ModelForm):
@@ -48,7 +56,7 @@ class ESuiteKlantConfigAdminForm(forms.ModelForm):
 class ESuiteKlantConfigAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
     form = ESuiteKlantConfigAdminForm
     inlines = [
-        ContactFormSubjectInlineAdmin,
+        ContactFormSubjectInlineAdminESuite,
     ]
     fieldsets = [
         (
@@ -110,6 +118,9 @@ class OpenKlant2ConfigAdminForm(forms.ModelForm):
 class OpenKlant2ConfigAdmin(SingletonModelAdmin):
     model = OpenKlant2Config
     form = OpenKlant2ConfigAdminForm
+    inlines = [
+        ContactFormSubjectInlineAdminOpenKlant,
+    ]
     fieldsets = [
         (
             _("API configuration"),

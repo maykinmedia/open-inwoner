@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.utils.translation import gettext as _
 
+from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.cms.footer.cms_plugins import FooterPagesPlugin
 from open_inwoner.cms.tests import cms_tools
 from open_inwoner.openklant.constants import KlantenServiceType
@@ -12,6 +13,9 @@ from open_inwoner.utils.test import ClearCachesMixin
 class ContactFormTestCase(ClearCachesMixin, TestCase):
     def setUp(self):
         super().setUp()
+
+        self.user = UserFactory()
+
         # clear esuite_config
         esuite_config = ESuiteKlantConfig.get_solo()
         esuite_config.klanten_service = None
@@ -19,7 +23,6 @@ class ContactFormTestCase(ClearCachesMixin, TestCase):
         esuite_config.register_bronorganisatie_rsin = ""
         esuite_config.register_type = ""
         esuite_config.register_employee_id = ""
-        esuite_config.send_email_confirmation = True
         esuite_config.save()
 
     def test_no_form_link_shown_in_footer_if_not_has_configuration(self):
