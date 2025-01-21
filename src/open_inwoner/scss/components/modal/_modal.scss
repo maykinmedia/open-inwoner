@@ -63,6 +63,7 @@
     .button {
       height: var(--font-size-body);
       padding: 0;
+      pointer-events: all;
     }
   }
 
@@ -70,6 +71,7 @@
     min-width: auto;
     display: flex;
     justify-content: center;
+    pointer-events: all;
 
     @media (min-width: 768px) {
       min-width: 150px;
