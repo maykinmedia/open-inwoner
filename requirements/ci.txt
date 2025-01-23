@@ -1022,7 +1022,7 @@ soupsieve==2.5
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   beautifulsoup4
-sphinx==7.3.7
+sphinx==7.4.7
     # via
     #   -r requirements/docs.in
     #   recommonmark

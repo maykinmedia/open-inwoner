@@ -1184,7 +1184,7 @@ soupsieve==2.5
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   beautifulsoup4
-sphinx==7.3.7
+sphinx==7.4.7
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
