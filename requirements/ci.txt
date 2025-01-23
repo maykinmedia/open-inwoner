@@ -1031,7 +1031,7 @@ sphinx==7.4.7
     #   sphinxcontrib-jquery
 sphinx-markdown-tables==0.0.16
     # via -r requirements/docs.in
-sphinx-rtd-theme==2.0.0
+sphinx-rtd-theme==3.0.2
     # via -r requirements/docs.in
 sphinx-tabs==3.4.5
     # via -r requirements/docs.in

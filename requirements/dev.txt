@@ -1196,7 +1196,7 @@ sphinx-markdown-tables==0.0.16
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-sphinx-rtd-theme==2.0.0
+sphinx-rtd-theme==3.0.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
