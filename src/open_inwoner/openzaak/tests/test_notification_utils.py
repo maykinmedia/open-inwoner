@@ -27,6 +27,7 @@ class NotificationHandlerUtilsTestCase(TestCase):
     def setUp(self):
         self.api_group = ZGWApiGroupConfigFactory(
             zrc_service__api_root=ZAKEN_ROOT,
+            fetch_eherkenning_zaken_with_rsin=False,
         )
 
     def test_send_case_update_email(self):
@@ -236,6 +237,6 @@ class NotificationHandlerUtilsTestCase(TestCase):
 
         # of all the Users with Roles only these match all conditions
         expected = {user_1, user_2}
-        actual = _get_initiator_users_from_roles(roles)
+        actual = _get_initiator_users_from_roles(roles, api_group=self.api_group)
 
         self.assertEqual(set(actual), expected)

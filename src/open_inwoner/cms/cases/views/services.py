@@ -105,7 +105,9 @@ class CaseListService:
             raise ValueError(f"{group} has no `forms_client`")
 
         return group.forms_client.fetch_open_submissions(
-            **get_user_fetch_parameters(self.request, check_rsin=False)
+            **get_user_fetch_parameters(
+                self.request, use_rsin=group.fetch_eherkenning_zaken_with_rsin
+            )
         )
 
     def get_submissions(self) -> list[SubmissionWithApiGroup]:
@@ -192,7 +194,9 @@ class CaseListService:
 
     def _get_cases_for_api_group(self, group: ZGWApiGroupConfig) -> list[Zaak]:
         raw_cases = group.zaken_client.fetch_cases(
-            **get_user_fetch_parameters(self.request)
+            **get_user_fetch_parameters(
+                self.request, use_rsin=group.fetch_eherkenning_zaken_with_rsin
+            )
         )
         resolved_cases = self.resolve_cases(raw_cases, group)
 

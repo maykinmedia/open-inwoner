@@ -78,7 +78,7 @@ class CaseAccessMixin(AccessMixin):
                 elif request.user.kvk:
                     identifier = self.request.user.kvk
                     config = OpenZaakConfig.get_solo()
-                    if config.fetch_eherkenning_zaken_with_rsin:
+                    if api_group.fetch_eherkenning_zaken_with_rsin:
                         identifier = self.request.user.rsin
 
                     vestigingsnummer = get_kvk_branch_number(self.request.session)

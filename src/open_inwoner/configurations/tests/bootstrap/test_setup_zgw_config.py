@@ -88,7 +88,6 @@ class ZGWConfigurationTests(TestCase):
         self.assertEqual(config.enable_categories_filtering_with_zaken, False)
         self.assertEqual(config.skip_notification_statustype_informeren, False)
         self.assertEqual(config.reformat_esuite_zaak_identificatie, False)
-        self.assertEqual(config.fetch_eherkenning_zaken_with_rsin, False)
 
     def test_configure_full_sets_the_correct_fields(self):
         execute_single_step(
@@ -120,7 +119,6 @@ class ZGWConfigurationTests(TestCase):
         self.assertEqual(config.enable_categories_filtering_with_zaken, True)
         self.assertEqual(config.skip_notification_statustype_informeren, False)
         self.assertEqual(config.reformat_esuite_zaak_identificatie, True)
-        self.assertEqual(config.fetch_eherkenning_zaken_with_rsin, False)
 
     def test_configure_raises_on_missing_groups(self):
         with self.assertRaises(PrerequisiteFailed):

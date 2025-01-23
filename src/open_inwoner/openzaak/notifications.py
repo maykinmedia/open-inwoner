@@ -24,6 +24,8 @@ from open_inwoner.openzaak.models import (
     UserCaseInfoObjectNotification,
     UserCaseStatusNotification,
     ZaakTypeConfig,
+    ZaakTypeStatusTypeConfig,
+    ZGWApiGroupConfig,
 )
 from open_inwoner.openzaak.utils import (
     get_zaak_type_config,
@@ -34,8 +36,6 @@ from open_inwoner.openzaak.utils import (
 from open_inwoner.userfeed import hooks
 from open_inwoner.utils.logentry import system_action as log_system_action
 from open_inwoner.utils.url import build_absolute_url
-
-from .models import ZaakTypeStatusTypeConfig, ZGWApiGroupConfig
 
 logger = logging.getLogger(__name__)
 
@@ -85,7 +85,7 @@ def handle_zaken_notification(notification: Notification):
         )
         return
 
-    inform_users = _get_initiator_users_from_roles(roles)
+    inform_users = _get_initiator_users_from_roles(roles, api_group=api_group)
     if not inform_users:
         log_system_action(
             f"ignored {r} notification: no users with bsn/nnp_id as (mede)initiators in case {case_url}",
@@ -656,7 +656,9 @@ def _get_nnp_initiator_nnp_id_from_roles(roles: list[Rol]) -> list[str]:
     return list(ret)
 
 
-def _get_initiator_users_from_roles(roles: list[Rol]) -> list[User]:
+def _get_initiator_users_from_roles(
+    roles: list[Rol], api_group: ZGWApiGroupConfig
+) -> list[User]:
     """
     iterate over Rollen and return User objects for initiators
     """
@@ -668,8 +670,7 @@ def _get_initiator_users_from_roles(roles: list[Rol]) -> list[User]:
 
     nnp_id_list = _get_nnp_initiator_nnp_id_from_roles(roles)
     if nnp_id_list:
-        config = OpenZaakConfig.get_solo()
-        if config.fetch_eherkenning_zaken_with_rsin:
+        if api_group.fetch_eherkenning_zaken_with_rsin:
             id_filter = {"rsin__in": nnp_id_list}
         else:
             id_filter = {"kvk__in": nnp_id_list}

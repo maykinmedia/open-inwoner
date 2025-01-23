@@ -77,7 +77,6 @@ class OpenZaakConfigAdmin(SingletonModelAdmin):
                 "fields": [
                     "skip_notification_statustype_informeren",
                     "reformat_esuite_zaak_identificatie",
-                    "fetch_eherkenning_zaken_with_rsin",
                     "derive_zaak_titel_from",
                 ],
             },

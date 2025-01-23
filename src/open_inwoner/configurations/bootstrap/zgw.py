@@ -28,7 +28,6 @@ class OpenZaakConfigurationModel(ConfigurationModel):
                 "max_upload_size",
                 "skip_notification_statustype_informeren",
                 "reformat_esuite_zaak_identificatie",
-                "fetch_eherkenning_zaken_with_rsin",
                 "derive_zaak_titel_from",
                 "order_statuses_by_date_set",
                 "title_text",

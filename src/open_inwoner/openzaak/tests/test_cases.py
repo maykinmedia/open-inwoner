@@ -487,6 +487,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                     zrc_service__api_root=zaken_root,
                     ztc_service__api_root=catalogi_root,
                     form_service=None,
+                    fetch_eherkenning_zaken_with_rsin=False,
                 )
             )
             self.mocks.append(
@@ -705,10 +706,11 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
             with self.subTest(
                 fetch_eherkenning_zaken_with_rsin=fetch_eherkenning_zaken_with_rsin
             ):
-                self.config.fetch_eherkenning_zaken_with_rsin = (
-                    fetch_eherkenning_zaken_with_rsin
-                )
-                self.config.save()
+                for group in self.api_groups:
+                    group.fetch_eherkenning_zaken_with_rsin = (
+                        fetch_eherkenning_zaken_with_rsin
+                    )
+                    group.save()
 
                 m.reset_mock()
 
@@ -804,9 +806,6 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
 
         self.client.force_login(user=self.eherkenning_user)
 
-        self.config.fetch_eherkenning_zaken_with_rsin = False
-        self.config.save()
-
         m.reset_mock()
 
         response = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
@@ -869,9 +868,6 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
 
         self.client.force_login(user=self.eherkenning_user)
 
-        self.config.fetch_eherkenning_zaken_with_rsin = True
-        self.config.save()
-
         m.reset_mock()
 
         response = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
@@ -928,11 +924,12 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
         for mock in self.mocks:
             mock._setUpMocks(m)
 
+        for group in self.api_groups:
+            group.fetch_eherkenning_zaken_with_rsin = True
+            group.save()
+
         self.eherkenning_user.rsin = ""
         self.eherkenning_user.save()
-
-        self.config.fetch_eherkenning_zaken_with_rsin = True
-        self.config.save()
 
         m.reset_mock()
 
@@ -1179,10 +1176,12 @@ class CaseSubmissionTest(TransactionWebTest):
         ZGWApiGroupConfigFactory(
             zrc_service__api_root=ZAKEN_ROOT,
             form_service__api_root=FORMS_ROOT,
+            fetch_eherkenning_zaken_with_rsin=False,
         )
         ZGWApiGroupConfigFactory(
             zrc_service__api_root=ANOTHER_ZAKEN_ROOT,
             form_service__api_root=ANOTHER_FORMS_ROOT,
+            fetch_eherkenning_zaken_with_rsin=False,
         )
 
     @requests_mock.Mocker()

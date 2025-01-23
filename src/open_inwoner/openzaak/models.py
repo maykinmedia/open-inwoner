@@ -252,6 +252,17 @@ class ZGWApiGroupConfig(models.Model):
         if self.form_service:
             return cast(FormClient, self._build_client_from_attr("form_service"))
 
+    fetch_eherkenning_zaken_with_rsin = models.BooleanField(
+        verbose_name=_(
+            "Fetch Zaken for users authenticated with eHerkenning using RSIN"
+        ),
+        help_text=_(
+            "If enabled, Zaken for eHerkenning users are fetched using the company RSIN (Open Zaak). "
+            "If not enabled, Zaken are fetched using the KvK number (eSuite)."
+        ),
+        default=False,
+    )
+
     class Meta:
         verbose_name = _("ZGW API set")
         verbose_name_plural = _("ZGW API sets")
@@ -401,16 +412,6 @@ class OpenZaakConfig(SingletonModel):
         default=False,
     )
 
-    fetch_eherkenning_zaken_with_rsin = models.BooleanField(
-        verbose_name=_(
-            "Fetch Zaken for users authenticated with eHerkenning using RSIN"
-        ),
-        help_text=_(
-            "If enabled, Zaken for eHerkenning users are fetched using the company RSIN (Open Zaak). "
-            "If not enabled, Zaken are fetched using the KvK number (eSuite)."
-        ),
-        default=False,
-    )
 
     enable_eherkenning_for_eenmanszaak = models.BooleanField(
         verbose_name=_("Allow eenmanszaken to authenticate using eHerkenning"),
