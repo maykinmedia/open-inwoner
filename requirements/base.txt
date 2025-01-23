@@ -256,7 +256,7 @@ django-sessionprofile==1.0
     # via
     #   -r requirements/base.in
     #   django-digid-eherkenning
-django-setup-configuration==0.5.0
+django-setup-configuration==0.7.0
     # via
     #   -r requirements/base.in
     #   mozilla-django-oidc-db
@@ -317,6 +317,8 @@ djangorestframework-camel-case==1.4.2
     #   notifications-api-common
 dnspython==2.6.1
     # via email-validator
+docutils==0.21.2
+    # via django-setup-configuration
 drf-spectacular==0.20.1
     # via -r requirements/base.in
 easy-thumbnails[svg]==2.8.5
@@ -522,6 +524,10 @@ requests==2.31.0
     #   messagebird
     #   mozilla-django-oidc
     #   zgw-consumers
+ruamel-yaml==0.18.10
+    # via django-setup-configuration
+ruamel-yaml-clib==0.2.12
+    # via ruamel-yaml
 sentry-sdk[django]==2.19.2
     # via -r requirements/base.in
 simplejson==3.19.2
