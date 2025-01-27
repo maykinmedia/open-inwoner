@@ -64,11 +64,11 @@
   }
 
   // Remove Safari iOS phone-parsing from specific elements
-  .phone-parsing {
+  .skip-phone-parsing {
     pointer-events: none;
   }
   // Hide style for iOS-rendered anchor element
-  .phone-parsing > a {
+  .skip-phone-parsing > a {
     text-decoration: none;
     color: inherit;
   }

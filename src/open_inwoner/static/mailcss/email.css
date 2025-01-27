@@ -262,11 +262,11 @@ strong .color--primary, strong .color--secondary {
 
 /* iOS specific */
 
-.phone-parsing {
+.skip-phone-parsing {
     pointer-events: none;
 }
 
-.phone-parsing > a {
+.skip-phone-parsing > a {
     text-decoration: none;
     color: inherit;
 }
