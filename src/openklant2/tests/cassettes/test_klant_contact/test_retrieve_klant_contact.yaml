@@ -1,40 +1,39 @@
 interactions:
 - request:
-    body: '{"nummer": "0000000112", "kanaal": "store", "onderwerp": "its", "inhoud":
-      "Grow conference approach exactly various enough.", "taal": "nld", "indicatieContactGelukt":
-      true, "vertrouwelijk": true, "plaatsgevondenOp": "2020-05-25T22:59:07.622262"}'
+    body: '{"nummer": "0000000112", "kanaal": "though", "onderwerp": "difference",
+      "inhoud": "Mr office forward eat peace record big.", "taal": "nld", "indicatieContactGelukt":
+      true, "vertrouwelijk": true, "plaatsgevondenOp": "2003-07-23T02:34:24.331740"}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '245'
+      - '244'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"17e8b1e2-292b-4117-9868-abbaf455f774","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/17e8b1e2-292b-4117-9868-abbaf455f774","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000112","kanaal":"store","onderwerp":"its","inhoud":"Grow
-        conference approach exactly various enough.","indicatieContactGelukt":true,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2020-05-25T22:59:07.622262Z"}'
+      string: '{"uuid":"e44a457e-2b03-41d9-860c-75d872104aea","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/e44a457e-2b03-41d9-860c-75d872104aea","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000112","kanaal":"though","onderwerp":"difference","inhoud":"Mr
+        office forward eat peace record big.","indicatieContactGelukt":true,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2003-07-23T02:34:24.331740Z"}'
     headers:
       API-version:
-      - 0.0.3
+      - 0.0.4
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '507'
+      - '506'
       Content-Security-Policy:
-      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
-        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
-        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
-        blob:'
+      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
+        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
+        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/17e8b1e2-292b-4117-9868-abbaf455f774
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/e44a457e-2b03-41d9-860c-75d872104aea
       Referrer-Policy:
       - same-origin
       Vary:
@@ -52,24 +51,23 @@ interactions:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
     method: GET
-    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten/17e8b1e2-292b-4117-9868-abbaf455f774
+    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten/e44a457e-2b03-41d9-860c-75d872104aea
   response:
     body:
-      string: '{"uuid":"17e8b1e2-292b-4117-9868-abbaf455f774","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/17e8b1e2-292b-4117-9868-abbaf455f774","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000112","kanaal":"store","onderwerp":"its","inhoud":"Grow
-        conference approach exactly various enough.","indicatieContactGelukt":true,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2020-05-25T22:59:07.622262Z"}'
+      string: '{"uuid":"e44a457e-2b03-41d9-860c-75d872104aea","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/e44a457e-2b03-41d9-860c-75d872104aea","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000112","kanaal":"though","onderwerp":"difference","inhoud":"Mr
+        office forward eat peace record big.","indicatieContactGelukt":true,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2003-07-23T02:34:24.331740Z"}'
     headers:
       API-version:
-      - 0.0.3
+      - 0.0.4
       Allow:
       - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
       Content-Length:
-      - '507'
+      - '506'
       Content-Security-Policy:
-      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
-        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
-        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
-        blob:'
+      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
+        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
+        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

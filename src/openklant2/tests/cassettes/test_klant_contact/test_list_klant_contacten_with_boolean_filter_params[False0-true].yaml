@@ -1,40 +1,39 @@
 interactions:
 - request:
-    body: '{"nummer": "0000000116", "kanaal": "ask", "onderwerp": "focus", "inhoud":
-      "Around oil right rather company outside describe.", "taal": "nld", "indicatieContactGelukt":
-      false, "vertrouwelijk": true, "plaatsgevondenOp": "2004-10-24T01:55:55.993083"}'
+    body: '{"nummer": "0000000116", "kanaal": "suggest", "onderwerp": "home", "inhoud":
+      "Since just charge nearly long.", "taal": "nld", "indicatieContactGelukt": false,
+      "vertrouwelijk": false, "plaatsgevondenOp": "1995-10-11T20:14:41.351910"}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '247'
+      - '232'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"9a1f9329-63fb-4ca7-bf71-c511d33b7b9f","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/9a1f9329-63fb-4ca7-bf71-c511d33b7b9f","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000116","kanaal":"ask","onderwerp":"focus","inhoud":"Around
-        oil right rather company outside describe.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2004-10-24T01:55:55.993083Z"}'
+      string: '{"uuid":"66190d8b-5e3a-40d9-94ec-07f6fed60a21","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/66190d8b-5e3a-40d9-94ec-07f6fed60a21","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000116","kanaal":"suggest","onderwerp":"home","inhoud":"Since
+        just charge nearly long.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"1995-10-11T20:14:41.351910Z"}'
     headers:
       API-version:
-      - 0.0.3
+      - 0.0.4
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '509'
+      - '494'
       Content-Security-Policy:
-      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
-        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
-        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
-        blob:'
+      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
+        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
+        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/9a1f9329-63fb-4ca7-bf71-c511d33b7b9f
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/66190d8b-5e3a-40d9-94ec-07f6fed60a21
       Referrer-Policy:
       - same-origin
       Vary:
@@ -55,21 +54,20 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1&indicatieContactGelukt=False
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"9a1f9329-63fb-4ca7-bf71-c511d33b7b9f","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/9a1f9329-63fb-4ca7-bf71-c511d33b7b9f","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000116","kanaal":"ask","onderwerp":"focus","inhoud":"Around
-        oil right rather company outside describe.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2004-10-24T01:55:55.993083Z","_expand":{}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"66190d8b-5e3a-40d9-94ec-07f6fed60a21","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/66190d8b-5e3a-40d9-94ec-07f6fed60a21","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000116","kanaal":"suggest","onderwerp":"home","inhoud":"Since
+        just charge nearly long.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"1995-10-11T20:14:41.351910Z","_expand":{}}]}'
     headers:
       API-version:
-      - 0.0.3
+      - 0.0.4
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '574'
+      - '559'
       Content-Security-Policy:
-      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
-        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
-        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
-        blob:'
+      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
+        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
+        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
@@ -97,17 +95,16 @@ interactions:
       string: '{"count":0,"next":null,"previous":null,"results":[]}'
     headers:
       API-version:
-      - 0.0.3
+      - 0.0.4
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
       - '52'
       Content-Security-Policy:
-      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
-        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
-        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
-        blob:'
+      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
+        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
+        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

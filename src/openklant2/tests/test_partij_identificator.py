@@ -38,10 +38,10 @@ def een_partij_identificator(client, een_persoon) -> Partij:
     data = {
         "identificeerdePartij": {"uuid": een_persoon["uuid"]},
         "partijIdentificator": {
-            "codeObjecttype": "PERSOON",
-            "codeSoortObjectId": "BSN",
-            "objectId": "123456789",
-            "codeRegister": "BRP",
+            "codeObjecttype": "natuurlijk_persoon",
+            "codeSoortObjectId": "bsn",
+            "objectId": "631706549",
+            "codeRegister": "brp",
         },
         "anderePartijIdentificator": "optional_identifier_123",
     }
@@ -54,10 +54,10 @@ def test_create_partij_identificator(client, een_persoon) -> None:
         {
             "identificeerdePartij": {"uuid": een_persoon["uuid"]},
             "partijIdentificator": {
-                "codeObjecttype": "PERSOON",
-                "codeSoortObjectId": "BSN",
-                "objectId": "123456789",
-                "codeRegister": "BRP",
+                "codeObjecttype": "natuurlijk_persoon",
+                "codeSoortObjectId": "bsn",
+                "objectId": "631706549",
+                "codeRegister": "brp",
             },
             "anderePartijIdentificator": "optional_identifier_123",
         }

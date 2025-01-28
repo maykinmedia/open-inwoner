@@ -13,7 +13,7 @@ interactions:
   response:
     body:
       string: '{"type":"http://localhost:8338/ref/fouten/ValidationError/","code":"invalid","title":"Invalid
-        input.","status":400,"detail":"","instance":"urn:uuid:5a74024d-1b12-4141-89c3-a04220bfd405","invalidParams":[{"name":"digitaleAdressen","code":"required","reason":"Dit
+        input.","status":400,"detail":"","instance":"urn:uuid:57103ec2-f23f-4485-b2eb-0e402ceea511","invalidParams":[{"name":"digitaleAdressen","code":"required","reason":"Dit
         veld is vereist."},{"name":"voorkeursDigitaalAdres","code":"required","reason":"Dit
         veld is vereist."},{"name":"rekeningnummers","code":"required","reason":"Dit
         veld is vereist."},{"name":"voorkeursRekeningnummer","code":"required","reason":"Dit
@@ -22,17 +22,16 @@ interactions:
         is vereist."}]}'
     headers:
       API-version:
-      - 0.0.3
+      - 0.0.4
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
       - '678'
       Content-Security-Policy:
-      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
-        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
-        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
-        blob:'
+      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
+        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
+        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
