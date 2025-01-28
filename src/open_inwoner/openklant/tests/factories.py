@@ -8,6 +8,7 @@ from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.services import Question, QuestionValidator
 from open_inwoner.openzaak.tests.factories import ServiceFactory
 from open_inwoner.utils.url import uuid_from_url
+from openklant2.tests.helpers import OpenKlantServiceManager
 
 from .data import OPENKLANT2_ROOT
 
@@ -30,7 +31,10 @@ class KlantContactMomentAnswerFactory(factory.django.DjangoModelFactory):
 
 class OpenKlant2ConfigFactory(factory.django.DjangoModelFactory):
     service = factory.SubFactory(
-        ServiceFactory, api_root=OPENKLANT2_ROOT, api_type=APITypes.kc
+        ServiceFactory,
+        api_root=OPENKLANT2_ROOT,
+        api_type=APITypes.kc,
+        secret=OpenKlantServiceManager._api_token,
     )
     mijn_vragen_kanaal = "oip_mijn_vragen"
     mijn_vragen_organisatie_naam = "Open Inwoner Platform"

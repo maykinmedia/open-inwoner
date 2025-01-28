@@ -98,6 +98,7 @@ class OpenKlantServiceManager:
                     "model": "token.tokenauth",
                     "pk": 1,
                     "fields": {
+                        "identifier": "test-token",
                         "token": self._api_token,
                         "contact_person": "Boaty McBoatface",
                         "email": "boaty@mcboatface.com",
@@ -107,7 +108,27 @@ class OpenKlantServiceManager:
                         "application": "",
                         "administration": "",
                     },
-                }
+                },
+                # add admin user for convenience + debugging
+                {
+                    "model": "accounts.user",
+                    "pk": 1,
+                    "fields": {
+                        # password is "secret"
+                        "password": "pbkdf2_sha256$600000$11HRNvD3J8QPTCkp0avgKX$gY/NX5+Ap8jAmD86HxEneVHwzi9+g45NhTBMkB3vJuo=",
+                        "last_login": "2025-01-28T10:30:23.474Z",
+                        "is_superuser": True,
+                        "username": "admin",
+                        "first_name": "",
+                        "last_name": "",
+                        "email": "admin@oip.nl",
+                        "is_staff": True,
+                        "is_active": True,
+                        "date_joined": "2025-01-28T10:29:59.843Z",
+                        "groups": [],
+                        "user_permissions": [],
+                    },
+                },
             ]
         )
 
