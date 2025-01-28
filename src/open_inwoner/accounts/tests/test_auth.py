@@ -20,6 +20,7 @@ from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.kvk.branches import get_kvk_branch_number
 from open_inwoner.kvk.tests.factories import CertificateFactory
 from open_inwoner.openklant.tests.data import MockAPIReadPatchData
+from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin
 
 from ...cms.collaborate.cms_apps import CollaborateApphook
@@ -671,11 +672,15 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
         return_value="",
         autospec=True,
     )
-    def test_login_as_eenmanszaak_blocked(
+    def test_login_as_eenmanszaak_blocked_if_enable_eherkenning_for_eenmanszaak_is_false(
         self,
         mock_retrieve_rsin_with_kvk,
         mock_get_basisprofiel,
     ):
+        config = OpenZaakConfig.get_solo()
+        config.enable_eherkenning_for_eenmanszaak = False
+        config.save()
+
         mock_get_basisprofiel.return_value = {
             "_embedded": {"eigenaar": {"rechtsvorm": "Eenmanszaak"}}
         }
@@ -693,18 +698,64 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
         }
 
         # post our password to the IDP
-        response = self.client.post(url, data, follow=False)
+        response = self.app.post(url, data)
 
         # it will redirect to our ACS
         self.assertEqual(response.status_code, 302)
         self.assertIn(reverse("eherkenning:acs"), response["Location"])
 
         # follow the ACS redirect and get/create the user
-        response = self.client.get(response["Location"])
+        response = self.app.get(response["Location"])
 
         # User is logged out and redirected to login view
         self.assertNotIn("_auth_user_id", self.app.session)
         self.assertRedirectsLogin(response, with_host=True)
+
+    @patch("open_inwoner.kvk.signals.KvKClient.get_basisprofiel", autospec=True)
+    @patch(
+        "open_inwoner.kvk.signals.KvKClient.retrieve_rsin_with_kvk",
+        return_value="",
+        autospec=True,
+    )
+    def test_login_as_eenmanszaak_not_blocked_if_enable_eherkenning_for_eenmanszaak_is_true(
+        self,
+        mock_retrieve_rsin_with_kvk,
+        mock_get_basisprofiel,
+    ):
+        config = OpenZaakConfig.get_solo()
+        config.enable_eherkenning_for_eenmanszaak = True
+        config.save()
+
+        url = reverse("eherkenning-mock:password")
+        params = {
+            "acs": f"http://testserver{reverse('eherkenning:acs')}",
+            "next": RETURN_URL,
+            "cancel": CANCEL_URL,
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "29664887",
+            "auth_pass": "company@localhost",
+        }
+
+        # post our password to the IDP
+        response = self.app.post(url, data)
+
+        # it will redirect to our ACS
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("eherkenning:acs"), response["Location"])
+
+        # follow the ACS redirect and get/create the user
+        response = self.app.get(response["Location"])
+
+        # User is logged in and redirected to RETURN_URL
+        self.assertIn("_auth_user_id", self.app.session)
+        self.assertIn(RETURN_URL, response["Location"])
+
+        # We bailed out early -- because the flag is true, we don't have to poll the KvK
+        # to check if the entity is an eenmanszaak
+        mock_get_basisprofiel.assert_not_called()
 
     @patch("eherkenning.validators.KVKValidator.__call__")
     def test_eherkenning_fail_without_invite_and_next_url_redirects_to_login_page(

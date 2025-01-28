@@ -25,6 +25,7 @@ from eherkenning.mock.views.eherkenning import (
     eHerkenningAssertionConsumerServiceMockView,
 )
 from open_inwoner.kvk.client import KvKClient
+from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.utils.views import LogMixin
 
 from ..choices import LoginTypeChoices
@@ -135,6 +136,10 @@ class CustomDigiDAssertionConsumerServiceView(DigiDAssertionConsumerServiceView)
 class BlockEenmanszaakLoginMixin:
     def get(self, request):
         response = super().get(request)
+
+        config = OpenZaakConfig.get_solo()
+        if config.enable_eherkenning_for_eenmanszaak:
+            return response
 
         if not hasattr(request.user, "kvk"):
             return response
