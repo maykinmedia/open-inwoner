@@ -846,6 +846,9 @@ class OpenKlant2Service(KlantenService):
 
     def __init__(self, config: OpenKlant2Config | None = None):
         self.config = config or OpenKlant2Config.get_solo()
+        if not self.config.service:
+            raise ImproperlyConfigured("No openklant2 Service object configured")
+
         self.client = OpenKlant2Client(
             base_url=self.config.service.api_root,
             request_kwargs={
