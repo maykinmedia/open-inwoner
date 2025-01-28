@@ -889,7 +889,7 @@ class OpenKlant2Service(KlantenService):
         return {
             "partijIdentificator__codeSoortObjectId": "bsn",
             "partijIdentificator__codeRegister": "brp",
-            "partijIdentificator__codeObjecttype": "inp",
+            "partijIdentificator__codeObjecttype": "natuurlijk_persoon",
             "partijIdentificator__objectId": bsn,
             "soortPartij": "persoon",
         }
@@ -897,9 +897,9 @@ class OpenKlant2Service(KlantenService):
     @staticmethod
     def _kvk_list_param(kvk: str) -> PartijListParams:
         return {
-            "partijIdentificator__codeSoortObjectId": "kvk",
+            "partijIdentificator__codeSoortObjectId": "kvk_nummer",
             "partijIdentificator__codeRegister": "hr",
-            "partijIdentificator__codeObjecttype": "nnp",
+            "partijIdentificator__codeObjecttype": "niet_natuurlijk_persoon",
             "partijIdentificator__objectId": kvk,
             "soortPartij": "organisatie",
         }
@@ -907,9 +907,9 @@ class OpenKlant2Service(KlantenService):
     @staticmethod
     def _vestigingsnummer_list_param(vestigingsnummer: str) -> PartijListParams:
         return {
-            "partijIdentificator__codeSoortObjectId": "vtn",
+            "partijIdentificator__codeSoortObjectId": "vestigingsnummer",
             "partijIdentificator__codeRegister": "hr",
-            "partijIdentificator__codeObjecttype": "nnp",
+            "partijIdentificator__codeObjecttype": "vestiging",
             "partijIdentificator__objectId": vestigingsnummer,
             "soortPartij": "organisatie",
         }
@@ -962,7 +962,7 @@ class OpenKlant2Service(KlantenService):
                         data={
                             "identificeerdePartij": {"uuid": persoon["uuid"]},
                             "partijIdentificator": {
-                                "codeObjecttype": "inp",
+                                "codeObjecttype": "natuurlijk_persoon",
                                 "codeSoortObjectId": "bsn",
                                 "objectId": bsn,
                                 "codeRegister": "brp",
@@ -1003,9 +1003,9 @@ class OpenKlant2Service(KlantenService):
                 )
                 created = True
 
-                for soort_object_id, object_id in (
-                    ("kvk", kvk),
-                    ("vtn", vestigingsnummer),
+                for object_type, soort_object_id, object_id in (
+                    ("niet_natuurlijk_persoon", "kvk_nummer", kvk),
+                    ("vestiging", "vestigingsnummer", vestigingsnummer),
                 ):
                     if object_id:
                         try:
@@ -1015,7 +1015,7 @@ class OpenKlant2Service(KlantenService):
                                         "uuid": organisatie["uuid"]
                                     },
                                     "partijIdentificator": {
-                                        "codeObjecttype": "nnp",
+                                        "codeObjecttype": object_type,
                                         "codeSoortObjectId": soort_object_id,
                                         "objectId": object_id,
                                         "codeRegister": "hr",

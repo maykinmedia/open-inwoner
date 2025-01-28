@@ -29,7 +29,7 @@ class PartijGetOrCreateTestCase(Openklant2ServiceTestCase):
 
         # First call creates
         persoon, created = self.service.get_or_create_partij_for_user(
-            {"user_bsn": "123456789"}, self.user
+            {"user_bsn": "521311408"}, self.user
         )
 
         self.assertTrue(
@@ -45,9 +45,9 @@ class PartijGetOrCreateTestCase(Openklant2ServiceTestCase):
             ],
             [
                 {
-                    "codeObjecttype": "inp",
+                    "codeObjecttype": "natuurlijk_persoon",
                     "codeSoortObjectId": "bsn",
-                    "objectId": "123456789",
+                    "objectId": "521311408",
                     "codeRegister": "brp",
                 }
             ],
@@ -55,7 +55,7 @@ class PartijGetOrCreateTestCase(Openklant2ServiceTestCase):
 
         # Second call gets
         persoon, created = self.service.get_or_create_partij_for_user(
-            {"user_bsn": "123456789"}, self.user
+            {"user_bsn": "521311408"}, self.user
         )
 
         self.assertFalse(
@@ -71,9 +71,9 @@ class PartijGetOrCreateTestCase(Openklant2ServiceTestCase):
             ],
             [
                 {
-                    "codeObjecttype": "inp",
+                    "codeObjecttype": "natuurlijk_persoon",
                     "codeSoortObjectId": "bsn",
-                    "objectId": "123456789",
+                    "objectId": "521311408",
                     "codeRegister": "brp",
                 }
             ],
@@ -86,7 +86,7 @@ class PartijGetOrCreateTestCase(Openklant2ServiceTestCase):
 
         # First call creates
         persoon, created = self.service.get_or_create_partij_for_user(
-            {"user_kvk_or_rsin": "123456789"},
+            {"user_kvk_or_rsin": "12345678"},
             self.user,
         )
 
@@ -103,9 +103,9 @@ class PartijGetOrCreateTestCase(Openklant2ServiceTestCase):
             ],
             [
                 {
-                    "codeObjecttype": "nnp",
-                    "codeSoortObjectId": "kvk",
-                    "objectId": "123456789",
+                    "codeObjecttype": "niet_natuurlijk_persoon",
+                    "codeSoortObjectId": "kvk_nummer",
+                    "objectId": "12345678",
                     "codeRegister": "hr",
                 },
             ],
@@ -113,7 +113,7 @@ class PartijGetOrCreateTestCase(Openklant2ServiceTestCase):
 
         # Second call gets
         persoon, created = self.service.get_or_create_partij_for_user(
-            {"user_kvk_or_rsin": "123456789"}, self.user
+            {"user_kvk_or_rsin": "12345678"}, self.user
         )
 
         self.assertFalse(
@@ -129,9 +129,9 @@ class PartijGetOrCreateTestCase(Openklant2ServiceTestCase):
             ],
             [
                 {
-                    "codeObjecttype": "nnp",
-                    "codeSoortObjectId": "kvk",
-                    "objectId": "123456789",
+                    "codeObjecttype": "niet_natuurlijk_persoon",
+                    "codeSoortObjectId": "kvk_nummer",
+                    "objectId": "12345678",
                     "codeRegister": "hr",
                 }
             ],
@@ -144,7 +144,7 @@ class PartijGetOrCreateTestCase(Openklant2ServiceTestCase):
 
         # First call creates
         persoon, created = self.service.get_or_create_partij_for_user(
-            {"user_kvk_or_rsin": "123456789", "vestigingsnummer": "987654321"},
+            {"user_kvk_or_rsin": "12345678", "vestigingsnummer": "123456789123"},
             self.user,
         )
 
@@ -161,15 +161,15 @@ class PartijGetOrCreateTestCase(Openklant2ServiceTestCase):
             ],
             [
                 {
-                    "codeObjecttype": "nnp",
-                    "codeSoortObjectId": "vtn",
-                    "objectId": "987654321",
+                    "codeObjecttype": "vestiging",
+                    "codeSoortObjectId": "vestigingsnummer",
+                    "objectId": "123456789123",
                     "codeRegister": "hr",
                 },
                 {
-                    "codeObjecttype": "nnp",
-                    "codeSoortObjectId": "kvk",
-                    "objectId": "123456789",
+                    "codeObjecttype": "niet_natuurlijk_persoon",
+                    "codeSoortObjectId": "kvk_nummer",
+                    "objectId": "12345678",
                     "codeRegister": "hr",
                 },
             ],
@@ -177,7 +177,7 @@ class PartijGetOrCreateTestCase(Openklant2ServiceTestCase):
 
         # Second call gets
         persoon, created = self.service.get_or_create_partij_for_user(
-            {"user_kvk_or_rsin": "123456789"}, self.user
+            {"user_kvk_or_rsin": "12345678"}, self.user
         )
 
         self.assertFalse(
@@ -193,15 +193,15 @@ class PartijGetOrCreateTestCase(Openklant2ServiceTestCase):
             ],
             [
                 {
-                    "codeObjecttype": "nnp",
-                    "codeSoortObjectId": "vtn",
-                    "objectId": "987654321",
+                    "codeObjecttype": "vestiging",
+                    "codeSoortObjectId": "vestigingsnummer",
+                    "objectId": "123456789123",
                     "codeRegister": "hr",
                 },
                 {
-                    "codeObjecttype": "nnp",
-                    "codeSoortObjectId": "kvk",
-                    "objectId": "123456789",
+                    "codeObjecttype": "niet_natuurlijk_persoon",
+                    "codeSoortObjectId": "kvk_nummer",
+                    "objectId": "12345678",
                     "codeRegister": "hr",
                 },
             ],
@@ -240,9 +240,9 @@ class Openklant2ServiceTest(Openklant2ServiceTestCase):
             data={
                 "identificeerdePartij": {"uuid": self.persoon["uuid"]},
                 "partijIdentificator": {
-                    "codeObjecttype": "bsn",
-                    "codeSoortObjectId": "inp",
-                    "objectId": "123456789",
+                    "codeObjecttype": "natuurlijk_persoon",
+                    "codeSoortObjectId": "bsn",
+                    "objectId": "521311408",
                     "codeRegister": "brp",
                 },
                 "anderePartijIdentificator": "optional_identifier_123",
@@ -344,7 +344,9 @@ class QuestionAnswerTestCase(Openklant2ServiceTestCase):
             }
         )
 
-        self.openklant2_config = OpenKlant2ConfigFactory()
+        self.openklant2_config = OpenKlant2ConfigFactory(
+            mijn_vragen_actor=self.designated_actor["uuid"]
+        )
         self.service = OpenKlant2Service(config=self.openklant2_config)
 
     def test_designated_actor_is_required_to_create_question(self):
