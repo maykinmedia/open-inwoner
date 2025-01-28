@@ -39,6 +39,25 @@ class ZGWApiGroupConfig(admin.StackedInline):
     model = ZGWApiGroupConfig
     extra = 0
 
+    fieldsets = (
+        (
+            _("Basic configuration"),
+            {
+                "fields": [
+                    "name",
+                    "zrc_service",
+                    "drc_service",
+                    "ztc_service",
+                    "form_service",
+                ]
+            },
+        ),
+        (
+            _("Backend-specific flags"),
+            {"fields": ["fetch_eherkenning_zaken_with_rsin"]},
+        ),
+    )
+
 
 @admin.register(OpenZaakConfig)
 class OpenZaakConfigAdmin(SingletonModelAdmin):

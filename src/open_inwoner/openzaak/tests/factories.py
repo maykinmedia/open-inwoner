@@ -42,7 +42,7 @@ class ZGWApiGroupConfigFactory(factory.django.DjangoModelFactory):
     drc_service = factory.SubFactory(ServiceFactory, api_type=APITypes.drc)
     ztc_service = factory.SubFactory(ServiceFactory, api_type=APITypes.ztc)
     form_service = factory.SubFactory(ServiceFactory, api_type=APITypes.orc)
-    fetch_eherkenning_zaken_with_rsin = factory.Faker("boolean")
+    fetch_eherkenning_zaken_with_rsin = False
 
     class Meta:
         model = ZGWApiGroupConfig

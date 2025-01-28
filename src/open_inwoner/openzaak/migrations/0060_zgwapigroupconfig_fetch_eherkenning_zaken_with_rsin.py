@@ -2,7 +2,6 @@
 
 import logging
 
-from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.db import migrations, models
 
 logger = logging.getLogger(__name__)
@@ -12,27 +11,13 @@ def migrate_fetch_eherkenning_zaken_with_rsin(apps, _):
     OpenZaakConfig = apps.get_model("openzaak", "OpenZaakConfig")
     ZGWApiGroupConfig = apps.get_model("openzaak", "ZGWApiGroupConfig")
 
-    try:
-        zgw_group_config = ZGWApiGroupConfig.objects.get()
-    except ObjectDoesNotExist:
-        logger.info(
-            "No zgw_api_group_config found. "
-            "Skipping migration of fetch_eherkenning_zaken_with_rsin"
-        )
-        return
-    except MultipleObjectsReturned:
-        logger.info(
-            "Multiple zgw_api_group_config instances found. "
-            "Skipping migration of fetch_eherkenning_zaken_with_rsin"
-        )
-        return
-
     zaak_config = OpenZaakConfig.objects.first()
 
-    zgw_group_config.fetch_eherkenning_zaken_with_rsin = (
-        zaak_config.fetch_eherkenning_zaken_with_rsin
-    )
-    zgw_group_config.save()
+    for config in ZGWApiGroupConfig.objects.all():
+        config.fetch_eherkenning_zaken_with_rsin = (
+            zaak_config.fetch_eherkenning_zaken_with_rsin
+        )
+        config.save()
 
 
 class Migration(migrations.Migration):

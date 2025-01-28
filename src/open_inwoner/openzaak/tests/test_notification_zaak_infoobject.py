@@ -117,8 +117,6 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
                 mock_handle.reset_mock()
                 self.clearTimelineLogs()
 
-                #
-
                 handle_zaken_notification(data.zio_notification2)
 
                 mock_handle.assert_called_once()

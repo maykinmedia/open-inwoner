@@ -12,6 +12,7 @@ class ZGWAPIGroup(ConfigurationModel):
     documenten_api_identifier: str
     catalogi_api_identifier: str
     form_api_identifier: str | None = None
+    fetch_eherkenning_zaken_with_rsin: bool = False
 
 
 class OpenZaakConfigurationModel(ConfigurationModel):
