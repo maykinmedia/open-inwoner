@@ -1,5 +1,9 @@
 {% load i18n utils anchor_menu_tags card_tags file_tags form_tags grid_tags solo_tags link_tags button_tags icon_tags notification_tags %}
 
+{% block title %}
+    <title>{% if page_title %}{{ page_title }}{% else %}{% trans "Aanvraag" %}{% endif %}</title>
+{% endblock title %}
+
 {# Messages #}
 <div class="container container--no-margin" id="cases-status-messages-oob" hx-swap-oob="true">
     {% notifications messages closable=True %}
@@ -9,6 +13,13 @@
 
 <div class="case__grid">
 {% if case %}
+    {# Dynamically update page title after content is loaded via HTMX #}
+    <script>
+        document.body.addEventListener('htmx:afterSwap', function(event) {
+            document.title = "{{ case.description|default:'Aanvraag' }}";
+        });
+    </script>
+
     {% render_grid %}
         {% render_column span=12 %}
             {# Title/dashboard #}

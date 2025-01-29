@@ -188,6 +188,8 @@ class InnerCaseDetailView(
             api_group = ZGWApiGroupConfig.objects.get(pk=self.kwargs["api_group_id"])
             zaken_client = api_group.zaken_client
 
+            context["page_title"] = self.case.description
+
             # fetch data associated with `self.case`
             documents = self.get_case_document_files(self.case, api_group)
             statuses = zaken_client.fetch_status_history(self.case.url)
