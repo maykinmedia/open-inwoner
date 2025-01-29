@@ -9,6 +9,8 @@ from open_inwoner.accounts.models import User
 from open_inwoner.haalcentraal.models import HaalCentraalConfig
 from open_inwoner.haalcentraal.utils import update_brp_data_in_db
 from open_inwoner.kvk.client import KvKClient
+from open_inwoner.openklant.constants import KlantenServiceType
+from open_inwoner.openklant.models import KlantenSysteemConfig
 from open_inwoner.openklant.services import OpenKlant2Service, eSuiteKlantenService
 from open_inwoner.utils.logentry import user_action
 
@@ -40,21 +42,21 @@ def update_user_on_login(sender, user, request, *args, **kwargs):
     if user.login_type == LoginTypeChoices.eherkenning:
         _update_eherkenning_user_from_kvk_api(user=user)
 
-    # OpenKlant2
-    try:
-        service = OpenKlant2Service()
-    except Exception:
-        logger.error("OpenKlant2 service failed to build")
-    else:
-        _update_user_from_openklant2(user=user, service=service, request=request)
-
-    # eSuite
-    try:
-        service = eSuiteKlantenService()
-    except Exception:
-        logger.error("eSuiteKlantenService failed to build")
-    else:
-        _update_user_from_esuite(user=user, service=service, request=request)
+    config = KlantenSysteemConfig.get_solo()
+    if config.primary_backend == KlantenServiceType.OPENKLANT2.value:
+        try:
+            service = OpenKlant2Service()
+        except Exception:
+            logger.error("OpenKlant2 service failed to build")
+        else:
+            _update_user_from_openklant2(user=user, service=service, request=request)
+    if config.primary_backend == KlantenServiceType.ESUITE.value:
+        try:
+            service = eSuiteKlantenService()
+        except Exception:
+            logger.error("eSuiteKlantenService failed to build")
+        else:
+            _update_user_from_esuite(user=user, service=service, request=request)
 
 
 def _update_user_from_openklant2(

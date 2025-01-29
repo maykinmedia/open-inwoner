@@ -225,7 +225,7 @@ class OpenKlant2Config(SingletonModel):
 
     @property
     def has_api_configuration(self):
-        return all(getattr(self, f, "") for f in self.register_api_required_fields)
+        return all(getattr(self, f, False) for f in self.register_api_required_fields)
 
     class Meta:
         verbose_name = _("OpenKlant2 configuration")

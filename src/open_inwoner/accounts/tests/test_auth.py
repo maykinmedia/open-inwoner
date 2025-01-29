@@ -19,6 +19,8 @@ from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.kvk.branches import get_kvk_branch_number
 from open_inwoner.kvk.tests.factories import CertificateFactory
+from open_inwoner.openklant.constants import KlantenServiceType
+from open_inwoner.openklant.models import KlantenSysteemConfig
 from open_inwoner.openklant.tests.data import MockAPIReadPatchData
 from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin
 
@@ -2038,6 +2040,10 @@ class UpdateUserOnLoginTest(TestCase):
         config = SiteConfiguration.get_solo()
         config.enable_notification_channel_choice = True
         config.save()
+
+        klant_config = KlantenSysteemConfig.get_solo()
+        klant_config.primary_backend = KlantenServiceType.ESUITE.value
+        klant_config.save()
 
     def test_update_hook_is_registered_on_login(self, m):
         connected_functions = [receiver[1]() for receiver in user_logged_in.receivers]

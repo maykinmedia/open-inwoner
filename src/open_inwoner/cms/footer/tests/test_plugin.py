@@ -1,7 +1,6 @@
 from django.test import TestCase
 from django.utils.translation import gettext as _
 
-from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.cms.footer.cms_plugins import FooterPagesPlugin
 from open_inwoner.cms.tests import cms_tools
 from open_inwoner.openklant.constants import KlantenServiceType
@@ -13,8 +12,6 @@ from open_inwoner.utils.test import ClearCachesMixin
 class ContactFormTestCase(ClearCachesMixin, TestCase):
     def setUp(self):
         super().setUp()
-
-        self.user = UserFactory()
 
         # clear esuite_config
         esuite_config = ESuiteKlantConfig.get_solo()
@@ -42,7 +39,7 @@ class ContactFormTestCase(ClearCachesMixin, TestCase):
         self.assertFalse(klant_config.has_contactform_configuration)
 
         esuite_config = ESuiteKlantConfig.get_solo()
-        ContactFormSubjectFactory(config=esuite_config)
+        ContactFormSubjectFactory(esuite_config=esuite_config)
 
         klant_config.register_contact_email = "example@example.com"
         klant_config.save()

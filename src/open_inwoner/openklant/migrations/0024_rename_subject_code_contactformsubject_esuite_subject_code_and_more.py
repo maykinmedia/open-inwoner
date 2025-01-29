@@ -6,9 +6,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ("openklant", "0023_remove_esuiteklantconfig_register_contact_moment_and_more"),
-    ]
+    dependencies = [("openklant", "0024_alter_klantensysteemconfig_primary_backend")]
 
     operations = [
         migrations.RenameField(
