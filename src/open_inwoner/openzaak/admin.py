@@ -67,6 +67,7 @@ class OpenZaakConfigAdmin(SingletonModelAdmin):
                     "enable_categories_filtering_with_zaken",
                     "zaken_filter_enabled",
                     "order_statuses_by_date_set",
+                    "enable_eherkenning_for_eenmanszaak",
                 ),
             },
         ),
