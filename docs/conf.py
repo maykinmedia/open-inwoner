@@ -43,6 +43,8 @@ extensions = [
     "sphinx_tabs.tabs",
     "recommonmark",
     # "sphinx_markdown_tables",
+    "django_setup_configuration.documentation.setup_config_example",
+    "django_setup_configuration.documentation.setup_config_usage",
 ]
 
 # Add any paths that contain templates here, relative to this directory.

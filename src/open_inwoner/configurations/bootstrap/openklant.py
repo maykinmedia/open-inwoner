@@ -68,7 +68,8 @@ class KlantenSysteemConfigurationModel(ConfigurationModel):
 
 class ESuiteKlantConfigurationStep(BaseConfigurationStep[KlantenApiConfigurationModel]):
     """
-    Configure the KIC settings and set any feature flags or other options if specified
+    Connectivity parameters and feature flags relevant to communicating with the Esuite
+    klanten en contactmomenten APIs.
     """
 
     verbose_name = "eSuite Klant APIs configuration"
@@ -123,7 +124,8 @@ class ESuiteKlantConfigurationStep(BaseConfigurationStep[KlantenApiConfiguration
 
 class OpenKlant2ConfigurationStep(BaseConfigurationStep[OpenKlant2Configuration]):
     """
-    Configure the OpenKlant2 settings.
+    Connectivity parameters and feature flags relevant to communicating with the
+    OpenKlant2 klantinteracties API.
     """
 
     verbose_name = "OpenKlant2 APIs configuration"
@@ -158,7 +160,8 @@ class KlantenSysteemConfigurationStep(
     BaseConfigurationStep[KlantenSysteemConfigurationModel]
 ):
     """
-    Configure the KlantenSysteem settings
+    Configuration related to connecting Open Inwoner to a backend for storing
+    customer and contact information.
     """
 
     verbose_name = "KlantenSysteem configuration"
