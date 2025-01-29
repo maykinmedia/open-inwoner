@@ -1,40 +1,39 @@
 interactions:
 - request:
-    body: '{"naam": "Robert Martin", "soortActor": "organisatorische_eenheid", "indicatieActief":
-      false, "actoridentificator": {"objectId": "0000000013", "codeObjecttype": "low",
-      "codeRegister": "cup", "codeSoortObjectId": "away"}}'
+    body: '{"naam": "David Robertson", "soortActor": "organisatorische_eenheid", "indicatieActief":
+      false, "actoridentificator": {"objectId": "0000000013", "codeObjecttype": "me",
+      "codeRegister": "majority", "codeSoortObjectId": "now"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '220'
+      - '225'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/actoren
   response:
     body:
-      string: '{"uuid":"c3b845e8-77d0-416e-a198-f36eb73c4f8e","url":"http://localhost:8338/klantinteracties/api/v1/actoren/c3b845e8-77d0-416e-a198-f36eb73c4f8e","naam":"Robert
-        Martin","soortActor":"organisatorische_eenheid","indicatieActief":false,"actoridentificator":{"objectId":"0000000013","codeObjecttype":"low","codeRegister":"cup","codeSoortObjectId":"away"},"actorIdentificatie":null}'
+      string: '{"uuid":"9c5fb14e-1079-4398-bfac-af37df18ac08","url":"http://localhost:8338/klantinteracties/api/v1/actoren/9c5fb14e-1079-4398-bfac-af37df18ac08","naam":"David
+        Robertson","soortActor":"organisatorische_eenheid","indicatieActief":false,"actoridentificator":{"objectId":"0000000013","codeObjecttype":"me","codeRegister":"majority","codeSoortObjectId":"now"},"actorIdentificatie":null}'
     headers:
       API-version:
-      - 0.0.3
+      - 0.0.4
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '377'
+      - '382'
       Content-Security-Policy:
-      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
-        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
-        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
-        blob:'
+      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
+        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
+        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/c3b845e8-77d0-416e-a198-f36eb73c4f8e
+      - http://localhost:8338/klantinteracties/api/v1/actoren/9c5fb14e-1079-4398-bfac-af37df18ac08
       Referrer-Policy:
       - same-origin
       Vary:
@@ -47,41 +46,40 @@ interactions:
       code: 201
       message: Created
 - request:
-    body: '{"naam": "David Jenkins", "soortActor": "organisatorische_eenheid", "indicatieActief":
-      false, "actoridentificator": {"objectId": "0000000014", "codeObjecttype": "late",
-      "codeRegister": "music", "codeSoortObjectId": "media"}}'
+    body: '{"naam": "Linda Pierce", "soortActor": "medewerker", "indicatieActief":
+      false, "actoridentificator": {"objectId": "0000000014", "codeObjecttype": "ask",
+      "codeRegister": "check", "codeSoortObjectId": "human"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '224'
+      - '208'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/actoren
   response:
     body:
-      string: '{"uuid":"a53f7379-69fe-4159-becb-fb18b1c838a2","url":"http://localhost:8338/klantinteracties/api/v1/actoren/a53f7379-69fe-4159-becb-fb18b1c838a2","naam":"David
-        Jenkins","soortActor":"organisatorische_eenheid","indicatieActief":false,"actoridentificator":{"objectId":"0000000014","codeObjecttype":"late","codeRegister":"music","codeSoortObjectId":"media"},"actorIdentificatie":null}'
+      string: '{"uuid":"84d5176b-ae44-4951-9196-4a4d65b7a963","url":"http://localhost:8338/klantinteracties/api/v1/actoren/84d5176b-ae44-4951-9196-4a4d65b7a963","naam":"Linda
+        Pierce","soortActor":"medewerker","indicatieActief":false,"actoridentificator":{"objectId":"0000000014","codeObjecttype":"ask","codeRegister":"check","codeSoortObjectId":"human"},"actorIdentificatie":null}'
     headers:
       API-version:
-      - 0.0.3
+      - 0.0.4
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '381'
+      - '365'
       Content-Security-Policy:
-      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
-        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
-        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
-        blob:'
+      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
+        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
+        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/a53f7379-69fe-4159-becb-fb18b1c838a2
+      - http://localhost:8338/klantinteracties/api/v1/actoren/84d5176b-ae44-4951-9196-4a4d65b7a963
       Referrer-Policy:
       - same-origin
       Vary:
@@ -94,41 +92,40 @@ interactions:
       code: 201
       message: Created
 - request:
-    body: '{"naam": "Donna Williams", "soortActor": "geautomatiseerde_actor", "indicatieActief":
-      true, "actoridentificator": {"objectId": "0000000015", "codeObjecttype": "because",
-      "codeRegister": "decade", "codeSoortObjectId": "behavior"}}'
+    body: '{"naam": "Joshua Davis", "soortActor": "geautomatiseerde_actor", "indicatieActief":
+      true, "actoridentificator": {"objectId": "0000000015", "codeObjecttype": "popular",
+      "codeRegister": "chance", "codeSoortObjectId": "east"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '229'
+      - '223'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/actoren
   response:
     body:
-      string: '{"uuid":"f5b95973-0976-411c-917c-015b68ea5ca3","url":"http://localhost:8338/klantinteracties/api/v1/actoren/f5b95973-0976-411c-917c-015b68ea5ca3","naam":"Donna
-        Williams","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000015","codeObjecttype":"because","codeRegister":"decade","codeSoortObjectId":"behavior"},"actorIdentificatie":null}'
+      string: '{"uuid":"e2010c2b-3136-4f5c-b83e-3972eb351bfd","url":"http://localhost:8338/klantinteracties/api/v1/actoren/e2010c2b-3136-4f5c-b83e-3972eb351bfd","naam":"Joshua
+        Davis","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000015","codeObjecttype":"popular","codeRegister":"chance","codeSoortObjectId":"east"},"actorIdentificatie":null}'
     headers:
       API-version:
-      - 0.0.3
+      - 0.0.4
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '386'
+      - '380'
       Content-Security-Policy:
-      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
-        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
-        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
-        blob:'
+      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
+        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
+        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/f5b95973-0976-411c-917c-015b68ea5ca3
+      - http://localhost:8338/klantinteracties/api/v1/actoren/e2010c2b-3136-4f5c-b83e-3972eb351bfd
       Referrer-Policy:
       - same-origin
       Vary:
@@ -149,21 +146,20 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/actoren?indicatieActief=True&soortActor=geautomatiseerde_actor
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"f5b95973-0976-411c-917c-015b68ea5ca3","url":"http://localhost:8338/klantinteracties/api/v1/actoren/f5b95973-0976-411c-917c-015b68ea5ca3","naam":"Donna
-        Williams","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000015","codeObjecttype":"because","codeRegister":"decade","codeSoortObjectId":"behavior"},"actorIdentificatie":null}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"e2010c2b-3136-4f5c-b83e-3972eb351bfd","url":"http://localhost:8338/klantinteracties/api/v1/actoren/e2010c2b-3136-4f5c-b83e-3972eb351bfd","naam":"Joshua
+        Davis","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000015","codeObjecttype":"popular","codeRegister":"chance","codeSoortObjectId":"east"},"actorIdentificatie":null}]}'
     headers:
       API-version:
-      - 0.0.3
+      - 0.0.4
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '438'
+      - '432'
       Content-Security-Policy:
-      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
-        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
-        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
-        blob:'
+      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
+        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
+        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

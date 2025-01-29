@@ -1,8 +1,8 @@
 interactions:
 - request:
-    body: '{"naam": "Robert Winters", "soortActor": "geautomatiseerde_actor", "indicatieActief":
-      true, "actoridentificator": {"objectId": "0000000006", "codeObjecttype": "specific",
-      "codeRegister": "career", "codeSoortObjectId": "language"}}'
+    body: '{"naam": "Christopher May", "soortActor": "geautomatiseerde_actor", "indicatieActief":
+      true, "actoridentificator": {"objectId": "0000000006", "codeObjecttype": "yet",
+      "codeRegister": "development", "codeSoortObjectId": "officer"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
@@ -14,27 +14,26 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/actoren
   response:
     body:
-      string: '{"uuid":"0a7adfd0-bfcc-487f-9b54-9f20ef135558","url":"http://localhost:8338/klantinteracties/api/v1/actoren/0a7adfd0-bfcc-487f-9b54-9f20ef135558","naam":"Robert
-        Winters","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000006","codeObjecttype":"specific","codeRegister":"career","codeSoortObjectId":"language"},"actorIdentificatie":null}'
+      string: '{"uuid":"40bd5a89-47dc-4ea4-8677-e9f551e27a98","url":"http://localhost:8338/klantinteracties/api/v1/actoren/40bd5a89-47dc-4ea4-8677-e9f551e27a98","naam":"Christopher
+        May","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000006","codeObjecttype":"yet","codeRegister":"development","codeSoortObjectId":"officer"},"actorIdentificatie":null}'
     headers:
       API-version:
-      - 0.0.3
+      - 0.0.4
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
       - '387'
       Content-Security-Policy:
-      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
-        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
-        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
-        blob:'
+      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
+        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
+        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/0a7adfd0-bfcc-487f-9b54-9f20ef135558
+      - http://localhost:8338/klantinteracties/api/v1/actoren/40bd5a89-47dc-4ea4-8677-e9f551e27a98
       Referrer-Policy:
       - same-origin
       Vary:
@@ -52,24 +51,23 @@ interactions:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
     method: GET
-    uri: http://localhost:8338/klantinteracties/api/v1/actoren/0a7adfd0-bfcc-487f-9b54-9f20ef135558
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren/40bd5a89-47dc-4ea4-8677-e9f551e27a98
   response:
     body:
-      string: '{"uuid":"0a7adfd0-bfcc-487f-9b54-9f20ef135558","url":"http://localhost:8338/klantinteracties/api/v1/actoren/0a7adfd0-bfcc-487f-9b54-9f20ef135558","naam":"Robert
-        Winters","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000006","codeObjecttype":"specific","codeRegister":"career","codeSoortObjectId":"language"},"actorIdentificatie":null}'
+      string: '{"uuid":"40bd5a89-47dc-4ea4-8677-e9f551e27a98","url":"http://localhost:8338/klantinteracties/api/v1/actoren/40bd5a89-47dc-4ea4-8677-e9f551e27a98","naam":"Christopher
+        May","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000006","codeObjecttype":"yet","codeRegister":"development","codeSoortObjectId":"officer"},"actorIdentificatie":null}'
     headers:
       API-version:
-      - 0.0.3
+      - 0.0.4
       Allow:
       - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
       Content-Length:
       - '387'
       Content-Security-Policy:
-      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
-        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
-        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
-        blob:'
+      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
+        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
+        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

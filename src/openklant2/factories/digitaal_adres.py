@@ -17,11 +17,15 @@ class CreateDigitaalAdresDataFactory(factory.Factory):
         model = dict
 
     adres = factory.LazyAttribute(
-        lambda obj: fake.email()
-        if obj.soortDigitaalAdres == "email"
-        else fake.phone_number()
-        if obj.soortDigitaalAdres == "telefoonnummer"
-        else fake.address()
+        lambda obj: (
+            fake.email()
+            if obj.soortDigitaalAdres == "email"
+            else (
+                "0912345678"
+                if obj.soortDigitaalAdres == "telefoonnummer"
+                else fake.address()
+            )
+        )
     )
     omschrijving = factory.Faker("word")
     soortDigitaalAdres = random.choice(["email", "telefoonnummer", "overig"])  # nosec
