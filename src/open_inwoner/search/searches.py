@@ -64,9 +64,7 @@ class ProductSearch(FacetedSearch):
         """
         if query:
             fields = self.get_boosted_fields()
-            return search.query(
-                "multi_match", fields=fields, query=query, fuzziness="AUTO"
-            )
+            return search.query("multi_match", fields=fields, query=query, fuzziness=0)
         return search
 
 
