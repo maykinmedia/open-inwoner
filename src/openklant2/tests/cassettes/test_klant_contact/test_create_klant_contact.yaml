@@ -13,27 +13,26 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"8e23e12b-2a4a-4575-824e-705870336a3a","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/8e23e12b-2a4a-4575-824e-705870336a3a","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000001","kanaal":"contactformulier","onderwerp":"vraag","inhoud":"Dit
-        is een vraag","indicatieContactGelukt":null,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2024-12-06T11:35:03.253467Z"}'
+      string: '{"uuid":"c3748ccb-0891-4aa0-bf99-ca46d70380ba","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/c3748ccb-0891-4aa0-bf99-ca46d70380ba","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000001","kanaal":"contactformulier","onderwerp":"vraag","inhoud":"Dit
+        is een vraag","indicatieContactGelukt":null,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2025-01-28T16:33:55.762548Z"}'
     headers:
       API-version:
-      - 0.0.3
+      - 0.0.4
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
       - '488'
       Content-Security-Policy:
-      - 'frame-src ''self''; default-src ''self''; form-action ''self''; font-src
-        ''self'' fonts.gstatic.com; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; object-src ''none''; img-src ''self'' data: cdn.redoc.ly;
-        script-src ''self'' ''unsafe-inline''; base-uri ''self''; worker-src ''self''
-        blob:'
+      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
+        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
+        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/8e23e12b-2a4a-4575-824e-705870336a3a
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/c3748ccb-0891-4aa0-bf99-ca46d70380ba
       Referrer-Policy:
       - same-origin
       Vary:

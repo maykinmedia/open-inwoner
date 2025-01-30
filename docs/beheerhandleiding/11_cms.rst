@@ -545,3 +545,12 @@ om de footertekst aan te passen. Klik op [+] om een plugin toe te voegen aan de 
   deze plugin. Het gaat in dit geval om de platte pagina’s zoals deze in
   de backend onder “Configuratie” als platte pagina’s zijn gedefinieerd.
   Wijzigingen aan deze lijst kunt u aanbrengen via de backend. Zie hoofdstuk 12.4.
+
+
+11.2.10. Contactformulier aanpassen via CMS
+--------------------------------
+
+Het contactformulier van Open Inwoner kan worden aangepast via het Django CMS. Dit doet u door naar het CMS
+menu te gaan. U krijgt dan frontend van het Open Inwoner de opties om pagina’s te wijzigen, maar als u op de pagina van het contactformulier bent vindt u i het plugin menu ook de contactformulier plugin.
+Wanneer u op het potloodicoontje klikt, verschijnt er een pop-up waarmee u de begeleidende tekst van het contactformulier kunt aanpassen middels een rich text editor.
+Zodra u uw gewenste tekst heeft opgesteld klikt u op opslaan. De tekst wordt direct boven het contactformulier weergegeven.

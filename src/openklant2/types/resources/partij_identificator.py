@@ -1,4 +1,4 @@
-from typing import NotRequired
+from typing import Literal, NotRequired
 
 from pydantic import TypeAdapter
 from typing_extensions import TypedDict
@@ -7,12 +7,33 @@ from typing_extensions import TypedDict
 # Input
 #
 
+CodeObjecttype = Literal[
+    "natuurlijk_persoon",
+    "niet_natuurlijk_persoon",
+    "overig",
+    "vestiging",
+]
+
+CodeSoortObjectId = Literal[
+    "bsn",
+    "kvk_nummer",
+    "overig",
+    "rsin",
+    "vestigingsnummer",
+]
+
+CodeRegister = Literal[
+    "brp",
+    "hr",
+    "overig",
+]
+
 
 class PartijIdentificatorObject(TypedDict):
-    codeObjecttype: str
-    codeSoortObjectId: str
+    codeObjecttype: CodeObjecttype
+    codeSoortObjectId: CodeSoortObjectId
+    codeRegister: CodeRegister
     objectId: str
-    codeRegister: str
 
 
 class CreateIdentificeerdePartij(TypedDict):
@@ -27,9 +48,9 @@ class CreatePartijIdentificatorData(TypedDict):
 
 class ListPartijIdentificatorenParams(TypedDict, total=False):
     page: int
-    partijIdentificatorCodeObjecttype: str
-    partijIdentificatorCodeRegister: str
-    partijIdentificatorCodeSoortObjectId: str
+    partijIdentificatorCodeObjecttype: CodeObjecttype
+    partijIdentificatorCodeRegister: CodeRegister
+    partijIdentificatorCodeSoortObjectId: CodeSoortObjectId
     partijIdentificatorObjectId: str
 
 
