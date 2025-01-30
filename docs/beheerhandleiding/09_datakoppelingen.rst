@@ -258,16 +258,20 @@ diverse niveaus, variërend van openbaar tot zeer geheim.
 | Hier stelt u in hoeveel dagen de gebruiker standaard krijgt om actie
   te ondernemen.
 
+
 | *Maximale upload grootte (in MB)*
 | Hier kiest u de maximaal toegestane grootte van te uploaden
   documenten.
 
+
 | *Toegestane bestandsformaten uploads*
 | Hier kiest u welk bestandsformaat te uploaden documenten mogen hebben.
+
 
 | *Titel tekst*
 | Hier stelt u de tekst in die getoond wordt als titel/introductietekst
   in de lijstweergave van *Mijn aanvragen*.
+
 
 9.3.2. Feature Flags
 --------------------
