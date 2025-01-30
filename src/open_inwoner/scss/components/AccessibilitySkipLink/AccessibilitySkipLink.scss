@@ -4,7 +4,10 @@
   text-decoration: none;
 
   &--visible-on-focus {
+    left: 100%;
+
     &:focus {
+      left: initial;
       text-decoration: none;
     }
   }

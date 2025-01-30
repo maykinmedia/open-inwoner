@@ -82,7 +82,10 @@
                             {% else %}
                                 {% list_item case.current_status caption=_("Status") compact=True strong=False %}
                             {% endif %}
-                            {% list_item case.identification caption=_("Zaaknummer") compact=True strong=False %}
+                            <li class="list-item list-item--compact">
+                               <p class="utrecht-paragraph list-item__caption">Zaaknummer</p>
+                               <p class="utrecht-paragraph skip-phone-parsing">&zwj;{{ case.identification }}</p>
+                            </li>
                         {% endrender_list %}
 
                         <span class="link link--icon link--secondary">

@@ -62,4 +62,14 @@
       display: inline;
     }
   }
+
+  // Remove Safari iOS phone-parsing from specific elements
+  .skip-phone-parsing {
+    pointer-events: none;
+  }
+  // Hide style for iOS-rendered anchor element
+  .skip-phone-parsing > a {
+    text-decoration: none;
+    color: inherit;
+  }
 }
