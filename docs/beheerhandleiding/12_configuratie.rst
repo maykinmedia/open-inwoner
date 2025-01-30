@@ -254,30 +254,41 @@ op de betreffende pagina kan doen/vinden.
 
 Hier kunt u een onderwerpenfilter, een tagfilter en/of een organisaties-filter toevoegen aan de
 zoekresultaten. U kunt deze filters naar eigen inzicht selecteren. Deze filters worden weergegeven aan de
-linkerkant van de pagina met zoekresultaten. Een voorbeeld hiervan is weergegeven in het screenshot hier:
+linkerkant van de pagina met zoekresultaten. Een voorbeeld hiervan is weergegeven in het onderstaande screenshot:
 
 .. image:: images/image114.png
    :width: 624px
    :height: 500px
 
 
-12.1.8. E-mails
----------------
+12.1.8. Notificaties
+-------------------------
 
-Hier kunt u selecteren of u wilt dat gebruikers een mail ontvangen wanneer zij een nieuw bericht hebben.
+Wanneer u het onderdeel 'Notificaties' weergeeft, krijgt u de mogelijkheid notificaties aan- en uit te schakelen op het niveau van het gehele platform. 
+Door vinkjes te zetten bij de verschillende soorten notificaties worden de instellingen voor alle gebruikers mogelijk gemaakt of gewijzigd. 
+Gebruikers kunnen deze instellingen op gebruikersniveau alsnog wijzigen.
 
-| *Stuur een e-mail bij nieuwe berichten*
-| Wanneer dit is aangevinkt wordt er een e-mailnotificatie gestuurd naar
-  gebruikers als zij in Open Inwoner een nieuw bericht hebben ontvangen.
+| *Activeer keuzemogelijkheid voor notificatiekanaal*
+| Wanneer dit is aangevinkt wordt gebruikers de mogelijkheid geboden te kiezen hoe zij meldingen willen ontvangen
 
-| *Ontvangers e-mailsamenvatting*
-| Hier vult u de e-mailadressen van beheerders die dagelijks een
- samenvatting dienen te ontvangen van alle op te lossen zaken
- (e-mails die niet aankomen).
+| *Gebruikersnotificaties voor aanvragen*
+| Wanneer dit is aangevinkt wordt er een e-mailnotificatie gestuurd naar gebruikers als zij in Open Inwoner een nieuwe aanvraag hebben ontvangen.
+
+| *Gebruikersnotificaties voor berichten*
+| Wanneer dit is aangevinkt wordt er een e-mailnotificatie gestuurd naar gebruikers als zij in Open Inwoner een nieuw bericht hebben ontvangen.
+
+| *Gebruikersnotificaties voor verlopende samenwerkingen*
+| Wanneer dit is aangevinkt wordt er een e-mailnotificatie gestuurd naar gebruikers als een van hun samenwerkingen eerdaags verloopt.
+
+| *Gebruikersnotificaties voor verlopende acties*
+| Wanneer dit is aangevinkt wordt er een e-mailnotificatie gestuurd naar gebruikers als een van hun acties eerdaags verloopt.
 
 | *E-mailverificatie vereist*
-| Hier kunt u selecteren of gebruikers verplicht zijn om na het
- inloggen hun e-mailadres te verifiëren voor bepaalde handelingen.
+| Hier kunt u selecteren of gebruikers verplicht zijn om na het inloggen hun e-mailadres te verifiëren voor bepaalde handelingen.
+
+| *Ontvangers e-mailsamenvatting*
+| Hier vult u de e-mailadressen van beheerders die dagelijks een samenvatting dienen te ontvangen van alle op te lossen zaken
+ (e-mails die niet aankomen).
 
 .. image:: images/image115.png
    :width: 624px
