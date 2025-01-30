@@ -999,11 +999,28 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
     def register_by_api(self, form, config: KlantenSysteemConfig):
         if config.primary_backend == KlantenServiceType.ESUITE.value:
             return self._register_via_esuite(form, config=ESuiteKlantConfig.get_solo())
-        return self._register_via_openklant2(form, config=OpenKlant2Config.get_solo())
+        return self._register_via_openklant(form, config=OpenKlant2Config.get_solo())
 
-    # TODO
-    def _register_via_openklant2(self, form, config: OpenKlant2Config):
-        raise NotImplementedError
+    def _register_via_openklant(self, form, config: OpenKlant2Config) -> bool:
+        user = self.request.user
+        service = OpenKlant2Service(config=config)
+
+        partij, created = service.get_or_create_partij_for_user(
+            fetch_params=service.get_fetch_parameters(user=user),
+            user=user,
+        )
+
+        cleaned_data = form.cleaned_data
+        question = cleaned_data["question"]
+
+        question = service.create_question_for_zaak(
+            partij_uuid=partij["uuid"],
+            question=question,
+            subject=self.case.omschrijving,
+            zaak=self.case,
+        )
+
+        return bool(question)
 
     def _register_via_esuite(self, form, config: ESuiteKlantConfig):
         assert config.has_api_configuration

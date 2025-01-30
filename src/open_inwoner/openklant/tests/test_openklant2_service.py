@@ -3,6 +3,7 @@ import datetime
 from django.test import tag
 
 import freezegun
+from timeline_logger.models import TimelineLog
 
 from open_inwoner.accounts.models import User
 from open_inwoner.accounts.tests.factories import UserFactory
@@ -435,4 +436,39 @@ class QuestionAnswerTestCase(Openklant2ServiceTestCase):
         )
         self.assertTrue(
             all(self.een_persoon["uuid"] in question.question for question in questions)
+        )
+
+    def test_create_question_for_zaak(self):
+        class MockZaak:
+            def __init__(self, identificatie):
+                self.identificatie = identificatie
+
+        zaak = MockZaak(identificatie="Coffee zaak")
+        question = self.service.create_question_for_zaak(
+            self.een_persoon["uuid"],
+            question="A question asked by Morice",
+            subject="Important question",
+            zaak=zaak,
+        )
+
+        # check onderwerp_object created
+        onderwerp_objecten = self.service.client.onderwerp_object.list()
+        self.assertEqual(len(onderwerp_objecten["results"]), 1)
+
+        onderwerp_object = onderwerp_objecten["results"][0]
+        self.assertEqual(
+            onderwerp_object["klantcontact"]["uuid"], question.question_kcm_uuid
+        )
+
+        # check logs
+        log_entries = TimelineLog.objects.all()
+
+        self.assertEqual(log_entries.count(), 2)
+        self.assertEqual(
+            log_entries[0].extra_data["message"],
+            f"registered question {question.question_kcm_uuid} for partij {self.een_persoon['uuid']} via OpenKlant",
+        )
+        self.assertEqual(
+            log_entries[1].extra_data["message"],
+            f"Created onderwerp_object {onderwerp_object['uuid']} for zaak `{zaak.identificatie}`",
         )

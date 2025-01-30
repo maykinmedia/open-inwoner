@@ -53,7 +53,7 @@ from open_inwoner.openzaak.models import ZGWApiGroupConfig
 from open_inwoner.utils.api import ClientError, get_json_response
 from open_inwoner.utils.logentry import system_action
 from open_inwoner.utils.time import instance_is_new
-from open_inwoner.utils.url import uuid_from_url
+from open_inwoner.utils.views import LogMixin
 from openklant2.client import OpenKlant2Client
 from openklant2.types.resources.digitaal_adres import DigitaalAdres
 from openklant2.types.resources.klant_contact import (
@@ -853,7 +853,7 @@ class OpenKlant2Question(BaseModel):
         )
 
 
-class OpenKlant2Service(KlantenService):
+class OpenKlant2Service(LogMixin, KlantenService):
     config: OpenKlant2Config
     client: OpenKlant2Client
     supports_anonymous_questions: bool = False
@@ -1209,6 +1209,46 @@ class OpenKlant2Service(KlantenService):
 
         return OpenKlant2Question.from_klantcontact_and_answer(klantcontact)
 
+    def create_question_for_zaak(
+        self,
+        partij_uuid: str,
+        question: str,
+        subject: str,
+        zaak: str,
+    ) -> OpenKlant2Question:
+        ok2_question = self.create_question(
+            partij_uuid=partij_uuid, question=question, subject=subject
+        )
+
+        self.log_system_action(
+            "registered question {question_uuid} for partij {partij} via OpenKlant".format(
+                question_uuid=ok2_question.question_kcm_uuid, partij=partij_uuid
+            )
+        )
+
+        # TODO: No convention has (yet) been established for the use of
+        # `onderwerpobjectidentificator`; the implementation is provisianal
+        onderwerp_object = self.client.onderwerp_object.create(
+            data={
+                "klantcontact": {"uuid": ok2_question.question_kcm_uuid},
+                "wasKlantcontact": None,
+                "onderwerpobjectidentificator": {
+                    "objectId": zaak.identificatie,
+                    "codeObjecttype": "zaak",
+                    "codeRegister": "openzaak",
+                    "codeSoortObjectId": "identificatie",
+                },
+            }
+        )
+        self.log_system_action(
+            "Created onderwerp_object {onderwerp_object_uuid} for zaak `{zaak_identificatie}`".format(
+                onderwerp_object_uuid=onderwerp_object["uuid"],
+                zaak_identificatie=zaak.identificatie,
+            )
+        )
+
+        return ok2_question
+
     def create_answer(
         self, partij_uuid: str, question_klantcontact_uuid: str, answer: str
     ) -> OpenKlant2Answer:
@@ -1294,19 +1334,20 @@ class OpenKlant2Service(KlantenService):
                 klantcontact["uuid"]
             ] = klantcontact
 
-            # A klantcontact is an answer if it is linked to a Question via an onderwerp object
             if onderwerp_objecten := klantcontact["gingOverOnderwerpobjecten"]:
 
-                # To which question klantcontact is this an answer?
+                # Determine if the klantcontact is an answer by checking `wasKlantcontact` in
+                # the related onderwerp_object; otherwise, treat it as question
+                #
+                # TODO: is it sufficient to pick the first onderwerp_object?
+                # TODO: our use of `onderwerp_object` to model the relation of a klantcontact
+                # to different kinds of objects like answers, zaken etc. needs to be
+                # revisited
                 answer_onderwerp_object = self.client.onderwerp_object.retrieve(
                     onderwerp_objecten[0]["uuid"]
                 )
-
                 if not answer_onderwerp_object["wasKlantcontact"]:
-                    logger.error(
-                        "Onderwerp object %s should point to question klantcontact",
-                        answer_onderwerp_object["uuid"],
-                    )
+                    question_uuids.append(klantcontact["uuid"])
                     continue
 
                 # Map the question to the answer
@@ -1392,7 +1433,7 @@ class OpenKlant2Service(KlantenService):
             {
                 "identification": question_ok2.nummer,
                 "api_source_url": question_ok2.url,
-                "api_source_uuid": uuid_from_url(question_ok2.url),
+                "api_source_uuid": str(question_ok2.question_kcm_uuid),
                 "subject": question_ok2.onderwerp,
                 "question_text": question_ok2.question,
                 "answer_text": answer_text,
@@ -1417,5 +1458,19 @@ class OpenKlant2Service(KlantenService):
         )
         return answer_is_recent and not answer.is_seen
 
-    def list_questions_for_zaak(self, zaak: Zaak, user: User) -> list[Question]:
-        return []
+    def list_questions_for_zaak(
+        self,
+        zaak: Zaak,
+        user: User,
+    ) -> list[Question]:
+        klantcontacten_for_zaak = self.client.klant_contact.list(
+            params={
+                "onderwerpobject__onderwerpobjectidentificatorObjectId": zaak.identificatie
+            }
+        )["results"]
+
+        questions = [
+            OpenKlant2Question.from_klantcontact_and_answer(klantcontact, None)
+            for klantcontact in klantcontacten_for_zaak
+        ]
+        return self._build_question_dtos(questions_ok2=questions, user=user)

@@ -1,11 +1,13 @@
 from unittest.mock import ANY, patch
 
 from django.conf import settings
+from django.contrib.auth import signals
 from django.core import mail
 from django.test import override_settings
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
+import factory
 import requests_mock
 from django_webtest import WebTest
 from zgw_consumers.api_models.constants import (
@@ -20,9 +22,15 @@ from open_inwoner.accounts.tests.factories import (
     eHerkenningUserFactory,
 )
 from open_inwoner.openklant.constants import KlantenServiceType, Status
-from open_inwoner.openklant.models import ESuiteKlantConfig, KlantenSysteemConfig
+from open_inwoner.openklant.models import (
+    ContactFormSubject,
+    ESuiteKlantConfig,
+    KlantenSysteemConfig,
+)
 from open_inwoner.openklant.services import eSuiteVragenService
 from open_inwoner.openklant.tests.data import CONTACTMOMENTEN_ROOT, KLANTEN_ROOT
+from open_inwoner.openklant.tests.factories import OpenKlant2ConfigFactory
+from open_inwoner.openklant.tests.mocks import MockOpenKlant2Service
 from open_inwoner.openzaak.models import CatalogusConfig, OpenZaakConfig
 from open_inwoner.openzaak.tests.factories import (
     ServiceFactory,
@@ -88,6 +96,8 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         self.klant_config.register_contact_via_api = True
         self.klant_config.send_email_confirmation = True
         self.klant_config.save()
+
+        self.openklant_config = OpenKlant2ConfigFactory()
 
         self.esuite_config = ESuiteKlantConfig.get_solo()
         self.esuite_config.register_bronorganisatie_rsin = "123456788"
@@ -473,7 +483,9 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
 
         mock_send_confirm.assert_not_called()
 
-    def test_form_success_with_api(self, m, mock_contactmoment, mock_send_confirm):
+    def test_form_success_with_api_esuite(
+        self, m, mock_contactmoment, mock_send_confirm
+    ):
         self._setUpMocks(m)
         self._setUpExtraMocks(m)
 
@@ -526,6 +538,50 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             },
         )
 
+        mock_send_confirm.assert_called_once_with("foo@example.com", ANY)
+
+    @factory.django.mute_signals(signals.user_logged_in)
+    @patch(
+        "open_inwoner.cms.cases.views.status.OpenKlant2Service",
+        return_value=MockOpenKlant2Service(),
+    )
+    def test_form_success_with_api_openklant(
+        self, m, mock_openklant_service, mock_contactmoment, mock_send_confirm
+    ):
+        self._setUpMocks(m)
+        self._setUpExtraMocks(m)
+
+        self.contactformsubject = ContactFormSubject.objects.create(
+            subject="oip_subject",
+        )
+
+        self.klant_config.primary_backend = KlantenServiceType.OPENKLANT2.value
+        self.klant_config.save()
+
+        response = self.app.get(self.case_detail_url, user=self.user)
+        form = response.forms["contact-form"]
+        form.action = reverse(
+            "cases:case_detail_contact_form",
+            kwargs={"object_id": self.zaak["uuid"], "api_group_id": self.api_group.id},
+        )
+        form["question"] = "What?"
+        response = form.submit()
+
+        self.assertEqual(
+            response.headers["HX-Redirect"],
+            reverse(
+                "cases:case_detail",
+                kwargs={
+                    "object_id": str(self.zaak["uuid"]),
+                    "api_group_id": self.api_group.id,
+                },
+            ),
+        )
+
+        redirect = self.app.get(response.headers["HX-Redirect"])
+        redirect_messages = list(redirect.context["messages"])
+
+        self.assertEqual(redirect_messages[0].message, _("Vraag verstuurd!"))
         mock_send_confirm.assert_called_once_with("foo@example.com", ANY)
 
     def test_form_success_missing_medewerker(
