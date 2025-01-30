@@ -51,11 +51,15 @@ function initFilterBar() {
       expandIcon.setAttribute('aria-hidden', 'true')
       expandIcon.textContent = 'expand_more'
 
+      let closeIconWrapper = document.createElement('span')
+      closeIconWrapper.classList.add('close-icon') // Wrapper only, will get pointer-events
+      closeIconWrapper.setAttribute('tabindex', '0') // Adding tabindex for keyboard focus
+
       let closeIcon = document.createElement('span')
-      closeIcon.classList.add('material-icons', 'close-icon')
-      closeIcon.setAttribute('aria-hidden', 'false') // Hiding element that gets focus is not allowed in accessibility
-      closeIcon.setAttribute('tabindex', '0') // Adding tabindex for keyboard focus
+      closeIcon.classList.add('material-icons')
       closeIcon.textContent = 'close'
+      closeIcon.setAttribute('aria-hidden', 'true') // Hiding iconfont for accessibility
+      closeIconWrapper.appendChild(closeIcon) // Add icon to wrapper for pointer-events
 
       // Add text and icons based on selected filters
       if (selectedFilters.length === 0) {
@@ -67,7 +71,7 @@ function initFilterBar() {
         ellipsisSpan.classList.add('ellipsis')
         ellipsisSpan.textContent = selectedFilters[0]
         selectButton.appendChild(ellipsisSpan)
-        selectButton.appendChild(closeIcon)
+        selectButton.appendChild(closeIconWrapper) // Append wrapper
         selectButton.classList.add('active')
       } else {
         selectButton.textContent = 'Status '
@@ -75,7 +79,7 @@ function initFilterBar() {
         activeFilterSpan.classList.add('active-filters')
         activeFilterSpan.textContent = `${selectedFilters.length} actieve filters`
         selectButton.appendChild(activeFilterSpan)
-        selectButton.appendChild(closeIcon)
+        selectButton.appendChild(closeIconWrapper) // Append wrapper
         selectButton.classList.add('active')
       }
 
@@ -90,13 +94,14 @@ function initFilterBar() {
         }
       }
 
-      closeIcon.addEventListener('click', function (event) {
+      closeIconWrapper.addEventListener('click', function (event) {
+        // Listen on wrapper
         event.stopPropagation()
         handleClose()
       })
 
-      // Add accessibility functionality for close icon
-      closeIcon.addEventListener('keydown', function (event) {
+      // Add accessibility functionality for close icon-wrapper
+      closeIconWrapper.addEventListener('keydown', function (event) {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault()
           handleClose()

@@ -17,11 +17,7 @@
   &:has(.show) {
     .button__select {
       *[class*='icons'] {
-        display: flex;
-        position: absolute;
-        right: var(--spacing-large);
-        top: 11px;
-        transform: rotate(180deg);
+        pointer-events: none;
       }
     }
 
@@ -69,8 +65,6 @@
 
       *[class*='icons'] {
         color: var(--color-white);
-        position: absolute;
-        right: 12px;
       }
 
       .ellipsis {
@@ -87,6 +81,21 @@
       color: var(--color-gray-dark);
       border-radius: var(--border-radius);
       padding: 0 var(--spacing-medium);
+    }
+  }
+
+  #selectButton .close-icon {
+    border-radius: var(--border-radius);
+    display: flex;
+    height: var(--spacing-large);
+    width: var(--spacing-large);
+    position: absolute;
+    right: var(--spacing-large);
+    top: 11px;
+
+    &:focus,
+    &:focus-visible {
+      border: var(--border-width-thin) solid var(--color-secondary-lighter);
     }
   }
 
