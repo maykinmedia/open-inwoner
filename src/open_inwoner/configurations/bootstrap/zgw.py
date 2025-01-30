@@ -12,6 +12,7 @@ class ZGWAPIGroup(ConfigurationModel):
     documenten_api_identifier: str
     catalogi_api_identifier: str
     form_api_identifier: str | None = None
+    fetch_eherkenning_zaken_with_rsin: bool = False
 
 
 class OpenZaakConfigurationModel(ConfigurationModel):
@@ -28,7 +29,6 @@ class OpenZaakConfigurationModel(ConfigurationModel):
                 "max_upload_size",
                 "skip_notification_statustype_informeren",
                 "reformat_esuite_zaak_identificatie",
-                "fetch_eherkenning_zaken_with_rsin",
                 "derive_zaak_titel_from",
                 "order_statuses_by_date_set",
                 "title_text",

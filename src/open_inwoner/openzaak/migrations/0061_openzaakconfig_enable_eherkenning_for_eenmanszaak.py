@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
     dependencies = [
         (
             "openzaak",
-            "0060_remove_openzaakconfig_use_zaak_omschrijving_as_title_and_more",
+            "0061_merge_20250124_1149",
         ),
     ]
 

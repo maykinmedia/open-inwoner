@@ -281,6 +281,7 @@ class MockAPIData:
             zrc_service__api_root=ZAKEN_ROOT,
             drc_service__api_root=DOCUMENTEN_ROOT,
             form_service=None,
+            fetch_eherkenning_zaken_with_rsin=False,
         )
 
 

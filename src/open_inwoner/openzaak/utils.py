@@ -129,7 +129,7 @@ def get_zaak_type_info_object_type_config(
         return None
 
 
-def get_user_fetch_parameters(request, check_rsin: bool = True) -> dict:
+def get_user_fetch_parameters(request, use_rsin: bool = True) -> dict:
     """
     Determine the parameters used to perform ZGW resource fetches
     """
@@ -144,10 +144,8 @@ def get_user_fetch_parameters(request, check_rsin: bool = True) -> dict:
     if user.kvk:
         parameters = {"user_kvk": user.kvk}
 
-        if check_rsin:
-            config = OpenZaakConfig.get_solo()
-            if config.fetch_eherkenning_zaken_with_rsin:
-                parameters = {"user_rsin": user.rsin}
+        if use_rsin:
+            parameters = {"user_rsin": user.rsin}
 
         vestigingsnummer = get_kvk_branch_number(request.session)
         if vestigingsnummer:

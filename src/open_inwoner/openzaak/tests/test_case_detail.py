@@ -1453,10 +1453,14 @@ class TestCaseDetailView(
             with self.subTest(
                 fetch_eherkenning_zaken_with_rsin=fetch_eherkenning_zaken_with_rsin
             ):
-                self.config.fetch_eherkenning_zaken_with_rsin = (
+                self.api_group.fetch_eherkenning_zaken_with_rsin = (
                     fetch_eherkenning_zaken_with_rsin
                 )
-                self.config.save()
+                self.api_group.save()
+                self.api_group_alt.fetch_eherkenning_zaken_with_rsin = (
+                    fetch_eherkenning_zaken_with_rsin
+                )
+                self.api_group_alt.save()
 
                 response = self.app.get(
                     self.eherkenning_case_detail_url,
@@ -1500,10 +1504,14 @@ class TestCaseDetailView(
             with self.subTest(
                 fetch_eherkenning_zaken_with_rsin=fetch_eherkenning_zaken_with_rsin
             ):
-                self.config.fetch_eherkenning_zaken_with_rsin = (
+                self.api_group.fetch_eherkenning_zaken_with_rsin = (
                     fetch_eherkenning_zaken_with_rsin
                 )
-                self.config.save()
+                self.api_group.save()
+                self.api_group_alt.fetch_eherkenning_zaken_with_rsin = (
+                    fetch_eherkenning_zaken_with_rsin
+                )
+                self.api_group_alt.save()
 
                 response = self.client.get(self.eherkenning_case_detail_url)
 

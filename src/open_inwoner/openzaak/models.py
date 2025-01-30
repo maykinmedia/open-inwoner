@@ -16,6 +16,8 @@ from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 from zgw_consumers.constants import APITypes
 from zgw_consumers.models import Service
 
+from open_inwoner.openklant.constants import KlantenServiceType
+from open_inwoner.openklant.models import validate_backend_choice
 from open_inwoner.openzaak.managers import (
     CatalogusConfigManager,
     UserCaseInfoObjectNotificationManager,
@@ -252,6 +254,30 @@ class ZGWApiGroupConfig(models.Model):
         if self.form_service:
             return cast(FormClient, self._build_client_from_attr("form_service"))
 
+    # backend-specific flags
+    fetch_eherkenning_zaken_with_rsin = models.BooleanField(
+        verbose_name=_(
+            "Fetch Zaken for users authenticated with eHerkenning using RSIN"
+        ),
+        help_text=_(
+            "If enabled, Zaken for eHerkenning users are fetched using the company RSIN (Open Zaak). "
+            "If not enabled, Zaken are fetched using the KvK number (eSuite)."
+        ),
+        default=False,
+    )
+
+    # flags related to other services
+    klant_backend = models.CharField(
+        verbose_name=_("Klant API backend"),
+        max_length=10,
+        choices=[(service.value, service.name) for service in KlantenServiceType],
+        default=KlantenServiceType.ESUITE.value,
+        null=True,
+        blank=True,
+        help_text=_("Choose the API backend for retrieving klanten data."),
+        validators=[validate_backend_choice],
+    )
+
     class Meta:
         verbose_name = _("ZGW API set")
         verbose_name_plural = _("ZGW API sets")
@@ -397,17 +423,6 @@ class OpenZaakConfig(SingletonModel):
         verbose_name=_("Reformat eSuite Zaak.identificatie"),
         help_text=_(
             "Enable to reformat user-facing Zaak.identificatie numbers from internal eSuite format (ex: '0014ESUITE66392022') to user friendly format ('6639-2022')."
-        ),
-        default=False,
-    )
-
-    fetch_eherkenning_zaken_with_rsin = models.BooleanField(
-        verbose_name=_(
-            "Fetch Zaken for users authenticated with eHerkenning using RSIN"
-        ),
-        help_text=_(
-            "If enabled, Zaken for eHerkenning users are fetched using the company RSIN (Open Zaak). "
-            "If not enabled, Zaken are fetched using the KvK number (eSuite)."
         ),
         default=False,
     )

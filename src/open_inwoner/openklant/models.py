@@ -217,13 +217,15 @@ class OpenKlant2Config(SingletonModel):
         verbose_name = _("OpenKlant2 configuration")
 
 
+# Deprecated in favor of `validate_backend_choice`, which has more general use
+# TODO: Can be removed after migration openklant.0024_alter_klantensysteemconfig_primary_backend has been squashed
 def validate_primary_backend(value):
     if value == KlantenServiceType.OPENKLANT2.value:
         config = OpenKlant2Config.get_solo()
         if not config.service:
             raise ValidationError(
                 "OpenKlant2 must be configured with a Klanten API service before it can be selected "
-                "as primary backend"
+                "as backend"
             )
         return
 
@@ -231,12 +233,35 @@ def validate_primary_backend(value):
     if not config.klanten_service:
         raise ValidationError(
             "The Esuite klant system must be configured with a Klanten API service before it can be selected "
-            "as primary backend"
+            "as backend"
         )
     if not config.contactmomenten_service:
         raise ValidationError(
             "The Esuite klant system must be configured with a Contactmomenten API service service before "
-            "it can be selected as primary backend"
+            "it can be selected as backend"
+        )
+
+
+def validate_backend_choice(value):
+    if value == KlantenServiceType.OPENKLANT2.value:
+        config = OpenKlant2Config.get_solo()
+        if not config.service:
+            raise ValidationError(
+                "OpenKlant2 must be configured with a Klanten API service before it can be selected "
+                "as backend"
+            )
+        return
+
+    config = ESuiteKlantConfig.get_solo()
+    if not config.klanten_service:
+        raise ValidationError(
+            "The Esuite klant system must be configured with a Klanten API service before it can be selected "
+            "as backend"
+        )
+    if not config.contactmomenten_service:
+        raise ValidationError(
+            "The Esuite klant system must be configured with a Contactmomenten API service service before "
+            "it can be selected as backend"
         )
 
 
@@ -249,7 +274,7 @@ class KlantenSysteemConfig(SingletonModel):
             "Choose the primary backend for retrieving klanten data. "
             "Changes to klanten data will be saved to both backends (if configured)."
         ),
-        validators=[validate_primary_backend],
+        validators=[validate_backend_choice],
     )
     register_contact_via_api = models.BooleanField(
         verbose_name=_("Registreer op API"),

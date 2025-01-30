@@ -117,11 +117,6 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
                 mock_handle.reset_mock()
                 self.clearTimelineLogs()
 
-                config.fetch_eherkenning_zaken_with_rsin = (
-                    fetch_eherkenning_zaken_with_rsin
-                )
-                config.save()
-
                 handle_zaken_notification(data.zio_notification2)
 
                 mock_handle.assert_called_once()
