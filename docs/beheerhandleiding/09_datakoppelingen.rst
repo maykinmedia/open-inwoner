@@ -254,21 +254,18 @@ diverse niveaus, variërend van openbaar tot zeer geheim.
    :width: 624px
    :height: 840px
 
-| *Standaard actie deadline termijn in dagen*
+| **Standaard actie deadline termijn in dagen**
 | Hier stelt u in hoeveel dagen de gebruiker standaard krijgt om actie
   te ondernemen.
 
-
-| *Maximale upload grootte (in MB)*
+| **Maximale upload grootte (in MB)**
 | Hier kiest u de maximaal toegestane grootte van te uploaden
   documenten.
 
-
-| *Toegestane bestandsformaten uploads*
+| **Toegestane bestandsformaten uploads**
 | Hier kiest u welk bestandsformaat te uploaden documenten mogen hebben.
 
-
-| *Titel tekst*
+| **Titel tekst**
 | Hier stelt u de tekst in die getoond wordt als titel/introductietekst
   in de lijstweergave van *Mijn aanvragen*.
 
@@ -301,21 +298,21 @@ kunt een extra API set toevoegen door op de [+] onder de reeds geconfigureerde A
    :width: 624px
    :height: 500px
 
-| *Naam*
+| **Naam**
 | Hier kunt u de API set een naam geven. Deze naam is vrij in te vullen.
 
-| *Zaken API*
+| **Zaken API**
 | Deze API vult de zaken of aanvragen uit *Mijn aanvragen* in.
 
-| *Documenten API*
+| **Documenten API**
 | Deze API haalt de documenten op die bij een bepaalde zaak horen.
 
-| *Catalogi API*
+| **Catalogi API**
 | In de catalogi zit alle informatie over zaaktypes en andere
   gerelateerde informatie. De Catalogi API vult de zaaktypeconfiguratie
   in. Denk hierbij aan statussen, documenten, resultaten.
 
-| *Formulieren API (Open Aanvragen)*
+| **Formulieren API (Open Aanvragen)**
 | Deze API slaat de gegevens van onvoltooide formulieren op en vult deze
   automatisch in. Dit is een optioneel veld.
 
