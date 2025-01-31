@@ -22,8 +22,6 @@ Modified ZGWModel's to work with both OpenZaak and e-Suite implementations,
 because there is an issue where e-Suite doesn't return all JSON fields the official API and dataclasses expect
 """
 
-# TODO: add uuid to Zaak?
-
 
 @dataclass
 class Zaak(ZGWModel):
