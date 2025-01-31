@@ -85,6 +85,7 @@ class OpenZaakConfigAdmin(SingletonModelAdmin):
                 "fields": (
                     "enable_categories_filtering_with_zaken",
                     "zaken_filter_enabled",
+                    "show_cases_without_status",
                     "order_statuses_by_date_set",
                     "enable_eherkenning_for_eenmanszaak",
                 ),
