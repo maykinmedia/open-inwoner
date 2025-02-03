@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-16 15:42+0100\n"
+"POT-Creation-Date: 2025-02-03 09:44+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -32,8 +32,8 @@ msgstr "Onthoud mijn eHerkenning gebruikersnaam"
 #: eherkenning/mock/views/eherkenning.py:92
 msgid ""
 "An error occurred in the communication with eHerkenning. Please try again "
-"later. If this error persists, please check the website https://www."
-"eherkenning.nl for the latest information."
+"later. If this error persists, please check the website https://"
+"www.eherkenning.nl for the latest information."
 msgstr ""
 "Er is een fout opgetreden in de verbinding met eHerkenning. Probeer het "
 "later nog een keer. Lukt het nog steeds niet? Kijk dan op de website https://"
@@ -343,17 +343,23 @@ msgstr "Organisatie"
 
 #: open_inwoner/accounts/choices.py:32 open_inwoner/accounts/choices.py:62
 #: open_inwoner/accounts/models.py:657
-#: open_inwoner/cms/cases/views/status.py:96
-#: open_inwoner/cms/cases/views/status.py:166
-#: open_inwoner/cms/cases/views/status.py:172
-#: open_inwoner/cms/cases/views/status.py:715
+#: open_inwoner/cms/cases/views/status.py:100
+#: open_inwoner/cms/cases/views/status.py:170
+#: open_inwoner/cms/cases/views/status.py:176
+#: open_inwoner/cms/cases/views/status.py:719
 #: open_inwoner/components/templates/components/Action/Actions.html:82
 #: open_inwoner/components/templates/components/FilterBar/MultiSelectListbox.html:6
+#: open_inwoner/openklant/tests/test_views.py:149
+#: open_inwoner/openklant/tests/test_views.py:151
+#: open_inwoner/openklant/tests/test_views.py:152
+#: open_inwoner/openklant/tests/test_views.py:236
+#: open_inwoner/openklant/tests/test_views.py:238
+#: open_inwoner/openklant/tests/test_views.py:239
 #: open_inwoner/plans/choices.py:6 open_inwoner/plans/forms.py:141
 #: open_inwoner/templates/export/include/actions.html:7
 #: open_inwoner/templates/export/profile/action_export.html:20
-#: open_inwoner/templates/pages/cases/list_inner.html:55
-#: open_inwoner/templates/pages/cases/list_inner.html:79
+#: open_inwoner/templates/pages/cases/list_inner.html:59
+#: open_inwoner/templates/pages/cases/list_inner.html:83
 #: open_inwoner/templates/pages/cases/statuses.html:4
 #: open_inwoner/templates/pages/contactmoment/list.html:54
 #: open_inwoner/templates/pages/plans/list.html:42
@@ -696,7 +702,7 @@ msgstr ""
 "De contactpersonen die wachten voor goedkeuring. Dit veld wordt gebruikt "
 "voor bestaande gebruikers in de applicatie."
 
-#: open_inwoner/accounts/models.py:317 open_inwoner/openklant/models.py:169
+#: open_inwoner/accounts/models.py:317 open_inwoner/openklant/models.py:146
 msgid "User"
 msgstr "Gebruiker"
 
@@ -705,12 +711,12 @@ msgid "Users"
 msgstr "Gebruikers"
 
 #: open_inwoner/accounts/models.py:385
-#: open_inwoner/accounts/tests/test_auth.py:1173
+#: open_inwoner/accounts/tests/test_auth.py:1235
 msgid "This account has been deactivated"
 msgstr "Deze gebruiker is gedeactiveerd"
 
 #: open_inwoner/accounts/models.py:400 open_inwoner/accounts/models.py:405
-#: open_inwoner/accounts/tests/test_auth.py:1172
+#: open_inwoner/accounts/tests/test_auth.py:1234
 msgid "This email is already taken."
 msgstr "Een gebruiker met dit e-mailadres bestaat al"
 
@@ -759,7 +765,7 @@ msgstr "De naam van het document"
 
 #: open_inwoner/accounts/models.py:603 open_inwoner/accounts/models.py:695
 #: open_inwoner/accounts/models.py:790 open_inwoner/accounts/models.py:867
-#: open_inwoner/openzaak/models.py:846 open_inwoner/pdc/models/product.py:153
+#: open_inwoner/openzaak/models.py:870 open_inwoner/pdc/models/product.py:153
 #: open_inwoner/search/models.py:60
 #: open_inwoner/templates/export/plans/plan_export.html:34
 #: open_inwoner/templates/export/profile/action_export.html:40
@@ -819,7 +825,7 @@ msgid "The name of the action"
 msgstr "De naam van de actie"
 
 #: open_inwoner/accounts/models.py:651 open_inwoner/cms/banner/models.py:38
-#: open_inwoner/openklant/cms_plugins.py:18 open_inwoner/openzaak/models.py:556
+#: open_inwoner/openklant/cms_plugins.py:18 open_inwoner/openzaak/models.py:580
 #: open_inwoner/pdc/models/category.py:73
 #: open_inwoner/templates/export/plans/plan_export.html:18
 #: open_inwoner/templates/export/profile/action_export.html:16
@@ -1026,6 +1032,10 @@ msgstr "Uitnodiging"
 msgid "Invitations"
 msgstr "Uitnodigingen"
 
+#: open_inwoner/accounts/models.py:879
+msgid "new user"
+msgstr "Nieuwe gebruiker"
+
 #: open_inwoner/accounts/signals.py:21
 #: open_inwoner/accounts/tests/test_logging.py:163
 msgid "user was logged in via admin page"
@@ -1223,7 +1233,7 @@ msgstr "Welkom"
 
 #: open_inwoner/accounts/templates/registration/login.html:43
 #: open_inwoner/accounts/templates/registration/login.html:53
-#: open_inwoner/accounts/tests/test_auth.py:1796
+#: open_inwoner/accounts/tests/test_auth.py:1864
 msgid "Inloggen met DigiD"
 msgstr "Log in met DigiD"
 
@@ -1249,7 +1259,7 @@ msgstr ""
 
 #: open_inwoner/accounts/templates/registration/login.html:143
 #: open_inwoner/accounts/templates/registration/login.html:153
-#: open_inwoner/accounts/tests/test_auth.py:1821
+#: open_inwoner/accounts/tests/test_auth.py:1889
 msgid "Inloggen met eHerkenning"
 msgstr "Inloggen met eHerkenning"
 
@@ -1320,10 +1330,10 @@ msgstr "Mijn acties"
 msgid "Voer een geldig e-mailadres in."
 msgstr "Voer een geldig e-mailadres in."
 
-#: open_inwoner/accounts/tests/test_auth.py:982
-#: open_inwoner/accounts/tests/test_auth.py:1005
-#: open_inwoner/accounts/tests/test_auth.py:1713
-#: open_inwoner/accounts/tests/test_auth.py:1741
+#: open_inwoner/accounts/tests/test_auth.py:1044
+#: open_inwoner/accounts/tests/test_auth.py:1067
+#: open_inwoner/accounts/tests/test_auth.py:1781
+#: open_inwoner/accounts/tests/test_auth.py:1809
 #: open_inwoner/accounts/tests/test_contact_views.py:254
 #: open_inwoner/accounts/tests/test_contact_views.py:276
 #: open_inwoner/accounts/tests/test_profile_views.py:409
@@ -1335,7 +1345,7 @@ msgstr ""
 "Zorg dat de invoer alleen geldige tekens bevat (letters, cijfers, apostrof, "
 "streepje of spatie)."
 
-#: open_inwoner/accounts/tests/test_auth.py:1037
+#: open_inwoner/accounts/tests/test_auth.py:1099
 #: open_inwoner/utils/validators.py:175 open_inwoner/utils/validators.py:182
 msgid ""
 "Your password must contain at least 1 upper-case letter, 1 lower-case "
@@ -1344,7 +1354,7 @@ msgstr ""
 "Het wachtwoord moet in ieder geval 1 hoofdletter, 1 kleine letter en een "
 "nummer bevatten."
 
-#: open_inwoner/accounts/tests/test_auth.py:1155
+#: open_inwoner/accounts/tests/test_auth.py:1217
 #: open_inwoner/pdc/tests/test_organization_location.py:33
 #: open_inwoner/pdc/tests/test_organization_location.py:34
 #: open_inwoner/pdc/tests/test_product_location.py:239
@@ -1352,25 +1362,25 @@ msgstr ""
 msgid "Dit veld is vereist."
 msgstr "Dit veld is vereist."
 
-#: open_inwoner/accounts/tests/test_auth.py:1842
-#: open_inwoner/accounts/tests/test_auth.py:1857
+#: open_inwoner/accounts/tests/test_auth.py:1910
+#: open_inwoner/accounts/tests/test_auth.py:1925
 msgid ""
 "Voer een juiste E-mailadres en wachtwoord in. Let op dat beide velden "
 "hoofdlettergevoelig zijn."
 msgstr ""
 
-#: open_inwoner/accounts/tests/test_auth.py:1879
+#: open_inwoner/accounts/tests/test_auth.py:1947
 #: open_inwoner/templates/registration/password_reset_form.html:8
 #: open_inwoner/templates/registration/password_reset_form.html:15
 msgid "Reset password"
 msgstr "Wijzig wachtwoord"
 
-#: open_inwoner/accounts/tests/test_auth.py:1889
+#: open_inwoner/accounts/tests/test_auth.py:1957
 #, python-brace-format
 msgid "Password reset for {domain}"
 msgstr "Wachtwoordwijziging voor {domain}"
 
-#: open_inwoner/accounts/tests/test_auth.py:1894
+#: open_inwoner/accounts/tests/test_auth.py:1962
 msgid ""
 "U ontvangt deze e-mail, omdat u een aanvraag voor opnieuw instellen van het "
 "wachtwoord voor uw account op example.com hebt gedaan."
@@ -1378,23 +1388,23 @@ msgstr ""
 "U ontvangt deze e-mail, omdat u een aanvraag voor opnieuw instellen van het "
 "wachtwoord voor uw account op {domain} hebt gedaan."
 
-#: open_inwoner/accounts/tests/test_auth.py:1899
+#: open_inwoner/accounts/tests/test_auth.py:1967
 #, python-brace-format
 msgid "Uw gebruikersnaam, mocht u deze vergeten zijn: {user_email}"
 msgstr "Uw gebruikersnaam, mocht u deze vergeten zijn: {user_email}"
 
-#: open_inwoner/accounts/tests/test_auth.py:1912
+#: open_inwoner/accounts/tests/test_auth.py:1980
 #: open_inwoner/templates/registration/password_change_form.html:22
 #: open_inwoner/templates/registration/password_reset_confirm.html:8
 msgid "Change my password"
 msgstr "Mijn wachtwoord wijzigen"
 
-#: open_inwoner/accounts/tests/test_auth.py:1933
+#: open_inwoner/accounts/tests/test_auth.py:2001
 #: open_inwoner/templates/registration/password_change_form.html:13
 msgid "Password reset"
 msgstr "Wachtwoordwijziging"
 
-#: open_inwoner/accounts/tests/test_auth.py:1937
+#: open_inwoner/accounts/tests/test_auth.py:2005
 #: open_inwoner/templates/registration/password_change_done.html:6
 msgid "Your password has been changed."
 msgstr "Uw wachtwoord is gewijzigd."
@@ -1502,17 +1512,17 @@ msgstr "gebruikersaccount is op eigen verzoek verwijderd"
 
 #: open_inwoner/accounts/tests/test_logging.py:251
 #: open_inwoner/accounts/tests/test_logging.py:261
-#: open_inwoner/accounts/views/auth.py:46
+#: open_inwoner/accounts/views/auth.py:47
 msgid "password was changed"
 msgstr "wachtwoord is gewijzigd"
 
 #: open_inwoner/accounts/tests/test_logging.py:279
-#: open_inwoner/accounts/views/auth.py:54
+#: open_inwoner/accounts/views/auth.py:55
 msgid "password reset was accessed"
 msgstr "wachtwoord reset is uitgevoerd"
 
 #: open_inwoner/accounts/tests/test_logging.py:309
-#: open_inwoner/accounts/views/auth.py:63
+#: open_inwoner/accounts/views/auth.py:64
 msgid "password reset was completed"
 msgstr "wachtwoordreset is uitgevoerd"
 
@@ -1604,8 +1614,8 @@ msgstr ""
 msgid "From: {sender}, To: {receiver} (2021-10-18)"
 msgstr ""
 
-#: open_inwoner/accounts/tests/test_oidc_views.py:1619
-#: open_inwoner/accounts/views/auth.py:150
+#: open_inwoner/accounts/tests/test_oidc_views.py:1637
+#: open_inwoner/accounts/views/auth.py:162
 msgid "Use DigiD to log in as a sole proprietor."
 msgstr "Gebruik DigiD om in te loggen als eenmanszaak."
 
@@ -1786,7 +1796,7 @@ msgstr "Details"
 
 #: open_inwoner/accounts/views/contactmoments.py:185
 #: open_inwoner/cms/cases/forms.py:77
-#: open_inwoner/cms/cases/tests/test_htmx.py:514
+#: open_inwoner/cms/cases/tests/test_htmx.py:519
 #: open_inwoner/conf/parts/maileditor.py:525 open_inwoner/openklant/forms.py:43
 #: open_inwoner/pdc/models/faq.py:26 open_inwoner/pdc/models/faq.py:34
 #: open_inwoner/questionnaire/admin.py:63
@@ -1853,6 +1863,10 @@ msgstr "contact is goedgekeurd"
 #: open_inwoner/accounts/views/contacts.py:181
 msgid "contact was rejected"
 msgstr "contact is geweigerd"
+
+#: open_inwoner/accounts/views/inbox.py:127
+msgid "Laatste bericht ontvangen op"
+msgstr "Laatste bericht ontvangen op"
 
 #: open_inwoner/accounts/views/invite.py:42
 msgid "The invitation was expired"
@@ -2063,37 +2077,37 @@ msgstr "Bestand type"
 msgid "Bestand"
 msgstr "Bestand"
 
-#: open_inwoner/cms/cases/tests/test_contactform.py:498
-#: open_inwoner/cms/cases/tests/test_contactform.py:560
-#: open_inwoner/cms/cases/tests/test_contactform.py:644
-#: open_inwoner/cms/cases/tests/test_contactform.py:695
-#: open_inwoner/cms/cases/tests/test_contactform.py:737
-#: open_inwoner/cms/cases/tests/test_htmx.py:527
-#: open_inwoner/cms/cases/views/status.py:958
-#: open_inwoner/openklant/tests/test_contactform.py:231
-#: open_inwoner/openklant/tests/test_contactform.py:286
-#: open_inwoner/openklant/tests/test_contactform.py:419
-#: open_inwoner/openklant/tests/test_contactform.py:564
-#: open_inwoner/openklant/views/contactform.py:96
+#: open_inwoner/cms/cases/tests/test_contactform.py:503
+#: open_inwoner/cms/cases/tests/test_contactform.py:565
+#: open_inwoner/cms/cases/tests/test_contactform.py:649
+#: open_inwoner/cms/cases/tests/test_contactform.py:700
+#: open_inwoner/cms/cases/tests/test_contactform.py:742
+#: open_inwoner/cms/cases/tests/test_htmx.py:532
+#: open_inwoner/cms/cases/views/status.py:964
+#: open_inwoner/openklant/tests/test_contactform.py:249
+#: open_inwoner/openklant/tests/test_contactform.py:309
+#: open_inwoner/openklant/tests/test_contactform.py:451
+#: open_inwoner/openklant/tests/test_contactform.py:605
+#: open_inwoner/openklant/views/contactform.py:101
 msgid "Vraag verstuurd!"
 msgstr "Vraag verstuurd!"
 
-#: open_inwoner/cms/cases/tests/test_contactform.py:701
+#: open_inwoner/cms/cases/tests/test_contactform.py:706
 msgid "Contact formulier inzending vanaf Open Inwoner Platform"
 msgstr "Contact formulier inzending vanaf Open Inwoner Platform"
 
-#: open_inwoner/cms/cases/tests/test_htmx.py:477
+#: open_inwoner/cms/cases/tests/test_htmx.py:482
 #: open_inwoner/components/templates/components/Form/FileInput.html:8
 msgid "Sleep of selecteer bestanden"
 msgstr "Sleep of selecteer bestanden"
 
-#: open_inwoner/cms/cases/tests/test_htmx.py:488
-#: open_inwoner/cms/cases/tests/test_htmx.py:616
+#: open_inwoner/cms/cases/tests/test_htmx.py:493
+#: open_inwoner/cms/cases/tests/test_htmx.py:621
 #: open_inwoner/components/templates/components/Form/FileInput.html:19
 msgid "Upload documenten"
 msgstr "Upload documenten"
 
-#: open_inwoner/cms/cases/tests/test_htmx.py:519
+#: open_inwoner/cms/cases/tests/test_htmx.py:524
 #: open_inwoner/templates/pages/cases/contact_form.html:17
 #: open_inwoner/templates/pages/contactmoment/list.html:98
 msgid "Vraag versturen"
@@ -2102,8 +2116,8 @@ msgstr "Vraag versturen"
 #: open_inwoner/cms/cases/views/cases.py:34
 #: open_inwoner/cms/cases/views/cases.py:38
 #: open_inwoner/cms/cases/views/cases.py:64
-#: open_inwoner/cms/cases/views/status.py:94
-#: open_inwoner/cms/cases/views/status.py:164
+#: open_inwoner/cms/cases/views/status.py:98
+#: open_inwoner/cms/cases/views/status.py:168
 msgid "Mijn aanvragen"
 msgstr "Mijn aanvragen"
 
@@ -2129,79 +2143,79 @@ msgstr "Lopende aanvragen"
 msgid "Afgeronde aanvragen"
 msgstr "Afgeronde aanvragen"
 
-#: open_inwoner/cms/cases/views/status.py:290
+#: open_inwoner/cms/cases/views/status.py:294
 msgid "Zaaknummer:"
 msgstr "Zaaknummer:"
 
-#: open_inwoner/cms/cases/views/status.py:294
-#: open_inwoner/templates/pages/cases/list_inner.html:74
+#: open_inwoner/cms/cases/views/status.py:298
+#: open_inwoner/templates/pages/cases/list_inner.html:78
 msgid "Aanvraag ingediend op:"
 msgstr "Aanvraag ingediend op:"
 
-#: open_inwoner/cms/cases/views/status.py:298
+#: open_inwoner/cms/cases/views/status.py:302
 msgid "Beslissing op zijn laatst:"
 msgstr "Beslissing op zijn laatst:"
 
-#: open_inwoner/cms/cases/views/status.py:429
-#: open_inwoner/openzaak/api_models.py:80
+#: open_inwoner/cms/cases/views/status.py:433
+#: open_inwoner/openzaak/api_models.py:82
 #: open_inwoner/openzaak/notifications.py:166
-#: open_inwoner/openzaak/tests/test_api_models.py:84
+#: open_inwoner/openzaak/tests/test_api_models.py:85
 #: open_inwoner/userfeed/hooks/case_status.py:28
 #: open_inwoner/userfeed/hooks/case_status.py:103
 msgid "No data available"
 msgstr "Geen data beschikbaar"
 
-#: open_inwoner/cms/cases/views/status.py:454
-#: open_inwoner/cms/cases/views/status.py:641
+#: open_inwoner/cms/cases/views/status.py:458
+#: open_inwoner/cms/cases/views/status.py:645
 msgid "Bekijk aanvraag"
 msgstr "Bekijk aanvraag"
 
-#: open_inwoner/cms/cases/views/status.py:613
+#: open_inwoner/cms/cases/views/status.py:617
 msgid "Nieuwe aanvraag"
 msgstr "Nieuwe aanvraag"
 
-#: open_inwoner/cms/cases/views/status.py:712
+#: open_inwoner/cms/cases/views/status.py:716
 msgid "Gegevens"
 msgstr "Gegevens"
 
-#: open_inwoner/cms/cases/views/status.py:718
+#: open_inwoner/cms/cases/views/status.py:722
 #: open_inwoner/templates/pages/cases/status_inner.html:26
 msgid "Documenten"
 msgstr "Documenten"
 
-#: open_inwoner/cms/cases/views/status.py:763
+#: open_inwoner/cms/cases/views/status.py:767
 #: open_inwoner/openzaak/tests/test_documents.py:386
 #, python-brace-format
 msgid "Document van zaak gedownload {case}: {filename}"
 msgstr "Document van zaak gedownload {case}: {filename}"
 
-#: open_inwoner/cms/cases/views/status.py:798
+#: open_inwoner/cms/cases/views/status.py:802
 #, python-brace-format
 msgid "An error occured while uploading file {filename}"
 msgstr "Een fout is opgetreden bij het uploaden van {filename}"
 
-#: open_inwoner/cms/cases/views/status.py:848
+#: open_inwoner/cms/cases/views/status.py:852
 #, python-brace-format
 msgid "Document was uploaded for {case}: {filename}"
 msgstr "Document {filename} is geüpload voor {case}"
 
-#: open_inwoner/cms/cases/views/status.py:856
+#: open_inwoner/cms/cases/views/status.py:860
 #, python-brace-format
 msgid "Wij hebben **{num_uploaded} bestand(en)** succesvol geüpload:"
 msgstr "Wij hebben **{num_uploaded} bestand(en)** succesvol geüpload:"
 
-#: open_inwoner/cms/cases/views/status.py:932
-#: open_inwoner/cms/cases/views/status.py:970
+#: open_inwoner/cms/cases/views/status.py:938
+#: open_inwoner/cms/cases/views/status.py:976
 #, python-brace-format
 msgid "Case: {case_identification}"
 msgstr "Zaak: {case_identification}"
 
-#: open_inwoner/cms/cases/views/status.py:963
-#: open_inwoner/openklant/views/contactform.py:101
+#: open_inwoner/cms/cases/views/status.py:969
+#: open_inwoner/openklant/views/contactform.py:106
 msgid "Probleem bij versturen van de vraag."
 msgstr "Probleem bij versturen van de vraag."
 
-#: open_inwoner/cms/cases/views/status.py:1106
+#: open_inwoner/cms/cases/views/status.py:1121
 msgid ""
 "The link you clicked on has expired. Please find your case in the list below."
 msgstr ""
@@ -2297,10 +2311,10 @@ msgstr "Icoon in het menu"
 msgid "Pages List"
 msgstr "Pagina lijst"
 
-#: open_inwoner/cms/footer/tests/test_plugin.py:33
-#: open_inwoner/cms/footer/tests/test_plugin.py:48
-#: open_inwoner/openklant/views/contactform.py:43
-#: open_inwoner/openklant/views/contactform.py:46
+#: open_inwoner/cms/footer/tests/test_plugin.py:32
+#: open_inwoner/cms/footer/tests/test_plugin.py:51
+#: open_inwoner/openklant/views/contactform.py:48
+#: open_inwoner/openklant/views/contactform.py:51
 #: open_inwoner/templates/cms/footer/footer_pages_plugin.html:6
 msgid "Contact formulier"
 msgstr "Contactformulier"
@@ -2678,7 +2692,7 @@ msgid "Sluiten"
 msgstr "Sluiten"
 
 #: open_inwoner/components/templates/components/FilterBar/FilterBar.html:16
-#: open_inwoner/templates/pages/cases/list_inner.html:19
+#: open_inwoner/templates/pages/cases/list_inner.html:20
 msgid "Filters"
 msgstr "Filters"
 
@@ -2860,7 +2874,11 @@ msgid "Tag lijst"
 msgstr "Tag lijst"
 
 #: open_inwoner/components/templates/components/Testing/InclusionTag.html:3
-#: open_inwoner/openzaak/admin.py:225
+#: open_inwoner/components/tests/test_render_tag.py:29
+#: open_inwoner/components/tests/test_render_tag.py:48
+#: open_inwoner/components/tests/test_render_tag.py:63
+#: open_inwoner/components/tests/test_render_tag.py:80
+#: open_inwoner/openzaak/admin.py:247
 msgid "Yes"
 msgstr "Ja"
 
@@ -2913,7 +2931,7 @@ msgstr "Contactformulier plugin"
 msgid "Arrow"
 msgstr "Pijl"
 
-#: open_inwoner/conf/base.py:976
+#: open_inwoner/conf/base.py:979
 #, python-brace-format
 msgid "Inlogcode: {token} (deze code is geldig voor 5 minuten)"
 msgstr "Inlogcode: {token} (deze code is geldig voor 5 minuten)"
@@ -3212,7 +3230,7 @@ msgstr ""
 
 #: open_inwoner/conf/parts/maileditor.py:474
 #: open_inwoner/conf/parts/maileditor.py:509 open_inwoner/openklant/forms.py:12
-#: open_inwoner/openklant/models.py:140
+#: open_inwoner/openklant/models.py:117
 msgid "Onderwerp"
 msgstr "Onderwerp"
 
@@ -4246,8 +4264,8 @@ msgstr "Stuur niet-ingelogde gebruiker door naar"
 #: open_inwoner/configurations/models.py:543
 msgid ""
 "Provide a url or a path where the user should be redirected to from the "
-"anonymous page. Path example: '/accounts/login/', Url example: 'https://www."
-"example.com'"
+"anonymous page. Path example: '/accounts/login/', Url example: 'https://"
+"www.example.com'"
 msgstr ""
 "Geef een URL of pad op waar de niet-ingelogde gebruiker naar toe "
 "doorgestuurd moet worden vanuit de niet-ingelogde homepage. Pad voorbeeld: '/"
@@ -4532,11 +4550,11 @@ msgstr "API root"
 
 #: open_inwoner/kvk/models.py:16
 msgid ""
-"The root of the API without version number and endpoint (e.g. https://api."
-"kvk.nl/api/ or https://api.kvk.nl/test/api)."
+"The root of the API without version number and endpoint (e.g. https://"
+"api.kvk.nl/api/ or https://api.kvk.nl/test/api)."
 msgstr ""
-"De root van de API zonder versienummer en endpoint (bijvoorbeeld https://api."
-"kvk.nl/api/ of https://api.kvk.nl/test/api)"
+"De root van de API zonder versienummer en endpoint (bijvoorbeeld https://"
+"api.kvk.nl/api/ of https://api.kvk.nl/test/api)"
 
 #: open_inwoner/kvk/models.py:21
 msgid "API key"
@@ -4687,36 +4705,34 @@ msgstr "Video"
 msgid "Must be configured if E-suite is used"
 msgstr "Moet geconigureerd zijn indien de eSuite wordt gebruikt"
 
-#: open_inwoner/openklant/admin.py:51
-msgid ""
-"Voor registratie in de Klanten en Contactmomenten API is dit veld vereist."
-msgstr ""
-"Voor registratie in de Klanten en Contactmomenten API is dit veld vereist."
-
-#: open_inwoner/openklant/admin.py:66
-msgid "Email registratie"
-msgstr "Email registratie"
-
-#: open_inwoner/openklant/admin.py:74
+#: open_inwoner/openklant/admin.py:55
 msgid "Klanten en Contacten API registratie"
 msgstr "Klanten en Contacten API registratie"
 
-#: open_inwoner/openklant/admin.py:88
+#: open_inwoner/openklant/admin.py:67
 msgid "Filter Contactmomenten"
 msgstr "Filter Contactmomenten"
 
-#: open_inwoner/openklant/admin.py:96
+#: open_inwoner/openklant/admin.py:75
 msgid "Services"
 msgstr "Services"
 
-#: open_inwoner/openklant/admin.py:136
+#: open_inwoner/openklant/admin.py:115
 msgid "API configuration"
 msgstr "API configuratie"
 
-#: open_inwoner/openklant/admin.py:144
+#: open_inwoner/openklant/admin.py:123
 #: open_inwoner/templates/pages/partials/questions.html:3
 msgid "Vragen"
 msgstr "Vragen"
+
+#: open_inwoner/openklant/admin.py:143
+msgid "API configuration globals"
+msgstr "API configuratie globals"
+
+#: open_inwoner/openklant/admin.py:147
+msgid "Vragen/contactmomenten"
+msgstr "Vragen/contactmomenten"
 
 #: open_inwoner/openklant/cms_plugins.py:20
 msgid "Description of the contact form."
@@ -4727,12 +4743,14 @@ msgid "In behandeling"
 msgstr "In behandeling"
 
 #: open_inwoner/openklant/constants.py:10
+#: open_inwoner/openklant/tests/test_views.py:152
+#: open_inwoner/openklant/tests/test_views.py:239
 msgid "Afgehandeld"
 msgstr "Afgehandeld"
 
 #: open_inwoner/openklant/forms.py:15
-#: open_inwoner/openklant/tests/test_contactform.py:186
 #: open_inwoner/openklant/tests/test_contactform.py:202
+#: open_inwoner/openklant/tests/test_contactform.py:218
 msgid "Selecteren"
 msgstr "Selecteren"
 
@@ -4755,16 +4773,16 @@ msgstr "Achternaam"
 msgid "Beantwoord deze rekensom"
 msgstr "Beantwoord deze rekensom"
 
-#: open_inwoner/openklant/forms.py:82
-#: open_inwoner/openklant/tests/test_contactform.py:141
+#: open_inwoner/openklant/forms.py:83
+#: open_inwoner/openklant/tests/test_contactform.py:151
 msgid "Vul een e-mailadres of telefoonnummer in."
 msgstr "Vul een e-mailadres of telefoonnummer in."
 
-#: open_inwoner/openklant/forms.py:102
+#: open_inwoner/openklant/forms.py:103
 msgid "Fout antwoord, probeer het opnieuw."
 msgstr "Fout antwoord, probeer het opnieuw."
 
-#: open_inwoner/openklant/models.py:28 open_inwoner/openklant/models.py:194
+#: open_inwoner/openklant/models.py:28 open_inwoner/openklant/models.py:171
 msgid "Klanten API"
 msgstr "Klanten API"
 
@@ -4773,42 +4791,34 @@ msgid "Contactmomenten API"
 msgstr "Contactmomenten API"
 
 #: open_inwoner/openklant/models.py:46
-msgid "Registreer op email adres"
-msgstr "Registreer op email adres"
-
-#: open_inwoner/openklant/models.py:50
-msgid "Registreer in Contactmomenten API"
-msgstr "Registreer in Contactmomenten API"
-
-#: open_inwoner/openklant/models.py:54
 msgid "Organisatie RSIN"
 msgstr "Organisatie RSIN"
 
-#: open_inwoner/openklant/models.py:60
+#: open_inwoner/openklant/models.py:52
 msgid "Contactmoment kanaal"
 msgstr "Contactmoment kanaal"
 
-#: open_inwoner/openklant/models.py:64
+#: open_inwoner/openklant/models.py:56
 msgid "The channel through which contactmomenten are created"
 msgstr "De kanaal waarop nieuwe contactmomenten worden aangemaakt"
 
-#: open_inwoner/openklant/models.py:67
+#: open_inwoner/openklant/models.py:59
 msgid "Contactmoment type"
 msgstr "Contactmoment type"
 
-#: open_inwoner/openklant/models.py:71
+#: open_inwoner/openklant/models.py:63
 msgid "Naam van 'contacttype' uit e-Suite"
 msgstr "Naam van 'contacttype' uit e-Suite"
 
-#: open_inwoner/openklant/models.py:74
+#: open_inwoner/openklant/models.py:66
 msgid "Medewerker identificatie"
 msgstr "Medewerker identificatie"
 
-#: open_inwoner/openklant/models.py:78
+#: open_inwoner/openklant/models.py:70
 msgid "Gebruikersnaam van actieve medewerker uit e-Suite"
 msgstr "Gebruikersnaam van actieve medewerker uit e-Suite"
 
-#: open_inwoner/openklant/models.py:83
+#: open_inwoner/openklant/models.py:75
 msgid ""
 "Fetch resources from Klanten and Contactmomenten APIs for users "
 "authenticated with eHerkenning using RSIN"
@@ -4816,7 +4826,7 @@ msgstr ""
 "Haal bronnen op uit de Klanten- en Contactmomenten-API's voor gebruikers die "
 "zijn geauthenticeerd met eHerkenning via RSIN"
 
-#: open_inwoner/openklant/models.py:86
+#: open_inwoner/openklant/models.py:78
 msgid ""
 "If enabled, resources from the Klanten and Contactmomenten APIs for "
 "eHerkenning users are fetched using the company RSIN (Open Klant). If not "
@@ -4826,11 +4836,143 @@ msgstr ""
 "voor eHerkenning-gebruikers opgehaald via RSIN (Open Klant). Indien niet "
 "ingeschakeld, worden deze bronnen via het KVK-nummer."
 
-#: open_inwoner/openklant/models.py:93
+#: open_inwoner/openklant/models.py:89
+msgid ""
+"Contactmomenten registered via one of these channels will not be displayed "
+"to users."
+msgstr ""
+"Contactmomenten die via één van deze kanalen worden geregistreerd, zullen "
+"niet aan gebruikers getoond worden."
+
+#: open_inwoner/openklant/models.py:109
+msgid "eSuite Klant configuration"
+msgstr "eSuite Klant configuratie"
+
+#: open_inwoner/openklant/models.py:121 open_inwoner/openzaak/models.py:602
+msgid "e-Suite 'onderwerp' code"
+msgstr "e-Suite 'onderwerp' code"
+
+#: open_inwoner/openklant/models.py:135
+msgid "Contact formulier onderwerp"
+msgstr "Contact formulier onderwerp"
+
+#: open_inwoner/openklant/models.py:136
+msgid "Contact formulier onderwerpen"
+msgstr "Contact formulier onderwerpen"
+
+#: open_inwoner/openklant/models.py:150
+msgid "This is the user that asked the question to which this is an answer."
+msgstr "Dit is de gebruiker die de vraag heeft gesteld."
+
+#: open_inwoner/openklant/models.py:154
+msgid "ContactMoment URL"
+msgstr "Contactmoment URL"
+
+#: open_inwoner/openklant/models.py:157
+msgid "Is seen"
+msgstr "Is bekeken"
+
+#: open_inwoner/openklant/models.py:158
+msgid "Whether or not the user has seen the answer"
+msgstr "Of de gebruiker het antwoord heeft gezien"
+
+#: open_inwoner/openklant/models.py:163
+msgid "KlantContactMoment"
+msgstr "KlantContactMoment"
+
+#: open_inwoner/openklant/models.py:164
+msgid "KlantContactMomenten"
+msgstr "KlantContactMomenten"
+
+#: open_inwoner/openklant/models.py:179
+msgid "Mijn vragen kanaal"
+msgstr "Mijn vragen kanaal"
+
+#: open_inwoner/openklant/models.py:183
+msgid ""
+"Het kanaal waaronder nieuwe vragen als Klantcontact object zullen worden "
+"aangemaakt"
+msgstr "Het kanaal waaronder nieuwe vragen als Klantcontact object zullen worden "
+"aangemaakt"
+
+#: open_inwoner/openklant/models.py:187
+msgid "Mijn vragen organisatie naam"
+msgstr "Mijn vragen organisatienaam"
+
+#: open_inwoner/openklant/models.py:192
+msgid "Mijn vragen actor"
+msgstr "Mijn vragen actor"
+
+#: open_inwoner/openklant/models.py:196
+msgid ""
+"De UUID van een bestaande Actor in de de configureerde API waaraan nieuwe "
+"vragen worden toegewezen"
+msgstr ""
+"De UUID van een bestaande Actor in de de configureerde API waaraan nieuwe "
+"vragen worden toegewezen"
+
+#: open_inwoner/openklant/models.py:200
+msgid "Interne taak gevraagde handeling"
+msgstr "Interne taak gevraagde handeling"
+
+#: open_inwoner/openklant/models.py:204
+msgid ""
+"Beschrijving van de gevraagde handeling voor de interne taak die ontstaat "
+"als resultaat van een vraag"
+msgstr "Beschrijving van de gevraagde handeling voor de interne taak die ontstaat als resultaat van een vraag"
+
+#: open_inwoner/openklant/models.py:208
+msgid "Interne taak toelichting"
+msgstr "Interne taak toelichting"
+
+#: open_inwoner/openklant/models.py:212
+msgid ""
+"Toelichting bij de gevraagde handeling voor de interne taak die ontstaat als "
+"resultaat van een vraag"
+msgstr "Toelichting bij de gevraagde handeling voor de interne taak die ontstaat als resultaat van een vraag"
+
+#: open_inwoner/openklant/models.py:217
+msgid "OpenKlant2 configuration"
+msgstr "OpenKlant2 configuratie"
+
+#: open_inwoner/openklant/models.py:270
+msgid "Primary backend"
+msgstr "Primaire backend"
+
+#: open_inwoner/openklant/models.py:274
+msgid ""
+"Choose the primary backend for retrieving klanten data. Changes to klanten "
+"data will be saved to both backends (if configured)."
+msgstr ""
+"Kies het primaire systeem voor het ophalen van klantgegevens. Mutaties in "
+"klantgegevens zullen naar beide systemen worden weggeschreven (mits "
+"geconfigureerd)."
+
+#: open_inwoner/openklant/models.py:280
+msgid "Registreer op API"
+msgstr "Registreer op API"
+
+#: open_inwoner/openklant/models.py:283
+msgid ""
+"Contacts initiated or questions submitted by a client (e.g. via a contact "
+"form) will be registered in the appropriate API (eSuite or OpenKlant2)."
+msgstr "Contacten die door een klant worden geïnitieerd of vragen die door een klant worden ingediend (bijvoorbeeld via een contactformulier), worden geregistreerd in de daarvoor bestemde API (eSuite of OpenKlant2)."
+
+#: open_inwoner/openklant/models.py:288
+msgid "Registreer op email adres"
+msgstr "Registreer op email adres"
+
+#: open_inwoner/openklant/models.py:291
+msgid ""
+"Contacts initiated or questions submitted by a client (e.g. via a contact "
+"form) will be registered via email."
+msgstr "Contacten die door een klant worden geïnitieerd of vragen die door een klant worden ingediend (bijvoorbeeld via een contactformulier), worden via e-mail geregistreerd."
+
+#: open_inwoner/openklant/models.py:296
 msgid "Stuur contactformulier e-mailbevestiging"
 msgstr "Stuur contactformulier e-mailbevestiging"
 
-#: open_inwoner/openklant/models.py:95
+#: open_inwoner/openklant/models.py:298
 msgid ""
 "If enabled the 'contactform_confirmation' email template will be sent. If "
 "disabled the external API will send a confirmation email."
@@ -4840,100 +4982,17 @@ msgstr ""
 "contactformulier. Indien uitgeschakeld dan wordt aangenomen dat de externe "
 "contactmomenten API (eg. eSuite) de e-mailbevestiging zal sturen"
 
-#: open_inwoner/openklant/models.py:105
-msgid ""
-"Contactmomenten registered via one of these channels will not be displayed "
-"to users."
-msgstr ""
-"Contactmomenten die via één van deze kanalen worden geregistreerd, zullen "
-"niet aan gebruikers getoond worden."
-
-#: open_inwoner/openklant/models.py:126
-msgid "eSuite Klant configuration"
-msgstr "eSuite Klant configuratie"
-
-#: open_inwoner/openklant/models.py:144 open_inwoner/openzaak/models.py:578
-msgid "e-Suite 'onderwerp' code"
-msgstr "e-Suite 'onderwerp' code"
-
-#: open_inwoner/openklant/models.py:158
-msgid "Contact formulier onderwerp"
-msgstr "Contact formulier onderwerp"
-
-#: open_inwoner/openklant/models.py:159
-msgid "Contact formulier onderwerpen"
-msgstr "Contact formulier onderwerpen"
-
-#: open_inwoner/openklant/models.py:173
-msgid "This is the user that asked the question to which this is an answer."
-msgstr "Dit is de gebruiker die de vraag heeft gesteld."
-
-#: open_inwoner/openklant/models.py:177
-msgid "ContactMoment URL"
-msgstr "Contactmoment URL"
-
-#: open_inwoner/openklant/models.py:180
-msgid "Is seen"
-msgstr "Is bekeken"
-
-#: open_inwoner/openklant/models.py:181
-msgid "Whether or not the user has seen the answer"
-msgstr "Of de gebruiker het antwoord heeft gezien"
-
-#: open_inwoner/openklant/models.py:186
-msgid "KlantContactMoment"
-msgstr "KlantContactMoment"
-
-#: open_inwoner/openklant/models.py:187
-msgid "KlantContactMomenten"
-msgstr "KlantContactMomenten"
-
-#: open_inwoner/openklant/models.py:202
-msgid "Mijn vragen kanaal"
-msgstr "Mijn vragen kanaal"
-
-#: open_inwoner/openklant/models.py:207
-msgid "Mijn vragen organisatie naam"
-msgstr ""
-
-#: open_inwoner/openklant/models.py:212
-msgid "Mijn vragen actor"
-msgstr "Mijn vragen actor"
-
-#: open_inwoner/openklant/models.py:217
-msgid "Interne taak gevraagde handeling"
-msgstr "Interne taak gevraagde handeling"
-
-#: open_inwoner/openklant/models.py:222
-msgid "Interne taak toelichting"
-msgstr "Interne taak toelichting"
-
-#: open_inwoner/openklant/models.py:228
-msgid "OpenKlant2 configuration"
-msgstr "OpenKlant2 configuratie"
-
-#: open_inwoner/openklant/models.py:256
-msgid "Primary backend"
-msgstr "Primaire backend"
-
-#: open_inwoner/openklant/models.py:260
-msgid ""
-"Choose the primary backend for retrieving klanten data. Changes to klanten "
-"data will be saved to both backends (if configured)."
-msgstr ""
-"Kies het primaire systeem voor het ophalen van klantgegevens. Mutaties in "
-"klantgegevens zullen naar beide systemen worden weggeschreven (mits "
-"geconfigureerd)."
-
-#: open_inwoner/openklant/models.py:267
+#: open_inwoner/openklant/models.py:305
 msgid "Configuratie Klanten Systeem"
 msgstr "Configuratie Klanten Systeem"
 
 #: open_inwoner/openklant/services.py:643
+#: open_inwoner/openklant/tests/test_views.py:151
+#: open_inwoner/openklant/tests/test_views.py:238
 msgid "Onbekend"
 msgstr "Onbekend"
 
-#: open_inwoner/openklant/tests/test_contactform.py:104
+#: open_inwoner/openklant/tests/test_contactform.py:112
 #: open_inwoner/templates/pages/contactform/form.html:11
 msgid "Contact formulier niet geconfigureerd."
 msgstr "Contact formulier niet geconfigureerd."
@@ -4946,7 +5005,7 @@ msgstr "Contact formulier niet geconfigureerd."
 msgid "Nieuw antwoord beschikbaar"
 msgstr "Nieuw antwoord beschikbaar"
 
-#: open_inwoner/openklant/views/contactform.py:249
+#: open_inwoner/openklant/views/contactform.py:261
 #, python-brace-format
 msgid ""
 "{text}\n"
@@ -4959,15 +5018,23 @@ msgstr ""
 msgid "What is {num1} {operator} {num2}?"
 msgstr "Wat is {num1} {operator} {num2}?"
 
-#: open_inwoner/openzaak/admin.py:75
-msgid "API behaviour override options"
-msgstr "eSuite-specifieke ZGW API opties"
+#: open_inwoner/openzaak/admin.py:44
+msgid "Basic configuration"
+msgstr "Basisconfiguratie"
 
-#: open_inwoner/openzaak/admin.py:90
+#: open_inwoner/openzaak/admin.py:56
+msgid "Backend-specific flags"
+msgstr "Backend-specifieke flags"
+
+#: open_inwoner/openzaak/admin.py:95
+msgid "API behaviour override options"
+msgstr "API-gedrag override-opties"
+
+#: open_inwoner/openzaak/admin.py:110
 msgid "ZGW export bestand"
 msgstr "ZGW export bestand"
 
-#: open_inwoner/openzaak/admin.py:92
+#: open_inwoner/openzaak/admin.py:112
 #, python-format
 msgid ""
 "Upload a file generated by the export function on the 'Catalogus Config' "
@@ -4976,22 +5043,22 @@ msgstr ""
 "Upload een bestand dat met de exportfunctie is aangemaakt op de 'Catalogus "
 "Configs' beheerpagina. De maximale grootte van dit bestand is %(file_size)s"
 
-#: open_inwoner/openzaak/admin.py:141 open_inwoner/openzaak/admin.py:449
+#: open_inwoner/openzaak/admin.py:161 open_inwoner/openzaak/admin.py:471
 msgid "Export to file"
 msgstr "Opslaan als bestand"
 
-#: open_inwoner/openzaak/admin.py:174 open_inwoner/openzaak/admin.py:482
+#: open_inwoner/openzaak/admin.py:194 open_inwoner/openzaak/admin.py:504
 #, python-format
 msgid ""
 "%(num_rows)d item(s) processed in total, with %(error_rows)d failing row(s)."
 msgstr ""
 "%(num_rows)d item(s) in totaal verwerkt, met %(error_rows)d falende item(s)."
 
-#: open_inwoner/openzaak/admin.py:192 open_inwoner/openzaak/admin.py:500
+#: open_inwoner/openzaak/admin.py:214 open_inwoner/openzaak/admin.py:524
 msgid "It was not possible to import the following items:"
 msgstr "Het was niet mogelijk om de volgene items te importeren:"
 
-#: open_inwoner/openzaak/admin.py:207 open_inwoner/openzaak/admin.py:515
+#: open_inwoner/openzaak/admin.py:229 open_inwoner/openzaak/admin.py:539
 #: open_inwoner/openzaak/tests/test_admin.py:245
 msgid ""
 "We were unable to process your upload. Please regenerate the file and try "
@@ -5000,19 +5067,19 @@ msgstr ""
 "We konden uw upload niet verwerken. Genereer het bestand opnieuw en probeer "
 "het nog eens."
 
-#: open_inwoner/openzaak/admin.py:220
+#: open_inwoner/openzaak/admin.py:242
 msgid "notify document attachment"
 msgstr "notificeer bij nieuw document"
 
-#: open_inwoner/openzaak/admin.py:226
+#: open_inwoner/openzaak/admin.py:248
 msgid "No"
 msgstr "Nee"
 
-#: open_inwoner/openzaak/admin.py:239
+#: open_inwoner/openzaak/admin.py:261
 msgid "Catalogus"
 msgstr "Catalogus"
 
-#: open_inwoner/openzaak/admin.py:267
+#: open_inwoner/openzaak/admin.py:289
 #: open_inwoner/openzaak/tests/test_admin.py:94
 msgid ""
 "Enabling both zaaktype and zaaktypeinformatieobject upload is not allowed. "
@@ -5021,7 +5088,7 @@ msgstr ""
 "Het gebruiken van een link en een informatieobject tegelijkertijd wordt niet "
 "toegestaan. Gebruik of de link, of een informatieobject maar niet beiden."
 
-#: open_inwoner/openzaak/admin.py:591
+#: open_inwoner/openzaak/admin.py:615
 #, python-format
 msgid "%d zaaktype was successfully set to notify on status changes."
 msgid_plural "%d zaaktypes were successfully set to notify on status changes."
@@ -5032,7 +5099,7 @@ msgstr[1] ""
 "%d zaaktypen zijn succesvol ingesteld om bij statusveranderingen een "
 "notificatie te sturen."
 
-#: open_inwoner/openzaak/admin.py:605
+#: open_inwoner/openzaak/admin.py:629
 #, python-format
 msgid "%d zaaktype was successfully set to not notify on status changes."
 msgid_plural ""
@@ -5060,80 +5127,114 @@ msgstr "Negatief"
 msgid "Success"
 msgstr "Succes"
 
-#: open_inwoner/openzaak/models.py:181
+#: open_inwoner/openzaak/constants.py:14
+msgid "The description of the case (`zaak.omschrijving`)"
+msgstr "Omschrijving van de zaak"
+
+#: open_inwoner/openzaak/constants.py:17
+msgid "The description of the case's type (`zaaktype.omschrijving`)"
+msgstr "Omschrijving van het zaaktype"
+
+#: open_inwoner/openzaak/constants.py:20
+msgid "The subject of the case's type (`zaaktype.onderwerp`)"
+msgstr "Onderwerp van het zaaktype"
+
+#: open_inwoner/openzaak/models.py:183
 msgid "name"
 msgstr "Naam"
 
-#: open_inwoner/openzaak/models.py:183
+#: open_inwoner/openzaak/models.py:185
 msgid "A recognisable name for this set of ZGW APIs."
 msgstr "Een herkenbare naam voor deze set ZGW APIs"
 
-#: open_inwoner/openzaak/models.py:187
+#: open_inwoner/openzaak/models.py:189
 msgid "Zaken API"
 msgstr "Zaken API"
 
-#: open_inwoner/openzaak/models.py:208
+#: open_inwoner/openzaak/models.py:210
 msgid "Documenten API"
 msgstr "Documenten API"
 
-#: open_inwoner/openzaak/models.py:224
+#: open_inwoner/openzaak/models.py:226
 msgid "Catalogi API"
 msgstr "Catalogi API"
 
-#: open_inwoner/openzaak/models.py:240
+#: open_inwoner/openzaak/models.py:242
 msgid "Form API"
 msgstr "Formulieren API (open aanvragen)"
 
-#: open_inwoner/openzaak/models.py:256
+#: open_inwoner/openzaak/models.py:260
+msgid "Fetch Zaken for users authenticated with eHerkenning using RSIN"
+msgstr "Maak gebruik van het RSIN voor ophalen eHerkenning zaken"
+
+#: open_inwoner/openzaak/models.py:263
+msgid ""
+"If enabled, Zaken for eHerkenning users are fetched using the company RSIN "
+"(Open Zaak). If not enabled, Zaken are fetched using the KvK number (eSuite)."
+msgstr ""
+"Indien ingeschakeld dan wordt het RSIN van eHerkenning gebruikers gebruikt "
+"om de zaken op te halen. Indien uitgeschakeld dan wordt het KVK nummer "
+"gebruikt om de zaken op te halen. Open Zaak hanteert conform de ZGW API "
+"specificatie de RSIN, de eSuite maakt gebruik van het KVK nummer."
+
+#: open_inwoner/openzaak/models.py:271
+msgid "Klant API backend"
+msgstr "Klanten API back-end"
+
+#: open_inwoner/openzaak/models.py:277
+msgid "Choose the API backend for retrieving klanten data."
+msgstr "Configureer de API back-end for het ophalen van klantgegevens:"
+
+#: open_inwoner/openzaak/models.py:282
 msgid "ZGW API set"
 msgstr "ZGW API set"
 
-#: open_inwoner/openzaak/models.py:257
+#: open_inwoner/openzaak/models.py:283
 msgid "ZGW API sets"
 msgstr "ZGW API sets"
 
-#: open_inwoner/openzaak/models.py:364
+#: open_inwoner/openzaak/models.py:390
 msgid "Case confidentiality"
-msgstr "Zaak vertrouwelijkheid"
+msgstr "Vertrouwelijkheid van de zaak"
 
-#: open_inwoner/openzaak/models.py:365
+#: open_inwoner/openzaak/models.py:391
 msgid "Select maximum confidentiality level of cases"
 msgstr "Selecteer de maximale vertrouwelijkheid van de getoonde zaken"
 
-#: open_inwoner/openzaak/models.py:371
+#: open_inwoner/openzaak/models.py:397
 msgid "Documents confidentiality"
 msgstr "Documenten vertrouwelijkheid"
 
-#: open_inwoner/openzaak/models.py:372
+#: open_inwoner/openzaak/models.py:398
 msgid "Select confidentiality level of documents to display for cases"
 msgstr ""
 "Selecteer de maximale vertrouwelijkheid van de getoonde documenten van zaken"
 
-#: open_inwoner/openzaak/models.py:375
+#: open_inwoner/openzaak/models.py:401
 msgid "Max upload file size (in MB)"
 msgstr "Maximale upload grootte (in MB)"
 
-#: open_inwoner/openzaak/models.py:377
+#: open_inwoner/openzaak/models.py:403
 msgid "The max size of the file (in MB) which is uploaded."
 msgstr ""
 "Documentuploads mogen maximaal dit aantal MB groot zijn, anders worden ze "
 "geweigerd."
 
-#: open_inwoner/openzaak/models.py:381
+#: open_inwoner/openzaak/models.py:407
 msgid "Allowed file extensions"
 msgstr "Toegestane bestandsextensies"
 
-#: open_inwoner/openzaak/models.py:385
+#: open_inwoner/openzaak/models.py:411
 msgid "A list of the allowed file extensions."
 msgstr ""
 "Een lijst van toegestande bestandsextensies, alleen documentuploads met een "
 "van deze extensies worden toegelaten."
 
-#: open_inwoner/openzaak/models.py:389
+#: open_inwoner/openzaak/models.py:415
 msgid "Use StatusType.informeren workaround"
 msgstr "Maak gebruik van StatusType.informeren workaround (eSuite)"
 
-#: open_inwoner/openzaak/models.py:391
+#: open_inwoner/openzaak/models.py:417
 msgid ""
 "Enable when StatusType.informeren is not supported by the ZGW backend. This "
 "requires ZaakTypeConfig's to be configured to determine on which changes to "
@@ -5144,11 +5245,11 @@ msgstr ""
 "API)Hierdoor is het verplicht om per zaaktype aan te geven wanneer een "
 "inwoner hier een notificatie van dient te krijgen."
 
-#: open_inwoner/openzaak/models.py:397
+#: open_inwoner/openzaak/models.py:423
 msgid "Reformat eSuite Zaak.identificatie"
 msgstr "Converteer eSuite zaaknummers"
 
-#: open_inwoner/openzaak/models.py:399
+#: open_inwoner/openzaak/models.py:425
 msgid ""
 "Enable to reformat user-facing Zaak.identificatie numbers from internal "
 "eSuite format (ex: '0014ESUITE66392022') to user friendly format "
@@ -5158,40 +5259,29 @@ msgstr ""
 "'0014ESUITE66392022') om te zetten naar een toegankelijkere notatie "
 "('6639-2022')."
 
-#: open_inwoner/openzaak/models.py:406
-msgid "Fetch Zaken for users authenticated with eHerkenning using RSIN"
-msgstr "Maak gebruik van het RSIN voor ophalen eHerkenning zaken"
+#: open_inwoner/openzaak/models.py:431
+msgid "Allow eenmanszaken to authenticate using eHerkenning"
+msgstr "Sta eenmanszaken toe in te loggen met eHerkenning"
 
-#: open_inwoner/openzaak/models.py:409
+#: open_inwoner/openzaak/models.py:433
 msgid ""
-"If enabled, Zaken for eHerkenning users are fetched using the company RSIN "
-"(Open Zaak). If not enabled, Zaken are fetched using the KvK number (eSuite)."
-msgstr ""
-"Indien ingeschakeld dan wordt het RSIN van eHerkenning gebruikers gebruikt "
-"om de zaken op te halen. Indien uitgeschakeld dan wordt het KVK nummer "
-"gebruikt om de zaken op te halen. Open Zaak hanteert conform de ZGW API "
-"specificatie de RSIN, de eSuite maakt gebruik van het KVK nummer."
+"If enabled, eenmanszaken may authenticate using eHerkenning and subsequently "
+"their kvk nummer will be used to interface with the zaken and klanten "
+"backends). If not, an eenmanszaak will be forced to use DigiD,  and the "
+"user's BSN will be used instead."
+msgstr "Indien ingeschakeld, kunnen eenmanszaken inloggen met eHerkenning en wordt vervolgens het KVK-nummer gebruikt om te interfacen met de zaken- en klanten-backends. Indien niet ingeschakeld, moet een eenmanszaak DigiD gebruiken en wordt in plaats daarvan het BSN-nummer gebruikt."
 
-#: open_inwoner/openzaak/models.py:417
+#: open_inwoner/openzaak/models.py:444
+msgid "Derive the case title from"
+msgstr "Leid de zaaktitel af van"
+
+#: open_inwoner/openzaak/models.py:446
 msgid ""
-"Make use of zaak.omschrijving for the title of the cases instead of zaaktype."
-"omschrijving (eSuite)"
-msgstr ""
-"Gebruik zaak.omschrijving voor de titel van de zaken in plaats van zaaktype."
-"omschrijving (eSuite)"
+"Which field from the underlying zaaksysteem to use to display the title  for "
+"a zaak (e.g. on the Mijn Aanvragen page)."
+msgstr "Welk veld uit het onderliggende zaaksysteem moet worden gebruikt om de titel van een zaak weer te geven (bijvoorbeeld op de pagina Mijn Aanvragen)."
 
-#: open_inwoner/openzaak/models.py:421
-msgid ""
-"If enabled, we use zaak.omschrijving for the title of the cases, and use "
-"zaaktype.omschrijving as a fallback in case it is not filled in. If not "
-"enabled, we ignore zaak.omschrijving and always use zaaktype.omschrijving."
-msgstr ""
-"Als dit is ingeschakeld, gebruiken we zaak.omschrijving voor de titel van de "
-"zaken en gebruiken we zaaktype.omschrijving als een fallback voor het geval "
-"dat deze niet is ingevuld. Als dit niet is ingeschakeld, negeren we zaak."
-"omschrijving en gebruiken we altijd zaaktype.omschrijving."
-
-#: open_inwoner/openzaak/models.py:429
+#: open_inwoner/openzaak/models.py:452
 msgid ""
 "On the detail page of the case, order the statuses based on the date they "
 "have been set"
@@ -5199,7 +5289,7 @@ msgstr ""
 "Op de detailpagina van de zaak, de statussen ordenen op basis van de datum "
 "waarop ze zijn ingesteld"
 
-#: open_inwoner/openzaak/models.py:432
+#: open_inwoner/openzaak/models.py:455
 msgid ""
 "If enabled, the statuses of a case are ordered based on "
 "'datum_status_gezet'. If not enabled, we show the statuses in the reverse "
@@ -5212,29 +5302,33 @@ msgstr ""
 "geretourneerd, dit omdat de eSuite de tijdstempels van de statussen niet "
 "retourneert (eSuite, maar werkt ook voor Open Zaak)."
 
-#: open_inwoner/openzaak/models.py:441
+#: open_inwoner/openzaak/models.py:464
+msgid "Show cases without status"
+msgstr "Toon zaken die geen status hebben"
+
+#: open_inwoner/openzaak/models.py:465
 msgid "By default cases are only shown if they have a status set."
 msgstr ""
 "Standaard zullen aanvragen slechts zichtbaar zijn als de status bekend is."
 
-#: open_inwoner/openzaak/models.py:446
+#: open_inwoner/openzaak/models.py:470
 msgid "Title text"
 msgstr "Titel tekst"
 
-#: open_inwoner/openzaak/models.py:448
+#: open_inwoner/openzaak/models.py:472
 msgid "The title/introductory text shown on the list view of 'Mijn aanvragen'."
 msgstr ""
 "De titel/introductietekst getoond op de lijstweergave van 'Mijn aanvragen'."
 
-#: open_inwoner/openzaak/models.py:451
+#: open_inwoner/openzaak/models.py:475
 msgid "Hier vindt u een overzicht van al uw lopende en afgeronde aanvragen."
 msgstr "Hier vindt u een overzicht van al uw lopende en afgeronde aanvragen."
 
-#: open_inwoner/openzaak/models.py:457
+#: open_inwoner/openzaak/models.py:481
 msgid "Enable category filtering based on zaken"
 msgstr "Inschakelen gepersonaliseerde Onderwerpen op basis van zaken"
 
-#: open_inwoner/openzaak/models.py:460
+#: open_inwoner/openzaak/models.py:484
 msgid ""
 "If checked, the highlighted categories list on the homepage will consist of "
 "categories that are linked to ZaakTypen for which the DigiD authenticated "
@@ -5244,59 +5338,59 @@ msgstr ""
 "getoonde onderwerpen op de Homepage bepaald op basis van de zaken van de "
 "gebruiker"
 
-#: open_inwoner/openzaak/models.py:467
+#: open_inwoner/openzaak/models.py:491
 msgid "Standaard actie deadline termijn in dagen"
 msgstr "Standaard actie deadline termijn in dagen"
 
-#: open_inwoner/openzaak/models.py:469
+#: open_inwoner/openzaak/models.py:493
 msgid "Aantal dagen voor gebruiker om actie te ondernemen."
 msgstr "Aantal dagen voor gebruiker om actie te ondernemen."
 
-#: open_inwoner/openzaak/models.py:472
+#: open_inwoner/openzaak/models.py:496
 msgid "Enable zaken filter"
 msgstr "Schakel zaken filter in"
 
-#: open_inwoner/openzaak/models.py:474
+#: open_inwoner/openzaak/models.py:498
 msgid "Give users the option to filter zaken by status"
 msgstr "Geeft gebruikers de optie om aanvragen op status te filteren"
 
-#: open_inwoner/openzaak/models.py:478
+#: open_inwoner/openzaak/models.py:502
 msgid "Open Zaak configuration"
 msgstr "Configuratie 'Open Zaak'"
 
-#: open_inwoner/openzaak/models.py:486
+#: open_inwoner/openzaak/models.py:510
 msgid "Catalogus URL"
 msgstr "Catalogus URL"
 
-#: open_inwoner/openzaak/models.py:490
+#: open_inwoner/openzaak/models.py:514
 msgid "Domein"
 msgstr "Domein"
 
-#: open_inwoner/openzaak/models.py:494
+#: open_inwoner/openzaak/models.py:518
 msgid "RSIN"
 msgstr "RSIN"
 
-#: open_inwoner/openzaak/models.py:499
+#: open_inwoner/openzaak/models.py:523
 msgid "Catalogus API"
 msgstr "Catalogus API"
 
-#: open_inwoner/openzaak/models.py:524
+#: open_inwoner/openzaak/models.py:548
 msgid "Zaaktype URL"
 msgstr "Zaaktype URL"
 
-#: open_inwoner/openzaak/models.py:534
+#: open_inwoner/openzaak/models.py:558
 msgid "Zaaktype identificatie"
 msgstr "Zaaktype identificatie"
 
-#: open_inwoner/openzaak/models.py:538
+#: open_inwoner/openzaak/models.py:562
 msgid "Zaaktype omschrijving"
 msgstr "Zaaktype omschrijving"
 
-#: open_inwoner/openzaak/models.py:547
+#: open_inwoner/openzaak/models.py:571
 msgid "Notify of status changes"
 msgstr "Notificeren bij statuswijzigingen"
 
-#: open_inwoner/openzaak/models.py:550
+#: open_inwoner/openzaak/models.py:574
 msgid ""
 "Whether the user should be notified of status changes for cases with this "
 "zaak type"
@@ -5304,7 +5398,7 @@ msgstr ""
 "Bepaalt of de gebruiker notificaties dient te krijgen bij statuswijzigingen "
 "van dit zaaktype"
 
-#: open_inwoner/openzaak/models.py:560
+#: open_inwoner/openzaak/models.py:584
 msgid ""
 "Description - clarification of why a user should upload a document for this "
 "case type"
@@ -5312,56 +5406,56 @@ msgstr ""
 "Omschrijving - verduidelijking waarom een gebruiker documenten zou moeten "
 "uploaden voor dit zaaktype"
 
-#: open_inwoner/openzaak/models.py:564
+#: open_inwoner/openzaak/models.py:588
 msgid "Document upload URL"
 msgstr "Document upload URL"
 
-#: open_inwoner/openzaak/models.py:568
+#: open_inwoner/openzaak/models.py:592
 msgid "Enable document upload via URL"
 msgstr "Activeer documentuploads via URL"
 
-#: open_inwoner/openzaak/models.py:574
+#: open_inwoner/openzaak/models.py:598
 msgid "Enable sending questions via OpenKlant API"
 msgstr ""
 "Schakel het versturen van vragen via de OpenKlant Contactmomenten API in"
 
-#: open_inwoner/openzaak/models.py:584
+#: open_inwoner/openzaak/models.py:608
 msgid "Relevante zaakperiode"
 msgstr "Relevante zaakperiode"
 
-#: open_inwoner/openzaak/models.py:588
+#: open_inwoner/openzaak/models.py:612
 msgid ""
 "Aantal maanden dat teruggekeken moet worden naar Zaken van deze zaaktypes."
 msgstr ""
 "Aantal maanden dat teruggekeken moet worden naar Zaken van deze zaaktypes."
 
-#: open_inwoner/openzaak/models.py:595
+#: open_inwoner/openzaak/models.py:619
 msgid "Zaaktype Configuration"
 msgstr "Zaaktype Configuratie"
 
-#: open_inwoner/openzaak/models.py:620
+#: open_inwoner/openzaak/models.py:644
 msgid "Information object URL"
 msgstr "Informatieobject URL"
 
-#: open_inwoner/openzaak/models.py:624 open_inwoner/openzaak/models.py:685
-#: open_inwoner/openzaak/models.py:805
+#: open_inwoner/openzaak/models.py:648 open_inwoner/openzaak/models.py:709
+#: open_inwoner/openzaak/models.py:829
 msgid "Omschrijving"
 msgstr "Omschrijving"
 
-#: open_inwoner/openzaak/models.py:629 open_inwoner/openzaak/models.py:694
-#: open_inwoner/openzaak/models.py:810
+#: open_inwoner/openzaak/models.py:653 open_inwoner/openzaak/models.py:718
+#: open_inwoner/openzaak/models.py:834
 msgid "Zaaktype UUID"
 msgstr "Zaaktype UUID"
 
-#: open_inwoner/openzaak/models.py:637
+#: open_inwoner/openzaak/models.py:661
 msgid "Enable document upload"
 msgstr "Activeer documentuploads"
 
-#: open_inwoner/openzaak/models.py:641
+#: open_inwoner/openzaak/models.py:665
 msgid "Enable document notifications"
 msgstr "Activeer documentnotificiaties"
 
-#: open_inwoner/openzaak/models.py:644
+#: open_inwoner/openzaak/models.py:668
 msgid ""
 "When enabled the user will receive a notification when a visible document is "
 "added to the case"
@@ -5369,37 +5463,37 @@ msgstr ""
 "Wanneer dit is ingeschakeld dan krijgen actieve gebruikers op deze omgeving "
 "een bericht wanneer er een nieuw zaakdocument voor hen beschikbaar is"
 
-#: open_inwoner/openzaak/models.py:650
+#: open_inwoner/openzaak/models.py:674
 msgid "Zaaktype Information Object Configuration"
 msgstr "Zaaktype Informatieobject configuratie"
 
-#: open_inwoner/openzaak/models.py:664
+#: open_inwoner/openzaak/models.py:688
 msgid "Information object UUID"
 msgstr "Informatieobject UUID"
 
-#: open_inwoner/openzaak/models.py:681
+#: open_inwoner/openzaak/models.py:705
 msgid "Statustype URL"
 msgstr "Statustype URL"
 
-#: open_inwoner/openzaak/models.py:689
+#: open_inwoner/openzaak/models.py:713
 msgid "Statustekst"
 msgstr "Statustekst"
 
-#: open_inwoner/openzaak/models.py:704
+#: open_inwoner/openzaak/models.py:728
 msgid "Statustype indicator"
 msgstr "Statustype indicator"
 
-#: open_inwoner/openzaak/models.py:706
+#: open_inwoner/openzaak/models.py:730
 msgid ""
 "Determines what color will be shown to the user if a case is set to this "
 "status"
 msgstr "Bepaalt de aan de gebruiker getoonde kleur van deze status"
 
-#: open_inwoner/openzaak/models.py:712
+#: open_inwoner/openzaak/models.py:736
 msgid "Statustype indicator text"
 msgstr "Status lijstweergave tekst"
 
-#: open_inwoner/openzaak/models.py:714
+#: open_inwoner/openzaak/models.py:738
 msgid ""
 "Determines the text that will be shown to the user if a case is set to this "
 "status"
@@ -5407,11 +5501,11 @@ msgstr ""
 "Bepaalt voor de lijstweergave van 'Mijn Aanvragen' of (naast de kleur) ook "
 "een melding getoond moet worden bij weergave van een zaak met deze status"
 
-#: open_inwoner/openzaak/models.py:720
+#: open_inwoner/openzaak/models.py:744
 msgid "Document upload description"
 msgstr "Document uploadomschrijving"
 
-#: open_inwoner/openzaak/models.py:722
+#: open_inwoner/openzaak/models.py:746
 msgid ""
 "Description that will be shown above the document upload widget in a case "
 "detail page"
@@ -5419,11 +5513,11 @@ msgstr ""
 "Omschrijving dat getoond wordt aan de gebruiker boven de uploadwidget van "
 "een zaak in 'Mijn Aanvragen'"
 
-#: open_inwoner/openzaak/models.py:728
+#: open_inwoner/openzaak/models.py:752
 msgid "Frontend description"
 msgstr "Status detailweergave omschrijving"
 
-#: open_inwoner/openzaak/models.py:730
+#: open_inwoner/openzaak/models.py:754
 msgid ""
 "The text displayed in the case detail page for the status with this "
 "statustype"
@@ -5431,82 +5525,82 @@ msgstr ""
 "De getoonde tekst bij het openklappen van deze status op de detailweergave "
 "van een zaak in 'Mijn Aanvragen'"
 
-#: open_inwoner/openzaak/models.py:734
+#: open_inwoner/openzaak/models.py:758
 msgid "Notify of status change"
 msgstr "Notificeer bij statuswijziging"
 
-#: open_inwoner/openzaak/models.py:737
+#: open_inwoner/openzaak/models.py:761
 msgid ""
 "Whether the user should be notfied if a case is set to this type of status"
 msgstr ""
 "Bepaalt of de gebruiker een notificatie dient te krijgen wanneer een zaak "
 "deze status krijgt"
 
-#: open_inwoner/openzaak/models.py:741 open_inwoner/userfeed/models.py:99
+#: open_inwoner/openzaak/models.py:765 open_inwoner/userfeed/models.py:99
 msgid "Action required"
 msgstr "Actie benodigd"
 
-#: open_inwoner/openzaak/models.py:744
+#: open_inwoner/openzaak/models.py:768
 msgid ""
 "Whether the status change notification should indicate that an action is "
 "required"
 msgstr "Of de statuswijzigingsmelding moet aangeven dat er actie nodig is"
 
-#: open_inwoner/openzaak/models.py:749
+#: open_inwoner/openzaak/models.py:773
 msgid "Document uploads"
 msgstr "Documenten uploaden"
 
-#: open_inwoner/openzaak/models.py:751
+#: open_inwoner/openzaak/models.py:775
 msgid ""
 "Enable document uploads for this statustype (override setting for case type)"
 msgstr ""
 "Schakelt het kunnen uploaden van documenten in voor zaken met deze status. "
 "Zet deze optie uit om het uploaden uit te zetten voor een specifieke status."
 
-#: open_inwoner/openzaak/models.py:757
+#: open_inwoner/openzaak/models.py:781
 msgid "Call to action url"
 msgstr "Statusknop URL"
 
-#: open_inwoner/openzaak/models.py:759
+#: open_inwoner/openzaak/models.py:783
 msgid ""
 "The url the user will be sent to by clicking on the call-to-action button"
 msgstr ""
 "Bepaalt de URL achter de getoonde knop bij het openklappen van deze status"
 
-#: open_inwoner/openzaak/models.py:766
+#: open_inwoner/openzaak/models.py:790
 msgid "Call to action text"
 msgstr "Statusknop label"
 
-#: open_inwoner/openzaak/models.py:767
+#: open_inwoner/openzaak/models.py:791
 msgid "The text displayed on the call-to-action button"
 msgstr ""
 "Bepaalt de knoplabel tekst van de getoonde knop bij het openklappen van deze "
 "status"
 
-#: open_inwoner/openzaak/models.py:773
+#: open_inwoner/openzaak/models.py:797
 msgid "Case link text"
 msgstr "Linknaam naar detailweergave"
 
-#: open_inwoner/openzaak/models.py:775
+#: open_inwoner/openzaak/models.py:799
 msgid ""
 "The text that will be shown in the button that links to a case's detail page"
 msgstr ""
 "De naam van de link op de lijstweergave om naar de detailweergave te "
 "navigeren. Standaard staat dit op 'Bekijk aanvraag'"
 
-#: open_inwoner/openzaak/models.py:782
+#: open_inwoner/openzaak/models.py:806
 msgid "Zaaktype Statustype Configuration"
 msgstr "Zaaktype Statustype Configuratie"
 
-#: open_inwoner/openzaak/models.py:801
+#: open_inwoner/openzaak/models.py:825
 msgid "Resultaattype URL"
 msgstr "Resultaattype URL"
 
-#: open_inwoner/openzaak/models.py:819
+#: open_inwoner/openzaak/models.py:843
 msgid "Result description"
 msgstr "Resultaatomschrijving"
 
-#: open_inwoner/openzaak/models.py:821
+#: open_inwoner/openzaak/models.py:845
 msgid ""
 "Determines the text that will be shown to the user if a case is set to this "
 "result"
@@ -5514,35 +5608,35 @@ msgstr ""
 "Bepaalt de getoonde tekst op de detailpagina van 'Mijn aanvragen' wanneer "
 "een zaak dit resultaat heeft bereikt"
 
-#: open_inwoner/openzaak/models.py:826
+#: open_inwoner/openzaak/models.py:850
 msgid "Zaaktype Resultaattype Configuration"
 msgstr "Zaaktype Resultaattype Configuratie"
 
-#: open_inwoner/openzaak/models.py:843
+#: open_inwoner/openzaak/models.py:867
 msgid "Zaak UUID"
 msgstr "Zaak UUID"
 
-#: open_inwoner/openzaak/models.py:848
+#: open_inwoner/openzaak/models.py:872
 msgid "Is sent"
 msgstr "Is verzonden"
 
-#: open_inwoner/openzaak/models.py:849
+#: open_inwoner/openzaak/models.py:873
 msgid "Collision key"
 msgstr "Collision key"
 
-#: open_inwoner/openzaak/models.py:861
+#: open_inwoner/openzaak/models.py:885
 msgid "Status UUID"
 msgstr "Status UUID"
 
-#: open_inwoner/openzaak/models.py:866
+#: open_inwoner/openzaak/models.py:890
 msgid "Open Zaak status notification record"
 msgstr "Open Zaak statusnotificatie record"
 
-#: open_inwoner/openzaak/models.py:885
+#: open_inwoner/openzaak/models.py:909
 msgid "InformatieObject UUID"
 msgstr "Informatieobject UUID"
 
-#: open_inwoner/openzaak/models.py:890
+#: open_inwoner/openzaak/models.py:914
 msgid "Open Zaak info object notification record"
 msgstr "Open Zaak informatieobject notificatie record"
 
@@ -5558,35 +5652,35 @@ msgstr ""
 msgid "2 item(s) processed in total, with 1 failing row(s)."
 msgstr ""
 
-#: open_inwoner/openzaak/tests/test_case_detail.py:1567
-#: open_inwoner/openzaak/tests/test_case_detail.py:1607
-#: open_inwoner/openzaak/tests/test_case_detail.py:1647
-#: open_inwoner/openzaak/tests/test_case_detail.py:1739
-#: open_inwoner/openzaak/tests/test_case_detail.py:1777
-#: open_inwoner/openzaak/tests/test_case_detail.py:1833
+#: open_inwoner/openzaak/tests/test_case_detail.py:1575
+#: open_inwoner/openzaak/tests/test_case_detail.py:1615
+#: open_inwoner/openzaak/tests/test_case_detail.py:1655
+#: open_inwoner/openzaak/tests/test_case_detail.py:1747
+#: open_inwoner/openzaak/tests/test_case_detail.py:1785
+#: open_inwoner/openzaak/tests/test_case_detail.py:1841
 #: open_inwoner/templates/pages/cases/403.html:3
 msgid "Sorry, you don't have access to this page (403)"
 msgstr "Sorry, u heeft geen toegang tot deze pagina (403)"
 
-#: open_inwoner/openzaak/tests/test_case_detail.py:1802
 #: open_inwoner/openzaak/tests/test_case_detail.py:1810
-#: open_inwoner/openzaak/tests/test_case_detail.py:2023
+#: open_inwoner/openzaak/tests/test_case_detail.py:1818
+#: open_inwoner/openzaak/tests/test_case_detail.py:2031
 #: open_inwoner/templates/pages/cases/status_inner.html:96
 #: open_inwoner/templates/pages/contactmoment/detail.html:45
 msgid "There is no available data at the moment."
 msgstr "Op dit moment zijn er geen aanvragen beschikbaar."
 
-#: open_inwoner/openzaak/tests/test_case_detail.py:1965
-#: open_inwoner/openzaak/tests/test_case_detail.py:2316
+#: open_inwoner/openzaak/tests/test_case_detail.py:1973
+#: open_inwoner/openzaak/tests/test_case_detail.py:2324
 msgid "some description content"
 msgstr "some description content"
 
-#: open_inwoner/openzaak/tests/test_case_detail.py:2004
+#: open_inwoner/openzaak/tests/test_case_detail.py:2012
 msgid "Grootte max. 50 MB, toegestane document formaten:"
 msgstr "Grootte max. 50 MB, toegestane document formaten:"
 
-#: open_inwoner/openzaak/tests/test_case_detail.py:2110
-#: open_inwoner/openzaak/tests/test_case_detail.py:2169
+#: open_inwoner/openzaak/tests/test_case_detail.py:2118
+#: open_inwoner/openzaak/tests/test_case_detail.py:2177
 #, python-brace-format
 msgid ""
 "Wij hebben **1 bestand(en)** succesvol geüpload:\n"
@@ -5594,14 +5688,14 @@ msgid ""
 "- {title}"
 msgstr ""
 
-#: open_inwoner/openzaak/tests/test_case_detail.py:2290
-#: open_inwoner/openzaak/tests/test_case_detail.py:2368
-#: open_inwoner/openzaak/tests/test_case_detail.py:2394
-#: open_inwoner/openzaak/tests/test_case_detail.py:2420
+#: open_inwoner/openzaak/tests/test_case_detail.py:2298
+#: open_inwoner/openzaak/tests/test_case_detail.py:2376
+#: open_inwoner/openzaak/tests/test_case_detail.py:2402
+#: open_inwoner/openzaak/tests/test_case_detail.py:2428
 msgid "By clicking the button below you can upload a document."
 msgstr "Via onderstaande knop kunt u een bestand toevoegen."
 
-#: open_inwoner/openzaak/tests/test_case_detail.py:2343
+#: open_inwoner/openzaak/tests/test_case_detail.py:2351
 #: open_inwoner/templates/pages/cases/status_inner.html:54
 msgid ""
 "By clicking the button below you can upload a document. This is an external "
@@ -5609,15 +5703,6 @@ msgid ""
 msgstr ""
 "Via onderstaande knop kunt u een bestand toevoegen. U wordt doorgestuurd "
 "naar een ander systeem."
-
-#: open_inwoner/openzaak/tests/test_case_detail.py:2474
-#: open_inwoner/openzaak/tests/test_case_detail.py:2519
-msgid ""
-"Een fout is opgetreden bij het uploaden van {self."
-"uploaded_informatie_object['bestandsnaam']}"
-msgstr ""
-"Een fout is opgetreden bij het uploaden van {self."
-"uploaded_informatie_object['bestandsnaam']}"
 
 #: open_inwoner/pdc/admin/category.py:81 open_inwoner/pdc/admin/category.py:116
 msgid "Parent nodes have to be published in order to publish a child."
@@ -6268,18 +6353,9 @@ msgstr "Tag type"
 msgid "Tag types"
 msgstr "Tag types"
 
-#: open_inwoner/pdc/resources/import_resource.py:19
-#, python-brace-format
-msgid "Missing required headers: {missing_headers}"
-msgstr "Ontbrekende verplichte headers: {missing_headers}"
-
 #: open_inwoner/pdc/resources/widgets.py:10
 msgid "The field categories is required"
 msgstr "Het veld categories is verplicht"
-
-#: open_inwoner/pdc/resources/widgets.py:15
-msgid "The {self.model.__name__.lower()} you entered does not exist"
-msgstr "Het ingevulde {self.model.__name__.lower()} bestaat niet"
 
 #: open_inwoner/pdc/tests/test_logging.py:49
 #: open_inwoner/pdc/tests/test_logging.py:194
@@ -6322,7 +6398,7 @@ msgstr "Bestanden"
 msgid "Locaties"
 msgstr "Locaties"
 
-#: open_inwoner/pdc/views.py:257
+#: open_inwoner/pdc/views.py:249 open_inwoner/pdc/views.py:257
 msgid "Formulier"
 msgstr "Formulier"
 
@@ -6881,7 +6957,7 @@ msgid "Field boosts"
 msgstr "Zoekveldgewicht"
 
 #: open_inwoner/search/tests/test_feedback.py:192
-#: open_inwoner/search/views.py:189
+#: open_inwoner/search/views.py:192
 msgid "Thank you for your feedback, it will help us improve our search engine."
 msgstr ""
 "Dank u voor uw feedback, hiermee kunnen wij de omgeving verder verbeteren."
@@ -6891,11 +6967,11 @@ msgstr ""
 msgid "search query: {query}"
 msgstr "zoekterm: {query}"
 
-#: open_inwoner/search/views.py:135 open_inwoner/utils/mixins.py:133
+#: open_inwoner/search/views.py:138 open_inwoner/utils/mixins.py:133
 msgid "Page is not 'last', nor can it be converted to an int."
 msgstr "Page is not 'last', nor can it be converted to an int."
 
-#: open_inwoner/search/views.py:142 open_inwoner/utils/mixins.py:140
+#: open_inwoner/search/views.py:145 open_inwoner/utils/mixins.py:140
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
 msgstr "Ongelidge pagina (%(page_number)s): %(message)s"
@@ -7211,33 +7287,29 @@ msgstr "Bestand uploaden"
 msgid "Verwijder eerst bestanden die niet voldoen aan de voorwaarden"
 msgstr "Verwijder eerst bestanden die niet voldoen aan de voorwaarden"
 
-#: open_inwoner/templates/pages/cases/list_inner.html:23
+#: open_inwoner/templates/pages/cases/list_inner.html:27
 msgid "Filter op"
 msgstr "Filter op"
 
-#: open_inwoner/templates/pages/cases/list_inner.html:33
+#: open_inwoner/templates/pages/cases/list_inner.html:37
 msgid "U heeft op dit moment nog geen lopende aanvragen."
 msgstr "U heeft op dit moment nog geen lopende aanvragen."
 
-#: open_inwoner/templates/pages/cases/list_inner.html:52
+#: open_inwoner/templates/pages/cases/list_inner.html:56
 msgid "Laatst gewijzigd op:"
 msgstr "Laatst gewijzigd op:"
 
-#: open_inwoner/templates/pages/cases/list_inner.html:55
+#: open_inwoner/templates/pages/cases/list_inner.html:59
 msgid "Openstaande aanvraag"
 msgstr "Openstaande aanvraag"
 
-#: open_inwoner/templates/pages/cases/list_inner.html:58
+#: open_inwoner/templates/pages/cases/list_inner.html:62
 msgid "Aanvraag afronden"
 msgstr "Aanvraag afronden"
 
-#: open_inwoner/templates/pages/cases/list_inner.html:77
+#: open_inwoner/templates/pages/cases/list_inner.html:81
 msgid "Resultaat"
 msgstr "Resultaat"
-
-#: open_inwoner/templates/pages/cases/list_inner.html:81
-msgid "Zaaknummer"
-msgstr "Zaaknummer"
 
 #: open_inwoner/templates/pages/cases/list_outer.html:11
 #: open_inwoner/templates/pages/cases/status_outer.html:14
@@ -8100,10 +8172,12 @@ msgid "Case status has been changed to '{status}'"
 msgstr "Aanvraagstatus is veranderd naar '{status}'"
 
 #: open_inwoner/userfeed/hooks/external_task.py:22
+#: open_inwoner/userfeed/tests/test_external_tasks.py:53
 msgid "Open task"
 msgstr "Openstaande actie"
 
 #: open_inwoner/userfeed/hooks/external_task.py:23
+#: open_inwoner/userfeed/tests/test_external_tasks.py:54
 msgid "Case number"
 msgstr "Zaaknummer"
 
