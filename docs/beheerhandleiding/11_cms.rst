@@ -79,7 +79,7 @@ Wanneer u na het aanmaken van de pagina de plek in de boomstructuur wilt verande
 11.1.6. Preview van een pagina bekijken
 ---------------------------------------
 
-Om een voorbeeld van een pagina te bekijken en te zien hoe het er frontend uitziet, klikt u op het oogje achter de betreffende pagina. In hetzelfde venster opent de website op de aangeklikte pagina. Wilt u dit in een ander tabblad of ander venster, gebruik dan uw rechter muisknop en klik op [open link in nieuw venster] of [open link in nieuw tabblad].
+Om een voorbeeld van een pagina te bekijken en te zien hoe het er in de frontend uitziet, klikt u op het oogje achter de betreffende pagina. In hetzelfde venster opent de website op de aangeklikte pagina. Wilt u dit in een ander tabblad of ander venster, gebruik dan uw rechter muisknop en klik op [open link in nieuw venster] of [open link in nieuw tabblad].
 
 .. image:: images/image85.png
    :alt: CMS dashboard
@@ -413,11 +413,11 @@ De footer van Open Inwoner kan worden aangepast via het Django CMS. Dit doet u d
 
 
 11.2.10. Contactformulier aanpassen via CMS
-------------------------------------------------------------------
+-------------------------------------------
 
 Het contactformulier van Open Inwoner kan worden aangepast via het Django CMS. Dit doet u door naar het CMS menu te gaan. U krijgt dan frontend van het Open Inwoner de opties om pagina’s te wijzigen, maar als u op de pagina van het contactformulier bent vindt u i het plugin menu ook de contactformulier plugin.
 
-.. image:: images/250121 Screenshots OI front CMS contactformulier.png
+.. image:: images/frontCMScontactformulier.png
    :alt: CMS contactformulier
    :width: 600px
 
