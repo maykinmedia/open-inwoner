@@ -413,7 +413,7 @@ De footer van Open Inwoner kan worden aangepast via het Django CMS. Dit doet u d
 
 
 11.2.10. Contactformulier aanpassen via CMS
---------------------------------
+------------------------------------------------------------------
 
 Het contactformulier van Open Inwoner kan worden aangepast via het Django CMS. Dit doet u door naar het CMS menu te gaan. U krijgt dan frontend van het Open Inwoner de opties om pagina’s te wijzigen, maar als u op de pagina van het contactformulier bent vindt u i het plugin menu ook de contactformulier plugin.
 
