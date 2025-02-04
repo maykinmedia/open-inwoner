@@ -37,7 +37,7 @@ def update_user_on_login(sender, user, request, *args, **kwargs):
         return
 
     # KvK API
-    if user.login_type is LoginTypeChoices.eherkenning:
+    if user.login_type == LoginTypeChoices.eherkenning:
         _update_eherkenning_user_from_kvk_api(user=user)
 
     # OpenKlant2
