@@ -2,9 +2,8 @@
  * Note: users can upload multiple faulty files with their respective errors, and can delete them one by one,
  * Tracking should only happen on newly added errors, not the entire occurring set.
  */
-
-// Mock _sz object for testing
 if (typeof _sz === 'undefined') {
+  /** Mock SiteImprove `_sz` object for testing - only used during development */
   var _sz = {
     push: function (data) {
       try {
@@ -16,124 +15,119 @@ if (typeof _sz === 'undefined') {
   }
 }
 
-let fileErrorObserver
-let trackingEnabled = false
-let lastErrorState = new Map()
-let userHasSelectedFiles = false // Track only after user SELECTS a file
-let previousErrorState = new Map() // Keeps track of errors before file selection
-
-// Function to generate a unique identifier for each error element
-function getErrorIdentifier(element) {
-  return `${element.className}-${Array.from(
-    element.parentNode.children
-  ).indexOf(element)}`
-}
-
-// Detect and push only new errors that come into the DOM
-function trackFileErrors() {
-  if (!userHasSelectedFiles) {
-    return
+/**
+ * Class that handles the transaction between file errors and SiteImprove.
+ * Used in `/mijn-aanvragen/{number}/{uuid}/status`
+ */
+class DynamicFileInputErrors {
+  constructor() {
+    this.initialized = false
+    this.previousErrorState = new Map()
+    this.bindEvents()
   }
-  console.log('[trackFileErrors] Checking for file errors...')
 
-  const errorElements = [
-    ...document.querySelectorAll(
-      '.file-error__size, .file-error__type, .file-error__type-size'
-    ),
-  ]
-  const currentErrors = new Map()
-
-  errorElements.forEach((element) => {
-    const errorText = element.textContent.trim() || 'Unknown error'
-    const errorId = getErrorIdentifier(element)
-    currentErrors.set(errorId, errorText)
-  })
-
-  currentErrors.forEach((message, id) => {
-    if (!previousErrorState.has(id)) {
-      _sz.push(['event', 'Mijn Aanvragen', 'Error', message])
+  /**
+   * Binds events to callbacks.
+   * Use this to define EventListeners, MutationObservers etc.
+   */
+  bindEvents() {
+    if (this.#formElement && !this.initialized) {
+      this.initialized = true
+      this.#formElement.addEventListener(
+        'change',
+        this.handleChanges.bind(this)
+      )
     }
-  })
-
-  // Update previous error state only with persistent errors
-  previousErrorState = new Map(currentErrors)
-}
-
-// Start observing errors inside the file list
-function startTracking() {
-  if (trackingEnabled) {
-    return
-  }
-  trackingEnabled = true
-
-  const fileList = document.querySelector('#document-upload .file-list__list')
-  if (!fileList) {
-    return
   }
 
-  fileErrorObserver = new MutationObserver(trackFileErrors)
-  fileErrorObserver.observe(fileList, {
-    childList: true,
-    subtree: true,
-    attributes: true,
-  })
-}
+  /**
+   * Gets called when this.getForm() changes.
+   * @param {MouseEvent} event
+   */
+  handleChanges(event) {
+    if (!this.#fileInputElement || event.target !== this.#fileInputElement)
+      return
 
-// Stop tracking errors
-function stopTracking() {
-  if (!trackingEnabled) {
-    return
-  }
-  trackingEnabled = false
-
-  if (fileErrorObserver) {
-    fileErrorObserver.disconnect()
-  }
-}
-
-// Check for form presence and start tracking
-function checkAndStartTracking() {
-  const documentUpload = document.getElementById('document-upload')
-
-  if (documentUpload) {
-    startTracking()
-  } else {
-    stopTracking()
-  }
-}
-
-// Detect file selection
-document.body.addEventListener('change', (event) => {
-  const fileInput = document.querySelector(
-    '#document-upload .file-input__input'
-  )
-  if (fileInput && event.target === fileInput) {
-    userHasSelectedFiles = true
-    console.log(
-      '[change] User selected new files. Storing existing errors before tracking new ones.'
+    const currentErrors = Object.entries(this.#occurringErrors).reduce(
+      (acc, [key, nodes]) => {
+        nodes.forEach((node) => {
+          const fileName =
+            node.querySelector('.file__name').textContent ??
+            [...this.#fileListElement.children].indexOf(node)
+          acc.set(fileName, this.#ERROR_MAP[key])
+        })
+        return acc
+      },
+      new Map()
     )
-    previousErrorState = new Map(lastErrorState)
-    trackFileErrors()
+
+    currentErrors.forEach((message, id) => {
+      if (!this.previousErrorState.has(id))
+        _sz.push(['event', 'Mijn Aanvragen', 'Error', message])
+    })
+
+    // Update previous error state only with persistent errors
+    this.previousErrorState = currentErrors
   }
-})
 
-// Prevent duplicate tracking after clicks on delete buttons
-document.body.addEventListener('click', (event) => {
-  const deleteButton = event.target.closest('.file__delete')
-  if (deleteButton) {
-    return
+  /**
+   * The predefined (dutch) error messages
+   * @private
+   */
+  get #ERROR_MAP() {
+    return {
+      type: 'Error verkeerd bestand type.',
+      size: 'Error bestand te groot.',
+      typeSize: 'Error bestand te groot en van verkeerde type.',
+    }
   }
-})
 
-// HTMX event listener to restart tracking when content updates
-document.body.addEventListener('htmx:afterSwap', () => {
-  checkAndStartTracking()
-})
+  /**
+   * Get the form element
+   * @returns {HTMLElement}
+   * @private
+   */
+  get #formElement() {
+    return document.querySelector('#document-upload')
+  }
 
-// Initial setup
-checkAndStartTracking()
+  /**
+   * Get the file input element
+   * @returns {HTMLElement}
+   * @private
+   */
+  get #fileInputElement() {
+    return document.querySelector('#document-upload .file-input__input')
+  }
 
-// Dynamic observer
-const formObserver = new MutationObserver(checkAndStartTracking)
-formObserver.observe(document.body, { childList: true, subtree: true })
-console.log('[Script] Created MutationObserver for form changes.')
+  /**
+   * Returns a specific file list based on a child.
+   * @returns {HTMLElement}
+   * @private
+   */
+  get #fileListElement() {
+    return document.querySelector('#document-upload .file-list__list')
+  }
+
+  /**
+   * Returns the name of a file or the index of the file in the list.
+   * @param {HTMLElement} node
+   * @returns {{type: NodeListOf<Element>, size: NodeListOf<Element>, typeSize: NodeListOf<Element>}}
+   * @private
+   */
+  get #occurringErrors() {
+    return {
+      type: document.querySelectorAll('.file:has(.error > .file-error__type)'),
+      size: document.querySelectorAll('.file:has(.error > .file-error__size)'),
+      typeSize: document.querySelectorAll(
+        '.file:has(.error > .file-error__type-size)'
+      ),
+    }
+  }
+}
+
+// HTMX event listener to start tracking when content updates. - Start!
+document.body.addEventListener(
+  'htmx:afterSwap',
+  () => new DynamicFileInputErrors()
+)
