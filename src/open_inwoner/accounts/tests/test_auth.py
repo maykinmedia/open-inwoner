@@ -20,7 +20,6 @@ from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.kvk.branches import get_kvk_branch_number
 from open_inwoner.kvk.tests.factories import CertificateFactory
 from open_inwoner.openklant.tests.data import MockAPIReadPatchData
-from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin
 
 from ...cms.collaborate.cms_apps import CollaborateApphook
@@ -677,7 +676,7 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
         mock_retrieve_rsin_with_kvk,
         mock_get_basisprofiel,
     ):
-        config = OpenZaakConfig.get_solo()
+        config = SiteConfiguration.get_solo()
         config.enable_eherkenning_for_eenmanszaak = False
         config.save()
 
@@ -722,7 +721,7 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
         mock_retrieve_rsin_with_kvk,
         mock_get_basisprofiel,
     ):
-        config = OpenZaakConfig.get_solo()
+        config = SiteConfiguration.get_solo()
         config.enable_eherkenning_for_eenmanszaak = True
         config.save()
 
