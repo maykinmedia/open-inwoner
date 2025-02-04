@@ -6,8 +6,8 @@
  * in order to organize them for the Siteimprove Dashboard where they are grouped by category
  */
 
-// Mock _sz object for testing
 // if (typeof _sz === 'undefined') {
+//   /** Mock SiteImprove `_sz` object for testing - only used during development */
 //   var _sz = {
 //     push: function (data) {
 //       try {
@@ -247,7 +247,6 @@ const specificClickSelectors = {
     ['event', 'Aanvraag detail', 'Click', 'Upload documenten'],
   '#document-upload > .form__control.file-input > .form__actions.form__actions--fullwidth > button span':
     ['event', 'Aanvraag detail', 'Click', 'Upload documenten'],
-
   // Accessibility header
   '.accessibility-header > ul > li > a[aria-label="Lees voor"] > .link__text': [
     'event',
