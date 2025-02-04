@@ -5129,15 +5129,15 @@ msgstr "Succes"
 
 #: open_inwoner/openzaak/constants.py:14
 msgid "The description of the case (`zaak.omschrijving`)"
-msgstr "Omschrijving van de zaak"
+msgstr "Omschrijving van de zaak (`zaak.omschrijving`)"
 
 #: open_inwoner/openzaak/constants.py:17
 msgid "The description of the case's type (`zaaktype.omschrijving`)"
-msgstr "Omschrijving van het zaaktype"
+msgstr "Omschrijving van het zaaktype (`zaaktype.omschrijving`)"
 
 #: open_inwoner/openzaak/constants.py:20
 msgid "The subject of the case's type (`zaaktype.onderwerp`)"
-msgstr "Onderwerp van het zaaktype"
+msgstr "Onderwerp van het zaaktype (`zaaktype.onderwerp`)"
 
 #: open_inwoner/openzaak/models.py:183
 msgid "name"
@@ -5183,7 +5183,7 @@ msgstr "Klanten API back-end"
 
 #: open_inwoner/openzaak/models.py:277
 msgid "Choose the API backend for retrieving klanten data."
-msgstr "Configureer de API back-end for het ophalen van klantgegevens:"
+msgstr "Configureer de API back-end voor het ophalen van klantgegevens."
 
 #: open_inwoner/openzaak/models.py:282
 msgid "ZGW API set"
@@ -5269,7 +5269,7 @@ msgid ""
 "their kvk nummer will be used to interface with the zaken and klanten "
 "backends). If not, an eenmanszaak will be forced to use DigiD,  and the "
 "user's BSN will be used instead."
-msgstr "Indien ingeschakeld, kunnen eenmanszaken inloggen met eHerkenning en wordt vervolgens het KVK-nummer gebruikt om te interfacen met de zaken- en klanten-backends. Indien niet ingeschakeld, moet een eenmanszaak DigiD gebruiken en wordt in plaats daarvan het BSN-nummer gebruikt."
+msgstr "Indien ingeschakeld, kunnen eenmanszaken inloggen met eHerkenning en wordt vervolgens het KVK-nummer gebruikt om te interfacen met de zaken- en klanten-backends. Indien niet ingeschakeld, moet een eenmanszaak DigiD gebruiken en wordt in plaats van het KVK-nummer het BSN-nummer gebruikt."
 
 #: open_inwoner/openzaak/models.py:444
 msgid "Derive the case title from"
