@@ -128,6 +128,16 @@ class SiteConfiguration(SingletonModel):
         verbose_name=_("Login tekst"),
         help_text=_("Deze tekst wordt getoond op de login pagina."),
     )
+    enable_eherkenning_for_eenmanszaak = models.BooleanField(
+        verbose_name=_("Allow eenmanszaken to authenticate using eHerkenning"),
+        help_text=_(
+            "If enabled, eenmanszaken may authenticate using eHerkenning and "
+            "subsequently their kvk nummer will be used to interface with the zaken and"
+            " klanten backends. If not, an eenmanszaak will be forced to use DigiD,"
+            " and the user's BSN will be used instead."
+        ),
+        default=False,
+    )
     registration_text = models.TextField(
         blank=True,
         verbose_name=_("Registratie tekst"),

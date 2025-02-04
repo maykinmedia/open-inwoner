@@ -131,6 +131,7 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "name",
                     "login_show",
                     "login_allow_registration",
+                    "enable_eherkenning_for_eenmanszaak",
                     "login_2fa_sms",
                     "allow_messages_file_sharing",
                     "redirect_to",

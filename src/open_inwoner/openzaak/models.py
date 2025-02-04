@@ -427,17 +427,6 @@ class OpenZaakConfig(SingletonModel):
         default=False,
     )
 
-    enable_eherkenning_for_eenmanszaak = models.BooleanField(
-        verbose_name=_("Allow eenmanszaken to authenticate using eHerkenning"),
-        help_text=_(
-            "If enabled, eenmanszaken may authenticate using eHerkenning and "
-            "subsequently their kvk nummer will be used to interface with the zaken and"
-            " klanten backends). If not, an eenmanszaak will be forced to use DigiD, "
-            " and the user's BSN will be used instead."
-        ),
-        default=False,
-    )
-
     derive_zaak_titel_from = models.CharField(
         choices=ZaakTitleDisplayChoices.choices,
         default=ZaakTitleDisplayChoices.zaaktype_omschrijving,
