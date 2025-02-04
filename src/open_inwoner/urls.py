@@ -118,7 +118,6 @@ urlpatterns = [
     path("eherkenning-oidc/", include("open_inwoner.accounts.eherkenning_urls")),
     path("login/failure/", OIDCFailureView.as_view(), name="oidc-error"),
     path("faq/", FAQView.as_view(), name="general_faq"),
-    path("apimock/", include("open_inwoner.apimock.urls")),
     path("kvk/", include("open_inwoner.kvk.urls")),
     path("", include("open_inwoner.search.urls", namespace="search")),
     re_path(r"^", include("cms.urls")),
