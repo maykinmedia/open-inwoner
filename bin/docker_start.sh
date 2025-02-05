@@ -26,46 +26,38 @@ export UWSGI_CHDIR="src"
 export UWSGI_STATIC_MAP="/static=/app/static /media=/app/media"
 
 # --- Process Management
-export UWSGI_MASTER=true
+# Allow for better worker coordination and graceful shutdowns for unresponsive workers
+export UWSGI_MASTER=1
 export UWSGI_PROCESSES=${UWSGI_PROCESSES:-4}
 export UWSGI_THREADS=${UWSGI_THREADS:-8}
 
-# Shutdown gracefully on SIGTERM (common with supervisord and k8s)
-export UWSGI_DIE_ON_TERM=true
+# Shutdown gracefully on SIGTERM, which is used by both Docker and k8s to stop containers
+export UWSGI_DIE_ON_TERM=1
 
-# We're not hosting multiple apps, so no isolation required
-export UWSGI_SINGLE_INTERPRETER=true
+# We're not hosting multiple apps, so no interpreter isolation should be required
+export UWSGI_SINGLE_INTERPRETER=1
 
-# Enable Python threading
-export UWSGI_ENABLE_THREADS=true
+# Enable Python threading support
+export UWSGI_ENABLE_THREADS=1
 
-# --- HTTP Server Settings
+# --- HTTP Settings
+# Use http rather than wsgi protocol (also note that UWSGI_PORT is not a native uwsgi option).
 export UWSGI_HTTP=${UWSGI_PORT:-8000}
+export UWSGI_HTTP_KEEPALIVE=${UWSGI_HTTP_KEEPALIVE:-1}
 export UWSGI_HTTP_TIMEOUT=${UWSGI_HTTP_TIMEOUT:-120}
-export UWSGI_HTTP_KEEPALIVE=true
+
+# Hard-kill requests after 125 seconds (slightly longer than the default timeout)
+export UWSGI_HARAKIRI=${UWSGI_HARAKIRI:-125}
+
+# Periodically recycle workers
+export UWSGI_MAX_REQUESTS=${UWSGI_MAX_REQUESTS:-100}
 
 # --- Request Handling
-# Buffer size for POST requests
-export UWSGI_POST_BUFFERING=8192
+# Buffer size for POST requests (in bytes)
+export UWSGI_POST_BUFFERING=${UWSGI_POST_BUFFERING:-8192}
 
-# Internal buffer size
-export UWSGI_BUFFER_SIZE=65535
-
-# --- Worker Lifecycle
-# Make UWSGI_MAX_REQUESTS explicitly opt-in
-if [ -n "${UWSGI_MAX_REQUESTS+x}" ]; then
-    if [ "$UWSGI_MAX_REQUESTS" -gt 1 ] 2>/dev/null; then
-        export UWSGI_MAX_REQUESTS
-    else
-        echo "Warning: UWSGI_MAX_REQUESTS must be greater than 1. The variable will be unset."
-        unset UWSGI_MAX_REQUESTS
-    fi
-else
-    unset UWSGI_MAX_REQUESTS
-fi
-
-# Hard-kill requests after 60 seconds
-export UWSGI_HARAKIRI=${UWSGI_HARAKIRI:-60}
+# Internal buffer size (in bytes)
+export UWSGI_BUFFER_SIZE=${UWSGI_BUFFER_SIZE:-65535}
 
 # Start Server
 >&2 echo "Starting server"

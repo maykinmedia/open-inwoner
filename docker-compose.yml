@@ -83,6 +83,16 @@ services:
       - DISABLE_2FA=${DISABLE_2FA:-True}
       - DEBUG=True
       - IS_HTTPS=no
+      # Overridable uwsgi settings
+      - UWSGI_PROCESSES
+      - UWSGI_THREADS
+      - UWSGI_PORT
+      - UWSGI_HTTP_KEEPALIVE
+      - UWSGI_HTTP_TIMEOUT
+      - UWSGI_HARAKIRI
+      - UWSGI_MAX_REQUESTS
+      - UWSGI_POST_BUFFERING
+      - UWSGI_BUFFER_SIZE
     healthcheck:
       test: ["CMD", "python", "-c", "import requests; exit(requests.head('http://localhost:8000/admin/').status_code not in [200, 302])"]
       interval: 30s
