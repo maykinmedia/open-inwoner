@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 from django.conf import settings
 from django.core import mail
-from django.test import TestCase, override_settings
+from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse
 
 from django_webtest import WebTest
@@ -11,6 +11,7 @@ from furl.furl import furl
 from pyquery.pyquery import PyQuery
 
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.accounts.views.registration import EmailVerificationUserView
 from open_inwoner.cms.profile.cms_apps import ProfileApphook
 from open_inwoner.cms.tests import cms_tools
 from open_inwoner.configurations.models import SiteConfiguration
@@ -322,3 +323,34 @@ class TestMailVerificationMiddlewareFlow(WebTest):
 
         # email sent after submitting form
         mock_send.assert_called_once_with(user, target_url)
+
+    @patch(
+        "open_inwoner.accounts.views.registration.send_user_email_verification_mail",
+        autospec=True,
+    )
+    def test_verification_email_dupes(self, mock_send):
+        request_factory = RequestFactory()
+        user = UserFactory(email="foo@example.com")
+
+        request = request_factory.get("/")
+        request.session = {}
+        request.user = user
+
+        view = EmailVerificationUserView.as_view()
+
+        # two requests with the same email: one call
+        view(request)
+        view(request)
+
+        mock_send.assert_called_once_with(user, next_url="")
+
+        # request with changed email: two calls
+        user.email = "changed@example.com"
+        view(request)
+
+        self.assertEqual(len(mock_send.call_args_list), 2)
+
+        # still two calls
+        view(request)
+
+        self.assertEqual(len(mock_send.call_args_list), 2)
