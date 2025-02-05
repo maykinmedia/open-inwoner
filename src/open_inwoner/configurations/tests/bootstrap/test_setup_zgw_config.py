@@ -13,7 +13,8 @@ from zgw_consumers.constants import APITypes
 from zgw_consumers.models import Service
 
 from open_inwoner.configurations.bootstrap.zgw import OpenZaakConfigurationStep
-from open_inwoner.openzaak.models import OpenZaakConfig
+from open_inwoner.openzaak.constants import ZaakTitleDisplayChoices
+from open_inwoner.openzaak.models import OpenZaakConfig, ZGWApiGroupConfig
 from open_inwoner.openzaak.tests.factories import ServiceFactory
 
 ZAAK_SERVICE_API_ROOT = "https://openzaak.local/zaken/api/v1/"
@@ -95,23 +96,26 @@ class ZGWConfigurationTests(TestCase):
         )
         config = OpenZaakConfig.get_solo()
 
-        zaak_service = config.zaak_service
-        catalogi_service = config.catalogi_service
-        document_service = config.document_service
-        form_service = config.form_service
+        group = ZGWApiGroupConfig.objects.get()  # Should be only one
+
+        zaak_service = group.zrc_service
+        catalogi_service = group.ztc_service
+        document_service = group.drc_service
+        form_service = group.form_service
 
         self.assertEqual(zaak_service.api_root, ZAAK_SERVICE_API_ROOT)
         self.assertEqual(catalogi_service.api_root, CATALOGI_SERVICE_API_ROOT)
         self.assertEqual(document_service.api_root, DOCUMENTEN_SERVICE_API_ROOT)
         self.assertEqual(form_service.api_root, FORM_SERVICE_API_ROOT)
+        self.assertFalse(group.fetch_eherkenning_zaken_with_rsin)
 
         self.assertEqual(
             config.zaak_max_confidentiality,
-            VertrouwelijkheidsAanduidingen.openbaar,
+            VertrouwelijkheidsAanduidingen.intern,
         )
         self.assertEqual(
             config.document_max_confidentiality,
-            VertrouwelijkheidsAanduidingen.vertrouwelijk,
+            VertrouwelijkheidsAanduidingen.intern,
         )
         self.assertEqual(config.action_required_deadline_days, 1874)
         self.assertEqual(config.allowed_file_extensions, [".pdf", ".txt"])
@@ -119,6 +123,13 @@ class ZGWConfigurationTests(TestCase):
         self.assertEqual(config.enable_categories_filtering_with_zaken, True)
         self.assertEqual(config.skip_notification_statustype_informeren, False)
         self.assertEqual(config.reformat_esuite_zaak_identificatie, True)
+        self.assertEqual(
+            config.derive_zaak_titel_from, ZaakTitleDisplayChoices.zaaktype_onderwerp
+        )
+        self.assertTrue(config.zaken_filter_enabled)
+        self.assertEqual(config.action_required_deadline_days, 1874)
+        self.assertEqual(config.max_upload_size, 51)
+        self.assertFalse(config.order_statuses_by_date_set)
 
     def test_configure_raises_on_missing_groups(self):
         with self.assertRaises(PrerequisiteFailed):

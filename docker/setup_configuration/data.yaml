@@ -94,8 +94,7 @@ openzaak_config:
   max_upload_size: 50
   skip_notification_statustype_informeren: false
   reformat_esuite_zaak_identificatie: true
-  fetch_eherkenning_zaken_with_rsin: false
-  use_zaak_omschrijving_as_title: 'true'
+  derive_zaak_titel_from: zaaktype_omschrijving
   order_statuses_by_date_set: false
   title_text: title text from setup configuration
   enable_categories_filtering_with_zaken: true
@@ -108,6 +107,7 @@ openzaak_config:
     - zaken_api_identifier: zaken-test
       documenten_api_identifier: documenten-test
       catalogi_api_identifier: catalogi-test
+      fetch_eherkenning_zaken_with_rsin: true
 
 # OpenKlant (v1, i.e. eSuite)
 openklant_config_enable: true
