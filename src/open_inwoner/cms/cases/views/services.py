@@ -282,7 +282,7 @@ class CaseListService:
 
             case.zaaktype_config = zaaktype_config
 
-            if zaaktype_config:
+            if zaaktype_config and case.status:
                 statustype_config = ZaakTypeStatusTypeConfig.objects.get(
                     zaaktype_config=zaaktype_config,
                     statustype_url=case.status.statustype.url,

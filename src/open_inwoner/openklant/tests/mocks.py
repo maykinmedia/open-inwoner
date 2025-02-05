@@ -2,11 +2,18 @@ import uuid
 from datetime import datetime
 
 from ..constants import KlantenServiceType
+from ..services import OpenKlant2Question
 
 
 class MockOpenKlant2Service:
     def __init__(self):
         self.service_type = KlantenServiceType.OPENKLANT2
+
+    def get_fetch_parameters(self, request=None, user=None, use_vestigingsnummer=False):
+        return {"user_bsn": "123456789"}
+
+    def get_or_create_partij_for_user(self, fetch_params={}, user=None):
+        return {"uuid": "0d150ff9-0924-46f6-8ef9-17fee9e54d23"}, False
 
     def list_questions(self, fetch_params={}, user=None):
         return [self.retrieve_question()[0]]
@@ -34,5 +41,21 @@ class MockOpenKlant2Service:
     def list_questions_for_zaak(self, zaak=None, user=None):
         return [self.retrieve_question()[0]]
 
-    def get_fetch_parameters(self, request=None, user=None, use_vestigingsnummer=False):
-        return {"user_bsn": "123456789"}
+    def create_question_for_zaak(
+        self,
+        partij_uuid: str,
+        question: str,
+        subject: str,
+        zaak: str,
+    ) -> OpenKlant2Question:
+        return OpenKlant2Question(
+            url="http://openklant/api/test/klantcontacten/9431676d-07ce-45e9-bfa8-db86c229b916",
+            question_kcm_uuid="9431676d-07ce-45e9-bfa8-db86c229b916",
+            question="What?",
+            answer=None,
+            onderwerp="Coffee zaak",
+            kanaal="email",
+            taal="nl",
+            nummer="42",
+            plaatsgevonden_op=datetime.fromisoformat("2024-01-01T12:00:00Z"),
+        )
