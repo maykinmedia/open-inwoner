@@ -72,8 +72,8 @@ class ContactMomentViewsTestCase(
         # for testing replacement of e-suite "onderwerp" code with OIP configured subject
         self.contactformsubject = ContactFormSubject.objects.create(
             subject="oip_subject",
-            subject_code="e_suite_subject_code",
-            config=klant_config,
+            esuite_subject_code="e_suite_subject_code",
+            esuite_config=klant_config,
         )
 
     def test_contactmoment_list_bsn(
@@ -612,8 +612,8 @@ class ContactMomentViewsTestCase(
 
         ContactFormSubject.objects.create(
             subject="control_subject_for_duplicate_code",
-            subject_code=self.contactformsubject.subject_code,
-            config=ESuiteKlantConfig.get_solo(),
+            esuite_subject_code=self.contactformsubject.esuite_subject_code,
+            esuite_config=ESuiteKlantConfig.get_solo(),
         )
 
         detail_url_esuite = reverse(
@@ -723,7 +723,7 @@ class ContactMomentViewsTestCase(
                 "identification": cm_data["identificatie"],
                 "api_source_url": cm_data["url"],
                 "api_source_uuid": uuid_from_url(cm_data["url"]),
-                "subject": self.contactformsubject.subject_code,
+                "subject": self.contactformsubject.esuite_subject_code,
                 "question_text": cm_data["tekst"],
                 "answer_text": cm_data["antwoord"],
                 "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),

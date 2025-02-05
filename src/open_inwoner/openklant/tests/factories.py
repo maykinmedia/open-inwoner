@@ -18,7 +18,7 @@ class ContactFormSubjectFactory(factory.django.DjangoModelFactory):
         model = "openklant.ContactFormSubject"
 
     subject = factory.Faker("sentence")
-    subject_code = factory.Faker("word")
+    esuite_subject_code = factory.Faker("word")
 
 
 class KlantContactMomentAnswerFactory(factory.django.DjangoModelFactory):

@@ -1,3 +1,5 @@
+import logging
+
 from django.conf import settings
 from django.contrib import messages
 from django.urls import reverse
@@ -16,32 +18,40 @@ from open_inwoner.openklant.api_models import (
     Klant,
     MedewerkerIdentificatie,
 )
-from open_inwoner.openklant.clients import (
-    KlantenClient,
-    build_contactmomenten_client,
-    build_klanten_client,
-)
+from open_inwoner.openklant.clients import KlantenClient, build_klanten_client
 from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.forms import ContactForm
-from open_inwoner.openklant.models import (
-    ESuiteKlantConfig,
-    KlantenSysteemConfig,
-    OpenKlant2Config,
-)
+from open_inwoner.openklant.models import ESuiteKlantConfig, KlantenSysteemConfig
+from open_inwoner.openklant.services import OpenKlant2Service, eSuiteVragenService
 from open_inwoner.openklant.views.utils import generate_question_answer_pair
 from open_inwoner.openklant.wrap import get_fetch_parameters
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
+
+logger = logging.getLogger(__name__)
 
 
 class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
     form_class = ContactForm
     template_name = "pages/contactform/form_wrap.html"  # inner ("structure") template rendered by CMS plugin
+    klanten_config = KlantenSysteemConfig
     klanten_client: KlantenClient | None
+    vragen_service: OpenKlant2Service | eSuiteVragenService | None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.klanten_client = build_klanten_client()
+        self.klanten_client = None
+        self.vragen_service = None
+
+        self.klanten_config = KlantenSysteemConfig.get_solo()
+        match self.klanten_config.primary_backend:
+            case KlantenServiceType.ESUITE.value:
+                self.klanten_client = build_klanten_client()
+                self.vragen_service = eSuiteVragenService()
+            case KlantenServiceType.OPENKLANT2.value:
+                self.vragen_service = OpenKlant2Service()
+            case _:
+                logger.info("No klanten/vragen service configured for contactform")
 
     @cached_property
     def crumbs(self):
@@ -92,8 +102,17 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        config = KlantenSysteemConfig.get_solo()
-        context["has_form_configuration"] = config.has_contactform_configuration
+
+        has_contactform_configuration = (
+            self.klanten_config.has_contactform_configuration
+        )
+        if not self.request.user.is_authenticated:
+            has_contactform_configuration = (
+                has_contactform_configuration
+                and self.vragen_service.supports_anonymous_questions
+            )
+        context["has_form_configuration"] = has_contactform_configuration
+
         return context
 
     def set_result_message(self, success: bool):
@@ -107,21 +126,23 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
             )
 
     def form_valid(self, form: ContactForm):
-        config = KlantenSysteemConfig.get_solo()
-
         email_success = False
         api_success = False
         send_confirmation = False
         api_user_email = None
 
-        if config.register_contact_email:
-            email_success = self.register_by_email(form, config.register_contact_email)
+        if self.klanten_config.register_contact_email:
+            email_success = self.register_by_email(
+                form, self.klanten_config.register_contact_email
+            )
             send_confirmation = email_success
 
-        if config.register_contact_via_api:
-            api_success, api_user_email = self.register_by_api(form, config)
+        if self.klanten_config.register_contact_via_api:
+            api_success, api_user_email = self.register_by_api(
+                form, self.klanten_config
+            )
             if api_success:
-                send_confirmation = config.send_email_confirmation
+                send_confirmation = self.klanten_config.send_email_confirmation
             # else keep the send_confirmation if email set it
 
         user_email = (
@@ -174,18 +195,37 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
             return self._register_via_esuite(
                 form, esuite_config=ESuiteKlantConfig.get_solo()
             )
-        return self._register_via_openklant2(form, config=OpenKlant2Config.get_solo())
+        return self._register_via_openklant2(form)
 
-    # TODO
-    def _register_via_openklant2(self, form: ContactForm, config: OpenKlant2Config):
-        raise NotImplementedError
+    def _register_via_openklant2(self, form: ContactForm):
+        user = self.request.user
+
+        partij, created = self.vragen_service.get_or_create_partij_for_user(
+            fetch_params=self.vragen_service.get_fetch_parameters(user=user),
+            user=user,
+        )
+
+        cleaned_data = form.cleaned_data
+        question = cleaned_data["question"]
+        subject = cleaned_data["subject"].subject
+
+        question = self.vragen_service.create_question(
+            partij_uuid=partij["uuid"], question=question, subject=subject
+        )
+
+        self.log_system_action(
+            "registered question via OpenKlant", user=self.request.user
+        )
+
+        # TODO: get email from partij
+        return True, getattr(user, "email", None)
 
     def _register_via_esuite(
         self,
         form: ContactForm,
         esuite_config: ESuiteKlantConfig,
     ) -> tuple[bool, str]:
-        assert esuite_config.has_api_configuration()
+        assert esuite_config.has_api_configuration
 
         klant = self._fetch_klant()
         if klant:
@@ -201,7 +241,7 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
             )
             return False, getattr(klant, "emailadres", None)
         self.log_system_action(
-            "registered contactmoment by API", user=self.request.user
+            "registered contactmoment via eSuite", user=self.request.user
         )
         return True, getattr(klant, "emailadres", None)
 
@@ -246,11 +286,8 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
         klanten_config: ESuiteKlantConfig,
         klant: Klant | None = None,
     ):
-        if not (contactmoment_client := build_contactmomenten_client()):
-            return
-
         subject = form_data["subject"].subject
-        subject_code = form_data["subject"].subject_code
+        subject_code = form_data["subject"].esuite_subject_code
         text = form_data["question"]
 
         if not klant:
@@ -292,4 +329,4 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
                 identificatie=employee_id
             )
 
-        return contactmoment_client.create_contactmoment(data, klant=klant)
+        return self.vragen_service.create_contactmoment(data, klant=klant)

@@ -8,7 +8,8 @@ from open_inwoner.accounts.choices import LoginTypeChoices, NotificationChannelC
 from open_inwoner.accounts.models import User
 from open_inwoner.accounts.tests.factories import UserFactory, eHerkenningUserFactory
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.openklant.models import ESuiteKlantConfig
+from open_inwoner.openklant.constants import KlantenServiceType
+from open_inwoner.openklant.models import ESuiteKlantConfig, KlantenSysteemConfig
 from open_inwoner.openklant.tests.data import KLANTEN_ROOT, MockAPIReadData
 from open_inwoner.openzaak.tests.helpers import generate_oas_component_cached
 from open_inwoner.utils.test import (
@@ -31,6 +32,10 @@ class UpdateUserFromLoginSignalAPITestCase(
         config = SiteConfiguration.get_solo()
         config.enable_notification_channel_choice = True
         config.save()
+
+        klant_config = KlantenSysteemConfig.get_solo()
+        klant_config.primary_backend = KlantenServiceType.ESUITE.value
+        klant_config.save()
 
     def setUp(self) -> None:
         super().setUp()

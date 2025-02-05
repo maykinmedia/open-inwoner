@@ -28,8 +28,8 @@ class eSuiteVragenServiceTestCase(TestCase):
 
         self.contactformsubject = ContactFormSubject.objects.create(
             subject="oip_subject",
-            subject_code="e_suite_subject_code",
-            config=klanten_config,
+            esuite_subject_code="e_suite_subject_code",
+            esuite_config=klanten_config,
         )
 
     def test_list_questions_returns_expected_rows(self, m):

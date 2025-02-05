@@ -1006,7 +1006,7 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
         raise NotImplementedError
 
     def _register_via_esuite(self, form, config: ESuiteKlantConfig):
-        assert config.has_api_configuration()
+        assert config.has_api_configuration
 
         try:
             ztc = ZaakTypeConfig.objects.filter_case_type(self.case.zaaktype).get()

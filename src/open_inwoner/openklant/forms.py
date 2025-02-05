@@ -2,7 +2,8 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from open_inwoner.accounts.models import User
-from open_inwoner.openklant.models import ContactFormSubject, ESuiteKlantConfig
+from open_inwoner.openklant.constants import KlantenServiceType
+from open_inwoner.openklant.models import ContactFormSubject, KlantenSysteemConfig
 from open_inwoner.openklant.views.utils import generate_question_answer_pair
 from open_inwoner.utils.validators import DutchPhoneNumberValidator
 
@@ -57,9 +58,19 @@ class ContactForm(forms.Form):
         self.user = user
         self.request_session = request_session
 
-        # TODO: check for primary_backend? What in case of OK2?
-        config = ESuiteKlantConfig.get_solo()
-        self.fields["subject"].queryset = config.contactformsubject_set.all()
+        klant_config = KlantenSysteemConfig.get_solo()
+        if klant_config.primary_backend == KlantenServiceType.OPENKLANT2.value:
+            subjects = ContactFormSubject.objects.filter(
+                esuite_subject_code__isnull=True
+            )
+        elif klant_config.primary_backend == KlantenServiceType.ESUITE.value:
+            subjects = ContactFormSubject.objects.filter(
+                esuite_subject_code__isnull=False
+            )
+        else:
+            subjects = ContactFormSubject.objects.none()
+
+        self.fields["subject"].queryset = subjects
 
         if self.user.is_authenticated:
             del self.fields["first_name"]

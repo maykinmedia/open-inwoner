@@ -12,6 +12,7 @@ from open_inwoner.utils.test import ClearCachesMixin
 class ContactFormTestCase(ClearCachesMixin, TestCase):
     def setUp(self):
         super().setUp()
+
         # clear esuite_config
         esuite_config = ESuiteKlantConfig.get_solo()
         esuite_config.klanten_service = None
@@ -19,7 +20,6 @@ class ContactFormTestCase(ClearCachesMixin, TestCase):
         esuite_config.register_bronorganisatie_rsin = ""
         esuite_config.register_type = ""
         esuite_config.register_employee_id = ""
-        esuite_config.send_email_confirmation = True
         esuite_config.save()
 
     def test_no_form_link_shown_in_footer_if_not_has_configuration(self):
@@ -39,7 +39,7 @@ class ContactFormTestCase(ClearCachesMixin, TestCase):
         self.assertFalse(klant_config.has_contactform_configuration)
 
         esuite_config = ESuiteKlantConfig.get_solo()
-        ContactFormSubjectFactory(config=esuite_config)
+        ContactFormSubjectFactory(esuite_config=esuite_config)
 
         klant_config.register_contact_email = "example@example.com"
         klant_config.save()
