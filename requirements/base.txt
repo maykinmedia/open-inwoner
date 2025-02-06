@@ -163,7 +163,7 @@ django-axes==5.25.0
     # via -r requirements/base.in
 django-celery-beat==2.6.0
     # via -r requirements/base.in
-django-celery-monitor @ git+https://github.com/maykinmedia/django-celery-monitor@513dc28
+django-celery-monitor @ git+https://github.com/maykinmedia/django-celery-monitor@74b1252
     # via -r requirements/base.in
 django-choices==2.0.0
     # via mail-editor
