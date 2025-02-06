@@ -86,7 +86,7 @@ services:
       # Overridable uwsgi settings
       - UWSGI_PROCESSES
       - UWSGI_THREADS
-      - UWSGI_PORT
+      - PORT
       - UWSGI_HTTP_KEEPALIVE
       - UWSGI_HTTP_TIMEOUT
       - UWSGI_HARAKIRI
