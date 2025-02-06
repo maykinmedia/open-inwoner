@@ -230,7 +230,7 @@ class SearchPagePlaywrightTests(
         # search to find both products
         page.goto(self.live_reverse("search:search", params={"query": "summary"}))
         page.wait_for_url(self.live_reverse("search:search", star=True))
-        expect(page.locator(".search-results__item")).to_have_count(2)
+        expect(page.locator(".card")).to_have_count(2)
 
     def test_search_form_delegates_copy_query_value(self):
         context = self.browser.new_context()
@@ -270,11 +270,11 @@ class SearchPagePlaywrightTests(
 
                 # search from this page
                 _do_search("summary", form_id, open_menu)
-                expect(page.locator(".search-results__item")).to_have_count(2)
+                expect(page.locator(".card")).to_have_count(2)
 
                 # perform another search from the search results page
                 _do_search("other", form_id, open_menu)
-                expect(page.locator(".search-results__item")).to_have_count(1)
+                expect(page.locator(".card")).to_have_count(1)
 
                 page.close()
                 context.close()

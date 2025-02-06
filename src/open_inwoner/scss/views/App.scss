@@ -161,6 +161,7 @@
     var(--color-info-s),
     calc(var(--color-info-l) + 10%)
   );
+  --color-info-lightest: hsl(210, 70%, 96%);
   --color-info-darker: hsl(
     var(--color-info-h),
     var(--color-info-s),
