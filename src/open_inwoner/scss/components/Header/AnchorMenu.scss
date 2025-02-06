@@ -36,7 +36,7 @@
 
   &--mobile {
     box-sizing: border-box;
-    padding: 0 (var(--spacing-large));
+    padding: 0 var(--spacing-large);
     margin: var(--spacing-medium) var(--spacing-tiny) 0 var(--spacing-tiny);
     position: initial;
     width: calc(100% - (var(--spacing-tiny)));

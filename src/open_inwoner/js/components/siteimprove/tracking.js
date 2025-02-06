@@ -6,8 +6,8 @@
  * in order to organize them for the Siteimprove Dashboard where they are grouped by category
  */
 
-// Mock _sz object for testing
 // if (typeof _sz === 'undefined') {
+//   /** Mock SiteImprove `_sz` object for testing - only used during development */
 //   var _sz = {
 //     push: function (data) {
 //       try {
@@ -235,6 +235,7 @@ const specificClickSelectors = {
       "Open aanvraag via 'Bekijk aanvraag' link",
     ],
   // Detail Case view
+  '.file__delete': ['event', 'Aanvraag detail', 'Click', 'Verwijder bestand'],
   '#statuses_component .status-list__notification-content > p.utrecht-paragraph.status-list__upload.status-list__upload--enabled > a':
     ['event', 'Aanvraag detail', 'Scroll click', 'Scroll omlaag'],
   '#cases-detail-content .column.column--start-4.column--span-6 > section.case-detail__documents > .file-list > ul > li > aside > div > div > *':
@@ -337,9 +338,17 @@ const specificClickSelectors = {
  * Enabling to overwrite the Category only and leave Label and/or Action alone, and vice versa.
  */
 const partialClickSelectors = {
+  'body > header > div > nav.primary-navigation.primary-navigation--desktop.primary-navigation__main > ul > li > button':
+    {
+      category: 'Dropdown',
+    },
+  'body > header > div > nav.primary-navigation.primary-navigation--desktop.primary-navigation__main > ul > li > button *':
+    {
+      category: 'Dropdown',
+    },
   '.header .primary-navigation.primary-navigation--open.primary-navigation__main > .primary-navigation__list > li > ul > li > a > .link__text':
     {
-      category: 'Desktop onderwerpen dropdown',
+      category: 'Dropdown',
     },
   '#modal .modal__actions *': {
     category: 'Modal pop-up',
