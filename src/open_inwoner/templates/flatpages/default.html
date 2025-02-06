@@ -1,6 +1,8 @@
 {% extends 'master.html' %}
 {% load render_tags %}
 
+{% block title %}{{ flatpage.title }}{% endblock %}
+
 {% block content %}
   <h1 class="utrecht-heading-1">{{ flatpage.title }}</h1>
   <p class="utrecht-paragraph">{{ flatpage.content|ckeditor_content|safe }}</p>
