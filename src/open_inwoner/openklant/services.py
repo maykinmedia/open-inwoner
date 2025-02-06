@@ -1326,7 +1326,6 @@ class OpenKlant2Service(LogMixin, KlantenService):
         answers_for_klantcontact_uuid = {}
         question_uuids = []
         klantcontact_uuid_to_klantcontact_object = {}
-
         for klantcontact in self.klantcontacten_for_partij(
             partij_uuid, kanaal=self.config.mijn_vragen_kanaal
         ):

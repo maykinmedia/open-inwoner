@@ -31,7 +31,7 @@ urlpatterns = [
         name="contactmoment_detail",
     ),
     path(
-        "contactmoment/<str:uuid>/",
+        "contactmoment/<str:api_service>/<str:uuid>/",
         KlantContactMomentRedirectView.as_view(),
         name="kcm_redirect",
     ),
