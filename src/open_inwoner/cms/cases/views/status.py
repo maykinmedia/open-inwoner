@@ -26,6 +26,7 @@ from django.views.generic import FormView, TemplateView
 
 from django_htmx.http import HttpResponseClientRedirect
 from mail_editor.helpers import find_template
+from requests import RequestException
 from view_breadcrumbs import BaseBreadcrumbMixin
 from zgw_consumers.api_models.constants import RolOmschrijving
 
@@ -194,22 +195,26 @@ class InnerCaseDetailView(
             self.store_resulttype_mapping(self.case.zaaktype.identificatie)
 
             questions = []
-            if ok2_service := self.get_service(
-                service_type=KlantenServiceType.OPENKLANT2
-            ):
-                questions.extend(
-                    ok2_service.list_questions_for_zaak(
-                        self.case, user=self.request.user
-                    )
-                )
-            if esuite_service := self.get_service(
-                service_type=KlantenServiceType.ESUITE
-            ):
-                questions.extend(
-                    esuite_service.list_questions_for_zaak(
-                        self.case, user=self.request.user
-                    )
-                )
+            for service_type in KlantenServiceType:
+                if service := self.get_service(service_type=service_type):
+                    try:
+                        service_questions = service.list_questions_for_zaak(
+                            self.case, user=self.request.user
+                        )
+                        questions.extend(service_questions)
+                    except RequestException:
+                        # TODO: This can happen. Ideally, we would present the user with
+                        # warning noting that not all questions might be visible.
+                        logger.warning(
+                            "Connection error for service %s",
+                            service_type,
+                            exc_info=True,
+                        )
+                    except BaseException:
+                        logger.exception(
+                            "Unable to fetch questions for service %s", service_type
+                        )
+
             questions.sort(key=lambda q: q["registered_date"], reverse=True)
 
             statustypen = []
