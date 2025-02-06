@@ -11,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import TemplateView
 
+from requests import RequestException
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.models import User
@@ -146,20 +147,27 @@ class KlantContactMomentListView(
         ctx = super().get_context_data(**kwargs)
 
         questions = []
-        if ok2_service := self.get_service(service_type=KlantenServiceType.OPENKLANT2):
-            questions.extend(
-                ok2_service.list_questions(
-                    self.get_fetch_params(ok2_service),
-                    user=self.request.user,
-                )
-            )
-        if esuite_service := self.get_service(service_type=KlantenServiceType.ESUITE):
-            questions.extend(
-                esuite_service.list_questions(
-                    fetch_params=self.get_fetch_params(esuite_service),
-                    user=self.request.user,
-                )
-            )
+        for service_type in KlantenServiceType:
+            if service := self.get_service(service_type=service_type):
+                try:
+                    service_questions = service.list_questions(
+                        self.get_fetch_params(service),
+                        user=self.request.user,
+                    )
+                    questions.extend(service_questions)
+                except RequestException:
+                    # TODO: This can happen. Ideally, we would present the user with
+                    # warning noting that not all questions might be visible.
+                    logger.warning(
+                        "Connection error for service %s",
+                        service_type,
+                        exc_info=True,
+                    )
+                except BaseException:
+                    logger.exception(
+                        "Unable to fetch questions for service %s", service_type
+                    )
+
         questions.sort(key=lambda q: q["registered_date"], reverse=True)
         ctx["questions"] = questions
 
