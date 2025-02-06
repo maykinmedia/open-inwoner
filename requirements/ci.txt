@@ -438,7 +438,7 @@ django-sessionprofile==1.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-digid-eherkenning
-django-setup-configuration==0.5.0
+django-setup-configuration==0.7.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -539,8 +539,11 @@ dnspython==2.6.1
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   email-validator
-docutils==0.20.1
+docutils==0.21.2
     # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   django-setup-configuration
     #   recommonmark
     #   sphinx
     #   sphinx-rtd-theme
@@ -750,7 +753,7 @@ mozilla-django-oidc==4.0.1
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   mozilla-django-oidc-db
-mozilla-django-oidc-db[setup-configuration]==0.21.1
+mozilla-django-oidc-db[setup-configuration]==0.22.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -991,6 +994,16 @@ requests==2.31.0
     #   zgw-consumers
 requests-mock==1.12.1
     # via -r requirements/test-tools.in
+ruamel-yaml==0.18.10
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   django-setup-configuration
+ruamel-yaml-clib==0.2.12
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   ruamel-yaml
 sentry-sdk[django]==2.19.2
     # via
     #   -c requirements/base.txt
@@ -1022,7 +1035,7 @@ soupsieve==2.5
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   beautifulsoup4
-sphinx==7.3.7
+sphinx==7.4.7
     # via
     #   -r requirements/docs.in
     #   recommonmark
@@ -1031,7 +1044,7 @@ sphinx==7.3.7
     #   sphinxcontrib-jquery
 sphinx-markdown-tables==0.0.16
     # via -r requirements/docs.in
-sphinx-rtd-theme==2.0.0
+sphinx-rtd-theme==3.0.2
     # via -r requirements/docs.in
 sphinx-tabs==3.4.5
     # via -r requirements/docs.in

@@ -208,28 +208,6 @@ jobs:
           pytest check_sphinx.py -v --tb=auto
         working-directory: docs
 
-  setup-config-docs:
-    name: Check that documentation for configuration steps is up-to-date
-    runs-on: ubuntu-latest
-
-    # Disabled while we complete the upgrade to the latest setup-configuration
-    if: false
-
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: 'true'
-      - name: Set up backend environment
-        uses: maykinmedia/setup-django-backend@v1
-        with:
-          apt-packages: 'libxml2-dev libxmlsec1-dev libxmlsec1-openssl gettext libgdal-dev gdal-bin graphviz'
-          python-version: '3.11'
-          setup-node: 'no'
-
-      - name: Build docs for django-setup-configuration steps
-        run: |
-          python src/manage.py generate_config_docs --dry-run
-
   #
   # Docker
   #

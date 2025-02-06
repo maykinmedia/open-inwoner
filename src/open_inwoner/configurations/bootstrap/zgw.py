@@ -47,7 +47,7 @@ class OpenZaakConfigurationModel(ConfigurationModel):
 
 class OpenZaakConfigurationStep(BaseConfigurationStep):
     """
-    Configure the ZGW settings and set any feature flags or other options if specified
+    General settings related to interacting with one or more ZGW backends.
     """
 
     verbose_name = "Openzaak configuration"
