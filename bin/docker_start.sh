@@ -41,8 +41,7 @@ export UWSGI_SINGLE_INTERPRETER=1
 export UWSGI_ENABLE_THREADS=1
 
 # --- HTTP Settings
-# Use http rather than wsgi protocol (also note that UWSGI_PORT is not a native uwsgi option).
-export UWSGI_HTTP=${UWSGI_PORT:-8000}
+export UWSGI_HTTP=0.0.0.0:${PORT:-8000}
 export UWSGI_HTTP_KEEPALIVE=${UWSGI_HTTP_KEEPALIVE:-1}
 export UWSGI_HTTP_TIMEOUT=${UWSGI_HTTP_TIMEOUT:-120}
 
