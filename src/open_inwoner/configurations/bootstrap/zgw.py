@@ -7,16 +7,22 @@ from open_inwoner.configurations.bootstrap.utils import get_service
 from open_inwoner.openzaak.models import OpenZaakConfig, ZGWApiGroupConfig
 
 
-class ZGWAPIGroup(ConfigurationModel):
+class ZGWAPIGroupConfigModel(ConfigurationModel):
     zaken_api_identifier: str
     documenten_api_identifier: str
     catalogi_api_identifier: str
     form_api_identifier: str | None = None
-    fetch_eherkenning_zaken_with_rsin: bool = False
+
+    class Meta:
+        django_model_refs = {
+            ZGWApiGroupConfig: [
+                "fetch_eherkenning_zaken_with_rsin",
+            ]
+        }
 
 
 class OpenZaakConfigurationModel(ConfigurationModel):
-    api_groups: list[ZGWAPIGroup]
+    api_groups: list[ZGWAPIGroupConfigModel]
     allowed_file_extensions: list[str] = DjangoModelRef(
         OpenZaakConfig, "allowed_file_extensions"
     )
@@ -87,7 +93,10 @@ class OpenZaakConfigurationStep(BaseConfigurationStep):
                 ztc_service=ztc_service,
                 drc_service=drc_service,
                 form_service=form_service,
-                defaults={"name": "Auto-configured by django-setup-configuration"},
+                defaults={
+                    "name": "Auto-configured by django-setup-configuration",
+                    "fetch_eherkenning_zaken_with_rsin": api_group.fetch_eherkenning_zaken_with_rsin,
+                },
             )
 
         general_settings = model.model_dump(exclude={"api_groups"})
