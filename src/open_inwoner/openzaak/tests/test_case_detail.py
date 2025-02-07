@@ -54,6 +54,7 @@ from open_inwoner.utils.test import (
     uuid_from_url,
 )
 from openklant2.types.resources.klant_contact import KlantContactValidator
+from openklant2.types.resources.onderwerp_object import OnderwerpObjectValidator
 from openklant2.types.resources.partij import PartijValidator
 
 from ...utils.tests.helpers import AssertRedirectsMixin
@@ -111,12 +112,14 @@ class TestCaseDetailView(
             zrc_service__api_root=ZAKEN_ROOT,
             drc_service__api_root=DOCUMENTEN_ROOT,
             form_service=None,
+            klant_backend=KlantenServiceType.ESUITE.value,
         )
         self.api_group_alt = ZGWApiGroupConfigFactory(
             ztc_service__api_root=ANOTHER_CATALOGI_ROOT,
             zrc_service__api_root=ANOTHER_ZAKEN_ROOT,
             drc_service__api_root=ANOTHER_DOCUMENTEN_ROOT,
             form_service=None,
+            klant_backend=KlantenServiceType.OPENKLANT2.value,
         )
 
         # openzaak config
@@ -2719,6 +2722,20 @@ class TestCaseDetailView(
         }
         KlantContactValidator.validate_python(klantcontact)
 
+        onderwerp_object = {
+            "uuid": "81b7d113-e46c-4919-90ff-ecb69c637a13",
+            "url": "http://klantinteracties.nl/api/onderwerpen/81b7d113-e46c-4919-90ff-ecb69c637a13",
+            "klantcontact": klantcontact,
+            "wasKlantcontact": None,
+            "onderwerpobjectidentificator": {
+                "objectId": self.zaak["identificatie"],
+                "codeObjecttype": "string",
+                "codeRegister": "string",
+                "codeSoortObjectId": "identificatie",
+            },
+        }
+        OnderwerpObjectValidator.validate_python(onderwerp_object)
+
         m.get(
             "https://klanten.nl/api/v1/partijen?partijIdentificator__codeSoortObjectId=bsn&partijIdentificator__codeRegister=brp&partijIdentificator__codeObjecttype=natuurlijk_persoon&partijIdentificator__objectId=900222086&soortPartij=persoon",
             headers={"Content-Type": "application/json"},
@@ -2752,6 +2769,16 @@ class TestCaseDetailView(
                 "next": None,
                 "previous": None,
                 "results": [klantcontact],
+            },
+        )
+        m.get(
+            "https://klanten.nl/api/v1/onderwerpobjecten",
+            headers={"Content-Type": "application/json"},
+            json={
+                "count": 1,
+                "next": None,
+                "previous": None,
+                "results": [onderwerp_object],
             },
         )
 

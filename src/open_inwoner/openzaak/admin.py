@@ -54,7 +54,12 @@ class ZGWApiGroupConfig(admin.StackedInline):
         ),
         (
             _("Backend-specific flags"),
-            {"fields": ["fetch_eherkenning_zaken_with_rsin"]},
+            {
+                "fields": [
+                    "fetch_eherkenning_zaken_with_rsin",
+                    "klant_backend",
+                ]
+            },
         ),
     )
 

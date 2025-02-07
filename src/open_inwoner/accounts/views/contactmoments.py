@@ -201,8 +201,11 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
         elif KlantenServiceType.OPENKLANT2.value in self.request.path:
             service = self.get_service(service_type=KlantenServiceType.OPENKLANT2)
 
+        origin = self.request.headers.get("Referer")
         question, zaak = service.retrieve_question(
-            self.get_fetch_params(service), kwargs["kcm_uuid"], user=self.request.user
+            self.get_fetch_params(service),
+            question_uuid=kwargs["kcm_uuid"],
+            user=self.request.user,
         )
         if not question:
             raise Http404()
@@ -247,7 +250,6 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
                 "value": question["channel"].capitalize(),
             },
         ]
-        origin = self.request.headers.get("Referer")
         if origin and reverse("cases:contactmoment_list") in origin:
             ctx["origin"] = {
                 "label": _("Terug naar overzicht"),
