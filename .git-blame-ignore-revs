@@ -4,3 +4,9 @@
 
 # Apply ruff fixes for E + F
 39b04db835afdc2086ff433b0a2694ccd254dd74
+
+# Apply fixes for ruff SIM
+ea0326c3d0a373a4701d64e6355b6ec60181ccdd
+
+# Apply potentially unsafe fixes for ruff SIM
+0d9012fb9160e0e9237bf5ac1aecca4b35ffa867

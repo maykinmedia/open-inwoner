@@ -69,13 +69,13 @@ class _UserChangeForm(UserChangeForm):
 class _UserCreationForm(UserCreationForm):
     def clean(self, *args, **kwargs):
         cleaned_data = super().clean(*args, **kwargs)
-        if (
-            (email := cleaned_data.get("email"))
+
+        if cleaned_data.get("email"):
             # we use both queries in order to avoid the duplicate validation errors
-            and User.objects.filter(email__iexact=email)
-            and not User.objects.filter(email=email)
-        ):
-            raise ValidationError(_("The user with this email already exists."))
+            if User.objects.filter(
+                email__iexact=cleaned_data["email"]
+            ) and not User.objects.filter(email=cleaned_data["email"]):
+                raise ValidationError(_("The user with this email already exists."))
 
 
 @admin.register(User)
