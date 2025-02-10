@@ -23,7 +23,6 @@ python src/manage.py migrate
 # --- Basic Application Configuration
 export UWSGI_MODULE="open_inwoner.wsgi"
 export UWSGI_CHDIR="src"
-export UWSGI_STATIC_MAP="/static=/app/static /media=/app/media"
 
 # --- Process Management
 # Allow for better worker coordination and graceful shutdowns for unresponsive workers
@@ -60,4 +59,8 @@ export UWSGI_BUFFER_SIZE=${UWSGI_BUFFER_SIZE:-65535}
 
 # Start Server
 >&2 echo "Starting server"
-exec uwsgi --show-config --strict
+exec uwsgi \
+    --show-config \
+    --strict \
+    --static-map /static=/app/static \
+    --static-map /media=/app/media
