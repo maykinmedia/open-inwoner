@@ -109,7 +109,7 @@ class ContactForm(forms.Form):
             captcha_answer = cleaned_data.get("captcha")
             if (
                 captcha_answer
-                and not captcha_answer == self.request_session["captcha_answer"]
+                and captcha_answer != self.request_session["captcha_answer"]
             ):
                 self.add_error("captcha", _("Fout antwoord, probeer het opnieuw."))
 
