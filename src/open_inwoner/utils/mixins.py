@@ -75,12 +75,11 @@ class ThrottleMixin:
         return self.request.method.lower() in self.throttle_methods
 
     def dispatch(self, request, *args, **kwargs):
-        if self.throttle_403:
-            if (
-                self.should_be_throttled()
-                and self.get_visits_in_window() > self.throttle_visits
-            ):
-                raise PermissionDenied
+        if self.throttle_403 and (
+            self.should_be_throttled()
+            and self.get_visits_in_window() > self.throttle_visits
+        ):
+            raise PermissionDenied
 
         return super().dispatch(request, *args, **kwargs)
 

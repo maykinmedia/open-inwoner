@@ -1,4 +1,5 @@
 import abc
+import contextlib
 
 from django.conf import settings
 from django.shortcuts import redirect, resolve_url
@@ -44,11 +45,11 @@ def get_app_pass_prefixes() -> tuple[str, ...]:
 def resolve_urls(urls) -> tuple[str, ...]:
     ret = list()
     for url in urls:
-        try:
+        with contextlib.suppress(
+            NoReverseMatch
+        ):  # support testing without cms app mounted
             ret.append(resolve_url(url))
-        except NoReverseMatch:
-            # support testing without cms app mounted
-            pass
+
     return tuple(ret)
 
 

@@ -1,3 +1,5 @@
+import contextlib
+
 from django import forms
 from django.contrib import admin
 from django.forms import BaseModelFormSet
@@ -100,13 +102,12 @@ class CategoryAdminFormSet(BaseModelFormSet):
         for row in self.cleaned_data:
             current_node = row["id"]
             children = current_node.get_children()
-            if children:
-                if not row["published"] and children.published().exists():
-                    raise forms.ValidationError(
-                        _(
-                            "Parent nodes cannot be unpublished if they have published children."
-                        )
+            if children and (not row["published"] and children.published().exists()):
+                raise forms.ValidationError(
+                    _(
+                        "Parent nodes cannot be unpublished if they have published children."
                     )
+                )
             if (
                 row["published"]
                 and not current_node.is_root()
@@ -206,10 +207,8 @@ class CategoryAdmin(OrderedInlineModelAdminMixin, ImportExportMixin, TreeAdmin):
 
         # disable product management if we have restrictions
         if request.user.has_group_managed_categories():
-            try:
+            with contextlib.suppress(ValueError):
                 inlines.remove(CategoryProductInline)
-            except ValueError:
-                pass
 
         return inlines
 

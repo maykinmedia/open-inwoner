@@ -182,10 +182,14 @@ class ZGWConfigExport:
             self.zaak_resultaat_type_configs,
         )
 
-    def __eq__(self, other: QuerySet) -> bool:
-        for a, b in zip(self, other):
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, ZGWConfigExport):
+            raise ValueError("You can only compare `ZGWConfigExport` objects")
+
+        for a, b in zip(self, other):  # noqa: SIM110
             if a.difference(b).exists():
                 return False
+
         return True
 
     def as_dicts_iter(self) -> Generator[dict, Any, None]:

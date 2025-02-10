@@ -51,12 +51,10 @@ class CategoryImportResource(ImportResource):
         self, instance, import_validation_errors=None, validate_unique=True
     ):
         last_root = Category.get_last_root_node()
-        if last_root:
-            # Add the new root node as the last one
-            newpath = last_root._inc_path()
-        else:
-            # Add the first root node
-            newpath = Category._get_path(None, 1, 1)
+        # Add the new root node as the last one if present, otherwise add the first root
+        # node
+        newpath = last_root._inc_path() if last_root else Category._get_path(None, 1, 1)
+
         instance.depth = 1
         instance.path = newpath
         return super().validate_instance(

@@ -36,10 +36,7 @@ class CategoryBreadcrumbMixin:
                         "category": get_object_or_404(Category, slug=sl),
                     }
                 )
-                if older_slugs:
-                    older_slugs = f"{older_slugs}/{sl}"
-                else:
-                    older_slugs = sl
+                older_slugs = f"{older_slugs}/{sl}" if older_slugs else sl
         return categories
 
     def get_categories_breadcrumbs(self, slug_name="slug"):
@@ -152,13 +149,9 @@ class CategoryDetailView(
 
         if self.request.user.is_authenticated:
             if self.request.user.bsn:
-                if obj.visible_for_citizens:
-                    return False
-                return True
+                return not obj.visible_for_citizens
             elif self.request.user.kvk:
-                if obj.visible_for_companies:
-                    return False
-                return True
+                return not obj.visible_for_companies
 
         if not obj.visible_for_anonymous:
             return True
@@ -346,10 +339,7 @@ class ProductFinderView(CommonPageMixin, FormView):
             for _order, answer in current_answers.items():
                 new_filter = Q(conditions=answer.get("condition"))
 
-                if filters:
-                    filters = filters | new_filter
-                else:
-                    filters = new_filter
+                filters = filters | new_filter if filters else new_filter
 
         if filters:
             return Product.objects.published().filter(filters).distinct()

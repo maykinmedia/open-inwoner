@@ -12,12 +12,12 @@ from .logentry import addition, change, deletion, system_action, user_action
 class CommonPageMixin:
     @property
     def page_title(self):
-        page_title = ""
+        page_title: str
         try:
             # hook into breadcrumbs
             page_title = self.crumbs[-1][0]
         except (AttributeError, IndexError):
-            pass
+            page_title = ""
 
         return page_title
 

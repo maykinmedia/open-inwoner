@@ -50,8 +50,8 @@ DIGID_XML_METADATA_PATH = (
     "src/open_inwoner/configurations/tests/bootstrap/files/digid-metadata.xml"
 )
 
-PUBLIC_CERT_FILE = tempfile.NamedTemporaryFile()
-PRIVATE_KEY_FILE = tempfile.NamedTemporaryFile()
+PUBLIC_CERT_FILE = tempfile.NamedTemporaryFile()  # noqa: SIM115
+PRIVATE_KEY_FILE = tempfile.NamedTemporaryFile()  # noqa: SIM115
 
 with open(PUBLIC_CERT_FILE.name, "w") as f:
     f.write("cert")

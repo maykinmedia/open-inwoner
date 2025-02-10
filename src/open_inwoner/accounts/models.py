@@ -456,15 +456,24 @@ class User(AbstractBaseUser, PermissionsMixin):
         config = SiteConfiguration.get_solo()
 
         enabled = []
-        if config.notifications_cases_enabled:
-            if self.login_type == LoginTypeChoices.digid and case_page_is_published():
-                enabled.append(_("cases"))
-        if config.notifications_messages_enabled:
-            if self.messages_notifications and inbox_page_is_published():
-                enabled.append(_("messages"))
-        if config.notifications_plans_enabled:
-            if self.plans_notifications and collaborate_page_is_published():
-                enabled.append(_("plans"))
+        if (
+            config.notifications_cases_enabled
+            and self.login_type == LoginTypeChoices.digid
+            and case_page_is_published()
+        ):
+            enabled.append(_("cases"))
+        if (
+            config.notifications_messages_enabled
+            and self.messages_notifications
+            and inbox_page_is_published()
+        ):
+            enabled.append(_("messages"))
+        if (
+            config.notifications_plans_enabled
+            and self.plans_notifications
+            and collaborate_page_is_published()
+        ):
+            enabled.append(_("plans"))
 
         if not enabled:
             return _("You do not have any notifications enabled.")

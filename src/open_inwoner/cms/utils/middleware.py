@@ -52,7 +52,7 @@ class DropToolbarMiddleware:
         return response
 
     def force_disable_toolbar(self, request):
-        if not request.user.is_staff or not request.user.is_verified():
-            return True
-        else:
-            return False
+        user_is_not_staff = not request.user.is_staff
+        user_is_not_verified = not request.user.is_verified()
+        return user_is_not_staff or user_is_not_verified
+                                                                                    

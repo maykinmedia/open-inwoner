@@ -112,9 +112,8 @@ def log_user_login(sender, user, request, *args, **kwargs):
     # update brp fields when login with digid and brp is configured
     brp_config = HaalCentraalConfig.get_solo()
 
-    if user.login_type == LoginTypeChoices.digid:
-        if brp_config.service:
-            update_brp_data_in_db(user)
+    if user.login_type == LoginTypeChoices.digid and brp_config.service:
+        update_brp_data_in_db(user)
 
 
 @receiver(user_logged_out)
