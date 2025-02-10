@@ -119,11 +119,11 @@ class QuestionnaireExportView(LogMixin, ExportMixin, TemplateView):
         content = [c.content for c in tree]
         root_title = tree.first().title
 
-        steps = []
-        for i in range(len(answers)):
-            steps.append(
-                {"question": questions[i], "answer": answers[i], "content": content[i]}
-            )
+        steps = [
+            {"question": questions[i], "answer": answer, "content": content[i]}
+            for i, answer in enumerate(answers)
+        ]
+
         last_step = tree.last()
 
         context["root_title"] = root_title

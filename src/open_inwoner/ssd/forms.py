@@ -61,11 +61,7 @@ def get_yearly_report_dates() -> list[tuple[date, str]]:
     if today < available_from:
         dates.pop(0)
 
-    choices = []
-    for report_date in dates:
-        choices.append((report_date.date(), str(report_date.year)))
-
-    return choices
+    return [(report_date.date(), str(report_date.year)) for report_date in dates]
 
 
 #
