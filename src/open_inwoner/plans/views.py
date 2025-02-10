@@ -118,9 +118,9 @@ class PlanListView(
         """
         Return all available contacts for filtering for all the plans.
         """
-        user_contacts_qs = []
-        for plan in plans:
-            user_contacts_qs.append(plan.get_other_users(user=self.request.user))
+        user_contacts_qs = (
+            plan.get_other_users(user=self.request.user) for plan in plans
+        )
 
         available_contacts = User.objects.none()
         for qs in user_contacts_qs:
