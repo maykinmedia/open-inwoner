@@ -1158,6 +1158,10 @@ ruamel-yaml-clib==0.2.12
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   ruamel-yaml
+ruff==0.9.6
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 sentry-sdk[django]==2.19.2
     # via
     #   -c requirements/ci.txt
