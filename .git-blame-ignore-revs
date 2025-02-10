@@ -1,3 +1,6 @@
 # format YAML files (remove whitespace)
 
 7ba06e990ff66aadb422e3dba3edbbbcb9bdf970
+
+# Apply ruff fixes for E + F
+39b04db835afdc2086ff433b0a2694ccd254dd74
