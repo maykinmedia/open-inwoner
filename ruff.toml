@@ -44,6 +44,8 @@ select = [
     "F",
     # https://docs.astral.sh/ruff/rules/#flake8-simplify-sim
     "SIM",
+    # https://docs.astral.sh/ruff/rules/#perflint-perf
+    "PERF",
 ]
 ignore = [
     # Whitespace before ':' (conflicts with Black)
