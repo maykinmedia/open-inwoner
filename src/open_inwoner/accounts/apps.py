@@ -65,10 +65,8 @@ class AccountsConfig(AppConfig):
     _has_run = False
 
     def ready(self):
-        from .signals import (  # noqa:register the signals
-            log_user_login,
-            log_user_logout,
-        )
+        # Register the signals upon app init
+        from .signals import log_user_login, log_user_logout  # noqa:F401
 
         if self._has_run:
             return
