@@ -28,7 +28,7 @@ class SearchView(
 ):
     form_class = SearchForm
     template_name = "pages/search.html"
-    paginate_by = 20
+    paginate_by = 9
     paginator_class = Paginator
     page_kwarg = "page"
     success_url = reverse_lazy("search:search")
@@ -114,7 +114,7 @@ class SearchView(
         # update form fields with choices
         for facet in results.facets:
             if facet.name in form.fields:
-                form.fields[facet.name].choices = facet.total_choices()
+                form.fields[facet.name].choices = facet.choices()
 
         # paginate
         paginator_dict = self.paginate_with_context(results.results)

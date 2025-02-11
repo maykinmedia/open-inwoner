@@ -4,17 +4,18 @@
 {% block main_inner %}
     {#  search term section #}
     <div class="grid">
-        <div class="grid__sidebar">&nbsp;</div>
         <div class="grid__main">
-            <h1 class="utrecht-heading-1">{% trans "Zoeken naar " %} "{% firstof search_form.query.value "" %}"</h1>
+            <h1 class="utrecht-heading-1">{% trans "Zoekresultaten voor " %} "{% firstof search_form.query.value "" %}"</h1>
+            <p class="search-results__title-small">{{ paginator.count }} {% trans "resultaten" %} </p>
         </div>
     </div>
 
     {#  facets and results section #}
     <div class="grid">
-        <aside class="grid__sidebar grid__filters" aria-label="{% trans "Zoekfilters" %}">
+    {% if paginator.count %}
         {% if search_filter_categories or search_filter_tags or search_filter_organizations %}
-            <h2 class="utrecht-heading-2">{% trans "Zoekfilters" %}</h2>
+            <aside class="grid__sidebar grid__filters" aria-label="{% trans "Zoekfilters" %}">
+                <h2 class="utrecht-heading-2">{% trans "Zoekfilters" %}</h2>
                 {% if search_filter_categories %}
                     {% include "components/Filter/Filter.html" with field=search_form.categories form_id="search-form" only %}
                 {% endif %}
@@ -24,41 +25,29 @@
                 {% if search_filter_organizations %}
                     {% include "components/Filter/Filter.html" with field=search_form.organizations form_id="search-form" only %}
                 {% endif %}
-        {%  endif %}
+            </aside>
+        {% endif %}
         {#  end search filters #}
-        </aside>
+    {% endif %}
 
         <div class="grid__main grid__main--search">
             {% if paginator.count %}
                 <div class="search-results">
-                    <h2 class="utrecht-heading-2 search-results__title">
-                        {% trans "Zoekresultaten" %}
-                        <span class="search-results__title-small">{{ paginator.count }} zoekresultaten</span>
-                    </h2>
                     <div class="search-results__list">
-
                         <div class="card__grid">
                             {% render_grid %}
-
                                 {% for hit in page_obj %}
                                     {% render_column start=0 span=12 %}
-
                                         <a href="{% url 'products:product_detail' hit.slug %}" class="card card__description-card search-results__item">
                                             <div class="card__body">
-                                                <div class="tag-lists">
-                                                    {% include "components/Tag/Tag.html" with tags=hit.categories only %}
-                                                    {% include "components/Tag/Tag.html" with tags=hit.tags only %}
-                                                    {% include "components/Tag/Tag.html" with tags=hit.organizations only %}
-                                                </div>
                                                 <h3 class="utrecht-heading-3 search-results__item-title">{{ hit.name }}</h3>
                                                 <p class="utrecht-paragraph search-results__item-intro">{{ hit.summary }}</p>
                                                 <span class="link link--icon link--primary">
-                                                <span class="link__text">Bekijk {{ hit.name }}</span>
+                                                <span class="link__text">Bekijk resultaat</span>
                                                 {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
                                             </span>
                                             </div>
                                         </a>
-
                                     {% endrender_column %}
                                 {% endfor %}
                             {% endrender_grid %}
@@ -99,22 +88,26 @@
                 {% endif %}
 
             {% else %}
-                <div class="search-results search-results--none">
-                    <h2 class="utrecht-heading-2 search-results__title">
-                        {% trans "Geen zoekresultaten" %}
-                    </h2>
-                    <p class="utrecht-paragraph">{% trans "Helaas, wij vonden geen resultaten voor jouw zoekopdracht." %}</p>
-                </div>
-                <ul class="ul">
-                   <li class="li">{% trans "Controleer de spelling van je zoekopdracht." %}</li>
-                   <li class="li">{% trans "Probeer een andere zoekopdracht." %}</li>
-                   <li class="li">{% trans "Vragen? Neem contact met ons op." %}</li>
-                </ul>
 
-                <div class="search-results search-suggestions">
-                    <h2 class="utrecht-heading-2">{% trans "Misschien bedoelt u:" %}</h2>
-                    <a class="link link--secondary" href="#">alt</a> <a class="link link--secondary" href="#">placeholder</a> <a class="link link--secondary" href="#">suggesties</a>
-                </div>
+                {% render_grid %}
+                    {% render_column start=0 span=10 %}
+                        <div class="search-results search-results--none">
+                            <div class="search-results--none-column">{% icon icon="info" icon_position="before" extra_classes="icon--info" outlined=True %}</div>
+                            <div class="search-results--none-column">
+                                <h2 class="utrecht-heading-2 search-results__title">
+                                    {% trans "We konden geen zoekresultaten vinden" %}
+                                </h2>
+                                <p class="utrecht-paragraph">{% trans "Probeer het nog eens met deze tips:" %}</p>
+
+                                <ul class="ul">
+                                    <li class="li">{% trans "Zorg ervoor dat alle woorden goed gespeld zijn." %}</li>
+                                    <li class="li">{% trans "Probeer andere zoektermen." %}</li>
+                                    <li class="li">{% trans "Maak de zoektermen algemener." %}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    {% endrender_column %}
+                {% endrender_grid %}
             {% endif %}
         </div>
     </div>
