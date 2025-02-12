@@ -52,6 +52,9 @@ select = [
     "B006",
     "B010",
     "B904",
+    # https://docs.astral.sh/ruff/rules/#pep8-naming-n
+    "N",
+>>>>>>> 1fccb49c (Enable ruff pep8-naming rule)
 ]
 ignore = [
     # Whitespace before ':' (conflicts with Black)
@@ -71,9 +74,14 @@ ignore = [
     # Use a single `with` statement with multiple contexts instead of nested `with` statements
     "SIM117",
     # Checks for nested if statements that can be collapsed into a single if statement.
-    "SIM102"
+    "SIM102",
+    # Variables in function scope should be lower-case
+    "N806",
+    # Cariables in class scope should not be mixed-case
+    "N815",
+    # Exception name should be named with Error suffix
+    "N818",
 ]
-
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]
@@ -81,3 +89,13 @@ unfixable = []
 
 # Allow unused variables when underscore-prefixed.
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+# Ad hoc exceptions
+[lint.pep8-naming]
+ignore-names = [
+    # N801
+    "eHerkenning*", "eSuite*", "BRP_[0-9]_[0-9]",
+    # N802
+    "*setUp*", "tearDown*", "*assert*",
+    "*TimelineLog*", "innNnpId",
+]
