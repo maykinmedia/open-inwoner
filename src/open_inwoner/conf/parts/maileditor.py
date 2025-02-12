@@ -304,6 +304,11 @@ MAIL_EDITOR_CONF = {
                 "example": _("Casetype placeholder"),
             },
             {
+                "name": "case_description",
+                "description": _("The description of the particular case"),
+                "example": _("Aanvraag koffie"),
+            },
+            {
                 "name": "status_description",
                 "description": _("The description of the status of the case"),
                 "example": _("status placeholder"),
@@ -368,6 +373,11 @@ MAIL_EDITOR_CONF = {
                 "name": "type_description",
                 "description": _("The description of the type of the case"),
                 "example": _("Casetype placeholder"),
+            },
+            {
+                "name": "case_description",
+                "description": _("The description of the particular case"),
+                "example": _("Aanvraag koffie"),
             },
             {
                 "name": "start_date",
