@@ -148,7 +148,7 @@ jobs:
       - name: Install dependencies
         run: grep ^ruff requirements/ci.txt | pip install -r /dev/stdin
       - name: Run ruff on all files
-        run: ruff check -e --output-format=github src
+        run: ruff check --output-format=github src
 
   bandit:
     name: Python security check using Bandit
