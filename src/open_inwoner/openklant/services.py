@@ -1106,17 +1106,17 @@ class OpenKlant2Service(LogMixin, KlantenService):
     def get_or_create_digitaal_adres(
         self,
         partij_uuid: str,
-        soortAdres: Literal["email", "telefoonnummer"],
+        soort_adres: Literal["email", "telefoonnummer"],
         adres: str,
-        isStandaardAdres: bool = False,
+        is_standaard_adres: bool = False,
     ) -> tuple[DigitaalAdres, bool]:
         digitale_adressen = self.filter_digitale_addressen_for_partij(
-            partij_uuid, soortDigitaalAdres=soortAdres
+            partij_uuid, soortDigitaalAdres=soort_adres
         )
         for digitaal_adres in digitale_adressen:
             if (
                 digitaal_adres["adres"] == adres
-                and digitaal_adres["isStandaardAdres"] == isStandaardAdres
+                and digitaal_adres["isStandaardAdres"] == is_standaard_adres
             ):
                 return digitaal_adres, False
 
@@ -1124,8 +1124,8 @@ class OpenKlant2Service(LogMixin, KlantenService):
             self.client.digitaal_adres.create(
                 data={
                     "adres": adres,
-                    "soortDigitaalAdres": soortAdres,
-                    "isStandaardAdres": isStandaardAdres,
+                    "soortDigitaalAdres": soort_adres,
+                    "isStandaardAdres": is_standaard_adres,
                     "verstrektDoorPartij": {
                         "uuid": partij_uuid,
                     },
@@ -1181,9 +1181,9 @@ class OpenKlant2Service(LogMixin, KlantenService):
 
         _, created = self.get_or_create_digitaal_adres(
             partij_uuid=partij_uuid,
-            soortAdres="telefoonnummer",
+            soort_adres="telefoonnummer",
             adres=user.phonenumber,
-            isStandaardAdres=True,
+            is_standaard_adres=True,
         )
         if created:
             updated_fields.append("digitaleAddresen.telefoonnummer")
@@ -1194,9 +1194,9 @@ class OpenKlant2Service(LogMixin, KlantenService):
         ):
             _, created = self.get_or_create_digitaal_adres(
                 partij_uuid=partij_uuid,
-                soortAdres=soort_adres,
+                soort_adres=soort_adres,
                 adres=getattr(user, attr),
-                isStandaardAdres=False,
+                is_standaard_adres=False,
             )
             if created:
                 updated_fields.append(f"digitaleAddresen.{soort_adres}")

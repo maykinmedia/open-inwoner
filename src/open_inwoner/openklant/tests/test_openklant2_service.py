@@ -257,20 +257,20 @@ class Openklant2ServiceTest(Openklant2ServiceTestCase):
             self.persoon["uuid"],
             "telefoonnummer",
             "0644938475",
-            isStandaardAdres=True,
+            is_standaard_adres=True,
         )
         # bogus address for testing edge case with multiple non-standard numbers
         self.service.get_or_create_digitaal_adres(
             self.persoon["uuid"],
             "telefoonnummer",
             "0612345678",
-            isStandaardAdres=False,
+            is_standaard_adres=False,
         )
         self.service.get_or_create_digitaal_adres(
             self.persoon["uuid"],
             "telefoonnummer",
             "0687654321",
-            isStandaardAdres=False,
+            is_standaard_adres=False,
         )
         self.service.get_or_create_digitaal_adres(
             self.persoon["uuid"],
