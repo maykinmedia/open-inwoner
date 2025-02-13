@@ -111,6 +111,7 @@ class CustomRegistrationForm(RegistrationForm):
             "infix",
             "last_name",
             "phonenumber",
+            "phonenumber_alternative",
             "password1",
             "password2",
             "invite",
@@ -123,8 +124,22 @@ class CustomRegistrationForm(RegistrationForm):
         config = SiteConfiguration.get_solo()
         if not config.login_2fa_sms:
             del self.fields["phonenumber"]
+            del self.fields["phonenumber_alternative"]
         else:
             self.fields["phonenumber"].required = True
+
+    def clean_phonenumber_alternative(self):
+        phonenumber = self.cleaned_data.get("phonenumber")
+        phonenumber_alt = self.cleaned_data.get("phonenumber_alternative")
+
+        if phonenumber_alt and not phonenumber:
+            raise ValidationError(
+                _(
+                    "A primary phone number is required for setting an alternative phone number"
+                )
+            )
+
+        return phonenumber_alt
 
 
 class BaseUserForm(forms.ModelForm):
@@ -134,6 +149,7 @@ class BaseUserForm(forms.ModelForm):
             "first_name",
             "email",
             "phonenumber",
+            "phonenumber_alternative",
             "image",
             "cropping",
         )
@@ -159,6 +175,7 @@ class UserForm(ErrorMessageMixin, BaseUserForm):
             "last_name",
             "email",
             "phonenumber",
+            "phonenumber_alternative",
             "street",
             "housenumber",
             "postcode",
@@ -166,6 +183,19 @@ class UserForm(ErrorMessageMixin, BaseUserForm):
             "image",
             "cropping",
         )
+
+    def clean_phonenumber_alternative(self):
+        phonenumber = self.cleaned_data.get("phonenumber")
+        phonenumber_alt = self.cleaned_data.get("phonenumber_alternative")
+
+        if phonenumber_alt and not phonenumber:
+            raise ValidationError(
+                _(
+                    "A primary phone number is required for setting an alternative phone number"
+                )
+            )
+
+        return phonenumber_alt
 
 
 class BrpUserForm(BaseUserForm):

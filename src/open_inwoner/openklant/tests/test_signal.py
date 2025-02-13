@@ -51,6 +51,7 @@ class UpdateUserFromLoginSignalAPITestCase(
             url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             emailadres="new@example.com",
             telefoonnummer="0612345678",
+            telefoonnummerAlternatief="0687654321",
             toestemmingZaakNotificatiesAlleenDigitaal=False,
         )
 

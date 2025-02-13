@@ -280,15 +280,21 @@ class eSuiteKlantenService(KlantenService):
     def update_user_from_klant(self, klant: Klant, user: User):
         update_data = {}
 
-        if klant.telefoonnummer and klant.telefoonnummer != user.phonenumber:
-            update_data["phonenumber"] = klant.telefoonnummer
-
         if (
             klant.emailadres
             and klant.emailadres != user.email
             and (not User.objects.filter(email__iexact=klant.emailadres).exists())
         ):
             update_data["email"] = klant.emailadres
+
+        if klant.telefoonnummer and klant.telefoonnummer != user.phonenumber:
+            update_data["phonenumber"] = klant.telefoonnummer
+
+        if (
+            klant.telefoonnummerAlternatief
+            and klant.telefoonnummerAlternatief != user.phonenumber_alternative
+        ):
+            update_data["phonenumber_alternative"] = klant.telefoonnummerAlternatief
 
         config = SiteConfiguration.get_solo()
         if config.enable_notification_channel_choice:
@@ -352,6 +358,7 @@ class eSuiteKlantenService(KlantenService):
             Sequence[
                 Literal[
                     "telefoonnummer",
+                    "telefoonnummerAlternatief",
                     "emailadres",
                     "toestemmingZaakNotificatiesAlleenDigitaal",
                 ]
@@ -361,6 +368,7 @@ class eSuiteKlantenService(KlantenService):
     ):
         valid_update_fields = {
             "telefoonnummer",
+            "telefoonnummerAlternatief",
             "emailadres",
             "toestemmingZaakNotificatiesAlleenDigitaal",
         }
@@ -373,6 +381,7 @@ class eSuiteKlantenService(KlantenService):
         update_data: KlantWritePayload = {
             "emailadres": user.email,
             "telefoonnummer": user.phonenumber,
+            "telefoonnummerAlternatief": user.phonenumber_alternative,
             "toestemmingZaakNotificatiesAlleenDigitaal": user.case_notification_channel
             == NotificationChannelChoice.digital_only,
         }

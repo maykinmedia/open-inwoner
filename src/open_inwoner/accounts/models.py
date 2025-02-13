@@ -165,6 +165,13 @@ class User(AbstractBaseUser, PermissionsMixin):
         max_length=15,
         validators=[DutchPhoneNumberValidator()],
     )
+    phonenumber_alternative = models.CharField(
+        verbose_name=_("Alternative phonenumber"),
+        blank=True,
+        default="",
+        max_length=15,
+        validators=[DutchPhoneNumberValidator()],
+    )
     image = ImageCropField(
         verbose_name=_("Image"),
         null=True,
@@ -324,31 +331,10 @@ class User(AbstractBaseUser, PermissionsMixin):
                 & ~Q(login_type=LoginTypeChoices.eherkenning),
                 name="unique_email_when_not_digid_or_eherkenning",
             ),
-            # UniqueConstraint(
-            #     fields=["bsn"],
-            #     condition=Q(login_type=LoginTypeChoices.digid)
-            #     # not quite sure if we want this (bsn shouldn't be null AND blank)
-            #     & ~(Q(bsn="") | Q(bsn__isnull=True)),
-            #     name="unique_bsn_when_digid",
-            # ),
-            # UniqueConstraint(
-            #     fields=["rsin"],
-            #     condition=Q(login_type=LoginTypeChoices.eherkenning)
-            #     # not quite sure if we want this (rsin shouldn't be null AND blank)
-            #     & ~(Q(rsin="") | Q(rsin__isnull=True)),
-            #     name="unique_rsin_when_eherkenning",
-            # ),
-            # UniqueConstraint(
-            #     fields=["oidc_id"],
-            #     condition=Q(login_type=LoginTypeChoices.oidc),
-            #     name="unique_bsn_when_digid",
-            # ),
-            # CheckConstraint(
-            #     # maybe this is not correct?
-            #     check=(Q(bsn="") | Q(bsn__isnull=True))
-            #     | ~Q(login_type=LoginTypeChoices.digid),
-            #     name="check_digid_bsn_required_when_digid",
-            # ),
+            models.CheckConstraint(
+                check=~Q(phonenumber__exact="") | Q(phonenumber_alternative__exact=""),
+                name="phonenumber_alt_requires_phonenumber_primary",
+            ),
         ]
 
     def __init__(self, *args, **kwargs):
