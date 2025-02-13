@@ -1,3 +1,5 @@
+import './filter-dropdown-mobile'
+import './filter-modal'
 import './filter-mobile'
 import './filter-options'
 

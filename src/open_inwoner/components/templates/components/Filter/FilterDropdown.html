@@ -1,0 +1,21 @@
+{% load i18n icon_tags button_tags form_tags %}
+
+<div class="filter-dropdown">
+    <div class="filter-dropdown__dropdown">
+        <button type="button" class="button" aria-haspopup="listbox" aria-expanded="false">
+            {{ field.label }} ({{ field.field.choices|length }})
+            {% icon icon="expand_more" icon_position="after" icon_outlined=True %}
+        </button>
+        <div class="filter-dropdown__content" role="listbox">
+            <div class="filter-dropdown__menu">
+                <ul class="filter-dropdown__list">
+                    {% for option in field.field.choices %}
+                        <li class="filter-dropdown__list-item">
+                            {% choice_checkbox choice=option name=field.name data=field.data index=forloop.counter form_id=form_id %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

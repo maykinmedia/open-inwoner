@@ -15,4 +15,8 @@
       overflow: auto;
     }
   }
+
+  .body--noscroll {
+    overflow: hidden;
+  }
 }
