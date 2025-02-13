@@ -32,7 +32,11 @@ from open_inwoner.openklant.constants import (
     KlantenServiceType,
     Status as ContactMomentStatus,
 )
-from open_inwoner.openklant.models import ESuiteKlantConfig
+from open_inwoner.openklant.models import (
+    ESuiteKlantConfig,
+    KlantenSysteemConfig,
+    OpenKlant2Config,
+)
 from open_inwoner.openklant.services import eSuiteVragenService
 from open_inwoner.openklant.tests.factories import make_question_from_contactmoment
 from open_inwoner.openklant.tests.mocks import MockOpenKlant2Service
@@ -49,6 +53,9 @@ from open_inwoner.utils.test import (
     set_kvk_branch_number_in_session,
     uuid_from_url,
 )
+from openklant2.types.resources.klant_contact import KlantContactValidator
+from openklant2.types.resources.onderwerp_object import OnderwerpObjectValidator
+from openklant2.types.resources.partij import PartijValidator
 
 from ...utils.tests.helpers import AssertRedirectsMixin
 from ..api_models import Status, StatusType
@@ -105,28 +112,38 @@ class TestCaseDetailView(
             zrc_service__api_root=ZAKEN_ROOT,
             drc_service__api_root=DOCUMENTEN_ROOT,
             form_service=None,
+            klant_backend=KlantenServiceType.ESUITE.value,
         )
         self.api_group_alt = ZGWApiGroupConfigFactory(
             ztc_service__api_root=ANOTHER_CATALOGI_ROOT,
             zrc_service__api_root=ANOTHER_ZAKEN_ROOT,
             drc_service__api_root=ANOTHER_DOCUMENTEN_ROOT,
             form_service=None,
+            klant_backend=KlantenServiceType.OPENKLANT2.value,
         )
 
         # openzaak config
-        self.config = OpenZaakConfig.get_solo()
-        self.config.document_max_confidentiality = (
+        self.zaak_config = OpenZaakConfig.get_solo()
+        self.zaak_config.document_max_confidentiality = (
             VertrouwelijkheidsAanduidingen.beperkt_openbaar
         )
-        self.config.zaak_max_confidentiality = (
+        self.zaak_config.zaak_max_confidentiality = (
             VertrouwelijkheidsAanduidingen.beperkt_openbaar
         )
-        self.config.save()
+        self.zaak_config.save()
+
+        # esuite config
+        self.esuite_config = ESuiteKlantConfig.get_solo()
+        self.esuite_config.contactmomenten_service = self.contactmoment_service
+        self.esuite_config.save()
 
         # openklant config
-        self.openklant_config = ESuiteKlantConfig.get_solo()
-        self.openklant_config.contactmomenten_service = self.contactmoment_service
-        self.openklant_config.save()
+        self.openklant_config = OpenKlant2Config.get_solo()
+
+        # klant systeem config
+        self.klant_config = KlantenSysteemConfig.get_solo()
+        self.klant_config.primary_backend = KlantenServiceType.ESUITE.value
+        self.klant_config.save()
 
         self.case_detail_url = reverse(
             "cases:case_detail_content",
@@ -951,8 +968,8 @@ class TestCaseDetailView(
         status_new_obj.statustype = factory(StatusType, self.status_type_new)
         status_finish_obj.statustype = factory(StatusType, self.status_type_finish)
 
-        self.openklant_config.exclude_contactmoment_kanalen = ["Balie"]
-        self.openklant_config.save()
+        self.esuite_config.exclude_contactmoment_kanalen = ["Balie"]
+        self.esuite_config.save()
 
         response = self.app.get(self.case_detail_url, user=self.user)
 
@@ -1006,7 +1023,9 @@ class TestCaseDetailView(
                 "internal_upload_enabled": False,
                 "external_upload_enabled": False,
                 "external_upload_url": "",
-                "allowed_file_extensions": sorted(self.config.allowed_file_extensions),
+                "allowed_file_extensions": sorted(
+                    self.zaak_config.allowed_file_extensions
+                ),
                 "contact_form_enabled": False,
                 "new_docs": True,
                 "questions": [
@@ -1029,15 +1048,26 @@ class TestCaseDetailView(
         links = doc.find(".contactmomenten__link")
 
         self.assertEqual(len(links), 3)
+
         for link, question in zip(links, case["questions"]):
-            self.assertEqual(
+            self.assertIn(
                 link.attrib["href"],
-                reverse(
-                    "cases:kcm_redirect",
-                    kwargs={
-                        "uuid": question["api_source_uuid"],
-                    },
-                ),
+                [
+                    reverse(
+                        "cases:kcm_redirect",
+                        kwargs={
+                            "api_service": KlantenServiceType.ESUITE.value,
+                            "uuid": question["api_source_uuid"],
+                        },
+                    ),
+                    reverse(
+                        "cases:kcm_redirect",
+                        kwargs={
+                            "api_service": KlantenServiceType.OPENKLANT2.value,
+                            "uuid": question["api_source_uuid"],
+                        },
+                    ),
+                ],
             )
 
         new_answer_headers = links.find(".card__status_indicator_text")
@@ -1133,7 +1163,9 @@ class TestCaseDetailView(
                 "internal_upload_enabled": False,
                 "external_upload_enabled": False,
                 "external_upload_url": "",
-                "allowed_file_extensions": sorted(self.config.allowed_file_extensions),
+                "allowed_file_extensions": sorted(
+                    self.zaak_config.allowed_file_extensions
+                ),
                 "contact_form_enabled": False,
                 "new_docs": False,
                 "questions": [
@@ -1152,14 +1184,24 @@ class TestCaseDetailView(
         self.assertEqual(len(links), 4)
 
         for link, question in zip(links, case["questions"]):
-            self.assertEqual(
+            self.assertIn(
                 link.attrib["href"],
-                reverse(
-                    "cases:kcm_redirect",
-                    kwargs={
-                        "uuid": question["api_source_uuid"],
-                    },
-                ),
+                [
+                    reverse(
+                        "cases:kcm_redirect",
+                        kwargs={
+                            "api_service": KlantenServiceType.ESUITE.value,
+                            "uuid": question["api_source_uuid"],
+                        },
+                    ),
+                    reverse(
+                        "cases:kcm_redirect",
+                        kwargs={
+                            "api_service": KlantenServiceType.OPENKLANT2.value,
+                            "uuid": question["api_source_uuid"],
+                        },
+                    ),
+                ],
             )
 
     def test_second_status_preview(self, m):
@@ -1641,10 +1683,10 @@ class TestCaseDetailView(
             with self.subTest(
                 fetch_eherkenning_zaken_with_rsin=fetch_eherkenning_zaken_with_rsin
             ):
-                self.config.fetch_eherkenning_zaken_with_rsin = (
+                self.zaak_config.fetch_eherkenning_zaken_with_rsin = (
                     fetch_eherkenning_zaken_with_rsin
                 )
-                self.config.save()
+                self.zaak_config.save()
 
                 response = self.app.get(
                     self.case_detail_url, user=self.eherkenning_user
@@ -1701,10 +1743,10 @@ class TestCaseDetailView(
             with self.subTest(
                 fetch_eherkenning_zaken_with_rsin=fetch_eherkenning_zaken_with_rsin
             ):
-                self.config.fetch_eherkenning_zaken_with_rsin = (
+                self.zaak_config.fetch_eherkenning_zaken_with_rsin = (
                     fetch_eherkenning_zaken_with_rsin
                 )
-                self.config.save()
+                self.zaak_config.save()
 
                 response = self.client.get(self.case_detail_url)
 
@@ -1735,10 +1777,10 @@ class TestCaseDetailView(
             with self.subTest(
                 fetch_eherkenning_zaken_with_rsin=fetch_eherkenning_zaken_with_rsin
             ):
-                self.config.fetch_eherkenning_zaken_with_rsin = (
+                self.zaak_config.fetch_eherkenning_zaken_with_rsin = (
                     fetch_eherkenning_zaken_with_rsin
                 )
-                self.config.save()
+                self.zaak_config.save()
 
                 response = self.client.get(self.case_detail_url)
 
@@ -1772,8 +1814,8 @@ class TestCaseDetailView(
             json=paginated_response([not_initiator_role]),
         )
 
-        self.config.fetch_eherkenning_zaken_with_rsin = True
-        self.config.save()
+        self.zaak_config.fetch_eherkenning_zaken_with_rsin = True
+        self.zaak_config.save()
 
         self.eherkenning_user.rsin = ""
         self.eherkenning_user.save()
@@ -2217,7 +2259,7 @@ class TestCaseDetailView(
             form_response.context["form"].errors,
             {
                 "files": [
-                    f"Het type bestand dat u hebt geüpload is ongeldig. Geldige bestandstypen zijn: {', '.join(sorted(self.config.allowed_file_extensions))}"
+                    f"Het type bestand dat u hebt geüpload is ongeldig. Geldige bestandstypen zijn: {', '.join(sorted(self.zaak_config.allowed_file_extensions))}"
                 ]
             },
         )
@@ -2242,8 +2284,8 @@ class TestCaseDetailView(
         )
 
         # mock max file size to 10 bytes
-        self.config.max_upload_size = 10 / (1024**2)
-        self.config.save()
+        self.zaak_config.max_upload_size = 10 / (1024**2)
+        self.zaak_config.save()
 
         response = self.app.get(
             reverse(
@@ -2261,13 +2303,13 @@ class TestCaseDetailView(
         form["file"] = Upload("upload.txt", b"data", "text/plain")
         form_response = form.submit()
 
-        self.config.refresh_from_db()
+        self.zaak_config.refresh_from_db()
 
         self.assertEqual(
             form_response.context["form"].errors,
             {
                 "files": [
-                    f"Een aangeleverd bestand dient maximaal {self.config.max_upload_size} MB te zijn, uw bestand is te groot."
+                    f"Een aangeleverd bestand dient maximaal {self.zaak_config.max_upload_size} MB te zijn, uw bestand is te groot."
                 ]
             },
         )
@@ -2528,7 +2570,7 @@ class TestCaseDetailView(
             ),
         )
 
-    def test_kcm_redirect(self, m):
+    def test_kcm_redirect_esuite(self, m):
         """Check redirect from question embedded in case detail to klant_contactmoment detail"""
 
         self._setUpMocks(m)
@@ -2539,8 +2581,8 @@ class TestCaseDetailView(
         self.klanten_service = ServiceFactory(
             api_root=KLANTEN_ROOT, api_type=APITypes.kc
         )
-        self.openklant_config.klanten_service = self.klanten_service
-        self.openklant_config.save()
+        self.esuite_config.klanten_service = self.klanten_service
+        self.esuite_config.save()
 
         klant = generate_oas_component_cached(
             "kc",
@@ -2580,7 +2622,10 @@ class TestCaseDetailView(
         response = self.app.get(
             reverse(
                 "cases:kcm_redirect",
-                kwargs={"uuid": uuid_from_url(self.contactmoment_old["url"])},
+                kwargs={
+                    "api_service": KlantenServiceType.ESUITE.value,
+                    "uuid": uuid_from_url(self.contactmoment_old["url"]),
+                },
             ),
             user=self.user,
         )
@@ -2591,6 +2636,172 @@ class TestCaseDetailView(
                 kwargs={
                     "api_service": KlantenServiceType.ESUITE.value,
                     "kcm_uuid": uuid_from_url(klant_contactmoment["url"]),
+                },
+            ),
+            status_code=302,
+            target_status_code=200,
+        )
+
+    def test_kcm_redirect_openklant(self, m):
+        """Check redirect from question embedded in case detail to klant_contactmoment detail"""
+
+        self._setUpMocks(m)
+
+        self.klant_config.primary_backend = KlantenServiceType.OPENKLANT2.value
+        self.klant_config.save()
+
+        #
+        # extra configs + mocks
+        #
+        self.klanten_service = ServiceFactory(
+            api_root=KLANTEN_ROOT, api_type=APITypes.kc
+        )
+        self.openklant_config.service = self.klanten_service
+        self.openklant_config.save()
+
+        # OpenKlant mocks
+        persoon = {
+            "uuid": "095be615-a8ad-4c33-8e9c-c7612fbf6c9f",
+            "url": "http://openklant/test/api/v1/partijen/095be615-a8ad-4c33-8e9c-c7612fbf6c9f",
+            "nummer": "42",
+            "interneNotitie": "",
+            "betrokkenen": [],
+            "categorieRelaties": [],
+            "digitaleAdressen": [],
+            "voorkeursDigitaalAdres": None,
+            "vertegenwoordigden": [],
+            "rekeningnummers": [{"uuid": "095be615-a8ad-4c33-8e9c-c7612fbf6c9f"}],
+            "voorkeursRekeningnummer": None,
+            "partijIdentificatoren": [],
+            "soortPartij": "persoon",
+            "indicatieGeheimhouding": False,
+            "voorkeurstaal": "dut",
+            "indicatieActief": True,
+            "bezoekadres": None,
+            "correspondentieadres": None,
+            "partijIdentificatie": {
+                "contactnaam": {
+                    "voorletters": "string",
+                    "voornaam": "Joe",
+                    "voorvoegselAchternaam": "string",
+                    "achternaam": "Schmoe",
+                },
+            },
+            "_expand": {},
+        }
+        PartijValidator.validate_python(persoon)
+
+        klantcontact = {
+            "uuid": "095be615-a8ad-4c33-8e9c-c7612fbf6c9f",
+            "url": "http://openklant/test/api/v1/klantcontacten/095be615-a8ad-4c33-8e9c-c7612fbf6c9f",
+            "gingOverOnderwerpobjecten": [],
+            "hadBetrokkenActoren": [],
+            "omvatteBijlagen": [],
+            "hadBetrokkenen": [],
+            "leiddeTotInterneTaken": [],
+            "nummer": "string",
+            "kanaal": "string",
+            "onderwerp": "string",
+            "inhoud": "string",
+            "indicatieContactGelukt": True,
+            "taal": "dut",
+            "vertrouwelijk": False,
+            "plaatsgevondenOp": "2019-08-24T14:15:22Z",
+            "_expand": {
+                "hadBetrokkenen": [
+                    {
+                        "uuid": "095be615-a8ad-4c33-8e9c-c7612fbf6c9f",
+                        "url": "http://example.com",
+                        "wasPartij": {
+                            "uuid": "095be615-a8ad-4c33-8e9c-c7612fbf6c9f",
+                            "url": "http://example.com",
+                        },
+                    }
+                ],
+            },
+        }
+        KlantContactValidator.validate_python(klantcontact)
+
+        onderwerp_object = {
+            "uuid": "81b7d113-e46c-4919-90ff-ecb69c637a13",
+            "url": "http://klantinteracties.nl/api/onderwerpen/81b7d113-e46c-4919-90ff-ecb69c637a13",
+            "klantcontact": klantcontact,
+            "wasKlantcontact": None,
+            "onderwerpobjectidentificator": {
+                "objectId": self.zaak["identificatie"],
+                "codeObjecttype": "string",
+                "codeRegister": "string",
+                "codeSoortObjectId": "identificatie",
+            },
+        }
+        OnderwerpObjectValidator.validate_python(onderwerp_object)
+
+        m.get(
+            "https://klanten.nl/api/v1/partijen?partijIdentificator__codeSoortObjectId=bsn&partijIdentificator__codeRegister=brp&partijIdentificator__codeObjecttype=natuurlijk_persoon&partijIdentificator__objectId=900222086&soortPartij=persoon",
+            headers={"Content-Type": "application/json"},
+            json={
+                "count": 1,
+                "next": None,
+                "previous": None,
+                "results": [persoon],
+            },
+        )
+        m.get(
+            "https://klanten.nl/api/v1/partijen/095be615-a8ad-4c33-8e9c-c7612fbf6c9f?expand=digitaleAdressen%2Cbetrokkenen%2Cbetrokkenen.hadKlantcontact",
+            headers={"Content-Type": "application/json"},
+            json=persoon,
+        )
+        m.get(
+            "https://klanten.nl/api/v1/partijen/095be615-a8ad-4c33-8e9c-c7612fbf6c9f?expand=digitaleAdressen%2Cbetrokkenen%2Cbetrokkenen.hadKlantcontact",
+            headers={"Content-Type": "application/json"},
+            json=persoon,
+        )
+        m.get(
+            "https://klanten.nl/api/v1/partijen/095be615-a8ad-4c33-8e9c-c7612fbf6c9f?expand=digitaleAdressen",
+            headers={"Content-Type": "application/json"},
+            json=persoon,
+        )
+        m.get(
+            "https://klanten.nl/api/v1/klantcontacten?expand=leiddeTotInterneTaken%2CgingOverOnderwerpobjecten%2ChadBetrokkenen%2ChadBetrokkenen.wasPartij&kanaal=",
+            headers={"Content-Type": "application/json"},
+            json={
+                "count": 1,
+                "next": None,
+                "previous": None,
+                "results": [klantcontact],
+            },
+        )
+        m.get(
+            "https://klanten.nl/api/v1/onderwerpobjecten",
+            headers={"Content-Type": "application/json"},
+            json={
+                "count": 1,
+                "next": None,
+                "previous": None,
+                "results": [onderwerp_object],
+            },
+        )
+
+        #
+        # asserts
+        #
+        response = self.app.get(
+            reverse(
+                "cases:kcm_redirect",
+                kwargs={
+                    "api_service": KlantenServiceType.OPENKLANT2.value,
+                    "uuid": klantcontact["uuid"],
+                },
+            ),
+            user=self.user,
+        )
+        self.assertRedirects(
+            response,
+            reverse(
+                "cases:contactmoment_detail",
+                kwargs={
+                    "api_service": KlantenServiceType.OPENKLANT2.value,
+                    "kcm_uuid": klantcontact["uuid"],
                 },
             ),
             status_code=302,
@@ -2649,8 +2860,8 @@ class TestCaseDetailView(
             ),
         )
 
-        self.config.order_statuses_by_date_set = True
-        self.config.save()
+        self.zaak_config.order_statuses_by_date_set = True
+        self.zaak_config.save()
 
         response = self.app.get(self.case_detail_url, user=self.user)
         case = response.context.get("case")

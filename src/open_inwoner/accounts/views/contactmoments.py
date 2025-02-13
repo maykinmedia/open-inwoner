@@ -201,8 +201,11 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
         elif KlantenServiceType.OPENKLANT2.value in self.request.path:
             service = self.get_service(service_type=KlantenServiceType.OPENKLANT2)
 
+        origin = self.request.headers.get("Referer")
         question, zaak = service.retrieve_question(
-            self.get_fetch_params(service), kwargs["kcm_uuid"], user=self.request.user
+            self.get_fetch_params(service),
+            question_uuid=kwargs["kcm_uuid"],
+            user=self.request.user,
         )
         if not question:
             raise Http404()
@@ -247,7 +250,6 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
                 "value": question["channel"].capitalize(),
             },
         ]
-        origin = self.request.headers.get("Referer")
         if origin and reverse("cases:contactmoment_list") in origin:
             ctx["origin"] = {
                 "label": _("Terug naar overzicht"),
@@ -276,6 +278,43 @@ class KlantContactMomentRedirectView(KlantContactMomentAccessMixin, View):
     """
 
     def get(self, request, *args, **kwargs):
+        api_service = kwargs.get("api_service")
+
+        match api_service:
+            case KlantenServiceType.OPENKLANT2.value:
+                question_uuid = self._get_klantcontact_openklant(
+                    request, *args, **kwargs
+                )
+            case KlantenServiceType.ESUITE.value:
+                question_uuid = self._get_klantcontactmoment_esuite(
+                    request, *args, **kwargs
+                )
+            case _:
+                raise RuntimeError("Unsupported klanten backend")
+
+        return HttpResponseRedirect(
+            reverse(
+                "cases:contactmoment_detail",
+                kwargs={
+                    "api_service": api_service,
+                    "kcm_uuid": question_uuid,
+                },
+            )
+        )
+
+    def _get_klantcontact_openklant(self, request, *args, **kwargs):
+        service: OpenKlant2Service = OpenKlant2Service()
+        fetch_params = service.get_fetch_parameters(user=request.user)
+
+        question_dto, _ = service.retrieve_question(
+            fetch_params=fetch_params,
+            question_uuid=str(kwargs.get("uuid")),
+            user=request.user,
+        )
+
+        return question_dto.get("api_source_uuid")
+
+    def _get_klantcontactmoment_esuite(self, request, *args, **kwargs):
         vragen_service: VragenService = eSuiteVragenService()
         klanten_service: KlantenService = eSuiteKlantenService()
         fetch_params = klanten_service.get_fetch_parameters(self.request)
@@ -294,12 +333,4 @@ class KlantContactMomentRedirectView(KlantContactMomentAccessMixin, View):
         if not kcm:
             raise Http404
 
-        return HttpResponseRedirect(
-            reverse(
-                "cases:contactmoment_detail",
-                kwargs={
-                    "api_service": KlantenServiceType.ESUITE.value,
-                    "kcm_uuid": kcm.uuid,
-                },
-            )
-        )
+        return kcm.uuid

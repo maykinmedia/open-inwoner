@@ -1,6 +1,6 @@
 {% load i18n icon_tags list_tags %}
 
-<a href="{% url 'cases:kcm_redirect' question.api_source_uuid %}" class="card card--compact card--stretch {% if toggle_hide %}card--toggle-hide{% endif %} contactmomenten__link">
+<a href="{% url 'cases:kcm_redirect' api_service=question.api_service.value uuid=question.api_source_uuid %}" class="card card--compact card--stretch {% if toggle_hide %}card--toggle-hide{% endif %} contactmomenten__link">
     {% if question.new_answer_available %}
         {% translate "Nieuw antwoord beschikbaar" as new_answer_text %}
         {% include "components/StatusIndicator/StatusIndicator.html" with status_indicator="info" status_indicator_text=new_answer_text only %}

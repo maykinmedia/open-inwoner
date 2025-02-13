@@ -723,7 +723,9 @@ class eSuiteVragenService(KlantenService):
         ocm = self.retrieve_objectcontactmoment(kcm.contactmoment, "zaak")
         if ocm and ocm.object_type == "zaak":
             zaak_url = ocm.object
-            groups = list(ZGWApiGroupConfig.objects.all())
+            groups = ZGWApiGroupConfig.objects.filter(
+                klant_backend=KlantenServiceType.ESUITE.value
+            )
             proxy = MultiZgwClientProxy([group.zaken_client for group in groups])
             proxy_response = proxy.fetch_case_by_url_no_cache(zaak_url)
             cases_found = proxy_response.truthy_responses
@@ -1326,7 +1328,6 @@ class OpenKlant2Service(LogMixin, KlantenService):
         answers_for_klantcontact_uuid = {}
         question_uuids = []
         klantcontact_uuid_to_klantcontact_object = {}
-
         for klantcontact in self.klantcontacten_for_partij(
             partij_uuid, kanaal=self.config.mijn_vragen_kanaal
         ):
@@ -1393,7 +1394,7 @@ class OpenKlant2Service(LogMixin, KlantenService):
         fetch_params: FetchParameters,
         question_uuid: str,
         user: User,
-    ) -> tuple[Question | None, ZaakWithApiGroup | None]:  # noqa: E704
+    ) -> tuple[Question | None, Zaak | None]:  # noqa: E704
         if bsn := fetch_params.get("user_bsn"):
             partij = self.find_persoon_for_bsn(bsn)
         elif kvk_or_rsin := fetch_params.get("user_kvk_or_rsin"):
@@ -1404,11 +1405,66 @@ class OpenKlant2Service(LogMixin, KlantenService):
             q for q in all_questions if q.question_kcm_uuid == question_uuid
         )
 
-        # TODO
-        # should return (Question, zaak_with_api_group); the latter is left out until a
-        # standard for linking klantcontact + zaak is agreed upon
-        # https://github.com/Klantinteractie-Servicesysteem/KISS-frontend/issues/808#issuecomment-2357637675
-        return self._build_question_dto(question_ok2=question, user=user), None
+        # fetch onderwerp_object linked to klantcontact
+        onderwerp_objecten = [
+            obj
+            for obj in self.client.onderwerp_object.list()["results"]
+            if obj["klantcontact"]["uuid"] == question.question_kcm_uuid
+        ]
+        if not onderwerp_objecten:
+            return self._build_question_dto(question_ok2=question, user=user), None
+        if len(onderwerp_objecten) > 1:
+            logger.error(
+                "More than one onderwerp_object found for question %s",
+                question.question_kcm_uuid,
+            )
+            return self._build_question_dto(question_ok2=question, user=user), None
+
+        onderwerp_object = onderwerp_objecten[0]
+
+        zaak_with_api_group = None
+
+        # fetch zaken for user
+        groups = ZGWApiGroupConfig.objects.filter(
+            klant_backend=KlantenServiceType.OPENKLANT2.value
+        )
+        proxy = MultiZgwClientProxy([group.zaken_client for group in groups])
+        proxy_response = proxy.fetch_cases(user_bsn=user.bsn)
+
+        if not (truthy_responses := proxy_response.truthy_responses):
+            logger.info(
+                "Unable to find matched contactmomenten zaak with OpenKlant2 backend"
+            )
+            return self._build_question_dto(question_ok2=question, user=user), None
+
+        # find the unique zaak for the question
+        zaken_for_question = []
+        for response in truthy_responses:
+            # discard the client for determining the api_group; we only need the zaak
+            zaken = response.result
+            zaken_filtered = filter(
+                lambda z: z.identificatie
+                == onderwerp_object["onderwerpobjectidentificator"]["objectId"],
+                zaken,
+            )
+            zaken_for_question.extend(zaken_filtered)
+        if not zaken_for_question:
+            logger.info(
+                "Could not find zaak corresponding to question %s",
+                question.question_kcm_uuid,
+            )
+            return self._build_question_dto(question_ok2=question, user=user), None
+        if len(zaken_for_question) > 1:
+            logger.error(
+                "More than one zaak found for question %s",
+                question.question_kcm_uuid,
+            )
+            return self._build_question_dto(question_ok2=question, user=user), None
+
+        return (
+            self._build_question_dto(question_ok2=question, user=user),
+            zaken_for_question[0],
+        )
 
     def _build_question_dtos(
         self,
