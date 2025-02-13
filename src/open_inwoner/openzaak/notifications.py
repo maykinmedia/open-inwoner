@@ -153,6 +153,7 @@ def send_case_update_email(
     template = find_template(template_name)
     context = {
         "identification": case.identification,
+        "case_description": case.omschrijving,
         "type_description": case.zaaktype.omschrijving,
         "start_date": case.startdatum,
         "end_date": date.today() + timedelta(days=config.action_required_deadline_days),
