@@ -295,7 +295,7 @@ class SearchPagePlaywrightTests(
         for facet in FacetChoices.values:
             # tags, organizations, categories
             controls = page.locator(f"input[form='search-form'][name='{facet}']")
-            expect(controls).to_have_count(2)
+            expect(controls).to_have_count(2, 4)
             for checkbox in controls.all():
                 # the input elements are hidden for styling so just test for enabled
                 expect(checkbox).to_be_enabled()

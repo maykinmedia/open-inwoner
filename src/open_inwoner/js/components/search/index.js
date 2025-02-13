@@ -1,4 +1,6 @@
 import './filter-options'
+import './filter-dropdown-mobile'
+import './filter-modal'
 
 const searchForm = document.getElementById('search-form')
 

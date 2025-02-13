@@ -5,4 +5,10 @@
   .input {
     margin-top: 0;
   }
+
+  &__mobile {
+    @media (min-width: 768px) {
+      display: none;
+    }
+  }
 }

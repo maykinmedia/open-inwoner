@@ -57,7 +57,43 @@
     cursor: pointer;
   }
 
+  .button--textless [class*='icons'] {
+    display: inline-block;
+    right: var(--spacing-large);
+    top: 0;
+    transform: rotate(180deg);
+    transition: all 0.3s;
+  }
+
+  .filter__list {
+    display: grid;
+  }
+
+}
+
+.grid__filters {
+  display: none;
+  @media (min-width: 768px) {
+    display: block;
+  }
+
+  .utrecht-heading-2 {
+    border-bottom: 2px solid var(--color-gray-light);
+    display: block;
+    padding-bottom: var(--spacing-large);
+    @media (min-width: 768px) {
+      display: none;
+    }
+  }
+
   &__counter {
     color: var(--color-tinted-mute);
+  }
+
+  &-mobile {
+    display: block;
+    @media (min-width: 768px) {
+      display: none;
+    }
   }
 }
