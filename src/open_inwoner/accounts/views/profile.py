@@ -238,6 +238,7 @@ class EditProfileView(
         field_mapping = {
             "emailadres": "email",
             "telefoonnummer": "phonenumber",
+            "telefoonnummerAlternatief": "phonenumber_alternative",
         }
         update_data = {
             api_name: user_form_data[local_name]

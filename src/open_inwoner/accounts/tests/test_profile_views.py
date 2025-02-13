@@ -350,6 +350,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         form["last_name"] = ""
         form["email"] = ""
         form["phonenumber"] = ""
+        form["phonenumber_alternative"] = ""
         form["street"] = ""
         form["housenumber"] = ""
         form["postcode"] = ""
@@ -371,6 +372,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         form["last_name"] = "Last name"
         form["email"] = "user@example.com"
         form["phonenumber"] = "0612345678"
+        form["phonenumber_alternative"] = "0687654321"
         form["street"] = "Keizersgracht"
         form["housenumber"] = "17 d"
         form["postcode"] = "1013 RM"
@@ -384,6 +386,8 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         self.assertEqual(self.user.last_name, "Last name")
         self.assertEqual(self.user.display_name, "First name")
         self.assertEqual(self.user.email, "user@example.com")
+        self.assertEqual(self.user.phonenumber, "0612345678")
+        self.assertEqual(self.user.phonenumber_alternative, "0687654321")
         self.assertEqual(self.user.street, "Keizersgracht")
         self.assertEqual(self.user.housenumber, "17 d")
         self.assertEqual(self.user.postcode, "1013 RM")
@@ -432,11 +436,13 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         form = response.forms["profile-edit"]
         form["email"] = "user@example.com"
         form["phonenumber"] = "0612345678"
+        form["phonenumber_alternative"] = "0687654321"
         response = form.submit()
         self.eherkenning_user.refresh_from_db()
         self.assertEqual(response.url, self.return_url)
         self.assertEqual(self.eherkenning_user.email, "user@example.com")
         self.assertEqual(self.eherkenning_user.phonenumber, "0612345678")
+        self.assertEqual(self.eherkenning_user.phonenumber_alternative, "0687654321")
 
     def test_updating_a_field_without_modifying_email_succeeds(self):
         initial_email = self.user.email
@@ -468,6 +474,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
 
         form["email"] = "user@example.com"
         form["phonenumber"] = "0612345678"
+        form["phonenumber_alternative"] = "0687654321"
         response = form.submit()
 
         self.assertEqual(response.url, self.return_url)
@@ -477,6 +484,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         self.assertEqual(user.display_name, "name")
         self.assertEqual(user.email, "user@example.com")
         self.assertEqual(user.phonenumber, "0612345678")
+        self.assertEqual(user.phonenumber_alternative, "0687654321")
 
     def test_expected_form_is_rendered(self):
         # regular user
@@ -564,6 +572,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         form = response.forms["profile-edit"]
         form["email"] = "new@example.com"
         form["phonenumber"] = "0612345678"
+        form["phonenumber_alternative"] = "0687654321"
         form.submit()
 
         # user data tested in other cases
@@ -575,11 +584,12 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
             {
                 "emailadres": "new@example.com",
                 "telefoonnummer": "0612345678",
+                "telefoonnummerAlternatief": "0687654321",
             },
         )
         self.assertTimelineLog("retrieved klant for user")
         self.assertTimelineLog(
-            "patched klant from user profile edit with fields: emailadres, telefoonnummer"
+            "patched klant from user profile edit with fields: emailadres, telefoonnummer, telefoonnummerAlternatief"
         )
 
     @requests_mock.Mocker()

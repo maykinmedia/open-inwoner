@@ -1,3 +1,4 @@
+from django.db.utils import IntegrityError
 from django.test import TestCase
 
 from open_inwoner.accounts.choices import LoginTypeChoices
@@ -110,3 +111,10 @@ class UserTests(TestCase):
 
         user.clear_plan_contact_new_count()
         self.assertEqual(0, user.get_plan_contact_new_count())
+
+    def test_constraint_phonenumber_alternative(self):
+        user = UserFactory(phonenumber="")
+
+        with self.assertRaises(IntegrityError):
+            user.phonenumber_alternative = "0612345678"
+            user.save()
