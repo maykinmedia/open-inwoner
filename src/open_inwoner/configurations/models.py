@@ -613,6 +613,11 @@ class SiteConfiguration(SingletonModel):
             "Display contact form on the questions list page so that users can create new questions"
         ),
     )
+    enable_crawler_indexing = models.BooleanField(
+        verbose_name=_("Enable indexing by search engines"),
+        default=True,
+        help_text=_("When enabled, search engines can index the site"),
+    )
 
     class Meta:
         verbose_name = _("Site Configuration")
