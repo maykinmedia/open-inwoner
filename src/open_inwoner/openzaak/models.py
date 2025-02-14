@@ -458,11 +458,9 @@ class OpenZaakConfig(SingletonModel):
     title_text = models.TextField(
         verbose_name=_("Title text"),
         help_text=_(
-            "The title/introductory text shown on the list view of 'Mijn aanvragen'."
+            "The title/introductory text shown on the list view of 'Mijn zaken'."
         ),
-        default=_(
-            "Hier vindt u een overzicht van al uw lopende en afgeronde aanvragen."
-        ),
+        default=_("Hier vindt u een overzicht van al uw lopende en afgeronde zaken."),
     )
 
     # feature flags

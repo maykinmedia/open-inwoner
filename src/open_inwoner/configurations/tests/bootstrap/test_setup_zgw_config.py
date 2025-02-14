@@ -84,7 +84,7 @@ class ZGWConfigurationTests(TestCase):
         )
         self.assertEqual(
             config.title_text,
-            "Hier vindt u een overzicht van al uw lopende en afgeronde aanvragen.",
+            "Hier vindt u een overzicht van al uw lopende en afgeronde zaken.",
         )
         self.assertEqual(config.enable_categories_filtering_with_zaken, False)
         self.assertEqual(config.skip_notification_statustype_informeren, False)
