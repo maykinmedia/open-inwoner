@@ -21,10 +21,10 @@ gebruikers. Dit is overzichtelijk weergegeven in de tabel op deze pagina.
 |    | Qmatic                       |    | Mijn afspraken                                           |
 |    | SSD                          |    | Mijn uitkeringen                                         |
 |    | SOAP services                |    | Mijn uitkeringen                                         |
-|    | Catalogus configs            |    | Mijn aanvragen                                           |
-|    | Open Zaak                    |    | Mijn aanvragen                                           |
+|    | Catalogus configs            |    | Mijn zaken                                               |
+|    | Open Zaak                    |    | Mijn zaken                                               |
 |    | Open Formulieren             |    | Producten                                                |
-|    | Webhook-abonnementen         |    | Mijn aanvragen - notificaties                            |
+|    | Webhook-abonnementen         |    | Mijn zaken - notificaties                                |
 +-----------------------------------+---------------------------------------------------------------+
 
 9.1 Catalogus Configs
@@ -146,7 +146,7 @@ Vervolgens kunt u een primaire backend selecteren via het dropdown-menu.
 9.2.1. E-suite
 --------------
 
-Er zijn diverse zaken die ingesteld moeten worden om Mijn aanvragen naar behoren te laten
+Er zijn diverse zaken die ingesteld moeten worden om Mijn zaken naar behoren te laten
 functioneren. In het volgende screenshot is te zien om welke elementen het gaat.
 
 .. image:: images/image64.png
@@ -210,7 +210,7 @@ onderwerp toevoegen]. Als alles naar wens is geconfigureerd klikt u op [Opslaan]
 9.2.2. OpenKlant2
 -----------------
 
-Er zijn diverse zaken die ingesteld moeten worden om Mijn aanvragen naar behoren te laten
+Er zijn diverse zaken die ingesteld moeten worden om Mijn zaken naar behoren te laten
 functioneren. In het volgende screenshot is te zien om welke elementen het gaat.
 
 .. image:: images/image145.png
@@ -238,7 +238,7 @@ automatisch als interne taken toe te wijzen voor afhandeling.
 Dit is de configuratie voor de koppeling van het Open Inwoner platform met Open Zaak of eSuite. Om
 Mijn Aanvragen te kunnen gebruiken is het noodzakelijk om de Open Zaak API en de Catalogi API in te
 stellen. Hierdoor worden – na het inloggen met DigiD - de zaken van burgers getoond onder het
-onderdeel Mijn aanvragen. Om eventueel de mogelijkheid te bieden om documenten te uploaden en in
+onderdeel Mijn zaken. Om eventueel de mogelijkheid te bieden om documenten te uploaden en in
 te zien, of verder te gaan met niet-afgeronde formulieren is het noodzakelijk de Documenten API en de
 Formulieren API in te stellen.
 
@@ -267,7 +267,7 @@ diverse niveaus, variërend van openbaar tot zeer geheim.
 
 | **Titel tekst**
 | Hier stelt u de tekst in die getoond wordt als titel/introductietekst
-  in de lijstweergave van *Mijn aanvragen*.
+  in de lijstweergave van *Mijn zaken*.
 
 
 9.3.2. Feature Flags
@@ -302,7 +302,7 @@ kunt een extra API set toevoegen door op de [+] onder de reeds geconfigureerde A
 | Hier kunt u de API set een naam geven. Deze naam is vrij in te vullen.
 
 | **Zaken API**
-| Deze API vult de zaken of aanvragen uit *Mijn aanvragen* in.
+| Deze API vult de zaken of aanvragen uit *Mijn zaken* in.
 
 | **Documenten API**
 | Deze API haalt de documenten op die bij een bepaalde zaak horen.

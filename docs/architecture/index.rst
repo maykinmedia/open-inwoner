@@ -25,7 +25,7 @@ The Django code-base is structured into a range of built-in Django apps, one for
 For making use of these integrations in a pluggable fashion, OIP uses Django CMS apphooks which can be found in the `cms` app:
 
  * `products` publishes the PDC / Category and Product details to anonymous and logged-in users (eg. Productenpagina's)
- * `cases` exposes the Open Zaak case details to logged-in users (eg. Mijn aanvragen)
+ * `cases` exposes the Open Zaak case details to logged-in users (eg. Mijn zaken)
  * `collaborate` exposes the cooperative planning module to logged-in users (eg. Samenwerken)
  * `inbox` exposes the internal messaging app to logged-in users (eg. Mijn Berichten)
  * `profile` exposes the profile to logged-in users (eg. Mijn Profiel)
