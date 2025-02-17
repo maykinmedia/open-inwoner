@@ -286,5 +286,8 @@ document.body.addEventListener('htmx:afterSwap', function () {
 document.addEventListener('click', function (e) {
   if (e.target && e.target.classList.contains('pagination__link')) {
     scrollToTopOfWindow() // Scroll up after clicking pagination
+    setTimeout(function () {
+      initFilterBar() // Reinitialize filter bar after HTMX swap from pagination
+    }, 20)
   }
 })
