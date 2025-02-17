@@ -51,7 +51,7 @@ $vm: var(--spacing-large);
       width: 6px;
       display: inline-block;
       border: 2px solid white;
-      border-radius: 100px; // This is big to make sure the corners are rounded properly.
+      border-radius: var(--border-radius-rounded);
     }
   }
 

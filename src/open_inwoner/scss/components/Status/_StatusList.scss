@@ -86,7 +86,7 @@
       &::before {
         content: '';
         background-color: var(--color-white);
-        border-radius: 50%;
+        border-radius: var(--border-radius-rounded);
         top: 2px;
         left: 2px;
         height: 20px;

@@ -114,7 +114,7 @@
     width: var(--font-line-height-body-small);
     height: var(--font-line-height-body-small);
     border: var(--border-width) solid var(--color-gray-dark);
-    border-radius: 100%;
+    border-radius: var(--border-radius-rounded);
     background-color: var(--color-white);
   }
 

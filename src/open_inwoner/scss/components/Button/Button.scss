@@ -141,11 +141,11 @@
     position: relative;
     color: var(--color-primary);
     filter: saturate(50%);
-    border-radius: 100px; // This is big to make sure the corners are rounded properly.
+    border-radius: var(--border-radius-rounded);
 
     &:before {
       content: ' ';
-      border-radius: 100px; // This is big to make sure the corners are rounded properly.
+      border-radius: var(--border-radius-rounded);
       position: absolute;
       top: 0;
       bottom: 0;

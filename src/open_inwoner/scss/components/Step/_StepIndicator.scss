@@ -39,7 +39,7 @@
   &__list-item:before {
     align-items: center;
     border: var(--border-width) solid var(--color-gray-dark);
-    border-radius: 100%;
+    border-radius: var(--border-radius-rounded);
     content: counter(step-indicator-list-counter);
     display: flex;
     flex-shrink: 0;

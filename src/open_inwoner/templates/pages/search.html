@@ -34,25 +34,22 @@
             {% if paginator.count %}
                 <div class="search-results">
                     <div class="search-results__list">
-                        <div class="card__grid">
                             {% render_grid %}
                                 {% for hit in page_obj %}
-                                    {% render_column start=0 span=12 %}
-                                        <a href="{% url 'products:product_detail' hit.slug %}" class="card card__description-card search-results__item">
-                                            <div class="card__body">
-                                                <h3 class="utrecht-heading-3 search-results__item-title">{{ hit.name }}</h3>
-                                                <p class="utrecht-paragraph search-results__item-intro">{{ hit.summary }}</p>
-                                                <span class="link link--icon link--primary">
-                                                <span class="link__text">Bekijk resultaat</span>
-                                                {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
-                                            </span>
-                                            </div>
-                                        </a>
-                                    {% endrender_column %}
+                                <div class="column column--start-0 {% if search_filter_categories or search_filter_tags or search_filter_organizations %}column--span-12{% else %}column--span-8{% endif %}">
+                                    <a href="{% url 'products:product_detail' hit.slug %}" class="card card__description-card search-results__item">
+                                        <div class="card__body card__body--tabled">
+                                            <h3 class="utrecht-heading-3 search-results__item-title">{{ hit.name }}</h3>
+                                            <p class="utrecht-paragraph search-results__item-intro">{{ hit.summary }}</p>
+                                            <span class="link link--icon link--primary">
+                                                    <span class="link__text">Bekijk resultaat</span>
+                                                    {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+                                                </span>
+                                        </div>
+                                    </a>
+                                </div>
                                 {% endfor %}
                             {% endrender_grid %}
-                        </div>
-                        {# end card grid#}
                     </div>
                 </div>
 
@@ -90,10 +87,10 @@
             {% else %}
 
                 {% render_grid %}
-                    {% render_column start=0 span=10 %}
-                        <div class="search-results search-results--none">
-                            <div class="search-results--none-column">{% icon icon="info" icon_position="before" extra_classes="icon--info" outlined=True %}</div>
-                            <div class="search-results--none-column">
+                    {% render_column start=0 span=8 %}
+                        <div class="search-results search-results--no-results">
+                            <div class="search-results--no-results-column">{% icon icon="info" icon_position="before" extra_classes="icon--info" outlined=True %}</div>
+                            <div class="search-results--no-results-column">
                                 <h2 class="utrecht-heading-2 search-results__title">
                                     {% trans "We konden geen zoekresultaten vinden" %}
                                 </h2>
