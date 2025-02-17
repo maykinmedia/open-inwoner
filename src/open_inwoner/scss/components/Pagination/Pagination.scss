@@ -28,7 +28,7 @@
     &--active {
       color: var(--color-white);
       background-color: var(--color-primary);
-      border-radius: 100px;
+      border-radius: var(--border-radius-rounded);
 
       &:hover {
         background-color: var(--color-body);

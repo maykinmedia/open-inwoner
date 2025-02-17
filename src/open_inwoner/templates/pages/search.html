@@ -36,7 +36,7 @@
                     <div class="search-results__list">
                             {% render_grid %}
                                 {% for hit in page_obj %}
-                                <div class="column column--start-0 {% if search_filter_categories or search_filter_tags or search_filter_organizations %}column--span-12{% else %}column--span-8{% endif %}">
+                                <div class="column column--start-0 column--span-{% if search_filter_categories or search_filter_tags or search_filter_organizations %}12{% else %}8{% endif %}">
                                     <a href="{% url 'products:product_detail' hit.slug %}" class="card card__description-card search-results__item">
                                         <div class="card__body card__body--tabled">
                                             <h3 class="utrecht-heading-3 search-results__item-title">{{ hit.name }}</h3>

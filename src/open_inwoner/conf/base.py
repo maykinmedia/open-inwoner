@@ -891,6 +891,8 @@ ES_INDEX_PRODUCTS = config("ES_INDEX_PRODUCTS", "products")
 ES_MAX_SIZE = 10000
 ES_SUGGEST_SIZE = 5
 
+# Search page pagination trigger
+RESULTS_PER_PAGE = config("RESULTS_PER_PAGE", default=9)
 
 # django import-export
 IMPORT_EXPORT_USE_TRANSACTIONS = True

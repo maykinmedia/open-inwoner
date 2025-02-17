@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.test import override_settings, tag
 from django.urls import reverse_lazy
 
@@ -110,7 +111,9 @@ class SearchPageTests(ClearCachesMixin, ESMixin, WebTest):
         self.assertEqual(results[0].slug, self.product1.slug)
 
     def test_pagination_links(self):
-        products = ProductFactory.create_batch(9, content="content")
+        products = ProductFactory.create_batch(
+            settings.RESULTS_PER_PAGE, content="content"
+        )
         self.tag.products.add(*products)
         self.update_index()
 
@@ -119,7 +122,7 @@ class SearchPageTests(ClearCachesMixin, ESMixin, WebTest):
         self.assertEqual(response.status_code, 200)
 
         results = response.context["paginator"].object_list
-        self.assertEqual(len(results), 10)
+        self.assertEqual(len(results), settings.RESULTS_PER_PAGE + 1)
 
         pagination_div = response.html.find("div", {"class": "pagination"})
         pagination_links = pagination_div.find_all("a")

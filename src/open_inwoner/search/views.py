@@ -1,5 +1,6 @@
 import logging
 
+from django.conf import settings
 from django.contrib import messages
 from django.core.paginator import InvalidPage, Paginator
 from django.http import Http404
@@ -28,7 +29,7 @@ class SearchView(
 ):
     form_class = SearchForm
     template_name = "pages/search.html"
-    paginate_by = 9
+    paginate_by = settings.RESULTS_PER_PAGE
     paginator_class = Paginator
     page_kwarg = "page"
     success_url = reverse_lazy("search:search")
