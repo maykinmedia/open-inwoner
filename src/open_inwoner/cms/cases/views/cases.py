@@ -31,11 +31,11 @@ class OuterCaseListView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn aanvragen"), reverse("cases:index")),
+            (_("Mijn zaken"), reverse("cases:index")),
         ]
 
     def page_title(self):
-        return _("Mijn aanvragen")
+        return _("Mijn zaken")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -61,7 +61,7 @@ class InnerCaseListView(
     paginate_by = 9
 
     def page_title(self):
-        return _("Mijn aanvragen")
+        return _("Mijn zaken")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

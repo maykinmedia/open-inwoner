@@ -180,57 +180,57 @@ const specificClickSelectors = {
   // Open Aanvraag via cards
   '#cases-content > .card__grid .column a.card div': [
     'event',
-    'Mijn aanvragen',
+    'Mijn zaken',
     'Click',
     'Open Aanvraag via tegel',
   ],
   '#cases-content > .card__grid a.card .card__status_indicator_text': [
     'event',
-    'Mijn aanvragen',
+    'Mijn zaken',
     'Click',
     'Open Aanvraag via tegel',
   ],
   '#cases-content > .card__grid a.card ul > li > p.utrecht-paragraph': [
     'event',
-    'Mijn aanvragen',
+    'Mijn zaken',
     'Click',
     'Open Aanvraag via tegel',
   ],
   '#cases-content > .card__grid a.card > div > h2': [
     'event',
-    'Mijn aanvragen',
+    'Mijn zaken',
     'Click',
     'Open Aanvraag via tegel',
   ],
   '#cases-content > .card__grid a.card ul > li': [
     'event',
-    'Mijn aanvragen',
+    'Mijn zaken',
     'Click',
     'Open Aanvraag via tegel',
   ],
   '#cases-content > .card__grid a.card ul > li .utrecht-paragraph': [
     'event',
-    'Mijn aanvragen',
+    'Mijn zaken',
     'Click',
     'Open Aanvraag via tegel',
   ],
   '#cases-content > .card__grid a.card ul > li .card__caption span': [
     'event',
-    'Mijn aanvragen',
+    'Mijn zaken',
     'Click',
     'Open Aanvraag via tegel',
   ],
   '#cases-content .card__grid .grid .card .card__body .link--icon.link--secondary':
     [
       'event',
-      'Mijn aanvragen',
+      'Mijn zaken',
       'Click',
       "Open aanvraag via 'Bekijk aanvraag' link",
     ],
   '#cases-content .card__grid .grid .card .card__body .link--icon.link--secondary *':
     [
       'event',
-      'Mijn aanvragen',
+      'Mijn zaken',
       'Click',
       "Open aanvraag via 'Bekijk aanvraag' link",
     ],
@@ -303,31 +303,31 @@ const specificClickSelectors = {
   // Filters in Cases list
   '#filterBar .filter-bar__mobile-button > button': [
     'event',
-    'Mijn aanvragen filters',
+    'Mijn zaken filters',
     'Click',
     'Filters pop-up mobiel',
   ],
   '#filterBar .filter-bar__mobile-button > button span': [
     'event',
-    'Mijn aanvragen filters',
+    'Mijn zaken filters',
     'Click',
     'Filters pop-up mobiel',
   ],
   '.filter-bar #selectButton': [
     'event',
-    'Mijn aanvragen filters',
+    'Mijn zaken filters',
     'Click',
     'Filter dropdown',
   ],
   '.filter-bar .multiselect-listbox #listboxDropdown input[type="checkbox"]': [
     'event',
-    'Mijn aanvragen filters',
+    'Mijn zaken filters',
     'Click',
     'Checkbox status filter',
   ],
   '.filter-bar .multiselect-listbox #listboxDropdown .checkbox__label': [
     'event',
-    'Mijn aanvragen filters',
+    'Mijn zaken filters',
     'Click',
     'Checkbox status filter option',
   ],
@@ -382,11 +382,11 @@ const partialClickSelectors = {
   },
   // Detail case toggle statuses
   '#statuses_component > aside > ul > li.status-list__list-item.status--current > div > h3 > button':
-    { category: 'Mijn aanvragen huidige status' },
+    { category: 'Mijn zaken huidige status' },
   '#statuses_component > aside > ul > li.status--completed.status-list__list-item > div > h3 > button':
-    { category: 'Mijn aanvragen voltooide status' },
+    { category: 'Mijn zaken voltooide status' },
   '#statuses_component > aside > ul > li.status--active.status-list__list-item > div > h3 > button':
-    { category: 'Mijn aanvragen openstaande status' },
+    { category: 'Mijn zaken openstaande status' },
   '.logo .logo__image': { label: 'Header logo' },
   '.view--inbox-index #content .grid__sidebar ul li > a > p.utrecht-heading-4':
     { category: 'Mijn berichten', label: 'Click naar bericht' },
