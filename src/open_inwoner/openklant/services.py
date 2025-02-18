@@ -1465,8 +1465,6 @@ class OpenKlant2Service(LogMixin, KlantenService):
 
         onderwerp_object = onderwerp_objecten[0]
 
-        zaak_with_api_group = None
-
         # fetch zaken for user
         groups = ZGWApiGroupConfig.objects.filter(
             klant_backend=KlantenServiceType.OPENKLANT2.value
@@ -1480,17 +1478,22 @@ class OpenKlant2Service(LogMixin, KlantenService):
             )
             return self._build_question_dto(question_ok2=question, user=user), None
 
-        # find the unique zaak for the question
+        # find the unique zaak + relevant api client for the question
         zaken_for_question = []
+        clients = []
         for response in truthy_responses:
             # discard the client for determining the api_group; we only need the zaak
             zaken = response.result
+            client = response.client
             zaken_filtered = filter(
                 lambda z: z.identificatie
                 == onderwerp_object["onderwerpobjectidentificator"]["objectId"],
                 zaken,
             )
             zaken_for_question.extend(zaken_filtered)
+            clients.append(client)
+
+        # sanity checks
         if not zaken_for_question:
             logger.info(
                 "Could not find zaak corresponding to question %s",
@@ -1503,10 +1506,18 @@ class OpenKlant2Service(LogMixin, KlantenService):
                 question.question_kcm_uuid,
             )
             return self._build_question_dto(question_ok2=question, user=user), None
+        if len(clients) > 1:
+            logger.error("Found one zaak in multiple backends")
+            return self._build_question_dto(question_ok2=question, user=user), None
+
+        group = ZGWApiGroupConfig.objects.resolve_group_from_hints(client=clients[0])
+        zaak_with_api_group = ZaakWithApiGroup(
+            zaak=zaken_for_question[0], api_group=group
+        )
 
         return (
             self._build_question_dto(question_ok2=question, user=user),
-            zaken_for_question[0],
+            zaak_with_api_group,
         )
 
     def _build_question_dtos(
