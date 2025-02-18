@@ -129,6 +129,7 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
             {
                 "fields": (
                     "name",
+                    "enable_crawler_indexing",
                     "login_show",
                     "login_allow_registration",
                     "enable_eherkenning_for_eenmanszaak",

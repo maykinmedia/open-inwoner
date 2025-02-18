@@ -18,6 +18,7 @@ def settings(request):
 
     context = {
         "site_name": config.name,
+        "enable_crawler_indexing": config.enable_crawler_indexing,
         "theming": {
             "primary": config.get_primary_color,
             "secondary": config.get_secondary_color,

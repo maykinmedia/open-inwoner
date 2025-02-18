@@ -2,6 +2,9 @@
 <html lang="nl" class="view utrecht-document openinwoner-theme {% block view_class %}view--{{ request.resolver_match.namespaces|join:'-' }}-{{ request.resolver_match.url_name }}{% endblock %}">
     <head>
         <meta charset="utf-8">
+        {% block robots %}
+            <meta name="robots" content="{% if enable_crawler_indexing %}all{% else %}noindex{% endif %}">
+        {% endblock robots %}
         <meta name="format-detection" content="telephone=no">
         <title>{% block title %}{% if page_title %}{{ page_title }} - {% endif %}{{ site_name }}{% endblock %}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -63,7 +66,7 @@
     </head>
 
     <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="utrecht-page">
-    
+
         {% if cookiebanner_enabled %}
         {# render cookiebanner first #}
         <div class="cookie-banner" id="cookie-banner" aria-labelledby="cookie-banner__title" aria-describedby="cookie-banner__text">
@@ -79,7 +82,7 @@
             </div>
         </div>
         {% endif %}
-        
+
         {% include "components/Header/AccessibilitySkipLink.html" %}
 
         {% if warning_banner_enabled %}

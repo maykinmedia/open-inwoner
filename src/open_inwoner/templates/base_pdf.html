@@ -3,6 +3,7 @@
     <html lang="en" class="view view--full-width">
         <head>
             <meta charset="utf-8">
+            <meta name="robots" content="{% if enable_crawler_indexing %}all{% else %}noindex{% endif %}">
             <title>{% block title %}{{ site_name }}{% endblock %}</title>
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <link href="{% static 'bundles/pdf-p.css' %}" media="all" rel="stylesheet" />
