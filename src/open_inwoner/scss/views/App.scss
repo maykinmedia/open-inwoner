@@ -22,6 +22,7 @@
   --border-width-thin: 1px;
   --border-radius: 3px;
   --border-radius-large: 8px;
+  --border-radius-rounded: 999px;
 
   // Color.
 
@@ -161,6 +162,7 @@
     var(--color-info-s),
     calc(var(--color-info-l) + 10%)
   );
+  --color-info-lightest: hsl(210, 70%, 96%);
   --color-info-darker: hsl(
     var(--color-info-h),
     var(--color-info-s),

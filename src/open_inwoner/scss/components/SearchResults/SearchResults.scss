@@ -3,22 +3,20 @@
     display: flex;
     flex-direction: column;
     gap: var(--spacing-large);
-  }
 
-  &__title {
-    margin: var(--spacing-giant) 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    .grid {
+      gap: var(--spacing-large);
+    }
   }
 
   &__title-small {
-    color: var(--color-black);
+    color: var(--color-body);
     font-family: var(--font-family-body);
     font-size: var(--font-size-body);
     letter-spacing: 0;
     line-height: var(--font-line-height-body);
     font-weight: normal;
+    margin: var(--spacing-extra-large) 0 var(--row-height) 0;
   }
 
   &__item {
@@ -28,38 +26,68 @@
     letter-spacing: 0;
     line-height: var(--font-line-height-body);
     text-decoration: none;
+
+    .utrecht-heading-3.search-results__item-title {
+      margin: 0 0 var(--spacing-large) 0;
+    }
+
+    .utrecht-paragraph {
+      margin: 0;
+    }
   }
 
-  &__item-title {
-    font-size: var(--utrecht-heading-3-font-size);
-    line-height: var(--utrecht-heading-3-line-height);
-    letter-spacing: 0;
-    margin: 0 0 6px;
+  .link {
+    padding-top: var(--card-spacing);
   }
 
-  &__item-info-container {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: var(--spacing-large);
-    align-items: end;
-  }
+  &--no-results {
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--border-radius);
+    background-color: var(--color-info-lighter);
+    color: var(--color-info-darker);
 
-  &__item-intro {
-    color: var(--color-black);
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-body);
-    letter-spacing: 0;
-    line-height: var(--font-line-height-body);
-    margin: 0;
-  }
+    &-column {
+      padding: var(--spacing-extra-large) var(--spacing-extra-large) 0
+        var(--spacing-extra-large);
 
-  &__item-type {
-    color: var(--color-black);
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-body);
-    letter-spacing: 0;
-    line-height: var(--font-line-height-body);
-    text-align: right;
-    margin: 0;
+      .search-results__title {
+        color: var(--color-info-darker);
+        margin: 0;
+      }
+
+      .ul {
+        margin-block-start: var(--spacing-giant);
+        margin-inline-start: 11px;
+        padding-inline-start: 0;
+      }
+
+      .utrecht-paragraph,
+      .ul .li {
+        color: var(--color-info-darker);
+      }
+
+      *[class*='icons'] {
+        margin-top: var(--spacing-small);
+      }
+
+      &:first-child {
+        @media (min-width: 768px) {
+          padding: var(--spacing-extra-large) 0 var(--spacing-extra-large)
+            var(--spacing-extra-large);
+        }
+      }
+
+      &:last-child {
+        padding-top: var(--spacing-medium);
+        @media (min-width: 768px) {
+          padding-top: var(--spacing-extra-large);
+        }
+      }
+    }
+
+    @media (min-width: 768px) {
+      flex-direction: row;
+    }
   }
 }

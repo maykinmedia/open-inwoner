@@ -26,22 +26,12 @@
     text-decoration: none;
 
     &--active {
-      color: var(--color-primary);
-
-      &:before {
-        background-color: var(--color-primary);
-        border-radius: 100px;
-        bottom: 0;
-        content: ' ';
-        left: 0;
-        opacity: 0.15;
-        position: absolute;
-        right: 0;
-        top: 0;
-      }
+      color: var(--color-white);
+      background-color: var(--color-primary);
+      border-radius: var(--border-radius-rounded);
 
       &:hover {
-        color: var(--color-body);
+        background-color: var(--color-body);
       }
     }
 

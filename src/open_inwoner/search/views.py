@@ -1,5 +1,6 @@
 import logging
 
+from django.conf import settings
 from django.contrib import messages
 from django.core.paginator import InvalidPage, Paginator
 from django.http import Http404
@@ -28,7 +29,7 @@ class SearchView(
 ):
     form_class = SearchForm
     template_name = "pages/search.html"
-    paginate_by = 20
+    paginate_by = settings.RESULTS_PER_PAGE
     paginator_class = Paginator
     page_kwarg = "page"
     success_url = reverse_lazy("search:search")
@@ -114,7 +115,7 @@ class SearchView(
         # update form fields with choices
         for facet in results.facets:
             if facet.name in form.fields:
-                form.fields[facet.name].choices = facet.total_choices()
+                form.fields[facet.name].choices = facet.choices()
 
         # paginate
         paginator_dict = self.paginate_with_context(results.results)
