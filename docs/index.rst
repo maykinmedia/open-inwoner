@@ -32,3 +32,4 @@ Documentation
     installation/index
     configuration/index
     testing
+    changelog
