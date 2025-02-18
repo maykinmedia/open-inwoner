@@ -1,3 +1,4 @@
+import contextlib
 import os
 import sys
 import warnings
@@ -155,7 +156,7 @@ if config("PROFILE", default=False):
     SILKY_PYTHON_PROFILER_BINARY = True
 
 # Override settings with local settings.
-try:
+
+
+with contextlib.suppress(ImportError):
     from .local import *  # noqa
-except ImportError:
-    pass

@@ -83,10 +83,7 @@ class AssertTimelineLogMixin:
         for log in qs:
             message = json.dumps(log.extra_data.get("message", ""))
             log_level = log.extra_data.get("log_level")
-            if log_level:
-                log_level = logging.getLevelName(log_level)
-            else:
-                log_level = "NO_LEVEL"
+            log_level = logging.getLevelName(log_level) if log_level else "NO_LEVEL"
             msg = f"  {log_level}: {message}"
 
             parts = []
@@ -225,10 +222,7 @@ class TwoFactorUserTestMixin:
 
 
 def create_image_bytes(img_file=None):
-    if img_file:
-        img = Image.open(img_file)
-    else:
-        img = Image.new("RGB", (10, 10))
+    img = Image.open(img_file) if img_file else Image.new("RGB", (10, 10))
     image_io = io.BytesIO()
     img.save(image_io, format="JPEG")
     img_bytes = image_io.getvalue()

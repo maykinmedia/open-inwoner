@@ -51,13 +51,14 @@ class MenuModifier(Modifier):
                 node.common = ext
 
                 # modify menu check for page visibility
-                if ext.requires_auth and not request.user.is_authenticated:
-                    nodes.remove(node)
-                    continue
-                elif ext.requires_auth_bsn_or_kvk and request.user.login_type not in [
-                    LoginTypeChoices.digid,
-                    LoginTypeChoices.eherkenning,
-                ]:
+                if (ext.requires_auth and not request.user.is_authenticated) or (
+                    ext.requires_auth_bsn_or_kvk
+                    and request.user.login_type
+                    not in [
+                        LoginTypeChoices.digid,
+                        LoginTypeChoices.eherkenning,
+                    ]
+                ):
                     nodes.remove(node)
                     continue
 

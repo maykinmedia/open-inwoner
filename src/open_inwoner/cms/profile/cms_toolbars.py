@@ -30,5 +30,5 @@ class ProfileApphookConfigToolbar(ExtensionToolbar):
             current_page_menu.add_modal_item(
                 _("Profile apphook configurations"),
                 url=url,
-                disabled=(not self.page.application_urls == "ProfileApphook"),
+                disabled=(self.page.application_urls != "ProfileApphook"),
             )

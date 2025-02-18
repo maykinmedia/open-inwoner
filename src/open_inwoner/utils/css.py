@@ -97,10 +97,9 @@ def _clean_toplevel(rule, allowed_css_properties):
     new_tokens = []
 
     for token in tinycss2.parse_declaration_list(rule.content):
-        if token.type == "declaration":
-            if token.lower_name in allowed_css_properties:
-                new_tokens.append(token)
-        elif token.type in ("comment", "whitespace"):
+        if token.type == "declaration" and token.lower_name in allowed_css_properties:
+            new_tokens.append(token)
+        elif token.type in ("comment", "whitespace"):  # noqa: SIM102
             if new_tokens and new_tokens[-1].type != token.type:
                 new_tokens.append(token)
 

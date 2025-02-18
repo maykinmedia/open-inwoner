@@ -9,7 +9,7 @@ register = template.Library()
 
 @register.inclusion_tag("components/Product/finder.html", takes_context=True)
 def product_finder(
-    context, condition, form, form_action=".", primary_text=None, **kwargs
+    context, condition, form, form_action=None, primary_text=None, **kwargs
 ):
     """
     Renders the actions in a filterable table.
@@ -28,7 +28,7 @@ def product_finder(
     try:
         form_action = reverse(form_action)
     except NoReverseMatch:
-        pass
+        form_action = "."
 
     kwargs.update(
         condition=condition,

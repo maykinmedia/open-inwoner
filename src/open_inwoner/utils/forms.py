@@ -27,8 +27,8 @@ class ErrorMessageMixin:
             field_error_messages = custom_error_messages.get(field_name, {})
 
             error_messages = {}
-            for key in self.default_error_messages.keys():
-                if key in field_error_messages.keys():
+            for key in self.default_error_messages:
+                if key in field_error_messages:
                     error_message = field_error_messages[key].format(
                         field_name=f'"{field.label}"'
                     )
@@ -141,7 +141,7 @@ class LimitedUploadFileField(forms.FileField):
     def clean(self, *args, **kwargs):
         f = super().clean(*args, **kwargs)
 
-        if isinstance(f, InMemoryUploadedFile) or isinstance(f, TemporaryUploadedFile):
+        if isinstance(f, (InMemoryUploadedFile, TemporaryUploadedFile)):
             _error_messages = self.upload_error_messages
 
             # checking file size limits

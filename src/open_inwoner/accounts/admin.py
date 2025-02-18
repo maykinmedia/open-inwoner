@@ -59,13 +59,11 @@ class _UserChangeForm(UserChangeForm):
         ):
             raise ValidationError(_("Only a 'begeleider' user can add an image."))
 
-        if cleaned_data.get("email"):
-
-            if (
-                User.objects.filter(email__iexact=cleaned_data["email"])
-                and self.instance.email != cleaned_data["email"]
-            ):
-                raise ValidationError(_("The user with this email already exists."))
+        if cleaned_data.get("email") and (
+            User.objects.filter(email__iexact=cleaned_data["email"])
+            and self.instance.email != cleaned_data["email"]
+        ):
+            raise ValidationError(_("The user with this email already exists."))
 
 
 class _UserCreationForm(UserCreationForm):

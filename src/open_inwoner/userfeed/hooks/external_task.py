@@ -87,14 +87,13 @@ def update_external_task_items(user: User, openstaande_taken: list[OpenTask]):
 
 
 def update_user_tasks(user: User):
-    if user.login_type == LoginTypeChoices.digid:
-        if client := build_forms_client():
-            try:
-                tasks = client.fetch_open_tasks(user.bsn)
-            except (RequestException, ClientError):
-                logger.exception("Something went wrong while fetching open tasks")
-            else:
-                update_external_task_items(user, tasks)
+    if user.login_type == LoginTypeChoices.digid and (client := build_forms_client()):
+        try:
+            tasks = client.fetch_open_tasks(user.bsn)
+        except (RequestException, ClientError):
+            logger.exception("Something went wrong while fetching open tasks")
+        else:
+            update_external_task_items(user, tasks)
 
 
 register_item_adapter(OpenTaskFeedItem, FeedItemType.external_task)

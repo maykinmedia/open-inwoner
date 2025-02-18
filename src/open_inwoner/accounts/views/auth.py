@@ -98,7 +98,7 @@ class CustomDigiDAssertionConsumerServiceMockView(
         session = self.request.session
 
         # Remove invite url from user's session after successful digid login
-        if "invite_url" in session.keys():
+        if "invite_url" in session:
             del session["invite_url"]
 
         return super().get_success_url()
@@ -127,7 +127,7 @@ class CustomDigiDAssertionConsumerServiceView(DigiDAssertionConsumerServiceView)
     def get_success_url(self):
         session = self.request.session
         # Remove invite url from user's session after successful digid login
-        if "invite_url" in session.keys():
+        if "invite_url" in session:
             del session["invite_url"]
 
         return super().get_success_url()
@@ -199,7 +199,7 @@ class CustomeHerkenningAssertionConsumerServiceMockView(
         session = self.request.session
 
         # Remove invite url from user's session after successful digid login
-        if "invite_url" in session.keys():
+        if "invite_url" in session:
             del session["invite_url"]
 
         return super().get_success_url()
@@ -230,7 +230,7 @@ class CustomeHerkenningAssertionConsumerServiceView(
     def get_success_url(self):
         session = self.request.session
         # Remove invite url from user's session after successful digid login
-        if "invite_url" in session.keys():
+        if "invite_url" in session:
             del session["invite_url"]
 
         return super().get_success_url()

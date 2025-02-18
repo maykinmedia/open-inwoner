@@ -283,9 +283,12 @@ class eSuiteKlantenService(KlantenService):
         if klant.telefoonnummer and klant.telefoonnummer != user.phonenumber:
             update_data["phonenumber"] = klant.telefoonnummer
 
-        if klant.emailadres and klant.emailadres != user.email:
-            if not User.objects.filter(email__iexact=klant.emailadres).exists():
-                update_data["email"] = klant.emailadres
+        if (
+            klant.emailadres
+            and klant.emailadres != user.email
+            and (not User.objects.filter(email__iexact=klant.emailadres).exists())
+        ):
+            update_data["email"] = klant.emailadres
 
         config = SiteConfiguration.get_solo()
         if config.enable_notification_channel_choice:
@@ -1063,9 +1066,10 @@ class OpenKlant2Service(LogMixin, KlantenService):
             partij_uuid, params={"expand": ["digitaleAdressen"]}
         )
 
-        if expand := expand_partij.get("_expand"):
-            if digitale_adressen := expand.get("digitaleAdressen"):
-                return digitale_adressen
+        if (expand := expand_partij.get("_expand")) and (
+            digitale_adressen := expand.get("digitaleAdressen")
+        ):
+            return digitale_adressen
 
         # TODO: A missing _expand can mean there are no addresses.
         # See: https://github.com/maykinmedia/open-klant/issues/243

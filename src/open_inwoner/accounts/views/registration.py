@@ -83,7 +83,7 @@ class CustomRegistrationView(LogMixin, InviteMixin, RegistrationView):
 
         # Remove invite url from user's session
         session = self.request.session
-        if "invite_url" in session.keys():
+        if "invite_url" in session:
             del session["invite_url"]
 
         self.request.user = user
@@ -208,10 +208,10 @@ class NecessaryFieldsUserView(
             return
 
         update_fields = ["emailadres"]
-        if "phonenumber" in form.cleaned_data.keys():
+        if "phonenumber" in form.cleaned_data:
             update_fields.append("telefoonnummer")
 
-        if "case_notification_channel" in form.cleaned_data.keys():
+        if "case_notification_channel" in form.cleaned_data:
             update_fields.append("toestemmingZaakNotificatiesAlleenDigitaal")
 
         service.update_klant_from_user(klant, user, update_fields=update_fields)

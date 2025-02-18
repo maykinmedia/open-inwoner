@@ -119,7 +119,7 @@ class ZaakAPIModelTest(TestCase):
             ZaakTitleDisplayChoices.zaaktype_onderwerp: zaaktype.onderwerp,
         }
         # Guard against new values
-        assert all(choice in expected.keys() for choice in ZaakTitleDisplayChoices)
+        assert all(choice in expected for choice in ZaakTitleDisplayChoices)
 
         for config_setting, expected_value in expected.items():
             with self.subTest(config_setting):

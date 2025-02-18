@@ -1,3 +1,5 @@
+import contextlib
+
 from django import forms
 from django.contrib import admin
 from django.forms import BaseModelFormSet
@@ -206,10 +208,8 @@ class CategoryAdmin(OrderedInlineModelAdminMixin, ImportExportMixin, TreeAdmin):
 
         # disable product management if we have restrictions
         if request.user.has_group_managed_categories():
-            try:
+            with contextlib.suppress(ValueError):
                 inlines.remove(CategoryProductInline)
-            except ValueError:
-                pass
 
         return inlines
 

@@ -339,8 +339,7 @@ class KlantenSysteemConfig(SingletonModel):
     @property
     def has_contactform_configuration(self) -> bool:
         contactform_subjects = ContactFormSubject.objects.filter(
-            esuite_subject_code__isnull=False
-            if self.primary_backend == KlantenServiceType.ESUITE.value
-            else True
+            esuite_subject_code__isnull=self.primary_backend
+            != KlantenServiceType.ESUITE.value
         )
         return self.contact_registration_enabled and contactform_subjects.exists()

@@ -170,9 +170,10 @@ def autorender_field(form_object, field_name, **kwargs):
 
     if type(field) is forms.fields.DateField:
         tmplt = WIDGET_TEMPLATES["DATE"]
-    elif type(field) is forms.models.ModelMultipleChoiceField:
-        tmplt = WIDGET_TEMPLATES["MULTIPLECHECKBOX"]
-    elif type(field) is forms.MultipleChoiceField:
+    elif (
+        type(field) is forms.models.ModelMultipleChoiceField
+        or type(field) is forms.MultipleChoiceField
+    ):
         tmplt = WIDGET_TEMPLATES["MULTIPLECHECKBOX"]
     elif type(field) is forms.fields.BooleanField:
         fn = checkbox
@@ -434,9 +435,8 @@ def form_actions(
     Extra context:
         - primary: bool | If the primary styling should be used.
     """
-    if not primary_text and primary_icon is None:
-        if kwargs.get("primary", True):
-            assert False, "provide primary_text or primary_icon"
+    if (not primary_text and primary_icon is None) and kwargs.get("primary", True):
+        assert False, "provide primary_text or primary_icon"
 
     primary = kwargs.get("primary", "transparent" not in kwargs)
 
@@ -510,9 +510,9 @@ class FormNode(template.Node):
 
 # delete?
 @register.filter
-def get_icon_symbol(key: str) -> str:
+def get_icon_symbol(key: str) -> str | None:
     mapping = {
         "Alleen digitaal": "computer",
         "Digitaal en per brief": "mail",
     }
-    return mapping.get(key, None)
+    return mapping.get(key)
