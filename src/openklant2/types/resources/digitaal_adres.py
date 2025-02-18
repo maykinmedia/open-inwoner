@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, NotRequired
 
 from pydantic import TypeAdapter
 from typing_extensions import TypedDict
@@ -19,6 +19,7 @@ class CreateDigitaalAdresData(TypedDict):
     adres: str
     omschrijving: str
     soortDigitaalAdres: SoortDigitaalAdres
+    isStandaardAdres: NotRequired[bool]
 
 
 class ListDigitaalAdresParams(TypedDict):
@@ -36,6 +37,7 @@ class DigitaalAdres(TypedDict):
     adres: str
     omschrijving: str
     soortDigitaalAdres: SoortDigitaalAdres
+    isStandaardAdres: bool
 
 
 CreateDigitaalAdresDataValidator = TypeAdapter(CreateDigitaalAdresData)

@@ -1105,12 +1105,16 @@ class OpenKlant2Service(LogMixin, KlantenService):
         partij_uuid: str,
         soortAdres: Literal["email", "telefoonnummer"],
         adres: str,
+        isStandaardAdres: bool = False,
     ) -> tuple[DigitaalAdres, bool]:
         digitale_adressen = self.filter_digitale_addressen_for_partij(
             partij_uuid, soortDigitaalAdres=soortAdres
         )
         for digitaal_adres in digitale_adressen:
-            if digitaal_adres["adres"] == adres:
+            if (
+                digitaal_adres["adres"] == adres
+                and digitaal_adres["isStandaardAdres"] == isStandaardAdres
+            ):
                 return digitaal_adres, False
 
         return (
@@ -1118,6 +1122,7 @@ class OpenKlant2Service(LogMixin, KlantenService):
                 data={
                     "adres": adres,
                     "soortDigitaalAdres": soortAdres,
+                    "isStandaardAdres": isStandaardAdres,
                     "verstrektDoorPartij": {
                         "uuid": partij_uuid,
                     },
@@ -1143,7 +1148,20 @@ class OpenKlant2Service(LogMixin, KlantenService):
         if phone_adressen := self.filter_digitale_addressen_for_partij(
             partij_uuid, soortDigitaalAdres="telefoonnummer", adressen=adressen
         ):
-            update_data["phonenumber"] = phone_adressen[0]["adres"]
+            for adres in phone_adressen:
+                if adres["isStandaardAdres"]:
+                    update_data["phonenumber"] = adres["adres"]
+                else:
+                    update_data["phonenumber_alternative"] = adres["adres"]
+
+            # we currently only support two phone numbers: primary + secondary
+            # the following edge case cannot happen through OIP, but we cannot
+            # exclude that it happens through some external service. In this case,
+            # we pick the last one
+            if len(phone_adressen) > 2:
+                logger.warning(
+                    "More than two phone numbers found for partij %s", partij_uuid
+                )
 
         if update_data:
             for attr, value in update_data.items():
@@ -1157,14 +1175,25 @@ class OpenKlant2Service(LogMixin, KlantenService):
 
     def update_partij_from_user(self, partij_uuid: str, user: User):
         updated_fields = []
+
+        _, created = self.get_or_create_digitaal_adres(
+            partij_uuid=partij_uuid,
+            soortAdres="telefoonnummer",
+            adres=user.phonenumber,
+            isStandaardAdres=True,
+        )
+        if created:
+            updated_fields.append("digitaleAddresen.telefoonnummer")
+
         for attr, soort_adres in (
             ("email", "email"),
-            ("phonenumber", "telefoonnummer"),
+            ("phonenumber_alternative", "telefoonnummer"),
         ):
             _, created = self.get_or_create_digitaal_adres(
-                partij_uuid,
-                soort_adres,
-                getattr(user, attr),
+                partij_uuid=partij_uuid,
+                soortAdres=soort_adres,
+                adres=getattr(user, attr),
+                isStandaardAdres=False,
             )
             if created:
                 updated_fields.append(f"digitaleAddresen.{soort_adres}")
