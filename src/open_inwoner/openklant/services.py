@@ -456,6 +456,7 @@ class eSuiteVragenService(KlantenService):
                     json={
                         "klant": klant.url,
                         "contactmoment": contactmoment.url,
+                        "verzendBevestigingsmail": self.config.send_klantcontact_confirmation_email,
                         "rol": rol,
                     },
                 )
