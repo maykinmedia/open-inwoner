@@ -3,7 +3,7 @@ from django.urls import reverse
 
 import requests_mock
 from freezegun import freeze_time
-from pyquery import PyQuery as PQ
+from pyquery import PyQuery
 
 from open_inwoner.cms.tests import cms_tools
 from open_inwoner.qmatic.tests.data import QmaticMockData
@@ -33,16 +33,16 @@ class TestUserAppointmentsPlugin(TestCase):
         self.assertIn("ID kaart", html)
         self.assertNotIn("Old appointment", html)
 
-        pyquery = PQ(html)
+        pyquery = PyQuery(html)
 
         # test item
         items = pyquery.find(".card-container .card")
         self.assertEqual(len(items), 2)
 
-        aanvraag_paspoort_date = PQ(items.find("p.tabled__value")[0]).text()
-        aanvraag_paspoort_title = PQ(items.find(".plugin-card__heading")[0]).text()
-        aanvraag_id_kaart_date = PQ(items.find("p.tabled__value")[1]).text()
-        aanvraag_id_kaart_title = PQ(items.find(".plugin-card__heading")[1]).text()
+        aanvraag_paspoort_date = PyQuery(items.find("p.tabled__value")[0]).text()
+        aanvraag_paspoort_title = PyQuery(items.find(".plugin-card__heading")[0]).text()
+        aanvraag_id_kaart_date = PyQuery(items.find("p.tabled__value")[1]).text()
+        aanvraag_id_kaart_title = PyQuery(items.find(".plugin-card__heading")[1]).text()
 
         self.assertEqual(aanvraag_paspoort_date, "1 januari 2020 om 13:00 uur")
         self.assertEqual(aanvraag_paspoort_title, "Paspoort")

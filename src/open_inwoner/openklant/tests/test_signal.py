@@ -123,7 +123,7 @@ class UpdateUserFromLoginSignalAPITestCase(
                     expected_user_case_notification_channel,
                 )
 
-    def test_update_notification_Channel_choice_after_login_requires_notification_choice_enabled(
+    def test_update_notification_channel_choice_after_login_requires_notification_choice_enabled(
         self, m
     ):
         config = SiteConfiguration.get_solo()

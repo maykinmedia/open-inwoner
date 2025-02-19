@@ -6,7 +6,7 @@ from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 
 from open_inwoner.cms.plugins.models.appointments import UserAppointments
-from open_inwoner.qmatic.client import NoServiceConfigured, QmaticClient
+from open_inwoner.qmatic.client import NoServiceConfigured, qmatic_client_factory
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +24,7 @@ class UserAppointmentsPlugin(CMSPluginBase):
             appointments = []
         else:
             try:
-                client = QmaticClient()
+                client = qmatic_client_factory()
             except NoServiceConfigured:
                 logger.exception("Error occurred while creating Qmatic client")
                 appointments = []

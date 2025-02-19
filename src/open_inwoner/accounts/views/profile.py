@@ -30,7 +30,7 @@ from open_inwoner.laposta.forms import NewsletterSubscriptionForm
 from open_inwoner.laposta.models import LapostaConfig
 from open_inwoner.openklant.services import eSuiteKlantenService
 from open_inwoner.plans.models import Plan
-from open_inwoner.qmatic.client import NoServiceConfigured, QmaticClient
+from open_inwoner.qmatic.client import NoServiceConfigured, qmatic_client_factory
 from open_inwoner.questionnaire.models import QuestionnaireStep
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
@@ -414,7 +414,7 @@ class UserAppointmentsView(
             context["appointments"] = []
         else:
             try:
-                client = QmaticClient()
+                client = qmatic_client_factory()
             except NoServiceConfigured:
                 logger.exception("Error occurred while creating Qmatic client")
                 context["appointments"] = []

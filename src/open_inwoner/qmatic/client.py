@@ -85,7 +85,7 @@ class NoServiceConfigured(RuntimeError):
 # API CLIENT IMPLEMENTATIONS, per major version of the API
 
 
-def QmaticClient() -> "Client":
+def qmatic_client_factory() -> "Client":
     """
     Create a Qmatic client instance from the database configuration.
     """

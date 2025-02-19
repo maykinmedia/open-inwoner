@@ -15,7 +15,7 @@ import requests_mock
 from django_webtest import DjangoTestApp, DjangoWebtestResponse, WebTest
 from furl import furl
 from mozilla_django_oidc_db.models import OpenIDConnectConfig
-from pyquery import PyQuery as PQ
+from pyquery import PyQuery
 
 from open_inwoner.accounts.views.auth_oidc import (
     GENERIC_DIGID_ERROR_MSG,
@@ -48,7 +48,7 @@ def perform_oidc_login(
 
     login_response = app.get(login_url)
 
-    doc = PQ(login_response.content)
+    doc = PyQuery(login_response.content)
     login_link = doc.find(f".link--{login_type}")
     init_url = login_link.attr("href")
 
@@ -817,7 +817,7 @@ class DigiDOIDCFlowTests(WebTest):
         )
 
         login_response = self.client.get(error_response.url)
-        doc = PQ(login_response.content)
+        doc = PyQuery(login_response.content)
         error_msg = doc.find(".notification__content").text()
 
         self.assertEqual(error_msg, "Je hebt het inloggen met DigiD geannuleerd.")
@@ -874,7 +874,7 @@ class DigiDOIDCFlowTests(WebTest):
         )
 
         login_response = self.client.get(error_response.url)
-        doc = PQ(login_response.content)
+        doc = PyQuery(login_response.content)
         error_msg = doc.find(".notification__content").text()
 
         self.assertEqual(error_msg, str(GENERIC_DIGID_ERROR_MSG))
@@ -927,7 +927,7 @@ class DigiDOIDCFlowTests(WebTest):
         )
 
         login_response = self.client.get(error_response.url)
-        doc = PQ(login_response.content)
+        doc = PyQuery(login_response.content)
         error_msg = doc.find(".notification__content").text()
 
         self.assertEqual(error_msg, str(GENERIC_DIGID_ERROR_MSG))
@@ -1438,7 +1438,7 @@ class eHerkenningOIDCFlowTests(WebTest):
         )
 
         login_response = self.client.get(error_response.url)
-        doc = PQ(login_response.content)
+        doc = PyQuery(login_response.content)
         error_msg = doc.find(".notification__content").text()
 
         self.assertEqual(error_msg, "Je hebt het inloggen met eHerkenning geannuleerd.")
@@ -1497,7 +1497,7 @@ class eHerkenningOIDCFlowTests(WebTest):
         )
 
         login_response = self.client.get(error_response.url)
-        doc = PQ(login_response.content)
+        doc = PyQuery(login_response.content)
         error_msg = doc.find(".notification__content").text()
 
         self.assertEqual(error_msg, str(GENERIC_EHERKENNING_ERROR_MSG))
@@ -1557,7 +1557,7 @@ class eHerkenningOIDCFlowTests(WebTest):
         )
 
         login_response = self.client.get(error_response.url)
-        doc = PQ(login_response.content)
+        doc = PyQuery(login_response.content)
         error_msg = doc.find(".notification__content").text()
 
         self.assertEqual(error_msg, str(GENERIC_EHERKENNING_ERROR_MSG))
