@@ -95,6 +95,13 @@ class ESuiteKlantConfig(SingletonModel):
         default=list,
         validators=[validate_array_contents_non_empty],
     )
+    send_klantcontact_confirmation_email = models.BooleanField(
+        verbose_name=_("Send confirmation email for registration of klantcontact"),
+        default=False,
+        help_text=_(
+            "If enabled, a confirmation email will be sent upon registering a klantcontact."
+        ),
+    )
 
     register_api_required_fields = (
         "contactmomenten_service",
