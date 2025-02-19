@@ -12,7 +12,7 @@ from django.utils.translation import gettext as _
 import requests_mock
 from django_webtest import WebTest
 from freezegun import freeze_time
-from pyquery import PyQuery as PQ
+from pyquery import PyQuery
 from webtest import Upload
 
 from open_inwoner.accounts.choices import NotificationChannelChoice, StatusChoices
@@ -153,7 +153,7 @@ class ProfileViewTests(WebTest):
         self.assertNotContains(response, "Bedrijfsgegevens")
 
         # check notification preferences displayed
-        doc = PQ(response.content)
+        doc = PyQuery(response.content)
 
         notifications_text = doc.find("#profile-notifications")[0].text_content()
         self.assertIn("Mijn Berichten", notifications_text)
@@ -171,7 +171,7 @@ class ProfileViewTests(WebTest):
 
         response = self.app.get(self.url, user=self.user)
 
-        doc = PQ(response.content)
+        doc = PyQuery(response.content)
 
         self.assertEqual(doc.find("#profile-notifications"), [])
 
@@ -250,7 +250,7 @@ class ProfileViewTests(WebTest):
         self.assertContains(response, "Fantasiestraat 42")
         self.assertContains(response, "1234 XY The good place")
 
-        doc = PQ(response.content)
+        doc = PyQuery(response.content)
 
         business_section = doc.find("#business-overview")[0]
         self.assertEqual(business_section.text.strip(), "Bedrijfsgegevens")
@@ -1337,13 +1337,13 @@ class NewsletterSubscriptionTests(ClearCachesMixin, WebTest):
         )
 
         self.assertEqual(
-            PQ(subscribe_error).text(),
+            PyQuery(subscribe_error).text(),
             _(
                 "Something went wrong while trying to subscribe to '{list_name}', please try again later"
             ).format(list_name="Nieuwsbrief2"),
         )
         self.assertEqual(
-            PQ(unsubscribe_error).text(),
+            PyQuery(unsubscribe_error).text(),
             _(
                 "Something went wrong while trying to unsubscribe from '{list_name}', please try again later"
             ).format(list_name="Nieuwsbrief1"),
@@ -1500,30 +1500,36 @@ class UserAppointmentsTests(ClearCachesMixin, WebTest):
 
         self.assertNotIn("Old appointment", response.text)
 
-        self.assertEqual(PQ(cards[0]).find(".card__heading-2").text(), "Paspoort")
+        self.assertEqual(PyQuery(cards[0]).find(".card__heading-2").text(), "Paspoort")
 
-        passport_appointment = PQ(cards[0]).find("ul").children()
+        passport_appointment = PyQuery(cards[0]).find("ul").children()
 
-        self.assertEqual(PQ(passport_appointment[0]).text(), "Datum\n1 januari 2020")
-        self.assertEqual(PQ(passport_appointment[1]).text(), "Tijd\n13:00 uur")
-        self.assertEqual(PQ(passport_appointment[2]).text(), "Locatie\nHoofdkantoor")
-        self.assertEqual(PQ(passport_appointment[3]).text(), "Dam 1")
-        self.assertEqual(PQ(passport_appointment[4]).text(), "1234 ZZ Amsterdam")
         self.assertEqual(
-            PQ(cards[0]).find("a").attr("href"),
+            PyQuery(passport_appointment[0]).text(), "Datum\n1 januari 2020"
+        )
+        self.assertEqual(PyQuery(passport_appointment[1]).text(), "Tijd\n13:00 uur")
+        self.assertEqual(
+            PyQuery(passport_appointment[2]).text(), "Locatie\nHoofdkantoor"
+        )
+        self.assertEqual(PyQuery(passport_appointment[3]).text(), "Dam 1")
+        self.assertEqual(PyQuery(passport_appointment[4]).text(), "1234 ZZ Amsterdam")
+        self.assertEqual(
+            PyQuery(cards[0]).find("a").attr("href"),
             f"{self.data.config.booking_base_url}{self.data.appointment_passport.publicId}",
         )
 
-        self.assertEqual(PQ(cards[1]).find(".card__heading-2").text(), "ID kaart")
+        self.assertEqual(PyQuery(cards[1]).find(".card__heading-2").text(), "ID kaart")
 
-        id_card_appointment = PQ(cards[1]).find("ul").children()
+        id_card_appointment = PyQuery(cards[1]).find("ul").children()
 
-        self.assertEqual(PQ(id_card_appointment[0]).text(), "Datum\n6 maart 2020")
-        self.assertEqual(PQ(id_card_appointment[1]).text(), "Tijd\n11:30 uur")
-        self.assertEqual(PQ(id_card_appointment[2]).text(), "Locatie\nHoofdkantoor")
-        self.assertEqual(PQ(id_card_appointment[3]).text(), "Wall Street 1")
-        self.assertEqual(PQ(id_card_appointment[4]).text(), "1111 AA New York")
+        self.assertEqual(PyQuery(id_card_appointment[0]).text(), "Datum\n6 maart 2020")
+        self.assertEqual(PyQuery(id_card_appointment[1]).text(), "Tijd\n11:30 uur")
         self.assertEqual(
-            PQ(cards[1]).find("a").attr("href"),
+            PyQuery(id_card_appointment[2]).text(), "Locatie\nHoofdkantoor"
+        )
+        self.assertEqual(PyQuery(id_card_appointment[3]).text(), "Wall Street 1")
+        self.assertEqual(PyQuery(id_card_appointment[4]).text(), "1111 AA New York")
+        self.assertEqual(
+            PyQuery(cards[1]).find("a").attr("href"),
             f"{self.data.config.booking_base_url}{self.data.appointment_idcard.publicId}",
         )

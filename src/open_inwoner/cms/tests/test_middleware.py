@@ -3,7 +3,7 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from maykin_2fa.test import disable_admin_mfa
-from pyquery import PyQuery as pq
+from pyquery import PyQuery
 
 from open_inwoner.cms.tests import cms_tools
 from open_inwoner.cms.utils.middleware import DropToolbarMiddleware
@@ -61,11 +61,11 @@ class TestDropToolbarMiddleware(TwoFactorUserTestMixin, TestCase):
         self.assertHasToolbar(response)
 
     def assertHasToolbar(self, response):
-        d = pq(response.content.decode("utf8"))
+        d = PyQuery(response.content.decode("utf8"))
         if not len(d(".cms-toolbar")):
             self.fail("cannot locate element with class '.cms-toolbar'")
 
     def assertNotHasToolbar(self, response):
-        d = pq(response.content.decode("utf8"))
+        d = PyQuery(response.content.decode("utf8"))
         if len(d(".cms-toolbar")):
             self.fail("found element with class '.cms-toolbar'")

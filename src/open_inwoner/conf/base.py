@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 import sentry_sdk
 from celery.schedules import crontab
-from easy_thumbnails.conf import Settings as thumbnail_settings
+from easy_thumbnails.conf import Settings as ThumbnailSettings
 from log_outgoing_requests.formatters import HttpFormatter
 
 from .utils import config, get_sentry_integrations
@@ -800,7 +800,7 @@ FILER_STORAGES = {
 THUMBNAIL_PROCESSORS = (
     "filer.thumbnail_processors.scale_and_crop_with_subject_location",
     "image_cropping.thumbnail_processors.crop_corners",
-) + thumbnail_settings.THUMBNAIL_PROCESSORS
+) + ThumbnailSettings.THUMBNAIL_PROCESSORS
 
 THUMBNAIL_HIGH_RESOLUTION = True
 

@@ -163,7 +163,7 @@ class CatalogusConfigAdmin(admin.ModelAdmin):
         return custom_urls + urls
 
     @admin.action(description=_("Export to file"))
-    def export_catalogus_configs(modeladmin, request, queryset):
+    def export_catalogus_configs(self, request, queryset):
         export = ZGWConfigExport.from_catalogus_configs(queryset)
         response = StreamingHttpResponse(
             export.as_jsonl_iter(),
@@ -473,7 +473,7 @@ class ZaakTypeConfigAdmin(admin.ModelAdmin):
         return custom_urls + urls
 
     @admin.action(description=_("Export to file"))
-    def export_zaaktype_configs(modeladmin, request, queryset):
+    def export_zaaktype_configs(self, request, queryset):
         export = ZGWConfigExport.from_zaaktype_configs(queryset)
         response = StreamingHttpResponse(
             export.as_jsonl_iter(),

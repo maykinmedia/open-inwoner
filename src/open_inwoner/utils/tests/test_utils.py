@@ -231,7 +231,7 @@ class CacheBehaviorTest(DjangoTestCase):
         with self.assertRaises(ValueError):
             foo()
 
-    def test_returning_None_is_not_treated_as_a_cache_miss(self):
+    def test_returning_none_is_not_treated_as_a_cache_miss(self):
         m = mock.Mock()
 
         @cache("foo")

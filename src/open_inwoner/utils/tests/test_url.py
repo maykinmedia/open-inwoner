@@ -11,7 +11,7 @@ from open_inwoner.utils.url import (
 
 
 class MockRequest:
-    def __init__(self, GET=None):
+    def __init__(self, GET=None):  # noqa: N803
         self.GET = GET or dict()
 
     def get_host(self):

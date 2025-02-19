@@ -11,7 +11,7 @@ from django.utils.translation import gettext as _
 import requests_mock
 from django_webtest import WebTest
 from furl import furl
-from pyquery import PyQuery as PQ
+from pyquery import PyQuery
 
 from open_inwoner.accounts.choices import NotificationChannelChoice
 from open_inwoner.accounts.signals import KvKClient, update_user_on_login
@@ -2008,7 +2008,7 @@ class TestPasswordChange(WebTest):
     def test_password_change_button_is_rendered_with_default_login_type(self):
         response = self.app.get(reverse("profile:detail"), user=self.user)
 
-        doc = PQ(response.content)
+        doc = PyQuery(response.content)
         link = doc.find("[aria-label='Wachtwoord']")[0]
         self.assertTrue(doc(link).is_("a"))
 
@@ -2018,7 +2018,7 @@ class TestPasswordChange(WebTest):
         )
         response = self.app.get(reverse("profile:detail"), user=digid_user)
 
-        doc = PQ(response.content)
+        doc = PyQuery(response.content)
         links = doc.find("[aria-label='Wachtwoord']")
         self.assertEqual(len(links), 0)
 

@@ -11,7 +11,7 @@ from .factories import InviteFactory, UserFactory
 
 class DeleteContactInvitationsTest(AssertTimelineLogMixin, TestCase):
     @freeze_time("2023-09-26", as_arg=True)
-    def test_delete_expired_invitations(frozen_time, self):
+    def test_delete_expired_invitations(frozen_time, self):  # noqa: N805
         user = UserFactory(
             first_name="Johann Maria Salvadore",
             infix="van de",
