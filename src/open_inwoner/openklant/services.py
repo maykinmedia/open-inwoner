@@ -1091,7 +1091,7 @@ class OpenKlant2Service(LogMixin, KlantenService):
         self,
         partij_uuid: str,
         *,
-        soortDigitaalAdres: str,
+        soort_digital_adres: str,
         adressen: Iterable[DigitaalAdres] | None = None,
     ) -> list[DigitaalAdres]:
         if adressen is None:
@@ -1100,7 +1100,7 @@ class OpenKlant2Service(LogMixin, KlantenService):
         return [
             digitaal_adres
             for digitaal_adres in adressen
-            if digitaal_adres["soortDigitaalAdres"] == soortDigitaalAdres
+            if digitaal_adres["soortDigitaalAdres"] == soort_digital_adres
         ]
 
     def get_or_create_digitaal_adres(
@@ -1111,7 +1111,7 @@ class OpenKlant2Service(LogMixin, KlantenService):
         is_standaard_adres: bool = False,
     ) -> tuple[DigitaalAdres, bool]:
         digitale_adressen = self.filter_digitale_addressen_for_partij(
-            partij_uuid, soortDigitaalAdres=soort_adres
+            partij_uuid, soort_digital_adres=soort_adres
         )
         for digitaal_adres in digitale_adressen:
             if (
@@ -1142,14 +1142,14 @@ class OpenKlant2Service(LogMixin, KlantenService):
         adressen = self.retrieve_digitale_addressen_for_partij(partij_uuid)
 
         if email_adressen := self.filter_digitale_addressen_for_partij(
-            partij_uuid, soortDigitaalAdres="email", adressen=adressen
+            partij_uuid, soort_digital_adres="email", adressen=adressen
         ):
             email = email_adressen[0]["adres"]
             if not User.objects.filter(email__iexact=email).exists():
                 update_data["email"] = email
 
         if phone_adressen := self.filter_digitale_addressen_for_partij(
-            partij_uuid, soortDigitaalAdres="telefoonnummer", adressen=adressen
+            partij_uuid, soort_digital_adres="telefoonnummer", adressen=adressen
         ):
             for adres in phone_adressen:
                 if adres["isStandaardAdres"]:

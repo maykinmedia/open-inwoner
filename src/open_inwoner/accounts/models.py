@@ -62,7 +62,7 @@ class OpenIDDigiDConfig(_OIDCDigiDConfig):
     # XXX: enabling this requires the tests/mocks to be updated. exercise left to the
     # reader.
     @classproperty
-    def oidcdb_check_idp_availability(cls):
+    def oidcdb_check_idp_availability(cls):  # noqa: N805
         return False
 
     @property
@@ -89,7 +89,7 @@ class OpenIDEHerkenningConfig(_OIDCEHerkenningConfig):
     # XXX: enabling this requires the tests/mocks to be updated. exercise left to the
     # reader.
     @classproperty
-    def oidcdb_check_idp_availability(cls):
+    def oidcdb_check_idp_availability(cls):  # noqa: N805
         return False
 
     @property

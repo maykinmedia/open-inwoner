@@ -14,7 +14,7 @@ from django.urls import reverse_lazy
 import requests_mock
 from django_webtest import TransactionWebTest
 from furl import furl
-from pyquery import PyQuery as PQ
+from pyquery import PyQuery
 from timeline_logger.models import TimelineLog
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 
@@ -621,7 +621,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
         self.assertFalse(response.context.get("filter_form_enabled"))
 
         # check status/result label
-        doc = PQ(response.content)
+        doc = PyQuery(response.content)
 
         status_labels = doc.find(".list-item__caption:Contains('Status')")
         result_labels = doc.find(".list-item__caption:Contains('Resultaat')")
@@ -641,7 +641,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
 
                 self.assertEqual(response.context.get("filter_form_enabled"), flag)
 
-                doc = PQ(response.rendered_content)
+                doc = PyQuery(response.rendered_content)
                 self.assertEqual(len(doc.find("#filterBar")), 1 if flag else 0)
 
     @staticmethod

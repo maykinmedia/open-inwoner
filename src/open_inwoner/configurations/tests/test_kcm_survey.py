@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 from django.test import TestCase
 
-from pyquery import PyQuery as PQ
+from pyquery import PyQuery
 
 from open_inwoner.cms.profile.cms_apps import ProfileApphook
 from open_inwoner.cms.tests import cms_tools
@@ -25,7 +25,7 @@ class KCMSurveyTestCase(TestCase):
     def test_kcm_survey_configured(self, mock_config):
         response = self.client.get("/")
 
-        doc = PQ(response.content)
+        doc = PyQuery(response.content)
 
         self.assertEqual(len(doc.find(self.css_selector)), 1)
 
@@ -46,6 +46,6 @@ class KCMSurveyTestCase(TestCase):
                 ):
                     response = self.client.get("/")
 
-                    doc = PQ(response.content)
+                    doc = PyQuery(response.content)
 
                     self.assertEqual(len(doc.find(self.css_selector)), 0)

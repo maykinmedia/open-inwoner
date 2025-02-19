@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.utils.html import strip_tags
 from django.utils.translation import ngettext
 
-from pyquery import PyQuery as PQ
+from pyquery import PyQuery
 
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.cms.tests import cms_tools
@@ -26,7 +26,7 @@ class TestUserFeedPlugin(TestCase):
         self.assertIn("Test message", html)
         self.assertIn("Hello", html)
 
-        pyquery = PQ(html)
+        pyquery = PyQuery(html)
 
         # test summary
         summaries = pyquery.find(".userfeed__summary .userfeed__list-item")
