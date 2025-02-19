@@ -206,12 +206,20 @@
                 {% endif %}
                         <div class="card__body">
                             <div class="ellipsis">
-                                <p class="card__heading-4"><span class="link link__text">{% trans "Mijn begeleider" %}</span></p>
+                                <p class="card__heading-4">
+                                    <span class="link link__text">
+                                        {% if mentor_contacts|length < 2 %}
+                                            {% trans "Mijn begeleider" %}
+                                        {% else %}
+                                            {% trans "Mijn begeleiders" %}
+                                        {% endif %}
+                                    </span>
+                                </p>
                                 {% render_list %}
                                     {% for name in mentor_contact_names %}
                                         {% list_item text=name compact=True strong=False %}
                                     {% empty %}
-                                        <li class="card__text--small">{% trans "U heeft geen gemeentelijke begeleider." %}</li>
+                                        <li class="card__text--small">{% trans "U heeft geen gemeentelijke begeleiders." %}</li>
                                     {% endfor %}
                                 {% endrender_list %}
 
