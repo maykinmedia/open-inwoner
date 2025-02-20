@@ -23,7 +23,7 @@
                         {% dropdown icon="more_horiz" %}
                             <div class="dropdown__item">
                                 {% get_action_edit_url action=action plan=plan as action_url %}
-                                {% button icon="edit" text=_("Bewerken") href=action_url icon_outlined=True transparent=True %}
+                                {% button icon="edit" text=_("Bewerken") href=action_url icon_outlined=True transparent=True open_new_tab=True %}
                             </div>
                             <div class="dropdown__item">
                                 {% if plan %}
