@@ -47,14 +47,14 @@ def update_user_on_login(sender, user, request, *args, **kwargs):
         try:
             service = OpenKlant2Service()
         except Exception:
-            logger.error("OpenKlant2 service failed to build")
+            logger.warning("OpenKlant2 service failed to build")
         else:
             _update_user_from_openklant2(user=user, service=service, request=request)
     if config.primary_backend == KlantenServiceType.ESUITE.value:
         try:
             service = eSuiteKlantenService()
         except Exception:
-            logger.error("eSuiteKlantenService failed to build")
+            logger.warning("eSuiteKlantenService failed to build")
         else:
             _update_user_from_esuite(user=user, service=service, request=request)
 

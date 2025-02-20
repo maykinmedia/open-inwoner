@@ -122,7 +122,9 @@ class Zaak(ZGWModel):
                 )
 
         if not description:
-            logger.error("No valid description found for zaak: %s", self.identificatie)
+            logger.warning(
+                "No valid description found for zaak: %s", self.identificatie
+            )
 
         return description
 

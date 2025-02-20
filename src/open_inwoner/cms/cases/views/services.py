@@ -293,7 +293,7 @@ class CaseListService:
             AttributeError,
             ZaakTypeStatusTypeConfig.DoesNotExist,
         ):
-            logger.exception(
+            logger.warning(
                 "Unable to resolve zaaktype_config and statustype_config for case %s",
                 case.identificatie,
                 exc_info=True,
