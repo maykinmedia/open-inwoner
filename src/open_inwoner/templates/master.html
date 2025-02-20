@@ -58,10 +58,10 @@
                 {{ extra_css }}
             </style>
         {% endif %}
+    {% include "analytics/siteimprove.html" %}
 	{% if request|cookies_accepted %}
 	  {% include "analytics/google.html" %}
 	  {% include "analytics/matomo.html" %}
-	  {% include "analytics/siteimprove.html" %}
 	{% endif %}
     </head>
 

@@ -110,13 +110,13 @@ class TestCookieBannerDisabled(TestCase):
         self.assertTemplateNotUsed(response, "analytics/matomo.html")
         self.assertNotContains(response, "<!-- Matomo -->")
 
-    def test_siteimprove_analytics_not_rendered(self):
+    def test_siteimprove_analytics_rendered(self):
         self.config.siteimprove_id = "555"
         self.config.save()
         response = self.client.get(reverse("pages-root"))
 
-        self.assertTemplateNotUsed(response, "analytics/siteimprove.html")
-        self.assertNotContains(response, "<!-- SiteImprove -->")
+        self.assertTemplateUsed(response, "analytics/siteimprove.html")
+        self.assertContains(response, "<!-- SiteImprove -->")
 
 
 @tag("e2e")
