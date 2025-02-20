@@ -16,13 +16,13 @@
         {% if search_filter_categories or search_filter_tags or search_filter_organizations %}
             <aside class="grid__sidebar grid__filters" aria-label="{% trans "Zoekfilters" %}">
                 <h2 class="utrecht-heading-2">{% trans "Zoekfilters" %}</h2>
-                {% if search_filter_categories %}
+                {% if search_filter_categories and search_form.categories.field.choices|length != 0 %}
                     {% include "components/Filter/Filter.html" with field=search_form.categories form_id="search-form" only %}
                 {% endif %}
-                {% if search_filter_tags %}
+                {% if search_filter_tags and search_form.tags.field.choices|length != 0  %}
                     {% include "components/Filter/Filter.html" with field=search_form.tags form_id="search-form" only %}
                 {% endif %}
-                {% if search_filter_organizations %}
+                {% if search_filter_organizations and search_form.organizations.field.choices|length != 0 %}
                     {% include "components/Filter/Filter.html" with field=search_form.organizations form_id="search-form" only %}
                 {% endif %}
             </aside>
