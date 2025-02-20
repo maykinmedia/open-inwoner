@@ -6,7 +6,7 @@
         href="{{ href }}"
         title="{% firstof title text %}"
         aria-label="{% firstof text title %}"
-        {% if href|startswith:"http" %}target="_blank"{% endif %}
+        {% if open_new_tab or href|startswith:"http" %}target="_blank"{% endif %}
         {% as_attributes extra_attributes %}
         {% if ariaExpanded %} aria-expanded="{{ ariaExpanded }}" {% endif %}
         {% if ariaControls %} aria-controls="{{ ariaControls }}" {% endif %}
