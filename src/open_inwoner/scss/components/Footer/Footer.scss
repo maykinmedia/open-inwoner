@@ -68,3 +68,7 @@
     padding: var(--spacing-small) 0;
   }
 }
+
+.footer__right :first-child {
+  padding-left: 0;
+}
