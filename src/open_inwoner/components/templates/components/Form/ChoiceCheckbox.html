@@ -1,6 +1,6 @@
 {% load l10n form_tags %}
 
-<div class="checkbox">
+<div class="checkbox {% if as_tag %}checkbox--tag{% endif %}">
     <input
         class="checkbox__input"
         type="checkbox"

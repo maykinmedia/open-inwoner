@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n form_tags utils icon_tags grid_tags pagination_tags %}
+{% load i18n form_tags utils icon_tags grid_tags pagination_tags button_tags %}
 
 {% block main_inner %}
     {#  search term section #}
@@ -15,7 +15,9 @@
     {% if paginator.count %}
         {% if search_filter_categories or search_filter_tags or search_filter_organizations %}
             <aside class="grid__sidebar grid__filters" aria-label="{% trans "Zoekfilters" %}">
-                <h2 class="utrecht-heading-2">{% trans "Zoekfilters" %}</h2>
+                <div class='filter__reset'>
+                    {% button transparent=True type='button' inline=True text=_('Wis alle?') %}
+                </div>
                 {% if search_filter_categories and search_form.categories.field.choices|length != 0 %}
                     {% include "components/Filter/Filter.html" with field=search_form.categories form_id="search-form" only %}
                 {% endif %}

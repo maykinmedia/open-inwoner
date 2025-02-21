@@ -1,4 +1,42 @@
 .checkbox {
+  &--tag {
+    display: flex;
+    max-height: 33px;
+    padding: var(--spacing-small) var(--spacing-medium);
+    border-radius: var(--border-radius);
+    color: var(--color-gray-dark);
+    background: var(--color-gray-lightest);
+    border: 1px solid var(--color-gray-light);
+    width: fit-content;
+
+    &:has(input:checked) {
+      color: var(--color-font-primary);
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+
+      .checkbox__label:after {
+        content: '';
+        display: block;
+        background-image: url("data:image/svg+xml,%3Csvg width='20' height='21' viewBox='0 0 20 21' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg clip-path='url(%23clip0_2541_1098)'%3E%3Cpath d='M15.1263 5.84163L10.8215 10.1464L10.468 10.5L10.8215 10.8535L15.1263 15.1583L14.6584 15.6262L10.3536 11.3214L10.0001 10.9679L9.64653 11.3214L5.34175 15.6262L4.87386 15.1583L9.17863 10.8535L9.53219 10.5L9.17863 10.1464L4.87385 5.84163L5.34175 5.37373L9.64653 9.67851L10.0001 10.0321L10.3536 9.67851L14.6584 5.37373L15.1263 5.84163Z' fill='white' stroke='white'/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id='clip0_2541_1098'%3E%3Crect width='20' height='20' fill='white' transform='translate(0 0.5)'/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E%0A");
+        width: 1.25rem;
+        height: 1.25rem;
+      }
+    }
+
+    & .checkbox__label {
+      gap: var(--spacing-medium);
+      align-items: center;
+      color: inherit !important;
+      white-space: nowrap;
+      padding: 0 !important;
+      display: flex;
+
+      &:before {
+        content: unset !important;
+      }
+    }
+  }
+
   .checkbox__input {
     opacity: 0;
     width: 0;

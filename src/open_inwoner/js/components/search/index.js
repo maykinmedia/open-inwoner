@@ -1,4 +1,3 @@
-import './filter-mobile'
 import './filter-options'
 
 const searchForm = document.getElementById('search-form')
