@@ -530,6 +530,7 @@ def _handle_status_notification(
 
     status = zaken_client.fetch_single_status(case.status)
     if not status:
+        # TODO: check if should we return or continue if the case has no status
         logger.error("Unable to fetch status for %s", case.status)
 
     case.status = status

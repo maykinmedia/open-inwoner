@@ -837,7 +837,7 @@ class MultiZgwClientProxy:
         self.clients = clients
 
         if len(clients) == 0:
-            logger.warning("No client specified for MultiZgwClientProxy")
+            raise ValueError("You must specify at least one client")
 
     def _call_method(self, method, *args, **kwargs) -> MultiZgwClientProxyResult:
         if not all(hasattr(client, method) for client in self.clients):
