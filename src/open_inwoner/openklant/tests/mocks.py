@@ -12,14 +12,14 @@ class MockOpenKlant2Service:
     def get_fetch_parameters(self, request=None, user=None, use_vestigingsnummer=False):
         return {"user_bsn": "123456789"}
 
-    def get_or_create_partij_for_user(self, fetch_params={}, user=None):
+    def get_or_create_partij_for_user(self, fetch_params=None, user=None):
         return {"uuid": "0d150ff9-0924-46f6-8ef9-17fee9e54d23"}, False
 
-    def list_questions(self, fetch_params={}, user=None):
+    def list_questions(self, fetch_params=None, user=None):
         return [self.retrieve_question()[0]]
 
     def retrieve_question(
-        self, fetch_params={}, question_uuid="", user=None, new_answer_available=False
+        self, fetch_params=None, question_uuid="", user=None, new_answer_available=False
     ):
         return (
             {

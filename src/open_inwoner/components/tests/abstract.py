@@ -1,3 +1,5 @@
+from typing import Any
+
 from django.template import Context, Template
 from django.test import RequestFactory
 
@@ -55,7 +57,7 @@ class InclusionTagWebTest(WebTest):
     # The tag name, a value of "list_item" would be the equivalent of "{% list_item %}".
     tag = ""
 
-    def assertContext(self, args: dict = {}) -> any:
+    def assertContext(self, args: dict | None = None) -> Any:
         """
         Asserts that a context is returned by the inclusion tag.
 
@@ -64,11 +66,12 @@ class InclusionTagWebTest(WebTest):
 
         Returns: The return value of the tag's function.
         """
+        args = args or {}
         context = self.call_function(args)
         self.assertTrue(context)
         return context
 
-    def assertRender(self, args: dict = {}, data={}) -> str:
+    def assertRender(self, args: dict | None = None, data: dict | None = None) -> str:
         """
         Asserts that something is rendered by the tag.
 
@@ -79,12 +82,14 @@ class InclusionTagWebTest(WebTest):
 
         Returns: The str rendered by the tag.
         """
+        data = data or {}
+        args = args or {}
         html = self.render(args, data)
         self.assertTrue(html)
         return html
 
     def assertSelector(
-        self, selector: str, args: dict = {}, data: dict = {}
+        self, selector: str, args: dict | None = None, data: dict | None = None
     ) -> ResultSet:
         """
         Asserts that an HTML tag matching `selector` is present in the tag's rendered output.
@@ -97,12 +102,14 @@ class InclusionTagWebTest(WebTest):
 
         Returns: bs4.element.ResultSet
         """
+        data = data or {}
+        args = args or {}
         nodes = self.select(selector, args, data)
         self.assertTrue(nodes, msg=f"Did not find selector {selector}")
         return nodes
 
     def assertNotSelector(
-        self, selector: str, args: dict = {}, data: dict = {}
+        self, selector: str, args: dict | None = None, data: dict | None = None
     ) -> ResultSet:
         """
         Asserts that an HTML tag matching `selector` is not present in the tag's rendered output.
@@ -115,12 +122,18 @@ class InclusionTagWebTest(WebTest):
 
         Returns: bs4.element.ResultSet
         """
+        data = data or {}
+        args = args or {}
         nodes = self.select(selector, args, data)
         self.assertFalse(nodes)
         return nodes
 
     def assertTextContent(
-        self, selector: str, text: str, args: dict = {}, data: dict = {}
+        self,
+        selector: str,
+        text: str,
+        args: dict | None = None,
+        data: dict | None = None,
     ) -> str:
         """
         Asserts that an HTML tag matching `selector` has textual content matching `text`.
@@ -134,11 +147,13 @@ class InclusionTagWebTest(WebTest):
 
         Returns: bs4.element.ResultSet
         """
+        data = data or {}
+        args = args or {}
         node = self.select_one(selector, args, data)
         self.assertEqual(str(text).strip(), node.text.strip())
         return node.text
 
-    def render(self, args={}, data={}):
+    def render(self, args: dict | None = None, data: dict | None = None):
         """
         Renders the template tag with arguments (and optionally passing `data` to RequestFactory's query string).
 
@@ -149,6 +164,7 @@ class InclusionTagWebTest(WebTest):
 
         Returns: The str rendered by the tag.
         """
+        data = data or {}
         args = args or {}
         template_context = self.get_template_context(args)
         context = Context(
@@ -157,7 +173,9 @@ class InclusionTagWebTest(WebTest):
         template = self.get_template(args)
         return template.render(context)
 
-    def select_one(self, selector: str, args: dict = {}, data: dict = {}) -> Tag:
+    def select_one(
+        self, selector: str, args: dict | None = None, data: dict | None = None
+    ) -> Tag | None:
         """
         Returns a bs4.element.Tag for HTML tag matching `selector` within the str rendered by the tag.
 
@@ -169,11 +187,15 @@ class InclusionTagWebTest(WebTest):
 
         Returns: bs4.element.Tag
         """
+        data = data or {}
+        args = args or {}
         html = self.render(args, data)
         soup = BeautifulSoup(html, features="lxml")
         return soup.select_one(selector)
 
-    def select(self, selector: str, args: dict = {}, data: dict = {}) -> ResultSet:
+    def select(
+        self, selector: str, args: dict | None = None, data: dict | None = None
+    ) -> ResultSet:
         """
         Returns a bs4.element.ResultSet for HTML tags matching `selector` within the str rendered by the tag.
 
@@ -185,11 +207,13 @@ class InclusionTagWebTest(WebTest):
 
         Returns: bs4.element.ResultSet
         """
+        data = data or {}
+        args = args or {}
         html = self.render(args, data)
         soup = BeautifulSoup(html, features="lxml")
         return soup.select(selector)
 
-    def call_function(self, args: dict = {}) -> any:
+    def call_function(self, args: dict | None = None) -> Any:
         """
         Calls the tag's function directly.
 
@@ -198,13 +222,15 @@ class InclusionTagWebTest(WebTest):
 
         Returns: The return value of the tag's function.
         """
+        if args is None:
+            args = {}
         template = self.get_template(args)
         nodelist = template.compile_nodelist()
         inclusion_node = nodelist[1]
         function = inclusion_node.func
         return function(**args)
 
-    def get_template(self, args={}):
+    def get_template(self, args: dict | None = None):
         """
         Returns the (Django) Template instance (in order to render the tag).
         A templates str is constructed and then passed to a django.template.Template, the resulting instance is
@@ -215,6 +241,8 @@ class InclusionTagWebTest(WebTest):
 
         Returns: django.template.Template
         """
+        if args is None:
+            args = {}
         args = self.get_args(args)
         template = (
             "{% load " + self.library + " %}{% " + self.tag + " " + args + " " + " %}"
@@ -315,7 +343,9 @@ class ContentsTagWebTest(InclusionTagWebTest):
     # A value of "{% list_item %}" would be the equivalent of "{% render_list %}{% list_item %}{% endrender_list %}".
     contents = ""
 
-    def assertContents(self, args={}, data={}, contents_context={}) -> str:
+    def assertContents(
+        self, args: dict | None = None, data: dict | None = None, contents_context=None
+    ) -> str:
         """
         Asserts that rendered HTML of contents is present in the tag's rendered output.
 
@@ -327,13 +357,16 @@ class ContentsTagWebTest(InclusionTagWebTest):
 
         Returns: The contents html.
         """
+        contents_context = contents_context or {}
+        data = data or {}
+        args = args or {}
         html = self.render(args, data)
         context = Context(contents_context)
         contents_html = self.get_contents(context)
         self.assertIn(contents_html, html)
         return contents_html
 
-    def get_contents(self, context: Context | dict = {}) -> str:
+    def get_contents(self, context: Context | dict | None = None) -> str:
         """
         Renders contents HTML.
 
@@ -342,11 +375,13 @@ class ContentsTagWebTest(InclusionTagWebTest):
 
         Returns: The contents html.
         """
+        if context is None:
+            context = {}
         return Template("{% load " + self.library + " %}" + self.contents).render(
             context
         )
 
-    def get_template(self, args={}):
+    def get_template(self, args: dict | None = None):
         """
         Returns the (Django) Template instance (in order to render the tag).
         A templates str is constructed and then passed to a django.template.Template, the resulting instance is
@@ -357,6 +392,8 @@ class ContentsTagWebTest(InclusionTagWebTest):
 
         Returns: django.template.Template
         """
+        if args is None:
+            args = {}
         args = self.get_args(args)
         template = (
             "{% load "
