@@ -43,7 +43,7 @@
             {# open submissions ("openstaande aanvragen") #}
             {% if case.case_type == "OpenSubmission" %}
 
-                <a href="{{ case.vervolg_link }}" class="card card card__description-card card--stretch">
+                <a href="{{ case.vervolg_link }}" class="card card card__description-card card--stretch" target="_blank">
                     <div class="card__body">
 
                         <h2 class="card__heading-2">{{ case.naam }}</h2>
