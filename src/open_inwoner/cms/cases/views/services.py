@@ -125,12 +125,11 @@ class CaseListService:
             for task in concurrent.futures.as_completed(futures):
                 try:
                     group_for_task = all_api_groups[futures.index(task)]
-                    for row in task.result():
-                        subs_with_api_group.append(
-                            SubmissionWithApiGroup(
-                                submission=row, api_group=group_for_task
-                            )
-                        )
+                    subs_with_api_group.extend(
+                        SubmissionWithApiGroup(submission=row, api_group=group_for_task)
+                        for row in task.result()
+                    )
+
                 except BaseException:
                     logger.exception("Error fetching and pre-processing cases")
 
@@ -177,10 +176,11 @@ class CaseListService:
             ):
                 group_for_task = all_api_groups[futures.index(task)]
                 try:
-                    for row in task.result():
-                        cases_with_api_group.append(
-                            ZaakWithApiGroup(zaak=row, api_group=group_for_task)
-                        )
+                    cases_with_api_group.extend(
+                        ZaakWithApiGroup(zaak=row, api_group=group_for_task)
+                        for row in task.result()
+                    )
+
                 except BaseException:
                     logger.exception(
                         "Error while fetching and pre-processing cases for API group %s",

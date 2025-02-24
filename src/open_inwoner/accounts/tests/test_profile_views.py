@@ -880,12 +880,7 @@ class MyDataTests(AssertTimelineLogMixin, HaalCentraalMixin, WebTest):
             s = elem.text.strip()
             texts.add(s)
 
-        missing = list()
-        for s in self.expected_strings:
-            if s not in texts:
-                missing.append(s)
-
-        if missing:
+        if missing := [s for s in self.expected_strings if s not in texts]:
             f = ", ".join(f"'{s}'" for s in missing)
             self.fail(f"missing display of values: {f}")
 

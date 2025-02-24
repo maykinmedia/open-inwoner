@@ -285,7 +285,7 @@ class ProductFinderView(CommonPageMixin, FormView):
         initial = super().get_initial()
         current_answers = self.request.session.get("product_finder")
         if current_answers:
-            for _order, answer in current_answers.items():
+            for answer in current_answers.values():
                 if answer.get("condition") == self.condition.pk:
                     initial["answer"] = answer.get("answer")
         return initial
@@ -336,7 +336,7 @@ class ProductFinderView(CommonPageMixin, FormView):
         current_answers = self.request.session.get("product_finder")
         filters = None
         if current_answers:
-            for _order, answer in current_answers.items():
+            for answer in current_answers.values():
                 new_filter = Q(conditions=answer.get("condition"))
 
                 filters = filters | new_filter if filters else new_filter
@@ -349,7 +349,7 @@ class ProductFinderView(CommonPageMixin, FormView):
         products = condition_products
         current_answers = self.request.session.get("product_finder")
         if current_answers:
-            for _order, answer in current_answers.items():
+            for answer in current_answers.values():
                 if answer.get("answer") == YesNo.no:
                     products = products.exclude(conditions=answer.get("condition"))
         return products
@@ -358,7 +358,7 @@ class ProductFinderView(CommonPageMixin, FormView):
         qs = Product.objects.published().exclude(pk__in=matched.values_list("pk"))
         current_answers = self.request.session.get("product_finder")
         if current_answers:
-            for _order, answer in current_answers.items():
+            for answer in current_answers.values():
                 if answer.get("answer") == YesNo.no:
                     qs = qs.exclude(conditions=answer.get("condition"))
         return qs

@@ -1,5 +1,3 @@
-# fmt: off
-
 from typing import Any
 
 import requests
@@ -71,25 +69,20 @@ def get_jaaropgaven(response: requests.Response) -> list[dict] | None:
 
     try:
         client = jaaropgave_info.jaar_opgave_client.client
-        inhoudingsplichtige = jaaropgave_info.jaar_opgave_client.jaar_opgave[
-            0
-        ].inhoudingsplichtige
-        specificatien = jaaropgave_info.jaar_opgave_client.jaar_opgave[
-            0
-        ].specificatie_jaar_opgave
+        jaar_opgave = jaaropgave_info.jaar_opgave_client.jaar_opgave[0]
+        inhoudingsplichtige = jaar_opgave.inhoudingsplichtige
+        specificatien = jaar_opgave.specificatie_jaar_opgave
     except AttributeError:
         return None
 
-    jaaropgaven = []
-    for specificatie in specificatien:
-        jaaropgaven.append(
-            {
-                "client": client,
-                "inhoudingsplichtige": inhoudingsplichtige,
-                "specificatie": specificatie,
-            }
-        )
-    return jaaropgaven
+    return [
+        {
+            "client": client,
+            "inhoudingsplichtige": inhoudingsplichtige,
+            "specificatie": specificatie,
+        }
+        for specificatie in specificatien
+    ]
 
 
 def get_uitkeringen(response: requests.Response) -> list[dict] | None:
@@ -104,24 +97,21 @@ def get_uitkeringen(response: requests.Response) -> list[dict] | None:
         return None
 
     try:
-        uitkeringsinstantie = uitkeringen_info.uitkerings_specificatie_client\
-                                              .uitkeringsspecificatie[0]\
-                                              .uitkeringsinstantie
+        uitkeringsspecificatie = (
+            uitkeringen_info.uitkerings_specificatie_client.uitkeringsspecificatie[0]
+        )
+        uitkeringsinstantie = uitkeringsspecificatie.uitkeringsinstantie
         client = uitkeringen_info.uitkerings_specificatie_client.client
-        dossierhistorien = uitkeringen_info.uitkerings_specificatie_client\
-                                           .uitkeringsspecificatie[0]\
-                                           .dossierhistorie
+        dossierhistorien = uitkeringsspecificatie.dossierhistorie
     except AttributeError:
         return None
 
-    uitkeringen = []
-    for historie in dossierhistorien:
-        uitkeringen.append(
-            {
-                "uitkeringsinstantie": uitkeringsinstantie,
-                "client": client,
-                "dossierhistorie": historie,
-                "details": historie.componenthistorie,
-            }
-        )
-    return uitkeringen
+    return [
+        {
+            "uitkeringsinstantie": uitkeringsinstantie,
+            "client": client,
+            "dossierhistorie": historie,
+            "details": historie.componenthistorie,
+        }
+        for historie in dossierhistorien
+    ]
