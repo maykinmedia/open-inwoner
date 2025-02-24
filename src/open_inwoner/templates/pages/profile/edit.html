@@ -26,9 +26,11 @@
                         {% if user.is_eherkenning_user %}
                             {% input form.email %}
                             {% input form.phonenumber %}
+                            {% input form.phonenumber_alternative %}
                         {% elif user.is_digid_user_with_brp %}
                             {% input form.email %}
                             {% input form.phonenumber %}
+                            {% input form.phonenumber_alternative %}
                             {% if user.contact_type == "begeleider" %}
                                 {% input form.image no_help=True %}
                                 {% image_crop form.cropping %}
@@ -39,6 +41,7 @@
                             {% input form.last_name %}
                             {% input form.email %}
                             {% input form.phonenumber %}
+                            {% input form.phonenumber_alternative %}
                             {% input form.street %}
                             {% input form.housenumber %}
                             {% input form.postcode %}

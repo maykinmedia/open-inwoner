@@ -1,4 +1,5 @@
 import datetime
+import logging
 
 from django.test import tag
 
@@ -256,6 +257,20 @@ class Openklant2ServiceTest(Openklant2ServiceTestCase):
             self.persoon["uuid"],
             "telefoonnummer",
             "0644938475",
+            isStandaardAdres=True,
+        )
+        # bogus address for testing edge case with multiple non-standard numbers
+        self.service.get_or_create_digitaal_adres(
+            self.persoon["uuid"],
+            "telefoonnummer",
+            "0612345678",
+            isStandaardAdres=False,
+        )
+        self.service.get_or_create_digitaal_adres(
+            self.persoon["uuid"],
+            "telefoonnummer",
+            "0687654321",
+            isStandaardAdres=False,
         )
         self.service.get_or_create_digitaal_adres(
             self.persoon["uuid"],
@@ -263,8 +278,19 @@ class Openklant2ServiceTest(Openklant2ServiceTestCase):
             "bar@foo.com",
         )
 
-        self.service.update_user_from_partij(self.persoon["uuid"], user)
+        logger = logging.getLogger("open_inwoner.openklant.services")
+
+        with self.assertLogs(logger=logger) as logs:
+            self.service.update_user_from_partij(self.persoon["uuid"], user)
+
+            self.assertEqual(len(logs.output), 1)
+            self.assertIn(
+                f"More than two phone numbers found for partij {self.persoon['uuid']}",
+                logs.output[0],
+            )
+
         self.assertEqual(user.phonenumber, "0644938475")
+        self.assertEqual(user.phonenumber_alternative, "0687654321")
         self.assertEqual(user.email, "bar@foo.com")
 
     def test_cannot_use_existing_user_email_when_updating_user_from_partij(self):
@@ -286,7 +312,11 @@ class Openklant2ServiceTest(Openklant2ServiceTestCase):
         )
 
     def test_update_partij_from_user(self):
-        user: User = UserFactory(phonenumber="0644938475", email="user@bar.com")
+        user: User = UserFactory(
+            phonenumber="0644938475",
+            phonenumber_alternative="0687654321",
+            email="user@bar.com",
+        )
 
         self.assertEqual(
             self.service.retrieve_digitale_addressen_for_partij(self.persoon["uuid"]),
@@ -295,14 +325,17 @@ class Openklant2ServiceTest(Openklant2ServiceTestCase):
 
         self.service.update_partij_from_user(self.persoon["uuid"], user)
 
+        adressen = self.service.retrieve_digitale_addressen_for_partij(
+            self.persoon["uuid"]
+        )
+
         self.assertEqual(
-            [
-                (da["soortDigitaalAdres"], da["adres"])
-                for da in self.service.retrieve_digitale_addressen_for_partij(
-                    self.persoon["uuid"]
-                )
-            ],
-            [("email", "user@bar.com"), ("telefoonnummer", "0644938475")],
+            set([(adres["soortDigitaalAdres"], adres["adres"]) for adres in adressen]),
+            {
+                ("email", "user@bar.com"),
+                ("telefoonnummer", "0644938475"),
+                ("telefoonnummer", "0687654321"),
+            },
         )
 
 
