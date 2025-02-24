@@ -202,7 +202,7 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
             service = self.get_service(service_type=KlantenServiceType.OPENKLANT2)
 
         origin = self.request.headers.get("Referer")
-        question, zaak = service.retrieve_question(
+        question, zaak_with_api_group = service.retrieve_question(
             self.get_fetch_params(service),
             question_uuid=kwargs["kcm_uuid"],
             user=self.request.user,
@@ -220,16 +220,16 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
             local_kcm.save()
 
         ctx["question"] = question
-        ctx["zaak"] = zaak.zaak if zaak else None
+        ctx["zaak"] = getattr(zaak_with_api_group, "zaak", None)
         case_url = (
             reverse(
                 "cases:case_detail",
                 kwargs={
-                    "object_id": str(zaak.zaak.uuid),
-                    "api_group_id": zaak.api_group.id,
+                    "object_id": str(zaak_with_api_group.zaak.uuid),
+                    "api_group_id": zaak_with_api_group.api_group.id,
                 },
             )
-            if zaak
+            if zaak_with_api_group
             else None
         )
         ctx["metrics"] = [
@@ -255,7 +255,7 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
                 "label": _("Terug naar overzicht"),
                 "url": origin,
             }
-            if zaak:
+            if zaak_with_api_group:
                 ctx["destination"] = {
                     "label": _("Naar aanvraag"),
                     "url": case_url,
