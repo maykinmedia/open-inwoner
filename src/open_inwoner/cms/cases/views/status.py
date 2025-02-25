@@ -300,7 +300,7 @@ class InnerCaseDetailView(
                     "value": context["case"].get("identification"),
                 },
                 {
-                    "label": _("Aanvraag ingediend op:"),
+                    "label": _("Zaak ingediend op:"),
                     "value": context["case"].get("start_date"),
                 },
                 {

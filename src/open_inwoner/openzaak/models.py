@@ -433,7 +433,7 @@ class OpenZaakConfig(SingletonModel):
         verbose_name=_("Derive the case title from"),
         help_text=_(
             "Which field from the underlying zaaksysteem to use to display the title "
-            " for a zaak (e.g. on the Mijn Aanvragen page)."
+            " for a zaak (e.g. on the Mijn Zaken page)."
         ),
     )
     order_statuses_by_date_set = models.BooleanField(
