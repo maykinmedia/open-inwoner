@@ -314,7 +314,7 @@ class SearchPagePlaywrightTests(
             details_element.click()
 
             # Wacht tot het specifieke <details>-element open is
-            details_element.wait_for_attribute("open")
+            expect(details_element).to_have_attribute("open")
 
             # Zoek de checkbox met de juiste naam, filter het via de 'checkbox--tag' class, en klik op de bijbehorende label
             checkbox = (
