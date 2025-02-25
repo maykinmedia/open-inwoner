@@ -302,14 +302,9 @@ class SearchPagePlaywrightTests(
                 expect(checkbox).not_to_be_checked()
 
         def _click_checkbox_for_name(page=page, name=""):
-            # first open de <details> through the summary
-            a = page.locator(f".filter > summary:has([name='{name}'])")
-            print(a)
-            if a:
-                a.click()
             # our checkbox widget hides the <input> element and styles the <label> and a pseudo-element
             # this a problem for playwright accessibility, so we find the label for the checkbox and click on the label like a user would
-            page.locator(".checkbox").filter(
+            page.locator(".checkbox--tag").filter(
                 has=page.get_by_role("checkbox", name=name)
             ).locator("label").click()
 
