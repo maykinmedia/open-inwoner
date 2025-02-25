@@ -3,12 +3,12 @@
 
 {% block main_inner %}
     {#  search term section #}
-    <div class="grid">
+    {% render_grid %}
         <div class="grid__main">
             <h1 class="utrecht-heading-1">{% trans "Zoekresultaten voor " %} "{% firstof search_form.query.value "" %}"</h1>
             <p class="search-results__title-small">{{ paginator.count }} {% trans "resultaten" %} </p>
         </div>
-    </div>
+    {% endrender_grid %}
 
     {#  facets and results section #}
     <div class="grid">
