@@ -303,7 +303,7 @@ class SearchPagePlaywrightTests(
 
         def _click_checkbox_for_name(page=page, name=""):
             # first open de <details> through the summary
-            page.locator(".filter__list").filter(
+            page.locator(".filter").filter(
                 has=page.get_by_role("checkbox", name=name)
             ).locator("summary").click()
             # our checkbox widget hides the <input> element and styles the <label> and a pseudo-element
