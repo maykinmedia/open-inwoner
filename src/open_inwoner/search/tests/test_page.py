@@ -301,17 +301,18 @@ class SearchPagePlaywrightTests(
                 expect(checkbox).to_be_enabled()
                 expect(checkbox).not_to_be_checked()
 
-        def _click_checkbox_for_name(page=page, name=""):
+        def _click_checkbox_for_name(page=page, name=''):
             # Open het details-element
             # Zoek het juiste <details>-element met de opgegeven checkbox naam
-            # details_element = page.locator(
-                # ".filter", has=page.get_by_role("checkbox", name=name)
-            # )
+            details_element = page.locator(
+                ".filter", has=page.get_by_role("checkbox", name=name)
+            )
 
             # print(details_element.is_visible())
 
             # Open het <details>-element
             # details_element.click()
+            
 
             # Wacht tot het specifieke <details>-element open is
             # expect(details_element).to_have_attribute("open", "")
@@ -331,6 +332,8 @@ class SearchPagePlaywrightTests(
             expect(page.locator(".search-results__item-title")).to_have_text(
                 expected_text
             )
+
+        print("Tag 1", self.product1.name)    
 
         _test_search("Tag 1", self.product1.name)
         _test_search("Tag 2", self.product2.name)
