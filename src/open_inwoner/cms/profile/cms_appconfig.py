@@ -71,3 +71,8 @@ class ProfileConfig(AppHookConfig):
         default=False,
         help_text=_("Designates whether 'Mijn afspraken' section is rendered or not."),
     )
+    documents = models.BooleanField(
+        verbose_name=_("Mijn documenten"),
+        default=False,
+        help_text=_("Designates whether 'Mijn documenten' section is rendered or not."),
+    )

@@ -21,6 +21,7 @@ from open_inwoner.accounts.views import (
     MyDataView,
     MyNotificationsView,
     MyProfileView,
+    MyDocumentsView,
     NecessaryFieldsUserView,
     UserAppointmentsView,
 )
@@ -109,5 +110,6 @@ urlpatterns = [
         name="email_verification_user",
     ),
     path("appointments", UserAppointmentsView.as_view(), name="appointments"),
+    path("mijn-documenten", MyDocumentsView.as_view(), name="documents"),
     path("", MyProfileView.as_view(), name="detail"),
 ]

@@ -50,6 +50,7 @@ from .profile import (
     MyNotificationsView,
     MyProfileView,
     UserAppointmentsView,
+    MyDocumentsView,
 )
 from .registration import CustomRegistrationView, NecessaryFieldsUserView
 
@@ -88,6 +89,7 @@ __all__ = [
     "MyNotificationsView",
     "MyProfileView",
     "UserAppointmentsView",
+    "MyDocumentsView",
     "CustomRegistrationView",
     "NecessaryFieldsUserView",
     # OIDC

@@ -430,3 +430,7 @@ class UserAppointmentsView(
             (_("Mijn profiel"), reverse("profile:detail")),
             (_("Mijn afspraken"), reverse("profile:appointments")),
         ]
+
+
+class MyDocumentsView(TemplateView):
+    template_name = "pages/profile/documents.html"
