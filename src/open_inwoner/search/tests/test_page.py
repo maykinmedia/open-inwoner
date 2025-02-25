@@ -317,15 +317,9 @@ class SearchPagePlaywrightTests(
             expect(details_element).to_have_attribute("open", "")
 
             # Zoek de checkbox met de juiste naam, filter het via de 'checkbox--tag' class, en klik op de bijbehorende label
-            checkbox = (
-                page.locator(".checkbox--tag")
-                .filter(has=page.get_by_role("checkbox", name=name))
-                .locator("label")
-            )
-
-            print(checkbox.is_visible())
-            if checkbox.is_visible():
-                checkbox.click()
+            page.locator(".checkbox").filter(
+                has=page.get_by_role("checkbox", name=name)
+            ).locator("label").click()
 
         def _test_search(checkbox_name, expected_text):
             page.goto(self.live_reverse("search:search", params={"query": "summary"}))
