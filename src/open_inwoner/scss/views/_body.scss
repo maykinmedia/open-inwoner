@@ -1,16 +1,18 @@
-.body--open {
-  overflow: hidden;
-  position: fixed;
-  width: 100%;
+@media (max-width: 767px) {
+  .body--open {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
 
-  // Hide focus for accessibility
-  .container,
-  .footer {
-    display: none;
-  }
+    // Hide focus for accessibility
+    .container,
+    .footer {
+      display: none;
+    }
 
-  @media (min-width: 768px) {
-    height: auto;
-    overflow: auto;
+    @media (min-width: 768px) {
+      height: auto;
+      overflow: auto;
+    }
   }
 }
