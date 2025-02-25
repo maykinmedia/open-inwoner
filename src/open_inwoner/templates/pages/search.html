@@ -19,13 +19,13 @@
                     {% button transparent=True type='button' inline=True text=_('Wis alle?') %}
                 </div>
                 {% if search_filter_categories and search_form.categories.field.choices|length != 0 %}
-                    {% include "components/Filter/Filter.html" with field=search_form.categories form_id="search-form" only %}
+                    {% include "components/Filter/Filter.html" with field=search_form.categories form_id="search-form" initial_open=True only  %}
                 {% endif %}
                 {% if search_filter_tags and search_form.tags.field.choices|length != 0  %}
-                    {% include "components/Filter/Filter.html" with field=search_form.tags form_id="search-form" only %}
+                    {% include "components/Filter/Filter.html" with field=search_form.tags form_id="search-form" initial_open=search_filter_categories only %}
                 {% endif %}
                 {% if search_filter_organizations and search_form.organizations.field.choices|length != 0 %}
-                    {% include "components/Filter/Filter.html" with field=search_form.organizations form_id="search-form" only %}
+                    {% include "components/Filter/Filter.html" with field=search_form.organizations form_id="search-form" initial_open=search_filter_organizations only %}
                 {% endif %}
             </aside>
         {% endif %}
