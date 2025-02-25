@@ -55,7 +55,12 @@ def get_rendered_content(content: str) -> str:
             if element.name == "a" and element.attrs.get("href", "").startswith("http"):
                 # icon & screenreader support
                 icon = soup.new_tag("span")
-                icon.attrs.update({"aria-hidden": "true", "class": "material-icons"})
+                icon.attrs.update(
+                    {
+                        "aria-hidden": "true",
+                        "class": "material-icons text-decoration-none",
+                    }
+                )
                 icon.append("open_in_new")
 
                 screen_reader_only_text = soup.new_tag("span")
