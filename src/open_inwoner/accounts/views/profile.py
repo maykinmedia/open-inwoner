@@ -18,7 +18,6 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 from open_inwoner.accounts.choices import (
     ContactTypeChoices,
     LoginTypeChoices,
-    NotificationChannelChoice,
     StatusChoices,
 )
 from open_inwoner.cms.utils.page_display import (
@@ -29,6 +28,7 @@ from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.haalcentraal.utils import fetch_brp
 from open_inwoner.laposta.forms import NewsletterSubscriptionForm
 from open_inwoner.laposta.models import LapostaConfig
+from open_inwoner.openklant.services import eSuiteKlantenService
 from open_inwoner.plans.models import Plan
 from open_inwoner.qmatic.client import NoServiceConfigured, QmaticClient
 from open_inwoner.questionnaire.models import QuestionnaireStep
@@ -36,7 +36,6 @@ from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from ..forms import BrpUserForm, CategoriesForm, UserForm, UserNotificationsForm
 from ..models import Action, User
-from .mixins import KlantenAPIMixin
 
 logger = logging.getLogger(__name__)
 
@@ -206,7 +205,6 @@ class EditProfileView(
     LogMixin,
     LoginRequiredMixin,
     CommonPageMixin,
-    KlantenAPIMixin,
     BaseBreadcrumbMixin,
     UpdateView,
 ):
@@ -227,14 +225,17 @@ class EditProfileView(
 
     def form_valid(self, form):
         form.save()
+        user: User = self.get_object()
 
-        self.update_klant({k: form.cleaned_data[k] for k in form.changed_data})
+        self.update_esuite_klant(
+            {k: form.cleaned_data[k] for k in form.changed_data}, user
+        )
 
         messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
         self.log_change(self.get_object(), _("profile was modified"))
         return HttpResponseRedirect(self.get_success_url())
 
-    def update_klant(self, user_form_data: dict):
+    def update_esuite_klant(self, user_form_data: dict, user: User):
         field_mapping = {
             "emailadres": "email",
             "telefoonnummer": "phonenumber",
@@ -245,7 +246,25 @@ class EditProfileView(
             for api_name, local_name in field_mapping.items()
             if user_form_data.get(local_name)
         }
-        self.patch_klant(update_data)
+        if not update_data:
+            return
+
+        try:
+            service = eSuiteKlantenService()
+        except Exception:
+            logger.warning("eSuiteKlantenService failed to build")
+            return
+
+        if fetch_params := service.get_fetch_parameters(
+            request=self.request, user=user
+        ):
+            klant, created = service.get_or_create_klant(
+                fetch_params=fetch_params, user=user
+            )
+            if klant and not created:
+                service.update_klant_from_user(
+                    klant, user, update_fields=list(update_data.keys())
+                )
 
     def get_form_class(self):
         user = self.request.user
@@ -311,7 +330,6 @@ class MyNotificationsView(
     LogMixin,
     LoginRequiredMixin,
     CommonPageMixin,
-    KlantenAPIMixin,
     BaseBreadcrumbMixin,
     UpdateView,
 ):
@@ -350,27 +368,34 @@ class MyNotificationsView(
 
     def form_valid(self, form):
         form.save()
+        user: User = self.get_object()
 
-        self.update_klant(
-            user_form_data={k: form.cleaned_data[k] for k in form.changed_data}
-        )
+        if "case_notification_channel" in form.changed_data:
+            self.update_esuite_klant(user)
 
         messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
         self.log_change(self.object, _("users notifications were modified"))
         return HttpResponseRedirect(self.get_success_url())
 
-    def update_klant(self, user_form_data: dict):
-        config = SiteConfiguration.get_solo()
-        if not config.enable_notification_channel_choice:
+    def update_esuite_klant(self, user: User):
+        try:
+            service = eSuiteKlantenService()
+        except Exception:
+            logger.warning("eSuiteKlantenService failed to build")
             return
 
-        if notification_channel := user_form_data.get("case_notification_channel"):
-            self.patch_klant(
-                update_data={
-                    "toestemmingZaakNotificatiesAlleenDigitaal": notification_channel
-                    == NotificationChannelChoice.digital_only
-                }
+        if fetch_params := service.get_fetch_parameters(
+            request=self.request, user=user
+        ):
+            klant, created = service.get_or_create_klant(
+                fetch_params=fetch_params, user=user
             )
+            if klant and not created:
+                service.update_klant_from_user(
+                    klant,
+                    user,
+                    update_fields=["toestemmingZaakNotificatiesAlleenDigitaal"],
+                )
 
 
 class UserAppointmentsView(

@@ -641,7 +641,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
                     )
 
     @requests_mock.Mocker()
-    def test_modify_phone_updates_klant_api_but_skips_unchanged(self, m):
+    def test_no_edited_fields_does_not_push_to_esuite(self, m):
         MockAPIReadPatchData.setUpServices()
         data = MockAPIReadPatchData().install_mocks(m)
 
