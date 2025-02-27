@@ -44,7 +44,7 @@ class LegacyCaseDetailUrlRedirectTest(TestCase):
         self.assertEqual(
             messages,
             [
-                "De link die u gebruikte, is verlopen. Uw aanvraag is via onderstaand "
+                "De link die u gebruikte, is verlopen. Uw zaak is via onderstaand "
                 "overzicht te vinden."
             ],
         )
