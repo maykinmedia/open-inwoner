@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-26 10:57+0100\n"
+"POT-Creation-Date: 2025-02-27 09:29+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -958,7 +958,7 @@ msgstr "De ontvanger van het bericht"
 msgid "This is the date the message was created"
 msgstr "Datum dat het bericht is aangemaakt"
 
-#: open_inwoner/accounts/models.py:781 open_inwoner/conf/base.py:585
+#: open_inwoner/accounts/models.py:781 open_inwoner/conf/base.py:595
 #: open_inwoner/pdc/models/product.py:111
 msgid "Content"
 msgstr "Content"
@@ -2913,39 +2913,39 @@ msgstr "Volgende"
 msgid "Dutch"
 msgstr "Nederlands"
 
-#: open_inwoner/conf/base.py:594
+#: open_inwoner/conf/base.py:604
 msgid "Banner Image"
 msgstr "Bannerafbeelding"
 
-#: open_inwoner/conf/base.py:595
+#: open_inwoner/conf/base.py:605
 msgid "Banner Text"
 msgstr "Banner tekst"
 
-#: open_inwoner/conf/base.py:596
+#: open_inwoner/conf/base.py:606
 msgid "Login Banner"
 msgstr "Login Banner"
 
-#: open_inwoner/conf/base.py:598
+#: open_inwoner/conf/base.py:608
 msgid "Footer, Left"
 msgstr "Footer linkerzijde"
 
-#: open_inwoner/conf/base.py:605
+#: open_inwoner/conf/base.py:615
 msgid "Footer, Center"
 msgstr "Footer midden"
 
-#: open_inwoner/conf/base.py:612
+#: open_inwoner/conf/base.py:622
 msgid "Footer, Right"
 msgstr "Footer rechterzijde"
 
-#: open_inwoner/conf/base.py:619 open_inwoner/openklant/cms_plugins.py:37
+#: open_inwoner/conf/base.py:629 open_inwoner/openklant/cms_plugins.py:37
 msgid "Contact form plugin"
 msgstr "Contactformulier plugin"
 
-#: open_inwoner/conf/base.py:627
+#: open_inwoner/conf/base.py:637
 msgid "Arrow"
 msgstr "Pijl"
 
-#: open_inwoner/conf/base.py:981
+#: open_inwoner/conf/base.py:991
 #, python-brace-format
 msgid "Inlogcode: {token} (deze code is geldig voor 5 minuten)"
 msgstr "Inlogcode: {token} (deze code is geldig voor 5 minuten)"
@@ -4402,7 +4402,8 @@ msgstr "Indexering door zoekmachines inschakelen"
 
 #: open_inwoner/configurations/models.py:619
 msgid "When enabled, search engines can index the site"
-msgstr "Als deze optie is ingeschakeld, kunnen zoekmachines de site indexeren"
+msgstr ""
+"Wanneer deze optie is ingeschakeld, kunnen zoekmachines de site indexeren"
 
 #: open_inwoner/configurations/models.py:623
 #: open_inwoner/configurations/models.py:626
@@ -4901,8 +4902,8 @@ msgid ""
 "If enabled, a confirmation email will be sent upon registering a "
 "klantcontact."
 msgstr ""
-"Als deze optie is ingeschakeld, wordt er een bevestigingsmail verzonden bij "
-"het registreren van een klantcontact."
+"Wanneer deze optie is ingeschakeld, wordt er een bevestigingsmail verzonden "
+"bij het registreren van een klantcontact."
 
 #: open_inwoner/openklant/models.py:116
 msgid "eSuite Klant configuration"
