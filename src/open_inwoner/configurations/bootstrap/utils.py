@@ -28,5 +28,5 @@ def get_service(slug: str) -> Service:
     """
     try:
         return Service.objects.get(slug=slug)
-    except Service.DoesNotExist as e:
-        raise Service.DoesNotExist(f"{str(e)} (identifier = {slug})")
+    except Service.DoesNotExist as exc:
+        raise Service.DoesNotExist(f"{str(exc)} (identifier = {slug})") from exc

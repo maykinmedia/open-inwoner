@@ -46,8 +46,8 @@ def decode_email_verification_token(token: str) -> Payload:
     signer = signing.TimestampSigner(salt=VERIFY_SALT)
     try:
         payload: Payload = signer.unsign_object(token, max_age=VERIFY_MAX_AGE)
-    except signing.BadSignature:
-        raise BadToken("invalid signature")
+    except signing.BadSignature as exc:
+        raise BadToken("invalid signature") from exc
     else:
         return payload
 

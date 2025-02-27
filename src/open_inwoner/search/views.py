@@ -131,21 +131,21 @@ class SearchView(
         page = self.kwargs.get(page_kwarg) or self.request.GET.get(page_kwarg) or 1
         try:
             page_number = int(page)
-        except ValueError:
+        except ValueError as exc:
             if page == "last":
                 page_number = paginator.num_pages
             else:
                 raise Http404(
                     _("Page is not 'last', nor can it be converted to an int.")
-                )
+                ) from exc
         try:
             page = paginator.page(page_number)
             return paginator, page, page.object_list, page.has_other_pages()
-        except InvalidPage as e:
+        except InvalidPage as exc:
             raise Http404(
                 _("Invalid page (%(page_number)s): %(message)s")
-                % {"page_number": page_number, "message": str(e)}
-            )
+                % {"page_number": page_number, "message": str(exc)}
+            ) from exc
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

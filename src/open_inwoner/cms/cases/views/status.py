@@ -111,9 +111,9 @@ class OuterCaseDetailView(
     def get(self, request, *args, **kwargs):
         try:
             ZGWApiGroupConfig.objects.get(pk=self.kwargs["api_group_id"])
-        except ZGWApiGroupConfig.DoesNotExist:
+        except ZGWApiGroupConfig.DoesNotExist as exc:
             logger.exception("Non-existent ZGWApiGroupConfig passed")
-            raise Http404
+            raise Http404 from exc
 
         return super().get(request, *args, **kwargs)
 
@@ -735,9 +735,9 @@ class CaseDocumentDownloadView(LogMixin, CaseAccessMixin, View):
 
         try:
             api_group = ZGWApiGroupConfig.objects.get(pk=self.kwargs["api_group_id"])
-        except ZGWApiGroupConfig.DoesNotExist:
+        except ZGWApiGroupConfig.DoesNotExist as exc:
             logger.exception("Non-existent ZGWApiGroupConfig passed")
-            raise Http404
+            raise Http404 from exc
 
         info_object_uuid = kwargs["info_id"]
         info_object = fetch_single_information_object_uuid(
@@ -821,9 +821,9 @@ class CaseDocumentUploadFormView(CaseAccessMixin, LogMixin, FormView):
     def handle_document_upload(self, request, form):
         try:
             api_group = ZGWApiGroupConfig.objects.get(pk=self.kwargs["api_group_id"])
-        except ZGWApiGroupConfig.DoesNotExist:
+        except ZGWApiGroupConfig.DoesNotExist as exc:
             logger.exception("Non-existent ZGWApiGroupConfig passed")
-            raise Http404
+            raise Http404 from exc
 
         cleaned_data = form.cleaned_data
         files = cleaned_data["files"]

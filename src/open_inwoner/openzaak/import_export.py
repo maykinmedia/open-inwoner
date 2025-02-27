@@ -102,7 +102,9 @@ def check_catalogus_config_exists(source_config: CatalogusConfig, jsonl: str):
         CatalogusConfig.DoesNotExist,
         CatalogusConfig.MultipleObjectsReturned,
     ) as exc:
-        raise ZGWImportError.from_exception_and_jsonl(exception=exc, jsonl=jsonl)
+        raise ZGWImportError.from_exception_and_jsonl(
+            exception=exc, jsonl=jsonl
+        ) from exc
 
 
 def _update_config(source, target, exclude_fields):
@@ -130,7 +132,9 @@ def _update_zaaktype_config(source_config: ZaakTypeConfig, jsonl: str):
         ZaakTypeConfig.DoesNotExist,
         ZaakTypeConfig.MultipleObjectsReturned,
     ) as exc:
-        raise ZGWImportError.from_exception_and_jsonl(exception=exc, jsonl=jsonl)
+        raise ZGWImportError.from_exception_and_jsonl(
+            exception=exc, jsonl=jsonl
+        ) from exc
     else:
         exclude_fields = [
             "id",
@@ -160,7 +164,9 @@ def _update_nested_zgw_config(
             catalogus_rsin=catalogus_rsin,
         )
     except (source_config.DoesNotExist, source_config.MultipleObjectsReturned) as exc:
-        raise ZGWImportError.from_exception_and_jsonl(exception=exc, jsonl=jsonl)
+        raise ZGWImportError.from_exception_and_jsonl(
+            exception=exc, jsonl=jsonl
+        ) from exc
     else:
         _update_config(source_config, target, exclude_fields)
 

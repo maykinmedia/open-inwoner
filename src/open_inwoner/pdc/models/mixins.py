@@ -108,9 +108,9 @@ class GeoModel(models.Model):
         except GeopyError as exc:
             raise ValidationError(
                 _("Locating geo coordinates has failed: %(exc)s") % {"exc": exc}
-            )
+            ) from exc
         except IndexError:
-            raise ValidationError(_("No location data was provided"))
+            raise ValidationError(_("No location data was provided")) from None
 
         if not geometry:
             raise ValidationError(
