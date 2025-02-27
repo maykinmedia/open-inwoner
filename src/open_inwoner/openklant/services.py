@@ -206,7 +206,7 @@ class eSuiteKlantenService(KlantenService):
                 params={"subjectNatuurlijkPersoon__inpBsn": user_bsn},
             )
             data = get_json_response(response)
-            all_data = list(pagination_helper(self, data))
+            all_data = list(pagination_helper(self.client, data))
         except (RequestException, ClientError) as e:
             logger.exception("exception while making request", exc_info=e)
             return []
@@ -231,7 +231,7 @@ class eSuiteKlantenService(KlantenService):
                 params=params,
             )
             data = get_json_response(response)
-            all_data = list(pagination_helper(self, data))
+            all_data = list(pagination_helper(self.client, data))
         except (RequestException, ClientError) as e:
             logger.exception("exception while making request", exc_info=e)
             return []
@@ -521,7 +521,7 @@ class eSuiteVragenService(KlantenService):
                 "objectcontactmomenten", params={"object": zaak.url}
             )
             data = get_json_response(response)
-            all_data = list(pagination_helper(self, data))
+            all_data = list(pagination_helper(self.client, data))
         except (RequestException, ClientError) as exc:
             logger.exception("exception while making request", exc_info=exc)
             return []
@@ -551,7 +551,7 @@ class eSuiteVragenService(KlantenService):
                 "objectcontactmomenten", params={"contactmoment": contactmoment.url}
             )
             data = get_json_response(response)
-            all_data = list(pagination_helper(self, data))
+            all_data = list(pagination_helper(self.client, data))
         except (RequestException, ClientError) as e:
             logger.exception("exception while making request", exc_info=e)
             return []
@@ -572,7 +572,7 @@ class eSuiteVragenService(KlantenService):
                 params={"klant": klant.url},
             )
             data = get_json_response(response)
-            all_data = list(pagination_helper(self, data))
+            all_data = list(pagination_helper(self.client, data))
         except (RequestException, ClientError) as e:
             logger.exception("exception while making request", exc_info=e)
             return []
