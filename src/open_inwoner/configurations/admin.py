@@ -109,13 +109,13 @@ class SiteConfigurationAdminForm(forms.ModelForm):
                 try:
                     resolve(redirect_to)
                 except Resolver404:
-                    raise ValidationError(_("The entered path is invalid."))
+                    raise ValidationError(_("The entered path is invalid.")) from None
             else:
                 validate_url = URLValidator()
                 try:
                     validate_url(redirect_to)
                 except exceptions.ValidationError:
-                    raise ValidationError(_("The entered url is invalid."))
+                    raise ValidationError(_("The entered url is invalid.")) from None
 
         return redirect_to
 

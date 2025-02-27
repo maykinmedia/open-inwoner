@@ -40,8 +40,8 @@ def get_valid_subscription_from_jwt(jwt_string: str) -> Subscription:
             },
         )
         client_id = decoded_unverified.get("client_id")
-    except InvalidTokenError:
-        raise InvalidAuth(f"cannot decode token: {jwt_string}")
+    except InvalidTokenError as exc:
+        raise InvalidAuth(f"cannot decode token: {jwt_string}") from exc
 
     if not client_id:
         raise InvalidAuth(f"missing 'client_id' in token: {jwt_string}")

@@ -895,7 +895,7 @@ def build_zgw_client_from_service(service: Service) -> ZgwClientFactoryReturn:
     except KeyError:
         raise ValueError(
             f"No client defined for API type {service.api_type} on service {service}"
-        )
+        ) from None
 
     client = build_client(service, client_factory=client_class, configured_from=service)
     return client

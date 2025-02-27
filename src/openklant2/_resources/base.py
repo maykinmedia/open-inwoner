@@ -68,8 +68,8 @@ class ResourceMixin:
                 raise NonJSONResponse(response)
 
             response_data = response.json()
-        except (requests.exceptions.JSONDecodeError, json.JSONDecodeError):
-            raise InvalidJSONResponse(response)
+        except (requests.exceptions.JSONDecodeError, json.JSONDecodeError) as exc:
+            raise InvalidJSONResponse(response) from exc
 
         match response.status_code:
             case code if code >= 200 and code < 300 and response_data:
