@@ -106,13 +106,3 @@ def cookies_accepted(request: HttpRequest) -> bool:
 @stringfilter
 def markdown(value):
     return md.markdown(value, extensions=["markdown.extensions.fenced_code"])
-
-
-@register.simple_tag
-def define(val=None):
-    return val
-
-
-@register.filter
-def is_same(value, arg):
-    return value == arg

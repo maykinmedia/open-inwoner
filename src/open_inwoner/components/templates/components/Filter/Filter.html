@@ -1,7 +1,7 @@
 {% load i18n icon_tags button_tags form_tags %}
 
 <div class="filter__container">
-    <details class="filter" aria-label="{% trans "Filter" %}" open>
+    <details class="filter" aria-label="{% trans "Filter" %}" {% if initial_open %}open{% endif %}>
         <summary class="filter__title">
             <span class="filter__summary-label">
                 {{ field.label }}

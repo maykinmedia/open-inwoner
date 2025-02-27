@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n form_tags utils icon_tags grid_tags pagination_tags button_tags %}
+{% load i18n form_tags utils icon_tags grid_tags pagination_tags button_tags filter_tags %}
 
 {% block main_inner %}
     {#  search term section #}
@@ -13,35 +13,10 @@
     {#  facets and results section #}
     <div class="grid">
     {% if paginator.count %}
+        {#  start search filters #}
         {% if search_filter_categories or search_filter_tags or search_filter_organizations %}
             <aside class="grid__sidebar grid__filters" aria-label="{% trans "Zoekfilters" %}">
-                {% if search_filter_categories and search_form.categories.field.choices|length != 0 %}
-                    {% define 0 as open_index %}
-                {% elif search_filter_tags and search_form.tags.field.choices|length != 0 %}
-                    {% define 1 as open_index %}
-                {% elif search_filter_organizations and search_form.organizations.field.choices|length != 0 %}
-                    {% define 2 as open_index %}
-                {% else %}
-                    {% define 3 as open_index %}
-                {% endif %}
-
-                {% if open_index <= 2 %}
-                <div class='filter__reset'>
-                    {% button transparent=True type='button' inline=True text=_('Wis alle?') %}
-                </div>
-                {% endif %}
-
-
-                {% if search_filter_categories and search_form.categories.field.choices|length != 0 %}
-                    {% include "components/Filter/Filter.html" with field=search_form.categories form_id="search-form" initial_open=open_index|is_same:0 only  %}
-                {% endif %}
-                {% if search_filter_tags and search_form.tags.field.choices|length != 0  %}
-                    TAGS
-                    {% include "components/Filter/Filter.html" with field=search_form.tags form_id="search-form" initial_open=open_index|is_same:1 only %}
-                {% endif %}
-                {% if search_filter_organizations and search_form.organizations.field.choices|length != 0 %}
-                    {% include "components/Filter/Filter.html" with field=search_form.organizations form_id="search-form" initial_open=open_index|is_same:2 only %}
-                {% endif %}
+                {% search_filters search_form form_id="search-form" search_filter_categories search_filter_tags search_filter_organizations %}
             </aside>
         {% endif %}
         {#  end search filters #}
