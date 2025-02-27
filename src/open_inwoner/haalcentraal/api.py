@@ -210,14 +210,15 @@ class BRP_Travel_Documents(BRPAPI):
             response = self.client.post(
                 url=url,
                 headers=headers,
-                params={
+                verify=False,
+                json={
                     "type": "ZoekMetBurgerservicenummer",
                     "burgerservicenummer": [user_bsn],
                     "fields": [
                         "reisdocumentnummer",
-                        
+
                         "soort.code",
-                        "soort.omschrijving"
+                        "soort.omschrijving",
 
                         "datumEindeGeldigheid.type",
                         "datumEindeGeldigheid.langFormaat",
@@ -243,15 +244,15 @@ class BRP_Travel_Documents(BRPAPI):
                         "houder.opschortingBijhouding.datum.datum",
                         "houder.inOnderzoek.burgerservicenummer",
                         "houder.inOnderzoek.datumIngangOnderzoek.type",
-                        "houder.inOnderzoek.datumIngangOnderzoek.langFormaat",
-                        "houder.inOnderzoek.datumIngangOnderzoek.datum",
+                        # "houder.inOnderzoek.datumIngangOnderzoek.langFormaat",
+                        # "houder.inOnderzoek.datumIngangOnderzoek.datum",
 
-                        "inOnderzoek.reisdocumentnummer",
-                        "inOnderzoek.soort",
-                        "inOnderzoek.datumEindeGeldigheid",
-                        "inOnderzoek.datumIngangOnderzoek.type",
-                        "inOnderzoek.datumIngangOnderzoek.langFormaat",
-                        "inOnderzoek.datumIngangOnderzoek.datum",
+                        # "inOnderzoek.reisdocumentnummer",
+                        # "inOnderzoek.soort",
+                        # "inOnderzoek.datumEindeGeldigheid",
+                        # "inOnderzoek.datumIngangOnderzoek.type",
+                        # "inOnderzoek.datumIngangOnderzoek.langFormaat",
+                        # "inOnderzoek.datumIngangOnderzoek.datum",
                     ]
                 }
             )

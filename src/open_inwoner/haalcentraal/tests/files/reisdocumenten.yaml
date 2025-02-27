@@ -52,10 +52,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ReisdocumentenQueryResponse'
                 example:
-                  jsonObject:
-                    summary: 'A sample object'
-                    # externalValue: 'reisdocumenten_data.json'
-                    $ref: 'reisdocumenten_data.json'
+                  $ref: 'reisdocumenten_data.json'
                 # example:
                 #   "reisdocumentnummer": 'NE3663258'
         "400":
