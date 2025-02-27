@@ -1,0 +1,675 @@
+openapi: 3.0.3
+info:
+  title: Haal Centraal Reisdocumenten bevragen
+  description: |
+    API voor het bevragen van gegevens van reisdocumenten.
+  contact:
+    url: https://brp-api.github.io/Haal-Centraal-Reisdocumenten-bevragen
+  license:
+    name: "European Union Public License, version 1.2 (EUPL-1.2)"
+    url: https://eupl.eu/1.2/nl/
+  version: 2.0.0
+servers:
+- url: https://proefomgeving.haalcentraal.nl/haalcentraal/api/reisdocumenten
+  description: |
+    Proef omgeving
+- url: http://localhost:5001/haalcentraal/api/reisdocumenten
+  description: |
+    Lokaal
+tags:
+- name: Reisdocumenten
+paths:
+  /reisdocumenten:
+    post:
+      tags:
+      - Reisdocumenten
+      description: |
+        Zoek reisdocumenten met één van de onderstaande verplichte combinaties van parameters
+
+        1. Raadpleeg met reisdocumentnummer
+        2. Zoek met burgerservicenummer
+      operationId: Reisdocumenten
+      requestBody:
+        content:
+          application/json; charset=utf-8:
+            schema:
+              $ref: '#/components/schemas/ReisdocumentenQuery'
+      responses:
+        "200":
+          description: |
+            Zoekactie geslaagd
+          headers:
+            warning:
+              $ref: '#/components/headers/warning'
+            X-Rate-Limit-Limit:
+              $ref: '#/components/headers/X_Rate_Limit_Limit'
+            X-Rate-Limit-Remaining:
+              $ref: '#/components/headers/X_Rate_Limit_Remaining'
+            X-Rate-Limit-Reset:
+              $ref: '#/components/headers/X_Rate_Limit_Reset'
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ReisdocumentenQueryResponse'
+                example:
+                  jsonObject:
+                    summary: 'A sample object'
+                    # externalValue: 'reisdocumenten_data.json'
+                    $ref: 'reisdocumenten_data.json'
+                # example:
+                #   "reisdocumentnummer": 'NE3663258'
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/BadRequestFoutbericht'
+              example:
+                type: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1
+                title: Ten minste één parameter moet worden opgegeven.
+                status: 400
+                detail: The request could not be understood by the server due to malformed
+                  syntax. The client SHOULD NOT repeat the request without modification.
+                instance: https://datapunt.voorbeeldgemeente.nl/api/v1/resourcenaam?parameter=waarde
+                code: paramsRequired
+                invalidParams:
+                - type: https://www.vng.nl/realisatie/api/validaties/integer
+                  name: huisnummer
+                  code: integer
+                  reason: Waarde is geen geldig getal.
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Foutbericht'
+              example:
+                type: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.2
+                title: Niet correct geauthenticeerd.
+                status: 401
+                detail: The request requires user authentication. The response MUST
+                  include a WWW-Authenticate header field (section 14.47) containing
+                  a challenge applicable to the requested resource.
+                instance: https://datapunt.voorbeeldgemeente.nl/api/v1/resourcenaam?parameter=waarde
+                code: authentication
+        "403":
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Foutbericht'
+              example:
+                type: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4
+                title: U bent niet geautoriseerd voor deze operatie.
+                status: 403
+                detail: "The server understood the request, but is refusing to fulfill\
+                  \ it."
+                instance: https://datapunt.voorbeeldgemeente.nl/api/v1/resourcenaam?parameter=waarde
+                code: autorisation
+        "406":
+          description: Not Acceptable
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Foutbericht'
+              example:
+                type: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.7
+                title: Gevraagde contenttype wordt niet ondersteund.
+                status: 406
+                detail: The resource identified by the request is only capable of
+                  generating response entities which have content characteristics
+                  not acceptable according to thr accept headers sent in the request
+                instance: https://datapunt.voorbeeldgemeente.nl/api/v1/resourcenaam?parameter=waarde
+                code: notAcceptable
+        "415":
+          description: Unsupported Media Type
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Foutbericht'
+              example:
+                type: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.16
+                title: Unsupported Media Type
+                status: 415
+                detail: The server is refusing the request because the entity of the
+                  request is in a format not supported by the requested resource for
+                  the requested method.
+                instance: https://datapunt.voorbeeldgemeente.nl/api/v1/resourcenaam?parameter=waarde
+                code: unsupported
+        "429":
+          description: Too Many Requests
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Foutbericht'
+              example:
+                type: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+                title: Too many request
+                status: 429
+                detail: The user has sent too many requests in a given amount of time
+                  (rate limiting).
+                instance: https://datapunt.voorbeeldgemeente.nl/api/v1/resourcenaam?parameter=waarde
+                code: tooManyRequests
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Foutbericht'
+              example:
+                type: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1
+                title: Interne server fout.
+                status: 500
+                detail: The server encountered an unexpected condition which prevented
+                  it from fulfilling the request.
+                instance: https://datapunt.voorbeeldgemeente.nl/api/v1/resourcenaam?parameter=waarde
+                code: serverError
+        "503":
+          description: Service Unavailable
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Foutbericht'
+              example:
+                type: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.4
+                title: Bronservice BRP is tijdelijk niet beschikbaar.
+                status: 503
+                detail: The service is currently unable to handle the request due
+                  to a temporary overloading or maintenance of the server.
+                instance: https://datapunt.voorbeeldgemeente.nl/api/v1/resourcenaam?parameter=waarde
+                code: notAvailable
+        default:
+          description: Er is een onverwachte fout opgetreden
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Foutbericht'
+components:
+  schemas:
+    ReisdocumentenQueryResponse:
+      required:
+      - type
+      type: object
+      properties:
+        type:
+          type: string
+      discriminator:
+        propertyName: type
+        mapping:
+          RaadpleegMetReisdocumentnummer: '#/components/schemas/RaadpleegMetReisdocumentnummerResponse'
+          ZoekMetBurgerservicenummer: '#/components/schemas/ZoekMetBurgerservicenummerResponse'
+    RaadpleegMetReisdocumentnummerResponse:
+      allOf:
+      - $ref: '#/components/schemas/ReisdocumentenQueryResponse'
+      - type: object
+        properties:
+          reisdocumenten:
+            type: array
+            items:
+              $ref: '#/components/schemas/Reisdocument'
+    ZoekMetBurgerservicenummerResponse:
+      allOf:
+      - $ref: '#/components/schemas/ReisdocumentenQueryResponse'
+      - type: object
+        properties:
+          reisdocumenten:
+            type: array
+            items:
+              $ref: '#/components/schemas/Reisdocument'
+    ReisdocumentenQuery:
+      required:
+      - fields
+      - type
+      type: object
+      properties:
+        type:
+          type: string
+        fields:
+          maxItems: 25
+          minItems: 1
+          type: array
+          items:
+            $ref: '#/components/schemas/Field'
+      discriminator:
+        propertyName: type
+        mapping:
+          RaadpleegMetReisdocumentnummer: '#/components/schemas/RaadpleegMetReisdocumentnummer'
+          ZoekMetBurgerservicenummer: '#/components/schemas/ZoekMetBurgerservicenummer'
+    RaadpleegMetReisdocumentnummer:
+      required:
+      - reisdocumentnummer
+      allOf:
+      - $ref: '#/components/schemas/ReisdocumentenQuery'
+      - type: object
+        properties:
+          reisdocumentnummer:
+            maxItems: 1
+            minItems: 1
+            type: array
+            items:
+              $ref: '#/components/schemas/Reisdocumentnummer'
+    ZoekMetBurgerservicenummer:
+      required:
+      - burgerservicenummer
+      allOf:
+      - $ref: '#/components/schemas/ReisdocumentenQuery'
+      - type: object
+        properties:
+          burgerservicenummer:
+            $ref: '#/components/schemas/Burgerservicenummer'
+    BadRequestFoutbericht:
+      allOf:
+      - $ref: '#/components/schemas/Foutbericht'
+      - type: object
+        properties:
+          invalidParams:
+            type: array
+            description: Foutmelding per fout in een parameter. Alle gevonden fouten
+              worden één keer teruggemeld.
+            items:
+              $ref: '#/components/schemas/InvalidParams'
+    Foutbericht:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Link naar meer informatie over deze fout
+          format: uri
+        title:
+          pattern: "^[a-zA-Z0-9À-ž \\.\\-]{1,80}$"
+          type: string
+          description: Beschrijving van de fout
+        status:
+          maximum: 600
+          minimum: 100
+          type: integer
+          description: Http status code
+        detail:
+          pattern: "^[a-zA-Z0-9À-ž \\.\\-\\(\\)\\,]{1,200}$"
+          type: string
+          description: Details over de fout
+        instance:
+          type: string
+          description: Uri van de aanroep die de fout heeft veroorzaakt
+          format: uri
+        code:
+          minLength: 1
+          pattern: "^[a-zA-Z0-9]{1,25}$"
+          type: string
+          description: Systeemcode die het type fout aangeeft
+      description: "Terugmelding bij een fout. JSON representatie in lijn met [RFC7807](https://tools.ietf.org/html/rfc7807)."
+    InvalidParams:
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+          example: "https://www.vng.nl/realisatie/api/{major-versie}/validaties/integer"
+        name:
+          pattern: "^[a-zA-Z0-9\\.,_]{1,30}$"
+          type: string
+          description: Naam van de parameter
+          example: huisnummer
+        code:
+          minLength: 1
+          pattern: "^[a-zA-Z0-9\\.,_]{1,25}$"
+          type: string
+          description: Systeemcode die het type fout aangeeft
+          example: integer
+        reason:
+          pattern: "^[a-zA-Z0-9\\.,_ ]{1,80}$"
+          type: string
+          description: Beschrijving van de fout op de parameterwaarde
+          example: Waarde is geen geldig getal.
+      description: Details over fouten in opgegeven parameters
+    Reisdocument:
+      type: object
+      properties:
+        reisdocumentnummer:
+          $ref: '#/components/schemas/Reisdocumentnummer'
+        soort:
+          $ref: '#/components/schemas/Waardetabel'
+        datumEindeGeldigheid:
+          $ref: '#/components/schemas/AbstractDatum'
+        inhoudingOfVermissing:
+          $ref: '#/components/schemas/InhoudingOfVermissing'
+        houder:
+          $ref: '#/components/schemas/Reisdocumenthouder'
+        inOnderzoek:
+          $ref: '#/components/schemas/ReisdocumentInOnderzoek'
+    Reisdocumentnummer:
+      pattern: "^[A-Z0-9]{9}$"
+      type: string
+    InhoudingOfVermissing:
+      type: object
+      properties:
+        datum:
+          $ref: '#/components/schemas/AbstractDatum'
+        aanduiding:
+          $ref: '#/components/schemas/Waardetabel'
+        inOnderzoek:
+          $ref: '#/components/schemas/InhoudingOfVermissingInOnderzoek'
+    InhoudingOfVermissingInOnderzoek:
+      type: object
+      properties:
+        datum:
+          type: boolean
+        aanduiding:
+          type: boolean
+        datumIngangOnderzoek:
+          $ref: '#/components/schemas/AbstractDatum'
+    Reisdocumenthouder:
+      allOf:
+      - $ref: '#/components/schemas/ReisdocumenthouderBasis'
+      - type: object
+        properties:
+          geheimhoudingPersoonsgegevens:
+            $ref: '#/components/schemas/GeheimhoudingPersoonsgegevens'
+          opschortingBijhouding:
+            $ref: '#/components/schemas/OpschortingBijhouding'
+          inOnderzoek:
+            $ref: '#/components/schemas/ReisdocumenthouderInOnderzoek'
+    ReisdocumenthouderBasis:
+      type: object
+      properties:
+        burgerservicenummer:
+          $ref: '#/components/schemas/Burgerservicenummer'
+    ReisdocumenthouderInOnderzoek:
+      type: object
+      properties:
+        burgerservicenummer:
+          type: boolean
+        datumIngangOnderzoek:
+          $ref: '#/components/schemas/AbstractDatum'
+    ReisdocumentInOnderzoek:
+      type: object
+      properties:
+        reisdocumentnummer:
+          type: boolean
+        soort:
+          type: boolean
+        datumEindeGeldigheid:
+          type: boolean
+        datumIngangOnderzoek:
+          $ref: '#/components/schemas/AbstractDatum'
+    Field:
+      pattern: "^[a-zA-Z0-9\\._]{1,200}$"
+      type: string
+      description: |
+        Het pad naar een gewenst veld in punt-gescheiden formaat. Bijvoorbeeld "burgerservicenummer", "geboorte.datum", "partners.naam.voornamen".
+    Burgerservicenummer:
+      pattern: "^[0-9]{9}$"
+      type: string
+      example: "555555021"
+    Waardetabel:
+      type: object
+      properties:
+        code:
+          pattern: "^[a-zA-Z0-9 \\.]+$"
+          type: string
+          example: "6030"
+        omschrijving:
+          pattern: "^[a-zA-Z0-9À-ž \\'\\,\\(\\)\\.\\-]{1,200}$"
+          type: string
+          example: Nederland
+    AbstractDatum:
+      required:
+      - type
+      type: object
+      properties:
+        type:
+          type: string
+        langFormaat:
+          pattern: "^[a-z0-9 ]{1,17}$"
+          type: string
+      discriminator:
+        propertyName: type
+        mapping:
+          Datum: '#/components/schemas/VolledigeDatum'
+          DatumOnbekend: '#/components/schemas/DatumOnbekend'
+          JaarDatum: '#/components/schemas/JaarDatum'
+          JaarMaandDatum: '#/components/schemas/JaarMaandDatum'
+    VolledigeDatum:
+      required:
+      - datum
+      description: Datum conform iso8601
+      example:
+        value:
+          type: Datum
+          datum: 2018-07-01
+          langFormaat: 1 juli 2018
+      allOf:
+      - $ref: '#/components/schemas/AbstractDatum'
+      - type: object
+        properties:
+          datum:
+            type: string
+            format: date
+    DatumOnbekend:
+      required:
+      - onbekend
+      description: representatie voor een volledig onbekend datum
+      example:
+        value:
+          type: DatumOnbekend
+          onbekend: true
+          langFormaat: onbekend
+      allOf:
+      - $ref: '#/components/schemas/AbstractDatum'
+      - type: object
+        properties:
+          onbekend:
+            type: boolean
+            default: true
+    JaarDatum:
+      required:
+      - jaar
+      description: representatie voor een datum waarvan maand en dag onbekend zijn
+      example:
+        value:
+          type: JaarDatum
+          jaar: 2018
+          langFormaat: 2018
+      allOf:
+      - $ref: '#/components/schemas/AbstractDatum'
+      - type: object
+        properties:
+          jaar:
+            $ref: '#/components/schemas/Jaar'
+    Jaar:
+      maximum: 9999
+      minimum: 1
+      type: integer
+      format: int32
+    JaarMaandDatum:
+      required:
+      - jaar
+      - maand
+      description: representatie voor een datum waarvan de dag onbekend is
+      example:
+        value:
+          type: JaarMaandDatum
+          jaar: 2018
+          maand: 7
+          langFormaat: juli 2018
+      allOf:
+      - $ref: '#/components/schemas/AbstractDatum'
+      - type: object
+        properties:
+          jaar:
+            $ref: '#/components/schemas/Jaar'
+          maand:
+            $ref: '#/components/schemas/Maand'
+    Maand:
+      maximum: 12
+      minimum: 1
+      type: integer
+      format: int32
+    GeheimhoudingPersoonsgegevens:
+      type: boolean
+      description: |
+        Gegevens mogen niet worden verstrekt aan derden / maatschappelijke instellingen.
+    OpschortingBijhouding:
+      allOf:
+      - $ref: '#/components/schemas/OpschortingBijhoudingBasis'
+      - type: object
+        properties:
+          datum:
+            $ref: '#/components/schemas/AbstractDatum'
+        description: |
+          * **datum**: de datum waarop de bijhouding van de persoonsgegevens is gestaakt.
+    OpschortingBijhoudingBasis:
+      type: object
+      properties:
+        reden:
+          $ref: '#/components/schemas/Waardetabel'
+      description: |
+        * **reden** - wordt gevuld met waarden voor 'Reden_Opschorting_Bijhouding' in 'tabelwaarden.csv'.
+  responses:
+    "400":
+      description: Bad Request
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/BadRequestFoutbericht'
+          example:
+            type: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1
+            title: Ten minste één parameter moet worden opgegeven.
+            status: 400
+            detail: The request could not be understood by the server due to malformed
+              syntax. The client SHOULD NOT repeat the request without modification.
+            instance: https://datapunt.voorbeeldgemeente.nl/api/v1/resourcenaam?parameter=waarde
+            code: paramsRequired
+            invalidParams:
+            - type: https://www.vng.nl/realisatie/api/validaties/integer
+              name: huisnummer
+              code: integer
+              reason: Waarde is geen geldig getal.
+    "401":
+      description: Unauthorized
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Foutbericht'
+          example:
+            type: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.2
+            title: Niet correct geauthenticeerd.
+            status: 401
+            detail: The request requires user authentication. The response MUST include
+              a WWW-Authenticate header field (section 14.47) containing a challenge
+              applicable to the requested resource.
+            instance: https://datapunt.voorbeeldgemeente.nl/api/v1/resourcenaam?parameter=waarde
+            code: authentication
+    "403":
+      description: Forbidden
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Foutbericht'
+          example:
+            type: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4
+            title: U bent niet geautoriseerd voor deze operatie.
+            status: 403
+            detail: "The server understood the request, but is refusing to fulfill\
+              \ it."
+            instance: https://datapunt.voorbeeldgemeente.nl/api/v1/resourcenaam?parameter=waarde
+            code: autorisation
+    "406":
+      description: Not Acceptable
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Foutbericht'
+          example:
+            type: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.7
+            title: Gevraagde contenttype wordt niet ondersteund.
+            status: 406
+            detail: The resource identified by the request is only capable of generating
+              response entities which have content characteristics not acceptable
+              according to thr accept headers sent in the request
+            instance: https://datapunt.voorbeeldgemeente.nl/api/v1/resourcenaam?parameter=waarde
+            code: notAcceptable
+    "415":
+      description: Unsupported Media Type
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Foutbericht'
+          example:
+            type: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.16
+            title: Unsupported Media Type
+            status: 415
+            detail: The server is refusing the request because the entity of the request
+              is in a format not supported by the requested resource for the requested
+              method.
+            instance: https://datapunt.voorbeeldgemeente.nl/api/v1/resourcenaam?parameter=waarde
+            code: unsupported
+    "429":
+      description: Too Many Requests
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Foutbericht'
+          example:
+            type: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+            title: Too many request
+            status: 429
+            detail: The user has sent too many requests in a given amount of time
+              (rate limiting).
+            instance: https://datapunt.voorbeeldgemeente.nl/api/v1/resourcenaam?parameter=waarde
+            code: tooManyRequests
+    "500":
+      description: Internal Server Error
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Foutbericht'
+          example:
+            type: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1
+            title: Interne server fout.
+            status: 500
+            detail: The server encountered an unexpected condition which prevented
+              it from fulfilling the request.
+            instance: https://datapunt.voorbeeldgemeente.nl/api/v1/resourcenaam?parameter=waarde
+            code: serverError
+    "503":
+      description: Service Unavailable
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Foutbericht'
+          example:
+            type: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.4
+            title: Bronservice BRP is tijdelijk niet beschikbaar.
+            status: 503
+            detail: The service is currently unable to handle the request due to a
+              temporary overloading or maintenance of the server.
+            instance: https://datapunt.voorbeeldgemeente.nl/api/v1/resourcenaam?parameter=waarde
+            code: notAvailable
+    default:
+      description: Er is een onverwachte fout opgetreden
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Foutbericht'
+  headers:
+    warning:
+      schema:
+        maxLength: 500
+        type: string
+        description: "zie RFC 7234. In het geval een major versie wordt uitgefaseerd,\
+          \ gebruiken we warn-code 299 (\"Miscellaneous Persistent Warning\") en het\
+          \ API end-point (inclusief versienummer) als de warn-agent van de warning,\
+          \ gevolgd door de warn-text met de human-readable waarschuwing"
+        example: "299 https://service.../api/.../v1 \"Deze versie van de API is verouderd\
+          \ en zal uit dienst worden genomen op 2018-02-01. Raadpleeg voor meer informatie\
+          \ hier de documentatie: https://omgevingswet.../api/.../v1\"."
+    X_Rate_Limit_Limit:
+      schema:
+        type: integer
+    X_Rate_Limit_Remaining:
+      schema:
+        type: integer
+    X_Rate_Limit_Reset:
+      schema:
+        type: integer

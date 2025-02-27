@@ -1,0 +1,64 @@
+{
+    "type": "ZoekMetBurgerservicenummer",
+    "reisdocumenten": [
+      {
+        "reisdocumentnummer": "^AAAAAAAAA$",
+        "soort": {
+          "code": "6030",
+          "omschrijving": "Nederland"
+        },
+        "datumEindeGeldigheid": {
+          "type": "string",
+          "langFormaat": "^a$"
+        },
+        "inhoudingOfVermissing": {
+          "datum": {
+            "type": "string",
+            "langFormaat": "^a$"
+          },
+          "aanduiding": {
+            "code": "6030",
+            "omschrijving": "Nederland"
+          },
+          "inOnderzoek": {
+            "datum": true,
+            "aanduiding": true,
+            "datumIngangOnderzoek": {
+              "type": "string",
+              "langFormaat": "^a$"
+            }
+          }
+        },
+        "houder": {
+          "burgerservicenummer": "555555021",
+          "geheimhoudingPersoonsgegevens": true,
+          "opschortingBijhouding": {
+            "reden": {
+              "code": "6030",
+              "omschrijving": "Nederland"
+            },
+            "datum": {
+              "type": "string",
+              "langFormaat": "^a$"
+            }
+          },
+          "inOnderzoek": {
+            "burgerservicenummer": true,
+            "datumIngangOnderzoek": {
+              "type": "string",
+              "langFormaat": "^a$"
+            }
+          }
+        },
+        "inOnderzoek": {
+          "reisdocumentnummer": true,
+          "soort": true,
+          "datumEindeGeldigheid": true,
+          "datumIngangOnderzoek": {
+            "type": "string",
+            "langFormaat": "^a$"
+          }
+        }
+      }
+    ]
+  }

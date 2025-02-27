@@ -197,3 +197,68 @@ class BRP_2_1(BRPAPI):
             # country=glom(data, "verblijfplaats.land.omschrijving", default=""),
         )
         return brp
+
+
+class BRP_Travel_Documents(BRPAPI):
+
+    def fetch_data(self, user_bsn: str) -> dict | None:
+        url = "reisdocumenten"
+        headers = {
+            "Accept": "application/json",
+        }
+        try:
+            response = self.client.post(
+                url=url,
+                headers=headers,
+                params={
+                    "type": "ZoekMetBurgerservicenummer",
+                    "burgerservicenummer": [user_bsn],
+                    "fields": [
+                        "reisdocumentnummer",
+                        
+                        "soort.code",
+                        "soort.omschrijving"
+
+                        "datumEindeGeldigheid.type",
+                        "datumEindeGeldigheid.langFormaat",
+                        "datumEindeGeldigheid.datum",
+
+                        "inhoudingOfVermissing.datum.type",
+                        "inhoudingOfVermissing.datum.langFormaat",
+                        "inhoudingOfVermissing.datum.datum",
+                        "inhoudingOfVermissing.aanduiding.code",
+                        "inhoudingOfVermissing.aanduiding.omschrijving",
+                        "inhoudingOfVermissing.inOnderzoek.datum",
+                        "inhoudingOfVermissing.inOnderzoek.aanduiding",
+                        "inhoudingOfVermissing.inOnderzoek.datumingangOnderzoek.type",
+                        "inhoudingOfVermissing.inOnderzoek.datumingangOnderzoek.langFormaat",
+                        "inhoudingOfVermissing.inOnderzoek.datumingangOnderzoek.datum",
+
+                        "houder.burgerservicenummer",
+                        "houder.geheimhoudingPersoonsgegevens",
+                        "houder.opschortingBijhouding.reden.code",
+                        "houder.opschortingBijhouding.reden.omschrijving",
+                        "houder.opschortingBijhouding.datum.type",
+                        "houder.opschortingBijhouding.datum.langFormaat",
+                        "houder.opschortingBijhouding.datum.datum",
+                        "houder.inOnderzoek.burgerservicenummer",
+                        "houder.inOnderzoek.datumIngangOnderzoek.type",
+                        "houder.inOnderzoek.datumIngangOnderzoek.langFormaat",
+                        "houder.inOnderzoek.datumIngangOnderzoek.datum",
+
+                        "inOnderzoek.reisdocumentnummer",
+                        "inOnderzoek.soort",
+                        "inOnderzoek.datumEindeGeldigheid",
+                        "inOnderzoek.datumIngangOnderzoek.type",
+                        "inOnderzoek.datumIngangOnderzoek.langFormaat",
+                        "inOnderzoek.datumIngangOnderzoek.datum",
+                    ]
+                }
+            )
+            return get_json_response(response)
+        except (RequestException, ClientError) as e:
+            logger.exception("exception while making request", exc_info=e)
+            return None
+
+    def parse_data(self, data: dict) -> BRPData | None:
+        pass
