@@ -3,7 +3,7 @@ import datetime as dt
 import logging
 from collections import defaultdict
 from datetime import datetime
-from typing import Iterable, Protocol
+from typing import Iterable, Protocol, cast
 
 from django.conf import settings
 from django.contrib import messages
@@ -44,7 +44,6 @@ from open_inwoner.openklant.services import (
     eSuiteKlantenService,
     eSuiteVragenService,
 )
-from open_inwoner.openklant.wrap import get_fetch_parameters
 from open_inwoner.openzaak.api_models import Status, StatusType, Zaak
 from open_inwoner.openzaak.clients import CatalogiClient, ZakenClient
 from open_inwoner.openzaak.documents import (
@@ -1036,13 +1035,15 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
             ztc = None
 
         klant = None
+        user = cast(User, self.request.user)
         try:
             service = eSuiteKlantenService(config=config)
         except (ImproperlyConfigured, RuntimeError):
             self.log_system_action("could not build client for klanten API")
         else:
+            fetch_params = service.get_fetch_parameters(self.request, user=user)
             klant, created = service.get_or_create_klant(
-                fetch_params=get_fetch_parameters(self.request), user=self.request.user
+                fetch_params=fetch_params, user=user
             )
             if not klant:
                 self.log_system_action(
