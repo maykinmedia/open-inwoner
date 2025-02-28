@@ -11,6 +11,8 @@ from openklant2.types.resources.digitaal_adres import DigitaalAdres
 # Input types
 #
 
+SoortPartij = Literal["persoon", "contactpersoon", "organisatie"]
+
 
 class CreateContactnaam(TypedDict):
     voorletters: str
@@ -60,6 +62,12 @@ class CreatePartijContactpersoonData(CreatePartijDataBase):
 class CreatePartijOrganisatieData(CreatePartijDataBase):
     soortPartij: Literal["organisatie"]
     partijIdentificatie: CreatePartijIdentificatieOrganisatie
+
+
+class PartialUpdatePartijData(CreatePartijDataBase, total=False):
+    # TODO: This is required for PATCH, which is a bug. Should be remove when
+    # https://github.com/maykinmedia/open-klant/issues/345 is addressed.
+    soortPartij: Required[SoortPartij]
 
 
 class PartijListParams(TypedDict, total=False):

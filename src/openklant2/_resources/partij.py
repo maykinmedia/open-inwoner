@@ -9,6 +9,7 @@ from openklant2.types.resources.partij import (
     CreatePartijContactpersoonData,
     CreatePartijOrganisatieData,
     CreatePartijPersoonData,
+    PartialUpdatePartijData,
     Partij,
     PartijListParams,
     PartijRetrieveParams,
@@ -59,4 +60,10 @@ class PartijResource(ResourceMixin):
         ),
     ) -> Partij:
         response = self._post(self.base_path, data=data)
+        return cast(Partij, self.process_response(response))
+
+    def partial_update(
+        self, /, uuid: str | uuid.UUID, *, data: PartialUpdatePartijData
+    ) -> Partij:
+        response = self._patch(f"{self.base_path}/{str(uuid)}", data=data)
         return cast(Partij, self.process_response(response))
