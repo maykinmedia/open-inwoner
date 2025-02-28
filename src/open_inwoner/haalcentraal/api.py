@@ -8,8 +8,8 @@ from glom import GlomError, glom
 from requests import RequestException
 from zgw_consumers.client import build_client
 
-from open_inwoner.haalcentraal.api_models import BRPData
-from open_inwoner.haalcentraal.models import HaalCentraalConfig
+from open_inwoner.haalcentraal.api_models import BRPData, BRP_Travel_Documents_Data
+from open_inwoner.haalcentraal.models import HaalCentraalConfig, ReisDocument
 from open_inwoner.utils.api import ClientError, get_json_response
 
 logger = logging.getLogger(__name__)
@@ -199,7 +199,11 @@ class BRP_2_1(BRPAPI):
         return brp
 
 
-class BRP_Travel_Documents(BRPAPI):
+class BRP_Travel_Documents():
+
+    def __init__(self):
+        self.config = HaalCentraalConfig.get_solo()
+        self.client = build_client(self.config.service)
 
     def fetch_data(self, user_bsn: str) -> dict | None:
         url = "reisdocumenten"
@@ -261,5 +265,21 @@ class BRP_Travel_Documents(BRPAPI):
             logger.exception("exception while making request", exc_info=e)
             return None
 
-    def parse_data(self, data: dict) -> BRPData | None:
-        pass
+    def parse_data(self, data: dict):
+        reisdocumenten = data["reisdocumenten"]
+
+        return [BRP_Travel_Documents_Data(
+            reisdocumentnummer=glom(document, "reisdocumentnummer", default=""),
+            type=glom(document, "soort.code", default=""),
+            description=glom(document, "soort.omschrijving", default=""),
+            enddatevalid_date=glom(document, "datumEindeGeldigheid.datum", default=""),
+        ) for document in reisdocumenten]
+
+    def fetch_travel_documents(self, user_bsn: str):
+
+        data = self.fetch_data(user_bsn)
+        if not data:
+            logger.warning("no data retrieved from Haal Centraal")
+            return None
+        obj = self.parse_data(data)
+        return obj

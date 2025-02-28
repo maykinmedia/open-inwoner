@@ -19,9 +19,9 @@ from open_inwoner.accounts.views import (
     InviteAcceptView,
     MyCategoriesView,
     MyDataView,
+    MyDocumentsView,
     MyNotificationsView,
     MyProfileView,
-    MyDocumentsView,
     NecessaryFieldsUserView,
     UserAppointmentsView,
 )

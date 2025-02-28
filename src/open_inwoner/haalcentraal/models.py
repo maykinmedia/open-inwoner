@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -5,6 +7,7 @@ from solo.models import SingletonModel
 from zgw_consumers.constants import APITypes
 
 from .validators import validate_verwerking_header
+from django.core.validators import RegexValidator
 
 
 class HaalCentraalConfigManager(models.Manager):
@@ -64,3 +67,27 @@ class HaalCentraalConfig(SingletonModel):
 
     class Meta:
         verbose_name = _("Haal Centraal configuration")
+
+
+class ReisDocument(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey("accounts.User", on_delete=models.CASCADE)
+    reisdocumentnummer = models.CharField(validators=[RegexValidator('^[A-Z0-9]{9}$')])
+    
+    # Code of the type ('soort.code' in the API)
+    type = models.CharField(validators=[RegexValidator('^[a-zA-Z0-9 \.]+$')])
+
+    # 'soort.description' in the API
+    description = models.CharField(validators=[RegexValidator('^[a-zA-Z0-9À-ž \'\,\(\)\.\-]{1,200}$')])
+
+    # Falls under 'datumEindeGeldigheid' in the API
+    endDateValid_date = models.CharField(max_length=10)
+    # endDateValid_type = models.CharField()
+
+    # Other fields...
+
+    # TODO: voeg nog deze attributes toe aan de velden:
+    # verbose_name
+    # related_name
+    # help_text
+    # Check hoe deze attributes bij andere models zijn toegevoegd

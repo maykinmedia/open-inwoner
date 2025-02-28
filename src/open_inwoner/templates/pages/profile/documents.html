@@ -1,9 +1,26 @@
 {% extends 'master.html' %}
 
-{% load i18n %}
+{% load i18n icon_tags %}
 
 {% block content %}
 
-<h1>{% trans "Mijn documenten" %}</h1>
+<h1 class="utrecht-heading-1">{% trans "Mijn documenten" %}</h1>
+<div class="card-container card-container--columns-3">
+    {% for document in travel_documents %}
+    <a class="card" href="#">
+        <div class="card__body">
+            <p class="card__heading-4"><span class="link link__text">{{ document.description }}</span></p>
+            <span class="card__text--small">{% trans "Geldig tot " %}{{ document.enddatevalid_date }}</span>
+            <span class="link link--icon link--secondary" title="{% trans "Vraag document aan" %}">
+                <span class="link__text">{% trans "Vraag dit document aan" %}</span>
+                {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+            </span>
+
+            <!-- {{ document.reisdocumentnummer }}
+            {{ document.type }} -->
+        </div>
+    </a>
+{% endfor %}
+</div>
 
 {% endblock %}

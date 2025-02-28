@@ -52,3 +52,11 @@ class BRPData:
             parts.append(" ")
             parts.append(str(self.housenumbersuffix))
         return "".join(parts)
+
+
+@dataclasses.dataclass
+class BRP_Travel_Documents_Data:
+    reisdocumentnummer: str = ""
+    type: str = ""
+    description: str = ""
+    enddatevalid_date: str = ""

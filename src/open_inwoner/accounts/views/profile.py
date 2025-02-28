@@ -25,7 +25,7 @@ from open_inwoner.cms.utils.page_display import (
     inbox_page_is_published,
 )
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.haalcentraal.utils import fetch_brp
+from open_inwoner.haalcentraal.utils import fetch_brp, fetch_brp_travel_documents
 from open_inwoner.laposta.forms import NewsletterSubscriptionForm
 from open_inwoner.laposta.models import LapostaConfig
 from open_inwoner.openklant.services import eSuiteKlantenService
@@ -434,3 +434,10 @@ class UserAppointmentsView(
 
 class MyDocumentsView(TemplateView):
     template_name = "pages/profile/documents.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        documents = fetch_brp_travel_documents(self.request.user.bsn)
+        
+        context['travel_documents'] = documents
+        return context

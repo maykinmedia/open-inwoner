@@ -5,11 +5,12 @@
         "reisdocumentnummer": "^AAAAAAAAA$",
         "soort": {
           "code": "6030",
-          "omschrijving": "Nederland"
+          "omschrijving": "Nationaal paspoort"
         },
         "datumEindeGeldigheid": {
           "type": "string",
-          "langFormaat": "^a$"
+          "langFormaat": "^a$",
+          "datum": "2023-02-23"
         },
         "inhoudingOfVermissing": {
           "datum": {
@@ -18,7 +19,7 @@
           },
           "aanduiding": {
             "code": "6030",
-            "omschrijving": "Nederland"
+            "omschrijving": "Nationaal paspoort"
           },
           "inOnderzoek": {
             "datum": true,
@@ -35,7 +36,251 @@
           "opschortingBijhouding": {
             "reden": {
               "code": "6030",
-              "omschrijving": "Nederland"
+              "omschrijving": "Nationaal paspoort"
+            },
+            "datum": {
+              "type": "string",
+              "langFormaat": "^a$"
+            }
+          },
+          "inOnderzoek": {
+            "burgerservicenummer": true,
+            "datumIngangOnderzoek": {
+              "type": "string",
+              "langFormaat": "^a$"
+            }
+          }
+        },
+        "inOnderzoek": {
+          "reisdocumentnummer": true,
+          "soort": true,
+          "datumEindeGeldigheid": true,
+          "datumIngangOnderzoek": {
+            "type": "string",
+            "langFormaat": "^a$"
+          }
+        }
+      },
+
+      {
+        "reisdocumentnummer": "^AAAAAAAAA$",
+        "soort": {
+          "code": "6030",
+          "omschrijving": "Nationaal paspoort"
+        },
+        "datumEindeGeldigheid": {
+          "type": "string",
+          "langFormaat": "^a$",
+          "datum": "2023-02-23"
+        },
+        "inhoudingOfVermissing": {
+          "datum": {
+            "type": "string",
+            "langFormaat": "^a$"
+          },
+          "aanduiding": {
+            "code": "6030",
+            "omschrijving": "Nationaal paspoort"
+          },
+          "inOnderzoek": {
+            "datum": true,
+            "aanduiding": true,
+            "datumIngangOnderzoek": {
+              "type": "string",
+              "langFormaat": "^a$"
+            }
+          }
+        },
+        "houder": {
+          "burgerservicenummer": "555555021",
+          "geheimhoudingPersoonsgegevens": true,
+          "opschortingBijhouding": {
+            "reden": {
+              "code": "6030",
+              "omschrijving": "Nationaal paspoort"
+            },
+            "datum": {
+              "type": "string",
+              "langFormaat": "^a$"
+            }
+          },
+          "inOnderzoek": {
+            "burgerservicenummer": true,
+            "datumIngangOnderzoek": {
+              "type": "string",
+              "langFormaat": "^a$"
+            }
+          }
+        },
+        "inOnderzoek": {
+          "reisdocumentnummer": true,
+          "soort": true,
+          "datumEindeGeldigheid": true,
+          "datumIngangOnderzoek": {
+            "type": "string",
+            "langFormaat": "^a$"
+          }
+        }
+      },
+
+      {
+        "reisdocumentnummer": "^AAAAAAAAA$",
+        "soort": {
+          "code": "6030",
+          "omschrijving": "Nationaal paspoort"
+        },
+        "datumEindeGeldigheid": {
+          "type": "string",
+          "langFormaat": "^a$",
+          "datum": "2023-02-23"
+        },
+        "inhoudingOfVermissing": {
+          "datum": {
+            "type": "string",
+            "langFormaat": "^a$"
+          },
+          "aanduiding": {
+            "code": "6030",
+            "omschrijving": "Nationaal paspoort"
+          },
+          "inOnderzoek": {
+            "datum": true,
+            "aanduiding": true,
+            "datumIngangOnderzoek": {
+              "type": "string",
+              "langFormaat": "^a$"
+            }
+          }
+        },
+        "houder": {
+          "burgerservicenummer": "555555021",
+          "geheimhoudingPersoonsgegevens": true,
+          "opschortingBijhouding": {
+            "reden": {
+              "code": "6030",
+              "omschrijving": "Nationaal paspoort"
+            },
+            "datum": {
+              "type": "string",
+              "langFormaat": "^a$"
+            }
+          },
+          "inOnderzoek": {
+            "burgerservicenummer": true,
+            "datumIngangOnderzoek": {
+              "type": "string",
+              "langFormaat": "^a$"
+            }
+          }
+        },
+        "inOnderzoek": {
+          "reisdocumentnummer": true,
+          "soort": true,
+          "datumEindeGeldigheid": true,
+          "datumIngangOnderzoek": {
+            "type": "string",
+            "langFormaat": "^a$"
+          }
+        }
+      },
+
+      {
+        "reisdocumentnummer": "^AAAAAAAAA$",
+        "soort": {
+          "code": "6030",
+          "omschrijving": "Nationaal paspoort"
+        },
+        "datumEindeGeldigheid": {
+          "type": "string",
+          "langFormaat": "^a$",
+          "datum": "2023-02-23"
+        },
+        "inhoudingOfVermissing": {
+          "datum": {
+            "type": "string",
+            "langFormaat": "^a$"
+          },
+          "aanduiding": {
+            "code": "6030",
+            "omschrijving": "Nationaal paspoort"
+          },
+          "inOnderzoek": {
+            "datum": true,
+            "aanduiding": true,
+            "datumIngangOnderzoek": {
+              "type": "string",
+              "langFormaat": "^a$"
+            }
+          }
+        },
+        "houder": {
+          "burgerservicenummer": "555555021",
+          "geheimhoudingPersoonsgegevens": true,
+          "opschortingBijhouding": {
+            "reden": {
+              "code": "6030",
+              "omschrijving": "Nationaal paspoort"
+            },
+            "datum": {
+              "type": "string",
+              "langFormaat": "^a$"
+            }
+          },
+          "inOnderzoek": {
+            "burgerservicenummer": true,
+            "datumIngangOnderzoek": {
+              "type": "string",
+              "langFormaat": "^a$"
+            }
+          }
+        },
+        "inOnderzoek": {
+          "reisdocumentnummer": true,
+          "soort": true,
+          "datumEindeGeldigheid": true,
+          "datumIngangOnderzoek": {
+            "type": "string",
+            "langFormaat": "^a$"
+          }
+        }
+      },
+
+      {
+        "reisdocumentnummer": "^AAAAAAAAA$",
+        "soort": {
+          "code": "6030",
+          "omschrijving": "Nationaal paspoort"
+        },
+        "datumEindeGeldigheid": {
+          "type": "string",
+          "langFormaat": "^a$",
+          "datum": "2023-02-23"
+        },
+        "inhoudingOfVermissing": {
+          "datum": {
+            "type": "string",
+            "langFormaat": "^a$"
+          },
+          "aanduiding": {
+            "code": "6030",
+            "omschrijving": "Nationaal paspoort"
+          },
+          "inOnderzoek": {
+            "datum": true,
+            "aanduiding": true,
+            "datumIngangOnderzoek": {
+              "type": "string",
+              "langFormaat": "^a$"
+            }
+          }
+        },
+        "houder": {
+          "burgerservicenummer": "555555021",
+          "geheimhoudingPersoonsgegevens": true,
+          "opschortingBijhouding": {
+            "reden": {
+              "code": "6030",
+              "omschrijving": ""
             },
             "datum": {
               "type": "string",

@@ -3,7 +3,7 @@ import logging
 from django.conf import settings
 from django.utils.translation import gettext as _
 
-from open_inwoner.haalcentraal.api import BRP_1_3, BRP_2_1, BRPAPI
+from open_inwoner.haalcentraal.api import BRP_1_3, BRP_2_1, BRPAPI, BRP_Travel_Documents
 from open_inwoner.haalcentraal.api_models import BRPData
 from open_inwoner.utils.logentry import system_action
 
@@ -44,3 +44,15 @@ def update_brp_data_in_db(user, initial=True):
     user.save()
 
     system_action(_("data was retrieved from haal centraal"), content_object=user)
+
+
+def fetch_brp_travel_documents(user_bsn):
+    if not user_bsn:
+        return
+    api = BRP_Travel_Documents()
+    return api.fetch_travel_documents(user_bsn)
+
+
+# This should be called somewhere using a signal (see how its done for the other stuff; basically, the database should get updated on login or on BSN change apparently)
+def update_brp_travel_documents_in_db():
+    pass

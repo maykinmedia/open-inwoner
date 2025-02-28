@@ -47,10 +47,10 @@ from .profile import (
     EditProfileView,
     MyCategoriesView,
     MyDataView,
+    MyDocumentsView,
     MyNotificationsView,
     MyProfileView,
     UserAppointmentsView,
-    MyDocumentsView,
 )
 from .registration import CustomRegistrationView, NecessaryFieldsUserView
 
