@@ -24,7 +24,6 @@ from open_inwoner.openklant.forms import ContactForm
 from open_inwoner.openklant.models import ESuiteKlantConfig, KlantenSysteemConfig
 from open_inwoner.openklant.services import OpenKlant2Service, eSuiteVragenService
 from open_inwoner.openklant.views.utils import generate_question_answer_pair
-from open_inwoner.openklant.wrap import get_fetch_parameters
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 logger = logging.getLogger(__name__)
@@ -254,7 +253,12 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
         if not self.klanten_client:
             return
 
-        klant = self.klanten_client.retrieve_klant(**get_fetch_parameters(self.request))
+        if not self.vragen_service:
+            return
+
+        klant = self.klanten_client.retrieve_klant(
+            **self.vragen_service.get_fetch_parameters(self.request)
+        )
 
         self.log_system_action("retrieved klant for BSN or KVK user", user=user)
 

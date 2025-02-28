@@ -1,8 +1,9 @@
 import datetime
 import logging
 import uuid
+from dataclasses import dataclass
 from datetime import timedelta
-from typing import Iterable, Literal, NotRequired, Protocol, Self, Sequence
+from typing import ClassVar, Iterable, Literal, NotRequired, Protocol, Self, Sequence
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -12,7 +13,6 @@ from django.utils.translation import gettext_lazy as _
 
 import glom
 from ape_pie.client import APIClient
-from attr import dataclass
 from pydantic import BaseModel, ConfigDict, TypeAdapter
 from requests.exceptions import RequestException
 from typing_extensions import TypedDict
@@ -93,7 +93,7 @@ class Question(TypedDict):
     registered_date: datetime.datetime
     status: str
     channel: str
-    new_answer_available: bool = False
+    new_answer_available: bool
     api_service: KlantenServiceType
 
 
@@ -101,9 +101,7 @@ QuestionValidator = TypeAdapter(Question)
 
 
 class KlantenService(Protocol):
-    config: ESuiteKlantConfig | OpenKlant2Config
     service_config: ServiceConfig
-    client: APIClient
 
     def get_fetch_parameters(
         self,
@@ -114,7 +112,9 @@ class KlantenService(Protocol):
         """
         Determine the parameters used to perform Klanten/Contactmomenten fetches
         """
-        user = user or request.user
+        user = user or getattr(request, "user", None)
+        if not user:
+            return None
 
         if user.bsn:
             return {"user_bsn": user.bsn}
@@ -125,6 +125,9 @@ class KlantenService(Protocol):
                 kvk_or_rsin = user.rsin
 
             if use_vestigingsnummer:
+                if not getattr(request, "session", None):
+                    raise ValueError("`request` does not contain a session")
+
                 vestigingsnummer = get_kvk_branch_number(request.session)
                 if vestigingsnummer:
                     return {
@@ -136,20 +139,14 @@ class KlantenService(Protocol):
 
         return None
 
-    @property
-    def supports_anonymous_questions(self):
-        match self.config:
-            case ESuiteKlantConfig():
-                return True
-            case OpenKlant2Config():
-                return False
-            case _:
-                raise ValueError("Unsupported backend for KlantenService")
+    supports_anonymous_questions: ClassVar[bool]
 
 
 class eSuiteKlantenService(KlantenService):
     config: ESuiteKlantConfig
-    supports_anonymous_questions: bool = True
+    client: APIClient
+    service_config: ServiceConfig
+    supports_anonymous_questions = True
 
     def __init__(self, config: ESuiteKlantConfig | None = None):
         self.config = config or ESuiteKlantConfig.get_solo()
@@ -158,17 +155,17 @@ class eSuiteKlantenService(KlantenService):
                 "eSuiteKlantenService instance needs a configuration"
             )
 
-        self.service_config = self.config.klanten_service
-        if not self.service_config:
+        if not self.config.klanten_service:
             raise ImproperlyConfigured(
                 "eSuiteKlantenService instance needs a servivce configuration"
             )
 
+        self.service_config = self.config.klanten_service
         self.client = build_zgw_client(
             service=self.service_config, client_factory=APIClient
         )
         if not self.client:
-            raise RuntimeError("eSuiteKlantenService instance needs a client")
+            raise ImproperlyConfigured("eSuiteKlantenService instance needs a client")
 
     def get_or_create_klant(
         self, fetch_params: FetchParameters, user: User
@@ -405,6 +402,7 @@ class eSuiteKlantenService(KlantenService):
 
 class eSuiteVragenService(KlantenService):
     config: ESuiteKlantConfig
+    supports_anonymous_questions = True
 
     def __init__(self, config: ESuiteKlantConfig | None = None):
         self.config = config or ESuiteKlantConfig.get_solo()
@@ -875,7 +873,7 @@ class OpenKlant2Question(BaseModel):
 class OpenKlant2Service(LogMixin, KlantenService):
     config: OpenKlant2Config
     client: OpenKlant2Client
-    supports_anonymous_questions: bool = False
+    supports_anonymous_questions = False
 
     def __init__(self, config: OpenKlant2Config | None = None):
         self.config = config or OpenKlant2Config.get_solo()
