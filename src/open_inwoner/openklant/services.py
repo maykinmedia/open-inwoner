@@ -189,13 +189,17 @@ class eSuiteKlantenService(KlantenService):
         self,
         user_bsn: str | None = None,
         user_kvk_or_rsin: str | None = None,
+        *,
+        vestigingsnummer: str | None = None,
     ):
         klanten = None
         # this is technically a search operation and could return multiple records
         if user_bsn:
             klanten = self._retrieve_klanten_for_bsn(user_bsn)
         elif user_kvk_or_rsin:
-            klanten = self._retrieve_klanten_for_kvk_or_rsin(user_kvk_or_rsin)
+            klanten = self._retrieve_klanten_for_kvk_or_rsin(
+                user_kvk_or_rsin, vestigingsnummer=vestigingsnummer
+            )
 
         return klanten[0] if klanten else None
 
