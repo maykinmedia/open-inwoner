@@ -244,6 +244,35 @@ def test_create_with_bad_request_exception(client):
     assert got == want
 
 
+@pytest.mark.vcr
+def test_partial_update(client, een_persoon):
+    target_nummer = "18744"
+    target_correspondentieadres = {
+        "adresregel1": "foo",
+        "adresregel2": "bar",
+        "adresregel3": "baz",
+        "land": "NL",
+        "nummeraanduidingId": "",
+    }
+    assert een_persoon["nummer"] != target_nummer
+    assert een_persoon["correspondentieadres"] != target_correspondentieadres
+
+    resp = client.partij.partial_update(
+        een_persoon["uuid"],
+        data={
+            # TODO: remove soortPartij which shouldn't be required, see:
+            # https://github.com/maykinmedia/open-klant/issues/345
+            "correspondentieadres": target_correspondentieadres,
+            "soortPartij": een_persoon["soortPartij"],
+            "nummer": target_nummer,
+        },
+    )
+
+    PartijValidator.validate_python(resp)
+    assert resp["nummer"] == target_nummer
+    assert resp["correspondentieadres"] == target_correspondentieadres
+
+
 def test_factory_partij_persoon_data():
     data = CreatePartijPersoonDataFactory.build()
     CreatePartijPersoonDataValidator.validate_python(data)
