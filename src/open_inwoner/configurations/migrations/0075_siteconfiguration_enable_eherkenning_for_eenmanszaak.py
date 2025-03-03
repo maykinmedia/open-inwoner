@@ -13,12 +13,15 @@ def copy_setting_from_openzaak_config(apps, _):
     SiteConfiguration = apps.get_model("configurations", "SiteConfiguration")
 
     try:
-        openzaak_config = OpenZaakConfig.objects.get()  # should be a singleton
+        # Should be a singletos
+        openzaak_config = OpenZaakConfig.objects.get()
         site_config = SiteConfiguration.objects.get()
-    except (ObjectDoesNotExist, MultipleObjectsReturned) as exc:
+    except ObjectDoesNotExist:
+        pass  # Nothing to migrate
+    except MultipleObjectsReturned:
         logger.warning(
-            "Unable to migrate `enable_eherkenning_for_eenmanszaak` flag from OpenZaakConfig, unable to fetch singletons",
-            exc_info=True,
+            "Unable to migrate `enable_eherkenning_for_eenmanszaak` flag from "
+            "OpenZaakConfig, found multiple OpenZaakConfig/SiteConfiguration objects"
         )
     else:
         site_config.enable_eherkenning_for_eenmanszaak = (
