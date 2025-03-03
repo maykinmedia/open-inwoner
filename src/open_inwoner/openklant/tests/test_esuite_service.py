@@ -8,7 +8,7 @@ from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.openklant.api_models import Klant
 from open_inwoner.openklant.services import eSuiteKlantenService
 from open_inwoner.openklant.tests.data import KLANTEN_ROOT, MockAPIReadData
-from open_inwoner.utils.test import DisableRequestLogMixin
+from open_inwoner.utils.test import DisableRequestLogMixin, paginated_response
 
 
 class eSuiteServiceTestCase(TestCase, DisableRequestLogMixin):
@@ -131,4 +131,55 @@ class eSuiteServiceTestCase(TestCase, DisableRequestLogMixin):
                 toestemming_zaak_notificaties_alleen_digitaal=False,
                 bedrijfsnaam="AcmeCorp B.V.",
             ),
+        )
+
+    def test_retrieve_klant_paginates_full_response(self):
+        data = MockAPIReadData()
+        base_url = (
+            f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn={data.user.bsn}"
+        )
+        with requests_mock.mock() as m:
+            m.get(
+                base_url,
+                json=paginated_response([data.klant_bsn])
+                | {"next": f"{base_url}&page=2"},
+            )
+            m.get(
+                f"{base_url}&page=2",
+                json=paginated_response([data.klant_kvk])
+                | {"next": f"{base_url}&page=3"},
+            )
+            m.get(
+                f"{base_url}&page=3",
+                json=paginated_response([data.klant_vestiging]),  # next=None
+            )
+
+            # Paginates all responses that match the BSN
+            klant = self.service.retrieve_klant(user_bsn=data.user.bsn)
+
+        self.assertEqual(
+            klant,
+            Klant(
+                url="https://klanten.nl/api/v1/klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+                bronorganisatie="123456789",
+                klantnummer="12345678",
+                website_url="",
+                voornaam="John",
+                voorvoegsel_achternaam="van der",
+                achternaam="Doe",
+                telefoonnummer="0612345678",
+                telefoonnummerAlternatief="",
+                emailadres="foo@example.com",
+                toestemming_zaak_notificaties_alleen_digitaal=False,
+                bedrijfsnaam="",
+            ),
+        )
+
+        self.assertEqual(
+            [rh.url for rh in m.request_history],
+            [
+                base_url,
+                f"{base_url}&page=2",
+                f"{base_url}&page=3",
+            ],
         )
