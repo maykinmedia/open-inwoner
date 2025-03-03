@@ -341,6 +341,56 @@ class SearchPagePlaywrightTests(
         _test_search("Category 1", self.product1.name)
         _test_search("Category 2", self.product2.name)
 
+    def test_search_with_filters_desktop(self):
+        # Create a desktop browser context (viewport wider than 768px)
+        context = self.browser.new_context(viewport={"width": 1024, "height": 800})
+        page = context.new_page()
+
+        # search to find both products
+        page.goto(self.live_reverse("search:search", params={"query": "summary"}))
+        page.wait_for_url(self.live_reverse("search:search", star=True))
+
+        # Check that there are 2 search results
+        expect(page.locator(".search-results__item")).to_have_count(2)
+
+        # Verify that the desktop filter section is visible and the mobile one is hidden
+        expect(page.locator(".grid__filters")).to_be_visible()
+        expect(page.locator(".grid__filters-mobile")).not_to_be_visible()
+
+        # check if we see all checkboxes
+        for facet in FacetChoices.values:
+            # tags, organizations, categories
+            controls = page.locator(f"input[form='search-form'][name='{facet}']")
+            expect(controls).to_have_count(2)
+            for checkbox in controls.all():
+                # the input elements are hidden for styling so just test for enabled
+                expect(checkbox).to_be_enabled()
+                expect(checkbox).not_to_be_checked()
+
+        # Helper function to simulate clicking on the checkbox label (mimicking user behavior)
+        def _click_checkbox_for_name(page, name):
+            page.locator(".checkbox").filter(
+                has=page.get_by_role("checkbox", name=name)
+            ).locator("label").click()
+
+        # Helper function to test that clicking a filter checkbox updates search results correctly
+        def _test_search(checkbox_name, expected_text):
+            page.goto(self.live_reverse("search:search", params={"query": "summary"}))
+            _click_checkbox_for_name(page, checkbox_name)
+            page.wait_for_url(self.live_reverse("search:search", star=True))
+            expect(page.get_by_role("checkbox", name=checkbox_name)).to_be_checked()
+            expect(page.locator(".search-results__item-title")).to_have_text(
+                expected_text
+            )
+
+        # Run tests for each filter
+        _test_search("Tag 1", self.product1.name)
+        _test_search("Tag 2", self.product2.name)
+        _test_search("Organization 1", self.product1.name)
+        _test_search("Organization 2", self.product2.name)
+        _test_search("Category 1", self.product1.name)
+        _test_search("Category 2", self.product2.name)
+
     def test_search_with_filter_combinations(self):
         # NOTE it isn't great to generate query-strings outside the form but we test the form above
         context = self.browser.new_context()
