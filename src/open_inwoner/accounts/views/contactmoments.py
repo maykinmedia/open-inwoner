@@ -196,10 +196,14 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
 
+        service: VragenService | None = None
         if KlantenServiceType.ESUITE.value in self.request.path:
             service = self.get_service(service_type=KlantenServiceType.ESUITE)
         elif KlantenServiceType.OPENKLANT2.value in self.request.path:
             service = self.get_service(service_type=KlantenServiceType.OPENKLANT2)
+
+        if not service:
+            raise ImproperlyConfigured("Unknown KlantenServiceType")
 
         origin = self.request.headers.get("Referer")
         question, zaak_with_api_group = service.retrieve_question(
