@@ -43,7 +43,7 @@ class PlanActionsEnabledMixin:
             try:
                 actions_resolver = resolve(reverse("profile:action_list"))
             except NoReverseMatch:
-                raise Http404("profile application is not active")
+                raise Http404("profile application is not active") from None
 
             profile_namespace = actions_resolver.namespace
             config = profile_app.get_config(profile_namespace)
@@ -435,8 +435,8 @@ class PlanActionCreateView(PlanActionsEnabledMixin, ActionCreateView):
             return Plan.objects.connected(self.request.user).get(
                 uuid=self.kwargs.get("uuid")
             )
-        except ObjectDoesNotExist as e:
-            raise Http404
+        except ObjectDoesNotExist as exc:
+            raise Http404 from exc
 
     def form_valid(self, form):
         self.object = self.get_object()
@@ -486,8 +486,8 @@ class PlanActionEditView(PlanActionsEnabledMixin, ActionUpdateView):
             return Plan.objects.connected(self.request.user).get(
                 uuid=self.kwargs.get("plan_uuid")
             )
-        except ObjectDoesNotExist as e:
-            raise Http404
+        except ObjectDoesNotExist as exc:
+            raise Http404 from exc
 
     def form_valid(self, form):
         self.object = self.get_plan()
@@ -520,8 +520,8 @@ class PlanActionEditStatusTagView(PlanActionsEnabledMixin, ActionUpdateStatusTag
             return Plan.objects.connected(self.request.user).get(
                 uuid=self.kwargs.get("plan_uuid")
             )
-        except ObjectDoesNotExist as e:
-            raise Http404
+        except ObjectDoesNotExist as exc:
+            raise Http404 from exc
 
     def get_template_tag_args(self, context):
         args = super().get_template_tag_args(context)
@@ -535,8 +535,8 @@ class PlanActionDeleteView(PlanActionsEnabledMixin, ActionDeleteView):
             return Plan.objects.connected(self.request.user).get(
                 uuid=self.kwargs.get("plan_uuid")
             )
-        except ObjectDoesNotExist as e:
-            raise Http404
+        except ObjectDoesNotExist as exc:
+            raise Http404 from exc
 
     def get_success_url(self) -> str:
         return self.get_plan().get_absolute_url()
@@ -578,8 +578,8 @@ class PlanActionHistoryView(PlanActionsEnabledMixin, ActionHistoryView):
             return Plan.objects.connected(self.request.user).get(
                 uuid=self.kwargs.get("plan_uuid")
             )
-        except ObjectDoesNotExist as e:
-            raise Http404
+        except ObjectDoesNotExist as exc:
+            raise Http404 from exc
 
 
 class PlanExportView(

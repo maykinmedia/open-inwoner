@@ -55,11 +55,11 @@ class DutchPhoneNumberValidator:
     def _parse_phonenumber(self, value: str) -> "PhoneNumber":
         try:
             return phonenumbers.parse(value, self.language)
-        except phonenumbers.NumberParseException:
+        except phonenumbers.NumberParseException as exc:
             raise ValidationError(
                 self.error_message,
                 code="invalid",
-            )
+            ) from exc
 
     def _check_for_invalid_chars(self, value: str) -> None:
         if " " in value or "-" in value:
@@ -107,7 +107,9 @@ def validate_phone_number(value):
     try:
         int(value.strip().lstrip("0+").replace("-", "").replace(" ", ""))
     except (ValueError, TypeError):
-        raise ValidationError(_("Het opgegeven mobiele telefoonnummer is ongeldig."))
+        raise ValidationError(
+            _("Het opgegeven mobiele telefoonnummer is ongeldig.")
+        ) from None
 
     return value
 

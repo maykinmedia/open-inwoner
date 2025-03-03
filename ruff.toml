@@ -48,6 +48,10 @@ select = [
     "PERF",
     # https://docs.astral.sh/ruff/rules/#refurb-furb
     "FURB",
+    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+    "B006",
+    "B010",
+    "B904",
 ]
 ignore = [
     # Whitespace before ':' (conflicts with Black)

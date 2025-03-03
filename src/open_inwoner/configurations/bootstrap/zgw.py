@@ -85,7 +85,7 @@ class OpenZaakConfigurationStep(BaseConfigurationStep):
                 raise ConfigurationRunFailed(
                     "You must first ensure all the ZGW Services referenced in this "
                     f"step have been created:\n{str(exc)}"
-                )
+                ) from exc
 
             ZGWApiGroupConfig.objects.get_or_create(
                 open_zaak_config=config,

@@ -37,7 +37,7 @@ def pyhash_value(value) -> int:
         # every normal hashable
         return hash(value)
 
-    except TypeError as e:
+    except TypeError as exc:
         if isinstance(value, dict):
             # convert dict to hashable tuple of key-value tuples
             # sort the *hashed* keys to support mixed key types
@@ -56,4 +56,4 @@ def pyhash_value(value) -> int:
             # we could add more support (dataclasses), but for now lets reraise
             raise TypeError(
                 f"unhashable type '{type(value)}' for value '{value}'"
-            ) from e
+            ) from exc

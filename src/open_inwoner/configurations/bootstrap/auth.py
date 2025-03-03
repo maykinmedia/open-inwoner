@@ -428,10 +428,10 @@ class DigiDSAMLConfigurationStep(BaseConfigurationStep):
 
         try:
             form.save()
-        except ValidationError as e:
+        except ValidationError as exc:
             raise ConfigurationRunFailed(
                 "Something went wrong while saving configuration"
-            ) from e
+            ) from exc
 
     def test_configuration(self):
         """

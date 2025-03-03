@@ -124,7 +124,7 @@ class CategoryDetailView(
             raise Http404(
                 _("No %(verbose_name)s found matching the query")
                 % {"verbose_name": queryset.model._meta.verbose_name}
-            )
+            ) from None
 
         return obj
 

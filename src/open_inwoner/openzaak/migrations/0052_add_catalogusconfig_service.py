@@ -19,7 +19,7 @@ def migrate_catalogus_config_service_field_from_default(apps, schema_editor):
             "Attempted to set CatalogusConfig.service using ZGWApiGroupConfig, but there"
             " are multiple instances configured. Please (temporarily) ensure you have only"
             " a single ZGWApiGroupConfig configured, then run this migration again."
-        )
+        ) from None
 
     for catalogus_config in CatalogusConfig.objects.all():
         catalogus_config.service = config.ztc_service

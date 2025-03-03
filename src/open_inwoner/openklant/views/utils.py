@@ -5,8 +5,9 @@ from django.utils.translation import gettext as _
 
 def generate_question_answer_pair(
     range_: tuple[int, int] = (1, 10),
-    operators: list[str] = ["+", "-"],
+    operators: list[str] | None = None,
 ) -> tuple[str, int]:
+    operators = operators or ["+", "-"]
     lower, upper = range_
     num1 = secrets.choice(range(lower, upper))
     num2 = secrets.choice(range(lower, upper))

@@ -145,7 +145,7 @@ class OpenKlantServiceManager:
                     logger.info("Max wait time exceeded.")
                     raise RuntimeError(
                         f"Maximum wait for service to be healthy exceeded: {elapsed_time} > {max_wait}"
-                    )
+                    ) from None
 
                 time.sleep(interval)
 
