@@ -3,10 +3,20 @@ import logging
 import uuid
 from dataclasses import dataclass
 from datetime import timedelta
-from typing import ClassVar, Iterable, Literal, NotRequired, Protocol, Self, Sequence
+from typing import (
+    ClassVar,
+    Iterable,
+    Literal,
+    NotRequired,
+    Protocol,
+    Self,
+    Sequence,
+    cast,
+)
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.http import HttpRequest
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -102,10 +112,11 @@ QuestionValidator = TypeAdapter(Question)
 
 class KlantenService(Protocol):
     service_config: ServiceConfig
+    supports_anonymous_questions: ClassVar[bool]
 
     def get_fetch_parameters(
         self,
-        request=None,
+        request: HttpRequest | None = None,
         user: User | None = None,
         use_vestigingsnummer: bool = False,
     ) -> FetchParameters | None:
@@ -125,10 +136,10 @@ class KlantenService(Protocol):
                 kvk_or_rsin = user.rsin
 
             if use_vestigingsnummer:
-                if not getattr(request, "session", None):
+                if not (session := getattr(request, "session", None)):
                     raise ValueError("`request` does not contain a session")
 
-                vestigingsnummer = get_kvk_branch_number(request.session)
+                vestigingsnummer = get_kvk_branch_number(session)
                 if vestigingsnummer:
                     return {
                         "user_kvk_or_rsin": kvk_or_rsin,
@@ -139,17 +150,17 @@ class KlantenService(Protocol):
 
         return None
 
-    supports_anonymous_questions: ClassVar[bool]
 
-
-class eSuiteKlantenService(KlantenService):
+class eSuiteKlantenService(
+    KlantenService,
+):
     config: ESuiteKlantConfig
     client: APIClient
     service_config: ServiceConfig
     supports_anonymous_questions = True
 
     def __init__(self, config: ESuiteKlantConfig | None = None):
-        self.config = config or ESuiteKlantConfig.get_solo()
+        self.config = cast(ESuiteKlantConfig, config or ESuiteKlantConfig.get_solo())
         if not self.config:
             raise ImproperlyConfigured(
                 "eSuiteKlantenService instance needs a configuration"
@@ -157,7 +168,7 @@ class eSuiteKlantenService(KlantenService):
 
         if not self.config.klanten_service:
             raise ImproperlyConfigured(
-                "eSuiteKlantenService instance needs a servivce configuration"
+                "eSuiteKlantenService instance needs a service configuration"
             )
 
         self.service_config = self.config.klanten_service
@@ -407,17 +418,19 @@ class eSuiteVragenService(KlantenService):
     def __init__(self, config: ESuiteKlantConfig | None = None):
         self.config = config or ESuiteKlantConfig.get_solo()
         if not self.config:
-            raise RuntimeError("eSuiteVragenService instance needs a configuration")
+            raise ImproperlyConfigured(
+                "eSuiteVragenService instance needs a configuration"
+            )
 
         self.service_config = self.config.contactmomenten_service
         if not self.service_config:
-            raise RuntimeError(
+            raise ImproperlyConfigured(
                 "eSuiteVragenService instance needs a servivce configuration"
             )
 
         self.client = build_zgw_client(service=self.service_config)
         if not self.client:
-            raise RuntimeError("eSuiteVragenService instance needs a client")
+            raise ImproperlyConfigured("eSuiteVragenService instance needs a client")
 
     #
     # contactmomenten
@@ -765,9 +778,9 @@ class eSuiteVragenService(KlantenService):
     def list_questions_for_zaak(self, zaak: Zaak, user: User) -> list[Question]:
         objectcontactmomenten = self.retrieve_objectcontactmomenten_for_zaak(zaak)
 
-        contactmomenten = []
+        contactmomenten: list[ContactMoment] = []
         for ocm in objectcontactmomenten:
-            question = getattr(ocm, "contactmoment", None)
+            question: ContactMoment | None = getattr(ocm, "contactmoment", None)
             if question:
                 contactmomenten.append(question)
         contactmomenten.sort(key=lambda q: q.registratiedatum, reverse=True)
@@ -780,13 +793,13 @@ class eSuiteVragenService(KlantenService):
             ]
 
         kcm_answer_mapping = get_kcm_answer_mapping(contactmomenten, user)
-        questions = []
+        questions: list[Question] = []
         for contactmoment in contactmomenten:
             new_answer_available = contactmoment_has_new_answer(
                 contactmoment, kcm_answer_mapping
             )
             questions.append(
-                Question(
+                dict(
                     identification=contactmoment.identificatie,
                     api_source_url=contactmoment.url,
                     api_source_uuid=contactmoment.uuid,
@@ -870,7 +883,10 @@ class OpenKlant2Question(BaseModel):
         )
 
 
-class OpenKlant2Service(LogMixin, KlantenService):
+class OpenKlant2Service(
+    LogMixin,
+    KlantenService,
+):
     config: OpenKlant2Config
     client: OpenKlant2Client
     supports_anonymous_questions = False
@@ -1439,7 +1455,7 @@ class OpenKlant2Service(LogMixin, KlantenService):
         fetch_params: FetchParameters,
         question_uuid: str,
         user: User,
-    ) -> tuple[Question | None, Zaak | None]:  # noqa: E704
+    ) -> tuple[Question | None, ZaakWithApiGroup | None]:  # noqa: E704
         if bsn := fetch_params.get("user_bsn"):
             partij = self.find_persoon_for_bsn(bsn)
         elif kvk_or_rsin := fetch_params.get("user_kvk_or_rsin"):
