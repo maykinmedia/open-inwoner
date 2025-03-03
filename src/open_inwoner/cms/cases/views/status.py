@@ -1075,7 +1075,7 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
 
         try:
             service = eSuiteVragenService(config=config)
-        except RuntimeError:
+        except ImproperlyConfigured:
             logger.error("Failed to build eSuiteVragenService")
             return
 
