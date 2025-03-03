@@ -5,13 +5,12 @@ from typing import NotRequired, TypedDict
 from django.conf import settings
 
 from open_inwoner.accounts.models import User
-from open_inwoner.kvk.branches import get_kvk_branch_number
 from open_inwoner.openklant.api_models import ContactMoment, KlantContactMoment
 from open_inwoner.openklant.clients import (
     build_contactmomenten_client,
     build_klanten_client,
 )
-from open_inwoner.openklant.models import ESuiteKlantConfig, KlantContactMomentAnswer
+from open_inwoner.openklant.models import KlantContactMomentAnswer
 from open_inwoner.utils.time import instance_is_new
 
 logger = logging.getLogger(__name__)
@@ -92,35 +91,6 @@ class OrgFetchParam(TypedDict):
 
 
 FetchParameters = BsnFetchParam | OrgFetchParam
-
-
-def get_fetch_parameters(
-    request, use_vestigingsnummer: bool = False
-) -> FetchParameters | None:
-    """
-    Determine the parameters used to perform Klanten/Contactmomenten fetches
-    """
-    user = request.user
-
-    if user.bsn:
-        return {"user_bsn": user.bsn}
-    elif user.kvk:
-        kvk_or_rsin = user.kvk
-        config = ESuiteKlantConfig.get_solo()
-        if config.use_rsin_for_innNnpId_query_parameter:
-            kvk_or_rsin = user.rsin
-
-        if use_vestigingsnummer:
-            vestigingsnummer = get_kvk_branch_number(request.session)
-            if vestigingsnummer:
-                return {
-                    "user_kvk_or_rsin": kvk_or_rsin,
-                    "vestigingsnummer": vestigingsnummer,
-                }
-
-        return {"user_kvk_or_rsin": kvk_or_rsin}
-
-    return None
 
 
 def get_kcm_answer_mapping(
