@@ -16,6 +16,15 @@ export class FilterModal {
       '.filter-dropdown.show .checkbox__input'
     )
 
+    this.searchForm = document.getElementById('search-form')
+    this.filterModalCheckboxes = document.querySelectorAll(
+      '.filter-modal .checkbox__input'
+    )
+    this.resetModalButton = document.querySelector(
+      '.filter-modal__reset .button'
+    )
+    this.filterModalInitial = document.querySelector('.filter-modal__initial')
+
     // Event listeners
     this.filterModalButton.addEventListener(
       'click',
@@ -29,6 +38,34 @@ export class FilterModal {
     this.searchFilterDropdowns.forEach((button) =>
       button.addEventListener('click', this.preventCloseOnClick.bind(this))
     )
+
+    // Integrate extra code: checkbox change triggers form submission
+    this.filterModalCheckboxes.forEach((checkbox) => {
+      console.log('Filter checkbox submit query started...')
+      checkbox.addEventListener('change', (event) => {
+        this.updateFilterModalState()
+        this.searchForm?.submit()
+      })
+    })
+
+    // Reset button logic
+    this.resetModalButton?.addEventListener('click', () => {
+      console.log('Modal reset button found...')
+      if (
+        !Array.from(this.filterModalCheckboxes).some(
+          (checkbox) => !!checkbox.checked
+        )
+      )
+        return
+      this.filterModalCheckboxes.forEach((checkbox) => {
+        checkbox.checked = false
+      })
+      this.updateFilterModalState()
+      this.searchForm?.submit()
+    })
+
+    // Initial check for active state
+    this.updateFilterModalState()
   }
 
   toggleModal(event) {
@@ -64,6 +101,15 @@ export class FilterModal {
 
   preventCloseOnClick(event) {
     event.stopPropagation() // Prevent click event from closing the modal
+  }
+
+  updateFilterModalState() {
+    if (this.filterModalInitial) {
+      const hasCheckedCheckboxes = Array.from(this.filterModalCheckboxes).some(
+        (checkbox) => checkbox.checked
+      )
+      this.filterModalInitial.classList.toggle('active', hasCheckedCheckboxes)
+    }
   }
 }
 
