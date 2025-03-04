@@ -2,7 +2,7 @@
 {% load i18n anchor_menu_tags button_tags card_tags form_tags grid_tags icon_tags link_tags list_tags pagination_tags utils %}
 
 {% block content %}
-    <h1 class="utrecht-heading-1" id="contactmomenten">{{ page_title }} ({{ contactmomenten|length }})</h1>
+    <h1 class="utrecht-heading-1" id="contactmomenten">{{ page_title }} ({{ questions|length }})</h1>
 
     {% if contactmoment_contact_form_enabled %}
     {# title + scroll down button #}
