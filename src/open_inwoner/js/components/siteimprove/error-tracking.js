@@ -63,7 +63,7 @@ class DynamicFileInputErrors {
 
     currentErrors.forEach((message, id) => {
       if (!this.previousErrorState.has(id) && typeof _sz !== 'undefined')
-        _sz.push(['event', 'Mijn Aanvragen', 'Error', message])
+        _sz.push(['event', 'Mijn zaken', 'Error', message])
     })
 
     // Update previous error state only with persistent errors
