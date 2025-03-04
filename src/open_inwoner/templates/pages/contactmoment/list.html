@@ -46,7 +46,7 @@
                             {% render_list %}
                                 <li class="list-item list-item--compact">
                                     {% with register_date=question.registered_date|default:"" %}
-                                    <p class="card__caption card__text--small"><span>{% trans "Vraag ingediend op:" %}</span><span class="card__text--dark">{{ register_date|date }}</span></p>
+                                    <p class="card__caption card__text--small"><span>{% trans "Vraag ingediend op" %}:</span><span class="card__text--dark">{{ register_date|date }}</span></p>
                                     {% endwith %}
                                 </li>
                                 {{ question.text }}
