@@ -50,7 +50,7 @@
 
             {# Desktop filters #}
             <aside class="grid__sidebar grid__filters" aria-label="{% trans "Zoekfilters" %}">
-                {% search_filters search_form form_id="search-form" search_filter_categories search_filter_tags search_filter_organizations %}
+                {% search_filters search_form search_filter_categories search_filter_tags search_filter_organizations form_id="search-form" %}
             </aside>
         {% endif %}
         {#  end search filters #}
