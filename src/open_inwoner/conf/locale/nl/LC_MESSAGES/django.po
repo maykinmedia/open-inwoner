@@ -7467,8 +7467,9 @@ msgid "U heeft op dit moment nog geen vragen."
 msgstr "U heeft op dit moment nog geen vragen."
 
 #: open_inwoner/templates/pages/contactmoment/list.html:49
-msgid "Vraag ingediend op:"
-msgstr "Vraag ingediend op:"
+#: open_inwoner/templates/pages/partials/question.html:11
+msgid "Vraag ingediend op"
+msgstr "Vraag ingediend op"
 
 #: open_inwoner/templates/pages/contactmoment/list.html:55
 msgid "Vraag nummer"
@@ -7508,10 +7509,6 @@ msgstr "Vestiging"
 #: open_inwoner/templates/pages/kvk/branches.html:57
 msgid "Ga door"
 msgstr "Ga door"
-
-#: open_inwoner/templates/pages/partials/question.html:11
-msgid "Vraag ingediend op"
-msgstr "Vraag ingediend op:"
 
 #: open_inwoner/templates/pages/partials/question.html:16
 msgid "Ingediend via"
