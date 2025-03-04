@@ -1,9 +1,10 @@
+import uuid
 from unittest.mock import ANY, patch
 
 from django.conf import settings
 from django.contrib.auth import signals
 from django.core import mail
-from django.test import override_settings
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
@@ -31,7 +32,11 @@ from open_inwoner.openklant.services import eSuiteVragenService
 from open_inwoner.openklant.tests.data import CONTACTMOMENTEN_ROOT, KLANTEN_ROOT
 from open_inwoner.openklant.tests.factories import OpenKlant2ConfigFactory
 from open_inwoner.openklant.tests.mocks import MockOpenKlant2Service
-from open_inwoner.openzaak.models import CatalogusConfig, OpenZaakConfig
+from open_inwoner.openzaak.models import (
+    CatalogusConfig,
+    OpenZaakConfig,
+    ZGWApiGroupConfig,
+)
 from open_inwoner.openzaak.tests.factories import (
     ServiceFactory,
     ZaakTypeConfigFactory,
@@ -530,6 +535,14 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         self._setUpOpenKlantMocks(m)
 
         response = self.app.get(self.case_detail_url, user=self.user)
+
+        # Set the primary to the opposite API, to ensure we pick the connected
+        # backend from the ZGWApiGroup
+        self.klant_config.primary_backend = KlantenServiceType.OPENKLANT2.value
+        self.klant_config.save()
+        self.api_group.klant_backend = KlantenServiceType.ESUITE.value
+        self.api_group.save()
+
         form = response.forms["contact-form"]
         form.action = reverse(
             "cases:case_detail_contact_form",
@@ -595,8 +608,12 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             subject="oip_subject",
         )
 
-        self.klant_config.primary_backend = KlantenServiceType.OPENKLANT2.value
+        # Set the primary to the opposite API, to ensure we pick the connected
+        # backend from the ZGWApiGroup
+        self.klant_config.primary_backend = KlantenServiceType.ESUITE.value
         self.klant_config.save()
+        self.api_group.klant_backend = KlantenServiceType.OPENKLANT2.value
+        self.api_group.save()
 
         response = self.app.get(self.case_detail_url, user=self.user)
         form = response.forms["contact-form"]
@@ -886,3 +903,34 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         form["question"] = "Sample text"
         response = form.submit()
         mock_send_confirm.assert_not_called()
+
+
+@override_settings(
+    ROOT_URLCONF="open_inwoner.cms.tests.urls", MIDDLEWARE=PATCHED_MIDDLEWARE
+)
+class CasesContactFormInvalidParamsTestCase(TestCase):
+    def setUp(self) -> None:
+        super().setUp()
+        self.user = DigidUserFactory(bsn="900222086", email="foo@example.com")
+        self.client = Client()
+        self.client.force_login(self.user)
+
+    def test_non_existent_zgw_api_group_yields_404(self):
+        fake_group_id = 8888
+        self.assertFalse(ZGWApiGroupConfig.objects.filter(id=fake_group_id).exists())
+
+        for method in ("get", "post"):
+            with self.subTest(method):
+                action = getattr(self.client, method)
+                response = action(
+                    reverse(
+                        "cases:case_detail_contact_form",
+                        kwargs={
+                            "object_id": str(uuid.uuid4()),
+                            "api_group_id": fake_group_id,
+                        },
+                    ),
+                    user=self.user,
+                )
+
+                self.assertEqual(response.status_code, 404)
