@@ -914,6 +914,12 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
     form_class = CaseContactForm
 
     def post(self, request, *args, **kwargs):
+        try:
+            api_group = ZGWApiGroupConfig.objects.get(pk=self.kwargs["api_group_id"])
+        except ZGWApiGroupConfig.DoesNotExist as exc:
+            logger.exception("Non-existent ZGWApiGroupConfig passed")
+            raise Http404 from exc
+
         form = self.get_form()
 
         if form.is_valid():
@@ -933,7 +939,7 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
                 send_confirmation = email_success
 
             if klant_config.register_contact_via_api:
-                api_success = self.register_by_api(form, config=klant_config)
+                api_success = self.register_by_api(form, api_group)
                 if api_success:
                     send_confirmation = klant_config.send_email_confirmation
                 # else keep the send_confirmation if email set it
@@ -1000,10 +1006,23 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
             )
             return False
 
-    def register_by_api(self, form, config: KlantenSysteemConfig):
-        if config.primary_backend == KlantenServiceType.ESUITE.value:
-            return self._register_via_esuite(form, config=ESuiteKlantConfig.get_solo())
-        return self._register_via_openklant(form, config=OpenKlant2Config.get_solo())
+    def register_by_api(self, form, api_group: ZGWApiGroupConfig):
+        if not api_group.klant_backend:
+            return
+
+        match api_group.klant_backend:
+            case KlantenServiceType.ESUITE.value:
+                return self._register_via_esuite(
+                    form, config=ESuiteKlantConfig.get_solo()
+                )
+            case KlantenServiceType.OPENKLANT2.value:
+                return self._register_via_openklant(
+                    form, config=OpenKlant2Config.get_solo()
+                )
+            case _:
+                logger.error(
+                    "Got non-existent klanten backend %s", api_group.klant_backend
+                )
 
     def _register_via_openklant(self, form, config: OpenKlant2Config) -> bool:
         user = self.request.user

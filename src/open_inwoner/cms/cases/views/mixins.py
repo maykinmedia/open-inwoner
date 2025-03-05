@@ -1,6 +1,7 @@
 import logging
 
 from django.contrib.auth.mixins import AccessMixin, LoginRequiredMixin
+from django.http import Http404
 from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
 
@@ -62,7 +63,12 @@ class CaseAccessMixin(AccessMixin):
             object_id := self.kwargs.get("object_id")
         )
         if is_retrieving_case:
-            api_group = ZGWApiGroupConfig.objects.get(pk=api_group_id)
+            try:
+                api_group = ZGWApiGroupConfig.objects.get(pk=api_group_id)
+            except ZGWApiGroupConfig.DoesNotExist as exc:
+                logger.exception("Non-existent ZGWApiGroupConfig passed")
+                raise Http404 from exc
+
             client = api_group.zaken_client
             self.case = client.fetch_single_case(object_id)
             if self.case:
