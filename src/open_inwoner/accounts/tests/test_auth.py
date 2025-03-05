@@ -2093,6 +2093,7 @@ class UpdateUserOnLoginTest(TestCase):
         request.user = self.data.user
 
         self.data.user.login_type = LoginTypeChoices.eherkenning
+        self.data.user.kvk = "69599084"
         self.data.user.save()
 
         self.assertEqual(request.user.company_name, "")

@@ -9,7 +9,7 @@ from freezegun import freeze_time
 from timeline_logger.models import TimelineLog
 
 from open_inwoner.accounts.choices import LoginTypeChoices
-from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.accounts.tests.factories import UserFactory, eHerkenningUserFactory
 from open_inwoner.utils.logentry import LOG_ACTIONS
 from open_inwoner.utils.test import ClearCachesMixin
 from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin
@@ -40,7 +40,7 @@ class TestPreSaveSignal(ClearCachesMixin, TestCase):
             json=mocks.basisprofiel_detail,
         )
 
-        user = UserModel.eherkenning_objects.eherkenning_create("69599084")
+        user = UserModel.eherkenning_objects.create(kvk="69599084")
 
         self.client.force_login(user=user)
 
@@ -69,7 +69,7 @@ class TestPreSaveSignal(ClearCachesMixin, TestCase):
             json=mocks.empty,
         )
 
-        user = UserModel.eherkenning_objects.eherkenning_create("69599084")
+        user = UserModel.eherkenning_objects.create(kvk="69599084")
 
         user.refresh_from_db()
 
@@ -84,7 +84,7 @@ class TestPreSaveSignal(ClearCachesMixin, TestCase):
             status_code=404,
         )
 
-        user = UserModel.eherkenning_objects.eherkenning_create("69599084")
+        user = UserModel.eherkenning_objects.create(kvk="69599084")
         user.refresh_from_db()
 
         self.assertEqual(user.rsin, "")
@@ -98,7 +98,7 @@ class TestPreSaveSignal(ClearCachesMixin, TestCase):
             status_code=500,
         )
 
-        user = UserModel.eherkenning_objects.eherkenning_create("69599084")
+        user = UserModel.eherkenning_objects.create(kvk="69599084")
         user.refresh_from_db()
 
         self.assertEqual(user.rsin, "")
@@ -126,9 +126,12 @@ class TestLogging(AssertTimelineLogMixin, TestCase):
         )
 
         user = UserFactory(
-            first_name="", last_name="", login_type=LoginTypeChoices.eherkenning
+            first_name="",
+            last_name="",
+            login_type=LoginTypeChoices.eherkenning,
+            kvk="69599084",
         )
-        user.kvk = "69599084"
+
         user.save()
 
         self.client.force_login(user=user)
@@ -149,11 +152,7 @@ class TestLogging(AssertTimelineLogMixin, TestCase):
             status_code=500,
         )
 
-        user = UserFactory(
-            first_name="", last_name="", login_type=LoginTypeChoices.eherkenning
-        )
-        user.kvk = "69599084"
-        user.save()
+        user = eHerkenningUserFactory(kvk="69599084", is_prepopulated=False)
 
         self.client.force_login(user=user)
 

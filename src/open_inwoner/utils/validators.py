@@ -195,6 +195,17 @@ def validate_kvk(value):
         raise ValidationError(_("Het KVK nummer moet numeriek zijn."), code="invalid")
 
 
+def validate_vestiging(value: str):
+    if len(value) != 12:
+        raise ValidationError(
+            _("Het vestigingsnummer moet uit 12 cijfers bestaan."), code="invalid"
+        )
+    if not value.isdigit():
+        raise ValidationError(
+            _("Het vestigingsnummer moet numeriek zijn."), code="invalid"
+        )
+
+
 def validate_array_contents_non_empty(list_: list) -> None:
     if any(item.isspace() or len(item) < 1 for item in list_):
         raise ValidationError(
