@@ -32,6 +32,8 @@ class UserFactory(factory.django.DjangoModelFactory):
     )
     password = factory.PostGenerationMethodCall("set_password", "secret")
     phonenumber = factory.Faker("numerify", text="061#######")
+    kvk = ""
+    vestiging = ""
 
 
 class DigidUserFactory(UserFactory):
@@ -57,6 +59,13 @@ class NewDigidUserFactory(UserFactory):
 class eHerkenningUserFactory(UserFactory):
     login_type = LoginTypeChoices.eherkenning
     kvk = "12345678"
+    is_prepopulated = True
+
+
+class eHerkenningVestigingUserFactory(UserFactory):
+    login_type = LoginTypeChoices.eherkenning
+    kvk = "12345678"
+    vestiging = "123456789012"
     is_prepopulated = True
 
 
