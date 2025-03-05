@@ -40,7 +40,7 @@ class TestPreSaveSignal(ClearCachesMixin, TestCase):
             json=mocks.basisprofiel_detail,
         )
 
-        user = UserModel.eherkenning_objects.eherkenning_create("69599084")
+        user = UserModel.eherkenning_objects.create(kvk="69599084")
 
         self.client.force_login(user=user)
 
@@ -69,7 +69,7 @@ class TestPreSaveSignal(ClearCachesMixin, TestCase):
             json=mocks.empty,
         )
 
-        user = UserModel.eherkenning_objects.eherkenning_create("69599084")
+        user = UserModel.eherkenning_objects.create(kvk="69599084")
 
         user.refresh_from_db()
 
@@ -84,7 +84,7 @@ class TestPreSaveSignal(ClearCachesMixin, TestCase):
             status_code=404,
         )
 
-        user = UserModel.eherkenning_objects.eherkenning_create("69599084")
+        user = UserModel.eherkenning_objects.create(kvk="69599084")
         user.refresh_from_db()
 
         self.assertEqual(user.rsin, "")
@@ -98,7 +98,7 @@ class TestPreSaveSignal(ClearCachesMixin, TestCase):
             status_code=500,
         )
 
-        user = UserModel.eherkenning_objects.eherkenning_create("69599084")
+        user = UserModel.eherkenning_objects.create(kvk="69599084")
         user.refresh_from_db()
 
         self.assertEqual(user.rsin, "")

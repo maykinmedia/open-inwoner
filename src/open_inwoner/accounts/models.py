@@ -30,6 +30,7 @@ from open_inwoner.utils.validators import (
     CharFieldValidator,
     DutchPhoneNumberValidator,
     validate_kvk,
+    validate_vestiging,
 )
 
 from ..plans.models import PlanContact
@@ -216,6 +217,13 @@ class User(AbstractBaseUser, PermissionsMixin):
         default="",
         validators=[validate_kvk],
     )
+    vestiging = models.CharField(
+        verbose_name=_("Vestigingsnummer"),
+        max_length=12,
+        blank=True,
+        default="",
+        validators=[validate_vestiging],
+    )
     company_name = models.CharField(
         verbose_name=_("Company name"), max_length=250, blank=True, default=""
     )
@@ -339,6 +347,10 @@ class User(AbstractBaseUser, PermissionsMixin):
                 check=~Q(phonenumber=F("phonenumber_alternative"))
                 | Q(phonenumber__exact=""),
                 name="check_alternative_phonenumber_differs_from_primary_phonenumber",
+            ),
+            models.CheckConstraint(
+                check=~Q(kvk__exact="") | Q(vestiging__exact=""),
+                name="vestiging_requires_kvk",
             ),
         ]
 

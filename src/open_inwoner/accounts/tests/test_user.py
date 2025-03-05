@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db.utils import IntegrityError
 from django.test import TestCase
 
@@ -6,7 +7,7 @@ from open_inwoner.utils.hash import generate_email_from_string
 
 from ...plans.tests.factories import PlanFactory
 from ..models import User
-from .factories import UserFactory
+from .factories import UserFactory, eHerkenningVestigingUserFactory
 
 
 class UserTests(TestCase):
@@ -132,3 +133,17 @@ class UserTests(TestCase):
         user.phonenumber = ""
         user.phonenumber_alternative = ""
         user.save()
+
+    def test_vestiging_validation(self):
+        for invalid_vestiging in tuple(str("1" * i) for i in range(1, 11)) + (
+            "a11111111111",
+        ):
+            with self.subTest(invalid_vestiging):
+                user = eHerkenningVestigingUserFactory(vestiging=invalid_vestiging)
+                with self.assertRaises(ValidationError):
+                    user.full_clean()
+
+    def test_vestiging_requires_kvk(self):
+
+        with self.assertRaises(IntegrityError):
+            eHerkenningVestigingUserFactory(kvk="", vestiging="123456789012")
