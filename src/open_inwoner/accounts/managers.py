@@ -29,14 +29,23 @@ class eHerkenningManager(BaseeHerkenningManager):
     def get_queryset(self):
         return super().get_queryset().filter(login_type=LoginTypeChoices.eherkenning)
 
-    def get_by_kvk(self, kvk):
-        return self.get_queryset().get(kvk=kvk)
+    def get_by_kvk(self, kvk: str):
+        return self.get_by_kvk_and_vestiging(kvk=kvk, vestiging=None)
 
-    def eherkenning_create(self, kvk, **kwargs):
+    def get_by_kvk_and_vestiging(self, *, kvk: str, vestiging: str | None = None):
+        vestiging = vestiging or ""
+        return self.get_queryset().get(kvk=kvk, vestiging__exact=vestiging)
+
+    def filter_by_kvk_and_vestiging(self, *, kvk: str, vestiging: str | None = None):
+        vestiging = vestiging or ""
+        return self.get_queryset().filter(kvk=kvk, vestiging__exact=vestiging)
+
+    def create(self, *, kvk: str, vestiging: str | None = None):
         return super().create(
-            email="user-{}@localhost".format(kvk),
+            email=f"user-{kvk}@localhost",
             login_type=LoginTypeChoices.eherkenning,
             kvk=kvk,
+            vestiging=vestiging or "",
         )
 
 
