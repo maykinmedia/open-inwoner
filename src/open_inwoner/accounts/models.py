@@ -30,6 +30,7 @@ from open_inwoner.utils.validators import (
     CharFieldValidator,
     DutchPhoneNumberValidator,
     validate_kvk,
+    validate_vestiging,
 )
 
 from ..plans.models import PlanContact
@@ -216,6 +217,13 @@ class User(AbstractBaseUser, PermissionsMixin):
         default="",
         validators=[validate_kvk],
     )
+    vestiging = models.CharField(
+        verbose_name=_("Vestigingsnummer"),
+        max_length=12,
+        blank=True,
+        default="",
+        validators=[validate_vestiging],
+    )
     company_name = models.CharField(
         verbose_name=_("Company name"), max_length=250, blank=True, default=""
     )
@@ -346,6 +354,14 @@ class User(AbstractBaseUser, PermissionsMixin):
                 violation_error_message=_(
                     "Users with login type `eHerkenning` must have a value set "
                     "for the kvk nummer"
+                ),
+            ),
+            UniqueConstraint(
+                fields=["kvk", "vestiging"],
+                condition=Q(login_type=LoginTypeChoices.eherkenning),
+                name="eherkenning_user_requires_unique_vestiging_for_a_kvk",
+                violation_error_message=_(
+                    "A vestigingsnummer must be unique for each kvk nummer"
                 ),
             ),
         ]
