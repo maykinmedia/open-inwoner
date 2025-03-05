@@ -31,7 +31,7 @@ class eHerkenningBackend(_eHerkenningBackend):
         try:
             user = UserModel.eherkenning_objects.get_by_kvk(kvk)
         except UserModel.DoesNotExist:
-            user = UserModel.eherkenning_objects.eherkenning_create(kvk)
+            user = UserModel.eherkenning_objects.create(kvk=kvk)
             created = True
 
         if vestigingsnummer := self.get_company_branch_number(saml_attributes):
