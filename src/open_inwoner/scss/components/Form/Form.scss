@@ -106,7 +106,6 @@
   }
 
   @media (min-width: 360px) {
-    &__control > .label .input,
     &__control > .label .input[type='file'] {
       max-width: var(--form-width);
     }
@@ -196,7 +195,7 @@
     &--fullwidth {
       display: block;
       margin: 0;
-      max-width: var(--form-width);
+      max-width: min-content;
 
       .button {
         width: 100%;

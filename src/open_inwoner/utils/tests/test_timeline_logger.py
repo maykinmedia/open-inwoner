@@ -72,7 +72,7 @@ class TestAdminTimelineLogging(WebTest):
         self.assertEqual(
             log_entry.extra_data,
             {
-                "message": "Titel, Doel and Einddatum gewijzigd.",
+                "message": "Titel, Doel and Expected end date gewijzigd.",
                 "action_flag": list(LOG_ACTIONS[CHANGE]),
                 "content_object_repr": "Updated",
             },

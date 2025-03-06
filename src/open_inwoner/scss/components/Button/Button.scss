@@ -111,6 +111,12 @@
         color: var(--color-primary);
         text-decoration: underline;
       }
+
+      &:focus {
+        background-color: transparent;
+        color: var(--font-color-body);
+        text-decoration: underline;
+      }
     }
 
     &.button--secondary {

@@ -233,7 +233,7 @@ class PlanDetailView(
         return context
 
 
-class PlanCreateView(
+class PlanTemplateChooseView(
     PlanActionsEnabledMixin,
     LogMixin,
     LoginRequiredMixin,
@@ -241,7 +241,7 @@ class PlanCreateView(
     BaseBreadcrumbMixin,
     CreateView,
 ):
-    template_name = "pages/plans/create.html"
+    template_name = "pages/plans/choose-template.html"
     model = Plan
     form_class = PlanForm
 
@@ -249,7 +249,84 @@ class PlanCreateView(
     def crumbs(self):
         return [
             (_("Samenwerken"), reverse("collaborate:plan_list")),
-            (_("Start nieuwe samenwerking"), reverse("collaborate:plan_create")),
+            (_("Kies voorstel"), reverse("collaborate:plan_choose_template")),
+        ]
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update(user=self.request.user)
+        return kwargs
+
+    def form_valid(self, form):
+        self.object = form.save(self.request.user)
+
+        # Add plan creator as a plan_contact as well
+        self.object.plan_contacts.add(self.object.created_by)
+
+        self.log_addition(self.object, _("plan was created"))
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self) -> str:
+        return self.object.get_absolute_url()
+
+
+class PlanCreateNoTemplateView(
+    PlanActionsEnabledMixin,
+    LogMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    CreateView,
+):
+    template_name = "pages/plans/create-no-template.html"
+    model = Plan
+    form_class = PlanForm
+
+    @cached_property
+    def crumbs(self):
+        return [
+            (_("Samenwerken"), reverse("collaborate:plan_list")),
+            (
+                _("Start een nieuwe samenwerking"),
+                reverse("collaborate:plan_create_no_template"),
+            ),
+        ]
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update(user=self.request.user)
+        return kwargs
+
+    def form_valid(self, form):
+        self.object = form.save(self.request.user)
+
+        # Add plan creator as a plan_contact as well
+        self.object.plan_contacts.add(self.object.created_by)
+
+        self.log_addition(self.object, _("plan was created"))
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self) -> str:
+        return self.object.get_absolute_url()
+
+
+class PlanCreateWithTemplateView(
+    PlanActionsEnabledMixin,
+    LogMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    CreateView,
+):
+    template_name = "pages/plans/create-with-template.html"
+    model = Plan
+    form_class = PlanForm
+
+    @cached_property
+    def crumbs(self):
+        return [
+            (_("Samenwerken"), reverse("collaborate:plan_list")),
+            (_("Gebruik dit voorstel"), reverse("collaborate:plan_choose_template")),
         ]
 
     def get_form_kwargs(self):

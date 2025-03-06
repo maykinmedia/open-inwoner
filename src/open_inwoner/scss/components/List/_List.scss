@@ -4,6 +4,13 @@
   padding: 0;
   width: 100%;
   overflow-y: auto;
+
+  &--styled {
+    list-style: disc;
+    margin: 0 0 0 var(--spacing-extra-large);
+    padding: 0;
+    width: 100%;
+  }
 }
 
 .search + .list {

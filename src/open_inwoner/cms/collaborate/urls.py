@@ -6,20 +6,32 @@ from open_inwoner.plans.views import (
     PlanActionEditStatusTagView,
     PlanActionEditView,
     PlanActionHistoryView,
-    PlanCreateView,
+    PlanCreateNoTemplateView,
+    PlanCreateWithTemplateView,
     PlanDetailView,
     PlanEditView,
     PlanExportView,
     PlanFileUploadView,
     PlanGoalEditView,
     PlanListView,
+    PlanTemplateChooseView,
 )
 
 app_name = "collaborate"
 
 urlpatterns = [
     path("", PlanListView.as_view(), name="plan_list"),
-    path("create/", PlanCreateView.as_view(), name="plan_create"),
+    path(
+        "choose-template/",
+        PlanTemplateChooseView.as_view(),
+        name="plan_choose_template",
+    ),
+    path("create/", PlanCreateNoTemplateView.as_view(), name="plan_create_no_template"),
+    path(
+        "create-from-template/",
+        PlanCreateWithTemplateView.as_view(),
+        name="plan_create_with_template",
+    ),
     path("<uuid:uuid>/", PlanDetailView.as_view(), name="plan_detail"),
     path("<uuid:uuid>/edit/", PlanEditView.as_view(), name="plan_edit"),
     path("<uuid:uuid>/edit/goal/", PlanGoalEditView.as_view(), name="plan_edit_goal"),

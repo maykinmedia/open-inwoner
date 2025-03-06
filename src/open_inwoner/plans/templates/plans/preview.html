@@ -1,39 +1,30 @@
-{% load i18n link_tags %}
+{% load i18n link_tags file_tags %}
 
-<div class='preview'>
+<div class='plan-preview'>
+<p class='plan-preview__key'>{% trans "Titel" %}</p>
+<h2 class="utrecht-heading-4">{{ plan_template.name }}</h2>
     {% if plan_template.goal %}
-        <div class='preview__title'>{% trans "Doel:" %}</div>
-        <div>{{ plan_template.goal }}</div>
+        <p class='plan-preview__key'>{% trans "Doel" %}</p>
+        <div>{{ plan_template.goal|truncatewords:20 }}</div>
     {% endif %}
 
     {% if plan_template.description %}
-        <div class='preview__title'>{% trans "Description:" %}</div>
-        <div>{{ plan_template.description }}</div>
+        <div class='plan-preview__key'>{% trans "Description:" %}</div>
+        <div>{{ plan_template.description|truncatewords:10 }}</div>
     {% endif %}
 
     {% if plan_template.file %}
-        <div class='preview__title'>{% trans 'File:' %}</div>
-        <div>{% link href=plan_template.file.url text=plan_template.file %}</div>
+        <div class='plan-preview__key'>{% trans 'Bestand' %}</div>
+        <div>{% file file=plan_template.file extension=plan_template.file.extension size=plan_template.file.size show_download=False %}</div>
     {% endif %}
 
     {% if plan_template.actiontemplates.exists %}
-        <div class='preview__title'>{% trans 'Actions:' %}</div>
+        <div class='plan-preview__key'>{% trans 'Actions:' %}</div>
 
+        <div class="plan-preview__actions">
         {% for action_template in plan_template.actiontemplates.all %}
-            <div class='preview__span'>
-                <div class='preview__title'>{{ forloop.counter }}</div>
-                <div class='preview__title'>{% trans 'Name:' %}</div>
-                <div>{{ action_template.name }}</div>
-                <div></div>
-                <div class='preview__title'>{% trans 'Description:' %}</div>
-                <div>{{ action_template.description }}</div>
-                <div></div>
-                <div class='preview__title'>{% trans 'Type:' %}</div>
-                <div>{{ action_template.get_type_display }}</div>
-                <div></div>
-                <div class='preview__title'>{% trans 'Eindigt' %}</div>
-                <div>{% trans "Over" %}{{ over }} {{ action_template.end_in_days }} {% trans "dagen" %} {{ days }}</div>
-            </div>
+            <div class='plan-preview__span'>{{ forloop.counter }}. {{ action_template.name }}</div>
         {% endfor %}
+        </div>
     {% endif %}
 </div>
