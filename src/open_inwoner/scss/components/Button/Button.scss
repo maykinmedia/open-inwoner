@@ -178,7 +178,7 @@
   }
 
   &--error {
-    color: var(--color-error-darker);
+    color: var(--color-red-notification);
   }
 
   &--primary-close {
@@ -188,7 +188,7 @@
   }
 
   &--error-confirm {
-    background-color: var(--color-error-darker);
+    background-color: var(--color-red-notification);
     color: var(--color-white);
   }
 
