@@ -14,6 +14,7 @@ from furl import furl
 from pyquery import PyQuery
 
 from open_inwoner.accounts.choices import NotificationChannelChoice
+from open_inwoner.accounts.eherkenning_session import EHerkenningSessionContext
 from open_inwoner.accounts.signals import KvKClient, update_user_on_login
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
@@ -932,6 +933,11 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
             response,
             reverse("profile:registration_necessary"),
         )
+        self.assertTrue(
+            EHerkenningSessionContext(
+                response.wsgi_request
+            ).is_initial_branch_selection_done()
+        )
 
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     @patch(
@@ -965,10 +971,16 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
             response, reverse("kvk:branches"), fetch_redirect_response=False
         )
 
-        res = self.app.post(response["Location"], {"branch_number": "1234"})
+        res = self.client.post(response["Location"], {"branch_number": "1234"})
 
         # redirect to /register/necessary/
         self.assertRedirects(res, reverse("profile:registration_necessary"))
+
+        self.assertTrue(
+            EHerkenningSessionContext(
+                res.wsgi_request
+            ).is_initial_branch_selection_done()
+        )
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
@@ -1276,27 +1288,11 @@ class DuplicateEmailRegistrationTest(WebTest):
         return_value="123456789",
         autospec=True,
     )
-    @patch(
-        "open_inwoner.kvk.client.KvKClient.get_all_company_branches",
-        autospec=True,
-    )
     def test_eherkenning_user_success(
-        self, mock_kvk, mock_retrieve_rsin_with_kvk, mock_get_basisprofiel
+        self, mock_retrieve_rsin_with_kvk, mock_get_basisprofiel
     ):
         """Assert that eHerkenning users can register with duplicate emails"""
 
-        mock_kvk.return_value = [
-            {
-                "kvkNummer": "12345678",
-                "vestigingsnummer": "1234",
-                "naam": "Mijn bedrijf",
-            },
-            {
-                "kvkNummer": "12345678",
-                "vestigingsnummer": "5678",
-                "naam": "Mijn bedrijf",
-            },
-        ]
         mock_get_basisprofiel.return_value = {
             "_embedded": {"eigenaar": {"rechtsvorm": "Stichting"}}
         }
@@ -1310,7 +1306,7 @@ class DuplicateEmailRegistrationTest(WebTest):
         url = reverse("eherkenning-mock:password")
         params = {
             "acs": reverse("eherkenning:acs"),
-            "next": reverse("kvk:branches"),
+            "next": reverse("profile:registration_necessary"),
         }
         url = f"{url}?{urlencode(params)}"
 
@@ -1319,13 +1315,7 @@ class DuplicateEmailRegistrationTest(WebTest):
             "auth_name": "12345678",
             "auth_pass": "bar",
         }
-        response = self.app.post(url, data).follow()
-
-        # select company branch
-        response = self.app.get(response["Location"])
-        form = response.forms["eherkenning-branch-form"]
-        form["branch_number"] = "5678"
-        response = form.submit().follow()
+        response = self.app.post(url, data).follow().follow()
 
         # fill in necessary fields form
         form = response.forms["necessary-form"]
