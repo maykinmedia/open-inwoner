@@ -1,0 +1,109 @@
+.filter-dropdown {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    z-index: 1100;
+  
+    .button {
+      color: var(--color-gray-dark);
+      justify-content: space-between;
+      padding-left: 0;
+      width: 100%;
+
+      [class*='icons']  {
+        font-size: 24px;
+        max-width: 24px;
+      }
+  
+      &[aria-expanded='true'] *[class*='icons'] {
+        transform: rotate(180deg);
+        transition: transform 0.25s ease-in-out;
+      }
+  
+      &[aria-expanded='false'] *[class*='icons'] {
+        transform: rotate(0deg);
+        transition: transform 0.25s ease-in-out;
+      }
+    }
+  
+    &__content {
+      display: none;
+  
+      &.show {
+        display: inline-block;
+        width: 100%;
+      }
+    }
+  
+    &__menu {
+      display: inline-block;
+      max-height: 150px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      width: 100%;
+      
+      @media (min-width: 768px) {
+        // display: contents;
+        
+      }
+    }
+  
+    &__list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+  
+    &__list-item {
+      margin-bottom: var(--spacing-medium);
+    }
+    @media (max-width: 768px) {
+  
+    .checkbox__input {
+      width: 100%;
+    }
+  
+    .checkbox__label {
+      background-color: var(--color-white);
+      color: var(--color-gray-dark);
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      padding: var(--spacing-small) var(--spacing-small) var(--spacing-small) 30px;
+      text-decoration: none;
+      width: 100%;
+  
+      &:before {
+        margin-top: 6px;
+      }
+    }
+  
+    .checkbox {
+      background-color: var(--color-white);
+      border: 1px solid var(--color-gray-lightest);
+      border-radius: var(--border-radius);
+      border-top: none;
+      color: var(--color-gray-dark-900);
+      display: flex;
+      justify-content: start;
+      line-height: 0;
+      padding: var(--spacing-medium) var(--spacing-large);
+
+        .checkbox__input:checked ~ .checkbox__label:before {
+            background-color: var(--color-white);
+            border: var(--border-width) solid var(--color-secondary);
+            color: var(--color-secondary);
+            content: '\e876';
+            font-family: 'Material Icons';
+        }
+        
+        &:has(.checkbox__input:checked) {
+            border-top: 1px solid var(--color-secondary);
+            border-right: 1px solid var(--color-secondary);
+            border-bottom: 1px solid var(--color-secondary);
+            border-left: 4px solid var(--color-secondary);
+        }
+    }
+    }
+  }

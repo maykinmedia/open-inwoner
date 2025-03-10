@@ -1,5 +1,5 @@
-import './filter-mobile'
-import './filter-options'
+import './filter'
+import './filter-modal'
 
 const searchForm = document.getElementById('search-form')
 
