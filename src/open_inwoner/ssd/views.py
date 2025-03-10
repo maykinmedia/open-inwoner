@@ -6,23 +6,30 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.functional import cached_property
-from django.utils.translation import gettext as _
 from django.views.generic.edit import FormView
 
 from furl import furl
 from view_breadcrumbs import BaseBreadcrumbMixin
 
+from open_inwoner.utils.views import CommonPageMixin
+
 from .client import JaaropgaveClient, UitkeringClient
 from .forms import MonthlyReportsForm, YearlyReportsForm
 
 
-class BenefitsFormView(LoginRequiredMixin, BaseBreadcrumbMixin, FormView):
+class BenefitsFormView(
+    LoginRequiredMixin, BaseBreadcrumbMixin, CommonPageMixin, FormView
+):
     template_name: str
     form_class: forms.Form
 
     @cached_property
     def crumbs(self):
-        return [(_("Mijn uitkeringen"), reverse("ssd:uitkeringen"))]
+        current_page = self.request.current_page
+        title = current_page.get_title() if current_page else ("Mijn uitkeringen")
+        return [
+            (title, reverse("ssd:uitkeringen")),
+        ]
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
