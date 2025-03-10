@@ -1,7 +1,6 @@
 from unittest.mock import patch
 from urllib.parse import urlencode
 
-from django.contrib.auth import get_user_model
 from django.test import TestCase, modify_settings, override_settings
 from django.urls import reverse
 
