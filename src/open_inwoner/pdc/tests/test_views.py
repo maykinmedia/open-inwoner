@@ -6,9 +6,9 @@ from open_inwoner.accounts.tests.factories import (
     DigidUserFactory,
     UserFactory,
     eHerkenningUserFactory,
+    eHerkenningVestigingUserFactory,
 )
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.utils.test import set_kvk_branch_number_in_session
 
 from .factories import CategoryFactory
 
@@ -20,7 +20,9 @@ PATCHED_MIDDLEWARE = [
 ]
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(
+    ROOT_URLCONF="open_inwoner.cms.tests.urls", MIDDLEWARE=PATCHED_MIDDLEWARE
+)
 class CategoryListViewTest(TestCase):
     def setUp(self):
         super().setUp()
@@ -150,7 +152,9 @@ class CategoryListViewTest(TestCase):
         )
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(
+    ROOT_URLCONF="open_inwoner.cms.tests.urls", MIDDLEWARE=PATCHED_MIDDLEWARE
+)
 class CategoryDetailViewTest(TestCase):
     def setUp(self):
         super().setUp()
@@ -212,14 +216,13 @@ class CategoryDetailViewTest(TestCase):
 
         self.assertEqual(response.status_code, 403)
 
-    @set_kvk_branch_number_in_session()
     def test_category_detail_view_access_restricted_for_eherkenning_user(self):
         category = CategoryFactory.create(
             name="test cat2",
             description="A <em>descriptive</em> description",
             visible_for_companies=False,
         )
-        user = eHerkenningUserFactory()
+        user = eHerkenningVestigingUserFactory()
         self.client.force_login(user)
 
         url = reverse("products:category_detail", kwargs={"slug": category.slug})
