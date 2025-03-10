@@ -31,7 +31,12 @@ from ...cms.profile.cms_apps import ProfileApphook
 from ...cms.tests import cms_tools
 from ..choices import LoginTypeChoices
 from ..models import OpenIDDigiDConfig, OpenIDEHerkenningConfig
-from .factories import DigidUserFactory, UserFactory, eHerkenningUserFactory
+from .factories import (
+    DigidUserFactory,
+    UserFactory,
+    eHerkenningUserFactory,
+    eHerkenningVestigingUserFactory,
+)
 
 User = get_user_model()
 
@@ -2260,9 +2265,11 @@ class eHerkenningOIDCFlowTests(WebTest):
         mock_get_basisprofiel,
     ):
         """
-        KVK branch selection should be skipped if KVK_BRANCH_SESSION_VARIABLE is present in session
+        KVK branch selection should be skipped
         """
-        user = eHerkenningUserFactory.create(kvk="12345678", rsin="123456789")
+        user = eHerkenningVestigingUserFactory.create(
+            kvk="12345678", rsin="123456789", vestiging="123456789000"
+        )
         mock_get_userinfo.return_value = {
             "sub": "some_username",
             "kvk": "12345678",
@@ -2289,9 +2296,7 @@ class eHerkenningOIDCFlowTests(WebTest):
 
         self.assertEqual(user.pk, int(self.app.session.get("_auth_user_id")))
         self.assertEqual(user.kvk, "12345678")
-        self.assertEqual(
-            self.app.session.get(KVK_BRANCH_SESSION_VARIABLE), "123456789000"
-        )
+        self.assertEqual(user.vestiging, "123456789000")
 
         self.assertRedirects(
             callback_response, reverse("profile:detail"), fetch_redirect_response=False
