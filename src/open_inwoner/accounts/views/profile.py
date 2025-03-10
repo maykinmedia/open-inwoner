@@ -432,7 +432,7 @@ class UserAppointmentsView(
         ]
 
 
-class MyDocumentsView(TemplateView):
+class MyDocumentsView(LoginRequiredMixin, TemplateView):
     template_name = "pages/profile/documents.html"
 
     def get_context_data(self, **kwargs):
