@@ -16,7 +16,7 @@ def set_default_for_klant_config(apps, _):
             contact_form_subject.esuite_config or ESuiteKlantConfig.objects.first()
         )
         contact_form_subject.openklant_config = (
-            contact_form_subject.esuite_config or OpenKlant2Config.objects.first()
+            contact_form_subject.openklant_config or OpenKlant2Config.objects.first()
         )
         contact_form_subject.save()
 
