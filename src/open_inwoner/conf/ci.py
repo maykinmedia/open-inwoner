@@ -36,7 +36,8 @@ AUTHENTICATION_BACKENDS = [
     # mock login like dev.py
     "digid_eherkenning.mock.backends.DigiDBackend",
     "eherkenning.mock.backends.eHerkenningBackend",
-    "open_inwoner.accounts.backends.DigiDEHerkenningOIDCBackend",
+    "open_inwoner.accounts.backends.DigiDOIDCBackend",
+    "open_inwoner.accounts.backends.EHerkenningOIDCBackend",
     "open_inwoner.accounts.backends.CustomOIDCBackend",
 ]
 
