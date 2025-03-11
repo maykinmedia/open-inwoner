@@ -194,6 +194,10 @@ class UserForm(ErrorMessageMixin, BaseUserForm):
                     "A primary phone number is required for setting an alternative phone number"
                 )
             )
+        if phonenumber_alt and phonenumber_alt == phonenumber:
+            raise ValidationError(
+                _("Primary and secondary phone numbers cannot be the same")
+            )
 
         return phonenumber_alt
 
