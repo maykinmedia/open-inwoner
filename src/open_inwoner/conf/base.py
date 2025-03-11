@@ -500,7 +500,8 @@ AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
     "digid_eherkenning.backends.DigiDBackend",
     "eherkenning.backends.eHerkenningBackend",
-    "open_inwoner.accounts.backends.DigiDEHerkenningOIDCBackend",
+    "open_inwoner.accounts.backends.DigiDOIDCBackend",
+    "open_inwoner.accounts.backends.EHerkenningOIDCBackend",
     "open_inwoner.accounts.backends.CustomOIDCBackend",
 ]
 

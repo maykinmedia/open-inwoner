@@ -20,10 +20,11 @@ class OIDCBackendTestCase(TestCase):
     @override_settings(
         AUTHENTICATION_BACKENDS=[
             "open_inwoner.accounts.backends.CustomOIDCBackend",
-            "open_inwoner.accounts.backends.DigiDEHerkenningOIDCBackend",
+            "open_inwoner.accounts.backends.DigiDOIDCBackend",
+            "open_inwoner.accounts.backends.EHerkenningOIDCBackend",
         ]
     )
-    @patch("open_inwoner.accounts.backends.DigiDEHerkenningOIDCBackend.authenticate")
+    @patch("open_inwoner.accounts.backends.DigiDOIDCBackend.authenticate")
     def test_digid_oidc_selects_correct_backend(self, mock_authenticate):
         """
         Both the regular OIDC and eHerkenning backend should check if the request path matches
@@ -50,12 +51,13 @@ class OIDCBackendTestCase(TestCase):
         self.assertEqual(result, self.user)
         # django keeps track of which backend was used to authenticate
         self.assertEqual(
-            result.backend, "open_inwoner.accounts.backends.DigiDEHerkenningOIDCBackend"
+            result.backend, "open_inwoner.accounts.backends.DigiDOIDCBackend"
         )
 
     @override_settings(
         AUTHENTICATION_BACKENDS=[
-            "open_inwoner.accounts.backends.DigiDEHerkenningOIDCBackend",
+            "open_inwoner.accounts.backends.DigiDOIDCBackend",
+            "open_inwoner.accounts.backends.EHerkenningOIDCBackend",
             "open_inwoner.accounts.backends.CustomOIDCBackend",
         ]
     )
