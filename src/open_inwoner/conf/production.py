@@ -16,7 +16,8 @@ AUTHENTICATION_BACKENDS = [
     "open_inwoner.accounts.backends.CustomAxesBackend",
     "open_inwoner.accounts.backends.UserModelEmailBackend",
     "django.contrib.auth.backends.ModelBackend",
-    "open_inwoner.accounts.backends.DigiDEHerkenningOIDCBackend",
+    "open_inwoner.accounts.backends.DigiDOIDCBackend",
+    "open_inwoner.accounts.backends.EHerkenningOIDCBackend",
     "open_inwoner.accounts.backends.CustomOIDCBackend",
 ]
 
