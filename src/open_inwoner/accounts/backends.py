@@ -151,16 +151,53 @@ class CustomOIDCBackend(OIDCAuthenticationBackend):
         return self.UserModel.objects.filter(**{"oidc_id__iexact": unique_id})
 
 
-class DigiDEHerkenningOIDCBackend(LogMixin, BaseBackend):
-    OIP_UNIQUE_ID_USER_FIELDNAME = dynamic_setting[Literal["bsn", "kvk"]]()
+class DigiDOIDCBackend(LogMixin, BaseBackend):
+    OIP_UNIQUE_ID_USER_FIELDNAME = dynamic_setting[Literal["bsn"]]()
     OIP_LOGIN_TYPE = dynamic_setting[LoginTypeChoices]()
 
     def _check_candidate_backend(self) -> bool:
         parent = super()._check_candidate_backend()
-        return parent and self.config_class in (
-            OpenIDDigiDConfig,
-            OpenIDEHerkenningConfig,
+        return parent and self.config_class is OpenIDDigiDConfig
+
+    def filter_users_by_claims(self, claims):
+        """Return all users matching the specified subject."""
+        unique_id = self._extract_username(claims)
+
+        if not unique_id:
+            return self.UserModel.objects.none()
+        return self.UserModel.objects.filter(
+            **{f"{self.OIP_UNIQUE_ID_USER_FIELDNAME}__iexact": unique_id}
         )
+
+    def create_user(self, claims):
+        """
+        Return object for a newly created user account.
+        """
+
+        unique_id = self._extract_username(claims)
+
+        logger.debug("Creating OIDC user: %s", unique_id)
+
+        user = self.UserModel.objects.create_user(
+            **{
+                self.UserModel.USERNAME_FIELD: generate_email_from_string(
+                    unique_id, domain="localhost"
+                ),
+                self.OIP_UNIQUE_ID_USER_FIELDNAME: unique_id,
+                "login_type": self.OIP_LOGIN_TYPE,
+            }
+        )
+
+        return user
+
+
+class EHerkenningOIDCBackend(LogMixin, BaseBackend):
+    OIP_UNIQUE_ID_USER_FIELDNAME = dynamic_setting[Literal["kvk"]]()
+    OIP_LOGIN_TYPE = dynamic_setting[LoginTypeChoices]()
+
+    def _check_candidate_backend(self) -> bool:
+        parent = super()._check_candidate_backend()
+        return parent and self.config_class is OpenIDEHerkenningConfig
 
     def _store_vestigingsnummer_in_session(self, claims: JSONObject):
         """Get company vestigingsnummer from OIDC claims & store in session"""
@@ -213,12 +250,10 @@ class DigiDEHerkenningOIDCBackend(LogMixin, BaseBackend):
             }
         )
 
-        if self.config_class is OpenIDEHerkenningConfig:
-            self._store_vestigingsnummer_in_session(claims)
+        self._store_vestigingsnummer_in_session(claims)
 
         return user
 
     def update_user(self, user: AbstractUser, claims: JSONObject):
-        if self.config_class is OpenIDEHerkenningConfig:
-            self._store_vestigingsnummer_in_session(claims)
+        self._store_vestigingsnummer_in_session(claims)
         return super().update_user(user, claims)
