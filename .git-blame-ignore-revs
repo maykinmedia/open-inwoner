@@ -10,3 +10,15 @@ ea0326c3d0a373a4701d64e6355b6ec60181ccdd
 
 # Apply potentially unsafe fixes for ruff SIM
 0d9012fb9160e0e9237bf5ac1aecca4b35ffa867
+
+# Apply ruff B904 raise without from inside except
+93936fe3f793ed83870e104679d8b02566fbdf6c
+
+# Apply ruff B010 no setattr with constant value
+da3980338792fe95659d1aef4e2ff3ecf9767cc5
+
+# Apply ruff B006 no mutable default args
+cb4197d07b630d6bb4ef2954b445eaf91795bf58
+
+# Refactor for compliance with PEP8-naming
+aa306e5041e55e8f9b34526fd210425f01757f70
