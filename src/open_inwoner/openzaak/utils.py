@@ -25,7 +25,14 @@ def is_object_visible(obj, max_confidentiality_level: str) -> bool:
     except ValueError:
         return False
 
-    return doc_index <= max_index
+    if doc_index > max_index:
+        logger.info(
+            "Ignoring %s as not visible for users: vertrouwelijkheidaanduiding too high",
+            obj,
+        )
+        return False
+
+    return True
 
 
 def is_info_object_visible(
@@ -38,6 +45,11 @@ def is_info_object_visible(
     level (compared the ordering from the VertrouwelijkheidsAanduidingen.choices)
     """
     if info_object.status not in ["definitief", "gearchiveerd"]:
+        logger.info(
+            "Ignoring informatieobject %s as not visible for user: status is neither "
+            "'definitief' nor 'gearchiveerd'",
+            info_object.url,
+        )
         return False
 
     return is_object_visible(info_object, max_confidentiality_level)
@@ -50,9 +62,21 @@ def is_zaak_visible(zaak: Zaak) -> bool:
         raise ValueError("expected zaak.zaaktype to be resolved from url to model")
 
     if not zaak.status and not config.show_cases_without_status:
+        logger.info(
+            "Ignoring zaak %s as not visible for users: zaak has no status and "
+            "`show_cases_without_status` is disabled",
+            zaak.url,
+        )
         return False
-
-    if not zaak.zaaktype or zaak.zaaktype.indicatie_intern_of_extern != "extern":
+    if not zaak.zaaktype:
+        logger.info(
+            "Ignoring zaak %s as not visible for users: zaak has no zaaktype", zaak.url
+        )
+        return False
+    if zaak.zaaktype.indicatie_intern_of_extern != "extern":
+        logger.info(
+            "Ignoring zaak %s as not visible for users: zaaktype is intern", zaak.url
+        )
         return False
 
     return is_object_visible(zaak, config.zaak_max_confidentiality)
@@ -113,6 +137,7 @@ def get_zaak_type_config(case_type: ZaakType) -> ZaakTypeConfig | None:
     try:
         return ZaakTypeConfig.objects.filter_case_type(case_type).get()
     except ZaakTypeConfig.DoesNotExist:
+        logger.info("No ZaakTypeConfig found for zaaktype %s", case_type.url)
         return None
 
 
@@ -126,6 +151,9 @@ def get_zaak_type_info_object_type_config(
             case_type, info_object_type_url
         )
     except ZaakTypeInformatieObjectTypeConfig.DoesNotExist:
+        logger.info(
+            "No ZaakTypeInformatieObjectTypeConfig found for zaaktype %s", case_type.url
+        )
         return None
 
 
