@@ -1,4 +1,4 @@
-from django.db.utils import IntegrityError
+from django.db import IntegrityError
 from django.test import TestCase
 
 from open_inwoner.accounts.choices import LoginTypeChoices
@@ -132,3 +132,8 @@ class UserTests(TestCase):
         user.phonenumber = ""
         user.phonenumber_alternative = ""
         user.save()
+
+    def test_eherkenning_user_requires_kvk(self):
+
+        with self.assertRaises(IntegrityError):
+            UserFactory(login_type=LoginTypeChoices.eherkenning, kvk="")
