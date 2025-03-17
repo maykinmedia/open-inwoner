@@ -1,6 +1,6 @@
 import itertools
 
-from django.test import TestCase
+from django.test import TestCase, tag
 
 import requests_mock
 
@@ -11,6 +11,7 @@ from open_inwoner.openklant.tests.data import KLANTEN_ROOT, MockAPIReadData
 from open_inwoner.utils.test import DisableRequestLogMixin, paginated_response
 
 
+@tag("user_model_with_vestiging")
 class eSuiteServiceTestCase(TestCase, DisableRequestLogMixin):
     maxDiff = None
 
