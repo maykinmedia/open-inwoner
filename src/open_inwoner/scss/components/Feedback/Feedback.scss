@@ -1,5 +1,15 @@
 .feedback {
-  margin: var(--row-height-giant) 0 0 0;
+  margin: var(--spacing-giant) 0 0 0;
+
+  &__translations {
+    display: contents;
+  }
+
+  .form {
+    gap: var(--row-height-small);
+    padding: 0;
+  }
+
   &__remark {
     display: none;
 
@@ -10,8 +20,19 @@
 
   &__options {
     border-radius: var(--border-radius);
+    display: flex;
+    flex-direction: row;
+    gap: var(--spacing-medium);
   }
 
-  .button-radio {
+  .textarea {
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  &__submit {
+    .form__actions {
+      display: flex;
+    }
   }
 }

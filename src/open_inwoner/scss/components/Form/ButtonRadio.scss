@@ -5,34 +5,45 @@
     z-index: -1;
 
     &:focus ~ .button-radio__button {
-      outline: 2px solid var(--color-info);
+      outline: var(--focus-border-width) var(--focus-border-style)
+        var(--color-primary-lighter);
     }
 
     &:checked ~ .button-radio__button {
       color: var(--color-primary);
       cursor: default;
     }
+
     &#negative {
       &:checked ~ .button-radio__button {
-        color: #cf1c08;
+        background-color: var(--color-error-lightest);
+        border: var(--border-width-thin) solid var(--color-error-darker);
+        color: var(--color-error-darker);
         cursor: default;
+        outline: 1px solid var(--color-primary-lighter);
       }
     }
+
     &#positive {
       &:checked ~ .button-radio__button {
-        color: var(--color-green-dark);
+        background-color: var(--color-success-lighter);
+        border: var(--border-width-thin) solid var(--color-success);
+        color: var(--color-success);
         cursor: default;
+        outline: 1px solid var(--color-primary-lighter);
       }
     }
   }
 
   &__button {
-    border: var(--border-width-thin) solid var(--color-gray-light);
-    border-left: 0;
-    background-color: var(--color-gray-lightest);
-    color: var(--color-gray-lighter);
-    display: inline-block;
-    padding: 12px;
+    align-items: center;
+    border: var(--border-width-thin) solid var(--color-gray-dark-900);
+    background-color: var(--color-white);
+    color: var(--font-color-body);
+    border-radius: var(--border-radius);
+    display: flex;
+    gap: var(--spacing-medium);
+    padding: var(--spacing-medium) var(--spacing-extra-large);
     cursor: pointer;
 
     &[for='negative'] {
@@ -46,9 +57,8 @@
     }
   }
 
-  &:first-child {
-    .button-radio__button {
-      border-left: 1px solid #d2d2d2;
-    }
+  *[class*='icons'],
+  *[class*='Icons'] {
+    font-size: var(--font-size-body);
   }
 }
