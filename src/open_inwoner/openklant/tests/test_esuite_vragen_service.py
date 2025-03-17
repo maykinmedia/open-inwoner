@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from django.test import TestCase, override_settings
+from django.test import TestCase, override_settings, tag
 
 import requests_mock
 
@@ -12,6 +12,7 @@ from open_inwoner.openklant.tests.data import MockAPIReadData
 from open_inwoner.utils.url import uuid_from_url
 
 
+@tag("user_model_with_vestiging")
 @requests_mock.Mocker()
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class eSuiteVragenServiceTestCase(TestCase):

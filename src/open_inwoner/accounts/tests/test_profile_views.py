@@ -236,6 +236,7 @@ class ProfileViewTests(WebTest):
         response = self.app.get(self.url, user=self.user)
         self.assertNotContains(response, _("My details"))
 
+    @tag("user_model_with_vestiging")
     def test_info_eherkenning_user(self):
         user = eHerkenningUserFactory(
             company_name="Makers and Shakers",
@@ -312,6 +313,7 @@ class ProfileViewTests(WebTest):
         self.assertEqual(link_text(), _("Stuur een bericht"))
 
 
+@tag("user_model_with_vestiging")
 @override_settings(
     ROOT_URLCONF="open_inwoner.cms.tests.urls", MIDDLEWARE=PATCHED_MIDDLEWARE
 )
