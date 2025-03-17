@@ -955,6 +955,9 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
 
         user = eHerkenningUserFactory.create(kvk="12345678", email="example@localhost")
 
+        self.client.force_login(
+            user, backend=EHerkenningSessionContext._expected_auth_backends()[0]
+        )
         response = self.app.get(reverse("pages-root"), user=user)
 
         # redirect to /kvk/branches/
