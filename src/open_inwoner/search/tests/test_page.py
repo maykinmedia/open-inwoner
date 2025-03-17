@@ -302,11 +302,27 @@ class SearchPagePlaywrightTests(
         # check if we see all checkboxes
         for facet in FacetChoices.values:
             # tags, organizations, categories
-            controls = page.locator(f"input[form='search-form'][name='{facet}']")
-            expect(controls).to_have_count(4)  # both mobile and desktop
-            for checkbox in controls.all():
+            mobile_controls = page.locator(".filters--desktop").locator(
+                f"input[form='search-form'][name='{facet}']"
+            )
+            expect(mobile_controls).to_have_count(2)  # only controls on desktop
+
+            # Check desktop controls.
+            for checkbox in mobile_controls.all():
                 # the input elements are hidden for styling so just test for enabled
                 expect(checkbox).to_be_enabled()
+                expect(checkbox).not_to_be_checked()
+
+            # Check mobile controls
+            mobile_controls = page.locator(".filters--mobile").locator(
+                f"input[form='search-form'][name='{facet}']"
+            )
+            expect(mobile_controls).to_have_count(2)  # only controls on desktop
+
+            # Check desktop controls.
+            for checkbox in mobile_controls.all():
+                # the input elements are hidden for styling so just test for enabled
+                expect(checkbox).not_to_be_enabled()
                 expect(checkbox).not_to_be_checked()
 
         def _click_checkbox_for_name(page, name):
@@ -333,6 +349,31 @@ class SearchPagePlaywrightTests(
         _test_search("Organization 2", self.product2.name)
         _test_search("Category 1", self.product1.name)
         _test_search("Category 2", self.product2.name)
+
+    def test_search_mobile_dialog(self):
+        context = self.browser.new_context()
+        page = context.new_page()
+
+        def _click_modal_opener():
+            dialog_opener = page.locator(".show-modal")
+            dialog_opener.click()
+
+        def _click_modal_closer():
+            dialog_closer = page.locator(".filter-modal__close")
+            dialog_closer.click()
+
+        # search to find both products
+        page.goto(self.live_reverse("search:search", params={"query": "summary"}))
+        page.wait_for_url(self.live_reverse("search:search", star=True))
+
+        dialog_modal = page.locator(".filter-modal")
+        # Open modal
+        _click_modal_opener()
+        expect(dialog_modal).to_have_text(".filter-modal--show")
+
+        # Close modal
+        _click_modal_closer()
+        expect(dialog_modal).not_to_have_text(".filter-modal--show")
 
     def test_search_with_filter_combinations(self):
         # NOTE it isn't great to generate query-strings outside the form but we test the form above
