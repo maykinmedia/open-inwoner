@@ -3,7 +3,7 @@ from unittest.mock import patch
 from django.contrib import messages
 from django.contrib.auth.models import AnonymousUser
 from django.core import mail
-from django.test import modify_settings
+from django.test import modify_settings, tag
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
@@ -30,6 +30,7 @@ from open_inwoner.utils.test import ClearCachesMixin, DisableRequestLogMixin
 from open_inwoner.utils.tests.helpers import AssertFormMixin, AssertTimelineLogMixin
 
 
+@tag("user_model_with_vestiging")
 @requests_mock.Mocker()
 @modify_settings(
     MIDDLEWARE={"remove": ["open_inwoner.kvk.middleware.KvKLoginMiddleware"]}
