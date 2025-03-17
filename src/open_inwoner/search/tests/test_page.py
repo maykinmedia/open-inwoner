@@ -325,19 +325,37 @@ class SearchPagePlaywrightTests(
                 expect(checkbox).not_to_be_enabled()
                 expect(checkbox).not_to_be_checked()
 
-        def _click_checkbox_for_name(page, name):
+        def _open_filter_for_checkbox(filter):
+            filter_button = filter.locator(".filter__opener")
+
+            # Check if filter is not open yet.
+            if filter_button.get_attribute("aria-expanded") != "true":
+                filter_button.click()
+
+            # Filter should be open.
+            expect(filter_button).to_have_attribute("aria-expanded", "true")
+
+        def _click_checkbox_for_name(page=page, name=""):
+            filter = page.locator(".filters--desktop").locator(".filter", has_text=name)
+            # first we need to open the list so that all the checkboxes are visible.
+            _open_filter_for_checkbox(filter)
             # our checkbox widget hides the <input> element and styles the <label> and a pseudo-element
             # this a problem for playwright accessibility, so we find the label for the checkbox and click on the label like a user would
-            page.locator(".checkbox").filter(
-                has=page.get_by_role("checkbox", name=name)
-            ).locator("label").click()
+            checkbox = filter.locator(".checkbox", has_text=name)
+            checkbox.locator(".checkbox__label").click()
+            # The checkbox should be checked immediately
+            expect(checkbox.locator(".checkbox__input")).to_be_checked()
 
         def _test_search(checkbox_name, expected_text):
             page.goto(self.live_reverse("search:search", params={"query": "summary"}))
             _click_checkbox_for_name(page, checkbox_name)
             page.wait_for_url(self.live_reverse("search:search", star=True))
             # is our box checked in response
-            expect(page.get_by_role("checkbox", name=checkbox_name)).to_be_checked()
+            expect(
+                page.locator(".filters--desktop")
+                .locator(".checkbox", has_text=checkbox_name)
+                .locator(".checkbox__input")
+            ).to_be_checked()
             # implies one exact result
             expect(page.locator(".search-results__item-title")).to_have_text(
                 expected_text
@@ -350,6 +368,7 @@ class SearchPagePlaywrightTests(
         _test_search("Category 1", self.product1.name)
         _test_search("Category 2", self.product2.name)
 
+    # Find out how playwright can view this test on a different viewport.
     def test_search_mobile_dialog(self):
         context = self.browser.new_context()
         page = context.new_page()

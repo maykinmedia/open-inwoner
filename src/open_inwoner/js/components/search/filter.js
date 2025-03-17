@@ -16,9 +16,10 @@ export class Filter {
   bindEvents() {
     // Open dropdown on button click.
     this.dropdowns.forEach((dropdown) => {
-      this.getDropdownButton(dropdown).addEventListener(
+      const button = this.getDropdownButton(dropdown)
+      button.addEventListener(
         'click',
-        this.toggleDropdown.bind(this, dropdown)
+        this.toggleDropdown.bind(this, dropdown, button)
       )
     })
 
@@ -95,7 +96,9 @@ export class Filter {
    * @param {HTMLDivElement} dropdown
    * @param {Event} event
    */
-  toggleDropdown(dropdown, event) {
+  toggleDropdown(dropdown, button, event) {
+    console.log(dropdown, button, event)
+    event.stopPropagation()
     event.preventDefault()
     const isOpen = dropdown
       .querySelector('.filter__dropdown')
@@ -104,7 +107,7 @@ export class Filter {
     dropdown
       .querySelector('.filter__dropdown')
       ?.classList.toggle('show', newIsOpen)
-    event.target?.setAttribute('aria-expanded', newIsOpen ? 'true' : 'false')
+    button?.setAttribute('aria-expanded', newIsOpen ? 'true' : 'false')
   }
 
   /**
