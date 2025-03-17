@@ -1,25 +1,20 @@
-{% load i18n icon_tags button_tags form_tags %}
+{% load i18n icon_tags form_tags %}
 
-<!-- TODO change open class from 'show' to a fitting modifier such ass &--open. -->
-<div class="filter-dropdown filter__container">
-    <div class="filter filter-dropdown__dropdown">
-        <button type="button" class="button button--transparent button--borderless filter__title" aria-haspopup="listbox" aria-expanded="{{ initial_open|yesno:'true,false' }}">
-            <span>
-                {{ field.label }}
-                <span class="filter__counter">({{field.field.choices|length}})</span>
-            </span>
-            {% icon icon="expand_more" icon_outlined=True %}
-        </button>
-        <div class="filter-dropdown__content filter__list {% if initial_open %}show{% endif %}" role="listbox" aria-hidden="{{ initial_open|yesno:'false,true' }}">
-            <div class="filter-dropdown__menu">
-                <ul class="filter-dropdown__list">
-                    {% for option in field.field.choices %}
-                        <li class="filter-dropdown__list-item">
-                            {% choice_checkbox as_tag=checkbox_as_tag choice=option name=field.name data=field.data index=forloop.counter form_id=form_id append_to_checkbox_id=append_to_checkbox_id %}
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
+<div class="filter">
+    <button type="button" class="filter__opener button button--transparent button--borderless" aria-haspopup="listbox" aria-expanded="{{ initial_open|yesno:'true,false' }}">
+        <span>
+            {{ field.label }}
+            <span class="filter__opener-counter">({{field.field.choices|length}})</span>
+        </span>
+        {% icon icon="expand_more" icon_outlined=True %}
+    </button>
+    <div class="filter__dropdown {% if initial_open %}show{% endif %}" role="listbox" aria-hidden="{{ initial_open|yesno:'false,true' }}">
+        <ul class="filter__list">
+            {% for option in field.field.choices %}
+                <li class="filter__list-item">
+                    {% choice_checkbox as_tag=checkbox_as_tag choice=option name=field.name data=field.data index=forloop.counter form_id=form_id append_to_checkbox_id=append_to_checkbox_id %}
+                </li>
+            {% endfor %}
+        </ul>
     </div>
 </div>

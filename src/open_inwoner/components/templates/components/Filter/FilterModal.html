@@ -1,20 +1,18 @@
 {% load i18n icon_tags button_tags form_tags %}
 
-<div class="filter-modal__initial">
-    {% button icon="filter_alt" text=_("Filters") icon_outlined=True transparent=True extra_classes="show-modal" %}
-    {% icon icon="check" icon_position="after" outlined=True %}
+<div class="filter-modal__initial {% if active_filter %}active{% endif %}">
+    {% button icon="filter_alt" type='button' text=_("Filters") icon_outlined=True transparent=True extra_classes="show-modal" %}
+    {% icon icon="check" icon_position="after" outlined=True %}     
     <span class="sr-only">{% trans "Gekozen filters" %}</span>
 </div>
-<div class="filter-modal filter-modal__backdrop" id="filterModal">
-    <div class="filter-modal--mobile">
-        <div class="filter-modal__mobile-controls">
+<div class="filter-modal" id="filterModal">
+    <div class="filter-modal__dialog">
+        <div class="filter-modal__actions">
             {% button icon="close" text=_("Sluiten") hide_text=True icon_outlined=True transparent=True extra_classes="show-controls filter-modal__close" %}
-            <div class="filter-modal__reset">
-                {% button text=_("Wis alle?") icon_outlined=True transparent=True extra_classes="filter-modal__reset-button filter__reset" %}
-            </div>
+            {% button text=_("Wis alle?") icon_outlined=True transparent=True extra_classes="filter-modal__reset-button filter__reset" %}
         </div>
         <p class="utrecht-paragraph filter-modal__heading">{% trans "Filters" %}</p>
-        <div class="filter-modal__contents">
+        <div class="filter-modal__filters">
             {{ contents }}
         </div>
     </div>

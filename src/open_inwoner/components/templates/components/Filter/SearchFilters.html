@@ -18,8 +18,8 @@
 
 {# Desktop search filters #}
 <div class="filters filters--desktop">
-    <div class='filter__reset'>
-        {% button transparent=True type='button' inline=True text=_('Wis alle?') %}
+    <div class="filters__reset">
+        {% button transparent=True type='button' inline=True text=_('Wis alle?') extra_classes='filters__reset-btn filter__reset' %}
     </div>
 
     {% if search_filter_categories and search_form.categories.field.choices|length != 0 %}

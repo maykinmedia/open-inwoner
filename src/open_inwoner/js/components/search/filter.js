@@ -63,7 +63,7 @@ export class Filter {
    * @returns {NodeListOf<HTMLDivElement>}
    */
   get dropdowns() {
-    return this.node.querySelectorAll('.filter-dropdown')
+    return this.node.querySelectorAll('.filter')
   }
 
   /**
@@ -97,10 +97,14 @@ export class Filter {
    */
   toggleDropdown(dropdown, event) {
     event.preventDefault()
+    const isOpen = dropdown
+      .querySelector('.filter__dropdown')
+      ?.classList.contains('show')
+    const newIsOpen = !isOpen
     dropdown
-      .querySelector('.filter-dropdown__content')
-      ?.classList.toggle('show')
-    event.target?.toggleAttribute('aria-expanded')
+      .querySelector('.filter__dropdown')
+      ?.classList.toggle('show', newIsOpen)
+    event.target?.setAttribute('aria-expanded', newIsOpen ? 'true' : 'false')
   }
 
   /**

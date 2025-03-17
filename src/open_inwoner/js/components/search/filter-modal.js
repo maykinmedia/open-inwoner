@@ -8,6 +8,7 @@ export class FilterModal {
   constructor(node) {
     this.node = node
     this.bindEvents()
+    this.render()
   }
 
   /**
@@ -27,24 +28,30 @@ export class FilterModal {
   }
 
   get closeButton() {
-    this.node.querySelector('.filter-modal__close')
+    return this.node.querySelector('.filter-modal__close')
   }
 
   get showModalButton() {
     return document.querySelector('.show-modal')
   }
 
+  get someChecked() {
+    return [...this.node.querySelectorAll('.checkbox__input')].some(
+      (x) => !!x.checked
+    )
+  }
+
   openModal() {
     this.node.classList.toggle('filter-modal--show', true)
     document.body.classList.toggle('body--noscroll', true)
-    this.node.setAttribute('aria-expanded', true)
+    this.node.setAttribute('aria-expanded', 'true')
     this.node.setAttribute('aria-label', 'Sluiten Filters')
   }
 
   closeModal() {
     this.node.classList.toggle('filter-modal--show', false)
     document.body.classList.toggle('body--noscroll', false)
-    this.node.setAttribute('aria-expanded', false)
+    this.node.setAttribute('aria-expanded', 'false')
     this.node.setAttribute('aria-label', 'Filters')
   }
 
@@ -56,6 +63,11 @@ export class FilterModal {
     ) {
       this.closeModal() // Close the modal on Escape key press
     }
+  }
+
+  render() {
+    if (this.someChecked)
+      document.querySelector('.filter-modal__initial').classList.add('active')
   }
 }
 

@@ -24,6 +24,20 @@
     gap: 0;
     justify-content: left;
 
+    // Active/selected filters
+    &.active {
+      color: var(--color-primary);
+
+      .button--transparent {
+        color: var(--color-primary);
+      }
+
+
+      > *[class*='icons'] {
+        display: inline-block;
+      }
+    }
+
     @media (min-width: 768px) {
       display: none;
     }
@@ -35,22 +49,9 @@
     > *[class*='icons'] {
       display: none;
     }
-
-    // Active/selected filters
-    &.active {
-      .button--transparent {
-        color: var(--color-primary);
-      }
-
-      color: var(--color-primary);
-
-      > *[class*='icons'] {
-        display: inline-block;
-      }
-    }
   }
 
-  &--mobile {
+  &__dialog {
     background-color: var(--color-gray-lightest);
     border-radius: var(--border-radius-large) var(--border-radius-large) 0 0;
     box-sizing: border-box;
@@ -59,42 +60,33 @@
     gap: var(--row-height);
     height: 70vh;
     margin: 0 var(--spacing-tiny);
-    padding: var(--spacing-large) var(--spacing-large) 0 var(--spacing-large);
+    padding: var(--spacing-large);
     position: fixed;
     top: 30vh;
     width: 100%;
     z-index: 1020;
   }
 
-  &__contents {
-    overflow-y: auto;
-    -ms-overflow-style: none;
-
-    &::-webkit-scrollbar {
-      display: none;
-    }
-  }
-
-  &__mobile-controls {
+  &__actions {
     display: flex;
     justify-content: space-between;
-
-    @media (min-width: 768px) {
-      display: none;
-    }
+    align-items: flex-end;
 
     *[class*='icons'] {
       font-size: 32px;
+      width: 32px;
+      max-width: 32px;
     }
 
     .button--textless {
-      padding-left: 0;
+      padding: 0;
+      height: fit-content;
     }
 
-    .filter-modal__reset {
-      .button {
-        font-weight: bold;
-      }
+    .filter-modal__reset-button {
+      font-weight: bold;
+      height: 24px;
+      padding: 0 var(--spacing-medium);
     }
   }
 
@@ -104,5 +96,12 @@
     font-size: var(--font-size-body-larger);
     font-weight: 700;
     margin: 0;
+  }
+
+  &__filters {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow-y: scroll;
   }
 }
