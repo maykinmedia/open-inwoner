@@ -372,6 +372,13 @@ class SearchPagePlaywrightTests(
     def test_search_mobile_dialog(self):
         context = self.browser.new_context()
         page = context.new_page()
+        page.set_viewport_size(
+            {
+                "width": 500,
+                "height": 480,
+            }
+        )
+        page.goto(self.live_reverse("search:search", params={"query": "summary"}))
 
         def _click_modal_opener():
             dialog_opener = page.locator(".show-modal")
