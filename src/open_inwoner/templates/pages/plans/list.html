@@ -8,7 +8,7 @@
 {% block content %}
     <header class="oip-header-group">
         <h1 class="utrecht-heading-1">
-            {% trans "Samenwerken" %}
+            {{ page_title }}
         </h1>
         {% button href="collaborate:plan_create" text=_("Start nieuwe samenwerking") primary=True icon="group" icon_outlined=True %}
     </header>
