@@ -137,9 +137,7 @@ class SearchPageTests(ClearCachesMixin, ESMixin, WebTest):
         config = SiteConfiguration.get_solo()
 
         def _assert_facet_checkbox_count(response, facet, count):
-            controls = response.pyquery(
-                f"input[form='search-form'][name='{facet}']"
-            )
+            controls = response.pyquery(f"input[form='search-form'][name='{facet}']")
             self.assertEqual(len(controls), count)
 
         with self.subTest("tags"):
@@ -305,7 +303,7 @@ class SearchPagePlaywrightTests(
         for facet in FacetChoices.values:
             # tags, organizations, categories
             controls = page.locator(f"input[form='search-form'][name='{facet}']")
-            expect(controls).to_have_count(2)
+            expect(controls).to_have_count(4)  # both mobile and desktop
             for checkbox in controls.all():
                 # the input elements are hidden for styling so just test for enabled
                 expect(checkbox).to_be_enabled()
