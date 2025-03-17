@@ -4,7 +4,7 @@ from unittest.mock import patch
 from uuid import uuid4
 
 from django.contrib.auth import signals
-from django.test import modify_settings, override_settings
+from django.test import modify_settings, override_settings, tag
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
@@ -38,6 +38,7 @@ from open_inwoner.utils.url import uuid_from_url
 from .factories import KlantContactMomentAnswerFactory
 
 
+@tag("user_model_with_vestiging")
 @requests_mock.Mocker()
 @patch.object(eSuiteVragenService, "get_kcm_answer_mapping", autospec=True)
 @patch(
