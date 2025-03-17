@@ -433,11 +433,11 @@ class UserAppointmentsView(
 
 
 class MyDocumentsView(LoginRequiredMixin, TemplateView):
-    template_name = "pages/profile/documents.html"
+    template_name = "pages/profile/travel_documents.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         documents = fetch_brp_travel_documents(self.request.user.bsn)
-        
-        context['travel_documents'] = documents
+
+        context["travel_documents"] = documents
         return context

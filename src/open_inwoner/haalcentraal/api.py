@@ -199,8 +199,7 @@ class BRP_2_1(BRPAPI):
         return brp
 
 
-class BRP_Travel_Documents():
-
+class BRP_Travel_Documents:
     def __init__(self):
         self.config = HaalCentraalConfig.get_solo()
         self.client = build_client(self.config.service)
@@ -220,14 +219,11 @@ class BRP_Travel_Documents():
                     "burgerservicenummer": [user_bsn],
                     "fields": [
                         "reisdocumentnummer",
-
                         "soort.code",
                         "soort.omschrijving",
-
                         "datumEindeGeldigheid.type",
                         "datumEindeGeldigheid.langFormaat",
                         "datumEindeGeldigheid.datum",
-
                         "inhoudingOfVermissing.datum.type",
                         "inhoudingOfVermissing.datum.langFormaat",
                         "inhoudingOfVermissing.datum.datum",
@@ -238,7 +234,6 @@ class BRP_Travel_Documents():
                         "inhoudingOfVermissing.inOnderzoek.datumingangOnderzoek.type",
                         "inhoudingOfVermissing.inOnderzoek.datumingangOnderzoek.langFormaat",
                         "inhoudingOfVermissing.inOnderzoek.datumingangOnderzoek.datum",
-
                         "houder.burgerservicenummer",
                         "houder.geheimhoudingPersoonsgegevens",
                         "houder.opschortingBijhouding.reden.code",
@@ -250,15 +245,14 @@ class BRP_Travel_Documents():
                         "houder.inOnderzoek.datumIngangOnderzoek.type",
                         # "houder.inOnderzoek.datumIngangOnderzoek.langFormaat",
                         # "houder.inOnderzoek.datumIngangOnderzoek.datum",
-
                         # "inOnderzoek.reisdocumentnummer",
                         # "inOnderzoek.soort",
                         # "inOnderzoek.datumEindeGeldigheid",
                         # "inOnderzoek.datumIngangOnderzoek.type",
                         # "inOnderzoek.datumIngangOnderzoek.langFormaat",
                         # "inOnderzoek.datumIngangOnderzoek.datum",
-                    ]
-                }
+                    ],
+                },
             )
             return get_json_response(response)
         except (RequestException, ClientError) as e:
@@ -268,12 +262,17 @@ class BRP_Travel_Documents():
     def parse_data(self, data: dict):
         reisdocumenten = data["reisdocumenten"]
 
-        return [BRP_Travel_Documents_Data(
-            reisdocumentnummer=glom(document, "reisdocumentnummer", default=""),
-            type=glom(document, "soort.code", default=""),
-            description=glom(document, "soort.omschrijving", default=""),
-            enddatevalid_date=glom(document, "datumEindeGeldigheid.datum", default=""),
-        ) for document in reisdocumenten]
+        return [
+            BRP_Travel_Documents_Data(
+                reisdocumentnummer=glom(document, "reisdocumentnummer", default=""),
+                type=glom(document, "soort.code", default=""),
+                description=glom(document, "soort.omschrijving", default=""),
+                enddatevalid_date=glom(
+                    document, "datumEindeGeldigheid.datum", default=""
+                ),
+            )
+            for document in reisdocumenten
+        ]
 
     def fetch_travel_documents(self, user_bsn: str):
 

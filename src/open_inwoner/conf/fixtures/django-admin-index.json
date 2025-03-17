@@ -359,6 +359,10 @@
             [
                 "zgw_consumers",
                 "service"
+            ],
+            [
+                "travel_documents",
+                "traveldocumentsconfig"
             ]
         ]
     }

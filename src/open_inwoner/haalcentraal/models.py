@@ -72,13 +72,15 @@ class HaalCentraalConfig(SingletonModel):
 class ReisDocument(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey("accounts.User", on_delete=models.CASCADE)
-    reisdocumentnummer = models.CharField(validators=[RegexValidator('^[A-Z0-9]{9}$')])
-    
+    reisdocumentnummer = models.CharField(validators=[RegexValidator("^[A-Z0-9]{9}$")])
+
     # Code of the type ('soort.code' in the API)
-    type = models.CharField(validators=[RegexValidator('^[a-zA-Z0-9 \.]+$')])
+    type = models.CharField(validators=[RegexValidator("^[a-zA-Z0-9 \.]+$")])
 
     # 'soort.description' in the API
-    description = models.CharField(validators=[RegexValidator('^[a-zA-Z0-9À-ž \'\,\(\)\.\-]{1,200}$')])
+    description = models.CharField(
+        validators=[RegexValidator("^[a-zA-Z0-9À-ž '\,\(\)\.\-]{1,200}$")]
+    )
 
     # Falls under 'datumEindeGeldigheid' in the API
     endDateValid_date = models.CharField(max_length=10)

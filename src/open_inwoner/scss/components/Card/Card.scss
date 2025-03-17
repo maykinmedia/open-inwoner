@@ -18,6 +18,10 @@
   position: relative;
   text-decoration: none;
 
+  .card__text--small ~ .link {
+    margin-top: var(--spacing-medium);
+  }
+
   .card__header {
     display: flex;
     background-color: var(--color-info-lighter);

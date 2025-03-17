@@ -2,7 +2,7 @@
     "type": "ZoekMetBurgerservicenummer",
     "reisdocumenten": [
       {
-        "reisdocumentnummer": "^AAAAAAAAA$",
+        "reisdocumentnummer": "123456789",
         "soort": {
           "code": "6030",
           "omschrijving": "Nationaal paspoort"
@@ -63,10 +63,10 @@
       },
 
       {
-        "reisdocumentnummer": "^AAAAAAAAA$",
+        "reisdocumentnummer": "123456789",
         "soort": {
           "code": "6030",
-          "omschrijving": "Nationaal paspoort"
+          "omschrijving": "Identiteitskaart"
         },
         "datumEindeGeldigheid": {
           "type": "string",
@@ -80,7 +80,7 @@
           },
           "aanduiding": {
             "code": "6030",
-            "omschrijving": "Nationaal paspoort"
+            "omschrijving": "Identiteitskaart"
           },
           "inOnderzoek": {
             "datum": true,
@@ -97,7 +97,7 @@
           "opschortingBijhouding": {
             "reden": {
               "code": "6030",
-              "omschrijving": "Nationaal paspoort"
+              "omschrijving": "Identiteitskaart"
             },
             "datum": {
               "type": "string",
@@ -124,10 +124,10 @@
       },
 
       {
-        "reisdocumentnummer": "^AAAAAAAAA$",
+        "reisdocumentnummer": "123456789",
         "soort": {
           "code": "6030",
-          "omschrijving": "Nationaal paspoort"
+          "omschrijving": "Zakenpaspoort"
         },
         "datumEindeGeldigheid": {
           "type": "string",
@@ -141,7 +141,7 @@
           },
           "aanduiding": {
             "code": "6030",
-            "omschrijving": "Nationaal paspoort"
+            "omschrijving": "Zakenpaspoort"
           },
           "inOnderzoek": {
             "datum": true,
@@ -158,7 +158,7 @@
           "opschortingBijhouding": {
             "reden": {
               "code": "6030",
-              "omschrijving": "Nationaal paspoort"
+              "omschrijving": "Zakenpaspoort"
             },
             "datum": {
               "type": "string",
@@ -185,10 +185,10 @@
       },
 
       {
-        "reisdocumentnummer": "^AAAAAAAAA$",
+        "reisdocumentnummer": "123456789",
         "soort": {
           "code": "6030",
-          "omschrijving": "Nationaal paspoort"
+          "omschrijving": "Tweede paspoort"
         },
         "datumEindeGeldigheid": {
           "type": "string",
@@ -202,7 +202,7 @@
           },
           "aanduiding": {
             "code": "6030",
-            "omschrijving": "Nationaal paspoort"
+            "omschrijving": "Tweede paspoort"
           },
           "inOnderzoek": {
             "datum": true,
@@ -219,7 +219,7 @@
           "opschortingBijhouding": {
             "reden": {
               "code": "6030",
-              "omschrijving": "Nationaal paspoort"
+              "omschrijving": "Tweede paspoort"
             },
             "datum": {
               "type": "string",
@@ -246,10 +246,10 @@
       },
 
       {
-        "reisdocumentnummer": "^AAAAAAAAA$",
+        "reisdocumentnummer": "123456789",
         "soort": {
           "code": "6030",
-          "omschrijving": "Nationaal paspoort"
+          "omschrijving": "Tweede zakenpaspoort"
         },
         "datumEindeGeldigheid": {
           "type": "string",
@@ -263,7 +263,7 @@
           },
           "aanduiding": {
             "code": "6030",
-            "omschrijving": "Nationaal paspoort"
+            "omschrijving": "Tweede zakenpaspoort"
           },
           "inOnderzoek": {
             "datum": true,
