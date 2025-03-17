@@ -4,7 +4,7 @@ from unittest.mock import ANY, patch
 from django.conf import settings
 from django.contrib.auth import signals
 from django.core import mail
-from django.test import Client, TestCase, override_settings
+from django.test import Client, TestCase, override_settings, tag
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
@@ -703,6 +703,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
 
         mock_send_confirm.assert_called_once_with("foo@example.com", ANY)
 
+    @tag("user_model_with_vestiging")
     def test_form_success_with_api_eherkenning_user(
         self, m, mock_contactmoment, mock_send_confirm
     ):
