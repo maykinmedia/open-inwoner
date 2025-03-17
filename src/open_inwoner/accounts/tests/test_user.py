@@ -135,7 +135,6 @@ class UserTests(TestCase):
         user.save()
 
     def test_eherkenning_user_requires_kvk(self):
-
         with self.assertRaises(IntegrityError):
             UserFactory(login_type=LoginTypeChoices.eherkenning, kvk="")
 
@@ -154,12 +153,10 @@ class UserTests(TestCase):
                     user.full_clean()
 
     def test_vestiging_requires_kvk(self):
-
         with self.assertRaises(IntegrityError):
             eHerkenningVestigingUserFactory(kvk="", vestiging="123456789012")
 
     def test_vestiging_can_be_empty(self):
-
         user = UserFactory(kvk="12345678", vestiging="")
         self.assertTrue(user)
 
