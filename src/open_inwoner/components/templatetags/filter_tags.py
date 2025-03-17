@@ -1,4 +1,5 @@
 from django import template
+
 from .helpers import create_content_wrapper
 
 register = template.Library()
@@ -100,7 +101,7 @@ def search_filters_mobile(
     kwargs["search_filter_tags"] = search_filter_tags
     kwargs["search_filter_organizations"] = search_filter_organizations
     kwargs["open_filter_index"] = open_filter_index
-    kwargs["append_to_checkbox_id"] = kwargs.get('append_to_checkbox_id', None)
+    kwargs["append_to_checkbox_id"] = kwargs.get("append_to_checkbox_id", None)
 
     return {**kwargs}
 
@@ -120,9 +121,9 @@ def filter(field, **kwargs):
         + index: int | The index of the current filter.
         + checkbox_as_tag: bool | Boolean indicating if the checkbox should render as a tag.
     """
-    
+
     kwargs["initial_open"] = kwargs["open_filter_index"] is kwargs["index"]
-    checkbox_as_tag = kwargs.get('checkbox_as_tag', False)
+    checkbox_as_tag = kwargs.get("checkbox_as_tag", False)
 
     return {"field": field, "checkbox_as_tag": checkbox_as_tag, **kwargs}
 
@@ -144,6 +145,6 @@ def render_filter_modal(parser, token):
     Extra context:
         - contents: string (HTML) | this is the context between the render_grid and endrender_grid tags
     """
-    return create_content_wrapper("render_filter_modal", "components/Filter/FilterModal.html")(
-        parser, token
-    )
+    return create_content_wrapper(
+        "render_filter_modal", "components/Filter/FilterModal.html"
+    )(parser, token)
