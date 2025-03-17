@@ -395,11 +395,11 @@ class SearchPagePlaywrightTests(
         dialog_modal = page.locator(".filter-modal")
         # Open modal
         _click_modal_opener()
-        expect(dialog_modal).to_have_text(".filter-modal--show")
+        expect(dialog_modal).to_be_visible()
 
         # Close modal
         _click_modal_closer()
-        expect(dialog_modal).not_to_have_text(".filter-modal--show")
+        expect(dialog_modal).not_to_be_visible()
 
     def test_search_with_filter_combinations(self):
         # NOTE it isn't great to generate query-strings outside the form but we test the form above
