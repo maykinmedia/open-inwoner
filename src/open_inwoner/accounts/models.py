@@ -340,6 +340,14 @@ class User(AbstractBaseUser, PermissionsMixin):
                 | Q(phonenumber__exact=""),
                 name="check_alternative_phonenumber_differs_from_primary_phonenumber",
             ),
+            models.CheckConstraint(
+                check=~Q(kvk__exact="", login_type=LoginTypeChoices.eherkenning),
+                name="eherkenning_user_requires_kvk",
+                violation_error_message=_(
+                    "Users with login type `eHerkenning` must have a value set "
+                    "for the kvk nummer"
+                ),
+            ),
         ]
 
     def __init__(self, *args, **kwargs):
