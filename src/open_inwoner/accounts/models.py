@@ -7,7 +7,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Q, UniqueConstraint
+from django.db.models import F, Q, UniqueConstraint
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.crypto import get_random_string
@@ -334,6 +334,11 @@ class User(AbstractBaseUser, PermissionsMixin):
             models.CheckConstraint(
                 check=~Q(phonenumber__exact="") | Q(phonenumber_alternative__exact=""),
                 name="phonenumber_alt_requires_phonenumber_primary",
+            ),
+            models.CheckConstraint(
+                check=~Q(phonenumber=F("phonenumber_alternative"))
+                | Q(phonenumber__exact=""),
+                name="check_alternative_phonenumber_differs_from_primary_phonenumber",
             ),
         ]
 
