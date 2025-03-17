@@ -101,7 +101,6 @@ def search_filters_mobile(
     kwargs["search_filter_tags"] = search_filter_tags
     kwargs["search_filter_organizations"] = search_filter_organizations
     kwargs["open_filter_index"] = open_filter_index
-    kwargs["append_to_checkbox_id"] = kwargs.get("append_to_checkbox_id", None)
 
     return {**kwargs}
 
