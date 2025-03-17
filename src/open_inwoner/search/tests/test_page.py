@@ -150,8 +150,12 @@ class SearchPageTests(ClearCachesMixin, ESMixin, WebTest):
             response = self.app.get(self.url, {"query": "content"})
 
             _assert_facet_checkbox_count(response, "tags", 0)
-            _assert_facet_checkbox_count(response, "categories", 1)
-            _assert_facet_checkbox_count(response, "organizations", 1)
+            _assert_facet_checkbox_count(
+                response, "categories", 2
+            )  # both mobile and desktop
+            _assert_facet_checkbox_count(
+                response, "organizations", 2
+            )  # both mobile and desktop
 
         with self.subTest("categories"):
             config.search_filter_tags = True
@@ -160,9 +164,11 @@ class SearchPageTests(ClearCachesMixin, ESMixin, WebTest):
             config.save()
             response = self.app.get(self.url, {"query": "content"})
 
-            _assert_facet_checkbox_count(response, "tags", 1)
+            _assert_facet_checkbox_count(response, "tags", 2)  # both mobile and desktop
             _assert_facet_checkbox_count(response, "categories", 0)
-            _assert_facet_checkbox_count(response, "organizations", 1)
+            _assert_facet_checkbox_count(
+                response, "organizations", 2
+            )  # both mobile and desktop
 
         with self.subTest("organizations"):
             config.search_filter_tags = True
@@ -171,8 +177,10 @@ class SearchPageTests(ClearCachesMixin, ESMixin, WebTest):
             config.save()
             response = self.app.get(self.url, {"query": "content"})
 
-            _assert_facet_checkbox_count(response, "tags", 1)
-            _assert_facet_checkbox_count(response, "categories", 1)
+            _assert_facet_checkbox_count(response, "tags", 2)  # both mobile and desktop
+            _assert_facet_checkbox_count(
+                response, "categories", 2
+            )  # both mobile and desktop
             _assert_facet_checkbox_count(response, "organizations", 0)
 
 
