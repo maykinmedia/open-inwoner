@@ -13,10 +13,12 @@
     {#  facets and results section #}
     <div class="grid">
         {#  start search filters #}
-        {% if paginator.count and search_filter_categories or search_filter_tags or search_filter_organizations %}
-            <aside class="grid__sidebar" aria-label="{% trans "Zoekfilters" %}">
-                {% search_filters search_form search_filter_categories search_filter_tags search_filter_organizations form_id="search-form"  %}
-            </aside>
+        {% if paginator.count %}
+            {% if search_filter_categories or search_filter_tags or search_filter_organizations %}
+                <aside class="grid__sidebar" aria-label="{% trans "Zoekfilters" %}">
+                    {% search_filters search_form search_filter_categories search_filter_tags search_filter_organizations form_id="search-form"  %}
+                </aside>
+            {% endif %}
         {% endif %}
         {#  end search filters #}
 
