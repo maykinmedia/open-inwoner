@@ -1,5 +1,6 @@
 import uuid
 
+from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -7,7 +8,6 @@ from solo.models import SingletonModel
 from zgw_consumers.constants import APITypes
 
 from .validators import validate_verwerking_header
-from django.core.validators import RegexValidator
 
 
 class HaalCentraalConfigManager(models.Manager):

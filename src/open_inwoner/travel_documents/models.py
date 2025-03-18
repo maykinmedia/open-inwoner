@@ -1,6 +1,7 @@
 from django.db import models
-from solo.models import SingletonModel
 from django.utils.translation import gettext_lazy as _
+
+from solo.models import SingletonModel
 
 
 class TravelDocumentsConfig(SingletonModel):
@@ -18,7 +19,7 @@ class TravelDocumentsConfig(SingletonModel):
         null=True,
         blank=True,
         verbose_name="Online inquiry URL",
-        help_text="Links to a page where the user can make a new online inquiry for this document.",
+        help_text="Links to a page where the user can request this document online.",
     )
     national_passport_report_missing_url = models.CharField(
         max_length=250,
@@ -48,7 +49,7 @@ class TravelDocumentsConfig(SingletonModel):
         null=True,
         blank=True,
         verbose_name="Online inquiry URL",
-        help_text="Links to a page where the user can make a new online inquiry for this document.",
+        help_text="Links to a page where the user can request this document online.",
     )
     id_card_report_missing_url = models.CharField(
         max_length=250,
@@ -78,7 +79,7 @@ class TravelDocumentsConfig(SingletonModel):
         null=True,
         blank=True,
         verbose_name="Online inquiry URL",
-        help_text="Links to a page where the user can make a new online inquiry for this document.",
+        help_text="Links to a page where the user can request this document online.",
     )
     business_passport_report_missing_url = models.CharField(
         max_length=250,
@@ -108,7 +109,7 @@ class TravelDocumentsConfig(SingletonModel):
         null=True,
         blank=True,
         verbose_name="Online inquiry URL",
-        help_text="Links to a page where the user can make a new online inquiry for this document.",
+        help_text="Links to a page where the user can request this document online.",
     )
     second_passport_report_missing_url = models.CharField(
         max_length=250,
@@ -138,7 +139,7 @@ class TravelDocumentsConfig(SingletonModel):
         null=True,
         blank=True,
         verbose_name="Online inquiry URL",
-        help_text="Links to a page where the user can make a new online inquiry for this document.",
+        help_text="Links to a page where the user can request this document online.",
     )
     second_business_passport_report_missing_url = models.CharField(
         max_length=250,

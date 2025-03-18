@@ -8,7 +8,7 @@ from glom import GlomError, glom
 from requests import RequestException
 from zgw_consumers.client import build_client
 
-from open_inwoner.haalcentraal.api_models import BRPData, BRP_Travel_Documents_Data
+from open_inwoner.haalcentraal.api_models import BRP_Travel_Documents_Data, BRPData
 from open_inwoner.haalcentraal.models import HaalCentraalConfig, ReisDocument
 from open_inwoner.utils.api import ClientError, get_json_response
 

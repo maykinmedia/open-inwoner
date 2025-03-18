@@ -25,7 +25,6 @@ from open_inwoner.cms.utils.page_display import (
     inbox_page_is_published,
 )
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.travel_documents.models import TravelDocumentsConfig
 from open_inwoner.haalcentraal.utils import fetch_brp, fetch_brp_travel_documents
 from open_inwoner.laposta.forms import NewsletterSubscriptionForm
 from open_inwoner.laposta.models import LapostaConfig
@@ -33,6 +32,7 @@ from open_inwoner.openklant.services import eSuiteKlantenService
 from open_inwoner.plans.models import Plan
 from open_inwoner.qmatic.client import NoServiceConfigured, qmatic_client_factory
 from open_inwoner.questionnaire.models import QuestionnaireStep
+from open_inwoner.travel_documents.models import TravelDocumentsConfig
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from ..forms import BrpUserForm, CategoriesForm, UserForm, UserNotificationsForm
@@ -441,7 +441,7 @@ class MyDocumentsView(LoginRequiredMixin, TemplateView):
         documents = fetch_brp_travel_documents(self.request.user.bsn)
 
         config = TravelDocumentsConfig.get_solo()
-        
+
         for doc in documents:
 
             # TODO: Try to make this code cleaner somhow:
@@ -456,13 +456,13 @@ class MyDocumentsView(LoginRequiredMixin, TemplateView):
                 doc.online_inquiry_url = config.id_card_online_inquiry_url
                 doc.report_missing_url = config.id_card_report_missing_url
                 doc.more_info_url = config.id_card_info_url
-            
+
             elif doc.description == "Zakenpaspoort":
                 doc.appointment_url = config.business_passport_appointment_url
                 doc.online_inquiry_url = config.business_passport_online_inquiry_url
                 doc.report_missing_url = config.business_passport_report_missing_url
                 doc.more_info_url = config.business_passport_info_url
-            
+
             elif doc.description == "Tweede paspoort":
                 doc.appointment_url = config.second_passport_appointment_url
                 doc.online_inquiry_url = config.second_passport_online_inquiry_url
@@ -471,8 +471,12 @@ class MyDocumentsView(LoginRequiredMixin, TemplateView):
 
             elif doc.description == "Tweede zakenpaspoort":
                 doc.appointment_url = config.second_business_passport_appointment_url
-                doc.online_inquiry_url = config.second_business_passport_online_inquiry_url
-                doc.report_missing_url = config.second_business_passport_report_missing_url
+                doc.online_inquiry_url = (
+                    config.second_business_passport_online_inquiry_url
+                )
+                doc.report_missing_url = (
+                    config.second_business_passport_report_missing_url
+                )
                 doc.more_info_url = config.second_business_passport_info_url
 
             # appointment_switcher = {

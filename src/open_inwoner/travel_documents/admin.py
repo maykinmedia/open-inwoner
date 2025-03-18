@@ -1,7 +1,9 @@
 from django.contrib import admin
-from solo.admin import SingletonModelAdmin
-from .models import TravelDocumentsConfig
 from django.utils.translation import gettext_lazy as _
+
+from solo.admin import SingletonModelAdmin
+
+from .models import TravelDocumentsConfig
 
 # Register your models here.
 
