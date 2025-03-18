@@ -8,11 +8,6 @@
         <div>{{ plan_template.goal|truncatewords:20 }}</div>
     {% endif %}
 
-    {% if plan_template.description %}
-        <div class='plan-preview__key'>{% trans "Description:" %}</div>
-        <div>{{ plan_template.description|truncatewords:10 }}</div>
-    {% endif %}
-
     {% if plan_template.file %}
         <div class='plan-preview__key'>{% trans 'Bestand' %}</div>
         <div>{% file file=plan_template.file extension=plan_template.file.extension size=plan_template.file.size show_download=False %}</div>

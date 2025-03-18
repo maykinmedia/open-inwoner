@@ -25,21 +25,23 @@ export class PlanPreview {
     modal.setCancelButtonVisibility(true)
     modal.setButtonIconCloseVisibility(true)
 
-    // Track the element that opened the modal
+    // Track element that opened the modal
     modal.openedBy = this.node
 
-    // Find the corresponding radio input
+    // Find corresponding radio input
     let radioInput = null
     let radioLabel = null
 
-    // First structure (original page)
+    // Find 'old' radio inputs structure so new and old can co-exist
+    // TODO: remove modal selectors for old way to display plan-template choices
     const templateRow = this.node.closest('.plan-template__row')
     if (templateRow) {
       radioInput = templateRow.querySelector('.radio__input')
       radioLabel = templateRow.querySelector('.radio__label')
     }
 
-    // Second structure (choice-list page)
+    // Find new radio choice-list structure
+    // TODO: remove redundant clarifications for new structure
     if (!radioInput) {
       const choiceListItem = this.node.closest('.choice-list__item')
       if (choiceListItem) {
@@ -48,14 +50,12 @@ export class PlanPreview {
       }
     }
 
-    // Get the template ID from the modalId
     const templateId = modalId.split('-')[1]
 
     // As a fallback, try to find the radio by its ID
     if (!radioInput && templateId) {
       radioInput = document.getElementById(`id_template_${templateId}`)
       if (radioInput) {
-        // Try to find the associated label
         radioLabel = document.querySelector(
           `label[for="id_template_${templateId}"]`
         )
@@ -68,12 +68,11 @@ export class PlanPreview {
       }
     }
 
-    // Find all close buttons in the modal
     const closeButtons = modalElement.querySelectorAll(
       '.modal__close, .modal__close-title'
     )
 
-    // Add event listener to all close buttons to select the radio input
+    // Event listener for all close buttons to select the radio input
     if (radioInput) {
       closeButtons.forEach((closeButton) => {
         closeButton.addEventListener(

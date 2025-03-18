@@ -6,15 +6,15 @@ from open_inwoner.plans.views import (
     PlanActionEditStatusTagView,
     PlanActionEditView,
     PlanActionHistoryView,
-    PlanCreateNoTemplateView,
-    PlanCreateWithTemplateView,
+    PlanCreateFromTemplateView,
+    PlanCreateView,
     PlanDetailView,
     PlanEditView,
     PlanExportView,
     PlanFileUploadView,
     PlanGoalEditView,
     PlanListView,
-    PlanTemplateChooseView,
+    PlanTemplateChoiceView,
 )
 
 app_name = "collaborate"
@@ -23,15 +23,22 @@ urlpatterns = [
     path("", PlanListView.as_view(), name="plan_list"),
     path(
         "choose-template/",
-        PlanTemplateChooseView.as_view(),
+        PlanTemplateChoiceView.as_view(),
         name="plan_choose_template",
     ),
-    path("create/", PlanCreateNoTemplateView.as_view(), name="plan_create_no_template"),
+    path("create/", PlanCreateView.as_view(), name="plan_create_no_template"),
+    # TODO: Replace page template of 'create/' with HTML from 'create-no-template/' and perhaps rename all to 'create/plan_create...'
+    # path("create/", PlanCreateView.as_view(), name="plan_create"),
     path(
         "create-from-template/",
-        PlanCreateWithTemplateView.as_view(),
-        name="plan_create_with_template",
+        PlanCreateFromTemplateView.as_view(),
+        name="plan_create_from_template",
     ),
+    # TODO: path(
+    #     "create-from-template/<int:template_id>/",
+    #     PlanCreateFromTemplateView.as_view(),
+    #     name="plan_create_from_template",
+    # )
     path("<uuid:uuid>/", PlanDetailView.as_view(), name="plan_detail"),
     path("<uuid:uuid>/edit/", PlanEditView.as_view(), name="plan_edit"),
     path("<uuid:uuid>/edit/goal/", PlanGoalEditView.as_view(), name="plan_edit_goal"),

@@ -233,7 +233,7 @@ class PlanDetailView(
         return context
 
 
-class PlanTemplateChooseView(
+class PlanTemplateChoiceView(
     PlanActionsEnabledMixin,
     LogMixin,
     LoginRequiredMixin,
@@ -241,7 +241,7 @@ class PlanTemplateChooseView(
     BaseBreadcrumbMixin,
     CreateView,
 ):
-    template_name = "pages/plans/choose-template.html"
+    template_name = "pages/plans/template-choice.html"
     model = Plan
     form_class = PlanForm
 
@@ -270,7 +270,7 @@ class PlanTemplateChooseView(
         return self.object.get_absolute_url()
 
 
-class PlanCreateNoTemplateView(
+class PlanCreateView(
     PlanActionsEnabledMixin,
     LogMixin,
     LoginRequiredMixin,
@@ -278,7 +278,7 @@ class PlanCreateNoTemplateView(
     BaseBreadcrumbMixin,
     CreateView,
 ):
-    template_name = "pages/plans/create-no-template.html"
+    template_name = "pages/plans/create.html"
     model = Plan
     form_class = PlanForm
 
@@ -310,7 +310,7 @@ class PlanCreateNoTemplateView(
         return self.object.get_absolute_url()
 
 
-class PlanCreateWithTemplateView(
+class PlanCreateFromTemplateView(
     PlanActionsEnabledMixin,
     LogMixin,
     LoginRequiredMixin,

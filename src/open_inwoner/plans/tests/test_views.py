@@ -47,7 +47,7 @@ class PlanViewTests(WebTest):
         self.choose_template_url = reverse("collaborate:plan_choose_template")
         # TODO: new tests for choosing template form
         self.create_url = reverse("collaborate:plan_create_no_template")
-        self.create_with_template_url = reverse("collaborate:plan_create_with_template")
+        self.create_from_template_url = reverse("collaborate:plan_create_from_template")
         # TODO: new tests for creating plan from template where Title/Goal are prefilled, but Contact/Enddate are not.
         self.detail_url = reverse(
             "collaborate:plan_detail", kwargs={"uuid": self.plan.uuid}
