@@ -7,7 +7,7 @@
 #
 #     ./bin/compile_dependencies.sh
 #
-# Any extra flags/arguments passed to this wrapper script are passed down to pip-compile.
+# Any extra flags/arguments passed to this wrapper script are passed down to uv pip compile.
 # E.g. to update a package:
 #
 #     ./bin/compile_dependencies.sh --upgrade-package django
@@ -21,13 +21,13 @@ cd $toplevel
 export CUSTOM_COMPILE_COMMAND="./bin/compile_dependencies.sh"
 
 # Base (& prod) deps
-pip-compile \
+uv pip compile --no-strip-extras \
     --no-emit-index-url \
     "$@" \
     requirements/base.in
 
 # Dependencies for testing
-pip-compile \
+uv pip compile --no-strip-extras \
     --no-emit-index-url \
     --output-file requirements/ci.txt \
     "$@" \
@@ -36,7 +36,7 @@ pip-compile \
     requirements/docs.in
 
 # Dev depedencies - exact same set as CI + some extra tooling
-pip-compile \
+uv pip compile --no-strip-extras \
     --no-emit-index-url \
     --output-file requirements/dev.txt \
     "$@" \
