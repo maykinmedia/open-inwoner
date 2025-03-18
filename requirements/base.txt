@@ -436,7 +436,7 @@ pillow==10.3.0
     #   easy-thumbnails
     #   reportlab
     #   weasyprint
-playwright==1.49.1
+playwright==1.50.0
     # via -r requirements/base.in
 prompt-toolkit==3.0.36
     # via click-repl
