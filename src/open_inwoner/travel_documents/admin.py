@@ -1,6 +1,7 @@
 from django.contrib import admin
 from solo.admin import SingletonModelAdmin
 from .models import TravelDocumentsConfig
+from django.utils.translation import gettext_lazy as _
 
 # Register your models here.
 
@@ -10,7 +11,7 @@ class TravelDocumentsConfigAdmin(SingletonModelAdmin):
 
     fieldsets = (
         (
-            "National passport options",
+            _("National passport options"),
             {
                 "fields": [
                     "national_passport_appointment_url",
@@ -21,7 +22,7 @@ class TravelDocumentsConfigAdmin(SingletonModelAdmin):
             },
         ),
         (
-            "ID-card options",
+            _("ID-card options"),
             {
                 "fields": [
                     "id_card_appointment_url",
@@ -32,7 +33,7 @@ class TravelDocumentsConfigAdmin(SingletonModelAdmin):
             },
         ),
         (
-            "Business passport options",
+            _("Business passport options"),
             {
                 "fields": [
                     "business_passport_appointment_url",
@@ -43,7 +44,7 @@ class TravelDocumentsConfigAdmin(SingletonModelAdmin):
             },
         ),
         (
-            "Second passport options",
+            _("Second passport options"),
             {
                 "fields": [
                     "second_passport_appointment_url",
@@ -54,7 +55,7 @@ class TravelDocumentsConfigAdmin(SingletonModelAdmin):
             },
         ),
         (
-            "Second business passport options",
+            _("Second business passport options"),
             {
                 "fields": [
                     "second_business_passport_appointment_url",
