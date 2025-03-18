@@ -6,6 +6,7 @@
 
 <h1 class="utrecht-heading-1">{% trans "Mijn reisdocumenten" %}</h1>
 <p class="utrecht-paragraph">{% trans "Hier kunt u uw reisdocumenten beheren." %}</p>
+
 <div class="card-container card-container--columns-3">
     {% for document in travel_documents %}
     <a class="card" href="#">
@@ -14,25 +15,34 @@
             <span class="card__text--small">{% trans "Documentnummer: " %}{{ document.reisdocumentnummer }}</span>
             <span class="card__text--small">{% trans "Verloopdatum: " %}{{ document.enddatevalid_date }}</span>
 
+            {% if document.appointment_url %}
             <span class="link link--icon link--secondary" title="{% trans "Afspraak maken" %}">
                 <span class="link__text">{% trans "Afspraak maken" %}</span>
                 {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
             </span>
+            {% endif %}
 
+            {% if document.online_inquiry_url %}
             <span class="link link--icon link--secondary" title="{% trans "Online aanvragen" %}">
                 <span class="link__text">{% trans "Online aanvragen" %}</span>
                 {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
             </span>
+            {% endif %}
 
+            {% if documents.report_missing_url %}
             <span class="link link--icon link--secondary" title="{% trans "Vermissing melden" %}">
                 <span class="link__text">{% trans "Vermissing melden" %}</span>
                 {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
             </span>
+            {% endif %}
 
+            {% if documents.more_info_url %}
             <span class="link link--icon link--secondary" title="{% trans "Meer informatie" %}">
                 <span class="link__text">{% trans "Meer informatie" %}</span>
                 {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
             </span>
+            {% endif %}
+
         </div>
     </a>
 {% endfor %}
