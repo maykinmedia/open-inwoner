@@ -81,6 +81,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-reco
 
 WORKDIR /app
 COPY ./bin/docker_start.sh /start.sh
+COPY ./bin/docker_health.sh /health.sh
 COPY ./bin/wait_for_db.sh /wait_for_db.sh
 COPY ./bin/celery_worker.sh /celery_worker.sh
 COPY ./bin/celery_beat.sh /celery_beat.sh
@@ -130,6 +131,8 @@ LABEL org.label-schema.vcs-ref=$COMMIT_HASH \
 # the image
 RUN python src/manage.py collectstatic --noinput \
     && python src/manage.py compilemessages
+
+HEALTHCHECK --interval=10s --timeout=5s CMD ["/health.sh"]
 
 EXPOSE 8000
 CMD ["/start.sh"]
