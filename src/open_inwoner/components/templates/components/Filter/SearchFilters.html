@@ -7,7 +7,7 @@
         {% if search_filter_categories and search_form.categories.field.choices|length != 0 %}
             {% filter field=search_form.categories form_id=form_id open_filter_index=open_filter_index index=0 append_to_checkbox_id='mobile' %}
         {% endif %}
-        {% if search_filter_tags and search_form.tags.field.choices|length != 0  %}
+        {% if search_filter_tags and search_form.tags.field.choices|length != 0 %}
             {% filter field=search_form.tags form_id=form_id open_filter_index=open_filter_index index=1 append_to_checkbox_id='mobile' %}
         {% endif %}
         {% if search_filter_organizations and search_form.organizations.field.choices|length != 0 %}
@@ -26,7 +26,7 @@
         {% filter field=search_form.categories form_id=form_id open_filter_index=open_filter_index index=0 checkbox_as_tag=True %}
     {% endif %}
 
-    {% if search_filter_tags and search_form.tags.field.choices|length != 0  %}
+    {% if search_filter_tags and search_form.tags.field.choices|length != 0 %}
         {% filter field=search_form.tags form_id=form_id open_filter_index=open_filter_index index=1 checkbox_as_tag=True %}
     {% endif %}
 

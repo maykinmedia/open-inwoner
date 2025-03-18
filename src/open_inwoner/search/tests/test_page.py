@@ -337,7 +337,7 @@ class SearchPagePlaywrightTests(
 
         def _click_checkbox_for_name(page=page, name=""):
             filter = page.locator(".filters--desktop").locator(".filter", has_text=name)
-            # first we need to open the list so that all the checkboxes are visible.
+            # first open the list so that all the checkboxes are visible.
             _open_filter_for_checkbox(filter)
             # our checkbox widget hides the <input> element and styles the <label> and a pseudo-element
             # this a problem for playwright accessibility, so we find the label for the checkbox and click on the label like a user would
@@ -368,7 +368,6 @@ class SearchPagePlaywrightTests(
         _test_search("Category 1", self.product1.name)
         _test_search("Category 2", self.product2.name)
 
-    # Find out how playwright can view this test on a different viewport.
     def test_search_mobile_dialog(self):
         context = self.browser.new_context()
         page = context.new_page()
