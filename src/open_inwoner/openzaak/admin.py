@@ -68,6 +68,7 @@ class OpenZaakConfigAdmin(SingletonModelAdmin):
                     "zaken_filter_enabled",
                     "use_zaak_omschrijving_as_title",
                     "order_statuses_by_date_set",
+                    "limit_user_visible_cases_to_role",
                 ),
             },
         ),

@@ -7,3 +7,7 @@ class StatusIndicators(models.TextChoices):
     warning = "warning", _("Warning")
     failure = "failure", _("Failure")
     success = "success", _("Success")
+
+
+class ZaakBetrokkeneRol(models.TextChoices):
+    initiator = "initiator", _("Initiator")
