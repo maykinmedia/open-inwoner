@@ -9,6 +9,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
 from django.views.generic import FormView
 
+from elasticsearch.exceptions import ConnectionTimeout
 from furl import furl
 
 from open_inwoner.configurations.models import SiteConfiguration
@@ -110,15 +111,27 @@ class SearchView(
                             )
 
         # perform search
-        results = search_products(query, filters=data)
+        try:
+            results = search_products(query, filters=data)
 
-        # update form fields with choices
-        for facet in results.facets:
-            if facet.name in form.fields:
-                form.fields[facet.name].choices = facet.choices()
+            # update form fields with choices
+            for facet in results.facets:
+                if facet.name in form.fields:
+                    form.fields[facet.name].choices = facet.choices()
 
-        # paginate
-        paginator_dict = self.paginate_with_context(results.results)
+            # paginate
+            paginator_dict = self.paginate_with_context(results.results)
+        except ConnectionTimeout:
+            logger.exception("Elasticsearch timeout on performing search query")
+            paginator_dict = self.paginate_with_context([])
+            messages.add_message(
+                self.request,
+                messages.ERROR,
+                _(
+                    "The search functionality is temporarily unavailable. "
+                    "Please try again at a later moment."
+                ),
+            )
 
         context.update(paginator_dict)
 
