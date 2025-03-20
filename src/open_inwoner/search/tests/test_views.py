@@ -1,9 +1,13 @@
+from unittest.mock import patch
 from urllib.parse import urlencode
 
+from django.contrib.messages import get_messages
 from django.test import TransactionTestCase, override_settings, tag
 from django.urls import reverse
+from django.utils.translation import gettext as _
 
 import requests_mock
+from elasticsearch.exceptions import ConnectionTimeout
 from furl import furl
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 
@@ -373,3 +377,22 @@ class TestSearchView(ESMixin, TransactionTestCase):
                 },
             ),
         )
+
+    @patch("open_inwoner.search.views.search_products")
+    def test_search_shows_error_on_connection_timeout(
+        self, request_mocker, mock_search
+    ):
+        mock_search.side_effect = ConnectionTimeout()
+        self.client.force_login(self.user)
+        params = urlencode({"query": "stuff"}, doseq=True)
+        response = self.client.get(f'{reverse("search:search")}?{params}')
+
+        self.assertEqual(response.status_code, 200)
+
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        expected = _(
+            "The search functionality is temporarily unavailable. "
+            "Please try again at a later moment."
+        )
+        self.assertEqual(str(messages[0]), expected)
