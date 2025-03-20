@@ -264,7 +264,7 @@ django-celery-beat==2.6.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-django-celery-monitor @ git+https://github.com/maykinmedia/django-celery-monitor@74b12529dcdd6923a4deed4c4b6fd3c9fc56eecd
+django-celery-monitor @ git+https://github.com/maykinmedia/django-celery-monitor@74b12529dcdd6923a4deed4c4b6fd3c9fc56eecd#egg=django_celery_monitor
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
