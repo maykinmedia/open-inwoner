@@ -373,11 +373,12 @@ Wanneer u op het hamburgermenu klikt krijgt u de mogelijkheid de plugins te knip
    :alt: CMS dashboard
    :width: 600px
 
-| **Markeren**
-| Wanneer u op markeren klikt wordt de betreffende plugin op de pagina weergegeven met een blauw kader. Zo weet u precies welk element op de pagina met de betreffende plugin wordt bedoeld.
+**Markeren**
+Wanneer u op markeren klikt wordt de betreffende plugin op de pagina weergegeven met een blauw kader. Zo weet u precies welk element op de pagina met de betreffende plugin wordt bedoeld.
 
-| **Creëer alias**
-| Door een alias te creëren kunt u content hergebruiken op verschillende pagina’s en deze op één plek beheren. Wanneer hergebruikte content op één plek wordt gewijzigd, wordt dit door de alias ook op de andere plekken gewijzigd.
+
+**Creëer alias**
+Door een alias te creëren kunt u content hergebruiken op verschillende pagina’s en deze op één plek beheren. Wanneer hergebruikte content op één plek wordt gewijzigd, wordt dit door de alias ook op de andere plekken gewijzigd.
 
 11.2.9. Footer aanpassen via CMS
 --------------------------------
@@ -388,28 +389,32 @@ De footer van Open Inwoner kan worden aangepast via het Django CMS. Dit doet u d
    :alt: CMS dashboard
    :width: 600px
 
-| **Footer plugins**
-| De footer bevat diverse soorten plugins: link, paginalijst of tekst. In het bovenstaande screenshot bevat de linker kolom uit tekst en de rechter kolom uit de paginalijst. Dit zijn de platte pagina’s die in de via de backend geconfigureerd zijn.
+**Footer plugins**
+De footer bevat diverse soorten plugins: link, paginalijst of tekst. In het bovenstaande screenshot bevat de linker kolom uit tekst en de rechter kolom uit de paginalijst. Dit zijn de platte pagina’s die in de via de backend geconfigureerd zijn.
 
-| **Footertekst wijzigen**
-| Wanneer u aangegeven heeft dat een plugin tekst moet bevatten kunt u de tekst aanpassen door op het uitvouwmenu [Tekst] te klikken en op het potloodicoontje klikken. U krijgt dan een pop-up editor in beeld waar u de tekst kunt opmaken en aanpassen, zoals in het volgende screenshot is weergegeven. Scheid de diverse onderdelen met een enter. Zo maakt u nieuwe ‘blokken’ in de footer. U kunt de tekst geheel naar wens aanpassen en opmaken. Er kunnen ook links worden ingevoegd. Klik op [opslaan] wanneer u klaar bent met wijzigen.
+
+**Footertekst wijzigen**
+Wanneer u aangegeven heeft dat een plugin tekst moet bevatten kunt u de tekst aanpassen door op het uitvouwmenu [Tekst] te klikken en op het potloodicoontje klikken. U krijgt dan een pop-up editor in beeld waar u de tekst kunt opmaken en aanpassen, zoals in het volgende screenshot is weergegeven. Scheid de diverse onderdelen met een enter. Zo maakt u nieuwe ‘blokken’ in de footer. U kunt de tekst geheel naar wens aanpassen en opmaken. Er kunnen ook links worden ingevoegd. Klik op [opslaan] wanneer u klaar bent met wijzigen.
+
 
 .. image:: images/image110.png
    :alt: CMS dashboard
    :width: 600px
 
-| **Extra plugin toevoegen aan footer**
-| Wanneer er in een kolom van de footer nog een extra plugin gewenst is, kunt u een extra plugin toevoegen door op de betreffende kolom van de footer op [+] te klikken. U krijgt dat wederom de pop-up met de keuzemogelijkheden voor de betreffende plugin. Zo kunt u bijvoorbeeld tekst met de paginalijst combineren etc. Wanneer u meerdere elementen in de footer heeft, kunt u deze slepen en angschikken op gewenste volgorde.
+**Extra plugin toevoegen aan footer**
+Wanneer er in een kolom van de footer nog een extra plugin gewenst is, kunt u een extra plugin toevoegen door op de betreffende kolom van de footer op [+] te klikken. U krijgt dat wederom de pop-up met de keuzemogelijkheden voor de betreffende plugin. Zo kunt u bijvoorbeeld tekst met de paginalijst combineren etc. Wanneer u meerdere elementen in de footer heeft, kunt u deze slepen en angschikken op gewenste volgorde.
 
-| **Footer link invoegen**
-| U kunt in de footer ook een link invoegen. Wanneer u kiest voor de link plugin krijgt u een pop-up scherm waarin u diverse gegevens kunt invoeren. U kunt kiezen voor een interne of externe link. Voer bij externe link de URL in en voer bij “Linktekst” de tekst die u voor deze link wilt gebruiken in. Kiest u voor een interne link, dan kunt u een van de pagina’s van de Open Inwoner omgeving selecteren in het dropdown menu. In het linker dropdown menu kiest u de website en bij het rechter menu de specifieke pagina.
+
+**Footer link invoegen**
+U kunt in de footer ook een link invoegen. Wanneer u kiest voor de link plugin krijgt u een pop-up scherm waarin u diverse gegevens kunt invoeren. U kunt kiezen voor een interne of externe link. Voer bij externe link de URL in en voer bij “Linktekst” de tekst die u voor deze link wilt gebruiken in. Kiest u voor een interne link, dan kunt u een van de pagina’s van de Open Inwoner omgeving selecteren in het dropdown menu. In het linker dropdown menu kiest u de website en bij het rechter menu de specifieke pagina.
+
 
 .. image:: images/image111.png
    :alt: CMS dashboard
    :width: 600px
 
-| **Paginalijst invoegen**
-| Wanneer u de paginalijst in de footer wilt weergeven, selecteert u deze plugin. Het gaat in dit geval om de platte pagina’s zoals deze in de backend onder “Configuratie” als platte pagina’s zijn gedefinieerd. Wijzigingen aan deze lijst kunt u aanbrengen via de backend. Zie hoofdstuk 12.4.
+**Paginalijst invoegen**
+Wanneer u de paginalijst in de footer wilt weergeven, selecteert u deze plugin. Het gaat in dit geval om de platte pagina’s zoals deze in de backend onder “Configuratie” als platte pagina’s zijn gedefinieerd. Wijzigingen aan deze lijst kunt u aanbrengen via de backend. Zie hoofdstuk 12.4.
 
 
 11.2.10. Contactformulier aanpassen via CMS
