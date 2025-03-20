@@ -99,8 +99,10 @@ class PlanListView(
 
     @cached_property
     def crumbs(self):
+        current_page = self.request.current_page
+        title = current_page.get_title() if current_page else _("Samenwerken")
         return [
-            (_("Samenwerken"), reverse("collaborate:plan_list")),
+            (title, reverse("collaborate:plan_list")),
         ]
 
     def get_queryset(self):
