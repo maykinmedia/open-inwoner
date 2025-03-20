@@ -245,7 +245,8 @@ class NecessaryUserForm(ErrorMessageMixin, forms.ModelForm):
             del self.fields["case_notification_channel"]
 
         if (
-            user.login_type != LoginTypeChoices.digid
+            user.login_type
+            not in [LoginTypeChoices.digid, LoginTypeChoices.eherkenning]
             or not config.notifications_cases_enabled
             or not case_page_is_published()
         ):
@@ -380,7 +381,8 @@ class UserNotificationsForm(forms.ModelForm):
         if (
             not siteconfig.notifications_cases_enabled
             or not case_page_is_published()
-            or user.login_type != LoginTypeChoices.digid
+            or user.login_type
+            not in [LoginTypeChoices.digid, LoginTypeChoices.eherkenning]
         ):
             del self.fields["cases_notifications"]
 
