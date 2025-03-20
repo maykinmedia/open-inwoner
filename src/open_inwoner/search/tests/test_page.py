@@ -148,8 +148,12 @@ class SearchPageTests(ClearCachesMixin, ESMixin, WebTest):
             response = self.app.get(self.url, {"query": "content"})
 
             _assert_facet_checkbox_count(response, "tags", 0)
-            _assert_facet_checkbox_count(response, "categories", 1)
-            _assert_facet_checkbox_count(response, "organizations", 1)
+            _assert_facet_checkbox_count(
+                response, "categories", 2
+            )  # both mobile and desktop
+            _assert_facet_checkbox_count(
+                response, "organizations", 2
+            )  # both mobile and desktop
 
         with self.subTest("categories"):
             config.search_filter_tags = True
@@ -158,9 +162,11 @@ class SearchPageTests(ClearCachesMixin, ESMixin, WebTest):
             config.save()
             response = self.app.get(self.url, {"query": "content"})
 
-            _assert_facet_checkbox_count(response, "tags", 1)
+            _assert_facet_checkbox_count(response, "tags", 2)  # both mobile and desktop
             _assert_facet_checkbox_count(response, "categories", 0)
-            _assert_facet_checkbox_count(response, "organizations", 1)
+            _assert_facet_checkbox_count(
+                response, "organizations", 2
+            )  # both mobile and desktop
 
         with self.subTest("organizations"):
             config.search_filter_tags = True
@@ -169,8 +175,10 @@ class SearchPageTests(ClearCachesMixin, ESMixin, WebTest):
             config.save()
             response = self.app.get(self.url, {"query": "content"})
 
-            _assert_facet_checkbox_count(response, "tags", 1)
-            _assert_facet_checkbox_count(response, "categories", 1)
+            _assert_facet_checkbox_count(response, "tags", 2)  # both mobile and desktop
+            _assert_facet_checkbox_count(
+                response, "categories", 2
+            )  # both mobile and desktop
             _assert_facet_checkbox_count(response, "organizations", 0)
 
 
@@ -294,26 +302,60 @@ class SearchPagePlaywrightTests(
         # check if we see all checkboxes
         for facet in FacetChoices.values:
             # tags, organizations, categories
-            controls = page.locator(f"input[form='search-form'][name='{facet}']")
-            expect(controls).to_have_count(2)
-            for checkbox in controls.all():
+            mobile_controls = page.locator(".filters--desktop").locator(
+                f"input[form='search-form'][name='{facet}']"
+            )
+            expect(mobile_controls).to_have_count(2)  # only controls on desktop
+
+            # Check desktop controls.
+            for checkbox in mobile_controls.all():
                 # the input elements are hidden for styling so just test for enabled
                 expect(checkbox).to_be_enabled()
                 expect(checkbox).not_to_be_checked()
 
-        def _click_checkbox_for_name(page, name):
+            # Check mobile controls
+            mobile_controls = page.locator(".filters--mobile").locator(
+                f"input[form='search-form'][name='{facet}']"
+            )
+            expect(mobile_controls).to_have_count(2)  # only controls on desktop
+
+            # Check desktop controls.
+            for checkbox in mobile_controls.all():
+                # the input elements are hidden for styling so just test for enabled
+                expect(checkbox).not_to_be_enabled()
+                expect(checkbox).not_to_be_checked()
+
+        def _open_filter_for_checkbox(filter):
+            filter_button = filter.locator(".filter__opener")
+
+            # Check if filter is not open yet.
+            if filter_button.get_attribute("aria-expanded") != "true":
+                filter_button.click()
+
+            # Filter should be open.
+            expect(filter_button).to_have_attribute("aria-expanded", "true")
+
+        def _click_checkbox_for_name(page=page, name=""):
+            filter = page.locator(".filters--desktop").locator(".filter", has_text=name)
+            # first open the list so that all the checkboxes are visible.
+            _open_filter_for_checkbox(filter)
             # our checkbox widget hides the <input> element and styles the <label> and a pseudo-element
             # this a problem for playwright accessibility, so we find the label for the checkbox and click on the label like a user would
-            page.locator(".checkbox").filter(
-                has=page.get_by_role("checkbox", name=name)
-            ).locator("label").click()
+            checkbox = filter.locator(".checkbox", has_text=name)
+            checkbox.locator(".checkbox__label").click()
+            # The checkbox should be checked immediately
+            expect(checkbox.locator(".checkbox__input")).to_be_checked()
 
         def _test_search(checkbox_name, expected_text):
             page.goto(self.live_reverse("search:search", params={"query": "summary"}))
             _click_checkbox_for_name(page, checkbox_name)
             page.wait_for_url(self.live_reverse("search:search", star=True))
             # is our box checked in response
-            expect(page.get_by_role("checkbox", name=checkbox_name)).to_be_checked()
+            expect(
+                page.locator(".filters--desktop")
+                .locator(".checkbox", has_text=checkbox_name)
+                .locator(".checkbox__input")
+            ).to_be_checked()
             # implies one exact result
             expect(page.locator(".search-results__item-title")).to_have_text(
                 expected_text
@@ -325,6 +367,38 @@ class SearchPagePlaywrightTests(
         _test_search("Organization 2", self.product2.name)
         _test_search("Category 1", self.product1.name)
         _test_search("Category 2", self.product2.name)
+
+    def test_search_mobile_dialog(self):
+        context = self.browser.new_context()
+        page = context.new_page()
+        page.set_viewport_size(
+            {
+                "width": 500,
+                "height": 480,
+            }
+        )
+        page.goto(self.live_reverse("search:search", params={"query": "summary"}))
+
+        def _click_modal_opener():
+            dialog_opener = page.locator(".show-modal")
+            dialog_opener.click()
+
+        def _click_modal_closer():
+            dialog_closer = page.locator(".filter-modal__close")
+            dialog_closer.click()
+
+        # search to find both products
+        page.goto(self.live_reverse("search:search", params={"query": "summary"}))
+        page.wait_for_url(self.live_reverse("search:search", star=True))
+
+        dialog_modal = page.locator(".filter-modal")
+        # Open modal
+        _click_modal_opener()
+        expect(dialog_modal).to_be_visible()
+
+        # Close modal
+        _click_modal_closer()
+        expect(dialog_modal).not_to_be_visible()
 
     def test_search_with_filter_combinations(self):
         # NOTE it isn't great to generate query-strings outside the form but we test the form above

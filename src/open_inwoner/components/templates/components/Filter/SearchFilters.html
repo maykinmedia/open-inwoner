@@ -1,0 +1,36 @@
+{% load i18n icon_tags button_tags form_tags filter_tags utils %}
+
+
+{# Mobile search filters - inside modal #}
+<div class="filters filters--mobile">
+    {% render_filter_modal %}
+        {% if search_filter_categories and search_form.categories.field.choices|length != 0 %}
+            {% filter field=search_form.categories form_id=form_id open_filter_index=open_filter_index index=0 append_to_checkbox_id='mobile' %}
+        {% endif %}
+        {% if search_filter_tags and search_form.tags.field.choices|length != 0 %}
+            {% filter field=search_form.tags form_id=form_id open_filter_index=open_filter_index index=1 append_to_checkbox_id='mobile' %}
+        {% endif %}
+        {% if search_filter_organizations and search_form.organizations.field.choices|length != 0 %}
+            {% filter field=search_form.organizations form_id=form_id open_filter_index=open_filter_index index=2 append_to_checkbox_id='mobile' %}
+        {% endif %}
+    {% endrender_filter_modal %}
+</div>
+
+{# Desktop search filters #}
+<div class="filters filters--desktop">
+    <div class="filters__reset">
+        {% button transparent=True type='button' inline=True text=_('Wis alle?') extra_classes='filters__reset-btn filter__reset' %}
+    </div>
+
+    {% if search_filter_categories and search_form.categories.field.choices|length != 0 %}
+        {% filter field=search_form.categories form_id=form_id open_filter_index=open_filter_index index=0 checkbox_as_tag=True %}
+    {% endif %}
+
+    {% if search_filter_tags and search_form.tags.field.choices|length != 0 %}
+        {% filter field=search_form.tags form_id=form_id open_filter_index=open_filter_index index=1 checkbox_as_tag=True %}
+    {% endif %}
+
+    {% if search_filter_organizations and search_form.organizations.field.choices|length != 0 %}
+        {% filter field=search_form.organizations form_id=form_id open_filter_index=open_filter_index index=2 checkbox_as_tag=True %}
+    {% endif %}
+</div>
