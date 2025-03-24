@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import date, timedelta
 from io import BytesIO
 
 from django import forms
@@ -59,6 +59,7 @@ class PlanForm(forms.ModelForm):
         goal = cleaned_data.get("goal")
         template = cleaned_data.get("template")
         plan_contacts = cleaned_data.get("plan_contacts")
+        end_date = cleaned_data.get("end_date")
 
         if not plan_contacts or (
             plan_contacts and not plan_contacts.exclude(pk=self.user.pk)
@@ -70,6 +71,27 @@ class PlanForm(forms.ModelForm):
             self.add_error(
                 "goal", _("This field is required when not using a template")
             )
+
+        # Verify that the selected end date of the plan does not precede the
+        # would-be dates of the actions in the selected template (if any)
+        if template and end_date:
+            template_row = PlanTemplate.objects.get(id=template.id)
+
+            actionTemplates = template_row.actiontemplates.all()
+
+            if actionTemplates:
+                latest_end_in_days = max([a.end_in_days for a in actionTemplates])
+
+                today = date.today()
+                actions_end_date = today + timedelta(days=latest_end_in_days)
+
+                if end_date < actions_end_date:
+                    self.add_error(
+                        "end_date",
+                        _(
+                            "The end date of the plan cannot precede the end dates of the actions in the selected template."
+                        ),
+                    )
 
     def clean_plan_contacts(self):
         # Make sure current user exists in plan_contacts when editing form

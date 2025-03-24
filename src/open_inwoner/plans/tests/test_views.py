@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 from unittest.mock import Mock, patch
 
 from django.contrib.messages import get_messages
@@ -440,11 +440,19 @@ class PlanViewTests(WebTest):
     def test_plan_create_plan_with_template_and_actions(self):
         plan_template = PlanTemplateFactory(file=None)
         ActionTemplateFactory(plan_template=plan_template)
+
+        # Necessary to make sure the end date of the actions
+        # is before the end date of the plan itself
+        for actionTemplate in plan_template.actiontemplates.all():
+            actionTemplate.end_in_days = 7
+            actionTemplate.save()
+
         self.assertEqual(Plan.objects.count(), 1)
         response = self.app.get(self.create_url, user=self.user)
         form = response.forms["plan-form"]
         form["title"] = "Plan"
-        form["end_date"] = "2022-01-01"
+        today = date.today()
+        form["end_date"] = today + timedelta(days=10)
         form["plan_contacts"] = [self.contact.pk]
         form["template"] = plan_template.pk
         response = form.submit().follow()
@@ -482,6 +490,38 @@ class PlanViewTests(WebTest):
         # NOTE: custom widget ID hardcoded on index of choice
         elem = response.pyquery("#id_plan_contacts_1")[0]
         self.assertEqual(elem.attrib.get("checked"), "checked")
+
+    def test_plan_create_plan_end_date_cannot_precede_action_end_dates(self):
+        plan_template = PlanTemplateFactory(file=None)
+        ActionTemplateFactory(plan_template=plan_template)
+        # make sure we have only one plan
+        self.assertEqual(Plan.objects.count(), 1)
+
+        # Purposely make the dates of the actions much higher
+        #  than the date of the plan
+        for actionTemplate in plan_template.actiontemplates.all():
+            actionTemplate.end_in_days = 10000
+            actionTemplate.save()
+
+        response = self.app.get(self.create_url, user=self.user)
+        form = response.forms["plan-form"]
+        form["title"] = "Plan"
+        form["end_date"] = "2025-02-23"
+        form["plan_contacts"] = [self.contact.pk]
+        form["template"] = plan_template.pk
+        response = form.submit()
+        self.assertEqual(response.status_code, 200)
+
+        # Confirm the mistake was caught
+        self.assertContains(
+            response,
+            _(
+                "The end date of the plan cannot precede the end dates of the actions in the selected template."
+            ),
+        )
+
+        # nothing was created
+        self.assertEqual(Plan.objects.count(), 1)
 
     def test_plan_create_contains_contact_create_link_when_no_contacts_exist(self):
         self.user.user_contacts.remove(self.contact)
