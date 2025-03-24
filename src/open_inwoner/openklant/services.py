@@ -135,16 +135,11 @@ class KlantenService(Protocol):
             if config.use_rsin_for_innNnpId_query_parameter:
                 kvk_or_rsin = user.rsin
 
-            if use_vestigingsnummer:
-                if not (session := getattr(request, "session", None)):
-                    raise ValueError("`request` does not contain a session")
-
-                vestigingsnummer = get_kvk_branch_number(session)
-                if vestigingsnummer:
-                    return {
-                        "user_kvk_or_rsin": kvk_or_rsin,
-                        "vestigingsnummer": vestigingsnummer,
-                    }
+            if use_vestigingsnummer and user.vestiging:
+                return {
+                    "user_kvk_or_rsin": kvk_or_rsin,
+                    "vestigingsnummer": user.vestiging,
+                }
 
             return {"user_kvk_or_rsin": kvk_or_rsin}
 
