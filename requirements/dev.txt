@@ -39,6 +39,11 @@ astroid==2.15.8
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   pylint
+async-timeout==4.0.3
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   redis
 attrs==21.2.0
     # via
     #   -c requirements/ci.txt
@@ -274,6 +279,7 @@ django==4.2.20
     #   mozilla-django-oidc-db
     #   notifications-api-common
     #   sentry-sdk
+    #   objects-api-client-django
     #   zgw-consumers
     #   zgw-consumers-oas
 django-admin-index==3.1.0
@@ -503,6 +509,7 @@ django-solo==2.2.0
     #   django-open-forms-client
     #   mozilla-django-oidc-db
     #   notifications-api-common
+    #   objects-api-client-django
     #   zgw-consumers
 django-timeline-logger==4.0.0
     # via
@@ -870,6 +877,10 @@ oath==1.4.4
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+objects-api-client-django @ git+https://github.com/maykinmedia/objects-api-client-django.git
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 odfpy==1.4.1
     # via
     #   -c requirements/ci.txt
@@ -1128,6 +1139,7 @@ requests==2.31.0
     #   maykin-python3-saml
     #   messagebird
     #   mozilla-django-oidc
+    #   objects-api-client-django
     #   requests-mock
     #   sphinx
     #   zgw-consumers
@@ -1407,6 +1419,7 @@ zgw-consumers==0.36.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   notifications-api-common
+    #   objects-api-client-django
 zgw-consumers-oas==1.0.0
     # via
     #   -c requirements/ci.txt
