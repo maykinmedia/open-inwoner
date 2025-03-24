@@ -58,7 +58,7 @@ def get_rendered_content(content: str) -> str:
                 icon.attrs.update(
                     {
                         "aria-hidden": "true",
-                        "class": "material-icons text-decoration-none",
+                        "class": "material-icons",
                     }
                 )
                 icon.append("open_in_new")
