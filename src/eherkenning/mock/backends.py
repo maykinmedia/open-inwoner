@@ -6,6 +6,8 @@ from django.contrib.auth import get_user_model
 from digid_eherkenning.backends import BaseBackend
 from digid_eherkenning.utils import get_client_ip
 
+from open_inwoner.accounts.eherkenning_session import EHerkenningSessionContext
+
 logger = logging.getLogger(__name__)
 
 UserModel = get_user_model()
@@ -22,6 +24,14 @@ class eHerkenningBackend(BaseBackend):
         }
     )
 
+    def _persist_eherkenning_params_to_session(self, request, user):
+        session_context = EHerkenningSessionContext(request)
+        session_context.persist_eherkenning_state_for_user(
+            user=user,
+            is_branch_restricted=bool(user.vestiging),
+            initial_branch_selection_done=False,
+        )
+
     def get_or_create_user(self, request, kvk):
         created = False
         try:
@@ -37,6 +47,7 @@ class eHerkenningBackend(BaseBackend):
             "service": self.service_name,
         }
 
+        self._persist_eherkenning_params_to_session(request, user)
         self.log_success(request, success_message)
 
         return user, created

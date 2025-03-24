@@ -158,10 +158,9 @@ class PasswordLoginViewTests(eHerkenningMockTestCase):
         self.assertRedirects(response, reverse("profile:registration_necessary"))
 
         # check user kvk
-        User = get_user_model()
-        self.assertEqual(
-            response.context["user"].kvk, User.eherkenning_objects.get().kvk
-        )
+        created_user = response.context["user"]
+        self.assertEqual(created_user.kvk, "29664887")
+        self.assertEqual(created_user.vestiging, "1234")
 
     @patch("open_inwoner.accounts.signals.KvKClient.get_basisprofiel", autospec=True)
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
