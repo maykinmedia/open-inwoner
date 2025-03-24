@@ -4,7 +4,7 @@ from digid_eherkenning.backends import eHerkenningBackend as _eHerkenningBackend
 from digid_eherkenning.exceptions import eHerkenningError
 from digid_eherkenning.utils import get_client_ip
 
-from open_inwoner.kvk.branches import KVK_BRANCH_SESSION_VARIABLE
+from open_inwoner.accounts.eherkenning_session import EHerkenningSessionContext
 
 UserModel = get_user_model()
 
@@ -13,6 +13,14 @@ class eHerkenningBackend(_eHerkenningBackend):
     """
     Custom backend to identify users based on the KvK number instead of RSIN
     """
+
+    def _persist_eherkenning_params_to_session(self, request, user):
+        session_context = EHerkenningSessionContext(request)
+        session_context.persist_eherkenning_state_for_user(
+            user=user,
+            is_branch_restricted=bool(user.vestiging),
+            initial_branch_selection_done=False,
+        )
 
     def get_company_branch_number(self, attributes):
         company_branch_number = attributes.get(
@@ -27,16 +35,20 @@ class eHerkenningBackend(_eHerkenningBackend):
                 "Login failed due to no KvK being returned by eHerkenning."
             )
 
+        vestigingsnummer = self.get_company_branch_number(saml_attributes)
+
         created = False
         try:
-            user = UserModel.eherkenning_objects.get_by_kvk(kvk)
+            user = UserModel.eherkenning_objects.get_by_kvk_and_vestiging(
+                kvk=kvk, vestiging=vestigingsnummer
+            )
         except UserModel.DoesNotExist:
-            user = UserModel.eherkenning_objects.create(kvk=kvk)
+            user = UserModel.eherkenning_objects.create(
+                kvk=kvk, vestiging=vestigingsnummer
+            )
             created = True
 
-        if vestigingsnummer := self.get_company_branch_number(saml_attributes):
-            self.request.session[KVK_BRANCH_SESSION_VARIABLE] = vestigingsnummer
-            self.request.session.save()
+        self._persist_eherkenning_params_to_session(request, user)
 
         success_message = self.error_messages["login_success"] % {
             "user": str(user),
