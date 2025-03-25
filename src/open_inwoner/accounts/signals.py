@@ -62,7 +62,7 @@ def update_user_on_login(sender, user, request, *args, **kwargs):
 def _update_user_from_openklant2(
     user: User, service: OpenKlant2Service, request: None = None
 ) -> None:
-    if fetch_params := service.get_fetch_parameters(request=request):
+    if fetch_params := service.get_fetch_parameters(user):
         partij, created = service.get_or_create_partij_for_user(
             fetch_params=fetch_params, user=user
         )
@@ -73,7 +73,7 @@ def _update_user_from_openklant2(
 def _update_user_from_esuite(
     user: User, service: eSuiteKlantenService, request: None = None
 ) -> None:
-    if not (fetch_params := service.get_fetch_parameters(request=request)):
+    if not (fetch_params := service.get_fetch_parameters(user)):
         return
 
     klant, created = service.get_or_create_klant(fetch_params=fetch_params, user=user)

@@ -255,9 +255,7 @@ class EditProfileView(
             logger.warning("eSuiteKlantenService failed to build")
             return
 
-        if fetch_params := service.get_fetch_parameters(
-            request=self.request, user=user
-        ):
+        if fetch_params := service.get_fetch_parameters(user):
             klant, created = service.get_or_create_klant(
                 fetch_params=fetch_params, user=user
             )
@@ -384,9 +382,7 @@ class MyNotificationsView(
             logger.warning("eSuiteKlantenService failed to build")
             return
 
-        if fetch_params := service.get_fetch_parameters(
-            request=self.request, user=user
-        ):
+        if fetch_params := service.get_fetch_parameters(user):
             klant, created = service.get_or_create_klant(
                 fetch_params=fetch_params, user=user
             )

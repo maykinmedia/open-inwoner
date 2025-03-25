@@ -9,7 +9,7 @@ class MockOpenKlant2Service:
     def __init__(self):
         self.service_type = KlantenServiceType.OPENKLANT2
 
-    def get_fetch_parameters(self, request=None, user=None, use_vestigingsnummer=False):
+    def get_fetch_parameters(self, user=None):
         return {"user_bsn": "123456789"}
 
     def get_or_create_partij_for_user(self, fetch_params=None, user=None):
