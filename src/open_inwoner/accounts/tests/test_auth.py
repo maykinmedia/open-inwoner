@@ -590,7 +590,9 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
 
     @patch("open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo")
     @patch("open_inwoner.configurations.models.SiteConfiguration.get_solo")
-    def test_registration_page_eherkenning(self, mock_solo, mock_eherkenning_config):
+    def test_registration_page_shows_link_to_configured_eherkenning_backend(
+        self, mock_solo, mock_eherkenning_config
+    ):
         mock_solo.return_value.eherkenning_enabled = True
         mock_solo.return_value.login_allow_registration = False
 
@@ -621,7 +623,9 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
                 )
 
     @patch("open_inwoner.configurations.models.SiteConfiguration.get_solo")
-    def test_registration_page_eherkenning_with_invite(self, mock_solo):
+    def test_registration_page_eherkenning_with_invite_includes_invite_key_in_next_url(
+        self, mock_solo
+    ):
         mock_solo.return_value.eherkenning_enabled = True
         mock_solo.return_value.login_allow_registration = False
 
