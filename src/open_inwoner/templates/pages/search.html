@@ -43,7 +43,7 @@
 
             {% if paginator.count and not messages %}
                 {% render_grid %}
-                    {% render_column start=1 span=6 %}
+                    {% render_column start=1 span=7 %}
                         <section class="feedback" aria-label="{% trans "Pagina feedback" %}">
                             <h2 class="utrecht-heading-2">{% trans "Heeft u gevonden wat u zocht?" %}</h2>
                             {% render_form form=feedback_form method="POST" form_action=request.get_full_path id="feedback_form" show_notifications=True %}
@@ -75,9 +75,6 @@
                                         <label class="label">
                                             <span class="feedback__label-text utrecht-paragraph"></span>
                                             {{ feedback_form.remark|addclass:"textarea" }}
-                                            {% if feedback_form.remark.errors %}
-                                                {% errors errors=feedback_form.remark.errors %}
-                                            {% endif %}
                                         </label>
                                     </div>
                                     <div class="feedback__submit">

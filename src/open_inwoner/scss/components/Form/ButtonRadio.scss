@@ -4,7 +4,8 @@
     position: absolute;
     z-index: -1;
 
-    &:focus ~ .button-radio__button {
+    &:focus ~ .button-radio__button,
+    &:focus-visible ~ .button-radio__button {
       outline: var(--focus-border-width) var(--focus-border-style)
         var(--color-primary-lighter);
     }
@@ -20,7 +21,9 @@
         border: var(--border-width-thin) solid var(--color-error-darker);
         color: var(--color-error-darker);
         cursor: default;
-        outline: 1px solid var(--color-primary-lighter);
+        outline: var(--focus-border-width) var(--focus-border-style)
+          var(--color-error-darker);
+        outline-offset: var(--spacing-tiny);
       }
     }
 
@@ -30,7 +33,9 @@
         border: var(--border-width-thin) solid var(--color-success);
         color: var(--color-success);
         cursor: default;
-        outline: 1px solid var(--color-primary-lighter);
+        outline: var(--focus-border-width) var(--focus-border-style)
+          var(--color-success);
+        outline-offset: var(--spacing-tiny);
       }
     }
   }
@@ -54,6 +59,10 @@
     &[for='positive'] {
       border-top-left-radius: var(--border-radius);
       border-bottom-left-radius: var(--border-radius);
+    }
+
+    &:hover {
+      transform: translateY(-1px);
     }
   }
 
