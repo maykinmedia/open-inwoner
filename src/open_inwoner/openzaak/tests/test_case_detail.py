@@ -3,7 +3,7 @@ from unittest.mock import Mock, patch
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.test import RequestFactory
+from django.test import RequestFactory, tag
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -1522,6 +1522,7 @@ class TestCaseDetailView(
                 self.assertContains(response, "ZAAK-2022-0000000025")
                 self.assertContains(response, "Coffee zaaktype")
 
+    @tag("user_model_with_vestiging")
     @set_kvk_branch_number_in_session("1234")
     @patch.object(
         eSuiteVragenService,
@@ -1797,6 +1798,7 @@ class TestCaseDetailView(
                     response, _("Sorry, you don't have access to this page (403)")
                 )
 
+    @tag("user_model_with_vestiging")
     @set_kvk_branch_number_in_session(value=None)
     def test_no_access_if_fetch_eherkenning_zaken_with_rsin_and_user_has_no_rsin(
         self, m
