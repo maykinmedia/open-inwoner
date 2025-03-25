@@ -19,3 +19,7 @@ class ZaakTitleDisplayChoices(models.TextChoices):
     zaaktype_onderwerp = "zaaktype_onderwerp", _(
         "The subject of the case's type (`zaaktype.onderwerp`)"
     )
+
+
+class ZaakBetrokkeneRol(models.TextChoices):
+    initiator = "initiator", _("Initiator")
