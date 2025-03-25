@@ -200,7 +200,7 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
         user = self.request.user
 
         partij, created = self.vragen_service.get_or_create_partij_for_user(
-            fetch_params=self.vragen_service.get_fetch_parameters(user=user),
+            fetch_params=self.vragen_service.get_fetch_parameters(user),
             user=user,
         )
 
@@ -257,7 +257,7 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
             return
 
         klant = self.klanten_client.retrieve_klant(
-            **self.vragen_service.get_fetch_parameters(self.request)
+            **self.vragen_service.get_fetch_parameters(self.request.user)
         )
 
         self.log_system_action("retrieved klant for BSN or KVK user", user=user)

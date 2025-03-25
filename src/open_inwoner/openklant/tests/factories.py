@@ -29,6 +29,22 @@ class KlantContactMomentAnswerFactory(factory.django.DjangoModelFactory):
     user = factory.SubFactory(UserFactory)
 
 
+class ESuiteConfigFactory(factory.django.DjangoModelFactory):
+    klanten_service = factory.SubFactory(
+        factory=ServiceFactory,
+        api_root="http://esuite-klanten-service.nl",
+        api_type=APITypes.kc,
+    )
+    contactmomenten_service = factory.SubFactory(
+        factory=ServiceFactory,
+        api_root="http://esuite-contactmomenten-service.nl",
+        api_type=APITypes.cmc,
+    )
+
+    class Meta:
+        model = "openklant.ESuiteKlantConfig"
+
+
 class OpenKlant2ConfigFactory(factory.django.DjangoModelFactory):
     service = factory.SubFactory(
         ServiceFactory,
