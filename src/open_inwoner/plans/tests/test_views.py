@@ -357,7 +357,7 @@ class PlanViewTests(WebTest):
         self.user.user_contacts.add(another_contact)
         response = self.app.get(self.create_url, user=self.user)
 
-        rendered_contacts = response.pyquery("#plan-form .grid .form__grid-box")[
+        rendered_contacts = response.pyquery("#plan-form .form__grid-box")[
             0
         ].text_content()
 
@@ -529,7 +529,9 @@ class PlanViewTests(WebTest):
         # nothing was created
         self.assertEqual(Plan.objects.count(), 1)
 
-    def test_plan_create_no_template_contains_contact_create_link_when_no_contacts_exist(self):
+    def test_plan_create_no_template_contains_contact_create_link_when_no_contacts_exist(
+        self,
+    ):
         self.user.user_contacts.remove(self.contact)
         response = self.app.get(self.create_url, user=self.user)
         self.assertContains(response, reverse("profile:contact_create"))

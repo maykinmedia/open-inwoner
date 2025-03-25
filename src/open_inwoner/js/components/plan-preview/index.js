@@ -68,14 +68,30 @@ export class PlanPreview {
       }
     }
 
-    const closeButtons = modalElement.querySelectorAll(
-      '.modal__close, .modal__close-title'
+    // Close buttons NOT selecting a radio input
+    const noSelectionCloseButtons = modalElement.querySelectorAll(
+      '.modal--no-reset .modal__actions--align-right .button--textless.button--transparent'
     )
 
-    // Event listener for all close buttons to select the radio input
+    noSelectionCloseButtons.forEach((button) => {
+      button.addEventListener(
+        'click',
+        (event) => {
+          event.preventDefault()
+          modal.hide() // Only close the modal
+        },
+        { once: true }
+      )
+    })
+
+    // Buttons that SHOULD select a radio input when closing modal
+    const selectionButtons = modalElement.querySelectorAll(
+      '.modal--no-reset .modal__actions--align-right .button--primary'
+    )
+
     if (radioInput) {
-      closeButtons.forEach((closeButton) => {
-        closeButton.addEventListener(
+      selectionButtons.forEach((button) => {
+        button.addEventListener(
           'click',
           () => {
             // Select the radio input
@@ -88,37 +104,39 @@ export class PlanPreview {
             const choiceListItem = radioInput.closest('.choice-list__item')
             if (choiceListItem) {
               // Remove 'selected' class from all items
-              const allItems = document.querySelectorAll('.choice-list__item')
-              allItems.forEach((item) => item.classList.remove('selected'))
+              document
+                .querySelectorAll('.choice-list__item')
+                .forEach((item) => item.classList.remove('selected'))
 
               // Add 'selected' class to the clicked item
               choiceListItem.classList.add('selected')
             }
 
-            // Trigger change event to ensure any listeners know the radio was changed
+            // Trigger change event to notify any listeners
             const changeEvent = new Event('change', { bubbles: true })
             radioInput.dispatchEvent(changeEvent)
 
-            // Add a small delay before setting focus to ensure DOM updates are processed
+            // Delay focus update for accessibility to ensure DOM updates are processed
             setTimeout(() => {
-              // For the first HTML variant, ensure focus affects the label for visual feedback
-              if (radioInput && radioLabel && templateRow) {
-                // First try to focus the label if possible (better for accessibility)
-                if (radioLabel.getAttribute('for') === radioInput.id) {
-                  radioLabel.focus()
-                } else {
-                  // Otherwise focus the input itself
-                  radioInput.focus()
-                }
+              // Ensure focus affects the label for visual feedback
+              if (
+                radioLabel &&
+                radioLabel.getAttribute('for') === radioInput.id
+              ) {
+                radioLabel.focus()
+              } else {
+                radioInput.focus()
               }
             }, 50)
+
+            modal.hide() // Close modal after selection
           },
           { once: true }
         )
       })
     }
 
-    // Set the modal-closed callback to focus on the selected radio or label
+    // Set modal close behavior without auto-selecting a radio input
     modal.setModalClosedCallback(() => {
       if (radioInput && radioInput.checked) {
         // Try to focus the label first (if it exists and is properly linked)

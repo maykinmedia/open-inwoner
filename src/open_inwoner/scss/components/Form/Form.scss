@@ -200,7 +200,12 @@
       .button {
         width: 100%;
         font-weight: bold;
+        padding-left: 0;
         justify-content: center;
+
+        &:hover {
+          transform: translateY(-1px);
+        }
       }
     }
   }

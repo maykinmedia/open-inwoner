@@ -13,61 +13,65 @@
         {% button href="collaborate:plan_create_no_template" text=_("Start een nieuwe samenwerking") primary=True icon="group" icon_outlined=True %}
     </header>
     {% optional_paragraph configurable_text.plans_page.plans_intro %}
-
+    
     {% if plans.extended_plans %}
         {% render_form form=plan_filter_form method="GET" spaceless=True autosubmit=True form_action=form_action %}
-        <div class="plan-filter">
-            <div class="plan-filter__button">
-                {% button text=_("Filter") type="button" bordered=True %}
-            </div>
-            <div class="plan-filter__container filter__container">
-                <p class="utrecht-paragraph">{% trans "Filter op:" %}</p>
-                {% input plan_filter_form.plan_contacts no_label=True no_help=True icon="person" %}
-                {% input plan_filter_form.status no_label=True no_help=True icon="expand_more" %}
-                <div class="plan-filter__search-container">
-                    {% input plan_filter_form.query no_label=True no_help=True %}
-                    {% form_actions primary_icon="search" single=True transparent=True %}
+            <div class="plan-filter">
+                <div class="plan-filter__button">
+                    {% button text=_("Filter") type="button" bordered=True %}
                 </div>
-                {% button text=_("Reset filters") href="collaborate:plan_list" icon="undo" transparent=True icon_position="before" %}
+                <div class="plan-filter__container filter__container">
+                    <p class="utrecht-paragraph">{% trans "Filter op:" %}</p>
+                    {% input plan_filter_form.plan_contacts no_label=True no_help=True icon="person" %}
+                    {% input plan_filter_form.status no_label=True no_help=True icon="expand_more" %}
+                    <div class="plan-filter__search-container">
+                        {% input plan_filter_form.query no_label=True no_help=True %}
+                        {% form_actions primary_icon="search" single=True transparent=True %}
+                    </div>
+                    {% button text=_("Reset filters") href="collaborate:plan_list" icon="undo" transparent=True icon_position="before" %}
+                </div>
             </div>
-        </div>
         {% endrender_form %}
 
         <table class="table plans-extended">
             <thead class="table__heading">
-                <tr>
-                    <td class="table__item">{% trans "Samenwerking" %}</td>
-                    <td class="table__item">{% trans "Deelnemers" %}</td>
-                    <td class="table__item">{% trans "Einddatum" %}</td>
-                    <td class="table__item">{% trans "Status" %}</td>
-                    <td class="table__item" colspan="2">{% trans "Openstaande acties" %}&nbsp;</td>
-                    <td class="table__item">&nbsp;</td>
-                </tr>
+            <tr>
+                <td class="table__item">{% trans "Samenwerking" %}</td>
+                <td class="table__item">{% trans "Deelnemers" %}</td>
+                <td class="table__item">{% trans "Einddatum" %}</td>
+                <td class="table__item">{% trans "Status" %}</td>
+                <td class="table__item" colspan="2">{% trans "Openstaande acties" %}&nbsp;</td>
+                <td class="table__item">&nbsp;</td>
+            </tr>
             </thead>
             <tbody>
-                {% for plan, plan_participants in plans.plan_list.items %}
-                    <tr>
-                        <th class="table__header">{% link href=plan.get_absolute_url text=plan.title %}</th>
-                        <td class="table__item">{{plan_participants|truncatechars:30}}</td>
-                        <td class="table__item table__item--no-lb">{{plan.end_date|date:"d F Y"}}</td>
-                        <td class="table__item">{{plan.get_status}}</td>
-                        <td class="table__item">{{plan.open_actions.count}}</td>
-                        <td class="table__item">
-                            {% if plan.open_actions.exists %}
-                                <div class="table__item--notification-danger">{% trans "Actie vereist" %}</div>
-                            {% endif %}
-                        </td>
-                        <td class="table__item">{% button text=plan.title hide_text=True href=plan.get_absolute_url icon="arrow_forward" icon_outlined=True transparent=True %}</td>
-                    </tr>
-                {% empty %}
-                    <tr>
-                        <td class="table__item" colspan="7" >{% trans "There are no plans with these filters." %}</td>
-                    </tr>
-                {% endfor %}
+            {% for plan, plan_participants in plans.plan_list.items %}
+                <tr>
+                    <th class="table__header">{% link href=plan.get_absolute_url text=plan.title %}</th>
+                    <td class="table__item">{{ plan_participants|truncatechars:30 }}</td>
+                    <td class="table__item table__item--no-lb">{{ plan.end_date|date:"d F Y" }}</td>
+                    <td class="table__item">{{ plan.get_status }}</td>
+                    <td class="table__item">{{ plan.open_actions.count }}</td>
+                    <td class="table__item">
+                        {% if plan.open_actions.exists %}
+                            <div class="table__item--notification-danger">{% trans "Actie vereist" %}</div>
+                        {% endif %}
+                    </td>
+                    <td class="table__item">{% button text=plan.title hide_text=True href=plan.get_absolute_url icon="arrow_forward" icon_outlined=True transparent=True %}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td class="table__item" colspan="7">{% trans "There are no plans with these filters." %}</td>
+                </tr>
+            {% endfor %}
             </tbody>
         </table>
     {% else %}
-        {% include "components/Card/CardContainer.html" with plans=plans.plan_list columns=2 only %}
+        {% if plans.plan_list %}
+            {% include "components/Card/CardContainer.html" with plans=plans.plan_list columns=2 only %}
+        {% else %}
+            <p class="utrecht-paragraph"><strong>{% trans "U heeft op dit moment nog geen samenwerkingsplannen." %}</strong></p>
+        {% endif %}
     {% endif %}
 
     {% pagination page_obj=page_obj paginator=paginator request=request %}

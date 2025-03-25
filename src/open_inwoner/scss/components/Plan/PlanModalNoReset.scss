@@ -23,6 +23,7 @@
       .modal__actions {
         justify-content: flex-start;
         margin: 0;
+
         .button__icon-close {
           min-width: 0;
         }
@@ -34,6 +35,11 @@
           }
         }
       }
+    }
+
+    .modal__content-wrapper {
+      margin: 0 auto;
+      max-width: var(--mobile-ms-width);
     }
 
     .oip-header-group {
