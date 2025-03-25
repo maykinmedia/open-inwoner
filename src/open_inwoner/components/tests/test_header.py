@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase, tag
 
 from pyquery import PyQuery
 
@@ -129,6 +129,7 @@ class HeaderTest(TestCase):
         self.assertEqual(links[2].attr("href"), self.published2.get_absolute_url())
         self.assertEqual(links[3].attr("href"), self.published4.get_absolute_url())
 
+    @tag("user_model_with_vestiging")
     @set_kvk_branch_number_in_session()
     def test_categories_visibility_for_eherkenning_users(self):
         config = SiteConfiguration.get_solo()

@@ -315,6 +315,7 @@ class ContactMomentViewsTestCase(
                     },
                 )
 
+    @tag("user_model_with_vestiging")
     @set_kvk_branch_number_in_session("1234")
     def test_contactmoment_list_vestiging(
         self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
@@ -735,6 +736,7 @@ class ContactMomentViewsTestCase(
             },
         )
 
+    @tag("user_model_with_vestiging")
     def test_contactmoment_detail_esuite_for_kvk_or_rsin(
         self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
     ):
@@ -783,6 +785,7 @@ class ContactMomentViewsTestCase(
                     },
                 )
 
+    @tag("user_model_with_vestiging")
     @set_kvk_branch_number_in_session("1234")
     def test_contactmoment_detail_esuite_vestiging(
         self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
@@ -830,6 +833,7 @@ class ContactMomentViewsTestCase(
                     },
                 )
 
+    @tag("user_model_with_vestiging")
     @set_kvk_branch_number_in_session("1234")
     def test_cannot_access_detail_for_hoofdvestiging_as_vestiging(
         self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
