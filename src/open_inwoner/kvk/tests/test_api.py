@@ -126,6 +126,40 @@ class KvKAPITest(TestCase):
             },
         )
 
+    def test_search_vestiging(self, m):
+        m.return_value.json.return_value = mocks.nevenvestiging
+
+        vestiging = self.kvk_client.get_vestiging(vestiging="000037178601")
+
+        self.assertEqual(
+            m.call_args.args[0],
+            "https://api.kvk.nl/test/api/v2/zoeken?vestigingsnummer=000037178601&resultatenPerPagina=100",
+        )
+        self.assertEqual(
+            vestiging,
+            {
+                "kvkNummer": "68750110",
+                "vestigingsnummer": "000037178601",
+                "naam": "Test BV Donald Nevenvestiging",
+                "adres": {
+                    "binnenlandsAdres": {
+                        "type": "bezoekadres",
+                        "straatnaam": "Brinkerinckbaan",
+                        "plaats": "Diepenveen",
+                    }
+                },
+                "type": "nevenvestiging",
+                "_links": {
+                    "basisprofiel": {
+                        "href": "https://api.kvk.nl/test/api/v1/basisprofielen/68750110"
+                    },
+                    "vestigingsprofiel": {
+                        "href": "https://api.kvk.nl/test/api/v1/vestigingsprofielen/000037178601"
+                    },
+                },
+            },
+        )
+
     def test_search_all_branches(self, m):
         m.return_value.json.return_value = mocks.multiple_branches
 
