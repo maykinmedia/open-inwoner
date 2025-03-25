@@ -53,7 +53,26 @@ def get_rendered_content(content: str) -> str:
         for element in soup.find_all(tag):
             element.attrs["class"] = class_name
             if element.name == "a" and element.attrs.get("href", "").startswith("http"):
-                element.attrs["target"] = "_blank"
+                # icon & screenreader support
+                icon = soup.new_tag("span")
+                icon.attrs.update(
+                    {
+                        "aria-hidden": "true",
+                        "class": "material-icons",
+                    }
+                )
+                icon.append("open_in_new")
+
+                screen_reader_only_text = soup.new_tag("span")
+                screen_reader_only_text.attrs.update(
+                    {
+                        "class": "sr-only",
+                    }
+                )
+                screen_reader_only_text.append(_("Opens external website"))
+
+                element.append(icon)
+                element.append(screen_reader_only_text)
 
     return str(soup)
 

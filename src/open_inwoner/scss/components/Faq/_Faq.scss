@@ -65,8 +65,15 @@
   &__answer--open {
     margin-top: var(--spacing-large) !important;
 
-    .link {
-      text-decoration: underline;
+    .utrecht-paragraph .link {
+      display: inline;
+
+      [class*='icons'] {
+        display: inline-block;
+        text-decoration: none;
+        transform: scale(0.75);
+        vertical-align: bottom;
+      }
     }
   }
 
