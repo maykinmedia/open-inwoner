@@ -21,13 +21,14 @@ cd $toplevel
 export CUSTOM_COMPILE_COMMAND="./bin/compile_dependencies.sh"
 
 # Base (& prod) deps
-uv pip compile --no-strip-extras \
+uv pip compile --no-strip-extras --python 3.11 \
     --no-emit-index-url \
+    --output-file requirements/base.txt \
     "$@" \
     requirements/base.in
 
 # Dependencies for testing
-uv pip compile --no-strip-extras \
+uv pip compile --no-strip-extras --python 3.11 \
     --no-emit-index-url \
     --output-file requirements/ci.txt \
     "$@" \
@@ -35,8 +36,8 @@ uv pip compile --no-strip-extras \
     requirements/test-tools.in \
     requirements/docs.in
 
-# Dev depedencies - exact same set as CI + some extra tooling
-uv pip compile --no-strip-extras \
+# Dev dependencies - exact same set as CI + some extra tooling
+uv pip compile --no-strip-extras --python 3.11 \
     --no-emit-index-url \
     --output-file requirements/dev.txt \
     "$@" \

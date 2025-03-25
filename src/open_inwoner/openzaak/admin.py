@@ -92,6 +92,7 @@ class OpenZaakConfigAdmin(SingletonModelAdmin):
                     "zaken_filter_enabled",
                     "show_cases_without_status",
                     "order_statuses_by_date_set",
+                    "limit_user_visible_cases_to_role",
                 ),
             },
         ),

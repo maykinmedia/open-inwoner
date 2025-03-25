@@ -30,7 +30,7 @@ from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin, Lookups
 
 from ...utils.tests.helpers import AssertRedirectsMixin
 from ..api_models import Zaak
-from ..constants import StatusIndicators
+from ..constants import StatusIndicators, ZaakBetrokkeneRol
 from ..models import OpenZaakConfig
 from .factories import (
     CatalogusConfigFactory,
@@ -237,7 +237,7 @@ class CaseListMocks:
             call_to_action_url="https://example.com",
             call_to_action_text="Click me",
         )
-        # open
+
         zaak1_id = str(uuid_generator.get_uuid())
         self.zaak1 = generate_oas_component_cached(
             "zrc",
@@ -404,6 +404,18 @@ class CaseListMocks:
             json=paginated_response(
                 [self.zaak1, self.zaak2, self.zaak3, self.zaak_intern, self.zaak_result]
             ),
+        )
+        m.get(
+            furl(f"{self.zaken_root}zaken")
+            .add(
+                {
+                    "rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn": self.user.bsn,
+                    "maximaleVertrouwelijkheidaanduiding": VertrouwelijkheidsAanduidingen.beperkt_openbaar,
+                    "rol__omschrijvingGeneriek": ZaakBetrokkeneRol.initiator,
+                }
+            )
+            .url,
+            json=paginated_response([self.zaak1]),
         )
         for identifier in [self.eherkenning_user.kvk, self.eherkenning_user.rsin]:
             m.get(
@@ -950,6 +962,74 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                 if req.hostname == zaken_root and req.path == "/api/v1/zaken"
             ]
             self.assertEqual(len(list_zaken_req), 0)
+
+    def test_list_cases_for_initiator_only(self, m):
+        for mock in self.mocks:
+            mock._setUpMocks(m)
+
+        self.config.limit_user_visible_cases_to_role = ZaakBetrokkeneRol.initiator
+        self.config.save()
+
+        # Added for https://taiga.maykinmedia.nl/project/open-inwoner/task/1904
+        # In eSuite it is possible to reuse a StatusType for multiple ZaakTypen, which
+        # led to errors when retrieving the ZaakTypeStatusTypeConfig. This duplicate
+        # config is added to verify that that issue was solved
+        for mock in self.mocks:
+            ZaakTypeStatusTypeConfigFactory.create(
+                statustype_url=mock.status_type_initial["url"],
+                status_indicator=StatusIndicators.warning,
+                status_indicator_text="U moet documenten toevoegen",
+                description="Lorem ipsum dolor sit amet",
+                call_to_action_url="https://example.com",
+                call_to_action_text="duplicate",
+            )
+
+        self.client.force_login(user=self.user)
+        response = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
+
+        expected_cases = []
+        for i, mock in enumerate(self.mocks):
+            expected_cases.extend(
+                [
+                    {
+                        "uuid": mock.zaak1["uuid"],
+                        "start_date": datetime.date.fromisoformat(
+                            mock.zaak1["startdatum"]
+                        ),
+                        "end_date": None,
+                        "identification": mock.zaak1["identificatie"],
+                        "description": mock.zaaktype["omschrijving"],
+                        "current_status": mock.status_type_initial["omschrijving"],
+                        "result": "",
+                        "zaaktype_config": mock.zaaktype_config1,
+                        "statustype_config": mock.zt_statustype_config1,
+                        "case_type": "Zaak",
+                        "api_group": self.api_groups[i],
+                    }
+                ]
+            )
+
+        self.assertListEqual(response.context["cases"], expected_cases)
+
+        # check zaken request query parameters
+        for zaken_root in ("zaken.nl", "andere-zaken.nl"):
+            list_zaken_req = [
+                req
+                for req in m.request_history
+                if req.hostname == zaken_root and req.path == "/api/v1/zaken"
+            ][0]
+            self.assertEqual(
+                list_zaken_req.qs,
+                {
+                    "rol__betrokkeneidentificatie__natuurlijkpersoon__inpbsn": [
+                        self.user.bsn
+                    ],
+                    "maximalevertrouwelijkheidaanduiding": [
+                        VertrouwelijkheidsAanduidingen.beperkt_openbaar
+                    ],
+                    "rol__omschrijvinggeneriek": [ZaakBetrokkeneRol.initiator],
+                },
+            )
 
     def test_format_zaak_identificatie(self, m):
         for mock in self.mocks:
