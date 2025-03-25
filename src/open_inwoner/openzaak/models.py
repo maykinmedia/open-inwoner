@@ -28,7 +28,7 @@ from open_inwoner.openzaak.managers import (
     ZaakTypeStatusTypeConfigQuerySet,
 )
 
-from .constants import StatusIndicators, ZaakBetrokkeneRol, ZaakTitleDisplayChoices
+from .constants import StatusIndicators, ZaakTitleDisplayChoices
 
 logger = logging.getLogger(__name__)
 
@@ -447,15 +447,6 @@ class OpenZaakConfig(SingletonModel):
             "works for Open Zaak)."
         ),
         default=False,
-    )
-    limit_user_visible_cases_to_role = models.CharField(
-        verbose_name=_("Limit cases to role"),
-        choices=ZaakBetrokkeneRol.choices,
-        blank=True,
-        help_text=_(
-            "Show only cases in which the user has the relevant role. "
-            "Leave empty to show cases irrespective of role."
-        ),
     )
 
     show_cases_without_status = models.BooleanField(

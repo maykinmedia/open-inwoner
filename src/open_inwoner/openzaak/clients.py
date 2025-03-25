@@ -118,10 +118,6 @@ class ZakenClient(ZgwAPIClient):
         }
         if identificatie:
             params.update({"identificatie": identificatie})
-        if config.limit_user_visible_cases_to_role:
-            params.update(
-                {"rol__omschrijvingGeneriek": config.limit_user_visible_cases_to_role}
-            )
 
         try:
             response = self.get(
@@ -188,11 +184,6 @@ class ZakenClient(ZgwAPIClient):
 
         if zaak_identificatie:
             params.update({"identificatie": zaak_identificatie})
-
-        if config.limit_user_visible_cases_to_role:
-            params.update(
-                {"rol__omschrijvingGeneriek": config.limit_user_visible_cases_to_role}
-            )
 
         try:
             response = self.get(
