@@ -49,6 +49,7 @@
     font-size: var(--font-size-body);
     letter-spacing: 0;
     line-height: var(--font-line-height-body);
+    margin: 0 var(--spacing-small);
     text-align: center;
     display: flex;
     justify-content: center;
@@ -61,9 +62,10 @@
   }
 
   &__previous {
+    margin-right: var(--spacing-medium);
+
     [class*='icons'] {
       color: var(--color-primary);
-      margin-right: var(--gutter-width);
 
       &:hover {
         color: var(--color-body);
@@ -78,9 +80,10 @@
   }
 
   &__next {
+    margin-left: var(--spacing-medium);
+
     [class*='icons'] {
       color: var(--color-primary);
-      margin-left: var(--gutter-width);
 
       &:hover {
         color: var(--color-body);
