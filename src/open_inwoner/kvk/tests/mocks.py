@@ -69,6 +69,40 @@ hoofdvestiging = {
     },
 }
 
+nevenvestiging = {
+    "pagina": 1,
+    "resultatenPerPagina": 10,
+    "totaal": 1,
+    "resultaten": [
+        {
+            "kvkNummer": "68750110",
+            "vestigingsnummer": "000037178601",
+            "naam": "Test BV Donald Nevenvestiging",
+            "adres": {
+                "binnenlandsAdres": {
+                    "type": "bezoekadres",
+                    "straatnaam": "Brinkerinckbaan",
+                    "plaats": "Diepenveen",
+                }
+            },
+            "type": "nevenvestiging",
+            "_links": {
+                "basisprofiel": {
+                    "href": "https://api.kvk.nl/test/api/v1/basisprofielen/68750110"
+                },
+                "vestigingsprofiel": {
+                    "href": "https://api.kvk.nl/test/api/v1/vestigingsprofielen/000037178601"
+                },
+            },
+        },
+    ],
+    "_links": {
+        "self": {
+            "href": "https://api.kvk.nl/test/api/v2/zoeken?vestigingsnummer=000037178601&pagina=1&resultatenperpagina=10"
+        }
+    },
+}
+
 multiple_branches = {
     "pagina": 1,
     "resultatenPerPagina": 10,

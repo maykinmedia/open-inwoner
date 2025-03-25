@@ -84,7 +84,10 @@ def _update_user_from_esuite(
 def _update_eherkenning_user_from_kvk_api(user: User):
     kvk_client = KvKClient()
 
-    vestiging = kvk_client.get_company_headquarters(kvk=user.kvk)
+    if user.vestiging:
+        vestiging = kvk_client.get_vestiging(vestiging=user.vestiging)
+    else:
+        vestiging = kvk_client.get_company_headquarters(kvk=user.kvk)
 
     if company_name := vestiging.get("naam"):
         user.company_name = company_name

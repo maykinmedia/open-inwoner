@@ -105,6 +105,15 @@ class KvKClient:
 
         return headquarters[0]
 
+    def get_vestiging(self, vestiging: str) -> dict | None:
+        vestigingen = self.search(vestigingsnummer=vestiging).get("resultaten", [])
+
+        if not vestigingen:
+            logger.info("No vestiging found for vestigingsnummer %s", vestiging)
+            return None
+
+        return vestigingen[0]
+
     def get_all_company_branches(self, kvk: str, **kwargs) -> list[dict | None]:
         """
         Get data about all branches ("hoofdvestiging" + "nevenvestigingen") of a company.
