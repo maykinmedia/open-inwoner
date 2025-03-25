@@ -81,9 +81,7 @@ class VragenService(Protocol):
 
     def get_fetch_parameters(
         self,
-        request=None,
         user: User | None = None,
-        use_vestigingsnummer: bool = False,
     ) -> FetchParameters | None:  # noqa: E704
         ...
 
@@ -111,11 +109,7 @@ class KlantContactMomentBaseView(
         return ctx
 
     def get_fetch_params(self, service: VragenService):
-        if not (
-            fetch_params := service.get_fetch_parameters(
-                self.request, use_vestigingsnummer=True
-            )
-        ):
+        if not (fetch_params := service.get_fetch_parameters(self.request.user)):
             raise ValueError("User has no bsn or kvk attributes")
 
         return fetch_params
@@ -308,7 +302,7 @@ class KlantContactMomentRedirectView(KlantContactMomentAccessMixin, View):
 
     def _get_klantcontact_openklant(self, request, *args, **kwargs):
         service: OpenKlant2Service = OpenKlant2Service()
-        fetch_params = service.get_fetch_parameters(user=request.user)
+        fetch_params = service.get_fetch_parameters(request.user)
 
         question_dto, _ = service.retrieve_question(
             fetch_params=fetch_params,
@@ -321,7 +315,7 @@ class KlantContactMomentRedirectView(KlantContactMomentAccessMixin, View):
     def _get_klantcontactmoment_esuite(self, request, *args, **kwargs):
         vragen_service: VragenService = eSuiteVragenService()
         klanten_service: KlantenService = eSuiteKlantenService()
-        fetch_params = klanten_service.get_fetch_parameters(self.request)
+        fetch_params = klanten_service.get_fetch_parameters(self.request.user)
 
         klant = klanten_service.retrieve_klant(**fetch_params)
         kcms = vragen_service.retrieve_klantcontactmomenten_for_klant(klant)
