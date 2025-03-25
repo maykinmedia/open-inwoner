@@ -33,11 +33,6 @@ asn1crypto==1.5.1
     #   webauthn
 astroid==2.15.8
     # via pylint
-async-timeout==4.0.3
-    # via
-    #   -c requirements/base.txt
-    #   -r requirements/base.txt
-    #   redis
 attrs==21.2.0
     # via
     #   -c requirements/base.txt
@@ -238,8 +233,8 @@ django==4.2.20
     #   mozilla-django-oidc
     #   mozilla-django-oidc-db
     #   notifications-api-common
-    #   sentry-sdk
     #   objects-api-client-django
+    #   sentry-sdk
     #   zgw-consumers
     #   zgw-consumers-oas
 django-admin-index==3.1.0
@@ -312,7 +307,7 @@ django-csp==3.7
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-django-csp-reports==1.8.1
+django-csp-reports==1.9.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -769,7 +764,7 @@ oath==1.4.4
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-objects-api-client-django @ git+https://github.com/maykinmedia/objects-api-client-django.git
+objects-api-client-django @ git+https://github.com/maykinmedia/objects-api-client-django.git@f3ed1be7dea30fe2eced6c5f2d33305ca011d03c#egg=objects-api-client-django
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
