@@ -639,6 +639,7 @@ class ContactFormIntegrationTest(
             },
         )
 
+    @tag("user_model_with_vestiging")
     def test_register_contactmoment_for_kvk_or_rsin_user_via_api(
         self, _m, mock_captcha, mock_send_confirm
     ):
@@ -846,6 +847,7 @@ class ContactFormIntegrationTest(
         mock_send_confirm.assert_called_once_with(data.user.email, subject.subject)
         mock_send_confirm.reset_mock()
 
+    @tag("user_model_with_vestiging")
     @patch("open_inwoner.openklant.forms.generate_question_answer_pair")
     def test_register_contactmoment_for_kvk_or_rsin_user_via_api_and_update_klant(
         self, m, mock_captcha2, mock_captcha, mock_send_confirm
