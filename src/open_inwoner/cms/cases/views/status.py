@@ -1029,7 +1029,7 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
         service = OpenKlant2Service(config=config)
 
         partij, created = service.get_or_create_partij_for_user(
-            fetch_params=service.get_fetch_parameters(user=user),
+            fetch_params=service.get_fetch_parameters(user),
             user=user,
         )
 
@@ -1060,7 +1060,7 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
         except (ImproperlyConfigured, RuntimeError):
             self.log_system_action("could not build client for klanten API")
         else:
-            fetch_params = service.get_fetch_parameters(self.request, user=user)
+            fetch_params = service.get_fetch_parameters(user)
             klant, created = service.get_or_create_klant(
                 fetch_params=fetch_params, user=user
             )
