@@ -12,6 +12,7 @@ from open_inwoner.openzaak.api_models import Zaak
 from open_inwoner.openzaak.clients import MultiZgwClientProxy, build_zaken_clients
 from open_inwoner.openzaak.models import ZaakTypeConfig
 from open_inwoner.openzaak.utils import get_user_fetch_parameters
+from open_inwoner.utils.views import LogMixin
 
 
 class ProductQueryset(models.QuerySet):
@@ -25,7 +26,7 @@ class ProductQueryset(models.QuerySet):
         return self.order_by("categoryproduct__order")
 
 
-class CategoryPublishedQueryset(MP_NodeQuerySet):
+class CategoryPublishedQueryset(LogMixin, MP_NodeQuerySet):
     def published(self):
         return self.filter(published=True)
 
