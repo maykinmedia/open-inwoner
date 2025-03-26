@@ -82,16 +82,22 @@ def _update_user_from_esuite(
 
 
 def _update_eherkenning_user_from_kvk_api(user: User):
-    kvk_client = KvKClient()
+    try:
+        kvk_client = KvKClient()
+        if user.vestiging:
+            vestiging = kvk_client.get_vestiging(vestiging=user.vestiging)
+        else:
+            vestiging = kvk_client.get_company_headquarters(kvk=user.kvk)
 
-    if user.vestiging:
-        vestiging = kvk_client.get_vestiging(vestiging=user.vestiging)
-    else:
-        vestiging = kvk_client.get_company_headquarters(kvk=user.kvk)
+        if not vestiging:
+            logger.error("Unable to connect to KvK API to get vestiging")
+            return
 
-    if company_name := vestiging.get("naam"):
-        user.company_name = company_name
-        user.save()
+        if company_name := vestiging.get("naam"):
+            user.company_name = company_name
+            user.save()
+    except Exception:
+        logger.exception("Unable to update eHerkenning user from KvK API")
 
 
 @receiver(user_logged_in)
