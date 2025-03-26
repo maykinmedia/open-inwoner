@@ -781,7 +781,7 @@ jsonschema==4.1.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   drf-spectacular
-kombu==5.3.7
+kombu==5.5.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -1305,12 +1305,13 @@ typing-extensions==4.10.0
     #   xsdata
     #   zgw-consumers
     #   zgw-consumers-oas
-tzdata==2024.1
+tzdata==2025.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   celery
     #   django-celery-beat
+    #   kombu
 uritemplate==4.1.1
     # via
     #   -c requirements/ci.txt
