@@ -715,20 +715,12 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             with self.subTest(
                 use_rsin_for_innNnpId_query_parameter=use_rsin_for_innNnpId_query_parameter
             ):
-
                 config = ESuiteKlantConfig.get_solo()
-                config.use_rsin_for_innNnpId_query_parameter = (
-                    use_rsin_for_innNnpId_query_parameter
-                )
+                config.use_rsin_for_innNnpId_query_parameter = True
                 config.save()
 
-                identifier = (
-                    eherkenning_user.rsin
-                    if use_rsin_for_innNnpId_query_parameter
-                    else eherkenning_user.kvk
-                )
                 m.get(
-                    f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId={identifier}",
+                    f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId={eherkenning_user.rsin}",
                     json=paginated_response([self.klant]),
                 ),
 

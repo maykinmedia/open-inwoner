@@ -68,8 +68,7 @@ jobs:
               --parallel \
               --exclude-tag=e2e \
               --exclude-tag=elastic \
-              --exclude-tag=sequential \
-              --exclude-tag=user_model_with_vestiging
+              --exclude-tag=sequential
           elif [ "${{ matrix.test-type }}" = "elastic" ]; then
             coverage run -p src/manage.py test src --tag=elastic --exclude-tag=e2e
           elif [ "${{ matrix.test-type }}" = "openklant" ]; then

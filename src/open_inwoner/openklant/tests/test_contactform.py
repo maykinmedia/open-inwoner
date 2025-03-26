@@ -3,7 +3,7 @@ from unittest.mock import patch
 from django.contrib import messages
 from django.contrib.auth.models import AnonymousUser
 from django.core import mail
-from django.test import modify_settings, tag
+from django.test import modify_settings
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
@@ -30,7 +30,6 @@ from open_inwoner.utils.test import ClearCachesMixin, DisableRequestLogMixin
 from open_inwoner.utils.tests.helpers import AssertFormMixin, AssertTimelineLogMixin
 
 
-@tag("user_model_with_vestiging")
 @requests_mock.Mocker()
 @modify_settings(
     MIDDLEWARE={"remove": ["open_inwoner.kvk.middleware.KvKLoginMiddleware"]}
@@ -639,7 +638,6 @@ class ContactFormIntegrationTest(
             },
         )
 
-    @tag("user_model_with_vestiging")
     def test_register_contactmoment_for_kvk_or_rsin_user_via_api(
         self, _m, mock_captcha, mock_send_confirm
     ):
@@ -656,6 +654,9 @@ class ContactFormIntegrationTest(
         esuite_config.register_type = "Melding"
         esuite_config.register_employee_id = "FooVonBar"
         esuite_config.save()
+
+        # counter for contructing different KVK numbers for subtests
+        kvk_diff = 0
 
         for (
             use_rsin_for_innNnpId_query_parameter,
@@ -676,7 +677,12 @@ class ContactFormIntegrationTest(
                     )
                     esuite_config.save()
 
-                    data = MockAPICreateData()
+                    # kvk must be unique; we construct it dynamically from a counter that increases
+                    # with every subtest
+                    eherkenning_kvk = f"0000000{kvk_diff}"
+                    kvk_diff += 1
+
+                    data = MockAPICreateData(eherkenning_kvk=eherkenning_kvk)
                     data.install_mocks_eherkenning(
                         m, use_rsin=use_rsin_for_innNnpId_query_parameter
                     )
@@ -847,7 +853,6 @@ class ContactFormIntegrationTest(
         mock_send_confirm.assert_called_once_with(data.user.email, subject.subject)
         mock_send_confirm.reset_mock()
 
-    @tag("user_model_with_vestiging")
     @patch("open_inwoner.openklant.forms.generate_question_answer_pair")
     def test_register_contactmoment_for_kvk_or_rsin_user_via_api_and_update_klant(
         self, m, mock_captcha2, mock_captcha, mock_send_confirm
@@ -870,6 +875,9 @@ class ContactFormIntegrationTest(
         esuite_config.register_employee_id = "FooVonBar"
         esuite_config.save()
 
+        # counter for contructing different KVK numbers for subtests
+        kvk_diff = 0
+
         for (
             use_rsin_for_innNnpId_query_parameter,
             send_klantcontact_confirmation_email,
@@ -889,7 +897,12 @@ class ContactFormIntegrationTest(
                     )
                     esuite_config.save()
 
-                    data = MockAPICreateData()
+                    # kvk must be unique; we construct it dynamically from a counter that increases
+                    # with every subtest
+                    eherkenning_kvk = f"0000000{kvk_diff}"
+                    kvk_diff += 1
+
+                    data = MockAPICreateData(eherkenning_kvk=eherkenning_kvk)
                     data.install_mocks_eherkenning_missing_contact_info(
                         m, use_rsin=use_rsin_for_innNnpId_query_parameter
                     )

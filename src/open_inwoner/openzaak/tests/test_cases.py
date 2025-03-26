@@ -7,7 +7,7 @@ from urllib.parse import urlencode
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.test import TransactionTestCase, tag
+from django.test import TransactionTestCase
 from django.test.utils import override_settings
 from django.urls import reverse_lazy
 
@@ -1311,10 +1311,11 @@ class CaseSubmissionTest(TransactionWebTest):
             data.submission_2["datumLaatsteWijziging"],
         )
 
-    @tag("user_model_with_vestiging")
     @requests_mock.Mocker()
-    @patch("open_inwoner.kvk.middleware.kvk_branch_selected_done")
-    def test_get_open_submissions_by_kvk(self, m, kvk_branch_selected):
+    @patch("open_inwoner.kvk.middleware.KvKLoginMiddleware.requires_redirect")
+    def test_get_open_submissions_by_kvk(self, m, mock_kvk_redirect):
+        mock_kvk_redirect.return_value = False
+
         user = UserFactory(login_type=LoginTypeChoices.eherkenning, kvk="68750110")
         data = ESuiteSubmissionData(
             zaken_root=ZAKEN_ROOT, forms_root=FORMS_ROOT, user=user

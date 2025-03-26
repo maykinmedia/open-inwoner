@@ -3,7 +3,7 @@ from unittest.mock import Mock, patch
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.test import RequestFactory, tag
+from django.test import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -51,12 +51,7 @@ from open_inwoner.openzaak.tests.factories import (
     ZaakTypeResultaatTypeConfigFactory,
     ZaakTypeStatusTypeConfigFactory,
 )
-from open_inwoner.utils.test import (
-    ClearCachesMixin,
-    paginated_response,
-    set_kvk_branch_number_in_session,
-    uuid_from_url,
-)
+from open_inwoner.utils.test import ClearCachesMixin, paginated_response, uuid_from_url
 from openklant2.types.resources.klant_contact import KlantContactValidator
 from openklant2.types.resources.onderwerp_object import OnderwerpObjectValidator
 from openklant2.types.resources.partij import PartijValidator
@@ -107,7 +102,7 @@ class TestCaseDetailView(
             rsin="123456789",
             login_type=LoginTypeChoices.eherkenning,
         )
-        self.eherkenning_user_vestiging = eHerkenningVestigingUserFactory.create(
+        self.vestiging_user = eHerkenningVestigingUserFactory.create(
             kvk="87654321",
             rsin="123456789",
             vestiging="987654321",
@@ -472,7 +467,7 @@ class TestCaseDetailView(
             omschrijvingGeneriek=RolOmschrijving.initiator,
             betrokkeneType=RolTypes.vestiging,
             betrokkeneIdentificatie={
-                "vestigingsNummer": self.eherkenning_user_vestiging.vestiging,
+                "vestigingsNummer": self.vestiging_user.vestiging,
                 "handelsnaam": "Foo Bar",
                 "verblijfsadres" "subVerblijfBuitenland": "van der",
                 "kvkNummer": "Bazz",
@@ -1522,8 +1517,6 @@ class TestCaseDetailView(
                 self.assertContains(response, "ZAAK-2022-0000000025")
                 self.assertContains(response, "Coffee zaaktype")
 
-    @tag("user_model_with_vestiging")
-    @set_kvk_branch_number_in_session("1234")
     @patch.object(
         eSuiteVragenService,
         "retrieve_objectcontactmomenten_for_zaak",
@@ -1713,7 +1706,7 @@ class TestCaseDetailView(
         Just having a role with betrokkeneType vestiging that matches for a case
         is sufficient to have access.
         """
-        self.client.force_login(user=self.eherkenning_user_vestiging)
+        self.client.force_login(user=self.vestiging_user)
 
         # Requires manually setting mocks to avoid default roles on case
         m.get(self.zaak["url"], json=self.zaak)
@@ -1770,7 +1763,7 @@ class TestCaseDetailView(
         In order to have access to a case when logged in as a vestiging, that case
         should have a role with betrokkeneType vestiging and a matching vestigingsnummer
         """
-        self.client.force_login(user=self.eherkenning_user_vestiging)
+        self.client.force_login(user=self.vestiging_user)
 
         m.get(self.zaak["url"], json=self.zaak)
         m.get(self.zaaktype["url"], json=self.zaaktype)
@@ -1798,8 +1791,6 @@ class TestCaseDetailView(
                     response, _("Sorry, you don't have access to this page (403)")
                 )
 
-    @tag("user_model_with_vestiging")
-    @set_kvk_branch_number_in_session(value=None)
     def test_no_access_if_fetch_eherkenning_zaken_with_rsin_and_user_has_no_rsin(
         self, m
     ):

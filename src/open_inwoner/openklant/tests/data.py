@@ -4,6 +4,7 @@ from zgw_consumers.constants import APITypes
 from open_inwoner.accounts.tests.factories import (
     DigidUserFactory,
     eHerkenningUserFactory,
+    eHerkenningVestigingUserFactory,
 )
 from open_inwoner.openklant.constants import Status
 from open_inwoner.openklant.models import ESuiteKlantConfig
@@ -39,7 +40,10 @@ class MockAPIData:
 
 
 class MockAPIReadPatchData(MockAPIData):
-    def __init__(self):
+    def __init__(self, eherkenning_kvk: str | None = None):
+        # allow specification of KVK number for mocks because KVK must be unique
+        self.eherkenning_kvk = eherkenning_kvk or "12345678"
+
         self.user = DigidUserFactory(
             email="old@example.com",
             phonenumber="0100000000",
@@ -51,7 +55,7 @@ class MockAPIReadPatchData(MockAPIData):
         )
         self.eherkenning_user = eHerkenningUserFactory(
             email="old2@example.com",
-            kvk="12345678",
+            kvk=self.eherkenning_kvk,
             rsin="000000000",
         )
         self.klant_bsn_old = generate_oas_component_cached(
@@ -187,13 +191,21 @@ class MockAPIReadPatchData(MockAPIData):
 
 
 class MockAPIReadData(MockAPIData):
-    def __init__(self):
+    def __init__(self, eherkenning_kvk: str | None = None):
+        # allow specification of KVK number for mocks because KVK must be unique
+        self.eherkenning_kvk = eherkenning_kvk or "12345678"
+
         self.user = DigidUserFactory(
             bsn="100000001",
         )
         self.eherkenning_user = eHerkenningUserFactory(
-            kvk="12345678",
+            kvk=self.eherkenning_kvk,
             rsin="000000000",
+        )
+        self.eherkenning_user_vestiging = eHerkenningVestigingUserFactory(
+            kvk=self.eherkenning_kvk,
+            rsin="000000000",
+            vestiging="1234",
         )
 
         self.klant_bsn = generate_oas_component_cached(
@@ -286,6 +298,7 @@ class MockAPIReadData(MockAPIData):
             identificatie="AB123",
             type="SomeType",
             kanaal="Mail",
+            registratiedatum="2022-01-01T12:00:00Z",
             status=Status.afgehandeld.value,
             tekst="Garage verbouwen?",
             antwoord="baz",
@@ -463,12 +476,15 @@ class MockAPIReadData(MockAPIData):
 
 
 class MockAPICreateData(MockAPIData):
-    def __init__(self):
+    def __init__(self, eherkenning_kvk: str | None = None):
+        # allow specification of KVK number for mocks because KVK must be unique
+        self.eherkenning_kvk = eherkenning_kvk or "12345678"
+
         self.user = DigidUserFactory(
             bsn="100000001",
         )
         self.eherkenning_user = eHerkenningUserFactory(
-            kvk="12345678",
+            kvk=self.eherkenning_kvk,
             rsin="000000000",
         )
         self.klant_bsn = generate_oas_component_cached(
