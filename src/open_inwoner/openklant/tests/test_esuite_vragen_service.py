@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from django.test import TestCase, override_settings, tag
+from django.test import TestCase, override_settings
 
 import requests_mock
 
@@ -12,7 +12,6 @@ from open_inwoner.openklant.tests.data import MockAPIReadData
 from open_inwoner.utils.url import uuid_from_url
 
 
-@tag("user_model_with_vestiging")
 @requests_mock.Mocker()
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class eSuiteVragenServiceTestCase(TestCase):
@@ -102,7 +101,6 @@ class eSuiteVragenServiceTestCase(TestCase):
                     },
                 )
                 m.reset_mock()
-                data = MockAPIReadData().install_mocks(m)
 
     def test_retrieve_question_returns_expected_result(self, m):
         data = MockAPIReadData().install_mocks(m)
@@ -174,4 +172,3 @@ class eSuiteVragenServiceTestCase(TestCase):
                     },
                 )
                 m.reset_mock()
-                data = MockAPIReadData().install_mocks(m)

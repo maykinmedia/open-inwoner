@@ -236,9 +236,9 @@ class ProfileViewTests(WebTest):
         response = self.app.get(self.url, user=self.user)
         self.assertNotContains(response, _("My details"))
 
-    @tag("user_model_with_vestiging")
     def test_info_eherkenning_user(self):
         user = eHerkenningUserFactory(
+            kvk="11111111",
             company_name="Makers and Shakers",
             street="Fantasiestraat",
             housenumber="42",
@@ -313,7 +313,6 @@ class ProfileViewTests(WebTest):
         self.assertEqual(link_text(), _("Stuur een bericht"))
 
 
-@tag("user_model_with_vestiging")
 @override_settings(
     ROOT_URLCONF="open_inwoner.cms.tests.urls", MIDDLEWARE=PATCHED_MIDDLEWARE
 )
@@ -322,7 +321,6 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         self.url = reverse("profile:edit")
         self.return_url = reverse("profile:detail")
         self.user = UserFactory()
-        self.eherkenning_user = eHerkenningUserFactory()
 
     def upload_test_image_to_profile_edit_page(self, img_bytes):
         response = self.app.get(self.url, user=self.user, status=200)
@@ -434,17 +432,18 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         self.assertEqual(self.user.email, "user@example.com")
 
     def test_modify_contact_details_eherkenning_succeeds(self):
-        response = self.app.get(self.url, user=self.eherkenning_user)
+        eherkenning_user = eHerkenningUserFactory()
+        response = self.app.get(self.url, user=eherkenning_user)
         form = response.forms["profile-edit"]
         form["email"] = "user@example.com"
         form["phonenumber"] = "0612345678"
         form["phonenumber_alternative"] = "0687654321"
         response = form.submit()
-        self.eherkenning_user.refresh_from_db()
+        eherkenning_user.refresh_from_db()
         self.assertEqual(response.url, self.return_url)
-        self.assertEqual(self.eherkenning_user.email, "user@example.com")
-        self.assertEqual(self.eherkenning_user.phonenumber, "0612345678")
-        self.assertEqual(self.eherkenning_user.phonenumber_alternative, "0687654321")
+        self.assertEqual(eherkenning_user.email, "user@example.com")
+        self.assertEqual(eherkenning_user.phonenumber, "0612345678")
+        self.assertEqual(eherkenning_user.phonenumber_alternative, "0687654321")
 
     def test_updating_a_field_without_modifying_email_succeeds(self):
         initial_email = self.user.email
@@ -606,7 +605,14 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
                 # `m` is overridden somewhere, which causes issues when `MockAPIReadPatchData.install_mocks`
                 # is run for the second time
                 with requests_mock.Mocker() as m:
-                    data = MockAPIReadPatchData().install_mocks_eherkenning(
+                    # kvk must be unique; we construct it dynamically from the subtest parameter
+                    eherkenning_kvk = (
+                        f"0000000{int(use_rsin_for_innNnpId_query_parameter)}"
+                    )
+
+                    data = MockAPIReadPatchData(
+                        eherkenning_kvk=eherkenning_kvk
+                    ).install_mocks_eherkenning(
                         m, use_rsin=use_rsin_for_innNnpId_query_parameter
                     )
 

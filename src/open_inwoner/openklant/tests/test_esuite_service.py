@@ -148,6 +148,7 @@ class eSuiteServiceTestCase(TestCase, DisableRequestLogMixin):
 
     def test_retrieve_klant_paginates_full_response(self):
         base_url = f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn={self.data.user.bsn}"
+
         with requests_mock.mock() as m:
             m.get(
                 base_url,
