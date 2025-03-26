@@ -249,8 +249,16 @@ class eSuiteKlantenService(
         *,
         data: KlantWritePayload | None = None,
     ) -> Klant | None:
-        if sum(bool(arg) for arg in (user_bsn, user_kvk_or_rsin, vestigingsnummer)) > 1:
-            raise ValueError("Only one argument can be specified")
+        if user_bsn and user_kvk_or_rsin:
+            raise ValueError(
+                "Specify either `user_bsn` or `user_kvk_or_rsin` with optional "
+                "`vestigingsnummer`"
+            )
+
+        if vestigingsnummer and not user_kvk_or_rsin:
+            raise ValueError(
+                "You must specify `user_kvk_or_rsin` if `vestigingsnummer` is set"
+            )
 
         payload = {}
 
@@ -262,10 +270,10 @@ class eSuiteKlantenService(
             payload = payload | {"subjectIdentificatie": {"inpBsn": user_bsn}}
         elif user_kvk_or_rsin:
             payload = payload | {"subjectIdentificatie": {"innNnpId": user_kvk_or_rsin}}
-        elif vestigingsnummer:
-            payload = payload | {
-                "subjectIdentificatie": {"vestigingsNummer": vestigingsnummer}
-            }
+            if vestigingsnummer:
+                payload["subjectIdentificatie"] = payload["subjectIdentificatie"] | {
+                    "vestigingsNummer": vestigingsnummer
+                }
 
         try:
             response = self.client.post("klanten", json=payload)
