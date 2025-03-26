@@ -710,14 +710,12 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         self._setUpMocks(m)
         self._setUpExtraMocks(m)
         self._setUpOpenKlantMocks(m)
+        eherkenning_user = eHerkenningUserFactory(kvk="12345678", rsin="000000000")
 
         for use_rsin_for_innNnpId_query_parameter in [True, False]:
             with self.subTest(
                 use_rsin_for_innNnpId_query_parameter=use_rsin_for_innNnpId_query_parameter
             ):
-                eherkenning_user = eHerkenningUserFactory(
-                    kvk="12345678", rsin="000000000"
-                )
 
                 config = ESuiteKlantConfig.get_solo()
                 config.use_rsin_for_innNnpId_query_parameter = (
