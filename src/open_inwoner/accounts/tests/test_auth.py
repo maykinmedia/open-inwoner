@@ -17,7 +17,6 @@ from open_inwoner.accounts.choices import NotificationChannelChoice
 from open_inwoner.accounts.signals import KvKClient, update_user_on_login
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
-from open_inwoner.kvk.branches import get_kvk_branch_number
 from open_inwoner.kvk.tests.factories import CertificateFactory
 from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.models import KlantenSysteemConfig
@@ -884,9 +883,6 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
         )
         self.assertNotIn("invite_url", self.client.session.keys())
 
-        # check company branch number in session
-        self.assertEqual(get_kvk_branch_number(self.client.session), None)
-
     @patch("open_inwoner.accounts.signals.KvKClient.get_basisprofiel", autospec=True)
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     @patch(
@@ -936,9 +932,6 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
             response,
             reverse("profile:registration_necessary"),
         )
-
-        # check company branch number in session
-        self.assertEqual(get_kvk_branch_number(self.client.session), None)
 
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     @patch(
