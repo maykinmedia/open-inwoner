@@ -5,7 +5,6 @@ from django.http import Http404
 from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
 
-from open_inwoner.kvk.branches import get_kvk_branch_number
 from open_inwoner.openzaak.models import OpenZaakConfig, ZGWApiGroupConfig
 from open_inwoner.openzaak.types import UniformCase
 from open_inwoner.openzaak.utils import is_zaak_visible
@@ -87,7 +86,7 @@ class CaseAccessMixin(AccessMixin):
                     if api_group.fetch_eherkenning_zaken_with_rsin:
                         identifier = self.request.user.rsin
 
-                    vestigingsnummer = get_kvk_branch_number(self.request.session)
+                    vestigingsnummer = request.user.vestiging
                     if vestigingsnummer:
                         if not client.fetch_roles_for_case_and_vestigingsnummer(
                             self.case.url, vestigingsnummer
