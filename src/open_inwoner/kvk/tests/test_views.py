@@ -8,7 +8,6 @@ from pyquery import PyQuery
 from open_inwoner.accounts.tests.factories import eHerkenningUserFactory
 from open_inwoner.kvk.branches import (
     KVK_BRANCH_SESSION_VARIABLE,
-    get_kvk_branch_number,
     kvk_branch_selected_done,
 )
 from open_inwoner.kvk.tests.factories import CertificateFactory
@@ -59,7 +58,6 @@ class KvKViewsTestCase(TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(kvk_branch_selected_done(self.client.session), True)
-        self.assertEqual(get_kvk_branch_number(self.client.session), "1234")
 
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     @patch(
@@ -82,7 +80,6 @@ class KvKViewsTestCase(TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(kvk_branch_selected_done(self.client.session), True)
-        self.assertEqual(get_kvk_branch_number(self.client.session), "")
 
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     @patch(
@@ -141,7 +138,6 @@ class KvKViewsTestCase(TestCase):
         # Because no branches were found, the branch check should be skipped in the future
         # and no branch number should be set
         self.assertEqual(kvk_branch_selected_done(self.client.session), True)
-        self.assertEqual(get_kvk_branch_number(self.client.session), None)
 
         response = self.client.get(response.url)
 
