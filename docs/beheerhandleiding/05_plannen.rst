@@ -86,7 +86,7 @@ Door op een samenwerkingsplan in het overzicht te klikken, kunt u deze wijzigen.
    :height: 408px
 
 **UUID (Universally Unique ID)**
-**Dit is de automatisch gegenereerde user ID. Deze code kunt u niet wijzigen.
+Dit is de automatisch gegenereerde user ID. Deze code kunt u niet wijzigen.
 
 **Titel**
 Hier kunt u het samenwerkingsplan een andere naam geven.
@@ -109,7 +109,7 @@ Hier wordt de betrokken contactpersoon weergegeven. Klik op een naam om een ande
 
 Door een vinkje te zetten bij *Notificeer contact* ontvangt de betrokken contactpersoon een notificatie dat deze bij de samenwerking betrokken is. Om de contactpersoon van de samenwerking te verwijderen zet u een vinkje bij [verwijderen] alvorens de samenwerking op te slaan.
 
-**Opslaan of verwijderen*
+*Opslaan of verwijderen*
 U kunt in dit scherm ook het betreffende document verwijderen door onderaan het scherm op de rode knop [verwijderen] te klikken.
 
 Als u uw wijzigingen tussentijds wilt opslaan, klikt u op [opslaan en opnieuw bewerken]. Wanneer u tevreden bent met uw wijzigingen klikt u op [opslaan] om terug te keren naar het overzicht. Of u klikt op [opslaan en nieuwe toevoegen] als u een extra item wilt toevoegen.

@@ -395,8 +395,7 @@ Klik op de [+ nog een platte pagina toevoegen] om een extra platte pagina aan de
 
 
 **Volgorde platte pagina’s veranderen**
-U kunt de volgorde van de platte pagina’s in de footer veranderen. Onder ‘volgorde’ ziet u de huidige volgorde, waarbij 0 de bovenste link is en het hoogste getal de onderste. Om de volgorde te veranderen
-  gebruikt u de pijltjes knoppen achter de platte pagina’s, onder ‘verplaatsen’.
+U kunt de volgorde van de platte pagina’s in de footer veranderen. Onder ‘volgorde’ ziet u de huidige volgorde, waarbij 0 de bovenste link is en het hoogste getal de onderste. Om de volgorde te veranderen gebruikt u de pijltjes knoppen achter de platte pagina’s, onder ‘verplaatsen’.
 
 
 .. image:: images/image117.png
@@ -513,8 +512,7 @@ Help
 ----
 
 **Subject variables, body variables**
-Subject variables en body variables zijn de beschikbare variabelen voor het onderwerp en de body text. Variabelen zijn automatisch ingevulde teksten op basis van de beschikbare gegevens op het moment van versturen. U plaatst deze tussen twee accolades, zoals:
-  {{site_name}}.
+Subject variables en body variables zijn de beschikbare variabelen voor het onderwerp en de body text. Variabelen zijn automatisch ingevulde teksten op basis van de beschikbare gegevens op het moment van versturen. U plaatst deze tussen twee accolades, zoals: {{site_name}}.
 
 
 **Opmerkingen**
