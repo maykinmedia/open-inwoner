@@ -207,7 +207,7 @@ django-formtools==2.3
     # via
     #   django-cms
     #   django-two-factor-auth
-django-htmx==1.13.0
+django-htmx==1.23.0
     # via -r requirements/base.in
 django-image-cropping==1.7
     # via -r requirements/base.in

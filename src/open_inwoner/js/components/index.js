@@ -1,4 +1,14 @@
-import 'htmx.org'
+import * as htmxModule from 'htmx.org'
+
+// Ensure we get the correct export
+const htmx = htmxModule.default || htmxModule
+
+// Explicitly assign to window to ensure global availability
+window.htmx = htmx
+
+// Configure HTMX
+htmx.config.allowEval = false
+htmx.config.includeIndicatorStyles = false
 
 import './accessibility'
 import './actions'
@@ -38,8 +48,6 @@ import './twofactor-sms'
 import { FileInput } from './form/FileInput'
 import { ToggleHide } from './card/ToggleHide'
 import './views'
-
-const htmx = (window.htmx = require('htmx.org'))
 
 // eval() is problematic with CSP
 htmx.config.allowEval = false
@@ -99,3 +107,7 @@ function wrapComponentsOf(targetElement) {
 }
 
 htmx.onLoad(wrapComponentsOf)
+
+if (typeof htmx.on !== 'function') {
+  console.error('HTMX not properly initialized at start!')
+}
