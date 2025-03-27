@@ -108,9 +108,9 @@ class PasswordLoginViewTests(eHerkenningMockTestCase):
         self.assertContains(response, reverse("login"))
         self.assertNoEHerkenningURLS(response)
 
-    @patch("open_inwoner.kvk.signals.KvKClient.get_basisprofiel", autospec=True)
+    @patch("open_inwoner.accounts.signals.KvKClient.get_basisprofiel", autospec=True)
     @patch(
-        "open_inwoner.kvk.signals.KvKClient.retrieve_rsin_with_kvk",
+        "open_inwoner.accounts.signals.KvKClient.retrieve_rsin_with_kvk",
         return_value="123456789",
         autospec=True,
     )
@@ -168,7 +168,7 @@ class PasswordLoginViewTests(eHerkenningMockTestCase):
         # check company branch number in session
         self.assertEqual(get_kvk_branch_number(self.client.session), "1234")
 
-    @patch("open_inwoner.kvk.signals.KvKClient.get_basisprofiel", autospec=True)
+    @patch("open_inwoner.accounts.signals.KvKClient.get_basisprofiel", autospec=True)
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     def test_redirect_flow_with_single_company(self, mock_kvk, mock_get_basisprofiel):
         """
@@ -209,7 +209,7 @@ class PasswordLoginViewTests(eHerkenningMockTestCase):
         # check company branch number in session
         self.assertEqual(get_kvk_branch_number(self.client.session), None)
 
-    @patch("open_inwoner.kvk.signals.KvKClient.get_basisprofiel", autospec=True)
+    @patch("open_inwoner.accounts.signals.KvKClient.get_basisprofiel", autospec=True)
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     def test_redirect_flow_with_no_vestigingsnummer(
         self, mock_kvk, mock_get_basisprofiel
