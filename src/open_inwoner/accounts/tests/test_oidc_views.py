@@ -1060,9 +1060,9 @@ class eHerkenningOIDCFlowTests(WebTest):
         cms_tools.create_homepage()
         cms_tools.create_apphook_page(ProfileApphook)
 
-    @patch("open_inwoner.kvk.signals.KvKClient.get_basisprofiel", autospec=True)
+    @patch("open_inwoner.accounts.signals.KvKClient.get_basisprofiel", autospec=True)
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
-    @patch("open_inwoner.kvk.signals.KvKClient.retrieve_rsin_with_kvk")
+    @patch("open_inwoner.accounts.signals.KvKClient.retrieve_rsin_with_kvk")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
@@ -1139,8 +1139,8 @@ class eHerkenningOIDCFlowTests(WebTest):
         self.assertEqual(db_user.first_name, "John")
         self.assertEqual(db_user.last_name, "Doe")
 
-    @patch("open_inwoner.kvk.signals.KvKClient.get_basisprofiel", autospec=True)
-    @patch("open_inwoner.kvk.signals.KvKClient.retrieve_rsin_with_kvk")
+    @patch("open_inwoner.accounts.signals.KvKClient.get_basisprofiel", autospec=True)
+    @patch("open_inwoner.accounts.signals.KvKClient.retrieve_rsin_with_kvk")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
@@ -1300,9 +1300,9 @@ class eHerkenningOIDCFlowTests(WebTest):
             ]
         }
     )
-    @patch("open_inwoner.kvk.signals.KvKClient.get_basisprofiel", autospec=True)
+    @patch("open_inwoner.accounts.signals.KvKClient.get_basisprofiel", autospec=True)
     @patch(
-        "open_inwoner.kvk.signals.KvKClient.retrieve_rsin_with_kvk",
+        "open_inwoner.accounts.signals.KvKClient.retrieve_rsin_with_kvk",
         return_value="123456789",
         autospec=True,
     )
@@ -1502,7 +1502,7 @@ class eHerkenningOIDCFlowTests(WebTest):
 
         self.assertEqual(error_msg, str(GENERIC_EHERKENNING_ERROR_MSG))
 
-    @patch("open_inwoner.kvk.signals.KvKClient.get_basisprofiel", autospec=True)
+    @patch("open_inwoner.accounts.signals.KvKClient.get_basisprofiel", autospec=True)
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
@@ -1562,8 +1562,10 @@ class eHerkenningOIDCFlowTests(WebTest):
 
         self.assertEqual(error_msg, str(GENERIC_EHERKENNING_ERROR_MSG))
 
-    @patch("open_inwoner.kvk.signals.KvKClient.retrieve_rsin_with_kvk", autospec=True)
-    @patch("open_inwoner.kvk.signals.KvKClient.get_basisprofiel", autospec=True)
+    @patch(
+        "open_inwoner.accounts.signals.KvKClient.retrieve_rsin_with_kvk", autospec=True
+    )
+    @patch("open_inwoner.accounts.signals.KvKClient.get_basisprofiel", autospec=True)
     @patch(
         "mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo",
         autospec=True,
@@ -1637,11 +1639,11 @@ class eHerkenningOIDCFlowTests(WebTest):
         self.assertContains(response, _("Use DigiD to log in as a sole proprietor."))
 
     @patch(
-        "open_inwoner.kvk.signals.KvKClient.retrieve_rsin_with_kvk",
+        "open_inwoner.accounts.signals.KvKClient.retrieve_rsin_with_kvk",
         return_value="123456789",
         autospec=True,
     )
-    @patch("open_inwoner.kvk.signals.KvKClient.get_basisprofiel", autospec=True)
+    @patch("open_inwoner.accounts.signals.KvKClient.get_basisprofiel", autospec=True)
     @patch(
         "open_inwoner.kvk.client.KvKClient.get_all_company_branches",
         autospec=True,
@@ -1761,10 +1763,10 @@ class eHerkenningOIDCFlowTests(WebTest):
         self.assertEqual(profile_response.status_code, 200)
 
     @patch(
-        "open_inwoner.kvk.signals.KvKClient.retrieve_rsin_with_kvk",
+        "open_inwoner.accounts.signals.KvKClient.retrieve_rsin_with_kvk",
         autospec=True,
     )
-    @patch("open_inwoner.kvk.signals.KvKClient.get_basisprofiel", autospec=True)
+    @patch("open_inwoner.accounts.signals.KvKClient.get_basisprofiel", autospec=True)
     @patch(
         "open_inwoner.kvk.client.KvKClient.get_all_company_branches",
         autospec=True,
@@ -1870,7 +1872,7 @@ class eHerkenningOIDCFlowTests(WebTest):
 
         self.assertEqual(profile_response.status_code, 200)
 
-    @patch("open_inwoner.kvk.signals.KvKClient.get_basisprofiel", autospec=True)
+    @patch("open_inwoner.accounts.signals.KvKClient.get_basisprofiel", autospec=True)
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     @patch("open_inwoner.utils.context_processors.SiteConfiguration")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
@@ -1954,7 +1956,7 @@ class eHerkenningOIDCFlowTests(WebTest):
 
         self.assertEqual(profile_response.status_code, 200)
 
-    @patch("open_inwoner.kvk.signals.KvKClient.get_basisprofiel", autospec=True)
+    @patch("open_inwoner.accounts.signals.KvKClient.get_basisprofiel", autospec=True)
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     @patch("open_inwoner.utils.context_processors.SiteConfiguration")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
