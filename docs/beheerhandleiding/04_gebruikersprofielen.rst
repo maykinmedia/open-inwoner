@@ -11,7 +11,7 @@ In het topmenu vindt u de knop Gebruikersprofielen. Wanneer u hier met uw muis o
 
 Onder acties vindt u alle acties die gebruikers aan de voorkant van Open Inwoner (onder Mijn Profiel) hebben aangemaakt. U kunt de acties eenvoudig filteren op gebruiker. U ziet dan enkel de acties die bij een bepaalde gebruiker horen. Dit onderdeel is enkel in te zien (read-only).
 
-.. image:: images/image10.png
+.. image:: images/Screenshot OIP Acties - Djuzz 250311.png
    :alt: Gebruikersprofielen
    :width: 650px
 
@@ -21,7 +21,7 @@ Onder acties vindt u alle acties die gebruikers aan de voorkant van Open Inwoner
 
 U kunt het actieoverzicht sorteren op naam, creatiedatum en gebruiker. Dit doet u door op de gewenstekolomnaam te klikken. U kunt oplopend of aflopend sorteren op één of meerdere kolommen. Wanneer u alleen wilt sorteren op Naam klikt u enkel op deze kolom. Om te wisselen tussen oplopend en aflopend klikt u op het icoontje van het driehoekje dat naar boven of naar beneden wijst.
 
-.. image:: images/image11.png
+.. image:: images/Screenshot OIP Acties sorteren - Djuzz 250311.png
    :width: 622px
    :height: 111px
 
@@ -42,7 +42,7 @@ Door op een specifiek bericht te klikken kunt u de details van het bericht raadp
 
 Onder documenten vindt u alle documenten die gebruikers aan de voorkant van Open Inwoner (onder Mijn Profiel) hebben aangemaakt. Dit onderdeel is read-only: er kunnen geen wijzigingen worden aangebracht. U kunt documenten eenvoudig filteren op gebruiker. U ziet dan enkel de documenten die toegevoegd zijn door een bepaalde gebruiker.
 
-.. image:: images/image12.png
+.. image:: images/Screenshot OIP documenten - Djuzz 250311.png
    :width: 622px
    :height: 113px
 
@@ -63,7 +63,7 @@ Onder feed item data kunt u zien welke openstaande acties er op de homepage van 
 
 In de backend is het overzicht van de feed item data te raadplegen. Er is informatie te vinden over voor welke betreffende gebruiker de feed item data is, het soort feed item data, de datum waarop de actie is aangemaakt en of de informatie in de feed bekeken is of dat de actie is voltooid en zo ja, op welke datum. De gegevens kunnen worden gefilterd en gesorteerd op de al deze elementen.
 
-.. image:: images/image14.png
+.. image:: images/Screenshot OIP feed item data - Djuzz 250311.png
    :width: 624px
    :height: 274px
 
@@ -73,7 +73,7 @@ In de backend is het overzicht van de feed item data te raadplegen. Er is inform
 
 Onder gebruikers vindt u alle gebruikers van uw Open Inwoner. Indien gewenst kunt u gebruikers toevoegen, wijzigen en verwijderen. Daarnaast kunt u de permissies van gebruikers wijzigen en een gebruikersaccount overnemen (kapen). Bovendien kunt u de gebruikers eenvoudig filteren op beheerstatus, supergebruikerstatus of op activiteit.
 
-.. image:: images/image15.png
+.. image:: images/Screenshot OIP gebruikers - Djuzz 250311.png
    :width: 622px
    :height: 176px
 
@@ -102,7 +102,7 @@ Door in het gebruikersoverzicht op de knop [Gebruiker toevoegen +] rechts boveni
 -------------------------
 Door op een gebruiker in het overzicht te klikken, kunt u deze wijzigen. Er wordt een nieuw scherm geopend waar u naast de persoonlijke gegevens diverse wijzigingen kunt aanbrengen.
 
-.. image:: images/image16.png
+.. image:: images/Screenshot OIP gebruiker wijzigen- Djuzz 250311.png
    :width: 624px
    :height: 385px
 
@@ -142,7 +142,7 @@ Door op een gebruiker in het overzicht te klikken, kunt u deze wijzigen. Er word
 
 Door in het gebruikersoverzicht op een bepaalde gebruiker te klikken kunt u deze wijzigen, zoals in 4.6.3 beschreven. Wanneer u de permissies van een gebruiker wilt aanpassen, klikt u in het wijzigingsscherm in de blauwe balk met Permissies op [tonen]. U kunt nu de diverse wijzigingen rond de permissies aanbrengen.
 
-.. image:: images/image17.png
+.. image:: images/Screenshot OIP gebruiker wijzigen permissies - Djuzz 250311.png
    :width: 622px
    :height: 333px
 
