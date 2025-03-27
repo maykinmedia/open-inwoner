@@ -138,12 +138,8 @@ class KvKClient:
     def get_basisprofiel(self, kvk: str) -> dict:
         return self._request(f"{self.basisprofielen_endpoint}/{kvk}")
 
-    def retrieve_rsin_with_kvk(self, kvk, **kwargs) -> str | None:
-        basisprofiel = self._request(
-            f"{self.basisprofielen_endpoint}/{kvk}", params=kwargs
-        )
-
-        if not basisprofiel:
+    def retrieve_rsin_with_kvk(self, kvk: str) -> str | None:
+        if not (basisprofiel := self.get_basisprofiel(kvk)):
             return None
 
         try:
