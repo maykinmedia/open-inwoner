@@ -186,7 +186,7 @@
     grid-template-areas: 'secondary spacing primary';
     grid-template-columns: auto 1fr auto;
     gap: var(--gutter-width);
-    margin-top: 28px;
+    margin-top: var(--spacing-extra-large);
 
     &--single {
       gap: 0;

@@ -1,3 +1,4 @@
+import './feedback'
 import './filter'
 import './filter-modal'
 
@@ -19,16 +20,3 @@ document.querySelectorAll('.search-form-delegate').forEach((form) => {
     }
   })
 })
-
-// connect search feedback
-document
-  .querySelectorAll('.feedback__options .button-radio__input')
-  .forEach((radioButton) => {
-    radioButton.addEventListener('click', (event) => {
-      document
-        .querySelectorAll('.feedback__remark')
-        .forEach((feedbackRemark) =>
-          feedbackRemark.classList.add('feedback__remark--show')
-        )
-    })
-  })

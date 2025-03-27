@@ -44,7 +44,7 @@ export class Filter {
   }
 
   /**
-   * Get the reset button `(_'Wiss alle?')` of the current filter,
+   * Get the reset button `(_'Wis alle?')` of the current filter,
    * @returns {HTMLButtonElement}
    */
   get resetButton() {
