@@ -12,7 +12,7 @@ from open_inwoner.kvk.client import KvKClient
 from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.models import KlantenSysteemConfig
 from open_inwoner.openklant.services import OpenKlant2Service, eSuiteKlantenService
-from open_inwoner.utils.logentry import user_action
+from open_inwoner.utils.logentry import system_action, user_action
 
 from .choices import LoginTypeChoices
 
@@ -38,8 +38,10 @@ def update_user_on_login(sender, user, request, *args, **kwargs):
     if user.login_type not in [LoginTypeChoices.digid, LoginTypeChoices.eherkenning]:
         return
 
-    # KvK API
-    if user.login_type == LoginTypeChoices.eherkenning:
+    # Sync company details from KvK -- note it's important this runs _before_ syncing
+    # to the klanten APIs, because e.g. RSIN or company name will be a required input
+    # for certain sync operations.
+    if user.is_eherkenning_user:
         _update_eherkenning_user_from_kvk_api(user=user)
 
     config = KlantenSysteemConfig.get_solo()
@@ -82,22 +84,59 @@ def _update_user_from_esuite(
 
 
 def _update_eherkenning_user_from_kvk_api(user: User):
+    extra_exc_params = {"kvk": user.kvk, "vestiging": user.vestiging}
     try:
         kvk_client = KvKClient()
-        if user.vestiging:
-            vestiging = kvk_client.get_vestiging(vestiging=user.vestiging)
+        updated_fields = []
+
+        # Update company name. We want this to run on every login because it may
+        # change (if infrequently)
+        if vestiging := (
+            kvk_client.get_vestiging(vestiging=user.vestiging)
+            if user.vestiging
+            else kvk_client.get_company_headquarters(kvk=user.kvk)
+        ):
+            if (
+                company_name := vestiging.get("naam")
+            ) and user.company_name != company_name:
+                user.company_name = company_name
+                user.save(update_fields=["company_name"])
+                updated_fields.append("company_name")
         else:
-            vestiging = kvk_client.get_company_headquarters(kvk=user.kvk)
+            logger.error(
+                "Unable to sync company_name from KvK API",
+                extra=extra_exc_params,
+            )
 
-        if not vestiging:
-            logger.error("Unable to connect to KvK API to get vestiging")
-            return
+        # Optionally update RSIN. Unlike company name, RSIN should be immutable, so we
+        # only have to fetch it if it's not set.
+        if not user.rsin:
+            rsin = kvk_client.retrieve_rsin_with_kvk(user.kvk)
 
-        if company_name := vestiging.get("naam"):
-            user.company_name = company_name
-            user.save()
+            if rsin:
+                user.rsin = rsin
+                user.save(update_fields=["rsin"])
+                updated_fields.append("rsin")
+            else:
+                logger.error(
+                    "Unable to sync rsin from KvK API",
+                    extra=extra_exc_params,
+                )
+
+        if updated_fields:
+            system_action(
+                _(
+                    "user attributes were updated from KvK API: %(fields)s"
+                    % {"fields": ", ".join(updated_fields)}
+                ),
+                content_object=user,
+            )
+
     except Exception:
-        logger.exception("Unable to update eHerkenning user from KvK API")
+        logger.exception(
+            "Unable to update eHerkenning user from KvK API",
+            extra=extra_exc_params,
+        )
 
 
 @receiver(user_logged_in)
