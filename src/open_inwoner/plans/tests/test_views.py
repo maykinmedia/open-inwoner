@@ -44,7 +44,11 @@ class PlanViewTests(WebTest):
 
         self.login_url = reverse("login")
         self.list_url = reverse("collaborate:plan_list")
-        self.create_url = reverse("collaborate:plan_create")
+        self.choose_template_url = reverse("collaborate:plan_choose_template")
+        # TODO: new tests for choosing template form
+        self.create_url = reverse("collaborate:plan_create_no_template")
+        self.create_from_template_url = reverse("collaborate:plan_create_from_template")
+        # TODO: new tests for creating plan from template where Title/Goal are prefilled, but Contact/Enddate are not.
         self.detail_url = reverse(
             "collaborate:plan_detail", kwargs={"uuid": self.plan.uuid}
         )
@@ -353,7 +357,7 @@ class PlanViewTests(WebTest):
         self.user.user_contacts.add(another_contact)
         response = self.app.get(self.create_url, user=self.user)
 
-        rendered_contacts = response.pyquery("#plan-form .grid .form__grid-box")[
+        rendered_contacts = response.pyquery("#plan-form .form__grid-box")[
             0
         ].text_content()
 
@@ -437,7 +441,7 @@ class PlanViewTests(WebTest):
         self.assertEqual(plan.documents.count(), 1)
         self.assertEqual(plan.actions.count(), 0)
 
-    def test_plan_create_plan_with_template_and_actions(self):
+    def test_plan_create_no_template_plan_with_template_and_actions(self):
         plan_template = PlanTemplateFactory(file=None)
         ActionTemplateFactory(plan_template=plan_template)
 
@@ -465,7 +469,9 @@ class PlanViewTests(WebTest):
         self.assertEqual(plan.documents.count(), 0)
         self.assertEqual(plan.actions.count(), 1)
 
-    def test_plan_create_plan_validation_error_reselects_template_and_contact(self):
+    def test_plan_create_no_template_plan_validation_error_reselects_template_and_contact(
+        self,
+    ):
         plan_template = PlanTemplateFactory(file=None)
         ActionTemplateFactory(plan_template=plan_template)
         # make sure we have only one plan
@@ -523,12 +529,14 @@ class PlanViewTests(WebTest):
         # nothing was created
         self.assertEqual(Plan.objects.count(), 1)
 
-    def test_plan_create_contains_contact_create_link_when_no_contacts_exist(self):
+    def test_plan_create_no_template_contains_contact_create_link_when_no_contacts_exist(
+        self,
+    ):
         self.user.user_contacts.remove(self.contact)
         response = self.app.get(self.create_url, user=self.user)
         self.assertContains(response, reverse("profile:contact_create"))
 
-    def test_plan_create_does_not_contain_contact_create_link_when_contacts_exist(
+    def test_plan_create_no_template_does_not_contain_contact_create_link_when_contacts_exist(
         self,
     ):
         response = self.app.get(self.create_url, user=self.user)

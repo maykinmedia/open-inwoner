@@ -1,8 +1,11 @@
 .plan-create {
+  .form {
+    gap: var(--spacing-giant);
+  }
+
   .form__control {
     .label {
       position: relative;
-      max-width: var(--form-width);
     }
 
     [class*='icons'] {
@@ -16,39 +19,11 @@
 
     &:focus,
     &:focus-visible {
-      background-color: var(--color-gray-lightest);
       border-radius: var(--border-radius);
     }
   }
 
-  .modal--open {
-    .modal__container {
-      padding: var(--spacing-giant);
-
-      [class*='icons'] {
-        font-size: var(--font-size-body-large);
-      }
-
-      .button-icon--primary {
-        color: var(--color-white);
-        font-size: var(--font-size-body);
-        transform: none;
-      }
-
-      .modal__actions {
-        .modal__button {
-          &:focus-visible {
-            box-shadow: none;
-            outline: none;
-          }
-        }
-      }
-
-      .modal__title .modal__button {
-        height: var(--font-size-body);
-        min-width: initial;
-        padding: 0;
-      }
-    }
+  .form__grid-box {
+    gap: 10px;
   }
 }

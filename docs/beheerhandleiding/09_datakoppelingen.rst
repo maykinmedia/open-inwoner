@@ -238,8 +238,7 @@ Deze API haalt de documenten op die bij een bepaalde zaak horen.
 
 
 **Catalogi API**
-In de catalogi zit alle informatie over zaaktypes en andere
-  gerelateerde informatie. De Catalogi API vult de zaaktypeconfiguratie in. Denk hierbij aan statussen, documenten, resultaten.
+In de catalogi zit alle informatie over zaaktypes en andere gerelateerde informatie. De Catalogi API vult de zaaktypeconfiguratie in. Denk hierbij aan statussen, documenten, resultaten.
 
 
 **Formulieren API (Open Aanvragen)**
@@ -364,8 +363,7 @@ Selecteer hier de betreffende SOAP service. Dit is de algemene manier om de SSD 
 
 
 **Maandspecificaties endpoint**
-De API die moet worden gebruikt om maandspecificatie-informatie op te
-  halen.
+De API die moet worden gebruikt om maandspecificatie-informatie op te halen.
 
 
 **Jaaropgave endpoint**

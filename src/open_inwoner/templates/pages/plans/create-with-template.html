@@ -1,0 +1,48 @@
+{% extends 'master.html' %}
+{% load i18n button_tags card_tags map_tags form_tags grid_tags icon_tags string_tags link_tags %}
+
+{% block content %}
+    <div class="plan-create">
+        <div class="plan-template__header">
+            <h1>{{ object.title }} 
+                {# remove once functional object exists #}
+                [[ Title of chosen plan template ]] </h1>
+            <div class="plan-template__header-nav">
+                {% if request.user.get_active_contacts %}
+                    {% button href="collaborate:plan_create_no_template" text=_("Zelf in te vullen samenwerking") primary=True transparent=True extra_classes="link--bold" icon="insert_drive_file" icon_outlined=True %}
+                {% endif %}
+            </div>
+        </div>
+
+        {% render_grid %}
+            {% render_column start=4 span=6 %}
+                {% if request.user.get_active_contacts %}
+                    {% render_form id="plan-form" form=form method="POST" %}
+                    {# TODO: May need different form, based on chosen template from previous step in flow #}
+                    {# {% render_form id="plan-form...?" form=form method="POST" %} #}
+                        {% csrf_token %}
+                        {% date_field form.end_date icon="calendar_today" icon_position="after" %}
+                        <div class="plan__contacts">
+                            <p class="utrecht-paragraph">Contactpersoon</p>
+                            {% checkboxes form.plan_contacts %}
+                        </div>
+
+                        {% if form.template.errors %}
+                            {% errors errors=form.template.errors %}
+                        {% endif %}
+
+                        <div class="form__actions form__actions--fullwidth">
+                            {% button text=_("Maak samenwerking aan") primary=True type="submit" %}
+                            {% button href="collaborate:plan_list" icon="west" text=_("Terug naar Mijn samenwerkingen") icon_outlined=True transparent=True %}
+                        </div>
+                    {% endrender_form %}
+                {% else %}
+                    <div class="utrecht-paragraph">
+                        {% url 'profile:contact_create' as contact_create %}
+                        {% link href=contact_create text=_("Maak je eerste contact aan voordat je een samenwerking start") icon="arrow_forward" icon_position="after" primary=True %}
+                    </div>
+                {% endif %}
+            {% endrender_column %}
+        {% endrender_grid %}
+    </div>
+{% endblock %}

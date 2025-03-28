@@ -46,8 +46,7 @@ Hier formuleert u het ontkennende antwoord op de conditie. Waarmee voldoet men n
 
 
 **Regel**
-Hier worden regels opgegeven voor de automatische controle van de betreffende conditie. Dit is momenteel nog niet beschikbaar in Open
-  Inwoner.
+Hier worden regels opgegeven voor de automatische controle van de betreffende conditie. Dit is momenteel nog niet beschikbaar in Open Inwoner.
 
 
 **Opslaan of verwijderen**

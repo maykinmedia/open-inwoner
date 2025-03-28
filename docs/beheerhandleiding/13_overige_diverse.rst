@@ -21,14 +21,6 @@ Door in het overzicht op de knop [application group toevoegen +] rechts bovenin 
 
 U kunt de volgorde van de menu-items veranderen door in het overzicht op de icoontjes naast het betreffende menu-item te klikken.
 
-|image5| \ = helemaal naar boven
-
-|image6| \ = één plaats naar boven
-
-|image7| \ = éen plaats naar onder
-
-|image8| \ = helemaal naar onderen
-
 13.1.3. Application group wijzigen
 ----------------------------------
 
@@ -226,13 +218,11 @@ Vul hier de override routing key in voor low-level AMQP routing.
 
 
 **Priority**
-Geef de periodieke taak een prioriteit mee. Hiervoor geldt een
- waarde tussen 0 en 255, waarbij 0 de hoogste prioriteit heeft.
+Geef de periodieke taak een prioriteit mee. Hiervoor geldt een waarde tussen 0 en 255, waarbij 0 de hoogste prioriteit heeft.
 
 
 **AMQP Message headers**
-Vul hier een JSON geëncodeerde bericht header in voor het AMQP
-  bericht.
+Vul hier een JSON geëncodeerde bericht header in voor het AMQP bericht.
 
 13.4.Taken
 ==========

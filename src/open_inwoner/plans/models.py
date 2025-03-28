@@ -107,25 +107,24 @@ class Plan(models.Model):
     )
     goal = models.TextField(
         verbose_name=_("Goal"),
-        help_text=_(
-            "The goal for the plan. So that you and the contact knows what the goal is."
-        ),
+        help_text=_("What do you wish to achieve through this plan?"),
     )
     description = models.TextField(
-        verbose_name=_("description"),
+        verbose_name=_("Description"),
         default="",
         blank=True,
-        help_text=_("The description of the plan."),
+        help_text=_("How do you intend to achieve this goal?"),
     )
     end_date = models.DateField(
-        verbose_name=_("End date"), help_text=_("When the plan should be archived.")
+        verbose_name=_("Expected end date"),
+        help_text=_("When the plan should be archived."),
     )
     plan_contacts = models.ManyToManyField(
         "accounts.User",
         verbose_name=_("Contacts"),
         related_name="plans",
         blank=True,
-        help_text=_("The contact that will help you with this plan."),
+        help_text=_("Who will you be working with on this plan?"),
         through=PlanContact,
     )
     created_by = models.ForeignKey(

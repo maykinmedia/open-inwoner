@@ -70,17 +70,20 @@
 
       &.actions__status-selector {
         &--approval {
-          border-color: var(--color-danger);
+          background-color: var(--color-danger-lightest);
+          border-color: var(--color-danger-lightest);
           color: var(--color-danger);
         }
 
         &--open {
-          border-color: var(--color-info-darker);
+          background-color: var(--color-info-lightest);
+          border-color: var(--color-info-lightest);
           color: var(--color-info-darker);
         }
 
         &--closed {
-          border-color: var(--color-success);
+          background-color: var(--color-success-lighter);
+          border-color: var(--color-success-lighter);
           color: var(--color-success);
         }
       }

@@ -18,11 +18,11 @@
                 <span class="file__name">
                     {{ name }}
                     {% if extension and size %}
-                        ({{ extension }}, {{ size|readable_size }})
+                        <span class="file__extension">({{ extension }}</span>, <span class="file__size">{{ size|readable_size }})</span>
                     {% elif extension %}
-                        ({{ extension }})
+                        <span class="file__extension">({{ extension }})</span>
                     {% elif size %}
-                        ({{ size|readable_size }})
+                        <span class="file__size">({{ size|readable_size }})</span>
                     {% endif %}
                 </span>
                 <span class="file__date">{{ created|date:'j F Y' }}</span>

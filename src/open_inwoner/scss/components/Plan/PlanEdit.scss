@@ -1,6 +1,5 @@
 .plan-edit {
   .form {
-    max-width: var(--form-width);
     .form__control [class*='icons'] {
       transform: initial;
     }
@@ -12,9 +11,6 @@
       .form__control > .label {
         input[type='file'] {
           min-width: 100%;
-        }
-        .input {
-          max-width: var(--form-width);
         }
       }
     }

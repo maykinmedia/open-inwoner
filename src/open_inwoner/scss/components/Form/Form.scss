@@ -106,7 +106,6 @@
   }
 
   @media (min-width: 360px) {
-    &__control > .label .input,
     &__control > .label .input[type='file'] {
       max-width: var(--form-width);
     }
@@ -186,7 +185,7 @@
     grid-template-areas: 'secondary spacing primary';
     grid-template-columns: auto 1fr auto;
     gap: var(--gutter-width);
-    margin-top: 28px;
+    margin-top: var(--spacing-extra-large);
 
     &--single {
       gap: 0;
@@ -196,12 +195,17 @@
     &--fullwidth {
       display: block;
       margin: 0;
-      max-width: var(--form-width);
+      max-width: min-content;
 
       .button {
         width: 100%;
         font-weight: bold;
+        padding-left: 0;
         justify-content: center;
+
+        &:hover {
+          transform: translateY(-1px);
+        }
       }
     }
   }
