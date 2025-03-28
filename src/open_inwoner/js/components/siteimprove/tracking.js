@@ -331,6 +331,29 @@ const specificClickSelectors = {
     'Click',
     'Checkbox status filter option',
   ],
+  // Hide personal data, and set Dashboard, for these elements
+  '.actions__filters select#id_is_for': [
+    'event',
+    'Mijn Samenwerkigen Acties',
+    'Click',
+    'Filter op persoon',
+  ],
+  '#profile-section-mentors .list .list-item .utrecht-paragraph': [
+    'event',
+    'Mijn Profiel Overzicht',
+    'Click',
+    'Ga naar Begeleiders via tegel',
+  ],
+  '#profile-section-contacts .list .list-item .utrecht-paragraph': [
+    'event',
+    'Mijn Profiel Overzicht',
+    'Click',
+    'Ga naar Mijn contacten via tegel',
+  ],
+  '.primary-navigation.primary-navigation__authenticated .primary-navigation__list .primary-navigation__list-item .primary-navigation--toggle':
+    ['event', 'Navigatie', 'Click', 'Welkom ...'],
+  '.primary-navigation.primary-navigation__authenticated .primary-navigation__list .primary-navigation__list-item .primary-navigation--toggle span':
+    ['event', 'Navigatie', 'Click', 'Welkom ...'],
 }
 
 /**
@@ -394,6 +417,9 @@ const partialClickSelectors = {
     { category: 'Mijn berichten', label: 'Click naar bericht' },
   // Hide personal data from inputs
   'input[type="text"]': { label: 'Click in invoerveld' },
+  'input[type="email"]': { label: 'Click in e-mail invoerveld' },
+  'input[type="password"]': { label: 'Click in wachtwoord invoerveld' },
+  'input[type="tel"]': { label: 'Click in telefoonnummer invoerveld' },
   'input[type="checkbox"]': { label: 'Click op checkbox' },
   '.newsletter-form input[type="checkbox"]': { category: 'Nieuwsbrieven' },
   'input[type="radio"]': { label: 'Click op radiobutton' },
