@@ -168,3 +168,8 @@
     }
   }
 }
+
+.body:has(.modal--open) {
+  overflow: hidden;
+  position: fixed;
+}

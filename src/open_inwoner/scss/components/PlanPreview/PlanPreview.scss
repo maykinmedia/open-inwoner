@@ -1,0 +1,29 @@
+.show-preview {
+  cursor: pointer;
+
+  & *[class*='icons'] {
+    font-size: var(--font-size-body-large);
+  }
+}
+
+.plan-preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-large);
+  text-align: left;
+
+  @media (min-width: 768px) {
+    grid-template-columns: 90px 1fr;
+  }
+
+  .plan-preview__span {
+    padding-bottom: var(--spacing-tiny);
+  }
+
+  .plan-preview__key {
+    color: var(--color-gray-dark-900);
+    font-size: var(--font-size-body-small);
+    line-height: var(--font-line-height-body-small);
+    margin: var(--spacing-large) 0 0 0;
+  }
+}

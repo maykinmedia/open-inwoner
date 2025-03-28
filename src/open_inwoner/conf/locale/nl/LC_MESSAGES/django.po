@@ -6496,21 +6496,20 @@ msgstr ""
 msgid "goal"
 msgstr "doel"
 
-#: open_inwoner/plans/models.py:37 open_inwoner/plans/models.py:111
+#: open_inwoner/plans/models.py:37 open_inwoner/plans/models.py:110
 msgid ""
-"The goal for the plan. So that you and the contact knows what the goal is."
+"What do you wish to achieve through this plan?"
 msgstr ""
-"Het doel van het plan, omschrijf in het algemeen wat je wilt bereiken met je "
-"plan."
+"Wat wilt u door de samenwerking bereiken?"
 
 #: open_inwoner/plans/models.py:41 open_inwoner/plans/models.py:71
 #: open_inwoner/plans/models.py:115
 msgid "description"
 msgstr "omschrijving"
 
-#: open_inwoner/plans/models.py:44 open_inwoner/plans/models.py:118
-msgid "The description of the plan."
-msgstr "Omschrijving van het plan"
+#: open_inwoner/plans/models.py:44 open_inwoner/plans/models.py:116
+msgid "How do you intend to achieve this goal?"
+msgstr "Hoe wilt u dit doel bereiken?"
 
 #: open_inwoner/plans/models.py:57
 msgid "Plan template"
@@ -6555,27 +6554,30 @@ msgstr "Notificeer contact"
 
 #: open_inwoner/plans/models.py:106
 msgid "The title of the plan"
-msgstr "De titel van het plan"
+msgstr "De titel van het samenwerkingsplan"
 
 #: open_inwoner/plans/models.py:109
 #: open_inwoner/templates/export/plans/plan_export.html:14
 msgid "Goal"
 msgstr "Doel"
 
-#: open_inwoner/plans/models.py:121
+#: open_inwoner/plans/models.py:119
+msgid "Expected end date"
+msgstr "Verwachte einddatum"
+
 #: open_inwoner/templates/export/include/actions.html:10
 #: open_inwoner/templates/export/plans/plan_export.html:22
 #: open_inwoner/templates/export/profile/action_export.html:24
 msgid "End date"
 msgstr "Einddatum"
 
-#: open_inwoner/plans/models.py:121
+#: open_inwoner/plans/models.py:120
 msgid "When the plan should be archived."
 msgstr "Wanneer het plan afgerond zou moeten zijn."
 
-#: open_inwoner/plans/models.py:128
-msgid "The contact that will help you with this plan."
-msgstr "Een contactpersoon die je met het plan gaat helpen."
+#: open_inwoner/plans/models.py:127
+msgid "Who will you be working with on this plan?"
+msgstr "Met wie gaat u aan dit plan werken?"
 
 #: open_inwoner/plans/models.py:134
 msgid "Created at"
@@ -6692,11 +6694,14 @@ msgstr "Samenwerken"
 msgid "Doelen"
 msgstr "Doelen"
 
-#: open_inwoner/plans/views.py:250
-#: open_inwoner/templates/pages/plans/create.html:6
+#: open_inwoner/plans/views.py:252
+msgid "Kies voorstel"
+msgstr "Kies voorstel"
+
+#: open_inwoner/templates/pages/plans/create.html:7
 #: open_inwoner/templates/pages/plans/list.html:13
-msgid "Start nieuwe samenwerking"
-msgstr "Start nieuwe samenwerking"
+msgid "Start een nieuwe samenwerking"
+msgstr "Start een nieuwe samenwerking"
 
 #: open_inwoner/plans/views.py:288 open_inwoner/plans/views.py:332
 #: open_inwoner/plans/views.py:373 open_inwoner/plans/views.py:410

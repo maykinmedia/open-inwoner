@@ -47,3 +47,43 @@
     margin-bottom: var(--spacing-medium);
   }
 }
+
+.plan__contacts {
+  .form__control {
+    display: flex;
+    flex-direction: column-reverse;
+
+    .utrecht-paragraph:last-child {
+      font-size: var(--font-size-body-small);
+      margin: var(--spacing-large) 0;
+    }
+  }
+
+  .checkbox {
+    position: relative;
+    padding: var(--spacing-medium) var(--spacing-large);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--font-color-body);
+  }
+
+  .checkbox {
+  }
+
+  .checkbox__input {
+    position: absolute;
+  }
+
+  .checkbox__label {
+    display: inline-block;
+    line-height: var(--font-line-height-body);
+    width: 100%;
+
+    &:before {
+      top: 2px;
+    }
+  }
+}
+
+.plan__no-contacts {
+  padding-top: var(--spacing-extra-large);
+}
