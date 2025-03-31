@@ -44,6 +44,10 @@ def update_user_on_login(sender, user, request, *args, **kwargs):
     if user.is_eherkenning_user:
         _update_eherkenning_user_from_kvk_api(user=user)
 
+    # update brp fields when login with digid and brp is configured
+    if user.is_digid_user and HaalCentraalConfig.get_solo().service:
+        update_brp_data_in_db(user)
+
     config = KlantenSysteemConfig.get_solo()
     if config.primary_backend == KlantenServiceType.OPENKLANT2.value:
         try:
@@ -156,12 +160,6 @@ def log_user_login(sender, user, request, *args, **kwargs):
         user_action(request, user, MESSAGE_TYPE["frontend_oidc"])
     else:
         user_action(request, user, MESSAGE_TYPE["frontend_email"])
-
-    # update brp fields when login with digid and brp is configured
-    brp_config = HaalCentraalConfig.get_solo()
-
-    if user.login_type == LoginTypeChoices.digid and brp_config.service:
-        update_brp_data_in_db(user)
 
 
 @receiver(user_logged_out)
