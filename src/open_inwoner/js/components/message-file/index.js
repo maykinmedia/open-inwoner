@@ -3,8 +3,30 @@ class MessageFile {
     // nodes
     this.node = node
     this.fileInput = node.querySelector('input[type=file]')
+    this.previewContainer = document.createElement('div')
+    this.previewContainer.classList.add('message-file__preview-container')
+    this.node.appendChild(this.previewContainer)
 
-    // init value
+    // Create an accessible button to trigger file selection
+    this.fileButton = document.createElement('button')
+    this.fileButton.setAttribute('type', 'button')
+    this.fileButton.classList.add('message-file__button')
+
+    const buttonIcon = document.createElement('span')
+    buttonIcon.classList.add('material-icons-outlined')
+    buttonIcon.textContent = 'attach_file'
+
+    const buttonText = document.createElement('span')
+    buttonText.classList.add('sr-only')
+    buttonText.textContent = 'Bestand selecteren'
+
+    this.fileButton.appendChild(buttonIcon)
+    this.fileButton.appendChild(buttonText)
+
+    this.fileButton.addEventListener('click', () => this.fileInput.click())
+    this.fileInput.insertAdjacentElement('beforebegin', this.fileButton)
+
+    // Check for initial file
     this.init = this.fileInput.dataset.init
     if (this.init) {
       this.addPreview(this.init)
@@ -25,33 +47,39 @@ class MessageFile {
     }
   }
 
-  removeFile(event) {
+  removeFile() {
     this.removePreview()
     this.clearInitInput()
+    this.fileInput.value = '' // Reset file input
   }
 
   addPreview(filename) {
     const preview = document.createElement('div')
     preview.classList.add('message-file__preview')
-    this.node.appendChild(preview)
 
     const fileNameElement = document.createElement('span')
     fileNameElement.textContent = filename
-    preview.appendChild(fileNameElement)
+
+    const deleteButton = document.createElement('button')
+    deleteButton.classList.add('message-file__delete')
+    deleteButton.setAttribute('aria-label', 'Verwijder bestand')
 
     const deleteIcon = document.createElement('span')
-    deleteIcon.classList.add('message-file__delete')
     deleteIcon.classList.add('material-icons')
     deleteIcon.textContent = 'delete'
-    preview.appendChild(deleteIcon)
 
-    deleteIcon.addEventListener('click', this.removeFile.bind(this))
+    deleteButton.appendChild(deleteIcon)
+    deleteButton.addEventListener('click', () => this.removeFile())
+
+    preview.appendChild(fileNameElement)
+    preview.appendChild(deleteButton)
+    this.previewContainer.appendChild(preview)
   }
 
+  // Remove all previews before adding a new one
   removePreview() {
-    const preview = this.node.querySelector('.message-file__preview')
-    if (preview) {
-      preview.remove()
+    while (this.previewContainer.firstChild) {
+      this.previewContainer.removeChild(this.previewContainer.firstChild)
     }
   }
 
@@ -59,10 +87,10 @@ class MessageFile {
     const initInput = this.node.querySelector('.message-file__init')
     if (initInput) {
       initInput.value = ''
-      initInput.defaultValue = ''
     }
   }
 }
 
-const messageFiles = document.querySelectorAll('.message-file')
-;[...messageFiles].forEach((node) => new MessageFile(node))
+document
+  .querySelectorAll('.message-file')
+  .forEach((node) => new MessageFile(node))

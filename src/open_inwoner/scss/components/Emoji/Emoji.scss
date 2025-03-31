@@ -16,6 +16,10 @@
     cursor: pointer;
   }
 
+  .button {
+    color: var(--color-primary);
+  }
+
   &__emoji-button {
     cursor: pointer;
 
@@ -34,6 +38,10 @@
     &--open {
       display: block;
     }
+  }
+
+  &__close {
+    pointer-events: all;
   }
 
   &__emojis {
