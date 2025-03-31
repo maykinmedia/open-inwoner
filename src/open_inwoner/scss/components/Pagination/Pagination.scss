@@ -3,6 +3,10 @@
   margin: var(--spacing-giant) auto 0 auto;
   justify-content: center;
 
+  > .button {
+    padding: var(--spacing-medium) var(--spacing-giant);
+  }
+
   &__pages {
     display: flex;
     flex-direction: row;
