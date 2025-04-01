@@ -269,10 +269,14 @@ class eSuiteKlantenService(
         if user_bsn:
             payload = payload | {"subjectIdentificatie": {"inpBsn": user_bsn}}
         elif user_kvk_or_rsin:
-            payload = payload | {"subjectIdentificatie": {"innNnpId": user_kvk_or_rsin}}
             if vestigingsnummer:
-                payload["subjectIdentificatie"] = payload["subjectIdentificatie"] | {
-                    "vestigingsNummer": vestigingsnummer
+                payload = payload | {
+                    "subjectIdentificatie": {"vestigingsNummer": vestigingsnummer}
+                }
+
+            else:
+                payload = payload | {
+                    "subjectIdentificatie": {"innNnpId": user_kvk_or_rsin}
                 }
 
         try:
@@ -312,18 +316,18 @@ class eSuiteKlantenService(
                 and user.case_notification_channel
                 != NotificationChannelChoice.digital_only
             ):
-                update_data[
-                    "case_notification_channel"
-                ] = NotificationChannelChoice.digital_only
+                update_data["case_notification_channel"] = (
+                    NotificationChannelChoice.digital_only
+                )
 
             elif (
                 klant.toestemming_zaak_notificaties_alleen_digitaal is False
                 and user.case_notification_channel
                 != NotificationChannelChoice.digital_and_post
             ):
-                update_data[
-                    "case_notification_channel"
-                ] = NotificationChannelChoice.digital_and_post
+                update_data["case_notification_channel"] = (
+                    NotificationChannelChoice.digital_and_post
+                )
             else:
                 # This is a guard against the scenario where a deployment is
                 # configured to use an older version of the klanten backend (that
@@ -1389,9 +1393,9 @@ class OpenKlant2Service(
         for klantcontact in self.klantcontacten_for_partij(
             partij_uuid, kanaal=self.config.mijn_vragen_kanaal
         ):
-            klantcontact_uuid_to_klantcontact_object[
-                klantcontact["uuid"]
-            ] = klantcontact
+            klantcontact_uuid_to_klantcontact_object[klantcontact["uuid"]] = (
+                klantcontact
+            )
 
             if onderwerp_objecten := klantcontact["gingOverOnderwerpobjecten"]:
 
