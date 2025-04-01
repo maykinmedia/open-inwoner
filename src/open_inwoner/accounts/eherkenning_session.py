@@ -136,6 +136,7 @@ class EHerkenningSessionContext:
             return  # Nothing to do
 
         # Persist these values before the session is cleared
+        previous_id_token = self._request.session["oidc_id_token"]
         previous_backend = self._request.session["_auth_user_backend"]
         previous_initial_branch_selection_done = self.is_initial_branch_selection_done()
 
@@ -153,3 +154,5 @@ class EHerkenningSessionContext:
             is_branch_restricted=False,
             initial_branch_selection_done=previous_initial_branch_selection_done,
         )
+        self._request.session["oidc_id_token"] = previous_id_token
+        self._request.session.save()
