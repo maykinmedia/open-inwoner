@@ -33,15 +33,15 @@ class PlanTemplate(models.Model):
     )
     goal = models.TextField(
         _("goal"),
-        help_text=_(
-            "The goal for the plan. So that you and the contact knows what the goal is."
-        ),
+        help_text=_("What do you wish to achieve through this plan?"),
     )
     description = models.TextField(
         verbose_name=_("description"),
         default="",
         blank=True,
-        help_text=_("The description of the plan."),
+        help_text=_(
+            "The description of the plan: how do you intend to achieve this goal?"
+        ),
     )
 
     def __str__(self):
