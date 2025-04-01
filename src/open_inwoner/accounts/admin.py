@@ -159,6 +159,8 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
         "is_staff",
         "is_active",
         "contact_type",
+        "last_login",
+    )
     )
     search_fields = ("first_name", "infix", "last_name", "email")
     ordering = ("email",)
