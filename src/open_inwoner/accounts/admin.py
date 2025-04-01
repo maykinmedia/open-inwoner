@@ -169,7 +169,7 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
         "login_type",
     )
     search_fields = ("first_name", "infix", "last_name", "email")
-    ordering = ("email",)
+    ordering = ("last_login",)
     filter_horizontal = (
         "user_contacts",
         "contacts_for_approval",
