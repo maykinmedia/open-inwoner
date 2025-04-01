@@ -86,10 +86,9 @@ class CaseAccessMixin(AccessMixin):
                     if api_group.fetch_eherkenning_zaken_with_rsin:
                         identifier = self.request.user.rsin
 
-                    vestigingsnummer = request.user.vestiging
-                    if vestigingsnummer:
+                    if request.user.vestiging:
                         if not client.fetch_roles_for_case_and_vestigingsnummer(
-                            self.case.url, vestigingsnummer
+                            self.case.url, request.user.vestiging
                         ):
                             logger.info(
                                 f"CaseAccessMixin - permission denied via vestigingsnummer: no role for the case {self.case.url}"
