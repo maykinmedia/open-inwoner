@@ -518,17 +518,6 @@ SESSION_COOKIE_AGE = 900  # Set to 15 minutes or less for testing
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/accounts/login/"
 
-# The SessionRefresh middleware is currently broken if multiple OIDC configurations
-# are active. As a workaround until this is fixed, we use this flag to optionally disable
-# it.
-# TODO: Remove when https://github.com/maykinmedia/mozilla-django-oidc-db/issues/136
-# has been resolved.
-USE_OIDC_SESSION_REFRESH_MIDDLEWARE = config(
-    "USE_OIDC_SESSION_REFRESH_MIDDLEWARE", default=True
-)
-if USE_OIDC_SESSION_REFRESH_MIDDLEWARE:
-    MIDDLEWARE.append("mozilla_django_oidc_db.middleware.SessionRefresh")
-
 #
 # SECURITY settings
 #
