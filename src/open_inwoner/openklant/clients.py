@@ -24,7 +24,10 @@ logger = logging.getLogger(__name__)
 
 class KlantenClient(APIClient):
     def retrieve_klant(
-        self, user_bsn: str | None = None, user_kvk_or_rsin: str | None = None
+        self,
+        user_bsn: str | None = None,
+        user_kvk_or_rsin: str | None = None,
+        vestigingsnummer: str | None = None,
     ) -> Klant | None:
         if not user_bsn and not user_kvk_or_rsin:
             return
@@ -33,7 +36,9 @@ class KlantenClient(APIClient):
         if user_bsn:
             klanten = self.retrieve_klanten_for_bsn(user_bsn)
         elif user_kvk_or_rsin:
-            klanten = self.retrieve_klanten_for_kvk_or_rsin(user_kvk_or_rsin)
+            klanten = self.retrieve_klanten_for_kvk_or_rsin(
+                user_kvk_or_rsin=user_kvk_or_rsin, vestigingsnummer=vestigingsnummer
+            )
 
         if klanten:
             # let's use the first one
