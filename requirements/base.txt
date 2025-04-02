@@ -8,7 +8,7 @@ annotated-types==0.6.0
     # via pydantic
 ape-pie==0.1.0
     # via zgw-consumers
-asgiref==3.7.2
+asgiref==3.8.1
     # via django
 asn1crypto==1.5.1
     # via webauthn
@@ -66,8 +66,6 @@ click-repl==0.2.0
     # via celery
 confusable-homoglyphs==3.2.0
     # via django-registration
-cron-descriptor==1.4.3
-    # via django-celery-beat
 cryptography==42.0.4
     # via
     #   django-digid-eherkenning
@@ -89,7 +87,7 @@ defusedxml==0.7.1
     # via odfpy
 diff-match-patch==20200713
     # via django-import-export
-django==4.2.20
+django==5.2
     # via
     #   -r requirements/base.in
     #   django-admin-index
@@ -104,7 +102,6 @@ django==4.2.20
     #   django-cms
     #   django-cors-headers
     #   django-csp
-    #   django-csp-reports
     #   django-digid-eherkenning
     #   django-extra-fields
     #   django-filer
@@ -160,7 +157,7 @@ django-autoslug==1.9.8
     # via -r requirements/base.in
 django-axes==5.25.0
     # via -r requirements/base.in
-django-celery-beat==2.6.0
+django-celery-beat==2.1.0
     # via -r requirements/base.in
 django-celery-monitor @ git+https://github.com/maykinmedia/django-celery-monitor@74b12529dcdd6923a4deed4c4b6fd3c9fc56eecd#egg=django_celery_monitor
     # via -r requirements/base.in
@@ -172,7 +169,7 @@ django-classy-tags==4.0.0
     # via
     #   django-cms
     #   django-sekizai
-django-cms==3.11.1
+django-cms==4.1.4
     # via
     #   -r requirements/base.in
     #   aldryn-apphooks-config
@@ -187,7 +184,7 @@ django-cors-headers==3.10.0
     # via -r requirements/base.in
 django-csp==3.7
     # via -r requirements/base.in
-django-csp-reports==1.9.1
+django-csp-reports==1.1
     # via -r requirements/base.in
 django-digid-eherkenning[oidc]==0.19.2
     # via -r requirements/base.in
@@ -195,7 +192,7 @@ django-elasticsearch-dsl==7.4
     # via -r requirements/base.in
 django-extra-fields==3.0.2
     # via -r requirements/base.in
-django-filer==3.1.1
+django-filer==3.3.1
     # via
     #   -r requirements/base.in
     #   djangocms-file
@@ -255,7 +252,7 @@ django-sessionprofile==1.0
     # via
     #   -r requirements/base.in
     #   django-digid-eherkenning
-django-setup-configuration==0.7.0
+django-setup-configuration==0.7.2
     # via
     #   -r requirements/base.in
     #   mozilla-django-oidc-db
@@ -277,7 +274,7 @@ django-solo==2.2.0
     #   zgw-consumers
 django-timeline-logger==4.0.0
     # via -r requirements/base.in
-django-timezone-field==6.1.0
+django-timezone-field==4.2.3
     # via django-celery-beat
 django-treebeard==4.4
     # via
@@ -424,7 +421,9 @@ openpyxl==3.0.9
 orderedmultidict==1.0.1
     # via furl
 packaging==23.0
-    # via djangocms-text-ckeditor
+    # via
+    #   django-cms
+    #   djangocms-text-ckeditor
 phonenumbers==8.13.29
     # via -r requirements/base.in
 phonenumberslite==8.13.29
@@ -492,6 +491,7 @@ python-stdnum==1.17
 pytz==2021.3
     # via
     #   -r requirements/base.in
+    #   django-timezone-field
     #   django-yubin
     #   djangorestframework
 pyyaml==6.0.2
@@ -570,7 +570,6 @@ typing-extensions==4.10.0
 tzdata==2025.1
     # via
     #   celery
-    #   django-celery-beat
     #   kombu
 uritemplate==4.1.1
     # via drf-spectacular

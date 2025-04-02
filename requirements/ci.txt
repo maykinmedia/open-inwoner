@@ -21,7 +21,7 @@ ape-pie==0.1.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   zgw-consumers
-asgiref==3.7.2
+asgiref==3.8.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -141,11 +141,6 @@ confusable-homoglyphs==3.2.0
     #   django-registration
 coverage==4.5.4
     # via -r requirements/test-tools.in
-cron-descriptor==1.4.3
-    # via
-    #   -c requirements/base.txt
-    #   -r requirements/base.txt
-    #   django-celery-beat
 cryptography==42.0.4
     # via
     #   -c requirements/base.txt
@@ -182,7 +177,7 @@ diff-match-patch==20200713
     #   django-import-export
 dill==0.3.7
     # via pylint
-django==4.2.20
+django==5.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -198,7 +193,6 @@ django==4.2.20
     #   django-cms
     #   django-cors-headers
     #   django-csp
-    #   django-csp-reports
     #   django-digid-eherkenning
     #   django-extensions
     #   django-extra-fields
@@ -266,7 +260,7 @@ django-axes==5.25.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-django-celery-beat==2.6.0
+django-celery-beat==2.1.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -290,7 +284,7 @@ django-classy-tags==4.0.0
     #   -r requirements/base.txt
     #   django-cms
     #   django-sekizai
-django-cms==3.11.1
+django-cms==4.1.4
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -312,7 +306,7 @@ django-csp==3.7
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-django-csp-reports==1.9.1
+django-csp-reports==1.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -330,7 +324,7 @@ django-extra-fields==3.0.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-django-filer==3.1.1
+django-filer==3.3.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -439,7 +433,7 @@ django-sessionprofile==1.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-digid-eherkenning
-django-setup-configuration==0.7.0
+django-setup-configuration==0.7.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -469,7 +463,7 @@ django-timeline-logger==4.0.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-django-timezone-field==6.1.0
+django-timezone-field==4.2.3
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -792,6 +786,7 @@ packaging==23.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   django-cms
     #   djangocms-text-ckeditor
     #   pytest
     #   sphinx
@@ -946,6 +941,7 @@ pytz==2021.3
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   django-timezone-field
     #   django-yubin
     #   djangorestframework
 pyyaml==6.0.2
@@ -1107,7 +1103,6 @@ tzdata==2025.1
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   celery
-    #   django-celery-beat
     #   kombu
 uritemplate==4.1.1
     # via
