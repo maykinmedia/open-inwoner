@@ -100,7 +100,9 @@ class KvKViewsTestCase(TestCase):
     @patch(
         "open_inwoner.kvk.models.KvKConfig.get_solo",
     )
-    def test_post_branches_page_with_empty_vestigingsnummer(self, mock_solo, mock_kvk):
+    def test_post_branches_page_with_empty_or_missing_vestigingsnummer(
+        self, mock_solo, mock_kvk
+    ):
         mock_kvk.return_value = [
             {"kvkNummer": "12345678"},
             {"kvkNummer": "12345678", "vestigingsnummer": "1234"},
@@ -117,20 +119,22 @@ class KvKViewsTestCase(TestCase):
             backend=EHerkenningSessionContext._expected_auth_backends()[0],
         )
 
-        response = self.client.post(self.url, data={"branch_number": ""})
+        for data in ({"branch_number": ""}, None):
+            with self.subTest(data):
+                response = self.client.post(self.url, data=data)
 
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(
-            response.wsgi_request.user,
-            self.user,
-            msg="Empty branch number interpreted as a change to the legal entity user",
-        )
-        self.assertEqual(response.wsgi_request.user.vestiging, "")
-        self.assertTrue(
-            EHerkenningSessionContext(
-                response.wsgi_request
-            ).is_initial_branch_selection_done()
-        )
+                self.assertEqual(response.status_code, 302)
+                self.assertEqual(
+                    response.wsgi_request.user,
+                    self.user,
+                    msg="Empty branch number interpreted as a change to the legal entity user",
+                )
+                self.assertEqual(response.wsgi_request.user.vestiging, "")
+                self.assertTrue(
+                    EHerkenningSessionContext(
+                        response.wsgi_request
+                    ).is_initial_branch_selection_done()
+                )
 
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     @patch(
