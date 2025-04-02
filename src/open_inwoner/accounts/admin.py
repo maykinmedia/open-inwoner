@@ -159,9 +159,17 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
         "is_staff",
         "is_active",
         "contact_type",
+        "last_login",
+    )
+    list_filter = (
+        "is_staff",
+        "is_superuser",
+        "is_active",
+        "groups",
+        "login_type",
     )
     search_fields = ("first_name", "infix", "last_name", "email")
-    ordering = ("email",)
+    ordering = ("last_login",)
     filter_horizontal = (
         "user_contacts",
         "contacts_for_approval",
