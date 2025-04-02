@@ -269,10 +269,14 @@ class eSuiteKlantenService(
         if user_bsn:
             payload = payload | {"subjectIdentificatie": {"inpBsn": user_bsn}}
         elif user_kvk_or_rsin:
-            payload = payload | {"subjectIdentificatie": {"innNnpId": user_kvk_or_rsin}}
             if vestigingsnummer:
-                payload["subjectIdentificatie"] = payload["subjectIdentificatie"] | {
-                    "vestigingsNummer": vestigingsnummer
+                payload = payload | {
+                    "subjectIdentificatie": {"vestigingsNummer": vestigingsnummer}
+                }
+
+            else:
+                payload = payload | {
+                    "subjectIdentificatie": {"innNnpId": user_kvk_or_rsin}
                 }
 
         try:
