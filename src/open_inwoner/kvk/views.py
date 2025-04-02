@@ -118,9 +118,9 @@ class CompanyBranchChoiceView(LogMixin, FormView):
             # Directly calling `super().form_invalid(form)` would override the error
             return self.render_to_response(context)
 
-        # empty string for KVK_BRANCH_SESSION_VARIABLE is interpreted as
-        # "interact as the rechtspersoon, not as any specific branch"
-        branch_number = request.POST["branch_number"]
+        # Empty string for branch_number is interpreted as "interact as the
+        # rechtspersoon, not as any specific branch"
+        branch_number = form.cleaned_data["branch_number"]
 
         # Change the user
         eherkenning_context = EHerkenningSessionContext(request)
