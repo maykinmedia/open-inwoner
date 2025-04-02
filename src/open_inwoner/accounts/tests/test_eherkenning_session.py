@@ -1,5 +1,6 @@
 from unittest import mock
 
+from django.contrib.auth import HASH_SESSION_KEY, SESSION_KEY, login as django_login
 from django.test import RequestFactory, TestCase
 
 from open_inwoner.accounts.eherkenning_session import EHerkenningSessionContext
@@ -232,3 +233,45 @@ class EHerkenningSessionContextTests(TestCase):
                 )
                 self.assertEqual(context.is_branch_restricted(), False)
                 self.assertFalse(context.is_initial_branch_selection_done())
+
+    def test_change_authenticated_user_persists_session_variables(self):
+        request = self.make_request_with_session()
+        request.session[
+            "_auth_user_backend"
+        ] = EHerkenningSessionContext._expected_auth_backends()[0]
+        request.user = self.user
+        context = EHerkenningSessionContext(request)
+        context._set_branch_restriction(False)
+        session = request.session
+        session["foo"] = "bar"
+        session["baz"] = 42
+        session.save()
+
+        # To add session and auth keys to the session
+        django_login(
+            request,
+            user=self.user,
+            backend=EHerkenningSessionContext._expected_auth_backends()[0],
+        )
+        initial_session_dict = dict(session)
+
+        context.change_authenticated_user(
+            kvk=self.vestiging_user.kvk,
+            vestiging=self.vestiging_user.vestiging,
+        )
+
+        self.assertEqual(request.user, self.vestiging_user)
+        self.assertEqual(
+            request.session["_auth_user_backend"],
+            EHerkenningSessionContext._expected_auth_backends()[0],
+        )
+        self.assertEqual(context.is_branch_restricted(), False)
+        self.assertFalse(context.is_initial_branch_selection_done())
+        self.assertEqual(context._request.session["foo"], "bar")
+        self.assertEqual(context._request.session["baz"], 42)
+        self.assertNotEqual(
+            initial_session_dict[SESSION_KEY], request.session[SESSION_KEY]
+        )
+        self.assertNotEqual(
+            initial_session_dict[HASH_SESSION_KEY], request.session[HASH_SESSION_KEY]
+        )

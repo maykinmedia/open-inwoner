@@ -1,5 +1,11 @@
 from django.conf import settings
-from django.contrib.auth import login as django_login, logout as django_logout
+from django.contrib.auth import (
+    BACKEND_SESSION_KEY,
+    HASH_SESSION_KEY,
+    SESSION_KEY,
+    login as django_login,
+    logout as django_logout,
+)
 from django.http import HttpRequest
 
 from open_inwoner.accounts.models import User
@@ -138,6 +144,7 @@ class EHerkenningSessionContext:
         # Persist these values before the session is cleared
         previous_backend = self._request.session["_auth_user_backend"]
         previous_initial_branch_selection_done = self.is_initial_branch_selection_done()
+        previous_session = dict(self._request.session)
 
         # Clear the session
         django_logout(self._request)
@@ -148,6 +155,18 @@ class EHerkenningSessionContext:
             user=target_user,
             backend=previous_backend,
         )
+
+        # We want to preserve as much as possible from the previous session values
+        # as possible. This is especially important because various flows in the
+        # mozilla_django_oidc_db depend on the presence of various session variables
+        # to work properly (e.g. SSO via the OIDC IdP).
+        skip = (SESSION_KEY, BACKEND_SESSION_KEY, HASH_SESSION_KEY)
+        for key, val in previous_session.items():
+            if key not in skip:
+                self._request.session[key] = val
+
+        self._request.session.save()
+
         self.persist_eherkenning_state_for_user(
             user=target_user,
             is_branch_restricted=False,
