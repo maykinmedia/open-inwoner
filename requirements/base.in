@@ -94,7 +94,7 @@ git+https://github.com/maykinmedia/django-celery-monitor@74b1252#egg=django_cele
 zgw-consumers
 zgw-consumers-oas
 notifications-api-common
-git+https://github.com/maykinmedia/objects-api-client-django.git@f3ed1be7dea30fe2eced6c5f2d33305ca011d03c#egg=objects-api-client-django
+git+https://github.com/maykinmedia/objects-api-client-django.git@6f26a2a2fbdb52fe89d779fd2432a99f3ee454a4#egg=objects-api-client-django
 
 
 # 2FA SMS verification
