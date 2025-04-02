@@ -123,7 +123,8 @@ class eSuiteServiceTestCase(TestCase, DisableRequestLogMixin):
             m.request_history[0].json(),
             {
                 "subjectIdentificatie": {
-                    "innNnpId": "87654321",
+                    # Note: the innNnpId is not sent for vestiging, it's either innNnpId
+                    # or vestigingsNummer
                     "vestigingsNummer": "123456789000",
                 }
             },
