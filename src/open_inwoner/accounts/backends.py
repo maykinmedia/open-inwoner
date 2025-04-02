@@ -14,6 +14,7 @@ from digid_eherkenning.oidc.backends import BaseBackend
 from glom import Path, glom
 from mozilla_django_oidc_db.backends import OIDCAuthenticationBackend
 from mozilla_django_oidc_db.config import dynamic_setting
+from mozilla_django_oidc_db.models import OpenIDConnectConfig
 from mozilla_django_oidc_db.typing import JSONObject
 from oath import accept_totp
 
@@ -82,6 +83,10 @@ class CustomAxesBackend(AxesBackend):
 
 class CustomOIDCBackend(OIDCAuthenticationBackend):
     callback_path = reverse_lazy("oidc_authentication_callback")
+
+    def _check_candidate_backend(self) -> bool:
+        parent = super()._check_candidate_backend()
+        return parent and self.config_class is OpenIDConnectConfig
 
     def authenticate(self, request, *args, **kwargs):
         # Avoid attempting OIDC for a specific variant if we know that that is not the
