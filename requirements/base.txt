@@ -9,7 +9,9 @@ annotated-types==0.6.0
 ape-pie==0.1.0
     # via zgw-consumers
 asgiref==3.7.2
-    # via django
+    # via
+    #   django
+    #   django-structlog
 asn1crypto==1.5.1
     # via webauthn
 async-timeout==4.0.3
@@ -130,6 +132,7 @@ django==4.2.20
     #   django-simple-certmanager
     #   django-sniplates
     #   django-solo
+    #   django-structlog
     #   django-timeline-logger
     #   django-timezone-field
     #   django-treebeard
@@ -214,7 +217,9 @@ django-image-cropping==1.7
 django-import-export==2.6.1
     # via -r requirements/base.in
 django-ipware==4.0.0
-    # via django-axes
+    # via
+    #   django-axes
+    #   django-structlog
 django-js-asset==2.2.0
     # via django-ckeditor
 django-jsonform==2.22.0
@@ -275,6 +280,8 @@ django-solo==2.2.0
     #   notifications-api-common
     #   objects-api-client-django
     #   zgw-consumers
+django-structlog==6.0.1
+    # via -r requirements/base.in
 django-timeline-logger==4.0.0
     # via -r requirements/base.in
 django-timezone-field==6.1.0
@@ -547,6 +554,8 @@ soupsieve==2.5
     # via beautifulsoup4
 sqlparse==0.4.4
     # via django
+structlog==25.2.0
+    # via django-structlog
 svglib==1.5.1
     # via easy-thumbnails
 tablib[html, ods, xls, xlsx, yaml]==3.1.0

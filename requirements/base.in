@@ -51,6 +51,7 @@ django-log-outgoing-requests
 xsdata
 django-setup-configuration
 django-yubin
+django-structlog
 
 # django cms
 django-cms

@@ -26,6 +26,7 @@ asgiref==3.7.2
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django
+    #   django-structlog
 asn1crypto==1.5.1
     # via
     #   -c requirements/base.txt
@@ -225,6 +226,7 @@ django==4.2.20
     #   django-simple-certmanager
     #   django-sniplates
     #   django-solo
+    #   django-structlog
     #   django-timeline-logger
     #   django-timezone-field
     #   django-treebeard
@@ -364,6 +366,7 @@ django-ipware==4.0.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-axes
+    #   django-structlog
 django-js-asset==2.2.0
     # via
     #   -c requirements/base.txt
@@ -465,6 +468,10 @@ django-solo==2.2.0
     #   notifications-api-common
     #   objects-api-client-django
     #   zgw-consumers
+django-structlog==6.0.1
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
 django-timeline-logger==4.0.0
     # via
     #   -c requirements/base.txt
@@ -1069,6 +1076,11 @@ sqlparse==0.4.4
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django
+structlog==25.2.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   django-structlog
 svglib==1.5.1
     # via
     #   -c requirements/base.txt
