@@ -53,6 +53,9 @@ def settings(request):
                 "select_questionnaire_title": config.select_questionnaire_title,
                 "select_questionnaire_intro": config.select_questionnaire_intro,
             },
+            "search_page": {
+                "search_zero_results_text": config.search_zero_results_text,
+            },
         },
         "footer": {
             "logo": config.footer_logo,

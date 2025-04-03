@@ -213,6 +213,11 @@ class SiteConfiguration(SingletonModel):
         blank=True,
         help_text=_("Product finder's intro text on the home page."),
     )
+    search_zero_results_text = ckeditor_fields.RichTextField(
+        verbose_name=_("Text for zero search results"),
+        blank=True,
+        help_text=_("Text to display for when there are no search results."),
+    )
     select_questionnaire_title = models.CharField(
         max_length=255,
         default=_("Keuze zelfdiagnose?"),

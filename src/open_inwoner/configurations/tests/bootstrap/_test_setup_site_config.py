@@ -39,6 +39,7 @@ from ...bootstrap.siteconfig import SiteConfigurationStep
     SITE_HOME_QUESTIONNAIRE_INTRO="home questionnaire intro",
     SITE_HOME_PRODUCT_FINDER_TITLE="home product finder title",
     SITE_HOME_PRODUCT_FINDER_INTRO="home product finder intro",
+    SITE_SEARCH_ZERO_RESULTS_TEXT="zero search results text",
     SITE_SELECT_QUESTIONNAIRE_TITLE="select questionnaire title",
     SITE_SELECT_QUESTIONNAIRE_INTRO="select questionnaire intro",
     SITE_PLANS_INTRO="plans intro",

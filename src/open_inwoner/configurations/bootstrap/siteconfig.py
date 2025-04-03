@@ -87,6 +87,7 @@ class SiteConfigurationStep(BaseConfigurationStep):
             "SITE_SEARCH_HELP_TEXT",
             "SITE_SECONDARY_COLOR",
             "SITE_SECONDARY_FONT_COLOR",
+            "SITE_SEARCH_ZERO_RESULTS_TEXT",
             "SITE_SELECT_QUESTIONNAIRE_INTRO",
             "SITE_SELECT_QUESTIONNAIRE_TITLE",
             "SITE_SITEIMPROVE_ID",
