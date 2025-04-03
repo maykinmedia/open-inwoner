@@ -123,7 +123,7 @@ class SiteConfiguration(SingletonModel):
             "Whether we want the users to be able to log in with 2FA authentication by using an SMS workflow."
         ),
     )
-    login_text = models.TextField(
+    login_text = ckeditor_fields.RichTextField(
         blank=True,
         verbose_name=_("Login tekst"),
         help_text=_("Deze tekst wordt getoond op de login pagina."),
