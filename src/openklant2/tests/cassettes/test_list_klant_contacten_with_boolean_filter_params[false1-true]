@@ -1,0 +1,245 @@
+interactions:
+- request:
+    body: '{"nummer": "0000000120", "kanaal": "court", "onderwerp": "citizen", "inhoud":
+      "Important local affect resource business field network fight.", "taal": "nld",
+      "indicatieContactGelukt": false, "vertrouwelijk": true, "plaatsgevondenOp":
+      "1996-09-11T01:17:30.841774"}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '263'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
+  response:
+    body:
+      string: '{"uuid":"a085cbf6-61fe-4642-a425-e4f8d29ffc98","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/a085cbf6-61fe-4642-a425-e4f8d29ffc98","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000120","kanaal":"court","onderwerp":"citizen","inhoud":"Important
+        local affect resource business field network fight.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"1996-09-11T01:17:30.841774Z"}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '525'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/a085cbf6-61fe-4642-a425-e4f8d29ffc98
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+    method: GET
+    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1&indicatieContactGelukt=False
+  response:
+    body:
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"a085cbf6-61fe-4642-a425-e4f8d29ffc98","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/a085cbf6-61fe-4642-a425-e4f8d29ffc98","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000120","kanaal":"court","onderwerp":"citizen","inhoud":"Important
+        local affect resource business field network fight.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"1996-09-11T01:17:30.841774Z","_expand":{}}]}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '590'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+    method: GET
+    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1&indicatieContactGelukt=true
+  response:
+    body:
+      string: '{"count":0,"next":null,"previous":null,"results":[]}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '52'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"nummer": "0000000121", "kanaal": "wind", "onderwerp": "often", "inhoud":
+      "Cause admit figure hot themselves new girl.", "taal": "nld", "indicatieContactGelukt":
+      false, "vertrouwelijk": true, "plaatsgevondenOp": "2022-08-28T23:46:43.522202"}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '242'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
+  response:
+    body:
+      string: '{"uuid":"203efd11-b489-4406-9b79-7d99360d9232","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/203efd11-b489-4406-9b79-7d99360d9232","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000121","kanaal":"wind","onderwerp":"often","inhoud":"Cause
+        admit figure hot themselves new girl.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2022-08-28T23:46:43.522202Z"}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '504'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/203efd11-b489-4406-9b79-7d99360d9232
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+    method: GET
+    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1&indicatieContactGelukt=False
+  response:
+    body:
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"203efd11-b489-4406-9b79-7d99360d9232","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/203efd11-b489-4406-9b79-7d99360d9232","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000121","kanaal":"wind","onderwerp":"often","inhoud":"Cause
+        admit figure hot themselves new girl.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2022-08-28T23:46:43.522202Z","_expand":{}}]}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '569'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+    method: GET
+    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1&indicatieContactGelukt=TRUE
+  response:
+    body:
+      string: '{"count":0,"next":null,"previous":null,"results":[]}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '52'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

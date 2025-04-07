@@ -251,8 +251,13 @@ def test_partial_update(client, een_persoon):
         "adresregel1": "foo",
         "adresregel2": "bar",
         "adresregel3": "baz",
+        "huisnummer": 1874,
+        "postcode": "1234 AB",
+        "stad": "Amsterdam",
+        "straatnaam": "Teleportweg",
         "land": "NL",
         "nummeraanduidingId": "",
+        "huisnummertoevoeging": "",
     }
     assert een_persoon["nummer"] != target_nummer
     assert een_persoon["correspondentieadres"] != target_correspondentieadres

@@ -1,0 +1,178 @@
+interactions:
+- request:
+    body: '{"naam": "Ernest Johnson", "soortActor": "geautomatiseerde_actor", "indicatieActief":
+      true, "actoridentificator": {"objectId": "0000000022", "codeObjecttype": "stage",
+      "codeRegister": "candidate", "codeSoortObjectId": "bad"}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '225'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"uuid":"28d1ff72-0b67-450a-8916-b11a02839bec","url":"http://localhost:8338/klantinteracties/api/v1/actoren/28d1ff72-0b67-450a-8916-b11a02839bec","naam":"Ernest
+        Johnson","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000022","codeObjecttype":"stage","codeRegister":"candidate","codeSoortObjectId":"bad"},"actorIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '382'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/actoren/28d1ff72-0b67-450a-8916-b11a02839bec
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"naam": "Rachael Herrera", "soortActor": "organisatorische_eenheid", "indicatieActief":
+      true, "actoridentificator": {"objectId": "0000000023", "codeObjecttype": "know",
+      "codeRegister": "pay", "codeSoortObjectId": "care"}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '222'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"uuid":"de699a21-f02b-472c-aad9-bb2a81e01c23","url":"http://localhost:8338/klantinteracties/api/v1/actoren/de699a21-f02b-472c-aad9-bb2a81e01c23","naam":"Rachael
+        Herrera","soortActor":"organisatorische_eenheid","indicatieActief":true,"actoridentificator":{"objectId":"0000000023","codeObjecttype":"know","codeRegister":"pay","codeSoortObjectId":"care"},"actorIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '379'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/actoren/de699a21-f02b-472c-aad9-bb2a81e01c23
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"naam": "Kelly Ray", "soortActor": "organisatorische_eenheid", "indicatieActief":
+      false, "actoridentificator": {"objectId": "0000000024", "codeObjecttype": "religious",
+      "codeRegister": "knowledge", "codeSoortObjectId": "open"}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '228'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"uuid":"defd3d16-8d2f-4419-8772-e559fa528d03","url":"http://localhost:8338/klantinteracties/api/v1/actoren/defd3d16-8d2f-4419-8772-e559fa528d03","naam":"Kelly
+        Ray","soortActor":"organisatorische_eenheid","indicatieActief":false,"actoridentificator":{"objectId":"0000000024","codeObjecttype":"religious","codeRegister":"knowledge","codeSoortObjectId":"open"},"actorIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '385'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/actoren/defd3d16-8d2f-4419-8772-e559fa528d03
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+    method: GET
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren?indicatieActief=False&soortActor=organisatorische_eenheid
+  response:
+    body:
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"defd3d16-8d2f-4419-8772-e559fa528d03","url":"http://localhost:8338/klantinteracties/api/v1/actoren/defd3d16-8d2f-4419-8772-e559fa528d03","naam":"Kelly
+        Ray","soortActor":"organisatorische_eenheid","indicatieActief":false,"actoridentificator":{"objectId":"0000000024","codeObjecttype":"religious","codeRegister":"knowledge","codeSoortObjectId":"open"},"actorIdentificatie":null}]}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '437'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

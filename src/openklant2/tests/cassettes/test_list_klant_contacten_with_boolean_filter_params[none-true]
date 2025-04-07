@@ -1,0 +1,244 @@
+interactions:
+- request:
+    body: '{"nummer": "0000000132", "kanaal": "central", "onderwerp": "sound", "inhoud":
+      "Heavy industry specific on collection.", "taal": "nld", "indicatieContactGelukt":
+      false, "vertrouwelijk": false, "plaatsgevondenOp": "2010-10-10T07:35:15.444285"}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '241'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
+  response:
+    body:
+      string: '{"uuid":"64a6afdc-d95a-43f2-8476-76cbdc23feb7","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/64a6afdc-d95a-43f2-8476-76cbdc23feb7","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000132","kanaal":"central","onderwerp":"sound","inhoud":"Heavy
+        industry specific on collection.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2010-10-10T07:35:15.444285Z"}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '503'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/64a6afdc-d95a-43f2-8476-76cbdc23feb7
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+    method: GET
+    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1
+  response:
+    body:
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"64a6afdc-d95a-43f2-8476-76cbdc23feb7","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/64a6afdc-d95a-43f2-8476-76cbdc23feb7","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000132","kanaal":"central","onderwerp":"sound","inhoud":"Heavy
+        industry specific on collection.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2010-10-10T07:35:15.444285Z","_expand":{}}]}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '568'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+    method: GET
+    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1&indicatieContactGelukt=true
+  response:
+    body:
+      string: '{"count":0,"next":null,"previous":null,"results":[]}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '52'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"nummer": "0000000133", "kanaal": "throughout", "onderwerp": "investment",
+      "inhoud": "Crime hold pressure order crime first.", "taal": "nld", "indicatieContactGelukt":
+      false, "vertrouwelijk": true, "plaatsgevondenOp": "2011-12-28T05:59:06.326971"}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '248'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
+  response:
+    body:
+      string: '{"uuid":"18b30c86-f91d-4ce8-89b9-b787a3a313e2","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/18b30c86-f91d-4ce8-89b9-b787a3a313e2","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000133","kanaal":"throughout","onderwerp":"investment","inhoud":"Crime
+        hold pressure order crime first.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2011-12-28T05:59:06.326971Z"}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '510'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/18b30c86-f91d-4ce8-89b9-b787a3a313e2
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+    method: GET
+    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1
+  response:
+    body:
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"18b30c86-f91d-4ce8-89b9-b787a3a313e2","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/18b30c86-f91d-4ce8-89b9-b787a3a313e2","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000133","kanaal":"throughout","onderwerp":"investment","inhoud":"Crime
+        hold pressure order crime first.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2011-12-28T05:59:06.326971Z","_expand":{}}]}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '575'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+    method: GET
+    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1&indicatieContactGelukt=TRUE
+  response:
+    body:
+      string: '{"count":0,"next":null,"previous":null,"results":[]}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '52'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

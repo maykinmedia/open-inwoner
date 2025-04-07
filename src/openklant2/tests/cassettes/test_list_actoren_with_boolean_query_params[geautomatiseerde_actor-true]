@@ -1,0 +1,178 @@
+interactions:
+- request:
+    body: '{"naam": "Kristin Padilla", "soortActor": "organisatorische_eenheid", "indicatieActief":
+      false, "actoridentificator": {"objectId": "0000000013", "codeObjecttype": "police",
+      "codeRegister": "thank", "codeSoortObjectId": "food"}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '227'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"uuid":"e511c92d-b705-4264-a82e-64e674ce335d","url":"http://localhost:8338/klantinteracties/api/v1/actoren/e511c92d-b705-4264-a82e-64e674ce335d","naam":"Kristin
+        Padilla","soortActor":"organisatorische_eenheid","indicatieActief":false,"actoridentificator":{"objectId":"0000000013","codeObjecttype":"police","codeRegister":"thank","codeSoortObjectId":"food"},"actorIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '384'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/actoren/e511c92d-b705-4264-a82e-64e674ce335d
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"naam": "Eric Colon", "soortActor": "organisatorische_eenheid", "indicatieActief":
+      false, "actoridentificator": {"objectId": "0000000014", "codeObjecttype": "receive",
+      "codeRegister": "arrive", "codeSoortObjectId": "into"}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '224'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"uuid":"0e98e3b0-5420-4871-99e8-3ffd1672e780","url":"http://localhost:8338/klantinteracties/api/v1/actoren/0e98e3b0-5420-4871-99e8-3ffd1672e780","naam":"Eric
+        Colon","soortActor":"organisatorische_eenheid","indicatieActief":false,"actoridentificator":{"objectId":"0000000014","codeObjecttype":"receive","codeRegister":"arrive","codeSoortObjectId":"into"},"actorIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '381'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/actoren/0e98e3b0-5420-4871-99e8-3ffd1672e780
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"naam": "Timothy Duarte", "soortActor": "geautomatiseerde_actor", "indicatieActief":
+      true, "actoridentificator": {"objectId": "0000000015", "codeObjecttype": "though",
+      "codeRegister": "sport", "codeSoortObjectId": "up"}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '221'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"uuid":"5cc3513e-d1f2-40f2-83a8-1ff7d82cea36","url":"http://localhost:8338/klantinteracties/api/v1/actoren/5cc3513e-d1f2-40f2-83a8-1ff7d82cea36","naam":"Timothy
+        Duarte","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000015","codeObjecttype":"though","codeRegister":"sport","codeSoortObjectId":"up"},"actorIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '378'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/actoren/5cc3513e-d1f2-40f2-83a8-1ff7d82cea36
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+    method: GET
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren?indicatieActief=True&soortActor=geautomatiseerde_actor
+  response:
+    body:
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"5cc3513e-d1f2-40f2-83a8-1ff7d82cea36","url":"http://localhost:8338/klantinteracties/api/v1/actoren/5cc3513e-d1f2-40f2-83a8-1ff7d82cea36","naam":"Timothy
+        Duarte","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000015","codeObjecttype":"though","codeRegister":"sport","codeSoortObjectId":"up"},"actorIdentificatie":null}]}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '430'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

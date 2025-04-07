@@ -1,0 +1,274 @@
+interactions:
+- request:
+    body: '{"naam": "John Navarro", "soortActor": "organisatorische_eenheid", "indicatieActief":
+      true, "actoridentificator": {"objectId": "0000000001", "codeObjecttype": "budget",
+      "codeRegister": "no", "codeSoortObjectId": "today"}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '221'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"uuid":"594675ca-c5f5-4561-a08a-b3d77f568957","url":"http://localhost:8338/klantinteracties/api/v1/actoren/594675ca-c5f5-4561-a08a-b3d77f568957","naam":"John
+        Navarro","soortActor":"organisatorische_eenheid","indicatieActief":true,"actoridentificator":{"objectId":"0000000001","codeObjecttype":"budget","codeRegister":"no","codeSoortObjectId":"today"},"actorIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '378'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/actoren/594675ca-c5f5-4561-a08a-b3d77f568957
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"naam": "Brenda Vang", "soortActor": "medewerker", "indicatieActief":
+      true, "actoridentificator": {"objectId": "0000000002", "codeObjecttype": "perhaps",
+      "codeRegister": "for", "codeSoortObjectId": "determine"}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '212'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"uuid":"1dc6fc1a-3887-487a-a374-df8917b2f84f","url":"http://localhost:8338/klantinteracties/api/v1/actoren/1dc6fc1a-3887-487a-a374-df8917b2f84f","naam":"Brenda
+        Vang","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000002","codeObjecttype":"perhaps","codeRegister":"for","codeSoortObjectId":"determine"},"actorIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '369'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/actoren/1dc6fc1a-3887-487a-a374-df8917b2f84f
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"naam": "Rebecca Gonzalez", "soortActor": "medewerker", "indicatieActief":
+      true, "actoridentificator": {"objectId": "0000000003", "codeObjecttype": "them",
+      "codeRegister": "full", "codeSoortObjectId": "material"}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '214'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"uuid":"30963e38-728c-4adb-bfa8-696e235a189a","url":"http://localhost:8338/klantinteracties/api/v1/actoren/30963e38-728c-4adb-bfa8-696e235a189a","naam":"Rebecca
+        Gonzalez","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000003","codeObjecttype":"them","codeRegister":"full","codeSoortObjectId":"material"},"actorIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '371'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/actoren/30963e38-728c-4adb-bfa8-696e235a189a
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"naam": "Sarah Gonzales", "soortActor": "organisatorische_eenheid", "indicatieActief":
+      true, "actoridentificator": {"objectId": "0000000004", "codeObjecttype": "physical",
+      "codeRegister": "final", "codeSoortObjectId": "hand"}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '227'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"uuid":"6710ff59-12b8-441f-8afd-ed2424063043","url":"http://localhost:8338/klantinteracties/api/v1/actoren/6710ff59-12b8-441f-8afd-ed2424063043","naam":"Sarah
+        Gonzales","soortActor":"organisatorische_eenheid","indicatieActief":true,"actoridentificator":{"objectId":"0000000004","codeObjecttype":"physical","codeRegister":"final","codeSoortObjectId":"hand"},"actorIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '384'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/actoren/6710ff59-12b8-441f-8afd-ed2424063043
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"naam": "Penny Spencer", "soortActor": "medewerker", "indicatieActief":
+      true, "actoridentificator": {"objectId": "0000000005", "codeObjecttype": "quality",
+      "codeRegister": "natural", "codeSoortObjectId": "tend"}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '213'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"uuid":"487dd32d-d048-4529-aada-432224754064","url":"http://localhost:8338/klantinteracties/api/v1/actoren/487dd32d-d048-4529-aada-432224754064","naam":"Penny
+        Spencer","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000005","codeObjecttype":"quality","codeRegister":"natural","codeSoortObjectId":"tend"},"actorIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '370'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/actoren/487dd32d-d048-4529-aada-432224754064
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+    method: GET
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"count":5,"next":null,"previous":null,"results":[{"uuid":"487dd32d-d048-4529-aada-432224754064","url":"http://localhost:8338/klantinteracties/api/v1/actoren/487dd32d-d048-4529-aada-432224754064","naam":"Penny
+        Spencer","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000005","codeObjecttype":"quality","codeRegister":"natural","codeSoortObjectId":"tend"},"actorIdentificatie":null},{"uuid":"6710ff59-12b8-441f-8afd-ed2424063043","url":"http://localhost:8338/klantinteracties/api/v1/actoren/6710ff59-12b8-441f-8afd-ed2424063043","naam":"Sarah
+        Gonzales","soortActor":"organisatorische_eenheid","indicatieActief":true,"actoridentificator":{"objectId":"0000000004","codeObjecttype":"physical","codeRegister":"final","codeSoortObjectId":"hand"},"actorIdentificatie":null},{"uuid":"30963e38-728c-4adb-bfa8-696e235a189a","url":"http://localhost:8338/klantinteracties/api/v1/actoren/30963e38-728c-4adb-bfa8-696e235a189a","naam":"Rebecca
+        Gonzalez","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000003","codeObjecttype":"them","codeRegister":"full","codeSoortObjectId":"material"},"actorIdentificatie":null},{"uuid":"1dc6fc1a-3887-487a-a374-df8917b2f84f","url":"http://localhost:8338/klantinteracties/api/v1/actoren/1dc6fc1a-3887-487a-a374-df8917b2f84f","naam":"Brenda
+        Vang","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000002","codeObjecttype":"perhaps","codeRegister":"for","codeSoortObjectId":"determine"},"actorIdentificatie":null},{"uuid":"594675ca-c5f5-4561-a08a-b3d77f568957","url":"http://localhost:8338/klantinteracties/api/v1/actoren/594675ca-c5f5-4561-a08a-b3d77f568957","naam":"John
+        Navarro","soortActor":"organisatorische_eenheid","indicatieActief":true,"actoridentificator":{"objectId":"0000000001","codeObjecttype":"budget","codeRegister":"no","codeSoortObjectId":"today"},"actorIdentificatie":null}]}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '1928'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

@@ -1,0 +1,138 @@
+interactions:
+- request:
+    body: '{"nummer": "0000000134", "kanaal": "remain", "onderwerp": "even", "inhoud":
+      "Suddenly member southern.", "taal": "nld", "indicatieContactGelukt": null,
+      "vertrouwelijk": false, "plaatsgevondenOp": "2010-12-25T20:30:34.508589"}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '225'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
+  response:
+    body:
+      string: '{"uuid":"f33334fd-b108-4ca2-9fcd-be26590a2704","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/f33334fd-b108-4ca2-9fcd-be26590a2704","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000134","kanaal":"remain","onderwerp":"even","inhoud":"Suddenly
+        member southern.","indicatieContactGelukt":null,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2010-12-25T20:30:34.508589Z"}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '487'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/f33334fd-b108-4ca2-9fcd-be26590a2704
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"nummer": "0000000135", "kanaal": "same", "onderwerp": "claim", "inhoud":
+      "Already bad bit herself left commercial season.", "taal": "nld", "indicatieContactGelukt":
+      true, "vertrouwelijk": true, "plaatsgevondenOp": "2020-05-02T17:37:21.529331"}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '245'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
+  response:
+    body:
+      string: '{"uuid":"9b7d0eb4-d39c-4b3f-aa53-9603a8869014","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/9b7d0eb4-d39c-4b3f-aa53-9603a8869014","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000135","kanaal":"same","onderwerp":"claim","inhoud":"Already
+        bad bit herself left commercial season.","indicatieContactGelukt":true,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2020-05-02T17:37:21.529331Z"}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '507'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/9b7d0eb4-d39c-4b3f-aa53-9603a8869014
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"klantcontact": {"uuid": "f33334fd-b108-4ca2-9fcd-be26590a2704"}, "wasKlantcontact":
+      {"uuid": "9b7d0eb4-d39c-4b3f-aa53-9603a8869014"}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '135'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/onderwerpobjecten
+  response:
+    body:
+      string: '{"uuid":"5f7e1a80-283a-47d6-8dea-6e3b53064c1c","url":"http://localhost:8338/klantinteracties/api/v1/onderwerpobjecten/5f7e1a80-283a-47d6-8dea-6e3b53064c1c","klantcontact":{"uuid":"f33334fd-b108-4ca2-9fcd-be26590a2704","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/f33334fd-b108-4ca2-9fcd-be26590a2704"},"wasKlantcontact":{"uuid":"9b7d0eb4-d39c-4b3f-aa53-9603a8869014","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/9b7d0eb4-d39c-4b3f-aa53-9603a8869014"},"onderwerpobjectidentificator":{"objectId":"","codeObjecttype":"","codeRegister":"","codeSoortObjectId":""}}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '605'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/onderwerpobjecten/5f7e1a80-283a-47d6-8dea-6e3b53064c1c
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+version: 1

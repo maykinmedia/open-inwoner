@@ -1,0 +1,134 @@
+interactions:
+- request:
+    body: '{"digitaleAdressen": null, "voorkeursDigitaalAdres": null, "rekeningnummers":
+      null, "voorkeursRekeningnummer": null, "indicatieGeheimhouding": false, "indicatieActief":
+      true, "voorkeurstaal": "ind", "soortPartij": "persoon", "partijIdentificatie":
+      {"contactnaam": {"voorletters": "Ind.", "voornaam": "Jamie", "voorvoegselAchternaam":
+      "Mx.", "achternaam": "Martin"}}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '366'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/partijen
+  response:
+    body:
+      string: '{"uuid":"ffd9e4a0-de09-4bd3-bbb0-cbd4080c1913","url":"http://localhost:8338/klantinteracties/api/v1/partijen/ffd9e4a0-de09-4bd3-bbb0-cbd4080c1913","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"ind","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","straatnaam":"","huisnummer":null,"huisnummertoevoeging":"","postcode":"","stad":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","straatnaam":"","huisnummer":null,"huisnummertoevoeging":"","postcode":"","stad":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Ind.","voornaam":"Jamie","voorvoegselAchternaam":"Mx.","achternaam":"Martin"},"volledigeNaam":"Jamie
+        Mx. Martin"}}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '1030'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/partijen/ffd9e4a0-de09-4bd3-bbb0-cbd4080c1913
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"adres": "Danahof 5\n9328 AL\nTiendeveen", "omschrijving": "together",
+      "soortDigitaalAdres": "overig", "verstrektDoorBetrokkene": null, "verstrektDoorPartij":
+      {"uuid": "ffd9e4a0-de09-4bd3-bbb0-cbd4080c1913"}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '209'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/digitaleadressen
+  response:
+    body:
+      string: '{"uuid":"c6735f6c-9b31-40e8-9b45-c4524d2d2ddd","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/c6735f6c-9b31-40e8-9b45-c4524d2d2ddd","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"ffd9e4a0-de09-4bd3-bbb0-cbd4080c1913","url":"http://localhost:8338/klantinteracties/api/v1/partijen/ffd9e4a0-de09-4bd3-bbb0-cbd4080c1913"},"adres":"Danahof
+        5\n9328 AL\nTiendeveen","soortDigitaalAdres":"overig","isStandaardAdres":false,"omschrijving":"together"}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '478'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/digitaleadressen/c6735f6c-9b31-40e8-9b45-c4524d2d2ddd
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+    method: GET
+    uri: http://localhost:8338/klantinteracties/api/v1/digitaleadressen/c6735f6c-9b31-40e8-9b45-c4524d2d2ddd
+  response:
+    body:
+      string: '{"uuid":"c6735f6c-9b31-40e8-9b45-c4524d2d2ddd","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/c6735f6c-9b31-40e8-9b45-c4524d2d2ddd","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"ffd9e4a0-de09-4bd3-bbb0-cbd4080c1913","url":"http://localhost:8338/klantinteracties/api/v1/partijen/ffd9e4a0-de09-4bd3-bbb0-cbd4080c1913"},"adres":"Danahof
+        5\n9328 AL\nTiendeveen","soortDigitaalAdres":"overig","isStandaardAdres":false,"omschrijving":"together"}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '478'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

@@ -1,0 +1,140 @@
+interactions:
+- request:
+    body: '{"nummer": "0000000109", "kanaal": "blood", "onderwerp": "ever", "inhoud":
+      "Student car leader use.", "taal": "nld", "indicatieContactGelukt": true, "vertrouwelijk":
+      true, "plaatsgevondenOp": "2023-05-19T14:27:23.589322"}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '221'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
+  response:
+    body:
+      string: '{"uuid":"b41851b2-ab80-45b1-9a57-175ffdcbb0fd","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/b41851b2-ab80-45b1-9a57-175ffdcbb0fd","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000109","kanaal":"blood","onderwerp":"ever","inhoud":"Student
+        car leader use.","indicatieContactGelukt":true,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2023-05-19T14:27:23.589322Z"}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '483'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/b41851b2-ab80-45b1-9a57-175ffdcbb0fd
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"naam": "Sarah Williams", "soortActor": "geautomatiseerde_actor", "indicatieActief":
+      true, "actoridentificator": {"objectId": "0000000025", "codeObjecttype": "strategy",
+      "codeRegister": "still", "codeSoortObjectId": "full"}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '225'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"uuid":"4beb6270-0e90-41b6-a75a-e08edcb29a30","url":"http://localhost:8338/klantinteracties/api/v1/actoren/4beb6270-0e90-41b6-a75a-e08edcb29a30","naam":"Sarah
+        Williams","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000025","codeObjecttype":"strategy","codeRegister":"still","codeSoortObjectId":"full"},"actorIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '382'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/actoren/4beb6270-0e90-41b6-a75a-e08edcb29a30
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"gevraagdeHandeling": "Foobar", "aanleidinggevendKlantcontact": {"uuid":
+      "b41851b2-ab80-45b1-9a57-175ffdcbb0fd"}, "toegewezenAanActor": {"uuid": "4beb6270-0e90-41b6-a75a-e08edcb29a30"},
+      "toelichting": "Dit is een vraag", "status": "te_verwerken"}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '247'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/internetaken
+  response:
+    body:
+      string: '{"uuid":"e5bd83fd-d30d-4756-bc97-b714f965e6c3","url":"http://localhost:8338/klantinteracties/api/v1/internetaken/e5bd83fd-d30d-4756-bc97-b714f965e6c3","nummer":"0000000001","gevraagdeHandeling":"Foobar","aanleidinggevendKlantcontact":{"uuid":"b41851b2-ab80-45b1-9a57-175ffdcbb0fd","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/b41851b2-ab80-45b1-9a57-175ffdcbb0fd"},"toegewezenAanActor":{"uuid":"4beb6270-0e90-41b6-a75a-e08edcb29a30","url":"http://localhost:8338/klantinteracties/api/v1/actoren/4beb6270-0e90-41b6-a75a-e08edcb29a30"},"toegewezenAanActoren":[{"uuid":"4beb6270-0e90-41b6-a75a-e08edcb29a30","url":"http://localhost:8338/klantinteracties/api/v1/actoren/4beb6270-0e90-41b6-a75a-e08edcb29a30"}],"toelichting":"Dit
+        is een vraag","status":"te_verwerken","toegewezenOp":"2025-04-07T09:23:12.762918Z","afgehandeldOp":null}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '851'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/internetaken/e5bd83fd-d30d-4756-bc97-b714f965e6c3
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+version: 1

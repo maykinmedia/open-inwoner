@@ -1,0 +1,182 @@
+interactions:
+- request:
+    body: '{"nummer": "0000000007", "kanaal": "I", "onderwerp": "color", "inhoud":
+      "Although rate Democrat reality program mouth ok.", "taal": "nld", "indicatieContactGelukt":
+      true, "vertrouwelijk": false, "plaatsgevondenOp": "2014-11-13T14:39:53.388605"}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '244'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
+  response:
+    body:
+      string: '{"uuid":"dcb44c6f-25fb-4743-8bbf-8cc7d4fb7818","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/dcb44c6f-25fb-4743-8bbf-8cc7d4fb7818","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000007","kanaal":"I","onderwerp":"color","inhoud":"Although
+        rate Democrat reality program mouth ok.","indicatieContactGelukt":true,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2014-11-13T14:39:53.388605Z"}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '506'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/dcb44c6f-25fb-4743-8bbf-8cc7d4fb7818
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"digitaleAdressen": null, "voorkeursDigitaalAdres": null, "rekeningnummers":
+      null, "voorkeursRekeningnummer": null, "indicatieGeheimhouding": false, "indicatieActief":
+      false, "voorkeurstaal": "tgk", "soortPartij": "persoon", "partijIdentificatie":
+      {"contactnaam": {"voorletters": "Mx.", "voornaam": "Mary", "voorvoegselAchternaam":
+      "Ms.", "achternaam": "Juarez"}}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '365'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/partijen
+  response:
+    body:
+      string: '{"uuid":"95fed25b-b74b-4d6b-84d8-51c77771fc22","url":"http://localhost:8338/klantinteracties/api/v1/partijen/95fed25b-b74b-4d6b-84d8-51c77771fc22","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"tgk","indicatieActief":false,"bezoekadres":{"nummeraanduidingId":"","straatnaam":"","huisnummer":null,"huisnummertoevoeging":"","postcode":"","stad":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","straatnaam":"","huisnummer":null,"huisnummertoevoeging":"","postcode":"","stad":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Mx.","voornaam":"Mary","voorvoegselAchternaam":"Ms.","achternaam":"Juarez"},"volledigeNaam":"Mary
+        Ms. Juarez"}}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '1028'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/partijen/95fed25b-b74b-4d6b-84d8-51c77771fc22
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"wasPartij": {"uuid": "95fed25b-b74b-4d6b-84d8-51c77771fc22"}, "hadKlantcontact":
+      {"uuid": "dcb44c6f-25fb-4743-8bbf-8cc7d4fb7818"}, "bezoekadres": null, "correspondentieadres":
+      null, "contactnaam": {"voorletters": "Dr.", "voornaam": "Kathy", "voorvoegselAchternaam":
+      "Mx.", "achternaam": "Welch"}, "rol": "klant", "organisatienaam": "Dixon-White",
+      "initiator": false}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '368'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/betrokkenen
+  response:
+    body:
+      string: '{"uuid":"a8d22ba7-0245-40d2-8a35-e95cd1f6df15","url":"http://localhost:8338/klantinteracties/api/v1/betrokkenen/a8d22ba7-0245-40d2-8a35-e95cd1f6df15","wasPartij":{"uuid":"95fed25b-b74b-4d6b-84d8-51c77771fc22","url":"http://localhost:8338/klantinteracties/api/v1/partijen/95fed25b-b74b-4d6b-84d8-51c77771fc22"},"hadKlantcontact":{"uuid":"dcb44c6f-25fb-4743-8bbf-8cc7d4fb7818","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/dcb44c6f-25fb-4743-8bbf-8cc7d4fb7818"},"digitaleAdressen":[],"bezoekadres":{"nummeraanduidingId":"","straatnaam":"","huisnummer":null,"huisnummertoevoeging":"","postcode":"","stad":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","straatnaam":"","huisnummer":null,"huisnummertoevoeging":"","postcode":"","stad":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"contactnaam":{"voorletters":"Dr.","voornaam":"Kathy","voorvoegselAchternaam":"Mx.","achternaam":"Welch"},"volledigeNaam":"Kathy
+        Mx. Welch","rol":"klant","organisatienaam":"Dixon-White","initiator":false}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '1087'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/betrokkenen/a8d22ba7-0245-40d2-8a35-e95cd1f6df15
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: null
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+    method: GET
+    uri: http://localhost:8338/klantinteracties/api/v1/betrokkenen/a8d22ba7-0245-40d2-8a35-e95cd1f6df15
+  response:
+    body:
+      string: '{"uuid":"a8d22ba7-0245-40d2-8a35-e95cd1f6df15","url":"http://localhost:8338/klantinteracties/api/v1/betrokkenen/a8d22ba7-0245-40d2-8a35-e95cd1f6df15","wasPartij":{"uuid":"95fed25b-b74b-4d6b-84d8-51c77771fc22","url":"http://localhost:8338/klantinteracties/api/v1/partijen/95fed25b-b74b-4d6b-84d8-51c77771fc22"},"hadKlantcontact":{"uuid":"dcb44c6f-25fb-4743-8bbf-8cc7d4fb7818","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/dcb44c6f-25fb-4743-8bbf-8cc7d4fb7818"},"digitaleAdressen":[],"bezoekadres":{"nummeraanduidingId":"","straatnaam":"","huisnummer":null,"huisnummertoevoeging":"","postcode":"","stad":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","straatnaam":"","huisnummer":null,"huisnummertoevoeging":"","postcode":"","stad":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"contactnaam":{"voorletters":"Dr.","voornaam":"Kathy","voorvoegselAchternaam":"Mx.","achternaam":"Welch"},"volledigeNaam":"Kathy
+        Mx. Welch","rol":"klant","organisatienaam":"Dixon-White","initiator":false}'
+    headers:
+      API-version:
+      - 0.1.0
+      Allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      Content-Length:
+      - '1087'
+      Content-Security-Policy:
+      - 'form-action ''self''; base-uri ''self''; font-src ''self'' fonts.gstatic.com;
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        worker-src ''self'' blob:; img-src ''self'' data: cdn.redoc.ly; object-src
+        ''none''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline'' fonts.googleapis.com'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1
