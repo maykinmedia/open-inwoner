@@ -716,7 +716,11 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
         self.assertNotIn("_auth_user_id", self.app.session)
         self.assertRedirectsLogin(response, with_host=True)
 
-    @patch("open_inwoner.accounts.signals.KvKClient.get_basisprofiel", autospec=True)
+    @patch(
+        "open_inwoner.accounts.signals.KvKClient.get_basisprofiel",
+        return_value={},
+        autospec=True,
+    )
     @patch(
         "open_inwoner.accounts.signals.KvKClient.retrieve_rsin_with_kvk",
         return_value="",
@@ -760,7 +764,8 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
 
         # We bailed out early -- because the flag is true, we don't have to poll the KvK
         # to check if the entity is an eenmanszaak
-        mock_get_basisprofiel.assert_not_called()
+        # mock_get_basisprofiel.assert_called_with(kvk=data["auth_name"])
+        mock_get_basisprofiel.assert_called()
 
     @patch("eherkenning.validators.KVKValidator.__call__")
     def test_eherkenning_fail_without_invite_and_next_url_redirects_to_login_page(
@@ -2087,37 +2092,37 @@ class UpdateUserOnLoginTest(TestCase):
         self.data.user.save()
 
         self.assertEqual(request.user.company_name, "")
+        self.assertEqual(request.user.branch_name, "")
 
-        vestiging = {
-            "kvkNummer": "68750110",
-            "vestigingsnummer": "000037178598",
+        basisprofiel = {
+            "kvkNummer": "69599084",
             "naam": "Test BV Donald",
-            "adres": {
-                "binnenlandsAdres": {
-                    "type": "bezoekadres",
-                    "straatnaam": "Hizzaarderlaan",
-                    "plaats": "Lollum",
-                }
-            },
-            "type": "hoofdvestiging",
-            "_links": {
-                "basisprofiel": {
-                    "href": "https://api.kvk.nl/test/api/v1/basisprofielen/68750110"
+            "statutaireNaam": "Test BV Donald",
+            "handelsnamen": [
+                {"naam": "Test BV Donald Hoofdvestiging", "volgorde": 0},
+                {"naam": "Test BV Donald Nevenvestiging", "volgorde": 1},
+            ],
+            "links": [
+                {
+                    "rel": "self",
+                    "href": "https://api.kvk.nl/test/api/v1/basisprofielen/68750110",
                 },
-                "vestigingsprofiel": {
-                    "href": "https://api.kvk.nl/test/api/v1/vestigingsprofielen/000037178598"
+                {
+                    "rel": "vestigingen",
+                    "href": "https://api.kvk.nl/test/api/v1/basisprofielen/68750110/vestigingen",
                 },
-            },
+            ],
         }
 
-        with patch.object(KvKClient, "get_company_headquarters") as mock_kvk:
-            mock_kvk.return_value = vestiging
+        with patch.object(KvKClient, "get_basisprofiel") as mock_kvk:
+            mock_kvk.return_value = basisprofiel
             update_user_on_login(
                 self.__class__,
                 request.user,
                 request,
             )
 
-            mock_kvk.assert_called_once()
+            mock_kvk.assert_called_with(kvk=self.data.user.kvk)
 
         self.assertEqual(request.user.company_name, "Test BV Donald")
+        self.assertEqual(request.user.branch_name, "")

@@ -224,8 +224,16 @@ class User(AbstractBaseUser, PermissionsMixin):
         default="",
         validators=[validate_vestiging],
     )
+    # company_name is the same for all branches of a company
+    # branch_name can differ for different branches
     company_name = models.CharField(
         verbose_name=_("Company name"), max_length=250, blank=True, default=""
+    )
+    branch_name = models.CharField(
+        verbose_name=_("Company branch name"),
+        max_length=250,
+        blank=True,
+        default="",
     )
     login_type = models.CharField(
         verbose_name=_("Login type"),

@@ -96,27 +96,26 @@ def _update_eherkenning_user_from_kvk_api(user: User):
 
         # Update company name. We want this to run on every login because it may
         # change (if infrequently)
-        if vestiging := (
-            kvk_client.get_vestiging(vestiging=user.vestiging)
-            if user.vestiging
-            else kvk_client.get_company_headquarters(kvk=user.kvk)
-        ):
-            if (
-                company_name := vestiging.get("naam")
-            ) and user.company_name != company_name:
-                user.company_name = company_name
-                user.save(update_fields=["company_name"])
-                updated_fields.append("company_name")
-        else:
-            logger.error(
-                "Unable to sync company_name from KvK API",
-                extra=extra_exc_params,
-            )
+        basisprofiel = kvk_client.get_basisprofiel(kvk=user.kvk)
+        company_name = basisprofiel.get("naam")
+        if company_name and user.company_name != company_name:
+            user.company_name = company_name
+            user.save(update_fields=["company_name"])
+            updated_fields.append("company_name")
+
+        # Update branch name (leave empty for rechtspersoon)
+        if user.vestiging:
+            branch_profile = kvk_client.get_vestigingsprofiel(vestiging=user.vestiging)
+            branch_name = branch_profile.get("eersteHandelsnaam")
+            if branch_name and user.branch_name != branch_name:
+                user.branch_name = branch_name
+                user.save()
+                updated_fields.append("branch_name")
 
         # Optionally update RSIN. Unlike company name, RSIN should be immutable, so we
         # only have to fetch it if it's not set.
         if not user.rsin:
-            rsin = kvk_client.retrieve_rsin_with_kvk(user.kvk)
+            rsin = kvk_client.retrieve_rsin_with_kvk(kvk=user.kvk)
 
             if rsin:
                 user.rsin = rsin

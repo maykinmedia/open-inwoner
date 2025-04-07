@@ -79,6 +79,10 @@ class KvKClient:
     def basisprofielen_endpoint(self):
         return self._urljoin(self.config.api_root, "v1", "basisprofielen")
 
+    @cached_property
+    def vestigingsprofielen_endpoint(self):
+        return self._urljoin(self.config.api_root, "v1", "vestigingsprofielen")
+
     def search(self, **kwargs) -> dict:
         """
         Generic call to the 'Zoeken' endpoint of the KvK API
@@ -136,11 +140,19 @@ class KvKClient:
 
     @cache_result("kvk:{kvk}")
     def get_basisprofiel(self, kvk: str) -> dict:
-        return self._request(f"{self.basisprofielen_endpoint}/{kvk}")
+        basisprofiel = self._request(f"{self.basisprofielen_endpoint}/{kvk}") or {}
+        return basisprofiel
 
-    def retrieve_rsin_with_kvk(self, kvk: str) -> str | None:
-        if not (basisprofiel := self.get_basisprofiel(kvk)):
-            return None
+    def get_vestigingsprofiel(self, vestiging: str) -> dict:
+        vestigingsprofiel = (
+            self._request(f"{self.vestigingsprofielen_endpoint}/{vestiging}") or {}
+        )
+        return vestigingsprofiel
+
+    def retrieve_rsin_with_kvk(
+        self, kvk: str, basisprofiel: dict | None = None
+    ) -> str | None:
+        basisprofiel = self.get_basisprofiel(kvk=kvk)
 
         try:
             rsin = basisprofiel["_embedded"]["eigenaar"]["rsin"]
