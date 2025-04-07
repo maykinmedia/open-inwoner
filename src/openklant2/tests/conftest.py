@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 
 from openklant2.tests.helpers import OpenKlantServiceManager
@@ -53,4 +55,19 @@ def vcr_config():
             "query",
             # "body",
         ],
+        "path_transformer": lambda path: Path(str(path).lower()).__str__(),
+        "cassette_library_dir": "tests/cassettes",  # adjust this path as needed
     }
+
+
+def lowercase_cassette_name(function_name):
+    """Convert function name to lowercase for VCR cassette names"""
+    return function_name.lower()
+
+
+@pytest.fixture
+def vcr_cassette_name(request):
+    """Override the default cassette name to ensure it's lowercase"""
+    test_name = request.node.name
+    # Convert to lowercase and replace any special characters if needed
+    return lowercase_cassette_name(test_name)
