@@ -407,7 +407,7 @@ messagebird==2.1.0
     # via -r requirements/base.in
 mozilla-django-oidc==4.0.1
     # via mozilla-django-oidc-db
-mozilla-django-oidc-db[setup-configuration]==0.22.0
+mozilla-django-oidc-db[setup-configuration]==0.23.0
     # via
     #   -r requirements/base.in
     #   django-digid-eherkenning
