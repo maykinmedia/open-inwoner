@@ -9,7 +9,6 @@ from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
 from django.views.generic import FormView
 
-from elasticsearch.exceptions import ConnectionTimeout
 from furl import furl
 
 from open_inwoner.configurations.models import SiteConfiguration
@@ -121,8 +120,8 @@ class SearchView(
 
             # paginate
             paginator_dict = self.paginate_with_context(results.results)
-        except ConnectionTimeout:
-            logger.exception("Elasticsearch timeout on performing search query")
+        except Exception:
+            logger.exception("Failed to execute search query")
             paginator_dict = self.paginate_with_context([])
             messages.add_message(
                 self.request,
