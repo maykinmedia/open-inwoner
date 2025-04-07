@@ -20,21 +20,30 @@
     color: var(--color-gray-dark);
     white-space: nowrap;
     border-top: var(--border-width-thin) solid var(--color-gray);
+    position: relative;
+
+    // Tablet
     @media (min-width: 900px) {
       border-top: none;
       margin-left: var(--spacing-extra-large);
+      min-width: 260px;
+
+      :nth-child(2)::after,
+      :nth-child(3)::after {
+        content: '';
+        position: absolute;
+        left: 100%;
+        bottom: var(--spacing-giant);
+        height: 50%;
+        margin: auto;
+        right: 0;
+        width: 1px;
+        border-left: 1px solid var(--color-gray);
+      }
     }
 
     &:first-child {
       margin-left: 0;
-    }
-
-    p::after {
-      color: var(--color-gray);
-      @media (min-width: 900px) {
-        content: '|';
-        margin-left: var(--spacing-extra-large);
-      }
     }
 
     &:last-child p::after {
