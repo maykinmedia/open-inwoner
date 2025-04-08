@@ -100,3 +100,6 @@ git+https://github.com/maykinmedia/objects-api-client-django.git@6f26a2a2fbdb52f
 # 2FA SMS verification
 oath
 messagebird
+
+# May delete later:
+git+https://github.com/maykinmedia/open-product-api-client

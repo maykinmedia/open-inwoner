@@ -239,6 +239,8 @@ INSTALLED_APPS = [
     "open_inwoner.cms.products",
     "open_inwoner.cms.collaborate",
     "open_inwoner.cms.banner",
+    "open_inwoner.cms.open_product.product_list",
+    "open_inwoner.cms.open_product.themes",
     "open_inwoner.cms.extensions",
     "open_inwoner.cms.footer",
     "open_inwoner.cms.plugins",
@@ -252,6 +254,8 @@ INSTALLED_APPS = [
     # Docker; this needs to be fixed this in the library eventually;
     # for now we load it after all our apps.
     "notifications_api_common",
+    "openproductapiclient",
+    "open_inwoner.open_product",
 ]
 
 MIDDLEWARE = [
@@ -593,6 +597,9 @@ CMS_PLACEHOLDER_CONF = {
             "UserAppointmentsPlugin",
             "TasksPlugin",
             "CMSFlatPagePlugin",
+            "ProductListPlugin",
+            "ThemeListPlugin",
+            "ThemePlugin",
         ],
         "text_only_plugins": ["LinkPlugin"],
         "name": _("Content"),

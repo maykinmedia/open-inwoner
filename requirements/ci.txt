@@ -231,6 +231,7 @@ django==4.2.22
     #   mozilla-django-oidc-db
     #   notifications-api-common
     #   objects-api-client-django
+    #   open-product-api-client
     #   sentry-sdk
     #   zgw-consumers
     #   zgw-consumers-oas
@@ -456,6 +457,7 @@ django-solo==2.2.0
     #   mozilla-django-oidc-db
     #   notifications-api-common
     #   objects-api-client-django
+    #   open-product-api-client
     #   zgw-consumers
 django-timeline-logger==4.0.0
     # via
@@ -756,6 +758,10 @@ odfpy==1.4.1
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   tablib
+open-product-api-client @ git+https://github.com/maykinmedia/open-product-api-client@01e3beb337cdcca40964a6d35dd62cfbee3f8609
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
 openpyxl==3.0.9
     # via
     #   -c requirements/base.txt
@@ -952,6 +958,7 @@ requests==2.31.0
     #   messagebird
     #   mozilla-django-oidc
     #   objects-api-client-django
+    #   open-product-api-client
     #   requests-mock
     #   sphinx
     #   zgw-consumers
@@ -1157,6 +1164,7 @@ zgw-consumers==0.38.1
     #   -r requirements/base.txt
     #   notifications-api-common
     #   objects-api-client-django
+    #   open-product-api-client
 zgw-consumers-oas==1.0.0
     # via
     #   -c requirements/base.txt

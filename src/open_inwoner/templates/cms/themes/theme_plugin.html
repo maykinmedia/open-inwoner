@@ -1,0 +1,17 @@
+{% load i18n button_tags card_tags utils icon_tags %}
+
+{% render_card image_object_fit="cover" href=plan.get_absolute_url %}
+    <a href="{{ page_url }}" class="card__content" style="text-decoration: none;">
+        <h3 class="utrecht-heading-3 card__heading-3 plan-list">{{ plugin.title }}</h3>
+        {% if plugin.caption|length > 0 %}
+            <p class="utrecht-paragraph">{{ plugin.caption }}</p>
+        {% endif %}
+        {% if plugin.required_actions %}
+            <p class="utrecht-paragraph" style="color: tomato;">U heeft 3 verreiste acties.</p>
+        {% endif %}
+        <span class="spacer"></span>
+        <span class="button button--icon-before button--transparent button--secondary">
+        {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+        </span>
+    </a>
+{% endrender_card %}
