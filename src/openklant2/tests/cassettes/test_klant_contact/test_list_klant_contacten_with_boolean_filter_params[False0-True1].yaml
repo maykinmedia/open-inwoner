@@ -1,39 +1,40 @@
 interactions:
 - request:
-    body: '{"nummer": "0000000115", "kanaal": "owner", "onderwerp": "his", "inhoud":
-      "Care air hard change.", "taal": "nld", "indicatieContactGelukt": false, "vertrouwelijk":
-      true, "plaatsgevondenOp": "2010-10-29T01:56:38.533953"}'
+    body: '{"nummer": "0000000115", "kanaal": "free", "onderwerp": "ok", "inhoud":
+      "Front town fall as day know.", "taal": "nld", "indicatieContactGelukt": false,
+      "vertrouwelijk": true, "plaatsgevondenOp": "2002-12-11T16:05:47.317210"}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '219'
+      - '224'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"a4f5bd96-b6e8-4aca-b070-ced5e81ba59f","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/a4f5bd96-b6e8-4aca-b070-ced5e81ba59f","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000115","kanaal":"owner","onderwerp":"his","inhoud":"Care
-        air hard change.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2010-10-29T01:56:38.533953Z"}'
+      string: '{"uuid":"24a888be-4888-432c-9c93-b97d0405c988","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/24a888be-4888-432c-9c93-b97d0405c988","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000115","kanaal":"free","onderwerp":"ok","inhoud":"Front
+        town fall as day know.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2002-12-11T16:05:47.317210Z"}'
     headers:
       API-version:
-      - 0.0.4
+      - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '481'
+      - '486'
       Content-Security-Policy:
-      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
-        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
-        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
+      - 'style-src ''self'' ''unsafe-inline'' fonts.googleapis.com; base-uri ''self'';
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; object-src ''none'';
+        form-action ''self''; frame-ancestors ''none''; font-src ''self'' fonts.gstatic.com;
+        frame-src ''self''; img-src ''self'' data: cdn.redoc.ly; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/a4f5bd96-b6e8-4aca-b070-ced5e81ba59f
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/24a888be-4888-432c-9c93-b97d0405c988
       Referrer-Policy:
       - same-origin
       Vary:
@@ -54,20 +55,21 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1&indicatieContactGelukt=False
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"a4f5bd96-b6e8-4aca-b070-ced5e81ba59f","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/a4f5bd96-b6e8-4aca-b070-ced5e81ba59f","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000115","kanaal":"owner","onderwerp":"his","inhoud":"Care
-        air hard change.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2010-10-29T01:56:38.533953Z","_expand":{}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"24a888be-4888-432c-9c93-b97d0405c988","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/24a888be-4888-432c-9c93-b97d0405c988","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000115","kanaal":"free","onderwerp":"ok","inhoud":"Front
+        town fall as day know.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2002-12-11T16:05:47.317210Z","_expand":{}}]}'
     headers:
       API-version:
-      - 0.0.4
+      - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '546'
+      - '551'
       Content-Security-Policy:
-      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
-        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
-        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
+      - 'style-src ''self'' ''unsafe-inline'' fonts.googleapis.com; base-uri ''self'';
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; object-src ''none'';
+        form-action ''self''; frame-ancestors ''none''; font-src ''self'' fonts.gstatic.com;
+        frame-src ''self''; img-src ''self'' data: cdn.redoc.ly; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
@@ -95,16 +97,17 @@ interactions:
       string: '{"count":0,"next":null,"previous":null,"results":[]}'
     headers:
       API-version:
-      - 0.0.4
+      - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
       - '52'
       Content-Security-Policy:
-      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
-        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
-        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
+      - 'style-src ''self'' ''unsafe-inline'' fonts.googleapis.com; base-uri ''self'';
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; object-src ''none'';
+        form-action ''self''; frame-ancestors ''none''; font-src ''self'' fonts.gstatic.com;
+        frame-src ''self''; img-src ''self'' data: cdn.redoc.ly; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

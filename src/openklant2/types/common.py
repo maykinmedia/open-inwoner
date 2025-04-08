@@ -17,6 +17,9 @@ class CreateAdres(TypedDict):
     adresregel2: NotRequired[str]
     adresregel3: NotRequired[str]
     land: NotRequired[str]
+    huisnummer: int
+    postcode: str
+    huisnummertoevoeging: str
 
 
 class Adres(TypedDict):
@@ -24,6 +27,9 @@ class Adres(TypedDict):
     adresregel1: str
     adresregel2: str
     adresregel3: str
+    huisnummer: int | None
+    postcode: str
+    huisnummertoevoeging: str
     land: str
 
 

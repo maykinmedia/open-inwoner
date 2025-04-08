@@ -1,39 +1,40 @@
 interactions:
 - request:
-    body: '{"nummer": "0000000112", "kanaal": "though", "onderwerp": "difference",
-      "inhoud": "Mr office forward eat peace record big.", "taal": "nld", "indicatieContactGelukt":
-      true, "vertrouwelijk": true, "plaatsgevondenOp": "2003-07-23T02:34:24.331740"}'
+    body: '{"nummer": "0000000112", "kanaal": "simple", "onderwerp": "ground", "inhoud":
+      "Word sort finish staff sister part loss.", "taal": "nld", "indicatieContactGelukt":
+      null, "vertrouwelijk": false, "plaatsgevondenOp": "2005-11-02T07:39:13.948219"}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '244'
+      - '242'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"e44a457e-2b03-41d9-860c-75d872104aea","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/e44a457e-2b03-41d9-860c-75d872104aea","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000112","kanaal":"though","onderwerp":"difference","inhoud":"Mr
-        office forward eat peace record big.","indicatieContactGelukt":true,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2003-07-23T02:34:24.331740Z"}'
+      string: '{"uuid":"8323ca57-4df8-4b0d-b92c-4e9f097e0638","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/8323ca57-4df8-4b0d-b92c-4e9f097e0638","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000112","kanaal":"simple","onderwerp":"ground","inhoud":"Word
+        sort finish staff sister part loss.","indicatieContactGelukt":null,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2005-11-02T07:39:13.948219Z"}'
     headers:
       API-version:
-      - 0.0.4
+      - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '506'
+      - '504'
       Content-Security-Policy:
-      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
-        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
-        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
+      - 'style-src ''self'' ''unsafe-inline'' fonts.googleapis.com; base-uri ''self'';
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; object-src ''none'';
+        form-action ''self''; frame-ancestors ''none''; font-src ''self'' fonts.gstatic.com;
+        frame-src ''self''; img-src ''self'' data: cdn.redoc.ly; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/e44a457e-2b03-41d9-860c-75d872104aea
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/8323ca57-4df8-4b0d-b92c-4e9f097e0638
       Referrer-Policy:
       - same-origin
       Vary:
@@ -51,23 +52,24 @@ interactions:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
     method: GET
-    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten/e44a457e-2b03-41d9-860c-75d872104aea
+    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten/8323ca57-4df8-4b0d-b92c-4e9f097e0638
   response:
     body:
-      string: '{"uuid":"e44a457e-2b03-41d9-860c-75d872104aea","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/e44a457e-2b03-41d9-860c-75d872104aea","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000112","kanaal":"though","onderwerp":"difference","inhoud":"Mr
-        office forward eat peace record big.","indicatieContactGelukt":true,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2003-07-23T02:34:24.331740Z"}'
+      string: '{"uuid":"8323ca57-4df8-4b0d-b92c-4e9f097e0638","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/8323ca57-4df8-4b0d-b92c-4e9f097e0638","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000112","kanaal":"simple","onderwerp":"ground","inhoud":"Word
+        sort finish staff sister part loss.","indicatieContactGelukt":null,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2005-11-02T07:39:13.948219Z"}'
     headers:
       API-version:
-      - 0.0.4
+      - 0.1.2
       Allow:
       - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
       Content-Length:
-      - '506'
+      - '504'
       Content-Security-Policy:
-      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
-        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
-        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
+      - 'style-src ''self'' ''unsafe-inline'' fonts.googleapis.com; base-uri ''self'';
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; object-src ''none'';
+        form-action ''self''; frame-ancestors ''none''; font-src ''self'' fonts.gstatic.com;
+        frame-src ''self''; img-src ''self'' data: cdn.redoc.ly; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

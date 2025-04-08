@@ -1,39 +1,40 @@
 interactions:
 - request:
-    body: '{"nummer": "0000000113", "kanaal": "discuss", "onderwerp": "conference",
-      "inhoud": "Concern activity material yard world now.", "taal": "nld", "indicatieContactGelukt":
-      false, "vertrouwelijk": true, "plaatsgevondenOp": "2003-12-20T07:53:01.643234"}'
+    body: '{"nummer": "0000000113", "kanaal": "front", "onderwerp": "interesting",
+      "inhoud": "Maintain quality spring place mention stop assume.", "taal": "nld",
+      "indicatieContactGelukt": null, "vertrouwelijk": true, "plaatsgevondenOp": "1997-09-21T22:09:04.570838"}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '248'
+      - '255'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"81909c5b-c246-4ce1-ade0-69effd424548","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/81909c5b-c246-4ce1-ade0-69effd424548","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000113","kanaal":"discuss","onderwerp":"conference","inhoud":"Concern
-        activity material yard world now.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2003-12-20T07:53:01.643234Z"}'
+      string: '{"uuid":"1a229758-0586-4c54-8596-93dfccd7216b","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/1a229758-0586-4c54-8596-93dfccd7216b","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000113","kanaal":"front","onderwerp":"interesting","inhoud":"Maintain
+        quality spring place mention stop assume.","indicatieContactGelukt":null,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"1997-09-21T22:09:04.570838Z"}'
     headers:
       API-version:
-      - 0.0.4
+      - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '510'
+      - '517'
       Content-Security-Policy:
-      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
-        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
-        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
+      - 'style-src ''self'' ''unsafe-inline'' fonts.googleapis.com; base-uri ''self'';
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; object-src ''none'';
+        form-action ''self''; frame-ancestors ''none''; font-src ''self'' fonts.gstatic.com;
+        frame-src ''self''; img-src ''self'' data: cdn.redoc.ly; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/81909c5b-c246-4ce1-ade0-69effd424548
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/1a229758-0586-4c54-8596-93dfccd7216b
       Referrer-Policy:
       - same-origin
       Vary:
@@ -54,20 +55,21 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"81909c5b-c246-4ce1-ade0-69effd424548","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/81909c5b-c246-4ce1-ade0-69effd424548","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000113","kanaal":"discuss","onderwerp":"conference","inhoud":"Concern
-        activity material yard world now.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2003-12-20T07:53:01.643234Z","_expand":{}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"1a229758-0586-4c54-8596-93dfccd7216b","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/1a229758-0586-4c54-8596-93dfccd7216b","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000113","kanaal":"front","onderwerp":"interesting","inhoud":"Maintain
+        quality spring place mention stop assume.","indicatieContactGelukt":null,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"1997-09-21T22:09:04.570838Z","_expand":{}}]}'
     headers:
       API-version:
-      - 0.0.4
+      - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '575'
+      - '582'
       Content-Security-Policy:
-      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
-        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
-        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
+      - 'style-src ''self'' ''unsafe-inline'' fonts.googleapis.com; base-uri ''self'';
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; object-src ''none'';
+        form-action ''self''; frame-ancestors ''none''; font-src ''self'' fonts.gstatic.com;
+        frame-src ''self''; img-src ''self'' data: cdn.redoc.ly; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

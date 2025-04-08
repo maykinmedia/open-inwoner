@@ -16,6 +16,6 @@ else
     exit 0
 fi
 
-export OPEN_KLANT_IMAGE_TAG="2.6.0"
+export OPEN_KLANT_IMAGE_TAG="2.7.0"
 echo "Using Open Klant image version $OPEN_KLANT_IMAGE_TAG"
 pytest --with-openklant-service --record-mode=all -vvv

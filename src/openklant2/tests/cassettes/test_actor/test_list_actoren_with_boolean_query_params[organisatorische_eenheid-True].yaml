@@ -1,54 +1,8 @@
 interactions:
 - request:
-    body: '{"naam": "Michael Powell", "soortActor": "organisatorische_eenheid", "indicatieActief":
-      false, "actoridentificator": {"objectId": "0000000019", "codeObjecttype": "despite",
-      "codeRegister": "discuss", "codeSoortObjectId": "down"}}'
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-      Content-Length:
-      - '229'
-      Content-Type:
-      - application/json
-    method: POST
-    uri: http://localhost:8338/klantinteracties/api/v1/actoren
-  response:
-    body:
-      string: '{"uuid":"f639ef95-a7aa-47a9-ae3d-334e31bf5722","url":"http://localhost:8338/klantinteracties/api/v1/actoren/f639ef95-a7aa-47a9-ae3d-334e31bf5722","naam":"Michael
-        Powell","soortActor":"organisatorische_eenheid","indicatieActief":false,"actoridentificator":{"objectId":"0000000019","codeObjecttype":"despite","codeRegister":"discuss","codeSoortObjectId":"down"},"actorIdentificatie":null}'
-    headers:
-      API-version:
-      - 0.0.4
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '386'
-      Content-Security-Policy:
-      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
-        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
-        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/f639ef95-a7aa-47a9-ae3d-334e31bf5722
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 201
-      message: Created
-- request:
-    body: '{"naam": "Alan Figueroa", "soortActor": "medewerker", "indicatieActief":
-      false, "actoridentificator": {"objectId": "0000000020", "codeObjecttype": "section",
-      "codeRegister": "mention", "codeSoortObjectId": "each"}}'
+    body: '{"naam": "Natalie Peterson", "soortActor": "medewerker", "indicatieActief":
+      false, "actoridentificator": {"objectId": "0000000019", "codeObjecttype": "least",
+      "codeRegister": "add", "codeSoortObjectId": "mission"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
@@ -60,26 +14,27 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/actoren
   response:
     body:
-      string: '{"uuid":"df930bca-9d11-4dff-b089-8e0963fcb388","url":"http://localhost:8338/klantinteracties/api/v1/actoren/df930bca-9d11-4dff-b089-8e0963fcb388","naam":"Alan
-        Figueroa","soortActor":"medewerker","indicatieActief":false,"actoridentificator":{"objectId":"0000000020","codeObjecttype":"section","codeRegister":"mention","codeSoortObjectId":"each"},"actorIdentificatie":null}'
+      string: '{"uuid":"1cc7026d-18df-452d-8581-dab70da3d5a7","url":"http://localhost:8338/klantinteracties/api/v1/actoren/1cc7026d-18df-452d-8581-dab70da3d5a7","naam":"Natalie
+        Peterson","soortActor":"medewerker","indicatieActief":false,"actoridentificator":{"objectId":"0000000019","codeObjecttype":"least","codeRegister":"add","codeSoortObjectId":"mission"},"actorIdentificatie":null}'
     headers:
       API-version:
-      - 0.0.4
+      - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
       - '371'
       Content-Security-Policy:
-      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
-        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
-        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
+      - 'style-src ''self'' ''unsafe-inline'' fonts.googleapis.com; base-uri ''self'';
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; object-src ''none'';
+        form-action ''self''; frame-ancestors ''none''; font-src ''self'' fonts.gstatic.com;
+        frame-src ''self''; img-src ''self'' data: cdn.redoc.ly; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/df930bca-9d11-4dff-b089-8e0963fcb388
+      - http://localhost:8338/klantinteracties/api/v1/actoren/1cc7026d-18df-452d-8581-dab70da3d5a7
       Referrer-Policy:
       - same-origin
       Vary:
@@ -92,9 +47,9 @@ interactions:
       code: 201
       message: Created
 - request:
-    body: '{"naam": "Brenda Richardson", "soortActor": "organisatorische_eenheid",
-      "indicatieActief": true, "actoridentificator": {"objectId": "0000000021", "codeObjecttype":
-      "north", "codeRegister": "recent", "codeSoortObjectId": "a"}}'
+    body: '{"naam": "Amanda Johnston", "soortActor": "geautomatiseerde_actor", "indicatieActief":
+      false, "actoridentificator": {"objectId": "0000000020", "codeObjecttype": "break",
+      "codeRegister": "they", "codeSoortObjectId": "entire"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
@@ -106,26 +61,74 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/actoren
   response:
     body:
-      string: '{"uuid":"4fabe823-26b8-44c1-9741-d8c629fc6a9f","url":"http://localhost:8338/klantinteracties/api/v1/actoren/4fabe823-26b8-44c1-9741-d8c629fc6a9f","naam":"Brenda
-        Richardson","soortActor":"organisatorische_eenheid","indicatieActief":true,"actoridentificator":{"objectId":"0000000021","codeObjecttype":"north","codeRegister":"recent","codeSoortObjectId":"a"},"actorIdentificatie":null}'
+      string: '{"uuid":"6898a4c0-b17d-4020-9abd-e89d2e1cbb51","url":"http://localhost:8338/klantinteracties/api/v1/actoren/6898a4c0-b17d-4020-9abd-e89d2e1cbb51","naam":"Amanda
+        Johnston","soortActor":"geautomatiseerde_actor","indicatieActief":false,"actoridentificator":{"objectId":"0000000020","codeObjecttype":"break","codeRegister":"they","codeSoortObjectId":"entire"},"actorIdentificatie":null}'
     headers:
       API-version:
-      - 0.0.4
+      - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
       - '382'
       Content-Security-Policy:
-      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
-        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
-        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
+      - 'style-src ''self'' ''unsafe-inline'' fonts.googleapis.com; base-uri ''self'';
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; object-src ''none'';
+        form-action ''self''; frame-ancestors ''none''; font-src ''self'' fonts.gstatic.com;
+        frame-src ''self''; img-src ''self'' data: cdn.redoc.ly; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/4fabe823-26b8-44c1-9741-d8c629fc6a9f
+      - http://localhost:8338/klantinteracties/api/v1/actoren/6898a4c0-b17d-4020-9abd-e89d2e1cbb51
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"naam": "Christine Briggs", "soortActor": "organisatorische_eenheid",
+      "indicatieActief": true, "actoridentificator": {"objectId": "0000000021", "codeObjecttype":
+      "water", "codeRegister": "cause", "codeSoortObjectId": "kind"}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '226'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"uuid":"c6de8ce6-c89c-4d44-a29a-2baf038bb35d","url":"http://localhost:8338/klantinteracties/api/v1/actoren/c6de8ce6-c89c-4d44-a29a-2baf038bb35d","naam":"Christine
+        Briggs","soortActor":"organisatorische_eenheid","indicatieActief":true,"actoridentificator":{"objectId":"0000000021","codeObjecttype":"water","codeRegister":"cause","codeSoortObjectId":"kind"},"actorIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.1.2
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '383'
+      Content-Security-Policy:
+      - 'style-src ''self'' ''unsafe-inline'' fonts.googleapis.com; base-uri ''self'';
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; object-src ''none'';
+        form-action ''self''; frame-ancestors ''none''; font-src ''self'' fonts.gstatic.com;
+        frame-src ''self''; img-src ''self'' data: cdn.redoc.ly; worker-src ''self''
+        blob:'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/actoren/c6de8ce6-c89c-4d44-a29a-2baf038bb35d
       Referrer-Policy:
       - same-origin
       Vary:
@@ -146,20 +149,21 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/actoren?indicatieActief=True&soortActor=organisatorische_eenheid
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"4fabe823-26b8-44c1-9741-d8c629fc6a9f","url":"http://localhost:8338/klantinteracties/api/v1/actoren/4fabe823-26b8-44c1-9741-d8c629fc6a9f","naam":"Brenda
-        Richardson","soortActor":"organisatorische_eenheid","indicatieActief":true,"actoridentificator":{"objectId":"0000000021","codeObjecttype":"north","codeRegister":"recent","codeSoortObjectId":"a"},"actorIdentificatie":null}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"c6de8ce6-c89c-4d44-a29a-2baf038bb35d","url":"http://localhost:8338/klantinteracties/api/v1/actoren/c6de8ce6-c89c-4d44-a29a-2baf038bb35d","naam":"Christine
+        Briggs","soortActor":"organisatorische_eenheid","indicatieActief":true,"actoridentificator":{"objectId":"0000000021","codeObjecttype":"water","codeRegister":"cause","codeSoortObjectId":"kind"},"actorIdentificatie":null}]}'
     headers:
       API-version:
-      - 0.0.4
+      - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '434'
+      - '435'
       Content-Security-Policy:
-      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
-        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
-        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
+      - 'style-src ''self'' ''unsafe-inline'' fonts.googleapis.com; base-uri ''self'';
+        default-src ''self''; script-src ''self'' ''unsafe-inline''; object-src ''none'';
+        form-action ''self''; frame-ancestors ''none''; font-src ''self'' fonts.gstatic.com;
+        frame-src ''self''; img-src ''self'' data: cdn.redoc.ly; worker-src ''self''
+        blob:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

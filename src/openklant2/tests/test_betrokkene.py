@@ -142,5 +142,5 @@ def test_list_betrokkenen_as_pagination_iter(client, betrokkene_factory):
 
     TypeAdapter(list[Betrokkene]).validate_python(resp)
     assert sorted(resp, key=lambda b: b["uuid"]) == sorted(
-        betrokkenen, key=lambda b: b["uuid"]
+        (b | {"_expand": {}} for b in betrokkenen), key=lambda b: b["uuid"]
     )
