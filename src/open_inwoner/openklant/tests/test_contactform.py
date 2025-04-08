@@ -655,6 +655,9 @@ class ContactFormIntegrationTest(
         esuite_config.register_employee_id = "FooVonBar"
         esuite_config.save()
 
+        # counter for contructing different KVK numbers for subtests
+        kvk_diff = 0
+
         for (
             use_rsin_for_innNnpId_query_parameter,
             send_klantcontact_confirmation_email,
@@ -674,7 +677,12 @@ class ContactFormIntegrationTest(
                     )
                     esuite_config.save()
 
-                    data = MockAPICreateData()
+                    # kvk must be unique; we construct it dynamically from a counter that increases
+                    # with every subtest
+                    eherkenning_kvk = f"0000000{kvk_diff}"
+                    kvk_diff += 1
+
+                    data = MockAPICreateData(eherkenning_kvk=eherkenning_kvk)
                     data.install_mocks_eherkenning(
                         m, use_rsin=use_rsin_for_innNnpId_query_parameter
                     )
@@ -867,6 +875,9 @@ class ContactFormIntegrationTest(
         esuite_config.register_employee_id = "FooVonBar"
         esuite_config.save()
 
+        # counter for contructing different KVK numbers for subtests
+        kvk_diff = 0
+
         for (
             use_rsin_for_innNnpId_query_parameter,
             send_klantcontact_confirmation_email,
@@ -886,7 +897,12 @@ class ContactFormIntegrationTest(
                     )
                     esuite_config.save()
 
-                    data = MockAPICreateData()
+                    # kvk must be unique; we construct it dynamically from a counter that increases
+                    # with every subtest
+                    eherkenning_kvk = f"0000000{kvk_diff}"
+                    kvk_diff += 1
+
+                    data = MockAPICreateData(eherkenning_kvk=eherkenning_kvk)
                     data.install_mocks_eherkenning_missing_contact_info(
                         m, use_rsin=use_rsin_for_innNnpId_query_parameter
                     )

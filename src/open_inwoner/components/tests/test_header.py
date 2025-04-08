@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.test import TestCase
 
 from pyquery import PyQuery
@@ -6,13 +8,13 @@ from open_inwoner.accounts.tests.factories import (
     DigidUserFactory,
     UserFactory,
     eHerkenningUserFactory,
+    eHerkenningVestigingUserFactory,
 )
 from open_inwoner.cms.products.cms_apps import ProductsApphook
 from open_inwoner.cms.tests import cms_tools
 from open_inwoner.cms.tests.cms_tools import create_apphook_page
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.pdc.tests.factories import CategoryFactory
-from open_inwoner.utils.test import set_kvk_branch_number_in_session
 
 
 class HeaderTest(TestCase):
@@ -25,6 +27,7 @@ class HeaderTest(TestCase):
 
         cls.digid_user = DigidUserFactory.create()
         cls.eherkenning_user = eHerkenningUserFactory.create()
+        cls.vestiging_user = eHerkenningVestigingUserFactory.create()
 
         cms_tools.create_homepage()
 
@@ -129,15 +132,17 @@ class HeaderTest(TestCase):
         self.assertEqual(links[2].attr("href"), self.published2.get_absolute_url())
         self.assertEqual(links[3].attr("href"), self.published4.get_absolute_url())
 
-    @set_kvk_branch_number_in_session()
-    def test_categories_visibility_for_eherkenning_users(self):
+    @patch("open_inwoner.kvk.middleware.KvKLoginMiddleware.requires_redirect")
+    def test_categories_visibility_for_eherkenning_users(self, mock_kvk_redirect):
+        mock_kvk_redirect.return_value = False
+
         config = SiteConfiguration.get_solo()
         config.hide_categories_from_anonymous_users = False
         config.save()
 
-        self.client.force_login(self.eherkenning_user)
+        self.client.force_login(self.vestiging_user)
 
-        response = self.client.get("/", user=self.eherkenning_user)
+        response = self.client.get("/", user=self.vestiging_user)
 
         doc = PyQuery(response.content)
 

@@ -101,7 +101,6 @@ class eSuiteVragenServiceTestCase(TestCase):
                     },
                 )
                 m.reset_mock()
-                data = MockAPIReadData().install_mocks(m)
 
     def test_retrieve_question_returns_expected_result(self, m):
         data = MockAPIReadData().install_mocks(m)
@@ -173,4 +172,3 @@ class eSuiteVragenServiceTestCase(TestCase):
                     },
                 )
                 m.reset_mock()
-                data = MockAPIReadData().install_mocks(m)

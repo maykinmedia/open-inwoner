@@ -5,11 +5,12 @@ from django.urls import reverse, reverse_lazy
 
 from pyquery import PyQuery
 
-from open_inwoner.accounts.tests.factories import eHerkenningUserFactory
-from open_inwoner.kvk.branches import (
-    KVK_BRANCH_SESSION_VARIABLE,
-    get_kvk_branch_number,
-    kvk_branch_selected_done,
+from open_inwoner.accounts.eherkenning_session import EHerkenningSessionContext
+from open_inwoner.accounts.models import User
+from open_inwoner.accounts.tests.factories import (
+    DigidUserFactory,
+    eHerkenningUserFactory,
+    eHerkenningVestigingUserFactory,
 )
 from open_inwoner.kvk.tests.factories import CertificateFactory
 
@@ -36,6 +37,27 @@ class KvKViewsTestCase(TestCase):
 
         self.assertEqual(response.status_code, 401)
 
+    def test_post_as_non_eherkenning_user_throws_401(self):
+        self.client.force_login(DigidUserFactory())
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, 401)
+
+    def test_post_as_branch_restricted_user_throws_401(self):
+        self.client.force_login(eHerkenningVestigingUserFactory())
+
+        # Note: we have to persist the session in a separate variable because every
+        # property access on self.client insantiates a new session
+        session = self.client.session
+        session.update(
+            {EHerkenningSessionContext.KVK_BRANCH_RESTRICTION_SESSION_KEY: True}
+        )
+        session.save()
+
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, 401)
+
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     @patch(
         "open_inwoner.kvk.models.KvKConfig.get_solo",
@@ -53,19 +75,34 @@ class KvKViewsTestCase(TestCase):
         mock_solo.return_value.client_certificate = CertificateFactory()
         mock_solo.return_value.server_certificate = CertificateFactory()
 
-        self.client.force_login(user=self.user)
+        self.client.force_login(
+            user=self.user,
+            backend=EHerkenningSessionContext._expected_auth_backends()[0],
+        )
 
-        response = self.client.post(self.url, data={"branch_number": "1234"})
+        vestiging = "1234"
+        self.assertEqual(
+            User.eherkenning_objects.filter_by_kvk_and_vestiging(
+                kvk=self.user.kvk, vestiging=vestiging
+            ).count(),
+            0,
+        )
+        response = self.client.post(self.url, data={"branch_number": vestiging})
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(kvk_branch_selected_done(self.client.session), True)
-        self.assertEqual(get_kvk_branch_number(self.client.session), "1234")
+        self.assertTrue(
+            EHerkenningSessionContext(
+                response.wsgi_request
+            ).is_initial_branch_selection_done()
+        )
 
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     @patch(
         "open_inwoner.kvk.models.KvKConfig.get_solo",
     )
-    def test_post_branches_page_with_empty_vestigingsnummer(self, mock_solo, mock_kvk):
+    def test_post_branches_page_with_empty_or_missing_vestigingsnummer(
+        self, mock_solo, mock_kvk
+    ):
         mock_kvk.return_value = [
             {"kvkNummer": "12345678"},
             {"kvkNummer": "12345678", "vestigingsnummer": "1234"},
@@ -76,13 +113,28 @@ class KvKViewsTestCase(TestCase):
         mock_solo.return_value.client_certificate = CertificateFactory()
         mock_solo.return_value.server_certificate = CertificateFactory()
 
-        self.client.force_login(user=self.user)
+        vestiging_user = eHerkenningVestigingUserFactory(kvk=self.user.kvk)
+        self.client.force_login(
+            user=vestiging_user,
+            backend=EHerkenningSessionContext._expected_auth_backends()[0],
+        )
 
-        response = self.client.post(self.url, data={"branch_number": ""})
+        for data in ({"branch_number": ""}, None):
+            with self.subTest(data):
+                response = self.client.post(self.url, data=data)
 
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(kvk_branch_selected_done(self.client.session), True)
-        self.assertEqual(get_kvk_branch_number(self.client.session), "")
+                self.assertEqual(response.status_code, 302)
+                self.assertEqual(
+                    response.wsgi_request.user,
+                    self.user,
+                    msg="Empty branch number interpreted as a change to the legal entity user",
+                )
+                self.assertEqual(response.wsgi_request.user.vestiging, "")
+                self.assertTrue(
+                    EHerkenningSessionContext(
+                        response.wsgi_request
+                    ).is_initial_branch_selection_done()
+                )
 
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     @patch(
@@ -101,13 +153,18 @@ class KvKViewsTestCase(TestCase):
         mock_solo.return_value.client_certificate = CertificateFactory()
         mock_solo.return_value.server_certificate = CertificateFactory()
 
-        self.client.force_login(user=self.user)
-
+        self.client.force_login(
+            user=self.user,
+            backend=EHerkenningSessionContext._expected_auth_backends()[0],
+        )
         response = self.client.post(self.url, data={"branch_number": "4321"})
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(kvk_branch_selected_done(self.client.session), False)
-        self.assertNotIn(KVK_BRANCH_SESSION_VARIABLE, self.client.session)
+        self.assertEqual(
+            response.wsgi_request.user,
+            self.user,
+            msg="Branch matched existing user, no user change required",
+        )
 
         doc = PyQuery(response.content)
         branch_inputs = doc.find("[name='branch_number']")
@@ -132,7 +189,10 @@ class KvKViewsTestCase(TestCase):
         mock_solo.return_value.client_certificate = CertificateFactory()
         mock_solo.return_value.server_certificate = CertificateFactory()
 
-        self.client.force_login(user=self.user)
+        self.client.force_login(
+            user=self.user,
+            backend=EHerkenningSessionContext._expected_auth_backends()[0],
+        )
 
         response = self.client.get(self.url)
 
@@ -140,8 +200,12 @@ class KvKViewsTestCase(TestCase):
         self.assertEqual(response.url, reverse("pages-root"))
         # Because no branches were found, the branch check should be skipped in the future
         # and no branch number should be set
-        self.assertEqual(kvk_branch_selected_done(self.client.session), True)
-        self.assertEqual(get_kvk_branch_number(self.client.session), None)
+        self.assertEqual(response.wsgi_request.user, self.user)
+        self.assertTrue(
+            EHerkenningSessionContext(
+                response.wsgi_request
+            ).is_initial_branch_selection_done()
+        )
 
         response = self.client.get(response.url)
 
@@ -176,7 +240,10 @@ class KvKViewsTestCase(TestCase):
         mock_solo.return_value.client_certificate = CertificateFactory()
         mock_solo.return_value.server_certificate = CertificateFactory()
 
-        self.client.force_login(user=self.user)
+        self.client.force_login(
+            user=self.user,
+            backend=EHerkenningSessionContext._expected_auth_backends()[0],
+        )
 
         response = self.client.get(self.url)
 
@@ -224,7 +291,10 @@ class KvKViewsTestCase(TestCase):
         mock_solo.return_value.client_certificate = CertificateFactory()
         mock_solo.return_value.server_certificate = CertificateFactory()
 
-        self.client.force_login(user=self.user)
+        self.client.force_login(
+            user=self.user,
+            backend=EHerkenningSessionContext._expected_auth_backends()[0],
+        )
 
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)

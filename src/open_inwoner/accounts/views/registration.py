@@ -197,7 +197,7 @@ class NecessaryFieldsUserView(
         user = form.instance
 
         klant, _ = service.get_or_create_klant(
-            user=user, fetch_params=service.get_fetch_parameters(user=user)
+            user=user, fetch_params=service.get_fetch_parameters(user)
         )
 
         if not klant:

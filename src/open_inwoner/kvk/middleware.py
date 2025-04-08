@@ -1,6 +1,6 @@
 from django.urls import NoReverseMatch, reverse
 
-from open_inwoner.kvk.branches import kvk_branch_selected_done
+from open_inwoner.accounts.eherkenning_session import EHerkenningSessionContext
 from open_inwoner.utils.middleware import BaseConditionalUserRedirectMiddleware
 
 
@@ -8,10 +8,11 @@ class KvKLoginMiddleware(BaseConditionalUserRedirectMiddleware):
     """Redirect authenticated eHerkenning users to select a company branch"""
 
     def requires_redirect(self, request):
-        user = request.user
-        return user.is_eherkenning_user and not kvk_branch_selected_done(
-            request.session
-        )
+        if not request.user.is_eherkenning_user:
+            return False
+
+        context = EHerkenningSessionContext(request)
+        return not context.is_initial_branch_selection_done()
 
     def get_redirect_url(self, request):
         try:

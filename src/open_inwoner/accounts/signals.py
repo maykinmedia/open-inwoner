@@ -12,7 +12,7 @@ from open_inwoner.kvk.client import KvKClient
 from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.models import KlantenSysteemConfig
 from open_inwoner.openklant.services import OpenKlant2Service, eSuiteKlantenService
-from open_inwoner.utils.logentry import user_action
+from open_inwoner.utils.logentry import system_action, user_action
 
 from .choices import LoginTypeChoices
 
@@ -38,9 +38,15 @@ def update_user_on_login(sender, user, request, *args, **kwargs):
     if user.login_type not in [LoginTypeChoices.digid, LoginTypeChoices.eherkenning]:
         return
 
-    # KvK API
-    if user.login_type == LoginTypeChoices.eherkenning:
+    # Sync company details from KvK -- note it's important this runs _before_ syncing
+    # to the klanten APIs, because e.g. RSIN or company name will be a required input
+    # for certain sync operations.
+    if user.is_eherkenning_user:
         _update_eherkenning_user_from_kvk_api(user=user)
+
+    # update brp fields when login with digid and brp is configured
+    if user.is_digid_user and HaalCentraalConfig.get_solo().service:
+        update_brp_data_in_db(user)
 
     config = KlantenSysteemConfig.get_solo()
     if config.primary_backend == KlantenServiceType.OPENKLANT2.value:
@@ -62,7 +68,7 @@ def update_user_on_login(sender, user, request, *args, **kwargs):
 def _update_user_from_openklant2(
     user: User, service: OpenKlant2Service, request: None = None
 ) -> None:
-    if fetch_params := service.get_fetch_parameters(request=request):
+    if fetch_params := service.get_fetch_parameters(user):
         partij, created = service.get_or_create_partij_for_user(
             fetch_params=fetch_params, user=user
         )
@@ -73,7 +79,7 @@ def _update_user_from_openklant2(
 def _update_user_from_esuite(
     user: User, service: eSuiteKlantenService, request: None = None
 ) -> None:
-    if not (fetch_params := service.get_fetch_parameters(request=request)):
+    if not (fetch_params := service.get_fetch_parameters(user)):
         return
 
     klant, created = service.get_or_create_klant(fetch_params=fetch_params, user=user)
@@ -82,13 +88,59 @@ def _update_user_from_esuite(
 
 
 def _update_eherkenning_user_from_kvk_api(user: User):
-    kvk_client = KvKClient()
+    extra_exc_params = {"kvk": user.kvk, "vestiging": user.vestiging}
+    try:
+        kvk_client = KvKClient()
+        updated_fields = []
 
-    vestiging = kvk_client.get_company_headquarters(kvk=user.kvk)
+        # Update company name. We want this to run on every login because it may
+        # change (if infrequently)
+        if vestiging := (
+            kvk_client.get_vestiging(vestiging=user.vestiging)
+            if user.vestiging
+            else kvk_client.get_company_headquarters(kvk=user.kvk)
+        ):
+            if (
+                company_name := vestiging.get("naam")
+            ) and user.company_name != company_name:
+                user.company_name = company_name
+                user.save(update_fields=["company_name"])
+                updated_fields.append("company_name")
+        else:
+            logger.error(
+                "Unable to sync company_name from KvK API",
+                extra=extra_exc_params,
+            )
 
-    if company_name := vestiging.get("naam"):
-        user.company_name = company_name
-        user.save()
+        # Optionally update RSIN. Unlike company name, RSIN should be immutable, so we
+        # only have to fetch it if it's not set.
+        if not user.rsin:
+            rsin = kvk_client.retrieve_rsin_with_kvk(user.kvk)
+
+            if rsin:
+                user.rsin = rsin
+                user.save(update_fields=["rsin"])
+                updated_fields.append("rsin")
+            else:
+                logger.error(
+                    "Unable to sync rsin from KvK API",
+                    extra=extra_exc_params,
+                )
+
+        if updated_fields:
+            system_action(
+                _(
+                    "user attributes were updated from KvK API: %(fields)s"
+                    % {"fields": ", ".join(updated_fields)}
+                ),
+                content_object=user,
+            )
+
+    except Exception:
+        logger.exception(
+            "Unable to update eHerkenning user from KvK API",
+            extra=extra_exc_params,
+        )
 
 
 @receiver(user_logged_in)
@@ -108,12 +160,6 @@ def log_user_login(sender, user, request, *args, **kwargs):
         user_action(request, user, MESSAGE_TYPE["frontend_oidc"])
     else:
         user_action(request, user, MESSAGE_TYPE["frontend_email"])
-
-    # update brp fields when login with digid and brp is configured
-    brp_config = HaalCentraalConfig.get_solo()
-
-    if user.login_type == LoginTypeChoices.digid and brp_config.service:
-        update_brp_data_in_db(user)
 
 
 @receiver(user_logged_out)

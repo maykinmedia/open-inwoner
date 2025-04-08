@@ -1,13 +1,10 @@
 from unittest.mock import patch
 from urllib.parse import urlencode
 
-from django.contrib.auth import get_user_model
 from django.test import TestCase, modify_settings, override_settings
 from django.urls import reverse
 
 from furl import furl
-
-from open_inwoner.kvk.branches import get_kvk_branch_number
 
 RETURN_URL = "/"
 CANCEL_URL = reverse("login")
@@ -108,9 +105,9 @@ class PasswordLoginViewTests(eHerkenningMockTestCase):
         self.assertContains(response, reverse("login"))
         self.assertNoEHerkenningURLS(response)
 
-    @patch("open_inwoner.kvk.signals.KvKClient.get_basisprofiel", autospec=True)
+    @patch("open_inwoner.accounts.signals.KvKClient.get_basisprofiel", autospec=True)
     @patch(
-        "open_inwoner.kvk.signals.KvKClient.retrieve_rsin_with_kvk",
+        "open_inwoner.accounts.signals.KvKClient.retrieve_rsin_with_kvk",
         return_value="123456789",
         autospec=True,
     )
@@ -160,15 +157,11 @@ class PasswordLoginViewTests(eHerkenningMockTestCase):
         self.assertRedirects(response, reverse("profile:registration_necessary"))
 
         # check user kvk
-        User = get_user_model()
-        self.assertEqual(
-            response.context["user"].kvk, User.eherkenning_objects.get().kvk
-        )
+        created_user = response.context["user"]
+        self.assertEqual(created_user.kvk, "29664887")
+        self.assertEqual(created_user.vestiging, "1234")
 
-        # check company branch number in session
-        self.assertEqual(get_kvk_branch_number(self.client.session), "1234")
-
-    @patch("open_inwoner.kvk.signals.KvKClient.get_basisprofiel", autospec=True)
+    @patch("open_inwoner.accounts.signals.KvKClient.get_basisprofiel", autospec=True)
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     def test_redirect_flow_with_single_company(self, mock_kvk, mock_get_basisprofiel):
         """
@@ -206,10 +199,7 @@ class PasswordLoginViewTests(eHerkenningMockTestCase):
         # follow the ACS redirect and get/create the user
         response = self.client.get(response["Location"], follow=True)
 
-        # check company branch number in session
-        self.assertEqual(get_kvk_branch_number(self.client.session), None)
-
-    @patch("open_inwoner.kvk.signals.KvKClient.get_basisprofiel", autospec=True)
+    @patch("open_inwoner.accounts.signals.KvKClient.get_basisprofiel", autospec=True)
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     def test_redirect_flow_with_no_vestigingsnummer(
         self, mock_kvk, mock_get_basisprofiel
@@ -248,9 +238,6 @@ class PasswordLoginViewTests(eHerkenningMockTestCase):
 
         # follow the ACS redirect and get/create the user
         response = self.client.get(response["Location"], follow=True)
-
-        # check company branch number in session
-        self.assertEqual(get_kvk_branch_number(self.client.session), None)
 
     def test_post_redirect_retains_acs_querystring_params(self):
         url = reverse("eherkenning-mock:password")

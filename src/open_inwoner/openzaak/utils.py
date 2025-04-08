@@ -2,7 +2,6 @@ import logging
 
 from zgw_consumers.api_models.constants import RolTypes, VertrouwelijkheidsAanduidingen
 
-from open_inwoner.kvk.branches import get_kvk_branch_number
 from open_inwoner.openzaak.api_models import InformatieObject, Rol, Zaak, ZaakType
 
 from .models import OpenZaakConfig, ZaakTypeConfig, ZaakTypeInformatieObjectTypeConfig
@@ -175,9 +174,8 @@ def get_user_fetch_parameters(request, use_rsin: bool = True) -> dict:
         if use_rsin:
             parameters = {"user_rsin": user.rsin}
 
-        vestigingsnummer = get_kvk_branch_number(request.session)
-        if vestigingsnummer:
-            parameters.update({"vestigingsnummer": vestigingsnummer})
+        if user.vestiging:
+            parameters.update({"vestigingsnummer": user.vestiging})
 
         return parameters
 

@@ -15,11 +15,11 @@ from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 from open_inwoner.accounts.tests.factories import (
     DigidUserFactory,
     eHerkenningUserFactory,
+    eHerkenningVestigingUserFactory,
 )
 from open_inwoner.cms.products.cms_apps import ProductsApphook
 from open_inwoner.cms.profile.cms_apps import ProfileApphook
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.kvk.branches import KVK_BRANCH_SESSION_VARIABLE
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.tests.factories import (
     ZaakTypeConfigFactory,
@@ -387,6 +387,11 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, TransactionWebTest):
 
         self.user = DigidUserFactory()
         self.eherkenning_user = eHerkenningUserFactory(kvk="12345678", rsin="123456789")
+        self.eherkenning_user_vestiging = eHerkenningVestigingUserFactory(
+            kvk="12345678",
+            rsin="123456789",
+            vestiging="987654321",
+        )
 
         # services
         ZGWApiGroupConfigFactory(
@@ -660,13 +665,16 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, TransactionWebTest):
     ):
         self._setUpMocks(m)
 
-        for identifier in [self.eherkenning_user.kvk, self.eherkenning_user.rsin]:
+        for identifier in [
+            self.eherkenning_user_vestiging.kvk,
+            self.eherkenning_user_vestiging.rsin,
+        ]:
             m.get(
                 furl(f"{ZAKEN_ROOT}zaken")
                 .add(
                     {
                         "maximaleVertrouwelijkheidaanduiding": VertrouwelijkheidsAanduidingen.beperkt_openbaar,
-                        "rol__betrokkeneIdentificatie__vestiging__vestigingsNummer": "1234",
+                        "rol__betrokkeneIdentificatie__vestiging__vestigingsNummer": self.eherkenning_user_vestiging.vestiging,
                     }
                 )
                 .url,
@@ -684,8 +692,7 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, TransactionWebTest):
 
                 html, context = cms_tools.render_plugin(
                     CategoriesPlugin,
-                    user=self.eherkenning_user,
-                    session_vars={KVK_BRANCH_SESSION_VARIABLE: "1234"},
+                    user=self.eherkenning_user_vestiging,
                 )
 
                 self.assertEqual(context["categories"].count(), 4)

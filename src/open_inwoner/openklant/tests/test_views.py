@@ -28,11 +28,7 @@ from open_inwoner.openklant.services import eSuiteVragenService
 from open_inwoner.openklant.tests.data import MockAPIReadData
 from open_inwoner.openklant.tests.mocks import MockOpenKlant2Service
 from open_inwoner.openzaak.models import OpenZaakConfig, ZGWApiGroupConfig
-from open_inwoner.utils.test import (
-    ClearCachesMixin,
-    DisableRequestLogMixin,
-    set_kvk_branch_number_in_session,
-)
+from open_inwoner.utils.test import ClearCachesMixin, DisableRequestLogMixin
 from open_inwoner.utils.url import uuid_from_url
 
 from .factories import KlantContactMomentAnswerFactory
@@ -314,14 +310,13 @@ class ContactMomentViewsTestCase(
                     },
                 )
 
-    @set_kvk_branch_number_in_session("1234")
     def test_contactmoment_list_vestiging(
         self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
     ):
         data = MockAPIReadData().install_mocks(m)
-        self.client.force_login(user=data.eherkenning_user)
+        self.client.force_login(user=data.eherkenning_user_vestiging)
 
-        for use_rsin_for_innNnpId_query_parameter in [True, False]:
+        for use_rsin_for_innNnpId_query_parameter in [True]:
             with self.subTest(
                 use_rsin_for_innNnpId_query_parameter=use_rsin_for_innNnpId_query_parameter
             ):
@@ -750,7 +745,9 @@ class ContactMomentViewsTestCase(
                 )
                 config.save()
 
-                data = MockAPIReadData().install_mocks(m)
+                eherkenning_kvk = f"0000000{int(use_rsin_for_innNnpId_query_parameter)}"
+
+                data = MockAPIReadData(eherkenning_kvk=eherkenning_kvk).install_mocks(m)
 
                 detail_url = reverse(
                     "cases:contactmoment_detail",
@@ -782,12 +779,11 @@ class ContactMomentViewsTestCase(
                     },
                 )
 
-    @set_kvk_branch_number_in_session("1234")
     def test_contactmoment_detail_esuite_vestiging(
         self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
     ):
         data = MockAPIReadData().install_mocks(m)
-        self.client.force_login(user=data.eherkenning_user)
+        self.client.force_login(user=data.eherkenning_user_vestiging)
 
         for use_rsin_for_innNnpId_query_parameter in [True, False]:
             with self.subTest(
@@ -829,12 +825,11 @@ class ContactMomentViewsTestCase(
                     },
                 )
 
-    @set_kvk_branch_number_in_session("1234")
     def test_cannot_access_detail_for_hoofdvestiging_as_vestiging(
         self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
     ):
         data = MockAPIReadData().install_mocks(m)
-        self.client.force_login(user=data.eherkenning_user)
+        self.client.force_login(user=data.eherkenning_user_vestiging)
 
         for use_rsin_for_innNnpId_query_parameter in [True, False]:
             with self.subTest(

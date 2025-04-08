@@ -10,14 +10,14 @@ class CompanyBranchChoiceForm(forms.Form):
         self.company_branches = company_branches
 
     def clean_branch_number(self):
-        form_data = self.cleaned_data.get("branch_number")
+        branch_number = self.cleaned_data.get("branch_number")
 
         if not any(
-            form_data == branch.get("vestigingsnummer")
+            branch_number == branch.get("vestigingsnummer")
             for branch in self.company_branches
         ):
             raise forms.ValidationError(
                 _("Invalid branch number for the current KvK number")
             )
 
-        return self.cleaned_data
+        return branch_number

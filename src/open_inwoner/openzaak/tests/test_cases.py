@@ -19,13 +19,13 @@ from timeline_logger.models import TimelineLog
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 
 from open_inwoner.accounts.choices import LoginTypeChoices
-from open_inwoner.accounts.tests.factories import UserFactory, eHerkenningUserFactory
-from open_inwoner.cms.cases.views.cases import CaseFilterFormOption, InnerCaseListView
-from open_inwoner.utils.test import (
-    ClearCachesMixin,
-    paginated_response,
-    set_kvk_branch_number_in_session,
+from open_inwoner.accounts.tests.factories import (
+    UserFactory,
+    eHerkenningUserFactory,
+    eHerkenningVestigingUserFactory,
 )
+from open_inwoner.cms.cases.views.cases import CaseFilterFormOption, InnerCaseListView
+from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin, Lookups
 
 from ...utils.tests.helpers import AssertRedirectsMixin
@@ -155,12 +155,21 @@ class CaseListAccessTests(AssertRedirectsMixin, ClearCachesMixin, TransactionWeb
 
 
 class CaseListMocks:
-    def __init__(self, *, zaken_root: str, catalogi_root: str, user, eherkenning_user):
+    def __init__(
+        self,
+        *,
+        zaken_root: str,
+        catalogi_root: str,
+        user,
+        eherkenning_user,
+        eherkenning_user_vestiging,
+    ):
         self.zaken_root = zaken_root
         self.catalogi_root = catalogi_root
         self.user = user
         self.eherkenning_user = eherkenning_user
         uuid_generator = SeededUUIDGenerator(zaken_root + catalogi_root)
+        self.eherkenning_user_vestiging = eherkenning_user_vestiging or None
 
         catalogus_url = f"{catalogi_root}catalogussen/{uuid_generator.get_uuid()}"
 
@@ -436,12 +445,13 @@ class CaseListMocks:
                 .add(
                     {
                         "maximaleVertrouwelijkheidaanduiding": VertrouwelijkheidsAanduidingen.beperkt_openbaar,
-                        "rol__betrokkeneIdentificatie__vestiging__vestigingsNummer": "1234",
+                        "rol__betrokkeneIdentificatie__vestiging__vestigingsNummer": self.eherkenning_user_vestiging.vestiging,
                     }
                 )
                 .url,
                 json=paginated_response([self.zaak_eherkenning1]),
             )
+
         for resource in [
             self.zaaktype,
             self.status_type_initial,
@@ -478,6 +488,12 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
             rsin="123456789",
             login_type=LoginTypeChoices.eherkenning,
         )
+        self.eherkenning_user_vestiging = eHerkenningVestigingUserFactory.create(
+            kvk="12345678",
+            rsin="123456789",
+            vestiging="987654321",
+            login_type=LoginTypeChoices.eherkenning,
+        )
 
         # openzaak config
         self.config = OpenZaakConfig.get_solo()
@@ -508,6 +524,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                     catalogi_root=catalogi_root,
                     user=self.user,
                     eherkenning_user=self.eherkenning_user,
+                    eherkenning_user_vestiging=self.eherkenning_user_vestiging,
                 )
             )
 
@@ -709,7 +726,6 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
         for case in cases:
             self.assertIsNotNone(case["end_date"])
 
-    @set_kvk_branch_number_in_session(None)
     def test_list_cases_for_eherkenning_user(self, m):
         for mock in self.mocks:
             mock._setUpMocks(m)
@@ -807,16 +823,11 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                         },
                     )
 
-    @set_kvk_branch_number_in_session("1234")
     def test_list_cases_for_kvk_user_with_vestigingsnummer(self, m):
-        """
-        If a KVK_BRANCH_NUMBER that is different from the KVK number is specified,
-        additional filtering by vestiging should be applied when retrieving zaken
-        """
         for mock in self.mocks:
             mock._setUpMocks(m)
 
-        self.client.force_login(user=self.eherkenning_user)
+        self.client.force_login(user=self.eherkenning_user_vestiging)
 
         m.reset_mock()
 
@@ -864,21 +875,16 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                         VertrouwelijkheidsAanduidingen.beperkt_openbaar
                     ],
                     "rol__betrokkeneidentificatie__vestiging__vestigingsnummer": [
-                        "1234"
+                        self.eherkenning_user_vestiging.vestiging
                     ],
                 },
             )
 
-    @set_kvk_branch_number_in_session("1234")
     def test_list_cases_for_rsin_user_with_vestigingsnummer(self, m):
-        """
-        If a KVK_BRANCH_NUMBER that is different from the RSIN number is specified,
-        cases should be filter by vestigingsnummber rather than rsin
-        """
         for mock in self.mocks:
             mock._setUpMocks(m)
 
-        self.client.force_login(user=self.eherkenning_user)
+        self.client.force_login(user=self.eherkenning_user_vestiging)
 
         m.reset_mock()
 
@@ -927,7 +933,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                         VertrouwelijkheidsAanduidingen.beperkt_openbaar
                     ],
                     "rol__betrokkeneidentificatie__vestiging__vestigingsnummer": [
-                        "1234"
+                        self.eherkenning_user_vestiging.vestiging
                     ],
                 },
             )
@@ -1306,8 +1312,10 @@ class CaseSubmissionTest(TransactionWebTest):
         )
 
     @requests_mock.Mocker()
-    @patch("open_inwoner.kvk.middleware.kvk_branch_selected_done")
-    def test_get_open_submissions_by_kvk(self, m, kvk_branch_selected):
+    @patch("open_inwoner.kvk.middleware.KvKLoginMiddleware.requires_redirect")
+    def test_get_open_submissions_by_kvk(self, m, mock_kvk_redirect):
+        mock_kvk_redirect.return_value = False
+
         user = UserFactory(login_type=LoginTypeChoices.eherkenning, kvk="68750110")
         data = ESuiteSubmissionData(
             zaken_root=ZAKEN_ROOT, forms_root=FORMS_ROOT, user=user

@@ -1,4 +1,5 @@
-from django.db.utils import IntegrityError
+from django.core.exceptions import ValidationError
+from django.db import IntegrityError
 from django.test import TestCase
 
 from open_inwoner.accounts.choices import LoginTypeChoices
@@ -6,7 +7,7 @@ from open_inwoner.utils.hash import generate_email_from_string
 
 from ...plans.tests.factories import PlanFactory
 from ..models import User
-from .factories import UserFactory
+from .factories import UserFactory, eHerkenningVestigingUserFactory
 
 
 class UserTests(TestCase):
@@ -132,3 +133,39 @@ class UserTests(TestCase):
         user.phonenumber = ""
         user.phonenumber_alternative = ""
         user.save()
+
+    def test_eherkenning_user_requires_kvk(self):
+        with self.assertRaises(IntegrityError):
+            UserFactory(login_type=LoginTypeChoices.eherkenning, kvk="")
+
+    def test_vestiging_validation_must_be_11_digits(self):
+        for invalid_vestiging in tuple(str("1" * i) for i in range(1, 11)):
+            with self.subTest(invalid_vestiging):
+                user = eHerkenningVestigingUserFactory(vestiging=invalid_vestiging)
+                with self.assertRaises(ValidationError):
+                    user.full_clean()
+
+    def test_vestiging_validation_must_be_numeric(self):
+        for invalid_vestiging in tuple(str(c * 11) for c in ("a", "-", " ")):
+            with self.subTest(invalid_vestiging):
+                user = eHerkenningVestigingUserFactory(vestiging=invalid_vestiging)
+                with self.assertRaises(ValidationError):
+                    user.full_clean()
+
+    def test_vestiging_requires_kvk(self):
+        with self.assertRaises(IntegrityError):
+            eHerkenningVestigingUserFactory(kvk="", vestiging="123456789012")
+
+    def test_vestiging_can_be_empty(self):
+        user = UserFactory(kvk="12345678", vestiging="")
+        self.assertTrue(user)
+
+    def test_vestiging_must_be_unique_per_kvk(self):
+        eHerkenningVestigingUserFactory(vestiging="123456789012")
+        with self.assertRaises(IntegrityError):
+            eHerkenningVestigingUserFactory(vestiging="123456789012")
+
+    def test_kvk_without_vestiging_must_be_unique(self):
+        eHerkenningVestigingUserFactory(kvk="12345678", vestiging="")
+        with self.assertRaises(IntegrityError):
+            eHerkenningVestigingUserFactory(kvk="12345678", vestiging="")

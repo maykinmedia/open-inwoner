@@ -1,3 +1,5 @@
+from typing import cast
+
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -6,7 +8,8 @@ from django.views.generic import FormView
 
 from furl import furl
 
-from open_inwoner.kvk.branches import KVK_BRANCH_SESSION_VARIABLE
+from open_inwoner.accounts.eherkenning_session import EHerkenningSessionContext
+from open_inwoner.accounts.models import User
 from open_inwoner.utils.views import LogMixin
 
 from ..utils.url import get_next_url_from
@@ -57,10 +60,34 @@ class CompanyBranchChoiceView(LogMixin, FormView):
             redirect = furl(reverse("pages-root"))
         return redirect.url
 
-    def get(self, request, *args, **kwargs):
-        if not getattr(request.user, "kvk", None):
+    def check_permissions(self, request):
+        user = cast(User, request.user)
+        context = EHerkenningSessionContext(request)
+
+        # Only eHerkenning users can potentially switch to a vestiging
+        try:
+            context.assert_valid_eherkenning_user(user)
+        except ValueError:
             return HttpResponse(_("Unauthorized"), status=401)
 
+        if context.is_branch_restricted():
+            return HttpResponse(
+                _("Your eHerkenning account cannot access other branches."),
+                status=401,
+            )
+
+    def dispatch(self, request, *args, **kwargs):
+        if bad_auth_response := self.check_permissions(request):
+            return bad_auth_response
+
+        # Assume we can access this page, we mark the branch selection is done if the
+        # page is visited
+        eherkenning_context = EHerkenningSessionContext(request)
+        eherkenning_context.mark_initial_branch_selection_done()
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
         redirect = self.get_redirect()
         context = super().get_context_data()
 
@@ -73,18 +100,14 @@ class CompanyBranchChoiceView(LogMixin, FormView):
                 f"List of company branches for KVK number {request.user.kvk} contains "
                 "no branch with vestigingsnummer"
             )
-            request.session[KVK_BRANCH_SESSION_VARIABLE] = None
-            request.session.save()
+
             return HttpResponseRedirect(redirect)
 
         context["company_branches"] = form.company_branches
 
         return render(request, self.template_name, context)
 
-    def post(self, request):
-        if not getattr(request.user, "kvk", None):
-            return HttpResponse(_("Unauthorized"), status=401)
-
+    def post(self, request, *args, **kwargs):
         redirect = self.get_redirect()
         context = self.get_context_data()
 
@@ -95,10 +118,17 @@ class CompanyBranchChoiceView(LogMixin, FormView):
             # Directly calling `super().form_invalid(form)` would override the error
             return self.render_to_response(context)
 
-        # empty string for KVK_BRANCH_SESSION_VARIABLE is interpreted as
-        # "interact as the rechtspersoon, not as any specific branch"
-        branch_number = request.POST["branch_number"]
-        request.session[KVK_BRANCH_SESSION_VARIABLE] = branch_number
+        # Empty string for branch_number is interpreted as "interact as the
+        # rechtspersoon, not as any specific branch"
+        branch_number = form.cleaned_data["branch_number"]
+
+        # Change the user
+        eherkenning_context = EHerkenningSessionContext(request)
+        eherkenning_context.change_authenticated_user(
+            kvk=request.user.kvk,
+            vestiging=branch_number or None,
+        )
+
         self.log_user_action(
             request.user,
             (

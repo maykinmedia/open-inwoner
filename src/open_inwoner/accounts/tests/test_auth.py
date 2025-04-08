@@ -14,10 +14,10 @@ from furl import furl
 from pyquery import PyQuery
 
 from open_inwoner.accounts.choices import NotificationChannelChoice
+from open_inwoner.accounts.eherkenning_session import EHerkenningSessionContext
 from open_inwoner.accounts.signals import KvKClient, update_user_on_login
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
-from open_inwoner.kvk.branches import get_kvk_branch_number
 from open_inwoner.kvk.tests.factories import CertificateFactory
 from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.models import KlantenSysteemConfig
@@ -590,7 +590,9 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
 
     @patch("open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo")
     @patch("open_inwoner.configurations.models.SiteConfiguration.get_solo")
-    def test_registration_page_eherkenning(self, mock_solo, mock_eherkenning_config):
+    def test_registration_page_shows_link_to_configured_eherkenning_backend(
+        self, mock_solo, mock_eherkenning_config
+    ):
         mock_solo.return_value.eherkenning_enabled = True
         mock_solo.return_value.login_allow_registration = False
 
@@ -621,7 +623,9 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
                 )
 
     @patch("open_inwoner.configurations.models.SiteConfiguration.get_solo")
-    def test_registration_page_eherkenning_with_invite(self, mock_solo):
+    def test_registration_page_eherkenning_with_invite_includes_invite_key_in_next_url(
+        self, mock_solo
+    ):
         mock_solo.return_value.eherkenning_enabled = True
         mock_solo.return_value.login_allow_registration = False
 
@@ -667,9 +671,9 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
 
         self.assertRedirectsLogin(response, with_host=True)
 
-    @patch("open_inwoner.kvk.signals.KvKClient.get_basisprofiel", autospec=True)
+    @patch("open_inwoner.accounts.signals.KvKClient.get_basisprofiel", autospec=True)
     @patch(
-        "open_inwoner.kvk.signals.KvKClient.retrieve_rsin_with_kvk",
+        "open_inwoner.accounts.signals.KvKClient.retrieve_rsin_with_kvk",
         return_value="",
         autospec=True,
     )
@@ -712,9 +716,9 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
         self.assertNotIn("_auth_user_id", self.app.session)
         self.assertRedirectsLogin(response, with_host=True)
 
-    @patch("open_inwoner.kvk.signals.KvKClient.get_basisprofiel", autospec=True)
+    @patch("open_inwoner.accounts.signals.KvKClient.get_basisprofiel", autospec=True)
     @patch(
-        "open_inwoner.kvk.signals.KvKClient.retrieve_rsin_with_kvk",
+        "open_inwoner.accounts.signals.KvKClient.retrieve_rsin_with_kvk",
         return_value="",
         autospec=True,
     )
@@ -813,9 +817,9 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
             f"http://testserver{reverse('django_registration_register')}?invite={invite.key}",
         )
 
-    @patch("open_inwoner.kvk.signals.KvKClient.get_basisprofiel", autospec=True)
+    @patch("open_inwoner.accounts.signals.KvKClient.get_basisprofiel", autospec=True)
     @patch(
-        "open_inwoner.kvk.signals.KvKClient.retrieve_rsin_with_kvk",
+        "open_inwoner.accounts.signals.KvKClient.retrieve_rsin_with_kvk",
         return_value="123456789",
         autospec=True,
     )
@@ -880,10 +884,7 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
         )
         self.assertNotIn("invite_url", self.client.session.keys())
 
-        # check company branch number in session
-        self.assertEqual(get_kvk_branch_number(self.client.session), None)
-
-    @patch("open_inwoner.kvk.signals.KvKClient.get_basisprofiel", autospec=True)
+    @patch("open_inwoner.accounts.signals.KvKClient.get_basisprofiel", autospec=True)
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     @patch(
         "open_inwoner.kvk.models.KvKConfig.get_solo",
@@ -932,9 +933,11 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
             response,
             reverse("profile:registration_necessary"),
         )
-
-        # check company branch number in session
-        self.assertEqual(get_kvk_branch_number(self.client.session), None)
+        self.assertTrue(
+            EHerkenningSessionContext(
+                response.wsgi_request
+            ).is_initial_branch_selection_done()
+        )
 
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     @patch(
@@ -958,6 +961,9 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
 
         user = eHerkenningUserFactory.create(kvk="12345678", email="example@localhost")
 
+        self.client.force_login(
+            user, backend=EHerkenningSessionContext._expected_auth_backends()[0]
+        )
         response = self.app.get(reverse("pages-root"), user=user)
 
         # redirect to /kvk/branches/
@@ -965,10 +971,16 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
             response, reverse("kvk:branches"), fetch_redirect_response=False
         )
 
-        res = self.app.post(response["Location"], {"branch_number": "1234"})
+        res = self.client.post(response["Location"], {"branch_number": "1234"})
 
         # redirect to /register/necessary/
         self.assertRedirects(res, reverse("profile:registration_necessary"))
+
+        self.assertTrue(
+            EHerkenningSessionContext(
+                res.wsgi_request
+            ).is_initial_branch_selection_done()
+        )
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
@@ -1270,33 +1282,17 @@ class DuplicateEmailRegistrationTest(WebTest):
         self.assertEqual(users.first().email, "test@example.com")
         self.assertEqual(users.last().email, "test@example.com")
 
-    @patch("open_inwoner.kvk.signals.KvKClient.get_basisprofiel", autospec=True)
+    @patch("open_inwoner.accounts.signals.KvKClient.get_basisprofiel", autospec=True)
     @patch(
-        "open_inwoner.kvk.signals.KvKClient.retrieve_rsin_with_kvk",
+        "open_inwoner.accounts.signals.KvKClient.retrieve_rsin_with_kvk",
         return_value="123456789",
         autospec=True,
     )
-    @patch(
-        "open_inwoner.kvk.client.KvKClient.get_all_company_branches",
-        autospec=True,
-    )
     def test_eherkenning_user_success(
-        self, mock_kvk, mock_retrieve_rsin_with_kvk, mock_get_basisprofiel
+        self, mock_retrieve_rsin_with_kvk, mock_get_basisprofiel
     ):
         """Assert that eHerkenning users can register with duplicate emails"""
 
-        mock_kvk.return_value = [
-            {
-                "kvkNummer": "12345678",
-                "vestigingsnummer": "1234",
-                "naam": "Mijn bedrijf",
-            },
-            {
-                "kvkNummer": "12345678",
-                "vestigingsnummer": "5678",
-                "naam": "Mijn bedrijf",
-            },
-        ]
         mock_get_basisprofiel.return_value = {
             "_embedded": {"eigenaar": {"rechtsvorm": "Stichting"}}
         }
@@ -1310,7 +1306,7 @@ class DuplicateEmailRegistrationTest(WebTest):
         url = reverse("eherkenning-mock:password")
         params = {
             "acs": reverse("eherkenning:acs"),
-            "next": reverse("kvk:branches"),
+            "next": reverse("profile:registration_necessary"),
         }
         url = f"{url}?{urlencode(params)}"
 
@@ -1319,13 +1315,7 @@ class DuplicateEmailRegistrationTest(WebTest):
             "auth_name": "12345678",
             "auth_pass": "bar",
         }
-        response = self.app.post(url, data).follow()
-
-        # select company branch
-        response = self.app.get(response["Location"])
-        form = response.forms["eherkenning-branch-form"]
-        form["branch_number"] = "5678"
-        response = form.submit().follow()
+        response = self.app.post(url, data).follow().follow()
 
         # fill in necessary fields form
         form = response.forms["necessary-form"]
@@ -2093,6 +2083,7 @@ class UpdateUserOnLoginTest(TestCase):
         request.user = self.data.user
 
         self.data.user.login_type = LoginTypeChoices.eherkenning
+        self.data.user.kvk = "69599084"
         self.data.user.save()
 
         self.assertEqual(request.user.company_name, "")

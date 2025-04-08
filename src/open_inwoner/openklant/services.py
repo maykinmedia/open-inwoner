@@ -16,7 +16,6 @@ from typing import (
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpRequest
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -34,7 +33,6 @@ from zgw_consumers.utils import pagination_helper
 from open_inwoner.accounts.choices import NotificationChannelChoice
 from open_inwoner.accounts.models import User
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.kvk.branches import get_kvk_branch_number
 from open_inwoner.openklant.api_models import (
     ContactMoment,
     ContactMomentCreateData,
@@ -116,14 +114,11 @@ class KlantenService(Protocol):
 
     def get_fetch_parameters(
         self,
-        request: HttpRequest | None = None,
         user: User | None = None,
-        use_vestigingsnummer: bool = False,
     ) -> FetchParameters | None:
         """
         Determine the parameters used to perform Klanten/Contactmomenten fetches
         """
-        user = user or getattr(request, "user", None)
         if not user:
             return None
 
@@ -131,20 +126,14 @@ class KlantenService(Protocol):
             return {"user_bsn": user.bsn}
         elif user.kvk:
             kvk_or_rsin = user.kvk
-            config = ESuiteKlantConfig.get_solo()
-            if config.use_rsin_for_innNnpId_query_parameter:
+            if getattr(self.config, "use_rsin_for_innNnpId_query_parameter", None):
                 kvk_or_rsin = user.rsin
 
-            if use_vestigingsnummer:
-                if not (session := getattr(request, "session", None)):
-                    raise ValueError("`request` does not contain a session")
-
-                vestigingsnummer = get_kvk_branch_number(session)
-                if vestigingsnummer:
-                    return {
-                        "user_kvk_or_rsin": kvk_or_rsin,
-                        "vestigingsnummer": vestigingsnummer,
-                    }
+            if user.vestiging:
+                return {
+                    "user_kvk_or_rsin": kvk_or_rsin,
+                    "vestigingsnummer": user.vestiging,
+                }
 
             return {"user_kvk_or_rsin": kvk_or_rsin}
 
@@ -260,8 +249,16 @@ class eSuiteKlantenService(
         *,
         data: KlantWritePayload | None = None,
     ) -> Klant | None:
-        if sum(bool(arg) for arg in (user_bsn, user_kvk_or_rsin, vestigingsnummer)) > 1:
-            raise ValueError("Only one argument can be specified")
+        if user_bsn and user_kvk_or_rsin:
+            raise ValueError(
+                "Specify either `user_bsn` or `user_kvk_or_rsin` with optional "
+                "`vestigingsnummer`"
+            )
+
+        if vestigingsnummer and not user_kvk_or_rsin:
+            raise ValueError(
+                "You must specify `user_kvk_or_rsin` if `vestigingsnummer` is set"
+            )
 
         payload = {}
 
@@ -272,11 +269,15 @@ class eSuiteKlantenService(
         if user_bsn:
             payload = payload | {"subjectIdentificatie": {"inpBsn": user_bsn}}
         elif user_kvk_or_rsin:
-            payload = payload | {"subjectIdentificatie": {"innNnpId": user_kvk_or_rsin}}
-        elif vestigingsnummer:
-            payload = payload | {
-                "subjectIdentificatie": {"vestigingsNummer": vestigingsnummer}
-            }
+            if vestigingsnummer:
+                payload = payload | {
+                    "subjectIdentificatie": {"vestigingsNummer": vestigingsnummer}
+                }
+
+            else:
+                payload = payload | {
+                    "subjectIdentificatie": {"innNnpId": user_kvk_or_rsin}
+                }
 
         try:
             response = self.client.post("klanten", json=payload)

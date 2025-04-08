@@ -1,5 +1,3 @@
-import itertools
-
 from django.test import TestCase
 
 import requests_mock
@@ -21,24 +19,31 @@ class eSuiteServiceTestCase(TestCase, DisableRequestLogMixin):
         self.service = eSuiteKlantenService()
         self.user = UserFactory()
 
-    def test_create_klant_can_only_specify_one_identifier(self):
-        identifiers = {
-            "vestigingsnummer": "123",
-            "user_bsn": "123",
-            "user_kvk_or_rsin": "123",
-        }
-
-        # Test all pairs
-        for id1, id2 in itertools.combinations(identifiers.keys(), 2):
-            with self.subTest(f"{id1} with {id2}"):
-                test_ids = {id1: "123", id2: "123"}
+    def test_create_klant_can_only_specify_valid_identifier_combinations(self):
+        for params in (
+            # Mutually exclusive
+            {
+                "user_bsn": "123",
+                "user_kvk_or_rsin": "123",
+            },
+            # Mutually exclusive
+            {
+                "user_bsn": "123",
+                "user_kvk_or_rsin": "123",
+                "vestigingsnummer": "123",
+            },
+            {
+                "user_bsn": "123",
+                "vestigingsnummer": "123",
+            },
+            # Needs kvk or rsin
+            {
+                "vestigingsnummer": "123",
+            },
+        ):
+            with self.subTest(params):
                 with self.assertRaises(ValueError):
-                    self.service.create_klant(**test_ids)
-
-        # Test all three
-        with self.subTest("all identifiers"):
-            with self.assertRaises(ValueError):
-                self.service.create_klant(**identifiers)
+                    self.service.create_klant(**params)
 
     def test_create_klant_bsn(self):
         with requests_mock.mock() as m:
@@ -109,12 +114,20 @@ class eSuiteServiceTestCase(TestCase, DisableRequestLogMixin):
                 json=self.data.klant_vestiging,
             )
 
-            klant = self.service.create_klant(vestigingsnummer="123456789000")
+            klant = self.service.create_klant(
+                user_kvk_or_rsin="87654321", vestigingsnummer="123456789000"
+            )
 
         self.assertIsInstance(klant, Klant)
         self.assertEqual(
             m.request_history[0].json(),
-            {"subjectIdentificatie": {"vestigingsNummer": "123456789000"}},
+            {
+                "subjectIdentificatie": {
+                    # Note: the innNnpId is not sent for vestiging, it's either innNnpId
+                    # or vestigingsNummer
+                    "vestigingsNummer": "123456789000",
+                }
+            },
         )
         self.assertEqual(
             klant,
@@ -134,28 +147,26 @@ class eSuiteServiceTestCase(TestCase, DisableRequestLogMixin):
         )
 
     def test_retrieve_klant_paginates_full_response(self):
-        data = MockAPIReadData()
-        base_url = (
-            f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn={data.user.bsn}"
-        )
+        base_url = f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn={self.data.user.bsn}"
+
         with requests_mock.mock() as m:
             m.get(
                 base_url,
-                json=paginated_response([data.klant_bsn])
+                json=paginated_response([self.data.klant_bsn])
                 | {"next": f"{base_url}&page=2"},
             )
             m.get(
                 f"{base_url}&page=2",
-                json=paginated_response([data.klant_kvk])
+                json=paginated_response([self.data.klant_kvk])
                 | {"next": f"{base_url}&page=3"},
             )
             m.get(
                 f"{base_url}&page=3",
-                json=paginated_response([data.klant_vestiging]),  # next=None
+                json=paginated_response([self.data.klant_vestiging]),  # next=None
             )
 
             # Paginates all responses that match the BSN
-            klant = self.service.retrieve_klant(user_bsn=data.user.bsn)
+            klant = self.service.retrieve_klant(user_bsn=self.data.user.bsn)
 
         self.assertEqual(
             klant,

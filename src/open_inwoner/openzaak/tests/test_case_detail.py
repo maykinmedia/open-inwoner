@@ -25,7 +25,11 @@ from zgw_consumers.api_models.constants import (
 from zgw_consumers.constants import APITypes
 
 from open_inwoner.accounts.choices import LoginTypeChoices
-from open_inwoner.accounts.tests.factories import UserFactory, eHerkenningUserFactory
+from open_inwoner.accounts.tests.factories import (
+    UserFactory,
+    eHerkenningUserFactory,
+    eHerkenningVestigingUserFactory,
+)
 from open_inwoner.cms.cases.views.status import InnerCaseDetailView, SimpleFile
 from open_inwoner.openklant.api_models import ObjectContactMoment
 from open_inwoner.openklant.constants import (
@@ -47,12 +51,7 @@ from open_inwoner.openzaak.tests.factories import (
     ZaakTypeResultaatTypeConfigFactory,
     ZaakTypeStatusTypeConfigFactory,
 )
-from open_inwoner.utils.test import (
-    ClearCachesMixin,
-    paginated_response,
-    set_kvk_branch_number_in_session,
-    uuid_from_url,
-)
+from open_inwoner.utils.test import ClearCachesMixin, paginated_response, uuid_from_url
 from openklant2.types.resources.klant_contact import KlantContactValidator
 from openklant2.types.resources.onderwerp_object import OnderwerpObjectValidator
 from openklant2.types.resources.partij import PartijValidator
@@ -101,6 +100,12 @@ class TestCaseDetailView(
         self.eherkenning_user = eHerkenningUserFactory.create(
             kvk="12345678",
             rsin="123456789",
+            login_type=LoginTypeChoices.eherkenning,
+        )
+        self.vestiging_user = eHerkenningVestigingUserFactory.create(
+            kvk="87654321",
+            rsin="123456789",
+            vestiging="987654321",
             login_type=LoginTypeChoices.eherkenning,
         )
         # services
@@ -462,7 +467,7 @@ class TestCaseDetailView(
             omschrijvingGeneriek=RolOmschrijving.initiator,
             betrokkeneType=RolTypes.vestiging,
             betrokkeneIdentificatie={
-                "vestigingsNummer": "1234",
+                "vestigingsNummer": self.vestiging_user.vestiging,
                 "handelsnaam": "Foo Bar",
                 "verblijfsadres" "subVerblijfBuitenland": "van der",
                 "kvkNummer": "Bazz",
@@ -1512,7 +1517,6 @@ class TestCaseDetailView(
                 self.assertContains(response, "ZAAK-2022-0000000025")
                 self.assertContains(response, "Coffee zaaktype")
 
-    @set_kvk_branch_number_in_session("1234")
     @patch.object(
         eSuiteVragenService,
         "retrieve_objectcontactmomenten_for_zaak",
@@ -1697,13 +1701,12 @@ class TestCaseDetailView(
                     response, _("Sorry, you don't have access to this page (403)")
                 )
 
-    @set_kvk_branch_number_in_session("1234")
     def test_access_as_vestiging_when_only_role_for_vestiging(self, m):
         """
         Just having a role with betrokkeneType vestiging that matches for a case
         is sufficient to have access.
         """
-        self.client.force_login(user=self.eherkenning_user)
+        self.client.force_login(user=self.vestiging_user)
 
         # Requires manually setting mocks to avoid default roles on case
         m.get(self.zaak["url"], json=self.zaak)
@@ -1753,7 +1756,6 @@ class TestCaseDetailView(
                 self.assertEquals(response.status_code, 200)
                 self.assertContains(response, self.zaak["identificatie"])
 
-    @set_kvk_branch_number_in_session("1234")
     def test_no_access_as_vestiging_when_no_roles_are_found_for_vestigingsnummer(
         self, m
     ):
@@ -1761,7 +1763,7 @@ class TestCaseDetailView(
         In order to have access to a case when logged in as a vestiging, that case
         should have a role with betrokkeneType vestiging and a matching vestigingsnummer
         """
-        self.client.force_login(user=self.eherkenning_user)
+        self.client.force_login(user=self.vestiging_user)
 
         m.get(self.zaak["url"], json=self.zaak)
         m.get(self.zaaktype["url"], json=self.zaaktype)
@@ -1789,7 +1791,6 @@ class TestCaseDetailView(
                     response, _("Sorry, you don't have access to this page (403)")
                 )
 
-    @set_kvk_branch_number_in_session(value=None)
     def test_no_access_if_fetch_eherkenning_zaken_with_rsin_and_user_has_no_rsin(
         self, m
     ):
