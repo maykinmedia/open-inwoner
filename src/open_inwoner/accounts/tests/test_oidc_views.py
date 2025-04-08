@@ -25,7 +25,6 @@ from open_inwoner.accounts.views.auth_oidc import (
 )
 from open_inwoner.configurations.choices import OpenIDDisplayChoices
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.kvk.branches import KVK_BRANCH_SESSION_VARIABLE
 
 from ...cms.profile.cms_apps import ProfileApphook
 from ...cms.tests import cms_tools
@@ -1503,7 +1502,6 @@ class eHerkenningOIDCFlowTests(WebTest):
             }
         }
         session["oidc_id_token"] = "foo"
-        session[KVK_BRANCH_SESSION_VARIABLE] = None
         session.save()
         logout_url = reverse("eherkenning_oidc:logout")
 
@@ -1552,7 +1550,6 @@ class eHerkenningOIDCFlowTests(WebTest):
             }
         }
         session["oidc_id_token"] = "foo"
-        session[KVK_BRANCH_SESSION_VARIABLE] = None
         session.save()
         logout_url = reverse("eherkenning_oidc:logout")
 
