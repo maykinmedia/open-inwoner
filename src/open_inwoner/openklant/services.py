@@ -1523,7 +1523,7 @@ class OpenKlant2Service(
     def list_questions(
         self, fetch_params: FetchParameters, user: User
     ) -> list[Question]:
-        partij, created = self.get_or_create_partij_for_user(fetch_params, user)
+        partij, _ = self.get_or_create_partij_for_user(user)
         if not partij:
             # Will be logged by get_or_create_partij_for_user
             return []
