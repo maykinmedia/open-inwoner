@@ -1,39 +1,40 @@
 interactions:
 - request:
-    body: '{"nummer": "0000000122", "kanaal": "in", "onderwerp": "three", "inhoud":
-      "Career media father.", "taal": "nld", "indicatieContactGelukt": false, "vertrouwelijk":
-      false, "plaatsgevondenOp": "2000-07-01T05:18:20.102491"}'
+    body: '{"nummer": "0000000122", "kanaal": "give", "onderwerp": "then", "inhoud":
+      "Open recognize practice result television.", "taal": "nld", "indicatieContactGelukt":
+      false, "vertrouwelijk": false, "plaatsgevondenOp": "2017-05-24T10:21:57.704549"}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '218'
+      - '241'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"4d3b2805-8cb7-42dc-8c2b-30e14b950840","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/4d3b2805-8cb7-42dc-8c2b-30e14b950840","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000122","kanaal":"in","onderwerp":"three","inhoud":"Career
-        media father.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2000-07-01T05:18:20.102491Z"}'
+      string: '{"uuid":"231b6c83-8b9f-4bf3-97f1-0eec61255da4","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/231b6c83-8b9f-4bf3-97f1-0eec61255da4","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000122","kanaal":"give","onderwerp":"then","inhoud":"Open
+        recognize practice result television.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2017-05-24T10:21:57.704549Z"}'
     headers:
       API-version:
-      - 0.0.4
+      - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '480'
+      - '503'
       Content-Security-Policy:
-      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
-        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
-        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
+      - 'frame-ancestors ''none''; frame-src ''self''; worker-src ''self'' blob:;
+        default-src ''self''; font-src ''self'' fonts.gstatic.com; object-src ''none'';
+        img-src ''self'' data: cdn.redoc.ly; base-uri ''self''; style-src ''self''
+        ''unsafe-inline'' fonts.googleapis.com; form-action ''self''; script-src ''self''
+        ''unsafe-inline'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/4d3b2805-8cb7-42dc-8c2b-30e14b950840
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/231b6c83-8b9f-4bf3-97f1-0eec61255da4
       Referrer-Policy:
       - same-origin
       Vary:
@@ -54,20 +55,21 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1&indicatieContactGelukt=false
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"4d3b2805-8cb7-42dc-8c2b-30e14b950840","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/4d3b2805-8cb7-42dc-8c2b-30e14b950840","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000122","kanaal":"in","onderwerp":"three","inhoud":"Career
-        media father.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2000-07-01T05:18:20.102491Z","_expand":{}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"231b6c83-8b9f-4bf3-97f1-0eec61255da4","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/231b6c83-8b9f-4bf3-97f1-0eec61255da4","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000122","kanaal":"give","onderwerp":"then","inhoud":"Open
+        recognize practice result television.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2017-05-24T10:21:57.704549Z","_expand":{}}]}'
     headers:
       API-version:
-      - 0.0.4
+      - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '545'
+      - '568'
       Content-Security-Policy:
-      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
-        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
-        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
+      - 'frame-ancestors ''none''; frame-src ''self''; worker-src ''self'' blob:;
+        default-src ''self''; font-src ''self'' fonts.gstatic.com; object-src ''none'';
+        img-src ''self'' data: cdn.redoc.ly; base-uri ''self''; style-src ''self''
+        ''unsafe-inline'' fonts.googleapis.com; form-action ''self''; script-src ''self''
+        ''unsafe-inline'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
@@ -95,16 +97,17 @@ interactions:
       string: '{"count":0,"next":null,"previous":null,"results":[]}'
     headers:
       API-version:
-      - 0.0.4
+      - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
       - '52'
       Content-Security-Policy:
-      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
-        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
-        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
+      - 'frame-ancestors ''none''; frame-src ''self''; worker-src ''self'' blob:;
+        default-src ''self''; font-src ''self'' fonts.gstatic.com; object-src ''none'';
+        img-src ''self'' data: cdn.redoc.ly; base-uri ''self''; style-src ''self''
+        ''unsafe-inline'' fonts.googleapis.com; form-action ''self''; script-src ''self''
+        ''unsafe-inline'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

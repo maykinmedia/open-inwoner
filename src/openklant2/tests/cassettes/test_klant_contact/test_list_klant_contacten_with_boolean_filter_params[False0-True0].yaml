@@ -1,39 +1,40 @@
 interactions:
 - request:
-    body: '{"nummer": "0000000114", "kanaal": "way", "onderwerp": "off", "inhoud":
-      "Chair national somebody news hotel resource.", "taal": "nld", "indicatieContactGelukt":
-      false, "vertrouwelijk": false, "plaatsgevondenOp": "1996-12-12T13:03:09.008226"}'
+    body: '{"nummer": "0000000114", "kanaal": "his", "onderwerp": "field", "inhoud":
+      "Bad himself enjoy her able where color.", "taal": "nld", "indicatieContactGelukt":
+      false, "vertrouwelijk": true, "plaatsgevondenOp": "2013-02-03T03:29:16.413505"}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '241'
+      - '237'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"342b2ab9-daf1-4893-a768-3be077563587","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/342b2ab9-daf1-4893-a768-3be077563587","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000114","kanaal":"way","onderwerp":"off","inhoud":"Chair
-        national somebody news hotel resource.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"1996-12-12T13:03:09.008226Z"}'
+      string: '{"uuid":"98232ed5-cd41-41a6-9af8-ba59362c60f7","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/98232ed5-cd41-41a6-9af8-ba59362c60f7","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000114","kanaal":"his","onderwerp":"field","inhoud":"Bad
+        himself enjoy her able where color.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2013-02-03T03:29:16.413505Z"}'
     headers:
       API-version:
-      - 0.0.4
+      - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '503'
+      - '499'
       Content-Security-Policy:
-      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
-        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
-        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
+      - 'frame-ancestors ''none''; frame-src ''self''; worker-src ''self'' blob:;
+        default-src ''self''; font-src ''self'' fonts.gstatic.com; object-src ''none'';
+        img-src ''self'' data: cdn.redoc.ly; base-uri ''self''; style-src ''self''
+        ''unsafe-inline'' fonts.googleapis.com; form-action ''self''; script-src ''self''
+        ''unsafe-inline'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/342b2ab9-daf1-4893-a768-3be077563587
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/98232ed5-cd41-41a6-9af8-ba59362c60f7
       Referrer-Policy:
       - same-origin
       Vary:
@@ -54,20 +55,21 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1&indicatieContactGelukt=False
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"342b2ab9-daf1-4893-a768-3be077563587","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/342b2ab9-daf1-4893-a768-3be077563587","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000114","kanaal":"way","onderwerp":"off","inhoud":"Chair
-        national somebody news hotel resource.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"1996-12-12T13:03:09.008226Z","_expand":{}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"98232ed5-cd41-41a6-9af8-ba59362c60f7","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/98232ed5-cd41-41a6-9af8-ba59362c60f7","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000114","kanaal":"his","onderwerp":"field","inhoud":"Bad
+        himself enjoy her able where color.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2013-02-03T03:29:16.413505Z","_expand":{}}]}'
     headers:
       API-version:
-      - 0.0.4
+      - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '568'
+      - '564'
       Content-Security-Policy:
-      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
-        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
-        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
+      - 'frame-ancestors ''none''; frame-src ''self''; worker-src ''self'' blob:;
+        default-src ''self''; font-src ''self'' fonts.gstatic.com; object-src ''none'';
+        img-src ''self'' data: cdn.redoc.ly; base-uri ''self''; style-src ''self''
+        ''unsafe-inline'' fonts.googleapis.com; form-action ''self''; script-src ''self''
+        ''unsafe-inline'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
@@ -95,16 +97,17 @@ interactions:
       string: '{"count":0,"next":null,"previous":null,"results":[]}'
     headers:
       API-version:
-      - 0.0.4
+      - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
       - '52'
       Content-Security-Policy:
-      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
-        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
-        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
+      - 'frame-ancestors ''none''; frame-src ''self''; worker-src ''self'' blob:;
+        default-src ''self''; font-src ''self'' fonts.gstatic.com; object-src ''none'';
+        img-src ''self'' data: cdn.redoc.ly; base-uri ''self''; style-src ''self''
+        ''unsafe-inline'' fonts.googleapis.com; form-action ''self''; script-src ''self''
+        ''unsafe-inline'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

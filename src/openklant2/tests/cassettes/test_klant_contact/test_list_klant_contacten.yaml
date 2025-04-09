@@ -1,39 +1,40 @@
 interactions:
 - request:
-    body: '{"nummer": "0000000113", "kanaal": "discuss", "onderwerp": "conference",
-      "inhoud": "Concern activity material yard world now.", "taal": "nld", "indicatieContactGelukt":
-      false, "vertrouwelijk": true, "plaatsgevondenOp": "2003-12-20T07:53:01.643234"}'
+    body: '{"nummer": "0000000113", "kanaal": "hotel", "onderwerp": "son", "inhoud":
+      "Recent star let ability sea offer professional.", "taal": "nld", "indicatieContactGelukt":
+      null, "vertrouwelijk": false, "plaatsgevondenOp": "2000-11-04T00:41:37.457815"}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '248'
+      - '245'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"81909c5b-c246-4ce1-ade0-69effd424548","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/81909c5b-c246-4ce1-ade0-69effd424548","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000113","kanaal":"discuss","onderwerp":"conference","inhoud":"Concern
-        activity material yard world now.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2003-12-20T07:53:01.643234Z"}'
+      string: '{"uuid":"2cf180f9-04cf-4485-986e-2da803ca6dc8","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/2cf180f9-04cf-4485-986e-2da803ca6dc8","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000113","kanaal":"hotel","onderwerp":"son","inhoud":"Recent
+        star let ability sea offer professional.","indicatieContactGelukt":null,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2000-11-04T00:41:37.457815Z"}'
     headers:
       API-version:
-      - 0.0.4
+      - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '510'
+      - '507'
       Content-Security-Policy:
-      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
-        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
-        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
+      - 'frame-ancestors ''none''; frame-src ''self''; worker-src ''self'' blob:;
+        default-src ''self''; font-src ''self'' fonts.gstatic.com; object-src ''none'';
+        img-src ''self'' data: cdn.redoc.ly; base-uri ''self''; style-src ''self''
+        ''unsafe-inline'' fonts.googleapis.com; form-action ''self''; script-src ''self''
+        ''unsafe-inline'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/81909c5b-c246-4ce1-ade0-69effd424548
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/2cf180f9-04cf-4485-986e-2da803ca6dc8
       Referrer-Policy:
       - same-origin
       Vary:
@@ -54,20 +55,21 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"81909c5b-c246-4ce1-ade0-69effd424548","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/81909c5b-c246-4ce1-ade0-69effd424548","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000113","kanaal":"discuss","onderwerp":"conference","inhoud":"Concern
-        activity material yard world now.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2003-12-20T07:53:01.643234Z","_expand":{}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"2cf180f9-04cf-4485-986e-2da803ca6dc8","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/2cf180f9-04cf-4485-986e-2da803ca6dc8","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000113","kanaal":"hotel","onderwerp":"son","inhoud":"Recent
+        star let ability sea offer professional.","indicatieContactGelukt":null,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2000-11-04T00:41:37.457815Z","_expand":{}}]}'
     headers:
       API-version:
-      - 0.0.4
+      - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '575'
+      - '572'
       Content-Security-Policy:
-      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
-        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
-        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
+      - 'frame-ancestors ''none''; frame-src ''self''; worker-src ''self'' blob:;
+        default-src ''self''; font-src ''self'' fonts.gstatic.com; object-src ''none'';
+        img-src ''self'' data: cdn.redoc.ly; base-uri ''self''; style-src ''self''
+        ''unsafe-inline'' fonts.googleapis.com; form-action ''self''; script-src ''self''
+        ''unsafe-inline'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

@@ -1,39 +1,40 @@
 interactions:
 - request:
-    body: '{"naam": "Mandy Nelson", "soortActor": "geautomatiseerde_actor", "indicatieActief":
-      true, "actoridentificator": {"objectId": "0000000016", "codeObjecttype": "behind",
-      "codeRegister": "two", "codeSoortObjectId": "power"}}'
+    body: '{"naam": "Oscar Collins", "soortActor": "geautomatiseerde_actor", "indicatieActief":
+      true, "actoridentificator": {"objectId": "0000000016", "codeObjecttype": "what",
+      "codeRegister": "network", "codeSoortObjectId": "like"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '220'
+      - '222'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/actoren
   response:
     body:
-      string: '{"uuid":"795f15ee-959e-448c-9c46-bdfa6fe9588c","url":"http://localhost:8338/klantinteracties/api/v1/actoren/795f15ee-959e-448c-9c46-bdfa6fe9588c","naam":"Mandy
-        Nelson","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000016","codeObjecttype":"behind","codeRegister":"two","codeSoortObjectId":"power"},"actorIdentificatie":null}'
+      string: '{"uuid":"280d8f62-3f00-419a-897c-78ecdae90212","url":"http://localhost:8338/klantinteracties/api/v1/actoren/280d8f62-3f00-419a-897c-78ecdae90212","naam":"Oscar
+        Collins","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000016","codeObjecttype":"what","codeRegister":"network","codeSoortObjectId":"like"},"actorIdentificatie":null}'
     headers:
       API-version:
-      - 0.0.4
+      - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '377'
+      - '379'
       Content-Security-Policy:
-      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
-        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
-        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
+      - 'frame-ancestors ''none''; frame-src ''self''; worker-src ''self'' blob:;
+        default-src ''self''; font-src ''self'' fonts.gstatic.com; object-src ''none'';
+        img-src ''self'' data: cdn.redoc.ly; base-uri ''self''; style-src ''self''
+        ''unsafe-inline'' fonts.googleapis.com; form-action ''self''; script-src ''self''
+        ''unsafe-inline'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/795f15ee-959e-448c-9c46-bdfa6fe9588c
+      - http://localhost:8338/klantinteracties/api/v1/actoren/280d8f62-3f00-419a-897c-78ecdae90212
       Referrer-Policy:
       - same-origin
       Vary:
@@ -46,40 +47,41 @@ interactions:
       code: 201
       message: Created
 - request:
-    body: '{"naam": "Kimberly Cantrell", "soortActor": "organisatorische_eenheid",
-      "indicatieActief": true, "actoridentificator": {"objectId": "0000000017", "codeObjecttype":
-      "land", "codeRegister": "eat", "codeSoortObjectId": "Democrat"}}'
+    body: '{"naam": "Robert Patrick", "soortActor": "geautomatiseerde_actor", "indicatieActief":
+      true, "actoridentificator": {"objectId": "0000000017", "codeObjecttype": "letter",
+      "codeRegister": "a", "codeSoortObjectId": "program"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '228'
+      - '222'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/actoren
   response:
     body:
-      string: '{"uuid":"5b49ab50-ae3a-40ec-9b95-ff84300b76f0","url":"http://localhost:8338/klantinteracties/api/v1/actoren/5b49ab50-ae3a-40ec-9b95-ff84300b76f0","naam":"Kimberly
-        Cantrell","soortActor":"organisatorische_eenheid","indicatieActief":true,"actoridentificator":{"objectId":"0000000017","codeObjecttype":"land","codeRegister":"eat","codeSoortObjectId":"Democrat"},"actorIdentificatie":null}'
+      string: '{"uuid":"d4f52374-9ca7-47aa-ae0a-8e06b0c83913","url":"http://localhost:8338/klantinteracties/api/v1/actoren/d4f52374-9ca7-47aa-ae0a-8e06b0c83913","naam":"Robert
+        Patrick","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000017","codeObjecttype":"letter","codeRegister":"a","codeSoortObjectId":"program"},"actorIdentificatie":null}'
     headers:
       API-version:
-      - 0.0.4
+      - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '385'
+      - '379'
       Content-Security-Policy:
-      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
-        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
-        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
+      - 'frame-ancestors ''none''; frame-src ''self''; worker-src ''self'' blob:;
+        default-src ''self''; font-src ''self'' fonts.gstatic.com; object-src ''none'';
+        img-src ''self'' data: cdn.redoc.ly; base-uri ''self''; style-src ''self''
+        ''unsafe-inline'' fonts.googleapis.com; form-action ''self''; script-src ''self''
+        ''unsafe-inline'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/5b49ab50-ae3a-40ec-9b95-ff84300b76f0
+      - http://localhost:8338/klantinteracties/api/v1/actoren/d4f52374-9ca7-47aa-ae0a-8e06b0c83913
       Referrer-Policy:
       - same-origin
       Vary:
@@ -92,40 +94,41 @@ interactions:
       code: 201
       message: Created
 - request:
-    body: '{"naam": "Jamie Rodriguez", "soortActor": "geautomatiseerde_actor", "indicatieActief":
-      false, "actoridentificator": {"objectId": "0000000018", "codeObjecttype": "bad",
-      "codeRegister": "gas", "codeSoortObjectId": "even"}}'
+    body: '{"naam": "Tamara Faulkner", "soortActor": "geautomatiseerde_actor", "indicatieActief":
+      false, "actoridentificator": {"objectId": "0000000018", "codeObjecttype": "billion",
+      "codeRegister": "image", "codeSoortObjectId": "investment"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '220'
+      - '232'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/actoren
   response:
     body:
-      string: '{"uuid":"38a2c741-26f5-4c38-8918-4a8dc4c8989f","url":"http://localhost:8338/klantinteracties/api/v1/actoren/38a2c741-26f5-4c38-8918-4a8dc4c8989f","naam":"Jamie
-        Rodriguez","soortActor":"geautomatiseerde_actor","indicatieActief":false,"actoridentificator":{"objectId":"0000000018","codeObjecttype":"bad","codeRegister":"gas","codeSoortObjectId":"even"},"actorIdentificatie":null}'
+      string: '{"uuid":"e5f56a8f-0afe-4982-b00a-111376cf4ca5","url":"http://localhost:8338/klantinteracties/api/v1/actoren/e5f56a8f-0afe-4982-b00a-111376cf4ca5","naam":"Tamara
+        Faulkner","soortActor":"geautomatiseerde_actor","indicatieActief":false,"actoridentificator":{"objectId":"0000000018","codeObjecttype":"billion","codeRegister":"image","codeSoortObjectId":"investment"},"actorIdentificatie":null}'
     headers:
       API-version:
-      - 0.0.4
+      - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '377'
+      - '389'
       Content-Security-Policy:
-      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
-        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
-        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
+      - 'frame-ancestors ''none''; frame-src ''self''; worker-src ''self'' blob:;
+        default-src ''self''; font-src ''self'' fonts.gstatic.com; object-src ''none'';
+        img-src ''self'' data: cdn.redoc.ly; base-uri ''self''; style-src ''self''
+        ''unsafe-inline'' fonts.googleapis.com; form-action ''self''; script-src ''self''
+        ''unsafe-inline'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/38a2c741-26f5-4c38-8918-4a8dc4c8989f
+      - http://localhost:8338/klantinteracties/api/v1/actoren/e5f56a8f-0afe-4982-b00a-111376cf4ca5
       Referrer-Policy:
       - same-origin
       Vary:
@@ -146,20 +149,21 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/actoren?indicatieActief=False&soortActor=geautomatiseerde_actor
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"38a2c741-26f5-4c38-8918-4a8dc4c8989f","url":"http://localhost:8338/klantinteracties/api/v1/actoren/38a2c741-26f5-4c38-8918-4a8dc4c8989f","naam":"Jamie
-        Rodriguez","soortActor":"geautomatiseerde_actor","indicatieActief":false,"actoridentificator":{"objectId":"0000000018","codeObjecttype":"bad","codeRegister":"gas","codeSoortObjectId":"even"},"actorIdentificatie":null}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"e5f56a8f-0afe-4982-b00a-111376cf4ca5","url":"http://localhost:8338/klantinteracties/api/v1/actoren/e5f56a8f-0afe-4982-b00a-111376cf4ca5","naam":"Tamara
+        Faulkner","soortActor":"geautomatiseerde_actor","indicatieActief":false,"actoridentificator":{"objectId":"0000000018","codeObjecttype":"billion","codeRegister":"image","codeSoortObjectId":"investment"},"actorIdentificatie":null}]}'
     headers:
       API-version:
-      - 0.0.4
+      - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '429'
+      - '441'
       Content-Security-Policy:
-      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
-        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
-        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
+      - 'frame-ancestors ''none''; frame-src ''self''; worker-src ''self'' blob:;
+        default-src ''self''; font-src ''self'' fonts.gstatic.com; object-src ''none'';
+        img-src ''self'' data: cdn.redoc.ly; base-uri ''self''; style-src ''self''
+        ''unsafe-inline'' fonts.googleapis.com; form-action ''self''; script-src ''self''
+        ''unsafe-inline'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

@@ -7,7 +7,12 @@ import freezegun
 from timeline_logger.models import TimelineLog
 
 from open_inwoner.accounts.models import User
-from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.accounts.tests.factories import (
+    DigidUserFactory,
+    UserFactory,
+    eHerkenningUserFactory,
+    eHerkenningVestigingUserFactory,
+)
 from open_inwoner.openklant.services import OpenKlant2Question, OpenKlant2Service
 from open_inwoner.openklant.tests.factories import OpenKlant2ConfigFactory
 from open_inwoner.openklant.tests.helpers import Openklant2ServiceTestCase
@@ -22,7 +27,13 @@ class PartijGetOrCreateTestCase(Openklant2ServiceTestCase):
 
         self.openklant2_config = OpenKlant2ConfigFactory()
         self.service = OpenKlant2Service(config=self.openklant2_config)
-        self.user = UserFactory(first_name="John", last_name="Doe")
+        self.digid_user = DigidUserFactory(
+            first_name="John", last_name="Doe", bsn="521311408"
+        )
+        self.kvk_only_user = eHerkenningUserFactory(kvk="12345678")
+        self.vestiging_user = eHerkenningVestigingUserFactory(
+            kvk=self.kvk_only_user.kvk, vestiging="123456789123"
+        )
 
     def test_get_or_create_persoon(self):
         # Empty state
@@ -30,9 +41,7 @@ class PartijGetOrCreateTestCase(Openklant2ServiceTestCase):
         self.assertEqual(self.service.client.partij_identificator.list()["count"], 0)
 
         # First call creates
-        persoon, created = self.service.get_or_create_partij_for_user(
-            {"user_bsn": "521311408"}, self.user
-        )
+        persoon, created = self.service.get_or_create_partij_for_user(self.digid_user)
 
         self.assertTrue(
             created, "persoon was retrieved (GET), expected create via POST"
@@ -56,9 +65,7 @@ class PartijGetOrCreateTestCase(Openklant2ServiceTestCase):
         )
 
         # Second call gets
-        persoon, created = self.service.get_or_create_partij_for_user(
-            {"user_bsn": "521311408"}, self.user
-        )
+        persoon, created = self.service.get_or_create_partij_for_user(self.digid_user)
 
         self.assertFalse(
             created, "persoon was was created (POST), expected retrieve via GET"
@@ -88,8 +95,7 @@ class PartijGetOrCreateTestCase(Openklant2ServiceTestCase):
 
         # First call creates
         persoon, created = self.service.get_or_create_partij_for_user(
-            {"user_kvk_or_rsin": "12345678"},
-            self.user,
+            self.kvk_only_user
         )
 
         self.assertTrue(
@@ -115,7 +121,7 @@ class PartijGetOrCreateTestCase(Openklant2ServiceTestCase):
 
         # Second call gets
         persoon, created = self.service.get_or_create_partij_for_user(
-            {"user_kvk_or_rsin": "12345678"}, self.user
+            self.kvk_only_user
         )
 
         self.assertFalse(
@@ -146,8 +152,7 @@ class PartijGetOrCreateTestCase(Openklant2ServiceTestCase):
 
         # First call creates
         persoon, created = self.service.get_or_create_partij_for_user(
-            {"user_kvk_or_rsin": "12345678", "vestigingsnummer": "123456789123"},
-            self.user,
+            self.vestiging_user,
         )
 
         self.assertTrue(
@@ -179,7 +184,7 @@ class PartijGetOrCreateTestCase(Openklant2ServiceTestCase):
 
         # Second call gets
         persoon, created = self.service.get_or_create_partij_for_user(
-            {"user_kvk_or_rsin": "12345678"}, self.user
+            self.vestiging_user
         )
 
         self.assertFalse(

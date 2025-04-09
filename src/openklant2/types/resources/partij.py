@@ -6,6 +6,9 @@ from typing_extensions import TypedDict
 from openklant2.types.common import Adres, CreateAdres, ForeignKeyRef
 from openklant2.types.iso_639_2 import LanguageCode
 from openklant2.types.resources.digitaal_adres import DigitaalAdres
+from openklant2.types.resources.partij_identificator import (
+    CreateEmbeddedPartijIdentificatorData,
+)
 
 #
 # Input types
@@ -34,6 +37,7 @@ class CreatePartijDataBase(TypedDict):
     indicatieGeheimhouding: bool
     correspondentieadres: NotRequired[CreateAdres]
     bezoekadres: NotRequired[CreateAdres | None]
+    partijIdentificatoren: NotRequired[list[CreateEmbeddedPartijIdentificatorData]]
 
 
 class CreatePartijIdentificatiePersoon(TypedDict):

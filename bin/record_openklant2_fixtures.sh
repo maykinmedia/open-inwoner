@@ -25,5 +25,7 @@ else
     exit 0
 fi
 
+export OPEN_KLANT_IMAGE_TAG="2.7.0"
+echo "Using Open Klant image version $OPEN_KLANT_IMAGE_TAG"
 set -x
 RECORD_OPENKLANT_CASSETTES=1 python src/manage.py test src/open_inwoner --tag openklant2

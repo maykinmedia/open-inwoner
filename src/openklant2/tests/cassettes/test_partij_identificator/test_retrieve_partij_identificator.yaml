@@ -16,27 +16,28 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/partijen
   response:
     body:
-      string: '{"uuid":"e57cd91d-08f1-4d4d-86e2-3dda9aba6c3e","url":"http://localhost:8338/klantinteracties/api/v1/partijen/e57cd91d-08f1-4d4d-86e2-3dda9aba6c3e","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"crp","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Dr.","voornaam":"Test
+      string: '{"uuid":"9e13c5d0-036d-49b3-9382-b816a7d1f82e","url":"http://localhost:8338/klantinteracties/api/v1/partijen/9e13c5d0-036d-49b3-9382-b816a7d1f82e","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"crp","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","straatnaam":"","huisnummer":null,"huisnummertoevoeging":"","postcode":"","stad":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","straatnaam":"","huisnummer":null,"huisnummertoevoeging":"","postcode":"","stad":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Dr.","voornaam":"Test
         Persoon","voorvoegselAchternaam":"Mrs.","achternaam":"Gamble"},"volledigeNaam":"Test
         Persoon Mrs. Gamble"}}'
     headers:
       API-version:
-      - 0.0.4
+      - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '877'
+      - '1045'
       Content-Security-Policy:
-      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
-        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
-        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
+      - 'frame-ancestors ''none''; frame-src ''self''; worker-src ''self'' blob:;
+        default-src ''self''; font-src ''self'' fonts.gstatic.com; object-src ''none'';
+        img-src ''self'' data: cdn.redoc.ly; base-uri ''self''; style-src ''self''
+        ''unsafe-inline'' fonts.googleapis.com; form-action ''self''; script-src ''self''
+        ''unsafe-inline'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/partijen/e57cd91d-08f1-4d4d-86e2-3dda9aba6c3e
+      - http://localhost:8338/klantinteracties/api/v1/partijen/9e13c5d0-036d-49b3-9382-b816a7d1f82e
       Referrer-Policy:
       - same-origin
       Vary:
@@ -49,7 +50,7 @@ interactions:
       code: 201
       message: Created
 - request:
-    body: '{"identificeerdePartij": {"uuid": "e57cd91d-08f1-4d4d-86e2-3dda9aba6c3e"},
+    body: '{"identificeerdePartij": {"uuid": "9e13c5d0-036d-49b3-9382-b816a7d1f82e"},
       "partijIdentificator": {"codeObjecttype": "natuurlijk_persoon", "codeSoortObjectId":
       "bsn", "objectId": "631706549", "codeRegister": "brp"}, "anderePartijIdentificator":
       "optional_identifier_123"}'
@@ -64,25 +65,26 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/partij-identificatoren
   response:
     body:
-      string: '{"uuid":"01529332-5331-4797-90ad-6fc0e84822ea","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/01529332-5331-4797-90ad-6fc0e84822ea","identificeerdePartij":{"uuid":"e57cd91d-08f1-4d4d-86e2-3dda9aba6c3e","url":"http://localhost:8338/klantinteracties/api/v1/partijen/e57cd91d-08f1-4d4d-86e2-3dda9aba6c3e"},"anderePartijIdentificator":"optional_identifier_123","partijIdentificator":{"codeObjecttype":"natuurlijk_persoon","codeSoortObjectId":"bsn","objectId":"631706549","codeRegister":"brp"}}'
+      string: '{"uuid":"9107248c-9925-465c-8ed7-dc4b27aca11a","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/9107248c-9925-465c-8ed7-dc4b27aca11a","identificeerdePartij":{"uuid":"9e13c5d0-036d-49b3-9382-b816a7d1f82e","url":"http://localhost:8338/klantinteracties/api/v1/partijen/9e13c5d0-036d-49b3-9382-b816a7d1f82e"},"anderePartijIdentificator":"optional_identifier_123","partijIdentificator":{"codeObjecttype":"natuurlijk_persoon","codeSoortObjectId":"bsn","objectId":"631706549","codeRegister":"brp"},"subIdentificatorVan":null}'
     headers:
       API-version:
-      - 0.0.4
+      - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '518'
+      - '545'
       Content-Security-Policy:
-      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
-        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
-        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
+      - 'frame-ancestors ''none''; frame-src ''self''; worker-src ''self'' blob:;
+        default-src ''self''; font-src ''self'' fonts.gstatic.com; object-src ''none'';
+        img-src ''self'' data: cdn.redoc.ly; base-uri ''self''; style-src ''self''
+        ''unsafe-inline'' fonts.googleapis.com; form-action ''self''; script-src ''self''
+        ''unsafe-inline'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/01529332-5331-4797-90ad-6fc0e84822ea
+      - http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/9107248c-9925-465c-8ed7-dc4b27aca11a
       Referrer-Policy:
       - same-origin
       Vary:
@@ -100,22 +102,23 @@ interactions:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
     method: GET
-    uri: http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/01529332-5331-4797-90ad-6fc0e84822ea
+    uri: http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/9107248c-9925-465c-8ed7-dc4b27aca11a
   response:
     body:
-      string: '{"uuid":"01529332-5331-4797-90ad-6fc0e84822ea","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/01529332-5331-4797-90ad-6fc0e84822ea","identificeerdePartij":{"uuid":"e57cd91d-08f1-4d4d-86e2-3dda9aba6c3e","url":"http://localhost:8338/klantinteracties/api/v1/partijen/e57cd91d-08f1-4d4d-86e2-3dda9aba6c3e"},"anderePartijIdentificator":"optional_identifier_123","partijIdentificator":{"codeObjecttype":"natuurlijk_persoon","codeSoortObjectId":"bsn","objectId":"631706549","codeRegister":"brp"}}'
+      string: '{"uuid":"9107248c-9925-465c-8ed7-dc4b27aca11a","url":"http://localhost:8338/klantinteracties/api/v1/partij-identificatoren/9107248c-9925-465c-8ed7-dc4b27aca11a","identificeerdePartij":{"uuid":"9e13c5d0-036d-49b3-9382-b816a7d1f82e","url":"http://localhost:8338/klantinteracties/api/v1/partijen/9e13c5d0-036d-49b3-9382-b816a7d1f82e"},"anderePartijIdentificator":"optional_identifier_123","partijIdentificator":{"codeObjecttype":"natuurlijk_persoon","codeSoortObjectId":"bsn","objectId":"631706549","codeRegister":"brp"},"subIdentificatorVan":null}'
     headers:
       API-version:
-      - 0.0.4
+      - 0.1.2
       Allow:
       - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
       Content-Length:
-      - '518'
+      - '545'
       Content-Security-Policy:
-      - 'frame-ancestors ''none''; object-src ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; form-action ''self''; worker-src ''self'' blob:; base-uri
-        ''self''; script-src ''self'' ''unsafe-inline''; img-src ''self'' data: cdn.redoc.ly;
-        font-src ''self'' fonts.gstatic.com; frame-src ''self''; default-src ''self'''
+      - 'frame-ancestors ''none''; frame-src ''self''; worker-src ''self'' blob:;
+        default-src ''self''; font-src ''self'' fonts.gstatic.com; object-src ''none'';
+        img-src ''self'' data: cdn.redoc.ly; base-uri ''self''; style-src ''self''
+        ''unsafe-inline'' fonts.googleapis.com; form-action ''self''; script-src ''self''
+        ''unsafe-inline'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

@@ -3,6 +3,8 @@ from typing import Literal, NotRequired
 from pydantic import TypeAdapter
 from typing_extensions import TypedDict
 
+from openklant2.types.common import ForeignKeyRef
+
 #
 # Input
 #
@@ -40,10 +42,18 @@ class CreateIdentificeerdePartij(TypedDict):
     uuid: str
 
 
+# For use in the Partij creation endpoint
+class CreateEmbeddedPartijIdentificatorData(TypedDict):
+    partijIdentificator: PartijIdentificatorObject
+    anderePartijIdentificator: NotRequired[str]
+    subIdentificatorVan: NotRequired[ForeignKeyRef]
+
+
 class CreatePartijIdentificatorData(TypedDict):
     identificeerdePartij: CreateIdentificeerdePartij
     partijIdentificator: PartijIdentificatorObject
     anderePartijIdentificator: NotRequired[str]
+    subIdentificatorVan: NotRequired[ForeignKeyRef]
 
 
 class ListPartijIdentificatorenParams(TypedDict, total=False):
@@ -65,9 +75,11 @@ class IdentificerendePartij(TypedDict):
 
 
 class PartijIdentificator(TypedDict):
+    uuid: str
     identificeerdePartij: IdentificerendePartij
     partijIdentificator: PartijIdentificatorObject
     anderePartijIdentificator: NotRequired[str]
+    subIdentificatorVan: ForeignKeyRef | None
 
 
 CreatePartijIdentificatorDataValidator = TypeAdapter(CreatePartijIdentificatorData)

@@ -108,6 +108,38 @@ def test_create_persoon(client) -> None:
 
 
 @pytest.mark.vcr
+def test_create_persoon_with_identificator(client) -> None:
+    data = CreatePartijPersoonDataValidator.validate_python(
+        {
+            "soortPartij": "persoon",
+            "digitaleAdressen": None,
+            "rekeningnummers": None,
+            "voorkeursRekeningnummer": None,
+            "voorkeurstaal": "nld",
+            "indicatieActief": True,
+            "indicatieGeheimhouding": False,
+            "voorkeursDigitaalAdres": None,
+            "partijIdentificatie": {"contactnaam": None},
+            "partijIdentificatoren": [
+                {
+                    "partijIdentificator": {
+                        "codeObjecttype": "natuurlijk_persoon",
+                        "codeSoortObjectId": "bsn",
+                        "objectId": "631706549",
+                        "codeRegister": "brp",
+                    }
+                }
+            ],
+        }
+    )
+    resp = client.partij.create_persoon(
+        data=data,
+    )
+
+    PartijValidator.validate_python(resp)
+
+
+@pytest.mark.vcr
 def test_create_contactpersoon(client, een_organisatie):
     data = CreatePartijContactpersoonDataValidator.validate_python(
         {
@@ -251,8 +283,13 @@ def test_partial_update(client, een_persoon):
         "adresregel1": "foo",
         "adresregel2": "bar",
         "adresregel3": "baz",
+        "huisnummer": 1874,
+        "postcode": "1234 AB",
+        "stad": "Amsterdam",
+        "straatnaam": "Teleportweg",
         "land": "NL",
         "nummeraanduidingId": "",
+        "huisnummertoevoeging": "",
     }
     assert een_persoon["nummer"] != target_nummer
     assert een_persoon["correspondentieadres"] != target_correspondentieadres

@@ -199,10 +199,7 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
     def _register_via_openklant2(self, form: ContactForm):
         user = self.request.user
 
-        partij, created = self.vragen_service.get_or_create_partij_for_user(
-            fetch_params=self.vragen_service.get_fetch_parameters(user),
-            user=user,
-        )
+        partij, _ = self.vragen_service.get_or_create_partij_for_user(user)
 
         cleaned_data = form.cleaned_data
         question = cleaned_data["question"]
