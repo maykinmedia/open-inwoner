@@ -1,40 +1,40 @@
 interactions:
 - request:
-    body: '{"nummer": "0000000133", "kanaal": "organization", "onderwerp": "find",
-      "inhoud": "World trade get tree upon.", "taal": "nld", "indicatieContactGelukt":
-      false, "vertrouwelijk": false, "plaatsgevondenOp": "2018-09-28T14:15:14.871262"}'
+    body: '{"nummer": "0000000133", "kanaal": "heavy", "onderwerp": "meeting", "inhoud":
+      "White star Mrs allow party response.", "taal": "nld", "indicatieContactGelukt":
+      false, "vertrouwelijk": false, "plaatsgevondenOp": "2005-12-17T03:39:38.471655"}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '233'
+      - '239'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"cc8f037a-b16e-473a-8b1c-ff01ce3ddd2f","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/cc8f037a-b16e-473a-8b1c-ff01ce3ddd2f","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000133","kanaal":"organization","onderwerp":"find","inhoud":"World
-        trade get tree upon.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2018-09-28T14:15:14.871262Z"}'
+      string: '{"uuid":"784adf64-18c7-422e-b270-995ae468069f","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/784adf64-18c7-422e-b270-995ae468069f","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000133","kanaal":"heavy","onderwerp":"meeting","inhoud":"White
+        star Mrs allow party response.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2005-12-17T03:39:38.471655Z"}'
     headers:
       API-version:
       - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '495'
+      - '501'
       Content-Security-Policy:
-      - 'style-src ''self'' ''unsafe-inline'' fonts.googleapis.com; base-uri ''self'';
-        default-src ''self''; script-src ''self'' ''unsafe-inline''; object-src ''none'';
-        form-action ''self''; frame-ancestors ''none''; font-src ''self'' fonts.gstatic.com;
-        frame-src ''self''; img-src ''self'' data: cdn.redoc.ly; worker-src ''self''
-        blob:'
+      - 'default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        base-uri ''self''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; font-src ''self'' fonts.gstatic.com; img-src ''self''
+        data: cdn.redoc.ly; object-src ''none''; worker-src ''self'' blob:; form-action
+        ''self'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/cc8f037a-b16e-473a-8b1c-ff01ce3ddd2f
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/784adf64-18c7-422e-b270-995ae468069f
       Referrer-Policy:
       - same-origin
       Vary:
@@ -55,21 +55,21 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"cc8f037a-b16e-473a-8b1c-ff01ce3ddd2f","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/cc8f037a-b16e-473a-8b1c-ff01ce3ddd2f","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000133","kanaal":"organization","onderwerp":"find","inhoud":"World
-        trade get tree upon.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2018-09-28T14:15:14.871262Z","_expand":{}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"784adf64-18c7-422e-b270-995ae468069f","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/784adf64-18c7-422e-b270-995ae468069f","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000133","kanaal":"heavy","onderwerp":"meeting","inhoud":"White
+        star Mrs allow party response.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2005-12-17T03:39:38.471655Z","_expand":{}}]}'
     headers:
       API-version:
       - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '560'
+      - '566'
       Content-Security-Policy:
-      - 'style-src ''self'' ''unsafe-inline'' fonts.googleapis.com; base-uri ''self'';
-        default-src ''self''; script-src ''self'' ''unsafe-inline''; object-src ''none'';
-        form-action ''self''; frame-ancestors ''none''; font-src ''self'' fonts.gstatic.com;
-        frame-src ''self''; img-src ''self'' data: cdn.redoc.ly; worker-src ''self''
-        blob:'
+      - 'default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        base-uri ''self''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; font-src ''self'' fonts.gstatic.com; img-src ''self''
+        data: cdn.redoc.ly; object-src ''none''; worker-src ''self'' blob:; form-action
+        ''self'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
@@ -103,11 +103,11 @@ interactions:
       Content-Length:
       - '52'
       Content-Security-Policy:
-      - 'style-src ''self'' ''unsafe-inline'' fonts.googleapis.com; base-uri ''self'';
-        default-src ''self''; script-src ''self'' ''unsafe-inline''; object-src ''none'';
-        form-action ''self''; frame-ancestors ''none''; font-src ''self'' fonts.gstatic.com;
-        frame-src ''self''; img-src ''self'' data: cdn.redoc.ly; worker-src ''self''
-        blob:'
+      - 'default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        base-uri ''self''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; font-src ''self'' fonts.gstatic.com; img-src ''self''
+        data: cdn.redoc.ly; object-src ''none''; worker-src ''self'' blob:; form-action
+        ''self'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

@@ -16,7 +16,7 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/partijen
   response:
     body:
-      string: '{"uuid":"aa031740-bec1-4718-8dcf-b7ba2eaf6447","url":"http://localhost:8338/klantinteracties/api/v1/partijen/aa031740-bec1-4718-8dcf-b7ba2eaf6447","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"crp","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","straatnaam":"","huisnummer":null,"huisnummertoevoeging":"","postcode":"","stad":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","straatnaam":"","huisnummer":null,"huisnummertoevoeging":"","postcode":"","stad":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Dr.","voornaam":"Test
+      string: '{"uuid":"71ebd72b-8cd5-4a5c-b417-f90a51ed4f33","url":"http://localhost:8338/klantinteracties/api/v1/partijen/71ebd72b-8cd5-4a5c-b417-f90a51ed4f33","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"crp","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","straatnaam":"","huisnummer":null,"huisnummertoevoeging":"","postcode":"","stad":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","straatnaam":"","huisnummer":null,"huisnummertoevoeging":"","postcode":"","stad":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Dr.","voornaam":"Test
         Persoon","voorvoegselAchternaam":"Mrs.","achternaam":"Gamble"},"volledigeNaam":"Test
         Persoon Mrs. Gamble"}}'
     headers:
@@ -27,17 +27,17 @@ interactions:
       Content-Length:
       - '1045'
       Content-Security-Policy:
-      - 'style-src ''self'' ''unsafe-inline'' fonts.googleapis.com; base-uri ''self'';
-        default-src ''self''; script-src ''self'' ''unsafe-inline''; object-src ''none'';
-        form-action ''self''; frame-ancestors ''none''; font-src ''self'' fonts.gstatic.com;
-        frame-src ''self''; img-src ''self'' data: cdn.redoc.ly; worker-src ''self''
-        blob:'
+      - 'default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        base-uri ''self''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; font-src ''self'' fonts.gstatic.com; img-src ''self''
+        data: cdn.redoc.ly; object-src ''none''; worker-src ''self'' blob:; form-action
+        ''self'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/partijen/aa031740-bec1-4718-8dcf-b7ba2eaf6447
+      - http://localhost:8338/klantinteracties/api/v1/partijen/71ebd72b-8cd5-4a5c-b417-f90a51ed4f33
       Referrer-Policy:
       - same-origin
       Vary:
@@ -55,10 +55,10 @@ interactions:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
     method: GET
-    uri: http://localhost:8338/klantinteracties/api/v1/partijen/aa031740-bec1-4718-8dcf-b7ba2eaf6447?expand=betrokkenen.hadKlantcontact
+    uri: http://localhost:8338/klantinteracties/api/v1/partijen/71ebd72b-8cd5-4a5c-b417-f90a51ed4f33?expand=betrokkenen.hadKlantcontact
   response:
     body:
-      string: '{"uuid":"aa031740-bec1-4718-8dcf-b7ba2eaf6447","url":"http://localhost:8338/klantinteracties/api/v1/partijen/aa031740-bec1-4718-8dcf-b7ba2eaf6447","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"crp","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","straatnaam":"","huisnummer":null,"huisnummertoevoeging":"","postcode":"","stad":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","straatnaam":"","huisnummer":null,"huisnummertoevoeging":"","postcode":"","stad":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Dr.","voornaam":"Test
+      string: '{"uuid":"71ebd72b-8cd5-4a5c-b417-f90a51ed4f33","url":"http://localhost:8338/klantinteracties/api/v1/partijen/71ebd72b-8cd5-4a5c-b417-f90a51ed4f33","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"crp","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","straatnaam":"","huisnummer":null,"huisnummertoevoeging":"","postcode":"","stad":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","straatnaam":"","huisnummer":null,"huisnummertoevoeging":"","postcode":"","stad":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Dr.","voornaam":"Test
         Persoon","voorvoegselAchternaam":"Mrs.","achternaam":"Gamble"},"volledigeNaam":"Test
         Persoon Mrs. Gamble"}}'
     headers:
@@ -69,11 +69,11 @@ interactions:
       Content-Length:
       - '1045'
       Content-Security-Policy:
-      - 'style-src ''self'' ''unsafe-inline'' fonts.googleapis.com; base-uri ''self'';
-        default-src ''self''; script-src ''self'' ''unsafe-inline''; object-src ''none'';
-        form-action ''self''; frame-ancestors ''none''; font-src ''self'' fonts.gstatic.com;
-        frame-src ''self''; img-src ''self'' data: cdn.redoc.ly; worker-src ''self''
-        blob:'
+      - 'default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        base-uri ''self''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; font-src ''self'' fonts.gstatic.com; img-src ''self''
+        data: cdn.redoc.ly; object-src ''none''; worker-src ''self'' blob:; form-action
+        ''self'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

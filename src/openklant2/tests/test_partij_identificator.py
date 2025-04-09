@@ -34,6 +34,38 @@ def een_persoon(client) -> Partij:
 
 
 @pytest.fixture()
+def een_organisatie(client):
+    data = {
+        "digitaleAdressen": None,
+        "voorkeursDigitaalAdres": None,
+        "rekeningnummers": None,
+        "voorkeursRekeningnummer": None,
+        "indicatieGeheimhouding": False,
+        "indicatieActief": True,
+        "voorkeurstaal": "tiv",
+        "soortPartij": "organisatie",
+        "partijIdentificatie": {"naam": "Test Organisatie"},
+    }
+    return client.partij.create_organisatie(data=data)
+
+
+@pytest.fixture()
+def een_andere_organisatie(client):
+    data = {
+        "digitaleAdressen": None,
+        "voorkeursDigitaalAdres": None,
+        "rekeningnummers": None,
+        "voorkeursRekeningnummer": None,
+        "indicatieGeheimhouding": False,
+        "indicatieActief": True,
+        "voorkeurstaal": "tiv",
+        "soortPartij": "organisatie",
+        "partijIdentificatie": {"naam": "Andere Test Organisatie"},
+    }
+    return client.partij.create_organisatie(data=data)
+
+
+@pytest.fixture()
 def een_partij_identificator(client, een_persoon) -> Partij:
     data = {
         "identificeerdePartij": {"uuid": een_persoon["uuid"]},
@@ -42,6 +74,21 @@ def een_partij_identificator(client, een_persoon) -> Partij:
             "codeSoortObjectId": "bsn",
             "objectId": "631706549",
             "codeRegister": "brp",
+        },
+        "anderePartijIdentificator": "optional_identifier_123",
+    }
+    return client.partij_identificator.create(data=data)
+
+
+@pytest.fixture()
+def een_kvk_partij_identificator(client, een_organisatie) -> Partij:
+    data = {
+        "identificeerdePartij": {"uuid": een_organisatie["uuid"]},
+        "partijIdentificator": {
+            "codeObjecttype": "niet_natuurlijk_persoon",
+            "codeSoortObjectId": "kvk_nummer",
+            "objectId": "68750110",
+            "codeRegister": "hr",
         },
         "anderePartijIdentificator": "optional_identifier_123",
     }
@@ -60,6 +107,32 @@ def test_create_partij_identificator(client, een_persoon) -> None:
                 "codeRegister": "brp",
             },
             "anderePartijIdentificator": "optional_identifier_123",
+        }
+    )
+    resp = client.partij_identificator.create(
+        data=data,
+    )
+
+    PartijIdentificatorValidator.validate_python(resp)
+
+
+@pytest.mark.vcr
+def test_create_vestiging_identificator(
+    client, een_kvk_partij_identificator, een_andere_organisatie
+) -> None:
+    data = CreatePartijIdentificatorDataValidator.validate_python(
+        {
+            "identificeerdePartij": {"uuid": een_andere_organisatie["uuid"]},
+            "partijIdentificator": {
+                "codeObjecttype": "natuurlijk_persoon",
+                "codeSoortObjectId": "bsn",
+                "objectId": "631706549",
+                "codeRegister": "brp",
+            },
+            "anderePartijIdentificator": "optional_identifier_123",
+            "subIdentificatorVan": {
+                "uuid": een_kvk_partij_identificator["uuid"],
+            },
         }
     )
     resp = client.partij_identificator.create(

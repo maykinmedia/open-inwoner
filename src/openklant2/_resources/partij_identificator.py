@@ -16,6 +16,10 @@ class PartijIdentificatorResource(ResourceMixin):
     http_client: APIClient
     base_path: str = "partij-identificatoren"
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.list_iter = self._make_list_iter(self.list)
+
     def list(
         self, *, params: ListPartijIdentificatorenParams | None = None
     ) -> PaginatedResponseBody[PartijIdentificator]:

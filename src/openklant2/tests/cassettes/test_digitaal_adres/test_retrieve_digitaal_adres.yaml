@@ -2,41 +2,41 @@ interactions:
 - request:
     body: '{"digitaleAdressen": null, "voorkeursDigitaalAdres": null, "rekeningnummers":
       null, "voorkeursRekeningnummer": null, "indicatieGeheimhouding": false, "indicatieActief":
-      false, "voorkeurstaal": "mas", "soortPartij": "persoon", "partijIdentificatie":
-      {"contactnaam": {"voorletters": "Mx.", "voornaam": "Stephanie", "voorvoegselAchternaam":
-      "Mr.", "achternaam": "Carlson"}}}'
+      false, "voorkeurstaal": "mdf", "soortPartij": "persoon", "partijIdentificatie":
+      {"contactnaam": {"voorletters": "Mx.", "voornaam": "Michael", "voorvoegselAchternaam":
+      "Miss", "achternaam": "Taylor"}}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '371'
+      - '369'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/partijen
   response:
     body:
-      string: '{"uuid":"5f0836a1-58af-4569-b4fa-c4946fe48d50","url":"http://localhost:8338/klantinteracties/api/v1/partijen/5f0836a1-58af-4569-b4fa-c4946fe48d50","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"mas","indicatieActief":false,"bezoekadres":{"nummeraanduidingId":"","straatnaam":"","huisnummer":null,"huisnummertoevoeging":"","postcode":"","stad":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","straatnaam":"","huisnummer":null,"huisnummertoevoeging":"","postcode":"","stad":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Mx.","voornaam":"Stephanie","voorvoegselAchternaam":"Mr.","achternaam":"Carlson"},"volledigeNaam":"Stephanie
-        Mr. Carlson"}}'
+      string: '{"uuid":"9ec47f66-ff52-431b-a830-621ddc51b9a9","url":"http://localhost:8338/klantinteracties/api/v1/partijen/9ec47f66-ff52-431b-a830-621ddc51b9a9","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"mdf","indicatieActief":false,"bezoekadres":{"nummeraanduidingId":"","straatnaam":"","huisnummer":null,"huisnummertoevoeging":"","postcode":"","stad":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","straatnaam":"","huisnummer":null,"huisnummertoevoeging":"","postcode":"","stad":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Mx.","voornaam":"Michael","voorvoegselAchternaam":"Miss","achternaam":"Taylor"},"volledigeNaam":"Michael
+        Miss Taylor"}}'
     headers:
       API-version:
       - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '1040'
+      - '1036'
       Content-Security-Policy:
-      - 'style-src ''self'' ''unsafe-inline'' fonts.googleapis.com; base-uri ''self'';
-        default-src ''self''; script-src ''self'' ''unsafe-inline''; object-src ''none'';
-        form-action ''self''; frame-ancestors ''none''; font-src ''self'' fonts.gstatic.com;
-        frame-src ''self''; img-src ''self'' data: cdn.redoc.ly; worker-src ''self''
-        blob:'
+      - 'default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        base-uri ''self''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; font-src ''self'' fonts.gstatic.com; img-src ''self''
+        data: cdn.redoc.ly; object-src ''none''; worker-src ''self'' blob:; form-action
+        ''self'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/partijen/5f0836a1-58af-4569-b4fa-c4946fe48d50
+      - http://localhost:8338/klantinteracties/api/v1/partijen/9ec47f66-ff52-431b-a830-621ddc51b9a9
       Referrer-Policy:
       - same-origin
       Vary:
@@ -49,41 +49,41 @@ interactions:
       code: 201
       message: Created
 - request:
-    body: '{"adres": "Melissabaan 150\n7207 HX\nTjalhuizum", "omschrijving": "apply",
+    body: '{"adres": "Mehmetsingel 759\n4152 LJ\nScheerwolde", "omschrijving": "unit",
       "soortDigitaalAdres": "overig", "verstrektDoorBetrokkene": null, "verstrektDoorPartij":
-      {"uuid": "5f0836a1-58af-4569-b4fa-c4946fe48d50"}}'
+      {"uuid": "9ec47f66-ff52-431b-a830-621ddc51b9a9"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '212'
+      - '213'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/digitaleadressen
   response:
     body:
-      string: '{"uuid":"244141f9-ab0e-42e4-b2f6-cccb4225d67c","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/244141f9-ab0e-42e4-b2f6-cccb4225d67c","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"5f0836a1-58af-4569-b4fa-c4946fe48d50","url":"http://localhost:8338/klantinteracties/api/v1/partijen/5f0836a1-58af-4569-b4fa-c4946fe48d50"},"adres":"Melissabaan
-        150\n7207 HX\nTjalhuizum","soortDigitaalAdres":"overig","isStandaardAdres":false,"omschrijving":"apply"}'
+      string: '{"uuid":"30450a97-481f-41cf-aca4-2ec8a9c01cbd","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/30450a97-481f-41cf-aca4-2ec8a9c01cbd","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"9ec47f66-ff52-431b-a830-621ddc51b9a9","url":"http://localhost:8338/klantinteracties/api/v1/partijen/9ec47f66-ff52-431b-a830-621ddc51b9a9"},"adres":"Mehmetsingel
+        759\n4152 LJ\nScheerwolde","soortDigitaalAdres":"overig","isStandaardAdres":false,"omschrijving":"unit"}'
     headers:
       API-version:
       - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '481'
+      - '482'
       Content-Security-Policy:
-      - 'style-src ''self'' ''unsafe-inline'' fonts.googleapis.com; base-uri ''self'';
-        default-src ''self''; script-src ''self'' ''unsafe-inline''; object-src ''none'';
-        form-action ''self''; frame-ancestors ''none''; font-src ''self'' fonts.gstatic.com;
-        frame-src ''self''; img-src ''self'' data: cdn.redoc.ly; worker-src ''self''
-        blob:'
+      - 'default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        base-uri ''self''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; font-src ''self'' fonts.gstatic.com; img-src ''self''
+        data: cdn.redoc.ly; object-src ''none''; worker-src ''self'' blob:; form-action
+        ''self'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/digitaleadressen/244141f9-ab0e-42e4-b2f6-cccb4225d67c
+      - http://localhost:8338/klantinteracties/api/v1/digitaleadressen/30450a97-481f-41cf-aca4-2ec8a9c01cbd
       Referrer-Policy:
       - same-origin
       Vary:
@@ -101,24 +101,24 @@ interactions:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
     method: GET
-    uri: http://localhost:8338/klantinteracties/api/v1/digitaleadressen/244141f9-ab0e-42e4-b2f6-cccb4225d67c
+    uri: http://localhost:8338/klantinteracties/api/v1/digitaleadressen/30450a97-481f-41cf-aca4-2ec8a9c01cbd
   response:
     body:
-      string: '{"uuid":"244141f9-ab0e-42e4-b2f6-cccb4225d67c","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/244141f9-ab0e-42e4-b2f6-cccb4225d67c","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"5f0836a1-58af-4569-b4fa-c4946fe48d50","url":"http://localhost:8338/klantinteracties/api/v1/partijen/5f0836a1-58af-4569-b4fa-c4946fe48d50"},"adres":"Melissabaan
-        150\n7207 HX\nTjalhuizum","soortDigitaalAdres":"overig","isStandaardAdres":false,"omschrijving":"apply"}'
+      string: '{"uuid":"30450a97-481f-41cf-aca4-2ec8a9c01cbd","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/30450a97-481f-41cf-aca4-2ec8a9c01cbd","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"9ec47f66-ff52-431b-a830-621ddc51b9a9","url":"http://localhost:8338/klantinteracties/api/v1/partijen/9ec47f66-ff52-431b-a830-621ddc51b9a9"},"adres":"Mehmetsingel
+        759\n4152 LJ\nScheerwolde","soortDigitaalAdres":"overig","isStandaardAdres":false,"omschrijving":"unit"}'
     headers:
       API-version:
       - 0.1.2
       Allow:
       - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
       Content-Length:
-      - '481'
+      - '482'
       Content-Security-Policy:
-      - 'style-src ''self'' ''unsafe-inline'' fonts.googleapis.com; base-uri ''self'';
-        default-src ''self''; script-src ''self'' ''unsafe-inline''; object-src ''none'';
-        form-action ''self''; frame-ancestors ''none''; font-src ''self'' fonts.gstatic.com;
-        frame-src ''self''; img-src ''self'' data: cdn.redoc.ly; worker-src ''self''
-        blob:'
+      - 'default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        base-uri ''self''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; font-src ''self'' fonts.gstatic.com; img-src ''self''
+        data: cdn.redoc.ly; object-src ''none''; worker-src ''self'' blob:; form-action
+        ''self'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

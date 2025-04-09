@@ -1,42 +1,42 @@
 interactions:
 - request:
     body: '{"digitaleAdressen": null, "voorkeursDigitaalAdres": null, "rekeningnummers":
-      null, "voorkeursRekeningnummer": null, "indicatieGeheimhouding": true, "indicatieActief":
-      false, "voorkeurstaal": "lua", "soortPartij": "persoon", "partijIdentificatie":
-      {"contactnaam": {"voorletters": "Mr.", "voornaam": "Kimberly", "voorvoegselAchternaam":
-      "Mx.", "achternaam": "Lucas"}}}'
+      null, "voorkeursRekeningnummer": null, "indicatieGeheimhouding": false, "indicatieActief":
+      true, "voorkeurstaal": "dan", "soortPartij": "persoon", "partijIdentificatie":
+      {"contactnaam": {"voorletters": "Mrs.", "voornaam": "Nicolas", "voorvoegselAchternaam":
+      "Mx.", "achternaam": "Sparks"}}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '367'
+      - '368'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/partijen
   response:
     body:
-      string: '{"uuid":"22fbff4a-3199-4fdf-842f-fb2ae8d59dde","url":"http://localhost:8338/klantinteracties/api/v1/partijen/22fbff4a-3199-4fdf-842f-fb2ae8d59dde","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":true,"voorkeurstaal":"lua","indicatieActief":false,"bezoekadres":{"nummeraanduidingId":"","straatnaam":"","huisnummer":null,"huisnummertoevoeging":"","postcode":"","stad":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","straatnaam":"","huisnummer":null,"huisnummertoevoeging":"","postcode":"","stad":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Mr.","voornaam":"Kimberly","voorvoegselAchternaam":"Mx.","achternaam":"Lucas"},"volledigeNaam":"Kimberly
-        Mx. Lucas"}}'
+      string: '{"uuid":"3e524856-cfdc-4594-b073-4fb0329ee5bf","url":"http://localhost:8338/klantinteracties/api/v1/partijen/3e524856-cfdc-4594-b073-4fb0329ee5bf","nummer":"0000000001","interneNotitie":"","betrokkenen":[],"categorieRelaties":[],"digitaleAdressen":[],"voorkeursDigitaalAdres":null,"vertegenwoordigden":[],"rekeningnummers":[],"voorkeursRekeningnummer":null,"partijIdentificatoren":[],"soortPartij":"persoon","indicatieGeheimhouding":false,"voorkeurstaal":"dan","indicatieActief":true,"bezoekadres":{"nummeraanduidingId":"","straatnaam":"","huisnummer":null,"huisnummertoevoeging":"","postcode":"","stad":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"correspondentieadres":{"nummeraanduidingId":"","straatnaam":"","huisnummer":null,"huisnummertoevoeging":"","postcode":"","stad":"","adresregel1":"","adresregel2":"","adresregel3":"","land":""},"partijIdentificatie":{"contactnaam":{"voorletters":"Mrs.","voornaam":"Nicolas","voorvoegselAchternaam":"Mx.","achternaam":"Sparks"},"volledigeNaam":"Nicolas
+        Mx. Sparks"}}'
     headers:
       API-version:
       - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '1033'
+      - '1034'
       Content-Security-Policy:
-      - 'style-src ''self'' ''unsafe-inline'' fonts.googleapis.com; base-uri ''self'';
-        default-src ''self''; script-src ''self'' ''unsafe-inline''; object-src ''none'';
-        form-action ''self''; frame-ancestors ''none''; font-src ''self'' fonts.gstatic.com;
-        frame-src ''self''; img-src ''self'' data: cdn.redoc.ly; worker-src ''self''
-        blob:'
+      - 'default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        base-uri ''self''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; font-src ''self'' fonts.gstatic.com; img-src ''self''
+        data: cdn.redoc.ly; object-src ''none''; worker-src ''self'' blob:; form-action
+        ''self'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/partijen/22fbff4a-3199-4fdf-842f-fb2ae8d59dde
+      - http://localhost:8338/klantinteracties/api/v1/partijen/3e524856-cfdc-4594-b073-4fb0329ee5bf
       Referrer-Policy:
       - same-origin
       Vary:
@@ -49,41 +49,41 @@ interactions:
       code: 201
       message: Created
 - request:
-    body: '{"adres": "Fatimapad 9\n2646 JE\nWinterswijk Meddo", "omschrijving": "record",
+    body: '{"adres": "Emirweg 534\n2947 OX\nUlvenhout AC", "omschrijving": "allow",
       "soortDigitaalAdres": "overig", "verstrektDoorBetrokkene": null, "verstrektDoorPartij":
-      {"uuid": "22fbff4a-3199-4fdf-842f-fb2ae8d59dde"}}'
+      {"uuid": "3e524856-cfdc-4594-b073-4fb0329ee5bf"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '216'
+      - '210'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/digitaleadressen
   response:
     body:
-      string: '{"uuid":"08c4cc5f-f003-4199-98cd-80885e2e104a","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/08c4cc5f-f003-4199-98cd-80885e2e104a","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"22fbff4a-3199-4fdf-842f-fb2ae8d59dde","url":"http://localhost:8338/klantinteracties/api/v1/partijen/22fbff4a-3199-4fdf-842f-fb2ae8d59dde"},"adres":"Fatimapad
-        9\n2646 JE\nWinterswijk Meddo","soortDigitaalAdres":"overig","isStandaardAdres":false,"omschrijving":"record"}'
+      string: '{"uuid":"bb4ee4a3-55b0-4526-9548-f5c247c50237","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/bb4ee4a3-55b0-4526-9548-f5c247c50237","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"3e524856-cfdc-4594-b073-4fb0329ee5bf","url":"http://localhost:8338/klantinteracties/api/v1/partijen/3e524856-cfdc-4594-b073-4fb0329ee5bf"},"adres":"Emirweg
+        534\n2947 OX\nUlvenhout AC","soortDigitaalAdres":"overig","isStandaardAdres":false,"omschrijving":"allow"}'
     headers:
       API-version:
       - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '485'
+      - '479'
       Content-Security-Policy:
-      - 'style-src ''self'' ''unsafe-inline'' fonts.googleapis.com; base-uri ''self'';
-        default-src ''self''; script-src ''self'' ''unsafe-inline''; object-src ''none'';
-        form-action ''self''; frame-ancestors ''none''; font-src ''self'' fonts.gstatic.com;
-        frame-src ''self''; img-src ''self'' data: cdn.redoc.ly; worker-src ''self''
-        blob:'
+      - 'default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        base-uri ''self''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; font-src ''self'' fonts.gstatic.com; img-src ''self''
+        data: cdn.redoc.ly; object-src ''none''; worker-src ''self'' blob:; form-action
+        ''self'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/digitaleadressen/08c4cc5f-f003-4199-98cd-80885e2e104a
+      - http://localhost:8338/klantinteracties/api/v1/digitaleadressen/bb4ee4a3-55b0-4526-9548-f5c247c50237
       Referrer-Policy:
       - same-origin
       Vary:
@@ -104,21 +104,21 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/digitaleadressen
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"08c4cc5f-f003-4199-98cd-80885e2e104a","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/08c4cc5f-f003-4199-98cd-80885e2e104a","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"22fbff4a-3199-4fdf-842f-fb2ae8d59dde","url":"http://localhost:8338/klantinteracties/api/v1/partijen/22fbff4a-3199-4fdf-842f-fb2ae8d59dde"},"adres":"Fatimapad
-        9\n2646 JE\nWinterswijk Meddo","soortDigitaalAdres":"overig","isStandaardAdres":false,"omschrijving":"record","_expand":{}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"bb4ee4a3-55b0-4526-9548-f5c247c50237","url":"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/bb4ee4a3-55b0-4526-9548-f5c247c50237","verstrektDoorBetrokkene":null,"verstrektDoorPartij":{"uuid":"3e524856-cfdc-4594-b073-4fb0329ee5bf","url":"http://localhost:8338/klantinteracties/api/v1/partijen/3e524856-cfdc-4594-b073-4fb0329ee5bf"},"adres":"Emirweg
+        534\n2947 OX\nUlvenhout AC","soortDigitaalAdres":"overig","isStandaardAdres":false,"omschrijving":"allow","_expand":{}}]}'
     headers:
       API-version:
       - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '550'
+      - '544'
       Content-Security-Policy:
-      - 'style-src ''self'' ''unsafe-inline'' fonts.googleapis.com; base-uri ''self'';
-        default-src ''self''; script-src ''self'' ''unsafe-inline''; object-src ''none'';
-        form-action ''self''; frame-ancestors ''none''; font-src ''self'' fonts.gstatic.com;
-        frame-src ''self''; img-src ''self'' data: cdn.redoc.ly; worker-src ''self''
-        blob:'
+      - 'default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        base-uri ''self''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; font-src ''self'' fonts.gstatic.com; img-src ''self''
+        data: cdn.redoc.ly; object-src ''none''; worker-src ''self'' blob:; form-action
+        ''self'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

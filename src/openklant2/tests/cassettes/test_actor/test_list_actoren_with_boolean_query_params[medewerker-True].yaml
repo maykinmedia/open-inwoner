@@ -1,40 +1,40 @@
 interactions:
 - request:
-    body: '{"naam": "Jordan Harris", "soortActor": "medewerker", "indicatieActief":
-      false, "actoridentificator": {"objectId": "0000000007", "codeObjecttype": "land",
-      "codeRegister": "per", "codeSoortObjectId": "way"}}'
+    body: '{"naam": "Jonathan Weeks", "soortActor": "geautomatiseerde_actor", "indicatieActief":
+      false, "actoridentificator": {"objectId": "0000000007", "codeObjecttype": "recognize",
+      "codeRegister": "others", "codeSoortObjectId": "tough"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '206'
+      - '229'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/actoren
   response:
     body:
-      string: '{"uuid":"2b9eb6de-511a-4b2a-95d0-0cc702579412","url":"http://localhost:8338/klantinteracties/api/v1/actoren/2b9eb6de-511a-4b2a-95d0-0cc702579412","naam":"Jordan
-        Harris","soortActor":"medewerker","indicatieActief":false,"actoridentificator":{"objectId":"0000000007","codeObjecttype":"land","codeRegister":"per","codeSoortObjectId":"way"},"actorIdentificatie":null}'
+      string: '{"uuid":"ef638f9f-14ad-4f16-9c87-7843bc914a3e","url":"http://localhost:8338/klantinteracties/api/v1/actoren/ef638f9f-14ad-4f16-9c87-7843bc914a3e","naam":"Jonathan
+        Weeks","soortActor":"geautomatiseerde_actor","indicatieActief":false,"actoridentificator":{"objectId":"0000000007","codeObjecttype":"recognize","codeRegister":"others","codeSoortObjectId":"tough"},"actorIdentificatie":null}'
     headers:
       API-version:
       - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '363'
+      - '386'
       Content-Security-Policy:
-      - 'style-src ''self'' ''unsafe-inline'' fonts.googleapis.com; base-uri ''self'';
-        default-src ''self''; script-src ''self'' ''unsafe-inline''; object-src ''none'';
-        form-action ''self''; frame-ancestors ''none''; font-src ''self'' fonts.gstatic.com;
-        frame-src ''self''; img-src ''self'' data: cdn.redoc.ly; worker-src ''self''
-        blob:'
+      - 'default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        base-uri ''self''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; font-src ''self'' fonts.gstatic.com; img-src ''self''
+        data: cdn.redoc.ly; object-src ''none''; worker-src ''self'' blob:; form-action
+        ''self'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/2b9eb6de-511a-4b2a-95d0-0cc702579412
+      - http://localhost:8338/klantinteracties/api/v1/actoren/ef638f9f-14ad-4f16-9c87-7843bc914a3e
       Referrer-Policy:
       - same-origin
       Vary:
@@ -47,41 +47,41 @@ interactions:
       code: 201
       message: Created
 - request:
-    body: '{"naam": "Jessica Campbell", "soortActor": "organisatorische_eenheid",
-      "indicatieActief": false, "actoridentificator": {"objectId": "0000000008", "codeObjecttype":
-      "interest", "codeRegister": "option", "codeSoortObjectId": "argue"}}'
+    body: '{"naam": "Heather Brooks", "soortActor": "geautomatiseerde_actor", "indicatieActief":
+      false, "actoridentificator": {"objectId": "0000000008", "codeObjecttype": "across",
+      "codeRegister": "discuss", "codeSoortObjectId": "fly"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '232'
+      - '225'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/actoren
   response:
     body:
-      string: '{"uuid":"635bd722-4745-4693-8379-c26d18b65eb2","url":"http://localhost:8338/klantinteracties/api/v1/actoren/635bd722-4745-4693-8379-c26d18b65eb2","naam":"Jessica
-        Campbell","soortActor":"organisatorische_eenheid","indicatieActief":false,"actoridentificator":{"objectId":"0000000008","codeObjecttype":"interest","codeRegister":"option","codeSoortObjectId":"argue"},"actorIdentificatie":null}'
+      string: '{"uuid":"349e8349-77af-4a35-8608-130f29c4baa4","url":"http://localhost:8338/klantinteracties/api/v1/actoren/349e8349-77af-4a35-8608-130f29c4baa4","naam":"Heather
+        Brooks","soortActor":"geautomatiseerde_actor","indicatieActief":false,"actoridentificator":{"objectId":"0000000008","codeObjecttype":"across","codeRegister":"discuss","codeSoortObjectId":"fly"},"actorIdentificatie":null}'
     headers:
       API-version:
       - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '389'
+      - '382'
       Content-Security-Policy:
-      - 'style-src ''self'' ''unsafe-inline'' fonts.googleapis.com; base-uri ''self'';
-        default-src ''self''; script-src ''self'' ''unsafe-inline''; object-src ''none'';
-        form-action ''self''; frame-ancestors ''none''; font-src ''self'' fonts.gstatic.com;
-        frame-src ''self''; img-src ''self'' data: cdn.redoc.ly; worker-src ''self''
-        blob:'
+      - 'default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        base-uri ''self''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; font-src ''self'' fonts.gstatic.com; img-src ''self''
+        data: cdn.redoc.ly; object-src ''none''; worker-src ''self'' blob:; form-action
+        ''self'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/635bd722-4745-4693-8379-c26d18b65eb2
+      - http://localhost:8338/klantinteracties/api/v1/actoren/349e8349-77af-4a35-8608-130f29c4baa4
       Referrer-Policy:
       - same-origin
       Vary:
@@ -94,41 +94,41 @@ interactions:
       code: 201
       message: Created
 - request:
-    body: '{"naam": "Michael Murphy", "soortActor": "medewerker", "indicatieActief":
-      true, "actoridentificator": {"objectId": "0000000009", "codeObjecttype": "theory",
-      "codeRegister": "five", "codeSoortObjectId": "discussion"}}'
+    body: '{"naam": "Joshua Pena", "soortActor": "medewerker", "indicatieActief":
+      true, "actoridentificator": {"objectId": "0000000009", "codeObjecttype": "soldier",
+      "codeRegister": "security", "codeSoortObjectId": "reflect"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '216'
+      - '215'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/actoren
   response:
     body:
-      string: '{"uuid":"830f82fc-d3ee-43d6-82d8-8f334050b72d","url":"http://localhost:8338/klantinteracties/api/v1/actoren/830f82fc-d3ee-43d6-82d8-8f334050b72d","naam":"Michael
-        Murphy","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000009","codeObjecttype":"theory","codeRegister":"five","codeSoortObjectId":"discussion"},"actorIdentificatie":null}'
+      string: '{"uuid":"8c8d53c9-70a4-4b6d-9314-b2517f075a56","url":"http://localhost:8338/klantinteracties/api/v1/actoren/8c8d53c9-70a4-4b6d-9314-b2517f075a56","naam":"Joshua
+        Pena","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000009","codeObjecttype":"soldier","codeRegister":"security","codeSoortObjectId":"reflect"},"actorIdentificatie":null}'
     headers:
       API-version:
       - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '373'
+      - '372'
       Content-Security-Policy:
-      - 'style-src ''self'' ''unsafe-inline'' fonts.googleapis.com; base-uri ''self'';
-        default-src ''self''; script-src ''self'' ''unsafe-inline''; object-src ''none'';
-        form-action ''self''; frame-ancestors ''none''; font-src ''self'' fonts.gstatic.com;
-        frame-src ''self''; img-src ''self'' data: cdn.redoc.ly; worker-src ''self''
-        blob:'
+      - 'default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        base-uri ''self''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; font-src ''self'' fonts.gstatic.com; img-src ''self''
+        data: cdn.redoc.ly; object-src ''none''; worker-src ''self'' blob:; form-action
+        ''self'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/830f82fc-d3ee-43d6-82d8-8f334050b72d
+      - http://localhost:8338/klantinteracties/api/v1/actoren/8c8d53c9-70a4-4b6d-9314-b2517f075a56
       Referrer-Policy:
       - same-origin
       Vary:
@@ -149,21 +149,21 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/actoren?indicatieActief=True&soortActor=medewerker
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"830f82fc-d3ee-43d6-82d8-8f334050b72d","url":"http://localhost:8338/klantinteracties/api/v1/actoren/830f82fc-d3ee-43d6-82d8-8f334050b72d","naam":"Michael
-        Murphy","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000009","codeObjecttype":"theory","codeRegister":"five","codeSoortObjectId":"discussion"},"actorIdentificatie":null}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"8c8d53c9-70a4-4b6d-9314-b2517f075a56","url":"http://localhost:8338/klantinteracties/api/v1/actoren/8c8d53c9-70a4-4b6d-9314-b2517f075a56","naam":"Joshua
+        Pena","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000009","codeObjecttype":"soldier","codeRegister":"security","codeSoortObjectId":"reflect"},"actorIdentificatie":null}]}'
     headers:
       API-version:
       - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '425'
+      - '424'
       Content-Security-Policy:
-      - 'style-src ''self'' ''unsafe-inline'' fonts.googleapis.com; base-uri ''self'';
-        default-src ''self''; script-src ''self'' ''unsafe-inline''; object-src ''none'';
-        form-action ''self''; frame-ancestors ''none''; font-src ''self'' fonts.gstatic.com;
-        frame-src ''self''; img-src ''self'' data: cdn.redoc.ly; worker-src ''self''
-        blob:'
+      - 'default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        base-uri ''self''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; font-src ''self'' fonts.gstatic.com; img-src ''self''
+        data: cdn.redoc.ly; object-src ''none''; worker-src ''self'' blob:; form-action
+        ''self'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

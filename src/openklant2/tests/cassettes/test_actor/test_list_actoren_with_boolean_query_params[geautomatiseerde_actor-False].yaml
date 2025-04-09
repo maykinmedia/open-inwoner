@@ -1,55 +1,8 @@
 interactions:
 - request:
-    body: '{"naam": "Gregory Cook", "soortActor": "medewerker", "indicatieActief":
-      true, "actoridentificator": {"objectId": "0000000016", "codeObjecttype": "how",
-      "codeRegister": "professor", "codeSoortObjectId": "tax"}}'
-    headers:
-      Authorization:
-      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
-      Content-Length:
-      - '209'
-      Content-Type:
-      - application/json
-    method: POST
-    uri: http://localhost:8338/klantinteracties/api/v1/actoren
-  response:
-    body:
-      string: '{"uuid":"b18561a2-8852-4b1f-84b8-0065e497d93d","url":"http://localhost:8338/klantinteracties/api/v1/actoren/b18561a2-8852-4b1f-84b8-0065e497d93d","naam":"Gregory
-        Cook","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000016","codeObjecttype":"how","codeRegister":"professor","codeSoortObjectId":"tax"},"actorIdentificatie":null}'
-    headers:
-      API-version:
-      - 0.1.2
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Content-Length:
-      - '366'
-      Content-Security-Policy:
-      - 'style-src ''self'' ''unsafe-inline'' fonts.googleapis.com; base-uri ''self'';
-        default-src ''self''; script-src ''self'' ''unsafe-inline''; object-src ''none'';
-        form-action ''self''; frame-ancestors ''none''; font-src ''self'' fonts.gstatic.com;
-        frame-src ''self''; img-src ''self'' data: cdn.redoc.ly; worker-src ''self''
-        blob:'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/b18561a2-8852-4b1f-84b8-0065e497d93d
-      Referrer-Policy:
-      - same-origin
-      Vary:
-      - origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 201
-      message: Created
-- request:
-    body: '{"naam": "David Davis", "soortActor": "organisatorische_eenheid", "indicatieActief":
-      true, "actoridentificator": {"objectId": "0000000017", "codeObjecttype": "picture",
-      "codeRegister": "push", "codeSoortObjectId": "fund"}}'
+    body: '{"naam": "Kenneth Bass", "soortActor": "organisatorische_eenheid", "indicatieActief":
+      true, "actoridentificator": {"objectId": "0000000016", "codeObjecttype": "their",
+      "codeRegister": "gas", "codeSoortObjectId": "always"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
@@ -61,8 +14,8 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/actoren
   response:
     body:
-      string: '{"uuid":"3e3610b1-1794-4857-96c5-95f46aa7afcc","url":"http://localhost:8338/klantinteracties/api/v1/actoren/3e3610b1-1794-4857-96c5-95f46aa7afcc","naam":"David
-        Davis","soortActor":"organisatorische_eenheid","indicatieActief":true,"actoridentificator":{"objectId":"0000000017","codeObjecttype":"picture","codeRegister":"push","codeSoortObjectId":"fund"},"actorIdentificatie":null}'
+      string: '{"uuid":"4298f80d-a026-4e24-85a4-ecf820e523ed","url":"http://localhost:8338/klantinteracties/api/v1/actoren/4298f80d-a026-4e24-85a4-ecf820e523ed","naam":"Kenneth
+        Bass","soortActor":"organisatorische_eenheid","indicatieActief":true,"actoridentificator":{"objectId":"0000000016","codeObjecttype":"their","codeRegister":"gas","codeSoortObjectId":"always"},"actorIdentificatie":null}'
     headers:
       API-version:
       - 0.1.2
@@ -71,17 +24,17 @@ interactions:
       Content-Length:
       - '379'
       Content-Security-Policy:
-      - 'style-src ''self'' ''unsafe-inline'' fonts.googleapis.com; base-uri ''self'';
-        default-src ''self''; script-src ''self'' ''unsafe-inline''; object-src ''none'';
-        form-action ''self''; frame-ancestors ''none''; font-src ''self'' fonts.gstatic.com;
-        frame-src ''self''; img-src ''self'' data: cdn.redoc.ly; worker-src ''self''
-        blob:'
+      - 'default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        base-uri ''self''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; font-src ''self'' fonts.gstatic.com; img-src ''self''
+        data: cdn.redoc.ly; object-src ''none''; worker-src ''self'' blob:; form-action
+        ''self'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/3e3610b1-1794-4857-96c5-95f46aa7afcc
+      - http://localhost:8338/klantinteracties/api/v1/actoren/4298f80d-a026-4e24-85a4-ecf820e523ed
       Referrer-Policy:
       - same-origin
       Vary:
@@ -94,41 +47,88 @@ interactions:
       code: 201
       message: Created
 - request:
-    body: '{"naam": "Danielle Jones", "soortActor": "geautomatiseerde_actor", "indicatieActief":
-      false, "actoridentificator": {"objectId": "0000000018", "codeObjecttype": "red",
-      "codeRegister": "when", "codeSoortObjectId": "add"}}'
+    body: '{"naam": "Annette Perez", "soortActor": "geautomatiseerde_actor", "indicatieActief":
+      true, "actoridentificator": {"objectId": "0000000017", "codeObjecttype": "note",
+      "codeRegister": "away", "codeSoortObjectId": "environmental"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '219'
+      - '228'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/actoren
   response:
     body:
-      string: '{"uuid":"cb338ef8-6793-4e4b-b5d6-1a4ffa0c2882","url":"http://localhost:8338/klantinteracties/api/v1/actoren/cb338ef8-6793-4e4b-b5d6-1a4ffa0c2882","naam":"Danielle
-        Jones","soortActor":"geautomatiseerde_actor","indicatieActief":false,"actoridentificator":{"objectId":"0000000018","codeObjecttype":"red","codeRegister":"when","codeSoortObjectId":"add"},"actorIdentificatie":null}'
+      string: '{"uuid":"cdd966bd-90c7-42cf-a68a-48ebd21e1f1d","url":"http://localhost:8338/klantinteracties/api/v1/actoren/cdd966bd-90c7-42cf-a68a-48ebd21e1f1d","naam":"Annette
+        Perez","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000017","codeObjecttype":"note","codeRegister":"away","codeSoortObjectId":"environmental"},"actorIdentificatie":null}'
     headers:
       API-version:
       - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '376'
+      - '385'
       Content-Security-Policy:
-      - 'style-src ''self'' ''unsafe-inline'' fonts.googleapis.com; base-uri ''self'';
-        default-src ''self''; script-src ''self'' ''unsafe-inline''; object-src ''none'';
-        form-action ''self''; frame-ancestors ''none''; font-src ''self'' fonts.gstatic.com;
-        frame-src ''self''; img-src ''self'' data: cdn.redoc.ly; worker-src ''self''
-        blob:'
+      - 'default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        base-uri ''self''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; font-src ''self'' fonts.gstatic.com; img-src ''self''
+        data: cdn.redoc.ly; object-src ''none''; worker-src ''self'' blob:; form-action
+        ''self'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/cb338ef8-6793-4e4b-b5d6-1a4ffa0c2882
+      - http://localhost:8338/klantinteracties/api/v1/actoren/cdd966bd-90c7-42cf-a68a-48ebd21e1f1d
+      Referrer-Policy:
+      - same-origin
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"naam": "Allison Oconnell", "soortActor": "geautomatiseerde_actor", "indicatieActief":
+      false, "actoridentificator": {"objectId": "0000000018", "codeObjecttype": "thought",
+      "codeRegister": "about", "codeSoortObjectId": "his"}}'
+    headers:
+      Authorization:
+      - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
+      Content-Length:
+      - '226'
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren
+  response:
+    body:
+      string: '{"uuid":"ac883f86-48a2-4920-92bd-3c23c1869d29","url":"http://localhost:8338/klantinteracties/api/v1/actoren/ac883f86-48a2-4920-92bd-3c23c1869d29","naam":"Allison
+        Oconnell","soortActor":"geautomatiseerde_actor","indicatieActief":false,"actoridentificator":{"objectId":"0000000018","codeObjecttype":"thought","codeRegister":"about","codeSoortObjectId":"his"},"actorIdentificatie":null}'
+    headers:
+      API-version:
+      - 0.1.2
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Content-Length:
+      - '383'
+      Content-Security-Policy:
+      - 'default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        base-uri ''self''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; font-src ''self'' fonts.gstatic.com; img-src ''self''
+        data: cdn.redoc.ly; object-src ''none''; worker-src ''self'' blob:; form-action
+        ''self'''
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Location:
+      - http://localhost:8338/klantinteracties/api/v1/actoren/ac883f86-48a2-4920-92bd-3c23c1869d29
       Referrer-Policy:
       - same-origin
       Vary:
@@ -149,21 +149,21 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/actoren?indicatieActief=False&soortActor=geautomatiseerde_actor
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"cb338ef8-6793-4e4b-b5d6-1a4ffa0c2882","url":"http://localhost:8338/klantinteracties/api/v1/actoren/cb338ef8-6793-4e4b-b5d6-1a4ffa0c2882","naam":"Danielle
-        Jones","soortActor":"geautomatiseerde_actor","indicatieActief":false,"actoridentificator":{"objectId":"0000000018","codeObjecttype":"red","codeRegister":"when","codeSoortObjectId":"add"},"actorIdentificatie":null}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"ac883f86-48a2-4920-92bd-3c23c1869d29","url":"http://localhost:8338/klantinteracties/api/v1/actoren/ac883f86-48a2-4920-92bd-3c23c1869d29","naam":"Allison
+        Oconnell","soortActor":"geautomatiseerde_actor","indicatieActief":false,"actoridentificator":{"objectId":"0000000018","codeObjecttype":"thought","codeRegister":"about","codeSoortObjectId":"his"},"actorIdentificatie":null}]}'
     headers:
       API-version:
       - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '428'
+      - '435'
       Content-Security-Policy:
-      - 'style-src ''self'' ''unsafe-inline'' fonts.googleapis.com; base-uri ''self'';
-        default-src ''self''; script-src ''self'' ''unsafe-inline''; object-src ''none'';
-        form-action ''self''; frame-ancestors ''none''; font-src ''self'' fonts.gstatic.com;
-        frame-src ''self''; img-src ''self'' data: cdn.redoc.ly; worker-src ''self''
-        blob:'
+      - 'default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        base-uri ''self''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; font-src ''self'' fonts.gstatic.com; img-src ''self''
+        data: cdn.redoc.ly; object-src ''none''; worker-src ''self'' blob:; form-action
+        ''self'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

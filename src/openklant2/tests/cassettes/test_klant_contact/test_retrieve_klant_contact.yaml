@@ -1,40 +1,40 @@
 interactions:
 - request:
-    body: '{"nummer": "0000000112", "kanaal": "simple", "onderwerp": "ground", "inhoud":
-      "Word sort finish staff sister part loss.", "taal": "nld", "indicatieContactGelukt":
-      null, "vertrouwelijk": false, "plaatsgevondenOp": "2005-11-02T07:39:13.948219"}'
+    body: '{"nummer": "0000000112", "kanaal": "natural", "onderwerp": "method", "inhoud":
+      "In television very movement direction him base.", "taal": "nld", "indicatieContactGelukt":
+      null, "vertrouwelijk": true, "plaatsgevondenOp": "1995-11-30T04:03:59.543414"}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '242'
+      - '249'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"8323ca57-4df8-4b0d-b92c-4e9f097e0638","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/8323ca57-4df8-4b0d-b92c-4e9f097e0638","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000112","kanaal":"simple","onderwerp":"ground","inhoud":"Word
-        sort finish staff sister part loss.","indicatieContactGelukt":null,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2005-11-02T07:39:13.948219Z"}'
+      string: '{"uuid":"0b721199-3ac3-436f-b16d-64b67297137a","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/0b721199-3ac3-436f-b16d-64b67297137a","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000112","kanaal":"natural","onderwerp":"method","inhoud":"In
+        television very movement direction him base.","indicatieContactGelukt":null,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"1995-11-30T04:03:59.543414Z"}'
     headers:
       API-version:
       - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '504'
+      - '511'
       Content-Security-Policy:
-      - 'style-src ''self'' ''unsafe-inline'' fonts.googleapis.com; base-uri ''self'';
-        default-src ''self''; script-src ''self'' ''unsafe-inline''; object-src ''none'';
-        form-action ''self''; frame-ancestors ''none''; font-src ''self'' fonts.gstatic.com;
-        frame-src ''self''; img-src ''self'' data: cdn.redoc.ly; worker-src ''self''
-        blob:'
+      - 'default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        base-uri ''self''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; font-src ''self'' fonts.gstatic.com; img-src ''self''
+        data: cdn.redoc.ly; object-src ''none''; worker-src ''self'' blob:; form-action
+        ''self'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/8323ca57-4df8-4b0d-b92c-4e9f097e0638
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/0b721199-3ac3-436f-b16d-64b67297137a
       Referrer-Policy:
       - same-origin
       Vary:
@@ -52,24 +52,24 @@ interactions:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
     method: GET
-    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten/8323ca57-4df8-4b0d-b92c-4e9f097e0638
+    uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten/0b721199-3ac3-436f-b16d-64b67297137a
   response:
     body:
-      string: '{"uuid":"8323ca57-4df8-4b0d-b92c-4e9f097e0638","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/8323ca57-4df8-4b0d-b92c-4e9f097e0638","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000112","kanaal":"simple","onderwerp":"ground","inhoud":"Word
-        sort finish staff sister part loss.","indicatieContactGelukt":null,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2005-11-02T07:39:13.948219Z"}'
+      string: '{"uuid":"0b721199-3ac3-436f-b16d-64b67297137a","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/0b721199-3ac3-436f-b16d-64b67297137a","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000112","kanaal":"natural","onderwerp":"method","inhoud":"In
+        television very movement direction him base.","indicatieContactGelukt":null,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"1995-11-30T04:03:59.543414Z"}'
     headers:
       API-version:
       - 0.1.2
       Allow:
       - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
       Content-Length:
-      - '504'
+      - '511'
       Content-Security-Policy:
-      - 'style-src ''self'' ''unsafe-inline'' fonts.googleapis.com; base-uri ''self'';
-        default-src ''self''; script-src ''self'' ''unsafe-inline''; object-src ''none'';
-        form-action ''self''; frame-ancestors ''none''; font-src ''self'' fonts.gstatic.com;
-        frame-src ''self''; img-src ''self'' data: cdn.redoc.ly; worker-src ''self''
-        blob:'
+      - 'default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
+        base-uri ''self''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
+        fonts.googleapis.com; font-src ''self'' fonts.gstatic.com; img-src ''self''
+        data: cdn.redoc.ly; object-src ''none''; worker-src ''self'' blob:; form-action
+        ''self'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
