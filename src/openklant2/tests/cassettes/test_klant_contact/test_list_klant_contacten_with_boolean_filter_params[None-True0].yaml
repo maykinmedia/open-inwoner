@@ -1,40 +1,40 @@
 interactions:
 - request:
-    body: '{"nummer": "0000000130", "kanaal": "boy", "onderwerp": "material", "inhoud":
-      "Little back mother something.", "taal": "nld", "indicatieContactGelukt": false,
-      "vertrouwelijk": true, "plaatsgevondenOp": "2001-05-13T09:35:28.147611"}'
+    body: '{"nummer": "0000000130", "kanaal": "same", "onderwerp": "impact", "inhoud":
+      "Throw summer our away.", "taal": "nld", "indicatieContactGelukt": false, "vertrouwelijk":
+      true, "plaatsgevondenOp": "2012-05-30T16:44:20.770414"}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '230'
+      - '222'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"e394747f-7350-4ef9-b146-87a1250780b2","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/e394747f-7350-4ef9-b146-87a1250780b2","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000130","kanaal":"boy","onderwerp":"material","inhoud":"Little
-        back mother something.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2001-05-13T09:35:28.147611Z"}'
+      string: '{"uuid":"7cc843e7-7695-4743-8bb2-6664f3648993","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/7cc843e7-7695-4743-8bb2-6664f3648993","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000130","kanaal":"same","onderwerp":"impact","inhoud":"Throw
+        summer our away.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2012-05-30T16:44:20.770414Z"}'
     headers:
       API-version:
       - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '492'
+      - '484'
       Content-Security-Policy:
-      - 'default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
-        base-uri ''self''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; font-src ''self'' fonts.gstatic.com; img-src ''self''
-        data: cdn.redoc.ly; object-src ''none''; worker-src ''self'' blob:; form-action
-        ''self'''
+      - 'frame-ancestors ''none''; frame-src ''self''; worker-src ''self'' blob:;
+        default-src ''self''; font-src ''self'' fonts.gstatic.com; object-src ''none'';
+        img-src ''self'' data: cdn.redoc.ly; base-uri ''self''; style-src ''self''
+        ''unsafe-inline'' fonts.googleapis.com; form-action ''self''; script-src ''self''
+        ''unsafe-inline'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/e394747f-7350-4ef9-b146-87a1250780b2
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/7cc843e7-7695-4743-8bb2-6664f3648993
       Referrer-Policy:
       - same-origin
       Vary:
@@ -55,21 +55,21 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"e394747f-7350-4ef9-b146-87a1250780b2","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/e394747f-7350-4ef9-b146-87a1250780b2","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000130","kanaal":"boy","onderwerp":"material","inhoud":"Little
-        back mother something.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2001-05-13T09:35:28.147611Z","_expand":{}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"7cc843e7-7695-4743-8bb2-6664f3648993","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/7cc843e7-7695-4743-8bb2-6664f3648993","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000130","kanaal":"same","onderwerp":"impact","inhoud":"Throw
+        summer our away.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2012-05-30T16:44:20.770414Z","_expand":{}}]}'
     headers:
       API-version:
       - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '557'
+      - '549'
       Content-Security-Policy:
-      - 'default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
-        base-uri ''self''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; font-src ''self'' fonts.gstatic.com; img-src ''self''
-        data: cdn.redoc.ly; object-src ''none''; worker-src ''self'' blob:; form-action
-        ''self'''
+      - 'frame-ancestors ''none''; frame-src ''self''; worker-src ''self'' blob:;
+        default-src ''self''; font-src ''self'' fonts.gstatic.com; object-src ''none'';
+        img-src ''self'' data: cdn.redoc.ly; base-uri ''self''; style-src ''self''
+        ''unsafe-inline'' fonts.googleapis.com; form-action ''self''; script-src ''self''
+        ''unsafe-inline'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
@@ -103,11 +103,11 @@ interactions:
       Content-Length:
       - '52'
       Content-Security-Policy:
-      - 'default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
-        base-uri ''self''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; font-src ''self'' fonts.gstatic.com; img-src ''self''
-        data: cdn.redoc.ly; object-src ''none''; worker-src ''self'' blob:; form-action
-        ''self'''
+      - 'frame-ancestors ''none''; frame-src ''self''; worker-src ''self'' blob:;
+        default-src ''self''; font-src ''self'' fonts.gstatic.com; object-src ''none'';
+        img-src ''self'' data: cdn.redoc.ly; base-uri ''self''; style-src ''self''
+        ''unsafe-inline'' fonts.googleapis.com; form-action ''self''; script-src ''self''
+        ''unsafe-inline'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

@@ -1,40 +1,40 @@
 interactions:
 - request:
-    body: '{"nummer": "0000000116", "kanaal": "loss", "onderwerp": "something", "inhoud":
-      "Other maybe I firm.", "taal": "nld", "indicatieContactGelukt": false, "vertrouwelijk":
-      true, "plaatsgevondenOp": "2004-10-27T12:01:03.746137"}'
+    body: '{"nummer": "0000000116", "kanaal": "institution", "onderwerp": "form",
+      "inhoud": "Card firm notice candidate natural east.", "taal": "nld", "indicatieContactGelukt":
+      false, "vertrouwelijk": false, "plaatsgevondenOp": "2000-06-23T14:55:30.201853"}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '222'
+      - '246'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten
   response:
     body:
-      string: '{"uuid":"e52c0076-9d7f-4dc7-9cbf-f8487d6cfafc","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/e52c0076-9d7f-4dc7-9cbf-f8487d6cfafc","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000116","kanaal":"loss","onderwerp":"something","inhoud":"Other
-        maybe I firm.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2004-10-27T12:01:03.746137Z"}'
+      string: '{"uuid":"c46af2df-65b4-42f1-b4f4-f5619d45a66f","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/c46af2df-65b4-42f1-b4f4-f5619d45a66f","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000116","kanaal":"institution","onderwerp":"form","inhoud":"Card
+        firm notice candidate natural east.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2000-06-23T14:55:30.201853Z"}'
     headers:
       API-version:
       - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '484'
+      - '508'
       Content-Security-Policy:
-      - 'default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
-        base-uri ''self''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; font-src ''self'' fonts.gstatic.com; img-src ''self''
-        data: cdn.redoc.ly; object-src ''none''; worker-src ''self'' blob:; form-action
-        ''self'''
+      - 'frame-ancestors ''none''; frame-src ''self''; worker-src ''self'' blob:;
+        default-src ''self''; font-src ''self'' fonts.gstatic.com; object-src ''none'';
+        img-src ''self'' data: cdn.redoc.ly; base-uri ''self''; style-src ''self''
+        ''unsafe-inline'' fonts.googleapis.com; form-action ''self''; script-src ''self''
+        ''unsafe-inline'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/e52c0076-9d7f-4dc7-9cbf-f8487d6cfafc
+      - http://localhost:8338/klantinteracties/api/v1/klantcontacten/c46af2df-65b4-42f1-b4f4-f5619d45a66f
       Referrer-Policy:
       - same-origin
       Vary:
@@ -55,21 +55,21 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/klantcontacten?page=1&indicatieContactGelukt=False
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"e52c0076-9d7f-4dc7-9cbf-f8487d6cfafc","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/e52c0076-9d7f-4dc7-9cbf-f8487d6cfafc","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000116","kanaal":"loss","onderwerp":"something","inhoud":"Other
-        maybe I firm.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":true,"plaatsgevondenOp":"2004-10-27T12:01:03.746137Z","_expand":{}}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"c46af2df-65b4-42f1-b4f4-f5619d45a66f","url":"http://localhost:8338/klantinteracties/api/v1/klantcontacten/c46af2df-65b4-42f1-b4f4-f5619d45a66f","gingOverOnderwerpobjecten":[],"hadBetrokkenActoren":[],"omvatteBijlagen":[],"hadBetrokkenen":[],"leiddeTotInterneTaken":[],"nummer":"0000000116","kanaal":"institution","onderwerp":"form","inhoud":"Card
+        firm notice candidate natural east.","indicatieContactGelukt":false,"taal":"nld","vertrouwelijk":false,"plaatsgevondenOp":"2000-06-23T14:55:30.201853Z","_expand":{}}]}'
     headers:
       API-version:
       - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '549'
+      - '573'
       Content-Security-Policy:
-      - 'default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
-        base-uri ''self''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; font-src ''self'' fonts.gstatic.com; img-src ''self''
-        data: cdn.redoc.ly; object-src ''none''; worker-src ''self'' blob:; form-action
-        ''self'''
+      - 'frame-ancestors ''none''; frame-src ''self''; worker-src ''self'' blob:;
+        default-src ''self''; font-src ''self'' fonts.gstatic.com; object-src ''none'';
+        img-src ''self'' data: cdn.redoc.ly; base-uri ''self''; style-src ''self''
+        ''unsafe-inline'' fonts.googleapis.com; form-action ''self''; script-src ''self''
+        ''unsafe-inline'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
@@ -103,11 +103,11 @@ interactions:
       Content-Length:
       - '52'
       Content-Security-Policy:
-      - 'default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
-        base-uri ''self''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; font-src ''self'' fonts.gstatic.com; img-src ''self''
-        data: cdn.redoc.ly; object-src ''none''; worker-src ''self'' blob:; form-action
-        ''self'''
+      - 'frame-ancestors ''none''; frame-src ''self''; worker-src ''self'' blob:;
+        default-src ''self''; font-src ''self'' fonts.gstatic.com; object-src ''none'';
+        img-src ''self'' data: cdn.redoc.ly; base-uri ''self''; style-src ''self''
+        ''unsafe-inline'' fonts.googleapis.com; form-action ''self''; script-src ''self''
+        ''unsafe-inline'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

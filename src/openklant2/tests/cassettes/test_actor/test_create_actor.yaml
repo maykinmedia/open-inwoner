@@ -14,7 +14,7 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/actoren
   response:
     body:
-      string: '{"uuid":"bf6201ad-b5f1-4a48-aa0b-cdcb2e39ceb0","url":"http://localhost:8338/klantinteracties/api/v1/actoren/bf6201ad-b5f1-4a48-aa0b-cdcb2e39ceb0","naam":"Miranda
+      string: '{"uuid":"7dba548e-1201-4d80-9d92-9f7b36dbfb07","url":"http://localhost:8338/klantinteracties/api/v1/actoren/7dba548e-1201-4d80-9d92-9f7b36dbfb07","naam":"Miranda
         Peters","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"6070462185571","codeObjecttype":"exist","codeRegister":"sport","codeSoortObjectId":"style"},"actorIdentificatie":null}'
     headers:
       API-version:
@@ -24,17 +24,17 @@ interactions:
       Content-Length:
       - '371'
       Content-Security-Policy:
-      - 'default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
-        base-uri ''self''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; font-src ''self'' fonts.gstatic.com; img-src ''self''
-        data: cdn.redoc.ly; object-src ''none''; worker-src ''self'' blob:; form-action
-        ''self'''
+      - 'frame-ancestors ''none''; frame-src ''self''; worker-src ''self'' blob:;
+        default-src ''self''; font-src ''self'' fonts.gstatic.com; object-src ''none'';
+        img-src ''self'' data: cdn.redoc.ly; base-uri ''self''; style-src ''self''
+        ''unsafe-inline'' fonts.googleapis.com; form-action ''self''; script-src ''self''
+        ''unsafe-inline'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/bf6201ad-b5f1-4a48-aa0b-cdcb2e39ceb0
+      - http://localhost:8338/klantinteracties/api/v1/actoren/7dba548e-1201-4d80-9d92-9f7b36dbfb07
       Referrer-Policy:
       - same-origin
       Vary:

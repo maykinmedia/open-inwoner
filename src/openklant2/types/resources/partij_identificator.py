@@ -42,6 +42,13 @@ class CreateIdentificeerdePartij(TypedDict):
     uuid: str
 
 
+# For use in the Partij creation endpoint
+class CreateEmbeddedPartijIdentificatorData(TypedDict):
+    partijIdentificator: PartijIdentificatorObject
+    anderePartijIdentificator: NotRequired[str]
+    subIdentificatorVan: NotRequired[ForeignKeyRef]
+
+
 class CreatePartijIdentificatorData(TypedDict):
     identificeerdePartij: CreateIdentificeerdePartij
     partijIdentificator: PartijIdentificatorObject

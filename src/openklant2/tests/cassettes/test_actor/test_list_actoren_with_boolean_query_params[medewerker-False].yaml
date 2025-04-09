@@ -1,8 +1,8 @@
 interactions:
 - request:
-    body: '{"naam": "Daniel Valencia", "soortActor": "geautomatiseerde_actor", "indicatieActief":
-      true, "actoridentificator": {"objectId": "0000000010", "codeObjecttype": "thank",
-      "codeRegister": "remain", "codeSoortObjectId": "parent"}}'
+    body: '{"naam": "Dr. Robert Walsh", "soortActor": "geautomatiseerde_actor", "indicatieActief":
+      true, "actoridentificator": {"objectId": "0000000010", "codeObjecttype": "myself",
+      "codeRegister": "who", "codeSoortObjectId": "special"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
@@ -14,8 +14,8 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/actoren
   response:
     body:
-      string: '{"uuid":"2fe8b20e-1369-4f4f-bcd4-4f90a886e5eb","url":"http://localhost:8338/klantinteracties/api/v1/actoren/2fe8b20e-1369-4f4f-bcd4-4f90a886e5eb","naam":"Daniel
-        Valencia","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000010","codeObjecttype":"thank","codeRegister":"remain","codeSoortObjectId":"parent"},"actorIdentificatie":null}'
+      string: '{"uuid":"ccbb2b92-6ef0-4a70-98f7-6bedd7ea4503","url":"http://localhost:8338/klantinteracties/api/v1/actoren/ccbb2b92-6ef0-4a70-98f7-6bedd7ea4503","naam":"Dr.
+        Robert Walsh","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000010","codeObjecttype":"myself","codeRegister":"who","codeSoortObjectId":"special"},"actorIdentificatie":null}'
     headers:
       API-version:
       - 0.1.2
@@ -24,17 +24,17 @@ interactions:
       Content-Length:
       - '383'
       Content-Security-Policy:
-      - 'default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
-        base-uri ''self''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; font-src ''self'' fonts.gstatic.com; img-src ''self''
-        data: cdn.redoc.ly; object-src ''none''; worker-src ''self'' blob:; form-action
-        ''self'''
+      - 'frame-ancestors ''none''; frame-src ''self''; worker-src ''self'' blob:;
+        default-src ''self''; font-src ''self'' fonts.gstatic.com; object-src ''none'';
+        img-src ''self'' data: cdn.redoc.ly; base-uri ''self''; style-src ''self''
+        ''unsafe-inline'' fonts.googleapis.com; form-action ''self''; script-src ''self''
+        ''unsafe-inline'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/2fe8b20e-1369-4f4f-bcd4-4f90a886e5eb
+      - http://localhost:8338/klantinteracties/api/v1/actoren/ccbb2b92-6ef0-4a70-98f7-6bedd7ea4503
       Referrer-Policy:
       - same-origin
       Vary:
@@ -47,41 +47,41 @@ interactions:
       code: 201
       message: Created
 - request:
-    body: '{"naam": "Christina Burton", "soortActor": "medewerker", "indicatieActief":
-      true, "actoridentificator": {"objectId": "0000000011", "codeObjecttype": "appear",
-      "codeRegister": "operation", "codeSoortObjectId": "remember"}}'
+    body: '{"naam": "Steven Flores", "soortActor": "medewerker", "indicatieActief":
+      true, "actoridentificator": {"objectId": "0000000011", "codeObjecttype": "into",
+      "codeRegister": "marriage", "codeSoortObjectId": "effect"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '221'
+      - '213'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/actoren
   response:
     body:
-      string: '{"uuid":"2a1af12f-1b83-48d6-b297-5d6d6f980c4c","url":"http://localhost:8338/klantinteracties/api/v1/actoren/2a1af12f-1b83-48d6-b297-5d6d6f980c4c","naam":"Christina
-        Burton","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000011","codeObjecttype":"appear","codeRegister":"operation","codeSoortObjectId":"remember"},"actorIdentificatie":null}'
+      string: '{"uuid":"61a0cac8-e7a1-4431-bb1c-d50e662cb416","url":"http://localhost:8338/klantinteracties/api/v1/actoren/61a0cac8-e7a1-4431-bb1c-d50e662cb416","naam":"Steven
+        Flores","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000011","codeObjecttype":"into","codeRegister":"marriage","codeSoortObjectId":"effect"},"actorIdentificatie":null}'
     headers:
       API-version:
       - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '378'
+      - '370'
       Content-Security-Policy:
-      - 'default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
-        base-uri ''self''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; font-src ''self'' fonts.gstatic.com; img-src ''self''
-        data: cdn.redoc.ly; object-src ''none''; worker-src ''self'' blob:; form-action
-        ''self'''
+      - 'frame-ancestors ''none''; frame-src ''self''; worker-src ''self'' blob:;
+        default-src ''self''; font-src ''self'' fonts.gstatic.com; object-src ''none'';
+        img-src ''self'' data: cdn.redoc.ly; base-uri ''self''; style-src ''self''
+        ''unsafe-inline'' fonts.googleapis.com; form-action ''self''; script-src ''self''
+        ''unsafe-inline'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/2a1af12f-1b83-48d6-b297-5d6d6f980c4c
+      - http://localhost:8338/klantinteracties/api/v1/actoren/61a0cac8-e7a1-4431-bb1c-d50e662cb416
       Referrer-Policy:
       - same-origin
       Vary:
@@ -94,9 +94,9 @@ interactions:
       code: 201
       message: Created
 - request:
-    body: '{"naam": "Betty Johns", "soortActor": "medewerker", "indicatieActief":
-      false, "actoridentificator": {"objectId": "0000000012", "codeObjecttype": "score",
-      "codeRegister": "hotel", "codeSoortObjectId": "although"}}'
+    body: '{"naam": "Andrew Lane", "soortActor": "medewerker", "indicatieActief":
+      false, "actoridentificator": {"objectId": "0000000012", "codeObjecttype": "weight",
+      "codeRegister": "stand", "codeSoortObjectId": "century"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
@@ -108,8 +108,8 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/actoren
   response:
     body:
-      string: '{"uuid":"0c364039-97bc-4cb9-9321-ac701a3d4058","url":"http://localhost:8338/klantinteracties/api/v1/actoren/0c364039-97bc-4cb9-9321-ac701a3d4058","naam":"Betty
-        Johns","soortActor":"medewerker","indicatieActief":false,"actoridentificator":{"objectId":"0000000012","codeObjecttype":"score","codeRegister":"hotel","codeSoortObjectId":"although"},"actorIdentificatie":null}'
+      string: '{"uuid":"4c89939a-4539-427f-9b67-2e80dd74bfbc","url":"http://localhost:8338/klantinteracties/api/v1/actoren/4c89939a-4539-427f-9b67-2e80dd74bfbc","naam":"Andrew
+        Lane","soortActor":"medewerker","indicatieActief":false,"actoridentificator":{"objectId":"0000000012","codeObjecttype":"weight","codeRegister":"stand","codeSoortObjectId":"century"},"actorIdentificatie":null}'
     headers:
       API-version:
       - 0.1.2
@@ -118,17 +118,17 @@ interactions:
       Content-Length:
       - '369'
       Content-Security-Policy:
-      - 'default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
-        base-uri ''self''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; font-src ''self'' fonts.gstatic.com; img-src ''self''
-        data: cdn.redoc.ly; object-src ''none''; worker-src ''self'' blob:; form-action
-        ''self'''
+      - 'frame-ancestors ''none''; frame-src ''self''; worker-src ''self'' blob:;
+        default-src ''self''; font-src ''self'' fonts.gstatic.com; object-src ''none'';
+        img-src ''self'' data: cdn.redoc.ly; base-uri ''self''; style-src ''self''
+        ''unsafe-inline'' fonts.googleapis.com; form-action ''self''; script-src ''self''
+        ''unsafe-inline'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/0c364039-97bc-4cb9-9321-ac701a3d4058
+      - http://localhost:8338/klantinteracties/api/v1/actoren/4c89939a-4539-427f-9b67-2e80dd74bfbc
       Referrer-Policy:
       - same-origin
       Vary:
@@ -149,8 +149,8 @@ interactions:
     uri: http://localhost:8338/klantinteracties/api/v1/actoren?indicatieActief=False&soortActor=medewerker
   response:
     body:
-      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"0c364039-97bc-4cb9-9321-ac701a3d4058","url":"http://localhost:8338/klantinteracties/api/v1/actoren/0c364039-97bc-4cb9-9321-ac701a3d4058","naam":"Betty
-        Johns","soortActor":"medewerker","indicatieActief":false,"actoridentificator":{"objectId":"0000000012","codeObjecttype":"score","codeRegister":"hotel","codeSoortObjectId":"although"},"actorIdentificatie":null}]}'
+      string: '{"count":1,"next":null,"previous":null,"results":[{"uuid":"4c89939a-4539-427f-9b67-2e80dd74bfbc","url":"http://localhost:8338/klantinteracties/api/v1/actoren/4c89939a-4539-427f-9b67-2e80dd74bfbc","naam":"Andrew
+        Lane","soortActor":"medewerker","indicatieActief":false,"actoridentificator":{"objectId":"0000000012","codeObjecttype":"weight","codeRegister":"stand","codeSoortObjectId":"century"},"actorIdentificatie":null}]}'
     headers:
       API-version:
       - 0.1.2
@@ -159,11 +159,11 @@ interactions:
       Content-Length:
       - '421'
       Content-Security-Policy:
-      - 'default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
-        base-uri ''self''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; font-src ''self'' fonts.gstatic.com; img-src ''self''
-        data: cdn.redoc.ly; object-src ''none''; worker-src ''self'' blob:; form-action
-        ''self'''
+      - 'frame-ancestors ''none''; frame-src ''self''; worker-src ''self'' blob:;
+        default-src ''self''; font-src ''self'' fonts.gstatic.com; object-src ''none'';
+        img-src ''self'' data: cdn.redoc.ly; base-uri ''self''; style-src ''self''
+        ''unsafe-inline'' fonts.googleapis.com; form-action ''self''; script-src ''self''
+        ''unsafe-inline'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:

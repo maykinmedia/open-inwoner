@@ -1,40 +1,40 @@
 interactions:
 - request:
-    body: '{"naam": "William Butler", "soortActor": "medewerker", "indicatieActief":
-      true, "actoridentificator": {"objectId": "0000000006", "codeObjecttype": "owner",
-      "codeRegister": "local", "codeSoortObjectId": "you"}}'
+    body: '{"naam": "Amy Peterson", "soortActor": "geautomatiseerde_actor", "indicatieActief":
+      true, "actoridentificator": {"objectId": "0000000006", "codeObjecttype": "also",
+      "codeRegister": "nation", "codeSoortObjectId": "we"}}'
     headers:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
       Content-Length:
-      - '209'
+      - '218'
       Content-Type:
       - application/json
     method: POST
     uri: http://localhost:8338/klantinteracties/api/v1/actoren
   response:
     body:
-      string: '{"uuid":"5e63fa41-eab4-48f1-bc23-202b2a307198","url":"http://localhost:8338/klantinteracties/api/v1/actoren/5e63fa41-eab4-48f1-bc23-202b2a307198","naam":"William
-        Butler","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000006","codeObjecttype":"owner","codeRegister":"local","codeSoortObjectId":"you"},"actorIdentificatie":null}'
+      string: '{"uuid":"31b5b607-d61f-47d3-aa5c-9fa8f5864158","url":"http://localhost:8338/klantinteracties/api/v1/actoren/31b5b607-d61f-47d3-aa5c-9fa8f5864158","naam":"Amy
+        Peterson","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000006","codeObjecttype":"also","codeRegister":"nation","codeSoortObjectId":"we"},"actorIdentificatie":null}'
     headers:
       API-version:
       - 0.1.2
       Allow:
       - GET, POST, HEAD, OPTIONS
       Content-Length:
-      - '366'
+      - '375'
       Content-Security-Policy:
-      - 'default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
-        base-uri ''self''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; font-src ''self'' fonts.gstatic.com; img-src ''self''
-        data: cdn.redoc.ly; object-src ''none''; worker-src ''self'' blob:; form-action
-        ''self'''
+      - 'frame-ancestors ''none''; frame-src ''self''; worker-src ''self'' blob:;
+        default-src ''self''; font-src ''self'' fonts.gstatic.com; object-src ''none'';
+        img-src ''self'' data: cdn.redoc.ly; base-uri ''self''; style-src ''self''
+        ''unsafe-inline'' fonts.googleapis.com; form-action ''self''; script-src ''self''
+        ''unsafe-inline'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Location:
-      - http://localhost:8338/klantinteracties/api/v1/actoren/5e63fa41-eab4-48f1-bc23-202b2a307198
+      - http://localhost:8338/klantinteracties/api/v1/actoren/31b5b607-d61f-47d3-aa5c-9fa8f5864158
       Referrer-Policy:
       - same-origin
       Vary:
@@ -52,24 +52,24 @@ interactions:
       Authorization:
       - Token b2eb1da9861da88743d72a3fb4344288fe2cba44
     method: GET
-    uri: http://localhost:8338/klantinteracties/api/v1/actoren/5e63fa41-eab4-48f1-bc23-202b2a307198
+    uri: http://localhost:8338/klantinteracties/api/v1/actoren/31b5b607-d61f-47d3-aa5c-9fa8f5864158
   response:
     body:
-      string: '{"uuid":"5e63fa41-eab4-48f1-bc23-202b2a307198","url":"http://localhost:8338/klantinteracties/api/v1/actoren/5e63fa41-eab4-48f1-bc23-202b2a307198","naam":"William
-        Butler","soortActor":"medewerker","indicatieActief":true,"actoridentificator":{"objectId":"0000000006","codeObjecttype":"owner","codeRegister":"local","codeSoortObjectId":"you"},"actorIdentificatie":null}'
+      string: '{"uuid":"31b5b607-d61f-47d3-aa5c-9fa8f5864158","url":"http://localhost:8338/klantinteracties/api/v1/actoren/31b5b607-d61f-47d3-aa5c-9fa8f5864158","naam":"Amy
+        Peterson","soortActor":"geautomatiseerde_actor","indicatieActief":true,"actoridentificator":{"objectId":"0000000006","codeObjecttype":"also","codeRegister":"nation","codeSoortObjectId":"we"},"actorIdentificatie":null}'
     headers:
       API-version:
       - 0.1.2
       Allow:
       - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
       Content-Length:
-      - '366'
+      - '375'
       Content-Security-Policy:
-      - 'default-src ''self''; script-src ''self'' ''unsafe-inline''; frame-src ''self'';
-        base-uri ''self''; frame-ancestors ''none''; style-src ''self'' ''unsafe-inline''
-        fonts.googleapis.com; font-src ''self'' fonts.gstatic.com; img-src ''self''
-        data: cdn.redoc.ly; object-src ''none''; worker-src ''self'' blob:; form-action
-        ''self'''
+      - 'frame-ancestors ''none''; frame-src ''self''; worker-src ''self'' blob:;
+        default-src ''self''; font-src ''self'' fonts.gstatic.com; object-src ''none'';
+        img-src ''self'' data: cdn.redoc.ly; base-uri ''self''; style-src ''self''
+        ''unsafe-inline'' fonts.googleapis.com; form-action ''self''; script-src ''self''
+        ''unsafe-inline'''
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
