@@ -68,12 +68,13 @@ def update_user_on_login(sender, user, request, *args, **kwargs):
 def _update_user_from_openklant2(
     user: User, service: OpenKlant2Service, request: None = None
 ) -> None:
-    if fetch_params := service.get_fetch_parameters(user):
-        partij, created = service.get_or_create_partij_for_user(
-            fetch_params=fetch_params, user=user
-        )
+    try:
+        partij, created = service.get_or_create_partij_for_user(user)
         if partij and not created:
             service.update_user_from_partij(partij_uuid=partij["uuid"], user=user)
+
+    except Exception:
+        logger.exception("Error updating user from partij via OpenKlant2")
 
 
 def _update_user_from_esuite(

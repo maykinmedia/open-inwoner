@@ -1025,13 +1025,13 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
                 )
 
     def _register_via_openklant(self, form, config: OpenKlant2Config) -> bool:
-        user = self.request.user
+        user = cast(User, self.request.user)
         service = OpenKlant2Service(config=config)
 
-        partij, created = service.get_or_create_partij_for_user(
-            fetch_params=service.get_fetch_parameters(user),
-            user=user,
-        )
+        partij, _ = service.get_or_create_partij_for_user(user)
+
+        if not partij:
+            return False
 
         cleaned_data = form.cleaned_data
         question = cleaned_data["question"]

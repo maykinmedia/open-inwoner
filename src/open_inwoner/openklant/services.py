@@ -69,6 +69,7 @@ from openklant2.types.resources.klant_contact import (
     ListKlantContactParams,
 )
 from openklant2.types.resources.partij import Partij, PartijListParams
+from openklant2.types.resources.partij_identificator import PartijIdentificator
 
 logger = logging.getLogger(__name__)
 
@@ -952,37 +953,79 @@ class OpenKlant2Service(
             "soortPartij": "organisatie",
         }
 
-    @staticmethod
-    def _vestigingsnummer_list_param(vestigingsnummer: str) -> PartijListParams:
-        return {
-            "partijIdentificator__codeSoortObjectId": "vestigingsnummer",
-            "partijIdentificator__codeRegister": "hr",
-            "partijIdentificator__codeObjecttype": "vestiging",
-            "partijIdentificator__objectId": vestigingsnummer,
-            "soortPartij": "organisatie",
-        }
-
     def find_persoon_for_bsn(self, bsn: str) -> Partij | None:
         return self.find_partij_for_params(params=self._bsn_list_param(bsn))
 
-    def find_organisatie_for_kvk(self, kvk: str) -> Partij | None:
-        return self.find_partij_for_params(params=self._kvk_list_param(kvk))
-
-    def find_organisatie_for_vestigingsnummer(
-        self, vestigingsnummer: str
+    def find_organisatie_for_kvk_and_vestiging(
+        self,
+        *,
+        kvk: str,
+        vestigingsnummer: str | None = None,
     ) -> Partij | None:
-        return self.find_partij_for_params(
-            params=self._vestigingsnummer_list_param(vestigingsnummer)
+        parent_kvk_results = list(
+            self.client.partij_identificator.list_iter(
+                params={
+                    "partijIdentificatorCodeSoortObjectId": "kvk_nummer",
+                    "partijIdentificatorCodeRegister": "hr",
+                    "partijIdentificatorCodeObjecttype": "niet_natuurlijk_persoon",
+                    "partijIdentificatorObjectId": kvk,
+                }
+            )
+        )
+        if not parent_kvk_results:
+            return None
+
+        kvk_pi: PartijIdentificator
+        match len(parent_kvk_results):
+            case 0:
+                return None
+            case x if x > 1:
+                raise RuntimeError("Unexpectedly found multiple PIs for a single kvk")
+            case _:
+                kvk_pi = parent_kvk_results[0]
+
+        # Return the kvk partij if no vestiging
+        if not vestigingsnummer:
+            if not (kvk_partij_ref := kvk_pi["identificeerdePartij"]):
+                # The PI exists, but not a Partij for the legal entity
+                return None
+
+            return self.client.partij.retrieve(kvk_partij_ref["uuid"])
+
+        # Bit convoluted: find all PIs for a vestiging, then cross-reference to the kvk
+        # pi for the parent
+        vestiging_pi = next(
+            result
+            for result in self.client.partij_identificator.list_iter(
+                params={
+                    "partijIdentificatorCodeSoortObjectId": "vestigingsnummer",
+                    "partijIdentificatorCodeRegister": "hr",
+                    "partijIdentificatorCodeObjecttype": "vestiging",
+                    "partijIdentificatorObjectId": vestigingsnummer,
+                }
+            )
+            if result["subIdentificatorVan"]
+            and result["subIdentificatorVan"]["uuid"] == kvk_pi["uuid"]
         )
 
-    def get_or_create_partij_for_user(
-        self, fetch_params: FetchParameters, user: User
-    ) -> tuple[Partij | None, bool]:
+        if not vestiging_pi:
+            return None
+
+        if not vestiging_pi["identificeerdePartij"]:
+            logger.warning(
+                "Found a Partij Identificator vor vestiging %s without a linked Partij",
+                vestiging_pi["partijIdentificator"]["objectId"],
+            )
+            return None
+
+        return self.client.partij.retrieve(vestiging_pi["identificeerdePartij"]["uuid"])
+
+    def get_or_create_partij_for_user(self, user: User) -> tuple[Partij | None, bool]:
         partij = None
         created = False
 
-        if bsn := fetch_params.get("user_bsn"):
-            if not (persoon := self.find_persoon_for_bsn(bsn)):
+        if user.bsn:
+            if not (persoon := self.find_persoon_for_bsn(user.bsn)):
                 persoon = self.client.partij.create_persoon(
                     data={
                         "digitaleAdressen": None,
@@ -1001,37 +1044,27 @@ class OpenKlant2Service(
                                 "voorvoegselAchternaam": "",
                             },
                         },
+                        "partijIdentificatoren": [
+                            {
+                                "partijIdentificator": {
+                                    "codeObjecttype": "natuurlijk_persoon",
+                                    "codeSoortObjectId": "bsn",
+                                    "objectId": user.bsn,
+                                    "codeRegister": "brp",
+                                }
+                            }
+                        ],
                     }
                 )
                 created = True
 
-                try:
-                    self.client.partij_identificator.create(
-                        data={
-                            "identificeerdePartij": {"uuid": persoon["uuid"]},
-                            "partijIdentificator": {
-                                "codeObjecttype": "natuurlijk_persoon",
-                                "codeSoortObjectId": "bsn",
-                                "objectId": bsn,
-                                "codeRegister": "brp",
-                            },
-                        }
-                    )
-                except Exception:
-                    logger.exception("Unable to register identificatoren for partij")
-
             partij = persoon
 
-        elif kvk := fetch_params.get("user_kvk_or_rsin"):
-
-            # Prefer vestigingsnummer if present, to stay consistent with OK1 behavior
-            organisatie: Partij | None
-            if vestigingsnummer := fetch_params.get("vestigingsnummer"):
-                organisatie = self.find_organisatie_for_vestigingsnummer(
-                    vestigingsnummer
-                )
-            else:
-                organisatie = self.find_organisatie_for_kvk(kvk)
+        elif user.kvk:
+            organisatie = self.find_organisatie_for_kvk_and_vestiging(
+                kvk=user.kvk,
+                vestigingsnummer=user.vestiging,
+            )
 
             if not organisatie:
                 organisatie = self.client.partij.create_organisatie(
@@ -1051,29 +1084,68 @@ class OpenKlant2Service(
                 )
                 created = True
 
-                for object_type, soort_object_id, object_id in (
-                    ("niet_natuurlijk_persoon", "kvk_nummer", kvk),
-                    ("vestiging", "vestigingsnummer", vestigingsnummer),
-                ):
-                    if object_id:
+                try:
+                    # Check for an existing entity-only PI (e.g. without)
+                    try:
+                        kvk_pi = next(
+                            pi
+                            for pi in self.client.partij_identificator.list_iter(
+                                params={
+                                    "partijIdentificatorCodeSoortObjectId": "kvk_nummer",
+                                    "partijIdentificatorCodeRegister": "hr",
+                                    "partijIdentificatorCodeObjecttype": "niet_natuurlijk_persoon",
+                                    "partijIdentificatorObjectId": user.kvk,
+                                }
+                            )
+                            if not pi["subIdentificatorVan"]
+                        )
+                    except StopIteration:
+                        kvk_pi = self.client.partij_identificator.create(
+                            data={
+                                "identificeerdePartij": {"uuid": organisatie["uuid"]},
+                                "partijIdentificator": {
+                                    "codeObjecttype": "niet_natuurlijk_persoon",
+                                    "codeSoortObjectId": "kvk_nummer",
+                                    "objectId": user.kvk,
+                                    "codeRegister": "hr",
+                                },
+                            }
+                        )
+
+                    if user.vestiging:
                         try:
+                            next(
+                                pi
+                                for pi in self.client.partij_identificator.list_iter(
+                                    params={
+                                        "partijIdentificatorCodeSoortObjectId": "vestigingsnummer",
+                                        "partijIdentificatorCodeRegister": "hr",
+                                        "partijIdentificatorCodeObjecttype": "vestiging",
+                                        "partijIdentificatorObjectId": user.vestiging,
+                                    }
+                                )
+                                if pi["subIdentificatorVan"]
+                                and pi["subIdentificatorVan"]["uuid"] == kvk_pi["uuid"]
+                            )
+                        except StopIteration:
                             self.client.partij_identificator.create(
                                 data={
                                     "identificeerdePartij": {
                                         "uuid": organisatie["uuid"]
                                     },
+                                    "subIdentificatorVan": {
+                                        "uuid": kvk_pi["uuid"],
+                                    },
                                     "partijIdentificator": {
-                                        "codeObjecttype": object_type,
-                                        "codeSoortObjectId": soort_object_id,
-                                        "objectId": object_id,
+                                        "codeObjecttype": "vestiging",
+                                        "codeSoortObjectId": "vestigingsnummer",
+                                        "objectId": user.vestiging,
                                         "codeRegister": "hr",
                                     },
                                 }
                             )
-                        except Exception:
-                            logger.exception(
-                                "Unable to register identificatoren for partij"
-                            )
+                except Exception:
+                    logger.exception("Unable to register identificatoren for partij")
 
             partij = organisatie
 
