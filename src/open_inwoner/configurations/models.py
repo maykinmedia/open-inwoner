@@ -618,6 +618,13 @@ class SiteConfiguration(SingletonModel):
         default=True,
         help_text=_("When enabled, search engines can index the site"),
     )
+    security_txt_redirect_target = models.URLField(
+        verbose_name=_("Redirect security.txt to"),
+        default="https://www.ncsc.nl/.well-known/security.txt",
+        help_text=_("Link to which ./well-known/security.txt will redirect to"),
+        blank=False,
+        null=False,
+    )
 
     class Meta:
         verbose_name = _("Site Configuration")
