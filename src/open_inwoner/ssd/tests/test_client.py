@@ -213,7 +213,7 @@ class JaaropgaveClientTest(TestCase):
                 res = ssd_client.get_reports(
                     bsn="12345",
                     report_date="1985-12-24",
-                    request_base_url="https://dummy.com",
+                    base_url="https://dummy.com",
                 )
                 self.assertIsNone(res)
 
@@ -230,7 +230,7 @@ class JaaropgaveClientTest(TestCase):
         ssd_client.get_reports(
             bsn="12345",
             report_date="1985",
-            request_base_url="https://dummy.com",
+            base_url="https://dummy.com",
         )
 
         # get request body and parse XML
