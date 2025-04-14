@@ -28,6 +28,7 @@ from open_inwoner.accounts.views import (
     ResendTokenView,
     VerifyTokenView,
 )
+from open_inwoner.configurations import views
 from open_inwoner.openklant.views.contactform import ContactFormView
 from open_inwoner.pdc.views import FAQView
 
@@ -40,6 +41,11 @@ admin.site.index_title = "Welkom op de OpenInwoner beheeromgeving"
 monkeypatch_admin()
 
 urlpatterns = [
+    re_path(
+        r"^.well-known/security\.txt$",
+        views.redirect_to_configured_security_txt,
+        name="security-txt-redirect",
+    ),
     path(
         "admin/password_reset/",
         PasswordResetView.as_view(),

@@ -135,6 +135,7 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "login_2fa_sms",
                     "allow_messages_file_sharing",
                     "redirect_to",
+                    "security_txt_redirect_target",
                 )
             },
         ),
