@@ -32,6 +32,9 @@ from ..client import UitkeringClient
 class TestMonthlyBenefitsFormView(TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.config = SSDConfigFactory(
+            service__url="https://example.com/soap-service/",
+        )
         cls.ssd_client = UitkeringClient()
 
     def setUp(self):
@@ -66,12 +69,14 @@ class TestMonthlyBenefitsFormView(TestCase):
         self.assertEqual(len(breadcrumbs), 2)
         self.assertIn(_("Mijn uitkeringen"), breadcrumbs[1].find("a").text)
 
-    @patch(
-        "open_inwoner.ssd.client.UitkeringClient.get_reports",
-        return_value=mock_uitkering_response_basic(),
-    )
+    @requests_mock.Mocker()
     @freeze_time("1985-12-25")
-    def test_uitkering_post_success(self, mock_report):
+    def test_uitkering_post_success(self, request_mock):
+        request_mock.post(
+            f"{self.config.service.url}maandspecificatie/",
+            content=mock_uitkering_response_basic().encode("utf-8"),
+        )
+
         url = reverse("ssd:monthly_benefits_index")
         self.client.login(email=self.user.email, password="12345")
 
@@ -79,6 +84,7 @@ class TestMonthlyBenefitsFormView(TestCase):
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertEqual(response.headers["content-type"], "application/pdf")
+        self.assertEqual(response.content[:4], b"%PDF")
 
     @patch(
         "open_inwoner.ssd.client.UitkeringClient.get_reports",
@@ -154,12 +160,17 @@ class TestYearlyBenefitsFormView(TestCase):
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
-    @patch(
-        "open_inwoner.ssd.client.JaaropgaveClient.get_reports",
-        return_value=mock_jaaropgave_response(),
-    )
+    @requests_mock.Mocker()
     @freeze_time("1985-12-25")
-    def test_jaaropgave_post_success(self, mock_report):
+    def test_jaaropgave_post_success(self, request_mock):
+        config = SSDConfigFactory(
+            service__url="https://example.com/soap-service/",
+        )
+        request_mock.post(
+            f"{config.service.url}jaaropgave/",
+            content=mock_jaaropgave_response().encode("utf-8"),
+        )
+
         url = reverse("ssd:yearly_benefits_index")
         self.client.login(email=self.user.email, password="12345")
 
@@ -167,6 +178,7 @@ class TestYearlyBenefitsFormView(TestCase):
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertEqual(response.headers["content-type"], "application/pdf")
+        self.assertEqual(response.content[:4], b"%PDF")
 
     @patch(
         "open_inwoner.ssd.client.JaaropgaveClient.get_reports",

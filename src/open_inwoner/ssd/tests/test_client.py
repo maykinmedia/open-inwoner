@@ -5,8 +5,11 @@ from unittest.mock import patch
 from django.test import TestCase
 
 import requests_mock
+from freezegun import freeze_time
 from lxml import etree
 from requests.exceptions import ConnectionError
+
+from open_inwoner.ssd.tests.mocks import mock_jaaropgave_response
 
 from ..client import JaaropgaveClient, UitkeringClient
 from .factories import ConcreteSSDClient, SSDConfigFactory
