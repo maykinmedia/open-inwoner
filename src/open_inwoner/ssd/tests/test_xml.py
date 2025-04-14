@@ -1,4 +1,3 @@
-from copy import copy
 from pathlib import Path
 from unittest import TestCase
 from unittest.mock import patch
@@ -8,7 +7,6 @@ from ..service.uitkering import (
     UitkeringsSpecificatieInfoResponse as UitkeringInfoResponse,
 )
 from ..templatetags.ssd_tags import (
-    calculate_loon_zvw,
     format_currency,
     format_date_month_name,
     format_period,
@@ -208,31 +206,6 @@ class UitkeringDataTest(TestCase):
 
 
 class SSDTagTest(TestCase):
-    @patch("open_inwoner.ssd.xml._get_report_info")
-    def test_calculate_loon_zvw(self, m):
-        jaaropgave_path = FILES_DIR / "jaaropgave_response.xml"
-        m.return_value = mock_get_report_info(
-            jaaropgave_path, JAAROPGAVE_INFO_RESPONSE_NODE, JaarOpgaveInfoResponse
-        )
-
-        jaaropgaven = get_jaaropgaven(None)
-
-        specificatie = jaaropgaven[0]["specificatie"]
-
-        # create copy for testing spec without vergoeding_premie_zvw
-        specificatie2 = copy(specificatie)
-        specificatie2.vergoeding_premie_zvw = None
-
-        tests = [
-            (specificatie, 7305),
-            (specificatie2, 7305),
-            (None, ""),
-        ]
-        for i, (specificatie, expected) in enumerate(tests):
-            with self.subTest(i=i):
-                res = calculate_loon_zvw(specificatie)
-                self.assertEqual(res, expected)
-
     def test_format_date_month_name(self):
         tests = [
             ("202305", "mei 2023"),

@@ -70,15 +70,15 @@
                 <table class="yearly-report__table table-fixed">
                     <tr class="yearly-report__tr">
                         <th class="yearly-report__th">BSN</th>
-                        <th class="yearly-report__th">Loon Zorgverzekeringswet</th>
                         <th class="yearly-report__th">Ingehouden bijdrage Zorgverzekeringswet</th>
                         <th class="yearly-report__th">Tijdvak</th>
+                        <th class="yearly-report__th">Verrekende levensloopverlofkorting</th>
                     </tr>
                     <tr class="yearly-report__tr">
                         <td class="yearly-report__td">{{ client.burger_service_nr }}</td>
-                        <td class="yearly-report__td">{% calculate_loon_zvw spec %}</td>
                         <td class="yearly-report__td">0</td>
                         <td class="yearly-report__td">{% format_period spec.aangifte_periode_van %} t/m {% format_period spec.aangifte_periode_tot %}</td>
+                        <td class="yearly-report__td">0</td>
                     </tr>
                 </table>
             </div>
@@ -87,16 +87,17 @@
                 <table class="yearly-report__table table-fixed">
                     <tr class="yearly-report__tr">
                         <!-- Hard-coded for now; see below -->
-                        <th class="yearly-report__th">Verrekende levensloopverlofkorting</th>
                         <th class="yearly-report__th">Totaal premies werknemer-verzekeringen</th>
                         <th class="yearly-report__th">Werkgeversheffing Zorgverzekeringswet </th>
                         <th class="yearly-report__th">Code loonbelastingtabel</th>
+                        <th class="yearly-report__th"></th>
                     </tr>
                     <tr class="yearly-report__tr">
                         <td class="yearly-report__td">0</td>
-                        <td class="yearly-report__td">0</td>
                         <td class="yearly-report__td">{{ spec.werkgeversheffing_premie_zvw.waarde_bedrag|unlocalize }}</td>
                         <td class="yearly-report__td">{{ spec.cd_premie_volksverzekering }}</td>
+                        {# TODO: Ugly style hack to avoid an empty black box and keep the grid spacing #}
+                        <td class="yearly-report__td" style="border: 0"></td>
                     </tr>
                 </table>
             </div>

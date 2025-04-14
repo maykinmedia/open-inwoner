@@ -9,18 +9,6 @@ register = template.Library()
 
 
 @register.simple_tag
-def calculate_loon_zvw(specificatie) -> int | str:
-    if not specificatie:
-        return ""
-
-    fiscaalloon = specificatie.fiscaalloon.waarde_bedrag
-
-    if vergoeding := specificatie.vergoeding_premie_zvw:
-        return fiscaalloon - vergoeding.waarde_bedrag
-    return fiscaalloon
-
-
-@register.simple_tag
 def format_date_month_name(date_str: str) -> str:
     """
     204805 -> mei 2048
