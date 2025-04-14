@@ -8,22 +8,24 @@ contents is tested in `test_xml_parsing.py`
 """
 
 from http import HTTPStatus
-from pathlib import Path
 from unittest.mock import patch
 
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
+import requests_mock
 from freezegun import freeze_time
 from pyquery import PyQuery
 
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.ssd.tests.factories import SSDConfigFactory
+from open_inwoner.ssd.tests.mocks import (
+    mock_jaaropgave_response,
+    mock_uitkering_response_basic,
+)
 
 from ..client import UitkeringClient
-from .mocks import mock_report
-
-FILES_DIR = Path(__file__).parent.resolve() / "files"
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
@@ -66,7 +68,7 @@ class TestMonthlyBenefitsFormView(TestCase):
 
     @patch(
         "open_inwoner.ssd.client.UitkeringClient.get_reports",
-        return_value=mock_report(str(FILES_DIR / "uitkering_response_basic.xml")),
+        return_value=mock_uitkering_response_basic(),
     )
     @freeze_time("1985-12-25")
     def test_uitkering_post_success(self, mock_report):
@@ -154,7 +156,7 @@ class TestYearlyBenefitsFormView(TestCase):
 
     @patch(
         "open_inwoner.ssd.client.JaaropgaveClient.get_reports",
-        return_value=mock_report(str(FILES_DIR / "jaaropgave_response.xml")),
+        return_value=mock_jaaropgave_response(),
     )
     @freeze_time("1985-12-25")
     def test_jaaropgave_post_success(self, mock_report):
