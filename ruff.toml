@@ -93,8 +93,17 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 [lint.pep8-naming]
 ignore-names = [
     # N801
-    "eHerkenning*", "eSuite*", "BRP_[0-9]_[0-9]",
+    "eHerkenning*",
+    "eSuite*",
+    "BRP_[0-9]_[0-9]",
     # N802
-    "*setUp*", "tearDown*", "*assert*",
-    "*TimelineLog*", "innNnpId",
+    "*setUp*",
+    "tearDown*",
+    "*assert*",
+    "*TimelineLog*",
+    "innNnpId",
 ]
+
+[format]
+# Use `\n` line endings for all files
+line-ending = "lf"
