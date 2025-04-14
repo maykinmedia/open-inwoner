@@ -15,7 +15,6 @@ def form_class_factory(*args, **kwargs):
 
 class LimitedUploadFileFieldTests(TestCase):
     def test_title_starting_lowercase(self):
-
         with self.assertRaises(ValueError):
             form_class_factory(allowed_mime_types=["i-am-not-a/valid-mime-type"])
 

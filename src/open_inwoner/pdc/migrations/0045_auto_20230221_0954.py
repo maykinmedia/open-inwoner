@@ -5,7 +5,6 @@ import open_inwoner.utils.validators
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("pdc", "0044_question_category_or_product_null"),
     ]

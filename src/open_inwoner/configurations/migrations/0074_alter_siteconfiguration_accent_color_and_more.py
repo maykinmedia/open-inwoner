@@ -6,7 +6,6 @@ import colorfield.fields
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("flatpages", "0001_initial"),
         (

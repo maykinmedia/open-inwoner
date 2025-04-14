@@ -19,7 +19,6 @@ def validate_no_missing_catalogus_fields(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("openzaak", "0052_add_catalogusconfig_service"),
     ]

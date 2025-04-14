@@ -5,7 +5,6 @@ import django_jsonform.models.fields
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("openzaak", "0033_openzaakconfig_enable_categories_filtering_with_zaken"),
     ]

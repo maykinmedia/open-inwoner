@@ -5,7 +5,6 @@ import open_inwoner.accounts.models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("accounts", "0054_remove_action_goal"),
     ]

@@ -32,7 +32,6 @@ def reverse_migrate_catalogus_config_service_field_from_default(apps, schema_edi
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("zgw_consumers", "0019_alter_service_uuid"),
         ("openzaak", "0051_drop_root_zgw_fields"),

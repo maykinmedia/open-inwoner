@@ -14,7 +14,6 @@ def set_order_fields(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("pdc", "0051_auto_20230220_1702"),
     ]

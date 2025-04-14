@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("openzaak", "0037_openzaakconfig_fetch_eherkenning_zaken_with_rsin"),
     ]

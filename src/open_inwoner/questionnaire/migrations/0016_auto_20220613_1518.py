@@ -5,7 +5,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("pdc", "0039_alter_category_highlighted"),
         ("questionnaire", "0015_alter_questionnairestep_help_text"),

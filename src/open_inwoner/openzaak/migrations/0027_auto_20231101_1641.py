@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("openzaak", "0026_zaaktypestatustypeconfig_document_upload_description"),
     ]

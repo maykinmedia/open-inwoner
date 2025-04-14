@@ -3,7 +3,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("zgw_consumers", "0019_alter_service_uuid"),
         ("openzaak", "0047_delete_statustranslation"),

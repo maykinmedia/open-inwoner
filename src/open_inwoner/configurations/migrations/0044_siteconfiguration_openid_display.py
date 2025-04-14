@@ -5,7 +5,6 @@ import open_inwoner.configurations.validators
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("configurations", "0043_siteconfiguration_allow_messages_file_sharing"),
     ]

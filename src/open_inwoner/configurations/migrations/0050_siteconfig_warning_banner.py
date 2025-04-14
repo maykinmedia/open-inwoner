@@ -6,7 +6,6 @@ import colorfield.fields
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("configurations", "0049_siteconfiguration_extra_css"),
     ]

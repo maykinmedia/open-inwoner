@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("openzaak", "0064_remove_openzaakconfig_enable_eherkenning_for_eenmanszaak"),
     ]

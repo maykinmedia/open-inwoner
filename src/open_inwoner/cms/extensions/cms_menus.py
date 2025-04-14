@@ -36,7 +36,8 @@ class MenuModifier(Modifier):
             pages = (
                 Page.objects.filter(id__in=page_nodes.keys())
                 # optimise and only retrieve id and related object
-                .only("id").select_related("commonextension")
+                .only("id")
+                .select_related("commonextension")
             )
             num_indicators = 0
 

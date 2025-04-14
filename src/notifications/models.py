@@ -104,9 +104,9 @@ class Subscription(models.Model):
         """
         Registers the webhook with the notification component.
         """
-        assert (
-            self.notifications_api_config.notifications_api_service
-        ), "No service for Notifications API configured"
+        assert self.notifications_api_config.notifications_api_service, (
+            "No service for Notifications API configured"
+        )
 
         client = self.notifications_api_config.get_client()
 

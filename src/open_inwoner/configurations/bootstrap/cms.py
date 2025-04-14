@@ -61,8 +61,7 @@ class GenericCMSConfigurationStep(BaseConfigurationStep):
 
         cms_tools.create_apphook_page(self.app_hook, extension_args=extension_args)
 
-    def test_configuration(self):
-        ...
+    def test_configuration(self): ...
 
 
 class CMSConfigSettings(ConfigSettings):
@@ -83,7 +82,6 @@ class CMSConfigSettings(ConfigSettings):
         *args,
         **kwargs,
     ):
-
         super().__init__(
             *args,
             namespace=namespace,

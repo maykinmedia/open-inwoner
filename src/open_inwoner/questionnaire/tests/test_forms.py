@@ -10,7 +10,7 @@ class QuestionnaireStepChoiceFieldTestCase(TestCase):
         root.add_child(parent_answer="bar")
         field = QuestionnaireStepChoiceField(queryset=root.get_children())
 
-        for (index, choice) in enumerate(field.choices):
+        for index, choice in enumerate(field.choices):
             if index == 0:
                 continue
             self.assertEqual("bar", choice[1])

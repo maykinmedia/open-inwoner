@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("configurations", "0034_siteconfiguration_plans_banner"),
         ("configurations", "0035_alter_siteconfiguration_footer_visiting_phonenumber"),

@@ -15,8 +15,7 @@ if TYPE_CHECKING:
 
 
 class ParsePhoneNumber(Protocol):
-    def __call__(self, value: str) -> "PhoneNumber":
-        ...  # pragma: nocover
+    def __call__(self, value: str) -> "PhoneNumber": ...
 
 
 @deconstructible

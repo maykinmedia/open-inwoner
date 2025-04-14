@@ -39,7 +39,6 @@ def reverse_migrate_zgw_service_config_to_default_group_config(apps, schema_edit
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("openzaak", "0049_add_multiple_zgw_backends_config"),
     ]

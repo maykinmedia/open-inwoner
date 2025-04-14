@@ -5,7 +5,6 @@ import openformsclient.models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("pdc", "0041_auto_20220724_1357"),
     ]

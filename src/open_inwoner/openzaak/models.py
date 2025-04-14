@@ -499,7 +499,6 @@ class OpenZaakConfig(SingletonModel):
 
 
 class CatalogusConfig(models.Model):
-
     objects = CatalogusConfigManager()
 
     url = models.URLField(

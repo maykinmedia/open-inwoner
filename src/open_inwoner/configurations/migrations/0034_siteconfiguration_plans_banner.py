@@ -7,7 +7,6 @@ import filer.fields.image
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.FILER_IMAGE_MODEL),
         ("configurations", "0033_alter_siteconfiguration_favicon"),

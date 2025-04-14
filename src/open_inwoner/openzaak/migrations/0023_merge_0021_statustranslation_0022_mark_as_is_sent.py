@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("openzaak", "0021_statustranslation"),
         ("openzaak", "0022_mark_as_is_sent"),

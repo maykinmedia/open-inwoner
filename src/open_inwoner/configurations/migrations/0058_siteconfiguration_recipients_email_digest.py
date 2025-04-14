@@ -5,7 +5,6 @@ import django_jsonform.models.fields
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("configurations", "0057_siteconfiguration_theme_stylesheet"),
     ]

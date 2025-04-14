@@ -6,7 +6,6 @@ import open_inwoner.openzaak.models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("openzaak", "0006_auto_20230123_1619"),
     ]

@@ -16,7 +16,6 @@ def remove_orphan_files(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("pdc", "0033_merge_20220329_1630"),
     ]

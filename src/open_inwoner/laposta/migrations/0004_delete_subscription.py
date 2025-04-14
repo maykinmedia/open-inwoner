@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("laposta", "0003_lapostaconfig_limit_list_selection_to"),
     ]

@@ -5,7 +5,6 @@ import django_jsonform.models.fields
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("pdc", "0061_auto_20231106_1207"),
     ]

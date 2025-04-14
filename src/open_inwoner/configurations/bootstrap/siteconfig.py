@@ -150,5 +150,4 @@ class SiteConfigurationStep(BaseConfigurationStep):
 
         form.save()
 
-    def test_configuration(self):
-        ...
+    def test_configuration(self): ...

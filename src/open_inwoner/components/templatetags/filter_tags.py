@@ -11,7 +11,7 @@ def search_filters(
     search_filter_categories,
     search_filter_tags,
     search_filter_organizations,
-    **kwargs
+    **kwargs,
 ):
     """
     Renders a search filter.

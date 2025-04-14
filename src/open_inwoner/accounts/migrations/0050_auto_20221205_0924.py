@@ -5,7 +5,6 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("plans", "0011_remove_plan_contacts"),
         ("accounts", "0049_auto_20221205_0921"),

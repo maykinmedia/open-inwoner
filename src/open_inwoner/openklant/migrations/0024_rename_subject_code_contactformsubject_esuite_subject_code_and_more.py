@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("openklant", "0024_alter_klantensysteemconfig_primary_backend")]
 
     operations = [

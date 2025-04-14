@@ -40,9 +40,9 @@ class EHerkenningSessionContextTests(TestCase):
 
     def test_branch_restriction_check_fails_on_non_bool(self):
         request = self.make_request_with_session()
-        request.session[
-            "_auth_user_backend"
-        ] = EHerkenningSessionContext._expected_auth_backends()[0]
+        request.session["_auth_user_backend"] = (
+            EHerkenningSessionContext._expected_auth_backends()[0]
+        )
 
         for val in (1, "foo", object(), None):
             with self.subTest(val):
@@ -76,9 +76,9 @@ class EHerkenningSessionContextTests(TestCase):
 
     def test_change_authenticated_user_raises_on_incorrect_backend(self):
         request = self.make_request_with_session()
-        request.session[
-            "_auth_user_backend"
-        ] = "open_inwoner.accounts.backends.DigiDOIDCBackend"
+        request.session["_auth_user_backend"] = (
+            "open_inwoner.accounts.backends.DigiDOIDCBackend"
+        )
 
         context = EHerkenningSessionContext(request)
         with self.assertRaises(ValueError) as ctx:
@@ -94,9 +94,9 @@ class EHerkenningSessionContextTests(TestCase):
 
     def test_change_authenticated_user_raises_on_non_eherkenning_user(self):
         request = self.make_request_with_session()
-        request.session[
-            "_auth_user_backend"
-        ] = EHerkenningSessionContext._expected_auth_backends()[0]
+        request.session["_auth_user_backend"] = (
+            EHerkenningSessionContext._expected_auth_backends()[0]
+        )
         request.user = DigidUserFactory()
 
         context = EHerkenningSessionContext(request)
@@ -109,9 +109,9 @@ class EHerkenningSessionContextTests(TestCase):
         self,
     ):
         request = self.make_request_with_session()
-        request.session[
-            "_auth_user_backend"
-        ] = EHerkenningSessionContext._expected_auth_backends()[0]
+        request.session["_auth_user_backend"] = (
+            EHerkenningSessionContext._expected_auth_backends()[0]
+        )
         request.user = self.user
 
         context = EHerkenningSessionContext(request)
@@ -131,9 +131,9 @@ class EHerkenningSessionContextTests(TestCase):
 
     def test_change_authenticated_user_raises_on_target_user_with_different_kvk(self):
         request = self.make_request_with_session()
-        request.session[
-            "_auth_user_backend"
-        ] = EHerkenningSessionContext._expected_auth_backends()[0]
+        request.session["_auth_user_backend"] = (
+            EHerkenningSessionContext._expected_auth_backends()[0]
+        )
         request.user = self.user
         different_kvk_user = eHerkenningUserFactory(kvk="38804926")
 
@@ -152,9 +152,9 @@ class EHerkenningSessionContextTests(TestCase):
 
     def test_change_authenticated_user_from_kvk_to_kvk_and_vestiging(self):
         request = self.make_request_with_session()
-        request.session[
-            "_auth_user_backend"
-        ] = EHerkenningSessionContext._expected_auth_backends()[0]
+        request.session["_auth_user_backend"] = (
+            EHerkenningSessionContext._expected_auth_backends()[0]
+        )
         request.user = self.user
 
         context = EHerkenningSessionContext(request)
@@ -172,9 +172,9 @@ class EHerkenningSessionContextTests(TestCase):
 
     def test_change_authenticated_user_from_vestiging_and_kvk_to_only_kvk(self):
         request = self.make_request_with_session()
-        request.session[
-            "_auth_user_backend"
-        ] = EHerkenningSessionContext._expected_auth_backends()[0]
+        request.session["_auth_user_backend"] = (
+            EHerkenningSessionContext._expected_auth_backends()[0]
+        )
         request.user = self.vestiging_user
 
         context = EHerkenningSessionContext(request)
@@ -190,9 +190,9 @@ class EHerkenningSessionContextTests(TestCase):
 
     def test_change_authenticated_user_to_same_user_does_not_mutate_session(self):
         request = self.make_request_with_session()
-        request.session[
-            "_auth_user_backend"
-        ] = EHerkenningSessionContext._expected_auth_backends()[0]
+        request.session["_auth_user_backend"] = (
+            EHerkenningSessionContext._expected_auth_backends()[0]
+        )
         request.user = self.user
 
         context = EHerkenningSessionContext(request)
@@ -213,7 +213,6 @@ class EHerkenningSessionContextTests(TestCase):
 
     def test_change_authenticated_user_maintains_branch_restriction_and_backend(self):
         for expected_backend in EHerkenningSessionContext._expected_auth_backends():
-
             with self.subTest(expected_backend):
                 request = self.make_request_with_session()
                 request.session["_auth_user_backend"] = expected_backend
@@ -236,9 +235,9 @@ class EHerkenningSessionContextTests(TestCase):
 
     def test_change_authenticated_user_persists_session_variables(self):
         request = self.make_request_with_session()
-        request.session[
-            "_auth_user_backend"
-        ] = EHerkenningSessionContext._expected_auth_backends()[0]
+        request.session["_auth_user_backend"] = (
+            EHerkenningSessionContext._expected_auth_backends()[0]
+        )
         request.user = self.user
         context = EHerkenningSessionContext(request)
         context._set_branch_restriction(False)

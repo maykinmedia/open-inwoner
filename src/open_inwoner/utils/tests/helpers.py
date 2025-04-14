@@ -42,7 +42,6 @@ class AssertTimelineLogMixin:
         content_object_repr=None,
         action_flag=None,
     ) -> TimelineLog:
-
         kwargs = {
             f"extra_data__message__{lookup}": force_str(message),
         }

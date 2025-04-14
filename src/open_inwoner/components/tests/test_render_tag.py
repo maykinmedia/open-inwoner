@@ -26,7 +26,7 @@ class RenderableTagTests(TestCase):
         actual = tag.render({"content": "Hello world!"})
         expected = f"""
         <div>
-            <p>{_('Yes')}</p>
+            <p>{_("Yes")}</p>
             <p>Hello world!</p>
         </div>
         """
@@ -45,7 +45,7 @@ class RenderableTagTests(TestCase):
             <h1>Welcome</h1>
             <p>I&#x27;m a simple tag!</p>
             <div>
-                <p>{_('Yes')}</p>
+                <p>{_("Yes")}</p>
                 <p>Hello world!</p>
             </div>
         </div>
@@ -60,7 +60,7 @@ class RenderableTagTests(TestCase):
             <h1>Welcome</h1>
             <p>I&#x27;m a simple tag!</p>
             <div>
-                <p>{_('Yes')}</p>
+                <p>{_("Yes")}</p>
                 <p>default</p>
             </div>
         </div>
@@ -77,7 +77,7 @@ class RenderableTagTests(TestCase):
             <h1>Welcome</h1>
             <p>I&#x27;m a simple tag!</p>
             <div>
-                <p>{_('Yes')}</p>
+                <p>{_("Yes")}</p>
                 <p>Hello world!</p>
             </div>
         </div>

@@ -9,7 +9,6 @@ import open_inwoner.utils.validators
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("accounts", "0002_auto_20211004_1708"),
     ]

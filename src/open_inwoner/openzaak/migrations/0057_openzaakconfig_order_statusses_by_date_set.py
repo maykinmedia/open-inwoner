@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("openzaak", "0056_openzaakconfig_use_zaak_omschrijving_as_title"),
     ]

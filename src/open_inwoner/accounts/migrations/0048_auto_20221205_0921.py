@@ -6,7 +6,6 @@ import open_inwoner.utils.validators
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("accounts", "0047_action_is_deleted"),
     ]

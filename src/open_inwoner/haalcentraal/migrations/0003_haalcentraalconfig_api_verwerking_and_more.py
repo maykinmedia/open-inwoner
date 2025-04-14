@@ -6,7 +6,6 @@ import open_inwoner.haalcentraal.validators
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("haalcentraal", "0002_auto_20230206_1511"),
     ]

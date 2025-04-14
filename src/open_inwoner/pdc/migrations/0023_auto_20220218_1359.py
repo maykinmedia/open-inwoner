@@ -10,7 +10,6 @@ import filer.fields.image
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("filer", "0012_file_mime_type"),
         migrations.swappable_dependency(settings.FILER_IMAGE_MODEL),

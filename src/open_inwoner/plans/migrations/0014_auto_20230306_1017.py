@@ -6,7 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("accounts", "0055_user_image"),
         ("plans", "0013_auto_20230223_1115"),

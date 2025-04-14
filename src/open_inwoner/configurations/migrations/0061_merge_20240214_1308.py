@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("configurations", "0059_siteconfiguration_email_logo"),
         ("configurations", "0060_auto_20240208_1426"),

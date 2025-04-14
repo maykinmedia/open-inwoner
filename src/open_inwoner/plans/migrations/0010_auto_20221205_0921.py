@@ -11,7 +11,6 @@ def populate_plan_contacts(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("plans", "0009_plan_plan_contacts"),
     ]

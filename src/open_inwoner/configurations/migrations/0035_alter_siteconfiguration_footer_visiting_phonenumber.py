@@ -5,7 +5,6 @@ import open_inwoner.utils.validators
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("configurations", "0034_siteconfiguration_footer_visiting_phonenumber"),
     ]

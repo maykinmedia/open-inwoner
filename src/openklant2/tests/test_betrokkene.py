@@ -85,7 +85,7 @@ def betrokkene_factory(client, persoon_factory, klantcontact_factory):
             *args,
             **kwargs,
             hadKlantcontact={"uuid": klantcontact["uuid"]},
-            wasPartij={"uuid": partij["uuid"]}
+            wasPartij={"uuid": partij["uuid"]},
         )
         return client.betrokkene.create(data=data)
 

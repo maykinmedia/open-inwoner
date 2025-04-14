@@ -6,7 +6,6 @@ import open_inwoner.openklant.models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("openklant", "0018_rename_openklantconfig_esuiteklantconfig_and_more"),
     ]

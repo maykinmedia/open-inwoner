@@ -469,7 +469,7 @@ class TestCaseDetailView(
             betrokkeneIdentificatie={
                 "vestigingsNummer": self.vestiging_user.vestiging,
                 "handelsnaam": "Foo Bar",
-                "verblijfsadres" "subVerblijfBuitenland": "van der",
+                "verblijfsadressubVerblijfBuitenland": "van der",
                 "kvkNummer": "Bazz",
             },
         )

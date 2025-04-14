@@ -6,7 +6,6 @@ import django_jsonform.models.fields
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("openzaak", "0026_zaaktypestatustypeconfig_document_upload_description"),
     ]

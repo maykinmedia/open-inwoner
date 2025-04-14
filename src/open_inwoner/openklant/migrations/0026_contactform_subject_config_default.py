@@ -33,7 +33,6 @@ def delete_default_for_klant_config(apps, _):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("openklant", "0025_esuiteklantconfig_send_klantcontact_confirmation_email"),
     ]

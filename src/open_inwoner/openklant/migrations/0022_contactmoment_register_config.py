@@ -18,7 +18,6 @@ def migrate_registration_defaults(apps, _):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("openklant", "0021_klantensysteemconfig_register_contact_email_and_more"),
     ]

@@ -30,7 +30,6 @@ def populate_invite_names(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("accounts", "0048_auto_20221205_0921"),
     ]

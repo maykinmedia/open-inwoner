@@ -5,7 +5,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("zgw_consumers", "0019_alter_service_uuid"),
         ("qmatic", "0003_alter_qmaticconfig_service"),

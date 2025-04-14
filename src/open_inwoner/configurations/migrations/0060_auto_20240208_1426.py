@@ -8,7 +8,6 @@ import open_inwoner.utils.files
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("configurations", "0059_merge_20240129_1645"),
     ]

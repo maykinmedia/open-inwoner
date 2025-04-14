@@ -8,7 +8,6 @@ logger = logging.getLogger(__name__)
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("openzaak", "0050_migrate_zgw_root_fields_to_multi_backend"),
     ]

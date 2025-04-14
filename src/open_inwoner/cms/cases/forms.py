@@ -24,7 +24,7 @@ class CaseUploadForm(forms.Form):
         self.oz_config = OpenZaakConfig.get_solo()
         super().__init__(**kwargs)
 
-        help_text = f"Grootte max. { self.oz_config.max_upload_size } MB, toegestane document formaten: { ', '.join(self.oz_config.allowed_file_extensions) }."
+        help_text = f"Grootte max. {self.oz_config.max_upload_size} MB, toegestane document formaten: {', '.join(self.oz_config.allowed_file_extensions)}."
 
         try:
             ztc = ZaakTypeConfig.objects.filter_case_type(case.zaaktype).get()
@@ -37,8 +37,10 @@ class CaseUploadForm(forms.Form):
         if case:
             self.fields[
                 "type"
-            ].queryset = ZaakTypeInformatieObjectTypeConfig.objects.filter_enabled_for_case_type(
-                case.zaaktype
+            ].queryset = (
+                ZaakTypeInformatieObjectTypeConfig.objects.filter_enabled_for_case_type(
+                    case.zaaktype
+                )
             )
 
         choices = self.fields["type"].choices

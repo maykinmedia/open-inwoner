@@ -6,7 +6,6 @@ import open_inwoner.utils.fields
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("configurations", "0048_auto_20230816_1255"),
     ]

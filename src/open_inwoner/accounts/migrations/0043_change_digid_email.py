@@ -22,7 +22,6 @@ def change_hash_email_to_bsn(apps, _):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("accounts", "0042_alter_invite_invitee_email")]
 
     operations = [

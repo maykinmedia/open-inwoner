@@ -20,7 +20,6 @@ class KvKViewsTestCase(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-
         super().setUpTestData()
 
         cls.user = eHerkenningUserFactory.create(

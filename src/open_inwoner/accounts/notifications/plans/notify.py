@@ -63,7 +63,6 @@ def collect_notifications_about_expiring_plans() -> list[dict]:
 def notify_user_about_expiring_plans(
     receiver_id: int, object_ids: list[int], channel: str
 ) -> None:
-
     send = _channels[channel]
 
     send(receiver_id=receiver_id, plan_ids=object_ids)

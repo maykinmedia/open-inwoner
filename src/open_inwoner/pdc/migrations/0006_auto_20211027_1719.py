@@ -6,7 +6,6 @@ import autoslug.fields
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("pdc", "0005_auto_20211025_1803"),
     ]

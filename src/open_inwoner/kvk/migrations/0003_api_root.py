@@ -15,7 +15,6 @@ def strip_version_number(apps, _):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("kvk", "0002_alter_kvkconfig_api_root"),
     ]

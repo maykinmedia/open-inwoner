@@ -5,7 +5,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("zgw_consumers", "0016_auto_20220818_1412"),
         ("openzaak", "0016_alter_zaaktypeconfig_document_upload_enabled"),

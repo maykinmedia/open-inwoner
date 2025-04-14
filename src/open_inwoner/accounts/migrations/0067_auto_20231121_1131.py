@@ -5,7 +5,6 @@ import open_inwoner.utils.validators
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("accounts", "0066_remove_user_selected_categories"),
     ]

@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("pdc", "0063_remove_category_relevante_zaakperiode"),
     ]

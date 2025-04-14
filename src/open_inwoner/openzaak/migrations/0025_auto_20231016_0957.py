@@ -6,7 +6,6 @@ import django_jsonform.models.fields
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("openzaak", "0024_zaaktypeconfig_contact_subject_code"),
     ]

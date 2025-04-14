@@ -242,7 +242,7 @@ class TestSearchView(ESMixin, TransactionTestCase):
 
         self.client.force_login(self.user)
         params = urlencode({"query": "ZAAK-2022-0000000001"}, doseq=True)
-        response = self.client.get(f'{reverse("search:search")}?{params}')
+        response = self.client.get(f"{reverse('search:search')}?{params}")
 
         # In case of an exact identificatie match, user should be redirected to
         # the status page of that Zaak
@@ -278,7 +278,7 @@ class TestSearchView(ESMixin, TransactionTestCase):
 
         search_url = reverse("search:search")
         params = urlencode({"query": "ZAAK-2022-0000000001"}, doseq=True)
-        response = self.client.get(f'{reverse("search:search")}?{params}')
+        response = self.client.get(f"{reverse('search:search')}?{params}")
 
         # Show regular search results page
         self.assertEqual(response.status_code, 200)
@@ -291,7 +291,7 @@ class TestSearchView(ESMixin, TransactionTestCase):
 
         search_url = reverse("search:search")
         params = urlencode({"query": "ZAAK-2022-000000000"}, doseq=True)
-        response = self.client.get(f'{reverse("search:search")}?{params}')
+        response = self.client.get(f"{reverse('search:search')}?{params}")
 
         # Show regular search results page
         self.assertEqual(response.status_code, 200)
@@ -362,7 +362,7 @@ class TestSearchView(ESMixin, TransactionTestCase):
 
         self.client.force_login(self.user)
         params = urlencode({"query": "ZAAK-2022-0000000001"}, doseq=True)
-        response = self.client.get(f'{reverse("search:search")}?{params}')
+        response = self.client.get(f"{reverse('search:search')}?{params}")
 
         # In case of an exact identificatie match, user should be redirected to
         # the status page of that Zaak
@@ -385,7 +385,7 @@ class TestSearchView(ESMixin, TransactionTestCase):
         mock_search.side_effect = ConnectionTimeout()
         self.client.force_login(self.user)
         params = urlencode({"query": "stuff"}, doseq=True)
-        response = self.client.get(f'{reverse("search:search")}?{params}')
+        response = self.client.get(f"{reverse('search:search')}?{params}")
 
         self.assertEqual(response.status_code, 200)
 

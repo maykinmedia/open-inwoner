@@ -5,7 +5,6 @@ import open_inwoner.kvk.validators
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("kvk", "0003_api_root"),
     ]

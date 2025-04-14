@@ -138,7 +138,6 @@ class JaaropgaveClient(SSDBaseClient):
     def get_reports(
         self, bsn: str, report_date: str, request_base_url: str
     ) -> bytes | None:
-
         response = self.templated_request(bsn=bsn, dienstjaar=report_date)
 
         if not response or response.status_code != 200:
@@ -194,7 +193,6 @@ class UitkeringClient(SSDBaseClient):
     def get_reports(
         self, bsn: str, report_date: str, request_base_url: str
     ) -> bytes | None:
-
         response = self.templated_request(bsn=bsn, period=report_date)
 
         if not response or response.status_code != 200:

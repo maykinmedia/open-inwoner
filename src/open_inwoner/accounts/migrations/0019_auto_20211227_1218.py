@@ -6,7 +6,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("pdc", "0018_alter_product_keywords"),
         ("accounts", "0018_merge_20211222_1030"),

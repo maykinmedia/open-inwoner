@@ -10,7 +10,6 @@ def migrate_invite_email(apps, _):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("accounts", "0040_auto_20220518_1456")]
 
     operations = [migrations.RunPython(migrate_invite_email, migrations.RunPython.noop)]

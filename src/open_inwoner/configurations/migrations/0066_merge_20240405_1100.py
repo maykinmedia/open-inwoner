@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("configurations", "0065_siteconfiguration_email_verification_required"),
         ("configurations", "0065_siteconfiguration_kcm_survey_link_text_and_more"),

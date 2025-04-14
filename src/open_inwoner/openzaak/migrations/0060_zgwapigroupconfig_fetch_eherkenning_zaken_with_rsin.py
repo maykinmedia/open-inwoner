@@ -21,7 +21,6 @@ def migrate_fetch_eherkenning_zaken_with_rsin(apps, _):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("openzaak", "0059_openzaakconfig_show_cases_without_status"),
     ]
