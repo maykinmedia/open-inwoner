@@ -27,6 +27,14 @@ exclude = [
     "site-packages",
     "venv",
     "env",
+
+    # Django specific
+    "static",
+    "media",
+    "env",
+
+    # Project specific
+    "src/open_inwoner/conf/local.py",
 ]
 
 # Same as Black.
@@ -104,6 +112,22 @@ ignore-names = [
     "innNnpId",
 ]
 
+# Import sorting configuration (equivalent to isort)
+[lint.isort]
+combine-as-imports = true
+force-wrap-aliases = false
+known-first-party = ["open_inwoner"]
+known-third-party = ["django"]
+lines-after-imports = 2
+relative-imports-order = "furthest-to-closest"
+section-order = [
+    "future",
+    "standard-library",
+    "third-party",
+    "first-party",
+    "local-folder",
+]
+
+
 [format]
-# Use `\n` line endings for all files
 line-ending = "lf"
