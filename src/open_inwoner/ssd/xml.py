@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, TypedDict, cast
 
 import requests
 from lxml import etree  # nosec
@@ -8,7 +8,13 @@ from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.parsers import XmlParser
 from xsdata.formats.dataclass.parsers.handlers import LxmlEventHandler
 
-from .service.jaaropgave import JaarOpgaveInfoResponse
+from open_inwoner.ssd.service.jaaropgave.body_reaction_resolved import (
+    Inhoudingsplichtige,
+    JaarOpgave,
+    SpecificatieJaarOpgave,
+)
+
+from .service.jaaropgave import Client, JaarOpgaveInfoResponse
 from .service.uitkering import (
     UitkeringsSpecificatieInfoResponse as UitkeringInfoResponse,
 )
@@ -56,7 +62,13 @@ def _get_report_info(
     return info
 
 
-def get_jaaropgaven(response: requests.Response) -> list[dict] | None:
+class JaaropgaveReturn(TypedDict):
+    client: Client
+    inhoudingsplichtige: Inhoudingsplichtige
+    specificatie: SpecificatieJaarOpgave
+
+
+def get_jaaropgaven(response: requests.Response) -> list[JaaropgaveReturn] | None:
     """
     Wrapper function: guard against `AttributeError` while fetching Jaaropgave data
     """
@@ -68,10 +80,14 @@ def get_jaaropgaven(response: requests.Response) -> list[dict] | None:
         return None
 
     try:
-        client = jaaropgave_info.jaar_opgave_client.client
-        jaar_opgave = jaaropgave_info.jaar_opgave_client.jaar_opgave[0]
-        inhoudingsplichtige = jaar_opgave.inhoudingsplichtige
-        specificatien = jaar_opgave.specificatie_jaar_opgave
+        client = cast(Client, jaaropgave_info.jaar_opgave_client.client)
+        jaar_opgave = cast(
+            JaarOpgave, jaaropgave_info.jaar_opgave_client.jaar_opgave[0]
+        )
+        inhoudingsplichtige = cast(Inhoudingsplichtige, jaar_opgave.inhoudingsplichtige)
+        specificatien = cast(
+            list[SpecificatieJaarOpgave], jaar_opgave.specificatie_jaar_opgave
+        )
     except AttributeError:
         return None
 
