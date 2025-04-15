@@ -82,7 +82,9 @@ class ContactCreateView(
         if added_contacts:
             for contact_user in added_contacts:
                 user.contacts_for_approval.add(contact_user)
-                self.send_email_to_existing_user(contact_user, user, self.request)
+                self.send_contact_approval_email_to_existing_user(
+                    contact_user, user, self.request
+                )
                 self.log_addition(
                     contact_user, _("contact was added, pending approval")
                 )
@@ -108,7 +110,9 @@ class ContactCreateView(
         )
         return HttpResponseRedirect(self.get_success_url())
 
-    def send_email_to_existing_user(self, receiver: User, sender: User, request=None):
+    def send_contact_approval_email_to_existing_user(
+        self, receiver: User, sender: User, request=None
+    ):
         contacts_url = reverse("profile:contact_list")
         if request:
             url = request.build_absolute_uri(contacts_url)
