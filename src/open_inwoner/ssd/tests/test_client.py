@@ -188,7 +188,7 @@ class UitkeringClientTest(TestCase):
         self.assertEqual(root.findtext(".//ApplicatieNaam"), "Open Inwoner")
         self.assertEqual(root.findtext(".//ApplicatieInformatie"), "Open Inwoner")
         for elem in root.findall(".//Gemeentecode"):
-            self.assertEqual(elem.text, "12345")
+            self.assertEqual(elem.text, "1234")
         self.assertEqual(
             root.findtext(".//DatTijdAanmaakRequest"), "2023-07-12T11:00:00"
         )
@@ -213,7 +213,7 @@ class JaaropgaveClientTest(TestCase):
                 res = ssd_client.get_reports(
                     bsn="12345",
                     report_date="1985-12-24",
-                    request_base_url="https://dummy.com",
+                    base_url="https://dummy.com",
                 )
                 self.assertIsNone(res)
 
@@ -230,7 +230,7 @@ class JaaropgaveClientTest(TestCase):
         ssd_client.get_reports(
             bsn="12345",
             report_date="1985",
-            request_base_url="https://dummy.com",
+            base_url="https://dummy.com",
         )
 
         # get request body and parse XML
@@ -244,7 +244,7 @@ class JaaropgaveClientTest(TestCase):
         self.assertEqual(root.findtext(".//ApplicatieNaam"), "Open Inwoner")
         self.assertEqual(root.findtext(".//ApplicatieInformatie"), "Open Inwoner")
         for elem in root.findall(".//Gemeentecode"):
-            self.assertEqual(elem.text, "12345")
+            self.assertEqual(elem.text, "1234")
         self.assertEqual(
             root.findtext(".//DatTijdAanmaakRequest"), "2023-07-12T11:00:00"
         )

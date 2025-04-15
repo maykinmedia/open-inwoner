@@ -135,10 +135,7 @@ class JaaropgaveClient(SSDBaseClient):
         """
         return f"Jaaropgave {report_date}"
 
-    def get_reports(
-        self, bsn: str, report_date: str, request_base_url: str
-    ) -> bytes | None:
-
+    def get_reports(self, bsn: str, report_date: str, base_url: str) -> bytes | None:
         response = self.templated_request(bsn=bsn, dienstjaar=report_date)
 
         if not response or response.status_code != 200:
@@ -159,7 +156,7 @@ class JaaropgaveClient(SSDBaseClient):
         pdf = render_pdf(
             self.html_template,
             context={"reports": jaaropgaven},
-            base_url=request_base_url,
+            base_url=base_url,
         )
         return pdf
 

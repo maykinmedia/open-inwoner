@@ -12,7 +12,7 @@ class SSDConfigFactory(factory.django.DjangoModelFactory):
     jaaropgave_endpoint = "jaaropgave/"
     applicatie_naam = "Open Inwoner"
     bedrijfs_naam = "Maykin"
-    gemeentecode = "12345"
+    gemeentecode = "1234"
 
     class Meta:
         model = SSDConfig
