@@ -1308,7 +1308,7 @@ class eHerkenningOIDCFlowTests(WebTest):
         )
         new_user = User.objects.get(kvk="00000000")
 
-        mock_retrieve_rsin_with_kvk.assert_called_with("00000000")
+        mock_retrieve_rsin_with_kvk.assert_called_with(kvk="00000000")
         salt = "generate_email_from_bsn"
         hashed_bsn = md5(
             (salt + "00000000").encode(), usedforsecurity=False
@@ -1383,7 +1383,7 @@ class eHerkenningOIDCFlowTests(WebTest):
         )
         new_user = User.objects.get(kvk="12345678", vestiging="849586958473")
 
-        mock_retrieve_rsin_with_kvk.assert_called_with("12345678")
+        mock_retrieve_rsin_with_kvk.assert_called_with(kvk="12345678")
         salt = "generate_email_from_bsn"
         hashed_bsn = md5(
             (salt + "12345678" + "849586958473").encode(), usedforsecurity=False

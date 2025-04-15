@@ -43,6 +43,10 @@
                 <div class="tabled__item tabled__key">{% trans "Vestigingsnummer" %}</div>
                 <div class="tabled__item tabled__value">{{ user.vestiging }}</div>
             </div>
+            <div class="tabled__row tabled__row--blank">
+                <div class="tabled__item tabled__key">{% trans "Branch name" %}</div>
+                <div class="tabled__item tabled__value">{{ user.branch_name }}</div>
+            </div>
         {% endif %}
         <div class="tabled__row tabled__row--blank">
             <div class="tabled__item tabled__key">{% trans "Zakelijk adres" %}</div>
