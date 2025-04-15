@@ -391,7 +391,7 @@ django-formtools==2.3
     #   -r requirements/ci.txt
     #   django-cms
     #   django-two-factor-auth
-django-htmx==1.13.0
+django-htmx==1.23.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt

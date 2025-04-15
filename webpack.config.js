@@ -37,6 +37,12 @@ module.exports = {
   // Plugins
   plugins: [new MiniCssExtractPlugin()],
 
+  resolve: {
+    alias: {
+      'htmx.org': require.resolve('htmx.org'),
+    },
+  },
+
   // Modules
   module: {
     rules: [
@@ -76,7 +82,12 @@ module.exports = {
       {
         test: /src\/.*.js?$/,
         exclude: /node_modules/,
-        loader: 'babel-loader',
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env'],
+          },
+        },
       },
 
       // .scss

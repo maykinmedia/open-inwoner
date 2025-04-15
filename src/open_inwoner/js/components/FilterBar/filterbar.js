@@ -111,14 +111,18 @@ export class FilterBar {
   }
 }
 
-// Reinitialize FilterBar after HTMX swap
-htmx.on('htmx:afterSwap', function (e) {
-  if (e.detail && e.detail.target.id === 'cases-content') {
-    const filterBars = document.querySelectorAll(FilterBar.selector)
-    if (filterBars.length !== 0) {
-      filterBars.forEach((filterbar) => new FilterBar(filterbar))
+document.addEventListener('DOMContentLoaded', function () {
+  const htmx = window.htmx
+
+  // Reinitialize FilterBar after HTMX swap
+  htmx.on('htmx:afterSwap', function (e) {
+    if (e.detail && e.detail.target.id === 'cases-content') {
+      const filterBars = document.querySelectorAll(FilterBar.selector)
+      if (filterBars.length !== 0) {
+        filterBars.forEach((filterbar) => new FilterBar(filterbar))
+      }
     }
-  }
+  })
 })
 
 // Initialize FilterBar on DOM load for the initial page load
