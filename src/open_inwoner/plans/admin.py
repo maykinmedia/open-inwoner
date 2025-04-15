@@ -6,7 +6,7 @@ from open_inwoner.utils.mixins import UUIDAdminFirstInOrder
 from .models import ActionTemplate, Plan, PlanContact, PlanTemplate
 
 
-class ActionTempalteInlineAdmin(admin.TabularInline):
+class ActionTemplateInlineAdmin(admin.TabularInline):
     model = ActionTemplate
     extra = 1
 
@@ -17,12 +17,12 @@ class PlanContactInlineAdmin(admin.TabularInline):
 
 
 @admin.register(PlanTemplate)
-class PlanTempalteAdmin(admin.ModelAdmin):
+class PlanTemplateAdmin(admin.ModelAdmin):
     list_display = (
         "name",
         "goal",
     )
-    inlines = [ActionTempalteInlineAdmin]
+    inlines = [ActionTemplateInlineAdmin]
 
 
 @admin.register(Plan)
