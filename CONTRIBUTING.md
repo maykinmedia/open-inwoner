@@ -21,29 +21,27 @@ other developers to give tips even before you start coding.
 
 To keep the code clean and readable, this project uses:
 
-- [`isort`](https://github.com/timothycrosley/isort) to order the imports
-- [`black`](https://github.com/psf/black) to format the Python code and keep diffs for
-  pull requests small
-- [`flake8`](https://github.com/PyCQA/flake8) to clean up code (removing unused imports, etc.)
+- [`ruff`](https://docs.astral.sh/ruff/) to format and clean up code (removing unused imports, etc.)
 - [`prettier`](https://github.com/prettier/prettier) to format the JS code and keep diffs for
   pull requests small
-Whenever a branch is pushed or a pull request is made, the code will be checked
-in CI by the tools mentioned above, so make sure to install these tools and run
-them locally before pushing branches/making pull requests.
+  Whenever a branch is pushed or a pull request is made, the code will be checked
+  in CI by the tools mentioned above, so make sure to install these tools and run
+  them locally before pushing branches/making pull requests.
 
 This project aims to meet the criteria of the
-[Standard for Public Code][Standard_for_Public_Code]. Please make sure that
+[Standard for Public Code][standard_for_public_code]. Please make sure that
 your pull requests are compliant, that will make the reviews quicker.
 
 ### Forking the repository
 
 In order to implement changes to this project when you do not have rights for
 this [repository][repository], you must first fork the repository. Once the
- repository is forked, you can clone it to your local machine.
+repository is forked, you can clone it to your local machine.
 
 ### Making the changes
 
 On your local machine, create a new branch, and name it like:
+
 - `feature/some-new-feature`, if the changes implement a new feature
 - `issue/some-issue`, if the changes fix an issue
 
@@ -68,8 +66,7 @@ given and if everything is approved, it will be merged.
 All pull requests will be reviewed by a project member before they are merged
 to a release branch.
 
-
 [issues]: https://github.com/maykinmedia/open-inwoner/issues
 [new_issue]: https://github.com/maykinmedia/open-inwoner/issues/new/choose
-[Standard_for_Public_Code]: https://standard.publiccode.net
+[standard_for_public_code]: https://standard.publiccode.net
 [repository]: https://github.com/maykinmedia/open-inwoner

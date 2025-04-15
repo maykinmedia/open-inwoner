@@ -14,10 +14,6 @@ tblib
 pytest  # for docs test
 
 # Code formatting
-black
-isort
-flake8
-autoflake
 ruff
 
 # DigidLocal
