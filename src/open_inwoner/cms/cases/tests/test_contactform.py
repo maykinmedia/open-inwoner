@@ -722,7 +722,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
                 m.get(
                     f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId={eherkenning_user.rsin}",
                     json=paginated_response([self.klant]),
-                ),
+                )
 
                 response = self.app.get(self.case_detail_url, user=eherkenning_user)
 

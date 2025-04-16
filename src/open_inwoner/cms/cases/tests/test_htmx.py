@@ -563,7 +563,7 @@ class CasesPlaywrightTests(
         m.get(
             f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak['url']}",
             text=mock_list,
-        ),
+        )
 
         # Upload mock.
         def mock_upload(request, context):
@@ -601,7 +601,7 @@ class CasesPlaywrightTests(
             f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten",
             status_code=201,
             text=mock_upload,
-        ),
+        )
 
         # Setup.
         context = self.browser.new_context(storage_state=self.user_login_state)
