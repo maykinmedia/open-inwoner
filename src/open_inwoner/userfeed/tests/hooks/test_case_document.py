@@ -57,7 +57,7 @@ class FeedHookTest(TestCase):
                 title=zio.informatieobject.titel
             ),
         )
-        self.assertEqual(item.title, case.omschrijving)
+        self.assertEqual(item.title, case.zaaktype.omschrijving)
         self.assertEqual(
             item.action_url,
             reverse(

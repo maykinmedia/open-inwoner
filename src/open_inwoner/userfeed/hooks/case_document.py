@@ -18,7 +18,7 @@ def case_document_added_notification_received(
         "case_url": case.url,
         "case_uuid": case.uuid,
         "case_identificatie": case.identificatie,
-        "case_omschrijving": case.omschrijving,
+        "case_omschrijving": case.description,
         "case_info_object_uuid": case_info_object.uuid,
         "case_info_object_titel": case_info_object.titel,
         "info_object_uuid": case_info_object.informatieobject.uuid,

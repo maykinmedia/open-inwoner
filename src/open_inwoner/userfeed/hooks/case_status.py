@@ -21,7 +21,7 @@ def case_status_notification_received(user: User, case: Zaak, status: Status):
     data = {
         "case_uuid": case.uuid,
         "case_identificatie": case.identificatie,
-        "case_omschrijving": case.omschrijving,
+        "case_omschrijving": case.description,
         "status_omschrijving": (
             status.statustype.statustekst
             or status.statustype.omschrijving
