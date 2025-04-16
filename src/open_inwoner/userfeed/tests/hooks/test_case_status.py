@@ -8,7 +8,7 @@ from django.utils.translation import gettext as _, ngettext
 from zgw_consumers.api_models.base import factory
 
 from open_inwoner.openzaak.api_models import Status, StatusType, Zaak, ZaakType
-from open_inwoner.openzaak.constants import StatusIndicators
+from open_inwoner.openzaak.constants import StatusIndicators, ZaakTitleDisplayChoices
 from open_inwoner.openzaak.models import ZGWApiGroupConfig
 from open_inwoner.openzaak.tests.factories import (
     ZaakTypeConfigFactory,
@@ -63,7 +63,7 @@ class FeedHookTest(TestCase):
             strip_tags(item.message),
             escape(_("Case status has been changed to 'initial'")),
         )
-        self.assertEqual(item.title, case.omschrijving)
+        self.assertEqual(item.title, case.zaaktype.omschrijving)
         self.assertEqual(
             item.action_url,
             reverse(
@@ -110,7 +110,7 @@ class FeedHookTest(TestCase):
                 )
             ),
         )
-        self.assertEqual(item.title, case.omschrijving)
+        self.assertEqual(item.title, case.zaaktype.omschrijving)
 
         # mark as seen
         case_status_seen(user, case)
@@ -141,7 +141,7 @@ class FeedHookTest(TestCase):
             catalogus__url=case.zaaktype.catalogus,
             catalogus__service=self.api_group.ztc_service,
         )
-        status_config = ZaakTypeStatusTypeConfigFactory(
+        ZaakTypeStatusTypeConfigFactory(
             zaaktype_config=ztc,
             statustype_url=status.statustype.url,
             status_indicator=StatusIndicators.warning,
@@ -149,29 +149,43 @@ class FeedHookTest(TestCase):
             action_required=True,
         )
 
-        case_status_notification_received(user, case, status)
+        scenarios = [
+            (ZaakTitleDisplayChoices.zaak_omschrijving, case.omschrijving),
+            (ZaakTitleDisplayChoices.zaaktype_omschrijving, case.zaaktype.omschrijving),
+            (ZaakTitleDisplayChoices.zaaktype_onderwerp, case.zaaktype.onderwerp),
+        ]
+        for zaak_title_config, expected_zaak_title in scenarios:
+            with self.subTest(f"zaak_title_config: {zaak_title_config}"):
+                zaak_config = self.api_group.open_zaak_config
+                zaak_config.derive_zaak_titel_from = zaak_title_config
+                zaak_config.save()
 
-        # check feed
-        feed = get_feed(user)
-        self.assertEqual(feed.total_items, 1)
-        self.assertEqual(len(feed.summary), 2)
+                case_status_notification_received(user, case, status)
 
-        # check item
-        item = feed.items[0]
-        self.assertEqual(item.type, FeedItemType.case_status_changed)
-        self.assertEqual(item.action_required, True)
-        self.assertEqual(item.is_completed, False)
-        self.assertEqual(item.status_indicator, StatusIndicators.warning)
-        self.assertEqual(item.status_text, "my_status_text")
-        self.assertEqual(
-            strip_tags(item.message),
-            escape(_("Case status has been changed to 'initial'")),
-        )
-        self.assertEqual(item.title, case.omschrijving)
-        self.assertEqual(
-            item.action_url,
-            reverse(
-                "cases:case_detail",
-                kwargs={"object_id": case.uuid, "api_group_id": self.api_group.id},
-            ),
-        )
+                # check feed
+                feed = get_feed(user)
+                self.assertEqual(feed.total_items, 1)
+                self.assertEqual(len(feed.summary), 2)
+
+                # check item
+                item = feed.items[0]
+                self.assertEqual(item.type, FeedItemType.case_status_changed)
+                self.assertEqual(item.action_required, True)
+                self.assertEqual(item.is_completed, False)
+                self.assertEqual(item.status_indicator, StatusIndicators.warning)
+                self.assertEqual(item.status_text, "my_status_text")
+                self.assertEqual(
+                    strip_tags(item.message),
+                    escape(_("Case status has been changed to 'initial'")),
+                )
+                self.assertEqual(item.title, expected_zaak_title)
+                self.assertEqual(
+                    item.action_url,
+                    reverse(
+                        "cases:case_detail",
+                        kwargs={
+                            "object_id": case.uuid,
+                            "api_group_id": self.api_group.id,
+                        },
+                    ),
+                )
