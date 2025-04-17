@@ -197,6 +197,7 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "theme_intro",
                     "home_questionnaire_title",
                     "home_questionnaire_intro",
+                    "search_zero_results_text",
                     "select_questionnaire_title",
                     "select_questionnaire_intro",
                     "plans_intro",
