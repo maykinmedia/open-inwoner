@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+from http import HTTPStatus
 from unittest.mock import Mock, patch
 
 from django.contrib.messages import get_messages
@@ -29,6 +30,8 @@ from .factories import ActionTemplateFactory, PlanFactory, PlanTemplateFactory
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class PlanViewTests(WebTest):
+    csrf_checks = False
+
     def setUp(self) -> None:
         self.user = UserFactory()
         self.contact = UserFactory()
@@ -46,8 +49,8 @@ class PlanViewTests(WebTest):
         self.list_url = reverse("collaborate:plan_list")
         self.choose_template_url = reverse("collaborate:plan_choose_template")
         # TODO: new tests for choosing template form
-        self.create_url = reverse("collaborate:plan_create_no_template")
-        self.create_from_template_url = reverse("collaborate:plan_create_from_template")
+        self.create_url = reverse("collaborate:plan_create")
+        # self.create_from_template_url = reverse("collaborate:plan_create_from_template")
         # TODO: new tests for creating plan from template where Title/Goal are prefilled, but Contact/Enddate are not.
         self.detail_url = reverse(
             "collaborate:plan_detail", kwargs={"uuid": self.plan.uuid}
@@ -83,6 +86,46 @@ class PlanViewTests(WebTest):
         self.export_url = reverse(
             "collaborate:plan_export", kwargs={"uuid": self.plan.uuid}
         )
+
+    def test_template_choice_view_redirects_to_plan_create_from_template_with_valid_pk(
+        self,
+    ):
+        plan_template = PlanTemplateFactory(file=None)
+        response = self.app.get(self.choose_template_url, user=self.user)
+
+        form = response.forms["template-choice-form"]
+        form["template"] = plan_template.pk
+        response = form.submit()
+
+        self.assertRedirects(
+            response,
+            reverse(
+                "collaborate:plan_create_from_template",
+                kwargs={"template_id": plan_template.id},
+            ),
+        )
+
+    def test_template_choice_with_non_existing_template_does_not_redirect(
+        self,
+    ):
+        plan_template = PlanTemplateFactory(file=None)
+        response = self.app.post(
+            self.choose_template_url,
+            user=self.user,
+            params={"template": plan_template.id + 1},
+        )
+
+        self.assertEqual(
+            response.status_code,
+            HTTPStatus.OK,
+            msg="Invalid template reloads form rather than redirecting",
+        )
+        self.assertIn(
+            "Selecteer een geldige keuze. Deze keuze is niet beschikbaar.",
+            response.text,
+        )
+
+        assert response
 
     def test_plan_list_login_required(self):
         response = self.app.get(self.list_url)

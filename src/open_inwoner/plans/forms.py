@@ -13,6 +13,15 @@ from .choices import PlanStatusChoices
 from .models import Plan, PlanTemplate
 
 
+class PlanTemplateChoiceForm(forms.Form):
+    template = forms.ModelChoiceField(
+        queryset=PlanTemplate.objects.all(),
+        required=True,
+        empty_label=_("No template"),
+        widget=forms.widgets.HiddenInput(),  # Form is used for validation only
+    )
+
+
 class PlanForm(forms.ModelForm):
     template = forms.ModelChoiceField(
         queryset=PlanTemplate.objects.all(),
