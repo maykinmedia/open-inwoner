@@ -122,6 +122,7 @@ class SiteConfigurationSetupTest(TestCase):
         self.assertEqual(config.home_questionnaire_intro, "home questionnaire intro")
         self.assertEqual(config.home_product_finder_title, "home product finder title")
         self.assertEqual(config.home_product_finder_intro, "home product finder intro")
+        self.assertEqual(config.search_zero_results_text, "zero search results text"),
         self.assertEqual(
             config.select_questionnaire_title, "select questionnaire title"
         )
