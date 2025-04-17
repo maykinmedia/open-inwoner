@@ -22,35 +22,27 @@
     border-top: var(--border-width-thin) solid var(--color-gray);
     position: relative;
 
-    // Tablet
+    // Tablet and wider
     @media (min-width: 900px) {
+      border-left: 1px solid var(--color-gray);
       border-top: none;
-      margin-left: var(--spacing-extra-large);
+      border-bottom: none;
       min-width: 260px;
-
-      :nth-child(2)::after,
-      :nth-child(3)::after {
-        content: '';
-        position: absolute;
-        left: 100%;
-        bottom: var(--spacing-giant);
-        height: 50%;
-        margin: auto;
-        right: 0;
-        width: 1px;
-        border-left: 1px solid var(--color-gray);
-      }
+      padding: 0 var(--spacing-large);
+      margin: var(--spacing-large) 0;
     }
 
     &:first-child {
-      margin-left: 0;
+      padding-left: 0;
+      border: none;
     }
 
-    &:last-child p::after {
-      @media (min-width: 900px) {
-        content: none;
-      }
-    }
+    //&:last-child p::after {
+    //  @media (min-width: 900px) {
+    //    content: none;
+    //    border: none;
+    //  }
+    //}
 
     @media (min-width: 900px) {
       text-align: start;
@@ -64,8 +56,4 @@
 
 .utrecht-heading-1 + .dashboard {
   margin-top: var(--spacing-large);
-
-  @media (min-width: 768px) {
-    margin-top: var(--row-height);
-  }
 }

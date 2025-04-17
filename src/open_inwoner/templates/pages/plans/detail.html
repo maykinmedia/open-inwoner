@@ -2,12 +2,11 @@
 {% load i18n button_tags card_tags map_tags utils icon_tags file_tags action_tags dropdown_tags anchor_menu_tags %}
 
 {% block sidebar_content %}
-    {% anchor_menu anchors=anchors desktop=True %}
-    {% button href="collaborate:plan_export" uuid=object.uuid icon="file-pdf" text=_("Sla pagina op als PDF") icon_outlined=True transparent=True secondary=True %}
+    {% anchor_menu anchors=anchors desktop=True export_button=True %}
 {% endblock sidebar_content %}
 
 {% block content %}
-<div class="plans">
+<div class="plan">
     <h1 class="utrecht-heading-1" id="title">
         {{ object.title }}
     </h1>
@@ -16,8 +15,8 @@
         <ul class="dashboard__list">
             <li class="dashboard__list-item">
                 <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-compact">
-                    <span class="dashboard__item-label">{% trans "Created by" %}:</span>
-                <span class="plan-contact__information">
+                    <span class="dashboard__item-label">{% trans "Aangemaakt door" %}:</span>
+                    <span class="plan-contact__information">
                     <span class="plan-contact__info">{{ object.created_by.get_full_name }}</span>
                     <span class="plan-contact__info">{{ object.created_by.email }}</span>
                 </span>
@@ -27,8 +26,10 @@
                 <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-compact">
                     <span class="dashboard__item-label">{% trans "Deelnemers" %}:</span>
                 <span class="plan-contact__information">
+                {% for user in contact_users %}
                     <span class="plan-contact__info">{{ user.get_full_name }}</span>
                     <span class="plan-contact__info">{{ user.email }}</span>
+                {% endfor %}
                 </span>
                 </p>
             </li>
@@ -43,19 +44,19 @@
         </ul>
     </aside>
 
-    <section class="tabled tabled--flexible  profile-section profile-section--bordered">
+    <section class="tabled tabled--flexible oip-section oip-section--bordered">
         <div class="tabled__section">
             <header class="oip-header-group title">
-                <h2 class="utrecht-heading-2">{% trans "Doel en omschrijving" %}</h2>
-                <div class="tabled__item--force-right tabled__item--mobile-big">
+                <h2 class="utrecht-heading-2" id="goal">{% trans "Doel en omschrijving" %}</h2>
+                <div class="tabled__item--mobile-big">
                     {% if is_creator %}
                         {% button href="collaborate:plan_edit_goal" uuid=object.uuid icon="edit" icon_outlined=True text=_("Bewerk") title=_("Doel en omschrijving bewerken") ariaLabel=_("Doel en omschrijving bewerken") transparent=True %}
                     {% endif %}
                 </div>
             </header>
         </div>
-        <div>
-            <h2 class="utrecht-heading-2" id="goals">{% trans "Doel" %}</h2>
+        <div class="tabled__inner">
+            <h2 class="utrecht-heading-2">{% trans "Doel" %}</h2>
             <p class="utrecht-paragraph">{{ object.goal|linebreaksbr }}</p>
 
             {% if object.description %}
@@ -65,14 +66,13 @@
         </div>
     </section>
 
-    <section class="tabled tabled--flexible">
+    <section class="tabled tabled--flexible oip-section">
         <div class="tabled__section">
             <header class="oip-header-group title">
-                <h2 class="utrecht-heading-2">{% trans "Samenwerkingsplan" %}</h2>
+                <h2 class="utrecht-heading-2" id="files">{% trans "Samenwerkingsplan" %}</h2>
             </header>
         </div>
-        <div>
-            <h2 class="utrecht-heading-2" id="files">{% trans "Bestanden" %}</h2>
+        <div class="plan__file">
             {% if object.get_latest_file %}
                 {% url "profile:documents_download" uuid=object.get_latest_file.uuid as download_url %}
                 {% file file=object.get_latest_file.file created=file.created_on extension=plan_template.file.extension size=plan_template.file.size show_download=True %}
@@ -81,15 +81,19 @@
                     {% file_table files=object.get_other_files download_view="profile:documents_download" %}
                 {% endif %}
             {% endif %}
-            {% button href="collaborate:plan_add_file" uuid=object.uuid text=_("Upload nieuwe versie") primary=True %}
+        </div>
+        <div class="plan__upload-document">
+            <h3 class="utrecht-heading-3" id="files">{% trans "Upload een nieuwe versie" %}</h3>
+            {# TODO: replace with upload component #}
+            {% button href="collaborate:plan_add_file" uuid=object.uuid text=_("Upload bestand") primary=True %}
         </div>
     </section>
 
-    <section class="tabled tabled--flexible">
+    <section class="tabled tabled--flexible oip-section">
         <div class="tabled__section">
             <header class="oip-header-group title">
-                <h2 class="utrecht-heading-2">{% trans "Acties" %}</h2>
-                <div class="tabled__item--force-right tabled__item--mobile-big">
+                <h2 class="utrecht-heading-2" id="actions">{% trans "Acties" %}</h2>
+                <div class="tabled__item--mobile-big">
                     {% button href="collaborate:plan_action_create" uuid=object.uuid icon="add_circle_outlined" icon_outlined=True text=_("Nieuw actie toevoegen") transparent=True %}
                 </div>
             </header>

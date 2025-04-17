@@ -33,7 +33,7 @@
 @import './Form/ButtonRadio.scss';
 @import './Form/ButtonRadio.scss';
 @import './Form/Checkbox.scss';
-@import './Form/ChoiceList';
+@import './Form/ChoiceList.scss';
 @import './Form/ContactForm.scss';
 @import './Form/Date.scss';
 @import './Form/Error.scss';
@@ -75,8 +75,9 @@
 @import './Notification/Notification.scss';
 @import './Notification/Notifications.scss';
 @import './Pagination/Pagination.scss';
-@import './Profile/personal-information';
-@import './Profile/personal-overview';
+@import './Profile/personal-information.scss';
+@import './Profile/personal-overview.scss';
+@import './Plan/Plan.scss';
 @import './Plan/PlanContact.scss';
 @import './Plan/PlanCreate.scss';
 @import './Plan/PlanEdit.scss';
@@ -89,10 +90,11 @@
 @import './Product/product-location.scss';
 @import './PlanTemplate/PlanTemplate.scss';
 @import './PluginCard/PluginCard.scss';
-@import './PlanPreview/PlanPreview';
+@import './PlanPreview/PlanPreview.scss';
 @import './ProgressIndicator/ProgressIndicator.scss';
 @import './Questionnaire/Questionnaire.scss';
 @import './ReadMore/ReadMore.scss';
+@import './Section/SectionBordered.scss';
 @import './SearchResults/SearchResults.scss';
 @import './Social/Social.scss';
 @import './Spinner/Spinner.scss';
@@ -115,7 +117,7 @@
 @import './Typography/wysiwyg.scss';
 @import './UserFeed/UserFeed.scss';
 @import './Video/Video.scss';
-@import './modal/modal';
+@import './modal/modal.scss';
 @import './Emoji/Emoji.scss';
 @import './Profile/edit.scss';
 @import './WarningHeader/WarningHeader.scss';

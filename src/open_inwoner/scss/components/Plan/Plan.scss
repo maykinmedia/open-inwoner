@@ -1,0 +1,19 @@
+.plan {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+
+  .oip-section.tabled .oip-header-group {
+    margin: 0;
+  }
+
+  &__upload-document {
+    .utrecht-heading-3 {
+      margin-top: var(--spacing-giant);
+    }
+    .button {
+      margin-bottom: var(--row-height);
+      margin-top: var(--spacing-medium);
+    }
+  }
+}

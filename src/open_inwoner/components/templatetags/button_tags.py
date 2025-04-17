@@ -58,8 +58,7 @@ def button(text, **kwargs):
         - icon_outlined: bool | if the outlined icons should be used.
         - text_icon: string | An additional icon to show before the (current value) text.
         - type: string | the type of button that should be used.
-        - aria-label: string | The HTML aria-label attribute if different then the title attribute or button-text.
-        - title: string | The HTML title attribute if different then the text.
+        - title: string | The HTML title attribute if different from the text.
         - extra_classes: string | Extra classes that need to be added to the button
         - extra_attributes: dict | Extra attributes that need to be added to the button
 

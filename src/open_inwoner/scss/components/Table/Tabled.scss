@@ -122,9 +122,19 @@
     &--mobile-big {
       grid-column-end: span 2;
 
+      .button:first-child {
+        padding-left: 0;
+      }
+
       @media (min-width: 768px) {
         grid-column-end: auto;
       }
+    }
+  }
+
+  &__inner {
+    > .utrecht-heading-2 {
+      margin-top: var(--spacing-giant);
     }
   }
 }

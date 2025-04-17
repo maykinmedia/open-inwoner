@@ -1,0 +1,26 @@
+.oip-section {
+  &--bordered {
+    border-bottom: 1px solid var(--color-gray-light);
+    padding-bottom: var(--spacing-large);
+    margin-bottom: var(--row-height);
+
+    &.tabled .tabled__section {
+      padding-bottom: 0;
+    }
+  }
+
+  .oip-header-group {
+    display: block;
+    height: initial;
+    margin: calc(var(--row-height)) 0 0 0;
+
+    @media (min-width: 768px) {
+      display: flex;
+      height: var(--row-height);
+    }
+  }
+
+  .utrecht-heading-2 + .grid {
+    margin-top: 0;
+  }
+}

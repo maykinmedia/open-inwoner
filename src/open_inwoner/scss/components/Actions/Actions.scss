@@ -127,4 +127,12 @@
       border-color: var(--color-danger);
     }
   }
+
+  &__footer {
+    .button {
+      margin: 0;
+      padding-left: 0;
+      padding-top: var(--spacing-large);
+    }
+  }
 }

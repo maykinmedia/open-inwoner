@@ -92,4 +92,10 @@
             <div class="table__item" colspan="4"><p class="utrecht-paragraph">{% trans "er zijn geen acties gevonden met de huidige filters of er zijn geen acties" %}</p></div>
         {% endfor %}
     </div>
+    {# TODO: conditional rendering cap of button to be determined later #}
+    {% if actions|length > 3 %}
+    <div class="actions__footer">
+        {% button href="collaborate:plan_action_create" uuid=plan.uuid icon="add_circle_outlined" icon_outlined=True text=_("Nieuw actie toevoegen") transparent=True %}
+    </div>
+    {% endif %}
 </div>
