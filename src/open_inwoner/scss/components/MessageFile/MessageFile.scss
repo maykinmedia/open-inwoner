@@ -2,7 +2,7 @@
   // layout
   display: flex;
   padding: var(--spacing-medium) var(--spacing-large);
-  gap: var(--spacing-extra-large);
+  gap: var(--spacing-tiny);
 
   // font
   color: var(--font-color-body);
@@ -11,9 +11,16 @@
 
   &__preview {
     display: flex;
-    background-color: var(--color-mute);
+    background-color: hsla(
+      var(--color-primary-h),
+      var(--color-primary-s),
+      var(--color-primary-l),
+      0.15
+    );
     border-radius: 10px;
-    padding: var(--spacing-small);
+    line-height: calc(var(--font-line-height-body) + var(--spacing-tiny));
+    padding: var(--spacing-small) var(--spacing-small) var(--spacing-small)
+      var(--spacing-large);
   }
 
   &__init {
@@ -25,7 +32,7 @@
   }
 
   *[class*='icons'] {
-    color: var(--color-gray-lighter);
+    color: var(--color-primary);
     left: 0;
     top: 0;
     transform: none;
@@ -33,7 +40,16 @@
   }
 
   input[type='file'] {
-    display: none;
+    // Hide visually, but not from screen-readers
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   .label {
@@ -43,6 +59,22 @@
     *[class*='icons'] {
       top: var(--spacing-tiny);
       left: -5px;
+    }
+
+    &--gapless .label__label--hidden {
+      pointer-events: none;
+    }
+  }
+
+  &__button,
+  &__delete {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: none;
     }
   }
 }
