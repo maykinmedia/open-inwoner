@@ -95,6 +95,23 @@ const specificClickSelectors = {
     'Zoeken',
   ],
   // End of search submits
+  // Mijn berichten
+  '#message-form > div.group-input > div.group-input__toolbar > div.form__control.message-file > label input':
+    ['event', 'Mijn berichten', 'Icon click', 'Selecteer bijlage bericht'],
+  '#start-message-form > div.group-input > div.form__control.message-file > label input':
+    [
+      'event',
+      'Mijn berichten',
+      'Icon click',
+      'Selecteer bijlage nieuw bericht',
+    ],
+  '.message-file__delete': [
+    'event',
+    'Mijn berichten',
+    'Icon click',
+    'Verwijder geselecteerde bijlage',
+  ],
+  // End of Mijn berichten
   // Start Communicatievoorkeuren
   // Can get contaminated with uncheck changes
   '.choice-list-multiple__item:not(.selected) .checkbox__label[for="id_messages_notifications"]':
@@ -516,6 +533,8 @@ const keydownSelectors = {
     }
 
     function trackEvent(event) {
+      event.stopPropagation() // Prevents event from bubbling up
+
       const eventType = event.type
       const target = event.target
 

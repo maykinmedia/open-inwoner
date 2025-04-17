@@ -51,14 +51,18 @@
                     {% textarea form.content %}
                     <div class="group-input__toolbar">
                         {% if allow_file_sharing %}
-                            {% input form.file icon="attach_file" no_label=True no_help=True extra_classes="message-file" %}
+                            {% input form.file no_label=True no_help=True extra_classes="message-file" %}
                         {% endif %}
                         <div class="emoji">
                             {% button class="emoji__button" icon="tag_faces" text=_('Selecteer emoji') hide_text=True type="button" %}
                             <div class="emoji__popup">
                                 <div class="emoji__header">
                                     <input class="emoji__search input input--bordered" type="search" placeholder="{% trans "Zoek emoji" %}">
-                                    {% icon icon="close" %}
+                                    <div>
+                                        <span aria-hidden="true" class="material-icons emoji__close">close</span>
+                                        <span class="sr-only">Sluit emojis dropdown</span>
+                                    </div>
+                                    
                                 </div>
                                 <div class="emoji__emojis"></div>
                             </div>
