@@ -3,11 +3,14 @@ import os
 from shutil import which
 from subprocess import CalledProcessError, check_output
 from typing import Any
+from structlog_sentry import SentryProcessor
 
 from django.conf import settings
 
 from decouple import Csv, config as _config, undefined
 from sentry_sdk.integrations import DidNotEnable, django, redis
+
+from open_inwoner.utils.logging import StructlogSentryProcessor
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +44,7 @@ def get_sentry_integrations() -> list:
         django.DjangoIntegration(),
         redis.RedisIntegration(),
     ]
-    extra = []
+    extra = [StructlogSentryProcessor(max_logs=20, max_age_seconds=60)]
 
     try:
         from sentry_sdk.integrations import celery

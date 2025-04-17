@@ -19,6 +19,10 @@ app.conf.ONCE = {
     },
 }
 
+
+# A step to initialize django-structlog
+app.steps["worker"].add(DjangoStructLogInitStep)
+
 app.autodiscover_tasks()
 
 

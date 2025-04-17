@@ -1,6 +1,7 @@
 import base64
 import concurrent.futures
-import logging
+from sys import exc_info
+import structlog
 import warnings
 from dataclasses import dataclass
 from datetime import date
@@ -43,7 +44,7 @@ from .models import OpenZaakConfig
 
 CRS_HEADERS = {"Content-Crs": "EPSG:4326", "Accept-Crs": "EPSG:4326"}
 
-logger = logging.getLogger(__name__)
+logger = structlog.getLogger(__name__)
 
 
 class ZgwAPIClient(APIClient):
@@ -729,7 +730,7 @@ class FormClient(ZgwAPIClient):
             data = get_json_response(response)
             all_data = list(pagination_helper(self, data, max_requests=max_requests))
         except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+            logger.exception("exception while making request", exc_info=True)
             return []
 
         results = factory(OpenSubmission, all_data)

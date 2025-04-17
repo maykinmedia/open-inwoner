@@ -1,4 +1,4 @@
-import logging
+import structlog
 
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.dispatch import receiver
@@ -16,7 +16,7 @@ from open_inwoner.utils.logentry import system_action, user_action
 
 from .choices import LoginTypeChoices
 
-logger = logging.getLogger(__name__)
+logger = structlog.getLogger(__name__)
 
 
 MESSAGE_TYPE = {
@@ -30,12 +30,24 @@ MESSAGE_TYPE = {
 
 @receiver(user_logged_in)
 def update_user_on_login(sender, user, request, *args, **kwargs):
+    logger.info(
+        "update_user_on_login",
+        msg="Syncing user with external systems on login",
+    )
     # This additional guard is mainly to facilitate easier testing, where not
     # all request factories return a full-fledged request object.
     if not hasattr(request, "user"):
+        logger.debug(
+            "update_user_on_login_aborted", reason="Request object has no user"
+        )
         return
 
     if user.login_type not in [LoginTypeChoices.digid, LoginTypeChoices.eherkenning]:
+        logger.debug(
+            "update_user_on_login_aborted",
+            reason="Unsupported user.login_type",
+            login_type=user.login_type,
+        )
         return
 
     # Sync company details from KvK -- note it's important this runs _before_ syncing
@@ -89,6 +101,8 @@ def _update_user_from_esuite(
 
 
 def _update_eherkenning_user_from_kvk_api(user: User):
+    logger.info("update_eherkenning_user_from_kvk_api", user=user)
+
     extra_exc_params = {"kvk": user.kvk, "vestiging": user.vestiging}
     try:
         kvk_client = KvKClient()

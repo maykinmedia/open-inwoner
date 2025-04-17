@@ -66,8 +66,9 @@ from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from ..forms import CaseContactForm, CaseUploadForm
 from .mixins import CaseAccessMixin, CaseLogMixin, OuterCaseAccessMixin
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.getLogger(__name__)
 
 
 @dataclasses.dataclass
@@ -112,7 +113,7 @@ class OuterCaseDetailView(
         try:
             ZGWApiGroupConfig.objects.get(pk=self.kwargs["api_group_id"])
         except ZGWApiGroupConfig.DoesNotExist as exc:
-            logger.exception("Non-existent ZGWApiGroupConfig passed")
+            logger.exception("case_detail_")
             raise Http404 from exc
 
         return super().get(request, *args, **kwargs)

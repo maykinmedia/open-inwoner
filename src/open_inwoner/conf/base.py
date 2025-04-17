@@ -1,3 +1,4 @@
+import logging
 import os
 import structlog
 
@@ -8,7 +9,9 @@ from celery.schedules import crontab
 from easy_thumbnails.conf import Settings as ThumbnailSettings
 from log_outgoing_requests.formatters import HttpFormatter
 
+from open_inwoner.utils.logging import StructlogSentryProcessor, sentry_log_capturer
 from .utils import config, get_sentry_integrations
+from structlog_sentry import SentryProcessor
 
 # Build paths inside the project, so further paths can be defined relative to
 # the code root.
@@ -446,8 +449,7 @@ LOGGING = {
         },
         "log_outgoing_requests": {
             "level": "DEBUG",
-            "formatter": "outgoing_requests",
-            "class": "logging.StreamHandler",
+            "class": "open_inwoner.utils.logging.StructlogOutgoingRequestsHandler",
         },
         "save_outgoing_requests": {
             "level": "DEBUG",
@@ -488,6 +490,9 @@ LOGGING = {
     },
 }
 
+
+DJANGO_STRUCTLOG_CELERY_ENABLED = True
+
 structlog.configure(
     processors=[
         structlog.contextvars.merge_contextvars,
@@ -499,7 +504,10 @@ structlog.configure(
         structlog.processors.StackInfoRenderer(),
         structlog.processors.format_exc_info,
         structlog.processors.UnicodeDecoder(),
+        structlog.processors.ExceptionPrettyPrinter(),
         structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
+        # SentryProcessor(event_level=logging.WARNING),
+        sentry_log_capturer,
     ],
     logger_factory=structlog.stdlib.LoggerFactory(),
     cache_logger_on_first_use=True,

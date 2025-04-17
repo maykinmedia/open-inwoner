@@ -1,4 +1,4 @@
-import logging
+import structlog
 
 from ape_pie.client import APIClient
 from requests.exceptions import RequestException
@@ -19,7 +19,7 @@ from .api_models import (
 )
 from .models import ESuiteKlantConfig
 
-logger = logging.getLogger(__name__)
+logger = structlog.getLogger(__name__)
 
 
 class KlantenClient(APIClient):

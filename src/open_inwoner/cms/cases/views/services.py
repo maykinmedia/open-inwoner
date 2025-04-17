@@ -1,7 +1,7 @@
 import concurrent.futures
 import enum
 import functools
-import logging
+import structlog
 from dataclasses import dataclass
 from typing import Callable, TypedDict
 
@@ -19,7 +19,7 @@ from open_inwoner.openzaak.models import (
 )
 from open_inwoner.openzaak.utils import get_user_fetch_parameters, is_zaak_visible
 
-logger = logging.getLogger(__name__)
+logger = structlog.getLogger(__name__)
 
 
 class CaseFilterFormOption(enum.Enum):
@@ -96,7 +96,7 @@ class CaseListService:
                 "resolve_case_instance": 3,
             }
 
-        logger.info("Configured thread limits as %s", self._thread_limits)
+        logger.debug("thread_limits_configured", thread_limits=self._thread_limits)
 
     def get_submissions_for_api_group(
         self, group: ZGWApiGroupConfig
@@ -238,7 +238,11 @@ class CaseListService:
         return resolved_cases
 
     def resolve_case(self, case: Zaak, group: ZGWApiGroupConfig) -> Zaak:
-        logger.debug("Resolving case %s with group %s", case.identificatie, group)
+        logger.debug(
+            "resolving_case",
+            case=case.identificatie,
+            group=group,
+        )
 
         functions = [
             functools.partial(
@@ -292,10 +296,12 @@ class CaseListService:
             ZaakTypeConfig.DoesNotExist,
             AttributeError,
             ZaakTypeStatusTypeConfig.DoesNotExist,
-        ):
+        ) as exc:
             logger.warning(
-                "Unable to resolve zaaktype_config and statustype_config for case %s",
-                case.identificatie,
+                "resolve_case_failure",
+                resolve_failure_type=exc.__class__.__name__,
+                resolve_failre_message=str(exc),
+                case=case.identificatie,
                 exc_info=True,
             )
 
@@ -312,12 +318,12 @@ class CaseListService:
             is only made for new case type urls
         """
         if not isinstance(case.zaaktype, str):
-            logger.debug("Case %s already has a resolved zaaktype", case.identificatie)
+            logger.debug("case_already_resolved", case=case.identificatie)
             return
 
         case_type = client.fetch_single_case_type(case.zaaktype)
         if not case_type:
-            logger.error("Unable to resolve zaaktype for url: %s", case.zaaktype)
+            logger.error("resolve_zaaktype_error", zaak=case.zaaktype)
             return
 
         def setter(target_case: Zaak):

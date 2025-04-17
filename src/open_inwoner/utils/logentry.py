@@ -1,4 +1,5 @@
 import logging
+import structlog
 
 from django.contrib.admin import models
 from django.contrib.admin.utils import _get_changed_field_labels_from_form
@@ -17,7 +18,7 @@ LOG_ACTIONS = {
     5: (5, "System action"),
 }
 
-logger = logging.getLogger(__name__)
+logger = structlog.getLogger(__name__)
 
 
 def get_change_message(fields=None, form=None):
@@ -126,11 +127,8 @@ def user_action(request, object, message):
     Log a generic action done by a user, useful for when add/change/delete
     aren't appropriate.
     """
-    logger.info(
-        ("User action: {object}, {message}. \n{request}").format(
-            object=object, message=message, request=request
-        )
-    )
+
+    logger.info("user_action", object=object, message=message, request=request)
     TimelineLog.log_from_request(
         request=request,
         content_object=object,
@@ -155,9 +153,11 @@ def system_action(
     user_text = f"{user}: " if user else ""
     object_text = force_str(content_object) if content_object else ""
 
-    logger.log(
-        log_level,
-        f"System action: {user_text}{message}. \n",
+    logger.info(
+        "system_action",
+        level=log_level,
+        user_text=user_text,
+        object_text=object_text,
         exc_info=exc_info,
     )
     TimelineLog.objects.create(

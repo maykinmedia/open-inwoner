@@ -145,6 +145,7 @@ def cache(
             logger.debug("cache_miss", cache_key=cache_key)
             result = func(*args, **kwargs)
             _cache.set(cache_key, result, timeout=timeout)
+            logger.debug("cache_set", cache_key=cache_key, set_value_type=type(result))
 
             return result
 

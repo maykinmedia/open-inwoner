@@ -106,6 +106,7 @@ celery==5.4.0
     #   celery-once
     #   django-celery-beat
     #   django-celery-monitor
+    #   django-structlog
     #   django-yubin
     #   notifications-api-common
 celery-once==3.0.1
@@ -514,7 +515,7 @@ django-solo==2.2.0
     #   notifications-api-common
     #   objects-api-client-django
     #   zgw-consumers
-django-structlog==6.0.1
+django-structlog[celery]==6.0.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
