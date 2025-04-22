@@ -4,11 +4,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.http import Http404, HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from django.urls import NoReverseMatch, resolve
 from django.urls.base import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
-from django.views.generic import CreateView, DetailView, ListView, UpdateView
+from django.views.generic import CreateView, DetailView, FormView, ListView, UpdateView
 
 from cms.apphook_pool import apphook_pool
 from view_breadcrumbs import BaseBreadcrumbMixin
@@ -29,8 +30,14 @@ from open_inwoner.utils.logentry import get_change_message
 from open_inwoner.utils.mixins import ExportMixin
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
-from .forms import PlanForm, PlanGoalForm, PlanListFilterForm
-from .models import Plan
+from .forms import (
+    CreatePlanFromTemplateForm,
+    PlanForm,
+    PlanGoalForm,
+    PlanListFilterForm,
+    PlanTemplateChoiceForm,
+)
+from .models import Plan, PlanTemplate
 
 
 class PlanActionsEnabledMixin:
@@ -239,11 +246,11 @@ class PlanTemplateChoiceView(
     LoginRequiredMixin,
     CommonPageMixin,
     BaseBreadcrumbMixin,
-    CreateView,
+    FormView,
 ):
     template_name = "pages/plans/template-choice.html"
     model = Plan
-    form_class = PlanForm
+    form_class = PlanTemplateChoiceForm
 
     @cached_property
     def crumbs(self):
@@ -252,22 +259,23 @@ class PlanTemplateChoiceView(
             (_("Kies voorstel"), reverse("collaborate:plan_choose_template")),
         ]
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs.update(user=self.request.user)
-        return kwargs
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+
+        # We need to do our own HTML/CSS around the template form, so we might as well
+        # directly pass all the templates as a context variable, as opposed to fishing
+        # the choices out of the form object. That would be tedious, and there's no
+        # ACL/filtering requirements. We'll simply use the form object for validation
+        # purposes.
+        data["templates"] = PlanTemplate.objects.all()
+        return data
 
     def form_valid(self, form):
-        self.object = form.save(self.request.user)
-
-        # Add plan creator as a plan_contact as well
-        self.object.plan_contacts.add(self.object.created_by)
-
-        self.log_addition(self.object, _("plan was created"))
-        return HttpResponseRedirect(self.get_success_url())
-
-    def get_success_url(self) -> str:
-        return self.object.get_absolute_url()
+        url = reverse(
+            "collaborate:plan_create_from_template",
+            kwargs={"template_id": form.cleaned_data["template"].id},
+        )
+        return HttpResponseRedirect(url)
 
 
 class PlanCreateView(
@@ -288,7 +296,7 @@ class PlanCreateView(
             (_("Samenwerken"), reverse("collaborate:plan_list")),
             (
                 _("Start een nieuwe samenwerking"),
-                reverse("collaborate:plan_create_no_template"),
+                reverse("collaborate:plan_create"),
             ),
         ]
 
@@ -320,7 +328,7 @@ class PlanCreateFromTemplateView(
 ):
     template_name = "pages/plans/create-with-template.html"
     model = Plan
-    form_class = PlanForm
+    form_class = CreatePlanFromTemplateForm
 
     @cached_property
     def crumbs(self):
@@ -329,10 +337,18 @@ class PlanCreateFromTemplateView(
             (_("Gebruik dit voorstel"), reverse("collaborate:plan_choose_template")),
         ]
 
+    def get_plan_template(self) -> PlanTemplate:
+        return get_object_or_404(PlanTemplate, id=self.kwargs.get("template_id"))
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs.update(user=self.request.user)
+        kwargs.update(user=self.request.user, template=self.get_plan_template())
         return kwargs
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data["plan_template"] = self.get_plan_template()
+        return data
 
     def form_valid(self, form):
         self.object = form.save(self.request.user)

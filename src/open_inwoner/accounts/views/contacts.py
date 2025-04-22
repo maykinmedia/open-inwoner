@@ -1,3 +1,5 @@
+from typing import cast
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http.response import HttpResponseBadRequest, HttpResponseRedirect
@@ -74,18 +76,26 @@ class ContactCreateView(
     def get_form_kwargs(self):
         return {**super().get_form_kwargs(), "user": self.request.user}
 
-    def form_valid(self, form):
-        user: User = self.request.user
+    def form_valid(self, form: ContactCreateForm):
+        user = cast(User, self.request.user)
         email = form.cleaned_data["email"]
 
-        added_contacts = form.cleaned_data.get("added_contacts")
-        if added_contacts:
+        # If the provided email matched any existing users, send them an approval
+        # request.
+        # added_contacts = form.cleaned_data.get("added_contacts")
+        if added_contacts := form.cleaned_data.get("added_contacts"):
             for contact_user in added_contacts:
                 user.contacts_for_approval.add(contact_user)
-                self.send_email_to_existing_user(contact_user, user, self.request)
+                self.send_contact_approval_email_to_existing_user(
+                    contact_user, user, self.request
+                )
                 self.log_addition(
                     contact_user, _("contact was added, pending approval")
                 )
+
+        # The provided email did not match any existing user, send a request to sign up
+        # to the platform. They'll be added as contacts in the invite accept flow,
+        # assuming they make it that far.
         else:
             # send invitation to new users
             invite = Invite.objects.create(
@@ -108,7 +118,9 @@ class ContactCreateView(
         )
         return HttpResponseRedirect(self.get_success_url())
 
-    def send_email_to_existing_user(self, receiver: User, sender: User, request=None):
+    def send_contact_approval_email_to_existing_user(
+        self, receiver: User, sender: User, request=None
+    ):
         contacts_url = reverse("profile:contact_list")
         if request:
             url = request.build_absolute_uri(contacts_url)

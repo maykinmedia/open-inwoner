@@ -32,9 +32,9 @@ class TestPlans(WebTest):
 
     def test_created_plan_is_logged(self):
         plan = PlanFactory.build(created_by=self.user)
-        form = self.app.get(
-            reverse("collaborate:plan_create_no_template"), user=self.user
-        ).forms["plan-form"]
+        form = self.app.get(reverse("collaborate:plan_create"), user=self.user).forms[
+            "plan-form"
+        ]
         form["title"] = plan.title
         form["goal"] = plan.goal
         form["end_date"] = plan.end_date

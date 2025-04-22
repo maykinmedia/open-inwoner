@@ -1,5 +1,6 @@
 from datetime import date, timedelta
 from io import BytesIO
+from typing import Any, cast
 
 from django import forms
 from django.core.exceptions import ValidationError
@@ -11,6 +12,105 @@ from open_inwoner.accounts.models import Action, Document, User
 
 from .choices import PlanStatusChoices
 from .models import Plan, PlanTemplate
+
+
+class PlanTemplateChoiceForm(forms.Form):
+    template = forms.ModelChoiceField(
+        queryset=PlanTemplate.objects.all(),
+        required=True,
+        empty_label=_("No template"),
+        widget=forms.widgets.HiddenInput(),  # Form is used for validation only
+    )
+
+
+class CreatePlanFromTemplateForm(forms.ModelForm):
+    class Meta:
+        model = Plan
+        fields = (
+            "end_date",
+            "plan_contacts",
+        )
+
+    def __init__(self, user, template, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.user = user
+        self.template = template
+        user_contacts = self.user.get_active_contacts()
+        self.fields["plan_contacts"].queryset = user_contacts
+
+        # NOTE we have to convert the ID value of the choice to string to make components recognize checked (taiga 899)
+        self.fields["plan_contacts"].choices = [
+            [str(c.id), c.get_full_name() or c.email] for c in user_contacts
+        ]
+
+    def clean_plan_contacts(self):
+        # Make sure current user exists in plan_contacts when editing form
+        data = self.cleaned_data["plan_contacts"]
+        if self.instance.pk:
+            data |= User.objects.filter(pk=self.user.pk)
+        return data.distinct()
+
+    def clean(self) -> dict[str, Any]:
+        cleaned_data = super().clean()
+        if (end_date := cleaned_data.get("end_date")) and (
+            actiontemplates := self.template.actiontemplates.all()
+        ):
+            latest_end_in_days = max([a.end_in_days for a in actiontemplates])
+
+            today = date.today()
+            actions_end_date = today + timedelta(days=latest_end_in_days)
+
+            if end_date < actions_end_date:
+                self.add_error(
+                    "end_date",
+                    _(
+                        "The end date of the plan cannot precede the end dates of the "
+                        "actions in the selected template."
+                    ),
+                )
+
+        return cleaned_data
+
+    def save(self, user, commit=True):
+        instance = cast(Plan, self.instance)
+        if not instance.pk:
+            instance.created_by = user
+
+        # Ensure we have a primary key to setup relations below
+        super().save(commit=commit)
+
+        instance.title = self.template.name
+        instance.goal = self.template.goal
+        instance.description = self.template.description
+        if self.template.file:
+            self.template.file.file.seek(0)
+            template_file = File(
+                BytesIO(self.template.file.file.read()),
+                self.template.file.original_filename,
+            )
+            Document.objects.create(
+                name=self.template.file.name,
+                file=template_file,
+                owner=user,
+                plan=instance,
+            )
+
+        now = timezone.now()
+        for action_template in self.template.actiontemplates.all():
+            end_date = now + timedelta(days=action_template.end_in_days)
+            Action.objects.create(
+                name=action_template.name,
+                description=action_template.description,
+                type=action_template.type,
+                end_date=end_date.date(),
+                is_for=user,
+                created_by=user,
+                plan=self.instance,
+            )
+
+        instance.save()
+        return instance
 
 
 class PlanForm(forms.ModelForm):
@@ -29,7 +129,6 @@ class PlanForm(forms.ModelForm):
             "description",
             "end_date",
             "plan_contacts",
-            "template",
         )
 
     def __init__(self, user, *args, **kwargs):
@@ -43,21 +142,11 @@ class PlanForm(forms.ModelForm):
         self.fields["plan_contacts"].choices = [
             [str(c.id), c.get_full_name()] for c in user_contacts
         ]
-        self.fields["template"].choices = [
-            (str(t.id), t) for t in self.fields["template"].queryset
-        ]
-
-        if self.instance.pk:
-            del self.fields["template"]
-        else:
-            # not always required (if we have a template)
-            self.fields["goal"].required = False
 
     def clean(self):
         cleaned_data = super().clean()
 
         goal = cleaned_data.get("goal")
-        template = cleaned_data.get("template")
         plan_contacts = cleaned_data.get("plan_contacts")
         end_date = cleaned_data.get("end_date")
 
@@ -67,31 +156,6 @@ class PlanForm(forms.ModelForm):
             raise ValidationError(
                 _("At least one collaborator is required for a plan.")
             )
-        if not template and not goal:
-            self.add_error(
-                "goal", _("This field is required when not using a template")
-            )
-
-        # Verify that the selected end date of the plan does not precede the
-        # would-be dates of the actions in the selected template (if any)
-        if template and end_date:
-            template_row = PlanTemplate.objects.get(id=template.id)
-
-            actionTemplates = template_row.actiontemplates.all()
-
-            if actionTemplates:
-                latest_end_in_days = max([a.end_in_days for a in actionTemplates])
-
-                today = date.today()
-                actions_end_date = today + timedelta(days=latest_end_in_days)
-
-                if end_date < actions_end_date:
-                    self.add_error(
-                        "end_date",
-                        _(
-                            "The end date of the plan cannot precede the end dates of the actions in the selected template."
-                        ),
-                    )
 
     def clean_plan_contacts(self):
         # Make sure current user exists in plan_contacts when editing form
@@ -104,43 +168,7 @@ class PlanForm(forms.ModelForm):
         if not self.instance.pk:
             self.instance.created_by = user
 
-        plan = super().save(commit=commit)
-
-        template = self.cleaned_data.get("template")
-        if template:
-            # apply template fields if not already set on new instance
-            if not self.instance.goal:
-                self.instance.goal = template.goal
-            if not self.instance.description:
-                self.instance.description = template.description
-
-            self.instance.save()
-
-            if template.file:
-                template.file.file.seek(0)
-                template_file = File(
-                    BytesIO(template.file.file.read()), template.file.original_filename
-                )
-                Document.objects.create(
-                    name=template.file.name,
-                    file=template_file,
-                    owner=user,
-                    plan=plan,
-                )
-
-            now = timezone.now()
-            for action_template in template.actiontemplates.all():
-                end_date = now + timedelta(days=action_template.end_in_days)
-                Action.objects.create(
-                    name=action_template.name,
-                    description=action_template.description,
-                    type=action_template.type,
-                    end_date=end_date.date(),
-                    is_for=user,
-                    created_by=user,
-                    plan=plan,
-                )
-        return plan
+        return super().save(commit=commit)
 
 
 class PlanGoalForm(forms.ModelForm):

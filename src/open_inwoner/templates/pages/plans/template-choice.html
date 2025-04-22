@@ -8,21 +8,21 @@
 
         {% if request.user.get_active_contacts %}
 
-            {% render_form id="plan-form" form=form method="POST" %}
+            {% render_form id="template-choice-form" form=form method="POST" %}
                 {% csrf_token %}
 
                 <div class="plan-template">
                     <div class="plan-template__header">
                         <span class="plan-tag">{% trans "Voorgesteld" %}</span>
                         <div class="plan-template__header-nav">
-                                {% button href="collaborate:plan_create_no_template" text=_("Zelf in te vullen samenwerking") primary=True transparent=True extra_classes="link--bold" icon="insert_drive_file" icon_outlined=True %}
+                                {% button href="collaborate:plan_create" text=_("Zelf in te vullen samenwerking") primary=True transparent=True extra_classes="link--bold" icon="insert_drive_file" icon_outlined=True %}
                         </div>
                     </div>
 
                     <div class="plan-template__options">
                         <ul class="choice-list choice-list--single">
 
-                            {% for tpl_id, plan_template in form.template.field.choices %}
+                            {% for plan_template in templates %}
                                 <li class="choice-list__item">
                                     <label class="choice-list__label">
                                         <input type="radio" id="id_template_{{ plan_template.id }}" name="template" value="{{ plan_template.id }}" class="choice-list__radio">
@@ -61,7 +61,7 @@
 
                 </div>
 
-                {% for tpl_id, plan_template in form.template.field.choices %}
+                {% for plan_template in templates %}
                     <div class="modal modal--no-reset" id="template-{{ plan_template.id }}">
                         <div class="modal__container">
                             <header class="oip-header-group">

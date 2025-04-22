@@ -26,19 +26,12 @@ urlpatterns = [
         PlanTemplateChoiceView.as_view(),
         name="plan_choose_template",
     ),
-    path("create/", PlanCreateView.as_view(), name="plan_create_no_template"),
-    # TODO: Replace page template of 'create/' with HTML from 'create-no-template/' and perhaps rename all to 'create/plan_create...'
-    # path("create/", PlanCreateView.as_view(), name="plan_create"),
+    path("create/", PlanCreateView.as_view(), name="plan_create"),
     path(
-        "create-from-template/",
+        "create-from-template/<int:template_id>/",
         PlanCreateFromTemplateView.as_view(),
         name="plan_create_from_template",
     ),
-    # TODO: path(
-    #     "create-from-template/<int:template_id>/",
-    #     PlanCreateFromTemplateView.as_view(),
-    #     name="plan_create_from_template",
-    # )
     path("<uuid:uuid>/", PlanDetailView.as_view(), name="plan_detail"),
     path("<uuid:uuid>/edit/", PlanEditView.as_view(), name="plan_edit"),
     path("<uuid:uuid>/edit/goal/", PlanGoalEditView.as_view(), name="plan_edit_goal"),

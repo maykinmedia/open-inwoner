@@ -1,3 +1,5 @@
+import logging
+
 from django import forms
 from django.conf import settings
 from django.contrib.admin.widgets import FilteredSelectMultiple
@@ -32,6 +34,8 @@ from .choices import (
     LoginTypeChoices,
 )
 from .models import Action, Document, Invite, Message, User
+
+logger = logging.getLogger(__name__)
 
 
 class VerifyTokenForm(forms.Form):
@@ -414,6 +418,14 @@ class ContactCreateForm(forms.Form):
     )
     email = forms.EmailField(label=_("Email"))
 
+    # Placeholder field that will be constructed in the clean() method below based on
+    # the other form inputs
+    added_contacts = forms.ModelMultipleChoiceField(
+        queryset=User.objects.none(),
+        widget=forms.HiddenInput(),
+        required=False,
+    )
+
     def __init__(self, user, *args, **kwargs):
         self.user = user
         super().__init__(*args, **kwargs)
@@ -427,9 +439,11 @@ class ContactCreateForm(forms.Form):
         But we still want to provide some error feedback
         """
         cleaned_data = super().clean()
+        cleaned_data["added_contacts"] = set()
+
         email = cleaned_data.get("email")
         if not email:
-            return
+            return cleaned_data
 
         # use sets for simplicity, and use .only("id")
         existing_users = set(User.objects.filter(email__iexact=email))
@@ -444,38 +458,52 @@ class ContactCreateForm(forms.Form):
 
         if not existing_users:
             # no users found, pass and let the view send an Invite to the email
-            return
+            return cleaned_data
 
-        # best effort, we're going to return successful if we find at least one good contact
-        #   or only report the worst error (to not confuse the end-user)
-        not_active = False
-        has_contact = False
-        added_contacts = set()
+        inactive_users: set[User] = set()
+        already_added_users: set[User] = set()
+        added_contacts: set[User] = set()
 
         # check if these users are valid and not already added
         for contact_user in existing_users:
             if not contact_user.is_active:
-                not_active = True
+                inactive_users.add(contact_user)
             elif contact_user in user_contacts or contact_user in contacts_for_approval:
-                has_contact = True
+                already_added_users.add(contact_user)
             else:
+                # User is a valid candidate to be a contact
                 added_contacts.add(contact_user)
 
-        # remember the contacts and let the view add records, logs and the emails
+        if inactive_users:
+            logger.warning(
+                "User attempted to add inactive users as contacts",
+                extra={"inactive_users": inactive_users},
+            )
+
+        if already_added_users:
+            logger.warning(
+                "User attempted to add contacts that are already added",
+                extra={"already_added_users": already_added_users},
+            )
+
+        # Best effort: we're going to return successful if we find at least one good contact
+        # or only report the worst error (to not confuse the end-user).
         if added_contacts:
             cleaned_data["added_contacts"] = added_contacts
         else:
             # produce some feedback, check most interesting first
-            if has_contact:
+            if already_added_users:
                 raise ValidationError(
                     _(
                         "Het ingevoerde e-mailadres komt al voor in uw contactpersonen. Pas de gegevens aan en probeer het opnieuw."
                     )
                 )
-            elif not_active:
+            elif inactive_users:
                 raise ValidationError(
                     _("The user cannot be added, their account has been deleted.")
                 )
+
+        return cleaned_data
 
 
 class UserField(forms.ModelChoiceField):
