@@ -9,7 +9,9 @@ annotated-types==0.6.0
 ape-pie==0.1.0
     # via zgw-consumers
 asgiref==3.7.2
-    # via django
+    # via
+    #   django
+    #   django-htmx
 asn1crypto==1.5.1
     # via webauthn
 async-timeout==4.0.3
@@ -255,7 +257,7 @@ django-sessionprofile==1.0
     # via
     #   -r requirements/base.in
     #   django-digid-eherkenning
-django-setup-configuration==0.7.0
+django-setup-configuration==0.7.2
     # via
     #   -r requirements/base.in
     #   mozilla-django-oidc-db
