@@ -26,6 +26,7 @@ asgiref==3.7.2
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django
+    #   django-htmx
 asn1crypto==1.5.1
     # via
     #   -c requirements/base.txt
@@ -439,7 +440,7 @@ django-sessionprofile==1.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-digid-eherkenning
-django-setup-configuration==0.7.0
+django-setup-configuration==0.7.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
