@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date
 from http import HTTPStatus
 from unittest.mock import Mock, patch
 
@@ -48,10 +48,10 @@ class PlanViewTests(WebTest):
         self.login_url = reverse("login")
         self.list_url = reverse("collaborate:plan_list")
         self.choose_template_url = reverse("collaborate:plan_choose_template")
-        # TODO: new tests for choosing template form
         self.create_url = reverse("collaborate:plan_create")
-        # self.create_from_template_url = reverse("collaborate:plan_create_from_template")
-        # TODO: new tests for creating plan from template where Title/Goal are prefilled, but Contact/Enddate are not.
+        self.create_from_template_url = lambda template_id: reverse(
+            "collaborate:plan_create_from_template", kwargs={"template_id": template_id}
+        )
         self.detail_url = reverse(
             "collaborate:plan_detail", kwargs={"uuid": self.plan.uuid}
         )
@@ -366,6 +366,13 @@ class PlanViewTests(WebTest):
         response = self.app.get(self.create_url)
         self.assertRedirects(response, f"{self.login_url}?next={self.create_url}")
 
+    def test_plan_create_from_template_login_required(self):
+        create_url = reverse(
+            "collaborate:plan_create_from_template", kwargs={"template_id": 1}
+        )
+        response = self.app.get(create_url)
+        self.assertRedirects(response, f"{self.login_url}?next={create_url}")
+
     def test_plan_create_fields_required(self):
         response = self.app.get(self.create_url, user=self.user)
         form = response.forms["plan-form"]
@@ -376,6 +383,7 @@ class PlanViewTests(WebTest):
             {
                 "title": [_("This field is required.")],
                 "end_date": [_("This field is required.")],
+                "goal": [_("This field is required.")],
                 "__all__": [_("At least one collaborator is required for a plan.")],
             },
         )
@@ -428,17 +436,17 @@ class PlanViewTests(WebTest):
     def test_plan_create_plan_with_template(self):
         plan_template = PlanTemplateFactory(file=None)
         self.assertEqual(Plan.objects.count(), 1)
-        response = self.app.get(self.create_url, user=self.user)
-        form = response.forms["plan-form"]
-        form["title"] = "Plan"
+        response = self.app.get(
+            self.create_from_template_url(plan_template.pk), user=self.user
+        )
+        form = response.forms["plan-from-template-form"]
         form["end_date"] = "2022-01-01"
         form["plan_contacts"] = [self.contact.pk]
-        form["template"] = plan_template.pk
         response = form.submit().follow()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Plan.objects.count(), 2)
         plan = Plan.objects.exclude(pk=self.plan.id).first()
-        self.assertEqual(plan.title, "Plan")
+        self.assertEqual(plan.title, plan_template.name)
         self.assertEqual(plan.goal, plan_template.goal)
         self.assertEqual(plan.description, plan_template.description)
         self.assertEqual(plan.documents.count(), 0)
@@ -447,43 +455,44 @@ class PlanViewTests(WebTest):
     def test_plan_create_plan_with_template_and_field_overrides(self):
         plan_template = PlanTemplateFactory(file=None)
         self.assertEqual(Plan.objects.count(), 1)
-        response = self.app.get(self.create_url, user=self.user)
-        form = response.forms["plan-form"]
-        form["title"] = "Plan"
-        form["goal"] = "Goal"
-        form["description"] = "Description"
+        response = self.app.get(
+            self.create_from_template_url(plan_template.pk), user=self.user
+        )
+        form = response.forms["plan-from-template-form"]
         form["end_date"] = "2022-01-01"
         form["plan_contacts"] = [self.contact.pk]
-        form["template"] = plan_template.pk
+
         response = form.submit().follow()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Plan.objects.count(), 2)
         plan = Plan.objects.exclude(pk=self.plan.id).first()
-        self.assertEqual(plan.title, "Plan")
-        self.assertEqual(plan.goal, "Goal")
-        self.assertEqual(plan.description, "Description")
+        self.assertEqual(plan.title, plan_template.name)
+        self.assertEqual(plan.goal, plan_template.goal)
+        self.assertEqual(plan.description, plan_template.description)
         self.assertEqual(plan.documents.count(), 0)
         self.assertEqual(plan.actions.count(), 0)
 
     def test_plan_create_plan_with_template_and_file(self):
         plan_template = PlanTemplateFactory()
         self.assertEqual(Plan.objects.count(), 1)
-        response = self.app.get(self.create_url, user=self.user)
-        form = response.forms["plan-form"]
-        form["title"] = "Plan"
+        response = self.app.get(
+            self.create_from_template_url(plan_template.pk), user=self.user
+        )
+        form = response.forms["plan-from-template-form"]
         form["end_date"] = "2022-01-01"
         form["plan_contacts"] = [self.contact.pk]
-        form["template"] = plan_template.pk
+
         response = form.submit().follow()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Plan.objects.count(), 2)
         plan = Plan.objects.exclude(pk=self.plan.id).first()
-        self.assertEqual(plan.title, "Plan")
+        self.assertEqual(plan.title, plan_template.name)
         self.assertEqual(plan.goal, plan_template.goal)
         self.assertEqual(plan.description, plan_template.description)
         self.assertEqual(plan.documents.count(), 1)
         self.assertEqual(plan.actions.count(), 0)
 
+    @freeze_time("2021-12-01")
     def test_plan_create_no_template_plan_with_template_and_actions(self):
         plan_template = PlanTemplateFactory(file=None)
         ActionTemplateFactory(plan_template=plan_template)
@@ -495,18 +504,18 @@ class PlanViewTests(WebTest):
             actionTemplate.save()
 
         self.assertEqual(Plan.objects.count(), 1)
-        response = self.app.get(self.create_url, user=self.user)
-        form = response.forms["plan-form"]
-        form["title"] = "Plan"
-        today = date.today()
-        form["end_date"] = today + timedelta(days=10)
+        response = self.app.get(
+            self.create_from_template_url(plan_template.pk), user=self.user
+        )
+        form = response.forms["plan-from-template-form"]
+        form["end_date"] = "2022-01-01"
         form["plan_contacts"] = [self.contact.pk]
-        form["template"] = plan_template.pk
+
         response = form.submit().follow()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Plan.objects.count(), 2)
         plan = Plan.objects.exclude(pk=self.plan.id).first()
-        self.assertEqual(plan.title, "Plan")
+        self.assertEqual(plan.title, plan_template.name)
         self.assertEqual(plan.goal, plan_template.goal)
         self.assertEqual(plan.description, plan_template.description)
         self.assertEqual(plan.documents.count(), 0)
@@ -520,21 +529,23 @@ class PlanViewTests(WebTest):
         # make sure we have only one plan
         self.assertEqual(Plan.objects.count(), 1)
 
-        response = self.app.get(self.create_url, user=self.user)
-        form = response.forms["plan-form"]
-        form["title"] = "Plan"
-        form["end_date"] = ""  # empty end_date so validation fails
-        form["plan_contacts"] = [str(self.contact.pk)]
-        form["template"] = str(plan_template.pk)
+        response = self.app.get(
+            self.create_from_template_url(plan_template.pk), user=self.user
+        )
+        form = response.forms["plan-from-template-form"]
+        form["end_date"] = ""
+        form["plan_contacts"] = [self.contact.pk]
+
         response = form.submit()
+
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.request.url,
+            "http://testserver" + self.create_from_template_url(plan_template.pk),
+        )
 
         # nothing was created
         self.assertEqual(Plan.objects.count(), 1)
-
-        # check if we reselected the template and contact
-        elem = response.pyquery(f"#id_template_{plan_template.id}")[0]
-        self.assertEqual(elem.attrib.get("checked"), "checked")
 
         # NOTE: custom widget ID hardcoded on index of choice
         elem = response.pyquery("#id_plan_contacts_1")[0]
@@ -552,14 +563,19 @@ class PlanViewTests(WebTest):
             actionTemplate.end_in_days = 10000
             actionTemplate.save()
 
-        response = self.app.get(self.create_url, user=self.user)
-        form = response.forms["plan-form"]
-        form["title"] = "Plan"
+        response = self.app.get(
+            self.create_from_template_url(plan_template.pk), user=self.user
+        )
+        form = response.forms["plan-from-template-form"]
         form["end_date"] = "2025-02-23"
         form["plan_contacts"] = [self.contact.pk]
-        form["template"] = plan_template.pk
         response = form.submit()
+
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.request.url,
+            "http://testserver" + self.create_from_template_url(plan_template.pk),
+        )
 
         # Confirm the mistake was caught
         self.assertContains(

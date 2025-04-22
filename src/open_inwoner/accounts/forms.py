@@ -35,7 +35,6 @@ from .choices import (
 )
 from .models import Action, Document, Invite, Message, User
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -301,9 +300,9 @@ class GroupAdminForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         if self.instance and self.instance.pk:
-            self.fields["managed_categories"].initial = (
-                self.instance.managed_categories.all()
-            )
+            self.fields[
+                "managed_categories"
+            ].initial = self.instance.managed_categories.all()
 
     def _save_m2m(self):
         super()._save_m2m()

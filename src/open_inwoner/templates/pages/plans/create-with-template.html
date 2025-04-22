@@ -4,9 +4,7 @@
 {% block content %}
     <div class="plan-create">
         <div class="plan-template__header">
-            <h1>{{ object.title }} 
-                {# remove once functional object exists #}
-                [[ Title of chosen plan template ]] </h1>
+            <h1>{{ plan_template.name }}</h1>
             <div class="plan-template__header-nav">
                 {% if request.user.get_active_contacts %}
                     {% button href="collaborate:plan_create_no_template" text=_("Zelf in te vullen samenwerking") primary=True transparent=True extra_classes="link--bold" icon="insert_drive_file" icon_outlined=True %}
@@ -17,19 +15,13 @@
         {% render_grid %}
             {% render_column start=4 span=6 %}
                 {% if request.user.get_active_contacts %}
-                    {% render_form id="plan-form" form=form method="POST" %}
-                    {# TODO: May need different form, based on chosen template from previous step in flow #}
-                    {# {% render_form id="plan-form...?" form=form method="POST" %} #}
+                    {% render_form id="plan-from-template-form" form=form method="POST" %}
                         {% csrf_token %}
                         {% date_field form.end_date icon="calendar_today" icon_position="after" %}
                         <div class="plan__contacts">
                             <p class="utrecht-paragraph">Contactpersoon</p>
                             {% checkboxes form.plan_contacts %}
                         </div>
-
-                        {% if form.template.errors %}
-                            {% errors errors=form.template.errors %}
-                        {% endif %}
 
                         <div class="form__actions form__actions--fullwidth">
                             {% button text=_("Maak samenwerking aan") primary=True type="submit" %}
