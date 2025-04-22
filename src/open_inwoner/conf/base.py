@@ -22,8 +22,6 @@ BASE_DIR = os.path.abspath(
 #
 # Core Django settings
 #
-SITE_ID = config("SITE_ID", default=1)
-
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -127,9 +125,6 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.auth",
     "django.contrib.sessions",
-    # NOTE: If enabled, at least one Site object is required and
-    # uncomment SITE_ID above.
-    "django.contrib.sites",
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.flatpages",
