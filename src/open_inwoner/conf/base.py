@@ -29,6 +29,11 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config("SECRET_KEY")
 
+# To facilitate key rotation and migrations. We currently only allow a single value
+# (hence the singular `SECRET_KEY_FALLBACK` config attribute).
+if secret_key_fallback := config("SECRET_KEY_FALLBACK", default=""):
+    SECRET_KEY_FALLBACKS = [secret_key_fallback]
+
 # NEVER run with DEBUG=True in production-like environments
 DEBUG = config("DEBUG", default=False)
 
