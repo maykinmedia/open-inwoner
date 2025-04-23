@@ -3,10 +3,6 @@ openzaak_config:
   zaak_max_confidentiality: openbaar
   document_max_confidentiality: vertrouwelijk
   max_upload_size: 50
-  skip_notification_statustype_informeren: false
-  reformat_esuite_zaak_identificatie: true
-  derive_zaak_titel_from: zaaktype_omschrijving
-  order_statuses_by_date_set: false
   title_text: title text from setup configuration
   enable_categories_filtering_with_zaken: true
   action_required_deadline_days: 1874

@@ -17,6 +17,10 @@ class ZGWAPIGroupConfigModel(ConfigurationModel):
         django_model_refs = {
             ZGWApiGroupConfig: [
                 "fetch_eherkenning_zaken_with_rsin",
+                "skip_notification_statustype_informeren",
+                "reformat_esuite_zaak_identificatie",
+                "derive_zaak_titel_from",
+                "order_statuses_by_date_set",
             ]
         }
 
@@ -33,10 +37,6 @@ class OpenZaakConfigurationModel(ConfigurationModel):
                 "zaak_max_confidentiality",
                 "document_max_confidentiality",
                 "max_upload_size",
-                "skip_notification_statustype_informeren",
-                "reformat_esuite_zaak_identificatie",
-                "derive_zaak_titel_from",
-                "order_statuses_by_date_set",
                 "title_text",
                 "enable_categories_filtering_with_zaken",
                 "action_required_deadline_days",
@@ -96,6 +96,10 @@ class OpenZaakConfigurationStep(BaseConfigurationStep):
                 defaults={
                     "name": "Auto-configured by django-setup-configuration",
                     "fetch_eherkenning_zaken_with_rsin": api_group.fetch_eherkenning_zaken_with_rsin,
+                    "skip_notification_statustype_informeren": api_group.skip_notification_statustype_informeren,
+                    "reformat_esuite_zaak_identificatie": api_group.reformat_esuite_zaak_identificatie,
+                    "derive_zaak_titel_from": api_group.derive_zaak_titel_from,
+                    "order_statuses_by_date_set": api_group.order_statuses_by_date_set,
                 },
             )
 

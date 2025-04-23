@@ -3,10 +3,6 @@ openzaak_config:
   zaak_max_confidentiality: intern
   document_max_confidentiality: intern
   max_upload_size: 51
-  skip_notification_statustype_informeren: false
-  reformat_esuite_zaak_identificatie: true
-  derive_zaak_titel_from: zaaktype_onderwerp
-  order_statuses_by_date_set: false
   title_text: title text from setup configuration
   enable_categories_filtering_with_zaken: true
   action_required_deadline_days: 1874
@@ -19,4 +15,8 @@ openzaak_config:
       documenten_api_identifier: document-api
       catalogi_api_identifier: catalogus-api
       form_api_identifier: form-api
-      fetch_eherkenning_zaken_with_rsin: false
+      fetch_eherkenning_zaken_with_rsin: true
+      skip_notification_statustype_informeren: false
+      reformat_esuite_zaak_identificatie: true
+      derive_zaak_titel_from: zaaktype_onderwerp
+      order_statuses_by_date_set: false
