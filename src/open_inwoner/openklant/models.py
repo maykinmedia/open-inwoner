@@ -289,6 +289,7 @@ def validate_backend_choice(value):
 class KlantenSysteemConfig(SingletonModel):
     primary_backend = models.CharField(
         verbose_name=_("Primary backend"),
+        blank=True,
         max_length=10,
         choices=[(service.value, service.name) for service in KlantenServiceType],
         help_text=_(
