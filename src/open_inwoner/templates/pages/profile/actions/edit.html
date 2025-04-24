@@ -1,31 +1,50 @@
 {% extends 'master.html' %}
-{% load i18n form_tags grid_tags %}
+{% load i18n button_tags form_tags grid_tags %}
 
 
 {% block content %}
     <div class="plan-edit">
-        <h1 class="utrecht-heading-1">
-            {% if action %}
-                {% trans "Wijzig actie" %}
-            {% else %}
-                {% trans "Creeer actie" %}
-            {% endif %}
-        </h1>
+        <div class="plan-template__header">
+            <h1 class="utrecht-heading-1">
+                {% if action %}
+                    {% trans "Wijzig actie" %}
+                {% else %}
+                    {% trans "Maak een actie aan" %}
+                {% endif %}
+            </h1>
+        </div> 
+        {% render_grid %}
+            {% render_column start=4 span=6 %}
+                {% render_form id="action-create" form=form method="POST" enctype="multipart/form-data" %}
+                    {% csrf_token %}
+                    {% input form.name no_help=True %}
+                    {% input form.description no_help=True %}
+                    {% input form.file icon="file_upload" outlined=True icon_position="after" %}
+                    {% input form.status no_help=True icon="expand_more" icon_position="after" extra_classes='form__control--no-help' %}
+                    {% date_field form.end_date no_help=True icon="calendar_today" icon_position="after" extra_classes='form__control--no-help' %}
+                    {% input form.is_for no_help=True icon="account_circle" icon_position="after" extra_classes='form__control--no-help' %}
 
-        {% render_form id="action-create" form=form method="POST" enctype="multipart/form-data" %}
-            {% csrf_token %}
-            {% input form.name no_help=True %}
-            {% input form.description no_help=True %}
-            {% render_grid %}
-                {% input form.status no_help=True icon="expand_more" icon_position="after" %}
-                {% date_field form.end_date no_help=True icon="today" icon_position="after" %}
-            {% endrender_grid %}
-            {% render_grid %}
-                {% input form.is_for no_help=True icon="person" icon_position="after" %}
-                {% input form.file no_help=True icon="file_upload" outlined=True icon_position="after" %}
-            {% endrender_grid %}
+                    <div>
+                        {% if form.template.errors %}
+                            {% errors errors=form.template.errors %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form__actions form__actions--fullwidth">
+                        {% if action %}
+                            {% button text=_("Actie opslaan") primary=True type="submit" extra_classes='submit-once-button' %}
+                        {% else %}
+                            {% button text=_("Maak actie aan") primary=True type="submit" extra_classes='submit-once-button' %}
+                        {% endif %}
+                        {% if plan %}
+                            {% button href=plan.get_absolute_url icon="west" text=_("Terug naar ")|add:plan.title icon_outlined=True transparent=True %}
+                        {% else %}
+                            {% button href='profile:action_list' icon="west" text=_("Terug naar acties") icon_outlined=True transparent=True %}
+                        {% endif %}
 
-            {% form_actions primary_text=_("Actie opslaan") %}
-        {% endrender_form %}
+                    </div>
+                {% endrender_form %}
+            {% endrender_column %}
+        {% endrender_grid %}
     </div>
 {% endblock content %}

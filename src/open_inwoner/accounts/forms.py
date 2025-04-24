@@ -525,13 +525,15 @@ class UserField(forms.ModelChoiceField):
 
 class ActionForm(forms.ModelForm):
     is_for = UserField(
-        label=_("Is voor"),
+        label=_("Action for"),
         queryset=User.objects.all(),
         empty_label=_("Myself"),
         required=False,
     )
     file = LimitedUploadFileField(
-        required=False, widget=PrivateFileWidget(url_name="profile:action_download")
+        label=_("Add a file"),
+        required=False,
+        widget=PrivateFileWidget(url_name="profile:action_download"),
     )
 
     class Meta:

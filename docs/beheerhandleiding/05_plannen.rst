@@ -139,7 +139,7 @@ Hier kunt u een korte omschrijving van de actie invullen.
    :height: 464px
 
 **Status**
-Hier kunt u selecteren wat de huidige status van de actie is: open, accordering of afgerond.
+Hier kunt u selecteren wat de huidige status van de actie is: 'nog te doen', 'mee bezig' of 'afgerond'.
 
 **Type**
 In dit dropdown menu kunt u selecteren of de actie eenmalig is of terugkerend.

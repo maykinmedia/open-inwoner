@@ -273,6 +273,12 @@
       transform: translateY(-50%);
     }
 
+    // Icon alignment fix if there is no help_text.
+    &--no-help *[class*='icons'],
+    &--no-help *[class*='Icons'] {
+      transform: translateY(15%) !important;
+    }
+
     .notification > *[class*='icons'],
     .notification > *[class*='Icons'] {
       width: auto !important;
