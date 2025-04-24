@@ -7,8 +7,7 @@
             <h1 class="utrecht-heading-1">{% trans "Start een nieuwe samenwerking" %}</h1>
             <div class="plan-template__header-nav">
                 {% if request.user.get_active_contacts %}
-                    {% button href="#plan-templates" text=_("Gebruik sjabloon") primary=True transparent=True extra_classes="link--bold" icon="insert_drive_file" icon_outlined=True %}
-                    {# TODO: Change scrollbutton into "href="collaborate:plan_choose_template" #}
+                    {% button href="collaborate:plan_choose_template" text=_("Gebruik sjabloon") primary=True transparent=True extra_classes="link--bold" icon="insert_drive_file" icon_outlined=True %}
                 {% endif %}
             </div>
         </div>
