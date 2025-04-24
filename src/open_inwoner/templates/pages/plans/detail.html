@@ -56,11 +56,11 @@
             </header>
         </div>
         <div class="tabled__inner">
-            <h2 class="utrecht-heading-2">{% trans "Doel" %}</h2>
+            <h3 class="utrecht-heading-3">{% trans "Doel" %}</h3>
             <p class="utrecht-paragraph">{{ object.goal|linebreaksbr }}</p>
 
             {% if object.description %}
-                <h2 class="utrecht-heading-2" id="description">{% trans "Description" %}</h2>
+                <h3 class="utrecht-heading-3" id="description">{% trans "Description" %}</h3>
                 <p class="utrecht-paragraph">{{ object.description|linebreaksbr }}</p>
             {% endif %}
         </div>
@@ -75,7 +75,7 @@
         <div class="plan__file">
             {% if object.get_latest_file %}
                 {% url "profile:documents_download" uuid=object.get_latest_file.uuid as download_url %}
-                {% file file=object.get_latest_file.file created=file.created_on extension=plan_template.file.extension size=plan_template.file.size show_download=True %}
+                {% file file=object.get_latest_file.file created=file.created_on extension=plan_template.file.extension size=plan_template.file.size show_download=True download_url=download_url %}
 
                 {% if object.get_other_files %}
                     {% file_table files=object.get_other_files download_view="profile:documents_download" %}

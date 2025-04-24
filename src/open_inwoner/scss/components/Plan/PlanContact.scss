@@ -1,6 +1,4 @@
 .plan-contact {
-  //margin-bottom: 0;
-
   .plan-contact__container {
     color: var(--font-color-body);
     font-family: var(--font-family-body);
@@ -13,16 +11,12 @@
   }
 
   .plan-contact__info {
-    display: inline-block;
+    display: flex;
+    flex-direction: column;
     margin: 0;
     word-wrap: break-word;
     word-break: break-word;
     white-space: normal;
-  }
-
-  .plan-contact__info {
-    display: flex;
-    flex-direction: column;
   }
 
   .plan-contact__grid {
