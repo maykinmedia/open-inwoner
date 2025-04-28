@@ -5,7 +5,7 @@ from typing import Any, cast
 from django import forms
 from django.core.exceptions import ValidationError
 from django.core.files.base import File
-from django.utils import timezone
+from django.utils import formats, timezone
 from django.utils.translation import gettext as _
 
 from open_inwoner.accounts.models import Action, Document, User
@@ -66,8 +66,10 @@ class CreatePlanFromTemplateForm(forms.ModelForm):
                     "end_date",
                     _(
                         "The end date of the plan cannot precede the end dates of the "
-                        "actions in the selected template."
-                    ),
+                        "actions in the selected template. The earliest possible end date "
+                        "for this type of plan is %s."
+                    )
+                    % formats.date_format(actions_end_date, use_l10n=True),
                 )
 
         return cleaned_data

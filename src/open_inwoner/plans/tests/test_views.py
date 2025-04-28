@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 from http import HTTPStatus
 from unittest.mock import Mock, patch
 
@@ -6,6 +6,7 @@ from django.contrib.messages import get_messages
 from django.core import mail
 from django.test import override_settings, tag
 from django.urls import reverse
+from django.utils import formats
 from django.utils.translation import gettext as _
 
 from django_webtest import WebTest
@@ -551,6 +552,7 @@ class PlanViewTests(WebTest):
         elem = response.pyquery("#id_plan_contacts_1")[0]
         self.assertEqual(elem.attrib.get("checked"), "checked")
 
+    @freeze_time("2025-02-23 12:00:00")
     def test_plan_create_plan_end_date_cannot_precede_action_end_dates(self):
         plan_template = PlanTemplateFactory(file=None)
         ActionTemplateFactory(plan_template=plan_template)
@@ -560,7 +562,7 @@ class PlanViewTests(WebTest):
         # Purposely make the dates of the actions much higher
         #  than the date of the plan
         for actionTemplate in plan_template.actiontemplates.all():
-            actionTemplate.end_in_days = 10000
+            actionTemplate.end_in_days = 100
             actionTemplate.save()
 
         response = self.app.get(
@@ -578,11 +580,19 @@ class PlanViewTests(WebTest):
         )
 
         # Confirm the mistake was caught
+        latest_end_in_days = max(
+            [a.end_in_days for a in plan_template.actiontemplates.all()]
+        )
+        today = date.today()
+        actions_end_date = today + timedelta(days=latest_end_in_days)
         self.assertContains(
             response,
             _(
-                "The end date of the plan cannot precede the end dates of the actions in the selected template."
-            ),
+                "The end date of the plan cannot precede the end dates of the "
+                "actions in the selected template. The earliest possible end date "
+                "for this type of plan is %s."
+            )
+            % formats.date_format(actions_end_date, use_l10n=True),
         )
 
         # nothing was created
