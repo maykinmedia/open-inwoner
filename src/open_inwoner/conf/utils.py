@@ -64,7 +64,7 @@ def _get_version_from_file():
     try:
         heads = os.listdir(heads_dir)
     except FileNotFoundError:
-        logging.warning("Unable to read commit hash from git files")
+        logger.warning("Unable to read commit hash from git files")
         return ""
 
     for filename in ("master", "main", "develop"):
@@ -73,7 +73,7 @@ def _get_version_from_file():
                 with open(os.path.join(heads_dir, filename)) as file:
                     return file.read().strip()
             except OSError:
-                logging.warning("Unable to read commit hash from file")
+                logger.warning("Unable to read commit hash from file")
 
     return ""
 
