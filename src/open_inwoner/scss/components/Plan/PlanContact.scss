@@ -1,16 +1,4 @@
 .plan-contact {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--spacing-medium);
-  margin-bottom: 56px;
-  color: var(--font-color-body);
-  font-family: var(--font-family-body);
-  font-size: var(--font-size-body);
-
-  @media (min-width: 768px) {
-    grid-template-columns: 1fr 1fr 2fr;
-  }
-
   .plan-contact__container {
     color: var(--font-color-body);
     font-family: var(--font-family-body);
@@ -23,7 +11,12 @@
   }
 
   .plan-contact__info {
+    display: flex;
+    flex-direction: column;
     margin: 0;
+    word-wrap: break-word;
+    word-break: break-word;
+    white-space: normal;
   }
 
   .plan-contact__grid {

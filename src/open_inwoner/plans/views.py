@@ -224,8 +224,7 @@ class PlanDetailView(
         context["contact_users"] = obj.get_other_users(user)
         context["is_creator"] = user == obj.created_by
         context["anchors"] = [
-            ("#title", obj.title),
-            ("#goals", _("Doelen")),
+            ("#goal", _("Doel en omschrijving")),
             ("#files", _("Bestanden")),
             ("#actions", _("Acties")),
         ]

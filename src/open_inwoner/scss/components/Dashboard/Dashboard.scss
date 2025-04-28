@@ -20,27 +20,21 @@
     color: var(--color-gray-dark);
     white-space: nowrap;
     border-top: var(--border-width-thin) solid var(--color-gray);
+    position: relative;
+
+    // Tablet and wider
     @media (min-width: 900px) {
+      border-left: 1px solid var(--color-gray);
       border-top: none;
-      margin-left: var(--spacing-extra-large);
+      border-bottom: none;
+      min-width: 260px;
+      padding: 0 var(--spacing-large);
+      margin: var(--spacing-large) 0;
     }
 
     &:first-child {
-      margin-left: 0;
-    }
-
-    p::after {
-      color: var(--color-gray);
-      @media (min-width: 900px) {
-        content: '|';
-        margin-left: var(--spacing-extra-large);
-      }
-    }
-
-    &:last-child p::after {
-      @media (min-width: 900px) {
-        content: none;
-      }
+      padding-left: 0;
+      border: none;
     }
 
     @media (min-width: 900px) {
@@ -55,8 +49,4 @@
 
 .utrecht-heading-1 + .dashboard {
   margin-top: var(--spacing-large);
-
-  @media (min-width: 768px) {
-    margin-top: var(--row-height);
-  }
 }

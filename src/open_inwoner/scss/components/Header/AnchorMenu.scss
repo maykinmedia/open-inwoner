@@ -59,10 +59,6 @@
     }
   }
 
-  &__start-inquiry {
-    margin-left: var(--spacing-large);
-  }
-
   &__list-item {
     box-sizing: border-box;
     font-weight: normal;
@@ -85,7 +81,7 @@
     font-weight: bold;
 
     @media (min-width: 768px) {
-      border-left-color: var(--color-primary);
+      border-left-color: var(--color-accent);
     }
   }
 
@@ -96,6 +92,7 @@
   }
 
   .button {
+    font-weight: bold;
     margin: 0;
     height: var(--row-height);
 
@@ -103,6 +100,15 @@
       margin: var(--spacing-medium) 0;
       height: var(--row-height-big);
       border-radius: var(--border-radius);
+    }
+  }
+
+  &__dynamic-items {
+    margin-left: var(--spacing-large);
+
+    .button--transparent {
+      padding: 0;
+      margin: 0;
     }
   }
 
