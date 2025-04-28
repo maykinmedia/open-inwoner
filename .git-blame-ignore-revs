@@ -22,3 +22,6 @@ cb4197d07b630d6bb4ef2954b445eaf91795bf58
 
 # Refactor for compliance with PEP8-naming
 aa306e5041e55e8f9b34526fd210425f01757f70
+
+# style: apply ruff isort and format
+fe92215efe106cf3a17c21c8055a7f048f698c08
