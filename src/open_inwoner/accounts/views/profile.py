@@ -102,11 +102,17 @@ class MyProfileView(
         user = self.request.user
         today = date.today()
 
+        if user.is_eherkenning_user:
+            overview_anchor = ("#business-overview", _("Bedrijfsgegevens"))
+        else:
+            overview_anchor = ("#personal-info", _("Persoonlijke gegevens"))
+
         context["anchors"] = [
-            ("#personal-info", _("Persoonlijke gegevens")),
-            ("#overview", _("Overzicht")),
+            overview_anchor,
             ("#profile-remove", _("Profiel verwijderen")),
         ]
+        if self.config and self.config.selected_categories:
+            context["anchors"].insert(1, ("#overview", _("Overzicht")))
         if config.any_notifications_enabled:
             context["anchors"].insert(
                 1, ("#notifications", _("Voorkeuren voor meldingen"))
