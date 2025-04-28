@@ -119,6 +119,8 @@ cffi==1.15.0
     #   -r requirements/ci.txt
     #   cryptography
     #   weasyprint
+cfgv==3.4.0
+    # via pre-commit
 charset-normalizer==2.0.6
     # via
     #   -c requirements/ci.txt
@@ -212,6 +214,8 @@ dill==0.3.7
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   pylint
+distlib==0.3.9
+    # via virtualenv
 django==4.2.20
     # via
     #   -c requirements/ci.txt
@@ -644,6 +648,8 @@ faker==27.0.0
     #   factory-boy
     #   polyfactory
     #   zgw-consumers-oas
+filelock==3.18.0
+    # via virtualenv
 flask==3.0.0
     # via
     #   flask-basicauth
@@ -719,6 +725,8 @@ humanfriendly==10.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+identify==2.6.10
+    # via pre-commit
 idna==3.7
     # via
     #   -c requirements/ci.txt
@@ -851,6 +859,8 @@ multidict==6.0.5
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   yarl
+nodeenv==1.9.1
+    # via pre-commit
 notifications-api-common==0.2.2
     # via
     #   -c requirements/ci.txt
@@ -918,6 +928,7 @@ platformdirs==2.4.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   pylint
+    #   virtualenv
 playwright==1.50.0
     # via
     #   -c requirements/ci.txt
@@ -931,6 +942,8 @@ polyfactory==2.13.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+pre-commit==4.2.0
+    # via -r requirements/dev.in
 prompt-toolkit==3.0.36
     # via
     #   -c requirements/ci.txt
@@ -1065,6 +1078,7 @@ pyyaml==6.0.2
     #   bandit
     #   drf-spectacular
     #   gemma-zds-client
+    #   pre-commit
     #   pydantic-settings
     #   tablib
     #   vcrpy
@@ -1308,6 +1322,8 @@ vine==5.1.0
     #   amqp
     #   celery
     #   kombu
+virtualenv==20.21.1
+    # via pre-commit
 waitress==2.1.2
     # via
     #   -c requirements/ci.txt
