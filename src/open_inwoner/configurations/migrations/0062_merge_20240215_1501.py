@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("configurations", "0059_alter_siteconfigurationpage_options"),
         ("configurations", "0061_merge_20240214_1308"),

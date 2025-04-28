@@ -11,7 +11,6 @@ def save_slug(apps, schemas):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("pdc", "0006_auto_20211027_1719"),
     ]

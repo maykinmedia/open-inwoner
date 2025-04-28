@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("pdc", "0066_category_access_groups"),
         ("accounts", "0072_merge_20240129_1610"),

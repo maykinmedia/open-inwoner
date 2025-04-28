@@ -143,7 +143,6 @@ class TestYearlyBenefitsFormView(TestCase):
         self.user.save()
 
     def test_jaaropgave_get(self):
-
         # request with anonymous user
         url = reverse("ssd:yearly_benefits_index")
         response = self.client.get(url)

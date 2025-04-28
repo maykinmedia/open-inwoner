@@ -12,7 +12,6 @@ def copy_contact_type_from_contacts_to_user(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("accounts", "0037_user_contact_type"),
     ]

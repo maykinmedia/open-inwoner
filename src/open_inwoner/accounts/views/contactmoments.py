@@ -68,22 +68,19 @@ class VragenService(Protocol):
         self,
         fetch_params: FetchParameters,
         user: User,
-    ) -> Iterable[Question]:  # noqa: E704
-        ...
+    ) -> Iterable[Question]: ...
 
     def retrieve_question(
         self,
         fetch_params: FetchParameters,
         question_uuid: str,
         user: User,
-    ) -> tuple[Question | None, ZaakWithApiGroup | None]:  # noqa: E704
-        ...
+    ) -> tuple[Question | None, ZaakWithApiGroup | None]: ...
 
     def get_fetch_parameters(
         self,
         user: User | None = None,
-    ) -> FetchParameters | None:  # noqa: E704
-        ...
+    ) -> FetchParameters | None: ...
 
 
 class KlantContactMomentBaseView(

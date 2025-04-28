@@ -50,7 +50,6 @@ def reverse_migrate_use_zaak_omschrijving_as_title(apps, _):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("openzaak", "0059_openzaakconfig_show_cases_without_status"),
     ]

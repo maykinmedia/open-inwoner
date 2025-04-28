@@ -6,7 +6,6 @@ import open_inwoner.openklant.models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("openklant", "0023_remove_esuiteklantconfig_register_contact_moment_and_more"),
     ]

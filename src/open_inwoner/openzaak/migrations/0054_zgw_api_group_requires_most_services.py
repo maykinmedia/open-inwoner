@@ -21,7 +21,6 @@ def validate_no_missing_service_fields(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("zgw_consumers", "0019_alter_service_uuid"),
         ("openzaak", "0053_zaaktypeconfig_catalogus_is_required"),

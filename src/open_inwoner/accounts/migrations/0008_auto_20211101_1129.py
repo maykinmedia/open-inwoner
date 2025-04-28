@@ -8,7 +8,6 @@ import privates.storages
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("accounts", "0007_contact_uuid"),
     ]

@@ -7,7 +7,6 @@ import filer.fields.file
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("filer", "0012_file_mime_type"),
         ("plans", "0006_auto_20220302_1028"),

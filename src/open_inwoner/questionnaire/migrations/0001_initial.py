@@ -7,7 +7,6 @@ import filer.fields.file
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [

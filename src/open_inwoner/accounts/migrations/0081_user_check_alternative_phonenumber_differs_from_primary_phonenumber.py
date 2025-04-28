@@ -13,7 +13,6 @@ def dedupe_phone_numbers(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("accounts", "0080_user_phonenumber_alternative"),
     ]

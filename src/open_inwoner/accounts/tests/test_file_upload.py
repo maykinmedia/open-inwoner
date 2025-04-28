@@ -22,7 +22,6 @@ class TestActionFileUploadLimits(WebTest):
 
     @temp_private_root()
     def test_valid_type_of_file_is_uploaded(self):
-
         self.form["file"] = Upload("readme.xlsx", b"data", "application/vnd.ms-excel")
         self.form["name"] = "Action name"
         upload_response = self.form.submit()

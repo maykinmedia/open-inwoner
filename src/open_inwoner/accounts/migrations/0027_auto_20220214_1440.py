@@ -6,7 +6,6 @@ import privates.storages
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("accounts", "0026_message_sent"),
     ]

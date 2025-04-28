@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("openklant", "0020_add_more_help_texts_to_openklant2_config"),
     ]

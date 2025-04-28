@@ -151,7 +151,6 @@ class ResourceMixin:
         headers: Mapping | None = None,
         params: Mapping | None = None,
     ) -> requests.Response:
-
         return self.http_client.request(
             "get", path, headers=headers, params=self._process_params(params)
         )

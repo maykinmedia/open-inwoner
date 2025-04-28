@@ -23,7 +23,6 @@ class ErrorMessageMixin:
         super().__init__(*args, **kwargs)
 
         for field_name, field in self.fields.items():
-
             field_error_messages = custom_error_messages.get(field_name, {})
 
             error_messages = {}

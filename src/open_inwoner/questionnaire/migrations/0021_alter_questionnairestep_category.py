@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("pdc", "0055_alter_product_content"),
         ("questionnaire", "0020_alter_questionnairestep_redirect_to"),

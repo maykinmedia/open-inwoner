@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("openzaak", "0057_openzaakconfig_order_statusses_by_date_set"),
     ]

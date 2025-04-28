@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("pdc", "0015_alter_productlocation_name"),
         ("pdc", "0015_auto_20211206_1033"),

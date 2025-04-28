@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("profile", "0005_remove_profileconfig_selected_categories"),
     ]

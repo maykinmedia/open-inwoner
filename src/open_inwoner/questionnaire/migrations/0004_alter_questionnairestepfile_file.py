@@ -7,7 +7,6 @@ import filer.fields.file
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("filer", "0012_file_mime_type"),
         ("questionnaire", "0003_questionnairestep_question_subject"),

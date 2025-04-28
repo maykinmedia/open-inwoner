@@ -10,7 +10,7 @@ class CreateInterneTaakFactory(factory.Factory):
     class Meta:
         model = dict
 
-    nummer = factory.LazyAttributeSequence(lambda o, n: f"{n+1:010d}")
+    nummer = factory.LazyAttributeSequence(lambda o, n: f"{n + 1:010d}")
     gevraagdeHandeling = factory.Faker("word")
     aanleidinggevendKlantcontact = None
     toegewezenAanActor = None

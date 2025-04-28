@@ -17,7 +17,6 @@ from open_inwoner.openklant.models import (
 
 
 class OpenKlant2Configuration(ConfigurationModel):
-
     service_identifier: str = DjangoModelRef(OpenKlant2Config, "service")
     mijn_vragen_actor: UUID4 = DjangoModelRef(OpenKlant2Config, "mijn_vragen_actor")
 

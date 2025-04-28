@@ -13,7 +13,6 @@ def gen_uuid_product_location(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("pdc", "0045_auto_20230221_0954"),
     ]

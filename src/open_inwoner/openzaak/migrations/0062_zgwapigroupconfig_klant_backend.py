@@ -6,7 +6,6 @@ import open_inwoner.openklant.models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("openzaak", "0061_openzaakconfig_enable_eherkenning_for_eenmanszaak"),
     ]

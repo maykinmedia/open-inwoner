@@ -170,9 +170,9 @@ class CatalogusConfigAdmin(admin.ModelAdmin):
             export.as_jsonl_iter(),
             content_type="application/json",
         )
-        response[
-            "Content-Disposition"
-        ] = 'attachment; filename="zgw-catalogi-export.json"'
+        response["Content-Disposition"] = (
+            'attachment; filename="zgw-catalogi-export.json"'
+        )
         return response
 
     def process_file_view(self, request):
@@ -480,9 +480,9 @@ class ZaakTypeConfigAdmin(admin.ModelAdmin):
             export.as_jsonl_iter(),
             content_type="application/json",
         )
-        response[
-            "Content-Disposition"
-        ] = 'attachment; filename="zgw-zaaktype-export.json"'
+        response["Content-Disposition"] = (
+            'attachment; filename="zgw-zaaktype-export.json"'
+        )
         return response
 
     def process_file_view(self, request):

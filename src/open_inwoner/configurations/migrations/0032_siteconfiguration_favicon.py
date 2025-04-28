@@ -10,7 +10,6 @@ import open_inwoner.utils.validators
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.FILER_IMAGE_MODEL),
         ("configurations", "0031_siteconfiguration_siteimprove_id"),

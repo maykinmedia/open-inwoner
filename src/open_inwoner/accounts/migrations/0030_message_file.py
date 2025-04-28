@@ -6,7 +6,6 @@ import privates.storages
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("accounts", "0029_auto_20220218_1359"),
     ]

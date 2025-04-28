@@ -12,7 +12,6 @@ def creator_is_for(apps, schemas):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("accounts", "0022_auto_20220202_0949"),
     ]

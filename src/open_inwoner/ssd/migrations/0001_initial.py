@@ -8,7 +8,6 @@ import open_inwoner.utils.validators
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [

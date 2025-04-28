@@ -154,9 +154,9 @@ class DigiDRegistrationTest(
         m.return_value = True
         invite = InviteFactory()
         session = self.client.session
-        session[
-            "invite_url"
-        ] = f"{reverse('django_registration_register')}?invite={invite.key}"
+        session["invite_url"] = (
+            f"{reverse('django_registration_register')}?invite={invite.key}"
+        )
         session.save()
 
         url = reverse("digid-mock:password")
@@ -181,9 +181,9 @@ class DigiDRegistrationTest(
     def test_invite_url_not_in_session_after_successful_login(self):
         invite = InviteFactory()
         session = self.client.session
-        session[
-            "invite_url"
-        ] = f"{reverse('django_registration_register')}?invite={invite.key}"
+        session["invite_url"] = (
+            f"{reverse('django_registration_register')}?invite={invite.key}"
+        )
         session.save()
 
         url = reverse("digid-mock:password")
@@ -285,9 +285,9 @@ class DigiDRegistrationTest(
         self.assertNotIn("messages_notifications", necessary_form.fields)
 
         necessary_form["plans_notifications"] = False
-        necessary_form[
-            "case_notification_channel"
-        ] = NotificationChannelChoice.digital_only
+        necessary_form["case_notification_channel"] = (
+            NotificationChannelChoice.digital_only
+        )
         necessary_form["email"] = "foo@bar.com"
         necessary_form.submit()
 
@@ -798,9 +798,9 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
         m.return_value = True
         invite = InviteFactory()
         session = self.client.session
-        session[
-            "invite_url"
-        ] = f"{reverse('django_registration_register')}?invite={invite.key}"
+        session["invite_url"] = (
+            f"{reverse('django_registration_register')}?invite={invite.key}"
+        )
         session.save()
 
         url = reverse("eherkenning-mock:password")
@@ -857,9 +857,9 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
 
         invite = InviteFactory()
         session = self.client.session
-        session[
-            "invite_url"
-        ] = f"{reverse('django_registration_register')}?invite={invite.key}"
+        session["invite_url"] = (
+            f"{reverse('django_registration_register')}?invite={invite.key}"
+        )
         session.save()
 
         url = reverse("eherkenning-mock:password")

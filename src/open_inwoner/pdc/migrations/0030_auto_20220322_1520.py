@@ -12,7 +12,6 @@ def set_order(apps, schemas):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("pdc", "0029_productcondition_order"),
     ]

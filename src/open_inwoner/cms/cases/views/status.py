@@ -83,8 +83,7 @@ class VragenService(Protocol):
         self,
         zaak: Zaak,
         user: User | None = None,
-    ) -> Iterable[Question]:  # noqa: E704
-        ...
+    ) -> Iterable[Question]: ...
 
 
 class OuterCaseDetailView(
@@ -930,9 +929,9 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
             send_confirmation = False
 
             if klant_config.register_contact_email:
-                form.cleaned_data[
-                    "question"
-                ] += f"\n\nCase number: {self.case.identificatie}"
+                form.cleaned_data["question"] += (
+                    f"\n\nCase number: {self.case.identificatie}"
+                )
                 email_success = self.register_by_email(
                     form, klant_config.register_contact_email
                 )

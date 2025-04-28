@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("openzaak", "0063_alter_openzaakconfig_show_cases_without_status"),
         ("configurations", "0075_siteconfiguration_enable_eherkenning_for_eenmanszaak"),

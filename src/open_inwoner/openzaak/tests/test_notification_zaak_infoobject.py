@@ -288,9 +288,9 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
         self, m, mock_handle: Mock
     ):
         data = MockAPIData()
-        data.informatie_object[
-            "vertrouwelijkheidaanduiding"
-        ] = VertrouwelijkheidsAanduidingen.geheim
+        data.informatie_object["vertrouwelijkheidaanduiding"] = (
+            VertrouwelijkheidsAanduidingen.geheim
+        )
         data.install_mocks(m)
 
         handle_zaken_notification(data.zio_notification)

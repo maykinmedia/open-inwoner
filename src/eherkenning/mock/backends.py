@@ -21,7 +21,7 @@ class eHerkenningBackend(BaseBackend):
             "eherkenning_no_kvk": "Login failed due to no KvK being returned by eHerkenning.",
             "eherkenning_len_kvk": "Login failed due to no KvK having more then 8 digits.",
             "eherkenning_num_kvk": "Login failed due to no KvK not being numerical.",
-        }
+        },
     )
 
     def _persist_eherkenning_params_to_session(self, request, user):
