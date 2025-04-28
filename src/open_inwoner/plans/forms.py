@@ -72,6 +72,13 @@ class CreatePlanFromTemplateForm(forms.ModelForm):
                     % formats.date_format(actions_end_date, use_l10n=True),
                 )
 
+        if not (
+            plan_contacts := cleaned_data["plan_contacts"]
+        ) or not plan_contacts.exclude(pk=self.user.pk):
+            raise ValidationError(
+                _("At least one collaborator is required for a plan.")
+            )
+
         return cleaned_data
 
     def save(self, user, commit=True):
@@ -148,13 +155,9 @@ class PlanForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
 
-        goal = cleaned_data.get("goal")
-        plan_contacts = cleaned_data.get("plan_contacts")
-        end_date = cleaned_data.get("end_date")
-
-        if not plan_contacts or (
-            plan_contacts and not plan_contacts.exclude(pk=self.user.pk)
-        ):
+        if not (
+            plan_contacts := cleaned_data["plan_contacts"]
+        ) or not plan_contacts.exclude(pk=self.user.pk):
             raise ValidationError(
                 _("At least one collaborator is required for a plan.")
             )

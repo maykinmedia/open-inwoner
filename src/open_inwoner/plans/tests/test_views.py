@@ -405,17 +405,38 @@ class PlanViewTests(WebTest):
         )
 
     def test_plan_create_contains_expected_contacts(self):
+        plan_template = PlanTemplateFactory(file=None)
         another_contact = UserFactory()
         self.user.user_contacts.add(another_contact)
-        response = self.app.get(self.create_url, user=self.user)
+        for url in (self.create_url, self.create_from_template_url(plan_template.pk)):
+            with self.subTest(url):
+                response = self.app.get(self.create_url, user=self.user)
 
-        rendered_contacts = response.pyquery("#plan-form .form__grid-box")[
-            0
-        ].text_content()
+                rendered_contacts = response.pyquery("#plan-form .form__grid-box")[
+                    0
+                ].text_content()
 
-        self.assertNotIn(self.user.get_full_name(), rendered_contacts)
-        self.assertIn(self.contact.get_full_name(), rendered_contacts)
-        self.assertIn(another_contact.get_full_name(), rendered_contacts)
+                self.assertNotIn(self.user.get_full_name(), rendered_contacts)
+                self.assertIn(self.contact.get_full_name(), rendered_contacts)
+                self.assertIn(another_contact.get_full_name(), rendered_contacts)
+
+    def test_plan_create_from_template_fails_with_no_collaborators(self):
+        plan_template = PlanTemplateFactory(file=None)
+        self.assertEqual(Plan.objects.count(), 1)
+        response = self.app.get(
+            self.create_from_template_url(plan_template.pk), user=self.user
+        )
+        form = response.forms["plan-from-template-form"]
+        form["end_date"] = "2022-01-01"
+        form["plan_contacts"] = []
+        response = form.submit()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Plan.objects.count(), 1)
+        self.assertEqual(
+            response.context["form"].errors,
+            {"__all__": [_("At least one collaborator is required for a plan.")]},
+        )
 
     def test_plan_create_plan(self):
         self.assertEqual(Plan.objects.count(), 1)
