@@ -33,8 +33,8 @@ class StatusEmptyChoice(models.TextChoices):
 
 
 class StatusChoices(models.TextChoices):
-    open = "open", _("Open")
-    approval = "approval", _("Accordering")
+    open = "open", _("Nog te doen")
+    approval = "approval", _("Mee bezig")
     closed = "closed", _("Afgerond")
 
     @staticmethod
@@ -60,8 +60,8 @@ class StatusChoices(models.TextChoices):
 
 class EmptyStatusChoices(models.TextChoices):
     empty = "", _("Status")
-    open = "open", _("Open")
-    approval = "approval", _("Accordering")
+    open = "open", _("Nog te doen")
+    approval = "approval", _("Mee bezig")
     closed = "closed", _("Afgerond")
 
 

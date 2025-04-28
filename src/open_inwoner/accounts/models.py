@@ -665,7 +665,7 @@ class Action(models.Model):
         help_text=_("Used as a reference in the actions api."),
     )
     name = models.CharField(
-        verbose_name=_("Name"),
+        verbose_name=_("Action title"),
         default="",
         max_length=250,
         help_text=_("The name of the action"),
@@ -691,13 +691,13 @@ class Action(models.Model):
         help_text=_("The type of action that it is"),
     )
     end_date = models.DateField(
-        verbose_name=_("Action end date"),
+        verbose_name=_("Execute before"),
         help_text=_("This is the date that the action should be done."),
         null=True,
         blank=True,
     )
     file = models.FileField(
-        verbose_name=_("File"),
+        verbose_name=_("Add a file"),
         null=True,
         blank=True,
         storage=PrivateMediaFileSystemStorage(),
@@ -709,7 +709,7 @@ class Action(models.Model):
         "accounts.User",
         null=True,
         blank=True,
-        verbose_name=_("Is for"),
+        verbose_name=_("Action for"),
         on_delete=models.CASCADE,
         related_name="actions",
         help_text=_("The person that needs to do this action."),
