@@ -66,27 +66,21 @@ def import_catalog_configs() -> list[CatalogusConfig]:
     if not result.join_results():
         return []
 
-    create = []
-
+    catalogs_created = []
     with transaction.atomic():
-        known = set(CatalogusConfig.objects.values_list("url", flat=True))
         for response in result:
             for catalog in response.result:
-                if catalog.url in known:
-                    continue
-                create.append(
-                    CatalogusConfig(
-                        url=catalog.url,
-                        rsin=catalog.rsin or "",
-                        domein=catalog.domein,
-                        service=response.client.configured_from,
-                    )
+                created_catalog = CatalogusConfig.objects.update_or_create(
+                    url=catalog.url,
+                    defaults={
+                        "rsin": catalog.rsin or "",
+                        "domein": catalog.domein,
+                        "service": response.client.configured_from,
+                    },
                 )
+                catalogs_created.append(created_catalog)
 
-        if create:
-            CatalogusConfig.objects.bulk_create(create)
-
-    return create
+    return catalogs_created
 
 
 def import_zaaktype_configs() -> list[ZaakTypeConfig]:
