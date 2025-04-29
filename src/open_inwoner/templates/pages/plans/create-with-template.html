@@ -22,6 +22,11 @@
                             <p class="utrecht-paragraph">Contactpersoon</p>
                             {% checkboxes form.plan_contacts %}
                         </div>
+                        <div>
+                        {% if form.template.errors %}
+                            {% errors errors=form.template.errors %}
+                        {% endif %}
+                        </div>
 
                         <div class="form__actions form__actions--fullwidth">
                             {% button text=_("Maak samenwerking aan") primary=True type="submit" %}

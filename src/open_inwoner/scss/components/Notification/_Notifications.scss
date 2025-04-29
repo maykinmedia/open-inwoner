@@ -13,9 +13,12 @@
     top: 0;
     gap: 0;
     width: 100%;
-    max-width: var(--form-width);
     margin: -2px var(--spacing-small) 0 0;
     padding: 0 0 var(--spacing-small) 0;
     border: none;
+
+    @media (min-width: 768px) {
+      max-width: var(--form-width);
+    }
   }
 }

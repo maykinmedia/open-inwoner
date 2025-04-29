@@ -75,10 +75,17 @@
     gap: var(--spacing-medium);
 
     .notifications {
-      &__errors .notification *[class*='icons'] {
+      &__errors .notification *[class*='icons'],
+      &__errors .notification *[class*='Icons'] {
         position: static;
         transform: translateY(-5px);
       }
+    }
+
+    // If Label is resized due to errors
+    &:has(.notifications) > [class*='icons'],
+    &:has(.notifications) > [class*='Icons'] {
+      top: 50px;
     }
   }
 
@@ -132,7 +139,8 @@
 
   /// Registration -end.
 
-  &__control > .label .material-icons-outlined {
+  &__control > .label [class*='icons'],
+  &__control > .label [class*='Icons'] {
     pointer-events: none;
   }
 
@@ -277,6 +285,12 @@
     &--no-help *[class*='icons'],
     &--no-help *[class*='Icons'] {
       transform: translateY(15%) !important;
+    }
+
+    // If Label is resized due to errors
+    &--no-help:has(.notifications) .label > [class*='icons'],
+    &--no-help:has(.notifications) .label > [class*='Icons'] {
+      top: 35px;
     }
 
     .notification > *[class*='icons'],
