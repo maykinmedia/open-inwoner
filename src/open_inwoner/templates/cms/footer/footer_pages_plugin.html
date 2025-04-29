@@ -11,5 +11,10 @@
                 {% link text=flatpage.title secondary=True href=flatpage.get_absolute_url %}
             </li>
         {% endfor %}
+
+        {# sitemap #}
+        <li class="footer__list-item">
+            {% link text="Sitemap" secondary=True href="sitemap" %}
+        </li>
     </ul>
 </nav>
