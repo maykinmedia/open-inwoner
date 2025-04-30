@@ -1,5 +1,6 @@
 import base64
 import concurrent.futures
+import functools
 import logging
 import warnings
 from dataclasses import dataclass
@@ -79,18 +80,20 @@ class ZakenClient(ZgwAPIClient):
             return self.fetch_cases_by_bsn(
                 user_bsn, max_requests=max_requests, identificatie=identificatie
             )
+
+        fetch_cases_for_company = functools.partial(
+            self.fetch_cases_for_company,
+            max_requests=max_requests,
+            zaak_identificatie=identificatie,
+        )
         if vestigingsnummer:
-            return self.fetch_cases_for_company(
-                max_requests=max_requests,
-                zaak_identificatie=identificatie,
+            return fetch_cases_for_company(
                 vestigingsnummer=vestigingsnummer,
             )
         if user_kvk or user_rsin:
             user_kvk_or_rsin = user_rsin if user_rsin else user_kvk
-            return self.fetch_cases_for_company(
+            return fetch_cases_for_company(
                 kvk_or_rsin=user_kvk_or_rsin,
-                max_requests=max_requests,
-                zaak_identificatie=identificatie,
             )
         return []
 
