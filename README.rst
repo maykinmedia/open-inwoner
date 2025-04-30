@@ -3,7 +3,7 @@ Open Inwoner
 ==================
 
 
-:Version: 1.29.0
+:Version: 1.30.0
 :Demo: https://openinwoner.nl
 :Source: https://github.com/maykinmedia/open-inwoner
 :Documentation: https://docs.openinwoner.nl
