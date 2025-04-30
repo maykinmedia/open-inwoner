@@ -220,12 +220,15 @@ class eSuiteKlantenService(
     def _retrieve_klanten_for_kvk_or_rsin(
         self, user_kvk_or_rsin: str, *, vestigingsnummer=None
     ) -> list[Klant]:
-        params = {"subjectNietNatuurlijkPersoon__innNnpId": user_kvk_or_rsin}
-
-        if vestigingsnummer:
-            params = {
+        params = (
+            {
                 "subjectVestiging__vestigingsNummer": vestigingsnummer,
             }
+            if vestigingsnummer
+            else {
+                "subjectNietNatuurlijkPersoon__innNnpId": user_kvk_or_rsin,
+            }
+        )
 
         try:
             response = self.client.get(
