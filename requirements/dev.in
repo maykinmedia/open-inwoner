@@ -2,6 +2,7 @@
 
 # Helpers
 pip-tools
+pre-commit
 
 # Code formatting
 bandit

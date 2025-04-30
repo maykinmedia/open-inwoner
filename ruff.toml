@@ -27,6 +27,16 @@ exclude = [
     "site-packages",
     "venv",
     "env",
+
+    # Django specific
+    "static",
+    "media",
+    "env",
+
+    # Project specific
+    "src/open_inwoner/conf/local.py",
+    "performance-tests",
+    "bootstrap.py"
 ]
 
 # Same as Black.
@@ -54,6 +64,8 @@ select = [
     "B904",
     # https://docs.astral.sh/ruff/rules/#pep8-naming-n
     "N",
+    # https://docs.astral.sh/ruff/rules/#isort-i
+    "I",
 ]
 ignore = [
     # Whitespace before ':' (conflicts with Black)
@@ -93,8 +105,34 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 [lint.pep8-naming]
 ignore-names = [
     # N801
-    "eHerkenning*", "eSuite*", "BRP_[0-9]_[0-9]",
+    "eHerkenning*",
+    "eSuite*",
+    "BRP_[0-9]_[0-9]",
     # N802
-    "*setUp*", "tearDown*", "*assert*",
-    "*TimelineLog*", "innNnpId",
+    "*setUp*",
+    "tearDown*",
+    "*assert*",
+    "*TimelineLog*",
+    "innNnpId",
 ]
+
+# Import sorting configuration (equivalent to isort)
+[lint.isort]
+combine-as-imports = true
+force-wrap-aliases = false
+known-first-party = ["open_inwoner"]
+lines-after-imports = -1
+relative-imports-order = "furthest-to-closest"
+sections = { django = ["django"] }
+section-order = [
+    "future",
+    "standard-library",
+    "django",
+    "third-party",
+    "first-party",
+    "local-folder",
+]
+
+
+[format]
+line-ending = "lf"

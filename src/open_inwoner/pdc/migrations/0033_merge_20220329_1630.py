@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("pdc", "0030_alter_question_category"),
         ("pdc", "0032_alter_productcondition_options"),

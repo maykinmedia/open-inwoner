@@ -33,7 +33,6 @@ class TestZaakTypeConfigAdmin(WebTest):
         )
 
     def test_enabling_only_ztc_succeeds(self):
-
         response = self.app.get(
             reverse(
                 "admin:openzaak_zaaktypeconfig_change",
@@ -55,7 +54,6 @@ class TestZaakTypeConfigAdmin(WebTest):
         self.assertFalse(self.ztiotc.document_upload_enabled)
 
     def test_enabling_only_ztiotc_succeeds(self):
-
         response = self.app.get(
             reverse(
                 "admin:openzaak_zaaktypeconfig_change",

@@ -6,7 +6,6 @@ import localflavor.nl.models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("accounts", "0068_relax_email_constraint_for_eherkenning"),
     ]

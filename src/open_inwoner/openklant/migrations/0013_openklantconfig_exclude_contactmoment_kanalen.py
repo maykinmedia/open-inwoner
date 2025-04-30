@@ -8,7 +8,6 @@ import open_inwoner.utils.validators
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("openklant", "0012_openklantconfig_send_email_confirmation"),
     ]

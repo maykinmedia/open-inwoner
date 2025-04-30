@@ -1,5 +1,7 @@
 from django.db import migrations
+
 from open_inwoner.utils.hash import generate_email_from_string
+
 from ..choices import LoginTypeChoices
 
 
@@ -22,7 +24,6 @@ def change_hash_email_to_bsn(apps, _):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("accounts", "0042_alter_invite_invitee_email")]
 
     operations = [

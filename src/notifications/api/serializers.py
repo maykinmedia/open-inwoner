@@ -28,7 +28,7 @@ class NotificatieSerializer(serializers.Serializer):
     )
     resource_url = serializers.URLField(
         label=_("resource URL"),
-        help_text=_("URL-referentie naar de `resource` van de publicerende " "API."),
+        help_text=_("URL-referentie naar de `resource` van de publicerende API."),
     )
     actie = serializers.CharField(
         label=_("actie"),

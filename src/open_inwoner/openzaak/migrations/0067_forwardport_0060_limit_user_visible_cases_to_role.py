@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("openzaak", "0060_openzaakconfig_limit_user_visible_cases_to_role"),
         ("openzaak", "0066_replace_aanvragen_zaken"),

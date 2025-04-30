@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("accounts", "0007_contact_uuid"),
         ("accounts", "0007_merge_0005_auto_20211013_1129_0006_auto_20211013_1415"),

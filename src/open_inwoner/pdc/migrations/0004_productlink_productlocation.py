@@ -8,7 +8,6 @@ import localflavor.nl.models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("pdc", "0003_auto_20211020_1234"),
     ]

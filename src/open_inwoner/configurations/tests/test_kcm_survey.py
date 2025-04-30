@@ -37,7 +37,6 @@ class KCMSurveyTestCase(TestCase):
         )
         for text, url in invalid_configs:
             with self.subTest(text=text, url=url):
-
                 with patch(
                     "open_inwoner.configurations.models.SiteConfiguration.get_solo",
                     return_value=SiteConfiguration(

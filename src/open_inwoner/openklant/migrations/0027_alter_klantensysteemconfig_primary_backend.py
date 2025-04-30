@@ -6,7 +6,6 @@ import open_inwoner.openklant.models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("openklant", "0026_contactform_subject_config_default"),
     ]

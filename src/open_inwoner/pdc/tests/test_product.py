@@ -284,7 +284,8 @@ class TestProductContent(WebTest):
 
     def test_sidemenu_button_is_not_rendered_when_cta_inside_product_content(self):
         product = ProductFactory(
-            content=r"Some content \[CTABUTTON\]", link="http://www.example.com"  # noqa
+            content=r"Some content \[CTABUTTON\]",
+            link="http://www.example.com",  # noqa
         )
 
         response = self.app.get(

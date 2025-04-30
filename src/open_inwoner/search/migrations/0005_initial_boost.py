@@ -11,7 +11,6 @@ def initiate_boost(apps, _):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("search", "0004_fieldboost")]
 
     operations = [migrations.RunPython(initiate_boost, migrations.RunPython.noop)]

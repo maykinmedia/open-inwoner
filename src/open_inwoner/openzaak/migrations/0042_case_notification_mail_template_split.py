@@ -36,7 +36,6 @@ def join_case_notification_mail_template(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("mail_editor", "0001_initial"),
         ("openzaak", "0041_configuration_cases_button"),

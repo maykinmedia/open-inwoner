@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("configurations", "0068_change_siteconfiguration_notifications"),
         ("configurations", "0068_siteconfiguration_contactmoment_contact_form"),

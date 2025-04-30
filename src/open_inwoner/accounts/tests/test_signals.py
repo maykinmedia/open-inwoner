@@ -17,16 +17,18 @@ class PostLoginSignalEHerkenningUserTestCase(TestCase, AssertTimelineLogMixin):
     def test_update_eherkenning_user_from_kvk_api_is_only_invoked_for_eherkenning_users(
         self,
     ):
-
         for user, expected_mock_call in (
             (eHerkenningUserFactory(), True),
             (eHerkenningVestigingUserFactory(), True),
             (DigidUserFactory(), False),
             (UserFactory(), False),
         ):
-            with self.subTest(f"{user=} {expected_mock_call=}"), patch(
-                "open_inwoner.accounts.signals._update_eherkenning_user_from_kvk_api"
-            ) as mock_update_eherkenning_user_from_kvk:
+            with (
+                self.subTest(f"{user=} {expected_mock_call=}"),
+                patch(
+                    "open_inwoner.accounts.signals._update_eherkenning_user_from_kvk_api"
+                ) as mock_update_eherkenning_user_from_kvk,
+            ):
                 request = request = RequestFactory().get("/")
                 request.user = user
 

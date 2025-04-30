@@ -2,11 +2,11 @@
 
 from django.conf import settings
 from django.db import migrations, models
+
 import open_inwoner.utils.validators
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("accounts", "0047_action_is_deleted"),
     ]

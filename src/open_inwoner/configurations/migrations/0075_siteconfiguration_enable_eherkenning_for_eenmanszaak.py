@@ -31,7 +31,6 @@ def copy_setting_from_openzaak_config(apps, _):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("configurations", "0074_alter_siteconfiguration_accent_color_and_more"),
         ("openzaak", "0063_alter_openzaakconfig_show_cases_without_status"),

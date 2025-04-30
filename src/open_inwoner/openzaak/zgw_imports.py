@@ -144,9 +144,9 @@ def import_zaaktype_configs() -> list[ZaakTypeConfig]:
     return list((create or {}).values())
 
 
-def import_zaaktype_informatieobjecttype_configs() -> (
-    list[tuple[ZaakTypeConfig, InformatieObjectType]]
-):
+def import_zaaktype_informatieobjecttype_configs() -> list[
+    tuple[ZaakTypeConfig, InformatieObjectType]
+]:
     """
     generate ZaakTypeInformatieObjectTypeConfigs for all ZaakTypeConfig
     """
@@ -170,9 +170,9 @@ def import_zaaktype_statustype_configs() -> list[tuple[ZaakTypeConfig, StatusTyp
     return created
 
 
-def import_zaaktype_resultaattype_configs() -> (
-    list[tuple[ZaakTypeConfig, ResultaatType]]
-):
+def import_zaaktype_resultaattype_configs() -> list[
+    tuple[ZaakTypeConfig, ResultaatType]
+]:
     """
     generate ZaakTypeResultaatTypeConfigs for all ZaakTypeConfig
     """

@@ -6,7 +6,6 @@ import open_inwoner.openklant.models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("zgw_consumers", "0022_set_default_service_slug"),
         ("openklant", "0017_alter_openklant2config_service"),

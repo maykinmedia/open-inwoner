@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("openzaak", "0059_openzaakconfig_show_cases_without_status"),
     ]

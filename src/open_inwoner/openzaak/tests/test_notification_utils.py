@@ -31,7 +31,6 @@ class NotificationHandlerUtilsTestCase(TestCase):
         )
 
     def test_send_case_update_email(self):
-
         config = SiteConfiguration.get_solo()
         data = MockAPIData()
 

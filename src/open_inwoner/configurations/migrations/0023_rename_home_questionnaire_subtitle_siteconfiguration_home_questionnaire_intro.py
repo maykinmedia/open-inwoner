@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("configurations", "0022_siteconfiguration_more_text"),
     ]

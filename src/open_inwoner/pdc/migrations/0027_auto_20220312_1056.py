@@ -20,7 +20,6 @@ def combine_locations(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("pdc", "0026_auto_20220312_1054"),
     ]

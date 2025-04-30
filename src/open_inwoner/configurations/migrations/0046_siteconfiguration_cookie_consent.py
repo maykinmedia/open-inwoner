@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("configurations", "0045_alter_siteconfiguration_footer_visiting_phonenumber"),
     ]

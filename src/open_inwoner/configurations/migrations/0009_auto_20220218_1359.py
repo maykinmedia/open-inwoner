@@ -9,7 +9,6 @@ import filer.fields.image
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("flatpages", "0001_initial"),
         migrations.swappable_dependency(settings.FILER_IMAGE_MODEL),

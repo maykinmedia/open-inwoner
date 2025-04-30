@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("questionnaire", "0005_questionnairestep_is_default"),
     ]

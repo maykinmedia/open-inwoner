@@ -12,7 +12,6 @@ def truncate_product_summary(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("pdc", "0048_alter_product_summary"),
     ]

@@ -22,7 +22,6 @@ class DynamicCacheKeyTest(DjangoTestCase):
 
     def test_method_key_accepts_permutations_of_attr_and_kwarg_keys(self):
         class TestClass:
-
             foo = "bar"
             bar = "baz"
 
@@ -83,7 +82,6 @@ class DynamicCacheKeyTest(DjangoTestCase):
         )
 
     def test_timeout_value_must_be_an_integer(self):
-
         for timeout in (None, "1", 1.0, object()):
             with self.subTest(timeout):
                 with self.assertRaises(ValueError):

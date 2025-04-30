@@ -21,7 +21,6 @@ def delete_old_celery_tasks(apps, _):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("django_celery_beat", "0018_improve_crontab_helptext")]
 
     operations = [

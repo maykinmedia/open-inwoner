@@ -1,6 +1,5 @@
 """Utilities for determining whether CMS pages are published"""
 
-
 from django.db.models import Q
 
 from cms.models import Page

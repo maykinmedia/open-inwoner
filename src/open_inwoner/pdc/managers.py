@@ -95,9 +95,9 @@ class CategoryPublishedQueryset(LogMixin, MP_NodeQuerySet):
                 or months_since_last_zaak_per_zaaktype[zaaktype_identificatie]
                 > duration_since_start.months
             ):
-                months_since_last_zaak_per_zaaktype[
-                    zaaktype_identificatie
-                ] = duration_since_start.months
+                months_since_last_zaak_per_zaaktype[zaaktype_identificatie] = (
+                    duration_since_start.months
+                )
 
         zaaktype_ids = list(months_since_last_zaak_per_zaaktype.keys())
 
