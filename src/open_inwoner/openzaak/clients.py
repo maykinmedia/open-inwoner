@@ -95,7 +95,8 @@ class ZakenClient(ZgwAPIClient):
             return fetch_cases_for_company(
                 kvk_or_rsin=user_kvk_or_rsin,
             )
-        return []
+
+        raise ValueError("You must supply either a bsn or kvk/rsin/vestigingsnummer")
 
     @cache_result(
         "{self.base_url}:cases:{user_bsn}:{max_requests}:{identificatie}",
