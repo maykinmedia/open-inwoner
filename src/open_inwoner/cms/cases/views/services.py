@@ -3,7 +3,7 @@ import enum
 import functools
 import logging
 from dataclasses import dataclass
-from typing import Callable, TypedDict
+from typing import Callable, TypedDict, cast
 
 from django.http import HttpRequest
 from django.utils.translation import gettext_lazy as _
@@ -11,6 +11,11 @@ from django.utils.translation import gettext_lazy as _
 from zgw_consumers.concurrent import parallel
 
 from open_inwoner.openzaak.api_models import OpenSubmission, Zaak
+from open_inwoner.openzaak.clients import (
+    CatalogiClient,
+    ZakenClient,
+    build_zgw_client_from_service,
+)
 from open_inwoner.openzaak.models import (
     ZaakTypeConfig,
     ZaakTypeStatusTypeConfig,
@@ -100,6 +105,14 @@ class CaseListService:
             }
 
         logger.info("Configured thread limits as %s", self._thread_limits)
+
+    @staticmethod
+    def _zaken_client_factory(group: ZGWApiGroupConfig):
+        return cast(ZakenClient, build_zgw_client_from_service(group.zrc_service))
+
+    @staticmethod
+    def _catalogi_client_factory(group: ZGWApiGroupConfig):
+        return cast(CatalogiClient, build_zgw_client_from_service(group.ztc_service))
 
     def get_submissions_for_api_group(
         self, group: ZGWApiGroupConfig
@@ -325,7 +338,7 @@ class CaseListService:
         Note: the result of `fetch_single_case_type` is cached, hence a request
             is only made for new case type urls
         """
-        client = group.catalogi_client
+        client = CaseListService._catalogi_client_factory(group)
         if not isinstance(case.zaaktype, str):
             logger.debug("Case %s already has a resolved zaaktype", case.identificatie)
             return
@@ -344,8 +357,8 @@ class CaseListService:
     def _resolve_status_and_status_type(
         case: Zaak, *, group: ZGWApiGroupConfig
     ) -> Callable[[Zaak], None] | None:
-        zaken_client = group.zaken_client
-        catalogi_client = group.catalogi_client
+        zaken_client = CaseListService._zaken_client_factory(group)
+        catalogi_client = CaseListService._catalogi_client_factory(group)
 
         if not isinstance(case.status, str):
             logger.error(
@@ -383,8 +396,8 @@ class CaseListService:
     def _resolve_resultaat_and_resultaat_type(
         case: Zaak, *, group: ZGWApiGroupConfig
     ) -> Callable[[Zaak], None] | None:
-        zaken_client = group.zaken_client
-        catalogi_client = group.catalogi_client
+        zaken_client = CaseListService._zaken_client_factory(group)
+        catalogi_client = CaseListService._catalogi_client_factory(group)
 
         if case.resultaat is None:
             return
