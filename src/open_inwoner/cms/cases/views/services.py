@@ -58,6 +58,7 @@ class ThreadLimits(TypedDict):
     zgw_api_groups: int
     resolve_case_list: int
     resolve_case_instance: int
+    get_submissions: int
 
 
 class CaseListService:
@@ -71,6 +72,7 @@ class CaseListService:
             "zgw_api_groups": 60,
             "resolve_case_instance": 15,
             "resolve_case_list": 15,
+            "get_submissions": 5,
         }
 
         # TODO: Ideally, this would be configured in light of:
@@ -85,12 +87,14 @@ class CaseListService:
         # should be fine, as the threads are primarily IO-bound.
         if ZGWApiGroupConfig.objects.count() > 1:
             self._thread_limits = {
+                "get_submissions": 1,
                 "zgw_api_groups": 2,
                 "resolve_case_list": 1,
                 "resolve_case_instance": 3,
             }
         else:
             self._thread_limits = {
+                "get_submissions": 1,
                 "zgw_api_groups": 1,
                 "resolve_case_list": 2,
                 "resolve_case_instance": 3,
@@ -115,14 +119,17 @@ class CaseListService:
             ZGWApiGroupConfig.objects.exclude(form_service__isnull=True)
         )
 
-        with parallel() as executor:
+        with parallel(max_workers=self._thread_limits["get_submissions"]) as executor:
             futures = [
                 executor.submit(self.get_submissions_for_api_group, group)
                 for group in all_api_groups
             ]
 
             subs_with_api_group: list[SubmissionWithApiGroup] = []
-            for task in concurrent.futures.as_completed(futures):
+            for task in concurrent.futures.as_completed(
+                futures,
+                timeout=self._thread_timeouts["get_submissions"],
+            ):
                 try:
                     group_for_task = all_api_groups[futures.index(task)]
                     subs_with_api_group.extend(
