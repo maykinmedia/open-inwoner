@@ -115,7 +115,12 @@ class CaseListService:
 
     def get_submissions(self) -> list[SubmissionWithApiGroup]:
         all_api_groups = list(
-            ZGWApiGroupConfig.objects.exclude(form_service__isnull=True)
+            ZGWApiGroupConfig.objects.select_related(
+                "zrc_service",
+                "ztc_service",
+                "drc_service",
+                "form_service",
+            ).exclude(form_service__isnull=True)
         )
 
         with parallel(max_workers=self._thread_limits["get_submissions"]) as executor:
@@ -167,7 +172,14 @@ class CaseListService:
         }
 
     def get_cases(self) -> list[ZaakWithApiGroup]:
-        all_api_groups = list(ZGWApiGroupConfig.objects.all())
+        all_api_groups = list(
+            ZGWApiGroupConfig.objects.select_related(
+                "zrc_service",
+                "ztc_service",
+                "drc_service",
+                "form_service",
+            ).all()
+        )
 
         with parallel(max_workers=self._thread_limits["zgw_api_groups"]) as executor:
             futures = [
