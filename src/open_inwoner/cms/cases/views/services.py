@@ -11,7 +11,6 @@ from django.utils.translation import gettext_lazy as _
 from zgw_consumers.concurrent import parallel
 
 from open_inwoner.openzaak.api_models import OpenSubmission, Zaak
-from open_inwoner.openzaak.clients import CatalogiClient, ZakenClient
 from open_inwoner.openzaak.models import (
     ZaakTypeConfig,
     ZaakTypeStatusTypeConfig,
@@ -250,37 +249,33 @@ class CaseListService:
         functions = [
             functools.partial(
                 self._resolve_resultaat_and_resultaat_type,
-                zaken_client=group.zaken_client,
-                catalogi_client=group.catalogi_client,
+                group=group,
             ),
             functools.partial(
                 self._resolve_status_and_status_type,
-                zaken_client=group.zaken_client,
-                catalogi_client=group.catalogi_client,
+                group=group,
             ),
             functools.partial(
                 self._resolve_zaak_type,
-                client=group.catalogi_client,
+                group=group,
             ),
         ]
 
-        # use contextmanager to ensure the `requests.Session` is reused
-        with group.catalogi_client, group.zaken_client:
-            with parallel(
-                max_workers=self._thread_limits["resolve_case_instance"]
-            ) as executor:
-                futures = [executor.submit(func, case) for func in functions]
+        with parallel(
+            max_workers=self._thread_limits["resolve_case_instance"]
+        ) as executor:
+            futures = [executor.submit(func, case) for func in functions]
 
-            for task in concurrent.futures.as_completed(
-                futures,
-                timeout=self._thread_timeouts["resolve_case_instance"],
-            ):
-                try:
-                    update_case = task.result()
-                    if hasattr(update_case, "__call__"):
-                        update_case(case)
-                except BaseException:
-                    logger.exception("Error in resolving case", stack_info=True)
+        for task in concurrent.futures.as_completed(
+            futures,
+            timeout=self._thread_timeouts["resolve_case_instance"],
+        ):
+            try:
+                update_case = task.result()
+                if hasattr(update_case, "__call__"):
+                    update_case(case)
+            except BaseException:
+                logger.exception("Error in resolving case", stack_info=True)
 
         try:
             zaaktype_config = ZaakTypeConfig.objects.filter_case_type(
@@ -310,7 +305,7 @@ class CaseListService:
 
     @staticmethod
     def _resolve_zaak_type(
-        case: Zaak, *, client: CatalogiClient
+        case: Zaak, *, group: ZGWApiGroupConfig
     ) -> Callable[[Zaak], None] | None:
         """
         Resolve `case.zaaktype` (`str`) to a `ZaakType(ZGWModel)` object
@@ -318,6 +313,7 @@ class CaseListService:
         Note: the result of `fetch_single_case_type` is cached, hence a request
             is only made for new case type urls
         """
+        client = group.catalogi_client
         if not isinstance(case.zaaktype, str):
             logger.debug("Case %s already has a resolved zaaktype", case.identificatie)
             return
@@ -334,8 +330,11 @@ class CaseListService:
 
     @staticmethod
     def _resolve_status_and_status_type(
-        case: Zaak, *, zaken_client: ZakenClient, catalogi_client: CatalogiClient
+        case: Zaak, *, group: ZGWApiGroupConfig
     ) -> Callable[[Zaak], None] | None:
+        zaken_client = group.zaken_client
+        catalogi_client = group.catalogi_client
+
         if not isinstance(case.status, str):
             logger.error(
                 "`case.status` for case %s is not a str but %s",
@@ -370,8 +369,11 @@ class CaseListService:
 
     @staticmethod
     def _resolve_resultaat_and_resultaat_type(
-        case: Zaak, *, zaken_client: ZakenClient, catalogi_client: CatalogiClient
+        case: Zaak, *, group: ZGWApiGroupConfig
     ) -> Callable[[Zaak], None] | None:
+        zaken_client = group.zaken_client
+        catalogi_client = group.catalogi_client
+
         if case.resultaat is None:
             return
 
