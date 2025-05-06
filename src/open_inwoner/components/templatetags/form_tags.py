@@ -18,6 +18,17 @@ WIDGET_TEMPLATES = {
     "TEXTAREA": "components/Form/Textarea.html",
 }
 
+HTML_NAME_TO_AUTOCOMPLETE = {
+    "first_name": "given-name",
+    "last_name": "family-name",
+    "email": "email",
+    "phonenumber": "tel-national",
+    "phonenumber_alternative": "tel-national",
+    "street": "address-line1",
+    "city": "address-level2",
+    "postcode": "postal-code",
+}
+
 
 def get_form_classes(**kwargs):
     classes = f"form {kwargs.get('extra_classes', '')}"
@@ -475,6 +486,10 @@ def field_as_widget(field, class_string, form_id):
         attrs["class"] = class_string
     if form_id:
         attrs["form"] = form_id
+
+    if autocomplete := HTML_NAME_TO_AUTOCOMPLETE.get(field.html_name):
+        attrs["autocomplete"] = autocomplete
+
     return field.as_widget(attrs=attrs)
 
 
