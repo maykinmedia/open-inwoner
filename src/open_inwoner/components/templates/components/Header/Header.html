@@ -9,31 +9,29 @@
         <div class="header__menu">
         {% if request.user.is_authenticated or not config.hide_categories_from_anonymous_users %}
             <button class="header__button" aria-expanded="false">
-                <div class="header__menu-icon">
+                <span class="header__menu-icon">
                     <span class="closed">{% trans "Menu" %}</span>
                     <span class="open">{% trans "Sluiten" %}</span>
-                </div>
+                </span>
             </button>
         {% endif %}
         {% firstof config.logo.default_alt_text config.name as logo_alt_text %}
         {% include "components/Logo/Logo.html" with src=config.logo.file.url alt=logo_alt_text svg_height=75 only %}
 
         {% if request.user.is_authenticated %}
-            <span class="nav-login--icon">{% icon icon="how_to_reg" icon_position="before" outlined=True %}
-                <span class="sr-only">{% trans "U bent ingelogd." %}</span>
-            </span>
+        <span class="nav-login__icon nav-login__icon--authenticated">
+            {% button text="" title=_("U bent ingelogd.") href="profile:detail" icon="how_to_reg" icon_position="before" transparent=True icon_outlined=True %}
+        <span class="sr-only">{% trans "U bent ingelogd." %}</span>
+        </span>
         {% elif config.login_show %}
-            <span class="nav-login--icon">
-                {% url 'login' as login_url %}
-                {% trans "Inloggen" as login %}
-                {% button text="" title="Inloggen" href=login_url icon="person" icon_position="before" primary=True icon_outlined=True %}
-            </span>
+        <span class="nav-login__icon">
+            {% button text="" title=_("Inloggen") href="login" icon="person" icon_position="before" primary=True icon_outlined=True %}
+        </span>
         {% endif %}
         </div>
         {# end of mobile header-menu with logo #}
 
         <div class="header--mobile header__submenu">
-        
             <div class="header--mobile__close">
                 {% button icon="close" text=_("Sluiten") hide_text=True icon_outlined=True transparent=True id="closeMobileNav" %}
             </div>
@@ -92,9 +90,8 @@
                     {% elif config.login_show %}
                         <ul class="header__list">
                             <li class="header__list-item">
-                                {% url 'login' as login_url %}
                                 {% trans "Log in" as loginmobile %}
-                                {% link text=loginmobile title=loginmobile href=login_url icon="account_circle" icon_position="before" primary=True icon_outlined=True %}
+                                {% link text=loginmobile title=loginmobile href="login" icon="account_circle" icon_position="before" primary=True icon_outlined=True %}
                             </li>
                         </ul>
                     {% endif %}

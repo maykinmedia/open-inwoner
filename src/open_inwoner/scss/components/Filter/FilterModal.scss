@@ -72,9 +72,9 @@
     align-items: flex-end;
 
     *[class*='icons'] {
-      font-size: 32px;
-      width: 32px;
-      max-width: 32px;
+      font-size: var(--font-size-icon-large);
+      width: var(--font-size-icon-large);
+      max-width: var(--font-size-icon-large);
     }
 
     .button--textless {
