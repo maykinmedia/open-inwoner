@@ -216,7 +216,7 @@ dill==0.3.7
     #   pylint
 distlib==0.3.9
     # via virtualenv
-django==4.2.20
+django==4.2.21
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
