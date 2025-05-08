@@ -25,7 +25,8 @@ CSP_SCRIPT_SRC = (
     "'self'",
     "https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:28992/",
     OPEN_FORMS_SDK_DOMAIN,
-)  # See if the unsafe-eval can be removed....
+)
+CSP_NONCE_IN = ["script"]
 CSP_STYLE_SRC = (
     "'self'",
     OPEN_FORMS_SDK_DOMAIN,

@@ -65,6 +65,9 @@ class PlanViewTests(WebTest):
         self.file_add_url = reverse(
             "collaborate:plan_add_file", kwargs={"uuid": self.plan.uuid}
         )
+        self.note_edit_url = reverse(
+            "collaborate:plan_edit_note", kwargs={"uuid": self.plan.uuid}
+        )
         self.action_add_url = reverse(
             "collaborate:plan_action_create", kwargs={"uuid": self.plan.uuid}
         )
@@ -328,6 +331,79 @@ class PlanViewTests(WebTest):
         self.assertEqual(response.status_code, 302)
 
         self.assertEqual(self.plan.documents.count(), 1)
+
+    def test_plan_note_edit_saves_note_correctly(self):
+        response = self.app.get(self.note_edit_url, user=self.user)
+        self.assertEqual(response.status_code, 200)
+
+        form = response.forms["note-edit"]
+        form["note"] = "<p>Form-based test note.</p>"
+
+        response = form.submit(user=self.user)
+        self.assertEqual(response.status_code, 302)
+
+        self.plan.refresh_from_db()
+        self.assertIn("Form-based test note", self.plan.note)
+
+    def test_plan_note_edit_appends_content(self):
+        # Step 1: First edit
+        response = self.app.get(self.note_edit_url, user=self.user)
+        self.assertEqual(response.status_code, 200)
+        form = response.forms["note-edit"]
+        form["note"] = "<p>First note content.</p>"
+        response = form.submit(user=self.user)
+        self.assertEqual(response.status_code, 302)
+
+        self.plan.refresh_from_db()
+        self.assertIn("First note content", self.plan.note)
+
+        # Step 2: Second edit (append new content)
+        response = self.app.get(self.note_edit_url, user=self.user)
+        form = response.forms["note-edit"]
+        # Simulate appending to existing note
+        form["note"] = self.plan.note + "<p>Second note content.</p>"
+        response = form.submit(user=self.user)
+        self.assertEqual(response.status_code, 302)
+
+        self.plan.refresh_from_db()
+        self.assertIn("First note content", self.plan.note)
+        self.assertIn("Second note content", self.plan.note)
+
+    def test_plan_note_edit_contact_can_edit(self):
+        # Contact user edits the note (not the creator of the plan)
+        response = self.app.get(self.note_edit_url, user=self.contact)
+        self.assertEqual(response.status_code, 200)
+        form = response.forms["note-edit"]
+        form["note"] = "<p>Note edited by contact user.</p>"
+        response = form.submit(user=self.contact)
+        self.assertEqual(response.status_code, 302)
+
+        self.plan.refresh_from_db()
+        self.assertIn("Note edited by contact user", self.plan.note)
+
+    def test_plan_note_edit_appends_content_by_different_users(self):
+        # Step 1: User makes the first note edit
+        response = self.app.get(self.note_edit_url, user=self.user)
+        self.assertEqual(response.status_code, 200)
+        form = response.forms["note-edit"]
+        form["note"] = "<p>User note content.</p>"
+        response = form.submit(user=self.user)
+        self.assertEqual(response.status_code, 302)
+
+        self.plan.refresh_from_db()
+        self.assertIn("User note content", self.plan.note)
+
+        # Step 2: Contact appends additional content
+        response = self.app.get(self.note_edit_url, user=self.contact)
+        self.assertEqual(response.status_code, 200)
+        form = response.forms["note-edit"]
+        form["note"] = self.plan.note + "<p>Contact note content.</p>"
+        response = form.submit(user=self.contact)
+        self.assertEqual(response.status_code, 302)
+
+        self.plan.refresh_from_db()
+        self.assertIn("User note content", self.plan.note)
+        self.assertIn("Contact note content", self.plan.note)
 
     def test_plan_file_add_not_your_action(self):
         other_user = UserFactory()

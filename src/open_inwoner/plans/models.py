@@ -7,6 +7,7 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
+import ckeditor.fields as ckeditor_fields
 from filer.fields.file import FilerFileField
 
 from open_inwoner.accounts.choices import StatusChoices, TypeChoices
@@ -114,6 +115,12 @@ class Plan(models.Model):
         default="",
         blank=True,
         help_text=_("How do you intend to achieve this goal?"),
+    )
+    note = ckeditor_fields.RichTextField(
+        blank=True,
+        help_text=_(
+            "Here you can add a note, and supplement it with new consecutive notes by clicking 'Save'."
+        ),
     )
     end_date = models.DateField(
         verbose_name=_("Expected end date"),

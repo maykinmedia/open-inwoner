@@ -136,5 +136,9 @@
     > .utrecht-heading-3 {
       margin-top: var(--spacing-giant);
     }
+    > .utrecht-paragraph strong {
+      display: inline-block;
+      margin-top: var(--spacing-giant);
+    }
   }
 }

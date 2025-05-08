@@ -8,6 +8,8 @@ from django.core.files.base import File
 from django.utils import formats, timezone
 from django.utils.translation import gettext as _
 
+from ckeditor.widgets import CKEditorWidget
+
 from open_inwoner.accounts.models import Action, Document, User
 
 from .choices import PlanStatusChoices
@@ -183,6 +185,22 @@ class PlanGoalForm(forms.ModelForm):
             "goal",
             "description",
         )
+
+    def save(self, commit=True):
+        return super().save(commit=commit)
+
+
+class PlanNoteForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["note"].label = ""
+
+    class Meta:
+        model = Plan
+        fields = ("note",)
+        widgets = {
+            "note": CKEditorWidget(),
+        }
 
     def save(self, commit=True):
         return super().save(commit=commit)

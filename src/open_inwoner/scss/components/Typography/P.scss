@@ -21,6 +21,10 @@
       margin-bottom: var(--oip-utrecht-paragraph-compact-margin-bottom);
     }
 
+    &-no-topmargin {
+      margin-top: var(--oip-utrecht-paragraph-compact-margin-top);
+    }
+
     &:empty {
       margin: 0 !important;
     }

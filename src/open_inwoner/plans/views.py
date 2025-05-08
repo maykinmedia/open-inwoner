@@ -12,6 +12,7 @@ from django.utils.translation import gettext as _
 from django.views.generic import CreateView, DetailView, FormView, ListView, UpdateView
 
 from cms.apphook_pool import apphook_pool
+from csp.decorators import csp_exempt
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.choices import ContactTypeChoices
@@ -35,6 +36,7 @@ from .forms import (
     PlanForm,
     PlanGoalForm,
     PlanListFilterForm,
+    PlanNoteForm,
     PlanTemplateChoiceForm,
 )
 from .models import Plan, PlanTemplate
@@ -226,6 +228,7 @@ class PlanDetailView(
         context["anchors"] = [
             ("#goal", _("Doel en omschrijving")),
             ("#files", _("Bestanden")),
+            ("#notes", _("Notities")),
             ("#actions", _("Acties")),
         ]
         context["action_form"] = ActionListForm(
@@ -489,6 +492,52 @@ class PlanFileUploadView(
         form.save(self.request.user, plan=self.object)
 
         self.log_user_action(object, _("file was uploaded"))
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self) -> str:
+        return self.object.get_absolute_url()
+
+
+class PlanNoteEditView(
+    PlanActionsEnabledMixin,
+    LogMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    UpdateView,
+):
+    template_name = "pages/plans/note_edit.html"
+    model = Plan
+    slug_field = "uuid"
+    slug_url_kwarg = "uuid"
+    form_class = PlanNoteForm
+    breadcrumb_use_pk = False
+
+    @csp_exempt
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+    @cached_property
+    def crumbs(self):
+        return [
+            (_("Samenwerkingsplannen"), reverse("collaborate:plan_list")),
+            (
+                self.get_object().title,
+                reverse("collaborate:plan_detail", kwargs=self.kwargs),
+            ),
+            (
+                _("Notitie bewerken"),
+                reverse("collaborate:plan_edit_note", kwargs=self.kwargs),
+            ),
+        ]
+
+    def get_queryset(self):
+        return Plan.objects.connected(self.request.user)
+
+    def form_valid(self, form):
+        self.object = form.save()
+
+        self.log_change(self.object, _("Plan note was modified"))
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self) -> str:
