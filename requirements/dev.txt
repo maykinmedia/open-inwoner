@@ -35,11 +35,6 @@ asn1crypto==1.5.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   webauthn
-astroid==2.15.8
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   pylint
 async-timeout==4.0.3
     # via
     #   -c requirements/ci.txt
@@ -209,11 +204,6 @@ diff-match-patch==20200713
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-import-export
-dill==0.3.7
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   pylint
 distlib==0.3.9
     # via virtualenv
 django==4.2.21
@@ -754,11 +744,6 @@ isodate==0.6.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   maykin-python3-saml
-isort==5.9.3
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   pylint
 itsdangerous==2.1.2
     # via flask
 jinja2==3.1.4
@@ -782,11 +767,6 @@ kombu==5.5.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   celery
-lazy-object-proxy==1.6.0
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   astroid
 locust==2.20.0
     # via -r requirements/dev.in
 lxml==4.9.1
@@ -833,11 +813,6 @@ maykin-python3-saml==1.16.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-digid-eherkenning
-mccabe==0.7.0
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   pylint
 messagebird==2.1.0
     # via
     #   -c requirements/ci.txt
@@ -900,10 +875,6 @@ pbr==5.9.0
     # via stevedore
 pep517==0.11.0
     # via build
-pep8==1.7.1
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
 phonenumbers==8.13.29
     # via
     #   -c requirements/ci.txt
@@ -924,11 +895,7 @@ pillow==10.3.0
 pip-tools==7.3.0
     # via -r requirements/dev.in
 platformdirs==2.4.0
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   pylint
-    #   virtualenv
+    # via virtualenv
 playwright==1.50.0
     # via
     #   -c requirements/ci.txt
@@ -1001,10 +968,6 @@ pyjwt==2.8.0
     #   gemma-zds-client
     #   messagebird
     #   zgw-consumers
-pylint==2.17.7
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
 pyopenssl==24.0.0
     # via
     #   -c requirements/ci.txt
@@ -1268,11 +1231,6 @@ toml==0.10.2
     # via autopep8
 tomli==1.2.1
     # via pep517
-tomlkit==0.12.3
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   pylint
 typing-extensions==4.10.0
     # via
     #   -c requirements/ci.txt
@@ -1370,7 +1328,6 @@ wrapt==1.14.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-    #   astroid
     #   elastic-apm
     #   vcrpy
 xlrd==2.0.1
