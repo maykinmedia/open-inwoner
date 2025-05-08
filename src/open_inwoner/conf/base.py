@@ -1019,6 +1019,19 @@ MAIL_EDITOR_BASE_HOST = BASE_URL
 CKEDITOR_CONFIGS = {
     "default": {
         "allowedContent": True,
+        "toolbar": "Custom",
+        "toolbar_Custom": [
+            ["Format"],  # Headings
+            ["Bold", "Italic", "Underline"],
+            ["NumberedList", "BulletedList"],
+            ["Link", "Unlink"],
+            ["Table", "HorizontalRule"],
+            ["RemoveFormat", "Source"],
+            ["Undo", "Redo"],
+        ],
+        "removeButtons": "TextColor,BGColor",  # Remove color-styling
+        "versionCheck": False,
+        "width": 600,
     },
     "mail_editor": {
         "allowedContent": True,

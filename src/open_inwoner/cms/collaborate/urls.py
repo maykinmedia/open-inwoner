@@ -14,6 +14,7 @@ from open_inwoner.plans.views import (
     PlanFileUploadView,
     PlanGoalEditView,
     PlanListView,
+    PlanNoteEditView,
     PlanTemplateChoiceView,
 )
 
@@ -36,6 +37,7 @@ urlpatterns = [
     path("<uuid:uuid>/edit/", PlanEditView.as_view(), name="plan_edit"),
     path("<uuid:uuid>/edit/goal/", PlanGoalEditView.as_view(), name="plan_edit_goal"),
     path("<uuid:uuid>/add/file/", PlanFileUploadView.as_view(), name="plan_add_file"),
+    path("<uuid:uuid>/edit/note/", PlanNoteEditView.as_view(), name="plan_edit_note"),
     path(
         "<uuid:uuid>/actions/add/",
         PlanActionCreateView.as_view(),
