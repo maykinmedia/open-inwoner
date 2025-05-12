@@ -7,19 +7,23 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 import freezegun
+import requests_mock
 from django_webtest import WebTest
 from maykin_2fa.test import disable_admin_mfa
 from privates.storages import PrivateMediaFileSystemStorage
 from privates.test import temp_private_root
+from pyquery import PyQuery
 from webtest import Upload
 
 from open_inwoner.accounts.tests.factories import UserFactory
 
+from ..api_models import ResultaatType
 from .factories import (
     CatalogusConfigFactory,
     ServiceFactory,
     ZaakTypeConfigFactory,
     ZaakTypeInformatieObjectTypeConfigFactory,
+    ZaakTypeResultaatTypeConfigFactory,
 )
 
 
@@ -121,6 +125,39 @@ class TestZaakTypeConfigAdmin(WebTest):
         )
         self.assertFalse(self.ztc.document_upload_enabled)
         self.assertFalse(self.ztiotc.document_upload_enabled)
+
+    @requests_mock.Mocker()
+    @mock.patch("open_inwoner.openzaak.admin.build_zgw_client_from_service")
+    def test_display_esuite_compat_naam(self, m, mock_client):
+        ZaakTypeResultaatTypeConfigFactory(
+            zaaktype_config=self.ztc,
+        )
+        resultaat_type = ResultaatType(
+            url="foo",
+            zaaktype="foo",
+            omschrijving="foo",
+            resultaattypeomschrijving="foo",
+            selectielijstklasse="foo",
+            omschrijving_generiek="foo",
+            toelichting="foo",
+            archiefnominatie="foo",
+            esuite_compat_naam="foobar",
+        )
+        mock_client.return_value.fetch_single_resultaat_type.return_value = (
+            resultaat_type
+        )
+
+        response = self.app.get(
+            reverse(
+                "admin:openzaak_zaaktypeconfig_change",
+                kwargs={"object_id": self.ztc.id},
+            ),
+            user=self.user,
+        )
+
+        doc = PyQuery(response.content)
+        div = doc.find("div.field-esuite_compat_naam div.readonly")[0]
+        self.assertEqual(div.text, "foobar")
 
 
 @disable_admin_mfa()

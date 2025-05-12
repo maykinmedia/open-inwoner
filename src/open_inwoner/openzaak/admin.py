@@ -17,6 +17,7 @@ from privates.storages import PrivateMediaFileSystemStorage
 from solo.admin import SingletonModelAdmin
 
 from open_inwoner.ckeditor5.widgets import CKEditorWidget
+from open_inwoner.openzaak.clients import build_zgw_client_from_service
 from open_inwoner.openzaak.import_export import ZGWConfigExport, ZGWConfigImport
 from open_inwoner.utils.forms import LimitedUploadFileField
 
@@ -377,11 +378,13 @@ class ZaakTypeResultaattypeConfigInline(admin.StackedInline):
         "omschrijving",
         "resultaattype_url",
         "zaaktype_uuids",
+        "esuite_compat_naam",
         "description",
     ]
     readonly_fields = [
         "omschrijving",
         "resultaattype_url",
+        "esuite_compat_naam",
         "zaaktype_uuids",
     ]
     ordering = (
@@ -394,6 +397,19 @@ class ZaakTypeResultaattypeConfigInline(admin.StackedInline):
 
     def has_delete_permission(self, request, obj=None):
         return request.user.is_superuser
+
+    def esuite_compat_naam(self, instance) -> str:
+        try:
+            catalogi_client = build_zgw_client_from_service(
+                service=instance.zaaktype_config.catalogus.service
+            )
+            result_type = catalogi_client.fetch_single_resultaat_type(
+                resultaat_type_url=instance.resultaattype_url
+            )
+        except Exception:
+            logger.exception("Error fetching resultaattype for zaaktype_config admin.")
+            return ""
+        return getattr(result_type, "esuite_compat_naam", "")
 
 
 @admin.register(ZaakTypeConfig)
