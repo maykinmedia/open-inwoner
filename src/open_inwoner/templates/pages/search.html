@@ -21,7 +21,7 @@
         {#  end search filters #}
 
         {% if paginator.count %}
-        <div class="column column--start-6 column--span-{% if search_filter_categories or search_filter_tags or search_filter_organizations %}12{% else %}8{% endif %}">
+        <div class="column column--start-{% if search_filter_categories or search_filter_tags or search_filter_organizations %}6{% else %}1{% endif %} column--span-{% if search_filter_categories or search_filter_tags or search_filter_organizations %}12{% else %}8{% endif %}">
             <div class="search-results">
                 <div class="search-results__list">
                     {% for hit in page_obj %}
@@ -30,9 +30,9 @@
                             <h3 class="utrecht-heading-3 search-results__item-title">{{ hit.name }}</h3>
                             <p class="utrecht-paragraph search-results__item-intro">{{ hit.summary }}</p>
                             <span class="link link--icon link--primary">
-                                    <span class="link__text">Bekijk resultaat</span>
-                                    {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
-                                </span>
+                                <span class="link__text">Bekijk resultaat</span>
+                                {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+                            </span>
                         </div>
                     </a>
                     {% endfor %}
