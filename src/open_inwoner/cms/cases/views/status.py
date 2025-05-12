@@ -330,11 +330,26 @@ class InnerCaseDetailView(
                     "label": _("Zaak ingediend op:"),
                     "value": context["case"].get("start_date"),
                 },
-                {
-                    "label": _("Beslissing op zijn laatst:"),
-                    "value": context["case"].get("end_date_legal"),
-                },
             ]
+            if self.case.einddatum:
+                context["metrics"].append(
+                    {
+                        "label": _("Besluit genomen op:"),
+                        "value": self.case.einddatum,
+                    },
+                )
+            else:
+                end_date = context["case"].get("end_date_legal") or context["case"].get(
+                    "end_date_planned"
+                )
+                context["metrics"].append(
+                    {
+                        "label": _("U ontvangt een besluit vóór:"),
+                        "value": end_date + dt.timedelta(days=1)
+                        if end_date
+                        else "unkown",
+                    }
+                )
         else:
             context["case"] = None
 
