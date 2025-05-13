@@ -409,11 +409,12 @@ class eSuiteKlantenService(
                 if field not in update_fields:
                     del update_data[field]
 
-        self.partial_update_klant(klant, update_data)
+        klant = self.partial_update_klant(klant, update_data)
         system_action(
             f"patched klant from user profile edit with fields: {', '.join(sorted(update_data.keys()))}",
             user=user,
         )
+        return klant
 
 
 class eSuiteVragenService(KlantenService):
