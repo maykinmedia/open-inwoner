@@ -47,14 +47,31 @@ class QuestionnaireStepView(CommonPageMixin, BaseBreadcrumbMixin, FormView):
 
     @cached_property
     def crumbs(self):
+        root_object = self.get_object().get_root()
         if self.request.user.is_authenticated:
             return [
                 (_("Mijn profiel"), reverse("profile:detail")),
                 (_("Zelfdiagnose"), reverse("products:questionnaire_list")),
+                (
+                    f"{root_object.question} - {_('Zelfdiagnose')}",
+                    reverse("products:descendent_step", kwargs=self.kwargs)
+                    if self.kwargs.get("root_slug")
+                    else reverse("products:root_step", kwargs=self.kwargs),
+                ),
             ]
         return [
             (_("Zelfdiagnose"), reverse("products:questionnaire_list")),
+            (
+                f"{root_object.question} - {_('Zelfdiagnose')}",
+                reverse("products:descendent_step", kwargs=self.kwargs)
+                if self.kwargs.get("root_slug")
+                else reverse("products:root_step", kwargs=self.kwargs),
+            ),
         ]
+
+    def page_title(self):
+        object = self.get_object()
+        return f"{object.depth} - {object.get_root().question} - {_('Zelfdiagnose')}"
 
     def get_object(self) -> QuestionnaireStep:
         slug = self.kwargs.get(
