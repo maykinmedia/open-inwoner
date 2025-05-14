@@ -87,19 +87,39 @@ class VragenService(Protocol):
 
 
 class OuterCaseDetailView(
-    OuterCaseAccessMixin, CommonPageMixin, BaseBreadcrumbMixin, TemplateView
+    OuterCaseAccessMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    CaseAccessMixin,
+    TemplateView,
 ):
     template_name = "pages/cases/status_outer.html"
+    case: Zaak | None = None
 
     @cached_property
     def crumbs(self):
+        # case is retrieved via CaseAccessMixin
+        if self.case:
+            return [
+                (_("Mijn zaken"), reverse("cases:index")),
+                (
+                    f"{self.case.description} - {_('Status')}",
+                    reverse("cases:case_detail", kwargs=self.kwargs),
+                ),
+            ]
         return [
             (_("Mijn zaken"), reverse("cases:index")),
             (
-                _("Status"),
+                f"{_('Zaak')} - {_('Status')}",
                 reverse("cases:case_detail", kwargs=self.kwargs),
             ),
         ]
+
+    def page_title(self):
+        if self.case:
+            return f"{self.case.description} {self.case.identification} - {_('Status')}"
+        else:
+            return f"{_('Zaak')} - {_('Status')}"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -163,16 +183,25 @@ class InnerCaseDetailView(
 
     @cached_property
     def crumbs(self):
+        # case is retrieved via CaseAccessMixin
+        if self.case:
+            return [
+                (_("Mijn zaken"), reverse("cases:index")),
+                (
+                    f"{self.case.description} - {_('Status')}",
+                    reverse("cases:case_detail", kwargs=self.kwargs),
+                ),
+            ]
         return [
             (_("Mijn zaken"), reverse("cases:index")),
             (
-                _("Status"),
+                f"{_('Zaak')} - {_('Status')}",
                 reverse("cases:case_detail", kwargs=self.kwargs),
             ),
         ]
 
     def page_title(self):
-        return _("Status")
+        return f"{self.case.description} {self.case.identification} - {_('Status')}"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

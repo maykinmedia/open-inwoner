@@ -35,7 +35,14 @@ class SearchView(
     success_url = reverse_lazy("search:search")
 
     def page_title(self):
-        return _("Zoeken")
+        form = self.get_form()
+        if form.is_valid():
+            data = form.cleaned_data.copy()
+            query = data.pop("query")
+            if query:
+                return f"{query} - {_('Zoeken')}"
+
+        return f"{_('Zoeken')}"
 
     def get(self, request, *args, **kwargs):
         # SearchForm

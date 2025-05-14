@@ -90,6 +90,15 @@ class CustomLoginView(LogMixin, LoginView):
 
         return redirect(furl(reverse("verify_token")).add(params).url)
 
+    # Manually overwrite the context site_name and page_title for the LoginView.
+    # A wrong default is set in django.contrib.auth.LoginView.
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        config = SiteConfiguration.get_solo()
+        context["site_name"] = config.name
+        context["page_title"] = _("Log in")
+        return context
+
 
 class VerifyTokenView(ThrottleMixin, FormView):
     throttle_visits = 3

@@ -176,7 +176,7 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
         return [(_("Mijn vragen"), reverse("cases:contactmoment_list"))]
 
     def page_title(self):
-        return _("Mijn vraag")
+        return f"{_('Mijn vraag')} {self.question['identification']}"
 
     def get_anchors(self) -> list:
         return [
@@ -204,7 +204,7 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
         )
         if not question:
             raise Http404()
-
+        self.question = question
         QuestionValidator.validate_python(question)
 
         local_kcm, created = KlantContactMomentAnswer.objects.get_or_create(  # noqa
