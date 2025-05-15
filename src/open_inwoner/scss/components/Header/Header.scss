@@ -83,7 +83,7 @@ $vm: var(--spacing-large);
         position: initial;
         grid-row: 1;
         grid-column: 6 / span 5;
-        margin-left: var(--spacing-large);
+        margin-left: 0;
       }
 
       > .primary-navigation {
@@ -123,7 +123,7 @@ $vm: var(--spacing-large);
         display: flex;
         flex-direction: row;
         justify-content: flex-end;
-        grid-column: 11 / span 2;
+        grid-column: 12;
         grid-row: 1;
       }
 
@@ -170,11 +170,22 @@ $vm: var(--spacing-large);
       display: none;
     }
 
-    .nav-login--icon {
+    .nav-login__icon {
       display: flex;
       justify-content: center;
       align-items: center;
       height: calc(var(--row-height) * 2);
+
+      &--authenticated {
+        .button--transparent {
+          padding-right: var(--spacing-medium);
+        }
+
+        [class*='icons'] {
+          color: var(--color-black);
+          font-size: var(--font-size-icon-large);
+        }
+      }
     }
   }
 
@@ -260,9 +271,11 @@ $vm: var(--spacing-large);
   .header__button .header__menu-icon {
     background-color: var(--color-primary);
   }
+
   .header__button .header__menu-icon .open {
     display: none;
   }
+
   .header__button .header__menu-icon .closed {
     height: var(--font-size-body);
     width: 100%;
@@ -285,14 +298,13 @@ $vm: var(--spacing-large);
       &__main {
         grid-row: 1;
         grid-column: 4 / span 2;
-        width: 180px;
       }
 
       &__authenticated {
-        display: flex;
+        display: grid;
         flex-direction: row;
         grid-row: 1;
-        grid-column: 11 / span 2;
+        grid-column: 12;
 
         // Tablet menu
         @media (min-width: 768px) and (max-width: 910px) {
@@ -330,7 +342,7 @@ $vm: var(--spacing-large);
     left: 0;
     margin: 0;
     max-width: 100%;
-    padding: 0 var(--spacing-medium) 0 var(--spacing-medium);
+    padding: 0;
     position: initial;
     right: 0;
     top: calc(2 * var(--row-height));
@@ -339,6 +351,15 @@ $vm: var(--spacing-large);
 
     .form {
       padding: 0;
+      max-width: var(--mobile-xs-width);
+
+      // Tablet view
+      @media (min-width: 768px) and (max-width: 910px) {
+        max-width: 100%;
+        .form__control {
+          max-width: 100%;
+        }
+      }
     }
 
     @media (min-width: 768px) {
