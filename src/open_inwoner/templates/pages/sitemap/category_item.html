@@ -1,0 +1,24 @@
+{% load i18n list_tags %}
+
+<li class="sitemap__list-item">
+    {# include root category #}
+    <a href={{ node.category.get_absolute_url }}>{% trans node.category.name %}</a>
+
+    {# include products #}
+    {% if node.products %}
+        <ul class="sitemap__list">
+            {% for product in node.products %}
+                <li class="sitemap__list-item"><a href="{{ product.get_absolute_url }}">{% trans product.name %}</a></li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {# recursively include sub-categories #}
+    {% if node.sub_categories %}
+        <ul class="sitemap__list">
+            {% for child in node.sub_categories %}
+                {% include "pages/sitemap/category_item.html" with node=child %}
+            {% endfor %}
+        </ul>
+    {% endif %}
+</li>

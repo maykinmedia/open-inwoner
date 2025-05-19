@@ -29,6 +29,7 @@ from open_inwoner.accounts.views import (
     VerifyTokenView,
 )
 from open_inwoner.configurations import views
+from open_inwoner.core.views import sitemap
 from open_inwoner.openklant.views.contactform import ContactFormView
 from open_inwoner.pdc.views import FAQView
 
@@ -113,6 +114,7 @@ urlpatterns = [
     # Views
     path("accounts/", include("open_inwoner.accounts.urls", namespace="accounts")),
     path("pages/", include("django.contrib.flatpages.urls"), name="flatpages"),
+    path("sitemap/", sitemap, name="sitemap"),
     path("mail-editor/", include("mail_editor.urls", namespace="mail_editor")),
     path(
         "sessions/",

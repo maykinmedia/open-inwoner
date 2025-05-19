@@ -212,6 +212,7 @@ INSTALLED_APPS = [
     "custom_migrations",
     "objectsapiclient",
     # Project applications.
+    "open_inwoner.core",
     "open_inwoner.components",
     "open_inwoner.kvk",
     "open_inwoner.laposta",

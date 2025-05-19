@@ -1,0 +1,60 @@
+{% extends "master.html" %}
+{% load i18n list_tags %}
+
+{% block content %}
+    <h1 class="utrecht-heading-1">{% trans "Links naar pagina's op het Open Inwoner Platform" %}</h1>
+
+    <div class="grid sitemap">
+        {# pages with information about OIP #}
+        <section class="sitemap__section">
+            <span class="utrecht-heading-2">{% trans "Platform" %}</span>
+            <ul class="sitemap__list">
+                {% for page in platform_pages %}
+                    {% with link=page.url_name text=page.link_text %}
+                        <li class="sitemap__list-item"><a href="{% url link %}">{% trans text %}</a></li>
+                    {% endwith %}
+                {% endfor %}
+                {% for page in flatpages %}
+                    {% with text=page.link_text %}
+                        <li class="sitemap__list-item"><a href={{ page.url }}>{% trans text %}</a></li>
+                    {% endwith %}
+                {% endfor %}
+            </ul>
+        </section>
+
+        {# onderwerpen #}
+        <section class="sitemap__section">
+            <a class="utrecht-heading-2" href="{% url 'products:category_list' %}">{% trans "Onderwerpen" %}</a>
+            <ul class="sitemap__list">
+                {% for node in category_nodes %}
+                    {% include "pages/sitemap/category_item.html" with node=node %}
+                {% endfor %}
+            </ul>
+        </section>
+
+        {% if request.user.is_authenticated %}
+            <section class="sitemap__section">
+                {# profile pages heading #}
+                {% for page in cms_profile_pages|slice:":1" %}
+                    {% with link=page.url_name text=page.link_text %}
+                        <a class="utrecht-heading-2" href="{% url link %}">{% trans text %}</a>
+                    {% endwith %}
+                {% endfor %}
+                <ul class="sitemap__list">
+                    {# profile pages #}
+                    {% for page in cms_profile_pages|slice:"1:" %}
+                        {% with link=page.url_name text=page.link_text %}
+                            <li class="sitemap__list-item"><a href="{% url link %}">{% trans text %}</a></li>
+                        {% endwith %}
+                    {% endfor %}
+                    {# other CMS pages #}
+                    {% for page in cms_pages %}
+                        {% with link=page.url_name text=page.link_text %}
+                            <li class="sitemap__list-item"><a href="{% url link %}">{% trans text %}</a></li>
+                        {% endwith %}
+                    {% endfor %}
+                </ul>
+            </section>
+        {% endif %}
+    </div>
+{% endblock content %}
