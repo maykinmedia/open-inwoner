@@ -157,6 +157,13 @@ class TestCaseDetailView(
                 "api_group_id": self.api_group.id,
             },
         )
+        self.case_detail_alt_url = reverse(
+            "cases:case_detail_content",
+            kwargs={
+                "object_id": "fead6fcd-7a91-494d-a269-926836152f81",
+                "api_group_id": self.api_group.id,
+            },
+        )
         self.eherkenning_case_detail_url = reverse(
             "cases:case_detail_content",
             kwargs={
@@ -371,6 +378,22 @@ class TestCaseDetailView(
             startdatum="2022-01-02",
             einddatumGepland="2022-01-04",
             uiterlijkeEinddatumAfdoening="2022-01-05",
+            status=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
+            resultaat=f"{ZAKEN_ROOT}resultaten/a44153aa-ad2c-6a07-be75-15add5113",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+        )
+        self.zaak_alt = generate_oas_component_cached(
+            "zrc",
+            "schemas/Zaak",
+            uuid="fead6fcd-7a91-494d-a269-926836152f81",
+            url=f"{ZAKEN_ROOT}zaken/fead6fcd-7a91-494d-a269-926836152f81",
+            zaaktype=self.zaaktype["url"],
+            identificatie="ZAAK-2025-0000000001",
+            omschrijving="Zaak naar aanleiding van ingezonden formulier",
+            startdatum="2025-05-01",
+            einddatumGepland="2025-05-10",
+            einddatum="2025-05-10",
+            uiterlijkeEinddatumAfdoening="2025-07-10",
             status=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
             resultaat=f"{ZAKEN_ROOT}resultaten/a44153aa-ad2c-6a07-be75-15add5113",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
@@ -699,6 +722,7 @@ class TestCaseDetailView(
 
         for resource in [
             self.zaak,
+            self.zaak_alt,
             self.zaak_eherkenning,
             self.result,
             self.zaaktype,
@@ -737,6 +761,14 @@ class TestCaseDetailView(
             ],
         )
         m.get(
+            f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak_alt['url']}",
+            json=[
+                self.zaak_informatie_object_old,
+                self.zaak_informatie_object_new,
+                self.zaak_informatie_object_invisible,
+            ],
+        )
+        m.get(
             f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak_eherkenning['url']}",
             json=[],
         )
@@ -746,10 +778,20 @@ class TestCaseDetailView(
                 # Taiga #972 these have to be oldest-last (newest-first) and cannot be resorted on
                 json=paginated_response([self.status_finish, self.status_new]),
             )
+            m.get(
+                f"{ZAKEN_ROOT}statussen?zaak={self.zaak_alt['url']}",
+                # Taiga #972 these have to be oldest-last (newest-first) and cannot be resorted on
+                json=paginated_response([self.status_finish, self.status_new]),
+            )
         else:
             m.get(
                 f"{ZAKEN_ROOT}statussen?zaak={self.zaak['url']}",
                 json=paginated_response([self.status_new]),
+            )
+            m.get(
+                f"{ZAKEN_ROOT}statussen?zaak={self.zaak_alt['url']}",
+                # Taiga #972 these have to be oldest-last (newest-first) and cannot be resorted on
+                json=paginated_response([self.status_finish, self.status_new]),
             )
         m.get(
             f"{ZAKEN_ROOT}statussen?zaak={self.zaak_eherkenning['url']}",
@@ -757,6 +799,10 @@ class TestCaseDetailView(
         )
         m.get(
             f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
+            json=paginated_response([self.user_role, self.not_initiator_role]),
+        )
+        m.get(
+            f"{ZAKEN_ROOT}rollen?zaak={self.zaak_alt['url']}",
             json=paginated_response([self.user_role, self.not_initiator_role]),
         )
         m.get(
@@ -1079,6 +1125,65 @@ class TestCaseDetailView(
 
         self.assertEqual(len(new_answer_headers), 1)
         self.assertEqual(new_answer_headers[0].text, _("Nieuw antwoord beschikbaar"))
+
+    @freeze_time("2021-01-12 17:00:00")
+    @patch(
+        "open_inwoner.cms.cases.views.status.OpenKlant2Service",
+        return_value=MockOpenKlant2Service(),
+    )
+    @patch("open_inwoner.userfeed.hooks.case_status_seen", autospec=True)
+    @patch("open_inwoner.userfeed.hooks.case_documents_seen", autospec=True)
+    def test_zaak_alternative(
+        self,
+        m,
+        mock_hook_status: Mock,
+        mock_hook_documents: Mock,
+        mock_openklant2_service,
+    ):
+        self.maxDiff = None
+
+        ZaakTypeStatusTypeConfigFactory.create(
+            zaaktype_config=self.zaaktype_config,
+            statustype_url=self.status_type_new["url"],
+            status_indicator=StatusIndicators.warning,
+            status_indicator_text="foo",
+            case_link_text="Bekijk aanvraag",
+        )
+        ZaakTypeStatusTypeConfigFactory.create(
+            zaaktype_config=self.zaaktype_config,
+            statustype_url=self.status_type_finish["url"],
+            status_indicator=StatusIndicators.success,
+            status_indicator_text="bar",
+            call_to_action_url="https://www.example.com",
+            call_to_action_text="Click me",
+            case_link_text="Bekijk aanvraag",
+        )
+
+        ZaakTypeResultaatTypeConfigFactory.create(
+            zaaktype_config=self.zaaktype_config,
+            resultaattype_url=self.resultaattype_with_naam["url"],
+            omschrijving=self.resultaattype_with_naam["omschrijving"],
+            zaaktype_uuids=[self.zaaktype["uuid"]],
+        )
+
+        self._setUpMocks(m)
+        status_new_obj, status_finish_obj = factory(
+            Status, [self.status_new, self.status_finish]
+        )
+        status_new_obj.statustype = factory(StatusType, self.status_type_new)
+        status_finish_obj.statustype = factory(StatusType, self.status_type_finish)
+
+        self.esuite_config.exclude_contactmoment_kanalen = ["Balie"]
+        self.esuite_config.save()
+
+        response = self.app.get(self.case_detail_alt_url, user=self.user)
+
+        metrics = response.context.get("metrics")
+
+        self.assertIn(
+            {"label": "Besluit genomen op:", "value": datetime.date(2025, 5, 10)},
+            metrics,
+        )
 
     @patch(
         "open_inwoner.cms.cases.views.status.OpenKlant2Service",
