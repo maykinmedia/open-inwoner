@@ -1,7 +1,7 @@
 {% extends 'master.html' %}
 {% load render_tags %}
 
-{% block title %}{{ flatpage.title }}{% endblock %}
+{% block title %}{% with page_title=flatpage.title %}{{ block.super }}{% endwith %}{% endblock %}
 
 {% block content %}
   <h1 class="utrecht-heading-1">{{ flatpage.title }}</h1>

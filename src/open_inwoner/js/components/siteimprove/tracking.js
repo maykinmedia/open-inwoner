@@ -400,11 +400,20 @@ const partialClickSelectors = {
     {
       category: 'Dropdown navigatie',
     },
+  '.header .header__container > nav.primary-navigation.primary-navigation--desktop.primary-navigation__authenticated > ul > li > span > span':
+    {
+      category: 'Dropdown navigatie desktop',
+      label: 'Click op persoons-icoon',
+    },
   '.header--mobile.header__submenu > nav > ul > li a span': {
     category: 'Mobiel menu',
   },
   '.header--mobile__close *': {
     category: 'Mobiel menu',
+  },
+  '.header .header__container > .header__menu > span > a': {
+    category: 'Mobiel menu',
+    label: 'Click op persoons-icoon',
   },
   '.userfeed .card *': {
     category: 'Homepage openstaande acties',
@@ -541,10 +550,7 @@ const keydownSelectors = {
       // Check if the target or any of its ancestors has a class we do not wish to track
       let doNotTrackElement = target
       while (doNotTrackElement) {
-        if (
-          doNotTrackElement.matches('#registration-form') ||
-          doNotTrackElement.classList.contains('login-tab--container')
-        ) {
+        if (doNotTrackElement.classList.contains('login-tab--container')) {
           return
         }
         doNotTrackElement = doNotTrackElement.parentElement
