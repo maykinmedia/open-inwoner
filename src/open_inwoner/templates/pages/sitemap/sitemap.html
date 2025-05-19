@@ -1,22 +1,39 @@
 {% extends "master.html" %}
-{% load i18n list_tags %}
+{% load i18n list_tags icon_tags %}
 
 {% block content %}
     <h1 class="utrecht-heading-1">{% trans "Links naar pagina's op het Open Inwoner Platform" %}</h1>
 
-    <div class="grid sitemap">
+    <div class="sitemap">
         {# pages with information about OIP #}
         <section class="sitemap__section">
-            <span class="utrecht-heading-2">{% trans "Platform" %}</span>
-            <ul class="sitemap__list">
+            <h2 class="utrecht-heading-2">{% trans "Platform" %}</h2>
+            <ul class="utrecht-unordered-list">
                 {% for page in platform_pages %}
-                    {% with link=page.url_name text=page.link_text %}
-                        <li class="sitemap__list-item"><a href="{% url link %}">{% trans text %}</a></li>
-                    {% endwith %}
+                    {% if page.url_name %}
+                        <li class="utrecht-unordered-list__item">
+                            <a href="{% url page.url_name %}" class="link--secondary">
+                                {% icon icon="chevron_right" icon_position="before" primary=True outlined=True %}
+                                <span class="link__text">{% trans page.link_text %}</span>
+                            </a>
+                        </li>
+                    {% elif page.url %}
+                        <li class="utrecht-unordered-list__item">
+                            <a href="{{ page.url }}" class="link--secondary">
+                                {% icon icon="chevron_right" icon_position="before" primary=True outlined=True %}
+                                <span class="link__text">{% trans page.link_text %}</span>
+                            </a>
+                        </li>
+                    {% endif %}
                 {% endfor %}
                 {% for page in flatpages %}
                     {% with text=page.link_text %}
-                        <li class="sitemap__list-item"><a href={{ page.url }}>{% trans text %}</a></li>
+                        <li class="utrecht-unordered-list__item">
+                            <a href="{{ page.url }}" class="link--secondary">
+                                {% icon icon="chevron_right" icon_position="before" primary=True outlined=True %}
+                                <span class="link__text">{% trans text %}</span>
+                            </a>
+                        </li>
                     {% endwith %}
                 {% endfor %}
             </ul>
@@ -24,8 +41,8 @@
 
         {# onderwerpen #}
         <section class="sitemap__section">
-            <a class="utrecht-heading-2" href="{% url 'products:category_list' %}">{% trans "Onderwerpen" %}</a>
-            <ul class="sitemap__list">
+            <h2 class="utrecht-heading-2"><a class="link" href="{% url 'products:category_list' %}">{% trans "Onderwerpen" %}</a></h2>
+            <ul class="utrecht-unordered-list">
                 {% for node in category_nodes %}
                     {% include "pages/sitemap/category_item.html" with node=node %}
                 {% endfor %}
@@ -36,22 +53,53 @@
             <section class="sitemap__section">
                 {# profile pages heading #}
                 {% for page in cms_profile_pages|slice:":1" %}
-                    {% with link=page.url_name text=page.link_text %}
-                        <a class="utrecht-heading-2" href="{% url link %}">{% trans text %}</a>
-                    {% endwith %}
+                    {% if page.url_name %}
+                        <h2 class="utrecht-heading-2">
+                            <a class="link" href="{% url page.url_name %}">{% trans page.link_text %}</a>
+                        </h2>
+                    {% elif page.url %}
+                        <h2 class="utrecht-heading-2">
+                            <a class="link" href="{{ page.url }}">{% trans page.link_text %}</a>
+                        </h2>
+                    {% endif %}
                 {% endfor %}
-                <ul class="sitemap__list">
+                <ul class="utrecht-unordered-list">
                     {# profile pages #}
                     {% for page in cms_profile_pages|slice:"1:" %}
-                        {% with link=page.url_name text=page.link_text %}
-                            <li class="sitemap__list-item"><a href="{% url link %}">{% trans text %}</a></li>
-                        {% endwith %}
+                        {% if page.url_name %}
+                            <li class="utrecht-unordered-list__item">
+                                <a href="{% url page.url_name %}" class="link--secondary">
+                                    {% icon icon="chevron_right" icon_position="before" primary=True outlined=True %}
+                                    <span class="link__text">{% trans page.link_text %}</span>
+                                </a>
+                            </li>
+                        {% elif page.url %}
+                            <li class="utrecht-unordered-list__item">
+                                <a href="{{ page.url }}" class="link--secondary">
+                                    {% icon icon="chevron_right" icon_position="before" primary=True outlined=True %}
+                                    <span class="link__text">{% trans page.link_text %}</span>
+                                </a>
+                            </li>
+                        {% endif %}
                     {% endfor %}
+
                     {# other CMS pages #}
                     {% for page in cms_pages %}
-                        {% with link=page.url_name text=page.link_text %}
-                            <li class="sitemap__list-item"><a href="{% url link %}">{% trans text %}</a></li>
-                        {% endwith %}
+                        {% if page.url_name %}
+                            <li class="utrecht-unordered-list__item">
+                                <a href="{% url page.url_name %}" class="link--secondary">
+                                    {% icon icon="chevron_right" icon_position="before" primary=True outlined=True %}
+                                    <span class="link__text">{% trans page.link_text %}</span>
+                                </a>
+                            </li>
+                        {% elif page.url %}
+                            <li class="utrecht-unordered-list__item">
+                                <a href="{{ page.url }}" class="link--secondary">
+                                    {% icon icon="chevron_right" icon_position="before" primary=True outlined=True %}
+                                    <span class="link__text">{% trans page.link_text %}</span>
+                                </a>
+                            </li>
+                        {% endif %}
                     {% endfor %}
                 </ul>
             </section>
