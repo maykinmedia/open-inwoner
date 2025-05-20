@@ -770,7 +770,7 @@ class eSuiteVragenService(KlantenService):
                     ZaakWithApiGroup(
                         zaak=case.result,
                         api_group=ZGWApiGroupConfig.objects.resolve_group_from_hints(
-                            case.client
+                            client=case.client
                         ),
                     )
                     for case in cases_found

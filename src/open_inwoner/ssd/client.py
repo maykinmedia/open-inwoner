@@ -42,6 +42,10 @@ class SSDBaseClient(ABC):
         }
 
     def _get_auth_kwargs(self) -> dict:
+        if not self.config.service:
+            logger.error("SSD client used without SOAP service")
+            return {}
+
         cert = self.config.service.get_cert()
         verify = self.config.service.get_verify()
         return {
@@ -64,7 +68,7 @@ class SSDBaseClient(ABC):
         context = {**self._get_base_context(), **kwargs}
         return loader.render_to_string(self.request_template, context)
 
-    def templated_request(self, **kwargs) -> Response:
+    def templated_request(self, **kwargs) -> Response | None:
         """Wrap around `requests.post` with headers, auth details, request body"""
 
         auth_kwargs = self._get_auth_kwargs()
@@ -78,8 +82,16 @@ class SSDBaseClient(ABC):
                 headers=headers,
                 **auth_kwargs,
             )
-        except requests.exceptions.RequestException as e:
-            logger.exception("Requests exception: %s", e)
+            response.raise_for_status()
+        except requests.HTTPError as exc:
+            status_code = exc.response.status_code if exc.response else None
+            if status_code and 400 <= status_code < 500:
+                logger.exception("Client error from SSD client")
+            elif status_code and 500 <= status_code < 600:
+                logger.exception("Server error from SSD client")
+            return
+        except requests.exceptions.RequestException as exc:
+            logger.exception("Requests exception: %s", exc)
             return
 
         return response
