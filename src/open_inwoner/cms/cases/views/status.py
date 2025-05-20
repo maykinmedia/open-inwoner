@@ -347,7 +347,7 @@ class InnerCaseDetailView(
                         "label": _("U ontvangt een besluit vóór:"),
                         "value": end_date + dt.timedelta(days=1)
                         if end_date
-                        else "unkown",
+                        else _("unkown"),
                     }
                 )
         else:
