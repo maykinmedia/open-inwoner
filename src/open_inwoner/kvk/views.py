@@ -1,5 +1,6 @@
 from typing import cast
 
+from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -14,6 +15,7 @@ from open_inwoner.utils.views import LogMixin
 
 from ..utils.url import get_next_url_from
 from .client import KvKClient
+from .exceptions import KVKAPIException
 from .forms import CompanyBranchChoiceForm
 
 
@@ -33,9 +35,19 @@ class CompanyBranchChoiceView(LogMixin, FormView):
 
         kvk_client = KvKClient()
 
-        company_branches = kvk_client.get_all_company_branches(
-            kvk=self.request.user.kvk
-        )
+        try:
+            company_branches = kvk_client.get_all_company_branches(
+                kvk=self.request.user.kvk
+            )
+        except KVKAPIException:
+            messages.error(
+                request=self.request,
+                message=_(
+                    "We are temporarily unable to show your branches, please try again at a later point."
+                ),
+            )
+            company_branches = []
+
         # create pseudo-branch representing the company as a whole (the "rechtspersoon").
         # technically, the compnay as a legal entity is represented as "rechtspersoon",
         # but this is not always included in query results

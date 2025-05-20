@@ -1,5 +1,6 @@
 import logging
 
+from django.contrib import messages
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.dispatch import receiver
 from django.urls import reverse
@@ -9,6 +10,7 @@ from open_inwoner.accounts.models import User
 from open_inwoner.haalcentraal.models import HaalCentraalConfig
 from open_inwoner.haalcentraal.utils import update_brp_data_in_db
 from open_inwoner.kvk.client import KvKClient
+from open_inwoner.kvk.exceptions import KVKAPIException
 from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.models import KlantenSysteemConfig
 from open_inwoner.openklant.services import OpenKlant2Service, eSuiteKlantenService
@@ -42,7 +44,16 @@ def update_user_on_login(sender, user, request, *args, **kwargs):
     # to the klanten APIs, because e.g. RSIN or company name will be a required input
     # for certain sync operations.
     if user.is_eherkenning_user:
-        _update_eherkenning_user_from_kvk_api(user=user)
+        try:
+            _update_eherkenning_user_from_kvk_api(user=user)
+        except KVKAPIException:
+            messages.warning(
+                request=request,
+                message=_(
+                    "We're experiencing technical difficulties. "
+                    "Your profile information may not be up-to-date."
+                ),
+            )
 
     # update brp fields when login with digid and brp is configured
     if user.is_digid_user and HaalCentraalConfig.get_solo().service:
@@ -90,56 +101,49 @@ def _update_user_from_esuite(
 
 def _update_eherkenning_user_from_kvk_api(user: User):
     extra_exc_params = {"kvk": user.kvk, "vestiging": user.vestiging}
-    try:
-        kvk_client = KvKClient()
-        updated_fields = []
+    kvk_client = KvKClient()
+    updated_fields = []
 
-        # Update company name. We want this to run on every login because it may
-        # change (if infrequently)
-        basisprofiel = kvk_client.get_basisprofiel(kvk=user.kvk)
-        company_name = basisprofiel.get("naam")
-        if company_name and user.company_name != company_name:
-            user.company_name = company_name
-            user.save(update_fields=["company_name"])
-            updated_fields.append("company_name")
+    # Update company name. We want this to run on every login because it may
+    # change (if infrequently)
+    basisprofiel = kvk_client.get_basisprofiel(kvk=user.kvk)
+    company_name = basisprofiel.get("naam")
+    if company_name and user.company_name != company_name:
+        user.company_name = company_name
+        user.save(update_fields=["company_name"])
+        updated_fields.append("company_name")
 
-        # Update branch name (leave empty for rechtspersoon)
-        if user.vestiging:
-            branch_profile = kvk_client.get_vestigingsprofiel(vestiging=user.vestiging)
-            branch_name = branch_profile.get("eersteHandelsnaam")
-            if branch_name and user.branch_name != branch_name:
-                user.branch_name = branch_name
-                user.save()
-                updated_fields.append("branch_name")
+    # Update branch name (leave empty for rechtspersoon)
+    if user.vestiging:
+        branch_profile = kvk_client.get_vestigingsprofiel(vestiging=user.vestiging)
+        branch_name = branch_profile.get("eersteHandelsnaam")
+        if branch_name and user.branch_name != branch_name:
+            user.branch_name = branch_name
+            user.save()
+            updated_fields.append("branch_name")
 
-        # Optionally update RSIN. Unlike company name, RSIN should be immutable, so we
-        # only have to fetch it if it's not set.
-        if not user.rsin:
-            rsin = kvk_client.retrieve_rsin_with_kvk(kvk=user.kvk)
+    # Optionally update RSIN. Unlike company name, RSIN should be immutable, so we
+    # only have to fetch it if it's not set.
+    if not user.rsin:
+        rsin = kvk_client.retrieve_rsin_with_kvk(kvk=user.kvk)
 
-            if rsin:
-                user.rsin = rsin
-                user.save(update_fields=["rsin"])
-                updated_fields.append("rsin")
-            else:
-                logger.error(
-                    "Unable to sync rsin from KvK API",
-                    extra=extra_exc_params,
-                )
-
-        if updated_fields:
-            system_action(
-                _(
-                    "user attributes were updated from KvK API: %(fields)s"
-                    % {"fields": ", ".join(updated_fields)}
-                ),
-                content_object=user,
+        if rsin:
+            user.rsin = rsin
+            user.save(update_fields=["rsin"])
+            updated_fields.append("rsin")
+        else:
+            logger.error(
+                "Unable to sync rsin from KvK API",
+                extra=extra_exc_params,
             )
 
-    except Exception:
-        logger.exception(
-            "Unable to update eHerkenning user from KvK API",
-            extra=extra_exc_params,
+    if updated_fields:
+        system_action(
+            _(
+                "user attributes were updated from KvK API: %(fields)s"
+                % {"fields": ", ".join(updated_fields)}
+            ),
+            content_object=user,
         )
 
 

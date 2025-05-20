@@ -26,6 +26,7 @@ from eherkenning.mock.views.eherkenning import (
 )
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.kvk.client import KvKClient
+from open_inwoner.kvk.exceptions import KVKAPIException
 from open_inwoner.utils.views import LogMixin
 
 from ..choices import LoginTypeChoices
@@ -149,26 +150,26 @@ class BlockEenmanszaakLoginMixin:
         failure_url = self.get_failure_url()
 
         client = KvKClient()
-        basisprofiel = client.get_basisprofiel(kvk=kvk)
 
-        if not basisprofiel:
-            auth.logout(request)
+        try:
+            basisprofiel = client.get_basisprofiel(kvk=kvk)
+        except KVKAPIException:
             messages.error(
-                request, _("We could not log you in. Please try again later.")
+                request=request,
+                message=_(
+                    "We're experiencing technical difficulties. Please try again later"
+                ),
             )
-            return HttpResponseRedirect(failure_url)
-
-        if basisprofiel.get("fout"):
             auth.logout(request)
-            message = basisprofiel["fout"][0]["omschrijving"]
-            messages.error(request, message)
             return HttpResponseRedirect(failure_url)
 
         rechtsvorm = glom(basisprofiel, "_embedded.eigenaar.rechtsvorm", default="")
         if rechtsvorm == "Eenmanszaak":
+            messages.error(
+                request,
+                _("Use DigiD to log in as a sole proprietor."),
+            )
             auth.logout(request)
-            message = _("Use DigiD to log in as a sole proprietor.")
-            messages.error(request, message)
             return HttpResponseRedirect(failure_url)
         return response
 
