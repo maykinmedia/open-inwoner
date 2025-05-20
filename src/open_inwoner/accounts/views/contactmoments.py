@@ -1,13 +1,14 @@
 import logging
 from typing import Iterable, Protocol
 
+from django.contrib import messages
 from django.contrib.auth.mixins import AccessMixin
 from django.core.exceptions import ImproperlyConfigured
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.functional import cached_property
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 from django.views import View
 from django.views.generic import TemplateView
 
@@ -197,14 +198,27 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
             raise ImproperlyConfigured("Unknown KlantenServiceType")
 
         origin = self.request.headers.get("Referer")
-        question, zaak_with_api_group = service.retrieve_question(
+        question, zaken_with_api_group = service.retrieve_question(
             self.get_fetch_params(service),
             question_uuid=kwargs["kcm_uuid"],
             user=self.request.user,
         )
         if not question:
             raise Http404()
+        if zaken_with_api_group and len(zaken_with_api_group) > 1:
+            # In principle this should not happen, a zaak should be stored in
+            # exactly one backend. But: https://www.xkcd.com/2200/
+            # We should at least receive a ping if this happens and warn the user.
+            logger.error("Found one zaak in multiple backends")
+            messages.warning(
+                self.request,
+                _(
+                    "Your question was connected to multiple cases, we are showing you the first."
+                ),
+            )
+
         self.question = question
+        zaak_with_api_group = zaken_with_api_group[0] if zaken_with_api_group else None
         QuestionValidator.validate_python(question)
 
         local_kcm, created = KlantContactMomentAnswer.objects.get_or_create(  # noqa
