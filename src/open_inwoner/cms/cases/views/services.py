@@ -297,7 +297,7 @@ class CaseListService:
         ):
             try:
                 update_case = task.result()
-                if hasattr(update_case, "__call__"):
+                if callable(update_case):
                     update_case(case)
             except BaseException:
                 logger.exception("Error in resolving case", stack_info=True)
