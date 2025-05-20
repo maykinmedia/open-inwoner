@@ -146,14 +146,22 @@ class BlockEenmanszaakLoginMixin:
         if not (kvk := request.user.kvk):
             return response
 
+        failure_url = self.get_failure_url()
+
         client = KvKClient()
         basisprofiel = client.get_basisprofiel(kvk=kvk)
+
+        if not basisprofiel:
+            auth.logout(request)
+            messages.error(
+                request, _("We could not log you in. Please try again later.")
+            )
+            return HttpResponseRedirect(failure_url)
 
         if basisprofiel.get("fout"):
             auth.logout(request)
             message = basisprofiel["fout"][0]["omschrijving"]
             messages.error(request, message)
-            failure_url = self.get_failure_url()
             return HttpResponseRedirect(failure_url)
 
         rechtsvorm = glom(basisprofiel, "_embedded.eigenaar.rechtsvorm", default="")
@@ -161,7 +169,6 @@ class BlockEenmanszaakLoginMixin:
             auth.logout(request)
             message = _("Use DigiD to log in as a sole proprietor.")
             messages.error(request, message)
-            failure_url = self.get_failure_url()
             return HttpResponseRedirect(failure_url)
         return response
 
