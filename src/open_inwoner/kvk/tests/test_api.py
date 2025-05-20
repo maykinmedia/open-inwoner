@@ -2,10 +2,12 @@ from unittest.mock import patch
 
 from django.test import TestCase
 
+import requests
 import requests_mock
 from requests.exceptions import InvalidJSONError, SSLError
 
 from ..client import KvKClient
+from ..exceptions import KVKAPIException
 from ..models import KvKConfig
 from . import mocks
 from .factories import CLIENT_CERT, CLIENT_CERT_PAIR, SERVER_CERT
@@ -305,33 +307,40 @@ class KvKRequestsInterfaceTest(TestCase):
     def test_kvk_response_not_ok(self, mocker):
         patch.stopall()  # use custom requests mock for this test
 
-        for code in [300, 400, 500]:
+        scenarios = [
+            (400, requests.HTTPError),
+            (500, requests.HTTPError),
+        ]
+        for code, error in scenarios:
             with self.subTest(code=code):
                 mocker.get(
                     f"{self.kvk_client.search_endpoint}?kvkNummer=69599084&resultatenPerPagina=100",
                     status_code=code,
+                    json={
+                        "fout": [
+                            {
+                                "code": "IPD0005",
+                                "omschrijving": "Op basis van het KVK-nummer 69599084 kan het product niet worden geleverd.",
+                            }
+                        ]
+                    },
                 )
 
-                company = self.kvk_client.search(kvkNummer="69599084")
-                self.assertEqual(company, {})
+                with self.assertRaises(KVKAPIException) as cm:
+                    self.kvk_client.search(kvkNummer="69599084")
+                self.assertEqual(
+                    cm.exception.message,
+                    "Op basis van het KVK-nummer 69599084 kan het product niet worden geleverd.",
+                )
 
     def test_kvk_api_error(self):
         self.mocked_requests.side_effect = SSLError
 
-        company = self.kvk_client.search(kvkNummer="69599084")
-
-        self.assertEqual(company, {})
+        with self.assertRaises(KVKAPIException):
+            self.kvk_client.search(kvkNummer="69599084")
 
     def test_kvk_invalid_json(self):
         self.mocked_requests.return_value.json.side_effect = InvalidJSONError
 
-        company = self.kvk_client.search(kvkNummer="69599084")
-
-        self.assertEqual(company, {})
-
-    def test_kvk_no_response(self):
-        self.mocked_requests.return_value = None
-
-        company = self.kvk_client.search(kvkNummer="69599084")
-
-        self.assertEqual(company, {})
+        with self.assertRaises(KVKAPIException):
+            self.kvk_client.search(kvkNummer="69599084")
