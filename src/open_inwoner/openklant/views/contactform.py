@@ -330,4 +330,10 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
                 identificatie=employee_id
             )
 
-        return self.vragen_service.create_contactmoment(data, klant=klant)
+        contactmoment = self.vragen_service.create_contactmoment(data, klant=klant)
+        if not contactmoment:
+            messages.warning(
+                request=self.request,
+                message=_("Your question could not be saved. Please try again later."),
+            )
+        return contactmoment

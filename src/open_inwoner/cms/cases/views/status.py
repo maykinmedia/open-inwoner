@@ -1147,6 +1147,10 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
             self.log_system_action(
                 "error while registering contactmoment by API", user=self.request.user
             )
+            messages.error(
+                request=self.request,
+                message=_("Your question could not be saved. Please try again later."),
+            )
             return False
 
         self.log_system_action(
