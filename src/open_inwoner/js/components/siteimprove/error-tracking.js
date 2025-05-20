@@ -2,18 +2,18 @@
  * Note: users can upload multiple faulty files with their respective errors, and can delete them one by one,
  * Tracking should only happen on newly added errors, not the entire occurring set.
  */
-// if (typeof _sz === 'undefined') {
-//   /** Mock SiteImprove `_sz` object for testing - only used during development */
-//   var _sz = {
-//     push: function (data) {
-//       try {
-//         console.log('Event pushed to _sz:', data)
-//       } catch (error) {
-//         console.error('Error occurred while pushing event data:', error)
-//       }
-//     },
-//   }
-// }
+if (window.IS_DEV && typeof _sz === 'undefined') {
+  /** Mock SiteImprove `_sz` object for testing - only used during development */
+  var _sz = {
+    push: function (data) {
+      try {
+        console.log('Event pushed to _sz:', data)
+      } catch (error) {
+        console.error('Error occurred while pushing event data:', error)
+      }
+    },
+  }
+}
 
 /**
  * Class that handles the transaction between file errors and SiteImprove.
