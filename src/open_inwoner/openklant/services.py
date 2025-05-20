@@ -750,7 +750,7 @@ class eSuiteVragenService(KlantenService):
             local_kcm.is_seen = True
             local_kcm.save()
 
-        zaak_with_api_group = None
+        zaken_with_api_group = []
 
         ocm = self.retrieve_objectcontactmoment(kcm.contactmoment, "zaak")
         if ocm and ocm.object_type == "zaak":
@@ -766,18 +766,17 @@ class eSuiteVragenService(KlantenService):
                     "Unable to find matched contactmomenten zaak in any zgw backend"
                 )
             else:
-                zaak, client = cases_found[0].result, cases_found[0].client
-                group = ZGWApiGroupConfig.objects.resolve_group_from_hints(
-                    client=client
-                )
-                zaak_with_api_group = ZaakWithApiGroup(zaak=zaak, api_group=group)
-                if case_count > 1:
-                    # In principle this should not happen, a zaak should be stored in
-                    # exactly one backend. But: https://www.xkcd.com/2200/
-                    # We should at least receive a ping if this happens.
-                    logger.error("Found one zaak in multiple backends")
+                zaken_with_api_group = [
+                    ZaakWithApiGroup(
+                        zaak=case.result,
+                        api_group=ZGWApiGroupConfig.objects.resolve_group_from_hints(
+                            case.client
+                        ),
+                    )
+                    for case in cases_found
+                ]
 
-        return self._build_question_dto(kcm), zaak_with_api_group
+        return self._build_question_dto(kcm), zaken_with_api_group
 
     def list_questions_for_zaak(self, zaak: Zaak, user: User) -> list[Question]:
         objectcontactmomenten = self.retrieve_objectcontactmomenten_for_zaak(zaak)
