@@ -9,6 +9,7 @@ from lxml import etree
 from requests.exceptions import ConnectionError
 
 from ..client import JaaropgaveClient, UitkeringClient
+from ..exceptions import SSDClientException
 from .factories import ConcreteSSDClient, SSDConfigFactory
 
 FILES_DIR = Path(__file__).parent.resolve() / "files"
@@ -134,9 +135,9 @@ class SSDClientRequestInterfaceTest(TestCase):
         )
 
         context = {"bsn": "dummy", "period": "dummy"}
-        response = ssd_client.templated_request(**context)
 
-        self.assertIsNone(response)
+        with self.assertRaises(SSDClientException):
+            ssd_client.templated_request(**context)
 
 
 class UitkeringClientTest(TestCase):
@@ -147,18 +148,29 @@ class UitkeringClientTest(TestCase):
             service__url="https://example.com/soap-service/",
         )
 
-        for code in [300, 400, 500]:
+        mock_request.post(
+            "https://example.com/soap-service/maandspecificatie/",
+            status_code=300,
+        )
+        res = ssd_client.get_reports(
+            bsn="12345",
+            report_date="198507",
+            request_url="https://dummy.com",
+        )
+        self.assertIsNone(res)
+
+        for code in [400, 500]:
             with self.subTest(code=code):
                 mock_request.post(
                     "https://example.com/soap-service/maandspecificatie/",
                     status_code=code,
                 )
-                res = ssd_client.get_reports(
-                    bsn="12345",
-                    report_date="198507",
-                    request_base_url="https://dummy.com",
-                )
-                self.assertIsNone(res)
+                with self.assertRaises(SSDClientException):
+                    ssd_client.get_reports(
+                        bsn="12345",
+                        report_date="198507",
+                        request_url="https://dummy.com",
+                    )
 
     @patch("django.utils.timezone.localtime", return_value=datetime(2023, 7, 12, 11, 0))
     @requests_mock.Mocker()
@@ -170,11 +182,13 @@ class UitkeringClientTest(TestCase):
 
         mock_request.post("https://example.com/soap-service/maandspecificatie/")
 
-        ssd_client.get_reports(
-            bsn="12345",
-            report_date="198507",
-            request_base_url="https://dummy.com",
-        )
+        # error due to missing response content; we only test the request body
+        with self.assertRaises(SSDClientException):
+            ssd_client.get_reports(
+                bsn="12345",
+                report_date="198507",
+                request_url="https://dummy.com",
+            )
 
         # get request body and parse XML
         body = mock_request.last_request.body
@@ -204,18 +218,29 @@ class JaaropgaveClientTest(TestCase):
             service__url="https://example.com/soap-service/",
         )
 
-        for code in [300, 400, 500]:
+        mock_request.post(
+            "https://example.com/soap-service/jaaropgave/",
+            status_code=300,
+        )
+        res = ssd_client.get_reports(
+            bsn="12345",
+            report_date="198507",
+            request_url="https://dummy.com",
+        )
+        self.assertIsNone(res)
+
+        for code in [400, 500]:
             with self.subTest(code=code):
                 mock_request.post(
                     "https://example.com/soap-service/jaaropgave/",
                     status_code=code,
                 )
-                res = ssd_client.get_reports(
-                    bsn="12345",
-                    report_date="1985-12-24",
-                    base_url="https://dummy.com",
-                )
-                self.assertIsNone(res)
+                with self.assertRaises(SSDClientException):
+                    ssd_client.get_reports(
+                        bsn="12345",
+                        report_date="198507",
+                        request_url="https://dummy.com",
+                    )
 
     @patch("django.utils.timezone.localtime", return_value=datetime(2023, 7, 12, 11, 0))
     @requests_mock.Mocker()
@@ -227,11 +252,13 @@ class JaaropgaveClientTest(TestCase):
 
         mock_request.post("https://example.com/soap-service/jaaropgave/")
 
-        ssd_client.get_reports(
-            bsn="12345",
-            report_date="1985",
-            base_url="https://dummy.com",
-        )
+        # error due to missing response content; we only test the request body
+        with self.assertRaises(SSDClientException):
+            ssd_client.get_reports(
+                bsn="12345",
+                report_date="1985",
+                request_url="https://dummy.com",
+            )
 
         # get request body and parse XML
         body = mock_request.last_request.body
