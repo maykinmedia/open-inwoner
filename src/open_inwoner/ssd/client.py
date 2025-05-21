@@ -12,6 +12,7 @@ import requests
 from requests import Response
 
 from ..utils.export import render_pdf
+from .exceptions import SSDClientException
 from .models import SSDConfig
 from .xml import get_jaaropgaven, get_uitkeringen
 
@@ -83,16 +84,9 @@ class SSDBaseClient(ABC):
                 **auth_kwargs,
             )
             response.raise_for_status()
-        except requests.HTTPError as exc:
-            status_code = exc.response.status_code if exc.response else None
-            if status_code and 400 <= status_code < 500:
-                logger.exception("Client error from SSD client")
-            elif status_code and 500 <= status_code < 600:
-                logger.exception("Server error from SSD client")
-            return
-        except requests.exceptions.RequestException as exc:
-            logger.exception("Requests exception: %s", exc)
-            return
+        except (requests.HTTPError, requests.RequestException) as exc:
+            logger.exception("Requests error from SSD client")
+            raise SSDClientException from exc
 
         return response
 
@@ -147,7 +141,7 @@ class JaaropgaveClient(SSDBaseClient):
         """
         return f"Jaaropgave {report_date}"
 
-    def get_reports(self, bsn: str, report_date: str, base_url: str) -> bytes | None:
+    def get_reports(self, bsn: str, report_date: str, request_url: str) -> bytes | None:
         response = self.templated_request(bsn=bsn, dienstjaar=report_date)
 
         if not response or response.status_code != 200:
@@ -168,7 +162,7 @@ class JaaropgaveClient(SSDBaseClient):
         pdf = render_pdf(
             self.html_template,
             context={"reports": jaaropgaven},
-            base_url=base_url,
+            base_url=request_url,
         )
         return pdf
 
@@ -200,9 +194,7 @@ class UitkeringClient(SSDBaseClient):
         dt_formatted = django_date(dt, "F Y").lower()
         return f"Maandspecificatie {dt_formatted}"
 
-    def get_reports(
-        self, bsn: str, report_date: str, request_base_url: str
-    ) -> bytes | None:
+    def get_reports(self, bsn: str, report_date: str, request_url: str) -> bytes | None:
         response = self.templated_request(bsn=bsn, period=report_date)
 
         if not response or response.status_code != 200:
@@ -225,7 +217,7 @@ class UitkeringClient(SSDBaseClient):
                 "reports": uitkeringen,
                 "comments": self.config.maandspecificatie_pdf_comments,
             },
-            base_url=request_base_url,
+            base_url=request_url,
         )
         return pdf
 

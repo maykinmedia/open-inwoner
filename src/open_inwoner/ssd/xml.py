@@ -14,6 +14,7 @@ from open_inwoner.ssd.service.jaaropgave.body_reaction_resolved import (
     SpecificatieJaarOpgave,
 )
 
+from .exceptions import SSDClientException
 from .service.jaaropgave import Client, JaarOpgaveInfoResponse
 from .service.uitkering import (
     UitkeringsSpecificatieInfoResponse as UitkeringInfoResponse,
@@ -29,6 +30,8 @@ UITKERING_INFO_RESPONSE_NODE = (
     "UitkeringsSpecificatieInfoResponse"
 )
 
+FAULT_NODE = "//{http://schemas.xmlsoap.org/soap/envelope/}Fault"
+
 
 def _get_report_info(
     response: requests.Response,
@@ -36,30 +39,41 @@ def _get_report_info(
     info_type: Any,
 ) -> JaarOpgaveInfoResponse | UitkeringInfoResponse | None:
     """
-    Return the `info_type` (e.g. JaarOpgaveInfoResponse) from the request
-    response, or `None` if a parsing error occurs
+    Return the `info_response` (e.g. `JaarOpgaveInfoResponse`) from the request
+    response, raise `SSDClientException` if an error occurs
 
     Note: bandit identifies the use of `lxml.etree.fromstring` as a security issue
     because the parser is vulnerable to certain XML attacks. We count the origin of the
     `response` as a trusted source, hence the warning is considered a false positive
     """
     if not response.content:
-        return None
+        raise SSDClientException("response had no content")
 
     try:
         tree = etree.fromstring(response.content).getroottree()
-        node = tree.find(info_response_node)
-    except (LxmlError, XMLSyntaxError):
-        return None
+    except (LxmlError, XMLSyntaxError) as exc:
+        raise SSDClientException("error generating XML from content") from exc
+
+    if not (info_node := tree.find(info_response_node)):
+        raise SSDClientException(
+            "XML node %s not found in response", info_response_node
+        )
 
     parser = XmlParser(context=XmlContext(), handler=LxmlEventHandler)
 
     try:
-        info = parser.parse(node, info_type)
-    except ParserError:
-        return None
+        info_response = parser.parse(info_node, info_type)
+    except ParserError as exc:
+        raise SSDClientException("failed to parse XML for %s", info_response) from exc
 
-    return info
+    # fout, waarschuwing, informatie
+    if info_response.fwi:
+        raise SSDClientException.from_xml_response(xml_response=info_response)
+
+    if info_response.niets_gevonden:
+        raise SSDClientException("unexpected error occured")
+
+    return info_response
 
 
 class JaaropgaveReturn(TypedDict):
@@ -76,20 +90,12 @@ def get_jaaropgaven(response: requests.Response) -> list[JaaropgaveReturn] | Non
         response, JAAROPGAVE_INFO_RESPONSE_NODE, JaarOpgaveInfoResponse
     )
 
-    if not jaaropgave_info or not isinstance(jaaropgave_info, JaarOpgaveInfoResponse):
-        return None
-
-    try:
-        client = cast(Client, jaaropgave_info.jaar_opgave_client.client)
-        jaar_opgave = cast(
-            JaarOpgave, jaaropgave_info.jaar_opgave_client.jaar_opgave[0]
-        )
-        inhoudingsplichtige = cast(Inhoudingsplichtige, jaar_opgave.inhoudingsplichtige)
-        specificatien = cast(
-            list[SpecificatieJaarOpgave], jaar_opgave.specificatie_jaar_opgave
-        )
-    except AttributeError:
-        return None
+    client = cast(Client, jaaropgave_info.jaar_opgave_client.client)
+    jaar_opgave = cast(JaarOpgave, jaaropgave_info.jaar_opgave_client.jaar_opgave[0])
+    inhoudingsplichtige = cast(Inhoudingsplichtige, jaar_opgave.inhoudingsplichtige)
+    specificatien = cast(
+        list[SpecificatieJaarOpgave], jaar_opgave.specificatie_jaar_opgave
+    )
 
     return [
         {
@@ -109,18 +115,12 @@ def get_uitkeringen(response: requests.Response) -> list[dict] | None:
         response, UITKERING_INFO_RESPONSE_NODE, UitkeringInfoResponse
     )
 
-    if not uitkeringen_info or not isinstance(uitkeringen_info, UitkeringInfoResponse):
-        return None
-
-    try:
-        uitkeringsspecificatie = (
-            uitkeringen_info.uitkerings_specificatie_client.uitkeringsspecificatie[0]
-        )
-        uitkeringsinstantie = uitkeringsspecificatie.uitkeringsinstantie
-        client = uitkeringen_info.uitkerings_specificatie_client.client
-        dossierhistorien = uitkeringsspecificatie.dossierhistorie
-    except AttributeError:
-        return None
+    uitkeringsspecificatie = (
+        uitkeringen_info.uitkerings_specificatie_client.uitkeringsspecificatie[0]
+    )
+    uitkeringsinstantie = uitkeringsspecificatie.uitkeringsinstantie
+    client = uitkeringen_info.uitkerings_specificatie_client.client
+    dossierhistorien = uitkeringsspecificatie.dossierhistorie
 
     return [
         {
