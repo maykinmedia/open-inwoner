@@ -3,7 +3,7 @@ import enum
 import logging
 import threading
 from dataclasses import dataclass
-from typing import TypedDict, cast
+from typing import Iterable, TypedDict, cast
 
 from django.conf import settings
 from django.http import HttpRequest
@@ -158,10 +158,11 @@ class CaseListService:
 
         return CaseFilterFormOption.OPEN_CASE
 
-    def get_case_status_frequencies(self) -> dict[CaseFilterFormOption, int]:
-        cases = self.get_cases()
-        submissions = self.get_submissions()
-
+    def get_case_status_frequencies(
+        self,
+        cases: Iterable[ZaakWithApiGroup],
+        submissions: Iterable[SubmissionWithApiGroup],
+    ) -> dict[CaseFilterFormOption, int]:
         case_statuses = [self.get_case_filter_status(case.zaak) for case in cases]
 
         # add static text for open submissions

@@ -74,7 +74,10 @@ class InnerCaseListView(
         preprocessed_cases: Sequence[UniformCase] = case_service.get_cases()
 
         if config.zaken_filter_enabled:
-            case_status_frequencies = case_service.get_case_status_frequencies()
+            case_status_frequencies = case_service.get_case_status_frequencies(
+                cases=preprocessed_cases,
+                submissions=open_submissions,
+            )
             # Separate frequency data from statusname
             context["status_freqs"] = [
                 (status.value, frequency)
