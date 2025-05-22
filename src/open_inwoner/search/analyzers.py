@@ -31,3 +31,10 @@ partial_analyzer = analyzer(
     tokenizer="standard",
     filter=["lowercase", partial_filter],
 )
+
+html_strip = analyzer(
+    "html_strip",
+    tokenizer="keyword",
+    filter=[partial_filter],
+    char_filter=["html_strip"],
+)

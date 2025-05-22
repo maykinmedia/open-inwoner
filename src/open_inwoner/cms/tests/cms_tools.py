@@ -11,10 +11,12 @@ from cms import api
 from cms.api import add_plugin
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
-from cms.models import Placeholder
+from cms.models import Page, Placeholder
+from cms.page_rendering import render_page
 from cms.plugin_rendering import ContentRenderer
 from cms.utils.plugins import get_plugins
 
+from open_inwoner.accounts.models import User
 from open_inwoner.cms.extensions.models import CommonExtension
 from open_inwoner.utils.test import SessionMiddleware
 
