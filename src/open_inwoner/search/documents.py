@@ -5,7 +5,10 @@ from cms.utils.page import get_page_queryset
 from django_elasticsearch_dsl import Document, fields
 from django_elasticsearch_dsl.registries import registry
 
-from open_inwoner.cms.tests.cms_tools import render_full_page
+from open_inwoner.cms.tests.cms_tools import (
+    render_content_placeholder,
+    render_full_page,
+)
 from open_inwoner.pdc.models import Category, Organization, Product, Tag
 
 from .analyzers import html_strip, partial_analyzer, synonym_analyzer
@@ -81,6 +84,7 @@ class ProductDocument(Document):
 class CMSPageDocument(Document):
     title = fields.TextField()
     rendered_html = fields.TextField(analyzer=html_strip)
+    rendered_content_placeholder = fields.TextField(analyzer=html_strip)
     description = fields.TextField()
     url = fields.TextField()
 
@@ -89,6 +93,10 @@ class CMSPageDocument(Document):
 
     def prepare_rendered_html(self, instance: Page):
         content = render_full_page(instance)
+        return content
+
+    def prepare_rendered_content_placeholder(self, instance: Page):
+        content = render_content_placeholder(instance)
         return content
 
     def prepare_title(self, instance: Page):

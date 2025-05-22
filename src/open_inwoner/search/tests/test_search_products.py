@@ -7,9 +7,9 @@ from open_inwoner.pdc.tests.factories import (
     TagFactory,
 )
 from open_inwoner.search.constants import FacetChoices
+from open_inwoner.search.views import multi_search
 
 from ..results import FacetBucket
-from ..searches import search_products
 from .utils import ESMixin
 
 
@@ -30,55 +30,64 @@ class SearchQueryTests(ESMixin, TestCase):
         self.update_index()
 
     def test_search_product_on_name(self):
-        results = search_products("Name").results
+        response, _ = multi_search("Name")
+        results = response.results
 
         self.assertEqual(len(results), 1)
         self.assertEqual(int(results[0].meta.id), self.product1.id)
 
     def test_search_product_on_name_partial(self):
-        results = search_products("nam").results
+        response, _ = multi_search("nam")
+        results = response.results
 
         self.assertEqual(len(results), 1)
         self.assertEqual(int(results[0].meta.id), self.product1.id)
 
     def test_search_product_on_summary(self):
-        results = search_products("summary").results
+        response, _ = multi_search("summary")
+        results = response.results
 
         self.assertEqual(len(results), 1)
         self.assertEqual(int(results[0].meta.id), self.product1.id)
 
     def test_search_product_on_summary_partial(self):
-        results = search_products("sum").results
+        response, _ = multi_search("sum")
+        results = response.results
 
         self.assertEqual(len(results), 1)
         self.assertEqual(int(results[0].meta.id), self.product1.id)
 
     def test_search_product_on_content(self):
-        results = search_products("content").results
+        response, _ = multi_search("content")
+        results = response.results
 
         self.assertEqual(len(results), 1)
         self.assertEqual(int(results[0].meta.id), self.product1.id)
 
     def test_search_product_on_content_partial(self):
-        results = search_products("cont").results
+        response, _ = multi_search("cont")
+        results = response.results
 
         self.assertEqual(len(results), 1)
         self.assertEqual(int(results[0].meta.id), self.product1.id)
 
     def test_search_product_on_keyword(self):
-        results = search_products("keyword1").results
+        response, _ = multi_search("keyword1")
+        results = response.results
 
         self.assertEqual(len(results), 1)
         self.assertEqual(int(results[0].meta.id), self.product1.id)
 
     def test_search_product_on_keyword_partial(self):
-        results = search_products("key").results
+        response, _ = multi_search("key")
+        results = response.results
 
         self.assertEqual(len(results), 1)
         self.assertEqual(int(results[0].meta.id), self.product1.id)
 
     def test_search_product_with_typo(self):
-        results = search_products("sumary").results
+        response, _ = multi_search("sumary")
+        results = response.results
 
         self.assertEqual(len(results), 1)
         self.assertEqual(int(results[0].meta.id), self.product1.id)
@@ -92,7 +101,8 @@ class SearchQueryTests(ESMixin, TestCase):
             published=False,
         )
         self.update_index()
-        results = search_products("Name").results
+        response, _ = multi_search("Name")
+        results = response.results
 
         self.assertEqual(len(results), 1)
         self.assertEqual(int(results[0].meta.id), self.product1.id)
@@ -126,7 +136,7 @@ class SearchFacetTests(ESMixin, TestCase):
         self.update_index()
 
     def test_facets_top_level(self):
-        result = search_products("")
+        result, _ = multi_search("")
 
         self.assertEqual(len(result.results), 2)
 
@@ -171,7 +181,7 @@ class SearchFacetTests(ESMixin, TestCase):
         )
 
     def test_facets_with_filter(self):
-        result = search_products("", filters={"tags": self.tag1.slug})
+        result, _ = multi_search("", filters={"tags": self.tag1.slug})
 
         self.assertEqual(len(result.results), 1)
         self.assertEqual(int(result.results[0].meta.id), self.product1.id)
@@ -212,6 +222,6 @@ class SearchFacetTests(ESMixin, TestCase):
         )
 
     def test_search_with_facet_filter(self):
-        result = search_products("other", filters={"tags": self.tag1.slug})
+        result, _ = multi_search("other", filters={"tags": self.tag1.slug})
 
         self.assertEqual(len(result.results), 0)
