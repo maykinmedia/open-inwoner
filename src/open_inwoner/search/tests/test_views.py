@@ -378,7 +378,7 @@ class TestSearchView(ESMixin, TransactionTestCase):
             ),
         )
 
-    @patch("open_inwoner.search.views.search_products")
+    @patch("open_inwoner.search.views.multi_search")
     def test_search_shows_error_on_connection_timeout(
         self, request_mocker, mock_search
     ):

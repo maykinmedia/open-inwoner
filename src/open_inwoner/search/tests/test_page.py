@@ -108,7 +108,7 @@ class SearchPageTests(ClearCachesMixin, ESMixin, WebTest):
 
         results = response.context["paginator"].object_list
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].slug, self.product1.slug)
+        self.assertEqual(results[0].title, self.product1.name)
 
     def test_pagination_links(self):
         products = ProductFactory.create_batch(

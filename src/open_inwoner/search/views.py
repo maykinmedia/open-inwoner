@@ -1,3 +1,4 @@
+import itertools
 import logging
 
 from django.conf import settings
@@ -19,7 +20,7 @@ from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import CommonPageMixin, LoginMaybeRequiredMixin, LogMixin
 
 from .forms import FeedbackForm, SearchForm
-from .searches import search_products
+from .searches import multi_search
 
 logger = logging.getLogger(__name__)
 
@@ -118,15 +119,19 @@ class SearchView(
 
         # perform search
         try:
-            results = search_products(query, filters=data)
+            response = multi_search(query, filters=data)
 
             # update form fields with choices
-            for facet in results.facets:
+            for facet in response[0].facets:
                 if facet.name in form.fields:
                     form.fields[facet.name].choices = facet.choices()
 
+            all_hits = list(
+                itertools.chain.from_iterable(r.get_generic_hits() for r in response)
+            )
+
             # paginate
-            paginator_dict = self.paginate_with_context(results.results)
+            paginator_dict = self.paginate_with_context(all_hits)
         except Exception:
             logger.exception("Failed to execute search query")
             paginator_dict = self.paginate_with_context([])
