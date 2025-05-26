@@ -188,6 +188,19 @@ class PlanGoalForm(forms.ModelForm):
         return super().save(commit=commit)
 
 
+class PlanNoteForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["note"].label = ""
+
+    class Meta:
+        model = Plan
+        fields = ("note",)
+
+    def save(self, commit=True):
+        return super().save(commit=commit)
+
+
 class PlanListFilterForm(forms.ModelForm):
     plan_contacts = forms.ModelChoiceField(
         queryset=Plan.objects.none(), required=False, to_field_name="uuid"

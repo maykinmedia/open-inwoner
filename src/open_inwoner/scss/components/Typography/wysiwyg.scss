@@ -22,7 +22,8 @@
     font-family: var(--utrecht-heading-font-family);
   }
 
-  ul {
+  ul,
+  ol {
     margin: 0;
     padding: 0 0 0 var(--utrecht-document-font-size);
   }

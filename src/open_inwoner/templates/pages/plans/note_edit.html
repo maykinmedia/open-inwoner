@@ -1,0 +1,24 @@
+{% extends 'master.html' %}
+{% load i18n button_tags card_tags map_tags form_tags grid_tags %}
+
+{% block content %}
+    <h1 class="utrecht-heading-1">{% trans "Notitie maken en aanvullen" %}</h1>
+    <p class="utrecht-paragraph">
+        {% trans "Voeg een notitie toe en/of vul een bestaande notitie aan met nieuwe tekst." %}
+    </p>
+
+    {% render_grid %}
+        {% render_column start=4 span=7 %}
+            <div class="plan__note">
+                {% render_form id="note-edit" form=form method="POST" %}
+                    {% csrf_token %}
+                    {% input form.note %}
+                    <div class="form__actions form__actions--fullwidth">
+                        {% button text=_("Bewaren") primary=True type="submit" %}
+                        {% button href=plan.get_absolute_url icon="west" text=_("Terug naar ")|add:plan.title icon_outlined=True transparent=True %}
+                    </div>
+                {% endrender_form %}
+            </div>
+        {% endrender_column %}
+    {% endrender_grid %}
+{% endblock %}

@@ -115,6 +115,12 @@ class Plan(models.Model):
         blank=True,
         help_text=_("How do you intend to achieve this goal?"),
     )
+    note = models.TextField(
+        blank=True,
+        help_text=_(
+            "Here you can add a note, and supplement it with new consecutive notes by clicking 'Save'."
+        ),
+    )
     end_date = models.DateField(
         verbose_name=_("Expected end date"),
         help_text=_("When the plan should be archived."),

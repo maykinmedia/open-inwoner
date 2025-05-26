@@ -11,9 +11,68 @@
     .utrecht-heading-3 {
       margin-top: var(--spacing-giant);
     }
+
     .button {
       margin-bottom: var(--row-height);
       margin-top: var(--spacing-medium);
+    }
+  }
+
+  // Deviant breakpoints due to sidebar
+  .dashboard {
+    &__list {
+      @media (min-width: 900px) and (max-width: 1200px) {
+        border-left: none;
+        border-top: var(--border-width-thin) solid var(--color-gray);
+        display: block;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        border-bottom: var(--border-width-thin) solid var(--color-gray);
+      }
+      @media (min-width: 1201px) {
+        display: flex;
+        gap: 0;
+      }
+    }
+
+    &__list-item {
+      &:first-child {
+        padding-left: 0;
+        border: none;
+      }
+
+      @media (min-width: 900px) and (max-width: 1200px) {
+        border-left: none;
+        padding: var(--spacing-large) 0;
+        margin: 0;
+        color: var(--color-gray-dark);
+        white-space: nowrap;
+        border-top: var(--border-width-thin) solid var(--color-gray);
+        position: relative;
+      }
+      @media (min-width: 1201px) {
+        border-left: 1px solid var(--color-gray);
+        border-top: none;
+        border-bottom: none;
+        min-width: 260px;
+        margin: var(--spacing-large) 0;
+      }
+      @media (min-width: 1201px) {
+        text-align: start;
+      }
+    }
+  }
+
+  &__note {
+    .form__actions {
+      margin-top: var(--spacing-large);
+    }
+  }
+
+  .wysiwyg {
+    > .utrecht-paragraph {
+      margin-top: var(--spacing-large);
     }
   }
 }

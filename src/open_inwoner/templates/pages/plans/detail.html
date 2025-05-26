@@ -44,7 +44,7 @@
         </ul>
     </aside>
 
-    <section class="tabled tabled--flexible oip-section oip-section--bordered">
+    <section class="tabled tabled--flexible oip-section oip-section--bordered" aria-labelledby="goal">
         <div class="tabled__section">
             <header class="oip-header-group title">
                 <h2 class="utrecht-heading-2" id="goal">{% trans "Doel en omschrijving" %}</h2>
@@ -66,7 +66,7 @@
         </div>
     </section>
 
-    <section class="tabled tabled--flexible oip-section">
+    <section class="tabled tabled--flexible oip-section" aria-labelledby="files">
         <div class="tabled__section">
             <header class="oip-header-group title">
                 <h2 class="utrecht-heading-2" id="files">{% trans "Samenwerkingsplan" %}</h2>
@@ -86,6 +86,29 @@
             <h3 class="utrecht-heading-3" id="files">{% trans "Upload een nieuwe versie" %}</h3>
             {# TODO: replace with upload component #}
             {% button href="collaborate:plan_add_file" uuid=object.uuid text=_("Upload bestand") primary=True %}
+        </div>
+    </section>
+
+    <section class="tabled tabled--flexible oip-section oip-section--bordered" aria-labelledby="notes">
+        <div class="tabled__section">
+            <header class="oip-header-group title">
+                <h2 class="utrecht-heading-2" id="notes">{% trans "Notities" %}</h2>
+                <div class="tabled__item--mobile-big">
+                    {% button href="collaborate:plan_edit_note" uuid=object.uuid icon="edit" icon_outlined=True text=_("Bewerk") title=_("Notitie aanvullen") ariaLabel=_("Notitie aanvullen") transparent=True %}
+                </div>
+            </header>
+        </div>
+        <div class="tabled__inner">
+        {% if object.note %}
+            <div class="wysiwyg">
+                <p class="utrecht-paragraph">{{ object.note|linebreaksbr }}</p>
+            </div>
+        {% else %}
+            <p class="utrecht-paragraph"><strong>{% trans "Er zijn nog geen notities toegevoegd." %}</strong></p>
+            <p class="utrecht-paragraph--oip">
+                {% trans "Klik op 'Bewerk' om een nieuwe notitie toe te voegen. Deze kan later nog worden aangevuld." %}
+            </p>
+        {% endif %}
         </div>
     </section>
 

@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n button_tags card_tags map_tags form_tags %}
+{% load i18n button_tags card_tags map_tags form_tags grid_tags %}
 
 {% block content %}
     <h1 class="utrecht-heading-1">{% trans "Doel en omschrijving aanpassen" %}</h1>
@@ -7,10 +7,17 @@
         {{configurable_text.plans_page.plans_edit_message}}
     </p>
 
-    {% render_form id="goal-edit" form=form method="POST" %}
-        {% csrf_token %}
-        {% input form.goal  %}
-        {% input form.description %}
-        {% form_actions primary_text=_("Verzenden") %}
-    {% endrender_form %}
+    {% render_grid %}
+        {% render_column start=4 span=6 %}
+            {% render_form id="goal-edit" form=form method="POST" %}
+                {% csrf_token %}
+                {% input form.goal %}
+                {% input form.description %}
+                <div class="form__actions form__actions--fullwidth">
+                    {% button text=_("Aanpassen") primary=True type="submit" %}
+                    {% button href=plan.get_absolute_url icon="west" text=_("Terug naar ")|add:plan.title icon_outlined=True transparent=True %}
+                </div>
+            {% endrender_form %}
+        {% endrender_column %}
+    {% endrender_grid %}
 {% endblock %}
