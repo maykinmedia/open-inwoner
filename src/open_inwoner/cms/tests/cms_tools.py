@@ -1,3 +1,5 @@
+from typing import Any, Mapping
+
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.test import RequestFactory
@@ -43,12 +45,21 @@ def _init_plugin(plugin_class, plugin_data=None) -> tuple[dict, str]:
     return model_instance
 
 
-def get_request(*, user=None, session_vars=None):
+def get_request(
+    *,
+    user: User | None = None,
+    session_vars: Mapping[str, Any] | None = None,
+    page: Page | None = None,
+):
     request = RequestFactory().get("/")
     if user:
         request.user = user
     else:
         request.user = AnonymousUser()
+
+    if page:
+        request.current_page = page
+
     middleware = SessionMiddleware()
     middleware.process_request(request)
     if session_vars:
