@@ -9,6 +9,10 @@ from django.utils import formats, timezone
 from django.utils.translation import gettext as _
 
 from open_inwoner.accounts.models import Action, Document, User
+from open_inwoner.openzaak.models import OpenZaakConfig
+from open_inwoner.utils.forms import (
+    LimitedUploadFileField,
+)
 
 from .choices import PlanStatusChoices
 from .models import Plan, PlanTemplate
@@ -231,3 +235,33 @@ class PlanListFilterForm(forms.ModelForm):
 
         # we have to add the empty label since we defined choices above
         self.fields["plan_contacts"].choices.insert(0, ("", _("Contactpersoon")))
+
+
+class PlanFileUploadForm(forms.ModelForm):
+    file = LimitedUploadFileField()
+
+    class Meta:
+        model = Document
+        fields = ("file", "name")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        config = OpenZaakConfig.get_solo()
+        self.fields["file"].help_text = (
+            f"Maximaal toegestane bestandsgrootte: {config.max_upload_size} MB, "
+            f"Toegestane bestandstypen: {', '.join(config.allowed_file_extensions)}."
+        )
+        # Hide name field from user
+        self.fields["name"].required = False
+        self.fields["name"].widget = forms.HiddenInput()
+
+    def save(self, user, plan=None, commit=True):
+        self.instance.owner = user
+        if plan:
+            self.instance.plan = plan
+
+        # Set name from uploaded file name
+        if not self.cleaned_data.get("name") and self.cleaned_data.get("file"):
+            self.instance.name = self.cleaned_data["file"].name
+
+        return super().save(commit=commit)

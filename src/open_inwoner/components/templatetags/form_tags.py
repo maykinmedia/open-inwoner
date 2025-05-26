@@ -338,19 +338,52 @@ def input(field, **kwargs):
 
 
 @register.inclusion_tag("components/Form/FileInput.html")
-def file_input(files, text="", **kwargs):
+def file_input(
+    files,
+    primary_text="",
+    multiple=None,
+    **kwargs,
+):
     """
     Displaying a file upload interface.
 
     Usage:
-        {% file_input form.field text=_('Selecteer bestanden') %}
+        {% file_input form.file primary_text=_('Upload documenten') multiple=True %}
 
     Variables:
         + field: Field | The field that needs to be rendered.
+        - primary_text: str | The label for the form submit button.
         - extra_classes: string| classes which should be added to the top-level container
+        - empty_label: string | the text for the button that appears if no file is selected
     """
-    multiple = files.field.widget.attrs.get("multiple", False)
-    return {**kwargs, "field": files, "text": text, "multiple": multiple}
+    if multiple is None:
+        multiple = files.field.widget.attrs.get("multiple", False)
+
+    # Labels
+    final_primary_text = primary_text or (
+        _("Upload documenten") if multiple else _("Upload document")
+    )
+    empty_label = (
+        _("Sleep of selecteer bestanden")
+        if multiple
+        else _("Sleep of selecteer bestand")
+    )
+    selected_label = (
+        _("Selecteer meer bestanden") if multiple else _("Selecteer ander bestand")
+    )
+    selected_heading = (
+        _("Geselecteerde bestanden") if multiple else _("Geselecteerd bestand")
+    )
+
+    return {
+        **kwargs,
+        "field": files,
+        "multiple": multiple,
+        "primary_text": final_primary_text,
+        "empty_label": empty_label,
+        "selected_label": selected_label,
+        "selected_heading": selected_heading,
+    }
 
 
 @register.inclusion_tag("components/Form/DateField.html")

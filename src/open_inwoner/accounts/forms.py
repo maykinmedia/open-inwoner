@@ -582,22 +582,6 @@ class ActionForm(forms.ModelForm):
         return super().save(commit=commit)
 
 
-class DocumentForm(forms.ModelForm):
-    file = LimitedUploadFileField()
-
-    class Meta:
-        model = Document
-        fields = ("file", "name")
-
-    def save(self, user, plan=None, commit=True):
-        if not self.instance.pk:
-            self.instance.owner = user
-        if plan:
-            self.instance.plan = plan
-
-        return super().save(commit=commit)
-
-
 class MessageFileInputWidget(forms.ClearableFileInput):
     template_name = "utils/widgets/message_file_input.html"
 

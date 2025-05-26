@@ -4,6 +4,8 @@ from unittest.mock import Mock, patch
 
 from django.contrib.messages import get_messages
 from django.core import mail
+
+# from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import override_settings, tag
 from django.urls import reverse
 from django.utils import formats
@@ -296,9 +298,8 @@ class PlanViewTests(WebTest):
     def test_plan_file_add(self):
         response = self.app.get(self.file_add_url, user=self.user)
         self.assertEqual(response.status_code, 200)
-        form = response.forms["document-create"]
+        form = response.forms["document-upload"]
         form["file"] = Upload("filename.txt", b"contents")
-        form["name"] = "file"
         response = form.submit(user=self.user)
         self.assertEqual(response.status_code, 302)
 
@@ -324,13 +325,33 @@ class PlanViewTests(WebTest):
     def test_plan_file_add_contact_can_access(self):
         response = self.app.get(self.file_add_url, user=self.contact)
         self.assertEqual(response.status_code, 200)
-        form = response.forms["document-create"]
+        form = response.forms["document-upload"]
         form["file"] = Upload("filename.txt", b"contents")
-        form["name"] = "file"
         response = form.submit(user=self.user)
         self.assertEqual(response.status_code, 302)
 
         self.assertEqual(self.plan.documents.count(), 1)
+
+    def test_htmx_get_plan_file_add_form_renders_upload_form(self):
+        response = self.app.get(
+            self.file_add_url,
+            user=self.user,
+            extra_environ={"HTTP_HX_REQUEST": "true"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        form = response.pyquery("#document-upload")
+        self.assertTrue(form, "Expected form with id='document-upload' not found.")
+
+        button = form.find("button[type='submit']")
+
+        # Assert the button has the correct visible text
+        self.assertEqual(
+            button.text().strip(),
+            "Upload document",
+            "Submit button does not contain the expected text.",
+        )
 
     def test_plan_note_edit_saves_note_correctly(self):
         response = self.app.get(self.note_edit_url, user=self.user)

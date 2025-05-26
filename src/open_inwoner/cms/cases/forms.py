@@ -50,6 +50,8 @@ class CaseUploadForm(forms.Form):
             self.fields["type"].widget = forms.HiddenInput()
 
     def clean_files(self):
+        # Note: We manually extract files from request.FILES using 'file' as the key
+        # This means the <input> in components/templates/components/Form/FileInput.html template MUST have name="file" to match this
         files = self.files.getlist("file")
 
         max_allowed_size = 1024**2 * self.oz_config.max_upload_size

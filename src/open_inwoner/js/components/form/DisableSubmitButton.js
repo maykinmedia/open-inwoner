@@ -1,5 +1,5 @@
 export class DisableSubmitButton {
-  static selector = '.case-detail-form'
+  static selector = '.file-input-form'
 
   constructor(form) {
     this.form = form

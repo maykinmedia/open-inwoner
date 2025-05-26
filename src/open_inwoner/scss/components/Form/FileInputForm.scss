@@ -1,0 +1,61 @@
+.file-input-form {
+  color: var(--color-gray-dark);
+  display: block;
+  padding: 0 0 var(--row-height) 0;
+
+  .form__actions--fullwidth {
+    max-width: initial;
+  }
+
+  .button--primary[type='submit'] {
+    justify-content: center;
+    width: 100%;
+
+    &:disabled {
+      @extend .button--disabled;
+      background-color: var(--color-gray);
+      border-color: var(--color-gray);
+      color: var(--color-gray-dark-900);
+      cursor: default;
+      font-weight: bold;
+      justify-content: center;
+      pointer-events: none;
+      width: 100%;
+    }
+  }
+
+  &:invalid [type='submit'] {
+    @extend .button--disabled;
+    background-color: var(--color-gray);
+    border-color: var(--color-gray);
+    color: var(--color-gray-dark-900);
+    cursor: default;
+    font-weight: bold;
+    justify-content: center;
+    pointer-events: none;
+    width: 100%;
+  }
+
+  .file-list,
+  .form__actions--fullwidth {
+    display: block;
+    margin: 0;
+
+    &-selection__heading.utrecht-heading-3 {
+      color: var(--font-color-heading-3);
+      font-family: var(--font-family-heading-3);
+      font-size: var(--font-size-heading-3);
+      font-weight: var(--font-weight-heading-3);
+      line-height: var(--font-line-height-heading-3);
+      margin: var(--row-height) 0 var(--spacing-large) 0;
+    }
+  }
+
+  /// Make required asterisk visible for this component
+  .label__label--required {
+    color: var(--color-red-notification);
+    padding-left: var(--spacing-tiny);
+    //make asterisks invisible by default, only make them visible if component has the caption
+    display: inline;
+  }
+}
