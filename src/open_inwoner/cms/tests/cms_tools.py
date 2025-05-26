@@ -1,7 +1,9 @@
+import logging
 from typing import Any, Mapping
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
+from django.template import Context
 from django.test import RequestFactory
 from django.utils.module_loading import import_string
 
@@ -11,9 +13,12 @@ from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
 from cms.models import Placeholder
 from cms.plugin_rendering import ContentRenderer
+from cms.utils.plugins import get_plugins
 
 from open_inwoner.cms.extensions.models import CommonExtension
 from open_inwoner.utils.test import SessionMiddleware
+
+logger = logging.getLogger(__name__)
 
 
 def create_homepage():
@@ -99,6 +104,62 @@ def render_plugin(
     return html, context
 
 
+def render_all_placeholders(
+    page: Page,
+    *,
+    as_user: User | None = None,
+    language: str = "nl",
+):
+    """Render all placeholders in a CMS page to a single string."""
+    logger.info("Rendering all placeholders for page: %s", page)
+    request = get_request(page=page, user=as_user)
+    renderer = ContentRenderer(request=request)
+
+    placeholders = page.placeholders.all()
+
+    if not placeholders.exists():
+        logger.info("Page has no placeholders to render")
+        return ""
+
+    for placeholder in placeholders:
+        logger.debug("rendering placeholder: %s", placeholder)
+        plugins = get_plugins(
+            request=request, placeholder=placeholder, template=None, lang=language
+        )
+
+        rendered_content_fragments = []
+        for plugin_instance in plugins:
+            logger.debug("rendering plugin: %s", plugin_instance)
+            rendered_content = renderer.render_plugin(
+                instance=plugin_instance,
+                context=Context({"request": request}),
+                placeholder=placeholder,
+            )
+            rendered_content_fragments.append(rendered_content)
+            logger.debug(
+                "rendered content: %s",
+                rendered_content
+                if len(rendered_content) < 128
+                else rendered_content[:128] + "...",
+            )
+
+        return "\n".join(rendered_content_fragments)
+
+    return ""
+
+
+def render_full_page(page: Page, *, as_user: User | None = None):
+    """
+    Render a full Django CMS page with container template in Django CMS 3.11
+    """
+    request = get_request(user=as_user, page=page)
+
+    # Use the render_page function
+    rendered_response = render_page(request, page, current_language="nl", slug=None)
+    rendered_response.render()
+    return rendered_response.content
+
+
 def import_context_processors():
     paths = settings.TEMPLATES[0]["OPTIONS"]["context_processors"]
     processors = [import_string(p) for p in paths]
@@ -153,3 +214,22 @@ def create_apphook_page(
         raise Exception("failed to publish page")
 
     return p
+
+
+def create_cms_page_with_content(
+    *, title: str, content: str, language: str = "nl"
+) -> Page:
+    """Create a CMS page with `content` text in the content slot."""
+    page = api.create_page(title, "cms/fullwidth.html", language, in_navigation=True)
+    if not page.publish(language):
+        raise Exception("failed to publish page")
+
+    content_placeholder = page.placeholders.get(slot="content")
+    add_plugin(
+        placeholder=content_placeholder,
+        plugin_type="TextPlugin",
+        language="nl",
+        body=content,
+    )
+
+    return page
