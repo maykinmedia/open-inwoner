@@ -4,8 +4,10 @@
     flex-direction: column;
     gap: var(--spacing-large);
 
-    @media (min-width: 768px) {
-      margin-top: 44px;
+    &--m {
+      @media (min-width: 768px) {
+        margin-top: 44px;
+      }
     }
 
     .grid {

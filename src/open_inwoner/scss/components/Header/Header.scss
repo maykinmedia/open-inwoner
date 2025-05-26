@@ -308,7 +308,7 @@ $vm: var(--spacing-large);
 
         // Tablet menu
         @media (min-width: 768px) and (max-width: 910px) {
-          grid-column: 10 / span 3;
+          grid-column: 8 / span 5;
         }
 
         .primary-navigation__list {
