@@ -916,6 +916,20 @@ ZGW_CONSUMERS_TEST_SCHEMA_DIRS = [
     os.path.join(DJANGO_PROJECT_DIR, "openklant", "tests", "files"),
 ]
 
+# The maximum number of workers to use when concurrently fetching and resolving
+# cases on the "Mijn Zaken" page
+ZGW_CASE_LIST_NUM_WORKERS = (
+    config("ZGW_CASE_LIST_NUM_WORKERS", default=0)
+    # Because auto config has no clean way to express "int | None", and we want to fall
+    # back to the library default
+    or None
+)
+
+# The aggregate number of seconds workers can concurrently fetch and resolve
+# cases on the "Mijn Zaken" page. Should be set to slightly less than the overall
+# timeout.
+ZGW_CASE_LIST_FETCH_TIMEOUT = config("ZGW_CASE_LIST_FETCH_TIMEOUT", default=25)
+
 # notifications
 ZGW_LIMIT_NOTIFICATIONS_FREQUENCY = config(
     "ZGW_LIMIT_NOTIFICATIONS_FREQUENCY", default=60 * 15
