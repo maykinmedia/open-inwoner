@@ -66,27 +66,40 @@ def import_catalog_configs() -> list[CatalogusConfig]:
     if not result.join_results():
         return []
 
-    create = []
-
+    to_create = []
+    to_update = []
     with transaction.atomic():
-        known = set(CatalogusConfig.objects.values_list("url", flat=True))
+        existing_configs = {
+            config.url: config for config in CatalogusConfig.objects.all()
+        }
+
         for response in result:
             for catalog in response.result:
-                if catalog.url in known:
-                    continue
-                create.append(
-                    CatalogusConfig(
-                        url=catalog.url,
-                        rsin=catalog.rsin or "",
-                        domein=catalog.domein,
-                        service=response.client.configured_from,
+                if catalog.url in existing_configs:
+                    # Ensure the connected Service still matches: we always want this
+                    # to match the Service backing the client that did the syncing
+                    existing = existing_configs[catalog.url]
+                    if existing.service != response.client.configured_from:
+                        existing.service = response.client.configured_from
+                        to_update.append(existing)
+                else:
+                    to_create.append(
+                        CatalogusConfig(
+                            url=catalog.url,
+                            rsin=catalog.rsin or "",
+                            domein=catalog.domein,
+                            service=response.client.configured_from,
+                        )
                     )
-                )
 
-        if create:
-            CatalogusConfig.objects.bulk_create(create)
+        if to_update:
+            CatalogusConfig.objects.bulk_update(to_update, ["service"])
+            logger.info("Updated service on %d catalogs", len(to_update))
 
-    return create
+        if to_create:
+            CatalogusConfig.objects.bulk_create(to_create)
+
+    return to_create
 
 
 def import_zaaktype_configs() -> list[ZaakTypeConfig]:

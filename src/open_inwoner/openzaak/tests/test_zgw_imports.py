@@ -5,6 +5,7 @@ import requests_mock
 from open_inwoner.openzaak.models import CatalogusConfig, OpenZaakConfig, ZaakTypeConfig
 from open_inwoner.openzaak.tests.factories import (
     CatalogusConfigFactory,
+    ServiceFactory,
     ZGWApiGroupConfigFactory,
 )
 from open_inwoner.openzaak.tests.helpers import generate_oas_component_cached
@@ -139,8 +140,9 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
         super().setUpTestData()
         cls.config = OpenZaakConfig.get_solo()
         cls.roots = (CATALOGI_ROOT, ANOTHER_CATALOGI_ROOT)
-        for root in cls.roots:
-            ZGWApiGroupConfigFactory(ztc_service__api_root=root)
+        cls.api_groups = [
+            ZGWApiGroupConfigFactory(ztc_service__api_root=root) for root in cls.roots
+        ]
 
     def test_import_catalogs(self, m):
         data = {root: CatalogMockData(root).install_mocks(m) for root in self.roots}
@@ -186,6 +188,32 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
                     "url", "domein", "rsin"
                 )[:2]
             ),
+        )
+
+    def test_import_catalogs_updates_service(self, m):
+        self.api_groups[1].delete()  # We'll use a single set of mocks for simplicity
+        configured_catalogi_service = self.api_groups[0].ztc_service
+        data = CatalogMockData(configured_catalogi_service.api_root).install_mocks(m)
+
+        another_service = ServiceFactory()
+        existing_catalogus_with_same_url_but_different_service = CatalogusConfigFactory(
+            service=another_service, url=data.catalogs[0]["url"]
+        )
+
+        self.assertNotEqual(
+            existing_catalogus_with_same_url_but_different_service.service,
+            configured_catalogi_service,
+            msg="Existing catalogusconfig service differs from client that will sync",
+        )
+
+        import_catalog_configs()
+
+        existing_catalogus_with_same_url_but_different_service.refresh_from_db()
+        self.assertEqual(
+            existing_catalogus_with_same_url_but_different_service.service,
+            configured_catalogi_service,
+            msg="Existing catalog with matching URL but differing Service should "
+            "be updated",
         )
 
     def test_import_zaaktype_configs_with_catalogs(self, m):
