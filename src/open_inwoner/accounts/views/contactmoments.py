@@ -91,14 +91,14 @@ class KlantContactMomentBaseView(
             try:
                 return OpenKlant2Service()
             except ImproperlyConfigured:
-                logger.error("OpenKlant2 configuration missing")
+                logger.info("OpenKlant2 configuration missing")
         if service_type == KlantenServiceType.ESUITE:
             try:
                 return eSuiteVragenService()
             except ImproperlyConfigured:
-                logger.error("eSuiteVragenService configuration missing")
+                logger.info("eSuiteVragenService configuration missing")
             except RuntimeError:
-                logger.error("Failed to build eSuiteVragenService")
+                logger.warning("Failed to build eSuiteVragenService")
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
