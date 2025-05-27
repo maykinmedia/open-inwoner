@@ -1,15 +1,17 @@
 from collections import OrderedDict
 from dataclasses import dataclass
-from typing import Type
+from typing import Generic, Protocol, Type, TypeVar
 
 from django.db import models
+from django.urls import reverse
 
+from django_elasticsearch_dsl import Document
 from elasticsearch_dsl import FacetedResponse
 from elasticsearch_dsl.response import Response
 
 from open_inwoner.pdc.models import Product
 
-from .documents import ProductDocument
+from .documents import CMSPageDocument, ProductDocument
 
 
 @dataclass(frozen=True)
@@ -81,11 +83,27 @@ class Facet:
         return [(b.slug, b.label) for b in self.buckets]
 
 
+@dataclass(frozen=True)
+class GenericHit:
+    title: str
+    summary: str
+    link: str
+
+
+T = TypeVar("T", bound=Document)
+
+
+class SearchResult(Protocol, Generic[T]):
+    results: list[T]
+
+    def get_generic_hits(self) -> list[GenericHit]: ...
+
+
 @dataclass()
-class ProductSearchResult:
+class ProductSearchResult(SearchResult):
     results: list[ProductDocument]
     facets: list[Facet]
-    _r: FacetedResponse = None
+    _r: FacetedResponse | None = None
 
     @classmethod
     def build_from_response(cls, response: FacetedResponse):
@@ -96,6 +114,31 @@ class ProductSearchResult:
             facets.append(facet)
 
         return cls(results=response.hits, facets=facets, _r=response)
+
+    def get_generic_hits(self):
+        return [
+            GenericHit(
+                title=hit.name,
+                summary=hit.summary,
+                link=reverse("products:product_detail", args=(hit.slug,)),
+            )
+            for hit in self.results
+        ]
+
+
+@dataclass()
+class CMSPageSearchResult(SearchResult):
+    results: list[CMSPageDocument]
+
+    @classmethod
+    def build_from_response(cls, response: Response):
+        return cls(results=response.hits)
+
+    def get_generic_hits(self):
+        return [
+            GenericHit(title=hit.title, summary=hit.description, link=hit.url)
+            for hit in self.results
+        ]
 
 
 @dataclass(frozen=True)

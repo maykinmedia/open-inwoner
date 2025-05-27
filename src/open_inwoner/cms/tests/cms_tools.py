@@ -1,5 +1,8 @@
+from typing import Any, Mapping
+
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
+from django.contrib.sessions.backends.db import SessionStore
 from django.test import RequestFactory
 from django.utils.module_loading import import_string
 
@@ -7,9 +10,12 @@ from cms import api
 from cms.api import add_plugin
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
-from cms.models import Placeholder
+from cms.models import Page, Placeholder
+from cms.page_rendering import render_page
 from cms.plugin_rendering import ContentRenderer
+from cms.utils.plugins import get_plugins
 
+from open_inwoner.accounts.models import User
 from open_inwoner.cms.extensions.models import CommonExtension
 from open_inwoner.utils.test import SessionMiddleware
 
@@ -43,12 +49,21 @@ def _init_plugin(plugin_class, plugin_data=None) -> tuple[dict, str]:
     return model_instance
 
 
-def get_request(*, user=None, session_vars=None):
+def get_request(
+    *,
+    user: User | None = None,
+    session_vars: Mapping[str, Any] | None = None,
+    page: Page | None = None,
+):
     request = RequestFactory().get("/")
     if user:
         request.user = user
     else:
         request.user = AnonymousUser()
+
+    if page:
+        request.current_page = page
+
     middleware = SessionMiddleware()
     middleware.process_request(request)
     if session_vars:
@@ -86,6 +101,49 @@ def render_plugin(
         context = None
 
     return html, context
+
+
+def render_content_placeholder(
+    page: Page,
+    *,
+    as_user: User | None = None,
+    language: str = "nl",
+):
+    """Render a page's 'content' slot placeholder, if it exists."""
+    try:
+        content_placeholder = page.placeholders.all().get(slot="content")
+    except Placeholder.DoesNotExist:
+        return ""
+
+    request = get_request(page=page, user=as_user)
+    renderer = ContentRenderer(request=request)
+
+    plugins = get_plugins(
+        request=request, placeholder=content_placeholder, template=None, lang=language
+    )
+
+    rendered_content_fragments = []
+    for plugin_instance in plugins:
+        rendered_content = renderer.render_plugin(
+            instance=plugin_instance,
+            context={"request": request},
+            placeholder=content_placeholder,
+        )
+        rendered_content_fragments.append(rendered_content)
+
+    return "\n".join(rendered_content_fragments)
+
+
+def render_full_page(page: Page, *, as_user: User | None = None):
+    """
+    Render a full Django CMS page with container template in Django CMS 3.11
+    """
+    request = get_request(user=as_user, page=page)
+
+    # Use the render_page function
+    rendered_response = render_page(request, page, current_language="nl", slug=None)
+    rendered_response.render()
+    return rendered_response.content
 
 
 def import_context_processors():
@@ -142,3 +200,20 @@ def create_apphook_page(
         raise Exception("failed to publish page")
 
     return p
+
+
+def create_cms_page_with_content(*, title: str, content: str):
+    """Create a CMS page with `content` text in the content slot."""
+    page = api.create_page(title, "cms/fullwidth.html", "nl", in_navigation=True)
+    if not page.publish("nl"):
+        raise Exception("failed to publish page")
+
+    content_placeholder = page.placeholders.get(slot="content")
+    add_plugin(
+        placeholder=content_placeholder,
+        plugin_type="TextPlugin",
+        language="nl",
+        body=content,
+    )
+
+    return page
