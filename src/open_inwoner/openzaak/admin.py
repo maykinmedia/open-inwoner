@@ -398,6 +398,7 @@ class ZaakTypeResultaattypeConfigInline(admin.StackedInline):
     def has_delete_permission(self, request, obj=None):
         return request.user.is_superuser
 
+    @admin.display(description=_("Externe naam (eSuite)"))
     def esuite_compat_naam(self, instance) -> str:
         try:
             catalogi_client = build_zgw_client_from_service(
