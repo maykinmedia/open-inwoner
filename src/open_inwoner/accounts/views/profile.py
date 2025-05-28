@@ -28,6 +28,7 @@ from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.haalcentraal.utils import fetch_brp
 from open_inwoner.laposta.forms import NewsletterSubscriptionForm
 from open_inwoner.laposta.models import LapostaConfig
+from open_inwoner.openklant.api_models import Klant
 from open_inwoner.openklant.services import eSuiteKlantenService
 from open_inwoner.plans.models import Plan
 from open_inwoner.qmatic.client import NoServiceConfigured, qmatic_client_factory
@@ -230,18 +231,35 @@ class EditProfileView(
         return self.request.user
 
     def form_valid(self, form):
-        form.save()
         user: User = self.get_object()
 
-        self.update_esuite_klant(
+        klant = self.update_esuite_klant(
             {k: form.cleaned_data[k] for k in form.changed_data}, user
         )
 
-        messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
-        self.log_change(self.get_object(), _("profile was modified"))
+        # only save the form if changes have been written to Klanten API or
+        # changes do not require writing to API
+        if klant or not any(
+            key in form.changed_data
+            for key in ("email", "phonenumber", "phonenumber_alternative")
+        ):
+            form.save()
+            messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
+            self.log_change(self.get_object(), _("profile was modified"))
+        else:
+            messages.error(
+                request=self.request,
+                message=_(
+                    "Your changes could not be saved due to technical problems. "
+                    "Please try again later"
+                ),
+            )
+            self.log_change(
+                self.get_object(), _("profile changes not saved due to Klant API error")
+            )
         return HttpResponseRedirect(self.get_success_url())
 
-    def update_esuite_klant(self, user_form_data: dict, user: User):
+    def update_esuite_klant(self, user_form_data: dict, user: User) -> Klant | None:
         field_mapping = {
             "emailadres": "email",
             "telefoonnummer": "phonenumber",
@@ -266,7 +284,7 @@ class EditProfileView(
                 fetch_params=fetch_params, user=user
             )
             if klant and not created:
-                service.update_klant_from_user(
+                return service.update_klant_from_user(
                     klant, user, update_fields=list(update_data.keys())
                 )
 

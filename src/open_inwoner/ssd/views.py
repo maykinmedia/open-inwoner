@@ -1,11 +1,14 @@
+import logging
 from datetime import datetime
 
 from django import forms
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.functional import cached_property
+from django.utils.translation import gettext as _
 from django.views.generic.edit import FormView
 
 from furl import furl
@@ -14,7 +17,10 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 from open_inwoner.utils.views import CommonPageMixin
 
 from .client import JaaropgaveClient, UitkeringClient
+from .exceptions import SSDClientException
 from .forms import MonthlyReportsForm, YearlyReportsForm
+
+logger = logging.getLogger(__name__)
 
 
 class BenefitsFormView(
@@ -39,9 +45,19 @@ class BenefitsFormView(
 
             bsn = request.user.bsn
             report_date = ssd_client.format_report_date(form.data["report_date"])
-            request_base_url = request.build_absolute_uri()
+            request_url = request.build_absolute_uri()
 
-            pdf_content = ssd_client.get_reports(bsn, report_date, request_base_url)
+            try:
+                pdf_content = ssd_client.get_reports(bsn, report_date, request_url)
+            except SSDClientException:
+                logger.exception("SSD client error")
+                messages.error(
+                    request=request,
+                    message=_(
+                        "Your report(s) could not be retrieved due to technical problems. "
+                        "Please try again later"
+                    ),
+                )
 
             if not pdf_content:
                 return_path = request.get_full_path()

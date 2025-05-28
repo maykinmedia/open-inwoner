@@ -365,7 +365,10 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         }
         self.assertEqual(base_response.context["form"].errors, expected_errors)
 
-    def test_save_filled_form(self):
+    @patch("open_inwoner.accounts.views.profile.EditProfileView.update_esuite_klant")
+    def test_save_filled_form(self, mock_update):
+        mock_update.return_value = True
+
         response = self.app.get(self.url, user=self.user, status=200)
         form = response.forms["profile-edit"]
         form["first_name"] = "First name"
@@ -378,6 +381,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         form["postcode"] = "1013 RM"
         form["city"] = "Amsterdam"
         base_response = form.submit()
+
         self.assertEqual(base_response.url, self.return_url)
         followed_response = base_response.follow()
         self.assertEqual(followed_response.status_code, 200)
@@ -422,16 +426,23 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
                 }
                 self.assertEqual(response.context["form"].errors, expected_errors)
 
-    def test_modify_email_succeeds(self):
+    @patch("open_inwoner.accounts.views.profile.EditProfileView.update_esuite_klant")
+    def test_modify_email_succeeds(self, mock_update):
+        mock_update.return_value = True
+
         response = self.app.get(self.url, user=self.user)
         form = response.forms["profile-edit"]
         form["email"] = "user@example.com"
         response = form.submit()
+
         self.user.refresh_from_db()
         self.assertEqual(response.url, self.return_url)
         self.assertEqual(self.user.email, "user@example.com")
 
-    def test_modify_contact_details_eherkenning_succeeds(self):
+    @patch("open_inwoner.accounts.views.profile.EditProfileView.update_esuite_klant")
+    def test_modify_contact_details_eherkenning_succeeds(self, mock_update):
+        mock_update.return_value = True
+
         eherkenning_user = eHerkenningUserFactory()
         response = self.app.get(self.url, user=eherkenning_user)
         form = response.forms["profile-edit"]
@@ -439,26 +450,34 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         form["phonenumber"] = "0612345678"
         form["phonenumber_alternative"] = "0687654321"
         response = form.submit()
+
         eherkenning_user.refresh_from_db()
         self.assertEqual(response.url, self.return_url)
         self.assertEqual(eherkenning_user.email, "user@example.com")
         self.assertEqual(eherkenning_user.phonenumber, "0612345678")
         self.assertEqual(eherkenning_user.phonenumber_alternative, "0687654321")
 
-    def test_updating_a_field_without_modifying_email_succeeds(self):
+    @patch("open_inwoner.accounts.views.profile.EditProfileView.update_esuite_klant")
+    def test_updating_a_field_without_modifying_email_succeeds(self, mock_update):
+        mock_update.return_value = True
+
         initial_email = self.user.email
         initial_first_name = self.user.first_name
+
         response = self.app.get(self.url, user=self.user)
         form = response.forms["profile-edit"]
         form["first_name"] = "Testing"
         response = form.submit()
+
         self.assertEqual(self.user.first_name, initial_first_name)
         self.user.refresh_from_db()
         self.assertEqual(response.url, self.return_url)
         self.assertEqual(self.user.email, initial_email)
         self.assertEqual(self.user.first_name, "Testing")
 
-    def test_form_for_digid_brp_user_saves_data(self):
+    @patch("open_inwoner.accounts.views.profile.EditProfileView.update_esuite_klant")
+    def test_form_for_digid_brp_user_saves_data(self, mock_update):
+        mock_update.return_value = True
         user = UserFactory(
             bsn="999993847",
             first_name="name",
@@ -507,7 +526,9 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
 
         self.assertEqual(type(form), BrpUserForm)
 
-    def test_image_is_saved_when_begeleider_and_default_login(self):
+    @patch("open_inwoner.accounts.views.profile.EditProfileView.update_esuite_klant")
+    def test_image_is_saved_when_begeleider_and_default_login(self, mock_update):
+        mock_update.return_value = True
         self.user.contact_type = ContactTypeChoices.begeleider
         self.user.save()
 
@@ -524,7 +545,10 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
 
         self.assertIsNotNone(self.user.image.file)
 
-    def test_image_is_saved_when_begeleider_and_digid_login(self):
+    @patch("open_inwoner.accounts.views.profile.EditProfileView.update_esuite_klant")
+    def test_image_is_saved_when_begeleider_and_digid_login(self, mock_update):
+        mock_update.return_value = True
+
         self.user.contact_type = ContactTypeChoices.begeleider
         self.user.login_type = LoginTypeChoices.digid
         self.user.save()

@@ -944,17 +944,19 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
             ).is_initial_branch_selection_done()
         )
 
+    @patch("open_inwoner.kvk.client.KvKClient.get_basisprofiel")
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     @patch(
         "open_inwoner.kvk.models.KvKConfig.get_solo",
     )
     def test_eherkenning_user_is_redirected_to_necessary_registration(
-        self, mock_solo, mock_kvk
+        self, mock_solo, mock_kvk, mock_get_basisprofiel
     ):
         """
         eHerkenning users that do not have their email filled in should be redirected to
         the registration form
         """
+        mock_get_basisprofiel.return_value = {}
         mock_kvk.return_value = [
             {"kvkNummer": "12345678", "vestigingsnummer": "1234"},
         ]
@@ -1418,11 +1420,13 @@ class DuplicateEmailRegistrationTest(WebTest):
 
         self.assertEqual(users.count(), 1)
 
-    def test_digid_user_can_edit_profile(self):
+    @patch("open_inwoner.accounts.views.profile.EditProfileView.update_esuite_klant")
+    def test_digid_user_can_edit_profile(self, mock_update):
         """
         Assert that digid user can edit their profile (the email of the same user
         is not counted as duplicate)
         """
+        mock_update.return_value = True
         url = reverse("digid-mock:password")
 
         # create profile
@@ -1556,11 +1560,13 @@ class DuplicateEmailRegistrationTest(WebTest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["form"].errors, expected_errors)
 
-    def test_non_digid_user_can_edit_profile(self):
+    @patch("open_inwoner.accounts.views.profile.EditProfileView.update_esuite_klant")
+    def test_non_digid_user_can_edit_profile(self, mock_update):
         """
         Assert that non-digid users can edit their profile (the email of the same user
         is not counted as duplicate)
         """
+        mock_update.return_value = True
 
         url = reverse("profile:edit")
         test_user = User.objects.create(

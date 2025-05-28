@@ -3,11 +3,12 @@ from functools import cached_property
 from urllib.parse import urlencode
 
 import requests
-from requests.exceptions import JSONDecodeError
+from requests.exceptions import InvalidJSONError, JSONDecodeError
 
 from open_inwoner.utils.decorators import cache as cache_result
 
 from .constants import CompanyType
+from .exceptions import KVKAPIException
 from .models import KvKConfig
 
 logger = logging.getLogger(__name__)
@@ -47,7 +48,7 @@ class KvKClient:
 
         return request_kwargs
 
-    def _request(self, endpoint: str, params: dict | None = None) -> dict:
+    def _request(self, endpoint: str, params: dict | None = None) -> dict | None:
         if not self.config or not self.config.api_root:
             return {}
 
@@ -56,15 +57,19 @@ class KvKClient:
 
         try:
             response = requests.get(url, **request_kwargs)
-        except requests.RequestException as ex:
-            logger.exception("Unable to retrieve information from the KVK API: %s", ex)
-            return {}
+            response.raise_for_status()
+        except requests.HTTPError as exc:
+            logger.warning("Error response while making request to KVK API")
+            raise KVKAPIException.from_error_response(exc.response) from exc
+        except requests.RequestException as exc:
+            logger.warning("Error while making request to KVK API")
+            raise KVKAPIException from exc
 
         try:
             data = response.json()
-        except (AttributeError, JSONDecodeError, requests.RequestException) as ex:
-            logger.exception("Unable to parse information from the KVK API: %s", ex)
-            return {}
+        except (InvalidJSONError, JSONDecodeError, ValueError) as exc:
+            logger.exception("Unable to parse information from the KVK API")
+            raise KVKAPIException from exc
 
         return data
 
@@ -140,8 +145,7 @@ class KvKClient:
 
     @cache_result("kvk:{kvk}")
     def get_basisprofiel(self, kvk: str) -> dict:
-        basisprofiel = self._request(f"{self.basisprofielen_endpoint}/{kvk}") or {}
-        return basisprofiel
+        return self._request(f"{self.basisprofielen_endpoint}/{kvk}")
 
     def get_vestigingsprofiel(self, vestiging: str) -> dict:
         vestigingsprofiel = (
