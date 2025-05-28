@@ -535,6 +535,8 @@ class ActionForm(forms.ModelForm):
         required=False,
         widget=PrivateFileWidget(url_name="profile:action_download"),
     )
+    # Disable has file state inside this form.
+    file.widget.is_initial = lambda _: False
 
     class Meta:
         model = Action
