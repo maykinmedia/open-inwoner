@@ -1,6 +1,7 @@
 .actions {
   font-family: var(--font-family-body);
 
+  // Mobile filters visible
   .actions__filters {
     &--open {
       .actions__filter-container {
@@ -9,8 +10,8 @@
     }
   }
 
+  // Mobile filter button
   .actions__filter-button {
-    border-bottom: 1px solid var(--color-gray-light);
     padding: 8px;
 
     @media (min-width: 768px) {
@@ -18,121 +19,239 @@
     }
   }
 
+  // Mobile and desktop filter styling
   .actions__filter-container {
     align-items: center;
-    border-bottom: 1px solid var(--color-gray-light);
     display: none;
     gap: var(--spacing-medium);
     grid-template-columns: 1fr;
     margin-bottom: var(--spacing-medium);
     padding: 8px;
 
+    // Tablet filter styling
     @media (min-width: 768px) {
       display: grid;
       grid-template-columns: 2fr 3fr 2fr 2fr;
       gap: var(--spacing-giant);
     }
 
+    // Styling for the date picker
     .input {
       min-width: auto;
     }
   }
 
+  // List styling
   .actions__list {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-medium);
+    gap: var(--spacing-large);
   }
 
-  .actions__action {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    position: relative;
-    border-bottom: 1px solid var(--color-gray-light);
-    padding-bottom: var(--spacing-large);
-
-    @media (min-width: 768px) {
-      grid-template-columns: 1fr 1fr 1fr;
-    }
-  }
-
-  .actions__label {
-    padding: var(--spacing-medium);
-    word-break: normal;
-    overflow-wrap: break-word;
-
-    &--big {
-      grid-column: 1 / span 2;
+  .action__label {
+    // Dropdown select
+    .dropdown > .button {
+      border: 1px solid var(--color-gray-light);
+      padding: 10px 12px 10px 15px;
+      height: unset;
+      min-width: 128px;
+      justify-content: space-between;
     }
 
-    .button {
-      border: 1px solid;
+    // Styling dropdown button
+    .dropdown__content {
+      // Align dropdown arrow with the select chevron.
+      margin-right: 10px;
 
-      &.actions__status-selector {
-        &--approval {
-          background-color: var(--color-danger-lightest);
-          border-color: var(--color-danger-lightest);
-          color: var(--color-danger);
-        }
-
-        &--open {
-          background-color: var(--color-info-lightest);
-          border-color: var(--color-info-lightest);
-          color: var(--color-info-darker);
-        }
-
-        &--closed {
-          background-color: var(--color-success-lighter);
-          border-color: var(--color-success-lighter);
-          color: var(--color-success);
-        }
+      .button {
+        border: none;
       }
     }
-
-    .dropdown__content .button {
-      border: none;
-    }
   }
 
-  .actions__actions {
-    align-items: center;
-    position: absolute;
-    top: 0;
-    right: 0;
-    color: var(--color-gray-lighter);
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-body);
-    display: flex;
-    justify-content: space-between;
-    display: flex;
-    gap: var(--spacing-medium);
-
-    [class*='icons'],
-    [class*='Icons'] {
-      color: var(--color-gray-lighter);
-      font-size: var(--font-size-body);
-    }
-  }
-  .button.actions__status-selector {
-    &--open {
-      color: var(--color-info-darker);
-      border-color: var(--color-info-darker);
-    }
-    &--closed {
-      color: var(--color-success);
-      border-color: var(--color-success);
-    }
-    &--approval {
-      color: var(--color-danger);
-      border-color: var(--color-danger);
-    }
-  }
-
+  // Actions footer.
   &__footer {
     .button {
       margin: 0;
       padding-left: 0;
       padding-top: var(--spacing-large);
+    }
+  }
+}
+
+// Action styling
+.action {
+  border: 1px var(--color-gray-light) solid;
+  border-radius: var(--border-radius);
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  padding: var(--spacing-large);
+
+  &__header {
+    display: flex;
+    gap: var(--spacing-giant);
+    flex-direction: column;
+
+    section {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    aside {
+      width: fit-content;
+      max-width: 100%;
+
+      @media (min-width: 768px) {
+        max-width: 600px;
+      }
+    }
+
+    .utrecht-heading-3 {
+      width: 100%;
+    }
+
+    .button {
+      width: 100%;
+      padding: 0;
+      justify-content: space-between;
+
+      [class*='icons'],
+      [class*='Icons'] {
+        font-size: 24px;
+        max-width: 24px;
+      }
+    }
+
+    .button__inner-text {
+      color: var(--color-black);
+    }
+
+    .utrecht-heading-3 .button,
+    .utrecht-heading-3 .button__inner-text {
+      font-family: inherit;
+      font-size: inherit;
+    }
+  }
+
+  // Action data.
+  &__data {
+    display: grid;
+    gap: var(--spacing-giant) var(--spacing-mega);
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'for'
+      'status'
+      'created'
+      'execute';
+
+    @media (min-width: 992px) {
+      grid-template-columns: 1fr 1fr 0;
+      grid-template-areas:
+        'for created x'
+        'status execute x';
+    }
+  }
+
+  // Remove first row if action is collapsed.
+  &[aria-expanded='false'] &__data {
+    grid-template-areas:
+      'status'
+      'execute';
+    @media (min-width: 992px) {
+      grid-template-areas: 'status execute';
+    }
+  }
+
+  // Action actions.
+  &__actions {
+    display: flex;
+    gap: var(--spacing-medium);
+    border-top: 1px var(--color-gray-light) solid;
+    padding-top: var(--spacing-large);
+    flex-direction: column;
+
+    @media (min-width: 768px) {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+  }
+
+  // Action data row
+  &__label {
+    display: flex;
+    gap: var(--spacing-large);
+    align-items: center;
+
+    &--for {
+      grid-area: for;
+    }
+    &--created {
+      grid-area: created;
+    }
+    &--status {
+      grid-area: status;
+    }
+    &--execute {
+      grid-area: execute;
+    }
+
+    &-value {
+      align-items: center;
+      color: var(--color-gray-dark);
+      display: flex;
+      gap: var(--spacing-medium);
+      margin: 0;
+      word-break: normal;
+      overflow-wrap: break-word;
+
+      span {
+        font-size: 16px;
+      }
+    }
+
+    &-title {
+      color: var(--color-gray-dark-900);
+      flex-shrink: 0;
+      width: 120px;
+    }
+
+    @media (min-width: 992px) {
+      &--small &-title {
+        width: 80px;
+      }
+    }
+  }
+
+  // Collapsed action card.
+  &[aria-expanded='false'] {
+    gap: var(--spacing-large);
+
+    .action__header-button--open,
+    .action__actions,
+    .action__data .action__label--for,
+    .action__data .action__label--created,
+    .action__header .file,
+    .action__header p {
+      display: none;
+    }
+  }
+
+  .action__header-button {
+    // Make sure action title is wrapped and aligned.
+    text-align: left;
+    min-height: var(--row-height);
+    height: auto;
+    white-space: wrap;
+
+    // Rotate chevron icon if the action is open/close
+    & [class*='icons'] {
+      transition: transform 0.3s;
+    }
+
+    &[aria-expanded='true'] [class*='icons'] {
+      transform: rotate(180deg);
     }
   }
 }
