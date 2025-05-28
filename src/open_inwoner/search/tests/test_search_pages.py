@@ -4,6 +4,7 @@ from django.test import TestCase, tag
 
 from elasticsearch_dsl import Search
 
+from open_inwoner.accounts.models import SiteConfiguration
 from open_inwoner.cms.tests.cms_tools import create_cms_page_with_content
 from open_inwoner.search.results import GenericHit
 from open_inwoner.search.views import multi_search
@@ -15,6 +16,10 @@ from .utils import ESMixin
 class CMSPageSearchTest(ESMixin, TestCase):
     def setUp(self):
         super().setUp()
+
+        site_config = SiteConfiguration.get_solo()
+        site_config.include_cms_pages_in_search_index = True
+        site_config.save()
 
         Site.objects.create(domain="http://test", name="testsite")
         self.foo_page = create_cms_page_with_content(title="foo page", content="foo")
@@ -48,3 +53,13 @@ class CMSPageSearchTest(ESMixin, TestCase):
         response = Search(index=settings.ES_INDEX_CMS_PAGES).execute()
 
         self.assertEqual([r.title for r in response.hits], [str(self.bar_page)])
+
+    def test_no_pages_are_indexed_when_config_flag_is_false(self):
+        site_config = SiteConfiguration.get_solo()
+        site_config.include_cms_pages_in_search_index = False
+        site_config.save()
+
+        self.update_index()
+        response = Search(index=settings.ES_INDEX_CMS_PAGES).execute()
+
+        self.assertEqual(list(response.hits), [])

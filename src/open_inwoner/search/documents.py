@@ -10,6 +10,7 @@ from open_inwoner.cms.tests.cms_tools import (
     render_all_placeholders,
     render_full_page,
 )
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.pdc.models import Category, Organization, Product, Tag
 
 from .analyzers import html_strip, partial_analyzer, synonym_analyzer
@@ -108,6 +109,10 @@ class CMSPageDocument(Document):
         return instance.get_public_url() or ""
 
     def get_queryset(self):
+        site_config = SiteConfiguration.get_solo()
+        if not site_config.include_cms_pages_in_search_index:
+            return Page.objects.none()
+
         site = Site.objects.get_current()
         return get_page_queryset(site, draft=False, published=True)
 
