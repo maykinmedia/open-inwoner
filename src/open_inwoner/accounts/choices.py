@@ -37,26 +37,6 @@ class StatusChoices(models.TextChoices):
     approval = "approval", _("Mee bezig")
     closed = "closed", _("Afgerond")
 
-    @staticmethod
-    def get_icon_mapping():
-        return {
-            "open": "format_list_bulleted",
-            "approval": "question_mark",
-            "closed": "check",
-        }
-
-    @classmethod
-    def get_icon(cls, status: str, default="label"):
-        if status in cls.values:
-            icon_mapping = cls.get_icon_mapping()
-            return icon_mapping[status]
-        else:
-            return default
-
-    @classmethod
-    def choices_with_icons(cls):
-        return [(value, label, cls.get_icon(value)) for value, label in cls.choices]
-
 
 class EmptyStatusChoices(models.TextChoices):
     empty = "", _("Status")

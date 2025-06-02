@@ -65,7 +65,6 @@ def action_status_button(action, request, plan=None, **kwargs):
     choices = [
         {
             "text": label,
-            "icon": icon,
             "class": f"actions__status-button actions__status-{value}",
             "selected": (value == action.status),
             # TODO enable this disabled disabled option after fixing the style issue
@@ -77,17 +76,16 @@ def action_status_button(action, request, plan=None, **kwargs):
                 "hx-target": f"#{swap_target_id}",
             },
         }
-        for value, label, icon in StatusChoices.choices_with_icons()
+        for value, label in StatusChoices.choices
     ]
-
     kwargs["class"] = (
         f"actions__status-selector actions__status-selector--{action.status}"
     )
+
     kwargs.update(
         action=action,
         request=request,
         swap_target_id=swap_target_id,
-        icon=action.get_status_icon(),
         text=action.get_status_display(),
         choices=choices,
     )

@@ -1,3 +1,5 @@
+import './action-accordion'
+
 class Actions {
   constructor(node) {
     this.node = node

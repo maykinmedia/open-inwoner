@@ -1,4 +1,4 @@
-{% load i18n form_tags icon_tags button_tags dropdown_tags action_tags link_tags %}
+{% load i18n form_tags file_tags icon_tags button_tags dropdown_tags action_tags link_tags %}
 
 <div class="actions">
     {% render_form form=form method="GET" spaceless=True autosubmit=True form_action=form_action %}
@@ -16,83 +16,82 @@
     {% endrender_form %}
     <div class="actions__list">
         {% for action in actions %}
-            <div class="actions__action">
-                <div class="actions__actions">
-                    {% button icon="file-pdf" text=_("Export to PDF") hide_text=True href="profile:action_export" uuid=action.uuid icon_outlined=True transparent=True %}
-                    {% if action|is_connected:request.user %}
-                        {% dropdown icon="more_horiz" %}
-                            <div class="dropdown__item">
-                                {% get_action_edit_url action=action plan=plan as action_url %}
-                                {% button icon="edit" text=_("Bewerken") href=action_url icon_outlined=True transparent=True open_new_tab=True %}
-                            </div>
-                            <div class="dropdown__item">
-                                {% if plan %}
-                                    {% url 'collaborate:plan_action_history' plan_uuid=plan.uuid uuid=action.uuid as action_history_url %}
-                                    {% button icon="history" text=_("History") href=action_history_url uuid=action.uuid icon_outlined=True transparent=True %}
-                                {% else %}
-                                    {% button icon="history" text=_("History") href="profile:action_history" uuid=action.uuid icon_outlined=True transparent=True %}
-                                {% endif %}
-                            </div>
-                            <div class="dropdown__item">
-                                {% get_action_delete_url action=action plan=plan as action_url %}
-                                {% render_form form=form method="POST" form_action=action_url extra_classes="confirm" spaceless=True data_confirm_title=_("Weet je het zeker dat je deze actie wilt verwijderen?") data_confirm_cancel=_("Nee, annuleren") data_confirm_default=_("Ja, verwijderen") %}
-                                    {% csrf_token %}
-                                    {% button icon="delete" text=_("Verwijderen") icon_outlined=True transparent=True %}
-                                {% endrender_form %}
-                            </div>
-                        {% enddropdown %}
+            <div class="action" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}">
+                <div class="action__header">
+                    <section>
+                        <h3 class="utrecht-heading-3">
+                            {% button extra_classes='action__header-button' icon="keyboard_arrow_down" text=action.name icon_position="after" icon_outlined=True transparent=True type="button" ariaExpanded=forloop.first|lower %}
+                        </h3>
+                    </section>
+                    {% if action.description %}
+                        <p class="utrecht-paragraph">{{ action.description }}</p>
                     {% endif %}
-                </div>
-                <div class="actions__label actions__label--big">
-                    <div class="table__explain">{% trans "Actie" %}</div>
-                    {{ action.name }}
-                </div>
-                <div class="actions__label">
-                    <div class="table__explain">{% trans "Onderdeel van" %}</div>
-                    {% if action.plan %}
-                        {% if show_plans %}
-                            {% link href=action.plan.get_absolute_url text=action.plan.title %}
-                        {% else %}
-                            {{ action.plan.title }}
-                        {% endif %}
-                    {% else %}
-                        -
-                    {% endif %}
-                </div>
-                <div class="actions__label actions__label--big">
-                    <div class="table__explain">{% trans "Actie voor" %}</div>
-                    {{ action.is_for.get_full_name }}
-                </div>
-                <div class="actions__label">
                     {% if action.file %}
-                        <div class="table__explain">{% trans "Document" %}</div>
-                        {% link href="profile:action_download" text=action.file.name uuid=action.uuid %}
+                        {% url "profile:action_download" uuid=action.uuid as download_url %}
+                        {% file file=action.file created=action.file.created_on extension=action.file.extension size=action.file.size show_download=True download_url=download_url %}
                     {% endif %}
                 </div>
-                <div class="actions__label">
-                    <div class="table__explain">{% trans "Toegevoegd op" %}</div>
-                    {{ action.created_on|date:"j F Y" }}
+
+                <div class="action__data">
+                    <section class="action__label action__label--small action__label--for">
+                        <div class="action__label-title">{% trans "Actie voor" %}:</div>
+                        <p class="action__label-value">
+                            {% icon icon="account_circle" outlined=True %}
+                            {{ action.is_for.get_full_name }}
+                        </p>
+                    </section>
+                    
+                    <section class="action__label action__label--created">
+                        <div class="action__label-title">{% trans "Toegevoegd op" %}:</div>
+                        <p class="action__label-value">
+                            {% icon icon="calendar_today" outlined=True %}
+                            {{ action.created_on|date:"j F Y" }}
+                        </p>
+                    </section>
+
+                    <section class="action__label action__label--small action__label--status">
+                        <div class="action__label-title">
+                            {% trans "Status" %}:
+                        </div>
+                        {% if action|is_connected:request.user %}
+                            {% action_status_button action=action request=request plan=plan %}
+                        {% else %}
+                            <p class="action__label-value">
+                                {{ action.get_status_display }}
+                            </p>
+                        {% endif %}
+                    </section>
+                    <section class="action__label action__label--execute">
+                        <div class="action__label-title">{% trans "Uitvoeren voor" %}:</div>
+                        <p class="action__label-value">{% icon icon="calendar_today" outlined=True %} {{ action.end_date|date:"j F Y"|default:"-" }}</p>
+                    </section>
                 </div>
-                <div class="actions__label">
-                    <div class="table__explain">{% trans "Uitvoeren voor" %}</div>
-                    {{ action.end_date|date:"j F Y"|default:"-" }}
-                </div>
-                <div class="actions__label">
-                    <div class="table__explain">
-                        {% trans "Status" %}
+                
+                {% if action|is_connected:request.user %}
+                <div class="action__actions">
+                        {% get_action_edit_url action=action plan=plan as action_url %}
+                        {% button icon="edit" text=_("Bewerken") href=action_url icon_outlined=True transparent=True %}
+
+                        {% if plan %}
+                            {% url 'collaborate:plan_action_history' plan_uuid=plan.uuid uuid=action.uuid as action_history_url %}
+                            {% button icon="history" text=_("History") href=action_history_url uuid=action.uuid icon_outlined=True transparent=True %}
+                        {% else %}
+                            {% button icon="history" text=_("History") href="profile:action_history" uuid=action.uuid icon_outlined=True transparent=True %}
+                        {% endif %}
+
+                        {% get_action_delete_url action=action plan=plan as action_url %}
+                        {% render_form form=form method="POST" form_action=action_url extra_classes="confirm" spaceless=True data_confirm_title=_("Weet je het zeker dat je deze actie wilt verwijderen?") data_confirm_cancel=_("Nee, annuleren") data_confirm_default=_("Ja, verwijderen") %}
+                            {% csrf_token %}
+                            {% button icon="delete" text=_("Verwijderen") icon_outlined=True transparent=True %}
+                        {% endrender_form %}
+                        {% button icon="file-pdf" text=_("Export to PDF") href="profile:action_export" uuid=action.uuid icon_outlined=True transparent=True %}
                     </div>
-                    {% if action|is_connected:request.user %}
-                        {% action_status_button action=action request=request plan=plan %}
-                    {% else %}
-                        {{ action.get_status_display }}
-                    {% endif %}
-                </div>
+                {% endif %}
             </div>
         {% empty %}
             <div class="table__item"><p class="utrecht-paragraph"><strong>{% trans "er zijn geen acties gevonden met de huidige filters of er zijn geen acties" %}</strong></p></div>
         {% endfor %}
     </div>
-    {# TODO: conditional rendering cap of button to be determined later #}
     {% if actions|length > 3 %}
     <div class="actions__footer">
         {% button href="collaborate:plan_action_create" uuid=plan.uuid icon="add_circle_outlined" icon_outlined=True text=_("Nieuw actie toevoegen") transparent=True %}
