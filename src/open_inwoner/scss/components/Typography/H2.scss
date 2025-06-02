@@ -1,4 +1,3 @@
-@import '~@utrecht/components/dist/heading-2/css/index.css';
 @import '~microscope-sass/lib/responsive';
 
 .utrecht-heading-2 {
@@ -13,6 +12,10 @@
   @include mobile-only {
     word-break: normal;
     overflow-wrap: break-word;
+  }
+
+  .link {
+    font-size: var(--utrecht-heading-2-font-size);
   }
 
   // when CMS is in edit mode

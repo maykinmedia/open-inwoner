@@ -1,3 +1,41 @@
+.utrecht-unordered-list {
+  list-style: none;
+  // TODO: Utrecht lists components are not finished yet, so remove unnecessary styles once the NLDS components are released
+  padding-inline-start: 0;
+
+  &__item {
+    position: relative;
+    padding-inline-start: 0;
+
+    &::marker {
+      font-size: 0;
+      color: var(--utrecht-unordered-list-marker-color);
+      content: var(--oip-utrecht-unordered-list-marker-content);
+      height: 0;
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: -10px;
+      top: 0.6em;
+      width: 6px;
+      height: 6px;
+      background-color: var(--color-accent);
+      border-radius: 50%;
+    }
+  }
+
+  &--nested {
+    margin-inline-start: var(
+      --oip-utrecht-unordered-list-nested-margin-inline-start
+    );
+    padding-inline-start: var(
+      --oip-utrecht-unordered-list-nested-padding-inline-start
+    );
+  }
+}
+
 .list {
   list-style: none;
   margin: 0;

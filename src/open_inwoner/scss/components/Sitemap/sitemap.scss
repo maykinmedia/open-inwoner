@@ -1,5 +1,64 @@
 .sitemap {
+  display: grid;
+  gap: var(--spacing-giant) var(--spacing-mega);
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    'platform'
+    'onderwerpen'
+    'mijn_profiel';
+
+  @media (min-width: 768px) {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      'platform onderwerpen'
+      'mijn_profiel onderwerpen';
+  }
+
+  // Map grid areas
+  & > .sitemap__section:nth-child(1) {
+    grid-area: platform;
+  }
+  & > .sitemap__section:nth-child(2) {
+    grid-area: onderwerpen;
+  }
+  & > .sitemap__section:nth-child(3) {
+    grid-area: mijn_profiel;
+  }
+
   &__section {
-    padding-top: var(--spacing-small);
+    margin-top: var(--spacing-large);
+
+    .utrecht-heading-2 {
+      margin-bottom: var(--spacing-medium);
+    }
+  }
+
+  .utrecht-unordered-list {
+    &__item {
+      &::before {
+        content: none;
+        background-color: transparent;
+      }
+    }
+  }
+
+  .link {
+    &--secondary {
+      display: flex;
+      text-decoration: none;
+      margin-bottom: var(--spacing-medium);
+
+      [class*='icons'],
+      [class*='Icons'] {
+        font-weight: normal;
+      }
+
+      .link__text {
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
   }
 }

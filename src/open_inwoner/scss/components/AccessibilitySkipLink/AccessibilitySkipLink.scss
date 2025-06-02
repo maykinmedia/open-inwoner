@@ -1,12 +1,16 @@
-@import '~@utrecht/components/dist/skip-link/css/index.css';
-
 .utrecht-skip-link {
   text-decoration: none;
+
+  &:focus,
+  &:focus-visible {
+    z-index: var(--utrecht-skip-link-z-index);
+  }
 
   &--visible-on-focus {
     left: 100%;
 
-    &:focus {
+    &:focus,
+    &:focus-visible {
       left: initial;
       text-decoration: none;
     }
