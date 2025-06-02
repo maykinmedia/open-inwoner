@@ -156,6 +156,7 @@
 
       .nav-login__icon {
         [class*='icons'] {
+          cursor: pointer;
           pointer-events: all;
         }
       }

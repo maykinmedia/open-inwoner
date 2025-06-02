@@ -23,7 +23,7 @@
         {% if paginator.count %}
         <div class="column column--start-{% if search_filter_categories or search_filter_tags or search_filter_organizations %}6{% else %}1{% endif %} column--span-{% if search_filter_categories or search_filter_tags or search_filter_organizations %}12{% else %}8{% endif %}">
             <div class="search-results">
-                <div class="search-results__list">
+                <div class="search-results__list {% if search_filter_categories or search_filter_tags or search_filter_organizations %}search-results__list--m{% endif %}">
                     {% for hit in page_obj %}
                     <a href="{% url 'products:product_detail' hit.slug %}" class="card card__description-card search-results__item">
                         <div class="card__body card__body--tabled">
