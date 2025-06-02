@@ -1,11 +1,19 @@
 from django.conf import settings
+from django.contrib.sites.models import Site
 
+from cms.models import Page
+from cms.utils.page import get_page_queryset
 from django_elasticsearch_dsl import Document, fields
 from django_elasticsearch_dsl.registries import registry
 
+from open_inwoner.cms.tests.cms_tools import (
+    render_all_placeholders,
+    render_full_page,
+)
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.pdc.models import Category, Organization, Product, Tag
 
-from .analyzers import partial_analyzer, synonym_analyzer
+from .analyzers import html_strip, partial_analyzer, synonym_analyzer
 
 
 @registry.register_document
@@ -72,3 +80,45 @@ class ProductDocument(Document):
 
     def get_instances_from_related(self, related_instance):
         return related_instance.products.all()
+
+
+@registry.register_document
+class CMSPageDocument(Document):
+    title = fields.TextField()
+    rendered_html = fields.TextField(analyzer=html_strip)
+    rendered_placeholders = fields.TextField(analyzer=html_strip)
+    description = fields.TextField()
+    url = fields.TextField()
+
+    def prepare_description(self, instance: Page):
+        return instance.get_meta_description(fallback=False, language="nl")
+
+    def prepare_rendered_html(self, instance: Page):
+        content = render_full_page(instance)
+        return content
+
+    def prepare_rendered_placeholders(self, instance: Page):
+        content = render_all_placeholders(instance)
+        return content
+
+    def prepare_title(self, instance: Page):
+        # The __str__ method for a page returns the title
+        return str(instance)
+
+    def prepare_url(self, instance: Page):
+        return instance.get_public_url() or ""
+
+    def get_queryset(self):
+        site_config = SiteConfiguration.get_solo()
+        if not site_config.include_cms_pages_in_search_index:
+            return Page.objects.none()
+
+        site = Site.objects.get_current()
+        return get_page_queryset(site, draft=False, published=True)
+
+    class Index:
+        name = settings.ES_INDEX_CMS_PAGES
+
+    class Django:
+        model = Page
+        auto_refresh = False

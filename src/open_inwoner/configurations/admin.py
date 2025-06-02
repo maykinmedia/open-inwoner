@@ -222,9 +222,10 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
             },
         ),
         (
-            _("Search filter options"),
+            _("Search options"),
             {
                 "fields": (
+                    "include_cms_pages_in_search_index",
                     "search_filter_categories",
                     "search_filter_tags",
                     "search_filter_organizations",

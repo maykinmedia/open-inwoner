@@ -579,6 +579,15 @@ class SiteConfiguration(SingletonModel):
             "If checked, only authenticated users will be able to search the page."
         ),
     )
+    include_cms_pages_in_search_index = models.BooleanField(
+        verbose_name=_("Make CMS Pages searchable"),
+        default=False,
+        help_text=_(
+            "If checked, CMS pages will be added to the search index and included in "
+            "search results. Note the change will not take effect until the search "
+            "index has been refreshed."
+        ),
+    )
     display_social = models.BooleanField(
         verbose_name=_("Display social media buttons"),
         default=True,

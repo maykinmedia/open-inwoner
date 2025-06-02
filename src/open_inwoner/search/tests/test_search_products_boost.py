@@ -3,7 +3,7 @@ from django.test import TestCase, tag
 from open_inwoner.pdc.tests.factories import ProductFactory
 
 from ..models import FieldBoost
-from ..searches import search_products
+from ..searches import multi_search
 from .utils import ESMixin
 
 
@@ -32,21 +32,24 @@ class SearchBoostTests(ESMixin, TestCase):
 
     def test_boost_name(self):
         FieldBoost.objects.create(field="name", boost=10)
-        results = search_products("found").results
+        response, _ = multi_search("found")
+        results = response.results
 
         self.assertEqual(len(results), 3)
         self.assertEqual(int(results[0].meta.id), self.product_name.id)
 
     def test_boost_summary(self):
         FieldBoost.objects.create(field="summary", boost=10)
-        results = search_products("found").results
+        response, _ = multi_search("found")
+        results = response.results
 
         self.assertEqual(len(results), 3)
         self.assertEqual(int(results[0].meta.id), self.product_summary.id)
 
     def test_boost_content(self):
         FieldBoost.objects.create(field="content", boost=10)
-        results = search_products("found").results
+        response, _ = multi_search("found")
+        results = response.results
 
         self.assertEqual(len(results), 3)
         self.assertEqual(int(results[0].meta.id), self.product_content.id)
