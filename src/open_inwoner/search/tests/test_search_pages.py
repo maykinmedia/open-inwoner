@@ -27,24 +27,27 @@ class CMSPageSearchTest(ESMixin, TestCase):
         self.update_index()
 
     def test_search_returns_expected_page(self):
+        page_without_title = create_cms_page_with_content(title="", content="")
         for term, expected_page, expected_hit in (
             (
                 "foo",
                 self.foo_page,
-                GenericHit(title="foo page", summary=None, link="/foo-page/"),
+                GenericHit(title="foo page", summary="", link="/foo-page/"),
             ),
             (
                 "bar",
                 self.bar_page,
-                GenericHit(title="bar page", summary=None, link="/bar-page/"),
+                GenericHit(title="bar page", summary="", link="/bar-page/"),
             ),
         ):
             with self.subTest(term):
                 _, pages_result = multi_search(term)
                 self.assertEqual(
-                    [r.title for r in pages_result.results], [str(expected_page)]
+                    [r.title for r in pages_result.results if r.title],
+                    [str(expected_page)],
                 )
                 self.assertEqual(pages_result.get_generic_hits(), [expected_hit])
+                self.assertNotIn(page_without_title, pages_result.results)
 
     def test_unpublished_pages_are_not_indexed(self):
         self.assertTrue(self.foo_page.unpublish(language="nl"))
