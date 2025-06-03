@@ -136,8 +136,9 @@ class CMSPageSearchResult(SearchResult):
 
     def get_generic_hits(self):
         return [
-            GenericHit(title=hit.title, summary=hit.description, link=hit.url)
+            GenericHit(title=hit.title, summary=hit.description or "", link=hit.url)
             for hit in self.results
+            if hit.title and hit.url
         ]
 
 
