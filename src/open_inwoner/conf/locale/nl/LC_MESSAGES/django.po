@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-02 16:17+0200\n"
+"POT-Creation-Date: 2025-06-03 09:46+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -266,7 +266,7 @@ msgstr "Persoonlijke informatie"
 msgid "Permissions"
 msgstr "Permissies"
 
-#: open_inwoner/accounts/admin.py:127 open_inwoner/configurations/admin.py:235
+#: open_inwoner/accounts/admin.py:127 open_inwoner/configurations/admin.py:236
 msgid "Notifications"
 msgstr "Notificaties"
 
@@ -1867,7 +1867,7 @@ msgstr "Vraag"
 #: open_inwoner/accounts/views/contactmoments.py:216
 msgid ""
 "Your question was connected to multiple cases, we are showing you the first."
-msgstr ""
+msgstr "Uw vraag hoort bij meerdere zaken. We laten u de eerste zien."
 
 #: open_inwoner/accounts/views/contactmoments.py:246
 msgid "Status: "
@@ -2881,8 +2881,8 @@ msgstr "Velden gemarkeerd met een sterretje %(star)s zijn verplicht"
 #: open_inwoner/components/templates/components/Header/Header.html:119
 #: open_inwoner/components/templates/components/Header/Header.html:134
 #: open_inwoner/plans/forms.py:214 open_inwoner/search/forms.py:14
-#: open_inwoner/search/forms.py:27 open_inwoner/search/views.py:43
-#: open_inwoner/search/views.py:45
+#: open_inwoner/search/forms.py:27 open_inwoner/search/views.py:44
+#: open_inwoner/search/views.py:46
 msgid "Zoeken"
 msgstr "Zoeken"
 
@@ -3061,7 +3061,7 @@ msgstr "Contactformulier plugin"
 msgid "Arrow"
 msgstr "Pijl"
 
-#: open_inwoner/conf/base.py:1005
+#: open_inwoner/conf/base.py:1006
 #, python-brace-format
 msgid "Inlogcode: {token} (deze code is 5 minuten geldig.)"
 msgstr "Inlogcode: {token} (deze code is 5 minuten geldig.)"
@@ -3500,88 +3500,88 @@ msgid "Help texts"
 msgstr "Helpteksten"
 
 #: open_inwoner/configurations/admin.py:225
-msgid "Search filter options"
+msgid "Search options"
 msgstr "Zoekfilter opties"
 
-#: open_inwoner/configurations/admin.py:250
+#: open_inwoner/configurations/admin.py:251
 msgid "Openid Connect"
 msgstr "OpenID Connect"
 
-#: open_inwoner/configurations/admin.py:260 open_inwoner/kvk/admin.py:19
+#: open_inwoner/configurations/admin.py:261 open_inwoner/kvk/admin.py:19
 #: open_inwoner/soap/admin.py:28
 msgid "Authentication"
 msgstr "Authenticatie"
 
-#: open_inwoner/configurations/admin.py:264
+#: open_inwoner/configurations/admin.py:265
 msgid "Analytics"
 msgstr "Analytics"
 
-#: open_inwoner/configurations/admin.py:276
+#: open_inwoner/configurations/admin.py:277
 msgid "Cookie consent"
 msgstr "Toestemming voor cookies"
 
-#: open_inwoner/configurations/admin.py:286
+#: open_inwoner/configurations/admin.py:287
 msgid "Customer satisfaction survey"
 msgstr "Gebruikersfeedbackonderzoek"
 
-#: open_inwoner/configurations/admin.py:295
+#: open_inwoner/configurations/admin.py:296
 msgid "Display options for anonymous users"
 msgstr "Weergaveopties voor anonieme gebruikers"
 
-#: open_inwoner/configurations/admin.py:304
+#: open_inwoner/configurations/admin.py:305
 msgid "Advanced display options"
 msgstr "Geavanceerde opties"
 
-#: open_inwoner/configurations/admin.py:314
+#: open_inwoner/configurations/admin.py:315
 msgid "Social media"
 msgstr "Sociale media"
 
-#: open_inwoner/configurations/admin.py:315
+#: open_inwoner/configurations/admin.py:316
 msgid "Questions"
 msgstr "Vragen"
 
-#: open_inwoner/configurations/admin.py:325
+#: open_inwoner/configurations/admin.py:326
 msgid "Allowed CSS properties"
 msgstr "Toegestane CSS attributen"
 
-#: open_inwoner/configurations/admin.py:357
+#: open_inwoner/configurations/admin.py:358
 #: open_inwoner/configurations/models.py:34
 #: open_inwoner/configurations/tests/test_colors.py:42
 msgid "Primary color"
 msgstr "Primaire kleur"
 
-#: open_inwoner/configurations/admin.py:359
+#: open_inwoner/configurations/admin.py:360
 #: open_inwoner/configurations/models.py:49
 msgid "Primary font color"
 msgstr "Primaire tekstkleur"
 
-#: open_inwoner/configurations/admin.py:364
+#: open_inwoner/configurations/admin.py:365
 #: open_inwoner/configurations/models.py:39
 #: open_inwoner/configurations/tests/test_colors.py:46
 msgid "Secondary color"
 msgstr "Secundaire kleur"
 
-#: open_inwoner/configurations/admin.py:366
+#: open_inwoner/configurations/admin.py:367
 #: open_inwoner/configurations/models.py:56
 msgid "Secondary font color"
 msgstr "Secundaire tekstkleur"
 
-#: open_inwoner/configurations/admin.py:371
+#: open_inwoner/configurations/admin.py:372
 #: open_inwoner/configurations/models.py:44
 #: open_inwoner/configurations/tests/test_colors.py:50
 msgid "Accent color"
 msgstr "Accentkleur"
 
-#: open_inwoner/configurations/admin.py:373
+#: open_inwoner/configurations/admin.py:374
 #: open_inwoner/configurations/models.py:63
 msgid "Accent font color"
 msgstr "Accent tekstkleur"
 
-#: open_inwoner/configurations/admin.py:378
+#: open_inwoner/configurations/admin.py:379
 msgid "Warning banner background color"
 msgstr "De achtergrondkleur van de waarschuwingsbanner"
 
-#: open_inwoner/configurations/admin.py:380
+#: open_inwoner/configurations/admin.py:381
 msgid "Warning banner font color"
 msgstr "Waarschuwingsbanner tekstkleur"
 
@@ -3638,7 +3638,7 @@ msgid "heading_font"
 msgstr "heading_font"
 
 #: open_inwoner/configurations/choices.py:20
-#: open_inwoner/configurations/models.py:776
+#: open_inwoner/configurations/models.py:785
 msgid "Heading font"
 msgstr "Heading font"
 
@@ -4464,28 +4464,42 @@ msgid "If checked, only authenticated users will be able to search the page."
 msgstr "Indien geselecteerd: alleen ingelogde gebruikers zien de zoekfunctie."
 
 #: open_inwoner/configurations/models.py:583
+msgid "Make CMS Pages searchable"
+msgstr "CMS-pagina’s vindbaar maken via zoeken"
+
+#: open_inwoner/configurations/models.py:586
+msgid ""
+"If checked, CMS pages will be added to the search index and included in "
+"search results. Note the change will not take effect until the search index "
+"has been refreshed."
+msgstr ""
+"Indien aangevinkt, worden CMS-pagina’s toegevoegd aan de zoekindex en "
+"getoond in zoekresultaten. Let op: de wijziging werkt pas nadat de "
+"zoekindex is vernieuwd."
+
+#: open_inwoner/configurations/models.py:592
 msgid "Display social media buttons"
 msgstr "Toon sociale media knoppen bij elk product"
 
-#: open_inwoner/configurations/models.py:586
+#: open_inwoner/configurations/models.py:595
 msgid "Enable sharing of products on social media (Facebook, LinkedIn...)"
 msgstr ""
 "Maak het delen mogelijk van producten op sociale media (Facebook, "
 "LinkedIn...)"
 
-#: open_inwoner/configurations/models.py:591
+#: open_inwoner/configurations/models.py:600
 msgid "Theme stylesheet"
 msgstr "Design/thema stylesheet"
 
-#: open_inwoner/configurations/models.py:592
+#: open_inwoner/configurations/models.py:601
 msgid "Additional CSS file added to the page."
 msgstr "Additioneel CSS bestand wat op alle pagina's wordt ingeladen."
 
-#: open_inwoner/configurations/models.py:599
+#: open_inwoner/configurations/models.py:608
 msgid "Extra CSS"
 msgstr "Extra CSS stijlen"
 
-#: open_inwoner/configurations/models.py:601
+#: open_inwoner/configurations/models.py:610
 msgid ""
 "Additional CSS added to the page. Note only a (safe) subset of CSS "
 "properties is supported."
@@ -4493,11 +4507,11 @@ msgstr ""
 "Extra CSS voor de site. Let op: slechts een (veilige) subset van CSS-"
 "eigenschappen wordt ondersteund."
 
-#: open_inwoner/configurations/models.py:606
+#: open_inwoner/configurations/models.py:615
 msgid "eHerkenning authentication enabled"
 msgstr "eHerkenning authentication ingeschakeld"
 
-#: open_inwoner/configurations/models.py:609
+#: open_inwoner/configurations/models.py:618
 msgid ""
 "Whether users can log in with eHerkenning or not. By default, the SAML "
 "integration will be used for this, in order to use the OpenID Connect "
@@ -4510,92 +4524,92 @@ msgstr ""
 "Connect (OIDC) koppeling, navigeer naar `OpenID Connect configuratie voor "
 "eHerkenning` om deze te activeren."
 
-#: open_inwoner/configurations/models.py:615
+#: open_inwoner/configurations/models.py:624
 msgid "Contactmoment contact form"
 msgstr "Contactmoment contact formulier"
 
-#: open_inwoner/configurations/models.py:618
+#: open_inwoner/configurations/models.py:627
 msgid ""
 "Display contact form on the questions list page so that users can create new "
 "questions"
-msgstr ""
+msgstr "Toon het contactformulier op de vragen-overzichtspagina, zodat gebruikers nieuwe vragen kunnen stellen."
 
-#: open_inwoner/configurations/models.py:622
+#: open_inwoner/configurations/models.py:631
 msgid "Enable indexing by search engines"
 msgstr "Indexering door zoekmachines inschakelen"
 
-#: open_inwoner/configurations/models.py:624
+#: open_inwoner/configurations/models.py:633
 msgid "When enabled, search engines can index the site"
 msgstr ""
 "Wanneer deze optie is ingeschakeld, kunnen zoekmachines de site indexeren"
 
-#: open_inwoner/configurations/models.py:627
+#: open_inwoner/configurations/models.py:636
 msgid "Redirect security.txt to"
 msgstr "Stuur security.txt door naar"
 
-#: open_inwoner/configurations/models.py:629
+#: open_inwoner/configurations/models.py:638
 msgid "Link to which ./well-known/security.txt will redirect to"
 msgstr "Link waarnaar ./well-known/security.txt zal doorverwijzen"
 
-#: open_inwoner/configurations/models.py:635
-#: open_inwoner/configurations/models.py:638
+#: open_inwoner/configurations/models.py:644
+#: open_inwoner/configurations/models.py:647
 msgid "Site Configuration"
 msgstr "Algemene configuratie"
 
-#: open_inwoner/configurations/models.py:783
+#: open_inwoner/configurations/models.py:792
 msgid "Upload heading font. TTF font types only."
 msgstr "Upload lettertype voor koppen. Alleen TTF lettertypes toegestaan."
 
-#: open_inwoner/configurations/models.py:787
-#: open_inwoner/configurations/models.py:851
+#: open_inwoner/configurations/models.py:796
+#: open_inwoner/configurations/models.py:860
 msgid "Configuration"
 msgstr "Configuratie"
 
-#: open_inwoner/configurations/models.py:792
+#: open_inwoner/configurations/models.py:801
 msgid "Body font regular"
 msgstr "Body font regular"
 
-#: open_inwoner/configurations/models.py:799
+#: open_inwoner/configurations/models.py:808
 msgid "Upload regular text body font. TTF font types only."
 msgstr "Upload reguliere tekst lettertype. Alleen TTF lettertypes toegestaan."
 
-#: open_inwoner/configurations/models.py:802
+#: open_inwoner/configurations/models.py:811
 msgid "Body font italic"
 msgstr "Body font italic"
 
-#: open_inwoner/configurations/models.py:809
+#: open_inwoner/configurations/models.py:818
 msgid "Upload italic text body font. TTF font types only."
 msgstr ""
 "Upload schuingedrukte tekst lettertype. Alleen TTF lettertypes toegestaan."
 
-#: open_inwoner/configurations/models.py:812
+#: open_inwoner/configurations/models.py:821
 msgid "Body font bold"
 msgstr "Body font bold"
 
-#: open_inwoner/configurations/models.py:819
+#: open_inwoner/configurations/models.py:828
 msgid "Upload bold text body font. TTF font types only."
 msgstr ""
 "Upload dikgedrukte tekst lettertype. Alleen TTF lettertypes toegestaan."
 
-#: open_inwoner/configurations/models.py:822
+#: open_inwoner/configurations/models.py:831
 msgid "Body font bold italic"
 msgstr "Body font bold italic"
 
-#: open_inwoner/configurations/models.py:829
+#: open_inwoner/configurations/models.py:838
 msgid "Upload bold italic text body font. TTF font types only."
 msgstr ""
 "Upload dik-en-schuingedrukte tekst lettertype. Alleen TTF lettertypes "
 "toegestaan."
 
-#: open_inwoner/configurations/models.py:857
+#: open_inwoner/configurations/models.py:866
 msgid "Flatpage"
 msgstr "Pagina"
 
-#: open_inwoner/configurations/models.py:866
+#: open_inwoner/configurations/models.py:875
 msgid "Flatpage in the footer"
 msgstr "Platte pagina in footer"
 
-#: open_inwoner/configurations/models.py:867
+#: open_inwoner/configurations/models.py:876
 msgid "Flatpages in the footer"
 msgstr "Platte pagina's in footer"
 
@@ -6738,7 +6752,7 @@ msgstr "Hoe wilt u dit doel bereiken? "
 msgid ""
 "Here you can add a note, and supplement it with new consecutive notes by "
 "clicking 'Save'."
-msgstr ""
+msgstr "Hier kunt u een notitie toevoegen. Daarna kunt u extra notities toevoegen door op 'Bewaren' te klikken."
 
 #: open_inwoner/plans/models.py:125
 msgid "Expected end date"
@@ -7194,28 +7208,28 @@ msgid "Field boosts"
 msgstr "Zoekveldgewicht"
 
 #: open_inwoner/search/tests/test_feedback.py:192
-#: open_inwoner/search/views.py:212
+#: open_inwoner/search/views.py:217
 msgid "Thank you for your feedback, it will help us improve our search engine."
 msgstr ""
 "Dank u voor uw feedback, hiermee kunnen wij de omgeving verder verbeteren."
 
-#: open_inwoner/search/tests/test_logging.py:33 open_inwoner/search/views.py:76
+#: open_inwoner/search/tests/test_logging.py:33 open_inwoner/search/views.py:77
 #, python-brace-format
 msgid "search query: {query}"
 msgstr "zoekterm: {query}"
 
-#: open_inwoner/search/tests/test_views.py:395 open_inwoner/search/views.py:137
+#: open_inwoner/search/tests/test_views.py:395 open_inwoner/search/views.py:142
 msgid ""
 "The search functionality is temporarily unavailable. Please try again at a "
 "later moment."
 msgstr ""
 "De zoekfunctie is tijdelijk niet beschikbaar. Probeer het later nog eens."
 
-#: open_inwoner/search/views.py:158 open_inwoner/utils/mixins.py:132
+#: open_inwoner/search/views.py:163 open_inwoner/utils/mixins.py:132
 msgid "Page is not 'last', nor can it be converted to an int."
 msgstr "Page is not 'last', nor can it be converted to an int."
 
-#: open_inwoner/search/views.py:165 open_inwoner/utils/mixins.py:139
+#: open_inwoner/search/views.py:170 open_inwoner/utils/mixins.py:139
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
 msgstr "Ongelidge pagina (%(page_number)s): %(message)s"
@@ -7792,7 +7806,7 @@ msgstr "Er zijn nog geen notities toegevoegd."
 msgid ""
 "Klik op 'Bewerk' om een nieuwe notitie toe te voegen. Deze kan later nog "
 "worden aangevuld."
-msgstr ""
+msgstr "Klik op 'Bewerk' om een nieuwe notitie toe te voegen. Deze kan later nog worden aangevuld."
 
 #: open_inwoner/templates/pages/plans/goal_edit.html:5
 msgid "Doel en omschrijving aanpassen"
@@ -7820,16 +7834,16 @@ msgstr "U heeft op dit moment nog geen samenwerkingsplannen."
 
 #: open_inwoner/templates/pages/plans/note_edit.html:5
 msgid "Notitie maken en aanvullen"
-msgstr ""
+msgstr "Notitie maken en aanvullen"
 
 #: open_inwoner/templates/pages/plans/note_edit.html:7
 msgid ""
 "Voeg een notitie toe en/of vul een bestaande notitie aan met nieuwe tekst."
-msgstr ""
+msgstr "Voeg een notitie toe en/of vul een bestaande notitie aan met nieuwe tekst."
 
 #: open_inwoner/templates/pages/plans/note_edit.html:17
 msgid "Bewaren"
-msgstr ""
+msgstr "Bewaren"
 
 #: open_inwoner/templates/pages/plans/template-choice.html:6
 #: open_inwoner/templates/pages/plans/template-choice.html:68
@@ -8754,6 +8768,3 @@ msgstr "Het vestigingsnummer moet numeriek zijn."
 #: open_inwoner/utils/validators.py:211
 msgid "Valid strings must include at least one non-space character"
 msgstr "Een geldige invoer bevat minimaal één teken dat geen spatie is."
-
-#~ msgid "Onderdeel van"
-#~ msgstr "Onderdeel van"
