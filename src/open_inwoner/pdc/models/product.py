@@ -98,7 +98,9 @@ class Product(models.Model):
         max_length=64,
         blank=True,
         default=_("Aanvraag starten"),
-        help_text=_("The text displayed on the button."),
+        help_text=_(
+            "The text displayed on the button inside the content of the product."
+        ),
     )
     form = OpenFormsSlugField(
         _("Request form"),
