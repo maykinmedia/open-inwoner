@@ -1003,7 +1003,7 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000
 #
 
 ACCOUNTS_USER_TOKEN_EXPIRE_TIME = 300
-ACCOUNTS_SMS_MESSAGE = _("Inlogcode: {token} (deze code is geldig voor 5 minuten)")
+ACCOUNTS_SMS_MESSAGE = _("Inlogcode: {token} (deze code is 5 minuten geldig.)")
 ACCOUNTS_SMS_GATEWAY = {
     "BACKEND": config(
         "ACCOUNTS_SMS_GATEWAY_BACKEND", "open_inwoner.accounts.gateways.Dummy"
