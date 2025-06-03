@@ -7503,8 +7503,8 @@ msgid "CTA Button text"
 msgstr "Tekst van CTA knop"
 
 #: open_inwoner/pdc/models/product.py:103
-msgid "The text displayed on the button."
-msgstr "De tekst die zichtbaar is in de CTA knop"
+msgid "The text displayed on the button inside the content of the product."
+msgstr "De tekst die zichtbaar is in de CTA knop binnen de inhoud van het product."
 
 #: open_inwoner/pdc/models/product.py:106
 msgid "Request form"
