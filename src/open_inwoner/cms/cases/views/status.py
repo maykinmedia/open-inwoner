@@ -154,12 +154,12 @@ class InnerCaseDetailView(
             try:
                 return OpenKlant2Service()
             except Exception:
-                logger.error("Failed to build OpenKlant2 service")
+                logger.warning("Failed to build OpenKlant2 service")
         if service_type == KlantenServiceType.ESUITE:
             try:
                 return eSuiteVragenService()
             except Exception:
-                logger.error("Failed to build eSuiteVragenService")
+                logger.warning("Failed to build eSuiteVragenService")
 
     def store_statustype_mapping(self, zaaktype_identificatie):
         # Filter on ZaakType identificatie to avoid eSuite situation where one statustype
