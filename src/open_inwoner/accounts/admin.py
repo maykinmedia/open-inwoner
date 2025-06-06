@@ -138,7 +138,10 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
             _("Contacts - invites"),
             {"fields": ("user_contacts", "contacts_for_approval")},
         ),
-        (_("Important dates"), {"fields": ("last_login", "date_joined")}),
+        (
+            _("Important dates"),
+            {"fields": ("last_login", "previous_login", "date_joined")},
+        ),
     )
     add_fieldsets = (
         (
@@ -149,7 +152,16 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
             },
         ),
     )
-    readonly_fields = ("bsn", "rsin", "is_prepopulated", "oidc_id", "uuid")
+    readonly_fields = (
+        "bsn",
+        "rsin",
+        "is_prepopulated",
+        "oidc_id",
+        "uuid",
+        "previous_login",
+        "last_login",
+        "date_joined",
+    )
     list_display = (
         "email",
         "first_name",
@@ -160,6 +172,7 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
         "is_active",
         "contact_type",
         "last_login",
+        "previous_login",
     )
     list_filter = (
         "is_staff",

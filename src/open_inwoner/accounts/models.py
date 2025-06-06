@@ -313,6 +313,15 @@ class User(AbstractBaseUser, PermissionsMixin):
             "Indicates if the user wants to receive notifications for updates concerning plans and actions."
         ),
     )
+    previous_login = models.DateTimeField(
+        _("Previous login"),
+        blank=True,
+        null=True,
+        help_text=_(
+            "The previous login time for the user, which will be shown upon login when `last_login` has been updated to the current timestamp."
+        ),
+    )
+
     user_contacts = models.ManyToManyField(
         "self",
         verbose_name=_("Contacts"),
@@ -603,6 +612,16 @@ class User(AbstractBaseUser, PermissionsMixin):
         from ..pdc.models import Category
 
         return Category.objects.filter(access_groups__user=self)
+
+    def save(
+        self, force_insert=False, force_update=False, using=None, update_fields=None
+    ):
+        if update_fields and "last_login" in update_fields:
+            update_fields.append("previous_login")
+
+        return super().save(
+            force_insert, force_update, using, update_fields=update_fields
+        )
 
 
 class Document(models.Model):
