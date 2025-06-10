@@ -5,7 +5,7 @@
 
 # Stage 1 - Backend build environment
 # includes compilers and build tooling to create the environment
-FROM python:3.11-slim-bookworm AS backend-build
+FROM python:3.12-slim-bookworm AS backend-build
 
 RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
     pkg-config \
@@ -54,7 +54,7 @@ COPY ./src /app/src
 RUN npm run build
 
 # Stage 3 - Build docker image suitable for production
-FROM python:3.11-slim-bookworm
+FROM python:3.12-slim-bookworm
 
 # Stage 3.1 - Set up the needed production dependencies
 # Note: mime-support becomes media-types in Debian Bullseye (required for correctly serving mime-types for images)
@@ -94,7 +94,7 @@ COPY ./bin/check_celery_worker_liveness.py ./bin/
 VOLUME ["/app/log", "/app/media", "/app/private_media"]
 
 # copy backend build deps
-COPY --from=backend-build /usr/local/lib/python3.11 /usr/local/lib/python3.11
+COPY --from=backend-build /usr/local/lib/python3.12 /usr/local/lib/python3.12
 COPY --from=backend-build /usr/local/bin/uwsgi /usr/local/bin/uwsgi
 COPY --from=backend-build /usr/local/bin/celery /usr/local/bin/celery
 
