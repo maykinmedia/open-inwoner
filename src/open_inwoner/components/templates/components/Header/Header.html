@@ -82,9 +82,13 @@
 
                     {% if request.user.is_authenticated %}
                         <ul class="header__list">
+                            {% if user.is_eherkenning_user and not session_is_branch_restricted %}
                             <li class="header__list-item">
-                                {% trans "Logout" as logout %}
-                                {% link text=logout href=request.user.get_logout_url icon="login" icon_position="before" primary=True %}
+                                {% link text=_("Wissel van vestiging") href="kvk:branches" icon="autorenew" icon_position="before" primary=True icon_outlined=True %}
+                            </li>
+                            {% endif %}
+                            <li class="header__list-item">
+                                {% link text=_("Logout") href=request.user.get_logout_url icon="login" icon_position="before" primary=True icon_outlined=True %}
                             </li>
                         </ul>
                     {% elif config.login_show %}

@@ -1,4 +1,4 @@
-{% load i18n form_tags icon_tags link_tags string_tags solo_tags menu_tags button_tags %}
+{% load i18n form_tags icon_tags link_tags string_tags solo_tags custom_session_tags menu_tags button_tags %}
 
 {% get_solo "configurations.SiteConfiguration" as config %}
 
@@ -30,9 +30,13 @@
                         </li>
                     {% endif %}
 
+                    {% if user.is_eherkenning_user and not session_is_branch_restricted %}
                     <li class="header__list-item">
-                        {% trans "Logout" as logout %}
-                        {% link text=logout href=request.user.get_logout_url icon="logout" icon_position="before" primary=True %}
+                        {% link text=_("Wissel van vestiging") href="kvk:branches" icon="autorenew" icon_position="before" primary=True icon_outlined=True %}
+                    </li>
+                    {% endif %}
+                    <li class="header__list-item">
+                        {% link text=_("Logout") href=request.user.get_logout_url icon="logout" icon_position="before" primary=True %}
                     </li>
                 </ul>
             </li>
