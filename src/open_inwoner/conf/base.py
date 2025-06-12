@@ -312,6 +312,7 @@ TEMPLATES = [
                 "sekizai.context_processors.sekizai",
                 "cms.context_processors.cms_settings",
                 "django.template.context_processors.i18n",
+                "open_inwoner.accounts.context_processors.set_branch_selection_state",
             ],
             "loaders": TEMPLATE_LOADERS,
         },
