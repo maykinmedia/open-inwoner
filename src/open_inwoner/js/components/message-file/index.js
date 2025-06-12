@@ -10,6 +10,7 @@ class MessageFile {
     // Create an accessible button to trigger file selection
     this.fileButton = document.createElement('button')
     this.fileButton.setAttribute('type', 'button')
+    this.fileButton.setAttribute('title', 'Bestand selecteren')
     this.fileButton.classList.add('message-file__button')
 
     const buttonIcon = document.createElement('span')
@@ -63,9 +64,10 @@ class MessageFile {
     const deleteButton = document.createElement('button')
     deleteButton.classList.add('message-file__delete')
     deleteButton.setAttribute('aria-label', 'Verwijder bestand')
+    deleteButton.setAttribute('title', 'Verwijder bestand')
 
     const deleteIcon = document.createElement('span')
-    deleteIcon.classList.add('material-icons')
+    deleteIcon.classList.add('material-icons-outlined')
     deleteIcon.textContent = 'delete'
 
     deleteButton.appendChild(deleteIcon)
