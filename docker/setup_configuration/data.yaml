@@ -140,3 +140,12 @@ sites_config:
   items:
     - domain: test-site
       name: The Django Sites default
+
+# Set default (staff) users
+default_user_configuration_enable: true
+default_user_configuration_config:
+  users:
+    - email: admin@user.nl
+      is_staff: True
+      is_superuser: True
+      password: change_me
