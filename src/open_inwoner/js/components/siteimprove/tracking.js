@@ -6,18 +6,19 @@
  * in order to organize them for the Siteimprove Dashboard where they are grouped by category
  */
 
-// if (typeof _sz === 'undefined') {
-//   /** Mock SiteImprove `_sz` object for testing - only used during development */
-//   var _sz = {
-//     push: function (data) {
-//       try {
-//         console.log('Event pushed to _sz:', data)
-//       } catch (error) {
-//         console.error('Error occurred while pushing event data:', error)
-//       }
-//     },
-//   }
-// }
+if (window.IS_DEV && typeof _sz === 'undefined') {
+  console.log('*** Running in development mode. ***')
+  /** Mock SiteImprove `_sz` object for testing - only used during development */
+  var _sz = {
+    push: function (data) {
+      try {
+        console.log('Event pushed to _sz:', data)
+      } catch (error) {
+        console.error('Error occurred while pushing event data:', error)
+      }
+    },
+  }
+}
 
 /**
  * Full replacements that overwrite the generic push for click-events
@@ -136,6 +137,25 @@ const specificClickSelectors = {
     ],
   '.choice-list-multiple__item.selected .checkbox__label[for="id_cases_notifications"]':
     ['event', 'Communicatievoorkeuren', 'Click', 'Disable zaaknotificatie'],
+  // Overwrite KVK main branch
+  '#eherkenning-branch-form > ul > li.choice-list__item.selected > label': [
+    'event',
+    'Inloggen vestigingen',
+    'Click',
+    'Kies vestiging',
+  ],
+  '#eherkenning-branch-form > ul > li > label > div > h2': [
+    'event',
+    'Inloggen vestigingen',
+    'Click',
+    'Kies vestiging',
+  ],
+  '#eherkenning-branch-form > ul > li > label > div > p': [
+    'event',
+    'Inloggen vestigingen',
+    'Click',
+    'Kies vestiging',
+  ],
   // Overwrite checkboxes
   '.form#change-notifications #id_cases_notifications:checked': [
     'event',
@@ -193,8 +213,13 @@ const specificClickSelectors = {
     'Change submit',
     'Save',
   ],
-  // End of Communicatievoorkeuren
-  // Open Aanvraag via cards
+  // Message center
+  '#autoComplete_list_1 li': [
+    'event',
+    'Berichtencentrum',
+    'Click',
+    'Contactpersoon gekozen',
+  ],
   '#cases-content > .card__grid .column a.card div': [
     'event',
     'Mijn zaken',
@@ -351,7 +376,7 @@ const specificClickSelectors = {
   // Hide personal data, and set Dashboard, for these elements
   '.actions__filters select#id_is_for': [
     'event',
-    'Mijn Samenwerkigen Acties',
+    'Mijn Samenwerkingen Acties',
     'Click',
     'Filter op persoon',
   ],
@@ -370,7 +395,7 @@ const specificClickSelectors = {
   '.primary-navigation.primary-navigation__authenticated .primary-navigation__list .primary-navigation__list-item .primary-navigation--toggle':
     ['event', 'Navigatie', 'Click', 'Welkom ...'],
   '.primary-navigation.primary-navigation__authenticated .primary-navigation__list .primary-navigation__list-item .primary-navigation--toggle span':
-    ['event', 'Navigatie', 'Click', 'Welkom ...'],
+    ['event', 'Navigatie', 'Click', 'Welkom...'],
 }
 
 /**
@@ -445,6 +470,7 @@ const partialClickSelectors = {
   'input[type="text"]': { label: 'Click in invoerveld' },
   'input[type="email"]': { label: 'Click in e-mail invoerveld' },
   'input[type="password"]': { label: 'Click in wachtwoord invoerveld' },
+  'input[type="search"]': { label: 'Click in zoekveld' },
   'input[type="tel"]': { label: 'Click in telefoonnummer invoerveld' },
   'input[type="checkbox"]': { label: 'Click op checkbox' },
   '.newsletter-form input[type="checkbox"]': { category: 'Nieuwsbrieven' },
@@ -547,13 +573,20 @@ const keydownSelectors = {
       const eventType = event.type
       const target = event.target
 
-      // Check if the target or any of its ancestors has a class we do not wish to track
-      let doNotTrackElement = target
-      while (doNotTrackElement) {
-        if (doNotTrackElement.classList.contains('login-tab--container')) {
-          return
+      // Add targets and any of their ancestors, we do not wish to track
+      const untrackedSelectors = ['.login-tab--container']
+
+      let currentElement = target
+      while (currentElement) {
+        if (
+          untrackedSelectors.some((selector) =>
+            currentElement.matches(selector)
+          ) &&
+          target.tagName.toLowerCase() === 'input'
+        ) {
+          return // Only skip tracking for <input> inside those containers
         }
-        doNotTrackElement = doNotTrackElement.parentElement
+        currentElement = currentElement.parentElement
       }
 
       let eventData = null
