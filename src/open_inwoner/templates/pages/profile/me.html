@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n l10n link_tags file_tags card_tags list_tags helpers button_tags utils icon_tags form_tags anchor_menu_tags dropdown_tags solo_tags %}
+{% load i18n l10n custom_session_tags link_tags file_tags card_tags list_tags helpers button_tags utils icon_tags form_tags anchor_menu_tags dropdown_tags solo_tags %}
 
 {% block sidebar_content %}
     {% anchor_menu anchors=anchors desktop=True %}
@@ -26,6 +26,9 @@
             <header class="oip-header-group title">
                 <h2 class="utrecht-heading-2" id="business-overview">{% trans "Bedrijfsgegevens" %}</h2>
                 <div class="tabled__item--mobile-big">
+                    {% if user.is_eherkenning_user and not session_is_branch_restricted %}
+                        {% button href="kvk:branches" text=_("Wissel van vestiging") icon="autorenew" transparent=True icon_outlined=True %}
+                    {% endif %}
                     {% button href="profile:edit" text=_("Bewerk") icon="edit" transparent=True icon_outlined=True %}
                 </div>
             </header>

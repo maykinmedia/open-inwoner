@@ -1,5 +1,5 @@
 {% extends "master.html" %}
-{% load i18n static form_tags grid_tags button_tags card_tags button_tags %}
+{% load i18n static custom_session_tags form_tags grid_tags button_tags card_tags button_tags %}
 
 {% block content %}
     {% render_grid %}
@@ -17,7 +17,12 @@
                     {% with entire_company=company_branches.0 %}
                         <li class="choice-list__item">
                             <label class="choice-list__label">
-                                <input type="radio" id="entire-company" name="branch_number" value="" class="choice-list__radio">
+                                <input type="radio"
+                                       id="entire-company"
+                                       name="branch_number"
+                                       value=""
+                                       class="choice-list__radio"
+                                       {% if not user.vestiging %}checked{% endif %}>
                                 <div class="choice-list__content">
                                     <h2 class="choice-list__heading">{{ entire_company.naam }}</h2>
                                 </div>
@@ -26,13 +31,17 @@
                     {% endwith %}
 
                     {% if company_branches|slice:"1:" %}
-                        {# only show multiple VESTIGINGEN #}
                         <p><strong>{% trans "Of selecteer de vestiging waarmee u wilt inloggen" %}</strong></p>
                         {% for branch in company_branches|slice:"1:" %}
                             {% with company_id=branch.vestigingsnummer %}
                                 <li class="choice-list__item">
                                     <label class="choice-list__label">
-                                        <input type="radio" id="branch-{{ company_id }}" name="branch_number" value="{{ company_id }}" class="choice-list__radio">
+                                        <input type="radio"
+                                               id="branch-{{ company_id }}"
+                                               name="branch_number"
+                                               value="{{ company_id }}"
+                                               class="choice-list__radio"
+                                               {% if user.vestiging == company_id %}checked{% endif %}>
                                         <div class="choice-list__content">
                                             <h2 class="choice-list__heading">{{ branch.naam }}</h2>
                                             {% if company_id %}
@@ -42,7 +51,7 @@
                                                 <p class="choice-list__p">{{ branch.adres.binnenlandsAdres.straatnaam }}</p>
                                             {% endif %}
                                             {% if branch.adres.binnenlandsAdres.plaats %}
-                                                <p class="choice-list__p">{{ branch.adres.binnenlandsAdres.plaats}}</p>
+                                                <p class="choice-list__p">{{ branch.adres.binnenlandsAdres.plaats }}</p>
                                             {% endif %}
                                         </div>
                                     </label>
@@ -50,12 +59,14 @@
                             {% endwith %}
                         {% endfor %}
                     {% endif %}
+
                 </ul>
 
                 <div class="form__actions form__actions--fullwidth">
-                    {% button_row %}
-                        {% button primary=True name="submit" text=_('Ga door') icon="east" icon_position="after" icon_outlined=True %}
-                    {% endbutton_row %}
+                    {% button primary=True name="submit" text=_('Ga door') icon="east" icon_position="after" icon_outlined=True %}
+                    {% if user.vestiging %}
+                        {% button href="profile:detail" icon="west" text=_("Terug naar huidige vestiging") icon_outlined=True transparent=True %}
+                    {% endif %}
                 </div>
             </form>
 
