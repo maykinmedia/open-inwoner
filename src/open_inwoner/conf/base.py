@@ -570,6 +570,7 @@ CMS_PLUGIN_CACHE = False
 
 CMS_TEMPLATES = [
     ("cms/fullwidth.html", "Home page template"),
+    ("cms/cms_flatpage_template.html", "CMS Flatpage Template"),
 ]
 CMS_PLACEHOLDER_CONF = {
     # TODO properly configure this based on actual available plugins
@@ -579,7 +580,7 @@ CMS_PLACEHOLDER_CONF = {
     },
     "content": {
         "plugins": [
-            # "TextPlugin",
+            "TextPlugin",
             "PicturePlugin",
             "VideoPlayerPlugin",
             "CategoriesPlugin",
@@ -590,6 +591,7 @@ CMS_PLACEHOLDER_CONF = {
             "UserFeedPlugin",
             "UserAppointmentsPlugin",
             "TasksPlugin",
+            "CMSFlatPagePlugin",
         ],
         "text_only_plugins": ["LinkPlugin"],
         "name": _("Content"),
@@ -628,6 +630,10 @@ CMS_PLACEHOLDER_CONF = {
     "contact_form": {
         "name": _("Contact form plugin"),
         "plugins": ["ContactFormPlugin"],
+    },
+    "cms_flatpage": {
+        "name": _("CMS flatpage plugin"),
+        "plugins": ["CMSFlatPagePlugin"],
     },
 }
 

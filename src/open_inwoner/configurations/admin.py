@@ -2,8 +2,6 @@ from django import forms
 from django.contrib import admin, messages
 from django.contrib.admin.actions import delete_selected as default_delete_selected
 from django.contrib.flatpages.admin import FlatPageAdmin
-from django.contrib.flatpages.forms import FlatpageForm
-from django.contrib.flatpages.models import FlatPage
 from django.contrib.sites.admin import SiteAdmin
 from django.contrib.sites.models import Site
 from django.core import exceptions
@@ -72,7 +70,7 @@ admin.site.register(Site, CustomSiteAdmin)
 class SiteConfigurationPageInline(OrderedTabularInline):
     model = SiteConfigurationPage
     fields = (
-        "flatpage",
+        "cms_page",
         "order",
         "move_up_down_links",
     )
@@ -82,7 +80,7 @@ class SiteConfigurationPageInline(OrderedTabularInline):
     )
     extra = 1
     ordering = ("order",)
-    autocomplete_fields = ("flatpage",)
+    autocomplete_fields = ("cms_page",)
 
 
 class FontConfigurationInline(admin.StackedInline):
@@ -389,17 +387,12 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
         self.report_contrast_ratio(request, obj)
 
 
-class FlatPageAdminForm(FlatpageForm):
+class CMSPageAdminForm(forms.Form):
     class Meta:
-        model = FlatPage
+        model = "cms.Page"
         fields = "__all__"
         widgets = {"content": CKEditorWidget}
 
 
-class CustomFlatPageAdmin(FlatPageAdmin):
-    form = FlatPageAdminForm
-
-
-# Re-register FlatPageAdmin
-admin.site.unregister(FlatPage)
-admin.site.register(FlatPage, CustomFlatPageAdmin)
+class CustomCMSPageAdmin(FlatPageAdmin):
+    form = CMSPageAdminForm
