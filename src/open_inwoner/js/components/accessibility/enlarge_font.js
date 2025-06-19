@@ -16,11 +16,6 @@ export class EnlargeFont {
       paragraphFontSizeSmall: '--utrecht-paragraph-small-font-size',
       headingThreeFontSize: '--utrecht-heading-3-font-size',
       headingFourFontSize: '--utrecht-heading-4-font-size',
-      // Legacy styles' initial values
-      oipBodyFontSizeDefault: '--font-size-body',
-      oipBodyFontSizeSmall: '--font-size-body-small',
-      oipHeadingThreeFontSize: '--font-size-heading-3',
-      oipHeadingFourFontSize: '--font-size-heading-4',
       // OIP specific card-heading
       oipCardHeadingFontSize: '--font-size-heading-card',
     }

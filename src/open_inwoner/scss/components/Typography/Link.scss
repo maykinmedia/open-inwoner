@@ -93,12 +93,4 @@
   *[class*='Icons']:first-child {
     transform: scale(1);
   }
-
-  ///
-  /// Legacy styling
-  ///
-
-  .leaflet-container .h4 &--primary {
-    color: var(--color-black);
-  }
 }

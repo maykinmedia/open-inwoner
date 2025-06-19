@@ -5,21 +5,3 @@
   font-family: var(--utrecht-heading-font-family),
     var(--utrecht-heading-4-font-family);
 }
-
-///
-/// Legacy styling
-///
-
-.h4 {
-  color: var(--utrecht-heading-4-color);
-  font-family: var(--utrecht-heading-4-font-family);
-  font-size: var(--utrecht-heading-4-font-size);
-  font-weight: var(--utrecht-heading-4-font-weight);
-  line-height: var(--utrecht-heading-4-line-height);
-  margin: 0;
-
-  @include mobile-only {
-    word-break: normal;
-    overflow-wrap: break-word;
-  }
-}

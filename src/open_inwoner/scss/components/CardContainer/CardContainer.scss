@@ -64,12 +64,3 @@
     }
   }
 }
-
-///
-/// Legacy styling
-///
-
-.p + .card-container,
-.card-container + .h2 {
-  margin-top: var(--gutter-width);
-}

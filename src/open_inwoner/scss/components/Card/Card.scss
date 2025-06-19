@@ -328,6 +328,10 @@
     margin: 0;
   }
 
+  &__heading-3 + .card__categories {
+    margin-top: var(--spacing-medium);
+  }
+
   &--product {
     padding: 20px;
     align-items: end;
