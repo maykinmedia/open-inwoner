@@ -218,10 +218,6 @@
                 "cspsetting"
             ],
             [
-                "flatpages",
-                "flatpage"
-            ],
-            [
                 "mail_editor",
                 "mailtemplate"
             ],
@@ -301,6 +297,10 @@
                 "subscription"
             ],
             [
+                "objectsapiclient",
+                "configuration"
+            ],
+            [
                 "openformsclient",
                 "configuration"
             ],
@@ -336,10 +336,6 @@
                 "openzaak",
                 "zaaktypeinformatieobjecttypeconfig"
             ],
-	    [
-		"objectsapiclient",
-		"configuration"
-	    ],
             [
                 "qmatic",
                 "qmaticconfig"
