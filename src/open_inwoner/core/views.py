@@ -3,6 +3,8 @@ from urllib.parse import urlencode
 from django.shortcuts import render
 from django.urls import reverse
 
+from cms.models import Title
+
 from open_inwoner.accounts.models import User
 from open_inwoner.cms.utils.page_display import (
     benefits_page_is_published,
@@ -99,15 +101,22 @@ def sitemap(request):
             {"url_name": "login", "link_text": "Login or create an account"}
         )
 
-    # add flatpages to platform_pages
+    # add cms_pages to platform_pages
     config = SiteConfiguration.get_solo()
-    flatpages = (
-        config.get_ordered_flatpages
-        if request.user.is_authenticated
-        else config.get_ordered_flatpages.filter(registration_required=False)
-    )
-    context["flatpages"] = [
-        {"url": page.url, "link_text": page.title} for page in flatpages
+    cms_pages = config.get_ordered_cms_pages()
+
+    if not request.user.is_authenticated:
+        for page in cms_pages:
+            if hasattr(page, "commonextension") and page.commonextension.requires_auth:
+                cms_pages.remove(page)
+
+    titles = [
+        Title.objects.get(page=page, language=page.languages) for page in cms_pages
+    ]
+
+    context["cms_pages"] = [
+        {"url": page.get_absolute_url(), "link_text": title.title}
+        for page, title in zip(cms_pages, titles)
     ]
 
     return render(request, template_name, context)
