@@ -231,13 +231,3 @@
 .cta-button {
   margin-bottom: var(--spacing-large);
 }
-
-///
-/// Legacy styling
-///
-
-.h2 + .button,
-.h4 + .button,
-.p + .button {
-  margin-top: var(--spacing-large);
-}

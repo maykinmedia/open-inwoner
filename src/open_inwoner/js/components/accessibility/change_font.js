@@ -14,10 +14,6 @@ export class ChangeFont {
     // Variable names for font families
     const bodyFontFamily = '--oip-typography-sans-serif-font-family'
     const headingFontFamily = '--utrecht-heading-font-family'
-    // Start of legacy styles
-    const oipBodyFontFamily = '--font-family-body'
-    const oipHeadingFontFamily = '--font-family-heading'
-    // end of legacy styles
     const openDyslexicFont = 'Open Dyslexic'
     const defaultBodyFont = 'Body'
     const defaultHeadingFont = 'Heading'
@@ -26,8 +22,6 @@ export class ChangeFont {
       // Switch back to default font
       root.style.setProperty(bodyFontFamily, defaultBodyFont)
       root.style.setProperty(headingFontFamily, defaultHeadingFont)
-      root.style.setProperty(oipBodyFontFamily, defaultBodyFont)
-      root.style.setProperty(oipHeadingFontFamily, defaultHeadingFont)
 
       // Update text content, aria-label, and title
       this.text.innerText = this.node.dataset.text
@@ -37,8 +31,6 @@ export class ChangeFont {
       // Switch to Dyslexic font
       root.style.setProperty(bodyFontFamily, openDyslexicFont)
       root.style.setProperty(headingFontFamily, openDyslexicFont)
-      root.style.setProperty(oipBodyFontFamily, openDyslexicFont)
-      root.style.setProperty(oipHeadingFontFamily, openDyslexicFont)
 
       // Update text content, aria-label, and title
       this.text.innerText = this.node.dataset.altText

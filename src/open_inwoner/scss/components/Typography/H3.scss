@@ -9,27 +9,3 @@
 .utrecht-paragraph + .utrecht-heading-3 {
   margin-top: var(--spacing-large);
 }
-
-///
-/// Legacy styling
-///
-
-.h3 {
-  color: var(--utrecht-heading-3-color);
-  font-family: var(--utrecht-heading-3-font-family);
-  font-size: var(--utrecht-heading-3-font-size);
-  font-weight: var(--utrecht-heading-3-font-weight);
-  line-height: var(--utrecht-heading-3-line-height);
-  margin: 0;
-  display: flex;
-  justify-content: space-between;
-
-  @include mobile-only {
-    word-break: normal;
-    overflow-wrap: break-word;
-  }
-}
-
-.p + .h3 {
-  margin-top: var(--spacing-large);
-}
