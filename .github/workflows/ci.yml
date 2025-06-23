@@ -186,11 +186,6 @@ jobs:
           DB_PASSWORD: ''
           E2E_DRIVER: ${{ matrix.browser }}
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: playwright-vids
-          path: videos
-
   #
   # Docs
   #
