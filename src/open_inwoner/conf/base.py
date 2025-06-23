@@ -869,7 +869,7 @@ if SENTRY_DSN:
 
     sentry_sdk.init(
         **SENTRY_CONFIG,
-        traces_sample_rate=1,
+        traces_sample_rate=0,
         integrations=get_sentry_integrations(),
         send_default_pii=True,
     )
