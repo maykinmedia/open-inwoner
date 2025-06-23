@@ -14,7 +14,6 @@ import logging
 import os
 
 from django.conf import settings
-
 from dotenv import load_dotenv
 from requests import Session
 
@@ -45,6 +44,7 @@ def monkeypatch_requests():
 
     def new_request(self, *args, **kwargs):
         kwargs.setdefault("timeout", settings.DEFAULT_TIMEOUT_REQUESTS)
+        kwargs.setdefault("verify", False)
         return self._original_request(*args, **kwargs)
 
     Session.request = new_request

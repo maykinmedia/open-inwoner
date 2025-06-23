@@ -4,9 +4,8 @@ from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import Optional, Union
 
-from django.utils.translation import gettext as _
-
 from dateutil.relativedelta import relativedelta
+from django.utils.translation import gettext as _
 from zgw_consumers.api_models.base import Model, ZGWModel
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 
@@ -173,7 +172,7 @@ class ZaakType(ZGWModel):
     # besluittypen: list
 
     begin_geldigheid: Optional[date] = None
-    einde_geldigheid: Optional[date] = None
+    # einde_geldigheid: Optional[date] = None
     versiedatum: Optional[date] = None
     concept: Optional[bool] = None
 
