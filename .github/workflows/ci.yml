@@ -134,9 +134,7 @@ jobs:
           - chromium
           - firefox
           - webkit
-          # Currently failing due to a presumed false-positive: disabled until we can
-          # properly investigate. See #3125.
-          # - msedge
+          - msedge
 
     name: End-to-end tests, ${{ matrix.browser }}
 
