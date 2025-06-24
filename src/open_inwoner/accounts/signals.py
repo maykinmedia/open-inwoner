@@ -2,6 +2,7 @@ import logging
 
 from django.contrib import messages
 from django.contrib.auth.signals import user_logged_in, user_logged_out
+from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django.urls import reverse
 from django.utils.translation import gettext as _
@@ -170,3 +171,12 @@ def log_user_login(sender, user, request, *args, **kwargs):
 def log_user_logout(sender, user, request, *args, **kwargs):
     if user:
         user_action(request, user, MESSAGE_TYPE["logout"])
+
+
+@receiver(pre_save, sender=User)
+def save_previous_login(sender, instance, update_fields, **kwargs):
+    """Save previous `last_login` value"""
+
+    if update_fields and "last_login" in update_fields:
+        old_instance = User.objects.get(id=instance.id)
+        instance.previous_login = old_instance.last_login
