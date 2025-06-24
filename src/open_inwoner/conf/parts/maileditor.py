@@ -1,13 +1,12 @@
-import os
 from datetime import date
+from pathlib import Path
 
 from django.utils.translation import gettext_lazy as _
 
 
-def _readfile(name):
-    p = os.path.join(os.path.dirname(__file__), name)
-    with open(p) as f:
-        return f.read()
+def _readfile(name: str) -> str:
+    p = Path(__file__).parent / name
+    return p.read_text()
 
 
 # mail-editor
@@ -42,7 +41,9 @@ MAIL_EDITOR_CONF = {
             {"name": "email", "description": _("Email of the invited user")},
             {
                 "name": "contact_page",
-                "description": _("The link to an existing contactpage"),
+                "description": _(
+                    "Link to contact page configured in Site Configuration"
+                ),
             },
             {
                 "name": "contact_phonenumber",
@@ -84,7 +85,9 @@ MAIL_EDITOR_CONF = {
             {"name": "email", "description": _("Email of the receiver user")},
             {
                 "name": "contact_page",
-                "description": _("The link to an existing contactpage"),
+                "description": _(
+                    "Link to contact page configured in Site Configuration"
+                ),
             },
             {
                 "name": "contact_phonenumber",
@@ -131,7 +134,9 @@ MAIL_EDITOR_CONF = {
             },
             {
                 "name": "contact_page",
-                "description": _("The link to an existing contactpage"),
+                "description": _(
+                    "Link to contact page configured in Site Configuration"
+                ),
             },
             {
                 "name": "contact_phonenumber",
@@ -174,7 +179,9 @@ MAIL_EDITOR_CONF = {
             },
             {
                 "name": "contact_page",
-                "description": _("The link to an existing contactpage"),
+                "description": _(
+                    "Link to contact page configured in Site Configuration"
+                ),
             },
             {
                 "name": "contact_phonenumber",
@@ -217,7 +224,9 @@ MAIL_EDITOR_CONF = {
             },
             {
                 "name": "contact_page",
-                "description": _("The link to an existing contactpage"),
+                "description": _(
+                    "Link to contact page configured in Site Configuration"
+                ),
             },
             {
                 "name": "contact_phonenumber",
@@ -264,7 +273,9 @@ MAIL_EDITOR_CONF = {
             },
             {
                 "name": "contact_page",
-                "description": _("The link to an existing contactpage"),
+                "description": _(
+                    "Link to contact page configured in Site Configuration"
+                ),
             },
             {
                 "name": "contact_phonenumber",
@@ -328,7 +339,9 @@ MAIL_EDITOR_CONF = {
             },
             {
                 "name": "contact_page",
-                "description": _("The link to an existing contactpage"),
+                "description": _(
+                    "Link to contact page configured in Site Configuration"
+                ),
             },
             {
                 "name": "contact_phonenumber",
@@ -394,7 +407,9 @@ MAIL_EDITOR_CONF = {
             },
             {
                 "name": "contact_page",
-                "description": _("The link to an existing contactpage"),
+                "description": _(
+                    "Link to contact page configured in Site Configuration"
+                ),
             },
             {
                 "name": "contact_phonenumber",
@@ -453,7 +468,9 @@ MAIL_EDITOR_CONF = {
             },
             {
                 "name": "contact_page",
-                "description": _("The link to an existing contactpage"),
+                "description": _(
+                    "Link to contact page configured in Site Configuration"
+                ),
             },
             {
                 "name": "contact_phonenumber",
