@@ -2,7 +2,7 @@
 
 {% if href %}
     <a
-        class="{{ classes }}"
+        class="utrecht-link-button {{ classes }}"
         href="{{ href }}"
         title="{% firstof title text %}"
         aria-label="{% firstof text title %}"
@@ -23,7 +23,7 @@
     </a>
 {% else %}
     <button
-        class="{{ classes }}"
+        class="utrecht-button {{ classes }}"
         type="{{ type }}"
         name="{{ name }}"
         value="{{ value }}"
