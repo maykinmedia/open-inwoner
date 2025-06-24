@@ -42,7 +42,9 @@ MAIL_EDITOR_CONF = {
             {"name": "email", "description": _("Email of the invited user")},
             {
                 "name": "contact_page",
-                "description": _("The link to an existing contactpage"),
+                "description": _(
+                    "Link to contact page configured in Site Configuration"
+                ),
             },
             {
                 "name": "contact_phonenumber",
@@ -84,7 +86,9 @@ MAIL_EDITOR_CONF = {
             {"name": "email", "description": _("Email of the receiver user")},
             {
                 "name": "contact_page",
-                "description": _("The link to an existing contactpage"),
+                "description": _(
+                    "Link to contact page configured in Site Configuration"
+                ),
             },
             {
                 "name": "contact_phonenumber",
@@ -131,7 +135,9 @@ MAIL_EDITOR_CONF = {
             },
             {
                 "name": "contact_page",
-                "description": _("The link to an existing contactpage"),
+                "description": _(
+                    "Link to contact page configured in Site Configuration"
+                ),
             },
             {
                 "name": "contact_phonenumber",
@@ -174,7 +180,9 @@ MAIL_EDITOR_CONF = {
             },
             {
                 "name": "contact_page",
-                "description": _("The link to an existing contactpage"),
+                "description": _(
+                    "Link to contact page configured in Site Configuration"
+                ),
             },
             {
                 "name": "contact_phonenumber",
@@ -217,7 +225,9 @@ MAIL_EDITOR_CONF = {
             },
             {
                 "name": "contact_page",
-                "description": _("The link to an existing contactpage"),
+                "description": _(
+                    "Link to contact page configured in Site Configuration"
+                ),
             },
             {
                 "name": "contact_phonenumber",
@@ -264,7 +274,9 @@ MAIL_EDITOR_CONF = {
             },
             {
                 "name": "contact_page",
-                "description": _("The link to an existing contactpage"),
+                "description": _(
+                    "Link to contact page configured in Site Configuration"
+                ),
             },
             {
                 "name": "contact_phonenumber",
@@ -328,7 +340,9 @@ MAIL_EDITOR_CONF = {
             },
             {
                 "name": "contact_page",
-                "description": _("The link to an existing contactpage"),
+                "description": _(
+                    "Link to contact page configured in Site Configuration"
+                ),
             },
             {
                 "name": "contact_phonenumber",
@@ -394,7 +408,9 @@ MAIL_EDITOR_CONF = {
             },
             {
                 "name": "contact_page",
-                "description": _("The link to an existing contactpage"),
+                "description": _(
+                    "Link to contact page configured in Site Configuration"
+                ),
             },
             {
                 "name": "contact_phonenumber",
@@ -453,7 +469,9 @@ MAIL_EDITOR_CONF = {
             },
             {
                 "name": "contact_page",
-                "description": _("The link to an existing contactpage"),
+                "description": _(
+                    "Link to contact page configured in Site Configuration"
+                ),
             },
             {
                 "name": "contact_phonenumber",
