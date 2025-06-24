@@ -84,15 +84,16 @@ export class FileInput extends Component {
    * @return {HTMLDivElement}
    */
   getFormNonFieldError() {
-    return document.querySelector('.non-field-error')
+    return this.node.closest('form')?.querySelector('.non-field-error')
   }
 
   /**
-   * Returns the submit button of the form
-   * @return {HTMLDivElement}
+   * Returns the submit button of the nearest parent form.
+   * This supports usage in multiple forms (e.g., #document-upload, and any other ID).
+   * @return {HTMLButtonElement}
    */
   getFormSubmitButton() {
-    return document.querySelector('#document-upload .button[type="submit"]')
+    return this.node.closest('form')?.querySelector('.button[type="submit"]')
   }
 
   /**
@@ -123,7 +124,7 @@ export class FileInput extends Component {
    */
   unbindEvents() {
     this.node.removeEventListener('change', this.boundRender)
-    this.getCard().removeEventListener('dragenter', this.boundOnDragLeave)
+    this.getCard().removeEventListener('dragenter', this.boundOnDragEnter)
     this.getCard().removeEventListener('dragover', this.boundNoop)
     this.getCard().removeEventListener('dragleave', this.boundOnDragLeave)
     this.getCard().removeEventListener('drop', this.boundOnDrop)
@@ -188,6 +189,7 @@ export class FileInput extends Component {
         const input = this.getInput()
 
         // Use filter, not splice
+        // to let users remove individual files before submitting the form.
         const files = Array.from(input.files).filter((_, i) => i !== index)
 
         this.addFiles(files, true)
@@ -216,17 +218,21 @@ export class FileInput extends Component {
     const input = this.getInput()
     const dataTransfer = new DataTransfer()
     // Ensure the previously selected files are added as well
+    const isMultiple = input.multiple
 
     let _files
-    if (removeCurrent) {
-      _files = input.multiple ? [...files] : [files[0]]
+    if (!isMultiple) {
+      // Single upload: keep only the latest selected file.
+      _files = files.length ? [files[files.length - 1]] : []
+    } else if (removeCurrent) {
+      // Replace current files with new list of files, for example: when deleting.
+      _files = [...files]
     } else {
-      _files = input.multiple
-        ? [...input.files, ...files]
-        : [...input.files, files[0]]
+      // Append new files to the existing one, because input.files is a read-only object.
+      _files = [...input.files, ...files]
     }
 
-    _files.filter((v) => v).forEach((file) => dataTransfer.items.add(file))
+    _files.filter(Boolean).forEach((file) => dataTransfer.items.add(file))
     input.files = dataTransfer.files
     this.files = _files
   }
@@ -244,7 +250,13 @@ export class FileInput extends Component {
     // overwrite the previously selected files, so the previously selected files need to
     // be stored and joined with the newly uploaded files, to avoid the selection from being overwritten
     if (e && e.type === 'change') {
-      files = [...(this.files || []), ...files]
+      if (this.getInput().multiple) {
+        // Combine previously selected files with the new ones
+        files = [...(this.files || []), ...files]
+      } else {
+        // For single file input, use the new selection (overwrite any old file)
+        files = [...files]
+      }
       this.addFiles(files, true)
     }
 
@@ -299,7 +311,7 @@ export class FileInput extends Component {
               }</span>
             </div>
             <div class="file__data">
-              <span class="file__name">${name} (${ext}, ${sizeMB}MB)</span>
+              <span class="file__name">${name} <span class="file__extension">(${ext}</span>, <span class="file__size">${sizeMB}MB)</span></span>
             </div>
             <a class="link link--primary file__download file__delete" href="#document-upload" role="button" aria-label="${labelDelete}">
               <span aria-hidden="true" class="material-icons-outlined">delete</span>

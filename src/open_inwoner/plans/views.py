@@ -1,5 +1,6 @@
 from datetime import date
 
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
@@ -15,7 +16,7 @@ from cms.apphook_pool import apphook_pool
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.choices import ContactTypeChoices
-from open_inwoner.accounts.forms import ActionListForm, DocumentForm
+from open_inwoner.accounts.forms import ActionListForm
 from open_inwoner.accounts.models import User
 from open_inwoner.accounts.views.actions import (
     ActionCreateView,
@@ -25,6 +26,7 @@ from open_inwoner.accounts.views.actions import (
     ActionUpdateView,
     BaseActionFilter,
 )
+from open_inwoner.plans.forms import PlanFileUploadForm
 from open_inwoner.userfeed import hooks
 from open_inwoner.utils.logentry import get_change_message
 from open_inwoner.utils.mixins import ExportMixin
@@ -221,6 +223,7 @@ class PlanDetailView(
         obj = self.object
         user = self.request.user
         context = super().get_context_data(**kwargs)
+        self.object.refresh_from_db()
 
         context["contact_users"] = obj.get_other_users(user)
         context["is_creator"] = user == obj.created_by
@@ -457,11 +460,11 @@ class PlanFileUploadView(
     BaseBreadcrumbMixin,
     UpdateView,
 ):
-    template_name = "pages/plans/file.html"
+    template_name = "pages/plans/file_upload_form.html"
     model = Plan
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
-    form_class = DocumentForm
+    form_class = PlanFileUploadForm
 
     @cached_property
     def crumbs(self):
@@ -481,20 +484,34 @@ class PlanFileUploadView(
         return Plan.objects.connected(self.request.user)
 
     def get_form_kwargs(self):
-        """Return the keyword arguments for instantiating the form."""
         kwargs = super().get_form_kwargs()
         kwargs.update({"instance": None})
         return kwargs
 
     def form_valid(self, form):
-        object = self.get_object()
-        form.save(self.request.user, plan=self.object)
+        """
+        After successful upload: save the Document, log user action, redirect back to Plan-detail page
+        """
+        plan = self.get_object()
+        form.save(self.request.user, plan=plan)
+        self.log_user_action(plan, _("file was uploaded"))
 
-        self.log_user_action(object, _("file was uploaded"))
+        messages.success(
+            self.request,
+            _("Bestand voor samenwerkingsplan is succesvol geüpload."),
+            extra_tags="local_message",
+        )
+
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self) -> str:
         return self.object.get_absolute_url()
+
+    def get_template_names(self):
+        """
+        HTMX GET returns full form template.
+        """
+        return [self.template_name]
 
 
 class PlanNoteEditView(

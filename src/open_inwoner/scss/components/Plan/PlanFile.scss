@@ -1,9 +1,3 @@
-#document-create {
-  /// Make required asterisk visible for this component
-  .label__label--required {
-    color: var(--color-red-notification);
-    padding-left: var(--spacing-tiny);
-    //make asterisks invisible by default, only make them visible if component has the caption
-    display: inline;
-  }
+.plan .file-input-form .form__actions--fullwidth {
+  max-width: min-content;
 }

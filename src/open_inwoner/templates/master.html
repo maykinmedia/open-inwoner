@@ -146,7 +146,7 @@
                         <p class="utrecht-paragraph">{{ footer.logo_title|linebreaksbr }}</p>
                     </div>
                 {% endif %}
-                {% if footer.logo %}
+                {% if footer.logo and footer.logo.url %}
                     <div class="footer__logo">
                         {% firstof footer.logo.default_alt_text config.name as footer_logo_alt_text %}
                         {% include "components/Logo/Logo.html" with src=footer.logo.url alt=footer_logo_alt_text href=footer.logo_url svg_height=60 only %}

@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n button_tags card_tags map_tags utils icon_tags file_tags action_tags dropdown_tags anchor_menu_tags %}
+{% load i18n button_tags card_tags map_tags utils icon_tags file_tags action_tags dropdown_tags anchor_menu_tags notification_tags %}
 
 {% block sidebar_content %}
     {% anchor_menu anchors=anchors desktop=True export_button=True %}
@@ -10,6 +10,9 @@
     <h1 class="utrecht-heading-1" id="title">
         {{ object.title }}
     </h1>
+    <div class="document-upload-notification">
+        {% notifications messages show_local_messages=True closable=True %}
+    </div>
 
     <aside class="dashboard plan-contact" aria-label="Dashboard">
         <ul class="dashboard__list">
@@ -80,12 +83,27 @@
                 {% if object.get_other_files %}
                     {% file_table files=object.get_other_files download_view="profile:documents_download" %}
                 {% endif %}
+            {% else %}
+                <p>{% trans "No files uploaded yet." %}</p>
             {% endif %}
         </div>
         <div class="plan__upload-document">
             <h3 class="utrecht-heading-3" id="files">{% trans "Upload een nieuwe versie" %}</h3>
-            {# TODO: replace with upload component #}
-            {% button href="collaborate:plan_add_file" uuid=object.uuid text=_("Upload bestand") primary=True %}
+
+            <div id="form_upload_wrapper">
+                <div id="form_upload"
+                     hx-get="{% url 'collaborate:plan_add_file' uuid=object.uuid %}"
+                     hx-target="#form_upload"
+                     hx-swap="outerHTML"
+                     hx-trigger="revealed">
+                    <div class="loader-container" id="spinner-container">
+                        <div class="spinner" id="spinner-id">
+                            {% icon icon="rotate_right" extra_classes="spinner-icon rotate" %}
+                            <div class="spinner__content" role="status"><p class="utrecht-paragraph--small">{% trans "Gegevens laden..." %}</p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 

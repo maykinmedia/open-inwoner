@@ -113,10 +113,9 @@ class TestPlans(WebTest):
         form = self.app.get(
             reverse("collaborate:plan_add_file", kwargs={"uuid": self.plan.uuid}),
             user=self.user,
-        ).forms["document-create"]
+        ).forms["document-upload"]
 
         form["file"] = Upload("readme.xlsx", b"data", "application/vnd.ms-excel")
-        form["name"] = "readme"
         form.submit()
         log_entry = TimelineLog.objects.filter(object_id=self.plan.id).last()
 

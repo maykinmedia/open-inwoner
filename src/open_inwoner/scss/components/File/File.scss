@@ -16,6 +16,7 @@
 
   &__symbol {
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     background-color: var(--color-gray-lightest);
     margin: 0;
@@ -30,21 +31,17 @@
 
   &__data {
     display: flex;
+    flex-shrink: 1;
+    flex-grow: 1;
     flex-direction: column;
     font-family: var(--font-family-body);
     line-height: var(--spacing-extra-large);
     padding: var(--spacing-large);
     margin: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
     width: 100%;
 
     .file__name {
-      margin: 0;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      overflow: hidden;
+      display: block;
     }
 
     .file__extension,
@@ -60,6 +57,7 @@
   }
 
   .file__download {
+    flex-shrink: 0;
     margin-left: auto;
   }
 
@@ -86,6 +84,7 @@
 
   &__file + .file__data {
     margin-top: var(--spacing-small);
+    min-width: 0;
   }
 
   &__file--recent {

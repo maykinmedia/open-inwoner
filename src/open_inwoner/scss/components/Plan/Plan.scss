@@ -13,7 +13,6 @@
     }
 
     .button {
-      margin-bottom: var(--row-height);
       margin-top: var(--spacing-medium);
     }
   }
@@ -74,5 +73,11 @@
     > .utrecht-paragraph {
       margin-top: var(--spacing-large);
     }
+  }
+
+  .loader-container {
+    height: (var(--spacing-mega));
+    margin-top: var(--spacing-extra-large);
+    margin-bottom: var(--spacing-extra-large);
   }
 }

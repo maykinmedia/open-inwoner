@@ -4,22 +4,39 @@
     {% render_card direction="vertical" %}
         {% icon icon="upload" icon_position="before" outlined=True extra_classes="icon--large" %}
         <input class="file-input__input" id="{{ field.auto_id }}" name="file" type="file"{% if field.field.required %} required{% endif %}{% if multiple %} multiple{% endif %} data-max-size="{{ max_upload_size }}" data-file-types="{{ allowed_file_extensions }}" />
+        {#  NOTE: The 'name' attribute of file input fields should be consistent with the key of form logic. #}
+        {#  TODO: change into name="{{ field.html_name }}" #}
         <label class="button button--primary file-input__label-empty" for="{{ field.auto_id }}">
-            {% if multiple %}{% trans 'Sleep of selecteer bestanden' %}{% else %}{% trans 'Sleep of selecteer bestand' %}{% endif %}
+            {{ empty_label }}
         </label>
         <label class="button button--borderless file-input__label-selected" for="{{ field.auto_id }}">
-        {% icon icon="add_circle_outlined" icon_position="before" outlined=True %}
-            {% if multiple %}{% trans 'Selecteer meer bestanden' %}{% else %}{% trans 'Selecteer ander bestand' %}{% endif %}
+            {% icon icon="add_circle_outlined" icon_position="before" outlined=True %}
+            {{ selected_label }}
         </label>
     {% endrender_card %}
 
-    {% if field.help_text %}<p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--small utrecht-paragraph--oip-centered">{{ field.help_text }}</p>{% endif %}
-    {% if field.errors %}{% errors errors=field.errors %}{% endif %}
+    {% if field.help_text %}
+        <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--small utrecht-paragraph--oip-centered">
+            {{ field.help_text }}
+        </p>
+    {% endif %}
 
-    {% form_actions primary_text=_("Upload documenten") enctype="multipart/form-data" fullwidth=True %}
+    {% if field.errors %}
+        {% errors errors=field.errors %}
+    {% endif %}
+
+    {% if multiple %}
+        {% form_actions primary_text=_("Upload documenten") enctype="multipart/form-data" fullwidth=True %}
+    {% else %}
+        {% form_actions primary_text=_("Upload document") enctype="multipart/form-data" fullwidth=True %}
+    {% endif %}
 
     <div class="file-list" aria-live="polite">
-        <div class="file-list-selection" hidden><h4 class="utrecht-heading-3 file-list-selection__heading">{% if multiple %}{% trans 'Geselecteerde bestanden' %}{% else %}{% trans 'Geselecteerd bestand' %}{% endif %}</h4></div>
+        <div class="file-list-selection" hidden>
+            <h4 class="utrecht-heading-3 file-list-selection__heading">
+                {{ selected_heading }}
+            </h4>
+        </div>
         <ul class="file-list__list" aria-live="polite" data-label-delete="{% trans 'Verwijderen' %}"></ul>
     </div>
 </div>

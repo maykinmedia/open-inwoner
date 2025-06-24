@@ -20,7 +20,7 @@ import './autocomplete'
 import './autosumbit'
 import './cases'
 import { DisableContactFormButton } from './form/DisableContactFormButton'
-import { DisableSubmitButton } from './cases/document_upload'
+import { DisableSubmitButton } from './form/DisableSubmitButton'
 import './confirmation'
 import './contacts'
 import { CookieBanner } from './cookie-consent'
@@ -80,7 +80,11 @@ let activeElements = []
 
 function wrapComponentsOf(targetElement) {
   console.debug(['wrapComponentsOf', targetElement])
-  if (targetElement === document.body) {
+  // Only skip if it's a full page load (not an HTMX request)
+  if (
+    targetElement === document.body &&
+    !document.body.hasAttribute('hx-boosted')
+  ) {
     // htmx:load also triggers for regular window onload (although the language in the document doesn't mention it)
     // so components get multiple initialisations if they also self-initialize in their own file, and
     // this is not caught by the activeElements check because the initial initialisation is not visible here
