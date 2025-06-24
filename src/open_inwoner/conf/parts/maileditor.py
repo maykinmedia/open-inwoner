@@ -1,13 +1,12 @@
-import os
 from datetime import date
+from pathlib import Path
 
 from django.utils.translation import gettext_lazy as _
 
 
-def _readfile(name):
-    p = os.path.join(os.path.dirname(__file__), name)
-    with open(p) as f:
-        return f.read()
+def _readfile(name: str) -> str:
+    p = Path(__file__).parent / name
+    return p.read_text()
 
 
 # mail-editor
