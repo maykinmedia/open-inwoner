@@ -243,6 +243,7 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "notifications_actions_enabled",
                     "email_verification_required",
                     "contact_phonenumber",
+                    "contact_page",
                     "recipients_email_digest",
                 )
             },
