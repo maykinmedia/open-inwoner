@@ -122,3 +122,4 @@ class CMSPageDocument(Document):
     class Django:
         model = Page
         auto_refresh = False
+        ignore_signals = True
