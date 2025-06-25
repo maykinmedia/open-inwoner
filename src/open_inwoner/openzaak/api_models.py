@@ -208,7 +208,7 @@ class InformatieObject(ZGWModel):
     titel: str
     vertrouwelijkheidaanduiding: str
     auteur: str
-    status: str
+    status: Optional[str] = ""
     formaat: str
     taal: str
     versie: int

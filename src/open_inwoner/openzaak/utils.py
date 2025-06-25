@@ -1,10 +1,13 @@
 import logging
 
-from zgw_consumers.api_models.constants import RolTypes, VertrouwelijkheidsAanduidingen
+from zgw_consumers.api_models.constants import (RolTypes,
+                                                VertrouwelijkheidsAanduidingen)
 
-from open_inwoner.openzaak.api_models import InformatieObject, Rol, Zaak, ZaakType
+from open_inwoner.openzaak.api_models import (InformatieObject, Rol, Zaak,
+                                              ZaakType)
 
-from .models import OpenZaakConfig, ZaakTypeConfig, ZaakTypeInformatieObjectTypeConfig
+from .models import (OpenZaakConfig, ZaakTypeConfig,
+                     ZaakTypeInformatieObjectTypeConfig)
 
 logger = logging.getLogger(__name__)
 
@@ -43,13 +46,13 @@ def is_info_object_visible(
     We check on its definitive or archived status, and a maximum confidentiality
     level (compared the ordering from the VertrouwelijkheidsAanduidingen.choices)
     """
-    if info_object.status not in ["definitief", "gearchiveerd"]:
-        logger.info(
-            "Ignoring informatieobject %s as not visible for user: status is neither "
-            "'definitief' nor 'gearchiveerd'",
-            info_object.url,
-        )
-        return False
+    #    if info_object.status not in ["definitief", "gearchiveerd"]:
+    #        logger.info(
+    #            "Ignoring informatieobject %s as not visible for user: status is neither "
+    #            "'definitief' nor 'gearchiveerd'",
+    #            info_object.url,
+    #        )
+    #        return False
 
     return is_object_visible(info_object, max_confidentiality_level)
 

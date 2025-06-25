@@ -7,23 +7,15 @@ from typing import Iterable, Protocol, cast
 
 from django.conf import settings
 from django.contrib import messages
-from django.core.exceptions import (
-    ImproperlyConfigured,
-    ObjectDoesNotExist,
-    PermissionDenied,
-)
-from django.http import (
-    Http404,
-    HttpRequest,
-    HttpResponseRedirect,
-    StreamingHttpResponse,
-)
+from django.core.exceptions import (ImproperlyConfigured, ObjectDoesNotExist,
+                                    PermissionDenied)
+from django.http import (Http404, HttpRequest, HttpResponseRedirect,
+                         StreamingHttpResponse)
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import FormView, TemplateView
-
 from django_htmx.http import HttpResponseClientRedirect
 from mail_editor.helpers import find_template
 from requests import RequestException
@@ -33,32 +25,24 @@ from zgw_consumers.api_models.constants import RolOmschrijving
 from open_inwoner.accounts.models import User
 from open_inwoner.mail.service import send_contact_confirmation_mail
 from open_inwoner.openklant.constants import KlantenServiceType
-from open_inwoner.openklant.models import (
-    ESuiteKlantConfig,
-    KlantenSysteemConfig,
-    OpenKlant2Config,
-)
-from open_inwoner.openklant.services import (
-    OpenKlant2Service,
-    Question,
-    eSuiteKlantenService,
-    eSuiteVragenService,
-)
+from open_inwoner.openklant.models import (ESuiteKlantConfig,
+                                           KlantenSysteemConfig,
+                                           OpenKlant2Config)
+from open_inwoner.openklant.services import (OpenKlant2Service, Question,
+                                             eSuiteKlantenService,
+                                             eSuiteVragenService)
 from open_inwoner.openzaak.api_models import Status, StatusType, Zaak
 from open_inwoner.openzaak.clients import CatalogiClient, ZakenClient
 from open_inwoner.openzaak.documents import (
     fetch_single_information_object_from_url,
-    fetch_single_information_object_uuid,
-)
-from open_inwoner.openzaak.models import (
-    OpenZaakConfig,
-    ZaakTypeConfig,
-    ZaakTypeInformatieObjectTypeConfig,
-    ZaakTypeResultaatTypeConfig,
-    ZaakTypeStatusTypeConfig,
-    ZGWApiGroupConfig,
-)
-from open_inwoner.openzaak.utils import get_role_name_display, is_info_object_visible
+    fetch_single_information_object_uuid)
+from open_inwoner.openzaak.models import (OpenZaakConfig, ZaakTypeConfig,
+                                          ZaakTypeInformatieObjectTypeConfig,
+                                          ZaakTypeResultaatTypeConfig,
+                                          ZaakTypeStatusTypeConfig,
+                                          ZGWApiGroupConfig)
+from open_inwoner.openzaak.utils import (get_role_name_display,
+                                         is_info_object_visible)
 from open_inwoner.userfeed import hooks
 from open_inwoner.utils.glom import glom_multiple
 from open_inwoner.utils.time import has_new_elements
@@ -83,7 +67,8 @@ class VragenService(Protocol):
         self,
         zaak: Zaak,
         user: User | None = None,
-    ) -> Iterable[Question]: ...
+    ) -> Iterable[Question]:
+        ...
 
 
 class OuterCaseDetailView(
@@ -286,7 +271,7 @@ class InnerCaseDetailView(
             context["case"] = {
                 "id": str(self.case.uuid),
                 "identification": self.case.identification,
-                "initiator": self.get_initiator_display(self.case, zaken_client),
+                "initiator": "initiator",  # self.get_initiator_display(self.case, zaken_client),
                 "result": result_data.get("display", ""),
                 "result_description": result_data.get("description", ""),
                 "start_date": self.case.startdatum,
@@ -973,9 +958,9 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
             send_confirmation = False
 
             if klant_config.register_contact_email:
-                form.cleaned_data["question"] += (
-                    f"\n\nCase number: {self.case.identificatie}"
-                )
+                form.cleaned_data[
+                    "question"
+                ] += f"\n\nCase number: {self.case.identificatie}"
                 email_success = self.register_by_email(
                     form, klant_config.register_contact_email
                 )
