@@ -30,10 +30,13 @@
                         </li>
                     {% endif %}
 
-                    {% if user.is_eherkenning_user and not session_is_branch_restricted %}
-                    <li class="header__list-item">
-                        {% link text=_("Wissel van vestiging") href="kvk:branches" icon="autorenew" icon_position="before" primary=True icon_outlined=True %}
-                    </li>
+                    {% if user.is_eherkenning_user %}
+                        {% session_is_branch_restricted as is_branch_restricted %}
+                        {% if not is_branch_restricted %}
+                        <li class="header__list-item">
+                            {% link text=_("Wissel van vestiging") href="kvk:branches" icon="autorenew" icon_position="before" primary=True icon_outlined=True %}
+                        </li>
+                        {% endif %}
                     {% endif %}
                     <li class="header__list-item">
                         {% link text=_("Logout") href=request.user.get_logout_url icon="logout" icon_position="before" primary=True %}
