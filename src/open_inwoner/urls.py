@@ -113,7 +113,6 @@ urlpatterns = [
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     # Views
     path("accounts/", include("open_inwoner.accounts.urls", namespace="accounts")),
-    path("pages/", include("django.contrib.flatpages.urls"), name="flatpages"),
     path("sitemap/", sitemap, name="sitemap"),
     path("mail-editor/", include("mail_editor.urls", namespace="mail_editor")),
     path(

@@ -1,7 +1,6 @@
 import os
 
 from django.conf import settings
-from django.contrib.flatpages.models import FlatPage
 from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.db.models.signals import post_save
@@ -291,9 +290,9 @@ class SiteConfiguration(SingletonModel):
         help_text=_("Image to use as favicon"),
         validators=[FilerExactImageSizeValidator(32, 32)],
     )
-    flatpages = models.ManyToManyField(
-        FlatPage,
-        verbose_name=_("Flatpages"),
+    cms_pages = models.ManyToManyField(
+        "cms.Page",
+        verbose_name=_("CMS pages"),
         through="SiteConfigurationPage",
         null=True,
         blank=True,
@@ -663,9 +662,11 @@ class SiteConfiguration(SingletonModel):
     def get_accent_color(self):
         return hex_to_hsl(self.accent_color)
 
-    @property
-    def get_ordered_flatpages(self):
-        return self.flatpages.order_by("ordered_flatpages")
+    def get_ordered_cms_pages(self):
+        return [
+            page.publisher_public
+            for page in self.cms_pages.order_by("ordered_cms_pages")
+        ]
 
     @property
     def google_enabled(self):
@@ -861,10 +862,11 @@ class SiteConfigurationPage(OrderedModel):
         related_name="ordered_configurations",
         on_delete=models.CASCADE,
     )
-    flatpage = models.ForeignKey(
-        FlatPage,
-        verbose_name=_("Flatpage"),
-        related_name="ordered_flatpages",
+    cms_page = models.ForeignKey(
+        "cms.Page",
+        verbose_name=_("Footer CMS Page"),
+        related_name="ordered_cms_pages",
+        null=True,
         on_delete=models.CASCADE,
     )
     order_with_respect_to = "configuration"
@@ -872,8 +874,10 @@ class SiteConfigurationPage(OrderedModel):
     objects = OrderedModelManager()
 
     class Meta(OrderedModel.Meta):
-        verbose_name = _("Flatpage in the footer")
-        verbose_name_plural = _("Flatpages in the footer")
+        verbose_name = _("CMS page in the footer")
+        verbose_name_plural = _("CMS pages in the footer")
 
     def __str__(self):
-        return self.flatpage.title
+        if self.cms_page:
+            return self.cms_page.get_title()
+        return ""
