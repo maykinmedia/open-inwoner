@@ -1033,3 +1033,161 @@ class ContactFormIntegrationTest(
                 else:
                     mock_send_confirm.assert_not_called()
                 mock_send_confirm.reset_mock()
+
+    def test_register_contactmoment_for_user_without_bsn_kvk_via_openklant2(
+        self, m, mock_captcha, mock_send_confirm
+    ):
+        """Test that users without BSN/KVK can register via OpenKlant2 by creating partij without identificatoren"""
+        MockAPICreateData.setUpServices()
+
+        # Create user without BSN/KVK
+        user = UserFactory(
+            bsn="",
+            kvk="",
+            email="test@example.com",
+            phonenumber="0612345678",
+            first_name="Test",
+            last_name="User",
+        )
+
+        config_data = MockAPICreateData()
+        config_data.install_mocks_openklant_no_bsn_kvk(m)
+
+        OpenKlant2ConfigFactory()
+
+        config = KlantenSysteemConfig.get_solo()
+        config.primary_backend = KlantenServiceType.OPENKLANT2.value
+        config.register_contact_via_api = True
+        config.send_email_confirmation = True
+        config.save()
+
+        subject = ContactFormSubjectFactory(
+            subject="Aanvraag", esuite_subject_code=None
+        )
+
+        response = self.app.get(self.url, user=user)
+        form = response.forms["contactmoment-form"]
+        form["subject"].select(text=subject.subject)
+        form["question"] = "What?"
+
+        response = form.submit().follow()
+
+        # Should show success message and register via API
+        msgs = list(response.context["messages"])
+        self.assertEqual(len(msgs), 1)
+        self.assertEqual(str(msgs[0]), _("Vraag verstuurd!"))
+        self.assertEqual(msgs[0].level, messages.SUCCESS)
+
+        # Verify timeline log for API registration is created
+        log_dump = self.getTimelineLogDump()
+        self.assertIn("registered question via OpenKlant", log_dump)
+
+        # Verify all API calls were made
+        for matcher in config_data.matchers:
+            self.assertTrue(matcher.called, str(matcher._url))
+
+        # Verify partij creation data
+        partij_create_data = config_data.matchers[0].request_history[0].json()
+        self.assertEqual(
+            partij_create_data,
+            {
+                "digitaleAdressen": None,
+                "voorkeursDigitaalAdres": None,
+                "rekeningnummers": None,
+                "voorkeursRekeningnummer": None,
+                "indicatieGeheimhouding": False,
+                "indicatieActief": True,
+                "voorkeurstaal": "nld",
+                "soortPartij": "persoon",
+                "partijIdentificatie": {
+                    "contactnaam": {
+                        "voornaam": "Test",
+                        "achternaam": "User",
+                        "voorletters": "",
+                        "voorvoegselAchternaam": "",
+                    }
+                },
+            },
+        )
+
+        # Verify klantcontact creation data
+        klantcontact_create_data = config_data.matchers[1].request_history[0].json()
+        self.assertEqual(klantcontact_create_data["kanaal"], "oip_mijn_vragen")
+        self.assertEqual(klantcontact_create_data["onderwerp"], "Aanvraag")
+        self.assertEqual(klantcontact_create_data["inhoud"], "What?")
+        self.assertEqual(klantcontact_create_data["taal"], "nld")
+        self.assertEqual(klantcontact_create_data["vertrouwelijk"], False)
+        # Just verify that plaatsgevondenOp is present
+        self.assertIn("plaatsgevondenOp", klantcontact_create_data)
+
+        # Confirmation email should be sent
+        mock_send_confirm.assert_called_once_with(user.email, subject.subject)
+
+    def test_register_contactmoment_for_user_without_bsn_kvk_via_esuite(
+        self, m, mock_captcha, mock_send_confirm
+    ):
+        """Test that users without BSN/KVK can register via eSuite as anonymous contactmoment"""
+        MockAPICreateData.setUpServices()
+
+        # Create user without BSN/KVK
+        user = UserFactory(
+            bsn="",
+            kvk="",
+            email="test@example.com",
+            phonenumber="0612345678",
+            first_name="Test",
+            last_name="User",
+        )
+
+        config = KlantenSysteemConfig.get_solo()
+        config.primary_backend = KlantenServiceType.ESUITE.value
+        config.register_contact_via_api = True
+        config.send_email_confirmation = True
+        config.save()
+
+        esuite_config = ESuiteKlantConfig.get_solo()
+        esuite_config.register_bronorganisatie_rsin = "123456789"
+        esuite_config.register_type = "Melding"
+        esuite_config.register_employee_id = "FooVonBar"
+        esuite_config.save()
+
+        data = MockAPICreateData()
+        data.install_mocks_anon_without_klant(m)
+
+        subject = ContactFormSubjectFactory(
+            subject="Aanvraag document",
+            esuite_subject_code="afdeling-xyz",
+            esuite_config=esuite_config,
+        )
+
+        response = self.app.get(self.url, user=user)
+        form = response.forms["contactmoment-form"]
+        form["subject"].select(text=subject.subject)
+        form["question"] = "What's my status?"
+
+        response = form.submit().follow()
+
+        # Should show success message
+        msgs = list(response.context["messages"])
+        self.assertEqual(len(msgs), 1)
+        self.assertEqual(str(msgs[0]), _("Vraag verstuurd!"))
+        self.assertEqual(msgs[0].level, messages.SUCCESS)
+
+        # Verify contactmoment is created without klant (anonymous)
+        self.assertTrue(data.matchers[1].called_once)  # contactmoment creation
+        contactmoment_create_data = data.matchers[1].request_history[0].json()
+
+        # Should contain user info in the text since no klant was created
+        # The eSuite backend appends the user's display name to the message
+        self.assertIn("What's my status?", contactmoment_create_data["tekst"])
+        self.assertIn(
+            "Naam: Test", contactmoment_create_data["tekst"]
+        )  # The actual name format may include infix
+        self.assertEqual(contactmoment_create_data["type"], "Melding")
+        self.assertEqual(contactmoment_create_data["onderwerp"], "afdeling-xyz")
+
+        # Should not create klant since user has no BSN/KVK
+        self.assertFalse(data.matchers[0].called)  # klant creation should fail
+
+        self.assertTimelineLog("registered contactmoment via eSuite")
+        mock_send_confirm.assert_called_once_with(user.email, subject.subject)

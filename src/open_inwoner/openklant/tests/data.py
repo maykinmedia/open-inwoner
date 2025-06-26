@@ -733,6 +733,117 @@ class MockAPICreateData(MockAPIData):
             ),
         ]
 
+    def install_mocks_openklant_no_bsn_kvk(self, m):
+        """Mock OpenKlant2 API calls for users without BSN/KVK - creates partij without identificatoren"""
+        # No search is performed for users without BSN/KVK - they are created directly
+
+        # Mock partij creation without identificatoren
+        partij = {
+            "uuid": "7260ea01-12c0-4750-8fd1-dfa777818837",
+            "digitaleAdressen": [
+                {
+                    "uuid": "d1234567-89ab-cdef-0123-456789abcdef",
+                    "adres": "test@example.com",
+                    "soortDigitaalAdres": "email",
+                    "omschrijving": "E-mailadres",
+                    "verstrektDoorBetrokkene": {
+                        "uuid": "7260ea01-12c0-4750-8fd1-dfa777818837"
+                    },
+                }
+            ],
+            "voorkeursDigitaalAdres": {
+                "uuid": "d1234567-89ab-cdef-0123-456789abcdef",
+            },
+            "indicatieGeheimhouding": False,
+            "indicatieActief": True,
+            "voorkeurstaal": "nld",
+            "soortPartij": "persoon",
+            "partijIdentificatie": {
+                "contactnaam": {
+                    "voorletters": "T.",
+                    "voornaam": "Test",
+                    "achternaam": "User",
+                }
+            },
+        }
+
+        partij_create_matcher = m.post(
+            "http://localhost:8338/klantinteracties/api/v1/partijen",
+            headers={"Content-Type": "application/json"},
+            json=partij,
+            status_code=201,
+        )
+
+        # Mock klantcontact creation
+        klantcontact = {
+            "uuid": "095be615-a8ad-4c33-8e9c-c7612fbf6c9f",
+            "url": "http://example.com",
+            "nummer": "007",
+            "kanaal": "webformulier",
+            "onderwerp": "Aanvraag",
+            "inhoud": "What?",
+            "taal": "nl",
+            "vertrouwelijk": False,
+            "plaatsgevondenOp": "2019-08-24T14:15:22Z",
+        }
+
+        klantcontact_create_matcher = m.post(
+            "http://localhost:8338/klantinteracties/api/v1/klantcontacten",
+            headers={"Content-Type": "application/json"},
+            json=klantcontact,
+            status_code=201,
+        )
+
+        # Mock betrokkene creation
+        betrokkene = {
+            "uuid": "095be615-a8ad-4c33-8e9c-c7612fbf6c9f",
+            "url": "http://example.com",
+            "wasPartij": {
+                "uuid": "7260ea01-12c0-4750-8fd1-dfa777818837",
+                "url": "http://example.com",
+            },
+            "hadKlantcontact": {
+                "uuid": "095be615-a8ad-4c33-8e9c-c7612fbf6c9f",
+                "url": "http://example.com",
+            },
+            "rol": "belanghebbende",
+            "initiator": True,
+        }
+
+        betrokkene_create_matcher = m.post(
+            "http://localhost:8338/klantinteracties/api/v1/betrokkenen",
+            headers={"Content-Type": "application/json"},
+            json=betrokkene,
+            status_code=201,
+        )
+
+        # Mock interne taak creation
+        interne_taak = {
+            "uuid": "095be615-a8ad-4c33-8e9c-c7612fbf6c9f",
+            "url": "http://example.com",
+            "gevraagdeHandeling": "Beantwoord de vraag van de klant",
+            "aanleidinggevendKlantcontact": {
+                "uuid": klantcontact["uuid"],
+                "url": "http://example.com",
+            },
+            "status": "te_verwerken",
+            "toegewezenOp": "2019-08-24T14:15:22Z",
+        }
+
+        interne_taak_create_matcher = m.post(
+            "http://localhost:8338/klantinteracties/api/v1/internetaken",
+            headers={"Content-Type": "application/json"},
+            json=interne_taak,
+            status_code=201,
+        )
+
+        self.matchers = [
+            partij_create_matcher,
+            klantcontact_create_matcher,
+            betrokkene_create_matcher,
+            interne_taak_create_matcher,
+        ]
+
     def install_mocks_digid_missing_contact_info(self, m) -> "MockAPICreateData":
         self.matchers = [
             m.get(
