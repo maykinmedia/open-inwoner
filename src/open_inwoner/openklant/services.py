@@ -1032,43 +1032,8 @@ class OpenKlant2Service(
         partij = None
         created = False
 
-        if user.bsn:
-            if not (persoon := self.find_persoon_for_bsn(user.bsn)):
-                persoon = self.client.partij.create_persoon(
-                    data={
-                        "digitaleAdressen": None,
-                        "voorkeursDigitaalAdres": None,
-                        "rekeningnummers": None,
-                        "voorkeursRekeningnummer": None,
-                        "indicatieGeheimhouding": False,
-                        "indicatieActief": True,
-                        "voorkeurstaal": "nld",
-                        "soortPartij": "persoon",
-                        "partijIdentificatie": {
-                            "contactnaam": {
-                                "voornaam": user.first_name,
-                                "achternaam": user.last_name,
-                                "voorletters": "",
-                                "voorvoegselAchternaam": "",
-                            },
-                        },
-                        "partijIdentificatoren": [
-                            {
-                                "partijIdentificator": {
-                                    "codeObjecttype": "natuurlijk_persoon",
-                                    "codeSoortObjectId": "bsn",
-                                    "objectId": user.bsn,
-                                    "codeRegister": "brp",
-                                }
-                            }
-                        ],
-                    }
-                )
-                created = True
-
-            partij = persoon
-
-        elif user.kvk:
+        if user.kvk:
+            # User has KVK, create/find organisatie
             organisatie = self.find_organisatie_for_kvk_and_vestiging(
                 kvk=user.kvk,
                 vestigingsnummer=user.vestiging,
@@ -1158,9 +1123,53 @@ class OpenKlant2Service(
 
             partij = organisatie
 
-        if not partij:
-            logger.error("Unable to create OpenKlant2 partij for user")
-            return None, False
+        else:
+            # No KVK, always create/find persoon (regardless of BSN)
+            if user.bsn:  # noqa: SIM108
+                # Try to find existing persoon by BSN
+                persoon = self.find_persoon_for_bsn(user.bsn)
+            else:
+                # No BSN, can't find existing persoon
+                persoon = None
+
+            if not persoon:
+                # Create new persoon
+                partij_data = {
+                    "digitaleAdressen": None,
+                    "voorkeursDigitaalAdres": None,
+                    "rekeningnummers": None,
+                    "voorkeursRekeningnummer": None,
+                    "indicatieGeheimhouding": False,
+                    "indicatieActief": True,
+                    "voorkeurstaal": "nld",
+                    "soortPartij": "persoon",
+                    "partijIdentificatie": {
+                        "contactnaam": {
+                            "voornaam": user.first_name,
+                            "achternaam": user.last_name,
+                            "voorletters": "",
+                            "voorvoegselAchternaam": "",
+                        },
+                    },
+                }
+
+                # Only add identificatoren if user has BSN
+                if user.bsn:
+                    partij_data["partijIdentificatoren"] = [
+                        {
+                            "partijIdentificator": {
+                                "codeObjecttype": "natuurlijk_persoon",
+                                "codeSoortObjectId": "bsn",
+                                "objectId": user.bsn,
+                                "codeRegister": "brp",
+                            }
+                        }
+                    ]
+
+                persoon = self.client.partij.create_persoon(data=partij_data)
+                created = True
+
+            partij = persoon
 
         msg = (
             f"{'created' if created else 'retrieved'} partij {partij['uuid']} for user"
