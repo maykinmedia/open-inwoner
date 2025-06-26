@@ -23,7 +23,6 @@ U kunt het actieoverzicht sorteren op naam, creatiedatum en gebruiker. Dit doet 
 
 .. image:: images/ScreenshotOIPActiessorteren-Djuzz250311.png
    :width: 622px
-   :height: 111px
 
 Om vervolgens nog te sorteren op creatiedatum, klikt u ook op deze kolom. De lijst wordt dan gesorteerd op creatiedatum + naam. Wilt u op alle drie de kolommen sorteren, dan klikt u ook op de kolom gebruiker. De lijst is nu gesorteerd op creatiedatum + naam + gebruiker. Het is belangrijk te weten dat de nieuw aangeklikte kolom óver de al actieve sortering wordt gezet. De laatste kolom geldt in dat geval dus als ‘hoofd’. Om de voorwaarde voor de sortering te verwijderen, klikt u op het icoontje van de twee driehoekjes met de streep erdoor.
 
@@ -44,7 +43,6 @@ Onder documenten vindt u alle documenten die gebruikers aan de voorkant van Open
 
 .. image:: images/ScreenshotOIPdocumenten-Djuzz250311.png
    :width: 622px
-   :height: 113px
 
 
 4.3.1. Documentenoverzicht sorteren
@@ -65,7 +63,6 @@ In de backend is het overzicht van de feed item data te raadplegen. Er is inform
 
 .. image:: images/ScreenshotOIPfeeditemdata-Djuzz250311.png
    :width: 624px
-   :height: 274px
 
 
 4.5. Gebruikers
@@ -75,8 +72,6 @@ Onder gebruikers vindt u alle gebruikers van uw Open Inwoner. Indien gewenst kun
 
 .. image:: images/ScreenshotOIPgebruikers-Djuzz250311.png
    :width: 622px
-   :height: 176px
-
 
 4.5.1. Gebruikersoverzicht sorteren
 -----------------------------------
