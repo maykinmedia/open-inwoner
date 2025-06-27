@@ -214,6 +214,49 @@ class PartijGetOrCreateTestCase(Openklant2ServiceTestCase):
             ],
         )
 
+    def test_get_or_create_partij_for_user_without_bsn_kvk(self):
+        """Test that users without BSN/KVK get a persoon created without identificatoren"""
+        # Create user without BSN/KVK
+        user_without_ids = UserFactory(
+            first_name="Jane", last_name="Anonymous", bsn="", kvk=""
+        )
+
+        # Empty state
+        self.assertEqual(self.service.client.partij.list()["count"], 0)
+        self.assertEqual(self.service.client.partij_identificator.list()["count"], 0)
+
+        # First call creates persoon without identificatoren
+        partij, created = self.service.get_or_create_partij_for_user(user_without_ids)
+
+        self.assertTrue(created, "partij was retrieved (GET), expected create via POST")
+        self.assertIsNotNone(partij, "partij should always be created")
+
+        # Validate partij structure
+        PartijValidator.validate_python(partij)
+        self.assertEqual(partij["soortPartij"], "persoon")
+        self.assertEqual(
+            partij["partijIdentificatie"]["contactnaam"]["voornaam"], "Jane"
+        )
+        self.assertEqual(
+            partij["partijIdentificatie"]["contactnaam"]["achternaam"], "Anonymous"
+        )
+
+        # Check that partij was created but NO identificatoren
+        self.assertEqual(self.service.client.partij.list()["count"], 1)
+        self.assertEqual(
+            self.service.client.partij_identificator.list()["count"],
+            0,
+            "No identificatoren should be created when user has no BSN/KVK",
+        )
+
+        # Second call should retrieve the same partij (though without identificatoren,
+        # it will create a new one since find_persoon_for_bsn won't find it)
+        partij2, created2 = self.service.get_or_create_partij_for_user(user_without_ids)
+
+        # Since there's no BSN to search by, a new partij will be created each time
+        self.assertTrue(created2, "Without BSN/KVK, a new partij is created each call")
+        self.assertEqual(self.service.client.partij.list()["count"], 2)
+
 
 @tag("openklant2")
 class Openklant2ServiceTest(Openklant2ServiceTestCase):
