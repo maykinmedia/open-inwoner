@@ -617,7 +617,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         self, force_insert=False, force_update=False, using=None, update_fields=None
     ):
         if update_fields and "last_login" in update_fields:
-            update_fields.append("previous_login")
+            if not isinstance(update_fields, set):
+                update_fields = set(update_fields)
+
+            update_fields.add("previous_login")
 
         return super().save(
             force_insert, force_update, using, update_fields=update_fields
