@@ -533,6 +533,7 @@ SESSION_COOKIE_SECURE = IS_HTTPS
 SESSION_COOKIE_HTTPONLY = True
 
 CSRF_COOKIE_SECURE = IS_HTTPS
+CSRF_USE_SESSIONS = True  # Because cookie csrf makes pen testers uncomfortable
 CSRF_FAILURE_VIEW = "open_inwoner.accounts.views.csrf_failure"
 
 if IS_HTTPS:
