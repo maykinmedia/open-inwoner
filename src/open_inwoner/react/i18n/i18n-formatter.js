@@ -1,4 +1,5 @@
 const fs = require('fs')
+/** @type {{outFile: string}} */
 const argv = require('yargs').argv
 
 // load the existing catalog to prevent overwriting messages

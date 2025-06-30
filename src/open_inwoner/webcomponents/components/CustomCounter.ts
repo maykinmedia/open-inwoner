@@ -8,17 +8,21 @@ import { customElement, property } from 'lit/decorators.js'
 @customElement('custom-counter')
 class CustomCounter extends LitElement {
   @property({ type: Number })
-  accessor value: number
+  // TODO: Update Prettier so it understands accessor keyword
+  // TODO: Replace 'declare' with 'accessor'
+  declare value: number
 
   @property({ type: Number })
-  accessor min: number
+  declare min: number
 
   @property({ type: Number })
-  accessor max: number
+  declare max: number
 
   @property({ type: Number })
-  accessor step: number
-  accessor displayOnly: boolean
+  declare step: number
+
+  @property({ type: Boolean })
+  declare displayOnly: boolean
 
   static styles = css`
     :host {

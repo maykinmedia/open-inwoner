@@ -28,6 +28,14 @@ export default defineConfig({
     }),
   ],
 
+  css: {
+    preprocessorOptions: {
+      scss: {
+        includePaths: ['node_modules'],
+      },
+    },
+  },
+
   build: {
     outDir: path.resolve(__dirname, paths.jsDir),
     emptyOutDir: false, // Matches Webpack's behavior (does not wipe output)
@@ -69,9 +77,6 @@ export default defineConfig({
     },
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
   },
-
-  // Match Webpack's mode behavior
-  mode: isProduction ? 'production' : 'development',
 
   test: {
     globals: true,
