@@ -23,6 +23,7 @@ from open_inwoner.accounts.tests.factories import (
     UserFactory,
 )
 from open_inwoner.accounts.tests.test_action_views import ActionsPlaywrightTests
+from open_inwoner.pdc.tests.factories import CategoryFactory
 
 from ...cms.collaborate.cms_apps import CollaborateApphook
 from ...cms.extensions.constants import Icons, IndicatorChoices
@@ -132,6 +133,50 @@ class PlanViewTests(WebTest):
         )
 
         assert response
+
+    def test_template_plans_are_ordered_based_on_interests(self):
+        # Set up categories
+        opleiding = CategoryFactory(name="Opleiding")
+        inburgering = CategoryFactory(name="Inburgering")
+
+        # Set up three Plan Templates
+        cv_plan_template = PlanTemplateFactory(file=None, name="CV maken")
+        cv_plan_template.related_categories.add(opleiding)
+        cv_plan_template.save()
+
+        nederlands_plan_template = PlanTemplateFactory(
+            file=None, name="Nederlands leren"
+        )
+        nederlands_plan_template.related_categories.add(inburgering)
+        nederlands_plan_template.save()
+
+        PlanTemplateFactory(file=None, name="Bijscholing")
+
+        # Baseline: without interest selected, the CV template is in front
+        response = self.app.get(self.choose_template_url, user=self.user)
+        delivered_plan_templates = response.context["templates"].all()
+        self.assertEqual(cv_plan_template, delivered_plan_templates[0])
+
+        # The user has selected 'opleiding' as interest:
+        self.user.selected_categories.add(opleiding)
+
+        # Visit the page
+        response = self.app.get(self.choose_template_url, user=self.user)
+        delivered_plan_templates = response.context["templates"].all()
+
+        # The CV plan template should be in front
+        self.assertEqual(cv_plan_template, delivered_plan_templates[0])
+
+        # Change interests to only 'inburgering'
+        self.user.selected_categories.remove(opleiding)
+        self.user.selected_categories.add(inburgering)
+
+        # Visit the page (again)
+        response = self.app.get(self.choose_template_url, user=self.user)
+        delivered_plan_templates = response.context["templates"].all()
+
+        # The 'Nederlands' plan template should be in front
+        self.assertEqual(nederlands_plan_template, delivered_plan_templates[0])
 
     def test_plan_list_login_required(self):
         response = self.app.get(self.list_url)

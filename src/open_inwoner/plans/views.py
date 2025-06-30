@@ -3,7 +3,7 @@ from datetime import date
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Q
+from django.db.models import Case, IntegerField, Q, Value, When
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import NoReverseMatch, resolve
@@ -266,12 +266,28 @@ class PlanTemplateChoiceView(
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
 
+        interests = self.request.user.get_interests()
+
+        # Put the plan templates with interests of the user in front
+        plan_templates = (
+            PlanTemplate.objects.annotate(
+                has_interest=Case(
+                    When(related_categories__name__in=interests, then=Value(1)),
+                    default=Value(0),
+                    output_field=IntegerField(),
+                )
+            )
+            .order_by("-has_interest", "id")
+            .distinct()
+        )
+
         # We need to do our own HTML/CSS around the template form, so we might as well
         # directly pass all the templates as a context variable, as opposed to fishing
         # the choices out of the form object. That would be tedious, and there's no
         # ACL/filtering requirements. We'll simply use the form object for validation
         # purposes.
-        data["templates"] = PlanTemplate.objects.all()
+        data["templates"] = plan_templates
+
         return data
 
     def form_valid(self, form):
