@@ -3,6 +3,7 @@ from urllib.parse import urlencode
 
 from django.shortcuts import render
 from django.urls import reverse
+from django.utils.translation import gettext as _
 
 from cms.models import Title
 
@@ -55,30 +56,30 @@ def sitemap(request):
     context["cms_pages"] = []
     if benefits_page_is_published():
         context["cms_pages"].append(
-            {"url_name": "ssd:uitkeringen", "link_text": "Mijn uitkeringen"}
+            {"url_name": "ssd:uitkeringen", "link_text": _("Mijn uitkeringen")}
         )
     if case_page_is_published():
         context["cms_pages"].append(
-            {"url_name": "cases:index", "link_text": "Mijn zaken"}
+            {"url_name": "cases:index", "link_text": _("Mijn zaken")}
         )
         context["cms_pages"].append(
-            {"url_name": "cases:contactmoment_list", "link_text": "Mijn vragen"}
+            {"url_name": "cases:contactmoment_list", "link_text": _("Mijn vragen")}
         )
     if collaborate_page_is_published():
         context["cms_pages"].append(
-            {"url_name": "collaborate:plan_list", "link_text": "Mijn samenwerkingen"}
+            {"url_name": "collaborate:plan_list", "link_text": _("Mijn samenwerkingen")}
         )
     if inbox_page_is_published():
         context["cms_pages"].append(
-            {"url_name": "inbox:index", "link_text": "Mijn berichten"}
+            {"url_name": "inbox:index", "link_text": _("Mijn berichten")}
         )
     if products_page_is_published():
         context["cms_pages"].append(
-            {"url_name": "products:questionnaire_list", "link_text": "Zelftest"}
+            {"url_name": "products:questionnaire_list", "link_text": _("Zelftest")}
         )
     if profile_page_is_published():
         context["cms_profile_pages"] = [
-            {"url_name": "profile:detail", "link_text": "Mijn profiel"},
+            {"url_name": "profile:detail", "link_text": _("Mijn profiel")},
         ]
 
         # conditionally add cms pages based on apphook configuration
@@ -92,7 +93,7 @@ def sitemap(request):
             cms_pages.append(
                 {
                     "url_name": "profile:categories",
-                    "link_text": "Mijn Interessegebieden",
+                    "link_text": _("Mijn Interessegebieden"),
                 },
             )
         if profile_config.mentors:
@@ -101,14 +102,14 @@ def sitemap(request):
             cms_pages.append(
                 {
                     "url": begeleiders_url,
-                    "link_text": "Mijn begeleiders",
+                    "link_text": _("Mijn begeleiders"),
                 },
             )
         if profile_config.my_contacts:
             cms_pages.append(
                 {
                     "url_name": "profile:contact_list",
-                    "link_text": "Mijn contacten",
+                    "link_text": _("Mijn contacten"),
                 },
             )
         if (
@@ -118,48 +119,48 @@ def sitemap(request):
             cms_pages.append(
                 {
                     "url_name": "products:questionnaire_list",
-                    "link_text": "Zelfdiagnose",
+                    "link_text": _("Zelfdiagnose"),
                 }
             )
         if profile_config.actions:
             cms_pages.append(
                 {
                     "url_name": "profile:action_list",
-                    "link_text": "Openstaande acties",
+                    "link_text": _("Openstaande acties"),
                 },
             )
         if profile_config.notifications:
             cms_pages.append(
                 {
                     "url_name": "profile:notifications",
-                    "link_text": "Notificatievoorkeuren",
+                    "link_text": _("Notificatievoorkeuren"),
                 }
             )
         if profile_config.questions:
             cms_pages.append(
                 {
                     "url_name": "cases:contactmoment_list",
-                    "link_text": "Mijn vragen",
+                    "link_text": _("Mijn vragen"),
                 }
             )
         if profile_config.ssd:
             cms_pages.append(
                 {
                     "url_name": "ssd:uitkeringen",
-                    "link_text": "Mijn uitkeringen",
+                    "link_text": _("Mijn uitkeringen"),
                 }
             )
         if profile_config.appointments:
             cms_pages.append(
                 {
                     "url_name": "profile:appointments",
-                    "link_text": "Mijn afspraken",
+                    "link_text": _("Mijn afspraken"),
                 },
             )
 
     # add "platform pages" (conditional login/register page, cookie info etc.)
     context["platform_pages"] = [
-        {"url_name": "pages-root", "link_text": "Home page"},
+        {"url_name": "pages-root", "link_text": _("Home page")},
     ]
 
     klant_config = KlantenSysteemConfig.get_solo()
@@ -167,14 +168,14 @@ def sitemap(request):
         context["platform_pages"].append(
             {
                 "url_name": "contactform",
-                "link_text": "Contactformulier",
+                "link_text": _("Contactformulier"),
             },
         )
 
     # hide login links for users that are logged in
     if not request.user.is_authenticated:
         context["platform_pages"].append(
-            {"url_name": "login", "link_text": "Login or create an account"}
+            {"url_name": "login", "link_text": _("Login or create an account")}
         )
 
     # add cms_pages to platform_pages
