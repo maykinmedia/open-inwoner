@@ -6,6 +6,7 @@ SETUP_CONFIGURATION_STEPS = [
     "open_inwoner.configurations.bootstrap.zgw.OpenZaakConfigurationStep",
     "open_inwoner.configurations.bootstrap.openklant.ESuiteKlantConfigurationStep",
     "open_inwoner.configurations.bootstrap.openklant.OpenKlant2ConfigurationStep",
+    "open_inwoner.configurations.bootstrap.default_users.UserConfigurationStep",
     "django_setup_configuration.contrib.sites.steps.SitesConfigurationStep",
 ]
 OIP_ORGANIZATION = config("OIP_ORGANIZATION", "")
