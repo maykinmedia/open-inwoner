@@ -364,6 +364,9 @@ class User(AbstractBaseUser, PermissionsMixin):
                 check=~Q(phonenumber=F("phonenumber_alternative"))
                 | Q(phonenumber__exact=""),
                 name="check_alternative_phonenumber_differs_from_primary_phonenumber",
+                violation_error_message=_(
+                    "Primary and secondary phone numbers cannot be the same"
+                ),
             ),
             models.CheckConstraint(
                 check=~Q(kvk__exact="", login_type=LoginTypeChoices.eherkenning),
