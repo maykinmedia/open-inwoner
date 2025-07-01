@@ -90,9 +90,10 @@ module.exports = {
         },
       },
 
-      // .scss
+      // .scss (excluding CKEditor files)
       {
         test: /src\/.*.(sa|sc|c)ss$/,
+        exclude: /ckeditor5-[^/\\]+[/\\]theme[/\\].+\.css$/,
         use: [
           // Writes css files.
           MiniCssExtractPlugin.loader,

@@ -1,7 +1,7 @@
-import {assert} from 'chai';
+import { describe, expect, it } from 'vitest'
 
 describe('Dummy Test', function () {
-    it('should pass', () => {
-        assert.equal(1, 1);
-    });
-});
+  it('should pass', () => {
+    expect(1).toBe(1)
+  })
+})
