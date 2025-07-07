@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fwi="http://www.centric.nl/GWS/FWI/v0200" xmlns:gwsd="http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient/v0600" xmlns:ns3="http://www.centric.nl/GWS/Header/v0201" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:wsa="http://www.w3.org/2005/08/addressing" xsi:schemaLocation="http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient/v0600 Diensten\UitkeringsSpecificatieClient\v0600-b01\BodyReaction_resolved.xsd">
+ <SOAP-ENV:Header>
+  <wsa:MessageID>447B2E69-F59E-4949-B31F-F1B6A0C80CDD</wsa:MessageID>
+  <wsa:Action>http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient-v0600/UitkeringsSpecificatieInfoResponse</wsa:Action>
+  <wsa:RelatesTo>urn:uuid:28d8fcc8-15fa-41de-b03e-b70b3349748a</wsa:RelatesTo>
+  <wsa:From>
+   <wsa:Address>https://rfor-2securet1.rfor.local:8443/ENSC/Intern/SSD/UitkeringsSpecificatieClient-v0600</wsa:Address>
+  </wsa:From>
+  <ns3:Header>
+   <RouteInformatie>
+    <Bron>
+     <Gemeentecode>0014</Gemeentecode>
+     <ApplicatieNaam>GWS4ALL</ApplicatieNaam>
+    </Bron>
+    <Bestemming>
+     <Gemeentecode>0014</Gemeentecode>
+     <ApplicatieNaam>Open Inwoner</ApplicatieNaam>
+    </Bestemming>
+   </RouteInformatie>
+   <BerichtIdentificatie>
+    <DatTijdAanmaakRequest>2025-07-08T13:41:45+0200</DatTijdAanmaakRequest>
+    <DatTijdOntvangstRequest>2025-07-08T13:41:46+02:00</DatTijdOntvangstRequest>
+    <DatTijdAanmaakResponse>2025-07-08T13:41:48+02:00</DatTijdAanmaakResponse>
+   </BerichtIdentificatie>
+  </ns3:Header>
+ </SOAP-ENV:Header>
+ <SOAP-ENV:Body>
+  <gwsd:UitkeringsSpecificatieInfoResponse>
+   <fwi:NietsGevonden/>
+  </gwsd:UitkeringsSpecificatieInfoResponse>
+ </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

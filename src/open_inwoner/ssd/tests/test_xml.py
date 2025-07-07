@@ -82,6 +82,17 @@ class JaaropgaveDataTest(TestCase):
             self.assertEqual(spec.werkgeversheffing_premie_zvw.waarde_bedrag, 494)
             self.assertEqual(spec.cd_premie_volksverzekering, "250")
 
+    @patch("open_inwoner.ssd.xml._get_report_info")
+    def test_jaaropgave_empty(self, m):
+        jaaropgave_path = FILES_DIR / "jaaropgave_empty_body.xml"
+        m.return_value = mock_get_report_info(
+            jaaropgave_path, JAAROPGAVE_INFO_RESPONSE_NODE, JaarOpgaveInfoResponse
+        )
+
+        jaaropgaven = get_jaaropgaven(None)
+
+        self.assertEqual(len(jaaropgaven), 0)
+
 
 class UitkeringDataTest(TestCase):
     @patch("open_inwoner.ssd.xml._get_report_info")
@@ -203,6 +214,17 @@ class UitkeringDataTest(TestCase):
 
             self.assertEqual(vakantiegeld, totaal_netto)
             self.assertEqual(totaal_netto, uit_te_betalen)
+
+    @patch("open_inwoner.ssd.xml._get_report_info")
+    def test_uitkering_empty(self, m):
+        uitkering_path = FILES_DIR / "uitkering_empty_body.xml"
+        m.return_value = mock_get_report_info(
+            uitkering_path, UITKERING_INFO_RESPONSE_NODE, UitkeringInfoResponse
+        )
+
+        uitkeringen = get_uitkeringen(None)
+
+        self.assertEqual(len(uitkeringen), 0)
 
 
 class SSDTagTest(TestCase):

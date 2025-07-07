@@ -70,9 +70,6 @@ def _get_report_info(
     if info_response.fwi:
         raise SSDClientException.from_xml_response(xml_response=info_response)
 
-    if info_response.niets_gevonden:
-        raise SSDClientException("unexpected error occured")
-
     return info_response
 
 
@@ -89,6 +86,8 @@ def get_jaaropgaven(response: requests.Response) -> list[JaaropgaveReturn] | Non
     jaaropgave_info = _get_report_info(
         response, JAAROPGAVE_INFO_RESPONSE_NODE, JaarOpgaveInfoResponse
     )
+    if jaaropgave_info.niets_gevonden:
+        return []
 
     client = cast(Client, jaaropgave_info.jaar_opgave_client.client)
     jaar_opgave = cast(JaarOpgave, jaaropgave_info.jaar_opgave_client.jaar_opgave[0])
@@ -114,6 +113,8 @@ def get_uitkeringen(response: requests.Response) -> list[dict] | None:
     uitkeringen_info = _get_report_info(
         response, UITKERING_INFO_RESPONSE_NODE, UitkeringInfoResponse
     )
+    if uitkeringen_info.niets_gevonden:
+        return []
 
     uitkeringsspecificatie = (
         uitkeringen_info.uitkerings_specificatie_client.uitkeringsspecificatie[0]
