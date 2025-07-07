@@ -122,6 +122,8 @@ class BRP_2_1(BRPAPI):
             "Accept": "application/json",
             "x-gebruiker": "BurgerZelf",
         }
+
+        # I connect headers
         if self.config.api_origin_oin:  # See Taiga #755
             headers["x-origin-oin"] = self.config.api_origin_oin
         if self.config.api_doelbinding:  # See Taiga #755
@@ -130,6 +132,16 @@ class BRP_2_1(BRPAPI):
             headers["x-verwerking"] = self.config.api_verwerking
         if self.config.api_afnemer_oin:  # See Taiga #2860 / Yenlo
             headers["x-afnemer-oin"] = self.config.api_afnemer_oin
+
+        # Centric headers
+        if self.config.x_request_organization:
+            headers["x-requets-organization"] = self.config.x_request_organization
+        if self.config.x_request_application:
+            headers["x-requets-application"] = self.config.x_request_application
+        if self.config.x_request_afnemerscode:
+            headers["x-requets-afnemerscode"] = self.config.x_request_afnemerscode
+        if self.config.x_request_user:
+            headers["x-requets-user"] = self.config.x_request_user
 
         response = self.client.post(
             url=url,
