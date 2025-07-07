@@ -14,7 +14,7 @@
 <section class="tabled tabled--flexible">
     <h1 class="utrecht-heading-1" id="title">{% trans "Welkom" %}{% if not user.is_eherkenning_user %}, {{ user.display_name }}{% endif %}</h1>
     <p class="tabled__key">
-    {% trans "voor het laatst ingelogd op" %}: <span
+    {% trans "Voor het laatst ingelogd op" %}: <span
     class="tabled__value">{% firstof user.previous_login|date:"j F Y" user.last_login|date:"j F Y" %} om {% firstof user.previous_login|date:"G:i" user.last_login|date:"G:i" %} uur</span>
     </p>
 </section>
@@ -68,7 +68,7 @@
             <div class="tabled__item tabled__value">{{ user.phonenumber }}</div>
         </div>
         <div class="tabled__row tabled__row--blank">
-            <div class="tabled__item tabled__key">{% trans "Alternatief telefoonnummer" %}</div>
+            <div class="tabled__item tabled__key">{% trans "Ander telefoonnummer" %}</div>
             <div class="tabled__item tabled__value">{{ user.phonenumber_alternative }}</div>
         </div>
     </section>
@@ -112,7 +112,7 @@
             <div class="tabled__item tabled__value">{{ user.phonenumber }}</div>
         </div>
         <div class="tabled__row tabled__row--blank">
-            <div class="tabled__item tabled__key">{% trans "Alternatief telefoonnummer" %}</div>
+            <div class="tabled__item tabled__key">{% trans "Ander telefoonnummer" %}</div>
             <div class="tabled__item tabled__value">{{ user.phonenumber_alternative }}</div>
         </div>
     </section>
@@ -136,7 +136,7 @@
                 <div class="tabled__item tabled__value">E-mail</div>
             </div>
             <div class="tabled__row tabled__row--blank">
-                <div class="tabled__item tabled__key">{% trans "Ontvang notificaties over" %}</div>
+                <div class="tabled__item tabled__key">{% trans "Ontvang meldingen over" %}</div>
                 <div class="tabled__item tabled__value">
                     <div class="item__option">{{ user.get_active_notifications }}</div>
                 </div>
@@ -359,10 +359,10 @@
         </div>
             <div class="tabled">
                 <p class="utrecht-paragraph">
-                    {% trans "Hiermee worden alleen uw persoonlijke voorkeuren verwijderd. U krijgt dan bijvoorbeeld geen e-mail meer van ons over wijzigingen van uw lopende zaken. Uw persoonsgegevens en uw lopende zaken zelf worden hiermee niet verwijderd." %}
+                    {% trans "Wilt u uw profiel verwijderen? Dan worden al uw persoonlijke voorkeuren verwijderd binnen deze MijnOmgeving. Uw persoonsgegevens en uw zaken worden niet verwijderd." %}
                 </p>
             </div>
-            {% render_form form=form method="POST" id="delete-form" extra_classes="confirm" spaceless=True data_confirm_title=_("Weet je zeker dat je jouw profiel wilt verwijderen?") data_confirm_text=_("Hiermee worden alleen uw persoonlijke voorkeuren verwijderd. U krijgt dan bijvoorbeeld geen e-mail meer van ons over wijzigingen van uw lopende zaken. Uw persoonsgegevens en uw lopende zaken zelf worden hiermee niet verwijderd.") data_confirm_cancel=_("Nee, annuleren") data_confirm_default=_("Ja, verwijderen") %}
+            {% render_form form=form method="POST" id="delete-form" extra_classes="confirm" spaceless=True data_confirm_title=_("Weet u zeker dat u uw profiel wilt verwijderen?") data_confirm_text=_("Hiermee worden alleen uw persoonlijke voorkeuren verwijderd. U krijgt dan bijvoorbeeld geen e-mails meer van ons over wijzigingen van uw lopende zaken. Uw persoonsgegevens en uw lopende zaken zelf worden hiermee niet verwijderd.") data_confirm_cancel=_("Nee, annuleren") data_confirm_default=_("Ja, verwijderen") %}
             {% csrf_token %}
                 {% button_row %}
                     {% button text=_("Profiel verwijderen") icon="delete" icon_position="before" icon_outlined=True transparent=True extra_classes="button--spaceless button--error" %}
