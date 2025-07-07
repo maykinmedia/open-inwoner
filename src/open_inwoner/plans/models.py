@@ -43,6 +43,12 @@ class PlanTemplate(models.Model):
             "The description of the plan: how do you intend to achieve this goal?"
         ),
     )
+    related_categories = models.ManyToManyField(
+        "pdc.Category",
+        verbose_name=_("Related categories"),
+        related_name="related_to",
+        blank=True,
+    )
 
     def __str__(self):
         return self.name

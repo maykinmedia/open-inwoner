@@ -23,6 +23,7 @@ class PlanTemplateAdmin(admin.ModelAdmin):
         "goal",
     )
     inlines = [ActionTemplateInlineAdmin]
+    filter_horizontal = ("related_categories",)
 
 
 @admin.register(Plan)
