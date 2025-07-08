@@ -576,6 +576,46 @@ class TestCaseDetailView(
         )
 
         #
+        # Klanten API
+        #
+        self.klant_bsn = generate_oas_component_cached(
+            "kc",
+            "schemas/Klant",
+            bronorganisatie="123456789",
+            klantnummer="12345678",
+            subjectIdentificatie={
+                "inpBsn": self.user.bsn,
+            },
+            url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            emailadres=self.user.email,
+            telefoonnummer="0612345678",
+            telefoonnummerAlternatief="0687654321",
+            toestemmingZaakNotificatiesAlleenDigitaal=False,
+            voornaam="John",
+            achternaam="Doe",
+            voorvoegselAchternaam="van der",
+            bedrijfsnaam="",
+        )
+        self.klant_kvk = generate_oas_component_cached(
+            "kc",
+            "schemas/Klant",
+            bronorganisatie="123456789",
+            klantnummer="87654321",
+            subjectIdentificatie={
+                "innNnpId": "87654321",
+            },
+            url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-ffffffffffff",
+            emailadres="foo@bar.com",
+            telefoonnummer="0687654321",
+            telefoonnummerAlternatief="0687654321",
+            toestemmingZaakNotificatiesAlleenDigitaal=False,
+            voornaam="",
+            achternaam="",
+            voorvoegselAchternaam="",
+            bedrijfsnaam="AcmeCorp B.V.",
+        )
+
+        #
         # Contactmomenten API (CMC)
         #
         self.contactmoment_old = generate_oas_component_cached(
@@ -651,6 +691,33 @@ class TestCaseDetailView(
             object=self.zaak_eherkenning["url"],
             object_type="zaak",
             contactmoment=self.contactmoment_old["url"],
+        )
+        self.klantcontactmoment_old = generate_oas_component_cached(
+            "cmc",
+            "schemas/Klantcontactmoment",
+            uuid="aaaaaaaa-aaaa-aaaa-aaaa-dddddddddddd",
+            url=f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten/aaaaaaaa-aaaa-aaaa-aaaa-dddddddddddd",
+            klant=self.klant_bsn["url"],
+            contactmoment=self.contactmoment_old["url"],
+            rol="gesprekspartner",
+        )
+        self.klantcontactmoment_new = generate_oas_component_cached(
+            "cmc",
+            "schemas/Klantcontactmoment",
+            uuid="aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
+            url=f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten/aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
+            klant=self.klant_bsn["url"],
+            contactmoment=self.contactmoment_new["url"],
+            rol="gesprekspartner",
+        )
+        self.klantcontactmoment_balie = generate_oas_component_cached(
+            "cmc",
+            "schemas/Klantcontactmoment",
+            uuid="aaaaaaaa-aaaa-aaaa-aaaa-gggggggggggg",
+            url=f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten/aaaaaaaa-aaaa-aaaa-aaaa-gggggggggggg",
+            klant=self.klant_bsn["url"],
+            contactmoment=self.contactmoment_balie["url"],
+            rol="gesprekspartner",
         )
 
         #
@@ -741,6 +808,10 @@ class TestCaseDetailView(
             self.objectcontactmoment_old,
             self.objectcontactmoment_new,
             self.objectcontactmoment_balie,
+            self.klant_bsn,
+            self.objectcontactmoment_old,
+            self.klantcontactmoment_new,
+            self.klantcontactmoment_balie,
         ]:
             m.get(resource["url"], json=resource)
 
@@ -847,6 +918,24 @@ class TestCaseDetailView(
                     self.objectcontactmoment_old,
                     self.objectcontactmoment_new,
                     self.objectcontactmoment_balie,
+                ]
+            ),
+        )
+        m.get(
+            f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn={self.user.bsn}",
+            json=paginated_response([self.klant_bsn]),
+        )
+        m.get(
+            f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId={self.eherkenning_user.kvk}",
+            json=paginated_response([self.klant_kvk]),
+        )
+        m.get(
+            f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten?klant={self.klant_bsn['url']}",
+            json=paginated_response(
+                [
+                    self.klantcontactmoment_old,
+                    self.klantcontactmoment_new,
+                    self.klantcontactmoment_balie,
                 ]
             ),
         )
@@ -987,6 +1076,11 @@ class TestCaseDetailView(
         mock_openklant2_service,
     ):
         self.maxDiff = None
+
+        self.esuite_config.klanten_service = ServiceFactory(
+            api_root=KLANTEN_ROOT, api_type=APITypes.kc
+        )
+        self.esuite_config.save()
 
         ZaakTypeStatusTypeConfigFactory.create(
             zaaktype_config=self.zaaktype_config,
@@ -1193,6 +1287,11 @@ class TestCaseDetailView(
         self, m, mock_openklant2_service
     ):
         self.maxDiff = None
+
+        self.esuite_config.klanten_service = ServiceFactory(
+            api_root=KLANTEN_ROOT, api_type=APITypes.kc
+        )
+        self.esuite_config.save()
 
         ZaakTypeStatusTypeConfigFactory.create(
             zaaktype_config=self.zaaktype_config,

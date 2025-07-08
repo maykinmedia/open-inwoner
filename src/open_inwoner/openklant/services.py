@@ -783,13 +783,21 @@ class eSuiteVragenService(KlantenService):
         return self._build_question_dto(kcm), zaken_with_api_group
 
     def list_questions_for_zaak(self, zaak: Zaak, user: User) -> list[Question]:
-        objectcontactmomenten = self.retrieve_objectcontactmomenten_for_zaak(zaak)
+        # fetch klantcontactmomenten for filtering
+        fetch_params = self.get_fetch_parameters(user)
+        klantcontactmomenten = self.fetch_klantcontactmomenten(**fetch_params)
+        relevant_contactmomenten_urls = {
+            kcm.contactmoment.url for kcm in klantcontactmomenten
+        }
 
+        # fetch contactmomenten for zaak, filter out those not attched to a klant
+        objectcontactmomenten = self.retrieve_objectcontactmomenten_for_zaak(zaak)
         contactmomenten: list[ContactMoment] = []
         for ocm in objectcontactmomenten:
-            question: ContactMoment | None = getattr(ocm, "contactmoment", None)
-            if question:
-                contactmomenten.append(question)
+            contactmoment: ContactMoment | None = getattr(ocm, "contactmoment", None)
+            if contactmoment and contactmoment.url in relevant_contactmomenten_urls:
+                contactmomenten.append(contactmoment)
+
         contactmomenten.sort(key=lambda q: q.registratiedatum, reverse=True)
 
         if exclude_range := self.config.exclude_contactmoment_kanalen:
