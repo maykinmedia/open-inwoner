@@ -58,6 +58,7 @@ class BenefitsFormView(
                         "Please try again later"
                     ),
                 )
+                pdf_content = None
 
             if not pdf_content:
                 return_path = request.get_full_path()

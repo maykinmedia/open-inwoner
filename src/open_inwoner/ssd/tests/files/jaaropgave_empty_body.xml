@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:gwsd="http://www.centric.nl/GWS/Diensten/JaarOpgaveClient/v0400" xmlns:fwi="http://www.centric.nl/GWS/FWI/v0200" xmlns:ns3="http://www.centric.nl/GWS/Header/v0201" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:wsa="http://www.w3.org/2005/08/addressing" xsi:schemaLocation="http://www.centric.nl/GWS/Diensten/JaarOpgaveClient/v0400 Diensten\JaarOpgaveClient\v0400-b01\BodyReaction_resolved.xsd">
+ <SOAP-ENV:Header>
+  <wsa:MessageID>739ABF07-3828-4477-9D2A-584045771D24</wsa:MessageID>
+  <wsa:Action>http://www.centric.nl/GWS/Diensten/JaarOpgaveClient-v0400/JaarOpgaveInfoResponse</wsa:Action>
+  <wsa:RelatesTo>urn:uuid:6be8d30a-7590-43de-9731-7c8dcbde91ad</wsa:RelatesTo>
+  <wsa:From>
+   <wsa:Address>https://rfor-2securet1.rfor.local:8443/ENSC/Intern/SSD/JaarOpgaveClient-v0400</wsa:Address>
+  </wsa:From>
+  <ns3:Header>
+   <RouteInformatie>
+    <Bron>
+     <Gemeentecode>0153</Gemeentecode>
+     <ApplicatieNaam>GWS4all</ApplicatieNaam>
+    </Bron>
+    <Bestemming>
+     <Gemeentecode>0153</Gemeentecode>
+     <ApplicatieNaam>Open Inwoner</ApplicatieNaam>
+    </Bestemming>
+   </RouteInformatie>
+   <BerichtIdentificatie>
+    <DatTijdAanmaakRequest>2023-08-17T09:09:26+0200</DatTijdAanmaakRequest>
+    <DatTijdOntvangstRequest>2023-08-17T09:09:26+02:00</DatTijdOntvangstRequest>
+    <DatTijdAanmaakResponse>2023-08-17T09:09:28+02:00</DatTijdAanmaakResponse>
+   </BerichtIdentificatie>
+  </ns3:Header>
+ </SOAP-ENV:Header>
+ <SOAP-ENV:Body>
+  <gwsd:JaarOpgaveInfoResponse>
+    <fwi:NietsGevonden/>
+  </gwsd:JaarOpgaveInfoResponse>
+ </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
