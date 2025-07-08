@@ -88,7 +88,7 @@ class HaalCentraalConfig(SingletonModel):
         _("API 'user' header"),
         max_length=64,
         blank=True,
-        help_text=_("Value of the 'x-request-usre' header"),
+        help_text=_("Value of the 'x-request-user' header"),
     )
 
     objects = HaalCentraalConfigManager()

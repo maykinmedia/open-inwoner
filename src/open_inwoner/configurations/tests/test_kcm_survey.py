@@ -18,7 +18,7 @@ class KCMSurveyTestCase(TestCase):
     @patch(
         "open_inwoner.configurations.models.SiteConfiguration.get_solo",
         return_value=SiteConfiguration(
-            kcm_survey_link_text="Geef je mening",
+            kcm_survey_link_text="Geef uw mening",
             kcm_survey_link_url="https://some-kcm-survey.url/foo",
         ),
     )
@@ -31,7 +31,7 @@ class KCMSurveyTestCase(TestCase):
 
     def test_kcm_survey_not_configured(self):
         invalid_configs = (
-            ("Geef je mening", ""),
+            ("Geef uw mening", ""),
             ("", "https://some-kcm-survey.url/foo"),
             ("", ""),
         )

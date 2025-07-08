@@ -119,5 +119,5 @@ class NewsletterSubscriptionForm(forms.Form):
 
         if has_errors:
             messages.warning(
-                request, _("Er ging iets mis bij het opslaan van je voorkeuren")
+                request, _("Er ging iets mis bij het opslaan van uw voorkeuren")
             )

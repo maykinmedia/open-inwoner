@@ -826,7 +826,7 @@ class DigiDOIDCFlowTests(WebTest):
         doc = PyQuery(login_response.content)
         error_msg = doc.find(".notification__content").text()
 
-        self.assertEqual(error_msg, "Je hebt het inloggen met DigiD geannuleerd.")
+        self.assertEqual(error_msg, "U heeft het inloggen met DigiD geannuleerd.")
 
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
@@ -1717,7 +1717,7 @@ class eHerkenningOIDCFlowTests(WebTest):
         doc = PyQuery(login_response.content)
         error_msg = doc.find(".notification__content").text()
 
-        self.assertEqual(error_msg, "Je hebt het inloggen met eHerkenning geannuleerd.")
+        self.assertEqual(error_msg, "U heeft het inloggen met eHerkenning geannuleerd.")
 
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")

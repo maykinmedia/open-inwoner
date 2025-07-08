@@ -130,7 +130,7 @@ class DigiDOIDCAuthenticationCallbackView(CallbackView):
     generic_error_msg = GENERIC_DIGID_ERROR_MSG
     error_message_mapping = {
         ("access_denied", "The user cancelled"): (
-            "Je hebt het inloggen met DigiD geannuleerd."
+            "U heeft het inloggen met DigiD geannuleerd."
         )
     }
 
@@ -142,7 +142,7 @@ class EHerkenningOIDCAuthenticationCallbackView(
     generic_error_msg = GENERIC_EHERKENNING_ERROR_MSG
     error_message_mapping = {
         ("access_denied", "The user cancelled"): (
-            "Je hebt het inloggen met eHerkenning geannuleerd."
+            "U heeft het inloggen met eHerkenning geannuleerd."
         )
     }
 
