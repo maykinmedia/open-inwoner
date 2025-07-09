@@ -1,3 +1,6 @@
+import tempfile
+from pathlib import Path
+
 from django.test import override_settings, tag
 from django.utils.translation import gettext
 
@@ -113,5 +116,18 @@ class PlansHTMXTest(PlaywrightSyncLiveServerTestCase):
             download_link.click()
 
         download = download_info.value
-        with open(download.path(), "rb") as f:
-            assert f.read() == self.uploaded_bytes
+
+        # Create a temporary file to save the download
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
+            temp_path = Path(temp_file.name)
+
+        try:
+            # Save the download to the temporary file
+            download.save_as(str(temp_path))
+
+            # Read and verify the file content
+            with open(temp_path, "rb") as f:
+                assert f.read() == self.uploaded_bytes
+        finally:
+            # Clean up the temporary file
+            temp_path.unlink(missing_ok=True)
