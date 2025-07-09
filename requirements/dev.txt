@@ -48,7 +48,7 @@ babel==2.15.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   sphinx
-bandit==1.7.4
+bandit==1.8.6
     # via -r requirements/dev.in
 beautifulsoup4==4.12.3
     # via
@@ -684,10 +684,6 @@ gevent==23.9.1
     #   locust
 geventhttpclient==2.0.11
     # via locust
-gitdb==4.0.9
-    # via gitpython
-gitpython==3.1.41
-    # via bandit
 glom==20.11.0
     # via
     #   -c requirements/ci.txt
@@ -789,6 +785,8 @@ markdown==3.3.6
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   sphinx-markdown-tables
+markdown-it-py==3.0.0
+    # via rich
 markuppy==1.14
     # via
     #   -c requirements/ci.txt
@@ -809,6 +807,8 @@ maykin-python3-saml==1.16.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-digid-eherkenning
+mdurl==0.1.2
+    # via markdown-it-py
 messagebird==2.1.0
     # via
     #   -c requirements/ci.txt
@@ -955,6 +955,7 @@ pygments==2.18.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   rich
     #   sphinx
     #   sphinx-tabs
 pyjwt==2.8.0
@@ -1086,6 +1087,8 @@ requests-mock==1.12.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+rich==14.0.0
+    # via bandit
 roundrobin==0.0.4
     # via locust
 ruamel-yaml==0.18.10
@@ -1126,8 +1129,6 @@ six==1.16.0
     #   orderedmultidict
     #   python-dateutil
     #   qrcode
-smmap==5.0.0
-    # via gitdb
 snowballstemmer==2.2.0
     # via
     #   -c requirements/ci.txt
