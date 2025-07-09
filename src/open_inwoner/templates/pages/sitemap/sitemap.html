@@ -40,14 +40,16 @@
         </section>
 
         {# onderwerpen #}
-        <section class="sitemap__section">
-            <h2 class="utrecht-heading-2"><a class="link" href="{% url 'products:category_list' %}">{% trans "Onderwerpen" %}</a></h2>
-            <ul class="utrecht-unordered-list">
-                {% for node in category_nodes %}
-                    {% include "pages/sitemap/category_item.html" with node=node %}
-                {% endfor %}
-            </ul>
-        </section>
+        {% if category_nodes %}
+            <section class="sitemap__section">
+                <h2 class="utrecht-heading-2"><a class="link" href="{% url 'products:category_list' %}">{% trans "Onderwerpen" %}</a></h2>
+                <ul class="utrecht-unordered-list">
+                    {% for node in category_nodes %}
+                        {% include "pages/sitemap/category_item.html" with node=node %}
+                    {% endfor %}
+                </ul>
+            </section>
+        {% endif %}
 
         {% if request.user.is_authenticated %}
             <section class="sitemap__section">
