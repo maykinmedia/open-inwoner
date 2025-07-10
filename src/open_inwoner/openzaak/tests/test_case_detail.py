@@ -1858,7 +1858,7 @@ class TestCaseDetailView(
 
                 response = self.client.get(self.case_detail_url)
 
-                self.assertEquals(response.status_code, 200)
+                self.assertEqual(response.status_code, 200)
                 self.assertContains(response, self.zaak["identificatie"])
 
     def test_no_access_as_vestiging_when_no_roles_are_found_for_vestigingsnummer(
