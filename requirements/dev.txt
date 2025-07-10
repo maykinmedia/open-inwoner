@@ -53,8 +53,6 @@ babel==2.15.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   sphinx
-bandit==1.7.4
-    # via -r requirements/dev.in
 beautifulsoup4==4.12.3
     # via
     #   -c requirements/ci.txt
@@ -688,10 +686,6 @@ gevent==23.9.1
     #   locust
 geventhttpclient==2.0.11
     # via locust
-gitdb==4.0.9
-    # via gitpython
-gitpython==3.1.41
-    # via bandit
 glom==20.11.0
     # via
     #   -c requirements/ci.txt
@@ -871,8 +865,6 @@ packaging==23.0
     #   djangocms-text-ckeditor
     #   pytest
     #   sphinx
-pbr==5.9.0
-    # via stevedore
 pep517==0.11.0
     # via build
 phonenumbers==8.13.29
@@ -1038,7 +1030,6 @@ pyyaml==6.0.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-    #   bandit
     #   drf-spectacular
     #   gemma-zds-client
     #   pre-commit
@@ -1129,8 +1120,6 @@ six==1.16.0
     #   orderedmultidict
     #   python-dateutil
     #   qrcode
-smmap==5.0.0
-    # via gitdb
 snowballstemmer==2.2.0
     # via
     #   -c requirements/ci.txt
@@ -1203,8 +1192,6 @@ sqlparse==0.4.4
     #   django
     #   django-debug-toolbar
     #   django-silk
-stevedore==3.5.0
-    # via bandit
 svglib==1.5.1
     # via
     #   -c requirements/ci.txt
