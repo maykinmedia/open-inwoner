@@ -430,7 +430,7 @@ django-polymorphic==3.0.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-filer
-django-privates==1.5.0
+django-privates==3.1.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -453,7 +453,7 @@ django-sekizai==4.0.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-cms
-django-sendfile2==0.7.0
+django-sendfile2==0.7.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
