@@ -8,7 +8,7 @@ interface CounterProps {
 
 const Counter: FC<CounterProps> = (props) => {
   return (
-    <div>
+    <div className="counter">
       <button onClick={() => props.setCount(props.count + 1)}>
         Count increment
       </button>
