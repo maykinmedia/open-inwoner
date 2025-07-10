@@ -14,7 +14,6 @@ export default defineConfig({
   plugins: [
     react({
       babel: {
-        // Fix bab
         plugins: [
           [
             'formatjs',
@@ -23,6 +22,7 @@ export default defineConfig({
               ast: true,
             },
           ],
+          ['@babel/plugin-proposal-decorators', { version: '2023-11' }],
         ],
       },
     }),
@@ -33,11 +33,11 @@ export default defineConfig({
     emptyOutDir: false, // Matches Webpack's behavior (does not wipe output)
     sourcemap: useSourceMap,
     minify: isProduction,
-    manifest: 'manifest.json',
     cssCodeSplit: true,
     rollupOptions: {
       input: {
         [`${paths.package.name}-react`]: `${__dirname}/${paths.reactEntry}`,
+        [`${paths.package.name}-webcomponents`]: `${__dirname}/${paths.webComponentsEntry}`,
       },
       output: {
         entryFileNames: '[name].js',
@@ -56,25 +56,22 @@ export default defineConfig({
   },
 
   // Configure base to match Webpack's publicPath
+  // This base is the location where the static files are sourced from (after building).
   base: '/static/bundles/',
 
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, 'src/open_inwoner/react'),
+      '@react': path.resolve(__dirname, 'src/open_inwoner/react'),
+      '@webcomponents': path.resolve(
+        __dirname,
+        'src/open_inwoner/webcomponents'
+      ),
     },
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
   },
 
   // Match Webpack's mode behavior
   mode: isProduction ? 'production' : 'development',
-
-  server: {
-    hmr: {
-      host: 'http://localhost',
-      port: 8000,
-    },
-    origin: 'http://localhost:8000',
-  },
 
   test: {
     globals: true,

@@ -1,5 +1,4 @@
-import Router from './router/router'
+import ModuleLoader from '@react/lib/loader'
 
-console.log('Vite is configured to render this inside open-inwoner-react.js')
-// Start routing
-Router.route()
+// Load the module.
+ModuleLoader.load()

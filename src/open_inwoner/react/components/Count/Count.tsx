@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { FormattedMessage } from 'react-intl'
-import '@/components/Count/Count.scss'
+import './Count.scss'
 interface CounterProps {
   count: number
 }

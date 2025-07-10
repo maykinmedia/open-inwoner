@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
-import Count from '@/components/Count/Count'
-import Counter from '@/components/Counter/Counter'
+import Count from '@react/components/Count/Count'
+import Counter from '@react/components/Counter/Counter'
 
 export interface DemoProps {
   countNode: HTMLDivElement | null

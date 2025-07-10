@@ -1,1 +1,0 @@
-// Write storybook component

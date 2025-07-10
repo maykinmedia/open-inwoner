@@ -1,18 +1,24 @@
 import { IntlConfig } from 'react-intl'
 
+/**
+ * i18n
+ * Auto loads translations based on html document language, which is read from html lang attribute.
+ */
+
+const locales = {
+  nl: () => import('@react/i18n/compiled/nl.json'),
+  en: () => import('@react/i18n/compiled/en.json'),
+}
+
+/**
+ * Load the relevant translations dynamically.
+ * @param locale The language of the html lang attribute.
+ */
 const loadLocaleData = async (locale: string): Promise<any> => {
-  switch (locale) {
-    case 'nl':
-      return import('../i18n/compiled/nl.json')
-    case 'en':
-      return import('../i18n/compiled/en.json')
-    default:
-      if (locale.length === 5) {
-        const localeData = await loadLocaleData(locale.substring(0, 2))
-        return localeData
-      }
-      return import('../i18n/compiled/en.json')
-  }
+  if (locale.length === 5) return await loadLocaleData(locale.substring(0, 2))
+  else if (locales[locale as keyof typeof locales])
+    return locales[locale as keyof typeof locales]()
+  else return locales.nl()
 }
 
 const getIntlProviderProps = async (): Promise<IntlConfig> => {
@@ -21,7 +27,7 @@ const getIntlProviderProps = async (): Promise<IntlConfig> => {
   return {
     messages,
     locale: lang,
-    defaultLocale: 'en',
+    defaultLocale: 'nl',
   }
 }
 
