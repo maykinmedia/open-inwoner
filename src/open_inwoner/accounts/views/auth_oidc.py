@@ -3,7 +3,7 @@ from urllib.parse import urlencode
 
 from django.conf import settings
 from django.contrib import auth, messages
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import IntegrityError, transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import resolve_url
@@ -96,7 +96,9 @@ class OIDCLogoutView(View):
         return resolve_url(settings.LOGOUT_REDIRECT_URL)
 
     def get(self, request):
-        assert self.config_class is not None
+        if self.config_class is None:
+            raise ImproperlyConfigured("Missing OIDCLogoutView config class")
+
         config = self.config_class.get_solo()
 
         id_token = request.session.get("oidc_id_token")

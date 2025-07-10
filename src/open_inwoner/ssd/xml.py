@@ -50,7 +50,7 @@ def _get_report_info(
         raise SSDClientException("response had no content")
 
     try:
-        tree = etree.fromstring(response.content).getroottree()
+        tree = etree.fromstring(response.content).getroottree()  # noqa: S320
     except (LxmlError, XMLSyntaxError) as exc:
         raise SSDClientException("error generating XML from content") from exc
 

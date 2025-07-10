@@ -55,7 +55,8 @@ def hex_to_luminance(hex_color):
     https://www.w3.org/TR/WCAG20-TECHS/G17.html#G17-procedure
     """
     color = re.sub(r"^0x|^#", "", hex_color)
-    assert len(color) == 6
+    if not len(color) == 6:
+        raise ValueError(f"Expected {color} to have length 6")
 
     def calc(c):
         if c <= 0.03928:

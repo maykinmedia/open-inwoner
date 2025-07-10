@@ -480,7 +480,7 @@ def form_actions(
         - primary: bool | If the primary styling should be used.
     """
     if (not primary_text and primary_icon is None) and kwargs.get("primary", True):
-        assert False, "provide primary_text or primary_icon"
+        raise ValueError("provide primary_text or primary_icon")
 
     primary = kwargs.get("primary", "transparent" not in kwargs)
 

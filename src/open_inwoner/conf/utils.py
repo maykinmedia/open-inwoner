@@ -83,8 +83,9 @@ def _get_version_from_git():
     Returns the current tag or commit hash supplied by git
     """
     try:
-        tags = check_output(
-            ["git", "tag", "--points-at", "HEAD"], universal_newlines=True
+        tags = check_output(  # noqa: S603
+            ["git", "tag", "--points-at", "HEAD"],  # noqa: S607
+            universal_newlines=True,
         )
     except CalledProcessError:
         logger.warning("Unable to list tags")
@@ -94,7 +95,10 @@ def _get_version_from_git():
         return next(version for version in tags.splitlines())
 
     try:
-        commit = check_output(["git", "rev-parse", "HEAD"], universal_newlines=True)
+        commit = check_output(  # noqa: S603
+            ["git", "rev-parse", "HEAD"],  # noqa: S607
+            universal_newlines=True,
+        )
     except CalledProcessError:
         logger.warning("Unable to list current commit hash")
         commit = None

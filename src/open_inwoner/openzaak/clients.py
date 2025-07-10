@@ -328,7 +328,9 @@ class ZakenClient(ZgwAPIClient):
             "zaak": case_url,
         }
         if role_desc_generic:
-            assert role_desc_generic in RolOmschrijving.values
+            if role_desc_generic not in RolOmschrijving.values:
+                raise ValueError(f"{role_desc_generic} is not a known RolOmschrijving")
+
             params["omschrijvingGeneriek"] = role_desc_generic
 
         try:

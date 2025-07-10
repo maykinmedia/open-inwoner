@@ -1089,7 +1089,8 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
         return bool(question)
 
     def _register_via_esuite(self, form, config: ESuiteKlantConfig):
-        assert config.has_api_configuration
+        if not config.has_api_configuration:
+            raise ImproperlyConfigured("Missing eSuite API configuration")
 
         try:
             ztc = ZaakTypeConfig.objects.filter_case_type(self.case.zaaktype).get()

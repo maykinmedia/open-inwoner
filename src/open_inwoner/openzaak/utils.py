@@ -144,7 +144,11 @@ def get_zaak_type_info_object_type_config(
     case_type: ZaakType,
     info_object_type_url: str,
 ) -> ZaakTypeInformatieObjectTypeConfig | None:
-    assert isinstance(info_object_type_url, str)
+    if not isinstance(info_object_type_url, str):
+        raise ValueError(
+            f"info_object_type_url is a {type(info_object_type_url)}, not a str"
+        )
+
     try:
         return ZaakTypeInformatieObjectTypeConfig.objects.get_for_case_and_info_type(
             case_type, info_object_type_url

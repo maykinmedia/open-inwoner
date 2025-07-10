@@ -10,7 +10,8 @@ def middle_truncate(value: str, length: int, dots="...") -> str:
 
 
 def html_tag_wrap_format(format_str: str, tag: str, **kwargs) -> str:
-    assert kwargs, "expected replacment kwargs"
+    if not kwargs:
+        raise ValueError("expected replacement kwargs")
     html_tag = "<{}>{{}}</{}>".format(tag, tag)
     replace = {
         name: format_html(html_tag, force_str(value)) for name, value in kwargs.items()

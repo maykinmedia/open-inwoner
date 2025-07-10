@@ -193,7 +193,9 @@ class ContactmomentenClient(APIClient):
         # resolve linked resources
         contactmoment_mapping = {}
         for ocm in object_contact_momenten:
-            assert ocm.object == zaak.url
+            if not ocm.object == zaak.url:
+                raise ValueError("objectcontactmoment not linked to zaak")
+
             ocm.object = zaak
 
             contactmoment_url = ocm.contactmoment
@@ -243,7 +245,9 @@ class ContactmomentenClient(APIClient):
 
         # resolve linked resources
         for kcm in klanten_contact_moments:
-            assert kcm.klant == klant.url
+            if not kcm.klant == klant.url:
+                raise ValueError("klantcontactmoment not linked to klant")
+
             kcm.klant = klant
             kcm.contactmoment = self.retrieve_contactmoment(kcm.contactmoment)
 
