@@ -436,22 +436,17 @@ Hier vult u de helptekst voor de kolommen in de jaaropgave PDF in. Deze helpteks
 
 Bij Services staan alle externe REST-API koppelingen met het Open Inwoner Platform ingesteld. Deze mogen niet worden gewijzigd.
 
-9.14. Statusvertalingen
-=======================
-
-Bij Statusvertalingen kunt u de statussen personaliseren. Zo kunt u standaardteksten naar believen veranderen in statussen die beter passen bij de situatie. Het gaat hier dus niet om vertalingen van taal naar taal.
-
-9.15. Webhook-abonnementen
+9.14. Webhook-abonnementen
 ==========================
 
 Bij Webhook-abonnementen kunt u instellen dat u alle notificaties van een bepaald kanaal (zaken/documenten/besluiten) terug ontvangt van open zaak of eSuite.
 
-9.16. Zaaktype configuraties
+9.15. Zaaktype configuraties
 ============================
 
 Bij Zaaktype configuraties vindt u alle soorten Zaken die in Open Zaak of eSuite aanwezig zijn. Wanneer u klikt op een bepaald Zaaktype (zaaktype identificatie) wordt er een nieuw scherm geopend waarin u het betreffende Zaaktype configuratie kunt wijzigen.
 
-9.16.1. Zaaktype configuratie wijzigen
+9.15.1. Zaaktype configuratie wijzigen
 --------------------------------------
 In dit scherm, weergegeven op de volgende pagina, vindt u de gegevens van het betreffende Zaaktype. De catalogus, de identificatie en de omschrijving. Naast deze vaste gegevens kunt u ook enkele dingen wijzigen. U kunt aangeven of er notificaties moeten worden verstuurd en of het mogelijk moet zijn om documenten te uploaden ter ondersteuning van het betreffende Zaaktype.
 
@@ -497,7 +492,7 @@ uploaden van bestanden activeert, vindt het uploaden plaats via het Open Inwoner
    :height: 143px
 
 
-9.16.2. Zaaktype statustype configuraties
+9.15.2. Zaaktype statustype configuraties
 -----------------------------------------
 Hier kunt u de statustypes die bij het betreffende Zaaktype horen configureren. Enkele gegevens zijn vast en kunnen niet worden gewijzigd. De elementen die kunnen worden gewijzigd worden hier behandeld. Klik allereerst op ‘tonen’ om alle gegevens uit te vouwen.
 
@@ -551,7 +546,7 @@ Hier vult u de linktekst in om van de lijstweergave naar de detailweergave te na
 
 .. _ZTCImportExport:
 
-9.16.3. Zaaktype configuratie importeren/exporteren
+9.15.3. Zaaktype configuratie importeren/exporteren
 ---------------------------------------------------
 
 Het is mogelijk om individuele Zaaktype Configuratie objecten te importeren, op analoge wijze zoals beschreven voor de Catalogus Configuraties (zie :ref:`CatalogusImportExport`).
