@@ -6,8 +6,8 @@ from django.db import models
 from django.urls import reverse
 
 from django_elasticsearch_dsl import Document
-from elasticsearch_dsl import FacetedResponse
-from elasticsearch_dsl.response import Response
+from elasticsearch.dsl import FacetedResponse
+from elasticsearch.dsl.response import Response
 
 from open_inwoner.pdc.models import Product
 

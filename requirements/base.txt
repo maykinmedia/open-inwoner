@@ -45,7 +45,7 @@ celery-once==3.0.1
 certifi==2023.11.17
     # via
     #   elastic-apm
-    #   elasticsearch
+    #   elastic-transport
     #   requests
     #   sentry-sdk
 cffi==1.15.0
@@ -193,7 +193,7 @@ django-csp-reports==1.9.1
     # via -r requirements/base.in
 django-digid-eherkenning[oidc]==0.19.2
     # via -r requirements/base.in
-django-elasticsearch-dsl==7.4
+django-elasticsearch-dsl==8.2
     # via -r requirements/base.in
 django-extra-fields==3.0.2
     # via -r requirements/base.in
@@ -331,9 +331,9 @@ ecs-logging==2.1.0
     # via elastic-apm
 elastic-apm==6.20.0
     # via -r requirements/base.in
-elasticsearch==7.15.1
-    # via elasticsearch-dsl
-elasticsearch-dsl==7.4.0
+elastic-transport==8.17.1
+    # via elasticsearch
+elasticsearch==8.18.1
     # via django-elasticsearch-dsl
 email-validator==2.1.1
     # via pydantic
@@ -479,7 +479,7 @@ python-dateutil==2.8.2
     # via
     #   celery
     #   django-relativedelta
-    #   elasticsearch-dsl
+    #   elasticsearch
     #   faker
     #   messagebird
     #   python-crontab
@@ -537,7 +537,6 @@ six==1.16.0
     # via
     #   click-repl
     #   django-elasticsearch-dsl
-    #   elasticsearch-dsl
     #   furl
     #   html5lib
     #   isodate
@@ -562,6 +561,7 @@ tinycss2==1.1.1
 typing-extensions==4.10.0
     # via
     #   -r requirements/base.in
+    #   elasticsearch
     #   mozilla-django-oidc-db
     #   pydantic
     #   pydantic-core
@@ -579,7 +579,7 @@ uritemplate==4.1.1
 urllib3==1.26.18
     # via
     #   elastic-apm
-    #   elasticsearch
+    #   elastic-transport
     #   requests
     #   sentry-sdk
 uwsgi==2.0.23

@@ -159,7 +159,11 @@ def render_full_page(page: Page, *, as_user: User | None = None):
     # Use the render_page function
     rendered_response = render_page(request, page, current_language="nl", slug=None)
     rendered_response.render()
-    return rendered_response.content
+
+    content = rendered_response.content
+    if isinstance(content, bytes):
+        content = content.decode("utf-8")
+    return content
 
 
 def import_context_processors():
