@@ -83,7 +83,7 @@ Stappen voor importeren:
 
 .. figure:: images/image141.png
    :width: 1178px
-    :alt: Importeren van catalogus configuraties
+   :alt: Importeren van catalogus configuraties
 
 #. Selecteer een bestand van uw lokale computer
 #. Upload het bestand
