@@ -184,9 +184,9 @@ class ZaakInformatieObject(ZGWModel):
     informatieobject: Union[str, "InformatieObject"]
     zaak: Union[str, Zaak]
     # aard_relatie_weergave: str
-    titel: str
     # beschrijving: str
     registratiedatum: Optional[datetime]
+    titel: Optional[str] = ""
 
 
 @dataclass
