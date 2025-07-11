@@ -340,12 +340,12 @@ Bij SDK kunnen de instellingen rond de voorkant van Open Formulieren worden aang
 Open Formulieren kan gebruik maken van logs op Sentry. Wanneer er een vinkje is gezet bij “Gebruik Sentry” worden SDK errors van Open Formulieren automatisch doorgestuurd naar de ingestelde Sentry instantie.
 
 9.10. Open Zaak informatieobject notificatie records
-===================================================
+====================================================
 
 Bij Open Zaak informatieobject notificatie records vindt u een register met daarin gegevens over naar welke gebruikers welke notificaties zijn verstuurd naar aanleiding van het toevoegen of wijzigen van een document.
 
 9.11. Open Zaak statusnotificatie records
-========================================
+=========================================
 
 Bij Open Zaak statusnotificatie records vindt u naar welke gebruikers welke notificaties zijn verstuurd naar aanleiding van een statuswijziging.
 
