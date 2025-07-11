@@ -313,7 +313,7 @@ Sla op en registreer de Webhook explciet door het in de lijst te selecteren en t
 5) Configureer in eSuite de Zaaktypes (/admin/openzaak/zaaktypeconfig/) Selecteer de Zaaktypes en InformatieObjectTypes en configureer de bijbehorende notificatieopties. Er is een cronjob om deze catalogus te importeren. Dit commando kan te allen tijde worden uitgevoerd python src/manage.py zgw_import_data (from the virtual env)
 
 9.8. Objects API client configuration
-====================================
+=====================================
 
 Bij Objects API client configuration stelt u in welke API gebruikt wordt.
 
