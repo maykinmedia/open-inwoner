@@ -24,6 +24,7 @@ U kunt het actieoverzicht sorteren op naam, creatiedatum en gebruiker. Dit doet 
 .. image:: images/ScreenshotOIPActiessorteren-Djuzz250311.png
    :width: 622px
 
+
 Om vervolgens nog te sorteren op creatiedatum, klikt u ook op deze kolom. De lijst wordt dan gesorteerd op creatiedatum + naam. Wilt u op alle drie de kolommen sorteren, dan klikt u ook op de kolom gebruiker. De lijst is nu gesorteerd op creatiedatum + naam + gebruiker. Het is belangrijk te weten dat de nieuw aangeklikte kolom óver de al actieve sortering wordt gezet. De laatste kolom geldt in dat geval dus als ‘hoofd’. Om de voorwaarde voor de sortering te verwijderen, klikt u op het icoontje van de twee driehoekjes met de streep erdoor.
 
 4.2. Berichten
