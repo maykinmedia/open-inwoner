@@ -1,0 +1,498 @@
+{% load static icon_tags %}
+
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,
+     initial-scale=1.0"
+    />
+    <title>Web Components Demo - Open Inwoner</title>
+
+    {# Include the main JS bundle for HTMX and other features #}
+    <script
+      nonce="{{ request.csp_nonce }}"
+      src="{% static 'bundles/open_inwoner-js.js' %}"
+      defer
+    ></script>
+
+    {# Include the web components bundle #}
+    <script
+      nonce="{{ request.csp_nonce }}"
+      src="{% static 'bundles/open_inwoner-webcomponents.js' %}"
+      defer
+      type="module"
+    ></script>
+
+    {# Include CSS for styling #}
+    <link
+      nonce="{{ request.csp_nonce }}"
+      href="{% static 'bundles/open_inwoner-css.css' %}"
+      media="all"
+      rel="stylesheet"
+    />
+
+    <meta name="csp-nonce" content="{{ request.csp_nonce }}" />
+
+    <style nonce="{{ request.csp_nonce }}">
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        line-height: 1.6;
+        margin: 40px;
+        background: #f8f9fa;
+      }
+
+      .demo-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .demo-section {
+        margin-block: 40px;
+        padding: 24px;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        background: #fafbfc;
+      }
+      .demo-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin: 20px 0;
+      }
+
+      .demo-item {
+        padding: 16px;
+        background: white;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 2rem;
+      }
+
+      .demo-item h4 {
+        margin-top: 0;
+        color: #666;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .code-block {
+        background: #f1f3f4;
+        padding: 12px;
+        border-radius: 4px;
+        font-family: 'Monaco', 'Consolas', monospace;
+        font-size: 13px;
+        margin: 8px 0;
+        overflow-x: auto;
+      }
+    </style>
+  </head>
+  <body class="openinwoner-theme">
+    <div class="demo-container">
+      <h1>🧩 Web Components Demo</h1>
+      <p>
+        This page demonstrates a custom web components integrated with HTMX and
+        the Open Inwoner frontend stack.
+      </p>
+
+      <!-- Custom Button Demo -->
+      <div class="demo-section">
+        <h2>Custom Web-Components</h2>
+        <p>Interactive buttons with click tracking and different variants.</p>
+
+        <div class="demo-grid">
+          <div class="demo-item">
+            <h4>Size Variants</h4>
+            <div>
+              <custom-button variant="primary" size="small">
+                <span slot="text">Small</span>
+              </custom-button>
+              <custom-button variant="primary" size="medium">
+                <span slot="text">Medium</span>
+              </custom-button>
+              <custom-button variant="primary" size="large">
+                <span slot="text">Large</span>
+              </custom-button>
+            </div>
+            <div class="code-block">
+              <pre>
+&lt;custom-button variant="primary" size="small"&gt;
+  &lt;span slot="text"&gt;Small&lt;/span&gt;
+&lt;/custom-button&gt;</pre
+              >
+            </div>
+          </div>
+
+          <div class="demo-item">
+            <h4>Color Variants</h4>
+            <div>
+              <custom-button variant="primary">
+                <span slot="text">Primary</span>
+              </custom-button>
+              <custom-button variant="secondary">
+                <span slot="text">Secondary</span>
+              </custom-button>
+              <custom-button variant="success">
+                <span slot="text">Success</span>
+              </custom-button>
+              <custom-button variant="danger">
+                <span slot="text">Danger</span>
+              </custom-button>
+              <custom-button disabled>
+                <span slot="text">Disabled</span>
+              </custom-button>
+            </div>
+            <div class="code-block">
+              <pre>
+&lt;custom-button variant="success"&gt;
+  &lt;span slot="text"&gt;Success&lt;/span&gt;
+&lt;/custom-button&gt;
+&lt;custom-button disabled&gt;
+  &lt;span slot="text"&gt;Disabled&lt;/span&gt;
+&lt;/custom-button&gt;</pre
+              >
+            </div>
+          </div>
+
+          <div class="demo-item">
+            <h4>With Icons</h4>
+            <div>
+              <custom-button variant="primary">
+                <span slot="icon">{% icon 'person' %}</span>
+                <span slot="text">With Icon</span>
+              </custom-button>
+              <custom-button variant="secondary">
+                <span slot="icon">{% icon 'settings' %}</span>
+                <span slot="text">Settings</span>
+              </custom-button>
+            </div>
+            <div class="code-block">
+              <pre>
+&lt;custom-button variant="primary"&gt;
+  &lt;span slot="icon"&gt;{% templatetag openblock %} icon 'person' {% templatetag closeblock %}&lt;/span&gt;
+  &lt;span slot="text"&gt;With Icon&lt;/span&gt;
+&lt;/custom-button&gt;</pre
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Custom Counter Demo -->
+      <div class="demo-section">
+        <h2>Custom Counter Component</h2>
+        <p>Stateful counter with min/max limits and step controls.</p>
+
+        <div class="demo-grid">
+          <div class="demo-item">
+            <h4>Basic Counter (0-10)</h4>
+            <custom-counter
+              min="0"
+              max="10"
+              step="1"
+              value="3"
+            ></custom-counter>
+            <div class="code-block">
+              <pre>
+&lt;custom-counter min="0" max="10" step="1" value="3"&gt;&lt;/custom-counter&gt;</pre
+              >
+            </div>
+          </div>
+
+          <div class="demo-item">
+            <h4>Step Counter (0-100, step 5)</h4>
+            <custom-counter
+              min="0"
+              max="100"
+              step="5"
+              value="15"
+            ></custom-counter>
+            <div class="code-block">
+              <pre>
+&lt;custom-counter min="0" max="100" step="5" value="15"&gt;&lt;/custom-counter&gt;</pre
+              >
+            </div>
+          </div>
+
+          <div class="demo-item">
+            <h4>Display Only Mode</h4>
+            <custom-counter
+              min="-10"
+              max="10"
+              step="2"
+              value="0"
+              display-only
+            ></custom-counter>
+            <div class="code-block">
+              <pre>
+&lt;custom-counter min="-10" max="10" step="2" value="0" display-only&gt;&lt;/custom-counter&gt;</pre
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Utrecht Design System Components -->
+      <div class="demo-section">
+        <utrecht-heading-2>Utrecht Design System Components</utrecht-heading-2>
+        <utrecht-paragraph>
+          These are some examples from the
+          <utrecht-link
+            href="https://nl-design-system.github.io/utrecht/storybook-web-component/?path=/docs/web-component-readme--docs"
+            >utrecht web component docs</utrecht-link
+          >
+        </utrecht-paragraph>
+        <utrecht-paragraph>
+          To give some extra look and feel to this page all components use
+          web-components (except code blocks, these are not responsive).
+        </utrecht-paragraph>
+
+        <utrecht-heading-3>Buttons & Actions</utrecht-heading-3>
+        <div class="demo-grid">
+          <div class="demo-item">
+            <utrecht-heading-4>Button Variants</utrecht-heading-4>
+            <div>
+              <utrecht-button appearance="primary-action-button">
+                Primary Action
+              </utrecht-button>
+              <utrecht-button appearance="secondary-action-button">
+                Secondary Action
+              </utrecht-button>
+              <utrecht-button appearance="subtle-button">
+                Subtle Button
+              </utrecht-button>
+              <utrecht-button appearance="button">
+                Default Button
+              </utrecht-button>
+            </div>
+            <div class="code-block">
+              <pre>
+&lt;utrecht-button appearance="primary-action-button"&gt;Primary Action&lt;/utrecht-button&gt;
+&lt;utrecht-button appearance="secondary-action-button"&gt;Secondary Action&lt;/utrecht-button&gt;
+&lt;utrecht-button appearance="subtle-button"&gt;Subtle Button&lt;/utrecht-button&gt;</pre
+              >
+            </div>
+          </div>
+
+          <div class="demo-item">
+            <utrecht-heading-4>Buttons with Icons</utrecht-heading-4>
+            <div>
+              <utrecht-button appearance="primary-action-button">
+                <utrecht-icon-bestemmingsplan
+                  slot="icon"
+                ></utrecht-icon-bestemmingsplan>
+                With Icon
+              </utrecht-button>
+              <utrecht-button appearance="secondary-action-button">
+                <utrecht-icon-bestemmingsplan
+                  slot="icon"
+                ></utrecht-icon-bestemmingsplan>
+                Secondary
+              </utrecht-button>
+            </div>
+            <div class="code-block">
+              <pre>
+&lt;utrecht-button appearance="primary-action-button"&gt;
+  &lt;utrecht-icon-bestemmingsplan slot="icon"&gt;&lt;/utrecht-icon-bestemmingsplan&gt;
+  With Icon
+&lt;/utrecht-button&gt;</pre
+              >
+            </div>
+          </div>
+        </div>
+
+        <utrecht-heading-3>Form Components</utrecht-heading-3>
+        <div class="demo-grid">
+          <div class="demo-item">
+            <utrecht-heading-4>Text Input</utrecht-heading-4>
+            <utrecht-textbox
+              placeholder="Enter your text here..."
+            ></utrecht-textbox>
+            <div class="code-block">
+              <pre>
+&lt;utrecht-textbox placeholder="Enter your text here..."&gt;&lt;/utrecht-textbox&gt;</pre
+              >
+            </div>
+          </div>
+
+          <div class="demo-item">
+            <utrecht-heading-4>Text field</utrecht-heading-4>
+            <div>
+              <utrecht-textarea
+                cols="20"
+                rows="2"
+                value="The Quick Brown Fox Jumps Over The Lazy Dog"
+              ></utrecht-textarea>
+            </div>
+            <div class="code-block">
+              <pre>
+&lt;utrecht-textarea
+  cols="20"
+  rows="2"
+  value="The Quick Brown Fox Jumps Over The Lazy Dog"
+&gt;&lt;/utrecht-textarea&gt;</pre
+              >
+            </div>
+          </div>
+
+          <div class="demo-item">
+            <utrecht-heading-4>Checkbox</utrecht-heading-4>
+            <div>
+              <utrecht-form-field-checkbox>
+                <span slot="label">I agree</span>
+              </utrecht-form-field-checkbox>
+            </div>
+            <div class="code-block">
+              <pre>
+&lt;utrecht-checkbox&gt;
+  &lt;utrecht-form-label&gt;I agree to the terms and conditions&lt;/utrecht-form-label&gt;
+&lt;/utrecht-checkbox&gt;</pre
+              >
+            </div>
+          </div>
+        </div>
+
+        <utrecht-heading-3>Typography & Content</utrecht-heading-3>
+        <div class="demo-grid">
+          <div class="demo-item">
+            <utrecht-heading-4>Headings</utrecht-heading-4>
+            <utrecht-heading-1>Heading Level 1</utrecht-heading-1>
+            <utrecht-heading-2>Heading Level 2</utrecht-heading-2>
+            <utrecht-heading-3>Heading Level 3</utrecht-heading-3>
+            <div class="code-block">
+              <pre>
+&lt;utrecht-heading-1&gt;Heading Level 1&lt;/utrecht-heading-1&gt;
+&lt;utrecht-heading-2&gt;Heading Level 2&lt;/utrecht-heading-2&gt;
+&lt;utrecht-heading-3&gt;Heading Level 3&lt;/utrecht-heading-3&gt;</pre
+              >
+            </div>
+          </div>
+
+          <div class="demo-item">
+            <utrecht-heading-4>Paragraph & Links</utrecht-heading-4>
+            <utrecht-paragraph>
+              This is a paragraph with some
+              <utrecht-link href="#">important links</utrecht-link> and
+              <strong>emphasized text</strong> to demonstrate Utrecht typography
+              components.
+            </utrecht-paragraph>
+            <div class="code-block">
+              <pre>
+&lt;utrecht-paragraph&gt;
+  This is a paragraph with &lt;utrecht-link href="#"&gt;links&lt;/utrecht-link&gt;
+&lt;/utrecht-paragraph&gt;</pre
+              >
+            </div>
+          </div>
+
+          <div class="demo-item">
+            <utrecht-heading-4>Side navigation</utrecht-heading-4>
+            <utrecht-sidenav
+              json='[{"href":"#","title":"Home"},{"href":"#","title":"Wonen en leven"},{"href":"#","title":"Parken en groen"},{"href":"#","title":"Bomen","haschildren":true,"children":[{"href":"#","title":"Bomennieuws"},{"href":"#","title":"Bomen planten en kappen","current":true},{"href":"#","title":"Bomenzorg en bomenbeleid"},{"href":"#","title":"Ziekten en plagen"},{"href":"#","title":"Overlast bomen"},{"href":"#","title":"Zorgvuldig met bomen omgaan"}]},{"href":"#","title":"Parken en plantsoenen","sibling":true}]'
+            >
+            </utrecht-sidenav>
+            <div class="code-block">
+              <pre>
+&lt;utrecht-sidenav 
+  json='[
+    {
+      "href":"#",
+      "title":"Home"
+    },
+    {
+      "href":"#",
+      "title":"Wonen en leven"
+    },
+    {
+      "href":"#",
+      "title":"Parken en groen"
+    },
+    {
+      "href":"#",
+      "title":"Bomen",
+      "haschildren":true,
+      "children":[
+        {
+          "href":"#","title":"Bomennieuws"
+        },
+        {
+          "href":"#","title":"Bomen planten en kappen",
+          "current":true
+        },
+        {
+          "href":"#",
+          "title":"Bomenzorg en bomenbeleid"
+        },  
+        {
+          "href":"#",
+          "title":"Ziekten en plagen"
+        },
+        {
+          "href":"#",
+          "title":"Overlast bomen"
+        },
+        {
+          "href":"#",
+          "title":"Zorgvuldig met bomen omgaan"
+        }
+      ]
+    },
+    {
+      "href":"#",
+      "title":"Parken en plantsoenen",
+      "sibling":true
+    },
+  ]'
+&gt;&lt;/utrecht-sidenav&gt;
+              </pre>
+            </div>
+          </div>
+        </div>
+
+        <utrecht-heading-3>Layout Components</utrecht-heading-3>
+        <div class="demo-grid">
+          <div class="demo-item">
+            <utrecht-heading-4>Article</utrecht-heading-4>
+            <utrecht-article>
+              <utrecht-heading-2>Article Title</utrecht-heading-2>
+              <utrecht-paragraph>
+                This is an article component that provides semantic structure
+                for content sections in your application.
+              </utrecht-paragraph>
+            </utrecht-article>
+            <div class="code-block">
+              <pre>
+&lt;utrecht-article&gt;
+  &lt;utrecht-heading-2&gt;Article Title&lt;/utrecht-heading-2&gt;
+  &lt;utrecht-paragraph&gt;Content here...&lt;/utrecht-paragraph&gt;
+&lt;/utrecht-article&gt;</pre
+              >
+            </div>
+          </div>
+
+          <div class="demo-item">
+            <utrecht-heading-4>Badge</utrecht-heading-4>
+            <div>
+              <utrecht-badge-status>Status</utrecht-badge-status>
+              <utrecht-badge-counter>42</utrecht-badge-counter>
+            </div>
+            <div class="code-block">
+              <pre>
+&lt;utrecht-badge-status&gt;Status&lt;/utrecht-badge-status&gt;
+&lt;utrecht-badge-counter&gt;42&lt;/utrecht-badge-counter&gt;</pre
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

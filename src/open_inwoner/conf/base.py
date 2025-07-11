@@ -901,9 +901,7 @@ GEOCODER = "open_inwoner.utils.geocode.PdocLocatieserver"
 
 
 # ELASTICSEARCH CONFIG
-ELASTICSEARCH_DSL = {
-    "default": {"hosts": config("ES_HOST", "localhost:9200")},
-}
+ELASTICSEARCH_DSL = {"default": {"hosts": config("ES_HOST", "http://localhost:9200")}}
 ES_INDEX_PRODUCTS = config("ES_INDEX_PRODUCTS", "products")
 ES_INDEX_CMS_PAGES = config("ES_INDEX_CMS_PAGES", "cms_pages")
 ES_MAX_SIZE = 10000

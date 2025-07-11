@@ -89,7 +89,7 @@ certifi==2023.11.17
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   elastic-apm
-    #   elasticsearch
+    #   elastic-transport
     #   requests
     #   sentry-sdk
 cffi==1.15.0
@@ -312,7 +312,7 @@ django-digid-eherkenning[oidc]==0.19.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-django-elasticsearch-dsl==7.4
+django-elasticsearch-dsl==8.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -560,12 +560,12 @@ elastic-apm==6.20.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-elasticsearch==7.15.1
+elastic-transport==8.17.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-    #   elasticsearch-dsl
-elasticsearch-dsl==7.4.0
+    #   elasticsearch
+elasticsearch==8.18.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -885,7 +885,7 @@ python-dateutil==2.8.2
     #   -r requirements/base.txt
     #   celery
     #   django-relativedelta
-    #   elasticsearch-dsl
+    #   elasticsearch
     #   faker
     #   freezegun
     #   messagebird
@@ -984,7 +984,6 @@ six==1.16.0
     #   -r requirements/base.txt
     #   click-repl
     #   django-elasticsearch-dsl
-    #   elasticsearch-dsl
     #   furl
     #   html5lib
     #   isodate
@@ -1054,6 +1053,7 @@ typing-extensions==4.10.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   elasticsearch
     #   mozilla-django-oidc-db
     #   polyfactory
     #   pydantic
@@ -1079,7 +1079,7 @@ urllib3==1.26.18
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   elastic-apm
-    #   elasticsearch
+    #   elastic-transport
     #   requests
     #   sentry-sdk
 uwsgi==2.0.23

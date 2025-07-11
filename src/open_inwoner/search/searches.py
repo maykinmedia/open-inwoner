@@ -2,7 +2,7 @@ import logging
 
 from django.conf import settings
 
-from elasticsearch_dsl import (
+from elasticsearch.dsl import (
     FacetedSearch,
     MultiSearch,
     NestedFacet,
@@ -11,7 +11,7 @@ from elasticsearch_dsl import (
     TermsFacet,
     query,
 )
-from elasticsearch_dsl.response import Response
+from elasticsearch.dsl.response import Response
 
 from .constants import FacetChoices
 from .documents import CMSPageDocument, ProductDocument

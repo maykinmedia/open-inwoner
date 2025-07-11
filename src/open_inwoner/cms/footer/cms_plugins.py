@@ -67,7 +67,7 @@ class CMSFlatPagePlugin(CMSPluginBase):
 
         cms_page = cms_pages.first()
 
-        if not context["user"].is_authenticated:
+        if not hasattr(context, "user") or not context["user"].is_authenticated:
             if (
                 hasattr(cms_page, "commonextension")
                 and cms_page.commonextension.requires_auth

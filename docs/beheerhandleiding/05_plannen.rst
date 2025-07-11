@@ -67,9 +67,8 @@ Als u uw wijzigingen tussentijds wilt opslaan, klikt u op [opslaan en opnieuw be
 
 Onder samenwerken vindt u een overzicht van de door gebruikers aangemaakte samenwerkingsplannen. U kunt vanuit deze vanuit de beheeromgeving inzien, wijzigen of verwijderen en u kunt een nieuw samenwerkingsplan toevoegen.
 
-.. image:: images/image21.png
+.. image:: images/ScreenshotOIPsamenwerken-Djuzz250311.png
   :width: 623px
-  :height: 123px
 
 5.2.1. Plan toevoegen
 ---------------------
@@ -81,9 +80,8 @@ Door in het overzicht op de knop [toevoegen +] rechts bovenin uw scherm te klikk
 
 Door op een samenwerkingsplan in het overzicht te klikken, kunt u deze wijzigen. Er wordt een nieuw scherm geopend waar u diverse wijzigingen kunt aanbrengen. Dit scherm bestaat uit twee delen: het algemene deel en het actiedeel. In het actiedeel kunt u direct de bij het samenwerkingsplan horende acties wijzigen of deze toevoegen. Alle informatie over de elementen binnen het actiedeel vindt u in hoofdstuk 4.1
 
-.. image:: images/image22.png
-   :width: 619px
-   :height: 408px
+.. image:: images/ScreenshotOIPsamenwerkenplanwijzigen-Djuzz250311.png
+   :width: 623px
 
 **UUID (Universally Unique ID)**
 Dit is de automatisch gegenereerde user ID. Deze code kunt u niet wijzigen.

@@ -1,4 +1,4 @@
-from elasticsearch_dsl import analyzer, token_filter
+from elasticsearch.dsl import analyzer, token_filter
 
 from .utils import load_synonyms
 
