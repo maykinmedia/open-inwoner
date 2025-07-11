@@ -46,7 +46,7 @@ Vink dit aan om te bepalen of gebruikers via Mijn Berichten bestanden kunnen del
 Geef hier een URL of pad op waar niet-ingelogde gebruikers naartoe doorgestuurd moeten worden vanuit de niet-ingelogde homepagina.
 
 - Een pad is bijvoorbeeld: '/accounts/login'.
-- Een URL is bijvoorbeeld: 'https://gemeente.groningen.nl'.
+- Een URL is bijvoorbeeld: 'https://groningen.nl'.
 
 12.1.2. Kleur
 -------------
