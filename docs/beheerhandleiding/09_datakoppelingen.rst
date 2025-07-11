@@ -75,7 +75,7 @@ Stappen voor exporteren:
 De export omvat alle catalogi, zaaktypes en onderliggende objecten (resultaattypen, informatie-objecttypen, etc.) van de geselecteerde catalogi.
 
 Importeren van catalogus configuraties
-----------
+--------------------------------------
 
 Stappen voor importeren:
 
@@ -105,7 +105,7 @@ Hier worden de gebruikte certificaten van het platform weergegeven. Bij ieder ce
 .. image:: images/Screenshot_OIP_Data_Koppelingen_Certificaten_Djuzz_250710.png
 
 9.2.1. Nieuw certificaat toevoegen
---------------
+----------------------------------
 
 U kunt een nieuw certificaat toevoegen door op de knop "certificaat toevoegen" te klikken. Er wordt dan een nieuw scherm geopend waarin alle gegevens van het nieuwe certificaat moeten worden ingevuld.
 
