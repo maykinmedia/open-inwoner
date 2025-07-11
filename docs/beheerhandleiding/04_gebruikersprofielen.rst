@@ -171,9 +171,8 @@ Door in het gebruikersoverzicht op een bepaalde gebruiker te klikken kunt u deze
 
 Wanneer u in de blauwe balk bij notificaties op [tonen] klikt, krijgt u de mogelijkheid de gebruikersinstellingen rond notificaties aan te passen. Wanneer getoond, krijgt u de mogelijke notificaties van de betreffende gebruiker te zien. De blauwe vinkjes geven aan voor welk soort notificaties de gebruiker zich voor heeft ingeschreven. Indien gewenst kunnen deze gegevens worden gewijzigd, zodat de gebruiker bepaalde notificaties juist wel of juist niet ontvangt.
 
-.. image:: images/image18.png
+.. image:: images/Algemeneconfiguratienotificaties.png
    :width: 624px
-   :height: 146px
 
 
 4.5.6. Contacten - uitnodigingen
