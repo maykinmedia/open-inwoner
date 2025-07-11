@@ -60,7 +60,7 @@ Matching-attributen
   ``zaaktype`` moeten gelijk zijn
 
 Exporteren van catalogus configuraties
-----------
+--------------------------------------
 
 Stappen voor exporteren:
 
