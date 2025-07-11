@@ -382,7 +382,7 @@ class TestSearchView(ESMixin, TransactionTestCase):
     def test_search_shows_error_on_connection_timeout(
         self, request_mocker, mock_search
     ):
-        mock_search.side_effect = ConnectionTimeout()
+        mock_search.side_effect = ConnectionTimeout(message="Connection was timed out.")
         self.client.force_login(self.user)
         params = urlencode({"query": "stuff"}, doseq=True)
         response = self.client.get(f"{reverse('search:search')}?{params}")

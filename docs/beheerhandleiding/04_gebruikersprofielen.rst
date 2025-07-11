@@ -44,7 +44,6 @@ Onder documenten vindt u alle documenten die gebruikers aan de voorkant van Open
 
 .. image:: images/ScreenshotOIPdocumenten-Djuzz250311.png
    :width: 622px
-   :height: 113px
 
 
 4.3.1. Documentenoverzicht sorteren
@@ -65,7 +64,6 @@ In de backend is het overzicht van de feed item data te raadplegen. Er is inform
 
 .. image:: images/ScreenshotOIPfeeditemdata-Djuzz250311.png
    :width: 624px
-   :height: 274px
 
 
 4.5. Gebruikers
@@ -75,8 +73,6 @@ Onder gebruikers vindt u alle gebruikers van uw Open Inwoner. Indien gewenst kun
 
 .. image:: images/ScreenshotOIPgebruikers-Djuzz250311.png
    :width: 622px
-   :height: 176px
-
 
 4.5.1. Gebruikersoverzicht sorteren
 -----------------------------------

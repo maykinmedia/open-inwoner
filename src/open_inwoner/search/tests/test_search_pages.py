@@ -2,7 +2,7 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.test import TestCase, tag
 
-from elasticsearch_dsl import Search
+from elasticsearch.dsl import Search
 
 from open_inwoner.accounts.models import SiteConfiguration
 from open_inwoner.cms.tests.cms_tools import create_cms_page_with_content

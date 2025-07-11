@@ -104,7 +104,7 @@ certifi==2023.11.17
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   elastic-apm
-    #   elasticsearch
+    #   elastic-transport
     #   geventhttpclient
     #   requests
     #   sentry-sdk
@@ -348,7 +348,7 @@ django-digid-eherkenning[oidc]==0.19.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-django-elasticsearch-dsl==7.4
+django-elasticsearch-dsl==8.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -602,12 +602,12 @@ elastic-apm==6.20.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-elasticsearch==7.15.1
+elastic-transport==8.17.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-    #   elasticsearch-dsl
-elasticsearch-dsl==7.4.0
+    #   elasticsearch
+elasticsearch==8.18.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -1009,7 +1009,7 @@ python-dateutil==2.8.2
     #   -r requirements/ci.txt
     #   celery
     #   django-relativedelta
-    #   elasticsearch-dsl
+    #   elasticsearch
     #   faker
     #   freezegun
     #   messagebird
@@ -1121,7 +1121,6 @@ six==1.16.0
     #   -r requirements/ci.txt
     #   click-repl
     #   django-elasticsearch-dsl
-    #   elasticsearch-dsl
     #   furl
     #   geventhttpclient
     #   html5lib
@@ -1235,6 +1234,7 @@ typing-extensions==4.10.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   elasticsearch
     #   mozilla-django-oidc-db
     #   polyfactory
     #   pydantic
@@ -1260,7 +1260,7 @@ urllib3==1.26.18
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   elastic-apm
-    #   elasticsearch
+    #   elastic-transport
     #   requests
     #   sentry-sdk
 uwsgi==2.0.23

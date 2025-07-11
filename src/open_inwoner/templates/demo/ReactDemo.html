@@ -1,0 +1,17 @@
+{% load static %}
+
+<html data-mount-modules='["demo"]' lang="nl">
+  <head>
+    {# Including this script will allow the page to use the react router #}
+    <script
+      type="module"
+      src="{% static 'bundles/open_inwoner-react.js' %}"
+      defer
+    ></script>
+  </head>
+  <body>
+    <div id="react-root-demo"></div>
+    <div class="test" id="react-root-demo-count"></div>
+    <div id="react-root-demo-counter"></div>
+  </body>
+</html>
