@@ -66,6 +66,8 @@ select = [
     "N",
     # https://docs.astral.sh/ruff/rules/#isort-i
     "I",
+    # https://docs.astral.sh/ruff/rules/#flake8-bandit-s
+    "S",
 ]
 ignore = [
     # Whitespace before ':' (conflicts with Black)
@@ -92,6 +94,8 @@ ignore = [
     "N815",
     # Exception name should be named with Error suffix
     "N818",
+    # Checks for uses of the Python requests or httpx module that omit the timeout parameter.
+    "S113"
 ]
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
@@ -115,6 +119,11 @@ ignore-names = [
     "*TimelineLog*",
     "innNnpId",
 ]
+
+[lint.per-file-ignores]
+# Ignore security rules in test files
+"**/test_*.py" = ["S"]
+"**/tests/**/*.py" = ["S"]
 
 # Import sorting configuration (equivalent to isort)
 [lint.isort]

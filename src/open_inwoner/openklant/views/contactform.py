@@ -2,6 +2,7 @@ import logging
 
 from django.conf import settings
 from django.contrib import messages
+from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse
 from django.utils.encoding import iri_to_uri
 from django.utils.functional import cached_property
@@ -221,7 +222,8 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
         form: ContactForm,
         esuite_config: ESuiteKlantConfig,
     ) -> tuple[bool, str]:
-        assert esuite_config.has_api_configuration
+        if not esuite_config.has_api_configuration:
+            raise ImproperlyConfigured("Missing API configuration for eSuite")
 
         klant = self._fetch_klant()
         if klant:

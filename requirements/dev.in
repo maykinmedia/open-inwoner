@@ -4,9 +4,6 @@
 pip-tools
 pre-commit
 
-# Code formatting
-bandit
-
 # Debug tooling
 django-debug-toolbar
 

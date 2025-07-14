@@ -1,4 +1,5 @@
 from django.contrib.postgres.fields import ArrayField
+from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -104,9 +105,8 @@ class Subscription(models.Model):
         """
         Registers the webhook with the notification component.
         """
-        assert self.notifications_api_config.notifications_api_service, (
-            "No service for Notifications API configured"
-        )
+        if not self.notifications_api_config.notifications_api_service:
+            raise ImproperlyConfigured("No service for Notifications API configured")
 
         client = self.notifications_api_config.get_client()
 

@@ -165,7 +165,7 @@ class Command(BaseCommand):
 
             # if next status is end-status we need to result, so random select one
             if next_status_type.is_eindstatus and not case.resultaat:
-                next_result_type = random.choice(result_types)  # nosec
+                next_result_type = random.choice(result_types)  # noqa: S311
                 self.stdout.write(f"setting new result {next_result_type.omschrijving}")
                 zaken_client.create(
                     "resultaat",

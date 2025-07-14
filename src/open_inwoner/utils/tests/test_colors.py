@@ -34,6 +34,27 @@ class ColorUtilsTestCase(TestCase):
                 actual = hex_to_luminance(hex)
                 self.assertAlmostEqual(actual, expected, places=3)
 
+    def test_hex_to_luminance_invalid_length(self):
+        """Test that hex_to_luminance raises ValueError for invalid color lengths."""
+        invalid_colors = [
+            "#fff",  # 3 characters (too short)
+            "#ff",  # 2 characters (too short)
+            "#f",  # 1 character (too short)
+            "#fffffff",  # 7 characters (too long)
+            "#ffffffff",  # 8 characters (too long)
+            "fff",  # No # prefix, 3 characters
+            "0xfff",  # 0x prefix, 3 characters
+            "",  # Empty string
+        ]
+
+        for color in invalid_colors:
+            with self.subTest(color=color):
+                with self.assertRaises(ValueError) as cm:
+                    hex_to_luminance(color)
+
+                # Verify the error message mentions the expected length
+                self.assertIn("to have length 6", str(cm.exception))
+
     def test_get_contrast_ratio(self):
         tests = [
             ("#000000", "#ffffff", 21.0),
