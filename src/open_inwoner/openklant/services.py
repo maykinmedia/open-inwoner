@@ -1485,7 +1485,17 @@ class OpenKlant2Service(
             klantcontacten,
         )
 
-        return klantcontacten_for_partij
+        # only show questions initiated by the current user
+        klantcontacten_for_initiator = filter(
+            lambda row: True
+            in glom.glom(
+                row,
+                ("_expand.hadBetrokkenen", ["initiator"]),
+            ),
+            klantcontacten_for_partij,
+        )
+
+        return klantcontacten_for_initiator
 
     def questions_for_partij(self, partij_uuid: str) -> list[OpenKlant2Question]:
         answers_for_klantcontact_uuid = {}
@@ -1692,14 +1702,24 @@ class OpenKlant2Service(
         zaak: Zaak,
         user: User,
     ) -> list[Question]:
-        klantcontacten_for_zaak = self.client.klant_contact.list(
-            params={
-                "onderwerpobject__onderwerpobjectidentificatorObjectId": zaak.identificatie
-            }
-        )["results"]
+        params: ListKlantContactParams = {
+            "onderwerpobject__onderwerpobjectidentificatorObjectId": zaak.identificatie,
+            "expand": ["hadBetrokkenen"],
+        }
+        klantcontacten_for_zaak = self.client.klant_contact.list_iter(params=params)
+
+        # only show questions initiated by the current user
+        klantcontacten_for_initiator = filter(
+            lambda row: True
+            in glom.glom(
+                row,
+                ("_expand.hadBetrokkenen", ["initiator"]),
+            ),
+            klantcontacten_for_zaak,
+        )
 
         questions = [
             OpenKlant2Question.from_klantcontact_and_answer(klantcontact, None)
-            for klantcontact in klantcontacten_for_zaak
+            for klantcontact in klantcontacten_for_initiator
         ]
         return self._build_question_dtos(questions_ok2=questions, user=user)

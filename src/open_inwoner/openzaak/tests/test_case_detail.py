@@ -2921,6 +2921,7 @@ class TestCaseDetailView(
                             "uuid": "095be615-a8ad-4c33-8e9c-c7612fbf6c9f",
                             "url": "http://example.com",
                         },
+                        "initiator": True,
                     }
                 ],
             },
