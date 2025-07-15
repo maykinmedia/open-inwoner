@@ -7,7 +7,7 @@ Open Inwoner
 :Demo: https://openinwoner.nl
 :Source: https://github.com/maykinmedia/open-inwoner
 :Documentation: https://docs.openinwoner.nl
-:PythonVersion: 3.12
+:PythonVersion: 3.11
 
 |build-status| |docker| |black| |python-versions|
 
