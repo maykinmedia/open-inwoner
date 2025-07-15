@@ -783,13 +783,21 @@ class eSuiteVragenService(KlantenService):
         return self._build_question_dto(kcm), zaken_with_api_group
 
     def list_questions_for_zaak(self, zaak: Zaak, user: User) -> list[Question]:
-        objectcontactmomenten = self.retrieve_objectcontactmomenten_for_zaak(zaak)
+        # fetch klantcontactmomenten for filtering
+        fetch_params = self.get_fetch_parameters(user)
+        klantcontactmomenten = self.fetch_klantcontactmomenten(**fetch_params)
+        relevant_contactmomenten_urls = {
+            kcm.contactmoment.url for kcm in klantcontactmomenten
+        }
 
+        # fetch contactmomenten for zaak, filter out those not attched to a klant
+        objectcontactmomenten = self.retrieve_objectcontactmomenten_for_zaak(zaak)
         contactmomenten: list[ContactMoment] = []
         for ocm in objectcontactmomenten:
-            question: ContactMoment | None = getattr(ocm, "contactmoment", None)
-            if question:
-                contactmomenten.append(question)
+            contactmoment: ContactMoment | None = getattr(ocm, "contactmoment", None)
+            if contactmoment and contactmoment.url in relevant_contactmomenten_urls:
+                contactmomenten.append(contactmoment)
+
         contactmomenten.sort(key=lambda q: q.registratiedatum, reverse=True)
 
         if exclude_range := self.config.exclude_contactmoment_kanalen:
@@ -1477,7 +1485,17 @@ class OpenKlant2Service(
             klantcontacten,
         )
 
-        return klantcontacten_for_partij
+        # only show questions initiated by the current user
+        klantcontacten_for_initiator = filter(
+            lambda row: True
+            in glom.glom(
+                row,
+                ("_expand.hadBetrokkenen", ["initiator"]),
+            ),
+            klantcontacten_for_partij,
+        )
+
+        return klantcontacten_for_initiator
 
     def questions_for_partij(self, partij_uuid: str) -> list[OpenKlant2Question]:
         answers_for_klantcontact_uuid = {}
@@ -1684,14 +1702,24 @@ class OpenKlant2Service(
         zaak: Zaak,
         user: User,
     ) -> list[Question]:
-        klantcontacten_for_zaak = self.client.klant_contact.list(
-            params={
-                "onderwerpobject__onderwerpobjectidentificatorObjectId": zaak.identificatie
-            }
-        )["results"]
+        params: ListKlantContactParams = {
+            "onderwerpobject__onderwerpobjectidentificatorObjectId": zaak.identificatie,
+            "expand": ["hadBetrokkenen"],
+        }
+        klantcontacten_for_zaak = self.client.klant_contact.list_iter(params=params)
+
+        # only show questions initiated by the current user
+        klantcontacten_for_initiator = filter(
+            lambda row: True
+            in glom.glom(
+                row,
+                ("_expand.hadBetrokkenen", ["initiator"]),
+            ),
+            klantcontacten_for_zaak,
+        )
 
         questions = [
             OpenKlant2Question.from_klantcontact_and_answer(klantcontact, None)
-            for klantcontact in klantcontacten_for_zaak
+            for klantcontact in klantcontacten_for_initiator
         ]
         return self._build_question_dtos(questions_ok2=questions, user=user)
