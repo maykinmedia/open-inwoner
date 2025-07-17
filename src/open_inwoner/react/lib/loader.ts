@@ -7,6 +7,7 @@ import { AbstractPage } from '@react/lib/abstractPage'
 
 const modules = {
   demo: () => import('@react/modules/demo'),
+  sidenav: () => import('@react/modules/Sidenav'),
 }
 
 /**

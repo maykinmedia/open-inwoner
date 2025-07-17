@@ -2,6 +2,8 @@ import { Root } from 'react-dom/client'
 import Demo from './Demo'
 import { AbstractPage } from '@react/lib/abstractPage'
 
+console.log('Demo counter module loaded')
+
 export default class Page extends AbstractPage {
   static reactRoot: Root
 

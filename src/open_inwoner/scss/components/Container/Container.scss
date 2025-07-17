@@ -25,4 +25,9 @@
       margin-bottom: 0;
     }
   }
+
+  // Home page
+  &--fullwidth {
+    margin-top: var(--row-height);
+  }
 }
