@@ -456,16 +456,28 @@ const partialClickSelectors = {
   },
   // Detail case toggle statuses
   '#statuses_component > aside > ul > li.status-list__list-item.status--current > div > h3 > button':
-    { category: 'Mijn zaken huidige status' },
+    {
+      category: 'Mijn zaken huidige status',
+    },
   '#statuses_component > aside > ul > li.status--completed.status-list__list-item > div > h3 > button':
-    { category: 'Mijn zaken voltooide status' },
+    {
+      category: 'Mijn zaken voltooide status',
+    },
   '#statuses_component > aside > ul > li.status--active.status-list__list-item > div > h3 > button':
-    { category: 'Mijn zaken openstaande status' },
+    {
+      category: 'Mijn zaken openstaande status',
+    },
   '.logo .logo__image': { label: 'Header logo' },
   '.view--inbox-index #content .grid__sidebar ul li > a > p.utrecht-heading-4':
-    { category: 'Mijn berichten', label: 'Click naar bericht' },
+    {
+      category: 'Mijn berichten',
+      label: 'Click naar bericht',
+    },
   '.view--inbox-index #content .grid__sidebar ul li > a > p.utrecht-paragraph':
-    { category: 'Mijn berichten', label: 'Click naar bericht' },
+    {
+      category: 'Mijn berichten',
+      label: 'Click naar bericht',
+    },
   // Hide personal data from inputs
   'input[type="text"]': { label: 'Click in invoerveld' },
   'input[type="email"]': { label: 'Click in e-mail invoerveld' },

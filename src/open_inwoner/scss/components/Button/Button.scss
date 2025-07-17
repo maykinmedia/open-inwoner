@@ -15,7 +15,9 @@
   padding: var(--spacing-medium) var(--spacing-large);
   text-align: center;
   text-decoration: none;
-  transition: transform 300ms, background-color 300ms;
+  transition:
+    transform 300ms,
+    background-color 300ms;
   font-weight: normal;
   // modified outline for accessibility focus
   outline-width: 1px;

@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import type { Preview } from '@storybook/react'
 import type { StoryFn } from '@storybook/react'
 
@@ -7,12 +6,7 @@ import '@open-inwoner/design-tokens/dist/css/index.css'
 // import '../src/open_inwoner/static/bundles/open_inwoner-css.css';
 
 const withThemeClass = (Story: StoryFn) => {
-  useEffect(() => {
-    document.body.classList.add('openinwoner-theme')
-    return () => {
-      document.body.classList.remove('openinwoner-theme')
-    }
-  }, [])
+  document.body.classList.add('openinwoner-theme')
 
   return <Story />
 }
@@ -33,8 +27,6 @@ const preview: Preview = {
           'Introduction',
           'Developers',
           'React',
-          'HTML',
-          'Web Components',
         ],
       },
     },

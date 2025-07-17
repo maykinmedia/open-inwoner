@@ -70,10 +70,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@react': path.resolve(__dirname, 'src/open_inwoner/react'),
-      '@webcomponents': path.resolve(
-        __dirname,
-        'src/open_inwoner/webcomponents'
-      ),
+      '@webcomponents': path.resolve(__dirname, 'src/open_inwoner/webcomponents'),
     },
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
   },

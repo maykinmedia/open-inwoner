@@ -53,4 +53,5 @@ src/open_inwoner/static/fonts/material-icons/
 # Storybook files
 *storybook.log
 storybook-static/
-coverage/storybook/
+coverage/
+

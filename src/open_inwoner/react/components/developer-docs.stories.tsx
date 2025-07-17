@@ -14,7 +14,7 @@ const meta: Meta = {
 
 export default meta
 
-// The single "Docs" story — this is what Storybook shows as the full doc page
+// Single unattached "Docs" page
 export const Docs = {
   parameters: {
     docs: {

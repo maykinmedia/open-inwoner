@@ -8,18 +8,16 @@ import { customElement, property } from 'lit/decorators.js'
 @customElement('custom-button')
 class CustomButton extends LitElement {
   @property({ type: String })
-  // TODO: Update Prettier so it understands accessor keyword
-  // TODO: Replace 'declare' with 'accessor'
-  declare variant: string
+  accessor variant: string
 
   @property({ type: String })
-  declare size: string
+  accessor size: string
 
   @property({ type: Boolean })
-  declare disabled: boolean
+  accessor disabled: boolean
 
   @property({ type: Number })
-  declare clickCount: number
+  accessor clickCount: number
 
   static styles = css`
     :host {

@@ -5,7 +5,9 @@
   border: 0;
   color: #fff;
   cursor: pointer;
-  transition: transform 300ms, background-color 300ms;
+  transition:
+    transform 300ms,
+    background-color 300ms;
 
   &:hover {
     background-color: darken(#248641, 5);

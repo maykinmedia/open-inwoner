@@ -51,7 +51,7 @@ export default meta
 export const Docs = {
   parameters: {
     docs: {
-      page: meta.parameters.docs.page, // Reuse the same page content
+      page: meta.parameters?.docs?.page,
     },
   },
 }

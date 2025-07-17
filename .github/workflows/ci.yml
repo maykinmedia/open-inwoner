@@ -24,6 +24,8 @@ jobs:
           node-version: 18
       - run: npm ci
       - run: npm run test:ci
+      - run: npm run type-check
+      - run: npm run build
 
   #
   # Unit and integration tests
@@ -267,7 +269,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '18'
-      - run: npm ci --legacy-peer-deps
+      - run: npm ci
       - run: npm run build-storybook
       - name: Upload Storybook build
         uses: actions/upload-artifact@v4
