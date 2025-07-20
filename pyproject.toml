@@ -1,0 +1,130 @@
+[project]
+name = "open-inwoner"
+version = "1.0.0"
+description = "Open Inwoner platform"
+authors = [{ name = "Maykin Media", email = "info@maykinmedia.nl" }]
+requires-python = "==3.11.*"
+readme = "README.rst"
+license = { text = "EUPL 1.2" }
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Framework :: Django",
+    "Framework :: Django :: 4.2",
+    "Intended Audience :: Developers",
+    "Operating System :: Unix",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "Pillow>=9.0.0",
+    "psycopg2",
+    "pytz",
+    "python-dotenv",
+    "python-decouple",
+    "geopy",
+    "glom",
+    "furl",
+    "weasyprint",
+    "tinycss2",
+    "css_inline",
+    "pydantic[email]",
+    "typing-extensions",
+    "Django>=4.2,<5.0",
+    "django-admin-index",
+    "django-axes",
+    "django-filer",
+    "django-ordered-model",
+    "django-redis",
+    "django-sniplates",
+    "django-treebeard",
+    "maykin-2fa",
+    "phonenumbers",
+    "django-localflavor",
+    "django-privates",
+    "django-cors-headers",
+    "django-autoslug",
+    "django-elasticsearch-dsl",
+    "django-import-export",
+    "django-solo",
+    "django-colorfield",
+    "django-registration",
+    "django-view-breadcrumbs",
+    "markdown",
+    "django-jsonform",
+    "humanfriendly",
+    "mail-editor",
+    "fontawesomefree",
+    "django-timeline-logger",
+    "django-csp",
+    "django-csp-reports",
+    "mozilla-django-oidc-db[setup-configuration]",
+    "django-open-forms-client",
+    "django-htmx",
+    "playwright",
+    "django-image-cropping",
+    "django-log-outgoing-requests",
+    "xsdata",
+    "django-setup-configuration",
+    "django-yubin",
+    "django-cms",
+    "djangocms-text-ckeditor",
+    "djangocms-link",
+    "djangocms-file",
+    "djangocms-picture",
+    "aldryn-apphooks-config",
+    "djangorestframework",
+    "django-extra-fields",
+    "django-filter",
+    "drf-spectacular",
+    "djangorestframework-camel-case",
+    "uwsgi",
+    "sentry-sdk[django]",
+    "elastic-apm",
+    "beautifulsoup4",
+    "django-digid-eherkenning[oidc]",
+    "maykin-python3-saml",
+    "pyopenssl",
+    "django-sessionprofile",
+    "celery>=5.3.5",
+    "celery-once",
+    "django-celery-beat",
+    "django-celery-monitor @ git+https://github.com/maykinmedia/django-celery-monitor@74b1252",
+    "zgw-consumers",
+    "zgw-consumers-oas",
+    "notifications-api-common",
+    "objects-api-client-django @ git+https://github.com/maykinmedia/objects-api-client-django.git@6f26a2a2fbdb52fe89d779fd2432a99f3ee454a4",
+    "oath",
+    "messagebird",
+]
+
+[dependency-groups]
+dev = [
+    "pre-commit",
+    "django-debug-toolbar",
+    "locust",
+    "django-silk",
+    "pytest-recording",
+    "vcrpy",
+]
+docs = [
+    "sphinx",
+    "sphinx_rtd_theme",
+    "recommonmark",
+    "sphinx-markdown-tables",
+    "sphinx-tabs",
+]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-dir]
+"" = "src"
