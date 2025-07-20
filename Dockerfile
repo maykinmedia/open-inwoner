@@ -25,15 +25,19 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-reco
 
 WORKDIR /app
 
-# Use uv to install dependencies
+# Install uv
 RUN pip install uv -U
-COPY ./requirements /app/requirements
-
-RUN uv pip install --system -r requirements/production.txt
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     && rm -rf /var/lib/apt/lists/*
+
+# Copy project files for dependency resolution
+COPY ./pyproject.toml ./uv.lock ./README.rst /app/
+COPY ./src /app/src
+
+# Install dependencies
+RUN uv sync --frozen --no-dev --compile-bytecode
 
 # Stage 2 - Install frontend deps and build assets
 FROM node:20-bookworm-slim AS frontend-build
@@ -94,9 +98,9 @@ COPY ./bin/check_celery_worker_liveness.py ./bin/
 VOLUME ["/app/log", "/app/media", "/app/private_media"]
 
 # copy backend build deps
-COPY --from=backend-build /usr/local/lib/python3.11 /usr/local/lib/python3.11
-COPY --from=backend-build /usr/local/bin/uwsgi /usr/local/bin/uwsgi
-COPY --from=backend-build /usr/local/bin/celery /usr/local/bin/celery
+COPY --from=backend-build /app/.venv/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=backend-build /app/.venv/bin/uwsgi /usr/local/bin/uwsgi
+COPY --from=backend-build /app/.venv/bin/celery /usr/local/bin/celery
 
 # copy frontend build statics
 COPY --from=frontend-build /app/src/open_inwoner/static /app/src/open_inwoner/static
