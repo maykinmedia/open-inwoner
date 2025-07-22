@@ -28,6 +28,14 @@ export default defineConfig({
     }),
   ],
 
+  css: {
+    preprocessorOptions: {
+      scss: {
+        includePaths: ['node_modules'],
+      },
+    },
+  },
+
   build: {
     outDir: path.resolve(__dirname, paths.jsDir),
     emptyOutDir: false, // Matches Webpack's behavior (does not wipe output)
@@ -62,16 +70,10 @@ export default defineConfig({
   resolve: {
     alias: {
       '@react': path.resolve(__dirname, 'src/open_inwoner/react'),
-      '@webcomponents': path.resolve(
-        __dirname,
-        'src/open_inwoner/webcomponents'
-      ),
+      '@webcomponents': path.resolve(__dirname, 'src/open_inwoner/webcomponents'),
     },
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
   },
-
-  // Match Webpack's mode behavior
-  mode: isProduction ? 'production' : 'development',
 
   test: {
     globals: true,

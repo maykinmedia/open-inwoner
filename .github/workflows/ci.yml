@@ -14,6 +14,19 @@ env:
   IMAGE_NAME: maykinmedia/open-inwoner
 
 jobs:
+  test_frontend:
+    name: Extract messages, compile i18n, and bundle React
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - run: npm ci
+      - run: npm run test:ci
+      - run: npm run type-check
+      - run: npm run build
+
   #
   # Unit and integration tests
   #
@@ -247,3 +260,31 @@ jobs:
         env:
           RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
         run: docker push $IMAGE_NAME:$RELEASE_VERSION
+
+  storybook:
+    name: Build Storybook
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm ci
+      - run: npm run build-storybook
+      - name: Upload Storybook build
+        uses: actions/upload-artifact@v4
+        with:
+          name: storybook-static
+          path: storybook-static/
+
+#  storybook tests:
+#    name: Run Storybook tests
+#    runs-on: ubuntu-latest
+#    needs:
+#      - storybook
+#
+#  chromatic:
+#    name: Visual regression test with Chromatic
+#    runs-on: ubuntu-latest
+#    needs:
+#      - storybook

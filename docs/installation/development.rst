@@ -85,13 +85,6 @@ This will include the `Open-Inwoner-Design-Tokens`_ subdirectory. When all is bu
        npm install
        npm run build
 
-   - Or as an alternative:
-
-   .. code-block:: bash
-
-       npm ci --legacy-peer-deps
-       npm run build
-
 6. Create the statics and database:
 
    .. code-block:: bash
@@ -164,8 +157,6 @@ When updating an existing installation:
        git pull
        pip install -r requirements/dev.txt
        npm install
-       or as an alternative: npm ci --legacy-peer-deps
-       npm run build
 
 3. Update the statics and database:
 

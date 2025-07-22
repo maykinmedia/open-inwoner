@@ -50,3 +50,8 @@ src/open_inwoner/static/webfonts/fa-v4compatibility.ttf
 src/open_inwoner/static/webfonts/fa-v4compatibility.woff2
 src/open_inwoner/static/fonts/material-icons/
 
+# Storybook files
+*storybook.log
+storybook-static/
+coverage/
+
