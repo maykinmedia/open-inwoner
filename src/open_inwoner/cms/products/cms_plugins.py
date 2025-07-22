@@ -37,6 +37,7 @@ class CategoriesPlugin(CMSActiveAppMixin, CMSPluginBase):
     render_template = "cms/products/categories_plugin.html"
     app_hook = "ProductsApphook"
     cache = False
+    limit = 3  # Limit to 3 categories for Home page
 
     def render(self, context, instance, placeholder):
         config = OpenZaakConfig.get_solo()
@@ -47,7 +48,7 @@ class CategoriesPlugin(CMSActiveAppMixin, CMSPluginBase):
             and selected_categories_enabled()
             and request.user.selected_categories.exists()
         ):
-            context["categories"] = request.user.selected_categories.all()
+            context["categories"] = request.user.selected_categories.all()[: self.limit]
         else:
             # Show the all the highlighted categories the user has access to, as well as
             # categories that are linked to ZaakTypen for which the user has Zaken within
@@ -63,7 +64,7 @@ class CategoriesPlugin(CMSActiveAppMixin, CMSPluginBase):
             ):
                 categories |= visible_categories.filter_by_zaken_for_request(request)
 
-            context["categories"] = categories.order_by("path")
+            context["categories"] = categories.order_by("path")[: self.limit]
 
         return context
 

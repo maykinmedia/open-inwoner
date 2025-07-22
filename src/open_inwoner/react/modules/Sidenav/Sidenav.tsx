@@ -1,41 +1,63 @@
 import React from 'react'
 import { SideNavigation } from '@gemeente-denhaag/side-navigation'
-// import '@gemeente-denhaag/side-navigation/dist/index.css'
 
-console.log('Sidenav react component loaded')
+// Material Icons component
+const MaterialIcon: React.FC<{ name: string }> = ({ name }) => (
+  <span className="material-icons-outlined" aria-hidden="true">
+    {name}
+  </span>
+)
 
-export interface SidenavProps {
-  // Later: get the navigation data from Django
-}
+const Sidenav: React.FC = () => {
+  // Get menu data from Django
+  const getMenuData = () => {
+    const scriptElement = document.getElementById('sidenav-menu-data')
+    if (scriptElement?.textContent) {
+      try {
+        const data = JSON.parse(scriptElement.textContent)
+        console.log('Menu data loaded:', data) // Debug log
+        return data
+      } catch (e) {
+        console.error('Failed to parse menu data:', e)
+      }
+    }
+    return []
+  }
 
-const Sidenav: React.FC<SidenavProps> = () => {
-  // Temporary hardcoded navigation items
-  // Later: needs data from Django
-  const navigationItems = [
+  const menuData = getMenuData()
+
+  // Transform Django menu data to DenHaag format
+  if (menuData.length > 0) {
+    const navigationItems = [
+      menuData.map((item: any) => ({
+        href: item.href,
+        label: item.label,
+        // Only include icon if is not empty, for municipalities that do configure icons
+        icon:
+          item.icon && item.icon.trim() ? (
+            <MaterialIcon name={item.icon} />
+          ) : undefined,
+        current: item.current,
+        counter: item.counter || undefined,
+      })),
+    ]
+
+    return <SideNavigation items={navigationItems} />
+  }
+
+  // Fallback - should not be appearing
+  const fallbackItems = [
     [
       {
-        href: '/profile/',
+        href: '/mijn-profiel/',
         label: 'Mijn Profiel',
-        icon: <span>👤</span>, // Replace with proper icons later
+        icon: <MaterialIcon name="person" />,
         current: false,
-      },
-      {
-        href: '/messages/',
-        label: 'Berichten',
-        icon: <span>✉️</span>,
-        current: false,
-        counter: 3, // Example counter
-      },
-      {
-        href: '/cases/',
-        label: 'Mijn Zaken',
-        icon: <span>📋</span>,
-        current: true, // This would be the current page
       },
     ],
   ]
 
-  return <SideNavigation items={navigationItems} />
+  return <SideNavigation items={fallbackItems} />
 }
 
 export default Sidenav

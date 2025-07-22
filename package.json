@@ -96,7 +96,6 @@
     "@chromatic-com/storybook": "^3.2.7",
     "@formatjs/cli": "^6.7.2",
     "@formatjs/ts-transformer": "^3.14.0",
-    "@nl-design-system-candidate/number-badge-react": "^1.2.3",
     "@storybook/addon-actions": "^8.6.14",
     "@storybook/addon-docs": "^8.6.14",
     "@storybook/addon-essentials": "^8.6.14",

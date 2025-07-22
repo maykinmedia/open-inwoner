@@ -174,7 +174,6 @@
 
         {% render_block "js" %}
         {% block extra_js %}{% endblock %}
-
         {% if debug %}
         {# Enables Dev only console logs, like for Siteimprove testing #}
         <script nonce="{{ request.csp_nonce }}">
