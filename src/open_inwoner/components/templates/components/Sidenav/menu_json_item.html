@@ -1,0 +1,13 @@
+{% load menu_tags %}
+
+{% for child in children %}
+{% with url=child.attr.redirect_url|default:child.get_absolute_url %}
+{
+    "href": "{{ url|escapejs }}",
+    "label": "{{ child.get_menu_title|escapejs }}",
+    "icon": "{{ child.common.menu_icon|default:'help'|escapejs }}",
+    "current": {{ child.selected|yesno:"true,false" }},
+    "counter": {% if child.indicator and child.indicator != "0" %}{{ child.indicator }}{% else %}null{% endif %}
+}{% if not forloop.last %},{% endif %}
+{% endwith %}
+{% endfor %}
