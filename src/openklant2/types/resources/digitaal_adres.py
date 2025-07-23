@@ -32,6 +32,8 @@ class ListDigitaalAdresParams(TypedDict):
 
 
 class DigitaalAdres(TypedDict):
+    uuid: str
+    url: str
     verstrektDoorBetrokkene: FullForeigKeyRef | None
     verstrektDoorPartij: FullForeigKeyRef | None
     adres: str

@@ -202,6 +202,7 @@ class MockAPIReadPatchData(MockAPIData):
         return self
 
     def install_mocks_openklant(self, m) -> "MockAPIReadPatchData":
+        self.partij_uuid = "7260ea01-12c0-4750-8fd1-dfa777818837"
         self.digid_user = DigidUserFactory()
         m.get(
             "http://localhost:8338/klantinteracties/api/v1/partijen?partijIdentificator__codeSoortObjectId=bsn&partijIdentificator__codeRegister=brp&partijIdentificator__codeObjecttype=natuurlijk_persoon&partijIdentificator__objectId=123456782&soortPartij=persoon",
@@ -212,7 +213,7 @@ class MockAPIReadPatchData(MockAPIData):
                 "previous": None,
                 "results": [
                     {
-                        "uuid": "7260ea01-12c0-4750-8fd1-dfa777818837",
+                        "uuid": self.partij_uuid,
                     },
                 ],
             },
@@ -227,7 +228,7 @@ class MockAPIReadPatchData(MockAPIData):
                 "previous": None,
                 "results": [
                     {
-                        "uuid": "7260ea01-12c0-4750-8fd1-dfa777818837",
+                        "uuid": self.partij_uuid,
                     },
                 ],
             },
@@ -235,10 +236,10 @@ class MockAPIReadPatchData(MockAPIData):
         )
 
         m.get(
-            "http://localhost:8338/klantinteracties/api/v1/partijen/7260ea01-12c0-4750-8fd1-dfa777818837?expand=digitaleAdressen%2Cbetrokkenen%2Cbetrokkenen.hadKlantcontact",
+            f"http://localhost:8338/klantinteracties/api/v1/partijen/{self.partij_uuid}?expand=digitaleAdressen%2Cbetrokkenen%2Cbetrokkenen.hadKlantcontact",
             headers={"Content-Type": "application/json"},
             json={
-                "uuid": "7260ea01-12c0-4750-8fd1-dfa777818837",
+                "uuid": self.partij_uuid,
                 "digitaleAdressen": None,
                 "voorkeursDigitaalAdres": None,
                 "rekeningnummers": None,
@@ -258,7 +259,17 @@ class MockAPIReadPatchData(MockAPIData):
             },
         )
         m.get(
-            "http://localhost:8338/klantinteracties/api/v1/partijen/7260ea01-12c0-4750-8fd1-dfa777818837?expand=digitaleAdressen",
+            f"http://localhost:8338/klantinteracties/api/v1/partijen/{self.partij_uuid}?expand=digitaleAdressen",
+            headers={"Content-Type": "application/json"},
+            json={
+                "count": 0,
+                "next": None,
+                "previous": None,
+                "results": [],
+            },
+        )
+        m.get(
+            f"http://localhost:8338/klantinteracties/api/v1/digitaleadressen?verstrektDoorPartij__uuid={self.partij_uuid}",
             headers={"Content-Type": "application/json"},
             json={
                 "count": 0,
@@ -275,6 +286,93 @@ class MockAPIReadPatchData(MockAPIData):
                 "next": None,
                 "previous": None,
                 "results": [],
+            },
+        )
+        m.get(
+            f"http://localhost:8338/klantinteracties/api/v1/digitaleadressen?verstrektDoorPartij__uuid={self.partij_uuid}",
+            json={
+                "count": 3,
+                "next": None,
+                "previous": None,
+                "results": [
+                    {
+                        "uuid": "email-uuid-123",
+                        "adres": "old@example.com",
+                        "soortDigitaalAdres": "email",
+                        "isStandaardAdres": True,
+                        "verstrektDoorPartij": {"uuid": self.partij_uuid},
+                    },
+                    {
+                        "uuid": "phone-uuid-123",
+                        "adres": "0600000000",
+                        "soortDigitaalAdres": "telefoonnummer",
+                        "isStandaardAdres": True,
+                        "verstrektDoorPartij": {"uuid": self.partij_uuid},
+                    },
+                    {
+                        "uuid": "phone-alt-uuid-123",
+                        "adres": "0611111111",
+                        "soortDigitaalAdres": "telefoonnummer",
+                        "isStandaardAdres": False,
+                        "verstrektDoorPartij": {"uuid": self.partij_uuid},
+                    },
+                ],
+            },
+            headers={"Content-Type": "application/json"},
+        )
+
+        # Mock for getting partij
+        m.get(
+            f"http://localhost:8338/klantinteracties/api/v1/partijen?partijIdentificator__codeSoortObjectId=bsn&partijIdentificator__codeRegister=brp&partijIdentificator__codeObjecttype=natuurlijk_persoon&partijIdentificator__objectId={self.digid_user.bsn}&soortPartij=persoon",
+            headers={"Content-Type": "application/json"},
+            json={
+                "count": 1,
+                "next": None,
+                "previous": None,
+                "results": [
+                    {
+                        "uuid": self.partij_uuid,
+                    },
+                ],
+            },
+            status_code=200,
+        )
+
+        # Mock for updating partij
+        m.patch(
+            f"http://localhost:8338/klantinteracties/api/v1/partijen/{self.partij_uuid}",
+            headers={"Content-Type": "application/json"},
+            json={
+                "uuid": self.partij_uuid,
+                "digitaleAdressen": None,
+                "voorkeursDigitaalAdres": None,
+                "rekeningnummers": None,
+                "voorkeursRekeningnummer": None,
+                "indicatieGeheimhouding": False,
+                "indicatieActief": True,
+                "voorkeurstaal": "crp",
+                "soortPartij": "persoon",
+                "partijIdentificatie": {
+                    "contactnaam": {
+                        "voorletters": "Dr.",
+                        "voornaam": "Test Persoon",
+                        "voorvoegselAchternaam": "Mrs.",
+                        "achternaam": "Gamble",
+                    }
+                },
+            },
+        )
+
+        # Mock for creating new digital addresses
+        m.post(
+            "http://localhost:8338/klantinteracties/api/v1/digitaleadressen",
+            headers={"Content-Type": "application/json"},
+            json={
+                "uuid": "new-email-uuid",
+                "adres": "new@example.com",
+                "soortDigitaalAdres": "email",
+                "isStandaardAdres": True,
+                "verstrektDoorPartij": {"uuid": self.partij_uuid},
             },
         )
 
@@ -757,6 +855,7 @@ class MockAPICreateData(MockAPIData):
         return self
 
     def install_mocks_openklant(self, m):
+        self.partij_uuid = "7260ea01-12c0-4750-8fd1-dfa777818837"
         self.digid_user = DigidUserFactory()
         m.get(
             "http://localhost:8338/klantinteracties/api/v1/partijen?partijIdentificator__codeSoortObjectId=bsn&partijIdentificator__codeRegister=brp&partijIdentificator__codeObjecttype=natuurlijk_persoon&partijIdentificator__objectId=123456782&soortPartij=persoon",
@@ -767,7 +866,7 @@ class MockAPICreateData(MockAPIData):
                 "previous": None,
                 "results": [
                     {
-                        "uuid": "7260ea01-12c0-4750-8fd1-dfa777818837",
+                        "uuid": self.partij_uuid,
                     },
                 ],
             },
@@ -782,7 +881,7 @@ class MockAPICreateData(MockAPIData):
                 "previous": None,
                 "results": [
                     {
-                        "uuid": "7260ea01-12c0-4750-8fd1-dfa777818837",
+                        "uuid": self.partij_uuid,
                     },
                 ],
             },
@@ -790,10 +889,10 @@ class MockAPICreateData(MockAPIData):
         )
 
         m.get(
-            "http://localhost:8338/klantinteracties/api/v1/partijen/7260ea01-12c0-4750-8fd1-dfa777818837?expand=digitaleAdressen%2Cbetrokkenen%2Cbetrokkenen.hadKlantcontact",
+            f"http://localhost:8338/klantinteracties/api/v1/partijen/{self.partij_uuid}?expand=digitaleAdressen%2Cbetrokkenen%2Cbetrokkenen.hadKlantcontact",
             headers={"Content-Type": "application/json"},
             json={
-                "uuid": "7260ea01-12c0-4750-8fd1-dfa777818837",
+                "uuid": self.partij_uuid,
                 "digitaleAdressen": None,
                 "voorkeursDigitaalAdres": None,
                 "rekeningnummers": None,
@@ -813,7 +912,7 @@ class MockAPICreateData(MockAPIData):
             },
         )
         m.get(
-            "http://localhost:8338/klantinteracties/api/v1/partijen/7260ea01-12c0-4750-8fd1-dfa777818837?expand=digitaleAdressen",
+            f"http://localhost:8338/klantinteracties/api/v1/partijen/{self.partij_uuid}?expand=digitaleAdressen",
             headers={"Content-Type": "application/json"},
             json={
                 "count": 0,

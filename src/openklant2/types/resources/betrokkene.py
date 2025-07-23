@@ -41,5 +41,9 @@ class Betrokkene(TypedDict):
     initiator: bool
 
 
+class BetrokkeneRetrieveParams(TypedDict):
+    expand: NotRequired[list[Literal["digitaleAdressen",]]]
+
+
 BetrokkeneCreateDataValidator = TypeAdapter(BetrokkeneCreateData)
 BetrokkeneValidator = TypeAdapter(Betrokkene)

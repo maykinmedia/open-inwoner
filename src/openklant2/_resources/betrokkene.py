@@ -1,11 +1,15 @@
 import uuid
-from typing import cast
+from typing import Optional, cast
 
 from ape_pie import APIClient
 
 from openklant2._resources.base import ResourceMixin
 from openklant2.types.pagination import PaginatedResponseBody
-from openklant2.types.resources.betrokkene import Betrokkene, BetrokkeneCreateData
+from openklant2.types.resources.betrokkene import (
+    Betrokkene,
+    BetrokkeneCreateData,
+    BetrokkeneRetrieveParams,
+)
 
 
 class BetrokkeneResource(ResourceMixin):
@@ -24,7 +28,12 @@ class BetrokkeneResource(ResourceMixin):
         response = self._post(self.base_path, data=data)
         return cast(Betrokkene, self.process_response(response))
 
-    def retrieve(self, /, uuid: str | uuid.UUID) -> Betrokkene:
+    def retrieve(
+        self,
+        /,
+        uuid: str | uuid.UUID,
+        params: Optional[BetrokkeneRetrieveParams] = None,
+    ) -> Betrokkene:
         response = self._get(f"{self.base_path}/{str(uuid)}")
         return cast(Betrokkene, self.process_response(response))
 

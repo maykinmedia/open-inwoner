@@ -35,3 +35,6 @@ class DigitaalAdresResource(ResourceMixin):
     ) -> DigitaalAdres:
         response = self._post(self.base_path, data=data)
         return cast(DigitaalAdres, self.process_response(response))
+
+    def delete(self, /, uuid: str):
+        return self._delete(f"{self.base_path}/{str(uuid)}")

@@ -35,6 +35,7 @@ from open_inwoner.openklant.types import PartijUpdateData
 from open_inwoner.plans.models import Plan
 from open_inwoner.qmatic.client import NoServiceConfigured, qmatic_client_factory
 from open_inwoner.questionnaire.models import QuestionnaireStep
+from open_inwoner.utils.logentry import system_action
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from ..forms import BrpUserForm, CategoriesForm, UserForm, UserNotificationsForm
@@ -276,6 +277,15 @@ class EditProfileView(
         return HttpResponseRedirect(self.get_success_url())
 
     def update_klant_via_openklant(self, user_form_data: dict, user: User) -> bool:
+        """
+        Update the user `partij` in OpenKlant from `user_form_data`
+
+        If applicable, clean up old contact information in OpenKlant before the update
+
+        Note: we only delete old contact info that is present in both OpenKlant and OIP;
+              the possibility that other contact info has been added by external sources
+              cannot be excluded
+        """
         try:
             service = OpenKlant2Service()
         except Exception:
@@ -285,6 +295,34 @@ class EditProfileView(
         partij, created = service.get_or_create_partij_for_user(user)
 
         if partij and not created:
+            adressen = service.retrieve_digitale_addressen_for_partij(partij["uuid"])
+
+            # Fetch original user from DB to access old contact info
+            old_user = User.objects.get(pk=user.pk)
+
+            for address_type in ["email", "phonenumber", "phonenumber_alternative"]:
+                old = getattr(old_user, address_type)
+                new = getattr(user, address_type)
+
+                if not old or not new:
+                    continue
+
+                if old == new:
+                    continue
+
+                try:
+                    digitaal_adres = next(
+                        obj for obj in adressen if obj["adres"] == old
+                    )
+                except StopIteration:
+                    pass
+                else:
+                    service.client.digitaal_adres.delete(digitaal_adres["uuid"])
+                    system_action(
+                        f"deleted old digitaal adres {digitaal_adres['uuid']}",
+                        content_object=user,
+                    )
+
             return service.update_partij_from_user_data(
                 partij_uuid=partij["uuid"],
                 update_data=PartijUpdateData(**user_form_data),
