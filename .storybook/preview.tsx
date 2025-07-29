@@ -3,7 +3,7 @@ import type { StoryFn } from '@storybook/react'
 
 import '@open-inwoner/design-tokens/dist/css/index.css'
 // Use this ↓ for OIP components and NLDS components thst we have set values for
-// import '../src/open_inwoner/static/bundles/open_inwoner-css.css';
+import '../src/open_inwoner/static/bundles/open_inwoner-css.css';
 
 const withThemeClass = (Story: StoryFn) => {
   document.body.classList.add('openinwoner-theme')

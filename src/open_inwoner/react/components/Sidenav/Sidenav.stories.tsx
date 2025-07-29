@@ -1,3 +1,4 @@
+import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import Sidenav from './Sidenav'
 
@@ -28,11 +29,35 @@ const setupMockDjangoData = (data: MockMenuItem[]) => {
   scriptElement.type = 'application/json'
   scriptElement.textContent = JSON.stringify(data)
   document.head.appendChild(scriptElement)
+
+  console.log('Mock data setup complete:', data)
 }
 
-const meta: Meta<typeof Sidenav & SidenavArgs> = {
+// Wrapper component that ensures proper data setup
+const SidenavStoryWrapper: React.FC<{ mockData?: MockMenuItem[] }> = ({
+  mockData,
+}) => {
+  React.useEffect(() => {
+    console.log('Setting up mock data:', mockData)
+
+    if (mockData && mockData.length > 0) {
+      setupMockDjangoData(mockData)
+    } else {
+      // Clear any existing data for fallback stories
+      const existingScript = document.getElementById('sidenav-menu-data')
+      if (existingScript) {
+        existingScript.remove()
+        console.log('Cleared existing mock data')
+      }
+    }
+  }, [mockData])
+
+  return <Sidenav />
+}
+
+const meta: Meta<SidenavArgs> = {
   title: 'Components/Navigation/Sidenav',
-  component: Sidenav,
+  component: SidenavStoryWrapper,
   parameters: {
     layout: 'padded',
     docs: {
@@ -51,31 +76,17 @@ The component reads menu data from a script tag injected by Django and transform
     },
   },
   decorators: [
-    (Story, context) => {
-      // Set up mock data before component renders
-      const args = context.args as SidenavArgs
-      if (args.mockData) {
-        setupMockDjangoData(args.mockData)
-      } else {
-        // Clear any existing data for fallback stories
-        const existingScript = document.getElementById('sidenav-menu-data')
-        if (existingScript) {
-          existingScript.remove()
-        }
-      }
-
-      return (
-        <div
-          style={{
-            maxWidth: '300px',
-            height: '600px',
-            border: '1px solid #e0e0e0',
-          }}
-        >
-          <Story />
-        </div>
-      )
-    },
+    (Story) => (
+      <div
+        style={{
+          maxWidth: '300px',
+          height: '400px',
+          border: '1px solid #e0e0e0',
+        }}
+      >
+        <Story />
+      </div>
+    ),
   ],
   argTypes: {
     mockData: {
@@ -87,7 +98,7 @@ The component reads menu data from a script tag injected by Django and transform
 }
 
 export default meta
-type Story = StoryObj<typeof Sidenav & SidenavArgs>
+type Story = StoryObj<SidenavArgs>
 
 export const Default: Story = {
   name: 'Default (Fallback)',
@@ -308,11 +319,11 @@ export const LongLabels: Story = {
   },
 }
 
-// Special story for testing invalid JSON - needs custom decorator
+// Special story for testing invalid JSON
 export const InvalidMenuData: Story = {
   name: 'Invalid Menu Data',
-  decorators: [
-    (Story) => {
+  render: () => {
+    React.useEffect(() => {
       // Set up invalid JSON before component renders
       const existingScript = document.getElementById('sidenav-menu-data')
       if (existingScript) {
@@ -325,19 +336,11 @@ export const InvalidMenuData: Story = {
       scriptElement.textContent = '{ invalid json data }'
       document.head.appendChild(scriptElement)
 
-      return (
-        <div
-          style={{
-            maxWidth: '300px',
-            height: '600px',
-            border: '1px solid #e0e0e0',
-          }}
-        >
-          <Story />
-        </div>
-      )
-    },
-  ],
+      console.log('Set up invalid JSON data')
+    }, [])
+
+    return <Sidenav />
+  },
   parameters: {
     docs: {
       description: {

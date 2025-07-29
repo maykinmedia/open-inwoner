@@ -23,13 +23,13 @@
 }
 
 .button:first-child {
-  background-color: var(--oip-color-info-light);
+  background-color: var(--oip-color-info);
   border: 1px solid var(--oip-color-info, green);
   margin-right: 2em;
 }
 
 .button:nth-child(2) {
-  background-color: var(--oip-color-danger-light);
+  background-color: var(--oip-color-danger);
   border: 1px solid var(--oip-color-danger, red);
   margin-right: 2em;
 }
