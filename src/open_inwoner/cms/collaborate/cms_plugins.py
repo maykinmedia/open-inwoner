@@ -18,7 +18,7 @@ class ActivePlansPlugin(CMSActiveAppMixin, CMSPluginBase):
     app_hook = "CollaborateApphook"
 
     # own variables
-    limit = 4
+    limit = 3
 
     def render(self, context, instance, placeholder):
         request = context["request"]
