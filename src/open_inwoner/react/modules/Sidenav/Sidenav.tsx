@@ -1,14 +1,14 @@
-import React from 'react'
+import { FC } from 'react'
 import { SideNavigation } from '@gemeente-denhaag/side-navigation'
 
 // Material Icons component
-const MaterialIcon: React.FC<{ name: string }> = ({ name }) => (
+const MaterialIcon: FC<{ name: string }> = ({ name }) => (
   <span className="material-icons-outlined" aria-hidden="true">
     {name}
   </span>
 )
 
-const Sidenav: React.FC = () => {
+const Sidenav: FC = () => {
   // Get menu data from Django
   const getMenuData = () => {
     const scriptElement = document.getElementById('sidenav-menu-data')

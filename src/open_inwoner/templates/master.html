@@ -1,5 +1,9 @@
 {% load static i18n card_tags button_tags link_tags notification_tags anchor_menu_tags view_breadcrumbs utils solo_tags session_tags django_htmx cms_tags menu_tags sekizai_tags %}<!DOCTYPE html>
-<html lang="nl" class="view utrecht-document openinwoner-theme {% block view_class %}view--{{ request.resolver_match.namespaces|join:'-' }}-{{ request.resolver_match.url_name }}{% endblock %}" {% block mount_modules %}{% endblock %}>
+<html
+	    lang="nl"
+	    class="view utrecht-document openinwoner-theme {% block view_class %}view--{{ request.resolver_match.namespaces|join:'-' }}-{{ request.resolver_match.url_name }}{% endblock %}"
+	    {% block mount_modules %}{% endblock %}
+	>
     <head>
         <meta charset="utf-8">
         {% block robots %}
@@ -174,6 +178,7 @@
 
         {% render_block "js" %}
         {% block extra_js %}{% endblock %}
+
         {% if debug %}
         {# Enables Dev only console logs, like for Siteimprove testing #}
         <script nonce="{{ request.csp_nonce }}">

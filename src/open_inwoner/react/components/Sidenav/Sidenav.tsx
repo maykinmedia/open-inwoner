@@ -1,16 +1,16 @@
 // PERHAPS THIS SHOULD BE HERE in components? ELSE IN 'modules'
 
-// import React from 'react'
+// import { FC } from 'react'
 // import { SideNavigation } from '@gemeente-denhaag/side-navigation'
 //
 // // Material Icons component
-// const MaterialIcon: React.FC<{ name: string }> = ({ name }) => (
+// const MaterialIcon: FC<{ name: string }> = ({ name }) => (
 //   <span className="material-icons-outlined" aria-hidden="true">
 //     {name}
 //   </span>
 // )
 //
-// const Sidenav: React.FC = () => {
+// const Sidenav: FC = () => {
 //   // Get menu data from Django
 //   const getMenuData = () => {
 //     const scriptElement = document.getElementById('sidenav-menu-data')
@@ -34,7 +34,11 @@
 //       menuData.map((item: any) => ({
 //         href: item.href,
 //         label: item.label,
-//         icon: <MaterialIcon name={item.icon} />, // Django provides Material Icons names
+//         // Only include icon if is not empty, for municipalities that do configure icons
+//         icon:
+//           item.icon && item.icon.trim() ? (
+//             <MaterialIcon name={item.icon} />
+//           ) : undefined,
 //         current: item.current,
 //         counter: item.counter || undefined,
 //       })),

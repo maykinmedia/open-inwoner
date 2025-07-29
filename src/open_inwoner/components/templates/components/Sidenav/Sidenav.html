@@ -2,10 +2,10 @@
 
 {% if request.user.is_authenticated %}
 
-    <!-- Set nonce for DenHaag components, or else styling from number-badge will cause CSP errors -->
-    <script nonce="{{ request.csp_nonce }}">
-        window.NONCE = "{{ request.csp_nonce }}"
-    </script>
+    {% block extra_head %}
+        <!-- Set nonce for DenHaag components, or else styling from number-badge will cause CSP errors -->
+        <meta name="csp-nonce" content="{{ request.csp_nonce }}" />
+    {% endblock %}
 
     <div class="side-navigation--oip">
         <div class="" id="react-openinwoner-sidenav"></div>
