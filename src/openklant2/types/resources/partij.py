@@ -1,4 +1,4 @@
-from typing import Literal, NotRequired, Required
+from typing import Literal, NotRequired
 
 from pydantic import TypeAdapter
 from typing_extensions import TypedDict
@@ -26,14 +26,15 @@ class CreateContactnaam(TypedDict):
 
 # Note this is polymorphic, concrete types below
 class CreatePartijDataBase(TypedDict):
+    soortPartij: Literal["organisatie", "persoon", "contactpersoon"]
+    indicatieActief: bool
     nummer: NotRequired[str]
     interneNotitie: NotRequired[str]
-    digitaleAdressen: Required[list[ForeignKeyRef] | None]
-    voorkeursDigitaalAdres: Required[ForeignKeyRef | None]
-    rekeningnummers: Required[list[ForeignKeyRef] | None]
-    voorkeursRekeningnummer: Required[ForeignKeyRef | None]
+    digitaleAdressen: list[ForeignKeyRef] | None
+    voorkeursDigitaalAdres: ForeignKeyRef | None
+    rekeningnummers: list[ForeignKeyRef] | None
+    voorkeursRekeningnummer: ForeignKeyRef | None
     voorkeurstaal: LanguageCode
-    indicatieActief: bool
     indicatieGeheimhouding: bool
     correspondentieadres: NotRequired[CreateAdres]
     bezoekadres: NotRequired[CreateAdres | None]
@@ -41,16 +42,16 @@ class CreatePartijDataBase(TypedDict):
 
 
 class CreatePartijIdentificatiePersoon(TypedDict):
-    contactnaam: Required[CreateContactnaam | None]
+    contactnaam: CreateContactnaam | None
 
 
 class CreatePartijIdentificatieContactpersoon(TypedDict):
-    contactnaam: Required[CreateContactnaam | None]
+    contactnaam: CreateContactnaam | None
     werkteVoorPartij: ForeignKeyRef
 
 
 class CreatePartijIdentificatieOrganisatie(TypedDict):
-    naam: Required[str]
+    naam: str
 
 
 class CreatePartijPersoonData(CreatePartijDataBase):
@@ -71,7 +72,7 @@ class CreatePartijOrganisatieData(CreatePartijDataBase):
 class PartialUpdatePartijData(CreatePartijDataBase, total=False):
     # TODO: This is required for PATCH, which is a bug. Should be remove when
     # https://github.com/maykinmedia/open-klant/issues/345 is addressed.
-    soortPartij: Required[SoortPartij]
+    soortPartij: SoortPartij
 
 
 class PartijListParams(TypedDict, total=False):

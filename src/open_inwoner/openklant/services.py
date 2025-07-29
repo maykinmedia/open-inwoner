@@ -64,12 +64,26 @@ from open_inwoner.utils.logentry import system_action
 from open_inwoner.utils.time import instance_is_new
 from open_inwoner.utils.views import LogMixin
 from openklant2.client import OpenKlant2Client
-from openklant2.types.resources.digitaal_adres import DigitaalAdres
+from openklant2.types.common import ForeignKeyRef
+from openklant2.types.resources.betrokkene import (
+    Betrokkene,
+    BetrokkeneCreateData,
+    CreateContactnaam,
+)
+from openklant2.types.resources.digitaal_adres import (
+    DigitaalAdres,
+    DigitaalAdresCreateData,
+)
+from openklant2.types.resources.interne_taak import InterneTaak
 from openklant2.types.resources.klant_contact import (
     KlantContact,
     ListKlantContactParams,
 )
-from openklant2.types.resources.partij import Partij, PartijListParams
+from openklant2.types.resources.partij import (
+    CreatePartijPersoonData,
+    Partij,
+    PartijListParams,
+)
 from openklant2.types.resources.partij_identificator import PartijIdentificator
 
 logger = logging.getLogger(__name__)
@@ -818,10 +832,7 @@ class eSuiteVragenService(KlantenService):
                     question_text=contactmoment.tekst,
                     answer_text=contactmoment.antwoord,
                     registered_date=contactmoment.registratiedatum,
-                    # registered_date=datetime.datetime.fromisoformat(
-                    #     contactmoment.registratiedatum.isoformat()
                     status=contactmoment.status,
-                    # ),
                     channel=contactmoment.kanaal,
                     new_answer_available=new_answer_available,
                     api_service=KlantenServiceType.ESUITE,
@@ -1184,7 +1195,9 @@ class OpenKlant2Service(
                         }
                     ]
 
-                persoon = self.client.partij.create_persoon(data=partij_data)
+                persoon = self.client.partij.create_persoon(
+                    data=cast(CreatePartijPersoonData, partij_data)
+                )
                 created = True
 
             partij = persoon
@@ -1202,11 +1215,14 @@ class OpenKlant2Service(
         uuid: str,
     ) -> list[DigitaalAdres]:
         if subject_type == "partij":
-            subject_param = "verstrektDoorPartij__uuid"
+            paginated_data = self.client.digitaal_adres.list(
+                params={"verstrektDoorPartij__uuid": uuid}
+            )
         else:
-            subject_param = "verstrektDoorBetrokkene__uuid"
+            paginated_data = self.client.digitaal_adres.list(
+                params={"verstrektDoorBetrokkene__uuid": uuid}
+            )
 
-        paginated_data = self.client.digitaal_adres.list(params={subject_param: uuid})
         digitale_adressen = list(pagination_helper(self.client, paginated_data))
 
         return digitale_adressen
@@ -1292,18 +1308,24 @@ class OpenKlant2Service(
             ):
                 return digitaal_adres, False
 
-        adres_data = {
-            "adres": adres,
-            "soortDigitaalAdres": soort_adres,
-            "isStandaardAdres": is_standaard_adres,
-            "omschrijving": "OIP profiel",
-        }
         if subject_type == "partij":
-            adres_data["verstrektDoorPartij"] = {"uuid": uuid}
-            adres_data["verstrektDoorBetrokkene"] = None
-        else:  # betrokkene
-            adres_data["verstrektDoorBetrokkene"] = {"uuid": uuid}
-            adres_data["verstrektDoorPartij"] = None
+            adres_data = DigitaalAdresCreateData(
+                adres=adres,
+                soortDigitaalAdres=soort_adres,
+                isStandaardAdres=is_standaard_adres,
+                omschrijving="OIP profiel",
+                verstrektDoorPartij={"uuid": uuid},
+                verstrektDoorBetrokkene=None,
+            )
+        else:
+            adres_data = DigitaalAdresCreateData(
+                adres=adres,
+                soortDigitaalAdres=soort_adres,
+                isStandaardAdres=is_standaard_adres,
+                omschrijving="OIP profiel",
+                verstrektDoorBetrokkene={"uuid": uuid},
+                verstrektDoorPartij=None,
+            )
 
         return self.client.digitaal_adres.create(data=adres_data), True
 
@@ -1401,7 +1423,7 @@ class OpenKlant2Service(
             if adres := update_data.get(attr):
                 _, created = self.get_or_create_digitaal_adres_for_partij(
                     partij_uuid=partij_uuid,
-                    soort_adres=soort_adres,
+                    soort_adres=cast(Literal["email", "telefoonnummer"], soort_adres),
                     adres=adres,
                     is_standaard_adres=False,
                 )
@@ -1419,7 +1441,7 @@ class OpenKlant2Service(
         self,
         question: str,
         subject: str,
-    ) -> dict:
+    ) -> KlantContact:
         if len(question.rstrip()) == 0:
             raise ValueError("You must provide a question")
         if not self.config.mijn_vragen_actor:
@@ -1445,16 +1467,17 @@ class OpenKlant2Service(
     def _create_betrokkene_in_klantcontact(
         self,
         klantcontact_uuid: str,
-        betrokkene_data: dict,
-    ) -> dict:
-        data = {
-            "rol": "klant",
-            "hadKlantcontact": {"uuid": klantcontact_uuid},
-            "wasPartij": None,
-            "initiator": True,
-            "organisatienaam": "Open Inwoner Platform",
-        }
-        data.update(betrokkene_data)
+        was_partij: ForeignKeyRef | None,
+        contactnaam: CreateContactnaam | None,
+    ) -> Betrokkene:
+        data = BetrokkeneCreateData(
+            wasPartij=was_partij,
+            rol="klant",
+            hadKlantcontact={"uuid": klantcontact_uuid},
+            organisatienaam="Open Inwoner Platform",
+            initiator=True,
+            contactnaam=contactnaam,
+        )
         betrokkene = self.client.betrokkene.create(data=data)
 
         logger.info("Created betrokkene: %s", betrokkene["uuid"])
@@ -1464,7 +1487,7 @@ class OpenKlant2Service(
     def _create_interne_taak(
         self,
         klantcontact_uuid: str,
-    ) -> dict:
+    ) -> InterneTaak:
         if not self.config.mijn_vragen_actor:
             raise RuntimeError("unexpected error: mijn_vragen_actor not configured")
 
@@ -1490,7 +1513,8 @@ class OpenKlant2Service(
         klantcontact = self._create_klantcontact(question=question, subject=subject)
         self._create_betrokkene_in_klantcontact(
             klantcontact_uuid=klantcontact["uuid"],
-            betrokkene_data={"wasPartij": {"uuid": partij_uuid}},
+            was_partij={"uuid": partij_uuid},
+            contactnaam=None,
         )
         self._create_interne_taak(klantcontact_uuid=klantcontact["uuid"])
 
@@ -1508,9 +1532,8 @@ class OpenKlant2Service(
         klantcontact = self._create_klantcontact(question=question, subject=subject)
         betrokkene = self._create_betrokkene_in_klantcontact(
             klantcontact_uuid=klantcontact["uuid"],
-            betrokkene_data={
-                "contactnaam": {"voornaam": first_name, "achternaam": last_name}
-            },
+            was_partij=None,
+            contactnaam=CreateContactnaam(voornaam=first_name, achternaam=last_name),
         )
 
         if email:
@@ -1535,7 +1558,7 @@ class OpenKlant2Service(
         partij_uuid: str,
         question: str,
         subject: str,
-        zaak: str,
+        zaak: Zaak,
     ) -> OpenKlant2Question:
         ok2_question = self.create_question_for_partij(
             partij_uuid=partij_uuid, question=question, subject=subject
@@ -1724,9 +1747,12 @@ class OpenKlant2Service(
         user: User,
     ) -> tuple[Question | None, ZaakWithApiGroup | None]:
         if bsn := fetch_params.get("user_bsn"):
-            partij = self.find_persoon_for_bsn(bsn)
+            partij = self.find_persoon_for_bsn(str(bsn))
         elif kvk_or_rsin := fetch_params.get("user_kvk_or_rsin"):
-            partij = self.find_organisatie_for_kvk(kvk_or_rsin)
+            partij = self.find_organisatie_for_kvk_and_vestiging(kvk=str(kvk_or_rsin))
+
+        if not partij:
+            return (None, None)
 
         all_questions = self.questions_for_partij(partij_uuid=partij["uuid"])
         question = next(
@@ -1737,7 +1763,8 @@ class OpenKlant2Service(
         onderwerp_objecten = [
             obj
             for obj in self.client.onderwerp_object.list()["results"]
-            if obj["klantcontact"]["uuid"] == question.question_kcm_uuid
+            if obj["klantcontact"]
+            and obj["klantcontact"]["uuid"] == question.question_kcm_uuid
         ]
         if not onderwerp_objecten:
             return self._build_question_dto(question_ok2=question, user=user), None
@@ -1764,7 +1791,7 @@ class OpenKlant2Service(
             return self._build_question_dto(question_ok2=question, user=user), None
 
         # find the unique zaak + relevant api client for the question
-        zaken_for_question = []
+        zaken_for_question: list = []
         clients = []
         for response in truthy_responses:
             # discard the client for determining the api_group; we only need the zaak

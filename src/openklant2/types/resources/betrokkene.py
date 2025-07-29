@@ -9,18 +9,18 @@ BetrokkeneRol = Literal["vertegenwoordiger", "klant"]
 
 
 class CreateContactnaam(TypedDict):
-    voorletters: str
+    voorletters: NotRequired[str]
     voornaam: str
-    voorvoegselAchternaam: str
+    voorvoegselAchternaam: NotRequired[str]
     achternaam: str
 
 
 class BetrokkeneCreateData(TypedDict):
-    wasPartij: ForeignKeyRef
-    hadKlantcontact: ForeignKeyRef
+    wasPartij: ForeignKeyRef | None
+    hadKlantcontact: ForeignKeyRef | None
     bezoekadres: NotRequired[Adres]
     correspondentieadres: NotRequired[Adres]
-    contactnaam: NotRequired[CreateContactnaam]
+    contactnaam: NotRequired[CreateContactnaam | None]
     rol: BetrokkeneRol
     organisatienaam: str
     initiator: bool
