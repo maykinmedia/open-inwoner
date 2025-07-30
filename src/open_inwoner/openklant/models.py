@@ -351,3 +351,16 @@ class KlantenSysteemConfig(SingletonModel):
             != KlantenServiceType.ESUITE.value
         )
         return self.contact_registration_enabled and contactform_subjects.exists()
+
+    def has_api_service_configured(
+        self, klanten_service_type: KlantenServiceType
+    ) -> bool:
+        match klanten_service_type:
+            case KlantenServiceType.ESUITE:
+                config = ESuiteKlantConfig.get_solo()
+                return getattr(config, "klanten_service", None) is not None
+            case KlantenServiceType.OPENKLANT2:
+                config = OpenKlant2Config.get_solo()
+                return getattr(config, "service", None) is not None
+            case _:
+                return False

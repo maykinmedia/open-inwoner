@@ -49,6 +49,7 @@ from open_inwoner.openklant.models import (
     KlantContactMomentAnswer,
     OpenKlant2Config,
 )
+from open_inwoner.openklant.types import PartijUpdateData
 from open_inwoner.openklant.wrap import (
     contactmoment_has_new_answer,
     fetch_klantcontactmoment,
@@ -1283,36 +1284,59 @@ class OpenKlant2Service(
                 content_object=user,
             )
 
-    def update_partij_from_user(self, partij_uuid: str, user: User):
+    def _update_partij(
+        self,
+        partij_uuid: str,
+        user: User | None = None,
+        update_data: PartijUpdateData | None = None,
+    ) -> bool:
+        if user:
+            update_data = PartijUpdateData(
+                email=user.email,
+                phonenumber=user.phonenumber,
+                phonenumber_alternative=user.phonenumber_alternative,
+            )
+
         updated_fields = []
 
-        _, created = self.get_or_create_digitaal_adres(
-            partij_uuid=partij_uuid,
-            soort_adres="telefoonnummer",
-            adres=user.phonenumber,
-            is_standaard_adres=True,
-        )
-        if created:
-            updated_fields.append("digitaleAddresen.telefoonnummer")
+        if phonenumber := update_data.get("phonenumber"):
+            _, created = self.get_or_create_digitaal_adres(
+                partij_uuid=partij_uuid,
+                soort_adres="telefoonnummer",
+                adres=phonenumber,
+                is_standaard_adres=True,
+            )
+            if created:
+                updated_fields.append("digitaleAddresen.telefoonnummer")
 
         for attr, soort_adres in (
             ("email", "email"),
             ("phonenumber_alternative", "telefoonnummer"),
         ):
-            _, created = self.get_or_create_digitaal_adres(
-                partij_uuid=partij_uuid,
-                soort_adres=soort_adres,
-                adres=getattr(user, attr),
-                is_standaard_adres=False,
-            )
-            if created:
-                updated_fields.append(f"digitaleAddresen.{soort_adres}")
+            if adres := update_data.get(attr):
+                _, created = self.get_or_create_digitaal_adres(
+                    partij_uuid=partij_uuid,
+                    soort_adres=soort_adres,
+                    adres=adres,
+                    is_standaard_adres=False,
+                )
+                if created:
+                    updated_fields.append(f"digitaleAddresen.{soort_adres}")
 
         if updated_fields:
             system_action(
-                f"updated Partij from user with fields: {', '.join(sorted(updated_fields))}",
-                content_object=user,
+                f"updated Partij from user {update_data['email']} with fields: {', '.join(sorted(updated_fields))}",
             )
+
+        return any(updated_fields)
+
+    def update_partij_from_user(self, partij_uuid: str, user: User) -> bool:
+        return self._update_partij(partij_uuid=partij_uuid, user=user)
+
+    def update_partij_from_user_data(
+        self, partij_uuid: str, update_data: PartijUpdateData
+    ) -> bool:
+        return self._update_partij(partij_uuid=partij_uuid, update_data=update_data)
 
     def create_question(
         self, partij_uuid: str, question: str, subject: str
