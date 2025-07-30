@@ -271,13 +271,13 @@ class EditProfileView(
             if user_form_data.get(local_name)
         }
         if not update_data:
-            return
+            return None
 
         try:
             service = eSuiteKlantenService()
         except Exception:
             logger.warning("eSuiteKlantenService failed to build")
-            return
+            return None
 
         if fetch_params := service.get_fetch_parameters(user):
             klant, created = service.get_or_create_klant(
@@ -287,6 +287,9 @@ class EditProfileView(
                 return service.update_klant_from_user(
                     klant, user, update_fields=list(update_data.keys())
                 )
+            return klant
+
+        return None
 
     def get_form_class(self):
         user = self.request.user
