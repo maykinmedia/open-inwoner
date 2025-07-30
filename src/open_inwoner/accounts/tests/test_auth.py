@@ -1420,7 +1420,9 @@ class DuplicateEmailRegistrationTest(WebTest):
 
         self.assertEqual(users.count(), 1)
 
-    @patch("open_inwoner.accounts.views.profile.EditProfileView.update_esuite_klant")
+    @patch(
+        "open_inwoner.accounts.views.profile.EditProfileView.update_klant_via_esuite"
+    )
     def test_digid_user_can_edit_profile(self, mock_update):
         """
         Assert that digid user can edit their profile (the email of the same user
@@ -1560,7 +1562,9 @@ class DuplicateEmailRegistrationTest(WebTest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["form"].errors, expected_errors)
 
-    @patch("open_inwoner.accounts.views.profile.EditProfileView.update_esuite_klant")
+    @patch(
+        "open_inwoner.accounts.views.profile.EditProfileView.update_klant_via_esuite"
+    )
     def test_non_digid_user_can_edit_profile(self, mock_update):
         """
         Assert that non-digid users can edit their profile (the email of the same user

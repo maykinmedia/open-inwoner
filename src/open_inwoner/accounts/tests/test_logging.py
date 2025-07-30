@@ -72,7 +72,9 @@ class TestProfile(WebTest):
             },
         )
 
-    @patch("open_inwoner.accounts.views.profile.EditProfileView.update_esuite_klant")
+    @patch(
+        "open_inwoner.accounts.views.profile.EditProfileView.update_klant_via_esuite"
+    )
     def test_users_modification_is_logged(self, mock_update):
         mock_update.return_value = True
 

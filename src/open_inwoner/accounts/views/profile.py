@@ -28,8 +28,10 @@ from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.haalcentraal.utils import fetch_brp
 from open_inwoner.laposta.forms import NewsletterSubscriptionForm
 from open_inwoner.laposta.models import LapostaConfig
-from open_inwoner.openklant.api_models import Klant
-from open_inwoner.openklant.services import eSuiteKlantenService
+from open_inwoner.openklant.constants import KlantenServiceType
+from open_inwoner.openklant.models import KlantenSysteemConfig
+from open_inwoner.openklant.services import OpenKlant2Service, eSuiteKlantenService
+from open_inwoner.openklant.types import PartijUpdateData
 from open_inwoner.plans.models import Plan
 from open_inwoner.qmatic.client import NoServiceConfigured, qmatic_client_factory
 from open_inwoner.questionnaire.models import QuestionnaireStep
@@ -233,20 +235,29 @@ class EditProfileView(
     def form_valid(self, form):
         user: User = self.get_object()
 
-        klant = self.update_esuite_klant(
-            {k: form.cleaned_data[k] for k in form.changed_data}, user
-        )
-
-        # only save the form if changes have been written to Klanten API or
-        # changes do not require writing to API
-        if klant or not any(
+        # immediately save form if changes don't require writing to API
+        if not any(
             key in form.changed_data
             for key in ("email", "phonenumber", "phonenumber_alternative")
         ):
             form.save()
             messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
             self.log_change(self.get_object(), _("profile was modified"))
-        else:
+            return HttpResponseRedirect(self.get_success_url())
+
+        # write changes to API's; abort saving if write fails
+        # we treat `api_update_ok` as True if the relevant service is not configured at all
+        esuite_update_ok, openklant_update_ok = True, True
+        klanten_config = KlantenSysteemConfig.get_solo()
+        if klanten_config.has_api_service_configured(KlantenServiceType.ESUITE):
+            esuite_update_ok = self.update_klant_via_esuite(
+                {k: form.cleaned_data[k] for k in form.changed_data}, user
+            )
+        if klanten_config.has_api_service_configured(KlantenServiceType.OPENKLANT2):
+            openklant_update_ok = self.update_klant_via_openklant(
+                {k: form.cleaned_data[k] for k in form.changed_data}, user
+            )
+        if not esuite_update_ok or not openklant_update_ok:
             messages.error(
                 request=self.request,
                 message=_(
@@ -257,9 +268,31 @@ class EditProfileView(
             self.log_change(
                 self.get_object(), _("profile changes not saved due to Klant API error")
             )
+            return HttpResponseRedirect(self.get_success_url())
+
+        form.save()
+        messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
+        self.log_change(self.get_object(), _("profile was modified"))
         return HttpResponseRedirect(self.get_success_url())
 
-    def update_esuite_klant(self, user_form_data: dict, user: User) -> Klant | None:
+    def update_klant_via_openklant(self, user_form_data: dict, user: User) -> bool:
+        try:
+            service = OpenKlant2Service()
+        except Exception:
+            logger.warning("OpenKlant2Service failed to build")
+            return False
+
+        partij, created = service.get_or_create_partij_for_user(user)
+
+        if partij and not created:
+            return service.update_partij_from_user_data(
+                partij_uuid=partij["uuid"],
+                update_data=PartijUpdateData(**user_form_data),
+            )
+
+        return bool(partij)
+
+    def update_klant_via_esuite(self, user_form_data: dict, user: User) -> bool:
         field_mapping = {
             "emailadres": "email",
             "telefoonnummer": "phonenumber",
@@ -270,26 +303,25 @@ class EditProfileView(
             for api_name, local_name in field_mapping.items()
             if user_form_data.get(local_name)
         }
-        if not update_data:
-            return None
 
         try:
             service = eSuiteKlantenService()
         except Exception:
             logger.warning("eSuiteKlantenService failed to build")
-            return None
+            return False
 
         if fetch_params := service.get_fetch_parameters(user):
             klant, created = service.get_or_create_klant(
                 fetch_params=fetch_params, user=user
             )
             if klant and not created:
-                return service.update_klant_from_user(
-                    klant, user, update_fields=list(update_data.keys())
+                return bool(
+                    service.update_klant_from_user(
+                        klant, user, update_fields=list(update_data.keys())
+                    )
                 )
-            return klant
 
-        return None
+        return bool(klant)
 
     def get_form_class(self):
         user = self.request.user
@@ -396,13 +428,13 @@ class MyNotificationsView(
         user: User = self.get_object()
 
         if "case_notification_channel" in form.changed_data:
-            self.update_esuite_klant(user)
+            self.update_klant_via_esuite(user)
 
         messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
         self.log_change(self.object, _("users notifications were modified"))
         return HttpResponseRedirect(self.get_success_url())
 
-    def update_esuite_klant(self, user: User):
+    def update_klant_via_esuite(self, user: User):
         try:
             service = eSuiteKlantenService()
         except Exception:
