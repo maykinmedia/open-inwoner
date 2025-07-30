@@ -693,7 +693,7 @@ lxml==4.9.1
     #   pyquery
     #   svglib
     #   xmlsec
-mail-editor==0.3.7
+mail-editor==0.3.8
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
