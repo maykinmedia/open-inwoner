@@ -98,7 +98,7 @@ class AssertTimelineLogMixin:
         return "\n".join(ret)
 
     def dumpTimelineLog(self):
-        print(self.getTimelineLogDump())
+        print(self.getTimelineLogDump())  # noqa: T201
 
     def clearTimelineLogs(self):
         TimelineLog.objects.all().delete()

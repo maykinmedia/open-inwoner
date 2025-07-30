@@ -40,8 +40,6 @@ class Command(BaseCommand):
                 self.stdout.write(f"{user.id} - {user}")
             return
 
-        print(user)
-
         if not options["message"] or not options["title"]:
             self.stdout.write("specify --title and/or --message")
             return
