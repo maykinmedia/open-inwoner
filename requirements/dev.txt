@@ -773,7 +773,7 @@ lxml==4.9.1
     #   pyquery
     #   svglib
     #   xmlsec
-mail-editor==0.3.7
+mail-editor==0.3.8
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt

@@ -391,7 +391,7 @@ lxml==4.9.1
     #   maykin-python3-saml
     #   svglib
     #   xmlsec
-mail-editor==0.3.7
+mail-editor==0.3.8
     # via -r requirements/base.in
 mail-parser==3.15.0
     # via django-yubin
