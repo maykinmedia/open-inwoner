@@ -8,10 +8,12 @@ class IndicatorChoices(models.TextChoices):
 
 
 class Icons(models.TextChoices):
+    # Note: help_outline from Material Icons requires _outline suffix for this icon's variant;
+    # Whereas person/inbox/euro etc. use the standard name without a suffix
     person = "person", _("User")
     description = "description", _("Products")
     inbox = "inbox", _("Inbox")
     inventory_2 = "inventory_2", _("Cases")
     group = "group", _("Collaborate")
-    help = "help", _("Help")
+    help_outline = "help_outline", _("Help")
     euro = "euro", _("Benefits")

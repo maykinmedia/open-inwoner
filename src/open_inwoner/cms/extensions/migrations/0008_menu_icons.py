@@ -3,12 +3,32 @@
 from django.db import migrations, models
 
 
+def map_icon_values(apps, schema_editor):
+    CommonExtension = apps.get_model("extensions", "CommonExtension")
+
+    # Euro_outline is an invalid name, note that help_outline is valid
+    CommonExtension.objects.filter(menu_icon="euro_outline").update(menu_icon="euro")
+
+
+def reverse_map_icon_values(apps, schema_editor):
+    CommonExtension = apps.get_model("extensions", "CommonExtension")
+
+    # Revert to the initial mapping
+    CommonExtension.objects.filter(menu_icon="euro").update(menu_icon="euro_outline")
+
+
 class Migration(migrations.Migration):
     dependencies = [
         ("extensions", "0007_alter_commonextension_requires_auth_bsn_or_kvk"),
     ]
 
     operations = [
+        # Note that the ORM itself does not validate the TextChoices, we can (re)map
+        # prior to the field being altered
+        migrations.RunPython(
+            map_icon_values,
+            reverse_map_icon_values,
+        ),
         migrations.AlterField(
             model_name="commonextension",
             name="menu_icon",
@@ -20,7 +40,7 @@ class Migration(migrations.Migration):
                     ("inbox", "Inbox"),
                     ("inventory_2", "Cases"),
                     ("group", "Collaborate"),
-                    ("help", "Help"),
+                    ("help_outline", "Help"),
                     ("euro", "Benefits"),
                 ],
                 help_text="Icon in het menu",

@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 @register.simple_tag(takes_context=True)
 def react_sidenav_data(context):
-    """Template tag to provide menu data for React Sidenav component"""
+    """Template tag to provide menu data for React SideNavModule component"""
     request = context["request"]
 
     try:
@@ -22,42 +22,46 @@ def react_sidenav_data(context):
         all_nodes = renderer.get_nodes()
         logger.debug(f"Total nodes found: {len(all_nodes)}")
 
-        # Find the "home" node - users are required to set this ID!
-        # else we need to exclude all the other pages from this menu node
+        # Find the "home" node first (preferred method)
         home_node = None
         for node in all_nodes:
-            # Check if this is the home page
-            if (
-                (hasattr(node, "id") and node.id == "home")
-                or (hasattr(node, "reverse_id") and node.reverse_id == "home")
-                or (
-                    getattr(node, "title", "").lower() == "overzicht"
-                    and node.get_absolute_url() == "/"
-                )
-            ):
+            # Check if this is the home page via node.attr.reverse_id
+            node_attr = getattr(node, "attr", {})
+            if node_attr.get("reverse_id", None) == "home":
                 home_node = node
                 logger.debug(f"Found home node: {node.title}")
                 break
 
-        if not home_node:
-            logger.error(
-                "Home node not found! Users must set reverse_id='home' on homepage."
+        # Determine which nodes to use
+        if home_node:
+            # Use children of home node (preferred)
+            target_nodes = getattr(home_node, "children", [])
+            logger.debug(f"Using home node children: {len(target_nodes)} items")
+        else:
+            # Fallback: use all visible nodes
+            logger.warning(
+                "Home node not found (reverse_id='home' not set). Using all visible pages as fallback."
             )
-            return []
 
-        # Use children of home node
-        target_nodes = getattr(home_node, "children", [])
-        logger.debug(f"Home node has {len(target_nodes)} children")
+            target_nodes = []
+            for node in all_nodes:
+                # Only include visible nodes
+                if getattr(node, "visible", True):
+                    target_nodes.append(node)
+
+            logger.debug(
+                f"Using fallback nodes (all visible): {len(target_nodes)} items"
+            )
 
         menu_items = []
 
-        # Process the home node children
+        # Process the target nodes
         for node in target_nodes:
             logger.debug(f"Processing node: {getattr(node, 'title', 'NO_TITLE')}")
 
             # Skip hidden items
             if not getattr(node, "visible", True):
-                logger.debug("Skipping invisible node")
+                logger.debug("  Skipping invisible node")
                 continue
 
             # Skip items without proper attributes
@@ -104,7 +108,7 @@ def react_sidenav_data(context):
                         common_ext = CommonExtension.objects.get(extended_object=page)
                         if common_ext.menu_icon:
                             icon = common_ext.menu_icon
-                            logger.debug(f"Found icon via CommonExtension: {icon}")
+                            logger.debug(f"  Found icon via CommonExtension: {icon}")
                 except Exception as icon_error:
                     logger.debug(
                         f"Could not get icon from CommonExtension: {icon_error}"
@@ -136,7 +140,7 @@ def react_sidenav_data(context):
                 f"Added menu item: {menu_item['label']} -> {menu_item['href']} (icon: {menu_item['icon']})"
             )
 
-        logger.debug(f"Final menu_items: {menu_items}")
+        logger.debug(f"Final menu_items count: {len(menu_items)}")
         return menu_items
 
     except Exception as e:

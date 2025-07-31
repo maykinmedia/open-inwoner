@@ -10,7 +10,7 @@
 //   </span>
 // )
 //
-// const Sidenav: FC = () => {
+// const SideNavModule: FC = () => {
 //   // Get menu data from Django
 //   const getMenuData = () => {
 //     const scriptElement = document.getElementById('sidenav-menu-data')
@@ -62,4 +62,4 @@
 //   return <SideNavigation items={fallbackItems} />
 // }
 //
-// export default Sidenav
+// export default SideNavModule

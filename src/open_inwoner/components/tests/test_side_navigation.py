@@ -8,7 +8,6 @@ from open_inwoner.components.templatetags.side_navigation import react_sidenav_d
 
 class TestReactSidenavData:
     def setup_method(self):
-        """Set up test fixtures"""
         self.factory = RequestFactory()
         self.request = self.factory.get("/")
         self.context = Context({"request": self.request})
@@ -26,69 +25,38 @@ class TestReactSidenavData:
         mock_menu_pool.get_renderer.assert_called_once_with(self.request)
         mock_renderer.get_nodes.assert_called_once()
 
-    @patch("your_app.templatetags.your_templatetags.menu_pool")
-    def test_home_node_found_by_id(self, mock_menu_pool):
-        """Test finding home node by id attribute"""
-        # Create mock nodes
+    @patch("open_inwoner.components.templatetags.side_navigation.menu_pool")
+    def test_home_node_found_by_reverse_id(self, mock_menu_pool):
+        """Test finding home node by reverse_id in node.attr"""
         home_node = Mock()
-        home_node.id = "home"
         home_node.title = "Home"
         home_node.children = []
-
-        other_node = Mock()
-        other_node.id = "other"
+        # Set up attr with reverse_id
+        home_node.attr = Mock()
+        home_node.attr.reverse_id = "home"
 
         mock_renderer = Mock()
-        mock_renderer.get_nodes.return_value = [other_node, home_node]
+        mock_renderer.get_nodes.return_value = [home_node]
         mock_menu_pool.get_renderer.return_value = mock_renderer
 
         result = react_sidenav_data(self.context)
 
         assert result == []  # No children
 
-    @patch("your_app.templatetags.your_templatetags.menu_pool")
-    def test_home_node_found_by_reverse_id(self, mock_menu_pool):
-        """Test finding home node by reverse_id attribute"""
-        home_node = Mock()
-        home_node.reverse_id = "home"
-        home_node.title = "Home"
-        home_node.children = []
-        # Make sure it doesn't have id attribute
-        del home_node.id
-
-        mock_renderer = Mock()
-        mock_renderer.get_nodes.return_value = [home_node]
-        mock_menu_pool.get_renderer.return_value = mock_renderer
-
-        result = react_sidenav_data(self.context)
-
-        assert result == []
-
-    @patch("your_app.templatetags.your_templatetags.menu_pool")
-    def test_home_node_found_by_title_and_url(self, mock_menu_pool):
-        """Test finding home node by title 'overzicht' and URL '/'"""
-        home_node = Mock()
-        home_node.title = "Overzicht"
-        home_node.get_absolute_url.return_value = "/"
-        home_node.children = []
-        # Remove id and reverse_id attributes
-        delattr(home_node, "id")
-        delattr(home_node, "reverse_id")
-
-        mock_renderer = Mock()
-        mock_renderer.get_nodes.return_value = [home_node]
-        mock_menu_pool.get_renderer.return_value = mock_renderer
-
-        result = react_sidenav_data(self.context)
-
-        assert result == []
-
-    @patch("your_app.templatetags.your_templatetags.menu_pool")
-    def test_no_home_node_found(self, mock_menu_pool):
-        """Test when no home node is found"""
+    @patch("open_inwoner.components.templatetags.side_navigation.menu_pool")
+    def test_home_node_not_found_uses_fallback(self, mock_menu_pool):
+        """Test fallback to all visible nodes when no reverse_id='home' is found"""
+        # Node without reverse_id="home"
         other_node = Mock()
-        other_node.id = "other"
-        other_node.title = "Other"
+        other_node.title = "Other Page"
+        other_node.visible = True
+        other_node.get_menu_title.return_value = "Other Menu"
+        other_node.get_absolute_url.return_value = "/other/"
+        other_node.selected = False
+        # Set up attr without reverse_id="home"
+        other_node.attr = Mock()
+        other_node.attr.reverse_id = "other"
+        delattr(other_node, "indicator")
 
         mock_renderer = Mock()
         mock_renderer.get_nodes.return_value = [other_node]
@@ -96,9 +64,50 @@ class TestReactSidenavData:
 
         result = react_sidenav_data(self.context)
 
-        assert result == []
+        # Should use fallback and include the visible node
+        expected = [
+            {
+                "href": "/other/",
+                "label": "Other Menu",
+                "icon": "",
+                "current": False,
+                "counter": None,
+            }
+        ]
+        assert result == expected
 
-    @patch("your_app.templatetags.your_templatetags.menu_pool")
+    @patch("open_inwoner.components.templatetags.side_navigation.menu_pool")
+    def test_home_node_without_attr(self, mock_menu_pool):
+        """Test node without attr attribute uses fallback"""
+        node_without_attr = Mock()
+        node_without_attr.title = "No Attr"
+        node_without_attr.visible = True
+        node_without_attr.get_menu_title.return_value = "No Attr Menu"
+        node_without_attr.get_absolute_url.return_value = "/no-attr/"
+        node_without_attr.selected = False
+        # Remove attr attribute entirely
+        delattr(node_without_attr, "attr")
+        delattr(node_without_attr, "indicator")
+
+        mock_renderer = Mock()
+        mock_renderer.get_nodes.return_value = [node_without_attr]
+        mock_menu_pool.get_renderer.return_value = mock_renderer
+
+        result = react_sidenav_data(self.context)
+
+        # Should use fallback
+        expected = [
+            {
+                "href": "/no-attr/",
+                "label": "No Attr Menu",
+                "icon": "",
+                "current": False,
+                "counter": None,
+            }
+        ]
+        assert result == expected
+
+    @patch("open_inwoner.components.templatetags.side_navigation.menu_pool")
     def test_invisible_child_node_skipped(self, mock_menu_pool):
         """Test that invisible child nodes are skipped"""
         child_node = Mock()
@@ -106,9 +115,10 @@ class TestReactSidenavData:
         child_node.title = "Invisible"
 
         home_node = Mock()
-        home_node.id = "home"
         home_node.title = "Home"
         home_node.children = [child_node]
+        home_node.attr = Mock()
+        home_node.attr.reverse_id = "home"
 
         mock_renderer = Mock()
         mock_renderer.get_nodes.return_value = [home_node]
@@ -118,19 +128,37 @@ class TestReactSidenavData:
 
         assert result == []
 
-    @patch("your_app.templatetags.your_templatetags.menu_pool")
+    @patch("open_inwoner.components.templatetags.side_navigation.menu_pool")
+    def test_fallback_invisible_node_skipped(self, mock_menu_pool):
+        """Test that invisible nodes are skipped in fallback mode"""
+        invisible_node = Mock()
+        invisible_node.visible = False
+        invisible_node.title = "Invisible"
+        invisible_node.attr = Mock()
+        invisible_node.attr.reverse_id = "other"
+
+        mock_renderer = Mock()
+        mock_renderer.get_nodes.return_value = [invisible_node]
+        mock_menu_pool.get_renderer.return_value = mock_renderer
+
+        result = react_sidenav_data(self.context)
+
+        assert result == []
+
+    @patch("open_inwoner.components.templatetags.side_navigation.menu_pool")
     def test_node_without_get_menu_title_skipped(self, mock_menu_pool):
         """Test that nodes without get_menu_title are skipped"""
         child_node = Mock()
         child_node.visible = True
         child_node.title = "No Menu Title"
         # Remove get_menu_title method
-        del child_node.get_menu_title
+        delattr(child_node, "get_menu_title")
 
         home_node = Mock()
-        home_node.id = "home"
         home_node.title = "Home"
         home_node.children = [child_node]
+        home_node.attr = Mock()
+        home_node.attr.reverse_id = "home"
 
         mock_renderer = Mock()
         mock_renderer.get_nodes.return_value = [home_node]
@@ -140,7 +168,7 @@ class TestReactSidenavData:
 
         assert result == []
 
-    @patch("your_app.templatetags.your_templatetags.menu_pool")
+    @patch("open_inwoner.components.templatetags.side_navigation.menu_pool")
     def test_node_with_redirect_url(self, mock_menu_pool):
         """Test node with redirect_url in attr"""
         child_node = Mock()
@@ -154,7 +182,8 @@ class TestReactSidenavData:
         delattr(child_node, "indicator")
 
         home_node = Mock()
-        home_node.id = "home"
+        home_node.attr = Mock()
+        home_node.attr.reverse_id = "home"
         home_node.children = [child_node]
 
         mock_renderer = Mock()
@@ -174,7 +203,7 @@ class TestReactSidenavData:
         ]
         assert result == expected
 
-    @patch("your_app.templatetags.your_templatetags.menu_pool")
+    @patch("open_inwoner.components.templatetags.side_navigation.menu_pool")
     def test_node_with_absolute_url(self, mock_menu_pool):
         """Test node using get_absolute_url when no redirect_url"""
         child_node = Mock()
@@ -188,7 +217,8 @@ class TestReactSidenavData:
         delattr(child_node, "indicator")
 
         home_node = Mock()
-        home_node.id = "home"
+        home_node.attr = Mock()
+        home_node.attr.reverse_id = "home"
         home_node.children = [child_node]
 
         mock_renderer = Mock()
@@ -208,7 +238,7 @@ class TestReactSidenavData:
         ]
         assert result == expected
 
-    @patch("your_app.templatetags.your_templatetags.menu_pool")
+    @patch("open_inwoner.components.templatetags.side_navigation.menu_pool")
     def test_node_without_url_skipped(self, mock_menu_pool):
         """Test that nodes without URL are skipped"""
         child_node = Mock()
@@ -220,7 +250,8 @@ class TestReactSidenavData:
         delattr(child_node, "get_absolute_url")
 
         home_node = Mock()
-        home_node.id = "home"
+        home_node.attr = Mock()
+        home_node.attr.reverse_id = "home"
         home_node.children = [child_node]
 
         mock_renderer = Mock()
@@ -231,7 +262,7 @@ class TestReactSidenavData:
 
         assert result == []
 
-    @patch("your_app.templatetags.your_templatetags.menu_pool")
+    @patch("open_inwoner.components.templatetags.side_navigation.menu_pool")
     def test_icon_from_common_menu_icon(self, mock_menu_pool):
         """Test getting icon from node.common.menu_icon"""
         child_node = Mock()
@@ -244,7 +275,8 @@ class TestReactSidenavData:
         delattr(child_node, "indicator")
 
         home_node = Mock()
-        home_node.id = "home"
+        home_node.attr = Mock()
+        home_node.attr.reverse_id = "home"
         home_node.children = [child_node]
 
         mock_renderer = Mock()
@@ -255,7 +287,7 @@ class TestReactSidenavData:
 
         assert result[0]["icon"] == "icon-home"
 
-    @patch("your_app.templatetags.your_templatetags.menu_pool")
+    @patch("open_inwoner.components.templatetags.side_navigation.menu_pool")
     def test_icon_from_menu_icon_attribute(self, mock_menu_pool):
         """Test getting icon from node.menu_icon when common doesn't have it"""
         child_node = Mock()
@@ -269,7 +301,8 @@ class TestReactSidenavData:
         delattr(child_node, "indicator")
 
         home_node = Mock()
-        home_node.id = "home"
+        home_node.attr = Mock()
+        home_node.attr.reverse_id = "home"
         home_node.children = [child_node]
 
         mock_renderer = Mock()
@@ -280,7 +313,7 @@ class TestReactSidenavData:
 
         assert result[0]["icon"] == "icon-settings"
 
-    @patch("your_app.templatetags.your_templatetags.menu_pool")
+    @patch("open_inwoner.components.templatetags.side_navigation.menu_pool")
     def test_icon_from_attr_menu_icon(self, mock_menu_pool):
         """Test getting icon from node.attr.menu_icon"""
         child_node = Mock()
@@ -298,7 +331,8 @@ class TestReactSidenavData:
         delattr(child_node, "indicator")
 
         home_node = Mock()
-        home_node.id = "home"
+        home_node.attr = Mock()
+        home_node.attr.reverse_id = "home"
         home_node.children = [child_node]
 
         mock_renderer = Mock()
@@ -309,9 +343,9 @@ class TestReactSidenavData:
 
         assert result[0]["icon"] == "icon-user"
 
-    @patch("your_app.templatetags.your_templatetags.CommonExtension")
-    @patch("your_app.templatetags.your_templatetags.Page")
-    @patch("your_app.templatetags.your_templatetags.menu_pool")
+    @patch("open_inwoner.components.templatetags.side_navigation.CommonExtension")
+    @patch("open_inwoner.components.templatetags.side_navigation.Page")
+    @patch("open_inwoner.components.templatetags.side_navigation.menu_pool")
     def test_icon_from_common_extension(
         self, mock_menu_pool, mock_page_model, mock_common_ext
     ):
@@ -337,7 +371,8 @@ class TestReactSidenavData:
         delattr(child_node, "indicator")
 
         home_node = Mock()
-        home_node.id = "home"
+        home_node.attr = Mock()
+        home_node.attr.reverse_id = "home"
         home_node.children = [child_node]
 
         mock_renderer = Mock()
@@ -350,9 +385,9 @@ class TestReactSidenavData:
         mock_page_model.objects.get.assert_called_once_with(pk=123)
         mock_common_ext.objects.get.assert_called_once_with(extended_object=mock_page)
 
-    @patch("your_app.templatetags.your_templatetags.CommonExtension")
-    @patch("your_app.templatetags.your_templatetags.Page")
-    @patch("your_app.templatetags.your_templatetags.menu_pool")
+    @patch("open_inwoner.components.templatetags.side_navigation.CommonExtension")
+    @patch("open_inwoner.components.templatetags.side_navigation.Page")
+    @patch("open_inwoner.components.templatetags.side_navigation.menu_pool")
     def test_icon_common_extension_fails(
         self, mock_menu_pool, mock_page_model, mock_common_ext
     ):
@@ -372,7 +407,8 @@ class TestReactSidenavData:
         delattr(child_node, "indicator")
 
         home_node = Mock()
-        home_node.id = "home"
+        home_node.attr = Mock()
+        home_node.attr.reverse_id = "home"
         home_node.children = [child_node]
 
         mock_renderer = Mock()
@@ -383,7 +419,7 @@ class TestReactSidenavData:
 
         assert result[0]["icon"] == ""  # Default empty icon
 
-    @patch("your_app.templatetags.your_templatetags.menu_pool")
+    @patch("open_inwoner.components.templatetags.side_navigation.menu_pool")
     def test_node_with_valid_counter(self, mock_menu_pool):
         """Test node with valid indicator/counter"""
         child_node = Mock()
@@ -394,7 +430,8 @@ class TestReactSidenavData:
         child_node.indicator = "5"  # String that can be converted to int
 
         home_node = Mock()
-        home_node.id = "home"
+        home_node.attr = Mock()
+        home_node.attr.reverse_id = "home"
         home_node.children = [child_node]
 
         mock_renderer = Mock()
@@ -405,7 +442,7 @@ class TestReactSidenavData:
 
         assert result[0]["counter"] == 5
 
-    @patch("your_app.templatetags.your_templatetags.menu_pool")
+    @patch("open_inwoner.components.templatetags.side_navigation.menu_pool")
     def test_node_with_zero_counter_ignored(self, mock_menu_pool):
         """Test that zero counter is treated as None"""
         child_node = Mock()
@@ -416,7 +453,8 @@ class TestReactSidenavData:
         child_node.indicator = "0"  # Zero should be ignored
 
         home_node = Mock()
-        home_node.id = "home"
+        home_node.attr = Mock()
+        home_node.attr.reverse_id = "home"
         home_node.children = [child_node]
 
         mock_renderer = Mock()
@@ -427,7 +465,7 @@ class TestReactSidenavData:
 
         assert result[0]["counter"] is None
 
-    @patch("your_app.templatetags.your_templatetags.menu_pool")
+    @patch("open_inwoner.components.templatetags.side_navigation.menu_pool")
     def test_node_with_invalid_counter(self, mock_menu_pool):
         """Test node with invalid indicator that can't be converted to int"""
         child_node = Mock()
@@ -438,7 +476,8 @@ class TestReactSidenavData:
         child_node.indicator = "invalid"  # Can't convert to int
 
         home_node = Mock()
-        home_node.id = "home"
+        home_node.attr = Mock()
+        home_node.attr.reverse_id = "home"
         home_node.children = [child_node]
 
         mock_renderer = Mock()
@@ -449,7 +488,7 @@ class TestReactSidenavData:
 
         assert result[0]["counter"] is None
 
-    @patch("your_app.templatetags.your_templatetags.menu_pool")
+    @patch("open_inwoner.components.templatetags.side_navigation.menu_pool")
     def test_exception_handling(self, mock_menu_pool):
         """Test that exceptions are caught and empty list is returned"""
         mock_menu_pool.get_renderer.side_effect = Exception("Menu error")
@@ -458,7 +497,7 @@ class TestReactSidenavData:
 
         assert result == []
 
-    @patch("your_app.templatetags.your_templatetags.menu_pool")
+    @patch("open_inwoner.components.templatetags.side_navigation.menu_pool")
     def test_complete_menu_item(self, mock_menu_pool):
         """Test a complete menu item with all attributes"""
         child_node = Mock()
@@ -471,8 +510,9 @@ class TestReactSidenavData:
         child_node.menu_icon = "icon-complete"
 
         home_node = Mock()
-        home_node.id = "home"
         home_node.title = "Home"
+        home_node.attr = Mock()
+        home_node.attr.reverse_id = "home"
         home_node.children = [child_node]
 
         mock_renderer = Mock()
@@ -504,8 +544,9 @@ class TestReactSidenavDataEdgeCases:
     def test_home_node_without_children_attribute(self, mock_menu_pool):
         """Test home node that doesn't have children attribute"""
         home_node = Mock()
-        home_node.id = "home"
         home_node.title = "Home"
+        home_node.attr = Mock()
+        home_node.attr.reverse_id = "home"
         # Remove children attribute entirely
         delattr(home_node, "children")
 
@@ -529,7 +570,8 @@ class TestReactSidenavDataEdgeCases:
         delattr(child_node, "indicator")
 
         home_node = Mock()
-        home_node.id = "home"
+        home_node.attr = Mock()
+        home_node.attr.reverse_id = "home"
         home_node.children = [child_node]
 
         mock_renderer = Mock()
