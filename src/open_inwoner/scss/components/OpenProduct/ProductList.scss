@@ -1,9 +1,9 @@
-.product_warning_indicator {
-  color: #ef780f;
+.product__indicator--warning {
+  color: var(--color-danger-lightest);
 }
 
-.product_warning_expired_indicator {
-  color: #bf492c;
+.product__indicator--expired {
+  color: var(--oip-color-red-notification);
   display: flex;
-  gap: 0.4em;
+  gap: var(--oip-color-red---spacing-medium);
 }

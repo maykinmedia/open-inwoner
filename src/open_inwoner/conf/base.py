@@ -488,6 +488,8 @@ LOGGING = {
 LOG_OUTGOING_REQUESTS_DB_SAVE = config("LOG_OUTGOING_REQUESTS_DB_SAVE", default=True)
 LOG_OUTGOING_REQUESTS_RESET_DB_SAVE_AFTER = None  # reset config after $ minutes
 
+# Open product API client settings
+EXPIRATION_WARNING_TIME_SLOT = config("EXPIRATION_WARNING_TIME_SLOT", default=14)
 
 #
 # AUTH settings - user accounts, passwords, backends...
@@ -600,6 +602,7 @@ CMS_PLACEHOLDER_CONF = {
             "ProductListPlugin",
             "ThemeListPlugin",
             "ThemePlugin",
+            "CMSFlatPagePlugin",
         ],
         "text_only_plugins": ["LinkPlugin"],
         "name": _("Content"),

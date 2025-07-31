@@ -1,3 +1,5 @@
+import logging
+
 from django import forms
 
 from .models import ProductList
@@ -10,7 +12,9 @@ def get_formatted_themes():
         themes = client.list_themes()["results"]
         return [(theme["uuid"], theme["naam"]) for theme in themes]
     except Exception:
-        return ["No themes available before Open Product initialization."]
+        message = "No themes available before Open Product initialization."
+        logging.info(message)
+        return [message]
 
 
 class ProductListForm(forms.ModelForm):

@@ -18,14 +18,8 @@ class OpenProductConfigAdmin(SingletonModelAdmin):
             _("Open Product Configuration"),
             {
                 "fields": ["action_urls"],
-                "description": _(
-                    """
-                    Configure URLs for producttype actions.
-
-                    Example:
-                    {"Paspoort:Afspraak maken": "https://example.nl/passport/request"}
-                    """
-                ),
+                "description": _("Configure URLs for producttype actions.\nExample:")
+                + ' {"Paspoort:Afspraak maken": "https://example.nl/passport/request"}',
             },
         )
     ]

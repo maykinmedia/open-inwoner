@@ -14,8 +14,8 @@
             <div class="card__body">
                 <h2 class="card__heading-2">{{ product.producttype.naam }}</h2>
 
-                <p>Geldig tot {{ product.eind_datum }}</p>
-                <p><b>Status: </b>{{ product.status }}</p>
+                <p>{% trans "Geldig tot "%}{{ product.eind_datum }}</p>
+                <p><strong>{% trans "Status: "%} </strong>{{ product.status }}</p>
 
                 {% for action in product.producttype.acties|dictsort:"naam" %}
                     <a class="link link--icon link--secondary" title="{{ action.naam }}" 
@@ -26,16 +26,16 @@
                 {% endfor %}
 
                 {% if product.nearing_expiration %}
-                    <p class="product_warning_indicator">
+                    <p class="product__indicator--warning">
                         {% icon icon="warning" icon_position="before" primary=True outlined=True %}
-                        <span>Dit document verloopt binnenkort.</span>
+                        <span>{% trans "Dit document verloopt binnenkort."%}</span>
                     </p>
                 {% endif %}
 
                 {% if product.status == 'verlopen' %}
-                    <p class="product_warning_expired_indicator">
+                    <p class="product__indicator--expired">
                         {% icon icon="error" icon_position="before" primary=True outlined=True %}
-                        <span>Dit document is verlopen.</span>
+                        <span>{% trans "Dit document is verlopen."%}</span>
                     </p>
                 {% endif %}
 

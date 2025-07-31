@@ -16,7 +16,7 @@ class ProductListTestCase(CMSTestCase):
 
         self.product_list = ProductListModel.objects.create(
             title="Mijn reisdocumenten",
-            description="Some description",
+            description="Een beschrijving",
             theme="Reisdocumenten",
         )
 

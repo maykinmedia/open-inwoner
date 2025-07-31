@@ -1,5 +1,6 @@
 from datetime import date
 
+from django.conf import settings
 from django.core.cache import cache as django_cache
 from django.utils.translation import gettext_lazy as _
 
@@ -22,10 +23,6 @@ class ProductListPlugin(CMSPluginBase):
     render_template = "cms/product_list/product_list_plugin.html"
     cache = False
 
-    # The amount of days before an indicator is shown
-    #  that the product/document is about to expire.
-    EXPIRATION_WARNING_TIME_SLOT = 14
-
     def __init__(self, model=None, admin_site=None):
         super().__init__(model, admin_site)
         self._client = None
@@ -40,7 +37,7 @@ class ProductListPlugin(CMSPluginBase):
             self._client = get_open_product_client()
         return self._client
 
-    def _get_cached_producttypes(self, theme):
+    def _get_producttypes(self, theme):
         """
         Retrieves cached producttypes. If not available,
          they are retrieved from the API.
@@ -49,36 +46,36 @@ class ProductListPlugin(CMSPluginBase):
         cache_id = f"products:{theme}"
         cached_producttypes = django_cache.get(cache_id)
 
-        if not cached_producttypes:
-            producttypes = self.client.list_product_types(themas__uuid=theme)["results"]
-
-            # Retrieve local configuration of product actions
-            producttypeactionsconfig = OpenProductConfig.get_solo()
-            action_urls = producttypeactionsconfig.action_urls
-
-            # For every producttype, insert local 'action_url' configuration
-            for pt in producttypes:
-                for key, value in action_urls.items():
-                    action_full_name = key.split(":")
-                    pt_name = action_full_name[0]
-                    action_name = action_full_name[1]
-
-                    if pt["naam"] == pt_name:
-                        for action in pt["acties"]:
-                            if action["naam"] == action_name:
-                                action["action_url"] = value
-
-            django_cache.set(cache_id, producttypes, self.PRODUCTTYPES_CACHE_TIMEOUT)
-            return producttypes
-        else:
+        if cached_producttypes:
             return cached_producttypes
+
+        producttypes = self.client.list_product_types(themas__uuid=theme)["results"]
+
+        # Retrieve local configuration of product actions
+        producttypeactionsconfig = OpenProductConfig.get_solo()
+        action_urls = producttypeactionsconfig.action_urls
+
+        # For every producttype, insert local 'action_url' configuration
+        for pt in producttypes:
+            for key, value in action_urls.items():
+                action_full_name = key.split(":")
+                pt_name = action_full_name[0]
+                action_name = action_full_name[1]
+
+                if pt["naam"] == pt_name:
+                    for action in pt["acties"]:
+                        if action["naam"] == action_name:
+                            action["action_url"] = value
+
+        django_cache.set(cache_id, producttypes, self.PRODUCTTYPES_CACHE_TIMEOUT)
+        return producttypes
 
     def _retrieve_user_products(self, theme, bsn):
         """
         Retrieve products from the user based on a given theme and BSN.
         """
 
-        producttypes = self._get_cached_producttypes(theme)
+        producttypes = self._get_producttypes(theme)
 
         codes = [pt["code"] for pt in producttypes]
         products = self.client.list_products(
@@ -106,13 +103,15 @@ class ProductListPlugin(CMSPluginBase):
             # Set 'expiration' indicator depending on
             # the end date of the product
             product["nearing_expiration"] = (
-                expiration_days_left > 0
-                and expiration_days_left <= self.EXPIRATION_WARNING_TIME_SLOT
+                0
+                < expiration_days_left
+                <= getattr(settings, "EXPIRATION_WARNING_TIME_SLOT")
             )
-
         return display_products
 
     def render(self, context, instance, placeholder):
+        # TODO: Find some solution here to make sure
+        # that the user is actually logged in
         bsn = context["request"].user.bsn
 
         products = self._retrieve_user_products(instance.theme, bsn)

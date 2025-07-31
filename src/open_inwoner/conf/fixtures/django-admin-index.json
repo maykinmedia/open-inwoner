@@ -297,10 +297,6 @@
                 "subscription"
             ],
             [
-                "objectsapiclient",
-                "configuration"
-            ],
-            [
                 "openformsclient",
                 "configuration"
             ],
@@ -335,6 +331,10 @@
             [
                 "openzaak",
                 "zaaktypeinformatieobjecttypeconfig"
+            ],
+            [
+                "objectsapiclient",
+                "configuration"
             ],
             [
                 "qmatic",
