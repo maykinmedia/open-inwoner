@@ -6,8 +6,11 @@ from open_inwoner.accounts.tests.factories import (
     eHerkenningUserFactory,
     eHerkenningVestigingUserFactory,
 )
-from open_inwoner.openklant.constants import Status
-from open_inwoner.openklant.models import ESuiteKlantConfig
+from open_inwoner.openklant.constants import KlantenServiceType, Status
+from open_inwoner.openklant.models import (
+    ESuiteKlantConfig,
+    OpenKlant2Config,
+)
 from open_inwoner.openzaak.tests.factories import (
     ServiceFactory,
     ZGWApiGroupConfigFactory,
@@ -23,15 +26,24 @@ CONTACTMOMENTEN_ROOT = "https://contactmomenten.nl/api/v1/"
 
 class MockAPIData:
     @classmethod
-    def setUpServices(cls):
-        config = ESuiteKlantConfig.get_solo()
-        config.klanten_service = ServiceFactory(
-            api_root=KLANTEN_ROOT, api_type=APITypes.kc
-        )
-        config.contactmomenten_service = ServiceFactory(
-            api_root=CONTACTMOMENTEN_ROOT, api_type=APITypes.cmc
-        )
-        config.save()
+    def setUpServices(
+        cls, klanten_service_type: KlantenServiceType = KlantenServiceType.ESUITE
+    ):
+        if klanten_service_type == KlantenServiceType.OPENKLANT2:
+            cls.config = OpenKlant2Config.get_solo()
+            cls.config.service = ServiceFactory(
+                api_root=OPENKLANT2_ROOT, api_type=APITypes.kc
+            )
+            cls.config.save()
+        else:
+            config = ESuiteKlantConfig.get_solo()
+            config.klanten_service = ServiceFactory(
+                api_root=KLANTEN_ROOT, api_type=APITypes.kc
+            )
+            config.contactmomenten_service = ServiceFactory(
+                api_root=CONTACTMOMENTEN_ROOT, api_type=APITypes.cmc
+            )
+            config.save()
 
         # services
         ZGWApiGroupConfigFactory(
@@ -185,6 +197,146 @@ class MockAPIReadPatchData(MockAPIData):
                 f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
                 json=self.klant_eherkenning_updated,
                 status_code=200,
+            ),
+        ]
+        return self
+
+    def install_mocks_openklant(self, m) -> "MockAPIReadPatchData":
+        self.digid_user = DigidUserFactory()
+        m.get(
+            "http://localhost:8338/klantinteracties/api/v1/partijen?partijIdentificator__codeSoortObjectId=bsn&partijIdentificator__codeRegister=brp&partijIdentificator__codeObjecttype=natuurlijk_persoon&partijIdentificator__objectId=123456782&soortPartij=persoon",
+            headers={"Content-Type": "application/json"},
+            json={
+                "count": 1,
+                "next": None,
+                "previous": None,
+                "results": [
+                    {
+                        "uuid": "7260ea01-12c0-4750-8fd1-dfa777818837",
+                    },
+                ],
+            },
+            status_code=200,
+        )
+        m.get(
+            "http://localhost:8338/klantinteracties/api/v1/partijen?partijIdentificator__codeSoortObjectId=bsn&partijIdentificator__codeRegister=brp&partijIdentificator__codeObjecttype=natuurlijk_persoon&partijIdentificator__objectId=100000001&soortPartij=persoon",
+            headers={"Content-Type": "application/json"},
+            json={
+                "count": 1,
+                "next": None,
+                "previous": None,
+                "results": [
+                    {
+                        "uuid": "7260ea01-12c0-4750-8fd1-dfa777818837",
+                    },
+                ],
+            },
+            status_code=200,
+        )
+
+        m.get(
+            "http://localhost:8338/klantinteracties/api/v1/partijen/7260ea01-12c0-4750-8fd1-dfa777818837?expand=digitaleAdressen%2Cbetrokkenen%2Cbetrokkenen.hadKlantcontact",
+            headers={"Content-Type": "application/json"},
+            json={
+                "uuid": "7260ea01-12c0-4750-8fd1-dfa777818837",
+                "digitaleAdressen": None,
+                "voorkeursDigitaalAdres": None,
+                "rekeningnummers": None,
+                "voorkeursRekeningnummer": None,
+                "indicatieGeheimhouding": False,
+                "indicatieActief": True,
+                "voorkeurstaal": "crp",
+                "soortPartij": "persoon",
+                "partijIdentificatie": {
+                    "contactnaam": {
+                        "voorletters": "Dr.",
+                        "voornaam": "Test Persoon",
+                        "voorvoegselAchternaam": "Mrs.",
+                        "achternaam": "Gamble",
+                    }
+                },
+            },
+        )
+        m.get(
+            "http://localhost:8338/klantinteracties/api/v1/partijen/7260ea01-12c0-4750-8fd1-dfa777818837?expand=digitaleAdressen",
+            headers={"Content-Type": "application/json"},
+            json={
+                "count": 0,
+                "next": None,
+                "previous": None,
+                "results": [],
+            },
+        )
+        m.post(
+            f"{OPENKLANT2_ROOT}/digitaleadressen",
+            headers={"Content-Type": "application/json"},
+            json={
+                "count": 1,
+                "next": None,
+                "previous": None,
+                "results": [],
+            },
+        )
+
+        klantcontact = {
+            "uuid": "095be615-a8ad-4c33-8e9c-c7612fbf6c9f",
+            "url": "http://example.com",
+            "gingOverOnderwerpobjecten": [],
+            "hadBetrokkenActoren": [],
+            "omvatteBijlagen": [],
+            "hadBetrokkenen": [],
+            "leiddeTotInterneTaken": [],
+            "nummer": "007",
+            "kanaal": "email",
+            "onderwerp": "Aanvraag",
+            "inhoud": "Hoe gaat het?",
+            "taal": "nl",
+            "vertrouwelijk": False,
+            "plaatsgevondenOp": "2019-08-24T14:15:22Z",
+        }
+        betrokkene = {
+            "uuid": "095be615-a8ad-4c33-8e9c-c7612fbf6c9f",
+            "url": "http://example.com",
+            "wasPartij": {
+                "uuid": "095be615-a8ad-4c33-8e9c-c7612fbf6c9f",
+                "url": "http://example.com",
+            },
+            "hadKlantcontact": {
+                "uuid": "095be615-a8ad-4c33-8e9c-c7612fbf6c9f",
+                "url": "http://example.com",
+            },
+            "digitaleAdressen": [{}],
+            "volledigeNaam": "John Doe",
+            "rol": "medewerker",
+            "initiator": True,
+        }
+        interne_taak = {
+            "uuid": "095be615-a8ad-4c33-8e9c-c7612fbf6c9f",
+            "url": "http://example.com",
+            "gevraagdeHandeling": "",
+            "aanleidinggevendKlantcontact": {
+                "uuid": klantcontact["uuid"],
+                "url": "http://example.com",
+            },
+            "status": "te_verwerken",
+            "toegewezenOp": "2019-08-24T14:15:22Z",
+        }
+
+        self.matchers = [
+            m.post(
+                "http://localhost:8338/klantinteracties/api/v1/betrokkenen",
+                headers={"Content-Type": "application/json"},
+                json=betrokkene,
+            ),
+            m.post(
+                "http://localhost:8338/klantinteracties/api/v1/klantcontacten",
+                headers={"Content-Type": "application/json"},
+                json=klantcontact,
+            ),
+            m.post(
+                "http://localhost:8338/klantinteracties/api/v1/internetaken",
+                headers={"Content-Type": "application/json"},
+                json=interne_taak,
             ),
         ]
         return self
