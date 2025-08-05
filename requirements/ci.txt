@@ -50,7 +50,7 @@ beautifulsoup4==4.12.3
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   webtest
-billiard==4.2.0
+billiard==4.2.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -71,7 +71,7 @@ cbor2==5.6.2
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   webauthn
-celery==5.4.0
+celery==5.5.3
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -678,7 +678,7 @@ jsonschema==4.1.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   drf-spectacular
-kombu==5.5.1
+kombu==5.5.4
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -771,6 +771,7 @@ packaging==23.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   djangocms-text-ckeditor
+    #   kombu
     #   pytest
     #   sphinx
 phonenumbers==8.13.29
@@ -1062,11 +1063,10 @@ typing-extensions==4.10.0
     #   xsdata
     #   zgw-consumers
     #   zgw-consumers-oas
-tzdata==2025.1
+tzdata==2025.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-    #   celery
     #   django-celery-beat
     #   kombu
 uritemplate==4.1.1
