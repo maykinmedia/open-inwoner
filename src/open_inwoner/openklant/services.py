@@ -1287,17 +1287,9 @@ class OpenKlant2Service(
     def _update_partij(
         self,
         partij_uuid: str,
-        user: User | None = None,
-        update_data: PartijUpdateData | None = None,
-    ) -> bool:
-        if user:
-            update_data = PartijUpdateData(
-                email=user.email,
-                phonenumber=user.phonenumber,
-                phonenumber_alternative=user.phonenumber_alternative,
-            )
-
-        updated_fields = []
+        update_data: PartijUpdateData,
+    ) -> list[str]:
+        updated_fields: list[str] = []
 
         if phonenumber := update_data.get("phonenumber"):
             _, created = self.get_or_create_digitaal_adres(
@@ -1325,18 +1317,27 @@ class OpenKlant2Service(
 
         if updated_fields:
             system_action(
-                f"updated Partij from user {update_data['email']} with fields: {', '.join(sorted(updated_fields))}",
+                f"updated Partij {partij_uuid} with fields: {', '.join(sorted(updated_fields))}",
             )
 
-        return any(updated_fields)
+        return updated_fields
 
     def update_partij_from_user(self, partij_uuid: str, user: User) -> bool:
-        return self._update_partij(partij_uuid=partij_uuid, user=user)
+        update_data = PartijUpdateData(
+            email=user.email,
+            phonenumber=user.phonenumber,
+            phonenumber_alternative=user.phonenumber_alternative,
+        )
+        return bool(
+            self._update_partij(partij_uuid=partij_uuid, update_data=update_data)
+        )
 
     def update_partij_from_user_data(
         self, partij_uuid: str, update_data: PartijUpdateData
     ) -> bool:
-        return self._update_partij(partij_uuid=partij_uuid, update_data=update_data)
+        return bool(
+            self._update_partij(partij_uuid=partij_uuid, update_data=update_data)
+        )
 
     def create_question(
         self, partij_uuid: str, question: str, subject: str
