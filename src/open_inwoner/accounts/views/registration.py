@@ -16,6 +16,7 @@ from furl import furl
 from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.models import KlantenSysteemConfig
 from open_inwoner.openklant.services import OpenKlant2Service, eSuiteKlantenService
+from open_inwoner.openklant.types import PartijUpdateData
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from ...mail.verification import send_user_email_verification_mail
@@ -211,16 +212,15 @@ class NecessaryFieldsUserView(
             )
             return
 
-        update_data = {}
+        update_data: PartijUpdateData = {}
         if "email" in form.cleaned_data:
             update_data["email"] = form.cleaned_data["email"]
         if "phonenumber" in form.cleaned_data:
             update_data["phonenumber"] = form.cleaned_data["phonenumber"]
 
-        service.update_partij_from_user(
+        service.update_partij_from_user_data(
             partij_uuid=partij["uuid"],
-            user=user,
-            user_form_data=update_data,
+            update_data=update_data,
         )
 
     def update_klant_via_esuite(self, form: NecessaryUserForm):
