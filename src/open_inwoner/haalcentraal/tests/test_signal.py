@@ -278,7 +278,7 @@ class TestLogging(HaalCentraalMixin, AssertTimelineLogMixin, TestCase):
         user.save()
 
         self.assertTimelineLog(
-            "Retrieving data for %s from haal centraal based on BSN",
+            "Retrieving data for user from haal centraal based on BSN",
             level=logging.INFO,
         )
         self.assertTimelineLog(
@@ -315,7 +315,7 @@ class TestLogging(HaalCentraalMixin, AssertTimelineLogMixin, TestCase):
         user.save()
 
         self.assertTimelineLog(
-            "Retrieving data for %s from haal centraal based on BSN",
+            "Retrieving data for user from haal centraal based on BSN",
             level=logging.INFO,
         )
         self.assertEqual(TimelineLog.objects.count(), 1)
