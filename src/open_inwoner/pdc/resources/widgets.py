@@ -12,6 +12,8 @@ class ValidatedManyToManyWidget(ManyToManyWidget):
         qs = super().clean(value, row=row, *args, **kwargs)
         if value and not qs:
             raise ValidationError(
-                _(f"The {self.model.__name__.lower()} you entered does not exist")
+                _("The {model_name} you entered does not exist").format(
+                    model_name=self.model.__name__.lower()
+                )
             )
         return qs

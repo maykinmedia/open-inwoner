@@ -2,6 +2,7 @@ from collections import OrderedDict
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+from django.utils.translation import gettext as _
 
 import tablib
 from freezegun import freeze_time
@@ -139,7 +140,7 @@ class TestProductImportResource(TestCase):
         with self.assertRaises(ValidationError) as e:
             self.resource.import_data(dataset, raise_errors=True)
 
-        self.assertEqual(e.exception.message, "The category you entered does not exist")
+        self.assertEqual(e.exception.message, _("De ingevoerde category bestaat niet"))
 
     def test_import_creates_slug_field_when_it_is_not_given(self):
         dataset = tablib.Dataset(
