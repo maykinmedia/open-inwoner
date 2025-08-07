@@ -1028,6 +1028,18 @@ class OpenKlant2Service(
 
         return self.client.partij.retrieve(vestiging_pi["identificeerdePartij"]["uuid"])
 
+    def get_partij_for_user(self, user: User) -> Partij | None:
+        if user.kvk:
+            return self.find_organisatie_for_kvk_and_vestiging(
+                kvk=user.kvk,
+                vestigingsnummer=user.vestiging,
+            )
+
+        if user.bsn:
+            return self.find_persoon_for_bsn(user.bsn)
+
+        return None
+
     def get_or_create_partij_for_user(self, user: User) -> tuple[Partij | None, bool]:
         partij = None
         created = False
@@ -1680,11 +1692,36 @@ class OpenKlant2Service(
         zaak: Zaak,
         user: User,
     ) -> list[Question]:
-        klantcontacten_for_zaak = self.client.klant_contact.list(
-            params={
-                "onderwerpobject__onderwerpobjectidentificatorObjectId": zaak.identificatie
-            }
-        )["results"]
+        params: ListKlantContactParams = {
+            "onderwerpobject__onderwerpobjectidentificatorObjectId": zaak.identificatie,
+            "expand": ["hadBetrokkenen"],
+        }
+        klantcontacten_for_zaak = self.client.klant_contact.list_iter(params=params)
+        if not (partij := self.get_partij_for_user(user)):
+            logger.error(
+                "Partij not found where one was expected", extra={"user": user}
+            )
+            return []
+
+        def partij_is_initiator(klantcontact: KlantContact) -> bool:
+            if _expand := klantcontact.get("_expand"):
+                if had_betrokkenen := _expand.get("hadBetrokkenen"):
+                    for betrokkene in had_betrokkenen:
+                        partij_was_betrokkene = (
+                            betrokkene["wasPartij"]["uuid"] == partij["uuid"]
+                        )
+                        partij_was_initiator = betrokkene["initiator"]
+
+                        if partij_was_betrokkene and partij_was_initiator:
+                            return True
+
+            return False
+
+        # only show questions initiated by the current user
+        klantcontacten_for_initiator = filter(
+            partij_is_initiator,
+            klantcontacten_for_zaak,
+        )
 
         questions = [
             OpenKlant2Question.from_klantcontact_and_answer(klantcontact, None)
