@@ -1,7 +1,6 @@
 import logging
 from typing import Iterable, Protocol
 
-from django.contrib import messages
 from django.contrib.auth.mixins import AccessMixin
 from django.core.exceptions import ImproperlyConfigured
 from django.http import Http404, HttpResponseRedirect
@@ -197,36 +196,15 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
         if not service:
             raise ImproperlyConfigured("Unknown KlantenServiceType")
 
-        origin = self.request.headers.get("Referer")
-        question, zaken_with_api_group = service.retrieve_question(
+        question, zaak_with_api_group = service.retrieve_question(
             self.get_fetch_params(service),
             question_uuid=kwargs["kcm_uuid"],
             user=self.request.user,
         )
         if not question:
             raise Http404()
-        if zaken_with_api_group and len(zaken_with_api_group) > 1:
-            # In principle this should not happen, a zaak should be stored in
-            # exactly one backend. But: https://www.xkcd.com/2200/
-            # We should at least receive a ping if this happens and warn the user.
-            logger.error("Found one zaak in multiple backends")
-            messages.warning(
-                self.request,
-                _(
-                    "Your question was connected to multiple cases, we are showing you the first."
-                ),
-            )
 
-        self.question = question
-        zaak_with_api_group = zaken_with_api_group[0] if zaken_with_api_group else None
-        QuestionValidator.validate_python(question)
-
-        local_kcm, created = KlantContactMomentAnswer.objects.get_or_create(  # noqa
-            user=self.request.user, contactmoment_url=question["api_source_url"]
-        )
-        if not local_kcm.is_seen:
-            local_kcm.is_seen = True
-            local_kcm.save()
+        self.question = QuestionValidator.validate_python(question)
 
         ctx["question"] = question
         ctx["zaak"] = getattr(zaak_with_api_group, "zaak", None)
@@ -259,7 +237,9 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
                 "value": question["channel"].capitalize(),
             },
         ]
-        if origin and reverse("cases:contactmoment_list") in origin:
+        if (origin := self.request.headers.get("Referer")) and reverse(
+            "cases:contactmoment_list"
+        ) in origin:
             ctx["origin"] = {
                 "label": _("Terug naar overzicht"),
                 "url": origin,
@@ -278,6 +258,14 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
                 "label": _("Bekijk alle vragen"),
                 "url": reverse("cases:contactmoment_list"),
             }
+
+        local_kcm, created = KlantContactMomentAnswer.objects.get_or_create(  # noqa
+            user=self.request.user, contactmoment_url=question["api_source_url"]
+        )
+        if not local_kcm.is_seen:
+            local_kcm.is_seen = True
+            local_kcm.save()
+
         return ctx
 
 
