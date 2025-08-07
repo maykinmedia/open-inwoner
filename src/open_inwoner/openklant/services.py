@@ -748,15 +748,7 @@ class eSuiteVragenService(KlantenService):
         if not (kcm := self.fetch_klantcontactmoment(question_uuid, **fetch_params)):
             return None, None
 
-        local_kcm, is_created = KlantContactMomentAnswer.objects.get_or_create(  # noqa
-            user=user, contactmoment_url=kcm.contactmoment.url
-        )
-        if not local_kcm.is_seen:
-            local_kcm.is_seen = True
-            local_kcm.save()
-
-        zaken_with_api_group = []
-
+        zaak_with_api_group: ZaakWithApiGroup | None = None
         ocm = self.retrieve_objectcontactmoment(kcm.contactmoment, "zaak")
         if ocm and ocm.object_type == "zaak":
             zaak_url = ocm.object
@@ -771,7 +763,12 @@ class eSuiteVragenService(KlantenService):
                     "Unable to find matched contactmomenten zaak in any zgw backend"
                 )
             else:
-                zaken_with_api_group = [
+                if case_count > 1:
+                    logger.error(
+                        "Case found in multiple backends", extra={"case_url": zaak_url}
+                    )
+
+                zaak_with_api_group = next(
                     ZaakWithApiGroup(
                         zaak=case.result,
                         api_group=ZGWApiGroupConfig.objects.resolve_group_from_hints(
@@ -779,9 +776,9 @@ class eSuiteVragenService(KlantenService):
                         ),
                     )
                     for case in cases_found
-                ]
+                )
 
-        return self._build_question_dto(kcm), zaken_with_api_group
+        return self._build_question_dto(kcm), zaak_with_api_group
 
     def list_questions_for_zaak(self, zaak: Zaak, user: User) -> list[Question]:
         # fetch klantcontactmomenten for filtering
