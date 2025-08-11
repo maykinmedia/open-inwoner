@@ -1,0 +1,73 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static admin_urls %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label='configurations' %}">{% trans 'Configurations' %}</a>
+&rsaquo; {{ title }}
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="module">   
+    <div class="form-row">
+        <p class="help">
+            {% blocktrans with tag=checks_tag %}
+            Displaying system checks results for tag: <strong>{{ tag }}</strong><br>
+            This page is accessible only to superusers and members of authorized groups.
+            {% endblocktrans %}
+        </p>
+    </div>
+
+    {% if checks_output %}
+    <div class="results">
+        <div class="system-checks-output">
+            <h3>{% trans "System Checks Output" %}</h3>
+            <pre>{{ checks_output }}</pre>
+        </div>
+    </div>
+    {% else %}
+    <div class="form-row">
+        <p>{% trans "No system checks results available." %}</p>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.system-checks-output {
+    margin: 20px 0;
+}
+
+.system-checks-output h3 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.system-checks-output pre {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    padding: 15px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 13px;
+    line-height: 1.4;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.help {
+    background: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+</style>
+
+{% endblock %}

@@ -1,18 +1,27 @@
+import contextlib
+import logging
+from io import StringIO
+
 from django import forms
 from django.contrib import admin, messages
 from django.contrib.admin.actions import delete_selected as default_delete_selected
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import user_passes_test
 from django.contrib.flatpages.admin import FlatPageAdmin
 from django.contrib.sites.admin import SiteAdmin
 from django.contrib.sites.models import Site
 from django.core import exceptions
+from django.core.management import call_command
 from django.core.validators import URLValidator
 from django.forms import ValidationError
 from django.http import HttpResponseRedirect
-from django.shortcuts import redirect
-from django.urls import resolve, reverse
+from django.shortcuts import redirect, render
+from django.urls import path, resolve, reverse
 from django.urls.exceptions import Resolver404
+from django.utils.decorators import method_decorator
 from django.utils.html import format_html, format_html_join
 from django.utils.translation import gettext_lazy as _
+from django.views import View
 
 from ordered_model.admin import OrderedInlineModelAdminMixin, OrderedTabularInline
 from solo.admin import SingletonModelAdmin
@@ -24,6 +33,73 @@ from ..utils.css import ALLOWED_PROPERTIES
 from ..utils.fields import CSSEditorWidget
 from ..utils.iteration import split
 from .models import CustomFontSet, SiteConfiguration, SiteConfigurationPage
+
+# Configuration for system checks display
+SYSTEM_CHECKS_TAG = "functional_config"
+SYSTEM_CHECKS_ALLOWED_GROUPS = ["System Administrators", "DevOps"]
+
+logger = logging.getLogger(__name__)
+
+
+def is_authorized_for_system_checks(user):
+    """Check if user is superuser or member of allowed groups."""
+    if user.is_superuser:
+        return True
+
+    user_groups = user.groups.values_list("name", flat=True)
+    return any(group in SYSTEM_CHECKS_ALLOWED_GROUPS for group in user_groups)
+
+
+class SystemChecksAdminView(View):
+    """Admin view for displaying system checks results."""
+
+    @method_decorator(staff_member_required)
+    @method_decorator(user_passes_test(is_authorized_for_system_checks))
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request):
+        try:
+            stdout_capture = StringIO()
+            stderr_capture = StringIO()
+
+            with (
+                contextlib.redirect_stdout(stdout_capture),
+                contextlib.redirect_stderr(stderr_capture),
+                contextlib.suppress(SystemExit),
+            ):
+                call_command("check", "--tag", SYSTEM_CHECKS_TAG, verbosity=2)
+
+            stdout_output = stdout_capture.getvalue()
+            stderr_output = stderr_capture.getvalue()
+
+            # Combine outputs
+            combined_output = ""
+            if stdout_output:
+                combined_output += stdout_output
+            if stderr_output:
+                if combined_output:
+                    combined_output += "\n\n--- STDERR ---\n"
+                combined_output += stderr_output
+
+            if not combined_output.strip():
+                combined_output = f"No issues found for tag '{SYSTEM_CHECKS_TAG}'"
+
+        except Exception as e:
+            logger.exception("Unable to display system check output in admin")
+            combined_output = (
+                f"Failed to run system checks: {str(e)}\nCheck server logs for details."
+            )
+
+        context = {
+            "title": f"System Checks - {SYSTEM_CHECKS_TAG} tag",
+            "checks_output": combined_output,
+            "checks_tag": SYSTEM_CHECKS_TAG,
+            "opts": {"app_label": "configurations", "model_name": "systemchecks"},
+            "has_view_permission": True,
+        }
+
+        return render(request, "admin/configurations/system_checks.html", context)
 
 
 @admin.action(description=_("Delete selected websites"))
@@ -320,6 +396,17 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
     readonly_fields = [
         "extra_css_allowed",
     ]
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                "system-checks/",
+                SystemChecksAdminView.as_view(),
+                name="configurations_systemchecks_list",
+            ),
+        ]
+        return custom_urls + urls
 
     @admin.display(
         description=_("Allowed CSS properties"),
