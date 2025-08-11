@@ -64,7 +64,6 @@ describe('SideNavModule', () => {
     })
   })
 
-
   describe('root', () => {
     it('returns a SideNav React element with menu items', () => {
       const script = document.createElement('script')
@@ -95,7 +94,12 @@ describe('SideNavModule', () => {
       expect(element?.props?.items).toEqual([
         [
           { href: '/abc', label: 'ABC', icon: 'book', current: false },
-          { href: '/faq', label: 'FAQ', icon: 'question_answer', current: false },
+          {
+            href: '/faq',
+            label: 'FAQ',
+            icon: 'question_answer',
+            current: false,
+          },
         ],
       ])
     })
