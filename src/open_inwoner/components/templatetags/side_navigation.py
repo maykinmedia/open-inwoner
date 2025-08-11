@@ -20,7 +20,7 @@ def react_sidenav_data(context):
 
         # Get all menu nodes
         all_nodes = renderer.get_nodes()
-        logger.debug(f"Total nodes found: {len(all_nodes)}")
+        logger.debug("Total nodes found: %s", len(all_nodes))
 
         # Find the "home" node first (preferred method)
         home_node = None
@@ -29,14 +29,14 @@ def react_sidenav_data(context):
             node_attr = getattr(node, "attr", {})
             if node_attr.get("reverse_id", None) == "home":
                 home_node = node
-                logger.debug(f"Found home node: {node.title}")
+                logger.debug("Found home node: %s", node.title)
                 break
 
         # Determine which nodes to use
         if home_node:
             # Use children of home node (preferred)
             target_nodes = getattr(home_node, "children", [])
-            logger.debug(f"Using home node children: {len(target_nodes)} items")
+            logger.debug("Using home node children: %s items", len(target_nodes))
         else:
             # Fallback: use all visible nodes
             logger.warning(
@@ -50,14 +50,14 @@ def react_sidenav_data(context):
                     target_nodes.append(node)
 
             logger.debug(
-                f"Using fallback nodes (all visible): {len(target_nodes)} items"
+                "Using fallback nodes (all visible): %s items", len(target_nodes)
             )
 
         menu_items = []
 
         # Process the target nodes
         for node in target_nodes:
-            logger.debug(f"Processing node: {getattr(node, 'title', 'NO_TITLE')}")
+            logger.debug("Processing node: %s", getattr(node, "title", "NO_TITLE"))
 
             # Skip hidden items
             if not getattr(node, "visible", True):
@@ -89,13 +89,13 @@ def react_sidenav_data(context):
             # Try multiple ways to get the icon
             if hasattr(node, "common") and hasattr(node.common, "menu_icon"):
                 icon = node.common.menu_icon
-                logger.debug(f"Found icon via node.common.menu_icon: {icon}")
+                logger.debug("Found icon via node.common.menu_icon: %s", icon)
             elif hasattr(node, "menu_icon"):
                 icon = node.menu_icon
-                logger.debug(f"Found icon via node.menu_icon: {icon}")
+                logger.debug("Found icon via node.menu_icon: %s", icon)
             elif hasattr(node, "attr") and hasattr(node.attr, "menu_icon"):
                 icon = node.attr.menu_icon
-                logger.debug(f"Found icon via node.attr.menu_icon: {icon}")
+                logger.debug("Found icon via node.attr.menu_icon: %s", icon)
             else:
                 # Try to get it from the page's CommonExtension
                 try:
@@ -108,10 +108,10 @@ def react_sidenav_data(context):
                         common_ext = CommonExtension.objects.get(extended_object=page)
                         if common_ext.menu_icon:
                             icon = common_ext.menu_icon
-                            logger.debug(f"  Found icon via CommonExtension: {icon}")
+                            logger.debug("  Found icon via CommonExtension: %s", icon)
                 except Exception as icon_error:
                     logger.debug(
-                        f"Could not get icon from CommonExtension: {icon_error}"
+                        "Could not get icon from CommonExtension: %s", icon_error
                     )
 
             # Extract indicator/counter
@@ -137,12 +137,15 @@ def react_sidenav_data(context):
 
             menu_items.append(menu_item)
             logger.debug(
-                f"Added menu item: {menu_item['label']} -> {menu_item['href']} (icon: {menu_item['icon']})"
+                "Added menu item: %s -> %s (icon: %s)",
+                menu_item["label"],
+                menu_item["href"],
+                menu_item["icon"],
             )
 
-        logger.debug(f"Final menu_items count: {len(menu_items)}")
+        logger.debug("Final menu_items count: %s", len(menu_items))
         return menu_items
 
     except Exception as e:
-        logger.error(f"Error loading sidenav menu: {e}", exc_info=True)
+        logger.exception("Error loading sidenav menu: %s", e)
         return []
