@@ -2,11 +2,42 @@ import contextlib
 import logging
 
 from django import template
+from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 from menus.menu_pool import menu_pool
 
 register = template.Library()
 logger = logging.getLogger(__name__)
+
+
+def get_extra_menu_items(context):
+    """Generate extra menu items based on context conditions"""
+    extra_items = []
+
+    # FAQ item (replaces current data-extra-item logic)
+    if context.get("has_general_faq_questions", False):
+        try:
+            extra_items.append(
+                {
+                    "href": reverse("general_faq"),
+                    "label": str(_("Veelgestelde vragen")),
+                    "icon": "question_answer",
+                    "current": False,
+                    "counter": None,
+                }
+            )
+            logger.debug("Added FAQ extra menu item")
+        except Exception as e:
+            logger.warning("Could not add FAQ menu item: %s", e)
+
+    # Add more conditional items here as needed:
+    # - User-specific items based on permissions
+    # - Context-specific items based on current page
+    # - Dynamic items based on user data/settings
+
+    logger.debug("Generated %s extra menu items", len(extra_items))
+    return extra_items
 
 
 @register.simple_tag(takes_context=True)
@@ -58,6 +89,10 @@ def react_sidenav_data(context):
         # Process the target nodes
         for node in target_nodes:
             logger.debug("Processing node: %s", getattr(node, "title", "NO_TITLE"))
+
+            if node.title == "Mijn Profiel":
+                logger.debug("  Skipping my profile node in react nav")
+                continue
 
             # Skip hidden items
             if not getattr(node, "visible", True):
@@ -143,8 +178,19 @@ def react_sidenav_data(context):
                 menu_item["icon"],
             )
 
-        logger.debug("Final menu_items count: %s", len(menu_items))
-        return menu_items
+        # Add extra items based on context/conditions
+        extra_items = get_extra_menu_items(context)
+
+        # Combine base menu with extra items
+        complete_menu = menu_items + extra_items
+
+        logger.debug(
+            "Base menu items: %s, Extra items: %s, Total: %s",
+            len(menu_items),
+            len(extra_items),
+            len(complete_menu),
+        )
+        return complete_menu
 
     except Exception as e:
         logger.exception("Error loading sidenav menu: %s", e)

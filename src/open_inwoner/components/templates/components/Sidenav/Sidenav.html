@@ -1,7 +1,6 @@
-{% load i18n form_tags icon_tags link_tags string_tags solo_tags custom_session_tags menu_tags button_tags side_navigation %}
+{% load i18n form_tags string_tags solo_tags custom_session_tags menu_tags button_tags side_navigation %}
 
 {% if request.user.is_authenticated %}
-
     {% block extra_head %}
         <!-- Set nonce for DenHaag components, or else styling from number-badge will cause CSP errors -->
         <meta name="csp-nonce" content="{{ request.csp_nonce }}" />
@@ -9,19 +8,7 @@
 
     <div class="side-navigation--oip">
         <div class="" id="react-openinwoner-sidenav"></div>
-
-        <nav class="primary-navigation" aria-label="Navigatie na inloggen">
-            <ul class="primary-navigation__list subpage-list">
-                {% if has_general_faq_questions %}
-                    <li class="primary-navigation__list-item">
-                        {% link text=_('Veelgestelde vragen') href='general_faq' icon="question_answer" icon_position="before" icon_outlined=True %}
-                    </li>
-                {% endif %}
-            </ul>
-        </nav>
-
         {% react_sidenav_data as menu_data %}
         {{ menu_data|json_script:"sidenav-menu-data" }}
     </div>
-
 {% endif %}

@@ -29,5 +29,17 @@
   // Home page
   &--fullwidth {
     margin-top: var(--row-height);
+
+    @media (max-width: 1023px) {
+      .grid {
+        &__sidebar {
+          display: none;
+        }
+
+        .grid__sidebar ~ .grid__main {
+          grid-column-end: span 12;
+        }
+      }
+    }
   }
 }

@@ -42,6 +42,7 @@ class CategoriesPlugin(CMSActiveAppMixin, CMSPluginBase):
     def render(self, context, instance, placeholder):
         config = OpenZaakConfig.get_solo()
         request = context["request"]
+        self.limit = 3 if request.user.is_authenticated else 4
 
         if (
             request.user.is_authenticated

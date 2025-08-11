@@ -34,7 +34,7 @@ describe('SideNav', () => {
       },
     ]
 
-    render(<SideNav items={items} />)
+    render(<SideNav items={[items]} />)
 
     // Check labels are rendered
     items.forEach(({ label }) => {
@@ -54,7 +54,7 @@ describe('SideNav', () => {
       { href: '/spaces', label: 'SpacesIcon', icon: '   ' },
     ]
 
-    render(<SideNav items={items} />)
+    render(<SideNav items={[items]} />)
 
     // Labels should be present
     items.forEach(({ label }) => {
@@ -70,7 +70,7 @@ describe('SideNav', () => {
       { href: '/counter', label: 'Counter', current: true, counter: 4 },
     ]
 
-    render(<SideNav items={items} />)
+    render(<SideNav items={[items]} />)
 
     expect(screen.getByText('Counter')).toBeInTheDocument()
   })

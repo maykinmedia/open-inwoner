@@ -24,12 +24,6 @@
                 <ul class="primary-navigation__list subpage-list">
                     {{ rendered_cms_menu__home }}
 
-                    {% if has_general_faq_questions %}
-                        <li class="primary-navigation__list-item">
-                            {% link text=_('Veelgestelde vragen') href='general_faq' icon="question_answer" icon_position="before" icon_outlined=True %}
-                        </li>
-                    {% endif %}
-
                     {% if user.is_eherkenning_user %}
                         {% session_is_branch_restricted as is_branch_restricted %}
                         {% if not is_branch_restricted %}

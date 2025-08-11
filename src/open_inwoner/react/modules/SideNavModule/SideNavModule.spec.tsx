@@ -15,11 +15,9 @@ describe('SideNavModule', () => {
       const node = SideNavModule.rootNode
       expect(node).toBe(div)
     })
-
-    // Removed the broken test for throwing when root DOM element is missing
   })
 
-  describe('getJsonScriptData', () => {
+  describe('getMenuData', () => {
     it('parses JSON from the script tag correctly', () => {
       const script = document.createElement('script')
       script.id = 'sidenav-menu-data'
@@ -29,14 +27,14 @@ describe('SideNavModule', () => {
       ])
       document.body.appendChild(script)
 
-      const data = SideNavModule.getJsonScriptData()
+      const data = SideNavModule.getMenuData()
       expect(data).toEqual([
         { href: '/test', label: 'Test', icon: 'icon', current: false },
       ])
     })
 
     it('returns fallback data if script tag is missing', () => {
-      const data = SideNavModule.getJsonScriptData()
+      const data = SideNavModule.getMenuData()
       expect(data).toEqual([
         {
           href: '/mijn-profiel/',
@@ -50,12 +48,11 @@ describe('SideNavModule', () => {
     it('returns fallback data if JSON is invalid', () => {
       const script = document.createElement('script')
       script.id = 'sidenav-menu-data'
-      // Remove or change type so the environment does not auto-parse
-      script.type = 'text/plain'
+      script.type = 'application/json'
       script.textContent = '{ invalid JSON '
       document.body.appendChild(script)
 
-      const data = SideNavModule.getJsonScriptData()
+      const data = SideNavModule.getMenuData()
       expect(data).toEqual([
         {
           href: '/mijn-profiel/',
@@ -66,6 +63,7 @@ describe('SideNavModule', () => {
       ])
     })
   })
+
 
   describe('root', () => {
     it('returns a SideNav React element with menu items', () => {
@@ -79,7 +77,40 @@ describe('SideNavModule', () => {
 
       const element = SideNavModule.root
       expect(element?.props?.items).toEqual([
+        [{ href: '/abc', label: 'ABC', icon: 'book', current: false }],
+      ])
+    })
+
+    it('returns a SideNav React element with all menu items from server', () => {
+      const script = document.createElement('script')
+      script.id = 'sidenav-menu-data'
+      script.type = 'application/json'
+      script.textContent = JSON.stringify([
         { href: '/abc', label: 'ABC', icon: 'book', current: false },
+        { href: '/faq', label: 'FAQ', icon: 'question_answer', current: false },
+      ])
+      document.body.appendChild(script)
+
+      const element = SideNavModule.root
+      expect(element?.props?.items).toEqual([
+        [
+          { href: '/abc', label: 'ABC', icon: 'book', current: false },
+          { href: '/faq', label: 'FAQ', icon: 'question_answer', current: false },
+        ],
+      ])
+    })
+
+    it('uses fallback data when no script tag exists', () => {
+      const element = SideNavModule.root
+      expect(element?.props?.items).toEqual([
+        [
+          {
+            href: '/mijn-profiel/',
+            label: 'Mijn Profiel',
+            icon: 'person',
+            current: false,
+          },
+        ],
       ])
     })
   })

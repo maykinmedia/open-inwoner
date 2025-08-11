@@ -1,6 +1,7 @@
 import { Root } from 'react-dom/client'
-import SideNav from '../../components/SideNav/SideNav'
+import SideNav, { MenuItem } from '@react/components/SideNav/SideNav'
 import { AbstractPage } from '@react/lib/abstractPage'
+import { getJsonFromScriptTag } from '@react/lib/getJsonScriptData'
 
 export default class SideNavModule extends AbstractPage {
   static reactRoot: Root
@@ -10,16 +11,12 @@ export default class SideNavModule extends AbstractPage {
   }
 
   // Extract menu data from Django
-  static getJsonScriptData() {
-    const scriptElement = document.getElementById('sidenav-menu-data')
-    if (scriptElement?.textContent) {
-      try {
-        const data = JSON.parse(scriptElement.textContent)
-        console.debug('Menu data loaded:', data)
-        return data
-      } catch (e) {
-        console.error('Failed to parse menu data:', e)
-      }
+  static getMenuData(): MenuItem[] {
+    const data = getJsonFromScriptTag<MenuItem[]>('sidenav-menu-data')
+
+    if (data) {
+      console.debug('Menu data loaded:', data)
+      return data
     }
 
     // Fallback data
@@ -34,8 +31,7 @@ export default class SideNavModule extends AbstractPage {
   }
 
   static get root() {
-    const menuData = this.getJsonScriptData()
-
-    return <SideNav items={menuData} />
+    const menuData = this.getMenuData()
+    return <SideNav items={[menuData]} />
   }
 }
