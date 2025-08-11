@@ -430,6 +430,7 @@ class QuestionAnswerTestCase(Openklant2ServiceTestCase):
             mijn_vragen_actor=self.designated_actor["uuid"]
         )
         self.service = OpenKlant2Service(config=self.openklant2_config)
+        self.user = DigidUserFactory()
 
     def test_designated_actor_is_required_to_create_question(self):
         self.openklant2_config.mijn_vragen_actor = None
@@ -552,4 +553,37 @@ class QuestionAnswerTestCase(Openklant2ServiceTestCase):
         self.assertEqual(
             log_entries[1].extra_data["message"],
             f"Created onderwerp_object {onderwerp_object['uuid']} for zaak `{zaak.identificatie}`",
+        )
+
+    def test_list_questions_for_zaak(self):
+        class MockZaak:
+            def __init__(self, identificatie):
+                self.identificatie = identificatie
+
+        persoon, _ = self.service.get_or_create_partij_for_user(user=self.user)
+        zaak = MockZaak(identificatie="Coffee zaak")
+        question_initiated_by_user = self.service.create_question_for_zaak(
+            persoon["uuid"],
+            question="A question asked by Morice",
+            subject="Important question",
+            zaak=zaak,
+        )
+        question_initiated_by_another_partij = self.service.create_question_for_zaak(
+            self.een_persoon["uuid"],
+            question="A question asked by Morice",
+            subject="Important question",
+            zaak=zaak,
+        )
+
+        questions = self.service.list_questions_for_zaak(zaak, self.user)
+        question_urls = {q["api_source_url"] for q in questions}
+        self.assertEqual(
+            question_urls,
+            {question_initiated_by_user.url},
+            msg="Questions initiated by the user should be returned",
+        )
+        self.assertNotEqual(
+            question_urls,
+            {question_initiated_by_another_partij.url},
+            msg="Questions initiated by others users should not be returned",
         )
