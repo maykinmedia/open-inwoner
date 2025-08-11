@@ -12,7 +12,19 @@ class TasksConfig(CMSPlugin):
         help_text=_("The title of the tasks block"),
         default=_("Mijn Taken"),
     )
-    object_type = ObjectTypeField()  # Stores the UUID of the selected object_type
+
+    # The two kinds of object types come from the same API,
+    # but they are based on independent schemata
+    object_type_dimpact = ObjectTypeField(
+        verbose_name=_("Object Type (Extern Formulier Taak)"),
+        null=True,
+        blank=True,
+    )
+    object_type_generieke_dienstverlening = ObjectTypeField(
+        verbose_name=_("Object Type (Url Taak)"),
+        null=True,
+        blank=True,
+    )
 
     def __str__(self):
         return self.title or super().__str__()
