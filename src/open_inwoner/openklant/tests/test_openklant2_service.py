@@ -301,29 +301,32 @@ class Openklant2ServiceTest(Openklant2ServiceTestCase):
 
     def test_update_user_from_partij(self):
         user: User = UserFactory(phonenumber="", email="foo@bar.com")
-        self.service.get_or_create_digitaal_adres(
+        self.service.get_or_create_digitaal_adres_for_partij(
             self.persoon["uuid"],
             "telefoonnummer",
             "0644938475",
             is_standaard_adres=True,
         )
-        # bogus address for testing edge case with multiple non-standard numbers
-        self.service.get_or_create_digitaal_adres(
-            self.persoon["uuid"],
-            "telefoonnummer",
-            "0612345678",
-            is_standaard_adres=False,
-        )
-        self.service.get_or_create_digitaal_adres(
+        self.service.get_or_create_digitaal_adres_for_partij(
             self.persoon["uuid"],
             "telefoonnummer",
             "0687654321",
             is_standaard_adres=False,
         )
-        self.service.get_or_create_digitaal_adres(
+        # bogus address for testing edge case with multiple non-standard numbers
+        self.service.get_or_create_digitaal_adres_for_partij(
+            self.persoon["uuid"],
+            "telefoonnummer",
+            "0612345678",
+            is_standaard_adres=False,
+        )
+        self.service.get_or_create_digitaal_adres_for_partij(
             self.persoon["uuid"],
             "email",
             "bar@foo.com",
+        )
+        all_addresses = self.service.retrieve_digitale_addressen_for_partij(
+            partij_uuid=self.persoon["uuid"]
         )
 
         logger = logging.getLogger("open_inwoner.openklant.services")
@@ -346,7 +349,7 @@ class Openklant2ServiceTest(Openklant2ServiceTestCase):
         another_user: User = UserFactory(email="another-user@foo.com")
 
         # Set user's OK email to another user's email
-        self.service.get_or_create_digitaal_adres(
+        self.service.get_or_create_digitaal_adres_for_partij(
             self.persoon["uuid"],
             "email",
             another_user.email,
@@ -359,19 +362,20 @@ class Openklant2ServiceTest(Openklant2ServiceTestCase):
             msg="Email was not updated to the email in OK due to conflict with existing user",
         )
 
-    def test_update_partij_from_user(self):
-        user: User = UserFactory(
-            phonenumber="0644938475",
-            phonenumber_alternative="0687654321",
-            email="user@bar.com",
-        )
-
+    def test_update_partij_from_user_data(self):
         self.assertEqual(
             self.service.retrieve_digitale_addressen_for_partij(self.persoon["uuid"]),
             [],
         )
 
-        self.service.update_partij_from_user(self.persoon["uuid"], user)
+        self.service.update_partij_from_user_data(
+            self.persoon["uuid"],
+            update_data={
+                "email": "user@bar.com",
+                "phonenumber": "0644938475",
+                "phonenumber_alternative": "0687654321",
+            },
+        )
 
         adressen = self.service.retrieve_digitale_addressen_for_partij(
             self.persoon["uuid"]
@@ -436,7 +440,7 @@ class QuestionAnswerTestCase(Openklant2ServiceTestCase):
         self.openklant2_config.mijn_vragen_actor = None
 
         with self.assertRaises(RuntimeError):
-            self.service.create_question(
+            self.service.create_question_for_partij(
                 self.een_persoon["uuid"],
                 question="A question asked by Alice",
                 subject="Important questions",
@@ -446,14 +450,14 @@ class QuestionAnswerTestCase(Openklant2ServiceTestCase):
         for question in ("", " ", "   ", "\n", "   \n"):
             with self.subTest("{q=} is not a valid question"):
                 with self.assertRaises(ValueError):
-                    self.service.create_question(
+                    self.service.create_question_for_partij(
                         self.een_persoon["uuid"],
                         question=question,
                         subject="Important questions",
                     )
 
     def test_create_question(self):
-        question = self.service.create_question(
+        question = self.service.create_question_for_partij(
             self.een_persoon["uuid"],
             question="A question asked by Alice",
             subject="Important questions",
@@ -491,7 +495,7 @@ class QuestionAnswerTestCase(Openklant2ServiceTestCase):
     def test_get_questions(self):
         for persoon in (self.een_persoon, self.een_ander_persoon):
             raw_questions = [
-                self.service.create_question(
+                self.service.create_question_for_partij(
                     persoon["uuid"],
                     question=f"A question asked by {persoon['uuid']}, part {i}",
                     subject="Life and stuff",
@@ -587,3 +591,139 @@ class QuestionAnswerTestCase(Openklant2ServiceTestCase):
             {question_initiated_by_another_partij.url},
             msg="Questions initiated by others users should not be returned",
         )
+
+    def test_create_question_with_betrokkene(self):
+        question = self.service.create_question_with_betrokkene(
+            question="A question from an anonymous user",
+            subject="Anonymous inquiry",
+            first_name="Hieronymous",
+            last_name="Anonymous",
+            email="hieronymous.anonymous@example.com",
+            phonenumber="0612345678",
+        )
+
+        # 1 question => 1 klantcontact, 1 betrokkene, 1 taak
+        (klantcontact,) = self.service.client.klant_contact.list_iter()
+        (betrokkene,) = self.service.client.betrokkene.list_iter()
+        (taak,) = self.service.client.interne_taak.list_iter()
+
+        # Check klantcontact
+        self.assertEqual(
+            klantcontact["kanaal"], self.openklant2_config.mijn_vragen_kanaal
+        )
+        self.assertEqual(klantcontact["inhoud"], "A question from an anonymous user")
+        self.assertEqual(klantcontact["onderwerp"], "Anonymous inquiry")
+
+        # Check betrokkene - should be linked to klantcontact but NOT to a partij
+        self.assertEqual(betrokkene["hadKlantcontact"]["uuid"], klantcontact["uuid"])
+        self.assertIsNone(betrokkene["wasPartij"])
+        self.assertEqual(betrokkene["contactnaam"]["voornaam"], "Hieronymous")
+        self.assertEqual(betrokkene["contactnaam"]["achternaam"], "Anonymous")
+        self.assertTrue(betrokkene["initiator"])
+        self.assertEqual(betrokkene["rol"], "klant")
+
+        # Check taak
+        self.assertEqual(
+            taak["aanleidinggevendKlantcontact"]["uuid"], klantcontact["uuid"]
+        )
+
+        # Check digital addresses were created for the betrokkene
+        digitale_adressen = self.service.retrieve_digitale_addressen_for_betrokkene(
+            betrokkene["uuid"]
+        )
+        self.assertEqual(len(digitale_adressen), 2)
+
+        email_addresses = [
+            addr for addr in digitale_adressen if addr["soortDigitaalAdres"] == "email"
+        ]
+        phone_addresses = [
+            addr
+            for addr in digitale_adressen
+            if addr["soortDigitaalAdres"] == "telefoonnummer"
+        ]
+
+        self.assertEqual(len(email_addresses), 1)
+        self.assertEqual(
+            email_addresses[0]["adres"], "hieronymous.anonymous@example.com"
+        )
+        self.assertEqual(
+            email_addresses[0]["verstrektDoorBetrokkene"]["uuid"], betrokkene["uuid"]
+        )
+        self.assertIsNone(email_addresses[0]["verstrektDoorPartij"])
+
+        self.assertEqual(len(phone_addresses), 1)
+        self.assertEqual(phone_addresses[0]["adres"], "0612345678")
+        self.assertEqual(
+            phone_addresses[0]["verstrektDoorBetrokkene"]["uuid"], betrokkene["uuid"]
+        )
+        self.assertIsNone(phone_addresses[0]["verstrektDoorPartij"])
+
+        # Check the returned question object
+        self.assertEqual(
+            question,
+            OpenKlant2Question(
+                url=klantcontact["url"],
+                answer=None,
+                nummer=klantcontact["nummer"],
+                question_kcm_uuid=klantcontact["uuid"],
+                question="A question from an anonymous user",
+                onderwerp="Anonymous inquiry",
+                kanaal=self.openklant2_config.mijn_vragen_kanaal,
+                taal="nld",
+                plaatsgevonden_op=QUESTION_DATE,
+            ),
+        )
+
+    def test_create_question_with_betrokkene_without_contact_info(self):
+        self.service.create_question_with_betrokkene(
+            question="A question without contact details",
+            subject="Minimal inquiry",
+            first_name="Jane",
+            last_name="Minimal",
+            email="",
+            phonenumber="",
+        )
+
+        # Check that betrokkene was created
+        (betrokkene,) = self.service.client.betrokkene.list_iter()
+        self.assertEqual(betrokkene["contactnaam"]["voornaam"], "Jane")
+        self.assertEqual(betrokkene["contactnaam"]["achternaam"], "Minimal")
+
+        # Check that no digital addresses were created
+        digitale_adressen = self.service.retrieve_digitale_addressen_for_betrokkene(
+            betrokkene["uuid"]
+        )
+        self.assertEqual(len(digitale_adressen), 0)
+
+    def test_create_question_with_betrokkene_partial_contact_info(self):
+        self.service.create_question_with_betrokkene(
+            question="A question with only email",
+            subject="Email only inquiry",
+            first_name="Bob",
+            last_name="EmailOnly",
+            email="bob.email@example.com",
+            phonenumber="",
+        )
+
+        (betrokkene,) = self.service.client.betrokkene.list_iter()
+
+        # Check that only email address was created
+        digitale_adressen = self.service.retrieve_digitale_addressen_for_betrokkene(
+            betrokkene["uuid"]
+        )
+        self.assertEqual(len(digitale_adressen), 1)
+        self.assertEqual(digitale_adressen[0]["soortDigitaalAdres"], "email")
+        self.assertEqual(digitale_adressen[0]["adres"], "bob.email@example.com")
+
+    def test_create_question_with_betrokkene_raises_on_missing_question(self):
+        for question in ("", " ", "   ", "\n", "   \n"):
+            with self.subTest(f"{question=} is not a valid question"):
+                with self.assertRaises(ValueError):
+                    self.service.create_question_with_betrokkene(
+                        question=question,
+                        subject="Test subject",
+                        first_name="Test",
+                        last_name="User",
+                        email="test@example.com",
+                        phonenumber="0612345678",
+                    )

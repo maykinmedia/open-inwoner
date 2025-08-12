@@ -103,15 +103,9 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        has_contactform_configuration = (
+        context["has_form_configuration"] = (
             self.klanten_config.has_contactform_configuration
         )
-        if not self.request.user.is_authenticated:
-            has_contactform_configuration = (
-                has_contactform_configuration
-                and self.vragen_service.supports_anonymous_questions
-            )
-        context["has_form_configuration"] = has_contactform_configuration
 
         return context
 
@@ -197,25 +191,42 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
             )
         return self._register_via_openklant2(form)
 
-    def _register_via_openklant2(self, form: ContactForm):
+    def _register_via_openklant2(self, form: ContactForm) -> tuple[bool, str]:
         user = self.request.user
-
-        partij, _ = self.vragen_service.get_or_create_partij_for_user(user)
 
         cleaned_data = form.cleaned_data
         question = cleaned_data["question"]
         subject = cleaned_data["subject"].subject
 
-        question = self.vragen_service.create_question(
-            partij_uuid=partij["uuid"], question=question, subject=subject
-        )
+        try:
+            if user.is_authenticated:
+                partij, _ = self.vragen_service.get_or_create_partij_for_user(user)
+                question = self.vragen_service.create_question_for_partij(
+                    partij_uuid=partij["uuid"], question=question, subject=subject
+                )
+                email = getattr(user, "email", None)
+            else:
+                first_name = cleaned_data["first_name"]
+                last_name = cleaned_data["last_name"]
+                email = cleaned_data["email"]
+                phonenumber = cleaned_data["phonenumber"]
+                question = self.vragen_service.create_question_with_betrokkene(
+                    question=question,
+                    subject=subject,
+                    first_name=first_name,
+                    last_name=last_name,
+                    email=email,
+                    phonenumber=phonenumber,
+                )
+        except Exception:
+            self.log_system_action("failed to register question via OpenKlant")
+            return False, ""
 
         self.log_system_action(
             "registered question via OpenKlant", user=self.request.user
         )
 
-        # TODO: get email from partij
-        return True, getattr(user, "email", None)
+        return True, email
 
     def _register_via_esuite(
         self,

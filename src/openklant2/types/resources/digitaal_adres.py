@@ -13,7 +13,7 @@ SoortDigitaalAdres = Literal["email", "telefoonnummer", "overig"]
 #
 
 
-class CreateDigitaalAdresData(TypedDict):
+class DigitaalAdresCreateData(TypedDict):
     verstrektDoorBetrokkene: ForeignKeyRef | None
     verstrektDoorPartij: ForeignKeyRef | None
     adres: str
@@ -23,7 +23,9 @@ class CreateDigitaalAdresData(TypedDict):
 
 
 class ListDigitaalAdresParams(TypedDict):
-    page: int
+    page: NotRequired[int]
+    verstrektDoorPartij__uuid: NotRequired[str]
+    verstrektDoorBetrokkene__uuid: NotRequired[str]
 
 
 #
@@ -32,6 +34,8 @@ class ListDigitaalAdresParams(TypedDict):
 
 
 class DigitaalAdres(TypedDict):
+    uuid: str
+    url: str
     verstrektDoorBetrokkene: FullForeigKeyRef | None
     verstrektDoorPartij: FullForeigKeyRef | None
     adres: str
@@ -40,5 +44,5 @@ class DigitaalAdres(TypedDict):
     isStandaardAdres: bool
 
 
-CreateDigitaalAdresDataValidator = TypeAdapter(CreateDigitaalAdresData)
+DigitaalAdresCreateDataValidator = TypeAdapter(DigitaalAdresCreateData)
 DigitaalAdresValidator = TypeAdapter(DigitaalAdres)

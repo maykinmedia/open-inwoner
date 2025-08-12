@@ -1864,9 +1864,7 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
         mock_service.get_or_create_partij_for_user.assert_called_once_with(user=user)
         mock_service.update_partij_from_user_data.assert_called_once_with(
             partij_uuid="12345678-1234-1234-1234-123456789012",
-            update_data={
-                "email": "new@example.com",
-            },
+            update_data={"email": "new@example.com"},
         )
 
     @patch("open_inwoner.accounts.views.registration.OpenKlant2Service")
@@ -1908,9 +1906,7 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
         self.assertEqual(response.status_code, 302)
         mock_service.update_partij_from_user_data.assert_called_once_with(
             partij_uuid="12345678-1234-1234-1234-123456789012",
-            update_data={
-                "email": "new@example.com",
-            },
+            update_data={"email": "new@example.com"},
         )
 
     @patch("open_inwoner.accounts.views.registration.eSuiteKlantenService")
@@ -2031,7 +2027,7 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
         # Assertions
         self.assertEqual(response.status_code, 302)
         mock_service.get_or_create_partij_for_user.assert_called_once_with(user=user)
-        mock_service.update_partij_from_user.assert_not_called()
+        mock_service.update_partij_from_user_data.assert_not_called()
         mock_logger.error.assert_called_once_with(
             "Unable to create partij during post-registration sync",
             extra={"user": user},

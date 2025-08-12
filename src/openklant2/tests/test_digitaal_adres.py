@@ -1,13 +1,13 @@
 import pytest
 from pydantic import TypeAdapter
 
-from openklant2.factories.digitaal_adres import CreateDigitaalAdresDataFactory
+from openklant2.factories.digitaal_adres import DigitaalAdresCreateDataFactory
 from openklant2.factories.partij import CreatePartijPersoonDataFactory
 from openklant2.types.pagination import PaginatedResponseBody
 from openklant2.types.resources import Partij
 from openklant2.types.resources.digitaal_adres import (
-    CreateDigitaalAdresDataValidator,
     DigitaalAdres,
+    DigitaalAdresCreateDataValidator,
     DigitaalAdresValidator,
 )
 
@@ -20,7 +20,7 @@ def een_partij(client) -> Partij:
 
 @pytest.fixture()
 def een_digitaal_adres(client, een_partij) -> Partij:
-    data = CreateDigitaalAdresDataFactory(
+    data = DigitaalAdresCreateDataFactory(
         verstrektDoorBetrokkene=None,
         verstrektDoorPartij__uuid=een_partij["uuid"],
     )
@@ -29,7 +29,7 @@ def een_digitaal_adres(client, een_partij) -> Partij:
 
 @pytest.mark.vcr
 def test_create_digitaal_adres(client, een_partij) -> None:
-    data = CreateDigitaalAdresDataValidator.validate_python(
+    data = DigitaalAdresCreateDataValidator.validate_python(
         {
             "adres": "foo@bar.com",
             "omschrijving": "professional",
