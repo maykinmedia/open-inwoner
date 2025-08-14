@@ -1,7 +1,9 @@
 {% load menu_tags link_tags %}
 {% for child in children %}
-    {% if request.resolver_match.url_name == 'pages-root' and not forloop.first %}
-        {% comment %}Skip non-first items on home page{% endcomment %}
+    {% if request.resolver_match.url_name == 'index' and 'cases' in request.resolver_match.app_names and not forloop.first %}
+        {# Skip non-first items on cases index #}
+    {% elif request.resolver_match.url_name in "pages-root,contactmoment_list,plan_list,uitkeringen,general_faq" and not forloop.first %}
+        {# Skip non-first items on hidden routes #}
     {% else %}
         {% with url=child.attr.redirect_url|default:child.get_absolute_url %}
             <li class="primary-navigation__list-item">
@@ -18,4 +20,3 @@
         {% endwith %}
     {% endif %}
 {% endfor %}
-

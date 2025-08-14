@@ -2,7 +2,7 @@ import contextlib
 import logging
 
 from django import template
-from django.urls import reverse
+from django.urls import NoReverseMatch, resolve, reverse
 from django.utils.translation import gettext_lazy as _
 
 from menus.menu_pool import menu_pool
@@ -14,16 +14,29 @@ logger = logging.getLogger(__name__)
 def get_extra_menu_items(context):
     """Generate extra menu items based on context conditions"""
     extra_items = []
+    request = context.get("request")
 
     # FAQ item (replaces current data-extra-item logic)
     if context.get("has_general_faq_questions", False):
         try:
+            # Check if current request matches the FAQ route or its sub-routes
+            is_current = False
+            if request and hasattr(request, "path"):
+                try:
+                    # Get the FAQ URL pattern
+                    faq_url = reverse("general_faq")
+                    # Check if current path starts with the FAQ URL
+                    is_current = request.path.startswith(faq_url)
+                except NoReverseMatch:
+                    # Fallback to hardcoded path if reverse fails
+                    is_current = request.path.startswith("/faq/")
+
             extra_items.append(
                 {
                     "href": reverse("general_faq"),
                     "label": str(_("Veelgestelde vragen")),
                     "icon": "question_answer",
-                    "current": False,
+                    "current": is_current,
                     "counter": None,
                 }
             )
@@ -161,6 +174,34 @@ def react_sidenav_data(context):
 
             # Check if current page
             current = getattr(node, "selected", False)
+
+            # Handle specific routes that don't match CMS page URLs
+            # This is needed since the configured route does not match
+            # the hardcoded url specified in `cms/cases/urls.py`
+            if request and hasattr(request, "path"):
+                try:
+                    resolved = resolve(request.path)
+                    # Define routes that need special handling
+                    special_routes = {
+                        "contactmoment_list": "contactmomenten",
+                        # Add more routes here as needed, e.g.:
+                        # 'another_route': 'another_keyword',
+                        # 'third_route': 'third_keyword',
+                    }
+
+                    if resolved.url_name in special_routes:
+                        keyword = special_routes[resolved.url_name]
+                        # Reset all items to not current first
+                        current = False
+
+                        redirect_url = node.attr.get("redirect_url") or None
+                        # Then set current=True only for menu items containing the keyword
+                        if redirect_url and keyword in redirect_url:
+                            current = True
+                except Exception as e:
+                    logger.debug(
+                        "Could not resolve current path for menu highlighting: %s", e
+                    )
 
             menu_item = {
                 "href": url,
