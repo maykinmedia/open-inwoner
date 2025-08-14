@@ -293,6 +293,7 @@ class TestPublishedCategories(WebTest):
                 self.published1,
                 self.published2,
                 self.published3,
+                self.published4,
             ],
         )
 
