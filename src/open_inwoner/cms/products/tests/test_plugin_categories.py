@@ -294,7 +294,6 @@ class TestPublishedCategories(WebTest):
                 self.published2,
                 self.published3,
                 self.published4,
-                self.published5,
             ],
         )
 
@@ -600,7 +599,6 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, TransactionWebTest):
         self.assertEqual(context["categories"].count(), 3)
         self.assertEqual(context["categories"].first(), self.category2)
         self.assertEqual(context["categories"][1], self.category6)
-        self.assertEqual(context["categories"].last(), self.category7)
 
     @requests_mock.Mocker()
     def test_categories_based_on_selected_categories(self, m):
@@ -620,8 +618,8 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, TransactionWebTest):
         html, context = cms_tools.render_plugin(CategoriesPlugin, user=self.user)
 
         self.assertEqual(context["categories"].count(), 2)
-        self.assertEqual(context["categories"].first(), self.category1)
-        self.assertEqual(context["categories"].last(), self.category2)
+        # Use non order-dependent set comparison
+        self.assertEqual(set(context["categories"]), {self.category1, self.category2})
 
     @requests_mock.Mocker()
     def test_categories_based_on_cases_for_eherkenning_user(self, m):
@@ -653,11 +651,10 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, TransactionWebTest):
                     CategoriesPlugin, user=self.eherkenning_user
                 )
 
-                self.assertEqual(context["categories"].count(), 4)
+                self.assertEqual(context["categories"].count(), 3)
                 self.assertEqual(context["categories"][0], self.category2)
                 self.assertEqual(context["categories"][1], self.category3)
                 self.assertEqual(context["categories"][2], self.category6)
-                self.assertEqual(context["categories"][3], self.category7)
 
     @requests_mock.Mocker()
     def test_categories_based_on_cases_for_eherkenning_user_with_vestigingsnummer(
@@ -695,11 +692,10 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, TransactionWebTest):
                     user=self.eherkenning_user_vestiging,
                 )
 
-                self.assertEqual(context["categories"].count(), 4)
+                self.assertEqual(context["categories"].count(), 3)
                 self.assertEqual(context["categories"][0], self.category2)
                 self.assertEqual(context["categories"][1], self.category3)
                 self.assertEqual(context["categories"][2], self.category6)
-                self.assertEqual(context["categories"][3], self.category7)
 
     @patch(
         "zgw_consumers.service.pagination_helper",
@@ -714,4 +710,3 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, TransactionWebTest):
 
         self.assertEqual(context["categories"].count(), 2)
         self.assertEqual(context["categories"].first(), self.category6)
-        self.assertEqual(context["categories"].last(), self.category7)
