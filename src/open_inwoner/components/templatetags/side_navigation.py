@@ -16,7 +16,7 @@ def get_extra_menu_items(context):
     extra_items = []
     request = context.get("request")
 
-    # FAQ item (replaces current data-extra-item logic)
+    # FAQ item
     if context.get("has_general_faq_questions", False):
         try:
             # Check if current request matches the FAQ route or its sub-routes
@@ -184,9 +184,6 @@ def react_sidenav_data(context):
                     # Define routes that need special handling
                     special_routes = {
                         "contactmoment_list": "contactmomenten",
-                        # Add more routes here as needed, e.g.:
-                        # 'another_route': 'another_keyword',
-                        # 'third_route': 'third_keyword',
                     }
 
                     if resolved.url_name in special_routes:
@@ -195,7 +192,7 @@ def react_sidenav_data(context):
                         current = False
 
                         redirect_url = node.attr.get("redirect_url") or None
-                        # Then set current=True only for menu items containing the keyword
+                        # Set current=True only for menu items containing the keyword
                         if redirect_url and keyword in redirect_url:
                             current = True
                 except Exception as e:
