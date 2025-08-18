@@ -1,9 +1,24 @@
 {% extends 'master.html' %}
-{% load i18n button_tags string_tags pagination_tags helpers form_tags link_tags cms_tags %}
+{% load i18n button_tags string_tags pagination_tags helpers form_tags link_tags cms_tags static %}
 
 {% block header_image %}
     {% placeholder 'banner' %}
 {% endblock header_image %}
+
+
+{% block mount_modules %} data-mount-modules='["sidenav"]'{% endblock %}
+
+{% block react_modules %}
+{# Including this script will allow the page to use the react component #}
+<script
+  type="module"
+  src="{% static 'bundles/open_inwoner-react.js' %}"
+></script>
+{% endblock %}
+
+{% block sidebar_content %}
+    {% include "components/Sidenav/Sidenav.html" %}
+{% endblock %}
 
 {% block content %}
     <header class="oip-header-group">

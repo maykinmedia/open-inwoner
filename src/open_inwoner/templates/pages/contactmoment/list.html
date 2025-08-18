@@ -1,5 +1,19 @@
 {% extends 'master.html' %}
-{% load i18n anchor_menu_tags button_tags card_tags form_tags grid_tags icon_tags link_tags list_tags pagination_tags utils %}
+{% load i18n anchor_menu_tags button_tags card_tags form_tags grid_tags icon_tags link_tags list_tags pagination_tags utils static %}
+
+{% block mount_modules %} data-mount-modules='["sidenav"]'{% endblock %}
+
+{% block react_modules %}
+{# Including this script will allow the page to use the react component #}
+<script
+  type="module"
+  src="{% static 'bundles/open_inwoner-react.js' %}"
+></script>
+{% endblock %}
+
+{% block sidebar_content %}
+    {% include "components/Sidenav/Sidenav.html" %}
+{% endblock %}
 
 {% block content %}
     <h1 class="utrecht-heading-1" id="contactmomenten">{{ page_title }} ({{ questions|length }})</h1>

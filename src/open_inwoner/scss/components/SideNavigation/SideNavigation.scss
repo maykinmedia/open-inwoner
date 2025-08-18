@@ -1,7 +1,7 @@
 // Styling is mostly coming from @gemeente-denhaag/side-navigation/dist/index.css
 
 :root {
-  --denhaag-side-navigation-mobile-display: block !important;
+  --denhaag-side-navigation-mobile-display: flex !important;
 }
 
 .side-navigation--oip {
@@ -9,28 +9,5 @@
 
   @media (min-width: 768px) {
     display: grid;
-  }
-
-  .primary-navigation {
-    color: var(--denhaag-side-navigation-link-color);
-
-    .primary-navigation__list .primary-navigation__list-item .link {
-      align-items: center;
-      color: var(--denhaag-side-navigation-link-color);
-      column-gap: var(--font-size-body);
-      display: flex;
-      flex-direction: row-reverse;
-      flex-grow: 1;
-      text-decoration: none;
-
-      &:hover {
-        color: var(--denhaag-side-navigation-link-hover-color);
-        text-decoration: none;
-
-        .link__text {
-          text-decoration: none;
-        }
-      }
-    }
   }
 }
