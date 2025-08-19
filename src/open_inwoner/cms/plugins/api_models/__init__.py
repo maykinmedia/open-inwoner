@@ -1,3 +1,9 @@
-from .taak import Object, ObjecttypeTaak
+from .taak import ExternFormulierTaak, KoppelingProduct, KoppelingZaak, Object, UrlTaak
 
-__all__ = ["Object", "ObjecttypeTaak"]
+__all__ = [
+    "Object",
+    "ExternFormulierTaak",
+    "KoppelingProduct",
+    "KoppelingZaak",
+    "UrlTaak",
+]
