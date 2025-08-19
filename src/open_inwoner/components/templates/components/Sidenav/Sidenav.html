@@ -1,10 +1,6 @@
 {% load i18n form_tags string_tags solo_tags custom_session_tags menu_tags button_tags side_navigation %}
 
 {% if request.user.is_authenticated %}
-    {% block extra_head %}
-        <!-- Set nonce for DenHaag components, or else styling from number-badge will cause CSP errors -->
-        <meta name="csp-nonce" content="{{ request.csp_nonce }}" />
-    {% endblock %}
 
     <div class="side-navigation--oip">
         <div class="" id="react-openinwoner-sidenav"></div>
