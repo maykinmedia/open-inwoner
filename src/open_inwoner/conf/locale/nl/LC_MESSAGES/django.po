@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-06 12:36+0200\n"
+"POT-Creation-Date: 2025-08-20 15:31+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -48,7 +48,12 @@ msgstr "KVK-nummer moet %(size)i tekens bevatten."
 msgid "Invalid KvK number."
 msgstr "Ongeldig KVK nummer"
 
-#: notifications/admin.py:25
+#: notifications/admin.py:20
+#, python-brace-format
+msgid "Skipping {subscription} because it has already already been registered."
+msgstr "Abonnement {subscription} overgeslagen omdat deze al geregistreerd is"
+
+#: notifications/admin.py:32
 #, python-brace-format
 msgid ""
 "Something went wrong while registering subscription for {callback}: "
@@ -57,9 +62,28 @@ msgstr ""
 "Er is iets misgegaan bij het registreren van een abonnement voor {callback}: "
 "{exception}"
 
-#: notifications/admin.py:31
+#: notifications/admin.py:38
 msgid "Register the webhooks"
 msgstr "Registreer de webhooks"
+
+#: notifications/admin.py:47
+#, python-brace-format
+msgid "Skipping {subscription} because it has not previously been registered."
+msgstr "Abonnement {subscription} overgeslagen omdat deze nog niet geregistreerd is"
+
+#: notifications/admin.py:59
+msgid ""
+"Something went wrong while deregistering subscription for {callback}: "
+"{exception}"
+msgstr ""
+"Er is iets misgegaan bij het uitschrijven van een abonnement voor {callback}: "
+"{exception}"
+
+#: notifications/admin.py:65
+#, fuzzy
+#| msgid "Register the webhooks"
+msgid "Deregister the webhooks"
+msgstr "Schrijf de webhooks uit"
 
 #: notifications/api/serializers.py:10
 msgid "kanaal"
@@ -352,8 +376,8 @@ msgstr "Organisatie"
 #: open_inwoner/templates/pages/cases/list_inner.html:59
 #: open_inwoner/templates/pages/cases/list_inner.html:83
 #: open_inwoner/templates/pages/cases/statuses.html:4
-#: open_inwoner/templates/pages/contactmoment/list.html:54
-#: open_inwoner/templates/pages/plans/list.html:42
+#: open_inwoner/templates/pages/contactmoment/list.html:68
+#: open_inwoner/templates/pages/plans/list.html:57
 msgid "Status"
 msgstr "Status"
 
@@ -733,7 +757,9 @@ msgstr ""
 "De contactpersonen die wachten voor goedkeuring. Dit veld wordt gebruikt "
 "voor bestaande gebruikers in de applicatie."
 
-#: open_inwoner/accounts/models.py:349 open_inwoner/openklant/models.py:161
+#: open_inwoner/accounts/models.py:349
+#: open_inwoner/cms/extensions/constants.py:13
+#: open_inwoner/openklant/models.py:161
 msgid "User"
 msgstr "Gebruiker"
 
@@ -1252,7 +1278,7 @@ msgstr ""
 #: open_inwoner/accounts/templates/registration/login.html:108
 #: open_inwoner/accounts/templates/registration/verify_token.html:23
 #: open_inwoner/components/templates/components/Header/Header.html:28
-#: open_inwoner/components/templates/components/Header/NavigationAuthenticated.html:51
+#: open_inwoner/components/templates/components/Header/NavigationAuthenticated.html:45
 msgid "Inloggen"
 msgstr "Log in"
 
@@ -1280,7 +1306,7 @@ msgstr "Welkom"
 
 #: open_inwoner/accounts/templates/registration/login.html:44
 #: open_inwoner/accounts/templates/registration/login.html:54
-#: open_inwoner/accounts/tests/test_auth.py:2088
+#: open_inwoner/accounts/tests/test_auth.py:2084
 msgid "Inloggen met DigiD"
 msgstr "Log in met DigiD"
 
@@ -1306,7 +1332,7 @@ msgstr ""
 
 #: open_inwoner/accounts/templates/registration/login.html:144
 #: open_inwoner/accounts/templates/registration/login.html:154
-#: open_inwoner/accounts/tests/test_auth.py:2113
+#: open_inwoner/accounts/tests/test_auth.py:2109
 msgid "Inloggen met eHerkenning"
 msgstr "Inloggen met eHerkenning"
 
@@ -1352,12 +1378,12 @@ msgstr "Actie '{action}' is verwijdered."
 #: open_inwoner/accounts/views/actions.py:331
 #: open_inwoner/accounts/views/contacts.py:33
 #: open_inwoner/accounts/views/contacts.py:68
-#: open_inwoner/accounts/views/profile.py:83
-#: open_inwoner/accounts/views/profile.py:228
-#: open_inwoner/accounts/views/profile.py:349
-#: open_inwoner/accounts/views/profile.py:371
-#: open_inwoner/accounts/views/profile.py:401
-#: open_inwoner/accounts/views/profile.py:485 open_inwoner/core/views.py:82
+#: open_inwoner/accounts/views/profile.py:84
+#: open_inwoner/accounts/views/profile.py:229
+#: open_inwoner/accounts/views/profile.py:387
+#: open_inwoner/accounts/views/profile.py:409
+#: open_inwoner/accounts/views/profile.py:439
+#: open_inwoner/accounts/views/profile.py:523 open_inwoner/core/views.py:82
 #: open_inwoner/questionnaire/views.py:53
 #: open_inwoner/questionnaire/views.py:165
 msgid "Mijn profiel"
@@ -1409,25 +1435,25 @@ msgstr ""
 msgid "Dit veld is vereist."
 msgstr "Dit veld is vereist."
 
-#: open_inwoner/accounts/tests/test_auth.py:2134
-#: open_inwoner/accounts/tests/test_auth.py:2149
+#: open_inwoner/accounts/tests/test_auth.py:2130
+#: open_inwoner/accounts/tests/test_auth.py:2145
 msgid ""
 "Voer een juiste E-mailadres en wachtwoord in. Let op dat beide velden "
 "hoofdlettergevoelig zijn."
 msgstr ""
 
-#: open_inwoner/accounts/tests/test_auth.py:2171
+#: open_inwoner/accounts/tests/test_auth.py:2167
 #: open_inwoner/templates/registration/password_reset_form.html:8
 #: open_inwoner/templates/registration/password_reset_form.html:15
 msgid "Reset password"
 msgstr "Wijzig wachtwoord"
 
-#: open_inwoner/accounts/tests/test_auth.py:2181
+#: open_inwoner/accounts/tests/test_auth.py:2177
 #, python-brace-format
 msgid "Password reset for {domain}"
 msgstr "Wachtwoordwijziging voor {domain}"
 
-#: open_inwoner/accounts/tests/test_auth.py:2186
+#: open_inwoner/accounts/tests/test_auth.py:2182
 msgid ""
 "U ontvangt deze e-mail, omdat u een aanvraag voor opnieuw instellen van het "
 "wachtwoord voor uw account op example.com hebt gedaan."
@@ -1435,23 +1461,23 @@ msgstr ""
 "U ontvangt deze e-mail, omdat u een aanvraag voor opnieuw instellen van het "
 "wachtwoord voor uw account op {domain} hebt gedaan."
 
-#: open_inwoner/accounts/tests/test_auth.py:2191
+#: open_inwoner/accounts/tests/test_auth.py:2187
 #, python-brace-format
 msgid "Uw gebruikersnaam, mocht u deze vergeten zijn: {user_email}"
 msgstr "Uw gebruikersnaam, mocht u deze vergeten zijn: {user_email}"
 
-#: open_inwoner/accounts/tests/test_auth.py:2204
+#: open_inwoner/accounts/tests/test_auth.py:2200
 #: open_inwoner/templates/registration/password_change_form.html:22
 #: open_inwoner/templates/registration/password_reset_confirm.html:8
 msgid "Change my password"
 msgstr "Mijn wachtwoord wijzigen"
 
-#: open_inwoner/accounts/tests/test_auth.py:2225
+#: open_inwoner/accounts/tests/test_auth.py:2221
 #: open_inwoner/templates/registration/password_change_form.html:13
 msgid "Password reset"
 msgstr "Wachtwoordwijziging"
 
-#: open_inwoner/accounts/tests/test_auth.py:2229
+#: open_inwoner/accounts/tests/test_auth.py:2225
 #: open_inwoner/templates/registration/password_change_done.html:6
 msgid "Your password has been changed."
 msgstr "Uw wachtwoord is gewijzigd."
@@ -1540,23 +1566,23 @@ msgid "user was created"
 msgstr "gebruikersaccount is aangemaakt"
 
 #: open_inwoner/accounts/tests/test_logging.py:97
-#: open_inwoner/accounts/views/profile.py:245
-#: open_inwoner/accounts/views/profile.py:275
+#: open_inwoner/accounts/views/profile.py:246
+#: open_inwoner/accounts/views/profile.py:276
 msgid "profile was modified"
 msgstr "profiel is gewijzigd"
 
 #: open_inwoner/accounts/tests/test_logging.py:121
-#: open_inwoner/accounts/views/profile.py:359
+#: open_inwoner/accounts/views/profile.py:397
 msgid "categories were modified"
 msgstr "interessegebieden zijn gewijzigd"
 
 #: open_inwoner/accounts/tests/test_logging.py:147
-#: open_inwoner/accounts/views/profile.py:434
+#: open_inwoner/accounts/views/profile.py:472
 msgid "users notifications were modified"
 msgstr "gebruikersnotificaties zijn gewijzigd"
 
 #: open_inwoner/accounts/tests/test_logging.py:239
-#: open_inwoner/accounts/views/profile.py:203
+#: open_inwoner/accounts/views/profile.py:204
 msgid "user was deleted via frontend"
 msgstr "gebruikersaccount is op eigen verzoek verwijderd"
 
@@ -1673,7 +1699,7 @@ msgstr "Gebruik DigiD om in te loggen als eenmanszaak."
 #: open_inwoner/accounts/tests/test_profile_views.py:114
 #: open_inwoner/accounts/tests/test_profile_views.py:133
 #: open_inwoner/components/templates/components/Header/Header.html:94
-#: open_inwoner/components/templates/components/Header/NavigationAuthenticated.html:42
+#: open_inwoner/components/templates/components/Header/NavigationAuthenticated.html:36
 msgid "Logout"
 msgstr "Uitloggen"
 
@@ -1710,44 +1736,44 @@ msgid "Stuur een bericht"
 msgstr "Stuur een bericht"
 
 #: open_inwoner/accounts/tests/test_profile_views.py:363
-#: open_inwoner/accounts/tests/test_profile_views.py:866
+#: open_inwoner/accounts/tests/test_profile_views.py:921
 msgid ""
 "Het verplichte veld \"E-mailadres\" is niet (goed) ingevuld. Vul het veld in."
 msgstr ""
 "Het verplichte veld \"E-mailadres\" is niet (goed) ingevuld. Vul het veld in."
 
-#: open_inwoner/accounts/tests/test_profile_views.py:860
+#: open_inwoner/accounts/tests/test_profile_views.py:915
 msgid "Het verplichte veld \"Naam\" is niet (goed) ingevuld. Vul het veld in."
 msgstr "Het verplichte veld \"Naam\" is niet (goed) ingevuld. Vul het veld in."
 
-#: open_inwoner/accounts/tests/test_profile_views.py:873
-#: open_inwoner/accounts/tests/test_profile_views.py:877
+#: open_inwoner/accounts/tests/test_profile_views.py:928
+#: open_inwoner/accounts/tests/test_profile_views.py:932
 msgid "Naam is verplicht."
 msgstr "Naam is verplicht."
 
-#: open_inwoner/accounts/tests/test_profile_views.py:874
-#: open_inwoner/accounts/tests/test_profile_views.py:878
+#: open_inwoner/accounts/tests/test_profile_views.py:929
+#: open_inwoner/accounts/tests/test_profile_views.py:933
 msgid "E-mail is verplicht."
 msgstr "E-mail is verplicht."
 
-#: open_inwoner/accounts/tests/test_profile_views.py:1035
-#: open_inwoner/accounts/tests/test_profile_views.py:1052
-#: open_inwoner/accounts/tests/test_profile_views.py:1086
-#: open_inwoner/accounts/views/profile.py:381
+#: open_inwoner/accounts/tests/test_profile_views.py:1090
+#: open_inwoner/accounts/tests/test_profile_views.py:1107
+#: open_inwoner/accounts/tests/test_profile_views.py:1141
+#: open_inwoner/accounts/views/profile.py:419
 msgid "user requests for brp data"
 msgstr "gebruiker vraagt BRP data op"
 
-#: open_inwoner/accounts/tests/test_profile_views.py:1394
-#: open_inwoner/accounts/tests/test_profile_views.py:1429
-#: open_inwoner/accounts/tests/test_profile_views.py:1534
-#: open_inwoner/accounts/views/profile.py:127
+#: open_inwoner/accounts/tests/test_profile_views.py:1449
+#: open_inwoner/accounts/tests/test_profile_views.py:1484
+#: open_inwoner/accounts/tests/test_profile_views.py:1589
+#: open_inwoner/accounts/views/profile.py:128
 #: open_inwoner/cms/profile/cms_appconfig.py:65
 #: open_inwoner/laposta/forms.py:24
 #: open_inwoner/templates/pages/profile/me.html:152
 msgid "Nieuwsbrieven"
 msgstr "Nieuwsbrieven"
 
-#: open_inwoner/accounts/tests/test_profile_views.py:1469
+#: open_inwoner/accounts/tests/test_profile_views.py:1524
 #: open_inwoner/laposta/forms.py:95
 #: open_inwoner/laposta/tests/test_forms.py:301
 #, python-brace-format
@@ -1758,7 +1784,7 @@ msgstr ""
 "Er ging iets mis bij het aanmelden op '{list_name}', probeer het later nog "
 "een keer"
 
-#: open_inwoner/accounts/tests/test_profile_views.py:1475
+#: open_inwoner/accounts/tests/test_profile_views.py:1530
 #: open_inwoner/laposta/forms.py:114
 #: open_inwoner/laposta/tests/test_forms.py:305
 #, python-brace-format
@@ -1769,17 +1795,17 @@ msgstr ""
 "Er ging iets mis bij het afmelden op '{list_name}', probeer het later nog "
 "een keer"
 
-#: open_inwoner/accounts/tests/test_profile_views.py:1567
-#: open_inwoner/accounts/tests/test_profile_views.py:1577
-#: open_inwoner/accounts/tests/test_profile_views.py:1591
-#: open_inwoner/accounts/tests/test_profile_views.py:1605
-#: open_inwoner/accounts/tests/test_profile_views.py:1614
-#: open_inwoner/templates/pages/profile/appointments.html:42
+#: open_inwoner/accounts/tests/test_profile_views.py:1622
+#: open_inwoner/accounts/tests/test_profile_views.py:1632
+#: open_inwoner/accounts/tests/test_profile_views.py:1646
+#: open_inwoner/accounts/tests/test_profile_views.py:1660
+#: open_inwoner/accounts/tests/test_profile_views.py:1669
+#: open_inwoner/templates/pages/profile/appointments.html:56
 msgid "Geen afspraken beschikbaar"
 msgstr "Geen afspraken beschikbaar"
 
-#: open_inwoner/accounts/tests/test_profile_views.py:1622
-#: open_inwoner/templates/pages/profile/appointments.html:9
+#: open_inwoner/accounts/tests/test_profile_views.py:1677
+#: open_inwoner/templates/pages/profile/appointments.html:23
 msgid "Een overzicht van uw afspraken"
 msgstr "Een overzicht van uw afspraken"
 
@@ -1831,22 +1857,22 @@ msgstr ""
 msgid "Something went wrong while logging in, please try again later."
 msgstr "Er ging iets mis bij het inloggen, Probeer het later nog eens"
 
-#: open_inwoner/accounts/views/contactmoments.py:128
-#: open_inwoner/accounts/views/contactmoments.py:131
-#: open_inwoner/accounts/views/contactmoments.py:135
-#: open_inwoner/accounts/views/contactmoments.py:177
+#: open_inwoner/accounts/views/contactmoments.py:127
+#: open_inwoner/accounts/views/contactmoments.py:130
+#: open_inwoner/accounts/views/contactmoments.py:134
+#: open_inwoner/accounts/views/contactmoments.py:176
 #: open_inwoner/cms/profile/cms_appconfig.py:51 open_inwoner/core/views.py:66
 #: open_inwoner/core/views.py:143
 #: open_inwoner/templates/pages/profile/me.html:314
 msgid "Mijn vragen"
 msgstr "Mijn vragen"
 
-#: open_inwoner/accounts/views/contactmoments.py:184
+#: open_inwoner/accounts/views/contactmoments.py:183
 #: open_inwoner/templates/pages/history.html:16
 msgid "Details"
 msgstr "Details"
 
-#: open_inwoner/accounts/views/contactmoments.py:185
+#: open_inwoner/accounts/views/contactmoments.py:184
 #: open_inwoner/cms/cases/forms.py:81
 #: open_inwoner/cms/cases/tests/test_htmx.py:519
 #: open_inwoner/conf/parts/maileditor.py:552 open_inwoner/openklant/forms.py:44
@@ -1856,42 +1882,37 @@ msgstr "Details"
 msgid "Vraag"
 msgstr "Vraag"
 
-#: open_inwoner/accounts/views/contactmoments.py:216
-msgid ""
-"Your question was connected to multiple cases, we are showing you the first."
-msgstr "Uw vraag hoort bij meerdere zaken. We laten u de eerste zien."
-
-#: open_inwoner/accounts/views/contactmoments.py:246
+#: open_inwoner/accounts/views/contactmoments.py:224
 msgid "Status: "
 msgstr "Status:"
 
-#: open_inwoner/accounts/views/contactmoments.py:250
+#: open_inwoner/accounts/views/contactmoments.py:228
 msgid "Ingediend op: "
 msgstr "Ingediend op: "
 
-#: open_inwoner/accounts/views/contactmoments.py:254
+#: open_inwoner/accounts/views/contactmoments.py:232
 msgid "Vraag nummer: "
 msgstr "Vraagnummer: "
 
-#: open_inwoner/accounts/views/contactmoments.py:258
+#: open_inwoner/accounts/views/contactmoments.py:236
 msgid "Contact gehad via: "
 msgstr "Contact gehad via: "
 
-#: open_inwoner/accounts/views/contactmoments.py:264
+#: open_inwoner/accounts/views/contactmoments.py:244
 msgid "Terug naar overzicht"
 msgstr "Terug naar overzicht"
 
-#: open_inwoner/accounts/views/contactmoments.py:269
+#: open_inwoner/accounts/views/contactmoments.py:249
 msgid "Naar aanvraag"
 msgstr "Naar zaak"
 
-#: open_inwoner/accounts/views/contactmoments.py:274
+#: open_inwoner/accounts/views/contactmoments.py:254
 #: open_inwoner/openklant/tests/test_views.py:514
 #: open_inwoner/openklant/tests/test_views.py:581
 msgid "Terug naar aanvraag"
 msgstr "Terug naar zaak"
 
-#: open_inwoner/accounts/views/contactmoments.py:278
+#: open_inwoner/accounts/views/contactmoments.py:258
 #: open_inwoner/openklant/tests/test_views.py:527
 #: open_inwoner/openklant/tests/test_views.py:594
 msgid "Bekijk alle vragen"
@@ -1964,50 +1985,50 @@ msgstr ""
 "Probeer het nogmaals. Mocht het inloggen na meerdere pogingen niet werken, "
 "neem dan contact met ons op."
 
-#: open_inwoner/accounts/views/profile.py:71
+#: open_inwoner/accounts/views/profile.py:72
 msgid "failed to modify user newsletter subscription"
 msgstr "het bijwerken van het nieuwsbriefabonnement is niet gelukt"
 
-#: open_inwoner/accounts/views/profile.py:75
-#: open_inwoner/accounts/views/profile.py:244
-#: open_inwoner/accounts/views/profile.py:274
-#: open_inwoner/accounts/views/profile.py:358
-#: open_inwoner/accounts/views/profile.py:433
+#: open_inwoner/accounts/views/profile.py:76
+#: open_inwoner/accounts/views/profile.py:245
+#: open_inwoner/accounts/views/profile.py:275
+#: open_inwoner/accounts/views/profile.py:396
+#: open_inwoner/accounts/views/profile.py:471
 msgid "Uw wijzigingen zijn opgeslagen"
 msgstr "Uw wijzigingen zijn opgeslagen"
 
-#: open_inwoner/accounts/views/profile.py:77
+#: open_inwoner/accounts/views/profile.py:78
 msgid "users newsletter subscriptions were modified"
 msgstr "nieuwsbrief abonnementen zijn gewijzigd"
 
-#: open_inwoner/accounts/views/profile.py:109
+#: open_inwoner/accounts/views/profile.py:110
 #: open_inwoner/templates/pages/profile/me.html:27
 msgid "Bedrijfsgegevens"
 msgstr "Bedrijfsgegevens"
 
-#: open_inwoner/accounts/views/profile.py:111
+#: open_inwoner/accounts/views/profile.py:112
 #: open_inwoner/templates/pages/profile/me.html:80
 #: open_inwoner/templates/pages/profile/mydata.html:12
 msgid "Persoonlijke gegevens"
 msgstr "Persoonlijke gegevens"
 
-#: open_inwoner/accounts/views/profile.py:115
+#: open_inwoner/accounts/views/profile.py:116
 #: open_inwoner/templates/pages/profile/me.html:357
 #: open_inwoner/templates/pages/profile/me.html:368
 msgid "Profiel verwijderen"
 msgstr "Profiel verwijderen"
 
-#: open_inwoner/accounts/views/profile.py:118
+#: open_inwoner/accounts/views/profile.py:119
 #: open_inwoner/templates/pages/profile/me.html:187
 msgid "Overzicht"
 msgstr "Overzicht"
 
-#: open_inwoner/accounts/views/profile.py:121
+#: open_inwoner/accounts/views/profile.py:122
 #: open_inwoner/templates/pages/profile/me.html:126
 msgid "Voorkeuren voor meldingen"
 msgstr "Voorkeuren voor meldingen"
 
-#: open_inwoner/accounts/views/profile.py:196
+#: open_inwoner/accounts/views/profile.py:197
 msgid ""
 "Your profile could not be deleted because you still have plans associated "
 "with it."
@@ -2015,15 +2036,15 @@ msgstr ""
 "Profiel kon niet worden verwijderd, u bent nog actief in 1 of meerdere "
 "samenwerkingsplannen."
 
-#: open_inwoner/accounts/views/profile.py:209
+#: open_inwoner/accounts/views/profile.py:210
 msgid "Uw account kon niet worden verwijderd"
 msgstr "Uw account kon niet worden verwijderd"
 
-#: open_inwoner/accounts/views/profile.py:229
+#: open_inwoner/accounts/views/profile.py:230
 msgid "Bewerk profiel"
 msgstr "Bewerk profiel"
 
-#: open_inwoner/accounts/views/profile.py:264
+#: open_inwoner/accounts/views/profile.py:265
 msgid ""
 "Your changes could not be saved due to technical problems. Please try again "
 "later"
@@ -2031,25 +2052,25 @@ msgstr ""
 "Door een storing zijn uw wijzigingen niet opgeslagen. Probeer het later nog "
 "eens."
 
-#: open_inwoner/accounts/views/profile.py:269
+#: open_inwoner/accounts/views/profile.py:270
 msgid "profile changes not saved due to Klant API error"
 msgstr "profiel is niet aangepast door een fout in de Klant API."
 
-#: open_inwoner/accounts/views/profile.py:350
+#: open_inwoner/accounts/views/profile.py:388
 msgid "Mijn interessegebieden"
 msgstr "Mijn interessegebieden"
 
-#: open_inwoner/accounts/views/profile.py:372
+#: open_inwoner/accounts/views/profile.py:410
 #: open_inwoner/cms/profile/cms_appconfig.py:9
 msgid "Mijn gegevens"
 msgstr "Mijn Gegevens"
 
-#: open_inwoner/accounts/views/profile.py:402
+#: open_inwoner/accounts/views/profile.py:440
 #: open_inwoner/templates/pages/profile/notifications.html:17
 msgid "Ontvang berichten over"
 msgstr "Ontvang berichten over"
 
-#: open_inwoner/accounts/views/profile.py:486
+#: open_inwoner/accounts/views/profile.py:524
 #: open_inwoner/cms/profile/cms_appconfig.py:70 open_inwoner/core/views.py:157
 #: open_inwoner/templates/pages/profile/me.html:341
 msgid "Mijn afspraken"
@@ -2173,7 +2194,7 @@ msgstr "Bestand"
 #: open_inwoner/openklant/tests/test_contactform.py:718
 #: open_inwoner/openklant/tests/test_contactform.py:1078
 #: open_inwoner/openklant/tests/test_contactform.py:1173
-#: open_inwoner/openklant/views/contactform.py:120
+#: open_inwoner/openklant/views/contactform.py:114
 msgid "Vraag verstuurd!"
 msgstr "Vraag verstuurd!"
 
@@ -2196,7 +2217,7 @@ msgstr "Upload documenten"
 
 #: open_inwoner/cms/cases/tests/test_htmx.py:524
 #: open_inwoner/templates/pages/cases/contact_form.html:17
-#: open_inwoner/templates/pages/contactmoment/list.html:98
+#: open_inwoner/templates/pages/contactmoment/list.html:112
 msgid "Vraag versturen"
 msgstr "Vraag versturen"
 
@@ -2308,7 +2329,7 @@ msgid "Case: {case_identification}"
 msgstr "Zaak: {case_identification}"
 
 #: open_inwoner/cms/cases/views/status.py:1022
-#: open_inwoner/openklant/views/contactform.py:125
+#: open_inwoner/openklant/views/contactform.py:119
 msgid "Probleem bij versturen van de vraag."
 msgstr "Probleem bij versturen van de vraag."
 
@@ -2328,7 +2349,7 @@ msgid "Collaborate Application"
 msgstr "Samenwerken app"
 
 #: open_inwoner/cms/collaborate/cms_plugins.py:13
-#: open_inwoner/cms/extensions/constants.py:15
+#: open_inwoner/cms/extensions/constants.py:17
 msgid "Collaborate"
 msgstr "Samenwerken"
 
@@ -2348,29 +2369,25 @@ msgstr "Samenwerken > nieuwe contacten"
 msgid "Inbox > new messages"
 msgstr "Berichten > nieuwe berichten"
 
-#: open_inwoner/cms/extensions/constants.py:11
-msgid "Home"
-msgstr "Home"
-
-#: open_inwoner/cms/extensions/constants.py:12
+#: open_inwoner/cms/extensions/constants.py:14
 #: open_inwoner/pdc/models/product.py:212
 msgid "Products"
 msgstr "Producten"
 
-#: open_inwoner/cms/extensions/constants.py:13
+#: open_inwoner/cms/extensions/constants.py:15
 msgid "Inbox"
 msgstr "Berichten"
 
-#: open_inwoner/cms/extensions/constants.py:14
+#: open_inwoner/cms/extensions/constants.py:16
 msgid "Cases"
 msgstr "Zaken"
 
-#: open_inwoner/cms/extensions/constants.py:16
+#: open_inwoner/cms/extensions/constants.py:18
 #: open_inwoner/components/templates/components/Header/AccessibilityHeader.html:29
 msgid "Help"
 msgstr "Help"
 
-#: open_inwoner/cms/extensions/constants.py:17
+#: open_inwoner/cms/extensions/constants.py:19
 msgid "Benefits"
 msgstr "Uitkeringen"
 
@@ -2445,7 +2462,7 @@ msgstr "Algemeen"
 msgid "My appointments"
 msgstr "Mijn afspraken"
 
-#: open_inwoner/cms/plugins/cms_plugins/tasks.py:25
+#: open_inwoner/cms/plugins/cms_plugins/tasks.py:38
 msgid "Task list Plugin"
 msgstr "Taken lijst Plugin"
 
@@ -2478,9 +2495,17 @@ msgstr "De titel van het takenblok"
 msgid "Mijn Taken"
 msgstr "Mijn Taken"
 
+#: open_inwoner/cms/plugins/models/tasks.py:19
+msgid "Object Type (Extern Formulier Taak)"
+msgstr "Object Type (Extern Formulier Taak)"
+
+#: open_inwoner/cms/plugins/models/tasks.py:24
+msgid "Object Type (Url Taak)"
+msgstr "Object Type (Url Taak)"
+
 #: open_inwoner/cms/plugins/models/userfeed.py:12
 #: open_inwoner/core/views.py:129
-#: open_inwoner/templates/pages/plans/list.html:43
+#: open_inwoner/templates/pages/plans/list.html:58
 msgid "Openstaande acties"
 msgstr "Openstaande acties"
 
@@ -2502,9 +2527,9 @@ msgid "Products Application"
 msgstr "Producten app"
 
 #: open_inwoner/cms/products/cms_plugins.py:35
-#: open_inwoner/cms/products/cms_plugins.py:73
-#: open_inwoner/cms/products/cms_plugins.py:88
-#: open_inwoner/cms/products/cms_plugins.py:102
+#: open_inwoner/cms/products/cms_plugins.py:75
+#: open_inwoner/cms/products/cms_plugins.py:90
+#: open_inwoner/cms/products/cms_plugins.py:104
 msgid "PDC"
 msgstr "PDC"
 
@@ -2512,15 +2537,15 @@ msgstr "PDC"
 msgid "Categories Plugin"
 msgstr "Onderwerpen Plugin"
 
-#: open_inwoner/cms/products/cms_plugins.py:74
+#: open_inwoner/cms/products/cms_plugins.py:76
 msgid "Questionnaire Plugin"
 msgstr "Vragenlijst Plugin"
 
-#: open_inwoner/cms/products/cms_plugins.py:89
+#: open_inwoner/cms/products/cms_plugins.py:91
 msgid "Product Finder Plugin"
 msgstr "Productzoeker Plugin"
 
-#: open_inwoner/cms/products/cms_plugins.py:103
+#: open_inwoner/cms/products/cms_plugins.py:105
 msgid "Product Location Plugin"
 msgstr "Productlocatie Plugin"
 
@@ -2628,13 +2653,13 @@ msgid "Profile apphook configurations"
 msgstr "Configuratie Mijn Profiel"
 
 #: open_inwoner/components/templates/components/Action/Actions.html:7
-#: open_inwoner/templates/pages/plans/list.html:21
+#: open_inwoner/templates/pages/plans/list.html:36
 #: open_inwoner/templates/pages/profile/contacts/list.html:74
 msgid "Filter"
 msgstr "Filter"
 
 #: open_inwoner/components/templates/components/Action/Actions.html:10
-#: open_inwoner/templates/pages/plans/list.html:24
+#: open_inwoner/templates/pages/plans/list.html:39
 #: open_inwoner/templates/pages/profile/contacts/list.html:77
 msgid "Filter op:"
 msgstr "Filter op:"
@@ -2721,7 +2746,7 @@ msgstr "Zaak starten"
 
 #: open_inwoner/components/templates/components/Card/DescriptionCard.html:14
 #: open_inwoner/components/templates/components/Card/ProductCard.html:21
-#: open_inwoner/templates/pages/plans/list.html:41
+#: open_inwoner/templates/pages/plans/list.html:56
 msgid "Einddatum"
 msgstr "Einddatum"
 
@@ -2743,9 +2768,9 @@ msgstr "Keuzemenu"
 
 #: open_inwoner/components/templates/components/Faq/Faq.html:3
 #: open_inwoner/components/templates/components/Header/Header.html:74
-#: open_inwoner/components/templates/components/Header/NavigationAuthenticated.html:29
+#: open_inwoner/components/templatetags/side_navigation.py:37
 #: open_inwoner/pdc/views.py:67 open_inwoner/pdc/views.py:209
-#: open_inwoner/templates/pages/faq.html:6
+#: open_inwoner/templates/pages/faq.html:20
 msgid "Veelgestelde vragen"
 msgstr "Veelgestelde vragen"
 
@@ -2794,7 +2819,7 @@ msgid "Geüpload door"
 msgstr "Geüpload door"
 
 #: open_inwoner/components/templates/components/File/FileTable.html:7
-#: open_inwoner/templates/pages/profile/appointments.html:21
+#: open_inwoner/templates/pages/profile/appointments.html:35
 msgid "Datum"
 msgstr "Datum"
 
@@ -2933,7 +2958,7 @@ msgid "Onderwerpen"
 msgstr "Onderwerpen"
 
 #: open_inwoner/components/templates/components/Header/Header.html:89
-#: open_inwoner/components/templates/components/Header/NavigationAuthenticated.html:37
+#: open_inwoner/components/templates/components/Header/NavigationAuthenticated.html:31
 #: open_inwoner/templates/pages/profile/me.html:31
 msgid "Wissel van vestiging"
 msgstr "Wissel van vestiging"
@@ -4626,12 +4651,12 @@ msgid "CMS pages in the footer"
 msgstr "CMS pagina's in de footer"
 
 #: open_inwoner/configurations/tests/test_analytics.py:146
-#: open_inwoner/templates/master.html:79
+#: open_inwoner/templates/master.html:87
 msgid "Alles toestaan"
 msgstr "Alles toestaan"
 
 #: open_inwoner/configurations/tests/test_analytics.py:170
-#: open_inwoner/templates/master.html:78
+#: open_inwoner/templates/master.html:86
 msgid "Alles weigeren"
 msgstr "Alles weigeren"
 
@@ -5306,7 +5331,7 @@ msgstr ""
 msgid "Configuratie Klanten Systeem"
 msgstr "Configuratie Klanten Systeem"
 
-#: open_inwoner/openklant/services.py:693
+#: open_inwoner/openklant/services.py:704
 msgid "Onbekend"
 msgstr "Onbekend"
 
@@ -5318,12 +5343,12 @@ msgstr "Contact formulier niet geconfigureerd."
 #: open_inwoner/openklant/tests/test_views.py:149
 #: open_inwoner/openklant/tests/test_views.py:236
 #: open_inwoner/openzaak/tests/test_case_detail.py:1221
-#: open_inwoner/templates/pages/contactmoment/list.html:40
+#: open_inwoner/templates/pages/contactmoment/list.html:54
 #: open_inwoner/templates/pages/partials/question.html:5
 msgid "Nieuw antwoord beschikbaar"
 msgstr "Nieuw antwoord beschikbaar"
 
-#: open_inwoner/openklant/views/contactform.py:301
+#: open_inwoner/openklant/views/contactform.py:312
 #, python-brace-format
 msgid ""
 "{text}\n"
@@ -6717,7 +6742,11 @@ msgstr "Content gewijzigd."
 #: open_inwoner/pdc/tests/test_logging.py:138
 #: open_inwoner/pdc/tests/test_logging.py:272
 msgid "new through import_export"
-msgstr ""
+msgstr "new through import_export"
+
+#: open_inwoner/pdc/tests/test_product_resources.py:143
+msgid "De ingevoerde category bestaat niet"
+msgstr "De ingevoerde category bestaat niet"
 
 #: open_inwoner/pdc/views.py:125
 #, python-format
@@ -6951,18 +6980,18 @@ msgid "This field is required."
 msgstr "Dit veld is vereist."
 
 #: open_inwoner/plans/tests/test_views.py:856 open_inwoner/plans/views.py:734
-#: open_inwoner/templates/pages/plans/list.html:39
+#: open_inwoner/templates/pages/plans/list.html:54
 msgid "Samenwerking"
 msgstr "Samenwerking"
 
 #: open_inwoner/plans/tests/test_views.py:1024
 #: open_inwoner/plans/tests/test_views.py:1051
-#: open_inwoner/templates/pages/plans/list.html:57
+#: open_inwoner/templates/pages/plans/list.html:72
 msgid "Actie vereist"
 msgstr "Actie vereist"
 
 #: open_inwoner/plans/tests/test_views.py:1131
-#: open_inwoner/templates/pages/plans/list.html:64
+#: open_inwoner/templates/pages/plans/list.html:79
 msgid "There are no plans with these filters."
 msgstr "Er zijn nog geen plannen met deze filters."
 
@@ -6992,7 +7021,7 @@ msgstr "Kies voorstel"
 
 #: open_inwoner/plans/views.py:318
 #: open_inwoner/templates/pages/plans/create.html:7
-#: open_inwoner/templates/pages/plans/list.html:13
+#: open_inwoner/templates/pages/plans/list.html:28
 msgid "Start een nieuwe samenwerking"
 msgstr "Start een nieuwe samenwerking"
 
@@ -7593,7 +7622,7 @@ msgid "Configure OpenKlant2 backend"
 msgstr "Configureer de OpenKlant2 backend"
 
 #: open_inwoner/templates/cms/banner/banner_image_plugin.html:7
-#: open_inwoner/templates/cms/fullwidth.html:19
+#: open_inwoner/templates/cms/fullwidth.html:28
 msgid "Welkom op de hoofdpagina"
 msgstr "Welkom op de hoofdpagina"
 
@@ -7601,7 +7630,7 @@ msgstr "Welkom op de hoofdpagina"
 msgid "Naar samenwerken"
 msgstr "Naar samenwerken"
 
-#: open_inwoner/templates/cms/fullwidth.html:34
+#: open_inwoner/templates/cms/fullwidth.html:56
 msgid "There is no content."
 msgstr "Deze pagina is nog leeg."
 
@@ -7610,7 +7639,7 @@ msgid "om"
 msgstr "om"
 
 #: open_inwoner/templates/cms/plugins/appointments/appointments.html:12
-#: open_inwoner/templates/pages/profile/appointments.html:22
+#: open_inwoner/templates/pages/profile/appointments.html:36
 msgid "uur"
 msgstr "uur"
 
@@ -7662,9 +7691,9 @@ msgid "Contact support to start the account recovery process"
 msgstr "Neem contact op met support om het accountherstelproces te starten"
 
 #: open_inwoner/templates/pages/cases/contact_form.html:3
-#: open_inwoner/templates/pages/contactmoment/list.html:12
-#: open_inwoner/templates/pages/contactmoment/list.html:21
-#: open_inwoner/templates/pages/contactmoment/list.html:78
+#: open_inwoner/templates/pages/contactmoment/list.html:26
+#: open_inwoner/templates/pages/contactmoment/list.html:35
+#: open_inwoner/templates/pages/contactmoment/list.html:92
 msgid "Stel een vraag"
 msgstr "Stel een vraag"
 
@@ -7712,7 +7741,7 @@ msgstr "Zaak afronden"
 msgid "Resultaat"
 msgstr "Resultaat"
 
-#: open_inwoner/templates/pages/cases/list_outer.html:11
+#: open_inwoner/templates/pages/cases/list_outer.html:24
 #: open_inwoner/templates/pages/cases/status_outer.html:14
 #: open_inwoner/templates/pages/plans/detail.html:102
 msgid "Gegevens laden..."
@@ -7786,8 +7815,8 @@ msgstr "Uw vraag"
 msgid "Nog geen antwoord beschijkbaar"
 msgstr "Nog geen antwoord beschikbaar"
 
-#: open_inwoner/templates/pages/contactmoment/list.html:14
-#: open_inwoner/templates/pages/contactmoment/list.html:80
+#: open_inwoner/templates/pages/contactmoment/list.html:28
+#: open_inwoner/templates/pages/contactmoment/list.html:94
 msgid ""
 "Heeft u een vraag? Dan kunt u deze hier stellen. Een van onze medewerkers "
 "beantwoord uw vraag z.s.m."
@@ -7795,25 +7824,25 @@ msgstr ""
 "Heeft u een vraag? Dan kunt u deze hier stellen. Een van onze medewerkers "
 "beantwoordt uw vraag z.s.m."
 
-#: open_inwoner/templates/pages/contactmoment/list.html:30
+#: open_inwoner/templates/pages/contactmoment/list.html:44
 msgid "Eerder gestelde vragen"
 msgstr "Vragen"
 
-#: open_inwoner/templates/pages/contactmoment/list.html:32
+#: open_inwoner/templates/pages/contactmoment/list.html:46
 msgid "U heeft op dit moment nog geen vragen."
 msgstr "U heeft op dit moment nog geen vragen."
 
-#: open_inwoner/templates/pages/contactmoment/list.html:49
+#: open_inwoner/templates/pages/contactmoment/list.html:63
 #: open_inwoner/templates/pages/partials/question.html:11
 msgid "Vraag ingediend op"
 msgstr "Vraag ingediend op"
 
-#: open_inwoner/templates/pages/contactmoment/list.html:55
+#: open_inwoner/templates/pages/contactmoment/list.html:69
 msgid "Vraag nummer"
 msgstr "Vraagnummer"
 
-#: open_inwoner/templates/pages/contactmoment/list.html:58
-#: open_inwoner/templates/pages/contactmoment/list.html:59
+#: open_inwoner/templates/pages/contactmoment/list.html:72
+#: open_inwoner/templates/pages/contactmoment/list.html:73
 #: open_inwoner/templates/pages/partials/question.html:20
 #: open_inwoner/templates/pages/partials/question.html:21
 msgid "Bekijk vraag"
@@ -7886,7 +7915,7 @@ msgid "Aangemaakt door"
 msgstr "Aangemaakt door"
 
 #: open_inwoner/templates/pages/plans/detail.html:30
-#: open_inwoner/templates/pages/plans/list.html:40
+#: open_inwoner/templates/pages/plans/list.html:55
 msgid "Deelnemers"
 msgstr "Deelnemers"
 
@@ -7951,11 +7980,11 @@ msgstr "Aanpassen"
 msgid "Terug naar "
 msgstr "Terug naar "
 
-#: open_inwoner/templates/pages/plans/list.html:31
+#: open_inwoner/templates/pages/plans/list.html:46
 msgid "Reset filters"
 msgstr "Reset filters"
 
-#: open_inwoner/templates/pages/plans/list.html:73
+#: open_inwoner/templates/pages/plans/list.html:88
 msgid "U heeft op dit moment nog geen samenwerkingsplannen."
 msgstr "U heeft op dit moment nog geen samenwerkingsplannen."
 
@@ -8086,20 +8115,20 @@ msgstr "Exporteer naar PDF"
 msgid "Terug naar mijn profiel"
 msgstr "Terug naar mijn profiel"
 
-#: open_inwoner/templates/pages/profile/appointments.html:6
+#: open_inwoner/templates/pages/profile/appointments.html:20
 msgid "Mijn balie-afspraken"
 msgstr "Mijn balie-afspraken"
 
-#: open_inwoner/templates/pages/profile/appointments.html:22
+#: open_inwoner/templates/pages/profile/appointments.html:36
 msgid "Tijd"
 msgstr "Tijd"
 
-#: open_inwoner/templates/pages/profile/appointments.html:24
+#: open_inwoner/templates/pages/profile/appointments.html:38
 msgid "Locatie"
 msgstr "Locatie"
 
-#: open_inwoner/templates/pages/profile/appointments.html:31
-#: open_inwoner/templates/pages/profile/appointments.html:32
+#: open_inwoner/templates/pages/profile/appointments.html:45
+#: open_inwoner/templates/pages/profile/appointments.html:46
 msgid "Wijzig of annuleer afspraak"
 msgstr "Wijzig of annuleer afspraak"
 
@@ -8481,7 +8510,7 @@ msgstr ""
 msgid "Download of monthly reports not supported."
 msgstr "Downloaden van maandoverzichten wordt niet ondersteund."
 
-#: open_inwoner/templates/pages/ssd/reports_base.html:11
+#: open_inwoner/templates/pages/ssd/reports_base.html:25
 #, python-format
 msgid ""
 "\n"
