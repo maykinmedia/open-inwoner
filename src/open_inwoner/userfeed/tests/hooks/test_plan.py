@@ -36,7 +36,7 @@ class FeedHookTest(TestCase):
         self.assertEqual(
             item.message,
             _("Plan deadline expires at {expire}").format(
-                expire=plan.end_date.strftime("%x")
+                expire=plan.end_date.strftime("%d-%m-%Y")
             ),
         )
         self.assertEqual(item.title, plan.title)
