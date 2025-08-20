@@ -136,3 +136,23 @@ class Subscription(models.Model):
 
         self._subscription = response_json["url"]
         self.save(update_fields=["_subscription"])
+
+    def deregister(self) -> None:
+        """
+        Deregisters the webhook from the notification component.
+        """
+        if not self._subscription:
+            return
+
+        if not self.notifications_api_config.notifications_api_service:
+            raise ImproperlyConfigured("No service for Notifications API configured")
+
+        client = self.notifications_api_config.get_client()
+        if not client:
+            raise ImproperlyConfigured("Could not build client for Notifications API")
+
+        response = client.delete(self._subscription)
+        response.raise_for_status()
+
+        self._subscription = ""
+        self.save(update_fields=["_subscription"])
