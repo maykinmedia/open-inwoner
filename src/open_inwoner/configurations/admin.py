@@ -1,5 +1,4 @@
 import logging
-from urllib.parse import urlparse
 
 from django import forms
 from django.conf import settings
@@ -7,8 +6,11 @@ from django.contrib import admin, messages
 from django.contrib.flatpages.admin import FlatPageAdmin
 from django.contrib.sites.admin import SiteAdmin
 from django.contrib.sites.models import Site
+from django.core import exceptions
 from django.core.exceptions import ValidationError
-from django.urls import Resolver404, resolve
+from django.core.validators import URLValidator
+from django.urls import resolve
+from django.urls.exceptions import Resolver404
 from django.utils.html import format_html, format_html_join
 from django.utils.translation import gettext_lazy as _
 
@@ -94,21 +96,20 @@ class SiteConfigurationAdminForm(forms.ModelForm):
         return custom_javascript
 
     def clean_redirect_to(self):
-        """Validate redirect_to field"""
-        redirect_to = self.cleaned_data.get("redirect_to")
+        redirect_to = self.cleaned_data["redirect_to"]
 
         if redirect_to:
-            # Check if it's a valid internal path
             if redirect_to.startswith("/"):
                 try:
                     resolve(redirect_to)
                 except Resolver404:
                     raise ValidationError(_("The entered path is invalid.")) from None
             else:
-                # Check if it's a valid URL
-                parsed = urlparse(redirect_to)
-                if not (parsed.scheme and parsed.netloc):
-                    raise ValidationError(_("The entered url is invalid."))
+                validate_url = URLValidator()
+                try:
+                    validate_url(redirect_to)
+                except exceptions.ValidationError:
+                    raise ValidationError(_("The entered url is invalid.")) from None
 
         return redirect_to
 
@@ -251,6 +252,7 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "notifications_plans_enabled",
                     "notifications_actions_enabled",
                     "email_verification_required",
+                    "email_verification_message",
                     "contact_phonenumber",
                     "contact_page",
                     "recipients_email_digest",
@@ -498,7 +500,6 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
         )
 
     def save_model(self, request, obj, form, change):
-        """Override save to report contrast ratio"""
         super().save_model(request, obj, form, change)
         self.report_contrast_ratio(request, obj)
 

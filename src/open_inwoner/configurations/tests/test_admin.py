@@ -14,12 +14,13 @@ from django_webtest import WebTest
 from maykin_2fa.test import disable_admin_mfa
 
 from open_inwoner.accounts.tests.factories import UserFactory
-from open_inwoner.configurations.admin import (
+
+from ..admin import (
     SiteConfigurationAdmin,
     SiteConfigurationAdminForm,
 )
-from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.configurations.validators import validate_javascript_file
+from ..models import SiteConfiguration
+from ..validators import validate_javascript_file
 
 
 @disable_admin_mfa()
@@ -32,6 +33,7 @@ class TestAdminSite(WebTest):
 
     def test_site_add_prevented_if_one_exists(self):
         """Test that adding a site is prevented if one already exists."""
+        # Make sure we have exactly one site
         initial_site_count = Site.objects.count()
         self.assertEqual(initial_site_count, 1)
 
@@ -50,13 +52,16 @@ class TestAdminSite(WebTest):
             reverse("admin:sites_site_change", args=[site.pk]), user=self.user
         )
 
+        # Verify the delete button is not present (text or link)
         self.assertNotIn("Delete", response.text)
         delete_url = reverse("admin:sites_site_delete", args=[site.pk])
         self.assertNotIn(delete_url, response.text)
 
+        # Try to access the delete page directly - should return 403 Forbidden
         response = self.app.get(delete_url, user=self.user, expect_errors=True)
         self.assertEqual(response.status_code, 403)
 
+        # Verify the site still exists
         self.assertTrue(Site.objects.filter(pk=site.pk).exists())
 
 
@@ -74,6 +79,9 @@ class TestAdminForm(WebTest):
         self.form["secondary_font_color"] = "#FFFFFF"
         self.form["accent_color"] = "#FFFFFF"
         self.form["accent_font_color"] = "#FFFFFF"
+        # django-jsonform requires JS to work properly and with Webtest the default
+        # value for ArrayFields is an empty string, causing it crash to when trying to parse
+        # that value as JSON
         self.form["recipients_email_digest"] = "[]"
 
     def test_valid_path_is_saved(self):
@@ -84,6 +92,7 @@ class TestAdminForm(WebTest):
         self.form.submit()
 
         config.refresh_from_db()
+
         self.assertEqual(config.redirect_to, "/accounts/login/")
 
     def test_invalid_path_is_not_saved(self):
@@ -94,6 +103,7 @@ class TestAdminForm(WebTest):
         response = self.form.submit()
 
         config.refresh_from_db()
+
         self.assertIsNone(config.redirect_to)
         self.assertEqual(
             response.context["errors"], [[_("The entered path is invalid.")]]
@@ -107,6 +117,7 @@ class TestAdminForm(WebTest):
         self.form.submit()
 
         config.refresh_from_db()
+
         self.assertEqual(config.redirect_to, "https://www.example.com")
 
     def test_invalid_url_is_not_saved(self):
@@ -117,10 +128,27 @@ class TestAdminForm(WebTest):
         response = self.form.submit()
 
         config.refresh_from_db()
+
         self.assertIsNone(config.redirect_to)
         self.assertEqual(
             response.context["errors"], [[_("The entered url is invalid.")]]
         )
+
+    def test_email_verification_requires_message(self):
+        """Test that email verification requires a message."""
+        config = SiteConfiguration.get_solo()
+
+        self.form["email_verification_required"] = True
+        self.form["email_verification_message"] = ""
+        response = self.form.submit()
+
+        self.assertIn(
+            "Email verification message cannot be empty if email verification is required",
+            response.text,
+        )
+
+        config.refresh_from_db()
+        self.assertFalse(config.email_verification_required)
 
 
 class CustomJavaScriptValidatorTests(TestCase):

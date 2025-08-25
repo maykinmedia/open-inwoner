@@ -13,8 +13,8 @@ Deployment aandachtspunten
 Nieuwe features
 ---------------
 
-* [:taiga-us:`3370`, :pr:`1888`]: Navigatiemenu-items correct weergegeven op verschillende schermbreedtes;
-  ``@gemeente-denhaag/side-navigation`` bijgewerkt naar ``4.0.2``, waardoor notificatiebadges in
+* [:taiga-us:`3370`, :pr:`1888`]: Navigatiemenu-items correct weergegeven op verschillende schermbreedtes; 
+  ``@gemeente-denhaag/side-navigation`` bijgewerkt naar ``4.0.2``, waardoor notificatiebadges in 
   navigatiemenu-items de rode indicator niet meer tonen.
 * [:taiga-us: `3406`, :pr:`1872`]: Het contactformulier wordt omgezet in een CMS-pagina.
   In plaats van één beschrijving heeft het contactformulier nu twee beschrijvingen, één voor
@@ -35,6 +35,8 @@ Nieuwe features
   ``rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId``. Deze flag staat
   standaard uit en moet expliciet aangezet worden voor een specifieke API set in het
   beheerscherm. Zie de documentatie onder "Open Zaak" voor verdere informatie.
+* [:taiga-issue: `3816`, :pr: `1865`]: Het e-mailverificatiebericht voor nieuwe gebruikers
+  is nu configureerbaar.
 
 Bugfixes
 --------

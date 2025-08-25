@@ -13,14 +13,15 @@ from django.views.generic import TemplateView, UpdateView
 from django_registration.backends.one_step.views import RegistrationView
 from furl import furl
 
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.models import KlantenSysteemConfig
 from open_inwoner.openklant.services import OpenKlant2Service, eSuiteKlantenService
 from open_inwoner.openklant.types import PartijUpdateData
+from open_inwoner.utils.text import html_tag_wrap_format
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from ...mail.verification import send_user_email_verification_mail
-from ...utils.text import html_tag_wrap_format
 from ...utils.url import get_next_url_from
 from ..forms import CustomRegistrationForm, NecessaryUserForm
 from ..models import Invite, OpenIDDigiDConfig, OpenIDEHerkenningConfig, User
@@ -262,12 +263,9 @@ class EmailVerificationUserView(LogMixin, LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        text = _(
-            "Er is een e-mail verstuurd naar {email}. Klik op de link in de mail om uw e-mailadres te bevestigen. "
-            "Heeft u geen e-mail ontvangen? Verstuur deze dan nog een keer via onderstaande knop."
-        )
+        config = SiteConfiguration.get_solo()
         ctx["verification_text"] = html_tag_wrap_format(
-            text, "strong", email=self.request.user.email
+            config.email_verification_message, "strong", email=self.request.user.email
         )
         ctx["button_text"] = _("Verstuur de e-mail opnieuw")
 

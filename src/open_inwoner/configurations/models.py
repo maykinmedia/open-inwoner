@@ -1,6 +1,7 @@
 import os
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.db.models.signals import post_save
@@ -431,6 +432,19 @@ class SiteConfiguration(SingletonModel):
         default=False,
         help_text=_("Whether to require users to verify their email address"),
     )
+    email_verification_message = models.TextField(
+        verbose_name=_("Email verification message"),
+        blank=True,
+        default=_(
+            "Er is een e-mail verstuurd naar {email}. Klik op de link in de mail om uw "
+            "e-mailadres te bevestigen. Heeft u geen e-mail ontvangen? Verstuur deze dan nog een "
+            "keer via onderstaande knop."
+        ),
+        help_text=_(
+            "The message for the user that they need to verify their email. Use the placeholder "
+            "{email} to insert the user's email."
+        ),
+    )
 
     # contact info
     contact_phonenumber = models.CharField(
@@ -663,6 +677,16 @@ class SiteConfiguration(SingletonModel):
 
     class Meta:
         verbose_name = _("Site Configuration")
+
+    def clean(self):
+        super().clean()
+
+        if self.email_verification_required and not self.email_verification_message:
+            raise ValidationError(
+                _(
+                    "Email verification message cannot be empty if email verification is required"
+                )
+            )
 
     def __str__(self):
         return str(_("Site Configuration"))
