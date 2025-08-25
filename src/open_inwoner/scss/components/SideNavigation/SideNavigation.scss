@@ -1,4 +1,5 @@
 // Styling is mostly coming from @gemeente-denhaag/side-navigation/dist/index.css
+@import '../Header/Header.scss';
 
 :root {
   --denhaag-side-navigation-mobile-display: flex !important;
@@ -7,7 +8,23 @@
 .side-navigation--oip {
   display: none;
 
+  // Make sure that the default outline is visible if
+  // --denhaag-focus-border is not defined.
+  .denhaag-side-navigation__link--focus,
+  .denhaag-side-navigation__link:focus-visible {
+    outline: var(--denhaag-focus-border, revert);
+  }
+
   @media (min-width: 768px) {
     display: grid;
+  }
+
+  .nl-number-badge {
+    position: relative;
+
+    &:after {
+      @extend %notification-dot;
+      content: '';
+    }
   }
 }

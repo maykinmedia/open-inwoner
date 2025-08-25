@@ -154,6 +154,14 @@
     .primary-navigation__list .primary-navigation__list-item {
       justify-content: flex-end;
 
+      /* Wide screens: show only first item */
+      @media (min-width: 1024px) {
+        &:not(:first-child, &--always-visible),
+        .indicator {
+          display: none;
+        }
+      }
+
       .nav-login__icon {
         [class*='icons'] {
           cursor: pointer;
