@@ -4,7 +4,6 @@ from django.utils.translation import gettext_lazy as _
 
 from django_webtest import WebTest
 from maykin_2fa.test import disable_admin_mfa
-from pyquery import PyQuery
 
 from open_inwoner.accounts.tests.factories import UserFactory
 
@@ -19,89 +18,39 @@ class TestAdminSite(WebTest):
     def setUpTestData(cls):
         cls.user = UserFactory(is_superuser=True, is_staff=True)
 
-    def test_delete_site_success(self):
-        site2 = Site.objects.create(id=2, domain="example2.com", name="example2")
+    def test_site_add_prevented_if_one_exists(self):
+        """Test that adding a site is prevented if one already exists."""
+        # Make sure we have exactly one site
+        initial_site_count = Site.objects.count()
+        self.assertEqual(initial_site_count, 1)
 
-        # delete site
         response = self.app.get(
-            reverse("admin:sites_site_delete", kwargs={"object_id": site2.id}),
-            user=self.user,
+            reverse("admin:sites_site_add"), user=self.user, expect_errors=True
         )
-        response = response.form.submit().follow()
 
-        # check sites
-        sites = Site.objects.all()
-        self.assertEqual(len(sites), 1)
+        self.assertEqual(response.status_code, 403)
 
-        # check message
-        doc = PyQuery(response.content)
+        self.assertEqual(Site.objects.count(), initial_site_count)
 
-        success_msg = doc.find(".success").text()
-        self.assertIn("met succes verwijderd.", success_msg)
+    def test_site_deletion_prevented(self):
+        """Test that site deletion is prevented."""
+        site = Site.objects.get()
 
-    def test_delete_last_site_fail(self):
-        # attempt to delete site
         response = self.app.get(
-            reverse("admin:sites_site_delete", kwargs={"object_id": 1}), user=self.user
+            reverse("admin:sites_site_change", args=[site.pk]), user=self.user
         )
-        response = response.form.submit().follow()
 
-        # check sites
-        sites = Site.objects.all()
-        self.assertEqual(len(sites), 1)
+        # Verify the delete button is not present (text or link)
+        self.assertNotIn("Delete", response.text)
+        delete_url = reverse("admin:sites_site_delete", args=[site.pk])
+        self.assertNotIn(delete_url, response.text)
 
-        # check message
-        doc = PyQuery(response.content)
+        # Try to access the delete page directly - should return 403 Forbidden
+        response = self.app.get(delete_url, user=self.user, expect_errors=True)
+        self.assertEqual(response.status_code, 403)
 
-        warning_msg = doc.find(".warning").text()
-        self.assertEqual(warning_msg, _("You cannot delete the last site."))
-
-    def test_bulk_delete_success(self):
-        site2 = Site.objects.create(id=2, domain="example2.com", name="example2")
-        site3 = Site.objects.create(id=3, domain="example3.com", name="example3")
-
-        # delete sites
-        data = {"action": "delete_selected", "_selected_action": [site2.pk, site3.pk]}
-        response = self.app.post(
-            reverse("admin:sites_site_changelist"), data, user=self.user
-        )
-        response = response.form.submit().follow()  # confirmation form
-
-        # check sites
-        sites = Site.objects.all()
-        self.assertEqual(len(sites), 1)
-
-        # check message
-        doc = PyQuery(response.content)
-
-        success_msg = doc.find(".success").text()
-        self.assertEqual(success_msg, "2 websites met succes verwijderd.")
-
-    def test_bulk_delete_fail(self):
-        Site.objects.create(id=2, domain="example2.com", name="example2")
-        Site.objects.create(id=3, domain="example3.com", name="example3")
-
-        # attempt to delete sites
-        data = {
-            "action": "delete_selected",
-            "_selected_action": [site.pk for site in Site.objects.all()],
-        }
-        response = self.app.post(
-            reverse("admin:sites_site_changelist"), data, user=self.user
-        ).follow()
-
-        # check sites
-        sites = Site.objects.all()
-        self.assertEqual(len(sites), 3)
-
-        # check message
-        doc = PyQuery(response.content)
-
-        warning_msg = doc.find(".warning").text()
-        self.assertEqual(
-            warning_msg,
-            _("You cannot delete all websites; at least one site must remain."),
-        )
+        # Verify the site still exists
+        self.assertTrue(Site.objects.filter(pk=site.pk).exists())
 
 
 @disable_admin_mfa()
