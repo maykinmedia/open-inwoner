@@ -1,23 +1,20 @@
 from unittest.mock import patch
 
 from django.contrib import messages
-from django.contrib.auth.models import AnonymousUser
 from django.core import mail
-from django.test import modify_settings
-from django.urls import reverse
+from django.test import modify_settings, override_settings
 from django.utils.translation import gettext as _
 
 import requests_mock
 from django_webtest import WebTest
 
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.cms.tests.cms_tools import create_apphook_page
 from open_inwoner.openklant.api_models import KlantContactRol
 from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.models import (
-    ContactFormSubject,
     ESuiteKlantConfig,
     KlantenSysteemConfig,
-    OpenKlant2Config,
 )
 from open_inwoner.openklant.tests.data import MockAPICreateData
 from open_inwoner.openklant.tests.factories import (
@@ -25,9 +22,10 @@ from open_inwoner.openklant.tests.factories import (
     OpenKlant2ConfigFactory,
 )
 from open_inwoner.openklant.views.contactform import ContactFormView
-from open_inwoner.openzaak.tests.factories import ServiceFactory
 from open_inwoner.utils.test import ClearCachesMixin, DisableRequestLogMixin
 from open_inwoner.utils.tests.helpers import AssertFormMixin, AssertTimelineLogMixin
+
+from ..cms_apps import OpenklantApphook
 
 
 @requests_mock.Mocker()
@@ -43,6 +41,7 @@ from open_inwoner.utils.tests.helpers import AssertFormMixin, AssertTimelineLogM
     autospec=True,
     return_value=("", 42),
 )
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class ContactFormIntegrationTest(
     ClearCachesMixin,
     AssertTimelineLogMixin,
@@ -56,7 +55,11 @@ class ContactFormIntegrationTest(
     def setUpTestData(cls):
         super().setUpTestData()
 
-        cls.url = reverse("contactform")
+        cls.page = create_apphook_page(OpenklantApphook, title="Contactformulier")
+
+        # Use the page's absolute URL directly; apphook namespaces
+        # are not automatically registered in test environments
+        cls.url = cls.page.get_absolute_url()
 
     def setUp(self):
         super().setUp()
@@ -76,88 +79,17 @@ class ContactFormIntegrationTest(
         klant_config.save()
 
         # bypass CMS for rendering form template directly via ContactFormView
-        ContactFormView.template_name = "pages/contactform/form.html"
+        ContactFormView.template_name = "cms/contactform/form_inner.html"
 
-    def test_contactform_configuration_esuite(self, m, mock_captcha, mock_send_confirm):
-        # use cleared (from setUp()
-        klant_config = KlantenSysteemConfig.get_solo()
-        esuite_config = ESuiteKlantConfig.get_solo()
-
-        self.assertFalse(klant_config.has_contactform_configuration)
-
-        # set email on glogal config and create subject for eSuite backend
-        klant_config.register_contact_email = "example@example.com"
-        ContactFormSubjectFactory(esuite_config=esuite_config)
-
-        self.assertTrue(klant_config.has_contactform_configuration)
-
-        # subject but nothing else
-        klant_config.register_contact_email = ""
-        self.assertFalse(klant_config.has_contactform_configuration)
-
-        # API and subject
-        esuite_config.register_contact_moment = True
-        esuite_config.register_bronorganisatie_rsin = "123456789"
-        esuite_config.klanten_service = ServiceFactory()
-        esuite_config.contactmomenten_service = ServiceFactory()
-        esuite_config.register_type = "Melding"
-        esuite_config.register_employee_id = "FooVonBar"
-        esuite_config.save()
-
-        self.assertTrue(klant_config.has_contactform_configuration)
-
-        mock_send_confirm.assert_not_called()
-
-    def test_contactform_configuration_openklant(
-        self, m, mock_captcha, mock_send_confirm
-    ):
-        klant_config = KlantenSysteemConfig.get_solo()
-        klant_config.primary_backend = KlantenServiceType.OPENKLANT2.value
-        klant_config.save()
-
-        test_cases = [
-            ("example@example.com", ServiceFactory(), "esuite-code", False),
-            ("example@example.com", ServiceFactory(), None, True),
-            ("example@example.com", None, "esuite-code", False),
-            ("example@example.com", None, None, True),
-            ("", ServiceFactory(), "esuite-code", False),
-            ("", ServiceFactory(), None, True),
-            ("", None, "esuite-code", False),
-            ("", None, None, False),
-        ]
-        for email, service, esuite_code, result in test_cases:
-            with self.subTest(email=email, service=service, esuite_code=esuite_code):
-                klant_config.register_contact_email = email
-                klant_config.save()
-
-                openklant_config = OpenKlant2Config.get_solo()
-                openklant_config.service = service
-                openklant_config.save()
-
-                ContactFormSubjectFactory(
-                    subject="Aanvraag", esuite_subject_code=esuite_code
-                )
-
-                self.assertEqual(klant_config.has_contactform_configuration, result)
-
-                # clear DB for next subtest
-                ContactFormSubject.objects.all().delete()
-
-        mock_send_confirm.assert_not_called()
-
-    def test_no_form_shown_if_no_contactform_configuration(
+    def test_no_form_shown_if_contactform_not_enabled(
         self, m, mock_captcha, mock_send_confirm
     ):
         MockAPICreateData.setUpServices()
 
-        # set nothing
-        anon_user = AnonymousUser()
         klant_config = KlantenSysteemConfig.get_solo()
-        self.assertFalse(klant_config.has_contactform_configuration)
+        self.assertFalse(klant_config.contact_registration_enabled)
 
-        response = self.app.get(self.url)
-        self.assertContains(response, _("Contact formulier niet geconfigureerd."))
-        self.assertEqual(0, len(response.pyquery("#contactmoment-form")))
+        self.app.get(self.url, status=404)
 
     def test_anon_form_requires_either_email_or_phonenumber(
         self, m, mock_captcha, mock_send_confirm
@@ -323,6 +255,8 @@ class ContactFormIntegrationTest(
     def test_register_contactmoment_for_anon_user_via_api_esuite(
         self, m, mock_captcha, mock_send_confirm
     ):
+        """Check `_get_kcm_subject` fallback logic for esuite subject codes"""
+
         MockAPICreateData.setUpServices()
 
         config = KlantenSysteemConfig.get_solo()

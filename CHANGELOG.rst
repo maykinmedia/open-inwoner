@@ -9,6 +9,10 @@ Nieuwe features
 * [:taiga-us:`3370`, :pr:`1888`]: Navigatiemenu-items correct weergegeven op verschillende schermbreedtes; 
   ``@gemeente-denhaag/side-navigation`` bijgewerkt naar ``4.0.2``, waardoor notificatiebadges in 
   navigatiemenu-items de rode indicator niet meer tonen.
+* [:taiga-us: `3406`, :pr:`1872`]: Het contactformulier wordt omgezet in een CMS-pagina.
+  In plaats van één beschrijving heeft het contactformulier nu twee beschrijvingen, één voor
+  geauthenticeerde en één voor anonieme gebruikers. De oude beschrijving wordt naar beide
+  nieuwe velden gekopieerd. Pas één of beide beschrijvingen naar behoefte aan.
 
 Bugfixes
 --------
@@ -18,7 +22,13 @@ Bugfixes
 Onderhoud
 ---------
 
-* [:cve:`CVE-2024-53899`, :pr:`1892`] ``virtualenv`` bijgewerkt naar versie ``20.34.0``. 
+* [:cve:`CVE-2024-53899`, :pr:`1892`] ``virtualenv`` bijgewerkt naar versie ``20.34.0``.
+
+Deployment aandachtspunten
+--------------------------
+
+* Het contactformulier is omgezet naar een CMS pagina. Verifieer na deployment de beschrijvingen van het
+  contactformulier.
 
 1.34.0 (2025-09-03)
 ===================

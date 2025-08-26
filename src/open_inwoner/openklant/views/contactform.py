@@ -3,6 +3,7 @@ import logging
 from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import ImproperlyConfigured
+from django.http import Http404
 from django.urls import reverse
 from django.utils.encoding import iri_to_uri
 from django.utils.functional import cached_property
@@ -31,8 +32,19 @@ logger = logging.getLogger(__name__)
 
 
 class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
+    """
+    View for handling the sumission of contact forms
+
+    Note on CMS-integration:
+
+    The template rendered by the view is the "outer" form template
+    containing {% placeholder %} used by Django CMS; the inner template
+    containing the actual form is rendered by `ContactFormPlugin` (enriched
+    with content editable via the plugin)
+    """
+
     form_class = ContactForm
-    template_name = "pages/contactform/form_wrap.html"  # inner ("structure") template rendered by CMS plugin
+    template_name = "cms/contactform/form_outer.html"
     klanten_config = KlantenSysteemConfig
     klanten_client: KlantenClient | None
     vragen_service: OpenKlant2Service | eSuiteVragenService | None
@@ -52,6 +64,11 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
                 self.vragen_service = OpenKlant2Service()
             case _:
                 logger.info("No klanten/vragen service configured for contactform")
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.klanten_config.contact_registration_enabled:
+            raise Http404("Contact form is not configured")
+        return super().dispatch(request, *args, **kwargs)
 
     @cached_property
     def crumbs(self):
@@ -99,15 +116,6 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
                 }
             )
         return initial
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        context["has_form_configuration"] = (
-            self.klanten_config.has_contactform_configuration
-        )
-
-        return context
 
     def set_result_message(self, success: bool):
         if success:
