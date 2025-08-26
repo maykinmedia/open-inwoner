@@ -81,6 +81,9 @@ DATABASES = {
 GEOS_LIBRARY_PATH = config("GEOS_LIBRARY_PATH", None)
 GDAL_LIBRARY_PATH = config("GDAL_LIBRARY_PATH", None)
 
+# Custom JavaScript feature flag
+ALLOW_CUSTOM_JS = config("ALLOW_CUSTOM_JS", default=False)
+
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",

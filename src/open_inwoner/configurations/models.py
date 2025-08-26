@@ -20,7 +20,7 @@ from ..utils.fields import CSSField
 from ..utils.files import OverwriteStorage
 from ..utils.validators import DutchPhoneNumberValidator, FilerExactImageSizeValidator
 from .choices import ColorTypeChoices, CustomFontName, OpenIDDisplayChoices
-from .validators import validate_oidc_config
+from .validators import validate_javascript_file, validate_oidc_config
 
 
 class SiteConfiguration(SingletonModel):
@@ -637,6 +637,28 @@ class SiteConfiguration(SingletonModel):
         help_text=_("Link to which ./well-known/security.txt will redirect to"),
         blank=False,
         null=False,
+    )
+    custom_javascript = models.FileField(
+        verbose_name=_("Custom JavaScript"),
+        upload_to="custom_scripts/",
+        blank=True,
+        null=True,
+        validators=[
+            FileExtensionValidator(allowed_extensions=["js"]),
+            validate_javascript_file,
+        ],
+        help_text=_(
+            "Upload a custom JavaScript file (.js) that will be loaded on every page."
+        ),
+    )
+    # Checkbox to "add script dangerously"
+    custom_javascript_confirmed = models.BooleanField(
+        verbose_name=_("I confirm I understand the risks of adding custom Javascript"),
+        default=False,
+        help_text=_(
+            "Let op: Custom JavaScript kan de beveiliging en prestaties van de applicatie negatief beïnvloeden. Door het aanvinken van deze optie bevestig ik dat ik de "
+            "mogelijke risico’s begrijp en – indien nodig – dit heb afgestemd met de security-afdeling voordat ik deze inlaad. Het aanvinken van deze optie is noodzakelijk om de Javascript daadwerkelijk te tonen."
+        ),
     )
 
     class Meta:

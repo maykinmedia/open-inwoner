@@ -18,6 +18,7 @@ a:link,
 a:visited {
   color: $color_link;
 }
+
 a:focus,
 a:hover {
   color: $color_link_hover;
@@ -87,8 +88,10 @@ div.breadcrumbs {
   a:hover {
     color: $color_link !important;
   }
+
   li.selected a {
     color: $color_link !important;
+
     &:focus,
     &:hover {
       color: $color_primary !important;
@@ -136,6 +139,7 @@ a.button {
   color: $color_lightest;
   /* border: 2px solid $color_dark; */
 }
+
 .button:active,
 input[type='submit']:active,
 input[type='button']:active,
@@ -147,11 +151,13 @@ input[type='submit']:hover,
 input[type='button']:hover {
   background: $color_primary_dark;
 }
+
 .button.default,
 input[type='submit'].default,
 .submit-row input.default {
   background: $color_primary_dark;
 }
+
 .button.default:active,
 input[type='submit'].default:active,
 .button.default:focus,
@@ -165,9 +171,11 @@ input[type='submit'].default:hover {
   form {
     input[type='submit'] {
     }
+
     .cancel-link {
       background: $color_primary_light;
       color: $color_lightest;
+
       &:active,
       &:focus,
       &:hover {
@@ -194,6 +202,7 @@ input[type='submit'].default:hover {
       &:active {
         background: $color_primary !important;
       }
+
       &:focus,
       &:hover {
         background: $color_primary_dark !important;
@@ -205,6 +214,7 @@ input[type='submit'].default:hover {
     }
   }
 }
+
 .calendarbox h2 {
   background: $color_secondary_dark !important;
   color: $color_dark !important;
@@ -215,11 +225,13 @@ input[type='submit'].default:hover {
   a:active {
     background: $color_primary !important;
   }
+
   a:focus,
   a:hover {
     background: $color_primary_dark !important;
   }
 }
+
 .module.clockbox h2 {
   /* Match the clock widget with the calendar widget */
   background: $color_secondary_dark !important;
@@ -232,16 +244,20 @@ input[type='submit'].default:hover {
   background: url('../img/admin/plus-square-regular.svg') 0 0/14px 14px
     no-repeat;
 }
+
 .changelink,
 .inlinechangelink {
   background: url('../img/admin/edit-regular.svg') 0 0/14px 14px no-repeat;
 }
+
 .deletelink {
   background: url('../img/admin/trash-alt-regular.svg') 0 0/14px 14px no-repeat;
 }
+
 .datetimeshortcuts .clock-icon {
   background: url('../img/admin/clock-regular.svg') 0 0/14px 14px no-repeat !important;
 }
+
 .datetimeshortcuts .date-icon {
   background: url('../img/admin/calendar-alt-regular.svg') 0 0/14px 14px
     no-repeat !important;
@@ -251,6 +267,7 @@ input[type='submit'].default:hover {
 .login .version {
   text-align: center;
 }
+
 .version {
   color: $color_secondary_dark;
   font-size: smaller;
@@ -343,12 +360,40 @@ form div.help {
     font-size: 95%;
   }
 }
+
 .css-properties-table {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-column-gap: 2em;
+
   &__column {
     font-family: monospace;
     font-size: 95%;
+  }
+}
+
+// Custom JavaScript status indicators in Django admin
+.js-enabled {
+  color: $color-success;
+  font-weight: 500;
+
+  &::before {
+    content: '✓ ';
+    font-weight: bold;
+  }
+}
+
+.js-disabled {
+  color: $color-warning;
+  font-weight: 500;
+  padding: 8px 12px;
+  background-color: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 4px;
+  display: inline-block;
+
+  &::before {
+    content: '⚠ ';
+    font-weight: bold;
   }
 }
