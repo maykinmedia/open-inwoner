@@ -100,6 +100,7 @@ class CustomTimelineLogAdmin(ExportMixin, TimelineLogAdmin):
         "object_id",
         "get_action_flag",
         "message",
+        "get_log_level",
     ]
     list_filter = [
         "timestamp",
@@ -143,6 +144,13 @@ class CustomTimelineLogAdmin(ExportMixin, TimelineLogAdmin):
     def message(self, obj):
         return obj.extra_data.get("message") if obj.extra_data else ""
 
+    def get_log_level(self, obj):
+        if obj.extra_data and "log_level" in obj.extra_data:
+            log_level = obj.extra_data.get("log_level")
+            if log_level is not None:
+                return logging.getLevelName(log_level)
+        return ""
+
     def object_link(self, obj):
         if not obj.extra_data:
             return ""
@@ -172,6 +180,7 @@ class CustomTimelineLogAdmin(ExportMixin, TimelineLogAdmin):
 
     get_action_flag.short_description = _("Actie")
     message.short_description = _("Bericht")
+    get_log_level.short_description = _("Log Level")
     object_link.short_description = _("Object")
 
     def has_add_permission(self, request):
