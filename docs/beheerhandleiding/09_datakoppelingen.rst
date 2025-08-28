@@ -303,14 +303,9 @@ Om de notificaties van de componentconfiguratie in te stellen volgt u het volgen
 
 2) Update Notificaties componentconfiguratie (/admin/notifications_api_common/notificationsconfig/) Selecteer de bovenstaande service.
 
-3) Creëer een Webhook-abonnement (/admin/notifications_api_common/subscription/) De Callback-url is het OIP domein met het volgende pad: /api/openzaak/notifications/webhook/zaken. Bijvoorbeeld: https://open-inwoner.gemeente.nl/api/openzaak/notifications/webhook/zaken
+3) De Configuratie 'Open Zaak' moet worden ingesteld voor Zaken (ZRC), Catalogus (ZTC) en Documenten (DRC). (/admin/openzaak/openzaakconfig/) Selecteer in eSuite ook "Maak gebruik van StatusType.informeren workaround (eSuite)".
 
-De Client-ID en Client-secret kunnen arbitrair zijn, maar de Client-secret moet moeilijk te raden zijn. Het veld ‘kanalen’ moet de Zaken bevatten.
-Sla op en registreer de Webhook explciet door het in de lijst te selecteren en te klikken op [Webhook registreren]. De NRC-API zal worden gebruikt om de Webhook te registreren. Zodra deze met succes is geregistreerd zal de Webhook een URL set krijgen waarmee men zich kan abonneren.
-
-4) De Configuratie 'Open Zaak' moet worden ingesteld voor Zaken (ZRC), Catalogus (ZTC) en Documenten (DRC). (/admin/openzaak/openzaakconfig/) Selecteer in eSuite ook "Maak gebruik van StatusType.informeren workaround (eSuite)".
-
-5) Configureer in eSuite de Zaaktypes (/admin/openzaak/zaaktypeconfig/) Selecteer de Zaaktypes en InformatieObjectTypes en configureer de bijbehorende notificatieopties. Er is een cronjob om deze catalogus te importeren. Dit commando kan te allen tijde worden uitgevoerd python src/manage.py zgw_import_data (from the virtual env)
+4) Configureer in eSuite de Zaaktypes (/admin/openzaak/zaaktypeconfig/) Selecteer de Zaaktypes en InformatieObjectTypes en configureer de bijbehorende notificatieopties. Er is een cronjob om deze catalogus te importeren. Dit commando kan te allen tijde worden uitgevoerd python src/manage.py zgw_import_data (from the virtual env)
 
 9.8. Objects API client configuration
 =====================================
@@ -468,7 +463,44 @@ Bij Statusvertalingen kunt u de statussen personaliseren. Zo kunt u standaardtek
 9.17. Webhook-abonnementen
 ==========================
 
-Bij Webhook-abonnementen kunt u instellen dat u alle notificaties van een bepaald kanaal (zaken/documenten/besluiten) terug ontvangt van open zaak of eSuite.
+Bij Webhook-abonnementen kunt u instellen dat u alle notificaties van een bepaald kanaal (zaken/documenten/besluiten) van open zaak of eSuite terug ontvangt.
+In het overzicht van webhook-abonnementen kunt u zien welke webhook-abonnementen zijn ingesteld.
+
+.. image:: images/Screenshot_OIP_Datakoppelingen_Webhook-Abonnementen_overzicht_Djuzz_250828.png
+   :width: 624px
+
+9.17.1. Webhook-abonnement aanmaken
+--------------------------------------
+
+U kunt een webhook abonnement aanmaken door op de button [webhook-abonnement toevoegen] te klikken. Er wordt dan een nieuw venster geopend waar u het webhook-abonnement kunt configureren.
+
+
+.. image:: images/Screenshot_OIP_Datakoppelingen_Webhook-Abonnementen_Djuzz_250828.png
+   :width: 624px
+
+**Notifications api confi**
+Hier selecteert u de API voor de betreffende notificaties. U kunt ook een nieuwe API toevoegen. (/admin/notifications_api_common/subscription/) 
+
+**Callback URL**
+De Callback-url is het domein van het Open Inwoner Platform waar de meldingen van het webhook-abonnement met het pad /api/openzaak/notifications/webhook/zaken naartoe moeten worden gestuurd. Bijvoorbeeld: https://open-inwoner.gemeente.nl/api/openzaak/notifications/webhook/zaken
+
+**Client ID**
+Dit is het client ID om het authenticator token samen te stellen. 
+
+**Client secret**
+Client ID en Client-secret kunnen arbitrair zijn, maar de Client-secret moet moeilijk te raden zijn. 
+
+**Kanalen**
+Bij kanalen vult u de Zaken in waarop u zich wilt abonneren. U kunt meerdere Zaken selecteren door ze te scheiden met een komma (,).
+
+Wanneer alle velden zijn ingevuld klikt u op [Opslaan]. Hierna dient u de Webhook te registreren explciet door het in de lijst te selecteren en te klikken op [Webhook registreren]. De NRC-API zal worden gebruikt om de Webhook te registreren. U kunt Onder het menu item Overige/diverse onder 'tasks' controleren of de webhook correct is geregistreerd. Indien dit het geval is, komt er tussen de taken de specifieke taak te staan van de betreffende notificatie. Deze achtergrondtaken dragen de naam: open_inwoner.openzaak.tasks.process_zaken_notification. Ziet u deze taak vaak verschijnen, dan is de webhook succesvol geregistreerd.
+
+Let op! Zodra de webhook met succes is geregistreerd zal hij in het bovenstaande overzicht een URL set krijgen waarmee men zich kan abonneren. Blijft het veld onder nc-abonnement leeg, dan is de registratie niet gelukt.
+
+9.17.2. Webhook-abonnement verwijderen
+--------------------------------------
+
+Indien u een webhook-abonnement wilt verwijderen is het belangrijk dat de juiste volgorde in het verwijderproces wordt aangehouden. U dient allereerst de webhook te de-registreren. Vervolgens kunt u de webhook verwijderen door in het overzicht van webhooks op de knop [verwijderen] te klikken.
 
 9.18. Zaaktype configuraties
 ============================
