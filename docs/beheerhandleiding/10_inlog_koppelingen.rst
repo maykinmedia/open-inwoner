@@ -9,7 +9,7 @@ Bij inlog koppelingen kunt u de authenticatiemogelijkheden voor inwoners, bedrij
 10.1. Configuratie ‘Haal centraal’
 ==================================
 
-Dit dient ter configuratie van de BRP-integratie met de Open Inwoner omgeving. Hier kan de beheerder de Haal Centraal API die van toepassing is selecteren.
+Dit dient ter configuratie van de BRP-integratie met de Open Inwoner omgeving. Hier kan de beheerder de Haal Centraal API die van toepassing is selecteren. In het venster zijn twee onderdelen zichtbaar: Headers voor I Connect en Headers voor Centric. Welke velden u exact dient in te vullen is afhankelijk van welke leverancier u heeft. U vult of de velden in bij I Connect óf bij Centric. Voor meer informatie over de in te vullen velden verwijzen wij u graag door naar de documentatie van de betreffende leverancier.
 
 10.2. DigiD configuratie
 ========================
@@ -25,6 +25,23 @@ Dit is de configuratie voor de koppeling van het Open Inwoner platform met eHerk
 ======================
 
 Dit is de configuratie voor de koppeling van het Open Inwoner platform met de KVK. Om Mijn Bedrijven te kunnen gebruiken is het noodzakelijk om de KVK API in te stellen. Hierdoor worden – na het inloggen met eHerkenning - de gegevens van het bedrijf opgehaald en getoond en vooraf ingevuld. Om de KVK API in te kunnen stellen zijn de API key, een client certificate (SSL) en een server certificate (SSL) noodzakelijk.
+
+.. image:: images/Screenshot_OIP_inlogkoppelingen_KVKconfiguratie_Djuzz_250829.png
+   :width: 624px
+
+**API root**
+De API root is verschillend voor de testomgeving en de productieomgeving van Open Inwoner. Bij de testomgeving moet de root https://developers.kvk.nl/test/api/ zijn en bij de productieomgeving https://api.kvk.nl/api/v2 
+
+Let op! Er is een abonnement noodzakelijk om gebruik te kunnen maken van deze API. Meer informatie over de KVK API kunt u vinden op: https://developers.kvk.nl/documentation
+
+**API Key**
+De API Key ontvangt u wanneer u zich aanmeldt om gebruik te maken van de KVK API.
+
+**Client certificate**
+Het SSL-certificaat dat wordt gebruikt voor clientidentificatie. Dit veld kan leeg blijven.
+
+**Server certificate**
+Hier wordt het SSL/TLS certificaat van de server weergegeven.
 
 10.5. OpenID Connect configuratie voor DigiD
 ============================================
