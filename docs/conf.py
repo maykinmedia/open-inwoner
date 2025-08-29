@@ -41,6 +41,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.graphviz",
     "sphinx_tabs.tabs",
+    "sphinx.ext.extlinks",
     "recommonmark",
     # "sphinx_markdown_tables",
     "django_setup_configuration.documentation.setup_config_example",
@@ -118,3 +119,15 @@ linkcheck_ignore = [
     r"https?://stackoverflow\.com/.*",  # SO 403s when running on github actions :/
     r"http://es6-features\.org.*",  # old link
 ]
+
+extlinks = {
+    "taiga-us": ("https://taiga.maykinmedia.nl/project/open-inwoner/us/%s", "#%s"),
+    "taiga-is": ("https://taiga.maykinmedia.nl/project/open-inwoner/issue/%s", "#%s"),
+    "taiga-dimpact": (
+        "https://taiga.maykinmedia.nl/project/dimpact-enschede-ssc-ict-1/issue/%s",
+        "#dimpact-%s",
+    ),
+    "pr": ("https://github.com/maykinmedia/open-inwoner/pull/%s", "PR %s"),
+    "release": ("https://github.com/maykinmedia/open-inwoner/releases/tag/%s", "%s"),
+    "cve": ("https://cve.mitre.org/cgi-bin/cvename.cgi?name=%s", "%s"),
+}
