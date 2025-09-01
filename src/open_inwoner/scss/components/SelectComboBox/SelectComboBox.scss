@@ -1,0 +1,139 @@
+// Design-token values from node_modules/@open-inwoner/design-tokens/dist/css/index.css
+
+.oip-combobox {
+  display: var(--oip-combobox-display);
+  inline-size: var(--oip-combobox-inline-size);
+  max-inline-size: var(--oip-combobox-max-inline-size);
+  border: var(--oip-combobox-border-width) solid var(--oip-color-fg);
+  border-radius: var(--oip-combobox-border-radius);
+  position: var(--oip-combobox-position);
+  width: var(--oip-combobox-inline-size);
+
+  &__input {
+    border-color: var(--utrecht-textbox-border-color);
+    background-color: var(--utrecht-textbox-background-color);
+    color: var(--oip-color-fg);
+    padding-inline-start: var(--utrecht-textbox-padding-inline-start);
+    padding-inline-end: var(--utrecht-textbox-padding-inline-end);
+    padding-block-end: var(--utrecht-textbox-padding-block-end);
+    padding-block-start: var(--utrecht-textbox-padding-block-start);
+    width: calc(100% - (2 * var(--spacing-extra-large)));
+  }
+
+  .button {
+    color: var(--oip-color-fg);
+    position: absolute;
+    right: 2px;
+    top: 2px;
+
+    // Only rotate the dropdown button, not the clear button
+    &[aria-expanded='true'] {
+      transition: transform 0.3s;
+      transform: rotate(180deg);
+    }
+
+    &.button__icon-close {
+      transform: rotate(0deg);
+      transition: transform 0s;
+    }
+  }
+
+  &[aria-expanded='true'] {
+    border-radius: 6px 6px 0 0;
+
+    .oip-combobox__input {
+      border-radius: 6px 6px 0 0;
+    }
+  }
+
+  &__popover {
+    position: var(--oip-combobox-popover-position);
+    inset: var(--oip-combobox-popover-inset);
+    z-index: var(--oip-combobox-popover-z-index, 1);
+    overflow: var(--oip-combobox-popover-overflow);
+    block-size: var(--oip-combobox-popover-block-size);
+    inline-size: var(--oip-combobox-popover-inline-size);
+    border: none;
+    border-top: 1px solid var(--oip-color-fg);
+    border-top-color: var(--oip-color-fg);
+    border-radius: 0 0 4px 4px;
+    background-color: var(--oip-combobox-popover-background-color);
+    color: var(--oip-combobox-popover-color);
+    padding-inline-start: var(--oip-combobox-popover-padding-inline-start);
+    padding-inline-end: var(--oip-combobox-popover-padding-inline-end);
+    padding-block-end: var(--oip-combobox-popover-padding-block-end);
+    padding-block-start: var(--oip-combobox-popover-padding-block-start);
+
+    &--block-end {
+      inset-block-start: 100%;
+    }
+
+    &--hidden {
+      display: var(--oip-combobox-popover-hidden-display);
+    }
+  }
+}
+
+.utrecht-listbox {
+  // Overwrite some of the utrecht atom styles
+  max-block-size: var(--utrecht-listbox-max-block-size);
+  width: auto;
+
+  &__label {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  &__list {
+    margin-block-start: 0;
+    margin-block-end: 0;
+    padding-block-start: 0;
+    padding-block-end: 0;
+    padding-inline-start: 0;
+  }
+
+  &__option {
+    background-color: var(--utrecht-listbox-option-background-color);
+    min-height: var(--utrecht-listbox-option-min-block-size);
+    position: relative;
+    width: auto;
+    border-bottom: 1px solid var(--oip-color-fg-lighter);
+    padding-inline-start: var(--utrecht-listbox-option-padding-inline-start);
+    padding-inline-end: var(--utrecht-listbox-option-padding-inline-end);
+    padding-block-end: var(--utrecht-listbox-option-padding-block-end);
+    padding-block-start: var(--utrecht-listbox-option-padding-block-start);
+
+    &:hover {
+      background-color: var(--utrecht-listbox-option-active-background-color);
+      cursor: pointer;
+    }
+
+    &--selected {
+      border: var(--border-width-thin) solid var(--color-secondary);
+      border-left-width: 4px;
+      padding-inline-start: 12px;
+    }
+
+    &--active {
+      background-color: var(--utrecht-listbox-option-hover-background-color);
+    }
+  }
+
+  &__heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var();
+    font-size: var(--font-size-body);
+    font-weight: bold;
+    line-height: var(--font-line-height-body);
+    margin-bottom: var(--spacing-extra-large);
+
+    [class*='icons'] {
+      color: var(--color-secondary);
+    }
+  }
+}

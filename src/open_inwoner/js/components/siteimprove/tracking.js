@@ -156,6 +156,10 @@ const specificClickSelectors = {
     'Click',
     'Kies vestiging',
   ],
+  '#eherkenning-branch-form .oip-combobox .utrecht-listbox__content .utrecht-listbox__heading':
+    ['event', 'Inloggen vestigingen', 'Click', 'Kies deze vestiging'],
+  '#eherkenning-branch-form .oip-combobox .utrecht-listbox__content .utrecht-listbox__p':
+    ['event', 'Inloggen vestigingen', 'Click', 'Kies deze vestiging'],
   // Overwrite checkboxes
   '.form#change-notifications #id_cases_notifications:checked': [
     'event',

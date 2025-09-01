@@ -1,75 +1,49 @@
 {% extends "master.html" %}
-{% load i18n static custom_session_tags form_tags grid_tags button_tags card_tags button_tags %}
+{% load i18n static form_tags grid_tags button_tags card_tags kvk_tags %}
+
+{% block mount_modules %}
+    data-mount-modules='["kvkbranchselector"]'
+{% endblock %}
+
+{% block react_modules %}
+<script
+  type="module"
+  src="{% static 'bundles/open_inwoner-react.js' %}"
+></script>
+{% endblock %}
 
 {% block content %}
     {% render_grid %}
         {% render_column start=4 span=6 %}
-            <h1 class="utrecht-heading-1" id="title">{% trans "Log in" %}</h1>
-            <form method="POST" id="eherkenning-branch-form" class="form  form__choice-list">
+            {% if user.vestiging %}
+                <h1 class="utrecht-heading-1" id="title">{% trans "Wissel van vestiging" %}</h1>
+            {% else %}
+                <h1 class="utrecht-heading-1" id="title">{% trans "Log in" %}</h1>
+            {% endif %}
+
+            <form method="POST" id="eherkenning-branch-form" class="form">
                 {% csrf_token %}
                 {% if form.branch_number.errors %}
                     {% errors errors=form.branch_number.errors %}
                 {% endif %}
 
-                <ul class="choice-list choice-list--single">
-                    {# first only show option to select entire company in separate list-item #}
-                    <p><strong>{% trans "Log in namens rechtspersoon" %}</strong></p>
-                    {% with entire_company=company_branches.0 %}
-                        <li class="choice-list__item">
-                            <label class="choice-list__label">
-                                <input type="radio"
-                                       id="entire-company"
-                                       name="branch_number"
-                                       value=""
-                                       class="choice-list__radio"
-                                       {% if not user.vestiging %}checked{% endif %}>
-                                <div class="choice-list__content">
-                                    <h2 class="choice-list__heading">{{ entire_company.naam }}</h2>
-                                </div>
-                            </label>
-                        </li>
-                    {% endwith %}
-
-                    {% if company_branches|slice:"1:" %}
-                        <p><strong>{% trans "Of selecteer de vestiging waarmee u wilt inloggen" %}</strong></p>
-                        {% for branch in company_branches|slice:"1:" %}
-                            {% with company_id=branch.vestigingsnummer %}
-                                <li class="choice-list__item">
-                                    <label class="choice-list__label">
-                                        <input type="radio"
-                                               id="branch-{{ company_id }}"
-                                               name="branch_number"
-                                               value="{{ company_id }}"
-                                               class="choice-list__radio"
-                                               {% if user.vestiging == company_id %}checked{% endif %}>
-                                        <div class="choice-list__content">
-                                            <h2 class="choice-list__heading">{{ branch.naam }}</h2>
-                                            {% if company_id %}
-                                                <p class="choice-list__p">{% trans "Vestiging" %}: {{ company_id }}{% if branch.type == "hoofdvestiging" %} ({% trans "Hoofdvestiging" %}){% endif %}</p>
-                                            {% endif %}
-                                            {% if branch.adres.binnenlandsAdres.straatnaam %}
-                                                <p class="choice-list__p">{{ branch.adres.binnenlandsAdres.straatnaam }}</p>
-                                            {% endif %}
-                                            {% if branch.adres.binnenlandsAdres.plaats %}
-                                                <p class="choice-list__p">{{ branch.adres.binnenlandsAdres.plaats }}</p>
-                                            {% endif %}
-                                        </div>
-                                    </label>
-                                </li>
-                            {% endwith %}
-                        {% endfor %}
-                    {% endif %}
-
-                </ul>
+                {# React combobox with data only - translations handled by react-intl #}
+                <div
+                    data-react-module="kvkbranchselector"
+                    data-id="branch-selector"
+                    data-label="{% trans 'Selecteer de rechtspersoon of vestiging waarmee u wilt inloggen' %}"
+                    data-name="branch_number"
+                >
+                    <script type="application/json" id="branch-data">{% vestigingen_combox_data company_branches user.vestiging %}</script>
+                </div>
 
                 <div class="form__actions form__actions--fullwidth">
-                    {% button primary=True name="submit" text=_('Ga door') icon="east" icon_position="after" icon_outlined=True %}
+                    {% button primary=True name="submit" text=_('Ga door') title=_('Ga door met gekozen vestiging') icon="east" icon_position="after" icon_outlined=True extra_classes="button--disabled" %}
                     {% if user.vestiging %}
                         {% button href="profile:detail" icon="west" text=_("Terug naar huidige vestiging") icon_outlined=True transparent=True %}
                     {% endif %}
                 </div>
             </form>
-
         {% endrender_column %}
     {% endrender_grid %}
 {% endblock content %}

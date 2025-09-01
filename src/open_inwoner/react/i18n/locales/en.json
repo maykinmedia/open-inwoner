@@ -3,5 +3,20 @@
     "defaultMessage": "This is the current count",
     "description": "Counter",
     "originalDefault": "This is the current count"
+  },
+  "combobox.clear": {
+    "defaultMessage": "Clear",
+    "description": "Clear search button label",
+    "originalDefault": "Wissen"
+  },
+  "combobox.placeholder": {
+    "defaultMessage": "Enter name, address or branch number",
+    "description": "Placeholder text for branch search input",
+    "originalDefault": "Vul naam, adres of vestigingsnummer in..."
+  },
+  "combobox.toggle": {
+    "defaultMessage": "Toggle dropdown",
+    "description": "Toggle dropdown button label",
+    "originalDefault": "Toggle dropdown"
   }
 }

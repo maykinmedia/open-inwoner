@@ -166,10 +166,20 @@ class KvKViewsTestCase(TestCase):
         )
 
         doc = PyQuery(response.content)
-        branch_inputs = doc.find("[name='branch_number']")
 
-        # check that pseudo-branch representing company as a whole has been added
-        self.assertEqual(len(branch_inputs), 3)
+        # Verify JSON data structure embedded in script tag for React component
+        # React reads branch data from this JSON rather than parsing DOM elements
+        branch_data_script = doc.find("script#branch-data")
+        self.assertEqual(len(branch_data_script), 1)
+
+        # Parse the JSON data to verify it contains the expected branches
+        import json
+
+        branch_data = json.loads(branch_data_script.text())
+        branch_items = branch_data.get("items", [])
+
+        # Should have 3 items: entire company + 2 branches
+        self.assertEqual(len(branch_data["items"]), 3)
 
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     @patch(
@@ -250,20 +260,36 @@ class KvKViewsTestCase(TestCase):
 
         doc = PyQuery(response.content)
 
-        branch_inputs = doc.find("[name='branch_number']")
+        # Verify branch data is properly serialized as JSON for React consumption
+        branch_data_script = doc.find("script#branch-data")
+        self.assertEqual(len(branch_data_script), 1)
 
-        # check that pseudo-branch representing company as a whole has been added
-        self.assertEqual(len(branch_inputs), 2)
+        # Parse the JSON data to verify it contains the expected branches
+        import json
 
-        self.assertEqual(branch_inputs[0], doc.find("[id='entire-company']")[0])
-        self.assertEqual(branch_inputs[1], doc.find("[id='branch-1234']")[0])
+        branch_data = json.loads(branch_data_script.text())
+        branch_items = branch_data.get("items", [])
 
-        # chack that company name is displayed for every branch
-        company_name_displays = doc("h2:Contains('Makers and Shakers')")
-        self.assertEqual(len(company_name_displays), 2)
+        # Should have 2 items: entire company + 1 branch
+        self.assertEqual(len(branch_data["items"]), 2)
 
-        main_branch_display = doc("p:Contains('Hoofdvestiging')")
-        self.assertEqual(len(main_branch_display), 1)
+        # Verify the structure - first should be entire company, second should be the branch
+        self.assertEqual(branch_items[0]["id"], "rechtspersoon")
+        self.assertEqual(branch_items[1]["id"], "1234")
+
+        # Verify company name appears in both entries
+        self.assertEqual(branch_items[0]["label"], "Makers and Shakers")
+        self.assertEqual(branch_items[1]["label"], "Makers and Shakers")
+
+        # Verify the entire company has rechtspersoon indicator
+        self.assertEqual(
+            branch_items[0]["rechtspersoonInfo"],
+            "Selecteer de rechtspersoon (geen vestiging)",
+        )
+
+        # Verify the branch has vestiging info with hoofdvestiging indicator
+        self.assertIn("Hoofdvestiging", branch_items[1]["vestigingInfo"])
+        self.assertIn("1234", branch_items[1]["vestigingInfo"])
 
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     @patch(
@@ -300,18 +326,38 @@ class KvKViewsTestCase(TestCase):
 
         doc = PyQuery(response.content)
 
-        branch_inputs = doc.find("[name='branch_number']")
+        # Check for React component data instead of DOM inputs
+        branch_data_script = doc.find("script#branch-data")
+        self.assertEqual(len(branch_data_script), 1)
 
-        # check that pseudo-branch representing company as a whole has been added
-        self.assertEqual(len(branch_inputs), 3)
+        # Parse the JSON data to verify it contains the expected branches
+        import json
 
-        self.assertEqual(branch_inputs[0], doc.find("[id='entire-company']")[0])
-        self.assertEqual(branch_inputs[1], doc.find("[id='branch-1234']")[0])
-        self.assertEqual(branch_inputs[2], doc.find("[id='branch-5678']")[0])
+        branch_data = json.loads(branch_data_script.text())
+        branch_items = branch_data.get("items", [])
 
-        # chack that company name is displayed for every branch
-        company_name_displays = doc("h2:Contains('Makers and Shakers')")
-        self.assertEqual(len(company_name_displays), 3)
+        # Should have 3 items: entire company + 2 branches
+        self.assertEqual(len(branch_data["items"]), 3)
 
-        main_branch_display = doc("p:Contains('Hoofdvestiging')")
-        self.assertEqual(len(main_branch_display), 1)
+        # Verify the structure
+        self.assertEqual(branch_items[0]["id"], "rechtspersoon")
+        self.assertEqual(branch_items[1]["id"], "1234")  # hoofdvestiging
+        self.assertEqual(branch_items[2]["id"], "5678")  # nevenvestiging
+
+        # Verify company name appears in all entries
+        for item in branch_items:
+            self.assertEqual(item["label"], "Makers and Shakers")
+
+        # Verify the entire company has rechtspersoon indicator
+        self.assertEqual(
+            branch_items[0]["rechtspersoonInfo"],
+            "Selecteer de rechtspersoon (geen vestiging)",
+        )
+
+        # Verify the main branch has hoofdvestiging indicator in vestigingInfo
+        self.assertIn("Hoofdvestiging", branch_items[1]["vestigingInfo"])
+        self.assertIn("1234", branch_items[1]["vestigingInfo"])
+
+        # Verify the second branch has vestiging number but no hoofdvestiging indicator
+        self.assertIn("5678", branch_items[2]["vestigingInfo"])
+        self.assertNotIn("Hoofdvestiging", branch_items[2]["vestigingInfo"])
