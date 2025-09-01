@@ -18,6 +18,47 @@ export interface ComboBoxItem {
  * Searches for elements with data-react-module="kvkbranchselector" and initializes them.
  */
 export default class KVKBranchSelectorModule {
+  /**
+   * Creates a React element from current DOM state (for module Story)
+   */
+  static get root() {
+    // Read from DOM
+    const data = getJsonFromScriptTag<{
+      items: ComboBoxItem[]
+      selected_id?: string
+    }>('branch-data')
+
+    const rootElement = document.getElementById('react-kvkbranchselector')
+    const id = rootElement?.getAttribute('data-id') || 'select-combobox'
+    const label =
+      rootElement?.getAttribute('data-label') ||
+      'Selecteer de rechtspersoon of vestiging waarmee u wilt inloggen'
+    const name = rootElement?.getAttribute('data-name') || 'branch_number'
+
+    // Handle error cases (empty data)
+    if (!data || !data.items || data.items.length === 0) {
+      return (
+        <p
+          className="utrecht-paragraph"
+          style={{ color: 'var(--color-red-notification)' }}
+        >
+          Er is een probleem opgetreden bij het laden van de vestigingen.
+        </p>
+      )
+    }
+
+    // Return component
+    return (
+      <KVKBranchSelector
+        id={id}
+        label={label}
+        name={name}
+        branches={data.items}
+        selectedBranchId={data.selected_id}
+      />
+    )
+  }
+
   static async init(): Promise<void> {
     const intlProps = await getIntlProviderProps()
     const nodes = document.querySelectorAll<HTMLElement>(

@@ -29,7 +29,7 @@ const Counter: FC<CounterProps> = (props) => {
       <button
         className="button button--primary"
         style={{
-          backgroundColor: incrementBgColor || 'var(--oip-color-info-light)',
+          backgroundColor: incrementBgColor || 'var(--oip-color-info)',
         }}
         onClick={() => setCount(count + 1)}
       >
@@ -38,7 +38,7 @@ const Counter: FC<CounterProps> = (props) => {
       <button
         className="button button--secondary"
         style={{
-          backgroundColor: decrementBgColor || 'var(--oip-color-danger-light)',
+          backgroundColor: decrementBgColor || 'var(--oip-color-danger)',
         }}
         disabled={count <= 0}
         onClick={() => count >= 1 && setCount(count - 1)}

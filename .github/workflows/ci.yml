@@ -274,7 +274,13 @@ jobs:
         with:
           node-version: '18'
       - run: npm ci
+
+      # Build frontend assets first to generate CSS bundle
+      - run: npm run build
+
+      # Build Storybook with the CSS bundle available
       - run: npm run build-storybook
+
       - name: Upload Storybook build
         uses: actions/upload-artifact@v4
         with:

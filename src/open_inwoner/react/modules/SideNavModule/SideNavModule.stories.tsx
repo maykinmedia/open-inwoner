@@ -2,7 +2,7 @@ import { Meta, StoryObj } from '@storybook/react'
 import SideNavModule from './SideNavModule'
 
 const meta: Meta = {
-  title: 'React/SideNavModule',
+  title: 'React/Modules/SideNavModule',
   parameters: {
     layout: 'padded',
     docs: {

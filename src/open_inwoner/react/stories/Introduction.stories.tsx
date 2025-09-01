@@ -1,8 +1,12 @@
-import type { Meta } from '@storybook/react'
-// This page is an example of an unattached doc
+import type { Meta, StoryObj } from '@storybook/react'
 
-const meta: Meta = {
+// This page is an example of an unattached doc
+const DocsOnly = () => null
+
+const meta: Meta<typeof DocsOnly> = {
   title: 'Introduction',
+  component: DocsOnly,
+  tags: ['autodocs'],
   parameters: {
     docs: {
       page: () => (
@@ -16,8 +20,7 @@ const meta: Meta = {
         >
           <h1>Open Inwoner Design System</h1>
           <p>This is the documentation for our component system.</p>
-
-          <h2>What's included</h2>
+          <h2>What&apos;s included</h2>
           <ul>
             <li>Web components</li>
             <li>React components</li>
@@ -33,7 +36,6 @@ const meta: Meta = {
               </a>
             </li>
           </ul>
-
           <h2>Getting Started</h2>
           <p>
             Explore the components in the sidebar to see examples and
@@ -44,11 +46,12 @@ const meta: Meta = {
     },
   },
 }
-
 export default meta
 
+type Story = StoryObj<typeof DocsOnly>
+
 // Create an unattached docs page
-export const Docs = {
+export const Docs: Story = {
   parameters: {
     docs: {
       page: meta.parameters?.docs?.page,

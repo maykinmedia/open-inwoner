@@ -67,36 +67,59 @@ export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
     [branches, selectedId]
   )
 
+  // Generate display text for selected branch with distinguishing info
+  const getDisplayText = (branch: ComboBoxItem): string => {
+    if (branch.id === 'rechtspersoon') {
+      return `${branch.label} (Rechtspersoon)`
+    }
+    // For vestiging, include vestigingsnummer to distinguish from rechtspersoon
+    if (branch.vestigingsnummer) {
+      return `${branch.label} (${branch.vestigingsnummer})`
+    }
+    return branch.label
+  }
+
+  // Check if query matches the selected branch's display text exactly
+  const isSelectedBranchDisplayText = useMemo(() => {
+    if (!selectedBranch) return false
+    return query.trim() === getDisplayText(selectedBranch).trim()
+  }, [query, selectedBranch])
+
   // Filter branches based on debounced search query across all text fields
   // This expensive operation only runs after user stops typing for 300ms
   // Split query and make substrings-tolerant search
-  const filtered = useMemo(
-    () =>
-      branches.filter((b) => {
-        // Combine all searchable fields into one string
-        const searchText = [
-          b.label,
-          b.vestigingInfo,
-          b.rechtspersoonInfo,
-          b.addressInfo,
-          b.cityInfo,
-        ]
-          .filter(Boolean)
-          .join(' ')
-          .toLowerCase()
+  const filtered = useMemo(() => {
+    // If the query matches the selected branch display text exactly,
+    // show all branches (user wants to see options, not search)
+    if (isSelectedBranchDisplayText || debouncedQuery.trim() === '') {
+      return branches
+    }
 
-        // Split query into individual words (ignoring extra spaces)
-        const searchWords = debouncedQuery
-          .toLowerCase()
-          .trim()
-          .split(/\s+/)
-          .filter(Boolean)
+    return branches.filter((b) => {
+      // Combine all searchable fields into one string
+      const searchText = [
+        b.label,
+        b.vestigingInfo,
+        b.rechtspersoonInfo,
+        b.addressInfo,
+        b.cityInfo,
+        b.vestigingsnummer,
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase()
 
-        // Check if all search words appear as substrings somewhere in the combined text
-        return searchWords.every((word) => searchText.includes(word))
-      }),
-    [branches, debouncedQuery]
-  )
+      // Split query into individual words (ignoring extra spaces)
+      const searchWords = debouncedQuery
+        .toLowerCase()
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean)
+
+      // Check if all search words appear as substrings somewhere in the combined text
+      return searchWords.every((word) => searchText.includes(word))
+    })
+  }, [branches, debouncedQuery, isSelectedBranchDisplayText])
 
   // Show clear button when input contains text
   const hasText = query !== ''
@@ -104,7 +127,8 @@ export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
   const handleSelect = (id: string) => {
     const branch = branches.find((b) => b.id === id)
     setSelectedId(id)
-    setQuery(branch?.label || '')
+    // Use display text with distinguishing info
+    setQuery(branch ? getDisplayText(branch) : '')
     setIsOpen(false)
     inputRef.current?.focus()
   }
@@ -133,6 +157,7 @@ export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault()
+        // Always open dropdown and navigate
         if (!isOpen) {
           setIsOpen(true)
           setFocusedIndex(0)
@@ -145,6 +170,7 @@ export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
 
       case 'ArrowUp':
         e.preventDefault()
+        // Always open dropdown and navigate
         if (!isOpen) {
           setIsOpen(true)
           setFocusedIndex(0)
@@ -177,6 +203,18 @@ export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
     setFocusedIndex(0)
   }
 
+  const handleInputClick = () => {
+    // Always open dropdown when clicking in the input
+    setIsOpen(true)
+    setFocusedIndex(0)
+  }
+
+  const handleInputFocus = () => {
+    // Always open dropdown when focusing the input
+    setIsOpen(true)
+    setFocusedIndex(0)
+  }
+
   // Close dropdown when clicking outside component
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -197,12 +235,12 @@ export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
     }
   }, [isOpen, containerRef])
 
-  // Initialize input with selected branch name
+  // Initialize input with selected branch name when selection changes
   useEffect(() => {
-    if (selectedBranch && !query) {
-      setQuery(selectedBranch.label)
+    if (selectedBranch) {
+      setQuery(getDisplayText(selectedBranch))
     }
-  }, [selectedBranch, query])
+  }, [selectedId]) // Only run when selectedId changes, not when query changes
 
   // Scroll focused option into view for keyboard navigation
   useEffect(() => {
@@ -268,10 +306,8 @@ export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
           role="combobox"
           value={query}
           onChange={handleInputChange}
-          onFocus={() => {
-            setIsOpen(true)
-            setFocusedIndex(0)
-          }}
+          onClick={handleInputClick}
+          onFocus={handleInputFocus}
           onKeyDown={handleKeyDown}
           aria-expanded={isOpen}
           aria-controls={`${id}-listbox`}
@@ -332,7 +368,7 @@ export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
                     'utrecht-listbox__option--active': focusedIndex === i,
                   })}
                   onMouseDown={(e) => {
-                    // After selection, close popover
+                    // Use onMouseDown to fire before click-outside handler
                     e.preventDefault()
                     e.stopPropagation()
                     handleSelect(item.id)

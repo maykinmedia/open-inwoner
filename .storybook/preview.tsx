@@ -1,9 +1,12 @@
 import type { Preview } from '@storybook/react'
 import type { StoryFn } from '@storybook/react'
 
+// NLDS keys
+// @ts-expect-error - CSS imports handled by bundler
 import '@open-inwoner/design-tokens/dist/css/index.css'
-// Use this ↓ for OIP components and NLDS components thst we have set values for
-// import '../src/open_inwoner/static/bundles/open_inwoner-css.css';
+// NLDS values
+// @ts-expect-error
+import '../src/open_inwoner/static/bundles/open_inwoner-css.css';
 
 const withThemeClass = (Story: StoryFn) => {
   document.body.classList.add('openinwoner-theme')

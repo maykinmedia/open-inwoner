@@ -14,3 +14,10 @@
     overflow: hidden;
   }
 }
+
+.utrecht-form-label {
+  // TODO: NLDS community does not have values for this yet
+  display: inline-block;
+  font-family: var(--utrecht-document-font-family), sans-serif;
+  margin-block-end: var(--spacing-large);
+}

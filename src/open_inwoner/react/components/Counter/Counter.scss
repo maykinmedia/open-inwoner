@@ -3,33 +3,22 @@
   font-family: var(--utrecht-document-font-family), sans-serif;
   font-size: var(--oip-text-big-font-size, 2em);
   padding: 1em;
+
+  .button {
+    border-radius: 6px;
+    font-family: var(--utrecht-document-font-family), sans-serif;
+    font-size: var(
+      --utrecht-paragraph-font-size,
+      var(--utrecht-document-font-size, inherit),
+      1em
+    );
+    padding: 0.5em;
+    margin-right: 2em;
+  }
 }
 
 .counter__result {
   font-family: var(--utrecht-document-font-family), sans-serif;
   font-size: var(--oip-text-big-font-size, 2em);
   margin-bottom: 1em;
-}
-
-.button {
-  border-radius: 6px;
-  font-family: var(--utrecht-document-font-family), sans-serif;
-  font-size: var(
-    --utrecht-paragraph-font-size,
-    var(--utrecht-document-font-size, inherit),
-    1em
-  );
-  padding: 0.5em;
-}
-
-.button:first-child {
-  background-color: var(--oip-color-info-light);
-  border: 1px solid var(--oip-color-info, green);
-  margin-right: 2em;
-}
-
-.button:nth-child(2) {
-  background-color: var(--oip-color-danger-light);
-  border: 1px solid var(--oip-color-danger, red);
-  margin-right: 2em;
 }
