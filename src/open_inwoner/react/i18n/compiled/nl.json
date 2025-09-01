@@ -4,5 +4,23 @@
       "type": 0,
       "value": "Dit is het aantal"
     }
+  ],
+  "combobox.clear": [
+    {
+      "type": 0,
+      "value": "Wissen"
+    }
+  ],
+  "combobox.placeholder": [
+    {
+      "type": 0,
+      "value": "Vul naam, adres of vestigingsnummer in"
+    }
+  ],
+  "combobox.toggle": [
+    {
+      "type": 0,
+      "value": "Toggle dropdown"
+    }
   ]
 }

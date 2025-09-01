@@ -4,5 +4,23 @@
       "type": 0,
       "value": "This is the current count"
     }
+  ],
+  "combobox.clear": [
+    {
+      "type": 0,
+      "value": "Clear"
+    }
+  ],
+  "combobox.placeholder": [
+    {
+      "type": 0,
+      "value": "Enter name, address or branch number"
+    }
+  ],
+  "combobox.toggle": [
+    {
+      "type": 0,
+      "value": "Toggle dropdown"
+    }
   ]
 }

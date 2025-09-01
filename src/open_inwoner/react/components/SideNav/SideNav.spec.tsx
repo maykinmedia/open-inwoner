@@ -6,7 +6,7 @@ import SideNav from './SideNav'
 import '@testing-library/jest-dom'
 
 // Mock MaterialIcon to simplify rendering and testing
-vi.mock('../MaterialIcons/MaterialIcons', () => ({
+vi.mock('@react/components//MaterialIcon/MaterialIcon', () => ({
   MaterialIcon: ({ name }: { name: string }) => (
     <span data-testid="material-icon">{name}</span>
   ),
