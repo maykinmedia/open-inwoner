@@ -25,6 +25,10 @@
     text-align: right;
   }
 
+  &--mailto {
+    word-break: break-all;
+  }
+
   *[class*='icons'],
   *[class*='Icons'] {
     font-size: 24px;

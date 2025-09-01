@@ -13,6 +13,7 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  hyphens: auto;
   min-height: 70px;
   min-width: var(--header-height);
   position: relative;
