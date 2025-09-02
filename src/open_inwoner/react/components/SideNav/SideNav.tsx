@@ -31,6 +31,8 @@ const SideNav: FC<SideNavProps> = ({ items }) => {
 
       return {
         ...item,
+        // TODO remove undefined once https://github.com/nl-design-system/denhaag/issues/1852 is fixed
+        counter: undefined,
         // Only include icon if it exists and is not empty
         icon: icon && icon.trim() ? <MaterialIcon name={icon} /> : undefined,
       }

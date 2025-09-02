@@ -156,7 +156,8 @@
 
       /* Wide screens: show only first item */
       @media (min-width: 1024px) {
-        &:not(:first-child, &--always-visible) {
+        &:not(:first-child, &--always-visible),
+        .indicator {
           display: none;
         }
       }

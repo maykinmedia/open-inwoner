@@ -21,6 +21,7 @@ class TestReactSidenavData(TestCase):
         """Test when no menu nodes are found"""
         mock_renderer = Mock()
         mock_renderer.get_nodes.return_value = []
+        mock_renderer.apply_modifiers.return_value = []
         mock_menu_pool.get_renderer.return_value = mock_renderer
 
         result = react_sidenav_data(self.context)
@@ -42,6 +43,7 @@ class TestReactSidenavData(TestCase):
 
         mock_renderer = Mock()
         mock_renderer.get_nodes.return_value = [home_node]
+        mock_renderer.apply_modifiers.return_value = [home_node]
         mock_menu_pool.get_renderer.return_value = mock_renderer
 
         result = react_sidenav_data(self.context)
@@ -74,6 +76,7 @@ class TestReactSidenavData(TestCase):
 
         mock_renderer = Mock()
         mock_renderer.get_nodes.return_value = [other_node]
+        mock_renderer.apply_modifiers.return_value = [other_node]
         mock_menu_pool.get_renderer.return_value = mock_renderer
 
         result = react_sidenav_data(self.context)
@@ -108,6 +111,7 @@ class TestReactSidenavData(TestCase):
 
         mock_renderer = Mock()
         mock_renderer.get_nodes.return_value = [node_without_attr]
+        mock_renderer.apply_modifiers.return_value = [node_without_attr]
         mock_menu_pool.get_renderer.return_value = mock_renderer
 
         result = react_sidenav_data(self.context)
@@ -141,6 +145,7 @@ class TestReactSidenavData(TestCase):
 
         mock_renderer = Mock()
         mock_renderer.get_nodes.return_value = [home_node]
+        mock_renderer.apply_modifiers.return_value = [home_node]
         mock_menu_pool.get_renderer.return_value = mock_renderer
 
         result = react_sidenav_data(self.context)
@@ -158,6 +163,7 @@ class TestReactSidenavData(TestCase):
 
         mock_renderer = Mock()
         mock_renderer.get_nodes.return_value = [invisible_node]
+        mock_renderer.apply_modifiers.return_value = [invisible_node]
         mock_menu_pool.get_renderer.return_value = mock_renderer
 
         result = react_sidenav_data(self.context)
@@ -190,6 +196,7 @@ class TestReactSidenavData(TestCase):
 
         mock_renderer = Mock()
         mock_renderer.get_nodes.return_value = [home_node]
+        mock_renderer.apply_modifiers.return_value = [home_node]
         mock_menu_pool.get_renderer.return_value = mock_renderer
 
         result = react_sidenav_data(self.context)
@@ -225,6 +232,7 @@ class TestReactSidenavData(TestCase):
 
         mock_renderer = Mock()
         mock_renderer.get_nodes.return_value = [home_node]
+        mock_renderer.apply_modifiers.return_value = [home_node]
         mock_menu_pool.get_renderer.return_value = mock_renderer
 
         result = react_sidenav_data(self.context)
@@ -266,6 +274,7 @@ class TestReactSidenavData(TestCase):
 
         mock_renderer = Mock()
         mock_renderer.get_nodes.return_value = [home_node]
+        mock_renderer.apply_modifiers.return_value = [home_node]
         mock_menu_pool.get_renderer.return_value = mock_renderer
 
         result = react_sidenav_data(self.context)
@@ -309,6 +318,7 @@ class TestReactSidenavData(TestCase):
 
         mock_renderer = Mock()
         mock_renderer.get_nodes.return_value = [home_node]
+        mock_renderer.apply_modifiers.return_value = [home_node]
         mock_menu_pool.get_renderer.return_value = mock_renderer
 
         result = react_sidenav_data(self.context)
@@ -337,6 +347,7 @@ class TestReactSidenavData(TestCase):
 
         mock_renderer = Mock()
         mock_renderer.get_nodes.return_value = [home_node]
+        mock_renderer.apply_modifiers.return_value = [home_node]
         mock_menu_pool.get_renderer.return_value = mock_renderer
 
         result = react_sidenav_data(self.context)
@@ -366,6 +377,7 @@ class TestReactSidenavData(TestCase):
 
         mock_renderer = Mock()
         mock_renderer.get_nodes.return_value = [home_node]
+        mock_renderer.apply_modifiers.return_value = [home_node]
         mock_menu_pool.get_renderer.return_value = mock_renderer
 
         result = react_sidenav_data(self.context)
@@ -399,6 +411,7 @@ class TestReactSidenavData(TestCase):
 
         mock_renderer = Mock()
         mock_renderer.get_nodes.return_value = [home_node]
+        mock_renderer.apply_modifiers.return_value = [home_node]
         mock_menu_pool.get_renderer.return_value = mock_renderer
 
         result = react_sidenav_data(self.context)
@@ -442,6 +455,7 @@ class TestReactSidenavData(TestCase):
 
         mock_renderer = Mock()
         mock_renderer.get_nodes.return_value = [home_node]
+        mock_renderer.apply_modifiers.return_value = [home_node]
         mock_menu_pool.get_renderer.return_value = mock_renderer
 
         result = react_sidenav_data(self.context)
@@ -481,6 +495,7 @@ class TestReactSidenavData(TestCase):
 
         mock_renderer = Mock()
         mock_renderer.get_nodes.return_value = [home_node]
+        mock_renderer.apply_modifiers.return_value = [home_node]
         mock_menu_pool.get_renderer.return_value = mock_renderer
 
         result = react_sidenav_data(self.context)
@@ -511,6 +526,7 @@ class TestReactSidenavData(TestCase):
 
         mock_renderer = Mock()
         mock_renderer.get_nodes.return_value = [home_node]
+        mock_renderer.apply_modifiers.return_value = [home_node]
         mock_menu_pool.get_renderer.return_value = mock_renderer
 
         result = react_sidenav_data(self.context)
@@ -541,6 +557,7 @@ class TestReactSidenavData(TestCase):
 
         mock_renderer = Mock()
         mock_renderer.get_nodes.return_value = [home_node]
+        mock_renderer.apply_modifiers.return_value = [home_node]
         mock_menu_pool.get_renderer.return_value = mock_renderer
 
         result = react_sidenav_data(self.context)
@@ -571,6 +588,7 @@ class TestReactSidenavData(TestCase):
 
         mock_renderer = Mock()
         mock_renderer.get_nodes.return_value = [home_node]
+        mock_renderer.apply_modifiers.return_value = [home_node]
         mock_menu_pool.get_renderer.return_value = mock_renderer
 
         result = react_sidenav_data(self.context)
@@ -612,6 +630,7 @@ class TestReactSidenavData(TestCase):
 
         mock_renderer = Mock()
         mock_renderer.get_nodes.return_value = [home_node]
+        mock_renderer.apply_modifiers.return_value = [home_node]
         mock_menu_pool.get_renderer.return_value = mock_renderer
 
         result = react_sidenav_data(self.context)
@@ -648,6 +667,7 @@ class TestReactSidenavDataEdgeCases(TestCase):
 
         mock_renderer = Mock()
         mock_renderer.get_nodes.return_value = [home_node]
+        mock_renderer.apply_modifiers.return_value = [home_node]
         mock_menu_pool.get_renderer.return_value = mock_renderer
 
         result = react_sidenav_data(self.context)
@@ -682,6 +702,7 @@ class TestReactSidenavDataEdgeCases(TestCase):
 
         mock_renderer = Mock()
         mock_renderer.get_nodes.return_value = [home_node]
+        mock_renderer.apply_modifiers.return_value = [home_node]
         mock_menu_pool.get_renderer.return_value = mock_renderer
 
         result = react_sidenav_data(self.context)
@@ -840,6 +861,7 @@ class TestReactSidenavDataAdditionalCases(TestCase):
 
         mock_renderer = Mock()
         mock_renderer.get_nodes.return_value = [home_node]
+        mock_renderer.apply_modifiers.return_value = [home_node]
         mock_menu_pool.get_renderer.return_value = mock_renderer
 
         result = react_sidenav_data(self.context)
@@ -883,6 +905,7 @@ class TestReactSidenavDataAdditionalCases(TestCase):
 
         mock_renderer = Mock()
         mock_renderer.get_nodes.return_value = [home_node]
+        mock_renderer.apply_modifiers.return_value = [home_node]
         mock_menu_pool.get_renderer.return_value = mock_renderer
 
         request = self.factory.get("/contactmoment/list/")
@@ -925,6 +948,7 @@ class TestReactSidenavDataAdditionalCases(TestCase):
 
         mock_renderer = Mock()
         mock_renderer.get_nodes.return_value = [home_node]
+        mock_renderer.apply_modifiers.return_value = [home_node]
         mock_menu_pool.get_renderer.return_value = mock_renderer
 
         request = self.factory.get("/contactmoment/list/")
@@ -959,6 +983,7 @@ class TestReactSidenavDataAdditionalCases(TestCase):
 
         mock_renderer = Mock()
         mock_renderer.get_nodes.return_value = [home_node]
+        mock_renderer.apply_modifiers.return_value = [home_node]
         mock_menu_pool.get_renderer.return_value = mock_renderer
 
         request = self.factory.get("/some-path/")
@@ -998,6 +1023,7 @@ class TestReactSidenavDataAdditionalCases(TestCase):
 
         mock_renderer = Mock()
         mock_renderer.get_nodes.return_value = [home_node]
+        mock_renderer.apply_modifiers.return_value = [home_node]
         mock_menu_pool.get_renderer.return_value = mock_renderer
 
         request = self.factory.get("/contactmoment/list/")
@@ -1035,6 +1061,7 @@ class TestReactSidenavDataAdditionalCases(TestCase):
 
         mock_renderer = Mock()
         mock_renderer.get_nodes.return_value = [home_node]
+        mock_renderer.apply_modifiers.return_value = [home_node]
         mock_menu_pool.get_renderer.return_value = mock_renderer
 
         # Mock extra items

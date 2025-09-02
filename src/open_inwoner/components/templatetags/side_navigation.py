@@ -64,6 +64,7 @@ def react_sidenav_data(context):
 
         # Get all menu nodes
         all_nodes = renderer.get_nodes()
+        all_nodes = renderer.apply_modifiers(all_nodes, post_cut=True)
         logger.debug("Total nodes found: %s", len(all_nodes))
 
         # Find the "home" node first (preferred method)
