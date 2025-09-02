@@ -1,7 +1,32 @@
-==============
-Change history
-==============
+1.34 (2025-??-??) [Unreleased]
+==============================
 
+Voor een volledig overzicht van alle commits, zie ...
 
-See the Github releases: https://github.com/maykinmedia/open-inwoner/releases
+Nieuwe features
+---------------
 
+* [:taiga-us:`3368`, :pr:`1839`]: Een anoniem ingevuld contactformulier wordt nu ook in de
+  OpenKlant2 backend opgeslagen.
+* [:taiga-us:`3370`, :pr:`1837`, :pr:`1869`]: Het navigatiemenu is nu conform het NL Design
+  System op de meeste pagina's aan de linkerkant van het scherm geplaatst. Sommige
+  detailpagina's behouden voorlopig het dropdownmenu in afwachting van nieuwe designs.
+
+Bugfixes
+--------
+
+* [:taiga-is:`3396`, :taiga-is:`3395`, :pr:`1852`, :pr:`1853`]: Verschillende problemen
+  bij het ophalen van contactmomenten uit OpenKlant2 zijn opgelost.
+* [:taiga-is:`3389`, :pr:`1845`]: De synchronisatie van gebruikersprofielen met
+  OpenKlant gebeurt nu ook direct na registratie, niet alleen na inloggen.
+* [:taiga-is:`3375`, :pr:`1852`, :pr:`1868` ]: Correct afbreken van lange woorden en
+  e-mailadressen in smalle tegels, zoals bij productlocaties.
+
+Onderhoud
+---------
+
+* [:taiga-us:`3393`, :pr:`1871`]: Kleine tekstuele verbeteringen zijn doorgevoerd om de
+  teksten B1-conform te maken.
+* [:pr:`1878`]: Aanpassen pipeline for het bijhouden en publiceren van de changelog
+  op de documentatie pagina.
+  

@@ -73,6 +73,31 @@ repository and create a pull request to the `develop` branch of this project's
 repository. Your pull request will be reviewed, if applicable, feedback will be
 given and if everything is approved, it will be merged.
 
+### Updating the changelog
+
+In most cases, you should also update the CHANGELOG.rst file to document your changes.
+Add an entry under the current release section in the appropriate category:
+
+- **Nieuwe features** - New functionality, features, or significant enhancements. This
+  will usually map to a Taiga story in the current sprint.
+- **Bugfixes** - Bug fixes, error corrections, or issue resolutions, which will usually
+  be in response to Taiga issues raised separately from the current sprint.
+- **Onderhoud** - Maintenance work, dependency updates, refactoring, or technical
+  improvements
+
+Each entry should reference both the GitHub pull request and related Taiga issue using
+Sphinx extlink shortcodes: `` :pr:`123` `` for pull requests, `` :taiga-us:`456` `` for
+Taiga user stories, `` :taiga-is:`789` `` for Taiga issues and  `` :taiga-dimpact:`123`
+`` for Taiga Dimpact issues. See the root `CHANGELOG.rst` file for examples of the
+proper format. 
+
+The entry should preferably be written in Dutch, though English is fine if you are not
+comfortable in Dutch. The English issues will be translated as part of preparing the
+release.
+
+If your PR contains multiple commits, add a separate commit for the changelog update.
+Otherwise, feel free to include in a single commit for minor changes.
+
 ### Reviews on releases
 
 All pull requests will be reviewed by a project member before they are merged
