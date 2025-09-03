@@ -600,3 +600,5 @@ Wanneer u een of meerdere platte pagina’s wilt verwijderen, kikt u in de check
 ==============
 
 Hier vult de beheerder de domeinnaam en weergavenaam van de website(s) in. Deze kunnen indien noodzakelijk worden aangepast. Dit is ter inrichting van het systeem. De domeinnaam moet overeenkomen met de domeinnaam van de omgeving.
+
+Voor het gebruik van Open Inwoner is een website vereist. Aangezien er geen gebruiksscenario is voor meerdere sites, is het niet mogelijk om de primaire website te verwijderen of extra sites toe te voegen.

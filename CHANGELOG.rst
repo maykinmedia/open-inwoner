@@ -21,6 +21,8 @@ Bugfixes
   OpenKlant gebeurt nu ook direct na registratie, niet alleen na inloggen.
 * [:taiga-is:`3375`, :pr:`1852`, :pr:`1868` ]: Correct afbreken van lange woorden en
   e-mailadressen in smalle tegels, zoals bij productlocaties.
+* [:taiga-dimpact:`297`, :pr:`1866`]: Het verwijderen van websites en het toevoegen van
+  sites naast de primaire website wordt voorkomen.
 
 Onderhoud
 ---------
@@ -29,4 +31,4 @@ Onderhoud
   teksten B1-conform te maken.
 * [:pr:`1878`]: Aanpassen pipeline for het bijhouden en publiceren van de changelog
   op de documentatie pagina.
-  
+
