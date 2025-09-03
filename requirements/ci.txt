@@ -431,7 +431,7 @@ django-sessionprofile==1.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-digid-eherkenning
-django-setup-configuration==0.8.2
+django-setup-configuration==0.9.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
