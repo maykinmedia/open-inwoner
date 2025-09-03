@@ -23,8 +23,6 @@ Bugfixes
   e-mailadressen in smalle tegels, zoals bij productlocaties.
 * [:taiga-dimpact:`297`, :pr:`1866`]: Het verwijderen van websites en het toevoegen van
   sites naast de primaire website wordt voorkomen.
-* [:taiga-is:`3377`,  :pr:`1882`]: De static/bundles/images map wordt nu correct 
-  opgebouwd in de Docker container.
 
 Onderhoud
 ---------
