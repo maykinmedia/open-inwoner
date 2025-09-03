@@ -50,6 +50,9 @@ RUN npm ci
 # copy source code
 COPY ./src /app/src
 
+# Ensure the target directory for npm run collect exists
+RUN mkdir -p /app/src/open_inwoner/static/bundles/
+
 # build frontend
 RUN npm run build
 
