@@ -1,6 +1,8 @@
 from unittest.mock import patch
 
 from django.contrib import admin
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -554,3 +556,122 @@ class JavaScriptAdminRenderingTests(WebTest):
         self.assertNotContains(response, 'name="custom_javascript"')
         self.assertNotContains(response, "custom_javascript_confirmed")
         self.assertContains(response, "Custom JavaScript is disabled")
+
+
+@disable_admin_mfa()
+class AdminPermissionTest(WebTest):
+    def setUp(self):
+        self.superuser = UserFactory(is_superuser=True, is_staff=True)
+        self.beheerder = UserFactory(is_staff=True)
+
+        siteconfig_ct = ContentType.objects.get_for_model(SiteConfiguration)
+        perm_warning, _ = Permission.objects.get_or_create(
+            codename="siteconfig_fieldset_warning_banner",
+            name="Can edit warning banner",
+            content_type=siteconfig_ct,
+        )
+        self.beheerder.user_permissions.add(perm_warning)
+
+    def test_admin_change_restricted(self):
+        """
+        Test that users with restricted permissions cannot modify fields they don't have
+        access to, even when submitting a POST request with those fields.
+        """
+        config = SiteConfiguration.get_solo()
+        config.warning_banner_text = "Old warning banner text"
+        config.enable_crawler_indexing = False
+        config.save()
+
+        form = self.app.get(
+            reverse("admin:configurations_siteconfiguration_change"),
+            user=self.beheerder,
+        ).forms["siteconfiguration_form"]
+
+        # Modify authorized field
+        form["warning_banner_text"] = "Warning banner text changed"
+
+        # Attempt to modify unauthorized field
+        form.fields["enable_crawler_indexing"] = True
+
+        response = form.submit()
+
+        self.assertEqual(response.status_code, 302)
+
+        config.refresh_from_db()
+
+        # Authorized field should be changed
+        self.assertEqual(config.warning_banner_text, "Warning banner text changed")
+
+        # Unauthorized field should not be changed
+        self.assertEqual(config.enable_crawler_indexing, False)
+
+    def test_admin_form_access_restricted(self):
+        """Test that users with restricted permissions do not see restricted fields"""
+
+        form = self.app.get(
+            reverse("admin:configurations_siteconfiguration_change"),
+            user=self.beheerder,
+        ).forms["siteconfiguration_form"]
+
+        # check that we can't access restricted fields, one for each fieldset
+        restricted_fields = [
+            "enable_crawler_indexing",
+            "primary_color",
+            "email_logo",
+            "login_text",
+            "home_help_text",
+            "include_cms_pages_in_search_index",
+            "enable_notification_channel_choice",
+            "openid_connect_logo",
+            "eherkenning_enabled",
+            "gtm_code",
+            "cookie_info_text",
+            "kcm_survey_link_text",
+            "hide_categories_from_anonymous_users",
+            "theme_stylesheet",
+            "display_social",
+            "contactmoment_contact_form_enabled",
+        ]
+
+        # Verify that restricted fields are not accessible in the form
+        for field in restricted_fields:
+            with self.assertRaises(AssertionError):
+                form[field]
+
+        # Verify that the allowed field is accessible
+        self.assertIsNotNone(form["warning_banner_text"])
+
+    def test_admin_form_superuser_access_full(self):
+        """Test that superusers can see restricted fields"""
+
+        form = self.app.get(
+            reverse("admin:configurations_siteconfiguration_change"),
+            user=self.superuser,
+        ).forms["siteconfiguration_form"]
+
+        # Fields that should be accessible to superusers (one from each fieldset)
+        all_fields = [
+            "enable_crawler_indexing",
+            "primary_color",
+            "email_logo",
+            "login_text",
+            "home_help_text",
+            "include_cms_pages_in_search_index",
+            "enable_notification_channel_choice",
+            "openid_connect_logo",
+            "eherkenning_enabled",
+            "gtm_code",
+            "cookie_info_text",
+            "kcm_survey_link_text",
+            "hide_categories_from_anonymous_users",
+            "theme_stylesheet",
+            "display_social",
+            "contactmoment_contact_form_enabled",
+            "warning_banner_text",
+        ]
+
+        for field in all_fields:
+            try:
+                form[field]
+            except AssertionError:
+                self.fail(f"Superuser could not access field: {field}")
