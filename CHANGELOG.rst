@@ -1,5 +1,25 @@
-1.34 (2025-09-03)
-=================
+1.35.0 (2025-XX-YY) [UNRELEASED]
+================================
+
+Voor een volledig overzicht van alle commits, zie ...
+
+Nieuwe features
+---------------
+
+* ...
+
+Bugfixes
+--------
+
+* ...
+
+Onderhoud
+---------
+
+* ...
+
+1.34.0 (2025-09-03)
+===================
 
 Voor een volledig overzicht van alle commits, zie :release:`v1.34.0`.
 
