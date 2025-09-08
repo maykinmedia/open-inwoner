@@ -4,7 +4,7 @@ from datetime import timedelta
 from typing import Protocol, cast
 from urllib.parse import urlparse
 
-from django.db import models, transaction
+from django.db import models
 from django.db.models import UniqueConstraint
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -303,85 +303,22 @@ class OpenZaakConfig(SingletonModel):
     """
 
     @property
-    def default_zgw_api_group(self):
-        # TODO: This is a temporary solution to the new mult-backend
-        # ZGW configuration to avoid breaking the existing API.
-        # The *_service fields are proxied through this field to
-        # avoid having two sources of truth regarding the configured
-        # ZGW services. The legacy code will simply have a single
-        # backend configured and retrieve this through the proxy.
-
-        if (api_groups_count := self.api_groups.count()) == 0:
-            return None
-
-        if api_groups_count > 0:
-            warnings.warn(
-                _default_zgw_api_group_deprecation_message,
-                DeprecationWarning,
-            )
-
-            return self.api_groups.first()
-
-    def _set_zgw_service(self, field: str, service):
-        if self.pk is None:
-            raise ValueError(
-                f"Please save your {self.__class__} instance before setting services"
-            )
-
-        with transaction.atomic():
-            if self.default_zgw_api_group is None:
-                raise RuntimeError(
-                    "You must define a default set of ZGW APIs before you can access them "
-                    "using the legacy `*_client` getters/setters."
-                )
-
-            default_group = self.default_zgw_api_group
-            setattr(default_group, field, service)
-            default_group.save()
-
-            return getattr(default_group, field)
+    def zaak_services(self):
+        return Service.objects.filter(pk__in=self.api_groups.values_list("zrc_service"))
 
     @property
-    def zaak_service(self):
-        if self.default_zgw_api_group is None:
-            return None
-
-        return self.default_zgw_api_group.zrc_service
-
-    @zaak_service.setter
-    def zaak_service(self, service):
-        return self._set_zgw_service("zrc_service", service)
+    def catalogi_services(self):
+        return Service.objects.filter(pk__in=self.api_groups.values_list("ztc_service"))
 
     @property
-    def catalogi_service(self):
-        if self.default_zgw_api_group is None:
-            return None
-        return self.default_zgw_api_group.ztc_service
-
-    @catalogi_service.setter
-    def catalogi_service(self, service):
-        return self._set_zgw_service("ztc_service", service)
+    def document_services(self):
+        return Service.objects.filter(pk__in=self.api_groups.values_list("drc_service"))
 
     @property
-    def document_service(self):
-        if self.default_zgw_api_group is None:
-            return None
-        return self.default_zgw_api_group.drc_service
-
-    @document_service.setter
-    def document_service(self, service):
-        return self._set_zgw_service("drc_service", service)
-
-    @property
-    def form_service(self):
-        if self.default_zgw_api_group is None:
-            return None
-
-        return self.default_zgw_api_group.form_service
-
-    @form_service.setter
-    def form_service(self, service):
-        return self._set_zgw_service("form_service", service)
+    def form_services(self):
+        return Service.objects.filter(
+            pk__in=self.api_groups.values_list("form_service")
+        )
 
     zaak_max_confidentiality = models.CharField(
         max_length=32,

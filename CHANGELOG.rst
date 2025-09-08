@@ -1,7 +1,14 @@
-1.35.0 (2025-XX-YY) [UNRELEASED]
+2.0.0 (2025-XX-YY) [UNRELEASED]
 ================================
 
 Voor een volledig overzicht van alle commits, zie ...
+
+Deployment aandachtspunten
+--------------------------
+
+* Het ``zgw_dev_status`` management commando is verwijderd.
+* Het contactformulier is omgezet naar een CMS pagina. Verifieer na deployment de
+  beschrijvingen van het contactformulier.
 
 Nieuwe features
 ---------------
@@ -25,12 +32,8 @@ Onderhoud
 ---------
 
 * [:cve:`CVE-2024-53899`, :pr:`1892`] ``virtualenv`` bijgewerkt naar versie ``20.34.0``.
-
-Deployment aandachtspunten
---------------------------
-
-* Het contactformulier is omgezet naar een CMS pagina. Verifieer na deployment de beschrijvingen van het
-  contactformulier.
+* [:pr:`1897`] Het legacy management commando ``zgw_dev_status`` is verwijderd, alsmede
+  legacy code voor het beheren van een "default" ZGW API Group.
 
 1.34.0 (2025-09-03)
 ===================
