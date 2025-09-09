@@ -54,7 +54,7 @@ Onderhoud
 * [:pr:`1884`]: ``django-setup-configuration`` bijgewerkt naar versie ``0.9.0``.
   Hiermee ondersteunt Open Inwoner het verwijzen naar environment variables in de
   setup configuration YAML bestanden.
-* [:pr:`1886`]: ``django`` bijgewerkt naar versie ``4.2.24``, waarmee een
-  `beveiligingsissue met severity "high"
+* [:pr:`1886`, :cve:`CVE-2025-57833`]: ``django`` bijgewerkt naar versie ``4.2.24``,
+  waarmee een `beveiligingsissue met severity "high"
   <https://www.djangoproject.com/weblog/2025/sep/03/security-releases/>`_ wordt
   opgelost.
