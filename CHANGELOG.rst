@@ -16,7 +16,7 @@ Bugfixes
 Onderhoud
 ---------
 
-* ...
+* [:cve:`CVE-2024-53899`, :pr:`1892`] ``virtualenv`` bijgewerkt naar versie ``20.34.0``. 
 
 1.34.0 (2025-09-03)
 ===================
