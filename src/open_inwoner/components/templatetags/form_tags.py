@@ -520,10 +520,15 @@ def field_as_widget(field, class_string, form_id):
     if form_id:
         attrs["form"] = form_id
 
-    if autocomplete := HTML_NAME_TO_AUTOCOMPLETE.get(field.html_name):
-        attrs["autocomplete"] = autocomplete
+    # Check if field is actually a form field object with html_name attribute
+    # and not a string or other type
+    if hasattr(field, "html_name"):
+        if autocomplete := HTML_NAME_TO_AUTOCOMPLETE.get(field.html_name):
+            attrs["autocomplete"] = autocomplete
+        return field.as_widget(attrs=attrs)
 
-    return field.as_widget(attrs=attrs)
+    # Return as is if field is not a form field object
+    return field
 
 
 @register.simple_tag(takes_context=True)

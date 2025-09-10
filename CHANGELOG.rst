@@ -17,7 +17,9 @@ Nieuwe features
 Bugfixes
 --------
 
-* ...
+* [:taiga-is: `3445`, :pr: `1898`]: De sjabloontag field_as_widget ging er onterecht
+  vanuit dat het primaire argument een formulierveld was en veroorzaakte daardoor
+  sporadisch fouten.
 
 Onderhoud
 ---------
