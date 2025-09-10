@@ -2,10 +2,9 @@ import base64
 import concurrent.futures
 import functools
 import logging
-import warnings
 from dataclasses import dataclass
 from datetime import date
-from typing import Any, Literal, Mapping, Type, TypeAlias, TypeVar
+from typing import Any, Literal, Mapping, Type, TypeAlias, TypeVar, cast
 
 from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -928,64 +927,24 @@ def _build_all_zgw_clients_for_type(
     }
 
     return [
-        build_zgw_client_from_service(
-            getattr(api_group, services_to_client_mapping[type_])
-        )
+        build_zgw_client_from_service(service)
         for api_group in config.api_groups.all()
+        if (service := getattr(api_group, services_to_client_mapping[type_]))
+        is not None
     ]
 
 
-_SINGLETON_ZGW_CLIENT_DEPRECATION_MESSAGE = (
-    "Singleton ZGW client factories are in the process of being deprecated in favour of"
-    " multi-ZGW backend aware implementations. Use build_*_clients() or build_zgw_"
-    "client_from_service() instead."
-)
-warnings.filterwarnings(
-    "once", _SINGLETON_ZGW_CLIENT_DEPRECATION_MESSAGE, category=DeprecationWarning
-)
-
-
-def build_zaken_client() -> ZakenClient:
-    warnings.warn(_SINGLETON_ZGW_CLIENT_DEPRECATION_MESSAGE, DeprecationWarning)
-    config = OpenZaakConfig.get_solo()
-    return build_zgw_client_from_service(config.zaak_service)
-
-
 def build_zaken_clients() -> list[ZakenClient]:
-    return _build_all_zgw_clients_for_type("zaak")
-
-
-def build_catalogi_client() -> CatalogiClient:
-    warnings.warn(_SINGLETON_ZGW_CLIENT_DEPRECATION_MESSAGE, DeprecationWarning)
-    config = OpenZaakConfig.get_solo()
-    return build_zgw_client_from_service(config.catalogi_service)
+    return cast(list[ZakenClient], _build_all_zgw_clients_for_type("zaak"))
 
 
 def build_catalogi_clients() -> list[CatalogiClient]:
-    return _build_all_zgw_clients_for_type("catalogi")
-
-
-def build_documenten_client() -> DocumentenClient:
-    warnings.warn(_SINGLETON_ZGW_CLIENT_DEPRECATION_MESSAGE, DeprecationWarning)
-    config = OpenZaakConfig.get_solo()
-    return build_zgw_client_from_service(config.document_service)
+    return cast(list[CatalogiClient], _build_all_zgw_clients_for_type("catalogi"))
 
 
 def build_documenten_clients() -> list[DocumentenClient]:
-    return _build_all_zgw_clients_for_type("document")
-
-
-def build_forms_client() -> FormClient | None:
-    warnings.warn(_SINGLETON_ZGW_CLIENT_DEPRECATION_MESSAGE, DeprecationWarning)
-    config = OpenZaakConfig.get_solo()
-
-    # Special case: though we require all other services,
-    # the form_service may not in fact be set
-    if not config.form_service:
-        return None
-
-    return build_zgw_client_from_service(config.form_service)
+    return cast(list[DocumentenClient], _build_all_zgw_clients_for_type("document"))
 
 
 def build_forms_clients() -> list[FormClient]:
-    return _build_all_zgw_clients_for_type("form")
+    return cast(list[FormClient], _build_all_zgw_clients_for_type("form"))

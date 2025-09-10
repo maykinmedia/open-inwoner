@@ -54,10 +54,10 @@ class ZGWConfigurationTests(TestCase):
 
     def assert_openzaak_config_defaults(self):
         config = OpenZaakConfig.get_solo()
-        self.assertIsNone(config.zaak_service)
-        self.assertIsNone(config.catalogi_service)
-        self.assertIsNone(config.document_service)
-        self.assertIsNone(config.form_service)
+        self.assertFalse(config.zaak_services)
+        self.assertFalse(config.catalogi_services)
+        self.assertFalse(config.document_services)
+        self.assertFalse(config.form_services)
 
         self.assertEqual(config.action_required_deadline_days, 15)
         self.assertEqual(
@@ -167,11 +167,15 @@ class ZGWConfigurationTests(TestCase):
 
         config = OpenZaakConfig.get_solo()
 
-        self.assertEqual(config.zaak_service.api_root, "http://an/updated/root/zaak")
         self.assertEqual(
-            config.catalogi_service.api_root, "http://an/updated/root/catalogus"
+            config.zaak_services.get().api_root, "http://an/updated/root/zaak"
         )
         self.assertEqual(
-            config.document_service.api_root, "http://an/updated/root/document"
+            config.catalogi_services.get().api_root, "http://an/updated/root/catalogus"
         )
-        self.assertEqual(config.form_service.api_root, "http://an/updated/root/form")
+        self.assertEqual(
+            config.document_services.get().api_root, "http://an/updated/root/document"
+        )
+        self.assertEqual(
+            config.form_services.get().api_root, "http://an/updated/root/form"
+        )

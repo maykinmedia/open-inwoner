@@ -21,11 +21,7 @@ from zgw_consumers.constants import AuthTypes
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.cms.cases.views.status import SimpleFile
-from open_inwoner.openzaak.clients import (
-    build_documenten_client,
-    build_documenten_clients,
-    build_zaken_client,
-)
+from open_inwoner.openzaak.clients import build_documenten_clients, build_zaken_clients
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
 from ..models import OpenZaakConfig
@@ -77,7 +73,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
             drc_service__api_root=ANOTHER_DOCUMENTEN_ROOT,
             form_service=None,
         )
-        self.zaken_client = build_zaken_client()
+        (self.zaken_client, self.other_zaken_client) = build_zaken_clients()
 
         self.config = OpenZaakConfig.get_solo()
         self.config.document_max_confidentiality = (
@@ -536,8 +532,8 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
 
         m.get(self.informatie_object["inhoud"], content=self.informatie_object_content)
 
-        document_client = build_documenten_client()
-        document_client.download_document(self.informatie_object["inhoud"])
+        (documenten_client, _) = build_documenten_clients()
+        documenten_client.download_document(self.informatie_object["inhoud"])
 
         req = m.request_history[0]
         self.assertEqual(req.verify, server.public_certificate.path)
@@ -560,7 +556,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
         file = get_temporary_text_file()
         title = "my_document"
 
-        documenten_client = build_documenten_client()
+        (documenten_client, _) = build_documenten_clients()
         created_document = documenten_client.upload_document(
             self.user, file, title, zaak_type_iotc.id, self.zaak["bronorganisatie"]
         )
@@ -654,7 +650,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
         title = "my_document"
 
         m.post(f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten", status_code=404)
-        documenten_client = build_documenten_client()
+        (documenten_client, _) = build_documenten_clients()
         created_document = documenten_client.upload_document(
             self.user, file, title, zaak_type_iotc.id, self.zaak["bronorganisatie"]
         )
@@ -677,7 +673,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
         title = "my_document"
 
         m.post(f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten", status_code=500)
-        documenten_client = build_documenten_client()
+        (documenten_client, _) = build_documenten_clients()
         created_document = documenten_client.upload_document(
             self.user, file, title, zaak_type_iotc.id, self.zaak["bronorganisatie"]
         )
