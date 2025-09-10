@@ -4,7 +4,7 @@ from django import forms
 from django.core.exceptions import PermissionDenied
 from django.utils.translation import gettext_lazy as _
 
-from cms.models import Page
+from cms.models import CMSPlugin, Page
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from djangocms_text_ckeditor.widgets import TextEditorWidget
@@ -37,8 +37,22 @@ class FooterPagesPlugin(CMSPluginBase):
                 ):
                     cms_pages.remove(page)
 
+        # Get ContactFormPlugin instances
+        contact_form_plugins = CMSPlugin.objects.filter(plugin_type="ContactFormPlugin")
+
+        # Get placeholders containing the plugins
+        placeholder_ids = contact_form_plugins.values_list("placeholder_id", flat=True)
+
+        # Get the CMS pages containing the placeholders
+        contact_form_pages = Page.objects.filter(
+            placeholders__id__in=placeholder_ids, publisher_is_draft=False
+        )
+
+        # Use the first page if it exists
+        if contact_form_pages.exists() and klant_config.contact_registration_enabled:
+            cms_pages.insert(0, contact_form_pages.first())
+
         context["cms_pages"] = cms_pages
-        context["has_form_configuration"] = klant_config.has_contactform_configuration
         return context
 
 

@@ -344,14 +344,6 @@ class KlantenSysteemConfig(SingletonModel):
     def contact_registration_enabled(self) -> bool:
         return bool(self.register_contact_email or self.has_api_configuration)
 
-    @property
-    def has_contactform_configuration(self) -> bool:
-        contactform_subjects = ContactFormSubject.objects.filter(
-            esuite_subject_code__isnull=self.primary_backend
-            != KlantenServiceType.ESUITE.value
-        )
-        return self.contact_registration_enabled and contactform_subjects.exists()
-
     def has_api_service_configured(
         self, klanten_service_type: KlantenServiceType
     ) -> bool:

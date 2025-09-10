@@ -164,7 +164,7 @@ def sitemap(request):
     ]
 
     klant_config = KlantenSysteemConfig.get_solo()
-    if klant_config.has_contactform_configuration:
+    if klant_config.contact_registration_enabled:
         context["platform_pages"].append(
             {
                 "url_name": "contactform",

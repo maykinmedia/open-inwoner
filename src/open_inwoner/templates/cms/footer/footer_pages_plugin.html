@@ -1,11 +1,6 @@
 {% load solo_tags link_tags %}
 <nav class="footer__links" aria-label="Footer navigatie">
     <ul class="footer__list">
-        {% if has_form_configuration %}
-            <li class="footer__list-item">
-                {% link text=_("Contact formulier") secondary=True href="contactform" %}
-            </li>
-        {% endif %}
         {% for cms_page in cms_pages %}
             <li class="footer__list-item">
                 {% link text=cms_page.get_title secondary=True href=cms_page.get_absolute_url %}
