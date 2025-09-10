@@ -6,7 +6,9 @@ Voor een volledig overzicht van alle commits, zie ...
 Nieuwe features
 ---------------
 
-* ...
+* [:taiga-us:`3370`, :pr:`1888`]: Navigatiemenu-items correct weergegeven op verschillende schermbreedtes; 
+  ``@gemeente-denhaag/side-navigation`` bijgewerkt naar ``4.0.2``, waardoor notificatiebadges in 
+  navigatiemenu-items de rode indicator niet meer tonen.
 
 Bugfixes
 --------
