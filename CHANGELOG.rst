@@ -85,6 +85,8 @@ Onderhoud
   teksten B1-conform te maken.
 * [:pr:`1878`]: Aanpassen pipeline for het bijhouden en publiceren van de changelog
   op de documentatie pagina.
+* [:pr:`1895`, :cve:`CVE-2025-7783`]: ``bump form-data`` bijgewerkt naar versie
+  ``3.0.4``.
 * [:pr:`1884`]: ``django-setup-configuration`` bijgewerkt naar versie ``0.9.0``.
   Hiermee ondersteunt Open Inwoner het verwijzen naar environment variables in de
   setup configuration YAML bestanden.
