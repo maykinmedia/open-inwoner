@@ -266,6 +266,22 @@ class ZGWApiGroupConfig(models.Model):
         default=False,
     )
 
+    fetch_eherkenning_zaken_with_openzaak_120_params = models.BooleanField(
+        default=False,
+        verbose_name=_(
+            "Fetch Zaken for users authenticated with eHerkenning using "
+            "OpenZaak 1.20 query parameters"
+        ),
+        help_text=_(
+            "If enabled, Zaken for eHerkenning users are fetched using the "
+            "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__kvkNummer and "
+            "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__vestigingsNummer "
+            "query parameters, rather than the rol__betrokkeneIdentificatie__vestiging_"
+            "_vestigingsNummer and rol__betrokkeneIdentificatie__nietNatuurlijkPersoon"
+            "__innNnpId query paramters"
+        ),
+    )
+
     # flags related to other services
     klant_backend = models.CharField(
         verbose_name=_("Klant API backend"),
