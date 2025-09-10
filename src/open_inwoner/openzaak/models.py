@@ -194,16 +194,22 @@ class ZGWApiGroupConfig(models.Model):
         blank=False,
     )
 
-    def _build_client_from_attr(self, attr: str):
+    def _build_client_from_attr(self, attr: str, **client_init_kwargs):
         from .clients import build_zgw_client_from_service
 
-        return build_zgw_client_from_service(getattr(self, attr))
+        return build_zgw_client_from_service(getattr(self, attr), **client_init_kwargs)
 
     @property
     def zaken_client(self):
         from .clients import ZakenClient
 
-        return cast(ZakenClient, self._build_client_from_attr("zrc_service"))
+        return cast(
+            ZakenClient,
+            self._build_client_from_attr(
+                "zrc_service",
+                use_openzaak_120_params=self.fetch_eherkenning_zaken_with_openzaak_120_params,
+            ),
+        )
 
     drc_service = models.ForeignKey(
         "zgw_consumers.Service",

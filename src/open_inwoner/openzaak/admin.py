@@ -58,6 +58,7 @@ class ZGWApiGroupConfig(admin.StackedInline):
             {
                 "fields": [
                     "fetch_eherkenning_zaken_with_rsin",
+                    "fetch_eherkenning_zaken_with_openzaak_120_params",
                     "klant_backend",
                 ]
             },

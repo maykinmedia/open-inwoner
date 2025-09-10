@@ -60,6 +60,12 @@ class ZgwAPIClient(APIClient):
 
 
 class ZakenClient(ZgwAPIClient):
+    use_openzaak_120_params: bool
+
+    def __init__(self, *args, use_openzaak_120_params: bool, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.use_openzaak_120_params = use_openzaak_120_params
+
     def fetch_cases(
         self,
         user_bsn: str | None = None,
@@ -174,18 +180,24 @@ class ZakenClient(ZgwAPIClient):
         params = {
             "maximaleVertrouwelijkheidaanduiding": config.zaak_max_confidentiality,
         }
+
+        vestigingsnummer_param = (
+            "rol__betrokkeneIdentificatie__vestiging__vestigingsNummer"
+        )
+        kvk_rsin_param = "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId"
+
+        if self.use_openzaak_120_params:
+            vestigingsnummer_param = (
+                "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__vestigingsNummer"
+            )
+            kvk_rsin_param = (
+                "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__kvkNummer"
+            )
+
         if vestigingsnummer:
-            params.update(
-                {
-                    "rol__betrokkeneIdentificatie__vestiging__vestigingsNummer": vestigingsnummer,
-                }
-            )
+            params.update({vestigingsnummer_param: vestigingsnummer})
         elif kvk_or_rsin:
-            params.update(
-                {
-                    "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId": kvk_or_rsin,
-                }
-            )
+            params.update({kvk_rsin_param: kvk_or_rsin})
         else:
             return []
 
@@ -896,7 +908,9 @@ ZgwClientFactoryReturn: TypeAlias = (
 )
 
 
-def build_zgw_client_from_service(service: Service) -> ZgwClientFactoryReturn:
+def build_zgw_client_from_service(
+    service: Service, **client_init_kwargs
+) -> ZgwClientFactoryReturn:
     services_to_client_mapping: Mapping[str, Type[ZgwClientFactoryReturn]] = {
         APITypes.zrc: ZakenClient,
         APITypes.ztc: CatalogiClient,
@@ -911,7 +925,12 @@ def build_zgw_client_from_service(service: Service) -> ZgwClientFactoryReturn:
             f"No client defined for API type {service.api_type} on service {service}"
         ) from None
 
-    client = build_client(service, client_factory=client_class, configured_from=service)
+    client = build_client(
+        service,
+        client_factory=client_class,
+        configured_from=service,
+        **client_init_kwargs,
+    )
     return client
 
 
@@ -926,12 +945,21 @@ def _build_all_zgw_clients_for_type(
         "form": "form_service",
     }
 
-    return [
-        build_zgw_client_from_service(service)
-        for api_group in config.api_groups.all()
-        if (service := getattr(api_group, services_to_client_mapping[type_]))
-        is not None
-    ]
+    clients = []
+    for api_group in config.api_groups.all():
+        service = getattr(api_group, services_to_client_mapping[type_])
+        if service is not None:
+            # Special case for ZakenClient to pass use_openzaak_120_params
+            client_init_kwargs = {}
+            if type_ == "zaak":
+                client_init_kwargs = {
+                    "use_openzaak_120_params": api_group.fetch_eherkenning_zaken_with_openzaak_120_params
+                }
+
+            client = build_zgw_client_from_service(service, **client_init_kwargs)
+            clients.append(client)
+
+    return clients
 
 
 def build_zaken_clients() -> list[ZakenClient]:

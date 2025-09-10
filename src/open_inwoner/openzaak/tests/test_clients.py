@@ -139,7 +139,12 @@ class ZGWApiGroupConfigFilterTests(TestCase):
                 "ztc_service",
             ):
                 service = getattr(group, service_field)
-                client = build_zgw_client_from_service(service)
+                client_init_kwargs = {}
+                if service_field == "zrc_service":
+                    client_init_kwargs = {
+                        "use_openzaak_120_params": group.fetch_eherkenning_zaken_with_openzaak_120_params,
+                    }
+                client = build_zgw_client_from_service(service, **client_init_kwargs)
                 url = service.api_root
                 self.assertEqual(
                     ZGWApiGroupConfig.objects.resolve_group_from_hints(
