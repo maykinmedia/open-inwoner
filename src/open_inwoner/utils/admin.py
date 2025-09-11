@@ -69,14 +69,14 @@ class TimelineLogLevelFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         return [(v, v) for v in logging.getLevelNamesMapping()] + [
-            ("unknown", _("Unknown"))
+            ("missing", _("Missing"))
         ]
 
     def queryset(self, request, queryset):
         if not (value := self.value()):
             return queryset
 
-        if value == "unknown":
+        if value == "missing":
             return queryset.filter(
                 ~Q(extra_data__has_key="log_level")
                 | Q(extra_data__log_level__isnull=True)
