@@ -2,6 +2,7 @@ from django.db import DataError
 
 from zgw_consumers.constants import APITypes
 
+from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.tests.factories import (
     ServiceFactory,
     ZGWApiGroupConfigFactory,
@@ -243,3 +244,33 @@ class TestZGWApiGroupServicesRequiredSuccessfulMigration(TestSuccessfulMigration
                 ("http://foobar/ztc", "ztc"),
             ],
         )
+
+
+class ZGWBackendFlagsMigrationTest(TestSuccessfulMigrations):
+    migrate_from = "0068_zgwapigroupconfig_derive_zaak_titel_from_and_more"
+    migrate_to = "0069_auto_20250423_1254"
+    app = "openzaak"
+
+    def setUpBeforeMigration(self, apps):
+        HistoricalOpenZaakConfig = apps.get_model("openzaak", "OpenZaakConfig")
+
+        config = HistoricalOpenZaakConfig.objects.create()
+
+        config.skip_notification_statustype_informeren = True
+        config.reformat_esuite_zaak_identificatie = True
+        config.derive_zaak_titel_from = True
+        config.order_statuses_by_date_set = True
+        config.save()
+
+        actual_openzaak_config = OpenZaakConfig.objects.get(pk=config.pk)
+
+        ZGWApiGroupConfigFactory(open_zaak_config=actual_openzaak_config)
+
+    def test_migrate_zgw_backend_flags(self):
+        ZGWApiGroupConfig = self.apps.get_model("openzaak", "ZGWApiGroupConfig")
+
+        for zgw_group in ZGWApiGroupConfig.objects.all():
+            self.assertTrue(zgw_group.skip_notification_statustype_informeren)
+            self.assertTrue(zgw_group.reformat_esuite_zaak_identificatie)
+            self.assertTrue(zgw_group.derive_zaak_titel_from)
+            self.assertTrue(zgw_group.order_statuses_by_date_set)

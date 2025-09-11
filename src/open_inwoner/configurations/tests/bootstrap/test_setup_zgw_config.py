@@ -87,8 +87,6 @@ class ZGWConfigurationTests(TestCase):
             "Hier vindt u een overzicht van al uw lopende en afgeronde zaken.",
         )
         self.assertEqual(config.enable_categories_filtering_with_zaken, False)
-        self.assertEqual(config.skip_notification_statustype_informeren, False)
-        self.assertEqual(config.reformat_esuite_zaak_identificatie, False)
 
     def test_configure_full_sets_the_correct_fields(self):
         execute_single_step(
@@ -107,7 +105,13 @@ class ZGWConfigurationTests(TestCase):
         self.assertEqual(catalogi_service.api_root, CATALOGI_SERVICE_API_ROOT)
         self.assertEqual(document_service.api_root, DOCUMENTEN_SERVICE_API_ROOT)
         self.assertEqual(form_service.api_root, FORM_SERVICE_API_ROOT)
-        self.assertFalse(group.fetch_eherkenning_zaken_with_rsin)
+        self.assertEqual(group.fetch_eherkenning_zaken_with_rsin, True)
+        self.assertEqual(group.skip_notification_statustype_informeren, False)
+        self.assertEqual(group.reformat_esuite_zaak_identificatie, True)
+        self.assertEqual(
+            group.derive_zaak_titel_from, ZaakTitleDisplayChoices.zaaktype_onderwerp
+        )
+        self.assertEqual(group.order_statuses_by_date_set, False)
 
         self.assertEqual(
             config.zaak_max_confidentiality,
@@ -121,15 +125,9 @@ class ZGWConfigurationTests(TestCase):
         self.assertEqual(config.allowed_file_extensions, [".pdf", ".txt"])
         self.assertEqual(config.title_text, "title text from setup configuration")
         self.assertEqual(config.enable_categories_filtering_with_zaken, True)
-        self.assertEqual(config.skip_notification_statustype_informeren, False)
-        self.assertEqual(config.reformat_esuite_zaak_identificatie, True)
-        self.assertEqual(
-            config.derive_zaak_titel_from, ZaakTitleDisplayChoices.zaaktype_onderwerp
-        )
-        self.assertTrue(config.zaken_filter_enabled)
+        self.assertEqual(config.zaken_filter_enabled, True)
         self.assertEqual(config.action_required_deadline_days, 1874)
         self.assertEqual(config.max_upload_size, 51)
-        self.assertFalse(config.order_statuses_by_date_set)
 
     def test_configure_raises_on_missing_groups(self):
         with self.assertRaises(PrerequisiteFailed):

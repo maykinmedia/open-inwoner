@@ -58,6 +58,10 @@ class ZGWApiGroupConfig(admin.StackedInline):
             {
                 "fields": [
                     "fetch_eherkenning_zaken_with_rsin",
+                    "skip_notification_statustype_informeren",
+                    "reformat_esuite_zaak_identificatie",
+                    "derive_zaak_titel_from",
+                    "order_statuses_by_date_set",
                     "klant_backend",
                 ]
             },

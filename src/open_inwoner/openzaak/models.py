@@ -265,6 +265,42 @@ class ZGWApiGroupConfig(models.Model):
         ),
         default=False,
     )
+    skip_notification_statustype_informeren = models.BooleanField(
+        verbose_name=_("Use StatusType.informeren workaround"),
+        help_text=_(
+            "Enable when StatusType.informeren is not supported by the ZGW backend. This requires ZaakTypeConfig's to be configured to determine on which changes to notify."
+        ),
+        default=False,
+    )
+    reformat_esuite_zaak_identificatie = models.BooleanField(
+        verbose_name=_("Reformat eSuite Zaak.identificatie"),
+        help_text=_(
+            "Enable to reformat user-facing Zaak.identificatie numbers from internal eSuite format (ex: '0014ESUITE66392022') to user friendly format ('6639-2022')."
+        ),
+        default=False,
+    )
+
+    derive_zaak_titel_from = models.CharField(
+        choices=ZaakTitleDisplayChoices.choices,
+        default=ZaakTitleDisplayChoices.zaaktype_omschrijving,
+        verbose_name=_("Derive the case title from"),
+        help_text=_(
+            "Which field from the underlying zaaksysteem to use to display the title "
+            " for a zaak (e.g. on the Mijn Zaken page)."
+        ),
+    )
+    order_statuses_by_date_set = models.BooleanField(
+        verbose_name=_(
+            "On the detail page of the case, order the statuses based on the date they have been set"
+        ),
+        help_text=_(
+            "If enabled, the statuses of a case are ordered based on 'datum_status_gezet'. "
+            "If not enabled, we show the statuses in the reverse order they are returned via the API, "
+            "this because the eSuite does not return the timestamps of the statuses (eSuite, but also "
+            "works for Open Zaak)."
+        ),
+        default=False,
+    )
 
     # flags related to other services
     klant_backend = models.CharField(
@@ -348,43 +384,6 @@ class OpenZaakConfig(SingletonModel):
         help_text=_("A list of the allowed file extensions."),
     )
 
-    skip_notification_statustype_informeren = models.BooleanField(
-        verbose_name=_("Use StatusType.informeren workaround"),
-        help_text=_(
-            "Enable when StatusType.informeren is not supported by the ZGW backend. This requires ZaakTypeConfig's to be configured to determine on which changes to notify."
-        ),
-        default=False,
-    )
-
-    reformat_esuite_zaak_identificatie = models.BooleanField(
-        verbose_name=_("Reformat eSuite Zaak.identificatie"),
-        help_text=_(
-            "Enable to reformat user-facing Zaak.identificatie numbers from internal eSuite format (ex: '0014ESUITE66392022') to user friendly format ('6639-2022')."
-        ),
-        default=False,
-    )
-
-    derive_zaak_titel_from = models.CharField(
-        choices=ZaakTitleDisplayChoices.choices,
-        default=ZaakTitleDisplayChoices.zaaktype_omschrijving,
-        verbose_name=_("Derive the case title from"),
-        help_text=_(
-            "Which field from the underlying zaaksysteem to use to display the title "
-            " for a zaak (e.g. on the Mijn Zaken page)."
-        ),
-    )
-    order_statuses_by_date_set = models.BooleanField(
-        verbose_name=_(
-            "On the detail page of the case, order the statuses based on the date they have been set"
-        ),
-        help_text=_(
-            "If enabled, the statuses of a case are ordered based on 'datum_status_gezet'. "
-            "If not enabled, we show the statuses in the reverse order they are returned via the API, "
-            "this because the eSuite does not return the timestamps of the statuses (eSuite, but also "
-            "works for Open Zaak)."
-        ),
-        default=False,
-    )
     limit_user_visible_cases_to_role = models.CharField(
         verbose_name=_("Limit cases to role"),
         choices=ZaakBetrokkeneRol.choices,
