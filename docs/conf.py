@@ -123,11 +123,13 @@ linkcheck_ignore = [
 extlinks = {
     "taiga-us": ("https://taiga.maykinmedia.nl/project/open-inwoner/us/%s", "#%s"),
     "taiga-is": ("https://taiga.maykinmedia.nl/project/open-inwoner/issue/%s", "#%s"),
+    "taiga-ta": ("https://taiga.maykinmedia.nl/project/open-inwoner/task/%s", "#%s"),
     "taiga-dimpact": (
         "https://taiga.maykinmedia.nl/project/dimpact-enschede-ssc-ict-1/issue/%s",
         "#dimpact-%s",
     ),
     "pr": ("https://github.com/maykinmedia/open-inwoner/pull/%s", "PR %s"),
+    "gh": ("https://github.com/maykinmedia/open-inwoner/issues/%s", "#%s"),
     "release": ("https://github.com/maykinmedia/open-inwoner/releases/tag/%s", "%s"),
     "cve": ("https://cve.mitre.org/cgi-bin/cvename.cgi?name=%s", "%s"),
 }

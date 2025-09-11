@@ -20,6 +20,8 @@ Nieuwe features
   In plaats van één beschrijving heeft het contactformulier nu twee beschrijvingen, één voor
   geauthenticeerde en één voor anonieme gebruikers. De oude beschrijving wordt naar beide
   nieuwe velden gekopieerd. Pas één of beide beschrijvingen naar behoefte aan.
+* [:pr:`1901`, :taiga-ta:`3447`]: ID en abonnement status toegevoegd als alleen-lezen
+  velden in de admin detailpagina van de Webhook abonnementen.
 
 Bugfixes
 --------
