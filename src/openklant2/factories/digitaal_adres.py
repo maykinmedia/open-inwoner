@@ -6,13 +6,13 @@ from faker import Faker
 
 from openklant2.factories.common import ForeignKeyRef
 from openklant2.factories.helpers import validator
-from openklant2.types.resources.digitaal_adres import CreateDigitaalAdresDataValidator
+from openklant2.types.resources.digitaal_adres import DigitaalAdresCreateDataValidator
 
 fake = Faker("nl_NL")
 
 
-@validator(CreateDigitaalAdresDataValidator)
-class CreateDigitaalAdresDataFactory(factory.Factory):
+@validator(DigitaalAdresCreateDataValidator)
+class DigitaalAdresCreateDataFactory(factory.Factory):
     class Meta:
         model = dict
 

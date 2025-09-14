@@ -30,7 +30,7 @@ def fetch_brp(user_bsn: str) -> BRPData | None:
 
 def update_brp_data_in_db(user, initial=True):
     system_action(
-        "Retrieving data for %s from haal centraal based on BSN",
+        "Retrieving data for user from haal centraal based on BSN",
         content_object=user,
     )
 

@@ -3,6 +3,7 @@ import logging
 from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import ImproperlyConfigured
+from django.http import Http404
 from django.urls import reverse
 from django.utils.encoding import iri_to_uri
 from django.utils.functional import cached_property
@@ -31,8 +32,19 @@ logger = logging.getLogger(__name__)
 
 
 class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
+    """
+    View for handling the sumission of contact forms
+
+    Note on CMS-integration:
+
+    The template rendered by the view is the "outer" form template
+    containing {% placeholder %} used by Django CMS; the inner template
+    containing the actual form is rendered by `ContactFormPlugin` (enriched
+    with content editable via the plugin)
+    """
+
     form_class = ContactForm
-    template_name = "pages/contactform/form_wrap.html"  # inner ("structure") template rendered by CMS plugin
+    template_name = "cms/contactform/form_outer.html"
     klanten_config = KlantenSysteemConfig
     klanten_client: KlantenClient | None
     vragen_service: OpenKlant2Service | eSuiteVragenService | None
@@ -52,6 +64,11 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
                 self.vragen_service = OpenKlant2Service()
             case _:
                 logger.info("No klanten/vragen service configured for contactform")
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.klanten_config.contact_registration_enabled:
+            raise Http404("Contact form is not configured")
+        return super().dispatch(request, *args, **kwargs)
 
     @cached_property
     def crumbs(self):
@@ -99,21 +116,6 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
                 }
             )
         return initial
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        has_contactform_configuration = (
-            self.klanten_config.has_contactform_configuration
-        )
-        if not self.request.user.is_authenticated:
-            has_contactform_configuration = (
-                has_contactform_configuration
-                and self.vragen_service.supports_anonymous_questions
-            )
-        context["has_form_configuration"] = has_contactform_configuration
-
-        return context
 
     def set_result_message(self, success: bool):
         if success:
@@ -197,25 +199,42 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
             )
         return self._register_via_openklant2(form)
 
-    def _register_via_openklant2(self, form: ContactForm):
+    def _register_via_openklant2(self, form: ContactForm) -> tuple[bool, str]:
         user = self.request.user
-
-        partij, _ = self.vragen_service.get_or_create_partij_for_user(user)
 
         cleaned_data = form.cleaned_data
         question = cleaned_data["question"]
         subject = cleaned_data["subject"].subject
 
-        question = self.vragen_service.create_question(
-            partij_uuid=partij["uuid"], question=question, subject=subject
-        )
+        try:
+            if user.is_authenticated:
+                partij, _ = self.vragen_service.get_or_create_partij_for_user(user)
+                question = self.vragen_service.create_question_for_partij(
+                    partij_uuid=partij["uuid"], question=question, subject=subject
+                )
+                email = getattr(user, "email", None)
+            else:
+                first_name = cleaned_data["first_name"]
+                last_name = cleaned_data["last_name"]
+                email = cleaned_data["email"]
+                phonenumber = cleaned_data["phonenumber"]
+                question = self.vragen_service.create_question_with_betrokkene(
+                    question=question,
+                    subject=subject,
+                    first_name=first_name,
+                    last_name=last_name,
+                    email=email,
+                    phonenumber=phonenumber,
+                )
+        except Exception:
+            self.log_system_action("failed to register question via OpenKlant")
+            return False, ""
 
         self.log_system_action(
             "registered question via OpenKlant", user=self.request.user
         )
 
-        # TODO: get email from partij
-        return True, getattr(user, "email", None)
+        return True, email
 
     def _register_via_esuite(
         self,

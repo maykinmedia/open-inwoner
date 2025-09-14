@@ -22,7 +22,7 @@ attrs==21.2.0
     #   jsonschema
 beautifulsoup4==4.12.3
     # via -r requirements/base.in
-billiard==4.2.0
+billiard==4.2.1
     # via celery
 boltons==21.0.0
     # via
@@ -32,7 +32,7 @@ brotli==1.0.9
     # via fonttools
 cbor2==5.6.2
     # via webauthn
-celery==5.4.0
+celery==5.5.3
     # via
     #   -r requirements/base.in
     #   celery-once
@@ -91,7 +91,7 @@ defusedxml==0.7.1
     # via odfpy
 diff-match-patch==20200713
     # via django-import-export
-django==4.2.22
+django==4.2.24
     # via
     #   -r requirements/base.in
     #   django-admin-index
@@ -258,7 +258,7 @@ django-sessionprofile==1.0
     # via
     #   -r requirements/base.in
     #   django-digid-eherkenning
-django-setup-configuration==0.8.2
+django-setup-configuration==0.9.0
     # via
     #   -r requirements/base.in
     #   mozilla-django-oidc-db
@@ -384,7 +384,7 @@ josepy==1.13.0
     # via mozilla-django-oidc
 jsonschema==4.1.0
     # via drf-spectacular
-kombu==5.5.1
+kombu==5.5.4
     # via celery
 lxml==4.9.1
     # via
@@ -430,7 +430,9 @@ openpyxl==3.0.9
 orderedmultidict==1.0.1
     # via furl
 packaging==23.0
-    # via djangocms-text-ckeditor
+    # via
+    #   djangocms-text-ckeditor
+    #   kombu
 phonenumbers==8.13.29
     # via -r requirements/base.in
 phonenumberslite==8.13.29
@@ -574,9 +576,8 @@ typing-extensions==4.10.0
     #   xsdata
     #   zgw-consumers
     #   zgw-consumers-oas
-tzdata==2025.1
+tzdata==2025.2
     # via
-    #   celery
     #   django-celery-beat
     #   kombu
 uritemplate==4.1.1

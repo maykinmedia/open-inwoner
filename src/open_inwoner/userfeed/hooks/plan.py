@@ -61,7 +61,7 @@ class PlanExpiresFeedItem(FeedItem):
 
     @property
     def message(self) -> str:
-        date_text = parse_date(self.get_data("plan_end_date")).strftime("%x")
+        date_text = parse_date(self.get_data("plan_end_date")).strftime("%d-%m-%Y")
         return self.base_message.format(expire=date_text)
 
     @property

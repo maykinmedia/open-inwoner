@@ -59,8 +59,8 @@ Matching-attributen
 - **Status, Resultaat en Informatie Object Typen**: ``omschrijving`` en de bovenliggende
   ``zaaktype`` moeten gelijk zijn
 
-Exporteren
-----------
+Exporteren van catalogus configuraties
+--------------------------------------
 
 Stappen voor exporteren:
 
@@ -72,12 +72,10 @@ Stappen voor exporteren:
    :height: 305px
    :alt: Exporteren van catalogus configuraties
 
-   Exporteren van catalogus configuraties
-
 De export omvat alle catalogi, zaaktypes en onderliggende objecten (resultaattypen, informatie-objecttypen, etc.) van de geselecteerde catalogi.
 
-Importeren
-----------
+Importeren van catalogus configuraties
+--------------------------------------
 
 Stappen voor importeren:
 
@@ -85,10 +83,7 @@ Stappen voor importeren:
 
 .. figure:: images/image141.png
    :width: 1178px
-   :height: 120px
    :alt: Importeren van catalogus configuraties
-
-   Importeren van catalogus configuraties
 
 #. Selecteer een bestand van uw lokale computer
 #. Upload het bestand
@@ -98,83 +93,38 @@ Stappen voor importeren:
 
 #. Na afloop toont het systeem:
 
-     * Aantal succesvol geïmporteerde objecten
-     * Aantal niet-geïmporteerde objecten. De meest voorkomende reden voor foutmeldingen
-       betreft pntbrekende objecten met de gespecificeerde matching-attributen. De
-       attributen die ertoe leidde dat bepaalde objecten niet gevonden konden worden,
-       zullen zoveel mogelijk worden vermeld.
+     * Het aantal succesvol geïmporteerde objecten
+     * Het aantal niet-geïmporteerde objecten. De meest voorkomende reden voor foutmeldingen
+       betreft pntbrekende objecten met de gespecificeerde matching-attributen. De attributen die ertoe leidden dat bepaalde objecten niet gevonden konden worden, zullen zoveel mogelijk worden vermeld.
 
-9.2. Configuratie Klanten Systeem
-=================================
+9.2. Certificaten
+=================
 
-Dit is de configuratie voor de koppeling van het Open Inwoner Platform met een klantensysteem, zoals eSuite of OpenKlant2. Indien één of beide systemen zijn geconfigureerd, worden klantgegevens (zoals e-mailadres en telefoonnummer) met deze systemen uitgewisseld. Deze systemen zijn ook noodzakelijk om gebruik te kunnen maken van het "Mijn Vragen" gedeelte van het platform.
+Hier worden de gebruikte certificaten van het platform weergegeven. Bij ieder certificaat staat aangegeven per wanneer en tot wanneer het certificaat geldig is en wat voor certificaat het is: een private key-pair of een certifcate-only. Indien gewenst kunt u een nieuw certficaat toevoegen en u kunt bestaande certificaten wijzigen door ze aan te klikken.
 
-In het hoofdscherm is het belangrijk om een "primaire" backend te kiezen. Dit is de backend waaruit klantgegevens worden uitgelezen en waarin nieuwe vragen in "Mijn Vragen" worden aangemaakt. 
+.. image:: images/Screenshot_OIP_Data_Koppelingen_Certificaten_Djuzz_250710.png
 
-Het wegschrijven van klantgegevens gebeurt altijd naar alle geconfigureerde backends tegelijk, maar voor het bijwerken van de klantgegevens op basis van het klantensysteem zal alleen naar de primaire backend worden gekeken.
+9.2.1. Nieuw certificaat toevoegen
+----------------------------------
 
-U dient eerst de betreffende backends via de daarvoor bestemde links te configureren. Vervolgens kunt u een primaire backend selecteren via het dropdown-menu.
+U kunt een nieuw certificaat toevoegen door op de knop "certificaat toevoegen" te klikken. Er wordt dan een nieuw scherm geopend waarin alle gegevens van het nieuwe certificaat moeten worden ingevuld.
 
-.. image:: images/image144.png
-   :width: 695px
-   :height: 394px
+.. image:: images/Screenshot_OIP_Data_Koppelingen_Certificaten_Toevoegen_Djuzz_250710.png
 
-9.2.1. E-suite
---------------
+**Label**
+Hier vult u een duidelijk en uniek label voor het certificaat in
 
-Er zijn diverse zaken die ingesteld moeten worden om Mijn zaken naar behoren te laten functioneren. In het volgende screenshot is te zien om welke elementen het gaat.
+**Type**
+Hier selecteert u wat voor soort certificaat het is. Wanneer er een private key noodzakelijk is selecteert u dit als optie. In andere gevallen is het een certificate-only.
 
-.. image:: images/image64.png
-   :width: 624px
-   :height: 540px
+**Public certificate**
+Hier kunt u het publieke deel van het certificaat uploaden.
 
+**Private Key**
+Hier kunt u het private deel van het certificaat uploaden.
 
-9.2.1.1. E-mailregistratie
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Hier vult u het e-mailadres in waarop de ingezonden contactformulieren ontvangen moeten worden.
-
-9.2.1.2. Klanten en contacten API registratie
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Hier kunt u aanvinken of u de aanvraag in de contactmomenten API geregistreerd wilt hebben. Laat u het vinkje hier weg, dan wordt de aanvraag niet geregistreerd in de contactmomenten API. De Organisatie RSIN is het nummer van de betreffende organisatie (Gemeente). Bij contactmoment type komt te staan om wat voor soort ‘contacttype’ de aanvraag gaat. Contactmomenttype dient te worden gedefinieerd middels een contacttype uit e-Suite. Het kanaal van het contactmoment behelst de manier waarop er contact is gezocht en de aanvraag is gedaan. Ook kan er een gebruikersnaam te worden ingevuld van een specifieke medewerker van de gemeente, zoals ingegeven op e-Suite. Als dit veld wordt leeggelaten komt het contactformulier op basis van het onderwerp bij de juiste afdeling.
-
-U kunt een vinkje zetten bij “Haal bronnen op uit de Klanten- en Contactmomenten-API's voor gebruikers die zijn geauthenticeerd met eHerkenning via RSIN”. Indien dit is ingeschakeld, worden bronnen uit de Klanten- en Contactmomenten-API's voor eHerkenning-gebruikers opgehaald via RSIN (Open Klant). Indien dit niet is ingeschakeld, worden deze bronnen via het KVK-nummer opgehaald. U kunt een vinkje zetten bij “Stuur contactformulier e-mailbevestiging”. Indien dit is ingeschakeld wordt het 'contactform_confimation' e-mailsjabloon gebruikt om een e-mailbevestiging te sturen na het insturen van het contactformulier. Indien dit is uitgeschakeld wordt aangenomen dat de externe contactmomenten API (eg. eSuite) de e-mailbevestiging zal sturen.
-
-
-9.2.1.3. Filter contactmomenten
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-In deze sectie kunt u een lijst van eSuite-kanalen configureren die uitgesloten worden bij het opvragen van contactmomenten. Dit is met name nuttig voor kanalen die alleen voor intern gebruik bestemd zijn.
-
-9.2.1.4. Services
-^^^^^^^^^^^^^^^^^
-
-Hier staan de API’s van de te koppelen services. Bij de configuratie van Open Zaak gaat het om een Klanten API en een Contactmomenten API. Deze services kunnen niet worden verwijderd of veranderd. U selecteert hier de juiste API van de betreffende gemeente.
-
-9.2.1.5. Contactformulier onderwerpen
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Bij Mijn Aanvragen vindt de gebruiker een contactformulier om de aanvraag in te dienen. U kunt als beheerder dit contactformulier configureren door de tekstuele labels aan te passen. Deze onderdelen kunt u indien gewenst ook voorzien van e-Suite onderwerpcode. Wanneer deze code is ingevuld komt een contactformulier op basis van deze automatisch bij de juiste afdeling terecht. De volgorde van de elementen van het contactformulier kan indien gewenst worden aangepast. Bovendien kunt u elementen uit het formulier verwijderen door een vinkje te zetten bij [verwijderen]. Om nog een onderwerp aan het contactformulier toe te voegen klikt u op [+ Nog een contactformulier onderwerp toevoegen]. Als alles naar wens is geconfigureerd klikt u op [Opslaan].
-
-9.2.2. OpenKlant2
------------------
-
-Er zijn diverse zaken die ingesteld moeten worden om Mijn zaken naar behoren te laten functioneren. In het volgende screenshot is te zien om welke elementen het gaat.
-
-.. image:: images/image145.png
-   :width: 624px
-   :height: 428px
-
-9.2.2.1. API Configuratie
-^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Bij deze configuratie kan een Service geselecteerd (of aangemaakt) worden die de technische configuratie bevat voor het communiceren met het OpenKlant2 systeem.
-
-9.2.2.1. Vragen
-^^^^^^^^^^^^^^^
-
-Deze instellingen zijn noodzakelijk voor de integratie met OpenKlant2 in het "Mijn Vragen" gedeelte van de website. Hoewel alle velden afzonderlijk worden toegelicht, verdient het veld "Mijn Vragen Actor" speciale aandacht. Dit veld vereist een geldige UUID van een bestaande Actor in het OpenKlant2 systeem. Deze Actor wordt gebruikt om nieuwe vragen automatisch als interne taken toe te wijzen voor afhandeling.
+**Passphrase**
+Hier vult u het wachtwoord in om het private deel van het certificaat te ontgrendelen
 
 9.3. Configuratie ‘Open Zaak’
 =============================
@@ -193,18 +143,14 @@ Wanneer u de geavanceerde opties zichtbaar maakt, krijgt u extra opties om de ve
 **Standaard actie deadline termijn in dagen**
 Hier stelt u in hoeveel dagen de gebruiker standaard krijgt om actie te ondernemen.
 
-
 **Maximale upload grootte (in MB)**
 Hier kiest u de maximaal toegestane grootte van te uploaden documenten.
-
 
 **Toegestane bestandsformaten uploads**
 Hier kiest u welk bestandsformaat te uploaden documenten mogen hebben.
 
-
 **Titel tekst**
 Hier stelt u de tekst in die getoond wordt als titel/introductietekst in de lijstweergave van *Mijn zaken*.
-
 
 9.3.2. Feature Flags
 --------------------
@@ -228,28 +174,94 @@ Een API set bestaat uit verschillende API’s die samen een zaaksysteem vormen. 
 **Naam**
 Hier kunt u de API set een naam geven. Deze naam is vrij in te vullen.
 
-
 **Zaken API**
 Deze API vult de zaken of aanvragen uit *Mijn zaken* in.
-
 
 **Documenten API**
 Deze API haalt de documenten op die bij een bepaalde zaak horen.
 
-
 **Catalogi API**
 In de catalogi zit alle informatie over zaaktypes en andere gerelateerde informatie. De Catalogi API vult de zaaktypeconfiguratie in. Denk hierbij aan statussen, documenten, resultaten.
-
 
 **Formulieren API (Open Aanvragen)**
 Deze API slaat de gegevens van onvoltooide formulieren op en vult deze automatisch in. Dit is een optioneel veld.
 
-9.4. KlantContactMomenten
+9.4. Configuratie Klanten Systeem
+=================================
+
+Dit is de configuratie voor de koppeling van het Open Inwoner Platform met een klantensysteem, zoals eSuite of OpenKlant2. Indien één of beide systemen zijn geconfigureerd, worden klantgegevens (zoals e-mailadres en telefoonnummer) met deze systemen uitgewisseld. Deze systemen zijn ook noodzakelijk om gebruik te kunnen maken van het "Mijn Vragen" gedeelte van het platform.
+
+In het hoofdscherm is het belangrijk om een "primaire" backend te kiezen. Dit is de backend waaruit klantgegevens worden uitgelezen en waarin nieuwe vragen in "Mijn Vragen" worden aangemaakt. 
+
+Het wegschrijven van klantgegevens gebeurt altijd naar alle geconfigureerde backends, maar voor het bijwerken van de klantgegevens op basis van het klantensysteem wordt enkel naar de primaire backend gekeken.
+
+U dient eerst de betreffende backends via de daarvoor bestemde links te configureren. Vervolgens kunt u een primaire backend selecteren via het dropdown-menu zoals hieronder is weergegeven.
+
+.. image:: images/Screenshot_OIP_Configuratie_Klantensysteem_Djuzz_250710.png
+
+9.4.1. E-suite
+--------------
+
+Er zijn diverse onderdelen die ingesteld moeten worden om Mijn zaken naar behoren te laten functioneren. Wanneer u binnen de Configuratie Klantensysteem klikt op de link met 'configureer de eSuite backend' wordt er een nieuw venster geopend waarin alle elementen staan die moeten worden geconfigureerd. 
+
+.. image:: images/Screenshot_OIP_Configuratie_Klantensysteem_Esuite_Djuzz_250710.png
+
+E-mailregistratie
+^^^^^^^^^^^^^^^^^
+
+Hier vult u het e-mailadres in waarop de ingezonden contactformulieren ontvangen moeten worden.
+
+Klanten en contacten API registratie
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Hier kunt u aanvinken of u de aanvraag in de contactmomenten API geregistreerd wilt hebben. Laat u het vinkje hier weg, dan wordt de aanvraag niet geregistreerd in de contactmomenten API. De Organisatie RSIN is het nummer van de betreffende organisatie (Gemeente). Bij contactmoment type komt te staan om wat voor soort ‘contacttype’ de aanvraag gaat. Het contactmomenttype dient te worden gedefinieerd door middel van een contacttype uit e-Suite. Het kanaal van het contactmoment behelst de manier waarop er contact is gezocht en de aanvraag is gedaan. Ook kan er een gebruikersnaam te worden ingevuld van een specifieke medewerker van de gemeente, zoals ingegeven op e-Suite. Wanneer dit veld leeg blijft, wordt het contactformulier op basis van het onderwerp bij de juiste afdeling afgeleverd.
+
+U kunt een vinkje zetten bij “Haal bronnen op uit de Klanten- en Contactmomenten-API's voor gebruikers die zijn geauthenticeerd met eHerkenning via RSIN”. Indien dit is ingeschakeld, worden bronnen uit de Klanten- en Contactmomenten-API's voor eHerkenning-gebruikers opgehaald via RSIN (Open Klant). Indien dit niet is ingeschakeld, worden deze bronnen via het KVK-nummer opgehaald. U kunt ook een vinkje zetten bij “Stuur bevestigingsmail voor registratie van klantcontact”. Indien dit is ingeschakeld wordt het 'contactform_confimation' e-mailsjabloon gebruikt om een e-mailbevestiging te sturen nadat het contactformulier verzonden is. Indien dit is uitgeschakeld wordt aangenomen dat de externe contactmomenten API (eg. eSuite) de e-mailbevestiging zal sturen.
+
+Filter contactmomenten
+^^^^^^^^^^^^^^^^^^^^^^
+
+In deze sectie kunt u een lijst van eSuite-kanalen configureren die uitgesloten worden bij het opvragen van contactmomenten. Dit is met name nuttig voor kanalen die enkel voor intern gebruik bestemd zijn.
+
+Services
+^^^^^^^^
+
+Onder services staan de API’s van de te koppelen services. Bij de configuratie van Open Zaak gaat het om een Klanten API en een Contactmomenten API. Deze services kunnen niet worden verwijderd of veranderd. U selecteert hier de juiste API van de betreffende gemeente.
+
+Contactformulier onderwerpen
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Bij Mijn Aanvragen vindt de gebruiker een contactformulier om de aanvraag in te dienen. U kunt als beheerder dit contactformulier configureren door de tekstuele labels aan te passen. Deze onderdelen kunt u indien gewenst ook voorzien van een e-Suite onderwerpcode. Wanneer deze code is ingevuld komt een contactformulier op basis van deze onderwerpcode automatisch bij de juiste afdeling terecht. De volgorde van de elementen van het contactformulier kan indien gewenst worden aangepast. Bovendien kunt u elementen uit het formulier verwijderen door een vinkje te zetten bij [verwijderen]. Om nog een onderwerp aan het contactformulier toe te voegen klikt u op [+ Nog een contactformulier onderwerp toevoegen]. Als alles naar wens is geconfigureerd klikt u op [Opslaan].
+
+9.4.2. OpenKlant2
+-----------------
+
+Er zijn diverse onderdelen die ingesteld moeten worden om Mijn zaken naar behoren te laten functioneren. Wanneer u binnen de Configuratie Klantensysteem klikt op de link met 'configureer de OpenKlant2 backend' wordt er een nieuw venster geopend waarin alle elementen staan die moeten worden geconfigureerd. 
+
+.. image:: images/Screenshot_OIP_Configuratie_Klantensysteem_OpenKlant2_Djuzz_250710.png
+
+API Configuratie
+^^^^^^^^^^^^^^^^
+
+Bij deze configuratie kan een Service geselecteerd (of aangemaakt) worden die de technische configuratie bevat voor het communiceren met het OpenKlant2 systeem.
+
+Vragen
+^^^^^^
+
+De instellingen die onder de sectie 'vragen' staan zijn noodzakelijk voor de integratie met OpenKlant2 in het "Mijn Vragen" gedeelte van de website. Hoewel alle velden afzonderlijk worden toegelicht in het scherm, verdient het veld "Mijn Vragen Actor" speciale aandacht. Dit veld vereist namelijk een geldige UUID van een bestaande Actor in het OpenKlant2 systeem. Deze Actor wordt gebruikt om nieuwe vragen automatisch als interne taken toe te wijzen voor afhandeling.
+
+Contactformulier onderwerpen
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Bij Mijn Aanvragen vindt de gebruiker een contactformulier om de aanvraag in te dienen. U kunt als beheerder dit contactformulier ook binnen OpenKlant2 configureren door de tekstuele labels aan te passen. Ook kunt u elementen uit het formulier verwijderen door een vinkje te zetten bij [verwijderen]. Om nog een onderwerp aan het contactformulier toe te voegen klikt u op [+ Nog een contactformulier onderwerp toevoegen]. Als alles naar wens is geconfigureerd klikt u op [Opslaan].
+
+
+9.5. KlantContactMomenten
 =========================
 
 Bij KlantContactMomenten vindt u een overzicht van alle door gebruikers gestelde vragen. In dit overzicht wordt weergegeven van welke gebruiker de vraag afkomstig is. Ook staat er een URL van het contactmoment in en wordt er door middel van een groen vinkje of een rood kruisje weergegeven of de gebruiker het antwoord op de vraag al heeft bekeken.
 
-9.5. Laposta configuratie
+9.6. Laposta configuratie
 =========================
 
 Laposta is de API voor nieuwsbriefintegratie. In de backend kunt u aangeven voor welke nieuwsbrieven gebruikers zich moeten kunnen inschrijven. Zoals aangegeven in de onderstaande screenshot.
@@ -260,7 +272,7 @@ Laposta is de API voor nieuwsbriefintegratie. In de backend kunt u aangeven voor
 
 Aan de voorkant van Open Inwoner krijgen gebruikers in Mijn Profiel de mogelijkheid zich in te schrijven voor diverse nieuwsbrieven. Afhankelijk van wat er in de backend door de beheerder mogelijk is gemaakt. Gebruikers kunnen zich te allen tijde aan- en afmelden en hun voorkeuren wijzigen.
 
-9.5.1. E-mailverificatie vereist
+9.6.1. E-mailverificatie vereist
 ================================
 
 Om de Laposta API te kunnen laten functioneren is het belangrijk dat er bij de Algemene configuratie een vinkje staat bij “E-mailverificatie vereist”. Wanneer dit is ingeschakeld krijgen nieuwe gebruikers na registratie een mail met een link waarmee zij hun e-mailadres moeten bevestigen.
@@ -270,17 +282,19 @@ Om de Laposta API te kunnen laten functioneren is het belangrijk dat er bij de A
    :height: 310px
 
 
-9.6. Notificaties componentconfiguratie
+9.7. Notificaties componentconfiguratie
 =======================================
 
 Wanneer u de notificaties van de componentconfiguratie instelt kunt u notificaties ontvangen van wijzigingen aan Zaken of documenten in eSuite of Open Zaak. Bij de instellingen kan aangegeven worden hoeveel afleverpogingen het systeem mag doen en de vertraging die er tussen de afleverpogingen mag zitten.
 
-9.6.1. Notificaties instellen
+9.7.1. Notificaties instellen
 =============================
 
 Om de notificaties van de componentconfiguratie in te stellen volgt u het volgende stappenplan:
 
-1) Creëer een ZGW Service voor de notificatie-API (NRC) met door de ZGW backend verzorgde referenties (/admin/zgw_consumers/service/). De ZGW heeft de volgende rechten nodig om referenties te kunnen verzorgen:
+1) Creëer een ZGW Service voor de notificatie-API (NRC) met door de ZGW backend
+   verzorgde referenties (/admin/zgw_consumers/service/). Deze Service heeft de volgende
+   rechten nodig om referenties te kunnen verzorgen:
 
 -  catalogi.lezen
 -  zaken.lezen
@@ -289,48 +303,63 @@ Om de notificaties van de componentconfiguratie in te stellen volgt u het volgen
 -  documenten.aanmaken
 -  notificaties.consumeren
 
-2) Update Notificaties componentconfiguratie (/admin/notifications_api_common/notificationsconfig/) Selecteer de bovenstaande service.
+2) Update Notificaties componentconfiguratie
+   (/admin/notifications_api_common/notificationsconfig/), selecteer de bij stap 1
+   aangemaakte Service.
 
-3) Creëer een Webhook-abonnement (/admin/notifications_api_common/subscription/) De Callback-url is het OIP domein met het volgende pad: /api/openzaak/notifications/webhook/zaken. Bijvoorbeeld: https://open-inwoner.gemeente.nl/api/openzaak/notifications/webhook/zaken
+3) De Configuratie 'Open Zaak' moet worden ingesteld voor Zaken (ZRC), Catalogus (ZTC)
+   en Documenten (DRC). (/admin/openzaak/openzaakconfig/) Selecteer in eSuite ook "Maak
+   gebruik van StatusType.informeren workaround (eSuite)".
 
-De Client-ID en Client-secret kunnen arbitrair zijn, maar de Client-secret moet moeilijk te raden zijn. Het veld ‘kanalen’ moet de Zaken bevatten.
-Sla op en registreer de Webhook explciet door het in de lijst te selecteren en te klikken op [Webhook registreren]. De NRC-API zal worden gebruikt om de Webhook te registreren. Zodra deze met succes is geregistreerd zal de Webhook een URL set krijgen waarmee men zich kan abonneren.
+4) Configureer in eSuite de Zaaktypes (/admin/openzaak/zaaktypeconfig/) Selecteer de
+   Zaaktypes en InformatieObjectTypes en configureer de bijbehorende notificatieopties.
+   Er is een cronjob om deze catalogus te importeren. Dit commando kan te allen tijde
+   worden uitgevoerd door via de "Period tasks" pagina onder "Overige/Diverse" de
+   "Importeer ZGW data" taak handmatig te starten via de "Start taak" knop.
 
-4) De Configuratie 'Open Zaak' moet worden ingesteld voor Zaken (ZRC), Catalogus (ZTC) en Documenten (DRC). (/admin/openzaak/openzaakconfig/) Selecteer in eSuite ook "Maak gebruik van StatusType.informeren workaround (eSuite)".
+9.8. Objects API client configuration
+=====================================
 
-5) Configureer in eSuite de Zaaktypes (/admin/openzaak/zaaktypeconfig/) Selecteer de Zaaktypes en InformatieObjectTypes en configureer de bijbehorende notificatieopties. Er is een cronjob om deze catalogus te importeren. Dit commando kan te allen tijde worden uitgevoerd python src/manage.py zgw_import_data (from the virtual env)
+Bij Objects API client configuration stelt u in welke API gebruikt wordt.
 
-9.7. Open Forms client configuration
+**Objects API service:** de koppeling naar de externe bron waar de gegevens vandaan komen.
+**Objects type API service:** geeft aan welk type gegevens (bijvoorbeeld inwoners, documenten of aanvragen) via deze koppeling beschikbaar zijn.
+
+Zo weet het Open Inwoner Platform waar het welke gegevens kan ophalen of opslaan.
+
+.. image:: images/Screenshot_OIP_Datakoppelingen_Objects_APIclient_configuration_Djuzz_250710.png
+
+9.9. Open Forms client configuration
 ====================================
 
 Bij Open Forms client configuration kunt u de configuratie van de Open Forms client gekoppeld aan het Open Inwoner Platform wijzigen. Hiermee kunt u Open Inwoner koppelen aan Open Formulieren. Wanneer dit is ingesteld is het mogelijk bij ieder product een formulier te selecteren uit Open Formulieren in plaats van via een externe URL om zo een aanvraag in gang te zetten. De Open Forms client configuration dient eenmalig te worden ingesteld. Dit kan door de beheerder of door Maykin worden gedaan.
 
-9.7.1. SDK
+9.9.1. SDK
 ----------
 
 Bij SDK kunnen de instellingen rond de voorkant van Open Formulieren worden aangepast. Het gaat hier om de CSS en Javascript instellingen voor wat betreft de vormgeving van Open Formulieren zoals ze voor de gebruiker na het doorklikken zichtbaar zijn. Op deze manier kan de huisstijl eenvoudig worden doorgevoerd in het betreffende formulier.
 
-9.7.2. Gebruik Sentry
+9.9.2. Gebruik Sentry
 ---------------------
 
 Open Formulieren kan gebruik maken van logs op Sentry. Wanneer er een vinkje is gezet bij “Gebruik Sentry” worden SDK errors van Open Formulieren automatisch doorgestuurd naar de ingestelde Sentry instantie.
 
-9.8. Open Zaak informatieobject notificatie records
-===================================================
+9.10. Open Zaak informatieobject notificatie records
+====================================================
 
 Bij Open Zaak informatieobject notificatie records vindt u een register met daarin gegevens over naar welke gebruikers welke notificaties zijn verstuurd naar aanleiding van het toevoegen of wijzigen van een document.
 
-9.9. Open Zaak statusnotificatie records
-========================================
+9.11. Open Zaak statusnotificatie records
+=========================================
 
 Bij Open Zaak statusnotificatie records vindt u naar welke gebruikers welke notificaties zijn verstuurd naar aanleiding van een statuswijziging.
 
-9.10. Qmatic configuratie
+9.12. Qmatic configuratie
 =========================
 
 De Qmatic configuratie maakt het mogelijk dat gebruikers in Mijn profiel hun balie-afspraken bij de Gemeente kunnen raadplegen. Hiervoor wordt gebruik gemaakt van een calendar API waar de gegevens vandaan gehaald worden. Ook is er de mogelijkheid een reservering URL in te geven, zodat gebruikers hun afspraak bij de gemeente kunnen wijzigen of verwijderen.
 
-9.10.1. E-mailverificatie vereist
+9.12.1. E-mailverificatie vereist
 ---------------------------------
 
 Om de Qmatic API te kunnen laten functioneren is het belangrijk dat er bij de Algemene configuratie een vinkje staat bij “E-mailverificatie vereist”. Wanneer dit is ingeschakeld krijgen nieuwe gebruikers na registratie een mail met een link waarmee zij hun e-mailadres moeten bevestigen.
@@ -340,16 +369,16 @@ Om de Qmatic API te kunnen laten functioneren is het belangrijk dat er bij de Al
    :height: 394px
 
 
-9.11. SOAP services
+9.13. SOAP services
 ===================
 
 Bij SOAP Services staan alle externe SOAP-API koppelingen met het Open Inwoner Platform ingesteld. Deze mogen niet worden gewijzigd.
 
-9.12. SSD
+9.14. SSD
 =========
 Bij SSD kunt u het onderdeel Mijn Uitkeringen configureren. Denk hierbij aan alles wat in het onderdeel Mijn Uitkeringen zichtbaar is en op welke manier dit zichtbaar moet worden.
 
-9.12.1. SSD clients
+9.14.1. SSD clients
 -------------------
 
 Hier kunt u de koppelingen voor de Suite voor Sociaal Domein te configureren. U kunt hier alle gegevens rond PDF’s van maandspecificaties en jaaropgaven instellen en wijzigen. Gebruikers kunnen in het platform hun overzichten van uitkeringen downloaden.
@@ -382,12 +411,12 @@ Hier komt de naam van de applicatie die gebruik maakt van de SSD Client te staan
 Vul hier de gemeentecode in voor zaakregistratie
 
 
-9.12.2. Mijn uitkeringen
+9.14.2. Mijn uitkeringen
 ------------------------
 
 Hier kunt u de begeleidende tekst invullen voor het onderdeel Mijn uitkeringen. Er is hier een groot tekstveld beschikbaar zonder uitgebreide editor.
 
-9.12.3. Maandspecificatie
+9.14.3. Maandspecificatie
 -------------------------
 
 Bij maandspecificatie kunnen alle overzichten van het tabblad Maandspecificatie in het onderdeel Mijn uitkeringen worden geconfigureerd.
@@ -407,7 +436,7 @@ Hier vult u in vanaf de hoeveelste dat van een maand het nieuwe maandoverzicht b
 **Tabblad tekst**
 Hier kunt u de begeleidende tekst invullen voor het maandoverzicht-tabblad binnen *Mijn uitkeringen.* Er is hier een groot tekstveld beschikbaar zonder uitgebreide editor.
 
-9.12.4. Jaaropgave
+9.14.4. Jaaropgave
 ------------------
 
 Bij Jaaropgave kunnen alle overzichten van het tabblad Maandspecificatie in het onderdeel Mijn uitkeringen worden geconfigureerd.
@@ -431,22 +460,88 @@ Hier kunt u de begeleidende tekst invullen voor het jaaropgave-tabblad binnen *M
 **PDF helpteksten**
 Hier vult u de helptekst voor de kolommen in de jaaropgave PDF in. Deze helpteksten worden ingesloten in de PDF.
 
-9.13. Services
+9.15. Services
 ==============
 
 Bij Services staan alle externe REST-API koppelingen met het Open Inwoner Platform ingesteld. Deze mogen niet worden gewijzigd.
 
-9.14. Webhook-abonnementen
+9.16. Statusvertalingen
+=======================
+
+Bij Statusvertalingen kunt u de statussen personaliseren. Zo kunt u standaardteksten naar believen veranderen in statussen die beter passen bij de situatie. Het gaat hier dus niet om vertalingen van taal naar taal.
+
+9.17. Webhook-abonnementen
 ==========================
 
-Bij Webhook-abonnementen kunt u instellen dat u alle notificaties van een bepaald kanaal (zaken/documenten/besluiten) terug ontvangt van open zaak of eSuite.
+Bij Webhook-abonnementen kunt u instellen dat u alle notificaties van een bepaald kanaal
+(zaken/documenten/besluiten) van Open Zaak of eSuite terug ontvangt. Deze webhook
+berichten worden o.m. gebruikt om status updates aan inwoners te tonen of op E-mail
+notificaties te versturen, bijvoorbeeld bij een zaak update.
 
-9.15. Zaaktype configuraties
+In het overzicht van webhook-abonnementen kunt u zien welke webhook-abonnementen zijn
+ingesteld.
+
+.. image:: images/Screenshot_OIP_Datakoppelingen_Webhook-Abonnementen_overzicht_Djuzz_250828.png
+   :width: 624px
+
+9.17.1. Webhook-abonnement aanmaken
+--------------------------------------
+
+U kunt een webhook abonnement aanmaken door op de button [webhook-abonnement toevoegen] te klikken. Er wordt dan een nieuw venster geopend waar u het webhook-abonnement kunt configureren.
+
+
+.. image:: images/Screenshot_OIP_Datakoppelingen_Webhook-Abonnementen_Djuzz_250828.png
+   :width: 624px
+
+**Notifications api config**
+Hier selecteert u de API voor de betreffende notificaties. U kunt ook een nieuwe API toevoegen. (/admin/notifications_api_common/subscription/) 
+
+**Callback URL**
+De Callback-url is de host waar het Open Inwoner Platform op gedeployed is, gevolgd door het vaste pad ``/api/openzaak/notifications/webhook/zaken``. Bijvoorbeeld: https://open-inwoner.gemeente.nl/api/openzaak/notifications/webhook/zaken
+
+**Client ID**
+Dit is het client ID om het authenticator token samen te stellen. U kunt hier zelf een
+waarde voor bedenken, houdt daarbij in gedachte dat de client ID in het systeem van de
+verzender betekenisvol moet zijn (bijvoorbeeld ``oip-notificaties-gemeente-demodam-acc``)
+
+**Client secret**
+Client ID en Client-secret kunnen arbitrair zijn, maar de Client-secret moet moeilijk te
+raden zijn, dus veel karakters met een mengsel van leestekens, cijfers en letters. 
+
+**Kanalen**
+Bij kanalen vult u de kanalen in waarop u zich wilt abonneren. U kunt meerdere kanalen
+selecteren door ze te scheiden met een komma (,),
+maar in in de praktijk zal u hier vaak `zaken` invullen.
+
+Wanneer alle velden zijn ingevuld klikt u op [Opslaan]. Hierna dient u de Webhook te
+registreren explciet door het in de lijst te selecteren en te klikken op [Webhook
+registreren]. De NRC-API zal worden gebruikt om de Webhook te registreren.
+
+U kunt Onder het menu item Overige/diverse onder 'tasks' controleren of de webhook
+correct is geregistreerd. Indien dit het geval is, veschijnen er voor elke ontvangen
+notificatie een taak met de naam:
+``open_inwoner.openzaak.tasks.process_zaken_notification``. Ziet u deze taak (vaak)
+verschijnen, dan is de webhook succesvol geregistreerd.
+
+.. warning::
+   Zodra de webhook met succes is geregistreerd zal hij in het bovenstaande
+   overzicht een URL set krijgen waarmee men zich kan abonneren. Blijft het veld onder
+   nc-abonnement leeg, dan is de registratie niet gelukt.
+
+9.17.2. Webhook-abonnement verwijderen
+--------------------------------------
+
+Indien u een webhook-abonnement wilt verwijderen is het belangrijk dat de juiste
+volgorde in het verwijderproces wordt aangehouden. U dient allereerst de webhook te
+de-registreren via de "Acties" optie. Vervolgens kunt u de webhook verwijderen door in
+het overzicht van webhooks op de knop [verwijderen] te klikken.
+
+9.18. Zaaktype configuraties
 ============================
 
 Bij Zaaktype configuraties vindt u alle soorten Zaken die in Open Zaak of eSuite aanwezig zijn. Wanneer u klikt op een bepaald Zaaktype (zaaktype identificatie) wordt er een nieuw scherm geopend waarin u het betreffende Zaaktype configuratie kunt wijzigen.
 
-9.15.1. Zaaktype configuratie wijzigen
+9.18.1. Zaaktype configuratie wijzigen
 --------------------------------------
 In dit scherm, weergegeven op de volgende pagina, vindt u de gegevens van het betreffende Zaaktype. De catalogus, de identificatie en de omschrijving. Naast deze vaste gegevens kunt u ook enkele dingen wijzigen. U kunt aangeven of er notificaties moeten worden verstuurd en of het mogelijk moet zijn om documenten te uploaden ter ondersteuning van het betreffende Zaaktype.
 
@@ -492,7 +587,7 @@ uploaden van bestanden activeert, vindt het uploaden plaats via het Open Inwoner
    :height: 143px
 
 
-9.15.2. Zaaktype statustype configuraties
+9.18.2. Zaaktype statustype configuraties
 -----------------------------------------
 Hier kunt u de statustypes die bij het betreffende Zaaktype horen configureren. Enkele gegevens zijn vast en kunnen niet worden gewijzigd. De elementen die kunnen worden gewijzigd worden hier behandeld. Klik allereerst op ‘tonen’ om alle gegevens uit te vouwen.
 
@@ -546,7 +641,7 @@ Hier vult u de linktekst in om van de lijstweergave naar de detailweergave te na
 
 .. _ZTCImportExport:
 
-9.15.3. Zaaktype configuratie importeren/exporteren
+9.18.3. Zaaktype configuratie importeren/exporteren
 ---------------------------------------------------
 
 Het is mogelijk om individuele Zaaktype Configuratie objecten te importeren, op analoge wijze zoals beschreven voor de Catalogus Configuraties (zie :ref:`CatalogusImportExport`).

@@ -1,15 +1,12 @@
 from django import forms
 from django.contrib import admin, messages
-from django.contrib.admin.actions import delete_selected as default_delete_selected
 from django.contrib.flatpages.admin import FlatPageAdmin
 from django.contrib.sites.admin import SiteAdmin
 from django.contrib.sites.models import Site
 from django.core import exceptions
+from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
-from django.forms import ValidationError
-from django.http import HttpResponseRedirect
-from django.shortcuts import redirect
-from django.urls import resolve, reverse
+from django.urls import resolve
 from django.urls.exceptions import Resolver404
 from django.utils.html import format_html, format_html_join
 from django.utils.translation import gettext_lazy as _
@@ -26,40 +23,14 @@ from ..utils.iteration import split
 from .models import CustomFontSet, SiteConfiguration, SiteConfigurationPage
 
 
-@admin.action(description=_("Delete selected websites"))
-def delete_selected(modeladmin, request, queryset):
-    """
-    Override `delete_selected` action to prevent accidental deletion of all websites
-    """
-    if queryset.count() == Site.objects.all().count():
-        messages.add_message(
-            request,
-            messages.WARNING,
-            _("You cannot delete all websites; at least one site must remain."),
-        )
-        return HttpResponseRedirect(reverse("admin:sites_site_changelist"))
-    return default_delete_selected(modeladmin, request, queryset)
-
-
 class CustomSiteAdmin(SiteAdmin):
-    """
-    Overrides `SiteAdmin` to prevent deletion of last website
-    """
-
     model = Site
-    actions = [delete_selected]
 
-    def delete_model(self, request, obj):
-        if self.model.objects.count() < 2:
-            messages.add_message(
-                request, messages.WARNING, _("You cannot delete the last site.")
-            )
-            return redirect("admin:sites_site_changelist")
-        else:
-            super().delete_model(request, obj)
+    def has_add_permission(self, request):
+        return not Site.objects.exists()
 
-    class Media:
-        css = {"all": ("css/admin/admin_overrides.css",)}
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 # re-register `Site` with our CustomSiteAdmin

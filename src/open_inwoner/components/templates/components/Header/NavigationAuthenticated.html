@@ -23,22 +23,15 @@
 
                 <ul class="primary-navigation__list subpage-list">
                     {{ rendered_cms_menu__home }}
-
-                    {% if has_general_faq_questions %}
-                        <li class="primary-navigation__list-item">
-                            {% link text=_('Veelgestelde vragen') href='general_faq' icon="question_answer" icon_position="before" icon_outlined=True %}
-                        </li>
-                    {% endif %}
-
                     {% if user.is_eherkenning_user %}
                         {% session_is_branch_restricted as is_branch_restricted %}
                         {% if not is_branch_restricted %}
-                        <li class="header__list-item">
-                            {% link text=_("Wissel van vestiging") href="kvk:branches" icon="autorenew" icon_position="before" primary=True icon_outlined=True %}
-                        </li>
+                            <li class="primary-navigation__list-item primary-navigation__list-item--always-visible">
+                                {% link text=_("Wissel van vestiging") href="kvk:branches" icon="autorenew" icon_position="before" primary=True icon_outlined=True %}
+                            </li>
                         {% endif %}
                     {% endif %}
-                    <li class="header__list-item">
+                    <li class="primary-navigation__list-item primary-navigation__list-item--always-visible">
                         {% link text=_("Logout") href=request.user.get_logout_url icon="logout" icon_position="before" primary=True %}
                     </li>
                 </ul>

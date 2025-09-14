@@ -11,7 +11,7 @@
                 {% link href='tel:'|addstr:phonenumber secondary=True text=phonenumber %}
             {% endif %}
             {% if email %}
-                {% link href='mailto:'|addstr:email secondary=True text=email %}
+                {% link href='mailto:'|addstr:email secondary=True text=email extra_classes="link--mailto" %}
             {% endif %}
         </div>
     </div>

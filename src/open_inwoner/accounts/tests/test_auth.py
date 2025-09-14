@@ -4,6 +4,7 @@ from urllib.parse import urlencode
 from django.contrib.auth.signals import user_logged_in
 from django.contrib.sites.models import Site
 from django.core import mail
+from django.core.exceptions import ImproperlyConfigured
 from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
@@ -22,6 +23,10 @@ from open_inwoner.kvk.tests.factories import CertificateFactory
 from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.models import KlantenSysteemConfig
 from open_inwoner.openklant.tests.data import MockAPIReadPatchData
+from open_inwoner.openklant.tests.factories import (
+    ESuiteConfigFactory,
+    OpenKlant2ConfigFactory,
+)
 from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin
 
 from ...cms.collaborate.cms_apps import CollaborateApphook
@@ -1420,7 +1425,9 @@ class DuplicateEmailRegistrationTest(WebTest):
 
         self.assertEqual(users.count(), 1)
 
-    @patch("open_inwoner.accounts.views.profile.EditProfileView.update_esuite_klant")
+    @patch(
+        "open_inwoner.accounts.views.profile.EditProfileView.update_klant_via_esuite"
+    )
     def test_digid_user_can_edit_profile(self, mock_update):
         """
         Assert that digid user can edit their profile (the email of the same user
@@ -1560,7 +1567,9 @@ class DuplicateEmailRegistrationTest(WebTest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["form"].errors, expected_errors)
 
-    @patch("open_inwoner.accounts.views.profile.EditProfileView.update_esuite_klant")
+    @patch(
+        "open_inwoner.accounts.views.profile.EditProfileView.update_klant_via_esuite"
+    )
     def test_non_digid_user_can_edit_profile(self, mock_update):
         """
         Assert that non-digid users can edit their profile (the email of the same user
@@ -1814,6 +1823,215 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
                     ]
                 }
                 self.assertEqual(response.context["form"].errors, expected_errors)
+
+    @patch("open_inwoner.accounts.views.registration.OpenKlant2Service")
+    def test_update_klant_via_openklant_successful(self, mock_service_class):
+        """Test successful update of user data via OpenKlant"""
+        OpenKlant2ConfigFactory()
+
+        config = KlantenSysteemConfig.get_solo()
+        config.primary_backend = KlantenServiceType.OPENKLANT2.value
+        config.save()
+
+        user = UserFactory(
+            first_name="",
+            last_name="",
+            email="old@example.com",
+            phonenumber="",
+            login_type=LoginTypeChoices.digid,
+        )
+
+        # Mock the service
+        mock_service = mock_service_class.return_value
+        mock_partij = {
+            "uuid": "12345678-1234-1234-1234-123456789012",
+            "id": "123",
+            "naam": "Test User",
+        }
+        mock_service.get_or_create_partij_for_user.return_value = (mock_partij, True)
+
+        # Submit the form
+        response = self.app.get(self.url, user=user)
+        form = response.forms["necessary-form"]
+        form["email"] = "new@example.com"
+        form["first_name"] = "John"
+        form["last_name"] = "Doe"
+
+        response = form.submit()
+
+        # Assertions
+        self.assertEqual(response.status_code, 302)
+        mock_service.get_or_create_partij_for_user.assert_called_once_with(user=user)
+        mock_service.update_partij_from_user_data.assert_called_once_with(
+            partij_uuid="12345678-1234-1234-1234-123456789012",
+            update_data={"email": "new@example.com"},
+        )
+
+    @patch("open_inwoner.accounts.views.registration.OpenKlant2Service")
+    def test_update_klant_via_openklant_with_existing_partij(self, mock_service_class):
+        """Test update when partij already exists (not created)"""
+        OpenKlant2ConfigFactory()
+
+        config = KlantenSysteemConfig.get_solo()
+        config.primary_backend = KlantenServiceType.OPENKLANT2.value
+        config.save()
+
+        user = UserFactory(
+            first_name="",
+            last_name="",
+            email="old@example.com",
+            login_type=LoginTypeChoices.digid,
+        )
+
+        # Mock the service - partij already exists
+        mock_service = mock_service_class.return_value
+        mock_partij = {
+            "uuid": "12345678-1234-1234-1234-123456789012",
+            "id": "123",
+            "naam": "Test User",
+        }
+        # Return False for created to indicate partij already exists
+        mock_service.get_or_create_partij_for_user.return_value = (mock_partij, False)
+
+        # Submit the form
+        response = self.app.get(self.url, user=user)
+        form = response.forms["necessary-form"]
+        form["email"] = "new@example.com"
+        form["first_name"] = "John"
+        form["last_name"] = "Doe"
+
+        response = form.submit()
+
+        # Assertions
+        self.assertEqual(response.status_code, 302)
+        mock_service.update_partij_from_user_data.assert_called_once_with(
+            partij_uuid="12345678-1234-1234-1234-123456789012",
+            update_data={"email": "new@example.com"},
+        )
+
+    @patch("open_inwoner.accounts.views.registration.eSuiteKlantenService")
+    @patch("open_inwoner.accounts.views.registration.OpenKlant2Service")
+    def test_both_esuite_and_openklant_services_called(
+        self, mock_openklant_class, mock_esuite_class
+    ):
+        """Test that both eSuite and OpenKlant services are called when both are configured"""
+        ESuiteConfigFactory()
+        OpenKlant2ConfigFactory()
+
+        config = KlantenSysteemConfig.get_solo()
+        config.primary_backend = KlantenServiceType.ESUITE.value
+        config.save()
+        user = UserFactory(
+            first_name="",
+            last_name="",
+            email="old@example.com",
+            login_type=LoginTypeChoices.digid,
+        )
+
+        # Mock eSuite service
+        mock_esuite = mock_esuite_class.return_value
+        mock_klant = {"id": "esuite-123"}
+        mock_esuite.get_or_create_klant.return_value = (mock_klant, True)
+        mock_esuite.get_fetch_parameters.return_value = {}
+
+        # Mock OpenKlant service
+        mock_openklant = mock_openklant_class.return_value
+        mock_partij = {
+            "uuid": "12345678-1234-1234-1234-123456789012",
+            "id": "openklant-123",
+        }
+        mock_openklant.get_or_create_partij_for_user.return_value = (mock_partij, True)
+
+        # Submit the form
+        response = self.app.get(self.url, user=user)
+        form = response.forms["necessary-form"]
+        form["email"] = "new@example.com"
+        form["first_name"] = "John"
+        form["last_name"] = "Doe"
+
+        response = form.submit()
+
+        # Assertions
+        self.assertEqual(response.status_code, 302)
+        mock_esuite.get_or_create_klant.assert_called_once()
+        mock_esuite.update_klant_from_user.assert_called_once()
+        mock_openklant.get_or_create_partij_for_user.assert_called_once()
+        mock_openklant.update_partij_from_user_data.assert_called_once()
+
+    @patch("open_inwoner.accounts.views.registration.OpenKlant2Service")
+    @patch("open_inwoner.accounts.views.registration.logger")
+    def test_update_klant_via_openklant_service_not_configured(
+        self, mock_logger, mock_service_class
+    ):
+        """Test handling when OpenKlant service is not properly configured"""
+        OpenKlant2ConfigFactory()
+
+        config = KlantenSysteemConfig.get_solo()
+        config.primary_backend = KlantenServiceType.OPENKLANT2.value
+        config.save()
+
+        user = UserFactory(
+            first_name="",
+            last_name="",
+            email="old@example.com",
+            login_type=LoginTypeChoices.digid,
+        )
+
+        # Mock the service to raise ImproperlyConfigured
+        mock_service_class.side_effect = ImproperlyConfigured("Service not configured")
+
+        # Submit the form
+        response = self.app.get(self.url, user=user)
+        form = response.forms["necessary-form"]
+        form["email"] = "new@example.com"
+        form["first_name"] = "John"
+        form["last_name"] = "Doe"
+
+        response = form.submit()
+
+        # Assertions - form should still submit successfully
+        self.assertEqual(response.status_code, 302)
+        mock_logger.info.assert_called_once_with("Unable to build KlantenService")
+
+    @patch("open_inwoner.accounts.views.registration.OpenKlant2Service")
+    @patch("open_inwoner.accounts.views.registration.logger")
+    def test_update_klant_via_openklant_partij_creation_fails(
+        self, mock_logger, mock_service_class
+    ):
+        """Test error handling when partij creation fails"""
+        OpenKlant2ConfigFactory()
+        config = KlantenSysteemConfig.get_solo()
+        config.primary_backend = KlantenServiceType.OPENKLANT2.value
+        config.save()
+
+        user = UserFactory(
+            first_name="",
+            last_name="",
+            email="old@example.com",
+            login_type=LoginTypeChoices.digid,
+        )
+
+        # Mock the service to return None for partij
+        mock_service = mock_service_class.return_value
+        mock_service.get_or_create_partij_for_user.return_value = (None, False)
+
+        # Submit the form
+        response = self.app.get(self.url, user=user)
+        form = response.forms["necessary-form"]
+        form["email"] = "new@example.com"
+        form["first_name"] = "John"
+        form["last_name"] = "Doe"
+
+        response = form.submit()
+
+        # Assertions
+        self.assertEqual(response.status_code, 302)
+        mock_service.get_or_create_partij_for_user.assert_called_once_with(user=user)
+        mock_service.update_partij_from_user_data.assert_not_called()
+        mock_logger.error.assert_called_once_with(
+            "Unable to create partij during post-registration sync",
+            extra={"user": user},
+        )
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")

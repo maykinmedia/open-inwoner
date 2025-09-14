@@ -2,7 +2,7 @@ from django.test import TestCase
 
 import requests_mock
 
-from open_inwoner.openzaak.clients import build_zaken_client
+from open_inwoner.openzaak.clients import build_zaken_clients
 
 from ...utils.test import ClearCachesMixin
 from ..models import OpenZaakConfig
@@ -31,12 +31,14 @@ class TestFetchSpecificCase(ClearCachesMixin, TestCase):
             einddatum=None,
         )
 
-        self.client = build_zaken_client()
+        (self.zaken_client,) = build_zaken_clients()
 
     def test_case_is_retrieved(self, m):
         m.get(self.zaak["url"], json=self.zaak)
 
-        case = self.client.fetch_single_case("d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d")
+        case = self.zaken_client.fetch_single_case(
+            "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"
+        )
 
         self.assertEqual(
             case.url,
@@ -46,7 +48,9 @@ class TestFetchSpecificCase(ClearCachesMixin, TestCase):
     def test_no_case_is_retrieved_when_http_404(self, m):
         m.get(self.zaak["url"], status_code=404)
 
-        case = self.client.fetch_single_case("d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d")
+        case = self.zaken_client.fetch_single_case(
+            "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"
+        )
 
         self.assertIsNone(case)
 
@@ -56,6 +60,8 @@ class TestFetchSpecificCase(ClearCachesMixin, TestCase):
             status_code=500,
         )
 
-        case = self.client.fetch_single_case("d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d")
+        case = self.zaken_client.fetch_single_case(
+            "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"
+        )
 
         self.assertIsNone(case)

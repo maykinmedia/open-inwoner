@@ -58,7 +58,7 @@ beautifulsoup4==4.12.3
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   webtest
-billiard==4.2.0
+billiard==4.2.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -84,7 +84,7 @@ cbor2==5.6.2
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   webauthn
-celery==5.4.0
+celery==5.5.3
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -204,7 +204,7 @@ diff-match-patch==20200713
     #   django-import-export
 distlib==0.3.9
     # via virtualenv
-django==4.2.22
+django==4.2.24
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -468,7 +468,7 @@ django-sessionprofile==1.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-digid-eherkenning
-django-setup-configuration==0.8.2
+django-setup-configuration==0.9.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -758,7 +758,7 @@ jsonschema==4.1.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   drf-spectacular
-kombu==5.5.1
+kombu==5.5.4
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -869,6 +869,7 @@ packaging==23.0
     #   -r requirements/ci.txt
     #   build
     #   djangocms-text-ckeditor
+    #   kombu
     #   pytest
     #   sphinx
 pep517==0.11.0
@@ -892,7 +893,7 @@ pillow==10.3.0
     #   weasyprint
 pip-tools==7.3.0
     # via -r requirements/dev.in
-platformdirs==2.4.0
+platformdirs==4.4.0
     # via virtualenv
 playwright==1.50.0
     # via
@@ -1237,11 +1238,10 @@ typing-extensions==4.10.0
     #   xsdata
     #   zgw-consumers
     #   zgw-consumers-oas
-tzdata==2025.1
+tzdata==2025.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-    #   celery
     #   django-celery-beat
     #   kombu
 uritemplate==4.1.1
@@ -1274,7 +1274,7 @@ vine==5.1.0
     #   amqp
     #   celery
     #   kombu
-virtualenv==20.21.1
+virtualenv==20.34.0
     # via pre-commit
 waitress==2.1.2
     # via

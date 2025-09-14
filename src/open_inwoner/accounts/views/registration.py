@@ -13,7 +13,10 @@ from django.views.generic import TemplateView, UpdateView
 from django_registration.backends.one_step.views import RegistrationView
 from furl import furl
 
-from open_inwoner.openklant.services import eSuiteKlantenService
+from open_inwoner.openklant.constants import KlantenServiceType
+from open_inwoner.openklant.models import KlantenSysteemConfig
+from open_inwoner.openklant.services import OpenKlant2Service, eSuiteKlantenService
+from open_inwoner.openklant.types import PartijUpdateData
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from ...mail.verification import send_user_email_verification_mail
@@ -165,7 +168,11 @@ class NecessaryFieldsUserView(
     def form_valid(self, form):
         user = form.save()
 
-        self.update_klant(form)
+        klanten_config = KlantenSysteemConfig.get_solo()
+        if klanten_config.has_api_service_configured(KlantenServiceType.ESUITE):
+            self.update_klant_via_esuite(form)
+        if klanten_config.has_api_service_configured(KlantenServiceType.OPENKLANT2):
+            self.update_klant_via_openklant(form)
 
         invite = form.cleaned_data["invite"]
         if invite:
@@ -187,7 +194,36 @@ class NecessaryFieldsUserView(
 
         return initial
 
-    def update_klant(self, form: NecessaryUserForm):
+    def update_klant_via_openklant(self, form: NecessaryUserForm):
+        try:
+            service = OpenKlant2Service()
+        except ImproperlyConfigured:
+            logger.info("Unable to build KlantenService")
+            return
+
+        user = form.instance
+
+        partij, _ = service.get_or_create_partij_for_user(user=user)
+
+        if not partij:
+            logger.error(
+                "Unable to create partij during post-registration sync",
+                extra={"user": user},
+            )
+            return
+
+        update_data: PartijUpdateData = {}
+        if "email" in form.cleaned_data:
+            update_data["email"] = form.cleaned_data["email"]
+        if "phonenumber" in form.cleaned_data:
+            update_data["phonenumber"] = form.cleaned_data["phonenumber"]
+
+        service.update_partij_from_user_data(
+            partij_uuid=partij["uuid"],
+            update_data=update_data,
+        )
+
+    def update_klant_via_esuite(self, form: NecessaryUserForm):
         try:
             service = eSuiteKlantenService()
         except ImproperlyConfigured:

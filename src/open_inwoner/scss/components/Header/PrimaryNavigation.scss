@@ -153,6 +153,31 @@
   &.primary-navigation__authenticated {
     .primary-navigation__list .primary-navigation__list-item {
       justify-content: flex-end;
+      /* Wide screens: show only first item */
+
+      body:has(main.container.container--fullwidth):has(
+          .denhaag-side-navigation
+        )
+        & {
+        @media (min-width: 1024px) {
+          &:not(:first-child, &--always-visible),
+          .indicator {
+            display: none;
+          }
+        }
+      }
+
+      body:has(main.container:not(.container--fullwidth)):has(
+          .denhaag-side-navigation
+        )
+        & {
+        @media (min-width: 768px) {
+          &:not(:first-child, &--always-visible),
+          .indicator {
+            display: none;
+          }
+        }
+      }
 
       .nav-login__icon {
         [class*='icons'] {

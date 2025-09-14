@@ -6,8 +6,8 @@ from ape_pie import APIClient
 from openklant2._resources.base import ResourceMixin
 from openklant2.types.pagination import PaginatedResponseBody
 from openklant2.types.resources.digitaal_adres import (
-    CreateDigitaalAdresData,
     DigitaalAdres,
+    DigitaalAdresCreateData,
     ListDigitaalAdresParams,
 )
 
@@ -31,7 +31,10 @@ class DigitaalAdresResource(ResourceMixin):
     def create(
         self,
         *,
-        data: CreateDigitaalAdresData,
+        data: DigitaalAdresCreateData,
     ) -> DigitaalAdres:
         response = self._post(self.base_path, data=data)
         return cast(DigitaalAdres, self.process_response(response))
+
+    def delete(self, /, uuid: str):
+        return self._delete(f"{self.base_path}/{str(uuid)}")

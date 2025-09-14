@@ -61,16 +61,24 @@ class ContactMomentViewsTestCase(
         MockAPIReadData.setUpServices()
         self.api_group = ZGWApiGroupConfig.objects.get()
 
-        klant_config = ESuiteKlantConfig.get_solo()
-        klant_config.exclude_contactmoment_kanalen = ["intern_initiatief"]
-        klant_config.save()
+        self.klant_config = ESuiteKlantConfig.get_solo()
+        self.klant_config.exclude_contactmoment_kanalen = ["intern_initiatief"]
+        self.klant_config.register_bronorganisatie_rsin = "123456789"
+        self.klant_config.save()
 
         # for testing replacement of e-suite "onderwerp" code with OIP configured subject
         self.contactformsubject = ContactFormSubject.objects.create(
             subject="oip_subject",
             esuite_subject_code="e_suite_subject_code",
-            esuite_config=klant_config,
+            esuite_config=self.klant_config,
         )
+
+        from open_inwoner.openklant.constants import KlantenServiceType
+        from open_inwoner.openklant.models import KlantenSysteemConfig
+
+        self.config = KlantenSysteemConfig.get_solo()
+        self.config.primary_backend = KlantenServiceType.ESUITE.value
+        self.config.save()
 
     def test_contactmoment_list_bsn(
         self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
@@ -855,6 +863,9 @@ class ContactMomentViewsTestCase(
     def test_contactmoment_list_requires_bsn_or_kvk(
         self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
     ):
+        self.klant_config.register_bronorganisatie_rsin = "123456789"
+        self.klant_config.save()
+
         user = UserFactory()
         list_url = reverse("cases:contactmoment_list")
         response = self.app.get(list_url, user=user)

@@ -21,6 +21,7 @@ from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.laposta.models import LapostaConfig
 from open_inwoner.laposta.tests.factories import LapostaListFactory, MemberFactory
+from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.models import ESuiteKlantConfig
 from open_inwoner.pdc.tests.factories import CategoryFactory
 from open_inwoner.plans.tests.factories import PlanFactory
@@ -365,7 +366,9 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         }
         self.assertEqual(base_response.context["form"].errors, expected_errors)
 
-    @patch("open_inwoner.accounts.views.profile.EditProfileView.update_esuite_klant")
+    @patch(
+        "open_inwoner.accounts.views.profile.EditProfileView.update_klant_via_esuite"
+    )
     def test_save_filled_form(self, mock_update):
         mock_update.return_value = True
 
@@ -426,7 +429,9 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
                 }
                 self.assertEqual(response.context["form"].errors, expected_errors)
 
-    @patch("open_inwoner.accounts.views.profile.EditProfileView.update_esuite_klant")
+    @patch(
+        "open_inwoner.accounts.views.profile.EditProfileView.update_klant_via_esuite"
+    )
     def test_modify_email_succeeds(self, mock_update):
         mock_update.return_value = True
 
@@ -439,7 +444,9 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         self.assertEqual(response.url, self.return_url)
         self.assertEqual(self.user.email, "user@example.com")
 
-    @patch("open_inwoner.accounts.views.profile.EditProfileView.update_esuite_klant")
+    @patch(
+        "open_inwoner.accounts.views.profile.EditProfileView.update_klant_via_esuite"
+    )
     def test_modify_contact_details_eherkenning_succeeds(self, mock_update):
         mock_update.return_value = True
 
@@ -457,7 +464,9 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         self.assertEqual(eherkenning_user.phonenumber, "0612345678")
         self.assertEqual(eherkenning_user.phonenumber_alternative, "0687654321")
 
-    @patch("open_inwoner.accounts.views.profile.EditProfileView.update_esuite_klant")
+    @patch(
+        "open_inwoner.accounts.views.profile.EditProfileView.update_klant_via_esuite"
+    )
     def test_updating_a_field_without_modifying_email_succeeds(self, mock_update):
         mock_update.return_value = True
 
@@ -475,7 +484,9 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         self.assertEqual(self.user.email, initial_email)
         self.assertEqual(self.user.first_name, "Testing")
 
-    @patch("open_inwoner.accounts.views.profile.EditProfileView.update_esuite_klant")
+    @patch(
+        "open_inwoner.accounts.views.profile.EditProfileView.update_klant_via_esuite"
+    )
     def test_form_for_digid_brp_user_saves_data(self, mock_update):
         mock_update.return_value = True
         user = UserFactory(
@@ -526,7 +537,9 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
 
         self.assertEqual(type(form), BrpUserForm)
 
-    @patch("open_inwoner.accounts.views.profile.EditProfileView.update_esuite_klant")
+    @patch(
+        "open_inwoner.accounts.views.profile.EditProfileView.update_klant_via_esuite"
+    )
     def test_image_is_saved_when_begeleider_and_default_login(self, mock_update):
         mock_update.return_value = True
         self.user.contact_type = ContactTypeChoices.begeleider
@@ -545,7 +558,9 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
 
         self.assertIsNotNone(self.user.image.file)
 
-    @patch("open_inwoner.accounts.views.profile.EditProfileView.update_esuite_klant")
+    @patch(
+        "open_inwoner.accounts.views.profile.EditProfileView.update_klant_via_esuite"
+    )
     def test_image_is_saved_when_begeleider_and_digid_login(self, mock_update):
         mock_update.return_value = True
 
@@ -582,40 +597,6 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
 
         self.assertNotIn("image", form.fields.keys())
         self.assertEqual(response.pyquery("#id_image"), [])
-
-    @requests_mock.Mocker()
-    def test_modify_phone_and_email_updates_klant_api(self, m):
-        MockAPIReadPatchData.setUpServices()
-        data = MockAPIReadPatchData().install_mocks(m)
-
-        response = self.app.get(self.url, user=data.user)
-
-        # reset noise from signals
-        m.reset_mock()
-        self.clearTimelineLogs()
-
-        form = response.forms["profile-edit"]
-        form["email"] = "new@example.com"
-        form["phonenumber"] = "0612345678"
-        form["phonenumber_alternative"] = "0687654321"
-        form.submit()
-
-        # user data tested in other cases
-
-        self.assertTrue(data.matchers[0].called)
-        klant_patch_data = data.matchers[1].request_history[0].json()
-        self.assertEqual(
-            klant_patch_data,
-            {
-                "emailadres": "new@example.com",
-                "telefoonnummer": "0612345678",
-                "telefoonnummerAlternatief": "0687654321",
-            },
-        )
-        self.assertTimelineLog("retrieved klant for user")
-        self.assertTimelineLog(
-            "patched klant from user profile edit with fields: emailadres, telefoonnummer, telefoonnummerAlternatief"
-        )
 
     @requests_mock.Mocker()
     def test_eherkenning_user_updates_klant_api(self, m):
@@ -692,6 +673,40 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         self.assertFalse(data.matchers[1].called)
 
     @requests_mock.Mocker()
+    def test_modify_phone_and_email_updates_klant_api(self, m):
+        MockAPIReadPatchData.setUpServices()
+        data = MockAPIReadPatchData().install_mocks(m)
+
+        response = self.app.get(self.url, user=data.user)
+
+        # reset noise from signals
+        m.reset_mock()
+        self.clearTimelineLogs()
+
+        form = response.forms["profile-edit"]
+        form["email"] = "new@example.com"
+        form["phonenumber"] = "0612345678"
+        form["phonenumber_alternative"] = "0687654321"
+        form.submit()
+
+        # user data tested in other cases
+
+        self.assertTrue(data.matchers[0].called)
+        klant_patch_data = data.matchers[1].request_history[0].json()
+        self.assertEqual(
+            klant_patch_data,
+            {
+                "emailadres": "new@example.com",
+                "telefoonnummer": "0612345678",
+                "telefoonnummerAlternatief": "0687654321",
+            },
+        )
+        self.assertTimelineLog("retrieved klant for user")
+        self.assertTimelineLog(
+            "patched klant from user profile edit with fields: emailadres, telefoonnummer, telefoonnummerAlternatief"
+        )
+
+    @requests_mock.Mocker()
     def test_modify_phone_updates_klant_api_but_skip_unchanged_email(self, m):
         MockAPIReadPatchData.setUpServices()
         data = MockAPIReadPatchData().install_mocks(m)
@@ -750,6 +765,141 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         self.assertTimelineLog(
             "patched klant from user profile edit with fields: emailadres"
         )
+
+    @requests_mock.Mocker()
+    def test_update_via_openklant(self, m):
+        MockAPIReadPatchData.setUpServices(
+            klanten_service_type=KlantenServiceType.OPENKLANT2
+        )
+        data = MockAPIReadPatchData().install_mocks_openklant(m)
+
+        response = self.app.get(self.url, user=data.digid_user)
+
+        # reset noise from signals
+        m.reset_mock()
+        self.clearTimelineLogs()
+
+        form = response.forms["profile-edit"]
+        form["email"] = "new@example.com"
+        form["phonenumber"] = "0612345678"
+        form["phonenumber_alternative"] = "0687654321"
+        response = form.submit()
+
+        self.assertEqual(response.status_code, 302)
+
+        digitale_adressen_requests = [
+            response
+            for response in m.request_history
+            if "digitaleadressen" in response.path
+        ]
+
+        # 1. email update
+        email_requests = [
+            response
+            for response in digitale_adressen_requests
+            if response.method in ["POST"]
+            and response.json()
+            and response.json().get("soortDigitaalAdres") == "email"
+        ]
+        self.assertEqual(len(email_requests), 1)
+
+        email_req = email_requests[0]
+        self.assertEqual(email_req.json()["adres"], "new@example.com")
+        self.assertEqual(email_req.json()["soortDigitaalAdres"], "email")
+        self.assertEqual(
+            email_req.json()["verstrektDoorPartij"],
+            {"uuid": "7260ea01-12c0-4750-8fd1-dfa777818837"},
+        )
+
+        # 2. phone number updates
+        phone_requests = [
+            response
+            for response in digitale_adressen_requests
+            if response.method in ["POST"]
+            and response.json()
+            and response.json().get("soortDigitaalAdres") == "telefoonnummer"
+        ]
+        self.assertEqual(len(phone_requests), 2)
+
+        phone_numbers = [response.json() for response in phone_requests]
+        standard_number = next(num for num in phone_numbers if num["isStandaardAdres"])
+        self.assertEqual(
+            standard_number,
+            {
+                "adres": "0612345678",
+                "soortDigitaalAdres": "telefoonnummer",
+                "isStandaardAdres": True,
+                "verstrektDoorPartij": {"uuid": "7260ea01-12c0-4750-8fd1-dfa777818837"},
+                "verstrektDoorBetrokkene": None,
+                "omschrijving": "OIP profiel",
+            },
+        )
+
+        alt_number = next(num for num in phone_numbers if not num["isStandaardAdres"])
+        self.assertEqual(
+            alt_number,
+            {
+                "adres": "0687654321",
+                "soortDigitaalAdres": "telefoonnummer",
+                "isStandaardAdres": False,
+                "verstrektDoorPartij": {"uuid": "7260ea01-12c0-4750-8fd1-dfa777818837"},
+                "verstrektDoorBetrokkene": None,
+                "omschrijving": "OIP profiel",
+            },
+        )
+
+    @requests_mock.Mocker()
+    def test_update_via_openklant_cleans_up_old_contact_info(self, m):
+        """Test that old contact information is deleted from OpenKlant when updating"""
+        MockAPIReadPatchData.setUpServices(
+            klanten_service_type=KlantenServiceType.OPENKLANT2
+        )
+        MockAPIReadPatchData().install_mocks_openklant(m)
+
+        User.objects.all().delete()
+        digid_user = DigidUserFactory()
+
+        digid_user.email = "old@example.com"
+        digid_user.phonenumber = "0600000000"
+        digid_user.phonenumber_alternative = "0611111111"
+        digid_user.save()
+
+        # Mock DELETE requests for old contact info
+        delete_email_matcher = m.delete(
+            "http://localhost:8338/klantinteracties/api/v1/digitaleadressen/email-uuid-123",
+            status_code=204,
+        )
+        delete_phone_matcher = m.delete(
+            "http://localhost:8338/klantinteracties/api/v1/digitaleadressen/phone-uuid-123",
+            status_code=204,
+        )
+        delete_phone_alt_matcher = m.delete(
+            "http://localhost:8338/klantinteracties/api/v1/digitaleadressen/phone-alt-uuid-123",
+            status_code=204,
+        )
+
+        response = self.app.get(self.url, user=digid_user)
+
+        form = response.forms["profile-edit"]
+        form["email"] = "new@example.com"
+        form["phonenumber"] = "0612345678"
+        form["phonenumber_alternative"] = "0687654321"
+        response = form.submit()
+
+        self.assertEqual(response.status_code, 302)
+
+        # Verify DELETE requests were made for old contact info
+        self.assertTrue(delete_email_matcher.called_once)
+        self.assertTrue(delete_phone_matcher.called_once)
+        self.assertTrue(delete_phone_alt_matcher.called_once)
+
+        # Verify POST requests were made for new contact info
+        post_requests = [
+            req
+            for req in m.request_history
+            if req.method == "POST" and "digitaleadressen" in req.path
+        ]
+        self.assertEqual(len(post_requests), 3)  # email + 2 phone numbers
 
 
 class TestForm(ErrorMessageMixin, forms.Form):

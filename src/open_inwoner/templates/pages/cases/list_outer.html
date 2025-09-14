@@ -1,6 +1,19 @@
 {% extends 'master.html' %}
-{% load i18n icon_tags %}
+{% load i18n icon_tags static %}
 
+{% block mount_modules %} data-mount-modules='["sidenav"]'{% endblock %}
+
+{% block react_modules %}
+{# Including this script will allow the page to use the react component #}
+<script
+  type="module"
+  src="{% static 'bundles/open_inwoner-react.js' %}"
+></script>
+{% endblock %}
+
+{% block sidebar_content %}
+    {% include "components/Sidenav/Sidenav.html" %}
+{% endblock %}
 
 {% block content %}
     <div class="cases" id="cases-content"></div>

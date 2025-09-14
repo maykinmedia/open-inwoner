@@ -7,7 +7,7 @@ from requests import RequestException
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.models import User
 from open_inwoner.openzaak.api_models import OpenTask
-from open_inwoner.openzaak.clients import build_forms_client
+from open_inwoner.openzaak.clients import build_forms_clients
 from open_inwoner.userfeed.adapter import FeedItem
 from open_inwoner.userfeed.choices import FeedItemType
 from open_inwoner.userfeed.models import FeedItemData
@@ -87,11 +87,19 @@ def update_external_task_items(user: User, openstaande_taken: list[OpenTask]):
 
 
 def update_user_tasks(user: User):
-    if user.login_type == LoginTypeChoices.digid and (client := build_forms_client()):
+    if user.login_type != LoginTypeChoices.digid:
+        return
+
+    for client in build_forms_clients():
         try:
             tasks = client.fetch_open_tasks(user.bsn)
         except (RequestException, ClientError):
-            logger.exception("Something went wrong while fetching open tasks")
+            logger.exception(
+                "Something went wrong while fetching open tasks",
+                extra={
+                    "client": client,
+                },
+            )
         else:
             update_external_task_items(user, tasks)
 

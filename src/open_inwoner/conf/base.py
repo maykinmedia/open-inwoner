@@ -578,6 +578,7 @@ CMS_PLUGIN_CACHE = False
 CMS_TEMPLATES = [
     ("cms/fullwidth.html", "Home page template"),
     ("cms/cms_flatpage_template.html", "CMS Flatpage Template"),
+    ("cms/contactform/form_outer.html", "CMS Contactformulier Template"),
 ]
 CMS_PLACEHOLDER_CONF = {
     # TODO properly configure this based on actual available plugins
@@ -786,7 +787,7 @@ CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 # SENTRY - error monitoring
 #
 SENTRY_DSN = config("SENTRY_DSN", None)
-RELEASE = "v1.32.0"  # get_current_version()
+RELEASE = "v1.34.0"  # get_current_version()
 
 PRIVATE_MEDIA_ROOT = os.path.join(BASE_DIR, "private_media")
 FILER_ROOT = os.path.join(BASE_DIR, "media", "filer")
