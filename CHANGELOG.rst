@@ -26,7 +26,15 @@ Nieuwe features
   Javascript bestand te uploaden dat automatisch op alle pagina's van de website wordt
   geladen. Deze functionaliteit wordt gecontroleerd door de ``ALLOW_CUSTOM_JS``
   environment variabele die op deployment niveau moet worden ingesteld.
-
+* [:taiga-us: `3317`, :pr:`1890`]: Er is een nieuwe flag toegevoegd op de ZGW API sets
+  (``ZGWApiGroupConfig``) om, bij het opvragen van zaken, gebruik te maken van de
+  ``rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__kvkNummer`` en
+  ``rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__vestigingsNummer`` query
+  parameters, die sinds Open Zaak 1.20 beschikbaar zijn, in plaats van
+  ``rol__betrokkeneIdentificatie__vestiging__vestigingsNummer`` en
+  ``rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId``. Deze flag staat
+  standaard uit en moet expliciet aangezet worden voor een specifieke API set in het
+  beheerscherm. Zie de documentatie onder "Open Zaak" voor verdere informatie.
 
 Bugfixes
 --------

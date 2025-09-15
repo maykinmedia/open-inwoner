@@ -97,7 +97,13 @@ class CaseListService:
 
     @staticmethod
     def _zaken_client_factory(group: ZGWApiGroupConfig):
-        return cast(ZakenClient, build_zgw_client_from_service(group.zrc_service))
+        return cast(
+            ZakenClient,
+            build_zgw_client_from_service(
+                group.zrc_service,
+                use_openzaak_120_params=group.fetch_eherkenning_zaken_with_openzaak_120_params,
+            ),
+        )
 
     @staticmethod
     def _catalogi_client_factory(group: ZGWApiGroupConfig):

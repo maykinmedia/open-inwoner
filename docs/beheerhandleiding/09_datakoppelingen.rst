@@ -184,7 +184,29 @@ Deze API haalt de documenten op die bij een bepaalde zaak horen.
 In de catalogi zit alle informatie over zaaktypes en andere gerelateerde informatie. De Catalogi API vult de zaaktypeconfiguratie in. Denk hierbij aan statussen, documenten, resultaten.
 
 **Formulieren API (Open Aanvragen)**
-Deze API slaat de gegevens van onvoltooide formulieren op en vult deze automatisch in. Dit is een optioneel veld.
+Deze API slaat de gegevens van onvoltooide formulieren op en vult deze automatisch in.
+Dit is een optioneel veld.
+
+Dan volgen er onder **Backend-specifieke flags** een aantal opties die bepalen op welke wijze moet deze APIs gecommuniceerd
+wordt:
+
+**Maak gebruik van het RSIN voor ophalen eHerkenning zaken**: indien aangevinkt, zullen
+eHerkenning gebruikers geidentificeerd worden via de RSIN in plaats van het KVK nummer.
+
+**Klanten API back-end**: De backend waarin de klantgegevens voor deze API set staan. In
+de regel zal dit eSuite zijn voor eSuite zaaksystemeen, en Openklant 2 voor Open Zaak.
+Laat dit veld leeg indien u geen gebruik maakt van een klant systeem.
+
+**Fetch Zaken for users authenticated with eHerkenning using OpenZaak 1.20 query
+parameters**: Indien aangevinkt, zullen zaken voor eHerkenning gebruikers worden
+opgehaald met de ``rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__kvkNummer`` en
+``rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__vestigingsNummer`` query
+parameters, in plaats van de oudere
+``rol__betrokkeneIdentificatie__vestiging__vestigingsNummer`` en
+``rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId`` parameters. Deze
+nieuwe parameters zijn specifiek bedoeld voor OpenZaak versies 1.20 of hoger. Voor
+eSuite of oudere versies van OpenZaak maakt u geen gebruik van deze optie.
+
 
 9.4. Configuratie Klanten Systeem
 =================================

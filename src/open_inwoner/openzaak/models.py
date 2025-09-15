@@ -194,16 +194,22 @@ class ZGWApiGroupConfig(models.Model):
         blank=False,
     )
 
-    def _build_client_from_attr(self, attr: str):
+    def _build_client_from_attr(self, attr: str, **client_init_kwargs):
         from .clients import build_zgw_client_from_service
 
-        return build_zgw_client_from_service(getattr(self, attr))
+        return build_zgw_client_from_service(getattr(self, attr), **client_init_kwargs)
 
     @property
     def zaken_client(self):
         from .clients import ZakenClient
 
-        return cast(ZakenClient, self._build_client_from_attr("zrc_service"))
+        return cast(
+            ZakenClient,
+            self._build_client_from_attr(
+                "zrc_service",
+                use_openzaak_120_params=self.fetch_eherkenning_zaken_with_openzaak_120_params,
+            ),
+        )
 
     drc_service = models.ForeignKey(
         "zgw_consumers.Service",
@@ -264,6 +270,23 @@ class ZGWApiGroupConfig(models.Model):
             "If not enabled, Zaken are fetched using the KvK number (eSuite)."
         ),
         default=False,
+    )
+
+    fetch_eherkenning_zaken_with_openzaak_120_params = models.BooleanField(
+        default=False,
+        verbose_name=_(
+            "Fetch Zaken for users authenticated with eHerkenning using "
+            "OpenZaak 1.20 query parameters"
+        ),
+        help_text=_(
+            "If enabled, Zaken for eHerkenning users are fetched using the "
+            "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__kvkNummer and "
+            "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__vestigingsNummer "
+            "query parameters, rather than the rol__betrokkeneIdentificatie__vestiging_"
+            "_vestigingsNummer and rol__betrokkeneIdentificatie__nietNatuurlijkPersoon"
+            "__innNnpId query paramters. This feature is available only in OpenZaak "
+            "from version 1.20 and higher."
+        ),
     )
 
     # flags related to other services

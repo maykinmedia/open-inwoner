@@ -7,6 +7,7 @@ from urllib.parse import urlencode
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
+from django.core.cache import cache
 from django.test import TransactionTestCase
 from django.test.utils import override_settings
 from django.urls import reverse_lazy
@@ -822,6 +823,88 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                             ],
                         },
                     )
+
+    def test_use_openzaak_120_params_flag_varies_query_params_for_eherkenning_users(
+        self, m
+    ):
+        for mock in self.mocks:
+            mock._setUpMocks(m)
+
+        test_users = [
+            ("kvk_only", self.eherkenning_user),
+            ("vestiging", self.eherkenning_user_vestiging),
+        ]
+
+        for user_type, user in test_users:
+            for use_openzaak_120_params in [False, True]:
+                with self.subTest(
+                    user_type=user_type, use_openzaak_120_params=use_openzaak_120_params
+                ):
+                    # Set the flag for all API groups
+                    for group in self.api_groups:
+                        group.fetch_eherkenning_zaken_with_openzaak_120_params = (
+                            use_openzaak_120_params
+                        )
+                        group.save()
+
+                    # Register additional mocks for OpenZaak 1.20+ parameters
+                    if use_openzaak_120_params:
+                        for group in self.api_groups:
+                            zrc_root = group.zrc_service.api_root.rstrip("/")
+                            if user.vestiging:
+                                m.get(
+                                    f"{zrc_root}/zaken?maximaleVertrouwelijkheidaanduiding=beperkt_openbaar&rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__vestigingsNummer={user.vestiging}",
+                                    json={"results": []},
+                                )
+                            else:
+                                m.get(
+                                    f"{zrc_root}/zaken?maximaleVertrouwelijkheidaanduiding=beperkt_openbaar&rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__kvkNummer={user.kvk}",
+                                    json={"results": []},
+                                )
+
+                    m.reset_mock()
+
+                    # Clear caches to ensure fresh requests for each subtest
+                    cache.clear()
+
+                    self.client.force_login(user=user)
+                    self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
+
+                    used_urls = {
+                        req.url
+                        for req in m.request_history
+                        if req.path == "/api/v1/zaken" and req.method == "GET"
+                    }
+
+                    # Build expected URLs based on user type and flag
+                    expected_urls = set()
+                    for group in self.api_groups:
+                        zrc_root = group.zrc_service.api_root.rstrip("/")
+
+                        if use_openzaak_120_params:
+                            if user.vestiging:
+                                # OpenZaak 1.20+ vestiging parameter
+                                expected_urls.add(
+                                    f"{zrc_root}/zaken?maximaleVertrouwelijkheidaanduiding=beperkt_openbaar&rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__vestigingsNummer={user.vestiging}"
+                                )
+                            else:
+                                # OpenZaak 1.20+ KvK parameter
+                                expected_urls.add(
+                                    f"{zrc_root}/zaken?maximaleVertrouwelijkheidaanduiding=beperkt_openbaar&rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__kvkNummer={user.kvk}"
+                                )
+                        else:
+                            if user.vestiging:
+                                # Legacy vestiging parameter
+                                expected_urls.add(
+                                    f"{zrc_root}/zaken?maximaleVertrouwelijkheidaanduiding=beperkt_openbaar&rol__betrokkeneIdentificatie__vestiging__vestigingsNummer={user.vestiging}"
+                                )
+                            else:
+                                # Legacy KvK/RSIN parameter
+                                expected_urls.add(
+                                    f"{zrc_root}/zaken?maximaleVertrouwelijkheidaanduiding=beperkt_openbaar&rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId={user.kvk}"
+                                )
+
+                    self.assertEqual(used_urls, expected_urls)
 
     def test_list_cases_for_kvk_user_with_vestigingsnummer(self, m):
         for mock in self.mocks:
