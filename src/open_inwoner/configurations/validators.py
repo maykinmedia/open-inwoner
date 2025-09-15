@@ -18,3 +18,26 @@ def validate_oidc_config(value):
                 "in the OpenID Connect configuration."
             )
         )
+
+
+def validate_javascript_file(file):
+    """Validate JavaScript file for size only"""
+    max_size = 1024 * 512  # 0.5MB
+    if file.size > max_size:
+        raise ValidationError(
+            _("File is too large. Maximum size is %(max_size)s MB")
+            % {"max_size": max_size / (1024 * 1024)}
+        )
+
+    # Basic file validation
+    file.seek(0)
+    try:
+        content = file.read().decode("utf-8")
+    except UnicodeDecodeError:
+        raise ValidationError(
+            _("File is not a valid JavaScript file (invalid encoding)")
+        ) from None
+
+    # Reset file pointer
+    file.seek(0)
+    return file

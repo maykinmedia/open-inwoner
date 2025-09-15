@@ -1,13 +1,14 @@
+import logging
+from urllib.parse import urlparse
+
 from django import forms
+from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.flatpages.admin import FlatPageAdmin
 from django.contrib.sites.admin import SiteAdmin
 from django.contrib.sites.models import Site
-from django.core import exceptions
 from django.core.exceptions import ValidationError
-from django.core.validators import URLValidator
-from django.urls import resolve
-from django.urls.exceptions import Resolver404
+from django.urls import Resolver404, resolve
 from django.utils.html import format_html, format_html_join
 from django.utils.translation import gettext_lazy as _
 
@@ -21,6 +22,8 @@ from ..utils.css import ALLOWED_PROPERTIES
 from ..utils.fields import CSSEditorWidget
 from ..utils.iteration import split
 from .models import CustomFontSet, SiteConfiguration, SiteConfigurationPage
+
+logger = logging.getLogger(__name__)
 
 
 class CustomSiteAdmin(SiteAdmin):
@@ -67,25 +70,62 @@ class SiteConfigurationAdminForm(forms.ModelForm):
         fields = "__all__"
         widgets = {
             "extra_css": CSSEditorWidget,
+            "custom_javascript_confirmed": forms.CheckboxInput(
+                attrs={"style": "margin-bottom: 8px; margin-right: 8px;"}
+            ),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Only update the widget if the field exists in the form
+        if "custom_javascript" in self.fields:
+            self.fields["custom_javascript"].widget.attrs.update({"accept": ".js"})
+
+    def clean_custom_javascript(self):
+        custom_javascript = self.cleaned_data.get("custom_javascript")
+
+        if custom_javascript and not settings.ALLOW_CUSTOM_JS:
+            raise ValidationError(
+                _(
+                    "Custom JavaScript upload is disabled. Contact your system administrator to enable this feature by setting the ALLOW_CUSTOM_JS flag to true."
+                )
+            )
+
+        return custom_javascript
+
     def clean_redirect_to(self):
-        redirect_to = self.cleaned_data["redirect_to"]
+        """Validate redirect_to field"""
+        redirect_to = self.cleaned_data.get("redirect_to")
 
         if redirect_to:
+            # Check if it's a valid internal path
             if redirect_to.startswith("/"):
                 try:
                     resolve(redirect_to)
                 except Resolver404:
                     raise ValidationError(_("The entered path is invalid.")) from None
             else:
-                validate_url = URLValidator()
-                try:
-                    validate_url(redirect_to)
-                except exceptions.ValidationError:
-                    raise ValidationError(_("The entered url is invalid.")) from None
+                # Check if it's a valid URL
+                parsed = urlparse(redirect_to)
+                if not (parsed.scheme and parsed.netloc):
+                    raise ValidationError(_("The entered url is invalid."))
 
         return redirect_to
+
+    def clean(self):
+        cleaned_data = super().clean()
+        custom_javascript = cleaned_data.get("custom_javascript")
+        confirmed = cleaned_data.get("custom_javascript_confirmed")
+
+        if custom_javascript and not confirmed:
+            raise ValidationError(
+                {
+                    "custom_javascript_confirmed": _(
+                        "You must confirm that you have reviewed the JavaScript code before uploading."
+                    )
+                }
+            )
+        return cleaned_data
 
 
 @admin.register(SiteConfiguration)
@@ -279,6 +319,9 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "theme_stylesheet",
                     "extra_css",
                     "extra_css_allowed",
+                    "custom_javascript_confirmed",
+                    "custom_javascript",
+                    "custom_javascript_file_info",
                 ),
             },
         ),
@@ -309,6 +352,107 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                 ((_get_column(c),) for c in columns),
             ),
         )
+
+    def get_fieldsets(self, request, obj=None):
+        fieldsets = list(super().get_fieldsets(request, obj))
+
+        for i, (name, options) in enumerate(fieldsets):
+            if name == _("Advanced display options"):
+                fields = list(options["fields"])
+
+                if not settings.ALLOW_CUSTOM_JS:
+                    # Remove ALL JavaScript-related fields when disabled
+                    js_fields_to_remove = [
+                        "custom_javascript_confirmed",
+                        "custom_javascript",
+                        "custom_javascript_file_info",
+                    ]
+                    for js_field in js_fields_to_remove:
+                        if js_field in fields:
+                            fields.remove(js_field)
+
+                    # Add ONLY the status field when disabled
+                    fields.append("custom_javascript_status")
+                else:
+                    # When enabled, show all fields normally
+                    # Find where to insert the status field
+                    insert_index = len(fields)
+                    js_fields = [
+                        "custom_javascript_confirmed",
+                        "custom_javascript",
+                        "custom_javascript_file_info",
+                    ]
+
+                    for js_field in js_fields:
+                        if js_field in fields:
+                            insert_index = fields.index(js_field)
+                            break
+
+                    # Insert status field before JS fields when enabled
+                    fields.insert(insert_index, "custom_javascript_status")
+
+                new_options = options.copy()
+                new_options["fields"] = tuple(fields)
+                fieldsets[i] = (name, new_options)
+                break
+
+        return tuple(fieldsets)
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly_fields = [
+            "extra_css_allowed",
+            "custom_javascript_status",
+        ]
+
+        if settings.ALLOW_CUSTOM_JS:
+            readonly_fields.append("custom_javascript_file_info")
+
+        return readonly_fields
+
+    @admin.display(description=_("Custom JavaScript Status"))
+    def custom_javascript_status(self, obj):
+        if settings.ALLOW_CUSTOM_JS:
+            return format_html(
+                '<span class="js-enabled">{}</span>', _("Custom JavaScript is enabled")
+            )
+        else:
+            return format_html(
+                '<span class="js-disabled">{}</span>',
+                _("Custom JavaScript is disabled. Contact your system administrator."),
+            )
+
+    @admin.display(description=_("Current upload"))
+    def custom_javascript_file_info(self, obj):
+        if obj.custom_javascript:
+            try:
+                if obj.custom_javascript.storage.exists(obj.custom_javascript.name):
+                    if settings.ALLOW_CUSTOM_JS:
+                        size_kb = obj.custom_javascript.size / 1024
+                        # Extract just the filename from the full path
+                        filename = obj.custom_javascript.name.split("/")[-1]
+                        # Filename extraction
+                        if "_" in filename and filename.endswith(".js"):
+                            base_name = filename.split("_")[0]
+                            original_filename = f"{base_name}.js"
+                        else:
+                            original_filename = filename
+
+                        return format_html(
+                            "{}: {} KB",
+                            original_filename,  # Show filename
+                            round(size_kb, 1),  # Show size
+                        )
+                    else:
+                        return _("File uploaded but feature is disabled")
+                else:
+                    return _("File missing from storage")
+            except Exception:
+                logger.exception(
+                    "Unable to render custom javascript_file_info admin field"
+                )
+                return _("Error accessing file")
+
+        return _("No file uploaded")
 
     def report_contrast_ratio(self, request, obj):
         def check_contrast_ratio(label1, color1, label2, color2, expected_ratio):
@@ -354,6 +498,7 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
         )
 
     def save_model(self, request, obj, form, change):
+        """Override save to report contrast ratio"""
         super().save_model(request, obj, form, change)
         self.report_contrast_ratio(request, obj)
 

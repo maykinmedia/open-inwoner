@@ -378,7 +378,19 @@ Hier kunt u selecteren of u het onderwerpen-menu en/of de zoekbalk voor anonieme
 12.1.15. Geavanceerde opties
 ----------------------------
 
+Klik op 'Tonen' om deze opties uit te klappen.
+
+**Design/thema stylesheet**
 Hier kunt u extra CSS-stijlen invoegen die op de site gebruikt worden. Let op, er kan enkel gebruik worden gemaakt van een beperkte, veilige subset van CSS-eigenschappen. Niet alle CSS-stijlen worden door het systeem ondersteund. In de aangegeven lijst staan de toegestane CSS-attributen die men eventueel nog aan de site kan toevoegen.
+
+**Custom JavaScript**
+Hier kunt u een eigen Javascript bestand uploaden dat automatisch op alle pagina's van de website wordt geladen.
+
+.. note::
+   Deze functionaliteit moet eerst worden ingeschakeld door uw systeembeheerder via de ``ALLOW_CUSTOM_JS`` environment variabele, door deze toe te voegen en op 'True' te zetten. Als deze optie niet zichtbaar is, neem dan contact op met degene die uw deployment beheert.
+
+.. warning::
+   JavaScript kan de beveiliging en prestaties van de applicatie negatief beïnvloeden. Door het aanvinken van de checkbox bevestigt u dat u de mogelijke risico's begrijpt.
 
 12.1.16. Sociale media
 ----------------------

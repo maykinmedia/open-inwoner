@@ -67,6 +67,8 @@ def get_request(
     if page:
         request.current_page = page
 
+    request.csp_nonce = "test-nonce"
+
     middleware = SessionMiddleware()
     middleware.process_request(request)
     if session_vars:

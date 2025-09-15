@@ -13,8 +13,8 @@ Deployment aandachtspunten
 Nieuwe features
 ---------------
 
-* [:taiga-us:`3370`, :pr:`1888`]: Navigatiemenu-items correct weergegeven op verschillende schermbreedtes; 
-  ``@gemeente-denhaag/side-navigation`` bijgewerkt naar ``4.0.2``, waardoor notificatiebadges in 
+* [:taiga-us:`3370`, :pr:`1888`]: Navigatiemenu-items correct weergegeven op verschillende schermbreedtes;
+  ``@gemeente-denhaag/side-navigation`` bijgewerkt naar ``4.0.2``, waardoor notificatiebadges in
   navigatiemenu-items de rode indicator niet meer tonen.
 * [:taiga-us: `3406`, :pr:`1872`]: Het contactformulier wordt omgezet in een CMS-pagina.
   In plaats van één beschrijving heeft het contactformulier nu twee beschrijvingen, één voor
@@ -22,6 +22,11 @@ Nieuwe features
   nieuwe velden gekopieerd. Pas één of beide beschrijvingen naar behoefte aan.
 * [:pr:`1901`, :taiga-ta:`3447`]: ID en abonnement status toegevoegd als alleen-lezen
   velden in de admin detailpagina van de Webhook abonnementen.
+* [:taiga-us:`3407`, :pr:`1873`]: De mogelijkheid voor admin gebruikers om een custom
+  Javascript bestand te uploaden dat automatisch op alle pagina's van de website wordt
+  geladen. Deze functionaliteit wordt gecontroleerd door de ``ALLOW_CUSTOM_JS``
+  environment variabele die op deployment niveau moet worden ingesteld.
+
 
 Bugfixes
 --------
@@ -58,7 +63,7 @@ Bugfixes
   bij het ophalen van contactmomenten uit OpenKlant2 zijn opgelost.
 * [:taiga-is:`3389`, :pr:`1845`]: De synchronisatie van gebruikersprofielen met
   OpenKlant gebeurt nu ook direct na registratie, niet alleen na inloggen.
-* [:taiga-is:`3375`, :pr:`1852`, :pr:`1868` ]: Correct afbreken van lange woorden en
+* [:taiga-is:`3375`, :pr:`1868`]: Correct afbreken van lange woorden en
   e-mailadressen in smalle tegels, zoals bij productlocaties.
 * [:taiga-dimpact:`297`, :pr:`1866`]: Het verwijderen van websites en het toevoegen van
   sites naast de primaire website wordt voorkomen.

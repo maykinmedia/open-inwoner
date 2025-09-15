@@ -82,6 +82,12 @@ def settings(request):
         "cookie_link_text": config.cookie_link_text,
         "cookie_link_url": config.cookie_link_url,
         "extra_css": config.extra_css,
+        "custom_javascript_url": config.custom_javascript.url
+        if config.custom_javascript
+        and config.custom_javascript_confirmed
+        and django_settings.ALLOW_CUSTOM_JS
+        and hasattr(config.custom_javascript, "url")
+        else None,
         "theme_stylesheet": (
             config.theme_stylesheet.url if config.theme_stylesheet else None
         ),

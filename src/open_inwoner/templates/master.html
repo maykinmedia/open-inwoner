@@ -60,12 +60,17 @@
             <link id="theme-css" nonce="{{ request.csp_nonce }}" media="all" rel="stylesheet" href="{{ theme_stylesheet }}" />
         {% endif %}
         {% block extra_css %}{% endblock %}
-        {% block extra_head %}{% endblock %}
         {% if extra_css %}
             <style id="extra-css" nonce="{{ request.csp_nonce }}">
                 {{ extra_css }}
             </style>
         {% endif %}
+        {% block custom_scripts %}
+            {% if custom_javascript_url %}
+                <script nonce="{{ request.csp_nonce }}" src="{{ custom_javascript_url }}" defer></script>
+            {% endif %}
+        {% endblock custom_scripts %}
+        {% block extra_head %}{% endblock %}
     {% include "analytics/siteimprove.html" %}
 	{% if request|cookies_accepted %}
 	  {% include "analytics/google.html" %}
