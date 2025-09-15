@@ -495,7 +495,7 @@ django-solo==2.2.0
     #   notifications-api-common
     #   objects-api-client-django
     #   zgw-consumers
-django-timeline-logger==4.0.0
+django-timeline-logger==5.0.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt

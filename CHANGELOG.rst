@@ -49,6 +49,7 @@ Onderhoud
 * [:cve:`CVE-2024-53899`, :pr:`1892`] ``virtualenv`` bijgewerkt naar versie ``20.34.0``.
 * [:pr:`1897`] Het legacy management commando ``zgw_dev_status`` is verwijderd, alsmede
   legacy code voor het beheren van een "default" ZGW API Group.
+* [:pr:`1903`] ``django-timeline-logger`` bijgewerkt naar ``5.0.0``.
 
 1.34.0 (2025-09-03)
 ===================

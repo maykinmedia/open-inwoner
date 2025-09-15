@@ -277,7 +277,7 @@ django-solo==2.2.0
     #   notifications-api-common
     #   objects-api-client-django
     #   zgw-consumers
-django-timeline-logger==4.0.0
+django-timeline-logger==5.0.0
     # via -r requirements/base.in
 django-timezone-field==6.1.0
     # via django-celery-beat
