@@ -1,3 +1,4 @@
+import functools
 import logging
 
 from django.contrib.admin import models
@@ -171,3 +172,8 @@ def system_action(
             **kwargs,
         },
     )
+
+
+system_debug = functools.partial(system_action, log_level=logging.DEBUG)
+system_error = functools.partial(system_action, log_level=logging.ERROR)
+system_warning = functools.partial(system_action, log_level=logging.WARNING)

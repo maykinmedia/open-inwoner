@@ -18,6 +18,19 @@ Bugfixes
   weergegeven in de zijnavigatie.
 * [:taiga-is:`3486`: :pr:`1946`]: Menu-items op pagina 'Mijn Zaken' worden niet langer
   dubbel getoond in de sidebar en het dropdownmenu.
+* [:taiga-is:`3445`, :pr:`1898`]: De sjabloontag field_as_widget ging er onterecht
+  vanuit dat het primaire argument een formulierveld was en veroorzaakte daardoor
+  sporadisch fouten.
+* [:taiga-is:`3459`: :pr:`1908`]: Haal de CMS-pagina voor het contactformulier op basis
+  van de sjabloon in plaats van de plug-in (zodat de pagina in de voettekst wordt
+  gekoppeld zodra deze is aangemaakt).
+* [:taiga-is:`3377`,  :pr:`1917`]: De ``static/bundles/images`` map wordt nu correct
+  opgebouwd in de Docker container, waardoor o.m. `marker-icon.png` bestanden correct
+  ontsloten worden.
+* [:taiga-is:`3466`, :pr:`1922`]: De bitnami images in CI en docker-compose zijn
+  vervangen met de officiële Elasticsearch images.
+* [:taiga-is:`3460`, :pr:`1904`]: Het indienen van lege waarden tijdens het bijwerken van
+  het profiel, wat leidt tot fouten van e, is opgelost.
 
 Onderhoud
 ---------
