@@ -1,6 +1,8 @@
 import dataclasses
 import logging
 
+from django.utils.translation import gettext as _
+
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -84,6 +86,9 @@ class NotificationsWebhookBaseView(APIView):
             )
         else:
             # looks like we're good
+            log_system_action(
+                _("accepted ZGW notification"), content_object=subscription
+            )
             return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -95,6 +100,11 @@ class ZakenNotificationsWebhookView(NotificationsWebhookBaseView):
     def handle_notification(self, notification: Notification):
         config = SiteConfiguration.get_solo()
         if not config.notifications_cases_enabled:
+            log_system_action(
+                _(
+                    "skipped processing of ZGW notification because case notifications are disabled"
+                )
+            )
             return
 
         notification_data = dataclasses.asdict(notification)

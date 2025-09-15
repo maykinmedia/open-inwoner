@@ -35,6 +35,9 @@ Nieuwe features
   ``rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId``. Deze flag staat
   standaard uit en moet expliciet aangezet worden voor een specifieke API set in het
   beheerscherm. Zie de documentatie onder "Open Zaak" voor verdere informatie.
+* [:taiga-ta:`3455`, :pr:`1903`] Bij het accepteren van ZGW webhook berichten worden er
+  nu logboek vermeldingen aangemaakt zodat beter gecontroleerd worden of en hoe de
+  notificaties naar behoren werken.
 
 Bugfixes
 --------
