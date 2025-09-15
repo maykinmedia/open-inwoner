@@ -420,10 +420,26 @@ Wanneer u de paginalijst in de footer wilt weergeven, selecteert u deze plugin. 
 11.2.10. Contactformulier aanpassen via CMS
 -------------------------------------------
 
-Het contactformulier van Open Inwoner kan worden aangepast via het Django CMS. Dit doet u door naar het CMS menu te gaan. U krijgt dan frontend van het Open Inwoner de opties om pagina’s te wijzigen, maar als u op de pagina van het contactformulier bent vindt u i het plugin menu ook de contactformulier plugin.
+Het contactformulier van Open Inwoner kan worden aangepast via het Django CMS. Hiervoor dient eerst een primaire back-end te zijn geconfigureerd, met een koppeling naar een klanten systeem. Ook dient deze back-end een aangemaakt "contact formulier onderwerp" te hebben, anders worden deze formulieronderwerpen niet zichtbaar in de keuzelijst van het gepubliceerde contactformulier.
+
+Django CMS kan worden bereikt via het CMS menu. U krijgt dan in de front-end van het Open Inwoner Platform de opties om nieuwe pagina’s aan te maken of te wijzigen. Indien u dit nog niet gedaan heeft, dan kunt u hier een pagina aanmaken voor het contactformulier en deze eerst opslaan.
+
+.. image:: images/frontCMScontactpaginaAanmaken.png
+   :alt: CMS contactformulier
+   :width: 600px
+
+Na bewaren kunt u voor deze contactpagina naar "Geavanceerde instellingen" gaan en daar eerst het juiste sjabloon kiezen ("CMS Contactformulier Sjabloon") en de juiste Applicatie koppelen: "Openklant applicatie." Publiceer de pagina. Deze wordt direct zichtbaar als link in de footer en in de sitemap.
+
+.. image:: images/frontCMScontactpaginaGeavanceerd.png
+   :alt: CMS contactformulier
+   :width: 600px
+
+Wanneer u op de pagina van het contactformulier zelf bent, dan vindt u in de CMS plugin werkbalk ook de contactformulier plugin.
 
 .. image:: images/frontCMScontactformulier.png
    :alt: CMS contactformulier
    :width: 600px
 
-Wanneer u op het potloodicoontje klikt, verschijnt er een pop-up waarmee u de begeleidende tekst van het contactformulier kunt aanpassen middels een rich text editor. Zodra u uw gewenste tekst heeft opgesteld klikt u op opslaan. De tekst wordt direct boven het contactformulier weergegeven.
+Wanneer u op het potloodicoontje klikt, verschijnt er een pop-up waarmee u de begeleidende teksten van het contactformulier kunt aanpassen middels een rich text editor. Zodra u uw gewenste teksten heeft opgesteld klikt u op opslaan. De tekst wordt direct boven het contactformulier weergegeven.
+
+Het contactformulier dat publiekelijk zichtbaar is voor alle gebruikers kunt u hier een andere beschrijvende tekst mee geven dan het contact formulier dat alleen zichtbaar is voor ingelogde gebruikers.
