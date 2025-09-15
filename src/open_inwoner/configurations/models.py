@@ -23,6 +23,19 @@ from .choices import ColorTypeChoices, CustomFontName, OpenIDDisplayChoices
 from .validators import validate_javascript_file, validate_oidc_config
 
 
+class TimelineLogConfig(SingletonModel):
+    automatically_prune_logs = models.BooleanField(
+        verbose_name=_("Automatically prune timeline logs"),
+        default=False,
+        help_text=_("Enable automatic pruning of old timeline log entries"),
+    )
+    keep_days = models.PositiveIntegerField(
+        verbose_name=_("Keep logs for days"),
+        default=90,
+        help_text=_("Number of days to keep timeline log entries before pruning"),
+    )
+
+
 class SiteConfiguration(SingletonModel):
     name = models.CharField(
         verbose_name=_("Name"),

@@ -21,7 +21,12 @@ from ..utils.colors import ACCESSIBLE_CONTRAST_RATIO, get_contrast_ratio
 from ..utils.css import ALLOWED_PROPERTIES
 from ..utils.fields import CSSEditorWidget
 from ..utils.iteration import split
-from .models import CustomFontSet, SiteConfiguration, SiteConfigurationPage
+from .models import (
+    CustomFontSet,
+    SiteConfiguration,
+    SiteConfigurationPage,
+    TimelineLogConfig,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -126,6 +131,14 @@ class SiteConfigurationAdminForm(forms.ModelForm):
                 }
             )
         return cleaned_data
+
+
+@admin.register(TimelineLogConfig)
+class TimelineLogConfigAdmin(SingletonModelAdmin):
+    fields = (
+        "automatically_prune_logs",
+        "keep_days",
+    )
 
 
 @admin.register(SiteConfiguration)
