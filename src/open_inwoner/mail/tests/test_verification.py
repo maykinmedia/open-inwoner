@@ -247,7 +247,7 @@ class TestMailVerificationMiddlewareFlow(WebTest):
         config.email_verification_required = True
         config.save()
 
-        self.app.get(self.url, user=user, status=200)
+        response = self.app.get(self.url, user=user, status=200)
 
     @patch(
         "open_inwoner.accounts.views.registration.send_user_email_verification_mail",
@@ -255,6 +255,9 @@ class TestMailVerificationMiddlewareFlow(WebTest):
     )
     def test_unverified_user_redirects(self, mock_send):
         config = SiteConfiguration.get_solo()
+        config.email_verification_message = "Test email for {email}"
+        config.save()
+
         user = UserFactory(email="foo@example.com")
         self.assertFalse(user.has_verified_email())
 
@@ -271,6 +274,9 @@ class TestMailVerificationMiddlewareFlow(WebTest):
         self.assertRedirects(response, verify_url)
 
         response = response.follow()
+
+        # email verification text
+        self.assertIn("Test email for <strong>foo@example.com</strong>", response.text)
 
         # email sent immediately on GET
         mock_send.assert_called_once_with(user, "")

@@ -174,6 +174,8 @@ Wanneer u in de blauwe balk bij notificaties op [tonen] klikt, krijgt u de mogel
 .. image:: images/Algemeneconfiguratienotificaties.png
    :width: 624px
 
+Het e-mailverificatiebericht voor nieuwe gebruikers is configureerbaar. Als e-mailverificatie vereist is, mag het bericht niet leeg zijn.
+
 
 4.5.6. Contacten - uitnodigingen
 --------------------------------
