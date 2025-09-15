@@ -35,7 +35,7 @@ from open_inwoner.openklant.types import PartijUpdateData
 from open_inwoner.plans.models import Plan
 from open_inwoner.qmatic.client import NoServiceConfigured, qmatic_client_factory
 from open_inwoner.questionnaire.models import QuestionnaireStep
-from open_inwoner.utils.logentry import system_action
+from open_inwoner.utils.logentry import system_action, system_error
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from ..forms import BrpUserForm, CategoriesForm, UserForm, UserNotificationsForm
@@ -266,9 +266,24 @@ class EditProfileView(
                     "Please try again later"
                 ),
             )
-            self.log_change(
-                self.get_object(), _("profile changes not saved due to Klant API error")
+            # Log which service failed and what fields were being updated
+            failed_services = []
+            if not esuite_update_ok:
+                failed_services.append("eSuite")
+            if not openklant_update_ok:
+                failed_services.append("OpenKlant")
+
+            log_msg = (
+                "API service failure when updating user profile. "
+                "Failed services: %(failed_services)s. "
+                "Changed fields: %(changed_fields)s"
+                % {
+                    "failed_services": " and ".join(failed_services),
+                    "changed_fields": ", ".join(form.changed_data),
+                }
             )
+            system_error(message=log_msg, user=self.get_object())
+
             return HttpResponseRedirect(self.get_success_url())
 
         form.save()
