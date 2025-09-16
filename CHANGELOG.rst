@@ -55,6 +55,7 @@ Onderhoud
   naar versie ``2.32.5``.
 * [:cve:`CVE-2024-37891`, :cve:`CVE-2024-35195`, :pr:`1905`] ``urllib3`` bijgewerkt
   naar versie ``2.5.0``.
+* [:pr:`1905`] ``vcrpy`` bijgewerkt naar versie ``7.0.0``.
 
 1.34.0 (2025-09-03)
 ===================

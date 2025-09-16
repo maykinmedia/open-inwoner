@@ -1250,11 +1250,12 @@ urllib3==2.5.0
     #   elastic-transport
     #   requests
     #   sentry-sdk
+    #   vcrpy
 uwsgi==2.0.23
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-vcrpy==6.0.1
+vcrpy==7.0.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
