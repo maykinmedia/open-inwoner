@@ -284,7 +284,7 @@ class ZGWApiGroupConfig(models.Model):
             "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__vestigingsNummer "
             "query parameters, rather than the rol__betrokkeneIdentificatie__vestiging_"
             "_vestigingsNummer and rol__betrokkeneIdentificatie__nietNatuurlijkPersoon"
-            "__innNnpId query paramters. This feature is available only in OpenZaak "
+            "__innNnpId query parameters. This feature is available only in OpenZaak "
             "from version 1.20 and higher."
         ),
     )

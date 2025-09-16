@@ -145,7 +145,7 @@ class TestAdminForm(WebTest):
         response = self.form.submit()
 
         self.assertIn(
-            "Email verification message cannot be empty if email verification is required",
+            "E-mailverificatiebericht mag niet leeg zijn als e-mailverificatie vereist is",
             response.text,
         )
 
@@ -186,7 +186,7 @@ class CustomJavaScriptValidatorTests(TestCase):
             validate_javascript_file(large_file)
 
         error_message = str(context.exception)
-        self.assertIn("too large", error_message)
+        self.assertIn("Bestand is te groot", error_message)
 
     def test_invalid_unicode_file(self):
         """Test that non-UTF8 files are rejected"""
@@ -198,7 +198,7 @@ class CustomJavaScriptValidatorTests(TestCase):
         with self.assertRaises(ValidationError) as context:
             validate_javascript_file(invalid_file)
 
-        self.assertIn("not a valid JavaScript", str(context.exception))
+        self.assertIn("geen geldig JavaScript-bestand", str(context.exception))
 
     def test_empty_javascript_file(self):
         """Test that empty JavaScript file passes validation"""
@@ -375,7 +375,7 @@ class SiteConfigurationJavaScriptAdminTests(TestCase):
         """Test that status shows enabled message when feature flag is true"""
         status_message = self.admin_instance.custom_javascript_status(self.site_config)
 
-        self.assertIn("Custom JavaScript is enabled", status_message)
+        self.assertIn("Custom JavaScript is ingeschakeld", status_message)
         self.assertIn('class="js-enabled"', status_message)
 
     @override_settings(ALLOW_CUSTOM_JS=False)
@@ -383,7 +383,7 @@ class SiteConfigurationJavaScriptAdminTests(TestCase):
         """Test that status shows disabled message when feature flag is false"""
         status_message = self.admin_instance.custom_javascript_status(self.site_config)
 
-        self.assertIn("Custom JavaScript is disabled", status_message)
+        self.assertIn("Upload van custom JavaScript is uitgeschakeld.", status_message)
         self.assertIn('class="js-disabled"', status_message)
 
     @override_settings(ALLOW_CUSTOM_JS=True)
@@ -392,7 +392,7 @@ class SiteConfigurationJavaScriptAdminTests(TestCase):
         # Test with no file
         self.site_config.custom_javascript = None
         info = self.admin_instance.custom_javascript_file_info(self.site_config)
-        self.assertEqual(info, "No file uploaded")
+        self.assertEqual(info, "Er zijn nog geen bestanden geüpload.")
 
         # Test with file
         js_content = 'console.log("test");'  # This is 20 bytes
@@ -420,7 +420,7 @@ class SiteConfigurationJavaScriptAdminTests(TestCase):
         self.site_config.save()
 
         info = self.admin_instance.custom_javascript_file_info(self.site_config)
-        self.assertEqual(info, "File uploaded but feature is disabled")
+        self.assertEqual(info, "Bestand geupload maar functionaliteit is uitgeschakeld")
 
     def test_javascript_field_upload_to_path(self):
         """Test that JavaScript files are uploaded to correct path"""
@@ -503,7 +503,7 @@ class SiteConfigurationJavaScriptAdminTests(TestCase):
             self.site_config.custom_javascript.storage, "exists", return_value=False
         ):
             info = self.admin_instance.custom_javascript_file_info(self.site_config)
-            self.assertEqual(info, "File missing from storage")
+            self.assertEqual(info, "Bestand niet gevonden in opslag")
 
     @override_settings(ALLOW_CUSTOM_JS=True)
     def test_javascript_file_info_when_exception_is_raised(self):
@@ -524,7 +524,7 @@ class SiteConfigurationJavaScriptAdminTests(TestCase):
             side_effect=ValueError,
         ):
             info = self.admin_instance.custom_javascript_file_info(self.site_config)
-            self.assertEqual(info, "Error accessing file")
+            self.assertEqual(info, "Fout bij openen van bestand")
 
 
 @disable_admin_mfa()
@@ -544,7 +544,7 @@ class JavaScriptAdminRenderingTests(WebTest):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'name="custom_javascript"')
         self.assertContains(response, "custom_javascript_confirmed")
-        self.assertContains(response, "Custom JavaScript is enabled")
+        self.assertContains(response, "Custom JavaScript is ingeschakeld")
 
     @override_settings(ALLOW_CUSTOM_JS=False)
     def test_admin_renders_with_javascript_disabled(self):
@@ -555,7 +555,7 @@ class JavaScriptAdminRenderingTests(WebTest):
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'name="custom_javascript"')
         self.assertNotContains(response, "custom_javascript_confirmed")
-        self.assertContains(response, "Custom JavaScript is disabled")
+        self.assertContains(response, "Upload van custom JavaScript is uitgeschakeld.")
 
 
 @disable_admin_mfa()
