@@ -66,36 +66,36 @@ jobs:
         run: |
           npm run check-linting
 
-  ruff-check:
-    name: Lint code with ruff
+  pre-commit:
+    name: Run pre-commit checks
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v4
-      - name: Install Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Install dependencies
-        run: |
-          pip install uv
-          grep ^ruff requirements/ci.txt | uv pip install --system -r /dev/stdin
-      - name: Run ruff check on all files
-        run: ruff check --output-format=github src
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+      - uses: pre-commit/action@v3.0.1
 
-  ruff-format:
-    name: Format code with ruff
+  ruff-version-check:
+    name: Check ruff version consistency
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v4
-      - name: Install Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Install dependencies
+      - uses: actions/checkout@v3
+      - name: Check ruff versions match
         run: |
-          pip install uv
-          grep ^ruff requirements/ci.txt | uv pip install --system -r /dev/stdin
-      - name: Run ruff format on all files
-        run: ruff format --diff --target-version py311 src
+          # Extract ruff version from ci.txt
+          CI_VERSION=$(grep "^ruff" requirements/ci.txt | sed 's/.*==//')
+
+          # Extract ruff version from pre-commit config
+          PRECOMMIT_VERSION=$(grep -A1 "repo: https://github.com/astral-sh/ruff-pre-commit" .pre-commit-config.yaml | grep "rev:" | sed 's/.*v//')
+
+          echo "Ruff version in ci.txt: $CI_VERSION"
+          echo "Ruff version in pre-commit-config.yaml: $PRECOMMIT_VERSION"
+
+          if [ "$CI_VERSION" != "$PRECOMMIT_VERSION" ]; then
+            echo "❌ ERROR: Ruff versions do not match!"
+            echo "requirements/ci.txt has: $CI_VERSION"
+            echo ".pre-commit-config.yaml has: $PRECOMMIT_VERSION"
+            echo "Please update both files to use the same ruff version."
+            exit 1
+          else
+            echo "✅ SUCCESS: Ruff versions match ($CI_VERSION)"
+          fi
