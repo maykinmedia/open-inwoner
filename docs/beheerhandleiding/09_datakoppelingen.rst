@@ -41,7 +41,7 @@ Catalogi en Zaaktype Configuraties kunnen worden geëxporteerd en geïmporteerd 
 
 .. note::
    De import/export-functionaliteit vereist dat de gekoppelde zaaksystemen materieel gelijk zijn. Dit betekent dat de catalogi en onderliggende zaaktypes in beide ZGW API's aanwezig moeten zijn (hoewel de URLs en UUIDs mogen verschillen). Voer daarom de ``Importeer ZGW data`` periodieke taak eerst handmatig uit op zowel de bron als bestemming zodat de ZGW objecten volledig in sync zijn.
-  
+
 
 .. note::
    Het onderstaande proces spitst zich toe op het importeren van hele Catalogus Configuraties. Echter, het is eveneens mogelijk om alleen bepaalde Zaaktype Configuraties te importeren/exporteren. Dit werkt op exact dezelfde wijze als in deze sectie is omschreven voor de Catalogus Configuraties. Ongeacht via welk scherm de export is aangemaakt, kunnen de opgeslagen bestande op zowel de totaaloverzichten van Catalogus Configuraties en Zaaktype Configruates geïmporteerd worden. Zie ook :ref:`ZTCImportExport`.
@@ -207,13 +207,14 @@ parameters, in plaats van de oudere
 nieuwe parameters zijn specifiek bedoeld voor OpenZaak versies 1.20 of hoger. Voor
 eSuite of oudere versies van OpenZaak maakt u geen gebruik van deze optie.
 
+.. _configuratie-klanten-systeem:
 
 9.4. Configuratie Klanten Systeem
 =================================
 
 Dit is de configuratie voor de koppeling van het Open Inwoner Platform met een klantensysteem, zoals eSuite of OpenKlant2. Indien één of beide systemen zijn geconfigureerd, worden klantgegevens (zoals e-mailadres en telefoonnummer) met deze systemen uitgewisseld. Deze systemen zijn ook noodzakelijk om gebruik te kunnen maken van het "Mijn Vragen" gedeelte van het platform.
 
-In het hoofdscherm is het belangrijk om een "primaire" backend te kiezen. Dit is de backend waaruit klantgegevens worden uitgelezen en waarin nieuwe vragen in "Mijn Vragen" worden aangemaakt. 
+In het hoofdscherm is het belangrijk om een "primaire" backend te kiezen. Dit is de backend waaruit klantgegevens worden uitgelezen en waarin nieuwe vragen in "Mijn Vragen" worden aangemaakt.
 
 Het wegschrijven van klantgegevens gebeurt altijd naar alle geconfigureerde backends, maar voor het bijwerken van de klantgegevens op basis van het klantensysteem wordt enkel naar de primaire backend gekeken.
 
@@ -224,7 +225,7 @@ U dient eerst de betreffende backends via de daarvoor bestemde links te configur
 9.4.1. E-suite
 --------------
 
-Er zijn diverse onderdelen die ingesteld moeten worden om Mijn zaken naar behoren te laten functioneren. Wanneer u binnen de Configuratie Klantensysteem klikt op de link met 'configureer de eSuite backend' wordt er een nieuw venster geopend waarin alle elementen staan die moeten worden geconfigureerd. 
+Er zijn diverse onderdelen die ingesteld moeten worden om Mijn zaken naar behoren te laten functioneren. Wanneer u binnen de Configuratie Klantensysteem klikt op de link met 'configureer de eSuite backend' wordt er een nieuw venster geopend waarin alle elementen staan die moeten worden geconfigureerd.
 
 .. image:: images/Screenshot_OIP_Configuratie_Klantensysteem_Esuite_Djuzz_250710.png
 
@@ -258,7 +259,7 @@ Bij Mijn Aanvragen vindt de gebruiker een contactformulier om de aanvraag in te 
 9.4.2. OpenKlant2
 -----------------
 
-Er zijn diverse onderdelen die ingesteld moeten worden om Mijn zaken naar behoren te laten functioneren. Wanneer u binnen de Configuratie Klantensysteem klikt op de link met 'configureer de OpenKlant2 backend' wordt er een nieuw venster geopend waarin alle elementen staan die moeten worden geconfigureerd. 
+Er zijn diverse onderdelen die ingesteld moeten worden om Mijn zaken naar behoren te laten functioneren. Wanneer u binnen de Configuratie Klantensysteem klikt op de link met 'configureer de OpenKlant2 backend' wordt er een nieuw venster geopend waarin alle elementen staan die moeten worden geconfigureerd.
 
 .. image:: images/Screenshot_OIP_Configuratie_Klantensysteem_OpenKlant2_Djuzz_250710.png
 
@@ -516,7 +517,7 @@ U kunt een webhook abonnement aanmaken door op de button [webhook-abonnement toe
    :width: 624px
 
 **Notifications api config**
-Hier selecteert u de API voor de betreffende notificaties. U kunt ook een nieuwe API toevoegen. (/admin/notifications_api_common/subscription/) 
+Hier selecteert u de API voor de betreffende notificaties. U kunt ook een nieuwe API toevoegen. (/admin/notifications_api_common/subscription/)
 
 **Callback URL**
 De Callback-url is de host waar het Open Inwoner Platform op gedeployed is, gevolgd door het vaste pad ``/api/openzaak/notifications/webhook/zaken``. Bijvoorbeeld: https://open-inwoner.gemeente.nl/api/openzaak/notifications/webhook/zaken
@@ -528,7 +529,7 @@ verzender betekenisvol moet zijn (bijvoorbeeld ``oip-notificaties-gemeente-demod
 
 **Client secret**
 Client ID en Client-secret kunnen arbitrair zijn, maar de Client-secret moet moeilijk te
-raden zijn, dus veel karakters met een mengsel van leestekens, cijfers en letters. 
+raden zijn, dus veel karakters met een mengsel van leestekens, cijfers en letters.
 
 **Kanalen**
 Bij kanalen vult u de kanalen in waarop u zich wilt abonneren. U kunt meerdere kanalen
@@ -683,5 +684,5 @@ U kunt het aldus opgeslagen bestand vervolgens op een andere installatie importe
 
 .. note::
    Zaaktype Configuraties die via deze wijze worden gexporteerd, kunnen ook worden
-   geimporteerd via het Catalogus Configuratie scherm, en omgekeerd. 
+   geimporteerd via het Catalogus Configuratie scherm, en omgekeerd.
    Zie verder :ref:`CatalogusImportExport`.
