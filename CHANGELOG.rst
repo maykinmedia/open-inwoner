@@ -44,6 +44,9 @@ Bugfixes
 * [:taiga-is:`3445`, :pr:`1898`]: De sjabloontag field_as_widget ging er onterecht
   vanuit dat het primaire argument een formulierveld was en veroorzaakte daardoor
   sporadisch fouten.
+* [:taiga-is:`3459`: :pr:`1908`]: Haal de CMS-pagina voor het contactformulier op basis
+  van de sjabloon in plaats van de plug-in (zodat de pagina in de voettekst wordt gekoppeld
+  zodra deze is aangemaakt).
 
 Onderhoud
 ---------
