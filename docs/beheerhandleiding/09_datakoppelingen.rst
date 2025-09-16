@@ -495,13 +495,9 @@ Bij Statusvertalingen kunt u de statussen personaliseren. Zo kunt u standaardtek
 9.17. Webhook-abonnementen
 ==========================
 
-Bij Webhook-abonnementen kunt u instellen dat u alle notificaties van een bepaald kanaal
-(zaken/documenten/besluiten) van Open Zaak of eSuite terug ontvangt. Deze webhook
-berichten worden o.m. gebruikt om status updates aan inwoners te tonen of op E-mail
-notificaties te versturen, bijvoorbeeld bij een zaak update.
+Bij Webhook-abonnementen kunt u instellen dat u alle notificaties van een bepaald kanaal (zaken/documenten/besluiten) van Open Zaak of eSuite terug ontvangt. Deze webhookberichten worden onder andere gebruikt om status updates aan inwoners te tonen of e-mailnotificaties te versturen. Bijvoorbeeld bij een zaak-update.
 
-In het overzicht van webhook-abonnementen kunt u zien welke webhook-abonnementen zijn
-ingesteld.
+In het overzicht van webhook-abonnementen kunt u zien welke webhook-abonnementen zijn ingesteld.
 
 .. image:: images/Screenshot_OIP_Datakoppelingen_Webhook-Abonnementen_overzicht_Djuzz_250828.png
    :width: 624px
@@ -522,41 +518,25 @@ Hier selecteert u de API voor de betreffende notificaties. U kunt ook een nieuwe
 De Callback-url is de host waar het Open Inwoner Platform op gedeployed is, gevolgd door het vaste pad ``/api/openzaak/notifications/webhook/zaken``. Bijvoorbeeld: https://open-inwoner.gemeente.nl/api/openzaak/notifications/webhook/zaken
 
 **Client ID**
-Dit is het client ID om het authenticator token samen te stellen. U kunt hier zelf een
-waarde voor bedenken, houdt daarbij in gedachte dat de client ID in het systeem van de
-verzender betekenisvol moet zijn (bijvoorbeeld ``oip-notificaties-gemeente-demodam-acc``)
+Dit is het client ID om het authenticator token samen te stellen. U kunt hier zelf een waarde voor bedenken, houdt daarbij in gedachte dat de client ID in het systeem van de verzender betekenisvol moet zijn (bijvoorbeeld ``oip-notificaties-gemeente-demodam-acc``)
 
 **Client secret**
-Client ID en Client-secret kunnen arbitrair zijn, maar de Client-secret moet moeilijk te
-raden zijn, dus veel karakters met een mengsel van leestekens, cijfers en letters. 
+Client ID en Client-secret kunnen arbitrair zijn, maar de Client-secret moet moeilijk te raden zijn. Gebruik hiervoor dus veel karakters met een mengsel van leestekens, cijfers en letters. 
 
 **Kanalen**
-Bij kanalen vult u de kanalen in waarop u zich wilt abonneren. U kunt meerdere kanalen
-selecteren door ze te scheiden met een komma (,),
-maar in in de praktijk zal u hier vaak `zaken` invullen.
+Bij kanalen vult u de kanalen in waarop u zich wilt abonneren. U kunt meerdere kanalen selecteren door ze te scheiden met een komma (,), maar in in de praktijk zal u hier vaak `zaken` invullen.
 
-Wanneer alle velden zijn ingevuld klikt u op [Opslaan]. Hierna dient u de Webhook te
-registreren explciet door het in de lijst te selecteren en te klikken op [Webhook
-registreren]. De NRC-API zal worden gebruikt om de Webhook te registreren.
+Wanneer alle velden zijn ingevuld klikt u op [Opslaan]. Hierna dient u de Webhook te registreren explciet door het in de lijst te selecteren en te klikken op [Webhook registreren]. De NRC-API zal worden gebruikt om de Webhook te registreren.
 
-U kunt Onder het menu item Overige/diverse onder 'tasks' controleren of de webhook
-correct is geregistreerd. Indien dit het geval is, veschijnen er voor elke ontvangen
-notificatie een taak met de naam:
-``open_inwoner.openzaak.tasks.process_zaken_notification``. Ziet u deze taak (vaak)
-verschijnen, dan is de webhook succesvol geregistreerd.
+U kunt Onder het menu item Overige/diverse onder 'tasks' controleren of de webhook correct is geregistreerd. Indien dit het geval is, veschijnen er voor elke ontvangen notificatie een taak met de naam: ``open_inwoner.openzaak.tasks.process_zaken_notification``. Ziet u deze taak (vaak) verschijnen? Dan is de webhook succesvol geregistreerd.
 
 .. warning::
-   Zodra de webhook met succes is geregistreerd zal hij in het bovenstaande
-   overzicht een URL set krijgen waarmee men zich kan abonneren. Blijft het veld onder
-   nc-abonnement leeg, dan is de registratie niet gelukt.
+   Zodra de webhook met succes is geregistreerd zal hij in het bovenstaande overzicht een URL set krijgen waarmee men zich kan abonneren. Blijft het veld onder nc-abonnement leeg, dan is de registratie niet gelukt.
 
 9.17.2. Webhook-abonnement verwijderen
 --------------------------------------
 
-Indien u een webhook-abonnement wilt verwijderen is het belangrijk dat de juiste
-volgorde in het verwijderproces wordt aangehouden. U dient allereerst de webhook te
-de-registreren via de "Acties" optie. Vervolgens kunt u de webhook verwijderen door in
-het overzicht van webhooks op de knop [verwijderen] te klikken.
+Indien u een webhook-abonnement wilt verwijderen is het belangrijk tijdens het verwijderproces de juiste volgorde aan te houden. U dient allereerst de webhook te deregistreren via de "Acties"-optie. Vervolgens kunt u de webhook verwijderen door in het overzicht van webhooks op de knop [verwijderen] te klikken. Als de webhook succesvol is gederegistreerd zal in het overzicht de URL bij de betreffende webhook verdwenen zijn. Is het deregistreren niet gelukt, dan zult u een foutmelding in beeld krijgen.
 
 9.18. Zaaktype configuraties
 ============================
