@@ -25,3 +25,6 @@ aa306e5041e55e8f9b34526fd210425f01757f70
 
 # style: apply ruff isort and format
 fe92215efe106cf3a17c21c8055a7f048f698c08
+
+# editorconfig compliance in changelog
+f851eac2759d7dd65687dce1869037296511140c
