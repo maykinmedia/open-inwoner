@@ -247,18 +247,29 @@ class EditProfileView(
             return HttpResponseRedirect(self.get_success_url())
 
         # write changes to API's; abort saving if write fails
-        # we treat `api_update_ok` as True if the relevant service is not configured at all
-        esuite_update_ok, openklant_update_ok = True, True
         klanten_config = KlantenSysteemConfig.get_solo()
+        failed_services = []
         if klanten_config.has_api_service_configured(KlantenServiceType.ESUITE):
-            esuite_update_ok = self.update_klant_via_esuite(
-                {k: form.cleaned_data[k] for k in form.changed_data}, user
-            )
+            try:
+                self.update_klant_via_esuite(
+                    {k: form.cleaned_data[k] for k in form.changed_data}, user
+                )
+            except Exception:
+                logger.exception(
+                    "eSuite failed during profile update", extra={"user": user}
+                )
+                failed_services.append("eSuite")
         if klanten_config.has_api_service_configured(KlantenServiceType.OPENKLANT2):
-            openklant_update_ok = self.update_klant_via_openklant(
-                {k: form.cleaned_data[k] for k in form.changed_data}, user
-            )
-        if not esuite_update_ok or not openklant_update_ok:
+            try:
+                self.update_klant_via_openklant(
+                    {k: form.cleaned_data[k] for k in form.changed_data}, user
+                )
+            except Exception:
+                logger.exception(
+                    "OpenKlant failed during profile update for", extra={"user": user}
+                )
+                failed_services.append("OpenKlant")
+        if failed_services:
             messages.error(
                 request=self.request,
                 message=_(
@@ -266,12 +277,6 @@ class EditProfileView(
                     "Please try again later"
                 ),
             )
-            # Log which service failed and what fields were being updated
-            failed_services = []
-            if not esuite_update_ok:
-                failed_services.append("eSuite")
-            if not openklant_update_ok:
-                failed_services.append("OpenKlant")
 
             log_msg = (
                 "API service failure when updating user profile. "
