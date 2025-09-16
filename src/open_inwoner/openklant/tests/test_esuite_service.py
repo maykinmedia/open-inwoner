@@ -1,8 +1,10 @@
+from dataclasses import asdict, dataclass
+
 from django.test import TestCase
 
 import requests_mock
 
-from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.accounts.tests.factories import DigidUserFactory, UserFactory
 from open_inwoner.openklant.api_models import Klant
 from open_inwoner.openklant.services import eSuiteKlantenService
 from open_inwoner.openklant.tests.data import KLANTEN_ROOT, MockAPIReadData
@@ -194,3 +196,45 @@ class eSuiteServiceTestCase(TestCase, DisableRequestLogMixin):
                 f"{base_url}&page=3",
             ],
         )
+
+    def test_update_klant_from_user(self):
+        user = DigidUserFactory(
+            email="old@example.com",
+            phonenumber="0100000000",
+            phonenumber_alternative="",
+        )
+
+        @dataclass
+        class Klant:
+            bronorganisatie: str
+            klantnummer: str
+            subjectIdentificatie: str
+            url: str
+            emailadres: str
+            telefoonnummer: str
+            telefoonnummerAlternatief: str
+            toestemmingZaakNotificatiesAlleenDigitaal: str
+
+        klant = Klant(
+            bronorganisatie="123456789",
+            klantnummer="12345678",
+            subjectIdentificatie={
+                "inpBsn": "123456789",
+            },
+            url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            emailadres="old@example.com",
+            telefoonnummer="0100000000",
+            telefoonnummerAlternatief="0687654321",
+            toestemmingZaakNotificatiesAlleenDigitaal=False,
+        )
+
+        with requests_mock.mock() as m:
+            m.patch(klant.url, json=asdict(klant))
+
+            klant = self.service.update_klant_from_user(
+                klant,
+                user,
+                update_fields=["telefoonnummer", "telefoonnummerAlternatief"],
+            )
+
+            self.assertEqual(klant.telefoonnummerAlternatief, "")
