@@ -515,7 +515,7 @@ reportlab==3.6.13
     # via
     #   easy-thumbnails
     #   svglib
-requests==2.31.0
+requests==2.32.5
     # via
     #   ape-pie
     #   django-log-outgoing-requests
@@ -577,7 +577,7 @@ tzdata==2025.2
     #   kombu
 uritemplate==4.1.1
     # via drf-spectacular
-urllib3==1.26.18
+urllib3==2.5.0
     # via
     #   elastic-apm
     #   elastic-transport

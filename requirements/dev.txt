@@ -1061,7 +1061,7 @@ reportlab==3.6.13
     #   -r requirements/ci.txt
     #   easy-thumbnails
     #   svglib
-requests==2.31.0
+requests==2.32.5
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -1242,7 +1242,7 @@ uritemplate==4.1.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   drf-spectacular
-urllib3==1.26.18
+urllib3==2.5.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -1250,11 +1250,12 @@ urllib3==1.26.18
     #   elastic-transport
     #   requests
     #   sentry-sdk
+    #   vcrpy
 uwsgi==2.0.23
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-vcrpy==6.0.1
+vcrpy==7.0.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt

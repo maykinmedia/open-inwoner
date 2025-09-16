@@ -51,6 +51,11 @@ Onderhoud
 * [:cve:`CVE-2024-53899`, :pr:`1892`] ``virtualenv`` bijgewerkt naar versie ``20.34.0``.
 * [:pr:`1897`] Het legacy management commando ``zgw_dev_status`` is verwijderd, alsmede
   legacy code voor het beheren van een "default" ZGW API Group.
+* [:cve:`CVE-2024-47081`, :cve:`CVE-2024-35195`, :pr:`1905`] ``requests`` bijgewerkt
+  naar versie ``2.32.5``.
+* [:cve:`CVE-2024-37891`, :cve:`CVE-2024-35195`, :pr:`1905`] ``urllib3`` bijgewerkt
+  naar versie ``2.5.0``.
+* [:pr:`1905`] ``vcrpy`` bijgewerkt naar versie ``7.0.0``.
 
 1.34.0 (2025-09-03)
 ===================
