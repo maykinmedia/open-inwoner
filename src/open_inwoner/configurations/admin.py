@@ -1,4 +1,5 @@
 import logging
+from typing import Generator
 
 from django import forms
 from django.conf import settings
@@ -18,6 +19,7 @@ from ordered_model.admin import OrderedInlineModelAdminMixin, OrderedTabularInli
 from solo.admin import SingletonModelAdmin
 
 from open_inwoner.ckeditor5.widgets import CKEditorWidget
+from open_inwoner.utils.logentry import user_action
 
 from ..utils.colors import ACCESSIBLE_CONTRAST_RATIO, get_contrast_ratio
 from ..utils.css import ALLOWED_PROPERTIES
@@ -26,6 +28,14 @@ from ..utils.iteration import split
 from .models import CustomFontSet, SiteConfiguration, SiteConfigurationPage
 
 logger = logging.getLogger(__name__)
+
+permission_to_fieldset = {
+    "configurations.siteconfig_fieldset_color": _("Color"),
+    "configurations.siteconfig_fieldset_images": _("Images"),
+    "configurations.siteconfig_fieldset_warning_banner": _("Warning banner"),
+    "configurations.siteconfig_fieldset_page_texts": _("Page texts"),
+    "configurations.siteconfig_fieldset_help_texts": _("Help texts"),
+}
 
 
 class CustomSiteAdmin(SiteAdmin):
@@ -131,6 +141,7 @@ class SiteConfigurationAdminForm(forms.ModelForm):
 
 @admin.register(SiteConfiguration)
 class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
+    form = SiteConfigurationAdminForm
     save_on_top = True
     fieldsets = (
         (
@@ -355,8 +366,33 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
             ),
         )
 
+    def get_authorized_fieldsets(self, request, obj=None):
+        """Return fieldsets based on user permissions"""
+        if request is None:
+            return super().get_fieldsets(request, obj)
+
+        # Full admin access
+        if request.user.is_superuser or request.user.has_perm(
+            "configurations.change_siteconfiguration"
+        ):
+            return super().get_fieldsets(request, obj)
+
+        # Partial admin access
+        permitted_fieldsets = []
+        all_fieldsets = super().get_fieldsets(request, obj)
+
+        # Add fieldsets based on permissions
+        for perm, fieldset_name in permission_to_fieldset.items():
+            if request.user.has_perm(perm):
+                for fieldset in all_fieldsets:
+                    if fieldset[0] == fieldset_name:
+                        permitted_fieldsets.append(fieldset)
+                        break
+
+        return permitted_fieldsets
+
     def get_fieldsets(self, request, obj=None):
-        fieldsets = list(super().get_fieldsets(request, obj))
+        fieldsets = list(self.get_authorized_fieldsets(request, obj))
 
         for i, (name, options) in enumerate(fieldsets):
             if name == _("Advanced display options"):
@@ -499,9 +535,69 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
             ACCESSIBLE_CONTRAST_RATIO,
         )
 
+    def _get_fields_from_fieldsets(
+        self, fieldset_names: list[str]
+    ) -> Generator[str, None, None]:
+        """Get all fields from the specified fieldsets"""
+        for name, opts in super().get_fieldsets(None):
+            if name in fieldset_names:
+                fields_ = opts["fields"]
+                # process nested fields
+                for f in fields_:
+                    if isinstance(f, (list, tuple)):
+                        yield from f
+                    else:
+                        yield f
+
     def save_model(self, request, obj, form, change):
-        super().save_model(request, obj, form, change)
         self.report_contrast_ratio(request, obj)
+
+        # Users with full permissions can save everything
+        if request.user.is_superuser or request.user.has_perm(
+            "configurations.change_siteconfiguration"
+        ):
+            return super().save_model(request, obj, form, change)
+
+        # Users with partial permissions
+        allowed_fieldset_names = []
+        for perm, fieldset_name in permission_to_fieldset.items():
+            if request.user.has_perm(perm):
+                allowed_fieldset_names.append(fieldset_name)
+
+        if not allowed_fieldset_names:
+            raise exceptions.PermissionDenied(
+                _("You do not have the rights to make changes")
+            )
+
+        # Get allowed fields from permitted fieldsets
+        allowed_fields = self._get_fields_from_fieldsets(allowed_fieldset_names)
+
+        # Check if user is trying to modify fields they don't have permission for
+        unauthorized_fields = [
+            field for field in form.changed_data if field not in allowed_fields
+        ]
+
+        if unauthorized_fields:
+            user_action(
+                request,
+                request.user,
+                "Unauthorized attempt to modify SiteConfiguration",
+            )
+            raise exceptions.PermissionDenied(
+                _("You do not have permission to modify these fields")
+            )
+
+        return super().save_model(request, obj, form, change)
+
+    def has_change_permission(self, request, obj=None):
+        # For superusers and users with full permissions, allow full access
+        if request.user.is_superuser or request.user.has_perm(
+            "configurations.change_siteconfiguration"
+        ):
+            return True
+
+        # Check partial editing permissions
+        return any(request.user.has_perm(perm) for perm in permission_to_fieldset)
 
 
 class CMSPageAdminForm(forms.Form):

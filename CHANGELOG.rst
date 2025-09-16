@@ -37,6 +37,9 @@ Nieuwe features
   beheerscherm. Zie de documentatie onder "Open Zaak" voor verdere informatie.
 * [:taiga-is:`3816`, :pr:`1865`]: Het e-mailverificatiebericht voor nieuwe gebruikers
   is nu configureerbaar.
+* [:taiga-us:`2942`, :pr:`1896`]: Er zijn nieuwe rechten toegevoegd waarmee gebruikers
+  uitsluitend op specifieke subsets van de Algemene configuratie beheer-toegang kunnen
+  ontvangen (kleuren, afbeeldingen, waarschuwingsbanner, paginateksten, helpteksten).
 
 Bugfixes
 --------
