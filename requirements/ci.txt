@@ -940,7 +940,7 @@ reportlab==3.6.13
     #   -r requirements/base.txt
     #   easy-thumbnails
     #   svglib
-requests==2.31.0
+requests==2.32.5
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
