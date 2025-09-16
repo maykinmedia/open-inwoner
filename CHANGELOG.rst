@@ -29,8 +29,9 @@ Bugfixes
   ontsloten worden.
 * [:taiga-is:`3466`, :pr:`1922`]: De bitnami images in CI en docker-compose zijn
   vervangen met de officiële Elasticsearch images.
-* [:taiga-is:`3460`, :pr:`1904`]: Het indienen van lege waarden tijdens het bijwerken van
-  het profiel, wat leidt tot fouten van e, is opgelost.
+* [:taiga-ta:`3460`, :taiga-us:`3449`, :pr:`1904`]: Het indienen van lege tekstwaarden
+  tijdens het bijwerken van het profiel, wat leidde tot fouten in eSuite klant, is
+  opgelost.
 
 Onderhoud
 ---------
