@@ -23,4 +23,3 @@
 - [ ] Updated the `docker-compose.yml` environment variables
   - [ ] Created an issue in https://github.com/maykinmedia/charts/ for new environment
     variables
-

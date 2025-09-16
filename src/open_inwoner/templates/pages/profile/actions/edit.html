@@ -12,7 +12,7 @@
                     {% trans "Maak een actie aan" %}
                 {% endif %}
             </h1>
-        </div> 
+        </div>
         {% render_grid %}
             {% render_column start=4 span=6 %}
                 {% render_form id="action-create" form=form method="POST" enctype="multipart/form-data" %}
@@ -35,7 +35,7 @@
                             {% errors errors=form.template.errors %}
                         {% endif %}
                     </div>
-                    
+
                     <div class="form__actions form__actions--fullwidth">
                         {% if action %}
                             {% button text=_("Actie opslaan") primary=True type="submit" extra_classes='submit-once-button' %}

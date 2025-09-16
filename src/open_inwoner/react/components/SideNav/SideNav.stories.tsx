@@ -14,7 +14,7 @@ SideNav is a pure React component that renders navigation menus using the Den Ha
 
 **Features:**
 - Material Icons integration for navigation icons
-- Current page highlighting with visual indicators  
+- Current page highlighting with visual indicators
 - Message/notification counters on menu items
 - Responsive design following Den Haag standards
 - Flexible item configuration (with or without icons)
@@ -160,7 +160,7 @@ export const MinimalSingleItem: Story = {
 Demonstrates the component with just one navigation item, useful for specialized pages or single-purpose applications. Shows how the Den Haag side navigation styling adapts to minimal content while maintaining consistent design patterns.
 
 * **Features shown:** Single item navigation, minimal interface
-* **Use case:** Specialized applications, landing pages, or focused user flows  
+* **Use case:** Specialized applications, landing pages, or focused user flows
         `,
       },
     },
@@ -255,9 +255,9 @@ Demonstrates how SideNav handles multiple navigation groups with logical separat
 
 * **Features shown:** Multi-section navigation, visual group separation, logical content organization
 * **Use case:** Complex applications requiring clear navigation hierarchy and content grouping
-* **Example Nav Groups:** 
+* **Example Nav Groups:**
   1. **Dashboard**: Primary landing area
-  2. **User Services**: Profile, applications, messaging  
+  2. **User Services**: Profile, applications, messaging
   3. **Financial**: Finance and document management
   4. **System**: Settings and account management
         `,

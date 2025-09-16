@@ -89,7 +89,7 @@ Each entry should reference both the GitHub pull request and related Taiga issue
 Sphinx extlink shortcodes: `` :pr:`123` `` for pull requests, `` :taiga-us:`456` `` for
 Taiga user stories, `` :taiga-is:`789` `` for Taiga issues and  `` :taiga-dimpact:`123`
 `` for Taiga Dimpact issues. See the root `CHANGELOG.rst` file for examples of the
-proper format. 
+proper format.
 
 The entry should preferably be written in Dutch, though English is fine if you are not
 comfortable in Dutch. The English issues will be translated as part of preparing the

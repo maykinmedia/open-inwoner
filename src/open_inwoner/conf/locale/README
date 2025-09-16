@@ -1,4 +1,4 @@
-In this directory, language directories can be created ('nl', 'en', etc.) for 
+In this directory, language directories can be created ('nl', 'en', etc.) for
 every locale in the Django settings. We use centralized translations for easy
 management, merging and translating.
 
