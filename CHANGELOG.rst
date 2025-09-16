@@ -16,7 +16,7 @@ Nieuwe features
 * [:taiga-us:`3370`, :pr:`1888`]: Navigatiemenu-items correct weergegeven op verschillende schermbreedtes; 
   ``@gemeente-denhaag/side-navigation`` bijgewerkt naar ``4.0.2``, waardoor notificatiebadges in 
   navigatiemenu-items de rode indicator niet meer tonen.
-* [:taiga-us: `3406`, :pr:`1872`]: Het contactformulier wordt omgezet in een CMS-pagina.
+* [:taiga-us:`3406`, :pr:`1872`]: Het contactformulier wordt omgezet in een CMS-pagina.
   In plaats van één beschrijving heeft het contactformulier nu twee beschrijvingen, één voor
   geauthenticeerde en één voor anonieme gebruikers. De oude beschrijving wordt naar beide
   nieuwe velden gekopieerd. Pas één of beide beschrijvingen naar behoefte aan.
@@ -26,7 +26,7 @@ Nieuwe features
   Javascript bestand te uploaden dat automatisch op alle pagina's van de website wordt
   geladen. Deze functionaliteit wordt gecontroleerd door de ``ALLOW_CUSTOM_JS``
   environment variabele die op deployment niveau moet worden ingesteld.
-* [:taiga-us: `3317`, :pr:`1890`]: Er is een nieuwe flag toegevoegd op de ZGW API sets
+* [:taiga-us:`3317`, :pr:`1890`]: Er is een nieuwe flag toegevoegd op de ZGW API sets
   (``ZGWApiGroupConfig``) om, bij het opvragen van zaken, gebruik te maken van de
   ``rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__kvkNummer`` en
   ``rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__vestigingsNummer`` query
@@ -35,13 +35,13 @@ Nieuwe features
   ``rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId``. Deze flag staat
   standaard uit en moet expliciet aangezet worden voor een specifieke API set in het
   beheerscherm. Zie de documentatie onder "Open Zaak" voor verdere informatie.
-* [:taiga-issue: `3816`, :pr: `1865`]: Het e-mailverificatiebericht voor nieuwe gebruikers
+* [:taiga-is:`3816`, :pr:`1865`]: Het e-mailverificatiebericht voor nieuwe gebruikers
   is nu configureerbaar.
 
 Bugfixes
 --------
 
-* [:taiga-is: `3445`, :pr: `1898`]: De sjabloontag field_as_widget ging er onterecht
+* [:taiga-is:`3445`, :pr:`1898`]: De sjabloontag field_as_widget ging er onterecht
   vanuit dat het primaire argument een formulierveld was en veroorzaakte daardoor
   sporadisch fouten.
 
