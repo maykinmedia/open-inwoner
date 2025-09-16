@@ -62,6 +62,8 @@ Onderhoud
 * [:cve:`CVE-2024-37891`, :cve:`CVE-2024-35195`, :pr:`1905`] ``urllib3`` bijgewerkt
   naar versie ``2.5.0``.
 * [:pr:`1905`] ``vcrpy`` bijgewerkt naar versie ``7.0.0``.
+* [:pr:`1907`, :cve:`CVE-2025-7783`]: ``form-data`` bijgewerkt naar versie
+  ``3.0.4``.
 
 1.34.0 (2025-09-03)
 ===================
