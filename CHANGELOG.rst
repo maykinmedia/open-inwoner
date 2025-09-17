@@ -56,6 +56,8 @@ Bugfixes
 * [:taiga-is:`3377`,  :pr:`1917`]: De ``static/bundles/images`` map wordt nu correct
   opgebouwd in de Docker container, waardoor o.m. `marker-icon.png` bestanden correct
   ontsloten worden.
+* [:taiga-is:`3466`, :pr:`1922`]: De bitnami images in CI en docker-compose zijn
+  vervangen met de officiële Elasticsearch images.
 
 Onderhoud
 ---------
