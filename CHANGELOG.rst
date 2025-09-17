@@ -24,7 +24,8 @@ Onderhoud
 
 * [:pr:`1907`, :pr:`1915`, :cve:`CVE-2025-7783`]: ``inline-css`` verwijderd en ``form-data`` override
   bijgewerkt om :cve:`CVE-2025-7783` te mitigeren.
-
+* [:taiga-is:`3466`, :pr:`1922`]: De bitnami images in CI en docker-compose zijn
+  vervangen met de officiële Elasticsearch images.
 
 1.34.0 (2025-09-03)
 ===================
