@@ -35,7 +35,7 @@ from open_inwoner.openklant.types import PartijUpdateData
 from open_inwoner.plans.models import Plan
 from open_inwoner.qmatic.client import NoServiceConfigured, qmatic_client_factory
 from open_inwoner.questionnaire.models import QuestionnaireStep
-from open_inwoner.utils.logentry import system_action
+from open_inwoner.utils.logentry import system_action, system_error
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from ..forms import BrpUserForm, CategoriesForm, UserForm, UserNotificationsForm
@@ -247,18 +247,29 @@ class EditProfileView(
             return HttpResponseRedirect(self.get_success_url())
 
         # write changes to API's; abort saving if write fails
-        # we treat `api_update_ok` as True if the relevant service is not configured at all
-        esuite_update_ok, openklant_update_ok = True, True
         klanten_config = KlantenSysteemConfig.get_solo()
+        failed_services = []
         if klanten_config.has_api_service_configured(KlantenServiceType.ESUITE):
-            esuite_update_ok = self.update_klant_via_esuite(
-                {k: form.cleaned_data[k] for k in form.changed_data}, user
-            )
+            try:
+                self.update_klant_via_esuite(
+                    {k: form.cleaned_data[k] for k in form.changed_data}, user
+                )
+            except Exception:
+                logger.exception(
+                    "eSuite failed during profile update", extra={"user": user}
+                )
+                failed_services.append("eSuite")
         if klanten_config.has_api_service_configured(KlantenServiceType.OPENKLANT2):
-            openklant_update_ok = self.update_klant_via_openklant(
-                {k: form.cleaned_data[k] for k in form.changed_data}, user
-            )
-        if not esuite_update_ok or not openklant_update_ok:
+            try:
+                self.update_klant_via_openklant(
+                    {k: form.cleaned_data[k] for k in form.changed_data}, user
+                )
+            except Exception:
+                logger.exception(
+                    "OpenKlant failed during profile update for", extra={"user": user}
+                )
+                failed_services.append("OpenKlant")
+        if failed_services:
             messages.error(
                 request=self.request,
                 message=_(
@@ -266,9 +277,18 @@ class EditProfileView(
                     "Please try again later"
                 ),
             )
-            self.log_change(
-                self.get_object(), _("profile changes not saved due to Klant API error")
+
+            log_msg = (
+                "API service failure when updating user profile. "
+                "Failed services: %(failed_services)s. "
+                "Changed fields: %(changed_fields)s"
+                % {
+                    "failed_services": " and ".join(failed_services),
+                    "changed_fields": ", ".join(form.changed_data),
+                }
             )
+            system_error(message=log_msg, user=self.get_object())
+
             return HttpResponseRedirect(self.get_success_url())
 
         form.save()

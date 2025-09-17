@@ -409,9 +409,9 @@ class eSuiteKlantenService(
                     raise ValueError(f"{field} is not a valid entry for update_fields")
 
         update_data: KlantWritePayload = {
-            "emailadres": user.email,
-            "telefoonnummer": user.phonenumber,
-            "telefoonnummerAlternatief": user.phonenumber_alternative,
+            "emailadres": user.email or None,
+            "telefoonnummer": user.phonenumber or None,
+            "telefoonnummerAlternatief": user.phonenumber_alternative or None,
             "toestemmingZaakNotificatiesAlleenDigitaal": user.case_notification_channel
             == NotificationChannelChoice.digital_only,
         }

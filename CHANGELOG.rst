@@ -43,6 +43,8 @@ Nieuwe features
   ontvangen (kleuren, afbeeldingen, waarschuwingsbanner, paginateksten, helpteksten).
 * [:taiga-us:`3405`, :pr:`1889`, :pr:`1916`] De documentatie is op verschillende punten
   bijgewerkt en verbeterd.
+* [:taiga-us:`3449`, :pr:`1904`]: Verbeterde logmelding voor mislukte API-services
+  tijdens updates van gebruikersprofielen
 
 Bugfixes
 --------
@@ -58,6 +60,8 @@ Bugfixes
   ontsloten worden.
 * [:taiga-is:`3466`, :pr:`1922`]: De bitnami images in CI en docker-compose zijn
   vervangen met de officiële Elasticsearch images.
+* [:taiga-ta:`3460`, :taiga-us:`3449`, :pr:`1904`]: Het indienen van lege tekstwaarden tijdens
+  het bijwerken van het profiel, wat leidde tot fouten in eSuite klant, is opgelost.
 
 Onderhoud
 ---------
