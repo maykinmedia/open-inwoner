@@ -76,7 +76,7 @@ services:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - CELERY_LOGLEVEL=DEBUG
-      - ES_HOST=elasticsearch
+      - ES_HOST=http://elasticsearch:9200
       # Needed for Celery Flower to match the TIME_ZONE configured in the
       # settings used by workers and beat containers.
       - TZ=Europe/Amsterdam

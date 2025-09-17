@@ -62,6 +62,8 @@ Bugfixes
   vervangen met de officiële Elasticsearch images.
 * [:taiga-ta:`3460`, :taiga-us:`3449`, :pr:`1904`]: Het indienen van lege tekstwaarden tijdens
   het bijwerken van het profiel, wat leidde tot fouten in eSuite klant, is opgelost.
+* [:pr:`1919`] De docker-compose variabelen voor de Elasticsearch verbinding gebruiken
+  nu de verplichte, volledig gekwalificeerde versie van de URL.
 
 Onderhoud
 ---------
