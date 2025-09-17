@@ -1,10 +1,61 @@
-node_modules
 Dockerfile*
 docker-compose*
 .dockerignore
+
+# From .gitignore:
+# Developers
+.hg
 .git
-.vscode
-env/
+.svn
+.idea/
+.vscode/
+.sass-cache/
+*.db
+*.pyc
+__pycache__
+*~
+
+# Javascript libraries
+/node_modules/
+
+# Generated files
+/docs/_build
+
+# Coverage reports
+/reports/
+/htmlcov/
+.coverage
+coverage.xml
+
+# Environment
+#/deployment/app.*.yml
+#/deployment/hosts.*
 local.py
-media/
-private_media/
+/env/
+/media/
+/private_media/
+/static/
+/mail/
+/log/*.log*
+/log/nginx/*.log*
+/.env
+.DS_STORE
+
+# Static files
+src/open_inwoner/static/bundles/
+src/open_inwoner/static/webfonts/
+src/open_inwoner/fonts/
+src/open_inwoner/static/webfonts/fa-brands-400.ttf
+src/open_inwoner/static/webfonts/fa-brands-400.woff2
+src/open_inwoner/static/webfonts/fa-regular-400.ttf
+src/open_inwoner/static/webfonts/fa-regular-400.woff2
+src/open_inwoner/static/webfonts/fa-solid-900.ttf
+src/open_inwoner/static/webfonts/fa-solid-900.woff2
+src/open_inwoner/static/webfonts/fa-v4compatibility.ttf
+src/open_inwoner/static/webfonts/fa-v4compatibility.woff2
+src/open_inwoner/static/fonts/material-icons/
+
+# Storybook files
+*storybook.log
+storybook-static/
+coverage/
