@@ -66,6 +66,8 @@ Bugfixes
 Onderhoud
 ---------
 
+* [:taiga-ta:`3465`, :pr:`1919`] Het Docker start script ondersteunt optioneel het
+  kopieren van static files naar een daarvoor aangewezen volume.
 * [:cve:`CVE-2024-53899`, :pr:`1892`] ``virtualenv`` bijgewerkt naar versie ``20.34.0``.
 * [:pr:`1897`] Het legacy management commando ``zgw_dev_status`` is verwijderd, alsmede
   legacy code voor het beheren van een "default" ZGW API Group.
