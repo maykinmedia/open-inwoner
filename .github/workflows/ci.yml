@@ -49,10 +49,11 @@ jobs:
           --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
           --name postgres
       elasticsearch:
-        image: bitnami/elasticsearch:9.0.3-debian-12-r1
+        image: elasticsearch:9.0.3
         env:
           discovery.type: single-node
           ES_JAVA_OPTS: '-Xms512m -Xmx512m'
+          xpack.security.enabled: false
         ports:
           - 9200:9200
           - 9300:9300
@@ -163,10 +164,11 @@ jobs:
           --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
           --name postgres
       elasticsearch:
-        image: bitnami/elasticsearch:9.0.3-debian-12-r1
+        image: elasticsearch:9.0.3
         env:
           discovery.type: single-node
           ES_JAVA_OPTS: '-Xms512m -Xmx512m'
+          xpack.security.enabled: false
         ports:
           - 9200:9200
           - 9300:9300

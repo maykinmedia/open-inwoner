@@ -28,7 +28,7 @@ services:
       - openinwoner-dev
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.0.3
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
