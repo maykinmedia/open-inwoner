@@ -16,14 +16,17 @@ Indien gewenst kunt u wijzigingen aan de weergave en voorkeuren van uw omgeving 
 12.1.1. Naam en opties
 ----------------------
 
-.. image:: images/image112.png
+.. image:: images/Screenshot_OIP_Algemene_config_overzicht_Djuzz_250916.png
    :width: 624px
-   :height: 280px
 
 In het bovenste gedeelte van het scherm kunt u de naam van uw gemeente aanpassen en u kunt bepaalde voorkeuren instellen door deze aan te vinken.
 
 **Naam**
 Voer hier de naam van uw gemeente in.
+
+
+**Indexering door zoekmachines inschakelen**
+Door hier een vinkje te zetten kunnen zoekmachines de niet-ingelogde versie van uw omgeving van Open Inwoner indexeren.
 
 
 **Toon inlogknop rechts bovenin**
@@ -32,6 +35,10 @@ Dit zorgt ervoor dat er standaard een knop is om in te loggen. Wanneer deze opti
 
 **Sta lokale registratie toe**
 Wanneer deze optie uit staat is het enkel toegestaan om met DigiD in te loggen. Zet deze instelling aan om ook het inloggen met gebruikersnaam/wachtwoord en het aanmelden zonder DigiD toe te staan.
+
+
+**Sta eenmanszaken toe in te loggen met eHerkenning**
+Eenmanszaken kunnen op Open Inwoner inloggen via DigiD of eHerkenning. Indien hier geen vinkje staat kunnen eenmanszaken enkel met DigiD inloggen. Wanneer een eenmanszaak dan alsnog via eHerkenning probeert in te loggen zal de gebruiker een foutmelding krijgen en worden doorgestuurd naar aanmelden via DigiD. Bij inloggen met eHerkenning wordt het KVK-nummer gebruikt voor de backend. Wanneer DigiD wordt gebruikt wordt hier het BSN voor gebruikt.
 
 
 **Login met 2FA-met-SMS**
@@ -47,6 +54,10 @@ Geef hier een URL of pad op waar niet-ingelogde gebruikers naartoe doorgestuurd 
 
 - Een pad is bijvoorbeeld: '/accounts/login'.
 - Een URL is bijvoorbeeld: 'https://groningen.nl'.
+
+**Stuur security.txt door naar:**
+Voor alle overheidsinstanties is het verplicht een security.txt bestand te hebben. Het adres van dit bestand vult u hier in. Voor meer informatie over een security.txt bestand kijkt u op: https://www.ncsc.nl/documenten/publicaties/2023/maart/2/handreiking-security.txt
+
 
 12.1.2. Kleur
 -------------
@@ -233,7 +244,29 @@ Dit is de tekst die wordt weergegeven wanneer de gebruiker op de pagina *Samenwe
 12.1.7. Zoekfilter opties
 -------------------------
 
-Hier kunt u een onderwerpenfilter, een tagfilter en/of een organisaties-filter toevoegen aan de zoekresultaten. U kunt deze filters naar eigen inzicht selecteren. Deze filters worden weergegeven aan de linkerkant van de pagina met zoekresultaten. Een voorbeeld hiervan is weergegeven in het onderstaande screenshot:
+Hier kunt u een onderwerpenfilter, een tagfilter en/of een organisaties-filter toevoegen aan de zoekresultaten. U kunt deze filters naar eigen inzicht selecteren.
+
+
+.. image:: images/Screenshot_OIP_Algemene_config_zoekfilteropties_Djuzz_250916.png
+   :width: 624px
+
+
+**CMS-pagina’s vindbaar maken via zoeken**
+Indien hier een vinkje staat worden CMS-pagina’s toegevoegd aan de zoekindex en zullen ze worden getoond in zoekresultaten. Let op: de wijziging werkt pas nadat de zoekindex is vernieuwd. Dit kunt u handmatig forceren via Overige/Diverse/Periodic tasks. Hier vindt u een taak 'Zoekindex opnieuw opbouwen'. Als u deze aanvinkt en dan op de knop [Start taak] klikt wordt de zoekindex opnieuw geïndexeerd. Wanneer u dit niet handmatig doet, zal de zoekindex pas op de periodiek ingestelde tijd opnieuw worden opgebouwd.
+
+
+**Onderwerpenfilter toevoegen aan zoekresultaten**
+Hier kunt u selecteren of er categorie-selectievakjes moeten worden weergegeven om het zoekresultaat te filteren.
+
+
+**Tagfilter toevoegen aan zoekresultaten**
+Hier kunt u selecteren of er tag-selectievakjes moeten worden weergegeven om het zoekresultaat te filteren.
+
+
+**Organisaties-filter toevoegen aan zoekresultatenn**
+Hier kunt u selecteren of er organisatie-selectievakjes moeten worden weergegeven om het zoekresultaat te filteren.
+
+De hierboven ingestelde zoekfilters worden in de frontend van Open Inwoner aan de linkerkant van de pagina met zoekresultaten weergegeven. Een voorbeeld hiervan is weergegeven in het onderstaande screenshot:
 
 .. image:: images/image114.png
    :width: 624px
@@ -269,10 +302,23 @@ Wanneer dit is aangevinkt wordt er een e-mailnotificatie gestuurd naar gebruiker
 Hier kunt u selecteren of gebruikers verplicht zijn om na het inloggen hun e-mailadres te verifiëren voor bepaalde handelingen.
 
 
+**Bericht E-mailverificatie**
+Hier kunt u een bericht invoeren dat gebruikers teruggekoppeld krijgen wanneer zij via
+een e-mailadres een account willen registreren. Dit e-mailadres dient eerst bevestigd te worden
+alvorens het kan worden geactiveerd.
+
+
+**Telefoonnummer**
+Hier voert u het telefoonnummer van de organisatie in.
+
+
+**URL**
+Hier voert u de URL naar de contactpagina van de organisatie in.
+
 **Ontvangers e-mailsamenvatting**
 Hier vult u de e-mailadressen van beheerders die dagelijks een samenvatting dienen te ontvangen van alle op te lossen zaken (e-mails die niet aankomen).
 
-.. image:: images/image115.png
+.. image:: images/Screenshot_OIP_Algemene_config_notificaties_Djuzz_250916.png
    :width: 624px
    :height: 265px
 
@@ -280,7 +326,7 @@ Hier vult u de e-mailadressen van beheerders die dagelijks een samenvatting dien
 12.1.9. OpenID Connect
 ----------------------
 
-Dit is een alternatieve login methode die naast DigiD kan worden ingesteld (zie 10.9). In de algemene configuratie kunt u de login button voor OpenID Connect configureren. Alle andere zaken rond de OpenID Connect configuratie vindt u onder inlog koppelingen (hoofdstuk 10.5 en 10.6).
+Dit is een alternatieve login methode die naast DigiD kan worden ingesteld (zie 10.2). In de algemene configuratie kunt u de login button voor OpenID Connect configureren. Alle andere zaken rond de OpenID Connect configuratie vindt u onder inlog koppelingen (hoofdstuk 10.5 en 10.6).
 
 **OpenID Connect logo**
 Hier kunt u het logo uploaden van de OpenID connect methode die u wilt gebruiken. Door een logo te uploaden maakt u het voor de gebruiker duidelijker welke login methode er wordt geboden.

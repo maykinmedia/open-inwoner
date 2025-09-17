@@ -41,6 +41,8 @@ Nieuwe features
 * [:taiga-us:`2942`, :pr:`1896`]: Er zijn nieuwe rechten toegevoegd waarmee gebruikers
   uitsluitend op specifieke subsets van de Algemene configuratie beheer-toegang kunnen
   ontvangen (kleuren, afbeeldingen, waarschuwingsbanner, paginateksten, helpteksten).
+* [:taiga-us:`3405`, :pr:`1889`, :pr:`1916`] De documentatie is op verschillende punten
+  bijgewerkt en verbeterd.
 
 Bugfixes
 --------
