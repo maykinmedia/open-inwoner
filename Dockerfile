@@ -44,6 +44,9 @@ WORKDIR /app
 COPY ./build /app/build/
 COPY ./*.json ./*.js ./*.mjs ./*.ts ./.babelrc /app/
 
+# Ensure the target directory for npm run collect exists
+RUN mkdir -p /app/src/open_inwoner/static/bundles/images
+
 # install WITH dev tooling
 RUN npm ci
 

@@ -1,4 +1,15 @@
-1.34 (2025-09-03)
+1.34.1 (2025-10-02)
+=================
+
+Bugfixes
+--------
+
+* [:taiga-is:`3377`,  :pr:`1917`]: De ``static/bundles/images`` map wordt nu correct
+  opgebouwd in de Docker container, waardoor o.m. `marker-icon.png` bestanden correct
+  ontsloten worden.
+
+
+1.34.0 (2025-09-03)
 =================
 
 Voor een volledig overzicht van alle commits, zie :release:`v1.34.0`.
