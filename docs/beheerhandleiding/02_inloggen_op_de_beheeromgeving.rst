@@ -34,16 +34,16 @@ gebruikers de meer gevoelige, functionele configuratie kunnen aanpassen.
 De toegang wordt geregeld per sectie ("fieldset") van de siteconfiguratie. De volgende
 secties kunnen afzonderlijk toegekend worden:
 
-* **Kleuren** (``configurations.siteconfig_fieldset_color``) - Toegang tot
-  kleurinstellingen van de website
-* **Afbeeldingen** (``configurations.siteconfig_fieldset_images``) - Toegang tot logo's,
-  favicon en andere afbeeldingen
-* **Waarschuwingsbanner** (``configurations.siteconfig_fieldset_warning_banner``) -
-  Toegang tot de waarschuwingsbanner instellingen
-* **Paginateksten** (``configurations.siteconfig_fieldset_page_texts``) - Toegang tot
-  verschillende teksten op de website
-* **Helpteksten** (``configurations.siteconfig_fieldset_help_texts``) - Toegang tot de
-  helpteksten voor verschillende pagina's
+* **Kleuren** (``configurations | Algemene configuratie | Can edit colors``) - Toegang
+  tot kleurinstellingen van de website
+* **Afbeeldingen** (``configurations | Algemene configuratie | Can edit images``) -
+  Toegang tot logo's, favicon en andere afbeeldingen
+* **Waarschuwingsbanner** (``configurations | Algemene configuratie | Can edit warning
+  banner``) - Toegang tot de waarschuwingsbanner instellingen
+* **Paginateksten** (``configurations | Algemene configuratie | Can edit page texts``) -
+  Toegang tot verschillende teksten op de website
+* **Helpteksten** (``configurations | Algemene configuratie | Can edit help texts``) -
+  Toegang tot de helpteksten voor verschillende pagina's
 
 **Rechten toekennen**
 
