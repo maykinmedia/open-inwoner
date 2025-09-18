@@ -75,7 +75,6 @@
     "gumshoejs": "^5.1.2",
     "html-minifier": "^4.0.0",
     "htmx.org": "^2.0.4",
-    "inline-css": "^3.0.0",
     "leaflet": "^1.7.1",
     "lit": "^3.3.0",
     "material-icons": "^1.13.12",
@@ -154,6 +153,6 @@
     "yargs": "latest"
   },
   "overrides": {
-    "form-data": ">=3.0.4"
+    "form-data": ">=2.5.4 || <3.0.0 || >=3.0.4 || <4.0.0 || >=4.0.4"
   }
 }
