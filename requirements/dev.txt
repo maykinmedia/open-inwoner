@@ -177,10 +177,11 @@ css-inline==0.13.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   mail-editor
-cssselect==1.1.0
+cssselect==1.3.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   prosemirror
     #   pyquery
 cssselect2==0.4.1
     # via
@@ -255,6 +256,7 @@ django==4.2.24
     #   easy-thumbnails
     #   mail-editor
     #   maykin-2fa
+    #   maykin-django-prosemirror
     #   mozilla-django-oidc
     #   mozilla-django-oidc-db
     #   notifications-api-common
@@ -361,6 +363,7 @@ django-filer==3.1.1
     #   djangocms-file
     #   djangocms-link
     #   djangocms-picture
+    #   maykin-django-prosemirror
 django-filter==21.1
     # via
     #   -c requirements/ci.txt
@@ -766,6 +769,7 @@ lxml==6.0.0
     #   django-digid-eherkenning
     #   mail-editor
     #   maykin-python3-saml
+    #   prosemirror
     #   pyquery
     #   svglib
     #   xmlsec
@@ -795,6 +799,10 @@ markupsafe==2.1.5
     #   jinja2
     #   werkzeug
 maykin-2fa==1.0.2
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+maykin-django-prosemirror[images]==0.1.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -905,6 +913,11 @@ prompt-toolkit==3.0.36
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   click-repl
+prosemirror==0.5.2
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   maykin-django-prosemirror
 psutil==5.9.7
     # via locust
 psycopg2==2.9.9
@@ -1221,6 +1234,7 @@ typing-extensions==4.10.0
     #   elasticsearch
     #   mozilla-django-oidc-db
     #   polyfactory
+    #   prosemirror
     #   pydantic
     #   pydantic-core
     #   pyee
