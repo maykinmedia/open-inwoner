@@ -1,3 +1,28 @@
+1.36.0 (2025-09-18) [UNRELEASED]
+================================
+
+Voor een volledig overzicht van alle commits, zie ...
+
+Deployment aandachtspunten
+--------------------------
+
+* ...
+
+Nieuwe features
+---------------
+
+* ...
+
+Bugfixes
+--------
+
+* ...
+
+Onderhoud
+---------
+
+* ...
+
 1.35.0 (2025-09-18)
 ===================
 
