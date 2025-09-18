@@ -21,7 +21,8 @@ Bugfixes
 Onderhoud
 ---------
 
-* ...
+* [:taiga-us:`3461`, :taiga-ta:`3472`, :pr:`1834`]: Python versie bijgewerkt naar
+  ``v3.12``.
 
 1.35.0 (2025-09-18)
 ===================
