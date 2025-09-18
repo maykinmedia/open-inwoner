@@ -13,6 +13,12 @@ De algemene configuratie is de hoofdconfiguratie. Hier kunt u de gehele Open Inw
 
 Indien gewenst kunt u wijzigingen aan de weergave en voorkeuren van uw omgeving aanbrengen door de configuratie te veranderen. Houd er rekening mee dat wijzigingen aan een liveomgeving direct aan de voorkant zichtbaar zijn. Door de knop [Geschiedenis] te raadplegen kunt u zien wanneer wie welke wijzigingen heeft doorgevoerd. Let op: vanwege de paginalengte zijn enkele te wijzigen onderdelen standaard ingeklapt. Klik op [tonen] om de paginateksten en hulpteksten te wijzigen.
 
+.. note::
+   **Beperkte toegang**: Het is mogelijk om gebruikers slechts toegang te geven tot
+   specifieke onderdelen van deze configuratie in plaats van volledige beheerdersrechten.
+   Zie :ref:`beperkte_toegang_beheeromgeving` voor meer informatie over het instellen van
+   beperkte toegangsrechten.
+
 12.1.1. Naam en opties
 ----------------------
 
