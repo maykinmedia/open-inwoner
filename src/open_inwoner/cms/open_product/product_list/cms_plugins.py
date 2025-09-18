@@ -1,11 +1,10 @@
 from datetime import date
 
+from cms.plugin_base import CMSPluginBase
+from cms.plugin_pool import plugin_pool
 from django.conf import settings
 from django.core.cache import cache as django_cache
 from django.utils.translation import gettext_lazy as _
-
-from cms.plugin_base import CMSPluginBase
-from cms.plugin_pool import plugin_pool
 
 from open_inwoner.open_product.models import OpenProductConfig
 
@@ -94,7 +93,8 @@ class ProductListPlugin(CMSPluginBase):
             if product_type_code in producttype_by_code:
                 product["producttype"] = producttype_by_code[product_type_code]
                 display_products.append(product)
-
+            if not hasattr(product, "eind_datum"):
+                continue
             year, month, day = product["eind_datum"].split("-")
             end_date = date(int(year), int(month), int(day))
 
