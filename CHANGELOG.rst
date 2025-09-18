@@ -8,6 +8,12 @@ Bugfixes
   opgebouwd in de Docker container, waardoor o.m. `marker-icon.png` bestanden correct
   ontsloten worden.
 
+Onderhoud
+---------
+
+* [:pr:`1907`, :pr:`1915`, :cve:`CVE-2025-7783`]: ``inline-css`` verwijderd en ``form-data`` override
+  bijgewerkt om :cve:`CVE-2025-7783` te mitigeren.
+
 
 1.34.0 (2025-09-03)
 ===================
