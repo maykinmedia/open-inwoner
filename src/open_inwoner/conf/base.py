@@ -242,6 +242,8 @@ INSTALLED_APPS = [
     "open_inwoner.cms.products",
     "open_inwoner.cms.collaborate",
     "open_inwoner.cms.banner",
+    "open_inwoner.cms.open_product.product_list",
+    "open_inwoner.cms.open_product.themes",
     "open_inwoner.cms.extensions",
     "open_inwoner.cms.footer",
     "open_inwoner.cms.plugins",
@@ -255,6 +257,8 @@ INSTALLED_APPS = [
     # Docker; this needs to be fixed this in the library eventually;
     # for now we load it after all our apps.
     "notifications_api_common",
+    "openproductapiclient",
+    "open_inwoner.open_product",
 ]
 
 MIDDLEWARE = [
@@ -487,6 +491,8 @@ LOGGING = {
 LOG_OUTGOING_REQUESTS_DB_SAVE = config("LOG_OUTGOING_REQUESTS_DB_SAVE", default=True)
 LOG_OUTGOING_REQUESTS_RESET_DB_SAVE_AFTER = None  # reset config after $ minutes
 
+# Open product API client settings
+EXPIRATION_WARNING_TIME_SLOT = config("EXPIRATION_WARNING_TIME_SLOT", default=14)
 
 #
 # AUTH settings - user accounts, passwords, backends...
@@ -596,6 +602,10 @@ CMS_PLACEHOLDER_CONF = {
             "UserFeedPlugin",
             "UserAppointmentsPlugin",
             "TasksPlugin",
+            "CMSFlatPagePlugin",
+            "ProductListPlugin",
+            "ThemeListPlugin",
+            "ThemePlugin",
             "CMSFlatPagePlugin",
         ],
         "text_only_plugins": ["LinkPlugin"],

@@ -297,10 +297,6 @@
                 "subscription"
             ],
             [
-                "objectsapiclient",
-                "configuration"
-            ],
-            [
                 "openformsclient",
                 "configuration"
             ],
@@ -337,6 +333,10 @@
                 "zaaktypeinformatieobjecttypeconfig"
             ],
             [
+                "objectsapiclient",
+                "configuration"
+            ],
+            [
                 "qmatic",
                 "qmaticconfig"
             ],
@@ -359,9 +359,17 @@
             [
                 "zgw_consumers",
                 "service"
+            ],
+            [
+                "openproductapiclient",
+                "configuration"
+            ],
+            [
+                "open_product",
+                "openproductconfig"
             ]
         ]
-    }
+    }   
 },
 {
     "model": "admin_index.appgroup",

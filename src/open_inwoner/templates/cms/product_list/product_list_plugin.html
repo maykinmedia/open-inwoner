@@ -1,0 +1,47 @@
+{% load i18n icon_tags %}
+<section>
+    <h1 class="utrecht-heading-2">{{ instance.title }}</h1>
+    
+    {% if products|length == 0 %}
+        <p>{% trans "U bezit nog geen producten van dit thema." %}</p>
+    {% else %}
+        <p>{{ instance.description }}</p>
+    {% endif %}
+
+    <div class="card-container card-container--columns-3">
+        {% for product in products %}
+        <div class="card card__category-card" href="#">
+            <div class="card__body">
+                <h2 class="card__heading-2">{{ product.producttype.naam }}</h2>
+
+                <p>{% trans "Geldig tot "%}{{ product.eind_datum }}</p>
+                <p><strong>{% trans "Status: "%} </strong>{{ product.status }}</p>
+
+                {% for action in product.producttype.acties|dictsort:"naam" %}
+                    <a class="link link--icon link--secondary" title="{{ action.naam }}" 
+                        href="{{ action.action_url }}" target="_blank" style="margin-bottom: 3px;">
+                        <span class="link__text">{{ action.naam }}</span>
+                        {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+                    </a>
+                {% endfor %}
+
+                {% if product.nearing_expiration %}
+                    <p class="product__indicator--warning">
+                        {% icon icon="warning" icon_position="before" primary=True outlined=True %}
+                        <span>{% trans "Dit document verloopt binnenkort."%}</span>
+                    </p>
+                {% endif %}
+
+                {% if product.status == 'verlopen' %}
+                    <p class="product__indicator--expired">
+                        {% icon icon="error" icon_position="before" primary=True outlined=True %}
+                        <span>{% trans "Dit document is verlopen."%}</span>
+                    </p>
+                {% endif %}
+
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+</section>

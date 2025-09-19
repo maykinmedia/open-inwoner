@@ -1,0 +1,16 @@
+{% load cms_tags %}
+
+{% load i18n button_tags card_tags utils icon_tags %}
+
+{% if request.user.is_authenticated %}
+    <section class="plugin plugin__plans">
+        <header class="oip-header-group">
+            <h2 class="utrecht-heading-2">{{ instance.title }}</h2>
+        </header>
+        <div class="plans-cards card-container card-container--columns-4">
+            {% for plugin in instance.child_plugin_instances %}
+                {% render_plugin plugin %}
+            {% endfor %}
+        </div>
+    </section>
+{% endif %}

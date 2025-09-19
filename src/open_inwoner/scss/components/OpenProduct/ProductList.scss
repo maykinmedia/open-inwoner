@@ -1,0 +1,9 @@
+.product__indicator--warning {
+  color: var(--color-danger-lightest);
+}
+
+.product__indicator--expired {
+  color: var(--oip-color-red-notification);
+  display: flex;
+  gap: var(--oip-color-red---spacing-medium);
+}

@@ -149,6 +149,7 @@ django==4.2.24
     #   mozilla-django-oidc-db
     #   notifications-api-common
     #   objects-api-client-django
+    #   open-product-api-client
     #   sentry-sdk
     #   zgw-consumers
     #   zgw-consumers-oas
@@ -280,6 +281,7 @@ django-solo==2.2.0
     #   mozilla-django-oidc-db
     #   notifications-api-common
     #   objects-api-client-django
+    #   open-product-api-client
     #   zgw-consumers
 django-timeline-logger==4.0.0
     # via -r requirements/base.in
@@ -428,6 +430,8 @@ objects-api-client-django @ git+https://github.com/maykinmedia/objects-api-clien
     # via -r requirements/base.in
 odfpy==1.4.1
     # via tablib
+open-product-api-client @ git+https://github.com/maykinmedia/open-product-api-client@01e3beb337cdcca40964a6d35dd62cfbee3f8609
+    # via -r requirements/base.in
 openpyxl==3.0.9
     # via tablib
 orderedmultidict==1.0.1
@@ -535,6 +539,7 @@ requests==2.32.5
     #   messagebird
     #   mozilla-django-oidc
     #   objects-api-client-django
+    #   open-product-api-client
     #   zgw-consumers
 ruamel-yaml==0.18.10
     # via django-setup-configuration
@@ -626,6 +631,7 @@ zgw-consumers==0.38.1
     #   -r requirements/base.in
     #   notifications-api-common
     #   objects-api-client-django
+    #   open-product-api-client
 zgw-consumers-oas==1.0.0
     # via -r requirements/base.in
 zopfli==0.1.9
