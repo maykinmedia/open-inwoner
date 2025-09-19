@@ -24,6 +24,7 @@ django-sniplates
 django-treebeard
 maykin-2fa
 phonenumbers
+maykin-django-prosemirror[images]
 django-localflavor
 django-privates
 django-cors-headers
