@@ -36,7 +36,9 @@ exclude = [
     # Project specific
     "src/open_inwoner/conf/local.py",
     "performance-tests",
-    "bootstrap.py"
+    "bootstrap.py",
+    "bin",
+    "docs"
 ]
 
 # Same as Black.

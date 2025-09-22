@@ -12,7 +12,7 @@ SideNavModule is a Django-integrated React component that dynamically loads navi
 
 **Features:**
 - Loads menu data from \`<script id="sidenav-menu-data">\` tags
-- Supports additional items via \`data-extra-item\` attributes  
+- Supports additional items via \`data-extra-item\` attributes
 - Handles JSON parsing errors gracefully with fallback data
 - Integrates seamlessly with Django template rendering
         `,

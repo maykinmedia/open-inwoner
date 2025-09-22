@@ -28,7 +28,7 @@
         {% button href="collaborate:plan_choose_template" text=_("Start een nieuwe samenwerking") primary=True icon="group" icon_outlined=True %}
     </header>
     {% optional_paragraph configurable_text.plans_page.plans_intro %}
-    
+
     {% if plans.extended_plans %}
         {% render_form form=plan_filter_form method="GET" spaceless=True autosubmit=True form_action=form_action %}
             <div class="plan-filter">

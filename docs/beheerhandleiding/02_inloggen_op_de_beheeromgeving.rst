@@ -71,4 +71,3 @@ Beperkte toegang kan op twee manieren worden ingesteld:
 bewerken waarvoor zij rechten hebben. Superusers en gebruikers met volledige
 ``configurations.change_siteconfiguration`` rechten hebben altijd toegang tot alle
 secties.
-

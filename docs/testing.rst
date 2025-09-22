@@ -51,5 +51,3 @@ Coverage reports can be found in ``build/reports/coverage``.
 To trigger a test run on file change (source file or test file), run::
 
     $ karma start karma.conf.js --single-run=false --browsers=PhantomJS
-
-

@@ -137,7 +137,7 @@ In dit veld vult u de positie van het onderwerp in. Selecteer ‘naast’ om het
 Hier kunt u aangeven wanneer het onderwerp zichtbaar mag zijn op het Open Inwoner Platform. U kunt hier kiezen uit de volgende opties:
 
 
-- Gepubliceerd: dit betekent dat het onderwerp zichtbaar mag zijn voor eindgebruikers. 
+- Gepubliceerd: dit betekent dat het onderwerp zichtbaar mag zijn voor eindgebruikers.
 
 
 De drie volgende vinkjes bepalen voor wie het onderwerp zichtbaar is. Om een onderwerp zichtbaar te maken moet er minimaal een vinkje bij gepubliceerd staan én een vinkje bij een van de overige opties (anoniem, bedrijven, inwoner):

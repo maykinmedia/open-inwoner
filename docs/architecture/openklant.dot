@@ -28,7 +28,7 @@ digraph model_graph {
     <FONT FACE="Roboto" COLOR="white" POINT-SIZE="10"><B>
     SingletonModel
     </B></FONT></TD></TR>
-  
+
     </TABLE>
     >]
 
@@ -38,15 +38,15 @@ digraph model_graph {
     <FONT FACE="Roboto" COLOR="white" POINT-SIZE="10"><B>
     OrderedModel<BR/>&lt;<FONT FACE="Roboto"><I>OrderedModelBase</I></FONT>&gt;
     </B></FONT></TD></TR>
-  
-  
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">order</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">PositiveIntegerField</FONT>
     </TD></TR>
-  
-  
+
+
     </TABLE>
     >]
 
@@ -56,95 +56,95 @@ digraph model_graph {
     <FONT FACE="Roboto" COLOR="white" POINT-SIZE="10"><B>
     OpenKlantConfig<BR/>&lt;<FONT FACE="Roboto"><I>SingletonModel</I></FONT>&gt;
     </B></FONT></TD></TR>
-  
-  
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto"><B>id</B></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto"><B>AutoField</B></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT COLOR="#7B7B7B" FACE="Roboto"><B>contactmomenten_service</B></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT COLOR="#7B7B7B" FACE="Roboto"><B>OneToOneField (id)</B></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT COLOR="#7B7B7B" FACE="Roboto"><B>klanten_service</B></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT COLOR="#7B7B7B" FACE="Roboto"><B>OneToOneField (id)</B></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT COLOR="#7B7B7B" FACE="Roboto">register_bronorganisatie_rsin</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT COLOR="#7B7B7B" FACE="Roboto">CharField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT COLOR="#7B7B7B" FACE="Roboto">register_channel</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT COLOR="#7B7B7B" FACE="Roboto">CharField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">register_contact_moment</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">BooleanField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT COLOR="#7B7B7B" FACE="Roboto">register_email</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT COLOR="#7B7B7B" FACE="Roboto">EmailField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT COLOR="#7B7B7B" FACE="Roboto">register_employee_id</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT COLOR="#7B7B7B" FACE="Roboto">CharField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT COLOR="#7B7B7B" FACE="Roboto">register_type</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT COLOR="#7B7B7B" FACE="Roboto">CharField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">send_email_confirmation</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">BooleanField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">use_rsin_for_innNnpId_query_parameter</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">BooleanField</FONT>
     </TD></TR>
-  
-  
+
+
     </TABLE>
     >]
 
@@ -154,47 +154,47 @@ digraph model_graph {
     <FONT FACE="Roboto" COLOR="white" POINT-SIZE="10"><B>
     ContactFormSubject<BR/>&lt;<FONT FACE="Roboto"><I>OrderedModel</I></FONT>&gt;
     </B></FONT></TD></TR>
-  
-  
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto"><B>id</B></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto"><B>AutoField</B></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto"><B>config</B></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto"><B>ForeignKey (id)</B></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto"><I>order</I></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto"><I>PositiveIntegerField</I></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">subject</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">CharField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT COLOR="#7B7B7B" FACE="Roboto">subject_code</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT COLOR="#7B7B7B" FACE="Roboto">CharField</FONT>
     </TD></TR>
-  
-  
+
+
     </TABLE>
     >]
 
@@ -204,39 +204,39 @@ digraph model_graph {
     <FONT FACE="Roboto" COLOR="white" POINT-SIZE="10"><B>
     KlantContactMomentAnswer
     </B></FONT></TD></TR>
-  
-  
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto"><B>id</B></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto"><B>AutoField</B></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto"><B>user</B></FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto"><B>ForeignKey (id)</B></FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">contactmoment_url</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">URLField</FONT>
     </TD></TR>
-  
-  
-  
+
+
+
     <TR><TD ALIGN="LEFT" BORDER="0">
     <FONT FACE="Roboto">is_seen</FONT>
     </TD><TD ALIGN="LEFT">
     <FONT FACE="Roboto">BooleanField</FONT>
     </TD></TR>
-  
-  
+
+
     </TABLE>
     >]
 
