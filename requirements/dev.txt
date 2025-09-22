@@ -256,6 +256,7 @@ django==4.2.24
     #   easy-thumbnails
     #   mail-editor
     #   maykin-2fa
+    #   maykin-common
     #   maykin-django-prosemirror
     #   mozilla-django-oidc
     #   mozilla-django-oidc-db
@@ -690,6 +691,12 @@ glom==20.11.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   mozilla-django-oidc-db
+googleapis-common-protos==1.70.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   opentelemetry-exporter-otlp-proto-grpc
+    #   opentelemetry-exporter-otlp-proto-http
 gprof2dot==2022.7.29
     # via django-silk
 greenlet==3.1.1
@@ -698,6 +705,11 @@ greenlet==3.1.1
     #   -r requirements/ci.txt
     #   gevent
     #   playwright
+grpcio==1.74.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   opentelemetry-exporter-otlp-proto-grpc
 html5lib==1.1
     # via
     #   -c requirements/ci.txt
@@ -722,6 +734,11 @@ imagesize==1.4.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   sphinx
+importlib-metadata==8.7.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   opentelemetry-api
 inflection==0.5.1
     # via
     #   -c requirements/ci.txt
@@ -802,6 +819,10 @@ maykin-2fa==1.0.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+maykin-common[otel]==0.10.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 maykin-django-prosemirror[images]==0.1.0
     # via
     #   -c requirements/ci.txt
@@ -827,7 +848,7 @@ mozilla-django-oidc-db[setup-configuration]==0.23.0
     #   django-digid-eherkenning
 msgpack==1.0.7
     # via locust
-multidict==6.0.5
+multidict==6.6.4
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -856,6 +877,89 @@ openpyxl==3.0.9
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   tablib
+opentelemetry-api==1.37.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   maykin-common
+    #   opentelemetry-exporter-otlp-proto-grpc
+    #   opentelemetry-exporter-otlp-proto-http
+    #   opentelemetry-instrumentation
+    #   opentelemetry-instrumentation-django
+    #   opentelemetry-instrumentation-wsgi
+    #   opentelemetry-sdk
+    #   opentelemetry-semantic-conventions
+opentelemetry-exporter-otlp==1.37.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   maykin-common
+opentelemetry-exporter-otlp-proto-common==1.37.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   opentelemetry-exporter-otlp-proto-grpc
+    #   opentelemetry-exporter-otlp-proto-http
+opentelemetry-exporter-otlp-proto-grpc==1.37.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   opentelemetry-exporter-otlp
+opentelemetry-exporter-otlp-proto-http==1.37.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   opentelemetry-exporter-otlp
+opentelemetry-instrumentation==0.58b0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   opentelemetry-instrumentation-django
+    #   opentelemetry-instrumentation-wsgi
+opentelemetry-instrumentation-django==0.58b0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   maykin-common
+opentelemetry-instrumentation-wsgi==0.58b0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   opentelemetry-instrumentation-django
+opentelemetry-proto==1.37.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   opentelemetry-exporter-otlp-proto-common
+    #   opentelemetry-exporter-otlp-proto-grpc
+    #   opentelemetry-exporter-otlp-proto-http
+opentelemetry-resource-detector-containerid==0.58b0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   maykin-common
+opentelemetry-sdk==1.37.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   maykin-common
+    #   opentelemetry-exporter-otlp-proto-grpc
+    #   opentelemetry-exporter-otlp-proto-http
+    #   opentelemetry-resource-detector-containerid
+opentelemetry-semantic-conventions==0.58b0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   opentelemetry-instrumentation
+    #   opentelemetry-instrumentation-django
+    #   opentelemetry-instrumentation-wsgi
+    #   opentelemetry-sdk
+opentelemetry-util-http==0.58b0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   opentelemetry-instrumentation-django
+    #   opentelemetry-instrumentation-wsgi
 orderedmultidict==1.0.1
     # via
     #   -c requirements/ci.txt
@@ -868,6 +972,7 @@ packaging==23.0
     #   build
     #   djangocms-text-ckeditor
     #   kombu
+    #   opentelemetry-instrumentation
     #   pytest
     #   sphinx
 pep517==0.11.0
@@ -913,11 +1018,22 @@ prompt-toolkit==3.0.36
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   click-repl
+propcache==0.3.2
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   yarl
 prosemirror==0.5.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   maykin-django-prosemirror
+protobuf==6.32.1
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   googleapis-common-protos
+    #   opentelemetry-proto
 psutil==5.9.7
     # via locust
 psycopg2==2.9.9
@@ -1084,6 +1200,7 @@ requests==2.32.5
     #   messagebird
     #   mozilla-django-oidc
     #   objects-api-client-django
+    #   opentelemetry-exporter-otlp-proto-http
     #   requests-mock
     #   sphinx
     #   zgw-consumers
@@ -1233,6 +1350,11 @@ typing-extensions==4.10.0
     #   -r requirements/ci.txt
     #   elasticsearch
     #   mozilla-django-oidc-db
+    #   opentelemetry-api
+    #   opentelemetry-exporter-otlp-proto-grpc
+    #   opentelemetry-exporter-otlp-proto-http
+    #   opentelemetry-sdk
+    #   opentelemetry-semantic-conventions
     #   polyfactory
     #   prosemirror
     #   pydantic
@@ -1327,6 +1449,7 @@ wrapt==1.14.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   elastic-apm
+    #   opentelemetry-instrumentation
     #   vcrpy
 xlrd==2.0.1
     # via
@@ -1347,7 +1470,7 @@ xsdata==23.8
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-yarl==1.9.8
+yarl==1.20.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -1362,6 +1485,11 @@ zgw-consumers-oas==1.0.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+zipp==3.23.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   importlib-metadata
 zope-event==5.0
     # via gevent
 zope-interface==6.1
