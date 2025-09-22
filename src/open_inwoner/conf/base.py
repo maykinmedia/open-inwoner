@@ -477,6 +477,21 @@ LOGGING = {
             "level": CELERY_LOGLEVEL,
             "propagate": True,
         },
+        "opentelemetry": {
+            "handlers": ["django"] if not LOG_STDOUT else ["console"],
+            "level": "ERROR",
+            "propagate": True,
+        },
+        "opentelemetry.metrics": {
+            "handlers": ["django"] if not LOG_STDOUT else ["console"],
+            "level": "ERROR",
+            "propagate": True,
+        },
+        "opentelemetry.sdk.metrics": {
+            "handlers": ["django"] if not LOG_STDOUT else ["console"],
+            "level": "ERROR",
+            "propagate": True,
+        },
     },
 }
 
