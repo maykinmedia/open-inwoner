@@ -1,0 +1,83 @@
+---
+
+extensions:
+  basicauth/server:
+    htpasswd:
+      inline: |
+        otel:supersecret
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+        auth:
+          authenticator: basicauth/server
+      http:
+        endpoint: 0.0.0.0:4318
+        auth:
+          authenticator: basicauth/server
+
+  # See https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/redisreceiver/README.md
+  redis:
+    endpoint: "redis:6379"
+    tls:
+      insecure: true
+
+  # See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/postgresqlreceiver
+  postgresql:
+    endpoint: "db:5432"
+    transport: tcp
+    username: open_inwoner
+    password: irrelevant
+    databases:
+      - open_inwoner
+    tls:
+      insecure: true
+
+  # See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/nginxreceiver
+  nginx:
+    endpoint: "http://nginx:80/_status"
+    collection_interval: 10s
+
+processors:
+  batch:
+    timeout: 1s
+    send_batch_size: 1024
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 1024
+  transform:
+    metric_statements:
+      - context: datapoint
+        statements:
+        - set(attributes["target"], resource.attributes["oip.target"])
+
+exporters:
+  # NOTE: Prior to v0.86.0 use `logging` instead of `debug`.
+  debug:
+    verbosity: detailed
+  # Exposes a metrics endpoint that prometheus can scrape
+  prometheus:
+    endpoint: 0.0.0.0:8889
+    namespace: otel  # this becomes a prefix in the prometheus metrics: `otel_*`
+    const_labels:
+      environment: local_otel_collector
+    resource_to_telemetry_conversion:
+      enabled: true
+
+service:
+  extensions: [basicauth/server]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [debug]
+    metrics:
+      receivers: [otlp, postgresql, redis, nginx]
+      processors: [memory_limiter, transform, batch]
+      exporters: [prometheus]
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [debug]

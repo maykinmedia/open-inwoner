@@ -60,3 +60,27 @@ Getting started
    .. code:: bash
 
         docker compose stop
+
+
+Testing OpenTelemetry Observability
+===================================
+
+To test the OpenTelemetry setup and view metrics in Grafana:
+
+1. Start the observability stack first:
+
+   .. code:: bash
+
+        bin/start_observability.sh
+
+2. Start the application with OpenTelemetry enabled:
+
+   .. code:: bash
+
+        OTEL_SDK_DISABLED=false docker compose up
+
+3. Access Grafana dashboard at http://localhost:3000 to view metrics
+
+The observability stack includes monitoring and metrics collection for the application
+performance and behavior. The easiest way to see if this is working is to navigate to
+the "Drilldown > Metrics" item in the left menu and filter by the ``otel_`` prefix.

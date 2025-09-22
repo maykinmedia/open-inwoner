@@ -6,6 +6,7 @@ fi
 
 set -e
 
+OTEL_SERVICE_NAME="${OTEL_SERVICE_NAME:-openinwoner-celery-monitor}"
 LOGLEVEL=${CELERY_LOGLEVEL:-INFO}
 
 # This monitors the tasks executed by Celery. The Celery worker needs to be
