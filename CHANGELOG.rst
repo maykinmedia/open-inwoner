@@ -7,6 +7,8 @@ Bugfixes
 * [:taiga-is:`3377`,  :pr:`1917`]: De ``static/bundles/images`` map wordt nu correct
   opgebouwd in de Docker container, waardoor o.m. `marker-icon.png` bestanden correct
   ontsloten worden.
+* [:taiga-is:`3480`, :pr:`1934`]: De paginering van de contactmomenten lijstweergave
+  ontbrak, maar is nu toegevoegd.
 
 Onderhoud
 ---------
