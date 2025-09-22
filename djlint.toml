@@ -1,0 +1,6 @@
+profile="django"
+files=[
+    "**/templates/**/*.html",
+    "src/open_inwoner/conf/parts/*.html"
+]
+custom_blocks="anchor_menu,button_row,capture,choice_list,dropdown,placeholder,render_card,render_column,render_form,render_grid,render_list"
