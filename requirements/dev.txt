@@ -133,6 +133,7 @@ click==8.1.3
     #   click-didyoumean
     #   click-plugins
     #   click-repl
+    #   djlint
     #   flask
     #   pip-tools
     #   typer
@@ -152,7 +153,11 @@ click-repl==0.2.0
     #   -r requirements/ci.txt
     #   celery
 colorama==0.4.6
-    # via commitizen
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   commitizen
+    #   djlint
 commitizen==4.16.3
     # via -r requirements/dev.in
 commonmark==0.9.1
@@ -194,6 +199,11 @@ css-inline==0.13.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   mail-editor
+cssbeautifier==1.15.4
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   djlint
 cssselect==1.3.0
     # via
     #   -c requirements/ci.txt
@@ -616,6 +626,10 @@ djangorestframework-camel-case==1.4.2
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   notifications-api-common
+djlint==1.36.4
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 dnspython==2.6.1
     # via
     #   -c requirements/ci.txt
@@ -645,6 +659,12 @@ ecs-logging==2.1.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   elastic-apm
+editorconfig==0.17.1
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   cssbeautifier
+    #   jsbeautifier
 elastic-apm==6.20.0
     # via
     #   -c requirements/ci.txt
@@ -816,6 +836,17 @@ josepy==1.13.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   mozilla-django-oidc
+jsbeautifier==1.15.4
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   cssbeautifier
+    #   djlint
+json5==0.12.1
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   djlint
 jsonschema==4.1.0
     # via
     #   -c requirements/ci.txt
@@ -1048,6 +1079,11 @@ packaging==26.0
     #   opentelemetry-instrumentation
     #   pytest
     #   sphinx
+pathspec==0.12.1
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   djlint
 pep517==0.11.0
     # via build
 phonenumbers==8.13.29
@@ -1246,6 +1282,7 @@ pyyaml==6.0.2
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   commitizen
+    #   djlint
     #   drf-spectacular
     #   gemma-zds-client
     #   pre-commit
@@ -1272,6 +1309,11 @@ redis==5.0.3
     #   -r requirements/ci.txt
     #   celery-once
     #   django-redis
+regex==2025.9.18
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   djlint
 reportlab==4.4.2
     # via
     #   -c requirements/ci.txt
@@ -1346,9 +1388,11 @@ six==1.16.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   click-repl
+    #   cssbeautifier
     #   django-elasticsearch-dsl
     #   furl
     #   isodate
+    #   jsbeautifier
     #   mail-parser
     #   orderedmultidict
     #   python-dateutil
@@ -1459,10 +1503,17 @@ tinyhtml5==2.0.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   weasyprint
+toml==0.10.2
+    # via autopep8
 tomli==1.2.1
     # via pep517
 tomlkit==0.15.0
     # via commitizen
+tqdm==4.67.1
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   djlint
 typer==0.21.1
     # via
     #   -c requirements/ci.txt

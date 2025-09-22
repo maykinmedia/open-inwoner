@@ -13,6 +13,7 @@ pytest  # for docs test
 
 # Code formatting
 ruff
+djlint
 
 # DigidLocal
 pyopenssl
