@@ -6,3 +6,51 @@ docs/
 bin/
 deployment/
 src/open_inwoner/react/i18n/compiled/
+
+# Templates
+**/templates/**/*.html
+src/open_inwoner/conf/parts/*.html
+
+# Developers
+.hg
+.git
+.svn
+.idea/
+.vscode/
+.sass-cache/
+*.db
+*.pyc
+__pycache__
+*~
+
+# Javascript libraries
+/node_modules/
+
+# Generated files
+/docs/_build
+
+# Coverage reports
+/reports/
+/htmlcov/
+.coverage
+coverage.xml
+
+# Environment
+#/deployment/app.*.yml
+#/deployment/hosts.*
+local.py
+/env/
+/media/
+/private_media/
+/static/
+/mail/
+/log/*.log*
+/log/nginx/*.log*
+/.env
+.DS_STORE
+
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
