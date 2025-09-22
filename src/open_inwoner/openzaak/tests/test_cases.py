@@ -852,13 +852,34 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                         for group in self.api_groups:
                             zrc_root = group.zrc_service.api_root.rstrip("/")
                             if user.vestiging:
+                                # Mock for vestigingsnummer request
                                 m.get(
                                     f"{zrc_root}/zaken?maximaleVertrouwelijkheidaanduiding=beperkt_openbaar&rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__vestigingsNummer={user.vestiging}",
+                                    json={"results": []},
+                                )
+                                # Mock for KVK/RSIN request
+                                m.get(
+                                    f"{zrc_root}/zaken?maximaleVertrouwelijkheidaanduiding=beperkt_openbaar&rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__kvkNummer={user.kvk}",
                                     json={"results": []},
                                 )
                             else:
                                 m.get(
                                     f"{zrc_root}/zaken?maximaleVertrouwelijkheidaanduiding=beperkt_openbaar&rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__kvkNummer={user.kvk}",
+                                    json={"results": []},
+                                )
+                    else:
+                        # For legacy parameters
+                        for group in self.api_groups:
+                            zrc_root = group.zrc_service.api_root.rstrip("/")
+                            if user.vestiging:
+                                # Mock for vestigingsnummer request
+                                m.get(
+                                    f"{zrc_root}/zaken?maximaleVertrouwelijkheidaanduiding=beperkt_openbaar&rol__betrokkeneIdentificatie__vestiging__vestigingsNummer={user.vestiging}",
+                                    json={"results": []},
+                                )
+                                # Mock for KVK/RSIN request
+                                m.get(
+                                    f"{zrc_root}/zaken?maximaleVertrouwelijkheidaanduiding=beperkt_openbaar&rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId={user.kvk}",
                                     json={"results": []},
                                 )
 
@@ -882,24 +903,29 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                         zrc_root = group.zrc_service.api_root.rstrip("/")
 
                         if use_openzaak_120_params:
+                            # Two requests when vestigingsnummer is provided
                             if user.vestiging:
                                 # OpenZaak 1.20+ vestiging parameter
                                 expected_urls.add(
                                     f"{zrc_root}/zaken?maximaleVertrouwelijkheidaanduiding=beperkt_openbaar&rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__vestigingsNummer={user.vestiging}"
                                 )
+                                # OpenZaak 1.20+ KVK parameter
+                                expected_urls.add(
+                                    f"{zrc_root}/zaken?maximaleVertrouwelijkheidaanduiding=beperkt_openbaar&rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__kvkNummer={user.kvk}"
+                                )
                             else:
-                                # OpenZaak 1.20+ KvK parameter
                                 expected_urls.add(
                                     f"{zrc_root}/zaken?maximaleVertrouwelijkheidaanduiding=beperkt_openbaar&rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__kvkNummer={user.kvk}"
                                 )
                         else:
                             if user.vestiging:
-                                # Legacy vestiging parameter
                                 expected_urls.add(
                                     f"{zrc_root}/zaken?maximaleVertrouwelijkheidaanduiding=beperkt_openbaar&rol__betrokkeneIdentificatie__vestiging__vestigingsNummer={user.vestiging}"
                                 )
+                                expected_urls.add(
+                                    f"{zrc_root}/zaken?maximaleVertrouwelijkheidaanduiding=beperkt_openbaar&rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId={user.kvk}"
+                                )
                             else:
-                                # Legacy KvK/RSIN parameter
                                 expected_urls.add(
                                     f"{zrc_root}/zaken?maximaleVertrouwelijkheidaanduiding=beperkt_openbaar&rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId={user.kvk}"
                                 )
@@ -944,15 +970,47 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
 
         # check zaken request query parameters
         for zaken_root in ("zaken.nl", "andere-zaken.nl"):
-            list_zaken_req = [
+            zaken_requests = [
                 req
                 for req in m.request_history
                 if req.hostname == zaken_root and req.path == "/api/v1/zaken"
-            ][0]
+            ]
 
-            self.assertEqual(len(list_zaken_req.qs), 2)
+            # we should have two requests, one for KVK + one for vestiging
+            self.assertEqual(len(zaken_requests), 2)
+
+            kvk_request = None
+            vestigingsnummer_request = None
+            for req in zaken_requests:
+                if (
+                    "rol__betrokkeneidentificatie__vestiging__vestigingsnummer"
+                    in req.qs
+                ):
+                    vestigingsnummer_request = req
+                if (
+                    "rol__betrokkeneidentificatie__nietnatuurlijkpersoon__innnnpid"
+                    in req.qs
+                ):
+                    kvk_request = req
+
+            self.assertIsNotNone(
+                vestigingsnummer_request, "No zaken request for vestigingsnummer found"
+            )
+            self.assertIsNotNone(kvk_request, "No zaken request for kvk found")
+
             self.assertEqual(
-                list_zaken_req.qs,
+                kvk_request.qs,
+                {
+                    "maximalevertrouwelijkheidaanduiding": [
+                        VertrouwelijkheidsAanduidingen.beperkt_openbaar
+                    ],
+                    "rol__betrokkeneidentificatie__nietnatuurlijkpersoon__innnnpid": [
+                        self.eherkenning_user_vestiging.kvk
+                    ],
+                },
+            )
+            self.assertEqual(
+                vestigingsnummer_request.qs,
                 {
                     "maximalevertrouwelijkheidaanduiding": [
                         VertrouwelijkheidsAanduidingen.beperkt_openbaar
@@ -967,12 +1025,38 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
         for mock in self.mocks:
             mock._setUpMocks(m)
 
+        for zaken_root in ("zaken.nl", "andere-zaken.nl"):
+            m.get(
+                furl(f"{zaken_root}/api/vi/zaken")
+                .add(
+                    {
+                        "maximaleVertrouwelijkheidaanduiding": VertrouwelijkheidsAanduidingen.openbaar,
+                        "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId": self.eherkenning_user_vestiging.rsin,
+                    }
+                )
+                .url,
+                json=paginated_response(
+                    [
+                        mock.zaak_eherkenning1,
+                        mock.zaak_eherkenning2,
+                    ]
+                )
+                if zaken_root == "zaken.nl"
+                else paginated_response([mock.zaak_eherkenning1]),
+            )
+
+        for group in self.api_groups:
+            group.fetch_eherkenning_zaken_with_rsin = True
+            group.save()
+
         self.client.force_login(user=self.eherkenning_user_vestiging)
 
         m.reset_mock()
 
         response = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
 
+        # We expect only zaak_eherkenning1 in the results since it's the only one
+        # present in both the RSIN and vestigingsnummer responses
         expected_cases = [
             {
                 "uuid": mock.zaak_eherkenning1["uuid"],
@@ -999,18 +1083,50 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
             # don't show internal cases
             self.assertNotContains(response, mock.zaak_intern["omschrijving"])
             self.assertNotContains(response, mock.zaak_intern["identificatie"])
+            # verify zaak_eherkenning2 is not included
+            self.assertNotContains(response, mock.zaak_eherkenning2["identificatie"])
 
-        # check zaken request query parameters
+        # check requests
         for zaken_root in ("zaken.nl", "andere-zaken.nl"):
-            list_zaken_req = [
+            zaken_requests = [
                 req
                 for req in m.request_history
                 if req.hostname == zaken_root and req.path == "/api/v1/zaken"
-            ][0]
+            ]
 
-            self.assertEqual(len(list_zaken_req.qs), 2)
+            self.assertEqual(len(zaken_requests), 2)
+
+            rsin_request = None
+            vestigingsnummer_request = None
+
+            for req in zaken_requests:
+                query_string = req.qs
+                if any("vestigingsnummer" in key.lower() for key in query_string):
+                    vestigingsnummer_request = req
+                elif any(
+                    "nietnatuurlijkpersoon" in key.lower() for key in query_string
+                ):
+                    rsin_request = req
+
+            self.assertIsNotNone(
+                vestigingsnummer_request, "No request for vestigingsnummer found"
+            )
+            self.assertIsNotNone(rsin_request, "No request for rsin found")
+
+            # Verify request params
             self.assertEqual(
-                list_zaken_req.qs,
+                rsin_request.qs,
+                {
+                    "maximalevertrouwelijkheidaanduiding": [
+                        VertrouwelijkheidsAanduidingen.beperkt_openbaar
+                    ],
+                    "rol__betrokkeneidentificatie__nietnatuurlijkpersoon__innnnpid": [
+                        self.eherkenning_user_vestiging.rsin
+                    ],
+                },
+            )
+            self.assertEqual(
+                vestigingsnummer_request.qs,
                 {
                     "maximalevertrouwelijkheidaanduiding": [
                         VertrouwelijkheidsAanduidingen.beperkt_openbaar

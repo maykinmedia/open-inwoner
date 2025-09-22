@@ -11,7 +11,8 @@ Deployment aandachtspunten
 Nieuwe features
 ---------------
 
-* ...
+* [:taiga-us:`3457`: :pr:`1936`]: Zaken voor eHerkenning-gebruikers worden nu gefilterd
+  op zowel KVK als vestigingsnummer
 
 Bugfixes
 --------

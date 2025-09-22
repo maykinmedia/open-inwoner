@@ -80,6 +80,10 @@ class ZakenClient(ZgwAPIClient):
                 "either `user_bsn` or `user_kvk`/`user_risin` (+ optionally `vestigingsnummer`) "
                 "should be supplied, not both"
             )
+        if not (user_bsn or user_kvk or user_rsin or vestigingsnummer):
+            raise ValueError(
+                "You must supply either a bsn or kvk/rsin/vestigingsnummer"
+            )
 
         if user_bsn:
             return self.fetch_cases_by_bsn(
@@ -91,17 +95,26 @@ class ZakenClient(ZgwAPIClient):
             max_requests=max_requests,
             zaak_identificatie=identificatie,
         )
+
+        user_kvk_or_rsin = user_rsin if user_rsin else user_kvk
+        kvk_cases = fetch_cases_for_company(
+            kvk_or_rsin=user_kvk_or_rsin,
+        )
+
         if vestigingsnummer:
-            return fetch_cases_for_company(
+            vestiging_cases = fetch_cases_for_company(
                 vestigingsnummer=vestigingsnummer,
             )
-        if user_kvk or user_rsin:
-            user_kvk_or_rsin = user_rsin if user_rsin else user_kvk
-            return fetch_cases_for_company(
-                kvk_or_rsin=user_kvk_or_rsin,
-            )
 
-        raise ValueError("You must supply either a bsn or kvk/rsin/vestigingsnummer")
+            # return intesection of zaken for kvk and zaken for vestiging
+            kvk_case_urls = {case.url for case in kvk_cases}
+            filtered_cases = [
+                case for case in vestiging_cases if case.url in kvk_case_urls
+            ]
+
+            return filtered_cases
+
+        return kvk_cases
 
     @cache_result(
         "{self.base_url}:cases:{user_bsn}:{max_requests}:{identificatie}",

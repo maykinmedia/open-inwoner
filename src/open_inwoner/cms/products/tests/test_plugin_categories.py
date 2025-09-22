@@ -677,6 +677,17 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, TransactionWebTest):
                 .url,
                 json=paginated_response([self.zaak, self.zaak3]),
             )
+            m.get(
+                furl(f"{ZAKEN_ROOT}zaken")
+                .add(
+                    {
+                        "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId": identifier,
+                        "maximaleVertrouwelijkheidaanduiding": VertrouwelijkheidsAanduidingen.beperkt_openbaar,
+                    }
+                )
+                .url,
+                json=paginated_response([self.zaak, self.zaak3]),
+            )
 
         for fetch_eherkenning_zaken_with_rsin in [True, False]:
             with self.subTest(
