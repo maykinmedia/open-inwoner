@@ -1,3 +1,12 @@
+1.35.1 (2025-XX-XX)
+===================
+
+Bugfixes
+--------
+
+* [:taiga-is:`3480`, :pr:`1934`]: De paginering van de contactmomenten lijstweergave
+  ontbrak, maar is nu toegevoegd.
+
 1.35.0 (2025-09-18)
 ===================
 
