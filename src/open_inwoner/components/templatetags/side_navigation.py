@@ -234,3 +234,16 @@ def react_sidenav_data(context):
     except Exception as e:
         logger.exception("Error loading sidenav menu: %s", e)
         return []
+
+
+@register.simple_tag(takes_context=True)
+def has_sidenav_items(context):
+    """
+    Check if there are any menu items.
+    If False then sidebar should be hidden and main content should be fullwidth
+    """
+    if not context["request"].user.is_authenticated:
+        return False
+
+    menu_data = react_sidenav_data(context)
+    return len(menu_data) > 0

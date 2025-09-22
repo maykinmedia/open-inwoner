@@ -1,10 +1,12 @@
 {% load i18n form_tags string_tags solo_tags custom_session_tags menu_tags button_tags side_navigation %}
 
 {% if request.user.is_authenticated %}
-
-    <div class="side-navigation--oip">
-        <div class="" id="react-openinwoner-sidenav"></div>
-        {% react_sidenav_data as menu_data %}
-        {{ menu_data|json_script:"sidenav-menu-data" }}
-    </div>
+    {% has_sidenav_items as has_menu %}
+    {% if has_menu %}
+        <div class="side-navigation--oip">
+            <div class="" id="react-openinwoner-sidenav"></div>
+            {% react_sidenav_data as menu_data %}
+            {{ menu_data|json_script:"sidenav-menu-data" }}
+        </div>
+    {% endif %}
 {% endif %}

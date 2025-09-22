@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n cms_tags sekizai_tags static %}
+{% load i18n cms_tags sekizai_tags static side_navigation %}
 
 {% block mount_modules %} data-mount-modules='["sidenav"]'{% endblock %}
 
@@ -33,13 +33,16 @@
 {% block main_outer %}
     <main id="content" class="container container--fullwidth">
         {% block main_inner %}
-            <div class="grid{% block grid_class %}{% endblock %}">
+            {% has_sidenav_items as has_menu %}
+            <div class="grid{% if has_menu %} grid--with-sidebar{% else %} grid--no-sidebar{% endif %}{% block grid_class %}{% endblock %}">
                 {% spaceless %}
-                    <div class="grid__sidebar">
-                        {% block sidebar_content %}
-                            {% include "components/Sidenav/Sidenav.html" %}
-                        {% endblock sidebar_content %}
-                    </div>
+                    {% if has_menu %}
+                        <div class="grid__sidebar">
+                            {% block sidebar_content %}
+                                {% include "components/Sidenav/Sidenav.html" %}
+                            {% endblock sidebar_content %}
+                        </div>
+                    {% endif %}
                 {% endspaceless %}
 
                 <div class="grid__main">
