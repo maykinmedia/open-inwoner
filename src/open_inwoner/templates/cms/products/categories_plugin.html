@@ -1,4 +1,4 @@
-{% load i18n button_tags %}
+{% load i18n button_tags side_navigation %}
 {% if categories %}
     <section class="plugin plugin__categories">
         <header class="oip-header-group">
@@ -9,8 +9,13 @@
 
         <p class="utrecht-paragraph">{{ configurable_text.home_page.home_theme_intro|linebreaksbr }}</p>
 
+        {% has_sidenav_items as has_menu %}
         {% if request.user.is_authenticated %}
-            {% include "components/Card/CardContainer.html" with categories=categories columns=3 image_object_fit="cover" only %}
+            {% if has_menu %}
+                {% include "components/Card/CardContainer.html" with categories=categories columns=3 image_object_fit="cover" only %}
+            {% else %}
+                {% include "components/Card/CardContainer.html" with categories=categories columns=4 image_object_fit="cover" only %}
+            {% endif %}
         {% else %}
             {% include "components/Card/CardContainer.html" with categories=categories columns=4 image_object_fit="cover" only %}
         {% endif %}
