@@ -1,5 +1,6 @@
 import logging
 from collections import defaultdict
+from typing import Iterable, Mapping, cast
 
 from django.db import transaction
 
@@ -157,9 +158,9 @@ def import_zaaktype_configs() -> list[ZaakTypeConfig]:
     return list((create or {}).values())
 
 
-def import_zaaktype_informatieobjecttype_configs() -> list[
-    tuple[ZaakTypeConfig, InformatieObjectType]
-]:
+def import_zaaktype_informatieobjecttype_configs() -> (
+    list[tuple[ZaakTypeConfig, InformatieObjectType]]
+):
     """
     generate ZaakTypeInformatieObjectTypeConfigs for all ZaakTypeConfig
     """
@@ -183,9 +184,9 @@ def import_zaaktype_statustype_configs() -> list[tuple[ZaakTypeConfig, StatusTyp
     return created
 
 
-def import_zaaktype_resultaattype_configs() -> list[
-    tuple[ZaakTypeConfig, ResultaatType]
-]:
+def import_zaaktype_resultaattype_configs() -> (
+    list[tuple[ZaakTypeConfig, ResultaatType]]
+):
     """
     generate ZaakTypeResultaatTypeConfigs for all ZaakTypeConfig
     """
@@ -291,6 +292,7 @@ def import_statustype_configs_for_type(
         client, ztc.identificatie, ztc.catalogus_url
     )
     if not zaak_types:
+        logger.info("No zaaktypes found in the API")
         return []
 
     create = []
@@ -299,26 +301,34 @@ def import_statustype_configs_for_type(
     with transaction.atomic():
         # map existing config records by url
 
-        info_map = {
-            zaaktype_statustype.statustype_url: zaaktype_statustype
-            for zaaktype_statustype in ztc.zaaktypestatustypeconfig_set.all()
+        current_status_typen_for_zaak_type: dict[str, ZaakTypeStatusTypeConfig] = {
+            statustype.statustype_url: statustype
+            for statustype in cast(
+                Iterable[ZaakTypeStatusTypeConfig],
+                ztc.zaaktypestatustypeconfig_set.all(),
+            )
         }
 
         # collect and implicitly de-duplicate statustype url's and track which zaaktype used it
-        info_queue = defaultdict(list)
+        info_queue: Mapping[str, list[ZaakType]] = defaultdict(list)
         for zaak_type in zaak_types:
+            logger.info("Resolving URLs %s for %s", zaak_type.statustypen, zaak_type)
             for url in zaak_type.statustypen:
                 info_queue[url].append(zaak_type)
 
         if info_queue:
             # load urls and update/create records
             for statustype_url, using_zaak_types in info_queue.items():
-                status_type = client.fetch_single_status_type(statustype_url)
+                logger.info("Fetching status_type for url %s", statustype_url)
+                status_type = cast(StatusType | None, client.fetch_single_status_type(statustype_url))
                 if not status_type:  # Statustype isn't available anymore?
+                    logger.warning("No statustype found for url: %s", statustype_url)
                     continue
 
-                zaaktype_statustype = info_map.get(status_type.url)
-                if zaaktype_statustype:
+                if zaaktype_statustype := current_status_typen_for_zaak_type.get(
+                    status_type.url
+                ):
+                    logger.info("Existing statustype found for %s, adding to update queue", status_type)
                     # we got a record for this, see if we got data to update
                     for using in using_zaak_types:
                         # track which zaaktype UUID's are interested in this statustype
@@ -327,6 +337,7 @@ def import_statustype_configs_for_type(
                             if zaaktype_statustype not in create:
                                 update.append(zaaktype_statustype)
                 else:
+                    logger.info("No existing statustype found for %s, addting to create queue", status_type)
                     # new record
                     zaaktype_statustype = ZaakTypeStatusTypeConfig(
                         zaaktype_config=ztc,
@@ -337,7 +348,9 @@ def import_statustype_configs_for_type(
                     )
                     create.append(zaaktype_statustype)
                     # not strictly necessary but let's be accurate
-                    info_map[status_type.uuid] = zaaktype_statustype
+                    current_status_typen_for_zaak_type[status_type.uuid] = (
+                        zaaktype_statustype
+                    )
 
         if create:
             ZaakTypeStatusTypeConfig.objects.bulk_create(create)
