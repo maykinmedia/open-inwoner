@@ -165,6 +165,8 @@ class KlantContactMomentListView(
         paginator_dict = self.paginate_with_context(ctx["questions"])
         ctx.update(paginator_dict)
 
+        # TODO: add flag concerning contactformulier to context
+
         return ctx
 
 
