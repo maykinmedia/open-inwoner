@@ -9,6 +9,8 @@ Bugfixes
   ontsloten worden.
 * [:taiga-is:`3480`, :pr:`1934`]: De paginering van de contactmomenten lijstweergave
   ontbrak, maar is nu toegevoegd.
+* [:taiga-is:`3483`,  :pr:`1937`]: Typo's in BRP API request headers verholpen
+  (``x-requets-*`` naar ``x-requests-*``).
 
 Onderhoud
 ---------
