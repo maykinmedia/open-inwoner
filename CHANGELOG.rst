@@ -9,6 +9,8 @@ Bugfixes
 * [:taiga-is:`3477`: :pr:`1935`]: Wanneer er geen CMS-pagina's zijn en het menu leeg is,
   dan wordt de zijnavigatie nu onzichtbaar, zodat de rest van de inhoud niet meer te smal
   wordt weergegeven.
+* [:taiga-is:`3483`,  :pr:`1937`]: Typo's in BRP API request headers verholpen
+  (``x-requets-*`` naar ``x-requests-*``).
 
 1.35.0 (2025-09-18)
 ===================
