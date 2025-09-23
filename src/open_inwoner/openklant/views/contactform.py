@@ -66,6 +66,8 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
                 logger.info("No klanten/vragen service configured for contactform")
 
     def dispatch(self, request, *args, **kwargs):
+        # TODO: distinguish between stand-alone contact form and form
+        # embedded in vragen list view
         if not self.klanten_config.contact_registration_enabled:
             raise Http404("Contact form is not configured")
         return super().dispatch(request, *args, **kwargs)
