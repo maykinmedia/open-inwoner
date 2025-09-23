@@ -16,7 +16,8 @@ Nieuwe features
 Bugfixes
 --------
 
-* ...
+* [:taiga-is:`3480`, :pr:`1934`]: De paginering van de contactmomenten lijstweergave
+  ontbrak, maar is nu toegevoegd.
 
 Onderhoud
 ---------
