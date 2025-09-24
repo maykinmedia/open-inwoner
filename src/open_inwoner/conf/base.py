@@ -102,6 +102,14 @@ CACHES = {
             "IGNORE_EXCEPTIONS": True,
         },
     },
+    "zgw": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": f"redis://{config('CACHE_DEFAULT', 'localhost:6379/0')}",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "IGNORE_EXCEPTIONS": True,
+        },
+    },
     "local": {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
     },

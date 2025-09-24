@@ -1,11 +1,9 @@
-from django.conf import settings
-
 from open_inwoner.openzaak.api_models import InformatieObject
 from open_inwoner.openzaak.clients import DocumentenClient
-from open_inwoner.utils.decorators import cache as cache_result
+from open_inwoner.openzaak.utils import zgw_zaken_cache
 
 
-@cache_result("information_object_url:{url}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT)
+@zgw_zaken_cache("information_object_url:{url}")
 def fetch_single_information_object_from_url(
     url: str, api_group
 ) -> InformatieObject | None:
