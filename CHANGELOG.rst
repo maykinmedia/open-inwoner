@@ -18,6 +18,8 @@ Bugfixes
   weergegeven in de zijnavigatie.
 * [:taiga-is:`3486`: :pr:`1946`]: Menu-items op pagina 'Mijn Zaken' worden niet langer
   dubbel getoond in de sidebar en het dropdownmenu.
+* [:taiga-is:`3484`]: De pagina voor contactmomenten crashte wanneer het contactformulier
+  niet was geconfigureerd.
 
 Onderhoud
 ---------
