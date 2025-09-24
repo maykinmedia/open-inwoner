@@ -12,7 +12,6 @@ from ordered_model.admin import OrderedInlineModelAdminMixin, OrderedTabularInli
 from treebeard.admin import TreeAdmin
 from treebeard.forms import movenodeform_factory
 
-from open_inwoner.ckeditor5.widgets import CKEditorWidget
 from open_inwoner.openzaak.models import OpenZaakConfig, ZaakTypeConfig
 from open_inwoner.pdc.models import Category, CategoryProduct
 from open_inwoner.pdc.resources import CategoryExportResource, CategoryImportResource
@@ -64,7 +63,6 @@ class CategoryAdminForm(movenodeform_factory(Category)):
     class Meta:
         model = Category
         fields = "__all__"
-        widgets = {"description": CKEditorWidget}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

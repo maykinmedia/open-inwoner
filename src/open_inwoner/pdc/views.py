@@ -11,7 +11,7 @@ from view_breadcrumbs import BaseBreadcrumbMixin, ListBreadcrumbMixin
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.pdc.models.product import ProductCondition
 from open_inwoner.questionnaire.models import QuestionnaireStep
-from open_inwoner.utils.ckeditor import get_rendered_content
+from open_inwoner.utils.html import get_rendered_content
 from open_inwoner.utils.views import CommonPageMixin, LoginMaybeRequiredMixin
 
 from .choices import YesNo

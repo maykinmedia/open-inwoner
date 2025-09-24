@@ -4,6 +4,8 @@ from zgw_consumers.constants import APITypes
 
 from open_inwoner.openzaak.tests.factories import (
     ServiceFactory,
+    ZaakTypeConfigFactory,
+    ZaakTypeStatusTypeConfigFactory,
     ZGWApiGroupConfigFactory,
 )
 from open_inwoner.utils.tests.test_migrations import (
@@ -243,3 +245,67 @@ class TestZGWApiGroupServicesRequiredSuccessfulMigration(TestSuccessfulMigration
                 ("http://foobar/ztc", "ztc"),
             ],
         )
+
+
+class StatusTypeDescriptionsMigrationTest(TestSuccessfulMigrations):
+    """Tests the migration of ZaakTypeStatusTypeConfig descriptions to ProsemirrorModelFields."""
+
+    migrate_from = "0069_parameter_spelling"
+    migrate_to = "0072_zaaktypestatustypeconfig_description_schema_2"
+    app = "openzaak"
+
+    def setUpBeforeMigration(self, apps):
+        zaaktype_config = ZaakTypeConfigFactory()
+
+        ZaakTypeStatusTypeConfigFactory(
+            zaaktype_config=zaaktype_config,
+            omschrijving="Test Statustype",
+            statustekst="Test Statustekst",
+            description="**Bold text** and _italic text_ with a [link](https://example.com)",
+        )
+
+    def test_description_migration(self):
+        ZaakTypeStatusTypeConfig = self.apps.get_model(
+            "openzaak", "ZaakTypeStatusTypeConfig"
+        )
+
+        statustype_config = ZaakTypeStatusTypeConfig.objects.first()
+
+        expected_html = '<p><strong>Bold text</strong> and <em>italic text</em> with a <a href="https://example.com">link</a></p>'
+        self.assertEqual(statustype_config.description.html, expected_html)
+
+        # Ensure the temporary field was removed
+        self.assertFalse(hasattr(statustype_config, "description_tmp"))
+
+
+class StatusTypeDocUploadDescriptionMigrationTest(TestSuccessfulMigrations):
+    """Tests the migration of ZaakTypeStatusTypeConfig document_upload_description to ProsemirrorModelFields."""
+
+    migrate_from = "0072_zaaktypestatustypeconfig_description_schema_2"
+    migrate_to = "0075_zaaktypestatustypeconfig_doc_upload_description_schema_2"
+    app = "openzaak"
+
+    def setUpBeforeMigration(self, apps):
+        zaaktype_config = ZaakTypeConfigFactory()
+
+        ZaakTypeStatusTypeConfigFactory(
+            zaaktype_config=zaaktype_config,
+            omschrijving="Test Statustype",
+            statustekst="Test Statustekst",
+            document_upload_description="**Upload instructions** with _formatting_ and a [link](https://example.com/upload-help)",
+        )
+
+    def test_document_upload_description_migration(self):
+        ZaakTypeStatusTypeConfig = self.apps.get_model(
+            "openzaak", "ZaakTypeStatusTypeConfig"
+        )
+
+        statustype_config = ZaakTypeStatusTypeConfig.objects.first()
+
+        expected_html = '<p><strong>Upload instructions</strong> with <em>formatting</em> and a <a href="https://example.com/upload-help">link</a></p>'
+        self.assertEqual(
+            statustype_config.document_upload_description.html, expected_html
+        )
+
+        # Ensure the temporary field was removed
+        self.assertFalse(hasattr(statustype_config, "document_upload_description_tmp"))

@@ -3,6 +3,8 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from django_jsonform.models.fields import ArrayField
+from django_prosemirror.fields import ProsemirrorModelField
+from django_prosemirror.schema import MarkType, NodeType
 from filer.fields.image import FilerImageField
 from treebeard.exceptions import InvalidMoveToDescendant
 from treebeard.mp_tree import MP_MoveHandler, MP_Node
@@ -69,10 +71,17 @@ class Category(MP_Node):
         default=False,
         help_text=_("Whether the category should be highlighted or not"),
     )
-    description = models.TextField(
-        verbose_name=_("Description"),
+    description = ProsemirrorModelField(
+        _("Description"),
+        allowed_node_types=[NodeType.PARAGRAPH, NodeType.FILER_IMAGE],
+        allowed_mark_types=[
+            MarkType.STRONG,
+            MarkType.ITALIC,
+            MarkType.UNDERLINE,
+            MarkType.LINK,
+        ],
+        null=True,
         blank=True,
-        default="",
         help_text=_("Description of the category"),
     )
     icon = FilerImageField(

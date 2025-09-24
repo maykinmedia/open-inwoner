@@ -182,10 +182,21 @@ class TestAdminCategoryForm(WebTest):
         ZaakTypeConfigFactory.create(identificatie="001")
 
         category = CategoryFactory(path="0006", slug="foo6", published=False)
-        form = self.app.get(
+        response_get = self.app.get(
             reverse("admin:pdc_category_change", kwargs={"object_id": category.pk}),
             user=self.user,
-        ).form
+        )
+
+        form = response_get.form
+
+        # Fix inline formsets - set TOTAL_FORMS to INITIAL_FORMS to prevent validation errors
+        # on empty inline forms (QuestionInline has required fields)
+        for key in list(form.fields.keys()):
+            if key.endswith("-TOTAL_FORMS"):
+                prefix = key.replace("-TOTAL_FORMS", "")
+                initial_forms_key = f"{prefix}-INITIAL_FORMS"
+                if initial_forms_key in form.fields:
+                    form[key] = form[initial_forms_key].value
 
         form["zaaktypen"] = json.dumps(["001"])
         response = form.submit("_save")
@@ -205,10 +216,21 @@ class TestAdminCategoryForm(WebTest):
         ZaakTypeConfigFactory.create(identificatie="001")
 
         category = CategoryFactory(path="0006", slug="foo6", published=False)
-        form = self.app.get(
+        response_get = self.app.get(
             reverse("admin:pdc_category_change", kwargs={"object_id": category.pk}),
             user=self.user,
-        ).form
+        )
+
+        form = response_get.form
+
+        # Fix inline formsets - set TOTAL_FORMS to INITIAL_FORMS to prevent validation errors
+        # on empty inline forms (QuestionInline has required fields)
+        for key in list(form.fields.keys()):
+            if key.endswith("-TOTAL_FORMS"):
+                prefix = key.replace("-TOTAL_FORMS", "")
+                initial_forms_key = f"{prefix}-INITIAL_FORMS"
+                if initial_forms_key in form.fields:
+                    form[key] = form[initial_forms_key].value
 
         form["zaaktypen"] = json.dumps(["001"])
         response = form.submit()

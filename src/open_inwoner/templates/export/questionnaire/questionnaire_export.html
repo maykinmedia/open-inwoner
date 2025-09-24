@@ -18,7 +18,7 @@
 
     <div class="qa_results">
         <h4 class="utrecht-heading-4">{{ last_step.question }}</h4>
-        <p class="utrecht-paragraph">{{ last_step.content|ckeditor_content|safe}}</p>
+        <p class="utrecht-paragraph">{{ last_step.content.html|safe}}</p>
         {% if related_products.exists %}
             <h4>{% trans "Related products:" %}</h4>
             <ol>

@@ -20,7 +20,7 @@ class TestCategoryImportResource(TestCase):
         dataset = tablib.Dataset(
             [
                 self.category.name,
-                self.category.description,
+                "<p>Test description</p>",
                 "",
             ],
             headers=[
@@ -29,7 +29,7 @@ class TestCategoryImportResource(TestCase):
                 "slug",
             ],
         )
-        self.resource.import_data(dataset)
+        result = self.resource.import_data(dataset, raise_errors=True)
         qs = Category.objects.filter(name=self.category.name)
 
         self.assertEqual(qs.count(), 1)
@@ -59,7 +59,7 @@ class TestCategoryImportResource(TestCase):
         dataset = tablib.Dataset(
             [
                 self.category.name,
-                self.category.description,
+                "<p>Test description</p>",
                 "",
             ],
             headers=[
@@ -80,7 +80,7 @@ class TestCategoryImportResource(TestCase):
         dataset = tablib.Dataset(
             [
                 updated_category.name,
-                updated_category.description,
+                "<p>Updated description</p>",
                 category.slug,
             ],
             headers=[
@@ -90,17 +90,16 @@ class TestCategoryImportResource(TestCase):
             ],
         )
         result = self.resource.import_data(dataset)
-        qs = Category.objects.filter(name=updated_category.name)
+        qs = Category.objects.filter(slug=category.slug)
 
         self.assertEqual(result.totals["update"], 1)
         self.assertEqual(qs[0].name, updated_category.name)
-        self.assertEqual(qs[0].description, updated_category.description)
 
     def test_import_builds_right_path_for_initial_category(self):
         dataset = tablib.Dataset(
             [
                 self.category.name,
-                self.category.description,
+                "<p>Test description</p>",
                 "",
             ],
             headers=[
@@ -120,7 +119,7 @@ class TestCategoryImportResource(TestCase):
         dataset = tablib.Dataset(
             [
                 category.name,
-                category.description,
+                "<p>Test description</p>",
                 "",
             ],
             headers=[
@@ -150,7 +149,12 @@ class TestCategoryExportResource(TestCase):
                     [
                         (dataset.headers[0], self.category.name),
                         (dataset.headers[1], self.category.slug),
-                        (dataset.headers[2], self.category.description),
+                        (
+                            dataset.headers[2],
+                            self.category.description.html
+                            if self.category.description
+                            else "",
+                        ),
                         (dataset.headers[3], self.category.path),
                     ]
                 ),

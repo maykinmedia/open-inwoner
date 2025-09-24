@@ -14,6 +14,8 @@ from django.core.serializers.base import DeserializationError
 from django.db import transaction
 from django.db.models import QuerySet
 
+from django_prosemirror.fields import ProsemirrorModelField
+
 from .models import (
     CatalogusConfig,
     ZaakTypeConfig,
@@ -209,6 +211,28 @@ class ZGWConfigExport:
             json_data: list[dict] = json.loads(
                 serialized_data,
             )
+
+            # Post-process ProsemirrorModelField values
+            for item in json_data:
+                model_class = qs.model
+                for field_name, field_value in item["fields"].items():
+                    field = model_class._meta.get_field(field_name)
+                    if isinstance(field, ProsemirrorModelField):
+                        # The field value is JSON-encoded
+                        # Decode it and extract the text content
+                        if field_value:
+                            try:
+                                decoded = (
+                                    json.loads(field_value)
+                                    if isinstance(field_value, str)
+                                    else field_value
+                                )
+                                item["fields"][field_name] = decoded or ""
+                            except (json.JSONDecodeError, TypeError):
+                                item["fields"][field_name] = ""
+                        else:
+                            item["fields"][field_name] = ""
+
             yield from json_data
 
     def as_jsonl_iter(self) -> Generator[str, Any, None]:

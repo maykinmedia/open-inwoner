@@ -10,6 +10,20 @@ from open_inwoner.accounts.tests.factories import GroupFactory, UserFactory
 from .factories import CategoryFactory, ProductFactory
 
 
+def fix_inline_formsets(form):
+    """
+    Fix inline formsets by setting TOTAL_FORMS to INITIAL_FORMS.
+    This prevents validation errors on empty inline forms with required fields.
+    """
+    for key in list(form.fields.keys()):
+        if key.endswith("-TOTAL_FORMS"):
+            prefix = key.replace("-TOTAL_FORMS", "")
+            initial_forms_key = f"{prefix}-INITIAL_FORMS"
+            if initial_forms_key in form.fields:
+                form[key] = form[initial_forms_key].value
+    return form
+
+
 @disable_admin_mfa()
 class TestAdminProductForm(WebTest):
     def test_access_limited_to_linked_auth_groups(self):
@@ -98,6 +112,7 @@ class TestAdminProductForm(WebTest):
                 set(response.form["categories"].value),
                 {str(category_general.id), str(category_grouped.id)},
             )
+            fix_inline_formsets(response.form)
             response = response.form.submit("_continue").follow()
 
             # no changes on resubmit
@@ -109,6 +124,7 @@ class TestAdminProductForm(WebTest):
             response.form["categories"].select_multiple(
                 value=[str(category_general.id), str(category_extra.id)]
             )
+            fix_inline_formsets(response.form)
             response = response.form.submit("_continue").follow()
             self.assertEqual(
                 set(product.categories.all()), {category_general, category_extra}
@@ -116,6 +132,7 @@ class TestAdminProductForm(WebTest):
 
             # sanity check with different combinations
             response.form["categories"].select_multiple(value=[str(category_extra.id)])
+            fix_inline_formsets(response.form)
             response = response.form.submit("_continue").follow()
             self.assertEqual(set(product.categories.all()), {category_extra})
 
@@ -130,6 +147,7 @@ class TestAdminProductForm(WebTest):
                 set(response.form["categories"].value),
                 {str(category_grouped.id)},
             )
+            fix_inline_formsets(response.form)
             response = response.form.submit("_continue").follow()
 
             # on resubmit the non-group category is still there
@@ -138,6 +156,7 @@ class TestAdminProductForm(WebTest):
             )
             # select different category
             response.form["categories"].select_multiple(value=[str(category_extra.id)])
+            fix_inline_formsets(response.form)
             response.form.submit().follow()
 
             # swapped different category but the non-group category is still there
@@ -147,6 +166,7 @@ class TestAdminProductForm(WebTest):
 
             # requires at least one category
             response.form["categories"].select_multiple(value=[])
+            fix_inline_formsets(response.form)
             response = response.form.submit()
             self.assertEqual(response.status_code, 200)
             self.assertEqual(

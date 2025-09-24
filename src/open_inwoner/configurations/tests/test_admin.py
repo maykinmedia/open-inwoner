@@ -1,3 +1,4 @@
+import json
 from unittest.mock import patch
 
 from django.contrib import admin
@@ -12,6 +13,9 @@ from django.urls import reverse
 from django.utils.datastructures import MultiValueDict
 from django.utils.translation import gettext_lazy as _
 
+from django_prosemirror.config import ProsemirrorConfig
+from django_prosemirror.schema import MarkType, NodeType
+from django_prosemirror.serde import html_to_doc
 from django_webtest import WebTest
 from maykin_2fa.test import disable_admin_mfa
 
@@ -22,6 +26,21 @@ from open_inwoner.configurations.admin import (
 )
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.configurations.validators import validate_javascript_file
+
+
+def text_to_prosemirror_doc(text: str) -> dict:
+    """Convert plain text to a ProseMirror document."""
+    config = ProsemirrorConfig(
+        allowed_node_types=[NodeType.PARAGRAPH],
+        allowed_mark_types=[
+            MarkType.STRONG,
+            MarkType.ITALIC,
+            MarkType.UNDERLINE,
+            MarkType.LINK,
+        ],
+    )
+    html = f"<p>{text}</p>"
+    return html_to_doc(html, schema=config.schema)
 
 
 @disable_admin_mfa()
@@ -577,7 +596,7 @@ class AdminPermissionTest(WebTest):
         access to, even when submitting a POST request with those fields.
         """
         config = SiteConfiguration.get_solo()
-        config.warning_banner_text = "Old warning banner text"
+        config.warning_banner_text = text_to_prosemirror_doc("Old warning banner text")
         config.enable_crawler_indexing = False
         config.save()
 
@@ -587,7 +606,8 @@ class AdminPermissionTest(WebTest):
         ).forms["siteconfiguration_form"]
 
         # Modify authorized field
-        form["warning_banner_text"] = "Warning banner text changed"
+        new_text_doc = text_to_prosemirror_doc("Warning banner text changed")
+        form["warning_banner_text"] = json.dumps(new_text_doc)
 
         # Attempt to modify unauthorized field
         form.fields["enable_crawler_indexing"] = True
@@ -599,7 +619,9 @@ class AdminPermissionTest(WebTest):
         config.refresh_from_db()
 
         # Authorized field should be changed
-        self.assertEqual(config.warning_banner_text, "Warning banner text changed")
+        self.assertEqual(
+            config.warning_banner_text.html, "<p>Warning banner text changed</p>"
+        )
 
         # Unauthorized field should not be changed
         self.assertEqual(config.enable_crawler_indexing, False)

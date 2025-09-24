@@ -1,13 +1,11 @@
 import logging
 
-from django import forms
 from django.core.exceptions import PermissionDenied
 from django.utils.translation import gettext_lazy as _
 
 from cms.models import Page
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
-from djangocms_text_ckeditor.widgets import TextEditorWidget
 
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openklant.models import KlantenSysteemConfig
@@ -49,20 +47,10 @@ class FooterPagesPlugin(CMSPluginBase):
         return context
 
 
-class CMSFlatPageModelForm(forms.ModelForm):
-    class Meta:
-        model = CMSFlatPageModel
-        fields = "__all__"
-        widgets = {
-            "content": TextEditorWidget,
-        }
-
-
 @plugin_pool.register_plugin
 class CMSFlatPagePlugin(CMSPluginBase):
     name = _("CMS Flatpage Plugin")
     model = CMSFlatPageModel
-    form = CMSFlatPageModelForm
     render_template = "cms/cms_flatpage.html"
 
     def render(self, context, instance, placeholder):

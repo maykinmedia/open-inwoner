@@ -1,22 +1,36 @@
-from django import forms
-from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from cms.models import CMSPlugin
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
-
-from open_inwoner.ckeditor5.widgets import CKEditorWidget
+from django_prosemirror.fields import ProsemirrorModelField
+from django_prosemirror.schema import MarkType, NodeType
 
 
 class ContactFormConfig(CMSPlugin):
-    description_authenticated_user = models.TextField(
+    description_authenticated_user = ProsemirrorModelField(
         _("Description authenticated users"),
+        allowed_node_types=[NodeType.PARAGRAPH],
+        allowed_mark_types=[
+            MarkType.STRONG,
+            MarkType.ITALIC,
+            MarkType.UNDERLINE,
+            MarkType.LINK,
+        ],
+        null=True,
         blank=True,
         help_text=_("Description of the contact form for authenticated users"),
     )
-    description_anonymous_user = models.TextField(
+    description_anonymous_user = ProsemirrorModelField(
         _("Description anonymous users"),
+        allowed_node_types=[NodeType.PARAGRAPH],
+        allowed_mark_types=[
+            MarkType.STRONG,
+            MarkType.ITALIC,
+            MarkType.UNDERLINE,
+            MarkType.LINK,
+        ],
+        null=True,
         blank=True,
         help_text=_(
             "Description of the contact form for anonymous/non-authenticated users"
@@ -24,19 +38,9 @@ class ContactFormConfig(CMSPlugin):
     )
 
 
-class ContactFormConfigForm(forms.ModelForm):
-    class Meta:
-        model = ContactFormConfig
-        fields = "__all__"
-        widgets = {
-            "description": CKEditorWidget,
-        }
-
-
 @plugin_pool.register_plugin
 class ContactFormPlugin(CMSPluginBase):
     model = ContactFormConfig
-    form = ContactFormConfigForm
     app_hook = "OpenKlantApphook"
     name = _("Contact form plugin")
     render_template = "cms/contactform/form_inner.html"

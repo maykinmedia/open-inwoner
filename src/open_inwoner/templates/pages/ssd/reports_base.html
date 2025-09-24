@@ -22,7 +22,7 @@
                 {{ page_title }}
             </h1>
             <p>
-                {% blocktrans with mijn_uitkeringen_text=client.config.mijn_uitkeringen_text|ckeditor_content|safe %}
+                {% blocktrans with mijn_uitkeringen_text=client.config.mijn_uitkeringen_text.html|safe %}
                     {{ mijn_uitkeringen_text }}
                 {% endblocktrans %}
             <p>

@@ -683,8 +683,11 @@ class InnerCaseDetailView(
                     "call_to_action_text",
                     None,
                 ),
-                "description": getattr(
-                    statustype_config_mapping.get(s.statustype.url), "description", None
+                "description": (
+                    config.description.html
+                    if (config := statustype_config_mapping.get(s.statustype.url))
+                    and config.description
+                    else ""
                 ),
                 "case_link_text": getattr(
                     statustype_config_mapping.get(s.statustype.url),

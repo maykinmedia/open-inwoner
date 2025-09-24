@@ -1,4 +1,4 @@
 {% load render_tags cms_tags %}
 
 <h1 class="utrecht-heading-1">{{ cms_flatpage_plugin.title }}</h1>
-<p class="utrecht-paragraph">{{ cms_flatpage_plugin.content|ckeditor_content|safe }}</p>
+<p class="utrecht-paragraph">{{ cms_flatpage_plugin.content|prosemirror_content|safe }}</p>

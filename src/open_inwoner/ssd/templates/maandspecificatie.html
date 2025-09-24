@@ -161,7 +161,7 @@
         {# Optional comments/help text #}
         {% if comments %}
             <section class="section monthly-report__p">
-                {{ comments|markdown|safe }}
+                {{ comments|safe }}
             </section>
         {% endif %}
 	</div>

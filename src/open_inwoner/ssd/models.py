@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from django_prosemirror.fields import ProsemirrorModelField
+from django_prosemirror.schema import MarkType, NodeType
 from solo.models import SingletonModel
 
 from open_inwoner.configurations.models import SiteConfiguration
@@ -79,15 +81,28 @@ class SSDConfig(SingletonModel):
             "Day and month from when the report for the preceding year is available for download"
         ),
     )
-    jaaropgave_display_text = models.TextField(
+    jaaropgave_display_text = ProsemirrorModelField(
         _("Display text"),
+        allowed_node_types=[NodeType.PARAGRAPH],
+        allowed_mark_types=[
+            MarkType.STRONG,
+            MarkType.ITALIC,
+            MarkType.UNDERLINE,
+            MarkType.LINK,
+        ],
+        null=True,
         blank=True,
         help_text=_("The text displayed as overview of the 'Jaaropgave' tab"),
     )
-    jaaropgave_pdf_comments = models.TextField(
+    jaaropgave_pdf_comments = ProsemirrorModelField(
         _("PDF help text"),
+        allowed_node_types=[NodeType.PARAGRAPH],
+        allowed_mark_types=[],
+        null=True,
         blank=True,
-        help_text=_("Help text for the columns in the Jaaropgave PDF"),
+        help_text=_(
+            "Optional comments to be included in the jaaropgave PDF. Markdown formatting is supported."
+        ),
     )
     # report options (maandspecificatie)
     maandspecificatie_enabled = models.BooleanField(
@@ -105,13 +120,24 @@ class SSDConfig(SingletonModel):
             "Day of the month from when the report for the preceding month is available for download"
         ),
     )
-    maandspecificatie_display_text = models.TextField(
+    maandspecificatie_display_text = ProsemirrorModelField(
         _("Display text"),
+        allowed_node_types=[NodeType.PARAGRAPH],
+        allowed_mark_types=[
+            MarkType.STRONG,
+            MarkType.ITALIC,
+            MarkType.UNDERLINE,
+            MarkType.LINK,
+        ],
+        null=True,
         blank=True,
         help_text=_("The text displayed as overview of the 'Maandspecificatie' tab"),
     )
-    maandspecificatie_pdf_comments = models.TextField(
+    maandspecificatie_pdf_comments = ProsemirrorModelField(
         _("PDF help text"),
+        allowed_node_types=[NodeType.PARAGRAPH],
+        allowed_mark_types=[],
+        null=True,
         blank=True,
         help_text=_(
             "Optional comments to be included in the maandspecificatie PDF. "

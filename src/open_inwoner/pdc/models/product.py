@@ -6,6 +6,8 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
+from django_prosemirror.fields import ProsemirrorModelField
+from django_prosemirror.schema import MarkType, NodeType
 from filer.fields.file import FilerFileField
 from filer.fields.image import FilerImageField
 from openformsclient.models import OpenFormsSlugField
@@ -107,8 +109,26 @@ class Product(models.Model):
             "Select a form to show this form on the product page. If a form is selected, the link will not be shown."
         ),
     )
-    content = models.TextField(
-        verbose_name=_("Content"),
+    content = ProsemirrorModelField(
+        _("Content"),
+        allowed_node_types=[
+            NodeType.PARAGRAPH,
+            NodeType.HEADING,
+            NodeType.FILER_IMAGE,
+            NodeType.TABLE,
+            NodeType.TABLE_ROW,
+            NodeType.TABLE_CELL,
+            NodeType.TABLE_HEADER,
+        ],
+        allowed_mark_types=[
+            MarkType.STRONG,
+            MarkType.ITALIC,
+            MarkType.UNDERLINE,
+            MarkType.LINK,
+        ],
+        blank=True,
+        null=True,
+        default=None,
         help_text=_(
             "Product content with build-in WYSIWYG editor. By adding '[CTABUTTON]' you can embed a cta-button for linking to the defined form or link"
         ),
@@ -229,7 +249,13 @@ class Product(models.Model):
         )
 
     def has_cta_tag(self):
-        return r"\[CTABUTTON\]" in self.content  # noqa
+        if not self.content:
+            return False
+        # Check if the ProseMirror HTML contains the CTABUTTON tag
+        try:
+            return "[CTABUTTON]" in self.content.html
+        except (AttributeError, TypeError):
+            return False
 
 
 class ProductFile(models.Model):

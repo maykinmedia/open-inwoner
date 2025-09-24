@@ -198,6 +198,7 @@ INSTALLED_APPS = [
     "zgw_consumers",
     "mail_editor",
     "ckeditor",
+    "django_prosemirror",
     "privates",
     "timeline_logger",
     "csp",

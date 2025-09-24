@@ -81,6 +81,29 @@ class ProductDocument(Document):
     def get_instances_from_related(self, related_instance):
         return related_instance.products.all()
 
+    def prepare_content(self, instance):
+        """Convert ProsemirrorFieldDocument to HTML string for indexing."""
+        if hasattr(instance.content, "html"):
+            return instance.content.html
+        return str(instance.content) if instance.content else ""
+
+    def prepare_categories(self, instance):
+        """Prepare categories with description converted to HTML."""
+        categories = []
+        for category in instance.categories.all():
+            category_data = {
+                "name": category.name,
+                "slug": category.slug,
+                "description": "",
+            }
+            if category.description:
+                if hasattr(category.description, "html"):
+                    category_data["description"] = category.description.html
+                else:
+                    category_data["description"] = str(category.description)
+            categories.append(category_data)
+        return categories
+
 
 @registry.register_document
 class CMSPageDocument(Document):

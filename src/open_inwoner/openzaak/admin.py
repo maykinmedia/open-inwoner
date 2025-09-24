@@ -16,7 +16,6 @@ from django.utils.translation import gettext_lazy as _, ngettext
 from privates.storages import PrivateMediaFileSystemStorage
 from solo.admin import SingletonModelAdmin
 
-from open_inwoner.ckeditor5.widgets import CKEditorWidget
 from open_inwoner.openzaak.clients import build_zgw_client_from_service
 from open_inwoner.openzaak.import_export import ZGWConfigExport, ZGWConfigImport
 from open_inwoner.utils.forms import LimitedUploadFileField
@@ -328,9 +327,7 @@ class ZaakTypeStatusTypeConfigInlineAdminForm(ModelForm):
         model = ZaakTypeStatusTypeConfig
         fields = "__all__"
         widgets = {
-            "document_upload_description": CKEditorWidget,
             "status_indicator_text": Textarea(attrs={"cols": 40, "rows": 10}),
-            "description": CKEditorWidget,
         }
 
 
