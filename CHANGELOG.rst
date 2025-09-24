@@ -13,6 +13,8 @@ Bugfixes
   (``x-requets-*`` naar ``x-requests-*``).
 * [:taiga-is:`3484`]: De pagina voor contactmomenten crashte wanneer het contactformulier
   niet was geconfigureerd.
+* [:taiga-is:`3479`: :pr:`1940`]: Ongepubliceerde CMS pagina's worden niet meer
+  weergegeven in de zijnavigatie.
 
 1.35.0 (2025-09-18)
 ===================
