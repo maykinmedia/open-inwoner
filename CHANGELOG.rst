@@ -14,6 +14,8 @@ Bugfixes
 * [:taiga-is:`3477`: :pr:`1935`]: Wanneer er geen CMS-pagina's zijn en het menu leeg is,
   dan wordt de zijnavigatie nu onzichtbaar, zodat de rest van de inhoud niet meer te smal
   wordt weergegeven.
+* [:taiga-is:`3479`: :pr:`1940`]: Ongepubliceerde CMS pagina's worden niet meer
+  weergegeven in de zijnavigatie.
 
 Onderhoud
 ---------
