@@ -15,8 +15,9 @@ from requests import RequestException
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.models import User
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openklant.constants import KlantenServiceType
-from open_inwoner.openklant.models import KlantContactMomentAnswer
+from open_inwoner.openklant.models import KlantContactMomentAnswer, KlantenSysteemConfig
 from open_inwoner.openklant.services import (
     KlantenService,
     OpenKlant2Service,
@@ -165,7 +166,12 @@ class KlantContactMomentListView(
         paginator_dict = self.paginate_with_context(ctx["questions"])
         ctx.update(paginator_dict)
 
-        # TODO: add flag concerning contactformulier to context
+        siteconfig = SiteConfiguration.get_solo()
+        klanten_config = KlantenSysteemConfig.get_solo()
+        ctx["contactmoment_contact_form_enabled"] = (
+            siteconfig.contactmoment_contact_form_enabled
+            and klanten_config.contact_registration_enabled
+        )
 
         return ctx
 

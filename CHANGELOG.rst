@@ -11,6 +11,8 @@ Bugfixes
   wordt weergegeven.
 * [:taiga-is:`3483`,  :pr:`1937`]: Typo's in BRP API request headers verholpen
   (``x-requets-*`` naar ``x-requests-*``).
+* [:taiga-is:`3484`]: De pagina voor contactmomenten crashte wanneer het contactformulier
+  niet was geconfigureerd.
 
 1.35.0 (2025-09-18)
 ===================
