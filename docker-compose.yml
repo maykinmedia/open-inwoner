@@ -13,6 +13,40 @@
 #
 version: '3.4'
 
+x-app-env: &x-app-env
+  - DJANGO_SETTINGS_MODULE=open_inwoner.conf.docker
+  - SECRET_KEY=${SECRET_KEY:-7bk)w=_%lnm#68rc!c)h@gy&5+%^fl=okq17bv!)yv!l0udu2y}
+  - ALLOWED_HOSTS=*
+  - CORS_ALLOW_ALL_ORIGINS=${CORS_ALLOW_ALL_ORIGINS:-true}
+  - CSRF_TRUSTED_ORIGINS='http://localhost:9000'
+  - CACHE_DEFAULT=redis:6379/0
+  - CACHE_AXES=redis:6379/0
+  - CACHE_OIDC=redis:6379/0
+  - CACHE_PORTALOCKER=redis:6379/0
+  - CELERY_BROKER_URL=redis://redis:6379/0
+  - CELERY_RESULT_BACKEND=redis://redis:6379/0
+  - CELERY_LOGLEVEL=DEBUG
+  - ES_HOST=http://elasticsearch:9200
+  # Needed for Celery Flower to match the TIME_ZONE configured in the
+  # settings used by workers and beat containers.
+  - TZ=Europe/Amsterdam
+  # WARNING: Strictly for development!
+  - DISABLE_2FA=${DISABLE_2FA:-True}
+  - DEBUG=True
+  - IS_HTTPS=no
+  - ALLOW_CUSTOM_JS=False
+  # Overridable uwsgi settings
+  - UWSGI_PROCESSES
+  - UWSGI_THREADS
+  - PORT
+  - UWSGI_HTTP_KEEPALIVE
+  - UWSGI_HTTP_TIMEOUT
+  - UWSGI_HARAKIRI
+  - UWSGI_MAX_REQUESTS
+  - UWSGI_POST_BUFFERING
+  - UWSGI_BUFFER_SIZE
+  - STATIC_ROOT_VOLUME=/srv/static
+
 services:
   db:
     image: postgis/postgis:${PG_VERSION:-14-master}
@@ -63,39 +97,7 @@ services:
         RELEASE: ${TAG:-latest}
     container_name: open-inwoner-web
     image: maykinmedia/open-inwoner:${TAG:-latest}
-    environment: &web_env
-      - DJANGO_SETTINGS_MODULE=open_inwoner.conf.docker
-      - SECRET_KEY=${SECRET_KEY:-7bk)w=_%lnm#68rc!c)h@gy&5+%^fl=okq17bv!)yv!l0udu2y}
-      - ALLOWED_HOSTS=*
-      - CORS_ALLOW_ALL_ORIGINS=${CORS_ALLOW_ALL_ORIGINS:-true}
-      - CSRF_TRUSTED_ORIGINS='http://localhost:9000'
-      - CACHE_DEFAULT=redis:6379/0
-      - CACHE_AXES=redis:6379/0
-      - CACHE_OIDC=redis:6379/0
-      - CACHE_PORTALOCKER=redis:6379/0
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
-      - CELERY_LOGLEVEL=DEBUG
-      - ES_HOST=http://elasticsearch:9200
-      # Needed for Celery Flower to match the TIME_ZONE configured in the
-      # settings used by workers and beat containers.
-      - TZ=Europe/Amsterdam
-      # WARNING: Strictly for development!
-      - DISABLE_2FA=${DISABLE_2FA:-True}
-      - DEBUG=True
-      - IS_HTTPS=no
-      - ALLOW_CUSTOM_JS=False
-      # Overridable uwsgi settings
-      - UWSGI_PROCESSES
-      - UWSGI_THREADS
-      - PORT
-      - UWSGI_HTTP_KEEPALIVE
-      - UWSGI_HTTP_TIMEOUT
-      - UWSGI_HARAKIRI
-      - UWSGI_MAX_REQUESTS
-      - UWSGI_POST_BUFFERING
-      - UWSGI_BUFFER_SIZE
-      - STATIC_ROOT_VOLUME=/srv/static
+    environment: *x-app-env
     healthcheck:
       test: ["CMD", "python", "-c", "import requests; exit(requests.head('http://localhost:8000/admin/').status_code not in [200, 302])"]
       interval: 30s
@@ -142,7 +144,7 @@ services:
   celery:
     build: *web_build
     image: maykinmedia/open-inwoner:${TAG:-latest}
-    environment: *web_env
+    environment: *x-app-env
     command: /celery_worker.sh
     healthcheck:
       test: ["CMD", "python", "/app/bin/check_celery_worker_liveness.py"]
@@ -168,7 +170,7 @@ services:
   celery-beat:
     build: *web_build
     image: maykinmedia/open-inwoner:${TAG:-latest}
-    environment: *web_env
+    environment: *x-app-env
     command: /celery_beat.sh
     depends_on:
       - celery
@@ -178,7 +180,7 @@ services:
   celery-monitor:
     build: *web_build
     image: maykinmedia/open-inwoner:${TAG:-latest}
-    environment: *web_env
+    environment: *x-app-env
     command: /celery_monitor.sh
     depends_on:
       - celery
