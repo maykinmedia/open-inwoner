@@ -1,13 +1,20 @@
 import logging
+from typing import Literal
 
 from django.contrib import messages
-from django.contrib.auth.signals import user_logged_in, user_logged_out
+from django.contrib.auth.signals import (
+    user_logged_in,
+    user_logged_out,
+    user_login_failed,
+)
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
+from django.http import HttpRequest
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
-from open_inwoner.accounts.models import User
+from axes.signals import user_locked_out
+
 from open_inwoner.haalcentraal.models import HaalCentraalConfig
 from open_inwoner.haalcentraal.utils import update_brp_data_in_db
 from open_inwoner.kvk.client import KvKClient
@@ -18,6 +25,8 @@ from open_inwoner.openklant.services import OpenKlant2Service, eSuiteKlantenServ
 from open_inwoner.utils.logentry import system_action, user_action
 
 from .choices import LoginTypeChoices
+from .metrics import login_failures, logins, logouts, user_lockouts
+from .models import User
 
 logger = logging.getLogger(__name__)
 
@@ -180,3 +189,59 @@ def save_previous_login(sender, instance, update_fields, **kwargs):
     if update_fields and "last_login" in update_fields:
         old_instance = User.objects.get(id=instance.id)
         instance.previous_login = old_instance.last_login
+
+
+@receiver(user_logged_in, dispatch_uid="user_logged_in.increment_counter")
+def increment_logins_counter(
+    sender: type[User], request: HttpRequest | None, user: User, **kwargs
+) -> None:
+    logins.add(
+        1,
+        attributes={
+            "user_id": user.id,
+            "login_type": user.login_type,
+            "http_target": request.path if request else "",
+        },
+    )
+
+
+@receiver(user_logged_out, dispatch_uid="user_logged_out.increment_counter")
+def increment_logouts_counter(
+    sender: type[User], request: HttpRequest | None, user: User | None, **kwargs
+) -> None:
+    if user is None:
+        return
+    logouts.add(
+        1,
+        attributes={
+            "user_id": user.id,
+            "login_type": user.login_type,
+        },
+    )
+
+
+@receiver(user_login_failed, dispatch_uid="user_login_failed.increment_counter")
+def increment_login_failure_counter(
+    sender, request: HttpRequest | None = None, **kwargs
+):
+    login_failures.add(
+        1,
+        attributes={"http_target": request.path if request else ""},
+    )
+
+
+@receiver(user_locked_out, dispatch_uid="user_locked_out.increment_counter")
+def increment_user_locked_out_counter(
+    sender: Literal["axes"],
+    request: HttpRequest,
+    username: str,
+    ip_address: str,
+    **kwargs,
+) -> None:
+    user_lockouts.add(
+        1,
+        attributes={
+            "http_target": request.path,
+            "username": username,
+        },
+    )
