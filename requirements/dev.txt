@@ -645,7 +645,7 @@ flask==3.0.0
     #   locust
 flask-basicauth==0.2.0
     # via locust
-flask-cors==4.0.0
+flask-cors==6.0.1
     # via locust
 fontawesomefree==6.4.2
     # via
@@ -1441,6 +1441,7 @@ webtest==3.0.0
 werkzeug==3.0.1
     # via
     #   flask
+    #   flask-cors
     #   locust
 wheel==0.42.0
     # via pip-tools
