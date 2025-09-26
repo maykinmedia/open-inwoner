@@ -31,6 +31,7 @@ Onderhoud
   ``v3.12``.
 * [:taiga-us:`3450`, :pr:`1927`]: ``maykin-django-prosemirror`` dependency toegevoegd.
 * [:taiga-ta:`3473`, :pr:`1931`]: ``maykin-common`` dependency toegevoegd.
+* [:pr:`1942`] ``sqlparse`` bijgewerkt naar versie ``0.5.3``.
 
 1.35.0 (2025-09-18)
 ===================

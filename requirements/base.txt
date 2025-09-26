@@ -625,7 +625,7 @@ six==1.16.0
     #   qrcode
 soupsieve==2.5
     # via beautifulsoup4
-sqlparse==0.4.4
+sqlparse==0.5.3
     # via django
 svglib==1.5.1
     # via easy-thumbnails
