@@ -27,6 +27,7 @@ Bugfixes
 Onderhoud
 ---------
 
+* [:pr:`1943`]: ``waitress`` bijgewerkt naar versie ``3.0.2``.
 * [:taiga-us:`3461`, :taiga-ta:`3472`, :pr:`1834`]: Python versie bijgewerkt naar
   ``v3.12``.
 * [:taiga-us:`3450`, :pr:`1927`]: ``maykin-django-prosemirror`` dependency toegevoegd.

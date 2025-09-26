@@ -1402,7 +1402,7 @@ vine==5.1.0
     #   kombu
 virtualenv==20.34.0
     # via pre-commit
-waitress==2.1.2
+waitress==3.0.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
