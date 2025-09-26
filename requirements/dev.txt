@@ -555,7 +555,7 @@ djangocms-text-ckeditor==5.1.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-djangorestframework==3.14.0
+djangorestframework==3.16.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -1151,7 +1151,6 @@ pytz==2021.3
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-yubin
-    #   djangorestframework
 pyyaml==6.0.2
     # via
     #   -c requirements/ci.txt
