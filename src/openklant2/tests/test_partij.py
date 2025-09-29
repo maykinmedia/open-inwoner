@@ -158,20 +158,7 @@ def test_create_contactpersoon(client, een_organisatie):
         }
     )
     resp = client.partij.create_contactpersoon(
-        data={
-            "soortPartij": "contactpersoon",
-            "digitaleAdressen": None,
-            "rekeningnummers": None,
-            "voorkeursRekeningnummer": None,
-            "voorkeurstaal": "nld",
-            "indicatieActief": True,
-            "indicatieGeheimhouding": False,
-            "voorkeursDigitaalAdres": None,
-            "partijIdentificatie": {
-                "contactnaam": None,
-                "werkteVoorPartij": {"uuid": een_organisatie["uuid"]},
-            },
-        },
+        data=data,
     )
 
     PartijValidator.validate_python(resp)
