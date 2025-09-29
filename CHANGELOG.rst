@@ -23,6 +23,8 @@ Bugfixes
 * [:taiga-is:`3477`: :pr:`1935`]: Wanneer er geen CMS-pagina's zijn en het menu leeg is,
   dan wordt de zijnavigatie nu onzichtbaar, zodat de rest van de inhoud niet meer te smal
   wordt weergegeven.
+* [:taiga-is:`3486`: :pr:`1946`]: Menu-items op pagina 'Mijn Zaken' worden niet langer
+  dubbel getoond in de sidebar en het dropdownmenu.
 
 Onderhoud
 ---------
