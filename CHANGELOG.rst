@@ -16,6 +16,8 @@ Bugfixes
   wordt weergegeven.
 * [:taiga-is:`3479`: :pr:`1940`]: Ongepubliceerde CMS pagina's worden niet meer
   weergegeven in de zijnavigatie.
+* [:taiga-is:`3486`: :pr:`1946`]: Menu-items op pagina 'Mijn Zaken' worden niet langer
+  dubbel getoond in de sidebar en het dropdownmenu.
 
 Onderhoud
 ---------
