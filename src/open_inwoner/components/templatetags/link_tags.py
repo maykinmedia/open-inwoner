@@ -1,3 +1,5 @@
+import logging
+
 from django import template
 from django.urls import NoReverseMatch, reverse
 from django.utils.html import format_html
@@ -5,6 +7,7 @@ from django.utils.html import format_html
 from furl import furl
 
 register = template.Library()
+logger = logging.getLogger(__name__)
 
 
 @register.inclusion_tag("components/Typography/Link.html")
@@ -125,3 +128,61 @@ def addnexturl(href, next_url):
     f = furl(href)
     f.args["next"] = next_url
     return f.url
+
+
+@register.simple_tag(takes_context=True)
+def show_full_dropdown_menu(context) -> bool:
+    """
+    Determines whether the full dropdown menu should be shown.
+
+    This is to avoid showing the full menu in the dropdown when those same items are
+    already displayed in the side menu.
+    """
+    request = context["request"]
+
+    if not request.resolver_match:
+        return True  # Show all items when URL resolution fails
+
+    current_url_name = request.resolver_match.url_name
+    current_namespace = (
+        request.resolver_match.namespaces[0]
+        if request.resolver_match.namespaces
+        else None
+    )
+    current_qualified_url_name = (
+        f"{current_namespace}:{current_url_name}"
+        if current_namespace
+        else current_url_name
+    )
+
+    # The following URLs are expected to have the sidenav, so they only need a minimal
+    # dropdown menu.
+    urls_with_minimal_dropdown_menu = {
+        "pages-root",
+        "general_faq",
+        "collaborate:plan_list",
+        "ssd:uitkeringen",
+        "products:category_list",
+        "cases:index",
+        "cases:contactmoment_list",
+        "profile:appointments",
+    }
+
+    is_url_with_minimal_dropdown = (
+        current_qualified_url_name in urls_with_minimal_dropdown_menu
+    )
+    should_show_full_dropdown_menu = not is_url_with_minimal_dropdown
+
+    if not should_show_full_dropdown_menu:
+        logger.debug(
+            "Menu items hidden from dropdown menu",
+            extra={
+                "current_url_name": current_url_name,
+                "current_namespace": current_namespace,
+                "current_qualified_url_name": current_qualified_url_name,
+                "excluded": is_url_with_minimal_dropdown,
+                "show_menu": should_show_full_dropdown_menu,
+            },
+        )
+
+    return should_show_full_dropdown_menu
