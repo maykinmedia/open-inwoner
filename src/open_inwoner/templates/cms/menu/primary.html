@@ -1,7 +1,8 @@
 {% load menu_tags link_tags %}
+{% show_full_dropdown_menu as should_show_full_dropdown_menu %}
 {% for child in children %}
     {% with url=child.attr.redirect_url|default:child.get_absolute_url %}
-        <li class="primary-navigation__list-item {% if request.resolver_match.url_name not in "pages-root,contactmoment_list,plan_list,uitkeringen,general_faq,category_list" %}primary-navigation__list-item--always-visible{% endif %}">
+        <li class="primary-navigation__list-item {% if should_show_full_dropdown_menu %}primary-navigation__list-item--always-visible{% endif %}">
             {% link text=child.get_menu_title href=url icon=child.common.menu_icon icon_outlined=True icon_position="before" %}
             {% if child.indicator %}
                 <span class="indicator"><a class="link secondary indicator__link" href="{{ url }}">{{ child.indicator }}<span class="indicator__dot"></span></a></span>
