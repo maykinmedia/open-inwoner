@@ -4,6 +4,7 @@ from django.db.models import Count, Q
 
 from opentelemetry import metrics
 
+from .choices import LoginTypeChoices
 from .models import User
 
 meter = metrics.get_meter("open_inwoner.accounts")
@@ -14,6 +15,12 @@ def count_users(options: metrics.CallbackOptions) -> Collection[metrics.Observat
         total=Count("id"),
         staff=Count("id", filter=Q(is_staff=True)),
         superuser=Count("id", filter=Q(is_superuser=True)),
+        login_default=Count("id", filter=Q(login_type=LoginTypeChoices.default)),
+        login_digid=Count("id", filter=Q(login_type=LoginTypeChoices.digid)),
+        login_eherkenning=Count(
+            "id", filter=Q(login_type=LoginTypeChoices.eherkenning)
+        ),
+        login_oidc=Count("id", filter=Q(login_type=LoginTypeChoices.oidc)),
     )
     return (
         metrics.Observation(
@@ -27,6 +34,22 @@ def count_users(options: metrics.CallbackOptions) -> Collection[metrics.Observat
         metrics.Observation(
             counts["superuser"],
             {"scope": "global", "type": "superuser"},
+        ),
+        metrics.Observation(
+            counts["login_default"],
+            {"scope": "global", "type": "all", "login_type": "default"},
+        ),
+        metrics.Observation(
+            counts["login_digid"],
+            {"scope": "global", "type": "all", "login_type": "digid"},
+        ),
+        metrics.Observation(
+            counts["login_eherkenning"],
+            {"scope": "global", "type": "all", "login_type": "eherkenning"},
+        ),
+        metrics.Observation(
+            counts["login_oidc"],
+            {"scope": "global", "type": "all", "login_type": "oidc"},
         ),
     )
 
