@@ -107,7 +107,7 @@ linkcheck_retries = 3
 linkcheck_ignore = [
     r"urn:*",
     r"https?://.*\.gemeente.nl",
-    r"http://localhost:\d+/",
+    r"http://localhost:\d+/?",
     r"https://.*sentry.*",
     r"https://example.com*",
     r"https://portal.azure.com*",
