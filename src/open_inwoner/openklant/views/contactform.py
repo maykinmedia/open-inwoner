@@ -66,7 +66,10 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
                 logger.info("No klanten/vragen service configured for contactform")
 
     def dispatch(self, request, *args, **kwargs):
-        if not self.klanten_config.contact_registration_enabled:
+        if not (
+            self.klanten_config.contact_registration_enabled
+            or request.path == reverse("cases:contactmoment_list")
+        ):
             raise Http404("Contact form is not configured")
         return super().dispatch(request, *args, **kwargs)
 
