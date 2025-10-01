@@ -4,7 +4,6 @@ from typing import Generator
 from django import forms
 from django.conf import settings
 from django.contrib import admin, messages
-from django.contrib.flatpages.admin import FlatPageAdmin
 from django.contrib.sites.admin import SiteAdmin
 from django.contrib.sites.models import Site
 from django.core import exceptions
@@ -18,7 +17,6 @@ from django.utils.translation import gettext_lazy as _
 from ordered_model.admin import OrderedInlineModelAdminMixin, OrderedTabularInline
 from solo.admin import SingletonModelAdmin
 
-from open_inwoner.ckeditor5.widgets import CKEditorWidget
 from open_inwoner.utils.colors import ACCESSIBLE_CONTRAST_RATIO, get_contrast_ratio
 from open_inwoner.utils.css import ALLOWED_PROPERTIES
 from open_inwoner.utils.fields import CSSEditorWidget
@@ -598,14 +596,3 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
 
         # Check partial editing permissions
         return any(request.user.has_perm(perm) for perm in permission_to_fieldset)
-
-
-class CMSPageAdminForm(forms.Form):
-    class Meta:
-        model = "cms.Page"
-        fields = "__all__"
-        widgets = {"content": CKEditorWidget}
-
-
-class CustomCMSPageAdmin(FlatPageAdmin):
-    form = CMSPageAdminForm
