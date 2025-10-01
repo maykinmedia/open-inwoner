@@ -21,6 +21,7 @@ from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.laposta.models import LapostaConfig
 from open_inwoner.laposta.tests.factories import LapostaListFactory, MemberFactory
+from open_inwoner.mijnzaken.cms_apps import CasesApphook
 from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.models import ESuiteKlantConfig
 from open_inwoner.pdc.tests.factories import CategoryFactory
@@ -36,7 +37,6 @@ from ...cms.inbox.cms_apps import InboxApphook
 from ...cms.profile.cms_apps import ProfileApphook
 from ...cms.tests import cms_tools
 from ...haalcentraal.api_models import BRPData
-from ...open_inwoner.mijnzaken.cms_apps import CasesApphook
 from ...openklant.tests.data import MockAPIReadPatchData
 from ...questionnaire.tests.factories import QuestionnaireStepFactory
 from ..choices import ContactTypeChoices, LoginTypeChoices
