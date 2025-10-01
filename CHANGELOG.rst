@@ -16,6 +16,8 @@ Nieuwe features
 Bugfixes
 --------
 
+* [:taiga-is:`3486`: :pr:`1946`]: Menu-items op pagina 'Mijn Zaken' worden niet langer
+  dubbel getoond in de sidebar en het dropdownmenu.
 * [:taiga-is:`3480`, :pr:`1934`]: De paginering van de contactmomenten lijstweergave
   ontbrak, maar is nu toegevoegd.
 * [:taiga-is:`3483`,  :pr:`1937`]: Typo's in BRP API request headers verholpen
