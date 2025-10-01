@@ -31,9 +31,9 @@ from open_inwoner.utils.logentry import LOG_ACTIONS
 from open_inwoner.utils.test import ClearCachesMixin
 from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin, create_image_bytes
 
-from ...cms.cases.cms_apps import CasesApphook
 from ...cms.collaborate.cms_apps import CollaborateApphook
 from ...cms.inbox.cms_apps import InboxApphook
+from ...cms.mijnzaken.cms_apps import CasesApphook
 from ...cms.profile.cms_apps import ProfileApphook
 from ...cms.tests import cms_tools
 from ...haalcentraal.api_models import BRPData

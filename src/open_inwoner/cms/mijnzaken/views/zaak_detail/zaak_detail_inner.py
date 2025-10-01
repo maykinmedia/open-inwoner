@@ -1,0 +1,698 @@
+import dataclasses
+import datetime as dt
+import logging
+from collections import defaultdict
+from datetime import datetime
+from typing import Iterable, Protocol
+
+from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
+from django.urls import reverse
+from django.utils.functional import cached_property
+from django.utils.translation import gettext_lazy as _
+from django.views.generic import FormView
+
+from requests import RequestException
+from view_breadcrumbs import BaseBreadcrumbMixin
+from zgw_consumers.api_models.constants import RolOmschrijving
+
+from open_inwoner.accounts.models import User
+from open_inwoner.openklant.constants import KlantenServiceType
+from open_inwoner.openklant.services import (
+    OpenKlant2Service,
+    Question,
+    eSuiteVragenService,
+)
+from open_inwoner.openzaak.api_models import Status, StatusType, Zaak
+from open_inwoner.openzaak.clients import CatalogiClient, ZakenClient
+from open_inwoner.openzaak.documents import fetch_single_information_object_from_url
+from open_inwoner.openzaak.models import (
+    OpenZaakConfig,
+    ZaakTypeConfig,
+    ZaakTypeInformatieObjectTypeConfig,
+    ZaakTypeResultaatTypeConfig,
+    ZaakTypeStatusTypeConfig,
+    ZGWApiGroupConfig,
+)
+from open_inwoner.openzaak.utils import get_role_name_display, is_info_object_visible
+from open_inwoner.userfeed import hooks
+from open_inwoner.utils.glom import glom_multiple
+from open_inwoner.utils.time import has_new_elements
+from open_inwoner.utils.views import CommonPageMixin
+
+from ...forms import CaseContactForm, CaseUploadForm
+from ..mixins import CaseAccessMixin, CaseLogMixin
+
+logger = logging.getLogger(__name__)
+
+
+@dataclasses.dataclass
+class SimpleFile:
+    name: str
+    size: int
+    url: str
+    created: datetime | None = None
+
+
+class VragenService(Protocol):
+    def list_questions_for_zaak(
+        self,
+        zaak: Zaak,
+        user: User | None = None,
+    ) -> Iterable[Question]: ...
+
+
+class InnerCaseDetailView(
+    CaseLogMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    CaseAccessMixin,
+    FormView,
+):
+    template_name = "pages/cases/status_inner.html"
+    form_class = CaseUploadForm
+    contact_form_class = CaseContactForm
+    case: Zaak | None = None
+
+    def get_service(self, service_type: KlantenServiceType) -> VragenService | None:
+        if service_type == KlantenServiceType.OPENKLANT2:
+            try:
+                return OpenKlant2Service()
+            except Exception:
+                logger.warning("Failed to build OpenKlant2 service")
+        if service_type == KlantenServiceType.ESUITE:
+            try:
+                return eSuiteVragenService()
+            except Exception:
+                logger.warning("Failed to build eSuiteVragenService")
+
+    def store_statustype_mapping(self, zaaktype_identificatie):
+        # Filter on ZaakType identificatie to avoid eSuite situation where one statustype
+        # is linked to multiple zaaktypes
+        self.statustype_config_mapping = {
+            zaaktype_statustype.statustype_url: zaaktype_statustype
+            for zaaktype_statustype in ZaakTypeStatusTypeConfig.objects.filter(
+                zaaktype_config__identificatie=zaaktype_identificatie
+            )
+        }
+
+    def store_resulttype_mapping(self, zaaktype_identificatie):
+        # Filter on ZaakType identificatie to avoid eSuite situation where one resulttype
+        # is linked to multiple zaaktypes
+        self.resulttype_config_mapping = {
+            zt_resulttype.resultaattype_url: zt_resulttype
+            for zt_resulttype in ZaakTypeResultaatTypeConfig.objects.filter(
+                zaaktype_config__identificatie=zaaktype_identificatie
+            )
+        }
+
+    @cached_property
+    def crumbs(self):
+        # case is retrieved via CaseAccessMixin
+        if self.case:
+            return [
+                (_("Mijn zaken"), reverse("cases:index")),
+                (
+                    f"{self.case.description} - {_('Status')}",
+                    reverse("cases:case_detail", kwargs=self.kwargs),
+                ),
+            ]
+        return [
+            (_("Mijn zaken"), reverse("cases:index")),
+            (
+                f"{_('Zaak')} - {_('Status')}",
+                reverse("cases:case_detail", kwargs=self.kwargs),
+            ),
+        ]
+
+    def page_title(self):
+        return f"{self.case.description} {self.case.identification} - {_('Status')}"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # case is retrieved via CaseAccessMixin
+        if self.case:
+            self.log_access_case_detail(self.case)
+
+            openzaak_config = OpenZaakConfig.get_solo()
+
+            api_group = ZGWApiGroupConfig.objects.get(pk=self.kwargs["api_group_id"])
+            zaken_client = api_group.zaken_client
+
+            # fetch data associated with `self.case`
+            documents = self.get_case_document_files(self.case, api_group)
+            statuses = zaken_client.fetch_status_history(self.case.url)
+            self.store_statustype_mapping(self.case.zaaktype.identificatie)
+            self.store_resulttype_mapping(self.case.zaaktype.identificatie)
+
+            questions = []
+            for service_type in KlantenServiceType:
+                if service := self.get_service(service_type=service_type):
+                    try:
+                        service_questions = service.list_questions_for_zaak(
+                            self.case, user=self.request.user
+                        )
+                        questions.extend(service_questions)
+                    except RequestException:
+                        # TODO: This can happen. Ideally, we would present the user with
+                        # warning noting that not all questions might be visible.
+                        logger.warning(
+                            "Connection error for service %s",
+                            service_type,
+                            exc_info=True,
+                        )
+                    except BaseException:
+                        logger.exception(
+                            "Unable to fetch questions for service %s", service_type
+                        )
+
+            questions.sort(key=lambda q: q["registered_date"], reverse=True)
+
+            statustypen = []
+            catalogi_client = api_group.catalogi_client
+            statustypen = catalogi_client.fetch_status_types_no_cache(
+                self.case.zaaktype.url
+            )
+
+            # NOTE we cannot always sort on the Status.datum_status_gezet (datetime) because eSuite
+            # returns zeros as the time component of the datetime, so we're going with the
+            # observation that on both OpenZaak and eSuite the returned list is ordered 'oldest-last'
+            # here we want it 'oldest-first' so we reverse() it instead of sort()-ing
+            if openzaak_config.order_statuses_by_date_set:
+                statuses.sort(key=lambda s: s.datum_status_gezet)
+            else:
+                statuses.reverse()
+
+            # get preview of second status
+            if len(statuses) == 1:
+                second_status_preview = self.get_second_status_preview(statustypen)
+            else:
+                second_status_preview = None
+
+            # handle/transform data associated with `self.case`
+            status_types_mapping = self.sync_statuses_with_status_types(
+                statuses, zaken_client, catalogi_client=catalogi_client
+            )
+            end_statustype_data = self.handle_end_statustype_data(
+                status_types_mapping=status_types_mapping,
+                end_statustype=self.handle_end_statustype(statuses, statustypen),
+            )
+            result_data = self.get_result_data(
+                self.case,
+                self.resulttype_config_mapping,
+                zaken_client,
+                catalogi_client,
+            )
+
+            hooks.case_status_seen(self.request.user, self.case)
+            hooks.case_documents_seen(self.request.user, self.case)
+
+            context["case"] = {
+                "id": str(self.case.uuid),
+                "identification": self.case.identification,
+                "initiator": self.get_initiator_display(self.case, zaken_client),
+                "result": result_data.get("display", ""),
+                "result_description": result_data.get("description", ""),
+                "start_date": self.case.startdatum,
+                "end_date": getattr(self.case, "einddatum", None),
+                "end_date_planned": getattr(self.case, "einddatum_gepland", None),
+                "end_date_legal": getattr(
+                    self.case, "uiterlijke_einddatum_afdoening", None
+                ),
+                "description": self.case.description,
+                "statuses": self.get_statuses_data(
+                    statuses, self.statustype_config_mapping
+                ),
+                "end_statustype_data": end_statustype_data,
+                "second_status_preview": second_status_preview,
+                "documents": documents,
+                "allowed_file_extensions": sorted(
+                    openzaak_config.allowed_file_extensions
+                ),
+                "new_docs": has_new_elements(
+                    documents,
+                    "created",
+                    dt.timedelta(days=settings.DOCUMENT_RECENT_DAYS),
+                ),
+                "questions": questions,
+            }
+            context["case"].update(self.get_upload_info_context(self.case))
+            context["anchors"] = self.get_anchors(statuses, documents)
+            context["contact_form"] = self.contact_form_class()
+            context["hxpost_contact_action"] = reverse(
+                "cases:case_detail_contact_form", kwargs=self.kwargs
+            )
+            context["hxpost_document_action"] = reverse(
+                "cases:case_detail_document_form", kwargs=self.kwargs
+            )
+            context["metrics"] = [
+                {
+                    "label": _("Zaaknummer:"),
+                    "value": context["case"].get("identification"),
+                },
+                {
+                    "label": _("Zaak ingediend op:"),
+                    "value": context["case"].get("start_date"),
+                },
+            ]
+            if self.case.einddatum:
+                context["metrics"].append(
+                    {
+                        "label": _("Besluit genomen op:"),
+                        "value": self.case.einddatum,
+                    },
+                )
+            else:
+                end_date = context["case"].get("end_date_legal") or context["case"].get(
+                    "end_date_planned"
+                )
+                context["metrics"].append(
+                    {
+                        "label": _("U ontvangt een besluit vóór:"),
+                        "value": end_date + dt.timedelta(days=1)
+                        if end_date
+                        else _("unkown"),
+                    }
+                )
+        else:
+            context["case"] = None
+
+        return context
+
+    def get_second_status_preview(self, statustypen: list) -> StatusType | None:
+        """
+        Get the relevant status type to display preview of second case status
+
+        Note: we cannot assume that the "second" statustype has the `volgnummer` 2;
+              hence we get all statustype_numbers, sort in ascending order, and let
+              the "second" statustype be that with `volgnummer == statustype_numbers[1]`
+        """
+        statustype_numbers = [s.volgnummer for s in statustypen]
+
+        # status_types retrieved via eSuite don't always have a volgnummer
+        if not all(statustype_numbers):
+            return
+
+        # only 1 statustype for `self.case`
+        # (this scenario is blocked by openzaak, but not part of the zgw standard)
+        if len(statustype_numbers) < 2:
+            logger.info("Case {case} has only one statustype".format(case=self.case))
+            return
+
+        statustype_numbers.sort()
+
+        return next(
+            filter(
+                lambda s: s.volgnummer == statustype_numbers[1] and not s.is_eindstatus,
+                statustypen,
+            ),
+            None,
+        )
+
+    def sync_statuses_with_status_types(
+        self,
+        statuses: list[Status],
+        zaken_client: ZakenClient,
+        catalogi_client: CatalogiClient,
+    ) -> dict[str, StatusType]:
+        """
+        Update `statuses` (including the status on this view) and sync with `status_types`:
+            - resolve `self.case.status` (a url/str) to a `Status` object
+            - resolve `status_type` url for each element in `statuses` to the corresponding
+              `StatusType` object (this also mutates `self.case.status`)
+            - create mapping `{status_type_url: StatusType}`
+
+        We create a preliminary mapping {status_type url: Status}, then loop over this mapping
+        replacing `Status` with the `StatusType` corresponding to the url, and resolving the
+        `status_type` url on each `Status` instance to the corresponding `StatusType` object.
+        Note that this works by mutating `statuses`.
+
+        Requires eSuite compatibility check for cases where the current status of our case is
+        not returned as part of the statuslist retrieval.
+        """
+        status_types_mapping = defaultdict(list)
+
+        # preliminary mapping {status_type url: status}
+        for status in statuses:
+            status_types_mapping[status.statustype].append(status)
+            if self.case.status == status.url:
+                self.case.status = status
+
+        # eSuite compatibility
+        if isinstance(self.case.status, str):
+            # OIP requests cases, user goes to detailview of case
+            # OIP requests the statusses of the case (the status history)
+            # OIP sees a zaak.status URL which doesn't occur in the status history, however requires this status to determine the statustype and configuration options related to this statustype (Taiga #2037, uploading documents was activated for statustype in the admin but wasn't active for users
+            # Workaround: OIP requests the current zaak.status individually and adds the retrieved information to the statustype mapping
+
+            logger.info(
+                "Issue #2037 -- Retrieving status individually for case {} because of eSuite".format(
+                    self.case.identification
+                )
+            )
+            self.case.status = zaken_client.fetch_single_status(self.case.status)
+            status_types_mapping[self.case.status.statustype].append(self.case.status)
+
+        # final mapping {status_type url: status_type}
+        for status_type_url, _statuses in list(status_types_mapping.items()):
+            status_type = catalogi_client.fetch_single_status_type(status_type_url)
+            status_types_mapping[status_type_url] = status_type
+            # resolve statustype url to `StatusType`
+            for status in _statuses:
+                status.statustype = status_type
+
+        return status_types_mapping
+
+    def handle_end_statustype(
+        self, statuses: list[Status], statustypen: list[StatusType]
+    ):
+        """
+        Determine the statustype of the endstatus in `statustypen` (if there is one)
+
+        Requires eSuite compatibility check for cases containing multiple statustypes
+        per zaaktype with `isEindstatus: true`. When reaching a `statustype` with
+        `isEindstatus: true`, we assume this is our end status.
+        """
+        # The end status data is not passed if the end status has been reached,
+        # because in that case the end status data is already included in `statuses`
+        end_statustype = next((s for s in statustypen if s.is_eindstatus), None)
+
+        # eSuite compatibility
+        if (
+            statuses
+            and statuses[-1].statustype
+            and statuses[-1].statustype.is_eindstatus
+        ):
+            end_statustype = statuses[-1].statustype
+
+        return end_statustype
+
+    def handle_end_statustype_data(
+        self,
+        status_types_mapping: dict[str, StatusType],
+        end_statustype: StatusType,
+    ):
+        """
+        Prepare data about end statustype for use in context/template
+        """
+        end_statustype_data = None
+        if not status_types_mapping.get(end_statustype.url):
+            end_statustype_data = {
+                "label": (
+                    end_statustype.statustekst
+                    or end_statustype.omschrijving
+                    or _("No data available")
+                ),
+                "status_indicator": getattr(
+                    self.statustype_config_mapping.get(end_statustype.url),
+                    "status_indicator",
+                    None,
+                ),
+                "status_indicator_text": getattr(
+                    self.statustype_config_mapping.get(end_statustype.url),
+                    "status_indicator_text",
+                    None,
+                ),
+                "call_to_action_url": getattr(
+                    self.statustype_config_mapping.get(end_statustype.url),
+                    "call_to_action_url",
+                    None,
+                ),
+                "call_to_action_text": getattr(
+                    self.statustype_config_mapping.get(end_statustype.url),
+                    "call_to_action_text",
+                    None,
+                ),
+                "case_link_text": getattr(
+                    self.statustype_config_mapping.get(end_statustype.url),
+                    "case_link_text",
+                    _("Bekijk aanvraag"),
+                ),
+            }
+        return end_statustype_data
+
+    @property
+    def is_file_upload_enabled_for_case_type(self) -> bool:
+        case_upload_enabled = (
+            ZaakTypeInformatieObjectTypeConfig.objects.filter_enabled_for_case_type(
+                self.case.zaaktype
+            ).exists()
+        )
+        logger.info(
+            "Case {url} has case type file upload: {case_upload_enabled}".format(
+                url=self.case.url, case_upload_enabled=case_upload_enabled
+            )
+        )
+        return case_upload_enabled
+
+    @property
+    def is_file_upload_enabled_for_statustype(self) -> bool:
+        try:
+            enabled_for_status_type = self.statustype_config_mapping[
+                self.case.status.statustype.url
+            ].document_upload_enabled
+        except AttributeError as e:
+            logger.exception(e)
+            logger.info(
+                "Could not retrieve status type for case {case}; "
+                "the status has not been resolved to a ZGW model object.".format(
+                    case=self.case
+                )
+            )
+            return True
+        except KeyError as e:
+            logger.exception(e)
+            logger.info(
+                "Could not retrieve status type config for url {url}".format(
+                    url=self.case.status.statustype.url
+                )
+            )
+            return True
+        logger.info(
+            "Case {url} status type {status_type} has status type file upload: {enabled_for_status_type}".format(
+                url=self.case.url,
+                status_type=self.case.status.statustype,
+                enabled_for_status_type=enabled_for_status_type,
+            )
+        )
+        return enabled_for_status_type
+
+    @property
+    def is_internal_file_upload_enabled(self) -> bool:
+        return (
+            self.is_file_upload_enabled_for_case_type
+            and self.is_file_upload_enabled_for_statustype
+        )
+
+    def get_upload_info_context(self, case: Zaak):
+        if not case:
+            return {}
+
+        from open_inwoner.openklant.models import KlantenSysteemConfig
+
+        klanten_config = KlantenSysteemConfig.get_solo()
+
+        case_type_config_description = ""
+        case_type_document_upload_description = ""
+        external_upload_enabled = False
+        external_upload_url = ""
+        contact_form_enabled = False
+
+        try:
+            ztc = ZaakTypeConfig.objects.filter_case_type(case.zaaktype).get()
+        except ObjectDoesNotExist:
+            pass
+        else:
+            case_type_config_description = ztc.description
+            contact_form_enabled = ztc.contact_form_enabled
+            if ztc.document_upload_enabled and ztc.external_document_upload_url != "":
+                external_upload_url = ztc.external_document_upload_url
+                external_upload_enabled = True
+
+            try:
+                zt_statustype_config = ztc.zaaktypestatustypeconfig_set.get(
+                    statustype_url=case.status.statustype.url
+                )
+            # case has no status, or statustype config not found
+            except (AttributeError, ObjectDoesNotExist):
+                pass
+            else:
+                case_type_document_upload_description = (
+                    zt_statustype_config.document_upload_description
+                )
+
+        # disable document upload message
+        if self.request.session.get("uploads", ""):
+            case_type_document_upload_description = ""
+            del self.request.session["uploads"]
+
+        return {
+            "case_type_config_description": case_type_config_description,
+            "case_type_document_upload_description": case_type_document_upload_description,
+            "internal_upload_enabled": self.is_internal_file_upload_enabled
+            and not getattr(self.case, "einddatum", None),
+            "external_upload_enabled": external_upload_enabled
+            and not getattr(self.case, "einddatum", None),
+            "external_upload_url": external_upload_url,
+            "contact_form_enabled": (
+                contact_form_enabled and klanten_config.contact_registration_enabled
+            ),
+        }
+
+    @staticmethod
+    def get_result_data(
+        case: Zaak,
+        result_type_config_mapping: dict,
+        zaken_client: ZakenClient,
+        catalogi_client: CatalogiClient,
+    ) -> dict:
+        """
+        Get display and description for the result of `case`
+
+        Note:
+            For the description, we try the `esuite_compat_naam` attribute of the corresponding
+            resultaattype first. This is for E-suite compatibility in case the E-suite returns
+            a description longer than 20 chars. Alternatively, we get the description from the
+            config of the resultaattype.
+        """
+        if not case.resultaat:
+            return {}
+
+        result = zaken_client.fetch_single_result(case.resultaat)
+        result_type = catalogi_client.fetch_single_resultaat_type(result.resultaattype)
+
+        display = result.toelichting
+        description = getattr(result_type, "esuite_compat_naam", "") or getattr(
+            result_type_config_mapping.get(result.resultaattype), "description", ""
+        )
+
+        return {
+            "display": display,
+            "description": description,
+        }
+
+    @staticmethod
+    def get_initiator_display(case: Zaak, zaken_client: ZakenClient) -> str:
+        roles = zaken_client.fetch_case_roles(case.url, RolOmschrijving.initiator)
+        return ", ".join(get_role_name_display(r) for r in roles)
+
+    @staticmethod
+    def get_statuses_data(
+        statuses: list[Status],
+        statustype_config_mapping: dict | None = None,
+    ) -> list[dict]:
+        return [
+            {
+                "date": s.datum_status_gezet,
+                "label": glom_multiple(
+                    s,
+                    ("statustype.statustekst", "statustype.omschrijving"),
+                    default=_("Nieuwe aanvraag"),
+                ),
+                "status_indicator": getattr(
+                    statustype_config_mapping.get(s.statustype.url),
+                    "status_indicator",
+                    None,
+                ),
+                "status_indicator_text": getattr(
+                    statustype_config_mapping.get(s.statustype.url),
+                    "status_indicator_text",
+                    None,
+                ),
+                "call_to_action_url": getattr(
+                    statustype_config_mapping.get(s.statustype.url),
+                    "call_to_action_url",
+                    None,
+                ),
+                "call_to_action_text": getattr(
+                    statustype_config_mapping.get(s.statustype.url),
+                    "call_to_action_text",
+                    None,
+                ),
+                "description": getattr(
+                    statustype_config_mapping.get(s.statustype.url), "description", None
+                ),
+                "case_link_text": getattr(
+                    statustype_config_mapping.get(s.statustype.url),
+                    "case_link_text",
+                    _("Bekijk aanvraag"),
+                ),
+            }
+            for s in statuses
+        ]
+
+    @staticmethod
+    def get_case_document_files(
+        case: Zaak, api_group: ZGWApiGroupConfig
+    ) -> list[SimpleFile]:
+        client = api_group.zaken_client
+        case_info_objects = client.fetch_case_information_objects(case.url)
+
+        # get the information objects for the case objects
+
+        # TODO we'd like to use parallel() but it is borked in tests
+        # with parallel() as executor:
+        #     info_objects = executor.map(
+        #         fetch_single_information_object,
+        #         [case_info.informatieobject for case_info in case_info_objects],
+        #     )
+        info_objects = [
+            fetch_single_information_object_from_url(
+                case_info.informatieobject, api_group=api_group
+            )
+            for case_info in case_info_objects
+        ]
+
+        config = OpenZaakConfig.get_solo()
+        documents = []
+        for case_info_obj, info_obj in zip(case_info_objects, info_objects):
+            if not info_obj:
+                continue
+            if not is_info_object_visible(
+                info_obj, config.document_max_confidentiality
+            ):
+                continue
+            # restructure into something understood by the FileList template tag
+            documents.append(
+                SimpleFile(
+                    name=getattr(info_obj, "titel", None),
+                    size=info_obj.bestandsomvang,
+                    url=reverse(
+                        "cases:document_download",
+                        kwargs={
+                            "object_id": case.uuid,
+                            "info_id": info_obj.uuid,
+                            "api_group_id": api_group.id,
+                        },
+                    ),
+                    created=getattr(case_info_obj, "registratiedatum", None),
+                )
+            )
+
+        # `registratiedatum` and `titel` should be present, but not guaranteed by schema
+        try:
+            return sorted(documents, key=lambda doc: doc.created, reverse=True)
+        except TypeError:
+            try:
+                return sorted(
+                    documents, key=lambda doc: doc.name
+                )  # order ascending b/c alphabetical
+            except TypeError:
+                return documents
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["case"] = self.case
+        return kwargs
+
+    def get_anchors(self, statuses, documents):
+        anchors = [["#title", _("Gegevens")]]
+
+        if statuses:
+            anchors.append(["#statuses", _("Status")])
+
+        if documents:
+            anchors.append(["#documents", _("Documenten")])
+
+        return anchors

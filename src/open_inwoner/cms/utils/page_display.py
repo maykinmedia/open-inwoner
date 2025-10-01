@@ -5,9 +5,9 @@ from django.db.models import Q
 from cms.models import Page
 
 from open_inwoner.cms.benefits.cms_apps import SSDApphook
-from open_inwoner.cms.cases.cms_apps import CasesApphook
 from open_inwoner.cms.collaborate.cms_apps import CollaborateApphook
 from open_inwoner.cms.inbox.cms_apps import InboxApphook
+from open_inwoner.cms.mijnzaken.cms_apps import CasesApphook
 from open_inwoner.cms.products.cms_apps import ProductsApphook
 from open_inwoner.cms.profile.cms_apps import ProfileApphook
 

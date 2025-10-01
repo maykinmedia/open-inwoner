@@ -25,7 +25,10 @@ from open_inwoner.accounts.tests.factories import (
     eHerkenningUserFactory,
     eHerkenningVestigingUserFactory,
 )
-from open_inwoner.cms.cases.views.cases import CaseFilterFormOption, InnerCaseListView
+from open_inwoner.cms.mijnzaken.views.cases import (
+    CaseFilterFormOption,
+    InnerCaseListView,
+)
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin, Lookups
 
