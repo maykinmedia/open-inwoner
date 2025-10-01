@@ -10,4 +10,4 @@ class CasesApphook(CMSApp):
     name = _("ZGW Application")
 
     def get_urls(self, page=None, language=None, **kwargs):
-        return ["open_inwoner.cms.mijnzaken.urls"]
+        return ["open_inwoner.mijnzaken.urls"]

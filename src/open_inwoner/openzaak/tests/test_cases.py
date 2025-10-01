@@ -25,7 +25,7 @@ from open_inwoner.accounts.tests.factories import (
     eHerkenningUserFactory,
     eHerkenningVestigingUserFactory,
 )
-from open_inwoner.cms.mijnzaken.views.cases import (
+from open_inwoner.mijnzaken.views.cases import (
     CaseFilterFormOption,
     InnerCaseListView,
 )

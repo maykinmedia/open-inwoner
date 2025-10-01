@@ -6,7 +6,7 @@ from django.conf import settings
 
 from filer.models.filemodels import File
 
-from open_inwoner.cms.mijnzaken.views.status import SimpleFile
+from open_inwoner.mijnzaken.views.status import SimpleFile
 from open_inwoner.utils.time import instance_is_new
 
 register = template.Library()

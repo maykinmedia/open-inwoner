@@ -237,7 +237,7 @@ INSTALLED_APPS = [
     "open_inwoner.media",
     "open_inwoner.userfeed",
     "open_inwoner.cms.profile",
-    "open_inwoner.cms.mijnzaken",
+    "open_inwoner.mijnzaken",
     "open_inwoner.cms.inbox",
     "open_inwoner.cms.products",
     "open_inwoner.cms.collaborate",

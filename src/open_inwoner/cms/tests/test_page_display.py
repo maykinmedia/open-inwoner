@@ -3,7 +3,6 @@ from django_webtest import WebTest
 from open_inwoner.cms.benefits.cms_apps import SSDApphook
 from open_inwoner.cms.collaborate.cms_apps import CollaborateApphook
 from open_inwoner.cms.inbox.cms_apps import InboxApphook
-from open_inwoner.cms.mijnzaken.cms_apps import CasesApphook
 from open_inwoner.cms.profile.cms_apps import ProfileApphook
 from open_inwoner.cms.tests.cms_tools import create_apphook_page
 from open_inwoner.cms.utils.page_display import (
@@ -14,6 +13,7 @@ from open_inwoner.cms.utils.page_display import (
     inbox_page_is_published,
     profile_page_is_published,
 )
+from open_inwoner.mijnzaken.cms_apps import CasesApphook
 
 
 class CMSPageDisplayTests(WebTest):

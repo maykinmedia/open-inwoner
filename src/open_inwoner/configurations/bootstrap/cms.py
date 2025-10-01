@@ -6,10 +6,10 @@ from django_setup_configuration.configuration import BaseConfigurationStep
 from open_inwoner.cms.benefits.cms_apps import SSDApphook
 from open_inwoner.cms.collaborate.cms_apps import CollaborateApphook
 from open_inwoner.cms.inbox.cms_apps import InboxApphook
-from open_inwoner.cms.mijnzaken.cms_apps import CasesApphook
 from open_inwoner.cms.products.cms_apps import ProductsApphook
 from open_inwoner.cms.profile.cms_apps import ProfileApphook
 from open_inwoner.cms.tests import cms_tools
+from open_inwoner.mijnzaken.cms_apps import CasesApphook
 
 
 def create_apphook_page_args(config_mapping: dict) -> dict:

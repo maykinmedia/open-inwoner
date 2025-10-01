@@ -33,10 +33,10 @@ from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin, create_imag
 
 from ...cms.collaborate.cms_apps import CollaborateApphook
 from ...cms.inbox.cms_apps import InboxApphook
-from ...cms.mijnzaken.cms_apps import CasesApphook
 from ...cms.profile.cms_apps import ProfileApphook
 from ...cms.tests import cms_tools
 from ...haalcentraal.api_models import BRPData
+from ...open_inwoner.mijnzaken.cms_apps import CasesApphook
 from ...openklant.tests.data import MockAPIReadPatchData
 from ...questionnaire.tests.factories import QuestionnaireStepFactory
 from ..choices import ContactTypeChoices, LoginTypeChoices

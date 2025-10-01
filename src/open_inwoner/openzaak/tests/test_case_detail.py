@@ -30,7 +30,7 @@ from open_inwoner.accounts.tests.factories import (
     eHerkenningUserFactory,
     eHerkenningVestigingUserFactory,
 )
-from open_inwoner.cms.mijnzaken.views.status import InnerCaseDetailView, SimpleFile
+from open_inwoner.mijnzaken.views.status import InnerCaseDetailView, SimpleFile
 from open_inwoner.openklant.api_models import ObjectContactMoment
 from open_inwoner.openklant.constants import (
     KlantenServiceType,
@@ -1063,7 +1063,7 @@ class TestCaseDetailView(
 
     @freeze_time("2021-01-12 17:00:00")
     @patch(
-        "open_inwoner.cms.mijnzaken.views.status.OpenKlant2Service",
+        "open_inwoner.mijnzaken.views.status.OpenKlant2Service",
         return_value=MockOpenKlant2Service(),
     )
     @patch("open_inwoner.userfeed.hooks.case_status_seen", autospec=True)
@@ -1222,7 +1222,7 @@ class TestCaseDetailView(
 
     @freeze_time("2021-01-12 17:00:00")
     @patch(
-        "open_inwoner.cms.mijnzaken.views.status.OpenKlant2Service",
+        "open_inwoner.mijnzaken.views.status.OpenKlant2Service",
         return_value=MockOpenKlant2Service(),
     )
     @patch("open_inwoner.userfeed.hooks.case_status_seen", autospec=True)
@@ -1280,7 +1280,7 @@ class TestCaseDetailView(
         )
 
     @patch(
-        "open_inwoner.cms.mijnzaken.views.status.OpenKlant2Service",
+        "open_inwoner.mijnzaken.views.status.OpenKlant2Service",
         return_value=MockOpenKlant2Service(),
     )
     def test_pass_endstatus_type_data_if_endstatus_not_reached(
@@ -2133,7 +2133,7 @@ class TestCaseDetailView(
         self.assertEqual(info_card.text.strip(), "info\n\nFoo\nbar")
 
     @patch(
-        "open_inwoner.cms.mijnzaken.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
+        "open_inwoner.mijnzaken.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
         autospec=True,
     )
     def test_expected_information_object_types_are_available_in_upload_form(
@@ -2188,7 +2188,7 @@ class TestCaseDetailView(
         self.assertEqual(sorted(type_field.options), sorted(expected_choices))
 
     @patch(
-        "open_inwoner.cms.mijnzaken.views.status.InnerCaseDetailView.is_internal_file_upload_enabled",
+        "open_inwoner.mijnzaken.views.status.InnerCaseDetailView.is_internal_file_upload_enabled",
         autospec=True,
     )
     def test_case_type_config_description_is_rendered_when_internal_upload(
@@ -2220,7 +2220,7 @@ class TestCaseDetailView(
         self.assertContains(response, _("some description content"))
 
     @patch(
-        "open_inwoner.cms.mijnzaken.views.status.InnerCaseDetailView.is_internal_file_upload_enabled",
+        "open_inwoner.mijnzaken.views.status.InnerCaseDetailView.is_internal_file_upload_enabled",
         autospec=True,
     )
     def test_fixed_text_is_rendered_when_no_description_in_internal_upload(
@@ -2296,7 +2296,7 @@ class TestCaseDetailView(
         self.assertNotIn("document-upload", response.forms)
 
     @patch(
-        "open_inwoner.cms.mijnzaken.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
+        "open_inwoner.mijnzaken.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
         autospec=True,
     )
     def test_document_upload_multiple_backends(self, m, upload):
@@ -2367,7 +2367,7 @@ class TestCaseDetailView(
                 )
 
     @patch(
-        "open_inwoner.cms.mijnzaken.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
+        "open_inwoner.mijnzaken.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
         autospec=True,
     )
     def test_successful_document_upload_flow_with_uppercase_extension(self, m, upload):
@@ -2427,7 +2427,7 @@ class TestCaseDetailView(
         )
 
     @patch(
-        "open_inwoner.cms.mijnzaken.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
+        "open_inwoner.mijnzaken.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
         autospec=True,
     )
     def test_upload_file_flow_fails_with_invalid_file_extension(self, m, upload):
@@ -2470,7 +2470,7 @@ class TestCaseDetailView(
         )
 
     @patch(
-        "open_inwoner.cms.mijnzaken.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
+        "open_inwoner.mijnzaken.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
         autospec=True,
     )
     def test_upload_with_larger_file_size_fails(self, m, upload):
@@ -2676,7 +2676,7 @@ class TestCaseDetailView(
         )
 
     @patch(
-        "open_inwoner.cms.mijnzaken.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
+        "open_inwoner.mijnzaken.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
         autospec=True,
     )
     def test_request_error_in_uploading_document_shows_proper_message(self, m, upload):
@@ -2731,7 +2731,7 @@ class TestCaseDetailView(
         )
 
     @patch(
-        "open_inwoner.cms.mijnzaken.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
+        "open_inwoner.mijnzaken.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
         autospec=True,
     )
     def test_request_error_in_connecting_doc_with_zaak_shows_proper_message(
