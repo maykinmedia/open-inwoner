@@ -6,12 +6,26 @@ Voor een volledig overzicht van alle commits, zie ...
 Deployment aandachtspunten
 --------------------------
 
-* ...
+* OpenTelemetry ondersteuning is toegevoegd voor metrics en logging. De applicatie kan nu
+  telemetrie data exporteren naar een OpenTelemetry collector via gRPC. Configuratie gebeurt
+  via omgevingsvariabelen zoals gedocumenteerd in de `OpenTelemetry specificatie
+  <https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/#general-sdk-configuration>`_.
+  Belangrijke variabelen zijn:
+
+  - ``OTEL_SDK_DISABLED`` (standaard: ``true``) - Zet op ``false`` om OpenTelemetry te activeren
+  - ``OTEL_EXPORTER_OTLP_ENDPOINT`` - gRPC endpoint van de OpenTelemetry collector (bijv. ``http://otel-collector:4317``)
+  - ``OTEL_EXPORTER_OTLP_HEADERS`` - Optionele headers voor authenticatie (bijv. ``Authorization=Basic ...``)
+  - ``OTEL_EXPORTER_OTLP_METRICS_INSECURE`` (standaard: ``true``) - Sta onveilige verbindingen toe voor development
+
+  De OpenTelemetry SDK is standaard uitgeschakeld en moet expliciet worden geactiveerd per
+  deployment. De applicatie verwacht een gRPC OpenTelemetry collector endpoint.
 
 Nieuwe features
 ---------------
 
-* ...
+* [:taiga-us:`3461`, :taiga-ta:`3473`, :pr:`1932`]: Basisinfrastructuur voor
+  OpenTelemetry toegevoegd, inclusief logging en metrics ondersteuning voor
+  observability.
 
 Bugfixes
 --------
