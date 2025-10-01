@@ -201,7 +201,7 @@ diff-match-patch==20200713
     #   django-import-export
 distlib==0.3.9
     # via virtualenv
-django==4.2.24
+django==4.2.25
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
