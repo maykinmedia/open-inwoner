@@ -1,7 +1,7 @@
 from import_export import fields, resources
 from import_export.widgets import CharWidget, ManyToManyWidget
 
-from ..models import Category, Organization, Product, Tag
+from open_inwoner.pdc.models import Category, Organization, Product, Tag
 
 
 class CategoryExportResource(resources.ModelResource):

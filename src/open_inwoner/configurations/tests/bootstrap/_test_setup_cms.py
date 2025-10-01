@@ -11,8 +11,7 @@ from open_inwoner.cms.utils.page_display import (
     products_page_is_published,
     profile_page_is_published,
 )
-
-from ...bootstrap.cms import (
+from open_inwoner.configurations.bootstrap.cms import (
     CMSBenefitsConfigurationStep,
     CMSCasesConfigurationStep,
     CMSCollaborateConfigurationStep,

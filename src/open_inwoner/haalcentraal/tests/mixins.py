@@ -1,7 +1,8 @@
 import json
 import os
 
-from ..models import HaalCentraalConfig
+from open_inwoner.haalcentraal.models import HaalCentraalConfig
+
 from .factories import ServiceFactory
 
 

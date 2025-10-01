@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from ..models import Neighbourhood
+from open_inwoner.pdc.models import Neighbourhood
 
 
 @admin.register(Neighbourhood)

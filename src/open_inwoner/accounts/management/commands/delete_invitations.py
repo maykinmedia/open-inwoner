@@ -5,9 +5,8 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
+from open_inwoner.accounts.models import Invite
 from open_inwoner.utils.logentry import system_action
-
-from ...models import Invite
 
 
 class Command(BaseCommand):

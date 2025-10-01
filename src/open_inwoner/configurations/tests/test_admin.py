@@ -16,13 +16,12 @@ from django_webtest import WebTest
 from maykin_2fa.test import disable_admin_mfa
 
 from open_inwoner.accounts.tests.factories import UserFactory
-
-from ..admin import (
+from open_inwoner.configurations.admin import (
     SiteConfigurationAdmin,
     SiteConfigurationAdminForm,
 )
-from ..models import SiteConfiguration
-from ..validators import validate_javascript_file
+from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.configurations.validators import validate_javascript_file
 
 
 @disable_admin_mfa()

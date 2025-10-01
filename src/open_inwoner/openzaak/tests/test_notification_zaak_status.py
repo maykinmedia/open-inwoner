@@ -11,6 +11,8 @@ from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openzaak.api.views import ZakenNotificationsWebhookView
+from open_inwoner.openzaak.api_models import Status, StatusType, Zaak, ZaakType
+from open_inwoner.openzaak.models import OpenZaakConfig, UserCaseStatusNotification
 from open_inwoner.openzaak.notifications import (
     _handle_status_update,
     handle_zaken_notification,
@@ -18,8 +20,6 @@ from open_inwoner.openzaak.notifications import (
 from open_inwoner.utils.test import ClearCachesMixin
 from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin, Lookups
 
-from ..api_models import Status, StatusType, Zaak, ZaakType
-from ..models import OpenZaakConfig, UserCaseStatusNotification
 from .factories import (
     NotificationFactory,
     ZaakTypeConfigFactory,

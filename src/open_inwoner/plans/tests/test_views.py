@@ -23,12 +23,12 @@ from open_inwoner.accounts.tests.factories import (
     UserFactory,
 )
 from open_inwoner.accounts.tests.test_action_views import ActionsPlaywrightTests
+from open_inwoner.cms.collaborate.cms_apps import CollaborateApphook
+from open_inwoner.cms.extensions.constants import Icons, IndicatorChoices
+from open_inwoner.cms.tests import cms_tools
 from open_inwoner.pdc.tests.factories import CategoryFactory
+from open_inwoner.plans.models import Plan, PlanContact
 
-from ...cms.collaborate.cms_apps import CollaborateApphook
-from ...cms.extensions.constants import Icons, IndicatorChoices
-from ...cms.tests import cms_tools
-from ..models import Plan, PlanContact
 from .factories import ActionTemplateFactory, PlanFactory, PlanTemplateFactory
 
 

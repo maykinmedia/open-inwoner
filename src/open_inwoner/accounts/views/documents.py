@@ -3,9 +3,8 @@ from django.urls.base import reverse_lazy
 from django.utils.translation import gettext as _
 from django.views.generic import DeleteView
 
+from open_inwoner.accounts.models import Document
 from open_inwoner.utils.views import LogMixin
-
-from ..models import Document
 
 
 class DocumentDeleteView(LogMixin, LoginRequiredMixin, DeleteView):

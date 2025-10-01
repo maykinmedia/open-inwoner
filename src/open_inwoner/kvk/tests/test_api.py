@@ -6,9 +6,10 @@ import requests
 import requests_mock
 from requests.exceptions import InvalidJSONError, SSLError
 
-from ..client import KvKClient
-from ..exceptions import KVKAPIException
-from ..models import KvKConfig
+from open_inwoner.kvk.client import KvKClient
+from open_inwoner.kvk.exceptions import KVKAPIException
+from open_inwoner.kvk.models import KvKConfig
+
 from . import mocks
 from .factories import CLIENT_CERT, CLIENT_CERT_PAIR, SERVER_CERT
 

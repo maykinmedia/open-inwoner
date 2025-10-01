@@ -9,11 +9,10 @@ from open_inwoner.accounts.models import User
 from open_inwoner.openzaak.api_models import OpenTask
 from open_inwoner.openzaak.clients import build_forms_clients
 from open_inwoner.userfeed.adapter import FeedItem
+from open_inwoner.userfeed.adapters import register_item_adapter
 from open_inwoner.userfeed.choices import FeedItemType
 from open_inwoner.userfeed.models import FeedItemData
 from open_inwoner.utils.api import ClientError
-
-from ..adapters import register_item_adapter
 
 logger = logging.getLogger(__name__)
 

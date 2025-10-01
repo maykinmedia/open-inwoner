@@ -15,10 +15,10 @@ from freezegun import freeze_time
 from furl import furl
 from timeline_logger.models import TimelineLog
 
+from open_inwoner.accounts.gateways import GatewayError
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.utils.logentry import LOG_ACTIONS
 
-from ..gateways import GatewayError
 from .factories import UserFactory
 
 signer = TimestampSigner()

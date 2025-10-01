@@ -11,9 +11,9 @@ from filer.fields.image import FilerImageField
 from openformsclient.models import OpenFormsSlugField
 from ordered_model.models import OrderedModel
 
+from open_inwoner.pdc.managers import ProductQueryset
 from open_inwoner.utils.validators import DutchPhoneNumberValidator
 
-from ..managers import ProductQueryset
 from .mixins import GeoModel
 
 

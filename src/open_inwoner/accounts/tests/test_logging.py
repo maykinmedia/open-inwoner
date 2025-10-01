@@ -15,14 +15,13 @@ from maykin_2fa.test import disable_admin_mfa
 from privates.test import temp_private_root
 from timeline_logger.models import TimelineLog
 
-from open_inwoner.accounts.models import Invite
+from open_inwoner.accounts.choices import LoginTypeChoices, StatusChoices
+from open_inwoner.accounts.forms import ActionForm
+from open_inwoner.accounts.models import Action, Invite, Message, User
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.pdc.tests.factories import CategoryFactory
 from open_inwoner.utils.logentry import LOG_ACTIONS
 
-from ..choices import LoginTypeChoices, StatusChoices
-from ..forms import ActionForm
-from ..models import Action, Message, User
 from .factories import (
     ActionFactory,
     DocumentFactory,

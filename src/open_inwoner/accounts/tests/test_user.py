@@ -3,10 +3,10 @@ from django.db import IntegrityError
 from django.test import TestCase
 
 from open_inwoner.accounts.choices import LoginTypeChoices
+from open_inwoner.accounts.models import User
+from open_inwoner.plans.tests.factories import PlanFactory
 from open_inwoner.utils.hash import generate_email_from_string
 
-from ...plans.tests.factories import PlanFactory
-from ..models import User
 from .factories import UserFactory, eHerkenningVestigingUserFactory
 
 

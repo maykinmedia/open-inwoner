@@ -5,10 +5,9 @@ import requests_mock
 from freezegun import freeze_time
 from pyquery import PyQuery
 
+from open_inwoner.cms.plugins.cms_plugins import UserAppointmentsPlugin
 from open_inwoner.cms.tests import cms_tools
 from open_inwoner.qmatic.tests.data import QmaticMockData
-
-from ..cms_plugins import UserAppointmentsPlugin
 
 
 @requests_mock.Mocker()

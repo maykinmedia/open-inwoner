@@ -1,6 +1,6 @@
 import factory
 
-from ..models import SiteConfiguration
+from open_inwoner.configurations.models import SiteConfiguration
 
 
 class SiteConfigurationFactory(factory.django.DjangoModelFactory):

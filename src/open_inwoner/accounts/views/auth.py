@@ -24,13 +24,12 @@ from eherkenning.mock import eherkenning_conf
 from eherkenning.mock.views.eherkenning import (
     eHerkenningAssertionConsumerServiceMockView,
 )
+from open_inwoner.accounts.choices import LoginTypeChoices
+from open_inwoner.accounts.forms import CustomPasswordResetForm
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.kvk.client import KvKClient
 from open_inwoner.kvk.exceptions import KVKAPIException
 from open_inwoner.utils.views import LogMixin
-
-from ..choices import LoginTypeChoices
-from ..forms import CustomPasswordResetForm
 
 logger = logging.getLogger(__name__)
 

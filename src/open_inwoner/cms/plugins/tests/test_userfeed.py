@@ -5,10 +5,9 @@ from django.utils.translation import ngettext
 from pyquery import PyQuery
 
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.cms.plugins.cms_plugins import UserFeedPlugin
 from open_inwoner.cms.tests import cms_tools
 from open_inwoner.userfeed.hooks.common import simple_message
-
-from ..cms_plugins import UserFeedPlugin
 
 
 class TestUserFeedPlugin(TestCase):

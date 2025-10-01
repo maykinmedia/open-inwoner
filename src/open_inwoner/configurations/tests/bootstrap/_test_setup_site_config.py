@@ -2,10 +2,9 @@ from django.test import TestCase, override_settings
 
 from django_setup_configuration.exceptions import ConfigurationRunFailed
 
+from open_inwoner.configurations.bootstrap.siteconfig import SiteConfigurationStep
 from open_inwoner.configurations.choices import ColorTypeChoices, OpenIDDisplayChoices
 from open_inwoner.configurations.models import SiteConfiguration
-
-from ...bootstrap.siteconfig import SiteConfigurationStep
 
 
 @override_settings(

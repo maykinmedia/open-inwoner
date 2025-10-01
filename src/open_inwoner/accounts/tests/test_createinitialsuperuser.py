@@ -4,7 +4,7 @@ from django.core.management import call_command
 from django.test import TestCase, override_settings
 from django.urls import exceptions, reverse
 
-from ..models import User
+from open_inwoner.accounts.models import User
 
 
 class CreateInitialSuperuserTests(TestCase):

@@ -15,9 +15,9 @@ from open_inwoner.accounts.tests.factories import (
     DocumentFactory,
     UserFactory,
 )
+from open_inwoner.plans.models import Plan
 from open_inwoner.utils.logentry import LOG_ACTIONS
 
-from ..models import Plan
 from .factories import PlanFactory
 
 

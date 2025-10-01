@@ -12,9 +12,9 @@ from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
-from ..models import OpenZaakConfig
 from .factories import ZGWApiGroupConfigFactory
 from .helpers import generate_oas_component_cached
 from .shared import CATALOGI_ROOT, ZAKEN_ROOT

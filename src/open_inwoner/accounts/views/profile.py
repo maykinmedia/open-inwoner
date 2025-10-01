@@ -20,6 +20,13 @@ from open_inwoner.accounts.choices import (
     LoginTypeChoices,
     StatusChoices,
 )
+from open_inwoner.accounts.forms import (
+    BrpUserForm,
+    CategoriesForm,
+    UserForm,
+    UserNotificationsForm,
+)
+from open_inwoner.accounts.models import Action, User
 from open_inwoner.cms.utils.page_display import (
     benefits_page_is_published,
     inbox_page_is_published,
@@ -37,9 +44,6 @@ from open_inwoner.qmatic.client import NoServiceConfigured, qmatic_client_factor
 from open_inwoner.questionnaire.models import QuestionnaireStep
 from open_inwoner.utils.logentry import system_action, system_error
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
-
-from ..forms import BrpUserForm, CategoriesForm, UserForm, UserNotificationsForm
-from ..models import Action, User
 
 logger = logging.getLogger(__name__)
 

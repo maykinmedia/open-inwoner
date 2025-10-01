@@ -5,9 +5,8 @@ from maykin_2fa.test import disable_admin_mfa
 from webtest import Upload
 
 from open_inwoner.accounts.tests.factories import UserFactory
-
-from ...utils.test import ClearCachesMixin
-from ..models import CustomFontSet, SiteConfiguration
+from open_inwoner.configurations.models import CustomFontSet, SiteConfiguration
+from open_inwoner.utils.test import ClearCachesMixin
 
 
 @disable_admin_mfa()

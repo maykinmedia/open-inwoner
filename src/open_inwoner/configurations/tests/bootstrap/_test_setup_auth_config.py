@@ -24,15 +24,14 @@ from privates.test import temp_private_root
 from simple_certmanager.constants import CertificateTypes
 
 from open_inwoner.accounts.models import OpenIDDigiDConfig, OpenIDEHerkenningConfig
-from open_inwoner.utils.test import ClearCachesMixin
-
-from ...bootstrap.auth import (
+from open_inwoner.configurations.bootstrap.auth import (
     AdminOIDCConfigurationStep,
     DigiDOIDCConfigurationStep,
     DigiDSAMLConfigurationStep,
     eHerkenningOIDCConfigurationStep,
     eHerkenningSAMLConfigurationStep,
 )
+from open_inwoner.utils.test import ClearCachesMixin
 
 IDENTITY_PROVIDER = "https://keycloak.local/realms/digid/"
 CONTACTMOMENTEN_API_ROOT = "https://openklant.local/contactmomenten/api/v1/"

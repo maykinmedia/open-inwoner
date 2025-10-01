@@ -8,8 +8,8 @@ from privates.test import temp_private_root
 from open_inwoner.accounts.models import Document
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.pdc.tests.factories import ProductFactory
+from open_inwoner.questionnaire.views import QUESTIONNAIRE_SESSION_KEY
 
-from ..views import QUESTIONNAIRE_SESSION_KEY
 from .factories import QuestionnaireStepFactory
 
 

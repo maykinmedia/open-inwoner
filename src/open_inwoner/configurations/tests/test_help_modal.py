@@ -5,10 +5,10 @@ from django.utils.translation import gettext_lazy as _
 from django_webtest import WebTest
 
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.cms.tests import cms_tools
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.pdc.tests.factories import ProductFactory
 
-from ...cms.tests import cms_tools
-from ..models import SiteConfiguration
 from .factories import SiteConfigurationFactory
 
 

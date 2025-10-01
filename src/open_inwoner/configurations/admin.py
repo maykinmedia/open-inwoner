@@ -19,12 +19,12 @@ from ordered_model.admin import OrderedInlineModelAdminMixin, OrderedTabularInli
 from solo.admin import SingletonModelAdmin
 
 from open_inwoner.ckeditor5.widgets import CKEditorWidget
+from open_inwoner.utils.colors import ACCESSIBLE_CONTRAST_RATIO, get_contrast_ratio
+from open_inwoner.utils.css import ALLOWED_PROPERTIES
+from open_inwoner.utils.fields import CSSEditorWidget
+from open_inwoner.utils.iteration import split
 from open_inwoner.utils.logentry import user_action
 
-from ..utils.colors import ACCESSIBLE_CONTRAST_RATIO, get_contrast_ratio
-from ..utils.css import ALLOWED_PROPERTIES
-from ..utils.fields import CSSEditorWidget
-from ..utils.iteration import split
 from .models import CustomFontSet, SiteConfiguration, SiteConfigurationPage
 
 logger = logging.getLogger(__name__)

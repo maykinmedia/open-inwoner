@@ -11,10 +11,10 @@ from timeline_logger.models import TimelineLog
 from webtest import Upload
 
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.pdc.models.category import Category
+from open_inwoner.pdc.models.product import Product
 from open_inwoner.utils.logentry import LOG_ACTIONS
 
-from ..models.category import Category
-from ..models.product import Product
 from .factories import CategoryFactory, ProductFactory
 
 

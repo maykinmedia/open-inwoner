@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from ..mixins import UUIDAdminFirstInOrder
+from open_inwoner.utils.mixins import UUIDAdminFirstInOrder
 
 
 class MockRequest:

@@ -3,7 +3,7 @@ from django.utils.text import slugify
 
 import factory.fuzzy
 
-from ..models import (
+from open_inwoner.pdc.models import (
     Category,
     Organization,
     OrganizationType,

@@ -7,10 +7,9 @@ from django.test import TestCase, override_settings
 from django_yubin.models import Message
 from freezegun import freeze_time
 
+from open_inwoner.configurations.emails import inform_admins_about_failing_emails
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.configurations.tasks import send_failed_mail_digest
-
-from ..emails import inform_admins_about_failing_emails
-from ..models import SiteConfiguration
 
 
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True)

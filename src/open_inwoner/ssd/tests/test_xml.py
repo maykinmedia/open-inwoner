@@ -2,11 +2,11 @@ from pathlib import Path
 from unittest import TestCase
 from unittest.mock import patch
 
-from ..service.jaaropgave import JaarOpgaveInfoResponse
-from ..service.uitkering import (
+from open_inwoner.ssd.service.jaaropgave import JaarOpgaveInfoResponse
+from open_inwoner.ssd.service.uitkering import (
     UitkeringsSpecificatieInfoResponse as UitkeringInfoResponse,
 )
-from ..templatetags.ssd_tags import (
+from open_inwoner.ssd.templatetags.ssd_tags import (
     format_currency,
     format_date_month_name,
     format_period,
@@ -14,7 +14,8 @@ from ..templatetags.ssd_tags import (
     format_string,
     get_detail_value_for_column,
 )
-from ..xml import get_jaaropgaven, get_uitkeringen
+from open_inwoner.ssd.xml import get_jaaropgaven, get_uitkeringen
+
 from .utils import get_component_value, mock_get_report_info
 
 JAAROPGAVE_INFO_RESPONSE_NODE = (

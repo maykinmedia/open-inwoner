@@ -1,6 +1,6 @@
 from polyfactory.factories.pydantic_factory import ModelFactory
 
-from ..client import Appointment, BranchDetail, QmaticService
+from open_inwoner.qmatic.client import Appointment, BranchDetail, QmaticService
 
 
 class BranchDetailFactory(ModelFactory[BranchDetail]):

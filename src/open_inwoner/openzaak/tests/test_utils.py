@@ -12,8 +12,8 @@ from open_inwoner.openzaak.utils import (
     is_info_object_visible,
     is_zaak_visible,
 )
+from open_inwoner.utils.test import ClearCachesMixin
 
-from ...utils.test import ClearCachesMixin
 from .helpers import copy_with_new_uuid
 from .shared import CATALOGI_ROOT, ZAKEN_ROOT
 

@@ -1,6 +1,10 @@
 from django.test import TestCase
 
-from ..forms import QuestionnaireStepChoiceField, QuestionnaireStepForm
+from open_inwoner.questionnaire.forms import (
+    QuestionnaireStepChoiceField,
+    QuestionnaireStepForm,
+)
+
 from .factories import QuestionnaireStepFactory
 
 

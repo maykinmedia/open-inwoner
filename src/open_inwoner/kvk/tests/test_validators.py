@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils.translation import gettext as _
 
-from ..validators import validate_api_root
+from open_inwoner.kvk.validators import validate_api_root
 
 
 class KvKAPIRootValidationTest(TestCase):

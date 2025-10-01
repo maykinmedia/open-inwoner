@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from ..models import Tag, TagType
+from open_inwoner.pdc.models import Tag, TagType
 
 
 @admin.register(Tag)

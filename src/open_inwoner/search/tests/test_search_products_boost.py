@@ -1,9 +1,9 @@
 from django.test import TestCase, tag
 
 from open_inwoner.pdc.tests.factories import ProductFactory
+from open_inwoner.search.models import FieldBoost
+from open_inwoner.search.searches import multi_search
 
-from ..models import FieldBoost
-from ..searches import multi_search
 from .utils import ESMixin
 
 

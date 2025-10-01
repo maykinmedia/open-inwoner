@@ -10,8 +10,13 @@ from cms.plugin_pool import plugin_pool
 from objectsapiclient.models import Configuration
 from pydantic import ValidationError
 
-from ..api_models import ExternFormulierTaak, KoppelingProduct, KoppelingZaak, UrlTaak
-from ..models import TasksConfig
+from open_inwoner.cms.plugins.api_models import (
+    ExternFormulierTaak,
+    KoppelingProduct,
+    KoppelingZaak,
+    UrlTaak,
+)
+from open_inwoner.cms.plugins.models import TasksConfig
 
 logger = logging.getLogger(__name__)
 

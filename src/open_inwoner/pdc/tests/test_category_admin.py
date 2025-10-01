@@ -10,8 +10,8 @@ from maykin_2fa.test import disable_admin_mfa
 
 from open_inwoner.accounts.tests.factories import GroupFactory, UserFactory
 from open_inwoner.openzaak.tests.factories import ZaakTypeConfigFactory
+from open_inwoner.pdc.models.category import Category
 
-from ..models.category import Category
 from .factories import CategoryFactory
 
 

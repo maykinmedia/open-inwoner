@@ -3,11 +3,10 @@ from django.urls import reverse
 
 from django_webtest import WebTest
 
+from open_inwoner.cms.products.cms_apps import ProductsApphook
+from open_inwoner.cms.products.cms_plugins import ProductLocationPlugin
+from open_inwoner.cms.tests import cms_tools
 from open_inwoner.pdc.tests.factories import ProductFactory, ProductLocationFactory
-
-from ...tests import cms_tools
-from ..cms_apps import ProductsApphook
-from ..cms_plugins import ProductLocationPlugin
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")

@@ -6,9 +6,8 @@ from open_inwoner.accounts.tests.factories import (
     DigidUserFactory,
     eHerkenningUserFactory,
 )
+from open_inwoner.core.views import _get_category_data_for_user
 from open_inwoner.pdc.tests.factories import CategoryFactory, ProductFactory
-
-from ..views import _get_category_data_for_user
 
 
 class SitemapCategoryDataTest(TestCase):

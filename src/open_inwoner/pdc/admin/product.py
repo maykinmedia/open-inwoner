@@ -8,10 +8,7 @@ from import_export.formats import base_formats
 from ordered_model.admin import OrderedModelAdmin
 
 from open_inwoner.ckeditor5.widgets import CKEditorWidget
-from open_inwoner.utils.logentry import system_action
-from open_inwoner.utils.mixins import UUIDAdminFirstInOrder
-
-from ..models import (
+from open_inwoner.pdc.models import (
     Category,
     Product,
     ProductCondition,
@@ -20,7 +17,10 @@ from ..models import (
     ProductLink,
     ProductLocation,
 )
-from ..resources import ProductExportResource, ProductImportResource
+from open_inwoner.pdc.resources import ProductExportResource, ProductImportResource
+from open_inwoner.utils.logentry import system_action
+from open_inwoner.utils.mixins import UUIDAdminFirstInOrder
+
 from . import QuestionInline
 from .mixins import GeoAdminMixin
 

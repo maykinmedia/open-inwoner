@@ -9,6 +9,13 @@ from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.openzaak.api_models import (
+    InformatieObject,
+    Zaak,
+    ZaakInformatieObject,
+    ZaakType,
+)
+from open_inwoner.openzaak.models import OpenZaakConfig, UserCaseInfoObjectNotification
 from open_inwoner.openzaak.notifications import (
     _handle_zaakinformatieobject_update,
     handle_zaken_notification,
@@ -20,8 +27,6 @@ from open_inwoner.openzaak.tests.factories import (
 from open_inwoner.utils.test import ClearCachesMixin
 from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin, Lookups
 
-from ..api_models import InformatieObject, Zaak, ZaakInformatieObject, ZaakType
-from ..models import OpenZaakConfig, UserCaseInfoObjectNotification
 from .helpers import copy_with_new_uuid
 from .test_notification_data import MockAPIData, MockAPIDataAlt
 

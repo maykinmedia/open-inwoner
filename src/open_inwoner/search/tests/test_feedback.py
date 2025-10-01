@@ -10,8 +10,8 @@ from furl import furl
 
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.pdc.tests.factories import CategoryFactory, ProductFactory, TagFactory
+from open_inwoner.search.models import Feedback
 
-from ..models import Feedback
 from .utils import ESMixin
 
 

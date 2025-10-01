@@ -4,7 +4,7 @@ from django.test import Client, TestCase
 
 import pytz
 
-from ..models import User
+from open_inwoner.accounts.models import User
 
 
 class TestPrevLogin(TestCase):

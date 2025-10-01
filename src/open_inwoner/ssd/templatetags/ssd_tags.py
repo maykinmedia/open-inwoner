@@ -3,7 +3,7 @@ from datetime import datetime
 from django import template
 from django.template.defaultfilters import date as django_date
 
-from ..service.jaaropgave.fwi_include_resolved import CdPositiefNegatief
+from open_inwoner.ssd.service.jaaropgave.fwi_include_resolved import CdPositiefNegatief
 
 register = template.Library()
 

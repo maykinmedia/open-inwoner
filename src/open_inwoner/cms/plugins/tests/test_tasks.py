@@ -3,9 +3,9 @@ from django.test import TestCase, override_settings
 import requests_mock
 
 from open_inwoner.accounts.tests.factories import DigidUserFactory
+from open_inwoner.cms.plugins.cms_plugins import TasksPlugin
 from open_inwoner.cms.tests import cms_tools
 
-from ..cms_plugins import TasksPlugin
 from .mocks import (
     UUID_OBJECT_TYPE_DIENSVERLENING,
     UUID_OBJECT_TYPE_DIMPACT_1,

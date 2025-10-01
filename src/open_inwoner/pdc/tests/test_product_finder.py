@@ -3,7 +3,8 @@ from django.urls import reverse
 
 from django_webtest import WebTest
 
-from ..models import ProductCondition
+from open_inwoner.pdc.models import ProductCondition
+
 from .factories import ProductConditionFactory, ProductFactory
 
 

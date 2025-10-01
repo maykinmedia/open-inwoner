@@ -5,9 +5,9 @@ from django.utils.html import escape
 
 from django_webtest import WebTest
 
-from ...cms.tests import cms_tools
-from ...utils.test import ClearCachesMixin, temp_media_root
-from ..models import SiteConfiguration
+from open_inwoner.cms.tests import cms_tools
+from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.utils.test import ClearCachesMixin, temp_media_root
 
 
 @temp_media_root()

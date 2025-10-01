@@ -11,10 +11,9 @@ from view_breadcrumbs import BaseBreadcrumbMixin, ListBreadcrumbMixin
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.pdc.models.product import ProductCondition
 from open_inwoner.questionnaire.models import QuestionnaireStep
-from open_inwoner.utils.views import LoginMaybeRequiredMixin
+from open_inwoner.utils.ckeditor import get_rendered_content
+from open_inwoner.utils.views import CommonPageMixin, LoginMaybeRequiredMixin
 
-from ..utils.ckeditor import get_rendered_content
-from ..utils.views import CommonPageMixin
 from .choices import YesNo
 from .forms import ProductFinderForm
 from .models import Category, Product, ProductLocation, Question

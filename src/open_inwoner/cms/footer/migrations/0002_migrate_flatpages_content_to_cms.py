@@ -5,7 +5,7 @@ from django.utils.text import slugify
 
 from cms.api import add_plugin, create_page
 
-from ..cms_plugins import CMSFlatPagePlugin
+from open_inwoner.cms.footer.cms_plugins import CMSFlatPagePlugin
 
 
 def create_cms_pages(apps, schema_editor):

@@ -6,10 +6,9 @@ from django.views.generic import UpdateView
 
 from furl import furl
 
+from open_inwoner.accounts.forms import InviteForm
+from open_inwoner.accounts.models import Invite
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
-
-from ..forms import InviteForm
-from ..models import Invite
 
 
 class InviteAcceptView(LogMixin, CommonPageMixin, UpdateView):

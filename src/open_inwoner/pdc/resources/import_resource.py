@@ -6,7 +6,8 @@ from import_export.exceptions import ImportExportError
 from import_export.instance_loaders import CachedInstanceLoader
 from import_export.widgets import CharWidget
 
-from ..models import Category, Organization, Product, Tag
+from open_inwoner.pdc.models import Category, Organization, Product, Tag
+
 from .widgets import ValidatedManyToManyWidget
 
 

@@ -8,12 +8,12 @@ from django_webtest import WebTest
 from playwright.sync_api import expect
 
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.media.tests.factories import VideoFactory
+from open_inwoner.pdc.models import CategoryProduct
 from open_inwoner.questionnaire.tests.factories import QuestionnaireStepFactory
 from open_inwoner.utils.test import ClearCachesMixin
 from open_inwoner.utils.tests.playwright import PlaywrightSyncLiveServerTestCase
 
-from ...media.tests.factories import VideoFactory
-from ..models import CategoryProduct
 from .factories import (
     CategoryFactory,
     ProductConditionFactory,

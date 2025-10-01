@@ -1,6 +1,6 @@
 from django.urls import reverse_lazy
 
-from ..utils import config
+from open_inwoner.conf.utils import config
 
 # The Open Forms SDK files might differ from the API domain.
 OPEN_FORMS_API_DOMAIN = config("OPEN_FORMS_DOMAIN", "")

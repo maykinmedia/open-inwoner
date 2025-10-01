@@ -5,19 +5,19 @@ from django.urls import reverse_lazy
 from django_webtest import WebTest
 from playwright.sync_api import expect
 
+from open_inwoner.cms.products.cms_apps import ProductsApphook
+from open_inwoner.cms.tests import cms_tools
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.pdc.tests.factories import (
     CategoryFactory,
     OrganizationFactory,
     ProductFactory,
     TagFactory,
 )
+from open_inwoner.search.constants import FacetChoices
+from open_inwoner.utils.test import ClearCachesMixin
+from open_inwoner.utils.tests.playwright import PlaywrightSyncLiveServerTestCase
 
-from ...cms.products.cms_apps import ProductsApphook
-from ...cms.tests import cms_tools
-from ...configurations.models import SiteConfiguration
-from ...utils.test import ClearCachesMixin
-from ...utils.tests.playwright import PlaywrightSyncLiveServerTestCase
-from ..constants import FacetChoices
 from .utils import ESMixin
 
 
