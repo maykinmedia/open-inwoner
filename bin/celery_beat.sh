@@ -6,6 +6,7 @@ fi
 
 set -e
 
+OTEL_SERVICE_NAME="${OTEL_SERVICE_NAME:-openinwoner-celery-beat}"
 LOGLEVEL=${CELERY_LOGLEVEL:-INFO}
 
 mkdir -p celerybeat

@@ -98,6 +98,7 @@ jobs:
           SECRET_KEY: dummy
           DB_USER: postgres
           DB_PASSWORD: ''
+          OTEL_SDK_DISABLED: true
 
       - name: Persist coverage data files
         uses: actions/upload-artifact@v4
@@ -198,6 +199,7 @@ jobs:
           DB_USER: postgres
           DB_PASSWORD: ''
           E2E_DRIVER: ${{ matrix.browser }}
+          OTEL_SDK_DISABLED: true
 
   #
   # Docs

@@ -1,0 +1,73 @@
+---
+
+# Taken and adapted from https://grafana.com/docs/loki/latest/setup/install/docker/#install-with-docker-compose
+
+services:
+  # logs storage
+  loki:
+    image: grafana/loki:latest
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - openinwoner-dev
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-tsdb:/prometheus
+    networks:
+      - openinwoner-dev
+
+  # log scraping from container output
+  promtail:
+    image: grafana/promtail:latest
+    volumes:
+      # for service discovery & reading container logs - note that doing this in
+      # production is NOT recommended due to security concerns
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # custom config file to scrape container logs
+      - ./observability/promtail/config.yml:/etc/promtail/config.yml
+      - promtail-logs:/var/log
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      - openinwoner-dev
+
+  # open telemetry collector, receives metrics from the application instance(s)
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.131.0
+    command: --config=/etc/otel-collector-config.yaml
+    volumes:
+      - ./observability/otel/otel-collector-config.yml:/etc/otel-collector-config.yaml
+    ports:
+      - 4317:4317
+      - 4318:4318
+      - 8889:8889
+    networks:
+      - openinwoner-dev
+
+  # dashboard tool, visualizes telemetry. queries loki and prometheus
+  grafana:
+    image: grafana/grafana:latest
+    volumes:
+      - ./observability/grafana/datasources:/etc/grafana/provisioning/datasources
+    environment:
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_FEATURE_TOGGLES_ENABLE=alertingSimplifiedRouting,alertingQueryAndExpressionsStepMode
+    ports:
+      - "3000:3000"
+    networks:
+      - openinwoner-dev
+
+volumes:
+  promtail-logs:
+  prometheus-tsdb:
+
+networks:
+  openinwoner-dev:
+    name: openinwoner-dev
