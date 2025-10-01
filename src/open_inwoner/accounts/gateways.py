@@ -1,3 +1,4 @@
+import functools
 import logging
 
 from django.conf import settings
@@ -6,7 +7,14 @@ from django.utils.module_loading import import_string
 
 import messagebird
 
+from open_inwoner.utils.text import mask_phone_number, mask_sensitive_data
+
 logger = logging.getLogger(__name__)
+
+
+_mask_token_message = functools.partial(
+    mask_sensitive_data, visible_start=2, visible_end=2, min_length=8
+)
 
 
 class GatewayError(Exception):
@@ -29,7 +37,9 @@ class Dummy(Gateway):
     def send(self, to, token, **kwargs):
         logger.info(
             '(Dummy) Sent SMS to {to} by "{orig}": "{msg}"'.format(
-                to=to, orig="oip", msg=self.get_message(token)
+                to=mask_phone_number(to),
+                orig="oip",
+                msg=_mask_token_message(self.get_message(token)),
             )
         )
         return True
@@ -66,12 +76,16 @@ class MessageBird(Gateway):
             )
         except messagebird.client.ErrorException as exc:
             for error in exc.errors:
-                logger.critical(
-                    ("Could not send SMS to {to}:\n{error}").format(to=to, error=error)
-                )
+                logger.critical(("Could not send SMS:\n{error}").format(error=error))
             raise GatewayError() from exc
         else:
-            logging.debug('Sent SMS to %s: "%s"', to, self.get_message(token))
+            logger.debug(
+                "Successfully sent SMS",
+                extra={
+                    "to": mask_phone_number(to),
+                    "message": _mask_token_message(self.get_message(token)),
+                },
+            )
             return True
 
 
