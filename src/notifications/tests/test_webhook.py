@@ -8,8 +8,9 @@ from requests.exceptions import RequestException
 from zgw_consumers.constants import APITypes
 from zgw_consumers.models.services import Service
 
-from ..admin import deregister_webhook, register_webhook
-from ..models import NotificationsAPIConfig, Subscription
+from notifications.admin import deregister_webhook, register_webhook
+from notifications.models import NotificationsAPIConfig, Subscription
+
 from .utils import make_request_with_middleware
 
 

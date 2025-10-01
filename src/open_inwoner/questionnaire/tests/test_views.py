@@ -7,17 +7,20 @@ from django.views.generic import FormView
 
 from django_webtest import WebTest
 
+from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
+from open_inwoner.cms.profile.cms_apps import ProfileApphook
+from open_inwoner.cms.tests import cms_tools
+from open_inwoner.pdc.models import Product
+from open_inwoner.pdc.tests.factories import ProductFactory
+from open_inwoner.questionnaire.forms import QuestionnaireStepForm
+from open_inwoner.questionnaire.models import QuestionnaireStep
+from open_inwoner.questionnaire.views import (
+    QUESTIONNAIRE_SESSION_KEY,
+    QuestionnaireStepView,
+)
 from open_inwoner.utils.test import SessionMiddleware
 
-from ...accounts.tests.factories import UserFactory
-from ...cms.profile.cms_appconfig import ProfileConfig
-from ...cms.profile.cms_apps import ProfileApphook
-from ...cms.tests import cms_tools
-from ...pdc.models import Product
-from ...pdc.tests.factories import ProductFactory
-from ..forms import QuestionnaireStepForm
-from ..models import QuestionnaireStep
-from ..views import QUESTIONNAIRE_SESSION_KEY, QuestionnaireStepView
 from .factories import QuestionnaireStepFactory, QuestionnaireStepFileFactory
 
 

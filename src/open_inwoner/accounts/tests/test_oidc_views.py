@@ -18,18 +18,18 @@ from furl import furl
 from mozilla_django_oidc_db.models import OpenIDConnectConfig
 from pyquery import PyQuery
 
+from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.eherkenning_session import EHerkenningSessionContext
+from open_inwoner.accounts.models import OpenIDDigiDConfig, OpenIDEHerkenningConfig
 from open_inwoner.accounts.views.auth_oidc import (
     GENERIC_DIGID_ERROR_MSG,
     GENERIC_EHERKENNING_ERROR_MSG,
 )
+from open_inwoner.cms.profile.cms_apps import ProfileApphook
+from open_inwoner.cms.tests import cms_tools
 from open_inwoner.configurations.choices import OpenIDDisplayChoices
 from open_inwoner.configurations.models import SiteConfiguration
 
-from ...cms.profile.cms_apps import ProfileApphook
-from ...cms.tests import cms_tools
-from ..choices import LoginTypeChoices
-from ..models import OpenIDDigiDConfig, OpenIDEHerkenningConfig
 from .factories import (
     DigidUserFactory,
     UserFactory,

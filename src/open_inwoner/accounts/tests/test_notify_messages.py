@@ -2,9 +2,9 @@ from django.core import mail
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
+from open_inwoner.accounts.tasks import schedule_user_notifications
 from open_inwoner.configurations.models import SiteConfiguration
 
-from ..tasks import schedule_user_notifications
 from .factories import MessageFactory, UserFactory
 
 

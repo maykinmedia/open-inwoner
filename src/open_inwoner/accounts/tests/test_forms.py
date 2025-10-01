@@ -1,9 +1,8 @@
 from django.test import TestCase
 
+from open_inwoner.accounts.forms import CustomRegistrationForm, UserForm
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.configurations.models import SiteConfiguration
-
-from ..forms import CustomRegistrationForm, UserForm
 
 
 class RegistrationFormTest(TestCase):

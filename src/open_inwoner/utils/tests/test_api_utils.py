@@ -4,7 +4,7 @@ from django.test import TestCase
 
 from pydantic import BaseModel, HttpUrl
 
-from ..api import JSONEncoderMixin
+from open_inwoner.utils.api import JSONEncoderMixin
 
 
 class TestDummy(JSONEncoderMixin, BaseModel):

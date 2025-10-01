@@ -2,7 +2,7 @@ from django.utils.text import slugify
 
 import factory
 
-from ..models import QuestionnaireStep, QuestionnaireStepFile
+from open_inwoner.questionnaire.models import QuestionnaireStep, QuestionnaireStepFile
 
 
 class QuestionnaireStepFactory(factory.django.DjangoModelFactory):

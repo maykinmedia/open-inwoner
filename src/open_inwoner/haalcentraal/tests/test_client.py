@@ -4,8 +4,9 @@ from django.test import TestCase
 
 import requests_mock
 
-from ..api import BRP_2_1
-from ..models import HaalCentraalConfig
+from open_inwoner.haalcentraal.api import BRP_2_1
+from open_inwoner.haalcentraal.models import HaalCentraalConfig
+
 from .mixins import HaalCentraalMixin
 
 

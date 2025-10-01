@@ -8,6 +8,7 @@ from open_inwoner.accounts.tests.factories import (
     eHerkenningVestigingUserFactory,
 )
 from open_inwoner.openklant.api_models import KlantContactMoment
+from open_inwoner.openklant.services import OpenKlant2Service, eSuiteKlantenService
 from open_inwoner.openklant.tests.data import MockAPIReadData
 from open_inwoner.openklant.wrap import (
     fetch_klantcontactmoment,
@@ -15,7 +16,6 @@ from open_inwoner.openklant.wrap import (
 )
 from open_inwoner.utils.test import ClearCachesMixin, DisableRequestLogMixin
 
-from ..services import OpenKlant2Service, eSuiteKlantenService
 from .factories import ESuiteConfigFactory, OpenKlant2ConfigFactory
 
 

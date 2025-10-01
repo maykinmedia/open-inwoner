@@ -5,7 +5,11 @@ import uuid
 from django.core.files.storage.memory import InMemoryStorage
 from django.test import TestCase
 
-from open_inwoner.openzaak.import_export import ZGWConfigExport, ZGWConfigImport
+from open_inwoner.openzaak.import_export import (
+    ZGWConfigExport,
+    ZGWConfigImport,
+    ZGWImportError,
+)
 from open_inwoner.openzaak.models import (
     CatalogusConfig,
     ZaakTypeConfig,
@@ -14,7 +18,6 @@ from open_inwoner.openzaak.models import (
     ZaakTypeStatusTypeConfig,
 )
 
-from ..import_export import ZGWImportError
 from .factories import (
     CatalogusConfigFactory,
     ServiceFactory,

@@ -31,3 +31,6 @@ f851eac2759d7dd65687dce1869037296511140c
 
 # chore: apply pre-commit QA checks
 50e637f07d232890bb5b4039822ed63eb630693a
+
+# refactor: apply ruff TID252 prohibit relative import from parents
+d2e40fbe2f6d8887ae16ffd5be45d84fb7e0c368

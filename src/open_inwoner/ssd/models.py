@@ -3,8 +3,8 @@ from django.utils.translation import gettext_lazy as _
 
 from solo.models import SingletonModel
 
-from ..configurations.models import SiteConfiguration
-from ..utils.validators import CharFieldValidator, validate_digits
+from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.utils.validators import CharFieldValidator, validate_digits
 
 
 class SSDConfigManager(models.Manager):

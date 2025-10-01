@@ -2,7 +2,7 @@ from pathlib import Path
 
 import factory
 
-from ..models import SoapService
+from open_inwoner.soap.models import SoapService
 
 DATA_DIR = Path(__file__).parent.resolve() / "data"
 

@@ -5,7 +5,8 @@ from django.urls import reverse
 
 from django_webtest import WebTest
 
-from ..models import Question
+from open_inwoner.pdc.models import Question
+
 from .factories import CategoryFactory, ProductFactory, QuestionFactory
 
 

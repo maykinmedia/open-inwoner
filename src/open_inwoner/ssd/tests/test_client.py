@@ -8,8 +8,9 @@ import requests_mock
 from lxml import etree
 from requests.exceptions import ConnectionError
 
-from ..client import JaaropgaveClient, UitkeringClient
-from ..exceptions import SSDClientException
+from open_inwoner.ssd.client import JaaropgaveClient, UitkeringClient
+from open_inwoner.ssd.exceptions import SSDClientException
+
 from .factories import ConcreteSSDClient, SSDConfigFactory
 
 FILES_DIR = Path(__file__).parent.resolve() / "files"

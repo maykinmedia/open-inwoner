@@ -18,7 +18,9 @@ from open_inwoner.accounts.tests.factories import (
     eHerkenningVestigingUserFactory,
 )
 from open_inwoner.cms.products.cms_apps import ProductsApphook
+from open_inwoner.cms.products.cms_plugins import CategoriesPlugin
 from open_inwoner.cms.profile.cms_apps import ProfileApphook
+from open_inwoner.cms.tests import cms_tools
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.tests.factories import (
@@ -33,9 +35,6 @@ from open_inwoner.openzaak.tests.shared import (
 )
 from open_inwoner.pdc.tests.factories import CategoryFactory
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
-
-from ...tests import cms_tools
-from ..cms_plugins import CategoriesPlugin
 
 TODAY = date.today()
 

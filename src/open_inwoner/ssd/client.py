@@ -11,7 +11,8 @@ from django.utils import timezone
 import requests
 from requests import Response
 
-from ..utils.export import render_pdf
+from open_inwoner.utils.export import render_pdf
+
 from .exceptions import SSDClientException
 from .models import SSDConfig
 from .xml import get_jaaropgaven, get_uitkeringen

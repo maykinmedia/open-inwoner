@@ -3,9 +3,8 @@ from django.utils.translation import gettext_lazy as _
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 
+from open_inwoner.cms.utils.plugin_mixins import CMSActiveAppMixin
 from open_inwoner.plans.models import Plan
-
-from ..utils.plugin_mixins import CMSActiveAppMixin
 
 
 @plugin_pool.register_plugin

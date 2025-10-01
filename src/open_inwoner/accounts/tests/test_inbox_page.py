@@ -9,11 +9,11 @@ from playwright.sync_api import expect
 from privates.test import temp_private_root
 from webtest import Upload
 
+from open_inwoner.accounts.models import Message
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.utils.tests.helpers import create_image_bytes
 from open_inwoner.utils.tests.playwright import PlaywrightSyncLiveServerTestCase
 
-from ..models import Message
 from .factories import DigidUserFactory, MessageFactory, UserFactory
 
 

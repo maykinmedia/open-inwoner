@@ -11,6 +11,7 @@ from django_webtest import WebTest
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.cms.tests.cms_tools import create_apphook_page
 from open_inwoner.openklant.api_models import KlantContactRol
+from open_inwoner.openklant.cms_apps import OpenklantApphook
 from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.models import (
     ESuiteKlantConfig,
@@ -24,8 +25,6 @@ from open_inwoner.openklant.tests.factories import (
 from open_inwoner.openklant.views.contactform import ContactFormView
 from open_inwoner.utils.test import ClearCachesMixin, DisableRequestLogMixin
 from open_inwoner.utils.tests.helpers import AssertFormMixin, AssertTimelineLogMixin
-
-from ..cms_apps import OpenklantApphook
 
 
 @requests_mock.Mocker()

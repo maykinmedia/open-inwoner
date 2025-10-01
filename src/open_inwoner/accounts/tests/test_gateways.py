@@ -2,7 +2,7 @@ from unittest import mock
 
 from django.test import TestCase, override_settings
 
-from ..gateways import MessageBird
+from open_inwoner.accounts.gateways import MessageBird
 
 
 class MessageBirdSMSTestCase(TestCase):

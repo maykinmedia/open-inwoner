@@ -4,11 +4,10 @@ from django.utils.translation import gettext as _
 
 from playwright.sync_api import expect
 
+from open_inwoner.cms.tests import cms_tools
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.utils.test import ClearCachesMixin
-
-from ...cms.tests import cms_tools
-from ...utils.tests.playwright import PlaywrightSyncLiveServerTestCase
-from ..models import SiteConfiguration
+from open_inwoner.utils.tests.playwright import PlaywrightSyncLiveServerTestCase
 
 
 class TestRenderedAnalytics(TestCase):

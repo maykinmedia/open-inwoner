@@ -4,8 +4,7 @@ from django.contrib import admin
 from ordered_model.admin import OrderedModelAdmin
 
 from open_inwoner.ckeditor5.widgets import CKEditorWidget
-
-from ..models import Question
+from open_inwoner.pdc.models import Question
 
 
 class QuestionAdminForm(forms.ModelForm):

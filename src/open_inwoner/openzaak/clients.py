@@ -24,8 +24,8 @@ from zgw_consumers.service import pagination_helper
 from open_inwoner.openzaak.api_models import InformatieObject
 from open_inwoner.openzaak.exceptions import MultiZgwClientProxyError
 from open_inwoner.utils.api import ClientError, get_json_response
+from open_inwoner.utils.decorators import cache as cache_result
 
-from ..utils.decorators import cache as cache_result
 from .api_models import (
     InformatieObjectType,
     OpenSubmission,

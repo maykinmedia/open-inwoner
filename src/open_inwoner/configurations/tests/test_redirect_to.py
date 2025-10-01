@@ -3,8 +3,7 @@ from django.urls import reverse
 from django_webtest import WebTest
 
 from open_inwoner.accounts.tests.factories import UserFactory
-
-from ..models import SiteConfiguration
+from open_inwoner.configurations.models import SiteConfiguration
 
 
 class TestRedirectTo(WebTest):

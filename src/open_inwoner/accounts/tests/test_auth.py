@@ -14,9 +14,17 @@ from django_webtest import WebTest
 from furl import furl
 from pyquery import PyQuery
 
-from open_inwoner.accounts.choices import NotificationChannelChoice
+from open_inwoner.accounts.choices import LoginTypeChoices, NotificationChannelChoice
 from open_inwoner.accounts.eherkenning_session import EHerkenningSessionContext
+from open_inwoner.accounts.models import (
+    OpenIDDigiDConfig,
+    OpenIDEHerkenningConfig,
+    User,
+)
 from open_inwoner.accounts.signals import KvKClient, update_user_on_login
+from open_inwoner.cms.collaborate.cms_apps import CollaborateApphook
+from open_inwoner.cms.profile.cms_apps import ProfileApphook
+from open_inwoner.cms.tests import cms_tools
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.kvk.tests.factories import CertificateFactory
@@ -27,15 +35,12 @@ from open_inwoner.openklant.tests.factories import (
     ESuiteConfigFactory,
     OpenKlant2ConfigFactory,
 )
-from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin
+from open_inwoner.utils.test import ClearCachesMixin
+from open_inwoner.utils.tests.helpers import (
+    AssertRedirectsMixin,
+    AssertTimelineLogMixin,
+)
 
-from ...cms.collaborate.cms_apps import CollaborateApphook
-from ...cms.profile.cms_apps import ProfileApphook
-from ...cms.tests import cms_tools
-from ...utils.test import ClearCachesMixin
-from ...utils.tests.helpers import AssertRedirectsMixin
-from ..choices import LoginTypeChoices
-from ..models import OpenIDDigiDConfig, OpenIDEHerkenningConfig, User
 from .factories import (
     DigidUserFactory,
     InviteFactory,

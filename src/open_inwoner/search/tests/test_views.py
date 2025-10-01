@@ -15,6 +15,7 @@ from open_inwoner.accounts.tests.factories import DigidUserFactory
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.tests.factories import ZGWApiGroupConfigFactory
+from open_inwoner.openzaak.tests.helpers import generate_oas_component_cached
 from open_inwoner.openzaak.tests.shared import (
     ANOTHER_CATALOGI_ROOT,
     ANOTHER_ZAKEN_ROOT,
@@ -23,7 +24,6 @@ from open_inwoner.openzaak.tests.shared import (
 )
 from open_inwoner.utils.test import paginated_response
 
-from ...openzaak.tests.helpers import generate_oas_component_cached
 from .utils import ESMixin
 
 

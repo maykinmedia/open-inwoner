@@ -11,9 +11,8 @@ from timeline_logger.models import TimelineLog
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.plans.models import Plan
 from open_inwoner.plans.tests.factories import PlanFactory
-
-from ..admin import CustomTimelineLogAdmin
-from ..logentry import LOG_ACTIONS
+from open_inwoner.utils.admin import CustomTimelineLogAdmin
+from open_inwoner.utils.logentry import LOG_ACTIONS
 
 
 @disable_admin_mfa()

@@ -2,7 +2,7 @@ from django.utils.translation import gettext_lazy as _
 
 from rest_framework import serializers
 
-from ..validators import UntilNowValidator
+from notifications.validators import UntilNowValidator
 
 
 class NotificatieSerializer(serializers.Serializer):

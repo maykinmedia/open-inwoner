@@ -6,8 +6,9 @@ from django.shortcuts import redirect, reverse
 from django.utils.translation import gettext as _
 from django.views import View
 
-from ..utils.url import get_next_url_from
-from ..utils.views import LogMixin
+from open_inwoner.utils.url import get_next_url_from
+from open_inwoner.utils.views import LogMixin
+
 from .verification import VERIFY_GET_PARAM, validate_email_verification_token
 
 

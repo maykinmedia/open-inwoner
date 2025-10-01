@@ -1,6 +1,6 @@
 from polyfactory.factories.pydantic_factory import ModelFactory
 
-from ..api_models import LapostaList, Member
+from open_inwoner.laposta.api_models import LapostaList, Member
 
 
 class LapostaListFactory(ModelFactory[LapostaList]):

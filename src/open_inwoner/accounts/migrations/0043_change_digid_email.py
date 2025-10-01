@@ -1,8 +1,7 @@
 from django.db import migrations
 
+from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.utils.hash import generate_email_from_string
-
-from ..choices import LoginTypeChoices
 
 
 def change_bsn_email_to_hash(apps, _):

@@ -1,8 +1,8 @@
 from django.test import TestCase
 
 from open_inwoner.accounts.choices import LoginTypeChoices
+from open_inwoner.accounts.models import User
 
-from ..models import User
 from .factories import UserFactory, eHerkenningUserFactory
 
 

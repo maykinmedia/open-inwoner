@@ -2,11 +2,10 @@ import os
 
 from django.test import TestCase
 
+from open_inwoner.cms.banner.cms_plugins import BannerImagePlugin, BannerTextPlugin
 from open_inwoner.cms.tests import cms_tools
 from open_inwoner.utils.test import temp_media_root
 from open_inwoner.utils.tests.factories import FilerImageFactory
-
-from ..cms_plugins import BannerImagePlugin, BannerTextPlugin
 
 
 @temp_media_root()

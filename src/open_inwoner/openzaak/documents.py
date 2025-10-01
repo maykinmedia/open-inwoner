@@ -4,8 +4,7 @@ from django.conf import settings
 
 from open_inwoner.openzaak.api_models import InformatieObject
 from open_inwoner.openzaak.clients import DocumentenClient
-
-from ..utils.decorators import cache as cache_result
+from open_inwoner.utils.decorators import cache as cache_result
 
 logger = logging.getLogger(__name__)
 

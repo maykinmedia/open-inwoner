@@ -1,9 +1,8 @@
 from django.test import TestCase
 
+from open_inwoner.cms.plugins.cms_plugins import VideoPlayerPlugin
 from open_inwoner.cms.tests import cms_tools
 from open_inwoner.media.tests.factories import VideoFactory
-
-from ..cms_plugins import VideoPlayerPlugin
 
 
 class TestVideoPlayerPlugin(TestCase):

@@ -5,10 +5,10 @@ from django_webtest import WebTest
 from maykin_2fa.test import disable_admin_mfa
 from webtest import Upload
 
+from open_inwoner.accounts.choices import ContactTypeChoices
+from open_inwoner.accounts.models import User
 from open_inwoner.utils.tests.helpers import create_image_bytes
 
-from ..choices import ContactTypeChoices
-from ..models import User
 from .factories import UserFactory
 
 

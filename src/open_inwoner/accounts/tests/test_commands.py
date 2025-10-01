@@ -3,9 +3,9 @@ from django.test import TestCase
 
 from freezegun import freeze_time
 
+from open_inwoner.accounts.models import Invite
 from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin
 
-from ..models import Invite
 from .factories import InviteFactory, UserFactory
 
 

@@ -7,10 +7,10 @@ from furl import furl
 from privates.test import temp_private_root
 from webtest import Upload
 
+from open_inwoner.accounts.models import Message
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.utils.tests.helpers import create_image_bytes
 
-from ..models import Message
 from .factories import DocumentFactory, UserFactory
 
 

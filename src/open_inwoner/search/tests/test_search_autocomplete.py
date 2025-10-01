@@ -1,8 +1,8 @@
 from django.test import TestCase, tag
 
 from open_inwoner.pdc.tests.factories import ProductFactory
+from open_inwoner.search.searches import search_autocomplete
 
-from ..searches import search_autocomplete
 from .utils import ESMixin
 
 

@@ -7,6 +7,11 @@ from django_setup_configuration.exceptions import ConfigurationRunFailed
 from django_setup_configuration.test_utils import execute_single_step
 from zgw_consumers.constants import APITypes
 
+from open_inwoner.configurations.bootstrap.openklant import (
+    ESuiteKlantConfigurationStep,
+    KlantenSysteemConfigurationStep,
+    OpenKlant2ConfigurationStep,
+)
 from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.models import (
     ESuiteKlantConfig,
@@ -14,12 +19,6 @@ from open_inwoner.openklant.models import (
     OpenKlant2Config,
 )
 from open_inwoner.openzaak.tests.factories import ServiceFactory
-
-from ...bootstrap.openklant import (
-    ESuiteKlantConfigurationStep,
-    KlantenSysteemConfigurationStep,
-    OpenKlant2ConfigurationStep,
-)
 
 KLANTEN_SERVICE_API_ROOT = "https://openklant.local/klanten/api/v1/"
 CONTACTMOMENTEN_SERVICE_API_ROOT = "https://openklant.local/contactmomenten/api/v1/"

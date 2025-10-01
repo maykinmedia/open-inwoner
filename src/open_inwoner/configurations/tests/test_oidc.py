@@ -6,10 +6,9 @@ from maykin_2fa.test import disable_admin_mfa
 from mozilla_django_oidc_db.models import OpenIDConnectConfig
 
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.configurations.choices import OpenIDDisplayChoices
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.utils.test import ClearCachesMixin
-
-from ..choices import OpenIDDisplayChoices
 
 
 @disable_admin_mfa()

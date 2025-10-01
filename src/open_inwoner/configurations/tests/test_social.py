@@ -3,8 +3,8 @@ from django.urls import reverse
 
 from pyquery import PyQuery
 
-from ...pdc.tests.factories import ProductFactory
-from ..models import SiteConfiguration
+from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.pdc.tests.factories import ProductFactory
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")

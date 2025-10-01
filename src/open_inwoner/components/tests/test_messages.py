@@ -4,9 +4,10 @@ from django.utils import timezone
 
 from freezegun import freeze_time
 
-from ...accounts.forms import InboxForm
-from ...accounts.models import Message
-from ...accounts.tests.factories import MessageFactory, UserFactory
+from open_inwoner.accounts.forms import InboxForm
+from open_inwoner.accounts.models import Message
+from open_inwoner.accounts.tests.factories import MessageFactory, UserFactory
+
 from .abstract import InclusionTagWebTest
 
 

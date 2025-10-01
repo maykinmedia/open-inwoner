@@ -16,8 +16,8 @@ from pyquery import PyQuery
 from webtest import Upload
 
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.openzaak.api_models import ResultaatType
 
-from ..api_models import ResultaatType
 from .factories import (
     CatalogusConfigFactory,
     ServiceFactory,

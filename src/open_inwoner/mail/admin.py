@@ -6,7 +6,7 @@ from django_yubin.admin import (
 )
 from django_yubin.models import Log as YubinLog, Message as YubinMessage
 
-from ..utils.admin import ReadOnlyAdminMixin
+from open_inwoner.utils.admin import ReadOnlyAdminMixin
 
 
 class LogReadOnlyAdmin(ReadOnlyAdminMixin, YubinLogAdmin):

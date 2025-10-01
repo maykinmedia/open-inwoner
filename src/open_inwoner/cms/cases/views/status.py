@@ -31,6 +31,7 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 from zgw_consumers.api_models.constants import RolOmschrijving
 
 from open_inwoner.accounts.models import User
+from open_inwoner.cms.cases.forms import CaseContactForm, CaseUploadForm
 from open_inwoner.mail.service import send_contact_confirmation_mail
 from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.models import (
@@ -64,7 +65,6 @@ from open_inwoner.utils.glom import glom_multiple
 from open_inwoner.utils.time import has_new_elements
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
-from ..forms import CaseContactForm, CaseUploadForm
 from .mixins import CaseAccessMixin, CaseLogMixin, OuterCaseAccessMixin
 
 logger = logging.getLogger(__name__)

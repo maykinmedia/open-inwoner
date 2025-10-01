@@ -13,11 +13,10 @@ from django.views.generic.edit import FormView
 from mail_editor.helpers import find_template
 from view_breadcrumbs import BaseBreadcrumbMixin
 
+from open_inwoner.accounts.forms import ContactCreateForm, ContactFilterForm
+from open_inwoner.accounts.models import Invite, User
 from open_inwoner.cms.utils.page_display import inbox_page_is_published
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
-
-from ..forms import ContactCreateForm, ContactFilterForm
-from ..models import Invite, User
 
 
 class ContactListView(

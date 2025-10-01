@@ -25,6 +25,7 @@ from privates.storages import PrivateMediaFileSystemStorage
 from timeline_logger.models import TimelineLog
 
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.plans.models import PlanContact
 from open_inwoner.utils.hash import create_sha256_hash
 from open_inwoner.utils.validators import (
     CharFieldValidator,
@@ -33,7 +34,6 @@ from open_inwoner.utils.validators import (
     validate_vestiging,
 )
 
-from ..plans.models import PlanContact
 from .choices import (
     ContactTypeChoices,
     LoginTypeChoices,
@@ -607,12 +607,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.login_type == LoginTypeChoices.eherkenning
 
     def has_group_managed_categories(self) -> bool:
-        from ..pdc.models import Category
+        from open_inwoner.pdc.models import Category
 
         return Category.objects.filter(access_groups__user=self).exists()
 
     def get_group_managed_categories(self):
-        from ..pdc.models import Category
+        from open_inwoner.pdc.models import Category
 
         return Category.objects.filter(access_groups__user=self)
 

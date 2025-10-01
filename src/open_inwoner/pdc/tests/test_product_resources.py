@@ -8,8 +8,9 @@ import tablib
 from freezegun import freeze_time
 from import_export.exceptions import ImportExportError
 
-from ..models import Product
-from ..resources import ProductExportResource, ProductImportResource
+from open_inwoner.pdc.models import Product
+from open_inwoner.pdc.resources import ProductExportResource, ProductImportResource
+
 from .factories import CategoryFactory, ProductFactory
 
 

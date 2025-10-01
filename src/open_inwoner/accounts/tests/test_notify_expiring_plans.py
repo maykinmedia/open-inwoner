@@ -5,12 +5,11 @@ from django.core import mail
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
+from open_inwoner.accounts.tasks import schedule_user_notifications
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.plans.models import Plan
 from open_inwoner.plans.tests.factories import PlanFactory
-
-from ..tasks import schedule_user_notifications
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")

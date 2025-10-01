@@ -19,13 +19,12 @@ from freezegun import freeze_time
 from pyquery import PyQuery
 
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.ssd.client import UitkeringClient
 from open_inwoner.ssd.tests.factories import SSDConfigFactory
 from open_inwoner.ssd.tests.mocks import (
     mock_jaaropgave_response,
     mock_uitkering_response_basic,
 )
-
-from ..client import UitkeringClient
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")

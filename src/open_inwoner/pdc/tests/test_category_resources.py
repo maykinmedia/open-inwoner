@@ -5,8 +5,9 @@ from django.test import TestCase
 import tablib
 from import_export.exceptions import ImportExportError
 
-from ..models import Category
-from ..resources import CategoryExportResource, CategoryImportResource
+from open_inwoner.pdc.models import Category
+from open_inwoner.pdc.resources import CategoryExportResource, CategoryImportResource
+
 from .factories import CategoryFactory
 
 

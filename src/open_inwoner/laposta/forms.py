@@ -8,11 +8,11 @@ from django.utils.translation import gettext_lazy as _
 from ipware import get_client_ip
 from requests.exceptions import RequestException
 
+from open_inwoner.accounts.models import User
 from open_inwoner.laposta.api_models import UserData
 from open_inwoner.laposta.models import LapostaConfig
 from open_inwoner.utils.api import ClientError
 
-from ..accounts.models import User
 from .choices import get_list_choices, get_list_remarks_mapping
 from .client import create_laposta_client
 

@@ -9,9 +9,9 @@ from open_inwoner.accounts.tests.factories import (
     UserFactory,
     eHerkenningUserFactory,
 )
+from open_inwoner.cms.tests import cms_tools
 from open_inwoner.questionnaire.tests.factories import QuestionnaireStepFactory
 
-from ...cms.tests import cms_tools
 from .factories import CategoryFactory
 
 PATCHED_MIDDLEWARE = [

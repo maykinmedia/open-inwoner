@@ -8,7 +8,8 @@ class UtilsConfig(AppConfig):
         from django.apps import registry
 
         # force the task autodiscovery
-        from ..celery import app
+        from open_inwoner.celery import app
+
         from . import checks  # noqa
         from .signals import copy_log_entry_to_timeline_logger  # noqa
 

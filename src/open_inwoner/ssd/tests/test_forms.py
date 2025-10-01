@@ -7,7 +7,8 @@ from unittest.mock import patch
 
 from freezegun import freeze_time
 
-from ..forms import get_monthly_report_dates, get_yearly_report_dates
+from open_inwoner.ssd.forms import get_monthly_report_dates, get_yearly_report_dates
+
 from .factories import SSDConfigFactory
 
 

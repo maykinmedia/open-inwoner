@@ -15,7 +15,8 @@ from digid_eherkenning.oidc.models import BaseConfig
 from digid_eherkenning.oidc.views import OIDCAuthenticationCallbackView
 from mozilla_django_oidc_db.views import _OIDC_ERROR_SESSION_KEY, OIDCInit
 
-from ..models import OpenIDDigiDConfig, OpenIDEHerkenningConfig
+from open_inwoner.accounts.models import OpenIDDigiDConfig, OpenIDEHerkenningConfig
+
 from .auth import BlockEenmanszaakLoginMixin
 
 logger = logging.getLogger(__name__)

@@ -7,9 +7,9 @@ from open_inwoner.pdc.tests.factories import (
     TagFactory,
 )
 from open_inwoner.search.constants import FacetChoices
+from open_inwoner.search.results import FacetBucket
 from open_inwoner.search.views import multi_search
 
-from ..results import FacetBucket
 from .utils import ESMixin
 
 

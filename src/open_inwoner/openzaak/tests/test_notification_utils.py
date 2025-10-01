@@ -10,6 +10,7 @@ from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 
 from open_inwoner.accounts.tests.factories import DigidUserFactory, UserFactory
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.openzaak.api_models import Status, StatusType, Zaak, ZaakType
 from open_inwoner.openzaak.notifications import (
     _get_initiator_users_from_roles,
     _get_np_initiator_bsns_from_roles,
@@ -18,7 +19,6 @@ from open_inwoner.openzaak.notifications import (
 from open_inwoner.openzaak.tests.factories import ZGWApiGroupConfigFactory, generate_rol
 from open_inwoner.openzaak.tests.shared import ZAKEN_ROOT
 
-from ..api_models import Status, StatusType, Zaak, ZaakType
 from .test_notification_data import MockAPIData
 
 

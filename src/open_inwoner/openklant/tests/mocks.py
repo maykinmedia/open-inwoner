@@ -1,8 +1,8 @@
 import uuid
 from datetime import datetime
 
-from ..constants import KlantenServiceType
-from ..services import OpenKlant2Question
+from open_inwoner.openklant.constants import KlantenServiceType
+from open_inwoner.openklant.services import OpenKlant2Question
 
 
 class MockOpenKlant2Service:

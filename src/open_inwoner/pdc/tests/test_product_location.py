@@ -10,8 +10,8 @@ from django_webtest import WebTest
 from maykin_2fa.test import disable_admin_mfa
 
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.pdc.models import ProductLocation
 
-from ..models import ProductLocation
 from .factories import ProductFactory, ProductLocationFactory
 
 

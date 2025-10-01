@@ -1,6 +1,7 @@
 from django.test import TestCase
 
-from ..models import Message
+from open_inwoner.accounts.models import Message
+
 from .factories import MessageFactory, UserFactory
 
 

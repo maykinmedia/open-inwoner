@@ -8,8 +8,8 @@ from ape_pie.client import APIClient
 from requests.exceptions import RequestException
 
 from open_inwoner.utils.api import ClientError, get_json_response
+from open_inwoner.utils.decorators import cache as cache_result
 
-from ..utils.decorators import cache as cache_result
 from .api_models import LapostaList, Member, UserData
 from .models import LapostaConfig
 

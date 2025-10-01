@@ -1,7 +1,7 @@
 from import_export import fields, resources
 from import_export.widgets import SimpleArrayWidget
 
-from ..models import Synonym
+from open_inwoner.search.models import Synonym
 
 
 class SynonymResource(resources.ModelResource):

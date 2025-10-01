@@ -13,18 +13,22 @@ from django.views.generic import TemplateView, UpdateView
 from django_registration.backends.one_step.views import RegistrationView
 from furl import furl
 
+from open_inwoner.accounts.forms import CustomRegistrationForm, NecessaryUserForm
+from open_inwoner.accounts.models import (
+    Invite,
+    OpenIDDigiDConfig,
+    OpenIDEHerkenningConfig,
+    User,
+)
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.mail.verification import send_user_email_verification_mail
 from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.models import KlantenSysteemConfig
 from open_inwoner.openklant.services import OpenKlant2Service, eSuiteKlantenService
 from open_inwoner.openklant.types import PartijUpdateData
 from open_inwoner.utils.text import html_tag_wrap_format
+from open_inwoner.utils.url import get_next_url_from
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
-
-from ...mail.verification import send_user_email_verification_mail
-from ...utils.url import get_next_url_from
-from ..forms import CustomRegistrationForm, NecessaryUserForm
-from ..models import Invite, OpenIDDigiDConfig, OpenIDEHerkenningConfig, User
 
 logger = logging.getLogger(__name__)
 

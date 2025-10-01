@@ -3,8 +3,7 @@ from unittest.mock import Mock, patch
 from django.test import TestCase
 
 from open_inwoner.celery import app as celery_app
-
-from ..tasks import rebuild_search_index
+from open_inwoner.search.tasks import rebuild_search_index
 
 
 class SearchTaskTest(TestCase):

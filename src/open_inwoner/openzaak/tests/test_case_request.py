@@ -3,9 +3,9 @@ from django.test import TestCase
 import requests_mock
 
 from open_inwoner.openzaak.clients import build_zaken_clients
+from open_inwoner.openzaak.models import OpenZaakConfig
+from open_inwoner.utils.test import ClearCachesMixin
 
-from ...utils.test import ClearCachesMixin
-from ..models import OpenZaakConfig
 from .factories import ZGWApiGroupConfigFactory
 from .helpers import generate_oas_component_cached
 from .shared import ZAKEN_ROOT

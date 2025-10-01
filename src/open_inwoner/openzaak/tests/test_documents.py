@@ -22,9 +22,9 @@ from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.cms.cases.views.status import SimpleFile
 from open_inwoner.openzaak.clients import build_documenten_clients, build_zaken_clients
+from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
-from ..models import OpenZaakConfig
 from .factories import (
     CertificateFactory,
     ZaakTypeConfigFactory,

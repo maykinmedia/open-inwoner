@@ -1,4 +1,4 @@
-from ..utils import config
+from open_inwoner.conf.utils import config
 
 SETUP_CONFIGURATION_STEPS = [
     "mozilla_django_oidc_db.setup_configuration.steps.AdminOIDCConfigurationStep",

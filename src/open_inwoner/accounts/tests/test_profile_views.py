@@ -15,33 +15,37 @@ from freezegun import freeze_time
 from pyquery import PyQuery
 from webtest import Upload
 
-from open_inwoner.accounts.choices import NotificationChannelChoice, StatusChoices
+from open_inwoner.accounts.choices import (
+    ContactTypeChoices,
+    LoginTypeChoices,
+    NotificationChannelChoice,
+    StatusChoices,
+)
+from open_inwoner.accounts.forms import BrpUserForm, UserForm
+from open_inwoner.accounts.models import User
+from open_inwoner.cms.cases.cms_apps import CasesApphook
+from open_inwoner.cms.collaborate.cms_apps import CollaborateApphook
+from open_inwoner.cms.inbox.cms_apps import InboxApphook
 from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
+from open_inwoner.cms.profile.cms_apps import ProfileApphook
+from open_inwoner.cms.tests import cms_tools
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.haalcentraal.api_models import BRPData
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.laposta.models import LapostaConfig
 from open_inwoner.laposta.tests.factories import LapostaListFactory, MemberFactory
 from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.models import ESuiteKlantConfig
+from open_inwoner.openklant.tests.data import MockAPIReadPatchData
 from open_inwoner.pdc.tests.factories import CategoryFactory
 from open_inwoner.plans.tests.factories import PlanFactory
 from open_inwoner.qmatic.tests.data import QmaticMockData
+from open_inwoner.questionnaire.tests.factories import QuestionnaireStepFactory
 from open_inwoner.utils.forms import ErrorMessageMixin
 from open_inwoner.utils.logentry import LOG_ACTIONS
 from open_inwoner.utils.test import ClearCachesMixin
 from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin, create_image_bytes
 
-from ...cms.cases.cms_apps import CasesApphook
-from ...cms.collaborate.cms_apps import CollaborateApphook
-from ...cms.inbox.cms_apps import InboxApphook
-from ...cms.profile.cms_apps import ProfileApphook
-from ...cms.tests import cms_tools
-from ...haalcentraal.api_models import BRPData
-from ...openklant.tests.data import MockAPIReadPatchData
-from ...questionnaire.tests.factories import QuestionnaireStepFactory
-from ..choices import ContactTypeChoices, LoginTypeChoices
-from ..forms import BrpUserForm, UserForm
-from ..models import User
 from .factories import (
     ActionFactory,
     DigidUserFactory,

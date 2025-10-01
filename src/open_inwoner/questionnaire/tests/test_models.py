@@ -2,7 +2,8 @@ from django.db import IntegrityError
 from django.test import TestCase, override_settings
 from django.utils.translation import gettext as _
 
-from ..models import QuestionnaireStep
+from open_inwoner.questionnaire.models import QuestionnaireStep
+
 from .factories import QuestionnaireStepFactory, QuestionnaireStepFileFactory
 
 

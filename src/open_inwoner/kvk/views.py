@@ -11,9 +11,9 @@ from furl import furl
 
 from open_inwoner.accounts.eherkenning_session import EHerkenningSessionContext
 from open_inwoner.accounts.models import User
+from open_inwoner.utils.url import get_next_url_from
 from open_inwoner.utils.views import LogMixin
 
-from ..utils.url import get_next_url_from
 from .client import KvKClient
 from .exceptions import KVKAPIException
 from .forms import CompanyBranchChoiceForm

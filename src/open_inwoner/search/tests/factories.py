@@ -1,8 +1,7 @@
 import factory
 
 from open_inwoner.accounts.tests.factories import UserFactory
-
-from ..models import Feedback, Synonym
+from open_inwoner.search.models import Feedback, Synonym
 
 
 class SynonymFactory(factory.django.DjangoModelFactory):

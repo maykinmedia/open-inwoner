@@ -4,12 +4,13 @@ from unittest.mock import patch
 
 from pyquery import PyQuery
 
-from ..client import UitkeringClient
-from ..models import SSDConfig
-from ..service.uitkering import (
+from open_inwoner.ssd.client import UitkeringClient
+from open_inwoner.ssd.models import SSDConfig
+from open_inwoner.ssd.service.uitkering import (
     UitkeringsSpecificatieInfoResponse as UitkeringInfoResponse,
 )
-from ..xml import get_uitkeringen
+from open_inwoner.ssd.xml import get_uitkeringen
+
 from .utils import get_total_component_value, mock_get_report_info, render_html
 
 UITKERING_INFO_RESPONSE_NODE = (

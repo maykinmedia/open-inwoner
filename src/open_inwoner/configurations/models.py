@@ -15,11 +15,15 @@ from filer.fields.image import FilerImageField
 from ordered_model.models import OrderedModel, OrderedModelManager
 from solo.models import SingletonModel
 
-from ..utils.colors import hex_to_hsl
-from ..utils.css import clean_stylesheet
-from ..utils.fields import CSSField
-from ..utils.files import OverwriteStorage
-from ..utils.validators import DutchPhoneNumberValidator, FilerExactImageSizeValidator
+from open_inwoner.utils.colors import hex_to_hsl
+from open_inwoner.utils.css import clean_stylesheet
+from open_inwoner.utils.fields import CSSField
+from open_inwoner.utils.files import OverwriteStorage
+from open_inwoner.utils.validators import (
+    DutchPhoneNumberValidator,
+    FilerExactImageSizeValidator,
+)
+
 from .choices import ColorTypeChoices, CustomFontName, OpenIDDisplayChoices
 from .validators import validate_javascript_file, validate_oidc_config
 

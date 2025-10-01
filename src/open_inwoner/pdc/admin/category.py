@@ -14,10 +14,10 @@ from treebeard.forms import movenodeform_factory
 
 from open_inwoner.ckeditor5.widgets import CKEditorWidget
 from open_inwoner.openzaak.models import OpenZaakConfig, ZaakTypeConfig
+from open_inwoner.pdc.models import Category, CategoryProduct
+from open_inwoner.pdc.resources import CategoryExportResource, CategoryImportResource
 from open_inwoner.utils.logentry import system_action
 
-from ..models import Category, CategoryProduct
-from ..resources import CategoryExportResource, CategoryImportResource
 from .faq import QuestionInline
 
 

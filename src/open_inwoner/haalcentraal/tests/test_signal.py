@@ -9,10 +9,10 @@ from timeline_logger.models import TimelineLog
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.haalcentraal.models import HaalCentraalConfig
+from open_inwoner.utils.test import ClearCachesMixin
 from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin
 
-from ...utils.test import ClearCachesMixin
-from ..models import HaalCentraalConfig
 from .factories import ServiceFactory
 from .mixins import HaalCentraalMixin
 

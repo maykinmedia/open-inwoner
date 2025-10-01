@@ -1,9 +1,8 @@
 import factory
 
 from open_inwoner.soap.tests.factories import SoapServiceFactory
-
-from ..client import SSDBaseClient
-from ..models import SSDConfig
+from open_inwoner.ssd.client import SSDBaseClient
+from open_inwoner.ssd.models import SSDConfig
 
 
 class SSDConfigFactory(factory.django.DjangoModelFactory):

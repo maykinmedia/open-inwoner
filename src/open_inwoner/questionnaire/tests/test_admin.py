@@ -6,9 +6,8 @@ from maykin_2fa.test import disable_admin_mfa
 
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.pdc.tests.factories import ProductFactory
+from open_inwoner.questionnaire.models import QuestionnaireStep
 from open_inwoner.questionnaire.tests.factories import QuestionnaireStepFactory
-
-from ..models import QuestionnaireStep
 
 
 @disable_admin_mfa()

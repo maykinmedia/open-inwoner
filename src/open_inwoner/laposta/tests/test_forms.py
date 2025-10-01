@@ -8,10 +8,10 @@ import requests_mock
 
 from open_inwoner.accounts.tests.factories import DigidUserFactory
 from open_inwoner.cms.tests.cms_tools import get_request
+from open_inwoner.laposta.forms import NewsletterSubscriptionForm
+from open_inwoner.laposta.models import LapostaConfig
 from open_inwoner.utils.test import ClearCachesMixin
 
-from ..forms import NewsletterSubscriptionForm
-from ..models import LapostaConfig
 from .factories import LapostaListFactory, MemberFactory
 
 LAPOSTA_API_ROOT = "https://laposta.local/api/v2/"

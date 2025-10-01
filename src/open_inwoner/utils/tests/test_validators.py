@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils.translation import gettext as _
 
-from ..validators import (
+from open_inwoner.utils.validators import (
     DutchPhoneNumberValidator,
     format_phone_number,
     validate_array_contents_non_empty,

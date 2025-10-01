@@ -5,8 +5,9 @@ from django.test import TestCase
 
 import tablib
 
-from ..models import Synonym
-from ..resources import SynonymResource
+from open_inwoner.search.models import Synonym
+from open_inwoner.search.resources import SynonymResource
+
 from .factories import SynonymFactory
 
 
