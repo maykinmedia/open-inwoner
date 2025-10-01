@@ -26,6 +26,7 @@ Onderhoud
   bijgewerkt om :cve:`CVE-2025-7783` te mitigeren.
 * [:taiga-is:`3466`, :pr:`1922`]: De bitnami images in CI en docker-compose zijn
   vervangen met de officiële Elasticsearch images.
+* [:pr:`1951`] ``django`` bijgewerkt naar versie ``4.2.25``.
 
 1.34.0 (2025-09-03)
 ===================
