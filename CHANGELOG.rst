@@ -1,6 +1,8 @@
 1.34.1 (2025-10-02)
 ===================
 
+Voor een volledig overzicht van alle commits, zie :release:`v1.34.1`.
+
 Bugfixes
 --------
 
