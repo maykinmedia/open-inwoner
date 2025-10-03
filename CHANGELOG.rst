@@ -142,6 +142,46 @@ Onderhoud
 * [:pr:`1907`, :pr:`1915`, :cve:`CVE-2025-7783`]: ``inline-css`` verwijderd en ``form-data`` override
   bijgewerkt om :cve:`CVE-2025-7783` te mitigeren.
 
+1.34.1 (2025-10-02)
+===================
+
+Voor een volledig overzicht van alle commits, zie :release:`v1.34.1`.
+
+Bugfixes
+--------
+
+* [:taiga-is:`3377`,  :pr:`1917`]: De ``static/bundles/images`` map wordt nu correct
+  opgebouwd in de Docker container, waardoor o.m. `marker-icon.png` bestanden correct
+  ontsloten worden.
+* [:taiga-is:`3480`, :pr:`1934`]: De paginering van de contactmomenten lijstweergave
+  ontbrak, maar is nu toegevoegd.
+* [:taiga-is:`3483`,  :pr:`1937`]: Typo's in BRP API request headers verholpen
+  (``x-requets-*`` naar ``x-requests-*``).
+* [:taiga-is:`3477`: :pr:`1935`]: Wanneer er geen CMS-pagina's zijn en het menu leeg is,
+  dan wordt de zijnavigatie nu onzichtbaar, zodat de rest van de inhoud niet meer te smal
+  wordt weergegeven.
+* [:taiga-is:`3479`: :pr:`1940`]: Ongepubliceerde CMS pagina's worden niet meer
+  weergegeven in de zijnavigatie.
+* [:taiga-is:`3486`: :pr:`1946`]: Menu-items op pagina 'Mijn Zaken' worden niet langer
+  dubbel getoond in de sidebar en het dropdownmenu.
+* [:taiga-is:`3445`, :pr:`1898`]: De sjabloontag field_as_widget ging er onterecht
+  vanuit dat het primaire argument een formulierveld was en veroorzaakte daardoor
+  sporadisch fouten.
+* [:taiga-is:`3466`, :pr:`1922`]: De bitnami images in CI en docker-compose zijn
+  vervangen met de officiële Elasticsearch images.
+* [:taiga-ta:`3460`, :taiga-us:`3449`, :pr:`1904`]: Het indienen van lege tekstwaarden
+  tijdens het bijwerken van het profiel, wat leidde tot fouten in eSuite klant, is
+  opgelost.
+
+Onderhoud
+---------
+
+* [:pr:`1907`, :pr:`1915`, :cve:`CVE-2025-7783`]: ``inline-css`` verwijderd en ``form-data`` override
+  bijgewerkt om :cve:`CVE-2025-7783` te mitigeren.
+* [:taiga-is:`3466`, :pr:`1922`]: De bitnami images in CI en docker-compose zijn
+  vervangen met de officiële Elasticsearch images.
+* [:pr:`1951`] ``django`` bijgewerkt naar versie ``4.2.25``.
+
 1.34.0 (2025-09-03)
 ===================
 
