@@ -1,3 +1,12 @@
+1.34.3 (2025-10-28)
+===================
+
+Bugfixes
+--------
+
+* [:taiga-is:`3494`: :pr:`1955`]: Verhelpen bug waardoor er sporadisch errors werden
+  getoond tijdens het zoeken naar zaken via de algemene zoek-functie.
+
 1.34.2 (2025-10-07)
 ===================
 
