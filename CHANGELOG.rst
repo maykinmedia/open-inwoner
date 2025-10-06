@@ -45,6 +45,8 @@ Bugfixes
   niet was geconfigureerd.
 * [:taiga-is:`3479`: :pr:`1940`]: Ongepubliceerde CMS pagina's worden niet meer
   weergegeven in de zijnavigatie.
+* [:taiga-is:`3493`: :pr:`1954`]: Paginering op contactmomenten lijst wordt nu correct
+  weergegeven.
 
 Onderhoud
 ---------
