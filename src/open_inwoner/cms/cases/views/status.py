@@ -63,7 +63,7 @@ from open_inwoner.openzaak.utils import get_role_name_display, is_info_object_vi
 from open_inwoner.userfeed import hooks
 from open_inwoner.utils.glom import glom_multiple
 from open_inwoner.utils.time import has_new_elements
-from open_inwoner.utils.views import CommonPageMixin, LogMixin
+from open_inwoner.utils.views import CommonPageMixin
 
 from .mixins import CaseAccessMixin, CaseLogMixin, OuterCaseAccessMixin
 
@@ -208,7 +208,7 @@ class InnerCaseDetailView(
 
         # case is retrieved via CaseAccessMixin
         if self.case:
-            self.log_access_case_detail(self.case)
+            self.log_case_detail_accessed(self.case)
 
             openzaak_config = OpenZaakConfig.get_solo()
 
@@ -771,7 +771,7 @@ class InnerCaseDetailView(
         return anchors
 
 
-class CaseDocumentDownloadView(LogMixin, CaseAccessMixin, View):
+class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
     def get(self, request, *args, **kwargs):
         if not self.case:
             raise Http404
@@ -809,13 +809,7 @@ class CaseDocumentDownloadView(LogMixin, CaseAccessMixin, View):
         if not content_stream:
             raise Http404
 
-        self.log_user_action(
-            self.request.user,
-            _("Document van zaak gedownload {case}: {filename}").format(
-                case=self.case.identificatie,
-                filename=info_object.bestandsnaam,
-            ),
-        )
+        self.log_case_document_downloaded(self.case, info_object.bestandsnaam)
 
         headers = {
             "Content-Disposition": f'attachment; filename="{info_object.bestandsnaam}"',
@@ -830,7 +824,7 @@ class CaseDocumentDownloadView(LogMixin, CaseAccessMixin, View):
         raise PermissionDenied()
 
 
-class CaseDocumentUploadFormView(CaseAccessMixin, LogMixin, FormView):
+class CaseDocumentUploadFormView(CaseAccessMixin, CaseLogMixin, FormView):
     template_name = "pages/cases/document_form.html"
     form_class = CaseUploadForm
 
@@ -894,13 +888,7 @@ class CaseDocumentUploadFormView(CaseAccessMixin, LogMixin, FormView):
             if not created_relationship:
                 return self.handle_document_error(request, file)
 
-            self.log_user_action(
-                request.user,
-                _("Document was uploaded for {case}: {filename}").format(
-                    case=self.case.identificatie,
-                    filename=file.name,
-                ),
-            )
+            self.log_case_document_uploaded(self.case, file.name)
             created_documents.append(created_document)
 
         success_message = (
@@ -952,7 +940,7 @@ class CaseDocumentUploadFormView(CaseAccessMixin, LogMixin, FormView):
         return context
 
 
-class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
+class CaseContactFormView(CaseAccessMixin, CaseLogMixin, FormView):
     template_name = "pages/cases/contact_form.html"
     form_class = CaseContactForm
 
@@ -1037,17 +1025,8 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
 
         success = template.send_email([recipient_email], context)
 
-        if success:
-            self.log_system_action(
-                "registered contactmoment by email", user=self.request.user
-            )
-            return True
-        else:
-            self.log_system_action(
-                "error while registering contactmoment by email",
-                user=self.request.user,
-            )
-            return False
+        self.log_contactmoment_for_zaak_registered_by_email(success)
+        return bool(success)
 
     def register_by_api(self, form, api_group: ZGWApiGroupConfig):
         if not api_group.klant_backend:
@@ -1107,20 +1086,6 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
             klant, created = service.get_or_create_klant(
                 fetch_params=fetch_params, user=user
             )
-            if not klant:
-                self.log_system_action(
-                    "could not create klant for user", user=self.request.user
-                )
-            else:
-                if created:
-                    self.log_system_action(
-                        (
-                            "created klant for basic authenticated user"
-                            if created
-                            else "retrieved klant for user"
-                        ),
-                        user=self.request.user,
-                    )
 
         # create contact moment
         question = form.cleaned_data["question"]
@@ -1141,11 +1106,9 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
             logger.error("Failed to build eSuiteVragenService")
             return
 
-        contactmoment = service.create_contactmoment(data, klant=klant)
-
-        if not contactmoment:
-            self.log_system_action(
-                "error while registering contactmoment by API", user=self.request.user
+        if not (contactmoment := service.create_contactmoment(data, klant=klant)):
+            self.log_contactmoment_for_zaak_registered_by_api(
+                contactmoment_success=False
             )
             messages.error(
                 request=self.request,
@@ -1153,21 +1116,13 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
             )
             return False
 
-        self.log_system_action(
-            "registered contactmoment by API", user=self.request.user
-        )
         objectcontactmoment = service.create_objectcontactmoment(
             contactmoment, self.case
         )
-        if objectcontactmoment:
-            self.log_system_action(
-                "registered objectcontactmoment by API", user=self.request.user
-            )
-        else:
-            self.log_system_action(
-                "error while registering objectcontactmoment by API",
-                user=self.request.user,
-            )
+        self.log_contactmoment_for_zaak_registered_by_api(
+            contactmoment_success=True,
+            objectcontactmoment_success=bool(objectcontactmoment),
+        )
 
         # We'll mark this call as successful if the cotactmoment is created, independent of
         # whether we've successfully associated the contactmoment with the case, because we

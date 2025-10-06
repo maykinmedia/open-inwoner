@@ -117,10 +117,10 @@ class InnerCaseListView(
         context["cases"] = case_dicts
         context.update(paginator_dict)
 
-        self.log_access_cases(case_dicts)
-
         # other data
         context["hxget"] = reverse("cases:cases_content")
         context["title_text"] = config.title_text
+
+        self.log_case_list_accessed(case_dicts)
 
         return context
