@@ -97,7 +97,7 @@ class ContactMomentViewsTestCase(
         list_url = reverse("cases:contactmoment_list")
         response = self.app.get(list_url, user=data.user)
 
-        kcms = response.context["questions"]
+        kcms = response.context["page_obj"].object_list
         cm_data = data.contactmoment
 
         self.assertEqual(len(kcms), 2)
@@ -148,6 +148,32 @@ class ContactMomentViewsTestCase(
         self.assertIn(f"{_('Status')}\n{_('Afgehandeld')}", status_item.text())
         self.assertNotIn(_("Nieuw antwoord beschikbaar"), response.text)
 
+    def test_contactmoment_list_pagination(
+        self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
+    ):
+        data = MockAPIReadData().install_mocks(m)
+        list_url = reverse("cases:contactmoment_list")
+
+        with patch(
+            "open_inwoner.accounts.views.contactmoments.KlantContactMomentListView.paginate_by",
+            1,
+        ):
+            # Test first page (default)
+            response = self.app.get(list_url, user=data.user)
+            kcms = response.context["page_obj"].object_list
+
+            self.assertEqual(len(kcms), 1)
+            self.assertEqual(kcms[0]["identification"], "openklant2_identification")
+
+            # Test second page
+            response = self.app.get(list_url, {"page": "2"}, user=data.user)
+            kcms = response.context["page_obj"].object_list
+
+            self.assertEqual(len(kcms), 1)
+            self.assertEqual(
+                kcms[0]["identification"], data.contactmoment["identificatie"]
+            )
+
     @freeze_time("2022-01-01")
     def test_contactmoment_list_bsn_new_answer_available(
         self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
@@ -184,7 +210,7 @@ class ContactMomentViewsTestCase(
         list_url = reverse("cases:contactmoment_list")
         response = self.app.get(list_url, user=data.user)
 
-        kcms = response.context["questions"]
+        kcms = response.context["page_obj"].object_list
         cm_data = data.contactmoment
 
         self.assertEqual(len(kcms), 2)
@@ -267,7 +293,7 @@ class ContactMomentViewsTestCase(
                 list_url = reverse("cases:contactmoment_list")
                 response = self.app.get(list_url, user=data.eherkenning_user)
 
-                kcms = response.context["questions"]
+                kcms = response.context["page_obj"].object_list
                 cm_data = data.contactmoment2
 
                 self.assertEqual(len(kcms), 2)
@@ -339,7 +365,7 @@ class ContactMomentViewsTestCase(
 
                 response = self.client.get(list_url)
 
-                kcms = response.context["questions"]
+                kcms = response.context["page_obj"].object_list
                 cm_data = data.contactmoment_vestiging
 
                 self.assertEqual(len(kcms), 2)
@@ -628,7 +654,7 @@ class ContactMomentViewsTestCase(
         list_url = reverse("cases:contactmoment_list")
         response = self.app.get(list_url, user=data.user)
 
-        kcms = response.context["questions"]
+        kcms = response.context["page_obj"].object_list
         cm_data = data.contactmoment
 
         self.assertEqual(len(kcms), 2)
@@ -692,7 +718,7 @@ class ContactMomentViewsTestCase(
         list_url = reverse("cases:contactmoment_list")
         response = self.app.get(list_url, user=data.user)
 
-        kcms = response.context["questions"]
+        kcms = response.context["page_obj"].object_list
         cm_data = data.contactmoment
 
         self.assertEqual(len(kcms), 2)

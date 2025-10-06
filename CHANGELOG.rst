@@ -1,3 +1,13 @@
+1.34.2 (2025-10-07)
+===================
+
+Voor een volledig overzicht van alle commits, zie :release:`v1.34.2`.
+
+Bugfixes
+--------
+* [:taiga-is:`3493`: :pr:`1954`]: Paginering op contactmomenten lijst wordt nu correct
+  weergegeven.
+
 1.34.1 (2025-10-02)
 ===================
 
