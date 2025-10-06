@@ -16,7 +16,7 @@
 {% endblock %}
 
 {% block content %}
-    <h1 class="utrecht-heading-1" id="contactmomenten">{{ page_title }} ({{ questions|length }})</h1>
+    <h1 class="utrecht-heading-1" id="contactmomenten">{{ page_title }} ({{ paginator.count }})</h1>
 
     {% if contactmoment_contact_form_enabled %}
     {# title + scroll down button #}
@@ -40,14 +40,14 @@
 
     {# grid with Question objects #}
     <div class="contactmomenten">
-        {% if questions %}
+        {% if paginator.count %}
             <h2 class="contactmomenten__title">{% trans "Eerder gestelde vragen" %}</h2>
         {% else %}
             <p class="utrecht-paragraph"><strong>{% trans "U heeft op dit moment nog geen vragen." %}</strong></p>
         {% endif %}
 
         {% render_grid %}
-            {% for question in questions %}
+            {% for question in page_obj.object_list %}
                 {% render_column start=forloop.counter_0|multiply:4 span=4 %}
                 <div class="card card--compact card--stretch">
                     {% if question.new_answer_available %}
@@ -81,9 +81,7 @@
         {% endrender_grid %}
     </div>
 
-    {% if questions %}
-        {% pagination page_obj=page_obj paginator=paginator request=request %}
-    {% endif %}
+    {% pagination page_obj=page_obj paginator=paginator request=request %}
 
     {% if contactmoment_contact_form_enabled %}
     <section class="contactmomenten contactmomenten__contact-form" data-testid="contactmomenten__contact_form">
