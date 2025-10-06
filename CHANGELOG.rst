@@ -30,6 +30,8 @@ Nieuwe features
 Bugfixes
 --------
 
+* [:taiga-is:`3494`: :pr:`1955`]: Verhelpen bug waardoor er sporadisch errors werden
+  getoond tijdens het zoeken naar zaken via de algemene zoek-functie.
 * [:taiga-is:`3486`: :pr:`1946`]: Menu-items op pagina 'Mijn Zaken' worden niet langer
   dubbel getoond in de sidebar en het dropdownmenu.
 * [:taiga-is:`3480`, :pr:`1934`]: De paginering van de contactmomenten lijstweergave
