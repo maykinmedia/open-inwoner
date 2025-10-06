@@ -101,21 +101,21 @@ class SearchView(
                         api_group = ZGWApiGroupConfig.objects.resolve_group_from_hints(
                             client=case_result.client
                         )
-                        zaak = proxy_result.responses[0].result[0]
-                        zaaktype = api_group.catalogi_client.fetch_single_case_type(
-                            zaak.zaaktype
-                        )
-                        zaak.zaaktype = zaaktype
-                        if is_zaak_visible(zaak):
-                            return HttpResponseRedirect(
-                                reverse(
-                                    "cases:case_detail",
-                                    kwargs={
-                                        "object_id": str(zaak.uuid),
-                                        "api_group_id": api_group.id,
-                                    },
-                                )
+                        for zaak in case_result.result:
+                            zaaktype = api_group.catalogi_client.fetch_single_case_type(
+                                zaak.zaaktype
                             )
+                            zaak.zaaktype = zaaktype
+                            if is_zaak_visible(zaak):
+                                return HttpResponseRedirect(
+                                    reverse(
+                                        "cases:case_detail",
+                                        kwargs={
+                                            "object_id": str(zaak.uuid),
+                                            "api_group_id": api_group.id,
+                                        },
+                                    )
+                                )
 
         # perform search
         try:
