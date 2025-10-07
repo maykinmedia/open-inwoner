@@ -724,3 +724,38 @@ class QuestionAnswerTestCase(Openklant2ServiceTestCase):
                         email="test@example.com",
                         phonenumber="0612345678",
                     )
+
+    def test_questions_for_partij_ignores_anonymous_questions(self):
+        # Create a question for a partij
+        partij_question = self.service.create_question_for_partij(
+            self.een_persoon["uuid"],
+            question="A question from Alice",
+            subject="Alice's question",
+        )
+
+        # Create an anonymous question (betrokkene without wasPartij)
+        anonymous_question = self.service.create_question_with_betrokkene(
+            question="An anonymous question",
+            subject="Anonymous inquiry",
+            first_name="Anonymous",
+            last_name="User",
+            email="anon@example.com",
+            phonenumber="0612345678",
+        )
+
+        # Get questions for the partij - should only return partij's question, not anonymous
+        questions = self.service.questions_for_partij(self.een_persoon["uuid"])
+
+        self.assertEqual(
+            len(questions), 1, msg="Only the partij's question should be returned"
+        )
+        self.assertEqual(
+            questions[0].question_kcm_uuid,
+            partij_question.question_kcm_uuid,
+            msg="The returned question should be the partij's question",
+        )
+        self.assertNotEqual(
+            questions[0].question_kcm_uuid,
+            anonymous_question.question_kcm_uuid,
+            msg="Anonymous questions should be filtered out",
+        )
