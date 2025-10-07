@@ -533,7 +533,6 @@ class QuestionAnswerTestCase(Openklant2ServiceTestCase):
         question = self.service.create_question_for_zaak(
             self.een_persoon["uuid"],
             question="A question asked by Morice",
-            subject="Important question",
             zaak=zaak,
         )
 
@@ -569,13 +568,11 @@ class QuestionAnswerTestCase(Openklant2ServiceTestCase):
         question_initiated_by_user = self.service.create_question_for_zaak(
             persoon["uuid"],
             question="A question asked by Morice",
-            subject="Important question",
             zaak=zaak,
         )
         question_initiated_by_another_partij = self.service.create_question_for_zaak(
             self.een_persoon["uuid"],
             question="A question asked by Morice",
-            subject="Important question",
             zaak=zaak,
         )
 
