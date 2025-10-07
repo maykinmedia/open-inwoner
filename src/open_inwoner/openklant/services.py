@@ -1557,11 +1557,12 @@ class OpenKlant2Service(
         self,
         partij_uuid: str,
         question: str,
-        subject: str,
         zaak: Zaak,
     ) -> OpenKlant2Question:
         ok2_question = self.create_question_for_partij(
-            partij_uuid=partij_uuid, question=question, subject=subject
+            partij_uuid=partij_uuid,
+            question=question,
+            subject=f"Vraag voor zaak: {zaak.identificatie}",
         )
 
         self.log_system_action(

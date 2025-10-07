@@ -45,7 +45,6 @@ class MockOpenKlant2Service:
         self,
         partij_uuid: str,
         question: str,
-        subject: str,
         zaak: str,
     ) -> OpenKlant2Question:
         return OpenKlant2Question(
