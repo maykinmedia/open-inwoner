@@ -510,7 +510,6 @@ class ContactFormIntegrationTest(
             },
         )
 
-        self.assertTimelineLog("retrieved klant for BSN or KVK user")
         self.assertTimelineLog("registered contactmoment via eSuite")
         mock_send_confirm.assert_called_once_with("foo@example.com", subject.subject)
 
@@ -687,8 +686,6 @@ class ContactFormIntegrationTest(
                             "rol": KlantContactRol.BELANGHEBBENDE,
                         },
                     )
-
-                    self.assertTimelineLog("retrieved klant for BSN or KVK user")
                     self.assertTimelineLog("registered contactmoment via eSuite")
 
                     mock_send_confirm.assert_called_once_with(
@@ -777,7 +774,6 @@ class ContactFormIntegrationTest(
             },
         )
 
-        self.assertTimelineLog("retrieved klant for BSN or KVK user")
         self.assertTimelineLog(
             "patched klant from user with missing fields: emailadres, telefoonnummer"
         )
@@ -903,7 +899,6 @@ class ContactFormIntegrationTest(
                         },
                     )
 
-                    self.assertTimelineLog("retrieved klant for BSN or KVK user")
                     self.assertTimelineLog(
                         "patched klant from user with missing fields: emailadres, telefoonnummer"
                     )

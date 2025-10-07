@@ -41,6 +41,7 @@ class ContactmomentLogMixin(LogMixin):
         else:
             log("error while registering contactmoment by API")
 
+
     def log_klant_patched(self, patched_fields: list[str]):
         """
         Log patching a klant with missing fields
@@ -59,4 +60,26 @@ class ContactmomentLogMixin(LogMixin):
         self.log_system_action(
             "could not retrieve or create klant for user, appended info to message",
             user=self.request.user,
+        )
+
+    def log_contactmoment_list_accessed(self, questions: list[dict]):
+        """
+        Log access to the contactmoment list view
+
+        Creates a single log for all questions
+        """
+        question_ids = (question["identification"] for question in questions)
+
+        self.log_user_action(
+            self.request.user,
+            f"Vragen bekeken: {', '.join(question_ids)}",
+        )
+
+    def log_contactmoment_detail_accessed(self, identification: str):
+        """
+        Log access to a specific contactmoment detail view
+        """
+        self.log_user_action(
+            self.request.user,
+            f"Vraag bekeken: {identification}",
         )
