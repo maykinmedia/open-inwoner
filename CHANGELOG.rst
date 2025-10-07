@@ -19,6 +19,9 @@ Deployment aandachtspunten
 
   De OpenTelemetry SDK is standaard uitgeschakeld en moet expliciet worden geactiveerd per
   deployment. De applicatie verwacht een gRPC OpenTelemetry collector endpoint.
+* De YAML structuur van ``django-setup-configuration`` voor het configureren van het
+  klantensysteem is aangepast. De nieuwe structuur is omschreven in de `documentatie
+  <https://docs.openinwoner.nl/en/latest/configuration/index.html>`_.
 
 Nieuwe features
 ---------------
@@ -65,6 +68,10 @@ Onderhoud
 * [:taiga-ta:`3473`, :pr:`1931`]: ``maykin-common`` dependency toegevoegd.
 * [:pr:`1942`] ``sqlparse`` bijgewerkt naar versie ``0.5.3``.
 * [:pr:`1951`] ``django`` bijgewerkt naar versie ``4.2.25``.
+* [:taiga-is:`3496`, :pr:`1957`]: De ``django-setup-configuration`` structuur voor
+  configuratie van het klantensysteem is gereorganiseerd om de structuur van het
+  beheerscherm te volgen, met een overkoepelend config en sub-configs voor eSuite en
+  Openklant.
 
 1.35.0 (2025-09-18)
 ===================
