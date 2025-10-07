@@ -2,6 +2,11 @@ from functools import partial
 
 from django.http import HttpRequest
 
+from open_inwoner.accounts.metrics import (
+    contactmoment_detail_views,
+    contactmoment_list_views,
+    contactmoment_registrations,
+)
 from open_inwoner.utils.views import LogMixin
 
 
@@ -19,6 +24,8 @@ class ContactmomentLogMixin(LogMixin):
         else:
             log("error while registering contactmoment by email")
 
+        contactmoment_registrations.add(1, {"channel": "email", "success": success})
+
     def log_question_registered_via_openklant(self, success: bool):
         """
         Log registering a question via OpenKlant2
@@ -29,6 +36,8 @@ class ContactmomentLogMixin(LogMixin):
             )
         else:
             self.log_system_action("failed to register question via OpenKlant")
+
+        contactmoment_registrations.add(1, {"channel": "openklant", "success": success})
 
     def log_contactmoment_registered_via_esuite(self, success: bool):
         """
@@ -41,6 +50,7 @@ class ContactmomentLogMixin(LogMixin):
         else:
             log("error while registering contactmoment by API")
 
+        contactmoment_registrations.add(1, {"channel": "esuite", "success": success})
 
     def log_klant_patched(self, patched_fields: list[str]):
         """
@@ -74,6 +84,7 @@ class ContactmomentLogMixin(LogMixin):
             self.request.user,
             f"Vragen bekeken: {', '.join(question_ids)}",
         )
+        contactmoment_list_views.add(1, {"num_questions_viewed": len(questions)})
 
     def log_contactmoment_detail_accessed(self, identification: str):
         """
@@ -83,3 +94,4 @@ class ContactmomentLogMixin(LogMixin):
             self.request.user,
             f"Vraag bekeken: {identification}",
         )
+        contactmoment_detail_views.add(1)

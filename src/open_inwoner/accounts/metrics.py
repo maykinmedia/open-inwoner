@@ -84,3 +84,27 @@ user_lockouts = meter.create_counter(
     unit="1",  # unitless count
     description="The number of user lockouts because of failed logins.",
 )
+
+contactmoment_list_views = meter.create_counter(
+    "contactmoments.list_views",
+    unit="1",
+    description=(
+        "Number of times users view the contactmoments list. "
+        "Attributes: num_questions_viewed (int)"
+    ),
+)
+
+contactmoment_detail_views = meter.create_counter(
+    "contactmoments.detail_views",
+    unit="1",
+    description="Number of times users view contactmoment details",
+)
+
+contactmoment_registrations = meter.create_counter(
+    "contactmoments.registrations",
+    unit="1",
+    description=(
+        "Contactmoment/question registrations. "
+        "Attributes: channel ('email', 'esuite', or 'openklant'), success (bool)"
+    ),
+)
