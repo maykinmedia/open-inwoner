@@ -1,0 +1,15 @@
+klantensysteem_config_enable: true
+klantensysteem_config:
+  primary_backend: esuite
+  register_contact_via_api: true
+  register_contact_email: "oip-test@test.nl"
+  send_email_confirmation: true
+  esuite_config:
+    klanten_service_identifier: klanten-service
+    contactmomenten_service_identifier: contactmomenten-service
+    exclude_contactmoment_kanalen: []
+    register_bronorganisatie_rsin: '837194569'
+    register_channel: email
+    register_type: bericht
+    register_employee_id: '1234'
+    use_rsin_for_innNnpId_query_parameter: true

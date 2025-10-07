@@ -16,7 +16,7 @@ from open_inwoner.openklant.models import (
 )
 
 
-class OpenKlant2Configuration(ConfigurationModel):
+class OpenKlant2ConfigurationModel(ConfigurationModel):
     service_identifier: str = DjangoModelRef(OpenKlant2Config, "service")
     mijn_vragen_actor: UUID4 = DjangoModelRef(OpenKlant2Config, "mijn_vragen_actor")
 
@@ -31,7 +31,7 @@ class OpenKlant2Configuration(ConfigurationModel):
         }
 
 
-class KlantenApiConfigurationModel(ConfigurationModel):
+class EsuiteKlantConfigurationModel(ConfigurationModel):
     klanten_service_identifier: str
     contactmomenten_service_identifier: str
     exclude_contactmoment_kanalen: list[str] | None = DjangoModelRef(
@@ -39,7 +39,6 @@ class KlantenApiConfigurationModel(ConfigurationModel):
         "exclude_contactmoment_kanalen",
         default=None,
     )
-    openklant2_config: OpenKlant2Configuration | None = Field(default=None)
 
     class Meta:
         django_model_refs = {
@@ -54,6 +53,9 @@ class KlantenApiConfigurationModel(ConfigurationModel):
 
 
 class KlantenSysteemConfigurationModel(ConfigurationModel):
+    esuite_config: EsuiteKlantConfigurationModel | None = Field(default=None)
+    openklant2_config: OpenKlant2ConfigurationModel | None = Field(default=None)
+
     class Meta:
         django_model_refs = {
             KlantenSysteemConfig: (
@@ -65,18 +67,46 @@ class KlantenSysteemConfigurationModel(ConfigurationModel):
         }
 
 
-class ESuiteKlantConfigurationStep(BaseConfigurationStep[KlantenApiConfigurationModel]):
+class KlantenSysteemConfigurationStep(
+    BaseConfigurationStep[KlantenSysteemConfigurationModel]
+):
     """
-    Connectivity parameters and feature flags relevant to communicating with the Esuite
-    klanten en contactmomenten APIs.
+    Configuration related to connecting Open Inwoner to a backend for storing
+    customer and contact information.
     """
 
-    verbose_name = "eSuite Klant APIs configuration"
-    enable_setting = "esuiteklant_config_enable"
-    namespace = "esuiteklant_config"
-    config_model = KlantenApiConfigurationModel
+    verbose_name = "KlantenSysteem configuration"
+    enable_setting = "klantensysteem_config_enable"
+    namespace = "klantensysteem_config"
+    config_model = KlantenSysteemConfigurationModel
 
-    def execute(self, model: KlantenApiConfigurationModel):
+    def execute(self, model: KlantenSysteemConfigurationModel):
+        # Configure eSuite if provided
+        if model.esuite_config:
+            self._configure_esuite(model.esuite_config)
+
+        # Configure OpenKlant2 if provided
+        if model.openklant2_config:
+            self._configure_openklant2(model.openklant2_config)
+
+        # Configure KlantenSysteem
+        config = KlantenSysteemConfig.get_solo()
+
+        for key, val in model.model_dump(
+            exclude={"esuite_config", "openklant2_config"}
+        ).items():
+            setattr(config, key, val)
+
+        try:
+            config.full_clean()
+            config.save()
+        except ValidationError as exc:
+            raise ConfigurationRunFailed(
+                "Unable to validate and save KlantenSysteemConfig"
+            ) from exc
+
+    def _configure_esuite(self, model: EsuiteKlantConfigurationModel):
+        """Configure eSuite Klant APIs"""
         config = ESuiteKlantConfig.get_solo()
 
         try:
@@ -117,22 +147,11 @@ class ESuiteKlantConfigurationStep(BaseConfigurationStep[KlantenApiConfiguration
             config.save()
         except ValidationError as exc:
             raise ConfigurationRunFailed(
-                "Unable to validate and save configuration"
+                "Unable to validate and save ESuiteKlantConfig"
             ) from exc
 
-
-class OpenKlant2ConfigurationStep(BaseConfigurationStep[OpenKlant2Configuration]):
-    """
-    Connectivity parameters and feature flags relevant to communicating with the
-    OpenKlant2 klantinteracties API.
-    """
-
-    verbose_name = "OpenKlant2 APIs configuration"
-    enable_setting = "openklant2_config_enable"
-    namespace = "openklant2_config"
-    config_model = OpenKlant2Configuration
-
-    def execute(self, model: OpenKlant2Configuration):
+    def _configure_openklant2(self, model: OpenKlant2ConfigurationModel):
+        """Configure OpenKlant2 APIs"""
         try:
             service = get_service(model.service_identifier)
         except Service.DoesNotExist as exc:
@@ -151,30 +170,10 @@ class OpenKlant2ConfigurationStep(BaseConfigurationStep[OpenKlant2Configuration]
         for key, val in create_or_update_kwargs.items():
             setattr(config, key, val)
 
-        config.full_clean()
-        config.save()
-
-
-class KlantenSysteemConfigurationStep(
-    BaseConfigurationStep[KlantenSysteemConfigurationModel]
-):
-    """
-    Configuration related to connecting Open Inwoner to a backend for storing
-    customer and contact information.
-    """
-
-    verbose_name = "KlantenSysteem configuration"
-    enable_setting = "klantensysteem_config_enable"
-    namespace = "klantensysteem_config"
-    config_model = KlantenSysteemConfigurationModel
-
-    def execute(self, model: KlantenApiConfigurationModel):
-        create_or_update_kwargs = model.model_dump()
-
-        config = KlantenSysteemConfig.get_solo()
-
-        for key, val in create_or_update_kwargs.items():
-            setattr(config, key, val)
-
-        config.full_clean()
-        config.save()
+        try:
+            config.full_clean()
+            config.save()
+        except ValidationError as exc:
+            raise ConfigurationRunFailed(
+                "Unable to validate and save ESuiteKlantConfig"
+            ) from exc
