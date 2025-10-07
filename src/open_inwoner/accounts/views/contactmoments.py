@@ -161,9 +161,8 @@ class KlantContactMomentListView(
                     )
 
         questions.sort(key=lambda q: q["registered_date"], reverse=True)
-        ctx["questions"] = questions
 
-        paginator_dict = self.paginate_with_context(ctx["questions"])
+        paginator_dict = self.paginate_with_context(questions)
         ctx.update(paginator_dict)
 
         siteconfig = SiteConfiguration.get_solo()
