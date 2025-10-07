@@ -23,18 +23,18 @@
   .button {
     color: var(--oip-color-fg);
     position: absolute;
-    right: 2px;
-    top: 2px;
+    right: 0;
+    top: 0;
 
     // Only rotate the dropdown button, not the clear button
     &[aria-expanded='true'] {
-      transition: transform 0.3s;
+      transition: transform 300ms;
       transform: rotate(180deg);
     }
 
     &.button__icon-close {
       transform: rotate(0deg);
-      transition: transform 0s;
+      transition: transform 0ms;
     }
   }
 
@@ -53,9 +53,9 @@
     overflow: var(--oip-combobox-popover-overflow);
     block-size: var(--oip-combobox-popover-block-size);
     inline-size: var(--oip-combobox-popover-inline-size);
-    border: none;
-    border-top: 1px solid var(--oip-color-fg);
-    border-top-color: var(--oip-color-fg);
+    border-style: var(--oip-combobox-popover-border-style);
+    border-top-width: var(--oip-combobox-popover-border-width);
+    border-top-color: var(--oip-combobox-popover-border-color);
     border-radius: 0 0 4px 4px;
     background-color: var(--oip-combobox-popover-background-color);
     color: var(--oip-combobox-popover-color);
@@ -76,6 +76,7 @@
 
 .utrecht-listbox {
   // Overwrite some of the utrecht atom styles
+  border: none;
   max-block-size: var(--utrecht-listbox-max-block-size);
   width: auto;
 
@@ -88,11 +89,28 @@
   }
 
   &__list {
-    margin-block-start: 0;
-    margin-block-end: 0;
-    padding-block-start: 0;
-    padding-block-end: 0;
-    padding-inline-start: 0;
+    margin-block-start: var(
+      --oip-combobox-popover-listbox-list-margin-block-start
+    );
+    margin-block-end: var(--oip-combobox-popover-listbox-list-margin-block-end);
+    margin-inline-start: var(
+      --oip-combobox-popover-listbox-list-margin-inline-start
+    );
+    margin-inline-end: var(
+      --oip-combobox-popover-listbox-list-margin-inline-end
+    );
+    padding-block-start: var(
+      --oip-combobox-popover-listbox-list-padding-block-start
+    );
+    padding-block-end: var(
+      --oip-combobox-popover-listbox-list-padding-block-end
+    );
+    padding-inline-start: var(
+      --oip-combobox-popover-listbox-list-padding-inline-start
+    );
+    padding-inline-end: var(
+      --oip-combobox-popover-listbox-list-padding-inline-end
+    );
   }
 
   &__option {
@@ -100,7 +118,7 @@
     min-height: var(--utrecht-listbox-option-min-block-size);
     position: relative;
     width: auto;
-    border-bottom: 1px solid var(--oip-color-fg-lighter);
+    border-top: 1px solid var(--oip-color-fg-lighter);
     padding-inline-start: var(--utrecht-listbox-option-padding-inline-start);
     padding-inline-end: var(--utrecht-listbox-option-padding-inline-end);
     padding-block-end: var(--utrecht-listbox-option-padding-block-end);
@@ -113,8 +131,8 @@
 
     &--selected {
       border: var(--border-width-thin) solid var(--color-secondary);
-      border-left-width: 4px;
-      padding-inline-start: 12px;
+      border-left-width: var(--spacing-small);
+      padding-inline-start: var(--spacing-large);
     }
 
     &--active {
@@ -126,7 +144,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    color: var();
+    color: var(--oip-color-fg-heading);
     font-size: var(--font-size-body);
     font-weight: bold;
     line-height: var(--font-line-height-body);

@@ -1,5 +1,5 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { IntlProvider } from 'react-intl'
 import { KVKBranchSelector } from './KVKBranchSelector'
 import '@testing-library/jest-dom'
@@ -16,9 +16,9 @@ Element.prototype.scrollIntoView = vi.fn()
 
 // Translation messages for IntlProvider
 const messages = {
-  'combobox.placeholder': 'Vul naam, adres of vestigingsnummer in...',
-  'combobox.clear': 'Wissen',
-  'combobox.toggle': 'Toggle dropdown',
+  'kvkbranchselector.placeholder': 'Vul naam, adres of vestigingsnummer in...',
+  'kvkbranchselector.clear': 'Wissen',
+  'kvkbranchselector.toggle': 'Toggle dropdown',
 }
 
 // Helper to wrap component with IntlProvider
@@ -181,7 +181,7 @@ describe('KVKBranchSelector', () => {
     fireEvent.focus(input)
 
     const option = screen.getByText('Test Company Branch 2')
-    fireEvent.click(option)
+    fireEvent.mouseDown(option)
 
     expect(input.value).toBe('Test Company Branch 2')
   })

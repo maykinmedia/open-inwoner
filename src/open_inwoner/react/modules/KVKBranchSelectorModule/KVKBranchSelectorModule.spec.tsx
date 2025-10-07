@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import KVKBranchSelectorModule from './KVKBranchSelectorModule'
 
 // Mock the i18n module

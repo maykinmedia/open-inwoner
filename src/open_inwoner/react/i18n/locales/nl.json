@@ -4,17 +4,17 @@
     "description": "Counter",
     "originalDefault": "This is the current count"
   },
-  "combobox.clear": {
+  "kvkbranchselector.clear": {
     "defaultMessage": "Wissen",
     "description": "Clear search button label",
     "originalDefault": "Wissen"
   },
-  "combobox.placeholder": {
-    "defaultMessage": "Vul naam, adres of vestigingsnummer in",
+  "kvkbranchselector.placeholder": {
+    "defaultMessage": "Vul naam, adres of vestigingsnummer in...",
     "description": "Placeholder text for branch search input",
     "originalDefault": "Vul naam, adres of vestigingsnummer in..."
   },
-  "combobox.toggle": {
+  "kvkbranchselector.toggle": {
     "defaultMessage": "Toggle dropdown",
     "description": "Toggle dropdown button label",
     "originalDefault": "Toggle dropdown"

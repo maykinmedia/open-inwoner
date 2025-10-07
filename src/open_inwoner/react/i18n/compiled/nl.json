@@ -5,19 +5,19 @@
       "value": "Dit is het aantal"
     }
   ],
-  "combobox.clear": [
+  "kvkbranchselector.clear": [
     {
       "type": 0,
       "value": "Wissen"
     }
   ],
-  "combobox.placeholder": [
+  "kvkbranchselector.placeholder": [
     {
       "type": 0,
-      "value": "Vul naam, adres of vestigingsnummer in"
+      "value": "Vul naam, adres of vestigingsnummer in..."
     }
   ],
-  "combobox.toggle": [
+  "kvkbranchselector.toggle": [
     {
       "type": 0,
       "value": "Toggle dropdown"
