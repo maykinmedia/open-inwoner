@@ -27,7 +27,7 @@ Nieuwe features
   OpenTelemetry toegevoegd, inclusief logging en metrics ondersteuning voor
   observability.
 * [:taiga-us:`3408`, :pr:`1881`]: Nieuw selectiescherm voor eHerkenning-inlog met zoek-
-  en dropdownfunctie voor betere UX bij grote aantallen vestigingen.
+  en dropdownfunctie voor betere UX waarmee gewiseld kan worden tussen vestigingen.
 
 Bugfixes
 --------

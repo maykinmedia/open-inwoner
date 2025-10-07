@@ -5,19 +5,19 @@
       "value": "This is the current count"
     }
   ],
-  "combobox.clear": [
+  "kvkbranchselector.clear": [
     {
       "type": 0,
-      "value": "Clear"
+      "value": "Wissen"
     }
   ],
-  "combobox.placeholder": [
+  "kvkbranchselector.placeholder": [
     {
       "type": 0,
-      "value": "Enter name, address or branch number"
+      "value": "Vul naam, adres of vestigingsnummer in..."
     }
   ],
-  "combobox.toggle": [
+  "kvkbranchselector.toggle": [
     {
       "type": 0,
       "value": "Toggle dropdown"

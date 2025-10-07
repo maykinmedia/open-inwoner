@@ -11,18 +11,14 @@ import { useState, useEffect } from 'react'
  * @returns The debounced value that only updates after the delay period.
  */
 
-export function useDebounce<T>(value: T, delay: number): T {
+export function useDebounce<T>(value: T, delay: number = 300): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value)
 
   useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value)
-    }, delay)
+    const handler = setTimeout(() => setDebouncedValue(value), delay)
 
     // Cleanup timer if value or delay changes before timeout
-    return () => {
-      clearTimeout(handler)
-    }
+    return () => clearTimeout(handler)
   }, [value, delay])
 
   return debouncedValue

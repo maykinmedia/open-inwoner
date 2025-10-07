@@ -1,12 +1,12 @@
 import {
-  FC,
-  useState,
-  useRef,
-  useEffect,
-  MouseEventHandler,
-  KeyboardEventHandler,
   ChangeEventHandler,
+  FC,
+  KeyboardEventHandler,
+  MouseEventHandler,
+  useEffect,
   useMemo,
+  useRef,
+  useState,
 } from 'react'
 import { useIntl } from 'react-intl'
 import { useDebounce } from '@react/lib/hooks/useDebounce'
@@ -276,7 +276,7 @@ export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
           aria-expanded={isOpen}
           aria-controls={`${id}-listbox`}
           placeholder={intl.formatMessage({
-            id: 'combobox.placeholder',
+            id: 'kvkbranchselector.placeholder',
             description: 'Placeholder text for branch search input',
             defaultMessage: 'Vul naam, adres of vestigingsnummer in...',
           })}
@@ -290,7 +290,7 @@ export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
             className="button button__icon-close button--textless button--icon oip-combobox__icon"
             onClick={handleClearQuery}
             aria-label={intl.formatMessage({
-              id: 'combobox.clear',
+              id: 'kvkbranchselector.clear',
               description: 'Clear search button label',
               defaultMessage: 'Wissen',
             })}
@@ -303,7 +303,7 @@ export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
             className="button button--textless button--icon oip-combobox__icon"
             onClick={handleToggleDropdown}
             aria-label={intl.formatMessage({
-              id: 'combobox.toggle',
+              id: 'kvkbranchselector.toggle',
               description: 'Toggle dropdown button label',
               defaultMessage: 'Toggle dropdown',
             })}
@@ -331,7 +331,12 @@ export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
                     'utrecht-listbox__option--selected': selectedId === item.id,
                     'utrecht-listbox__option--active': focusedIndex === i,
                   })}
-                  onClick={() => handleSelect(item.id)}
+                  onMouseDown={(e) => {
+                    // After selection, close popover
+                    e.preventDefault()
+                    e.stopPropagation()
+                    handleSelect(item.id)
+                  }}
                   onMouseEnter={() => setFocusedIndex(i)}
                 >
                   <div className="utrecht-listbox__content">

@@ -37,7 +37,9 @@ export default class KVKBranchSelectorModule {
         }>('branch-data')
 
         if (!data || !data.items || data.items.length === 0) {
-          console.error('[KVKBranchSelectorModule] No branches available')
+          console.error(
+            new Error('[KVKBranchSelectorModule] No branches available')
+          )
           el.innerHTML = `<p class="utrecht-paragraph" style="color:var(--color-red-notification);">Er is een probleem opgetreden bij het laden van de vestigingen. Probeer de pagina te vernieuwen.</p>`
           return
         }
