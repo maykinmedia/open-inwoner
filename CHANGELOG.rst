@@ -32,6 +32,11 @@ Bugfixes
 
 * [:taiga-is:`3494`: :pr:`1955`]: Verhelpen bug waardoor er sporadisch errors werden
   getoond tijdens het zoeken naar zaken via de algemene zoek-functie.
+* [:taiga-is:`3495`: :pr:`1956`]: Bij het aanmaken van contactmomenten onder een zaak
+  in OpenKlant2 werd de zaak omschrijving als onderwerp gebruikt. Dit veld is in
+  OpenKlant2 echter verplicht, en de omschrijving kan leeg zijn, hetgeen sporadisch tot
+  errors leidde. We gebruiken nu de zaak identificatie en een standaard tekst, die
+  altijd aanwezig is.
 * [:taiga-is:`3486`: :pr:`1946`]: Menu-items op pagina 'Mijn Zaken' worden niet langer
   dubbel getoond in de sidebar en het dropdownmenu.
 * [:taiga-is:`3480`, :pr:`1934`]: De paginering van de contactmomenten lijstweergave

@@ -1082,7 +1082,6 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
         question = service.create_question_for_zaak(
             partij_uuid=partij["uuid"],
             question=question,
-            subject=self.case.omschrijving,
             zaak=self.case,
         )
 
