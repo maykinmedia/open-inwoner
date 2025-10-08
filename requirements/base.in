@@ -56,7 +56,6 @@ django-yubin
 
 # django cms
 django-cms
-djangocms-text-ckeditor
 djangocms-link
 djangocms-file
 djangocms-picture

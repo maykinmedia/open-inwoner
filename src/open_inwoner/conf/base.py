@@ -151,7 +151,6 @@ INSTALLED_APPS = [
     "treebeard",
     "sekizai",
     # "djangocms_admin_style",
-    "djangocms_text_ckeditor",
     "djangocms_link",
     "djangocms_file",
     "djangocms_picture",
@@ -197,7 +196,6 @@ INSTALLED_APPS = [
     "simple_certmanager",
     "zgw_consumers",
     "mail_editor",
-    "ckeditor",
     "django_prosemirror",
     "privates",
     "timeline_logger",
@@ -221,7 +219,6 @@ INSTALLED_APPS = [
     "open_inwoner.kvk",
     "open_inwoner.laposta",
     "open_inwoner.qmatic",
-    "open_inwoner.ckeditor5",
     "open_inwoner.pdc",
     "open_inwoner.plans",
     "open_inwoner.search",
@@ -1056,32 +1053,6 @@ else:
 
 MAIL_EDITOR_BASE_HOST = BASE_URL
 
-CKEDITOR_CONFIGS = {
-    "default": {
-        "allowedContent": True,
-        "toolbar": "Custom",
-        "toolbar_Custom": [
-            ["Format"],  # Headings
-            ["Bold", "Italic", "Underline"],
-            ["NumberedList", "BulletedList"],
-            ["Link", "Unlink"],
-            ["Table", "HorizontalRule"],
-            ["RemoveFormat", "Source"],
-            ["Undo", "Redo"],
-        ],
-        "removeButtons": "TextColor,BGColor",  # Remove color-styling
-        "versionCheck": False,
-        "width": 600,
-    },
-    "mail_editor": {
-        "allowedContent": True,
-        "contentsCss": [
-            "/static/mailcss/email.css"
-        ],  # Enter the css file used to style the email.
-        "height": 600,  # This is optional
-        "entities": False,  # This is added because CKEDITOR escapes the ' when you do an if statement
-    },
-}
 
 #
 # django-setup-configuration

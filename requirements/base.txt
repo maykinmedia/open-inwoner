@@ -186,7 +186,6 @@ django-cms==3.11.1
     #   djangocms-file
     #   djangocms-link
     #   djangocms-picture
-    #   djangocms-text-ckeditor
 django-colorfield==0.4.5
     # via -r requirements/base.in
 django-cors-headers==3.10.0
@@ -310,8 +309,6 @@ djangocms-link==3.1.1
     # via -r requirements/base.in
 djangocms-picture==4.1.1
     # via -r requirements/base.in
-djangocms-text-ckeditor==5.1.2
-    # via -r requirements/base.in
 djangorestframework==3.16.1
     # via
     #   -r requirements/base.in
@@ -376,9 +373,7 @@ greenlet==3.1.1
 grpcio==1.74.0
     # via opentelemetry-exporter-otlp-proto-grpc
 html5lib==1.1
-    # via
-    #   djangocms-text-ckeditor
-    #   weasyprint
+    # via weasyprint
 humanfriendly==10.0
     # via -r requirements/base.in
 idna==3.7
@@ -496,7 +491,6 @@ orderedmultidict==1.0.1
     # via furl
 packaging==23.0
     # via
-    #   djangocms-text-ckeditor
     #   kombu
     #   opentelemetry-instrumentation
 phonenumbers==8.13.29
@@ -506,7 +500,6 @@ phonenumberslite==8.13.29
 pillow==10.3.0
     # via
     #   -r requirements/base.in
-    #   djangocms-text-ckeditor
     #   easy-thumbnails
     #   reportlab
     #   weasyprint
