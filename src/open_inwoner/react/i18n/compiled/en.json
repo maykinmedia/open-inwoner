@@ -8,13 +8,13 @@
   "kvkbranchselector.clear": [
     {
       "type": 0,
-      "value": "Wissen"
+      "value": "Clear"
     }
   ],
   "kvkbranchselector.placeholder": [
     {
       "type": 0,
-      "value": "Vul naam, adres of vestigingsnummer in..."
+      "value": "Enter name, address or branch number..."
     }
   ],
   "kvkbranchselector.toggle": [

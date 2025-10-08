@@ -1,3 +1,4 @@
+import json
 from unittest.mock import patch
 
 from django.test import TestCase
@@ -172,9 +173,6 @@ class KvKViewsTestCase(TestCase):
         branch_data_script = doc.find("script#branch-data")
         self.assertEqual(len(branch_data_script), 1)
 
-        # Parse the JSON data to verify it contains the expected branches
-        import json
-
         branch_data = json.loads(branch_data_script.text())
         branch_items = branch_data.get("items", [])
 
@@ -264,9 +262,6 @@ class KvKViewsTestCase(TestCase):
         branch_data_script = doc.find("script#branch-data")
         self.assertEqual(len(branch_data_script), 1)
 
-        # Parse the JSON data to verify it contains the expected branches
-        import json
-
         branch_data = json.loads(branch_data_script.text())
         branch_items = branch_data.get("items", [])
 
@@ -329,9 +324,6 @@ class KvKViewsTestCase(TestCase):
         # Check for React component data instead of DOM inputs
         branch_data_script = doc.find("script#branch-data")
         self.assertEqual(len(branch_data_script), 1)
-
-        # Parse the JSON data to verify it contains the expected branches
-        import json
 
         branch_data = json.loads(branch_data_script.text())
         branch_items = branch_data.get("items", [])

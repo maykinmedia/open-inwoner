@@ -7,15 +7,15 @@
   "kvkbranchselector.clear": {
     "defaultMessage": "Wissen",
     "description": "Clear search button label",
-    "originalDefault": "Wissen"
+    "originalDefault": "Clear"
   },
   "kvkbranchselector.placeholder": {
     "defaultMessage": "Vul naam, adres of vestigingsnummer in...",
     "description": "Placeholder text for branch search input",
-    "originalDefault": "Vul naam, adres of vestigingsnummer in..."
+    "originalDefault": "Enter name, address or branch number..."
   },
   "kvkbranchselector.toggle": {
-    "defaultMessage": "Toggle dropdown",
+    "defaultMessage": "Opties tonen",
     "description": "Toggle dropdown button label",
     "originalDefault": "Toggle dropdown"
   }

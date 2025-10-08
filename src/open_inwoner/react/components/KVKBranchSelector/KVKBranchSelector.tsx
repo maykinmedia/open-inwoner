@@ -278,7 +278,7 @@ export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
           placeholder={intl.formatMessage({
             id: 'kvkbranchselector.placeholder',
             description: 'Placeholder text for branch search input',
-            defaultMessage: 'Vul naam, adres of vestigingsnummer in...',
+            defaultMessage: 'Enter name, address or branch number...',
           })}
           autoComplete="off"
         />
@@ -292,7 +292,7 @@ export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
             aria-label={intl.formatMessage({
               id: 'kvkbranchselector.clear',
               description: 'Clear search button label',
-              defaultMessage: 'Wissen',
+              defaultMessage: 'Clear',
             })}
           >
             <MaterialIcon name="close" />
