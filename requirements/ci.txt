@@ -742,7 +742,7 @@ maykin-common[otel]==0.10.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-maykin-django-prosemirror[images]==0.1.0
+maykin-django-prosemirror[images]==0.2.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
