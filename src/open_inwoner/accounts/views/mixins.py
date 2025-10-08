@@ -1,12 +1,15 @@
 from functools import partial
 
 from django.http import HttpRequest
+from django.utils.translation import gettext_lazy as _
 
 from open_inwoner.accounts.metrics import (
     contactmoment_detail_views,
     contactmoment_list_views,
     contactmoment_registrations,
 )
+from open_inwoner.accounts.models import User
+from open_inwoner.utils.logentry import system_error
 from open_inwoner.utils.views import LogMixin
 
 
@@ -95,3 +98,52 @@ class ContactmomentLogMixin(LogMixin):
             f"Vraag bekeken: {identification}",
         )
         contactmoment_detail_views.add(1)
+
+
+class ProfileLogMixin(LogMixin):
+    request: HttpRequest
+
+    def log_newsletter_subscription_modified(self, success: bool):
+        if success:
+            self.log_user_action(
+                self.request.user, _("users newsletter subscriptions were modified")
+            )
+        else:
+            self.log_user_action(
+                self.request.user, _("failed to modify user newsletter subscription")
+            )
+
+    def log_user_deleted(self, user: User):
+        self.log_user_action(user, _("user was deleted via frontend"))
+
+    def log_profile_modified(self, user: User):
+        self.log_change(user, _("profile was modified"))
+
+    def log_profile_update_failed(
+        self, user: User, failed_services: list[str], changed_fields: list[str]
+    ):
+        log_msg = (
+            "API service failure when updating user profile. "
+            "Failed services: %(failed_services)s. "
+            "Changed fields: %(changed_fields)s"
+            % {
+                "failed_services": " and ".join(failed_services),
+                "changed_fields": ", ".join(changed_fields),
+            }
+        )
+        system_error(message=log_msg, user=user)
+
+    def log_digitaal_adres_deleted(self, user: User, digitaal_adres_uuid: str):
+        self.log_system_action(
+            f"deleted old digitaal adres {digitaal_adres_uuid}",
+            instance=user,
+        )
+
+    def log_categories_modified(self, user: User):
+        self.log_change(user, _("categories were modified"))
+
+    def log_brp_data_requested(self):
+        self.log_user_action(self.request.user, _("user requests for brp data"))
+
+    def log_notifications_modified(self, user: User):
+        self.log_change(user, _("users notifications were modified"))

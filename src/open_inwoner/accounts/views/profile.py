@@ -42,14 +42,15 @@ from open_inwoner.openklant.types import PartijUpdateData
 from open_inwoner.plans.models import Plan
 from open_inwoner.qmatic.client import NoServiceConfigured, qmatic_client_factory
 from open_inwoner.questionnaire.models import QuestionnaireStep
-from open_inwoner.utils.logentry import system_action, system_error
-from open_inwoner.utils.views import CommonPageMixin, LogMixin
+from open_inwoner.utils.views import CommonPageMixin
+
+from .mixins import ProfileLogMixin
 
 logger = logging.getLogger(__name__)
 
 
 class MyProfileView(
-    LogMixin,
+    ProfileLogMixin,
     LoginRequiredMixin,
     CommonPageMixin,
     BaseBreadcrumbMixin,
@@ -72,15 +73,11 @@ class MyProfileView(
 
         # Display errors raised by Laposta API
         if form.errors:
-            self.log_user_action(
-                self.request.user, _("failed to modify user newsletter subscription")
-            )
+            self.log_newsletter_subscription_modified(success=False)
             return self.form_invalid(form)
 
         messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
-        self.log_user_action(
-            self.request.user, _("users newsletter subscriptions were modified")
-        )
+        self.log_newsletter_subscription_modified(success=True)
         return HttpResponseRedirect(self.get_success_url())
 
     @cached_property
@@ -205,7 +202,7 @@ class MyProfileView(
                 return redirect("profile:detail")
 
             # continue with delete
-            self.log_user_action(instance, _("user was deleted via frontend"))
+            self.log_user_deleted(instance)
             instance.delete()
             request.session.flush()
 
@@ -216,7 +213,7 @@ class MyProfileView(
 
 
 class EditProfileView(
-    LogMixin,
+    ProfileLogMixin,
     LoginRequiredMixin,
     CommonPageMixin,
     BaseBreadcrumbMixin,
@@ -247,7 +244,7 @@ class EditProfileView(
         ):
             form.save()
             messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
-            self.log_change(self.get_object(), _("profile was modified"))
+            self.log_profile_modified(user)
             return HttpResponseRedirect(self.get_success_url())
 
         # write changes to API's; abort saving if write fails
@@ -282,22 +279,13 @@ class EditProfileView(
                 ),
             )
 
-            log_msg = (
-                "API service failure when updating user profile. "
-                "Failed services: %(failed_services)s. "
-                "Changed fields: %(changed_fields)s"
-                % {
-                    "failed_services": " and ".join(failed_services),
-                    "changed_fields": ", ".join(form.changed_data),
-                }
-            )
-            system_error(message=log_msg, user=self.get_object())
+            self.log_profile_update_failed(user, failed_services, form.changed_data)
 
             return HttpResponseRedirect(self.get_success_url())
 
         form.save()
         messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
-        self.log_change(self.get_object(), _("profile was modified"))
+        self.log_profile_modified(user)
         return HttpResponseRedirect(self.get_success_url())
 
     def update_klant_via_openklant(self, user_form_data: dict, user: User) -> bool:
@@ -342,10 +330,7 @@ class EditProfileView(
                     pass
                 else:
                     service.client.digitaal_adres.delete(digitaal_adres["uuid"])
-                    system_action(
-                        f"deleted old digitaal adres {digitaal_adres['uuid']}",
-                        content_object=user,
-                    )
+                    self.log_digitaal_adres_deleted(user, digitaal_adres["uuid"])
 
             return service.update_partij_from_user_data(
                 partij_uuid=partij["uuid"],
@@ -398,7 +383,11 @@ class EditProfileView(
 
 
 class MyCategoriesView(
-    LogMixin, LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, UpdateView
+    ProfileLogMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    UpdateView,
 ):
     template_name = "pages/profile/categories.html"
     model = User
@@ -418,12 +407,16 @@ class MyCategoriesView(
     def form_valid(self, form):
         form.save()
         messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
-        self.log_change(self.object, _("categories were modified"))
+        self.log_categories_modified(self.get_object())
         return HttpResponseRedirect(self.get_success_url())
 
 
 class MyDataView(
-    LogMixin, LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, TemplateView
+    ProfileLogMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    TemplateView,
 ):
     template_name = "pages/profile/mydata.html"
 
@@ -440,13 +433,13 @@ class MyDataView(
         return context
 
     def get_brp_data(self):
-        self.log_user_action(self.request.user, _("user requests for brp data"))
+        self.log_brp_data_requested()
         data = fetch_brp(self.request.user.bsn)
         return data
 
 
 class MyNotificationsView(
-    LogMixin,
+    ProfileLogMixin,
     LoginRequiredMixin,
     CommonPageMixin,
     BaseBreadcrumbMixin,
@@ -493,7 +486,7 @@ class MyNotificationsView(
             self.update_klant_via_esuite(user)
 
         messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
-        self.log_change(self.object, _("users notifications were modified"))
+        self.log_change(user, _("users notifications were modified"))
         return HttpResponseRedirect(self.get_success_url())
 
     def update_klant_via_esuite(self, user: User):
@@ -516,7 +509,7 @@ class MyNotificationsView(
 
 
 class UserAppointmentsView(
-    LogMixin,
+    ProfileLogMixin,
     LoginRequiredMixin,
     CommonPageMixin,
     BaseBreadcrumbMixin,
