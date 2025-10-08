@@ -1,5 +1,5 @@
 {% extends "master.html" %}
-{% load i18n static form_tags grid_tags button_tags card_tags kvk_tags %}
+{% load i18n static form_tags grid_tags button_tags card_tags %}
 
 {% block mount_modules %}
     data-mount-modules='["kvkbranchselector"]'
@@ -34,7 +34,7 @@
                     data-label="{% trans 'Selecteer de rechtspersoon of vestiging waarmee u wilt inloggen' %}"
                     data-name="branch_number"
                 >
-                    <script type="application/json" id="branch-data">{% vestigingen_combox_data company_branches user.vestiging %}</script>
+                    {{ vestigingen_combobox_data|json_script:"branch-data" }}
                 </div>
 
                 <div class="form__actions form__actions--fullwidth">
