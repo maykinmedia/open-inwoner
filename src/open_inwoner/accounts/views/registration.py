@@ -28,7 +28,9 @@ from open_inwoner.openklant.services import OpenKlant2Service, eSuiteKlantenServ
 from open_inwoner.openklant.types import PartijUpdateData
 from open_inwoner.utils.text import html_tag_wrap_format
 from open_inwoner.utils.url import get_next_url_from
-from open_inwoner.utils.views import CommonPageMixin, LogMixin
+from open_inwoner.utils.views import CommonPageMixin
+
+from .mixins import RegistrationLogMixin
 
 logger = logging.getLogger(__name__)
 
@@ -72,7 +74,7 @@ class InviteMixin(CommonPageMixin):
             invite.inviter.user_contacts.add(invitee)
 
 
-class CustomRegistrationView(LogMixin, InviteMixin, RegistrationView):
+class CustomRegistrationView(RegistrationLogMixin, InviteMixin, RegistrationView):
     form_class = CustomRegistrationForm
 
     def page_title(self):
@@ -88,6 +90,7 @@ class CustomRegistrationView(LogMixin, InviteMixin, RegistrationView):
         invite = form.cleaned_data["invite"]
         if invite:
             self.add_invitee(invite, user)
+            self.log_invite_accepted()
 
         # Remove invite url from user's session
         session = self.request.session
@@ -95,7 +98,8 @@ class CustomRegistrationView(LogMixin, InviteMixin, RegistrationView):
             del session["invite_url"]
 
         self.request.user = user
-        self.log_user_action(user, _("user was created"))
+        self.log_custom_user_registration(user)
+
         return HttpResponseRedirect(self.get_success_url())
 
     def get_context_data(self, **kwargs):
@@ -144,7 +148,7 @@ class CustomRegistrationView(LogMixin, InviteMixin, RegistrationView):
 
 
 class NecessaryFieldsUserView(
-    LogMixin,
+    RegistrationLogMixin,
     LoginRequiredMixin,
     InviteMixin,
     UpdateView,
@@ -174,16 +178,26 @@ class NecessaryFieldsUserView(
         user = form.save()
 
         klanten_config = KlantenSysteemConfig.get_solo()
+        updated_esuite = False
+        updated_openklant = False
+
         if klanten_config.has_api_service_configured(KlantenServiceType.ESUITE):
             self.update_klant_via_esuite(form)
+            updated_esuite = True
         if klanten_config.has_api_service_configured(KlantenServiceType.OPENKLANT2):
             self.update_klant_via_openklant(form)
+            updated_openklant = True
 
         invite = form.cleaned_data["invite"]
         if invite:
             self.add_invitee(invite, user)
 
-        self.log_user_action(user, _("user was updated with necessary fields"))
+        self.log_necessary_fields_completed(
+            user,
+            has_invite=bool(invite),
+            updated_esuite=updated_esuite,
+            updated_openklant=updated_openklant,
+        )
         return HttpResponseRedirect(self.get_success_url())
 
     def get_initial(self):
@@ -258,7 +272,7 @@ class NecessaryFieldsUserView(
         service.update_klant_from_user(klant, user, update_fields=update_fields)
 
 
-class EmailVerificationUserView(LogMixin, LoginRequiredMixin, TemplateView):
+class EmailVerificationUserView(RegistrationLogMixin, LoginRequiredMixin, TemplateView):
     model = User
     template_name = "accounts/email_verification.html"
 
@@ -300,7 +314,7 @@ class EmailVerificationUserView(LogMixin, LoginRequiredMixin, TemplateView):
         )
 
         messages.add_message(self.request, messages.SUCCESS, _("E-mail is verzonden"))
-        self.log_user_action(user, _("user requested e-mail address verification"))
+        self.log_email_verification_requested(user)
 
         return redirect(self.get_success_url())
 

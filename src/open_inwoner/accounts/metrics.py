@@ -108,3 +108,75 @@ contactmoment_registrations = meter.create_counter(
         "Attributes: channel ('email', 'esuite', or 'openklant'), success (bool)"
     ),
 )
+
+profile_updates = meter.create_counter(
+    "profile.updates",
+    unit="1",
+    description="Number of times users update their profile information",
+)
+
+profile_update_failures = meter.create_counter(
+    "profile.update_failures",
+    unit="1",
+    description=(
+        "Profile update failures due to API service issues. "
+        "Attributes: failed_services (str), changed_fields (str)"
+    ),
+)
+
+profile_categories_updates = meter.create_counter(
+    "profile.categories_updates",
+    unit="1",
+    description="Number of times users update their interest categories",
+)
+
+profile_newsletter_updates = meter.create_counter(
+    "profile.newsletter_updates",
+    unit="1",
+    description="Number of times users update newsletter subscriptions. Attributes: success (bool)",
+)
+
+profile_notifications_updates = meter.create_counter(
+    "profile.notifications_updates",
+    unit="1",
+    description="Number of times users update their notification preferences",
+)
+
+profile_deletions = meter.create_counter(
+    "profile.deletions",
+    unit="1",
+    description="Number of times users delete their account via the frontend",
+)
+
+brp_data_requests = meter.create_counter(
+    "profile.brp_data_requests",
+    unit="1",
+    description="Number of times users request their BRP (personal) data",
+)
+
+invites_accepted = meter.create_counter(
+    "registration.invites_accepted",
+    unit="1",
+    description="Number of invites accepted",
+)
+
+necessary_fields_completions = meter.create_counter(
+    "registration.necessary_fields_completions",
+    unit="1",
+    description=(
+        "Number of times users complete necessary registration fields. "
+        "Attributes: has_invite (bool), updated_esuite (bool), updated_openklant (bool)"
+    ),
+)
+
+email_verification_requests = meter.create_counter(
+    "registration.email_verification_requests",
+    unit="1",
+    description="Number of email verification requests by users",
+)
+
+email_verification_completions = meter.create_counter(
+    "registration.email_verification_completions",
+    unit="1",
+    description="Number of email verification completions. Attributes: success (bool)",
+)
