@@ -2,7 +2,7 @@ import {
   SideNavigation,
   SideNavigationProps,
 } from '@gemeente-denhaag/side-navigation'
-import { MaterialIcon } from '@react/components/MaterialIcons/MaterialIcons'
+import { MaterialIcon } from '@react/components/MaterialIcon'
 import { FC } from 'react'
 
 export interface MenuItem {

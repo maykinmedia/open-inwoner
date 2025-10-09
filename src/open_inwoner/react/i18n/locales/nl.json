@@ -3,5 +3,20 @@
     "defaultMessage": "Dit is het aantal",
     "description": "Counter",
     "originalDefault": "This is the current count"
+  },
+  "kvkbranchselector.clear": {
+    "defaultMessage": "Wissen",
+    "description": "Clear search button label",
+    "originalDefault": "Clear"
+  },
+  "kvkbranchselector.placeholder": {
+    "defaultMessage": "Vul naam, adres of vestigingsnummer in...",
+    "description": "Placeholder text for branch search input",
+    "originalDefault": "Enter name, address or branch number..."
+  },
+  "kvkbranchselector.toggle": {
+    "defaultMessage": "Opties tonen",
+    "description": "Toggle dropdown button label",
+    "originalDefault": "Toggle dropdown"
   }
 }

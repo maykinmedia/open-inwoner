@@ -4,5 +4,23 @@
       "type": 0,
       "value": "Dit is het aantal"
     }
+  ],
+  "kvkbranchselector.clear": [
+    {
+      "type": 0,
+      "value": "Wissen"
+    }
+  ],
+  "kvkbranchselector.placeholder": [
+    {
+      "type": 0,
+      "value": "Vul naam, adres of vestigingsnummer in..."
+    }
+  ],
+  "kvkbranchselector.toggle": [
+    {
+      "type": 0,
+      "value": "Opties tonen"
+    }
   ]
 }

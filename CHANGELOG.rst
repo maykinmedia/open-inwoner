@@ -29,6 +29,8 @@ Nieuwe features
 * [:taiga-us:`3461`, :taiga-ta:`3473`, :pr:`1932`]: Basisinfrastructuur voor
   OpenTelemetry toegevoegd, inclusief logging en metrics ondersteuning voor
   observability.
+* [:taiga-us:`3408`, :pr:`1881`]: Nieuw selectiescherm voor eHerkenning-inlog met zoek-
+  en dropdownfunctie voor betere UX waarmee gewiseld kan worden tussen vestigingen.
 
 Bugfixes
 --------

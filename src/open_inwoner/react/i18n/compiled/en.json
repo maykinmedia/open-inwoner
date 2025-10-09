@@ -4,5 +4,23 @@
       "type": 0,
       "value": "This is the current count"
     }
+  ],
+  "kvkbranchselector.clear": [
+    {
+      "type": 0,
+      "value": "Clear"
+    }
+  ],
+  "kvkbranchselector.placeholder": [
+    {
+      "type": 0,
+      "value": "Enter name, address or branch number..."
+    }
+  ],
+  "kvkbranchselector.toggle": [
+    {
+      "type": 0,
+      "value": "Toggle dropdown"
+    }
   ]
 }

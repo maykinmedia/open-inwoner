@@ -1,11 +1,11 @@
 import { Meta, StoryObj } from '@storybook/react'
-import { MaterialIcon } from './MaterialIcons'
+import { MaterialIcon } from './MaterialIcon'
 import 'material-icons/iconfont/material-icons.css'
 
 type ExtendedMateriaIconProps = typeof MaterialIcon & { nameTool: string }
 
 const meta: Meta<ExtendedMateriaIconProps> = {
-  title: 'React/MaterialIcons',
+  title: 'React/MaterialIcon',
   component: MaterialIcon,
   parameters: {
     layout: 'padded',
