@@ -5,17 +5,24 @@ $hm: max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
 $vm: var(--spacing-large);
 
 .header {
+  --header-height: 53px;
+
   position: relative;
-  min-height: 81px;
+  min-height: var(--header-height);
   background-color: var(--color-white);
   width: 100%;
   z-index: 1003;
+  margin-bottom: var(--spacing-large);
 
   @media (min-width: 768px) {
+    --header-height: 63px;
     display: flex;
     align-items: center;
-    min-height: 90px;
     margin-bottom: var(--spacing-tiny);
+  }
+
+  @media (min-width: 911px) {
+    --header-height: 80px;
   }
 
   .indicator {
@@ -61,7 +68,7 @@ $vm: var(--spacing-large);
     grid-column-gap: var(--spacing-tiny);
     position: relative;
     grid-template-columns: 1fr;
-    grid-template-rows: calc(2 * var(--row-height));
+    grid-template-rows: var(--header-height);
 
     > .header__actions {
       display: none;
@@ -82,7 +89,7 @@ $vm: var(--spacing-large);
         display: block;
         position: initial;
         grid-row: 1;
-        grid-column: 6 / span 5;
+        grid-column: 4 / span 5;
         margin-left: 0;
       }
 
@@ -128,7 +135,7 @@ $vm: var(--spacing-large);
       }
 
       @media (min-width: 768px) and (max-width: 910px) {
-        grid-column: 10 / span 3;
+        grid-column: 11 / span 2;
       }
     }
   }
@@ -136,28 +143,35 @@ $vm: var(--spacing-large);
   /// Layout.
 
   .logo {
+    --logo-height: calc(var(--header-height) - var(--spacing-large));
     height: 100%;
-    padding: 8px 8px 8px 0;
+    padding: 16px 0 0;
     box-sizing: border-box;
     width: fit-content;
 
     @media (max-width: 360px) {
-      margin-left: var(--spacing-tiny);
-      padding: 8px;
       margin-right: auto;
     }
+
     @media (min-width: 768px) {
+      --logo-height: calc(var(--header-height) - var(--spacing-extra-large));
+      padding: 8px 8px 8px 0;
       height: auto;
       grid-column: 1 / span 6;
       margin: 0;
     }
+
     @media (min-width: 361px) and (max-width: 767px) {
       margin-left: var(--spacing-large);
       margin-right: auto;
     }
 
+    @media (min-width: 911px) {
+      --logo-height: calc(var(--header-height) - var(--spacing-giant));
+    }
+
     img {
-      max-height: 50px;
+      max-height: var(--logo-height);
       max-width: 100%;
     }
   }
@@ -173,8 +187,8 @@ $vm: var(--spacing-large);
     .nav-login__icon {
       display: flex;
       justify-content: center;
-      align-items: center;
-      height: calc(var(--row-height) * 2);
+      align-items: flex-end;
+      height: var(--header-height);
 
       &--authenticated {
         .button--transparent {
@@ -192,11 +206,11 @@ $vm: var(--spacing-large);
   &__menu &__button {
     appearance: none;
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: center;
     background-color: transparent;
     border: none;
-    height: calc(2 * var(--row-height));
+    height: var(--header-height);
     width: calc(2 * var(--row-height));
     padding: 0;
     margin-right: var(--spacing-tiny);
@@ -210,7 +224,8 @@ $vm: var(--spacing-large);
     cursor: pointer;
     border: 1px solid var(--color-primary);
     border-radius: var(--border-radius);
-    height: var(--row-height);
+    height: calc(var(--header-height) - var(--spacing-large));
+    margin-top: var(--spacing-large);
     width: 80px;
 
     @media (min-width: 768px) {
@@ -234,12 +249,9 @@ $vm: var(--spacing-large);
   }
 
   &__submenu {
-    border-top: 1px solid var(--color-gray-light);
+    border: 2px solid var(--color-gray-lightest);
     border-top-left-radius: var(--spacing-medium);
     border-top-right-radius: var(--spacing-medium);
-    border-bottom: 1px solid var(--color-gray-light);
-    border-left: none;
-    border-right: none;
     bottom: 0;
     background-color: var(--color-white);
     box-sizing: border-box;
@@ -255,7 +267,7 @@ $vm: var(--spacing-large);
     position: absolute;
     right: 0;
     text-align: left;
-    top: var(--spacing-medium);
+    top: calc(var(--header-height) + var(--spacing-large));
     width: 100%;
     z-index: 2;
 
@@ -297,7 +309,9 @@ $vm: var(--spacing-large);
 
       &__main {
         grid-row: 1;
-        grid-column: 4 / span 2;
+        grid-column: 9 / span 3;
+        width: fit-content;
+        margin-left: auto;
       }
 
       &__authenticated {
@@ -305,11 +319,6 @@ $vm: var(--spacing-large);
         flex-direction: row;
         grid-row: 1;
         grid-column: 12;
-
-        // Tablet menu
-        @media (min-width: 768px) and (max-width: 910px) {
-          grid-column: 8 / span 5;
-        }
 
         .primary-navigation__list {
           overflow-x: visible;
@@ -359,6 +368,11 @@ $vm: var(--spacing-large);
         .form__control {
           max-width: 100%;
         }
+      }
+
+      // Desktop view
+      @media (min-width: 911px) {
+        max-width: 100%;
       }
     }
 
@@ -543,7 +557,6 @@ $vm: var(--spacing-large);
 
       .header {
         &__submenu {
-          border-top: none;
           display: block;
 
           .primary-navigation {
