@@ -13,12 +13,13 @@ from open_inwoner.openzaak.api_models import (
     Notification,
     Rol,
     Status,
+    StatusType,
     Zaak,
     ZaakInformatieObject,
-    ZaakType,
 )
 from open_inwoner.openzaak.clients import CatalogiClient, ZakenClient
 from open_inwoner.openzaak.documents import fetch_single_information_object_from_url
+from open_inwoner.openzaak.mixins import WebhookLogMixin
 from open_inwoner.openzaak.models import (
     OpenZaakConfig,
     UserCaseInfoObjectNotification,
@@ -38,6 +39,9 @@ from open_inwoner.utils.logentry import system_action as log_system_action
 from open_inwoner.utils.url import build_absolute_url
 
 logger = logging.getLogger(__name__)
+
+# Create a helper instance for logging
+_log_helper = WebhookLogMixin()
 
 
 # TODO: check siteconfig for notification enabled
@@ -251,15 +255,13 @@ def _handle_zaakinformatieobject_notification(
         return
 
     # reaching here means we're going to inform users
-    log_system_action(
-        f"accepted {r} notification: attempt informing users {_wrap_join(inform_users)} for case {case.url}",
-        log_level=logging.INFO,
-    )
+    _log_helper.log_notification_accepted(notification, inform_users, case.url)
     for user in inform_users:
-        _handle_zaakinformatieobject_update(user, case, ziobj, api_group)
+        _handle_zaakinformatieobject_update(notification, user, case, ziobj, api_group)
 
 
 def _handle_zaakinformatieobject_update(
+    notification: Notification,
     user: User,
     case: Zaak,
     zaak_info_object: ZaakInformatieObject,
@@ -271,10 +273,8 @@ def _handle_zaakinformatieobject_update(
     hooks.case_document_added_notification_received(user, case, zaak_info_object)
 
     if not user.cases_notifications or not user.get_contact_email():
-        log_system_action(
-            f"ignored user-disabled notification delivery for user "
-            f"'{user}' zaakinformatieobject {zaak_info_object.url} case {case.url}",
-            log_level=logging.INFO,
+        _log_helper.log_notification_email_blocked_by_user(
+            notification, user, zaak_info_object.url, case.url
         )
         return
 
@@ -285,30 +285,24 @@ def _handle_zaakinformatieobject_update(
         template_name,
     )
     if not note:
-        log_system_action(
-            f"ignored duplicate zaakinformatieobject notification delivery "
-            f"for user '{user}' zaakinformatieobject {zaak_info_object.url} case {case.url}",
-            log_level=logging.INFO,
+        _log_helper.log_notification_email_duplicate(
+            notification, user, zaak_info_object.url, case.url
         )
         return
 
     # let's not spam the users
     period = timedelta(seconds=settings.ZGW_LIMIT_NOTIFICATIONS_FREQUENCY)
     if note.has_received_similar_notes_within(period, template_name):
-        log_system_action(
-            f"blocked over-frequent zaakinformatieobject notification email "
-            f"for user '{user}' zaakinformatieobject {zaak_info_object.url} case {case.url}",
-            log_level=logging.INFO,
+        _log_helper.log_notification_email_rate_limited(
+            notification, user, zaak_info_object.url, case.url
         )
         return
 
     send_case_update_email(user, case, template_name, api_group=api_group)
     note.mark_sent()
 
-    log_system_action(
-        f"send zaakinformatieobject notification email for user '{user}' "
-        f"zaakinformatieobject {zaak_info_object.url} case {case.url}",
-        log_level=logging.INFO,
+    _log_helper.log_notification_email_sent(
+        notification, user, zaak_info_object.url, case.url
     )
 
 
@@ -378,7 +372,7 @@ def _check_status_type(
     status: Status,
     oz_config: OpenZaakConfig,
     catalogi_client: CatalogiClient,
-) -> ZaakType | None:
+) -> StatusType | None:
     """
     Check if a status_type exists for `status` and if notifications are enabled
     """
@@ -475,6 +469,7 @@ def _check_statustype_config(
 
 
 def _check_user_status_notitifactions(
+    notification: Notification,
     user: User,
     case: Zaak,
     status: Status,
@@ -489,10 +484,8 @@ def _check_user_status_notitifactions(
         return True
 
     if not user.cases_notifications or not user.get_contact_email():
-        log_system_action(
-            f"ignored user-disabled notification delivery for user '{user}' status "
-            f"{status.url} case {case.url}",
-            log_level=logging.INFO,
+        _log_helper.log_notification_email_blocked_by_user(
+            notification, user, status.url, case.url
         )
         return False
 
@@ -532,6 +525,7 @@ def _handle_status_notification(
     if not status:
         # TODO: check if should we return or continue if the case has no status
         logger.error("Unable to fetch status for %s", case.status)
+        return
 
     case.status = status
     if not (status_type_config := _check_statustype_config(notification, case, ztc)):
@@ -541,21 +535,20 @@ def _handle_status_notification(
 
     for user in inform_users:
         if not _check_user_status_notitifactions(
-            user, case, status, status_type_config
+            notification, user, case, status, status_type_config
         ):
             return
 
         # all checks have passed
-        log_system_action(
-            f"accepted {notification.resource} notification: attempt informing users "
-            f"{_wrap_join(inform_users)} for case {case.url}",
-            log_level=logging.INFO,
-        )
+        _log_helper.log_notification_accepted(notification, inform_users, case.url)
         # TODO: replace with notify_about_status_update(...args, method: Callable)
-        _handle_status_update(user, case, status, status_type_config, api_group)
+        _handle_status_update(
+            notification, user, case, status, status_type_config, api_group
+        )
 
 
 def _handle_status_update(
+    notification: Notification,
     user: User,
     case: Zaak,
     status: Status,
@@ -579,20 +572,16 @@ def _handle_status_update(
         template_name,
     )
     if not note:
-        log_system_action(
-            f"ignored duplicate status notification delivery for user '{user}' status "
-            f"{status.url} case {case.url}",
-            log_level=logging.INFO,
+        _log_helper.log_notification_email_duplicate(
+            notification, user, status.url, case.url
         )
         return
 
     # let's not spam the users
     period = timedelta(seconds=settings.ZGW_LIMIT_NOTIFICATIONS_FREQUENCY)
     if note.has_received_similar_notes_within(period, template_name):
-        log_system_action(
-            f"blocked over-frequent status notification email for user '{user}' status "
-            f"{status.url} case {case.url}",
-            log_level=logging.INFO,
+        _log_helper.log_notification_email_rate_limited(
+            notification, user, status.url, case.url
         )
         return
 
@@ -601,10 +590,7 @@ def _handle_status_update(
     )
     note.mark_sent()
 
-    log_system_action(
-        f"send status notification email for user '{user}' status {status.url} case {case.url}",
-        log_level=logging.INFO,
-    )
+    _log_helper.log_notification_email_sent(notification, user, status.url, case.url)
 
 
 # - - - - -
