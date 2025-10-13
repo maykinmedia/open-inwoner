@@ -30,7 +30,7 @@
                     {% if not is_branch_restricted %}
                         {% button href="kvk:branches" text=_("Wissel van vestiging") icon="autorenew" transparent=True icon_outlined=True %}
                     {% endif %}
-                    {% button href="profile:edit" text=_("Bewerk") icon="edit" transparent=True icon_outlined=True %}
+                    {% button href="profile:edit" text=_("Bewerk") aria_label=_("Bewerk bedrijfsgegevens") icon="edit" transparent=True icon_outlined=True %}
                 </div>
             </header>
         </div>
@@ -79,7 +79,7 @@
             <header class="oip-header-group title">
                 <h2 class="utrecht-heading-2 " id="personal-overview">{% trans "Persoonlijke gegevens" %}</h2>
                 <div class="tabled__item--mobile-big">
-                    {% button href="profile:edit" text=_("Bewerk") icon="edit" transparent=True icon_outlined=True %}
+                    {% button href="profile:edit" text=_("Bewerk") aria_label=_("Bewerk persoonsgegevens") icon="edit" transparent=True icon_outlined=True %}
                     {% if user.is_digid_user_with_brp and view.config.my_data %}
                         {% button href="profile:data" text=_("Bekijk alle gegevens") icon="east" transparent=True icon_position="after" icon_outlined=True %}
                     {% elif not user.is_digid_user %}
@@ -126,7 +126,7 @@
                     <h2 class="utrecht-heading-2" id="notifications">{% trans "Voorkeuren voor meldingen" %}
                     </h2>
                     <div class="tabled__item--mobile-big">
-                        {% button href="profile:notifications" text=_("Bewerk") icon="edit" transparent=True icon_outlined=True %}
+                        {% button href="profile:notifications" text=_("Bewerk") aria_label=_("Bewerk meldingsvoorkeuren") icon="edit" transparent=True icon_outlined=True %}
                     </div>
                 </header>
 
