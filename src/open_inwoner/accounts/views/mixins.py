@@ -1,5 +1,3 @@
-from functools import partial
-
 from django.http import HttpRequest
 from django.utils.translation import gettext_lazy as _
 
@@ -28,48 +26,33 @@ class ContactmomentLogMixin(LogMixin):
     request: HttpRequest
 
     def log_contactmoment_registered_by_email(self, success: bool):
-        """
-        Log registering a contactmoment by email
-        """
-        log = partial(self.log_system_action, user=self.request.user)
-
         if success:
-            log("registered contactmoment by email")
+            msg = "registered contactmoment by email"
         else:
-            log("error while registering contactmoment by email")
+            msg = "error while registering contactmoment by email"
 
+        self.log_system_action(msg, user=self.request.user)
         contactmoment_registrations.add(1, {"channel": "email", "success": success})
 
     def log_question_registered_via_openklant(self, success: bool):
-        """
-        Log registering a question via OpenKlant2
-        """
         if success:
-            self.log_system_action(
-                "registered question via OpenKlant", user=self.request.user
-            )
+            msg = "registered question via OpenKlant"
         else:
-            self.log_system_action("failed to register question via OpenKlant")
+            msg = "failed to register question via OpenKlant"
 
+        self.log_system_action(msg, user=self.request.user)
         contactmoment_registrations.add(1, {"channel": "openklant", "success": success})
 
     def log_contactmoment_registered_via_esuite(self, success: bool):
-        """
-        Log registering a contactmoment via eSuite
-        """
-        log = partial(self.log_system_action, user=self.request.user)
-
         if success:
-            log("registered contactmoment via eSuite")
+            msg = "registered contactmoment via eSuite"
         else:
-            log("error while registering contactmoment by API")
+            msg = "error while registering contactmoment by API"
 
+        self.log_system_action(msg, user=self.request.user)
         contactmoment_registrations.add(1, {"channel": "esuite", "success": success})
 
     def log_klant_patched(self, patched_fields: list[str]):
-        """
-        Log patching a klant with missing fields
-        """
         self.log_system_action(
             "patched klant from user with missing fields: {patched}".format(
                 patched=", ".join(sorted(patched_fields))
@@ -78,20 +61,12 @@ class ContactmomentLogMixin(LogMixin):
         )
 
     def log_klant_contact_info_appended_to_message(self):
-        """
-        Log when contact info is appended to message because klant couldn't be created
-        """
         self.log_system_action(
             "could not retrieve or create klant for user, appended info to message",
             user=self.request.user,
         )
 
     def log_contactmoment_list_accessed(self, questions: list[dict]):
-        """
-        Log access to the contactmoment list view
-
-        Creates a single log for all questions
-        """
         question_ids = (question["identification"] for question in questions)
 
         self.log_user_action(
@@ -101,9 +76,6 @@ class ContactmomentLogMixin(LogMixin):
         contactmoment_list_views.add(1, {"num_questions_viewed": len(questions)})
 
     def log_contactmoment_detail_accessed(self, identification: str):
-        """
-        Log access to a specific contactmoment detail view
-        """
         self.log_user_action(
             self.request.user,
             f"Vraag bekeken: {identification}",
@@ -116,14 +88,11 @@ class ProfileLogMixin(LogMixin):
 
     def log_newsletter_subscription_modified(self, success: bool):
         if success:
-            self.log_user_action(
-                self.request.user, _("users newsletter subscriptions were modified")
-            )
+            msg = _("users newsletter subscriptions were modified")
         else:
-            self.log_user_action(
-                self.request.user, _("failed to modify user newsletter subscription")
-            )
+            msg = _("failed to modify user newsletter subscription")
 
+        self.log_user_action(self.request.user, msg)
         profile_newsletter_updates.add(1, {"success": success})
 
     def log_user_deleted(self, user: User):
@@ -175,8 +144,6 @@ class ProfileLogMixin(LogMixin):
 
 
 class RegistrationLogMixin(LogMixin):
-    """Mixin for logging and metrics related to user registration"""
-
     request: HttpRequest
 
     def log_invite_accepted(self):
@@ -189,7 +156,6 @@ class RegistrationLogMixin(LogMixin):
         updated_esuite: bool,
         updated_openklant: bool,
     ):
-        """Log when a user completes necessary registration fields"""
         self.log_user_action(user, _("user was updated with necessary fields"))
         necessary_fields_completions.add(
             1,
@@ -204,14 +170,14 @@ class RegistrationLogMixin(LogMixin):
         self.log_user_action(user, _("user was created"))
 
     def log_email_verification_requested(self, user: User):
-        """Log when a user requests email verification"""
         self.log_user_action(user, _("user requested e-mail address verification"))
         email_verification_requests.add(1)
 
     def log_email_verification_completed(self, user: User, success: bool):
-        """Log when a user completes email verification"""
         if success:
-            self.log_user_action(user, _("user verified e-mail address"))
+            msg = _("user verified e-mail address")
         else:
-            self.log_user_action(user, _("user failed to verify e-mail address"))
+            msg = _("user failed to verify e-mail address")
+
+        self.log_user_action(user, msg)
         email_verification_completions.add(1, {"success": success})

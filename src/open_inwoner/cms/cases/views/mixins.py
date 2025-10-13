@@ -1,5 +1,4 @@
 import logging
-from functools import partial
 
 from django.contrib.auth.mixins import AccessMixin, LoginRequiredMixin
 from django.http import Http404, HttpRequest
@@ -25,11 +24,6 @@ class CaseLogMixin(LogMixin):
     request: HttpRequest
 
     def log_case_list_accessed(self, cases: list[dict]):
-        """
-        Log access to cases on the list view
-
-        Creates a single log for all cases
-        """
         case_ids = [case["identification"] for case in cases]
 
         self.log_user_action(
@@ -46,9 +40,6 @@ class CaseLogMixin(LogMixin):
         case_detail_views.add(1)
 
     def log_case_document_downloaded(self, case: UniformCase, filename: str):
-        """
-        Log downloading a document from a case
-        """
         self.log_user_action(
             self.request.user,
             _("Document van zaak gedownload {case}: {filename}").format(
@@ -59,9 +50,6 @@ class CaseLogMixin(LogMixin):
         case_document_downloads.add(1)
 
     def log_case_document_uploaded(self, case: UniformCase, filename: str):
-        """
-        Log uploading a document to a case
-        """
         self.log_user_action(
             self.request.user,
             _("Document was uploaded for {case}: {filename}").format(
@@ -72,21 +60,12 @@ class CaseLogMixin(LogMixin):
         case_document_uploads.add(1)
 
     def log_contactmoment_for_zaak_registered_by_email(self, success: bool):
-        """
-        Log registering a contactmoment by email
-        """
-        success = True
         if success:
-            self.log_system_action(
-                "registered contactmoment by email", user=self.request.user
-            )
+            msg = "registered contactmoment by email"
         else:
-            success = False
-            self.log_system_action(
-                "error while registering contactmoment by email",
-                user=self.request.user,
-            )
+            msg = "error while registering contactmoment by email"
 
+        self.log_system_action(msg, user=self.request.user)
         case_contact_form_registrations.add(1, {"channel": "email", "success": success})
 
     def log_contactmoment_for_zaak_registered_by_api(
@@ -94,24 +73,24 @@ class CaseLogMixin(LogMixin):
         contactmoment_success: bool,
         objectcontactmoment_success: bool | None = None,
     ):
-        """
-        Log registering a contactmoment and optionally objectcontactmoment by API
-        """
-        log = partial(self.log_system_action, user=self.request.user)
+        success = contactmoment_success and (
+            objectcontactmoment_success is None or objectcontactmoment_success
+        )
 
-        success = True
         if contactmoment_success:
-            log("registered contactmoment by API")
+            msg = "registered contactmoment by API"
         else:
-            sucess = False
-            log("error while registering contactmoment by API")
+            msg = "error while registering contactmoment by API"
+
+        self.log_system_action(msg, user=self.request.user)
 
         if objectcontactmoment_success is not None:
             if objectcontactmoment_success:
-                log("registered objectcontactmoment by API")
+                msg = "registered objectcontactmoment by API"
             else:
-                sucess = False
-                log("error linking objectcontactmoment to contactmoment by API")
+                msg = "error linking objectcontactmoment to contactmoment by API"
+
+            self.log_system_action(msg, user=self.request.user)
 
         case_contact_form_registrations.add(1, {"channel": "api", "success": success})
 
