@@ -8,20 +8,20 @@ export class FilterBar {
     this.backdrop = document.getElementById('filterBarBackdrop')
     this.closeButton = node.querySelector('.show-controls')
     this.selectionFilterBar = document.getElementById('selectionFilterBar')
+    this.listboxDropdown = document.getElementById('listboxDropdown')
 
     // Break if critical elements are not found
     if (!this.filterPopup || !this.filterButton || !this.selectionFilterBar) {
       return
     }
 
-    // Event listeners
     this.filterPopup.addEventListener(
       'click',
       this.toggleOpenFilterPopup.bind(this)
     )
     this.closeButton.addEventListener(
       'click',
-      this.closeFilterPopupDirect.bind(this) // Added a specific handler for direct close button click
+      this.closeFilterPopupDirect.bind(this)
     )
     document.addEventListener('click', this.closeFilterPopup.bind(this), false)
     document.addEventListener(
@@ -30,10 +30,9 @@ export class FilterBar {
       false
     )
 
-    // Attach checkbox listeners and update state
     this.attachCheckboxListeners()
+    this.attachCheckboxInputFocusListeners()
 
-    // Ensure the correct state is applied on page load
     setTimeout(() => {
       this.updateFilterBarState()
     }, 100)
@@ -41,11 +40,10 @@ export class FilterBar {
 
   toggleOpenFilterPopup(event) {
     event.preventDefault()
+    event.stopPropagation()
 
-    // Add 'show' class to the backdrop to make it visible
     this.backdrop.classList.add('show')
 
-    // Toggle mobile filter class
     setTimeout(() => {
       this.node.classList.toggle('filter-bar--mobile')
       const isExpanded =
@@ -55,16 +53,12 @@ export class FilterBar {
   }
 
   closeFilterPopupDirect() {
-    // Remove 'show' class from the backdrop to hide it
     this.backdrop.classList.remove('show')
-
-    // Remove mobile class and reset aria-expanded
     this.node.classList.remove('filter-bar--mobile')
     this.filterPopup.setAttribute('aria-expanded', 'false')
   }
 
   closeFilterPopup(event) {
-    // Close on clicking outside or pressing Escape
     if (
       (event.type === 'keydown' && event.key === 'Escape') ||
       (event.type === 'click' &&
@@ -72,10 +66,7 @@ export class FilterBar {
         !this.filterPopup.contains(event.target) &&
         !this.backdrop.contains(event.target))
     ) {
-      // Remove 'show' class from the backdrop to hide it
       this.backdrop.classList.remove('show')
-
-      // Remove mobile class and reset aria-expanded
       this.node.classList.remove('filter-bar--mobile')
       this.filterPopup.setAttribute('aria-expanded', 'false')
     }
@@ -108,6 +99,35 @@ export class FilterBar {
         this.updateFilterBarState()
       })
     })
+  }
+
+  attachCheckboxInputFocusListeners() {
+    const inputs = this.node.querySelectorAll(
+      '#listboxDropdown .checkbox__input'
+    )
+    const submitButton = document.getElementById('filterCases')
+
+    const addShowClass = () => {
+      if (this.listboxDropdown) {
+        this.listboxDropdown.classList.add('show')
+      }
+    }
+
+    const removeShowClass = () => {
+      if (this.listboxDropdown) {
+        this.listboxDropdown.classList.remove('show')
+      }
+    }
+
+    inputs.forEach((input) => {
+      input.addEventListener('focus', addShowClass)
+      input.addEventListener('blur', removeShowClass)
+    })
+
+    if (submitButton) {
+      submitButton.addEventListener('focus', addShowClass)
+      submitButton.addEventListener('blur', removeShowClass)
+    }
   }
 }
 

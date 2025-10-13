@@ -9,10 +9,9 @@
     <div class="pagination__pages">
         {% if page_obj.has_previous %}
             <a class="pagination__previous pagination__link"
+                href="?{% querystring key='page' value=page_obj.previous_page_number %}"
                 {% if hxget %}
                     hx-get="{{ hxget }}?{% querystring key='page' value=page_obj.previous_page_number %}" hx-trigger="click" hx-target="{{ hxtarget }}"
-                {% else %}
-                    href="?{% querystring key='page' value=page_obj.previous_page_number %}"
                 {% endif %}>
                 {% icon icon="west" %}
             </a>
@@ -26,10 +25,9 @@
             {% else %}
                 {% if i in page_numbers %}
                     <a class="pagination__link"
+                        href="?{% querystring key='page' value=i %}"
                         {% if hxget %}
                             hx-get="{{ hxget }}?{% querystring key='page' value=i %}" hx-trigger="click" hx-target="{{ hxtarget }}"
-                        {% else %}
-                            href="?{% querystring key='page' value=i %}"
                         {% endif %}
                     >
                         {{ i }}
@@ -37,10 +35,9 @@
                 {% else %}
                     {% if i == 1 %}
                         <a class="pagination__link"
+                            href="?{% querystring key='page' value=i %}"
                             {% if hxget %}
                                 hx-get="{{ hxget }}?{% querystring key='page' value=i %}" hx-trigger="click" hx-target="{{ hxtarget }}"
-                            {% else %}
-                                href="?{% querystring key='page' value=i %}"
                             {% endif %}
                         >
                             {{ i }}
@@ -57,10 +54,9 @@
                         {% endif %}
 
                         <a class="pagination__link"
+                            href="?{% querystring key='page' value=i %}"
                             {% if hxget %}
                                 hx-get="{{ hxget }}?{% querystring key='page' value=i %}" hx-trigger="click" hx-target="{{ hxtarget }}"
-                            {% else %}
-                                href="?{% querystring key='page' value=i %}"
                             {% endif %}
                         >
                             {{ i }}
@@ -72,10 +68,9 @@
 
         {% if page_obj.has_next %}
             <a class="pagination__next pagination__link"
+                href="?{% querystring key='page' value=page_obj.next_page_number %}"
                 {% if hxget %}
                     hx-get="{{ hxget }}?{% querystring key='page' value=page_obj.next_page_number %}" hx-trigger="click" hx-target="{{ hxtarget }}"
-                {% else %}
-                    href="?{% querystring key='page' value=page_obj.next_page_number %}"
                 {% endif %}
             >
                 {% icon icon="east" %}

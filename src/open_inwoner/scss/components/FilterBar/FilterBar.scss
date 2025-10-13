@@ -122,9 +122,9 @@
     border-radius: var(--border-radius-large) var(--border-radius-large) 0 0;
     margin: 0 var(--spacing-tiny);
     padding: var(--spacing-extra-large);
-    height: 70vh;
+    min-height: 70vh;
     position: fixed;
-    top: 30vh;
+    bottom: 0vh;
     z-index: 1020;
 
     .multiselect-listbox__popup {

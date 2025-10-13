@@ -53,7 +53,7 @@
                 <h2 class="utrecht-heading-2" id="goal">{% trans "Doel en omschrijving" %}</h2>
                 <div class="tabled__item--mobile-big">
                     {% if is_creator %}
-                        {% button href="collaborate:plan_edit_goal" uuid=object.uuid icon="edit" icon_outlined=True text=_("Bewerk") title=_("Doel en omschrijving bewerken") ariaLabel=_("Doel en omschrijving bewerken") transparent=True %}
+                        {% button href="collaborate:plan_edit_goal" uuid=object.uuid icon="edit" icon_outlined=True text=_("Bewerk") title=_("Doel en omschrijving bewerken") aria_label=_("Doel en omschrijving bewerken") transparent=True %}
                     {% endif %}
                 </div>
             </header>
@@ -112,7 +112,7 @@
             <header class="oip-header-group title">
                 <h2 class="utrecht-heading-2" id="notes">{% trans "Notities" %}</h2>
                 <div class="tabled__item--mobile-big">
-                    {% button href="collaborate:plan_edit_note" uuid=object.uuid icon="edit" icon_outlined=True text=_("Bewerk") title=_("Notitie aanvullen") ariaLabel=_("Notitie aanvullen") transparent=True %}
+                    {% button href="collaborate:plan_edit_note" uuid=object.uuid icon="edit" icon_outlined=True text=_("Bewerk") title=_("Notitie aanvullen") aria_label=_("Notitie aanvullen") transparent=True %}
                 </div>
             </header>
         </div>

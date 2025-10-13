@@ -5,7 +5,7 @@
         class="{{ classes }}"
         href="{{ href }}"
         title="{% firstof title text %}"
-        aria-label="{% firstof text title %}"
+        aria-label="{% firstof aria_label text title %}"
         {% if open_new_tab or href|startswith:"http" %}target="_blank"{% endif %}
         {% as_attributes extra_attributes %}
         {% if ariaExpanded %} aria-expanded="{{ ariaExpanded }}" {% endif %}
@@ -28,7 +28,7 @@
         name="{{ name }}"
         value="{{ value }}"
         title="{% firstof title text %}"
-        aria-label="{% firstof text title %}"
+        aria-label="{% firstof aria_label text title %}"
         {% as_attributes extra_attributes %}
         {% if id %} id="{{ id }}" {% endif %}
         {% if form_id %} form="{{ form_id }}"{% endif %}
