@@ -1660,7 +1660,10 @@ class OpenKlant2Service(
             lambda row: partij_uuid
             in glom.glom(
                 row,
-                ("_expand.hadBetrokkenen", ["wasPartij.uuid"]),
+                (
+                    "_expand.hadBetrokkenen",
+                    [(glom.Coalesce("wasPartij.uuid", default=glom.SKIP),)],
+                ),
             ),
             klantcontacten,
         )
@@ -1901,9 +1904,10 @@ class OpenKlant2Service(
             if _expand := klantcontact.get("_expand"):
                 if had_betrokkenen := _expand.get("hadBetrokkenen"):
                     for betrokkene in had_betrokkenen:
-                        partij_was_betrokkene = (
-                            betrokkene["wasPartij"]["uuid"] == partij["uuid"]
-                        )
+                        was_partij = betrokkene.get("wasPartij")
+                        if was_partij is None:
+                            continue
+                        partij_was_betrokkene = was_partij["uuid"] == partij["uuid"]
                         partij_was_initiator = betrokkene["initiator"]
 
                         if partij_was_betrokkene and partij_was_initiator:
