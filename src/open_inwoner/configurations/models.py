@@ -77,6 +77,7 @@ class SiteConfiguration(SingletonModel):
         help_text=_("Whether the warning banner should be displayed"),
     )
     warning_banner_text = ProsemirrorModelField(
+        verbose_name=_("Warning banner text"),
         allowed_node_types=[NodeType.PARAGRAPH],
         allowed_mark_types=[
             MarkType.STRONG,
@@ -135,6 +136,7 @@ class SiteConfiguration(SingletonModel):
         ),
     )
     login_text = ProsemirrorModelField(
+        verbose_name=_("Login tekst"),
         allowed_node_types=[NodeType.PARAGRAPH],
         allowed_mark_types=[
             MarkType.STRONG,
@@ -144,6 +146,7 @@ class SiteConfiguration(SingletonModel):
         ],
         null=True,
         blank=True,
+        help_text=_("Deze tekst wordt getoond op de login pagina."),
     )
     enable_eherkenning_for_eenmanszaak = models.BooleanField(
         verbose_name=_("Allow eenmanszaken to authenticate using eHerkenning"),
@@ -231,6 +234,7 @@ class SiteConfiguration(SingletonModel):
         help_text=_("Product finder's intro text on the home page."),
     )
     search_zero_results_text = ProsemirrorModelField(
+        verbose_name=_("Text for zero search results"),
         allowed_node_types=[NodeType.PARAGRAPH],
         allowed_mark_types=[
             MarkType.STRONG,
@@ -240,6 +244,7 @@ class SiteConfiguration(SingletonModel):
         ],
         null=True,
         blank=True,
+        help_text=_("Text will be displayed on the warning banner"),
     )
     select_questionnaire_title = models.CharField(
         max_length=255,
