@@ -154,7 +154,8 @@ class SideNavMenuData:
         try:
             resolved = resolve(self.request.path)
             if resolved.url_name == "contactmoment_list":
-                current = "contactmomenten" in node.get_absolute_url()
+                redirect_url = node.attr.get("redirect_url", None)
+                current = redirect_url and "contactmomenten" in redirect_url
         except Exception as e:
             logger.debug("Could not resolve current path for menu highlighting: %s", e)
 

@@ -71,6 +71,8 @@ Bugfixes
   weergegeven.
 * [:taiga-is:`3497`: :pr:`1958`]: Het ophalen van vragen in Openklant geeft geen
   foutmeldingen meer als er ook anonieme vragen voorkomen in de backend.
+* [:taiga-is:`3519`: :pr:`1966`]: Probleem opgelost in de side menu waarbij de
+  'mijn vragen' item niet geselecteerd wordt als huidige pagina.
 
 Onderhoud
 ---------
