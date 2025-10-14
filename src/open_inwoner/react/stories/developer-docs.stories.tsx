@@ -1,21 +1,26 @@
-import type { Meta } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react'
 
-const meta: Meta = {
-  title: 'Developer Docs', // sidebar link label
+const DocsOnly = () => null
+
+const meta: Meta<typeof DocsOnly> = {
+  title: 'Developer Docs',
+  component: DocsOnly,
+  tags: ['autodocs'],
   parameters: {
     docs: {
-      // Optional: remove Controls and Actions panels for pure doc page
+      // Remove Controls and Actions panels for pure doc page
       controls: { disable: true },
       actions: { disable: true },
       page: null, // We override page on Docs export story below
     },
   },
 }
-
 export default meta
 
+type Story = StoryObj<typeof DocsOnly>
+
 // Single unattached "Docs" page
-export const Docs = {
+export const Docs: Story = {
   parameters: {
     docs: {
       page: () => (

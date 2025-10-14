@@ -3,7 +3,7 @@ import SideNav from './SideNav'
 import 'material-icons/iconfont/material-icons.css'
 
 const meta: Meta<typeof SideNav> = {
-  title: 'React/SideNav',
+  title: 'React/Components/SideNav',
   component: SideNav,
   parameters: {
     layout: 'padded',

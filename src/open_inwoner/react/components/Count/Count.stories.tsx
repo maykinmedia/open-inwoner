@@ -7,7 +7,7 @@ const messages = {
 }
 
 const meta: Meta<typeof Count> = {
-  title: 'React/Count result',
+  title: 'React/Components/Count result',
   component: Count,
   decorators: [
     (Story) => (

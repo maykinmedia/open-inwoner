@@ -5,7 +5,7 @@ import 'material-icons/iconfont/material-icons.css'
 type ExtendedMateriaIconProps = typeof MaterialIcon & { nameTool: string }
 
 const meta: Meta<ExtendedMateriaIconProps> = {
-  title: 'React/MaterialIcon',
+  title: 'React/Components/MaterialIcon',
   component: MaterialIcon,
   parameters: {
     layout: 'padded',
