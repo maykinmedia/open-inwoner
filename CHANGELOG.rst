@@ -84,6 +84,8 @@ Bugfixes
   Prosemirror-velden niet waren gekopieerd.
 * [:taiga-is:`3519`: :pr:`1966`]: Probleem opgelost in de side menu waarbij de
   'mijn vragen' item niet geselecteerd wordt als huidige pagina.
+* [:taiga-is:`3507`: :pr:`1963`]: Verander kleur van menu items bij actieve en hover status
+  naar de correcte primaire kleur.
 
 Onderhoud
 ---------
