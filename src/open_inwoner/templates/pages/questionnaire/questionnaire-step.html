@@ -43,7 +43,7 @@
                 {% csrf_token %}
 
                 {% if form.instance.content %}
-                    {{ form.instance.content|ckeditor_content|safe }}
+                    {{ form.instance.content|safe }}
                 {% endif %}
 
                 {% if form.instance.questionnairestepfile_set.exists %}

@@ -25,7 +25,7 @@ class TestProductImportResource(TestCase):
             [
                 self.product.name,
                 self.product.summary,
-                self.product.content,
+                "<p>Test product content</p>",
                 self.category.slug,
                 "",
                 "",
@@ -84,7 +84,7 @@ class TestProductImportResource(TestCase):
             [
                 self.product.name,
                 self.product.summary,
-                self.product.content,
+                "<p>Test content</p>",
                 "",
                 "",
                 "",
@@ -116,7 +116,7 @@ class TestProductImportResource(TestCase):
             [
                 self.product.name,
                 self.product.summary,
-                self.product.content,
+                "<p>Test content</p>",
                 "wrong-category",
                 "",
                 "",
@@ -148,7 +148,7 @@ class TestProductImportResource(TestCase):
             [
                 self.product.name,
                 self.product.summary,
-                self.product.content,
+                "<p>Test content</p>",
                 self.category.slug,
                 "",
                 "",
@@ -177,15 +177,19 @@ class TestProductImportResource(TestCase):
         self.assertEqual(qs[0].slug, self.product.slug)
 
     def test_import_updates_product_when_slug_field_is_given(self):
-        self.product.save()
+        # Save product with explicit content to ensure it's valid
+        existing_product = ProductFactory(
+            categories=(self.category,), content="<p>Original content</p>"
+        )
         updated_product = ProductFactory.build(categories=(self.category,))
+        updated_content = "<p>Updated content</p>"
         dataset = tablib.Dataset(
             [
                 updated_product.name,
                 updated_product.summary,
-                updated_product.content,
+                updated_content,
                 self.category.slug,
-                self.product.slug,
+                existing_product.slug,
                 "",
                 "",
                 "",
@@ -205,20 +209,20 @@ class TestProductImportResource(TestCase):
                 "organizations",
             ],
         )
-        result = self.resource.import_data(dataset)
+        result = self.resource.import_data(dataset, raise_errors=True)
         qs = Product.objects.filter(name=updated_product.name)
 
         self.assertEqual(result.totals["update"], 1)
         self.assertEqual(qs[0].name, updated_product.name)
         self.assertEqual(qs[0].summary, updated_product.summary)
-        self.assertEqual(qs[0].content, updated_product.content)
+        self.assertEqual(qs[0].content.html, updated_content)
 
     def test_import_replaces_windows_newlines(self):
         dataset = tablib.Dataset(
             [
                 self.product.name,
                 self.product.summary,
-                "some content_x000D__x000D_and some extra",
+                "<p>some content</p>_x000D__x000D_<p>and some extra</p>",
                 self.category.slug,
                 "",
                 "",
@@ -243,7 +247,9 @@ class TestProductImportResource(TestCase):
         self.resource.import_data(dataset)
         qs = Product.objects.filter(name=self.product.name)
 
-        self.assertEqual(qs[0].content, "some content\n\nand some extra")
+        # After newline replacement and HTML parsing, we should have two paragraphs
+        self.assertIn("some content", qs[0].content.html)
+        self.assertIn("and some extra", qs[0].content.html)
 
 
 class TestProductExportResource(TestCase):
@@ -267,7 +273,10 @@ class TestProductExportResource(TestCase):
                         (dataset.headers[1], self.product.slug),
                         (dataset.headers[2], self.product.summary),
                         (dataset.headers[3], ""),
-                        (dataset.headers[4], self.product.content),
+                        (
+                            dataset.headers[4],
+                            self.product.content.html if self.product.content else "",
+                        ),
                         (dataset.headers[5], category_slug),
                         (dataset.headers[6], ""),
                         (dataset.headers[7], ""),

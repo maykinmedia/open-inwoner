@@ -1,21 +1,30 @@
+import logging
+
 from django import template
 
-from open_inwoner.utils.ckeditor import get_rendered_content
+from open_inwoner.utils.html import get_rendered_content
 
 register = template.Library()
 
 
-@register.filter("ckeditor_content")
-def ckeditor_content(content):
+logger = logging.getLogger(__name__)
+
+
+@register.filter("prosemirror_content")
+def prosemirror_content(content):
     """
-    Returns rendered content from ckeditor's textarea field.
+    Returns rendered content from ProsemirrorModelField
 
     Usage:
-        {{ object.content|ckeditor_content }}
+        {{ object.content|prosemirror_content }}
 
     Variables:
         + content: str | Object's content
     """
-    rendered_content = get_rendered_content(content)
-
-    return rendered_content
+    if content is None:
+        return ""
+    try:
+        return get_rendered_content(content)
+    except (AttributeError, TypeError) as e:
+        logger.warning("Could not render content: %s", e)
+        return ""

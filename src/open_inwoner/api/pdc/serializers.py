@@ -59,18 +59,38 @@ class SmallProductSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class Questionserializer(serializers.ModelSerializer):
+    answer = serializers.SerializerMethodField()
+
     class Meta:
         model = Question
         fields = ("question", "answer")
 
+    def get_answer(self, obj):
+        if obj.answer:
+            try:
+                return obj.answer.html
+            except Exception:
+                return None
+        return None
+
 
 class SmallCategorySerializer(serializers.HyperlinkedModelSerializer):
+    description = serializers.SerializerMethodField()
+
     class Meta:
         model = Category
         fields = ("url", "name", "slug", "published", "highlighted", "description")
         extra_kwargs = {
             "url": {"view_name": "api:categories-detail", "lookup_field": "slug"},
         }
+
+    def get_description(self, obj):
+        if obj.description:
+            try:
+                return obj.description.html
+            except Exception:
+                return None
+        return None
 
 
 class CategoryWithChildSerializer(serializers.ModelSerializer):
@@ -79,6 +99,7 @@ class CategoryWithChildSerializer(serializers.ModelSerializer):
     products = SmallProductSerializer(required=False, many=True)
     questions = Questionserializer(required=False, many=True, source="question_set")
     children = serializers.SerializerMethodField()
+    description = serializers.SerializerMethodField()
 
     class Meta:
         model = Category
@@ -94,6 +115,14 @@ class CategoryWithChildSerializer(serializers.ModelSerializer):
             "questions",
             "children",
         )
+
+    def get_description(self, obj):
+        if obj.description:
+            try:
+                return obj.description.html
+            except Exception:
+                return None
+        return None
 
     @extend_schema_field(SmallCategorySerializer(many=True))
     def get_children(self, obj):
@@ -156,6 +185,7 @@ class ProductSerializer(serializers.ModelSerializer):
     locations = ProductLocationSerializer(many=True, required=False)
     conditions = ProductConditionSerializer(many=True, required=False)
     files = ProductFileSerializer(many=True, required=False)
+    content = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
@@ -179,3 +209,11 @@ class ProductSerializer(serializers.ModelSerializer):
             "conditions",
             "files",
         )
+
+    def get_content(self, obj):
+        if obj.content:
+            try:
+                return obj.content.html
+            except Exception:
+                return None
+        return None

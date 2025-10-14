@@ -46,7 +46,7 @@
         {% endif %}
         <div class="readmore__content" id="readmore__content" data-toggle-readmore="{{ readmore|lower }}">
             <div class="readmore__inner-content {% if object.content_is_collapsable %}readmore__content--hidden{% endif %}">
-                {{ object|product_ckeditor_content|safe }}
+                {{ object|product_rendered_content|safe }}
             </div>
         </div>
     </div>

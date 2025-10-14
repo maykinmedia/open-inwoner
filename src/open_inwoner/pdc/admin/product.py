@@ -7,7 +7,6 @@ from import_export.admin import ImportExportMixin
 from import_export.formats import base_formats
 from ordered_model.admin import OrderedModelAdmin
 
-from open_inwoner.ckeditor5.widgets import CKEditorWidget
 from open_inwoner.pdc.models import (
     Category,
     Product,
@@ -40,7 +39,6 @@ class ProductAdminForm(forms.ModelForm):
     class Meta:
         model = Product
         fields = "__all__"
-        widgets = {"content": CKEditorWidget}
 
     categories = forms.ModelMultipleChoiceField(
         label=_("Categories"),

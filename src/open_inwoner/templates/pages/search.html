@@ -97,8 +97,8 @@
                         <h2 class="utrecht-heading-2 search-results__title">
                             {% trans "We konden geen zoekresultaten vinden" %}
                         </h2>
-                        {% if configurable_text.search_page.search_zero_results_text %}
-                            {{ configurable_text.search_page.search_zero_results_text|safe }}
+                        {% if configurable_text.search_page.search_zero_results_text.html %}
+                            {{ configurable_text.search_page.search_zero_results_text.html|safe }}
                         {% else %}
                             <p class="utrecht-paragraph">{% trans "Probeer het nog eens met deze tips:" %}</p>
                             <ul class="ul">

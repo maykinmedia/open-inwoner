@@ -2,7 +2,7 @@ from django import template
 from django.urls import NoReverseMatch, reverse
 from django.utils.translation import gettext as _
 
-from open_inwoner.utils.ckeditor import get_product_rendered_content
+from open_inwoner.utils.html import get_product_rendered_content
 
 register = template.Library()
 
@@ -40,13 +40,13 @@ def product_finder(
     return kwargs
 
 
-@register.filter("product_ckeditor_content")
-def product_ckeditor_content(product):
+@register.filter("product_rendered_content")
+def product_rendered_content(product):
     """
-    Returns rendered content from ckeditor's textarea field specifically for a product.
+    Returns rendered content for a product.
 
     Usage:
-        {{ object|product_ckeditor_content }}
+        {{ object|product_rendered_content }}
 
     Variables:
         + product: Product | The product object

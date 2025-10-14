@@ -122,7 +122,17 @@ class QuestionnaireStepViewTestCase(TestCase):
         self.assertContains(response, "bar")
 
     def test_render_content(self):
-        QuestionnaireStepFactory.create(code="bar", slug="bar", content="foo")
+        # QuestionnaireStepFactory.create(code="bar", slug="bar", content="foo")
+        QuestionnaireStepFactory.create(
+            code="bar",
+            slug="bar",
+            content={
+                "type": "doc",
+                "content": [
+                    {"type": "paragraph", "content": [{"type": "text", "text": "foo"}]}
+                ],
+            },
+        )
         path = reverse("products:root_step", kwargs={"slug": "bar"})
         response = self.client.get(path)
         self.assertContains(response, "foo")

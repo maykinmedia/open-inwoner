@@ -22,6 +22,12 @@ Deployment aandachtspunten
 * De YAML structuur van ``django-setup-configuration`` voor het configureren van het
   klantensysteem is aangepast. De nieuwe structuur is omschreven in de `documentatie
   <https://docs.openinwoner.nl/en/latest/configuration/index.html>`_.
+* De vervanging van CKEditor door Prosemirror vereiste het converteren van gegevens in HTML en
+  markdown naar een nieuwe structuur. In sommige gevallen (vooral wanneer de gegevens tabellen
+  of andere geavanceerde elementen bevatten) is de opmaak mogelijk niet behouden gebleven. In
+  deze gevallen blijft de ruwe inhoud van de oorspronkelijke CKEditor behouden zonder opmaak.
+  Controleer de opmaak van de inhoud van de rich text editor, met name voor de onderwerpen en
+  de producten.
 
 Nieuwe features
 ---------------
@@ -34,6 +40,7 @@ Nieuwe features
   observability.
 * [:taiga-us:`3408`, :pr:`1881`]: Nieuw selectiescherm voor eHerkenning-inlog met zoek-
   en dropdownfunctie voor betere UX waarmee gewiseld kan worden tussen vestigingen.
+* [:taiga-us:`3450`, :taiga-ta:`3454`]: CKEditor wordt vervangen door Prosemirror
 
 Bugfixes
 --------
@@ -77,6 +84,7 @@ Onderhoud
   configuratie van het klantensysteem is gereorganiseerd om de structuur van het
   beheerscherm te volgen, met een overkoepelend config en sub-configs voor eSuite en
   Openklant.
+* [:taiga-ta:`3454`]: ``django-prosemirror`` bijgewerkt naar nieuwste versie
 
 1.35.0 (2025-09-18)
 ===================

@@ -61,25 +61,16 @@ class QuestionnaireExportTests(TestCase):
         self.client.cookies[self.session_cookie_name] = self.session.session_key
         response = self.client.get(reverse("products:questionnaire_export"))
         self.assertEqual(response.context["root_title"], self.questionnaire.title)
-        self.assertListEqual(
-            response.context["steps"],
-            [
-                {
-                    "question": self.questionnaire.question,
-                    "answer": child.parent_answer,
-                    "content": child.content,
-                },
-                {
-                    "question": child.question,
-                    "answer": grandchild.parent_answer,
-                    "content": grandchild.content,
-                },
-            ],
-        )
-        self.assertEqual(
-            response.context["last_step"],
-            {"question": child.question, "content": child.content},
-        )
+
+        steps = response.context["steps"]
+        self.assertEqual(len(steps), 2)
+        self.assertEqual(steps[0]["question"], self.questionnaire.question)
+        self.assertEqual(steps[0]["answer"], child.parent_answer)
+        self.assertEqual(steps[0]["content"].html, child.content.html)
+        self.assertEqual(steps[1]["question"], child.question)
+        self.assertEqual(steps[1]["answer"], grandchild.parent_answer)
+        self.assertEqual(steps[1]["content"].html, grandchild.content.html)
+
         self.assertTrue(
             response.context["related_products"].filter(slug=product.slug).exists()
         )

@@ -31,12 +31,12 @@
                 </div>
 
 
-                {% if case.case_type_document_upload_description %}
+                {% if case.case_type_document_upload_description.html %}
                 <div class="card card--compact card--info">
                     <div class="card__body document-upload-description">
                         {% icon icon="info" icon_position="after" extra_classes="icon--info" outlined=True %}
 
-                        <div class="document-upload-description__text wysiwyg">{{ case.case_type_document_upload_description|markdown|safe }}</div>
+                        <div class="document-upload-description__text wysiwyg">{{ case.case_type_document_upload_description.html|safe }}</div>
                     </div>
                 </div>
                 {% endif %}

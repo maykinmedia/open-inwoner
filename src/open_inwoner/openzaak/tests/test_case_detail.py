@@ -2103,11 +2103,30 @@ class TestCaseDetailView(
             zaaktype_uuids=[self.zaaktype["uuid"]],
             document_upload_enabled=True,
         )
-        zt_statustype_config = ZaakTypeStatusTypeConfigFactory(
+
+        from django_prosemirror.config import ProsemirrorConfig
+        from django_prosemirror.schema import MarkType, NodeType
+        from django_prosemirror.serde import html_to_doc
+
+        # Create config matching the field definition
+        config = ProsemirrorConfig(
+            allowed_node_types=[NodeType.PARAGRAPH],
+            allowed_mark_types=[
+                MarkType.STRONG,
+                MarkType.ITALIC,
+                MarkType.LINK,
+                MarkType.UNDERLINE,
+            ],
+        )
+
+        html_content = "<p>Foo</p>\n<p>bar</p>"
+        doc_data = html_to_doc(html_content, schema=config.schema)
+
+        ZaakTypeStatusTypeConfigFactory(
             zaaktype_config=zaak_type_config,
             statustype_url=self.status_type_finish["url"],
             zaaktype_uuids=[self.zaaktype["uuid"]],
-            document_upload_description="- Foo\n- bar",
+            document_upload_description=doc_data,
         )
 
         response = self.app.get(
@@ -2130,7 +2149,11 @@ class TestCaseDetailView(
         info_card = response.html.find("div", {"class": "card--info"})
 
         self.assertIsNotNone(info_card)
-        self.assertEqual(info_card.text.strip(), "info\n\nFoo\nbar")
+
+        # TODO: ProsemirrorModelField renders compact HTML without newlines between block elements
+        # BeautifulSoup's .text property only preserves newlines that exist in the source HTML.
+        # For compact HTML without newlines, adjacent block elements are concatenated without separators.
+        self.assertEqual(info_card.text.strip(), "info\nFoobar")
 
     @patch(
         "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype",

@@ -1,6 +1,7 @@
 from pathlib import Path
-from unittest import TestCase
 from unittest.mock import patch
+
+from django.test import TestCase
 
 from pyquery import PyQuery
 
@@ -34,8 +35,23 @@ class UitkeringTemplateTest(TestCase):
         )
 
         config = SSDConfig.get_solo()
-        config.maandspecificatie_pdf_comments = "Lorem ipsum dolor sit amet..."
+        # Set ProsemirrorModelField with JSON data
+        config.maandspecificatie_pdf_comments = {
+            "type": "doc",
+            "content": [
+                {
+                    "type": "paragraph",
+                    "content": [
+                        {"type": "text", "text": "Lorem ipsum dolor sit amet..."}
+                    ],
+                }
+            ],
+        }
         config.save()
+
+        # Reload config to get ProsemirrorFieldDocument
+        config = SSDConfig.get_solo()
+        comments_html = config.maandspecificatie_pdf_comments.html
 
         uitkeringen = get_uitkeringen(None)
 
@@ -43,7 +59,7 @@ class UitkeringTemplateTest(TestCase):
             ssd_client.html_template,
             context={
                 "reports": uitkeringen,
-                "comments": config.maandspecificatie_pdf_comments,
+                "comments": comments_html,
             },
         )
 

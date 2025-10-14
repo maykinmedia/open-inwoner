@@ -2,9 +2,16 @@ from import_export import fields, resources
 from import_export.widgets import CharWidget, ManyToManyWidget
 
 from open_inwoner.pdc.models import Category, Organization, Product, Tag
+from open_inwoner.pdc.resources.widgets import ProsemirrorWidget
 
 
 class CategoryExportResource(resources.ModelResource):
+    description = fields.Field(
+        column_name="description",
+        attribute="description",
+        widget=ProsemirrorWidget(),
+    )
+
     class Meta:
         model = Category
         import_id_fields = ("slug",)
@@ -23,6 +30,11 @@ class CategoryExportResource(resources.ModelResource):
 
 
 class ProductExportResource(resources.ModelResource):
+    content = fields.Field(
+        column_name="content",
+        attribute="content",
+        widget=ProsemirrorWidget(),
+    )
     categories = fields.Field(
         column_name="categories",
         attribute="categories",

@@ -1,6 +1,5 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const argv = require('yargs').argv
-const { styles } = require('@ckeditor/ckeditor5-dev-utils')
 
 const paths = require('./build/paths')
 
@@ -46,38 +45,6 @@ module.exports = {
   // Modules
   module: {
     rules: [
-      // CKEditor
-      {
-        test: /ckeditor5-[^/\\]+[/\\]theme[/\\]icons[/\\][^/\\]+\.svg$/,
-        use: ['raw-loader'],
-      },
-      {
-        test: /ckeditor5-[^/\\]+[/\\]theme[/\\].+\.css$/,
-        use: [
-          {
-            loader: 'style-loader',
-            options: {
-              injectType: 'singletonStyleTag',
-              attributes: {
-                'data-cke': true,
-              },
-            },
-          },
-          'css-loader',
-          {
-            loader: 'postcss-loader',
-            options: {
-              postcssOptions: styles.getPostCssConfig({
-                themeImporter: {
-                  themePath: require.resolve('@ckeditor/ckeditor5-theme-lark'),
-                },
-                minify: true,
-              }),
-            },
-          },
-        ],
-      },
-
       // .js
       {
         test: /src\/.*.js?$/,

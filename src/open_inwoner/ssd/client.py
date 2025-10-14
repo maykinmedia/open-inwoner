@@ -157,7 +157,7 @@ class JaaropgaveClient(SSDBaseClient):
             report_data.update(
                 {
                     "logo": self.config.logo,
-                    "pdf_comments": self.config.jaaropgave_pdf_comments,
+                    "pdf_comments": self.config.jaaropgave_pdf_comments.html,
                 }
             )
         pdf = render_pdf(
@@ -216,7 +216,7 @@ class UitkeringClient(SSDBaseClient):
             self.html_template,
             context={
                 "reports": uitkeringen,
-                "comments": self.config.maandspecificatie_pdf_comments,
+                "comments": self.config.maandspecificatie_pdf_comments.html,
             },
             base_url=request_url,
         )

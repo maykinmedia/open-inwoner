@@ -3,6 +3,8 @@ from django.db.models import QuerySet
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
+from django_prosemirror.fields import ProsemirrorModelField
+from django_prosemirror.schema import MarkType, NodeType
 from filer.fields.file import FilerFileField
 from treebeard.mp_tree import MP_Node
 
@@ -58,11 +60,18 @@ class QuestionnaireStep(MP_Node):
         max_length=510,
         blank=True,
     )
-
-    content = models.TextField(
+    content = ProsemirrorModelField(
         _("Uitgebreide informatie"),
-        help_text=_("Deze inhoud wordt weergegeven in deze stap."),
+        allowed_node_types=[NodeType.PARAGRAPH],
+        allowed_mark_types=[
+            MarkType.STRONG,
+            MarkType.ITALIC,
+            MarkType.UNDERLINE,
+            MarkType.LINK,
+        ],
+        null=True,
         blank=True,
+        help_text=_("Deze inhoud wordt weergegeven in deze stap."),
     )
     highlighted = models.BooleanField(
         _("Highlighted"),

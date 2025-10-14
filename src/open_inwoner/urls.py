@@ -71,7 +71,7 @@ urlpatterns = [
     path("admin/login/failure/", AdminLoginFailure.as_view(), name="admin-oidc-error"),
     path("admin/", admin.site.urls),
     path("csp/", include("cspreports.urls")),
-    path("ckeditor/", include("open_inwoner.ckeditor5.urls")),
+    path("prosemirror/", include("django_prosemirror.urls")),
     # Simply show the master template.
     path(
         "accounts/register/",

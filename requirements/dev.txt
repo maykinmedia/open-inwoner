@@ -322,7 +322,6 @@ django-cms==3.11.1
     #   djangocms-file
     #   djangocms-link
     #   djangocms-picture
-    #   djangocms-text-ckeditor
 django-colorfield==0.4.5
     # via
     #   -c requirements/ci.txt
@@ -551,10 +550,6 @@ djangocms-picture==4.1.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-djangocms-text-ckeditor==5.1.2
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
 djangorestframework==3.16.1
     # via
     #   -c requirements/ci.txt
@@ -714,7 +709,6 @@ html5lib==1.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-    #   djangocms-text-ckeditor
     #   weasyprint
 humanfriendly==10.0
     # via
@@ -823,7 +817,7 @@ maykin-common[otel]==0.10.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-maykin-django-prosemirror[images]==0.1.0
+maykin-django-prosemirror[images]==0.2.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -970,7 +964,6 @@ packaging==23.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   build
-    #   djangocms-text-ckeditor
     #   kombu
     #   opentelemetry-instrumentation
     #   pytest
@@ -990,7 +983,6 @@ pillow==10.3.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-    #   djangocms-text-ckeditor
     #   easy-thumbnails
     #   reportlab
     #   weasyprint

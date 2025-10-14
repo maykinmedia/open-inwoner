@@ -8,7 +8,7 @@ from import_export.widgets import CharWidget
 
 from open_inwoner.pdc.models import Category, Organization, Product, Tag
 
-from .widgets import ValidatedManyToManyWidget
+from .widgets import ProsemirrorWidget, ValidatedManyToManyWidget
 
 
 class ImportResource(resources.ModelResource):
@@ -38,7 +38,10 @@ class CategoryImportResource(ImportResource):
     name = fields.Field(column_name="name", attribute="name")
     slug = fields.Field(column_name="slug", attribute="slug")
     description = fields.Field(
-        column_name="description", attribute="description", default=""
+        column_name="description",
+        attribute="description",
+        default="",
+        widget=ProsemirrorWidget(),
     )
 
     class Meta:
@@ -70,7 +73,11 @@ class ProductImportResource(ImportResource):
     slug = fields.Field(column_name="slug", attribute="slug")
     summary = fields.Field(column_name="summary", attribute="summary", default="")
     link = fields.Field(column_name="link", attribute="link", default="")
-    content = fields.Field(column_name="content", attribute="content")
+    content = fields.Field(
+        column_name="content",
+        attribute="content",
+        widget=ProsemirrorWidget(),
+    )
     categories = fields.Field(
         column_name="categories",
         attribute="categories",

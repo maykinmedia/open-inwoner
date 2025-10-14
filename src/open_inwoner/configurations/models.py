@@ -8,9 +8,10 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 
-import ckeditor.fields as ckeditor_fields
 from colorfield.fields import ColorField
 from django_jsonform.models.fields import ArrayField
+from django_prosemirror.fields import ProsemirrorModelField
+from django_prosemirror.schema import MarkType, NodeType
 from filer.fields.image import FilerImageField
 from ordered_model.models import OrderedModel, OrderedModelManager
 from solo.models import SingletonModel
@@ -75,10 +76,16 @@ class SiteConfiguration(SingletonModel):
         default=False,
         help_text=_("Whether the warning banner should be displayed"),
     )
-    warning_banner_text = ckeditor_fields.RichTextField(
-        verbose_name=_("Warning banner text"),
+    warning_banner_text = ProsemirrorModelField(
+        allowed_node_types=[NodeType.PARAGRAPH],
+        allowed_mark_types=[
+            MarkType.STRONG,
+            MarkType.ITALIC,
+            MarkType.UNDERLINE,
+            MarkType.LINK,
+        ],
+        null=True,
         blank=True,
-        help_text=_("Text will be displayed on the warning banner"),
     )
     warning_banner_background_color = ColorField(
         verbose_name=_("Warning banner background"),
@@ -127,10 +134,16 @@ class SiteConfiguration(SingletonModel):
             "Whether we want the users to be able to log in with 2FA authentication by using an SMS workflow."
         ),
     )
-    login_text = ckeditor_fields.RichTextField(
+    login_text = ProsemirrorModelField(
+        allowed_node_types=[NodeType.PARAGRAPH],
+        allowed_mark_types=[
+            MarkType.STRONG,
+            MarkType.ITALIC,
+            MarkType.UNDERLINE,
+            MarkType.LINK,
+        ],
+        null=True,
         blank=True,
-        verbose_name=_("Login tekst"),
-        help_text=_("Deze tekst wordt getoond op de login pagina."),
     )
     enable_eherkenning_for_eenmanszaak = models.BooleanField(
         verbose_name=_("Allow eenmanszaken to authenticate using eHerkenning"),
@@ -217,10 +230,16 @@ class SiteConfiguration(SingletonModel):
         blank=True,
         help_text=_("Product finder's intro text on the home page."),
     )
-    search_zero_results_text = ckeditor_fields.RichTextField(
-        verbose_name=_("Text for zero search results"),
+    search_zero_results_text = ProsemirrorModelField(
+        allowed_node_types=[NodeType.PARAGRAPH],
+        allowed_mark_types=[
+            MarkType.STRONG,
+            MarkType.ITALIC,
+            MarkType.UNDERLINE,
+            MarkType.LINK,
+        ],
+        null=True,
         blank=True,
-        help_text=_("Text to display for when there are no search results."),
     )
     select_questionnaire_title = models.CharField(
         max_length=255,

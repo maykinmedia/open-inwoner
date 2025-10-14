@@ -10,6 +10,8 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from django_jsonform.models.fields import ArrayField
+from django_prosemirror.fields import ProsemirrorModelField
+from django_prosemirror.schema import MarkType, NodeType
 from furl import furl
 from solo.models import SingletonModel
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
@@ -693,18 +695,32 @@ class ZaakTypeStatusTypeConfig(models.Model):
             "Determines the text that will be shown to the user if a case is set to this status"
         ),
     )
-    document_upload_description = models.TextField(
+    document_upload_description = ProsemirrorModelField(
+        _("Document upload description"),
+        allowed_node_types=[NodeType.PARAGRAPH],
+        allowed_mark_types=[
+            MarkType.STRONG,
+            MarkType.ITALIC,
+            MarkType.UNDERLINE,
+            MarkType.LINK,
+        ],
+        null=True,
         blank=True,
-        default="",
-        verbose_name=_("Document upload description"),
         help_text=_(
             "Description that will be shown above the document upload widget in a case detail page"
         ),
     )
-    description = models.TextField(
+    description = ProsemirrorModelField(
+        _("Frontend description"),
+        allowed_node_types=[NodeType.PARAGRAPH],
+        allowed_mark_types=[
+            MarkType.STRONG,
+            MarkType.ITALIC,
+            MarkType.UNDERLINE,
+            MarkType.LINK,
+        ],
+        null=True,
         blank=True,
-        default="",
-        verbose_name=_("Frontend description"),
         help_text=_(
             "The text displayed in the case detail page for the status with this statustype"
         ),
