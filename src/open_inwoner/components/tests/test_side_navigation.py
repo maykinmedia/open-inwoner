@@ -4,7 +4,7 @@ from django.contrib.sessions.backends.db import SessionStore
 from django.core.exceptions import ImproperlyConfigured
 from django.template import Context
 from django.test import RequestFactory, TestCase, override_settings
-from django.urls import NoReverseMatch
+from django.urls import NoReverseMatch, Resolver404, resolve
 from django.utils import translation
 
 from cms import api
@@ -50,6 +50,12 @@ class TestSideNavigationMenuFactory(CMSTestCase):
             request.user = user
             request.session = SessionStore()
             request.session.create()
+
+            # Simulate Django's URL resolution middleware
+            try:
+                request.resolver_match = resolve(path)
+            except Resolver404:
+                request.resolver_match = None
 
             context = Context({"request": request})
             return react_sidenav_data(context)

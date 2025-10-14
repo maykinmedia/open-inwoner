@@ -6,6 +6,8 @@ Bugfixes
 
 * [:taiga-is:`3494`: :pr:`1955`]: Verhelpen bug waardoor er sporadisch errors werden
   getoond tijdens het zoeken naar zaken via de algemene zoek-functie.
+* [:taiga-is:`3519`: :pr:`1966`]: Probleem opgelost in de side menu waarbij de
+  'mijn vragen' item niet geselecteerd wordt als huidige pagina.
 
 1.34.2 (2025-10-07)
 ===================
