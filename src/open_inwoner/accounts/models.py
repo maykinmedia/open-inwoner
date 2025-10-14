@@ -359,6 +359,10 @@ class User(AbstractBaseUser, PermissionsMixin):
             models.CheckConstraint(
                 check=~Q(phonenumber__exact="") | Q(phonenumber_alternative__exact=""),
                 name="phonenumber_alt_requires_phonenumber_primary",
+                violation_error_message=_(
+                    "A primary phone number is required for setting an alternative "
+                    "phone number"
+                ),
             ),
             models.CheckConstraint(
                 check=~Q(phonenumber=F("phonenumber_alternative"))

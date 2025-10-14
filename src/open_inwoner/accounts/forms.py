@@ -132,19 +132,6 @@ class CustomRegistrationForm(RegistrationForm):
         else:
             self.fields["phonenumber"].required = True
 
-    def clean_phonenumber_alternative(self):
-        phonenumber = self.cleaned_data.get("phonenumber")
-        phonenumber_alt = self.cleaned_data.get("phonenumber_alternative")
-
-        if phonenumber_alt and not phonenumber:
-            raise ValidationError(
-                _(
-                    "A primary phone number is required for setting an alternative phone number"
-                )
-            )
-
-        return phonenumber_alt
-
 
 class BaseUserForm(forms.ModelForm):
     class Meta:
@@ -187,23 +174,6 @@ class UserForm(ErrorMessageMixin, BaseUserForm):
             "image",
             "cropping",
         )
-
-    def clean_phonenumber_alternative(self):
-        phonenumber = self.cleaned_data.get("phonenumber")
-        phonenumber_alt = self.cleaned_data.get("phonenumber_alternative")
-
-        if phonenumber_alt and not phonenumber:
-            raise ValidationError(
-                _(
-                    "A primary phone number is required for setting an alternative phone number"
-                )
-            )
-        if phonenumber_alt and phonenumber_alt == phonenumber:
-            raise ValidationError(
-                _("Primary and secondary phone numbers cannot be the same")
-            )
-
-        return phonenumber_alt
 
 
 class BrpUserForm(BaseUserForm):
