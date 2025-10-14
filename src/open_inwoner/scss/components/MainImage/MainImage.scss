@@ -1,9 +1,11 @@
 $image-height: 261px;
+$image-height-mobile: 140px;
 
 .main-image {
   object-fit: cover;
   width: 100%;
   aspect-ratio: 64 / 32;
+  display: block;
 
   @supports not (aspect-ratio: auto) {
     height: $image-height;
@@ -17,5 +19,11 @@ $image-height: 261px;
 
   &.main-image--start-after ~ .container {
     margin-top: 0;
+  }
+}
+
+@media (max-width: 767px) {
+  #search-form ~ .banner:has(~ .container--fullwidth) .main-image {
+    height: $image-height-mobile;
   }
 }

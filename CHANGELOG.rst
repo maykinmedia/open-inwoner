@@ -44,7 +44,8 @@ Nieuwe features
 * [:taiga-us:`3408`, :pr:`1948`]: Het selectiescherm voor eHerkenning-inlog met zoek-
   en dropdownfunctie aan Storybook toegevoegd.
 * [:taiga-us:`3492`, :pr:`1960`]: Header en logo zijn kleiner gemaakt, onderwerpen en
-  zoekveld zijn gewisseld van plaats en mobiele navigatie is nu een overlay.
+  zoekveld zijn gewisseld van plaats, mobiele navigatie is nu een overlay en de mobiele
+  welkom tekst is hoger geplaatst.
 
 Bugfixes
 --------
