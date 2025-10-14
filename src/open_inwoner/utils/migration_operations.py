@@ -180,6 +180,7 @@ def migrate_to_prosemirror_field(
 
     # Process each instance
     for instance in instances:
+        target_prosemirror_field = getattr(instance, field_name)
         if not instance:
             continue
 
@@ -198,8 +199,7 @@ def migrate_to_prosemirror_field(
                 field_name,
                 instance.pk if hasattr(instance, "pk") else instance,
             )
-            setattr(instance, field_name, None)
-            instance.save()
+            # Nothing to do here
             continue
 
         # Clean empty tags before parsing (prevents IndexError)
@@ -207,8 +207,7 @@ def migrate_to_prosemirror_field(
 
         # After cleaning, double-check again if anything is left
         if not content or not content.strip():
-            setattr(instance, field_name, None)
-            instance.save()
+            # Nothing to do here
             continue
 
         try:
@@ -223,6 +222,7 @@ def migrate_to_prosemirror_field(
                 if not content.startswith("<p"):
                     content = f"<p>{content}</p>"
 
+            doc = None
             try:
                 # Convert HTML to ProseMirror document
                 doc = html_to_doc(content, schema=config.schema)
@@ -234,8 +234,9 @@ def migrate_to_prosemirror_field(
                     doc = _add_image_ids_to_prosemirror_doc(doc, apps)
             finally:
                 # Set the new field value
-                setattr(instance, field_name, doc)
-                instance.save()
+                if doc:
+                    target_prosemirror_field.doc = doc
+                    instance.save()
 
         except Exception as exc:
             logger.warning(
@@ -245,7 +246,6 @@ def migrate_to_prosemirror_field(
                 instance.pk if hasattr(instance, "pk") else instance,
                 exc,
             )
-            setattr(instance, field_name, None)
 
 
 def _clean_empty_html_tags(html):
