@@ -67,6 +67,8 @@ Bugfixes
   weergegeven in de zijnavigatie.
 * [:taiga-is:`3493`: :pr:`1954`]: Paginering op contactmomenten lijst wordt nu correct
   weergegeven.
+* [:taiga-is:`3497`: :pr:`1958`]: Het ophalen van vragen in Openklant geeft geen
+  foutmeldingen meer als er ook anonieme vragen voorkomen in de backend.
 
 Onderhoud
 ---------
