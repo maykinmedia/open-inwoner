@@ -1,9 +1,10 @@
 import logging
-from typing import List, TypedDict
+from typing import List, TypedDict, cast
 
 from django import template
 from django.core.exceptions import ImproperlyConfigured
-from django.urls import NoReverseMatch, resolve, reverse
+from django.http import HttpRequest
+from django.urls import NoReverseMatch, Resolver404, ResolverMatch, resolve, reverse
 from django.utils.translation import get_language, gettext_lazy as _
 
 from cms.models import Page
@@ -26,6 +27,8 @@ class MenuItem(TypedDict):
 
 class SideNavMenuData:
     """Generate data for the React side navigation meny."""
+
+    request: HttpRequest
 
     exclude_urls_from_menu = [
         "profile:detail",
@@ -142,23 +145,104 @@ class SideNavMenuData:
         return None
 
     def _is_current_page(self, node: NavigationNode) -> bool:
-        current = node.is_selected(self.request)
+        if not (resolved_current_path := self.request.resolver_match):
+            logger.debug(
+                "No resolver match found for current request: node '%s' cannot be active",
+                node,
+            )
+            return False
 
-        # Fallback to URL path matching if CMS selection isn't working. This is mostly
-        # needed to have some test coverage, because the test setup to get
-        # node.is_selected worked is too convoluted.
-        if not current:
-            current = self.request.path == node.get_absolute_url()
+        # Build qualified URL name for current path (namespace:url_name)
+        current_qualified_name = self._get_qualified_url_name(resolved_current_path)
+        logger.debug("Current page qualified URL name: '%s'", current_qualified_name)
 
-        # Handle special case where route doesn't match CMS page URLs
+        # Handle special case of redirect routes, where the route of the node is
+        # actually a redirect to another page: we want to verify if we're on the
+        # redirect target, not the node path.
         try:
-            resolved = resolve(self.request.path)
-            if resolved.url_name == "contactmoment_list":
-                current = "contactmomenten" in node.get_absolute_url()
-        except Exception as e:
-            logger.debug("Could not resolve current path for menu highlighting: %s", e)
+            if redirect_url := node.attr.get("redirect_url", None):
+                logger.debug(
+                    "Node '%s' has redirect_url configured: '%s'",
+                    node,
+                    redirect_url,
+                )
+                try:
+                    resolved_redirect_url = resolve(redirect_url)
+                    redirect_qualified_name = self._get_qualified_url_name(
+                        resolved_redirect_url
+                    )
+                    logger.debug(
+                        "Redirect target qualified URL name: '%s'",
+                        redirect_qualified_name,
+                    )
+                    if current_qualified_name == redirect_qualified_name:
+                        logger.debug(
+                            "Node '%s' redirect target '%s' matches current page '%s':"
+                            " marking as active",
+                            node,
+                            redirect_qualified_name,
+                            current_qualified_name,
+                        )
+                        return True
+                    else:
+                        logger.debug(
+                            "Node '%s' redirect target '%s' does not match current "
+                            "page '%s'",
+                            node,
+                            redirect_qualified_name,
+                            current_qualified_name,
+                        )
+                except Resolver404:
+                    logger.debug(
+                        "Could not resolve redirect_url '%s' for node '%s'",
+                        redirect_url,
+                        node,
+                    )
 
-        return current
+            node_absolute_url = node.get_absolute_url()
+            resolved_node_path = resolve(node_absolute_url)
+            node_qualified_name = self._get_qualified_url_name(resolved_node_path)
+            logger.debug(
+                "Node '%s' qualified URL name: '%s'", node, node_qualified_name
+            )
+
+            # For CMS pages (and other catch-all patterns), URL names match but paths differ.
+            # When URL names match, also verify the actual paths match.
+            if is_match := current_qualified_name == node_qualified_name:
+                is_match = self.request.path == node_absolute_url
+                logger.debug(
+                    "URL names match - comparing paths: request.path='%s' vs node_url='%s' -> %s",
+                    self.request.path,
+                    node_absolute_url,
+                    "match" if is_match else "no match",
+                )
+
+            logger.debug(
+                "Node '%s' URL name '%s' %s current page '%s'",
+                node,
+                node_qualified_name,
+                "matches" if is_match else "does not match",
+                current_qualified_name,
+            )
+            return is_match
+
+        except Exception as e:
+            logger.debug(
+                "Failed to resolve node '%s' for menu highlighting: %s",
+                node,
+                e,
+            )
+
+        logger.debug("Node '%s' is not active (fallthrough)", node)
+        return False
+
+    def _get_qualified_url_name(self, resolved_match: ResolverMatch) -> str:
+        """Build qualified URL name including namespace (e.g., 'namespace:url_name')"""
+        if resolved_match.namespaces:
+            namespace = ":".join(resolved_match.namespaces)
+            return f"{namespace}:{resolved_match.url_name}"
+
+        return cast(str, resolved_match.url_name)
 
     def _is_visible_to_user(self, node: NavigationNode) -> bool:
         try:
