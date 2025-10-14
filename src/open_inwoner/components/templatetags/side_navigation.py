@@ -142,15 +142,18 @@ class SideNavMenuData:
         return None
 
     def _is_current_page(self, node: NavigationNode) -> bool:
-        current = node.is_selected(self.request)
+        current = False
+        if current := node.is_selected(self.request):
+            return current
 
         # Fallback to URL path matching if CMS selection isn't working. This is mostly
         # needed to have some test coverage, because the test setup to get
         # node.is_selected worked is too convoluted.
-        if not current:
-            current = self.request.path == node.get_absolute_url()
+        if current := self.request.path == node.get_absolute_url():
+            return current
 
-        # Handle special case where route doesn't match CMS page URLs
+        # Handle special case where route of the node is actually a redirect to another
+        # page: we want to verify if we're on the redirect target, not the node path.
         try:
             resolved = resolve(self.request.path)
             if resolved.url_name == "contactmoment_list":
