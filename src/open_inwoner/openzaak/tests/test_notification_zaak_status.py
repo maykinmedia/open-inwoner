@@ -89,32 +89,35 @@ class StatusNotificationHandlerTestCase(
         config.notifications_cases_enabled = True
         config.save()
 
-        for api_group, notification, zaak, status, user_initiator in [
-            (
-                data.api_group,
-                data.status_notification,
-                data.zaak,
-                data.status_final,
-                data.user_initiator,
-            ),
-            (
-                data_alt.api_group_alt,
-                data_alt.status_notification_alt,
-                data_alt.zaak_alt,
-                data_alt.status_final_alt,
-                data_alt.user_initiator_alt,
-            ),
-        ]:
-            with self.subTest(f"api_group {api_group.id}"):
+        for idx, (api_group, notification, zaak, status, user_initiator) in enumerate(
+            [
+                (
+                    data.api_group,
+                    data.status_notification,
+                    data.zaak,
+                    data.status_final,
+                    data.user_initiator,
+                ),
+                (
+                    data_alt.api_group_alt,
+                    data_alt.status_notification_alt,
+                    data_alt.zaak_alt,
+                    data_alt.status_final_alt,
+                    data_alt.user_initiator_alt,
+                ),
+            ]
+        ):
+            with self.subTest(f"api_group_{idx}"):
                 webhook_view.handle_notification(notification)
 
                 mock_handle.assert_called()
 
                 # check call arguments
                 args = mock_handle.call_args.args
-                self.assertEqual(args[0], user_initiator)
-                self.assertEqual(args[1].url, zaak["url"])
-                self.assertEqual(args[2].url, status["url"])
+                self.assertEqual(args[0], notification)
+                self.assertEqual(args[1], user_initiator)
+                self.assertEqual(args[2].url, zaak["url"])
+                self.assertEqual(args[3].url, status["url"])
 
         log_dump = self.getTimelineLogDump()
         self.assertIn("total 2 timelinelogs", log_dump)
@@ -416,9 +419,10 @@ class StatusNotificationHandlerTestCase(
 
         # check call arguments
         args = mock_handle.call_args.args
-        self.assertEqual(args[0], data.user_initiator)
-        self.assertEqual(args[1].url, data.zaak["url"])
-        self.assertEqual(args[2].url, data.status_final["url"])
+        self.assertEqual(args[0], data.status_notification)
+        self.assertEqual(args[1], data.user_initiator)
+        self.assertEqual(args[2].url, data.zaak["url"])
+        self.assertEqual(args[3].url, data.status_final["url"])
 
         self.assertTimelineLog(
             "accepted status notification: attempt informing users ",
@@ -646,7 +650,12 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
 
         # first call
         _handle_status_update(
-            user, case, status_initial, status_type_config_initial, data.api_group
+            data.status_notification,
+            user,
+            case,
+            status_initial,
+            status_type_config_initial,
+            data.api_group,
         )
 
         mock_send.assert_called_once()
@@ -673,7 +682,7 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         mock_send.reset_mock()
 
         self.assertTimelineLog(
-            "send status notification email for user",
+            "sent status notification email for user",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -683,7 +692,12 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
 
         # second call with same case/status
         _handle_status_update(
-            user, case, status_initial, status_type_config_initial, data.api_group
+            data.status_notification,
+            user,
+            case,
+            status_initial,
+            status_type_config_initial,
+            data.api_group,
         )
 
         # no duplicate mail for this user/case/status
@@ -692,7 +706,12 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         with self.subTest("mails are throttled based on template_name"):
             # call with different status and different configuration with action_required=True
             _handle_status_update(
-                user, case, status_final, status_type_config_final, data.api_group
+                data.status_notification,
+                user,
+                case,
+                status_final,
+                status_type_config_final,
+                data.api_group,
             )
 
             mock_send.assert_called_once()
@@ -716,7 +735,12 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         # other user is fine
         other_user = UserFactory.create()
         _handle_status_update(
-            other_user, case, status_initial, status_type_config_initial, data.api_group
+            data.status_notification,
+            other_user,
+            case,
+            status_initial,
+            status_type_config_initial,
+            data.api_group,
         )
 
         mock_send.assert_called_once()
@@ -734,7 +758,12 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
             StatusType, copy_with_new_uuid(data.status_type_final)
         )
         _handle_status_update(
-            user, case, status, status_type_config_initial, data.api_group
+            data.status_notification,
+            user,
+            case,
+            status,
+            status_type_config_initial,
+            data.api_group,
         )
 
         # not sent because we already send to this user within the frequency
@@ -753,7 +782,12 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
                 StatusType, copy_with_new_uuid(data.status_type_final)
             )
             _handle_status_update(
-                user, case, status, status_type_config_initial, data.api_group
+                data.status_notification,
+                user,
+                case,
+                status,
+                status_type_config_initial,
+                data.api_group,
             )
 
             # this one succeeds
@@ -786,7 +820,14 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
             action_required=True,
         )
 
-        _handle_status_update(user, case, status, status_type_config, data.api_group)
+        _handle_status_update(
+            data.status_notification,
+            user,
+            case,
+            status,
+            status_type_config,
+            data.api_group,
+        )
 
         mock_send.assert_called_once()
         # check call arguments

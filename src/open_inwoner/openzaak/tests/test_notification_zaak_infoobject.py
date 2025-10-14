@@ -88,9 +88,9 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
 
                 # check call arguments
                 args = mock_handle.call_args.args
-                self.assertEqual(args[0], user_initiator)
-                self.assertEqual(args[1].url, zaak["url"])
-                self.assertEqual(args[2].url, zaak_info_obj["url"])
+                self.assertEqual(args[1], user_initiator)
+                self.assertEqual(args[2].url, zaak["url"])
+                self.assertEqual(args[3].url, zaak_info_obj["url"])
 
         log_dump = self.getTimelineLogDump()
         self.assertIn("total 2 timelinelogs", log_dump)
@@ -128,9 +128,9 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
 
                 # check call arguments
                 args = mock_handle.call_args.args
-                self.assertEqual(args[0], data.eherkenning_user_initiator)
-                self.assertEqual(args[1].url, data.zaak2["url"])
-                self.assertEqual(args[2].url, data.zaak_informatie_object2["url"])
+                self.assertEqual(args[1], data.eherkenning_user_initiator)
+                self.assertEqual(args[2].url, data.zaak2["url"])
+                self.assertEqual(args[3].url, data.zaak_informatie_object2["url"])
 
                 self.assertTimelineLog(
                     "accepted zaakinformatieobject notification: attempt informing users ",
@@ -390,7 +390,9 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         zio = factory(ZaakInformatieObject, data.zaak_informatie_object)
         zio.informatieobject = factory(InformatieObject, data.informatie_object)
 
-        _handle_zaakinformatieobject_update(user, case, zio, api_group=data.api_group)
+        _handle_zaakinformatieobject_update(
+            data.zio_notification, user, case, zio, api_group=data.api_group
+        )
 
         # not called because disabled notifications
         mock_send.assert_not_called()
@@ -423,7 +425,9 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         zio = factory(ZaakInformatieObject, data.zaak_informatie_object)
         zio.informatieobject = factory(InformatieObject, data.informatie_object)
 
-        _handle_zaakinformatieobject_update(user, case, zio, api_group=data.api_group)
+        _handle_zaakinformatieobject_update(
+            data.zio_notification, user, case, zio, api_group=data.api_group
+        )
 
         # not called because bad email
         mock_send.assert_not_called()
@@ -455,7 +459,9 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         zio.informatieobject = factory(InformatieObject, data.informatie_object)
 
         # first call
-        _handle_zaakinformatieobject_update(user, case, zio, api_group=data.api_group)
+        _handle_zaakinformatieobject_update(
+            data.zio_notification, user, case, zio, api_group=data.api_group
+        )
 
         mock_send.assert_called_once()
         mock_send.assert_called_with(
@@ -478,7 +484,7 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
 
         # check side effects
         self.assertTimelineLog(
-            "send zaakinformatieobject notification email for user",
+            "sent zaakinformatieobject notification email for user",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -487,7 +493,9 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         )
 
         # second call with same case/status
-        _handle_zaakinformatieobject_update(user, case, zio, api_group=data.api_group)
+        _handle_zaakinformatieobject_update(
+            data.zio_notification, user, case, zio, api_group=data.api_group
+        )
 
         # no duplicate mail for this user/case/status
         mock_send.assert_not_called()
@@ -501,7 +509,7 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         # other user is fine
         other_user = UserFactory.create()
         _handle_zaakinformatieobject_update(
-            other_user, case, zio, api_group=data.api_group
+            data.zio_notification, other_user, case, zio, api_group=data.api_group
         )
 
         mock_send.assert_called_once()
@@ -521,7 +529,9 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
             InformatieObject, copy_with_new_uuid(data.informatie_object)
         )
 
-        _handle_zaakinformatieobject_update(user, case, zio, api_group=data.api_group)
+        _handle_zaakinformatieobject_update(
+            data.zio_notification, user, case, zio, api_group=data.api_group
+        )
 
         # not sent because we already send to this user within the frequency
         mock_send.assert_not_called()
@@ -541,7 +551,7 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
                 InformatieObject, copy_with_new_uuid(data.informatie_object)
             )
             _handle_zaakinformatieobject_update(
-                user, case, zio, api_group=data.api_group
+                data.zio_notification, user, case, zio, api_group=data.api_group
             )
 
             # this one succeeds

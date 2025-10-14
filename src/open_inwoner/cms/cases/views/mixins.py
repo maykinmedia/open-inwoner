@@ -1,10 +1,17 @@
 import logging
 
 from django.contrib.auth.mixins import AccessMixin, LoginRequiredMixin
-from django.http import Http404
+from django.http import Http404, HttpRequest
 from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
 
+from open_inwoner.cms.cases.metrics import (
+    case_contact_form_registrations,
+    case_detail_views,
+    case_document_downloads,
+    case_document_uploads,
+    case_list_views,
+)
 from open_inwoner.openzaak.models import OpenZaakConfig, ZGWApiGroupConfig
 from open_inwoner.openzaak.types import UniformCase
 from open_inwoner.openzaak.utils import is_zaak_visible
@@ -14,24 +21,78 @@ logger = logging.getLogger(__name__)
 
 
 class CaseLogMixin(LogMixin):
-    def log_access_cases(self, cases: list[dict]):
-        """
-        Log access to cases on the list view
+    request: HttpRequest
 
-        Creates a single log for all cases
-        """
-        case_ids = (case["identification"] for case in cases)
+    def log_case_list_accessed(self, cases: list[dict]):
+        case_ids = [case["identification"] for case in cases]
 
         self.log_user_action(
             self.request.user,
             _("Zaken bekeken: {cases}").format(cases=", ".join(case_ids)),
         )
+        case_list_views.add(1, {"num_cases_viewed": len(case_ids)})
 
-    def log_access_case_detail(self, case: UniformCase):
+    def log_case_detail_accessed(self, case: UniformCase):
         self.log_user_action(
             self.request.user,
             _("Zaak bekeken: {case}").format(case=case.identification),
         )
+        case_detail_views.add(1)
+
+    def log_case_document_downloaded(self, case: UniformCase, filename: str):
+        self.log_user_action(
+            self.request.user,
+            _("Document van zaak gedownload {case}: {filename}").format(
+                case=case.identification,
+                filename=filename,
+            ),
+        )
+        case_document_downloads.add(1)
+
+    def log_case_document_uploaded(self, case: UniformCase, filename: str):
+        self.log_user_action(
+            self.request.user,
+            _("Document was uploaded for {case}: {filename}").format(
+                case=case.identification,
+                filename=filename,
+            ),
+        )
+        case_document_uploads.add(1)
+
+    def log_contactmoment_for_zaak_registered_by_email(self, success: bool):
+        if success:
+            msg = "registered contactmoment by email"
+        else:
+            msg = "error while registering contactmoment by email"
+
+        self.log_system_action(msg, user=self.request.user)
+        case_contact_form_registrations.add(1, {"channel": "email", "success": success})
+
+    def log_contactmoment_for_zaak_registered_by_api(
+        self,
+        contactmoment_success: bool,
+        objectcontactmoment_success: bool | None = None,
+    ):
+        success = contactmoment_success and (
+            objectcontactmoment_success is None or objectcontactmoment_success
+        )
+
+        if contactmoment_success:
+            msg = "registered contactmoment by API"
+        else:
+            msg = "error while registering contactmoment by API"
+
+        self.log_system_action(msg, user=self.request.user)
+
+        if objectcontactmoment_success is not None:
+            if objectcontactmoment_success:
+                msg = "registered objectcontactmoment by API"
+            else:
+                msg = "error linking objectcontactmoment to contactmoment by API"
+
+            self.log_system_action(msg, user=self.request.user)
+
+        case_contact_form_registrations.add(1, {"channel": "api", "success": success})
 
 
 class CaseAccessMixin(AccessMixin):

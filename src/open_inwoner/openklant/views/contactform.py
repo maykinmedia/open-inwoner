@@ -14,6 +14,7 @@ from django.views.generic import FormView
 from mail_editor.helpers import find_template
 from view_breadcrumbs import BaseBreadcrumbMixin
 
+from open_inwoner.accounts.views.mixins import ContactmomentLogMixin
 from open_inwoner.mail.service import send_contact_confirmation_mail
 from open_inwoner.openklant.api_models import (
     ContactMomentCreateData,
@@ -26,12 +27,14 @@ from open_inwoner.openklant.forms import ContactForm
 from open_inwoner.openklant.models import ESuiteKlantConfig, KlantenSysteemConfig
 from open_inwoner.openklant.services import OpenKlant2Service, eSuiteVragenService
 from open_inwoner.openklant.views.utils import generate_question_answer_pair
-from open_inwoner.utils.views import CommonPageMixin, LogMixin
+from open_inwoner.utils.views import CommonPageMixin
 
 logger = logging.getLogger(__name__)
 
 
-class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
+class ContactFormView(
+    CommonPageMixin, ContactmomentLogMixin, BaseBreadcrumbMixin, FormView
+):
     """
     View for handling the sumission of contact forms
 
@@ -183,17 +186,9 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
 
         success = template.send_email([recipient_email], context)
 
-        if success:
-            self.log_system_action(
-                "registered contactmoment by email", user=self.request.user
-            )
-            return True
-        else:
-            self.log_system_action(
-                "error while registering contactmoment by email",
-                user=self.request.user,
-            )
-            return False
+        self.log_contactmoment_registered_by_email(success)
+
+        return success
 
     def register_by_api(self, form, config: KlantenSysteemConfig):
         if config.primary_backend == KlantenServiceType.ESUITE.value:
@@ -230,12 +225,10 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
                     phonenumber=phonenumber,
                 )
         except Exception:
-            self.log_system_action("failed to register question via OpenKlant")
+            self.log_question_registered_via_openklant(success=False)
             return False, ""
 
-        self.log_system_action(
-            "registered question via OpenKlant", user=self.request.user
-        )
+        self.log_question_registered_via_openklant(success=True)
 
         return True, email
 
@@ -255,15 +248,10 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
             form.cleaned_data, esuite_config, klant
         )
 
-        if not contactmoment:
-            self.log_system_action(
-                "error while registering contactmoment by API", user=self.request.user
-            )
-            return False, getattr(klant, "emailadres", None)
-        self.log_system_action(
-            "registered contactmoment via eSuite", user=self.request.user
-        )
-        return True, getattr(klant, "emailadres", None)
+        success = bool(contactmoment)
+        self.log_contactmoment_registered_via_esuite(success)
+
+        return success, getattr(klant, "emailadres", None)
 
     def _fetch_klant(self) -> Klant | None:
         user = self.request.user
@@ -281,13 +269,9 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
             **self.vragen_service.get_fetch_parameters(self.request.user)
         )
 
-        self.log_system_action("retrieved klant for BSN or KVK user", user=user)
-
         return klant
 
     def _update_klant_with_form_data(self, klant: Klant, form_data: dict):
-        user = self.request.user
-
         update_data = {}
         user_email = form_data.get("email")
         phonenumber = form_data.get("phonenumber")
@@ -298,12 +282,7 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
             update_data["telefoonnummer"] = phonenumber
         if update_data:
             self.klanten_client.partial_update_klant(klant, update_data)
-            self.log_system_action(
-                "patched klant from user with missing fields: {patched}".format(
-                    patched=", ".join(sorted(update_data.keys()))
-                ),
-                user=user,
-            )
+            self.log_klant_patched(list(update_data.keys()))
 
     def _create_contactmoment(
         self,
@@ -324,10 +303,7 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
                 text=text, full_name=full_name
             )
 
-            self.log_system_action(
-                "could not retrieve or create klant for user, appended info to message",
-                user=self.request.user,
-            )
+            self.log_klant_contact_info_appended_to_message()
 
         data = ContactMomentCreateData(
             bronorganisatie=klanten_config.register_bronorganisatie_rsin,

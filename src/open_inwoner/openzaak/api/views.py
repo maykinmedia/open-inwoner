@@ -11,13 +11,13 @@ from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openzaak.api_models import Notification
 from open_inwoner.openzaak.auth import get_valid_subscription_from_request
 from open_inwoner.openzaak.exceptions import InvalidAuth
+from open_inwoner.openzaak.mixins import WebhookLogMixin
 from open_inwoner.openzaak.tasks import process_zaken_notification
-from open_inwoner.utils.logentry import system_action as log_system_action
 
 logger = logging.getLogger(__name__)
 
 
-class NotificationsWebhookBaseView(APIView):
+class NotificationsWebhookBaseView(WebhookLogMixin, APIView):
     """
     Generic ZGW notification webhook handler
     """
@@ -37,7 +37,7 @@ class NotificationsWebhookBaseView(APIView):
         try:
             subscription = get_valid_subscription_from_request(request)
         except InvalidAuth as e:
-            log_system_action(str(e), log_level=logging.ERROR)
+            self.log_webhook_auth_error(str(e))
             return Response(
                 {"detail": "cannot authenticate subscription"},
                 status=status.HTTP_401_UNAUTHORIZED,
@@ -46,44 +46,47 @@ class NotificationsWebhookBaseView(APIView):
         # deserialize
         serializer = NotificatieSerializer(data=request.data)
         if not serializer.is_valid():
-            log_system_action(
-                "cannot deserialize notification", log_level=logging.ERROR
-            )
+            self.log_webhook_deserialization_error()
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         notification = factory(Notification, serializer.validated_data)
 
         # verify channel
         if notification.kanaal == "test":
-            log_system_action(
-                "received notification on 'test' channel", log_level=logging.INFO
-            )
+            self.log_webhook_test_channel(notification)
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         if notification.kanaal not in subscription.channels:
-            msg = f"notification channel '{notification.kanaal}' not subscribed to"
-            log_system_action(msg, log_level=logging.ERROR)
-            return Response({"detail": msg}, status=status.HTTP_400_BAD_REQUEST)
+            self.log_webhook_channel_not_subscribed(notification)
+            return Response(
+                {
+                    "detail": f"notification channel '{notification.kanaal}' not subscribed to"
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         if self.accept_channels and notification.kanaal not in self.accept_channels:
-            msg = f"notification channel '{notification.kanaal}' not acceptable by webhook"
-            log_system_action(msg, log_level=logging.ERROR)
-            return Response({"detail": msg}, status=status.HTTP_400_BAD_REQUEST)
+            self.log_webhook_channel_not_acceptable(notification)
+            return Response(
+                {
+                    "detail": f"notification channel '{notification.kanaal}' not acceptable by webhook"
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         # call actual handler
         try:
             self.handle_notification(notification)
         except Exception as e:
             # handler had an error
-            log_system_action(
-                f"error handling notification: {e}", log_level=logging.ERROR, exc_info=e
-            )
+            self.log_webhook_handler_error(notification, e)
             return Response(
                 {"detail": "internal error handling notification"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
         else:
             # looks like we're good
+            self.log_webhook_notification_received(notification, "accepted")
             return Response(status=status.HTTP_204_NO_CONTENT)
 
 

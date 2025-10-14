@@ -6,13 +6,13 @@ from django.shortcuts import redirect, reverse
 from django.utils.translation import gettext as _
 from django.views import View
 
+from open_inwoner.accounts.views.mixins import RegistrationLogMixin
 from open_inwoner.utils.url import get_next_url_from
-from open_inwoner.utils.views import LogMixin
 
 from .verification import VERIFY_GET_PARAM, validate_email_verification_token
 
 
-class EmailVerificationTokenView(LoginRequiredMixin, LogMixin, View):
+class EmailVerificationTokenView(LoginRequiredMixin, RegistrationLogMixin, View):
     def get(self, request):
         if not request.user.is_authenticated:
             raise PermissionDenied("not authenticated")
@@ -25,7 +25,7 @@ class EmailVerificationTokenView(LoginRequiredMixin, LogMixin, View):
             messages.add_message(
                 self.request, messages.SUCCESS, _("Uw e-mailadres is bevestigd")
             )
-            self.log_user_action(request.user, _("user verified e-mail address"))
+            self.log_email_verification_completed(request.user, success=True)
 
             return HttpResponseRedirect(
                 get_next_url_from(self.request, default=reverse("pages-root"))
@@ -38,6 +38,7 @@ class EmailVerificationTokenView(LoginRequiredMixin, LogMixin, View):
                     "Er is iets misgegaan met het valideren van de link. Probeer het opnieuw"
                 ),
             )
+            self.log_email_verification_completed(request.user, success=False)
 
             from django.urls.exceptions import NoReverseMatch
 

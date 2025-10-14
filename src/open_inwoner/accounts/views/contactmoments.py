@@ -15,6 +15,7 @@ from requests import RequestException
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.models import User
+from open_inwoner.accounts.views.mixins import ContactmomentLogMixin
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.models import KlantContactMomentAnswer, KlantenSysteemConfig
@@ -172,10 +173,12 @@ class KlantContactMomentListView(
             and klanten_config.contact_registration_enabled
         )
 
+        self.log_contactmoment_list_accessed(questions=questions)
+
         return ctx
 
 
-class KlantContactMomentDetailView(KlantContactMomentBaseView):
+class KlantContactMomentDetailView(ContactmomentLogMixin, KlantContactMomentBaseView):
     template_name = "pages/contactmoment/detail.html"
 
     @cached_property
@@ -272,6 +275,10 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
         if not local_kcm.is_seen:
             local_kcm.is_seen = True
             local_kcm.save()
+
+        self.log_contactmoment_detail_accessed(
+            identification=question["identification"]
+        )
 
         return ctx
 
