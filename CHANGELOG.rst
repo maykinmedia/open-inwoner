@@ -4,6 +4,9 @@
 Bugfixes
 --------
 
+* [:taiga-is:`2522`:, :pr:`1969`]: Zaken die niet volledig opgehaald kunnen worden uit
+  het zaaksysteem worden nu gefilterd uit de zakenlijst om te voorkomen dat de gehele
+  lijst van Mijn Zaken toegankelijk blijft.
 * [:taiga-is:`3494`: :pr:`1955`]: Verhelpen bug waardoor er sporadisch errors werden
   getoond tijdens het zoeken naar zaken via de algemene zoek-functie.
 * [:taiga-is:`3519`: :pr:`1966`]: Probleem opgelost in de side menu waarbij de

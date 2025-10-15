@@ -2,6 +2,7 @@ import concurrent.futures
 import enum
 import logging
 import threading
+from collections import defaultdict
 from dataclasses import dataclass
 from typing import Iterable, TypedDict, cast
 
@@ -25,6 +26,12 @@ from open_inwoner.openzaak.models import (
 from open_inwoner.openzaak.utils import get_user_fetch_parameters, is_zaak_visible
 
 logger = logging.getLogger(__name__)
+
+
+class ResolveCaseException(Exception):
+    """Exception indicating we were unable to resolve a cases type/status/result."""
+
+    pass
 
 
 class CaseFilterFormOption(enum.Enum):
@@ -221,32 +228,34 @@ class CaseListService:
             logger.exception("Unhandled error fetching raw cases")
 
         # Resolve cases
-        resolve_cases_futures: dict[
-            ZaakWithApiGroup, list[concurrent.futures.Future[ZaakWithApiGroup]]
-        ] = {}
+        # Submit all futures and track which futures belong to which case
+        all_futures: list[concurrent.futures.Future[None]] = []
+        case_futures: dict[ZaakWithApiGroup, list[concurrent.futures.Future[None]]] = (
+            defaultdict(list)
+        )
+
+        resolver_functions = [
+            self._resolve_resultaat_and_resultaat_type,
+            self._resolve_status_and_status_type,
+            self._resolve_zaak_type,
+        ]
+
         with parallel(max_workers=self._max_workers) as executor:
             for case_with_group in fetched_cases:
-                # We have three independent resolvers functions we want to resolve
+                # We have three independent resolver functions we want to resolve
                 # concurrently. Only if all three tasks complete do we want to
                 # add the case to the final list of resolved cases. Therefore, we keep
                 # track of the futures on a per-case basis to be able to verify all
-                # futures completed once the wait call has elapsed.
-                resolve_cases_futures.update(
-                    {
-                        case_with_group: [
-                            executor.submit(func, case_with_group)
-                            for func in (
-                                self._resolve_resultaat_and_resultaat_type,
-                                self._resolve_status_and_status_type,
-                                self._resolve_zaak_type,
-                            )
-                        ]
-                    }
-                )
+                # futures completed once the timeout has elapsed.
+                for func in resolver_functions:
+                    future = executor.submit(func, case_with_group)
+                    all_futures.append(future)
+                    case_futures[case_with_group].append(future)
 
+        # Wait for futures to complete or timeout
         try:
             concurrent.futures.wait(
-                (f for future in resolve_cases_futures.values() for f in future),
+                all_futures,
                 timeout=self._timeouts["resolve_cases"],
             )
         except concurrent.futures.TimeoutError:
@@ -254,22 +263,21 @@ class CaseListService:
             # continue execution with the cases we _did_ manage to resolve.
             logger.warning("Timed out resolving cases", exc_info=True)
         except BaseException:
-            logger.exception("Unhandled error resolving zaak")
+            logger.exception("Unhandled error during zaak resolution")
 
+        # Now check which cases had all 3 futures complete successfully. If we did not
+        # manage to complete the resolutions for zaak, status and resultaat type, we
+        # exclude the case from the final list.
         resolved_cases: list[ZaakWithApiGroup] = []
-        for zaak, futures in resolve_cases_futures.items():
-            # Did all resolutions complete for this case? Note that we care about
-            # success specifically: cancellation or exceptions mean we discard the case
-            # from the final list.
-            for f in futures:
-                try:
-                    f.result()
-                except BaseException:
-                    logger.debug(
-                        "Culling zaak %s because it lacks a result",
-                        zaak.identification,
-                    )
-                    continue
+        for zaak, futures in case_futures.items():
+            # Check if all 3 futures completed without exceptions...
+            if not all(f.done() and not f.exception() for f in futures):
+                logger.warning(
+                    "Culling zaak %s because not all resolutions completed successfully",
+                    zaak.identification,
+                )
+                # ... unable to fully resolve, leave it out of the list
+                continue
 
             zaak_with_resolved_zgw_refs = self._replace_catalogus_api_with_model_refs(
                 zaak
@@ -344,10 +352,9 @@ class CaseListService:
 
         case_type = client.fetch_single_case_type(zaak_with_group.zaak.zaaktype)
         if not case_type:
-            logger.error(
-                "Unable to resolve zaaktype for url: %s", zaak_with_group.zaak.zaaktype
+            raise ResolveCaseException(
+                f"Unable to resolve zaaktype for url: {zaak_with_group.zaak.zaaktype}"
             )
-            return
 
         with self._zaak_update_lock:
             zaak_with_group.zaak.zaaktype = case_type
@@ -362,30 +369,21 @@ class CaseListService:
         )
 
         if not isinstance(zaak_with_group.zaak.status, str):
-            logger.error(
-                "`case.status` for case %s is not a str but %s",
-                zaak_with_group.zaak.identificatie,
-                type(zaak_with_group.zaak.status),
+            raise ResolveCaseException(
+                f"`case.status` for case {zaak_with_group.zaak.identificatie} is not a str but {type(zaak_with_group.zaak.status)}"
             )
-            return
 
         status = zaken_client.fetch_single_status(zaak_with_group.zaak.status)
         if not status:
-            logger.error(
-                "Unable to resolve status %s for case %s",
-                zaak_with_group.zaak.status,
-                zaak_with_group.zaak.identificatie,
+            raise ResolveCaseException(
+                f"Unable to resolve status {zaak_with_group.zaak.status} for case {zaak_with_group.zaak.identificatie}"
             )
-            return
 
         status_type = catalogi_client.fetch_single_status_type(status.statustype)
         if not status_type:
-            logger.error(
-                "Unable to resolve status_type %s for case %s",
-                status.statustype,
-                zaak_with_group.zaak.identificatie,
+            raise ResolveCaseException(
+                f"Unable to resolve status_type {status.statustype} for case {zaak_with_group.zaak.identificatie}"
             )
-            return
 
         with self._zaak_update_lock:
             zaak_with_group.zaak.status = status
@@ -395,38 +393,34 @@ class CaseListService:
         self,
         zaak_with_group: ZaakWithApiGroup,
     ) -> None:
+        # Note this is not a failure: the zaak has no resultaat, nothing to do.
+        if zaak_with_group.zaak.resultaat is None:
+            return
+
         zaken_client = CaseListService._zaken_client_factory(zaak_with_group.api_group)
         catalogi_client = CaseListService._catalogi_client_factory(
             zaak_with_group.api_group
         )
 
-        if zaak_with_group.zaak.resultaat is None:
-            return
-
         if not isinstance(zaak_with_group.zaak.resultaat, str):
-            logger.error(
-                "`case.resultaat` for case %s is not a str but %s",
-                zaak_with_group.zaak.identificatie,
-                type(zaak_with_group.zaak.resultaat),
+            raise ResolveCaseException(
+                f"`case.resultaat` for case {zaak_with_group.zaak.identificatie} is not a str but {type(zaak_with_group.zaak.resultaat)}"
             )
-            return
 
         resultaat = zaken_client.fetch_single_result(zaak_with_group.zaak.resultaat)
         if not resultaat:
-            logger.error("Unable to fetch resultaat for %s", zaak_with_group.zaak)
-            return
+            raise ResolveCaseException(
+                f"Unable to fetch resultaat for {zaak_with_group.zaak}"
+            )
 
         resultaattype = catalogi_client.fetch_single_resultaat_type(
             resultaat.resultaattype
         )
         if not resultaattype:
-            logger.error(
-                "Unable to resolve resultaattype for %s", resultaat.resultaattype
+            raise ResolveCaseException(
+                f"Unable to resolve resultaattype for {resultaat.resultaattype}"
             )
-            return
 
         with self._zaak_update_lock:
             zaak_with_group.zaak.resultaat = resultaat
             zaak_with_group.zaak.resultaat.resultaattype = resultaattype
-
-        return
