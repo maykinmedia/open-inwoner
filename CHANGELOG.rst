@@ -71,6 +71,9 @@ Bugfixes
   weergegeven.
 * [:taiga-is:`3497`: :pr:`1958`]: Het ophalen van vragen in Openklant geeft geen
   foutmeldingen meer als er ook anonieme vragen voorkomen in de backend.
+* [:pr:`1972`]: Informatieobjecttpen die bij de ZGW synchronisatie niet kunnen worden
+  opgehaald zullen worden overgeslagen, zodat de overgebleven objecten wel
+  gesynchroniseerd kunnen worden.
 
 Onderhoud
 ---------
