@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunPython(
             validate_no_missing_service_fields,
-            reverse_code=lambda *args, **kwargs: None,
+            reverse_code=migrations.RunPython.noop,
         ),
         migrations.AlterField(
             model_name="zgwapigroupconfig",
