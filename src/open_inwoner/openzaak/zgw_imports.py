@@ -239,7 +239,13 @@ def import_zaaktype_informatieobjecttype_configs_for_type(
             # load urls and update/create records
             for iot_url, using_zaak_types in info_queue.items():
                 info_type = client.fetch_single_information_object_type(iot_url)
-
+                if not info_type:
+                    logger.error(
+                        "Unable to retrieve informatieobjecttype {}, ignoring".format(
+                            iot_url
+                        )
+                    )
+                    continue
                 ztiotc = info_map.get(info_type.url)
                 if ztiotc:
                     # we got a record for this, see if we got data to update
@@ -315,6 +321,11 @@ def import_statustype_configs_for_type(
             for statustype_url, using_zaak_types in info_queue.items():
                 status_type = client.fetch_single_status_type(statustype_url)
                 if not status_type:  # Statustype isn't available anymore?
+                    logger.error(
+                        "Unable to obtain statustype {}, ignoring".format(
+                            statustype_url
+                        )
+                    )
                     continue
 
                 zaaktype_statustype = info_map.get(status_type.url)
@@ -390,7 +401,13 @@ def import_resultaattype_configs_for_type(
             # load urls and update/create records
             for resultaattype_url, using_zaak_types in info_queue.items():
                 resultaat_type = client.fetch_single_resultaat_type(resultaattype_url)
-
+                if not resultaat_type:
+                    logger.error(
+                        "Unable to obtain resultaattype {}, ignoring".format(
+                            resultaattype_url
+                        )
+                    )
+                    continue
                 zaaktype_resultaattype = info_map.get(resultaat_type.url)
                 if zaaktype_resultaattype:
                     # we got a record for this, see if we got data to update

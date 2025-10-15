@@ -33,6 +33,27 @@ Bugfixes
   foutmeldingen meer als er ook anonieme vragen voorkomen in de backend.
 * [:taiga-is:`3519`: :pr:`1966`]: Probleem opgelost in de side menu waarbij de
   'mijn vragen' item niet geselecteerd wordt als huidige pagina.
+* [:pr:`1972`]: Informatieobjecttpen die bij de ZGW synchronisatie niet kunnen worden
+  opgehaald zullen worden overgeslagen, zodat de overgebleven objecten wel
+  gesynchroniseerd kunnen worden.
+
+Onderhoud
+---------
+
+* [:pr:`1943`]: ``waitress`` bijgewerkt naar versie ``3.0.2``.
+* [:pr:`1943`]: ``Flask-CORS`` bijgewerkt naar versie ``6.0.1``.
+* [:pr:`1944`]: ``djangorestframework`` bijgewerkt naar versie ``3.16.1``.
+* [:taiga-us:`3461`, :taiga-ta:`3472`, :pr:`1834`]: Python versie bijgewerkt naar
+  ``v3.12``.
+* [:taiga-us:`3450`, :pr:`1927`]: ``maykin-django-prosemirror`` dependency toegevoegd.
+* [:taiga-ta:`3473`, :pr:`1931`]: ``maykin-common`` dependency toegevoegd.
+* [:pr:`1942`] ``sqlparse`` bijgewerkt naar versie ``0.5.3``.
+* [:pr:`1951`] ``django`` bijgewerkt naar versie ``4.2.25``.
+* [:taiga-is:`3496`, :pr:`1957`]: De ``django-setup-configuration`` structuur voor
+  configuratie van het klantensysteem is gereorganiseerd om de structuur van het
+  beheerscherm te volgen, met een overkoepelend config en sub-configs voor eSuite en
+  Openklant.
+* [:taiga-ta:`3454`]: ``django-prosemirror`` bijgewerkt naar nieuwste versie
 
 1.35.0 (2025-09-18)
 ===================
