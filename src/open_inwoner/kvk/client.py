@@ -1,8 +1,8 @@
-import logging
 from functools import cached_property
 from urllib.parse import urlencode
 
 import requests
+import structlog
 from requests.exceptions import InvalidJSONError, JSONDecodeError
 
 from open_inwoner.utils.decorators import cache as cache_result
@@ -11,7 +11,7 @@ from .constants import CompanyType
 from .exceptions import KVKAPIException
 from .models import KvKConfig
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class KvKClient:
@@ -118,7 +118,7 @@ class KvKClient:
         vestigingen = self.search(vestigingsnummer=vestiging).get("resultaten", [])
 
         if not vestigingen:
-            logger.info("No vestiging found for vestigingsnummer %s", vestiging)
+            logger.info("No vestiging found", vestigingsnummer=vestiging)
             return None
 
         return vestigingen[0]

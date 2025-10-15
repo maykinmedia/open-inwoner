@@ -1,4 +1,3 @@
-import logging
 from urllib.parse import urlencode
 
 from django.conf import settings
@@ -11,6 +10,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import View
 
+import structlog
 from digid_eherkenning.oidc.models import BaseConfig
 from digid_eherkenning.oidc.views import OIDCAuthenticationCallbackView
 from mozilla_django_oidc_db.views import _OIDC_ERROR_SESSION_KEY, OIDCInit
@@ -19,7 +19,7 @@ from open_inwoner.accounts.models import OpenIDDigiDConfig, OpenIDEHerkenningCon
 
 from .auth import BlockEenmanszaakLoginMixin
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 GENERIC_DIGID_ERROR_MSG = _(
@@ -62,10 +62,9 @@ class CallbackView(OIDCAuthenticationCallbackView):
         try:
             with transaction.atomic():
                 response = super().get(request)
-        except (IntegrityError, ValidationError) as exc:
+        except (IntegrityError, ValidationError):
             logger.exception(
                 "Something went wrong while attempting to authenticate via OIDC",
-                exc_info=exc,
             )
             request.session[_OIDC_ERROR_SESSION_KEY] = str(self.generic_error_msg)
             response = self.login_failure()

@@ -1,7 +1,7 @@
-import logging
 from datetime import date, datetime
 from urllib.parse import quote
 
+import structlog
 from ape_pie.client import APIClient
 from pydantic import BaseModel, ValidationError
 from zgw_consumers.client import build_client
@@ -11,7 +11,7 @@ from open_inwoner.utils.api import JSONEncoderMixin
 from .exceptions import QmaticException
 from .models import QmaticConfig
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 # API DATA DEFINITIONS
 

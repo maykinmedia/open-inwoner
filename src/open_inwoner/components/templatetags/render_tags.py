@@ -1,13 +1,13 @@
-import logging
-
 from django import template
+
+import structlog
 
 from open_inwoner.utils.html import get_rendered_content
 
 register = template.Library()
 
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 @register.filter("prosemirror_content")
@@ -25,6 +25,6 @@ def prosemirror_content(content):
         return ""
     try:
         return get_rendered_content(content)
-    except (AttributeError, TypeError) as e:
-        logger.warning("Could not render content: %s", e)
+    except (AttributeError, TypeError):
+        logger.warning("Could not render content", exc_info=True)
         return ""

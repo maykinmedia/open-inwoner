@@ -1,10 +1,10 @@
-import logging
 from typing import Generator, Type, TypedDict, assert_never
 from urllib.parse import urlencode
 
 from django.utils import formats
 from django.utils.translation import gettext as _
 
+import structlog
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from objectsapiclient.models import Configuration
@@ -18,7 +18,7 @@ from open_inwoner.cms.plugins.api_models import (
 )
 from open_inwoner.cms.plugins.models import TasksConfig
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class TaskData(TypedDict):
@@ -112,7 +112,7 @@ class TasksPlugin(CMSPluginBase):
                 except ValidationError:
                     logger.exception(
                         "Invalid externe taak",
-                        extra={"object_type_uuid": object_type_uuid},
+                        object_type_uuid=object_type_uuid,
                     )
 
     def get_tasks_by_bsn(

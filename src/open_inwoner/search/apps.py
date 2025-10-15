@@ -1,12 +1,11 @@
-import logging
-
 from django.apps import AppConfig
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
+import structlog
 from elasticsearch.dsl.connections import connections
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class SearchAppConfig(AppConfig):

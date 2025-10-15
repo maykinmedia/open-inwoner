@@ -1,15 +1,15 @@
-import logging
 from datetime import date
 
 from django.urls import reverse
 
+import structlog
 from mail_editor.helpers import find_template
 
 from open_inwoner.accounts.choices import StatusChoices
 from open_inwoner.accounts.models import Action, User
 from open_inwoner.utils.url import build_absolute_url
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 def collect_notifications_about_expiring_actions() -> list[dict]:
@@ -38,7 +38,7 @@ def collect_notifications_about_expiring_actions() -> list[dict]:
                     end_date=today,
                 ).values_list("id", flat=True)
             ),
-            object_type=str(Action),
+            object_type=Action,
         )
         for receiver in receivers
     ]
@@ -69,7 +69,9 @@ def _send_email(receiver_id: int, action_ids: list[int]) -> None:
     template.send_email([receiver.email], context)
 
     logger.info(
-        f"The email was sent to the user {receiver} about {actions.count()} expiring actions"
+        "The email was sent to the user about expiring actions",
+        receiver=receiver,
+        action_count=actions.count(),
     )
 
 

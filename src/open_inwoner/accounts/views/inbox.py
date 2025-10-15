@@ -1,4 +1,3 @@
-import logging
 from urllib.parse import unquote
 
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -10,6 +9,7 @@ from django.utils import formats
 from django.utils.translation import gettext as _
 from django.views.generic import FormView
 
+import structlog
 from privates.views import PrivateMediaView
 
 from open_inwoner.accounts.forms import InboxForm
@@ -19,7 +19,7 @@ from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class InboxView(
@@ -132,8 +132,10 @@ class InboxView(
         total_marked = Message.objects.mark_seen(self.request.user, other_user)
         if total_marked:
             logger.info(
-                f"{total_marked} messages are marked as seen for receiver {self.request.user.email} "
-                f"and sender {other_user.email}"
+                "messages are marked as seen",
+                messages_marked=total_marked,
+                receiver_email=self.request.user.email,
+                sender_email=other_user.email,
             )
 
     def get_initial(self):

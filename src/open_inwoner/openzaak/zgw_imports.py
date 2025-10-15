@@ -1,8 +1,8 @@
-import logging
 from collections import defaultdict
 
 from django.db import transaction
 
+import structlog
 from zgw_consumers.api_models.catalogi import (
     InformatieObjectType,
     ResultaatType,
@@ -24,7 +24,7 @@ from open_inwoner.openzaak.models import (
     ZaakTypeStatusTypeConfig,
 )
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 def filter_zaaktypes(case_types: list[ZaakType]) -> list[ZaakType]:
@@ -58,8 +58,8 @@ def import_catalog_configs() -> list[CatalogusConfig]:
     if result.has_errors:
         for response in result.failing_responses:
             logger.exception(
-                "Client %s encountered an exception. Import will continue, for any other configured clients",
-                response.client,
+                "ZGW client encountered an exception. Import will continue, for any other configured clients",
+                client=response.client,
                 exc_info=response.exception,
             )
 
@@ -94,7 +94,9 @@ def import_catalog_configs() -> list[CatalogusConfig]:
 
         if to_update:
             CatalogusConfig.objects.bulk_update(to_update, ["service"])
-            logger.info("Updated service on %d catalogs", len(to_update))
+            logger.info(
+                "Updated service on catalogs", number_of_updated_services=len(to_update)
+            )
 
         if to_create:
             CatalogusConfig.objects.bulk_create(to_create)
@@ -114,8 +116,8 @@ def import_zaaktype_configs() -> list[ZaakTypeConfig]:
     if result.has_errors:
         for response in result.failing_responses:
             logger.exception(
-                "Client %s encountered an exception. Import will continue, for any other configured clients",
-                response.client,
+                "ZGW client encountered an exception. Import will continue, for any other configured clients",
+                client=response.client,
                 exc_info=response.exception,
             )
 
@@ -241,9 +243,8 @@ def import_zaaktype_informatieobjecttype_configs_for_type(
                 info_type = client.fetch_single_information_object_type(iot_url)
                 if not info_type:
                     logger.error(
-                        "Unable to retrieve informatieobjecttype {}, ignoring".format(
-                            iot_url
-                        )
+                        "Unable to retrieve informatieobjecttype, ignoring",
+                        informatieobjecttype_url=iot_url,
                     )
                     continue
                 ztiotc = info_map.get(info_type.url)
@@ -322,9 +323,8 @@ def import_statustype_configs_for_type(
                 status_type = client.fetch_single_status_type(statustype_url)
                 if not status_type:  # Statustype isn't available anymore?
                     logger.error(
-                        "Unable to obtain statustype {}, ignoring".format(
-                            statustype_url
-                        )
+                        "Unable to obtain statustype, ignoring",
+                        statustype_url=statustype_url,
                     )
                     continue
 
@@ -403,9 +403,8 @@ def import_resultaattype_configs_for_type(
                 resultaat_type = client.fetch_single_resultaat_type(resultaattype_url)
                 if not resultaat_type:
                     logger.error(
-                        "Unable to obtain resultaattype {}, ignoring".format(
-                            resultaattype_url
-                        )
+                        "Unable to obtain resultaattype, ignoring",
+                        resultaattype_url=resultaattype_url,
                     )
                     continue
                 zaaktype_resultaattype = info_map.get(resultaat_type.url)

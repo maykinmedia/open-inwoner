@@ -336,7 +336,11 @@ class Openklant2ServiceTest(Openklant2ServiceTestCase):
 
             self.assertEqual(len(logs.output), 1)
             self.assertIn(
-                f"More than two phone numbers found for partij {self.persoon['uuid']}",
+                "More than two phone numbers found for partij",
+                logs.output[0],
+            )
+            self.assertIn(
+                str(self.persoon["uuid"]),
                 logs.output[0],
             )
 

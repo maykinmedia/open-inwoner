@@ -1,14 +1,13 @@
-import logging
-
 from django.contrib.admin import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+import structlog
 from timeline_logger.models import TimelineLog
 
 from .logentry import LOG_ACTIONS
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 @receiver(post_save, sender=models.LogEntry)
@@ -25,7 +24,7 @@ def copy_log_entry_to_timeline_logger(sender, instance, **kwargs):
         },
     )
     logger.info(
-        "Modified: %s, %s",
-        instance.content_type,
-        instance.get_change_message(),
+        "Log entry copied to timeline_logger",
+        content_type=instance.content_type,
+        message=instance.get_change_message(),
     )

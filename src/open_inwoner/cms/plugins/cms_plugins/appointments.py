@@ -1,14 +1,13 @@
-import logging
-
 from django.utils.translation import gettext as _
 
+import structlog
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 
 from open_inwoner.cms.plugins.models.appointments import UserAppointments
 from open_inwoner.qmatic.client import NoServiceConfigured, qmatic_client_factory
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 @plugin_pool.register_plugin

@@ -1,8 +1,7 @@
-import logging
-
 from django.core.exceptions import PermissionDenied
 from django.utils.translation import gettext_lazy as _
 
+import structlog
 from cms.models import Page
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
@@ -12,7 +11,7 @@ from open_inwoner.openklant.models import KlantenSysteemConfig
 
 from .models import CMSFlatPageModel
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 @plugin_pool.register_plugin

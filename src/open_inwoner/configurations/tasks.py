@@ -1,11 +1,12 @@
 import io
-import logging
 
 from django.core.management import call_command
 
+import structlog
+
 from open_inwoner.celery import app
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 @app.task

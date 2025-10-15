@@ -1,5 +1,4 @@
 import inspect
-import logging
 import re
 import uuid
 from collections.abc import Callable
@@ -8,7 +7,9 @@ from typing import TypeVar
 
 from django.core.cache import BaseCache, caches
 
-logger = logging.getLogger(__name__)
+import structlog
+
+logger = structlog.stdlib.get_logger(__name__)
 
 
 RT = TypeVar("RT")
@@ -142,11 +143,11 @@ def cache(
 
             result = _cache.get(cache_key, default=_CACHE_MISS)
             if result is not _CACHE_MISS:
-                logger.debug("Cache hit: '%s'", cache_key)
+                logger.debug("Cache hit", cache_key=cache_key)
                 return result
 
             # The key does not exist so we call the decorated function and set the cache
-            logger.debug("Cache miss: '%s'", cache_key)
+            logger.debug("Cache miss", cache_key=cache_key)
             result = func(*args, **kwargs)
             _cache.set(cache_key, result, timeout=timeout)
 

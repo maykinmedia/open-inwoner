@@ -1,4 +1,3 @@
-import logging
 from urllib.parse import unquote
 
 from django.contrib import messages
@@ -10,6 +9,7 @@ from django.urls import NoReverseMatch, reverse
 from django.utils.translation import gettext as _
 from django.views.generic import TemplateView, UpdateView
 
+import structlog
 from django_registration.backends.one_step.views import RegistrationView
 from furl import furl
 
@@ -32,7 +32,7 @@ from open_inwoner.utils.views import CommonPageMixin
 
 from .mixins import RegistrationLogMixin
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class InviteMixin(CommonPageMixin):
@@ -227,7 +227,7 @@ class NecessaryFieldsUserView(
         if not partij:
             logger.error(
                 "Unable to create partij during post-registration sync",
-                extra={"user": user},
+                user=user,
             )
             return
 
@@ -258,7 +258,7 @@ class NecessaryFieldsUserView(
         if not klant:
             logger.error(
                 "Unable to create klant during post-registration sync",
-                extra={"user": user},
+                user=user,
             )
             return
 

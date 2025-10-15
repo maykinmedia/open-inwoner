@@ -1,5 +1,4 @@
 import datetime
-import logging
 import uuid
 from dataclasses import dataclass
 from datetime import timedelta
@@ -21,6 +20,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 import glom
+import structlog
 from ape_pie.client import APIClient
 from pydantic import BaseModel, ConfigDict, TypeAdapter
 from requests.exceptions import RequestException
@@ -86,7 +86,7 @@ from openklant2.types.resources.partij import (
 )
 from openklant2.types.resources.partij_identificator import PartijIdentificator
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class BsnFetchParam(TypedDict):
@@ -222,8 +222,11 @@ class eSuiteKlantenService(
             )
             data = get_json_response(response)
             all_data = list(pagination_helper(self.client, data))
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception(
+                "Failed to retrieve klanten for BSN",
+                bsn=user_bsn,
+            )
             return []
 
         klanten = factory(Klant, all_data)
@@ -250,8 +253,12 @@ class eSuiteKlantenService(
             )
             data = get_json_response(response)
             all_data = list(pagination_helper(self.client, data))
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception(
+                "Failed to retrieve klanten for eHerkenning user",
+                user_kvk_or_rsin=user_kvk_or_rsin,
+                vestigingsnummer=vestigingsnummer,
+            )
             return []
 
         klanten = factory(Klant, all_data)
@@ -300,7 +307,11 @@ class eSuiteKlantenService(
             response = self.client.post("klanten", json=payload)
             response_data = get_json_response(response)
         except (RequestException, ClientError):
-            logger.exception("exception while making request")
+            logger.exception(
+                "Failed to create klant for user",
+                user_bsn=user_bsn,
+                user_kvk_or_rsin=user_kvk_or_rsin,
+            )
             return
 
         klant = factory(Klant, response_data)
@@ -372,8 +383,11 @@ class eSuiteKlantenService(
         try:
             response = self.client.patch(url=klant.url, json=update_data)
             data = get_json_response(response)
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception(
+                "Failed to update klant",
+                klant=klant,
+            )
             return
 
         klant = factory(Klant, data)
@@ -457,8 +471,8 @@ class eSuiteVragenService(KlantenService):
         try:
             response = self.client.get(url)
             data = get_json_response(response)
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception("exception while making request")
             return
 
         contact_moment = factory(ContactMoment, data)
@@ -475,8 +489,11 @@ class eSuiteVragenService(KlantenService):
         try:
             response = self.client.post("contactmomenten", json=data)
             data = get_json_response(response)
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception(
+                "Failed to create contactmoment",
+                contactmoment_data=data,
+            )
             return
 
         contactmoment = factory(ContactMoment, data)
@@ -493,8 +510,12 @@ class eSuiteVragenService(KlantenService):
                         "rol": rol,
                     },
                 )
-            except (RequestException, ClientError) as e:
-                logger.exception("exception while making request", exc_info=e)
+            except (RequestException, ClientError):
+                logger.exception(
+                    "Failed to create klantcontactmoment",
+                    klant=klant,
+                    contactmoment=contactmoment,
+                )
                 return
 
         return contactmoment
@@ -537,8 +558,12 @@ class eSuiteVragenService(KlantenService):
                 },
             )
             data = get_json_response(response)
-        except (RequestException, ClientError) as exc:
-            logger.exception("exception while making request", exc_info=exc)
+        except (RequestException, ClientError):
+            logger.exception(
+                "Failed to create objectcontactmoment",
+                zaak=zaak,
+                contactmoment=contactmoment,
+            )
             return None
 
         object_contact_moment = factory(ObjectContactMoment, data)
@@ -554,8 +579,11 @@ class eSuiteVragenService(KlantenService):
             )
             data = get_json_response(response)
             all_data = list(pagination_helper(self.client, data))
-        except (RequestException, ClientError) as exc:
-            logger.exception("exception while making request", exc_info=exc)
+        except (RequestException, ClientError):
+            logger.exception(
+                "Failed to retrieve objectcontactmoment for zaak",
+                zaak=zaak,
+            )
             return []
 
         object_contact_momenten = factory(ObjectContactMoment, all_data)
@@ -586,8 +614,11 @@ class eSuiteVragenService(KlantenService):
             )
             data = get_json_response(response)
             all_data = list(pagination_helper(self.client, data))
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception(
+                "Failed to retrieve objectcontactmomenten for contactmoment",
+                contactmoment=contactmoment,
+            )
             return []
 
         object_contact_momenten = factory(ObjectContactMoment, all_data)
@@ -607,8 +638,11 @@ class eSuiteVragenService(KlantenService):
             )
             data = get_json_response(response)
             all_data = list(pagination_helper(self.client, data))
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception(
+                "Failed to retrieve klantcontactmomenten for klant",
+                klant=klant,
+            )
             return []
 
         klanten_contact_moments = factory(KlantContactMoment, all_data)
@@ -642,18 +676,16 @@ class eSuiteVragenService(KlantenService):
             )
         except ContactFormSubject.MultipleObjectsReturned as exc:
             logger.warning(
-                "Multiple OIP subjects mapped to the same e-suite subject code for ",
-                "contactmoment %s; using the first one",
-                kcm.contactmoment.url,
-                exc_info=exc,
+                "Multiple OIP subjects mapped to the same e-suite subject code for contactmoment; using the first one",
+                contactmoment_url=kcm.contactmoment.url,
+                exc_info=True,
             )
             return ContactFormSubject.objects.first().subject
         except ContactFormSubject.DoesNotExist as exc:
             logger.warning(
-                "Could not determine OIP subject for contactmoment %s; "
-                "falling back on e-suite subject code ('onderwerp')",
-                kcm.contactmoment.url,
-                exc_info=exc,
+                "Could not determine OIP subject for contactmoment; falling back on e-suite subject code ('onderwerp')",
+                contactmoment_url=kcm.contactmoment.url,
+                exc_info=True,
             )
             return esuite_subject_code
 
@@ -775,9 +807,7 @@ class eSuiteVragenService(KlantenService):
                 )
             else:
                 if case_count > 1:
-                    logger.error(
-                        "Case found in multiple backends", extra={"case_url": zaak_url}
-                    )
+                    logger.error("Case found in multiple backends", case_url=zaak_url)
 
                 zaak_with_api_group = next(
                     ZaakWithApiGroup(
@@ -1002,11 +1032,10 @@ class OpenKlant2Service(
         kvk_pi = parent_kvk_results[0]
         if kvk_pi_count > 1:
             logger.error(
-                "Unexpectedly found %d Partij Identificatoren for single kvk %s, "
-                "defaulting to first option %s",
-                kvk_pi_count,
-                kvk,
-                kvk_pi["uuid"],
+                "Unexpectedly found Partij Identificatoren for single kvk, defaulting to first option",
+                pi_count=kvk_pi_count,
+                kvk=kvk,
+                selected_uuid=kvk_pi["uuid"],
             )
 
         # Return the kvk partij if no vestiging
@@ -1038,8 +1067,8 @@ class OpenKlant2Service(
 
         if not vestiging_pi["identificeerdePartij"]:
             logger.warning(
-                "Found a Partij Identificator for vestiging %s without a linked Partij",
-                vestiging_pi["partijIdentificator"]["objectId"],
+                "Found a Partij Identificator for vestiging without a linked Partij",
+                object_id=vestiging_pi["partijIdentificator"]["objectId"],
             )
             return None
 
@@ -1386,7 +1415,8 @@ class OpenKlant2Service(
             # we pick the last one
             if len(phone_adressen) > 2:
                 logger.warning(
-                    "More than two phone numbers found for partij %s", partij_uuid
+                    "More than two phone numbers found for partij",
+                    partij_uuid=partij_uuid,
                 )
 
         if update_data:
@@ -1460,7 +1490,7 @@ class OpenKlant2Service(
                 "plaatsgevondenOp": timezone.now().isoformat(),
             }
         )
-        logger.info("Created klantcontact: %s", klantcontact["uuid"])
+        logger.info("Created klantcontact", klantcontact_uuid=klantcontact["uuid"])
 
         return klantcontact
 
@@ -1480,7 +1510,7 @@ class OpenKlant2Service(
         )
         betrokkene = self.client.betrokkene.create(data=data)
 
-        logger.info("Created betrokkene: %s", betrokkene["uuid"])
+        logger.info("Created betrokkene", betrokkene_uuid=betrokkene["uuid"])
 
         return betrokkene
 
@@ -1500,7 +1530,7 @@ class OpenKlant2Service(
                 "toegewezenAanActor": {"uuid": str(self.config.mijn_vragen_actor)},
             }
         )
-        logger.info("Created taak: %s", taak["uuid"])
+        logger.info("Created taak", taak_uuid=taak["uuid"])
 
         return taak
 
@@ -1753,7 +1783,7 @@ class OpenKlant2Service(
         if bsn := fetch_params.get("user_bsn"):
             partij = self.find_persoon_for_bsn(str(bsn))
         elif kvk_or_rsin := fetch_params.get("user_kvk_or_rsin"):
-            partij = self.find_organisatie_for_kvk_and_vestiging(kvk=str(kvk_or_rsin))
+            partij = self.find_organisatie_for_kvk_and_vestiging(kvk=kvk_or_rsin)
 
         if not partij:
             return (None, None)
@@ -1774,8 +1804,8 @@ class OpenKlant2Service(
             return self._build_question_dto(question_ok2=question, user=user), None
         if len(onderwerp_objecten) > 1:
             logger.error(
-                "More than one onderwerp_object found for question %s",
-                question.question_kcm_uuid,
+                "More than one onderwerp_object found for question",
+                question_uuid=question.question_kcm_uuid,
             )
             return self._build_question_dto(question_ok2=question, user=user), None
 
@@ -1812,14 +1842,14 @@ class OpenKlant2Service(
         # sanity checks
         if not zaken_for_question:
             logger.info(
-                "Could not find zaak corresponding to question %s",
-                question.question_kcm_uuid,
+                "Could not find zaak corresponding to question",
+                question_kcm_uuid=question.question_kcm_uuid,
             )
             return self._build_question_dto(question_ok2=question, user=user), None
         if len(zaken_for_question) > 1:
             logger.error(
-                "More than one zaak found for question %s",
-                question.question_kcm_uuid,
+                "More than one zaak found for question",
+                question_uuid=question.question_kcm_uuid,
             )
             return self._build_question_dto(question_ok2=question, user=user), None
         if len(clients) > 1:
@@ -1895,9 +1925,7 @@ class OpenKlant2Service(
         }
         klantcontacten_for_zaak = self.client.klant_contact.list_iter(params=params)
         if not (partij := self.get_partij_for_user(user)):
-            logger.error(
-                "Partij not found where one was expected", extra={"user": user}
-            )
+            logger.error("Partij not found where one was expected", user=user)
             return []
 
         def partij_is_initiator(klantcontact: KlantContact) -> bool:

@@ -1,5 +1,4 @@
-import logging
-
+import structlog
 from ape_pie.client import APIClient
 from requests.exceptions import RequestException
 from zgw_consumers.api_models.base import factory
@@ -19,7 +18,7 @@ from .api_models import (
 )
 from .models import ESuiteKlantConfig
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class KlantenClient(APIClient):
@@ -54,8 +53,8 @@ class KlantenClient(APIClient):
             )
             data = get_json_response(response)
             all_data = list(pagination_helper(self, data))
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception("Error fetching Klant for DigiD user")
             return []
 
         klanten = factory(Klant, all_data)
@@ -80,8 +79,8 @@ class KlantenClient(APIClient):
             )
             data = get_json_response(response)
             all_data = list(pagination_helper(self, data))
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception("Error fetching Klant for eHerkenning user")
             return []
 
         klanten = factory(Klant, all_data)
@@ -92,8 +91,8 @@ class KlantenClient(APIClient):
         try:
             response = self.patch(url=klant.url, json=update_data)
             data = get_json_response(response)
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception("Error updating Klant from user")
             return
 
         klant = factory(Klant, data)
@@ -115,8 +114,8 @@ class ContactmomentenClient(APIClient):
         try:
             response = self.post("contactmomenten", json=data)
             data = get_json_response(response)
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception("Failed to create contactmoment")
             return
 
         contactmoment = factory(ContactMoment, data)
@@ -132,8 +131,8 @@ class ContactmomentenClient(APIClient):
                         "rol": rol,
                     },
                 )
-            except (RequestException, ClientError) as e:
-                logger.exception("exception while making request", exc_info=e)
+            except (RequestException, ClientError):
+                logger.exception("Failed to create klantcontactmoment")
                 return
 
         return contactmoment
@@ -142,8 +141,8 @@ class ContactmomentenClient(APIClient):
         try:
             response = self.get(url)
             data = get_json_response(response)
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception("Failed to retrieve contactmoment")
             return
 
         contact_moment = factory(ContactMoment, data)
@@ -169,8 +168,12 @@ class ContactmomentenClient(APIClient):
                 },
             )
             data = get_json_response(response)
-        except (RequestException, ClientError) as exc:
-            logger.exception("exception while making request", exc_info=exc)
+        except (RequestException, ClientError):
+            logger.exception(
+                "Failed to create objectcontactmoment for zaak",
+                zaak=zaak,
+                contactmoment=contactmoment,
+            )
             return None
 
         object_contact_moment = factory(ObjectContactMoment, data)
@@ -184,8 +187,11 @@ class ContactmomentenClient(APIClient):
             response = self.get("objectcontactmomenten", params={"object": zaak.url})
             data = get_json_response(response)
             all_data = list(pagination_helper(self, data))
-        except (RequestException, ClientError) as exc:
-            logger.exception("exception while making request", exc_info=exc)
+        except (RequestException, ClientError):
+            logger.exception(
+                "Failed to retrieve objectcontactmomenten for zaak",
+                zaak=zaak,
+            )
             return []
 
         object_contact_momenten = factory(ObjectContactMoment, all_data)
@@ -216,8 +222,11 @@ class ContactmomentenClient(APIClient):
             )
             data = get_json_response(response)
             all_data = list(pagination_helper(self, data))
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception(
+                "Failed to retrieve objectcontactmomenten for contactmoment",
+                contactmoment=contactmoment,
+            )
             return []
 
         object_contact_momenten = factory(ObjectContactMoment, all_data)
@@ -237,8 +246,11 @@ class ContactmomentenClient(APIClient):
             )
             data = get_json_response(response)
             all_data = list(pagination_helper(self, data))
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception(
+                "Failed to retrieve klantcontactmomenten for klant",
+                klant=klant,
+            )
             return []
 
         klanten_contact_moments = factory(KlantContactMoment, all_data)
@@ -285,7 +297,7 @@ def _build_open_klant_client(type_) -> APIClient | None:
             client = build_client(service, client_factory=client_class)
             return client
 
-    logger.warning("no service defined for %s", type_)
+    logger.warning("no service defined for type", service_type=type_)
     return None
 
 

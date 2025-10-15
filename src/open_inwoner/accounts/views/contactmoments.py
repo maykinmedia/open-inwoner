@@ -1,4 +1,3 @@
-import logging
 from typing import Iterable, Protocol
 
 from django.contrib.auth.mixins import AccessMixin
@@ -11,6 +10,7 @@ from django.utils.translation import gettext as _
 from django.views import View
 from django.views.generic import TemplateView
 
+import structlog
 from requests import RequestException
 from view_breadcrumbs import BaseBreadcrumbMixin
 
@@ -33,7 +33,7 @@ from open_inwoner.openklant.wrap import FetchParameters
 from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import CommonPageMixin
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class KlantContactMomentAccessMixin(AccessMixin):
@@ -152,13 +152,14 @@ class KlantContactMomentListView(
                     # TODO: This can happen. Ideally, we would present the user with
                     # warning noting that not all questions might be visible.
                     logger.warning(
-                        "Connection error for service %s",
-                        service_type,
+                        "Connection error for service",
+                        service_type=service_type.value,
                         exc_info=True,
                     )
                 except BaseException:
                     logger.exception(
-                        "Unable to fetch questions for service %s", service_type
+                        "Unable to fetch questions for service",
+                        service_type=service_type.value,
                     )
 
         questions.sort(key=lambda q: q["registered_date"], reverse=True)
@@ -319,7 +320,7 @@ class KlantContactMomentRedirectView(KlantContactMomentAccessMixin, View):
 
         question_dto, _ = service.retrieve_question(
             fetch_params=fetch_params,
-            question_uuid=str(kwargs.get("uuid")),
+            question_uuid=kwargs.get("uuid"),
             user=request.user,
         )
 

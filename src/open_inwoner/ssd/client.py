@@ -1,4 +1,3 @@
-import logging
 from abc import ABC, abstractmethod
 from datetime import datetime
 from pathlib import Path
@@ -9,6 +8,7 @@ from django.template.defaultfilters import date as django_date
 from django.utils import timezone
 
 import requests
+import structlog
 from requests import Response
 
 from open_inwoner.utils.export import render_pdf
@@ -17,7 +17,7 @@ from .exceptions import SSDClientException
 from .models import SSDConfig
 from .xml import get_jaaropgaven, get_uitkeringen
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 BASE_DIR = Path(__file__).absolute().parent.parent
 

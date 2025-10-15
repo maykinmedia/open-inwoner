@@ -620,16 +620,22 @@ class TestCatalogusImport(TestCase):
             logger="open_inwoner.openzaak.import_export", level="ERROR"
         ) as cm:
             import_result = ZGWConfigImport.from_jsonl_stream_or_string(import_line)
+            self.assertEqual(len(cm.records), 2)
             self.assertEqual(
-                cm.output,
-                [
-                    # error from trying to load existing CatalogusConfig
-                    "ERROR:open_inwoner.openzaak.import_export:"
-                    "CatalogusConfig not found in target environment: Domein = 'BAR', Rsin = '987654321'",
-                    # error from deserializing nested ZGW objects
-                    "ERROR:open_inwoner.openzaak.import_export:"
-                    "ZaakTypeConfig not found in target environment: Identificatie = 'ztc-id-a-0', Catalogus domein = 'DM-0', Catalogus rsin = '123456789'",
-                ],
+                cm.records[0].msg["event"],
+                "ZGW import error while updating nested config",
+            )
+            self.assertEqual(
+                cm.records[0].msg["error"],
+                "CatalogusConfig not found in target environment: Domein = 'BAR', Rsin = '987654321'",
+            )
+
+            self.assertEqual(
+                cm.records[1].msg["event"], "ZGW import error during deserialization"
+            )
+            self.assertEqual(
+                cm.records[1].msg["error"],
+                "ZaakTypeConfig not found in target environment: Identificatie = 'ztc-id-a-0', Catalogus domein = 'DM-0', Catalogus rsin = '123456789'",
             )
 
         self.assertEqual(CatalogusConfig.objects.count(), 1)

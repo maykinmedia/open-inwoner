@@ -1,5 +1,4 @@
 import json
-import logging
 from typing import (
     Any,
     Callable,
@@ -18,6 +17,7 @@ from typing import (
 
 import pydantic
 import requests
+import structlog
 from ape_pie import APIClient
 
 from openklant2.exceptions import (
@@ -36,7 +36,7 @@ from openklant2.types.error import (
 )
 from openklant2.types.pagination import PaginatedResponseBody
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 ResourceResponse = MutableMapping[str, Any]
 
@@ -130,9 +130,9 @@ class ResourceMixin:
             if next_url := _data.get("next"):
                 if max_requests and num_requests >= max_requests:
                     logger.info(
-                        "Number of requests while retrieving paginated results reached "
-                        "maximum of %s requests, returning results",
-                        max_requests,
+                        "Number of requests while retrieving paginated results reached maximum, returning results",
+                        max_requests=max_requests,
+                        next_url=next_url,
                     )
                     return
 

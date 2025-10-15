@@ -1,9 +1,9 @@
-import logging
 from datetime import date
 
 from django.db.models.query import Q
 from django.urls import reverse
 
+import structlog
 from mail_editor.helpers import find_template
 
 from open_inwoner.accounts.models import User
@@ -11,7 +11,7 @@ from open_inwoner.plans.models import Plan
 from open_inwoner.userfeed import hooks as userfeed_hooks
 from open_inwoner.utils.url import build_absolute_url
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 def collect_notifications_about_expiring_plans() -> list[dict]:
@@ -52,7 +52,7 @@ def collect_notifications_about_expiring_plans() -> list[dict]:
                 .filter(Q(created_by=receiver) | Q(plan_contacts=receiver))
                 .values_list("id", flat=True),
             ),
-            object_type=str(Plan),
+            object_type=Plan,
         )
         for receiver in receivers
     ]
@@ -87,7 +87,9 @@ def _send_email(receiver_id: int, plan_ids: list[int]) -> None:
     template.send_email([receiver.email], context)
 
     logger.info(
-        f"The email was sent to the user {receiver} about {plans.count()} expiring plans"
+        "The email was sent to the user about expiring plans",
+        receiver=receiver,
+        plan_count=plans.count(),
     )
 
 

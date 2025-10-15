@@ -2031,11 +2031,12 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
 
         # Assertions
         self.assertEqual(response.status_code, 302)
+
         mock_service.get_or_create_partij_for_user.assert_called_once_with(user=user)
         mock_service.update_partij_from_user_data.assert_not_called()
         mock_logger.error.assert_called_once_with(
             "Unable to create partij during post-registration sync",
-            extra={"user": user},
+            user=user,
         )
 
 

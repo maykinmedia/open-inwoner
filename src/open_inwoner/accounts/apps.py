@@ -1,4 +1,3 @@
-import logging
 from io import StringIO
 
 from django.apps import AppConfig, apps
@@ -7,7 +6,9 @@ from django.contrib.contenttypes.management import create_contenttypes
 from django.core.management import call_command
 from django.db.models.signals import post_migrate
 
-logger = logging.getLogger(__name__)
+import structlog
+
+logger = structlog.stdlib.get_logger(__name__)
 
 
 def update_admin_index(sender=None, **kwargs) -> bool:

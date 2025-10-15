@@ -1,4 +1,3 @@
-import logging
 from typing import Generator
 
 from django import forms
@@ -14,6 +13,7 @@ from django.urls.exceptions import Resolver404
 from django.utils.html import format_html, format_html_join
 from django.utils.translation import gettext_lazy as _
 
+import structlog
 from ordered_model.admin import OrderedInlineModelAdminMixin, OrderedTabularInline
 from solo.admin import SingletonModelAdmin
 
@@ -25,7 +25,7 @@ from open_inwoner.utils.logentry import user_action
 
 from .models import CustomFontSet, SiteConfiguration, SiteConfigurationPage
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 permission_to_fieldset = {
     "configurations.siteconfig_fieldset_color": _("Color"),

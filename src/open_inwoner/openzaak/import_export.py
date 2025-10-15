@@ -1,7 +1,6 @@
 import dataclasses
 import io
 import json
-import logging
 from collections import defaultdict
 from typing import IO, Any, Generator, Self
 from urllib.parse import urlparse
@@ -14,6 +13,7 @@ from django.core.serializers.base import DeserializationError
 from django.db import transaction
 from django.db.models import QuerySet
 
+import structlog
 from django_prosemirror.fields import ProsemirrorModelField
 
 from .models import (
@@ -24,7 +24,7 @@ from .models import (
     ZaakTypeStatusTypeConfig,
 )
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class ZGWImportError(Exception):
@@ -381,7 +381,9 @@ class ZGWConfigImport:
                 error = ZGWImportError.from_exception_and_jsonl(
                     exception=exc, jsonl=line
                 )
-                logger.error(error)
+                logger.error(
+                    "ZGW import error during deserialization", error=str(error)
+                )
                 import_errors.append(error)
             else:
                 source_config = deserialized_object.object
@@ -431,7 +433,9 @@ class ZGWConfigImport:
                                 source_config, exclude_fields, line
                             )
                 except ZGWImportError as exc:
-                    logger.error(exc)
+                    logger.exception(
+                        "ZGW import error while updating nested config", error=str(exc)
+                    )
                     import_errors.append(exc)
                 else:
                     object_type = source_config.__class__.__name__

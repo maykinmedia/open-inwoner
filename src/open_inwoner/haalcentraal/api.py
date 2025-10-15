@@ -1,9 +1,9 @@
 import abc
-import logging
 from abc import ABC
 from datetime import datetime
 
 import requests
+import structlog
 from glom import GlomError, glom
 from requests import RequestException
 from zgw_consumers.client import build_client
@@ -12,7 +12,7 @@ from open_inwoner.haalcentraal.api_models import BRPData
 from open_inwoner.haalcentraal.models import HaalCentraalConfig
 from open_inwoner.utils.api import ClientError, get_json_response
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class BRPAPI(ABC):
@@ -85,8 +85,8 @@ class BRP_1_3(BRPAPI):
                 verify=False,
             )
             return get_json_response(response)
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception("unexpected error connecting to Haal Centraal")
             return None
 
     def parse_data(self, data: dict) -> BRPData | None:
@@ -173,8 +173,8 @@ class BRP_2_1(BRPAPI):
         try:
             response = self.make_request(user_bsn)
             return get_json_response(response)
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception("unexpected error connecting to Haal Centraal")
             return None
 
     def parse_data(self, data: dict) -> BRPData | None:

@@ -1,4 +1,3 @@
-import logging
 from typing import Literal
 
 from django.contrib import messages
@@ -13,6 +12,7 @@ from django.http import HttpRequest
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
+import structlog
 from axes.signals import user_locked_out
 
 from open_inwoner.haalcentraal.models import HaalCentraalConfig
@@ -28,7 +28,7 @@ from .choices import LoginTypeChoices
 from .metrics import login_failures, logins, logouts, user_lockouts
 from .models import User
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 MESSAGE_TYPE = {
@@ -142,10 +142,7 @@ def _update_eherkenning_user_from_kvk_api(user: User):
             user.save(update_fields=["rsin"])
             updated_fields.append("rsin")
         else:
-            logger.error(
-                "Unable to sync rsin from KvK API",
-                extra=extra_exc_params,
-            )
+            logger.exception("Unable to sync rsin from KvK API", user=user)
 
     if updated_fields:
         system_action(

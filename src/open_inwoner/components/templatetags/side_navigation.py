@@ -1,4 +1,3 @@
-import logging
 from typing import List, TypedDict, cast
 
 from django import template
@@ -7,6 +6,7 @@ from django.http import HttpRequest
 from django.urls import NoReverseMatch, Resolver404, ResolverMatch, resolve, reverse
 from django.utils.translation import get_language, gettext_lazy as _
 
+import structlog
 from cms.models import Page
 from menus.base import NavigationNode
 from menus.menu_pool import menu_pool
@@ -14,7 +14,8 @@ from menus.menu_pool import menu_pool
 from open_inwoner.cms.extensions.models import CommonExtension
 
 register = template.Library()
-logger = logging.getLogger(__name__)
+
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class MenuItem(TypedDict):
@@ -92,9 +93,9 @@ class SideNavMenuData:
                     common_ext = CommonExtension.objects.get(extended_object=page_obj)
                     if common_ext.menu_icon:
                         logger.debug(
-                            "Found icon via CommonExtension%s: %s",
-                            page_type,
-                            common_ext.menu_icon,
+                            "Found icon via CommonExtension",
+                            page_type=page_type,
+                            icaon=common_ext.menu_icon,
                         )
                         return common_ext.menu_icon
                 except CommonExtension.DoesNotExist:
@@ -139,7 +140,7 @@ class SideNavMenuData:
             except (ValueError, TypeError):
                 logger.warning(
                     "Got a menu indicator value that cannot be coerced to int",
-                    extra={"indicator": indicator},
+                    indicator=indicator,
                 )
 
         return None
@@ -147,14 +148,17 @@ class SideNavMenuData:
     def _is_current_page(self, node: NavigationNode) -> bool:
         if not (resolved_current_path := self.request.resolver_match):
             logger.debug(
-                "No resolver match found for current request: node '%s' cannot be active",
-                node,
+                "No resolver match found for current request: node cannot be active",
+                node=node,
             )
             return False
 
         # Build qualified URL name for current path (namespace:url_name)
         current_qualified_name = self._get_qualified_url_name(resolved_current_path)
-        logger.debug("Current page qualified URL name: '%s'", current_qualified_name)
+        logger.debug(
+            "Current page qualified URL name",
+            qualified_name=current_qualified_name,
+        )
 
         # Handle special case of redirect routes, where the route of the node is
         # actually a redirect to another page: we want to verify if we're on the
@@ -162,9 +166,9 @@ class SideNavMenuData:
         try:
             if redirect_url := node.attr.get("redirect_url", None):
                 logger.debug(
-                    "Node '%s' has redirect_url configured: '%s'",
-                    node,
-                    redirect_url,
+                    "Node has redirect_url configured",
+                    node=node,
+                    redirect_url=redirect_url,
                 )
                 try:
                     resolved_redirect_url = resolve(redirect_url)
@@ -172,38 +176,38 @@ class SideNavMenuData:
                         resolved_redirect_url
                     )
                     logger.debug(
-                        "Redirect target qualified URL name: '%s'",
-                        redirect_qualified_name,
+                        "Redirect target qualified URL name",
+                        redirect_qualified_name=redirect_qualified_name,
                     )
                     if current_qualified_name == redirect_qualified_name:
                         logger.debug(
-                            "Node '%s' redirect target '%s' matches current page '%s':"
-                            " marking as active",
-                            node,
-                            redirect_qualified_name,
-                            current_qualified_name,
+                            "Node redirect target matches current page: marking as active",
+                            node=node,
+                            redirect_target=redirect_qualified_name,
+                            current_page=current_qualified_name,
                         )
                         return True
                     else:
                         logger.debug(
-                            "Node '%s' redirect target '%s' does not match current "
-                            "page '%s'",
-                            node,
-                            redirect_qualified_name,
-                            current_qualified_name,
+                            "Node redirect target does not match current page",
+                            node=node,
+                            redirect_target=redirect_qualified_name,
+                            current_page=current_qualified_name,
                         )
                 except Resolver404:
                     logger.debug(
-                        "Could not resolve redirect_url '%s' for node '%s'",
-                        redirect_url,
-                        node,
+                        "Could not resolve redirect_url for node",
+                        redirect_url=redirect_url,
+                        node=node,
                     )
 
             node_absolute_url = node.get_absolute_url()
             resolved_node_path = resolve(node_absolute_url)
             node_qualified_name = self._get_qualified_url_name(resolved_node_path)
             logger.debug(
-                "Node '%s' qualified URL name: '%s'", node, node_qualified_name
+                "Node qualified URL name",
+                node=node,
+                qualified_name=node_qualified_name,
             )
 
             # For CMS pages (and other catch-all patterns), URL names match but paths differ.
@@ -211,29 +215,29 @@ class SideNavMenuData:
             if is_match := current_qualified_name == node_qualified_name:
                 is_match = self.request.path == node_absolute_url
                 logger.debug(
-                    "URL names match - comparing paths: request.path='%s' vs node_url='%s' -> %s",
-                    self.request.path,
-                    node_absolute_url,
-                    "match" if is_match else "no match",
+                    "URL names match - comparing paths",
+                    request_path=self.request.path,
+                    node_url=node_absolute_url,
+                    result="match" if is_match else "no match",
                 )
 
             logger.debug(
-                "Node '%s' URL name '%s' %s current page '%s'",
-                node,
-                node_qualified_name,
-                "matches" if is_match else "does not match",
-                current_qualified_name,
+                "Node URL name comparison with current page",
+                node=node,
+                node_url_name=node_qualified_name,
+                result="matches" if is_match else "does not match",
+                current_page=current_qualified_name,
             )
             return is_match
 
         except Exception as e:
             logger.debug(
-                "Failed to resolve node '%s' for menu highlighting: %s",
-                node,
-                e,
+                "Failed to resolve node for menu highlighting",
+                node=node,
+                error=e,
             )
 
-        logger.debug("Node '%s' is not active (fallthrough)", node)
+        logger.debug("Node is not active (fallthrough)", node=node)
         return False
 
     def _get_qualified_url_name(self, resolved_match: ResolverMatch) -> str:
@@ -277,28 +281,29 @@ class SideNavMenuData:
                     except Exception:
                         logger.warning(
                             "unable to get page title for the current node",
-                            extra={"page": page},
+                            page=page,
                         )
 
                 logger.debug(
-                    "Skipping node %s for staff user: not published and no content for language %s",
-                    node.title,
-                    current_language,
+                    "Skipping node for staff user: not published and no content for language",
+                    node_title=node.title,
+                    language=current_language,
                 )
                 return False
 
             # Regular users only see published (non-draft) pages
             if is_draft:
                 logger.debug(
-                    "Skipping node %s for regular user: page is draft", node.title
+                    "Skipping node for regular user: page is draft",
+                    node_title=node.title,
                 )
                 return False
 
             if not is_published_for_language:
                 logger.debug(
-                    "Skipping node %s for regular user: not published for language %s",
-                    node.title,
-                    current_language,
+                    "Skipping node for regular user: not published for language",
+                    node_title=node.title,
+                    language=current_language,
                 )
                 return False
 
@@ -306,9 +311,9 @@ class SideNavMenuData:
 
         except (Page.DoesNotExist, AttributeError):
             logger.warning(
-                "Unable to determine publication status for node %s (id=%s): page not found or missing attributes",
-                getattr(node, "title", "Unknown"),
-                getattr(node, "id", "Unknown"),
+                "Unable to determine publication status for node: page not found or missing attributes",
+                node_title=getattr(node, "title", "Unknown"),
+                node_id=getattr(node, "id", "Unknown"),
             )
             return False
 
@@ -319,14 +324,18 @@ class SideNavMenuData:
             try:
                 excluded_url_path = reverse(excluded_url)
                 if excluded_url_path in url:
-                    logger.debug("Excluding node %s with URL %s", node, url)
+                    logger.debug("Excluding node with URL", node=node, url=url)
                     return False
             except Exception:
-                logger.debug("Failed to reverse URL %s", excluded_url, exc_info=True)
+                logger.debug(
+                    "Failed to reverse URL",
+                    excluded_url=excluded_url,
+                    exc_info=True,
+                )
                 continue
 
         if not self._is_visible_to_user(node):
-            logger.debug("Skipped node: not published %s", node)
+            logger.debug("Skipped node: not published", node=node)
             return False
 
         return True
@@ -351,16 +360,16 @@ class SideNavMenuData:
             }
 
             menu_items.append(menu_item)
-            logger.debug("Added menu item: %s", menu_item)
+            logger.debug("Added menu item", menu_item=menu_item)
 
         extra_items = self.get_extra_menu_items()
         complete_menu = menu_items + extra_items
 
         logger.debug(
-            "Base menu items: %s, Extra items: %s, Total: %s",
-            len(menu_items),
-            len(extra_items),
-            len(complete_menu),
+            "Menu items counts",
+            base_items=len(menu_items),
+            extra_items=len(extra_items),
+            total=len(complete_menu),
         )
         return complete_menu
 
@@ -380,7 +389,7 @@ class SideNavMenuData:
             faq_url = reverse("general_faq")
             is_current = request.path.startswith(faq_url)
         except NoReverseMatch:
-            logger.warning("Could not add FAQ menu item: %s", exc_info=True)
+            logger.warning("Could not add FAQ menu item", exc_info=True)
             return extra_items
 
         extra_items.append(
@@ -393,7 +402,7 @@ class SideNavMenuData:
             }
         )
 
-        logger.debug("Generated %s extra menu items", len(extra_items))
+        logger.debug("Generated extra menu items", count=len(extra_items))
         return extra_items
 
 

@@ -1,7 +1,6 @@
-import logging
-
 from django.conf import settings
 
+import structlog
 from elasticsearch.dsl import (
     FacetedSearch,
     MultiSearch,
@@ -18,7 +17,7 @@ from .documents import CMSPageDocument, ProductDocument
 from .models import FieldBoost
 from .results import AutocompleteResult, CMSPageSearchResult, ProductSearchResult
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class ProductSearch(FacetedSearch):
@@ -134,7 +133,7 @@ def multi_search(
     search_query = search_query.add(search=product_search._s)
     search_query = search_query.add(search=page_search)
 
-    logger.debug("built_search_query: %s", search_query.to_dict())
+    logger.debug("built_search_query", query=search_query.to_dict())
     products_response, pages_response = search_query.execute()
 
     return ProductSearchResult.build_from_response(

@@ -14,16 +14,12 @@ def migrate_use_zaak_omschrijving_as_title(apps, _):
     if config := OpenZaakConfig.objects.first():
         if config.use_zaak_omschrijving_as_title:
             logger.info(
-                "Setting OpenZaakConfig.derive_zaak_titel_from to %s because "
-                "OpenZaakConfig.use_zaak_omschrijving_as_title = True",
-                ZaakTitleDisplayChoices.zaak_omschrijving,
+                "Setting OpenZaakConfig.derive_zaak_titel_from to %s because use_zaak_omschrijving_as_title = True", ZaakTitleDisplayChoices.zaak_omschrijving,
             )
             config.derive_zaak_titel_from = ZaakTitleDisplayChoices.zaak_omschrijving
         else:
             logger.info(
-                "Setting OpenZaakConfig.derive_zaak_titel_from to %s because "
-                "OpenZaakConfig.use_zaak_omschrijving_as_title = False",
-                ZaakTitleDisplayChoices.zaaktype_omschrijving,
+                "Setting OpenZaakConfig.derive_zaak_titel_from to %s because use_zaak_omschrijving_as_title = False", ZaakTitleDisplayChoices.zaaktype_omschrijving,
             )
             config.derive_zaak_titel_from = (
                 ZaakTitleDisplayChoices.zaaktype_omschrijving
