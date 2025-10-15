@@ -11,6 +11,9 @@ Bugfixes
   getoond tijdens het zoeken naar zaken via de algemene zoek-functie.
 * [:taiga-is:`3519`: :pr:`1966`]: Probleem opgelost in de side menu waarbij de
   'mijn vragen' item niet geselecteerd wordt als huidige pagina.
+* [:pr:`1972`]: Informatieobjecttpen die bij de ZGW synchronisatie niet kunnen worden
+  opgehaald zullen worden overgeslagen, zodat de overgebleven objecten wel
+  gesynchroniseerd kunnen worden.
 
 1.34.2 (2025-10-07)
 ===================
