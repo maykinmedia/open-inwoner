@@ -1,6 +1,9 @@
+from django.test import tag
+
 from open_inwoner.utils.tests.test_migrations import TestSuccessfulMigrations
 
 
+@tag("migrations")
 class QuestionnaireStepContentMigrationTest(TestSuccessfulMigrations):
     migrate_from = "0021_alter_questionnairestep_category"
     migrate_to = "0024_questionnairestep_content_schema_2"

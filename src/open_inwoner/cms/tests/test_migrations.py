@@ -1,6 +1,9 @@
+from django.test import tag
+
 from open_inwoner.utils.tests.test_migrations import TestSuccessfulMigrations
 
 
+@tag("migrations")
 class MenuIconsSuccessfulMigrations(TestSuccessfulMigrations):
     migrate_from = "0007_alter_commonextension_requires_auth_bsn_or_kvk"
     migrate_to = "0008_menu_icons"

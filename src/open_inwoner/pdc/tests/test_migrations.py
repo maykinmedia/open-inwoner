@@ -1,4 +1,5 @@
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import tag
 
 from filer.models import Image
 
@@ -6,6 +7,7 @@ from open_inwoner.utils.test import temp_media_root
 from open_inwoner.utils.tests.test_migrations import TestSuccessfulMigrations
 
 
+@tag("migrations")
 class QuestionAnswerMigrationTest(TestSuccessfulMigrations):
     """Tests the migration of Question answer field to ProsemirrorModelField."""
 
@@ -153,6 +155,7 @@ class QuestionAnswerMigrationTest(TestSuccessfulMigrations):
         self.assertFalse(hasattr(question, "answer_tmp"))
 
 
+@tag("migrations")
 class CategoryDescriptionMigrationTest(TestSuccessfulMigrations):
     """Tests the migration of Category description field to ProsemirrorModelField."""
 
@@ -380,6 +383,7 @@ class CategoryDescriptionMigrationTest(TestSuccessfulMigrations):
         self.assertFalse(hasattr(category, "description_tmp"))
 
 
+@tag("migrations")
 class ProductContentMigrationTest(TestSuccessfulMigrations):
     """Tests the migration of Product content field to ProsemirrorModelField."""
 

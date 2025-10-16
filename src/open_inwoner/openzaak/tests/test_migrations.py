@@ -1,4 +1,5 @@
 from django.db import DataError
+from django.test import tag
 
 from zgw_consumers.constants import APITypes
 
@@ -14,6 +15,7 @@ from open_inwoner.utils.tests.test_migrations import (
 )
 
 
+@tag("migrations")
 class TestMultiZGWBackendMigrations(TestSuccessfulMigrations):
     migrate_from = "0047_delete_statustranslation"
     migrate_to = "0051_drop_root_zgw_fields"
@@ -88,6 +90,7 @@ class RequiredServiceToCatalogusConfigMigrationsTestCase:
         super().setUp()
 
 
+@tag("migrations")
 class TestRequiredCatalogusConfigServiceHappyPath(
     RequiredServiceToCatalogusConfigMigrationsTestCase, TestSuccessfulMigrations
 ):
@@ -107,6 +110,7 @@ class TestRequiredCatalogusConfigServiceHappyPath(
         )
 
 
+@tag("migrations")
 class TestRequiredCatalogusConfigServiceUnhappyPath(
     RequiredServiceToCatalogusConfigMigrationsTestCase, TestFailingMigrations
 ):
@@ -154,6 +158,7 @@ class TestRequiredCatalogusConfigServiceUnhappyPath(
         )
 
 
+@tag("migrations")
 class TestMakeZaakTypeConfigCatalogusRequired(TestFailingMigrations):
     migrate_from = "0052_add_catalogusconfig_service"
     migrate_to = "0053_zaaktypeconfig_catalogus_is_required"
@@ -175,6 +180,7 @@ class TestMakeZaakTypeConfigCatalogusRequired(TestFailingMigrations):
         )
 
 
+@tag("migrations")
 class TestZGWApiGroupServicesRequiredFailingMigration(TestFailingMigrations):
     migrate_from = "0053_zaaktypeconfig_catalogus_is_required"
     migrate_to = "0054_zgw_api_group_requires_most_services"
@@ -204,6 +210,7 @@ class TestZGWApiGroupServicesRequiredFailingMigration(TestFailingMigrations):
         )
 
 
+@tag("migrations")
 class TestZGWApiGroupServicesRequiredSuccessfulMigration(TestSuccessfulMigrations):
     migrate_from = "0053_zaaktypeconfig_catalogus_is_required"
     migrate_to = "0054_zgw_api_group_requires_most_services"
@@ -247,6 +254,7 @@ class TestZGWApiGroupServicesRequiredSuccessfulMigration(TestSuccessfulMigration
         )
 
 
+@tag("migrations")
 class StatusTypeDescriptionsMigrationTest(TestSuccessfulMigrations):
     """Tests the migration of ZaakTypeStatusTypeConfig descriptions to ProsemirrorModelFields."""
 
@@ -278,6 +286,7 @@ class StatusTypeDescriptionsMigrationTest(TestSuccessfulMigrations):
         self.assertFalse(hasattr(statustype_config, "description_tmp"))
 
 
+@tag("migrations")
 class StatusTypeDocUploadDescriptionMigrationTest(TestSuccessfulMigrations):
     """Tests the migration of ZaakTypeStatusTypeConfig document_upload_description to ProsemirrorModelFields."""
 
