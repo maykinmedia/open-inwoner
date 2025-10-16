@@ -74,6 +74,8 @@ Bugfixes
 * [:pr:`1972`]: Informatieobjecttpen die bij de ZGW synchronisatie niet kunnen worden
   opgehaald zullen worden overgeslagen, zodat de overgebleven objecten wel
   gesynchroniseerd kunnen worden.
+* [:taiga-is:`3520`, :pr:`1967`]: Missende labels hersteld, die tijdens de migratie voor sommige
+  Prosemirror-velden niet waren gekopieerd.
 
 Onderhoud
 ---------
