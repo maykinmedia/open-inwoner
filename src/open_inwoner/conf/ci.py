@@ -9,15 +9,26 @@ os.environ.setdefault("ALLOWED_HOSTS", "")
 
 from .base import *  # noqa isort:skip
 
-LOGGING["loggers"].update(
-    {
-        "django": {
-            "handlers": ["django"],
-            "level": "WARNING",
-            "propagate": True,
+# Disable all logging
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": True,
+    "handlers": {
+        "null": {
+            "class": "logging.NullHandler",
         },
-    }
-)
+    },
+    "root": {
+        "handlers": ["null"],
+    },
+    "loggers": {
+        "": {
+            "handlers": ["null"],
+            "level": "CRITICAL",
+            "propagate": False,
+        },
+    },
+}
 
 CACHES.update(
     {

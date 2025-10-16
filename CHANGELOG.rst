@@ -97,6 +97,9 @@ Onderhoud
   beheerscherm te volgen, met een overkoepelend config en sub-configs voor eSuite en
   Openklant.
 * [:taiga-ta:`3454`]: ``django-prosemirror`` bijgewerkt naar nieuwste versie
+* [:pr:`1974`] De primaire CI testsuite draait op enhanced runner met meer cores,
+  en testen voor migrations zijn afgesplitst in een eigen pipeline.
+* [:pr:`1977`] Logging is uitgeschakeld in de CI test runs.
 
 1.35.0 (2025-09-18)
 ===================
