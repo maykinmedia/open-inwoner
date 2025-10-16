@@ -15,6 +15,24 @@ from .mixins import HaalCentraalMixin
 @requests_mock.Mocker()
 @override_settings(
     LOG_OUTGOING_REQUESTS_DB_SAVE=True,
+    LOG_OUTGOING_REQUESTS_EMIT_BODY=True,
+    LOGGING={
+        "version": 1,
+        "disable_existing_loggers": False,
+        "handlers": {
+            "log_outgoing_requests": {
+                "level": "DEBUG",
+                "class": "log_outgoing_requests.handlers.DatabaseOutgoingRequestsHandler",
+            },
+        },
+        "loggers": {
+            "log_outgoing_requests": {
+                "handlers": ["log_outgoing_requests"],
+                "level": "DEBUG",
+                "propagate": False,
+            },
+        },
+    },
 )
 class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
     def test_outgoing_requests_are_logged_and_saved(self, m):
