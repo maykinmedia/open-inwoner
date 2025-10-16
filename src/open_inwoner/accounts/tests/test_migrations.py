@@ -1,9 +1,11 @@
 from django.db.models import F
 from django.db.utils import IntegrityError
+from django.test import tag
 
 from open_inwoner.utils.tests.test_migrations import TestSuccessfulMigrations
 
 
+@tag("migrations")
 class UserMigrationTest(TestSuccessfulMigrations):
     migrate_from = "0080_user_phonenumber_alternative"
     migrate_to = (

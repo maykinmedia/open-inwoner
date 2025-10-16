@@ -1,9 +1,12 @@
+from django.test import tag
+
 from zgw_consumers.constants import APITypes
 
 from open_inwoner.openzaak.tests.factories import ServiceFactory
 from open_inwoner.utils.tests.test_migrations import TestSuccessfulMigrations
 
 
+@tag("migrations")
 class NotificationsAPILibraryMigrationTest(TestSuccessfulMigrations):
     migrate_from = "0001_initial"
     migrate_to = "0002_migrate_data_from_notifications_api_common"

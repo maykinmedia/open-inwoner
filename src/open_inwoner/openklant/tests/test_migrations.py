@@ -1,6 +1,9 @@
+from django.test import tag
+
 from open_inwoner.utils.tests.test_migrations import TestSuccessfulMigrations
 
 
+@tag("migrations")
 class ContactFormSubjectConfigMigrationTest(TestSuccessfulMigrations):
     migrate_from = "0025_esuiteklantconfig_send_klantcontact_confirmation_email"
     migrate_to = "0026_contactform_subject_config_default"
@@ -31,6 +34,7 @@ class ContactFormSubjectConfigMigrationTest(TestSuccessfulMigrations):
             )
 
 
+@tag("migrations")
 class ContactFormtConfigMigrationTest(TestSuccessfulMigrations):
     migrate_from = "0027_alter_klantensysteemconfig_primary_backend"
     migrate_to = "0028_change_contactformconfig_descriptions"

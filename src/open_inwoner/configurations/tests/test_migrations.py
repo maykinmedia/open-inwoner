@@ -1,6 +1,9 @@
+from django.test import tag
+
 from open_inwoner.utils.tests.test_migrations import TestSuccessfulMigrations
 
 
+@tag("migrations")
 class PartialEditPermissionsMigrationTest(TestSuccessfulMigrations):
     migrate_from = "0082_alter_siteconfigurationpage_cms_page"
     migrate_to = "0085_create_partial_admin_edit_permissions"
@@ -35,6 +38,7 @@ class PartialEditPermissionsMigrationTest(TestSuccessfulMigrations):
             self.assertTrue(qs.exists())
 
 
+@tag("migrations")
 class WarningBannerTextMigrationTest(TestSuccessfulMigrations):
     migrate_from = "0085_create_partial_admin_edit_permissions"
     migrate_to = "0088_siteconfiguration_warning_banner_text_schema_2"
@@ -60,6 +64,7 @@ class WarningBannerTextMigrationTest(TestSuccessfulMigrations):
         self.assertFalse(hasattr(config, "warning_banner_text_tmp"))
 
 
+@tag("migrations")
 class LoginTextMigrationTest(TestSuccessfulMigrations):
     migrate_from = "0088_siteconfiguration_warning_banner_text_schema_2"
     migrate_to = "0091_siteconfiguration_login_text_schema_2"
@@ -85,6 +90,7 @@ class LoginTextMigrationTest(TestSuccessfulMigrations):
         self.assertFalse(hasattr(config, "login_text_tmp"))
 
 
+@tag("migrations")
 class SearchZeroResultsTextMigrationTest(TestSuccessfulMigrations):
     migrate_from = "0091_siteconfiguration_login_text_schema_2"
     migrate_to = "0094_siteconfiguration_search_zero_results_text_schema_2"

@@ -1,6 +1,9 @@
+from django.test import tag
+
 from open_inwoner.utils.tests.test_migrations import TestSuccessfulMigrations
 
 
+@tag("migrations")
 class SSDConfigRichtTextMigrationTest(TestSuccessfulMigrations):
     migrate_from = (
         "0006_rename_jaaropgave_comments_ssdconfig_jaaropgave_pdf_comments_and_more"

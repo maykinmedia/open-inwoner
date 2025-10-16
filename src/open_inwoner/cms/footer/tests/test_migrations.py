@@ -1,6 +1,9 @@
+from django.test import tag
+
 from open_inwoner.utils.tests.test_migrations import TestSuccessfulMigrations
 
 
+@tag("migrations")
 class FlatPageContentMigrationTest(TestSuccessfulMigrations):
     migrate_from = "0002_migrate_flatpages_content_to_cms"
     migrate_to = "0005_cmsflatpagemodel_content_schema_2"
