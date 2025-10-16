@@ -82,13 +82,14 @@ jobs:
               --parallel \
               --exclude-tag=e2e \
               --exclude-tag=elastic \
-              --exclude-tag=sequential
+              --exclude-tag=sequential \
+              --exclude-tag=migrations
           elif [ "${{ matrix.test-type }}" = "elastic" ]; then
-            coverage run -p src/manage.py test src --tag=elastic --exclude-tag=e2e
+            coverage run -p src/manage.py test src --tag=elastic --exclude-tag=e2e --exclude-tag=migrations
           elif [ "${{ matrix.test-type }}" = "openklant" ]; then
             coverage run -m pytest --block-network --record-mode=none -vvv src/openklant2
           elif [ "${{ matrix.test-type }}" = "sequential" ]; then
-            coverage run -p src/manage.py test src --tag=sequential
+            coverage run -p src/manage.py test src --tag=sequential --tag=migrations
           else
             echo "Error: Unknown test type '${{ matrix.test-type }}'"
             exit 1
@@ -132,6 +133,7 @@ jobs:
           mv coverages/elastic/.coverage* .
           mv coverages/openklant/.coverage* .
           mv coverages/sequential/.coverage* .
+          mv coverages/migrations/.coverage* .
           coverage combine
       - name: Publish coverage report
         uses: codecov/codecov-action@v3
