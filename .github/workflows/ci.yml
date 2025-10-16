@@ -32,7 +32,7 @@ jobs:
   #
   tests:
     name: Run the Django test suite
-    runs-on: openinwoner-runner
+    runs-on: ${{ matrix.test-type == 'main' && 'openinwoner-runner' || 'ubuntu-latest' }}
     strategy:
       matrix:
         test-type: [main, elastic, openklant, sequential]
@@ -133,7 +133,6 @@ jobs:
           mv coverages/elastic/.coverage* .
           mv coverages/openklant/.coverage* .
           mv coverages/sequential/.coverage* .
-          mv coverages/migrations/.coverage* .
           coverage combine
       - name: Publish coverage report
         uses: codecov/codecov-action@v3
