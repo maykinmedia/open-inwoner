@@ -37,12 +37,20 @@
       }
 
       &.banner__text {
-        margin-top: -130px;
-        background-color: var(--color-white);
-        border-radius: var(--border-radius);
+        $image-height-mobile: 140px;
+        margin-top: -$image-height-mobile;
         padding: var(--spacing-large);
+        padding-bottom: 0;
         box-sizing: border-box;
         width: 100%;
+        background-color: rgba(255, 255, 255, 0.6); /* fallback */
+        @supports (background-color: color-mix(in srgb, white, transparent)) {
+          background-color: color-mix(
+            in srgb,
+            var(--color-white) 60%,
+            transparent
+          );
+        }
 
         @media (min-width: 768px) {
           margin-top: 0;

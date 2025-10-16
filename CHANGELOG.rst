@@ -43,6 +43,9 @@ Nieuwe features
 * [:taiga-us:`3450`, :taiga-ta:`3454`]: CKEditor wordt vervangen door Prosemirror
 * [:taiga-us:`3408`, :pr:`1948`]: Het selectiescherm voor eHerkenning-inlog met zoek-
   en dropdownfunctie aan Storybook toegevoegd.
+* [:taiga-us:`3492`, :pr:`1960`]: Header en logo zijn kleiner gemaakt, onderwerpen en
+  zoekveld zijn gewisseld van plaats, mobiele navigatie is nu een overlay en de mobiele
+  welkom tekst is hoger geplaatst.
 
 Bugfixes
 --------

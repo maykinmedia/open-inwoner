@@ -21,13 +21,7 @@
 
 
 {% block header_image %}
-    {% if request.user.is_authenticated %}
-        {% placeholder 'banner_image' %}
-    {% else %}
-        <aside class="banner" aria-hidden="true">
-            <img class="main-image" src="{{ hero_image_login }}" alt="{% trans "Welkom op de hoofdpagina" %}">
-        </aside>
-    {% endif %}
+    {% placeholder 'banner_image' %}
 {% endblock header_image %}
 
 {% block main_outer %}
