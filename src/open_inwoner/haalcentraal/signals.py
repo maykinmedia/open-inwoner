@@ -1,5 +1,3 @@
-import logging
-
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
@@ -7,8 +5,6 @@ from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.models import User
 
 from .utils import update_brp_data_in_db
-
-logger = logging.getLogger(__name__)
 
 
 @receiver(post_save, sender=User)

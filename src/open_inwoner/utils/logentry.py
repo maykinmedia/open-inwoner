@@ -1,5 +1,5 @@
 import functools
-import logging
+import logging  # noqa: TID251 - only used for log levels
 
 from django.contrib.admin import models
 from django.contrib.admin.utils import _get_changed_field_labels_from_form

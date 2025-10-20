@@ -1,4 +1,4 @@
-import logging
+import logging  # noqa: TID251 - only used for log levels
 import tempfile
 from typing import Any
 from uuid import UUID

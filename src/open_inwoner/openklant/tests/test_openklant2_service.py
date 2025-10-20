@@ -1,5 +1,4 @@
 import datetime
-import logging
 
 from django.test import tag
 
@@ -329,9 +328,7 @@ class Openklant2ServiceTest(Openklant2ServiceTestCase):
             partij_uuid=self.persoon["uuid"]
         )
 
-        logger = logging.getLogger("open_inwoner.openklant.services")
-
-        with self.assertLogs(logger=logger) as logs:
+        with self.assertLogs("open_inwoner.openklant.services") as logs:
             self.service.update_user_from_partij(self.persoon["uuid"], user)
 
             self.assertEqual(len(logs.output), 1)

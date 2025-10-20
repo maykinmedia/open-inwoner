@@ -154,3 +154,6 @@ ban-relative-imports = "parents"
 
 [format]
 line-ending = "lf"
+
+[lint.flake8-tidy-imports.banned-api]
+"logging".msg = "Use `structlog.get_logger(__name__)` instead of the stdlib logging module."

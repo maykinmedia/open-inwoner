@@ -1,12 +1,9 @@
-import logging
 from datetime import datetime
 from ipaddress import IPv4Address, IPv6Address
 from typing import Any
 
 import requests
 from pydantic_core import Url
-
-logger = logging.getLogger(__name__)
 
 Object = dict[str, Any]
 

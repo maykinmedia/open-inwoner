@@ -10,17 +10,17 @@ they are available for Django settings initialization.
     before Django is initialized.
 """
 
-import logging
 import os
 import warnings
 
 from django.conf import settings
 
+import structlog
 from dotenv import load_dotenv
 from maykin_common.otel import setup_otel
 from requests import Session
 
-logger = logging.getLogger(__name__)
+logger = structlog.getLogger(__name__)
 
 
 def setup_env():

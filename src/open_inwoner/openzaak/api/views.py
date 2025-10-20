@@ -1,5 +1,4 @@
 import dataclasses
-import logging
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -13,8 +12,6 @@ from open_inwoner.openzaak.auth import get_valid_subscription_from_request
 from open_inwoner.openzaak.exceptions import InvalidAuth
 from open_inwoner.openzaak.mixins import WebhookLogMixin
 from open_inwoner.openzaak.tasks import process_zaken_notification
-
-logger = logging.getLogger(__name__)
 
 
 class NotificationsWebhookBaseView(WebhookLogMixin, APIView):

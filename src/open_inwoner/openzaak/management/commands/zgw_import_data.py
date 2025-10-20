@@ -1,5 +1,3 @@
-import logging
-
 from django.core.management.base import BaseCommand
 
 from open_inwoner.openzaak.models import ZGWApiGroupConfig
@@ -10,8 +8,6 @@ from open_inwoner.openzaak.zgw_imports import (
     import_zaaktype_resultaattype_configs,
     import_zaaktype_statustype_configs,
 )
-
-logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):

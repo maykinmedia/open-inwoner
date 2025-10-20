@@ -1,4 +1,4 @@
-import logging
+import logging  # noqa: TID251 - only used for log levels
 
 from django.contrib.admin.models import ADDITION, CHANGE, LogEntry
 from django.contrib.contenttypes.models import ContentType

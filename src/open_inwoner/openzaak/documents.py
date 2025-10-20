@@ -1,12 +1,8 @@
-import logging
-
 from django.conf import settings
 
 from open_inwoner.openzaak.api_models import InformatieObject
 from open_inwoner.openzaak.clients import DocumentenClient
 from open_inwoner.utils.decorators import cache as cache_result
-
-logger = logging.getLogger(__name__)
 
 
 @cache_result("information_object_url:{url}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT)

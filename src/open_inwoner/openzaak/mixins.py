@@ -1,4 +1,4 @@
-import logging
+import logging  # noqa: TID251 - only used for log levels
 from typing import TYPE_CHECKING
 
 from django.http import HttpRequest

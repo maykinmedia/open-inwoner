@@ -1,4 +1,4 @@
-import logging
+import logging  # noqa: TID251 - only used for log levels
 from datetime import date, timedelta
 
 from django.conf import settings

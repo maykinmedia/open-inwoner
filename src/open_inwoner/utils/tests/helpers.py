@@ -1,6 +1,6 @@
 import io
 import json
-import logging
+import logging  # noqa: TID251 - only used for log levels
 
 from django.conf import settings
 from django.contrib.auth import get_user_model

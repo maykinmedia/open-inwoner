@@ -1,4 +1,4 @@
-import logging
+import logging  # noqa: TID251 - keep for old migrations
 
 from django.db import migrations
 
