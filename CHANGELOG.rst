@@ -79,6 +79,8 @@ Bugfixes
   gesynchroniseerd kunnen worden.
 * [:taiga-is:`3520`, :pr:`1967`]: Missende labels hersteld, die tijdens de migratie voor sommige
   Prosemirror-velden niet waren gekopieerd.
+* [:taiga-is:`3519`: :pr:`1966`]: Probleem opgelost in de side menu waarbij de
+  'mijn vragen' item niet geselecteerd wordt als huidige pagina.
 
 Onderhoud
 ---------
