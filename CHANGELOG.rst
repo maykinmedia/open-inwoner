@@ -14,6 +14,10 @@ Bugfixes
 * [:pr:`1972`]: Informatieobjecttpen die bij de ZGW synchronisatie niet kunnen worden
   opgehaald zullen worden overgeslagen, zodat de overgebleven objecten wel
   gesynchroniseerd kunnen worden.
+* [:taiga-is:`3525`: :pr:`1978`]: De positie van CMS-pagina's bepaalt niet langer welke
+  items worden weergegeven in het verkorte dropdown menu. Menu-items worden nu alleen
+  getoond in het dropdown menu als er geen sidenav beschikbaar is en als ze expliciet
+  zijn geconfigureerd (op dit moment alleen de link naar "Mijn Profiel").
 
 1.34.2 (2025-10-07)
 ===================
