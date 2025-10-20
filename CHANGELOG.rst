@@ -95,6 +95,8 @@ Bugfixes
   items worden weergegeven in het verkorte dropdown menu. Menu-items worden nu alleen
   getoond in het dropdown menu als er geen sidenav beschikbaar is en als ze expliciet
   zijn geconfigureerd (op dit moment alleen de link naar "Mijn Profiel").
+* [:taiga-is:`3521`, :pr:`1975`]: Probleem opgelost waar de notificatie en mobiele welkom tekst
+  overlay op de home pagina in elkaar overlopen.
 
 Onderhoud
 ---------
