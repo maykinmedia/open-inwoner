@@ -18,6 +18,8 @@ Bugfixes
   items worden weergegeven in het verkorte dropdown menu. Menu-items worden nu alleen
   getoond in het dropdown menu als er geen sidenav beschikbaar is en als ze expliciet
   zijn geconfigureerd (op dit moment alleen de link naar "Mijn Profiel").
+* [:pr:`1980`] Cache decorator ondersteunt kwargs met default argumenten, en maakt
+  correct onderscheid tussen ``None`` en ``"None"`` waarden.
 
 1.34.2 (2025-10-07)
 ===================
