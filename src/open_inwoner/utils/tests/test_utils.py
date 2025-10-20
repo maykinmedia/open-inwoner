@@ -54,10 +54,12 @@ class DynamicCacheKeyTest(DjangoTestCase):
 
         self.cache.get.assert_has_calls(
             [
-                mock.call("alpha:charlie:bravo:42", default=mock.ANY),
-                mock.call("alpha:bar:bravo:baz", default=mock.ANY),
-                mock.call("alpha:bar:bravo:5", default=mock.ANY),
-                mock.call("alpha:bar:bravo:baz:charlie:charlie:42", default=mock.ANY),
+                mock.call("alpha:'charlie':bravo:42", default=mock.ANY),
+                mock.call("alpha:'bar':bravo:'baz'", default=mock.ANY),
+                mock.call("alpha:'bar':bravo:5", default=mock.ANY),
+                mock.call(
+                    "alpha:'bar':bravo:'baz':'charlie':charlie:42", default=mock.ANY
+                ),
                 mock.call("static", default=mock.ANY),
             ]
         )
@@ -269,3 +271,20 @@ class CacheBehaviorTest(DjangoTestCase):
         self.assertEqual(result3, "foo:bar:None")
         self.assertEqual(result4, "foo:bar:None")
         self.assertEqual(result5, "foo:bar:baz")
+
+    def test_none_and_empty_string_produce_different_cache_keys(self):
+        m = mock.Mock(side_effect=lambda x: f"result:{x}")
+
+        @cache("dynamic:{a}")
+        def func(a: str | None = None):
+            return m(a)
+
+        # All three calls should miss cache because they have different values
+        result1 = func(None)  # cache key: "dynamic:None"
+        result2 = func("")  # cache key: "dynamic:''"
+        result3 = func("None")  # cache key: "dynamic:'None'"
+
+        self.assertEqual(m.call_count, 3)
+        self.assertEqual(result1, "result:None")
+        self.assertEqual(result2, "result:")
+        self.assertEqual(result3, "result:None")
