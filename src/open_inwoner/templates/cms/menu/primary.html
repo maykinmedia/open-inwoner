@@ -1,4 +1,4 @@
-{% load menu_tags link_tags side_navigation %}
+{% load menu_tags link_tags menu %}
 {% show_full_dropdown_menu as should_show_full_dropdown_menu %}
 {% for child in children %}
     {% with url=child.attr.redirect_url|default:child.get_absolute_url %}
