@@ -13,7 +13,7 @@ from cms.test_utils.testcases import CMSTestCase
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.cms.extensions.constants import IndicatorChoices
 from open_inwoner.cms.extensions.models import CommonExtension
-from open_inwoner.components.templatetags.side_navigation import (
+from open_inwoner.components.templatetags.menu import (
     SideNavMenuData,
     react_sidenav_data,
 )
@@ -529,9 +529,7 @@ class TestExtraMenuItemGeneration(TestCase):
             {"request": self.factory.get("/"), "has_general_faq_questions": True}
         )
 
-        with patch(
-            "open_inwoner.components.templatetags.side_navigation.reverse"
-        ) as mock_reverse:
+        with patch("open_inwoner.components.templatetags.menu.reverse") as mock_reverse:
             mock_reverse.side_effect = NoReverseMatch(
                 "general_faq URL pattern not found"
             )
