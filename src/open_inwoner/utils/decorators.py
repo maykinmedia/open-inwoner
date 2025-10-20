@@ -87,11 +87,16 @@ def cache(
     def decorator(func: Callable[..., RT]) -> Callable[..., RT]:
         argspec = inspect.getfullargspec(func)
 
+        # Collect defaults from regular args
         if argspec.defaults:
             positional_count = len(argspec.args) - len(argspec.defaults)
             defaults = dict(zip(argspec.args[positional_count:], argspec.defaults))
         else:
             defaults = {}
+
+        # Collect defaults from keyword-only args
+        if argspec.kwonlydefaults:
+            defaults.update(argspec.kwonlydefaults)
 
         @wraps(func)
         def wrapped(*args, **kwargs) -> RT:
