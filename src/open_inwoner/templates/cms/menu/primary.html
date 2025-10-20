@@ -1,8 +1,9 @@
-{% load menu_tags link_tags %}
+{% load menu_tags link_tags side_navigation %}
 {% show_full_dropdown_menu as should_show_full_dropdown_menu %}
 {% for child in children %}
     {% with url=child.attr.redirect_url|default:child.get_absolute_url %}
-        <li class="primary-navigation__list-item {% if should_show_full_dropdown_menu %}primary-navigation__list-item--always-visible{% endif %}">
+        {% should_show_menu_item_in_dropdown url as show_item %}
+        <li class="primary-navigation__list-item {% if show_item %}primary-navigation__list-item--always-visible{% endif %}">
             {% link text=child.get_menu_title href=url icon=child.common.menu_icon icon_outlined=True icon_position="before" %}
             {% if child.indicator %}
                 <span class="indicator"><a class="link secondary indicator__link" href="{{ url }}">{{ child.indicator }}<span class="indicator__dot"></span></a></span>

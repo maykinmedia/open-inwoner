@@ -1,3 +1,4 @@
+import json
 from datetime import date, timedelta
 from http import HTTPStatus
 from unittest.mock import Mock, patch
@@ -1398,40 +1399,54 @@ class NewPlanContactCounterTest(WebTest):
         root_url = reverse("pages-root")
         list_url = reverse("collaborate:plan_list")
 
-        # check no number shows by default
+        # check no counter shows by default in sidenav
         response = self.app.get(root_url, user=user)
+        sidenav_script = response.pyquery("script#sidenav-menu-data")
+        menu_data = json.loads(sidenav_script.text())
 
-        links = response.pyquery(f".primary-navigation a[href='{list_url}']")
-        self.assertEqual(len(links), 2)  # Duplicate due to mobile
-        self.assertTrue(_("Samenwerken") + " group" in links.text())
+        samenwerken_items = [
+            item for item in menu_data if _("Samenwerken") in item.get("label", "")
+        ]
+        self.assertEqual(len(samenwerken_items), 1)
+        self.assertIsNone(samenwerken_items[0]["counter"])
 
-        # check if the number shows up in the menu
+        # check if the counter shows up in the sidenav
         plan_1.plan_contacts.add(user)
         plan_2.plan_contacts.add(user)
         self.assertEqual(2, user.get_plan_contact_new_count())
 
         response = self.app.get(root_url, user=user)
-        links = response.pyquery(
-            f".header__container > .primary-navigation a[href='{list_url}']"
-        )
-        # second link appears
-        self.assertEqual(len(links), 2)
-        self.assertIn("2", links.text())
+        sidenav_script = response.pyquery("script#sidenav-menu-data")
+        menu_data = json.loads(sidenav_script.text())
+
+        samenwerken_items = [
+            item for item in menu_data if _("Samenwerken") in item.get("label", "")
+        ]
+        self.assertEqual(len(samenwerken_items), 1)
+        self.assertEqual(samenwerken_items[0]["counter"], 2)
 
         # access the list page to reset
         response = self.app.get(list_url, user=user)
-        links = response.pyquery(
-            f".header__container > .primary-navigation a[href='{list_url}']"
-        )
-        self.assertEqual(len(links), 1)
-        self.assertEqual(links.text(), _("Samenwerken") + " group")
+        response = self.app.get(root_url, user=user)
+        sidenav_script = response.pyquery("script#sidenav-menu-data")
+        menu_data = json.loads(sidenav_script.text())
 
-        # check this doesn't appear for owner
+        samenwerken_items = [
+            item for item in menu_data if _("Samenwerken") in item.get("label", "")
+        ]
+        self.assertEqual(len(samenwerken_items), 1)
+        self.assertIsNone(samenwerken_items[0]["counter"])
+
+        # check counter doesn't appear for owner
         response = self.app.get(root_url, user=owner)
-        links = response.pyquery(
-            f".header__container > .primary-navigation a[href='{list_url}']"
-        )
-        self.assertEqual(len(links), 1)
+        sidenav_script = response.pyquery("script#sidenav-menu-data")
+        menu_data = json.loads(sidenav_script.text())
+
+        samenwerken_items = [
+            item for item in menu_data if _("Samenwerken") in item.get("label", "")
+        ]
+        self.assertEqual(len(samenwerken_items), 1)
+        self.assertIsNone(samenwerken_items[0]["counter"])
 
 
 @tag("e2e")
