@@ -244,3 +244,28 @@ class CacheBehaviorTest(DjangoTestCase):
         returns_none()
 
         m.assert_called_once()
+
+    def test_optional_parameters_with_none_values_are_handled(self):
+        m = mock.Mock(side_effect=lambda x, y, c: f"{x}:{y}:{c}")
+
+        @cache("dynamic:{a}:{b}:{c}")
+        def func(a: str, b: str | None = None, *, c: str | None = None):
+            return m(a, b, c)
+
+        # Miss, initial cache
+        result1 = func("foo")
+        # Hit
+        result2 = func("foo")
+        # Miss, new cache key
+        result3 = func("foo", "bar")
+        # Hit, kwarg should not be treated differently
+        result4 = func("foo", b="bar")
+        # Hit
+        result5 = func("foo", "bar", c="baz")
+
+        self.assertEqual(m.call_count, 3)
+        self.assertEqual(result1, "foo:None:None")
+        self.assertEqual(result2, "foo:None:None")
+        self.assertEqual(result3, "foo:bar:None")
+        self.assertEqual(result4, "foo:bar:None")
+        self.assertEqual(result5, "foo:bar:baz")
