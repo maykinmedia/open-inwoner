@@ -249,7 +249,7 @@ jobs:
       - name: Build the Docker image
         env:
           RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
-        run: docker build . --tag $IMAGE_NAME:$RELEASE_VERSION
+        run: docker build . --tag $IMAGE_NAME:$RELEASE_VERSION --add-host "alm-joinwebt.gemalm.intern:87.249.97.99"
 
       - name: Log into registry
         if: github.event_name == 'push' # exclude PRs
