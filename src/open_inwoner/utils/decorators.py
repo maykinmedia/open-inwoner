@@ -87,11 +87,16 @@ def cache(
     def decorator(func: Callable[..., RT]) -> Callable[..., RT]:
         argspec = inspect.getfullargspec(func)
 
+        # Collect defaults from regular args
         if argspec.defaults:
             positional_count = len(argspec.args) - len(argspec.defaults)
             defaults = dict(zip(argspec.args[positional_count:], argspec.defaults))
         else:
             defaults = {}
+
+        # Collect defaults from keyword-only args
+        if argspec.kwonlydefaults:
+            defaults.update(argspec.kwonlydefaults)
 
         @wraps(func)
         def wrapped(*args, **kwargs) -> RT:
@@ -127,7 +132,10 @@ def cache(
                         )
                         raise
 
-            cache_key = cache_key_with_attr_placeholders.format(**key_kwargs)
+            # Use repr() for all values to ensure distinct cache keys
+            # (e.g., None vs "None", "" vs None, etc.)
+            formatted_key_kwargs = {k: repr(v) for k, v in key_kwargs.items()}
+            cache_key = cache_key_with_attr_placeholders.format(**formatted_key_kwargs)
             logger.debug("Resolved cache_key `%s` to `%s`", key, cache_key)
 
             _cache: BaseCache = caches[alias]

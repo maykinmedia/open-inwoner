@@ -103,6 +103,8 @@ Onderhoud
   en testen voor migrations zijn afgesplitst in een eigen pipeline.
 * [:pr:`1977`] Logging is uitgeschakeld in de CI test runs.
 * [:pr:`1982`] ``playwright`` (npm) bijgewerkt naar ``>=1.55.1``.
+* [:pr:`1980`] Cache decorator ondersteunt kwargs met default argumenten, en maakt
+  correct onderscheid tussen ``None`` en ``"None"`` waarden.
 
 1.35.0 (2025-09-18)
 ===================
