@@ -5,6 +5,7 @@ from django.test import TestCase
 
 import requests
 import requests_mock
+from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 from zgw_consumers.constants import APITypes
 
 from open_inwoner.openzaak.clients import (
@@ -20,6 +21,7 @@ from open_inwoner.openzaak.clients import (
 from open_inwoner.openzaak.exceptions import MultiZgwClientProxyError
 from open_inwoner.openzaak.models import ZGWApiGroupConfig
 from open_inwoner.openzaak.tests.factories import ZGWApiGroupConfigFactory
+from open_inwoner.openzaak.tests.helpers import generate_oas_component_cached
 from open_inwoner.openzaak.tests.shared import (
     CATALOGI_ROOT,
     DOCUMENTEN_ROOT,
@@ -143,6 +145,7 @@ class ZGWApiGroupConfigFilterTests(TestCase):
                 if service_field == "zrc_service":
                     client_init_kwargs = {
                         "use_openzaak_120_params": group.fetch_eherkenning_zaken_with_openzaak_120_params,
+                        "fetch_rollen_with_betrokkene_type": group.fetch_rollen_with_betrokkene_type,
                     }
                 client = build_zgw_client_from_service(service, **client_init_kwargs)
                 url = service.api_root
@@ -225,6 +228,119 @@ class ZGWApiGroupConfigFilterTests(TestCase):
             ZGWApiGroupConfig.objects.resolve_group_from_hints(
                 service=service_already_used
             )
+
+    @requests_mock.Mocker()
+    def test_fetch_case_roles_with_betrokkene_type_filter(self, m):
+        api_group = self.api_groups[0]
+        api_group.fetch_rollen_with_betrokkene_type = True
+        api_group.save()
+
+        zaken_client = build_zgw_client_from_service(
+            api_group.zrc_service,
+            use_openzaak_120_params=False,
+            fetch_rollen_with_betrokkene_type=api_group.fetch_rollen_with_betrokkene_type,
+        )
+
+        case_url_1 = f"{ZAKEN_ROOT}zaken/12345678-1234-1234-1234-123456789012"
+        mock_role_1 = generate_oas_component_cached(
+            "zrc",
+            "schemas/Rol",
+            url=f"{ZAKEN_ROOT}rollen/f33153aa-ad2c-4a07-ae75-15add5891",
+            omschrijvingGeneriek=RolOmschrijving.initiator,
+            betrokkeneType=RolTypes.natuurlijk_persoon,
+            betrokkeneIdentificatie={
+                "inpBsn": "900222086",
+                "voornamen": "Foo",
+                "geslachtsnaam": "Bar",
+            },
+        )
+        case_url_2 = f"{ZAKEN_ROOT}zaken/87654321-1234-1234-1234-123456789012"
+        mock_role_2 = generate_oas_component_cached(
+            "zrc",
+            "schemas/Rol",
+            url=f"{ZAKEN_ROOT}rollen/aa35133f-ad2c-4a07-ae75-1985dda51",
+            omschrijvingGeneriek=RolOmschrijving.initiator,
+            betrokkeneType=RolTypes.niet_natuurlijk_persoon,
+            betrokkeneIdentificatie={
+                "innNnpId": "000000000",
+                "voornamen": "Baz",
+                "geslachtsnaam": "Bar",
+            },
+        )
+        case_url_3 = f"{ZAKEN_ROOT}zaken/11223344-1234-1234-1234-123456789012"
+        mock_role_3 = generate_oas_component_cached(
+            "zrc",
+            "schemas/Rol",
+            url=f"{ZAKEN_ROOT}rollen/bb46244g-ad2c-4a07-ae75-2096eeb62",
+            omschrijvingGeneriek=RolOmschrijving.initiator,
+            betrokkeneType=RolTypes.vestiging,
+            betrokkeneIdentificatie={
+                "vestigingsNummer": "123456789012",
+            },
+        )
+
+        m.get(
+            f"{ZAKEN_ROOT}rollen?zaak={case_url_1}&betrokkeneType=natuurlijk_persoon",
+            json={"count": 1, "next": None, "previous": None, "results": [mock_role_1]},
+        )
+        m.get(
+            f"{ZAKEN_ROOT}rollen?zaak={case_url_2}&betrokkeneType=niet_natuurlijk_persoon",
+            json={"count": 1, "next": None, "previous": None, "results": [mock_role_2]},
+        )
+        m.get(
+            f"{ZAKEN_ROOT}rollen?zaak={case_url_3}&betrokkeneType=vestiging",
+            json={"count": 1, "next": None, "previous": None, "results": [mock_role_3]},
+        )
+
+        test_cases = [
+            (case_url_1, mock_role_1, mock_role_1["betrokkeneType"]),
+            (case_url_2, mock_role_2, mock_role_2["betrokkeneType"]),
+            (case_url_3, mock_role_3, mock_role_3["betrokkeneType"]),
+        ]
+        for case_url, mock_role, betrokkene_type in test_cases:
+            with self.subTest(mock_role=mock_role):
+                # Track the number of requests before this iteration
+                request_count_before = len(m.request_history)
+
+                roles = zaken_client.fetch_case_roles(
+                    case_url, betrokkene_type=betrokkene_type.value
+                )
+
+                self.assertEqual(len(roles), 1)
+                self.assertEqual(roles[0].betrokkene_type, betrokkene_type)
+                self.assertEqual(
+                    roles[0].omschrijving_generiek, RolOmschrijving.initiator
+                )
+
+                # Verify exactly one new request was made
+                self.assertEqual(len(m.request_history), request_count_before + 1)
+                # Check the most recent request
+                request = m.request_history[-1]
+                self.assertIn(f"betrokkeneType={betrokkene_type.value}", request.url)
+
+    @requests_mock.Mocker()
+    def test_fetch_case_roles_raises_if_betrokkene_filter_set_but_param_missing(
+        self, m
+    ):
+        api_group = self.api_groups[0]
+        api_group.fetch_rollen_with_betrokkene_type = True
+        api_group.save()
+
+        zaken_client = build_zgw_client_from_service(
+            api_group.zrc_service,
+            use_openzaak_120_params=False,
+            fetch_rollen_with_betrokkene_type=api_group.fetch_rollen_with_betrokkene_type,
+        )
+
+        case_url = f"{ZAKEN_ROOT}zaken/12345678-1234-1234-1234-123456789012"
+
+        with self.assertRaises(ValueError) as cm:
+            zaken_client.fetch_case_roles(case_url)
+
+        self.assertEqual(
+            str(cm.exception),
+            "Betrokkene type mandatory if fetch_rollen_with_betrokkene_type set",
+        )
 
 
 @requests_mock.Mocker()

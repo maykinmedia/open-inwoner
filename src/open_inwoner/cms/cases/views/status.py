@@ -28,7 +28,7 @@ from django_htmx.http import HttpResponseClientRedirect
 from mail_editor.helpers import find_template
 from requests import RequestException
 from view_breadcrumbs import BaseBreadcrumbMixin
-from zgw_consumers.api_models.constants import RolOmschrijving
+from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 
 from open_inwoner.accounts.models import User
 from open_inwoner.cms.cases.forms import CaseContactForm, CaseUploadForm
@@ -287,7 +287,7 @@ class InnerCaseDetailView(
             context["case"] = {
                 "id": str(self.case.uuid),
                 "identification": self.case.identification,
-                "initiator": self.get_initiator_display(self.case, zaken_client),
+                "initiator": self.get_initiator_display(self.case, api_group),
                 "result": result_data.get("display", ""),
                 "result_description": result_data.get("description", ""),
                 "start_date": self.case.startdatum,
@@ -645,9 +645,45 @@ class InnerCaseDetailView(
             "description": description,
         }
 
-    @staticmethod
-    def get_initiator_display(case: Zaak, zaken_client: ZakenClient) -> str:
-        roles = zaken_client.fetch_case_roles(case.url, RolOmschrijving.initiator)
+    def get_initiator_display(self, case: Zaak, api_group: ZGWApiGroupConfig) -> str:
+        """
+        Fetch zaak roles filtered by the user's betrokkene type.
+
+        Only returns roles that match the betrokkene_type of the current user:
+            - natuurlijk_persoon if user has BSN
+            - niet_natuurlijk_persoon if user has KVK/RSIN and no vestigingsnummer
+            - vestiging if user has vestigingsnummer
+        """
+        zaken_client = api_group.zaken_client
+        user = self.request.user
+
+        if api_group.fetch_rollen_with_betrokkene_type:
+            if user.bsn:
+                roles = zaken_client.fetch_case_roles(
+                    case.url,
+                    betrokkene_type=RolTypes.natuurlijk_persoon,
+                    role_desc_generic=RolOmschrijving.initiator,
+                )
+            elif user.kvk:
+                if user.vestiging:
+                    roles = zaken_client.fetch_case_roles(
+                        case.url,
+                        betrokkene_type=RolTypes.vestiging,
+                        role_desc_generic=RolOmschrijving.initiator,
+                    )
+                else:
+                    roles = zaken_client.fetch_case_roles(
+                        case.url,
+                        betrokkene_type=RolTypes.niet_natuurlijk_persoon,
+                        role_desc_generic=RolOmschrijving.initiator,
+                    )
+            else:
+                roles = []
+        else:
+            roles = zaken_client.fetch_case_roles(
+                case.url, role_desc_generic=RolOmschrijving.initiator
+            )
+
         return ", ".join(get_role_name_display(r) for r in roles)
 
     @staticmethod

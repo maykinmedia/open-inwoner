@@ -77,6 +77,7 @@ class CasesPlaywrightTests(
             zrc_service__api_root=ZAKEN_ROOT,
             drc_service__api_root=DOCUMENTEN_ROOT,
             form_service=None,
+            fetch_rollen_with_betrokkene_type=True,
         )
         # openzaak config
         self.oz_config = OpenZaakConfig.get_solo()
@@ -397,7 +398,7 @@ class CasesPlaywrightTests(
                 json=paginated_response([self.user_role]),
             ),
             m.get(
-                f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}&omschrijvingGeneriek={RolOmschrijving.initiator}",
+                f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}&omschrijvingGeneriek={RolOmschrijving.initiator}&betrokkeneType=natuurlijk_persoon",
                 # Taiga #961 this is not an accurate OpenZaak response as it has a 'behandelaar' even when we filter on 'initiator'
                 # but eSuite doesn't filter the response in the API, so we use filtering in Python to remove the not-initiator
                 json=paginated_response([self.user_role]),
