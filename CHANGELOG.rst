@@ -46,6 +46,7 @@ Onderhoud
 
 * [:pr:`1980`] Cache decorator ondersteunt kwargs met default argumenten, en maakt
   correct onderscheid tussen ``None`` en ``"None"`` waarden.
+* [:pr:`1982`] ``playwright`` (npm) bijgewerkt naar ``>=1.55.1``.
 
 1.35.0 (2025-09-18)
 ===================
