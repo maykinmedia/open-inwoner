@@ -333,10 +333,19 @@ class ZakenClient(ZgwAPIClient):
         timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
     )
     def fetch_case_roles(
-        self, case_url: str, role_desc_generic: str | None = None
+        self,
+        case_url: str,
+        role_desc_generic: str | None = None,
+        *,
+        betrokkene_type: Literal[
+            "natuurlijk_persoon",
+            "niet_natuurlijk_persoon",
+            "vestiging",
+        ],
     ) -> list[Rol]:
         params = {
             "zaak": case_url,
+            "betrokkeneType": betrokkene_type,
         }
         if role_desc_generic:
             if role_desc_generic not in RolOmschrijving.values:
@@ -394,7 +403,9 @@ class ZakenClient(ZgwAPIClient):
 
         see Taiga #948
         """
-        case_roles = self.fetch_case_roles(case_url)
+        case_roles = self.fetch_case_roles(
+            case_url, betrokkene_type="natuurlijk_persoon"
+        )
         if not case_roles:
             return []
 
@@ -417,7 +428,9 @@ class ZakenClient(ZgwAPIClient):
 
         see Taiga #948
         """
-        case_roles = self.fetch_case_roles(case_url)
+        case_roles = self.fetch_case_roles(
+            case_url, betrokkene_type="niet_natuurlijk_persoon"
+        )
         if not case_roles:
             return []
 
