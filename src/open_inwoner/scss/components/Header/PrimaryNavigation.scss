@@ -159,7 +159,7 @@
         )
         & {
         @media (min-width: 1024px) {
-          &:not(&--always-visible),
+          &:not(:has(.primary-navigation--toggle), &--always-visible),
           .indicator {
             display: none;
           }
@@ -171,7 +171,7 @@
         )
         & {
         @media (min-width: 768px) {
-          &:not(&--always-visible),
+          &:not(:has(.primary-navigation--toggle), &--always-visible),
           .indicator {
             display: none;
           }
