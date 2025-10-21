@@ -1,9 +1,11 @@
 import json
 import logging
+import os
 import subprocess
 import time
 from contextlib import contextmanager
 from pathlib import Path
+from typing import Mapping
 from urllib.parse import urljoin
 
 import requests
@@ -23,16 +25,24 @@ class OpenKlantServiceManager:
     _api_token: str = "b2eb1da9861da88743d72a3fb4344288fe2cba44"
     _docker_compose_project_name: str = "openklant2-api-test"
     _docker_compose_path: Path = BASE_DIR / "docker-compose.yaml"
+    _superuser_password: str = "admin"
+    _superuser_username: str = "supersecret99"
 
     def _docker_compose(
         self,
         *args: str,
         check: bool = True,
         input: str | None = None,
+        env: Mapping | None = None,
     ):
+        _env = None
+        if env:
+            _env = os.environ.copy()
+            _env = _env.update(env)
+
         input_data = {"text": True, "input": input} if input else {}
         try:
-            return subprocess.run(
+            result = subprocess.run(
                 args=[
                     "docker-compose",
                     "-f",
@@ -43,6 +53,7 @@ class OpenKlantServiceManager:
                 ],
                 check=check,
                 capture_output=True,
+                env=_env,
                 **input_data,
             )
         except subprocess.CalledProcessError as exc:
@@ -53,10 +64,13 @@ class OpenKlantServiceManager:
             )
             raise
 
+        return result
+
     def _manage_py(
         self,
         *args: str,
         input: str | None = None,
+        env: Mapping | None = None,
     ):
         self._docker_compose(
             "run",
@@ -66,6 +80,7 @@ class OpenKlantServiceManager:
             "src/manage.py",
             *args,
             input=input,
+            env=env,
         )
 
     def _service_teardown(self):
@@ -81,6 +96,18 @@ class OpenKlantServiceManager:
     def reset_db_state(self):
         self._manage_py("flush", "--no-input")
         self._load_fixture_from_json_string(self._generate_token_fixture())
+        self._create_superuser()
+
+    def _create_superuser(self):
+        self._manage_py(
+            "createsuperuser",
+            "--username",
+            self._superuser_username,
+            "--email",
+            "admin@example.com",
+            "--no-input",
+            env={"DJANGO_SUPERUSER_PASSWORD": self._superuser_password},
+        )
 
     def _load_fixture_from_json_string(self, fixture: str):
         self._manage_py(
