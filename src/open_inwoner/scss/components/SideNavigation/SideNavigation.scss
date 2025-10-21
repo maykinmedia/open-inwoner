@@ -2,6 +2,8 @@
 
 :root {
   --denhaag-side-navigation-mobile-display: flex !important;
+  --denhaag-side-navigation-link-active-color: var(--color-primary);
+  --denhaag-side-navigation-link-hover-color: var(--color-primary);
 }
 
 .side-navigation--oip {
