@@ -50,6 +50,9 @@ Nieuwe features
 Bugfixes
 --------
 
+* [:taiga-is:`2522`:, :pr:`1969`]: Zaken die niet volledig opgehaald kunnen worden uit
+  het zaaksysteem worden nu gefilterd uit de zakenlijst om te voorkomen dat de gehele
+  lijst van Mijn Zaken toegankelijk blijft.
 * [:taiga-is:`3494`: :pr:`1955`]: Verhelpen bug waardoor er sporadisch errors werden
   getoond tijdens het zoeken naar zaken via de algemene zoek-functie.
 * [:taiga-is:`3495`: :pr:`1956`]: Bij het aanmaken van contactmomenten onder een zaak
