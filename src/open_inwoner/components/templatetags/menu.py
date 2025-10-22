@@ -1,4 +1,5 @@
 from typing import List, TypedDict, cast
+from urllib.parse import urlparse
 
 from django import template
 from django.core.exceptions import ImproperlyConfigured
@@ -429,3 +430,115 @@ def has_sidenav_items(context):
 
     menu_data = react_sidenav_data(context)
     return len(menu_data) > 0
+
+
+@register.simple_tag(takes_context=True)
+def show_full_dropdown_menu(context) -> bool:
+    """
+    Determines whether the full dropdown menu should be shown.
+
+    This is to avoid showing the full menu in the dropdown when those same items are
+    already displayed in the side menu.
+    """
+    request = context["request"]
+
+    if not request.resolver_match:
+        return True  # Show all items when URL resolution fails
+
+    current_url_name = request.resolver_match.url_name
+    current_namespace = (
+        request.resolver_match.namespaces[0]
+        if request.resolver_match.namespaces
+        else None
+    )
+    current_qualified_url_name = (
+        f"{current_namespace}:{current_url_name}"
+        if current_namespace
+        else current_url_name
+    )
+
+    # The following URLs are expected to have the sidenav, so they only need a minimal
+    # dropdown menu.
+    urls_with_minimal_dropdown_menu = {
+        "pages-root",
+        "general_faq",
+        "collaborate:plan_list",
+        "ssd:uitkeringen",
+        "products:category_list",
+        "cases:index",
+        "cases:contactmoment_list",
+        "profile:appointments",
+    }
+
+    is_url_with_minimal_dropdown = (
+        current_qualified_url_name in urls_with_minimal_dropdown_menu
+    )
+    should_show_full_dropdown_menu = not is_url_with_minimal_dropdown
+
+    if not should_show_full_dropdown_menu:
+        logger.debug(
+            "Menu items hidden from dropdown menu",
+            extra={
+                "current_url_name": current_url_name,
+                "current_namespace": current_namespace,
+                "current_qualified_url_name": current_qualified_url_name,
+                "excluded": is_url_with_minimal_dropdown,
+                "show_menu": should_show_full_dropdown_menu,
+            },
+        )
+
+    return should_show_full_dropdown_menu
+
+
+@register.simple_tag(takes_context=True)
+def should_show_menu_item_in_dropdown(context, menu_item_url: str) -> bool:
+    """
+    Determines whether a specific menu item should be shown in the dropdown.
+
+    When the side navigation is active, only show "My Profile" (profile:detail) in the
+    dropdown. Otherwise, show all items.
+
+    Args:
+        context: Template context
+        menu_item_url: The URL of the menu item to check
+
+    Returns:
+        True if the item should be shown, False otherwise
+    """
+    # If the full dropdown menu should be shown, all items are visible
+    if show_full_dropdown_menu(context):
+        return True
+
+    if not menu_item_url:
+        logger.warning(
+            "Empty menu item url passed to dropdown menu",
+            extra={"menu_item_url": menu_item_url},
+        )
+        return False
+
+    # When side nav is active, only show these items
+    allowed_url_names_in_minimal_dropdown = {
+        "profile:detail",
+    }
+
+    try:
+        # Handle the edge case where the URL is a qualified URL (e.g. through a redirect
+        # url field). If we've just received a path, this won't change the behaviour.
+        parsed = urlparse(menu_item_url)
+        resolved_menu_item = resolve(parsed.path)
+
+        # Build qualified URL name from resolved match
+        if resolved_menu_item.namespaces:
+            namespace = ":".join(resolved_menu_item.namespaces)
+            menu_item_qualified_name = f"{namespace}:{resolved_menu_item.url_name}"
+        else:
+            menu_item_qualified_name = cast(str, resolved_menu_item.url_name)
+
+        return menu_item_qualified_name in allowed_url_names_in_minimal_dropdown
+    except Resolver404:
+        logger.warning(
+            "Could not resolve menu item URL: %s", menu_item_url, exc_info=True
+        )
+        # If we can't determine the URL, do not show it (we're working on an allowlist
+        # principle)
+        return False

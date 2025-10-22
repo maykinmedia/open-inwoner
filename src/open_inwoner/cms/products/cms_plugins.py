@@ -6,7 +6,7 @@ from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 
 from open_inwoner.cms.utils.plugin_mixins import CMSActiveAppMixin
-from open_inwoner.components.templatetags.side_navigation import react_sidenav_data
+from open_inwoner.components.templatetags.menu import react_sidenav_data
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.pdc.forms import ProductFinderForm
 from open_inwoner.pdc.models import Category, ProductCondition, ProductLocation

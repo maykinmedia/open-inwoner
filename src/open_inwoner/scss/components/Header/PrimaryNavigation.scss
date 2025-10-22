@@ -153,14 +153,13 @@
   &.primary-navigation__authenticated {
     .primary-navigation__list .primary-navigation__list-item {
       justify-content: flex-end;
-      /* Wide screens: show only first item */
 
       body:has(main.container.container--fullwidth):has(
           .denhaag-side-navigation
         )
         & {
         @media (min-width: 1024px) {
-          &:not(:first-child, &--always-visible),
+          &:not(:has(.primary-navigation--toggle), &--always-visible),
           .indicator {
             display: none;
           }
@@ -172,7 +171,7 @@
         )
         & {
         @media (min-width: 768px) {
-          &:not(:first-child, &--always-visible),
+          &:not(:has(.primary-navigation--toggle), &--always-visible),
           .indicator {
             display: none;
           }
