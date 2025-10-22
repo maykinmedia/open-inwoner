@@ -1,7 +1,6 @@
 import base64
 import concurrent.futures
 import functools
-import logging
 from dataclasses import dataclass
 from datetime import date
 from typing import Any, Literal, Mapping, Type, TypeAlias, TypeVar, cast
@@ -10,6 +9,7 @@ from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.utils.functional import SimpleLazyObject
 
+import structlog
 from ape_pie.client import APIClient
 from requests import HTTPError, RequestException, Response
 from zgw_consumers.api_models.base import factory
@@ -43,7 +43,7 @@ from .models import OpenZaakConfig
 
 CRS_HEADERS = {"Content-Crs": "EPSG:4326", "Accept-Crs": "EPSG:4326"}
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class ZgwAPIClient(APIClient):
@@ -147,8 +147,12 @@ class ZakenClient(ZgwAPIClient):
                     headers=CRS_HEADERS,
                 )
             )
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception(
+                "Failed to retrieve zaken by BSN",
+                user_bsn=user_bsn,
+                zaak_identificatie=identificatie,
+            )
             return []
 
         cases = factory(Zaak, all_data)
@@ -224,8 +228,13 @@ class ZakenClient(ZgwAPIClient):
                     headers=CRS_HEADERS,
                 )
             )
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception(
+                "Failed to retrieve zaken for eHerkenning user",
+                kvk_or_rsin=kvk_or_rsin,
+                vestigingsnummer=vestigingsnummer,
+                zaak_identificatie=zaak_identificatie,
+            )
             return []
 
         cases = factory(Zaak, all_data)
@@ -240,8 +249,11 @@ class ZakenClient(ZgwAPIClient):
         try:
             response = self.get(f"zaken/{case_uuid}", headers=CRS_HEADERS)
             data = get_json_response(response)
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception(
+                "Failed to retrieve case",
+                case_uuid=case_uuid,
+            )
             return
 
         case = factory(Zaak, data)
@@ -252,8 +264,11 @@ class ZakenClient(ZgwAPIClient):
         try:
             response = self.get(url=case_url, headers=CRS_HEADERS)
             data = get_json_response(response)
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception(
+                "Failed to retrieve case",
+                case_url=case_url,
+            )
             return
 
         case = factory(Zaak, data)
@@ -270,8 +285,11 @@ class ZakenClient(ZgwAPIClient):
         try:
             response = self.get(url=url)
             data = get_json_response(response)
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception(
+                "Failed to retrieve single informatieobject",
+                informatieobject_url=url,
+            )
             return
 
         case = factory(ZaakInformatieObject, data)
@@ -287,8 +305,11 @@ class ZakenClient(ZgwAPIClient):
                 params={"zaak": case_url},
             )
             data = get_json_response(response)
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception(
+                "Failed to retrieve informatieobjecten for case",
+                zaak_url=case_url,
+            )
             return []
 
         case_info_objects = factory(ZaakInformatieObject, data)
@@ -299,8 +320,11 @@ class ZakenClient(ZgwAPIClient):
         try:
             response = self.get("statussen", params={"zaak": case_url})
             data = get_json_response(response)
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception(
+                "Failed to retrieve statussen for zaak",
+                zaak_url=case_url,
+            )
             return []
 
         # TODO use pagination_helper?
@@ -320,8 +344,11 @@ class ZakenClient(ZgwAPIClient):
         try:
             response = self.get(url=status_url)
             data = get_json_response(response)
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception(
+                "Failed to retrieve single status",
+                status_url=status_url,
+            )
             return
 
         status = factory(Status, data)
@@ -352,7 +379,10 @@ class ZakenClient(ZgwAPIClient):
             data = get_json_response(response)
             all_data = list(pagination_helper(self, data))
         except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+            logger.exception(
+                "Failed to retrieve case roles",
+                zaak_url=case_url,
+            )
             return []
 
         roles = factory(Rol, all_data)
@@ -444,7 +474,11 @@ class ZakenClient(ZgwAPIClient):
             )
             data = get_json_response(response)
         except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+            logger.exception(
+                "Failed to retrieve informatieobjecten for zaak",
+                zaak_url=case_url,
+                informatieobject_url=info_object_url,
+            )
             return []
 
         case_info_objects = factory(ZaakInformatieObject, data)
@@ -459,8 +493,11 @@ class ZakenClient(ZgwAPIClient):
         try:
             response = self.get(url=result_url)
             data = get_json_response(response)
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception(
+                "Failed to retrieve single zaak result",
+                result_url=result_url,
+            )
             return
 
         result = factory(Resultaat, data)
@@ -476,8 +513,12 @@ class ZakenClient(ZgwAPIClient):
                 json={"zaak": case_url, "informatieobject": document_url},
             )
             data = get_json_response(response)
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception(
+                "Failed to connect zaak with document",
+                zaak_url=case_url,
+                document_url=document_url,
+            )
             return
 
         return data
@@ -494,8 +535,8 @@ class CatalogiClient(ZgwAPIClient):
             )
             data = get_json_response(response)
             all_data = list(pagination_helper(self, data))
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception("")
             return []
 
         status_types = factory(StatusType, all_data)
@@ -512,8 +553,8 @@ class CatalogiClient(ZgwAPIClient):
             )
             data = get_json_response(response)
             all_data = list(pagination_helper(self, data))
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception("exception while making request")
             return []
 
         result_types = factory(ResultaatType, all_data)
@@ -528,8 +569,8 @@ class CatalogiClient(ZgwAPIClient):
         try:
             response = self.get(url=status_type_url)
             data = get_json_response(response)
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception("exception while making request")
             return
 
         status_type = factory(StatusType, data)
@@ -546,8 +587,8 @@ class CatalogiClient(ZgwAPIClient):
         try:
             response = self.get(url=resultaat_type_url)
             data = get_json_response(response)
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception("exception while making request")
             return
 
         resultaat_type = factory(ResultaatType, data)
@@ -559,8 +600,8 @@ class CatalogiClient(ZgwAPIClient):
             response = self.get("zaaktypen")
             data = get_json_response(response)
             all_data = list(pagination_helper(self, data))
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception("exception while making request")
             return []
 
         zaak_types = factory(ZaakType, all_data)
@@ -582,8 +623,8 @@ class CatalogiClient(ZgwAPIClient):
             response = self.get("zaaktypen", params=params)
             data = get_json_response(response)
             all_data = list(pagination_helper(self, data))
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception("exception while making request")
             return []
 
         zaak_types = factory(ZaakType, all_data)
@@ -598,8 +639,8 @@ class CatalogiClient(ZgwAPIClient):
         try:
             response = self.get(url=case_type_url)
             data = get_json_response(response)
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception("exception while making request")
             return
 
         case_type = factory(ZaakType, data)
@@ -614,8 +655,8 @@ class CatalogiClient(ZgwAPIClient):
             response = self.get("catalogussen")
             data = get_json_response(response)
             all_data = list(pagination_helper(self, data))
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception("exception while making request")
             return []
 
         catalogs = factory(Catalogus, all_data)
@@ -633,8 +674,8 @@ class CatalogiClient(ZgwAPIClient):
         try:
             response = self.get(url=information_object_type_url)
             data = get_json_response(response)
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception("exception while making request")
             return
 
         information_object_type = factory(InformatieObjectType, data)
@@ -655,8 +696,8 @@ class DocumentenClient(ZgwAPIClient):
             else:
                 response = self.get(f"enkelvoudiginformatieobjecten/{uuid}")
             data = get_json_response(response)
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception("exception while making request")
             return
 
         info_object = factory(InformatieObject, data)
@@ -667,8 +708,8 @@ class DocumentenClient(ZgwAPIClient):
         try:
             response = self.get(url)
             response.raise_for_status()
-        except HTTPError as e:
-            logger.exception("exception while making request", exc_info=e)
+        except HTTPError:
+            logger.exception("exception while making request")
         else:
             return response
 
@@ -697,8 +738,8 @@ class DocumentenClient(ZgwAPIClient):
         try:
             response = self.post("enkelvoudiginformatieobjecten", json=document_body)
             data = get_json_response(response)
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception("exception while making request")
             return
 
         return data
@@ -745,8 +786,8 @@ class FormClient(ZgwAPIClient):
             )
             data = get_json_response(response)
             all_data = list(pagination_helper(self, data, max_requests=max_requests))
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception("exception while making request")
             return []
 
         results = factory(OpenSubmission, all_data)
@@ -770,8 +811,8 @@ class FormClient(ZgwAPIClient):
             )
             data = get_json_response(response)
             all_data = list(pagination_helper(self, data, max_requests=max_requests))
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception("exception while making request")
             return []
 
         results = factory(OpenSubmission, all_data)

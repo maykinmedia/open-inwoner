@@ -1,9 +1,9 @@
-import logging
-
 from django.contrib.auth.mixins import AccessMixin, LoginRequiredMixin
 from django.http import Http404, HttpRequest
 from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
+
+import structlog
 
 from open_inwoner.cms.cases.metrics import (
     case_contact_form_registrations,
@@ -17,7 +17,7 @@ from open_inwoner.openzaak.types import UniformCase
 from open_inwoner.openzaak.utils import is_zaak_visible
 from open_inwoner.utils.views import LogMixin
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class CaseLogMixin(LogMixin):
@@ -138,7 +138,8 @@ class CaseAccessMixin(AccessMixin):
                         self.case.url, request.user.bsn
                     ):
                         logger.info(
-                            f"CaseAccessMixin - permission denied via bsn: no role for the case {self.case.url}"
+                            "CaseAccessMixin - permission denied via bsn: no role for the case",
+                            zaak_url=self.case.url,
                         )
                         return self.handle_no_permission()
                 elif request.user.kvk:
@@ -153,7 +154,8 @@ class CaseAccessMixin(AccessMixin):
                             self.case.url, vestigingsnummer
                         ):
                             logger.info(
-                                f"CaseAccessMixin - permission denied via vestigingsnummer: no role for the case {self.case.url}"
+                                "CaseAccessMixin - permission denied via vestigingsnummer: no role for the case",
+                                zaak_url=self.case.url,
                             )
                             return self.handle_no_permission()
                     else:
@@ -161,7 +163,8 @@ class CaseAccessMixin(AccessMixin):
                             self.case.url, identifier
                         ):
                             logger.info(
-                                f"CaseAccessMixin - permission denied via kvk/rsin: no role for the case {self.case.url}"
+                                "CaseAccessMixin - permission denied via kvk/rsin: no role for the case",
+                                zaak_url=self.case.url,
                             )
                             return self.handle_no_permission()
 
@@ -172,14 +175,16 @@ class CaseAccessMixin(AccessMixin):
                 )
                 if not self.case.zaaktype:
                     logger.info(
-                        f"CaseAccessMixin - permission denied: no case type for case {self.case.url}"
+                        "CaseAccessMixin - permission denied: no case type for case",
+                        zaak_url=self.case.url,
                     )
                     return self.handle_no_permission()
 
                 # check if case + case-type are visible
                 if not is_zaak_visible(self.case):
                     logger.info(
-                        f"CaseAccessMixin - permission denied: case {self.case.url} is not visible"
+                        "CaseAccessMixin - permission denied: case  is not visible",
+                        zaak_url=self.case.url,
                     )
                     return self.handle_no_permission()
 

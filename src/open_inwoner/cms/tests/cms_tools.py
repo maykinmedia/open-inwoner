@@ -1,12 +1,13 @@
-import logging
 from typing import Any, Mapping
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.template import Context
+from django.template.defaultfilters import truncatechars
 from django.test import RequestFactory
 from django.utils.module_loading import import_string
 
+import structlog
 from cms import api
 from cms.api import add_plugin
 from cms.app_base import CMSApp
@@ -20,7 +21,7 @@ from open_inwoner.accounts.models import User
 from open_inwoner.cms.extensions.models import CommonExtension
 from open_inwoner.utils.test import SessionMiddleware
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 def create_homepage():
@@ -115,25 +116,25 @@ def render_all_placeholders(
     language: str = "nl",
 ):
     """Render all placeholders in a CMS page to a single string."""
-    logger.info("Rendering all placeholders for page: %s", page)
+    logger.info("Rendering all placeholders for CMS page", page=page)
     request = get_request(page=page, user=as_user)
     renderer = ContentRenderer(request=request)
 
     placeholders = page.placeholders.all()
 
     if not placeholders.exists():
-        logger.info("Page has no placeholders to render")
+        logger.info("CMS page has no placeholders to render")
         return ""
 
     for placeholder in placeholders:
-        logger.debug("rendering placeholder: %s", placeholder)
+        logger.debug("rendering placeholder", placeholder=placeholder)
         plugins = get_plugins(
             request=request, placeholder=placeholder, template=None, lang=language
         )
 
         rendered_content_fragments = []
         for plugin_instance in plugins:
-            logger.debug("rendering plugin: %s", plugin_instance)
+            logger.debug("rendering plugin", plugin_instance=plugin_instance)
             rendered_content = renderer.render_plugin(
                 instance=plugin_instance,
                 context=Context({"request": request}),
@@ -141,10 +142,8 @@ def render_all_placeholders(
             )
             rendered_content_fragments.append(rendered_content)
             logger.debug(
-                "rendered content: %s",
-                rendered_content
-                if len(rendered_content) < 128
-                else rendered_content[:128] + "...",
+                "rendered content",
+                content=truncatechars(rendered_content, 127),
             )
 
         return "\n".join(rendered_content_fragments)

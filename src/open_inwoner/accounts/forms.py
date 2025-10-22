@@ -1,5 +1,3 @@
-import logging
-
 from django import forms
 from django.conf import settings
 from django.contrib.admin.widgets import FilteredSelectMultiple
@@ -11,6 +9,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template import loader
 from django.utils.translation import gettext_lazy as _
 
+import structlog
 from django_registration.forms import RegistrationForm
 
 from open_inwoner.cms.utils.page_display import (
@@ -35,7 +34,7 @@ from .choices import (
 )
 from .models import Action, Document, Invite, Message, User
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class VerifyTokenForm(forms.Form):
@@ -447,13 +446,13 @@ class ContactCreateForm(forms.Form):
         if inactive_users:
             logger.warning(
                 "User attempted to add inactive users as contacts",
-                extra={"inactive_users": inactive_users},
+                inactive_users=inactive_users,
             )
 
         if already_added_users:
             logger.warning(
                 "User attempted to add contacts that are already added",
-                extra={"already_added_users": already_added_users},
+                already_added_users=already_added_users,
             )
 
         # Best effort: we're going to return successful if we find at least one good contact

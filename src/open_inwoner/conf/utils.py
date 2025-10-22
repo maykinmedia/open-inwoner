@@ -1,4 +1,3 @@
-import logging
 import os
 from shutil import which
 from subprocess import CalledProcessError, check_output
@@ -6,10 +5,11 @@ from typing import Any
 
 from django.conf import settings
 
+import structlog
 from decouple import Csv, config as _config, undefined
 from sentry_sdk.integrations import DidNotEnable, django, redis
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 def config(option: str, default: Any = undefined, *args, **kwargs):
@@ -64,7 +64,7 @@ def _get_version_from_file():
     try:
         heads = os.listdir(heads_dir)
     except FileNotFoundError:
-        logging.warning("Unable to read commit hash from git files")
+        logger.warning("Unable to read commit hash from git files")
         return ""
 
     for filename in ("master", "main", "develop"):
@@ -73,7 +73,7 @@ def _get_version_from_file():
                 with open(os.path.join(heads_dir, filename)) as file:
                     return file.read().strip()
             except OSError:
-                logging.warning("Unable to read commit hash from file")
+                logger.warning("Unable to read commit hash from file")
 
     return ""
 

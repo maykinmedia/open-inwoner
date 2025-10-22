@@ -1,4 +1,3 @@
-import logging
 from datetime import timedelta
 from typing import NotRequired, TypedDict
 
@@ -12,8 +11,6 @@ from open_inwoner.openklant.clients import (
 )
 from open_inwoner.openklant.models import KlantContactMomentAnswer
 from open_inwoner.utils.time import instance_is_new
-
-logger = logging.getLogger(__name__)
 
 
 def fetch_klantcontactmomenten(

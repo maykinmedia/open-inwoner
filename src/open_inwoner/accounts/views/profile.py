@@ -1,4 +1,3 @@
-import logging
 from collections.abc import Generator
 from datetime import date
 from typing import Any
@@ -12,6 +11,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 from django.views.generic import FormView, TemplateView, UpdateView
 
+import structlog
 from aldryn_apphooks_config.mixins import AppConfigMixin
 from view_breadcrumbs import BaseBreadcrumbMixin
 
@@ -46,7 +46,7 @@ from open_inwoner.utils.views import CommonPageMixin
 
 from .mixins import ProfileLogMixin
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class MyProfileView(
@@ -256,9 +256,7 @@ class EditProfileView(
                     {k: form.cleaned_data[k] for k in form.changed_data}, user
                 )
             except Exception:
-                logger.exception(
-                    "eSuite failed during profile update", extra={"user": user}
-                )
+                logger.exception("eSuite failed during profile update", user=user)
                 failed_services.append("eSuite")
         if klanten_config.has_api_service_configured(KlantenServiceType.OPENKLANT2):
             try:
@@ -266,9 +264,7 @@ class EditProfileView(
                     {k: form.cleaned_data[k] for k in form.changed_data}, user
                 )
             except Exception:
-                logger.exception(
-                    "OpenKlant failed during profile update for", extra={"user": user}
-                )
+                logger.exception("OpenKlant failed during profile update", user=user)
                 failed_services.append("OpenKlant")
         if failed_services:
             messages.error(

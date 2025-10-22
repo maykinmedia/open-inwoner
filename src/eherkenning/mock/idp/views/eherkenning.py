@@ -1,16 +1,16 @@
-import logging
 from urllib.parse import urlencode
 
 from django.http import HttpResponseBadRequest
 from django.urls import reverse
 from django.views.generic import FormView, TemplateView
 
+import structlog
 from furl import furl
 
 from eherkenning.mock import eherkenning_conf as conf
 from eherkenning.mock.idp.forms import eHerkenningPasswordLoginForm
 
-logger = logging.getLogger(__name__)
+logger = structlog.getLogger(__name__)
 
 
 class _BaseIDPViewMixin(TemplateView):

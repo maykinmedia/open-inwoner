@@ -1,4 +1,3 @@
-import logging
 import re
 
 from django.contrib.auth import get_user_model
@@ -7,8 +6,6 @@ from digid_eherkenning.backends import BaseBackend
 from digid_eherkenning.utils import get_client_ip
 
 from open_inwoner.accounts.eherkenning_session import EHerkenningSessionContext
-
-logger = logging.getLogger(__name__)
 
 UserModel = get_user_model()
 

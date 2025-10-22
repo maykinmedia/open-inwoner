@@ -1,12 +1,11 @@
-import logging
-
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.module_loading import import_string
 
 import messagebird
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class GatewayError(Exception):
@@ -28,9 +27,10 @@ class Gateway:
 class Dummy(Gateway):
     def send(self, to, token, **kwargs):
         logger.info(
-            '(Dummy) Sent SMS to {to} by "{orig}": "{msg}"'.format(
-                to=to, orig="oip", msg=self.get_message(token)
-            )
+            "(Dummy) Sent SMS",
+            receiver=to,
+            originator="oip",
+            message=self.get_message(token),
         )
         return True
 
@@ -66,12 +66,10 @@ class MessageBird(Gateway):
             )
         except messagebird.client.ErrorException as exc:
             for error in exc.errors:
-                logger.critical(
-                    ("Could not send SMS to {to}:\n{error}").format(to=to, error=error)
-                )
+                logger.critical("Could not send SMS", receiver=to, error=error)
             raise GatewayError() from exc
         else:
-            logging.debug('Sent SMS to %s: "%s"', to, self.get_message(token))
+            logger.debug("SMS sent", receiver=to, message=self.get_message(token))
             return True
 
 

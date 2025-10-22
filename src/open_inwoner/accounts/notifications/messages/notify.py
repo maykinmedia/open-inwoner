@@ -1,14 +1,13 @@
-import logging
-
 from django.db.models import Count
 from django.urls import reverse
 
+import structlog
 from mail_editor.helpers import find_template
 
 from open_inwoner.accounts.models import Message, User
 from open_inwoner.utils.url import build_absolute_url
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 def collect_notifications_about_messages() -> list[dict]:
@@ -37,7 +36,7 @@ def collect_notifications_about_messages() -> list[dict]:
                     sent=False,
                 ).values_list("id", flat=True)
             ),
-            object_type=str(Message),
+            object_type=Message,
         )
         for receiver in receivers
     ]
@@ -76,7 +75,9 @@ def _send_email(receiver_id: int, message_ids: list[int]) -> None:
     messages.update(sent=True)
 
     logger.info(
-        f"The email was sent to the user {receiver} about {total_messages} new messages"
+        "The email was sent to the user about new messages",
+        receiver=receiver,
+        message_count=total_messages,
     )
 
 

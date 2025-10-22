@@ -1,4 +1,3 @@
-import logging
 from typing import Sequence
 
 from django.urls import reverse
@@ -6,6 +5,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
+import structlog
 from furl import furl
 from view_breadcrumbs import BaseBreadcrumbMixin
 
@@ -18,7 +18,7 @@ from open_inwoner.utils.views import CommonPageMixin
 from .mixins import CaseAccessMixin, CaseLogMixin, OuterCaseAccessMixin
 from .services import CaseFilterFormOption, CaseListService
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class OuterCaseListView(
@@ -91,9 +91,9 @@ class InnerCaseListView(
                     statuses.append(CaseFilterFormOption(status))
                 except ValueError:
                     logger.error(
-                        "Invalid data (%s) for case filtering by %s",
-                        self.request.GET,
-                        self.request.user,
+                        "Invalid data for case filtering by",
+                        data=self.request.GET,
+                        user=self.request.user,
                     )
 
             # Actually filter the submissions

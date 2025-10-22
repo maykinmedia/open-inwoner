@@ -1,10 +1,10 @@
-import logging
 from urllib.parse import urlencode
 
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
+import structlog
 from cms.models import Title
 
 from open_inwoner.accounts.models import User
@@ -22,7 +22,7 @@ from open_inwoner.openklant.models import KlantenSysteemConfig
 from open_inwoner.pdc.models.category import Category
 from open_inwoner.questionnaire.models import QuestionnaireStep
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 def _get_category_data_for_user(cat: Category, user: User) -> dict:

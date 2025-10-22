@@ -1,4 +1,4 @@
-import logging
+import logging  # noqa: TID251 - only used for log levels
 
 from django.test import TestCase
 

@@ -1,5 +1,4 @@
 import json
-import logging
 import subprocess
 import time
 from contextlib import contextmanager
@@ -7,12 +6,13 @@ from pathlib import Path
 from urllib.parse import urljoin
 
 import requests
+import structlog
 
 from openklant2.client import OpenKlant2Client
 
 BASE_DIR = Path(__file__).parent.parent.resolve()
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class OpenKlantServiceManager:
@@ -48,8 +48,8 @@ class OpenKlantServiceManager:
         except subprocess.CalledProcessError as exc:
             logger.exception(
                 "Unable to execute command",
-                exc_info=True,
-                extra={"stderr": exc.stderr, "stdout": exc.stdout},
+                stderr=str(exc.stderr),
+                stdout=str(exc.stdout),
             )
             raise
 

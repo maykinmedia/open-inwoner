@@ -1,10 +1,11 @@
-import logging
+import logging  # noqa: TID251 - only used for log levels
 from datetime import date, timedelta
 
 from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
+import structlog
 from mail_editor.helpers import find_template
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 
@@ -38,7 +39,7 @@ from open_inwoner.userfeed import hooks
 from open_inwoner.utils.logentry import system_action as log_system_action
 from open_inwoner.utils.url import build_absolute_url
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 # Create a helper instance for logging
 _log_helper = WebhookLogMixin()
@@ -74,7 +75,7 @@ def handle_zaken_notification(notification: Notification):
     try:
         api_group = ZGWApiGroupConfig.objects.resolve_group_from_hints(url=case_url)
     except ZGWApiGroupConfig.DoesNotExist:
-        logger.error("No API group defined for case %s", case_url)
+        logger.error("No API group defined for case", case_url=case_url)
         return
 
     zaken_client = api_group.zaken_client
@@ -524,7 +525,7 @@ def _handle_status_notification(
     status = zaken_client.fetch_single_status(case.status)
     if not status:
         # TODO: check if should we return or continue if the case has no status
-        logger.error("Unable to fetch status for %s", case.status)
+        logger.error("Unable to fetch status", status_url=case.status)
         return
 
     case.status = status

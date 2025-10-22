@@ -3,6 +3,7 @@ import os
 from django.utils.translation import gettext_lazy as _
 
 import sentry_sdk
+import structlog
 from celery.schedules import crontab
 from easy_thumbnails.conf import Settings as ThumbnailSettings
 from log_outgoing_requests.formatters import HttpFormatter
@@ -255,6 +256,15 @@ INSTALLED_APPS = [
     "notifications_api_common",
 ]
 
+_log_requests_via_middleware = config("LOG_REQUESTS", default=True)
+_structlog_middleware = (
+    [
+        "django_structlog.middlewares.RequestMiddleware",
+    ]
+    if _log_requests_via_middleware
+    else []
+)
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "sessionprofile.middleware.SessionProfileMiddleware",
@@ -265,6 +275,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    *_structlog_middleware,
     "csp.contrib.rate_limiting.RateLimitedCSPMiddleware",
     "csp.middleware.CSPMiddleware",
     "open_inwoner.custom_csp.middleware.SkipStaffCSPMiddleware",
@@ -382,13 +393,32 @@ LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
-        "verbose": {
-            "format": "%(asctime)s %(levelname)s %(name)s %(module)s %(process)d %(thread)d  %(message)s"
-        },
         "timestamped": {"format": "%(asctime)s %(levelname)s %(name)s  %(message)s"},
         "simple": {"format": "%(levelname)s  %(message)s"},
         "performance": {
             "format": "%(asctime)s %(process)d | %(thread)d | %(message)s",
+        },
+        "json": {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.processors.JSONRenderer(),
+            "foreign_pre_chain": [
+                structlog.contextvars.merge_contextvars,
+                structlog.processors.TimeStamper(fmt="iso"),
+                structlog.stdlib.add_logger_name,
+                structlog.stdlib.add_log_level,
+                structlog.stdlib.PositionalArgumentsFormatter(),
+            ],
+        },
+        "plain_console": {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.dev.ConsoleRenderer(pad_level=False),
+            "foreign_pre_chain": [
+                structlog.contextvars.merge_contextvars,
+                structlog.processors.TimeStamper(fmt="iso"),
+                structlog.stdlib.add_logger_name,
+                structlog.stdlib.add_log_level,
+                structlog.stdlib.PositionalArgumentsFormatter(),
+            ],
         },
         "outgoing_requests": {"()": HttpFormatter},
     },
@@ -408,13 +438,13 @@ LOGGING = {
         "console": {
             "level": "DEBUG",
             "class": "logging.StreamHandler",
-            "formatter": "timestamped",
+            "formatter": config("LOG_FORMAT_CONSOLE", default="plain_console"),
         },
         "django": {
             "level": "DEBUG",
             "class": "logging.handlers.RotatingFileHandler",
             "filename": os.path.join(LOGGING_DIR, "django.log"),
-            "formatter": "verbose",
+            "formatter": "json",
             "maxBytes": 1024 * 1024 * 10,  # 10 MB
             "backupCount": 10,
         },
@@ -422,7 +452,7 @@ LOGGING = {
             "level": "DEBUG",
             "class": "logging.handlers.RotatingFileHandler",
             "filename": os.path.join(LOGGING_DIR, "open_inwoner.log"),
-            "formatter": "verbose",
+            "formatter": "json",
             "maxBytes": 1024 * 1024 * 10,  # 10 MB
             "backupCount": 10,
         },
@@ -470,11 +500,6 @@ LOGGING = {
             "level": "DEBUG",
             "propagate": True,
         },
-        "celery": {
-            "handlers": ["django"] if not LOG_STDOUT else ["console"],
-            "level": CELERY_LOGLEVEL,
-            "propagate": True,
-        },
         "opentelemetry": {
             "handlers": ["django"] if not LOG_STDOUT else ["console"],
             "level": "ERROR",
@@ -490,8 +515,35 @@ LOGGING = {
             "level": "ERROR",
             "propagate": True,
         },
+        "django_structlog": {
+            "handlers": ["console"],
+            "level": "INFO",
+        },
     },
 }
+
+structlog.configure(
+    processors=[
+        structlog.contextvars.merge_contextvars,
+        structlog.stdlib.filter_by_level,
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.stdlib.add_logger_name,
+        structlog.stdlib.add_log_level,
+        structlog.stdlib.PositionalArgumentsFormatter(),
+        structlog.processors.StackInfoRenderer(),
+        structlog.processors.format_exc_info,
+        structlog.processors.UnicodeDecoder(),
+        structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
+    ],
+    logger_factory=structlog.stdlib.LoggerFactory(),
+    cache_logger_on_first_use=True,
+)
+
+#
+# DJANGO-STRUCTLOG
+#
+DJANGO_STRUCTLOG_IP_LOGGING_ENABLED = False
+DJANGO_STRUCTLOG_CELERY_ENABLED = True
 
 
 #

@@ -1,4 +1,3 @@
-import logging
 import warnings
 from datetime import timedelta
 from typing import Protocol, cast
@@ -9,6 +8,7 @@ from django.db.models import UniqueConstraint
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+import structlog
 from django_jsonform.models.fields import ArrayField
 from django_prosemirror.fields import ProsemirrorModelField
 from django_prosemirror.schema import MarkType, NodeType
@@ -32,7 +32,7 @@ from open_inwoner.openzaak.managers import (
 
 from .constants import StatusIndicators, ZaakBetrokkeneRol, ZaakTitleDisplayChoices
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 def generate_default_file_extensions():
@@ -118,9 +118,8 @@ class ZGWApiGroupConfigQuerySet(models.QuerySet):
             # usage, so this is solely to ensure we get a Sentry ping.
             # Also: https://www.xkcd.com/2200/
             logger.error(
-                "Strategies for resolving ZGWApiGroupConfig yielded multiple results for "
-                "strategies: %s",
-                strategies_with_multiple_results,
+                "Strategies for resolving ZGWApiGroupConfig yielded multiple results",
+                strategies=strategies_with_multiple_results,
             )
             raise ZGWApiGroupConfig.MultipleObjectsReturned
 

@@ -1,10 +1,9 @@
-import logging
-
 from django import forms
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
+import structlog
 from ipware import get_client_ip
 from requests.exceptions import RequestException
 
@@ -16,7 +15,7 @@ from open_inwoner.utils.api import ClientError
 from .choices import get_list_choices, get_list_remarks_mapping
 from .client import create_laposta_client
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class NewsletterSubscriptionForm(forms.Form):

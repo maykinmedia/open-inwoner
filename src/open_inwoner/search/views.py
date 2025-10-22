@@ -1,5 +1,4 @@
 import itertools
-import logging
 
 from django.conf import settings
 from django.contrib import messages
@@ -10,6 +9,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
 from django.views.generic import FormView
 
+import structlog
 from furl import furl
 
 from open_inwoner.configurations.models import SiteConfiguration
@@ -22,7 +22,7 @@ from open_inwoner.utils.views import CommonPageMixin, LoginMaybeRequiredMixin, L
 from .forms import FeedbackForm, SearchForm
 from .searches import multi_search
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class SearchView(

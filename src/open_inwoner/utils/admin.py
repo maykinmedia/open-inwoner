@@ -1,5 +1,4 @@
 import json
-import logging
 
 from django.contrib import admin
 from django.contrib.admin.models import ADDITION, CHANGE, DELETION
@@ -19,8 +18,6 @@ from timeline_logger.resources import TimelineLogResource
 
 from open_inwoner.celery import app
 from open_inwoner.utils.logentry import LOG_ACTIONS
-
-logger = logging.getLogger(__name__)
 
 
 class LogActionListFilter(admin.SimpleListFilter):

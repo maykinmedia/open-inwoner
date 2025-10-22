@@ -1,15 +1,15 @@
 import io
-import logging
 
 from django.core.management import call_command
 
+import structlog
 from zgw_consumers.api_models.base import factory
 
 from open_inwoner.celery import app
 from open_inwoner.openzaak.api_models import Notification
 from open_inwoner.openzaak.notifications import handle_zaken_notification
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 @app.task

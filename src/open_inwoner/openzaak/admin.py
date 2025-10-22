@@ -1,5 +1,4 @@
 import datetime
-import logging
 
 from django.contrib import admin, messages
 from django.core.exceptions import ValidationError
@@ -13,6 +12,7 @@ from django.urls import path, reverse
 from django.utils.html import format_html, format_html_join
 from django.utils.translation import gettext_lazy as _, ngettext
 
+import structlog
 from privates.storages import PrivateMediaFileSystemStorage
 from solo.admin import SingletonModelAdmin
 
@@ -32,7 +32,7 @@ from .models import (
     ZGWApiGroupConfig,
 )
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class ZGWApiGroupConfig(admin.StackedInline):

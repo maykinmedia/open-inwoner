@@ -1,4 +1,3 @@
-import logging
 from datetime import datetime
 
 from django import forms
@@ -11,6 +10,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 from django.views.generic.edit import FormView
 
+import structlog
 from furl import furl
 from view_breadcrumbs import BaseBreadcrumbMixin
 
@@ -20,7 +20,7 @@ from .client import JaaropgaveClient, UitkeringClient
 from .exceptions import SSDClientException
 from .forms import MonthlyReportsForm, YearlyReportsForm
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class BenefitsFormView(

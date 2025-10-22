@@ -1,7 +1,6 @@
-import logging
-
 from django.utils.translation import gettext_lazy as _
 
+import structlog
 from requests import RequestException
 
 from open_inwoner.accounts.choices import LoginTypeChoices
@@ -14,7 +13,7 @@ from open_inwoner.userfeed.choices import FeedItemType
 from open_inwoner.userfeed.models import FeedItemData
 from open_inwoner.utils.api import ClientError
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class OpenTaskFeedItem(FeedItem):
@@ -95,9 +94,7 @@ def update_user_tasks(user: User):
         except (RequestException, ClientError):
             logger.exception(
                 "Something went wrong while fetching open tasks",
-                extra={
-                    "client": client,
-                },
+                client=client,
             )
         else:
             update_external_task_items(user, tasks)

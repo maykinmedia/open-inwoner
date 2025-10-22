@@ -46,6 +46,9 @@ Nieuwe features
 * [:taiga-us:`3492`, :pr:`1960`]: Header en logo zijn kleiner gemaakt, onderwerpen en
   zoekveld zijn gewisseld van plaats, mobiele navigatie is nu een overlay en de mobiele
   welkom tekst is hoger geplaatst.
+* [:taiga-us:`3508`, :pr:`1979`]: Alle logging aangepast om gebruikt te maken van ``structlog``,
+  waardoor de logging data beter kan worden verwerkt door andere observability tools zoals
+  Grafana.
 
 Bugfixes
 --------

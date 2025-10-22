@@ -1,6 +1,5 @@
 import concurrent.futures
 import enum
-import logging
 import threading
 from collections import defaultdict
 from dataclasses import dataclass
@@ -10,6 +9,7 @@ from django.conf import settings
 from django.http import HttpRequest
 from django.utils.translation import gettext_lazy as _
 
+import structlog
 from zgw_consumers.concurrent import parallel
 
 from open_inwoner.openzaak.api_models import OpenSubmission, Zaak
@@ -25,7 +25,7 @@ from open_inwoner.openzaak.models import (
 )
 from open_inwoner.openzaak.utils import get_user_fetch_parameters, is_zaak_visible
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class ResolveCaseException(Exception):
@@ -93,9 +93,9 @@ class CaseListService:
         self._max_workers = settings.ZGW_CASE_LIST_NUM_WORKERS
 
         logger.debug(
-            "Configured CaseListService with timeouts=%s and worker limit=%s",
-            repr(self._timeouts),
-            self._max_workers,
+            "Configured CaseListService",
+            timeouts=self._timeouts,
+            max_workers=self._max_workers,
         )
 
         # Our resolver functions modify the case list in-place, the lock is used to
@@ -312,9 +312,9 @@ class CaseListService:
             ).get()
 
             logger.debug(
-                "Resolved %s to %s",
-                zaak_with_api_group.zaak.zaaktype.url,
-                zaaktype_config,
+                "Resolved zaaktype URL to config",
+                zaaktype_url=zaak_with_api_group.zaak.zaaktype.url,
+                zaaktype_config=zaaktype_config,
             )
             zaak_with_api_group.zaak.zaaktype_config = zaaktype_config
 
@@ -326,13 +326,13 @@ class CaseListService:
                 zaak_with_api_group.zaak.statustype_config = statustype_config
         except ZaakTypeConfig.DoesNotExist:
             logger.warning(
-                "No matching ZaakTypeConfig for type=%s",
-                zaak_with_api_group.zaak.zaaktype.url,
+                "No matching ZaakTypeConfig for type",
+                zaaktype_url=zaak_with_api_group.zaak.zaaktype.url,
             )
         except ZaakTypeStatusTypeConfig.DoesNotExist:
             logger.warning(
-                "No matching ZaakTypeStatusTypeConfig_config for statustype_url=%s",
-                zaak_with_api_group.zaak.status.statustype.url,
+                "No matching ZaakTypeStatusTypeConfig_config for statustype_url",
+                statustype_url=zaak_with_api_group.zaak.status.statustype.url,
                 exc_info=True,
             )
 
@@ -376,19 +376,22 @@ class CaseListService:
 
         if not isinstance(zaak_with_group.zaak.status, str):
             raise ResolveCaseException(
-                f"`case.status` for case {zaak_with_group.zaak.identificatie} is not a str but {type(zaak_with_group.zaak.status)}"
+                f"`case.status` for case {zaak_with_group.zaak.identificatie} "
+                f"is not a str but {type(zaak_with_group.zaak.status)}"
             )
 
         status = zaken_client.fetch_single_status(zaak_with_group.zaak.status)
         if not status:
             raise ResolveCaseException(
-                f"Unable to resolve status {zaak_with_group.zaak.status} for case {zaak_with_group.zaak.identificatie}"
+                f"Unable to resolve status {zaak_with_group.zaak.status} "
+                f"for case {zaak_with_group.zaak.identificatie}"
             )
 
         status_type = catalogi_client.fetch_single_status_type(status.statustype)
         if not status_type:
             raise ResolveCaseException(
-                f"Unable to resolve status_type {status.statustype} for case {zaak_with_group.zaak.identificatie}"
+                f"Unable to resolve status_type {status.statustype} "
+                f"for case {zaak_with_group.zaak.identificatie}"
             )
 
         with self._zaak_update_lock:
@@ -410,7 +413,8 @@ class CaseListService:
 
         if not isinstance(zaak_with_group.zaak.resultaat, str):
             raise ResolveCaseException(
-                f"`case.resultaat` for case {zaak_with_group.zaak.identificatie} is not a str but {type(zaak_with_group.zaak.resultaat)}"
+                f"`case.resultaat` for case {zaak_with_group.zaak.identificatie} "
+                f"is not a str but {type(zaak_with_group.zaak.resultaat)}"
             )
 
         resultaat = zaken_client.fetch_single_result(zaak_with_group.zaak.resultaat)

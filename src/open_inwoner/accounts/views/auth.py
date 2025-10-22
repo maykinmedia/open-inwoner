@@ -1,5 +1,3 @@
-import logging
-
 from django.conf import settings
 from django.contrib import auth, messages
 from django.contrib.auth.mixins import UserPassesTestMixin
@@ -30,8 +28,6 @@ from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.kvk.client import KvKClient
 from open_inwoner.kvk.exceptions import KVKAPIException
 from open_inwoner.utils.views import LogMixin
-
-logger = logging.getLogger(__name__)
 
 
 class LogPasswordChangeView(UserPassesTestMixin, LogMixin, PasswordChangeView):

@@ -1,4 +1,3 @@
-import logging
 from typing import Literal, NamedTuple
 
 from django.conf import settings
@@ -9,6 +8,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import SuspiciousOperation
 from django.urls import reverse, reverse_lazy
 
+import structlog
 from axes.backends import AxesBackend
 from digid_eherkenning.oidc.backends import BaseBackend
 from glom import Path, glom
@@ -25,7 +25,7 @@ from open_inwoner.utils.views import LogMixin
 from .choices import LoginTypeChoices
 from .models import OpenIDDigiDConfig, OpenIDEHerkenningConfig, User
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class UserModelEmailBackend(ModelBackend):
@@ -116,7 +116,11 @@ class CustomOIDCBackend(OIDCAuthenticationBackend):
             is_active=True,
         ).first()
         if existing_user:
-            logger.debug("Updating OIDC user: %s with email %s", unique_id, email)
+            logger.debug(
+                "Updating OIDC user with email",
+                oidc_id=unique_id,
+                email=email,
+            )
             existing_user.oidc_id = unique_id
             existing_user.login_type = LoginTypeChoices.oidc
             # TODO verify we want unusable_password
@@ -126,7 +130,7 @@ class CustomOIDCBackend(OIDCAuthenticationBackend):
             self.update_user(existing_user, claims)
             return existing_user
         else:
-            logger.debug("Creating OIDC user: %s", unique_id)
+            logger.debug("Creating OIDC user", oidc_id=unique_id)
 
             kwargs = {
                 "oidc_id": unique_id,
@@ -178,7 +182,7 @@ class DigiDOIDCBackend(LogMixin, BaseBackend):
 
         unique_id = self._extract_username(claims)
 
-        logger.debug("Creating OIDC user: %s", unique_id)
+        logger.debug("Creating OIDC user", oidc_id=unique_id)
 
         user = self.UserModel.objects.create_user(
             **{
@@ -246,7 +250,7 @@ class EHerkenningOIDCBackend(LogMixin, BaseBackend):
             logger.warning(
                 "eHerkenning OIDC backend possibly configured to use an identifier "
                 "type claim which does not point to KvK",
-                extra={"identifier_type": identifier_type},
+                identifier_type=identifier_type,
             )
 
         return KvkEntityInformation(kvk=kvk_or_rsin, vestigingsnummer=vestigingsnummer)

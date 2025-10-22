@@ -1,14 +1,13 @@
-import logging
-
 from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry, Point
 from django.utils.module_loading import import_string
 
+import structlog
 from furl import furl
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class PdocLocatieserver(Geocoder):
@@ -66,7 +65,7 @@ class PdocLocatieserver(Geocoder):
         """
 
         url = furl(self.api).add({"q": query, "fq": fq, "fl": fl}).url
-        logger.debug("%s.geocode: %s", self.__class__.__name__, url)
+        logger.debug("geocode", class_name=self.__class__.__name__, url=url)
         callback = self._parse_json
         return self._call_geocoder(url, callback, timeout=timeout)
 

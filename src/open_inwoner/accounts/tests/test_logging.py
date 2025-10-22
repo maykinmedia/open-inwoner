@@ -1,4 +1,4 @@
-import logging
+import logging  # noqa: TID251 - only used for log levels
 from datetime import timedelta
 from unittest.mock import patch
 

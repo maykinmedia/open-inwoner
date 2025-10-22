@@ -44,7 +44,7 @@ from open_inwoner.openklant.models import (
 from open_inwoner.openklant.services import eSuiteVragenService
 from open_inwoner.openklant.tests.factories import make_question_from_contactmoment
 from open_inwoner.openklant.tests.mocks import MockOpenKlant2Service
-from open_inwoner.openzaak.api_models import Status, StatusType
+from open_inwoner.openzaak.api_models import Status, StatusType, Zaak
 from open_inwoner.openzaak.constants import StatusIndicators
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.tests.factories import (
@@ -1419,7 +1419,7 @@ class TestCaseDetailView(
         request = RequestFactory().get("/")
         detail_view = InnerCaseDetailView()
         detail_view.setup(request)
-        detail_view.case = self.zaak
+        detail_view.case = factory(Zaak, self.zaak)
 
         st1 = StatusType(
             url="http://statustype_2.com",

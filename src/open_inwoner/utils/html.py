@@ -1,13 +1,8 @@
-import logging
-
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
 
 import markdown
 from bs4 import BeautifulSoup
-
-logger = logging.getLogger(__name__)
-
 
 CLASS_ADDERS = [
     ("h1", "utrecht-heading-1"),

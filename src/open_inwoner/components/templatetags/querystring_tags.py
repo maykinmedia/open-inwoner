@@ -1,12 +1,11 @@
-import logging
-
 from django import template
 from django.http import QueryDict
 from django.utils.html import format_html
 
+import structlog
 from furl import furl
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 register = template.Library()
 
@@ -39,7 +38,9 @@ def querystring(context, *query_values, key="", value="", query=""):
     if request.method != "GET":
         # let's leave a warning for now because this tag is used elsewhere
         logger.warning(
-            f"querystring-template-tag used with {request.method} and dumped all submitted form-data into urls"
+            "Attempted to modify query string with invalid key-value pair",
+            key=key,
+            value=value,
         )
 
     if key and value:

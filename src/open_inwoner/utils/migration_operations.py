@@ -1,4 +1,4 @@
-import logging
+import logging  # noqa: TID251 - keep for old migrations
 import re
 from html.parser import HTMLParser
 
@@ -291,7 +291,7 @@ def _add_image_ids_to_prosemirror_doc(doc, apps):
     html_to_doc converts <img> tags to filer_image nodes, but doesn't set imageId.
     We need to look up the image by URL to get the correct ID.
     """
-    import logging
+    import logging  # noqa: TID251 - keep for old migrations
 
     logger = logging.getLogger(__name__)
 

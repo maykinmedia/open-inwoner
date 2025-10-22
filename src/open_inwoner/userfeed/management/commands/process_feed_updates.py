@@ -1,11 +1,11 @@
-import logging
-
 from django.core.management import BaseCommand
 from django.utils import timezone
 
+import structlog
+
 from open_inwoner.userfeed.models import FeedItemData
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class Command(BaseCommand):
@@ -24,6 +24,6 @@ def auto_expire_items():
         completed_at__isnull=True,
     )
     for data in qs:
-        logger.info(f"automatically expired feed item: {data.id} {data}")
+        logger.info("automatically expired feed item:", id=data.id, data=data)
 
     qs.mark_completed()

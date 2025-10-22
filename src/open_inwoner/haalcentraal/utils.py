@@ -1,13 +1,13 @@
-import logging
-
 from django.conf import settings
 from django.utils.translation import gettext as _
+
+import structlog
 
 from open_inwoner.haalcentraal.api import BRP_1_3, BRP_2_1, BRPAPI
 from open_inwoner.haalcentraal.api_models import BRPData
 from open_inwoner.utils.logentry import system_action
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 def get_brp_api() -> BRPAPI:

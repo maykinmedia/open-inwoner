@@ -1,9 +1,9 @@
-import logging
 from urllib.parse import quote
 
 from django.conf import settings
 from django.core.cache import cache
 
+import structlog
 from ape_pie.client import APIClient
 from requests.exceptions import RequestException
 
@@ -13,7 +13,7 @@ from open_inwoner.utils.decorators import cache as cache_result
 from .api_models import LapostaList, Member, UserData
 from .models import LapostaConfig
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 def quote_email(email: str) -> str:
@@ -30,8 +30,8 @@ class LapostaClient(APIClient):
         try:
             response = self.get("list")
             data = get_json_response(response)
-        except (RequestException, ClientError) as e:
-            logger.exception("exception while making request", exc_info=e)
+        except (RequestException, ClientError):
+            logger.exception("error while fetching newsletters with Laposta")
             return []
 
         if not data:

@@ -1,4 +1,3 @@
-import logging
 from urllib.parse import urlencode
 
 from django.conf import settings
@@ -10,11 +9,12 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import RedirectView
 
+import structlog
 from digid_eherkenning.views.base import get_redirect_url
 
 from eherkenning.mock import eherkenning_conf as conf
 
-logger = logging.getLogger(__name__)
+logger = structlog.getLogger(__name__)
 
 
 class eHerkenningLoginMockView(RedirectView):

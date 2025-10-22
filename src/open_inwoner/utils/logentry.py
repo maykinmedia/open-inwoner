@@ -1,5 +1,5 @@
 import functools
-import logging
+import logging  # noqa: TID251 - only used for log levels
 
 from django.contrib.admin import models
 from django.contrib.admin.utils import _get_changed_field_labels_from_form
@@ -8,6 +8,7 @@ from django.utils.encoding import force_str
 from django.utils.text import get_text_list
 from django.utils.translation import gettext_lazy as _
 
+import structlog
 from timeline_logger.models import TimelineLog
 
 LOG_ACTIONS = {
@@ -18,7 +19,7 @@ LOG_ACTIONS = {
     5: (5, "System action"),
 }
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 def get_change_message(fields=None, form=None):
@@ -70,9 +71,11 @@ def addition(request, object, message=""):
     Log that an object has been successfully added.
     """
     logger.info(
-        ("Added: {object}, {message}. \n{request}").format(
-            object=object, message=message, request=request
-        )
+        "Timeline logger entry created",
+        object=object,
+        message=message,
+        request=request,
+        cause="Object created",
     )
     TimelineLog.log_from_request(
         request=request,
@@ -89,9 +92,11 @@ def change(request, object, message):
     Log that an object has been successfully changed.
     """
     logger.info(
-        ("Changed: {object}, {message}. \n{request}").format(
-            object=object, message=message, request=request
-        )
+        "Timeline logger entry created",
+        object=object,
+        message=message,
+        request=request,
+        cause="Object changed",
     )
     TimelineLog.log_from_request(
         request=request,
@@ -108,9 +113,11 @@ def deletion(request, object, message=""):
     Log that an object was deleted.
     """
     logger.info(
-        ("Deleted: {object}, {message}. \n{request}").format(
-            object=object, message=message, request=request
-        )
+        "Timeline logger entry created",
+        object=object,
+        message=message,
+        request=request,
+        cause="Object deleted",
     )
     TimelineLog.log_from_request(
         request=request,
@@ -128,9 +135,10 @@ def user_action(request, object, message):
     aren't appropriate.
     """
     logger.info(
-        ("User action: {object}, {message}. \n{request}").format(
-            object=object, message=message, request=request
-        )
+        "Timeline logger entry created (user action)",
+        object=object,
+        message=message,
+        request=request,
     )
     TimelineLog.log_from_request(
         request=request,
@@ -153,12 +161,13 @@ def system_action(
     """
     Log a generic action done by business logic.
     """
-    user_text = f"{user}: " if user else ""
     object_text = force_str(content_object) if content_object else ""
 
     logger.log(
         log_level,
-        f"System action: {user_text}{message}. \n",
+        "Timeline logger entry created (system action)",
+        user=user,
+        message=message,
         exc_info=exc_info,
     )
     TimelineLog.objects.create(

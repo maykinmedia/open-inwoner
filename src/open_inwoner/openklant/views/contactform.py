@@ -1,5 +1,3 @@
-import logging
-
 from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import ImproperlyConfigured
@@ -11,6 +9,7 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
+import structlog
 from mail_editor.helpers import find_template
 from view_breadcrumbs import BaseBreadcrumbMixin
 
@@ -29,7 +28,7 @@ from open_inwoner.openklant.services import OpenKlant2Service, eSuiteVragenServi
 from open_inwoner.openklant.views.utils import generate_question_answer_pair
 from open_inwoner.utils.views import CommonPageMixin
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class ContactFormView(

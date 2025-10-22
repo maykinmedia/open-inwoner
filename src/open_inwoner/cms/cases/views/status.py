@@ -1,6 +1,5 @@
 import dataclasses
 import datetime as dt
-import logging
 from collections import defaultdict
 from datetime import datetime
 from typing import Iterable, Protocol, cast
@@ -24,6 +23,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import FormView, TemplateView
 
+import structlog
 from django_htmx.http import HttpResponseClientRedirect
 from mail_editor.helpers import find_template
 from requests import RequestException
@@ -67,7 +67,7 @@ from open_inwoner.utils.views import CommonPageMixin
 
 from .mixins import CaseAccessMixin, CaseLogMixin, OuterCaseAccessMixin
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 @dataclasses.dataclass
@@ -233,13 +233,14 @@ class InnerCaseDetailView(
                         # TODO: This can happen. Ideally, we would present the user with
                         # warning noting that not all questions might be visible.
                         logger.warning(
-                            "Connection error for service %s",
-                            service_type,
+                            "Connection error for service",
+                            service_type=service_type,
                             exc_info=True,
                         )
                     except BaseException:
                         logger.exception(
-                            "Unable to fetch questions for service %s", service_type
+                            "Unable to fetch questions for service",
+                            service_type=service_type.value,
                         )
 
             questions.sort(key=lambda q: q["registered_date"], reverse=True)
@@ -372,7 +373,11 @@ class InnerCaseDetailView(
         # only 1 statustype for `self.case`
         # (this scenario is blocked by openzaak, but not part of the zgw standard)
         if len(statustype_numbers) < 2:
-            logger.info("Case {case} has only one statustype".format(case=self.case))
+            logger.info(
+                "Case has only one statustype",
+                case_identificatie=self.case.identification,
+                case_uuid=self.case.uuid,
+            )
             return
 
         statustype_numbers.sort()
@@ -422,9 +427,8 @@ class InnerCaseDetailView(
             # Workaround: OIP requests the current zaak.status individually and adds the retrieved information to the statustype mapping
 
             logger.info(
-                "Issue #2037 -- Retrieving status individually for case {} because of eSuite".format(
-                    self.case.identification
-                )
+                "Issue #2037 -- Retrieving status individually for case because of eSuite",
+                case_identification=self.case.identification,
             )
             self.case.status = zaken_client.fetch_single_status(self.case.status)
             status_types_mapping[self.case.status.statustype].append(self.case.status)
@@ -515,9 +519,10 @@ class InnerCaseDetailView(
             ).exists()
         )
         logger.info(
-            "Case {url} has case type file upload: {case_upload_enabled}".format(
-                url=self.case.url, case_upload_enabled=case_upload_enabled
-            )
+            "File upload status for case (enabled/disabled)",
+            case_identificatie=self.case.identification,
+            case_uuid=self.case.uuid,
+            case_upload_enabled=case_upload_enabled,
         )
         return case_upload_enabled
 
@@ -527,29 +532,24 @@ class InnerCaseDetailView(
             enabled_for_status_type = self.statustype_config_mapping[
                 self.case.status.statustype.url
             ].document_upload_enabled
-        except AttributeError as e:
-            logger.exception(e)
-            logger.info(
-                "Could not retrieve status type for case {case}; "
-                "the status has not been resolved to a ZGW model object.".format(
-                    case=self.case
-                )
+        except AttributeError:
+            logger.exception(
+                "Could not retrieve status type for case; the status has not been resolved to a ZGW model object",
+                case_identificatie=self.case.identification,
+                case_uuid=self.case.uuid,
             )
             return True
-        except KeyError as e:
-            logger.exception(e)
-            logger.info(
-                "Could not retrieve status type config for url {url}".format(
-                    url=self.case.status.statustype.url
-                )
+        except KeyError:
+            logger.exception(
+                "Could not retrieve status type config for url",
+                statustype_url=self.case.status.statustype.url,
             )
             return True
         logger.info(
-            "Case {url} status type {status_type} has status type file upload: {enabled_for_status_type}".format(
-                url=self.case.url,
-                status_type=self.case.status.statustype,
-                enabled_for_status_type=enabled_for_status_type,
-            )
+            "File upload for case statustype (enabled/disabled)",
+            case_url=self.case.url,
+            status_type=self.case.status.statustype,
+            file_upload_enabled=enabled_for_status_type,
         )
         return enabled_for_status_type
 
@@ -1046,7 +1046,8 @@ class CaseContactFormView(CaseAccessMixin, CaseLogMixin, FormView):
                 )
             case _:
                 logger.error(
-                    "Got non-existent klanten backend %s", api_group.klant_backend
+                    "Got non-existent klanten backend",
+                    klanten_backend=api_group.klant_backend,
                 )
 
     def _register_via_openklant(self, form, config: OpenKlant2Config) -> bool:

@@ -1,4 +1,3 @@
-import logging
 import re
 from dataclasses import dataclass, field
 from datetime import date, datetime
@@ -6,6 +5,7 @@ from typing import Optional, Union
 
 from django.utils.translation import gettext as _
 
+import structlog
 from dateutil.relativedelta import relativedelta
 from zgw_consumers.api_models.base import Model, ZGWModel
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
@@ -14,7 +14,7 @@ from open_inwoner.utils.glom import glom_multiple
 
 from .constants import ZaakTitleDisplayChoices
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 """
@@ -123,7 +123,7 @@ class Zaak(ZGWModel):
 
         if not description:
             logger.warning(
-                "No valid description found for zaak: %s", self.identificatie
+                "No valid description found for zaak", zaak=self.identificatie
             )
 
         return description

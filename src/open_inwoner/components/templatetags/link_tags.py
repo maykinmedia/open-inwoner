@@ -1,13 +1,12 @@
-import logging
-
 from django import template
 from django.urls import NoReverseMatch, reverse
 from django.utils.html import format_html
 
+import structlog
 from furl import furl
 
 register = template.Library()
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 @register.inclusion_tag("components/Typography/Link.html")
@@ -176,13 +175,11 @@ def show_full_dropdown_menu(context) -> bool:
     if not should_show_full_dropdown_menu:
         logger.debug(
             "Menu items hidden from dropdown menu",
-            extra={
-                "current_url_name": current_url_name,
-                "current_namespace": current_namespace,
-                "current_qualified_url_name": current_qualified_url_name,
-                "excluded": is_url_with_minimal_dropdown,
-                "show_menu": should_show_full_dropdown_menu,
-            },
+            current_url_name=current_url_name,
+            current_namespace=current_namespace,
+            current_qualified_url_name=current_qualified_url_name,
+            excluded=is_url_with_minimal_dropdown,
+            show_menu=should_show_full_dropdown_menu,
         )
 
     return should_show_full_dropdown_menu
