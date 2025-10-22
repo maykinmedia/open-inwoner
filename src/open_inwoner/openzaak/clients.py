@@ -380,7 +380,9 @@ class ZakenClient(ZgwAPIClient):
 
         see Taiga #948
         """
-        case_roles = self.fetch_case_roles(case_url)
+        case_roles = self.fetch_case_roles(
+            case_url, betrokkene_type="natuurlijk_persoon"
+        )
         if not case_roles:
             return []
 
@@ -404,7 +406,7 @@ class ZakenClient(ZgwAPIClient):
         see Taiga #948
         """
         case_roles = self.fetch_case_roles(
-            case_url, betrokkene_type="natuurlijk_persoon"
+            case_url, betrokkene_type="niet_natuurlijk_persoon"
         )
         if not case_roles:
             return []
@@ -428,9 +430,7 @@ class ZakenClient(ZgwAPIClient):
 
         see Taiga #948
         """
-        case_roles = self.fetch_case_roles(
-            case_url, betrokkene_type="niet_natuurlijk_persoon"
-        )
+        case_roles = self.fetch_case_roles(case_url, betrokkene_type="vestiging")
         if not case_roles:
             return []
 
