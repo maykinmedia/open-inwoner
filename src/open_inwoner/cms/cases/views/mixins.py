@@ -74,13 +74,14 @@ class CaseAccessMixin(AccessMixin):
                 # check if we have a role in this case
                 if request.user.bsn:
                     pass
-                #                    if not client.fetch_roles_for_case_and_bsn(
-                #                        self.case.url, request.user.bsn
-                #                    ):
-                #                        logger.info(
-                #                            f"CaseAccessMixin - permission denied via bsn: no role for the case {self.case.url}"
-                #                        )
-                #                        return self.handle_no_permission()
+
+                if not client.fetch_roles_for_case_and_bsn(
+                    self.case.url, request.user.bsn
+                ):
+                    logger.info(
+                        f"CaseAccessMixin - permission denied via bsn: no role for the case {self.case.url}"
+                    )
+                    return self.handle_no_permission()
                 elif request.user.kvk:
                     identifier = self.request.user.kvk
                     config = OpenZaakConfig.get_solo()
