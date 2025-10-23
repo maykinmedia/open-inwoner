@@ -97,6 +97,8 @@ Bugfixes
   zijn geconfigureerd (op dit moment alleen de link naar "Mijn Profiel").
 * [:taiga-is:`3521`, :pr:`1975`]: Probleem opgelost waar de notificatie en mobiele welkom tekst
   overlay op de home pagina in elkaar overlopen.
+* [:taiga-is:`3530`: :pr:`1984`]: Uitkeringspagina's tonen nu correct het verkorte
+  dropdown menu wanneer er geen sidenav beschikbaar is.
 
 Onderhoud
 ---------
