@@ -1,6 +1,10 @@
 from django.urls import path
 
-from open_inwoner.ssd.views import MonthlyBenefitsFormView, YearlyBenefitsFormView
+from open_inwoner.ssd.views import (
+    MonthlyBenefitsFormView,
+    MonthlyBenefitsIndexView,
+    YearlyBenefitsFormView,
+)
 
 app_name = "ssd"
 
@@ -8,7 +12,7 @@ app_name = "ssd"
 urlpatterns = [
     path(
         "",
-        MonthlyBenefitsFormView.as_view(),
+        MonthlyBenefitsIndexView.as_view(),
         name="uitkeringen",
     ),
     path(

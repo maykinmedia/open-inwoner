@@ -8,6 +8,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
+from django.views.generic.base import RedirectView
 from django.views.generic.edit import FormView
 
 import structlog
@@ -21,6 +22,12 @@ from .exceptions import SSDClientException
 from .forms import MonthlyReportsForm, YearlyReportsForm
 
 logger = structlog.stdlib.get_logger(__name__)
+
+
+class MonthlyBenefitsIndexView(RedirectView):
+    permanent = False
+    query_string = True
+    pattern_name = "ssd:monthly_benefits_index"
 
 
 class BenefitsFormView(
