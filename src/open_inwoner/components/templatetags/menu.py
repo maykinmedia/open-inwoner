@@ -96,7 +96,7 @@ class SideNavMenuData:
                         logger.debug(
                             "Found icon via CommonExtension",
                             page_type=page_type,
-                            icaon=common_ext.menu_icon,
+                            icon=common_ext.menu_icon,
                         )
                         return common_ext.menu_icon
                 except CommonExtension.DoesNotExist:
@@ -221,6 +221,20 @@ class SideNavMenuData:
                     node_url=node_absolute_url,
                     result="match" if is_match else "no match",
                 )
+
+            # Cases where detail pages also have a side menu
+            active_item_if_qualified_name = {
+                "ssd:uitkeringen": (
+                    "ssd:yearly_benefits_index",
+                    "ssd:monthly_benefits_index",
+                )
+            }
+
+            detail_routes = active_item_if_qualified_name.get(
+                node_qualified_name, tuple()
+            )
+            if current_qualified_name in detail_routes:
+                is_match = True
 
             logger.debug(
                 "Node URL name comparison with current page",
@@ -464,6 +478,8 @@ def show_full_dropdown_menu(context) -> bool:
         "general_faq",
         "collaborate:plan_list",
         "ssd:uitkeringen",
+        "ssd:yearly_benefits_index",
+        "ssd:monthly_benefits_index",
         "products:category_list",
         "cases:index",
         "cases:contactmoment_list",
