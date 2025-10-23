@@ -222,6 +222,20 @@ class SideNavMenuData:
                     result="match" if is_match else "no match",
                 )
 
+            # Cases where detail pages also have a side menu
+            active_item_if_qualified_name = {
+                "ssd:uitkeringen": (
+                    "ssd:yearly_benefits_index",
+                    "ssd:monthly_benefits_index",
+                )
+            }
+
+            detail_routes = active_item_if_qualified_name.get(
+                node_qualified_name, tuple()
+            )
+            if current_qualified_name in detail_routes:
+                is_match = True
+
             logger.debug(
                 "Node URL name comparison with current page",
                 node=node,
@@ -464,6 +478,8 @@ def show_full_dropdown_menu(context) -> bool:
         "general_faq",
         "collaborate:plan_list",
         "ssd:uitkeringen",
+        "ssd:yearly_benefits_index",
+        "ssd:monthly_benefits_index",
         "products:category_list",
         "cases:index",
         "cases:contactmoment_list",
