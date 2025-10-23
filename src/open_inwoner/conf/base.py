@@ -467,7 +467,7 @@ LOGGING = {
         "log_outgoing_requests": {
             "level": "DEBUG",
             "formatter": "outgoing_requests",
-            "class": "logging.StreamHandler",
+            "class": "open_inwoner.utils.logging.StructlogOutgoingRequestsHandler",
         },
         "save_outgoing_requests": {
             "level": "DEBUG",

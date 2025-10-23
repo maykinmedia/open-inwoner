@@ -53,6 +53,8 @@ Nieuwe features
   Grafana.
 * [:taiga-us:`3511`, :pr:`1988`]: CMS-plugin toegevoegd voor links naar andere portalen van de
   gemeente.
+* [:taiga-is:`3556`, :pr:`1995`]: Uitgaande requests worden nu gelogd als gestructureerde
+  events met ``structlog``, waardoor ze beter verwerkt kunnen worden door observability tools.
 
 Bugfixes
 --------
