@@ -7,13 +7,13 @@ interface ModuleWithInit {
 const modules = {
   demo: () => import('@react/modules/demo'),
   sidenav: () => import('@react/modules/SideNavModule/SideNavModule'),
-  kvkbranchselector: () =>
-    import('@react/modules/KVKBranchSelectorModule/KVKBranchSelectorModule'),
 }
 
 // The list of our react + web components
 const webcomponents = {
   'action-list': () => import('@react/components/ActionList/web-component'),
+  'kvk-branch-selector': () =>
+    import('@react/components/KVKBranchSelector/web-component'),
 }
 
 const loadModule = async (
