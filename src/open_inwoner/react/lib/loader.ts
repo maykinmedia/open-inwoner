@@ -11,6 +11,11 @@ const modules = {
     import('@react/modules/KVKBranchSelectorModule/KVKBranchSelectorModule'),
 }
 
+// The list of our react + web components
+const webcomponents = {
+  'action-list': () => import('@react/components/ActionList/web-component'),
+}
+
 const loadModule = async (
   module: keyof typeof modules
 ): Promise<{ default: typeof AbstractPage | ModuleWithInit } | undefined> => {
@@ -19,6 +24,8 @@ const loadModule = async (
 
 export default class ModuleLoader {
   static async load() {
+    await this.detectWebComponents()
+
     if (!this.modules.length) return
     try {
       for (const module of this.modules) {
@@ -37,6 +44,18 @@ export default class ModuleLoader {
       return JSON.parse(html?.dataset.mountModules ?? '[]') ?? []
     } catch {
       return []
+    }
+  }
+
+  // auto-detect the usage of a webcomponent on the page.
+  // if there is one import the needed script and define the component.
+  static async detectWebComponents() {
+    for (const wc of Object.entries(webcomponents)) {
+      const [name, importer] = wc
+      const found = document.querySelector(name)
+      if (!found) continue
+      const { default: Component } = await importer()
+      customElements.define(name, Component)
     }
   }
 }

@@ -51,6 +51,8 @@ Nieuwe features
 * [:taiga-us:`3508`, :pr:`1979`]: Alle logging aangepast om gebruikt te maken van ``structlog``,
   waardoor de logging data beter kan worden verwerkt door andere observability tools zoals
   Grafana.
+* [:taiga-us:`3519`, :pr:`1981`]: Nieuw design vsn openstaande acties plugin op de
+  homepagina geïmplementeerd.
 
 Bugfixes
 --------
