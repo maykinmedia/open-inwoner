@@ -96,7 +96,7 @@ class SideNavMenuData:
                         logger.debug(
                             "Found icon via CommonExtension",
                             page_type=page_type,
-                            icaon=common_ext.menu_icon,
+                            icon=common_ext.menu_icon,
                         )
                         return common_ext.menu_icon
                 except CommonExtension.DoesNotExist:
