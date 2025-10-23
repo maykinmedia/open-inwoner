@@ -117,7 +117,7 @@ class GetProductRenderedContentTest(TestCase):
 
         # Check that external link icon is added
         self.assertIn("open_in_new", html)
-        self.assertIn("Opens external website", html)
+        self.assertIn("Opent externe website", html)
 
     def test_adds_heading_ids(self):
         """Test that h2 headings get slugified IDs."""
