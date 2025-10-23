@@ -37,8 +37,12 @@
       }
 
       &.banner__text {
-        $image-height-mobile: 140px;
-        margin-top: -$image-height-mobile;
+        .container:not(:has(.notifications .notification)) ~ .container & {
+          $image-height-mobile: 140px;
+          margin-top: -$image-height-mobile;
+        }
+
+        margin-top: 0;
         padding: var(--spacing-large);
         padding-bottom: 0;
         box-sizing: border-box;
