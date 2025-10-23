@@ -90,7 +90,7 @@ intersphinx_mapping = {
 # a list of builtin themes.
 #
 html_logo = "logo.png"
-html_theme = "sphinx_rtd_theme"
+html_theme = "alabaster"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -99,6 +99,15 @@ html_static_path = ["_static"]
 html_css_files = [
     "theme_overrides.css",  # override wide tables with word wrap
 ]
+html_sidebars = {
+    '**': [
+        'about.html',
+        'searchfield.html',
+        'navigation.html',
+        'relations.html',
+        'donate.html',
+    ]
+}
 
 todo_include_todos = True
 
