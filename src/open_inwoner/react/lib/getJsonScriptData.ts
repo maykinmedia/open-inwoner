@@ -26,7 +26,8 @@ export function parseJsonSafely<T = unknown>(
   }
 
   try {
-    return JSON.parse(text) as T
+    const json = text.replace(/'/g, '"')
+    return JSON.parse(json) as T
   } catch (error) {
     console.error(`Failed to parse JSON: ${text}`, error)
     return undefined

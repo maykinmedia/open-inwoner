@@ -21,6 +21,7 @@ class UserFeedPlugin(CMSPluginBase):
             {
                 "instance": instance,
                 "userfeed": feed,
+                "userfeed_item_list": feed.items_as_list(),
             }
         )
         return context

@@ -1,4 +1,5 @@
 import { AbstractPage } from '@react/lib/abstractPage'
+import { registerWebComponents } from './wc/register'
 
 interface ModuleWithInit {
   init(): Promise<void> | void
@@ -19,6 +20,8 @@ const loadModule = async (
 
 export default class ModuleLoader {
   static async load() {
+    await registerWebComponents()
+
     if (!this.modules.length) return
     try {
       for (const module of this.modules) {

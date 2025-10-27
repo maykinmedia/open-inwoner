@@ -65,3 +65,14 @@ class FeedItem:
 
     def mark_completed(self):
         self.data.mark_completed()
+
+    def to_dict(self) -> dict:
+        """Serialize the feed item to a dictionary for JSON serialization."""
+        # List of property names to serialize
+        fields = [
+            "title",
+            "message",
+            "action_text",
+            "action_url",
+        ]
+        return {field: getattr(self, field) for field in fields}

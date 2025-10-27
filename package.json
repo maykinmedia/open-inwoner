@@ -46,6 +46,7 @@
     "@emotion/react": "^11.5.0",
     "@emotion/styled": "^11.3.0",
     "@fortawesome/fontawesome-free": "^6.4.2",
+    "@gemeente-denhaag/action": "^4.0.1",
     "@gemeente-denhaag/side-navigation": "^4.0.2",
     "@joeattardi/emoji-button": "^4.6.4",
     "@nl-design-system-candidate/number-badge-css": "^1.1.2",
