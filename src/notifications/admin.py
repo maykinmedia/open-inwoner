@@ -84,9 +84,11 @@ class SubscriptionAdmin(admin.ModelAdmin):
     )
     fields = (
         "id",
+        "notifications_api_config",
         "callback_url",
         "channels",
         "client_id",
+        "secret",
         "_subscription",
     )
     actions = [register_webhook, deregister_webhook]
