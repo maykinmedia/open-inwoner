@@ -67,5 +67,28 @@ deregister_webhook.short_description = _("Deregister the webhooks")  # noqa
 
 @admin.register(Subscription)
 class SubscriptionAdmin(admin.ModelAdmin):
-    list_display = ("callback_url", "channels", "_subscription")
+    list_display = (
+        "id",
+        "callback_url",
+        "channels",
+        "client_id",
+        "_subscription",
+    )
+    list_display_links = (
+        "id",
+        "callback_url",
+    )
+    readonly_fields = (
+        "id",
+        "_subscription",
+    )
+    fields = (
+        "id",
+        "notifications_api_config",
+        "callback_url",
+        "channels",
+        "client_id",
+        "secret",
+        "_subscription",
+    )
     actions = [register_webhook, deregister_webhook]

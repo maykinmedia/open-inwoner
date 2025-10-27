@@ -20,6 +20,9 @@ Bugfixes
   zijn geconfigureerd (op dit moment alleen de link naar "Mijn Profiel").
 * [:pr:`1980`] Cache decorator ondersteunt kwargs met default argumenten, en maakt
   correct onderscheid tussen ``None`` en ``"None"`` waarden.
+* [:taiga-ta:`3557`, :pr:`1987`]: Ontbrekende verplichte velden toegevoegd aan de
+  Subscription detail admin, waardoor het weer mogelijk is om nieuwe Subscription
+  objecten aan te maken.
 
 1.34.2 (2025-10-07)
 ===================
