@@ -47,6 +47,9 @@ Onderhoud
 * [:pr:`1980`] Cache decorator ondersteunt kwargs met default argumenten, en maakt
   correct onderscheid tussen ``None`` en ``"None"`` waarden.
 * [:pr:`1982`] ``playwright`` (npm) bijgewerkt naar ``>=1.55.1``.
+* [:taiga-ta:`3557`, :pr:`1987`]: Ontbrekende verplichte velden toegevoegd aan de
+  Subscription detail admin, waardoor het weer mogelijk is om nieuwe Subscription
+  objecten aan te maken.
 
 1.35.0 (2025-09-18)
 ===================
