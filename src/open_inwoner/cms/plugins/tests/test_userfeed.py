@@ -29,10 +29,10 @@ class TestUserFeedPlugin(TestCase):
         pyquery = PyQuery(html)
 
         # make sure the json script has the correct content
-        items = pyquery.find("#userfeed_json").text()
+        items = pyquery.find("action-list").attr("actions")
         self.assertEqual(
             items,
-            '[{"title": "Test message", "message": "Hello", "action_text": "", "action_url": "http://foo.bar"}]',
+            "[{'title': 'Test message', 'message': 'Hello', 'action_text': '', 'action_url': 'http://foo.bar'}]",
         )
 
     def test_multiple_plugin(self):
@@ -58,8 +58,8 @@ class TestUserFeedPlugin(TestCase):
         pyquery = PyQuery(html)
 
         # make sure the json script has the correct content
-        items = pyquery.find("#userfeed_json").text()
+        items = pyquery.find("action-list").attr("actions")
         self.assertEqual(
             items,
-            '[{"title": "My message", "message": "Hi", "action_text": "", "action_url": "http://test.com"}, {"title": "TEST MESSAGE 2", "message": "TEST", "action_text": "", "action_url": "http://example.com"}]',
+            "[{'title': 'My message', 'message': 'Hi', 'action_text': '', 'action_url': 'http://test.com'}, {'title': 'TEST MESSAGE 2', 'message': 'TEST', 'action_text': '', 'action_url': 'http://example.com'}]",
         )
