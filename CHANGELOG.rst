@@ -51,6 +51,8 @@ Nieuwe features
 * [:taiga-us:`3508`, :pr:`1979`]: Alle logging aangepast om gebruikt te maken van ``structlog``,
   waardoor de logging data beter kan worden verwerkt door andere observability tools zoals
   Grafana.
+* [:taiga-us:`3511`, :pr:`1988`]: CMS-plugin toegevoegd voor links naar andere portalen van de
+  gemeente.
 
 Bugfixes
 --------

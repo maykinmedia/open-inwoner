@@ -1,0 +1,15 @@
+{% load i18n icon_tags %}
+
+<section class="plugin">
+    <h2 class="utrecht-heading-2">{{ link_plugin.title }}</h2>
+    <div class="card-container card-container--columns-2">
+        {% for link in link_plugin.child_plugin_instances %}
+            <a href="{{ link.get_link }}" class="card" {% if link.target %}target="{{ link.target }}" {% endif %}>
+                <span class="button button--icon-before button--transparent">
+                    {% icon icon=link.icon %}
+                </span>
+                <span>{{ link.name.html|safe }}</span>
+            </a>
+        {% endfor %}
+    </div>
+</section>
