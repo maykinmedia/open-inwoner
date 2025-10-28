@@ -1,4 +1,7 @@
+import json
+
 from django import forms
+from django.utils.html import strip_tags
 from django.utils.translation import gettext as _
 
 from cms.plugin_base import CMSPluginBase
@@ -25,9 +28,22 @@ class CMSLinkPlugin(CMSPluginBase):
         if not context["request"].user.is_authenticated:
             return context
 
+        links_data = [
+            {
+                "url": link.get_link(),
+                "name": strip_tags(link.name.html)
+                if hasattr(link.name, "html")
+                else str(link.name),
+                "icon": link.icon,
+                "target": link.target or "_self",
+            }
+            for link in instance.child_plugin_instances
+        ]
+
         context.update(
             {
                 "link_plugin": instance,
+                "links_json": json.dumps(links_data),
             }
         )
         return context

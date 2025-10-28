@@ -138,6 +138,7 @@
     "raw-loader": "^4.0.2",
     "regenerator-runtime": "^0.14.1",
     "sass": "latest",
+    "sass-embedded": "^1.93.3",
     "sass-loader": "latest",
     "simulant": "latest",
     "sinon": "latest",

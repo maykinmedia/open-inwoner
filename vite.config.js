@@ -78,6 +78,11 @@ export default defineConfig({
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
   },
 
+  // Enable experimental decorators for Lit
+  esbuild: {
+    target: 'es2020',
+  },
+
   test: {
     globals: true,
     environment: 'jsdom',

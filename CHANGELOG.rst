@@ -57,6 +57,8 @@ Nieuwe features
   Grafana.
 * [:taiga-us:`3519`, :pr:`1981`]: Nieuw design van openstaande acties plugin op de
   homepagina geïmplementeerd.
+* [:taiga-us:`3511`, :pr:`1988`]: CMS-plugin toegevoegd voor links naar andere portalen van de
+  gemeente.
 * [:taiga-is:`3556`, :pr:`1995`]: Uitgaande requests worden nu gelogd als gestructureerde
   events met ``structlog``, waardoor ze beter verwerkt kunnen worden door observability tools.
 * [:taiga-us:`3512`, :pr:`2003`]: De taken die worden weergegeven onder 'Openstaande acties' en

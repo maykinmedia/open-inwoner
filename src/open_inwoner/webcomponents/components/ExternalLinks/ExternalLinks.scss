@@ -1,12 +1,27 @@
 .external-links {
-  // Context
-  .card-container.card-container--columns-2 {
+  // Link list, list grid
+  &__list {
+    display: grid;
+    gap: var(--gutter-width);
+    grid-template-columns: repeat(1, 1fr);
+
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
     grid-row-gap: var(--spacing-medium);
     grid-column-gap: var(--spacing-giant);
-  }
 
-  // Link list
-  &__list {
+    @for $i from 1 through 12 {
+      &--columns-#{$i} {
+        --card-columns: 1;
+
+        @media (min-width: 768px) {
+          --card-columns: #{$i};
+        }
+      }
+    }
+
     list-style-type: none;
     margin-block-start: var(--spacing-extra-large);
     margin-block-end: 0;
@@ -53,6 +68,16 @@
         --oip-external-link-custom-icon-margin-inline-start
       );
       margin-inline-end: var(--oip-external-link-custom-icon-margin-inline-end);
+      padding-block-start: var(
+        --oip-external-link-custom-icon-padding-block-start
+      );
+      padding-block-end: var(--oip-external-link-custom-icon-padding-block-end);
+      padding-inline-start: var(
+        --oip-external-link-custom-icon-padding-inline-start
+      );
+      padding-inline-end: var(
+        --oip-external-link-custom-icon-padding-inline-end
+      );
     }
 
     &__content {
