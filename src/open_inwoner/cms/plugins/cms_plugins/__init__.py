@@ -1,4 +1,5 @@
 from .appointments import UserAppointmentsPlugin
+from .links import CMSLinkPlugin, LinkPlugin
 from .tasks import TasksPlugin
 from .text import TextPlugin
 from .userfeed import UserFeedPlugin
@@ -10,4 +11,6 @@ __all__ = [
     "TasksPlugin",
     "TextPlugin",
     "VideoPlayerPlugin",
+    "CMSLinkPlugin",
+    "LinkPlugin",
 ]

@@ -662,16 +662,11 @@ CMS_PLACEHOLDER_CONF = {
             "UserAppointmentsPlugin",
             "TasksPlugin",
             "CMSFlatPagePlugin",
+            "CMSLinkPlugin",
         ],
         "text_only_plugins": ["LinkPlugin"],
         "name": _("Content"),
         "language_fallback": True,
-        # "child_classes": {
-        #     "TextPlugin": ["PicturePlugin", "LinkPlugin"],
-        # },
-        # "parent_classes": {
-        #     "LinkPlugin": ["TextPlugin"],
-        # },
     },
     "banner_image": {"plugins": ["BannerImagePlugin"], "name": _("Banner Image")},
     "banner_text": {"plugins": ["BannerTextPlugin"], "name": _("Banner Text")},
