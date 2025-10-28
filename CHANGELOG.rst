@@ -99,6 +99,9 @@ Bugfixes
   overlay op de home pagina in elkaar overlopen.
 * [:taiga-is:`3530`: :pr:`1984`]: Uitkeringspagina's tonen nu correct het verkorte
   dropdown menu wanneer er geen sidenav beschikbaar is.
+* [:taiga-ta:`3557`, :pr:`1987`]: Ontbrekende verplichte velden toegevoegd aan de
+  Subscription detail admin, waardoor het weer mogelijk is om nieuwe Subscription
+  objecten aan te maken.
 
 Onderhoud
 ---------
