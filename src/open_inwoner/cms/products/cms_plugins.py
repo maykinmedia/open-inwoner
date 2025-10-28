@@ -7,7 +7,7 @@ from cms.plugin_pool import plugin_pool
 
 from open_inwoner.cms.utils.plugin_mixins import CMSActiveAppMixin
 from open_inwoner.components.templatetags.menu import react_sidenav_data
-from open_inwoner.openzaak.models import OpenZaakConfig
+from open_inwoner.openzaak.models import OpenZaakConfig, ZGWApiGroupConfig
 from open_inwoner.pdc.forms import ProductFinderForm
 from open_inwoner.pdc.models import Category, ProductCondition, ProductLocation
 from open_inwoner.questionnaire.models import QuestionnaireStep
@@ -77,6 +77,9 @@ class CategoriesPlugin(CMSActiveAppMixin, CMSPluginBase):
                 config.enable_categories_filtering_with_zaken
                 and request.user.is_authenticated
                 and (request.user.bsn or request.user.kvk)
+                # The plugin is usable without a ZGW backend, so ensure one exists
+                # before making any zaak-related queries.
+                and ZGWApiGroupConfig.objects.exists()
             ):
                 categories |= visible_categories.filter_by_zaken_for_request(request)
 

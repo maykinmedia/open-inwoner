@@ -22,7 +22,7 @@ from open_inwoner.cms.products.cms_plugins import CategoriesPlugin
 from open_inwoner.cms.profile.cms_apps import ProfileApphook
 from open_inwoner.cms.tests import cms_tools
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.openzaak.models import OpenZaakConfig
+from open_inwoner.openzaak.models import OpenZaakConfig, ZGWApiGroupConfig
 from open_inwoner.openzaak.tests.factories import (
     ZaakTypeConfigFactory,
     ZGWApiGroupConfigFactory,
@@ -711,3 +711,17 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, TransactionWebTest):
 
         self.assertEqual(context["categories"].count(), 2)
         self.assertEqual(context["categories"].first(), self.category6)
+
+    def test_categories_no_zgw_api_group_configured(self):
+        """
+        When no ZGW API group is configured, zaak-based filtering should not occur
+        and only highlighted categories should be shown
+        """
+        ZGWApiGroupConfig.objects.all().delete()
+
+        html, context = cms_tools.render_plugin(CategoriesPlugin, user=self.user)
+
+        # Only highlighted categories should be shown (category6 and category7)
+        self.assertEqual(context["categories"].count(), 2)
+        self.assertEqual(context["categories"].first(), self.category6)
+        self.assertEqual(context["categories"][1], self.category7)
