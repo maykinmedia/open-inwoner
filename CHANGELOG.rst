@@ -127,6 +127,8 @@ Onderhoud
 * [:pr:`1982`] ``playwright`` (npm) bijgewerkt naar ``>=1.55.1``.
 * [:pr:`1980`] Cache decorator ondersteunt kwargs met default argumenten, en maakt
   correct onderscheid tussen ``None`` en ``"None"`` waarden.
+* [:pr:`1991`, :taiga-is:`3626`] Vervang het woord "notificaties" met "meldingen"
+  omwille van de B1 taaleis.
 
 1.35.0 (2025-09-18)
 ===================
