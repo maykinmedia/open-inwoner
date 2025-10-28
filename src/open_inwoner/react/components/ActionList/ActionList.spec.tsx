@@ -134,6 +134,16 @@ describe('ActionList', () => {
     ]
 
     render(<ActionList actions={specialActions} />)
+    // Check that title with ampersand is rendered correctly
     expect(screen.getByText('Test & Review')).toBeInTheDocument()
+
+    // Check that message with HTML characters is properly escaped
+    const messageElement = screen.getByText(/Check.*verify/)
+    expect(messageElement).toBeInTheDocument()
+    expect(messageElement.innerHTML).toContain('&lt;data&gt;')
+
+    // Verify link URL with query parameters is correct
+    const link = screen.getByText('Test & Review').closest('a')
+    expect(link).toHaveAttribute('href', '/test?id=1&type=review')
   })
 })

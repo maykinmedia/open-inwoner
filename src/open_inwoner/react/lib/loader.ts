@@ -1,5 +1,5 @@
 import { AbstractPage } from '@react/lib/abstractPage'
-import { registerWebComponents } from './wc/register'
+import { registerWebComponents } from '@react/lib/web-component/register'
 
 interface ModuleWithInit {
   init(): Promise<void> | void

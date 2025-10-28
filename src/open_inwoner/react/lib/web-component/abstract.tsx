@@ -1,13 +1,12 @@
-import { parseJsonSafely } from '@react/lib/getJsonScriptData'
 import { createRoot, Root } from 'react-dom/client'
 import { FC } from 'react'
 import { normalizeAttribute } from './utils'
+import unescape from 'lodash.unescape'
 
 export abstract class AbstractWebComponent extends HTMLElement {
   static observedAttributes: string[]
   connectedCallback() {}
-  connectedMoveCallback() {}
-  disconnetedCallback() {}
+  disconnectedCallback() {}
   adoptedCallback() {}
   attributeChangedCallback(
     _name: string,
@@ -37,17 +36,22 @@ class GenericReactWebComponent<T extends object> extends AbstractWebComponent {
   }
 
   private getPropsFromAttributes<T>(): T {
-    const props: Record<string, T | string> = {}
-    for (let index = 0; index < this.attributes.length; index++) {
-      const attribute = this.attributes[index]
+    const props: Record<string, unknown> = {}
+
+    for (let i = 0; i < this.attributes.length; i++) {
+      const attribute = this.attributes[i]
       const attr = normalizeAttribute(attribute.name)
-      const value = attribute.value
+      const value = unescape(attribute.value)
+
       try {
-        props[attr] = parseJsonSafely<T>(value) ?? value
+        // Try parsing as JSON
+        props[attr] = JSON.parse(value)
       } catch {
+        // Fallback to string
         props[attr] = value
       }
     }
+
     return props as T
   }
 }

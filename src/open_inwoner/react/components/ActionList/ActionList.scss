@@ -30,4 +30,15 @@ action-list {
   .denhaag-action__link-icon {
     height: var(--denhaag-action-link-icon-width);
   }
+
+  /// Open Inwoner modifiers
+
+  .denhaag-action__content--oip-message {
+    font-weight: bold;
+    color: var(--oip-color-fg-heading);
+  }
+
+  .denhaag-action__content--oip-title {
+    color: var(--utrecht-document-color);
+  }
 }

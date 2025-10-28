@@ -33,9 +33,6 @@ class Feed:
     def __bool__(self):
         return self.has_display()
 
-    def items_as_list(self):
-        return [item.to_dict() for item in self.items]
-
 
 def wrap_items(items: Iterable[FeedItemData]) -> Iterable[FeedItem]:
     for item in items:

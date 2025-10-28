@@ -16,7 +16,10 @@ const ActionList: FC<IActionListProps> = ({ actions = [] }) => {
   return actions?.map(({ title, message, action_url: url }, index) => {
     return (
       <ActionSingle key={index} link={url}>
-        <span>{message} | </span> {title}
+        <span className="denhaag-action__content--oip-message">
+          {message} |{' '}
+        </span>{' '}
+        <span className="denhaag-action__content--oip-title">{title}</span>
       </ActionSingle>
     )
   })
