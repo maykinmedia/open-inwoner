@@ -181,8 +181,8 @@
     var(--color-success-s),
     calc(var(--color-success-l) + 57%)
   );
-  // color-success-l was +50% but +57% is needed for 4.5:1 contrast
 
+  // Font-colors change depending on color-picker
   --color-font-primary: var(--color-white);
   --color-font-secondary: var(--color-white);
   --color-font-accent: var(--color-gray-dark);
@@ -225,6 +225,21 @@
   --font-weight-heading-4: var(--font-weight-heading);
 
   --font-size-heading-card: 18px;
+
+  /// Start overwrite of NLDS colors always through the color-picker colors
+  --oip-color-primary-h: var(--color-primary-h);
+  --oip-color-primary-s: var(--color-primary-s);
+  --oip-color-primary-l: var(--color-primary-l);
+  --oip-color-secondary-h: var(--color-secondary-h);
+  --oip-color-secondary-s: var(--color-secondary-s);
+  --oip-color-secondary-l: var(--color-secondary-l);
+  --oip-color-accent-h: var(--color-accent-h);
+  --oip-color-accent-s: var(--color-accent-s);
+  --oip-color-accent-l: var(--color-accent-l);
+  --oip-color-fg-font-primary: var(--color-font-primary);
+  --oip-color-fg-font-secondary: var(--color-font-secondary);
+  --oip-color-fg-font-accent: var(--color-font-accent);
+  // End overwrite of NLDS colors.
 
   // Font-family = 'Body' coming from both NLDS and/or the font-upload functionality
   --font-family-body: var(--utrecht-document-font-family);
