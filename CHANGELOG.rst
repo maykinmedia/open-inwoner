@@ -1,5 +1,8 @@
-1.35.1 (2025-XX-XX)
+1.35.1 (2025-10-29)
 ===================
+
+
+Voor een volledig overzicht van alle commits, zie :release:`v1.35.1`.
 
 Bugfixes
 --------
