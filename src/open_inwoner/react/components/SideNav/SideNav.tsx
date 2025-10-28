@@ -4,6 +4,7 @@ import {
 } from '@gemeente-denhaag/side-navigation'
 import { MaterialIcon } from '@react/components/MaterialIcon'
 import { FC } from 'react'
+import './SideNav.scss'
 
 export interface MenuItem {
   href: string

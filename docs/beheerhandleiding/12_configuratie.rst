@@ -435,6 +435,19 @@ Klik op 'Tonen' om deze opties uit te klappen.
 **Design/thema stylesheet**
 Hier kunt u extra CSS-stijlen invoegen die op de site gebruikt worden. Let op, er kan enkel gebruik worden gemaakt van een beperkte, veilige subset van CSS-eigenschappen. Niet alle CSS-stijlen worden door het systeem ondersteund. In de aangegeven lijst staan de toegestane CSS-attributen die men eventueel nog aan de site kan toevoegen.
 
+Indien meer flexibiliteit nodig is, kunt u hier ook een eigen CSS-bestand uploaden. Dit is tevens de plek waar NL Design System design tokens kunnen worden toegevoegd. Wanneer u een CSS-bestand met NLDS-waarden of -variabelen hier uploadt, zal dit bestand de bestaande stijlen overschrijven.
+
+In het onderstaande voorbeeld ziet u de NLDS-tokenwaarde voor de 'actieve' kleur van de zij-navigatie. Als er geen design tokens worden ingeladen, wordt de primaire kleur overgenomen uit de kleurkiezer (*'Algemene configuratie'* >> *'Kleur'*). Zodra design tokens wel worden toegepast, krijgen deze de prioriteit en bepalen zij de uiteindelijke kleur.
+
+*Voorbeeldbestand: design-tokens.css*
+
+.. code-block:: css
+
+    .openinwoner-theme {
+        --denhaag-side-navigation-link-active-color: aqua;
+    }
+
+
 **Custom JavaScript**
 Hier kunt u een eigen Javascript bestand uploaden dat automatisch op alle pagina's van de website wordt geladen.
 

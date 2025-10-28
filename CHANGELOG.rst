@@ -113,6 +113,8 @@ Bugfixes
 * [:taiga-ta:`3557`, :pr:`1987`]: Ontbrekende verplichte velden toegevoegd aan de
   Subscription detail admin, waardoor het weer mogelijk is om nieuwe Subscription
   objecten aan te maken.
+* [:taiga-is:`3507`: :pr:`1993`]: De vaste NLDS-huisstijlkleuren (primaire-, secundaire en accent-
+  kleuren) kunnen nu worden overschreven met de kleuren van de colorpicker.
 
 Onderhoud
 ---------
