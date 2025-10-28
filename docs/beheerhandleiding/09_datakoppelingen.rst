@@ -496,7 +496,7 @@ Bij Statusvertalingen kunt u de statussen personaliseren. Zo kunt u standaardtek
 9.17. Webhook-abonnementen
 ==========================
 
-Bij Webhook-abonnementen kunt u instellen dat u alle notificaties van een bepaald kanaal (zaken/documenten/besluiten) van Open Zaak of eSuite terug ontvangt. Deze webhookberichten worden onder andere gebruikt om status updates aan inwoners te tonen of e-mailnotificaties te versturen. Bijvoorbeeld bij een zaak-update.
+Bij Webhook-abonnementen kunt u instellen dat u alle notificaties van een bepaald kanaal (zaken/documenten/besluiten) van Open Zaak of eSuite terug ontvangt. Deze webhookberichten worden onder andere gebruikt om status updates aan inwoners te tonen of E-mailmeldingen te versturen. Bijvoorbeeld bij een zaak-update.
 
 In het overzicht van webhook-abonnementen kunt u zien welke webhook-abonnementen zijn ingesteld.
 
