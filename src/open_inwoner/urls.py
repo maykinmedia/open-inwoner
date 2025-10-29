@@ -40,7 +40,9 @@ admin.site.index_title = "Welkom op de OpenInwoner beheeromgeving"
 
 monkeypatch_admin()
 
+
 urlpatterns = [
+    path("_health/", include("open_inwoner.healthchecks.urls")),
     re_path(
         r"^.well-known/security\.txt$",
         views.redirect_to_configured_security_txt,

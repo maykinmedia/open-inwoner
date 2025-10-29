@@ -215,6 +215,7 @@ INSTALLED_APPS = [
     "custom_migrations",
     "objectsapiclient",
     # Project applications.
+    "open_inwoner.healthchecks",
     "open_inwoner.core",
     "open_inwoner.components",
     "open_inwoner.kvk",
@@ -1100,6 +1101,25 @@ else:
     BASE_URL = "https://example.com"
 
 MAIL_EDITOR_BASE_HOST = BASE_URL
+
+
+#
+# Health checks configuration
+#
+HEALTHCHECKS_READINESS_CHECKS = [
+    "open_inwoner.healthchecks.checks.check_database",
+    "open_inwoner.healthchecks.checks.check_cache",
+]
+
+HEALTHCHECKS_STARTUP_CHECKS = [
+    "open_inwoner.healthchecks.checks.check_database",
+]
+
+HEALTHCHECKS_LIVENESS_CHECKS = []
+
+# Set to True to return detailed error messages and allow JSON responses
+# Set to False (recommended for production) to only return "OK" or "NOT OK"
+HEALTHCHECKS_VERBOSE_RESPONSE = False
 
 
 #
