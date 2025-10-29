@@ -1,5 +1,5 @@
-1.36.0 (2025-09-18) [UNRELEASED]
-================================
+2.0.0 (2025-XX-XX) [UNRELEASED]
+===============================
 
 Voor een volledig overzicht van alle commits, zie ...
 
