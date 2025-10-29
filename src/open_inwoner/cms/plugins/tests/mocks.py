@@ -5,9 +5,10 @@ from .factories import ObjectsAPIConfigFactory
 OBJECTS_API_ROOT = "http://www.objects-api.nl/api/v1"
 OBJECT_TYPE_API_ROOT = "http://www.object-type-api.nl/api/v1"
 
-UUID_OBJECT_TYPE_DIMPACT_1 = "2a3030c1-b4eb-4ca5-a3b4-13dd21954002"
-UUID_OBJECT_TYPE_DIMPACT_2 = "5ed4afd2-068e-49a8-a825-adb7117a1213"
-UUID_OBJECT_TYPE_DIENSVERLENING = "e45ae321-77ef-483b-bcf9-329dacf88ff3"
+UUID_OBJECT_TYPE_DIMPACT = "2a3030c1-b4eb-4ca5-a3b4-13dd21954002"
+# UUID_OBJECT_TYPE_DIMPACT_2 = "5ed4afd2-068e-49a8-a825-adb7117a1213"
+UUID_OBJECT_TYPE_DIENSVERLENING_1 = "e45ae321-77ef-483b-bcf9-329dacf88ff3"
+UUID_OBJECT_TYPE_DIENSVERLENING_2 = "5ed4afd2-068e-49a8-a825-adb7117a1213"
 
 
 class TaakMockData:
@@ -36,6 +37,7 @@ class TaakMockData:
                     "soort": "url",
                     "value": "http://portaalformulier-url/formulier/startpagina",
                 },
+                "verzonden_data": {},
             },
             "verwerker_taak_id": "0d59ada7-eacb-4129-8b7e-9907cd82c6d0",
         }
@@ -63,6 +65,7 @@ class TaakMockData:
                     "soort": "url",
                     "value": "http://portaalformulier-url/formulier-2/startpagina",
                 },
+                "verzonden_data": {},
             },
             "verwerker_taak_id": "0d59ada7-eacb-4129-8b7e-9907cd82c6d0",
         }
@@ -84,7 +87,7 @@ class TaakMockData:
         self.mock_task_externformulier_1 = {
             "url": f"{OBJECTS_API_ROOT}/objects/f58d9f41-78de-4d59-89ef-c439c5c24510",
             "uuid": "f58d9f41-78de-4d59-89ef-c439c5c24510",
-            "type": f"{OBJECT_TYPE_API_ROOT}/objecttypes/{UUID_OBJECT_TYPE_DIMPACT_1}/",
+            "type": f"{OBJECT_TYPE_API_ROOT}/objecttypes/{UUID_OBJECT_TYPE_DIENSVERLENING_1}/",
             "record": {
                 "index": 1,
                 "typeVersion": 1,
@@ -100,7 +103,7 @@ class TaakMockData:
         self.mock_task_externformulier_2 = {
             "url": f"{OBJECTS_API_ROOT}/objects/3da7c3e6-e8fd-4b77-80f3-c70ee5c2742d",
             "uuid": "3da7c3e6-e8fd-4b77-80f3-c70ee5c2742d",
-            "type": f"{OBJECT_TYPE_API_ROOT}/objecttypes/{UUID_OBJECT_TYPE_DIMPACT_2}/",
+            "type": f"{OBJECT_TYPE_API_ROOT}/objecttypes/{UUID_OBJECT_TYPE_DIENSVERLENING_2}/",
             "record": {
                 "index": 1,
                 "typeVersion": 1,
@@ -116,7 +119,7 @@ class TaakMockData:
         self.mock_task_url = {
             "url": f"{OBJECTS_API_ROOT}/objects/4db3491d-6ae1-4674-ba82-622f963b51d8",
             "uuid": "4db3491d-6ae1-4674-ba82-622f963b51d8",
-            "type": f"{OBJECT_TYPE_API_ROOT}/objecttypes/{UUID_OBJECT_TYPE_DIENSVERLENING}/",
+            "type": f"{OBJECT_TYPE_API_ROOT}/objecttypes/{UUID_OBJECT_TYPE_DIMPACT}/",
             "record": {
                 "index": 1,
                 "typeVersion": 1,
@@ -145,9 +148,22 @@ class TaakMockData:
             f"{OBJECT_TYPE_API_ROOT}/objecttypes/", safe=""
         )
 
-        # UUID_OBJECT_TYPE_DIMPACT_1
+        # UUID_OBJECT_TYPE_DIMPACT
         m.get(
-            f"{OBJECTS_API_ROOT}/objects?type={encoded_object_type_base}{UUID_OBJECT_TYPE_DIMPACT_1}%2F",
+            f"{OBJECTS_API_ROOT}/objects?type={encoded_object_type_base}{UUID_OBJECT_TYPE_DIMPACT}%2F",
+            json={
+                "count": 1,
+                "next": None,
+                "previous": None,
+                "results": [
+                    self.mock_task_url,
+                ],
+            },
+        )
+
+        # UUID_OBJECT_TYPE_DIENSVERLENING_1
+        m.get(
+            f"{OBJECTS_API_ROOT}/objects?type={encoded_object_type_base}{UUID_OBJECT_TYPE_DIENSVERLENING_1}%2F",
             json={
                 "count": 1,
                 "next": None,
@@ -157,29 +173,15 @@ class TaakMockData:
                 ],
             },
         )
-
-        # UUID_OBJECT_TYPE_DIMPACT_2
+        # UUID_OBJECT_TYPE_DIENSVERLENING_2
         m.get(
-            f"{OBJECTS_API_ROOT}/objects?type={encoded_object_type_base}{UUID_OBJECT_TYPE_DIMPACT_2}%2F",
+            f"{OBJECTS_API_ROOT}/objects?type={encoded_object_type_base}{UUID_OBJECT_TYPE_DIENSVERLENING_2}%2F",
             json={
                 "count": 1,
                 "next": None,
                 "previous": None,
                 "results": [
                     self.mock_task_externformulier_2,
-                ],
-            },
-        )
-
-        # UUID_OBJECT_TYPE_DIENSVERLENING
-        m.get(
-            f"{OBJECTS_API_ROOT}/objects?type={encoded_object_type_base}{UUID_OBJECT_TYPE_DIENSVERLENING}%2F",
-            json={
-                "count": 1,
-                "next": None,
-                "previous": None,
-                "results": [
-                    self.mock_task_url,
                 ],
             },
         )
