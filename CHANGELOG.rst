@@ -57,6 +57,8 @@ Nieuwe features
 Bugfixes
 --------
 
+* [:taiga-is:`3561`, :pr:`1995`]: CMS Categories plugin probeert nu niet meer om zaken
+  op te halen wanneer er geen ZGW backend is geconfigureerd.
 * [:taiga-is:`2522`:, :pr:`1969`]: Zaken die niet volledig opgehaald kunnen worden uit
   het zaaksysteem worden nu gefilterd uit de zakenlijst om te voorkomen dat de gehele
   lijst van Mijn Zaken toegankelijk blijft.
