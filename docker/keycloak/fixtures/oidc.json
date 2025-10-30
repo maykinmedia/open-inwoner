@@ -4,8 +4,8 @@
         "pk": 1,
         "fields": {
             "enabled": true,
-            "oidc_rp_client_id": "testid_public",
-            "oidc_rp_client_secret": "23a12032-e080-4f65-b733-ad2567ec1605",
+            "oidc_rp_client_id": "testid",
+            "oidc_rp_client_secret": "7DB3KUAAizYCcmZufpHRVOcD0TOkNO3I",
             "oidc_rp_sign_algo": "RS256",
             "oidc_op_discovery_endpoint": "http://localhost:8080/realms/test/",
             "oidc_op_jwks_endpoint": "http://localhost:8080/realms/test/protocol/openid-connect/certs",
@@ -28,8 +28,8 @@
         "pk": 1,
         "fields": {
             "enabled": true,
-            "oidc_rp_client_id": "testid_public",
-            "oidc_rp_client_secret": "23a12032-e080-4f65-b733-ad2567ec1605",
+            "oidc_rp_client_id": "testid",
+            "oidc_rp_client_secret": "7DB3KUAAizYCcmZufpHRVOcD0TOkNO3I",
             "oidc_rp_sign_algo": "RS256",
             "oidc_op_discovery_endpoint": "http://localhost:8080/realms/test/",
             "oidc_op_jwks_endpoint": "http://localhost:8080/realms/test/protocol/openid-connect/certs",
