@@ -57,6 +57,9 @@ Nieuwe features
 Bugfixes
 --------
 
+* [:taiga-is:`3518`, :pr:`2000`]: ``maykin-django-prosemirror`` bijgewerkt naar versie
+  ``0.3.0``, waardoor het te vroeg laden van de prosemirror JS op bepaalde admin
+  pagina's is verholpen.
 * [:taiga-is:`3561`, :pr:`1995`]: CMS Categories plugin probeert nu niet meer om zaken
   op te halen wanneer er geen ZGW backend is geconfigureerd.
 * [:taiga-is:`3559`, :pr:`1994`]: OpenKlant2 service veld in admin is nu nullable, zodat
