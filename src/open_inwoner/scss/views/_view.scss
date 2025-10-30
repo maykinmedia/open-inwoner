@@ -1,21 +1,40 @@
 .view {
   &---pages-root {
-    &.has-notifications {
+    &:has(.notifications .notification) {
       .notifications {
-        margin-top: -41px;
-        @media (min-width: 768px) {
-          margin-top: -32px;
-        }
+        margin-top: calc(-1 * var(--spacing-giant));
       }
-      .grid__welcome {
-        margin-top: -40px;
-        padding: 0;
+
+      // When authenticated and banner plug-in is in use
+      .grid__main .plugin.banner__text {
+        background-color: var(--color-white);
+        margin-top: calc(-1 * var(--spacing-giant));
 
         @media (min-width: 768px) {
-          margin-top: -30px;
+          margin-top: var(--spacing-giant);
+        }
+
+        .grid__welcome {
+          padding: 0;
+          margin-top: 0;
+
+          @media (min-width: 768px) {
+            margin-top: calc(-1 * var(--spacing-giant));
+          }
         }
       }
     }
+
+    // When not authenticated and only configuration text is used
+    @media (max-width: 767px) {
+      .grid__welcome {
+        background-color: var(--color-white);
+        border-radius: var(--border-radius);
+        margin-top: calc(-1 * var(--image-height-mobile));
+        padding: var(--spacing-extra-large);
+      }
+    }
+
     .container .button--icon-after {
       padding-left: 0;
 
