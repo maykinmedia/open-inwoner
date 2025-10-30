@@ -824,7 +824,7 @@ maykin-common[otel]==0.10.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-maykin-django-prosemirror[images]==0.2.0
+maykin-django-prosemirror[images]==0.3.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
