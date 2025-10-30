@@ -47,7 +47,6 @@ import './siteimprove/tracking'
 import './twofactor-sms'
 import { FileInput } from './form/FileInput'
 import { ToggleHide } from './card/ToggleHide'
-import './views'
 
 // eval() is problematic with CSP
 htmx.config.allowEval = false

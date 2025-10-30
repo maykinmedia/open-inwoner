@@ -37,24 +37,13 @@
       }
 
       &.banner__text {
-        .container:not(:has(.notifications .notification)) ~ .container & {
-          $image-height-mobile: 140px;
-          margin-top: -$image-height-mobile;
-        }
-
-        margin-top: 0;
         padding: var(--spacing-large);
         padding-bottom: 0;
         box-sizing: border-box;
         width: 100%;
-        background-color: rgba(255, 255, 255, 0.6); /* fallback */
-        @supports (background-color: color-mix(in srgb, white, transparent)) {
-          background-color: color-mix(
-            in srgb,
-            var(--color-white) 60%,
-            transparent
-          );
-        }
+        border-top-left-radius: var(--border-radius);
+        border-top-right-radius: var(--border-radius);
+        background-color: var(--color-white);
 
         @media (min-width: 768px) {
           margin-top: 0;

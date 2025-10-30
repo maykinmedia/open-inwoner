@@ -45,9 +45,9 @@ Nieuwe features
   en dropdownfunctie aan Storybook toegevoegd.
 * [:taiga-us:`3499`, :pr:`1962`]: WCAG toegankelijkheidsverbeteringen op de Profiel pagina
   en de zakenoverzichtspagina.
-* [:taiga-us:`3492`, :pr:`1960`]: Header en logo zijn kleiner gemaakt, onderwerpen en
-  zoekveld zijn gewisseld van plaats, mobiele navigatie is nu een overlay en de mobiele
-  welkom tekst is hoger geplaatst.
+* [:taiga-us:`3492`, :pr:`1960`, :pr:`2001`]: Header en logo zijn verkleind; onderwerpen en zoekveld
+  zijn omgewisseld op desktop; mobiele navigatie omgezet naar een overlay; mobiele welkomsttekst hoger
+  geplaatst; welkomsttekst wordt nu los onder de bannerafbeelding weergegeven op desktop.
 * [:taiga-us:`3508`, :pr:`1979`]: Alle logging aangepast om gebruikt te maken van ``structlog``,
   waardoor de logging data beter kan worden verwerkt door andere observability tools zoals
   Grafana.

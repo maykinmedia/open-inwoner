@@ -528,7 +528,8 @@ $vm: var(--spacing-large);
 
           .header__text-actions {
             padding: 0 0 0 var(--spacing-small);
-            margin: var(--spacing-extra-large) 0;
+            margin: var(--spacing-extra-large) 0 var(--spacing-extra-large)
+              var(--spacing-medium);
             width: calc(100% - (var(--spacing-extra-large)));
 
             .header__list-item {

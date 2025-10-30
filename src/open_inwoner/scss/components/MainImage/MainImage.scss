@@ -1,5 +1,4 @@
 $image-height: 261px;
-$image-height-mobile: 140px;
 
 .main-image {
   object-fit: cover;
@@ -24,6 +23,6 @@ $image-height-mobile: 140px;
 
 @media (max-width: 767px) {
   #search-form ~ .banner:has(~ .container--fullwidth) .main-image {
-    height: $image-height-mobile;
+    height: var(--image-height-mobile);
   }
 }
