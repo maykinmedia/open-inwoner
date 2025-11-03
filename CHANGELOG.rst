@@ -148,6 +148,7 @@ Onderhoud
   correct onderscheid tussen ``None`` en ``"None"`` waarden.
 * [:pr:`1991`, :taiga-is:`3626`] Vervang het woord "notificaties" met "meldingen"
   omwille van de B1 taaleis.
+* [:pr:`2005`] Update opmaak van gecompileerde berichten (Voeg een nieuwe regel toe).
 
 1.35.0 (2025-09-18)
 ===================
