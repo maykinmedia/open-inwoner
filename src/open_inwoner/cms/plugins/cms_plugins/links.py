@@ -22,6 +22,9 @@ class CMSLinkPlugin(CMSPluginBase):
     cache = False
 
     def render(self, context, instance, placeholder):
+        if not context["request"].user.is_authenticated:
+            return context
+
         context.update(
             {
                 "link_plugin": instance,
