@@ -380,8 +380,70 @@ Wanneer u op markeren klikt wordt de betreffende plugin op de pagina weergegeven
 **Creëer alias**
 Door een alias te creëren kunt u content hergebruiken op verschillende pagina’s en deze op één plek beheren. Wanneer hergebruikte content op één plek wordt gewijzigd, wordt dit door de alias ook op de andere plekken gewijzigd.
 
-11.2.9. Footer aanpassen via CMS
---------------------------------
+
+11.2.9. 'Ga Naar' links op homepagina via CMS
+---------------------------------------------
+Wanneer u de homepagina bewerkt, kunt u via het plugin menu een nieuw blok toevoegen met 1 of meerdere externe links. Elke 'Ga naar' link dient een eigen icoontje te krijgen. De iconenset die in Open Inwoner wordt gebruikt is Material Icons. Deze bevat meer dan 2000 iconen waaruit u kunt kiezen.
+
+1. Voeg eerst de plugin toe aan de pagina door middel van het plus symbool. Sleep deze plugin naar de gewenste volgorde binnen de plugin hiërarchie.
+
+2. Voeg daarna één of meerdere links via het plus-symbool dat is verschenen bij de externe links plugin via 'Voeg plugin toe'. Kies daar 'Generiek' >> 'Link'
+
+3. Selecteer voor elke link een passend icoon. De linktekst kan worden ingevoerd via de rich tekst editr. De gehele tekst en het icoon worden onderdeel van de link en zijn aanklikbaar.
+
+Een icoon kan worden ingesteld door de juiste icoonnaam in te vullen in het veld ‘Icoon’. De exacte namen van alle beschikbare iconen vindt u op: https://fonts.google.com/icons
+
+Kies in de linkerbalk de subset 'Material Icons' (niet 'Material Symbols') en selecteer vervolgens de variant 'Outlined'. In het middendeel kunt u gericht zoeken op soorten iconen, bijvoorbeeld 'park' of 'help'.
+
+De exacte code-naam van het icoon verschijnt in de rechter pop-up. Vul deze naam in het veld ‘Icoon’ in, inclusief eventuele underscores (bijvoorbeeld *help_outline* of *account_balance*).
+
+Plugin toevoegen:
+
+.. image:: images/externe-link-plugin-kiezen.png
+   :alt: Externe CMS link met icoon
+   :width: 700px
+
+De titel van het pagina blok is standaard 'ingesteld als 'Ga naar' maar hier kan uiteraard ook een andere tekst worden ingevoerd. deze titel wordt zichtbaar als H2 kopje boven de links.
+
+.. image:: images/externe-link-ganaar-titel.png
+   :alt: Externe CMS link met icoon
+   :width: 700px
+
+Link toevoegen:
+
+.. image:: images/externe-link-toevoegen.png
+   :alt: Externe CMS link met icoon
+   :width: 700px
+
+'Material Icons' set selecteren, tevens 'Outlined' set kiezen en icoon zoeken:
+
+.. image:: images/externe-link-material-con-zoeken.png
+   :alt: Externe CMS link met icoon
+   :width: 700px
+
+Icoon kiezen en exacte naam zoeken bij 'Web' >> 'Icon Font':
+
+.. image:: images/external-link-kies-icoon.png
+   :alt: Externe CMS link met icoon
+   :width: 700px
+
+Icoonveld correct invullen en eventueel link laten openen in nieuw venster via geavanceerde instellingen:
+
+.. image:: images/external-link-icoonnaam.png
+   :alt: Externe CMS link met icoon
+   :width: 700px
+
+Publiceer de pagina om de wijzigingen definitief te maken.
+
+Hieronder een voorbeeld van hoe het blok er aan de voorkant uit kan zien met 4 toegevoegde links. De iconen die hier zijn gebruikt, zijn achtereenvolgens: 'people', 'message', 'list_alt' en 'insert_drive_file'.
+
+.. image:: images/externe-links-voltooid.png
+   :alt: Externe CMS link met icoon
+   :width: 700px
+
+
+11.2.10. Footer aanpassen via CMS
+---------------------------------
 
 De footer van Open Inwoner kan worden aangepast via het Django CMS. Dit doet u door naar het CMS menu te gaan. U krijgt dan frontend van het Open Inwoner de opties om pagina’s te wijzigen, maar in het plugin menu vindt u ook de diverse opties rond de footer. De footer bestaat uit 3 kolommen: Footer linkerzijde, Footer midden en Footer rechterzijde. In het huidige screenshot bevat de footer enkel elementen in de linker- en rechter kolom. De middelste is leeg. Om de footerkolommen te wijzigen Wanneer u op het uitvouwmenu van de betreffende kolom klikt, kunt u op het potloodicoontje klikken om de footertekst aan te passen. Klik op [+] om een plugin toe te voegen aan de kolom.
 
@@ -417,7 +479,7 @@ U kunt in de footer ook een link invoegen. Wanneer u kiest voor de link plugin k
 Wanneer u de paginalijst in de footer wilt weergeven, selecteert u deze plugin. Het gaat in dit geval om de platte pagina’s zoals deze in de backend onder “Configuratie” als platte pagina’s zijn gedefinieerd. Wijzigingen aan deze lijst kunt u aanbrengen via de backend. Zie hoofdstuk 12.4.
 
 
-11.2.10. Contactformulier aanpassen via CMS
+11.2.11. Contactformulier aanpassen via CMS
 -------------------------------------------
 
 Het contactformulier van Open Inwoner kan worden aangepast via het Django CMS. Hiervoor dient u eerst de configuratie voor openklant te voltooien. Zie :ref:`hoofdstuk 9.4 <configuratie-klanten-systeem>`. Daar kunt u kiezen voor een API of e-mail of beiden. Wanneer aan het Klanten Systeem een "contact formulier onderwerp" wordt toegevoegd, wordt deze zichtbaar in de keuzelijst van het gepubliceerde contactformulier.
