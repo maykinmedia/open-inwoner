@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import Generator, Type, TypedDict, assert_never
 from urllib.parse import urlencode
 
@@ -9,6 +10,7 @@ from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from objectsapiclient.models import Configuration
 from pydantic import ValidationError
+from requests import RequestException
 
 from open_inwoner.cms.plugins.api_models import (
     ExternFormulierTaak,
@@ -17,11 +19,22 @@ from open_inwoner.cms.plugins.api_models import (
     UrlTaak,
 )
 from open_inwoner.cms.plugins.models import TasksConfig
+from open_inwoner.openzaak.api_models import OpenTask
+from open_inwoner.openzaak.clients import build_forms_clients
+from open_inwoner.utils.api import ClientError
 
 logger = structlog.stdlib.get_logger(__name__)
 
 
+class TaskAPISource(Enum):
+    ZGW_API = "ZGW API"
+    OBJECTS_API = "Objects API"
+
+
 class TaskData(TypedDict):
+    # metadata for internal use
+    api_source: TaskAPISource
+
     soort: str
     titel: str
     status: str
@@ -35,8 +48,13 @@ class TaskData(TypedDict):
 @plugin_pool.register_plugin
 class TasksPlugin(CMSPluginBase):
     """
-    Uses the Objects API to retrieve and show tasks according to the MijnTaken Objecttypes schema
-    Reuses the UserFeedPlugin template
+    Fetches and combines `openstaande taken` form ZGW API's and `externe taken`
+    from Objects API.
+
+    Note:
+        Objects returned by the eSuite have fewer fields than those
+        returned by the Objects API. For consistency, we use the same `TypedDict`
+        for validation with empty defaults for the eSuite taken.
     """
 
     model = TasksConfig
@@ -52,9 +70,27 @@ class TasksPlugin(CMSPluginBase):
         if not request.user.is_authenticated or not (bsn := request.user.bsn):
             return context
 
-        task_objects = self.get_tasks_by_bsn(instance, user_bsn=bsn)
-
         task_dicts = []
+
+        # fetch "openstaande taken" from ZGW API's
+        zgw_taken = self.fetch_zgw_taken(bsn=bsn)
+        task_dicts.extend(
+            TaskData(
+                api_source=TaskAPISource.ZGW_API.value,
+                task_url=taak.formulier_link,
+                status="open",
+                titel=taak.naam,
+                soort="",
+                verloopdatum="",
+                koppeling=None,
+                eigenaar="",
+                verwerker_taak_id="",
+            )
+            for taak in zgw_taken
+        )
+
+        # fetch externe taken from Objects API
+        task_objects = self.get_tasks_by_bsn(instance, user_bsn=bsn)
         for task in task_objects:
             # determine task_url based on type
             match task:
@@ -68,6 +104,7 @@ class TasksPlugin(CMSPluginBase):
                     assert_never(task)
 
             task_data = TaskData(
+                api_source=TaskAPISource.OBJECTS_API.value,
                 soort=task.soort,
                 titel=task.titel,
                 status=task.status,
@@ -88,9 +125,29 @@ class TasksPlugin(CMSPluginBase):
 
         return context
 
+    def fetch_zgw_taken(self, bsn: str) -> list[OpenTask]:
+        """
+        Fetch `openstaande taken` from ZGW API's
+        """
+        zgw_taken = []
+        for zgw_client in build_forms_clients():
+            try:
+                taken = zgw_client.fetch_open_tasks(bsn=bsn)
+            except (RequestException, ClientError):
+                logger.exception(
+                    "Error fetching 'openstaande taken' from ZGW API",
+                    zgw_client=zgw_client,
+                )
+            else:
+                zgw_taken.extend(taken)
+        return zgw_taken
+
     def get_tasks(
         self, instance
     ) -> Generator[ExternFormulierTaak | UrlTaak, None, None]:
+        """
+        Fetch `externe taken` from Objects API
+        """
         objects_api_client = Configuration.get_solo().client
 
         if objects_api_client is None:
