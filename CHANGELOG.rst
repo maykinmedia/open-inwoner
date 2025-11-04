@@ -13,6 +13,7 @@ Bugfixes
 
 * [:taiga-dimpact:`358`, :pr:`2009`]: Het alternatieve telefoonnummer wordt nu correct
   verwerkt vanuit de eSuite.
+* [:taiga-is:`3321`, :pr:`2008`]: Dubbele links in sitemap verwijderd.
 
 1.35.1 (2025-10-29)
 ===================
