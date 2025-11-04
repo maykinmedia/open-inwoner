@@ -53,12 +53,11 @@ Nieuwe features
   Grafana.
 * [:taiga-us:`3511`, :pr:`1988`]: CMS-plugin toegevoegd voor links naar andere portalen van de
   gemeente.
-* [:taiga-us:`3511`, :pr: `2004`] : Er is nu documentatie over het gebruik van de
-  CMS-plugin voor links naar andere portalen
 * [:taiga-is:`3556`, :pr:`1995`]: Uitgaande requests worden nu gelogd als gestructureerde
   events met ``structlog``, waardoor ze beter verwerkt kunnen worden door observability tools.
 * [:taiga-us:`3512`, :pr:`2003`]: De taken die worden weergegeven onder 'Openstaande acties' en
   'Mijn taken' zijn nu samengevoegd en worden nu samen weergegeven onder 'Mijn taken'.
+* [:taiga-is:`3321`, :pr:`2008`]: Dubbele links in sitemap verwijderd.
 
 Bugfixes
 --------
@@ -119,8 +118,6 @@ Bugfixes
   objecten aan te maken.
 * [:taiga-is:`3507`: :pr:`1993`]: De vaste NLDS-huisstijlkleuren (primaire-, secundaire en accent-
   kleuren) kunnen nu worden overschreven met de kleuren van de colorpicker.
-* [:taiga-is:`3471`: :pr:`2007`]: De paginatitel van de sitemap verandert nu mee met de in de
-  configuratie meegegeven site-naam.
 
 Onderhoud
 ---------
