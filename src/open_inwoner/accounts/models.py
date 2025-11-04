@@ -15,12 +15,14 @@ from django.utils.functional import classproperty
 from django.utils.translation import gettext_lazy as _
 
 from digid_eherkenning.oidc.models import (
+    BaseConfig,
     DigiDConfig as _OIDCDigiDConfig,
     EHerkenningConfig as _OIDCEHerkenningConfig,
 )
 from image_cropping import ImageCropField, ImageRatioField
 from localflavor.nl.models import NLBSNField, NLZipCodeField
 from mail_editor.helpers import find_template
+from mozilla_django_oidc_db.fields import ClaimField, ClaimFieldDefault
 from privates.storages import PrivateMediaFileSystemStorage
 from timeline_logger.models import TimelineLog
 
@@ -101,6 +103,128 @@ class OpenIDEHerkenningConfig(_OIDCEHerkenningConfig):
         from .views import eherkenning_callback
 
         return eherkenning_callback
+
+
+class OpenIDEIDASConfig(BaseConfig):
+    """
+    eIDAS OIDC configuration model.
+
+    eIDAS (electronic IDentification, Authentication and trust Services) enables
+    European citizens and businesses to use their national eID across EU borders.
+
+    This configuration allows mapping eIDAS attributes for:
+    - Natural persons: BSN identifier, pseudo identifier, first name, family name, date of birth
+    - Legal persons: Legal subject identifier
+
+    The unique identifier is stored in the User.oidc_id field since eIDAS can
+    authenticate different types of entities from various EU member states.
+
+    Follows naming convention from digid_eherkenning.oidc.models (OFEIDASConfig).
+    """
+
+    oip_unique_id_user_fieldname = "eidas_pseudo_id"
+    # oip_login_type = LoginTypeChoices.eidas_person_bsn
+
+    # Common to both natural and legal persons
+    pseudo_identifier_claim = ClaimField(
+        verbose_name=_("Pseudo identifier claim"),
+        default=ClaimFieldDefault("person_pseudo_identifier"),
+        blank=True,
+        help_text=_(
+            "Claim path for PseudoID - unique pseudonymous identifier for natural persons. "
+            "Use this to identify users across authentication sessions when BSN is not available. "
+            "Source: eHerkenning/eIDAS urn:etoegang:1.12:EntityConcernedID:PseudoID"
+        ),
+    )
+
+    # Natural persons
+    ## This may or may not be present, depending on whether the subject has connected
+    ## their BSN to their EIDAS
+    natural_person_bsn_identifier_claim = ClaimField(
+        verbose_name=_("BSN identifier claim"),
+        default=ClaimFieldDefault("person_bsn_identifier"),
+        blank=True,
+        help_text=_(
+            "Claim path for BSN (Burgerservicenummer) - National Identification Number. "
+            "Source: eHerkenning/eIDAS urn:etoegang:1.12:EntityConcernedID:BSN"
+        ),
+    )
+    natural_person_first_name_claim = ClaimField(
+        verbose_name=_("First name claim"),
+        default=ClaimFieldDefault("first_name"),
+        blank=True,
+        help_text=_(
+            "Claim path for first/given name of natural person. Source: eHerkenning/eIDAS"
+        ),
+    )
+
+    natural_person_family_name_claim = ClaimField(
+        verbose_name=_("Family name claim"),
+        default=ClaimFieldDefault("family_name"),
+        blank=True,
+        help_text=_(
+            "Claim path for family name/surname of natural person. Source: eHerkenning/eIDAS"
+        ),
+    )
+
+    natural_person_date_of_birth_claim = ClaimField(
+        verbose_name=_("Date of birth claim"),
+        default=ClaimFieldDefault("birthdate"),
+        blank=True,
+        help_text=_(
+            "Claim path for date of birth in format YYYY-MM-DD. Source: eHerkenning/eIDAS"
+        ),
+    )
+
+    # Legal person (company) claims
+    ## Note this is not pseudonymized, and _separate_ from the psuedo ID
+    legal_entity_identifier_claim = ClaimField(
+        verbose_name=_("Legal entity identifier claim"),
+        default=ClaimFieldDefault("company_identifier"),
+        blank=True,
+        help_text=_(
+            "Claim path for legal entity identifier - additional identifier for legal entities. "
+            "Source: urn:etoegang:1.11:EntityConcernedID:eIDASLegalIdentifier"
+        ),
+    )
+
+    company_name_claim = ClaimField(
+        verbose_name=_("Company name claim"),
+        default=ClaimFieldDefault("company_name"),
+        blank=True,
+        help_text=_(
+            "Claim path for company/organization legal name. Source: eIDAS urn:etoegang:1.12:EntityConcernedID:LegalName"
+        ),
+    )
+
+    # Level of Assurance claim
+    loa_claim = ClaimField(
+        verbose_name=_("Level of Assurance (LoA) claim"),
+        default=ClaimFieldDefault("acr"),
+        blank=True,
+        help_text=_(
+            "Claim path for Level of Assurance (LoA) value. "
+            "Indicates the authentication strength/security level. Source: eIDAS"
+        ),
+    )
+
+    # Natural person attribute claims
+
+    class Meta:
+        verbose_name = _("eIDAS OIDC configuration")
+
+    @classproperty
+    def oidcdb_check_idp_availability(cls):  # noqa: N805
+        return False
+
+    @property
+    def oidc_authentication_callback_url(self):
+        return "eidas_oidc:callback"
+
+    def get_callback_view(self):
+        from .views import eidas_callback
+
+        return eidas_callback
 
 
 ###
@@ -223,6 +347,18 @@ class User(AbstractBaseUser, PermissionsMixin):
         blank=True,
         default="",
         validators=[validate_vestiging],
+    )
+    eidas_pseudo_id = models.CharField(
+        verbose_name=_("EIDAS Pseudo ID"),
+        max_length=256,
+        blank=True,
+        default="",
+    )
+    eidas_company_id = models.CharField(
+        verbose_name=_("EIDAS Company ID"),
+        max_length=128,
+        blank=True,
+        default="",
     )
     # company_name is the same for all branches of a company
     # branch_name can differ for different branches
@@ -352,9 +488,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         constraints = [
             UniqueConstraint(
                 fields=["email"],
-                condition=~Q(login_type=LoginTypeChoices.digid)
-                & ~Q(login_type=LoginTypeChoices.eherkenning),
-                name="unique_email_when_not_digid_or_eherkenning",
+                condition=Q(login_type=LoginTypeChoices.default),
+                name="unique_email_for_regular_users",
             ),
             models.CheckConstraint(
                 check=~Q(phonenumber__exact="") | Q(phonenumber_alternative__exact=""),
@@ -386,6 +521,30 @@ class User(AbstractBaseUser, PermissionsMixin):
                 name="eherkenning_user_requires_unique_vestiging_for_a_kvk",
                 violation_error_message=_(
                     "A vestigingsnummer must be unique for each kvk nummer"
+                ),
+            ),
+            models.CheckConstraint(
+                check=~Q(
+                    eidas_pseudo_id__exact="",
+                    login_type__in=[
+                        LoginTypeChoices.eidas_person_bsn,
+                        LoginTypeChoices.eidas_person_pseudo_id,
+                        LoginTypeChoices.eidas_company,
+                    ],
+                ),
+                name="eidas_user_requires_pseudo_id",
+                violation_error_message=_(
+                    "Users with eIDAS login types must have a value set for the eIDAS pseudo identifier"
+                ),
+            ),
+            UniqueConstraint(
+                fields=["eidas_pseudo_id"],
+                condition=Q(login_type=LoginTypeChoices.eidas_person_bsn)
+                | Q(login_type=LoginTypeChoices.eidas_person_pseudo_id)
+                | Q(login_type=LoginTypeChoices.eidas_company),
+                name="eidas_pseudo_id_unique_for_eidas_login_types",
+                violation_error_message=_(
+                    "The eIDAS pseudo identifier must be unique across all eIDAS login types"
                 ),
             ),
         ]

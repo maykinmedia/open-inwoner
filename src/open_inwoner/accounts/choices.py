@@ -7,6 +7,9 @@ class LoginTypeChoices(models.TextChoices):
     digid = "digid", _("DigiD")
     eherkenning = "eherkenning", _("eHerkenning")
     oidc = "oidc", _("OpenId connect")
+    eidas_person_bsn = "eidas_person_bsn", _("EIDAS person with BSN")
+    eidas_person_pseudo_id = "eidas_person_pseudo_id", _("EIDAS person with Pseudo ID")
+    eidas_company = "eidas_company", _("EIDAS company with Company ID")
 
 
 # Created because of a filter that needs to happen. This way the form can take the empty choice and the modal is still filled.

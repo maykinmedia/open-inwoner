@@ -20,7 +20,11 @@ from pyquery import PyQuery
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.eherkenning_session import EHerkenningSessionContext
-from open_inwoner.accounts.models import OpenIDDigiDConfig, OpenIDEHerkenningConfig
+from open_inwoner.accounts.models import (
+    OpenIDDigiDConfig,
+    OpenIDEHerkenningConfig,
+    OpenIDEIDASConfig,
+)
 from open_inwoner.accounts.views.auth_oidc import (
     GENERIC_DIGID_ERROR_MSG,
     GENERIC_EHERKENNING_ERROR_MSG,
@@ -2301,3 +2305,855 @@ class eHerkenningOIDCFlowTests(WebTest):
 
         response = self.app.get(callback_response.url)
         self.assertEqual(response.status_code, 200)
+
+
+class EIDASOIDCFlowTests(WebTest):
+    """
+    Test the full OIDC authentication flow for eIDAS users.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cms_tools.create_homepage()
+        cms_tools.create_apphook_page(ProfileApphook)
+
+    def setUp(self):
+        super().setUp()
+        # Create and configure the eIDAS OIDC config
+        self.config = OpenIDEIDASConfig.get_solo()
+        self.config.enabled = True
+        self.config.pseudo_identifier_claim = ["sub"]
+        self.config.natural_person_bsn_identifier_claim = ["bsn"]
+        self.config.natural_person_first_name_claim = ["given_name"]
+        self.config.natural_person_family_name_claim = ["family_name"]
+        self.config.company_name_claim = ["company_name"]
+        self.config.legal_entity_identifier_claim = ["legal_entity_id"]
+        self.config.save()
+
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
+    def test_new_eidas_person_with_bsn_is_created(
+        self,
+        mock_get_token,
+        mock_verify_token,
+        mock_store_tokens,
+        mock_get_userinfo,
+    ):
+        mock_get_userinfo.return_value = {
+            "sub": "eidas-pseudo-123",
+            "bsn": "123456789",
+            "given_name": "Jane",
+            "family_name": "Doe",
+        }
+
+        session = self.client.session
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "accounts.OpenIDEIDASConfig",
+            }
+        }
+        session.save()
+
+        callback_url = reverse("eidas_oidc:callback")
+
+        self.assertEqual(
+            User.objects.count(), 0, msg="No users should exist before authentication"
+        )
+
+        callback_response = self.client.get(
+            callback_url, {"code": "mock", "state": "mock"}
+        )
+
+        self.assertRedirects(
+            callback_response,
+            reverse("pages-root"),
+            fetch_redirect_response=False,
+            msg_prefix="User should be redirected to homepage after successful authentication",
+        )
+
+        self.assertEqual(
+            User.objects.count(),
+            1,
+            msg="Exactly one user should be created after authentication",
+        )
+
+        new_user = User.objects.get()
+
+        self.assertEqual(
+            new_user.eidas_pseudo_id,
+            "eidas-pseudo-123",
+            msg="User's eIDAS pseudo ID must match the value from the configured pseudo_identifier_claim",
+        )
+        self.assertEqual(
+            new_user.bsn,
+            "123456789",
+            msg="User's BSN must match the value from the configured natural_person_bsn_identifier_claim",
+        )
+        self.assertEqual(
+            new_user.first_name,
+            "Jane",
+            msg="User's first name must match the value from the configured natural_person_first_name_claim",
+        )
+        self.assertEqual(
+            new_user.last_name,
+            "Doe",
+            msg="User's last name must match the value from the configured natural_person_family_name_claim",
+        )
+        self.assertEqual(
+            new_user.login_type,
+            LoginTypeChoices.eidas_person_bsn,
+            msg="User with BSN claim must have login_type set to eidas_person_bsn",
+        )
+        self.assertTrue(
+            new_user.email.endswith("@localhost"),
+            msg="User email must be generated with @localhost domain when not provided in claims",
+        )
+
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
+    def test_existing_eidas_user_logs_in_without_creating_new_user(
+        self,
+        mock_get_token,
+        mock_verify_token,
+        mock_store_tokens,
+        mock_get_userinfo,
+    ):
+        existing_user = UserFactory.create(
+            eidas_pseudo_id="eidas-pseudo-456",
+            login_type=LoginTypeChoices.eidas_person_pseudo_id,
+            first_name="John",
+            last_name="Smith",
+        )
+
+        mock_get_userinfo.return_value = {
+            "sub": "eidas-pseudo-456",
+            "given_name": "John",
+            "family_name": "Smith",
+        }
+
+        session = self.client.session
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "accounts.OpenIDEIDASConfig",
+            }
+        }
+        session.save()
+
+        callback_url = reverse("eidas_oidc:callback")
+
+        self.assertEqual(
+            User.objects.count(),
+            1,
+            msg="Exactly one user should exist before authentication",
+        )
+
+        callback_response = self.client.get(
+            callback_url, {"code": "mock", "state": "mock"}
+        )
+
+        self.assertRedirects(
+            callback_response,
+            reverse("pages-root"),
+            fetch_redirect_response=False,
+            msg_prefix="Existing user should be redirected to homepage after successful authentication",
+        )
+
+        self.assertEqual(
+            User.objects.count(),
+            1,
+            msg="No new user should be created when existing user with matching pseudo_id logs in",
+        )
+
+        user = User.objects.get()
+
+        self.assertEqual(
+            user.id,
+            existing_user.id,
+            msg="The authenticated user must be the same as the existing user",
+        )
+        self.assertEqual(
+            user.eidas_pseudo_id,
+            "eidas-pseudo-456",
+            msg="User's eIDAS pseudo ID must remain unchanged",
+        )
+
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
+    def test_new_eidas_company_user_is_created(
+        self,
+        mock_get_token,
+        mock_verify_token,
+        mock_store_tokens,
+        mock_get_userinfo,
+    ):
+        mock_get_userinfo.return_value = {
+            "sub": "eidas-company-789",
+            "company_name": "Acme Corporation",
+            "legal_entity_id": "NL123456789B01",
+        }
+
+        session = self.client.session
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "accounts.OpenIDEIDASConfig",
+            }
+        }
+        session.save()
+
+        callback_url = reverse("eidas_oidc:callback")
+
+        self.assertEqual(
+            User.objects.count(), 0, msg="No users should exist before authentication"
+        )
+
+        callback_response = self.client.get(
+            callback_url, {"code": "mock", "state": "mock"}
+        )
+
+        self.assertRedirects(
+            callback_response,
+            reverse("pages-root"),
+            fetch_redirect_response=False,
+            msg_prefix="Company user should be redirected to homepage after successful authentication",
+        )
+
+        self.assertEqual(
+            User.objects.count(),
+            1,
+            msg="Exactly one user should be created after authentication",
+        )
+
+        new_user = User.objects.get()
+
+        self.assertEqual(
+            new_user.eidas_pseudo_id,
+            "eidas-company-789",
+            msg="User's eIDAS pseudo ID must match the value from the configured pseudo_identifier_claim",
+        )
+        self.assertEqual(
+            new_user.company_name,
+            "Acme Corporation",
+            msg="User's company name must match the value from the configured company_name_claim",
+        )
+        self.assertEqual(
+            new_user.eidas_company_id,
+            "NL123456789B01",
+            msg="User's company ID must match the value from the configured legal_entity_identifier_claim",
+        )
+        self.assertEqual(
+            new_user.login_type,
+            LoginTypeChoices.eidas_company,
+            msg="User with company claims must have login_type set to eidas_company",
+        )
+        self.assertEqual(
+            new_user.first_name,
+            "",
+            msg="Company user should not have first_name set",
+        )
+        self.assertEqual(
+            new_user.last_name,
+            "",
+            msg="Company user should not have last_name set",
+        )
+        self.assertEqual(
+            new_user.bsn,
+            "",
+            msg="Company user should not have BSN set",
+        )
+
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
+    def test_new_eidas_person_without_bsn_is_created(
+        self,
+        mock_get_token,
+        mock_verify_token,
+        mock_store_tokens,
+        mock_get_userinfo,
+    ):
+        mock_get_userinfo.return_value = {
+            "sub": "eidas-pseudo-no-bsn",
+            "given_name": "Maria",
+            "family_name": "Garcia",
+        }
+
+        session = self.client.session
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "accounts.OpenIDEIDASConfig",
+            }
+        }
+        session.save()
+
+        callback_url = reverse("eidas_oidc:callback")
+
+        self.assertEqual(
+            User.objects.count(), 0, msg="No users should exist before authentication"
+        )
+
+        callback_response = self.client.get(
+            callback_url, {"code": "mock", "state": "mock"}
+        )
+
+        self.assertRedirects(
+            callback_response,
+            reverse("pages-root"),
+            fetch_redirect_response=False,
+            msg_prefix="User should be redirected to homepage after successful authentication",
+        )
+
+        self.assertEqual(
+            User.objects.count(),
+            1,
+            msg="Exactly one user should be created after authentication",
+        )
+
+        new_user = User.objects.get()
+
+        self.assertEqual(
+            new_user.eidas_pseudo_id,
+            "eidas-pseudo-no-bsn",
+            msg="User's eIDAS pseudo ID must match the value from the configured pseudo_identifier_claim",
+        )
+        self.assertEqual(
+            new_user.first_name,
+            "Maria",
+            msg="User's first name must match the value from the configured natural_person_first_name_claim",
+        )
+        self.assertEqual(
+            new_user.last_name,
+            "Garcia",
+            msg="User's last name must match the value from the configured natural_person_family_name_claim",
+        )
+        self.assertEqual(
+            new_user.login_type,
+            LoginTypeChoices.eidas_person_pseudo_id,
+            msg="User without BSN claim must have login_type set to eidas_person_pseudo_id",
+        )
+        self.assertEqual(
+            new_user.bsn,
+            "",
+            msg="User without BSN claim should have empty BSN field",
+        )
+        self.assertEqual(
+            new_user.company_name,
+            "",
+            msg="Person user should not have company_name set",
+        )
+        self.assertEqual(
+            new_user.eidas_company_id,
+            "",
+            msg="Person user should not have eidas_company_id set",
+        )
+
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
+    def test_authentication_fails_when_pseudo_id_missing(
+        self,
+        mock_get_token,
+        mock_verify_token,
+        mock_store_tokens,
+        mock_get_userinfo,
+    ):
+        mock_get_userinfo.return_value = {
+            "given_name": "John",
+            "family_name": "Doe",
+        }
+
+        session = self.client.session
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "accounts.OpenIDEIDASConfig",
+            }
+        }
+        session.save()
+
+        callback_url = reverse("eidas_oidc:callback")
+
+        self.assertEqual(
+            User.objects.count(), 0, msg="No users should exist before authentication"
+        )
+
+        callback_response = self.client.get(
+            callback_url, {"code": "mock", "state": "mock"}
+        )
+
+        self.assertRedirects(
+            callback_response,
+            reverse("oidc-error"),
+            fetch_redirect_response=False,
+            msg_prefix="User should be redirected to error page when authentication fails",
+        )
+
+        self.assertEqual(
+            User.objects.count(),
+            0,
+            msg="No user should be created when pseudo_id claim is missing",
+        )
+
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
+    def test_existing_user_information_is_updated(
+        self,
+        mock_get_token,
+        mock_verify_token,
+        mock_store_tokens,
+        mock_get_userinfo,
+    ):
+        existing_user = UserFactory.create(
+            eidas_pseudo_id="eidas-pseudo-update",
+            login_type=LoginTypeChoices.eidas_person_pseudo_id,
+            first_name="OldFirstName",
+            last_name="OldLastName",
+        )
+
+        mock_get_userinfo.return_value = {
+            "sub": "eidas-pseudo-update",
+            "bsn": "392228634",
+            "given_name": "NewFirstName",
+            "family_name": "NewLastName",
+        }
+
+        session = self.client.session
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "accounts.OpenIDEIDASConfig",
+            }
+        }
+        session.save()
+
+        callback_url = reverse("eidas_oidc:callback")
+
+        self.assertEqual(
+            User.objects.count(),
+            1,
+            msg="Exactly one user should exist before authentication",
+        )
+
+        callback_response = self.client.get(
+            callback_url, {"code": "mock", "state": "mock"}
+        )
+
+        self.assertRedirects(
+            callback_response,
+            reverse("pages-root"),
+            fetch_redirect_response=False,
+            msg_prefix="User should be redirected to homepage after successful authentication",
+        )
+
+        self.assertEqual(
+            User.objects.count(),
+            1,
+            msg="No new user should be created when existing user logs in",
+        )
+
+        user = User.objects.get()
+
+        self.assertEqual(
+            user.id,
+            existing_user.id,
+            msg="The authenticated user must be the same as the existing user",
+        )
+        self.assertEqual(
+            user.first_name,
+            "NewFirstName",
+            msg="User's first name should be updated to match new claims",
+        )
+        self.assertEqual(
+            user.last_name,
+            "NewLastName",
+            msg="User's last name should be updated to match new claims",
+        )
+        self.assertEqual(
+            user.bsn,
+            "392228634",
+            msg="User's BSN should be updated when provided in new claims",
+        )
+        self.assertEqual(
+            user.login_type,
+            LoginTypeChoices.eidas_person_bsn,
+            msg="Login type should be updated to eidas_person_bsn when BSN is added",
+        )
+
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
+    def test_company_claims_take_priority_over_person_claims(
+        self,
+        mock_get_token,
+        mock_verify_token,
+        mock_store_tokens,
+        mock_get_userinfo,
+    ):
+        mock_get_userinfo.return_value = {
+            "sub": "eidas-pseudo-mixed",
+            "company_name": "Priority Company",
+            "legal_entity_id": "NL999999999B01",
+            "bsn": "123456789",
+            "given_name": "John",
+            "family_name": "Doe",
+        }
+
+        session = self.client.session
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "accounts.OpenIDEIDASConfig",
+            }
+        }
+        session.save()
+
+        callback_url = reverse("eidas_oidc:callback")
+
+        self.assertEqual(
+            User.objects.count(), 0, msg="No users should exist before authentication"
+        )
+
+        callback_response = self.client.get(
+            callback_url, {"code": "mock", "state": "mock"}
+        )
+
+        self.assertRedirects(
+            callback_response,
+            reverse("pages-root"),
+            fetch_redirect_response=False,
+            msg_prefix="User should be redirected to homepage after successful authentication",
+        )
+
+        self.assertEqual(
+            User.objects.count(),
+            1,
+            msg="Exactly one user should be created after authentication",
+        )
+
+        new_user = User.objects.get()
+
+        self.assertEqual(
+            new_user.login_type,
+            LoginTypeChoices.eidas_company,
+            msg="When both company and person claims present, login_type must be eidas_company",
+        )
+        self.assertEqual(
+            new_user.company_name,
+            "Priority Company",
+            msg="Company name should be set from company claims",
+        )
+        self.assertEqual(
+            new_user.eidas_company_id,
+            "NL999999999B01",
+            msg="Company ID should be set from company claims",
+        )
+        self.assertEqual(
+            new_user.first_name,
+            "",
+            msg="Person first_name should not be set when company claims take priority",
+        )
+        self.assertEqual(
+            new_user.last_name,
+            "",
+            msg="Person last_name should not be set when company claims take priority",
+        )
+        self.assertEqual(
+            new_user.bsn,
+            "",
+            msg="Person BSN should not be set when company claims take priority",
+        )
+
+    def test_user_cancellation_shows_appropriate_error_message(self):
+        session = self.client.session
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "accounts.OpenIDEIDASConfig",
+            }
+        }
+        session.save()
+
+        callback_url = reverse("eidas_oidc:callback")
+
+        self.assertEqual(
+            User.objects.count(), 0, msg="No users should exist before authentication"
+        )
+
+        callback_response = self.client.get(
+            callback_url,
+            {
+                "error": "access_denied",
+                "error_description": "The user cancelled",
+                "state": "mock",
+            },
+        )
+
+        self.assertRedirects(
+            callback_response,
+            reverse("oidc-error"),
+            fetch_redirect_response=False,
+            msg_prefix="User should be redirected to error page when authentication is cancelled",
+        )
+
+        self.assertEqual(
+            User.objects.count(),
+            0,
+            msg="No user should be created when user cancels authentication",
+        )
+
+        error_response = self.client.get(callback_response.url)
+
+        self.assertRedirects(
+            error_response,
+            reverse("login"),
+            fetch_redirect_response=False,
+            msg_prefix="Error page should redirect to login page",
+        )
+
+        login_response = self.client.get(error_response.url)
+        content = login_response.content.decode()
+
+        self.assertIn(
+            "U heeft het inloggen met eIDAS geannuleerd",
+            content,
+            msg="Cancellation error message should be displayed to user",
+        )
+
+    def test_logout_with_sso_logout_configured(self):
+        self.config.oidc_op_logout_endpoint = "http://localhost:8080/eidas-logout"
+        self.config.save()
+
+        user = UserFactory.create(
+            eidas_pseudo_id="eidas-logout-test",
+            login_type=LoginTypeChoices.eidas_person_pseudo_id,
+        )
+        self.client.force_login(user)
+        session = self.client.session
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "accounts.OpenIDEIDASConfig",
+            }
+        }
+        session["oidc_id_token"] = "test-id-token"
+        session.save()
+
+        logout_url = reverse("eidas_oidc:logout")
+
+        logout_response = self.client.get(logout_url)
+
+        self.assertRedirects(
+            logout_response,
+            "http://localhost:8080/eidas-logout"
+            + "?"
+            + urlencode(
+                dict(
+                    id_token_hint="test-id-token",
+                    post_logout_redirect_uri=f"http://testserver{settings.LOGOUT_REDIRECT_URL}",
+                )
+            ),
+            fetch_redirect_response=False,
+            msg_prefix="Should redirect to OIDC provider logout endpoint with id_token_hint",
+        )
+
+        self.assertNotIn(
+            "oidc_states",
+            self.client.session,
+            msg="OIDC states should be cleared from session after logout",
+        )
+        self.assertNotIn(
+            "oidc_id_token",
+            self.client.session,
+            msg="OIDC ID token should be cleared from session after logout",
+        )
+        self.assertFalse(
+            logout_response.wsgi_request.user.is_authenticated,
+            msg="User should not be authenticated after logout",
+        )
+
+    def test_logout_without_sso_logout_configured(self):
+        self.config.oidc_op_logout_endpoint = ""
+        self.config.save()
+
+        user = UserFactory.create(
+            eidas_pseudo_id="eidas-logout-no-sso",
+            login_type=LoginTypeChoices.eidas_person_pseudo_id,
+        )
+        self.client.force_login(user)
+        session = self.client.session
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "accounts.OpenIDEIDASConfig",
+            }
+        }
+        session["oidc_id_token"] = "test-id-token"
+        session.save()
+
+        logout_url = reverse("eidas_oidc:logout")
+
+        logout_response = self.client.get(logout_url)
+
+        self.assertRedirects(
+            logout_response,
+            settings.LOGOUT_REDIRECT_URL,
+            fetch_redirect_response=False,
+            msg_prefix="Should redirect to local logout URL when SSO logout not configured",
+        )
+
+        self.assertNotIn(
+            "oidc_states",
+            self.client.session,
+            msg="OIDC states should be cleared from session after logout",
+        )
+        self.assertNotIn(
+            "oidc_id_token",
+            self.client.session,
+            msg="OIDC ID token should be cleared from session after logout",
+        )
+        self.assertFalse(
+            logout_response.wsgi_request.user.is_authenticated,
+            msg="User should not be authenticated after logout",
+        )
+
+    def test_generic_authentication_error_shows_generic_message(self):
+        session = self.client.session
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "accounts.OpenIDEIDASConfig",
+            }
+        }
+        session.save()
+
+        callback_url = reverse("eidas_oidc:callback")
+
+        self.assertEqual(
+            User.objects.count(), 0, msg="No users should exist before authentication"
+        )
+
+        callback_response = self.client.get(
+            callback_url,
+            {
+                "error": "server_error",
+                "error_description": "Internal server error",
+                "state": "mock",
+            },
+        )
+
+        self.assertRedirects(
+            callback_response,
+            reverse("oidc-error"),
+            fetch_redirect_response=False,
+            msg_prefix="User should be redirected to error page when generic error occurs",
+        )
+
+        self.assertEqual(
+            User.objects.count(),
+            0,
+            msg="No user should be created when authentication error occurs",
+        )
+
+        error_response = self.client.get(callback_response.url)
+
+        self.assertRedirects(
+            error_response,
+            reverse("login"),
+            fetch_redirect_response=False,
+            msg_prefix="Error page should redirect to login page",
+        )
+
+        login_response = self.client.get(error_response.url)
+        content = login_response.content.decode()
+
+        self.assertIn(
+            "Inloggen bij deze organisatie is niet gelukt",
+            content,
+            msg="Generic eIDAS error message should be displayed for unmapped errors",
+        )
+
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
+    def test_duplicate_pseudo_id_prevents_user_creation(
+        self,
+        mock_get_token,
+        mock_verify_token,
+        mock_store_tokens,
+        mock_get_userinfo,
+    ):
+        existing_user = UserFactory.create(
+            eidas_pseudo_id="duplicate-pseudo-id",
+            login_type=LoginTypeChoices.eidas_person_pseudo_id,
+            first_name="Existing",
+            last_name="User",
+        )
+
+        mock_get_userinfo.return_value = {
+            "sub": "duplicate-pseudo-id",
+            "given_name": "New",
+            "family_name": "User",
+        }
+
+        session = self.client.session
+        session["oidc_states"] = {
+            "mock": {
+                "nonce": "nonce",
+                "config_class": "accounts.OpenIDEIDASConfig",
+            }
+        }
+        session.save()
+
+        callback_url = reverse("eidas_oidc:callback")
+
+        self.assertEqual(
+            User.objects.count(),
+            1,
+            msg="Exactly one user should exist before authentication",
+        )
+
+        callback_response = self.client.get(
+            callback_url, {"code": "mock", "state": "mock"}
+        )
+
+        self.assertRedirects(
+            callback_response,
+            reverse("pages-root"),
+            fetch_redirect_response=False,
+            msg_prefix="Existing user should be logged in when pseudo_id matches",
+        )
+
+        self.assertEqual(
+            User.objects.count(),
+            1,
+            msg="No new user should be created when pseudo_id already exists",
+        )
+
+        user = User.objects.get()
+
+        self.assertEqual(
+            user.id,
+            existing_user.id,
+            msg="The authenticated user must be the existing user with matching pseudo_id",
+        )
+        self.assertEqual(
+            user.eidas_pseudo_id,
+            "duplicate-pseudo-id",
+            msg="User's eIDAS pseudo_id must remain unchanged",
+        )

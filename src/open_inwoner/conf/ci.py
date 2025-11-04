@@ -49,6 +49,7 @@ AUTHENTICATION_BACKENDS = [
     "eherkenning.mock.backends.eHerkenningBackend",
     "open_inwoner.accounts.backends.DigiDOIDCBackend",
     "open_inwoner.accounts.backends.EHerkenningOIDCBackend",
+    "open_inwoner.accounts.backends.EIDASOIDCBackend",
     "open_inwoner.accounts.backends.CustomOIDCBackend",
 ]
 

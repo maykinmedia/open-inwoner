@@ -13,9 +13,17 @@ from django.views.generic import View
 import structlog
 from digid_eherkenning.oidc.models import BaseConfig
 from digid_eherkenning.oidc.views import OIDCAuthenticationCallbackView
-from mozilla_django_oidc_db.views import _OIDC_ERROR_SESSION_KEY, OIDCInit
+from mozilla_django_oidc_db.views import (
+    _OIDC_ERROR_SESSION_KEY,
+    AdminCallbackView,
+    OIDCInit,
+)
 
-from open_inwoner.accounts.models import OpenIDDigiDConfig, OpenIDEHerkenningConfig
+from open_inwoner.accounts.models import (
+    OpenIDDigiDConfig,
+    OpenIDEHerkenningConfig,
+    OpenIDEIDASConfig,
+)
 
 from .auth import BlockEenmanszaakLoginMixin
 
@@ -32,6 +40,10 @@ GENERIC_EHERKENNING_ERROR_MSG = _(
     "Inloggen bij deze organisatie is niet gelukt. Probeert u het later nog een keer. "
     "Lukt het nog steeds niet? Neem dan contact op met uw eHerkenning leverancier of "
     "kijk op https://www.eherkenning.nl"
+)
+GENERIC_EIDAS_ERROR_MSG = _(
+    "Inloggen bij deze organisatie is niet gelukt. Probeert u het later nog een keer. "
+    "Lukt het nog steeds niet? Neem dan contact op met uw eIDAS leverancier."
 )
 
 
@@ -159,3 +171,40 @@ digid_logout = OIDCLogoutView.as_view(config_class=OpenIDDigiDConfig)
 eherkenning_init = OIDCInit.as_view(config_class=OpenIDEHerkenningConfig)
 eherkenning_callback = EHerkenningOIDCAuthenticationCallbackView.as_view()
 eherkenning_logout = OIDCLogoutView.as_view(config_class=OpenIDEHerkenningConfig)
+
+
+class EIDASOIDCAuthenticationCallbackView(AdminCallbackView):
+    failure_url = reverse_lazy("oidc-error")
+    error_message_mapping = {
+        ("access_denied", "The user cancelled"): (
+            "U heeft het inloggen met eIDAS geannuleerd."
+        )
+    }
+
+    def get(self, request):
+        response = super().get(request)
+
+        # Map eIDAS-specific error codes to user-friendly messages.
+        # This is a bit inelegant (we're adding error mapping after the parent's
+        # error handling), but it avoids duplicating the entire error handling
+        # logic from AdminCallbackView. We want consistent error handling behavior
+        # with DigiD/eHerkenning views (which use CallbackView from digid_eherkenning),
+        # but eIDAS uses mozilla_django_oidc_db, so we leverage AdminCallbackView's
+        # existing error handling and just add custom message mapping on top.
+        if error_label := self._map_error(request):
+            request.session[_OIDC_ERROR_SESSION_KEY] = error_label
+
+        return response
+
+    def _map_error(self, request) -> str:
+        if not (error := request.GET.get("error")):
+            return ""
+
+        error_description = request.GET.get("error_description", "")
+        mapped_error = self.error_message_mapping.get((error, error_description))
+        return mapped_error or str(GENERIC_EIDAS_ERROR_MSG)
+
+
+eidas_init = OIDCInit.as_view(config_class=OpenIDEIDASConfig)
+eidas_callback = EIDASOIDCAuthenticationCallbackView.as_view()
+eidas_logout = OIDCLogoutView.as_view(config_class=OpenIDEIDASConfig)

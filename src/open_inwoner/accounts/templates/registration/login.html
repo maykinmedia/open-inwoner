@@ -57,6 +57,23 @@
                         {% endif %}
                         {# end digid #}
 
+                        {# eIDAS / Open ID Connect #}
+                        {% get_solo 'accounts.OpenIDEIDASConfig' as eidas_oidc_config %}
+                        {% if eidas_oidc_config.enabled %}
+                            {% render_column start=4 span=5 %}
+                                {% render_card direction='horizontal' tinted=True compact=True %}
+                                    {% url 'eidas_oidc:init' as href %}
+                                    {% with href|addnexturl:next as href_with_next %}
+                                        <a href="{{ href_with_next }}" class="link eidas-logo">
+                                            <img class="digid-logo__image" src="{% static 'accounts/eidas_logo.svg' %}" alt="eIDAS inlogpagina">
+                                        </a>
+                                        {% link href=href_with_next text=_('Inloggen met eIDAS') primary=True icon='east' extra_classes="link--next link--eidas" %}
+                                    {% endwith %}
+                                {% endrender_card %}
+                            {% endrender_column %}
+                        {% endif %}
+                        {# end eidas #}
+
                         <div class="column column--start-4 column--span-5" id="column__openid">
                             {% get_solo 'mozilla_django_oidc_db.OpenIDConnectConfig' as oidc_config %}
                             {% get_solo 'configurations.SiteConfiguration' as site_config %}

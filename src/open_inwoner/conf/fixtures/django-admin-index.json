@@ -441,6 +441,10 @@
                 "eherkenningconfig"
             ],
             [
+                "accounts",
+                "openideidasconfig"
+            ],
+            [
                 "haalcentraal",
                 "haalcentraalconfig"
             ],

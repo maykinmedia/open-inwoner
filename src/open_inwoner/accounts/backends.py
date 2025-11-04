@@ -1,11 +1,11 @@
-from typing import Literal, NamedTuple
+from typing import Literal, NamedTuple, TypedDict, cast
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import AbstractUser
-from django.core.exceptions import SuspiciousOperation
+from django.core.exceptions import SuspiciousOperation, ValidationError
 from django.urls import reverse, reverse_lazy
 
 import structlog
@@ -23,7 +23,7 @@ from open_inwoner.utils.hash import generate_email_from_string
 from open_inwoner.utils.views import LogMixin
 
 from .choices import LoginTypeChoices
-from .models import OpenIDDigiDConfig, OpenIDEHerkenningConfig, User
+from .models import OpenIDDigiDConfig, OpenIDEHerkenningConfig, OpenIDEIDASConfig, User
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -314,3 +314,186 @@ class EHerkenningOIDCBackend(LogMixin, BaseBackend):
         self._persist_eherkenning_params_to_session(user)
         self._log_successful_authenticate(user)
         return super().update_user(user, claims)
+
+
+class EIDASClaimValues(TypedDict):
+    """Extracted claim values from eIDAS OIDC claims."""
+
+    pseudo_id: str | None
+    bsn: str | None
+    company_name: str | None
+    legal_entity_id: str | None
+    first_name: str | None
+    family_name: str | None
+
+
+class EIDASOIDCBackend(LogMixin, BaseBackend):
+    OIP_UNIQUE_ID_USER_FIELDNAME = dynamic_setting[Literal["eidas_pseudo_id"]]()
+    OIP_LOGIN_TYPE = dynamic_setting[LoginTypeChoices]()
+    config_class = OpenIDEIDASConfig
+
+    def _check_candidate_backend(self) -> bool:
+        parent = super()._check_candidate_backend()
+        return parent and self.config_class is OpenIDEIDASConfig
+
+    def _extract_eidas_claim_values(self, claims: JSONObject) -> EIDASClaimValues:
+        """
+        Extract all eIDAS claim values from the claims dict.
+
+        Returns a typed dictionary with all possible claim values (or None if not present).
+        """
+        eidas_config = cast(OpenIDEIDASConfig, self.config_class.get_solo())
+
+        return EIDASClaimValues(
+            pseudo_id=glom(
+                claims,
+                Path(*eidas_config.pseudo_identifier_claim),
+                default=None,
+            ),
+            bsn=glom(
+                claims,
+                Path(*eidas_config.natural_person_bsn_identifier_claim),
+                default=None,
+            ),
+            company_name=glom(
+                claims,
+                Path(*eidas_config.company_name_claim),
+                default=None,
+            ),
+            legal_entity_id=glom(
+                claims,
+                Path(*eidas_config.legal_entity_identifier_claim),
+                default=None,
+            ),
+            first_name=glom(
+                claims,
+                Path(*eidas_config.natural_person_first_name_claim),
+                default=None,
+            ),
+            family_name=glom(
+                claims,
+                Path(*eidas_config.natural_person_family_name_claim),
+                default=None,
+            ),
+        )
+
+    def _construct_user_creation_kwargs_from_claims(
+        self, claims: JSONObject
+    ) -> dict | None:
+        """
+        Extract user filter and create kwargs based on eIDAS claim patterns.
+        """
+        # Extract all claim values
+        claim_values = self._extract_eidas_claim_values(claims)
+        logger.info("eidas_oidc_claims_received", claim_keys=list(claims.keys()))
+
+        # Validate presence of required pseudo_id
+        if not claim_values["pseudo_id"]:
+            msg = (
+                "Claims did not include a value for the configured pseudo identifier claim. "
+                "Pseudo identifier is required for all eIDAS authentications."
+            )
+            self.log_system_error(msg)
+            raise SuspiciousOperation(msg)
+
+        # Validate that at least one identifying claim is present (excluding pseudo_id).
+        # This is mainly a matter of defensive programming: although there are required
+        # attributes, these may nevertheless be missing due to e.g. missing scopes in
+        # in the configuration. We catch that early and report an error.
+        identifying_claims = {k: v for k, v in claim_values.items() if k != "pseudo_id"}
+
+        if not any(identifying_claims.values()):
+            logger.error(
+                "eIDAS claims did not contain any identifying information",
+                claim_values=claim_values,
+                available_claim_keys=list(claims.keys()),
+            )
+
+            raise SuspiciousOperation(
+                "eIDAS claims did not contain any identifying information. "
+                "Expected at least one of: BSN, company name + legal entity ID, or first/family name. "
+                f"Available claim keys: {', '.join(claims.keys())}. "
+                f"Check the claim path configuration in the admin."
+            )
+
+        base_create_kwargs = {
+            "eidas_pseudo_id": claim_values["pseudo_id"],
+            "email": generate_email_from_string(
+                claim_values["pseudo_id"], domain="localhost"
+            ),
+        }
+
+        # Try company first, as the required fields are unambiguous
+        has_company_name = bool(claim_values["company_name"])
+        has_legal_entity = bool(claim_values["legal_entity_id"])
+        if has_company_name or has_legal_entity:
+            if not (has_company_name and has_legal_entity):
+                raise SuspiciousOperation(
+                    "eIDAS company claims must include both company name and legal entity ID. "
+                    f"Received: company_name={'present' if has_company_name else 'missing'}, "
+                    f"legal_entity_id={'present' if has_legal_entity else 'missing'}."
+                )
+
+            return base_create_kwargs | {
+                "login_type": LoginTypeChoices.eidas_company,
+                "company_name": claim_values["company_name"],
+                "eidas_company_id": claim_values["legal_entity_id"],
+            }
+
+        # Assume this is a person
+        person_kwargs = base_create_kwargs | {
+            "login_type": LoginTypeChoices.eidas_person_pseudo_id,
+            "first_name": claim_values["first_name"] or "",
+            "last_name": claim_values["family_name"] or "",
+        }
+
+        # Do we have a BSN? If so, add it and update login type to reflect this
+        if claim_values["bsn"]:
+            person_kwargs = person_kwargs | {
+                "bsn": claim_values["bsn"],
+                "login_type": LoginTypeChoices.eidas_person_bsn,
+            }
+
+        return person_kwargs
+
+    def filter_users_by_claims(self, claims):
+        claim_values = self._extract_eidas_claim_values(claims)
+        if not claim_values["pseudo_id"]:
+            return User.objects.none()
+
+        return User.objects.filter(eidas_pseudo_id=claim_values["pseudo_id"])
+
+    def create_user(self, claims: JSONObject):
+        if not (
+            create_kwargs := self._construct_user_creation_kwargs_from_claims(claims)
+        ):
+            return None
+
+        logger.info(
+            "Creating new eIDAS user", pseudo_id=create_kwargs["eidas_pseudo_id"]
+        )
+        user = User.objects.create_user(**create_kwargs)
+
+        return user
+
+    def update_user(self, user: User, claims: JSONObject):
+        if not (
+            create_kwargs := self._construct_user_creation_kwargs_from_claims(claims)
+        ):
+            return None
+
+        for attr, val in create_kwargs.items():
+            setattr(user, attr, val)
+
+        try:
+            user.full_clean()
+        except ValidationError as exc:
+            raise SuspiciousOperation(
+                "Unable to update user due to a validation error"
+            ) from exc
+        else:
+            logger.info(
+                "Updating eIDAS user", pseudo_id=create_kwargs["eidas_pseudo_id"]
+            )
+            user.save()
+        return user

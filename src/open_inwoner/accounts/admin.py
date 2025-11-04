@@ -9,12 +9,13 @@ from django.utils.translation import gettext_lazy as _, ngettext
 
 from image_cropping import ImageCroppingMixin
 from privates.admin import PrivateMediaMixin
+from solo.admin import SingletonModelAdmin
 
 from open_inwoner.utils.mixins import UUIDAdminFirstInOrder
 
 from .choices import ContactTypeChoices
 from .forms import GroupAdminForm
-from .models import Action, Document, Invite, Message, User
+from .models import Action, Document, Invite, Message, OpenIDEIDASConfig, User
 
 
 class ReadOnlyFileMixin:
@@ -307,3 +308,111 @@ class InviteAdmin(admin.ModelAdmin):
     list_display = ("inviter", "invitee_email", "invitee", "accepted", "created_on")
     list_filter = ("inviter", "invitee")
     readonly_fields = ("key",)
+
+
+@admin.register(OpenIDEIDASConfig)
+class OpenIDEIDASConfigAdmin(SingletonModelAdmin):
+    fieldsets = (
+        (
+            _("Activation"),
+            {
+                "fields": ("enabled",),
+            },
+        ),
+        (
+            _("Common settings"),
+            {
+                "fields": (
+                    "oidc_rp_client_id",
+                    "oidc_rp_client_secret",
+                    "oidc_rp_scopes_list",
+                    "oidc_rp_sign_algo",
+                    "oidc_rp_idp_sign_key",
+                ),
+            },
+        ),
+        (
+            _("eIDAS pseudo identifier (required)"),
+            {
+                "fields": ("pseudo_identifier_claim",),
+                "description": _(
+                    "The pseudo identifier is REQUIRED for all eIDAS authentication."
+                    "This pseudonymous identifier is used for both natural persons "
+                    "and legal persons."
+                ),
+            },
+        ),
+        (
+            _("eIDAS natural person identifier claims"),
+            {
+                "fields": (
+                    "natural_person_bsn_identifier_claim",
+                    "natural_person_first_name_claim",
+                    "natural_person_family_name_claim",
+                    "natural_person_date_of_birth_claim",
+                ),
+                "description": _(
+                    "The BSN (Burgerservicenummer) is optional, but might be included "
+                    "if users have linked it to their EIDAS authentication instrument. "
+                    "When present, this will be used in addition to the pseudo "
+                    "identifier."
+                ),
+            },
+        ),
+        (
+            _("eIDAS legal person identifier claims"),
+            {
+                "fields": (
+                    "legal_entity_identifier_claim",
+                    "company_name_claim",
+                ),
+                "description": _(
+                    "Identifiers and attributes for legal persons (companies/"
+                    "organizations) authenticating via eIDAS."
+                ),
+            },
+        ),
+        (
+            _("eIDAS authentication metadata"),
+            {
+                "fields": ("loa_claim",),
+                "description": _(
+                    "Level of Assurance (LoA) indicates authentication strength/"
+                    "security level."
+                ),
+            },
+        ),
+        (
+            _("Endpoints"),
+            {
+                "fields": (
+                    "oidc_op_discovery_endpoint",
+                    "oidc_op_jwks_endpoint",
+                    "oidc_op_authorization_endpoint",
+                    "oidc_op_token_endpoint",
+                    "oidc_token_use_basic_auth",
+                    "oidc_op_user_endpoint",
+                    "oidc_op_logout_endpoint",
+                ),
+            },
+        ),
+        (
+            _("Keycloak specific settings"),
+            {
+                "fields": ("oidc_keycloak_idp_hint",),
+                "classes": ["collapse in"],
+            },
+        ),
+        (
+            _("Advanced settings"),
+            {
+                "fields": (
+                    "oidc_use_nonce",
+                    "oidc_nonce_size",
+                    "oidc_state_size",
+                    "userinfo_claims_source",
+                ),
+                "classes": ["collapse in"],
+            },
+        ),
+    )

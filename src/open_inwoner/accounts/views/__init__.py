@@ -25,6 +25,9 @@ from .auth_oidc import (
     eherkenning_callback,
     eherkenning_init,
     eherkenning_logout,
+    eidas_callback,
+    eidas_init,
+    eidas_logout,
 )
 from .contacts import (
     ContactApprovalView,
@@ -98,4 +101,7 @@ __all__ = [
     "eherkenning_init",
     "eherkenning_callback",
     "eherkenning_logout",
+    "eidas_init",
+    "eidas_callback",
+    "eidas_logout",
 ]
