@@ -7,4 +7,3 @@ class FeedItemType(models.TextChoices):
     case_status_changed = "case_status_change", _("Case status changed")
     case_document_added = "case_document_added", _("Case document added")
     plan_expiring = "plan_expiring", _("Plan nears deadline")
-    external_task = "external_task", _("External task")
