@@ -213,6 +213,18 @@ jobs:
     name: Build and check documentation
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgis/postgis:15-3.4
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        # Needed because the postgres container does not provide a healthcheck
+        options:
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+          --name postgres
+
     steps:
       - uses: actions/checkout@v3
         with:

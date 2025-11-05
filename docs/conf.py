@@ -9,9 +9,15 @@ import os
 import sys
 
 import django
+from django.core.management import call_command
 
 sys.path.insert(0, os.path.abspath("../src"))
+
+# Set database configuration BEFORE any imports that might load Django settings
 os.environ["LOG_REQUESTS"] = "false"
+os.environ["DB_USER"] = "postgres"
+os.environ["DB_PASSWORD"] = ""
+os.environ["DB_NAME"] = "postgres"
 
 import open_inwoner  # noqa isort:skip
 
@@ -19,6 +25,9 @@ from open_inwoner.setup import setup_env  # noqa isort:skip
 
 setup_env()
 django.setup()
+
+# Create database tables needed for docs build
+call_command("migrate", "--run-syncdb", verbosity=0, interactive=False)
 
 # -- Project information -----------------------------------------------------
 
