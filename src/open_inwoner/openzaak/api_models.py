@@ -366,7 +366,7 @@ class OpenSubmission(Model):
 
 
 @dataclass
-class OpenTask(Model):
+class OpenstaandeTaak(Model):
     url: str
     uuid: str
     identificatie: str

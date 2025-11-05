@@ -19,7 +19,7 @@ from open_inwoner.cms.plugins.api_models import (
     UrlTaak,
 )
 from open_inwoner.cms.plugins.models import TasksConfig
-from open_inwoner.openzaak.api_models import OpenTask
+from open_inwoner.openzaak.api_models import OpenstaandeTaak
 from open_inwoner.openzaak.clients import build_forms_clients
 from open_inwoner.utils.api import ClientError
 
@@ -125,7 +125,7 @@ class TasksPlugin(CMSPluginBase):
 
         return context
 
-    def fetch_zgw_taken(self, bsn: str) -> list[OpenTask]:
+    def fetch_zgw_taken(self, bsn: str) -> list[OpenstaandeTaak]:
         """
         Fetch `openstaande taken` from ZGW API's
         """
