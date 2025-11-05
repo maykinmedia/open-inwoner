@@ -79,7 +79,7 @@ class UpdateUserFromLoginSignalAPITestCase(
 
         self.assertTimelineLog("retrieved klant for user")
         self.assertTimelineLog(
-            "updated user from klant API with fields: email, phonenumber"
+            "updated user from klant API with fields: email, phonenumber, phonenumber_alternative"
         )
 
     def test_update_notification_channel_choice_after_login(self, m):
@@ -178,6 +178,7 @@ class UpdateUserFromLoginSignalAPITestCase(
             ):
                 user.email = "old@example.com"
                 user.phonenumber = "0123456789"
+                user.phonenumber_alternative = ""
                 user.save()
                 self.clearTimelineLogs()
 
@@ -206,7 +207,7 @@ class UpdateUserFromLoginSignalAPITestCase(
 
                 self.assertTimelineLog("retrieved klant for user")
                 self.assertTimelineLog(
-                    "updated user from klant API with fields: email, phonenumber"
+                    "updated user from klant API with fields: email, phonenumber, phonenumber_alternative"
                 )
 
     def test_update_user_after_login_skips_existing_email(self, m):
@@ -238,7 +239,9 @@ class UpdateUserFromLoginSignalAPITestCase(
         self.assertEqual(user.phonenumber, "0612345678")
 
         self.assertTimelineLog("retrieved klant for user")
-        self.assertTimelineLog("updated user from klant API with fields: phonenumber")
+        self.assertTimelineLog(
+            "updated user from klant API with fields: phonenumber, phonenumber_alternative"
+        )
 
     def test_create_klant_for_digid_user(self, m):
         with requests_mock.mock(case_sensitive=True) as m:

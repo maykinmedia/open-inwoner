@@ -72,6 +72,7 @@ class eSuiteServiceTestCase(TestCase, DisableRequestLogMixin):
                 voorvoegsel_achternaam="van der",
                 achternaam="Doe",
                 telefoonnummer="0612345678",
+                telefoonnummer_alternatief="0687654321",
                 emailadres="foo@example.com",
                 toestemming_zaak_notificaties_alleen_digitaal=False,
                 bedrijfsnaam="",
@@ -103,6 +104,7 @@ class eSuiteServiceTestCase(TestCase, DisableRequestLogMixin):
                 voorvoegsel_achternaam="",
                 achternaam="",
                 telefoonnummer="0687654321",
+                telefoonnummer_alternatief="0687654321",
                 emailadres="foo@bar.com",
                 toestemming_zaak_notificaties_alleen_digitaal=False,
                 bedrijfsnaam="AcmeCorp B.V.",
@@ -142,6 +144,7 @@ class eSuiteServiceTestCase(TestCase, DisableRequestLogMixin):
                 voorvoegsel_achternaam="",
                 achternaam="",
                 telefoonnummer="0612345678",
+                telefoonnummer_alternatief="0687654321",
                 emailadres="foo@bar.com",
                 toestemming_zaak_notificaties_alleen_digitaal=False,
                 bedrijfsnaam="AcmeCorp B.V.",
@@ -181,7 +184,7 @@ class eSuiteServiceTestCase(TestCase, DisableRequestLogMixin):
                 voorvoegsel_achternaam="van der",
                 achternaam="Doe",
                 telefoonnummer="0612345678",
-                telefoonnummerAlternatief="",
+                telefoonnummer_alternatief="0687654321",
                 emailadres="foo@example.com",
                 toestemming_zaak_notificaties_alleen_digitaal=False,
                 bedrijfsnaam="",
@@ -212,7 +215,7 @@ class eSuiteServiceTestCase(TestCase, DisableRequestLogMixin):
             url: str
             emailadres: str
             telefoonnummer: str
-            telefoonnummerAlternatief: str
+            telefoonnummer_alternatief: str
             toestemmingZaakNotificatiesAlleenDigitaal: str
 
         klant = Klant(
@@ -224,7 +227,7 @@ class eSuiteServiceTestCase(TestCase, DisableRequestLogMixin):
             url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             emailadres="old@example.com",
             telefoonnummer="0100000000",
-            telefoonnummerAlternatief="0687654321",
+            telefoonnummer_alternatief="0687654321",
             toestemmingZaakNotificatiesAlleenDigitaal=False,
         )
 
@@ -237,4 +240,4 @@ class eSuiteServiceTestCase(TestCase, DisableRequestLogMixin):
                 update_fields=["telefoonnummer", "telefoonnummerAlternatief"],
             )
 
-            self.assertEqual(klant.telefoonnummerAlternatief, "")
+            self.assertEqual(klant.telefoonnummer_alternatief, "0687654321")

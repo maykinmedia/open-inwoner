@@ -8,6 +8,12 @@ Onderhoud
 
 * [:pr:`2014`]: ``django`` bijgewerkt naar versie ``4.2.26``.
 
+Bugfixes
+--------
+
+* [:taiga-dimpact:`358`, :pr:`2009`]: Het alternatieve telefoonnummer wordt nu correct
+  verwerkt vanuit de eSuite.
+
 1.35.1 (2025-10-29)
 ===================
 
