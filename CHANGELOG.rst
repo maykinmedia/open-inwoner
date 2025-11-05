@@ -122,6 +122,8 @@ Bugfixes
   objecten aan te maken.
 * [:taiga-is:`3507`: :pr:`1993`]: De vaste NLDS-huisstijlkleuren (primaire-, secundaire en accent-
   kleuren) kunnen nu worden overschreven met de kleuren van de colorpicker.
+* [:taiga-dimpact:`358`, :pr:`2009`]: Het alternatieve telefoonnummer wordt nu correct verwerkt
+  vanuit de eSuite.
 
 Onderhoud
 ---------
