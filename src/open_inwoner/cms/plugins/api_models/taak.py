@@ -98,6 +98,7 @@ class Formulier(BaseModel):
 class Portaalformulier(BaseModel):
     data: object
     formulier: Formulier
+    verzonden_data: object
 
 
 class TaakUrl(BaseModel):

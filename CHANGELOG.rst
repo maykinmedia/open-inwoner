@@ -57,6 +57,8 @@ Nieuwe features
   CMS-plugin voor links naar andere portalen
 * [:taiga-is:`3556`, :pr:`1995`]: Uitgaande requests worden nu gelogd als gestructureerde
   events met ``structlog``, waardoor ze beter verwerkt kunnen worden door observability tools.
+* [:taiga-us:`3512`, :pr:`2003`]: De taken die worden weergegeven onder 'Openstaande acties' en
+  'Mijn taken' zijn nu samengevoegd en worden nu samen weergegeven onder 'Mijn taken'.
 
 Bugfixes
 --------

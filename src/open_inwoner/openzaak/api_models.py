@@ -366,11 +366,11 @@ class OpenSubmission(Model):
 
 
 @dataclass
-class OpenTask(Model):
+class OpenstaandeTaak(Model):
     url: str
     uuid: str
     identificatie: str
     naam: str
-    startdatum: date
+    startdatum: Optional[date]
     formulier_link: str
     zaak_identificatie: str

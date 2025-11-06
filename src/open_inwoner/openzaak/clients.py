@@ -28,8 +28,8 @@ from open_inwoner.utils.decorators import cache as cache_result
 
 from .api_models import (
     InformatieObjectType,
+    OpenstaandeTaak,
     OpenSubmission,
-    OpenTask,
     Resultaat,
     ResultaatType,
     Rol,
@@ -819,7 +819,7 @@ class FormClient(ZgwAPIClient):
 
         return results
 
-    def fetch_open_tasks(self, bsn: str) -> list[OpenTask]:
+    def fetch_open_tasks(self, bsn: str) -> list[OpenstaandeTaak]:
         if not bsn:
             return []
 
@@ -830,7 +830,7 @@ class FormClient(ZgwAPIClient):
         data = get_json_response(response)
         all_data = list(pagination_helper(self, data))
 
-        results = factory(OpenTask, all_data)
+        results = factory(OpenstaandeTaak, all_data)
 
         return results
 
