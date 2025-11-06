@@ -229,6 +229,9 @@ jobs:
           export OPENSSL_CONF=$(pwd)/openssl.conf
           pytest check_sphinx.py -v --tb=auto
         working-directory: docs
+        env:
+          DJANGO_SETTINGS_MODULE: open_inwoner.conf.ci
+
 
   #
   # Docker
