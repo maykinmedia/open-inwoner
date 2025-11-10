@@ -1,13 +1,33 @@
 from django.contrib.auth.models import AnonymousUser
 from django.test import TestCase
+from django.test.utils import override_settings
+from django.urls import reverse
 from django.utils.crypto import get_random_string
+from django.utils.translation import gettext as _
+
+from cms import api
 
 from open_inwoner.accounts.tests.factories import (
     DigidUserFactory,
+    UserFactory,
     eHerkenningUserFactory,
 )
+from open_inwoner.cms.benefits.cms_apps import SSDApphook
+from open_inwoner.cms.cases.cms_apps import CasesApphook
+from open_inwoner.cms.collaborate.cms_apps import CollaborateApphook
+from open_inwoner.cms.extensions.models import CommonExtension
+from open_inwoner.cms.inbox.cms_apps import InboxApphook
+from open_inwoner.cms.products.cms_apps import ProductsApphook
+from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
+from open_inwoner.cms.profile.cms_apps import ProfileApphook
+from open_inwoner.cms.tests import cms_tools
+from open_inwoner.cms.tests.cms_tools import create_apphook_page, create_homepage
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.core.views import _get_category_data_for_user
+from open_inwoner.openklant.constants import KlantenServiceType
+from open_inwoner.openklant.models import KlantenSysteemConfig
 from open_inwoner.pdc.tests.factories import CategoryFactory, ProductFactory
+from open_inwoner.questionnaire.tests.factories import QuestionnaireStepFactory
 
 
 class SitemapCategoryDataTest(TestCase):
@@ -271,3 +291,293 @@ class SitemapCategoryDataTest(TestCase):
                 res = _get_category_data_for_user(root_category, eherkenning_user)
 
                 self.assertEqual(len(res["sub_categories"]), res_company)
+
+
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+class SitemapViewTest(TestCase):
+    def setUp(self):
+        self.user = UserFactory()
+
+        # Homepage is required for sitemap
+        create_homepage()
+
+        self.config = SiteConfiguration.objects.create(name="Test Site")
+
+    def test_sitemap_renders_for_anonymous_user(self):
+        response = self.client.get(reverse("sitemap"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Platform", response.content)
+
+    def test_sitemap_renders_for_authenticated_user(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("sitemap"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Platform", response.content)
+
+    def test_sitemap_includes_categories(self):
+        cms_tools.create_apphook_page(ProductsApphook)
+        category = CategoryFactory(published=True, visible_for_anonymous=True)
+
+        response = self.client.get(reverse("sitemap"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(category.name.encode(), response.content)
+
+    def test_sitemap_includes_platform_pages(self):
+        response = self.client.get(reverse("sitemap"))
+        content = response.content.decode()
+
+        self.assertIn(_("Home page"), content)
+        self.assertIn(_("Login or create an account"), content)
+
+    def test_sitemap_hides_login_for_authenticated_users(self):
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("sitemap"))
+        content = response.content.decode()
+
+        self.assertNotIn(_("Login or create an account"), content)
+
+    def test_sitemap_includes_contact_form_when_enabled(self):
+        config = KlantenSysteemConfig.get_solo()
+        config.register_contact_email = "test@test.nl"
+        config.primary_backend = KlantenServiceType.OPENKLANT2.value
+        config.save()
+
+        response = self.client.get(reverse("sitemap"))
+        content = response.content.decode()
+
+        self.assertIn(_("Contactformulier"), content)
+
+    def test_sitemap_excludes_contact_form_when_disabled(self):
+        config = KlantenSysteemConfig.get_solo()
+        config.register_contact_email = ""
+        config.primary_backend = KlantenServiceType.OPENKLANT2.value
+        config.save()
+
+        response = self.client.get(reverse("sitemap"))
+        self.assertNotIn(b"Contactformulier", response.content)
+
+    def test_sitemap_includes_benefits_page_when_published(self):
+        create_apphook_page(SSDApphook)
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("sitemap"))
+        content = response.content.decode()
+
+        self.assertIn(_("Mijn uitkeringen"), content)
+
+    def test_sitemap_excludes_benefits_page_when_not_published(self):
+        response = self.client.get(reverse("sitemap"))
+        content = response.content.decode()
+
+        self.assertNotIn(_("Mijn uitkeringen"), content)
+
+    def test_sitemap_includes_case_pages_when_published(self):
+        create_apphook_page(CasesApphook)
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("sitemap"))
+        content = response.content.decode()
+
+        self.assertIn(_("Mijn zaken"), content)
+        self.assertIn(_("Mijn vragen"), content)
+
+    def test_sitemap_includes_collaborate_page_when_published(self):
+        create_apphook_page(CollaborateApphook)
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("sitemap"))
+        content = response.content.decode()
+
+        self.assertIn(_("Mijn samenwerkingen"), content)
+
+    def test_sitemap_includes_inbox_page_when_published(self):
+        create_apphook_page(InboxApphook)
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("sitemap"))
+        content = response.content.decode()
+
+        self.assertIn(_("Mijn berichten"), content)
+
+    def test_sitemap_includes_products_page_when_published(self):
+        create_apphook_page(ProductsApphook)
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("sitemap"))
+        content = response.content.decode()
+
+        self.assertIn(_("Zelftest"), content)
+
+    def test_sitemap_includes_profile_pages_when_published(self):
+        create_apphook_page(ProfileApphook)
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("sitemap"))
+        content = response.content.decode()
+
+        self.assertIn(_("Mijn profiel"), content)
+
+    def test_sitemap_excludes_profile_section_for_anonymous_users(self):
+        create_apphook_page(ProfileApphook)
+
+        response = self.client.get(reverse("sitemap"))
+        content = response.content.decode()
+
+        self.assertNotIn(_("Mijn profiel"), content)
+
+    def test_sitemap_includes_profile_selected_categories(self):
+        create_apphook_page(ProfileApphook, config_args={"selected_categories": True})
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("sitemap"))
+        content = response.content.decode()
+
+        self.assertIn(_("Mijn Interessegebieden"), content)
+
+    def test_sitemap_excludes_profile_selected_categories_when_disabled(self):
+        create_apphook_page(ProfileApphook, config_args={"selected_categories": False})
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("sitemap"))
+        content = response.content.decode()
+
+        self.assertNotIn(_("Mijn Interessegebieden"), content)
+
+    def test_sitemap_includes_profile_my_contacts(self):
+        create_apphook_page(ProfileApphook, config_args={"my_contacts": True})
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("sitemap"))
+        content = response.content.decode()
+
+        self.assertIn(_("Mijn contacten"), content)
+
+    def test_sitemap_excludes_profile_my_contacts_when_disabled(self):
+        create_apphook_page(ProfileApphook, config_args={"my_contacts": False})
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("sitemap"))
+        content = response.content.decode()
+
+        self.assertNotIn(_("Mijn contacten"), content)
+
+    def test_sitemap_includes_profile_selfdiagnose(self):
+        create_apphook_page(ProfileApphook, config_args={"selfdiagnose": True})
+        QuestionnaireStepFactory.create(published=True)
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("sitemap"))
+        content = response.content.decode()
+
+        self.assertIn(_("Zelfdiagnose"), content)
+
+    def test_sitemap_excludes_profile_selfdiagnose_when_no_questionnaires(self):
+        create_apphook_page(ProfileApphook, config_args={"selfdiagnose": True})
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("sitemap"))
+        content = response.content.decode()
+
+        self.assertNotIn(_("Zelfdiagnose"), content)
+
+    def test_sitemap_includes_profile_actions(self):
+        create_apphook_page(ProfileApphook, config_args={"actions": True})
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("sitemap"))
+        content = response.content.decode()
+
+        self.assertIn(_("Openstaande acties"), content)
+
+    def test_sitemap_excludes_profile_actions_when_disabled(self):
+        create_apphook_page(ProfileApphook, config_args={"actions": False})
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("sitemap"))
+        content = response.content.decode()
+
+        self.assertNotIn(_("Openstaande acties"), content)
+
+    def test_sitemap_includes_profile_notifications(self):
+        create_apphook_page(ProfileApphook, config_args={"notifications": True})
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("sitemap"))
+        content = response.content.decode()
+
+        self.assertIn(_("Notificatievoorkeuren"), content)
+
+    def test_sitemap_excludes_profile_notifications_when_disabled(self):
+        create_apphook_page(ProfileApphook, config_args={"notifications": False})
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("sitemap"))
+        content = response.content.decode()
+
+        self.assertNotIn(_("Notificatievoorkeuren"), content)
+
+    def test_sitemap_handles_multiple_profile_configs_gracefully(self):
+        # Create first profile page with config
+        create_apphook_page(
+            ProfileApphook, config_args={"namespace": "profile1", "actions": True}
+        )
+        # Create second profile config
+        ProfileConfig.objects.create(namespace="profile2", actions=False)
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("sitemap"))
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_sitemap_includes_footer_cms_pages(self):
+        page = api.create_page(
+            "Privacy Policy", "cms/fullwidth.html", "nl", in_navigation=True
+        )
+        page.publish("nl")
+        self.config.cms_pages.add(page)
+
+        response = self.client.get(reverse("sitemap"))
+        content = response.content.decode()
+
+        self.assertIn("Privacy Policy", content)
+
+    def test_sitemap_excludes_auth_required_footer_pages_for_anonymous(self):
+        # Create a CMS page that requires auth
+        page = api.create_page(
+            "Members Only", "cms/fullwidth.html", "nl", in_navigation=True
+        )
+        page.publish("nl")
+        published_page = page.get_public_object()
+        CommonExtension.objects.create(
+            extended_object=published_page, requires_auth=True
+        )
+        # Add to site configuration
+        self.config.cms_pages.add(page)
+
+        response = self.client.get(reverse("sitemap"))
+        content = response.content.decode()
+
+        self.assertNotIn("Members Only", content)
+
+    def test_sitemap_includes_auth_required_footer_pages_for_authenticated(self):
+        # Create a CMS page that requires auth
+        page = api.create_page(
+            "Members Only", "cms/fullwidth.html", "nl", in_navigation=True
+        )
+        page.publish("nl")
+        published_page = page.get_public_object()
+        CommonExtension.objects.create(
+            extended_object=published_page, requires_auth=True
+        )
+        # Add to site configuration
+        self.config.cms_pages.add(page)
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("sitemap"))
+        content = response.content.decode()
+
+        self.assertIn("Members Only", content)

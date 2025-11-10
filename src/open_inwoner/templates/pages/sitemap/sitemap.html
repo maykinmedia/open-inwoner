@@ -26,7 +26,7 @@
                         </li>
                     {% endif %}
                 {% endfor %}
-                {% for page in cms_pages %}
+                {% for page in cms_footer_pages %}
                     {% with text=page.link_text %}
                         <li class="utrecht-unordered-list__item">
                             <a href="{{ page.url }}" class="link--secondary">
