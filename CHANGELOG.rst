@@ -58,6 +58,8 @@ Nieuwe features
 * [:taiga-us:`3512`, :pr:`2003`]: De taken die worden weergegeven onder 'Openstaande acties' en
   'Mijn taken' zijn nu samengevoegd en worden nu samen weergegeven onder 'Mijn taken'.
 * [:taiga-is:`3321`, :pr:`2008`]: Dubbele links in sitemap verwijderd.
+* [:taiga-us:`3510`, :pr:`1988`, :pr:`2002`]: CMS-plugin toegevoegd voor links naar andere
+  portalen van de gemeente.
 
 Bugfixes
 --------
