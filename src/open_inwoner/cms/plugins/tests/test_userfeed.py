@@ -1,6 +1,6 @@
+import json
+
 from django.test import TestCase
-from django.utils.html import strip_tags
-from django.utils.translation import ngettext
 
 from pyquery import PyQuery
 
@@ -11,43 +11,58 @@ from open_inwoner.userfeed.hooks.common import simple_message
 
 
 class TestUserFeedPlugin(TestCase):
-    def test_plugin(self):
-        user = UserFactory()
-        simple_message(user, "Hello", title="Test message", url="http://foo.bar")
+    def setUp(self):
+        self.user = UserFactory()
 
+    def test_plugin(self):
+        simple_message(self.user, "Hello", title="Test message", url="http://foo.bar")
         html, context = cms_tools.render_plugin(
-            UserFeedPlugin, plugin_data={}, user=user
+            UserFeedPlugin, plugin_data={}, user=self.user
         )
 
-        feed = context["userfeed"]
-        self.assertEqual(feed.total_items, 1)
+        feed_json = context["userfeed_item_list_json"]
+        feed = json.loads(feed_json)
+        self.assertEqual(len(feed), 1)
 
-        self.assertIn("Test message", html)
         self.assertIn("Hello", html)
+        self.assertIn("Test message", html)
+        self.assertIn("http://foo.bar", html)
 
         pyquery = PyQuery(html)
 
-        # test summary
-        summaries = pyquery.find(".userfeed__summary .userfeed__list-item")
-        self.assertEqual(len(summaries), 1)
+        # make sure the json script has the correct content
+        items = pyquery.find("action-list").attr("actions")
+        self.assertEqual(
+            items,
+            '[{"title": "Test message", "message": "Hello", "action_text": "", "action_url": "http://foo.bar"}]',
+        )
 
-        summary = summaries.text()
-        expected = ngettext(
-            "There is {count} message",
-            "There are {count} messages",
-            1,
-        ).format(count=1)
-        self.assertEqual(strip_tags(summary), expected)
+    def test_multiple_plugin(self):
+        simple_message(self.user, "Hi", title="My message", url="http://test.com")
+        simple_message(
+            self.user, "TEST", title="TEST MESSAGE 2", url="http://example.com"
+        )
 
-        # test item
-        items = pyquery.find(".card-container .card")
-        self.assertEqual(len(items), 1)
+        html, context = cms_tools.render_plugin(
+            UserFeedPlugin, plugin_data={}, user=self.user
+        )
+        feed_json = context["userfeed_item_list_json"]
+        feed = json.loads(feed_json)
+        self.assertEqual(len(feed), 2)  # two items
 
-        title = items.find(".userfeed__title").text()
-        self.assertEqual(title, "Test message")
+        self.assertIn("Hi", html)
+        self.assertIn("My message", html)
+        self.assertIn("http://test.com", html)
 
-        message = items.find(".userfeed-card__description").text()
-        self.assertEqual(message, "Hello")
+        self.assertIn("TEST", html)
+        self.assertIn("TEST MESSAGE 2", html)
+        self.assertIn("http://example.com", html)
 
-        action_url = items[0].attrib["href"]
-        self.assertEqual(action_url, "http://foo.bar")
+        pyquery = PyQuery(html)
+
+        # make sure the json script has the correct content
+        items = pyquery.find("action-list").attr("actions")
+        self.assertEqual(
+            items,
+            '[{"title": "My message", "message": "Hi", "action_text": "", "action_url": "http://test.com"}, {"title": "TEST MESSAGE 2", "message": "TEST", "action_text": "", "action_url": "http://example.com"}]',
+        )

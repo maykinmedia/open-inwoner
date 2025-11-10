@@ -10,25 +10,10 @@ export function getJsonFromScriptTag<T = unknown>(id: string): T | undefined {
     return undefined
   }
 
-  return parseJsonSafely<T>(scriptElement.textContent)
-}
-
-/**
- * Safely parse JSON string with error handling.
- * @param text The JSON string to parse
- * @returns The parsed JSON data or undefined if parsing fails
- */
-export function parseJsonSafely<T = unknown>(
-  text: string | null | undefined
-): T | undefined {
-  if (!text || typeof text !== 'string') {
-    return undefined
-  }
-
   try {
-    return JSON.parse(text) as T
+    return JSON.parse(scriptElement.textContent) as T
   } catch (error) {
-    console.error(`Failed to parse JSON: ${text}`, error)
+    console.error('Failed to parse JSON:', scriptElement.textContent, error)
     return undefined
   }
 }

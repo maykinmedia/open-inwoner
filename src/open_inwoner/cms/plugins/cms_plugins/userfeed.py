@@ -1,3 +1,5 @@
+import json
+
 from django.utils.translation import gettext as _
 
 from cms.plugin_base import CMSPluginBase
@@ -17,10 +19,22 @@ class UserFeedPlugin(CMSPluginBase):
     def render(self, context, instance, placeholder):
         request = context["request"]
         feed = get_feed(request.user)
+
+        feed_items_list = [
+            {
+                "title": item.title,
+                "message": item.message,
+                "action_text": item.action_text,
+                "action_url": item.action_url,
+            }
+            for item in feed.items
+        ]
+
         context.update(
             {
                 "instance": instance,
                 "userfeed": feed,
+                "userfeed_item_list_json": json.dumps(feed_items_list),
             }
         )
         return context
