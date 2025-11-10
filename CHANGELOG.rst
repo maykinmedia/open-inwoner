@@ -1,6 +1,15 @@
-1.35.1 (2025-10-29)
+1.35.2 (2025-11-13)
 ===================
 
+Voor een volledig overzicht van alle commits, zie ....
+
+Onderhoud
+---------
+
+* [:pr:`2014`]: ``django`` bijgewerkt naar versie ``4.2.26``.
+
+1.35.1 (2025-10-29)
+===================
 
 Voor een volledig overzicht van alle commits, zie :release:`v1.35.1`.
 
