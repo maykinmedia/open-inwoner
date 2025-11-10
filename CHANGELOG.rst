@@ -131,6 +131,7 @@ Onderhoud
 * [:taiga-ta:`3473`, :pr:`1931`]: ``maykin-common`` dependency toegevoegd.
 * [:pr:`1942`] ``sqlparse`` bijgewerkt naar versie ``0.5.3``.
 * [:pr:`1951`] ``django`` bijgewerkt naar versie ``4.2.25``.
+* [:pr:`2014`] ``django`` bijgewerkt naar versie ``4.2.26``.
 * [:taiga-is:`3496`, :pr:`1957`]: De ``django-setup-configuration`` structuur voor
   configuratie van het klantensysteem is gereorganiseerd om de structuur van het
   beheerscherm te volgen, met een overkoepelend config en sub-configs voor eSuite en
