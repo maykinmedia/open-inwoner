@@ -24,7 +24,6 @@ from open_inwoner.openklant.models import KlantenSysteemConfig
 from open_inwoner.openklant.services import OpenKlant2Service, eSuiteKlantenService
 from open_inwoner.utils.logentry import system_action, user_action
 
-from .choices import LoginTypeChoices
 from .metrics import login_failures, logins, logouts, user_lockouts
 from .models import User
 
@@ -47,7 +46,7 @@ def update_user_on_login(sender, user, request, *args, **kwargs):
     if not hasattr(request, "user"):
         return
 
-    if user.login_type not in [LoginTypeChoices.digid, LoginTypeChoices.eherkenning]:
+    if not (user.is_bsn_user or user.is_eherkenning_user):
         return
 
     # Sync company details from KvK -- note it's important this runs _before_ syncing
@@ -66,7 +65,7 @@ def update_user_on_login(sender, user, request, *args, **kwargs):
             )
 
     # update brp fields when login with digid and brp is configured
-    if user.is_digid_user and HaalCentraalConfig.get_solo().service:
+    if user.is_bsn_user and HaalCentraalConfig.get_solo().service:
         update_brp_data_in_db(user)
 
     config = KlantenSysteemConfig.get_solo()

@@ -487,6 +487,11 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
         self.user = UserFactory(
             login_type=LoginTypeChoices.digid, bsn="900222086", email="johm@smith.nl"
         )
+        self.eidas_bsn_user = UserFactory(
+            login_type=LoginTypeChoices.eidas_person_bsn,
+            bsn="900222086",
+            eidas_pseudo_id="pseudo-id-1",
+        )
         self.eherkenning_user = eHerkenningUserFactory.create(
             kvk="12345678",
             rsin="123456789",
@@ -661,6 +666,26 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
 
         self.assertEqual(len(status_labels), 4)
         self.assertEqual(len(result_labels), 4)
+
+    def test_digid_user_and_eidas_bsn_user_receive_same_cases(self, m):
+        for mock in self.mocks:
+            mock._setUpMocks(m)
+
+        # Get cases for DigiD user
+        self.client.force_login(user=self.user)
+        digid_response = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
+        digid_cases = digid_response.context["cases"]
+
+        # Get cases for eIDAS BSN user (same BSN)
+        self.client.force_login(user=self.eidas_bsn_user)
+        eidas_response = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
+        eidas_cases = eidas_response.context["cases"]
+
+        self.assertEqual(
+            digid_cases,
+            eidas_cases,
+            msg="DigiD and EIDAS BSN users should receive exactly the same cases",
+        )
 
     def test_filter_widget_is_controlled_by_zaken_filter_enabled(self, m):
         self.client.force_login(user=self.user)

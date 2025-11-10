@@ -177,6 +177,9 @@ class MyProfileView(
         context["can_change_password"] = user.login_type not in (
             LoginTypeChoices.digid,
             LoginTypeChoices.eherkenning,
+            LoginTypeChoices.eidas_person_bsn,
+            LoginTypeChoices.eidas_person_pseudo_id,
+            LoginTypeChoices.eidas_company,
         )
         context["inbox_page_is_published"] = inbox_page_is_published()
         context["benefits_page_is_published"] = benefits_page_is_published()
@@ -368,7 +371,7 @@ class EditProfileView(
 
     def get_form_class(self):
         user = self.request.user
-        if user.is_digid_user_with_brp:
+        if user.is_bsn_user_with_brp:
             return BrpUserForm
         return super().get_form_class()
 

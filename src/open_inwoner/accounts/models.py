@@ -574,11 +574,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         # account has been deactivated
         for user in existing_users:
-            if (
-                user.login_type == LoginTypeChoices.digid
-                and user.bsn == self.bsn
-                and not user.is_active
-            ):
+            if user.is_bsn_user and user.bsn == self.bsn and not user.is_active:
                 raise ValidationError(
                     {"email": ValidationError(_("This account has been deactivated"))}
                 )
@@ -655,7 +651,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         enabled = []
         if config.notifications_cases_enabled:
-            if self.login_type == LoginTypeChoices.digid and case_page_is_published():
+            if self.is_bsn_user and case_page_is_published():
                 enabled.append(_("cases"))
         if config.notifications_messages_enabled:
             if self.messages_notifications and inbox_page_is_published():
@@ -671,26 +667,20 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def require_necessary_fields(self) -> bool:
         """returns whether user needs to fill in necessary fields"""
-        if self.is_digid_user_with_brp:
+        if self.is_bsn_user_with_brp:
             return not self.has_usable_email
         elif self.login_type == LoginTypeChoices.digid:
             return (
                 not self.first_name or not self.last_name or not self.has_usable_email
             )
-        elif self.login_type in (
-            LoginTypeChoices.oidc,
-            LoginTypeChoices.eherkenning,
-        ):
+        elif self.is_eherkenning_user or self.login_type == LoginTypeChoices.oidc:
             return not self.has_usable_email
         return False
 
     def get_logout_url(self) -> str:
         # Exit early, because for some reason reverse("logout") fails after checking
         # the singletonmodels
-        if self.login_type not in [
-            LoginTypeChoices.digid,
-            LoginTypeChoices.eherkenning,
-        ]:
+        if not (self.is_bsn_user or self.is_eherkenning_user or self.is_eidas_user):
             return reverse("logout")
 
         if self.login_type == LoginTypeChoices.digid:
@@ -700,6 +690,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         elif self.login_type == LoginTypeChoices.eherkenning:
             if OpenIDEHerkenningConfig.get_solo().enabled:
                 return reverse("eherkenning_oidc:logout")
+            return reverse("logout")
+        elif self.is_eidas_user:
+            if OpenIDEIDASConfig.get_solo().enabled:
+                return reverse("eidas_oidc:logout")
             return reverse("logout")
 
     @property
@@ -754,20 +748,28 @@ class User(AbstractBaseUser, PermissionsMixin):
         PlanContact.objects.filter(user=self).update(notify_new=False)
 
     @property
-    def is_digid_user(self) -> bool:
-        return self.login_type == LoginTypeChoices.digid
+    def is_bsn_user(self) -> bool:
+        return bool(self.bsn)
 
     @property
-    def is_digid_user_with_brp(self) -> bool:
+    def is_bsn_user_with_brp(self) -> bool:
         """
         Returns whether user is logged in with digid and data has
         been requested from haal centraal
         """
-        return self.is_digid_user and self.is_prepopulated
+        return self.is_bsn_user and self.is_prepopulated
 
     @property
     def is_eherkenning_user(self) -> bool:
         return self.login_type == LoginTypeChoices.eherkenning
+
+    @property
+    def is_eidas_user(self) -> bool:
+        return self.login_type in (
+            LoginTypeChoices.eidas_person_bsn,
+            LoginTypeChoices.eidas_person_pseudo_id,
+            LoginTypeChoices.eidas_company,
+        )
 
     def has_group_managed_categories(self) -> bool:
         from open_inwoner.pdc.models import Category
