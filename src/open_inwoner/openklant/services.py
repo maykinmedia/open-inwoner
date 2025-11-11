@@ -332,10 +332,10 @@ class eSuiteKlantenService(
             update_data["phonenumber"] = klant.telefoonnummer
 
         if (
-            klant.telefoonnummerAlternatief
-            and klant.telefoonnummerAlternatief != user.phonenumber_alternative
+            klant.telefoonnummer_alternatief
+            and klant.telefoonnummer_alternatief != user.phonenumber_alternative
         ):
-            update_data["phonenumber_alternative"] = klant.telefoonnummerAlternatief
+            update_data["phonenumber_alternative"] = klant.telefoonnummer_alternatief
 
         config = SiteConfiguration.get_solo()
         if config.enable_notification_channel_choice:

@@ -36,7 +36,7 @@ class Klant(ZGWModel):
     voorvoegsel_achternaam: str = ""
     achternaam: str = ""
     telefoonnummer: str = ""
-    telefoonnummerAlternatief: str = ""
+    telefoonnummer_alternatief: str = ""
     emailadres: str = ""
     toestemming_zaak_notificaties_alleen_digitaal: bool | None = None
     bedrijfsnaam: str = ""
