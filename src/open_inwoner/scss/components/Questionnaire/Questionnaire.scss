@@ -47,11 +47,5 @@
     &__list-item:nth-child(2) {
       border-top: var(--border-width-thin) solid var(--color-gray);
     }
-
-    &__list-item {
-      .button {
-        padding: var(--spacing-giant) var(--spacing-medium);
-      }
-    }
   }
 }

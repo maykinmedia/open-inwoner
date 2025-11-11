@@ -152,6 +152,8 @@ Bugfixes
   vanuit de eSuite.
 * [:taiga-is:`3590`: :pr:`2030`]: Bug opgelost waarbij tablet gebruikers geen volledig uitgevuld
   navigatie menu zagen.
+* [:taiga-is:`3572`: :pr:`2019`]: De kleuren van call-to-action links en knoppen in tegels komen
+  nu overeen met de primaire kleur zoals die in de Figma designs vastgelegd is.
 * [:taiga-is:`3588`, :pr:`2029`]: Ontbrekende logout URL voor reguliere gebruikers is
   toegoevegd, en de logica voor alle login types is opgeschoond.
 * [:taiga-is:`3599`, :pr:`2045`]: Bij het bekijken van de bron code van componenten in Storybook
