@@ -337,6 +337,11 @@ $vm: var(--spacing-large);
           }
         }
       }
+
+      // Desktop menu toggle button
+      .button--transparent {
+        font-weight: normal;
+      }
     }
 
     // Unauthenticated tablet grid

@@ -58,7 +58,7 @@
                             </li>
                             {% list_item text=_("Openstaande zaak") caption=_("Status") compact=True strong=False %}
                         {% endrender_list %}
-                        <span class="link link--icon link--secondary">
+                        <span class="link link--icon link--bold link--primary">
                         <span class="link__text">{% trans "Zaak afronden" %}</span>
                         {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
                     </span>
@@ -88,7 +88,7 @@
                             </li>
                         {% endrender_list %}
 
-                        <span class="link link--icon link--secondary">
+                        <span class="link link--icon link--bold link--primary">
                         <span class="link__text">{{ case.statustype_config.case_link_text|default:"Bekijk zaak" }}</span>
                         {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
                     </span>

@@ -40,6 +40,13 @@
 
       @media (min-width: 768px) {
         padding-left: var(--spacing-large);
+        padding-right: 0;
+      }
+    }
+
+    .questionnaire__list-item {
+      .button {
+        padding-left: 0;
       }
     }
   }
