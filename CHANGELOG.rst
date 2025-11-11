@@ -67,6 +67,8 @@ Nieuwe features
 * [:taiga-us:`3511`, :taiga-is:`3531`, :pr:`1996`]: Front-end voor CMS-plugin voor links naar
   andere portalen gebouwd, inclusief nieuwe design-tokens volgens NLDS conventies.
 * [:taiga-us:`3509`, :pr:`1997`]: Ondersteuning voor eIDAS login via OIDC is toegevoegd.
+* [:taiga-us:`3575`, :pr:`2020`]: CMS plug-in 'Mijn Zaken' angemaakt voor het ontsluiten van zaken
+  in de startpagina
 
 Bugfixes
 --------
