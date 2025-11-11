@@ -9,7 +9,7 @@ Open Inwoner
 :Documentation: https://docs.openinwoner.nl
 :PythonVersion: 3.12
 
-|build-status| |docker| |black| |python-versions|
+|build-status| |docker| |ruff| |python-versions| |storybook|
 
 Platform voor gemeenten en overheden om producten inzichtelijker en toegankelijker te maken voor inwoners.
 
