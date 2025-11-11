@@ -4,6 +4,7 @@ from .tasks import TasksPlugin
 from .text import TextPlugin
 from .userfeed import UserFeedPlugin
 from .videoplayer import VideoPlayerPlugin
+from .zaken import CMSZakenPlugin
 
 __all__ = [
     "UserAppointmentsPlugin",
@@ -13,4 +14,5 @@ __all__ = [
     "VideoPlayerPlugin",
     "CMSLinkPlugin",
     "LinkPlugin",
+    "CMSZakenPlugin",
 ]

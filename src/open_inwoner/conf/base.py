@@ -659,6 +659,7 @@ CMS_PLACEHOLDER_CONF = {
             "TasksPlugin",
             "CMSFlatPagePlugin",
             "CMSLinkPlugin",
+            "CMSZakenPlugin",
         ],
         "text_only_plugins": ["LinkPlugin"],
         "name": _("Content"),
