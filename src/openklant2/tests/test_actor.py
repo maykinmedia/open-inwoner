@@ -1,10 +1,13 @@
 import pytest
 from pydantic import TypeAdapter
 
-from open_inwoner.ssd.service.jaaropgave.fwi_include_resolved import Actor
 from openklant2.factories.actor import CreateActorDataFactory
 from openklant2.types.pagination import PaginatedResponseBody
-from openklant2.types.resources.actor import ActorValidator, CreateActorDataValidator
+from openklant2.types.resources.actor import (
+    Actor,
+    ActorValidator,
+    CreateActorDataValidator,
+)
 
 
 @pytest.fixture()
