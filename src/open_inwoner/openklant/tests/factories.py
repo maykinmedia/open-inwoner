@@ -1,7 +1,6 @@
 import datetime
 
 import factory
-from openklant_client.tests.helpers import OpenKlantServiceManager
 from zgw_consumers.constants import APITypes
 
 from open_inwoner.accounts.tests.factories import UserFactory
@@ -50,7 +49,7 @@ class OpenKlant2ConfigFactory(factory.django.DjangoModelFactory):
         ServiceFactory,
         api_root=OPENKLANT2_ROOT,
         api_type=APITypes.kc,
-        secret=OpenKlantServiceManager._api_token,
+        secret="test-api-token",
     )
     mijn_vragen_kanaal = "oip_mijn_vragen"
     mijn_vragen_organisatie_naam = "Open Inwoner Platform"
