@@ -6,9 +6,10 @@ amqp==5.1.1
     # via kombu
 annotated-types==0.6.0
     # via pydantic
-ape-pie==0.1.0
+ape-pie==0.2.0
     # via
     #   objects-api-client-django
+    #   open-klant-client
     #   zgw-consumers
 asgiref==3.7.2
     # via
@@ -454,6 +455,8 @@ objects-api-client-django==0.5.0
     # via -r requirements/base.in
 odfpy==1.4.1
     # via tablib
+open-klant-client==0.4.0
+    # via -r requirements/base.in
 openpyxl==3.0.9
     # via tablib
 opentelemetry-api==1.37.0
