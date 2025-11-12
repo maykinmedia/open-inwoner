@@ -15,8 +15,7 @@ from open_inwoner.accounts.tests.factories import (
 from open_inwoner.openklant.services import OpenKlant2Question, OpenKlant2Service
 from open_inwoner.openklant.tests.factories import OpenKlant2ConfigFactory
 from open_inwoner.openklant.tests.helpers import Openklant2ServiceTestCase
-from openklant2.factories.partij import CreatePartijPersoonDataFactory
-from openklant2.types.resources.partij import PartijValidator
+from open_inwoner.openklant.tests.validators import PartijValidator
 
 
 @tag("openklant2")
@@ -411,16 +410,44 @@ class QuestionAnswerTestCase(Openklant2ServiceTestCase):
             }
         )
         self.een_persoon = self.openklant_client.partij.create_persoon(
-            data=CreatePartijPersoonDataFactory(
-                partijIdentificatie__contactnaam__voornaam="Alice",
-                partijIdentificatie__contactnaam__achternaam="McAlice",
-            )
+            data={
+                "digitaleAdressen": None,
+                "voorkeursDigitaalAdres": None,
+                "rekeningnummers": None,
+                "voorkeursRekeningnummer": None,
+                "indicatieGeheimhouding": False,
+                "indicatieActief": True,
+                "voorkeurstaal": "nld",
+                "soortPartij": "persoon",
+                "partijIdentificatie": {
+                    "contactnaam": {
+                        "voorletters": "",
+                        "voornaam": "Alice",
+                        "voorvoegselAchternaam": "",
+                        "achternaam": "McAlice",
+                    }
+                },
+            }
         )
         self.een_ander_persoon = self.openklant_client.partij.create_persoon(
-            data=CreatePartijPersoonDataFactory(
-                partijIdentificatie__contactnaam__voornaam="Bob",
-                partijIdentificatie__contactnaam__achternaam="McBob",
-            )
+            data={
+                "digitaleAdressen": None,
+                "voorkeursDigitaalAdres": None,
+                "rekeningnummers": None,
+                "voorkeursRekeningnummer": None,
+                "indicatieGeheimhouding": False,
+                "indicatieActief": True,
+                "voorkeurstaal": "nld",
+                "soortPartij": "persoon",
+                "partijIdentificatie": {
+                    "contactnaam": {
+                        "voorletters": "",
+                        "voornaam": "Bob",
+                        "voorvoegselAchternaam": "",
+                        "achternaam": "McBob",
+                    }
+                },
+            }
         )
 
         self.designated_actor = self.openklant_client.actor.create(

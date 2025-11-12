@@ -1,11 +1,11 @@
 from django.test import TestCase as DjangoTestCase
 
+from openklant_client.tests.helpers import LiveOpenKlantTestMixin
 from typing_extensions import TypedDict
 from vcr.record_mode import RecordMode
 from vcr.unittest import VCRMixin
 
 from open_inwoner.conf.utils import config
-from openklant2.tests.helpers import LiveOpenKlantTestMixin
 
 
 class OpenKlant2ServiceTestConfig(TypedDict):

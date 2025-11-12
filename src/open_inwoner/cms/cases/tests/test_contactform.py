@@ -32,6 +32,7 @@ from open_inwoner.openklant.services import eSuiteVragenService
 from open_inwoner.openklant.tests.data import CONTACTMOMENTEN_ROOT, KLANTEN_ROOT
 from open_inwoner.openklant.tests.factories import OpenKlant2ConfigFactory
 from open_inwoner.openklant.tests.mocks import MockOpenKlant2Service
+from open_inwoner.openklant.tests.validators import KlantContactValidator
 from open_inwoner.openzaak.models import (
     CatalogusConfig,
     OpenZaakConfig,
@@ -50,7 +51,6 @@ from open_inwoner.openzaak.tests.shared import (
 )
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 from open_inwoner.utils.tests.helpers import AssertMockMatchersMixin
-from openklant2.types.resources.klant_contact import KlantContactValidator
 
 PATCHED_MIDDLEWARE = [
     m
