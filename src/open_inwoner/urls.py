@@ -121,6 +121,7 @@ urlpatterns = [
     path("oidc/", include("mozilla_django_oidc.urls")),
     path("digid-oidc/", include("open_inwoner.accounts.digid_urls")),
     path("eherkenning-oidc/", include("open_inwoner.accounts.eherkenning_urls")),
+    path("eidas-oidc/", include("open_inwoner.accounts.eidas_urls")),
     path("login/failure/", OIDCFailureView.as_view(), name="oidc-error"),
     path("faq/", FAQView.as_view(), name="general_faq"),
     path("kvk/", include("open_inwoner.kvk.urls")),

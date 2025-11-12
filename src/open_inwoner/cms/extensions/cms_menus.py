@@ -4,7 +4,6 @@ from cms.models import Page
 from menus.base import Modifier
 from menus.menu_pool import menu_pool
 
-from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.cms.extensions.constants import IndicatorChoices
 from open_inwoner.cms.extensions.models import CommonExtension
 
@@ -54,11 +53,9 @@ class MenuModifier(Modifier):
                 # modify menu check for page visibility
                 if (ext.requires_auth and not request.user.is_authenticated) or (
                     ext.requires_auth_bsn_or_kvk
-                    and request.user.login_type
-                    not in [
-                        LoginTypeChoices.digid,
-                        LoginTypeChoices.eherkenning,
-                    ]
+                    and not (
+                        request.user.is_bsn_user or request.user.is_eherkenning_user
+                    )
                 ):
                     nodes.remove(node)
                     continue

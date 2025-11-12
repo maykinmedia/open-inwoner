@@ -6,7 +6,14 @@ from django.views.defaults import ERROR_500_TEMPLATE_NAME
 
 from view_breadcrumbs import DetailBreadcrumbMixin
 
-from .logentry import addition, change, deletion, system_action, user_action
+from .logentry import (
+    addition,
+    change,
+    deletion,
+    system_action,
+    system_error,
+    user_action,
+)
 
 
 class CommonPageMixin:
@@ -119,3 +126,6 @@ class LogMixin:
         Log system events not related to a specific user.
         """
         system_action(message, content_object=instance, user=user)
+
+    def log_system_error(self, message, instance=None, user=None):
+        system_error(message, content_object=instance, user=user)

@@ -28,6 +28,10 @@ Deployment aandachtspunten
   deze gevallen blijft de ruwe inhoud van de oorspronkelijke CKEditor behouden zonder opmaak.
   Controleer de opmaak van de inhoud van de rich text editor, met name voor de onderwerpen en
   de producten.
+* De database migraties, die tijdens het deployen eenmalig zullen worden uitgevoerd,
+  kunnen langer duren dan normaal voor installaties met een groot aantal gebruikers. Dit
+  is een gevolg van nieuwe database indices die zijn toegevoegd in het kader van de de
+  nieuwe eIDAS ondersteuning.
 
 Nieuwe features
 ---------------
@@ -62,6 +66,7 @@ Nieuwe features
   portalen van de gemeente.
 * [:taiga-us:`3511`, :taiga-is:`3531`, :pr:`1996`]: Front-end voor CMS-plugin voor links naar
   andere portalen gebouwd, inclusief nieuwe design-tokens volgens NLDS conventies.
+* [:taiga-us:`3509`, :pr:`1997`]: Ondersteuning voor eIDAS login via OIDC is toegevoegd.
 
 Bugfixes
 --------

@@ -219,7 +219,11 @@ class NecessaryUserForm(ErrorMessageMixin, forms.ModelForm):
 
         if (
             user.login_type
-            not in [LoginTypeChoices.digid, LoginTypeChoices.eherkenning]
+            not in [
+                LoginTypeChoices.digid,
+                LoginTypeChoices.eherkenning,
+                LoginTypeChoices.eidas_person_bsn,
+            ]
             or not config.notifications_cases_enabled
             or not case_page_is_published()
         ):
@@ -232,7 +236,7 @@ class NecessaryUserForm(ErrorMessageMixin, forms.ModelForm):
         ):
             del self.fields["plans_notifications"]
 
-        if user.is_digid_user_with_brp:
+        if user.is_bsn_user_with_brp:
             self.fields["first_name"].disabled = True
             self.fields["infix"].disabled = True
             self.fields["last_name"].disabled = True
