@@ -3,8 +3,8 @@
  */
 export const isMobile = () => {
   try {
-    return window.matchMedia('(max-width: 767px)').matches
+    return window.matchMedia('(max-width: 767px)').matches;
   } catch (e) {
-    return false
+    return false;
   }
-}
+};

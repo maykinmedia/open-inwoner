@@ -2,8 +2,10 @@
 
 This app contains the UI elements of the project implemented as inclusion tags.
 
-> Components are the reusable building blocks of our design system. Each component meets a specific interaction or UI
-> need, and has been specifically created to work together to create patterns and intuitive user experiences. - [Atlassian Design System](https://atlassian.design/components/)
+> Components are the reusable building blocks of our design system. Each
+> component meets a specific interaction or UI need, and has been specifically
+> created to work together to create patterns and intuitive user experiences. -
+> [Atlassian Design System](https://atlassian.design/components/)
 
 ## Contents
 
@@ -19,23 +21,34 @@ This app contains the UI elements of the project implemented as inclusion tags.
 
 ## What are inclusion tags?
 
-Inclusion tags are a mechanism in Django te render a (small) template based on (optionally) a set of arguments. We use
-these tags te create the individual building blocks of our interface, abstracting away the implementation
+Inclusion tags are a mechanism in Django te render a (small) template based on
+(optionally) a set of arguments. We use these tags te create the individual
+building blocks of our interface, abstracting away the implementation
 (HTMl/CSS/JavaScript) from their (programming) interface.
 
-*Note: inclusion_tags are often referered to as "components". Components typically make up an inclusion tag, a template,
-a Sass (`.scss`) and sometimes a JavaScript file.*
+_Note: inclusion_tags are often referered to as "components". Components
+typically make up an inclusion tag, a template, a Sass (`.scss`) and sometimes a
+JavaScript file._
 
-> Another common type of template tag is the type that displays some data by rendering another template. For example,
-> Django’s admin interface uses custom template tags to display the buttons along the bottom of the “add/change” form pages. Those buttons always look the same, but the link targets change depending on the object being edited – so they’re a perfect case for using a small template that is filled with details from the current object. (In the admin’s case, this is the submit_row tag.) - [Django documentation](https://docs.djangoproject.com/en/4.0/howto/custom-template-tags/#howto-custom-template-tags-inclusion-tags)
+> Another common type of template tag is the type that displays some data by
+> rendering another template. For example, Django’s admin interface uses custom
+> template tags to display the buttons along the bottom of the “add/change” form
+> pages. Those buttons always look the same, but the link targets change
+> depending on the object being edited – so they’re a perfect case for using a
+> small template that is filled with details from the current object. (In the
+> admin’s case, this is the submit_row tag.) -
+> [Django documentation](https://docs.djangoproject.com/en/4.0/howto/custom-template-tags/#howto-custom-template-tags-inclusion-tags)
 
-Inclusion tags in Django are provided in "libraries" that can be registered in apps. Libraries are Python files that
-register various template tags (like inclusion tags).
+Inclusion tags in Django are provided in "libraries" that can be registered in
+apps. Libraries are Python files that register various template tags (like
+inclusion tags).
 
-Django will automatically discover any librar(y/ies) in any app within their `templatetags` package. The libraries
-provided by the `components` app can be found in `components/template_tags/`.
+Django will automatically discover any librar(y/ies) in any app within their
+`templatetags` package. The libraries provided by the `components` app can be
+found in `components/template_tags/`.
 
-A library should instantiate a `Library` class and then register a function to it:
+A library should instantiate a `Library` class and then register a function to
+it:
 
 ```python
 # my_first_tags.py
@@ -62,15 +75,15 @@ def my_first_inclusion_tag(foo, bar):
 ```html
 <!-- components/MyFirstInclusionTag/MyFirstInclusionTag.html -->
 <div class="my-first-inclusion-tag">
-    <strong>foo:</strong> {{ foo }}
-    <strong>bar:</strong> {{ bar }}
+  <strong>foo:</strong> {{ foo }} <strong>bar:</strong> {{ bar }}
 </div>
 ```
 
-*(Creating a library might require a server restart.*
+_(Creating a library might require a server restart._
 
-The library above exposes an inclusion tag `my_first_inclusion_tag` which would render
-`components/MyFirstInclusionTag/MyFirstInclusionTag.html` with `{"foo": foo, "bar": bar}` as context.
+The library above exposes an inclusion tag `my_first_inclusion_tag` which would
+render `components/MyFirstInclusionTag/MyFirstInclusionTag.html` with
+`{"foo": foo, "bar": bar}` as context.
 
 The inclusion tag can be rendered anywhere using:
 
@@ -86,7 +99,8 @@ The inclusion tag can be rendered anywhere using:
 Inclusion tags have various benefits over traditional templates:
 
 - Inclusion tags are highly reusable.
-- Inclusion tags can ensure consistency of the UI by providing a single source of truth of the implementation.
+- Inclusion tags can ensure consistency of the UI by providing a single source
+  of truth of the implementation.
 - Inclusion tags can do their own centralized context processing.
 - Inclusion tags can be tested with little dependencies.
 
@@ -97,20 +111,22 @@ Given an example of a hyperlink with an icon:
 ```html
 {% load i18n %}
 <a class="button button--primary" href="{% url 'inbox:index' %}">
-    <span class="material-icon">arrow_forward</span>
-    {% trans 'My messages' %}
+  <span class="material-icon">arrow_forward</span>
+  {% trans 'My messages' %}
 </a>
 ```
 
-This template may look simple at once, but contains various sources of logic that need to work together:
+This template may look simple at once, but contains various sources of logic
+that need to work together:
 
 - Button styling.
 - Icon styling.
 - URL resolving.
 - Translation.
 
-Most of this logic can change anytime and such a change would require all usages to be updated. Such changes might be as
-simple as a CSS file update that requires the HTML tree to be rendered differently (this invalidates all existing
+Most of this logic can change anytime and such a change would require all usages
+to be updated. Such changes might be as simple as a CSS file update that
+requires the HTML tree to be rendered differently (this invalidates all existing
 implementations).
 
 Replacing this link with a simple:
@@ -120,24 +136,29 @@ Replacing this link with a simple:
 {% link href='inbox:index' text=_('My messages') button=True primary=True icon='arrow_forward' %}
 ```
 
-Gives us the ability to alter (upgrade) the implementation anytime without worrying about the existing usages. As a
-bonus: it allows us to do certain processing in the component (like url reversion) in the tag itself. Reducing workload
-for the developer.
+Gives us the ability to alter (upgrade) the implementation anytime without
+worrying about the existing usages. As a bonus: it allows us to do certain
+processing in the component (like url reversion) in the tag itself. Reducing
+workload for the developer.
 
 `<a id="when-writing-inclusion-tags"/></a>`
 
 # When writing inclusion tags
 
-Writing inclusion tags allows a developer to split a view into smaller pieces. Although this has various advantages,
-please adhere to the following:
+Writing inclusion tags allows a developer to split a view into smaller pieces.
+Although this has various advantages, please adhere to the following:
 
 - Do maintain a stable (backwards compatible) signature for a template tag.
-- Do: write docstrings for template tags explaining what they do and how they should be used.
+- Do: write docstrings for template tags explaining what they do and how they
+  should be used.
 - Do: write tests for your template tag (see: [writing tests](#writing-tests)).
-- Do: "speak Django", use default object types (like QuerySet and Form) where possible and use names/structures similar
-  to the world of Django (e.g. `object_list`, `page_obj` etc.).
-- Do: be implementation agnostic: preferably, an inclusion tag should not depend on specific business logic/models.
-- Don't: reinvent the wheel, handoff logic to Django builtin's (like paginaton) where possible.
+- Do: "speak Django", use default object types (like QuerySet and Form) where
+  possible and use names/structures similar to the world of Django (e.g.
+  `object_list`, `page_obj` etc.).
+- Do: be implementation agnostic: preferably, an inclusion tag should not depend
+  on specific business logic/models.
+- Don't: reinvent the wheel, handoff logic to Django builtin's (like paginaton)
+  where possible.
 
 `<a id="nesting-tags"/></a>`
 
@@ -145,15 +166,20 @@ please adhere to the following:
 
 ### TODO: Nested tags might use refactoring/improvements.
 
-Some tags (not inclusion tags) provide a way to nest other contents and tags as children. By convenstion, we prefix the
-name of these tags with "render_"
+Some tags (not inclusion tags) provide a way to nest other contents and tags as
+children. By convenstion, we prefix the name of these tags with "render\_"
 
-> A nested component is a child of the parent component that contains it. The child component is positioned and rendered
-> relative to that parent. The minimum size of a container component is determined by the size of its child components.- [Apple Developer Documentation](https://developer.apple.com/documentation/apple_news/apple_news_format/components/nesting_components_in_an_article)
+> A nested component is a child of the parent component that contains it. The
+> child component is positioned and rendered relative to that parent. The
+> minimum size of a container component is determined by the size of its child
+> components.-
+> [Apple Developer Documentation](https://developer.apple.com/documentation/apple_news/apple_news_format/components/nesting_components_in_an_article)
 
-Django, by default does not support a way of nesting inclusion tags. The components app provides a different way of
-dealing with this using a `ContentsNode`. This will create a tag which accepts children between
-`{% render_my_first_contents_node %}` and `{% endrender_my_first_contents_node %}`:
+Django, by default does not support a way of nesting inclusion tags. The
+components app provides a different way of dealing with this using a
+`ContentsNode`. This will create a tag which accepts children between
+`{% render_my_first_contents_node %}` and
+`{% endrender_my_first_contents_node %}`:
 
 ```python
 @register.tag()
@@ -180,7 +206,8 @@ def render_my_first_contents_node(parser, token):  # Start tag
 ```html
 <!-- components/MyFirstContentsNode/MyFirstContentsNode.html -->
 <div class="my-first-contents-tag">
-    {{ contents }}  <!-- Provided by ContentsNode, contains nested content (children). -->
+  {{ contents }}
+  <!-- Provided by ContentsNode, contains nested content (children). -->
 </div>
 ```
 
@@ -188,11 +215,12 @@ def render_my_first_contents_node(parser, token):  # Start tag
 
 # Writing tests
 
-Tests for components are located in the `tests` package of the components app (`components/tests/`). In this directory a
-file called `abstract.py` can be found. This file contains utility classes that provide testing of tags:
+Tests for components are located in the `tests` package of the components app
+(`components/tests/`). In this directory a file called `abstract.py` can be
+found. This file contains utility classes that provide testing of tags:
 
 - `InclusionTagWebTest` allows for testing inclusion tags.
-- `ContentsTagWebTest` similar to  InclusionTagWebTest, but for content tags.
+- `ContentsTagWebTest` similar to InclusionTagWebTest, but for content tags.
 
 Please refer to the docstrings of their respective methods for usages.
 
@@ -253,11 +281,13 @@ class TestListItem(InclusionTagWebTest):
 
 ### Inclusion tags don't get executed in all cases.
 
-Some requests, for instance: POST requests, might not invoke template rendering and skip code in template tags. This
-might complicate cases where processing of such requests is required.
+Some requests, for instance: POST requests, might not invoke template rendering
+and skip code in template tags. This might complicate cases where processing of
+such requests is required.
 
-A possible solution is to manually invoke template rendering from within the `post` method on the view, or to handle
-this logic in a separate `url` and set that as the form's action.
+A possible solution is to manually invoke template rendering from within the
+`post` method on the view, or to handle this logic in a separate `url` and set
+that as the form's action.
 
 `<a id="further-reading"></a>`
 

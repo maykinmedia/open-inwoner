@@ -7,17 +7,17 @@
  */
 
 if (window.IS_DEV && typeof _sz === 'undefined') {
-  console.log('*** Running in development mode. ***')
+  console.log('*** Running in development mode. ***');
   /** Mock SiteImprove `_sz` object for testing - only used during development */
   var _sz = {
     push: function (data) {
       try {
-        console.log('Event pushed to _sz:', data)
+        console.log('Event pushed to _sz:', data);
       } catch (error) {
-        console.error('Error occurred while pushing event data:', error)
+        console.error('Error occurred while pushing event data:', error);
       }
     },
-  }
+  };
 }
 
 /**
@@ -400,7 +400,7 @@ const specificClickSelectors = {
     ['event', 'Navigatie', 'Click', 'Welkom ...'],
   '.primary-navigation.primary-navigation__authenticated .primary-navigation__list .primary-navigation__list-item .primary-navigation--toggle span':
     ['event', 'Navigatie', 'Click', 'Welkom...'],
-}
+};
 
 /**
  * Partial replacements in the overwrite for click-events that contain unknown variable/configurable content.
@@ -492,7 +492,7 @@ const partialClickSelectors = {
   '.newsletter-form input[type="checkbox"]': { category: 'Nieuwsbrieven' },
   'input[type="radio"]': { label: 'Click op radiobutton' },
   textarea: { label: 'Click in tekstveld' },
-}
+};
 
 /**
  * Full overwrite of the _sz object in order to generate very specific grouping for change events in the Siteimprove Dashboard
@@ -528,7 +528,7 @@ const changeSelectors = {
     'Telefoonnummer',
     'Change',
   ],
-}
+};
 
 /**
  * Full overwrite for keydown (Enter) events
@@ -537,41 +537,41 @@ const keydownSelectors = {
   // Distinguish between pressing Enter or using button
   '#id_query': ['event', 'Header', 'Zoeken', 'Enter click'],
   '.form input[name="query"]': ['event', 'Header', 'Zoeken', 'Enter click'],
-}
+};
 
-;(function () {
-  let isEventTrackerInitialized = false
+(function () {
+  let isEventTrackerInitialized = false;
 
   function initGeneralEventTracker() {
-    if (isEventTrackerInitialized) return
-    isEventTrackerInitialized = true
+    if (isEventTrackerInitialized) return;
+    isEventTrackerInitialized = true;
 
-    const eventTypes = ['click', 'change', 'keydown']
+    const eventTypes = ['click', 'change', 'keydown'];
 
     const selectorMaps = {
       click: { full: specificClickSelectors, partial: partialClickSelectors },
       change: { full: changeSelectors },
       keydown: { full: keydownSelectors },
-    }
+    };
 
     function handleSelectors(eventType, target, selectors) {
       for (const [selector, data] of Object.entries(selectors)) {
         if (target.matches(selector)) {
           if (typeof _sz !== 'undefined') {
-            _sz.push(data)
+            _sz.push(data);
           } else {
-            console.warn('_sz is not defined')
+            console.warn('_sz is not defined');
           }
-          return data
+          return data;
         }
       }
-      return null
+      return null;
     }
 
     // If element does not belong to a meaningful category, replace category with URL
     function getCategoryFromURL() {
-      const path = window.location.pathname
-      return path ? path.replace(/^\/+/, '') : 'Home page'
+      const path = window.location.pathname;
+      return path ? path.replace(/^\/+/, '') : 'Home page';
     }
 
     function getLabelFromTarget(target) {
@@ -580,19 +580,19 @@ const keydownSelectors = {
         target.value ||
         target.textContent.trim() ||
         'Empty label'
-      )
+      );
     }
 
     function trackEvent(event) {
-      event.stopPropagation() // Prevents event from bubbling up
+      event.stopPropagation(); // Prevents event from bubbling up
 
-      const eventType = event.type
-      const target = event.target
+      const eventType = event.type;
+      const target = event.target;
 
       // Add targets and any of their ancestors, we do not wish to track
-      const untrackedSelectors = ['.login-tab--container']
+      const untrackedSelectors = ['.login-tab--container'];
 
-      let currentElement = target
+      let currentElement = target;
       while (currentElement) {
         if (
           untrackedSelectors.some((selector) =>
@@ -600,16 +600,16 @@ const keydownSelectors = {
           ) &&
           target.tagName.toLowerCase() === 'input'
         ) {
-          return // Only skip tracking for <input> inside those containers
+          return; // Only skip tracking for <input> inside those containers
         }
-        currentElement = currentElement.parentElement
+        currentElement = currentElement.parentElement;
       }
 
-      let eventData = null
+      let eventData = null;
 
       if (!eventTypes.includes(eventType)) {
-        console.warn(`Unsupported event type: ${eventType}`)
-        return
+        console.warn(`Unsupported event type: ${eventType}`);
+        return;
       }
 
       // Check if selectorMaps[eventType] exists BEFORE accessing its properties
@@ -618,19 +618,19 @@ const keydownSelectors = {
           eventType,
           target,
           selectorMaps[eventType].full
-        )
+        );
         if (!eventData && selectorMaps[eventType].partial) {
           let partialData = handleSelectors(
             eventType,
             target,
             selectorMaps[eventType].partial,
             true
-          )
+          );
           if (partialData) {
-            const category = partialData.category || getCategoryFromURL()
-            const label = partialData.label || getLabelFromTarget(target)
-            const action = partialData.action || eventType
-            eventData = ['event', category, action, label]
+            const category = partialData.category || getCategoryFromURL();
+            const label = partialData.label || getLabelFromTarget(target);
+            const action = partialData.action || eventType;
+            eventData = ['event', category, action, label];
           }
         }
       }
@@ -640,8 +640,8 @@ const keydownSelectors = {
        * This is the general logic that handles interactive elements without explicit selectors.
        */
       if (eventType === 'click' && !eventData) {
-        let isInteractive = false
-        let currentElement = target
+        let isInteractive = false;
+        let currentElement = target;
         while (currentElement) {
           if (
             ['a', 'button', 'label', 'select', 'textarea'].includes(
@@ -653,37 +653,37 @@ const keydownSelectors = {
                 currentElement.type === 'file'))
           ) {
             // console.log(currentElement)
-            isInteractive = true
-            break
+            isInteractive = true;
+            break;
           }
-          currentElement = currentElement.parentElement
+          currentElement = currentElement.parentElement;
         }
 
         // Track event only if the element is interactive
         if (isInteractive) {
-          const category = getCategoryFromURL()
-          const label = getLabelFromTarget(target)
-          eventData = ['event', category, eventType, label]
+          const category = getCategoryFromURL();
+          const label = getLabelFromTarget(target);
+          eventData = ['event', category, eventType, label];
         }
       }
 
       if (eventData && typeof _sz !== 'undefined') {
-        _sz.push(eventData)
+        _sz.push(eventData);
       } else if (eventData) {
-        console.warn('_sz is not defined')
+        console.warn('_sz is not defined');
       }
     }
 
     if (typeof _sz !== 'undefined') {
-      window.addEventListener('click', trackEvent)
-      window.addEventListener('change', trackEvent)
+      window.addEventListener('click', trackEvent);
+      window.addEventListener('change', trackEvent);
       window.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
-          trackEvent(event)
+          trackEvent(event);
         }
-      })
+      });
     }
   }
 
-  initGeneralEventTracker()
-})()
+  initGeneralEventTracker();
+})();

@@ -1,5 +1,5 @@
-import { LitElement, html, css } from 'lit'
-import { customElement, property } from 'lit/decorators.js'
+import { LitElement, html, css } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
 
 /**
  * Custom Counter Web Component using Lit
@@ -8,17 +8,17 @@ import { customElement, property } from 'lit/decorators.js'
 @customElement('custom-counter')
 class CustomCounter extends LitElement {
   @property({ type: Number })
-  accessor value: number
+  accessor value: number;
 
   @property({ type: Number })
-  accessor min: number
+  accessor min: number;
 
   @property({ type: Number })
-  accessor max: number
+  accessor max: number;
 
   @property({ type: Number })
-  accessor step: number
-  accessor displayOnly: boolean
+  accessor step: number;
+  accessor displayOnly: boolean;
 
   static styles = css`
     :host {
@@ -71,38 +71,38 @@ class CustomCounter extends LitElement {
       color: #666;
       text-align: center;
     }
-  `
+  `;
 
   constructor() {
-    super()
-    this.min = 0
-    this.max = 100
-    this.step = 1
-    this.value = 0
-    this.displayOnly = false
+    super();
+    this.min = 0;
+    this.max = 100;
+    this.step = 1;
+    this.value = 0;
+    this.displayOnly = false;
   }
 
   setValue(newValue: number) {
-    const numValue = parseInt(newValue.toString()) || 0
-    this.value = Math.max(this.min, Math.min(this.max, numValue))
+    const numValue = parseInt(newValue.toString()) || 0;
+    this.value = Math.max(this.min, Math.min(this.max, numValue));
   }
 
   increment() {
-    this.setValue(this.value + this.step)
+    this.setValue(this.value + this.step);
   }
 
   decrement() {
-    this.setValue(this.value - this.step)
+    this.setValue(this.value - this.step);
   }
 
   handleInput = (e: InputEvent) => {
-    const target = e.target as HTMLInputElement
-    this.setValue(parseInt(target?.value) || 0)
-  }
+    const target = e.target as HTMLInputElement;
+    this.setValue(parseInt(target?.value) || 0);
+  };
 
   render() {
-    const isDecrementDisabled = this.value <= this.min
-    const isIncrementDisabled = this.value >= this.max
+    const isDecrementDisabled = this.value <= this.min;
+    const isIncrementDisabled = this.value >= this.max;
 
     return html`
       <div class="counter-container" part="container">
@@ -143,8 +143,8 @@ class CustomCounter extends LitElement {
       <div class="counter-info" part="info">
         Range: ${this.min} - ${this.max}, Step: ${this.step}
       </div>
-    `
+    `;
   }
 }
 
-export default CustomCounter
+export default CustomCounter;

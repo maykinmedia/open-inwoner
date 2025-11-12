@@ -32,7 +32,9 @@ jobs:
   #
   tests:
     name: Run the Django test suite
-    runs-on: ${{ matrix.test-type == 'main' && 'openinwoner-runner' || 'ubuntu-latest' }}
+    runs-on:
+      ${{ matrix.test-type == 'main' && 'openinwoner-runner' || 'ubuntu-latest'
+      }}
     strategy:
       matrix:
         test-type: [main, elastic, openklant, migrations]
@@ -46,8 +48,8 @@ jobs:
           - 5432:5432
         # needed because the postgres container does not provide a healthcheck
         options:
-          --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-          --name postgres
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s
+          --health-retries 5 --name postgres
       elasticsearch:
         image: elasticsearch:9.0.3
         env:
@@ -67,7 +69,9 @@ jobs:
       - name: Set up backend environment
         uses: maykinmedia/setup-django-backend@v1.3
         with:
-          apt-packages: 'libxml2-dev libxmlsec1-dev libxmlsec1-openssl gettext postgresql-client libgdal-dev gdal-bin'
+          apt-packages:
+            'libxml2-dev libxmlsec1-dev libxmlsec1-openssl gettext
+            postgresql-client libgdal-dev gdal-bin'
           python-version: '3.12'
           optimize-postgres: 'yes'
           pg-service: 'postgres'
@@ -167,8 +171,8 @@ jobs:
           - 5432:5432
         # Needed because the postgres container does not provide a healthcheck
         options:
-          --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-          --name postgres
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s
+          --health-retries 5 --name postgres
       elasticsearch:
         image: elasticsearch:9.0.3
         env:
@@ -184,7 +188,9 @@ jobs:
       - name: Set up backend environment
         uses: maykinmedia/setup-django-backend@v1.3
         with:
-          apt-packages: 'libxml2-dev libxmlsec1-dev libxmlsec1-openssl gettext postgresql-client libgdal-dev gdal-bin'
+          apt-packages:
+            'libxml2-dev libxmlsec1-dev libxmlsec1-openssl gettext
+            postgresql-client libgdal-dev gdal-bin'
           python-version: '3.12'
           optimize-postgres: 'yes'
           pg-service: 'postgres'
@@ -220,7 +226,9 @@ jobs:
       - name: Set up backend environment
         uses: maykinmedia/setup-django-backend@v1.3
         with:
-          apt-packages: 'libxml2-dev libxmlsec1-dev libxmlsec1-openssl gettext libgdal-dev gdal-bin graphviz'
+          apt-packages:
+            'libxml2-dev libxmlsec1-dev libxmlsec1-openssl gettext libgdal-dev
+            gdal-bin graphviz'
           python-version: '3.12'
           setup-node: 'no'
 
@@ -231,7 +239,6 @@ jobs:
         working-directory: docs
         env:
           DJANGO_SETTINGS_MODULE: open_inwoner.conf.ci
-
 
   #
   # Docker
@@ -265,7 +272,9 @@ jobs:
 
       - name: Log into registry
         if: github.event_name == 'push' # exclude PRs
-        run: echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+        run:
+          echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u ${{
+          secrets.DOCKER_USERNAME }} --password-stdin
 
       - name: Push the Docker image
         if: github.event_name == 'push' # exclude PRs
@@ -294,7 +303,6 @@ jobs:
         with:
           name: storybook-static
           path: storybook-static/
-
 #  storybook tests:
 #    name: Run Storybook tests
 #    runs-on: ubuntu-latest

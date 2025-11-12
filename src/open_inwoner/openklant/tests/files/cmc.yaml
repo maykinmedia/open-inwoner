@@ -1,54 +1,57 @@
 openapi: 3.0.1
 info:
   # source: https://dmidoffice2.esuite-development.net/contactmomenten-api-provider/api/v1/schema/openapi.yaml
-  description: Deze implementatie is niet 'compliant' maar streeft er naar 'compatible'
-    te zijn met de Contactmomenten API specificatie.
-  title: E-Suite implementatie van een deel van de Contactmomenten API versie 1.0.0
+  description:
+    Deze implementatie is niet 'compliant' maar streeft er naar 'compatible' te
+    zijn met de Contactmomenten API specificatie.
+  title:
+    E-Suite implementatie van een deel van de Contactmomenten API versie 1.0.0
     om Contacten te kunnen aanmaken en ophalen.
   version: 1.7.0
 servers:
-- url: /api/v1
+  - url: /api/v1
 security:
-- JWT-Claims: []
+  - JWT-Claims: []
 paths:
   /contactmomenten:
     get:
       operationId: contactmoment_list
       parameters:
-      - description: URL-referentie naar een Klant.
-        in: query
-        name: klant
-        schema:
-          type: string
-          format: uri
-      - description: Functionele identificatie van een Contact.
-        in: query
-        name: identificatie
-        schema:
-          type: string
-      - description: Geheel of gedeelte van een telefoonnummer of emailadres van een
-          anoniem Contact.
-        in: query
-        name: telefoonnummerOfEmailadres
-        schema:
-          type: string
-      - description: 1 of meerdere Contact Types.
-        in: query
-        name: type
-        schema:
-          type: array
-          items:
+        - description: URL-referentie naar een Klant.
+          in: query
+          name: klant
+          schema:
             type: string
-          uniqueItems: true
-      - description: Een pagina binnen de gepagineerde set resultaten.
-        in: query
-        name: page
-        schema:
-          type: string
-          format: int32
-          minimum: 1
+            format: uri
+        - description: Functionele identificatie van een Contact.
+          in: query
+          name: identificatie
+          schema:
+            type: string
+        - description:
+            Geheel of gedeelte van een telefoonnummer of emailadres van een
+            anoniem Contact.
+          in: query
+          name: telefoonnummerOfEmailadres
+          schema:
+            type: string
+        - description: 1 of meerdere Contact Types.
+          in: query
+          name: type
+          schema:
+            type: array
+            items:
+              type: string
+            uniqueItems: true
+        - description: Een pagina binnen de gepagineerde set resultaten.
+          in: query
+          name: page
+          schema:
+            type: string
+            format: int32
+            minimum: 1
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
@@ -56,12 +59,13 @@ paths:
           description: OK
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
-        "400":
+        '400':
           content:
             application/problem+json:
               schema:
@@ -69,12 +73,13 @@ paths:
           description: Bad request
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
-        "401":
+        '401':
           content:
             application/problem+json:
               schema:
@@ -82,12 +87,13 @@ paths:
           description: Unauthorized
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
-        "403":
+        '403':
           content:
             application/problem+json:
               schema:
@@ -95,12 +101,13 @@ paths:
           description: Forbidden
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
-        "500":
+        '500':
           content:
             application/problem+json:
               schema:
@@ -108,18 +115,20 @@ paths:
           description: Internal server error
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
       security:
-      - JWT-Claims:
-        - contactmomenten.lezen
-      summary: Lopende Contacten van een Klant opvragen of een Contact opvragen op
+        - JWT-Claims:
+            - contactmomenten.lezen
+      summary:
+        Lopende Contacten van een Klant opvragen of een Contact opvragen op
         basis van functionele identificatie.
       tags:
-      - contactmomenten
+        - contactmomenten
     post:
       operationId: contactmoment_create
       requestBody:
@@ -129,7 +138,7 @@ paths:
               $ref: '#/components/schemas/Contactmoment'
         required: true
       responses:
-        "201":
+        '201':
           content:
             application/json:
               schema:
@@ -137,12 +146,13 @@ paths:
           description: Created
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
-        "400":
+        '400':
           content:
             application/problem+json:
               schema:
@@ -150,12 +160,13 @@ paths:
           description: Bad request
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
-        "401":
+        '401':
           content:
             application/problem+json:
               schema:
@@ -163,12 +174,13 @@ paths:
           description: Unauthorized
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
-        "403":
+        '403':
           content:
             application/problem+json:
               schema:
@@ -176,12 +188,13 @@ paths:
           description: Forbidden
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
-        "409":
+        '409':
           content:
             application/problem+json:
               schema:
@@ -189,12 +202,13 @@ paths:
           description: Conflict
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
-        "500":
+        '500':
           content:
             application/problem+json:
               schema:
@@ -202,32 +216,35 @@ paths:
           description: Internal server error
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
       security:
-      - JWT-Claims:
-        - contactmomenten.aanmaken
-      summary: Contact aanmaken. Een Contact aanmaken met status 'nieuw' of 'in_behandeling'
-        representeerd het aanmaken van een Contactverzoek. Een Contact aanmakem met
-        status 'afgehandeld' representeerd het aanmaken van een Contactmoment.
+        - JWT-Claims:
+            - contactmomenten.aanmaken
+      summary:
+        Contact aanmaken. Een Contact aanmaken met status 'nieuw' of
+        'in_behandeling' representeerd het aanmaken van een Contactverzoek. Een
+        Contact aanmakem met status 'afgehandeld' representeerd het aanmaken van
+        een Contactmoment.
       tags:
-      - contactmomenten
+        - contactmomenten
   /contactmomenten/{uuid}:
     get:
       operationId: contactmoment_read
       parameters:
-      - description: Unieke resource identifier (UUID4)
-        in: path
-        name: uuid
-        required: true
-        schema:
-          type: string
-          format: uuid
+        - description: Unieke resource identifier (UUID4)
+          in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
@@ -235,12 +252,13 @@ paths:
           description: OK
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
-        "400":
+        '400':
           content:
             application/problem+json:
               schema:
@@ -248,12 +266,13 @@ paths:
           description: Bad request
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
-        "401":
+        '401':
           content:
             application/problem+json:
               schema:
@@ -261,12 +280,13 @@ paths:
           description: Unauthorized
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
-        "403":
+        '403':
           content:
             application/problem+json:
               schema:
@@ -274,12 +294,13 @@ paths:
           description: Forbidden
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
-        "404":
+        '404':
           content:
             application/problem+json:
               schema:
@@ -287,12 +308,13 @@ paths:
           description: Not found
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
-        "500":
+        '500':
           content:
             application/problem+json:
               schema:
@@ -300,37 +322,38 @@ paths:
           description: Internal server error
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
       security:
-      - JWT-Claims:
-        - contactmomenten.lezen
+        - JWT-Claims:
+            - contactmomenten.lezen
       summary: Contact opvragen.
       tags:
-      - contactmomenten
+        - contactmomenten
   /klantcontactmomenten:
     get:
       operationId: klantcontactmoment_list
       parameters:
-      - description: URL-referentie naar een KLANT
-        in: query
-        name: klant
-        required: true
-        schema:
-          type: string
-          format: uri
-      - description: Een pagina binnen de gepagineerde set resultaten.
-        in: query
-        name: page
-        schema:
-          type: string
-          format: int32
-          minimum: 1
+        - description: URL-referentie naar een KLANT
+          in: query
+          name: klant
+          required: true
+          schema:
+            type: string
+            format: uri
+        - description: Een pagina binnen de gepagineerde set resultaten.
+          in: query
+          name: page
+          schema:
+            type: string
+            format: int32
+            minimum: 1
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
@@ -338,12 +361,13 @@ paths:
           description: OK
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
-        "400":
+        '400':
           content:
             application/problem+json:
               schema:
@@ -351,12 +375,13 @@ paths:
           description: Bad request
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
-        "401":
+        '401':
           content:
             application/problem+json:
               schema:
@@ -364,12 +389,13 @@ paths:
           description: Unauthorized
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
-        "403":
+        '403':
           content:
             application/problem+json:
               schema:
@@ -377,12 +403,13 @@ paths:
           description: Forbidden
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
-        "500":
+        '500':
           content:
             application/problem+json:
               schema:
@@ -390,17 +417,18 @@ paths:
           description: Internal server error
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
       security:
-      - JWT-Claims:
-        - contactmomenten.lezen
+        - JWT-Claims:
+            - contactmomenten.lezen
       summary: Koppelingen tussen Contacten en Personen of Bedrijven opvragen.
       tags:
-      - klantcontactmomenten
+        - klantcontactmomenten
     post:
       operationId: klantcontactmoment_create
       requestBody:
@@ -410,7 +438,7 @@ paths:
               $ref: '#/components/schemas/Klantcontactmoment'
         required: true
       responses:
-        "201":
+        '201':
           content:
             application/json:
               schema:
@@ -418,12 +446,13 @@ paths:
           description: Created
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
-        "400":
+        '400':
           content:
             application/problem+json:
               schema:
@@ -431,12 +460,13 @@ paths:
           description: Bad request
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
-        "401":
+        '401':
           content:
             application/problem+json:
               schema:
@@ -444,12 +474,13 @@ paths:
           description: Unauthorized
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
-        "403":
+        '403':
           content:
             application/problem+json:
               schema:
@@ -457,12 +488,13 @@ paths:
           description: Forbidden
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
-        "409":
+        '409':
           content:
             application/json:
               schema:
@@ -470,12 +502,13 @@ paths:
           description: Conflict
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
-        "500":
+        '500':
           content:
             application/problem+json:
               schema:
@@ -483,35 +516,36 @@ paths:
           description: Internal server error
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
       security:
-      - JWT-Claims:
-        - contactmomenten.aanmaken
+        - JWT-Claims:
+            - contactmomenten.aanmaken
       summary: Koppelen van Contact aan Persoon of Bedrijf.
       tags:
-      - klantcontactmomenten
+        - klantcontactmomenten
   /objectcontactmomenten:
     get:
       operationId: objectcontactmoment_list
       parameters:
-      - description: URL-referentie naar een Zaak.
-        in: query
-        name: object
-        schema:
-          type: string
-          format: uri
-      - description: URL-referentie naar een Contactmoment
-        in: query
-        name: contactmoment
-        schema:
-          type: string
-          format: uri
+        - description: URL-referentie naar een Zaak.
+          in: query
+          name: object
+          schema:
+            type: string
+            format: uri
+        - description: URL-referentie naar een Contactmoment
+          in: query
+          name: contactmoment
+          schema:
+            type: string
+            format: uri
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
@@ -519,12 +553,13 @@ paths:
           description: OK
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
-        "400":
+        '400':
           content:
             application/problem+json:
               schema:
@@ -532,12 +567,13 @@ paths:
           description: Bad request
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
-        "401":
+        '401':
           content:
             application/problem+json:
               schema:
@@ -545,12 +581,13 @@ paths:
           description: Unauthorized
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
-        "403":
+        '403':
           content:
             application/problem+json:
               schema:
@@ -558,12 +595,13 @@ paths:
           description: Forbidden
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
-        "500":
+        '500':
           content:
             application/problem+json:
               schema:
@@ -571,17 +609,18 @@ paths:
           description: Internal server error
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
       security:
-      - JWT-Claims:
-        - contactmomenten.lezen
+        - JWT-Claims:
+            - contactmomenten.lezen
       summary: Koppelingen tussen Contacten en Zaken opvragen.
       tags:
-      - objectcontactmomenten
+        - objectcontactmomenten
     post:
       operationId: objectcontactmoment_create
       requestBody:
@@ -591,7 +630,7 @@ paths:
               $ref: '#/components/schemas/Objectcontactmoment'
         required: true
       responses:
-        "201":
+        '201':
           content:
             application/json:
               schema:
@@ -599,12 +638,13 @@ paths:
           description: Created
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
-        "400":
+        '400':
           content:
             application/problem+json:
               schema:
@@ -612,12 +652,13 @@ paths:
           description: Bad request
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
-        "401":
+        '401':
           content:
             application/problem+json:
               schema:
@@ -625,12 +666,13 @@ paths:
           description: Unauthorized
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
-        "403":
+        '403':
           content:
             application/problem+json:
               schema:
@@ -638,12 +680,13 @@ paths:
           description: Forbidden
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
-        "409":
+        '409':
           content:
             application/json:
               schema:
@@ -651,12 +694,13 @@ paths:
           description: Conflict
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
-        "500":
+        '500':
           content:
             application/problem+json:
               schema:
@@ -664,22 +708,24 @@ paths:
           description: Internal server error
           headers:
             API-version:
-              description: Geeft een specifieke API-versie aan in de context van een
+              description:
+                Geeft een specifieke API-versie aan in de context van een
                 specifieke aanroep. Voorbeeld 1.2.1.
               schema:
                 type: string
               style: simple
       security:
-      - JWT-Claims:
-        - contactmomenten.aanmaken
+        - JWT-Claims:
+            - contactmomenten.aanmaken
       summary: Koppelen van een Contact aan een zaak.
       tags:
-      - objectcontactmomenten
+        - objectcontactmomenten
 components:
   schemas:
     Behandelaar:
       type: object
-      description: Behandelaar van Contact. Kan alleen meegegeven worden in POST wanneer
+      description:
+        Behandelaar van Contact. Kan alleen meegegeven worden in POST wanneer
         status ongelijk is aan 'afgehandeld'
       properties:
         gebruikersnaam:
@@ -694,7 +740,7 @@ components:
           readOnly: true
           title: Volledige naam
       required:
-      - gebruikersnaam
+        - gebruikersnaam
       title: Behandelaar
     Contactgegevens:
       type: object
@@ -710,7 +756,8 @@ components:
           title: Telefoonnummer
         telefoonnummerAlternatief:
           type: string
-          description: Alternatief telefoonnummer. Indien gevuld moet ook het primaire
+          description:
+            Alternatief telefoonnummer. Indien gevuld moet ook het primaire
             telefoonnummer gevuld zijn.
           title: Telefoonnummer alternatief
       title: Contactgegevens
@@ -724,8 +771,9 @@ components:
           title: Afdeling
         antwoord:
           type: string
-          description: Antwoord uit Contact. Een Contact met status 'afgehandeld'
-            moet een antwoord bevatten.
+          description:
+            Antwoord uit Contact. Een Contact met status 'afgehandeld' moet een
+            antwoord bevatten.
           title: Antwoord
         behandelaar:
           $ref: '#/components/schemas/Behandelaar'
@@ -750,7 +798,8 @@ components:
           title: Identificatie
         kanaal:
           type: string
-          description: Kanaal vanuit waar Contact is aangemaakt. Naam van een bestaand
+          description:
+            Kanaal vanuit waar Contact is aangemaakt. Naam van een bestaand
             Kanaal in e-Suite.
           maxLength: 255
           title: Kanaal
@@ -758,13 +807,20 @@ components:
           $ref: '#/components/schemas/Medewerker'
         onderwerp:
           type: string
-          description: "Bij een POST: Naam van afdeling, of groep, waaraan Contact\
-            \ wordt toegekend. Indien waarde wordt voorafgegaan door 'afd:' dan wordt\
-            \ de waarde na deze prefix beschouwd als naam van een afdeling. Indien\
-            \ waarde wordt voorafgegaan door 'grp:' dan wordt de waarde na deze prefix\
-            \ beschouwd als naam van een groep. Bij een GET: Naam van een afdeling\
-            \ voorafgegaand door 'afd:' of naam van een groep voorafgegaan door 'grp:'\
-            \ waaraan Contact is toegekend. Naam van een in e-Suite bestaande afdeling\
+          description: "Bij een POST: Naam van afdeling, of groep, waaraan
+            Contact\
+            \ wordt toegekend. Indien waarde wordt voorafgegaan door 'afd:' dan
+            wordt\
+            \ de waarde na deze prefix beschouwd als naam van een afdeling.
+            Indien\
+            \ waarde wordt voorafgegaan door 'grp:' dan wordt de waarde na deze
+            prefix\
+            \ beschouwd als naam van een groep. Bij een GET: Naam van een
+            afdeling\
+            \ voorafgegaand door 'afd:' of naam van een groep voorafgegaan door
+            'grp:'\
+            \ waaraan Contact is toegekend. Naam van een in e-Suite bestaande
+            afdeling\
             \ of groep."
           maxLength: 255
           title: Onderwerp
@@ -780,9 +836,9 @@ components:
           default: nieuw
           description: Status van Contact
           enum:
-          - nieuw
-          - in_behandeling
-          - afgehandeld
+            - nieuw
+            - in_behandeling
+            - afgehandeld
           title: Status
         tekst:
           type: string
@@ -790,12 +846,15 @@ components:
           title: Tekst
         toelichting:
           type: string
-          description: Interne toelichting voor behandeling van Contact.  Kan alleen
-            meegegeven worden in POST wanneer status ongelijk is aan 'afgehandeld'"
+          description:
+            Interne toelichting voor behandeling van Contact.  Kan alleen
+            meegegeven worden in POST wanneer status ongelijk is aan
+            'afgehandeld'"
           title: Toelichting
         type:
           type: string
-          description: Type Contact. Naam van een bestaand Contact Type in e-Suite.
+          description:
+            Type Contact. Naam van een bestaand Contact Type in e-Suite.
           maxLength: 255
           title: Type
         url:
@@ -806,18 +865,19 @@ components:
           title: Url
         voorlopigeAntwoorden:
           type: array
-          description: Voorlopige antwoorden bij Contact gesorteerd van nieuw naar
-            oud. Wordt alleen gevuld bij ophalen van Contact via operation 'contactmoment_read'.
-            Of bij ophalen van Contact via operation 'contactmoment_list' en gebruik
-            van parameter 'identificatie'
+          description:
+            Voorlopige antwoorden bij Contact gesorteerd van nieuw naar oud.
+            Wordt alleen gevuld bij ophalen van Contact via operation
+            'contactmoment_read'. Of bij ophalen van Contact via operation
+            'contactmoment_list' en gebruik van parameter 'identificatie'
           items:
             $ref: '#/components/schemas/VoorlopigAntwoord'
           readOnly: true
           title: Voorlopige antwoorden
       required:
-      - bronorganisatie
-      - tekst
-      - url
+        - bronorganisatie
+        - tekst
+        - url
     ContactmomentResults:
       type: object
       properties:
@@ -837,8 +897,8 @@ components:
           items:
             $ref: '#/components/schemas/Contactmoment'
       required:
-      - count
-      - results
+        - count
+        - results
     Fout:
       type: object
       properties:
@@ -846,21 +906,23 @@ components:
           type: string
           description: Systeemcode die het type fout aangeeft
           enum:
-          - INTERNAL
-          - VALIDATION
-          - NOT_FOUND
-          - NOT_AUTHORISED
-          - CONFLICT
+            - INTERNAL
+            - VALIDATION
+            - NOT_FOUND
+            - NOT_AUTHORISED
+            - CONFLICT
           title: Code
         detail:
           type: string
-          description: "Extra informatie bij de fout, indien beschikbaar"
+          description: 'Extra informatie bij de fout, indien beschikbaar'
           minLength: 1
           title: Detail
         instance:
           type: string
-          description: "URI met referentie naar dit specifiek voorkomen van de fout.\
-            \ Deze kan gebruikt worden in combinatie met server logs, bijvoorbeeld."
+          description: "URI met referentie naar dit specifiek voorkomen van de
+            fout.\
+            \ Deze kan gebruikt worden in combinatie met server logs,
+            bijvoorbeeld."
           minLength: 1
           title: Instance
         status:
@@ -875,13 +937,14 @@ components:
           title: Title
         type:
           type: string
-          description: "URI referentie naar het type fout, bedoeld voor developers"
+          description:
+            'URI referentie naar het type fout, bedoeld voor developers'
           title: Type
       required:
-      - code
-      - instance
-      - status
-      - title
+        - code
+        - instance
+        - status
+        - title
     Klantcontactmoment:
       type: object
       properties:
@@ -898,12 +961,13 @@ components:
         rol:
           type: string
           default: gesprekspartner
-          description: Rol van de klant in het contactmoment. Binnen e-Suite wordt
-            deze informatie niet opgeslagen. Bij lezen wordt altijd 'gesprekspartner'
+          description:
+            Rol van de klant in het contactmoment. Binnen e-Suite wordt deze
+            informatie niet opgeslagen. Bij lezen wordt altijd 'gesprekspartner'
             geretournerd. Bij schrijven wordt de meegegeven waarde genegeerd
           enum:
-          - belanghebbende
-          - gesprekspartner
+            - belanghebbende
+            - gesprekspartner
           readOnly: true
           title: Rol
         url:
@@ -913,10 +977,10 @@ components:
           readOnly: true
           title: Url
       required:
-      - contactmoment
-      - klant
-      - rol
-      - url
+        - contactmoment
+        - klant
+        - rol
+        - url
     KlantcontactmomentResults:
       type: object
       properties:
@@ -936,8 +1000,8 @@ components:
           items:
             $ref: '#/components/schemas/Klantcontactmoment'
       required:
-      - count
-      - results
+        - count
+        - results
     Medewerker:
       type: object
       description: Medewerker die Contact heeft aangemaakt.
@@ -954,7 +1018,7 @@ components:
           maxLength: 128
           title: Identificatie
       required:
-      - identificatie
+        - identificatie
       title: Medewerker identificatie
     Objectcontactmoment:
       type: object
@@ -974,7 +1038,7 @@ components:
           default: zaak
           description: Het type van het gerelateerde OBJECT
           enum:
-          - zaak
+            - zaak
           title: Objecttype
         url:
           type: string
@@ -983,10 +1047,10 @@ components:
           readOnly: true
           title: Url
       required:
-      - contactmoment
-      - object
-      - objectType
-      - url
+        - contactmoment
+        - object
+        - objectType
+        - url
     ObjectcontactmomentResults:
       type: object
       properties:
@@ -1006,8 +1070,8 @@ components:
           items:
             $ref: '#/components/schemas/Objectcontactmoment'
       required:
-      - count
-      - results
+        - count
+        - results
     ValidatieFout:
       type: object
       properties:
@@ -1015,21 +1079,23 @@ components:
           type: string
           description: Systeemcode die het type fout aangeeft
           enum:
-          - INTERNAL
-          - VALIDATION
-          - NOT_FOUND
-          - NOT_AUTHORISED
-          - CONFLICT
+            - INTERNAL
+            - VALIDATION
+            - NOT_FOUND
+            - NOT_AUTHORISED
+            - CONFLICT
           title: Code
         detail:
           type: string
-          description: "Extra informatie bij de fout, indien beschikbaar"
+          description: 'Extra informatie bij de fout, indien beschikbaar'
           minLength: 1
           title: Detail
         instance:
           type: string
-          description: "URI met referentie naar dit specifiek voorkomen van de fout.\
-            \ Deze kan gebruikt worden in combinatie met server logs, bijvoorbeeld."
+          description: "URI met referentie naar dit specifiek voorkomen van de
+            fout.\
+            \ Deze kan gebruikt worden in combinatie met server logs,
+            bijvoorbeeld."
           minLength: 1
           title: Instance
         status:
@@ -1044,20 +1110,22 @@ components:
           title: Title
         type:
           type: string
-          description: "URI referentie naar het type fout, bedoeld voor developers"
+          description:
+            'URI referentie naar het type fout, bedoeld voor developers'
           title: Type
       required:
-      - code
-      - instance
-      - status
-      - title
+        - code
+        - instance
+        - status
+        - title
     VoorlopigAntwoord:
       type: object
       description: Voorlopig antwoord bij Contact
       properties:
         afdeling:
           type: string
-          description: Primaire afdeling van medewerker die voorlopig antwoord heeft
+          description:
+            Primaire afdeling van medewerker die voorlopig antwoord heeft
             aangemaakt.
           maxLength: 128
           readOnly: true
@@ -1069,7 +1137,8 @@ components:
           title: Antwoord
         gebruikersnaam:
           type: string
-          description: Gebruikersnaam van medewerker die voorlopig antwoord heeft
+          description:
+            Gebruikersnaam van medewerker die voorlopig antwoord heeft
             aangemaakt.
           maxLength: 128
           readOnly: true
@@ -1082,13 +1151,14 @@ components:
           title: Registratiedatum
         volledigeNaam:
           type: string
-          description: Volledige naam van medewerker die voorlopig antwoord heeft
+          description:
+            Volledige naam van medewerker die voorlopig antwoord heeft
             aangemaakt.
           maxLength: 128
           readOnly: true
           title: Volledige naam
       readOnly: true
       required:
-      - antwoord
-      - registratiedatum
+        - antwoord
+        - registratiedatum
       title: Voorlopig antwoord

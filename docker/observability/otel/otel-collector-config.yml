@@ -1,5 +1,4 @@
 ---
-
 extensions:
   basicauth/server:
     htpasswd:
@@ -20,13 +19,13 @@ receivers:
 
   # See https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/redisreceiver/README.md
   redis:
-    endpoint: "redis:6379"
+    endpoint: 'redis:6379'
     tls:
       insecure: true
 
   # See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/postgresqlreceiver
   postgresql:
-    endpoint: "db:5432"
+    endpoint: 'db:5432'
     transport: tcp
     username: open_inwoner
     password: irrelevant
@@ -37,7 +36,7 @@ receivers:
 
   # See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/nginxreceiver
   nginx:
-    endpoint: "http://nginx:80/_status"
+    endpoint: 'http://nginx:80/_status'
     collection_interval: 10s
 
 processors:
@@ -51,7 +50,7 @@ processors:
     metric_statements:
       - context: datapoint
         statements:
-        - set(attributes["target"], resource.attributes["oip.target"])
+          - set(attributes["target"], resource.attributes["oip.target"])
 
 exporters:
   # NOTE: Prior to v0.86.0 use `logging` instead of `debug`.
@@ -60,7 +59,7 @@ exporters:
   # Exposes a metrics endpoint that prometheus can scrape
   prometheus:
     endpoint: 0.0.0.0:8889
-    namespace: otel  # this becomes a prefix in the prometheus metrics: `otel_*`
+    namespace: otel # this becomes a prefix in the prometheus metrics: `otel_*`
     const_labels:
       environment: local_otel_collector
     resource_to_telemetry_conversion:

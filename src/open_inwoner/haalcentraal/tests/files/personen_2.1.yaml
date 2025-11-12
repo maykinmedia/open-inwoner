@@ -10,20 +10,20 @@ info:
   contact:
     url: https://brp-api.github.io/Haal-Centraal-BRP-bevragen
   license:
-    name: "European Union Public License, version 1.2 (EUPL-1.2)"
+    name: 'European Union Public License, version 1.2 (EUPL-1.2)'
     url: https://eupl.eu/1.2/nl/
   version: 2.1.0
 servers:
-- url: https://proefomgeving.haalcentraal.nl/haalcentraal/api/brp
-  description: |
-    Proef omgeving
+  - url: https://proefomgeving.haalcentraal.nl/haalcentraal/api/brp
+    description: |
+      Proef omgeving
 tags:
-- name: Personen
+  - name: Personen
 paths:
   /personen:
     post:
       tags:
-      - Personen
+        - Personen
       summary: Zoek personen
       description: |
         Zoek personen met één van de onderstaande verplichte combinaties van parameters en vul ze evt. aan met optionele parameters.
@@ -45,7 +45,7 @@ paths:
             schema:
               $ref: '#/components/schemas/PersonenQuery'
       responses:
-        "200":
+        '200':
           description: |
             Zoekactie geslaagd
           headers:
@@ -61,7 +61,7 @@ paths:
             application/json; charset=utf-8:
               schema:
                 $ref: '#/components/schemas/PersonenQueryResponse'
-        "400":
+        '400':
           description: Bad Request
           content:
             application/problem+json:
@@ -71,16 +71,18 @@ paths:
                 type: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1
                 title: Ten minste één parameter moet worden opgegeven.
                 status: 400
-                detail: The request could not be understood by the server due to malformed
-                  syntax. The client SHOULD NOT repeat the request without modification.
+                detail:
+                  The request could not be understood by the server due to
+                  malformed syntax. The client SHOULD NOT repeat the request
+                  without modification.
                 instance: https://datapunt.voorbeeldgemeente.nl/api/v1/resourcenaam?parameter=waarde
                 code: paramsRequired
                 invalidParams:
-                - type: https://www.vng.nl/realisatie/api/validaties/integer
-                  name: huisnummer
-                  code: integer
-                  reason: Waarde is geen geldig getal.
-        "401":
+                  - type: https://www.vng.nl/realisatie/api/validaties/integer
+                    name: huisnummer
+                    code: integer
+                    reason: Waarde is geen geldig getal.
+        '401':
           description: Unauthorized
           content:
             application/problem+json:
@@ -90,12 +92,13 @@ paths:
                 type: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.2
                 title: Niet correct geauthenticeerd.
                 status: 401
-                detail: The request requires user authentication. The response MUST
-                  include a WWW-Authenticate header field (section 14.47) containing
-                  a challenge applicable to the requested resource.
+                detail:
+                  The request requires user authentication. The response MUST
+                  include a WWW-Authenticate header field (section 14.47)
+                  containing a challenge applicable to the requested resource.
                 instance: https://datapunt.voorbeeldgemeente.nl/api/v1/resourcenaam?parameter=waarde
                 code: authentication
-        "403":
+        '403':
           description: Forbidden
           content:
             application/problem+json:
@@ -105,11 +108,12 @@ paths:
                 type: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4
                 title: U bent niet geautoriseerd voor deze operatie.
                 status: 403
-                detail: "The server understood the request, but is refusing to fulfill\
+                detail: "The server understood the request, but is refusing to
+                  fulfill\
                   \ it."
                 instance: https://datapunt.voorbeeldgemeente.nl/api/v1/resourcenaam?parameter=waarde
                 code: autorisation
-        "406":
+        '406':
           description: Not Acceptable
           content:
             application/problem+json:
@@ -119,12 +123,14 @@ paths:
                 type: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.7
                 title: Gevraagde contenttype wordt niet ondersteund.
                 status: 406
-                detail: The resource identified by the request is only capable of
-                  generating response entities which have content characteristics
-                  not acceptable according to thr accept headers sent in the request
+                detail:
+                  The resource identified by the request is only capable of
+                  generating response entities which have content
+                  characteristics not acceptable according to thr accept headers
+                  sent in the request
                 instance: https://datapunt.voorbeeldgemeente.nl/api/v1/resourcenaam?parameter=waarde
                 code: notAcceptable
-        "415":
+        '415':
           description: Unsupported Media Type
           content:
             application/problem+json:
@@ -134,12 +140,13 @@ paths:
                 type: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.16
                 title: Unsupported Media Type
                 status: 415
-                detail: The server is refusing the request because the entity of the
-                  request is in a format not supported by the requested resource for
-                  the requested method.
+                detail:
+                  The server is refusing the request because the entity of the
+                  request is in a format not supported by the requested resource
+                  for the requested method.
                 instance: https://datapunt.voorbeeldgemeente.nl/api/v1/resourcenaam?parameter=waarde
                 code: unsupported
-        "429":
+        '429':
           description: Too Many Requests
           content:
             application/problem+json:
@@ -149,11 +156,12 @@ paths:
                 type: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
                 title: Too many request
                 status: 429
-                detail: The user has sent too many requests in a given amount of time
+                detail:
+                  The user has sent too many requests in a given amount of time
                   (rate limiting).
                 instance: https://datapunt.voorbeeldgemeente.nl/api/v1/resourcenaam?parameter=waarde
                 code: tooManyRequests
-        "500":
+        '500':
           description: Internal Server Error
           content:
             application/problem+json:
@@ -163,11 +171,12 @@ paths:
                 type: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1
                 title: Interne server fout.
                 status: 500
-                detail: The server encountered an unexpected condition which prevented
+                detail:
+                  The server encountered an unexpected condition which prevented
                   it from fulfilling the request.
                 instance: https://datapunt.voorbeeldgemeente.nl/api/v1/resourcenaam?parameter=waarde
                 code: serverError
-        "503":
+        '503':
           description: Service Unavailable
           content:
             application/problem+json:
@@ -177,8 +186,9 @@ paths:
                 type: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.4
                 title: Bronservice BRP is tijdelijk niet beschikbaar.
                 status: 503
-                detail: The service is currently unable to handle the request due
-                  to a temporary overloading or maintenance of the server.
+                detail:
+                  The service is currently unable to handle the request due to a
+                  temporary overloading or maintenance of the server.
                 instance: https://datapunt.voorbeeldgemeente.nl/api/v1/resourcenaam?parameter=waarde
                 code: notAvailable
         default:
@@ -191,7 +201,7 @@ components:
   schemas:
     PersonenQueryResponse:
       required:
-      - type
+        - type
       type: object
       properties:
         type:
@@ -207,74 +217,74 @@ components:
           ZoekMetNummeraanduidingIdentificatie: '#/components/schemas/ZoekMetNummeraanduidingIdentificatieResponse'
     ZoekMetGeslachtsnaamEnGeboortedatumResponse:
       allOf:
-      - $ref: '#/components/schemas/PersonenQueryResponse'
-      - type: object
-        properties:
-          personen:
-            type: array
-            description: |
-              * **geslacht** - wordt gevuld met waarden voor 'Geslacht' in 'tabelwaarden.csv'.
-            items:
-              $ref: '#/components/schemas/PersoonBeperkt'
+        - $ref: '#/components/schemas/PersonenQueryResponse'
+        - type: object
+          properties:
+            personen:
+              type: array
+              description: |
+                * **geslacht** - wordt gevuld met waarden voor 'Geslacht' in 'tabelwaarden.csv'.
+              items:
+                $ref: '#/components/schemas/PersoonBeperkt'
     ZoekMetNaamEnGemeenteVanInschrijvingResponse:
       allOf:
-      - $ref: '#/components/schemas/PersonenQueryResponse'
-      - type: object
-        properties:
-          personen:
-            type: array
-            description: |
-              * **geslacht** - wordt gevuld met waarden voor 'Geslacht' in 'tabelwaarden.csv'.
-            items:
-              $ref: '#/components/schemas/PersoonBeperkt'
+        - $ref: '#/components/schemas/PersonenQueryResponse'
+        - type: object
+          properties:
+            personen:
+              type: array
+              description: |
+                * **geslacht** - wordt gevuld met waarden voor 'Geslacht' in 'tabelwaarden.csv'.
+              items:
+                $ref: '#/components/schemas/PersoonBeperkt'
     RaadpleegMetBurgerservicenummerResponse:
       allOf:
-      - $ref: '#/components/schemas/PersonenQueryResponse'
-      - type: object
-        properties:
-          personen:
-            type: array
-            description: |
-              * **geslacht** - wordt gevuld met waarden voor 'Geslacht' in 'tabelwaarden.csv'.
-            items:
-              $ref: '#/components/schemas/Persoon'
+        - $ref: '#/components/schemas/PersonenQueryResponse'
+        - type: object
+          properties:
+            personen:
+              type: array
+              description: |
+                * **geslacht** - wordt gevuld met waarden voor 'Geslacht' in 'tabelwaarden.csv'.
+              items:
+                $ref: '#/components/schemas/Persoon'
     ZoekMetPostcodeEnHuisnummerResponse:
       allOf:
-      - $ref: '#/components/schemas/PersonenQueryResponse'
-      - type: object
-        properties:
-          personen:
-            type: array
-            description: |
-              * **geslacht** - wordt gevuld met waarden voor 'Geslacht' in 'tabelwaarden.csv'.
-            items:
-              $ref: '#/components/schemas/PersoonBeperkt'
+        - $ref: '#/components/schemas/PersonenQueryResponse'
+        - type: object
+          properties:
+            personen:
+              type: array
+              description: |
+                * **geslacht** - wordt gevuld met waarden voor 'Geslacht' in 'tabelwaarden.csv'.
+              items:
+                $ref: '#/components/schemas/PersoonBeperkt'
     ZoekMetStraatHuisnummerEnGemeenteVanInschrijvingResponse:
       allOf:
-      - $ref: '#/components/schemas/PersonenQueryResponse'
-      - type: object
-        properties:
-          personen:
-            type: array
-            description: |
-              * **geslacht** - wordt gevuld met waarden voor 'Geslacht' in 'tabelwaarden.csv'.
-            items:
-              $ref: '#/components/schemas/PersoonBeperkt'
+        - $ref: '#/components/schemas/PersonenQueryResponse'
+        - type: object
+          properties:
+            personen:
+              type: array
+              description: |
+                * **geslacht** - wordt gevuld met waarden voor 'Geslacht' in 'tabelwaarden.csv'.
+              items:
+                $ref: '#/components/schemas/PersoonBeperkt'
     ZoekMetNummeraanduidingIdentificatieResponse:
       allOf:
-      - $ref: '#/components/schemas/PersonenQueryResponse'
-      - type: object
-        properties:
-          personen:
-            type: array
-            description: |
-              * **geslacht** - wordt gevuld met waarden voor 'Geslacht' in 'tabelwaarden.csv'.
-            items:
-              $ref: '#/components/schemas/PersoonBeperkt'
+        - $ref: '#/components/schemas/PersonenQueryResponse'
+        - type: object
+          properties:
+            personen:
+              type: array
+              description: |
+                * **geslacht** - wordt gevuld met waarden voor 'Geslacht' in 'tabelwaarden.csv'.
+              items:
+                $ref: '#/components/schemas/PersoonBeperkt'
     PersonenQuery:
       required:
-      - fields
-      - type
+        - fields
+        - type
       type: object
       properties:
         type:
@@ -306,28 +316,28 @@ components:
           ZoekMetNummeraanduidingIdentificatie: '#/components/schemas/ZoekMetNummeraanduidingIdentificatie'
     ZoekMetGeslachtsnaamEnGeboortedatum:
       required:
-      - geboortedatum
-      - geslachtsnaam
+        - geboortedatum
+        - geslachtsnaam
       allOf:
-      - $ref: '#/components/schemas/PersonenQuery'
-      - type: object
-        properties:
-          inclusiefOverledenPersonen:
-            $ref: '#/components/schemas/InclusiefOverledenPersonen'
-          geboortedatum:
-            type: string
-            description: |
-              Je kunt alleen zoeken met een volledige geboortedatum.
-            format: date
-            example: 1964-09-24
-          geslachtsnaam:
-            $ref: '#/components/schemas/GeslachtsnaamFilter'
-          geslacht:
-            $ref: '#/components/schemas/GeslachtFilter'
-          voorvoegsel:
-            $ref: '#/components/schemas/VoorvoegselFilter'
-          voornamen:
-            $ref: '#/components/schemas/VoornamenOptioneelFilter'
+        - $ref: '#/components/schemas/PersonenQuery'
+        - type: object
+          properties:
+            inclusiefOverledenPersonen:
+              $ref: '#/components/schemas/InclusiefOverledenPersonen'
+            geboortedatum:
+              type: string
+              description: |
+                Je kunt alleen zoeken met een volledige geboortedatum.
+              format: date
+              example: 1964-09-24
+            geslachtsnaam:
+              $ref: '#/components/schemas/GeslachtsnaamFilter'
+            geslacht:
+              $ref: '#/components/schemas/GeslachtFilter'
+            voorvoegsel:
+              $ref: '#/components/schemas/VoorvoegselFilter'
+            voornamen:
+              $ref: '#/components/schemas/VoornamenOptioneelFilter'
     InclusiefOverledenPersonen:
       type: boolean
       description: |
@@ -335,95 +345,96 @@ components:
       example: true
     ZoekMetNaamEnGemeenteVanInschrijving:
       required:
-      - gemeenteVanInschrijving
-      - geslachtsnaam
-      - voornamen
+        - gemeenteVanInschrijving
+        - geslachtsnaam
+        - voornamen
       allOf:
-      - $ref: '#/components/schemas/PersonenQuery'
-      - type: object
-        properties:
-          inclusiefOverledenPersonen:
-            $ref: '#/components/schemas/InclusiefOverledenPersonen'
-          geslacht:
-            $ref: '#/components/schemas/GeslachtFilter'
-          geslachtsnaam:
-            $ref: '#/components/schemas/GeslachtsnaamFilter'
-          voorvoegsel:
-            $ref: '#/components/schemas/VoorvoegselFilter'
-          voornamen:
-            $ref: '#/components/schemas/VoornamenVerplichtFilter'
+        - $ref: '#/components/schemas/PersonenQuery'
+        - type: object
+          properties:
+            inclusiefOverledenPersonen:
+              $ref: '#/components/schemas/InclusiefOverledenPersonen'
+            geslacht:
+              $ref: '#/components/schemas/GeslachtFilter'
+            geslachtsnaam:
+              $ref: '#/components/schemas/GeslachtsnaamFilter'
+            voorvoegsel:
+              $ref: '#/components/schemas/VoorvoegselFilter'
+            voornamen:
+              $ref: '#/components/schemas/VoornamenVerplichtFilter'
     RaadpleegMetBurgerservicenummer:
       required:
-      - burgerservicenummer
+        - burgerservicenummer
       allOf:
-      - $ref: '#/components/schemas/PersonenQuery'
-      - type: object
-        properties:
-          burgerservicenummer:
-            maxItems: 20
-            minItems: 1
-            type: array
-            items:
-              $ref: '#/components/schemas/Burgerservicenummer'
+        - $ref: '#/components/schemas/PersonenQuery'
+        - type: object
+          properties:
+            burgerservicenummer:
+              maxItems: 20
+              minItems: 1
+              type: array
+              items:
+                $ref: '#/components/schemas/Burgerservicenummer'
     ZoekMetPostcodeEnHuisnummer:
       required:
-      - huisnummer
-      - postcode
+        - huisnummer
+        - postcode
       allOf:
-      - $ref: '#/components/schemas/PersonenQuery'
-      - type: object
-        properties:
-          inclusiefOverledenPersonen:
-            $ref: '#/components/schemas/InclusiefOverledenPersonen'
-          huisletter:
-            $ref: '#/components/schemas/Huisletter'
-          huisnummer:
-            $ref: '#/components/schemas/Huisnummer'
-          huisnummertoevoeging:
-            $ref: '#/components/schemas/Huisnummertoevoeging'
-          postcode:
-            $ref: '#/components/schemas/Postcode'
+        - $ref: '#/components/schemas/PersonenQuery'
+        - type: object
+          properties:
+            inclusiefOverledenPersonen:
+              $ref: '#/components/schemas/InclusiefOverledenPersonen'
+            huisletter:
+              $ref: '#/components/schemas/Huisletter'
+            huisnummer:
+              $ref: '#/components/schemas/Huisnummer'
+            huisnummertoevoeging:
+              $ref: '#/components/schemas/Huisnummertoevoeging'
+            postcode:
+              $ref: '#/components/schemas/Postcode'
     ZoekMetStraatHuisnummerEnGemeenteVanInschrijving:
       required:
-      - gemeenteVanInschrijving
-      - huisnummer
-      - straat
+        - gemeenteVanInschrijving
+        - huisnummer
+        - straat
       allOf:
-      - $ref: '#/components/schemas/PersonenQuery'
-      - type: object
-        properties:
-          inclusiefOverledenPersonen:
-            $ref: '#/components/schemas/InclusiefOverledenPersonen'
-          huisletter:
-            $ref: '#/components/schemas/Huisletter'
-          huisnummer:
-            $ref: '#/components/schemas/Huisnummer'
-          huisnummertoevoeging:
-            $ref: '#/components/schemas/Huisnummertoevoeging'
-          straat:
-            $ref: '#/components/schemas/StraatFilter'
+        - $ref: '#/components/schemas/PersonenQuery'
+        - type: object
+          properties:
+            inclusiefOverledenPersonen:
+              $ref: '#/components/schemas/InclusiefOverledenPersonen'
+            huisletter:
+              $ref: '#/components/schemas/Huisletter'
+            huisnummer:
+              $ref: '#/components/schemas/Huisnummer'
+            huisnummertoevoeging:
+              $ref: '#/components/schemas/Huisnummertoevoeging'
+            straat:
+              $ref: '#/components/schemas/StraatFilter'
     ZoekMetNummeraanduidingIdentificatie:
       required:
-      - nummeraanduidingIdentificatie
+        - nummeraanduidingIdentificatie
       allOf:
-      - $ref: '#/components/schemas/PersonenQuery'
-      - type: object
-        properties:
-          inclusiefOverledenPersonen:
-            $ref: '#/components/schemas/InclusiefOverledenPersonen'
-          nummeraanduidingIdentificatie:
-            $ref: '#/components/schemas/NummeraanduidingIdentificatie'
+        - $ref: '#/components/schemas/PersonenQuery'
+        - type: object
+          properties:
+            inclusiefOverledenPersonen:
+              $ref: '#/components/schemas/InclusiefOverledenPersonen'
+            nummeraanduidingIdentificatie:
+              $ref: '#/components/schemas/NummeraanduidingIdentificatie'
     BadRequestFoutbericht:
       allOf:
-      - $ref: '#/components/schemas/Foutbericht'
-      - type: object
-        properties:
-          invalidParams:
-            type: array
-            description: Foutmelding per fout in een parameter. Alle gevonden fouten
-              worden één keer teruggemeld.
-            items:
-              $ref: '#/components/schemas/InvalidParams'
+        - $ref: '#/components/schemas/Foutbericht'
+        - type: object
+          properties:
+            invalidParams:
+              type: array
+              description:
+                Foutmelding per fout in een parameter. Alle gevonden fouten
+                worden één keer teruggemeld.
+              items:
+                $ref: '#/components/schemas/InvalidParams'
     Foutbericht:
       type: object
       properties:
@@ -450,17 +461,19 @@ components:
           format: uri
         code:
           minLength: 1
-          pattern: "^[a-zA-Z0-9]{1,25}$"
+          pattern: '^[a-zA-Z0-9]{1,25}$'
           type: string
           description: Systeemcode die het type fout aangeeft
-      description: "Terugmelding bij een fout. JSON representatie in lijn met [RFC7807](https://tools.ietf.org/html/rfc7807)."
+      description:
+        'Terugmelding bij een fout. JSON representatie in lijn met
+        [RFC7807](https://tools.ietf.org/html/rfc7807).'
     InvalidParams:
       type: object
       properties:
         type:
           type: string
           format: uri
-          example: "https://www.vng.nl/realisatie/api/{major-versie}/validaties/integer"
+          example: 'https://www.vng.nl/realisatie/api/{major-versie}/validaties/integer'
         name:
           pattern: "^[a-zA-Z0-9\\.,_]{1,30}$"
           type: string
@@ -508,9 +521,9 @@ components:
       description: |
         * **geslacht** - wordt gevuld met waarden voor 'Geslacht' in 'tabelwaarden.csv'.
     Burgerservicenummer:
-      pattern: "^[0-9]{9}$"
+      pattern: '^[0-9]{9}$'
       type: string
-      example: "555555021"
+      example: '555555021'
     GeheimhoudingPersoonsgegevens:
       type: boolean
       description: |
@@ -545,8 +558,9 @@ components:
           $ref: '#/components/schemas/OmschrijvingVerdrag'
         categorie:
           $ref: '#/components/schemas/Categorie'
-      description: Gegevens over de RNI-deelnemer die de gegevens in de betrokken
-        categorie heeft aangeleverd.
+      description:
+        Gegevens over de RNI-deelnemer die de gegevens in de betrokken categorie
+        heeft aangeleverd.
     OmschrijvingVerdrag:
       pattern: "^[a-zA-Z0-9À-ž \\.\\-\\']{1,50}$"
       type: string
@@ -555,7 +569,8 @@ components:
     Categorie:
       pattern: "^[a-zA-Z0-9À-ž \\.\\-\\'\\/]{1,40}$"
       type: string
-      description: Naam van categorie waarop de RNI-deelnemer gegevens heeft aangeleverd
+      description:
+        Naam van categorie waarop de RNI-deelnemer gegevens heeft aangeleverd
       example: Verblijfplaats
     Verificatie:
       type: object
@@ -639,7 +654,7 @@ components:
       description: |
         * **geslacht** - wordt gevuld met waarden voor 'Geslacht' in 'tabelwaarden.csv'.
     ANummer:
-      pattern: "^[0-9]{10}$"
+      pattern: '^[0-9]{10}$'
       type: string
       description: |
         Het A-nummer van de persoon
@@ -682,20 +697,21 @@ components:
       description: |
         Het pad naar een gewenst veld in punt-gescheiden formaat. Bijvoorbeeld "burgerservicenummer", "geboorte.datum", "partners.naam.voornamen".
     GemeenteVanInschrijving:
-      pattern: "^[0-9]{4}$"
+      pattern: '^[0-9]{4}$'
       type: string
       description: |
         Een code die aangeeft in welke gemeente de persoon woont, of de laatste gemeente waar de persoon heeft gewoond, of de gemeente waar de persoon voor het eerst is ingeschreven.
-      example: "0518"
+      example: '0518'
     GeslachtsnaamFilter:
-      pattern: "^[a-zA-Z0-9À-ž \\.\\-\\']{1,200}$|^[a-zA-Z0-9À-ž \\.\\-\\']{3,199}\\\
+      pattern: "^[a-zA-Z0-9À-ž \\.\\-\\']{1,200}$|^[a-zA-Z0-9À-ž
+        \\.\\-\\']{3,199}\\\
         *{1}$"
       type: string
       description: |
         De (geslachts)naam waarvan de eventueel aanwezige voorvoegsels zijn afgesplitst. **Gebruik van de wildcard is toegestaan bij invoer van ten minste 3 letters.** **Zoeken met tekstvelden is case-insensitive.**
       example: Vries
     GeslachtFilter:
-      pattern: "^([Mm]|[Vv]|[Oo])$"
+      pattern: '^([Mm]|[Vv]|[Oo])$'
       type: string
       description: |
         Geeft aan dat de persoon een man of een vrouw is, of dat het geslacht (nog) onbekend is.
@@ -713,14 +729,15 @@ components:
         De verzameling namen die, gescheiden door spaties, aan de geslachtsnaam voorafgaat. **Gebruik van de wildcard is toegestaan.** **Zoeken met tekstvelden is case-insensitive.**
       example: Dirk
     VoornamenVerplichtFilter:
-      pattern: "^[a-zA-Z0-9À-ž \\.\\-\\']{1,200}$|^[a-zA-Z0-9À-ž \\.\\-\\']{3,199}\\\
+      pattern: "^[a-zA-Z0-9À-ž \\.\\-\\']{1,200}$|^[a-zA-Z0-9À-ž
+        \\.\\-\\']{3,199}\\\
         *{1}$"
       type: string
       description: |
         De verzameling namen die, gescheiden door spaties, aan de geslachtsnaam voorafgaat. **Gebruik van de wildcard is toegestaan bij invoer van ten minste 3 letters.** **Zoeken met tekstvelden is case-insensitive.**
       example: Dirk
     Huisletter:
-      pattern: "^[a-zA-Z]{1}$"
+      pattern: '^[a-zA-Z]{1}$'
       type: string
       description: |
         Een toevoeging aan een huisnummer in de vorm van een letter die door de gemeente aan een adresseerbaar object is gegeven.
@@ -739,32 +756,35 @@ components:
         Een toevoeging aan een huisnummer of een combinatie van huisnummer en huisletter die door de gemeente aan een adresseerbaar object is gegeven.
       example: bis
     Postcode:
-      pattern: "^[1-9]{1}[0-9]{3}[ ]?[A-Za-z]{2}$"
+      pattern: '^[1-9]{1}[0-9]{3}[ ]?[A-Za-z]{2}$'
       type: string
       description: |
         De door PostNL vastgestelde code die bij een bepaalde combinatie van een straatnaam en een huisnummer hoort.
       example: 2341SX
     StraatFilter:
-      pattern: "^[a-zA-Z0-9À-ž \\-\\'\\.]{1,80}$|^[a-zA-Z0-9À-ž \\-\\'\\.]{7,79}\\\
+      pattern: "^[a-zA-Z0-9À-ž \\-\\'\\.]{1,80}$|^[a-zA-Z0-9À-ž
+        \\-\\'\\.]{7,79}\\\
         *{1}$|^\\*{1}[a-zA-Z0-9À-ž \\-\\'\\.]{7,79}$"
       type: string
-      description: "Een naam die door de gemeente aan een openbare ruimte is gegeven.\
-        \ **Gebruik van de wildcard is toegestaan bij invoer van ten minste 7 letters.**\
+      description: "Een naam die door de gemeente aan een openbare ruimte is
+        gegeven.\
+        \ **Gebruik van de wildcard is toegestaan bij invoer van ten minste 7
+        letters.**\
         \ **Zoeken met tekstvelden is case-insensitive.** \n"
       example: Tulpstraat
     NummeraanduidingIdentificatie:
-      pattern: "^[0-9]{16}$"
+      pattern: '^[0-9]{16}$'
       type: string
       description: |
         Unieke identificatie van een nummeraanduiding (en het bijbehorende adres) in de BAG.
-      example: "0518200000366054"
+      example: '0518200000366054'
     GeboorteBeperkt:
       allOf:
-      - $ref: '#/components/schemas/GeboorteBasis'
-      - type: object
-        properties:
-          inOnderzoek:
-            $ref: '#/components/schemas/GeboorteInOnderzoekBeperkt'
+        - $ref: '#/components/schemas/GeboorteBasis'
+        - type: object
+          properties:
+            inOnderzoek:
+              $ref: '#/components/schemas/GeboorteInOnderzoekBeperkt'
     GeboorteBasis:
       type: object
       properties:
@@ -772,18 +792,18 @@ components:
           $ref: '#/components/schemas/AbstractDatum'
     GeboorteInOnderzoekBeperkt:
       allOf:
-      - $ref: '#/components/schemas/InOnderzoek'
-      - type: object
-        properties:
-          datum:
-            type: boolean
+        - $ref: '#/components/schemas/InOnderzoek'
+        - type: object
+          properties:
+            datum:
+              type: boolean
     Waardetabel:
       type: object
       properties:
         code:
           pattern: "^[a-zA-Z0-9 \\.]+$"
           type: string
-          example: "6030"
+          example: '6030'
         omschrijving:
           pattern: "^[a-zA-Z0-9À-ž \\'\\,\\(\\)\\.\\-]{1,200}$"
           type: string
@@ -792,10 +812,10 @@ components:
       description: |
         Gegevens over de naam van de persoon.
       allOf:
-      - $ref: '#/components/schemas/NaamBasis'
-      - properties:
-          inOnderzoek:
-            $ref: '#/components/schemas/NaamPersoonInOnderzoekBeperkt'
+        - $ref: '#/components/schemas/NaamBasis'
+        - properties:
+            inOnderzoek:
+              $ref: '#/components/schemas/NaamPersoonInOnderzoekBeperkt'
     NaamBasis:
       type: object
       properties:
@@ -821,20 +841,20 @@ components:
       description: |
         Wordt gevuld met waarden uit de landelijke tabel 'Adellijke titel/predicaat'. De property soort geeft aan of het een 'predicaat' of een 'titel' is.
       allOf:
-      - $ref: '#/components/schemas/Waardetabel'
-      - properties:
-          soort:
-            $ref: '#/components/schemas/AdellijkeTitelPredicaatSoort'
-        example:
-          value:
-            code: JV
-            omschrijving: jonkvrouw
-            soort: predicaat
+        - $ref: '#/components/schemas/Waardetabel'
+        - properties:
+            soort:
+              $ref: '#/components/schemas/AdellijkeTitelPredicaatSoort'
+          example:
+            value:
+              code: JV
+              omschrijving: jonkvrouw
+              soort: predicaat
     AdellijkeTitelPredicaatSoort:
       type: string
       enum:
-      - titel
-      - predicaat
+        - titel
+        - predicaat
     Voorvoegsel:
       maxLength: 10
       pattern: "^[a-zA-Z \\']{1,10}$"
@@ -860,37 +880,37 @@ components:
       example: Pieter Jan de Vries
     NaamPersoonInOnderzoekBeperkt:
       allOf:
-      - $ref: '#/components/schemas/NaamInOnderzoek'
-      - type: object
-        properties:
-          volledigeNaam:
-            type: boolean
+        - $ref: '#/components/schemas/NaamInOnderzoek'
+        - type: object
+          properties:
+            volledigeNaam:
+              type: boolean
     NaamInOnderzoek:
       description: |
         Geeft aan welke gegevens over de naam in onderzoek zijn.
       allOf:
-      - $ref: '#/components/schemas/InOnderzoek'
-      - type: object
-        properties:
-          voornamen:
-            type: boolean
-          adellijkeTitelPredicaat:
-            type: boolean
-          voorvoegsel:
-            type: boolean
-          geslachtsnaam:
-            type: boolean
-          voorletters:
-            type: boolean
+        - $ref: '#/components/schemas/InOnderzoek'
+        - type: object
+          properties:
+            voornamen:
+              type: boolean
+            adellijkeTitelPredicaat:
+              type: boolean
+            voorvoegsel:
+              type: boolean
+            geslachtsnaam:
+              type: boolean
+            voorletters:
+              type: boolean
     OpschortingBijhouding:
       allOf:
-      - $ref: '#/components/schemas/OpschortingBijhoudingBasis'
-      - type: object
-        properties:
-          datum:
-            $ref: '#/components/schemas/AbstractDatum'
-        description: |
-          * **datum**: de datum waarop de bijhouding van de persoonsgegevens is gestaakt.
+        - $ref: '#/components/schemas/OpschortingBijhoudingBasis'
+        - type: object
+          properties:
+            datum:
+              $ref: '#/components/schemas/AbstractDatum'
+          description: |
+            * **datum**: de datum waarop de bijhouding van de persoonsgegevens is gestaakt.
     OpschortingBijhoudingBasis:
       type: object
       properties:
@@ -900,10 +920,10 @@ components:
         * **reden** - wordt gevuld met waarden voor 'Reden_Opschorting_Bijhouding' in 'tabelwaarden.csv'.
     AdresseringBeperkt:
       allOf:
-      - $ref: '#/components/schemas/AdresseringBasis'
-      - properties:
-          inOnderzoek:
-            $ref: '#/components/schemas/AdresseringInOnderzoekBeperkt'
+        - $ref: '#/components/schemas/AdresseringBasis'
+        - properties:
+            inOnderzoek:
+              $ref: '#/components/schemas/AdresseringInOnderzoekBeperkt'
     AdresseringBasis:
       type: object
       properties:
@@ -917,7 +937,7 @@ components:
           $ref: '#/components/schemas/Waardetabel'
         indicatieVastgesteldVerblijftNietOpAdres:
           $ref: '#/components/schemas/IndicatieVastgesteldVerblijftNietOpAdres'
-      description: ""
+      description: ''
     Adresregel1:
       maxLength: 40
       type: string
@@ -953,14 +973,14 @@ components:
         Geeft aan welke gegevens over de adressering in onderzoek zijn.
     AbstractDatum:
       required:
-      - langFormaat
-      - type
+        - langFormaat
+        - type
       type: object
       properties:
         type:
           type: string
         langFormaat:
-          pattern: "^[a-z0-9 ]{1,17}$"
+          pattern: '^[a-z0-9 ]{1,17}$'
           type: string
       discriminator:
         propertyName: type
@@ -971,7 +991,7 @@ components:
           JaarMaandDatum: '#/components/schemas/JaarMaandDatum'
     VolledigeDatum:
       required:
-      - datum
+        - datum
       description: Datum conform iso8601
       example:
         value:
@@ -979,15 +999,15 @@ components:
           datum: 2018-07-01
           langFormaat: 1 juli 2018
       allOf:
-      - $ref: '#/components/schemas/AbstractDatum'
-      - type: object
-        properties:
-          datum:
-            type: string
-            format: date
+        - $ref: '#/components/schemas/AbstractDatum'
+        - type: object
+          properties:
+            datum:
+              type: string
+              format: date
     DatumOnbekend:
       required:
-      - onbekend
+        - onbekend
       description: representatie voor een volledig onbekend datum
       example:
         value:
@@ -995,27 +1015,28 @@ components:
           onbekend: true
           langFormaat: onbekend
       allOf:
-      - $ref: '#/components/schemas/AbstractDatum'
-      - type: object
-        properties:
-          onbekend:
-            type: boolean
-            default: true
+        - $ref: '#/components/schemas/AbstractDatum'
+        - type: object
+          properties:
+            onbekend:
+              type: boolean
+              default: true
     JaarDatum:
       required:
-      - jaar
-      description: representatie voor een datum waarvan maand en dag onbekend zijn
+        - jaar
+      description:
+        representatie voor een datum waarvan maand en dag onbekend zijn
       example:
         value:
           type: JaarDatum
           jaar: 2018
           langFormaat: 2018
       allOf:
-      - $ref: '#/components/schemas/AbstractDatum'
-      - type: object
-        properties:
-          jaar:
-            $ref: '#/components/schemas/Jaar'
+        - $ref: '#/components/schemas/AbstractDatum'
+        - type: object
+          properties:
+            jaar:
+              $ref: '#/components/schemas/Jaar'
     Jaar:
       maximum: 9999
       minimum: 1
@@ -1023,8 +1044,8 @@ components:
       format: int32
     JaarMaandDatum:
       required:
-      - jaar
-      - maand
+        - jaar
+        - maand
       description: representatie voor een datum waarvan de dag onbekend is
       example:
         value:
@@ -1033,13 +1054,13 @@ components:
           maand: 7
           langFormaat: juli 2018
       allOf:
-      - $ref: '#/components/schemas/AbstractDatum'
-      - type: object
-        properties:
-          jaar:
-            $ref: '#/components/schemas/Jaar'
-          maand:
-            $ref: '#/components/schemas/Maand'
+        - $ref: '#/components/schemas/AbstractDatum'
+        - type: object
+          properties:
+            jaar:
+              $ref: '#/components/schemas/Jaar'
+            maand:
+              $ref: '#/components/schemas/Maand'
     Maand:
       maximum: 12
       minimum: 1
@@ -1067,24 +1088,24 @@ components:
         Gegevens over de naam van de persoon.
         * **aanduidingNaamgebruik** - wordt gevuld met waarden voor 'Naamgebruik' in 'tabelwaarden.csv'.
       allOf:
-      - $ref: '#/components/schemas/NaamBasis'
-      - properties:
-          aanduidingNaamgebruik:
-            $ref: '#/components/schemas/Waardetabel'
-          inOnderzoek:
-            $ref: '#/components/schemas/NaamPersoonInOnderzoek'
+        - $ref: '#/components/schemas/NaamBasis'
+        - properties:
+            aanduidingNaamgebruik:
+              $ref: '#/components/schemas/Waardetabel'
+            inOnderzoek:
+              $ref: '#/components/schemas/NaamPersoonInOnderzoek'
     NaamPersoonInOnderzoek:
       allOf:
-      - $ref: '#/components/schemas/NaamInOnderzoek'
-      - type: object
-        properties:
-          aanduidingNaamgebruik:
-            type: boolean
-          volledigeNaam:
-            type: boolean
+        - $ref: '#/components/schemas/NaamInOnderzoek'
+        - type: object
+          properties:
+            aanduidingNaamgebruik:
+              type: boolean
+            volledigeNaam:
+              type: boolean
     AbstractNationaliteit:
       required:
-      - type
+        - type
       type: object
       properties:
         type:
@@ -1105,93 +1126,93 @@ components:
       description: |
         * **nationaliteit** - wordt gevuld met waarden uit de landelijke tabel 'Nationaliteiten'.
       allOf:
-      - $ref: '#/components/schemas/AbstractNationaliteit'
-      - type: object
-        properties:
-          datumIngangGeldigheid:
-            $ref: '#/components/schemas/AbstractDatum'
-          nationaliteit:
-            $ref: '#/components/schemas/Waardetabel'
-          inOnderzoek:
-            $ref: '#/components/schemas/NationaliteitBekendInOnderzoek'
+        - $ref: '#/components/schemas/AbstractNationaliteit'
+        - type: object
+          properties:
+            datumIngangGeldigheid:
+              $ref: '#/components/schemas/AbstractDatum'
+            nationaliteit:
+              $ref: '#/components/schemas/Waardetabel'
+            inOnderzoek:
+              $ref: '#/components/schemas/NationaliteitBekendInOnderzoek'
     NationaliteitBekendInOnderzoek:
       description: |
         Geeft aan welke gegevens over de nationaliteit in onderzoek zijn.
       allOf:
-      - $ref: '#/components/schemas/InOnderzoek'
-      - type: object
-        properties:
-          type:
-            type: boolean
-          nationaliteit:
-            type: boolean
-          redenOpname:
-            type: boolean
+        - $ref: '#/components/schemas/InOnderzoek'
+        - type: object
+          properties:
+            type:
+              type: boolean
+            nationaliteit:
+              type: boolean
+            redenOpname:
+              type: boolean
     BehandeldAlsNederlander:
       allOf:
-      - $ref: '#/components/schemas/AbstractNationaliteit'
-      - type: object
-        properties:
-          datumIngangGeldigheid:
-            $ref: '#/components/schemas/AbstractDatum'
-          inOnderzoek:
-            $ref: '#/components/schemas/BijzonderNederlanderschapInOnderzoek'
+        - $ref: '#/components/schemas/AbstractNationaliteit'
+        - type: object
+          properties:
+            datumIngangGeldigheid:
+              $ref: '#/components/schemas/AbstractDatum'
+            inOnderzoek:
+              $ref: '#/components/schemas/BijzonderNederlanderschapInOnderzoek'
     BijzonderNederlanderschapInOnderzoek:
       allOf:
-      - $ref: '#/components/schemas/InOnderzoek'
-      - type: object
-        properties:
-          type:
-            type: boolean
-          redenOpname:
-            type: boolean
+        - $ref: '#/components/schemas/InOnderzoek'
+        - type: object
+          properties:
+            type:
+              type: boolean
+            redenOpname:
+              type: boolean
     VastgesteldNietNederlander:
       allOf:
-      - $ref: '#/components/schemas/AbstractNationaliteit'
-      - type: object
-        properties:
-          datumIngangGeldigheid:
-            $ref: '#/components/schemas/AbstractDatum'
-          inOnderzoek:
-            $ref: '#/components/schemas/BijzonderNederlanderschapInOnderzoek'
+        - $ref: '#/components/schemas/AbstractNationaliteit'
+        - type: object
+          properties:
+            datumIngangGeldigheid:
+              $ref: '#/components/schemas/AbstractDatum'
+            inOnderzoek:
+              $ref: '#/components/schemas/BijzonderNederlanderschapInOnderzoek'
     Staatloos:
       description: |
         * **redenOpname** : De reden op grond waarvan de persoon de nationaliteit gekregen heeft.
       allOf:
-      - $ref: '#/components/schemas/AbstractNationaliteit'
-      - type: object
-        properties:
-          datumIngangGeldigheid:
-            $ref: '#/components/schemas/AbstractDatum'
-          inOnderzoek:
-            $ref: '#/components/schemas/StaatloosInOnderzoek'
+        - $ref: '#/components/schemas/AbstractNationaliteit'
+        - type: object
+          properties:
+            datumIngangGeldigheid:
+              $ref: '#/components/schemas/AbstractDatum'
+            inOnderzoek:
+              $ref: '#/components/schemas/StaatloosInOnderzoek'
     StaatloosInOnderzoek:
       allOf:
-      - $ref: '#/components/schemas/InOnderzoek'
-      - type: object
-        properties:
-          type:
-            type: boolean
-          redenOpname:
-            type: boolean
+        - $ref: '#/components/schemas/InOnderzoek'
+        - type: object
+          properties:
+            type:
+              type: boolean
+            redenOpname:
+              type: boolean
     NationaliteitOnbekend:
       allOf:
-      - $ref: '#/components/schemas/AbstractNationaliteit'
-      - type: object
-        properties:
-          datumIngangGeldigheid:
-            $ref: '#/components/schemas/AbstractDatum'
-          inOnderzoek:
-            $ref: '#/components/schemas/NationaliteitOnbekendInOnderzoek'
+        - $ref: '#/components/schemas/AbstractNationaliteit'
+        - type: object
+          properties:
+            datumIngangGeldigheid:
+              $ref: '#/components/schemas/AbstractDatum'
+            inOnderzoek:
+              $ref: '#/components/schemas/NationaliteitOnbekendInOnderzoek'
     NationaliteitOnbekendInOnderzoek:
       allOf:
-      - $ref: '#/components/schemas/InOnderzoek'
-      - type: object
-        properties:
-          type:
-            type: boolean
-          redenOpname:
-            type: boolean
+        - $ref: '#/components/schemas/InOnderzoek'
+        - type: object
+          properties:
+            type:
+              type: boolean
+            redenOpname:
+              type: boolean
     Geboorte:
       description: |
         Gegevens over de geboorte.
@@ -1199,26 +1220,26 @@ components:
         * **land** - land waar de persoon is geboren. Wordt gevuld met waarden uit de landelijke tabel 'Landen'.
         * **plaats** - gemeente waar de persoon is geboren. Wordt gevuld met waarden uit de landelijke tabel "Gemeenten" voor een gemeente in Nederland of als de persoon is geboren buiten Nederland de omschrijving van een buitenlandse plaatsnaam of aanduiding.
       allOf:
-      - $ref: '#/components/schemas/GeboorteBasis'
-      - type: object
-        properties:
-          land:
-            $ref: '#/components/schemas/Waardetabel'
-          plaats:
-            $ref: '#/components/schemas/Waardetabel'
-          inOnderzoek:
-            $ref: '#/components/schemas/GeboorteInOnderzoek'
+        - $ref: '#/components/schemas/GeboorteBasis'
+        - type: object
+          properties:
+            land:
+              $ref: '#/components/schemas/Waardetabel'
+            plaats:
+              $ref: '#/components/schemas/Waardetabel'
+            inOnderzoek:
+              $ref: '#/components/schemas/GeboorteInOnderzoek'
     GeboorteInOnderzoek:
       allOf:
-      - $ref: '#/components/schemas/InOnderzoek'
-      - type: object
-        properties:
-          datum:
-            type: boolean
-          land:
-            type: boolean
-          plaats:
-            type: boolean
+        - $ref: '#/components/schemas/InOnderzoek'
+        - type: object
+          properties:
+            datum:
+              type: boolean
+            land:
+              type: boolean
+            plaats:
+              type: boolean
     Overlijden:
       type: object
       properties:
@@ -1239,18 +1260,18 @@ components:
       description: |
         Geeft aan welke gegevens over het overlijden van de persoon in onderzoek zijn.
       allOf:
-      - $ref: '#/components/schemas/InOnderzoek'
-      - type: object
-        properties:
-          datum:
-            type: boolean
-          land:
-            type: boolean
-          plaats:
-            type: boolean
+        - $ref: '#/components/schemas/InOnderzoek'
+        - type: object
+          properties:
+            datum:
+              type: boolean
+            land:
+              type: boolean
+            plaats:
+              type: boolean
     AbstractVerblijfplaats:
       required:
-      - type
+        - type
       type: object
       properties:
         type:
@@ -1269,17 +1290,17 @@ components:
         * **gemeenteVanInschrijving** - wordt gevuld met waarden uit de landelijke tabel 'Gemeenten'.
         * **land** - land waar de persoon is overleden. Wordt gevuld met waarden uit de landelijke tabel 'Landen'.
       allOf:
-      - $ref: '#/components/schemas/AbstractVerblijfplaats'
-      - type: object
-        properties:
-          verblijfadres:
-            $ref: '#/components/schemas/VerblijfadresBuitenland'
-          datumVan:
-            $ref: '#/components/schemas/AbstractDatum'
-          datumIngangGeldigheid:
-            $ref: '#/components/schemas/AbstractDatum'
-          inOnderzoek:
-            $ref: '#/components/schemas/VerblijfplaatsBuitenlandInOnderzoek'
+        - $ref: '#/components/schemas/AbstractVerblijfplaats'
+        - type: object
+          properties:
+            verblijfadres:
+              $ref: '#/components/schemas/VerblijfadresBuitenland'
+            datumVan:
+              $ref: '#/components/schemas/AbstractDatum'
+            datumIngangGeldigheid:
+              $ref: '#/components/schemas/AbstractDatum'
+            inOnderzoek:
+              $ref: '#/components/schemas/VerblijfplaatsBuitenlandInOnderzoek'
     VerblijfadresBuitenland:
       type: object
       properties:
@@ -1304,7 +1325,7 @@ components:
       type: string
       description: |
         Het tweede deel van een buitenlands adres. Vaak is dit een combinatie van woonplaats eventueel in combinatie met de postcode.
-      example: "Washington, DC 20500"
+      example: 'Washington, DC 20500'
     Regel3:
       maxLength: 35
       type: string
@@ -1313,28 +1334,28 @@ components:
       example: Selangor
     VerblijfadresBuitenlandInOnderzoek:
       allOf:
-      - $ref: '#/components/schemas/InOnderzoek'
-      - type: object
-        properties:
-          regel1:
-            type: boolean
-          regel2:
-            type: boolean
-          regel3:
-            type: boolean
-          land:
-            type: boolean
+        - $ref: '#/components/schemas/InOnderzoek'
+        - type: object
+          properties:
+            regel1:
+              type: boolean
+            regel2:
+              type: boolean
+            regel3:
+              type: boolean
+            land:
+              type: boolean
     VerblijfplaatsBuitenlandInOnderzoek:
       allOf:
-      - $ref: '#/components/schemas/InOnderzoek'
-      - type: object
-        properties:
-          type:
-            type: boolean
-          datumVan:
-            type: boolean
-          datumIngangGeldigheid:
-            type: boolean
+        - $ref: '#/components/schemas/InOnderzoek'
+        - type: object
+          properties:
+            type:
+              type: boolean
+            datumVan:
+              type: boolean
+            datumIngangGeldigheid:
+              type: boolean
     Adres:
       description: |
         Gegevens over het adres van een persoon.
@@ -1344,25 +1365,25 @@ components:
         * **datumVan** : de datum van aangifte of ambtshalve melding van verblijf en adres.
         * **datumIngangGeldigheid** : datum waarop de gegevens over de verblijfplaats geldig zijn geworden.
       allOf:
-      - $ref: '#/components/schemas/AbstractVerblijfplaats'
-      - type: object
-        properties:
-          verblijfadres:
-            $ref: '#/components/schemas/VerblijfadresBinnenland'
-          functieAdres:
-            $ref: '#/components/schemas/Waardetabel'
-          adresseerbaarObjectIdentificatie:
-            $ref: '#/components/schemas/AdresseerbaarObjectIdentificatie'
-          nummeraanduidingIdentificatie:
-            $ref: '#/components/schemas/NummeraanduidingIdentificatie'
-          datumVan:
-            $ref: '#/components/schemas/AbstractDatum'
-          datumIngangGeldigheid:
-            $ref: '#/components/schemas/AbstractDatum'
-          indicatieVastgesteldVerblijftNietOpAdres:
-            $ref: '#/components/schemas/IndicatieVastgesteldVerblijftNietOpAdres'
-          inOnderzoek:
-            $ref: '#/components/schemas/AdresInOnderzoek'
+        - $ref: '#/components/schemas/AbstractVerblijfplaats'
+        - type: object
+          properties:
+            verblijfadres:
+              $ref: '#/components/schemas/VerblijfadresBinnenland'
+            functieAdres:
+              $ref: '#/components/schemas/Waardetabel'
+            adresseerbaarObjectIdentificatie:
+              $ref: '#/components/schemas/AdresseerbaarObjectIdentificatie'
+            nummeraanduidingIdentificatie:
+              $ref: '#/components/schemas/NummeraanduidingIdentificatie'
+            datumVan:
+              $ref: '#/components/schemas/AbstractDatum'
+            datumIngangGeldigheid:
+              $ref: '#/components/schemas/AbstractDatum'
+            indicatieVastgesteldVerblijftNietOpAdres:
+              $ref: '#/components/schemas/IndicatieVastgesteldVerblijftNietOpAdres'
+            inOnderzoek:
+              $ref: '#/components/schemas/AdresInOnderzoek'
     VerblijfadresBinnenland:
       type: object
       properties:
@@ -1403,95 +1424,95 @@ components:
       example: Duiven
     VerblijfadresBinnenlandInOnderzoek:
       allOf:
-      - $ref: '#/components/schemas/InOnderzoek'
-      - type: object
-        properties:
-          aanduidingBijHuisnummer:
-            type: boolean
-          huisletter:
-            type: boolean
-          huisnummer:
-            type: boolean
-          huisnummertoevoeging:
-            type: boolean
-          officieleStraatnaam:
-            type: boolean
-          postcode:
-            type: boolean
-          korteStraatnaam:
-            type: boolean
-          woonplaats:
-            type: boolean
+        - $ref: '#/components/schemas/InOnderzoek'
+        - type: object
+          properties:
+            aanduidingBijHuisnummer:
+              type: boolean
+            huisletter:
+              type: boolean
+            huisnummer:
+              type: boolean
+            huisnummertoevoeging:
+              type: boolean
+            officieleStraatnaam:
+              type: boolean
+            postcode:
+              type: boolean
+            korteStraatnaam:
+              type: boolean
+            woonplaats:
+              type: boolean
     AdresseerbaarObjectIdentificatie:
-      pattern: "^[0-9]{16}$"
+      pattern: '^[0-9]{16}$'
       type: string
       description: |
         De verblijfplaats van de persoon kan een ligplaats, een standplaats of een verblijfsobject zijn.
-      example: "0226010000038820"
+      example: '0226010000038820'
     IndicatieVastgesteldVerblijftNietOpAdres:
       type: boolean
       description: |
         Geeft aan dat is vastgesteld dat de persoon niet meer op de geregistreerde adres/locatie staat ingeschreven.
     AdresInOnderzoek:
       allOf:
-      - $ref: '#/components/schemas/InOnderzoek'
-      - type: object
-        properties:
-          type:
-            type: boolean
-          datumVan:
-            type: boolean
-          datumIngangGeldigheid:
-            type: boolean
-          nummeraanduidingIdentificatie:
-            type: boolean
-          adresseerbaarObjectIdentificatie:
-            type: boolean
-          functieAdres:
-            type: boolean
+        - $ref: '#/components/schemas/InOnderzoek'
+        - type: object
+          properties:
+            type:
+              type: boolean
+            datumVan:
+              type: boolean
+            datumIngangGeldigheid:
+              type: boolean
+            nummeraanduidingIdentificatie:
+              type: boolean
+            adresseerbaarObjectIdentificatie:
+              type: boolean
+            functieAdres:
+              type: boolean
     VerblijfplaatsOnbekend:
       allOf:
-      - $ref: '#/components/schemas/AbstractVerblijfplaats'
-      - type: object
-        properties:
-          datumVan:
-            $ref: '#/components/schemas/AbstractDatum'
-          datumIngangGeldigheid:
-            $ref: '#/components/schemas/AbstractDatum'
-          inOnderzoek:
-            $ref: '#/components/schemas/VerblijfplaatsOnbekendInOnderzoek'
+        - $ref: '#/components/schemas/AbstractVerblijfplaats'
+        - type: object
+          properties:
+            datumVan:
+              $ref: '#/components/schemas/AbstractDatum'
+            datumIngangGeldigheid:
+              $ref: '#/components/schemas/AbstractDatum'
+            inOnderzoek:
+              $ref: '#/components/schemas/VerblijfplaatsOnbekendInOnderzoek'
     VerblijfplaatsOnbekendInOnderzoek:
       allOf:
-      - $ref: '#/components/schemas/InOnderzoek'
-      - type: object
-        properties:
-          type:
-            type: boolean
-          datumVan:
-            type: boolean
-          datumIngangGeldigheid:
-            type: boolean
+        - $ref: '#/components/schemas/InOnderzoek'
+        - type: object
+          properties:
+            type:
+              type: boolean
+            datumVan:
+              type: boolean
+            datumIngangGeldigheid:
+              type: boolean
     Locatie:
       description: |
         * **gemeenteVanInschrijving** - wordt gevuld met waarden uit de landelijke tabel 'Gemeenten'.
         * **functieAdres** - wordt gevuld met waarden voor 'Functie_Adres' in 'tabelwaarden.csv'.
         * **landVanWaarIngeschreven** : het land waar de persoon woonde voor (her)vestiging in Nederland. Wordt gevuld met waarden uit de landelijke tabel 'Landen'.
       allOf:
-      - $ref: '#/components/schemas/AbstractVerblijfplaats'
-      - type: object
-        properties:
-          datumVan:
-            $ref: '#/components/schemas/AbstractDatum'
-          functieAdres:
-            $ref: '#/components/schemas/Waardetabel'
-          verblijfadres:
-            $ref: '#/components/schemas/VerblijfadresLocatie'
-          datumIngangGeldigheid:
-            $ref: '#/components/schemas/AbstractDatum'
-          indicatieVastgesteldVerblijftNietOpAdres:
-            $ref: '#/components/schemas/IndicatieVastgesteldVerblijftNietOpAdres'
-          inOnderzoek:
-            $ref: '#/components/schemas/LocatieInOnderzoek'
+        - $ref: '#/components/schemas/AbstractVerblijfplaats'
+        - type: object
+          properties:
+            datumVan:
+              $ref: '#/components/schemas/AbstractDatum'
+            functieAdres:
+              $ref: '#/components/schemas/Waardetabel'
+            verblijfadres:
+              $ref: '#/components/schemas/VerblijfadresLocatie'
+            datumIngangGeldigheid:
+              $ref: '#/components/schemas/AbstractDatum'
+            indicatieVastgesteldVerblijftNietOpAdres:
+              $ref: '#/components/schemas/IndicatieVastgesteldVerblijftNietOpAdres'
+            inOnderzoek:
+              $ref: '#/components/schemas/LocatieInOnderzoek'
     VerblijfadresLocatie:
       type: object
       properties:
@@ -1507,24 +1528,24 @@ components:
       example: Naast de derde brug
     VerblijfadresLocatieInOnderzoek:
       allOf:
-      - $ref: '#/components/schemas/InOnderzoek'
-      - type: object
-        properties:
-          locatiebeschrijving:
-            type: boolean
+        - $ref: '#/components/schemas/InOnderzoek'
+        - type: object
+          properties:
+            locatiebeschrijving:
+              type: boolean
     LocatieInOnderzoek:
       allOf:
-      - $ref: '#/components/schemas/InOnderzoek'
-      - type: object
-        properties:
-          type:
-            type: boolean
-          datumVan:
-            type: boolean
-          functieAdres:
-            type: boolean
-          datumIngangGeldigheid:
-            type: boolean
+        - $ref: '#/components/schemas/InOnderzoek'
+        - type: object
+          properties:
+            type:
+              type: boolean
+            datumVan:
+              type: boolean
+            functieAdres:
+              type: boolean
+            datumIngangGeldigheid:
+              type: boolean
     Immigratie:
       type: object
       properties:
@@ -1551,29 +1572,29 @@ components:
         Geeft aan dat de persoon zich vanuit het buitenland heeft ingeschreven.
     ImmigratieInOnderzoek:
       allOf:
-      - $ref: '#/components/schemas/InOnderzoek'
-      - type: object
-        properties:
-          datumVestigingInNederland:
-            type: boolean
-          landVanwaarIngeschreven:
-            type: boolean
-          vanuitVerblijfplaatsOnbekend:
-            type: boolean
-          indicatieVestigingVanuitBuitenland:
-            type: boolean
+        - $ref: '#/components/schemas/InOnderzoek'
+        - type: object
+          properties:
+            datumVestigingInNederland:
+              type: boolean
+            landVanwaarIngeschreven:
+              type: boolean
+            vanuitVerblijfplaatsOnbekend:
+              type: boolean
+            indicatieVestigingVanuitBuitenland:
+              type: boolean
     Adressering:
       allOf:
-      - $ref: '#/components/schemas/AdresseringBasis'
-      - properties:
-          aanhef:
-            $ref: '#/components/schemas/Aanhef'
-          aanschrijfwijze:
-            $ref: '#/components/schemas/Aanschrijfwijze'
-          gebruikInLopendeTekst:
-            $ref: '#/components/schemas/GebruikInLopendeTekst'
-          inOnderzoek:
-            $ref: '#/components/schemas/AdresseringInOnderzoek'
+        - $ref: '#/components/schemas/AdresseringBasis'
+        - properties:
+            aanhef:
+              $ref: '#/components/schemas/Aanhef'
+            aanschrijfwijze:
+              $ref: '#/components/schemas/Aanschrijfwijze'
+            gebruikInLopendeTekst:
+              $ref: '#/components/schemas/GebruikInLopendeTekst'
+            inOnderzoek:
+              $ref: '#/components/schemas/AdresseringInOnderzoek'
     Aanhef:
       pattern: "^[a-zA-Z0-9À-ž \\.\\-\\']{1,650}$"
       type: string
@@ -1588,7 +1609,7 @@ components:
           type: string
           example: H.W. baron van den Aedel
         aanspreekvorm:
-          pattern: "^[a-zA-Z ]{1,25}$"
+          pattern: '^[a-zA-Z ]{1,25}$'
           type: string
           description: |
             Deze regel moet als aparte regel boven de samengestelde naam worden geplaatst. Komt alleen voor bij personen met een adellijke titel of predicaat.
@@ -1646,15 +1667,15 @@ components:
       description: |
         Geeft aan welke gegevens over de verblijfstitel in onderzoek zijn.
       allOf:
-      - $ref: '#/components/schemas/InOnderzoek'
-      - type: object
-        properties:
-          aanduiding:
-            type: boolean
-          datumEinde:
-            type: boolean
-          datumIngang:
-            type: boolean
+        - $ref: '#/components/schemas/InOnderzoek'
+        - type: object
+          properties:
+            aanduiding:
+              type: boolean
+            datumEinde:
+              type: boolean
+            datumIngang:
+              type: boolean
     Kind:
       type: object
       properties:
@@ -1670,11 +1691,11 @@ components:
       description: |
         Geeft aan of de gegevens over het kind van de persoon in onderzoek zijn.
       allOf:
-      - $ref: '#/components/schemas/InOnderzoek'
-      - type: object
-        properties:
-          burgerservicenummer:
-            type: boolean
+        - $ref: '#/components/schemas/InOnderzoek'
+        - type: object
+          properties:
+            burgerservicenummer:
+              type: boolean
     Ouder:
       type: object
       properties:
@@ -1697,22 +1718,22 @@ components:
         * **datumIngangFamilierechtelijkeBetrekking** - De datum waarop de familierechtelijke betrekking is ontstaan.
         * **geslacht** - wordt gevuld met waarden voor 'Geslacht' in 'tabelwaarden.csv'.
     OuderAanduiding:
-      pattern: "^[1|2]$"
+      pattern: '^[1|2]$'
       type: string
-      example: "1"
+      example: '1'
     OuderInOnderzoek:
       description: |
         Geeft aan welke gegevens van de de ouder in onderzoek zijn.
       allOf:
-      - $ref: '#/components/schemas/InOnderzoek'
-      - type: object
-        properties:
-          burgerservicenummer:
-            type: boolean
-          datumIngangFamilierechtelijkeBetrekking:
-            type: boolean
-          geslacht:
-            type: boolean
+        - $ref: '#/components/schemas/InOnderzoek'
+        - type: object
+          properties:
+            burgerservicenummer:
+              type: boolean
+            datumIngangFamilierechtelijkeBetrekking:
+              type: boolean
+            geslacht:
+              type: boolean
     Partner:
       type: object
       properties:
@@ -1736,15 +1757,15 @@ components:
       description: |
         Geeft aan welke gegevens over het huwelijk of het partnerschap in onderzoek zijn.
       allOf:
-      - $ref: '#/components/schemas/InOnderzoek'
-      - type: object
-        properties:
-          burgerservicenummer:
-            type: boolean
-          geslacht:
-            type: boolean
-          soortVerbintenis:
-            type: boolean
+        - $ref: '#/components/schemas/InOnderzoek'
+        - type: object
+          properties:
+            burgerservicenummer:
+              type: boolean
+            geslacht:
+              type: boolean
+            soortVerbintenis:
+              type: boolean
     AangaanHuwelijkPartnerschap:
       type: object
       properties:
@@ -1765,15 +1786,15 @@ components:
       description: |
         Geeft aan welke gegevens over het voltrekken van het huwelijk of aangaan van het partnerschap in onderzoek zijn.
       allOf:
-      - $ref: '#/components/schemas/InOnderzoek'
-      - type: object
-        properties:
-          datum:
-            type: boolean
-          land:
-            type: boolean
-          plaats:
-            type: boolean
+        - $ref: '#/components/schemas/InOnderzoek'
+        - type: object
+          properties:
+            datum:
+              type: boolean
+            land:
+              type: boolean
+            plaats:
+              type: boolean
     OntbindingHuwelijkPartnerschap:
       type: object
       properties:
@@ -1788,11 +1809,11 @@ components:
       description: |
         Geeft aan welke gegevens over het onbinden van het huwelijk of aangaan van het partnerschap in onderzoek zijn.
       allOf:
-      - $ref: '#/components/schemas/InOnderzoek'
-      - type: object
-        properties:
-          datum:
-            type: boolean
+        - $ref: '#/components/schemas/InOnderzoek'
+        - type: object
+          properties:
+            datum:
+              type: boolean
     InOnderzoek:
       type: object
       properties:
@@ -1814,7 +1835,7 @@ components:
         inOnderzoek:
           $ref: '#/components/schemas/NaamInOnderzoek'
   responses:
-    "400":
+    '400':
       description: Bad Request
       content:
         application/problem+json:
@@ -1824,16 +1845,18 @@ components:
             type: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1
             title: Ten minste één parameter moet worden opgegeven.
             status: 400
-            detail: The request could not be understood by the server due to malformed
-              syntax. The client SHOULD NOT repeat the request without modification.
+            detail:
+              The request could not be understood by the server due to malformed
+              syntax. The client SHOULD NOT repeat the request without
+              modification.
             instance: https://datapunt.voorbeeldgemeente.nl/api/v1/resourcenaam?parameter=waarde
             code: paramsRequired
             invalidParams:
-            - type: https://www.vng.nl/realisatie/api/validaties/integer
-              name: huisnummer
-              code: integer
-              reason: Waarde is geen geldig getal.
-    "401":
+              - type: https://www.vng.nl/realisatie/api/validaties/integer
+                name: huisnummer
+                code: integer
+                reason: Waarde is geen geldig getal.
+    '401':
       description: Unauthorized
       content:
         application/problem+json:
@@ -1843,12 +1866,13 @@ components:
             type: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.2
             title: Niet correct geauthenticeerd.
             status: 401
-            detail: The request requires user authentication. The response MUST include
-              a WWW-Authenticate header field (section 14.47) containing a challenge
-              applicable to the requested resource.
+            detail:
+              The request requires user authentication. The response MUST
+              include a WWW-Authenticate header field (section 14.47) containing
+              a challenge applicable to the requested resource.
             instance: https://datapunt.voorbeeldgemeente.nl/api/v1/resourcenaam?parameter=waarde
             code: authentication
-    "403":
+    '403':
       description: Forbidden
       content:
         application/problem+json:
@@ -1858,11 +1882,12 @@ components:
             type: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4
             title: U bent niet geautoriseerd voor deze operatie.
             status: 403
-            detail: "The server understood the request, but is refusing to fulfill\
+            detail: "The server understood the request, but is refusing to
+              fulfill\
               \ it."
             instance: https://datapunt.voorbeeldgemeente.nl/api/v1/resourcenaam?parameter=waarde
             code: autorisation
-    "406":
+    '406':
       description: Not Acceptable
       content:
         application/problem+json:
@@ -1872,12 +1897,13 @@ components:
             type: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.7
             title: Gevraagde contenttype wordt niet ondersteund.
             status: 406
-            detail: The resource identified by the request is only capable of generating
-              response entities which have content characteristics not acceptable
-              according to thr accept headers sent in the request
+            detail:
+              The resource identified by the request is only capable of
+              generating response entities which have content characteristics
+              not acceptable according to thr accept headers sent in the request
             instance: https://datapunt.voorbeeldgemeente.nl/api/v1/resourcenaam?parameter=waarde
             code: notAcceptable
-    "415":
+    '415':
       description: Unsupported Media Type
       content:
         application/problem+json:
@@ -1887,12 +1913,13 @@ components:
             type: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.16
             title: Unsupported Media Type
             status: 415
-            detail: The server is refusing the request because the entity of the request
-              is in a format not supported by the requested resource for the requested
-              method.
+            detail:
+              The server is refusing the request because the entity of the
+              request is in a format not supported by the requested resource for
+              the requested method.
             instance: https://datapunt.voorbeeldgemeente.nl/api/v1/resourcenaam?parameter=waarde
             code: unsupported
-    "429":
+    '429':
       description: Too Many Requests
       content:
         application/problem+json:
@@ -1902,11 +1929,12 @@ components:
             type: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
             title: Too many request
             status: 429
-            detail: The user has sent too many requests in a given amount of time
+            detail:
+              The user has sent too many requests in a given amount of time
               (rate limiting).
             instance: https://datapunt.voorbeeldgemeente.nl/api/v1/resourcenaam?parameter=waarde
             code: tooManyRequests
-    "500":
+    '500':
       description: Internal Server Error
       content:
         application/problem+json:
@@ -1916,11 +1944,12 @@ components:
             type: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1
             title: Interne server fout.
             status: 500
-            detail: The server encountered an unexpected condition which prevented
-              it from fulfilling the request.
+            detail:
+              The server encountered an unexpected condition which prevented it
+              from fulfilling the request.
             instance: https://datapunt.voorbeeldgemeente.nl/api/v1/resourcenaam?parameter=waarde
             code: serverError
-    "503":
+    '503':
       description: Service Unavailable
       content:
         application/problem+json:
@@ -1930,7 +1959,8 @@ components:
             type: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.4
             title: Bronservice BRP is tijdelijk niet beschikbaar.
             status: 503
-            detail: The service is currently unable to handle the request due to a
+            detail:
+              The service is currently unable to handle the request due to a
               temporary overloading or maintenance of the server.
             instance: https://datapunt.voorbeeldgemeente.nl/api/v1/resourcenaam?parameter=waarde
             code: notAvailable
@@ -1945,12 +1975,17 @@ components:
       schema:
         maxLength: 500
         type: string
-        description: "zie RFC 7234. In het geval een major versie wordt uitgefaseerd,\
-          \ gebruiken we warn-code 299 (\"Miscellaneous Persistent Warning\") en het\
-          \ API end-point (inclusief versienummer) als de warn-agent van de warning,\
+        description: "zie RFC 7234. In het geval een major versie wordt
+          uitgefaseerd,\
+          \ gebruiken we warn-code 299 (\"Miscellaneous Persistent Warning\") en
+          het\
+          \ API end-point (inclusief versienummer) als de warn-agent van de
+          warning,\
           \ gevolgd door de warn-text met de human-readable waarschuwing"
-        example: "299 https://service.../api/.../v1 \"Deze versie van de API is verouderd\
-          \ en zal uit dienst worden genomen op 2018-02-01. Raadpleeg voor meer informatie\
+        example: "299 https://service.../api/.../v1 \"Deze versie van de API is
+          verouderd\
+          \ en zal uit dienst worden genomen op 2018-02-01. Raadpleeg voor meer
+          informatie\
           \ hier de documentatie: https://omgevingswet.../api/.../v1\"."
     X_Rate_Limit_Limit:
       schema:

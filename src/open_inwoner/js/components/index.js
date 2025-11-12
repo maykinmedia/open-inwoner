@@ -1,58 +1,58 @@
-import * as htmxModule from 'htmx.org'
+import * as htmxModule from 'htmx.org';
 
 // Ensure we get the correct export
-const htmx = htmxModule.default || htmxModule
+const htmx = htmxModule.default || htmxModule;
 
 // Explicitly assign to window to ensure global availability
-window.htmx = htmx
+window.htmx = htmx;
 
 // Configure HTMX
-htmx.config.allowEval = false
-htmx.config.includeIndicatorStyles = false
+htmx.config.allowEval = false;
+htmx.config.includeIndicatorStyles = false;
 
-import './accessibility'
-import './actions'
-import './anchor-menu'
-import { AnchorMobile } from './anchor-menu/anchor-menu-mobile'
-import { CreateGumshoe } from './anchor-menu/anchor-menu'
-import './autocomplete-search'
-import './autocomplete'
-import './autosumbit'
-import './cases'
-import { DisableContactFormButton } from './form/DisableContactFormButton'
-import { DisableSubmitButton } from './form/DisableSubmitButton'
-import './confirmation'
-import './contacts'
-import { CookieBanner } from './cookie-consent'
-import './datepicker'
-import { Dropdown } from './dropdown'
-import './emoji-button'
-import './FilterBar'
-import './form'
-import './header'
-import './map'
-import './message-file'
-import { Notification } from './notifications'
-import './plans'
-import './plan-preview'
-import './questionnaire'
-import './readmore'
-import './search'
-import { TabPanel } from './tab-panels'
-import './toggle'
-import { StatusAccordion } from './cases/status_accordion'
-import './session'
-import './siteimprove/error-tracking'
-import './siteimprove/tracking'
-import './twofactor-sms'
-import { FileInput } from './form/FileInput'
-import { ToggleHide } from './card/ToggleHide'
+import './accessibility';
+import './actions';
+import './anchor-menu';
+import { AnchorMobile } from './anchor-menu/anchor-menu-mobile';
+import { CreateGumshoe } from './anchor-menu/anchor-menu';
+import './autocomplete-search';
+import './autocomplete';
+import './autosumbit';
+import './cases';
+import { DisableContactFormButton } from './form/DisableContactFormButton';
+import { DisableSubmitButton } from './form/DisableSubmitButton';
+import './confirmation';
+import './contacts';
+import { CookieBanner } from './cookie-consent';
+import './datepicker';
+import { Dropdown } from './dropdown';
+import './emoji-button';
+import './FilterBar';
+import './form';
+import './header';
+import './map';
+import './message-file';
+import { Notification } from './notifications';
+import './plans';
+import './plan-preview';
+import './questionnaire';
+import './readmore';
+import './search';
+import { TabPanel } from './tab-panels';
+import './toggle';
+import { StatusAccordion } from './cases/status_accordion';
+import './session';
+import './siteimprove/error-tracking';
+import './siteimprove/tracking';
+import './twofactor-sms';
+import { FileInput } from './form/FileInput';
+import { ToggleHide } from './card/ToggleHide';
 
 // eval() is problematic with CSP
-htmx.config.allowEval = false
+htmx.config.allowEval = false;
 
 // injecting a style element is problematic with CSP
-htmx.config.includeIndicatorStyles = false
+htmx.config.includeIndicatorStyles = false;
 
 // define selectors and callables to apply after we loaded a html fragment
 const elementWrappers = [
@@ -71,14 +71,14 @@ const elementWrappers = [
   [ToggleHide.selector, (elt) => new ToggleHide(elt)],
   [TabPanel.selector, (elt) => new TabPanel(elt)],
   // add more when needed
-]
+];
 
 // harden against multiple events
 // should not be needed but protects against unforeseen issues
-let activeElements = []
+let activeElements = [];
 
 function wrapComponentsOf(targetElement) {
-  console.debug(['wrapComponentsOf', targetElement])
+  console.debug(['wrapComponentsOf', targetElement]);
   // Only skip if it's a full page load (not an HTMX request)
   if (
     targetElement === document.body &&
@@ -88,29 +88,29 @@ function wrapComponentsOf(targetElement) {
     // so components get multiple initialisations if they also self-initialize in their own file, and
     // this is not caught by the activeElements check because the initial initialisation is not visible here
     // taiga #1511 and #1544 should clean this up
-    return
+    return;
   }
   // apply the javascript component wrappers
   for (const [selector, callable] of elementWrappers) {
     for (const elt of htmx.findAll(targetElement, selector)) {
       if (activeElements.indexOf(elt) < 0) {
-        callable(elt)
-        activeElements.push(elt)
-        console.log(['htmx re-activated component on: ' + selector, elt])
+        callable(elt);
+        activeElements.push(elt);
+        console.log(['htmx re-activated component on: ' + selector, elt]);
       } else {
         console.debug([
           'htmx skipped duplicate re-activation of component: ' + selector,
           elt,
-        ])
+        ]);
       }
     }
   }
   // clean-up removed elements
-  activeElements = activeElements.filter((elt) => elt.isConnected)
+  activeElements = activeElements.filter((elt) => elt.isConnected);
 }
 
-htmx.onLoad(wrapComponentsOf)
+htmx.onLoad(wrapComponentsOf);
 
 if (typeof htmx.on !== 'function') {
-  console.error('HTMX not properly initialized at start!')
+  console.error('HTMX not properly initialized at start!');
 }

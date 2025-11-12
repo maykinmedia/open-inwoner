@@ -1,43 +1,78 @@
 openapi: 3.0.0
 info:
   title: Catalogi API
-  description:
-    "Een API om een zaaktypecatalogus (ZTC) te benaderen.\n\nDe zaaktypecatalogus\
-    \ helpt gemeenten om het proces vanuit de 'vraag van een\nklant' (productaanvraag,\
-    \ melding, aangifte, informatieverzoek e.d.) tot en met\nhet leveren van een passend\
-    \ antwoord daarop in te richten, inclusief de\nbijbehorende informatievoorziening.\n\
-    \nEen CATALOGUS bestaat uit ZAAKTYPEn, INFORMATIEOBJECTTYPEn en BESLUITTYPEn en\n\
-    wordt typisch gebruikt om een ZAAK (in de Zaken API), INFORMATIEOBJECT (in de\n\
-    Documenten API) en BESLUIT (in de Besluiten API) te voorzien van type,\nstandaardwaarden\
-    \ en processtructuur.\n\n**Afhankelijkheden**\n\nDeze API is afhankelijk van:\n\
-    \n* Gemeentelijke Selectielijst API\n* Autorisaties API *(optioneel)*\n\n\n###\
-    \ Autorisatie\n\nDeze API vereist autorisatie.\n\n_Zelf een token genereren_\n\
-    \nDe tokens die gebruikt worden voor autorisatie zijn [jwt.io][JWT's] (JSON web\n\
-    token). In de API calls moeten deze gebruikt worden in de `Authorization`\nheader:\n\
-    \n```\nAuthorization: Bearer <token>\n```\n\nOm een JWT te genereren heb je een\
-    \ `client ID` en een `secret` nodig. Het JWT\nmoet gebouwd worden volgens het\
-    \ `HS256` algoritme. De vereiste payload is:\n\n```json\n{\n    \"iss\": \"<client\
-    \ ID>\",\n    \"iat\": 1572863906,\n    \"client_id\": \"<client ID>\",\n    \"\
-    user_id\": \"<user identifier>\",\n    \"user_representation\": \"<user representation>\"\
-    \n}\n```\n\nAls `issuer` gebruik je dus je eigen client ID. De `iat` timestamp\
-    \ is een\nUNIX-timestamp die aangeeft op welk moment het token gegenereerd is.\n\
-    \n`user_id` en `user_representation` zijn nodig voor de audit trails. Het zijn\n\
-    vrije velden met als enige beperking dat de lengte maximaal de lengte van\nde\
-    \ overeenkomstige velden in de audit trail resources is (zie rest API spec).\n\
-    \n\n### Notificaties\n\nDeze API publiceert notificaties op het kanaal `zaaktypen`.\n\
-    \n**Main resource**\n\n`zaaktype`\n\n\n\n**Kenmerken**\n\n* `catalogus`: URL-referentie\
-    \ naar de CATALOGUS waartoe dit ZAAKTYPE behoort.\n\n**Resources en acties**\n\
-    - `zaaktype`: create, update, destroy\n\n\nDeze API publiceert notificaties op\
-    \ het kanaal `besluittypen`.\n\n**Main resource**\n\n`besluittype`\n\n\n\n**Kenmerken**\n\
-    \n* `catalogus`: URL-referentie naar de CATALOGUS waartoe dit BESLUITTYPE behoort.\n\
-    \n**Resources en acties**\n- `besluittype`: create, update, destroy\n\n\nDeze\
-    \ API publiceert notificaties op het kanaal `informatieobjecttypen`.\n\n**Main\
-    \ resource**\n\n`informatieobjecttype`\n\n\n\n**Kenmerken**\n\n* `catalogus`:\
-    \ URL-referentie naar de CATALOGUS waartoe dit INFORMATIEOBJECTTYPE behoort.\n\
-    \n**Resources en acties**\n- `informatieobjecttype`: create, update, destroy\n\
-    \n\n**Handige links**\n\n* [API-documentatie](https://vng-realisatie.github.io/gemma-zaken/standaard/)\n\
-    * [Open Zaak documentatie](https://open-zaak.readthedocs.io/en/latest/)\n* [Zaakgericht\
-    \ werken](https://www.vngrealisatie.nl/producten/api-standaarden-zaakgericht-werken)\n\
+  description: "Een API om een zaaktypecatalogus (ZTC) te benaderen.\n\nDe
+    zaaktypecatalogus\
+    \ helpt gemeenten om het proces vanuit de 'vraag van een\nklant'
+    (productaanvraag,\
+    \ melding, aangifte, informatieverzoek e.d.) tot en met\nhet leveren van een
+    passend\
+    \ antwoord daarop in te richten, inclusief de\nbijbehorende
+    informatievoorziening.\n\
+    \nEen CATALOGUS bestaat uit ZAAKTYPEn, INFORMATIEOBJECTTYPEn en BESLUITTYPEn
+    en\n\
+    wordt typisch gebruikt om een ZAAK (in de Zaken API), INFORMATIEOBJECT (in
+    de\n\
+    Documenten API) en BESLUIT (in de Besluiten API) te voorzien van
+    type,\nstandaardwaarden\
+    \ en processtructuur.\n\n**Afhankelijkheden**\n\nDeze API is afhankelijk
+    van:\n\
+    \n* Gemeentelijke Selectielijst API\n* Autorisaties API
+    *(optioneel)*\n\n\n###\
+    \ Autorisatie\n\nDeze API vereist autorisatie.\n\n_Zelf een token
+    genereren_\n\
+    \nDe tokens die gebruikt worden voor autorisatie zijn [jwt.io][JWT's] (JSON
+    web\n\
+    token). In de API calls moeten deze gebruikt worden in de
+    `Authorization`\nheader:\n\
+    \n```\nAuthorization: Bearer <token>\n```\n\nOm een JWT te genereren heb je
+    een\
+    \ `client ID` en een `secret` nodig. Het JWT\nmoet gebouwd worden volgens
+    het\
+    \ `HS256` algoritme. De vereiste payload is:\n\n```json\n{\n    \"iss\":
+    \"<client\
+    \ ID>\",\n    \"iat\": 1572863906,\n    \"client_id\": \"<client
+    ID>\",\n    \"\
+    user_id\": \"<user identifier>\",\n    \"user_representation\": \"<user
+    representation>\"\
+    \n}\n```\n\nAls `issuer` gebruik je dus je eigen client ID. De `iat`
+    timestamp\
+    \ is een\nUNIX-timestamp die aangeeft op welk moment het token gegenereerd
+    is.\n\
+    \n`user_id` en `user_representation` zijn nodig voor de audit trails. Het
+    zijn\n\
+    vrije velden met als enige beperking dat de lengte maximaal de lengte
+    van\nde\
+    \ overeenkomstige velden in de audit trail resources is (zie rest API
+    spec).\n\
+    \n\n### Notificaties\n\nDeze API publiceert notificaties op het kanaal
+    `zaaktypen`.\n\
+    \n**Main resource**\n\n`zaaktype`\n\n\n\n**Kenmerken**\n\n* `catalogus`:
+    URL-referentie\
+    \ naar de CATALOGUS waartoe dit ZAAKTYPE behoort.\n\n**Resources en
+    acties**\n\
+    - `zaaktype`: create, update, destroy\n\n\nDeze API publiceert notificaties
+    op\
+    \ het kanaal `besluittypen`.\n\n**Main
+    resource**\n\n`besluittype`\n\n\n\n**Kenmerken**\n\
+    \n* `catalogus`: URL-referentie naar de CATALOGUS waartoe dit BESLUITTYPE
+    behoort.\n\
+    \n**Resources en acties**\n- `besluittype`: create, update,
+    destroy\n\n\nDeze\
+    \ API publiceert notificaties op het kanaal
+    `informatieobjecttypen`.\n\n**Main\
+    \ resource**\n\n`informatieobjecttype`\n\n\n\n**Kenmerken**\n\n*
+    `catalogus`:\
+    \ URL-referentie naar de CATALOGUS waartoe dit INFORMATIEOBJECTTYPE
+    behoort.\n\
+    \n**Resources en acties**\n- `informatieobjecttype`: create, update,
+    destroy\n\
+    \n\n**Handige links**\n\n*
+    [API-documentatie](https://vng-realisatie.github.io/gemma-zaken/standaard/)\n\
+    * [Open Zaak documentatie](https://open-zaak.readthedocs.io/en/latest/)\n*
+    [Zaakgericht\
+    \
+    werken](https://www.vngrealisatie.nl/producten/api-standaarden-zaakgericht-werken)\n\
     * [Open Zaak GitHub](https://github.com/open-zaak/open-zaak)\n"
   contact:
     url: https://www.maykinmedia.nl
@@ -57,31 +92,34 @@ paths:
       parameters:
         - name: catalogus
           in: query
-          description: URL-referentie naar de CATALOGUS waartoe dit BESLUITTYPE behoort.
+          description:
+            URL-referentie naar de CATALOGUS waartoe dit BESLUITTYPE behoort.
           required: false
           schema:
             type: string
             format: uri
         - name: zaaktypen
           in: query
-          description: ZAAKTYPE met ZAAKen die relevant kunnen zijn voor dit BESLUITTYPE
+          description:
+            ZAAKTYPE met ZAAKen die relevant kunnen zijn voor dit BESLUITTYPE
           required: false
           schema:
             type: string
         - name: informatieobjecttypen
           in: query
           description:
-            Het INFORMATIEOBJECTTYPE van informatieobjecten waarin besluiten
-            van dit BESLUITTYPE worden vastgelegd.
+            Het INFORMATIEOBJECTTYPE van informatieobjecten waarin besluiten van
+            dit BESLUITTYPE worden vastgelegd.
           required: false
           schema:
             type: string
         - name: status
           in: query
-          description: 'filter objects depending on their concept status:
-            * `alles`: Toon objecten waarvan het attribuut `concept` true of false is.
-            * `concept`: Toon objecten waarvan het attribuut `concept` true is.
-            * `definitief`: Toon objecten waarvan het attribuut `concept` false is (standaard).
+          description: 'filter objects depending on their concept status: *
+            `alles`: Toon objecten waarvan het attribuut `concept` true of false
+            is. * `concept`: Toon objecten waarvan het attribuut `concept` true
+            is. * `definitief`: Toon objecten waarvan het attribuut `concept`
+            false is (standaard).
             '
           required: false
           schema:
@@ -104,8 +142,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -165,8 +203,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
             Location:
               schema:
                 type: string
@@ -213,8 +251,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -246,9 +284,8 @@ paths:
       operationId: besluittype_update
       summary: Werk een BESLUITTYPE in zijn geheel bij.
       description:
-        'Werk een BESLUITTYPE in zijn geheel bij. Dit kan alleen als het
-        een concept
-        betreft.'
+        'Werk een BESLUITTYPE in zijn geheel bij. Dit kan alleen als het een
+        concept betreft.'
       requestBody:
         $ref: '#/components/requestBodies/BesluitType'
       responses:
@@ -259,8 +296,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -306,8 +343,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -340,7 +377,8 @@ paths:
     delete:
       operationId: besluittype_delete
       summary: Verwijder een BESLUITTYPE.
-      description: Verwijder een BESLUITTYPE. Dit kan alleen als het een concept betreft.
+      description:
+        Verwijder een BESLUITTYPE. Dit kan alleen als het een concept betreft.
       responses:
         '204':
           description: No content
@@ -349,8 +387,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
         '401':
           $ref: '#/components/responses/401'
         '403':
@@ -388,11 +426,9 @@ paths:
       summary: Publiceer het concept BESLUITTYPE.
       description:
         'Publiceren van het besluittype zorgt ervoor dat dit in een Besluiten
-        API kan gebruikt
-        worden. Na het publiceren van een besluittype zijn geen inhoudelijke wijzigingen
-        meer mogelijk. Indien er na het publiceren nog wat gewijzigd moet worden,
-        dan moet
-        je een nieuwe versie aanmaken.'
+        API kan gebruikt worden. Na het publiceren van een besluittype zijn geen
+        inhoudelijke wijzigingen meer mogelijk. Indien er na het publiceren nog
+        wat gewijzigd moet worden, dan moet je een nieuwe versie aanmaken.'
       responses:
         '200':
           description: ''
@@ -401,8 +437,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -486,8 +522,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -551,8 +587,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
             Location:
               schema:
                 type: string
@@ -599,8 +635,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -653,10 +689,11 @@ paths:
             format: uri
         - name: status
           in: query
-          description: 'filter objects depending on their concept status:
-            * `alles`: Toon objecten waarvan het attribuut `concept` true of false is.
-            * `concept`: Toon objecten waarvan het attribuut `concept` true is.
-            * `definitief`: Toon objecten waarvan het attribuut `concept` false is (standaard).
+          description: 'filter objects depending on their concept status: *
+            `alles`: Toon objecten waarvan het attribuut `concept` true of false
+            is. * `concept`: Toon objecten waarvan het attribuut `concept` true
+            is. * `definitief`: Toon objecten waarvan het attribuut `concept`
+            false is (standaard).
             '
           required: false
           schema:
@@ -679,8 +716,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -731,8 +768,7 @@ paths:
       summary: Maak een EIGENSCHAP aan.
       description:
         'Maak een EIGENSCHAP aan. Dit kan alleen als het bijbehorende ZAAKTYPE
-        een
-        concept betreft.'
+        een concept betreft.'
       requestBody:
         $ref: '#/components/requestBodies/Eigenschap'
       responses:
@@ -743,8 +779,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
             Location:
               schema:
                 type: string
@@ -791,8 +827,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -836,8 +872,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -883,8 +919,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -918,9 +954,8 @@ paths:
       operationId: eigenschap_delete
       summary: Verwijder een EIGENSCHAP.
       description:
-        'Verwijder een EIGENSCHAP. Dit kan alleen als het bijbehorende
-        ZAAKTYPE een
-        concept betreft.'
+        'Verwijder een EIGENSCHAP. Dit kan alleen als het bijbehorende ZAAKTYPE
+        een concept betreft.'
       responses:
         '204':
           description: No content
@@ -929,8 +964,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
         '401':
           $ref: '#/components/responses/401'
         '403':
@@ -979,10 +1014,11 @@ paths:
             format: uri
         - name: status
           in: query
-          description: 'filter objects depending on their concept status:
-            * `alles`: Toon objecten waarvan het attribuut `concept` true of false is.
-            * `concept`: Toon objecten waarvan het attribuut `concept` true is.
-            * `definitief`: Toon objecten waarvan het attribuut `concept` false is (standaard).
+          description: 'filter objects depending on their concept status: *
+            `alles`: Toon objecten waarvan het attribuut `concept` true of false
+            is. * `concept`: Toon objecten waarvan het attribuut `concept` true
+            is. * `definitief`: Toon objecten waarvan het attribuut `concept`
+            false is (standaard).
             '
           required: false
           schema:
@@ -1005,8 +1041,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -1066,8 +1102,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
             Location:
               schema:
                 type: string
@@ -1114,8 +1150,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -1147,9 +1183,8 @@ paths:
       operationId: informatieobjecttype_update
       summary: Werk een INFORMATIEOBJECTTYPE in zijn geheel bij.
       description:
-        'Werk een INFORMATIEOBJECTTYPE in zijn geheel bij. Dit kan alleen
-        als het een
-        concept betreft.'
+        'Werk een INFORMATIEOBJECTTYPE in zijn geheel bij. Dit kan alleen als
+        het een concept betreft.'
       requestBody:
         $ref: '#/components/requestBodies/InformatieObjectType'
       responses:
@@ -1160,8 +1195,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -1195,9 +1230,8 @@ paths:
       operationId: informatieobjecttype_partial_update
       summary: Werk een INFORMATIEOBJECTTYPE deels bij.
       description:
-        'Werk een INFORMATIEOBJECTTYPE deels bij. Dit kan alleen als het
-        een concept
-        betreft.'
+        'Werk een INFORMATIEOBJECTTYPE deels bij. Dit kan alleen als het een
+        concept betreft.'
       requestBody:
         $ref: '#/components/requestBodies/InformatieObjectType'
       responses:
@@ -1208,8 +1242,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -1243,8 +1277,7 @@ paths:
       operationId: informatieobjecttype_delete
       summary: Verwijder een INFORMATIEOBJECTTYPE.
       description:
-        'Verwijder een INFORMATIEOBJECTTYPE. Dit kan alleen als het een
-        concept
+        'Verwijder een INFORMATIEOBJECTTYPE. Dit kan alleen als het een concept
         betreft.'
       responses:
         '204':
@@ -1254,8 +1287,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
         '401':
           $ref: '#/components/responses/401'
         '403':
@@ -1292,11 +1325,11 @@ paths:
       operationId: informatieobjecttype_publish
       summary: Publiceer het concept INFORMATIEOBJECTTYPE.
       description:
-        'Publiceren van het informatieobjecttype zorgt ervoor dat dit in
-        een Documenten API
-        kan gebruikt worden. Na het publiceren van een informatieobjecttype zijn geen
-        inhoudelijke wijzigingen meer mogelijk. Indien er na het publiceren nog wat
-        gewijzigd moet worden, dan moet je een nieuwe versie aanmaken.'
+        'Publiceren van het informatieobjecttype zorgt ervoor dat dit in een
+        Documenten API kan gebruikt worden. Na het publiceren van een
+        informatieobjecttype zijn geen inhoudelijke wijzigingen meer mogelijk.
+        Indien er na het publiceren nog wat gewijzigd moet worden, dan moet je
+        een nieuwe versie aanmaken.'
       responses:
         '200':
           description: ''
@@ -1305,8 +1338,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -1351,18 +1384,19 @@ paths:
         - name: zaaktype
           in: query
           description:
-            URL-referentie naar het ZAAKTYPE van ZAAKen waarin resultaten
-            van dit RESULTAATTYPE bereikt kunnen worden.
+            URL-referentie naar het ZAAKTYPE van ZAAKen waarin resultaten van
+            dit RESULTAATTYPE bereikt kunnen worden.
           required: false
           schema:
             type: string
             format: uri
         - name: status
           in: query
-          description: 'filter objects depending on their concept status:
-            * `alles`: Toon objecten waarvan het attribuut `concept` true of false is.
-            * `concept`: Toon objecten waarvan het attribuut `concept` true is.
-            * `definitief`: Toon objecten waarvan het attribuut `concept` false is (standaard).
+          description: 'filter objects depending on their concept status: *
+            `alles`: Toon objecten waarvan het attribuut `concept` true of false
+            is. * `concept`: Toon objecten waarvan het attribuut `concept` true
+            is. * `definitief`: Toon objecten waarvan het attribuut `concept`
+            false is (standaard).
             '
           required: false
           schema:
@@ -1385,8 +1419,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -1437,8 +1471,7 @@ paths:
       summary: Maak een RESULTAATTYPE aan.
       description:
         'Maak een RESULTAATTYPE aan. Dit kan alleen als het bijbehorende
-        ZAAKTYPE een
-        concept betreft.'
+        ZAAKTYPE een concept betreft.'
       requestBody:
         $ref: '#/components/requestBodies/ResultaatType'
       responses:
@@ -1449,8 +1482,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
             Location:
               schema:
                 type: string
@@ -1497,8 +1530,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -1530,8 +1563,7 @@ paths:
       operationId: resultaattype_update
       summary: Werk een RESULTAATTYPE in zijn geheel bij.
       description:
-        'Werk een RESULTAATTYPE in zijn geheel bij. Dit kan alleen als
-        het
+        'Werk een RESULTAATTYPE in zijn geheel bij. Dit kan alleen als het
         bijbehorende ZAAKTYPE een concept betreft.'
       requestBody:
         $ref: '#/components/requestBodies/ResultaatType'
@@ -1543,8 +1575,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -1590,8 +1622,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -1626,8 +1658,7 @@ paths:
       summary: Verwijder een RESULTAATTYPE.
       description:
         'Verwijder een RESULTAATTYPE. Dit kan alleen als het bijbehorende
-        ZAAKTYPE
-        een concept betreft.'
+        ZAAKTYPE een concept betreft.'
       responses:
         '204':
           description: No content
@@ -1636,8 +1667,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
         '401':
           $ref: '#/components/responses/401'
         '403':
@@ -1678,8 +1709,8 @@ paths:
         - name: zaaktype
           in: query
           description:
-            URL-referentie naar het ZAAKTYPE waar deze ROLTYPEn betrokken
-            kunnen zijn.
+            URL-referentie naar het ZAAKTYPE waar deze ROLTYPEn betrokken kunnen
+            zijn.
           required: false
           schema:
             type: string
@@ -1701,10 +1732,11 @@ paths:
               - mede_initiator
         - name: status
           in: query
-          description: 'filter objects depending on their concept status:
-            * `alles`: Toon objecten waarvan het attribuut `concept` true of false is.
-            * `concept`: Toon objecten waarvan het attribuut `concept` true is.
-            * `definitief`: Toon objecten waarvan het attribuut `concept` false is (standaard).
+          description: 'filter objects depending on their concept status: *
+            `alles`: Toon objecten waarvan het attribuut `concept` true of false
+            is. * `concept`: Toon objecten waarvan het attribuut `concept` true
+            is. * `definitief`: Toon objecten waarvan het attribuut `concept`
+            false is (standaard).
             '
           required: false
           schema:
@@ -1727,8 +1759,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -1778,8 +1810,7 @@ paths:
       operationId: roltype_create
       summary: Maak een ROLTYPE aan.
       description:
-        'Maak een ROLTYPE aan. Dit kan alleen als het bijbehorende ZAAKTYPE
-        een
+        'Maak een ROLTYPE aan. Dit kan alleen als het bijbehorende ZAAKTYPE een
         concept betreft.'
       requestBody:
         $ref: '#/components/requestBodies/RolType'
@@ -1791,8 +1822,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
             Location:
               schema:
                 type: string
@@ -1839,8 +1870,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -1871,7 +1902,8 @@ paths:
     put:
       operationId: roltype_update
       summary: Werk een ROLTYPE in zijn geheel bij.
-      description: 'Werk een ROLTYPE in zijn geheel bij. Dit kan alleen als het
+      description:
+        'Werk een ROLTYPE in zijn geheel bij. Dit kan alleen als het
         bijbehorende ZAAKTYPE een concept betreft.'
       requestBody:
         $ref: '#/components/requestBodies/RolType'
@@ -1883,8 +1915,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -1930,8 +1962,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -1965,8 +1997,7 @@ paths:
       operationId: roltype_delete
       summary: Verwijder een ROLTYPE.
       description:
-        'Verwijder een ROLTYPE. Dit kan alleen als het bijbehorende ZAAKTYPE
-        een
+        'Verwijder een ROLTYPE. Dit kan alleen als het bijbehorende ZAAKTYPE een
         concept betreft.'
       responses:
         '204':
@@ -1976,8 +2007,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
         '401':
           $ref: '#/components/responses/401'
         '403':
@@ -2017,18 +2048,19 @@ paths:
         - name: zaaktype
           in: query
           description:
-            URL-referentie naar het ZAAKTYPE van ZAAKen waarin STATUSsen
-            van dit STATUSTYPE bereikt kunnen worden.
+            URL-referentie naar het ZAAKTYPE van ZAAKen waarin STATUSsen van dit
+            STATUSTYPE bereikt kunnen worden.
           required: false
           schema:
             type: string
             format: uri
         - name: status
           in: query
-          description: 'filter objects depending on their concept status:
-            * `alles`: Toon objecten waarvan het attribuut `concept` true of false is.
-            * `concept`: Toon objecten waarvan het attribuut `concept` true is.
-            * `definitief`: Toon objecten waarvan het attribuut `concept` false is (standaard).
+          description: 'filter objects depending on their concept status: *
+            `alles`: Toon objecten waarvan het attribuut `concept` true of false
+            is. * `concept`: Toon objecten waarvan het attribuut `concept` true
+            is. * `definitief`: Toon objecten waarvan het attribuut `concept`
+            false is (standaard).
             '
           required: false
           schema:
@@ -2051,8 +2083,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -2103,8 +2135,7 @@ paths:
       summary: Maak een STATUSTYPE aan.
       description:
         'Maak een STATUSTYPE aan. Dit kan alleen als het bijbehorende ZAAKTYPE
-        een
-        concept betreft.'
+        een concept betreft.'
       requestBody:
         $ref: '#/components/requestBodies/StatusType'
       responses:
@@ -2115,8 +2146,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
             Location:
               schema:
                 type: string
@@ -2163,8 +2194,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -2208,8 +2239,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -2255,8 +2286,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -2290,9 +2321,8 @@ paths:
       operationId: statustype_delete
       summary: Verwijder een STATUSTYPE.
       description:
-        'Verwijder een STATUSTYPE. Dit kan alleen als het bijbehorende
-        ZAAKTYPE een
-        concept betreft.'
+        'Verwijder een STATUSTYPE. Dit kan alleen als het bijbehorende ZAAKTYPE
+        een concept betreft.'
       responses:
         '204':
           description: No content
@@ -2301,8 +2331,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
         '401':
           $ref: '#/components/responses/401'
         '403':
@@ -2357,8 +2387,9 @@ paths:
         - name: richting
           in: query
           description:
-            Aanduiding van de richting van informatieobjecten van het gerelateerde
-            INFORMATIEOBJECTTYPE bij zaken van het gerelateerde ZAAKTYPE.
+            Aanduiding van de richting van informatieobjecten van het
+            gerelateerde INFORMATIEOBJECTTYPE bij zaken van het gerelateerde
+            ZAAKTYPE.
           required: false
           schema:
             type: string
@@ -2368,10 +2399,11 @@ paths:
               - uitgaand
         - name: status
           in: query
-          description: 'filter objects depending on their concept status:
-            * `alles`: Toon objecten waarvan het attribuut `concept` true of false is.
-            * `concept`: Toon objecten waarvan het attribuut `concept` true is.
-            * `definitief`: Toon objecten waarvan het attribuut `concept` false is (standaard).
+          description: 'filter objects depending on their concept status: *
+            `alles`: Toon objecten waarvan het attribuut `concept` true of false
+            is. * `concept`: Toon objecten waarvan het attribuut `concept` true
+            is. * `definitief`: Toon objecten waarvan het attribuut `concept`
+            false is (standaard).
             '
           required: false
           schema:
@@ -2390,8 +2422,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -2441,10 +2473,8 @@ paths:
       operationId: zaakinformatieobjecttype_create
       summary: Maak een ZAAKTYPE-INFORMATIEOBJECTTYPE relatie aan.
       description:
-        'Maak een ZAAKTYPE-INFORMATIEOBJECTTYPE relatie aan. Dit kan alleen
-        als het
-        bijbehorende ZAAKTYPE een concept betreft.
-        Er wordt gevalideerd op:
+        'Maak een ZAAKTYPE-INFORMATIEOBJECTTYPE relatie aan. Dit kan alleen als
+        het bijbehorende ZAAKTYPE een concept betreft. Er wordt gevalideerd op:
         - `zaaktype` en `informatieobjecttype` behoren tot dezelfde `catalogus`'
       requestBody:
         $ref: '#/components/requestBodies/ZaakTypeInformatieObjectType'
@@ -2456,8 +2486,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
             Location:
               schema:
                 type: string
@@ -2495,7 +2525,8 @@ paths:
     get:
       operationId: zaakinformatieobjecttype_read
       summary: Een specifieke ZAAKTYPE-INFORMATIEOBJECTTYPE relatie opvragen.
-      description: Een specifieke ZAAKTYPE-INFORMATIEOBJECTTYPE relatie opvragen.
+      description:
+        Een specifieke ZAAKTYPE-INFORMATIEOBJECTTYPE relatie opvragen.
       responses:
         '200':
           description: OK
@@ -2504,8 +2535,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -2535,13 +2566,13 @@ paths:
             - catalogi.lezen
     put:
       operationId: zaakinformatieobjecttype_update
-      summary: Werk een ZAAKTYPE-INFORMATIEOBJECTTYPE relatie in zijn geheel bij.
+      summary:
+        Werk een ZAAKTYPE-INFORMATIEOBJECTTYPE relatie in zijn geheel bij.
       description:
-        'Werk een ZAAKTYPE-INFORMATIEOBJECTTYPE relatie in zijn geheel
-        bij. Dit kan
-        alleen als het bijbehorende ZAAKTYPE een concept betreft.
-        Er wordt gevalideerd op:
-        - `zaaktype` en `informatieobjecttype` behoren tot dezelfde `catalogus`'
+        'Werk een ZAAKTYPE-INFORMATIEOBJECTTYPE relatie in zijn geheel bij. Dit
+        kan alleen als het bijbehorende ZAAKTYPE een concept betreft. Er wordt
+        gevalideerd op: - `zaaktype` en `informatieobjecttype` behoren tot
+        dezelfde `catalogus`'
       requestBody:
         $ref: '#/components/requestBodies/ZaakTypeInformatieObjectType'
       responses:
@@ -2552,8 +2583,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -2587,11 +2618,10 @@ paths:
       operationId: zaakinformatieobjecttype_partial_update
       summary: Werk een ZAAKTYPE-INFORMATIEOBJECTTYPE relatie deels bij.
       description:
-        'Werk een ZAAKTYPE-INFORMATIEOBJECTTYPE relatie deels bij. Dit
-        kan alleen
-        als het bijbehorende ZAAKTYPE een concept betreft.
-        Er wordt gevalideerd op:
-        - `zaaktype` en `informatieobjecttype` behoren tot dezelfde `catalogus`'
+        'Werk een ZAAKTYPE-INFORMATIEOBJECTTYPE relatie deels bij. Dit kan
+        alleen als het bijbehorende ZAAKTYPE een concept betreft. Er wordt
+        gevalideerd op: - `zaaktype` en `informatieobjecttype` behoren tot
+        dezelfde `catalogus`'
       requestBody:
         $ref: '#/components/requestBodies/ZaakTypeInformatieObjectType'
       responses:
@@ -2602,8 +2632,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -2637,10 +2667,8 @@ paths:
       operationId: zaakinformatieobjecttype_delete
       summary: Verwijder een ZAAKTYPE-INFORMATIEOBJECTTYPE relatie.
       description:
-        'Verwijder een ZAAKTYPE-INFORMATIEOBJECTTYPE relatie. Dit kan alleen
-        als
-        het bijbehorende ZAAKTYPE een concept betreft.
-        Er wordt gevalideerd op:
+        'Verwijder een ZAAKTYPE-INFORMATIEOBJECTTYPE relatie. Dit kan alleen als
+        het bijbehorende ZAAKTYPE een concept betreft. Er wordt gevalideerd op:
         - `zaaktype` of `informatieobjecttype` is nog niet gepubliceerd'
       responses:
         '204':
@@ -2650,8 +2678,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
         '401':
           $ref: '#/components/responses/401'
         '403':
@@ -2691,7 +2719,8 @@ paths:
       parameters:
         - name: catalogus
           in: query
-          description: URL-referentie naar de CATALOGUS waartoe dit ZAAKTYPE behoort.
+          description:
+            URL-referentie naar de CATALOGUS waartoe dit ZAAKTYPE behoort.
           required: false
           schema:
             type: string
@@ -2699,8 +2728,8 @@ paths:
         - name: identificatie
           in: query
           description:
-            Unieke identificatie van het ZAAKTYPE binnen de CATALOGUS waarin
-            het ZAAKTYPE voorkomt.
+            Unieke identificatie van het ZAAKTYPE binnen de CATALOGUS waarin het
+            ZAAKTYPE voorkomt.
           required: false
           schema:
             type: string
@@ -2712,10 +2741,11 @@ paths:
             type: string
         - name: status
           in: query
-          description: 'filter objects depending on their concept status:
-            * `alles`: Toon objecten waarvan het attribuut `concept` true of false is.
-            * `concept`: Toon objecten waarvan het attribuut `concept` true is.
-            * `definitief`: Toon objecten waarvan het attribuut `concept` false is (standaard).
+          description: 'filter objects depending on their concept status: *
+            `alles`: Toon objecten waarvan het attribuut `concept` true of false
+            is. * `concept`: Toon objecten waarvan het attribuut `concept` true
+            is. * `definitief`: Toon objecten waarvan het attribuut `concept`
+            false is (standaard).
             '
           required: false
           schema:
@@ -2738,8 +2768,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -2788,12 +2818,16 @@ paths:
     post:
       operationId: zaaktype_create
       summary: Maak een ZAAKTYPE aan.
-      description:
-        "Maak een ZAAKTYPE aan.\n\nEr wordt gevalideerd op:\n- geldigheid\
-        \ `catalogus` URL, dit moet een catalogus binnen dezelfde API zijn\n- Uniciteit\
-        \ `catalogus` en `omschrijving`. Dezelfde omeschrijving mag enkel\n  opnieuw\
-        \ gebruikt worden als het zaaktype een andere geldigheidsperiode\n  kent dan\
-        \ bestaande zaaktypen.\n- `deelzaaktypen` moeten tot dezelfde catalogus behoren\
+      description: "Maak een ZAAKTYPE aan.\n\nEr wordt gevalideerd op:\n-
+        geldigheid\
+        \ `catalogus` URL, dit moet een catalogus binnen dezelfde API zijn\n-
+        Uniciteit\
+        \ `catalogus` en `omschrijving`. Dezelfde omeschrijving mag
+        enkel\n  opnieuw\
+        \ gebruikt worden als het zaaktype een andere geldigheidsperiode\n  kent
+        dan\
+        \ bestaande zaaktypen.\n- `deelzaaktypen` moeten tot dezelfde catalogus
+        behoren\
         \ als het ZAAKTYPE."
       requestBody:
         $ref: '#/components/requestBodies/ZaakType'
@@ -2805,8 +2839,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
             Location:
               schema:
                 type: string
@@ -2853,8 +2887,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -2887,10 +2921,8 @@ paths:
       summary: Werk een ZAAKTYPE in zijn geheel bij.
       description:
         'Werk een ZAAKTYPE in zijn geheel bij. Dit kan alleen als het een
-        concept
-        betreft.
-        Er wordt gevalideerd op:
-        - `deelzaaktypen` moeten tot dezelfde catalogus behoren als het ZAAKTYPE.'
+        concept betreft. Er wordt gevalideerd op: - `deelzaaktypen` moeten tot
+        dezelfde catalogus behoren als het ZAAKTYPE.'
       requestBody:
         $ref: '#/components/requestBodies/ZaakType'
       responses:
@@ -2901,8 +2933,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -2937,9 +2969,8 @@ paths:
       summary: Werk een ZAAKTYPE deels bij.
       description:
         'Werk een ZAAKTYPE deels bij. Dit kan alleen als het een concept
-        betreft.
-        Er wordt gevalideerd op:
-        - `deelzaaktypen` moeten tot dezelfde catalogus behoren als het ZAAKTYPE.'
+        betreft. Er wordt gevalideerd op: - `deelzaaktypen` moeten tot dezelfde
+        catalogus behoren als het ZAAKTYPE.'
       requestBody:
         $ref: '#/components/requestBodies/ZaakType'
       responses:
@@ -2950,8 +2981,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -2984,7 +3015,8 @@ paths:
     delete:
       operationId: zaaktype_delete
       summary: Verwijder een ZAAKTYPE.
-      description: Verwijder een ZAAKTYPE. Dit kan alleen als het een concept betreft.
+      description:
+        Verwijder een ZAAKTYPE. Dit kan alleen als het een concept betreft.
       responses:
         '204':
           description: No content
@@ -2993,8 +3025,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
         '401':
           $ref: '#/components/responses/401'
         '403':
@@ -3031,13 +3063,11 @@ paths:
       operationId: zaaktype_publish
       summary: Publiceer het concept ZAAKTYPE.
       description:
-        'Publiceren van het zaaktype zorgt ervoor dat dit in een Zaken
-        API kan gebruikt
-        worden. Na het publiceren van een zaaktype zijn geen inhoudelijke wijzigingen
-        meer mogelijk - ook niet de statustypen, eigenschappen... etc. Indien er na
-        het
-        publiceren nog wat gewijzigd moet worden, dan moet je een nieuwe versie
-        aanmaken.'
+        'Publiceren van het zaaktype zorgt ervoor dat dit in een Zaken API kan
+        gebruikt worden. Na het publiceren van een zaaktype zijn geen
+        inhoudelijke wijzigingen meer mogelijk - ook niet de statustypen,
+        eigenschappen... etc. Indien er na het publiceren nog wat gewijzigd moet
+        worden, dan moet je een nieuwe versie aanmaken.'
       responses:
         '200':
           description: ''
@@ -3046,8 +3076,8 @@ paths:
               schema:
                 type: string
               description:
-                'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -3297,8 +3327,8 @@ components:
         url:
           title: Url
           description:
-            URL-referentie naar dit object. Dit is de unieke identificatie
-            en locatie van dit object.
+            URL-referentie naar dit object. Dit is de unieke identificatie en
+            locatie van dit object.
           type: string
           format: uri
           readOnly: true
@@ -3306,27 +3336,31 @@ components:
           minLength: 1
         catalogus:
           title: Catalogus
-          description: URL-referentie naar de CATALOGUS waartoe dit BESLUITTYPE behoort.
+          description:
+            URL-referentie naar de CATALOGUS waartoe dit BESLUITTYPE behoort.
           type: string
           format: uri
         zaaktypen:
-          description: ZAAKTYPE met ZAAKen die relevant kunnen zijn voor dit BESLUITTYPE
+          description:
+            ZAAKTYPE met ZAAKen die relevant kunnen zijn voor dit BESLUITTYPE
           type: array
           items:
-            description: ZAAKTYPE met ZAAKen die relevant kunnen zijn voor dit BESLUITTYPE
+            description:
+              ZAAKTYPE met ZAAKen die relevant kunnen zijn voor dit BESLUITTYPE
             type: string
             format: uri
           uniqueItems: true
         omschrijving:
           title: Omschrijving
-          description: Omschrijving van de aard van BESLUITen van het BESLUITTYPE.
+          description:
+            Omschrijving van de aard van BESLUITen van het BESLUITTYPE.
           type: string
           maxLength: 80
         omschrijvingGeneriek:
           title: Omschrijving generiek
           description:
-            Algemeen gehanteerde omschrijving van de aard van BESLUITen
-            van het BESLUITTYPE
+            Algemeen gehanteerde omschrijving van de aard van BESLUITen van het
+            BESLUITTYPE
           type: string
           maxLength: 80
         besluitcategorie:
@@ -3337,9 +3371,9 @@ components:
         reactietermijn:
           title: Reactietermijn
           description:
-            De duur (typisch een aantal dagen), gerekend vanaf de verzend-
-            of publicatiedatum, waarbinnen verweer tegen een besluit van het besluittype
-            mogelijk is.
+            De duur (typisch een aantal dagen), gerekend vanaf de verzend- of
+            publicatiedatum, waarbinnen verweer tegen een besluit van het
+            besluittype mogelijk is.
           type: string
           format: duration
           nullable: true
@@ -3358,9 +3392,9 @@ components:
         publicatietermijn:
           title: Publicatietermijn
           description:
-            De duur (typisch een aantal dagen), gerekend vanaf de verzend-
-            of publicatiedatum, dat BESLUITen van dit BESLUITTYPE gepubliceerd moeten
-            blijven.
+            De duur (typisch een aantal dagen), gerekend vanaf de verzend- of
+            publicatiedatum, dat BESLUITen van dit BESLUITTYPE gepubliceerd
+            moeten blijven.
           type: string
           format: duration
           nullable: true
@@ -3375,8 +3409,9 @@ components:
           type: array
           items:
             description:
-              URL-referenties naar het INFORMATIEOBJECTTYPE van informatieobjecten
-              waarin besluiten van dit BESLUITTYPE worden vastgelegd.
+              URL-referenties naar het INFORMATIEOBJECTTYPE van
+              informatieobjecten waarin besluiten van dit BESLUITTYPE worden
+              vastgelegd.
             type: string
             format: uri
           uniqueItems: true
@@ -3395,8 +3430,8 @@ components:
           title: Concept
           description:
             Geeft aan of het object een concept betreft. Concepten zijn
-            niet-definitieve versies en zouden niet gebruikt moeten worden buiten
-            deze API.
+            niet-definitieve versies en zouden niet gebruikt moeten worden
+            buiten deze API.
           type: boolean
           readOnly: true
     Fout:
@@ -3410,7 +3445,8 @@ components:
       properties:
         type:
           title: Type
-          description: URI referentie naar het type fout, bedoeld voor developers
+          description:
+            URI referentie naar het type fout, bedoeld voor developers
           type: string
         code:
           title: Code
@@ -3434,8 +3470,8 @@ components:
         instance:
           title: Instance
           description:
-            URI met referentie naar dit specifiek voorkomen van de fout.
-            Deze kan gebruikt worden in combinatie met server logs, bijvoorbeeld.
+            URI met referentie naar dit specifiek voorkomen van de fout. Deze
+            kan gebruikt worden in combinatie met server logs, bijvoorbeeld.
           type: string
           minLength: 1
     FieldValidationError:
@@ -3472,7 +3508,8 @@ components:
       properties:
         type:
           title: Type
-          description: URI referentie naar het type fout, bedoeld voor developers
+          description:
+            URI referentie naar het type fout, bedoeld voor developers
           type: string
         code:
           title: Code
@@ -3496,8 +3533,8 @@ components:
         instance:
           title: Instance
           description:
-            URI met referentie naar dit specifiek voorkomen van de fout.
-            Deze kan gebruikt worden in combinatie met server logs, bijvoorbeeld.
+            URI met referentie naar dit specifiek voorkomen van de fout. Deze
+            kan gebruikt worden in combinatie met server logs, bijvoorbeeld.
           type: string
           minLength: 1
         invalidParams:
@@ -3514,8 +3551,8 @@ components:
         url:
           title: Url
           description:
-            URL-referentie naar dit object. Dit is de unieke identificatie
-            en locatie van dit object.
+            URL-referentie naar dit object. Dit is de unieke identificatie en
+            locatie van dit object.
           type: string
           format: uri
           readOnly: true
@@ -3524,8 +3561,8 @@ components:
         domein:
           title: Domein
           description:
-            Een afkorting waarmee wordt aangegeven voor welk domein in
-            een CATALOGUS ZAAKTYPEn zijn uitgewerkt.
+            Een afkorting waarmee wordt aangegeven voor welk domein in een
+            CATALOGUS ZAAKTYPEn zijn uitgewerkt.
           type: string
           maxLength: 5
           minLength: 1
@@ -3540,23 +3577,23 @@ components:
         contactpersoonBeheerNaam:
           title: Naam
           description:
-            De naam van de contactpersoon die verantwoordelijk is voor
-            het beheer van de CATALOGUS.
+            De naam van de contactpersoon die verantwoordelijk is voor het
+            beheer van de CATALOGUS.
           type: string
           maxLength: 40
           minLength: 1
         contactpersoonBeheerTelefoonnummer:
           title: Telefoonnummer
           description:
-            Het telefoonnummer van de contactpersoon die verantwoordelijk
-            is voor het beheer van de CATALOGUS.
+            Het telefoonnummer van de contactpersoon die verantwoordelijk is
+            voor het beheer van de CATALOGUS.
           type: string
           maxLength: 20
         contactpersoonBeheerEmailadres:
           title: Emailadres
           description:
-            Het emailadres van de contactpersoon die verantwoordelijk is
-            voor het beheer van de CATALOGUS.
+            Het emailadres van de contactpersoon die verantwoordelijk is voor
+            het beheer van de CATALOGUS.
           type: string
           format: email
           maxLength: 254
@@ -3609,20 +3646,16 @@ components:
         groep:
           title: Groep
           description:
-            Benaming van het object of groepattribuut waarvan de EIGENSCHAP
-            een inhoudelijk gegeven specificeert.
+            Benaming van het object of groepattribuut waarvan de EIGENSCHAP een
+            inhoudelijk gegeven specificeert.
           type: string
           maxLength: 32
         formaat:
           title: Formaat
           description:
-            'Het soort tekens waarmee waarden van de EIGENSCHAP kunnen
-            worden vastgelegd.
-            Uitleg bij mogelijke waarden:
-            * `tekst` - Tekst
-            * `getal` - Getal
-            * `datum` - Datum
-            * `datum_tijd` - Datum/tijd'
+            'Het soort tekens waarmee waarden van de EIGENSCHAP kunnen worden
+            vastgelegd. Uitleg bij mogelijke waarden: * `tekst` - Tekst *
+            `getal` - Getal * `datum` - Datum * `datum_tijd` - Datum/tijd'
           type: string
           enum:
             - tekst
@@ -3640,8 +3673,8 @@ components:
         kardinaliteit:
           title: Kardinaliteit
           description:
-            Het aantal mogelijke voorkomens van waarden van deze EIGENSCHAP
-            bij een zaak van het ZAAKTYPE.
+            Het aantal mogelijke voorkomens van waarden van deze EIGENSCHAP bij
+            een zaak van het ZAAKTYPE.
           type: string
           maxLength: 3
           minLength: 1
@@ -3663,8 +3696,8 @@ components:
         url:
           title: Url
           description:
-            URL-referentie naar dit object. Dit is de unieke identificatie
-            en locatie van dit object.
+            URL-referentie naar dit object. Dit is de unieke identificatie en
+            locatie van dit object.
           type: string
           format: uri
           readOnly: true
@@ -3687,8 +3720,8 @@ components:
         toelichting:
           title: Toelichting
           description:
-            Een toelichting op deze EIGENSCHAP en het belang hiervan voor
-            zaken van dit ZAAKTYPE.
+            Een toelichting op deze EIGENSCHAP en het belang hiervan voor zaken
+            van dit ZAAKTYPE.
           type: string
           maxLength: 1000
         zaaktype:
@@ -3709,8 +3742,8 @@ components:
         url:
           title: Url
           description:
-            URL-referentie naar dit object. Dit is de unieke identificatie
-            en locatie van dit object.
+            URL-referentie naar dit object. Dit is de unieke identificatie en
+            locatie van dit object.
           type: string
           format: uri
           readOnly: true
@@ -3725,24 +3758,22 @@ components:
           format: uri
         omschrijving:
           title: Omschrijving
-          description: Omschrijving van de aard van informatieobjecten van dit INFORMATIEOBJECTTYPE.
+          description:
+            Omschrijving van de aard van informatieobjecten van dit
+            INFORMATIEOBJECTTYPE.
           type: string
           maxLength: 80
           minLength: 1
         vertrouwelijkheidaanduiding:
           title: Vertrouwelijkheidaanduiding
           description:
-            'Aanduiding van de mate waarin informatieobjecten van dit INFORMATIEOBJECTTYPE
-            voor de openbaarheid bestemd zijn.
-            Uitleg bij mogelijke waarden:
-            * `openbaar` - Openbaar
-            * `beperkt_openbaar` - Beperkt openbaar
-            * `intern` - Intern
-            * `zaakvertrouwelijk` - Zaakvertrouwelijk
-            * `vertrouwelijk` - Vertrouwelijk
-            * `confidentieel` - Confidentieel
-            * `geheim` - Geheim
-            * `zeer_geheim` - Zeer geheim'
+            'Aanduiding van de mate waarin informatieobjecten van dit
+            INFORMATIEOBJECTTYPE voor de openbaarheid bestemd zijn. Uitleg bij
+            mogelijke waarden: * `openbaar` - Openbaar * `beperkt_openbaar` -
+            Beperkt openbaar * `intern` - Intern * `zaakvertrouwelijk` -
+            Zaakvertrouwelijk * `vertrouwelijk` - Vertrouwelijk *
+            `confidentieel` - Confidentieel * `geheim` - Geheim * `zeer_geheim`
+            - Zeer geheim'
           type: string
           enum:
             - openbaar
@@ -3768,49 +3799,76 @@ components:
           title: Concept
           description:
             Geeft aan of het object een concept betreft. Concepten zijn
-            niet-definitieve versies en zouden niet gebruikt moeten worden buiten
-            deze API.
+            niet-definitieve versies en zouden niet gebruikt moeten worden
+            buiten deze API.
           type: boolean
           readOnly: true
     BrondatumArchiefprocedure:
       description:
-        Specificatie voor het bepalen van de brondatum voor de start van
-        de Archiefactietermijn (=brondatum) van het zaakdossier.
+        Specificatie voor het bepalen van de brondatum voor de start van de
+        Archiefactietermijn (=brondatum) van het zaakdossier.
       required:
         - afleidingswijze
       type: object
       properties:
         afleidingswijze:
           title: Afleidingswijze brondatum
-          description:
-            "Wijze van bepalen van de brondatum.\n\nUitleg bij mogelijke\
-            \ waarden:\n\n* `afgehandeld` - (Afgehandeld) De termijn start op de datum\
-            \ waarop de zaak is afgehandeld (ZAAK.Einddatum in het RGBZ).\n* `ander_datumkenmerk`\
-            \ - (Ander datumkenmerk) De termijn start op de datum die is vastgelegd\
-            \ in een ander datumveld dan de datumvelden waarop de overige waarden\
-            \ (van deze attribuutsoort) betrekking hebben. `Objecttype`, `Registratie`\
-            \ en `Datumkenmerk` zijn niet leeg.\n* `eigenschap` - (Eigenschap) De\
-            \ termijn start op de datum die vermeld is in een zaaktype-specifieke\
-            \ eigenschap (zijnde een `datumveld`). `ResultaatType.ZaakType` heeft\
-            \ een `Eigenschap`; `Objecttype`, en `Datumkenmerk` zijn niet leeg.\n\
-            * `gerelateerde_zaak` - (Gerelateerde zaak) De termijn start op de datum\
-            \ waarop de gerelateerde zaak is afgehandeld (`ZAAK.Einddatum` of `ZAAK.Gerelateerde_zaak.Einddatum`\
-            \ in het RGBZ). `ResultaatType.ZaakType` heeft gerelateerd `ZaakType`\n\
-            * `hoofdzaak` - (Hoofdzaak) De termijn start op de datum waarop de gerelateerde\
-            \ zaak is afgehandeld, waarvan de zaak een deelzaak is (`ZAAK.Einddatum`\
-            \ van de hoofdzaak in het RGBZ). ResultaatType.ZaakType is deelzaaktype\
-            \ van ZaakType.\n* `ingangsdatum_besluit` - (Ingangsdatum besluit) De\
-            \ termijn start op de datum waarop het besluit van kracht wordt (`BESLUIT.Ingangsdatum`\
-            \ in het RGBZ).\tResultaatType.ZaakType heeft relevant BesluitType\n*\
-            \ `termijn` - (Termijn) De termijn start een vast aantal jaren na de datum\
-            \ waarop de zaak is afgehandeld (`ZAAK.Einddatum` in het RGBZ).\n* `vervaldatum_besluit`\
-            \ - (Vervaldatum besluit) De termijn start op de dag na de datum waarop\
-            \ het besluit vervalt (`BESLUIT.Vervaldatum` in het RGBZ). ResultaatType.ZaakType\
-            \ heeft relevant BesluitType\n* `zaakobject` - (Zaakobject) De termijn\
-            \ start op de einddatum geldigheid van het zaakobject waarop de zaak betrekking\
-            \ heeft (bijvoorbeeld de overlijdendatum van een Persoon). M.b.v. de attribuutsoort\
-            \ `Objecttype` wordt vastgelegd om welke zaakobjecttype het gaat; m.b.v.\
-            \ de attribuutsoort `Datumkenmerk` wordt vastgelegd welke datum-attribuutsoort\
+          description: "Wijze van bepalen van de brondatum.\n\nUitleg bij
+            mogelijke\
+            \ waarden:\n\n* `afgehandeld` - (Afgehandeld) De termijn start op de
+            datum\
+            \ waarop de zaak is afgehandeld (ZAAK.Einddatum in het RGBZ).\n*
+            `ander_datumkenmerk`\
+            \ - (Ander datumkenmerk) De termijn start op de datum die is
+            vastgelegd\
+            \ in een ander datumveld dan de datumvelden waarop de overige
+            waarden\
+            \ (van deze attribuutsoort) betrekking hebben. `Objecttype`,
+            `Registratie`\
+            \ en `Datumkenmerk` zijn niet leeg.\n* `eigenschap` - (Eigenschap)
+            De\
+            \ termijn start op de datum die vermeld is in een
+            zaaktype-specifieke\
+            \ eigenschap (zijnde een `datumveld`). `ResultaatType.ZaakType`
+            heeft\
+            \ een `Eigenschap`; `Objecttype`, en `Datumkenmerk` zijn niet
+            leeg.\n\
+            * `gerelateerde_zaak` - (Gerelateerde zaak) De termijn start op de
+            datum\
+            \ waarop de gerelateerde zaak is afgehandeld (`ZAAK.Einddatum` of
+            `ZAAK.Gerelateerde_zaak.Einddatum`\
+            \ in het RGBZ). `ResultaatType.ZaakType` heeft gerelateerd
+            `ZaakType`\n\
+            * `hoofdzaak` - (Hoofdzaak) De termijn start op de datum waarop de
+            gerelateerde\
+            \ zaak is afgehandeld, waarvan de zaak een deelzaak is
+            (`ZAAK.Einddatum`\
+            \ van de hoofdzaak in het RGBZ). ResultaatType.ZaakType is
+            deelzaaktype\
+            \ van ZaakType.\n* `ingangsdatum_besluit` - (Ingangsdatum besluit)
+            De\
+            \ termijn start op de datum waarop het besluit van kracht wordt
+            (`BESLUIT.Ingangsdatum`\
+            \ in het RGBZ).\tResultaatType.ZaakType heeft relevant
+            BesluitType\n*\
+            \ `termijn` - (Termijn) De termijn start een vast aantal jaren na de
+            datum\
+            \ waarop de zaak is afgehandeld (`ZAAK.Einddatum` in het RGBZ).\n*
+            `vervaldatum_besluit`\
+            \ - (Vervaldatum besluit) De termijn start op de dag na de datum
+            waarop\
+            \ het besluit vervalt (`BESLUIT.Vervaldatum` in het RGBZ).
+            ResultaatType.ZaakType\
+            \ heeft relevant BesluitType\n* `zaakobject` - (Zaakobject) De
+            termijn\
+            \ start op de einddatum geldigheid van het zaakobject waarop de zaak
+            betrekking\
+            \ heeft (bijvoorbeeld de overlijdendatum van een Persoon). M.b.v. de
+            attribuutsoort\
+            \ `Objecttype` wordt vastgelegd om welke zaakobjecttype het gaat;
+            m.b.v.\
+            \ de attribuutsoort `Datumkenmerk` wordt vastgelegd welke
+            datum-attribuutsoort\
             \ van het zaakobjecttype het betreft."
           type: string
           enum:
@@ -3826,54 +3884,40 @@ components:
         datumkenmerk:
           title: Datumkenmerk
           description:
-            Naam van de attribuutsoort van het procesobject dat bepalend
-            is voor het einde van de procestermijn.
+            Naam van de attribuutsoort van het procesobject dat bepalend is voor
+            het einde van de procestermijn.
           type: string
           maxLength: 80
         einddatumBekend:
           title: Einddatum bekend
           description:
             Indicatie dat de einddatum van het procesobject gedurende de
-            uitvoering van de zaak bekend moet worden. Indien deze nog niet bekend
-            is en deze waarde staat op `true`, dan kan de zaak (nog) niet afgesloten
-            worden.
+            uitvoering van de zaak bekend moet worden. Indien deze nog niet
+            bekend is en deze waarde staat op `true`, dan kan de zaak (nog) niet
+            afgesloten worden.
           type: boolean
         objecttype:
           title: Objecttype
           description:
-            'Het soort object in de registratie dat het procesobject representeert.
-            Uitleg bij mogelijke waarden:
-            * `adres` - Adres
-            * `besluit` - Besluit
-            * `buurt` - Buurt
-            * `enkelvoudig_document` - Enkelvoudig document
-            * `gemeente` - Gemeente
-            * `gemeentelijke_openbare_ruimte` - Gemeentelijke openbare ruimte
-            * `huishouden` - Huishouden
-            * `inrichtingselement` - Inrichtingselement
-            * `kadastrale_onroerende_zaak` - Kadastrale onroerende zaak
-            * `kunstwerkdeel` - Kunstwerkdeel
-            * `maatschappelijke_activiteit` - Maatschappelijke activiteit
-            * `medewerker` - Medewerker
-            * `natuurlijk_persoon` - Natuurlijk persoon
-            * `niet_natuurlijk_persoon` - Niet-natuurlijk persoon
-            * `openbare_ruimte` - Openbare ruimte
-            * `organisatorische_eenheid` - Organisatorische eenheid
-            * `pand` - Pand
-            * `spoorbaandeel` - Spoorbaandeel
-            * `status` - Status
-            * `terreindeel` - Terreindeel
-            * `terrein_gebouwd_object` - Terrein gebouwd object
-            * `vestiging` - Vestiging
-            * `waterdeel` - Waterdeel
-            * `wegdeel` - Wegdeel
-            * `wijk` - Wijk
-            * `woonplaats` - Woonplaats
-            * `woz_deelobject` - Woz deel object
-            * `woz_object` - Woz object
-            * `woz_waarde` - Woz waarde
-            * `zakelijk_recht` - Zakelijk recht
-            * `overige` - Overige'
+            'Het soort object in de registratie dat het procesobject
+            representeert. Uitleg bij mogelijke waarden: * `adres` - Adres *
+            `besluit` - Besluit * `buurt` - Buurt * `enkelvoudig_document` -
+            Enkelvoudig document * `gemeente` - Gemeente *
+            `gemeentelijke_openbare_ruimte` - Gemeentelijke openbare ruimte *
+            `huishouden` - Huishouden * `inrichtingselement` -
+            Inrichtingselement * `kadastrale_onroerende_zaak` - Kadastrale
+            onroerende zaak * `kunstwerkdeel` - Kunstwerkdeel *
+            `maatschappelijke_activiteit` - Maatschappelijke activiteit *
+            `medewerker` - Medewerker * `natuurlijk_persoon` - Natuurlijk
+            persoon * `niet_natuurlijk_persoon` - Niet-natuurlijk persoon *
+            `openbare_ruimte` - Openbare ruimte * `organisatorische_eenheid` -
+            Organisatorische eenheid * `pand` - Pand * `spoorbaandeel` -
+            Spoorbaandeel * `status` - Status * `terreindeel` - Terreindeel *
+            `terrein_gebouwd_object` - Terrein gebouwd object * `vestiging` -
+            Vestiging * `waterdeel` - Waterdeel * `wegdeel` - Wegdeel * `wijk` -
+            Wijk * `woonplaats` - Woonplaats * `woz_deelobject` - Woz deel
+            object * `woz_object` - Woz object * `woz_waarde` - Woz waarde *
+            `zakelijk_recht` - Zakelijk recht * `overige` - Overige'
           type: string
           enum:
             - adres
@@ -3910,17 +3954,16 @@ components:
         registratie:
           title: Registratie
           description:
-            De naam van de registratie waarvan het procesobject deel uit
-            maakt.
+            De naam van de registratie waarvan het procesobject deel uit maakt.
           type: string
           maxLength: 80
         procestermijn:
           title: Procestermijn
           description:
             De periode dat het zaakdossier na afronding van de zaak actief
-            gebruikt en/of geraadpleegd wordt ter ondersteuning van de taakuitoefening
-            van de organisatie. Enkel relevant indien de afleidingswijze 'termijn'
-            is.
+            gebruikt en/of geraadpleegd wordt ter ondersteuning van de
+            taakuitoefening van de organisatie. Enkel relevant indien de
+            afleidingswijze 'termijn' is.
           type: string
           format: duration
           nullable: true
@@ -3936,8 +3979,8 @@ components:
         url:
           title: Url
           description:
-            URL-referentie naar dit object. Dit is de unieke identificatie
-            en locatie van dit object.
+            URL-referentie naar dit object. Dit is de unieke identificatie en
+            locatie van dit object.
           type: string
           format: uri
           readOnly: true
@@ -3946,30 +3989,33 @@ components:
         zaaktype:
           title: is van
           description:
-            URL-referentie naar het ZAAKTYPE van ZAAKen waarin resultaten
-            van dit RESULTAATTYPE bereikt kunnen worden.
+            URL-referentie naar het ZAAKTYPE van ZAAKen waarin resultaten van
+            dit RESULTAATTYPE bereikt kunnen worden.
           type: string
           format: uri
         omschrijving:
           title: Omschrijving
-          description: Omschrijving van de aard van resultaten van het RESULTAATTYPE.
+          description:
+            Omschrijving van de aard van resultaten van het RESULTAATTYPE.
           type: string
           maxLength: 20
           minLength: 1
         resultaattypeomschrijving:
           title: Resultaattypeomschrijving
           description:
-            Algemeen gehanteerde omschrijving van de aard van resultaten
-            van het RESULTAATTYPE. Dit moet een URL-referentie zijn naar de referenlijst
-            van generieke resultaattypeomschrijvingen. Im ImZTC heet dit 'omschrijving
-            generiek'
+            Algemeen gehanteerde omschrijving van de aard van resultaten van het
+            RESULTAATTYPE. Dit moet een URL-referentie zijn naar de referenlijst
+            van generieke resultaattypeomschrijvingen. Im ImZTC heet dit
+            'omschrijving generiek'
           type: string
           format: uri
           maxLength: 1000
           minLength: 1
         omschrijvingGeneriek:
           title: Omschrijving generiek
-          description: Waarde van de omschrijving-generiek referentie (attribuut `omschrijving`)
+          description:
+            Waarde van de omschrijving-generiek referentie (attribuut
+            `omschrijving`)
           type: string
           readOnly: true
           minLength: 1
@@ -3977,8 +4023,9 @@ components:
           title: Selectielijstklasse
           description:
             URL-referentie naar de, voor het archiefregime bij het RESULTAATTYPE
-            relevante, categorie in de Selectielijst Archiefbescheiden (RESULTAAT
-            in de Selectielijst API) van de voor het ZAAKTYPE verantwoordelijke overheidsorganisatie.
+            relevante, categorie in de Selectielijst Archiefbescheiden
+            (RESULTAAT in de Selectielijst API) van de voor het ZAAKTYPE
+            verantwoordelijke overheidsorganisatie.
           type: string
           format: uri
           maxLength: 1000
@@ -3986,21 +4033,21 @@ components:
         toelichting:
           title: Toelichting
           description:
-            Een toelichting op dit RESULTAATTYPE en het belang hiervan
-            voor ZAAKen waarin een resultaat van dit RESULTAATTYPE wordt geselecteerd.
+            Een toelichting op dit RESULTAATTYPE en het belang hiervan voor
+            ZAAKen waarin een resultaat van dit RESULTAATTYPE wordt
+            geselecteerd.
           type: string
         archiefnominatie:
           title: Archiefnominatie
           description:
             'Aanduiding die aangeeft of ZAAKen met een resultaat van dit
-            RESULTAATTYPE blijvend moeten worden bewaard of (op termijn) moeten worden
-            vernietigd. Indien niet expliciet opgegeven wordt dit gevuld vanuit de
-            selectielijst.
-            Uitleg bij mogelijke waarden:
-            * `blijvend_bewaren` - Het zaakdossier moet bewaard blijven en op de Archiefactiedatum
-            overgedragen worden naar een archiefbewaarplaats.
-            * `vernietigen` - Het zaakdossier moet op of na de Archiefactiedatum vernietigd
-            worden.'
+            RESULTAATTYPE blijvend moeten worden bewaard of (op termijn) moeten
+            worden vernietigd. Indien niet expliciet opgegeven wordt dit gevuld
+            vanuit de selectielijst. Uitleg bij mogelijke waarden: *
+            `blijvend_bewaren` - Het zaakdossier moet bewaard blijven en op de
+            Archiefactiedatum overgedragen worden naar een archiefbewaarplaats.
+            * `vernietigen` - Het zaakdossier moet op of na de Archiefactiedatum
+            vernietigd worden.'
           type: string
           enum:
             - blijvend_bewaren
@@ -4008,13 +4055,14 @@ components:
         archiefactietermijn:
           title: Archiefactietermijn
           description:
-            De termijn, na het vervallen van het bedrjfsvoeringsbelang,
-            waarna het zaakdossier (de ZAAK met alle bijbehorende INFORMATIEOBJECTen)
-            van een ZAAK met een resultaat van dit RESULTAATTYPE vernietigd of overgebracht
-            (naar een archiefbewaarplaats) moet worden. Voor te vernietigen dossiers
-            betreft het de in die Selectielijst genoemde bewaartermjn. Voor blijvend
-            te bewaren zaakdossiers betreft het de termijn vanaf afronding van de
-            zaak tot overbrenging (de procestermijn is dan nihil).
+            De termijn, na het vervallen van het bedrjfsvoeringsbelang, waarna
+            het zaakdossier (de ZAAK met alle bijbehorende INFORMATIEOBJECTen)
+            van een ZAAK met een resultaat van dit RESULTAATTYPE vernietigd of
+            overgebracht (naar een archiefbewaarplaats) moet worden. Voor te
+            vernietigen dossiers betreft het de in die Selectielijst genoemde
+            bewaartermjn. Voor blijvend te bewaren zaakdossiers betreft het de
+            termijn vanaf afronding van de zaak tot overbrenging (de
+            procestermijn is dan nihil).
           type: string
           format: duration
           nullable: true
@@ -4030,8 +4078,8 @@ components:
         url:
           title: Url
           description:
-            URL-referentie naar dit object. Dit is de unieke identificatie
-            en locatie van dit object.
+            URL-referentie naar dit object. Dit is de unieke identificatie en
+            locatie van dit object.
           type: string
           format: uri
           readOnly: true
@@ -4040,8 +4088,8 @@ components:
         zaaktype:
           title: Zaaktype
           description:
-            URL-referentie naar het ZAAKTYPE waar deze ROLTYPEn betrokken
-            kunnen zijn.
+            URL-referentie naar het ZAAKTYPE waar deze ROLTYPEn betrokken kunnen
+            zijn.
           type: string
           format: uri
         omschrijving:
@@ -4052,20 +4100,32 @@ components:
           minLength: 1
         omschrijvingGeneriek:
           title: Omschrijving generiek
-          description:
-            "Algemeen gehanteerde omschrijving van de aard van de ROL.\n\
-            \nUitleg bij mogelijke waarden:\n\n* `adviseur` - (Adviseur) Kennis in\
-            \ dienst stellen van de behandeling van (een deel van) een zaak.\n* `behandelaar`\
-            \ - (Behandelaar) De vakinhoudelijke behandeling doen van (een deel van)\
-            \ een zaak.\n* `belanghebbende` - (Belanghebbende) Vanuit eigen en objectief\
-            \ belang rechtstreeks betrokken zijn bij de behandeling en/of de uitkomst\
-            \ van een zaak.\n* `beslisser` - (Beslisser) Nemen van besluiten die voor\
-            \ de uitkomst van een zaak noodzakelijk zijn.\n* `initiator` - (Initiator)\
-            \ Aanleiding geven tot de start van een zaak ..\n* `klantcontacter` -\
-            \ (Klantcontacter) Het eerste aanspreekpunt zijn voor vragen van burgers\
-            \ en bedrijven ..\n* `zaakcoordinator` - (Zaakco\xF6rdinator) Er voor\
-            \ zorg dragen dat de behandeling van de zaak in samenhang uitgevoerd wordt\
-            \ conform de daarover gemaakte afspraken.\n* `mede_initiator` - Mede-initiator"
+          description: "Algemeen gehanteerde omschrijving van de aard van de
+            ROL.\n\
+            \nUitleg bij mogelijke waarden:\n\n* `adviseur` - (Adviseur) Kennis
+            in\
+            \ dienst stellen van de behandeling van (een deel van) een zaak.\n*
+            `behandelaar`\
+            \ - (Behandelaar) De vakinhoudelijke behandeling doen van (een deel
+            van)\
+            \ een zaak.\n* `belanghebbende` - (Belanghebbende) Vanuit eigen en
+            objectief\
+            \ belang rechtstreeks betrokken zijn bij de behandeling en/of de
+            uitkomst\
+            \ van een zaak.\n* `beslisser` - (Beslisser) Nemen van besluiten die
+            voor\
+            \ de uitkomst van een zaak noodzakelijk zijn.\n* `initiator` -
+            (Initiator)\
+            \ Aanleiding geven tot de start van een zaak ..\n* `klantcontacter`
+            -\
+            \ (Klantcontacter) Het eerste aanspreekpunt zijn voor vragen van
+            burgers\
+            \ en bedrijven ..\n* `zaakcoordinator` - (Zaakco\xF6rdinator) Er
+            voor\
+            \ zorg dragen dat de behandeling van de zaak in samenhang uitgevoerd
+            wordt\
+            \ conform de daarover gemaakte afspraken.\n* `mede_initiator` -
+            Mede-initiator"
           type: string
           enum:
             - adviseur
@@ -4086,8 +4146,8 @@ components:
         url:
           title: Url
           description:
-            URL-referentie naar dit object. Dit is de unieke identificatie
-            en locatie van dit object.
+            URL-referentie naar dit object. Dit is de unieke identificatie en
+            locatie van dit object.
           type: string
           format: uri
           readOnly: true
@@ -4096,53 +4156,54 @@ components:
         omschrijving:
           title: Omschrijving
           description:
-            Een korte, voor de initiator van de zaak relevante, omschrijving
-            van de aard van de STATUS van zaken van een ZAAKTYPE.
+            Een korte, voor de initiator van de zaak relevante, omschrijving van
+            de aard van de STATUS van zaken van een ZAAKTYPE.
           type: string
           maxLength: 80
           minLength: 1
         omschrijvingGeneriek:
           title: Omschrijving generiek
           description:
-            Algemeen gehanteerde omschrijving van de aard van STATUSsen
-            van het STATUSTYPE
+            Algemeen gehanteerde omschrijving van de aard van STATUSsen van het
+            STATUSTYPE
           type: string
           maxLength: 80
         statustekst:
           title: Statustekst
           description:
-            De tekst die wordt gebruikt om de Initiator te informeren over
-            het bereiken van een STATUS van dit STATUSTYPE bij het desbetreffende
+            De tekst die wordt gebruikt om de Initiator te informeren over het
+            bereiken van een STATUS van dit STATUSTYPE bij het desbetreffende
             ZAAKTYPE.
           type: string
           maxLength: 1000
         zaaktype:
           title: Zaaktype
           description:
-            URL-referentie naar het ZAAKTYPE van ZAAKen waarin STATUSsen
-            van dit STATUSTYPE bereikt kunnen worden.
+            URL-referentie naar het ZAAKTYPE van ZAAKen waarin STATUSsen van dit
+            STATUSTYPE bereikt kunnen worden.
           type: string
           format: uri
         volgnummer:
           title: Volgnummer
           description:
-            Een volgnummer voor statussen van het STATUSTYPE binnen een
-            zaak.
+            Een volgnummer voor statussen van het STATUSTYPE binnen een zaak.
           type: integer
           maximum: 9999
           minimum: 1
         isEindstatus:
           title: Is eindstatus
           description:
-            Geeft aan dat dit STATUSTYPE een eindstatus betreft. Dit gegeven
-            is afgeleid uit alle STATUSTYPEn van dit ZAAKTYPE met het hoogste volgnummer.
+            Geeft aan dat dit STATUSTYPE een eindstatus betreft. Dit gegeven is
+            afgeleid uit alle STATUSTYPEn van dit ZAAKTYPE met het hoogste
+            volgnummer.
           type: boolean
           readOnly: true
         informeren:
           title: Informeren
-          description:
-            "Aanduiding die aangeeft of na het zetten van een STATUS van\
-            \ dit STATUSTYPE de Initiator moet worden ge\xEFnformeerd over de statusovergang."
+          description: "Aanduiding die aangeeft of na het zetten van een STATUS
+            van\
+            \ dit STATUSTYPE de Initiator moet worden ge\xEFnformeerd over de
+            statusovergang."
           type: boolean
     ZaakTypeInformatieObjectType:
       required:
@@ -4155,8 +4216,8 @@ components:
         url:
           title: Url
           description:
-            URL-referentie naar dit object. Dit is de unieke identificatie
-            en locatie van dit object.
+            URL-referentie naar dit object. Dit is de unieke identificatie en
+            locatie van dit object.
           type: string
           format: uri
           readOnly: true
@@ -4184,11 +4245,9 @@ components:
           title: Richting
           description:
             'Aanduiding van de richting van informatieobjecten van het
-            gerelateerde INFORMATIEOBJECTTYPE bij zaken van het gerelateerde ZAAKTYPE.
-            Uitleg bij mogelijke waarden:
-            * `inkomend` - Inkomend
-            * `intern` - Intern
-            * `uitgaand` - Uitgaand'
+            gerelateerde INFORMATIEOBJECTTYPE bij zaken van het gerelateerde
+            ZAAKTYPE. Uitleg bij mogelijke waarden: * `inkomend` - Inkomend *
+            `intern` - Intern * `uitgaand` - Uitgaand'
           type: string
           enum:
             - inkomend
@@ -4197,8 +4256,8 @@ components:
         statustype:
           title: Status type
           description:
-            URL-referentie naar het STATUSTYPE waarbij deze INFORMATIEOBJECTTYPEn
-            verplicht aanwezig moeten zijn.
+            URL-referentie naar het STATUSTYPE waarbij deze
+            INFORMATIEOBJECTTYPEn verplicht aanwezig moeten zijn.
           type: string
           format: uri
           nullable: true
@@ -4221,7 +4280,8 @@ components:
           format: uri
           maxLength: 200
     ZaakTypenRelatie:
-      description: De ZAAKTYPEn van zaken die relevant zijn voor zaken van dit ZAAKTYPE.
+      description:
+        De ZAAKTYPEn van zaken die relevant zijn voor zaken van dit ZAAKTYPE.
       required:
         - zaaktype
         - aardRelatie
@@ -4230,8 +4290,8 @@ components:
         zaaktype:
           title: Zaaktype
           description:
-            URL referentie naar het gerelateerde zaaktype, mogelijks in
-            een extern ZTC.
+            URL referentie naar het gerelateerde zaaktype, mogelijks in een
+            extern ZTC.
           type: string
           format: uri
           maxLength: 200
@@ -4239,12 +4299,10 @@ components:
         aardRelatie:
           title: Aard relatie
           description:
-            'Omschrijving van de aard van de relatie van zaken van het
-            ZAAKTYPE tot zaken van het andere ZAAKTYPE
-            Uitleg bij mogelijke waarden:
-            * `vervolg` - Vervolg
-            * `bijdrage` - Bijdrage
-            * `onderwerp` - Onderwerp'
+            'Omschrijving van de aard van de relatie van zaken van het ZAAKTYPE
+            tot zaken van het andere ZAAKTYPE Uitleg bij mogelijke waarden: *
+            `vervolg` - Vervolg * `bijdrage` - Bijdrage * `onderwerp` -
+            Onderwerp'
           type: string
           enum:
             - vervolg
@@ -4252,7 +4310,8 @@ components:
             - onderwerp
         toelichting:
           title: Toelichting
-          description: Een toelichting op de aard van de relatie tussen beide ZAAKTYPEN.
+          description:
+            Een toelichting op de aard van de relatie tussen beide ZAAKTYPEN.
           type: string
           maxLength: 255
     ZaakType:
@@ -4280,8 +4339,8 @@ components:
         url:
           title: Url
           description:
-            URL-referentie naar dit object. Dit is de unieke identificatie
-            en locatie van dit object.
+            URL-referentie naar dit object. Dit is de unieke identificatie en
+            locatie van dit object.
           type: string
           format: uri
           readOnly: true
@@ -4290,8 +4349,8 @@ components:
         identificatie:
           title: Identificatie
           description:
-            Unieke identificatie van het ZAAKTYPE binnen de CATALOGUS waarin
-            het ZAAKTYPE voorkomt.
+            Unieke identificatie van het ZAAKTYPE binnen de CATALOGUS waarin het
+            ZAAKTYPE voorkomt.
           type: string
           maxLength: 50
         omschrijving:
@@ -4303,25 +4362,20 @@ components:
         omschrijvingGeneriek:
           title: Omschrijving generiek
           description:
-            Algemeen gehanteerde omschrijving van de aard van ZAAKen van
-            het ZAAKTYPE
+            Algemeen gehanteerde omschrijving van de aard van ZAAKen van het
+            ZAAKTYPE
           type: string
           maxLength: 80
         vertrouwelijkheidaanduiding:
           title: Vertrouwelijkheidaanduiding
           description:
-            'Aanduiding van de mate waarin zaakdossiers van ZAAKen van
-            dit ZAAKTYPE voor de openbaarheid bestemd zijn. Indien de zaak bij het
-            aanmaken geen vertrouwelijkheidaanduiding krijgt, dan wordt deze waarde
-            gezet.
-            Uitleg bij mogelijke waarden:
-            * `openbaar` - Openbaar
-            * `beperkt_openbaar` - Beperkt openbaar
-            * `intern` - Intern
-            * `zaakvertrouwelijk` - Zaakvertrouwelijk
-            * `vertrouwelijk` - Vertrouwelijk
-            * `confidentieel` - Confidentieel
-            * `geheim` - Geheim
+            'Aanduiding van de mate waarin zaakdossiers van ZAAKen van dit
+            ZAAKTYPE voor de openbaarheid bestemd zijn. Indien de zaak bij het
+            aanmaken geen vertrouwelijkheidaanduiding krijgt, dan wordt deze
+            waarde gezet. Uitleg bij mogelijke waarden: * `openbaar` - Openbaar
+            * `beperkt_openbaar` - Beperkt openbaar * `intern` - Intern *
+            `zaakvertrouwelijk` - Zaakvertrouwelijk * `vertrouwelijk` -
+            Vertrouwelijk * `confidentieel` - Confidentieel * `geheim` - Geheim
             * `zeer_geheim` - Zeer geheim'
           type: string
           enum:
@@ -4336,15 +4390,15 @@ components:
         doel:
           title: Doel
           description:
-            Een omschrijving van hetgeen beoogd is te bereiken met een
-            zaak van dit zaaktype.
+            Een omschrijving van hetgeen beoogd is te bereiken met een zaak van
+            dit zaaktype.
           type: string
           minLength: 1
         aanleiding:
           title: Aanleiding
           description:
-            Een omschrijving van de gebeurtenis die leidt tot het starten
-            van een ZAAK van dit ZAAKTYPE.
+            Een omschrijving van de gebeurtenis die leidt tot het starten van
+            een ZAAK van dit ZAAKTYPE.
           type: string
           minLength: 1
         toelichting:
@@ -4355,11 +4409,14 @@ components:
           type: string
         indicatieInternOfExtern:
           title: Indicatie intern of extern
-          description:
-            "Een aanduiding waarmee onderscheid wordt gemaakt tussen ZAAKTYPEn\
-            \ die Intern respectievelijk Extern ge\xEFnitieerd worden. Indien van\
-            \ beide sprake kan zijn, dan prevaleert de externe initiatie.\n\nUitleg\
-            \ bij mogelijke waarden:\n\n* `inkomend` - Inkomend\n* `intern` - Intern\n\
+          description: "Een aanduiding waarmee onderscheid wordt gemaakt tussen
+            ZAAKTYPEn\
+            \ die Intern respectievelijk Extern ge\xEFnitieerd worden. Indien
+            van\
+            \ beide sprake kan zijn, dan prevaleert de externe
+            initiatie.\n\nUitleg\
+            \ bij mogelijke waarden:\n\n* `inkomend` - Inkomend\n* `intern` -
+            Intern\n\
             * `uitgaand` - Uitgaand"
           type: string
           enum:
@@ -4368,65 +4425,69 @@ components:
         handelingInitiator:
           title: Handeling initiator
           description:
-            Werkwoord dat hoort bij de handeling die de initiator verricht
-            bij dit zaaktype. Meestal 'aanvragen', 'indienen' of 'melden'. Zie ook
-            het IOB model op https://www.gemmaonline.nl/index.php/Imztc_2.1/doc/attribuutsoort/zaaktype.handeling_initiator
+            Werkwoord dat hoort bij de handeling die de initiator verricht bij
+            dit zaaktype. Meestal 'aanvragen', 'indienen' of 'melden'. Zie ook
+            het IOB model op
+            https://www.gemmaonline.nl/index.php/Imztc_2.1/doc/attribuutsoort/zaaktype.handeling_initiator
           type: string
           maxLength: 20
           minLength: 1
         onderwerp:
           title: Onderwerp
           description:
-            "Het onderwerp van ZAAKen van dit ZAAKTYPE. In veel gevallen
-            nauw gerelateerd aan de product- of dienstnaam uit de Producten- en Dienstencatalogus
-            (PDC). Bijvoorbeeld: 'Evenementenvergunning', 'Geboorte', 'Klacht'.
-            Zie ook het IOB model op https://www.gemmaonline.nl/index.php/Imztc_2.1/doc/attribuutsoort/zaaktype.onderwerp"
+            "Het onderwerp van ZAAKen van dit ZAAKTYPE. In veel gevallen nauw
+            gerelateerd aan de product- of dienstnaam uit de Producten- en
+            Dienstencatalogus (PDC). Bijvoorbeeld: 'Evenementenvergunning',
+            'Geboorte', 'Klacht'. Zie ook het IOB model op
+            https://www.gemmaonline.nl/index.php/Imztc_2.1/doc/attribuutsoort/zaaktype.onderwerp"
           type: string
           maxLength: 80
           minLength: 1
         handelingBehandelaar:
           title: Handeling behandelaar
           description:
-            Werkwoord dat hoort bij de handeling die de behandelaar verricht
-            bij het afdoen van ZAAKen van dit ZAAKTYPE. Meestal 'behandelen', 'uitvoeren',
-            'vaststellen' of 'onderhouden'. Zie ook het IOB model op https://www.gemmaonline.nl/index.php/Imztc_2.1/doc/attribuutsoort/zaaktype.handeling_behandelaar
+            Werkwoord dat hoort bij de handeling die de behandelaar verricht bij
+            het afdoen van ZAAKen van dit ZAAKTYPE. Meestal 'behandelen',
+            'uitvoeren', 'vaststellen' of 'onderhouden'. Zie ook het IOB model
+            op
+            https://www.gemmaonline.nl/index.php/Imztc_2.1/doc/attribuutsoort/zaaktype.handeling_behandelaar
           type: string
           maxLength: 20
           minLength: 1
         doorlooptijd:
           title: Doorlooptijd
           description:
-            De periode waarbinnen volgens wet- en regelgeving een ZAAK
-            van het ZAAKTYPE afgerond dient te zijn, in kalenderdagen.
+            De periode waarbinnen volgens wet- en regelgeving een ZAAK van het
+            ZAAKTYPE afgerond dient te zijn, in kalenderdagen.
           type: string
           format: duration
         servicenorm:
           title: Servicenorm
           description:
             De periode waarbinnen verwacht wordt dat een ZAAK van het ZAAKTYPE
-            afgerond wordt conform de geldende servicenormen van de zaakbehandelende
-            organisatie(s).
+            afgerond wordt conform de geldende servicenormen van de
+            zaakbehandelende organisatie(s).
           type: string
           format: duration
           nullable: true
         opschortingEnAanhoudingMogelijk:
           title: Opschorting/aanhouding mogelijk
           description:
-            Aanduiding die aangeeft of ZAAKen van dit mogelijk ZAAKTYPE
-            kunnen worden opgeschort en/of aangehouden.
+            Aanduiding die aangeeft of ZAAKen van dit mogelijk ZAAKTYPE kunnen
+            worden opgeschort en/of aangehouden.
           type: boolean
         verlengingMogelijk:
           title: Verlenging mogelijk
           description:
-            Aanduiding die aangeeft of de Doorlooptijd behandeling van
-            ZAAKen van dit ZAAKTYPE kan worden verlengd.
+            Aanduiding die aangeeft of de Doorlooptijd behandeling van ZAAKen
+            van dit ZAAKTYPE kan worden verlengd.
           type: boolean
         verlengingstermijn:
           title: Verlengingstermijn
           description:
             De termijn (typisch een aantal dagen) waarmee de Doorlooptijd
-            behandeling van ZAAKen van dit ZAAKTYPE kan worden verlengd. Mag alleen
-            een waarde bevatten als verlenging mogelijk is.
+            behandeling van ZAAKen van dit ZAAKTYPE kan worden verlengd. Mag
+            alleen een waarde bevatten als verlenging mogelijk is.
           type: string
           format: duration
           nullable: true
@@ -4448,11 +4509,12 @@ components:
           type: boolean
         publicatietekst:
           title: Publicatietekst
-          description: De generieke tekst van de publicatie van ZAAKen van dit ZAAKTYPE.
+          description:
+            De generieke tekst van de publicatie van ZAAKen van dit ZAAKTYPE.
           type: string
         verantwoordingsrelatie:
-          description:
-            "De relatie tussen ZAAKen van dit ZAAKTYPE en de beleidsmatige\
+          description: "De relatie tussen ZAAKen van dit ZAAKTYPE en de
+            beleidsmatige\
             \ en/of financi\xEBle verantwoording."
           type: array
           items:
@@ -4474,8 +4536,8 @@ components:
         selectielijstProcestype:
           title: Selectielijst procestype
           description:
-            URL-referentie naar een vanuit archiveringsoptiek onderkende
-            groep processen met dezelfde kenmerken (PROCESTYPE in de Selectielijst
+            URL-referentie naar een vanuit archiveringsoptiek onderkende groep
+            processen met dezelfde kenmerken (PROCESTYPE in de Selectielijst
             API).
           type: string
           format: uri
@@ -4484,57 +4546,58 @@ components:
           $ref: '#/components/schemas/ReferentieProces'
         catalogus:
           title: Catalogus
-          description: URL-referentie naar de CATALOGUS waartoe dit ZAAKTYPE behoort.
+          description:
+            URL-referentie naar de CATALOGUS waartoe dit ZAAKTYPE behoort.
           type: string
           format: uri
         statustypen:
           description:
-            URL-referenties naar de STATUSTYPEN die mogelijk zijn binnen
-            dit ZAAKTYPE.
+            URL-referenties naar de STATUSTYPEN die mogelijk zijn binnen dit
+            ZAAKTYPE.
           type: array
           items:
             description:
-              URL-referenties naar de STATUSTYPEN die mogelijk zijn binnen
-              dit ZAAKTYPE.
+              URL-referenties naar de STATUSTYPEN die mogelijk zijn binnen dit
+              ZAAKTYPE.
             type: string
             format: uri
           readOnly: true
           uniqueItems: true
         resultaattypen:
           description:
-            URL-referenties naar de RESULTAATTYPEN die mogelijk zijn binnen
-            dit ZAAKTYPE.
+            URL-referenties naar de RESULTAATTYPEN die mogelijk zijn binnen dit
+            ZAAKTYPE.
           type: array
           items:
             description:
-              URL-referenties naar de RESULTAATTYPEN die mogelijk zijn
-              binnen dit ZAAKTYPE.
+              URL-referenties naar de RESULTAATTYPEN die mogelijk zijn binnen
+              dit ZAAKTYPE.
             type: string
             format: uri
           readOnly: true
           uniqueItems: true
         eigenschappen:
           description:
-            URL-referenties naar de EIGENSCHAPPEN die aanwezig moeten zijn
-            in ZAKEN van dit ZAAKTYPE.
+            URL-referenties naar de EIGENSCHAPPEN die aanwezig moeten zijn in
+            ZAKEN van dit ZAAKTYPE.
           type: array
           items:
             description:
-              URL-referenties naar de EIGENSCHAPPEN die aanwezig moeten
-              zijn in ZAKEN van dit ZAAKTYPE.
+              URL-referenties naar de EIGENSCHAPPEN die aanwezig moeten zijn in
+              ZAKEN van dit ZAAKTYPE.
             type: string
             format: uri
           readOnly: true
           uniqueItems: true
         informatieobjecttypen:
           description:
-            URL-referenties naar de INFORMATIEOBJECTTYPEN die mogelijk
-            zijn binnen dit ZAAKTYPE.
+            URL-referenties naar de INFORMATIEOBJECTTYPEN die mogelijk zijn
+            binnen dit ZAAKTYPE.
           type: array
           items:
             description:
-              URL-referenties naar de INFORMATIEOBJECTTYPEN die mogelijk
-              zijn binnen dit ZAAKTYPE.
+              URL-referenties naar de INFORMATIEOBJECTTYPEN die mogelijk zijn
+              binnen dit ZAAKTYPE.
             type: string
             format: uri
           readOnly: true
@@ -4546,34 +4609,34 @@ components:
           type: array
           items:
             description:
-              URL-referenties naar de ROLTYPEN die mogelijk zijn binnen
-              dit ZAAKTYPE.
+              URL-referenties naar de ROLTYPEN die mogelijk zijn binnen dit
+              ZAAKTYPE.
             type: string
             format: uri
           readOnly: true
           uniqueItems: true
         besluittypen:
           description:
-            URL-referenties naar de BESLUITTYPEN die mogelijk zijn binnen
-            dit ZAAKTYPE.
+            URL-referenties naar de BESLUITTYPEN die mogelijk zijn binnen dit
+            ZAAKTYPE.
           type: array
           items:
             title: heeft relevante besluittypen
             description:
-              URL-referenties naar de BESLUITTYPEN die mogelijk zijn binnen
-              dit ZAAKTYPE.
+              URL-referenties naar de BESLUITTYPEN die mogelijk zijn binnen dit
+              ZAAKTYPE.
             type: string
             format: uri
           uniqueItems: true
         deelzaaktypen:
           description:
-            De ZAAKTYPE(n) waaronder ZAAKen als deelzaak kunnen voorkomen
-            bij ZAAKen van dit ZAAKTYPE.
+            De ZAAKTYPE(n) waaronder ZAAKen als deelzaak kunnen voorkomen bij
+            ZAAKen van dit ZAAKTYPE.
           type: array
           items:
             description:
-              De ZAAKTYPE(n) waaronder ZAAKen als deelzaak kunnen voorkomen
-              bij ZAAKen van dit ZAAKTYPE.
+              De ZAAKTYPE(n) waaronder ZAAKen als deelzaak kunnen voorkomen bij
+              ZAAKen van dit ZAAKTYPE.
             type: string
             format: uri
             nullable: true
@@ -4599,15 +4662,15 @@ components:
         versiedatum:
           title: Versiedatum
           description:
-            De datum waarop de (gewijzigde) kenmerken van het ZAAKTYPE
-            geldig zijn geworden
+            De datum waarop de (gewijzigde) kenmerken van het ZAAKTYPE geldig
+            zijn geworden
           type: string
           format: date
         concept:
           title: Concept
           description:
             Geeft aan of het object een concept betreft. Concepten zijn
-            niet-definitieve versies en zouden niet gebruikt moeten worden buiten
-            deze API.
+            niet-definitieve versies en zouden niet gebruikt moeten worden
+            buiten deze API.
           type: boolean
           readOnly: true

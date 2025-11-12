@@ -1,15 +1,15 @@
-import { ActionSingle } from '@gemeente-denhaag/action'
-import { FC } from 'react'
-import './ActionList.scss'
+import { ActionSingle } from '@gemeente-denhaag/action';
+import { FC } from 'react';
+import './ActionList.scss';
 
 export interface IActionProps {
-  title: string
-  message: string
-  action_url: string
+  title: string;
+  message: string;
+  action_url: string;
 }
 
 export interface IActionListProps {
-  actions: IActionProps[]
+  actions: IActionProps[];
 }
 
 const ActionList: FC<IActionListProps> = ({ actions = [] }) => {
@@ -21,8 +21,8 @@ const ActionList: FC<IActionListProps> = ({ actions = [] }) => {
         </span>{' '}
         <span className="denhaag-action__content--oip-title">{title}</span>
       </ActionSingle>
-    )
-  })
-}
+    );
+  });
+};
 
-export default ActionList
+export default ActionList;

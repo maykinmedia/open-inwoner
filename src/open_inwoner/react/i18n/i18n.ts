@@ -1,4 +1,4 @@
-import { IntlConfig } from 'react-intl'
+import { IntlConfig } from 'react-intl';
 
 /**
  * i18n
@@ -8,31 +8,31 @@ import { IntlConfig } from 'react-intl'
 const locales = {
   nl: () => import('@react/i18n/compiled/nl.json'),
   en: () => import('@react/i18n/compiled/en.json'),
-}
+};
 
 /**
  * Load the relevant translations dynamically.
  * @param locale The language of the html lang attribute.
  */
 const loadLocaleData = async (locale: string): Promise<any> => {
-  if (locale.length === 5) return await loadLocaleData(locale.substring(0, 2))
+  if (locale.length === 5) return await loadLocaleData(locale.substring(0, 2));
   else if (locales[locale as keyof typeof locales])
-    return locales[locale as keyof typeof locales]()
-  else return locales.nl()
-}
+    return locales[locale as keyof typeof locales]();
+  else return locales.nl();
+};
 
 const getIntlProviderProps = async (): Promise<IntlConfig> => {
-  const lang = getLocale()
-  const messages = await loadLocaleData(lang)
+  const lang = getLocale();
+  const messages = await loadLocaleData(lang);
   return {
     messages,
     locale: lang,
     defaultLocale: 'nl',
-  }
-}
+  };
+};
 
 const getLocale = (): string => {
-  return document.querySelector('html')?.getAttribute('lang') ?? 'nl'
-}
+  return document.querySelector('html')?.getAttribute('lang') ?? 'nl';
+};
 
-export { loadLocaleData, getIntlProviderProps, getLocale }
+export { loadLocaleData, getIntlProviderProps, getLocale };

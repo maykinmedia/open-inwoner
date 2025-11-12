@@ -1,6 +1,6 @@
-import { Meta, StoryObj } from '@storybook/react'
-import SideNav from './SideNav'
-import 'material-icons/iconfont/material-icons.css'
+import { Meta, StoryObj } from '@storybook/react';
+import SideNav from './SideNav';
+import 'material-icons/iconfont/material-icons.css';
 
 const meta: Meta<typeof SideNav> = {
   title: 'React/Components/SideNav',
@@ -26,10 +26,10 @@ SideNav is a pure React component that renders navigation menus using the Den Ha
       },
     },
   },
-}
-export default meta
+};
+export default meta;
 
-type Story = StoryObj<typeof SideNav>
+type Story = StoryObj<typeof SideNav>;
 
 export const StandardNavigation: Story = {
   name: 'Standard Navigation',
@@ -70,7 +70,7 @@ Demonstrates the most common SideNav configuration with icons, current page high
       ],
     ],
   },
-}
+};
 
 export const NotificationCounters: Story = {
   name: 'Message & Notification Counters',
@@ -112,7 +112,7 @@ Focuses on the counter functionality for displaying unread messages, notificatio
       ],
     ],
   },
-}
+};
 
 export const TextOnlyNavigation: Story = {
   name: 'Text-Only Navigation',
@@ -149,7 +149,7 @@ Shows how SideNav handles navigation items without icons, creating a clean text-
       ],
     ],
   },
-}
+};
 
 export const MinimalSingleItem: Story = {
   name: 'Single Navigation Item',
@@ -177,7 +177,7 @@ Demonstrates the component with just one navigation item, useful for specialized
       ],
     ],
   },
-}
+};
 
 export const ComprehensiveNavigation: Story = {
   name: 'Full Application Navigation',
@@ -243,7 +243,7 @@ Shows a comprehensive navigation menu with multiple sections, representing a ful
       ],
     ],
   },
-}
+};
 
 export const GroupedNavigationSections: Story = {
   name: 'Grouped Navigation Sections',
@@ -325,4 +325,4 @@ Demonstrates how SideNav handles multiple navigation groups with logical separat
       ],
     ],
   },
-}
+};

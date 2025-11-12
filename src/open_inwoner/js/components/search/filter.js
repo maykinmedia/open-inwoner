@@ -1,13 +1,13 @@
-const FILTERS = document.querySelectorAll('.filters') // desktop and mobile -> length = 2;
+const FILTERS = document.querySelectorAll('.filters'); // desktop and mobile -> length = 2;
 
 export class Filter {
   /**
    * @param {HTMLDivElement} node
    */
   constructor(node) {
-    this.node = node
-    this.bindEvents()
-    this.render()
+    this.node = node;
+    this.bindEvents();
+    this.render();
   }
 
   /**
@@ -16,23 +16,23 @@ export class Filter {
   bindEvents() {
     // Open dropdown on button click.
     this.dropdowns.forEach((dropdown) => {
-      const button = this.getDropdownButton(dropdown)
+      const button = this.getDropdownButton(dropdown);
       button.addEventListener(
         'click',
         this.toggleDropdown.bind(this, dropdown, button)
-      )
-    })
+      );
+    });
 
     // Submit form on change.
     this.checkboxes.forEach((checkbox) => {
-      checkbox.addEventListener('change', this.submitForm.bind(this))
-    })
+      checkbox.addEventListener('change', this.submitForm.bind(this));
+    });
 
     // Reset form handler.
-    this.resetButton?.addEventListener('click', this.resetFilter.bind(this))
+    this.resetButton?.addEventListener('click', this.resetFilter.bind(this));
 
     // Resize handler.
-    window.addEventListener('resize', this.disableCheckboxes.bind(this))
+    window.addEventListener('resize', this.disableCheckboxes.bind(this));
   }
 
   /**
@@ -40,7 +40,7 @@ export class Filter {
    * @returns {HTMLFormElement}
    */
   get searchForm() {
-    return document.getElementById('search-form')
+    return document.getElementById('search-form');
   }
 
   /**
@@ -48,7 +48,7 @@ export class Filter {
    * @returns {HTMLButtonElement}
    */
   get resetButton() {
-    return this.node.querySelector('.filter__reset')
+    return this.node.querySelector('.filter__reset');
   }
 
   /**
@@ -56,7 +56,7 @@ export class Filter {
    * @returns {NodeListOf<HTMLInputElement>}
    */
   get checkboxes() {
-    return this.node.parentElement.querySelectorAll('.checkbox__input')
+    return this.node.parentElement.querySelectorAll('.checkbox__input');
   }
 
   /**
@@ -64,7 +64,7 @@ export class Filter {
    * @returns {NodeListOf<HTMLDivElement>}
    */
   get dropdowns() {
-    return this.node.querySelectorAll('.filter')
+    return this.node.querySelectorAll('.filter');
   }
 
   /**
@@ -73,22 +73,22 @@ export class Filter {
    * @returns {HTMLButtonElement}
    */
   getDropdownButton(node = this.node) {
-    return node.querySelector('button')
+    return node.querySelector('button');
   }
 
   /**
    * Disable the mobile checkboxes on desktop size and vice versa.
    */
   disableCheckboxes() {
-    const isMobileView = window.innerWidth <= 768
+    const isMobileView = window.innerWidth <= 768;
 
     this.checkboxes.forEach((checkbox) => {
-      const isMobileCb = checkbox.id.endsWith('_mobile')
+      const isMobileCb = checkbox.id.endsWith('_mobile');
       const shouldEnable =
-        (isMobileCb && isMobileView) || (!isMobileCb && !isMobileView)
-      checkbox.disabled = !shouldEnable
-      checkbox.ariaDisabled = !shouldEnable
-    })
+        (isMobileCb && isMobileView) || (!isMobileCb && !isMobileView);
+      checkbox.disabled = !shouldEnable;
+      checkbox.ariaDisabled = !shouldEnable;
+    });
   }
 
   /**
@@ -97,17 +97,17 @@ export class Filter {
    * @param {Event} event
    */
   toggleDropdown(dropdown, button, event) {
-    console.log(dropdown, button, event)
-    event.stopPropagation()
-    event.preventDefault()
+    console.log(dropdown, button, event);
+    event.stopPropagation();
+    event.preventDefault();
     const isOpen = dropdown
       .querySelector('.filter__dropdown')
-      ?.classList.contains('show')
-    const newIsOpen = !isOpen
+      ?.classList.contains('show');
+    const newIsOpen = !isOpen;
     dropdown
       .querySelector('.filter__dropdown')
-      ?.classList.toggle('show', newIsOpen)
-    button?.setAttribute('aria-expanded', newIsOpen ? 'true' : 'false')
+      ?.classList.toggle('show', newIsOpen);
+    button?.setAttribute('aria-expanded', newIsOpen ? 'true' : 'false');
   }
 
   /**
@@ -115,17 +115,17 @@ export class Filter {
    * least one checkbox is changed.
    */
   resetFilter() {
-    let executeSubmit = false
+    let executeSubmit = false;
 
     for (const checkbox of this.checkboxes) {
       if (checkbox.checked) {
-        checkbox.checked = false
-        executeSubmit = true
+        checkbox.checked = false;
+        executeSubmit = true;
       }
     }
 
     if (executeSubmit) {
-      this.submitForm()
+      this.submitForm();
     }
   }
 
@@ -133,16 +133,16 @@ export class Filter {
    * Submit handler
    */
   submitForm() {
-    this.searchForm?.submit()
+    this.searchForm?.submit();
   }
 
   /**
    * Renderer
    */
   render() {
-    this.disableCheckboxes()
+    this.disableCheckboxes();
   }
 }
 
 // Start!
-;[...FILTERS].forEach((node) => new Filter(node))
+[...FILTERS].forEach((node) => new Filter(node));

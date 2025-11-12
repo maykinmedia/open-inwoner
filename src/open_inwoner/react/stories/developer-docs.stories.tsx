@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react';
 
-const DocsOnly = () => null
+const DocsOnly = () => null;
 
 const meta: Meta<typeof DocsOnly> = {
   title: 'Developer Docs',
@@ -14,10 +14,10 @@ const meta: Meta<typeof DocsOnly> = {
       page: null, // We override page on Docs export story below
     },
   },
-}
-export default meta
+};
+export default meta;
 
-type Story = StoryObj<typeof DocsOnly>
+type Story = StoryObj<typeof DocsOnly>;
 
 // Single unattached "Docs" page
 export const Docs: Story = {
@@ -148,4 +148,4 @@ export const Docs: Story = {
       ),
     },
   },
-}
+};

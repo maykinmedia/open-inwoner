@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import { Meta, StoryObj } from '@storybook/react'
-import Counter from '@react/components/Counter/Counter'
+import { useState } from 'react';
+import { Meta, StoryObj } from '@storybook/react';
+import Counter from '@react/components/Counter/Counter';
 
 const meta: Meta<typeof Counter> = {
   title: 'React/Components/Counter',
@@ -32,11 +32,11 @@ const meta: Meta<typeof Counter> = {
       description: 'Background color for the reset button',
     },
   },
-}
+};
 
-export default meta
+export default meta;
 
-type Story = StoryObj<typeof Counter>
+type Story = StoryObj<typeof Counter>;
 
 export const Default: Story = {
   args: {
@@ -48,7 +48,7 @@ export const Default: Story = {
     resetBgColor: '', // Will use CSS custom property var(--oip-color-neutral-light)
   },
   render: (args) => {
-    const [count, setCount] = useState(0)
+    const [count, setCount] = useState(0);
     return (
       <div>
         <div className="counter__result">Count: {count}</div>
@@ -63,6 +63,6 @@ export const Default: Story = {
           resetBgColor={args.resetBgColor}
         />
       </div>
-    )
+    );
   },
-}
+};

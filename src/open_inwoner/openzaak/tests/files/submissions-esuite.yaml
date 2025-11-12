@@ -1,25 +1,28 @@
 openapi: 3.0.1
 info:
   title: E-Suite Formulieren API
-  description: "An API to retrieve form and submission information.\n# Introduction\n\
-    Concept specification to retrieve form and submission information.\n# Authorizations\n\
-    The API uses API-tokens that grant certain permissions. The API-token is\npassed\
+  description: "An API to retrieve form and submission information.\n#
+    Introduction\n\
+    Concept specification to retrieve form and submission information.\n#
+    Authorizations\n\
+    The API uses API-tokens that grant certain permissions. The API-token
+    is\npassed\
     \ via a header, like this: `Authorization: Token <token>`\n"
   version: 2.1.1 (v2)
 paths:
   /openstaande-inzendingen:
     get:
       tags:
-      - submissions
+        - submissions
       operationId: opensubmission_list
       parameters:
-      - name: bsn
-        in: query
-        required: true
-        schema:
-          type: string
+        - name: bsn
+          in: query
+          required: true
+          schema:
+            type: string
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -28,24 +31,24 @@ paths:
   /openstaande-inzendingen/{uuid}:
     get:
       tags:
-      - submissions
+        - submissions
       operationId: opensubmission_read
       parameters:
-      - name: uuid
-        in: path
-        description: Unique identifier (UUID4)
-        required: true
-        schema:
-          type: string
-          format: uuid
+        - name: uuid
+          in: path
+          description: Unique identifier (UUID4)
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/OpenstaandeInzending'
-        "404":
+        '404':
           description: Not found
 components:
   schemas:
@@ -53,17 +56,18 @@ components:
       type: object
     OpenstaandeInzending:
       required:
-      - datumLaatsteWijziging
-      - naam
-      - url
-      - uuid
-      - vervolgLink
+        - datumLaatsteWijziging
+        - naam
+        - url
+        - uuid
+        - vervolgLink
       type: object
       properties:
         url:
           type: string
-          description: URL reference to this object. This is the unique identification
-            and location of this object.
+          description:
+            URL reference to this object. This is the unique identification and
+            location of this object.
           format: uri
           readOnly: true
         uuid:

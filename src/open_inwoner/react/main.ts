@@ -1,4 +1,4 @@
-import ModuleLoader from '@react/lib/loader'
+import ModuleLoader from '@react/lib/loader';
 
 // Load the module.
-ModuleLoader.load()
+ModuleLoader.load();

@@ -1,22 +1,22 @@
 export class ReadMore {
-  static selector = '.readmore'
+  static selector = '.readmore';
 
   constructor(node) {
-    this.node = node
-    this.button = node.querySelector('.readmore .button')
+    this.node = node;
+    this.button = node.querySelector('.readmore .button');
     // Execute if selector exists
-    this.button?.addEventListener('click', this.toggleReadMore.bind(this))
+    this.button?.addEventListener('click', this.toggleReadMore.bind(this));
   }
 
   toggleReadMore() {
     setTimeout(() => {
-      this.node.classList.toggle('readmore--open')
+      this.node.classList.toggle('readmore--open');
 
       this.button.setAttribute(
         'aria-expanded',
         this.button.getAttribute('aria-expanded') === 'true' ? 'false' : 'true'
-      )
-    }, 5)
+      );
+    }, 5);
   }
 }
 
@@ -25,4 +25,4 @@ export class ReadMore {
  */
 document
   .querySelectorAll(ReadMore.selector)
-  .forEach((readmoreToggle) => new ReadMore(readmoreToggle))
+  .forEach((readmoreToggle) => new ReadMore(readmoreToggle));

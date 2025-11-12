@@ -1,2 +1,2 @@
-import './spinner'
-import './status_accordion'
+import './spinner';
+import './status_accordion';

@@ -1,18 +1,18 @@
-import { Component } from '../abstract/component'
+import { Component } from '../abstract/component';
 
 /**
  * Drag-and-drop capable custom file input component.
  */
 export class FileInput extends Component {
   /** @type {string} Use this as selector to instantiate the file input. */
-  static selector = '.file-input'
+  static selector = '.file-input';
 
   /**
    * Get configured maximum filesize from 'data-max-size' and use in node.
    * @returns {number} Maximum file size.
    */
   getLimit() {
-    return parseInt(this.getInput().dataset.maxSize)
+    return parseInt(this.getInput().dataset.maxSize);
   }
 
   /**
@@ -20,7 +20,7 @@ export class FileInput extends Component {
    * @returns {string} of file extensions.
    */
   getUploadTypes() {
-    return this.getInput().dataset.fileTypes.replace(/["'\[\]]/g, '')
+    return this.getInput().dataset.fileTypes.replace(/["'\[\]]/g, '');
   }
 
   /**
@@ -28,7 +28,7 @@ export class FileInput extends Component {
    * @return {HTMLDivElement}
    */
   getCard() {
-    return this.node.querySelector(`${FileInput.selector} .card`)
+    return this.node.querySelector(`${FileInput.selector} .card`);
   }
 
   /**
@@ -36,7 +36,7 @@ export class FileInput extends Component {
    * @return HTMLInputElement
    */
   getInput() {
-    return this.node.querySelector(`${FileInput.selector}__input`)
+    return this.node.querySelector(`${FileInput.selector}__input`);
   }
 
   /**
@@ -44,7 +44,7 @@ export class FileInput extends Component {
    * @return {HTMLLabelElement}
    */
   getLabelEmpty() {
-    return this.node.querySelector(`${FileInput.selector}__label-empty`)
+    return this.node.querySelector(`${FileInput.selector}__label-empty`);
   }
 
   /**
@@ -52,7 +52,7 @@ export class FileInput extends Component {
    * @return {HTMLLabelElement}
    */
   getLabelSelected() {
-    return this.node.querySelector(`${FileInput.selector}__label-selected`)
+    return this.node.querySelector(`${FileInput.selector}__label-selected`);
   }
 
   /**
@@ -60,7 +60,7 @@ export class FileInput extends Component {
    * @return {HTMLDivElement}
    */
   getFilesSection() {
-    return this.node.querySelector(`${FileInput.selector} .file-list`)
+    return this.node.querySelector(`${FileInput.selector} .file-list`);
   }
 
   /**
@@ -68,7 +68,9 @@ export class FileInput extends Component {
    * @return {HTMLDivElement}
    */
   getSelectionIndicator() {
-    return this.node.querySelector(`${FileInput.selector} .file-list-selection`)
+    return this.node.querySelector(
+      `${FileInput.selector} .file-list-selection`
+    );
   }
 
   /**
@@ -76,7 +78,7 @@ export class FileInput extends Component {
    * @return {HTMLUListElement}
    */
   getFilesList() {
-    return this.node.querySelector(`${FileInput.selector} .file-list__list`)
+    return this.node.querySelector(`${FileInput.selector} .file-list__list`);
   }
 
   /**
@@ -84,7 +86,7 @@ export class FileInput extends Component {
    * @return {HTMLDivElement}
    */
   getFormNonFieldError() {
-    return this.node.closest('form')?.querySelector('.non-field-error')
+    return this.node.closest('form')?.querySelector('.non-field-error');
   }
 
   /**
@@ -93,7 +95,7 @@ export class FileInput extends Component {
    * @return {HTMLButtonElement}
    */
   getFormSubmitButton() {
-    return this.node.closest('form')?.querySelector('.button[type="submit"]')
+    return this.node.closest('form')?.querySelector('.button[type="submit"]');
   }
 
   /**
@@ -102,19 +104,19 @@ export class FileInput extends Component {
    * NOTE: CHANGE EVENT MAY BE BYPASSED WHEN USING HTMX.
    */
   bindEvents() {
-    this.boundRender = this.render.bind(this)
-    this.boundOnDragEnter = this.onDragEnter.bind(this)
-    this.boundOnDragLeave = this.onDragLeave.bind(this)
-    this.boundOnDrop = this.onDrop.bind(this)
-    this.boundOnClick = this.onClick.bind(this)
-    this.boundNoop = this.noop.bind(this)
+    this.boundRender = this.render.bind(this);
+    this.boundOnDragEnter = this.onDragEnter.bind(this);
+    this.boundOnDragLeave = this.onDragLeave.bind(this);
+    this.boundOnDrop = this.onDrop.bind(this);
+    this.boundOnClick = this.onClick.bind(this);
+    this.boundNoop = this.noop.bind(this);
 
-    this.node.addEventListener('change', this.boundRender)
-    this.getCard().addEventListener('dragenter', this.boundOnDragEnter)
-    this.getCard().addEventListener('dragover', this.boundNoop)
-    this.getCard().addEventListener('dragleave', this.boundOnDragLeave)
-    this.getCard().addEventListener('drop', this.boundOnDrop)
-    this.getFilesList().addEventListener('click', this.boundOnClick)
+    this.node.addEventListener('change', this.boundRender);
+    this.getCard().addEventListener('dragenter', this.boundOnDragEnter);
+    this.getCard().addEventListener('dragover', this.boundNoop);
+    this.getCard().addEventListener('dragleave', this.boundOnDragLeave);
+    this.getCard().addEventListener('drop', this.boundOnDrop);
+    this.getFilesList().addEventListener('click', this.boundOnClick);
   }
 
   /**
@@ -123,12 +125,12 @@ export class FileInput extends Component {
    * Use this to call `removeEventListener()` for every `addEventListener`()` called.
    */
   unbindEvents() {
-    this.node.removeEventListener('change', this.boundRender)
-    this.getCard().removeEventListener('dragenter', this.boundOnDragEnter)
-    this.getCard().removeEventListener('dragover', this.boundNoop)
-    this.getCard().removeEventListener('dragleave', this.boundOnDragLeave)
-    this.getCard().removeEventListener('drop', this.boundOnDrop)
-    this.getFilesList().removeEventListener('click', this.boundOnClick)
+    this.node.removeEventListener('change', this.boundRender);
+    this.getCard().removeEventListener('dragenter', this.boundOnDragEnter);
+    this.getCard().removeEventListener('dragover', this.boundNoop);
+    this.getCard().removeEventListener('dragleave', this.boundOnDragLeave);
+    this.getCard().removeEventListener('drop', this.boundOnDrop);
+    this.getFilesList().removeEventListener('click', this.boundOnClick);
   }
 
   /**
@@ -136,13 +138,13 @@ export class FileInput extends Component {
    * @param {DragEvent} e
    */
   onDrop(e) {
-    e.preventDefault()
+    e.preventDefault();
 
-    this.node.classList.remove('file-input--drag-active')
-    this.addFiles(e.dataTransfer.files)
+    this.node.classList.remove('file-input--drag-active');
+    this.addFiles(e.dataTransfer.files);
 
     // We need to render manually since we're not making state changes.
-    this.render()
+    this.render();
   }
 
   /**
@@ -150,7 +152,7 @@ export class FileInput extends Component {
    * @param {Event} e
    */
   onDragEnter() {
-    this.node.classList.add('file-input--drag-active')
+    this.node.classList.add('file-input--drag-active');
   }
 
   /**
@@ -159,9 +161,9 @@ export class FileInput extends Component {
    */
   onDragLeave(e) {
     if (e.target !== this.getCard()) {
-      return
+      return;
     }
-    this.node.classList.remove('file-input--drag-active')
+    this.node.classList.remove('file-input--drag-active');
   }
 
   /**
@@ -169,34 +171,34 @@ export class FileInput extends Component {
    * @param {PointerEvent} e
    */
   onClick(e) {
-    e.preventDefault()
-    const { target } = e
+    e.preventDefault();
+    const { target } = e;
 
     // Check if the click originates from a delete button
     const isDeleteButton =
       // Filter the file list.
       target.classList.contains('link') ||
-      target.parentElement.classList.contains('link')
+      target.parentElement.classList.contains('link');
 
     if (isDeleteButton) {
-      const listItem = target.closest('.file-list__list-item')
+      const listItem = target.closest('.file-list__list-item');
 
       // Ensure the list item is found
       if (listItem) {
         const index = Array.from(listItem.parentElement.children).indexOf(
           listItem
-        )
-        const input = this.getInput()
+        );
+        const input = this.getInput();
 
         // Use filter, not splice
         // to let users remove individual files before submitting the form.
-        const files = Array.from(input.files).filter((_, i) => i !== index)
+        const files = Array.from(input.files).filter((_, i) => i !== index);
 
-        this.addFiles(files, true)
-        this.files = files
+        this.addFiles(files, true);
+        this.files = files;
 
         // We need to render manually since we're not making state changes.
-        this.render()
+        this.render();
       }
     }
   }
@@ -206,7 +208,7 @@ export class FileInput extends Component {
    * @param {Event} e
    */
   noop(e) {
-    e.preventDefault()
+    e.preventDefault();
   }
 
   /**
@@ -215,26 +217,26 @@ export class FileInput extends Component {
    * @param {boolean} removeCurrent=false
    */
   addFiles(files, removeCurrent = false) {
-    const input = this.getInput()
-    const dataTransfer = new DataTransfer()
+    const input = this.getInput();
+    const dataTransfer = new DataTransfer();
     // Ensure the previously selected files are added as well
-    const isMultiple = input.multiple
+    const isMultiple = input.multiple;
 
-    let _files
+    let _files;
     if (!isMultiple) {
       // Single upload: keep only the latest selected file.
-      _files = files.length ? [files[files.length - 1]] : []
+      _files = files.length ? [files[files.length - 1]] : [];
     } else if (removeCurrent) {
       // Replace current files with new list of files, for example: when deleting.
-      _files = [...files]
+      _files = [...files];
     } else {
       // Append new files to the existing one, because input.files is a read-only object.
-      _files = [...input.files, ...files]
+      _files = [...input.files, ...files];
     }
 
-    _files.filter(Boolean).forEach((file) => dataTransfer.items.add(file))
-    input.files = dataTransfer.files
-    this.files = _files
+    _files.filter(Boolean).forEach((file) => dataTransfer.items.add(file));
+    input.files = dataTransfer.files;
+    this.files = _files;
   }
 
   /**
@@ -243,7 +245,7 @@ export class FileInput extends Component {
    * NOTE: CHANGE EVENT MAY BE BYPASSED WHEN USING HTMX.
    */
   render(e) {
-    let { files } = this.getInput()
+    let { files } = this.getInput();
 
     // Bugfix for https://taiga.maykinmedia.nl/project/open-inwoner/task/1975
     // Selecting files using the select window triggers a change event and would normally
@@ -252,33 +254,33 @@ export class FileInput extends Component {
     if (e && e.type === 'change') {
       if (this.getInput().multiple) {
         // Combine previously selected files with the new ones
-        files = [...(this.files || []), ...files]
+        files = [...(this.files || []), ...files];
       } else {
         // For single file input, use the new selection (overwrite any old file)
-        files = [...files]
+        files = [...files];
       }
-      this.addFiles(files, true)
+      this.addFiles(files, true);
     }
 
-    const filesExist = files.length > 0
-    const filesSection = this.getFilesSection()
-    const selectionIndicator = this.getSelectionIndicator()
-    const additionalLabel = this.getLabelSelected()
-    const emptyLabel = this.getLabelEmpty()
-    const formSubmitButton = this.getFormSubmitButton()
+    const filesExist = files.length > 0;
+    const filesSection = this.getFilesSection();
+    const selectionIndicator = this.getSelectionIndicator();
+    const additionalLabel = this.getLabelSelected();
+    const emptyLabel = this.getLabelEmpty();
+    const formSubmitButton = this.getFormSubmitButton();
 
     // Only show these sections when files are selected.
-    filesSection.hidden = !filesExist
-    selectionIndicator.hidden = !filesExist
-    additionalLabel.hidden = !filesExist
-    formSubmitButton.hidden = !filesExist
+    filesSection.hidden = !filesExist;
+    selectionIndicator.hidden = !filesExist;
+    additionalLabel.hidden = !filesExist;
+    formSubmitButton.hidden = !filesExist;
 
     // Hide label when no files are selected
-    emptyLabel.toggleAttribute('hidden', files.length > 0)
+    emptyLabel.toggleAttribute('hidden', files.length > 0);
 
     // Populate the file list.
-    const html = [...files].map((file) => this.renderFileHTML(file)).join('')
-    this.getFilesList().innerHTML = html
+    const html = [...files].map((file) => this.renderFileHTML(file)).join('');
+    this.getFilesList().innerHTML = html;
   }
 
   /**
@@ -287,18 +289,18 @@ export class FileInput extends Component {
    * @return {string}
    */
   renderFileHTML(file) {
-    const { name, size, type } = file
-    const ext = name.split('.').pop().toUpperCase()
-    const sizeMB = (size / (1024 * 1024)).toFixed(2)
-    const labelDelete = this.getFilesList().dataset.labelDelete || 'Delete'
-    const getFormNonFieldError = this.getFormNonFieldError()
-    const formSubmitButton = this.getFormSubmitButton()
+    const { name, size, type } = file;
+    const ext = name.split('.').pop().toUpperCase();
+    const sizeMB = (size / (1024 * 1024)).toFixed(2);
+    const labelDelete = this.getFilesList().dataset.labelDelete || 'Delete';
+    const getFormNonFieldError = this.getFormNonFieldError();
+    const formSubmitButton = this.getFormSubmitButton();
 
-    const maxMegabytes = this.getLimit()
-    const uploadFileTypes = this.getUploadTypes().toUpperCase()
+    const maxMegabytes = this.getLimit();
+    const uploadFileTypes = this.getUploadTypes().toUpperCase();
 
-    const sizeError = sizeMB > maxMegabytes
-    const typeError = !uploadFileTypes.split(', ').includes(ext)
+    const sizeError = sizeMB > maxMegabytes;
+    const typeError = !uploadFileTypes.split(', ').includes(ext);
 
     const htmlStart = `
     <li class="file-list__list-item">
@@ -339,16 +341,16 @@ export class FileInput extends Component {
           }
         </div>
       </aside>
-    </li>`
+    </li>`;
 
     if (typeError || sizeError) {
-      getFormNonFieldError.removeAttribute('hidden')
-      formSubmitButton.setAttribute('disabled', 'true')
+      getFormNonFieldError.removeAttribute('hidden');
+      formSubmitButton.setAttribute('disabled', 'true');
     } else {
-      getFormNonFieldError.setAttribute('hidden', 'hidden')
-      formSubmitButton.removeAttribute('disabled')
+      getFormNonFieldError.setAttribute('hidden', 'hidden');
+      formSubmitButton.removeAttribute('disabled');
     }
 
-    return htmlStart
+    return htmlStart;
   }
 }

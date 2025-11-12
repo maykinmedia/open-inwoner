@@ -1,3 +1,3 @@
-import './header'
-import './primary-navigation'
-import './subpage-navigation'
+import './header';
+import './primary-navigation';
+import './subpage-navigation';

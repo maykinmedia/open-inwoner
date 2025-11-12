@@ -1,13 +1,13 @@
-const fs = require('fs')
+const fs = require('fs');
 
 /** Parses package.json */
-const pkg = JSON.parse(fs.readFileSync('./package.json', 'utf-8'))
+const pkg = JSON.parse(fs.readFileSync('./package.json', 'utf-8'));
 
 /** Src dir */
-const sourcesRoot = 'src/' + pkg.name + '/'
+const sourcesRoot = 'src/' + pkg.name + '/';
 
 /** "Main" static dir */
-const staticRoot = sourcesRoot + 'static/'
+const staticRoot = sourcesRoot + 'static/';
 
 /**
  * Application path configuration for use in frontend scripts
@@ -48,4 +48,4 @@ module.exports = {
 
   // Path to js code coverage directory
   coverageDir: 'reports/jstests/',
-}
+};

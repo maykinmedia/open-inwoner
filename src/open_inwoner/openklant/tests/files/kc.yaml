@@ -3,8 +3,8 @@
 openapi: 3.0.1
 info:
   description:
-    Deze implementatie is niet 'compliant' maar streeft er naar 'compatible'
-    te zijn met de Klanten API specificatie.
+    Deze implementatie is niet 'compliant' maar streeft er naar 'compatible' te
+    zijn met de Klanten API specificatie.
   title: E-Suite implementatie van een deel van de Klanten API versie 1.0.0
   version: 1.5.0
 servers:
@@ -112,9 +112,10 @@ paths:
       security:
         - JWT-Claims:
             - klanten.lezen
-      summary:
-        "Klant (persoon of bedrijf in e-Suite) opvragen op basis van BSN, KVK\
-        \ nummer of vestigingsnummer. 1, en niet meer dan 1, van de query parameters\
+      summary: "Klant (persoon of bedrijf in e-Suite) opvragen op basis van BSN,
+        KVK\
+        \ nummer of vestigingsnummer. 1, en niet meer dan 1, van de query
+        parameters\
         \ moet gevuld zijn."
       tags:
         - klanten
@@ -238,8 +239,8 @@ paths:
             - klanten.aanmaken
       summary:
         Ophalen van een in e-Suite niet bestaand persoon of bedrijf uit extern
-        systeem en opslaan in e-Suite als klant. Tevens wordt het meegegeven telefoonnummer
-        of emailadres opgeslagen.
+        systeem en opslaan in e-Suite als klant. Tevens wordt het meegegeven
+        telefoonnummer of emailadres opgeslagen.
       tags:
         - klanten
   /klanten/{uuid}:
@@ -477,8 +478,8 @@ paths:
         - JWT-Claims:
             - klanten.bijwerken
       summary:
-        Bijwerken van telefoonnummers of emailadres van een Klant (persoon
-        of bedrijf in e-Suite).
+        Bijwerken van telefoonnummers of emailadres van een Klant (persoon of
+        bedrijf in e-Suite).
       tags:
         - klanten
 components:
@@ -504,9 +505,10 @@ components:
           title: Detail
         instance:
           type: string
-          description:
-            "URI met referentie naar dit specifiek voorkomen van de fout.\
-            \ Deze kan gebruikt worden in combinatie met server logs, bijvoorbeeld."
+          description: "URI met referentie naar dit specifiek voorkomen van de
+            fout.\
+            \ Deze kan gebruikt worden in combinatie met server logs,
+            bijvoorbeeld."
           minLength: 1
           title: Instance
         status:
@@ -521,7 +523,8 @@ components:
           title: Title
         type:
           type: string
-          description: 'URI referentie naar het type fout, bedoeld voor developers'
+          description:
+            'URI referentie naar het type fout, bedoeld voor developers'
           title: Type
       required:
         - code
@@ -556,7 +559,8 @@ components:
           title: Emailadres
         klantnummer:
           type: string
-          description: Unieke identificatie van persoon of bedrijf binnen e-Suite.
+          description:
+            Unieke identificatie van persoon of bedrijf binnen e-Suite.
           maxLength: 8
           readOnly: true
           title: Klantnummer
@@ -587,15 +591,16 @@ components:
           type: boolean
           description:
             Wanneer aanwezig en True dan heeft de klant toegestemd om alleen
-            digitaal te worden genotificeerd over zijn zaken en documenten. Wanneer
-            aanwezig en False dan heeft de klant niet toegestemd om alleen digitaal
-            te worden genotificeerd over zijn zaken en documenten. Indien niet aanwezig
-            dan heeft de klant geen keuze gemaakt. Wanneer dit attribuut geen waarde
-            heeft bij het aanmaken van een klant dan wordt dit attribuut niet overgenomen
-            in e-Suite wat betekend dat de klant nog geen keuze heeft gemaakt. Wanneer
-            dit attribuut geen waarde heeft bij het updaten van een klant dan wordt
-            dit overgenomen in de e-Suite als een beslissing dat klant niet toestemd
-            om alleen digitaal te worden genotificeerd.
+            digitaal te worden genotificeerd over zijn zaken en documenten.
+            Wanneer aanwezig en False dan heeft de klant niet toegestemd om
+            alleen digitaal te worden genotificeerd over zijn zaken en
+            documenten. Indien niet aanwezig dan heeft de klant geen keuze
+            gemaakt. Wanneer dit attribuut geen waarde heeft bij het aanmaken
+            van een klant dan wordt dit attribuut niet overgenomen in e-Suite
+            wat betekend dat de klant nog geen keuze heeft gemaakt. Wanneer dit
+            attribuut geen waarde heeft bij het updaten van een klant dan wordt
+            dit overgenomen in de e-Suite als een beslissing dat klant niet
+            toestemd om alleen digitaal te worden genotificeerd.
           title: Toestemming zaak notificaties alleen digitaal
         url:
           type: string
@@ -676,9 +681,10 @@ components:
           title: Detail
         instance:
           type: string
-          description:
-            "URI met referentie naar dit specifiek voorkomen van de fout.\
-            \ Deze kan gebruikt worden in combinatie met server logs, bijvoorbeeld."
+          description: "URI met referentie naar dit specifiek voorkomen van de
+            fout.\
+            \ Deze kan gebruikt worden in combinatie met server logs,
+            bijvoorbeeld."
           minLength: 1
           title: Instance
         status:
@@ -693,7 +699,8 @@ components:
           title: Title
         type:
           type: string
-          description: 'URI referentie naar het type fout, bedoeld voor developers'
+          description:
+            'URI referentie naar het type fout, bedoeld voor developers'
           title: Type
       required:
         - code

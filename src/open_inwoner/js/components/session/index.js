@@ -1,7 +1,7 @@
-import Modal from '../modal'
+import Modal from '../modal';
 
 function currentTime() {
-  return Math.floor(Date.now() / 1000)
+  return Math.floor(Date.now() / 1000);
 }
 
 /*
@@ -9,44 +9,44 @@ function currentTime() {
  */
 class SessionTimeout {
   constructor() {
-    this.element = document.getElementById('session-timeout')
+    this.element = document.getElementById('session-timeout');
     if (!this.element) {
-      return
+      return;
     }
 
-    this.configureTimeout()
-    this.configureActivityCheck()
+    this.configureTimeout();
+    this.configureActivityCheck();
   }
 
   configureTimeout() {
-    console.log('Session started.')
-    this.userActive = null
+    console.log('Session started.');
+    this.userActive = null;
 
-    this.setDataset()
+    this.setDataset();
 
     // When the session has been restarted, there can be lingering timeouts.
-    clearTimeout(this.warningTimeout)
-    clearTimeout(this.expiredTimeout)
+    clearTimeout(this.warningTimeout);
+    clearTimeout(this.expiredTimeout);
 
     this.warningTimeout = setTimeout(
       this.showWarningModal.bind(this),
       this.warnTime * 1000
-    )
+    );
     this.expiredTimeout = setTimeout(
       this.showExpiredModal.bind(this),
       (this.expiryAge + 1) * 1000
-    )
+    );
   }
 
   setDataset() {
-    this.expiryAge = parseInt(this.element.dataset.expiryAge)
-    this.warnTime = parseInt(this.element.dataset.warnTime)
+    this.expiryAge = parseInt(this.element.dataset.expiryAge);
+    this.warnTime = parseInt(this.element.dataset.warnTime);
   }
 
   showWarningModal() {
     if (this.userActive) {
-      this.restartSession()
-      return
+      this.restartSession();
+      return;
     }
 
     this.configureModal(
@@ -54,7 +54,7 @@ class SessionTimeout {
       'Klik op de knop "Doorgaan" om verder te gaan met de huidige sessie.',
       'Doorgaan',
       this.restartSession
-    )
+    );
   }
 
   showExpiredModal() {
@@ -63,7 +63,7 @@ class SessionTimeout {
       'Klik op de knop "Doorgaan" om opnieuw in te loggen.',
       'Doorgaan',
       this.reloadPage
-    )
+    );
   }
 
   /*
@@ -72,26 +72,26 @@ class SessionTimeout {
   restartSession() {
     fetch('/sessions/restart/')
       .then((response) => response.text())
-      .then((data) => this.resetWarnTime(data))
+      .then((data) => this.resetWarnTime(data));
   }
 
   reloadPage() {
-    window.location.reload()
+    window.location.reload();
   }
 
   configureModal(title, bodyText, buttonText, callback) {
-    const modalId = document.getElementById('modal')
+    const modalId = document.getElementById('modal');
     // Differentiate this modal from others
-    modalId.classList.add('session-modal')
-    const modal = new Modal(modalId)
-    modal.setTitle(title)
-    modal.setText(bodyText)
-    modal.setModalIcons(false)
-    modal.setConfirmButtonVisibility(true)
-    modal.setCancelButtonVisibility(false)
-    modal.setButtonIconCloseVisibility(true)
-    modal.setConfirm(buttonText, callback.bind(this))
-    modal.show()
+    modalId.classList.add('session-modal');
+    const modal = new Modal(modalId);
+    modal.setTitle(title);
+    modal.setText(bodyText);
+    modal.setModalIcons(false);
+    modal.setConfirmButtonVisibility(true);
+    modal.setCancelButtonVisibility(false);
+    modal.setButtonIconCloseVisibility(true);
+    modal.setConfirm(buttonText, callback.bind(this));
+    modal.show();
   }
 
   configureActivityCheck() {
@@ -103,23 +103,23 @@ class SessionTimeout {
     /*
      * Note: 'keyup' does not account for tablet/phone users (and probably other devices).
      */
-    document.addEventListener('keyup', this.setUserActivity)
+    document.addEventListener('keyup', this.setUserActivity);
 
-    this.configureActivityTimeout()
+    this.configureActivityTimeout();
   }
 
   configureActivityTimeout() {
-    clearTimeout(this.activityRestart)
+    clearTimeout(this.activityRestart);
 
     this.activityRestart = setTimeout(
       this.restartNoActivity.bind(this),
       30 * 1000
-    )
+    );
     // SESSION_COOKIE_AGE in seconds - (minus) 30 = warnTime
   }
 
   restartNoActivity() {
-    this.configureActivityTimeout()
+    this.configureActivityTimeout();
 
     /*
      * After a session restart we register if a user was active (in setUserActivity).
@@ -132,39 +132,39 @@ class SessionTimeout {
      */
 
     if (this.userActive === null) {
-      console.log('No user activity after the session started.')
-      return
+      console.log('No user activity after the session started.');
+      return;
     }
 
-    let latestActivity = currentTime() - this.userActive
+    let latestActivity = currentTime() - this.userActive;
     console.log(
       `Latest activity after the session started was ${latestActivity} seconds ago`
-    )
+    );
 
     if (latestActivity >= 60) {
-      this.restartSession()
+      this.restartSession();
     }
   }
 
   setUserActivity() {
-    this.userActive = currentTime()
-    console.log(`Registered user activity, timestamp: ${this.userActive}`)
+    this.userActive = currentTime();
+    console.log(`Registered user activity, timestamp: ${this.userActive}`);
   }
 
   resetWarnTime(response) {
     // If we are redirected to a login page.
     if (response !== 'restarted') {
-      clearTimeout(this.expiredTimeout)
+      clearTimeout(this.expiredTimeout);
 
       // Wait for the current modal to close and then open the expired one.
       // Ensure that the event is unbound after, to avoid an additional pop up before reload.
-      this.showExpiredModal()
+      this.showExpiredModal();
     } else {
-      this.configureTimeout()
+      this.configureTimeout();
     }
   }
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-  const s = new SessionTimeout()
-})
+  const s = new SessionTimeout();
+});

@@ -1,22 +1,22 @@
-import BEM from 'bem.js'
-import { Component } from '../abstract/component'
+import BEM from 'bem.js';
+import { Component } from '../abstract/component';
 
 /** @type {string} The primary navigation block name. */
-const BLOCK_PRIMARY_NAVIGATION = 'primary-navigation'
+const BLOCK_PRIMARY_NAVIGATION = 'primary-navigation';
 
 /** @type {string} The dismissed modifier state, overrides focus/hover. */
-const MODIFIER_DISMISSED = 'dismissed'
+const MODIFIER_DISMISSED = 'dismissed';
 
 /**
  * Controls the primary navigation and dismissing it using the escape key.
  */
 class PrimaryNavigation extends Component {
   constructor(node, initialState = { dismissed: false }) {
-    super(node, initialState)
+    super(node, initialState);
     /** Handler to bypass Safari bug */
     this.navigationToggle = this.node.querySelectorAll(
       '.primary-navigation--desktop .primary-navigation--toggle'
-    )
+    );
   }
 
   /**
@@ -25,9 +25,9 @@ class PrimaryNavigation extends Component {
    * Focus is split to be handled in Safari
    */
   bindEvents() {
-    this.node.addEventListener('click', this.toggleDesktopNavOpen.bind(this))
-    this.node.addEventListener('focusout', this.onFocusOut.bind(this))
-    window.addEventListener('keyup', this.onKeyUp.bind(this))
+    this.node.addEventListener('click', this.toggleDesktopNavOpen.bind(this));
+    this.node.addEventListener('focusout', this.onFocusOut.bind(this));
+    window.addEventListener('keyup', this.onKeyUp.bind(this));
   }
 
   /**
@@ -37,11 +37,11 @@ class PrimaryNavigation extends Component {
    */
   onFocusOut() {
     if (this.node) {
-      BEM.removeModifier(this.node, 'open')
+      BEM.removeModifier(this.node, 'open');
     }
     this.navigationToggle.forEach((toggle) => {
-      toggle.setAttribute('aria-expanded', 'false')
-    })
+      toggle.setAttribute('aria-expanded', 'false');
+    });
   }
 
   /**
@@ -50,17 +50,17 @@ class PrimaryNavigation extends Component {
    */
   toggleDesktopNavOpen() {
     if (this.node) {
-      const isOpen = BEM.hasModifier(this.node, 'open')
-      BEM.toggleModifier(this.node, 'open', !isOpen)
-      BEM.toggleModifier(this.node, MODIFIER_DISMISSED)
+      const isOpen = BEM.hasModifier(this.node, 'open');
+      BEM.toggleModifier(this.node, 'open', !isOpen);
+      BEM.toggleModifier(this.node, MODIFIER_DISMISSED);
 
       if (BLOCK_PRIMARY_NAVIGATION) {
-        BEM.removeModifier(this.node, MODIFIER_DISMISSED)
+        BEM.removeModifier(this.node, MODIFIER_DISMISSED);
       }
       // Safari specific
       this.navigationToggle.forEach((toggle) => {
-        toggle.setAttribute('aria-expanded', isOpen ? 'false' : 'true')
-      })
+        toggle.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+      });
     }
   }
 
@@ -71,11 +71,11 @@ class PrimaryNavigation extends Component {
    */
   onKeyUp(event) {
     if (event.key === 'Escape') {
-      this.setState({ dismissed: true })
+      this.setState({ dismissed: true });
       if (this.node) {
-        this.node.blur()
+        this.node.blur();
         // Safari specific
-        this.navigationToggle.forEach((elem) => elem.blur())
+        this.navigationToggle.forEach((elem) => elem.blur());
       }
     }
   }
@@ -87,10 +87,10 @@ class PrimaryNavigation extends Component {
    */
   render(state) {
     if (this.node) {
-      BEM.toggleModifier(this.node, MODIFIER_DISMISSED, state.dismissed)
+      BEM.toggleModifier(this.node, MODIFIER_DISMISSED, state.dismissed);
 
       if (state.dismissed) {
-        this.node.blur()
+        this.node.blur();
       }
     }
   }
@@ -100,7 +100,7 @@ class PrimaryNavigation extends Component {
 document.addEventListener('DOMContentLoaded', () => {
   BEM.getBEMNodes(BLOCK_PRIMARY_NAVIGATION).forEach((node) => {
     if (node) {
-      new PrimaryNavigation(node, { dismissed: false })
+      new PrimaryNavigation(node, { dismissed: false });
     }
-  })
-})
+  });
+});

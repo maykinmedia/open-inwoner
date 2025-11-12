@@ -1,1 +1,1 @@
-import './override-custom-js-script'
+import './override-custom-js-script';

@@ -1,4 +1,4 @@
-const FILTER_MODALS = document.querySelectorAll('.filter-modal')
+const FILTER_MODALS = document.querySelectorAll('.filter-modal');
 
 export class FilterModal {
   /**
@@ -6,9 +6,9 @@ export class FilterModal {
    * @param {HTMLDivElement} node
    */
   constructor(node) {
-    this.node = node
-    this.bindEvents()
-    this.render()
+    this.node = node;
+    this.bindEvents();
+    this.render();
   }
 
   /**
@@ -16,43 +16,43 @@ export class FilterModal {
    */
   bindEvents() {
     // Open modal
-    this.showModalButton?.addEventListener('click', this.openModal.bind(this))
+    this.showModalButton?.addEventListener('click', this.openModal.bind(this));
     // Close modal
-    this.closeButton?.addEventListener('click', this.closeModal.bind(this))
+    this.closeButton?.addEventListener('click', this.closeModal.bind(this));
     // Close modal with keys.
-    document.addEventListener('keydown', this.filterClosing.bind(this), false)
+    document.addEventListener('keydown', this.filterClosing.bind(this), false);
   }
 
   get isModalVisible() {
-    return this.node.classList.contains('filter-modal--show')
+    return this.node.classList.contains('filter-modal--show');
   }
 
   get closeButton() {
-    return this.node.querySelector('.filter-modal__close')
+    return this.node.querySelector('.filter-modal__close');
   }
 
   get showModalButton() {
-    return document.querySelector('.show-modal')
+    return document.querySelector('.show-modal');
   }
 
   get someChecked() {
     return [...this.node.querySelectorAll('.checkbox__input')].some(
       (x) => !!x.checked
-    )
+    );
   }
 
   openModal() {
-    this.node.classList.toggle('filter-modal--show', true)
-    document.body.classList.toggle('body--noscroll', true)
-    this.node.setAttribute('aria-expanded', 'true')
-    this.node.setAttribute('aria-label', 'Sluiten Filters')
+    this.node.classList.toggle('filter-modal--show', true);
+    document.body.classList.toggle('body--noscroll', true);
+    this.node.setAttribute('aria-expanded', 'true');
+    this.node.setAttribute('aria-label', 'Sluiten Filters');
   }
 
   closeModal() {
-    this.node.classList.toggle('filter-modal--show', false)
-    document.body.classList.toggle('body--noscroll', false)
-    this.node.setAttribute('aria-expanded', 'false')
-    this.node.setAttribute('aria-label', 'Filters')
+    this.node.classList.toggle('filter-modal--show', false);
+    document.body.classList.toggle('body--noscroll', false);
+    this.node.setAttribute('aria-expanded', 'false');
+    this.node.setAttribute('aria-label', 'Filters');
   }
 
   filterClosing(event) {
@@ -61,15 +61,15 @@ export class FilterModal {
       event.key === 'Escape' &&
       this.isModalVisible
     ) {
-      this.closeModal() // Close the modal on Escape key press
+      this.closeModal(); // Close the modal on Escape key press
     }
   }
 
   render() {
     if (this.someChecked)
-      document.querySelector('.filter-modal__initial').classList.add('active')
+      document.querySelector('.filter-modal__initial').classList.add('active');
   }
 }
 
 // Start!
-;[...FILTER_MODALS].forEach((node) => new FilterModal(node))
+[...FILTER_MODALS].forEach((node) => new FilterModal(node));

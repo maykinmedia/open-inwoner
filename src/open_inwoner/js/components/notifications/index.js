@@ -1,4 +1,4 @@
-const typeOrder = ['error', 'warning', 'success', 'info']
+const typeOrder = ['error', 'warning', 'success', 'info'];
 
 /**
  * Helper function to determine the order index of a notification type.
@@ -6,9 +6,9 @@ const typeOrder = ['error', 'warning', 'success', 'info']
  * @returns {number} - Order index of the notification type.
  */
 const getTypeOrderIndex = (notification) => {
-  const type = getTypeFromNotification(notification)
-  return typeOrder.indexOf(type)
-}
+  const type = getTypeFromNotification(notification);
+  return typeOrder.indexOf(type);
+};
 
 /**
  * Helper function to get the type of a notification.
@@ -16,21 +16,21 @@ const getTypeOrderIndex = (notification) => {
  * @returns {string} - Type of the notification.
  */
 const getTypeFromNotification = (notification) => {
-  let notificationType = ''
+  let notificationType = '';
   notification.classList.forEach((cls) => {
     if (cls.startsWith('notification--')) {
-      notificationType = cls.replace('notification--', '')
+      notificationType = cls.replace('notification--', '');
     }
-  })
-  return notificationType
-}
+  });
+  return notificationType;
+};
 
 /**
  * Single Notification class.
  * @class
  */
 export class Notification {
-  static selector = '.notification'
+  static selector = '.notification';
 
   /**
    * Constructor method.
@@ -38,10 +38,10 @@ export class Notification {
    */
   constructor(node) {
     /** @type {HTMLElement} */
-    this.node = node
+    this.node = node;
 
-    this.bindEvents()
-    this.reorderNotifications()
+    this.bindEvents();
+    this.reorderNotifications();
   }
 
   /**
@@ -49,7 +49,7 @@ export class Notification {
    * @return {HTMLElement|null}
    */
   getClose() {
-    return this.node.querySelector('.notification__close')
+    return this.node.querySelector('.notification__close');
   }
 
   /**
@@ -58,7 +58,7 @@ export class Notification {
   scrollToNotification() {
     const notificationContents = Array.from(
       this.node.querySelectorAll('.notification__content')
-    )
+    );
 
     if (notificationContents) {
       notificationContents.forEach((content) => {
@@ -68,13 +68,13 @@ export class Notification {
         content.scrollIntoView({
           block: 'center',
           behavior: 'smooth',
-        })
+        });
 
         // Add a pause before setting focus for screen readers after DOM load
         setTimeout(() => {
-          content.focus()
-        }, 100)
-      })
+          content.focus();
+        }, 100);
+      });
     }
   }
 
@@ -83,18 +83,18 @@ export class Notification {
    */
   bindEvents() {
     this.getClose()?.addEventListener('click', (e) => {
-      e.preventDefault()
-      this.close()
-    })
+      e.preventDefault();
+      this.close();
+    });
   }
 
   /**
    * Closes the notification
    */
   close() {
-    this.node.parentElement.removeChild(this.node)
+    this.node.parentElement.removeChild(this.node);
     // Dispatch a custom event to notify other components that a notification has been closed
-    document.dispatchEvent(new CustomEvent('notificationClosed'))
+    document.dispatchEvent(new CustomEvent('notificationClosed'));
   }
 
   /**
@@ -102,27 +102,27 @@ export class Notification {
    */
   reorderNotifications() {
     // Select the parent container, in order to re-index its children
-    const notificationsContainer = document.querySelector('.notifications')
+    const notificationsContainer = document.querySelector('.notifications');
 
     if (notificationsContainer) {
       const notifications = Array.from(
         // Get first matching element in the document
         notificationsContainer.querySelectorAll(Notification.selector)
-      )
+      );
 
       // Re-indexing the NodeList: Sort notifications (children/siblings) based on type order
       notifications.sort((a, b) => {
-        const typeA = getTypeOrderIndex(a)
-        const typeB = getTypeOrderIndex(b)
-        return typeA - typeB
-      })
+        const typeA = getTypeOrderIndex(a);
+        const typeB = getTypeOrderIndex(b);
+        return typeA - typeB;
+      });
 
       // Re-append sorted notifications to parent container
       notifications.forEach((notification) =>
         notificationsContainer.appendChild(notification)
-      )
+      );
     } else {
-      return
+      return;
     }
   }
 }
@@ -132,13 +132,13 @@ export class Notification {
 // Create a new Notification instance for each matching element in the NodeList
 document
   .querySelectorAll(Notification.selector)
-  .forEach((notification) => new Notification(notification))
+  .forEach((notification) => new Notification(notification));
 
 // Scroll to the notifications after reordering
 setTimeout(() => {
-  const firstNotification = document.querySelector(Notification.selector)
+  const firstNotification = document.querySelector(Notification.selector);
   if (firstNotification) {
-    const instance = new Notification(firstNotification)
-    instance.scrollToNotification()
+    const instance = new Notification(firstNotification);
+    instance.scrollToNotification();
   }
-}, 0)
+}, 0);

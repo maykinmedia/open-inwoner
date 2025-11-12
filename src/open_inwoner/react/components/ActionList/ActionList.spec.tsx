@@ -1,8 +1,8 @@
-import { render, screen } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
-import ActionList, { IActionProps } from './ActionList'
+import { render, screen } from '@testing-library/react';
+import { describe, it, expect } from 'vitest';
+import ActionList, { IActionProps } from './ActionList';
 
-import '@testing-library/jest-dom'
+import '@testing-library/jest-dom';
 
 const mockActions: IActionProps[] = [
   {
@@ -15,50 +15,50 @@ const mockActions: IActionProps[] = [
     message: 'Upload required documents for verification',
     action_url: '/documents',
   },
-]
+];
 
 describe('ActionList', () => {
   it('renders without crashing', () => {
-    render(<ActionList actions={mockActions} />)
-    expect(screen.getByText('Complete your profile')).toBeInTheDocument()
-  })
+    render(<ActionList actions={mockActions} />);
+    expect(screen.getByText('Complete your profile')).toBeInTheDocument();
+  });
 
   it('renders all actions', () => {
-    render(<ActionList actions={mockActions} />)
+    render(<ActionList actions={mockActions} />);
 
-    expect(screen.getByText('Complete your profile')).toBeInTheDocument()
-    expect(screen.getByText('Upload documents')).toBeInTheDocument()
-  })
+    expect(screen.getByText('Complete your profile')).toBeInTheDocument();
+    expect(screen.getByText('Upload documents')).toBeInTheDocument();
+  });
 
   it('renders action messages', () => {
-    render(<ActionList actions={mockActions} />)
+    render(<ActionList actions={mockActions} />);
 
     expect(
       screen.getByText(/Please fill in your personal information/)
-    ).toBeInTheDocument()
+    ).toBeInTheDocument();
     expect(
       screen.getByText(/Upload required documents for verification/)
-    ).toBeInTheDocument()
-  })
+    ).toBeInTheDocument();
+  });
 
   it('renders action links with correct URLs', () => {
-    render(<ActionList actions={mockActions} />)
-    const profileLink = screen.getByText('Complete your profile').closest('a')
-    const uploadLink = screen.getByText('Upload documents').closest('a')
+    render(<ActionList actions={mockActions} />);
+    const profileLink = screen.getByText('Complete your profile').closest('a');
+    const uploadLink = screen.getByText('Upload documents').closest('a');
 
-    expect(profileLink).toHaveAttribute('href', '/profile')
-    expect(uploadLink).toHaveAttribute('href', '/documents')
-  })
+    expect(profileLink).toHaveAttribute('href', '/profile');
+    expect(uploadLink).toHaveAttribute('href', '/documents');
+  });
 
   it('renders empty list when no actions provided', () => {
-    const { container } = render(<ActionList actions={[]} />)
-    expect(container.firstChild).toBeNull()
-  })
+    const { container } = render(<ActionList actions={[]} />);
+    expect(container.firstChild).toBeNull();
+  });
 
   it('handles undefined actions gracefully', () => {
-    const { container } = render(<ActionList actions={undefined!} />)
-    expect(container.firstChild).toBeNull()
-  })
+    const { container } = render(<ActionList actions={undefined!} />);
+    expect(container.firstChild).toBeNull();
+  });
 
   it('renders action without text when action_text is empty', () => {
     const actionWithoutText = [
@@ -67,62 +67,62 @@ describe('ActionList', () => {
         message: 'Test message',
         action_url: '/test',
       },
-    ]
+    ];
 
-    render(<ActionList actions={actionWithoutText} />)
-    expect(() => screen.getByText('Ga naar actie')).toThrow()
-    expect(screen.getByRole('link')).toBeInTheDocument()
-  })
+    render(<ActionList actions={actionWithoutText} />);
+    expect(() => screen.getByText('Ga naar actie')).toThrow();
+    expect(screen.getByRole('link')).toBeInTheDocument();
+  });
 
   it('renders correct number of Action components', () => {
-    const { container } = render(<ActionList actions={mockActions} />)
+    const { container } = render(<ActionList actions={mockActions} />);
 
     // Each Action component should render the title
-    const titles = container.querySelectorAll('div')
-    expect(titles.length).toBeGreaterThan(0)
-  })
+    const titles = container.querySelectorAll('div');
+    expect(titles.length).toBeGreaterThan(0);
+  });
 
   it('renders actions in correct order', () => {
-    render(<ActionList actions={mockActions} />)
+    render(<ActionList actions={mockActions} />);
 
-    const messages = screen.getAllByText(/|/)
+    const messages = screen.getAllByText(/|/);
     expect(messages[0]).toHaveTextContent(
       'Please fill in your personal information'
-    )
+    );
     expect(messages[1]).toHaveTextContent(
       'Upload required documents for verification'
-    )
-  })
+    );
+  });
 
   it('renders action links with correct CSS classes', () => {
-    render(<ActionList actions={mockActions} />)
+    render(<ActionList actions={mockActions} />);
 
-    const links = screen.getAllByRole('link')
+    const links = screen.getAllByRole('link');
     links.forEach((link) => {
       expect(link).toHaveClass(
         'nl-link',
         'denhaag-action',
         'denhaag-action--single'
-      )
-    })
-  })
+      );
+    });
+  });
 
   it('renders single action correctly', () => {
-    const singleAction = [mockActions[0]]
-    render(<ActionList actions={singleAction} />)
+    const singleAction = [mockActions[0]];
+    render(<ActionList actions={singleAction} />);
 
-    expect(screen.getByText('Complete your profile')).toBeInTheDocument()
-    expect(screen.queryByText('Upload documents')).not.toBeInTheDocument()
-  })
+    expect(screen.getByText('Complete your profile')).toBeInTheDocument();
+    expect(screen.queryByText('Upload documents')).not.toBeInTheDocument();
+  });
 
   it('maintains action data integrity', () => {
-    render(<ActionList actions={mockActions} />)
+    render(<ActionList actions={mockActions} />);
 
     mockActions.forEach((action) => {
-      expect(screen.getByText(action.title)).toBeInTheDocument()
-      expect(screen.getByText(new RegExp(action.message))).toBeInTheDocument()
-    })
-  })
+      expect(screen.getByText(action.title)).toBeInTheDocument();
+      expect(screen.getByText(new RegExp(action.message))).toBeInTheDocument();
+    });
+  });
 
   it('renders with special characters in action data', () => {
     const specialActions = [
@@ -131,19 +131,19 @@ describe('ActionList', () => {
         message: 'Check <data> & verify',
         action_url: '/test?id=1&type=review',
       },
-    ]
+    ];
 
-    render(<ActionList actions={specialActions} />)
+    render(<ActionList actions={specialActions} />);
     // Check that title with ampersand is rendered correctly
-    expect(screen.getByText('Test & Review')).toBeInTheDocument()
+    expect(screen.getByText('Test & Review')).toBeInTheDocument();
 
     // Check that message with HTML characters is properly escaped
-    const messageElement = screen.getByText(/Check.*verify/)
-    expect(messageElement).toBeInTheDocument()
-    expect(messageElement.innerHTML).toContain('&lt;data&gt;')
+    const messageElement = screen.getByText(/Check.*verify/);
+    expect(messageElement).toBeInTheDocument();
+    expect(messageElement.innerHTML).toContain('&lt;data&gt;');
 
     // Verify link URL with query parameters is correct
-    const link = screen.getByText('Test & Review').closest('a')
-    expect(link).toHaveAttribute('href', '/test?id=1&type=review')
-  })
-})
+    const link = screen.getByText('Test & Review').closest('a');
+    expect(link).toHaveAttribute('href', '/test?id=1&type=review');
+  });
+});

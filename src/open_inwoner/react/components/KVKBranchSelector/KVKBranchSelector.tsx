@@ -7,29 +7,29 @@ import {
   useMemo,
   useRef,
   useState,
-} from 'react'
-import { useIntl } from 'react-intl'
-import { useDebounce } from '@react/lib/hooks/useDebounce'
-import clsx from 'clsx'
-import { MaterialIcon } from '@react/components/MaterialIcon'
+} from 'react';
+import { useIntl } from 'react-intl';
+import { useDebounce } from '@react/lib/hooks/useDebounce';
+import clsx from 'clsx';
+import { MaterialIcon } from '@react/components/MaterialIcon';
 
 export interface ComboBoxItem {
-  id: string
-  label: string
-  vestigingInfo?: string
-  rechtspersoonInfo?: string
-  addressInfo?: string
-  cityInfo?: string
-  vestigingsnummer?: string
-  type?: string
+  id: string;
+  label: string;
+  vestigingInfo?: string;
+  rechtspersoonInfo?: string;
+  addressInfo?: string;
+  cityInfo?: string;
+  vestigingsnummer?: string;
+  type?: string;
 }
 
 interface KVKBranchSelectorProps {
-  id: string
-  label: string
-  name: string
-  branches: ComboBoxItem[]
-  selectedBranchId?: string
+  id: string;
+  label: string;
+  name: string;
+  branches: ComboBoxItem[];
+  selectedBranchId?: string;
 }
 
 /**
@@ -43,47 +43,47 @@ export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
   branches,
   selectedBranchId,
 }) => {
-  const intl = useIntl()
-  const [query, setQuery] = useState('')
+  const intl = useIntl();
+  const [query, setQuery] = useState('');
   // Debounce the query to prevent expensive filtering on every keystroke
   // Wait 300ms after user stops typing before filtering results
-  const debouncedQuery = useDebounce(query, 300)
-  const [isOpen, setIsOpen] = useState(false)
+  const debouncedQuery = useDebounce(query, 300);
+  const [isOpen, setIsOpen] = useState(false);
   // Lazy initializer with auto-select
   const [selectedId, setSelectedId] = useState<string | undefined>(() => {
-    if (selectedBranchId) return selectedBranchId
+    if (selectedBranchId) return selectedBranchId;
     // Find rechtspersoon branch and auto-select it
-    const rechtspersoonBranch = branches.find((b) => b.id === 'rechtspersoon')
-    return rechtspersoonBranch ? 'rechtspersoon' : undefined
-  })
-  const [focusedIndex, setFocusedIndex] = useState<number>(0)
-  const listRef = useRef<HTMLUListElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
+    const rechtspersoonBranch = branches.find((b) => b.id === 'rechtspersoon');
+    return rechtspersoonBranch ? 'rechtspersoon' : undefined;
+  });
+  const [focusedIndex, setFocusedIndex] = useState<number>(0);
+  const listRef = useRef<HTMLUListElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Find the selected branch to display its name in the input
   const selectedBranch = useMemo(
     () => branches.find((b) => b.id === selectedId),
     [branches, selectedId]
-  )
+  );
 
   // Generate display text for selected branch with distinguishing info
   const getDisplayText = (branch: ComboBoxItem): string => {
     if (branch.id === 'rechtspersoon') {
-      return `${branch.label} (Rechtspersoon)`
+      return `${branch.label} (Rechtspersoon)`;
     }
     // For vestiging, include vestigingsnummer to distinguish from rechtspersoon
     if (branch.vestigingsnummer) {
-      return `${branch.label} (${branch.vestigingsnummer})`
+      return `${branch.label} (${branch.vestigingsnummer})`;
     }
-    return branch.label
-  }
+    return branch.label;
+  };
 
   // Check if query matches the selected branch's display text exactly
   const isSelectedBranchDisplayText = useMemo(() => {
-    if (!selectedBranch) return false
-    return query.trim() === getDisplayText(selectedBranch).trim()
-  }, [query, selectedBranch])
+    if (!selectedBranch) return false;
+    return query.trim() === getDisplayText(selectedBranch).trim();
+  }, [query, selectedBranch]);
 
   // Filter branches based on debounced search query across all text fields
   // This expensive operation only runs after user stops typing for 300ms
@@ -92,7 +92,7 @@ export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
     // If the query matches the selected branch display text exactly,
     // show all branches (user wants to see options, not search)
     if (isSelectedBranchDisplayText || debouncedQuery.trim() === '') {
-      return branches
+      return branches;
     }
 
     return branches.filter((b) => {
@@ -107,113 +107,113 @@ export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
       ]
         .filter(Boolean)
         .join(' ')
-        .toLowerCase()
+        .toLowerCase();
 
       // Split query into individual words (ignoring extra spaces)
       const searchWords = debouncedQuery
         .toLowerCase()
         .trim()
         .split(/\s+/)
-        .filter(Boolean)
+        .filter(Boolean);
 
       // Check if all search words appear as substrings somewhere in the combined text
-      return searchWords.every((word) => searchText.includes(word))
-    })
-  }, [branches, debouncedQuery, isSelectedBranchDisplayText])
+      return searchWords.every((word) => searchText.includes(word));
+    });
+  }, [branches, debouncedQuery, isSelectedBranchDisplayText]);
 
   // Show clear button when input contains text
-  const hasText = query !== ''
+  const hasText = query !== '';
 
   const handleSelect = (id: string) => {
-    const branch = branches.find((b) => b.id === id)
-    setSelectedId(id)
+    const branch = branches.find((b) => b.id === id);
+    setSelectedId(id);
     // Use display text with distinguishing info
-    setQuery(branch ? getDisplayText(branch) : '')
-    setIsOpen(false)
-    inputRef.current?.focus()
-  }
+    setQuery(branch ? getDisplayText(branch) : '');
+    setIsOpen(false);
+    inputRef.current?.focus();
+  };
 
   const handleClearQuery = () => {
-    setQuery('')
-    setSelectedId(undefined)
-    setFocusedIndex(0)
-    setIsOpen(true)
-    inputRef.current?.focus()
-  }
+    setQuery('');
+    setSelectedId(undefined);
+    setFocusedIndex(0);
+    setIsOpen(true);
+    inputRef.current?.focus();
+  };
 
   const handleToggleDropdown: MouseEventHandler<HTMLButtonElement> = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    const newIsOpen = !isOpen
-    setIsOpen(newIsOpen)
+    e.preventDefault();
+    e.stopPropagation();
+    const newIsOpen = !isOpen;
+    setIsOpen(newIsOpen);
     if (newIsOpen) {
-      setFocusedIndex(0)
+      setFocusedIndex(0);
       // Only focus input when opening to prevent conflict with close action
-      inputRef.current?.focus()
+      inputRef.current?.focus();
     }
-  }
+  };
 
   const handleKeyDown: KeyboardEventHandler<HTMLInputElement> = (e) => {
     switch (e.key) {
       case 'ArrowDown':
-        e.preventDefault()
+        e.preventDefault();
         // Always open dropdown and navigate
         if (!isOpen) {
-          setIsOpen(true)
-          setFocusedIndex(0)
+          setIsOpen(true);
+          setFocusedIndex(0);
         } else {
           setFocusedIndex((prev) =>
             prev < filtered.length - 1 ? prev + 1 : prev
-          )
+          );
         }
-        break
+        break;
 
       case 'ArrowUp':
-        e.preventDefault()
+        e.preventDefault();
         // Always open dropdown and navigate
         if (!isOpen) {
-          setIsOpen(true)
-          setFocusedIndex(0)
+          setIsOpen(true);
+          setFocusedIndex(0);
         } else {
-          setFocusedIndex((prev) => (prev > 0 ? prev - 1 : 0))
+          setFocusedIndex((prev) => (prev > 0 ? prev - 1 : 0));
         }
-        break
+        break;
 
       case 'Enter':
-        e.preventDefault()
+        e.preventDefault();
         if (isOpen && filtered[focusedIndex]) {
-          handleSelect(filtered[focusedIndex].id)
+          handleSelect(filtered[focusedIndex].id);
         }
-        break
+        break;
 
       case 'Escape':
-        e.preventDefault()
-        setIsOpen(false)
-        break
+        e.preventDefault();
+        setIsOpen(false);
+        break;
 
       case 'Tab':
-        setIsOpen(false)
-        break
+        setIsOpen(false);
+        break;
     }
-  }
+  };
 
   const handleInputChange: ChangeEventHandler<HTMLInputElement> = (e) => {
-    setQuery(e.target.value)
-    setIsOpen(true)
-    setFocusedIndex(0)
-  }
+    setQuery(e.target.value);
+    setIsOpen(true);
+    setFocusedIndex(0);
+  };
 
   const handleInputClick = () => {
     // Always open dropdown when clicking in the input
-    setIsOpen(true)
-    setFocusedIndex(0)
-  }
+    setIsOpen(true);
+    setFocusedIndex(0);
+  };
 
   const handleInputFocus = () => {
     // Always open dropdown when focusing the input
-    setIsOpen(true)
-    setFocusedIndex(0)
-  }
+    setIsOpen(true);
+    setFocusedIndex(0);
+  };
 
   // Close dropdown when clicking outside component
   useEffect(() => {
@@ -222,71 +222,71 @@ export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
         containerRef.current &&
         !containerRef.current.contains(event.target as Node)
       ) {
-        setIsOpen(false)
+        setIsOpen(false);
       }
-    }
+    };
 
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
+      document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [isOpen, containerRef])
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen, containerRef]);
 
   // Initialize input with selected branch name when selection changes
   useEffect(() => {
     if (selectedBranch) {
-      setQuery(getDisplayText(selectedBranch))
+      setQuery(getDisplayText(selectedBranch));
     }
-  }, [selectedId]) // Only run when selectedId changes, not when query changes
+  }, [selectedId]); // Only run when selectedId changes, not when query changes
 
   // Scroll focused option into view for keyboard navigation
   useEffect(() => {
     if (isOpen && listRef.current && listRef.current.children[focusedIndex]) {
-      const el = listRef.current.children[focusedIndex] as HTMLElement
-      el.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+      const el = listRef.current.children[focusedIndex] as HTMLElement;
+      el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     }
-  }, [focusedIndex, isOpen])
+  }, [focusedIndex, isOpen]);
 
   // Sync selection with hidden form input for Django form submission
   useEffect(() => {
-    const form = inputRef.current?.closest('form')
-    if (!form) return
+    const form = inputRef.current?.closest('form');
+    if (!form) return;
 
     // Create or update hidden input with selected branch value
     let hiddenInput = form.querySelector<HTMLInputElement>(
       `input[name="${name}"]`
-    )
+    );
     if (!hiddenInput) {
-      hiddenInput = document.createElement('input')
-      hiddenInput.type = 'hidden'
-      hiddenInput.name = name
-      form.appendChild(hiddenInput)
+      hiddenInput = document.createElement('input');
+      hiddenInput.type = 'hidden';
+      hiddenInput.name = name;
+      form.appendChild(hiddenInput);
     }
 
     // Map 'rechtspersoon' ID to empty string for Django backend
     if (selectedId !== undefined) {
-      hiddenInput.value = selectedId === 'rechtspersoon' ? '' : selectedId
+      hiddenInput.value = selectedId === 'rechtspersoon' ? '' : selectedId;
     }
 
     // Enable/disable submit button based on selection state
     const submitButton = form.querySelector<HTMLButtonElement>(
       'button[name="submit"]'
-    )
+    );
     if (submitButton) {
       if (selectedId !== undefined) {
         // When selection is made
-        submitButton.disabled = false
-        submitButton.classList.remove('button--disabled')
+        submitButton.disabled = false;
+        submitButton.classList.remove('button--disabled');
       } else {
         // Anytime no selection exists
-        submitButton.disabled = true
-        submitButton.classList.add('button--disabled')
+        submitButton.disabled = true;
+        submitButton.classList.add('button--disabled');
       }
     }
-  }, [selectedId, name])
+  }, [selectedId, name]);
 
   return (
     <div
@@ -369,9 +369,9 @@ export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
                   })}
                   onMouseDown={(e) => {
                     // Use onMouseDown to fire before click-outside handler
-                    e.preventDefault()
-                    e.stopPropagation()
-                    handleSelect(item.id)
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleSelect(item.id);
                   }}
                   onMouseEnter={() => setFocusedIndex(i)}
                 >
@@ -406,5 +406,5 @@ export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
         )}
       </div>
     </div>
-  )
-}
+  );
+};

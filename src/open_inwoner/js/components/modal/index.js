@@ -1,138 +1,138 @@
 export default class Modal {
   constructor(node) {
-    this.node = node
-    this.title = this.node.querySelector('.modal__title')
-    this.text = this.node.querySelector('.modal__text')
-    this.actions = this.node.querySelector('.modal__actions')
-    this.close = this.node.querySelector('.modal__close')
-    this.confirm = this.node.querySelector('.modal__confirm')
-    this.closeInnerText = this.node.querySelector('.modal__close .inner-text')
+    this.node = node;
+    this.title = this.node.querySelector('.modal__title');
+    this.text = this.node.querySelector('.modal__text');
+    this.actions = this.node.querySelector('.modal__actions');
+    this.close = this.node.querySelector('.modal__close');
+    this.confirm = this.node.querySelector('.modal__confirm');
+    this.closeInnerText = this.node.querySelector('.modal__close .inner-text');
     this.confirmInnerText = this.node.querySelector(
       '.modal__confirm .inner-text'
-    )
-    this.closeTitle = this.node.querySelector('.modal__close-title')
-    this.openedBy = null // Track the element that opened the modal
+    );
+    this.closeTitle = this.node.querySelector('.modal__close-title');
+    this.openedBy = null; // Track the element that opened the modal
 
     // This is for the prefilled modals so they will not be emptied
     if (!this.node.classList.contains('modal--no-reset')) {
-      this.reset()
+      this.reset();
     }
-    this.setListeners()
+    this.setListeners();
   }
 
   reset() {
-    this.modalClosedCallback = null
-    this.setTitle('')
-    this.setText('')
-    this.setModalIcons(false)
-    this.setConfirmButtonVisibility(false)
-    this.setCancelButtonVisibility(false)
+    this.modalClosedCallback = null;
+    this.setTitle('');
+    this.setText('');
+    this.setModalIcons(false);
+    this.setConfirmButtonVisibility(false);
+    this.setCancelButtonVisibility(false);
     if (this.confirm) {
-      this.setConfirm('')
-      this.confirm.className = 'button modal__button modal__confirm'
+      this.setConfirm('');
+      this.confirm.className = 'button modal__button modal__confirm';
     }
     if (this.close) {
-      this.setClose('')
-      this.close.className = 'button modal__button modal__close'
+      this.setClose('');
+      this.close.className = 'button modal__button modal__close';
     }
   }
 
   setListeners() {
     this.close.addEventListener('click', (event) => {
-      event.preventDefault()
-      this.hide()
-    })
+      event.preventDefault();
+      this.hide();
+    });
 
     if (this.closeTitle) {
       this.closeTitle.addEventListener('click', () => {
-        this.hide()
-      })
+        this.hide();
+      });
     }
     this.node.addEventListener('close', () => {
-      this.hide()
-    })
+      this.hide();
+    });
     document.addEventListener('keydown', (event) => {
-      this.escapeModal(event)
-    })
+      this.escapeModal(event);
+    });
   }
 
   setTitle(text) {
-    this.title.innerText = text
+    this.title.innerText = text;
   }
 
   setText(text) {
-    this.text.innerText = text
+    this.text.innerText = text;
   }
 
   setModalIcons(modalIcons) {
     // Whether the modal-buttons should have icons or not
     if (modalIcons) {
-      this.node.classList.add('show-modal-icons')
+      this.node.classList.add('show-modal-icons');
     } else {
       // Remove lingering elements if user did not close other modals
-      this.node.classList.remove('show-modal-icons')
+      this.node.classList.remove('show-modal-icons');
     }
   }
 
   setConfirmButtonVisibility(confirmVisibility) {
     // Accessibility: whether the modal should have a confirm button or not
     if (confirmVisibility) {
-      this.node.classList.add('show-confirm-button')
+      this.node.classList.add('show-confirm-button');
     } else {
       // Remove lingering elements if user did not close other modals
-      this.node.classList.remove('show-confirm-button')
+      this.node.classList.remove('show-confirm-button');
     }
   }
 
   setCancelButtonVisibility(cancelVisibility) {
     // Accessibility: whether the modal should have a cancel button or not
     if (cancelVisibility) {
-      this.node.classList.add('show-cancel-button')
+      this.node.classList.add('show-cancel-button');
     } else {
       // Remove lingering elements if user did not close other modals
-      this.node.classList.remove('show-cancel-button')
+      this.node.classList.remove('show-cancel-button');
     }
   }
 
   setButtonIconCloseVisibility(buttonIconCloseVisibility) {
     // Whether the modal should have a top-right close button or not
     if (buttonIconCloseVisibility) {
-      this.node.classList.add('show-button-icon-close')
+      this.node.classList.add('show-button-icon-close');
     } else {
       // Remove lingering elements if user did not close other modals
-      this.node.classList.remove('show-button-icon-close')
+      this.node.classList.remove('show-button-icon-close');
     }
   }
 
   setClose(text, className = 'button--primary') {
-    this.closeInnerText.innerText = text
-    this.close.classList.add(className)
+    this.closeInnerText.innerText = text;
+    this.close.classList.add(className);
   }
 
   setConfirm(text, callback, className = 'button--primary') {
-    this.confirmInnerText.innerText = text
+    this.confirmInnerText.innerText = text;
     this.confirm.onclick = (event) => {
-      callback(event)
-      this.hide()
-    }
-    this.confirm.classList.add(className)
+      callback(event);
+      this.hide();
+    };
+    this.confirm.classList.add(className);
   }
 
   setModalClosedCallback(callback) {
-    this.modalClosedCallback = callback
+    this.modalClosedCallback = callback;
   }
 
   show(refocusOnClose) {
-    this.node.classList.add('modal--open')
-    this.refocusOnClose = refocusOnClose
+    this.node.classList.add('modal--open');
+    this.refocusOnClose = refocusOnClose;
 
     // Set focus on the cancel button if it exists
     if (this.close) {
-      this.close.focus()
+      this.close.focus();
     } else if (this.confirm) {
-      this.confirm.focus()
+      this.confirm.focus();
     } else {
-      this.node.focus()
+      this.node.focus();
     }
   }
 
@@ -147,23 +147,23 @@ export default class Modal {
       'show-confirm-button',
       'show-cancel-button',
       'show-button-icon-close',
-    ]
+    ];
     classesToRemove.forEach((className) =>
       this.node.classList.remove(className)
-    )
+    );
     if (this.refocusOnClose) {
-      this.refocusOnClose.focus()
-      this.refocusOnClose = null
+      this.refocusOnClose.focus();
+      this.refocusOnClose = null;
     }
     if (this.modalClosedCallback) {
-      this.modalClosedCallback()
+      this.modalClosedCallback();
     }
-    this.openedBy = null // Reset the reference to the element that opened the modal
+    this.openedBy = null; // Reset the reference to the element that opened the modal
   }
 
   escapeModal(event) {
     if (event.key === 'Escape') {
-      this.hide()
+      this.hide();
     }
   }
 }
