@@ -1400,7 +1400,7 @@ class eHerkenningOIDCFlowTests(WebTest):
         self.assertEqual(existing_user.kvk, new_user.kvk)
         self.assertEqual(existing_user.vestiging, "")
 
-        self.assertEqual(list(User.objects.all()), [existing_user, new_user])
+        self.assertEqual(set(User.objects.all()), {existing_user, new_user})
 
         self.assertEqual(callback_response.wsgi_request.user, new_user)
         self.assertTrue(
