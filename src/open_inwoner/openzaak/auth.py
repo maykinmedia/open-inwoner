@@ -23,7 +23,8 @@ def get_valid_subscription_from_request(request) -> Subscription:
 
 
 def get_valid_subscriptions_from_bearer(header_value: str) -> Subscription:
-    jwt_string = re.sub(r"^Bearer ", "", header_value)
+    # FIXME: JOIN adds an extra Bearer, so we get Bearer Bearer.
+    jwt_string = re.sub(r"^Bearer Bearer ", "", header_value)
     if not jwt_string:
         raise InvalidAuth(f"cannot locate Bearer token in header: {header_value}")
     return get_valid_subscription_from_jwt(jwt_string)
