@@ -1,10 +1,10 @@
-import BEM from 'bem.js'
+import BEM from 'bem.js';
 
 /** @const {string} */
-export const BLOCK_TOGGLE = 'toggle'
+export const BLOCK_TOGGLE = 'toggle';
 
 /** @const {NodeList} */
-const TOGGLES = BEM.getBEMNodes(BLOCK_TOGGLE)
+const TOGGLES = BEM.getBEMNodes(BLOCK_TOGGLE);
 
 /**
  * Class for generic toggles (like FAQ accordion).
@@ -27,29 +27,29 @@ class Toggle {
    */
   constructor(node) {
     /** @type {HTMLElement} */
-    this.node = node
+    this.node = node;
 
     /** @type {string} */
-    this.toggleModifier = this.node.dataset.toggleModifier
+    this.toggleModifier = this.node.dataset.toggleModifier;
 
     /** @type {(boolean|undefined)} */
     this.toggleMobileState = this.node.dataset.toggleMobileState
       ? this.node.dataset.toggleMobileState.toUpperCase() === 'TRUE'
-      : undefined
+      : undefined;
 
-    this.restoreState()
-    this.bindEvents()
-    this.setAria()
+    this.restoreState();
+    this.bindEvents();
+    this.setAria();
   }
 
   /**
    * Binds events to callbacks.
    */
   bindEvents() {
-    this.node.addEventListener('click', this.onClick.bind(this))
+    this.node.addEventListener('click', this.onClick.bind(this));
     document.addEventListener('click', () =>
       setTimeout(this.setAria.bind(this), 300)
-    )
+    );
   }
 
   /**
@@ -64,46 +64,46 @@ class Toggle {
    * @param {MouseEvent} e
    */
   onClick(e) {
-    let toggleLinkMode = this.node.dataset.toggleLinkMode || 'normal'
+    let toggleLinkMode = this.node.dataset.toggleLinkMode || 'normal';
 
     if (toggleLinkMode === 'normal') {
       if (!e.target.href || e.target.href === '#') {
-        e.preventDefault()
+        e.preventDefault();
       }
     } else if (toggleLinkMode === 'positive') {
       if (!e.target.href || !this.getState()) {
-        e.preventDefault()
+        e.preventDefault();
       }
     } else if (toggleLinkMode === 'negative') {
       if (!e.target.href || this.getState()) {
-        e.preventDefault()
+        e.preventDefault();
       }
     } else if (toggleLinkMode === 'prevent') {
-      e.preventDefault()
+      e.preventDefault();
     }
 
-    let ignore = this.node.dataset.toggleIgnore || ''
-    ignore = ignore.split(',').map((n) => n.trim().toUpperCase())
+    let ignore = this.node.dataset.toggleIgnore || '';
+    ignore = ignore.split(',').map((n) => n.trim().toUpperCase());
 
     if (ignore.indexOf(e.target.tagName) > -1) {
-      return
+      return;
     }
 
     setTimeout(() => {
-      this.toggle()
-      this.saveState()
-      this.focus()
-    }, 100)
+      this.toggle();
+      this.saveState();
+      this.focus();
+    }, 100);
   }
 
   /**
    * Focuses this.node.dataset.focusTarget.
    */
   focus() {
-    let querySelector = this.node.dataset.focusTarget
+    let querySelector = this.node.dataset.focusTarget;
     if (querySelector && this.getState()) {
-      let target = document.querySelector(querySelector)
-      target.focus()
+      let target = document.querySelector(querySelector);
+      target.focus();
     }
   }
 
@@ -112,18 +112,18 @@ class Toggle {
    * @param {boolean} [exp] If passed, add/removes this.toggleModifier based on exp.
    */
   toggle(exp = undefined) {
-    let targets = this.getTargets()
+    let targets = this.getTargets();
     targets.forEach((target) =>
       BEM.toggleModifier(target, this.toggleModifier, exp)
-    )
+    );
 
     this.getExclusive()
       .filter((exclusive) => targets.indexOf(exclusive) === -1)
       .forEach((exclusive) =>
         BEM.removeModifier(exclusive, this.toggleModifier)
-      )
+      );
 
-    this.setAria()
+    this.setAria();
   }
 
   /**
@@ -132,12 +132,12 @@ class Toggle {
    * @returns {(boolean|null)} Boolean is target is found and state is retrieved, null if no target has been found.
    */
   getState() {
-    let referenceTarget = this.getTargets()[0]
+    let referenceTarget = this.getTargets()[0];
     if (!referenceTarget) {
-      return null
+      return null;
     }
 
-    return Boolean(BEM.hasModifier(referenceTarget, this.toggleModifier))
+    return Boolean(BEM.hasModifier(referenceTarget, this.toggleModifier));
   }
 
   /**
@@ -145,8 +145,8 @@ class Toggle {
    * @return {Array} An array of all matched nodes.
    */
   getTargets() {
-    let selector = this.node.dataset.toggleTarget
-    return this.getRelated(selector)
+    let selector = this.node.dataset.toggleTarget;
+    return this.getRelated(selector);
   }
 
   /**
@@ -154,8 +154,8 @@ class Toggle {
    * @return {Array} An array of all matched nodes.
    */
   getExclusive() {
-    let selector = this.node.dataset.toggleExclusive || ''
-    return this.getRelated(selector)
+    let selector = this.node.dataset.toggleExclusive || '';
+    return this.getRelated(selector);
   }
 
   /**
@@ -164,35 +164,35 @@ class Toggle {
    * @return {Array} An array of all matched nodes.
    */
   getRelated(selector) {
-    let targets = []
+    let targets = [];
     selector
       .split(',')
       .filter((selector) => selector.length)
       .forEach(
         (selector) =>
           (targets = [...targets, ...document.querySelectorAll(selector)])
-      )
+      );
 
-    return targets
+    return targets;
   }
 
   /**
    * Saves state to localstorage.
    */
   saveState() {
-    let id = this.node.id
-    let value = this.getState()
+    let id = this.node.id;
+    let value = this.getState();
 
     if (typeof value !== 'boolean') {
-      return
+      return;
     }
 
     if (id) {
-      let key = `ToggleButton#${id}.modifierApplied`
+      let key = `ToggleButton#${id}.modifierApplied`;
       try {
-        localStorage.setItem(key, value)
+        localStorage.setItem(key, value);
       } catch (e) {
-        console.warn(this, 'Unable to save state to localstorage')
+        console.warn(this, 'Unable to save state to localstorage');
       }
     }
   }
@@ -205,39 +205,39 @@ class Toggle {
       this.toggleMobileState !== undefined &&
       matchMedia('(max-width: 767px)').matches
     ) {
-      this.toggle(this.toggleMobileState)
-      return
+      this.toggle(this.toggleMobileState);
+      return;
     }
 
-    let id = this.node.id
+    let id = this.node.id;
 
     if (id) {
-      let key = `ToggleButton#${id}.modifierApplied`
+      let key = `ToggleButton#${id}.modifierApplied`;
       try {
-        let value = localStorage.getItem(key) || false
-        this.toggle(value.toUpperCase() === 'TRUE')
+        let value = localStorage.getItem(key) || false;
+        this.toggle(value.toUpperCase() === 'TRUE');
       } catch (e) {}
     }
   }
 
   setAria() {
     if (!this.node.dataset.useAria) {
-      return
+      return;
     }
-    const state = this.getState()
-    const targets = this.getTargets()
+    const state = this.getState();
+    const targets = this.getTargets();
 
-    this.node.setAttribute('aria-expanded', state)
+    this.node.setAttribute('aria-expanded', state);
 
     if (targets.length === 1) {
-      const target = targets[0]
+      const target = targets[0];
 
       if (target.id) {
-        this.node.setAttribute('aria-controls', target.id)
+        this.node.setAttribute('aria-controls', target.id);
       }
     }
   }
 }
 
 // Start!
-;[...TOGGLES].forEach((node) => new Toggle(node))
+[...TOGGLES].forEach((node) => new Toggle(node));

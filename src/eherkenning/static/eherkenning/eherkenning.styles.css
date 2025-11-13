@@ -132,9 +132,9 @@ select {
   text-transform: none;
 }
 button,
-html input[type="button"],
-input[type="reset"],
-input[type="submit"] {
+html input[type='button'],
+input[type='reset'],
+input[type='submit'] {
   -webkit-appearance: button;
   cursor: pointer;
 }
@@ -150,23 +150,23 @@ input::-moz-focus-inner {
 input {
   line-height: normal;
 }
-input[type="checkbox"],
-input[type="radio"] {
+input[type='checkbox'],
+input[type='radio'] {
   box-sizing: border-box;
   padding: 0;
 }
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
   height: auto;
 }
-input[type="search"] {
+input[type='search'] {
   -webkit-appearance: textfield;
   -moz-box-sizing: content-box;
   -webkit-box-sizing: content-box;
   box-sizing: content-box;
 }
-input[type="search"]::-webkit-search-cancel-button,
-input[type="search"]::-webkit-search-decoration {
+input[type='search']::-webkit-search-cancel-button,
+input[type='search']::-webkit-search-decoration {
   -webkit-appearance: none;
 }
 fieldset {
@@ -237,7 +237,7 @@ video {
 .login label.leverancier {
   display: none;
 }
-input[type="submit"] {
+input[type='submit'] {
   -moz-border-radius: 0;
   -webkit-border-radius: 0;
   border-radius: 0;
@@ -252,7 +252,7 @@ input[type="submit"] {
   background-color: #fab2bd;
 }
 .message.error .inner:before {
-  content: "!";
+  content: '!';
   background: #e71e27;
   color: #ffffff;
 }
@@ -272,7 +272,7 @@ input[type="submit"] {
   width: 20px;
   height: 20px;
   text-align: center;
-  content: "i";
+  content: 'i';
   background: #fbd326;
 }
 .message .inner p {
@@ -292,28 +292,29 @@ input[type="submit"] {
   width: 20px;
   height: 20px;
   text-align: center;
-  content: "x";
+  content: 'x';
   background: #fbd326;
   display: block;
   float: right;
 }
 html {
   background-color: #f3f3f3;
-  background-image: repeating-linear-gradient(
+  background-image:
+    repeating-linear-gradient(
       -45deg,
       rgba(255, 255, 255, 0.8),
       rgba(255, 255, 255, 0.8) 5px,
       rgba(255, 255, 255, 0.5) 5px,
       rgba(255, 255, 255, 0.5) 10px
     ),
-    url("../images/eherkenning/backdrop.jpg");
+    url('../images/eherkenning/backdrop.jpg');
   background-size: auto, cover;
   background-repeat: repeat, no-repeat;
   background-position: center;
   height: 100%;
 }
 body {
-  font-family: "PT Sans", sans-serif;
+  font-family: 'PT Sans', sans-serif;
   font-size: 16px;
   line-height: 1.46;
   color: #1c2f70;
@@ -388,24 +389,24 @@ p {
   font-size: 0.9em;
   margin-bottom: 20px;
 }
-.login form input[type="checkbox"],
-.login form select[type="checkbox"] {
+.login form input[type='checkbox'],
+.login form select[type='checkbox'] {
   width: auto;
   display: inline;
 }
 @media (min-width: 40.063em) {
-  .login form input[type="checkbox"],
-  .login form select[type="checkbox"] {
+  .login form input[type='checkbox'],
+  .login form select[type='checkbox'] {
     margin-top: 0;
   }
 }
-.login form input[type="checkbox"]:after,
-.login form select[type="checkbox"]:after {
-  content: " ";
+.login form input[type='checkbox']:after,
+.login form select[type='checkbox']:after {
+  content: ' ';
   display: block;
 }
-.login form input[type="submit"],
-.login form select[type="submit"] {
+.login form input[type='submit'],
+.login form select[type='submit'] {
   display: inline;
   text-align: center;
   background-color: #1c2f70;
@@ -420,8 +421,8 @@ p {
   background-position: right 5px center;
 }
 @media (min-width: 40.063em) {
-  .login form input[type="submit"],
-  .login form select[type="submit"] {
+  .login form input[type='submit'],
+  .login form select[type='submit'] {
     margin-top: 15px;
   }
 }
@@ -531,20 +532,20 @@ a.info:active span {
   }
 }
 .uservoice .inner:before {
-  content: "";
+  content: '';
   width: 53px;
   height: 40px;
-  background: url("../images/eherkenning/duimpje.svg") no-repeat;
+  background: url('../images/eherkenning/duimpje.svg') no-repeat;
   display: block;
   position: absolute;
   left: -3px;
   top: -4px;
 }
 .uservoice .inner:after {
-  content: "";
+  content: '';
   width: 30px;
   height: 30px;
-  background: url("../images/eherkenning/pijltje-donker.svg") no-repeat;
+  background: url('../images/eherkenning/pijltje-donker.svg') no-repeat;
   display: block;
   position: absolute;
   right: 5px;
@@ -557,7 +558,7 @@ a.info:active span {
 }
 @media (min-width: 1440px) {
   .uservoice .inner:after {
-    background: url("../images/eherkenning/pijltje.svg") no-repeat;
+    background: url('../images/eherkenning/pijltje.svg') no-repeat;
     right: 30px;
   }
 }
@@ -573,11 +574,11 @@ a.info:active span {
     display: inline;
   }
   .uservoice a:after {
-    content: "";
+    content: '';
     display: inline-block;
     width: 18px;
     height: 18px;
-    background: url("../images/eherkenning/pijltje.svg") no-repeat;
+    background: url('../images/eherkenning/pijltje.svg') no-repeat;
     background-size: contain;
     position: absolute;
     margin-left: 5px;

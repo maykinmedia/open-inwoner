@@ -1,2 +1,2 @@
-import './anchor-menu'
-import './anchor-menu-mobile'
+import './anchor-menu';
+import './anchor-menu-mobile';

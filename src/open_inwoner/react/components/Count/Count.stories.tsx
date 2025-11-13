@@ -1,10 +1,10 @@
-import { Meta, StoryObj } from '@storybook/react'
-import { IntlProvider } from 'react-intl'
-import Count from '@react/components/Count/Count'
+import { Meta, StoryObj } from '@storybook/react';
+import { IntlProvider } from 'react-intl';
+import Count from '@react/components/Count/Count';
 
 const messages = {
   'This is the current count': 'Dit is de huidige telling',
-}
+};
 
 const meta: Meta<typeof Count> = {
   title: 'React/Components/Count result',
@@ -16,10 +16,10 @@ const meta: Meta<typeof Count> = {
       </IntlProvider>
     ),
   ],
-}
-export default meta
+};
+export default meta;
 
-type Story = StoryObj<typeof Count>
+type Story = StoryObj<typeof Count>;
 
 export const Default: Story = {
   render: (args) => (
@@ -30,4 +30,4 @@ export const Default: Story = {
   args: {
     count: 42,
   },
-}
+};

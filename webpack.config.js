@@ -1,13 +1,13 @@
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const argv = require('yargs').argv
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const argv = require('yargs').argv;
 
-const paths = require('./build/paths')
+const paths = require('./build/paths');
 
 // Set isProduction based on environment or argv.
 
-let isProduction = process.env.NODE_ENV === 'production'
+let isProduction = process.env.NODE_ENV === 'production';
 if (argv.production) {
-  isProduction = true
+  isProduction = true;
 }
 
 /**
@@ -98,4 +98,4 @@ module.exports = {
 
   // Use --sourcemap to generate sourcemap.
   devtool: argv.sourcemap ? 'sourcemap' : false,
-}
+};

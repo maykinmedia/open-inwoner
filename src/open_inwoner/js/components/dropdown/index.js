@@ -1,21 +1,21 @@
 export class Dropdown {
-  static selector = '.dropdown'
+  static selector = '.dropdown';
 
   constructor(node) {
-    this.node = node
-    this.button = node.querySelector('.button')
-    this.button.addEventListener('click', this.toggleOpen.bind(this))
-    document.addEventListener('click', this.doClosing.bind(this), false)
-    document.addEventListener('keydown', this.doClosing.bind(this), false)
+    this.node = node;
+    this.button = node.querySelector('.button');
+    this.button.addEventListener('click', this.toggleOpen.bind(this));
+    document.addEventListener('click', this.doClosing.bind(this), false);
+    document.addEventListener('keydown', this.doClosing.bind(this), false);
   }
 
   toggleOpen(event) {
     // event.stopPropagation()
-    event.preventDefault()
+    event.preventDefault();
     setTimeout(() => {
-      this.node.classList.add('dropdown--open')
-      this.button.setAttribute('aria-expanded', 'true')
-    }, 5)
+      this.node.classList.add('dropdown--open');
+      this.button.setAttribute('aria-expanded', 'true');
+    }, 5);
   }
 
   doClosing(event) {
@@ -23,11 +23,11 @@ export class Dropdown {
       event.type === 'click' ||
       (event.type === 'keydown' && event.key === 'Escape')
     ) {
-      this.node.classList.remove('dropdown--open')
-      this.button.setAttribute('aria-expanded', 'false')
+      this.node.classList.remove('dropdown--open');
+      this.button.setAttribute('aria-expanded', 'false');
     }
   }
 }
 
-const dropdowns = document.querySelectorAll(Dropdown.selector)
-;[...dropdowns].forEach((dropdown) => new Dropdown(dropdown))
+const dropdowns = document.querySelectorAll(Dropdown.selector);
+[...dropdowns].forEach((dropdown) => new Dropdown(dropdown));

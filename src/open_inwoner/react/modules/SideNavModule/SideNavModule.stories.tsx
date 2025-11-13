@@ -1,5 +1,5 @@
-import { Meta, StoryObj } from '@storybook/react'
-import SideNavModule from './SideNavModule'
+import { Meta, StoryObj } from '@storybook/react';
+import SideNavModule from './SideNavModule';
 
 const meta: Meta = {
   title: 'React/Modules/SideNavModule',
@@ -21,34 +21,34 @@ SideNavModule is a Django-integrated React component that dynamically loads navi
   },
   decorators: [
     (Story) => {
-      const mockJsonScriptElement = document.createElement('script')
-      mockJsonScriptElement.id = 'sidenav-menu-data'
-      mockJsonScriptElement.type = 'application/json'
+      const mockJsonScriptElement = document.createElement('script');
+      mockJsonScriptElement.id = 'sidenav-menu-data';
+      mockJsonScriptElement.type = 'application/json';
 
-      const existingElement = document.getElementById('sidenav-menu-data')
+      const existingElement = document.getElementById('sidenav-menu-data');
       if (existingElement) {
-        existingElement.remove()
+        existingElement.remove();
       }
 
-      document.head.appendChild(mockJsonScriptElement)
+      document.head.appendChild(mockJsonScriptElement);
 
-      const mockRootElement = document.createElement('div')
-      mockRootElement.id = 'react-openinwoner-sidenav'
+      const mockRootElement = document.createElement('div');
+      mockRootElement.id = 'react-openinwoner-sidenav';
 
-      const existingRoot = document.getElementById('react-openinwoner-sidenav')
+      const existingRoot = document.getElementById('react-openinwoner-sidenav');
       if (existingRoot) {
-        existingRoot.remove()
+        existingRoot.remove();
       }
 
-      document.body.appendChild(mockRootElement)
+      document.body.appendChild(mockRootElement);
 
-      return <Story />
+      return <Story />;
     },
   ],
-}
-export default meta
+};
+export default meta;
 
-type Story = StoryObj
+type Story = StoryObj;
 
 export const BasicNavigation: Story = {
   name: 'Basic Navigation Menu',
@@ -64,7 +64,7 @@ Shows the basic SideNavModule functionality with a complete navigation menu load
     },
   },
   render: () => {
-    const scriptElement = document.getElementById('sidenav-menu-data')
+    const scriptElement = document.getElementById('sidenav-menu-data');
     if (scriptElement) {
       scriptElement.textContent = JSON.stringify([
         {
@@ -86,11 +86,11 @@ Shows the basic SideNavModule functionality with a complete navigation menu load
           current: false,
           counter: 3,
         },
-      ])
+      ]);
     }
-    return SideNavModule.root
+    return SideNavModule.root;
   },
-}
+};
 
 export const ServerComposedNavigation: Story = {
   name: 'Server-Composed Navigation',
@@ -108,7 +108,7 @@ Demonstrates how SideNavModule now receives complete navigation data from Django
     },
   },
   render: () => {
-    const scriptElement = document.getElementById('sidenav-menu-data')
+    const scriptElement = document.getElementById('sidenav-menu-data');
     if (scriptElement) {
       scriptElement.textContent = JSON.stringify([
         {
@@ -131,12 +131,12 @@ Demonstrates how SideNavModule now receives complete navigation data from Django
           current: false,
           counter: null,
         },
-      ])
+      ]);
     }
 
-    return SideNavModule.root
+    return SideNavModule.root;
   },
-}
+};
 
 export const EmptyMenuFallback: Story = {
   name: 'Empty Menu Array - Fallback Data',
@@ -153,13 +153,13 @@ Shows how SideNavModule handles empty menu data by falling back to default navig
     },
   },
   render: () => {
-    const scriptElement = document.getElementById('sidenav-menu-data')
+    const scriptElement = document.getElementById('sidenav-menu-data');
     if (scriptElement) {
-      scriptElement.textContent = JSON.stringify([])
+      scriptElement.textContent = JSON.stringify([]);
     }
-    return SideNavModule.root
+    return SideNavModule.root;
   },
-}
+};
 
 export const EmptyScriptFallback: Story = {
   name: 'Empty Script Content - Fallback Data',
@@ -176,13 +176,13 @@ Demonstrates the fallback behavior when the script tag exists but contains empty
     },
   },
   render: () => {
-    const scriptElement = document.getElementById('sidenav-menu-data')
+    const scriptElement = document.getElementById('sidenav-menu-data');
     if (scriptElement) {
-      scriptElement.textContent = ''
+      scriptElement.textContent = '';
     }
-    return SideNavModule.root
+    return SideNavModule.root;
   },
-}
+};
 
 export const InvalidJsonFallback: Story = {
   name: 'Invalid JSON - Error Recovery',
@@ -200,10 +200,10 @@ Shows the error recovery mechanism when the script tag contains malformed JSON. 
     },
   },
   render: () => {
-    const scriptElement = document.getElementById('sidenav-menu-data')
+    const scriptElement = document.getElementById('sidenav-menu-data');
     if (scriptElement) {
-      scriptElement.textContent = '{ invalid json'
+      scriptElement.textContent = '{ invalid json';
     }
-    return SideNavModule.root
+    return SideNavModule.root;
   },
-}
+};

@@ -1,5 +1,4 @@
 ---
-
 server:
   http_listen_port: 9080
   grpc_listen_port: 0
@@ -14,11 +13,11 @@ scrape_configs:
   # default config from the container, scraping itself
   - job_name: system
     static_configs:
-    - targets:
-        - localhost
-      labels:
-        job: varlogs
-        __path__: /var/log/*log
+      - targets:
+          - localhost
+        labels:
+          job: varlogs
+          __path__: /var/log/*log
   # docker service discovery
   - job_name: docker
     docker_sd_configs:
@@ -26,30 +25,30 @@ scrape_configs:
         refresh_interval: 5s
     relabel_configs:
       - source_labels:
-        - __meta_docker_container_name
+          - __meta_docker_container_name
         regex: /(.*)
         target_label: container
       - source_labels:
-        - __meta_docker_container_log_stream
+          - __meta_docker_container_log_stream
         target_label: logstream
       - source_labels:
-        - __meta_docker_container_label_client
+          - __meta_docker_container_label_client
         target_label: client
       - source_labels:
-        - __meta_docker_container_label_app
+          - __meta_docker_container_label_app
         target_label: app
       - source_labels:
-        - __meta_docker_container_label_target
+          - __meta_docker_container_label_target
         target_label: target
       - source_labels:
-        - __meta_docker_container_label_service
+          - __meta_docker_container_label_service
         target_label: service
       - source_labels:
-        - __meta_docker_container_label_app
+          - __meta_docker_container_label_app
         action: drop
         regex: promtail
     pipeline_stages:
-    - docker: {}
-    - static_labels:
-        job: docker
-        instance: docker.host.internal
+      - docker: {}
+      - static_labels:
+          job: docker
+          instance: docker.host.internal

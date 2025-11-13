@@ -1,4 +1,4 @@
-const SUBMIT_ONCE_BUTTONS = document.querySelectorAll('.submit-once-button')
+const SUBMIT_ONCE_BUTTONS = document.querySelectorAll('.submit-once-button');
 
 /**
  * SubmitOnceButton Class
@@ -10,15 +10,15 @@ class SubmitOnceButton {
    * @param {HTMLButtonElement} node - The button DOM element to apply the submit-once behavior to
    */
   constructor(node) {
-    this.node = node
-    this.bindEvents()
+    this.node = node;
+    this.bindEvents();
   }
 
   /**
    * Set up the event listeners for this button
    */
   bindEvents() {
-    this.node.addEventListener('click', this.submitButton.bind(this))
+    this.node.addEventListener('click', this.submitButton.bind(this));
   }
 
   /**
@@ -29,13 +29,13 @@ class SubmitOnceButton {
    */
   submitButton(e) {
     // Prevent the default form submission
-    e.preventDefault()
+    e.preventDefault();
 
     // Manually submit the form
-    this.node.form.submit()
+    this.node.form.submit();
 
     // Disable the button to prevent multiple submissions
-    this.disableButton()
+    this.disableButton();
   }
 
   /**
@@ -45,13 +45,13 @@ class SubmitOnceButton {
    */
   disableButton() {
     // Add disabled styling
-    this.node.classList.add('button--disabled')
+    this.node.classList.add('button--disabled');
 
     // Update attributes to indicate the button is disabled
-    this.node.setAttribute('disabled', 'true')
-    this.node.setAttribute('aria-disabled', 'true')
+    this.node.setAttribute('disabled', 'true');
+    this.node.setAttribute('aria-disabled', 'true');
   }
 }
 
 // Start!
-;[...SUBMIT_ONCE_BUTTONS].forEach((node) => new SubmitOnceButton(node))
+[...SUBMIT_ONCE_BUTTONS].forEach((node) => new SubmitOnceButton(node));

@@ -1,13 +1,13 @@
 export class EnlargeFont {
-  static selector = '.accessibility--enlarge-font'
+  static selector = '.accessibility--enlarge-font';
 
   constructor(node) {
-    this.node = node
-    this.text = node.querySelector('.link__text')
-    this.icon = node.querySelector('.material-icons')
-    this.node.addEventListener('click', this.enlarge.bind(this))
+    this.node = node;
+    this.text = node.querySelector('.link__text');
+    this.icon = node.querySelector('.material-icons');
+    this.node.addEventListener('click', this.enlarge.bind(this));
 
-    this.root = document.documentElement
+    this.root = document.documentElement;
 
     // Target specific sizes that need to be enlarged
     this.styles = {
@@ -18,7 +18,7 @@ export class EnlargeFont {
       headingFourFontSize: '--utrecht-heading-4-font-size',
       // OIP specific card-heading
       oipCardHeadingFontSize: '--font-size-heading-card',
-    }
+    };
 
     // Set initial values for toggling default styles
     this.baseSizes = {
@@ -27,7 +27,7 @@ export class EnlargeFont {
       headingThree: '20px',
       headingFour: '16px',
       cardHeading: '18px',
-    }
+    };
 
     // Enlarge the different types of body-font as well as paragraphs
     // and set all lower types of headings (lower than H2) to get the same larger font-size
@@ -35,58 +35,58 @@ export class EnlargeFont {
       default: '20px',
       small: '17px',
       headings: '22px',
-    }
+    };
 
-    this.setInitialStyles()
+    this.setInitialStyles();
   }
 
   setInitialStyles() {
     Object.keys(this.styles).forEach((key) => {
-      const sizeKey = this.getSizeKey(key)
-      this.root.style.setProperty(this.styles[key], this.baseSizes[sizeKey])
-    })
+      const sizeKey = this.getSizeKey(key);
+      this.root.style.setProperty(this.styles[key], this.baseSizes[sizeKey]);
+    });
   }
 
   // Target both NL Design System values and legacy variables by their component type
   getSizeKey(styleKey) {
-    if (styleKey.includes('Small')) return 'small'
-    if (styleKey.includes('Three')) return 'headingThree'
-    if (styleKey.includes('Four')) return 'headingFour'
-    if (styleKey.includes('CardHeading')) return 'cardHeading'
-    return 'default'
+    if (styleKey.includes('Small')) return 'small';
+    if (styleKey.includes('Three')) return 'headingThree';
+    if (styleKey.includes('Four')) return 'headingFour';
+    if (styleKey.includes('CardHeading')) return 'cardHeading';
+    return 'default';
   }
 
   enlarge(event) {
-    event.preventDefault()
+    event.preventDefault();
 
     const isEnlarged =
       this.root.style.getPropertyValue(this.styles.bodyFontSizeDefault) ===
-      this.enlargeSizes.default
+      this.enlargeSizes.default;
 
     // Loop through all styles and set either the enlarged size or the base size
     Object.keys(this.styles).forEach((key) => {
-      const sizeKey = this.getSizeKey(key)
+      const sizeKey = this.getSizeKey(key);
       this.root.style.setProperty(
         this.styles[key],
         isEnlarged
           ? this.baseSizes[sizeKey]
           : this.enlargeSizes[sizeKey] || this.enlargeSizes.headings
-      )
-    })
+      );
+    });
 
     // Update text, aria-label, and title based on the state
     if (isEnlarged) {
       // Set back to original state
-      this.text.innerText = this.node.dataset.text
-      this.node.setAttribute('aria-label', this.node.dataset.text)
-      this.node.setAttribute('title', this.node.dataset.text)
-      this.icon.innerText = this.node.dataset.icon
+      this.text.innerText = this.node.dataset.text;
+      this.node.setAttribute('aria-label', this.node.dataset.text);
+      this.node.setAttribute('title', this.node.dataset.text);
+      this.icon.innerText = this.node.dataset.icon;
     } else {
       // Switch to larger font state
-      this.text.innerText = this.node.dataset.altText
-      this.node.setAttribute('aria-label', this.node.dataset.altText)
-      this.node.setAttribute('title', this.node.dataset.altText)
-      this.icon.innerText = this.node.dataset.altIcon
+      this.text.innerText = this.node.dataset.altText;
+      this.node.setAttribute('aria-label', this.node.dataset.altText);
+      this.node.setAttribute('title', this.node.dataset.altText);
+      this.icon.innerText = this.node.dataset.altIcon;
     }
   }
 }
@@ -96,4 +96,4 @@ export class EnlargeFont {
  */
 document
   .querySelectorAll(EnlargeFont.selector)
-  .forEach((enlargeButton) => new EnlargeFont(enlargeButton))
+  .forEach((enlargeButton) => new EnlargeFont(enlargeButton));

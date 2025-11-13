@@ -1,18 +1,18 @@
-import { useState } from 'react'
-import { createPortal } from 'react-dom'
-import Count from '@react/components/Count/Count'
-import Counter from '@react/components/Counter/Counter'
+import { useState } from 'react';
+import { createPortal } from 'react-dom';
+import Count from '@react/components/Count/Count';
+import Counter from '@react/components/Counter/Counter';
 
 export interface DemoProps {
-  countNode: HTMLDivElement | null
-  counterNode: HTMLDivElement | null
+  countNode: HTMLDivElement | null;
+  counterNode: HTMLDivElement | null;
 }
 
 /**
  * Main component to manage everything demo related.
  */
 const Demo: React.FC<DemoProps> = ({ countNode, counterNode }) => {
-  const [count, setCount] = useState(1)
+  const [count, setCount] = useState(1);
 
   return (
     <>
@@ -23,7 +23,7 @@ const Demo: React.FC<DemoProps> = ({ countNode, counterNode }) => {
           counterNode
         )}
     </>
-  )
-}
+  );
+};
 
-export default Demo
+export default Demo;

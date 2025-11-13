@@ -1,1 +1,1 @@
-export { KVKBranchSelector } from './KVKBranchSelector'
+export { KVKBranchSelector } from './KVKBranchSelector';

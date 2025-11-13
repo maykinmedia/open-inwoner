@@ -34,3 +34,6 @@ f851eac2759d7dd65687dce1869037296511140c
 
 # refactor: apply ruff TID252 prohibit relative import from parents
 d2e40fbe2f6d8887ae16ffd5be45d84fb7e0c368
+
+# refactor: apply new prettier rules
+c307bc411297480eebb02306769923beccf205f5

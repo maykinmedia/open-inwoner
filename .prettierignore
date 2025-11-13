@@ -1,8 +1,4 @@
-frontend/
-static/
-src/open_inwoner/static/
-media/
-docs/
-bin/
-deployment/
-src/open_inwoner/react/i18n/compiled/
+# Templates, which cannot be formatted by prettier due to
+# Django's templating language
+**/templates/**/*.html
+src/open_inwoner/conf/parts

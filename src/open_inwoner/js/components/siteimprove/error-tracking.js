@@ -7,12 +7,12 @@ if (window.IS_DEV && typeof _sz === 'undefined') {
   var _sz = {
     push: function (data) {
       try {
-        console.log('Event pushed to _sz:', data)
+        console.log('Event pushed to _sz:', data);
       } catch (error) {
-        console.error('Error occurred while pushing event data:', error)
+        console.error('Error occurred while pushing event data:', error);
       }
     },
-  }
+  };
 }
 
 /**
@@ -21,9 +21,9 @@ if (window.IS_DEV && typeof _sz === 'undefined') {
  */
 class DynamicFileInputErrors {
   constructor() {
-    this.initialized = false
-    this.previousErrorState = new Map()
-    this.bindEvents()
+    this.initialized = false;
+    this.previousErrorState = new Map();
+    this.bindEvents();
   }
 
   /**
@@ -32,11 +32,11 @@ class DynamicFileInputErrors {
    */
   bindEvents() {
     if (this.#formElement && !this.initialized) {
-      this.initialized = true
+      this.initialized = true;
       this.#formElement.addEventListener(
         'change',
         this.handleChanges.bind(this)
-      )
+      );
     }
   }
 
@@ -46,28 +46,28 @@ class DynamicFileInputErrors {
    */
   handleChanges(event) {
     if (!this.#fileInputElement || event.target !== this.#fileInputElement)
-      return
+      return;
 
     const currentErrors = Object.entries(this.#occurringErrors).reduce(
       (acc, [key, nodes]) => {
         nodes.forEach((node) => {
           const fileName =
             node.querySelector('.file__name').textContent ??
-            [...this.#fileListElement.children].indexOf(node)
-          acc.set(fileName, this.#ERROR_MAP[key])
-        })
-        return acc
+            [...this.#fileListElement.children].indexOf(node);
+          acc.set(fileName, this.#ERROR_MAP[key]);
+        });
+        return acc;
       },
       new Map()
-    )
+    );
 
     currentErrors.forEach((message, id) => {
       if (!this.previousErrorState.has(id) && typeof _sz !== 'undefined')
-        _sz.push(['event', 'Mijn zaken', 'Error', message])
-    })
+        _sz.push(['event', 'Mijn zaken', 'Error', message]);
+    });
 
     // Update previous error state only with persistent errors
-    this.previousErrorState = currentErrors
+    this.previousErrorState = currentErrors;
   }
 
   /**
@@ -79,7 +79,7 @@ class DynamicFileInputErrors {
       type: 'Error verkeerd bestand type.',
       size: 'Error bestand te groot.',
       typeSize: 'Error bestand te groot en van verkeerde type.',
-    }
+    };
   }
 
   /**
@@ -88,7 +88,7 @@ class DynamicFileInputErrors {
    * @private
    */
   get #formElement() {
-    return document.querySelector('#document-upload')
+    return document.querySelector('#document-upload');
   }
 
   /**
@@ -97,7 +97,7 @@ class DynamicFileInputErrors {
    * @private
    */
   get #fileInputElement() {
-    return document.querySelector('#document-upload .file-input__input')
+    return document.querySelector('#document-upload .file-input__input');
   }
 
   /**
@@ -106,7 +106,7 @@ class DynamicFileInputErrors {
    * @private
    */
   get #fileListElement() {
-    return document.querySelector('#document-upload .file-list__list')
+    return document.querySelector('#document-upload .file-list__list');
   }
 
   /**
@@ -122,7 +122,7 @@ class DynamicFileInputErrors {
       typeSize: document.querySelectorAll(
         '.file:has(.error > .file-error__type-size)'
       ),
-    }
+    };
   }
 }
 
@@ -130,4 +130,4 @@ class DynamicFileInputErrors {
 document.body.addEventListener(
   'htmx:afterSwap',
   () => new DynamicFileInputErrors()
-)
+);

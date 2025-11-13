@@ -1,7 +1,7 @@
 # Keycloak infrastructure
 
-Open Inwoner supports OpenID Connect as an authentication protocol. Keycloak is an
-example of an Identity Provider that supports OIDC.
+Open Inwoner supports OpenID Connect as an authentication protocol. Keycloak is
+an example of an Identity Provider that supports OIDC.
 
 We include a compose stack for development and testing/CI purposes. This is
 **NOT** suitable for production usage.

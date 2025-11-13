@@ -1,6 +1,6 @@
 // From https://github.com/arbakker/pdok-js-map-examples/blob/master/leaflet-tms-epsg28992/index.js
-import * as L from 'leaflet'
-import 'proj4leaflet'
+import * as L from 'leaflet';
+import 'proj4leaflet';
 
 /**
  * see "Nederlandse richtlijn tiling"
@@ -11,7 +11,7 @@ import 'proj4leaflet'
 const RES = [
   3440.64, 1720.32, 860.16, 430.08, 215.04, 107.52, 53.76, 26.88, 13.44, 6.72,
   3.36, 1.68, 0.84, 0.42,
-]
+];
 
 /*jshint multistr: true */
 const RD =
@@ -24,7 +24,7 @@ const RD =
 +ellps=bessel \
 +units=m \
 +towgs84=565.2369,50.0087,465.658,-0.406857330322398,0.350732676542563,-1.8703473836068,4.0812 \
-+no_defs'
++no_defs';
 
 // @ts-ignore
 const RD_CRS = new L.Proj.CRS('EPSG:28992', RD, {
@@ -32,6 +32,6 @@ const RD_CRS = new L.Proj.CRS('EPSG:28992', RD, {
   origin: [-285401.92, 903401.92],
   transformation: new L.Transformation(-1, 0, -1, 0),
   bounds: L.bounds([-285401.92, 903401.92], [595401.92, 22598.08]),
-})
+});
 
-export { RD_CRS }
+export { RD_CRS };

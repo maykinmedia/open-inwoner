@@ -1,6 +1,6 @@
-import { StorybookConfig } from '@storybook/react-vite'
-import path from 'path'
-import { mergeConfig } from 'vite'
+import { StorybookConfig } from '@storybook/react-vite';
+import path from 'path';
+import { mergeConfig } from 'vite';
 
 const config: StorybookConfig = {
   framework: {
@@ -14,10 +14,7 @@ const config: StorybookConfig = {
     '../src/**/*.stories.@(js|jsx|ts|tsx|mdx)',
     '../src/open_inwoner/react/components/**/*.stories.@(js|jsx|ts|tsx)',
   ],
-  addons: [
-    '@storybook/addon-essentials',
-    '@chromatic-com/storybook',
-  ],
+  addons: ['@storybook/addon-essentials', '@chromatic-com/storybook'],
   docs: {
     autodocs: true,
   },
@@ -28,7 +25,10 @@ const config: StorybookConfig = {
       resolve: {
         alias: {
           '@react': path.resolve(__dirname, '../src/open_inwoner/react'),
-          '@webcomponents': path.resolve(__dirname, '../src/open_inwoner/webcomponents'),
+          '@webcomponents': path.resolve(
+            __dirname,
+            '../src/open_inwoner/webcomponents'
+          ),
         },
         extensions: ['.js', '.jsx', '.ts', '.tsx', '.json', '.mdx'],
       },
@@ -49,13 +49,13 @@ const config: StorybookConfig = {
       esbuild: {
         jsx: 'automatic',
       },
-    })
+    });
   },
 
   typescript: {
     check: false, // Disable TypeScript checking to avoid conflicts
     reactDocgen: 'react-docgen-typescript',
   },
-}
+};
 
-export default config
+export default config;

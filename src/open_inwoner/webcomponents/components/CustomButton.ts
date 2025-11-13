@@ -1,5 +1,5 @@
-import { LitElement, html, css } from 'lit'
-import { customElement, property } from 'lit/decorators.js'
+import { LitElement, html, css } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
 
 /**
  * Custom Button Web Component using Lit
@@ -8,16 +8,16 @@ import { customElement, property } from 'lit/decorators.js'
 @customElement('custom-button')
 class CustomButton extends LitElement {
   @property({ type: String })
-  accessor variant: string
+  accessor variant: string;
 
   @property({ type: String })
-  accessor size: string
+  accessor size: string;
 
   @property({ type: Boolean })
-  accessor disabled: boolean
+  accessor disabled: boolean;
 
   @property({ type: Number })
-  accessor clickCount: number
+  accessor clickCount: number;
 
   static styles = css`
     :host {
@@ -48,18 +48,18 @@ class CustomButton extends LitElement {
     .click-count {
       margin-left: 8px;
     }
-  `
+  `;
 
   constructor() {
-    super()
-    this.variant = 'primary'
-    this.size = 'medium'
-    this.disabled = false
-    this.clickCount = 0
+    super();
+    this.variant = 'primary';
+    this.size = 'medium';
+    this.disabled = false;
+    this.clickCount = 0;
   }
 
   increment() {
-    this.clickCount = this.clickCount + 1
+    this.clickCount = this.clickCount + 1;
   }
 
   render() {
@@ -69,8 +69,8 @@ class CustomButton extends LitElement {
         <slot name="icon"></slot>
       </button>
       <span class="click-count">Clicked: ${this.clickCount}</span>
-    `
+    `;
   }
 }
 
-export default CustomButton
+export default CustomButton;

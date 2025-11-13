@@ -5,15 +5,15 @@
  * @returns The parsed JSON data or undefined if not found/invalid
  */
 export function getJsonFromScriptTag<T = unknown>(id: string): T | undefined {
-  const scriptElement = document.getElementById(id)
+  const scriptElement = document.getElementById(id);
   if (!scriptElement?.textContent) {
-    return undefined
+    return undefined;
   }
 
   try {
-    return JSON.parse(scriptElement.textContent) as T
+    return JSON.parse(scriptElement.textContent) as T;
   } catch (error) {
-    console.error('Failed to parse JSON:', scriptElement.textContent, error)
-    return undefined
+    console.error('Failed to parse JSON:', scriptElement.textContent, error);
+    return undefined;
   }
 }

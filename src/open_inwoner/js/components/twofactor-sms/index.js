@@ -1,13 +1,13 @@
 // used for the anchor tag (link for resending the token via a more secure way - POST request)
 
-import { getCsrfTokenFromDom } from '../../utils'
+import { getCsrfTokenFromDom } from '../../utils';
 
 document.addEventListener('DOMContentLoaded', function () {
-  var postRequests = document.querySelectorAll('.resend-token-post-request')
+  var postRequests = document.querySelectorAll('.resend-token-post-request');
 
   postRequests.forEach(function (element) {
     element.addEventListener('click', function (event) {
-      event.preventDefault()
+      event.preventDefault();
 
       fetch(element.href, {
         method: 'POST',
@@ -16,8 +16,8 @@ document.addEventListener('DOMContentLoaded', function () {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
       }).then((res) => {
-        window.location.reload()
-      })
-    })
-  })
-})
+        window.location.reload();
+      });
+    });
+  });
+});

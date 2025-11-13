@@ -1,283 +1,296 @@
 /* Tags: general styles for all templates */
 
-table, th, td, img {
-    border: 0;
-    border-spacing: 0;
-    padding: 0;
+table,
+th,
+td,
+img {
+  border: 0;
+  border-spacing: 0;
+  padding: 0;
 }
 
 th {
-    font-weight: bold;
-    padding: 18px 20px 18px 20px;
-    text-align: left;
+  font-weight: bold;
+  padding: 18px 20px 18px 20px;
+  text-align: left;
 }
 
 p {
-    padding: 0;
-    margin: 0;
+  padding: 0;
+  margin: 0;
 }
 
-.heading-font, h1, h2, h3, h4 {
-    color: #000000;
-    font-family: Ubuntu, Helvetica, Arial, sans-serif;
-    font-weight: bold;
-    padding: 0;
-    margin: 0;
+.heading-font,
+h1,
+h2,
+h3,
+h4 {
+  color: #000000;
+  font-family: Ubuntu, Helvetica, Arial, sans-serif;
+  font-weight: bold;
+  padding: 0;
+  margin: 0;
 }
 
-table, .table-mail {
-    /* --color-gray-dark */
-    background-color: #ffffff;
-    border-spacing: 0;
-    border-collapse: collapse;
-    color: #4B4B4B;
-    font-family: Lato, Helvetica, sans-serif;
-    line-height: 24px;
+table,
+.table-mail {
+  /* --color-gray-dark */
+  background-color: #ffffff;
+  border-spacing: 0;
+  border-collapse: collapse;
+  color: #4b4b4b;
+  font-family: Lato, Helvetica, sans-serif;
+  line-height: 24px;
 }
 
-td, .td-mail {
-    /* --color-gray-dark */
-    color: #4B4B4B;
-    font-family: Lato, Helvetica, Arial, sans-serif;
-    line-height: 24px;
+td,
+.td-mail {
+  /* --color-gray-dark */
+  color: #4b4b4b;
+  font-family: Lato, Helvetica, Arial, sans-serif;
+  line-height: 24px;
 }
 
 /* Class styles for differing elements */
 
 .td-mail__bg-danger .td-mail__bg-white a {
-    color: #704000;
+  color: #704000;
 }
 
-.td-mail__bg-info .td-mail__bg-white a, .td-mail__bg-info a, .td__info-link a {
-    color: #2566A7;
+.td-mail__bg-info .td-mail__bg-white a,
+.td-mail__bg-info a,
+.td__info-link a {
+  color: #2566a7;
 }
 
 .td-mail__bg-success .td-mail__bg-white a {
-    color: #4A7746;
+  color: #4a7746;
 }
 
 .td__logo-mail {
-    text-align: center;
-    padding-top: 16px;
-    padding-bottom: 24px;
+  text-align: center;
+  padding-top: 16px;
+  padding-bottom: 24px;
 }
 
 .img__logo-mail {
-    width: auto;
-    max-height: 55px;
-    max-width: 600px;
+  width: auto;
+  max-height: 55px;
+  max-width: 600px;
 }
 
 .mail__icon {
-    padding-right: 8px;
-    margin-right: 0;
-    width: 20px;
-    height: 20px;
+  padding-right: 8px;
+  margin-right: 0;
+  width: 20px;
+  height: 20px;
 }
 
 .td-mail h1 {
-    font-size: 20px;
+  font-size: 20px;
 }
 
 .td-mail h2 {
-    font-size: 18px;
+  font-size: 18px;
 }
 
 .td-mail.align-top {
-    vertical-align: top;
+  vertical-align: top;
 }
 
 td.align-center {
-    vertical-align: middle;
+  vertical-align: middle;
 }
 
 .tr-mail.border-top .td-mail {
-    border-top: 1px solid #d2d2d2;
+  border-top: 1px solid #d2d2d2;
 }
 
 .td-mail.spacer-bottom {
-    border-bottom: 1px solid #d2d2d2;
-    padding-top: 60px;
+  border-bottom: 1px solid #d2d2d2;
+  padding-top: 60px;
 }
 
 .td-mail--accent {
-    height: 24px;
+  height: 24px;
 }
 
 .td-mail__bg-info {
-    background-color: #eef5fc;
+  background-color: #eef5fc;
 }
 
 .td-mail__bg-success {
-    background-color: #edf6ef;
+  background-color: #edf6ef;
 }
 
 .td-mail__bg-danger {
-    background-color: #fef8f1;
+  background-color: #fef8f1;
 }
 
 .td-mail__bg-white {
-    background-color: #ffffff;
-    color: #4B4B4B;
-    font-family: Lato, Helvetica, Arial, sans-serif;
-    font-size: 16px;
-    line-height: 24px;
-    margin: auto;
-    text-decoration: none;
-    width: 100%;
-    -webkit-text-size-adjust: none;
+  background-color: #ffffff;
+  color: #4b4b4b;
+  font-family: Lato, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  margin: auto;
+  text-decoration: none;
+  width: 100%;
+  -webkit-text-size-adjust: none;
 }
 
 .mail-cell--rounded {
-    border: 1px solid #ffffff;
-    border-radius: 3px;
-    display: inline-block;
-    margin: 3px;
-    padding: 3px;
+  border: 1px solid #ffffff;
+  border-radius: 3px;
+  display: inline-block;
+  margin: 3px;
+  padding: 3px;
 }
 
 .mail--transparent {
-    background-color: transparent;
+  background-color: transparent;
 }
 
 .td__padding-top {
-    padding-top: 24px;
+  padding-top: 24px;
 }
 
 .td__padding-right {
-    padding-right: 24px;
+  padding-right: 24px;
 }
 
 .td__padding-bottom {
-    padding-bottom: 24px;
+  padding-bottom: 24px;
 }
 
 .td__padding-left {
-    padding-left: 24px;
+  padding-left: 24px;
 }
 
 .td__padding-all {
-    padding: 20px 24px 20px 24px;
+  padding: 20px 24px 20px 24px;
 }
 
 .cell--rounded-padding {
-    padding: 20px 30px 20px 20px;
+  padding: 20px 30px 20px 20px;
 }
 
 .td__padding-small {
-    padding: 16px;
+  padding: 16px;
 }
 
 .td__padding-zero {
-    padding: 0;
+  padding: 0;
 }
 
 .td__nowrap {
-    white-space: nowrap;
+  white-space: nowrap;
 }
 
 .td__alignright {
-    text-align: right;
+  text-align: right;
 }
 
 .td__rightcell.td__nowrap {
-    min-width: 200px;
+  min-width: 200px;
 }
 
 .spacing__extra {
-    height: 20px;
+  height: 20px;
 }
 
 .button--primary {
-    border: 1px solid transparent;
-    border-radius: 3px;
-    color: #ffffff;
-    display: inline-block;
-    font-family: sans-serif;
-    font-size: 16px;
-    line-height: 44px;
-    margin-top: 24px;
-    text-align: center;
-    text-decoration: none;
-    width: 100%;
-    -webkit-text-size-adjust: none;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  color: #ffffff;
+  display: inline-block;
+  font-family: sans-serif;
+  font-size: 16px;
+  line-height: 44px;
+  margin-top: 24px;
+  text-align: center;
+  text-decoration: none;
+  width: 100%;
+  -webkit-text-size-adjust: none;
 }
 
 /* Theme-colors and other mail-template colors */
 
 .text-color__info {
-    color: #2566A7;
+  color: #2566a7;
 }
 
 .text-color__success {
-    color: #4A7746;
+  color: #4a7746;
 }
 
 .text-color__danger {
-    color: #704000;
+  color: #704000;
 }
 
 .text-color__gray-900 {
-    /* --color-gray-dark-900 */
-    color: #676767;
+  /* --color-gray-dark-900 */
+  color: #676767;
 }
 
 .text-color__small-gray-900 {
-    color: #676767;
-    font-size: 14px;
+  color: #676767;
+  font-size: 14px;
 }
 
-strong .color--primary, strong .color--secondary {
-    line-height: 42px;
-    text-decoration: none;
+strong .color--primary,
+strong .color--secondary {
+  line-height: 42px;
+  text-decoration: none;
 }
 
 .table-mail--lined {
-    border: 1px solid #999999;
-    margin: auto;
-    width: 100%;
+  border: 1px solid #999999;
+  margin: auto;
+  width: 100%;
 }
 
 .table-mail--lined th {
-    border: 1px solid #999999;
-    padding: 8px;
-    text-align: left;
-    vertical-align: baseline;
+  border: 1px solid #999999;
+  padding: 8px;
+  text-align: left;
+  vertical-align: baseline;
 }
 
 .table-mail--lined td {
-    border: 1px solid #d2d2d2;
-    padding: 8px;
+  border: 1px solid #d2d2d2;
+  padding: 8px;
 }
 
 /* Specific nested tables */
 
 .table-mail--lined td.border-bottom--zero {
-    border-bottom: 0px solid transparent;
+  border-bottom: 0px solid transparent;
 }
 
-.table-mail--lined th.border-top--bold, .table-mail--lined td.border-top--bold {
-    border-top: 3px solid #999999;
+.table-mail--lined th.border-top--bold,
+.table-mail--lined td.border-top--bold {
+  border-top: 3px solid #999999;
 }
 
 /* iOS specific */
 
 .skip-phone-parsing {
-    pointer-events: none;
+  pointer-events: none;
 }
 
 .skip-phone-parsing > a {
-    text-decoration: none;
-    color: inherit;
+  text-decoration: none;
+  color: inherit;
 }
 
 /* CKEditor only */
 
 .cke_editable a {
-    color: #248641;
+  color: #248641;
 }
 
 .cke_editable .button--primary {
-    background-color: #0065BD;
-    color: #FFFFFF;
+  background-color: #0065bd;
+  color: #ffffff;
 }

@@ -1,5 +1,4 @@
 ---
-
 # Taken and adapted from https://grafana.com/docs/loki/latest/setup/install/docker/#install-with-docker-compose
 
 services:
@@ -7,7 +6,7 @@ services:
   loki:
     image: grafana/loki:latest
     ports:
-      - "3100:3100"
+      - '3100:3100'
     command: -config.file=/etc/loki/local-config.yaml
     networks:
       - openinwoner-dev
@@ -15,7 +14,7 @@ services:
   prometheus:
     image: prom/prometheus:latest
     ports:
-      - "9090:9090"
+      - '9090:9090'
     volumes:
       - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus-tsdb:/prometheus
@@ -60,7 +59,7 @@ services:
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
       - GF_FEATURE_TOGGLES_ENABLE=alertingSimplifiedRouting,alertingQueryAndExpressionsStepMode
     ports:
-      - "3000:3000"
+      - '3000:3000'
     networks:
       - openinwoner-dev
 

@@ -1,6 +1,6 @@
-import { Meta, StoryObj } from '@storybook/react'
-import { IntlProvider } from 'react-intl'
-import KVKBranchSelectorModule from './KVKBranchSelectorModule'
+import { Meta, StoryObj } from '@storybook/react';
+import { IntlProvider } from 'react-intl';
+import KVKBranchSelectorModule from './KVKBranchSelectorModule';
 
 const meta: Meta = {
   title: 'React/Modules/KVKBranchSelectorModule',
@@ -53,36 +53,36 @@ The module automatically initializes components with \`data-react-module="kvkbra
   decorators: [
     (Story) => {
       // Create the script tag for branch data (Django would render this)
-      const scriptElement = document.createElement('script')
-      scriptElement.id = 'branch-data'
-      scriptElement.type = 'application/json'
+      const scriptElement = document.createElement('script');
+      scriptElement.id = 'branch-data';
+      scriptElement.type = 'application/json';
 
       // Remove existing script if present
-      const existingScript = document.getElementById('branch-data')
+      const existingScript = document.getElementById('branch-data');
       if (existingScript) {
-        existingScript.remove()
+        existingScript.remove();
       }
 
-      document.head.appendChild(scriptElement)
+      document.head.appendChild(scriptElement);
 
       // Create the root element with data attributes (Django would render this)
-      const rootElement = document.createElement('div')
-      rootElement.id = 'react-kvkbranchselector'
-      rootElement.setAttribute('data-react-module', 'kvkbranchselector')
-      rootElement.setAttribute('data-id', 'branch-selector')
+      const rootElement = document.createElement('div');
+      rootElement.id = 'react-kvkbranchselector';
+      rootElement.setAttribute('data-react-module', 'kvkbranchselector');
+      rootElement.setAttribute('data-id', 'branch-selector');
       rootElement.setAttribute(
         'data-label',
         'Selecteer de vestiging waarmee u wilt inloggen'
-      )
-      rootElement.setAttribute('data-name', 'branch_number')
+      );
+      rootElement.setAttribute('data-name', 'branch_number');
 
       // Remove existing root if present
-      const existingRoot = document.getElementById('react-kvkbranchselector')
+      const existingRoot = document.getElementById('react-kvkbranchselector');
       if (existingRoot) {
-        existingRoot.remove()
+        existingRoot.remove();
       }
 
-      document.body.appendChild(rootElement)
+      document.body.appendChild(rootElement);
 
       // Wrap in IntlProvider for translations
       return (
@@ -99,13 +99,13 @@ The module automatically initializes components with \`data-react-module="kvkbra
             <Story />
           </IntlProvider>
         </div>
-      )
+      );
     },
   ],
-}
+};
 
-export default meta
-type Story = StoryObj
+export default meta;
+type Story = StoryObj;
 
 export const BasicUsage: Story = {
   name: 'Basic Django Integration',
@@ -125,7 +125,7 @@ Shows the basic KVKBranchSelectorModule functionality with branch data loaded fr
     },
   },
   render: () => {
-    const scriptElement = document.getElementById('branch-data')
+    const scriptElement = document.getElementById('branch-data');
     if (scriptElement) {
       scriptElement.textContent = JSON.stringify({
         items: [
@@ -145,11 +145,11 @@ Shows the basic KVKBranchSelectorModule functionality with branch data loaded fr
           },
         ],
         selected_id: null,
-      })
+      });
     }
-    return KVKBranchSelectorModule.root
+    return KVKBranchSelectorModule.root;
   },
-}
+};
 
 export const WithPreselection: Story = {
   name: 'Preselected Branch from Django',
@@ -173,7 +173,7 @@ Demonstrates how Django can preselect a branch by setting the \`selected_id\` fi
     },
   },
   render: () => {
-    const scriptElement = document.getElementById('branch-data')
+    const scriptElement = document.getElementById('branch-data');
     if (scriptElement) {
       scriptElement.textContent = JSON.stringify({
         items: [
@@ -193,11 +193,11 @@ Demonstrates how Django can preselect a branch by setting the \`selected_id\` fi
           },
         ],
         selected_id: '000038509474', // Preselected vestiging
-      })
+      });
     }
-    return KVKBranchSelectorModule.root
+    return KVKBranchSelectorModule.root;
   },
-}
+};
 
 export const EmptyBranchesArray: Story = {
   name: 'Empty Branches - Error Handling',
@@ -219,16 +219,16 @@ Shows how the module handles empty branch data from Django. When Django renders 
     },
   },
   render: () => {
-    const scriptElement = document.getElementById('branch-data')
+    const scriptElement = document.getElementById('branch-data');
     if (scriptElement) {
       scriptElement.textContent = JSON.stringify({
         items: [],
         selected_id: null,
-      })
+      });
     }
-    return KVKBranchSelectorModule.root
+    return KVKBranchSelectorModule.root;
   },
-}
+};
 
 export const EmptyScriptContent: Story = {
   name: 'Empty Script Tag - Error Recovery',
@@ -250,13 +250,13 @@ Demonstrates error recovery when the script tag exists but contains empty conten
     },
   },
   render: () => {
-    const scriptElement = document.getElementById('branch-data')
+    const scriptElement = document.getElementById('branch-data');
     if (scriptElement) {
-      scriptElement.textContent = ''
+      scriptElement.textContent = '';
     }
-    return KVKBranchSelectorModule.root
+    return KVKBranchSelectorModule.root;
   },
-}
+};
 
 export const InvalidJsonData: Story = {
   name: 'Invalid JSON - Error Handling',
@@ -283,10 +283,10 @@ Shows the error recovery mechanism when Django renders malformed JSON. This demo
     },
   },
   render: () => {
-    const scriptElement = document.getElementById('branch-data')
+    const scriptElement = document.getElementById('branch-data');
     if (scriptElement) {
-      scriptElement.textContent = '{ invalid json syntax'
+      scriptElement.textContent = '{ invalid json syntax';
     }
-    return KVKBranchSelectorModule.root
+    return KVKBranchSelectorModule.root;
   },
-}
+};

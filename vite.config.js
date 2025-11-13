@@ -1,13 +1,13 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import path from 'path'
-import paths from './build/paths'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
+import paths from './build/paths';
 
 // Support CLI flags like --production and --sourcemap
-const argv = process.argv
+const argv = process.argv;
 const isProduction =
-  process.env.NODE_ENV === 'production' || argv.includes('--production')
-const useSourceMap = argv.includes('--sourcemap')
+  process.env.NODE_ENV === 'production' || argv.includes('--production');
+const useSourceMap = argv.includes('--sourcemap');
 
 // Export Vite build-only config
 export default defineConfig({
@@ -53,9 +53,9 @@ export default defineConfig({
         manualChunks: (id) => {
           if (id.includes('.css') || id.includes('.scss')) {
             // Extract component name from path
-            const match = id.match(/\/([^\/]+)\.(css|scss)$/)
+            const match = id.match(/\/([^\/]+)\.(css|scss)$/);
             if (match) {
-              return `styles-${match[1]}`
+              return `styles-${match[1]}`;
             }
           }
         },
@@ -70,7 +70,10 @@ export default defineConfig({
   resolve: {
     alias: {
       '@react': path.resolve(__dirname, 'src/open_inwoner/react'),
-      '@webcomponents': path.resolve(__dirname, 'src/open_inwoner/webcomponents'),
+      '@webcomponents': path.resolve(
+        __dirname,
+        'src/open_inwoner/webcomponents'
+      ),
     },
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
   },
@@ -79,4 +82,4 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
   },
-})
+});

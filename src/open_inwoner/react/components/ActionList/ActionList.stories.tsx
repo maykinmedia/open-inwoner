@@ -1,5 +1,5 @@
-import { Meta, StoryObj } from '@storybook/react'
-import ActionList, { IActionProps } from './ActionList'
+import { Meta, StoryObj } from '@storybook/react';
+import ActionList, { IActionProps } from './ActionList';
 
 const meta: Meta<typeof ActionList> = {
   title: 'React/Components/ActionList',
@@ -24,10 +24,10 @@ This component integrates with the Den Haag Action component and provides a cons
       },
     },
   },
-}
-export default meta
+};
+export default meta;
 
-type Story = StoryObj<typeof ActionList>
+type Story = StoryObj<typeof ActionList>;
 
 const mockDataWithItems: IActionProps[] = [
   {
@@ -51,7 +51,7 @@ const mockDataWithItems: IActionProps[] = [
     message: 'You have a new message from the municipality.',
     action_url: '/messages',
   },
-]
+];
 
 export const Default: Story = {
   name: 'Default with Items',
@@ -66,7 +66,7 @@ export const Default: Story = {
       },
     },
   },
-}
+};
 
 export const Empty: Story = {
   name: 'Empty List',
@@ -80,4 +80,4 @@ export const Empty: Story = {
       },
     },
   },
-}
+};

@@ -1,8 +1,8 @@
-import { FC } from 'react'
-import { FormattedMessage } from 'react-intl'
-import './Count.scss'
+import { FC } from 'react';
+import { FormattedMessage } from 'react-intl';
+import './Count.scss';
 interface CounterProps {
-  count: number
+  count: number;
 }
 
 const Count: FC<CounterProps> = (props) => {
@@ -16,6 +16,6 @@ const Count: FC<CounterProps> = (props) => {
       </h4>
       <p data-testid="count">{props.count}</p>
     </div>
-  )
-}
-export default Count
+  );
+};
+export default Count;

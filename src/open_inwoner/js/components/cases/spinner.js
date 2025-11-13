@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-  const htmx = window.htmx
+  const htmx = window.htmx;
 
   // Show the spinner before an HTMX request starts
   htmx.on('htmx:beforeRequest', function (e) {
@@ -11,13 +11,13 @@ document.addEventListener('DOMContentLoaded', function () {
       // Show the spinner
       document
         .getElementById('spinner-container')
-        .classList.remove('loader-container--hide')
+        .classList.remove('loader-container--hide');
       // Hide the swappable content
       document
         .getElementById('cases-content')
-        .classList.add('cases__spinner--hide')
+        .classList.add('cases__spinner--hide');
     }
-  })
+  });
 
   // Hide the spinner after the content is swapped
   htmx.on('htmx:afterSwap', function (e) {
@@ -29,11 +29,11 @@ document.addEventListener('DOMContentLoaded', function () {
       // Hide the spinner
       document
         .getElementById('spinner-container')
-        .classList.add('loader-container--hide')
+        .classList.add('loader-container--hide');
       // Show the swappable content
       document
         .getElementById('cases-content')
-        .classList.remove('cases__spinner--hide')
+        .classList.remove('cases__spinner--hide');
     }
-  })
-})
+  });
+});

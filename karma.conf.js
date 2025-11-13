@@ -6,64 +6,51 @@ webpackConfig.output.library = undefined;
 
 // Add istanbul-instrumenter to webpack configuration
 webpackConfig.module.rules.push({
-    test: /\.js$/,
-    include: __dirname + '/' + paths.jsSrcDir,
-    loader: 'istanbul-instrumenter-loader',
-    enforce: 'post',
+  test: /\.js$/,
+  include: __dirname + '/' + paths.jsSrcDir,
+  loader: 'istanbul-instrumenter-loader',
+  enforce: 'post',
 
-    options: {
-        esModules: true
-    }
+  options: {
+    esModules: true,
+  },
 });
-
 
 // The preprocessor config
 const preprocessors = {};
-preprocessors[paths.jsSpecEntry] = [
-    'webpack'
-];
-
+preprocessors[paths.jsSpecEntry] = ['webpack'];
 
 // The main configuration
 const configuration = function (config) {
-    config.set({
-        frameworks: [
-            'mocha'
-        ],
+  config.set({
+    frameworks: ['mocha'],
 
-        files: [
-            'node_modules/@babel/polyfill/dist/polyfill.js',
-            paths.jsSpecEntry
-        ],
+    files: ['node_modules/@babel/polyfill/dist/polyfill.js', paths.jsSpecEntry],
 
-        singleRun: true,
-        preprocessors: preprocessors,
+    singleRun: true,
+    preprocessors: preprocessors,
 
-        webpack: webpackConfig,
+    webpack: webpackConfig,
 
-        webpackMiddleware: {
-            noInfo: true
-        },
+    webpackMiddleware: {
+      noInfo: true,
+    },
 
-        reporters: ['coverage', 'junit', 'spec'],
+    reporters: ['coverage', 'junit', 'spec'],
 
-        coverageReporter: {
-            dir: 'reports/jstests/',
-            reporters: [
-                {type: 'html'},
-                {type: 'text'},
-                {type: 'text-summary'},
-            ]
-        },
+    coverageReporter: {
+      dir: 'reports/jstests/',
+      reporters: [{ type: 'html' }, { type: 'text' }, { type: 'text-summary' }],
+    },
 
-        junitReporter: {
-          outputDir: 'reports/jstests/',
-          outputFile: 'junit.xml',
-          useBrowserName: false,
-        },
+    junitReporter: {
+      outputDir: 'reports/jstests/',
+      outputFile: 'junit.xml',
+      useBrowserName: false,
+    },
 
-        browsers: ['Chromium'],
-    });
+    browsers: ['Chromium'],
+  });
 };
 
 module.exports = configuration;

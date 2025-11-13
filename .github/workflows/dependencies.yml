@@ -39,7 +39,6 @@ jobs:
       - name: Run bin/compile_dependencies.sh
         run: ./bin/compile_dependencies.sh
 
-
   compile_dependencies_macos:
     name: Run compile_dependencies on MacOS
     runs-on: macos-latest

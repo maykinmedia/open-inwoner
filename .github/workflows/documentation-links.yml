@@ -6,7 +6,7 @@ on:
     # Execute this action only on PRs that touch
     # documentation files.
     paths:
-      - "docs/**"
+      - 'docs/**'
 
 permissions:
   pull-requests: write
@@ -17,4 +17,4 @@ jobs:
     steps:
       - uses: readthedocs/actions/preview@v1
         with:
-          project-slug: "open-inwoner"
+          project-slug: 'open-inwoner'

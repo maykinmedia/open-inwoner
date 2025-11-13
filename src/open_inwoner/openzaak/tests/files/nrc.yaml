@@ -99,8 +99,9 @@ paths:
             API-version:
               schema:
                 type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+              description:
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -140,8 +141,9 @@ paths:
             API-version:
               schema:
                 type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+              description:
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
             Location:
               schema:
                 type: string
@@ -186,8 +188,9 @@ paths:
             API-version:
               schema:
                 type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+              description:
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -227,8 +230,9 @@ paths:
             API-version:
               schema:
                 type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+              description:
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -270,8 +274,9 @@ paths:
             API-version:
               schema:
                 type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+              description:
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -311,8 +316,9 @@ paths:
             API-version:
               schema:
                 type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+              description:
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
         '401':
           $ref: '#/components/responses/401'
         '403':
@@ -351,7 +357,8 @@ paths:
       parameters:
         - name: naam
           in: query
-          description: Naam van het KANAAL (ook wel "Exchange" genoemd) dat de bron
+          description:
+            Naam van het KANAAL (ook wel "Exchange" genoemd) dat de bron
             vertegenwoordigd.
           required: false
           schema:
@@ -363,8 +370,9 @@ paths:
             API-version:
               schema:
                 type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+              description:
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -410,8 +418,9 @@ paths:
             API-version:
               schema:
                 type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+              description:
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
             Location:
               schema:
                 type: string
@@ -456,8 +465,9 @@ paths:
             API-version:
               schema:
                 type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+              description:
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -510,8 +520,9 @@ paths:
             API-version:
               schema:
                 type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
+              description:
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
           content:
             application/json:
               schema:
@@ -532,7 +543,8 @@ components:
         API-version:
           schema:
             type: string
-          description: 'Geeft een specifieke API-versie aan in de context van een
+          description:
+            'Geeft een specifieke API-versie aan in de context van een
             specifieke aanroep. Voorbeeld: 1.2.1.'
       content:
         application/problem+json:
@@ -544,7 +556,8 @@ components:
         API-version:
           schema:
             type: string
-          description: 'Geeft een specifieke API-versie aan in de context van een
+          description:
+            'Geeft een specifieke API-versie aan in de context van een
             specifieke aanroep. Voorbeeld: 1.2.1.'
       content:
         application/problem+json:
@@ -556,7 +569,8 @@ components:
         API-version:
           schema:
             type: string
-          description: 'Geeft een specifieke API-versie aan in de context van een
+          description:
+            'Geeft een specifieke API-versie aan in de context van een
             specifieke aanroep. Voorbeeld: 1.2.1.'
       content:
         application/problem+json:
@@ -568,7 +582,8 @@ components:
         API-version:
           schema:
             type: string
-          description: 'Geeft een specifieke API-versie aan in de context van een
+          description:
+            'Geeft een specifieke API-versie aan in de context van een
             specifieke aanroep. Voorbeeld: 1.2.1.'
       content:
         application/problem+json:
@@ -580,7 +595,8 @@ components:
         API-version:
           schema:
             type: string
-          description: 'Geeft een specifieke API-versie aan in de context van een
+          description:
+            'Geeft een specifieke API-versie aan in de context van een
             specifieke aanroep. Voorbeeld: 1.2.1.'
       content:
         application/problem+json:
@@ -592,7 +608,8 @@ components:
         API-version:
           schema:
             type: string
-          description: 'Geeft een specifieke API-versie aan in de context van een
+          description:
+            'Geeft een specifieke API-versie aan in de context van een
             specifieke aanroep. Voorbeeld: 1.2.1.'
       content:
         application/problem+json:
@@ -604,7 +621,8 @@ components:
         API-version:
           schema:
             type: string
-          description: 'Geeft een specifieke API-versie aan in de context van een
+          description:
+            'Geeft een specifieke API-versie aan in de context van een
             specifieke aanroep. Voorbeeld: 1.2.1.'
       content:
         application/problem+json:
@@ -616,7 +634,8 @@ components:
         API-version:
           schema:
             type: string
-          description: 'Geeft een specifieke API-versie aan in de context van een
+          description:
+            'Geeft een specifieke API-versie aan in de context van een
             specifieke aanroep. Voorbeeld: 1.2.1.'
       content:
         application/problem+json:
@@ -628,7 +647,8 @@ components:
         API-version:
           schema:
             type: string
-          description: 'Geeft een specifieke API-versie aan in de context van een
+          description:
+            'Geeft een specifieke API-versie aan in de context van een
             specifieke aanroep. Voorbeeld: 1.2.1.'
       content:
         application/problem+json:
@@ -640,7 +660,8 @@ components:
         API-version:
           schema:
             type: string
-          description: 'Geeft een specifieke API-versie aan in de context van een
+          description:
+            'Geeft een specifieke API-versie aan in de context van een
             specifieke aanroep. Voorbeeld: 1.2.1.'
       content:
         application/problem+json:
@@ -652,7 +673,8 @@ components:
         API-version:
           schema:
             type: string
-          description: 'Geeft een specifieke API-versie aan in de context van een
+          description:
+            'Geeft een specifieke API-versie aan in de context van een
             specifieke aanroep. Voorbeeld: 1.2.1.'
       content:
         application/problem+json:
@@ -672,16 +694,18 @@ components:
       bearerFormat: JWT
   schemas:
     FilterGroup:
-      description: Een lijst van kanalen en filters waarop het ABONNEMENT wordt afgenomen.
+      description:
+        Een lijst van kanalen en filters waarop het ABONNEMENT wordt afgenomen.
       required:
         - naam
       type: object
       properties:
         filters:
           title: Filters
-          description: Map van kenmerken (sleutel/waarde) waarop notificaties gefilterd
-            worden. Alleen notificaties waarvan de kenmerken voldoen aan het filter
-            worden doorgestuurd naar de afnemer van het ABONNEMENT.
+          description:
+            Map van kenmerken (sleutel/waarde) waarop notificaties gefilterd
+            worden. Alleen notificaties waarvan de kenmerken voldoen aan het
+            filter worden doorgestuurd naar de afnemer van het ABONNEMENT.
           type: object
           additionalProperties:
             title: kenmerk
@@ -691,8 +715,9 @@ components:
             minLength: 1
         naam:
           title: Naam
-          description: De naam van het KANAAL (`KANAAL.naam`) waarop een abonnement
-            is of wordt genomen.
+          description:
+            De naam van het KANAAL (`KANAAL.naam`) waarop een abonnement is of
+            wordt genomen.
           type: string
           minLength: 1
     Abonnement:
@@ -704,8 +729,9 @@ components:
       properties:
         url:
           title: Url
-          description: URL-referentie naar dit object. Dit is de unieke identificatie
-            en locatie van dit object.
+          description:
+            URL-referentie naar dit object. Dit is de unieke identificatie en
+            locatie van dit object.
           type: string
           format: uri
           readOnly: true
@@ -713,8 +739,9 @@ components:
           minLength: 1
         callbackUrl:
           title: Callback URL
-          description: De URL waar notificaties naar toe gestuurd dienen te worden.
-            Deze URL dient uit te komen bij een API die geschikt is om notificaties
+          description:
+            De URL waar notificaties naar toe gestuurd dienen te worden. Deze
+            URL dient uit te komen bij een API die geschikt is om notificaties
             op te ontvangen.
           type: string
           format: uri
@@ -722,13 +749,15 @@ components:
           minLength: 1
         auth:
           title: Autorisatie header
-          description: 'Autorisatie header invulling voor het vesturen naar de "Callback
+          description:
+            'Autorisatie header invulling voor het vesturen naar de "Callback
             URL". Voorbeeld: Bearer a4daa31...'
           type: string
           maxLength: 1000
           minLength: 1
         kanalen:
-          description: Een lijst van kanalen en filters waarop het ABONNEMENT wordt
+          description:
+            Een lijst van kanalen en filters waarop het ABONNEMENT wordt
             afgenomen.
           type: array
           items:
@@ -744,7 +773,8 @@ components:
       properties:
         type:
           title: Type
-          description: URI referentie naar het type fout, bedoeld voor developers
+          description:
+            URI referentie naar het type fout, bedoeld voor developers
           type: string
         code:
           title: Code
@@ -767,8 +797,9 @@ components:
           minLength: 1
         instance:
           title: Instance
-          description: URI met referentie naar dit specifiek voorkomen van de fout.
-            Deze kan gebruikt worden in combinatie met server logs, bijvoorbeeld.
+          description:
+            URI met referentie naar dit specifiek voorkomen van de fout. Deze
+            kan gebruikt worden in combinatie met server logs, bijvoorbeeld.
           type: string
           minLength: 1
     FieldValidationError:
@@ -805,7 +836,8 @@ components:
       properties:
         type:
           title: Type
-          description: URI referentie naar het type fout, bedoeld voor developers
+          description:
+            URI referentie naar het type fout, bedoeld voor developers
           type: string
         code:
           title: Code
@@ -828,8 +860,9 @@ components:
           minLength: 1
         instance:
           title: Instance
-          description: URI met referentie naar dit specifiek voorkomen van de fout.
-            Deze kan gebruikt worden in combinatie met server logs, bijvoorbeeld.
+          description:
+            URI met referentie naar dit specifiek voorkomen van de fout. Deze
+            kan gebruikt worden in combinatie met server logs, bijvoorbeeld.
           type: string
           minLength: 1
         invalidParams:
@@ -843,8 +876,9 @@ components:
       properties:
         url:
           title: Url
-          description: URL-referentie naar dit object. Dit is de unieke identificatie
-            en locatie van dit object.
+          description:
+            URL-referentie naar dit object. Dit is de unieke identificatie en
+            locatie van dit object.
           type: string
           format: uri
           readOnly: true
@@ -852,7 +886,8 @@ components:
           minLength: 1
         naam:
           title: Naam
-          description: Naam van het KANAAL (ook wel "Exchange" genoemd) dat de bron
+          description:
+            Naam van het KANAAL (ook wel "Exchange" genoemd) dat de bron
             vertegenwoordigd.
           type: string
           maxLength: 50
@@ -864,8 +899,10 @@ components:
           format: uri
           maxLength: 200
         filters:
-          description: Lijst van mogelijke filter kenmerken van een KANAAL. Deze filter
-            kenmerken kunnen worden gebruikt bij het aanmaken van een ABONNEMENT.
+          description:
+            Lijst van mogelijke filter kenmerken van een KANAAL. Deze filter
+            kenmerken kunnen worden gebruikt bij het aanmaken van een
+            ABONNEMENT.
           type: array
           items:
             title: Filters
@@ -884,15 +921,17 @@ components:
       properties:
         kanaal:
           title: kanaal
-          description: De naam van het kanaal (`KANAAL.naam`) waar het bericht op
-            moet worden gepubliceerd.
+          description:
+            De naam van het kanaal (`KANAAL.naam`) waar het bericht op moet
+            worden gepubliceerd.
           type: string
           maxLength: 50
           minLength: 1
         hoofdObject:
           title: hoofd object
-          description: URL-referentie naar het hoofd object van de publicerende API
-            die betrekking heeft op de `resource`.
+          description:
+            URL-referentie naar het hoofd object van de publicerende API die
+            betrekking heeft op de `resource`.
           type: string
           format: uri
           minLength: 1
@@ -904,14 +943,16 @@ components:
           minLength: 1
         resourceUrl:
           title: resource URL
-          description: URL-referentie naar de `resource` van de publicerende API.
+          description:
+            URL-referentie naar de `resource` van de publicerende API.
           type: string
           format: uri
           minLength: 1
         actie:
           title: actie
-          description: De actie die door de publicerende API is gedaan. De publicerende
-            API specificeert de toegestane acties.
+          description:
+            De actie die door de publicerende API is gedaan. De publicerende API
+            specificeert de toegestane acties.
           type: string
           maxLength: 100
           minLength: 1
@@ -922,8 +963,9 @@ components:
           format: date-time
         kenmerken:
           title: kenmerken
-          description: Mapping van kenmerken (sleutel/waarde) van de notificatie.
-            De publicerende API specificeert de toegestane kenmerken.
+          description:
+            Mapping van kenmerken (sleutel/waarde) van de notificatie. De
+            publicerende API specificeert de toegestane kenmerken.
           type: object
           additionalProperties:
             title: kenmerk

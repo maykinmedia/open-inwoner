@@ -1,8 +1,8 @@
-import type { Meta, StoryObj } from '@storybook/react'
-import { IntlProvider } from 'react-intl'
-import { KVKBranchSelector } from '../KVKBranchSelector/KVKBranchSelector'
-import 'material-icons/iconfont/material-icons.css'
-import '@open-inwoner/design-tokens/dist/css/index.css'
+import type { Meta, StoryObj } from '@storybook/react';
+import { IntlProvider } from 'react-intl';
+import { KVKBranchSelector } from '../KVKBranchSelector/KVKBranchSelector';
+import 'material-icons/iconfont/material-icons.css';
+import '@open-inwoner/design-tokens/dist/css/index.css';
 
 const meta: Meta<typeof KVKBranchSelector> = {
   title: 'React/Components/KVKBranchSelector',
@@ -83,10 +83,10 @@ const meta: Meta<typeof KVKBranchSelector> = {
       },
     },
   },
-}
+};
 
-export default meta
-type Story = StoryObj<typeof KVKBranchSelector>
+export default meta;
+type Story = StoryObj<typeof KVKBranchSelector>;
 
 // Reusable mock data
 const mockBranches = [
@@ -113,7 +113,7 @@ const mockBranches = [
     vestigingsnummer: '000087654321',
     type: 'nevenvestiging',
   },
-]
+];
 
 const manyBranches = [
   {
@@ -132,7 +132,7 @@ const manyBranches = [
     vestigingsnummer: `00003${i.toString().padStart(7, '0')}`,
     type: i === 0 ? 'hoofdvestiging' : 'nevenvestiging',
   })),
-]
+];
 
 export const Default: Story = {
   args: {
@@ -146,7 +146,7 @@ export const Default: Story = {
       },
     },
   },
-}
+};
 
 export const WithPreselection: Story = {
   args: {
@@ -161,7 +161,7 @@ export const WithPreselection: Story = {
       },
     },
   },
-}
+};
 
 export const ManyBranches: Story = {
   args: {
@@ -175,7 +175,7 @@ export const ManyBranches: Story = {
       },
     },
   },
-}
+};
 
 export const SearchFiltering: Story = {
   args: {
@@ -189,7 +189,7 @@ export const SearchFiltering: Story = {
       },
     },
   },
-}
+};
 
 export const InsideForm: Story = {
   args: {
@@ -198,10 +198,10 @@ export const InsideForm: Story = {
   render: (args) => (
     <form
       onSubmit={(e) => {
-        e.preventDefault()
-        alert('Form submitted! Check console for form data.')
-        const formData = new FormData(e.currentTarget)
-        console.log('Form data:', Object.fromEntries(formData))
+        e.preventDefault();
+        alert('Form submitted! Check console for form data.');
+        const formData = new FormData(e.currentTarget);
+        console.log('Form data:', Object.fromEntries(formData));
       }}
     >
       <KVKBranchSelector {...args} />
@@ -229,7 +229,7 @@ export const InsideForm: Story = {
       },
     },
   },
-}
+};
 
 export const EmptyBranches: Story = {
   args: {
@@ -243,4 +243,4 @@ export const EmptyBranches: Story = {
       },
     },
   },
-}
+};

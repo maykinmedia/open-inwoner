@@ -23,7 +23,9 @@ jobs:
         ports:
           - 5432:5432
         # Needed because the postgres container does not provide a healthcheck
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+        options:
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s
+          --health-retries 5
 
     steps:
       - uses: actions/checkout@v3
@@ -52,26 +54,14 @@ jobs:
           DB_USER: postgres
           DB_PASSWORD: ''
 
-  prettier:
-    name: Check code formatting with prettier
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Install dependencies
-        run: |
-          npm install
-      - name: Run Prettier
-        run: |
-          npm run check-linting
-
   pre-commit:
     name: Run pre-commit checks
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v3
+      - name: npm install
+        run: npm install
       - uses: pre-commit/action@v3.0.1
 
   ruff-version-check:

@@ -29,5 +29,9 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["vite-env.d.ts","src/open_inwoner/react", "src/open_inwoner/webcomponents"]
+  "include": [
+    "vite-env.d.ts",
+    "src/open_inwoner/react",
+    "src/open_inwoner/webcomponents"
+  ]
 }

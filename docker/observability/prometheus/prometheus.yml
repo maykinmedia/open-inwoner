@@ -1,5 +1,4 @@
 ---
-
 # From https://github.com/prometheus/prometheus/blob/main/documentation/examples/prometheus-otlp.yml
 # and https://github.com/prometheus/prometheus/blob/main/documentation/examples/prometheus-docker.yml
 
@@ -37,30 +36,30 @@ global:
 
 scrape_configs:
   # Make Prometheus scrape itself for metrics.
-  - job_name: "prometheus"
+  - job_name: 'prometheus'
     static_configs:
-      - targets: ["localhost:9090"]
+      - targets: ['localhost:9090']
 
   - job_name: 'otel-collector'
     static_configs:
-      - targets: ["otel-collector:8889"]
+      - targets: ['otel-collector:8889']
     metrics_path: /metrics
     metric_relabel_configs:
       # put the exported job (service name) in the job label
-      - source_labels: ["exported_job"]
+      - source_labels: ['exported_job']
         regex: (.+)
         action: replace
         target_label: job
         replacement: $1
       # put the exported instance  in the instance label
-      - source_labels: ["exported_instance"]
+      - source_labels: ['exported_instance']
         regex: (.*)
         action: replace
         target_label: instance
         replacement: $1
       # remove cardinality on instance when the metric is global scope, this
       # effectively de-duplicates them.
-      - source_labels: ["scope"]
+      - source_labels: ['scope']
         regex: global
         target_label: instance
         replacement: global
@@ -71,4 +70,4 @@ scrape_configs:
       # - exported_job is already assigned to job
       # - telemetry_sdk_version increases cardinality, but has little use
       - action: labeldrop
-        regex: "^(service_instance_id|exported_instance|exported_job|telemetry_sdk_version)$"
+        regex: '^(service_instance_id|exported_instance|exported_job|telemetry_sdk_version)$'

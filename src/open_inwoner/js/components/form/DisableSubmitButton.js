@@ -1,18 +1,18 @@
 export class DisableSubmitButton {
-  static selector = '.file-input-form'
+  static selector = '.file-input-form';
 
   constructor(form) {
-    this.form = form
-    this.form.addEventListener('submit', this.disableButton.bind(this))
+    this.form = form;
+    this.form.addEventListener('submit', this.disableButton.bind(this));
   }
 
   disableButton() {
-    const submitButton = this.form.querySelector('button[type="submit"]')
-    submitButton.setAttribute('disabled', 'true')
+    const submitButton = this.form.querySelector('button[type="submit"]');
+    submitButton.setAttribute('disabled', 'true');
   }
 }
 
-const caseDetailForms = document.querySelectorAll(DisableSubmitButton.selector)
-;[...caseDetailForms].forEach(
+const caseDetailForms = document.querySelectorAll(DisableSubmitButton.selector);
+[...caseDetailForms].forEach(
   (caseDetailForm) => new DisableSubmitButton(caseDetailForm)
-)
+);

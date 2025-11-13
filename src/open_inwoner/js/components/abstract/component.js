@@ -10,17 +10,17 @@ export class Component {
    */
   constructor(node, initialState = {}) {
     /** @type {HTMLElement} */
-    this.node = node
+    this.node = node;
 
     /**
      * @type {Object} State, do not mutate directly.
      * @readonly
      **/
-    this.state = {}
+    this.state = {};
 
-    this.setState(initialState)
-    this.bindEvents()
-    this.setupMutationObserver()
+    this.setState(initialState);
+    this.bindEvents();
+    this.setupMutationObserver();
   }
 
   /**
@@ -44,11 +44,11 @@ export class Component {
       mutations.forEach((mutation) => {
         if (mutation.type === 'childList' && !document.contains(this.node)) {
           // Element has been removed from the DOM
-          this.unbindEvents()
-          this.mutationObserver.disconnect() // Stop observing once the element is removed
+          this.unbindEvents();
+          this.mutationObserver.disconnect(); // Stop observing once the element is removed
         }
-      })
-    })
+      });
+    });
   }
 
   /**
@@ -56,11 +56,11 @@ export class Component {
    * @param {Object} changes Object containing (only) changes to state.
    */
   setState(changes) {
-    const oldState = this.state
-    const clonedState = JSON.parse(JSON.stringify(oldState)) // Clone.
-    const newState = Object.assign(clonedState, changes)
-    this.state = newState
-    this.render(newState)
+    const oldState = this.state;
+    const clonedState = JSON.parse(JSON.stringify(oldState)); // Clone.
+    const newState = Object.assign(clonedState, changes);
+    this.state = newState;
+    this.render(newState);
   }
 
   /**

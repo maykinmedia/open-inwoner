@@ -1,15 +1,15 @@
-import { FC } from 'react'
-import './Counter.scss'
+import { FC } from 'react';
+import './Counter.scss';
 
 interface CounterProps {
-  count: number
-  setCount: React.Dispatch<React.SetStateAction<number>>
-  incrementText?: string
-  decrementText?: string
-  resetText?: string
-  incrementBgColor?: string
-  decrementBgColor?: string
-  resetBgColor?: string
+  count: number;
+  setCount: React.Dispatch<React.SetStateAction<number>>;
+  incrementText?: string;
+  decrementText?: string;
+  resetText?: string;
+  incrementBgColor?: string;
+  decrementBgColor?: string;
+  resetBgColor?: string;
 }
 
 const Counter: FC<CounterProps> = (props) => {
@@ -22,7 +22,7 @@ const Counter: FC<CounterProps> = (props) => {
     incrementBgColor,
     decrementBgColor,
     resetBgColor,
-  } = props
+  } = props;
 
   return (
     <div className="counter">
@@ -58,7 +58,7 @@ const Counter: FC<CounterProps> = (props) => {
         </button>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default Counter
+export default Counter;
