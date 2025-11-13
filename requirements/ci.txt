@@ -57,7 +57,7 @@ boltons==21.0.0
     #   -r requirements/base.txt
     #   face
     #   glom
-brotli==1.0.9
+brotli==1.2.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt

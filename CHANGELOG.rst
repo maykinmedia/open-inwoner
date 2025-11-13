@@ -133,6 +133,7 @@ Bugfixes
 Onderhoud
 ---------
 
+* [:pr:`2024`]: ``brotli`` bijgewerkt naar versie ``1.2.0``.
 * [:pr:`1943`]: ``waitress`` bijgewerkt naar versie ``3.0.2``.
 * [:pr:`1943`]: ``Flask-CORS`` bijgewerkt naar versie ``6.0.1``.
 * [:pr:`1944`]: ``djangorestframework`` bijgewerkt naar versie ``3.16.1``.
