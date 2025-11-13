@@ -160,6 +160,7 @@ Onderhoud
   correct onderscheid tussen ``None`` en ``"None"`` waarden.
 * [:pr:`1991`, :taiga-is:`3626`] Vervang het woord "notificaties" met "meldingen"
   omwille van de B1 taaleis.
+* [:pr:`2016`] Code-opzet voor omzetten van HTML componenten naar web-componenten.
 
 1.35.0 (2025-09-18)
 ===================
