@@ -1,7 +1,7 @@
 1.35.2 (2025-11-13)
 ===================
 
-Voor een volledig overzicht van alle commits, zie ....
+Voor een volledig overzicht van alle commits, zie :release:`v1.35.2`.
 
 Onderhoud
 ---------
