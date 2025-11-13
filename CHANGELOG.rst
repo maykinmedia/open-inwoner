@@ -7,6 +7,7 @@ Onderhoud
 ---------
 
 * [:pr:`2014`]: ``django`` bijgewerkt naar versie ``4.2.26``.
+* [:pr:`2024`]: ``brotli`` bijgewerkt naar versie ``1.2.0``.
 
 Bugfixes
 --------
