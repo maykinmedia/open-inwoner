@@ -159,6 +159,82 @@ Onderhoud
 * [:pr:`1991`, :taiga-is:`3626`] Vervang het woord "notificaties" met "meldingen"
   omwille van de B1 taaleis.
 
+1.35.2 (2025-11-13)
+===================
+
+Voor een volledig overzicht van alle commits, zie :release:`v1.35.2`.
+
+Onderhoud
+---------
+
+* [:pr:`2014`]: ``django`` bijgewerkt naar versie ``4.2.26``.
+* [:pr:`2024`]: ``brotli`` bijgewerkt naar versie ``1.2.0``.
+
+Bugfixes
+--------
+
+* [:taiga-dimpact:`358`, :pr:`2009`]: Het alternatieve telefoonnummer wordt nu correct
+  verwerkt vanuit de eSuite.
+* [:taiga-is:`3321`, :pr:`2008`]: Dubbele links in sitemap verwijderd.
+
+1.35.1 (2025-10-29)
+===================
+
+Voor een volledig overzicht van alle commits, zie :release:`v1.35.1`.
+
+Bugfixes
+--------
+
+* [:taiga-is:`3561`, :pr:`1995`]: CMS Categories plugin probeert nu niet meer om zaken
+  op te halen wanneer er geen ZGW backend is geconfigureerd.
+* [:taiga-is:`2522`:, :pr:`1969`]: Zaken die niet volledig opgehaald kunnen worden uit
+  het zaaksysteem worden nu gefilterd uit de zakenlijst om te voorkomen dat de gehele
+  lijst van Mijn Zaken toegankelijk blijft.
+* [:taiga-is:`3494`: :pr:`1955`]: Verhelpen bug waardoor er sporadisch errors werden
+  getoond tijdens het zoeken naar zaken via de algemene zoek-functie.
+* [:taiga-is:`3495`: :pr:`1956`]: Bij het aanmaken van contactmomenten onder een zaak
+  in OpenKlant2 werd de zaak omschrijving als onderwerp gebruikt. Dit veld is in
+  OpenKlant2 echter verplicht, en de omschrijving kan leeg zijn, hetgeen sporadisch tot
+  errors leidde. We gebruiken nu de zaak identificatie en een standaard tekst, die
+  altijd aanwezig is.
+* [:taiga-is:`3486`: :pr:`1946`]: Menu-items op pagina 'Mijn Zaken' worden niet langer
+  dubbel getoond in de sidebar en het dropdownmenu.
+* [:taiga-is:`3480`, :pr:`1934`]: De paginering van de contactmomenten lijstweergave
+  ontbrak, maar is nu toegevoegd.
+* [:taiga-is:`3477`: :pr:`1935`]: Wanneer er geen CMS-pagina's zijn en het menu leeg is,
+  dan wordt de zijnavigatie nu onzichtbaar, zodat de rest van de inhoud niet meer te smal
+  wordt weergegeven.
+* [:taiga-is:`3483`,  :pr:`1937`]: Typo's in BRP API request headers verholpen
+  (``x-requets-*`` naar ``x-requests-*``).
+* [:taiga-is:`3484`]: De pagina voor contactmomenten crashte wanneer het contactformulier
+  niet was geconfigureerd.
+* [:taiga-is:`3479`: :pr:`1940`]: Ongepubliceerde CMS pagina's worden niet meer
+  weergegeven in de zijnavigatie.
+* [:taiga-is:`3493`: :pr:`1954`]: Paginering op contactmomenten lijst wordt nu correct
+  weergegeven.
+* [:taiga-is:`3497`: :pr:`1958`]: Het ophalen van vragen in Openklant geeft geen
+  foutmeldingen meer als er ook anonieme vragen voorkomen in de backend.
+* [:taiga-is:`3519`: :pr:`1966`]: Probleem opgelost in de side menu waarbij de
+  'mijn vragen' item niet geselecteerd wordt als huidige pagina.
+* [:pr:`1972`]: Informatieobjecttpen die bij de ZGW synchronisatie niet kunnen worden
+  opgehaald zullen worden overgeslagen, zodat de overgebleven objecten wel
+  gesynchroniseerd kunnen worden.
+* [:taiga-is:`3525`: :pr:`1978`]: De positie van CMS-pagina's bepaalt niet langer welke
+  items worden weergegeven in het verkorte dropdown menu. Menu-items worden nu alleen
+  getoond in het dropdown menu als er geen sidenav beschikbaar is en als ze expliciet
+  zijn geconfigureerd (op dit moment alleen de link naar "Mijn Profiel").
+
+Onderhoud
+---------
+
+* [:pr:`1980`] Cache decorator ondersteunt kwargs met default argumenten, en maakt
+  correct onderscheid tussen ``None`` en ``"None"`` waarden.
+* [:pr:`1982`] ``playwright`` (npm) bijgewerkt naar ``>=1.55.1``.
+* [:taiga-ta:`3557`, :pr:`1987`]: Ontbrekende verplichte velden toegevoegd aan de
+  Subscription detail admin, waardoor het weer mogelijk is om nieuwe Subscription
+  objecten aan te maken.
+
+
 1.35.0 (2025-09-18)
 ===================
 
@@ -243,6 +319,16 @@ Onderhoud
 * [:pr:`1918`]: ``maykin-2fa`` bijgewerkt naar versie ``1.0.2``.
 * [:pr:`1907`, :pr:`1915`, :cve:`CVE-2025-7783`]: ``inline-css`` verwijderd en ``form-data`` override
   bijgewerkt om :cve:`CVE-2025-7783` te mitigeren.
+
+1.34.2 (2025-10-07)
+===================
+
+Voor een volledig overzicht van alle commits, zie :release:`v1.34.2`.
+
+Bugfixes
+--------
+* [:taiga-is:`3493`: :pr:`1954`]: Paginering op contactmomenten lijst wordt nu correct
+  weergegeven.
 
 1.34.1 (2025-10-02)
 ===================
