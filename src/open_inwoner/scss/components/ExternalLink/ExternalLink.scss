@@ -1,39 +1,60 @@
 .external-links {
-  // Context
-  .card-container.card-container--columns-2 {
-    grid-row-gap: var(--spacing-medium);
-    grid-column-gap: var(--spacing-giant);
-  }
-
-  // Link list
+  // Link list, list grid
   &__list {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
     list-style-type: none;
     margin-block-start: var(--spacing-extra-large);
     margin-block-end: 0;
     padding-inline-start: 0;
+    grid-row-gap: var(--spacing-medium);
+    grid-column-gap: var(--spacing-giant);
   }
 
   // Link 'cards'
-  .external-link {
-    color: var(--oip-external-link-color);
-    font-family: var(--oip-external-link-font-family);
-    font-size: var(--oip-external-link-content-font-size);
-    font-weight: bold;
+  &__list-item {
     background-color: var(--oip-external-link-background-color);
-    border-width: var(--oip-external-link-border-width);
-    border-style: var(--oip-external-link-border-style);
-    border-color: var(--oip-external-link-border-color);
-    border-radius: var(--oip-external-link-border-radius);
+    border: var(--oip-external-link-border-width)
+      var(--oip-external-link-border-style)
+      var(--oip-external-link-border-color);
+    border-radius: var(--border-radius);
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    hyphens: auto;
+    min-height: 70px;
+    min-width: var(--header-height);
+    position: relative;
+    justify-content: center;
+  }
+
+  // Link content
+  .external-link {
+    position: relative;
     display: var(--oip-external-link-display);
     flex-direction: var(--oip-external-link-flex-direction);
-    align-items: var(--oip-external-link-align-items);
-    position: relative;
-    text-decoration: var(--oip-external-link-text-decoration);
+    align-items: center;
+    box-sizing: border-box;
+    height: 100%;
+    border-width: var(--oip-external-link-border-width);
+    border-style: var(--oip-external-link-border-style);
+    border-color: transparent;
+    border-radius: var(--oip-external-link-border-radius);
     padding-block-start: var(--oip-external-link-body-padding-block-start);
     padding-block-end: var(--oip-external-link-body-padding-block-end);
     padding-inline-start: var(--oip-external-link-body-padding-inline-start);
     padding-inline-end: var(--oip-external-link-body-padding-inline-end);
+    background-color: var(--oip-external-link-background-color);
+    font-family: var(--oip-external-link-font-family);
+    font-size: var(--oip-external-link-content-font-size);
+    font-weight: bold;
+    color: var(--oip-external-link-color);
+    text-decoration: var(--oip-external-link-text-decoration);
 
     &:hover {
       background-color: var(--oip-external-link-hover-background-color);
@@ -53,15 +74,30 @@
         --oip-external-link-custom-icon-margin-inline-start
       );
       margin-inline-end: var(--oip-external-link-custom-icon-margin-inline-end);
+      padding-block-start: var(
+        --oip-external-link-custom-icon-padding-block-start
+      );
+      padding-block-end: var(--oip-external-link-custom-icon-padding-block-end);
+      padding-inline-start: var(
+        --oip-external-link-custom-icon-padding-inline-start
+      );
+      padding-inline-end: var(
+        --oip-external-link-custom-icon-padding-inline-end
+      );
+      width: 24px;
     }
 
     &__content {
+      display: inline-block;
       color: var(--oip-external-link-content-color);
       font-family: var(--oip-external-link-content-font-family);
       margin-block-start: var(--oip-external-link-content-margin-block-start);
       margin-block-end: var(--oip-external-link-content-margin-block-end);
       margin-inline-start: var(--oip-external-link-content-margin-inline-start);
       margin-inline-end: var(--oip-external-link-content-margin-inline-end);
+
+      // Width minus floating arrow icon-width
+      width: calc(100% - var(--spacing-mega));
 
       p {
         color: var(--oip-external-link-content-color);
@@ -76,6 +112,9 @@
     }
 
     &__arrow {
+      position: absolute;
+      bottom: 28px;
+      right: 24px;
       color: var(--oip-external-link-arrow-icon-color);
       margin-inline-start: var(
         --oip-external-link-arrow-icon-margin-inline-start

@@ -64,8 +64,9 @@ Nieuwe features
 * [:taiga-is:`3321`, :pr:`2008`]: Dubbele links in sitemap verwijderd.
 * [:taiga-us:`3510`, :pr:`1988`, :pr:`2002`]: CMS-plugin toegevoegd voor links naar andere
   portalen van de gemeente.
-* [:taiga-us:`3511`, :taiga-is:`3531`, :pr:`1996`]: Front-end voor CMS-plugin voor links naar
-  andere portalen gebouwd, inclusief nieuwe design-tokens volgens NLDS conventies.
+* [:taiga-us:`3511`, :taiga-is:`3583`, :taiga-is:`3531`, :pr:`1996`, :pr:`2022`]: Front-end voor CMS-plugin
+  voor links naar andere portalen gebouwd, inclusief nieuwe design-tokens volgens NLDS conventies. Opmaak is
+  verbeterd voor inhoud met langere linkteksten die naar een nieuwe regel worden afgebroken.
 * [:taiga-us:`3509`, :pr:`1997`]: Ondersteuning voor eIDAS login via OIDC is toegevoegd.
 
 Bugfixes
