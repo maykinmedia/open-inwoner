@@ -115,6 +115,9 @@ SOLO_CACHE = "local"  # Avoid Redis overhead
 CACHE_ZGW_CATALOGI_TIMEOUT = config("CACHE_ZGW_CATALOGI_TIMEOUT", default=60 * 60 * 24)
 CACHE_ZGW_ZAKEN_TIMEOUT = config("CACHE_ZGW_ZAKEN_TIMEOUT", default=60 * 1)
 
+# Maximum number of pagination requests to follow when fetching zaken from ZGW APIs
+ZGW_MAX_REQUESTS = config("ZGW_MAX_REQUESTS", default=8)
+
 # Laposta API caching
 CACHE_LAPOSTA_API_TIMEOUT = config("CACHE_LAPOSTA_API_TIMEOUT", default=60 * 15)
 
