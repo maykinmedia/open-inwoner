@@ -1,6 +1,9 @@
+from unittest.mock import patch
+
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.test import TestCase
+from django.urls import reverse
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.models import User
@@ -169,3 +172,52 @@ class UserTests(TestCase):
         eHerkenningVestigingUserFactory(kvk="12345678", vestiging="")
         with self.assertRaises(IntegrityError):
             eHerkenningVestigingUserFactory(kvk="12345678", vestiging="")
+
+    @patch("open_inwoner.accounts.models.OpenIDDigiDConfig")
+    def test_get_logout_url_digid_takes_oidc_config_into_account(
+        self, mock_digid_config
+    ):
+        user = UserFactory(login_type=LoginTypeChoices.digid)
+
+        # Test with OIDC enabled
+        mock_digid_config.get_solo.return_value.enabled = True
+        self.assertEqual(user.get_logout_url(), reverse("digid_oidc:logout"))
+
+        # Test with OIDC disabled
+        mock_digid_config.get_solo.return_value.enabled = False
+        self.assertEqual(user.get_logout_url(), reverse("digid:logout"))
+
+    def test_get_logout_url_returns_correct_option_for_login_type(self):
+        test_cases = [
+            (
+                LoginTypeChoices.eherkenning,
+                {"kvk": "12345678"},
+                reverse("eherkenning_oidc:logout"),
+            ),
+            (LoginTypeChoices.oidc, {}, reverse("oidc_logout")),
+            (
+                LoginTypeChoices.eidas_person_bsn,
+                {"bsn": "123456789", "eidas_pseudo_id": "test_eidas_bsn"},
+                reverse("eidas_oidc:logout"),
+            ),
+            (
+                LoginTypeChoices.eidas_person_pseudo_id,
+                {"eidas_pseudo_id": "test_eidas_pseudo"},
+                reverse("eidas_oidc:logout"),
+            ),
+            (
+                LoginTypeChoices.eidas_company,
+                {
+                    "kvk": "12345678",
+                    "eidas_pseudo_id": "test_eidas_company",
+                    "eidas_company_id": "test_company_id",
+                },
+                reverse("eidas_oidc:logout"),
+            ),
+            (LoginTypeChoices.default, {}, reverse("logout")),
+        ]
+
+        for login_type, extra_kwargs, expected_url in test_cases:
+            with self.subTest(login_type=login_type):
+                user = UserFactory(login_type=login_type, **extra_kwargs)
+                self.assertEqual(user.get_logout_url(), expected_url)

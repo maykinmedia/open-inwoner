@@ -120,47 +120,33 @@ class ProfileViewTests(WebTest):
 
                 self.assertEqual(logout_link.attr("href"), logout_url)
 
-    @patch("open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo")
-    def test_show_correct_logout_button_for_login_type_eherkenning(self, mock_solo):
-        for oidc_enabled in [True, False]:
-            with self.subTest(oidc_enabled=oidc_enabled):
-                mock_solo.return_value.enabled = oidc_enabled
+    def test_show_correct_logout_button_for_login_type_eherkenning(self):
+        """eHerkenning always uses OIDC logout"""
+        logout_url = reverse("eherkenning_oidc:logout")
 
-                logout_url = (
-                    reverse("eherkenning_oidc:logout")
-                    if oidc_enabled
-                    else reverse("logout")
-                )
+        response = self.app.get(self.url, user=self.eherkenning_user)
 
-                response = self.app.get(self.url, user=self.eherkenning_user)
+        logout_title = _("Logout")
+        logout_link = response.pyquery.find(f"[title='{logout_title}']")
 
-                logout_title = _("Logout")
-                logout_link = response.pyquery.find(f"[title='{logout_title}']")
+        self.assertEqual(logout_link.attr("href"), logout_url)
 
-                self.assertEqual(logout_link.attr("href"), logout_url)
+    def test_show_correct_logout_button_for_login_type_eidas(self):
+        """eIDAS always uses OIDC logout"""
+        logout_url = reverse("eidas_oidc:logout")
 
-    @patch("open_inwoner.accounts.models.OpenIDEIDASConfig.get_solo")
-    def test_show_correct_logout_button_for_login_type_eidas(self, mock_solo):
-        for oidc_enabled in [True, False]:
-            with self.subTest(oidc_enabled=oidc_enabled):
-                mock_solo.return_value.enabled = oidc_enabled
+        eidas_user = UserFactory(
+            login_type=LoginTypeChoices.eidas_person_bsn,
+            bsn="123456789",
+            eidas_pseudo_id="eidas-test",
+        )
 
-                logout_url = (
-                    reverse("eidas_oidc:logout") if oidc_enabled else reverse("logout")
-                )
+        response = self.app.get(self.url, user=eidas_user)
 
-                eidas_user = UserFactory(
-                    login_type=LoginTypeChoices.eidas_person_bsn,
-                    bsn="123456789",
-                    eidas_pseudo_id=f"eidas-test-{oidc_enabled}",
-                )
+        logout_title = _("Logout")
+        logout_link = response.pyquery.find(f"[title='{logout_title}']")
 
-                response = self.app.get(self.url, user=eidas_user)
-
-                logout_title = _("Logout")
-                logout_link = response.pyquery.find(f"[title='{logout_title}']")
-
-                self.assertEqual(logout_link.attr("href"), logout_url)
+        self.assertEqual(logout_link.attr("href"), logout_url)
 
     @patch(
         "open_inwoner.cms.utils.page_display.inbox_page_is_published", return_value=True
