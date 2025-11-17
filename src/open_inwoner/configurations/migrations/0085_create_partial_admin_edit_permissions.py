@@ -2,6 +2,10 @@
 
 from django.db import migrations
 
+import structlog
+
+logger = structlog.stdlib.get_logger(__name__)
+
 
 def create_partial_admin_edit_permissions(apps, _):
     SiteConfiguration = apps.get_model("configurations", "SiteConfiguration")
@@ -34,7 +38,13 @@ def delete_partial_admin_edit_permissions(apps, _):
         "siteconfig_fieldset_page_texts",
         "siteconfig_fieldset_help_texts",
     ):
-        Permission.objects.get(codename=codename).delete()
+        deleted_count, _ = Permission.objects.filter(codename=codename).delete()
+        if deleted_count:
+            logger.info(
+                "Deleted Permission objects for SiteConfiguration",
+                siteconfig_part=codename,
+                deleted_count=deleted_count,
+            )
 
 
 class Migration(migrations.Migration):
