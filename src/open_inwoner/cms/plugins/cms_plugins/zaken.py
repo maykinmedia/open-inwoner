@@ -1,3 +1,5 @@
+import json
+
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -32,6 +34,7 @@ class CMSZakenPlugin(CMSPluginBase):
             {
                 "instance": instance,
                 "hxget": hxget,
+                "hxget_json": json.dumps(hxget),
             }
         )
 

@@ -69,6 +69,7 @@ Nieuwe features
 * [:taiga-us:`3509`, :pr:`1997`]: Ondersteuning voor eIDAS login via OIDC is toegevoegd.
 * [:taiga-us:`3575`, :pr:`2020`]: CMS plug-in 'Mijn Zaken' angemaakt voor het ontsluiten van zaken
   in de startpagina
+* [:taiga-us:`3576`]
 
 Bugfixes
 --------
