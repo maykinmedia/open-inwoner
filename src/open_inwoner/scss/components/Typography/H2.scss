@@ -1,5 +1,5 @@
-@import '~@utrecht/heading-2-css/dist/index.css';
-@import '~microscope-sass/lib/responsive';
+@use '@utrecht/heading-2-css/dist/index.css';
+@use 'microscope-sass/lib/responsive' as *;
 
 .utrecht-heading-2 {
   // Reverse font-family fallback order

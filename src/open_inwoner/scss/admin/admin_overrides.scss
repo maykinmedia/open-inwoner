@@ -1,8 +1,7 @@
 // External
-@import 'leaflet/dist/leaflet.css';
-
+@use 'leaflet/dist/leaflet.css';
 //Internal
-@import './admin_theme';
-@import './app_overrides';
-@import './ck_editor';
-@import '../components/Map/Map.scss';
+@use './admin_theme';
+@use './app_overrides';
+@use './ck_editor';
+@use '../components/Map/Map';

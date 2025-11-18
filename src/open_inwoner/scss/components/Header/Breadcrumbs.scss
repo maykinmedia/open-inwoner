@@ -1,4 +1,4 @@
-@import '~microscope-sass/lib/responsive';
+@use 'microscope-sass/lib/responsive' as *;
 
 .breadcrumbs {
   display: none;

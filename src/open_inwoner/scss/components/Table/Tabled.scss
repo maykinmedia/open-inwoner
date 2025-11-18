@@ -96,7 +96,7 @@
     &--right {
       @media (min-width: 768px) {
         display: flex;
-        justify-content: end;
+        justify-content: flex-end;
       }
 
       .button {
@@ -109,7 +109,7 @@
 
     &--force-right {
       display: flex;
-      justify-content: end;
+      justify-content: flex-end;
 
       .button {
         &--transparent,

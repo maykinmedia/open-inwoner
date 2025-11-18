@@ -194,7 +194,7 @@
             window.IS_DEV = true;
         </script>
         {% endif %}
-        <script nonce="{{ request.csp_nonce }}" src="{% static 'bundles/open_inwoner-js.js' %}" type="text/javascript"></script>
+        <script nonce="{{ request.csp_nonce }}" src="{% static 'bundles/open_inwoner-js.js' %}" type="module"></script>
         {% block react_modules %}{% endblock %}
     </body>
 </html>
