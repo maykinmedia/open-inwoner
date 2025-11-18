@@ -102,14 +102,6 @@ CACHES = {
             "IGNORE_EXCEPTIONS": True,
         },
     },
-    "oidc": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"redis://{config('CACHE_DEFAULT', 'localhost:6379/0')}",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "IGNORE_EXCEPTIONS": True,
-        },
-    },
     "local": {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
     },
@@ -1062,8 +1054,7 @@ OIDC_CALLBACK_CLASS = "mozilla_django_oidc_db.views.OIDCCallbackView"
 OIDC_AUTHENTICATION_CALLBACK_URL = "oidc_authentication_callback"
 # ID token is required to enable OIDC logout
 OIDC_STORE_ID_TOKEN = True
-MOZILLA_DJANGO_OIDC_DB_CACHE = "oidc"
-MOZILLA_DJANGO_OIDC_DB_CACHE_TIMEOUT = 1
+
 
 # In order to support zaaktypeconfig admin screens with many statusses/results
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000

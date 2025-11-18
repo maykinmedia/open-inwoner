@@ -161,6 +161,7 @@ Onderhoud
   correct onderscheid tussen ``None`` en ``"None"`` waarden.
 * [:pr:`1991`, :taiga-is:`3626`] Vervang het woord "notificaties" met "meldingen"
   omwille van de B1 taaleis.
+* [:pr:`2031`] Verouderde ``mozilla-django-oidc-db`` cache-instellingen verwijderd.
 
 1.35.2 (2025-11-13)
 ===================
