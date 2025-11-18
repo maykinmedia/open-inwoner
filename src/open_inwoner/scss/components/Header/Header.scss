@@ -65,10 +65,11 @@ $vm: var(--spacing-large);
   &__container {
     box-sizing: border-box;
     display: grid;
-    grid-column-gap: var(--spacing-tiny);
+    grid-column-gap: 0;
     position: relative;
     grid-template-columns: 1fr;
     grid-template-rows: var(--header-height);
+    width: 100%;
 
     > .header__actions {
       display: none;
@@ -335,6 +336,13 @@ $vm: var(--spacing-large);
             }
           }
         }
+      }
+    }
+
+    // Unauthenticated tablet grid
+    @media (min-width: 768px) and (max-width: 910px) {
+      &__main {
+        grid-column: 9 / span 2;
       }
     }
   }
