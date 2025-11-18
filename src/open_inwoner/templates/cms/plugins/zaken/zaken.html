@@ -1,0 +1,46 @@
+{% load i18n icon_tags button_tags django_htmx %}
+{% if request.htmx %}
+    {% if zaken %}
+        <div class="card-container card-container--columns-2 plugin-card">
+            {% for zaak in zaken %}
+                {% url "cases:case_detail" object_id=zaak.uuid api_group_id=zaak.api_group.id as zaak_url %}
+                <a href="{{ zaak_url }}" class="card card--status card--status--info">
+                    <div class="userfeed__marker userfeed__marker--info"></div>
+                    <div class="card__body card__body--tabled">
+                        <h3 class="utrecht-heading-3 userfeed__title">Status: {{ zaak.current_status }} {% if zaak.case_type %}- Soort: {{ zaak.case_type }}{% endif %}</h3>
+                        {% include "components/StatusIndicator/StatusIndicator.html" with status_indicator=info status_indicator_text="Let op!" %}
+                        <p class="userfeed-card__description">
+                            <span class="status">{{ zaak.description }}</span>
+                        </p>
+                        <span class="button button--icon-before button--transparent">
+                            {% icon icon="east" icon_position="after" primary=True outlined=True %}
+                        </span>
+                    </div>
+                    <p class="userfeed-card__description">
+                        <span class="status">{{ zaak.identification }}</span>
+                    </p>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="userfeed-card__description">{% trans "U heeft op dit moment geen lopende zaken." %}</p>
+    {% endif %}
+{% else %}
+    {% if instance %}
+        <section class="plugin userfeed">
+            <header class="userfeed__header">
+                <div class="heading-2__indicator">
+                    <h2 class="utrecht-heading-2">{{ instance.title }}</h2>
+                </div>
+            </header>
+            <div id="zaken-content-{{ instance.pk }}" hx-get="{{ hxget }}" hx-trigger="load" hx-swap="innerHTML">
+                <div class="loader-container">
+                    <div class="spinner">
+                        {% icon icon="rotate_right" extra_classes="spinner-icon rotate" %}
+                        <div class="spinner__content" role="status">{% trans "Zaken laden..." %}</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% endif %}
+{% endif %}

@@ -4,6 +4,7 @@ from .tasks import TasksConfig
 from .text import Text
 from .userfeed import UserFeed
 from .videoplayer import VideoPlayer
+from .zaken import CMSZakenPluginConfig
 
 __all__ = [
     "UserAppointments",
@@ -13,4 +14,5 @@ __all__ = [
     "VideoPlayer",
     "CMSLinkPluginConfig",
     "ExtendedCMSLink",
+    "CMSZakenPluginConfig",
 ]
