@@ -1,4 +1,25 @@
 {% load i18n icon_tags button_tags django_htmx %}
+<script>
+  // Mock data to test the web component
+  const mockCases = [
+    {
+      uuid: "123e4567-e89b-12d3-a456-426614174000",
+      api_group_id: "1",
+      description: "Vergunningsaanvraag",
+      case_type: "Omgevingsvergunning",
+      identification: "ZAAK-2024-001",
+      url: "/cases/123e4567-e89b-12d3-a456-426614174000/1/"
+    }
+  ];
+
+  // Add the web component with data
+  document.addEventListener('DOMContentLoaded', function() {
+    const caseCards = document.createElement('case-cards');
+    caseCards.setAttribute('cases', JSON.stringify(mockCases));
+    document.querySelector('.where-you-want-it').appendChild(caseCards);
+  });
+</script>
+
 {% if request.htmx %}
     {% if zaken %}
         <section class="plugin">
@@ -8,27 +29,23 @@
                 {% url "cases:case_detail" object_id=zaak.uuid api_group_id=zaak.api_group.id as zaak_url %}
                 <a href="{{ zaak_url }}" class="card card--status card--status--info">
                     <div class="card__body card__body--tabled">
-                        <h3 class="utrecht-heading-3 userfeed__title">Description: {% if zaak.description %}<span class="status">{{ zaak.description }}</span>{% endif %} {% if zaak.case_type %}- Soort: {{ zaak.case_type }}{% endif %}</h3>
-                        <p class="userfeed-card__description">
-                            description
-
-                        </p>
+                        <h3 class="utrecht-heading-3 case-card__title">{% if zaak.description %}<span class="status">{{ zaak.description }}</span>{% endif %} {% if zaak.case_type %} | {{ zaak.case_type }}{% endif %}</h3>
+                        <p class="case-card-card__description">
+                        Zaaknummer
+                        <span class="status">{{ zaak.identification }}</span>
+                    </p>
                         <span class="button button--icon-before button--transparent">Bekijk zaak
                             {% icon icon="east" icon_position="after" primary=True outlined=True %}
                         </span>
                     </div>
-                    <p class="userfeed-card__description">
-                        identification
-                        <span class="status">{{ zaak.identification }}</span>
-                    </p>
                 </a>
 
                 <hr>
 
-                <case-card
-                    id="case-card-{{ hxget_json.id }}"
-                    links='{{ hxget_json }}'>
-                </case-card>
+                <case-cards
+                    cases='{{ cases_json|safe }}'
+                    title="Mijn zaken"
+                ></case-cards>
             {% endfor %}
         </div>
 
@@ -50,9 +67,10 @@
 
             <hr>
 
-        <case-card
-    id="case-card-{{ link_plugin.id }}"
-    links='{{ hxget_json }}'></case-card>
+            <case-cards
+                cases='{{ cases_json|safe }}'
+                title="Mijn zaken"
+            ></case-cards>
         </section>
     {% endif %}
 {% endif %}
