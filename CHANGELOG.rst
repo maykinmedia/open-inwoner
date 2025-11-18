@@ -150,6 +150,8 @@ Bugfixes
   kleuren) kunnen nu worden overschreven met de kleuren van de colorpicker.
 * [:taiga-dimpact:`358`, :pr:`2009`]: Het alternatieve telefoonnummer wordt nu correct verwerkt
   vanuit de eSuite.
+* [:taiga-is:`3590`: :pr:`2030`]: Bug opgelost waarbij tablet gebruikers geen volledig uitgevuld
+  navigatie menu zagen.
 * [:taiga-is:`3588`, :pr:`2029`]: Ontbrekende logout URL voor reguliere gebruikers is
   toegoevegd, en de logica voor alle login types is opgeschoond.
 
