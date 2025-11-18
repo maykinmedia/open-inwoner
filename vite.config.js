@@ -28,43 +28,36 @@ export default defineConfig({
     }),
   ],
 
-  css: {
-    preprocessorOptions: {
-      scss: {
-        includePaths: ['node_modules'],
-      },
-    },
-  },
-
   build: {
     outDir: path.resolve(__dirname, paths.jsDir),
-    emptyOutDir: false, // Matches Webpack's behavior (does not wipe output)
+    emptyOutDir: false,
     sourcemap: useSourceMap,
     minify: isProduction,
-    cssCodeSplit: true,
     rollupOptions: {
       input: {
+        // React and Web Components (modern)
         [`${paths.package.name}-react`]: `${__dirname}/${paths.reactEntry}`,
         [`${paths.package.name}-webcomponents`]: `${__dirname}/${paths.webComponentsEntry}`,
+        // Legacy entries (van webpack)
+        [`${paths.package.name}-css`]: `${__dirname}/${paths.scssEntry}`,
+        [`${paths.package.name}-js`]: `${__dirname}/${paths.jsEntry}`,
+        admin_overrides: `${__dirname}/${paths.scssSrcDir}/admin/admin_overrides.scss`,
+        'pdf-p': `${__dirname}/${paths.scssSrcDir}/pdf/pdf_portrait.scss`,
+        'django-admin': `${__dirname}/${paths.jsSrcDir}/django-admin.js`,
       },
       output: {
         entryFileNames: '[name].js',
         chunkFileNames: '[name].bundle.js',
+        // Group all vendor dependencies into one chunk (like Webpack)
         manualChunks: (id) => {
-          if (id.includes('.css') || id.includes('.scss')) {
-            // Extract component name from path
-            const match = id.match(/\/([^\/]+)\.(css|scss)$/);
-            if (match) {
-              return `styles-${match[1]}`;
-            }
-          }
+          return undefined;
         },
       },
     },
+    // Reduce chunk splitting for traditional page loads (not SPA)
+    chunkSizeWarningLimit: 1000,
   },
 
-  // Configure base to match Webpack's publicPath
-  // This base is the location where the static files are sourced from (after building).
   base: '/static/bundles/',
 
   resolve: {
@@ -74,6 +67,7 @@ export default defineConfig({
         __dirname,
         'src/open_inwoner/webcomponents'
       ),
+      'htmx.org': path.resolve(__dirname, 'node_modules/htmx.org'),
     },
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
   },
