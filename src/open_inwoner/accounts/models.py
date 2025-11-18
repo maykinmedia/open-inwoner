@@ -1,5 +1,6 @@
 import os
 from datetime import timedelta
+from typing import Any, assert_never, cast
 from uuid import uuid4
 
 from django.conf import settings
@@ -678,23 +679,27 @@ class User(AbstractBaseUser, PermissionsMixin):
         return False
 
     def get_logout_url(self) -> str:
-        # Exit early, because for some reason reverse("logout") fails after checking
-        # the singletonmodels
-        if not (self.is_bsn_user or self.is_eherkenning_user or self.is_eidas_user):
-            return reverse("logout")
-
-        if self.login_type == LoginTypeChoices.digid:
-            if OpenIDDigiDConfig.get_solo().enabled:
-                return reverse("digid_oidc:logout")
-            return reverse("digid:logout")
-        elif self.login_type == LoginTypeChoices.eherkenning:
-            if OpenIDEHerkenningConfig.get_solo().enabled:
+        match self.login_type:
+            case LoginTypeChoices.digid:
+                return (
+                    reverse("digid_oidc:logout")
+                    if OpenIDDigiDConfig.get_solo().enabled
+                    else reverse("digid:logout")
+                )
+            case LoginTypeChoices.eherkenning:
                 return reverse("eherkenning_oidc:logout")
-            return reverse("logout")
-        elif self.is_eidas_user:
-            if OpenIDEIDASConfig.get_solo().enabled:
+            case LoginTypeChoices.oidc:
+                return reverse("oidc_logout")
+            case (
+                LoginTypeChoices.eidas_person_bsn
+                | LoginTypeChoices.eidas_person_pseudo_id
+                | LoginTypeChoices.eidas_company
+            ):
                 return reverse("eidas_oidc:logout")
-            return reverse("logout")
+            case LoginTypeChoices.default:
+                return reverse("logout")
+            case _ as unreachable:
+                assert_never(cast(Any, unreachable))
 
     @property
     def has_usable_email(self) -> bool:
