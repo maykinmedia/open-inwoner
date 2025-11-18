@@ -71,7 +71,7 @@ class ZakenClient(ZgwAPIClient):
         user_bsn: str | None = None,
         user_kvk: str | None = None,
         user_rsin: str | None = None,
-        max_requests: int = 4,
+        max_requests: int | None = None,
         identificatie: str | None = None,
         vestigingsnummer: str | None = None,
     ):
@@ -83,12 +83,14 @@ class ZakenClient(ZgwAPIClient):
 
         if user_bsn:
             return self.fetch_cases_by_bsn(
-                user_bsn, max_requests=max_requests, identificatie=identificatie
+                user_bsn,
+                max_requests=max_requests or settings.ZGW_MAX_REQUESTS,
+                identificatie=identificatie,
             )
 
         fetch_cases_for_company = functools.partial(
             self.fetch_cases_for_company,
-            max_requests=max_requests,
+            max_requests=max_requests or settings.ZGW_MAX_REQUESTS,
             zaak_identificatie=identificatie,
         )
         if vestigingsnummer:
@@ -110,7 +112,7 @@ class ZakenClient(ZgwAPIClient):
     def fetch_cases_by_bsn(
         self,
         user_bsn: str,
-        max_requests: int | None = 4,
+        max_requests: int | None = None,
         identificatie: str | None = None,
     ) -> list[Zaak]:
         """
@@ -143,7 +145,7 @@ class ZakenClient(ZgwAPIClient):
                 pagination_helper(
                     self,
                     data,
-                    max_requests=max_requests,
+                    max_requests=max_requests or settings.ZGW_MAX_REQUESTS,
                     headers=CRS_HEADERS,
                 )
             )
@@ -166,7 +168,7 @@ class ZakenClient(ZgwAPIClient):
     def fetch_cases_for_company(
         self,
         kvk_or_rsin: str | None = None,
-        max_requests: int | None = 4,
+        max_requests: int | None = None,
         zaak_identificatie: str | None = None,
         vestigingsnummer: str | None = None,
     ) -> list[Zaak]:
@@ -224,7 +226,7 @@ class ZakenClient(ZgwAPIClient):
                 pagination_helper(
                     self,
                     data,
-                    max_requests=max_requests,
+                    max_requests=max_requests or settings.ZGW_MAX_REQUESTS,
                     headers=CRS_HEADERS,
                 )
             )
@@ -751,7 +753,7 @@ class FormClient(ZgwAPIClient):
         user_bsn: str | None = None,
         user_kvk: str | None = None,
         vestigingsnummer: str | None = None,
-        max_requests: int = 4,
+        max_requests: int | None = None,
         **kwargs,
     ) -> list[OpenSubmission]:
         if user_bsn and (user_kvk or vestigingsnummer):
@@ -762,13 +764,13 @@ class FormClient(ZgwAPIClient):
 
         if user_bsn:
             return self.fetch_open_submissions_by_bsn(
-                user_bsn, max_requests=max_requests
+                user_bsn, max_requests=max_requests or settings.ZGW_MAX_REQUESTS
             )
 
         if user_kvk:
             return self.fetch_open_submissions_by_kvk(
                 user_kvk,
-                max_requests=max_requests,
+                max_requests=max_requests or settings.ZGW_MAX_REQUESTS,
                 vestigingsnummer=vestigingsnummer,
             )
 
@@ -777,7 +779,7 @@ class FormClient(ZgwAPIClient):
     def fetch_open_submissions_by_bsn(
         self,
         user_bsn: str,
-        max_requests: int,
+        max_requests: int | None = None,
     ) -> list[OpenSubmission]:
         try:
             response = self.get(
@@ -785,7 +787,11 @@ class FormClient(ZgwAPIClient):
                 params={"bsn": user_bsn},
             )
             data = get_json_response(response)
-            all_data = list(pagination_helper(self, data, max_requests=max_requests))
+            all_data = list(
+                pagination_helper(
+                    self, data, max_requests=max_requests or settings.ZGW_MAX_REQUESTS
+                )
+            )
         except (RequestException, ClientError):
             logger.exception("exception while making request")
             return []
@@ -798,7 +804,7 @@ class FormClient(ZgwAPIClient):
         self,
         user_kvk: str,
         vestigingsnummer: str | None,
-        max_requests: int,
+        max_requests: int | None = None,
     ) -> list[OpenSubmission]:
         request_params = {"kvk": user_kvk}
         if vestigingsnummer:
@@ -810,7 +816,11 @@ class FormClient(ZgwAPIClient):
                 params=request_params,
             )
             data = get_json_response(response)
-            all_data = list(pagination_helper(self, data, max_requests=max_requests))
+            all_data = list(
+                pagination_helper(
+                    self, data, max_requests=max_requests or settings.ZGW_MAX_REQUESTS
+                )
+            )
         except (RequestException, ClientError):
             logger.exception("exception while making request")
             return []

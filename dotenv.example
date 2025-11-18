@@ -8,3 +8,10 @@ DB_USER="open_inwoner"
 DB_PASSWORD=""
 DB_HOST=""
 DB_PORT=""
+
+#
+# ZGW API Settings
+#
+# Maximum number of pagination requests to follow when fetching zaken from ZGW APIs
+# Default: 8
+ZGW_MAX_REQUESTS=4

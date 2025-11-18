@@ -32,6 +32,9 @@ Deployment aandachtspunten
   kunnen langer duren dan normaal voor installaties met een groot aantal gebruikers. Dit
   is een gevolg van nieuwe database indices die zijn toegevoegd in het kader van de de
   nieuwe eIDAS ondersteuning.
+* Het aantal requests aan zaken API's is nu configureerbaar via een omgevingsvariabele ``ZGW_MAX_REQUESTS``
+  (standaardwaarde is 8).
+
 
 Nieuwe features
 ---------------
@@ -68,6 +71,9 @@ Nieuwe features
   voor links naar andere portalen gebouwd, inclusief nieuwe design-tokens volgens NLDS conventies. Opmaak is
   verbeterd voor inhoud met langere linkteksten die naar een nieuwe regel worden afgebroken.
 * [:taiga-us:`3509`, :pr:`1997`]: Ondersteuning voor eIDAS login via OIDC is toegevoegd.
+
+* [:taiga-us:`3574`, :pr:`2026`]: Aantal requests aan zaken API's configureerbaar gemaakt via
+  omgevingsvariabele.
 
 Bugfixes
 --------

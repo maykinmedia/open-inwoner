@@ -46,6 +46,8 @@ x-app-env: &x-app-env
   - UWSGI_MAX_REQUESTS
   - UWSGI_POST_BUFFERING
   - UWSGI_BUFFER_SIZE
+  # Overridable ZGW API settings
+  - ZGW_MAX_REQUESTS
   - STATIC_ROOT_VOLUME=/srv/static
   # Enabling Open Telemetry requires the services in docker/docker-compose.observability.yml
   # to be up and running.
