@@ -172,7 +172,8 @@ class ZaakType(ZGWModel):
     # roltypen: list
     # besluittypen: list
 
-    begin_geldigheid: Optional[date] = None
+    # TODO: broken in DECOS
+    # begin_geldigheid: Optional[date] = None
     # einde_geldigheid: Optional[date] = None
     versiedatum: Optional[date] = None
     concept: Optional[bool] = None
