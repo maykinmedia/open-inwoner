@@ -244,6 +244,7 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
             _("Search options"),
             {
                 "fields": (
+                    "search_enabled",
                     "include_cms_pages_in_search_index",
                     "search_filter_categories",
                     "search_filter_tags",

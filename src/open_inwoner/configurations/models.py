@@ -382,7 +382,12 @@ class SiteConfiguration(SingletonModel):
         help_text=_("The help text for the plan page."),
     )
 
-    # search filters
+    # search options
+    search_enabled = models.BooleanField(
+        verbose_name=_("Enable Search"),
+        default=True,
+        help_text=_("Whether search functionality is enabled."),
+    )
     search_filter_categories = models.BooleanField(
         verbose_name=_("Add category filter for search results"),
         default=True,
