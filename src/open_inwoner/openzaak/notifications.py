@@ -76,7 +76,13 @@ def handle_zaken_notification(notification: Notification):
     zaken_client = api_group.zaken_client
 
     # check if we have users that need to be informed about this case
-    if not (roles := zaken_client.fetch_case_roles(case_url)):
+    # TODO: iterate over all role types for completeness.
+    # TODO: Backport this to feature PR
+    if not (
+        roles := zaken_client.fetch_case_roles(
+            case_url, betrokkene_type="natuurlijk_persoon"
+        )
+    ):
         log_system_action(
             f"ignored {r} notification: cannot retrieve rollen for case {case_url}",
             # NOTE this used to be logging.ERROR, but as this is also our first call
