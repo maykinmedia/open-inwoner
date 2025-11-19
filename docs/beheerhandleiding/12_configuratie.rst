@@ -232,10 +232,6 @@ Dit is de tekst die wordt weergegeven wanneer de gebruiker op de onderwerppagina
 Dit is de tekst die wordt weergegeven wanneer de gebruiker op een productpagina op [Help] klikt.
 
 
-**Helptekst zoeken**
-Dit is de tekst die wordt weergegeven wanneer de gebruiker op de zoekpagina op [Help] klikt.
-
-
 **Helptekst Mijn profiel**
 Dit is de tekst die wordt weergegeven wanneer de gebruiker op de profielpagina op [Help] klikt.
 
@@ -247,14 +243,31 @@ Dit is de tekst die wordt weergegeven wanneer de gebruiker tijdens de vragenlijs
 **Helptekst samenwerken**
 Dit is de tekst die wordt weergegeven wanneer de gebruiker op de pagina *Samenwerken* op [Help] klikt.
 
-12.1.7. Zoekfilter opties
--------------------------
 
-Hier kunt u een onderwerpenfilter, een tagfilter en/of een organisaties-filter toevoegen aan de zoekresultaten. U kunt deze filters naar eigen inzicht selecteren.
+12.1.7. Zoeken
+--------------
+
+Hier kunt u de zoekfunctie in- of uitschakelen en verschillende filters toevoegen aan de zoekresultaten, bijvoorbeeld een onderwerpfilter, een tagfilter en/of een organisatiefilter.
+U kunt deze filters naar eigen inzicht selecteren.
 
 
-.. image:: images/Screenshot_OIP_Algemene_config_zoekfilteropties_Djuzz_250916.png
+.. image:: images/Screenshot_OIP_Algemene_config_zoeken.png
    :width: 624px
+
+**Zoeken in- of uitschakelen**
+U kunt de zoekfunctie voor de hele site in- of uitschakelen (standaard: ingeschakeld).
+
+
+**Zoekbalk weergeven voor anonieme gebruikers**
+Indien uitgeschakeld, wordt de zoekbalk niet weergegeven voor anonieme gebruikers.
+
+
+**Helptekst zoeken**
+Dit is de tekst die wordt weergegeven wanneer de gebruiker op de zoekpagina op [Help] klikt.
+
+
+**Tekst voor nul zoekresultaten**
+De tekst die wordt weergegeven als er geen zoekresultaten zijn.
 
 
 **CMS-pagina’s vindbaar maken via zoeken**
@@ -425,7 +438,7 @@ Hier vult u de URL in naar het formulier waar gebruikers feedback kunnen geven.
 12.1.14. Weergaveopties voor anonieme gebruikers
 ------------------------------------------------
 
-Hier kunt u selecteren of u het onderwerpen-menu en/of de zoekbalk voor anonieme gebruikers wilt verbergen. Wanneer u het vakje heeft aangevinkt zal de betreffende optie alleen zichtbaar zijn voor ingelogde gebruikers.
+Hier kunt u selecteren of u het onderwerpen-menu voor anonieme gebruikers wilt verbergen. Wanneer u het vakje heeft aangevinkt zal de betreffende optie alleen zichtbaar zijn voor ingelogde gebruikers.
 
 12.1.15. Geavanceerde opties
 ----------------------------

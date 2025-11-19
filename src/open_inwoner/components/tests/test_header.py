@@ -16,7 +16,6 @@ from open_inwoner.cms.products.cms_apps import ProductsApphook
 from open_inwoner.cms.tests import cms_tools
 from open_inwoner.cms.tests.cms_tools import create_apphook_page
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.configurations.tests.factories import SiteConfigurationFactory
 from open_inwoner.pdc.tests.factories import CategoryFactory
 
 
@@ -213,90 +212,95 @@ class DisplaySearchTemplateTagTest(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
         self.template = Template(
-            "{% load header_tags %}{% display_search as result %}{{ result }}"
+            "{% load header_tags %}{% display_search_for_user as result %}{{ result }}"
         )
 
     def _should_display_search(self, context):
         """
-        Evaluate whether search should be displayed based on `context`
+        Helper method to evaluate whether search should be displayed.
 
         Returns:
-            bool: `True` if the `display_search` template tag indicates that search
-            should be shown
+            bool: True if the `display_search` template tag indicates search should be shown
         """
         result = self.template.render(context)
         return result.strip() == "True"
 
-    def test_search_disabled_globally(self):
-        SiteConfigurationFactory(search_enabled=False)
+    # Tests for global `search_enabled` setting
+
+    def test_search_disabled_globally_for_authenticated_user(self):
+        config = SiteConfiguration.get_solo()
+        config.search_enabled = False
+        config.save()
+
         request = self.factory.get("/")
         request.user = UserFactory()
-
-        context = Context({"request": request, "cms_apps": {"products": True}})
-
-        self.assertFalse(
-            self._should_display_search(context),
-            "Search should be hidden when search_enabled is False",
-        )
-
-    def test_search_disabled_globally_even_with_anonymous_users_allowed(self):
-        SiteConfigurationFactory(
-            search_enabled=False, hide_search_from_anonymous_users=False
-        )
-        request = self.factory.get("/")
-        request.user = AnonymousUser()
-
         context = Context({"request": request})
 
         self.assertFalse(
             self._should_display_search(context),
-            "Search should be hidden when search_enabled is False, "
-            "regardless of other settings",
+            "Search should be hidden when search_enabled is False, even for authenticated users",
         )
 
-    def test_authenticated_user_with_products(self):
-        SiteConfigurationFactory(search_enabled=True)
+    def test_search_disabled_globally_for_anonymous_user(self):
+        """
+        Search is hidden when search_enabled is False, even if anonymous
+        users are normally allowed
+        """
+        config = SiteConfiguration.get_solo()
+        config.search_enabled = False
+        config.hide_search_from_anonymous_users = False
+        config.save()
+
+        request = self.factory.get("/")
+        request.user = AnonymousUser()
+        context = Context({"request": request})
+
+        self.assertFalse(
+            self._should_display_search(context),
+            "Search should be hidden when search_enabled is False, regardless of other settings",
+        )
+
+    # Tests for authenticated users
+
+    def test_authenticated_user_always_sees_search_when_enabled(self):
+        config = SiteConfiguration.get_solo()
+        config.search_enabled = True
+        config.save()
+
         request = self.factory.get("/")
         request.user = UserFactory()
-
-        context = Context({"request": request, "cms_apps": {"products": True}})
+        context = Context({"request": request})
 
         self.assertTrue(
             self._should_display_search(context),
-            "Authenticated users should see search when products app exists",
+            "Authenticated users should always see search when search_enabled is True",
         )
 
-    def test_authenticated_user_without_products(self):
-        SiteConfigurationFactory(search_enabled=True)
+    def test_authenticated_user_sees_search_regardless_of_anonymous_setting(self):
+        config = SiteConfiguration.get_solo()
+        config.search_enabled = True
+        config.hide_search_from_anonymous_users = True
+        config.save()
+
         request = self.factory.get("/")
         request.user = UserFactory()
-
-        context = Context({"request": request, "cms_apps": {}})
-
-        self.assertFalse(
-            self._should_display_search(context),
-            "Authenticated users should not see search without products app",
-        )
-
-    def test_authenticated_user_without_cms_apps_context(self):
-        SiteConfigurationFactory(search_enabled=True)
-        request = self.factory.get("/")
-        request.user = UserFactory()
-
         context = Context({"request": request})
 
-        self.assertFalse(
+        self.assertTrue(
             self._should_display_search(context),
-            "Authenticated users should not see search when cms_apps is missing",
+            "Authenticated users should see search even when hide_search_from_anonymous_users is True",
         )
 
-    def test_anonymous_user_search_not_hidden(self):
-        SiteConfigurationFactory(
-            search_enabled=True, hide_search_from_anonymous_users=False
-        )
+    # Tests for anonymous users
+
+    def test_anonymous_user_sees_search_when_not_hidden(self):
+        config = SiteConfiguration.get_solo()
+        config.search_enabled = True
+        config.hide_search_from_anonymous_users = False
+        config.save()
+
         request = self.factory.get("/")
         request.user = AnonymousUser()
-
         context = Context({"request": request})
 
         self.assertTrue(
@@ -305,57 +309,16 @@ class DisplaySearchTemplateTagTest(TestCase):
         )
 
     def test_anonymous_user_search_hidden(self):
-        SiteConfigurationFactory(
-            search_enabled=True, hide_search_from_anonymous_users=True
-        )
+        config = SiteConfiguration.get_solo()
+        config.search_enabled = True
+        config.hide_search_from_anonymous_users = True
+        config.save()
+
         request = self.factory.get("/")
         request.user = AnonymousUser()
-
         context = Context({"request": request})
 
         self.assertFalse(
             self._should_display_search(context),
             "Anonymous users should not see search when hide_search_from_anonymous_users is True",
-        )
-
-    def test_anonymous_user_with_products_in_context(self):
-        SiteConfigurationFactory(
-            search_enabled=True, hide_search_from_anonymous_users=False
-        )
-        request = self.factory.get("/")
-        request.user = AnonymousUser()
-
-        context = Context({"request": request, "cms_apps": {"products": True}})
-
-        self.assertTrue(
-            self._should_display_search(context),
-            "Anonymous users should see search based on config, not products availability",
-        )
-
-    def test_anonymous_user_without_products_but_search_allowed(self):
-        SiteConfigurationFactory(
-            search_enabled=True, hide_search_from_anonymous_users=False
-        )
-        request = self.factory.get("/")
-        request.user = AnonymousUser()
-
-        context = Context({"request": request, "cms_apps": {}})
-
-        self.assertTrue(
-            self._should_display_search(context),
-            "Anonymous users should see search when allowed, regardless of products",
-        )
-
-    def test_authenticated_user_search_hidden_for_anonymous_has_no_effect(self):
-        SiteConfigurationFactory(
-            search_enabled=True, hide_search_from_anonymous_users=True
-        )
-        request = self.factory.get("/")
-        request.user = UserFactory()
-
-        context = Context({"request": request, "cms_apps": {"products": True}})
-
-        self.assertTrue(
-            self._should_display_search(context),
-            "Authenticated users should see search even when hide_search_from_anonymous_users is True",
         )

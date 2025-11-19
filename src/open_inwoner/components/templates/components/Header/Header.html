@@ -117,7 +117,7 @@
     {% firstof config.logo.default_alt_text config.name as logo_alt_text %}
         <div class="logo__desktop">{% include "components/Logo/Logo.html" with src=config.logo.file.url alt=logo_alt_text svg_height=75 only %}</div>
 
-        {% display_search as search_visible %}
+        {% display_search_for_user as search_visible %}
         {% if search_visible %}
             <nav class="header__actions" aria-label="Zoek navigatie desktop">
                 <form id="search-form-desktop" class="search-form-delegate form form--spaceless form--inline">

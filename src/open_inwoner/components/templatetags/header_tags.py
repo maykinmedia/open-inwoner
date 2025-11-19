@@ -22,18 +22,9 @@ def accessibility_header(request, **kwargs):
 
 
 @register.simple_tag(takes_context=True)
-def display_search(context):
+def display_search_for_user(context: dict) -> bool:
     """
     Determine if search should be displayed based on configuration and user status.
-
-    Logic:
-    1. Search must be globally enabled (SiteConfiguration.search_enabled)
-    2. For authenticated users: CMS products app must exist
-    3. For anonymous users: search must not be hidden from them
-       (SiteConfiguration.hide_search_from_anonymous_users)
-
-    Returns:
-        bool: True if search should be displayed
     """
     request = context.get("request")
     config = SiteConfiguration.get_solo()
@@ -42,7 +33,6 @@ def display_search(context):
         return False
 
     if request.user.is_authenticated:
-        cms_apps = context.get("cms_apps", {})
-        return bool(cms_apps.get("products"))
+        return True
 
     return not config.hide_search_from_anonymous_users

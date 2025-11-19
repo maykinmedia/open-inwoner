@@ -216,7 +216,6 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "theme_intro",
                     "home_questionnaire_title",
                     "home_questionnaire_intro",
-                    "search_zero_results_text",
                     "select_questionnaire_title",
                     "select_questionnaire_intro",
                     "plans_intro",
@@ -233,7 +232,6 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "home_help_text",
                     "theme_help_text",
                     "product_help_text",
-                    "search_help_text",
                     "account_help_text",
                     "questionnaire_help_text",
                     "plan_help_text",
@@ -241,10 +239,13 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
             },
         ),
         (
-            _("Search options"),
+            _("Search"),
             {
                 "fields": (
                     "search_enabled",
+                    "hide_search_from_anonymous_users",
+                    "search_help_text",
+                    "search_zero_results_text",
                     "include_cms_pages_in_search_index",
                     "search_filter_categories",
                     "search_filter_tags",
@@ -316,12 +317,7 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
         ),
         (
             _("Display options for anonymous users"),
-            {
-                "fields": (
-                    "hide_categories_from_anonymous_users",
-                    "hide_search_from_anonymous_users",
-                )
-            },
+            {"fields": ("hide_categories_from_anonymous_users",)},
         ),
         (
             _("Advanced display options"),
