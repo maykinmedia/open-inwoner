@@ -4,8 +4,9 @@ from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import Optional, Union
 
-from dateutil.relativedelta import relativedelta
 from django.utils.translation import gettext as _
+
+from dateutil.relativedelta import relativedelta
 from zgw_consumers.api_models.base import Model, ZGWModel
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 
@@ -194,8 +195,9 @@ class InformatieObjectType(ZGWModel):
     catalogus: str
     omschrijving: str
     vertrouwelijkheidaanduiding: str
-    begin_geldigheid: Optional[date] = None
-    einde_geldigheid: Optional[date] = None
+    # Decos gives missing as empty strings
+    # begin_geldigheid: Optional[date] = None
+    # einde_geldigheid: Optional[date] = None
     concept: bool = False
 
 
