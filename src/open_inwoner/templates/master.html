@@ -33,6 +33,13 @@
             window.NONCE = "{{ request.csp_nonce }}";
         </script>
 
+        {# Include web components bundle #}
+        <script
+            nonce="{{ request.csp_nonce }}"
+            src="{% static 'bundles/open_inwoner-webcomponents.js' %}"
+            defer
+            type="module"
+        ></script>
 
         {% if favicon %}<link rel="icon" href="{{ favicon }}" />
         <link rel="apple-touch-icon" href="{{ favicon }}">{% endif %}

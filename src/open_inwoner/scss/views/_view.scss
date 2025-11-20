@@ -1,4 +1,10 @@
 .view {
+  &--cases-index {
+    // prevent large content shift after spinner disappears
+    .loader-container {
+      height: 65vh;
+    }
+  }
   &---pages-root {
     &:has(.notifications .notification) {
       .notifications {

@@ -1,0 +1,108 @@
+.plugin {
+  //TODO: remove only this plugin style when switching to Preact, since this needs to be defined by porent grid
+  padding-top: var(--row-height);
+}
+
+//TODO: re-usable component styles, keep these when switching to Preact
+.plugin__header {
+  // TODO: to give these back to NLDS community, add these variables to OIP design-tokens package
+  --oip-plugin-header-margin: 0 0 var(--spacing-medium);
+  --oip-plugin-header-display: flex;
+  --oip-plugin-header-font-family: 'Heading', Arial, sans-serif;
+  --oip-plugin-header-align-items: center;
+  --oip-plugin-header-justify-content: space-between;
+  --oip-plugin-header-flex-direction-mobile: column;
+  --oip-plugin-header-align-items-mobile: flex-start;
+  --oip-plugin-header-word-break-mobile: normal;
+  --oip-plugin-header-overflow-wrap-mobile: break-word;
+  // Indicator tokens
+  --oip-plugin-header-indicator-display: flex;
+  --oip-plugin-header-indicator-flex-direction: row;
+  --oip-plugin-header-notification-indicator-color: #e50026;
+  --oip-plugin-header-notification-indicator-font-size: 12px;
+  --oip-plugin-header-notification-indicator-vertical-align: super;
+  --oip-plugin-header-indicator-display-inline: inline-block;
+  --oip-plugin-header-indicator-justify-content: flex-start;
+  --oip-plugin-header-indicator-overflow: visible;
+  --oip-plugin-header-indicator-position: relative;
+  // Heading tokens
+  --oip-plugin-header-heading-color: var(--font-color-heading);
+  --oip-plugin-header-heading-font-family: 'Heading', Arial, sans-serif;
+  --oip-plugin-header-heading-margin: 0;
+
+  margin: var(--oip-plugin-header-margin);
+  display: var(--oip-plugin-header-display);
+  font-family: var(--oip-plugin-header-font-family);
+  align-items: var(--oip-plugin-header-align-items);
+  justify-content: var(--oip-plugin-header-justify-content);
+
+  &__indicator {
+    display: var(--oip-plugin-header-indicator-display);
+    flex-direction: var(--oip-plugin-header-indicator-flex-direction);
+  }
+
+  .plugin__notification-indicator {
+    color: var(--oip-plugin-header-notification-indicator-color);
+    font-size: var(--oip-plugin-header-notification-indicator-font-size);
+    vertical-align: var(
+      --oip-plugin-header-notification-indicator-vertical-align
+    );
+  }
+
+  .indicator {
+    display: var(--oip-plugin-header-indicator-display-inline);
+    justify-content: var(--oip-plugin-header-indicator-justify-content);
+    overflow: var(--oip-plugin-header-indicator-overflow);
+    position: var(--oip-plugin-header-indicator-position);
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: var(--oip-plugin-header-flex-direction-mobile);
+    align-items: var(--oip-plugin-header-align-items-mobile);
+    word-break: var(--oip-plugin-header-word-break-mobile);
+    overflow-wrap: var(--oip-plugin-header-overflow-wrap-mobile);
+  }
+
+  .utrecht-heading-2 {
+    color: var(--oip-plugin-header-heading-color);
+    font-family: var(--oip-plugin-header-heading-font-family);
+    margin: var(--oip-plugin-header-heading-margin);
+  }
+
+  .button {
+    align-items: center;
+    background-color: transparent;
+    border: 0;
+    border-radius: var(--border-radius);
+    box-sizing: border-box;
+    color: var(--color-primary);
+    cursor: pointer;
+    display: inline-flex;
+    font-family: 'Body', Arial, sans-serif;
+    font-size: var(--font-size-body);
+    font-weight: bold;
+    gap: var(--spacing-medium);
+    height: var(--row-height);
+    letter-spacing: 0;
+    line-height: var(--font-line-height-body);
+    outline-offset: 1px;
+    outline-width: 1px;
+    padding: var(--spacing-medium) var(--spacing-large);
+    text-align: center;
+    text-decoration: none;
+    transition:
+      transform 0.3s,
+      background-color 0.3s;
+    white-space: nowrap;
+
+    &.button--icon-after {
+      flex-direction: row-reverse;
+      padding-left: 0;
+
+      &[class*='icons'] {
+        font-size: 20px;
+        max-width: 20px;
+      }
+    }
+  }
+}
