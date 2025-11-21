@@ -1,3 +1,29 @@
+1.35.3 (2025-11-24)
+===================
+
+Voor een volledig overzicht van alle commits, zie ...
+
+Deployment aandachtspunten
+--------------------------
+
+* De nieuwe omgevingsvariabele ``OIDC_FRONTEND_LOGOUT_WITH_HINTS`` (standaard: ``true``)
+  bepaalt of hints zoals ``id_token_hint`` en ``post_logout_redirect_uri`` worden
+  meegegeven bij OIDC frontend logout redirects. Wanneer het ID token gevoelige claims
+  bevat die niet in de querystring van de user agent mogen verschijnen (bijvoorbeeld
+  voor security compliance), kan deze variabele op ``false`` worden gezet om alleen naar
+  het logout endpoint te redirecten zonder aanvullende parameters.
+
+
+Nieuwe features
+---------------
+
+* [:taiga-us:`3596`, :pr:`2036`]: Hints (zoals ``id_token_hint`` en
+  ``post_logout_redirect_uri``) bij OIDC frontend logout zijn nu optioneel
+  configureerbaar via de omgevingsvariabele ``OIDC_FRONTEND_LOGOUT_WITH_HINTS``. Dit
+  voorkomt dat gevoelige claims in de querystring van de user agent terechtkomen, wat
+  belangrijk kan zijn voor security audits (zoals PENTests) van bijvoorbeeld DigiD.
+  Standaard blijven de hints ingeschakeld om het huidige gedrag te behouden.
+
 1.35.2 (2025-11-13)
 ===================
 
