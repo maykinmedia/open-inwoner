@@ -122,19 +122,21 @@ class OIDCLogoutView(View):
 
         # Try to initiate a frontchannel redirect
         if logout_endpoint := config.oidc_op_logout_endpoint:
-            params = {
-                # The value MUST have been previously registered with the
-                # OP, either using the post_logout_redirect_uri
-                # registration parameter or via another mechanism.
-                "post_logout_redirect_uri": self.request.build_absolute_uri(
-                    self.get_success_url()
-                ),
-            }
-            if id_token:
-                params["id_token_hint"] = id_token
+            if settings.OIDC_FRONTEND_LOGOUT_WITH_HINTS:
+                params = {
+                    # The value MUST have been previously registered with the
+                    # OP, either using the post_logout_redirect_uri
+                    # registration parameter or via another mechanism.
+                    "post_logout_redirect_uri": self.request.build_absolute_uri(
+                        self.get_success_url()
+                    ),
+                }
+                if id_token:
+                    params["id_token_hint"] = id_token
 
-            logout_url = f"{logout_endpoint}?{urlencode(params)}"
-            return HttpResponseRedirect(logout_url)
+                logout_endpoint += f"?{urlencode(params)}"
+
+            return HttpResponseRedirect(logout_endpoint)
 
         logger.warning("No OIDC logout endpoint defined")
         return HttpResponseRedirect(self.get_success_url())
