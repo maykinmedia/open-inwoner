@@ -525,6 +525,7 @@ SESSION_COOKIE_AGE = 900  # Set to 15 minutes or less for testing
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/accounts/login/"
 
+OIDC_FRONTEND_LOGOUT_WITH_HINTS = config("OIDC_FRONTEND_LOGOUT_WITH_HINTS", True)
 
 #
 # SECURITY settings

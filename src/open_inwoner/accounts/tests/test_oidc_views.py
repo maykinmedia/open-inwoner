@@ -630,44 +630,53 @@ class DigiDOIDCFlowTests(WebTest):
             id=1, enabled=True, oidc_op_logout_endpoint="http://localhost:8080/logout"
         ),
     )
-    def test_logout(self, mock_get_solo):
+    def test_frontend_logout_redirects_to_correct_url_with_optional_hints(
+        self, mock_get_solo
+    ):
         # set up a user with a non existing email address
         user = DigidUserFactory.create(
             bsn="123456782", email="existing_user@example.com"
         )
-        self.client.force_login(user)
-        session = self.client.session
-        session["oidc_states"] = {
-            "mock": {
-                "nonce": "nonce",
-                "config_class": "accounts.OpenIDDigiDConfig",
-            }
-        }
-        session["oidc_id_token"] = "foo"
-        session.save()
-        logout_url = reverse("digid_oidc:logout")
 
-        self.assertFalse(User.objects.filter(email="new_user@example.com").exists())
+        for logout_with_hints in (True, False):
+            with (
+                self.subTest(logout_with_hints=logout_with_hints),
+                override_settings(OIDC_FRONTEND_LOGOUT_WITH_HINTS=logout_with_hints),
+            ):
+                self.client.force_login(user)
+                session = self.client.session
+                session["oidc_states"] = {
+                    "mock": {
+                        "nonce": "nonce",
+                        "config_class": "accounts.OpenIDDigiDConfig",
+                    }
+                }
+                session["oidc_id_token"] = "foo"
+                session.save()
+                logout_url = reverse("digid_oidc:logout")
 
-        # enter the logout flow
-        logout_response = self.client.get(logout_url)
+                # enter the logout flow
+                logout_response = self.client.get(logout_url)
 
-        self.assertRedirects(
-            logout_response,
-            "http://localhost:8080/logout"
-            + "?"
-            + urlencode(
-                dict(
-                    id_token_hint="foo",
-                    post_logout_redirect_uri=f"http://testserver{settings.LOGOUT_REDIRECT_URL}",
+                expected_redirect_url = "http://localhost:8080/logout"
+                if logout_with_hints:
+                    params = urlencode(
+                        dict(
+                            id_token_hint="foo",
+                            post_logout_redirect_uri=f"http://testserver{settings.LOGOUT_REDIRECT_URL}",
+                        )
+                    )
+                    expected_redirect_url += f"?{params}"
+
+                self.assertRedirects(
+                    logout_response,
+                    expected_redirect_url,
+                    fetch_redirect_response=False,
                 )
-            ),
-            fetch_redirect_response=False,
-        )
 
-        self.assertNotIn("oidc_states", self.client.session)
-        self.assertNotIn("oidc_id_token", self.client.session)
-        self.assertFalse(logout_response.wsgi_request.user.is_authenticated)
+                self.assertNotIn("oidc_states", self.client.session)
+                self.assertNotIn("oidc_id_token", self.client.session)
+                self.assertFalse(logout_response.wsgi_request.user.is_authenticated)
 
     @patch(
         "open_inwoner.accounts.models.OpenIDDigiDConfig.get_solo",
