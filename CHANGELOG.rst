@@ -1,7 +1,7 @@
 1.34.3 (2025-11-21)
 ===================
 
-Voor een volledig overzicht van alle commits, zie ....
+Voor een volledig overzicht van alle commits, zie :release:`v1.34.3`.
 
 Deployment aandachtspunten
 --------------------------
