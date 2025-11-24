@@ -33,8 +33,7 @@ jobs:
   tests:
     name: Run the Django test suite
     runs-on:
-      ${{ matrix.test-type == 'main' && 'openinwoner-runner' || 'ubuntu-latest'
-      }}
+      ${{ matrix.test-type == 'main' && 'maykin-runner' || 'ubuntu-latest' }}
     strategy:
       matrix:
         test-type: [main, elastic, openklant, migrations]
