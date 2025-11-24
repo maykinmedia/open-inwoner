@@ -1,7 +1,7 @@
 1.35.3 (2025-11-24)
 ===================
 
-Voor een volledig overzicht van alle commits, zie ...
+Voor een volledig overzicht van alle commits, zie :release:`v1.35.3`.
 
 Deployment aandachtspunten
 --------------------------
