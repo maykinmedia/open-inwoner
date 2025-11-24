@@ -54,6 +54,8 @@ beautifulsoup4==4.12.3
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   webtest
+bidict==0.23.1
+    # via python-socketio
 billiard==4.2.1
     # via
     #   -c requirements/ci.txt
@@ -146,8 +148,10 @@ commonmark==0.9.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   recommonmark
-configargparse==1.7
-    # via locust
+configargparse==1.7.1
+    # via
+    #   locust
+    #   locust-cloud
 confusable-homoglyphs==3.2.0
     # via
     #   -c requirements/ci.txt
@@ -642,12 +646,12 @@ filelock==3.18.0
     # via virtualenv
 flask==3.0.0
     # via
-    #   flask-basicauth
     #   flask-cors
+    #   flask-login
     #   locust
-flask-basicauth==0.2.0
-    # via locust
 flask-cors==6.0.1
+    # via locust
+flask-login==0.6.3
     # via locust
 fontawesomefree==6.4.2
     # via
@@ -682,11 +686,12 @@ geopy==2.2.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-gevent==23.9.1
+gevent==24.11.1
     # via
     #   geventhttpclient
     #   locust
-geventhttpclient==2.0.11
+    #   locust-cloud
+geventhttpclient==2.3.5
     # via locust
 glom==20.11.0
     # via
@@ -712,6 +717,8 @@ grpcio==1.74.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   opentelemetry-exporter-otlp-proto-grpc
+h11==0.16.0
+    # via wsproto
 html5lib==1.1
     # via
     #   -c requirements/ci.txt
@@ -757,7 +764,7 @@ isodate==0.6.1
     #   maykin-python3-saml
 itsdangerous==2.1.2
     # via flask
-jinja2==3.1.4
+jinja2==3.1.6
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -778,8 +785,10 @@ kombu==5.5.4
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   celery
-locust==2.20.0
+locust==2.39.1
     # via -r requirements/dev.in
+locust-cloud==1.29.0
+    # via locust
 lxml==6.0.0
     # via
     #   -c requirements/ci.txt
@@ -996,7 +1005,9 @@ pillow==10.3.0
 pip-tools==7.3.0
     # via -r requirements/dev.in
 platformdirs==4.4.0
-    # via virtualenv
+    # via
+    #   locust-cloud
+    #   virtualenv
 playwright==1.50.0
     # via
     #   -c requirements/ci.txt
@@ -1140,6 +1151,15 @@ python-dotenv==1.0.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   pydantic-settings
+python-engineio==4.12.3
+    # via
+    #   locust
+    #   locust-cloud
+    #   python-socketio
+python-socketio[client]==5.15.0
+    # via
+    #   locust
+    #   locust-cloud
 python-stdnum==1.17
     # via
     #   -c requirements/ci.txt
@@ -1199,6 +1219,7 @@ requests==2.32.5
     #   mozilla-django-oidc
     #   objects-api-client-django
     #   opentelemetry-exporter-otlp-proto-http
+    #   python-socketio
     #   requests-mock
     #   sphinx
     #   zgw-consumers
@@ -1206,8 +1227,6 @@ requests-mock==1.12.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-roundrobin==0.0.4
-    # via locust
 ruamel-yaml==0.18.10
     # via
     #   -c requirements/ci.txt
@@ -1226,6 +1245,8 @@ sentry-sdk[django]==2.19.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+simple-websocket==1.1.0
+    # via python-engineio
 simplejson==3.19.2
     # via
     #   -c requirements/ci.txt
@@ -1238,7 +1259,6 @@ six==1.16.0
     #   click-repl
     #   django-elasticsearch-dsl
     #   furl
-    #   geventhttpclient
     #   html5lib
     #   isodate
     #   mail-parser
@@ -1383,6 +1403,7 @@ urllib3==2.5.0
     #   -r requirements/ci.txt
     #   elastic-apm
     #   elastic-transport
+    #   geventhttpclient
     #   requests
     #   sentry-sdk
     #   vcrpy
@@ -1436,15 +1457,18 @@ webob==1.8.7
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   webtest
+websocket-client==1.9.0
+    # via python-socketio
 webtest==3.0.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-webtest
-werkzeug==3.0.1
+werkzeug==3.1.3
     # via
     #   flask
     #   flask-cors
+    #   flask-login
     #   locust
 wheel==0.42.0
     # via pip-tools
@@ -1455,6 +1479,8 @@ wrapt==1.14.1
     #   elastic-apm
     #   opentelemetry-instrumentation
     #   vcrpy
+wsproto==1.3.2
+    # via simple-websocket
 xlrd==2.0.1
     # via
     #   -c requirements/ci.txt

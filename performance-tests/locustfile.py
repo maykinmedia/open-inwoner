@@ -26,7 +26,12 @@ class OpenInwonerUser(HttpUser):
         digid_login_url = f"/digid/idp/inloggen_ww/?{params}"
 
         response = self.client.get(digid_login_url)
-        csrftoken = response.cookies["csrftoken"]
+        csrftoken = response.cookies.get("csrftoken")
+
+        # If no cookie, try to extract from the page content
+        if not csrftoken:
+            doc = pq(response.content)
+            csrftoken = doc.find('input[name="csrfmiddlewaretoken"]').attr("value")
 
         self.client.post(
             digid_login_url,

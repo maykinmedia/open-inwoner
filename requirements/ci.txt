@@ -686,7 +686,7 @@ isodate==0.6.1
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   maykin-python3-saml
-jinja2==3.1.4
+jinja2==3.1.6
     # via sphinx
 josepy==1.13.0
     # via
