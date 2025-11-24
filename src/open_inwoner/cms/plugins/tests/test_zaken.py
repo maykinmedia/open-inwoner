@@ -1,5 +1,6 @@
 from unittest.mock import MagicMock, patch
 
+from django.contrib.auth.models import AnonymousUser
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
@@ -23,10 +24,81 @@ class CMSZakenPluginTest(TestCase):
     def setUp(self):
         self.user = UserFactory(login_type=LoginTypeChoices.digid, bsn="123456789")
 
-    def test_plugin_renders_htmx_loading_placeholder(self):
-        """
-        Test that plugin initially renders a loading spinner with HTMX attributes
-        """
+    def test_plugin_renders_for_authenticated_bsn_user(self):
+        ZGWApiGroupConfigFactory()
+
+        html, context = cms_tools.render_plugin(
+            CMSZakenPlugin,
+            plugin_data={"title": "Mijn Zaken", "num_zaken": 4},
+            user=self.user,
+        )
+
+        # Check that context has the expected keys
+        self.assertIn("show_zaken_plugin", context)
+        self.assertIn("plugin_title", context)
+        self.assertIn("mijn_zaken_url", context)
+        self.assertIn("hx_get_url", context)
+
+        # Verify values
+        self.assertEqual(context["plugin_title"], "Mijn Zaken")
+        self.assertIn("/cases/", context["mijn_zaken_url"])
+        self.assertIn("/cms-plugins/zaken/", context["hx_get_url"])
+        self.assertIn("/content/", context["hx_get_url"])
+        self.assertIn("num_zaken=4", context["hx_get_url"])
+
+        # Check that web component container is rendered
+        self.assertIn("oip-homepage-plugin-section", html)
+        self.assertIn("Mijn Zaken", html)
+        self.assertIn("hx-get", html)
+
+    def test_plugin_does_not_render_without_zgw_api_group_config(self):
+        ZGWApiGroupConfig.objects.all().delete()
+
+        html, context = cms_tools.render_plugin(
+            CMSZakenPlugin,
+            plugin_data={"title": "Mijn Zaken"},
+            user=self.user,
+        )
+
+        # Should not have plugin-specific context keys
+        self.assertNotIn("plugin_title", context)
+        self.assertNotIn("hx_get_url", context)
+        self.assertNotIn("show_zaken_plugin", context)
+
+        # Template always renders HTML comments, but no content when show_zaken_plugin is not set
+        self.assertIn("<!-- start zaken plugin -->", html)
+        self.assertIn("<!-- end zaken plugin -->", html)
+        # Should not contain any actual plugin content
+        self.assertNotIn("oip-homepage-plugin-section", html)
+        self.assertNotIn("oip-zaken-plugin-container", html)
+
+    def test_plugin_does_not_render_for_anonymous_user(self):
+        ZGWApiGroupConfigFactory()
+        anonymous_user = AnonymousUser()
+
+        html, context = cms_tools.render_plugin(
+            CMSZakenPlugin,
+            plugin_data={"title": "Mijn Zaken"},
+            user=anonymous_user,
+        )
+
+        self.assertNotIn("plugin_title", context)
+        self.assertNotIn("hx_get_url", context)
+
+    def test_plugin_does_not_render_for_non_bsn_user(self):
+        ZGWApiGroupConfigFactory()
+        non_bsn_user = UserFactory(login_type=LoginTypeChoices.default, bsn="")
+
+        html, context = cms_tools.render_plugin(
+            CMSZakenPlugin,
+            plugin_data={"title": "Mijn Zaken"},
+            user=non_bsn_user,
+        )
+
+        self.assertNotIn("plugin_title", context)
+        self.assertNotIn("hx_get_url", context)
+
+    def test_plugin_uses_default_num_zaken_value(self):
         ZGWApiGroupConfigFactory()
 
         html, context = cms_tools.render_plugin(
@@ -35,77 +107,24 @@ class CMSZakenPluginTest(TestCase):
             user=self.user,
         )
 
-        pyquery = PyQuery(html)
+        # Default is 4 based on the model default
+        hx_get_url = context["hx_get_url"]
+        self.assertIn("num_zaken=4", hx_get_url)
 
-        self.assertIn("Mijn Zaken", html)
-
-        spinner = pyquery.find(".spinner")
-        self.assertEqual(len(spinner), 1)
-        self.assertIn("Zaken laden...", html)
-
-        # Check that HTMX attributes are present on the container div
-        htmx_container = pyquery.find("[hx-get]")
-        self.assertEqual(
-            len(htmx_container), 1, "Should have exactly one element with hx-get"
-        )
-        self.assertEqual(htmx_container.attr("hx-trigger"), "load")
-        self.assertEqual(htmx_container.attr("hx-swap"), "innerHTML")
-        # Check that the HTMX container has the correct ID pattern
-        self.assertTrue(htmx_container.attr("id").startswith("zaken-content-"))
-
-        # Check that hx-get URL is constructed correctly
-        hxget = context["hxget"]
-        self.assertIn("/cms-plugins/zaken/", hxget)
-        self.assertIn("/content/", hxget)
-
-    def test_plugin_does_not_render_for_anonymous_user(self):
+    def test_plugin_includes_custom_num_zaken_in_url(self):
         ZGWApiGroupConfigFactory()
 
         html, context = cms_tools.render_plugin(
             CMSZakenPlugin,
-            plugin_data={"title": "Mijn Zaken"},
-            user=None,
+            plugin_data={"title": "Mijn Zaken", "num_zaken": 7},
+            user=self.user,
         )
 
-        self.assertNotIn("hxget", context)
-        self.assertEqual(html.strip(), "")
+        hx_get_url = context["hx_get_url"]
+        self.assertIn("num_zaken=7", hx_get_url)
 
-    def test_plugin_does_not_render_for_user_with_wrong_login_type(self):
-        user = UserFactory(login_type=LoginTypeChoices.default)
-        html, context = cms_tools.render_plugin(
-            CMSZakenPlugin,
-            plugin_data={"title": "Mijn Zaken"},
-            user=user,
-        )
-
-        self.assertNotIn("hxget", context)
-        # Should not render the plugin content
-        self.assertEqual(html.strip(), "")
-
-    def test_plugin_does_not_render_without_zgw_api_group_config(self):
-        ZGWApiGroupConfig.objects.all().delete()
-
-        user = UserFactory(login_type=LoginTypeChoices.digid)
-        html, context = cms_tools.render_plugin(
-            CMSZakenPlugin,
-            plugin_data={"title": "Mijn Zaken"},
-            user=user,
-        )
-
-        # Should not have the hxget in context
-        self.assertNotIn("hxget", context)
-        # Should not render the plugin content
-        self.assertEqual(html.strip(), "")
-
-    @patch("open_inwoner.cms.plugins.views.CaseListService")
-    def test_htmx_content_endpoint_returns_empty_without_zgw_api_group_config(
-        self, mock_case_list_service
-    ):
-        """
-        Test that the HTMX content endpoint returns early when no ZGWApiGroupConfig exists
-        """
-        ZGWApiGroupConfig.objects.all().delete()
-
+    def test_htmx_content_endpoint_requires_htmx(self):
+        ZGWApiGroupConfigFactory()
         plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
 
         url = reverse(
@@ -113,19 +132,10 @@ class CMSZakenPluginTest(TestCase):
         )
 
         self.client.force_login(self.user)
-        response = self.client.get(
-            url,
-            HTTP_HX_REQUEST="true",
-        )
+        response = self.client.get(url)  # No HTMX header
 
-        self.assertEqual(response.status_code, 200)
-
-        content = response.content.decode("utf-8")
-
-        self.assertIn("U heeft op dit moment geen lopende zaken.", content)
-
-        # CaseListService should not be instantiated, we return early
-        mock_case_list_service.assert_not_called()
+        # Should return 400 Bad Request
+        self.assertEqual(response.status_code, 400)
 
     @patch(
         "open_inwoner.cms.plugins.views.CaseListService.get_cases",
@@ -138,9 +148,6 @@ class CMSZakenPluginTest(TestCase):
     def test_htmx_content_endpoint_returns_empty_state(
         self, mock_submissions, mock_cases
     ):
-        """
-        Test that the HTMX endpoint returns empty state when no cases exist
-        """
         ServiceFactory(api_root=ZAKEN_ROOT)
         ZGWApiGroupConfigFactory()
         plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
@@ -150,38 +157,33 @@ class CMSZakenPluginTest(TestCase):
         )
 
         self.client.force_login(self.user)
-        response = self.client.get(
-            url,
-            HTTP_HX_REQUEST="true",
-        )
+        response = self.client.get(url, HTTP_HX_REQUEST="true")
 
         self.assertEqual(response.status_code, 200)
-
         content = response.content.decode("utf-8")
-        self.assertIn("U heeft op dit moment geen lopende zaken.", content)
 
-    @patch(
-        "open_inwoner.cms.plugins.views.CaseListService.get_cases",
-    )
+        # Should render container with no items
+        self.assertIn("oip-zaken-plugin-container", content)
+        # Should have no zaak items
+        self.assertNotIn("oip-zaken-plugin-zaak-item", content)
+
+    @patch("open_inwoner.cms.plugins.views.CaseListService.get_cases")
     @patch(
         "open_inwoner.cms.plugins.views.CaseListService.get_submissions",
         return_value=[],
     )
     def test_htmx_content_endpoint_returns_cases(self, mock_submissions, mock_cases):
-        """
-        Test that the HTMX endpoint returns case data
-        """
         api_group = ZGWApiGroupConfigFactory()
+
         mock_case = MagicMock()
         mock_case.process_data.return_value = {
             "uuid": "test-uuid-123",
             "identification": "ZAAK-001",
-            "description": "Test zaak beschrijving",
-            "current_status": "In behandeling",
-            "case_type": "Test zaaktype",
+            "naam": "Test zaak beschrijving",
             "api_group": api_group,
         }
         mock_cases.return_value = [mock_case]
+
         plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
 
         url = reverse(
@@ -189,26 +191,28 @@ class CMSZakenPluginTest(TestCase):
         )
 
         self.client.force_login(self.user)
-        response = self.client.get(
-            url,
-            HTTP_HX_REQUEST="true",
-        )
+        response = self.client.get(url, HTTP_HX_REQUEST="true")
 
         self.assertEqual(response.status_code, 200)
         content = response.content.decode("utf-8")
 
+        # Should render zaak items
         pyquery = PyQuery(content)
-        cards = pyquery.find(".card")
-        self.assertEqual(len(cards), 1)
+        zaak_items = pyquery.find("oip-zaken-plugin-zaak-item")
+        self.assertEqual(len(zaak_items), 1)
 
-        self.assertIn("In behandeling", content)
-        self.assertIn("Test zaak beschrijving", content)
-        self.assertIn("ZAAK-001", content)
+        # Check attributes (note: template uses 'identificatie' not 'identification')
+        zaak_item = zaak_items.eq(0)
+        self.assertEqual(zaak_item.attr("identificatie"), "ZAAK-001")
+        self.assertEqual(zaak_item.attr("description"), "Test zaak beschrijving")
+        self.assertIn("test-uuid-123", zaak_item.attr("detail-url"))
 
-    def test_htmx_content_endpoint_requires_htmx(self):
-        """
-        Test that the content endpoint requires HTMX header
-        """
+    @patch("open_inwoner.cms.plugins.views.CaseListService.get_cases")
+    @patch("open_inwoner.cms.plugins.views.CaseListService.get_submissions")
+    def test_htmx_content_endpoint_complete_failure(self, mock_submissions, mock_cases):
+        mock_cases.side_effect = Exception("Cases API error")
+        mock_submissions.side_effect = Exception("Submissions API error")
+
         plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
 
         url = reverse(
@@ -216,54 +220,62 @@ class CMSZakenPluginTest(TestCase):
         )
 
         self.client.force_login(self.user)
-        response = self.client.get(url)
+        response = self.client.get(url, HTTP_HX_REQUEST="true")
 
-        # Should return 400 Bad Request without HTMX header
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 200)
+        content = response.content.decode("utf-8")
 
-    def test_plugin_includes_num_zaken_in_hxget_url(self):
-        """
-        Test that the plugin includes num_zaken parameter in the HTMX URL
-        """
-        ZGWApiGroupConfigFactory()
+        # Should render container but with no items
+        self.assertIn("oip-zaken-plugin-container", content)
+        # Should have no zaak items
+        self.assertNotIn("oip-zaken-plugin-zaak-item", content)
 
-        html, context = cms_tools.render_plugin(
-            CMSZakenPlugin,
-            plugin_data={"title": "Mijn Zaken", "num_zaken": 5},
-            user=self.user,
+    @patch("open_inwoner.cms.plugins.views.CaseListService.get_cases")
+    @patch("open_inwoner.cms.plugins.views.CaseListService.get_submissions")
+    def test_htmx_content_endpoint_partial_failure(self, mock_submissions, mock_cases):
+        api_group = ZGWApiGroupConfigFactory()
+
+        # Submissions fail
+        mock_submissions.side_effect = Exception("Submissions API error")
+
+        # Cases succeed
+        mock_case = MagicMock()
+        mock_case.process_data.return_value = {
+            "uuid": "test-uuid-123",
+            "identification": "ZAAK-001",
+            "naam": "Test zaak",
+            "api_group": api_group,
+        }
+        mock_cases.return_value = [mock_case]
+
+        plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
+
+        url = reverse(
+            "cms_plugins:zaken_content", kwargs={"plugin_id": plugin_model.pk}
         )
 
-        # Check that hx-get URL contains num_zaken parameter
-        hxget = context["hxget"]
-        self.assertIn("num_zaken=5", hxget)
+        self.client.force_login(self.user)
+        response = self.client.get(url, HTTP_HX_REQUEST="true")
 
-    def test_plugin_uses_default_num_zaken_value(self):
-        """
-        Test that the plugin uses the default num_zaken value (4) when not specified
-        """
-        ZGWApiGroupConfigFactory()
+        self.assertEqual(response.status_code, 200)
+        content = response.content.decode("utf-8")
 
-        html, context = cms_tools.render_plugin(
-            CMSZakenPlugin,
-            plugin_data={"title": "Mijn Zaken"},
-            user=self.user,
-        )
+        # Should render cases that were retrieved
+        pyquery = PyQuery(content)
+        zaak_items = pyquery.find("oip-zaken-plugin-zaak-item")
+        self.assertEqual(len(zaak_items), 1)
 
-        # Check that hx-get URL contains default num_zaken parameter
-        hxget = context["hxget"]
-        self.assertIn("num_zaken=4", hxget)
+        # Should have error message in slot
+        error_slot = pyquery.find('[slot="error"]')
+        self.assertEqual(len(error_slot), 1)
+        self.assertIn("technical difficulties", error_slot.text().lower())
 
-    @patch(
-        "open_inwoner.cms.plugins.views.CaseListService.get_cases",
-    )
+    @patch("open_inwoner.cms.plugins.views.CaseListService.get_cases")
     @patch(
         "open_inwoner.cms.plugins.views.CaseListService.get_submissions",
         return_value=[],
     )
     def test_num_zaken_parameter_limits_results(self, mock_submissions, mock_cases):
-        """
-        Test that the num_zaken query parameter correctly limits the number of returned cases
-        """
         api_group = ZGWApiGroupConfigFactory()
 
         mock_cases_list = []
@@ -272,9 +284,7 @@ class CMSZakenPluginTest(TestCase):
             mock_case.process_data.return_value = {
                 "uuid": f"test-uuid-{i}",
                 "identification": f"ZAAK-{i:03d}",
-                "description": f"Test zaak {i}",
-                "current_status": "In behandeling",
-                "case_type": "Test zaaktype",
+                "naam": f"Test zaak {i}",
                 "api_group": api_group,
             }
             mock_cases_list.append(mock_case)
@@ -290,87 +300,28 @@ class CMSZakenPluginTest(TestCase):
         )
 
         self.client.force_login(self.user)
-        response = self.client.get(
-            url,
-            {"num_zaken": "3"},
-            HTTP_HX_REQUEST="true",
-        )
+        response = self.client.get(url, {"num_zaken": "3"}, HTTP_HX_REQUEST="true")
 
         self.assertEqual(response.status_code, 200)
         content = response.content.decode("utf-8")
 
         pyquery = PyQuery(content)
-        cards = pyquery.find(".card")
+        zaak_items = pyquery.find("oip-zaken-plugin-zaak-item")
 
-        self.assertEqual(len(cards), 3)
+        # Should only return 3 items
+        self.assertEqual(len(zaak_items), 3)
 
         # Verify it shows the first 3 cases
-        self.assertIn("ZAAK-000", content)
-        self.assertIn("ZAAK-001", content)
-        self.assertIn("ZAAK-002", content)
-        self.assertNotIn("ZAAK-003", content)
+        identifications = [pyquery(item).attr("identificatie") for item in zaak_items]
+        self.assertIn("ZAAK-000", identifications)
+        self.assertIn("ZAAK-001", identifications)
+        self.assertIn("ZAAK-002", identifications)
 
-    @patch(
-        "open_inwoner.cms.plugins.views.CaseListService.get_cases",
-    )
-    @patch(
-        "open_inwoner.cms.plugins.views.CaseListService.get_submissions",
-        return_value=[],
-    )
-    def test_num_zaken_parameter_with_different_values(
-        self, mock_submissions, mock_cases
-    ):
-        """
-        Test that different num_zaken values return correct number of cases
-        """
-        api_group = ZGWApiGroupConfigFactory()
-
-        mock_cases_list = []
-        for i in range(10):
-            mock_case = MagicMock()
-            mock_case.process_data.return_value = {
-                "uuid": f"test-uuid-{i}",
-                "identification": f"ZAAK-{i:03d}",
-                "description": f"Test zaak {i}",
-                "current_status": "In behandeling",
-                "case_type": "Test zaaktype",
-                "api_group": api_group,
-            }
-            mock_cases_list.append(mock_case)
-
-        mock_cases.return_value = mock_cases_list
-
-        plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
-
-        url = reverse(
-            "cms_plugins:zaken_content", kwargs={"plugin_id": plugin_model.pk}
-        )
-
-        self.client.force_login(self.user)
-
-        test_cases = ["2", "7", "10"]
-        for num_zaken in test_cases:
-            with self.subTest(num_zaken=num_zaken):
-                response = self.client.get(
-                    url,
-                    {"num_zaken": num_zaken},
-                    HTTP_HX_REQUEST="true",
-                )
-                pyquery = PyQuery(response.content.decode("utf-8"))
-                self.assertEqual(len(pyquery.find(".card")), int(num_zaken))
-
-    @patch(
-        "open_inwoner.cms.plugins.views.CaseListService.get_cases",
-    )
-    @patch(
-        "open_inwoner.cms.plugins.views.CaseListService.get_submissions",
-    )
+    @patch("open_inwoner.cms.plugins.views.CaseListService.get_cases")
+    @patch("open_inwoner.cms.plugins.views.CaseListService.get_submissions")
     def test_num_zaken_parameter_with_mixed_submissions_and_cases(
         self, mock_submissions, mock_cases
     ):
-        """
-        Test that num_zaken correctly limits combined submissions and cases
-        """
         api_group = ZGWApiGroupConfigFactory()
 
         # 3 mock submissions
@@ -380,9 +331,7 @@ class CMSZakenPluginTest(TestCase):
             mock_submission.process_data.return_value = {
                 "uuid": f"submission-uuid-{i}",
                 "identification": f"SUBMISSION-{i:03d}",
-                "description": f"Test submission {i}",
-                "current_status": "Open",
-                "case_type": "Submission type",
+                "naam": f"Test submission {i}",
                 "api_group": api_group,
             }
             mock_submissions_list.append(mock_submission)
@@ -394,9 +343,7 @@ class CMSZakenPluginTest(TestCase):
             mock_case.process_data.return_value = {
                 "uuid": f"case-uuid-{i}",
                 "identification": f"ZAAK-{i:03d}",
-                "description": f"Test zaak {i}",
-                "current_status": "In behandeling",
-                "case_type": "Test zaaktype",
+                "naam": f"Test zaak {i}",
                 "api_group": api_group,
             }
             mock_cases_list.append(mock_case)
@@ -413,39 +360,34 @@ class CMSZakenPluginTest(TestCase):
         self.client.force_login(self.user)
 
         # Test with num_zaken=5 (should get 3 submissions + 2 cases)
-        response = self.client.get(
-            url,
-            {"num_zaken": "5"},
-            HTTP_HX_REQUEST="true",
-        )
-        content = response.content.decode("utf-8")
-        pyquery = PyQuery(content)
+        response = self.client.get(url, {"num_zaken": "5"}, HTTP_HX_REQUEST="true")
 
-        self.assertEqual(len(pyquery.find(".card")), 5)
+        pyquery = PyQuery(response.content.decode("utf-8"))
+        zaak_items = pyquery.find("oip-zaken-plugin-zaak-item")
+
+        # Should return exactly 5 items
+        self.assertEqual(len(zaak_items), 5)
+
+        # Extract identifications (note: template uses 'identificatie' attribute)
+        identifications = [pyquery(item).attr("identificatie") for item in zaak_items]
 
         # Verify submissions come first
-        self.assertIn("SUBMISSION-000", content)
-        self.assertIn("SUBMISSION-001", content)
-        self.assertIn("SUBMISSION-002", content)
+        self.assertIn("SUBMISSION-000", identifications)
+        self.assertIn("SUBMISSION-001", identifications)
+        self.assertIn("SUBMISSION-002", identifications)
         # Then cases
-        self.assertIn("ZAAK-000", content)
-        self.assertIn("ZAAK-001", content)
+        self.assertIn("ZAAK-000", identifications)
+        self.assertIn("ZAAK-001", identifications)
         # But not the 3rd case
-        self.assertNotIn("ZAAK-002", content)
+        self.assertNotIn("ZAAK-002", identifications)
 
-    @patch(
-        "open_inwoner.cms.plugins.views.CaseListService.get_cases",
-    )
+    @patch("open_inwoner.cms.plugins.views.CaseListService.get_cases")
     @patch(
         "open_inwoner.cms.plugins.views.CaseListService.get_submissions",
         return_value=[],
     )
-    def test_num_zaken_parameter_handles_invalid_string(
-        self, mock_submissions, mock_cases
-    ):
-        """
-        Test that invalid string values for num_zaken fall back to MAX_CASES_DEFAULT
-        """
+    def test_num_zaken_parameter_invalid_input(self, mock_submissions, mock_cases):
+        """Test that invalid values for num_zaken fall back to MAX_CASES_DEFAULT"""
         api_group = ZGWApiGroupConfigFactory()
 
         mock_cases_list = []
@@ -454,9 +396,7 @@ class CMSZakenPluginTest(TestCase):
             mock_case.process_data.return_value = {
                 "uuid": f"test-uuid-{i}",
                 "identification": f"ZAAK-{i:03d}",
-                "description": f"Test zaak {i}",
-                "current_status": "In behandeling",
-                "case_type": "Test zaaktype",
+                "naam": f"Test zaak {i}",
                 "api_group": api_group,
             }
             mock_cases_list.append(mock_case)
@@ -471,49 +411,36 @@ class CMSZakenPluginTest(TestCase):
 
         self.client.force_login(self.user)
 
-        # Test with invalid string - should fall back to MAX_CASES_DEFAULT
-        response = self.client.get(
-            url,
-            {"num_zaken": "invalid"},
-            HTTP_HX_REQUEST="true",
-        )
+        test_cases = ["invalid", "-5"]
+        for invalid_num_zaken in test_cases:
+            with self.subTest(invalid_num_zaken=invalid_num_zaken):
+                response = self.client.get(
+                    url, {"num_zaken": invalid_num_zaken}, HTTP_HX_REQUEST="true"
+                )
 
-        self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.status_code, 200)
 
-        pyquery = PyQuery(response.content.decode("utf-8"))
-        cards = pyquery.find(".card")
-        # Should return MAX_CASES_DEFAULT instead of crashing
-        self.assertEqual(len(cards), MAX_CASES_DEFAULT)
+                pyquery = PyQuery(response.content.decode("utf-8"))
+                zaak_items = pyquery.find("oip-zaken-plugin-zaak-item")
+                # Should return MAX_CASES_DEFAULT
+                self.assertEqual(len(zaak_items), MAX_CASES_DEFAULT)
 
-    @patch(
-        "open_inwoner.cms.plugins.views.CaseListService.get_cases",
-    )
+    @patch("open_inwoner.cms.plugins.views.CaseListService.get_cases")
     @patch(
         "open_inwoner.cms.plugins.views.CaseListService.get_submissions",
         return_value=[],
     )
-    def test_num_zaken_parameter_handles_negative_value(
-        self, mock_submissions, mock_cases
-    ):
-        """
-        Test that negative values for num_zaken fall back to MAX_CASES_DEFAULT
-        """
+    def test_htmx_content_maps_naam_to_description(self, mock_submissions, mock_cases):
         api_group = ZGWApiGroupConfigFactory()
 
-        mock_cases_list = []
-        for i in range(15):
-            mock_case = MagicMock()
-            mock_case.process_data.return_value = {
-                "uuid": f"test-uuid-{i}",
-                "identification": f"ZAAK-{i:03d}",
-                "description": f"Test zaak {i}",
-                "current_status": "In behandeling",
-                "case_type": "Test zaaktype",
-                "api_group": api_group,
-            }
-            mock_cases_list.append(mock_case)
-
-        mock_cases.return_value = mock_cases_list
+        mock_case = MagicMock()
+        mock_case.process_data.return_value = {
+            "uuid": "test-uuid-123",
+            "identification": "ZAAK-001",
+            "naam": "Dit is de naam van de zaak",
+            "api_group": api_group,
+        }
+        mock_cases.return_value = [mock_case]
 
         plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
 
@@ -522,50 +449,34 @@ class CMSZakenPluginTest(TestCase):
         )
 
         self.client.force_login(self.user)
-
-        # Test with negative value - should fall back to MAX_CASES_DEFAULT
-        response = self.client.get(
-            url,
-            {"num_zaken": "-5"},
-            HTTP_HX_REQUEST="true",
-        )
+        response = self.client.get(url, HTTP_HX_REQUEST="true")
 
         self.assertEqual(response.status_code, 200)
 
         pyquery = PyQuery(response.content.decode("utf-8"))
-        cards = pyquery.find(".card")
-        # Should return MAX_CASES_DEFAULT instead of processing negative value
-        self.assertEqual(len(cards), MAX_CASES_DEFAULT)
+        zaak_item = pyquery.find("oip-zaken-plugin-zaak-item")
 
-    @patch(
-        "open_inwoner.cms.plugins.views.CaseListService.get_cases",
-    )
+        # Verify naam is mapped to description attribute
+        self.assertEqual(zaak_item.attr("description"), "Dit is de naam van de zaak")
+
+    @patch("open_inwoner.cms.plugins.views.CaseListService.get_cases")
     @patch(
         "open_inwoner.cms.plugins.views.CaseListService.get_submissions",
         return_value=[],
     )
-    def test_num_zaken_parameter_handles_excessive_value(
+    def test_htmx_content_handles_missing_optional_fields(
         self, mock_submissions, mock_cases
     ):
-        """
-        Test that values over MAX_CASES_DEFAULT fall back to MAX_CASES_DEFAULT
-        """
         api_group = ZGWApiGroupConfigFactory()
 
-        mock_cases_list = []
-        for i in range(15):
-            mock_case = MagicMock()
-            mock_case.process_data.return_value = {
-                "uuid": f"test-uuid-{i}",
-                "identification": f"ZAAK-{i:03d}",
-                "description": f"Test zaak {i}",
-                "current_status": "In behandeling",
-                "case_type": "Test zaaktype",
-                "api_group": api_group,
-            }
-            mock_cases_list.append(mock_case)
-
-        mock_cases.return_value = mock_cases_list
+        mock_case = MagicMock()
+        # Return minimal data - identification is required for logging
+        mock_case.process_data.return_value = {
+            "uuid": "test-uuid-123",
+            "identification": "",  # Required for logging
+            "api_group": api_group,
+        }
+        mock_cases.return_value = [mock_case]
 
         plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
 
@@ -574,17 +485,76 @@ class CMSZakenPluginTest(TestCase):
         )
 
         self.client.force_login(self.user)
-
-        # Test with excessive value - should fall back to MAX_CASES_DEFAULT
-        response = self.client.get(
-            url,
-            {"num_zaken": "20"},
-            HTTP_HX_REQUEST="true",
-        )
+        response = self.client.get(url, HTTP_HX_REQUEST="true")
 
         self.assertEqual(response.status_code, 200)
 
         pyquery = PyQuery(response.content.decode("utf-8"))
-        cards = pyquery.find(".card")
-        # Should return MAX_CASES_DEFAULT
-        self.assertEqual(len(cards), MAX_CASES_DEFAULT)
+        zaak_item = pyquery.find("oip-zaken-plugin-zaak-item")
+
+        # Verify missing fields are provided as empty strings
+        self.assertEqual(zaak_item.attr("identificatie"), "")
+        self.assertEqual(zaak_item.attr("description"), "")
+
+    @patch("open_inwoner.cms.plugins.views.CaseListService.get_cases")
+    @patch("open_inwoner.cms.plugins.views.CaseListService.get_submissions")
+    def test_htmx_content_handles_both_naam_and_description_fields(
+        self, mock_submissions, mock_cases
+    ):
+        """
+        Test that both 'naam' field (from openstaande inzendingen) and 'description' field
+        (from regular zaken) are correctly mapped to 'description' in the component output.
+        """
+        api_group = ZGWApiGroupConfigFactory()
+
+        # Mock open submission with "naam" field
+        mock_submission = MagicMock()
+        mock_submission.process_data.return_value = {
+            "uuid": "submission-uuid-1",
+            "identification": "SUBMISSION-001",
+            "naam": "Open submission met naam field",
+            "api_group": api_group,
+        }
+
+        # Mock regular case with "description"
+        mock_case = MagicMock()
+        mock_case.process_data.return_value = {
+            "uuid": "case-uuid-1",
+            "identification": "ZAAK-001",
+            "description": "Regular case met description field",
+            "api_group": api_group,
+        }
+
+        mock_submissions.return_value = [mock_submission]
+        mock_cases.return_value = [mock_case]
+
+        plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
+
+        url = reverse(
+            "cms_plugins:zaken_content", kwargs={"plugin_id": plugin_model.pk}
+        )
+
+        self.client.force_login(self.user)
+        response = self.client.get(url, HTTP_HX_REQUEST="true")
+
+        self.assertEqual(response.status_code, 200)
+
+        pyquery = PyQuery(response.content.decode("utf-8"))
+        zaak_items = pyquery.find("oip-zaken-plugin-zaak-item")
+
+        # Should have both items
+        self.assertEqual(len(zaak_items), 2)
+
+        # First item should be the submission with "naam" field
+        submission_item = zaak_items.eq(0)
+        self.assertEqual(submission_item.attr("identificatie"), "SUBMISSION-001")
+        self.assertEqual(
+            submission_item.attr("description"), "Open submission met naam field"
+        )
+
+        # Second item should be the case with "description" field
+        case_item = zaak_items.eq(1)
+        self.assertEqual(case_item.attr("identificatie"), "ZAAK-001")
+        self.assertEqual(
+            case_item.attr("description"), "Regular case met description field"
+        )

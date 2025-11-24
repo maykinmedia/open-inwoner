@@ -19,7 +19,13 @@ class CMSZakenPlugin(CMSPluginBase):
     render_template = "cms/plugins/zaken/zaken.html"
     cache = False
 
-    def render(self, context, instance, placeholder) -> dict[str, str]:
+    def render(self, context, instance, placeholder) -> dict:
+        """
+        Render the CMS Zaken Plugin
+
+        This method prepares the initial container that will use HTMX to load
+        zaken data asynchronously.
+        """
         if not ZGWApiGroupConfig.objects.exists():
             return context
 
@@ -33,10 +39,14 @@ class CMSZakenPlugin(CMSPluginBase):
         )
         f_url.args["num_zaken"] = instance.num_zaken
 
+        mijn_zaken_url = reverse("cases:index")
+
         context.update(
             {
-                "instance": instance,
-                "hxget": f_url.url,
+                "show_zaken_plugin": True,
+                "mijn_zaken_url": mijn_zaken_url,
+                "plugin_title": instance.title,
+                "hx_get_url": f_url.url,
             }
         )
 
