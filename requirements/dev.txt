@@ -95,7 +95,7 @@ celery-once==3.0.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-certifi==2023.11.17
+certifi==2025.11.12
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt

@@ -184,6 +184,7 @@ Onderhoud
 * [:pr:`1991`, :taiga-is:`3626`] Vervang het woord "notificaties" met "meldingen"
   omwille van de B1 taaleis.
 * [:pr:`2031`] Verouderde ``mozilla-django-oidc-db`` cache-instellingen verwijderd.
+* [:pr:`2041`]: ``certifi`` bijgewerkt naar versie ``2025.11.12``.
 
 1.35.2 (2025-11-13)
 ===================
