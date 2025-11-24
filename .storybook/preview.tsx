@@ -1,32 +1,22 @@
-import type { Preview } from '@storybook/react';
-import type { StoryFn } from '@storybook/react';
-
-// NLDS keys
-// @ts-expect-error - CSS imports handled by bundler
 import '@open-inwoner/design-tokens/dist/css/index.css';
-// NLDS values
-// @ts-expect-error
+import { Preview, StoryFn } from '@storybook/preact';
 import '../src/open_inwoner/static/bundles/open_inwoner-css.css';
+import '../src/open_inwoner/static/bundles/open_inwoner-react.js';
 
 const withThemeClass = (Story: StoryFn) => {
   document.body.classList.add('openinwoner-theme');
-
+  // @ts-ignore
   return <Story />;
 };
 
 const preview: Preview = {
   decorators: [withThemeClass],
   parameters: {
-    controls: {
-      matchers: {
-        color: /(background|color)$/i,
-        date: /Date$/,
-      },
-    },
+    controls: { matchers: { color: /(background|color)$/i, date: /Date$/ } },
     options: {
       storySort: {
         method: 'alphabetical',
-        order: ['Introduction', 'Developers', 'React'],
+        order: ['Introduction', 'Developers', 'Preact'],
       },
     },
     layout: 'centered',

@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
 import path from 'path';
 import paths from './build/paths';
+import preact from '@preact/preset-vite';
 
 // Support CLI flags like --production and --sourcemap
 const argv = process.argv;
@@ -12,7 +12,7 @@ const useSourceMap = argv.includes('--sourcemap');
 // Export Vite build-only config
 export default defineConfig({
   plugins: [
-    react({
+    preact({
       babel: {
         plugins: [
           [
@@ -22,7 +22,6 @@ export default defineConfig({
               ast: true,
             },
           ],
-          ['@babel/plugin-proposal-decorators', { version: '2023-11' }],
         ],
       },
     }),
@@ -45,7 +44,6 @@ export default defineConfig({
     rollupOptions: {
       input: {
         [`${paths.package.name}-react`]: `${__dirname}/${paths.reactEntry}`,
-        [`${paths.package.name}-webcomponents`]: `${__dirname}/${paths.webComponentsEntry}`,
       },
       output: {
         entryFileNames: '[name].js',
