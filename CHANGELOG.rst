@@ -156,6 +156,7 @@ Bugfixes
 Onderhoud
 ---------
 
+* [:pr:`2039`]: ``jinja2`` bijgewerkt naar versie ``3.1.6``.
 * [:pr:`2024`]: ``brotli`` bijgewerkt naar versie ``1.2.0``.
 * [:pr:`1943`]: ``waitress`` bijgewerkt naar versie ``3.0.2``.
 * [:pr:`1943`]: ``Flask-CORS`` bijgewerkt naar versie ``6.0.1``.
