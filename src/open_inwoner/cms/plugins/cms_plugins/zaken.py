@@ -23,7 +23,8 @@ class CMSZakenPlugin(CMSPluginBase):
         if not ZGWApiGroupConfig.objects.exists():
             return context
 
-        if not context["request"].user.is_bsn_user:
+        user = context["request"].user
+        if not user.is_authenticated or not user.is_bsn_user:
             return context
 
         # HTMX endpoint with num_zaken parameter
