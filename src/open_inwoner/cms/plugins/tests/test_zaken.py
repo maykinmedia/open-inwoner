@@ -58,8 +58,19 @@ class CMSZakenPluginTest(TestCase):
         self.assertIn("/cms-plugins/zaken/", hxget)
         self.assertIn("/content/", hxget)
 
-    def test_plugin_does_not_render_for_unauthenticated_user(self):
-        """Test that the plugin doesn't render for users without appropriate login type"""
+    def test_plugin_does_not_render_for_anonymous_user(self):
+        ZGWApiGroupConfigFactory()
+
+        html, context = cms_tools.render_plugin(
+            CMSZakenPlugin,
+            plugin_data={"title": "Mijn Zaken"},
+            user=None,
+        )
+
+        self.assertNotIn("hxget", context)
+        self.assertEqual(html.strip(), "")
+
+    def test_plugin_does_not_render_for_user_with_wrong_login_type(self):
         user = UserFactory(login_type=LoginTypeChoices.default)
         html, context = cms_tools.render_plugin(
             CMSZakenPlugin,
