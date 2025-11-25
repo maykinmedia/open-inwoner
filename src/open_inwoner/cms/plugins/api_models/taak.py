@@ -2,13 +2,30 @@ from datetime import datetime
 from typing import Literal, Optional, Union
 from uuid import UUID
 
-from pydantic import AnyUrl, BaseModel, Extra, Field
+from pydantic import AnyUrl, BaseModel, ConfigDict, Extra, Field
+
+
+def to_camel(string: str) -> str:
+    parts = string.split("_")
+    return parts[0] + "".join(part.capitalize() for part in parts[1:])
+
+
+class PydanticCamelCaseModel(BaseModel):
+    """
+    Pydantic BaseModel with alias generator and default config.
+    """
+
+    model_config = ConfigDict(
+        populate_by_name=True,  # Accept both field name and alias
+        alias_generator=to_camel,
+        extra=Extra.ignore,
+    )
 
 
 #
 # object (generic envelope)
 #
-class ObjectRecord(BaseModel):
+class ObjectRecord(PydanticCamelCaseModel):
     index: int
     type_version: int
     data: Optional[dict]
@@ -20,7 +37,7 @@ class ObjectRecord(BaseModel):
     corrected_by: int
 
 
-class Object(BaseModel):
+class Object(PydanticCamelCaseModel):
     url: str
     uuid: str
     type: str
@@ -41,22 +58,21 @@ TaakSoort = Literal[
 TaakStatus = Literal["open", "afgerond", "verwerkt", "gesloten"]
 
 
-class Url(BaseModel):
-    class Config:
-        extra = Extra.forbid
+class Url(PydanticCamelCaseModel):
+    model_config = ConfigDict(extra=Extra.forbid)
 
     uri: AnyUrl
 
 
-class LegalSubject(BaseModel):
+class LegalSubject(PydanticCamelCaseModel):
     identifier: str
 
 
-class Authorizee(BaseModel):
+class Authorizee(PydanticCamelCaseModel):
     legal_subject: LegalSubject
 
 
-class Betrokkene(BaseModel):
+class Betrokkene(PydanticCamelCaseModel):
     source: Literal["digid", "eherkenning"]
     authorizee: Authorizee
     representee: object | None = None
@@ -64,48 +80,48 @@ class Betrokkene(BaseModel):
     mandate: object | None = None
 
 
-class IdentificatieBSN(BaseModel):
+class IdentificatieBSN(PydanticCamelCaseModel):
     type: Literal["bsn"]
     value: str = Field(pattern=r"^\d{9}$")
 
 
-class IdentificatieKVK(BaseModel):
+class IdentificatieKVK(PydanticCamelCaseModel):
     type: Literal["kvk"]
     value: str = Field(pattern=r"^\d{8}$")
 
 
-class KoppelingZaak(BaseModel):
-    class Config:
-        extra = Extra.forbid
+class KoppelingZaak(PydanticCamelCaseModel):
+    model_config = ConfigDict(extra=Extra.forbid)
 
     registratie: Literal["zaak"]
     value: Optional[UUID] = None
 
 
-class KoppelingProduct(BaseModel):
-    class Config:
-        extra = Extra.forbid
+class KoppelingProduct(PydanticCamelCaseModel):
+    model_config = ConfigDict(extra=Extra.forbid)
 
     registratie: Literal["product"]
     value: Optional[UUID] = None
 
 
-class Formulier(BaseModel):
+class Formulier(PydanticCamelCaseModel):
     soort: str
     value: str
 
 
-class Portaalformulier(BaseModel):
+class Portaalformulier(PydanticCamelCaseModel):
     data: object
     formulier: Formulier
     verzonden_data: object
 
 
-class TaakUrl(BaseModel):
+class TaakUrl(PydanticCamelCaseModel):
     uri: AnyUrl
 
 
-class ExternFormulierTaak(BaseModel):
+class ExternFormulierTaak(PydanticCamelCaseModel):
+    model_config = ConfigDict(extra=Extra.forbid)
+
     # object data
     url: str
     uuid: str
@@ -123,11 +139,10 @@ class ExternFormulierTaak(BaseModel):
     betrokkene: Betrokkene
     portaalformulier: Portaalformulier
 
-    class Config:
-        extra = Extra.forbid
 
+class UrlTaak(PydanticCamelCaseModel):
+    model_config = ConfigDict(extra=Extra.forbid)
 
-class UrlTaak(BaseModel):
     # object data
     url: str
     uuid: str
@@ -144,6 +159,3 @@ class UrlTaak(BaseModel):
     koppeling: KoppelingZaak | KoppelingProduct | None = None
     identificatie: Union[IdentificatieBSN, IdentificatieKVK]
     task_url: TaakUrl
-
-    class Config:
-        extra = Extra.forbid

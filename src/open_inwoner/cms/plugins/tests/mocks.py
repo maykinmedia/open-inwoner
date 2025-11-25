@@ -1,6 +1,6 @@
 from urllib.parse import quote
 
-from .factories import ObjectsAPIConfigFactory
+from .factories import ObjectsAPIServiceConfigFactory
 
 OBJECTS_API_ROOT = "http://www.objects-api.nl/api/v1"
 OBJECT_TYPE_API_ROOT = "http://www.object-type-api.nl/api/v1"
@@ -134,11 +134,11 @@ class TaakMockData:
 
     @classmethod
     def setUpServices(cls):
-        ObjectsAPIConfigFactory(
-            object_type_api_service__api_root=OBJECT_TYPE_API_ROOT,
-            objects_api_service__label="API-objects",
-            objects_api_service__api_root=OBJECTS_API_ROOT,
-            objects_api_service__slug="api-objects",
+        ObjectsAPIServiceConfigFactory(
+            objecttypes_api_client_config__api_root=OBJECT_TYPE_API_ROOT,
+            objects_api_client_config__label="API-objects",
+            objects_api_client_config__api_root=OBJECTS_API_ROOT,
+            objects_api_client_config__slug="api-objects",
         )
 
     def install_mocks(self, m) -> "TaakMockData":
