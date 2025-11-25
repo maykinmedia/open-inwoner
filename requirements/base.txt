@@ -269,7 +269,7 @@ django-setup-configuration==0.9.0
     # via
     #   -r requirements/base.in
     #   mozilla-django-oidc-db
-django-simple-certmanager==2.4.1
+django-simple-certmanager==2.5.0
     # via
     #   django-digid-eherkenning
     #   zgw-consumers
