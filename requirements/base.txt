@@ -41,7 +41,7 @@ celery==5.5.3
     #   notifications-api-common
 celery-once==3.0.1
     # via -r requirements/base.in
-certifi==2023.11.17
+certifi==2025.11.12
     # via
     #   elastic-apm
     #   elastic-transport
