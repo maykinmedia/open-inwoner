@@ -154,6 +154,8 @@ Bugfixes
   navigatie menu zagen.
 * [:taiga-is:`3588`, :pr:`2029`]: Ontbrekende logout URL voor reguliere gebruikers is
   toegoevegd, en de logica voor alle login types is opgeschoond.
+* [:taiga-is:`3599`, :pr:`2045`]: Bij het bekijken van de bron code van componenten in Storybook
+  wordt nu de correcte styling getoond.
 
 Onderhoud
 ---------
