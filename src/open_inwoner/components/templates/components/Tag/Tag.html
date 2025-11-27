@@ -1,10 +1,10 @@
 {% load i18n %}
 
-<aside class="tag-list" aria-label="{% trans "Tag lijst" %}">
-    <ul class="tag-list__list">
+<aside class="oip-tag-list" aria-label="{% trans "Tag lijst" %}">
+    <ul class="oip-tag-list__list">
         {% for tag in tags %}
-            <li class="tag-list__list-item">
-                <span class="tag">{{ tag.name }}</span>
+            <li class="oip-tag-list__list-item">
+                <span class="oip-tag">{{ tag.name }}</span>
             </li>
         {% endfor %}
     </ul>
