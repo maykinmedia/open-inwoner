@@ -1,9 +1,4 @@
 {
-  "Q6fIiw": {
-    "defaultMessage": "Dit is het aantal",
-    "description": "Counter",
-    "originalDefault": "This is the current count"
-  },
   "kvkbranchselector.clear": {
     "defaultMessage": "Wissen",
     "description": "Clear search button label",
