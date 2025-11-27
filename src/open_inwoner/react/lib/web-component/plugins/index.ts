@@ -10,4 +10,3 @@
 export { skeletonPlugin } from './skeleton';
 export { silentErrorPlugin } from './error-boundary';
 export { performancePlugin } from './performance';
-export { withIntl } from '../../decorators/intl';

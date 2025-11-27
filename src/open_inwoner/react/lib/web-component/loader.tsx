@@ -1,15 +1,17 @@
-import { wcRegistry } from './registry';
 import {
+  createContextsForComponent,
+  findWebComponentsOnPage,
   runAfterLoadHooks,
   runBeforeLoadHooks,
   runErrorHooks,
-} from './middleware';
-import { createContextsForComponent, findWebComponentsOnPage } from './utils';
+  wcRegistry,
+  WebComponentKey,
+} from '.';
 
 /**
  * Load a single web component with plugin lifecycle
  */
-export const wcLoader = async (name: string): Promise<void> => {
+export const wcLoader = async (name: WebComponentKey): Promise<void> => {
   // Skip if already defined
   if (customElements.get(name)) return;
 
@@ -47,6 +49,8 @@ export const registerWebComponents = async (): Promise<void> => {
 
     // Only continue if there are web components on the current page
     if (!founded.length) return;
+
+    console.log(founded);
 
     // Load all unique components in parallel
     await Promise.all(founded.map(wcLoader));

@@ -1,9 +1,13 @@
+import { wcRegistry } from '.';
+
+export type WebComponentKey = keyof typeof wcRegistry;
+
 /**
  * Context object passed to plugin hooks
  */
 export interface WebComponentContext {
-  /** The web component tag name (e.g., 'simple-header') */
-  componentName: string;
+  /** The web component tag name (e.g., 'action-list') */
+  componentName: WebComponentKey;
   /** The HTML element instance */
   element: HTMLElement;
 }
@@ -28,15 +32,18 @@ export interface WebComponentPlugin {
   onError?: WebComponentLoadHook;
 }
 
-/**
- * Type for component importer functions
- */
-export type WebComponentImporter = () => Promise<{ loader: () => void }>;
+// /**
+//  * Type for component importer functions
+//  */
+// export type WebComponentImporter = () => Promise<{ loader: () => void }>;
 
-/**
- * Registry of web components
- */
-export type WebComponentRegistry = Record<string, WebComponentImporter>;
+// /**
+//  * Registry of web components
+//  */
+// export type WebComponentRegistry = Record<
+//   WebComponentKey,
+//   WebComponentImporter
+// >;
 
 /**
  * Function that executes a load hook
@@ -45,3 +52,27 @@ export type WebComponentLoadHook = (
   context: WebComponentContext,
   error?: Error
 ) => Promise<void> | void;
+
+/**
+ * Extended options for web component registration
+ */
+export type WebComponentRegisterOptions =
+  | {
+      shadow: false;
+      /**
+       * Whether to automatically wrap the component with IntlProvider for i18n support
+       * @default false
+       */
+      i18n?: boolean;
+    }
+  | {
+      shadow: true;
+      mode?: 'open' | 'closed';
+      adoptedStyleSheets?: CSSStyleSheet[];
+      serializable?: boolean;
+      /**
+       * Whether to automatically wrap the component with IntlProvider for i18n support
+       * @default false
+       */
+      i18n?: boolean;
+    };

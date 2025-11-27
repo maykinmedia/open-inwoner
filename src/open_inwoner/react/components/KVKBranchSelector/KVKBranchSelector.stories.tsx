@@ -2,7 +2,7 @@ import '@open-inwoner/design-tokens/dist/css/index.css';
 import type { Meta, StoryObj } from '@storybook/preact';
 // import 'material-icons/iconfont/material-icons.css';
 import { KVKBranchSelector, KVKBranchSelectorProps, loader } from '.';
-import { withLoader } from '@react/lib/decorators/storybook-decorators';
+import { withLoader } from '@react/lib/decorators/storybook';
 
 const meta: Meta<KVKBranchSelectorProps> = {
   title: 'Components/KVKBranchSelector',

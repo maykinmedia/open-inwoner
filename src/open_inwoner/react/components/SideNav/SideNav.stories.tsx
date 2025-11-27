@@ -1,7 +1,7 @@
 import { Meta, StoryObj } from '@storybook/preact';
 import SideNav, { SideNavProps, loader } from './SideNav';
 import 'material-icons/iconfont/material-icons.css';
-import { withLoader } from '@react/lib/decorators/storybook-decorators';
+import { withLoader } from '@react/lib/decorators/storybook';
 
 const meta: Meta<typeof SideNav> = {
   title: 'Components/SideNav',

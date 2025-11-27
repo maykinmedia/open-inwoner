@@ -4,10 +4,14 @@
  * This module exports utilities for creating and managing web components.
  *
  * - i18n
+ * - middleware
  * - registry
  * - types
+ * - utils
  */
-export { IntlProviderWrapper } from './IntlProviderWrapper';
+
+export * from './i18n';
+export * from './middleware';
 export { wcPluginRegistry, wcRegistry } from './registry';
-export type { WebComponentPlugin, WebComponentRegistry } from './types';
-export { withIntl } from './plugins';
+export type * from './types';
+export * from './utils';

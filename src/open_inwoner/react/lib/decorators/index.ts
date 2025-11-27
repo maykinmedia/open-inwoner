@@ -1,2 +1,2 @@
-export { withIntl } from './intl';
-export { withIntl as withIntlSb, withThemeClass } from './storybook-decorators';
+export { withIntlWc as withIntl, withThemeClass } from './storybook';
+export { withIntl as withIntlWc } from './web-component';

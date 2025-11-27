@@ -2,7 +2,7 @@ import { ActionSingle } from '@gemeente-denhaag/action';
 import { usePropsOrScriptData } from '@react/lib/getJsonScriptData';
 import { registerWebComponent } from '@react/lib/web-component/utils';
 import { FunctionComponent as FC } from 'preact';
-import { webComponentName } from '.';
+import { WEB_COMPONENT_NAME } from '.';
 import './ActionList.scss';
 
 export interface IActionProps {
@@ -35,9 +35,14 @@ const ActionList: FC<IActionListProps> = ({ actionsId, actions }) => {
 
 // This wrapper allows lazy loading of the component
 export function loader() {
-  registerWebComponent(ActionList, webComponentName, ['actions', 'actionsId'], {
-    shadow: false,
-  });
+  registerWebComponent(
+    ActionList,
+    WEB_COMPONENT_NAME,
+    ['actions', 'actionsId'],
+    {
+      shadow: false,
+    }
+  );
 }
 
 export default ActionList;

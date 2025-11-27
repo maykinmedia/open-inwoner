@@ -1,5 +1,5 @@
+import { I18nProvider } from '@react/i18n';
 import { AnyComponent } from 'preact';
-import { IntlProviderWrapper } from '../web-component/IntlProviderWrapper';
 
 /**
  * Higher-order component that wraps a component with IntlProvider
@@ -25,18 +25,12 @@ import { IntlProviderWrapper } from '../web-component/IntlProviderWrapper';
 export function withIntl<P = {}, S = {}>(
   Component: AnyComponent<P, S>
 ): AnyComponent<P, S> {
-  const ComponentWithIntl: any = (props: any) => {
+  const ComponentWithIntl: AnyComponent<P, S> = (props) => {
     return (
-      <IntlProviderWrapper>
+      <I18nProvider>
         <Component {...props} />
-      </IntlProviderWrapper>
+      </I18nProvider>
     );
   };
-
-  // Preserve display name for debugging
-  ComponentWithIntl.displayName = `withIntl(${
-    (Component as any).displayName || (Component as any).name || 'Component'
-  })`;
-
   return ComponentWithIntl;
 }

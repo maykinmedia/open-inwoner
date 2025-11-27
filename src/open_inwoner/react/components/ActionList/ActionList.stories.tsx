@@ -1,6 +1,6 @@
 import { Meta, StoryObj } from '@storybook/preact';
 import { ActionList, IActionListProps, IActionProps, loader } from '.';
-import { withLoader } from '@react/lib/decorators/storybook-decorators';
+import { withLoader } from '@react/lib/decorators/storybook';
 
 const meta: Meta<typeof ActionList> = {
   title: 'Components/ActionList',

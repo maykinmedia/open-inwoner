@@ -7,7 +7,7 @@ import {
   silentErrorPlugin,
   skeletonPlugin,
 } from './plugins';
-import type { WebComponentPlugin, WebComponentRegistry } from './types';
+import type { WebComponentPlugin } from './types';
 
 /**
  * Object containing key-value pairs of the webcomponent name (key)
@@ -18,7 +18,7 @@ import type { WebComponentPlugin, WebComponentRegistry } from './types';
  * NOTE: Make sure to add the web component props to `web-components.d.ts`.
  * This allows the jsx engine to recognize the element and props.
  */
-export const wcRegistry: WebComponentRegistry = {
+export const wcRegistry = {
   [ACTION_LIST]: () => import('@react/components/ActionList/ActionList'),
   [SIDE_NAV]: () => import('@react/components/SideNav/SideNav'),
   [KVK_BRANCH_SELECTOR]: () =>

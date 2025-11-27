@@ -1,7 +1,7 @@
 import { MaterialIcon } from '@react/components/MaterialIcon';
 import { usePropsOrScriptData } from '@react/lib/getJsonScriptData';
 import { useDebounce } from '@react/lib/hooks/useDebounce';
-import { registerWebComponent } from '@react/lib/web-component/utils';
+import { registerWebComponent } from '@react/lib/web-component';
 import clsx from 'clsx';
 import {
   FunctionComponent as FC,

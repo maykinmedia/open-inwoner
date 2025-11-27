@@ -1,41 +1,23 @@
 import register from 'preact-custom-element';
 import { AnyComponent } from 'preact';
 import { wcRegistry as wcRegistry } from './registry';
-import { WebComponentContext } from './types';
-import { withIntl } from './plugins';
-
-/**
- * Extended options for web component registration
- */
-type RegisterOptions =
-  | {
-      shadow: false;
-      /**
-       * Whether to automatically wrap the component with IntlProvider for i18n support
-       * @default false
-       */
-      i18n?: boolean;
-    }
-  | {
-      shadow: true;
-      mode?: 'open' | 'closed';
-      adoptedStyleSheets?: CSSStyleSheet[];
-      serializable?: boolean;
-      /**
-       * Whether to automatically wrap the component with IntlProvider for i18n support
-       * @default false
-       */
-      i18n?: boolean;
-    };
+import {
+  WebComponentContext,
+  WebComponentKey,
+  WebComponentRegisterOptions,
+} from './types';
+import { withIntlWc } from '@react/lib/decorators';
 
 /**
  * Find all unique web component names on the current page
- * @returns a unique array of founded component names or null.
+ * @returns a unique array of strings from the founded component names.
  */
-export const findWebComponentsOnPage = (): string[] => {
+export const findWebComponentsOnPage = (): WebComponentKey[] => {
   const selector = Object.keys(wcRegistry).join(',');
   const elements = document.querySelectorAll<HTMLElement>(selector);
-  const foundComponents = [...elements].map((el) => el.tagName.toLowerCase());
+  const foundComponents = [...elements].map(
+    (el) => el.tagName.toLowerCase() as WebComponentKey
+  );
   return Array.from(new Set(foundComponents));
 };
 
@@ -43,7 +25,7 @@ export const findWebComponentsOnPage = (): string[] => {
  * Create context objects for all elements of a specific component
  */
 export const createContextsForComponent = (
-  componentName: string
+  componentName: WebComponentKey
 ): WebComponentContext[] => {
   const elements = document.querySelectorAll<HTMLElement>(componentName);
   return [...elements].map((element) => ({ componentName, element }));
@@ -61,22 +43,18 @@ export const createContextsForComponent = (
  */
 export function registerWebComponent<P = {}, S = {}>(
   Component: AnyComponent<P, S>,
-  tagName?: string,
+  tagName: WebComponentKey,
   propNames?: (keyof P)[],
-  options?: RegisterOptions
+  options: WebComponentRegisterOptions = { shadow: false, i18n: false }
 ): HTMLElement {
   if (customElements.get(tagName ?? '')) return undefined!;
 
-  // If i18n option is enabled, wrap the component with IntlProvider
-  const ComponentToRegister = options?.i18n ? withIntl(Component) : Component;
-
   // Remove i18n from options before passing to preact-custom-element
-  const { i18n, ...registerOptions } = options || {};
+  const { i18n, ...registerOptions } = options;
 
-  return register(
-    ComponentToRegister,
-    tagName,
-    propNames,
-    registerOptions as any
-  );
+  // If i18n option is enabled, wrap the component with IntlProvider
+  // This
+  const ComponentToRegister = i18n ? withIntlWc(Component) : Component;
+
+  return register(ComponentToRegister, tagName, propNames, registerOptions);
 }
