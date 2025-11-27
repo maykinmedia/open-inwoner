@@ -28,10 +28,6 @@ const config: StorybookConfig = {
       esbuild: { jsx: 'automatic' },
     });
   },
-
-  typescript: {
-    check: false, // Disable TypeScript checking to avoid conflicts
-  },
 };
 
 export default config;

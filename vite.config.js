@@ -1,7 +1,10 @@
 import { defineConfig } from 'vite';
 import path from 'path';
-import paths from './build/paths';
+import { createRequire } from 'module';
 import preact from '@preact/preset-vite';
+
+const require = createRequire(import.meta.url);
+const paths = require('./build/paths');
 
 // Support CLI flags like --production and --sourcemap
 const argv = process.argv;
@@ -72,6 +75,9 @@ export default defineConfig({
         __dirname,
         'src/open_inwoner/webcomponents'
       ),
+      react: 'preact/compat',
+      'react-dom': 'preact/compat',
+      'react/jsx-runtime': 'preact/jsx-runtime',
     },
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
   },

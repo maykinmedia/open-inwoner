@@ -12,7 +12,8 @@
     </header>
 
     <div class="card-container card-container--columns-1 plugin-card">
-        <action-list actions='{{ userfeed_item_list_json }}'></action-list>
+        {{userfeed_item_list_json|json_script:"userfeed_data"}}
+        <action-list actions-id="userfeed_data" />
     </div>
 </section>
 {% endif %}
