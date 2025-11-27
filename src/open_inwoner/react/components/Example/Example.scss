@@ -1,0 +1,14 @@
+.oip-example {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+
+  a {
+    max-width: 320px;
+    background-color: #eee;
+    padding: 12px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    color: #333;
+  }
+}

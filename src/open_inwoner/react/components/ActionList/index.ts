@@ -6,6 +6,6 @@ export type { IActionListProps, IActionProps } from './ActionList';
 
 // Web Component
 export { loader } from './ActionList';
-export const webComponentName = 'action-list';
 
+// Constants
 export { WEB_COMPONENT_NAME } from './constants';
