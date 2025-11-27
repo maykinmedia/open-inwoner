@@ -1,14 +1,6 @@
 {% extends 'master.html' %}
 {% load i18n anchor_menu_tags button_tags card_tags form_tags grid_tags icon_tags link_tags list_tags pagination_tags utils static %}
 
-{% block react_modules %}
-{# Including this script will allow the page to use the react component #}
-<script
-  type="module"
-  src="{% static 'bundles/open_inwoner-react.js' %}"
-></script>
-{% endblock %}
-
 {% block sidebar_content %}
     {% include "components/Sidenav/Sidenav.html" %}
 {% endblock %}

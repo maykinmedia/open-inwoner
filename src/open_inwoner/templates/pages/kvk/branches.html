@@ -1,13 +1,6 @@
 {% extends "master.html" %}
 {% load i18n static form_tags grid_tags button_tags card_tags %}
 
-{% block react_modules %}
-<script
-  type="module"
-  src="{% static 'bundles/open_inwoner-react.js' %}"
-></script>
-{% endblock %}
-
 {% block content %}
     {% render_grid %}
         {% render_column start=4 span=6 %}

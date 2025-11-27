@@ -1,14 +1,6 @@
 {% extends 'master.html' %}
 {% load i18n cms_tags sekizai_tags static menu %}
 
-{% block react_modules %}
-{# Including this script will allow the page to use the react component #}
-<script
-  type="module"
-  src="{% static 'bundles/open_inwoner-react.js' %}"
-></script>
-{% endblock %}
-
 {% block extra_head %}
 {% page_attribute "meta_description" as meta_description %}
 {{ block.super }}

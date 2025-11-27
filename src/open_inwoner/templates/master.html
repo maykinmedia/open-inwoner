@@ -204,6 +204,8 @@
         </script>
         {% endif %}
         <script nonce="{{ request.csp_nonce }}" src="{% static 'bundles/open_inwoner-js.js' %}" type="text/javascript"></script>
-        {% block react_modules %}{% endblock %}
+        {# Including this script will allow the page to use the preact web-components #}
+        {# TODO remove once we have removed webpack #}
+        <script nonce="{{ request.csp_nonce }}" src="{% static 'bundles/open_inwoner-react.js' %}" type="module"></script>
     </body>
 </html>
