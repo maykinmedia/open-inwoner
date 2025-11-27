@@ -1,4 +1,3 @@
-import ModuleLoader from '@react/lib/loader';
+import { registerWebComponents } from './lib/web-component/loader';
 
-// Load the module.
-ModuleLoader.load();
+registerWebComponents();

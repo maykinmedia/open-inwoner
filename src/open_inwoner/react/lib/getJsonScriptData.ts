@@ -17,3 +17,24 @@ export function getJsonFromScriptTag<T = unknown>(id: string): T | undefined {
     return undefined;
   }
 }
+
+/**
+ * Simple utility to get JSON data from either props or a script tag.
+ * Follows the Single Responsibility Principle - only handles data retrieval.
+ *
+ * @param data Direct data from props
+ * @param id HTML id of a script tag containing JSON
+ * @returns The data or null if no data is available
+ *
+ * @example
+ * // Get data from props or script tag
+ * const rawItems = getDataFromPropOrJsonScript(props.items, props.itemsId);
+ * if (!rawItems) return null;
+ *
+ * // Then transform it explicitly
+ * const normalized = Array.isArray(rawItems[0]) ? rawItems : [rawItems];
+ */
+export function usePropsOrScriptData<T>(data?: T, id?: string): T | null {
+  if (!id && !data) return null;
+  return id ? (getJsonFromScriptTag<T>(id) ?? null) : (data ?? null);
+}

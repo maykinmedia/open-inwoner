@@ -1,11 +1,10 @@
-import { Meta, StoryObj } from '@storybook/react';
-import { MaterialIcon } from './MaterialIcon';
+import { Meta, StoryObj } from '@storybook/preact';
+import { MaterialIcon, MaterialIconProps, loader } from '.';
 import 'material-icons/iconfont/material-icons.css';
+import { withLoader } from '@react/lib/decorators/storybook-decorators';
 
-type ExtendedMateriaIconProps = typeof MaterialIcon & { nameTool: string };
-
-const meta: Meta<ExtendedMateriaIconProps> = {
-  title: 'React/Components/MaterialIcon',
+const meta: Meta<typeof MaterialIcon> = {
+  title: 'Components/MaterialIcon',
   component: MaterialIcon,
   parameters: {
     layout: 'padded',
@@ -25,7 +24,7 @@ This component provides a consistent way to display Material Design icons throug
 };
 export default meta;
 
-type Story = StoryObj<ExtendedMateriaIconProps>;
+type Story = StoryObj<MaterialIconProps>;
 
 export const CustomIconName: Story = {
   name: 'Custom Icon Name',
@@ -124,4 +123,13 @@ export const CommonIcons: Story = {
       </div>
     </div>
   ),
+};
+
+/**
+ * Rendered as webcomponent
+ */
+export const AsWebComponent: Story = {
+  args: { name: 'home' },
+  decorators: withLoader(loader),
+  render: ({ name }) => <material-icon name={name} />,
 };

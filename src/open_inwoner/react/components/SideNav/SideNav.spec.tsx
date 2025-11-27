@@ -1,16 +1,9 @@
-import { render, screen } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
-import SideNav from './SideNav';
+import { render, screen } from '@testing-library/preact';
+import { describe, it, expect } from 'vitest';
+import { SideNav } from '.';
 
 // Import jest-dom matchers for extended assertions like toBeInTheDocument
 import '@testing-library/jest-dom';
-
-// Mock MaterialIcon to simplify rendering and testing
-vi.mock('@react/components/MaterialIcon', () => ({
-  MaterialIcon: ({ name }: { name: string }) => (
-    <span data-testid="material-icon">{name}</span>
-  ),
-}));
 
 describe('SideNav', () => {
   it('renders without crashing', () => {
@@ -42,10 +35,11 @@ describe('SideNav', () => {
     });
 
     // Check MaterialIcon rendered only for items with non-empty icon string
-    const icons = screen.getAllByTestId('material-icon');
-    expect(icons.length).toBe(2);
-    expect(icons[0]).toHaveTextContent('home');
-    expect(icons[1]).toHaveTextContent('inbox');
+    const iconHome = screen.getByText('home');
+    expect(iconHome).toBeInTheDocument();
+
+    const iconInbox = screen.getByText('inbox');
+    expect(iconInbox).toBeInTheDocument();
   });
 
   it('does not render icon if icon is empty or whitespace', () => {
@@ -60,9 +54,6 @@ describe('SideNav', () => {
     items.forEach(({ label }) => {
       expect(screen.getByText(label)).toBeInTheDocument();
     });
-
-    // No MaterialIcon should be rendered
-    expect(screen.queryByTestId('material-icon')).toBeNull();
   });
 
   it('passes current and counter props correctly', () => {

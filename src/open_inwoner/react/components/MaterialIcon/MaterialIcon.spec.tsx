@@ -1,6 +1,6 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/preact';
 import { describe, it, expect } from 'vitest';
-import { MaterialIcon } from './MaterialIcon';
+import { MaterialIcon } from '.';
 
 // Import jest-dom matchers for extended assertions like toBeInTheDocument
 import '@testing-library/jest-dom';

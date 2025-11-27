@@ -3,7 +3,10 @@ import {
   SideNavigationProps,
 } from '@gemeente-denhaag/side-navigation';
 import { MaterialIcon } from '@react/components/MaterialIcon';
-import { FC } from 'react';
+import { usePropsOrScriptData } from '@react/lib/getJsonScriptData';
+import { registerWebComponent } from '@react/lib/web-component/utils';
+import { FunctionComponent as FC } from 'preact';
+import { WEB_COMPONENT_NAME } from '.';
 import './SideNav.scss';
 
 export interface MenuItem {
@@ -14,19 +17,35 @@ export interface MenuItem {
   counter?: number;
 }
 
-interface SideNavProps {
+export interface SideNavProps {
   /**
    * Define the menu items.
    * The array inside the array allows to create one navigation,
    * with multiple lists that have a gap in between.
    */
-  items: MenuItem[][];
+  items?: MenuItem[] | MenuItem[][];
+  itemsId?: string;
 }
 
-const SideNav: FC<SideNavProps> = ({ items }) => {
+const SideNav: FC<SideNavProps> = ({ items, itemsId }) => {
+  if (!items && !itemsId) return <></>;
+
+  // Get data from props or script tag
+  const rawData = usePropsOrScriptData<MenuItem[] | MenuItem[][]>(
+    items,
+    itemsId
+  );
+  if (!rawData) return <></>;
+
+  // Normalize to MenuItem[][] - check if first element is an array
+  const normalized =
+    rawData.length > 0 && Array.isArray(rawData[0])
+      ? (rawData as MenuItem[][])
+      : [rawData as MenuItem[]];
+
   // Transform menu data to DenHaag format
-  const navigationItems: SideNavigationProps['items'] = items.map((item) =>
-    item.map(({ icon, ...item }) => {
+  const navigationItems = normalized.map((item) =>
+    item?.map(({ icon, ...item }) => {
       // Make sure icon names are valid.
       icon = icon === 'euro_outline' ? 'euro' : icon;
 
@@ -36,9 +55,15 @@ const SideNav: FC<SideNavProps> = ({ items }) => {
         icon: icon && icon.trim() ? <MaterialIcon name={icon} /> : undefined,
       };
     })
-  );
+  ) satisfies SideNavigationProps['items'];
 
   return <SideNavigation items={navigationItems} />;
 };
+
+export function loader() {
+  registerWebComponent(SideNav, WEB_COMPONENT_NAME, ['items', 'itemsId'], {
+    shadow: false,
+  });
+}
 
 export default SideNav;

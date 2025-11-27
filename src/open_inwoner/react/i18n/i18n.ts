@@ -25,7 +25,7 @@ const getIntlProviderProps = async (): Promise<IntlConfig> => {
   const lang = getLocale();
   const messages = await loadLocaleData(lang);
   return {
-    messages,
+    messages: messages.default,
     locale: lang,
     defaultLocale: 'nl',
   };

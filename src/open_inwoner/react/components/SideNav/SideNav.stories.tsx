@@ -1,10 +1,12 @@
-import { Meta, StoryObj } from '@storybook/react';
-import SideNav from './SideNav';
+import { Meta, StoryObj } from '@storybook/preact';
+import SideNav, { SideNavProps, loader } from './SideNav';
 import 'material-icons/iconfont/material-icons.css';
+import { withLoader } from '@react/lib/decorators/storybook-decorators';
 
 const meta: Meta<typeof SideNav> = {
-  title: 'React/Components/SideNav',
+  title: 'Components/SideNav',
   component: SideNav,
+  tags: ['autodocs'],
   parameters: {
     layout: 'padded',
     docs: {
@@ -29,7 +31,7 @@ SideNav is a pure React component that renders navigation menus using the Den Ha
 };
 export default meta;
 
-type Story = StoryObj<typeof SideNav>;
+type Story = StoryObj<SideNavProps>;
 
 export const StandardNavigation: Story = {
   name: 'Standard Navigation',
@@ -325,4 +327,42 @@ Demonstrates how SideNav handles multiple navigation groups with logical separat
       ],
     ],
   },
+};
+
+const mockMenuData = [
+  {
+    href: '/mijn-profiel/',
+    label: 'Mijn Profiel',
+    icon: 'person',
+    current: false,
+  },
+  {
+    href: '/mijn-aanvragen/',
+    label: 'Mijn Aanvragen',
+    icon: 'description',
+    current: true,
+  },
+  {
+    href: '/mijn-berichten/',
+    label: 'Mijn Berichten',
+    icon: 'mail',
+    current: false,
+    counter: 3,
+  },
+];
+
+/**
+ * Rendered as webcomponent
+ */
+export const AsWebComponent: Story = {
+  args: { itemsId: 'sidenav-test-data' },
+  decorators: withLoader(loader),
+  render: ({ itemsId }) => (
+    <>
+      <script type="application/json" id={itemsId}>
+        {JSON.stringify(mockMenuData)}
+      </script>
+      <side-navigation items-id={itemsId} />
+    </>
+  ),
 };
