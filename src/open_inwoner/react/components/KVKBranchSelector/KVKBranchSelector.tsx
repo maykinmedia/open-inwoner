@@ -334,6 +334,8 @@ export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
     );
   }
 
+  if (!data) return <></>;
+
   return (
     <div
       className="utrecht-form-field utrecht-form-field--text"

@@ -1,6 +1,6 @@
 import { registerWebComponent } from '@react/lib/web-component/utils';
 import { FunctionComponent as FC } from 'preact';
-import { webComponentName } from '.';
+import { WEB_COMPONENT_NAME } from '.';
 
 export interface MaterialIconProps {
   name: string;
@@ -17,7 +17,7 @@ const MaterialIcon: FC<MaterialIconProps> = ({ name }) => (
 );
 
 export function loader() {
-  return registerWebComponent(MaterialIcon, webComponentName, ['name'], {
+  return registerWebComponent(MaterialIcon, WEB_COMPONENT_NAME, ['name'], {
     shadow: false,
   });
 }

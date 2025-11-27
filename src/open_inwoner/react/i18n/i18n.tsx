@@ -76,6 +76,9 @@ export const I18nProvider: FC<{ lang?: string }> = ({ lang, children }) => {
     };
   }, [lang]);
 
+  // TODO find another solution for this
+  if (!config?.messages) return <></>;
+
   return (
     <IntlProvider
       defaultLocale="nl"

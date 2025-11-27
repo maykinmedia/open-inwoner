@@ -1,7 +1,7 @@
-import { WEB_COMPONENT_NAME as ACTION_LIST } from '@react/components/ActionList';
-import { WEB_COMPONENT_NAME as KVK_BRANCH_SELECTOR } from '@react/components/KVKBranchSelector';
-import { WEB_COMPONENT_NAME as MATERIAL_ICON } from '@react/components/MaterialIcon';
-import { WEB_COMPONENT_NAME as SIDE_NAV } from '@react/components/SideNav';
+import { WEB_COMPONENT_NAME as ACTION_LIST } from '@react/components/ActionList/constants';
+import { WEB_COMPONENT_NAME as KVK_BRANCH_SELECTOR } from '@react/components/KVKBranchSelector/constants';
+import { WEB_COMPONENT_NAME as MATERIAL_ICON } from '@react/components/MaterialIcon/constants';
+import { WEB_COMPONENT_NAME as SIDE_NAV } from '@react/components/SideNav/constants';
 import {
   performancePlugin,
   silentErrorPlugin,
