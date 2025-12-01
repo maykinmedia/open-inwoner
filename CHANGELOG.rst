@@ -40,7 +40,10 @@ Deployment aandachtspunten
   bevat die niet in de querystring van de user agent mogen verschijnen (bijvoorbeeld
   voor security compliance), kan deze variabele op ``false`` worden gezet om alleen naar
   het logout endpoint te redirecten zonder aanvullende parameters.
-
+* Wanneer via de color-picker of in CSS een secundaire kleur wordt ingesteld die anders is dan
+  de primaire kleur (CSS-variabelen ``--color-primary`` en ``--color-secondary``) is hier nu een
+  stijl verandering te zien. Call-to-action elementen gebruiken nu altijd de primaire kleur. Hierdoor
+  worden de knoppen in tegels niet langer in een afwijkende secundaire kleur weergegeven.
 
 Nieuwe features
 ---------------
