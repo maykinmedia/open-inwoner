@@ -1,6 +1,6 @@
-import { registerWebComponent } from '@react/lib/web-component/utils';
 import { FunctionComponent as FC } from 'preact';
 import { WEB_COMPONENT_NAME } from '.';
+import { WebComponentLoader } from '@react/lib/web-component/loader';
 
 export interface MaterialIconProps {
   name: string;
@@ -16,10 +16,9 @@ const MaterialIcon: FC<MaterialIconProps> = ({ name }) => (
   </span>
 );
 
-export function loader() {
-  return registerWebComponent(MaterialIcon, WEB_COMPONENT_NAME, ['name'], {
-    shadow: false,
-  });
-}
+export const loader = WebComponentLoader.loadWC(
+  WEB_COMPONENT_NAME,
+  MaterialIcon
+);
 
 export default MaterialIcon;

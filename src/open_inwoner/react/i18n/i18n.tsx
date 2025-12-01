@@ -61,20 +61,31 @@ export async function loadI18nConfig(
  * ```
  */
 export const I18nProvider: FC<{ lang?: string }> = ({ lang, children }) => {
-  const [config, setConfig] = useState<IntlConfig | null>(null);
-  const locale = lang || document.documentElement.lang;
+  const locale = lang || document.documentElement.lang || 'nl';
+
+  // Shorten locale for cache lookup
+  const shortLocale = (
+    locale.length === 5 ? locale.substring(0, 2) : locale
+  ) as keyof typeof locales;
+
+  // Check if config is already cached - use it immediately if available
+  const cachedConfig = cache.get(shortLocale);
+  const [config, setConfig] = useState<IntlConfig | null>(cachedConfig || null);
 
   useEffect(() => {
     let abort = false;
 
-    loadI18nConfig(locale).then((cfg) => {
-      if (!abort && cfg) setConfig(cfg);
-    });
+    // Only load if not already in state
+    if (!config) {
+      loadI18nConfig(locale).then((cfg) => {
+        if (!abort && cfg) setConfig(cfg);
+      });
+    }
 
     return () => {
       abort = true;
     };
-  }, [lang]);
+  }, [lang, locale, config]);
 
   // TODO find another solution for this
   if (!config?.messages) return <></>;

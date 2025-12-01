@@ -13,7 +13,7 @@ export const withThemeClass = (Story: StoryFn) => {
  * Decorator that wraps stories with IntlProvider for i18n support
  * This is useful for components that use react-intl hooks like useIntl()
  */
-export const withIntlWc = (Story: StoryFn) => {
+export const withIntl = (Story: StoryFn) => {
   return (
     <I18nProvider>
       <Story />

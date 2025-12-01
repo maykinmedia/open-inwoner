@@ -1,7 +1,6 @@
 import { MaterialIcon } from '@react/components/MaterialIcon';
-import { usePropsOrScriptData } from '@react/lib/getJsonScriptData';
+import { usePropsOrScriptData } from '@react/lib/json/getJsonScriptData';
 import { useDebounce } from '@react/lib/hooks/useDebounce';
-import { registerWebComponent } from '@react/lib/web-component';
 import clsx from 'clsx';
 import {
   FunctionComponent as FC,
@@ -12,6 +11,7 @@ import {
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { useIntl } from 'react-intl';
 import { WEB_COMPONENT_NAME } from '.';
+import { WebComponentLoader } from '@react/lib/web-component/loader';
 
 export interface ComboBoxItem {
   id: string;
@@ -457,14 +457,7 @@ export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
   );
 };
 
-export function loader() {
-  registerWebComponent(
-    KVKBranchSelector,
-    WEB_COMPONENT_NAME,
-    ['id', 'label', 'name', 'branches', 'selectedBranchId', 'branchesId'],
-    {
-      shadow: false,
-      i18n: true,
-    }
-  );
-}
+export const loader = WebComponentLoader.loadWC(
+  WEB_COMPONENT_NAME,
+  KVKBranchSelector
+);

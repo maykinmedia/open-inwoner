@@ -27,12 +27,8 @@ export function getJsonFromScriptTag<T = unknown>(id: string): T | undefined {
  * @returns The data or null if no data is available
  *
  * @example
- * // Get data from props or script tag
  * const rawItems = getDataFromPropOrJsonScript(props.items, props.itemsId);
  * if (!rawItems) return null;
- *
- * // Then transform it explicitly
- * const normalized = Array.isArray(rawItems[0]) ? rawItems : [rawItems];
  */
 export function usePropsOrScriptData<T>(data?: T, id?: string): T | null {
   if (!id && !data) return null;

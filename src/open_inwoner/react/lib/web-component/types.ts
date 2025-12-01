@@ -1,19 +1,32 @@
-import { wcRegistry } from '.';
-
-export type WebComponentKey = keyof typeof wcRegistry;
+/**
+ * Web Component Type Definitions
+ *
+ * Core types used throughout the web component system.
+ * These types are foundational and have no dependencies on the registry.
+ */
 
 /**
  * Context object passed to plugin hooks
+ * Contains information about the component being loaded
  */
 export interface WebComponentContext {
   /** The web component tag name (e.g., 'action-list') */
-  componentName: WebComponentKey;
+  componentName: string;
   /** The HTML element instance */
   element: HTMLElement;
 }
 
 /**
+ * Function signature for plugin lifecycle hooks
+ */
+export type WebComponentLoadHook = (
+  context: WebComponentContext,
+  error?: Error
+) => Promise<void> | void;
+
+/**
  * Plugin interface for extending web component behavior
+ * Plugins can hook into the loading lifecycle
  */
 export interface WebComponentPlugin {
   /** Unique plugin identifier */
@@ -32,47 +45,53 @@ export interface WebComponentPlugin {
   onError?: WebComponentLoadHook;
 }
 
-// /**
-//  * Type for component importer functions
-//  */
-// export type WebComponentImporter = () => Promise<{ loader: () => void }>;
-
-// /**
-//  * Registry of web components
-//  */
-// export type WebComponentRegistry = Record<
-//   WebComponentKey,
-//   WebComponentImporter
-// >;
-
 /**
- * Function that executes a load hook
+ * Extra options for web component registration
  */
-export type WebComponentLoadHook = (
-  context: WebComponentContext,
-  error?: Error
-) => Promise<void> | void;
+export type WebComponentRegisterExtraOptions = {
+  /**
+   * Whether to automatically wrap the component with IntlProvider for i18n support
+   * @default false
+   */
+  i18n?: boolean;
+};
 
 /**
  * Extended options for web component registration
+ * Supports both shadow DOM and light DOM configurations
  */
-export type WebComponentRegisterOptions =
-  | {
-      shadow: false;
-      /**
-       * Whether to automatically wrap the component with IntlProvider for i18n support
-       * @default false
-       */
-      i18n?: boolean;
-    }
-  | {
-      shadow: true;
-      mode?: 'open' | 'closed';
-      adoptedStyleSheets?: CSSStyleSheet[];
-      serializable?: boolean;
-      /**
-       * Whether to automatically wrap the component with IntlProvider for i18n support
-       * @default false
-       */
-      i18n?: boolean;
-    };
+export type WebComponentRegisterOptions = WebComponentRegisterExtraOptions &
+  (
+    | { shadow: false }
+    | {
+        shadow: true;
+        mode?: 'open' | 'closed';
+        adoptedStyleSheets?: CSSStyleSheet[];
+        serializable?: boolean;
+      }
+  );
+
+/**
+ * Web component definition with full configuration
+ * Define this in each component's constants.ts file
+ *
+ * @example
+ * ```ts
+ * export const EXAMPLE_DEFINITION: WebComponentDefinition<IExampleProps> = {
+ *   tagName: 'oip-example',
+ *   propNames: ['data', 'dataId'],
+ *   options: { shadow: false },
+ *   importer: () => import('./Example'),
+ * };
+ * ```
+ */
+export interface WebComponentDefinition<P = {}> {
+  /** The custom element tag name */
+  tagName: string;
+  /** Array of prop names to expose as HTML attributes */
+  propNames: (keyof P)[];
+  /** Registration options (shadow DOM, i18n, etc.) */
+  options?: WebComponentRegisterOptions;
+  /** Dynamic import function for lazy loading */
+  importer: () => Promise<{ loader: () => void }>;
+}

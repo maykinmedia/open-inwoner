@@ -1,6 +1,6 @@
 import { ActionSingle } from '@gemeente-denhaag/action';
-import { usePropsOrScriptData } from '@react/lib/getJsonScriptData';
-import { registerWebComponent } from '@react/lib/web-component/utils';
+import { usePropsOrScriptData } from '@react/lib/json/getJsonScriptData';
+import { WebComponentLoader } from '@react/lib/web-component';
 import { FunctionComponent as FC } from 'preact';
 import { WEB_COMPONENT_NAME } from '.';
 import './ActionList.scss';
@@ -33,16 +33,6 @@ const ActionList: FC<IActionListProps> = ({ actionsId, actions }) => {
   });
 };
 
-// This wrapper allows lazy loading of the component
-export function loader() {
-  registerWebComponent(
-    ActionList,
-    WEB_COMPONENT_NAME,
-    ['actions', 'actionsId'],
-    {
-      shadow: false,
-    }
-  );
-}
+export const loader = WebComponentLoader.loadWC(WEB_COMPONENT_NAME, ActionList);
 
 export default ActionList;

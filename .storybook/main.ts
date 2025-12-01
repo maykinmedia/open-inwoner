@@ -1,5 +1,4 @@
 import type { StorybookConfig } from '@storybook/preact-vite';
-import path from 'path';
 import { mergeConfig } from 'vite';
 
 const config: StorybookConfig = {
@@ -7,7 +6,7 @@ const config: StorybookConfig = {
   core: { disableWhatsNewNotifications: true },
   stories: [
     '../src/**/*.stories.@(js|jsx|ts|tsx|mdx)',
-    '../src/open_inwoner/react/components/**/*.stories.@(js|jsx|ts|tsx)',
+    '@react/components/**/*.stories.@(js|jsx|ts|tsx)',
   ],
   addons: ['@storybook/addon-essentials', '@chromatic-com/storybook'],
   docs: { autodocs: true },

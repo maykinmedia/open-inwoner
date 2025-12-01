@@ -1,3 +1,5 @@
-import { registerWebComponents } from './lib/web-component/loader';
+import { WebComponentLoader } from './lib/web-component/loader';
 
-registerWebComponents();
+// registerWebComponents();
+
+WebComponentLoader.registerWebComponents();
