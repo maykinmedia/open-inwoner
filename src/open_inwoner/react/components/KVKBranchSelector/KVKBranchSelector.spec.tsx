@@ -1,7 +1,8 @@
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/preact';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { KVKBranchSelector } from '.';
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { KVKBranchSelector, KVK_BRANCH_SELECTOR_DEFINITION } from '.';
+import { WebComponentLoader } from '@react/lib/web-component';
 
 // Mock useIntl hook to avoid IntlProvider compatibility issues with Preact
 vi.mock('react-intl', () => ({
@@ -254,5 +255,63 @@ describe('KVKBranchSelector', () => {
     ) as HTMLInputElement;
 
     expect(hiddenInput.value).toBe('');
+  });
+
+  describe('Web Component', () => {
+    beforeAll(async () => {
+      // Register the web component before tests
+      await WebComponentLoader.importWC(KVK_BRANCH_SELECTOR_DEFINITION.tagName);
+    });
+
+    it('can be rendered as a web component with branches-id', () => {
+      const branchesId = 'test-branches-id';
+
+      // Create script tag with JSON data
+      const script = document.createElement('script');
+      script.type = 'application/json';
+      script.id = branchesId;
+      script.textContent = JSON.stringify(mockBranches);
+      document.body.appendChild(script);
+
+      // Create and render web component
+      const { container } = render(
+        <kvk-branch-selector
+          id="test-kvk"
+          label="Select Branch"
+          name="branch"
+          branches-id={branchesId}
+        />
+      );
+
+      // Verify element is in the DOM
+      const webComponent = container.querySelector('kvk-branch-selector');
+      expect(webComponent).toBeInTheDocument();
+      expect(webComponent?.getAttribute('branches-id')).toBe(branchesId);
+
+      // Clean up
+      document.body.removeChild(script);
+    });
+
+    it('renders web component with inline branches prop', () => {
+      const branches = [
+        {
+          id: 'test-1',
+          label: 'Test Branch',
+          vestigingInfo: 'Vestiging: test-1',
+        },
+      ];
+
+      const { container } = render(
+        <kvk-branch-selector
+          id="test-selector"
+          label="Branch Selector"
+          name="branch_selector"
+          branches={branches}
+        />
+      );
+
+      const webComponent = container.querySelector('kvk-branch-selector');
+      expect(webComponent).toBeInTheDocument();
+    });
   });
 });
