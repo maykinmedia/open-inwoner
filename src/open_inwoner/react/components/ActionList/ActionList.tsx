@@ -1,6 +1,6 @@
 import { ActionSingle } from '@gemeente-denhaag/action';
 import { usePropsOrScriptData } from '@react/lib/json/getJsonScriptData';
-import { FC } from 'preact';
+import { AnyComponent as FC } from 'preact';
 import './ActionList.scss';
 
 export interface IActionProps {

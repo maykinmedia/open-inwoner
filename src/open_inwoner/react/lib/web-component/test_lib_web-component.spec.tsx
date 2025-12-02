@@ -1,6 +1,6 @@
 import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest';
 import { WebComponentLoader } from './loader';
-import type { FC } from 'preact';
+import type { AnyComponent as FC } from 'preact';
 
 // Mock preact-custom-element
 vi.mock('preact-custom-element', () => ({

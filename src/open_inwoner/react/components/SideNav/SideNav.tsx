@@ -4,7 +4,7 @@ import {
 } from '@gemeente-denhaag/side-navigation';
 import { MaterialIcon } from '@react/components/MaterialIcon';
 import { usePropsOrScriptData } from '@react/lib/json/getJsonScriptData';
-import { FC } from 'preact';
+import { AnyComponent as FC } from 'preact';
 import './SideNav.scss';
 
 export interface MenuItem {

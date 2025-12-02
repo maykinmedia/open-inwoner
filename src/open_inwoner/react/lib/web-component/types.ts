@@ -5,7 +5,7 @@
  * These types are foundational and have no dependencies on the registry.
  */
 
-import { FC } from 'preact';
+import { AnyComponent as FC } from 'preact';
 import { WEB_COMPONENT_REGISTRY } from './registry';
 import { KebabCasedProperties } from 'type-fest';
 

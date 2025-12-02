@@ -1,4 +1,4 @@
-import { FC } from 'preact';
+import { AnyComponent as FC } from 'preact';
 import register from 'preact-custom-element';
 import { withIntlWc } from '../decorators';
 import {

@@ -3,7 +3,7 @@ import { usePropsOrScriptData } from '@react/lib/json/getJsonScriptData';
 import { useDebounce } from '@react/lib/hooks/useDebounce';
 import clsx from 'clsx';
 import {
-  FC,
+  AnyComponent as FC,
   InputEventHandler,
   KeyboardEventHandler,
   MouseEventHandler,

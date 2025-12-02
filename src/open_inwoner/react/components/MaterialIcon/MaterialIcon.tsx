@@ -1,4 +1,4 @@
-import { FC } from 'preact';
+import { AnyComponent as FC } from 'preact';
 
 export interface MaterialIconProps {
   name: string;
