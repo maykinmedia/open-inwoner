@@ -4,9 +4,7 @@ import {
 } from '@gemeente-denhaag/side-navigation';
 import { MaterialIcon } from '@react/components/MaterialIcon';
 import { usePropsOrScriptData } from '@react/lib/json/getJsonScriptData';
-import { WebComponentLoader } from '@react/lib/web-component/loader';
-import { FunctionComponent as FC } from 'preact';
-import { WEB_COMPONENT_NAME } from '.';
+import { FC } from 'preact';
 import './SideNav.scss';
 
 export interface MenuItem {
@@ -59,7 +57,5 @@ const SideNav: FC<SideNavProps> = ({ items, itemsId }) => {
 
   return <SideNavigation items={navigationItems} />;
 };
-
-export const loader = WebComponentLoader.loadWC(WEB_COMPONENT_NAME, SideNav);
 
 export default SideNav;

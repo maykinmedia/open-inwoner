@@ -1,5 +1,10 @@
 import { Meta, StoryObj } from '@storybook/preact';
-import { ActionList, IActionListProps, IActionProps, loader } from '.';
+import {
+  ACTION_LIST_DEFINITION,
+  ActionList,
+  IActionListProps,
+  IActionProps,
+} from '.';
 import { withLoader } from '@react/lib/decorators/storybook';
 
 const meta: Meta<typeof ActionList> = {
@@ -88,7 +93,7 @@ export const Empty: Story = {
  */
 export const AsWebComponent: Story = {
   args: { actionsId: 'test-id' },
-  decorators: withLoader(loader),
+  decorators: withLoader(ACTION_LIST_DEFINITION.tagName),
   render: ({ actionsId }) => (
     <>
       <script type="application/json" id={actionsId}>

@@ -1,7 +1,11 @@
 import '@open-inwoner/design-tokens/dist/css/index.css';
 import type { Meta, StoryObj } from '@storybook/preact';
 // import 'material-icons/iconfont/material-icons.css';
-import { KVKBranchSelector, KVKBranchSelectorProps, loader } from '.';
+import {
+  KVK_BRANCH_SELECTOR_DEFINITION,
+  KVKBranchSelector,
+  KVKBranchSelectorProps,
+} from '.';
 import { withLoader } from '@react/lib/decorators/storybook';
 
 const meta: Meta<KVKBranchSelectorProps> = {
@@ -238,7 +242,7 @@ export const AsWebComponent: Story = {
     name: 'branch_number',
     branchesId: 'branches-id',
   },
-  decorators: withLoader(loader),
+  decorators: withLoader(KVK_BRANCH_SELECTOR_DEFINITION.tagName),
   render: ({ id, label, name, branchesId }) => (
     <>
       <script type="application/json" id={branchesId}>

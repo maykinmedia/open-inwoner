@@ -3,15 +3,13 @@ import { usePropsOrScriptData } from '@react/lib/json/getJsonScriptData';
 import { useDebounce } from '@react/lib/hooks/useDebounce';
 import clsx from 'clsx';
 import {
-  FunctionComponent as FC,
+  FC,
   InputEventHandler,
   KeyboardEventHandler,
   MouseEventHandler,
 } from 'preact';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { useIntl } from 'react-intl';
-import { WEB_COMPONENT_NAME } from '.';
-import { WebComponentLoader } from '@react/lib/web-component/loader';
 
 export interface ComboBoxItem {
   id: string;
@@ -42,7 +40,7 @@ type BranchData = {
  * Accessible combobox component for branch selection with search filtering.
  * Supports keyboard navigation, mouse/touchscreen, and form submission.
  */
-export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
+const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
   id,
   label,
   name,
@@ -457,7 +455,4 @@ export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
   );
 };
 
-export const loader = WebComponentLoader.loadWC(
-  WEB_COMPONENT_NAME,
-  KVKBranchSelector
-);
+export default KVKBranchSelector;

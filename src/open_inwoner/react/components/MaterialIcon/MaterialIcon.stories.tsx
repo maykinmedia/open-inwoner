@@ -1,6 +1,6 @@
 import { withLoader } from '@react/lib/decorators/storybook';
 import { Meta, StoryObj } from '@storybook/preact';
-import { MaterialIcon, MaterialIconProps, loader } from '.';
+import { MATERIAL_ICON_DEFINITION, MaterialIcon, MaterialIconProps } from '.';
 
 const meta: Meta<typeof MaterialIcon> = {
   title: 'Components/MaterialIcon',
@@ -129,6 +129,6 @@ export const CommonIcons: Story = {
  */
 export const AsWebComponent: Story = {
   args: { name: 'home' },
-  decorators: withLoader(loader),
+  decorators: withLoader(MATERIAL_ICON_DEFINITION.tagName),
   render: ({ name }) => <material-icon name={name} />,
 };

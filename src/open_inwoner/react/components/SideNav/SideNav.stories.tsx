@@ -1,7 +1,8 @@
-import { Meta, StoryObj } from '@storybook/preact';
-import SideNav, { SideNavProps, loader } from './SideNav';
-import 'material-icons/iconfont/material-icons.css';
 import { withLoader } from '@react/lib/decorators/storybook';
+import { Meta, StoryObj } from '@storybook/preact';
+import 'material-icons/iconfont/material-icons.css';
+import { SIDE_NAV_DEFINITION } from '.';
+import SideNav, { SideNavProps } from './SideNav';
 
 const meta: Meta<typeof SideNav> = {
   title: 'Components/SideNav',
@@ -356,7 +357,7 @@ const mockMenuData = [
  */
 export const AsWebComponent: Story = {
   args: { itemsId: 'sidenav-test-data' },
-  decorators: withLoader(loader),
+  decorators: withLoader(SIDE_NAV_DEFINITION.tagName),
   render: ({ itemsId }) => (
     <>
       <script type="application/json" id={itemsId}>

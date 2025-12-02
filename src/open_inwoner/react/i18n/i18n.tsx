@@ -1,4 +1,4 @@
-import { FunctionComponent as FC } from 'preact';
+import { FC } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 import { IntlConfig, IntlProvider } from 'react-intl';
 

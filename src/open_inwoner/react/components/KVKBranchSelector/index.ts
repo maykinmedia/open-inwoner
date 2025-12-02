@@ -1,5 +1,5 @@
-// Preact and Web Component
-export { KVKBranchSelector, loader } from './KVKBranchSelector';
+// Preact Component
+export { default as KVKBranchSelector } from './KVKBranchSelector';
 
 // Types
 export type { ComboBoxItem, KVKBranchSelectorProps } from './KVKBranchSelector';

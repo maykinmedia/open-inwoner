@@ -1,5 +1,6 @@
 import { StoryFn } from '@storybook/preact';
 import { I18nProvider } from '@react/i18n';
+import { WebComponentLoader, WebComponentTagName } from '../web-component';
 
 /**
  * Decorator that adds the openinwoner-theme class to the body
@@ -26,7 +27,8 @@ export const withIntl = (Story: StoryFn) => {
  * @param loader Function that registers the a web component
  * @returns
  */
-export const withLoader = (loader: VoidFunction) => (Story: StoryFn) => {
-  loader();
-  return <Story />;
-};
+export const withLoader =
+  (tagName: WebComponentTagName) => (Story: StoryFn) => {
+    WebComponentLoader.importWC(tagName);
+    return <Story />;
+  };

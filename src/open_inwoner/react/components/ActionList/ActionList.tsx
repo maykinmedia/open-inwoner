@@ -1,8 +1,6 @@
 import { ActionSingle } from '@gemeente-denhaag/action';
 import { usePropsOrScriptData } from '@react/lib/json/getJsonScriptData';
-import { WebComponentLoader } from '@react/lib/web-component';
-import { FunctionComponent as FC } from 'preact';
-import { WEB_COMPONENT_NAME } from '.';
+import { FC } from 'preact';
 import './ActionList.scss';
 
 export interface IActionProps {
@@ -32,7 +30,5 @@ const ActionList: FC<IActionListProps> = ({ actionsId, actions }) => {
     );
   });
 };
-
-export const loader = WebComponentLoader.loadWC(WEB_COMPONENT_NAME, ActionList);
 
 export default ActionList;

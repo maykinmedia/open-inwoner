@@ -1,5 +1,5 @@
-// Preact and Web component
-export { default as MaterialIcon, loader } from './MaterialIcon';
+// Preact Component
+export { default as MaterialIcon } from './MaterialIcon';
 
 // Types
 export type { MaterialIconProps } from './MaterialIcon';

@@ -5,6 +5,10 @@
  * These types are foundational and have no dependencies on the registry.
  */
 
+import { FC } from 'preact';
+import { WEB_COMPONENT_REGISTRY } from './registry';
+import { KebabCasedProperties } from 'type-fest';
+
 /**
  * Context object passed to plugin hooks
  * Contains information about the component being loaded
@@ -77,7 +81,7 @@ export type WebComponentRegisterOptions = WebComponentRegisterExtraOptions &
  *
  * @example
  * ```ts
- * export const EXAMPLE_DEFINITION: WebComponentDefinition<IExampleProps> = {
+ * export const EXAMPLE_DEFINITION: WebComponentDefinition<IExampleProps, "oip-example"> = {
  *   tagName: 'oip-example',
  *   propNames: ['data', 'dataId'],
  *   options: { shadow: false },
@@ -85,13 +89,36 @@ export type WebComponentRegisterOptions = WebComponentRegisterExtraOptions &
  * };
  * ```
  */
-export interface WebComponentDefinition<P = {}> {
+export interface WebComponentDefinition<T extends string, P = {}> {
   /** The custom element tag name */
-  tagName: string;
+  tagName: T;
   /** Array of prop names to expose as HTML attributes */
   propNames: (keyof P)[];
   /** Registration options (shadow DOM, i18n, etc.) */
   options?: WebComponentRegisterOptions;
   /** Dynamic import function for lazy loading */
-  importer: () => Promise<{ loader: () => void }>;
+  importer: () => Promise<{
+    default: FC<P>;
+  }>;
 }
+
+/**
+ * Valid web component tag names - derived from the registry keys
+ */
+export type WebComponentTagName = keyof typeof WEB_COMPONENT_REGISTRY;
+
+/**
+ * JSX Registry - automatically derived from WEB_COMPONENT_REGISTRY
+ * Maps web component tag names to their kebab-cased prop types
+ * This is used in web-components.d.ts to provide JSX typing
+ */
+export type WebComponentJSXRegistry = {
+  [K in keyof typeof WEB_COMPONENT_REGISTRY]: KebabCasedProperties<
+    (typeof WEB_COMPONENT_REGISTRY)[K] extends WebComponentDefinition<
+      infer _S,
+      infer P
+    >
+      ? P
+      : never
+  >;
+};
