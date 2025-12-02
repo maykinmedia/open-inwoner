@@ -117,7 +117,8 @@
     {% firstof config.logo.default_alt_text config.name as logo_alt_text %}
         <div class="logo__desktop">{% include "components/Logo/Logo.html" with src=config.logo.file.url alt=logo_alt_text svg_height=75 only %}</div>
 
-        {% if cms_apps.products and request.user.is_authenticated or not config.hide_search_from_anonymous_users %}
+        {% display_search_for_user as search_visible %}
+        {% if search_visible %}
             <nav class="header__actions" aria-label="Zoek navigatie desktop">
                 <form id="search-form-desktop" class="search-form-delegate form form--spaceless form--inline">
                     {% input search_form.query no_label=True %}
@@ -133,7 +134,7 @@
     {# end of header container #}
 </header>
 
-{% if cms_apps.products and request.user.is_authenticated or not config.hide_search_from_anonymous_users %}
+{% if search_visible %}
     <section class="search search__mobile search__mobile--closed">
         <nav class="search__actions " aria-label="Zoek navigatie mobiel">
             <form id="search-form-mobile-closed" class="search-form-delegate form form--inline">

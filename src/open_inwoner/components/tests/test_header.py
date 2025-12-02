@@ -1,6 +1,8 @@
 from unittest.mock import patch
 
-from django.test import TestCase
+from django.contrib.auth.models import AnonymousUser
+from django.template import Context, Template
+from django.test import RequestFactory, TestCase
 
 from pyquery import PyQuery
 
@@ -204,3 +206,119 @@ class HeaderTest(TestCase):
                 1,
                 "Each search form should have a single text input named 'query'.",
             )
+
+
+class DisplaySearchTemplateTagTest(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.template = Template(
+            "{% load header_tags %}{% display_search_for_user as result %}{{ result }}"
+        )
+
+    def _should_display_search(self, context):
+        """
+        Helper method to evaluate whether search should be displayed.
+
+        Returns:
+            bool: True if the `display_search` template tag indicates search should be shown
+        """
+        result = self.template.render(context)
+        return result.strip() == "True"
+
+    # Tests for global `search_enabled` setting
+
+    def test_search_disabled_globally_for_authenticated_user(self):
+        config = SiteConfiguration.get_solo()
+        config.search_enabled = False
+        config.save()
+
+        request = self.factory.get("/")
+        request.user = UserFactory()
+        context = Context({"request": request})
+
+        self.assertFalse(
+            self._should_display_search(context),
+            "Search should be hidden when search_enabled is False, even for authenticated users",
+        )
+
+    def test_search_disabled_globally_for_anonymous_user(self):
+        """
+        Search is hidden when search_enabled is False, even if anonymous
+        users are normally allowed
+        """
+        config = SiteConfiguration.get_solo()
+        config.search_enabled = False
+        config.hide_search_from_anonymous_users = False
+        config.save()
+
+        request = self.factory.get("/")
+        request.user = AnonymousUser()
+        context = Context({"request": request})
+
+        self.assertFalse(
+            self._should_display_search(context),
+            "Search should be hidden when search_enabled is False, regardless of other settings",
+        )
+
+    # Tests for authenticated users
+
+    def test_authenticated_user_always_sees_search_when_enabled(self):
+        config = SiteConfiguration.get_solo()
+        config.search_enabled = True
+        config.save()
+
+        request = self.factory.get("/")
+        request.user = UserFactory()
+        context = Context({"request": request})
+
+        self.assertTrue(
+            self._should_display_search(context),
+            "Authenticated users should always see search when search_enabled is True",
+        )
+
+    def test_authenticated_user_sees_search_regardless_of_anonymous_setting(self):
+        config = SiteConfiguration.get_solo()
+        config.search_enabled = True
+        config.hide_search_from_anonymous_users = True
+        config.save()
+
+        request = self.factory.get("/")
+        request.user = UserFactory()
+        context = Context({"request": request})
+
+        self.assertTrue(
+            self._should_display_search(context),
+            "Authenticated users should see search even when hide_search_from_anonymous_users is True",
+        )
+
+    # Tests for anonymous users
+
+    def test_anonymous_user_sees_search_when_not_hidden(self):
+        config = SiteConfiguration.get_solo()
+        config.search_enabled = True
+        config.hide_search_from_anonymous_users = False
+        config.save()
+
+        request = self.factory.get("/")
+        request.user = AnonymousUser()
+        context = Context({"request": request})
+
+        self.assertTrue(
+            self._should_display_search(context),
+            "Anonymous users should see search when hide_search_from_anonymous_users is False",
+        )
+
+    def test_anonymous_user_search_hidden(self):
+        config = SiteConfiguration.get_solo()
+        config.search_enabled = True
+        config.hide_search_from_anonymous_users = True
+        config.save()
+
+        request = self.factory.get("/")
+        request.user = AnonymousUser()
+        context = Context({"request": request})
+
+        self.assertFalse(
+            self._should_display_search(context),
+            "Anonymous users should not see search when hide_search_from_anonymous_users is True",
+        )

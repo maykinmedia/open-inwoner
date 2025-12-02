@@ -90,6 +90,7 @@ Nieuwe features
   voorkomt dat gevoelige claims in de querystring van de user agent terechtkomen, wat
   belangrijk kan zijn voor security audits (zoals PENTests) van bijvoorbeeld DigiD.
   Standaard blijven de hints ingeschakeld om het huidige gedrag te behouden.
+* [:taiga-us:`3580`, :pr:`2033`]: De zoekfunctie kan nu worden uitgeschakeld in de Algemene Configuratie.
 
 Bugfixes
 --------

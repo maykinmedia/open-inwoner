@@ -19,3 +19,20 @@ def accessibility_header(request, **kwargs):
     config = SiteConfiguration.get_solo()
     kwargs["help_text"] = config.get_help_text(request)
     return {**kwargs, "request": request}
+
+
+@register.simple_tag(takes_context=True)
+def display_search_for_user(context: dict) -> bool:
+    """
+    Determine if search should be displayed based on configuration and user status.
+    """
+    request = context.get("request")
+    config = SiteConfiguration.get_solo()
+
+    if not config.search_enabled:
+        return False
+
+    if request.user.is_authenticated:
+        return True
+
+    return not config.hide_search_from_anonymous_users

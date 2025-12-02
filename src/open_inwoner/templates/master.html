@@ -80,6 +80,8 @@
 
     <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="utrecht-page">
 
+    {% get_solo 'configurations.SiteConfiguration' as config %}
+
         {% if cookiebanner_enabled %}
         {# render cookiebanner first #}
         <div class="cookie-banner" id="cookie-banner" aria-labelledby="cookie-banner__title" aria-describedby="cookie-banner__text">
@@ -111,9 +113,11 @@
         {% include "components/Header/Header.html" %}
 
         {# javascript and the form-attribute are used to connect various forms and controls to this invisible form #}
-        <form id="search-form" class="form--hidden" method="GET" action="{% url 'search:search' %}" novalidate="">
-            <input name="query" type="hidden" value="{% firstof search_form.query.value "" %}">
-        </form>
+        {% if config.search_enabled %}
+            <form id="search-form" class="form--hidden" method="GET" action="{% url 'search:search' %}" novalidate="">
+                <input name="query" type="hidden" value="{% firstof search_form.query.value "" %}">
+            </form>
+        {% endif %}
 
         {% if anchors and not custom_anchors %}
             {% anchor_menu anchors=anchors desktop=False %}
@@ -171,7 +175,6 @@
             <div class="footer__center wysiwyg">{% static_placeholder "footer_center" %}</div>
             <div class="footer__right wysiwyg">{% static_placeholder "footer_right" %}</div>
 
-            {% get_solo 'configurations.SiteConfiguration' as config %}
             {% if config.kcm_survey_link_url and config.kcm_survey_link_text %}
                 <div class="kcm-survey">
                     {% link bold=True href=config.kcm_survey_link_url text=config.kcm_survey_link_text blank=True hide_external_icon=True %}

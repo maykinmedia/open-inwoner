@@ -45,6 +45,13 @@ class SearchView(
 
         return f"{_('Zoeken')}"
 
+    def dispatch(self, request, *args, **kwargs):
+        config = SiteConfiguration.get_solo()
+
+        if not config.search_enabled:
+            raise Http404(_("The page does not exist"))
+        return super().dispatch(request, *args, **kwargs)
+
     def get(self, request, *args, **kwargs):
         # SearchForm
         form = self.get_form()

@@ -233,19 +233,6 @@ class SiteConfiguration(SingletonModel):
         blank=True,
         help_text=_("Product finder's intro text on the home page."),
     )
-    search_zero_results_text = ProsemirrorModelField(
-        verbose_name=_("Text for zero search results"),
-        allowed_node_types=[NodeType.PARAGRAPH],
-        allowed_mark_types=[
-            MarkType.STRONG,
-            MarkType.ITALIC,
-            MarkType.UNDERLINE,
-            MarkType.LINK,
-        ],
-        null=True,
-        blank=True,
-        help_text=_("Text will be displayed on the warning banner"),
-    )
     select_questionnaire_title = models.CharField(
         max_length=255,
         default=_("Keuze zelfdiagnose?"),
@@ -351,12 +338,6 @@ class SiteConfiguration(SingletonModel):
         verbose_name=_("Product help"),
         help_text=_("The help text for the product page."),
     )
-    search_help_text = models.TextField(
-        blank=True,
-        default=_("Op dit scherm kunt u zoeken naar de producten en diensten."),
-        verbose_name=_("Search help"),
-        help_text=_("The help text for the search page."),
-    )
     account_help_text = models.TextField(
         blank=True,
         default=_(
@@ -382,7 +363,49 @@ class SiteConfiguration(SingletonModel):
         help_text=_("The help text for the plan page."),
     )
 
-    # search filters
+    #
+    # Search options
+    #
+    search_enabled = models.BooleanField(
+        verbose_name=_("Enable Search"),
+        default=True,
+        help_text=_("Whether search functionality is enabled."),
+    )
+    hide_search_from_anonymous_users = models.BooleanField(
+        verbose_name=_("Hide search from anonymous users"),
+        default=False,
+        help_text=_(
+            "If checked, only authenticated users will be able to search the page."
+        ),
+    )
+    search_help_text = models.TextField(
+        verbose_name=_("Search help"),
+        blank=True,
+        default=_("Op dit scherm kunt u zoeken naar de producten en diensten."),
+        help_text=_("The help text for the search page."),
+    )
+    search_zero_results_text = ProsemirrorModelField(
+        verbose_name=_("Text for zero search results"),
+        allowed_node_types=[NodeType.PARAGRAPH],
+        allowed_mark_types=[
+            MarkType.STRONG,
+            MarkType.ITALIC,
+            MarkType.UNDERLINE,
+            MarkType.LINK,
+        ],
+        null=True,
+        blank=True,
+        help_text=_("Text will be displayed on the warning banner"),
+    )
+    include_cms_pages_in_search_index = models.BooleanField(
+        verbose_name=_("Make CMS Pages searchable"),
+        default=False,
+        help_text=_(
+            "If checked, CMS pages will be added to the search index and included in "
+            "search results. Note the change will not take effect until the search "
+            "index has been refreshed."
+        ),
+    )
     search_filter_categories = models.BooleanField(
         verbose_name=_("Add category filter for search results"),
         default=True,
@@ -611,22 +634,6 @@ class SiteConfiguration(SingletonModel):
         default=False,
         help_text=_(
             "If checked, categories will be hidden from users who are not logged in."
-        ),
-    )
-    hide_search_from_anonymous_users = models.BooleanField(
-        verbose_name=_("Hide search from anonymous users"),
-        default=False,
-        help_text=_(
-            "If checked, only authenticated users will be able to search the page."
-        ),
-    )
-    include_cms_pages_in_search_index = models.BooleanField(
-        verbose_name=_("Make CMS Pages searchable"),
-        default=False,
-        help_text=_(
-            "If checked, CMS pages will be added to the search index and included in "
-            "search results. Note the change will not take effect until the search "
-            "index has been refreshed."
         ),
     )
     display_social = models.BooleanField(
