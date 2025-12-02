@@ -488,10 +488,10 @@ Hier vult u de helptekst voor de kolommen in de jaaropgave PDF in. Deze helpteks
 
 Bij Services staan alle externe REST-API koppelingen met het Open Inwoner Platform ingesteld. Deze mogen niet worden gewijzigd.
 
-9.16. Statusvertalingen
+9.16. Signing requests
 =======================
 
-Bij Statusvertalingen kunt u de statussen personaliseren. Zo kunt u standaardteksten naar believen veranderen in statussen die beter passen bij de situatie. Het gaat hier dus niet om vertalingen van taal naar taal.
+Hier kunt u een CSR (Certificate Signing Request) genereren die kan worden ingediend bij een certificeringsinstantie (CA) voor de uitgifte van een digitaal certificaat.
 
 9.17. Webhook-abonnementen
 ==========================

@@ -152,6 +152,7 @@
         ["openzaak", "zaaktypeinformatieobjecttypeconfig"],
         ["qmatic", "qmaticconfig"],
         ["simple_certmanager", "certificate"],
+        ["simple_certmanager", "signingrequest"],
         ["soap", "soapservice"],
         ["ssd", "ssdconfig"],
         ["zgw_consumers", "certificate"],

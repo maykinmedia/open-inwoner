@@ -93,6 +93,8 @@ Nieuwe features
   belangrijk kan zijn voor security audits (zoals PENTests) van bijvoorbeeld DigiD.
   Standaard blijven de hints ingeschakeld om het huidige gedrag te behouden.
 * [:taiga-us:`3580`, :pr:`2033`]: De zoekfunctie kan nu worden uitgeschakeld in de Algemene Configuratie.
+* [:taiga-is`3600`, :pr:`2046`]: 'Signing requets' toegevoegd aan admin. Beheerders kunnen nu een CSR
+  (Certificate Signing Request) genereren in de admin via 'Datakoppelingen > Ondertekeningsverzoeken'.
 
 Bugfixes
 --------
