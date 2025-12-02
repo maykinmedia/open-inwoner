@@ -84,6 +84,8 @@ Nieuwe features
   ontsluiten van zaken in de startpagina.
 * [:taiga-us:`3574`, :pr:`2026`]: Aantal requests aan zaken API's configureerbaar gemaakt via
   omgevingsvariabele.
+* [:taiga-us:`3576`, :pr:`2034`]: Front-end voor CMS plug-in 'Mijn Zaken' gebouwd met design-tokens
+  volgens het NLDS principe.
 * [:taiga-us:`3596`, :pr:`2036`]: Hints (zoals ``id_token_hint`` en
   ``post_logout_redirect_uri``) bij OIDC frontend logout zijn nu optioneel
   configureerbaar via de omgevingsvariabele ``OIDC_FRONTEND_LOGOUT_WITH_HINTS``. Dit
