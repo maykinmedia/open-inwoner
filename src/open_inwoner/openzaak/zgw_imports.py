@@ -32,7 +32,7 @@ class ExclusionReason(StrEnum):
         "Object uitgefilterd omdat deze door een database fout niet kon worden opgeslagen"
     )
     MISSING_CATALOGUS = _("Object verwijst naar een niet-bestaande catalogus")
-    NO_CLIENT = _("Object uitgefilderd omdat er geen valide client beschikbaar was")
+    NO_CLIENT = _("Object uitgefilterd omdat er geen valide client beschikbaar was")
 
 
 @dataclass
