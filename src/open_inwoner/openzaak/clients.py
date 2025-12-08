@@ -27,9 +27,9 @@ from open_inwoner.utils.api import ClientError, get_json_response
 from open_inwoner.utils.decorators import cache as cache_result
 
 from .api_models import (
+    Formulier,
     InformatieObjectType,
     OpenstaandeTaak,
-    OpenSubmission,
     Resultaat,
     ResultaatType,
     Rol,
@@ -738,7 +738,7 @@ class FormClient(ZgwAPIClient):
         vestigingsnummer: str | None = None,
         max_requests: int | None = None,
         **kwargs,
-    ) -> list[OpenSubmission]:
+    ) -> list[Formulier]:
         if user_bsn and (user_kvk or vestigingsnummer):
             raise ValueError(
                 "either `user_bsn` or `user_kvk` (optionally with `vestigingsnummer`) "
@@ -763,7 +763,7 @@ class FormClient(ZgwAPIClient):
         self,
         user_bsn: str,
         max_requests: int | None = None,
-    ) -> list[OpenSubmission]:
+    ) -> list[Formulier]:
         try:
             response = self.get(
                 "openstaande-inzendingen",
@@ -779,7 +779,7 @@ class FormClient(ZgwAPIClient):
             logger.exception("exception while making request")
             return []
 
-        results = factory(OpenSubmission, all_data)
+        results = factory(Formulier, all_data)
 
         return results
 
@@ -788,7 +788,7 @@ class FormClient(ZgwAPIClient):
         user_kvk: str,
         vestigingsnummer: str | None,
         max_requests: int | None = None,
-    ) -> list[OpenSubmission]:
+    ) -> list[Formulier]:
         request_params = {"kvk": user_kvk}
         if vestigingsnummer:
             request_params["vestigingsnummer"] = vestigingsnummer
@@ -808,7 +808,7 @@ class FormClient(ZgwAPIClient):
             logger.exception("exception while making request")
             return []
 
-        results = factory(OpenSubmission, all_data)
+        results = factory(Formulier, all_data)
 
         return results
 

@@ -100,7 +100,7 @@ class InnerCaseListView(
             if statuses:
                 open_submissions = (
                     open_submissions
-                    if CaseFilterFormOption.OPEN_SUBMISSION in statuses
+                    if CaseFilterFormOption.FORMULIER in statuses
                     else []
                 )
                 preprocessed_cases = [

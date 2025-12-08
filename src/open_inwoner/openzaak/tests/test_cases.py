@@ -726,7 +726,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
         self.config.save()
 
         self.client.force_login(user=self.user)
-        inner_url = f"{reverse_lazy('cases:cases_content')}?{self._encode_statuses(CaseFilterFormOption.OPEN_CASE)}"
+        inner_url = f"{reverse_lazy('cases:cases_content')}?{self._encode_statuses(CaseFilterFormOption.ZAAK_OPEN)}"
 
         response = self.client.get(inner_url, HTTP_HX_REQUEST="true")
 
@@ -746,7 +746,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
 
         self.client.force_login(user=self.user)
         filter_param = self._encode_statuses(
-            [CaseFilterFormOption.CLOSED_CASE, CaseFilterFormOption.OPEN_SUBMISSION]
+            [CaseFilterFormOption.ZAAK_AFGEROND, CaseFilterFormOption.FORMULIER]
         )
         inner_url = f"{reverse_lazy('cases:cases_content')}?{filter_param}"
 
@@ -1416,6 +1416,8 @@ class CaseSubmissionTest(TransactionWebTest):
             cases[0]["datum_laatste_wijziging"].strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
             data_alt.submission_3["datumLaatsteWijziging"],
         )
+        # Verify case_type is "Formulier" for submissions
+        self.assertEqual(cases[0]["case_type"], "Formulier")
 
         self.assertEqual(cases[1]["url"], data.submission_2["url"])
         self.assertEqual(cases[1]["uuid"], data.submission_2["uuid"])
@@ -1425,6 +1427,12 @@ class CaseSubmissionTest(TransactionWebTest):
             cases[1]["datum_laatste_wijziging"].strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
             data.submission_2["datumLaatsteWijziging"],
         )
+        # Verify case_type is "Formulier" for submissions
+        self.assertEqual(cases[1]["case_type"], "Formulier")
+
+        # Verify the HTML contains the formulier-specific text
+        self.assertIn("Formulier afronden", response.text)
+        self.assertIn("Nog niet afgerond formulier", response.text)
 
     @requests_mock.Mocker()
     @patch("open_inwoner.kvk.middleware.KvKLoginMiddleware.requires_redirect")

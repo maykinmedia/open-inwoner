@@ -336,7 +336,7 @@ class Notification(Model):
 
 
 @dataclass
-class OpenSubmission(Model):
+class Formulier(Model):
     url: str
     uuid: str
     naam: str

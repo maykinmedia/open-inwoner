@@ -12,7 +12,7 @@ from django.utils.translation import gettext_lazy as _
 import structlog
 from zgw_consumers.concurrent import parallel
 
-from open_inwoner.openzaak.api_models import OpenSubmission, Zaak
+from open_inwoner.openzaak.api_models import Formulier, Zaak
 from open_inwoner.openzaak.clients import (
     CatalogiClient,
     ZakenClient,
@@ -36,9 +36,9 @@ class ResolveCaseException(Exception):
 
 
 class CaseFilterFormOption(enum.Enum):
-    OPEN_SUBMISSION = _("Openstaande formulieren")
-    OPEN_CASE = _("Lopende aanvragen")
-    CLOSED_CASE = _("Afgeronde aanvragen")
+    FORMULIER = _("Openstaande formulieren")
+    ZAAK_OPEN = _("Lopende aanvragen")
+    ZAAK_AFGEROND = _("Afgeronde aanvragen")
 
 
 @dataclass(frozen=True)
@@ -63,18 +63,18 @@ class ZaakWithApiGroup:
 
 
 @dataclass(frozen=True)
-class SubmissionWithApiGroup:
-    submission: OpenSubmission
+class FormulierWithApiGroup:
+    formulier: Formulier
     api_group: ZGWApiGroupConfig
     type_aanvraag: TypeAanvraag
 
     @property
     def identification(self) -> str:
-        return self.submission.url
+        return self.formulier.url
 
     def process_data(self) -> dict:
         return {
-            **self.submission.process_data(),
+            **self.formulier.process_data(),
             "api_group": self.api_group,
             "type_aanvraag": self.type_aanvraag.value,
         }
@@ -129,12 +129,12 @@ class CaseListService:
 
     def _get_submissions_for_api_group(
         self, group: ZGWApiGroupConfig
-    ) -> list[SubmissionWithApiGroup]:
+    ) -> list[FormulierWithApiGroup]:
         if not group.forms_client:
             raise ValueError(f"{group} has no `forms_client`")
 
         return [
-            SubmissionWithApiGroup(
+            FormulierWithApiGroup(
                 submission=sub, api_group=group, type_aanvraag=TypeAanvraag.FORMULIER
             )
             for sub in group.forms_client.fetch_open_submissions(
@@ -144,14 +144,14 @@ class CaseListService:
             )
         ]
 
-    def get_submissions(self) -> list[SubmissionWithApiGroup]:
+    def get_submissions(self) -> list[FormulierWithApiGroup]:
         all_api_groups = list(
             ZGWApiGroupConfig.objects.filter(form_service__isnull=False).select_related(
                 "form_service",
             )
         )
 
-        subs_with_api_group: list[SubmissionWithApiGroup] = []
+        subs_with_api_group: list[FormulierWithApiGroup] = []
         with parallel(max_workers=self._max_workers) as executor:
             futures = [
                 executor.submit(self._get_submissions_for_api_group, group)
@@ -172,7 +172,7 @@ class CaseListService:
 
         # Sort submissions by date modified
         subs_with_api_group.sort(
-            key=lambda sub: sub.submission.datum_laatste_wijziging, reverse=True
+            key=lambda sub: sub.formulier.datum_laatste_wijziging, reverse=True
         )
 
         return subs_with_api_group
@@ -180,19 +180,19 @@ class CaseListService:
     @staticmethod
     def get_case_filter_status(zaak: Zaak) -> CaseFilterFormOption:
         if zaak.einddatum:
-            return CaseFilterFormOption.CLOSED_CASE
+            return CaseFilterFormOption.ZAAK_AFGEROND
 
-        return CaseFilterFormOption.OPEN_CASE
+        return CaseFilterFormOption.ZAAK_OPEN
 
     def get_case_status_frequencies(
         self,
         cases: Iterable[ZaakWithApiGroup],
-        submissions: Iterable[SubmissionWithApiGroup],
+        submissions: Iterable[FormulierWithApiGroup],
     ) -> dict[CaseFilterFormOption, int]:
         case_statuses = [self.get_case_filter_status(case.zaak) for case in cases]
 
         # add static text for open submissions
-        case_statuses += [CaseFilterFormOption.OPEN_SUBMISSION for _ in submissions]
+        case_statuses += [CaseFilterFormOption.FORMULIER for _ in submissions]
 
         return {
             status: case_statuses.count(status) for status in list(CaseFilterFormOption)

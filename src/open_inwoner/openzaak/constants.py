@@ -32,4 +32,4 @@ class ZaakBetrokkeneRol(models.TextChoices):
 
 class TypeAanvraag(Enum):
     ZAAK = "Zaak"
-    FORMULIER = "OpenSubmission"  # "openstaande inzending/formulier"
+    FORMULIER = "Formulier"  # "openstaande inzending/formulier"
