@@ -86,7 +86,7 @@ class FormulierWithApiGroup:
 class Timeouts(TypedDict):
     fetch_raw_cases: int | float
     resolve_cases: int | float
-    fetch_submissions: int | float
+    fetch_formulieren: int | float
 
 
 class CaseListService:
@@ -99,7 +99,7 @@ class CaseListService:
         self._timeouts = {
             "fetch_raw_cases": settings.ZGW_CASE_LIST_FETCH_TIMEOUT * 0.3,
             "resolve_cases": settings.ZGW_CASE_LIST_FETCH_TIMEOUT * 0.5,
-            "fetch_submissions": settings.ZGW_CASE_LIST_FETCH_TIMEOUT * 0.2,
+            "fetch_formulieren": settings.ZGW_CASE_LIST_FETCH_TIMEOUT * 0.2,
         }
         self._max_workers = settings.ZGW_CASE_LIST_NUM_WORKERS
 
@@ -127,7 +127,7 @@ class CaseListService:
     def _catalogi_client_factory(group: ZGWApiGroupConfig):
         return cast(CatalogiClient, build_zgw_client_from_service(group.ztc_service))
 
-    def _get_submissions_for_api_group(
+    def _get_formulieren_for_api_group(
         self, group: ZGWApiGroupConfig
     ) -> list[FormulierWithApiGroup]:
         if not group.forms_client:
@@ -135,16 +135,18 @@ class CaseListService:
 
         return [
             FormulierWithApiGroup(
-                submission=sub, api_group=group, type_aanvraag=TypeAanvraag.FORMULIER
+                formulier=formulier,
+                api_group=group,
+                type_aanvraag=TypeAanvraag.FORMULIER,
             )
-            for sub in group.forms_client.fetch_open_submissions(
+            for formulier in group.forms_client.fetch_formulieren(
                 **get_user_fetch_parameters(
                     self.request, use_rsin=group.fetch_eherkenning_zaken_with_rsin
                 )
             )
         ]
 
-    def get_submissions(self) -> list[FormulierWithApiGroup]:
+    def get_formulieren(self) -> list[FormulierWithApiGroup]:
         all_api_groups = list(
             ZGWApiGroupConfig.objects.filter(form_service__isnull=False).select_related(
                 "form_service",
@@ -154,23 +156,23 @@ class CaseListService:
         subs_with_api_group: list[FormulierWithApiGroup] = []
         with parallel(max_workers=self._max_workers) as executor:
             futures = [
-                executor.submit(self._get_submissions_for_api_group, group)
+                executor.submit(self._get_formulieren_for_api_group, group)
                 for group in all_api_groups
             ]
 
         try:
             for task in concurrent.futures.as_completed(
                 futures,
-                timeout=self._timeouts["fetch_submissions"],
+                timeout=self._timeouts["fetch_formulieren"],
             ):
                 try:
                     subs_with_api_group.extend(task.result())
                 except BaseException:
                     logger.exception("Error fetching and pre-processing cases")
         except concurrent.futures.TimeoutError:
-            logger.warning("Timeout while fetching submissions")
+            logger.warning("Timeout while fetching formulieren")
 
-        # Sort submissions by date modified
+        # Sort formulieren by date modified
         subs_with_api_group.sort(
             key=lambda sub: sub.formulier.datum_laatste_wijziging, reverse=True
         )
@@ -187,12 +189,12 @@ class CaseListService:
     def get_case_status_frequencies(
         self,
         cases: Iterable[ZaakWithApiGroup],
-        submissions: Iterable[FormulierWithApiGroup],
+        formulieren: Iterable[FormulierWithApiGroup],
     ) -> dict[CaseFilterFormOption, int]:
         case_statuses = [self.get_case_filter_status(case.zaak) for case in cases]
 
-        # add static text for open submissions
-        case_statuses += [CaseFilterFormOption.FORMULIER for _ in submissions]
+        # add static text for formulieren
+        case_statuses += [CaseFilterFormOption.FORMULIER for _ in formulieren]
 
         return {
             status: case_statuses.count(status) for status in list(CaseFilterFormOption)

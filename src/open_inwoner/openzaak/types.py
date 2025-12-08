@@ -3,7 +3,7 @@ from typing import Protocol
 
 class UniformCase(Protocol):
     """
-    Zaken and open submissions are classified as "cases" if they have an
+    Zaken and formulieren are classified as "cases" if they have an
     `identification` property and a method `process_data` to prepare data
     for the template
     """

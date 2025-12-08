@@ -730,8 +730,8 @@ class DocumentenClient(ZgwAPIClient):
         return data
 
 
-class FormClient(ZgwAPIClient):
-    def fetch_open_submissions(
+class FormulierenClient(ZgwAPIClient):
+    def fetch_formulieren(
         self,
         user_bsn: str | None = None,
         user_kvk: str | None = None,
@@ -746,12 +746,12 @@ class FormClient(ZgwAPIClient):
             )
 
         if user_bsn:
-            return self.fetch_open_submissions_by_bsn(
+            return self.fetch_formulieren_by_bsn(
                 user_bsn, max_requests=max_requests or settings.ZGW_MAX_REQUESTS
             )
 
         if user_kvk:
-            return self.fetch_open_submissions_by_kvk(
+            return self.fetch_formulieren_by_kvk(
                 user_kvk,
                 max_requests=max_requests or settings.ZGW_MAX_REQUESTS,
                 vestigingsnummer=vestigingsnummer,
@@ -759,7 +759,7 @@ class FormClient(ZgwAPIClient):
 
         return []
 
-    def fetch_open_submissions_by_bsn(
+    def fetch_formulieren_by_bsn(
         self,
         user_bsn: str,
         max_requests: int | None = None,
@@ -783,7 +783,7 @@ class FormClient(ZgwAPIClient):
 
         return results
 
-    def fetch_open_submissions_by_kvk(
+    def fetch_formulieren_by_kvk(
         self,
         user_kvk: str,
         vestigingsnummer: str | None,
@@ -938,7 +938,7 @@ class MultiZgwClientProxy:
 
 ZgwClientType = Literal["zaak", "catalogi", "document", "form"]
 ZgwClientFactoryReturn: TypeAlias = (
-    ZakenClient | CatalogiClient | DocumentenClient | FormClient
+    ZakenClient | CatalogiClient | DocumentenClient | FormulierenClient
 )
 
 
@@ -949,7 +949,7 @@ def build_zgw_client_from_service(
         APITypes.zrc: ZakenClient,
         APITypes.ztc: CatalogiClient,
         APITypes.drc: DocumentenClient,
-        APITypes.orc: FormClient,
+        APITypes.orc: FormulierenClient,
     }
 
     try:
@@ -970,7 +970,7 @@ def build_zgw_client_from_service(
 
 def _build_all_zgw_clients_for_type(
     type_: ZgwClientType,
-) -> list[ZakenClient | CatalogiClient | DocumentenClient | FormClient]:
+) -> list[ZakenClient | CatalogiClient | DocumentenClient | FormulierenClient]:
     config = OpenZaakConfig.get_solo()
     services_to_client_mapping: Mapping[ZgwClientType, str] = {
         "zaak": "zrc_service",
@@ -1008,5 +1008,5 @@ def build_documenten_clients() -> list[DocumentenClient]:
     return cast(list[DocumentenClient], _build_all_zgw_clients_for_type("document"))
 
 
-def build_forms_clients() -> list[FormClient]:
-    return cast(list[FormClient], _build_all_zgw_clients_for_type("form"))
+def build_forms_clients() -> list[FormulierenClient]:
+    return cast(list[FormulierenClient], _build_all_zgw_clients_for_type("form"))

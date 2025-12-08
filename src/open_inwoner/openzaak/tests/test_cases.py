@@ -1370,7 +1370,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class CaseSubmissionTest(TransactionWebTest):
+class FormulierTest(TransactionWebTest):
     inner_url = reverse_lazy("cases:cases_content")
 
     def setUp(self):
@@ -1386,7 +1386,7 @@ class CaseSubmissionTest(TransactionWebTest):
         )
 
     @requests_mock.Mocker()
-    def test_get_open_submissions_by_bsn(self, m):
+    def test_get_formulieren_by_bsn(self, m):
         digid_user = UserFactory(
             login_type=LoginTypeChoices.digid, bsn="900222086", email="john@smith.nl"
         )
@@ -1416,8 +1416,8 @@ class CaseSubmissionTest(TransactionWebTest):
             cases[0]["datum_laatste_wijziging"].strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
             data_alt.submission_3["datumLaatsteWijziging"],
         )
-        # Verify case_type is "Formulier" for submissions
-        self.assertEqual(cases[0]["case_type"], "Formulier")
+        # Verify case_type is "Formulier"
+        self.assertEqual(cases[0]["type_aanvraag"], "Formulier")
 
         self.assertEqual(cases[1]["url"], data.submission_2["url"])
         self.assertEqual(cases[1]["uuid"], data.submission_2["uuid"])
@@ -1427,8 +1427,8 @@ class CaseSubmissionTest(TransactionWebTest):
             cases[1]["datum_laatste_wijziging"].strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
             data.submission_2["datumLaatsteWijziging"],
         )
-        # Verify case_type is "Formulier" for submissions
-        self.assertEqual(cases[1]["case_type"], "Formulier")
+        # Verify case_type
+        self.assertEqual(cases[1]["type_aanvraag"], "Formulier")
 
         # Verify the HTML contains the formulier-specific text
         self.assertIn("Formulier afronden", response.text)
@@ -1436,7 +1436,7 @@ class CaseSubmissionTest(TransactionWebTest):
 
     @requests_mock.Mocker()
     @patch("open_inwoner.kvk.middleware.KvKLoginMiddleware.requires_redirect")
-    def test_get_open_submissions_by_kvk(self, m, mock_kvk_redirect):
+    def test_get_formulieren_by_kvk(self, m, mock_kvk_redirect):
         mock_kvk_redirect.return_value = False
 
         user = UserFactory(login_type=LoginTypeChoices.eherkenning, kvk="68750110")

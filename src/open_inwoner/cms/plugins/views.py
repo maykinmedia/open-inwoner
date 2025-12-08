@@ -54,21 +54,17 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
             )
             num_zaken = MAX_CASES_DEFAULT
 
-        # fetch zaken + openstaande inzendingen
+        # fetch zaken + formulieren
         # note: we count the retrieval as success of one part is successfully retrieved
         msg = None
         partial_error_msg = _(
             "We're experiencing technical difficulties. Some results may be missing from your cases."
         )
         try:
-            open_submissions: Sequence[UniformCase] | None = (
-                case_service.get_submissions()
-            )
+            formulieren: Sequence[UniformCase] | None = case_service.get_formulieren()
         except Exception:
-            logger.error(
-                "Failed to retrieve openstaande inzendingen", user=request.user
-            )
-            open_submissions = None
+            logger.error("Failed to retrieve formulieren", user=request.user)
+            formulieren = None
             msg = partial_error_msg
         try:
             preprocessed_cases: Sequence[UniformCase] | None = case_service.get_cases()
@@ -76,7 +72,7 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
             logger.error("Failed to retrieve zaken", user=request.user)
             preprocessed_cases = None
             msg = partial_error_msg
-        if open_submissions is None and preprocessed_cases is None:
+        if formulieren is None and preprocessed_cases is None:
             context = {
                 "show_zaken_plugin": True,
                 "zaken": [],
@@ -90,7 +86,7 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
         zaken_dicts = [
             zaak.process_data()
             for zaak in itertools.islice(
-                itertools.chain(open_submissions or [], preprocessed_cases or []),
+                itertools.chain(formulieren or [], preprocessed_cases or []),
                 num_zaken,
             )
         ]
@@ -113,7 +109,7 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
                     "uuid": zaak["uuid"],
                     "url": f_url.url,
                     "identification": zaak.get("identification", ""),
-                    # for 'openstaande inzendingen/formulieren':
+                    # for 'formulieren':
                     # "naam" from API -> "description" for web component
                     "description": zaak.get("naam", zaak.get("description", "")),
                 }

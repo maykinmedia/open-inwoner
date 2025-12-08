@@ -69,14 +69,14 @@ class InnerCaseListView(
         case_service = CaseListService(self.request)
         context["filter_form_enabled"] = config.zaken_filter_enabled
 
-        # update ctx with open submissions and cases (possibly fitered)
-        open_submissions: Sequence[UniformCase] = case_service.get_submissions()
+        # update ctx with formulieren and cases (possibly filtered)
+        formulieren: Sequence[UniformCase] = case_service.get_formulieren()
         preprocessed_cases: Sequence[UniformCase] = case_service.get_cases()
 
         if config.zaken_filter_enabled:
             case_status_frequencies = case_service.get_case_status_frequencies(
                 cases=preprocessed_cases,
-                submissions=open_submissions,
+                formulieren=formulieren,
             )
             # Separate frequency data from statusname
             context["status_freqs"] = [
@@ -96,12 +96,10 @@ class InnerCaseListView(
                         user=self.request.user,
                     )
 
-            # Actually filter the submissions
+            # Actually filter the formulieren
             if statuses:
-                open_submissions = (
-                    open_submissions
-                    if CaseFilterFormOption.FORMULIER in statuses
-                    else []
+                formulieren = (
+                    formulieren if CaseFilterFormOption.FORMULIER in statuses else []
                 )
                 preprocessed_cases = [
                     case
@@ -109,9 +107,7 @@ class InnerCaseListView(
                     if case_service.get_case_filter_status(case.zaak) in statuses
                 ]
 
-        paginator_dict = self.paginate_with_context(
-            [*open_submissions, *preprocessed_cases]
-        )
+        paginator_dict = self.paginate_with_context([*formulieren, *preprocessed_cases])
         case_dicts = [case.process_data() for case in paginator_dict["object_list"]]
 
         context["cases"] = case_dicts

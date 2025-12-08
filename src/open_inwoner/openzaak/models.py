@@ -134,7 +134,12 @@ class ZGWApiGroupConfigQuerySet(models.QuerySet):
         )
 
     def filter_by_zgw_client(self, client: _ZgwClient):
-        from .clients import CatalogiClient, DocumentenClient, FormClient, ZakenClient
+        from .clients import (
+            CatalogiClient,
+            DocumentenClient,
+            FormulierenClient,
+            ZakenClient,
+        )
 
         match client:
             case ZakenClient():
@@ -143,12 +148,12 @@ class ZGWApiGroupConfigQuerySet(models.QuerySet):
                 return self.filter(ztc_service=client.configured_from)
             case DocumentenClient():
                 return self.filter(drc_service=client.configured_from)
-            case FormClient():
+            case FormulierenClient():
                 return self.filter(form_service=client.configured_from)
             case _:
                 raise ValueError(
                     f"Client is of type {type(client)} but expected to be one of: "
-                    "ZakenClient, DocumentenClient, FormClient, CatalogiClient"
+                    "ZakenClient, DocumentenClient, FormulierenClient, CatalogiClient"
                 )
 
     def filter_by_url_root_overlap(self, url: str):
@@ -256,10 +261,10 @@ class ZGWApiGroupConfig(models.Model):
 
     @property
     def forms_client(self):
-        from .clients import FormClient
+        from .clients import FormulierenClient
 
         if self.form_service:
-            return cast(FormClient, self._build_client_from_attr("form_service"))
+            return cast(FormulierenClient, self._build_client_from_attr("form_service"))
 
     # backend-specific flags
     fetch_eherkenning_zaken_with_rsin = models.BooleanField(

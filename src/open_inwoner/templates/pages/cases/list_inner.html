@@ -40,7 +40,7 @@
     {% for case in cases %}
         {% render_column start=forloop.counter_0|multiply:4 span=4 %}
             {# "openstaande formulieren/inzendingen" #}
-            {% if case.type_aanvraag == "OpenSubmission" %}
+            {% if case.type_aanvraag == "Formulier" %}
                 <a href="{{ case.vervolg_link }}" class="card card card__description-card card--stretch" target="_blank">
                     <div class="card__body">
 
