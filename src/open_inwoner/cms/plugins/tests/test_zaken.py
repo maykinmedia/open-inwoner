@@ -11,6 +11,7 @@ from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.cms.plugins.cms_plugins import CMSZakenPlugin
 from open_inwoner.cms.plugins.models.zaken import MAX_CASES_DEFAULT
 from open_inwoner.cms.tests import cms_tools
+from open_inwoner.openzaak.constants import TypeAanvraag
 from open_inwoner.openzaak.models import ZGWApiGroupConfig
 from open_inwoner.openzaak.tests.factories import (
     ServiceFactory,
@@ -178,6 +179,7 @@ class CMSZakenPluginTest(TestCase):
             "identification": "ZAAK-001",
             "naam": "Test zaak beschrijving",
             "api_group": api_group,
+            "type_aanvraag": TypeAanvraag.ZAAK.value,
         }
         mock_cases.return_value = [mock_case]
 
@@ -240,6 +242,7 @@ class CMSZakenPluginTest(TestCase):
             "identification": "ZAAK-001",
             "naam": "Test zaak",
             "api_group": api_group,
+            "type_aanvraag": TypeAanvraag.ZAAK.value,
         }
         mock_cases.return_value = [mock_case]
 
@@ -281,6 +284,7 @@ class CMSZakenPluginTest(TestCase):
                 "identification": f"ZAAK-{i:03d}",
                 "naam": f"Test zaak {i}",
                 "api_group": api_group,
+                "type_aanvraag": TypeAanvraag.ZAAK.value,
             }
             mock_cases_list.append(mock_case)
 
@@ -328,6 +332,7 @@ class CMSZakenPluginTest(TestCase):
                 "identification": f"SUBMISSION-{i:03d}",
                 "naam": f"Test submission {i}",
                 "api_group": api_group,
+                "type_aanvraag": TypeAanvraag.FORMULIER.value,
             }
             mock_submissions_list.append(mock_submission)
 
@@ -340,6 +345,7 @@ class CMSZakenPluginTest(TestCase):
                 "identification": f"ZAAK-{i:03d}",
                 "naam": f"Test zaak {i}",
                 "api_group": api_group,
+                "type_aanvraag": TypeAanvraag.ZAAK.value,
             }
             mock_cases_list.append(mock_case)
 
@@ -393,6 +399,7 @@ class CMSZakenPluginTest(TestCase):
                 "identification": f"ZAAK-{i:03d}",
                 "naam": f"Test zaak {i}",
                 "api_group": api_group,
+                "type_aanvraag": TypeAanvraag.ZAAK.value,
             }
             mock_cases_list.append(mock_case)
 
@@ -434,6 +441,7 @@ class CMSZakenPluginTest(TestCase):
             "identification": "ZAAK-001",
             "naam": "Dit is de naam van de zaak",
             "api_group": api_group,
+            "type_aanvraag": TypeAanvraag.ZAAK.value,
         }
         mock_cases.return_value = [mock_case]
 
@@ -470,6 +478,7 @@ class CMSZakenPluginTest(TestCase):
             "uuid": "test-uuid-123",
             "identification": "",  # Required for logging
             "api_group": api_group,
+            "type_aanvraag": TypeAanvraag.ZAAK.value,
         }
         mock_cases.return_value = [mock_case]
 
@@ -509,6 +518,7 @@ class CMSZakenPluginTest(TestCase):
             "identification": "SUBMISSION-001",
             "naam": "Open submission met naam field",
             "api_group": api_group,
+            "type_aanvraag": TypeAanvraag.FORMULIER.value,
         }
 
         # Mock regular case with "description"
@@ -518,6 +528,7 @@ class CMSZakenPluginTest(TestCase):
             "identification": "ZAAK-001",
             "description": "Regular case met description field",
             "api_group": api_group,
+            "type_aanvraag": TypeAanvraag.ZAAK.value,
         }
 
         mock_submissions.return_value = [mock_submission]

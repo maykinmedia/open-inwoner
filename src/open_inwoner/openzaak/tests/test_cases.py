@@ -27,7 +27,11 @@ from open_inwoner.accounts.tests.factories import (
 )
 from open_inwoner.cms.cases.views.cases import CaseFilterFormOption, InnerCaseListView
 from open_inwoner.openzaak.api_models import Zaak
-from open_inwoner.openzaak.constants import StatusIndicators, ZaakBetrokkeneRol
+from open_inwoner.openzaak.constants import (
+    StatusIndicators,
+    TypeAanvraag,
+    ZaakBetrokkeneRol,
+)
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 from open_inwoner.utils.tests.helpers import (
@@ -574,7 +578,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                         "result": "",
                         "zaaktype_config": mock.zaaktype_config1,
                         "statustype_config": mock.zt_statustype_config1,
-                        "case_type": "Zaak",
+                        "type_aanvraag": TypeAanvraag.ZAAK.value,
                         "api_group": self.api_groups[i],
                     },
                     {
@@ -589,7 +593,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                         "result": "",
                         "zaaktype_config": mock.zaaktype_config1,
                         "statustype_config": mock.zt_statustype_config1,
-                        "case_type": "Zaak",
+                        "type_aanvraag": TypeAanvraag.ZAAK.value,
                         "api_group": self.api_groups[i],
                     },
                     {
@@ -606,7 +610,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                         "result": mock.resultaat_type["omschrijving"],
                         "zaaktype_config": mock.zaaktype_config1,
                         "statustype_config": None,
-                        "case_type": "Zaak",
+                        "type_aanvraag": TypeAanvraag.ZAAK.value,
                         "api_group": self.api_groups[i],
                     },
                     {
@@ -621,7 +625,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                         "result": mock.resultaat_type["omschrijving"],
                         "zaaktype_config": mock.zaaktype_config1,
                         "statustype_config": mock.zt_statustype_config1,
-                        "case_type": "Zaak",
+                        "type_aanvraag": TypeAanvraag.ZAAK.value,
                         "api_group": self.api_groups[i],
                     },
                 ]
@@ -794,7 +798,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                                 "result": "",
                                 "zaaktype_config": mock.zaaktype_config1,
                                 "statustype_config": mock.zt_statustype_config1,
-                                "case_type": "Zaak",
+                                "type_aanvraag": TypeAanvraag.ZAAK.value,
                                 "api_group": self.api_groups[i],
                             },
                             {
@@ -813,7 +817,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                                 "result": "",
                                 "zaaktype_config": mock.zaaktype_config1,
                                 "statustype_config": mock.zt_statustype_config1,
-                                "case_type": "Zaak",
+                                "type_aanvraag": TypeAanvraag.ZAAK.value,
                                 "api_group": self.api_groups[i],
                             },
                         ]
@@ -956,7 +960,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                 "result": "",
                 "zaaktype_config": mock.zaaktype_config1,
                 "statustype_config": mock.zt_statustype_config1,
-                "case_type": "Zaak",
+                "type_aanvraag": TypeAanvraag.ZAAK.value,
                 "api_group": self.api_groups[i],
             }
             for i, mock in enumerate(self.mocks)
@@ -1014,7 +1018,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                 "result": "",
                 "zaaktype_config": mock.zaaktype_config1,
                 "statustype_config": mock.zt_statustype_config1,
-                "case_type": "Zaak",
+                "type_aanvraag": TypeAanvraag.ZAAK.value,
                 "api_group": self.api_groups[i],
             }
             for i, mock in enumerate(self.mocks)
@@ -1120,7 +1124,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                         "result": "",
                         "zaaktype_config": mock.zaaktype_config1,
                         "statustype_config": mock.zt_statustype_config1,
-                        "case_type": "Zaak",
+                        "type_aanvraag": TypeAanvraag.ZAAK.value,
                         "api_group": self.api_groups[i],
                     }
                 ]
@@ -1260,7 +1264,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                     "result": "",
                     "zaaktype_config": mock.zaaktype_config1,
                     "statustype_config": mock.zt_statustype_config1,
-                    "case_type": "Zaak",
+                    "type_aanvraag": TypeAanvraag.ZAAK.value,
                     "api_group": self.api_groups[i],
                 },
                 {
@@ -1273,7 +1277,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                     "result": "",
                     "zaaktype_config": mock.zaaktype_config1,
                     "statustype_config": mock.zt_statustype_config1,
-                    "case_type": "Zaak",
+                    "type_aanvraag": TypeAanvraag.ZAAK.value,
                     "api_group": self.api_groups[i],
                 },
                 {
@@ -1286,7 +1290,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                     "result": mock.resultaat_type["omschrijving"],
                     "zaaktype_config": mock.zaaktype_config1,
                     "statustype_config": None,
-                    "case_type": "Zaak",
+                    "type_aanvraag": TypeAanvraag.ZAAK.value,
                     "api_group": self.api_groups[i],
                 },
                 {
@@ -1301,7 +1305,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                     "result": mock.resultaat_type["omschrijving"],
                     "zaaktype_config": mock.zaaktype_config1,
                     "statustype_config": mock.zt_statustype_config1,
-                    "case_type": "Zaak",
+                    "type_aanvraag": TypeAanvraag.ZAAK.value,
                     "api_group": self.api_groups[i],
                 },
             ]

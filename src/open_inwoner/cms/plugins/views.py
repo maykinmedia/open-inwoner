@@ -113,7 +113,8 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
                     "uuid": zaak["uuid"],
                     "url": f_url.url,
                     "identification": zaak.get("identification", ""),
-                    # for 'openstaande inzendingen': "naam" from API -> "description" for component
+                    # for 'openstaande inzendingen/formulieren':
+                    # "naam" from API -> "description" for web component
                     "description": zaak.get("naam", zaak.get("description", "")),
                 }
             except (AttributeError, KeyError):

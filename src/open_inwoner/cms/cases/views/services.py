@@ -18,6 +18,7 @@ from open_inwoner.openzaak.clients import (
     ZakenClient,
     build_zgw_client_from_service,
 )
+from open_inwoner.openzaak.constants import TypeAanvraag
 from open_inwoner.openzaak.models import (
     ZaakTypeConfig,
     ZaakTypeStatusTypeConfig,
@@ -44,13 +45,18 @@ class CaseFilterFormOption(enum.Enum):
 class ZaakWithApiGroup:
     zaak: Zaak
     api_group: ZGWApiGroupConfig
+    type_aanvraag: TypeAanvraag
 
     @property
     def identification(self) -> str:
         return self.zaak.url
 
     def process_data(self) -> dict:
-        return {**self.zaak.process_data(), "api_group": self.api_group}
+        return {
+            **self.zaak.process_data(),
+            "api_group": self.api_group,
+            "type_aanvraag": self.type_aanvraag.value,
+        }
 
     def __hash__(self):
         return hash((self.identification, self.api_group.pk))
@@ -60,13 +66,18 @@ class ZaakWithApiGroup:
 class SubmissionWithApiGroup:
     submission: OpenSubmission
     api_group: ZGWApiGroupConfig
+    type_aanvraag: TypeAanvraag
 
     @property
     def identification(self) -> str:
         return self.submission.url
 
     def process_data(self) -> dict:
-        return {**self.submission.process_data(), "api_group": self.api_group}
+        return {
+            **self.submission.process_data(),
+            "api_group": self.api_group,
+            "type_aanvraag": self.type_aanvraag.value,
+        }
 
     def __hash__(self):
         return hash((self.identification, self.api_group.pk))
@@ -123,7 +134,9 @@ class CaseListService:
             raise ValueError(f"{group} has no `forms_client`")
 
         return [
-            SubmissionWithApiGroup(submission=sub, api_group=group)
+            SubmissionWithApiGroup(
+                submission=sub, api_group=group, type_aanvraag=TypeAanvraag.FORMULIER
+            )
             for sub in group.forms_client.fetch_open_submissions(
                 **get_user_fetch_parameters(
                     self.request, use_rsin=group.fetch_eherkenning_zaken_with_rsin
@@ -195,7 +208,10 @@ class CaseListService:
         )
 
         return [
-            ZaakWithApiGroup(zaak=raw_cases, api_group=group) for raw_cases in raw_cases
+            ZaakWithApiGroup(
+                zaak=raw_cases, api_group=group, type_aanvraag=TypeAanvraag.ZAAK
+            )
+            for raw_cases in raw_cases
         ]
 
     def get_cases(self) -> list[ZaakWithApiGroup]:
