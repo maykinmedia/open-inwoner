@@ -70,7 +70,6 @@ class CMSZakenPluginTest(TestCase):
         self.assertIn("<!-- end zaken plugin -->", html)
         # Should not contain any actual plugin content
         self.assertNotIn("oip-homepage-plugin-section", html)
-        self.assertNotIn("oip-zaken-plugin-container", html)
 
     def test_plugin_does_not_render_for_anonymous_user(self):
         ZGWApiGroupConfigFactory()
@@ -162,8 +161,6 @@ class CMSZakenPluginTest(TestCase):
         self.assertEqual(response.status_code, 200)
         content = response.content.decode("utf-8")
 
-        # Should render container with no items
-        self.assertIn("oip-zaken-plugin-container", content)
         # Should have no zaak items
         self.assertNotIn("oip-zaken-plugin-zaak-item", content)
 
@@ -225,8 +222,6 @@ class CMSZakenPluginTest(TestCase):
         self.assertEqual(response.status_code, 200)
         content = response.content.decode("utf-8")
 
-        # Should render container but with no items
-        self.assertIn("oip-zaken-plugin-container", content)
         # Should have no zaak items
         self.assertNotIn("oip-zaken-plugin-zaak-item", content)
 

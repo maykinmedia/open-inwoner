@@ -106,3 +106,34 @@
     }
   }
 }
+
+// Plugin grid layout
+.plugin__grid {
+  // TODO: to give these back to NLDS community, add these variables to OIP design-tokens package
+  --oip-plugin-grid-display: grid;
+  --oip-plugin-grid-template-columns-mobile: repeat(1, 1fr);
+  --oip-plugin-grid-template-columns-desktop: repeat(
+    var(--plugin-columns, 2),
+    1fr
+  );
+  --oip-plugin-grid-list-style-type: none;
+  --oip-plugin-grid-margin-block-start: 0;
+  --oip-plugin-grid-margin-block-end: 0;
+  --oip-plugin-grid-padding-inline-start: 0;
+  --oip-plugin-grid-row-gap: var(--spacing-medium);
+  --oip-plugin-grid-column-gap: var(--spacing-giant);
+
+  display: var(--oip-plugin-grid-display);
+  grid-template-columns: var(--oip-plugin-grid-template-columns-mobile);
+
+  @media (min-width: 768px) {
+    grid-template-columns: var(--oip-plugin-grid-template-columns-desktop);
+  }
+
+  list-style-type: var(--oip-plugin-grid-list-style-type);
+  margin-block-start: var(--oip-plugin-grid-margin-block-start);
+  margin-block-end: var(--oip-plugin-grid-margin-block-end);
+  padding-inline-start: var(--oip-plugin-grid-padding-inline-start);
+  grid-row-gap: var(--oip-plugin-grid-row-gap);
+  grid-column-gap: var(--oip-plugin-grid-column-gap);
+}

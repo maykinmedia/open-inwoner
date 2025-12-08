@@ -12,6 +12,7 @@ from furl import furl
 
 from open_inwoner.cms.cases.views.mixins import CaseLogMixin
 from open_inwoner.cms.cases.views.services import CaseListService
+from open_inwoner.cms.plugins.models import CMSZakenPluginConfig
 from open_inwoner.cms.plugins.models.zaken import MAX_CASES_DEFAULT, MIN_CASES
 from open_inwoner.htmx.mixins import RequiresHtmxMixin
 from open_inwoner.openzaak.types import UniformCase
@@ -26,6 +27,14 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
 
     def get(self, request: HttpRequest, plugin_id: int) -> HttpResponse:
         case_service = CaseListService(request)
+
+        # Get plugin instance for title
+        try:
+            plugin_instance = CMSZakenPluginConfig.objects.get(pk=plugin_id)
+            plugin_title = plugin_instance.title
+        except CMSZakenPluginConfig.DoesNotExist:
+            logger.warning("Plugin instance not found", plugin_id=plugin_id)
+            plugin_title = _("Mijn Zaken")
 
         # determine no. of zaken to be displayed
         num_zaken = request.GET.get("num_zaken", 0)
@@ -72,6 +81,8 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
                 "show_zaken_plugin": True,
                 "zaken": [],
                 "error_message": "We're experiencing technical difficulties showing your cases.",
+                "plugin_title": plugin_title,
+                "mijn_zaken_url": reverse("cases:index"),
             }
             return render(request, "cms/plugins/zaken/zaken.html", context)
 
@@ -117,6 +128,8 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
             "show_zaken_plugin": True,
             "zaken": cases_for_component,
             "error_message": msg,
+            "plugin_title": plugin_title,
+            "mijn_zaken_url": reverse("cases:index"),
         }
 
         return render(request, "cms/plugins/zaken/zaken.html", context)
