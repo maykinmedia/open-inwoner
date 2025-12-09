@@ -1,6 +1,7 @@
 from django.contrib.messages import get_messages
 from django.test import TestCase, override_settings
 from django.urls import reverse
+from django.utils.translation import gettext as _
 
 from open_inwoner.openzaak.tests.factories import ZGWApiGroupConfigFactory
 
@@ -44,8 +45,10 @@ class LegacyCaseDetailUrlRedirectTest(TestCase):
         self.assertEqual(
             messages,
             [
-                "De link die u gebruikte, is verlopen. Uw zaak is via onderstaand "
-                "overzicht te vinden."
+                _(
+                    "The link you clicked on has expired. Please find your zaak in the"
+                    " list below."
+                )
             ],
         )
 

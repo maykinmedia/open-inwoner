@@ -57,7 +57,7 @@ class CategoryPublishedQueryset(LogMixin, MP_NodeQuerySet):
 
         clients = build_zaken_clients()
         proxy_result = MultiZgwClientProxy(clients)
-        proxy_result = proxy_result.fetch_cases(**get_user_fetch_parameters(request))
+        proxy_result = proxy_result.fetch_zaken(**get_user_fetch_parameters(request))
         if proxy_result.has_errors:
             self.log_system_action("unable to retrieve cases", user=request.user)
 

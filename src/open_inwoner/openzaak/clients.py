@@ -74,7 +74,7 @@ class ZakenClient(ZgwAPIClient):
         self.use_openzaak_120_params = use_openzaak_120_params
         self.fetch_rollen_with_betrokkene_type = fetch_rollen_with_betrokkene_type
 
-    def fetch_cases(
+    def fetch_zaken(
         self,
         user_bsn: str | None = None,
         user_kvk: str | None = None,
@@ -90,44 +90,44 @@ class ZakenClient(ZgwAPIClient):
             )
 
         if user_bsn:
-            return self.fetch_cases_by_bsn(
+            return self.fetch_zaken_by_bsn(
                 user_bsn,
                 max_requests=max_requests or settings.ZGW_MAX_REQUESTS,
                 identificatie=identificatie,
             )
 
-        fetch_cases_for_company = functools.partial(
-            self.fetch_cases_for_company,
+        fetch_zaken_for_company = functools.partial(
+            self.fetch_zaken_for_company,
             max_requests=max_requests or settings.ZGW_MAX_REQUESTS,
             zaak_identificatie=identificatie,
         )
         if vestigingsnummer:
-            return fetch_cases_for_company(
+            return fetch_zaken_for_company(
                 vestigingsnummer=vestigingsnummer,
             )
         if user_kvk or user_rsin:
             user_kvk_or_rsin = user_rsin if user_rsin else user_kvk
-            return fetch_cases_for_company(
+            return fetch_zaken_for_company(
                 kvk_or_rsin=user_kvk_or_rsin,
             )
 
         raise ValueError("You must supply either a bsn or kvk/rsin/vestigingsnummer")
 
     @cache_result(
-        "{self.base_url}:cases:{user_bsn}:{max_requests}:{identificatie}",
+        "{self.base_url}:zaken:{user_bsn}:{max_requests}:{identificatie}",
         timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
     )
-    def fetch_cases_by_bsn(
+    def fetch_zaken_by_bsn(
         self,
         user_bsn: str,
         max_requests: int | None = None,
         identificatie: str | None = None,
     ) -> list[Zaak]:
         """
-        retrieve cases for particular user with allowed confidentiality level
+        retrieve zaken for particular user with allowed confidentiality level
 
         :param:max_requests - used to limit the number of requests to list_zaken resource.
-        :param:identificatie - used to filter the cases by a specific identification
+        :param:identificatie - used to filter the zaken by a specific identification
         """
         config = OpenZaakConfig.get_solo()
 
@@ -165,15 +165,15 @@ class ZakenClient(ZgwAPIClient):
             )
             return []
 
-        cases = factory(Zaak, all_data)
+        zaken = factory(Zaak, all_data)
 
-        return cases
+        return zaken
 
     @cache_result(
-        "{self.base_url}:cases:{kvk_or_rsin}:{vestigingsnummer}:{max_requests}:{zaak_identificatie}",
+        "{self.base_url}:zaken:{kvk_or_rsin}:{vestigingsnummer}:{max_requests}:{zaak_identificatie}",
         timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
     )
-    def fetch_cases_for_company(
+    def fetch_zaken_for_company(
         self,
         kvk_or_rsin: str | None = None,
         max_requests: int | None = None,
@@ -181,12 +181,12 @@ class ZakenClient(ZgwAPIClient):
         vestigingsnummer: str | None = None,
     ) -> list[Zaak]:
         """
-        retrieve cases for particular company with allowed confidentiality level
+        retrieve zaken for particular company with allowed confidentiality level
 
-        :param kvk_or_rsin: - used to filter the cases by a KVK number or RSIN (configured via OpenZaakConfig)
+        :param kvk_or_rsin: - used to filter the zaken by a KVK number or RSIN (configured via OpenZaakConfig)
         :param max_requests: - used to limit the number of requests to list_zaken resource.
-        :param zaak_identificatie: - used to filter the cases by a unique Zaak identification number
-        :param vestigingsnummer: - used to filter the cases by a vestigingsnummer
+        :param zaak_identificatie: - used to filter the zaken by a unique Zaak identification number
+        :param vestigingsnummer: - used to filter the zaken by a vestigingsnummer
         """
 
         config = OpenZaakConfig.get_solo()
@@ -247,49 +247,49 @@ class ZakenClient(ZgwAPIClient):
             )
             return []
 
-        cases = factory(Zaak, all_data)
+        zaken = factory(Zaak, all_data)
 
-        return cases
+        return zaken
 
     @cache_result(
-        "{self.base_url}:single_case:{case_uuid}",
+        "{self.base_url}:single_zaak:{zaak_uuid}",
         timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
     )
-    def fetch_single_case(self, case_uuid: str) -> Zaak | None:
+    def fetch_single_zaak(self, zaak_uuid: str) -> Zaak | None:
         try:
-            response = self.get(f"zaken/{case_uuid}", headers=CRS_HEADERS)
+            response = self.get(f"zaken/{zaak_uuid}", headers=CRS_HEADERS)
             data = get_json_response(response)
         except (RequestException, ClientError):
             logger.exception(
-                "Failed to retrieve case",
-                case_uuid=case_uuid,
+                "Failed to retrieve zaak",
+                zaak_uuid=zaak_uuid,
             )
             return
 
-        case = factory(Zaak, data)
+        zaak = factory(Zaak, data)
 
-        return case
+        return zaak
 
-    def fetch_case_by_url_no_cache(self, case_url: str) -> Zaak | None:
+    def fetch_zaak_by_url_no_cache(self, zaak_url: str) -> Zaak | None:
         try:
-            response = self.get(url=case_url, headers=CRS_HEADERS)
+            response = self.get(url=zaak_url, headers=CRS_HEADERS)
             data = get_json_response(response)
         except (RequestException, ClientError):
             logger.exception(
-                "Failed to retrieve case",
-                case_url=case_url,
+                "Failed to retrieve zaak",
+                zaak_url=zaak_url,
             )
             return
 
-        case = factory(Zaak, data)
+        zaak = factory(Zaak, data)
 
-        return case
+        return zaak
 
     @cache_result(
-        "{self.base_url}:single_case_information_object:{url}",
+        "{self.base_url}:single_zaak_information_object:{url}",
         timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
     )
-    def fetch_single_case_information_object(
+    def fetch_single_zaak_information_object(
         self, url: str
     ) -> ZaakInformatieObject | None:
         try:
@@ -302,38 +302,38 @@ class ZakenClient(ZgwAPIClient):
             )
             return
 
-        case = factory(ZaakInformatieObject, data)
+        zaak_info_object = factory(ZaakInformatieObject, data)
 
-        return case
+        return zaak_info_object
 
-    def fetch_case_information_objects(
-        self, case_url: str
+    def fetch_zaak_information_objects(
+        self, zaak_url: str
     ) -> list[ZaakInformatieObject]:
         try:
             response = self.get(
                 "zaakinformatieobjecten",
-                params={"zaak": case_url},
+                params={"zaak": zaak_url},
             )
             data = get_json_response(response)
         except (RequestException, ClientError):
             logger.exception(
-                "Failed to retrieve informatieobjecten for case",
-                zaak_url=case_url,
+                "Failed to retrieve informatieobjecten for zaak",
+                zaak_url=zaak_url,
             )
             return []
 
-        case_info_objects = factory(ZaakInformatieObject, data)
+        zaak_info_objects = factory(ZaakInformatieObject, data)
 
-        return case_info_objects
+        return zaak_info_objects
 
-    def fetch_status_history_no_cache(self, case_url: str) -> list[Status]:
+    def fetch_status_history_no_cache(self, zaak_url: str) -> list[Status]:
         try:
-            response = self.get("statussen", params={"zaak": case_url})
+            response = self.get("statussen", params={"zaak": zaak_url})
             data = get_json_response(response)
         except (RequestException, ClientError):
             logger.exception(
                 "Failed to retrieve statussen for zaak",
-                zaak_url=case_url,
+                zaak_url=zaak_url,
             )
             return []
 
@@ -343,11 +343,11 @@ class ZakenClient(ZgwAPIClient):
         return statuses
 
     @cache_result(
-        "{self.base_url}:status_history:{case_url}",
+        "{self.base_url}:status_history:{zaak_url}",
         timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
     )
-    def fetch_status_history(self, case_url: str) -> list[Status]:
-        return self.fetch_status_history_no_cache(case_url)
+    def fetch_status_history(self, zaak_url: str) -> list[Status]:
+        return self.fetch_status_history_no_cache(zaak_url)
 
     @cache_result("{self.base_url}:status:{status_url}", timeout=60 * 60)
     def fetch_single_status(self, status_url: str) -> Status | None:
@@ -366,23 +366,17 @@ class ZakenClient(ZgwAPIClient):
         return status
 
     @cache_result(
-        "{self.base_url}:case_roles:{case_url}:{betrokkene_type}:{role_desc_generic}",
+        "{self.base_url}:zaak_roles:{zaak_url}:{role_desc_generic}",
         timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
     )
-    def fetch_case_roles(
+    def fetch_zaak_roles(
         self,
-        case_url: str,
-        *,
-        betrokkene_type: Literal[
-            "natuurlijk_persoon",
-            "niet_natuurlijk_persoon",
-            "vestiging",
-        ]
-        | None = None,
+        zaak_url: str,
         role_desc_generic: str | None = None,
+        betrokkene_type: str | None = None,
     ) -> list[Rol]:
         params = {
-            "zaak": case_url,
+            "zaak": zaak_url,
         }
         if role_desc_generic:
             if role_desc_generic not in RolOmschrijving.values:
@@ -390,11 +384,8 @@ class ZakenClient(ZgwAPIClient):
 
             params["omschrijvingGeneriek"] = role_desc_generic
 
-        if self.fetch_rollen_with_betrokkene_type:
-            if not betrokkene_type:
-                raise ValueError(
-                    "Betrokkene type mandatory if fetch_rollen_with_betrokkene_type set"
-                )
+        # Add betrokkene_type to params if provided
+        if betrokkene_type:
             params["betrokkeneType"] = betrokkene_type
 
         try:
@@ -406,8 +397,8 @@ class ZakenClient(ZgwAPIClient):
             all_data = list(pagination_helper(self, data))
         except (RequestException, ClientError):
             logger.exception(
-                "Failed to retrieve case roles",
-                zaak_url=case_url,
+                "Failed to retrieve zaak roles",
+                zaak_url=zaak_url,
             )
             return []
 
@@ -419,22 +410,20 @@ class ZakenClient(ZgwAPIClient):
 
         return roles
 
-    # implicitly cached because it uses fetch_case_roles()
-    def fetch_roles_for_case_and_bsn(self, case_url: str, bsn: str) -> list[Rol]:
+    # implicitly cached because it uses fetch_zaak_roles()
+    def fetch_roles_for_zaak_and_bsn(self, zaak_url: str, bsn: str) -> list[Rol]:
         """
-        note we do a query on all case_roles and then manually filter our roles from the result,
+        note we do a query on all zaak_roles and then manually filter our roles from the result,
         because e-Suite doesn't support querying on both "zaak" AND "betrokkeneIdentificatie__natuurlijkPersoon__inpBsn"
 
         see Taiga #948
         """
-        case_roles = self.fetch_case_roles(
-            case_url, betrokkene_type="natuurlijk_persoon"
-        )
-        if not case_roles:
+        zaak_roles = self.fetch_zaak_roles(zaak_url)
+        if not zaak_roles:
             return []
 
         bsn_roles = []
-        for role in case_roles:
+        for role in zaak_roles:
             if role.betrokkene_type == RolTypes.natuurlijk_persoon:
                 inp_bsn = role.betrokkene_identificatie.get("inp_bsn")
                 if inp_bsn and inp_bsn == bsn:
@@ -442,24 +431,22 @@ class ZakenClient(ZgwAPIClient):
 
         return bsn_roles
 
-    # implicitly cached because it uses fetch_case_roles()
-    def fetch_roles_for_case_and_kvk_or_rsin(
-        self, case_url: str, kvk_or_rsin: str
+    # implicitly cached because it uses fetch_zaak_roles()
+    def fetch_roles_for_zaak_and_kvk_or_rsin(
+        self, zaak_url: str, kvk_or_rsin: str
     ) -> list[Rol]:
         """
-        note we do a query on all case_roles and then manually filter our roles from the result,
+        note we do a query on all zaak_roles and then manually filter our roles from the result,
         because e-Suite doesn't support querying on both "zaak" AND "betrokkeneIdentificatie__nietNatuurlijkPersoon__inn_nnp_id"
 
         see Taiga #948
         """
-        case_roles = self.fetch_case_roles(
-            case_url, betrokkene_type="niet_natuurlijk_persoon"
-        )
-        if not case_roles:
+        zaak_roles = self.fetch_zaak_roles(zaak_url)
+        if not zaak_roles:
             return []
 
         roles = []
-        for role in case_roles:
+        for role in zaak_roles:
             if role.betrokkene_type == RolTypes.niet_natuurlijk_persoon:
                 nnp_id = role.betrokkene_identificatie.get("inn_nnp_id")
                 if nnp_id and nnp_id == kvk_or_rsin:
@@ -467,22 +454,22 @@ class ZakenClient(ZgwAPIClient):
 
         return roles
 
-    # implicitly cached because it uses fetch_case_roles()
-    def fetch_roles_for_case_and_vestigingsnummer(
-        self, case_url: str, vestigingsnummer: str
+    # implicitly cached because it uses fetch_zaak_roles()
+    def fetch_roles_for_zaak_and_vestigingsnummer(
+        self, zaak_url: str, vestigingsnummer: str
     ) -> list[Rol]:
         """
-        note we do a query on all case_roles and then manually filter our roles from the result,
+        note we do a query on all zaak_roles and then manually filter our roles from the result,
         because e-Suite doesn't support querying on both "zaak" AND "rol__betrokkeneIdentificatie__vestiging__vestigingsNummer"
 
         see Taiga #948
         """
-        case_roles = self.fetch_case_roles(case_url, betrokkene_type="vestiging")
-        if not case_roles:
+        zaak_roles = self.fetch_zaak_roles(zaak_url)
+        if not zaak_roles:
             return []
 
         roles = []
-        for role in case_roles:
+        for role in zaak_roles:
             if role.betrokkene_type == RolTypes.vestiging:
                 identifier = role.betrokkene_identificatie.get("vestigings_nummer")
                 if identifier and identifier == vestigingsnummer:
@@ -491,14 +478,14 @@ class ZakenClient(ZgwAPIClient):
         return roles
 
     # not cached because currently only used in info-object download view
-    def fetch_case_information_objects_for_case_and_info(
-        self, case_url: str, info_object_url: str
+    def fetch_zaak_information_objects_for_zaak_and_info(
+        self, zaak_url: str, info_object_url: str
     ) -> list[ZaakInformatieObject]:
         try:
             response = self.get(
                 "zaakinformatieobjecten",
                 params={
-                    "zaak": case_url,
+                    "zaak": zaak_url,
                     "informatieobject": info_object_url,
                 },
             )
@@ -506,14 +493,14 @@ class ZakenClient(ZgwAPIClient):
         except (RequestException, ClientError) as e:
             logger.exception(
                 "Failed to retrieve informatieobjecten for zaak",
-                zaak_url=case_url,
+                zaak_url=zaak_url,
                 informatieobject_url=info_object_url,
             )
             return []
 
-        case_info_objects = factory(ZaakInformatieObject, data)
+        zaak_info_objects = factory(ZaakInformatieObject, data)
 
-        return case_info_objects
+        return zaak_info_objects
 
     @cache_result(
         "{self.base_url}:single_result:{result_url}",
@@ -535,18 +522,18 @@ class ZakenClient(ZgwAPIClient):
         return result
 
     def connect_case_with_document(
-        self, case_url: str, document_url: str
+        self, zaak_url: str, document_url: str
     ) -> dict | None:
         try:
             response = self.post(
                 "zaakinformatieobjecten",
-                json={"zaak": case_url, "informatieobject": document_url},
+                json={"zaak": zaak_url, "informatieobject": document_url},
             )
             data = get_json_response(response)
         except (RequestException, ClientError):
             logger.exception(
                 "Failed to connect zaak with document",
-                zaak_url=case_url,
+                zaak_url=zaak_url,
                 document_url=document_url,
             )
             return
@@ -557,11 +544,11 @@ class ZakenClient(ZgwAPIClient):
 class CatalogiClient(ZgwAPIClient):
     # not cached because only used by tools,
     # and because caching (stale) listings can break lookups
-    def fetch_status_types_no_cache(self, case_type_url: str) -> list[StatusType]:
+    def fetch_statustypes_no_cache(self, zaaktype_url: str) -> list[StatusType]:
         try:
             response = self.get(
                 "statustypen",
-                params={"zaaktype": case_type_url},
+                params={"zaaktype": zaaktype_url},
             )
             data = get_json_response(response)
             all_data = list(pagination_helper(self, data))
@@ -575,11 +562,11 @@ class CatalogiClient(ZgwAPIClient):
 
     # not cached because only used by tools,
     # and because caching (stale) listings can break lookups
-    def fetch_result_types_no_cache(self, case_type_url: str) -> list[ResultaatType]:
+    def fetch_resultaattypes_no_cache(self, zaaktype_url: str) -> list[ResultaatType]:
         try:
             response = self.get(
                 "resultaattypen",
-                params={"zaaktype": case_type_url},
+                params={"zaaktype": zaaktype_url},
             )
             data = get_json_response(response)
             all_data = list(pagination_helper(self, data))
@@ -645,20 +632,20 @@ class CatalogiClient(ZgwAPIClient):
         return zaak_types
 
     @cache_result(
-        "{self.base_url}:case_type:{case_type_url}",
+        "{self.base_url}:zaaktype:{zaaktype_url}",
         timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT,
     )
-    def fetch_single_case_type(self, case_type_url: str) -> ZaakType | None:
+    def fetch_single_zaaktype(self, zaaktype_url: str) -> ZaakType | None:
         try:
-            response = self.get(url=case_type_url)
+            response = self.get(url=zaaktype_url)
             data = get_json_response(response)
         except (RequestException, ClientError):
             logger.exception("exception while making request")
             return
 
-        case_type = factory(ZaakType, data)
+        zaaktype = factory(ZaakType, data)
 
-        return case_type
+        return zaaktype
 
     def fetch_catalogs_no_cache(self) -> list[Catalogus]:
         """

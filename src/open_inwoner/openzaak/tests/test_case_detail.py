@@ -198,7 +198,12 @@ class TestCaseDetailView(
             beginGeldigheid="2020-09-25",
             versiedatum="2020-09-25",
         )
+        # Reuse the ztc_service to avoid creating duplicate services in subtests
+        catalogus_config = CatalogusConfigFactory.create(
+            service=self.api_group.ztc_service
+        )
         self.zaaktype_config = ZaakTypeConfigFactory.create(
+            catalogus=catalogus_config,
             identificatie=self.zaaktype["identificatie"],
         )
         self.status_type_new = generate_oas_component_cached(
@@ -1118,7 +1123,7 @@ class TestCaseDetailView(
 
         response = self.app.get(self.case_detail_url, user=self.user)
 
-        case = response.context.get("case")
+        case = response.context.get("zaak")
 
         self.assertEqual(
             case,
@@ -1326,7 +1331,7 @@ class TestCaseDetailView(
 
         response = self.app.get(self.case_detail_url, user=self.user)
 
-        case = response.context.get("case")
+        case = response.context.get("zaak")
         self.assertEqual(
             case,
             {
@@ -1419,7 +1424,7 @@ class TestCaseDetailView(
         request = RequestFactory().get("/")
         detail_view = InnerCaseDetailView()
         detail_view.setup(request)
-        detail_view.case = factory(Zaak, self.zaak)
+        detail_view.zaak = factory(Zaak, self.zaak)
 
         st1 = StatusType(
             url="http://statustype_2.com",
@@ -1505,7 +1510,7 @@ class TestCaseDetailView(
 
         response = self.app.get(self.case_detail_url, user=self.user)
 
-        case = response.context.get("case")
+        case = response.context.get("zaak")
         first_status = case["statuses"][0]
 
         self.assertEqual(first_status["status_indicator_text"], "foo")
@@ -1606,7 +1611,7 @@ class TestCaseDetailView(
 
         response = self.app.get(self.case_detail_url, user=self.user)
 
-        documents = response.context.get("case")["documents"]
+        documents = response.context.get("zaak")["documents"]
         self.assertEqual(len(documents), 3)
 
         # order should be reverse of list order from response
@@ -1667,7 +1672,7 @@ class TestCaseDetailView(
 
         response = self.app.get(self.case_detail_url, user=self.user)
 
-        documents = response.context.get("case")["documents"]
+        documents = response.context.get("zaak")["documents"]
 
         # order of #1 and #2 should be reversed
         self.assertEqual(documents[0].name, self.informatie_object_2["titel"])
@@ -1680,7 +1685,7 @@ class TestCaseDetailView(
 
         response = self.app.get(self.case_detail_url, user=self.user)
 
-        self.assertEqual(response.context.get("case")["new_docs"], True)
+        self.assertEqual(response.context.get("zaak")["new_docs"], True)
 
     def test_page_displays_expected_data(self, m):
         self._setUpMocks(m)
@@ -1802,7 +1807,7 @@ class TestCaseDetailView(
         self._setUpMocks(m)
 
         response = self.app.get(self.case_detail_url, user=self.user)
-        documents = response.context.get("case", {}).get("documents")
+        documents = response.context.get("zaak", {}).get("documents")
         self.assertEqual(len(documents), 2)
         self.assertEqual(
             documents,
@@ -2053,7 +2058,7 @@ class TestCaseDetailView(
 
         response = self.app.get(self.case_detail_url, user=self.user)
 
-        self.assertIsNone(response.context.get("case"))
+        self.assertIsNone(response.context.get("zaak"))
         self.assertContains(response, _("There is no available data at the moment."))
 
     def test_no_data_is_retrieved_when_http_500(self, m):
@@ -2061,7 +2066,7 @@ class TestCaseDetailView(
 
         response = self.app.get(self.case_detail_url, user=self.user)
 
-        self.assertIsNone(response.context.get("case"))
+        self.assertIsNone(response.context.get("zaak"))
         self.assertContains(response, _("There is no available data at the moment."))
 
     def test_no_access_when_case_is_confidential(self, m):
@@ -3093,7 +3098,7 @@ class TestCaseDetailView(
         self.zaak_config.save()
 
         response = self.app.get(self.case_detail_url, user=self.user)
-        case = response.context.get("case")
+        case = response.context.get("zaak")
 
         self.assertEqual(case["statuses"][0]["label"], "Registered")
         self.assertEqual(case["statuses"][1]["label"], "Modified")

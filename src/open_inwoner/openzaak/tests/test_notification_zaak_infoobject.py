@@ -166,7 +166,7 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            "ignored not_status notification: resource is not 'status' or 'zaakinformatieobject' but 'not_status' for case https://",
+            "ignored not_status notification: resource is not 'status' or 'zaakinformatieobject' but 'not_status' for zaak https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -179,7 +179,7 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            "ignored zaakinformatieobject notification: cannot retrieve rollen for case https://",
+            "ignored zaakinformatieobject notification: cannot retrieve rollen for zaak https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -195,7 +195,7 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            "ignored zaakinformatieobject notification: no users with bsn/nnp_id as (mede)initiators in case https://",
+            "ignored zaakinformatieobject notification: no users with bsn/nnp_id as (mede)initiators in zaak https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -208,7 +208,7 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            "ignored zaakinformatieobject notification: cannot retrieve case https://",
+            "ignored zaakinformatieobject notification: cannot retrieve zaak https://",
             lookup=Lookups.startswith,
             level=logging.ERROR,
         )
@@ -221,7 +221,7 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            "ignored zaakinformatieobject notification: cannot retrieve case_type https://",
+            "ignored zaakinformatieobject notification: cannot retrieve zaaktype https://",
             lookup=Lookups.startswith,
             level=logging.ERROR,
         )
@@ -237,7 +237,7 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            "ignored zaakinformatieobject notification: case not visible after applying website visibility filter for case https://",
+            "ignored zaakinformatieobject notification: zaak not visible after applying website visibility filter for zaak https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -253,7 +253,7 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            "ignored zaakinformatieobject notification: case not visible after applying website visibility filter for case https://",
+            "ignored zaakinformatieobject notification: zaak not visible after applying website visibility filter for zaak https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -271,7 +271,7 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored zaakinformatieobject notification: cannot retrieve zaakinformatieobject {data.zaak_informatie_object['url']} for case https://",
+            f"ignored zaakinformatieobject notification: cannot retrieve zaakinformatieobject {data.zaak_informatie_object['url']} for zaak https://",
             lookup=Lookups.startswith,
             level=logging.ERROR,
         )
@@ -284,7 +284,7 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored zaakinformatieobject notification: cannot retrieve informatieobject {data.informatie_object['url']} for case https://",
+            f"ignored zaakinformatieobject notification: cannot retrieve informatieobject {data.informatie_object['url']} for zaak https://",
             lookup=Lookups.startswith,
             level=logging.ERROR,
         )
@@ -302,7 +302,7 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            "ignored zaakinformatieobject notification: informatieobject not visible after applying website visibility filter for case https://",
+            "ignored zaakinformatieobject notification: informatieobject not visible after applying website visibility filter for zaak https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -318,7 +318,7 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            "ignored zaakinformatieobject notification: informatieobject not visible after applying website visibility filter for case https://",
+            "ignored zaakinformatieobject notification: informatieobject not visible after applying website visibility filter for zaak https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -332,7 +332,7 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored zaakinformatieobject notification: cannot retrieve info_type configuration {data.informatie_object['informatieobjecttype']} and case https://",
+            f"ignored zaakinformatieobject notification: cannot retrieve info_type configuration {data.informatie_object['informatieobjecttype']} and zaak https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -353,7 +353,7 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored zaakinformatieobject notification: info_type configuration 'important document' {data.informatie_object['informatieobjecttype']} found but 'document_notification_enabled' is False for case https://",
+            f"ignored zaakinformatieobject notification: info_type configuration 'important document' {data.informatie_object['informatieobjecttype']} found but 'document_notification_enabled' is False for zaak https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -384,14 +384,14 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         user.cases_notifications = False  # opt-out
         user.save()
 
-        case = factory(Zaak, data.zaak)
-        case.zaaktype = factory(ZaakType, data.zaak_type)
+        zaak = factory(Zaak, data.zaak)
+        zaak.zaaktype = factory(ZaakType, data.zaak_type)
 
         zio = factory(ZaakInformatieObject, data.zaak_informatie_object)
         zio.informatieobject = factory(InformatieObject, data.informatie_object)
 
         _handle_zaakinformatieobject_update(
-            data.zio_notification, user, case, zio, api_group=data.api_group
+            data.zio_notification, user, zaak, zio, api_group=data.api_group
         )
 
         # not called because disabled notifications
@@ -419,14 +419,14 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         user.email = "user@example.org"
         user.save()
 
-        case = factory(Zaak, data.zaak)
-        case.zaaktype = factory(ZaakType, data.zaak_type)
+        zaak = factory(Zaak, data.zaak)
+        zaak.zaaktype = factory(ZaakType, data.zaak_type)
 
         zio = factory(ZaakInformatieObject, data.zaak_informatie_object)
         zio.informatieobject = factory(InformatieObject, data.informatie_object)
 
         _handle_zaakinformatieobject_update(
-            data.zio_notification, user, case, zio, api_group=data.api_group
+            data.zio_notification, user, zaak, zio, api_group=data.api_group
         )
 
         # not called because bad email
@@ -452,21 +452,21 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         data = MockAPIData()
         user = data.user_initiator
 
-        case = factory(Zaak, data.zaak)
-        case.zaaktype = factory(ZaakType, data.zaak_type)
+        zaak = factory(Zaak, data.zaak)
+        zaak.zaaktype = factory(ZaakType, data.zaak_type)
 
         zio = factory(ZaakInformatieObject, data.zaak_informatie_object)
         zio.informatieobject = factory(InformatieObject, data.informatie_object)
 
         # first call
         _handle_zaakinformatieobject_update(
-            data.zio_notification, user, case, zio, api_group=data.api_group
+            data.zio_notification, user, zaak, zio, api_group=data.api_group
         )
 
         mock_send.assert_called_once()
         mock_send.assert_called_with(
             user,
-            case,
+            zaak,
             template_name="case_document_notification",
             api_group=data.api_group,
         )
@@ -477,7 +477,7 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         # check call arguments
         args = mock_send.call_args.args
         self.assertEqual(args[0], user)
-        self.assertEqual(args[1].url, case.url)
+        self.assertEqual(args[1].url, zaak.url)
         self.assertEqual(args[2], "case_document_notification")
 
         mock_send.reset_mock()
@@ -492,12 +492,12 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
             1, UserCaseInfoObjectNotification.objects.filter(is_sent=True).count()
         )
 
-        # second call with same case/status
+        # second call with same zaak/status
         _handle_zaakinformatieobject_update(
-            data.zio_notification, user, case, zio, api_group=data.api_group
+            data.zio_notification, user, zaak, zio, api_group=data.api_group
         )
 
-        # no duplicate mail for this user/case/status
+        # no duplicate mail for this user/zaak/status
         mock_send.assert_not_called()
 
         self.assertTimelineLog(
@@ -509,7 +509,7 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         # other user is fine
         other_user = UserFactory.create()
         _handle_zaakinformatieobject_update(
-            data.zio_notification, other_user, case, zio, api_group=data.api_group
+            data.zio_notification, other_user, zaak, zio, api_group=data.api_group
         )
 
         mock_send.assert_called_once()
@@ -530,7 +530,7 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         )
 
         _handle_zaakinformatieobject_update(
-            data.zio_notification, user, case, zio, api_group=data.api_group
+            data.zio_notification, user, zaak, zio, api_group=data.api_group
         )
 
         # not sent because we already send to this user within the frequency
@@ -551,7 +551,7 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
                 InformatieObject, copy_with_new_uuid(data.informatie_object)
             )
             _handle_zaakinformatieobject_update(
-                data.zio_notification, user, case, zio, api_group=data.api_group
+                data.zio_notification, user, zaak, zio, api_group=data.api_group
             )
 
             # this one succeeds

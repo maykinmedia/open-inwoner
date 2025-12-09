@@ -81,12 +81,12 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
             formulieren = None
             msg = partial_error_msg
         try:
-            preprocessed_cases: Sequence[UniformCase] | None = case_service.get_cases()
+            preprocessed_zaken: Sequence[UniformCase] | None = case_service.get_zaken()
         except Exception:
             logger.error("Failed to retrieve zaken", user=request.user)
-            preprocessed_cases = None
-            msg = partial_error_msg
-        if formulieren is None and preprocessed_cases is None:
+            preprocessed_zaken = None
+
+        if formulieren is None and preprocessed_zaken is None:
             context = {
                 "show_zaken_plugin": True,
                 "zaken": [],
@@ -100,7 +100,7 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
         zaken_dicts = [
             zaak.process_data()
             for zaak in itertools.islice(
-                itertools.chain(formulieren or [], preprocessed_cases or []),
+                itertools.chain(formulieren or [], preprocessed_zaken or []),
                 num_zaken,
             )
         ]

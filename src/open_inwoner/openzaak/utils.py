@@ -37,7 +37,7 @@ def is_info_object_visible(
     info_object: InformatieObject, max_confidentiality_level: str
 ) -> bool:
     """
-    Test if a InformatieObject (case info object) should be visible to the user.
+    Test if a InformatieObject (zaak info object) should be visible to the user.
 
     We check on its definitive or archived status, and a maximum confidentiality
     level (compared the ordering from the VertrouwelijkheidsAanduidingen.choices)
@@ -132,16 +132,16 @@ def get_role_name_display(rol: Rol) -> str:
         return display
 
 
-def get_zaak_type_config(case_type: ZaakType) -> ZaakTypeConfig | None:
+def get_zaak_type_config(zaak_type: ZaakType) -> ZaakTypeConfig | None:
     try:
-        return ZaakTypeConfig.objects.filter_case_type(case_type).get()
+        return ZaakTypeConfig.objects.filter_zaak_type(zaak_type).get()
     except ZaakTypeConfig.DoesNotExist:
-        logger.info("No ZaakTypeConfig found for zaaktype", zaaktype_url=case_type.url)
+        logger.info("No ZaakTypeConfig found for zaaktype", zaaktype_url=zaak_type.url)
         return None
 
 
 def get_zaak_type_info_object_type_config(
-    case_type: ZaakType,
+    zaak_type: ZaakType,
     info_object_type_url: str,
 ) -> ZaakTypeInformatieObjectTypeConfig | None:
     if not isinstance(info_object_type_url, str):
@@ -150,13 +150,13 @@ def get_zaak_type_info_object_type_config(
         )
 
     try:
-        return ZaakTypeInformatieObjectTypeConfig.objects.get_for_case_and_info_type(
-            case_type, info_object_type_url
+        return ZaakTypeInformatieObjectTypeConfig.objects.get_for_zaak_and_info_type(
+            zaak_type, info_object_type_url
         )
     except ZaakTypeInformatieObjectTypeConfig.DoesNotExist:
         logger.info(
             "No ZaakTypeInformatieObjectTypeConfig found for zaaktype",
-            zaaktype_url=case_type.url,
+            zaaktype_url=zaak_type.url,
         )
         return None
 

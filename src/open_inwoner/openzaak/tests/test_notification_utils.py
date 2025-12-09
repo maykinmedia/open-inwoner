@@ -36,29 +36,29 @@ class NotificationHandlerUtilsTestCase(TestCase):
 
         user = data.user_initiator
 
-        case = factory(Zaak, data.zaak)
-        case.zaaktype = factory(ZaakType, data.zaak_type)
+        zaak = factory(Zaak, data.zaak)
+        zaak.zaaktype = factory(ZaakType, data.zaak_type)
 
         status = factory(Status, data.status_final)
         status.statustype = factory(StatusType, data.status_type_final)
 
-        case.status = status
+        zaak.status = status
 
-        case_url = reverse(
+        zaak_url = reverse(
             "cases:case_detail",
-            kwargs={"object_id": str(case.uuid), "api_group_id": self.api_group.id},
+            kwargs={"object_id": str(zaak.uuid), "api_group_id": self.api_group.id},
         )
 
         # mock `_format_zaak_identificatie`, but then continue with result of actual call
         # (test redirect for invalid BSN that passes pattern validation)
-        ret_val = case._format_zaak_identificatie()
+        ret_val = zaak._format_zaak_identificatie()
         with mock.patch.object(
             Zaak, "_format_zaak_identificatie"
         ) as format_identificatie:
             format_identificatie.return_value = ret_val
             send_case_update_email(
                 user,
-                case,
+                zaak,
                 "case_status_notification",
                 status=status,
                 api_group=self.api_group,
@@ -72,10 +72,10 @@ class NotificationHandlerUtilsTestCase(TestCase):
         self.assertIn(config.name, email.subject)
 
         body_html = email.alternatives[0][0]
-        self.assertIn(case.identificatie, body_html)
-        self.assertIn(case.zaaktype.omschrijving, body_html)
+        self.assertIn(zaak.identificatie, body_html)
+        self.assertIn(zaak.zaaktype.omschrijving, body_html)
         self.assertIn(status.statustype.statustekst, body_html)
-        self.assertIn(case_url, body_html)
+        self.assertIn(zaak_url, body_html)
         self.assertIn(config.name, body_html)
 
     def test_send_case_update_email__no_status(self):
@@ -84,16 +84,16 @@ class NotificationHandlerUtilsTestCase(TestCase):
 
         user = data.user_initiator
 
-        case = factory(Zaak, data.zaak)
-        case.zaaktype = factory(ZaakType, data.zaak_type)
+        zaak = factory(Zaak, data.zaak)
+        zaak.zaaktype = factory(ZaakType, data.zaak_type)
 
-        case_url = reverse(
+        zaak_url = reverse(
             "cases:case_detail",
-            kwargs={"object_id": str(case.uuid), "api_group_id": self.api_group.id},
+            kwargs={"object_id": str(zaak.uuid), "api_group_id": self.api_group.id},
         )
 
         send_case_update_email(
-            user, case, "case_document_notification", api_group=self.api_group
+            user, zaak, "case_document_notification", api_group=self.api_group
         )
 
         self.assertEqual(len(mail.outbox), 1)
@@ -102,9 +102,9 @@ class NotificationHandlerUtilsTestCase(TestCase):
         self.assertIn(config.name, email.subject)
 
         body_html = email.alternatives[0][0]
-        self.assertIn(case.identificatie, body_html)
-        self.assertIn(case.zaaktype.omschrijving, body_html)
-        self.assertIn(case_url, body_html)
+        self.assertIn(zaak.identificatie, body_html)
+        self.assertIn(zaak.zaaktype.omschrijving, body_html)
+        self.assertIn(zaak_url, body_html)
         self.assertIn(config.name, body_html)
 
     # TODO we're missing a similar test for get_nnp_initiator_nnp_id_from_roles()

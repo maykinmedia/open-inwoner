@@ -88,7 +88,7 @@ class SearchView(
             clients = build_zaken_clients()
             if clients:
                 proxy_result = MultiZgwClientProxy(clients)
-                proxy_result = proxy_result.fetch_cases(
+                proxy_result = proxy_result.fetch_zaken(
                     **search_params,
                     identificatie=query,
                 )
@@ -109,7 +109,7 @@ class SearchView(
                             client=case_result.client
                         )
                         for zaak in case_result.result:
-                            zaaktype = api_group.catalogi_client.fetch_single_case_type(
+                            zaaktype = api_group.catalogi_client.fetch_single_zaaktype(
                                 zaak.zaaktype
                             )
                             zaak.zaaktype = zaaktype

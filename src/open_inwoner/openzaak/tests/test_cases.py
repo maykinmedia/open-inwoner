@@ -113,7 +113,7 @@ class CaseListAccessTests(AssertRedirectsMixin, ClearCachesMixin, TransactionWeb
         )
         self.app.get(self.outer_url, user=user, status=403)
 
-    def test_anonymous_user_has_no_access_to_cases_page(self):
+    def test_anonymous_user_has_no_access_to_zaken_page(self):
         user = AnonymousUser()
 
         response = self.app.get(self.outer_url, user=user)
@@ -130,7 +130,7 @@ class CaseListAccessTests(AssertRedirectsMixin, ClearCachesMixin, TransactionWeb
         self.app.get(self.inner_url, user=user, status=400)
 
     @requests_mock.Mocker()
-    def test_no_cases_are_retrieved_when_http_404(self, m):
+    def test_no_zaken_are_retrieved_when_http_404(self, m):
         user = UserFactory(
             login_type=LoginTypeChoices.digid, bsn="900222086", email="john@smith.nl"
         )
@@ -143,10 +143,10 @@ class CaseListAccessTests(AssertRedirectsMixin, ClearCachesMixin, TransactionWeb
             self.inner_url, user=user, headers={"HX-Request": "true"}
         )
 
-        self.assertListEqual(response.context.get("cases"), [])
+        self.assertListEqual(response.context.get("zaken"), [])
 
     @requests_mock.Mocker()
-    def test_no_cases_are_retrieved_when_http_500(self, m):
+    def test_no_zaken_are_retrieved_when_http_500(self, m):
         user = UserFactory(
             login_type=LoginTypeChoices.digid, bsn="900222086", email="john@smith.nl"
         )
@@ -159,7 +159,7 @@ class CaseListAccessTests(AssertRedirectsMixin, ClearCachesMixin, TransactionWeb
             self.inner_url, user=user, headers={"HX-Request": "true"}
         )
 
-        self.assertListEqual(response.context.get("cases"), [])
+        self.assertListEqual(response.context.get("zaken"), [])
 
 
 class CaseListMocks:
@@ -541,7 +541,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                 )
             )
 
-    def test_list_cases(self, m):
+    def test_list_zaken(self, m):
         for mock in self.mocks:
             mock._setUpMocks(m)
 
@@ -562,9 +562,9 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
         self.client.force_login(user=self.user)
         response = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
 
-        expected_cases = []
+        expected_zaken = []
         for i, mock in enumerate(self.mocks):
-            expected_cases.extend(
+            expected_zaken.extend(
                 [
                     {
                         "uuid": mock.zaak2["uuid"],
@@ -631,10 +631,10 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                 ]
             )
 
-        cases = response.context["cases"]
+        zaken = response.context["zaken"]
 
-        self.assertListEqual(response.context["cases"], expected_cases)
-        # don't show internal cases
+        self.assertListEqual(response.context["zaken"], expected_zaken)
+        # don't show internal zaken
         for mock in self.mocks:
             self.assertNotContains(response, mock.zaak_intern["omschrijving"])
             self.assertNotContains(response, text=mock.zaak_intern["identificatie"])
@@ -659,7 +659,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                 },
             )
 
-        # case filter form is disabled by default
+        # zaak filter form is disabled by default
         self.assertFalse(response.context.get("filter_form_enabled"))
 
         # check status/result label
@@ -671,24 +671,24 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
         self.assertEqual(len(status_labels), 4)
         self.assertEqual(len(result_labels), 4)
 
-    def test_digid_user_and_eidas_bsn_user_receive_same_cases(self, m):
+    def test_digid_user_and_eidas_bsn_user_receive_same_zaken(self, m):
         for mock in self.mocks:
             mock._setUpMocks(m)
 
-        # Get cases for DigiD user
+        # Get zaken for DigiD user
         self.client.force_login(user=self.user)
         digid_response = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
-        digid_cases = digid_response.context["cases"]
+        digid_zaken = digid_response.context["zaken"]
 
-        # Get cases for eIDAS BSN user (same BSN)
+        # Get zaken for eIDAS BSN user (same BSN)
         self.client.force_login(user=self.eidas_bsn_user)
         eidas_response = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
-        eidas_cases = eidas_response.context["cases"]
+        eidas_zaken = eidas_response.context["zaken"]
 
         self.assertEqual(
-            digid_cases,
-            eidas_cases,
-            msg="DigiD and EIDAS BSN users should receive exactly the same cases",
+            digid_zaken,
+            eidas_zaken,
+            msg="DigiD and EIDAS BSN users should receive exactly the same zaken",
         )
 
     def test_filter_widget_is_controlled_by_zaken_filter_enabled(self, m):
@@ -718,7 +718,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
         parts = [urlencode({"status": status.value}) for status in statuses]
         return "&".join(parts)
 
-    def test_filter_cases_simple(self, m):
+    def test_filter_zaken_simple(self, m):
         for mock in self.mocks:
             mock._setUpMocks(m)
 
@@ -730,14 +730,14 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
 
         response = self.client.get(inner_url, HTTP_HX_REQUEST="true")
 
-        # check cases
-        cases = response.context["cases"]
+        # check zaken
+        zaken = response.context["zaken"]
 
-        self.assertEqual(len(cases), 4)
-        for case in cases:
-            self.assertIsNone(case["end_date"])
+        self.assertEqual(len(zaken), 4)
+        for zaak in zaken:
+            self.assertIsNone(zaak["end_date"])
 
-    def test_filter_cases_multiple(self, m):
+    def test_filter_zaken_multiple(self, m):
         for mock in self.mocks:
             mock._setUpMocks(m)
 
@@ -752,14 +752,14 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
 
         response = self.client.get(inner_url, HTTP_HX_REQUEST="true")
 
-        # check cases
-        cases = response.context["cases"]
+        # check zaak
+        zaken = response.context["zaken"]
 
-        self.assertEqual(len(cases), 4)
-        for case in cases:
-            self.assertIsNotNone(case["end_date"])
+        self.assertEqual(len(zaken), 4)
+        for zaak in zaken:
+            self.assertIsNotNone(zaak["end_date"])
 
-    def test_list_cases_for_eherkenning_user(self, m):
+    def test_list_zaken_for_eherkenning_user(self, m):
         for mock in self.mocks:
             mock._setUpMocks(m)
 
@@ -778,9 +778,9 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                 self.client.force_login(user=self.eherkenning_user)
                 response = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
 
-                expected_cases = []
+                expected_zaken = []
                 for i, mock in enumerate(self.mocks):
-                    expected_cases.extend(
+                    expected_zaken.extend(
                         [
                             {
                                 "uuid": mock.zaak_eherkenning2["uuid"],
@@ -823,10 +823,10 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                         ]
                     )
 
-                self.assertListEqual(response.context["cases"], expected_cases)
+                self.assertListEqual(response.context["zaken"], expected_zaken)
 
                 for mock in self.mocks:
-                    # don't show internal cases
+                    # don't show internal zaken
                     self.assertNotContains(response, mock.zaak_intern["omschrijving"])
                     self.assertNotContains(response, mock.zaak_intern["identificatie"])
 
@@ -938,7 +938,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
 
                     self.assertEqual(used_urls, expected_urls)
 
-    def test_list_cases_for_kvk_user_with_vestigingsnummer(self, m):
+    def test_list_zaken_for_kvk_user_with_vestigingsnummer(self, m):
         for mock in self.mocks:
             mock._setUpMocks(m)
 
@@ -947,7 +947,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
         m.reset_mock()
 
         response = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
-        expected_cases = [
+        expected_zaken = [
             {
                 "uuid": mock.zaak_eherkenning1["uuid"],
                 "start_date": datetime.date.fromisoformat(
@@ -966,11 +966,11 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
             for i, mock in enumerate(self.mocks)
         ]
         self.assertListEqual(
-            response.context["cases"],
-            expected_cases,
+            response.context["zaken"],
+            expected_zaken,
         )
         for mock in self.mocks:
-            # don't show internal cases
+            # don't show internal zaken
             self.assertNotContains(response, mock.zaak_intern["omschrijving"])
             self.assertNotContains(response, mock.zaak_intern["identificatie"])
 
@@ -995,7 +995,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                 },
             )
 
-    def test_list_cases_for_rsin_user_with_vestigingsnummer(self, m):
+    def test_list_zaken_for_rsin_user_with_vestigingsnummer(self, m):
         for mock in self.mocks:
             mock._setUpMocks(m)
 
@@ -1005,7 +1005,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
 
         response = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
 
-        expected_cases = [
+        expected_zaken = [
             {
                 "uuid": mock.zaak_eherkenning1["uuid"],
                 "start_date": datetime.date.fromisoformat(
@@ -1024,11 +1024,11 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
             for i, mock in enumerate(self.mocks)
         ]
         self.assertListEqual(
-            response.context["cases"],
-            expected_cases,
+            response.context["zaken"],
+            expected_zaken,
         )
         for mock in self.mocks:
-            # don't show internal cases
+            # don't show internal zaken
             self.assertNotContains(response, mock.zaak_intern["omschrijving"])
             self.assertNotContains(response, mock.zaak_intern["identificatie"])
 
@@ -1053,7 +1053,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                 },
             )
 
-    def test_list_cases_for_eherkenning_user_missing_rsin(self, m):
+    def test_list_zaken_for_eherkenning_user_missing_rsin(self, m):
         for mock in self.mocks:
             mock._setUpMocks(m)
 
@@ -1069,9 +1069,9 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
         self.client.force_login(user=self.eherkenning_user)
         response = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
 
-        self.assertListEqual(response.context["cases"], [])
+        self.assertListEqual(response.context["zaken"], [])
         for mock in self.mocks:
-            # don't show internal cases
+            # don't show internal zaken
             self.assertNotContains(response, mock.zaak_intern["omschrijving"])
             self.assertNotContains(response, mock.zaak_intern["identificatie"])
 
@@ -1084,7 +1084,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
             ]
             self.assertEqual(len(list_zaken_req), 0)
 
-    def test_list_cases_for_initiator_only(self, m):
+    def test_list_zaken_for_initiator_only(self, m):
         for mock in self.mocks:
             mock._setUpMocks(m)
 
@@ -1108,9 +1108,9 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
         self.client.force_login(user=self.user)
         response = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
 
-        expected_cases = []
+        expected_zaken = []
         for i, mock in enumerate(self.mocks):
-            expected_cases.extend(
+            expected_zaken.extend(
                 [
                     {
                         "uuid": mock.zaak1["uuid"],
@@ -1130,7 +1130,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                 ]
             )
 
-        self.assertListEqual(response.context["cases"], expected_cases)
+        self.assertListEqual(response.context["zaken"], expected_zaken)
 
         # check zaken request query parameters
         for zaken_root in ("zaken.nl", "andere-zaken.nl"):
@@ -1167,9 +1167,9 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
 
             for mock in self.mocks:
                 for e_suite_case in (
-                    case
-                    for case in response.context["cases"]
-                    if case["uuid"] == mock.zaak2["uuid"]
+                    zaak
+                    for zaak in response.context["zaken"]
+                    if zaak["uuid"] == mock.zaak2["uuid"]
                 ):
                     self.assertEqual(e_suite_case["identification"], "6639-2022")
 
@@ -1181,9 +1181,9 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
 
             for mock in self.mocks:
                 for e_suite_case in (
-                    case
-                    for case in response.context["cases"]
-                    if case["uuid"] == mock.zaak2["uuid"]
+                    zaak
+                    for zaak in response.context["zaken"]
+                    if zaak["uuid"] == mock.zaak2["uuid"]
                 ):
                     self.assertEqual(
                         e_suite_case["identification"], "0014ESUITE66392022"
@@ -1203,37 +1203,37 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                 actual = Zaak._reformat_esuite_zaak_identificatie(value)
                 self.assertEqual(actual, expected)
 
-    def test_list_cases_logs_displayed_case_ids(self, m):
+    def test_list_zaken_logs_displayed_case_ids(self, m):
         for mock in self.mocks:
             mock._setUpMocks(m)
 
         self.client.force_login(user=self.user)
         self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
 
-        # check access logs for displayed cases
+        # check access logs for displayed zaken
         logs = list(TimelineLog.objects.all())
 
-        case_log = [
+        zaak_log = [
             l
             for l in logs
             for mock in self.mocks
             if mock.zaak1["identificatie"] in l.extra_data["message"]
         ]
-        self.assertEqual(len(case_log), 2)
-        self.assertTrue(all(l.user == self.user for l in case_log))
-        self.assertTrue(all(l.content_object == self.user for l in case_log))
+        self.assertEqual(len(zaak_log), 2)
+        self.assertTrue(all(l.user == self.user for l in zaak_log))
+        self.assertTrue(all(l.content_object == self.user for l in zaak_log))
 
-        case_log = [
+        zaak_log = [
             l
             for l in logs
             for mock in self.mocks
             if mock.zaak2["identificatie"] in l.extra_data["message"]
         ]
-        self.assertEqual(len(case_log), 2)
-        self.assertTrue(all(l.user == self.user for l in case_log))
-        self.assertTrue(all(l.content_object == self.user for l in case_log))
+        self.assertEqual(len(zaak_log), 2)
+        self.assertTrue(all(l.user == self.user for l in zaak_log))
+        self.assertTrue(all(l.content_object == self.user for l in zaak_log))
 
-        # no logs for internal, hence non-displayed cases
+        # no logs for internal, hence non-displayed zaken
         for log in logs:
             for mock in self.mocks:
                 self.assertNotIn(
@@ -1241,9 +1241,9 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                 )
 
     @patch.object(InnerCaseListView, "paginate_by", 4)
-    def test_list_cases_paginated(self, m):
+    def test_list_zaken_paginated(self, m):
         """
-        show only cases from the first backend and url to the next page
+        show only zaken from the first backend and url to the next page
         """
         for mock in self.mocks:
             mock._setUpMocks(m)
@@ -1252,7 +1252,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
         self.client.force_login(user=self.user)
         response_1 = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
 
-        expected_cases = [
+        expected_zaken = [
             [
                 {
                     "uuid": mock.zaak2["uuid"],
@@ -1312,7 +1312,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
             for i, mock in enumerate(self.mocks)
         ]
 
-        self.assertListEqual(response_1.context.get("cases"), expected_cases[0])
+        self.assertListEqual(response_1.context.get("zaken"), expected_zaken[0])
         self.assertNotContains(response_1, self.mocks[0].zaak2["url"])
         self.assertContains(response_1, "?page=2")
 
@@ -1320,12 +1320,12 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
         next_page = f"{self.inner_url}?page=2"
         response_2 = self.client.get(next_page, HTTP_HX_REQUEST="true")
 
-        self.assertListEqual(response_2.context.get("cases"), expected_cases[1])
+        self.assertListEqual(response_2.context.get("zaken"), expected_zaken[1])
         self.assertNotContains(response_2, self.mocks[1].zaak2["url"])
         self.assertContains(response_2, "?page=1")
 
     @patch.object(InnerCaseListView, "paginate_by", 4)
-    def test_list_cases_paginated_logs_displayed_case_ids(self, m):
+    def test_list_zaken_paginated_logs_displayed_case_ids(self, m):
         for mock in self.mocks:
             mock._setUpMocks(m)
 
@@ -1343,7 +1343,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                     mock.zaak_result["uuid"],
                 ]
                 self.assertListEqual(
-                    [c["uuid"] for c in response.context.get("cases")], expected_uuids
+                    [c["uuid"] for c in response.context.get("zaken")], expected_uuids
                 )
 
                 expected_identifications = [
@@ -1403,32 +1403,32 @@ class FormulierTest(TransactionWebTest):
             self.inner_url, user=digid_user, headers={"HX-Request": "true"}
         )
 
-        cases = response.context["cases"]
+        zaken = response.context["zaken"]
 
-        self.assertEqual(len(cases), 3)
+        self.assertEqual(len(zaken), 3)
 
-        # submission cases are sorted in reverse by `last modified`
-        self.assertEqual(cases[0]["url"], data_alt.submission_3["url"])
-        self.assertEqual(cases[0]["uuid"], data_alt.submission_3["uuid"])
-        self.assertEqual(cases[0]["naam"], data_alt.submission_3["naam"])
-        self.assertEqual(cases[0]["vervolg_link"], data_alt.submission_3["vervolgLink"])
+        # submission zaken are sorted in reverse by `last modified`
+        self.assertEqual(zaken[0]["url"], data_alt.submission_3["url"])
+        self.assertEqual(zaken[0]["uuid"], data_alt.submission_3["uuid"])
+        self.assertEqual(zaken[0]["naam"], data_alt.submission_3["naam"])
+        self.assertEqual(zaken[0]["vervolg_link"], data_alt.submission_3["vervolgLink"])
         self.assertEqual(
-            cases[0]["datum_laatste_wijziging"].strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
+            zaken[0]["datum_laatste_wijziging"].strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
             data_alt.submission_3["datumLaatsteWijziging"],
         )
         # Verify case_type is "Formulier"
-        self.assertEqual(cases[0]["type_aanvraag"], "Formulier")
+        self.assertEqual(zaken[0]["type_aanvraag"], "Formulier")
 
-        self.assertEqual(cases[1]["url"], data.submission_2["url"])
-        self.assertEqual(cases[1]["uuid"], data.submission_2["uuid"])
-        self.assertEqual(cases[1]["naam"], data.submission_2["naam"])
-        self.assertEqual(cases[1]["vervolg_link"], data.submission_2["vervolgLink"])
+        self.assertEqual(zaken[1]["url"], data.submission_2["url"])
+        self.assertEqual(zaken[1]["uuid"], data.submission_2["uuid"])
+        self.assertEqual(zaken[1]["naam"], data.submission_2["naam"])
+        self.assertEqual(zaken[1]["vervolg_link"], data.submission_2["vervolgLink"])
         self.assertEqual(
-            cases[1]["datum_laatste_wijziging"].strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
+            zaken[1]["datum_laatste_wijziging"].strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
             data.submission_2["datumLaatsteWijziging"],
         )
         # Verify case_type
-        self.assertEqual(cases[1]["type_aanvraag"], "Formulier")
+        self.assertEqual(zaken[1]["type_aanvraag"], "Formulier")
 
         # Verify the HTML contains the formulier-specific text
         self.assertIn("Formulier afronden", response.text)
@@ -1451,25 +1451,25 @@ class FormulierTest(TransactionWebTest):
             self.inner_url, user=user, headers={"HX-Request": "true"}
         )
 
-        cases = response.context["cases"]
+        zaken = response.context["zaken"]
 
-        self.assertEqual(len(cases), 3)
+        self.assertEqual(len(zaken), 3)
 
-        # submission cases are sorted in reverse by `last modified`
-        self.assertEqual(cases[0]["url"], data_alt.submission_3["url"])
-        self.assertEqual(cases[0]["uuid"], data_alt.submission_3["uuid"])
-        self.assertEqual(cases[0]["naam"], data_alt.submission_3["naam"])
-        self.assertEqual(cases[0]["vervolg_link"], data_alt.submission_3["vervolgLink"])
+        # submission zaken are sorted in reverse by `last modified`
+        self.assertEqual(zaken[0]["url"], data_alt.submission_3["url"])
+        self.assertEqual(zaken[0]["uuid"], data_alt.submission_3["uuid"])
+        self.assertEqual(zaken[0]["naam"], data_alt.submission_3["naam"])
+        self.assertEqual(zaken[0]["vervolg_link"], data_alt.submission_3["vervolgLink"])
         self.assertEqual(
-            cases[0]["datum_laatste_wijziging"].strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
+            zaken[0]["datum_laatste_wijziging"].strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
             data_alt.submission_3["datumLaatsteWijziging"],
         )
 
-        self.assertEqual(cases[1]["url"], data.submission_2["url"])
-        self.assertEqual(cases[1]["uuid"], data.submission_2["uuid"])
-        self.assertEqual(cases[1]["naam"], data.submission_2["naam"])
-        self.assertEqual(cases[1]["vervolg_link"], data.submission_2["vervolgLink"])
+        self.assertEqual(zaken[1]["url"], data.submission_2["url"])
+        self.assertEqual(zaken[1]["uuid"], data.submission_2["uuid"])
+        self.assertEqual(zaken[1]["naam"], data.submission_2["naam"])
+        self.assertEqual(zaken[1]["vervolg_link"], data.submission_2["vervolgLink"])
         self.assertEqual(
-            cases[1]["datum_laatste_wijziging"].strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
+            zaken[1]["datum_laatste_wijziging"].strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
             data.submission_2["datumLaatsteWijziging"],
         )

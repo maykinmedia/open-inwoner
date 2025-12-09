@@ -799,7 +799,7 @@ class eSuiteVragenService(KlantenService):
                 klant_backend=KlantenServiceType.ESUITE.value
             )
             proxy = MultiZgwClientProxy([group.zaken_client for group in groups])
-            proxy_response = proxy.fetch_case_by_url_no_cache(zaak_url)
+            proxy_response = proxy.fetch_zaak_by_url_no_cache(zaak_url)
             cases_found = proxy_response.truthy_responses
             if (case_count := len(cases_found)) == 0:
                 logger.error(
@@ -807,16 +807,16 @@ class eSuiteVragenService(KlantenService):
                 )
             else:
                 if case_count > 1:
-                    logger.error("Case found in multiple backends", case_url=zaak_url)
+                    logger.error("Zaak found in multiple backends", zaak_url=zaak_url)
 
                 zaak_with_api_group = next(
                     ZaakWithApiGroup(
-                        zaak=case.result,
+                        zaak=zaak.result,
                         api_group=ZGWApiGroupConfig.objects.resolve_group_from_hints(
-                            client=case.client
+                            client=zaak.client
                         ),
                     )
-                    for case in cases_found
+                    for zaak in cases_found
                 )
 
         return self._build_question_dto(kcm), zaak_with_api_group
@@ -1816,7 +1816,7 @@ class OpenKlant2Service(
             klant_backend=KlantenServiceType.OPENKLANT2.value
         )
         proxy = MultiZgwClientProxy([group.zaken_client for group in groups])
-        proxy_response = proxy.fetch_cases(user_bsn=user.bsn)
+        proxy_response = proxy.fetch_zaken(user_bsn=user.bsn)
 
         if not (truthy_responses := proxy_response.truthy_responses):
             logger.info(

@@ -192,7 +192,7 @@ class StatusNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            "ignored not_status notification: resource is not 'status' or 'zaakinformatieobject' but 'not_status' for case https://",
+            "ignored not_status notification: resource is not 'status' or 'zaakinformatieobject' but 'not_status' for zaak https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -205,7 +205,7 @@ class StatusNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            "ignored status notification: cannot retrieve rollen for case https://",
+            "ignored status notification: cannot retrieve rollen for zaak https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -221,7 +221,7 @@ class StatusNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            "ignored status notification: no users with bsn/nnp_id as (mede)initiators in case https://",
+            "ignored status notification: no users with bsn/nnp_id as (mede)initiators in zaak https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -234,7 +234,7 @@ class StatusNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            "ignored status notification: cannot retrieve case https://",
+            "ignored status notification: cannot retrieve zaak https://",
             lookup=Lookups.startswith,
             level=logging.ERROR,
         )
@@ -247,7 +247,7 @@ class StatusNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            "ignored status notification: cannot retrieve case_type https://",
+            "ignored status notification: cannot retrieve zaaktype https://",
             lookup=Lookups.startswith,
             level=logging.ERROR,
         )
@@ -263,7 +263,7 @@ class StatusNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            "ignored status notification: case not visible after applying website visibility filter for case https://",
+            "ignored status notification: zaak not visible after applying website visibility filter for zaak https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -279,7 +279,7 @@ class StatusNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            "ignored status notification: case not visible after applying website visibility filter for case https://",
+            "ignored status notification: zaak not visible after applying website visibility filter for zaak https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -296,7 +296,7 @@ class StatusNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            "ignored status notification: cannot retrieve status_history for case https://",
+            "ignored status notification: cannot retrieve status_history for zaak https://",
             lookup=Lookups.startswith,
             level=logging.ERROR,
         )
@@ -312,7 +312,7 @@ class StatusNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            "ignored status notification: skip initial status notification for case https://",
+            "ignored status notification: skip initial status notification for zaak https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -325,7 +325,7 @@ class StatusNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored status notification: cannot retrieve status_type {data.status_type_final['url']} for case https://",
+            f"ignored status notification: cannot retrieve status_type {data.status_type_final['url']} for zaak https://",
             lookup=Lookups.startswith,
             level=logging.ERROR,
         )
@@ -341,7 +341,7 @@ class StatusNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored status notification: status_type.informeren is false for status {data.status_final['url']} and case https://",
+            f"ignored status notification: status_type.informeren is false for status {data.status_final['url']} and zaak https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -360,7 +360,7 @@ class StatusNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored status notification: 'skip_notification_statustype_informeren' is True but cannot retrieve case_type configuration '{data.zaak_type['identificatie']}' for case https://",
+            f"ignored status notification: 'skip_notification_statustype_informeren' is True but cannot retrieve zaaktype configuration '{data.zaak_type['identificatie']}' for zaak https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -379,7 +379,7 @@ class StatusNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored status notification: 'skip_notification_statustype_informeren' is True but cannot retrieve case_type configuration '{data.zaak_type['identificatie']}' for case https://",
+            f"ignored status notification: 'skip_notification_statustype_informeren' is True but cannot retrieve zaaktype configuration '{data.zaak_type['identificatie']}' for zaak https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -482,7 +482,7 @@ class StatusNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored status notification: case_type configuration '{data.zaak_type['identificatie']}' found but 'notify_status_changes' is False for case https://",
+            f"ignored status notification: zaaktype configuration '{data.zaak_type['identificatie']}' found but 'notify_status_changes' is False for zaak https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -507,7 +507,7 @@ class StatusNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored status notification: 'skip_notification_statustype_informeren' is True but cannot retrieve case_type configuration '{data.zaak_type['identificatie']}' for case https://",
+            f"ignored status notification: 'skip_notification_statustype_informeren' is True but cannot retrieve zaaktype configuration '{data.zaak_type['identificatie']}' for zaak https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -620,8 +620,8 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         data = MockAPIData()
         user = data.user_initiator
 
-        case = factory(Zaak, data.zaak)
-        case.zaaktype = factory(ZaakType, data.zaak_type)
+        zaak = factory(Zaak, data.zaak)
+        zaak.zaaktype = factory(ZaakType, data.zaak_type)
 
         status_initial = factory(Status, data.status_initial)
         status_initial.statustype = factory(StatusType, data.status_type_initial)
@@ -652,7 +652,7 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         _handle_status_update(
             data.status_notification,
             user,
-            case,
+            zaak,
             status_initial,
             status_type_config_initial,
             data.api_group,
@@ -661,7 +661,7 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         mock_send.assert_called_once()
         mock_send.assert_called_with(
             user,
-            case,
+            zaak,
             template_name="case_status_notification",
             api_group=data.api_group,
             status=status_initial,
@@ -675,7 +675,7 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         kwargs = mock_send.call_args.kwargs
 
         self.assertEqual(args[0], user)
-        self.assertEqual(args[1].url, case.url)
+        self.assertEqual(args[1].url, zaak.url)
         self.assertEqual(args[2], "case_status_notification")
         self.assertEqual(kwargs["status"], status_initial)
 
@@ -690,17 +690,17 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
             1, UserCaseStatusNotification.objects.filter(is_sent=True).count()
         )
 
-        # second call with same case/status
+        # second call with same zaak/status
         _handle_status_update(
             data.status_notification,
             user,
-            case,
+            zaak,
             status_initial,
             status_type_config_initial,
             data.api_group,
         )
 
-        # no duplicate mail for this user/case/status
+        # no duplicate mail for this user/zaak/status
         mock_send.assert_not_called()
 
         with self.subTest("mails are throttled based on template_name"):
@@ -708,7 +708,7 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
             _handle_status_update(
                 data.status_notification,
                 user,
-                case,
+                zaak,
                 status_final,
                 status_type_config_final,
                 data.api_group,
@@ -721,7 +721,7 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
             kwargs = mock_send.call_args.kwargs
 
             self.assertEqual(args[0], user)
-            self.assertEqual(args[1].url, case.url)
+            self.assertEqual(args[1].url, zaak.url)
             self.assertEqual(args[2], "case_status_notification_action_required")
             self.assertEqual(kwargs["status"], status_final)
 
@@ -737,7 +737,7 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         _handle_status_update(
             data.status_notification,
             other_user,
-            case,
+            zaak,
             status_initial,
             status_type_config_initial,
             data.api_group,
@@ -760,7 +760,7 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         _handle_status_update(
             data.status_notification,
             user,
-            case,
+            zaak,
             status,
             status_type_config_initial,
             data.api_group,
@@ -784,7 +784,7 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
             _handle_status_update(
                 data.status_notification,
                 user,
-                case,
+                zaak,
                 status,
                 status_type_config_initial,
                 data.api_group,
@@ -801,8 +801,8 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         data = MockAPIData()
         user = data.user_initiator
 
-        case = factory(Zaak, data.zaak)
-        case.zaaktype = factory(ZaakType, data.zaak_type)
+        zaak = factory(Zaak, data.zaak)
+        zaak.zaaktype = factory(ZaakType, data.zaak_type)
 
         status = factory(Status, data.status_final)
         status.statustype = factory(StatusType, data.status_type_final)
@@ -823,7 +823,7 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         _handle_status_update(
             data.status_notification,
             user,
-            case,
+            zaak,
             status,
             status_type_config,
             data.api_group,
@@ -835,6 +835,6 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         kwargs = mock_send.call_args.kwargs
 
         self.assertEqual(args[0], user)
-        self.assertEqual(args[1].url, case.url)
+        self.assertEqual(args[1].url, zaak.url)
         self.assertEqual(args[2], "case_status_notification_action_required")
         self.assertEqual(kwargs["status"], status)

@@ -28,7 +28,7 @@ class CaseLogMixin(LogMixin):
 
         self.log_user_action(
             self.request.user,
-            _("Zaken bekeken: {cases}").format(cases=", ".join(case_ids)),
+            _("Zaken bekeken: {zaken}").format(zaken=", ".join(case_ids)),
         )
         case_list_views.add(1, {"num_cases_viewed": len(case_ids)})
 
@@ -130,16 +130,16 @@ class CaseAccessMixin(AccessMixin):
                 raise Http404 from exc
 
             client = api_group.zaken_client
-            self.case = client.fetch_single_case(object_id)
-            if self.case:
+            self.zaak = client.fetch_single_zaak(object_id)
+            if self.zaak:
                 # check if we have a role in this case
                 if request.user.bsn:
-                    if not client.fetch_roles_for_case_and_bsn(
-                        self.case.url, request.user.bsn
+                    if not client.fetch_roles_for_zaak_and_bsn(
+                        self.zaak.url, request.user.bsn
                     ):
                         logger.info(
                             "CaseAccessMixin - permission denied via bsn: no role for the case",
-                            zaak_url=self.case.url,
+                            zaak_url=self.zaak.url,
                         )
                         return self.handle_no_permission()
                 elif request.user.kvk:
@@ -150,41 +150,41 @@ class CaseAccessMixin(AccessMixin):
 
                     vestigingsnummer = request.user.vestiging
                     if vestigingsnummer:
-                        if not client.fetch_roles_for_case_and_vestigingsnummer(
-                            self.case.url, vestigingsnummer
+                        if not client.fetch_roles_for_zaak_and_vestigingsnummer(
+                            self.zaak.url, vestigingsnummer
                         ):
                             logger.info(
                                 "CaseAccessMixin - permission denied via vestigingsnummer: no role for the case",
-                                zaak_url=self.case.url,
+                                zaak_url=self.zaak.url,
                             )
                             return self.handle_no_permission()
                     else:
-                        if not client.fetch_roles_for_case_and_kvk_or_rsin(
-                            self.case.url, identifier
+                        if not client.fetch_roles_for_zaak_and_kvk_or_rsin(
+                            self.zaak.url, identifier
                         ):
                             logger.info(
                                 "CaseAccessMixin - permission denied via kvk/rsin: no role for the case",
-                                zaak_url=self.case.url,
+                                zaak_url=self.zaak.url,
                             )
                             return self.handle_no_permission()
 
                 # resolve case-type
                 catalogi_client = api_group.catalogi_client
-                self.case.zaaktype = catalogi_client.fetch_single_case_type(
-                    self.case.zaaktype
+                self.zaak.zaaktype = catalogi_client.fetch_single_zaaktype(
+                    self.zaak.zaaktype
                 )
-                if not self.case.zaaktype:
+                if not self.zaak.zaaktype:
                     logger.info(
                         "CaseAccessMixin - permission denied: no case type for case",
-                        zaak_url=self.case.url,
+                        zaak_url=self.zaak.url,
                     )
                     return self.handle_no_permission()
 
                 # check if case + case-type are visible
-                if not is_zaak_visible(self.case):
+                if not is_zaak_visible(self.zaak):
                     logger.info(
                         "CaseAccessMixin - permission denied: case  is not visible",
-                        zaak_url=self.case.url,
+                        zaak_url=self.zaak.url,
                     )
                     return self.handle_no_permission()
 
