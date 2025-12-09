@@ -51,9 +51,17 @@ class ZgwAPIClient(APIClient):
 
     configured_from: Service
 
-    def __init__(self, *args, **kwargs):
+    def __init__(
+        self, base_url: str, request_kwargs: dict[str, Any] | None = None, **kwargs
+    ):
         self.configured_from = kwargs.pop("configured_from")
-        super().__init__(*args, **kwargs)
+
+        # FIXME: Workaround disables TLS until we can approach the backends
+        # via a properly exposed DNS
+        if request_kwargs is None:
+            request_kwargs = {}
+        request_kwargs["verify"] = False
+        super().__init__(base_url, request_kwargs=request_kwargs, **kwargs)
 
     def __str__(self):
         return f"Client {self.__class__.__name__} for {self.base_url}"
