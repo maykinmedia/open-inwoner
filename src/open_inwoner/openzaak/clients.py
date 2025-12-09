@@ -597,31 +597,14 @@ class CatalogiClient(ZgwAPIClient):
 
         return resultaat_type
 
-    def fetch_zaaktypes_no_cache(self) -> list[ZaakType]:
-        try:
-            response = self.get("zaaktypen")
-            data = get_json_response(response)
-            all_data = list(pagination_helper(self, data))
-        except (RequestException, ClientError):
-            logger.exception("exception while making request")
-            return []
-
-        zaak_types = factory(ZaakType, all_data)
-
-        return zaak_types
-
-    # not cached because only used by cronjob
-    # and because caching (stale) listings can break lookups
-    def fetch_case_types_by_identification_no_cache(
-        self, case_type_identification: str, catalog_url: str | None = None
+    def fetch_zaaktypes_no_cache(
+        self, identificatie: str | None = None
     ) -> list[ZaakType]:
-        try:
-            params = {
-                "identificatie": case_type_identification,
-            }
-            if catalog_url:
-                params["catalogus"] = catalog_url
+        params = None
+        if identificatie:
+            params = {"identificatie": identificatie}
 
+        try:
             response = self.get("zaaktypen", params=params)
             data = get_json_response(response)
             all_data = list(pagination_helper(self, data))

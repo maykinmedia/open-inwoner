@@ -1,436 +1,1049 @@
 from collections import defaultdict
+from dataclasses import dataclass, field
+from enum import StrEnum
+from textwrap import dedent
+from typing import Literal
 
-from django.db import transaction
+from django.utils.translation import gettext as _
 
 import structlog
-from zgw_consumers.api_models.catalogi import (
-    InformatieObjectType,
-    ResultaatType,
-    StatusType,
-)
+from jinja2 import Template
 
-from open_inwoner.openzaak.api_models import ZaakType
-from open_inwoner.openzaak.clients import (
-    CatalogiClient,
-    MultiZgwClientProxy,
-    build_catalogi_clients,
-    build_zgw_client_from_service,
-)
 from open_inwoner.openzaak.models import (
     CatalogusConfig,
     ZaakTypeConfig,
     ZaakTypeInformatieObjectTypeConfig,
     ZaakTypeResultaatTypeConfig,
     ZaakTypeStatusTypeConfig,
+    ZGWApiGroupConfig,
 )
 
 logger = structlog.stdlib.get_logger(__name__)
 
 
-def filter_zaaktypes(case_types: list[ZaakType]) -> list[ZaakType]:
-    return [c for c in case_types if c.indicatie_intern_of_extern == "extern"]
+class ExclusionReason(StrEnum):
+    """Reasons why an object was excluded from import"""
 
-
-def get_configurable_zaaktypes(case_types: list[ZaakType]) -> list[ZaakType]:
-    case_types = filter_zaaktypes(case_types)
-    return case_types
-
-
-def get_configurable_zaaktypes_by_identification(
-    client: CatalogiClient, identificatie, catalogus_url
-) -> list[ZaakType]:
-    case_types = client.fetch_case_types_by_identification_no_cache(
-        identificatie, catalogus_url
+    FILTERED_INTERNAL = _("Object uitgefilterd omdat deze als 'intern' is aangemerkt")
+    API_ERROR = _(
+        "Object uitgefilterd omdat deze door een API fout niet kon worden opgevraagd"
     )
-    case_types = filter_zaaktypes(case_types)
-    return case_types
+    DATABASE_ERROR = _(
+        "Object uitgefilterd omdat deze door een database fout niet kon worden opgeslagen"
+    )
+    MISSING_CATALOGUS = _("Object verwijst naar een niet-bestaande catalogus")
+    NO_CLIENT = _("Object uitgefilderd omdat er geen valide client beschikbaar was")
 
 
-def import_catalog_configs() -> list[CatalogusConfig]:
-    """
-    generate a CatalogusConfig for every catalog in the ZGW API
+@dataclass
+class ExcludedObject:
+    """Represents an object that was excluded from import"""
 
-    note this doesn't generate anything on eSuite
-    """
-    proxy = MultiZgwClientProxy(build_catalogi_clients())
-    result = proxy.fetch_catalogs_no_cache()
+    object_type: Literal[
+        "Catalogus",
+        "ZaakType",
+        "InformatieObjectType",
+        "StatusType",
+        "ResultaatType",
+    ]
+    url: str
+    identificatie: str = ""
+    reason: ExclusionReason = ExclusionReason.API_ERROR
+    error_message: str = ""
+    extra_context: dict = field(default_factory=dict)
 
-    if result.has_errors:
-        for response in result.failing_responses:
-            logger.exception(
-                "ZGW client encountered an exception. Import will continue, for any other configured clients",
-                client=response.client,
-                exc_info=response.exception,
+
+@dataclass
+class ImportResult[T]:
+    """Generic result class for tracking what was synced"""
+
+    created: list[T] = field(default_factory=list)
+    updated: list[T] = field(default_factory=list)
+    excluded: list[ExcludedObject] = field(default_factory=list)
+
+    @property
+    def total_synced(self) -> int:
+        return len(self.created) + len(self.updated)
+
+    @property
+    def total_excluded(self) -> int:
+        return len(self.excluded)
+
+
+@dataclass
+class ZaakTypeRelatedImportResult[T]:
+    """Result of importing related types for a specific zaaktype"""
+
+    zaaktype_config: ZaakTypeConfig | None = None
+    created: list[T] = field(default_factory=list)
+    updated: list[T] = field(default_factory=list)
+    excluded: list[ExcludedObject] = field(default_factory=list)
+
+    @property
+    def total_synced(self) -> int:
+        return len(self.created) + len(self.updated)
+
+    @property
+    def total_excluded(self) -> int:
+        return len(self.excluded)
+
+
+@dataclass
+class FullImportResult:
+    """Complete result of full import operation"""
+
+    api_group: ZGWApiGroupConfig
+    catalogi: ImportResult[CatalogusConfig] = field(
+        default_factory=lambda: ImportResult[CatalogusConfig]()
+    )
+    zaaktypen: ImportResult[ZaakTypeConfig] = field(
+        default_factory=lambda: ImportResult[ZaakTypeConfig]()
+    )
+    informatieobjecttypen: list[
+        ZaakTypeRelatedImportResult[ZaakTypeInformatieObjectTypeConfig]
+    ] = field(default_factory=list)
+    statustypen: list[ZaakTypeRelatedImportResult[ZaakTypeStatusTypeConfig]] = field(
+        default_factory=list
+    )
+    resultaattypen: list[ZaakTypeRelatedImportResult[ZaakTypeResultaatTypeConfig]] = (
+        field(default_factory=list)
+    )
+
+    def pretty_print(self) -> str:
+        """
+        Generate a human-readable summary of the import results.
+
+        Returns:
+            Formatted string showing created, updated, and excluded objects by category
+        """
+        section_template = Template(
+            dedent("""
+            {{ emoji }} {{ title }}
+            --------------------------------------------------------------------------------
+            {%- if created_items %}
+              ✨ Created ({{ created_items|length }}):
+            {%- for item in created_items %}
+                 - {{ item }}
+            {%- endfor %}
+            {%- endif %}
+            {%- if updated_items %}
+              🔄 Updated ({{ updated_items|length }}):
+            {%- for item in updated_items %}
+                 - {{ item }}
+            {%- endfor %}
+            {%- endif %}
+            {%- if excluded_items %}
+              ⚠️  Excluded ({{ excluded_items|length }}):
+            {%- for exc_item in excluded_items %}
+                 - {{ exc_item.label }}
+                   Reason: {{ exc_item.reason }}
+            {%- if exc_item.error %}
+                   🔴 Error: {{ exc_item.error }}
+            {%- endif %}
+            {%- endfor %}
+            {%- endif %}
+            {%- if not created_items and not updated_items and not excluded_items %}
+              No changes
+            {%- endif %}
+        """).strip()
+        )
+
+        # Prepare sections data
+        sections = []
+
+        # Catalogus section
+        cat_created = [
+            f"{cat.domein} (RSIN: {cat.rsin or 'N/A'})" for cat in self.catalogi.created
+        ]
+        cat_updated = [
+            f"{cat.domein} (RSIN: {cat.rsin or 'N/A'})" for cat in self.catalogi.updated
+        ]
+        cat_excluded = [
+            {
+                "label": "Catalogus",
+                "reason": exc.reason.value,
+                "error": exc.error_message,
+            }
+            for exc in self.catalogi.excluded
+        ]
+        sections.append(
+            {
+                "emoji": "📂",
+                "title": "Catalogus Configs",
+                "created_items": sorted(cat_created),
+                "updated_items": sorted(cat_updated),
+                "excluded_items": sorted(cat_excluded, key=lambda x: x["label"]),
+            }
+        )
+
+        # ZaakType section
+        zt_created = [
+            f"{zt.identificatie}: {zt.omschrijving}" for zt in self.zaaktypen.created
+        ]
+        zt_updated = [
+            f"{zt.identificatie}: {zt.omschrijving}" for zt in self.zaaktypen.updated
+        ]
+        zt_excluded = [
+            {
+                "label": f"{exc.identificatie or 'Unknown'}: {exc.extra_context.get('omschrijving', '')}",
+                "reason": exc.reason.value,
+                "error": exc.error_message,
+            }
+            for exc in self.zaaktypen.excluded
+        ]
+        sections.append(
+            {
+                "emoji": "📋",
+                "title": "ZaakType Configs",
+                "created_items": sorted(zt_created),
+                "updated_items": sorted(zt_updated),
+                "excluded_items": sorted(zt_excluded, key=lambda x: x["label"]),
+            }
+        )
+
+        # InformatieObjectType section
+        iot_created = []
+        iot_updated = []
+        iot_excluded = []
+        for result in self.informatieobjecttypen:
+            zt_id = (
+                result.zaaktype_config.identificatie
+                if result.zaaktype_config
+                else "Unknown"
+            )
+            iot_created.extend(
+                [f"{item.omschrijving} (ZaakType: {zt_id})" for item in result.created]
+            )
+            iot_updated.extend(
+                [f"{item.omschrijving} (ZaakType: {zt_id})" for item in result.updated]
+            )
+            iot_excluded.extend(
+                [
+                    {
+                        "label": f"ZaakType: {zt_id}",
+                        "reason": exc.reason.value,
+                        "error": exc.error_message,
+                    }
+                    for exc in result.excluded
+                ]
             )
 
-    if not result.join_results():
-        return []
+        sections.append(
+            {
+                "emoji": "📄",
+                "title": "InformatieObjectType Configs",
+                "created_items": sorted(iot_created),
+                "updated_items": sorted(iot_updated),
+                "excluded_items": sorted(iot_excluded, key=lambda x: x["label"]),
+            }
+        )
 
-    to_create = []
-    to_update = []
-    with transaction.atomic():
+        # StatusType section
+        st_created = []
+        st_updated = []
+        st_excluded = []
+        for result in self.statustypen:
+            zt_id = (
+                result.zaaktype_config.identificatie
+                if result.zaaktype_config
+                else "Unknown"
+            )
+            st_created.extend(
+                [f"{item.omschrijving} (ZaakType: {zt_id})" for item in result.created]
+            )
+            st_updated.extend(
+                [f"{item.omschrijving} (ZaakType: {zt_id})" for item in result.updated]
+            )
+            st_excluded.extend(
+                [
+                    {
+                        "label": f"ZaakType: {zt_id}",
+                        "reason": exc.reason.value,
+                        "error": exc.error_message,
+                    }
+                    for exc in result.excluded
+                ]
+            )
+
+        sections.append(
+            {
+                "emoji": "🔔",
+                "title": "StatusType Configs",
+                "created_items": sorted(st_created),
+                "updated_items": sorted(st_updated),
+                "excluded_items": sorted(st_excluded, key=lambda x: x["label"]),
+            }
+        )
+
+        # ResultaatType section
+        rt_created = []
+        rt_updated = []
+        rt_excluded = []
+        for result in self.resultaattypen:
+            zt_id = (
+                result.zaaktype_config.identificatie
+                if result.zaaktype_config
+                else "Unknown"
+            )
+            rt_created.extend(
+                [f"{item.omschrijving} (ZaakType: {zt_id})" for item in result.created]
+            )
+            rt_updated.extend(
+                [f"{item.omschrijving} (ZaakType: {zt_id})" for item in result.updated]
+            )
+            rt_excluded.extend(
+                [
+                    {
+                        "label": f"ZaakType: {zt_id}",
+                        "reason": exc.reason.value,
+                        "error": exc.error_message,
+                    }
+                    for exc in result.excluded
+                ]
+            )
+
+        sections.append(
+            {
+                "emoji": "✅",
+                "title": "ResultaatType Configs",
+                "created_items": sorted(rt_created),
+                "updated_items": sorted(rt_updated),
+                "excluded_items": sorted(rt_excluded, key=lambda x: x["label"]),
+            }
+        )
+
+        # Calculate totals
+        total_created = sum(len(s["created_items"]) for s in sections)
+        total_updated = sum(len(s["updated_items"]) for s in sections)
+        total_excluded = sum(len(s["excluded_items"]) for s in sections)
+
+        # Build output
+        output_parts = [
+            "=" * 80,
+            f"ZGW Import Results for {self.api_group}",
+            "=" * 80,
+            "",
+        ]
+
+        # Render each section
+        output_parts.extend(section_template.render(**section) for section in sections)
+
+        # Add summary
+        output_parts.extend(
+            [
+                "",
+                "=" * 80,
+                "Summary",
+                "=" * 80,
+                f"Total Created:  {total_created}",
+                f"Total Updated:  {total_updated}",
+                f"Total Excluded: {total_excluded}",
+                "=" * 80,
+            ]
+        )
+
+        return "\n".join(output_parts)
+
+
+_CACHE_MISS = object()
+
+
+class ZGWCatalogusImporter:
+    """
+    Handles importing ZGW Catalogus configuration objects.
+
+    This class consolidates the logic for importing catalogi, zaaktypen, and related
+    objects from a ZGW API backend. It tracks what was synced and what was excluded.
+    """
+
+    def __init__(self, zgw_api_group: ZGWApiGroupConfig):
+        """
+        Initialize the importer with a specific ZGW API group.
+
+        Args:
+            zgw_api_group: The ZGW API group configuration to use for imports
+        """
+        self.zgw_api_group = zgw_api_group
+        self.catalogi_client = zgw_api_group.catalogi_client
+
+    def import_all(self) -> FullImportResult:
+        """
+        Import all catalogus data: catalogi, zaaktypen, and related types.
+
+        Returns:
+            FullImportResult with details on what was synced and excluded
+        """
+        result = FullImportResult(api_group=self.zgw_api_group)
+
+        # Import catalogi
+        result.catalogi = self.import_catalogus_configs()
+
+        # Import zaaktypen
+        result.zaaktypen = self.import_zaaktype_configs()
+
+        # Import related types for each zaaktype
+        for ztc in ZaakTypeConfig.objects.filter(
+            catalogus__service=self.zgw_api_group.ztc_service
+        ).order_by("catalogus__domein", "identificatie"):
+            result.informatieobjecttypen.append(
+                self.import_informatieobjecttype_configs_for_zaaktype(ztc)
+            )
+            result.statustypen.append(self.import_statustype_configs_for_zaaktype(ztc))
+            result.resultaattypen.append(
+                self.import_resultaattype_configs_for_zaaktype(ztc)
+            )
+
+        return result
+
+    def import_catalogus_configs(self) -> ImportResult[CatalogusConfig]:
+        """
+        Import catalogus configurations from the ZGW API.
+
+        Returns:
+            ImportResult with created/updated/excluded catalogi
+        """
+        result = ImportResult[CatalogusConfig]()
+
+        try:
+            catalogi = self.catalogi_client.fetch_catalogs_no_cache()
+        except Exception as exc:
+            logger.exception(
+                "Failed to fetch catalogi from ZGW API",
+                client=self.catalogi_client,
+            )
+            result.excluded.append(
+                ExcludedObject(
+                    object_type="Catalogus",
+                    url=self.catalogi_client.configured_from.api_root,
+                    reason=ExclusionReason.API_ERROR,
+                    error_message=str(exc),
+                )
+            )
+            return result
+
+        if not catalogi:
+            return result
+
         existing_configs = {
             config.url: config for config in CatalogusConfig.objects.all()
         }
 
-        for response in result:
-            for catalog in response.result:
-                if catalog.url in existing_configs:
-                    # Ensure the connected Service still matches: we always want this
-                    # to match the Service backing the client that did the syncing
-                    existing = existing_configs[catalog.url]
-                    if existing.service != response.client.configured_from:
-                        existing.service = response.client.configured_from
-                        to_update.append(existing)
-                else:
-                    to_create.append(
-                        CatalogusConfig(
-                            url=catalog.url,
-                            rsin=catalog.rsin or "",
-                            domein=catalog.domein,
-                            service=response.client.configured_from,
+        for catalogus in catalogi:
+            if existing := existing_configs.get(catalogus.url):
+                # Update existing
+                updated = False
+
+                # Update all fields that overlap with API model
+                if existing.service != self.catalogi_client.configured_from:
+                    existing.service = self.catalogi_client.configured_from
+                    updated = True
+
+                if existing.rsin != (catalogus.rsin or ""):
+                    existing.rsin = catalogus.rsin or ""
+                    updated = True
+
+                if existing.domein != catalogus.domein:
+                    existing.domein = catalogus.domein
+                    updated = True
+
+                if updated:
+                    try:
+                        existing.save()
+                        result.updated.append(existing)
+                    except Exception as exc:
+                        logger.exception(
+                            "Failed to update catalogus config",
+                            url=catalogus.url,
+                        )
+                        result.excluded.append(
+                            ExcludedObject(
+                                object_type="Catalogus",
+                                url=catalogus.url,
+                                reason=ExclusionReason.DATABASE_ERROR,
+                                error_message=f"Save failed: {exc}",
+                            )
+                        )
+            else:
+                # Create new
+                new_config = CatalogusConfig(
+                    url=catalogus.url,
+                    rsin=catalogus.rsin or "",
+                    domein=catalogus.domein,
+                    service=self.catalogi_client.configured_from,
+                )
+                try:
+                    new_config.save()
+                    result.created.append(new_config)
+                    existing_configs[catalogus.url] = new_config
+                except Exception as exc:
+                    logger.exception(
+                        "Failed to create catalogus config",
+                        url=catalogus.url,
+                    )
+                    result.excluded.append(
+                        ExcludedObject(
+                            object_type="Catalogus",
+                            url=catalogus.url,
+                            reason=ExclusionReason.DATABASE_ERROR,
+                            error_message=f"Save failed: {exc}",
                         )
                     )
 
-        if to_update:
-            CatalogusConfig.objects.bulk_update(to_update, ["service"])
-            logger.info(
-                "Updated service on catalogs", number_of_updated_services=len(to_update)
-            )
+        return result
 
-        if to_create:
-            CatalogusConfig.objects.bulk_create(to_create)
+    def import_zaaktype_configs(self) -> ImportResult[ZaakTypeConfig]:
+        """
+        Import zaaktype configurations from the ZGW API.
 
-    return to_create
+        This collapses individual ZaakType versions on their identificatie and catalog.
 
+        Returns:
+            ImportResult with created/updated/excluded zaaktypen
+        """
+        result = ImportResult[ZaakTypeConfig]()
 
-def import_zaaktype_configs() -> list[ZaakTypeConfig]:
-    """
-    generate a ZaakTypeConfig for every ZaakType.identificatie in the ZGW API
-
-    this collapses individual ZaakType versions on their identificatie and catalog
-    """
-    proxy = MultiZgwClientProxy(build_catalogi_clients())
-    result = proxy.fetch_zaaktypes_no_cache()
-
-    if result.has_errors:
-        for response in result.failing_responses:
+        try:
+            zaak_types = self.catalogi_client.fetch_zaaktypes_no_cache()
+        except Exception as exc:
             logger.exception(
-                "ZGW client encountered an exception. Import will continue, for any other configured clients",
-                client=response.client,
-                exc_info=response.exception,
+                "Failed to fetch zaaktypen from ZGW API",
+                client=self.catalogi_client,
             )
+            result.excluded.append(
+                ExcludedObject(
+                    object_type="ZaakType",
+                    url=self.catalogi_client.configured_from.api_root,
+                    reason=ExclusionReason.API_ERROR,
+                    error_message=str(exc),
+                )
+            )
+            return result
 
-    zaak_types = filter_zaaktypes(result.join_results())
-    create = {}
+        # Filter out internal zaaktypen and track excluded
+        filtered_zaak_types = []
+        for zt in zaak_types:
+            if zt.indicatie_intern_of_extern == "extern":
+                filtered_zaak_types.append(zt)
+            else:
+                result.excluded.append(
+                    ExcludedObject(
+                        object_type="ZaakType",
+                        url=zt.url,
+                        identificatie=zt.identificatie,
+                        reason=ExclusionReason.FILTERED_INTERNAL,
+                        extra_context={
+                            "omschrijving": zt.omschrijving,
+                            "catalogus": zt.catalogus,
+                        },
+                    )
+                )
 
-    with transaction.atomic():
         catalog_lookup = {c.url: c for c in CatalogusConfig.objects.all()}
+        existing_ztc = {
+            (ztc.catalogus_id, ztc.identificatie): ztc
+            for ztc in ZaakTypeConfig.objects.all()
+        }
 
-        known_keys = set(
-            ZaakTypeConfig.objects.values_list("catalogus_id", "identificatie")
-        )
-
-        for zaak_type in zaak_types:
+        for zaak_type in filtered_zaak_types:
             try:
                 catalog = catalog_lookup[zaak_type.catalogus]
-            except KeyError as exc:
-                raise RuntimeError(
-                    f"ZaakType `{zaak_type.url}` points to a Catalogus at"
-                    f" `{zaak_type.catalogus}` which is not currently configured."
-                ) from exc
+            except KeyError:
+                result.excluded.append(
+                    ExcludedObject(
+                        object_type="ZaakType",
+                        url=zaak_type.url,
+                        identificatie=zaak_type.identificatie,
+                        reason=ExclusionReason.MISSING_CATALOGUS,
+                        error_message=f"Catalogus {zaak_type.catalogus} niet geconfigureerd for ZaakType",
+                        extra_context={"omschrijving": zaak_type.omschrijving},
+                    )
+                )
+                continue
 
-            # make key for de-duplication and collapsing related zaak-types on their 'identificatie'
             key = (catalog.id, zaak_type.identificatie)
-            if key not in known_keys:
-                known_keys.add(key)
-                create[key] = ZaakTypeConfig(
+
+            if ztc := existing_ztc.get(key):
+                # Update existing
+                updated = False
+
+                # Update URL list if this zaaktype URL is not already tracked
+                if zaak_type.url not in ztc.urls:
+                    ztc.urls = ztc.urls + [zaak_type.url]
+                    updated = True
+
+                # Update omschrijving if changed
+                if ztc.omschrijving != zaak_type.omschrijving:
+                    ztc.omschrijving = zaak_type.omschrijving
+                    updated = True
+
+                if updated:
+                    try:
+                        ztc.save()
+                        if ztc not in result.updated:
+                            result.updated.append(ztc)
+                    except Exception as exc:
+                        logger.exception(
+                            "Failed to update zaaktype config",
+                            url=zaak_type.url,
+                            identificatie=zaak_type.identificatie,
+                            exc_info=exc,
+                        )
+                        result.excluded.append(
+                            ExcludedObject(
+                                object_type="ZaakType",
+                                url=zaak_type.url,
+                                identificatie=zaak_type.identificatie,
+                                reason=ExclusionReason.DATABASE_ERROR,
+                                error_message=f"Save failed: {exc}",
+                            )
+                        )
+            else:
+                # Create new
+                ztc = ZaakTypeConfig(
                     urls=[zaak_type.url],
                     catalogus=catalog,
                     identificatie=zaak_type.identificatie,
                     omschrijving=zaak_type.omschrijving,
                 )
-            elif key in create:
-                create[key].urls = create[key].urls + [zaak_type.url]
+                try:
+                    ztc.save()
+                    result.created.append(ztc)
+                    existing_ztc[key] = ztc
+                except Exception as exc:
+                    logger.exception(
+                        "Failed to create zaaktype config",
+                        url=zaak_type.url,
+                        identificatie=zaak_type.identificatie,
+                        exc_info=exc,
+                    )
+                    result.excluded.append(
+                        ExcludedObject(
+                            object_type="ZaakType",
+                            url=zaak_type.url,
+                            identificatie=zaak_type.identificatie,
+                            reason=ExclusionReason.DATABASE_ERROR,
+                            error_message=f"Save failed: {exc}",
+                        )
+                    )
 
-        if create:
-            ZaakTypeConfig.objects.bulk_create(list(create.values()))
+        return result
 
-    return list((create or {}).values())
-
-
-def import_zaaktype_informatieobjecttype_configs() -> list[
-    tuple[ZaakTypeConfig, InformatieObjectType]
-]:
-    """
-    generate ZaakTypeInformatieObjectTypeConfigs for all ZaakTypeConfig
-    """
-    created = []
-    for ztc in ZaakTypeConfig.objects.all():
-        imported = import_zaaktype_informatieobjecttype_configs_for_type(ztc)
-        if imported:
-            created.append((ztc, imported))
-    return created
-
-
-def import_zaaktype_statustype_configs() -> list[tuple[ZaakTypeConfig, StatusType]]:
-    """
-    generate ZaakTypeStatusTypeConfigs for all ZaakTypeConfig
-    """
-    created = []
-    for ztc in ZaakTypeConfig.objects.all():
-        imported = import_statustype_configs_for_type(ztc)
-        if imported:
-            created.append((ztc, imported))
-    return created
-
-
-def import_zaaktype_resultaattype_configs() -> list[
-    tuple[ZaakTypeConfig, ResultaatType]
-]:
-    """
-    generate ZaakTypeResultaatTypeConfigs for all ZaakTypeConfig
-    """
-    created = []
-    for ztc in ZaakTypeConfig.objects.all():
-        imported = import_resultaattype_configs_for_type(ztc)
-        if imported:
-            created.append((ztc, imported))
-    return created
-
-
-def import_zaaktype_informatieobjecttype_configs_for_type(
-    ztc: ZaakTypeConfig,
-) -> list[ZaakTypeInformatieObjectTypeConfig]:
-    """
-    generate ZaakTypeInformatieObjectTypeConfigs for all InformationObjectTypes used by each ZaakTypeConfigs source ZaakTypes
-
-    this is a bit complicated because one ZaakTypeConfig can represent multiple ZaakTypes
-    """
-    client = build_zgw_client_from_service(ztc.catalogus.service)
-    if not client:
-        logger.warning(
-            "Not importing zaaktype-informatieobjecttype configs: could not build Catalogi API client"
+    def get_api_zaaktypen_for_saved_ztc(self, ztc: ZaakTypeConfig):
+        return (
+            zt
+            for zt in self.catalogi_client.fetch_zaaktypes_no_cache(
+                identificatie=ztc.identificatie
+            )
+            # Filter out internal zaaktypen (we don't track exclusions here since
+            # they're already tracked in import_zaaktype_configs)
+            if zt.indicatie_intern_of_extern == "extern"
+            and zt.catalogus == ztc.catalogus_url
         )
-        return []
 
-    # grab actual ZaakTypes for this identificatie
-    zaak_types: list[ZaakType] = get_configurable_zaaktypes_by_identification(
-        client, ztc.identificatie, ztc.catalogus_url
-    )
-    if not zaak_types:
-        return []
+    def import_informatieobjecttype_configs_for_zaaktype(
+        self, ztc: ZaakTypeConfig
+    ) -> ZaakTypeRelatedImportResult[ZaakTypeInformatieObjectTypeConfig]:
+        """
+        Import informatieobjecttype configurations for a specific zaaktype.
 
-    create = []
-    update = []
+        Args:
+            ztc: The ZaakTypeConfig to import informatieobjecttypen for
 
-    with transaction.atomic():
-        # map existing config records by url
-        info_map = {
-            ztiotc.informatieobjecttype_url: ztiotc
-            for ztiotc in ztc.zaaktypeinformatieobjecttypeconfig_set.all()
-        }
+        Returns:
+            ZaakTypeRelatedImportResult with created/updated/excluded informatieobjecttypen
+        """
+        result = ZaakTypeRelatedImportResult[ZaakTypeInformatieObjectTypeConfig](
+            zaaktype_config=ztc
+        )
 
-        # collect and implicitly de-duplicate informatieobjecttype url's and track which zaaktype used it
+        zaak_types = self.get_api_zaaktypen_for_saved_ztc(ztc)
+
+        # Collect and implicitly de-duplicate informatieobjecttype urls
         info_queue = defaultdict(list)
         for zaak_type in zaak_types:
             for url in zaak_type.informatieobjecttypen:
                 info_queue[url].append(zaak_type)
 
+        # Map existing config records by url
+        existing_map = {
+            ztiotc.informatieobjecttype_url: ztiotc
+            for ztiotc in ztc.zaaktypeinformatieobjecttypeconfig_set.all()
+        }
+
         if info_queue:
-            # load urls and update/create records
             for iot_url, using_zaak_types in info_queue.items():
-                info_type = client.fetch_single_information_object_type(iot_url)
-                if not info_type:
-                    logger.error(
-                        "Unable to retrieve informatieobjecttype, ignoring",
+                try:
+                    info_type = (
+                        self.catalogi_client.fetch_single_information_object_type(
+                            iot_url
+                        )
+                    )
+                except Exception as exc:
+                    logger.exception(
+                        "Unable to retrieve informatieobjecttype",
                         informatieobjecttype_url=iot_url,
+                        exc_info=exc,
+                    )
+                    result.excluded.append(
+                        ExcludedObject(
+                            object_type="InformatieObjectType",
+                            url=iot_url,
+                            reason=ExclusionReason.API_ERROR,
+                            error_message=str(exc),
+                            extra_context={"zaaktype_identificatie": ztc.identificatie},
+                        )
                     )
                     continue
-                ztiotc = info_map.get(info_type.url)
-                if ztiotc:
-                    # we got a record for this, see if we got data to update
+
+                if not info_type:
+                    result.excluded.append(
+                        ExcludedObject(
+                            object_type="InformatieObjectType",
+                            url=iot_url,
+                            reason=ExclusionReason.API_ERROR,
+                            error_message="API returned None",
+                            extra_context={"zaaktype_identificatie": ztc.identificatie},
+                        )
+                    )
+                    continue
+
+                if ztiotc := existing_map.get(info_type.url):
+                    # Update existing
+                    updated = False
+
+                    # Update omschrijving if changed
+                    if ztiotc.omschrijving != info_type.omschrijving:
+                        ztiotc.omschrijving = info_type.omschrijving
+                        updated = True
+
+                    # Track which zaaktype UUIDs use this informatieobjecttype
                     for using in using_zaak_types:
-                        # track which zaaktype UUID's are interested in this informationobjecttype
                         if using.uuid not in ztiotc.zaaktype_uuids:
                             ztiotc.zaaktype_uuids.append(using.uuid)
-                            if ztiotc not in create:
-                                update.append(ztiotc)
+                            updated = True
+
+                    if updated:
+                        try:
+                            ztiotc.save()
+                            if ztiotc not in result.updated:
+                                result.updated.append(ztiotc)
+                        except Exception as exc:
+                            logger.exception(
+                                "Failed to update informatieobjecttype config",
+                                informatieobjecttype_url=info_type.url,
+                                exc_info=exc,
+                            )
+                            result.excluded.append(
+                                ExcludedObject(
+                                    object_type="InformatieObjectType",
+                                    url=info_type.url,
+                                    reason=ExclusionReason.DATABASE_ERROR,
+                                    error_message=f"Save failed: {exc}",
+                                    extra_context={
+                                        "zaaktype_identificatie": ztc.identificatie
+                                    },
+                                )
+                            )
                 else:
-                    # new record
+                    # Create new
                     ztiotc = ZaakTypeInformatieObjectTypeConfig(
                         zaaktype_config=ztc,
                         informatieobjecttype_url=info_type.url,
                         omschrijving=info_type.omschrijving,
                         zaaktype_uuids=[zt.uuid for zt in using_zaak_types],
                     )
-                    create.append(ztiotc)
-                    # not strictly necessary but let's be accurate
-                    info_map[info_type.uuid] = ztiotc
+                    try:
+                        ztiotc.save()
+                        result.created.append(ztiotc)
+                        existing_map[info_type.url] = ztiotc
+                    except Exception as exc:
+                        logger.exception(
+                            "Failed to create informatieobjecttype config",
+                            informatieobjecttype_url=info_type.url,
+                            exc_info=exc,
+                        )
+                        result.excluded.append(
+                            ExcludedObject(
+                                object_type="InformatieObjectType",
+                                url=info_type.url,
+                                reason=ExclusionReason.DATABASE_ERROR,
+                                error_message=f"Save failed: {exc}",
+                                extra_context={
+                                    "zaaktype_identificatie": ztc.identificatie
+                                },
+                            )
+                        )
 
-        if create:
-            ZaakTypeInformatieObjectTypeConfig.objects.bulk_create(create)
-        if update:
-            ZaakTypeInformatieObjectTypeConfig.objects.bulk_update(
-                update, ["zaaktype_uuids"]
-            )
+        return result
 
-    return create
+    def import_statustype_configs_for_zaaktype(
+        self, ztc: ZaakTypeConfig
+    ) -> ZaakTypeRelatedImportResult[ZaakTypeStatusTypeConfig]:
+        """
+        Import statustype configurations for a specific zaaktype.
 
+        Args:
+            ztc: The ZaakTypeConfig to import statustypen for
 
-def import_statustype_configs_for_type(
-    ztc: ZaakTypeConfig,
-) -> list[ZaakTypeStatusTypeConfig]:
-    """
-    generate ZaakTypeStatusTypeConfigs for all StatusTypes used by each ZaakTypeConfigs source ZaakTypes
-
-    this is a bit complicated because one ZaakTypeConfig can represent multiple ZaakTypes
-    """
-    client = build_zgw_client_from_service(ztc.catalogus.service)
-    if not client:
-        logger.warning(
-            "Not importing statustype configs: could not build Catalogi API client"
+        Returns:
+            ZaakTypeRelatedImportResult with created/updated/excluded statustypen
+        """
+        result = ZaakTypeRelatedImportResult[ZaakTypeStatusTypeConfig](
+            zaaktype_config=ztc
         )
-        return []
+        zaak_types = self.get_api_zaaktypen_for_saved_ztc(ztc)
 
-    # grab actual ZaakTypes for this identificatie
-    zaak_types: list[ZaakType] = get_configurable_zaaktypes_by_identification(
-        client, ztc.identificatie, ztc.catalogus_url
-    )
-    if not zaak_types:
-        return []
-
-    create = []
-    update = []
-
-    with transaction.atomic():
-        # map existing config records by url
-
-        info_map = {
-            zaaktype_statustype.statustype_url: zaaktype_statustype
-            for zaaktype_statustype in ztc.zaaktypestatustypeconfig_set.all()
-        }
-
-        # collect and implicitly de-duplicate statustype url's and track which zaaktype used it
-        info_queue = defaultdict(list)
+        # Collect and implicitly de-duplicate statustype urls
+        status_queue = defaultdict(list)
         for zaak_type in zaak_types:
             for url in zaak_type.statustypen:
-                info_queue[url].append(zaak_type)
+                status_queue[url].append(zaak_type)
 
-        if info_queue:
-            # load urls and update/create records
-            for statustype_url, using_zaak_types in info_queue.items():
-                status_type = client.fetch_single_status_type(statustype_url)
-                if not status_type:  # Statustype isn't available anymore?
-                    logger.error(
-                        "Unable to obtain statustype, ignoring",
+        # Map existing config records by url
+        existing_map = {
+            ztstc.statustype_url: ztstc
+            for ztstc in ztc.zaaktypestatustypeconfig_set.all()
+        }
+
+        if status_queue:
+            for statustype_url, using_zaak_types in status_queue.items():
+                try:
+                    status_type = self.catalogi_client.fetch_single_status_type(
+                        statustype_url
+                    )
+                except Exception as exc:
+                    logger.exception(
+                        "Unable to obtain statustype",
                         statustype_url=statustype_url,
+                        exc_info=exc,
+                    )
+                    result.excluded.append(
+                        ExcludedObject(
+                            object_type="StatusType",
+                            url=statustype_url,
+                            reason=ExclusionReason.API_ERROR,
+                            error_message=str(exc),
+                            extra_context={"zaaktype_identificatie": ztc.identificatie},
+                        )
                     )
                     continue
 
-                zaaktype_statustype = info_map.get(status_type.url)
-                if zaaktype_statustype:
-                    # we got a record for this, see if we got data to update
+                if not status_type:
+                    result.excluded.append(
+                        ExcludedObject(
+                            object_type="StatusType",
+                            url=statustype_url,
+                            reason=ExclusionReason.API_ERROR,
+                            error_message="API returned None",
+                            extra_context={"zaaktype_identificatie": ztc.identificatie},
+                        )
+                    )
+                    continue
+
+                if ztstc := existing_map.get(status_type.url):
+                    # Update existing
+                    updated = False
+
+                    # Update all overlapping fields
+                    if ztstc.omschrijving != status_type.omschrijving:
+                        ztstc.omschrijving = status_type.omschrijving
+                        updated = True
+
+                    if ztstc.statustekst != status_type.statustekst:
+                        ztstc.statustekst = status_type.statustekst
+                        updated = True
+
+                    # Track which zaaktype UUIDs use this statustype
                     for using in using_zaak_types:
-                        # track which zaaktype UUID's are interested in this statustype
-                        if using.uuid not in zaaktype_statustype.zaaktype_uuids:
-                            zaaktype_statustype.zaaktype_uuids.append(using.uuid)
-                            if zaaktype_statustype not in create:
-                                update.append(zaaktype_statustype)
+                        if using.uuid not in ztstc.zaaktype_uuids:
+                            ztstc.zaaktype_uuids.append(using.uuid)
+                            updated = True
+
+                    if updated:
+                        try:
+                            ztstc.save()
+                            if ztstc not in result.updated:
+                                result.updated.append(ztstc)
+                        except Exception as exc:
+                            logger.exception(
+                                "Failed to update statustype config",
+                                statustype_url=status_type.url,
+                                exc_info=exc,
+                            )
+                            result.excluded.append(
+                                ExcludedObject(
+                                    object_type="StatusType",
+                                    url=status_type.url,
+                                    reason=ExclusionReason.DATABASE_ERROR,
+                                    error_message=f"Save failed: {exc}",
+                                    extra_context={
+                                        "zaaktype_identificatie": ztc.identificatie
+                                    },
+                                )
+                            )
                 else:
-                    # new record
-                    zaaktype_statustype = ZaakTypeStatusTypeConfig(
+                    # Create new
+                    ztstc = ZaakTypeStatusTypeConfig(
                         zaaktype_config=ztc,
                         statustype_url=status_type.url,
                         omschrijving=status_type.omschrijving,
                         statustekst=status_type.statustekst,
                         zaaktype_uuids=[zt.uuid for zt in using_zaak_types],
                     )
-                    create.append(zaaktype_statustype)
-                    # not strictly necessary but let's be accurate
-                    info_map[status_type.uuid] = zaaktype_statustype
+                    try:
+                        ztstc.save()
+                        result.created.append(ztstc)
+                        existing_map[status_type.url] = ztstc
+                    except Exception as exc:
+                        logger.exception(
+                            "Failed to create statustype config",
+                            statustype_url=status_type.url,
+                            exc_info=exc,
+                        )
+                        result.excluded.append(
+                            ExcludedObject(
+                                object_type="StatusType",
+                                url=status_type.url,
+                                reason=ExclusionReason.DATABASE_ERROR,
+                                error_message=f"Save failed: {exc}",
+                                extra_context={
+                                    "zaaktype_identificatie": ztc.identificatie
+                                },
+                            )
+                        )
 
-        if create:
-            ZaakTypeStatusTypeConfig.objects.bulk_create(create)
-        if update:
-            ZaakTypeStatusTypeConfig.objects.bulk_update(update, ["zaaktype_uuids"])
+        return result
 
-    return create
+    def import_resultaattype_configs_for_zaaktype(
+        self, ztc: ZaakTypeConfig
+    ) -> ZaakTypeRelatedImportResult[ZaakTypeResultaatTypeConfig]:
+        """
+        Import resultaattype configurations for a specific zaaktype.
 
+        Args:
+            ztc: The ZaakTypeConfig to import resultaattypen for
 
-def import_resultaattype_configs_for_type(
-    ztc: ZaakTypeConfig,
-) -> list[ZaakTypeResultaatTypeConfig]:
-    """
-    generate ZaakTypeResultaatTypeConfigs for all ResultaatTypes used by each ZaakTypeConfigs source ZaakTypes
-
-    this is a bit complicated because one ZaakTypeConfig can represent multiple ZaakTypes
-    """
-    client = build_zgw_client_from_service(ztc.catalogus.service)
-    if not client:
-        logger.warning(
-            "Not importing resultaattype configs: could not build Catalogi API client"
+        Returns:
+            ZaakTypeRelatedImportResult with created/updated/excluded resultaattypen
+        """
+        result = ZaakTypeRelatedImportResult[ZaakTypeResultaatTypeConfig](
+            zaaktype_config=ztc
         )
-        return []
 
-    # grab actual ZaakTypes for this identificatie
-    zaak_types: list[ZaakType] = get_configurable_zaaktypes_by_identification(
-        client, ztc.identificatie, ztc.catalogus_url
-    )
-    if not zaak_types:
-        return []
+        zaak_types = self.get_api_zaaktypen_for_saved_ztc(ztc)
 
-    create = []
-    update = []
-
-    with transaction.atomic():
-        # map existing config records by url
-
-        info_map = {
-            zaaktype_resultaattype.resultaattype_url: zaaktype_resultaattype
-            for zaaktype_resultaattype in ztc.zaaktyperesultaattypeconfig_set.all()
+        # Map existing config records by url
+        existing_map = {
+            ztrtc.resultaattype_url: ztrtc
+            for ztrtc in ztc.zaaktyperesultaattypeconfig_set.all()
         }
 
-        # collect and implicitly de-duplicate resultaattype url's and track which zaaktype used it
-        info_queue = defaultdict(list)
+        # Collect and implicitly de-duplicate resultaattype urls
+        resultaat_queue = defaultdict(list)
         for zaak_type in zaak_types:
             for url in zaak_type.resultaattypen:
-                info_queue[url].append(zaak_type)
+                resultaat_queue[url].append(zaak_type)
 
-        if info_queue:
-            # load urls and update/create records
-            for resultaattype_url, using_zaak_types in info_queue.items():
-                resultaat_type = client.fetch_single_resultaat_type(resultaattype_url)
-                if not resultaat_type:
-                    logger.error(
-                        "Unable to obtain resultaattype, ignoring",
+        if resultaat_queue:
+            for resultaattype_url, using_zaak_types in resultaat_queue.items():
+                try:
+                    resultaat_type = self.catalogi_client.fetch_single_resultaat_type(
+                        resultaattype_url
+                    )
+                except Exception as exc:
+                    logger.exception(
+                        "Unable to obtain resultaattype",
                         resultaattype_url=resultaattype_url,
+                        exc_info=exc,
+                    )
+                    result.excluded.append(
+                        ExcludedObject(
+                            object_type="ResultaatType",
+                            url=resultaattype_url,
+                            reason=ExclusionReason.API_ERROR,
+                            error_message=str(exc),
+                            extra_context={"zaaktype_identificatie": ztc.identificatie},
+                        )
                     )
                     continue
-                zaaktype_resultaattype = info_map.get(resultaat_type.url)
-                if zaaktype_resultaattype:
-                    # we got a record for this, see if we got data to update
+
+                if not resultaat_type:
+                    result.excluded.append(
+                        ExcludedObject(
+                            object_type="ResultaatType",
+                            url=resultaattype_url,
+                            reason=ExclusionReason.API_ERROR,
+                            error_message="API returned None",
+                            extra_context={"zaaktype_identificatie": ztc.identificatie},
+                        )
+                    )
+                    continue
+
+                if ztrtc := existing_map.get(resultaat_type.url):
+                    # Update existing
+                    updated = False
+
+                    # Update omschrijving if changed
+                    if ztrtc.omschrijving != resultaat_type.omschrijving:
+                        ztrtc.omschrijving = resultaat_type.omschrijving
+                        updated = True
+
+                    # Track which zaaktype UUIDs use this resultaattype
                     for using in using_zaak_types:
-                        # track which zaaktype UUID's are interested in this resultaattype
-                        if using.uuid not in zaaktype_resultaattype.zaaktype_uuids:
-                            zaaktype_resultaattype.zaaktype_uuids.append(using.uuid)
-                            if zaaktype_resultaattype not in create:
-                                update.append(zaaktype_resultaattype)
+                        if using.uuid not in ztrtc.zaaktype_uuids:
+                            ztrtc.zaaktype_uuids.append(using.uuid)
+                            updated = True
+
+                    if updated:
+                        try:
+                            ztrtc.save()
+                            if ztrtc not in result.updated:
+                                result.updated.append(ztrtc)
+                        except Exception as exc:
+                            logger.exception(
+                                "Failed to update resultaattype config",
+                                resultaattype_url=resultaat_type.url,
+                                exc_info=exc,
+                            )
+                            result.excluded.append(
+                                ExcludedObject(
+                                    object_type="ResultaatType",
+                                    url=resultaat_type.url,
+                                    reason=ExclusionReason.DATABASE_ERROR,
+                                    error_message=f"Save failed: {exc}",
+                                    extra_context={
+                                        "zaaktype_identificatie": ztc.identificatie
+                                    },
+                                )
+                            )
                 else:
-                    # new record
-                    zaaktype_resultaattype = ZaakTypeResultaatTypeConfig(
+                    # Create new
+                    ztrtc = ZaakTypeResultaatTypeConfig(
                         zaaktype_config=ztc,
                         resultaattype_url=resultaat_type.url,
                         omschrijving=resultaat_type.omschrijving,
                         zaaktype_uuids=[zt.uuid for zt in using_zaak_types],
                     )
-                    create.append(zaaktype_resultaattype)
-                    # not strictly necessary but let's be accurate
-                    info_map[resultaat_type.uuid] = zaaktype_resultaattype
+                    try:
+                        ztrtc.save()
+                        result.created.append(ztrtc)
+                        existing_map[resultaat_type.url] = ztrtc
+                    except Exception as exc:
+                        logger.exception(
+                            "Failed to create resultaattype config",
+                            resultaattype_url=resultaat_type.url,
+                            exc_info=exc,
+                        )
+                        result.excluded.append(
+                            ExcludedObject(
+                                object_type="ResultaatType",
+                                url=resultaat_type.url,
+                                reason=ExclusionReason.DATABASE_ERROR,
+                                error_message=f"Save failed: {exc}",
+                                extra_context={
+                                    "zaaktype_identificatie": ztc.identificatie
+                                },
+                            )
+                        )
 
-        if create:
-            ZaakTypeResultaatTypeConfig.objects.bulk_create(create)
-        if update:
-            ZaakTypeResultaatTypeConfig.objects.bulk_update(update, ["zaaktype_uuids"])
-
-    return create
+        return result
